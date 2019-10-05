@@ -4,7 +4,6 @@ import { observer } from 'mobx-react';
 import { ROUTES } from '../../routes-config';
 import environment from '../../environment';
 import type { InjectedProps } from '../../types/injectedPropsType';
-import Wallet from '../../domain/Wallet';
 import URILandingDialogContainer from './URILandingDialogContainer';
 
 type Props = InjectedProps;
@@ -22,8 +21,8 @@ export default class URILandingPage extends Component<Props> {
     const { wallets } = this.props.stores.substores[environment.API];
     let params = {};
     if (wallets.hasAnyWallets && wallets.first) {
-      const firstWallet: Wallet = wallets.first;
-      params = { id: firstWallet.id };
+      const firstWallet = wallets.first;
+      params = { id: firstWallet.self.getPublicDeriverId() };
     }
     // this will automatically reroute to the right page if no wallet exists
     this.props.actions.router.goToRoute.trigger({

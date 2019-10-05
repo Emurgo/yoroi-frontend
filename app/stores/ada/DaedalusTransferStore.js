@@ -29,6 +29,9 @@ import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import {
   asHasChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import type {
+  PublicDeriverWithCachedMeta
+} from '../base/WalletStore';
 
 declare var CONFIG: ConfigType;
 const websocketUrl = CONFIG.network.websocketUrl;
@@ -110,9 +113,8 @@ export default class DaedalusTransferStore extends Store {
    */
   _setupTransferWebSocket = async (
     wallet: RustModule.Wallet.DaedalusWallet,
+    publicDeriver: PublicDeriverWithCachedMeta,
   ): Promise<void> => {
-    const publicDeriver = this.stores.substores.ada.wallets.selected;
-    if (!publicDeriver) throw new Error('_setupTransferWebSocket no wallet selected');
     const withChains = asHasChains(publicDeriver.self);
     if (!withChains) throw new Error('_setupTransferWebSocket missing chains functionality');
     const nextInternal = await withChains.nextInternal();
@@ -193,7 +195,10 @@ export default class DaedalusTransferStore extends Store {
     });
   };
 
-  _setupTransferFundsWithMnemonic = async (payload: { recoveryPhrase: string }): Promise<void> => {
+  _setupTransferFundsWithMnemonic = async (payload: {
+    recoveryPhrase: string,
+    publicDeriver: PublicDeriverWithCachedMeta,
+  }): Promise<void> => {
     let { recoveryPhrase: secretWords } = payload;
     if (secretWords.split(' ').length === 27) {
       const [newSecretWords, unscrambledLen] =
@@ -208,15 +213,20 @@ export default class DaedalusTransferStore extends Store {
     }
 
     await this._setupTransferWebSocket(
-      getCryptoDaedalusWalletFromMnemonics(secretWords)
+      getCryptoDaedalusWalletFromMnemonics(secretWords),
+      payload.publicDeriver,
     );
   }
 
-  _setupTransferFundsWithMasterKey = async (payload: { masterKey: string }): Promise<void> => {
+  _setupTransferFundsWithMasterKey = async (payload: {
+    masterKey: string,
+    publicDeriver: PublicDeriverWithCachedMeta,
+  }): Promise<void> => {
     const { masterKey: key } = payload;
 
     await this._setupTransferWebSocket(
-      getCryptoDaedalusWalletFromMasterKey(key)
+      getCryptoDaedalusWalletFromMasterKey(key),
+      payload.publicDeriver,
     );
   }
 
@@ -239,7 +249,8 @@ export default class DaedalusTransferStore extends Store {
 
   /** Broadcast the transfer transaction if one exists and proceed to continuation */
   _transferFunds = async (payload: {
-    next: Function
+    next: Function,
+    publicDeriver: PublicDeriverWithCachedMeta,
   }): Promise<void> => {
     try {
       const { next } = payload;
@@ -249,7 +260,7 @@ export default class DaedalusTransferStore extends Store {
       await this.transferFundsRequest.execute({
         signedTx: this.transferTx.signedTx
       });
-      // TBD: why do we need a continuation instead of just pustting the code here directly?
+      // TBD: why do we need a continuation instead of just putting the code here directly?
       next();
       this._reset();
     } catch (error) {

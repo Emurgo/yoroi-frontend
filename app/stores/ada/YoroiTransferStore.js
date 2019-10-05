@@ -25,6 +25,7 @@ import { verifyAccountLevel } from '../../api/ada/lib/utils';
 import {
   asHasChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import type { PublicDeriverWithCachedMeta } from '../base/WalletStore';
 
 type TransferFundsRequest = {
   signedTx: RustModule.Wallet.SignedTransaction,
@@ -103,11 +104,10 @@ export default class YoroiTransferStore extends Store {
 
   _generateTransferTxFromMnemonic = async (
     recoveryPhrase: string,
-    updateStatusCallback: void=>void
+    updateStatusCallback: void=>void,
+    publicDeriver: PublicDeriverWithCachedMeta,
   ): Promise<TransferTx> => {
     // 1) get receive address
-    const publicDeriver = this.stores.substores.ada.wallets.selected;
-    if (!publicDeriver) throw new Error('_setupTransferWebSocket no wallet selected');
     const withChains = asHasChains(publicDeriver.self);
     if (!withChains) throw new Error('_setupTransferWebSocket missing chains functionality');
     const nextInternal = await withChains.nextInternal();
@@ -147,10 +147,10 @@ export default class YoroiTransferStore extends Store {
       addressKeys[addressInfo.address] = keyPrv;
     });
 
-    // 4) Send transaction
+    // 4) generate transaction
 
     // Possible exception: NotEnoughMoneyToSendError
-    return generateTransferTx({
+    return await generateTransferTx({
       outputAddr: nextInternalAddress,
       addressKeys,
       getUTXOsForAddresses:
@@ -159,12 +159,16 @@ export default class YoroiTransferStore extends Store {
     });
   }
 
-  _setupTransferFundsWithMnemonic = async (payload: { recoveryPhrase: string }): Promise<void> => {
+  _setupTransferFundsWithMnemonic = async (payload: {
+    recoveryPhrase: string,
+    publicDeriver: PublicDeriverWithCachedMeta,
+  }): Promise<void> => {
     this._updateStatus('checkingAddresses');
     this.recoveryPhrase = payload.recoveryPhrase;
     const transferTx = await this._generateTransferTxFromMnemonic(
       payload.recoveryPhrase,
-      () => this._updateStatus('generatingTx')
+      () => this._updateStatus('generatingTx'),
+      payload.publicDeriver
     );
     runInAction(() => {
       this.transferTx = transferTx;
@@ -185,14 +189,16 @@ export default class YoroiTransferStore extends Store {
 
   /** Broadcast the transfer transaction if one exists and proceed to continuation */
   _transferFunds = async (payload: {
-    next: void => void
+    next: void => void,
+    publicDeriver: PublicDeriverWithCachedMeta,
   }): Promise<void> => {
     /*
      Always re-recover from the mnemonics to reduce the chance that the wallet
      changes before the tx is submit (we can't really eliminate it).
      */
     const transferTx = await this._generateTransferTxFromMnemonic(
-      this.recoveryPhrase, () => {}
+      this.recoveryPhrase, () => {},
+      payload.publicDeriver,
     );
     if (!this.transferTx) {
       throw new NoTransferTxError();
@@ -216,7 +222,8 @@ export default class YoroiTransferStore extends Store {
            This should be very rare because the window is short.
         */
         const newTransferTx = await this._generateTransferTxFromMnemonic(
-          this.recoveryPhrase, () => {}
+          this.recoveryPhrase, () => {},
+          payload.publicDeriver,
         );
         if (this._isWalletChanged(newTransferTx, transferTx)) {
           return this._handleWalletChanged(newTransferTx);

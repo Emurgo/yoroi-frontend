@@ -34,6 +34,9 @@ import {
   isTrezorTWallet,
   isLedgerNanoSWallet,
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import {
+  PublicDeriver,
+} from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 export default class AddressesStore extends Store {
   @observable isActionProcessing: boolean = false;
@@ -49,7 +52,9 @@ export default class AddressesStore extends Store {
     actions.closeAddressDetailDialog.listen(this._closeAddressDetailDialog);
   }
 
-  @action _verifyAddress = async (): Promise<void> => {
+  @action _verifyAddress = async (
+    publicDeriver: PublicDeriver,
+  ): Promise<void> => {
     Logger.info('AddressStore::_verifyAddress called');
 
     if (!this.selectedAddress) {
@@ -61,13 +66,7 @@ export default class AddressesStore extends Store {
     const path = toJS(selectedAddress.path);
     const address = toJS(selectedAddress.address);
 
-    const { wallets } = this.stores.substores[environment.API];
-    const publicDeriver = wallets.selected;
-    if (!publicDeriver) {
-      // this Error will be converted to LocalizableError()
-      throw new Error('_verifyAddress Active wallet required before verifying address.');
-    }
-    const conceptualWallet = publicDeriver.self.getConceptualWallet();
+    const conceptualWallet = publicDeriver.getConceptualWallet();
 
     this._setError(null);
     this._setActionProcessing(true);

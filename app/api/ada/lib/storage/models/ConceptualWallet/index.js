@@ -60,6 +60,11 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
   getWalletType = (): WalletType => {
     return this.walletType;
   }
+  /**
+   * TODO: maybe  we shouldn't cache in this way
+   * since information like device ID, firmware version, etc.
+   * can change every time the user uses the HW wallet
+   */
   getHwWalletMeta = (): ?$ReadOnly<HwWalletMetaRow> => {
     return this.hardwareInfo;
   }

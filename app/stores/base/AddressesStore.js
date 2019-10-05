@@ -1,6 +1,6 @@
 // @flow
 import { observable, computed, action, runInAction } from 'mobx';
-import _ from 'lodash';
+import { find } from 'lodash';
 import Store from './Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import Request from '../lib/LocalizedRequest';
@@ -25,12 +25,12 @@ import {
 import { EXTERNAL, INTERNAL } from '../../config/numbersConfig';
 import type { PublicDeriverWithCachedMeta, } from  './WalletStore';
 
-type StandardAddress = {|
+export type StandardAddress = {|
   ...Address, ...Value, ...Addressing, ...UsedStatus
 |};
 
 type SubRequestType<T> = { publicDeriver: PublicDeriver } => Promise<Array<T>>;
-class AddressTypeStore<T> {
+export class AddressTypeStore<T> {
 
   @observable addressesRequests: Array<{
     publicDeriver: PublicDeriver,
@@ -62,7 +62,7 @@ class AddressTypeStore<T> {
     return result ? result.length > 0 : false;
   }
 
-  @computed get active(): ?T {
+  @computed get last(): ?T {
     const publicDeriver = this.stores.substores[environment.API].wallets.selected;
     if (!publicDeriver) return;
     const result = this._flowCoerceResult(this._getRequest(publicDeriver.self));
@@ -92,7 +92,7 @@ class AddressTypeStore<T> {
   }
 
   _getRequest: (PublicDeriver) => CachedRequest<SubRequestType<T>> = (publicDeriver) => {
-    const foundRequest = _.find(this.addressesRequests, { publicDeriver });
+    const foundRequest = find(this.addressesRequests, { publicDeriver });
     if (foundRequest && foundRequest.cachedRequest) {
       return foundRequest.cachedRequest;
     }

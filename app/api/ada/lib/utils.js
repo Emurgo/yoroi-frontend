@@ -220,7 +220,7 @@ export function signRequestTotalInput(req: BaseSignRequest, shift: boolean): Big
     .reduce((sum, val) => sum.plus(val), new BigNumber(0));
 
   const change = req.changeAddr
-    .map(val => new BigNumber(val.value))
+    .map(val => new BigNumber(val.value || new BigNumber(0)))
     .reduce((sum, val) => sum.plus(val), new BigNumber(0));
 
   let result = inputTotal.minus(change);

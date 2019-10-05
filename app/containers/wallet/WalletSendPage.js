@@ -27,6 +27,8 @@ import {
   signRequestReceivers,
   signRequestTotalInput,
 } from '../../api/ada/lib/utils';
+import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import { isLedgerNanoSWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 
 // Hardware Wallet Confirmation
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
@@ -72,9 +74,9 @@ export default class WalletSendPage extends Component<Props> {
 
   render() {
     const { wallets, transactions, transactionBuilderStore } = this.props.stores.substores.ada;
-    const activeWallet = wallets.active;
+    const publicDeriver = wallets.selected;
     // Guard against potential null values
-    if (!activeWallet) throw new Error('Active wallet required for WalletSendPage.');
+    if (!publicDeriver) throw new Error('Active wallet required for WalletSendPage.');
 
     const { intl } = this.context;
     const { uiDialogs, profile } = this.props.stores;
@@ -88,7 +90,8 @@ export default class WalletSendPage extends Component<Props> {
       actions.dialogs.closeActiveDialog.trigger();
     }
 
-    const targetDialog =  activeWallet.isHardwareWallet ?
+    const walletType = publicDeriver.self.getConceptualWallet().getWalletType();
+    const targetDialog = walletType === WalletTypeOption.HARDWARE_WALLET ?
       HWSendConfirmationDialog :
       WalletSendConfirmationDialog;
 
@@ -165,10 +168,10 @@ export default class WalletSendPage extends Component<Props> {
     * separate container is not needed, this container acts as container for Confirmation dialog */
   hardwareWalletDoConfirmation = (): Node => {
     const { intl } = this.context;
-    const { active } = this.props.stores.substores[environment.API].wallets;
+    const publicDeriver = this.props.stores.substores[environment.API].wallets.selected;
     const { transactionBuilderStore } = this.props.stores.substores.ada;
     // Guard against potential null values
-    if (!active) throw new Error('Active wallet required for hardwareWalletDoConfirmation.');
+    if (!publicDeriver) throw new Error('Active wallet required for hardwareWalletDoConfirmation.');
 
     if (!transactionBuilderStore.tentativeTx) {
       throw new Error('hardwareWalletDoConfirmation::should never happen');
@@ -179,8 +182,9 @@ export default class WalletSendPage extends Component<Props> {
     const fee = signRequestFee(signRequest, true);
     const receivers = signRequestReceivers(signRequest, false);
 
+    const conceptualWallet = publicDeriver.self.getConceptualWallet();
     let hwSendConfirmationDialog: Node = null;
-    if (active.isLedgerNanoSWallet) {
+    if (isLedgerNanoSWallet(conceptualWallet)) {
       const ledgerSendAction = this.props.actions[environment.API].ledgerSend;
       ledgerSendAction.init.trigger();
       const ledgerSendStore = this.props.stores.substores[environment.API].ledgerSend;
@@ -205,7 +209,7 @@ export default class WalletSendPage extends Component<Props> {
           onCancel={ledgerSendAction.cancel.trigger}
           classicTheme={this.props.stores.profile.isClassicTheme}
         />);
-    } else if (active.isTrezorTWallet) {
+    } else if (isTrezorTWallet(conceptualWallet)) {
       const trezorSendAction = this.props.actions[environment.API].trezorSend;
       const trezorSendStore = this.props.stores.substores[environment.API].trezorSend;
       hwSendConfirmationDialog = (

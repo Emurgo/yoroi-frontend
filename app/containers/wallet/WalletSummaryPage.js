@@ -71,8 +71,8 @@ export default class WalletSummaryPage extends Component<Props> {
             isLoadingTransactions={!recentTransactionsRequest.wasExecuted}
             hasMoreToLoad={totalAvailable > limit}
             onLoadMore={() => actions.ada.transactions.loadMoreTransactions.trigger()}
-            assuranceMode={wallet.assuranceMode}
-            walletId={wallet.id}
+            assuranceMode={publicDeriver.assuranceMode}
+            walletId={publicDeriver.self.getPublicDeriverId().toString()}
             formattedWalletAmount={formattedWalletAmount}
           />
         );

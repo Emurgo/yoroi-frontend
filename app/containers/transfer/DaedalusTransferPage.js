@@ -16,6 +16,7 @@ import { ROUTES } from '../../routes-config';
 import config from '../../config';
 
 import { formattedWalletAmount } from '../../utils/formatters';
+import type { PublicDeriverWithCachedMeta } from '../../stores/base/WalletStore';
 
 @observer
 export default class DaedalusTransferPage extends Component<InjectedProps> {
@@ -42,28 +43,39 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     this._getDaedalusTransferActions().startTransferMasterKey.trigger();
   }
 
-  setupTransferFundsWithMnemonic = (payload: { recoveryPhrase: string }) => {
+  setupTransferFundsWithMnemonic = (payload: {
+    recoveryPhrase: string,
+    publicDeriver: PublicDeriverWithCachedMeta,
+  }) => {
     this._getDaedalusTransferActions().setupTransferFundsWithMnemonic.trigger(payload);
   };
 
-  setupTransferFundsWithMasterKey = (payload: { masterKey: string }) => {
+  setupTransferFundsWithMasterKey = (payload: {
+    masterKey: string,
+    publicDeriver: PublicDeriverWithCachedMeta,
+  }) => {
     this._getDaedalusTransferActions().setupTransferFundsWithMasterKey.trigger(payload);
   };
 
   /** Broadcast the transfer transaction if one exists and return to wallet page */
   tranferFunds = () => {
+    const walletsStore = this._getWalletsStore();
+    const publicDeriver = walletsStore.selected;
+    if (publicDeriver == null) {
+      throw new Error('tranferFunds no wallet selected');
+    }
     // broadcast transfer transaction then call continuation
     this._getDaedalusTransferActions().transferFunds.trigger({
       next: () => {
-        const walletsStore = this._getWalletsStore();
-        walletsStore.refreshWalletsData();
+        walletsStore.refreshWallet(publicDeriver);
         if (walletsStore.activeWalletRoute != null) {
           const newRoute = walletsStore.activeWalletRoute;
           this._getRouter().goToRoute.trigger({
             route: newRoute
           });
         }
-      }
+      },
+      publicDeriver
     });
   }
 

@@ -50,6 +50,7 @@ function groupWallets(
   return Array.from(pairingMap.values());
 }
 
+// TODO: should be made into a Domain class
 export type PublicDeriverWithCachedMeta = {|
   self: PublicDeriver,
   // no plate if no public key
