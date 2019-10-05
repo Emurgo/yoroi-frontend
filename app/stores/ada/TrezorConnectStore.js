@@ -11,7 +11,6 @@ import Config from '../../config';
 import environment from '../../environment';
 
 import Store from '../base/Store';
-import Wallet from '../../domain/Wallet';
 import LocalizedRequest from '../lib/LocalizedRequest';
 
 import globalMessages from '../../i18n/global-messages';
@@ -37,6 +36,8 @@ import type {
   CreateHardwareWalletRequest,
   CreateHardwareWalletFunc,
 } from '../../api/ada';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
+
 
 type TrezorConnectionResponse = {
   trezorResp: CardanoGetPublicKey$,
@@ -62,7 +63,7 @@ export default class TrezorConnectStore
   get defaultWalletName(): string {
     let defaultWalletName = '';
     if (this.hwDeviceInfo && this.hwDeviceInfo.hwFeatures) {
-      defaultWalletName = this.hwDeviceInfo.hwFeatures.label;
+      defaultWalletName = this.hwDeviceInfo.hwFeatures.Label;
     }
     return defaultWalletName;
   }
@@ -234,14 +235,14 @@ export default class TrezorConnectStore
     return {
       publicMasterKey: trezorResp.payload.publicKey,
       hwFeatures: {
-        vendor: deviceFeatures.vendor,
-        model: deviceFeatures.model,
-        deviceId: deviceFeatures.device_id,
-        label: deviceFeatures.label,
-        majorVersion: deviceFeatures.major_version,
-        minorVersion: deviceFeatures.minor_version,
-        patchVersion: deviceFeatures.patch_version,
-        language: deviceFeatures.language,
+        Vendor: deviceFeatures.vendor,
+        Model: deviceFeatures.model,
+        DeviceId: deviceFeatures.device_id,
+        Label: deviceFeatures.label,
+        MajorVersion: deviceFeatures.major_version,
+        MinorVersion: deviceFeatures.minor_version,
+        PatchVersion: deviceFeatures.patch_version,
+        Language: deviceFeatures.language,
       }
     };
   }
@@ -339,28 +340,40 @@ export default class TrezorConnectStore
   };
 
   /** SAVE dialog submit (Save button) */
-  @action _submitSave = async (walletName: string): Promise<void> => {
+  @action _submitSave = async (request: {
+    walletName: string,
+    derivationIndex: number,
+  }): Promise<void> => {
     this.error = null;
     this.progressInfo.currentStep = ProgressStep.SAVE;
     this.progressInfo.stepState = StepState.PROCESS;
 
-    await this._saveHW(walletName);
+    await this._saveHW(
+      request.walletName,
+      request.derivationIndex,
+    );
   };
 
   /** creates new wallet and loads it */
-  _saveHW = async (walletName: string): Promise<void>  => {
+  _saveHW = async (
+    walletName: string,
+    derivationIndex: number,
+  ): Promise<void>  => {
     try {
       Logger.debug('TrezorConnectStore::_saveHW:: stated');
       this._setIsCreateHWActive(true);
       this.createHWRequest.reset();
 
-      const reqParams = this._prepareCreateHWReqParams(walletName);
+      const reqParams = this._prepareCreateHWReqParams(
+        walletName,
+        derivationIndex,
+      );
       this.createHWRequest.execute(reqParams);
       if (!this.createHWRequest.promise) throw new Error('should never happen');
 
-      const trezorWallet = await this.createHWRequest.promise;
+      const newWallet = await this.createHWRequest.promise;
 
-      await this._onSaveSucess(trezorWallet);
+      await this._onSaveSucess(newWallet.publicDeriver);
     } catch (error) {
       Logger.error(`TrezorConnectStore::_saveHW::error ${stringifyError(error)}`);
 
@@ -381,17 +394,27 @@ export default class TrezorConnectStore
     }
   };
 
-  _prepareCreateHWReqParams = (walletName: string): CreateHardwareWalletRequest => {
+  _prepareCreateHWReqParams = (
+    walletName: string,
+    derivationIndex: number,
+  ): CreateHardwareWalletRequest => {
     if (this.hwDeviceInfo == null
       || this.hwDeviceInfo.publicMasterKey == null
       || this.hwDeviceInfo.hwFeatures == null) {
       throw new Error('Trezor device hardware info not valid');
     }
 
+    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
+    if (persistentDb == null) {
+      throw new Error('_prepareCreateHWReqParams db not loaded. Should never happen');
+    }
+
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     return {
+      db: persistentDb,
+      derivationIndex,
       walletName,
-      publicMasterKey: this.hwDeviceInfo.publicMasterKey,
+      publicKey: this.hwDeviceInfo.publicMasterKey,
       hwFeatures: this.hwDeviceInfo.hwFeatures,
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
     };
@@ -402,21 +425,13 @@ export default class TrezorConnectStore
     this.progressInfo.stepState = StepState.ERROR;
   };
 
-  _onSaveSucess = async (trezorWallet: Wallet) => {
+  _onSaveSucess = async (publicDeriver: PublicDeriver) => {
     // close the active dialog
     Logger.debug('TrezorConnectStore::_saveTrezor success, closing dialog');
     this.actions.dialogs.closeActiveDialog.trigger();
 
     const { wallets } = this.stores.substores[environment.API];
-    await wallets._patchWalletRequestWithNewWallet(trezorWallet);
-
-    // goto the wallet transactions page
-    Logger.debug('TrezorConnectStore::_saveTrezor setting new walles as active wallet');
-    wallets.goToWalletRoute(trezorWallet.id);
-
-    // fetch its data
-    Logger.debug('TrezorConnectStore::_saveTrezor loading wallet data');
-    await wallets.refreshWalletsData();
+    await wallets.addHwWallet(publicDeriver);
 
     // show success notification
     wallets.showTrezorTWalletIntegratedNotification();

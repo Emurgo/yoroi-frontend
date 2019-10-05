@@ -96,19 +96,25 @@ export interface HWConnectStoreTypes<ConnectionResponse> {
   _goToSaveLoad(): void;
 
   /** SAVE dialog submit (Save button) */
-  _submitSave(walletName: string): Promise<void>;
+  _submitSave(request: {
+    walletName: string,
+    derivationIndex: number,
+  }): Promise<void>;
 
   _goToSaveError(): void;
 
   /** creates new wallet and loads it */
-  _saveHW(walletName: string): Promise<void>;
-
-  _prepareCreateHWReqParams(walletName: string): CreateHardwareWalletRequest;
-
-  _onSaveSucess(
-    conceptualWallet: ConceptualWallet,
-    publicDerivers: PublicDeriver,
+  _saveHW(
+    walletName: string,
+    derivationIndex: number,
   ): Promise<void>;
+
+  _prepareCreateHWReqParams(
+    walletName: string,
+    derivationIndex: number,
+  ): CreateHardwareWalletRequest;
+
+  _onSaveSucess(publicDeriver: PublicDeriver): Promise<void>;
   // =================== SAVE =================== //
 
   // =================== API =================== //

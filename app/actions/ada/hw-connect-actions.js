@@ -9,5 +9,8 @@ export default class HWConnectActions {
   submitCheck: Action<void> = new Action();
   goBackToCheck: Action<void> = new Action();
   submitConnect: Action<void> = new Action();
-  submitSave: Action<string> = new Action();
+  submitSave: Action<{
+    walletName: string,
+    derivationIndex: number,
+  }> = new Action();
 }

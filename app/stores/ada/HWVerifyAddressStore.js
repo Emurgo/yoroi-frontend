@@ -31,8 +31,6 @@ import {
   convertToLocalizableError as trezorErrorToLocalized
 } from '../../domain/TrezorLocalizedError';
 
-import Wallet from '../../domain/Wallet';
-
 export default class AddressesStore extends Store {
   @observable isActionProcessing: boolean = false;
   @observable error: ?LocalizableError = null;

@@ -494,7 +494,7 @@ export type CreateHardwareWalletRequest = {
 };
 export type CreateHardwareWalletResponse = {
   bip44Wallet: Bip44Wallet,
-  publicDerivers: Array<PublicDeriver>,
+  publicDeriver: PublicDeriver,
 };
 export type CreateHardwareWalletFunc = (
   request: CreateHardwareWalletRequest
@@ -1192,18 +1192,20 @@ export default class AdaApi {
         wallet.bip44WrapperRow,
         protocolMagic,
       );
-      const newPubDerivers = [];
-      for (const pubDeriver of wallet.publicDeriver) {
-        newPubDerivers.push(await PublicDeriver.createPublicDeriver(
-          pubDeriver.publicDeriverResult,
-          bip44Wallet,
-        ));
+
+      if (wallet.publicDeriver.length !== 1) {
+        throw new Error('createHardwareWallet should only do 1 HW derivation at a time');
       }
+      const pubDeriverResult = wallet.publicDeriver[0].publicDeriverResult;
+      const newPubDeriver = await PublicDeriver.createPublicDeriver(
+        pubDeriverResult,
+        bip44Wallet,
+      );
 
       Logger.debug('AdaApi::restoreWallet success');
       return {
         bip44Wallet,
-        publicDerivers: newPubDerivers,
+        publicDeriver: newPubDeriver,
       };
     } catch (error) {
       Logger.error('AdaApi::createHardwareWallet error: ' + stringifyError(error));

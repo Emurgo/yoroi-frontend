@@ -190,7 +190,6 @@ export default class WalletsStore extends Store {
     return matchRoute(ROUTES.WALLETS.ROOT + '(/*rest)', currentRoute);
   }
 
-
   getWalletRoute = (
     publicDeriver: PublicDeriver,
     page: string = 'transactions'
@@ -208,6 +207,18 @@ export default class WalletsStore extends Store {
   ): void {
     this.stores.substores[environment.API].addresses.addObservedWallet(publicDeriver);
     this.stores.substores[environment.API].transactions.addObservedWallet(publicDeriver);
+  }
+
+  addHwWallet = (
+    publicDeriver: PublicDeriver,
+  ): void => {
+    // set the first created as the result
+    this.publicDerivers.push(publicDeriver);
+
+    this.selected = publicDeriver;
+    this.goToWalletRoute(publicDeriver);
+
+    this.registerObserversForNewWallet(publicDeriver);
   }
 
   // ACTIONS

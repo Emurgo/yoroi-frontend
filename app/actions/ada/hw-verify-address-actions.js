@@ -4,7 +4,6 @@ import Action from '../lib/Action';
 import type {
   BIP32Path
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import Wallet from '../../domain/Wallet';
 
 // ======= ADDRESSES ACTIONS =======
 
