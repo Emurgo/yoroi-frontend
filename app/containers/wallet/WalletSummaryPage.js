@@ -46,10 +46,10 @@ export default class WalletSummaryPage extends Component<Props> {
       isExporting,
       exportError,
     } = transactions;
-    const wallet = wallets.active;
+    const publicDeriver = wallets.selected;
     let walletTransactions = null;
     // Guard against potential null values
-    if (!wallet) {
+    if (publicDeriver == null) {
       Logger.error('[WalletSummaryPage::render] Active wallet required');
       return null;
     }
