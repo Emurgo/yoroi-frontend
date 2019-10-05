@@ -14,16 +14,11 @@ import {
   MAX_INTEGER_PLACES_IN_ADA
 } from '../../config/numbersConfig';
 import globalMessages from '../../i18n/global-messages';
-import type {
-  StandardAddress,
-  AddressTypeStore,
-} from '../../stores/base/AddressesStore';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
-
+import { asHasChains } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 type Props = {
   ...InjectedProps,
-  addressTypeStore: AddressTypeStore<StandardAddress>,
 };
 
 type State = {
@@ -77,13 +72,18 @@ export default class WalletReceivePage extends Component<Props, State> {
 
     // Guard against potential null values
     if (!publicDeriver) throw new Error('Active wallet required for WalletReceivePage.');
+ 
+    // assume account-level wallet for now
+    const withChains = asHasChains(publicDeriver.self);
+    if (!withChains) throw new Error('WalletReceivePage only available for account-level wallets');
+    const addressTypeStore = addresses.externalForDisplay;
 
     // get info about the lattest address generated for special rendering
-    const lastAddress = this.props.addressTypeStore.last;
+    const lastAddress = addressTypeStore.last;
     const walletAddress = lastAddress != null ? lastAddress.address : '';
     const isWalletAddressUsed = lastAddress != null ? lastAddress.isUsed : false;
 
-    const walletAddresses = this.props.addressTypeStore.all.slice().reverse();
+    const walletAddresses = addressTypeStore.all.slice().reverse();
 
     const tooltipNotification = {
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
