@@ -1,5 +1,6 @@
 // @flow
 import { observable, action, computed, runInAction } from 'mobx';
+import BigNumber from 'bignumber.js';
 import { debounce, } from 'lodash';
 import Store from './Store';
 import Request from '../lib/LocalizedRequest';
@@ -19,6 +20,7 @@ import {
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import type { WalletAccountNumberPlate } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { createAccountPlate } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
+import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
 
 type GroupedWallets = {|
   publicDerivers: Array<PublicDeriverWithCachedMeta>;
@@ -50,6 +52,8 @@ export type PublicDeriverWithCachedMeta = {|
   self: PublicDeriver,
   // no plate if no public key
   plate: null | WalletAccountNumberPlate,
+  name: string,
+  amount: BigNumber,
 |};
 
 /**
@@ -110,12 +114,17 @@ export default class WalletsStore extends Store {
       plate = createAccountPlate(publicKey.Hash);
     }
 
+    const info = await publicDeriver.getFullPublicDeriverInfo();
+
     return {
       self: publicDeriver,
       plate,
+      name: info.Name,
+      amount: new BigNumber(0), // assume 0 for now. Updated later if necessary
     };
   }
 
+  @action
   _baseAddNewWallet = async (
     newWallet: RestoreWalletResponse,
   ): Promise<void> => {
@@ -244,6 +253,7 @@ export default class WalletsStore extends Store {
     this.stores.substores[environment.API].transactions.addObservedWallet(publicDeriver);
   }
 
+  @action
   addHwWallet = async (
     publicDeriver: PublicDeriver,
   ): Promise<void> => {
@@ -258,6 +268,15 @@ export default class WalletsStore extends Store {
   }
 
   // ACTIONS
+
+  @action.bound _updateBalance(balance: BigNumber): void {
+    const selected = this.selected;
+    if (selected != null) {
+      selected.amount = balance.dividedBy(
+        LOVELACES_PER_ADA
+      );
+    }
+  }
 
   /** Make all API calls required to setup/update wallet */
   @action restoreWalletsFromStorage = async (): Promise<void> => {
