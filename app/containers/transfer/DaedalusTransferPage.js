@@ -45,16 +45,30 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
 
   setupTransferFundsWithMnemonic = (payload: {
     recoveryPhrase: string,
-    publicDeriver: PublicDeriverWithCachedMeta,
-  }) => {
-    this._getDaedalusTransferActions().setupTransferFundsWithMnemonic.trigger(payload);
+  }): void => {
+    const walletsStore = this._getWalletsStore();
+    const publicDeriver = walletsStore.selected;
+    if (publicDeriver == null) {
+      throw new Error('tranferFunds no wallet selected');
+    }
+    this._getDaedalusTransferActions().setupTransferFundsWithMnemonic.trigger({
+      ...payload,
+      publicDeriver
+    });
   };
 
   setupTransferFundsWithMasterKey = (payload: {
     masterKey: string,
-    publicDeriver: PublicDeriverWithCachedMeta,
-  }) => {
-    this._getDaedalusTransferActions().setupTransferFundsWithMasterKey.trigger(payload);
+  }): void => {
+    const walletsStore = this._getWalletsStore();
+    const publicDeriver = walletsStore.selected;
+    if (publicDeriver == null) {
+      throw new Error('tranferFunds no wallet selected');
+    }
+    this._getDaedalusTransferActions().setupTransferFundsWithMasterKey.trigger({
+      ...payload,
+      publicDeriver
+    });
   };
 
   /** Broadcast the transfer transaction if one exists and return to wallet page */
