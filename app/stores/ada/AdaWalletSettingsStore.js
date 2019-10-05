@@ -1,5 +1,5 @@
 // @flow
-import { observable, action } from 'mobx';
+import { observable, action, runInAction } from 'mobx';
 import WalletSettingsStore from '../base/WalletSettingsStore';
 import Request from '../lib/LocalizedRequest';
 import type { ChangeModelPasswordFunc, RenameModelFunc } from '../../api/ada';
@@ -27,11 +27,10 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
   }
 
   @action _changeSigningPassword = async (request: {
-      publicDeriver: PublicDeriverWithCachedMeta,
-      oldPassword: string,
-      newPassword: string
-    }
-  ): Promise<void> => {
+    publicDeriver: PublicDeriverWithCachedMeta,
+    oldPassword: string,
+    newPassword: string
+  }): Promise<void> => {
     const withSigningKey = asGetSigningKey(request.publicDeriver.self);
     if (withSigningKey == null) {
       throw new Error('_changeSigningPassword missing signing functionality');
@@ -48,7 +47,9 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
     this.actions.dialogs.closeActiveDialog.trigger();
     this.changeSigningKeyRequest.reset();
 
-    request.publicDeriver.signingKeyUpdateDate = newUpdateDate;
+    runInAction(() => {
+      request.publicDeriver.signingKeyUpdateDate = newUpdateDate;
+    });
   };
 
   @action _renamePublicDeriver = async (request: {
@@ -66,7 +67,9 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
       },
     }).promise;
 
-    publicDeriver.publicDeriverName = request.newName;
+    runInAction(() => {
+      publicDeriver.publicDeriverName = request.newName;
+    });
   };
 
   @action _renameConceptualWallet = async (request: {
@@ -85,7 +88,9 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
       },
     }).promise;
 
-    publicDeriver.conceptualWalletName = request.newName;
+    runInAction(() => {
+      publicDeriver.conceptualWalletName = request.newName;
+    });
   };
 
 }

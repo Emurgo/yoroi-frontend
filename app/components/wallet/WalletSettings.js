@@ -24,6 +24,10 @@ const messages = defineMessages({
     id: 'wallet.settings.passwordLastUpdated',
     defaultMessage: '!!!Last updated',
   },
+  unchangedPassword: {
+    id: 'wallet.settings.unchangedPassword',
+    defaultMessage: '!!!Password unchanged since wallet creation',
+  },
 });
 
 type Props = {|
@@ -73,11 +77,13 @@ export default class WalletSettings extends Component<Props> {
       lastUpdatedField, dialog,
       showPasswordBlock, classicTheme,
     } = this.props;
-    const passwordMessage = (
-      intl.formatMessage(messages.passwordLastUpdated, {
-        lastUpdated: moment(walletPasswordUpdateDate).fromNow(),
-      })
-    );
+    const passwordMessage = walletPasswordUpdateDate == null
+      ? intl.formatMessage(messages.unchangedPassword)
+      : (
+        intl.formatMessage(messages.passwordLastUpdated, {
+          lastUpdated: moment(walletPasswordUpdateDate).fromNow(),
+        })
+      );
 
     return (
       <div>
