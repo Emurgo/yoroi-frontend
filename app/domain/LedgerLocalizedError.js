@@ -9,9 +9,13 @@ import {
 } from '../utils/logging';
 
 const messages = defineMessages({
-  signTxError101: {
-    id: 'wallet.send.ledger.error.101',
-    defaultMessage: '!!!Signing cancelled on Ledger device. Please retry or reconnect device.',
+  cancelOnDeviceError101: {
+    id: 'wallet.hw.ledger.common.error.101',
+    defaultMessage: '!!!Operation cancelled on Ledger device.',
+  },
+  cancleOnLedgerConnectError102: {
+    id: 'wallet.hw.ledger.common.error.102',
+    defaultMessage: '!!!Operation cancelled by user.',
   },
 });
 
@@ -28,7 +32,11 @@ export function convertToLocalizableError(error: Error): LocalizableError {
         localizableError = new LocalizableError(globalMessages.ledgerError101);
         break;
       case 'TransportStatusError: Ledger device: Action rejected by user':
-        localizableError = new LocalizableError(messages.signTxError101);
+        localizableError = new LocalizableError(messages.cancelOnDeviceError101);
+        break;
+      case 'NotAllowedError: The operation either timed out or was not allowed. See: https://w3c.github.io/webauthn/#sec-assertion-privacy.':
+      case 'Forcefully cancelled by user':
+        localizableError = new LocalizableError(messages.cancleOnLedgerConnectError102);
         break;
       default:
         /** we are not able to figure out why Error is thrown
