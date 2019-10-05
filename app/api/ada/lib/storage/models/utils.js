@@ -50,7 +50,6 @@ import {
 import type { GetPathWithSpecificByTreeRequest } from '../database/bip44/api/read';
 import type {
   Bip44AddressRow,
-  PublicDeriverRow,
 } from '../database/bip44/tables';
 import {
   GetUtxoTxOutputsWithTx,

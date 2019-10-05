@@ -14,7 +14,6 @@ import type {
 } from '../tables';
 import * as Tables from '../tables';
 import { getRowFromKey, getRowIn, } from '../../utils';
-import { Bip44WrapperSchema, } from '../../bip44/tables';
 
 export class GetConceptualWallet {
   static ownTables = Object.freeze({

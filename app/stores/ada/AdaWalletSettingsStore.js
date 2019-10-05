@@ -4,10 +4,9 @@ import WalletSettingsStore from '../base/WalletSettingsStore';
 import Request from '../lib/LocalizedRequest';
 import type { ChangeModelPasswordFunc, RenameModelFunc } from '../../api/ada';
 import {
-  PublicDeriver,
   asGetSigningKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-
+import type { PublicDeriverWithCachedMeta } from '../base/WalletStore';
 
 export default class AdaWalletSettingsStore extends WalletSettingsStore {
 
@@ -28,25 +27,28 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
   }
 
   @action _changeSigningPassword = async (request: {
-      publicDeriver: PublicDeriver,
+      publicDeriver: PublicDeriverWithCachedMeta,
       oldPassword: string,
       newPassword: string
     }
   ): Promise<void> => {
-    const withSigningKey = asGetSigningKey(request.publicDeriver);
+    const withSigningKey = asGetSigningKey(request.publicDeriver.self);
     if (withSigningKey == null) {
       throw new Error('_changeSigningPassword missing signing functionality');
     }
-    await this.changeSigningKeyRequest.execute({ 
+    const newUpdateDate = new Date();
+    await this.changeSigningKeyRequest.execute({
       func: withSigningKey.changeSigningKeyPassword,
       request: {
-        currentTime: new Date(),
+        currentTime: newUpdateDate,
         oldPassword: request.oldPassword,
         newPassword: request.newPassword,
       },
     });
     this.actions.dialogs.closeActiveDialog.trigger();
     this.changeSigningKeyRequest.reset();
+
+    request.publicDeriver.signingKeyUpdateDate = newUpdateDate;
   };
 
   @action _renamePublicDeriver = async (request: {

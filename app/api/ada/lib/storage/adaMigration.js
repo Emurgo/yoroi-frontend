@@ -4,14 +4,8 @@
 
 import type { lf$Database } from 'lovefield';
 import {
-  reset,
-} from './database/index';
-import {
   getLegacyAddressesList,
 } from './database/legacy';
-import {
-  saveLastReceiveAddressIndex,
-} from './adaLocalStorage';
 import LocalStorageApi from '../../../localStorage/index';
 import {
   Logger,
@@ -27,6 +21,7 @@ export async function migrateToLatest(
   localStorageApi: LocalStorageApi,
   persistentDb: lf$Database,
 ): Promise<boolean> {
+  return; // TODO: add migration for storagev2
   let lastLaunchVersion = await localStorageApi.getLastLaunchVersion();
   Logger.info(`Starting migration for ${lastLaunchVersion}`);
   /**

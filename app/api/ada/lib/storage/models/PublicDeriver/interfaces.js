@@ -8,9 +8,6 @@ import {
   BigNumber
 } from 'bignumber.js';
 
-import type {
-  IBip44Wallet,
-} from '../Bip44Wallet/interfaces';
 import { Bip44Wallet } from '../Bip44Wallet/index';
 import { ConceptualWallet } from '../ConceptualWallet/index';
 

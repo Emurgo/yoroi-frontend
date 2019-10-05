@@ -1,6 +1,8 @@
 // @flow
 import Action from '../lib/Action';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import type {
+  PublicDeriverWithCachedMeta
+} from '../../stores/base/WalletStore';
 
 export default class WalletSettingsActions {
   cancelEditingWalletField: Action<void> = new Action();
@@ -8,8 +10,9 @@ export default class WalletSettingsActions {
   stopEditingWalletField: Action<void> = new Action();
   renamePublicDeriver: Action<{ newName: string }> = new Action();
   renameConceptualWallet: Action<{ newName: string }> = new Action();
-  // eslint-disable-next-line max-len
   updateSigningPassword: Action<{
-    publicDeriver: PublicDeriver, oldPassword: string, newPassword: string
+    publicDeriver: PublicDeriverWithCachedMeta,
+    oldPassword: string,
+    newPassword: string
   }> = new Action();
 }

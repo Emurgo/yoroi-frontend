@@ -7,7 +7,6 @@ import LocalizableError from '../i18n/LocalizableError';
 
 import type { CreateHardwareWalletRequest, CreateHardwareWalletFunc } from '../api/ada';
 import type { StepStateEnum } from '../components/widgets/ProgressSteps';
-import { ConceptualWallet } from '../api/ada/lib/storage/models/ConceptualWallet';
 import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
 import type { HWFeatures } from '../api/ada/lib/storage/database/wallet/tables';
 

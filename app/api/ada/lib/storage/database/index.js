@@ -91,6 +91,10 @@ async function onUpgrade(
   rawDb: lf$raw$BackStore,
 ): Promise<void> {
   const version = rawDb.getVersion();
+  if (version === 0) {
+    // defaults to 0 when first time launching ever
+    return;
+  }
   if (version === 1) {
     // TODO: expose dump for migration
     const dump = rawDb.dump();

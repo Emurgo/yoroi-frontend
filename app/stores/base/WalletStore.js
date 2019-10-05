@@ -16,6 +16,7 @@ import type {
 import {
   PublicDeriver,
   asGetPublicKey,
+  asGetSigningKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import type { WalletAccountNumberPlate } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
@@ -59,6 +60,7 @@ export type PublicDeriverWithCachedMeta = {|
   conceptualWalletName: string,
   amount: BigNumber,
   assuranceMode: AssuranceMode,
+  signingKeyUpdateDate: null | Date,
 |};
 
 /**
@@ -124,6 +126,14 @@ export default class WalletsStore extends Store {
       .getConceptualWallet()
       .getFullConceptualWalletInfo();
 
+    let signingKeyUpdateDate = null;
+    {
+      const withSigningKey = asGetSigningKey(publicDeriver);
+      if (withSigningKey) {
+        const key = await withSigningKey.getSigningKey();
+        signingKeyUpdateDate = key.row.PasswordLastUpdate;
+      }
+    }
     return {
       self: publicDeriver,
       plate,
@@ -131,6 +141,7 @@ export default class WalletsStore extends Store {
       conceptualWalletName: conceptualWalletInfo.Name,
       amount: new BigNumber(0), // assume 0 for now. Updated later if necessary
       assuranceMode: assuranceModes.NORMAL,
+      signingKeyUpdateDate,
     };
   }
 

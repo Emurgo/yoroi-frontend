@@ -11,7 +11,7 @@ import styles from './Transaction.scss';
 import adaSymbol from '../../../assets/images/ada-symbol.inline.svg';
 import WalletTransaction from '../../../domain/WalletTransaction';
 import { environmentSpecificMessages } from '../../../i18n/global-messages';
-import type {TransactionDirectionType, } from '../../../api/ada/adaTypes';
+import type { TransactionDirectionType, } from '../../../api/ada/adaTypes';
 import { transactionTypes } from '../../../api/ada/adaTypes';
 import environment from '../../../environment';
 import { Logger } from '../../../utils/logging';

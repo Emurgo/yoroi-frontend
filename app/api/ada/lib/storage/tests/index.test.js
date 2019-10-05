@@ -71,9 +71,6 @@ test('Can add and fetch address in wallet', async (done) => {
   const firstAccountPk = rootPk.bip44_account(
     RustModule.Wallet.AccountIndex.new(firstAccountIndex)
   );
-  const secondAccountPk = rootPk.bip44_account(
-    RustModule.Wallet.AccountIndex.new(1 + HARD_DERIVATION_START)
-  );
   const firstExternalAddressKey = firstAccountPk
     .bip44_chain(false)
     .address_key(RustModule.Wallet.AddressKeyIndex.new(0));
@@ -175,7 +172,7 @@ test('Can add and fetch address in wallet', async (done) => {
           oldPassword: privateDeriverPassword,
           newPassword: 'asdf',
           currentTime: newDate,
-        });  
+        });
         done.fail(new Error('Above function should have thrown'));
       } catch (e) {
         expect(e).toBeInstanceOf(WrongPassphraseError);

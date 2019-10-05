@@ -9,7 +9,7 @@ import {
   getAllSchemaTables,
   raii,
 } from '../database/utils';
-import type { BlockInsert, DbBlock, BlockRow, } from '../database/uncategorized/tables';
+import type { BlockInsert, BlockRow, } from '../database/uncategorized/tables';
 import {
   GetAddress, GetBlock, GetEncryptionMeta,
 } from '../database/uncategorized/api/read';
@@ -26,7 +26,6 @@ import {
 import type {
   RemoteTxState,
   RemoteTransaction,
-  UserAnnotation,
   UtxoAnnotatedTransaction,
 } from '../../../adaTypes';
 import type {
