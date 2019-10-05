@@ -336,7 +336,7 @@ const Bip44Parent = Mixin<
 export const Bip44ParentInstance = (
   (Bip44Parent: any): ReturnType<typeof Bip44ParentMixin>
 );
-export function asBip44Parent<T>(
+export function asBip44Parent<T: IPublicDeriver>(
   obj: T
 ): void | (IBip44Parent & Bip44ParentDependencies & T) {
   if (obj instanceof Bip44ParentInstance) {
@@ -442,7 +442,7 @@ const AddFromPublic = Mixin<
 const AddFromPublicInstance = (
   (AddFromPublic: any): ReturnType<typeof AddFromPublicMixin>
 );
-export function asAddFromPublic<T>(
+export function asAddFromPublic<T: IPublicDeriver>(
   obj: T
 ): void | (IAddFromPublic & AddFromPublicDependencies & T) {
   if (obj instanceof AddFromPublicInstance) {
@@ -532,7 +532,7 @@ const GetPublicKey = Mixin<
 const GetPublicKeyInstance = (
   (GetPublicKey: any): ReturnType<typeof GetPublicKeyMixin>
 );
-export function asGetPublicKey<T>(
+export function asGetPublicKey<T: IPublicDeriver>(
   obj: T
 ): void | (IGetPublic & GetPublicKeyDependencies & T) {
   if (obj instanceof GetPublicKeyInstance) {
@@ -704,7 +704,7 @@ const GetSigningKey = Mixin<
 const GetSigningKeyInstance = (
   (GetSigningKey: any): ReturnType<typeof GetSigningKeyMixin>
 );
-export function asGetSigningKey<T>(
+export function asGetSigningKey<T: IPublicDeriver>(
   obj: T
 ): void | (IGetSigningKey & GetSigningKeyDependencies & T) {
   if (obj instanceof GetSigningKeyInstance) {
@@ -767,7 +767,7 @@ const GetAllAddresses = Mixin<
 const GetAllAddressesInstance = (
   (GetAllAddresses: any): ReturnType<typeof GetAllAddressesMixin>
 );
-export function asGetAllAddresses<T>(
+export function asGetAllAddresses<T: IPublicDeriver>(
   obj: T
 ): void | (IGetAllAddresses & GetAllAddressesDependencies & T) {
   if (obj instanceof GetAllAddressesInstance) {
@@ -831,7 +831,7 @@ const GetAllUtxos = Mixin<
 const GetAllUtxosInstance = (
   (GetAllUtxos: any): ReturnType<typeof GetAllUtxosMixin>
 );
-export function asGetAllUtxos<T>(
+export function asGetAllUtxos<T: IPublicDeriver>(
   obj: T
 ): void | (IGetAllUtxos & GetAllUtxosDependencies & T) {
   if (obj instanceof GetAllUtxosInstance) {
@@ -984,7 +984,7 @@ const DisplayCutoff = Mixin<
 const DisplayCutoffInstance = (
   (DisplayCutoff: any): ReturnType<typeof DisplayCutoffMixin>
 );
-export function asDisplayCutoff<T>(
+export function asDisplayCutoff<T: IPublicDeriver>(
   obj: T
 ): void | (IDisplayCutoff & DisplayCutoffDependencies & T) {
   if (obj instanceof DisplayCutoffInstance) {
@@ -1084,7 +1084,7 @@ const HasChains = Mixin<
 const HasChainsInstance = (
   (HasChains: any): ReturnType<typeof HasChainsMixin>
 );
-export function asHasChains<T>(
+export function asHasChains<T: IPublicDeriver>(
   obj: T
 ): void | (IHasChains & HasChainsDependencies & T) {
   if (obj instanceof HasChainsInstance) {
@@ -1110,7 +1110,7 @@ const GetBalance = Mixin<
 const GetBalanceInstance = (
   (GetBalance: any): ReturnType<typeof GetBalanceMixin>
 );
-export function asGetBalance<T>(
+export function asGetBalance<T: IPublicDeriver>(
   obj: T
 ): void | (IGetBalance & GetBalanceDependencies & T) {
   if (obj instanceof GetBalanceInstance) {
@@ -1175,7 +1175,7 @@ const GetUtxoBalance = Mixin<
 const GetUtxoBalanceInstance = (
   (GetUtxoBalance: any): ReturnType<typeof GetUtxoBalanceMixin>
 );
-export function asGetUtxoBalance<T>(
+export function asGetUtxoBalance<T: IPublicDeriver>(
   obj: T
 ): void | (IGetUtxoBalance & GetUtxoBalanceDependencies & T) {
   if (obj instanceof GetUtxoBalanceInstance) {
@@ -1201,7 +1201,7 @@ const ScanAddresses = Mixin<
 export const ScanAddressesInstance = (
   (ScanAddresses: any): ReturnType<typeof ScanAddressesMixin>
 );
-export function asScanAddresses<T>(
+export function asScanAddresses<T: IPublicDeriver>(
   obj: T
 ): void | (IScanAddresses & ScanAddressesDependencies & T) {
   if (obj instanceof ScanAddressesInstance) {
@@ -1325,7 +1325,7 @@ const ScanUtxoAccountAddresses = Mixin<
 const ScanUtxoAccountAddressesInstance = (
   (ScanUtxoAccountAddresses: any): ReturnType<typeof ScanUtxoAccountAddressesMixin>
 );
-export function asScanUtxoAccountAddressesInstance<T>(
+export function asScanUtxoAccountAddressesInstance<T: IPublicDeriver>(
   obj: T
 ): void | (IScanAddresses & ScanUtxoAccountAddressesDependencies & T) {
   if (obj instanceof ScanUtxoAccountAddressesInstance) {

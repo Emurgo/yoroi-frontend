@@ -67,7 +67,7 @@ export default class AddressesStore extends Store {
       // this Error will be converted to LocalizableError()
       throw new Error('_verifyAddress Active wallet required before verifying address.');
     }
-    const conceptualWallet = publicDeriver.getConceptualWallet();
+    const conceptualWallet = publicDeriver.self.getConceptualWallet();
 
     this._setError(null);
     this._setActionProcessing(true);

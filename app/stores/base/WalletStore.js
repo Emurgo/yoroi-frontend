@@ -12,21 +12,26 @@ import type {
   GenerateWalletRecoveryPhraseFunc,
   RestoreWalletResponse,
 } from '../../api/ada';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import {
+  PublicDeriver,
+  asGetPublicKey,
+} from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import type { WalletAccountNumberPlate } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import { createAccountPlate } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 
 type GroupedWallets = {|
-  publicDerivers: Array<PublicDeriver>;
+  publicDerivers: Array<PublicDeriverWithCachedMeta>;
   conceptualWallet: ConceptualWallet;
 |};
 
 function groupWallets(
-  publicDerivers: Array<PublicDeriver>,
+  publicDerivers: Array<PublicDeriverWithCachedMeta>,
 ): Array<GroupedWallets> {
   const pairingMap = new Map();
   for (const publicDeriver of publicDerivers) {
     // note: this may override previous entries but the result is the same
-    const parent = publicDeriver.getConceptualWallet();
+    const parent = publicDeriver.self.getConceptualWallet();
     pairingMap.set(parent, {
       conceptualWallet: parent,
       publicDerivers: [],
@@ -34,12 +39,18 @@ function groupWallets(
   }
   // now fill them with public derivers
   for (const publicDeriver of publicDerivers) {
-    const parentEntry = pairingMap.get(publicDeriver.getConceptualWallet());
+    const parentEntry = pairingMap.get(publicDeriver.self.getConceptualWallet());
     if (parentEntry == null) throw new Error('getPairing public deriver without parent');
     parentEntry.publicDerivers.push(publicDeriver);
   }
   return Array.from(pairingMap.values());
 }
+
+export type PublicDeriverWithCachedMeta = {|
+  self: PublicDeriver,
+  // no plate if no public key
+  plate: null | WalletAccountNumberPlate,
+|};
 
 /**
  * The base wallet store that contains the shared logic
@@ -50,8 +61,8 @@ export default class WalletsStore extends Store {
   WALLET_REFRESH_INTERVAL = environment.walletRefreshInterval;
   ON_VISIBLE_DEBOUNCE_WAIT = 1000;
 
-  @observable publicDerivers: Array<PublicDeriver>;
-  @observable selected: null | PublicDeriver;
+  @observable publicDerivers: Array<PublicDeriverWithCachedMeta>;
+  @observable selected: null | PublicDeriverWithCachedMeta;
   @observable getInitialWallets: Request<GetWalletsFunc>;
   @observable createWalletRequest: Request<CreateWalletFunc>;
   @observable generateWalletRecoveryPhraseRequest: Request<GenerateWalletRecoveryPhraseFunc>;
@@ -85,21 +96,45 @@ export default class WalletsStore extends Store {
     }
   };
 
-  _baseAddNewWallet = (
-    newWallet: RestoreWalletResponse,
-  ): void => {
-    // set the first created as the result
-    this.publicDerivers.push(...newWallet.publicDerivers);
-    const newSelected = newWallet.publicDerivers[0];
+  _addCachedData = async (
+    publicDeriver: PublicDeriver,
+  ): Promise<PublicDeriverWithCachedMeta> => {
+    const withPubKey = asGetPublicKey(publicDeriver);
 
-    this.selected = newSelected;
+    let plate = null;
+    if (withPubKey != null) {
+      const publicKey = await withPubKey.getPublicKey();
+      if (publicKey.IsEncrypted) {
+        throw new Error('_addCachedData unexpected encrypted public key');
+      }
+      plate = createAccountPlate(publicKey.Hash);
+    }
+
+    return {
+      self: publicDeriver,
+      plate,
+    };
+  }
+
+  _baseAddNewWallet = async (
+    newWallet: RestoreWalletResponse,
+  ): Promise<void> => {
+    // set the first created as the result
+    const newWithCachedData: Array<PublicDeriverWithCachedMeta> = [];
+    for (const newPublicDeriver of newWallet.publicDerivers) {
+      const withCache = await this._addCachedData(newPublicDeriver);
+      newWithCachedData.push(withCache);
+    }
+    this.publicDerivers.push(...newWithCachedData);
+
+    this.selected = newWithCachedData[0];
     this.actions.dialogs.closeActiveDialog.trigger();
-    this.goToWalletRoute(newSelected);
+    this.goToWalletRoute(newWithCachedData[0].self);
 
     const { wallets } = this.stores.substores[environment.API];
     wallets.showWalletCreatedNotification();
 
-    for (const pubDeriver of newWallet.publicDerivers) {
+    for (const pubDeriver of newWithCachedData) {
       this.registerObserversForNewWallet(pubDeriver);
     }
   }
@@ -118,7 +153,7 @@ export default class WalletsStore extends Store {
     }).promise;
     if (!createdWallet) throw new Error('_finishCreation should never happen');
 
-    this._baseAddNewWallet(createdWallet);
+    await this._baseAddNewWallet(createdWallet);
 
     this.stores.walletBackup.teardown();
   };
@@ -141,7 +176,7 @@ export default class WalletsStore extends Store {
     }).promise;
     if (!createdWallet) throw new Error('Restored wallet was not received correctly');
 
-    this._baseAddNewWallet(createdWallet);
+    await this._baseAddNewWallet(createdWallet);
 
     this.restoreRequest.reset();
   };
@@ -170,7 +205,7 @@ export default class WalletsStore extends Store {
     );
   }
 
-  @computed get first(): null | PublicDeriver {
+  @computed get first(): null | PublicDeriverWithCachedMeta {
     return this.publicDerivers.length === 0
       ? null
       : this.publicDerivers[0];
@@ -182,7 +217,7 @@ export default class WalletsStore extends Store {
 
   @computed get activeWalletRoute(): ?string {
     if (this.selected == null) return null;
-    return this.getWalletRoute(this.selected);
+    return this.getWalletRoute(this.selected.self);
   }
 
   @computed get isWalletRoute(): boolean {
@@ -203,22 +238,23 @@ export default class WalletsStore extends Store {
   }
 
   refreshWallet(
-    publicDeriver: PublicDeriver
+    publicDeriver: PublicDeriverWithCachedMeta
   ): void {
     this.stores.substores[environment.API].addresses.addObservedWallet(publicDeriver);
     this.stores.substores[environment.API].transactions.addObservedWallet(publicDeriver);
   }
 
-  addHwWallet = (
+  addHwWallet = async (
     publicDeriver: PublicDeriver,
-  ): void => {
+  ): Promise<void> => {
+    const withCache = await this._addCachedData(publicDeriver);
     // set the first created as the result
-    this.publicDerivers.push(publicDeriver);
+    this.publicDerivers.push(withCache);
 
-    this.selected = publicDeriver;
-    this.goToWalletRoute(publicDeriver);
+    this.selected = withCache;
+    this.goToWalletRoute(withCache.self);
 
-    this.registerObserversForNewWallet(publicDeriver);
+    this.registerObserversForNewWallet(withCache);
   }
 
   // ACTIONS
@@ -227,7 +263,7 @@ export default class WalletsStore extends Store {
   @action restoreWalletsFromStorage = async (): Promise<void> => {
     // TODO
     // const result = await this.walletsRequest.execute({}).promise;
-    const result: Array<PublicDeriver> = [];
+    const result: Array<PublicDeriverWithCachedMeta> = [];
     if (!result) return;
     runInAction('refresh active wallet', () => {
       if (this.selected != null) {
@@ -243,7 +279,7 @@ export default class WalletsStore extends Store {
   };
 
   @action registerObserversForNewWallet = async (
-    publicDeriver: PublicDeriver
+    publicDeriver: PublicDeriverWithCachedMeta
   ) => {
     this.stores.substores[environment.API].addresses.addObservedWallet(publicDeriver);
     this.stores.substores[environment.API].transactions.addObservedWallet(publicDeriver);
@@ -258,7 +294,7 @@ export default class WalletsStore extends Store {
   // =================== ACTIVE WALLET ==================== //
 
   @action _setActiveWallet = (
-    { wallet }: { wallet: PublicDeriver }
+    { wallet }: { wallet: PublicDeriverWithCachedMeta }
   ): void => {
     this.selected = wallet;
   };
@@ -310,7 +346,7 @@ export default class WalletsStore extends Store {
         // We have a route for a specific wallet -> lets try to find it
         let publicDeriverForRoute = undefined;
         for (const publicDeriver of this.publicDerivers) {
-          if (publicDeriver.getPublicDeriverId().toString() === matchWalletRoute) {
+          if (publicDeriver.self.getPublicDeriverId().toString() === matchWalletRoute) {
             publicDeriverForRoute = publicDeriver;
           }
         }
@@ -321,7 +357,7 @@ export default class WalletsStore extends Store {
           // There is no wallet with given id -> pick first wallet
           this._setActiveWallet({ wallet: this.publicDerivers[0] });
           if (this.selected != null) {
-            this.goToWalletRoute(this.selected);
+            this.goToWalletRoute(this.selected.self);
           }
         }
       } else if (this._canRedirectToWallet) {
@@ -330,7 +366,7 @@ export default class WalletsStore extends Store {
           this._setActiveWallet({ wallet: this.publicDerivers[0] });
         }
         if (this.selected != null) {
-          this.goToWalletRoute(this.selected);
+          this.goToWalletRoute(this.selected.self);
         }
       }
     });

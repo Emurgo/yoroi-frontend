@@ -62,7 +62,7 @@ export default class AdaTransactionsStore extends TransactionsStore {
     if (!publicDeriver) return unconfirmedAmount;
 
     // Get current transactions for public deriver
-    const result = this._getTransactionsAllRequest(publicDeriver).result;
+    const result = this._getTransactionsAllRequest(publicDeriver.self).result;
     if (!result || !result.transactions) return unconfirmedAmount;
 
     for (const transaction of result.transactions) {
@@ -104,7 +104,7 @@ export default class AdaTransactionsStore extends TransactionsStore {
 
       const publicDeriver = this.stores.substores.ada.wallets.selected;
       if (!publicDeriver) return;
-      const withGetAddresses = asGetAllAddresses(publicDeriver);
+      const withGetAddresses = asGetAllAddresses(publicDeriver.self);
       if (!withGetAddresses) return;
 
       this.getTransactionRowsToExportRequest.execute({

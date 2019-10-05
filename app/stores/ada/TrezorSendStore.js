@@ -11,9 +11,6 @@ import type {
   CreateTrezorSignTxDataFunc,
   BroadcastTrezorSignedTxFunc
 } from '../../api/ada';
-import {
-  PublicDeriver,
-} from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type {
   SendUsingTrezorParams
 } from '../../actions/ada/trezor-send-actions';
@@ -25,6 +22,7 @@ import {
   convertToLocalizableError
 } from '../../domain/TrezorLocalizedError';
 import LocalizableError from '../../i18n/LocalizableError';
+import type { PublicDeriverWithCachedMeta, } from  '../base/WalletStore';
 
 /** Note: Handles Trezor Signing */
 export default class TrezorSendStore extends Store {
@@ -109,7 +107,7 @@ export default class TrezorSendStore extends Store {
 
   _brodcastSignedTx = async (
     trezorSignTxResp: CardanoSignTransaction$,
-    publicDeriver: PublicDeriver,
+    publicDeriver: PublicDeriverWithCachedMeta,
   ): Promise<void> => {
     if (!trezorSignTxResp.success) {
       throw new Error('TrezorSendStore::_brodcastSignedTx should never happen');
@@ -124,7 +122,7 @@ export default class TrezorSendStore extends Store {
     await wallets.refreshWallet(publicDeriver);
 
     // go to transaction screen
-    wallets.goToWalletRoute(publicDeriver);
+    wallets.goToWalletRoute(publicDeriver.self);
 
     Logger.info('SUCCESS: ADA sent using Trezor SignTx');
   }

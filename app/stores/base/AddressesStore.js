@@ -23,6 +23,7 @@ import {
   Logger,
 } from '../../utils/logging';
 import { EXTERNAL, INTERNAL } from '../../config/numbersConfig';
+import type { PublicDeriverWithCachedMeta, } from  './WalletStore';
 
 type StandardAddress = {|
   ...Address, ...Value, ...Addressing, ...UsedStatus
@@ -49,7 +50,7 @@ class AddressTypeStore<T> {
   @computed get all(): Array<T> {
     const publicDeriver = this.stores.substores[environment.API].wallets.selected;
     if (!publicDeriver) return [];
-    const result = this._flowCoerceResult(this._getRequest(publicDeriver));
+    const result = this._flowCoerceResult(this._getRequest(publicDeriver.self));
     if (result == null) return [];
     return result;
   }
@@ -57,21 +58,21 @@ class AddressTypeStore<T> {
   @computed get hasAny(): boolean {
     const publicDeriver = this.stores.substores[environment.API].wallets.selected;
     if (!publicDeriver) return false;
-    const result = this._flowCoerceResult(this._getRequest(publicDeriver));
+    const result = this._flowCoerceResult(this._getRequest(publicDeriver.self));
     return result ? result.length > 0 : false;
   }
 
   @computed get active(): ?T {
     const publicDeriver = this.stores.substores[environment.API].wallets.selected;
     if (!publicDeriver) return;
-    const result = this._flowCoerceResult(this._getRequest(publicDeriver));
+    const result = this._flowCoerceResult(this._getRequest(publicDeriver.self));
     return result ? result[result.length - 1] : null;
   }
 
   @computed get totalAvailable(): number {
     const publicDeriver = this.stores.substores[environment.API].wallets.selected;
     if (!publicDeriver) return 0;
-    const result = this._flowCoerceResult(this._getRequest(publicDeriver));
+    const result = this._flowCoerceResult(this._getRequest(publicDeriver.self));
     return result ? result.length : 0;
   }
 
@@ -79,9 +80,9 @@ class AddressTypeStore<T> {
   @action refreshAddresses = () => {
     const publicDeriver = this.stores.substores[environment.API].wallets.selected;
     if (publicDeriver == null) return;
-    const allRequest = this._getRequest(publicDeriver);
+    const allRequest = this._getRequest(publicDeriver.self);
     allRequest.invalidate({ immediately: false });
-    allRequest.execute({ publicDeriver });
+    allRequest.execute({ publicDeriver: publicDeriver.self });
   };
 
   _flowCoerceResult: CachedRequest<SubRequestType<T>> => ?Array<T> = (request) => {
@@ -151,7 +152,7 @@ export default class AddressesStore extends Store {
     try {
       const publicDeriver = this.stores.substores[environment.API].wallets.selected;
       if (publicDeriver == null) return;
-      const withDisplayCutoff = asDisplayCutoff(publicDeriver);
+      const withDisplayCutoff = asDisplayCutoff(publicDeriver.self);
       if (withDisplayCutoff == null) {
         Logger.error(`_createAddress incorrect public deriver`);
         return;
@@ -172,18 +173,19 @@ export default class AddressesStore extends Store {
     this.error = null;
   };
 
-  addObservedWallet = (publicDeriver: PublicDeriver) => {
-    const withHasChains = asHasChains(publicDeriver);
+  addObservedWallet = (publicDeriver: PublicDeriverWithCachedMeta) => {
+    const withHasChains = asHasChains(publicDeriver.self);
     if (withHasChains == null) {
-      this.allAddressesForDisplay.addObservedWallet(publicDeriver);
+      this.allAddressesForDisplay.addObservedWallet(publicDeriver.self);
     } else {
-      this.externalForDisplay.addObservedWallet(publicDeriver);
-      this.internalForDisplay.addObservedWallet(publicDeriver);
+      this.externalForDisplay.addObservedWallet(publicDeriver.self);
+      this.internalForDisplay.addObservedWallet(publicDeriver.self);
     }
+    this.refreshAddresses(publicDeriver);
   }
 
-  refreshAddresses = (publicDeriver: PublicDeriver) => {
-    const withHasChains = asHasChains(publicDeriver);
+  refreshAddresses = (publicDeriver: PublicDeriverWithCachedMeta) => {
+    const withHasChains = asHasChains(publicDeriver.self);
     if (withHasChains == null) {
       this.allAddressesForDisplay.refreshAddresses();
     } else {

@@ -14,6 +14,7 @@ import {
   asGetAllAddresses,
   asGetBalance,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import type { PublicDeriverWithCachedMeta, } from  './WalletStore';
 
 export default class TransactionsStore extends Store {
 
@@ -61,7 +62,7 @@ export default class TransactionsStore extends Store {
         this.api[environment.API].refreshTransactions
       );
     }
-    return this._getTransactionsRecentRequest(publicDeriver);
+    return this._getTransactionsRecentRequest(publicDeriver.self);
   }
 
   /** Get (or create) the search options for the active wallet (if any)  */
@@ -88,21 +89,21 @@ export default class TransactionsStore extends Store {
   @computed get recent(): Array<WalletTransaction> {
     const publicDeriver = this.stores.substores[environment.API].wallets.selected;
     if (!publicDeriver) return [];
-    const result = this._getTransactionsRecentRequest(publicDeriver).result;
+    const result = this._getTransactionsRecentRequest(publicDeriver.self).result;
     return result ? result.transactions : [];
   }
 
   @computed get hasAny(): boolean {
     const publicDeriver = this.stores.substores[environment.API].wallets.selected;
     if (!publicDeriver) return false;
-    const result = this._getTransactionsRecentRequest(publicDeriver).result;
+    const result = this._getTransactionsRecentRequest(publicDeriver.self).result;
     return result ? result.transactions.length > 0 : false;
   }
 
   @computed get hasAnyPending(): boolean {
     const publicDeriver = this.stores.substores[environment.API].wallets.selected;
     if (!publicDeriver) return false;
-    const result = this._getTransactionsPendingRequest(publicDeriver).result;
+    const result = this._getTransactionsPendingRequest(publicDeriver.self).result;
     if (result) {
       this._hasAnyPending = result.length > 0;
     }
@@ -112,18 +113,18 @@ export default class TransactionsStore extends Store {
   @computed get totalAvailable(): number {
     const publicDeriver = this.stores.substores[environment.API].wallets.selected;
     if (!publicDeriver) return 0;
-    const result = this._getTransactionsAllRequest(publicDeriver).result;
+    const result = this._getTransactionsAllRequest(publicDeriver.self).result;
     return result ? result.transactions.length : 0;
   }
 
   /** Refresh transaction data for all wallets and update wallet balance */
   @action refreshTransactionData = (
-    basePubDeriver: PublicDeriver,
+    basePubDeriver: PublicDeriverWithCachedMeta,
   ): void => {
     const walletsStore = this.stores.substores[environment.API].wallets;
     const walletsActions = this.actions[environment.API].wallets;
 
-    const publicDeriver = asGetAllAddresses(basePubDeriver);
+    const publicDeriver = asGetAllAddresses(basePubDeriver.self);
     if (publicDeriver == null) {
       return;
     }
@@ -156,7 +157,7 @@ export default class TransactionsStore extends Store {
           { publicDeriver }
         );
 
-        const canGetBalance = asGetBalance(basePubDeriver);
+        const canGetBalance = asGetBalance(basePubDeriver.self);
         if (canGetBalance == null) {
           return new BigNumber(0);
         }
@@ -210,14 +211,14 @@ export default class TransactionsStore extends Store {
 
   /** Add a new public deriver to track and refresh the data */
   @action addObservedWallet = (
-    publicDeriver: PublicDeriver
+    publicDeriver: PublicDeriverWithCachedMeta
   ): void => {
     this.transactionsRequests.push({
-      publicDeriver,
-      recentRequest: this._getTransactionsRecentRequest(publicDeriver),
-      allRequest: this._getTransactionsAllRequest(publicDeriver),
-      getBalanceRequest: this._getBalanceRequest(publicDeriver),
-      pendingRequest: this._getTransactionsPendingRequest(publicDeriver),
+      publicDeriver: publicDeriver.self,
+      recentRequest: this._getTransactionsRecentRequest(publicDeriver.self),
+      allRequest: this._getTransactionsAllRequest(publicDeriver.self),
+      getBalanceRequest: this._getBalanceRequest(publicDeriver.self),
+      pendingRequest: this._getTransactionsPendingRequest(publicDeriver.self),
     });
     this.refreshTransactionData(publicDeriver);
   }

@@ -160,7 +160,7 @@ export default class LedgerSendStore extends Store {
     if (publicDeriver == null) {
       throw new Error('_prepareAndBroadcastSignedTx no public deriver selected');
     }
-    const withPublicKey = asGetPublicKey(publicDeriver);
+    const withPublicKey = asGetPublicKey(publicDeriver.self);
     if (withPublicKey == null) {
       throw new Error('_prepareAndBroadcastSignedTx public deriver has no public key.');
     }
@@ -185,7 +185,7 @@ export default class LedgerSendStore extends Store {
     await wallets.refreshWallet(publicDeriver);
 
     // go to transaction screen
-    wallets.goToWalletRoute(publicDeriver);
+    wallets.goToWalletRoute(publicDeriver.self);
 
     this._reset();
     Logger.info('SUCCESS: ADA sent using Ledger SignTx');

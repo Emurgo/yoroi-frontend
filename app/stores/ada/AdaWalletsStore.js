@@ -58,11 +58,11 @@ export default class AdaWalletsStore extends WalletStore {
     const publicDeriver = this.selected;
     if (!publicDeriver) throw new Error('Active wallet required before sending.');
 
-    const asBip44 = (asBip44Parent(publicDeriver));
+    const asBip44 = (asBip44Parent(publicDeriver.self));
     if (asBip44 == null) {
       throw new Error('_sendMoney public deriver missing bip44 functionality.');
     }
-    const withSigning = (asGetSigningKey(publicDeriver));
+    const withSigning = (asGetSigningKey(publicDeriver.self));
     if (withSigning == null) {
       throw new Error('_sendMoney public deriver missing signing functionality.');
     }
@@ -76,7 +76,7 @@ export default class AdaWalletsStore extends WalletStore {
     this.actions.dialogs.closeActiveDialog.trigger();
     this.sendMoneyRequest.reset();
     // go to transaction screen
-    this.goToWalletRoute(publicDeriver);
+    this.goToWalletRoute(publicDeriver.self);
   };
 
   @action _onRouteChange = (options: { route: string, params: ?Object }): void => {

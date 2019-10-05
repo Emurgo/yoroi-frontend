@@ -108,7 +108,7 @@ export default class YoroiTransferStore extends Store {
     // 1) get receive address
     const publicDeriver = this.stores.substores.ada.wallets.selected;
     if (!publicDeriver) throw new Error('_setupTransferWebSocket no wallet selected');
-    const withChains = asHasChains(publicDeriver);
+    const withChains = asHasChains(publicDeriver.self);
     if (!withChains) throw new Error('_setupTransferWebSocket missing chains functionality');
     const nextInternal = await withChains.nextInternal();
     if (nextInternal.addressInfo == null) {

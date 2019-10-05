@@ -171,7 +171,7 @@ export default class AdaTransactionBuilderStore extends Store {
       await this.createUnsignedTx.promise.catch(err => { /* do nothing */ });
     }
 
-    const withAddress = asGetAllAddresses(publicDeriver);
+    const withAddress = asGetAllAddresses(publicDeriver.self);
     if (withAddress == null) {
       throw new Error('_updateTxBuilder missing get address functionality');
     }

@@ -58,7 +58,7 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
 
     // update the meta-parameters in the internal wallet representation
     await this.renameModelRequest.execute({
-      func: publicDeriver.rename,
+      func: publicDeriver.self.rename,
       request: {
         newName: request.newName,
       },
@@ -74,7 +74,7 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
     const publicDeriver = this.stores.substores.ada.wallets.selected;
     if (!publicDeriver) return;
 
-    const conceptualWallet = publicDeriver.getConceptualWallet();
+    const conceptualWallet = publicDeriver.self.getConceptualWallet();
     // update the meta-parameters in the internal wallet representation
     await this.renameModelRequest.execute({
       func: conceptualWallet.rename,
