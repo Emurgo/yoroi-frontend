@@ -155,9 +155,11 @@ export default class WalletsStore extends Store {
       const withCache = await this._addCachedData(newPublicDeriver);
       newWithCachedData.push(withCache);
     }
-    this.publicDerivers.push(...newWithCachedData);
+    runInAction(() => {
+      this.publicDerivers.push(...newWithCachedData);
 
-    this.selected = newWithCachedData[0];
+      this.selected = newWithCachedData[0];
+    });
     this.actions.dialogs.closeActiveDialog.trigger();
     this.goToWalletRoute(newWithCachedData[0].self);
 
@@ -301,18 +303,29 @@ export default class WalletsStore extends Store {
 
   /** Make all API calls required to setup/update wallet */
   @action restoreWalletsFromStorage = async (): Promise<void> => {
-    // TODO
-    // const result = await this.walletsRequest.execute({}).promise;
-    const result: Array<PublicDeriverWithCachedMeta> = [];
-    if (!result) return;
+    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
+    if (persistentDb == null) {
+      throw new Error('restoreWalletsFromStorage db not loaded. Should never happen');
+    }
+    const result = await this.getInitialWallets.execute({
+      db: persistentDb,
+    }).promise;
+    if (result == null || result.length === 0) return;
+
+    const newWithCachedData: Array<PublicDeriverWithCachedMeta> = [];
+    for (const newPublicDeriver of result) {
+      const withCache = await this._addCachedData(newPublicDeriver);
+      newWithCachedData.push(withCache);
+    }
     runInAction('refresh active wallet', () => {
-      if (this.selected != null) {
+      if (this.selected == null) {
         this._setActiveWallet({
-          wallet: this.selected
+          wallet: newWithCachedData[0]
         });
+        this.publicDerivers.push(...newWithCachedData);
       }
     });
-    for (const publicDeriver of result) {
+    for (const publicDeriver of newWithCachedData) {
       this.stores.substores[environment.API].addresses.addObservedWallet(publicDeriver);
       this.stores.substores[environment.API].transactions.addObservedWallet(publicDeriver);
     }

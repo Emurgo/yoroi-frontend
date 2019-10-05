@@ -618,30 +618,28 @@ export async function loadWalletsFromStorage(
     .keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(db, table));
-  return await raii(
+  const bip44Wallets = await raii(
     db,
     depTables,
-    async tx => {
-      const bip44Wallets = await GetAllBip44Wallets.get(db, tx);
-      const bip44Map = new Map<number, Bip44Wallet>();
-      const result: Array<PublicDeriver> = [];
-      for (const entry of bip44Wallets) {
-        let bip44Wallet = bip44Map.get(entry.Bip44Wrapper.Bip44WrapperId);
-        if (bip44Wallet == null) {
-          bip44Wallet = await Bip44Wallet.createBip44Wallet(
-            db,
-            entry.Bip44Wrapper,
-            protocolMagic,
-          );
-          bip44Map.set(entry.Bip44Wrapper.Bip44WrapperId, bip44Wallet);
-        }
-        const publicDeriver = await PublicDeriver.createPublicDeriver(
-          entry.PublicDeriver,
-          bip44Wallet,
-        );
-        result.push(publicDeriver);
-      }
-      return result;
-    }
+    async tx => GetAllBip44Wallets.get(db, tx)
   );
+  const bip44Map = new Map<number, Bip44Wallet>();
+  const result: Array<PublicDeriver> = [];
+  for (const entry of bip44Wallets) {
+    let bip44Wallet = bip44Map.get(entry.Bip44Wrapper.Bip44WrapperId);
+    if (bip44Wallet == null) {
+      bip44Wallet = await Bip44Wallet.createBip44Wallet(
+        db,
+        entry.Bip44Wrapper,
+        protocolMagic,
+      );
+      bip44Map.set(entry.Bip44Wrapper.Bip44WrapperId, bip44Wallet);
+    }
+    const publicDeriver = await PublicDeriver.createPublicDeriver(
+      entry.PublicDeriver,
+      bip44Wallet,
+    );
+    result.push(publicDeriver);
+  }
+  return result;
 }

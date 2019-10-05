@@ -22,7 +22,7 @@ import {
 export default class AdaWalletsStore extends WalletStore {
 
   // REQUESTS
-  @observable walletsRequest: Request<GetWalletsFunc>
+  @observable getInitialWallets: Request<GetWalletsFunc>
     = new Request<GetWalletsFunc>(this.api.ada.getWallets);
 
   @observable createWalletRequest: Request<CreateWalletFunc>
