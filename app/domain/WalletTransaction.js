@@ -1,5 +1,5 @@
 // @flow
-import { observable } from 'mobx';
+import { action, observable } from 'mobx';
 import BigNumber from 'bignumber.js';
 import type { AssuranceMode, AssuranceLevel } from '../types/transactionAssuranceTypes';
 import { assuranceLevels } from '../config/transactionAssuranceConfig';
@@ -51,6 +51,7 @@ export default class WalletTransaction {
     return assuranceLevels.HIGH;
   }
 
+  @action
   static fromAnnotatedUtxoTx(request: {
     data: {|
       ...DbTxIO,
