@@ -12,6 +12,7 @@ import {
   genGetTransactionsHistoryForAddresses,
   genGetBestBlock,
   mockDate,
+  filterDbSnapshot,
 } from './common';
 import { loadLovefieldDB } from '../../database/index';
 
@@ -501,6 +502,17 @@ async function baseTest(
       expect(response).toEqual(new BigNumber('0'));
     }
   }
+
+  const keysForTest = [
+    'Address',
+    'Transaction',
+    'UtxoTransactionInput',
+    'UtxoTransactionOutput',
+    'LastSyncInfo',
+    'Block'
+  ];
+  const dump = (await db.export()).tables;
+  filterDbSnapshot(dump, keysForTest);
 }
 
 test('Syncing with pending', async (done) => {

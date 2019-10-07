@@ -12,6 +12,7 @@ import {
   genGetTransactionsHistoryForAddresses,
   genGetBestBlock,
   mockDate,
+  filterDbSnapshot,
 } from './common';
 import { loadLovefieldDB } from '../../database/index';
 
@@ -350,5 +351,15 @@ test('Syncing simple transaction', async (done) => {
     await checkPub1HasTx(publicDeriver1);
   }
 
+  const keysForTest = [
+    'Address',
+    'Transaction',
+    'UtxoTransactionInput',
+    'UtxoTransactionOutput',
+    'LastSyncInfo',
+    'Block'
+  ];
+  const dump = (await db.export()).tables;
+  filterDbSnapshot(dump, keysForTest);
   done();
 });

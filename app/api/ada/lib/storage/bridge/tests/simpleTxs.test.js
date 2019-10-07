@@ -427,12 +427,6 @@ test('Syncing simple transaction', async (done) => {
   ];
   const dump = (await db.export()).tables;
   filterDbSnapshot(dump, keysForTest);
-  // console.log(stableStringify(dbDump.Transaction));
-  // console.log(stableStringify(dbDump.UtxoTransactionInput));
-  // console.log(stableStringify(dbDump.UtxoTransactionOutput));
-  // console.log(stableStringify(dbDump.LastSyncInfo));
-  // console.log(stableStringify(dbDump));
-  // compareObject(await db.export(), snapshot);
   done();
 });
 
