@@ -24,7 +24,7 @@ import {
 } from '../../models/PublicDeriver/index';
 
 import {
-  updateTransactions
+  updateTransactions, getAllUtxoTransactions
 } from '../updateTransactions';
 
 const networkTransactions: Array<RemoteTransaction> = [{

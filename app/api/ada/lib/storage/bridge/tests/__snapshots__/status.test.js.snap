@@ -3,6 +3,152 @@
 exports[`Syncing with failed 1`] = `
 Array [
   Object {
+    "amount": "-1900000",
+    "block": null,
+    "fee": "-200000",
+    "transaction": Object {
+      "BlockId": null,
+      "Digest": 1.9060984568373646e-36,
+      "ErrorMessage": null,
+      "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed547",
+      "LastUpdateTime": 1568392676000,
+      "Ordinal": null,
+      "Status": -1,
+      "TransactionId": 3,
+    },
+    "type": "expend",
+    "utxoInputs": Array [
+      Object {
+        "AddressId": 5,
+        "Amount": "2100000",
+        "IndexInOwnTx": 0,
+        "IndexInParentTx": 0,
+        "ParentTxHash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546",
+        "TransactionId": 3,
+        "UtxoTransactionInputId": 3,
+      },
+    ],
+    "utxoOutputs": Array [
+      Object {
+        "AddressId": 48,
+        "Amount": "1900000",
+        "IsUnspent": true,
+        "OutputIndex": 0,
+        "TransactionId": 3,
+        "UtxoTransactionOutputId": 5,
+      },
+    ],
+  },
+  Object {
+    "amount": "2100000",
+    "block": Object {
+      "BlockId": 2,
+      "BlockTime": 2019-09-13T16:37:36.000Z,
+      "Digest": -9.690691258114666e-56,
+      "Hash": "a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26",
+      "Height": 218609,
+      "SlotNum": 219651,
+    },
+    "fee": "0",
+    "transaction": Object {
+      "BlockId": 2,
+      "Digest": 8.191593645542673e-27,
+      "ErrorMessage": null,
+      "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545",
+      "LastUpdateTime": 1568392656000,
+      "Ordinal": 0,
+      "Status": -2,
+      "TransactionId": 1,
+    },
+    "type": "income",
+    "utxoInputs": Array [
+      Object {
+        "AddressId": 46,
+        "Amount": "4000000",
+        "IndexInOwnTx": 0,
+        "IndexInParentTx": 0,
+        "ParentTxHash": "9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20",
+        "TransactionId": 1,
+        "UtxoTransactionInputId": 1,
+      },
+    ],
+    "utxoOutputs": Array [
+      Object {
+        "AddressId": 5,
+        "Amount": "2100000",
+        "IsUnspent": true,
+        "OutputIndex": 0,
+        "TransactionId": 1,
+        "UtxoTransactionOutputId": 1,
+      },
+      Object {
+        "AddressId": 47,
+        "Amount": "1731391",
+        "IsUnspent": true,
+        "OutputIndex": 1,
+        "TransactionId": 1,
+        "UtxoTransactionOutputId": 2,
+      },
+    ],
+  },
+  Object {
+    "amount": "2100000",
+    "block": Object {
+      "BlockId": 1,
+      "BlockTime": 2019-09-13T16:37:16.000Z,
+      "Digest": -6.352946211521613e-51,
+      "Hash": "a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25",
+      "Height": 218608,
+      "SlotNum": 219650,
+    },
+    "fee": "0",
+    "transaction": Object {
+      "BlockId": 1,
+      "Digest": 1.249559827714551e-31,
+      "ErrorMessage": null,
+      "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546",
+      "LastUpdateTime": 1568392636000,
+      "Ordinal": 0,
+      "Status": -2,
+      "TransactionId": 2,
+    },
+    "type": "income",
+    "utxoInputs": Array [
+      Object {
+        "AddressId": 46,
+        "Amount": "4000000",
+        "IndexInOwnTx": 0,
+        "IndexInParentTx": 0,
+        "ParentTxHash": "9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d21",
+        "TransactionId": 2,
+        "UtxoTransactionInputId": 2,
+      },
+    ],
+    "utxoOutputs": Array [
+      Object {
+        "AddressId": 5,
+        "Amount": "2100000",
+        "IsUnspent": true,
+        "OutputIndex": 0,
+        "TransactionId": 2,
+        "UtxoTransactionOutputId": 3,
+      },
+      Object {
+        "AddressId": 47,
+        "Amount": "1731391",
+        "IsUnspent": true,
+        "OutputIndex": 1,
+        "TransactionId": 2,
+        "UtxoTransactionOutputId": 4,
+      },
+    ],
+  },
+]
+`;
+
+exports[`Syncing with failed 2`] = `
+Array [
+  Object {
     "Address": Array [
       Object {
         "AddressId": 1,
@@ -390,6 +536,152 @@ Array [
 `;
 
 exports[`Syncing with pending 1`] = `
+Array [
+  Object {
+    "amount": "-1900000",
+    "block": null,
+    "fee": "-200000",
+    "transaction": Object {
+      "BlockId": null,
+      "Digest": 1.9060984568373646e-36,
+      "ErrorMessage": null,
+      "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed547",
+      "LastUpdateTime": 1568392676000,
+      "Ordinal": null,
+      "Status": -2,
+      "TransactionId": 3,
+    },
+    "type": "expend",
+    "utxoInputs": Array [
+      Object {
+        "AddressId": 5,
+        "Amount": "2100000",
+        "IndexInOwnTx": 0,
+        "IndexInParentTx": 0,
+        "ParentTxHash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546",
+        "TransactionId": 3,
+        "UtxoTransactionInputId": 3,
+      },
+    ],
+    "utxoOutputs": Array [
+      Object {
+        "AddressId": 48,
+        "Amount": "1900000",
+        "IsUnspent": true,
+        "OutputIndex": 0,
+        "TransactionId": 3,
+        "UtxoTransactionOutputId": 5,
+      },
+    ],
+  },
+  Object {
+    "amount": "2100000",
+    "block": Object {
+      "BlockId": 2,
+      "BlockTime": 2019-09-13T16:37:36.000Z,
+      "Digest": -9.690691258114666e-56,
+      "Hash": "a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26",
+      "Height": 218609,
+      "SlotNum": 219651,
+    },
+    "fee": "0",
+    "transaction": Object {
+      "BlockId": 2,
+      "Digest": 8.191593645542673e-27,
+      "ErrorMessage": null,
+      "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545",
+      "LastUpdateTime": 1568392656000,
+      "Ordinal": 0,
+      "Status": -2,
+      "TransactionId": 1,
+    },
+    "type": "income",
+    "utxoInputs": Array [
+      Object {
+        "AddressId": 46,
+        "Amount": "4000000",
+        "IndexInOwnTx": 0,
+        "IndexInParentTx": 0,
+        "ParentTxHash": "9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20",
+        "TransactionId": 1,
+        "UtxoTransactionInputId": 1,
+      },
+    ],
+    "utxoOutputs": Array [
+      Object {
+        "AddressId": 5,
+        "Amount": "2100000",
+        "IsUnspent": true,
+        "OutputIndex": 0,
+        "TransactionId": 1,
+        "UtxoTransactionOutputId": 1,
+      },
+      Object {
+        "AddressId": 47,
+        "Amount": "1731391",
+        "IsUnspent": true,
+        "OutputIndex": 1,
+        "TransactionId": 1,
+        "UtxoTransactionOutputId": 2,
+      },
+    ],
+  },
+  Object {
+    "amount": "2100000",
+    "block": Object {
+      "BlockId": 1,
+      "BlockTime": 2019-09-13T16:37:16.000Z,
+      "Digest": -6.352946211521613e-51,
+      "Hash": "a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25",
+      "Height": 218608,
+      "SlotNum": 219650,
+    },
+    "fee": "0",
+    "transaction": Object {
+      "BlockId": 1,
+      "Digest": 1.249559827714551e-31,
+      "ErrorMessage": null,
+      "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546",
+      "LastUpdateTime": 1568392636000,
+      "Ordinal": 0,
+      "Status": -2,
+      "TransactionId": 2,
+    },
+    "type": "income",
+    "utxoInputs": Array [
+      Object {
+        "AddressId": 46,
+        "Amount": "4000000",
+        "IndexInOwnTx": 0,
+        "IndexInParentTx": 0,
+        "ParentTxHash": "9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d21",
+        "TransactionId": 2,
+        "UtxoTransactionInputId": 2,
+      },
+    ],
+    "utxoOutputs": Array [
+      Object {
+        "AddressId": 5,
+        "Amount": "2100000",
+        "IsUnspent": true,
+        "OutputIndex": 0,
+        "TransactionId": 2,
+        "UtxoTransactionOutputId": 3,
+      },
+      Object {
+        "AddressId": 47,
+        "Amount": "1731391",
+        "IsUnspent": true,
+        "OutputIndex": 1,
+        "TransactionId": 2,
+        "UtxoTransactionOutputId": 4,
+      },
+    ],
+  },
+]
+`;
+
+exports[`Syncing with pending 2`] = `
 Array [
   Object {
     "Address": Array [

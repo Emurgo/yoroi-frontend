@@ -219,7 +219,18 @@ export class GetTxAndBlock {
     if (request.skip != null) {
       query.skip(request.skip);
     }
-    return await tx.attach(query);
+    const result = await tx.attach(query);
+
+    // convert leftOuterJoin notation
+    return result.map(entry => {
+      if (entry.Block.BlockId === null) {
+        return {
+          Transaction: entry.Transaction,
+          Block: null
+        };
+      }
+      return entry;
+    });
   }
 
   static async withStatus(
@@ -229,7 +240,10 @@ export class GetTxAndBlock {
       txIds: Array<number>,
       status: Array<TxStatusCodesType>,
     },
-  ): Promise<$ReadOnlyArray<$ReadOnly<TransactionRow>>> {
+  ): Promise<$ReadOnlyArray<{
+    Transaction: $ReadOnly<TransactionRow>,
+    Block: null | $ReadOnly<BlockRow>
+  }>>  {
     const txTableMeta = GetTxAndBlock.ownTables[Tables.TransactionSchema.name];
     const blockTableMeta = GetTxAndBlock.ownTables[BlockSchema.name];
     const txTable = db.getSchema().table(txTableMeta.name);
@@ -248,7 +262,18 @@ export class GetTxAndBlock {
         txTable[txTableMeta.properties.TransactionId].in(request.txIds),
         txTable[txTableMeta.properties.Status].in(request.status),
       ));
-    return await tx.attach(query);
+    const result = await tx.attach(query);
+
+    // convert leftOuterJoin notation
+    return result.map(entry => {
+      if (entry.Block.BlockId === null) {
+        return {
+          Transaction: entry.Transaction,
+          Block: null
+        };
+      }
+      return entry;
+    });
   }
 }
 

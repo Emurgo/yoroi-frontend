@@ -23,7 +23,7 @@ import {
 } from '../../models/PublicDeriver/index';
 
 import {
-  updateTransactions
+  updateTransactions, getAllUtxoTransactions
 } from '../updateTransactions';
 
 const initialPendingTx = (state: 'Pending' | 'Failed') => ({
@@ -503,6 +503,11 @@ async function baseTest(
     }
   }
 
+  const txList = await getAllUtxoTransactions(basePubDeriver.getDb(), {
+    addressFetch: basePubDeriver,
+  });
+  expect(txList).toMatchSnapshot();
+
   const keysForTest = [
     'Address',
     'Transaction',
@@ -529,7 +534,7 @@ test('Pending dropped from backend without rollback', async (done) => {
   const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
   const publicDeriver = await setup(db);
 
-  // need pointless tx otherwise the remoote response is ignore since remote has empty blockchain
+  // need pointless tx otherwise the remote response is ignore since remote has empty blockchain
   const networkTransactions = [pointlessTx, initialPendingTx('Pending')];
   const checkAddressesInUse = genCheckAddressesInUse(networkTransactions);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
