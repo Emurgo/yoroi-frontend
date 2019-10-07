@@ -11,6 +11,7 @@ import {
   genCheckAddressesInUse,
   genGetTransactionsHistoryForAddresses,
   genGetBestBlock,
+  mockDate,
 } from './common';
 import { loadLovefieldDB } from '../../database/index';
 
@@ -88,6 +89,10 @@ const networkTransactions: Array<RemoteTransaction> = [{
 
 const mnemonic1 = 'prevent company field green slot measure chief hero apple task eagle sunset endorse dress seed';
 const mnemonic2 = 'eight country switch draw meat scout mystery blade tip drift useless good keep usage title';
+
+beforeEach(() => {
+  mockDate();
+});
 
 async function checkPub1HasTx(
   publicDeriver1: PublicDeriver,
@@ -234,8 +239,6 @@ test('Syncing simple transaction', async (done) => {
   const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
   const publicDeriver1 = await setup(db, mnemonic1);
   const publicDeriver2 = await setup(db, mnemonic2);
-  // subtract 1ms to avoid test failing if tx history syncs in <1ms (so clock doesn't increase)
-  const startTime = ((new Date()).getTime() - 1);
 
   const checkAddressesInUse = genCheckAddressesInUse(networkTransactions);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
@@ -268,16 +271,12 @@ test('Syncing simple transaction', async (done) => {
     {
       // const foo: IGetLastSyncInfo = publicDeriver1;
       const response = await publicDeriver1.getLastSyncInfo();
-      const { Time, ...rest } = response;
-      // need to test the time separately since time gets set to new Date()
-      expect(Time != null ? Time.getTime() : Time).toBeGreaterThan(
-        startTime
-      );
-      expect(rest).toEqual({
+      expect(response).toEqual({
         BlockHash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25',
         LastSyncInfoId: 1,
         SlotNum: 1,
         Height: 1,
+        Time: new Date(0),
       });
     }
   }
@@ -310,14 +309,12 @@ test('Syncing simple transaction', async (done) => {
     await checkPub2HasTx(publicDeriver2);
     {
       const response = await publicDeriver2.getLastSyncInfo();
-      const { Time, ...rest } = response;
-      // need to test the time separately since time gets set to new Date()
-      expect(Time).not.toEqual(null);
-      expect(rest).toEqual({
+      expect(response).toEqual({
         BlockHash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25',
         LastSyncInfoId: 2,
         SlotNum: 1,
         Height: 1,
+        Time: new Date(1),
       });
     }
   }
@@ -338,13 +335,12 @@ test('Syncing simple transaction', async (done) => {
     {
       // make sure last sync info got reset to ensure rollback did happen
       const response = await publicDeriver2.getLastSyncInfo();
-      const { Time, ...rest } = response;
-      expect(Time).not.toEqual(null);
-      expect(rest).toEqual({
+      expect(response).toEqual({
         BlockHash: null,
         LastSyncInfoId: 2,
         SlotNum: null,
         Height: 0,
+        Time: new Date(2),
       });
     }
   }

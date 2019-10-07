@@ -156,7 +156,7 @@ test('Can add and fetch address in wallet', async (done) => {
       expect(key.keyRow.PasswordLastUpdate).toEqual(null);
       expect(key.keyRow.IsEncrypted).toEqual(true);
 
-      const newDate = new Date();
+      const newDate = new Date(Date.now());
       const newKey = await bipWallet.changePrivateDeriverPassword({
         oldPassword: privateDeriverPassword,
         newPassword: 'asdf',
@@ -303,7 +303,7 @@ test('Can add and fetch address in wallet', async (done) => {
       expect(normalized.prvKeyHex).toEqual(firstAccountPk.key().to_hex());
       expect(normalized.pubKeyHex).toEqual(firstAccountPk.public().key().to_hex());
 
-      const newDate = new Date();
+      const newDate = new Date(Date.now());
       const newKey = await asGetSigningKeyInstance.changeSigningKeyPassword({
         oldPassword: privateDeriverPassword,
         newPassword: 'asdf',

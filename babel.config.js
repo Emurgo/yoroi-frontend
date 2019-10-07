@@ -27,7 +27,8 @@ module.exports = function (api) {
       [
         '@babel/plugin-transform-runtime',
         {
-          corejs: 2,
+          // CoreJS breaks Jest mocks for some reason
+          corejs: api.env('jest') ? false : 2,
           helpers: true,
           regenerator: true
         }

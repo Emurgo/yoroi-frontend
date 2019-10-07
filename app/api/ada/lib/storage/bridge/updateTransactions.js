@@ -440,7 +440,7 @@ async function rollback(
     db, dbTx,
     {
       LastSyncInfoId: request.lastSyncInfo.LastSyncInfoId,
-      Time: new Date(),
+      Time: new Date(Date.now()),
       SlotNum: bestStillIncluded === undefined ? null : bestStillIncluded.Block.SlotNum,
       Height: bestStillIncluded === undefined ? 0 : bestStillIncluded.Block.Height,
       BlockHash: bestStillIncluded === undefined ? null : bestStillIncluded.Block.Hash,
@@ -590,7 +590,7 @@ async function rawUpdateTransactions(
     db, dbTx,
     {
       LastSyncInfoId: lastSyncInfo.LastSyncInfoId,
-      Time: new Date(),
+      Time: new Date(Date.now()),
       SlotNum: slotInRemote,
       BlockHash: bestBlock.hash,
       Height: bestBlock.height,

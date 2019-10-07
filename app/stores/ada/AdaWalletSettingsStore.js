@@ -35,7 +35,7 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
     if (withSigningKey == null) {
       throw new Error('_changeSigningPassword missing signing functionality');
     }
-    const newUpdateDate = new Date();
+    const newUpdateDate = new Date(Date.now());
     await this.changeSigningKeyRequest.execute({
       func: withSigningKey.changeSigningKeyPassword,
       request: {

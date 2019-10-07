@@ -29,6 +29,7 @@ const privateDeriverPassword = 'greatest_password_ever';
 
 const protocolMagic = 1097911063; // testnet
 
+
 export async function setup(
   db: lf$Database,
   walletMnemonic: string = mnemonic,
@@ -78,6 +79,34 @@ export async function setup(
 
   return publicDeriver;
 }
+
+export function mockDate() {
+  let time = [0];
+  // $FlowFixMe flow doesn't like that we override built-in functions.
+  Date.now = jest.spyOn(Date, 'now').mockImplementation(() => time[0]++);
+}
+
+export function filterDbSnapshot(
+  dump: any,
+  keys: Array<string>
+) {
+  // 1) test all keys we care about are present
+  keys.sort();
+
+  const keySet = new Set(keys);
+  const keysMatched = Object.keys(dump).filter(key => keySet.has(key));
+  keysMatched.sort();
+
+  expect(keysMatched).toEqual(keys);
+
+  // 2) compare content of keys to snapshot
+  const filteredDump = keys.map(filterKey => ({
+    [filterKey]: dump[filterKey]
+  }));
+
+  expect(filteredDump).toMatchSnapshot();
+}
+
 
 export function genCheckAddressesInUse(
   blockchain: Array<RemoteTransaction>,

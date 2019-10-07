@@ -12,6 +12,8 @@ import {
   genCheckAddressesInUse,
   genGetTransactionsHistoryForAddresses,
   genGetBestBlock,
+  filterDbSnapshot,
+  mockDate,
 } from './common';
 import { loadLovefieldDB } from '../../database/index';
 
@@ -146,11 +148,13 @@ const twoTxsRegularSpend = [{
   ]
 }];
 
+beforeEach(() => {
+  mockDate();
+});
+
 test('Syncing simple transaction', async (done) => {
   const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
   const publicDeriver = await setup(db);
-  // subtract 1ms to avoid test failing if tx history syncs in <1ms (so clock doesn't increase)
-  const startTime = ((new Date()).getTime() - 1);
 
   const checkAddressesInUse = genCheckAddressesInUse(networkTransactions);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
@@ -222,16 +226,12 @@ test('Syncing simple transaction', async (done) => {
 
     {
       const response = await publicDeriver.getLastSyncInfo();
-      const { Time, ...rest } = response;
-      // need to test the time separately since time gets set to new Date()
-      expect(Time != null ? Time.getTime() : Time).toBeGreaterThan(
-        startTime
-      );
-      expect(rest).toEqual({
+      expect(response).toEqual({
         BlockHash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25',
         LastSyncInfoId: 1,
         SlotNum: 219650,
         Height: 218608,
+        Time: new Date(0),
       });
     }
   }
@@ -329,16 +329,12 @@ test('Syncing simple transaction', async (done) => {
 
     {
       const response = await publicDeriver.getLastSyncInfo();
-      const { Time, ...rest } = response;
-      // need to test the time separately since time gets set to new Date()
-      expect(Time != null ? Time.getTime() : Time).toBeGreaterThan(
-        startTime
-      );
-      expect(rest).toEqual({
+      expect(response).toEqual({
         BlockHash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26',
         LastSyncInfoId: 1,
         SlotNum: 219651,
         Height: 218609,
+        Time: new Date(2),
       });
     }
   }
@@ -411,19 +407,26 @@ test('Syncing simple transaction', async (done) => {
 
     {
       const response = await publicDeriver.getLastSyncInfo();
-      const { Time, ...rest } = response;
-      // need to test the time separately since time gets set to new Date()
-      expect(Time != null ? Time.getTime() : Time).toBeGreaterThan(
-        startTime
-      );
-      expect(rest).toEqual({
+      expect(response).toEqual({
         BlockHash: null,
         LastSyncInfoId: 1,
         SlotNum: null,
         Height: 0,
+        Time: new Date(4),
       });
     }
   }
+
+  const keysForTest = [
+    'Address',
+    'Transaction',
+    'UtxoTransactionInput',
+    'UtxoTransactionOutput',
+    'LastSyncInfo',
+    'Block'
+  ];
+  const dump = (await db.export()).tables;
+  filterDbSnapshot(dump, keysForTest);
   // console.log(stableStringify(dbDump.Transaction));
   // console.log(stableStringify(dbDump.UtxoTransactionInput));
   // console.log(stableStringify(dbDump.UtxoTransactionOutput));
