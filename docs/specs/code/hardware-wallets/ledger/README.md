@@ -224,7 +224,7 @@ In order fix UI problem, support for [WebAuthn Transport](https://www.npmjs.com/
 
 As WebAuthn Transport supports all [targetted browsers](https://caniuse.com/#search=Web%20Authentication%20API) it will be used as the default protocol.<br>
 [U2F](https://www.npmjs.com/package/@ledgerhq/hw-transport-u2f) transport will still be available.<br>
-[WebUSB](https://www.npmjs.com/package/@ledgerhq/hw-transport-webusb) transport is not supported.
+[WebUSB](https://www.npmjs.com/package/@ledgerhq/hw-transport-webusb) transport support will also be added.
 
 ## Module structure
 Till now we have two modules and one repository at: https://github.com/Emurgo/yoroi-extension-ledger-bridge<br>
@@ -235,54 +235,45 @@ Hence proposing two new repository like:<br>
 1. [yoroi-extension-ledger-connect](https://github.com/Emurgo/yoroi-extension-ledger-connect) as website which will communicate with the Ledger device
 2. [yoroi-extension-ledger-connect-handler](https://github.com/Emurgo/yoroi-extension-ledger-connect-handler) as handler of opening, closing and communication with [yoroi-extension-ledger-connect](https://github.com/Emurgo/yoroi-extension-ledger-connect) (It will be npm published module, and only this module will be needed to import in Yoroi)
 
+## Message Passing
+![ledger-content-script](https://user-images.githubusercontent.com/19986226/66384568-f77fff00-e9f9-11e9-9d1d-dfe4b8afc5fc.png)
+
+**Steps:**<br>
+1. `Yoroi` requests `yoroi-extension-ledger-connect-handler`(Using function call).
+2. `yoroi-extension-ledger-connect-handler` opens target Website.
+3. `yoroi-extension-ledger-connect-handler` sends request message to `content-script`(Using browser port).
+4. `content-script` passes request to the target Website app(Using `postMessage()`).
+5. Target Website app processes the request and send response to `content-script`(Using `postMessage()`).
+6. `content-script` passes response to `yoroi-extension-ledger-connect-handler`(Using browser port).
+7. Finally, `yoroi-extension-ledger-connect-handler` passes response to `Yoroi`(Using function return).
+
+**NOTE:**<br>
+This will only work when Yoroi is running as a browser extension, when Yoroi is running as website needs additional fixes which in not implemented yet.
+
 ## Ledger Connect URL
 WebAuthn-Transport-URL types:<br>
 1. https://emurgo.github.io/yoroi-extension-ledger-connect/?locale=ja-JP<br>
 **(Will be used from Yoroi)**<br>
-In worse case scenario, if **WebAuthn is disabled**  (i.e [isSupported](https://github.com/LedgerHQ/ledgerjs/blob/5456188404c66f10ad8be60a29a9935a8af1856f/packages/hw-transport-webauthn/src/TransportWebAuthn.js#L52) is `false`) we will fallback to **U2F**. And if **U2F** is also disabled then error will thrown asking to enable **WebAuthn**.
 
 2. https://emurgo.github.io/yoroi-extension-ledger-connect/?transport=webauthn<br>
-(No Fallback, Will not be used from Yoroi)
-3. https://emurgo.github.io/yoroi-extension-ledger-connect/?transport=webauthn&locale=en-US<br>
-(No Fallback, Will not be used from Yoroi)
+(Will not be used from Yoroi)
 
-U2F-Transport-URL types:<br>
+3. https://emurgo.github.io/yoroi-extension-ledger-connect/?transport=webauthn&locale=en-US<br>
+(Will not be used from Yoroi)
+
+U2F-Transport-URL types(Will not be used from Yoroi):<br>
 1. https://emurgo.github.io/yoroi-extension-ledger-connect/?transport=u2f<br>
-(No Fallback, Will not be used from Yoroi, just kept it as it's already in implementation)
 
 2. https://emurgo.github.io/yoroi-extension-ledger-connect/?transport=u2f&locale=ja-JP<br>
-(No Fallback, Will not be used from Yoroi, just kept it as it's already in implementation)
 
-As this page will have i18n texts, locale can be set using query parameter `locale=LANGUAGE-CODE`. If no locale is provided then locale will be `en-US` by default.
+WebUSB-Transport-URL types(Will not be used from Yoroi):<br>
+1. https://emurgo.github.io/yoroi-extension-ledger-connect/?transport=webusb<br>
 
-For WebAuthn new tab is needed to process but for U2F it's not compulsury but still proposing processing in new tab for U2F transport as well just to keep it consistent and utilize rich and helpful UI for Ledger button oparations.
+2. https://emurgo.github.io/yoroi-extension-ledger-connect/?transport=webusb&locale=ja-JP<br>
 
-## Ledger Connect page UI design
-### Ledger Nano S [WebAuthn]
-1. Common to all oparation - Checking ledger device<br>
-https://projects.invisionapp.com/d/main#/console/18169679/383606610/preview<br>
-![image](https://user-images.githubusercontent.com/19986226/64831834-714ae580-d612-11e9-90c4-b78a7f580a14.png)
+As this page will have i18n texts, locale can be set using query parameter `locale=LANGUAGE-CODE`. If no locale is provided then by default locale will be `en-US` and will not passed as query string.
 
-2. Connect Ledger device with Yoroi (same as Creating or Restoring Wallet)<br>
-https://projects.invisionapp.com/d/main#/console/18169679/383606604/preview<br>
-![image](https://user-images.githubusercontent.com/19986226/64831958-e0283e80-d612-11e9-88a0-b93f91531402.png)
-
-3. Send Transaction using Ledger device<br>
-https://projects.invisionapp.com/d/main#/console/18169679/383606605/preview<br>
-![image](https://user-images.githubusercontent.com/19986226/64832357-9b050c00-d614-11e9-8516-674aeea62da1.png)
-
-4. Verify Address<br>
-https://projects.invisionapp.com/d/main#/console/18169679/383606606/preview<br>
-![image](https://user-images.githubusercontent.com/19986226/64832473-15359080-d615-11e9-9148-d97ff75feadf.png)
-
-### Ledger Nano X [WebAuthn]
-Similar with **Ledger Nano S [WebAuthn]** but gif will be updated according to **Ledger Nano X**.
-
-### Ledger Nano S [U2F]
-Similar with **Ledger Nano S [WebAuthn]** but no pop-up dialog and no top blackish block.
-
-### Ledger Nano X [U2F]
-Similar with **Ledger Nano X [WebAuthn]** but no pop-up dialog and no top blackish block.
+For WebAuthn new tab is needed to process but for U2F+WebUSB it's not compulsury but still proposing processing in new tab for U2F+WebUSB transport as well just to keep it consistent and utilize rich and helpful UI for Ledger button oparations.
 
 ## Related PRs
 Specification: https://github.com/Emurgo/yoroi-frontend/pull/696<br>
