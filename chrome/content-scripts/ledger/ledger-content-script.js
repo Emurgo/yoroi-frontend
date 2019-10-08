@@ -1,5 +1,6 @@
 (function init () {
   const YOROI_LEDGER_CONNECT_TARGET_NAME = 'YOROI-LEDGER-CONNECT';
+  const ORIGIN = 'https://emurgo.github.io';
   const closeWindowMsg = {
     target: YOROI_LEDGER_CONNECT_TARGET_NAME,
     action: 'close-window'
@@ -18,19 +19,21 @@
   
   // Close WebPage window when port is closed
   browserPort.onDisconnect.addListener(d => {
-    console.debug(`Closing WebPage window!!`);
+    console.debug(`[CS-LEDGER] Closing WebPage window!!`);
     window.postMessage(closeWindowMsg, window.location.origin);
   });
   
   // Passing messages from WebPage ==> Extension
   window.addEventListener('message', event => {
-    const { data } = event; 
-    if (data) {
-      console.debug(`${data.action}::${data.success}`);
-    }
-  
-    if (browserPort) {
-      browserPort.postMessage(event.data)
+    if(event.origin === ORIGIN && event.data) {
+      const { data } = event;
+      // As this listener, listens to events that needs to be passed to WebPage as well,
+      // but here we are only intersted in passing result to the Extension
+      if (data.action && data.action.endsWith('-reply') && browserPort) {
+        browserPort.postMessage(event.data)
+      }
+    } else {
+      console.debug(`[CS-LEDGER] Wrong origin or no data object: ${event.origin}`);
     }
   });
 }());
