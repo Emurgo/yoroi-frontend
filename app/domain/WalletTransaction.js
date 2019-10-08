@@ -53,31 +53,44 @@ export default class WalletTransaction {
 
   @action
   static fromAnnotatedUtxoTx(request: {
-    data: {|
+    tx: {|
       ...DbTxIO,
       ...WithNullableFields<DbBlock>,
       ...UserAnnotation,
     |},
+    addressLookupMap: Map<number, string>,
     lastBlockNumber: null | number,
   }): WalletTransaction {
-    const { data } = request;
+    const { addressLookupMap, tx } = request;
+
+    const toAddr = rows => {
+      const result  = [];
+      for (const row of rows) {
+        const val = addressLookupMap.get(row.AddressId);
+        if (val == null) {
+          throw new Error('fromAnnotatedUtxoTx address not in map');
+        }
+        result.push(val);
+      }
+      return result;
+    };
     return new WalletTransaction({
-      id: data.transaction.TransactionId.toString(),
-      type: data.type,
-      amount: data.amount,
-      fee: data.fee,
-      date: data.block != null
-        ? data.block.BlockTime
-        : new Date(data.transaction.LastUpdateTime),
-      numberOfConfirmations: request.lastBlockNumber != null && data.block != null
-        ? request.lastBlockNumber - data.block.SlotNum
+      id: tx.transaction.Hash,
+      type: tx.type,
+      amount: tx.amount,
+      fee: tx.fee,
+      date: tx.block != null
+        ? tx.block.BlockTime
+        : new Date(tx.transaction.LastUpdateTime),
+      numberOfConfirmations: request.lastBlockNumber != null && tx.block != null
+        ? request.lastBlockNumber - tx.block.SlotNum
         : 0,
       addresses: {
-        from: [],
-        to: [],
+        from: toAddr(tx.utxoInputs),
+        to: toAddr(tx.utxoOutputs),
       },
-      state: data.transaction.Status,
-      errorMsg: data.transaction.ErrorMessage,
+      state: tx.transaction.Status,
+      errorMsg: tx.transaction.ErrorMessage,
     });
   }
 }

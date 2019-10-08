@@ -86,7 +86,7 @@ export type RemoteTxBlockMeta = {|
   +height: number,
   +block_hash: string,
   +tx_ordinal: number,
-  +time: null | string, // timestamp with timezone
+  +time: string, // timestamp with timezone
   +epoch: number,
   +slot: number,
 |};

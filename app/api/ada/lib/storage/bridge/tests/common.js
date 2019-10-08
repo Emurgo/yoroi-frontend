@@ -81,7 +81,7 @@ export async function setup(
 }
 
 export function mockDate() {
-  let time = [0];
+  const time = [0];
   // $FlowFixMe flow doesn't like that we override built-in functions.
   Date.now = jest.spyOn(Date, 'now').mockImplementation(() => time[0]++);
 }

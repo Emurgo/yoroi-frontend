@@ -81,7 +81,10 @@ export async function rawGetUtxoTransactions(
     skip?: number,
     limit?: number,
   },
-): Promise<Array<UtxoAnnotatedTransaction>> {
+): Promise<{|
+  addressLookupMap: Map<number, string>,
+  txs: Array<UtxoAnnotatedTransaction>,
+|}> {
   const addresses = await request.addressFetch.rawGetAllAddresses(
     dbTx,
     {
@@ -106,6 +109,25 @@ export async function rawGetUtxoTransactions(
     { txs: txs.map(txWithBlock => txWithBlock.Transaction) }
   );
 
+  // we need to build a lookup map of AddressId => Hash
+  // note: some inputs or outputs may not belong to us
+  // so we can't build this map from previously calculated information
+  const addressLookupMap = new Map<number, string>();
+  {
+    const allAddressIds = txsWithIOs.flatMap(txWithIO => [
+      ...txWithIO.utxoInputs.map(input => input.AddressId),
+      ...txWithIO.utxoOutputs.map(output => output.AddressId)
+    ]);
+    const addressRows = await GetAddress.getById(
+      db, dbTx,
+      // get rid of duplications (some tx can have multiple inputs of same address)
+      Array.from(new Set(allAddressIds))
+    );
+    for (const row of addressRows) {
+      addressLookupMap.set(row.AddressId, row.Hash);
+    }
+  }
+
   const result = txsWithIOs.map(tx => ({
     ...tx,
     block: blockMap.get(tx.transaction.TransactionId),
@@ -116,7 +138,10 @@ export async function rawGetUtxoTransactions(
     })
   }));
 
-  return result;
+  return {
+    addressLookupMap,
+    txs: result,
+  };
 }
 
 export async function getAllUtxoTransactions(
@@ -126,7 +151,10 @@ export async function getAllUtxoTransactions(
     skip?: number,
     limit?: number,
   },
-): Promise<Array<UtxoAnnotatedTransaction>> {
+): Promise<{|
+  addressLookupMap: Map<number, string>,
+  txs: Array<UtxoAnnotatedTransaction>,
+|}> {
   const deps = Object.freeze({
     GetPathWithSpecific,
     GetAddress,
@@ -171,7 +199,10 @@ export async function getPendingUtxoTransactions(
   request: {
     addressFetch: IGetAllAddresses,
   },
-): Promise<Array<UtxoAnnotatedTransaction>> {
+): Promise<{|
+  addressLookupMap: Map<number, string>,
+  txs: Array<UtxoAnnotatedTransaction>,
+|}> {
   const deps = Object.freeze({
     GetPathWithSpecific,
     GetAddress,

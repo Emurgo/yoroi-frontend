@@ -649,9 +649,10 @@ export default class AdaApi {
       Logger.debug('AdaApi::refreshTransactions success: ' + stringifyData(fetchedTxs));
 
       const lastSyncInfo = await request.publicDeriver.getLastSyncInfo();
-      const mappedTransactions = fetchedTxs.map(tx => {
+      const mappedTransactions = fetchedTxs.txs.map(tx => {
         return WalletTransaction.fromAnnotatedUtxoTx({
-          data: tx,
+          tx,
+          addressLookupMap: fetchedTxs.addressLookupMap,
           lastBlockNumber: lastSyncInfo.SlotNum,
         });
       });
@@ -679,9 +680,10 @@ export default class AdaApi {
       Logger.debug('AdaApi::refreshPendingTransactions success: ' + stringifyData(fetchedTxs));
 
       const lastSyncInfo = await request.publicDeriver.getLastSyncInfo();
-      const mappedTransactions = fetchedTxs.map(tx => {
+      const mappedTransactions = fetchedTxs.txs.map(tx => {
         return WalletTransaction.fromAnnotatedUtxoTx({
-          data: tx,
+          tx,
+          addressLookupMap: fetchedTxs.addressLookupMap,
           lastBlockNumber: lastSyncInfo.SlotNum,
         });
       });
