@@ -1,6 +1,7 @@
 // @flow
 import { action, observable } from 'mobx';
 import BigNumber from 'bignumber.js';
+import { LOVELACES_PER_ADA } from '../config/numbersConfig';
 import type { AssuranceMode, AssuranceLevel } from '../types/transactionAssuranceTypes';
 import { assuranceLevels } from '../config/transactionAssuranceConfig';
 import type {
@@ -77,8 +78,8 @@ export default class WalletTransaction {
     return new WalletTransaction({
       id: tx.transaction.Hash,
       type: tx.type,
-      amount: tx.amount,
-      fee: tx.fee,
+      amount: tx.amount.dividedBy(LOVELACES_PER_ADA),
+      fee: tx.fee.dividedBy(LOVELACES_PER_ADA),
       date: tx.block != null
         ? tx.block.BlockTime
         : new Date(tx.transaction.LastUpdateTime),
