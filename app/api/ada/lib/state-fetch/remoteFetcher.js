@@ -120,7 +120,17 @@ export class RemoteFetcher implements IFetcher {
           'yoroi-locale': this.currentLocale()
         }
       }
-    ).then(response => response.data)
+    ).then(response => {
+      // TODO: remove this once we rename the field in the backend-service
+      return response.data.map(resp => {
+        const height = resp.block_num;
+        delete resp.block_num;
+        return {
+          ...resp,
+          height,
+        };
+      });
+    })
       .catch((error) => {
         Logger.error('RemoteFetcher::getTransactionsHistoryForAddresses error: ' + stringifyError(error));
         throw new GetTxHistoryForAddressesApiError();
