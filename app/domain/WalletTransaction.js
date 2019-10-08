@@ -78,7 +78,7 @@ export default class WalletTransaction {
     return new WalletTransaction({
       id: tx.transaction.Hash,
       type: tx.type,
-      amount: tx.amount.dividedBy(LOVELACES_PER_ADA),
+      amount: tx.amount.dividedBy(LOVELACES_PER_ADA).plus(tx.fee.dividedBy(LOVELACES_PER_ADA)),
       fee: tx.fee.dividedBy(LOVELACES_PER_ADA),
       date: tx.block != null
         ? tx.block.BlockTime
