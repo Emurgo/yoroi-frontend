@@ -12,7 +12,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onSubmit: { recoveryPhrase: string } => void,
+  onSubmit: { masterKey: string, } => void,
   onBack: Function,
   classicTheme: boolean,
 |};
