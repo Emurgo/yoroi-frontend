@@ -1235,7 +1235,7 @@ export default class AdaApi {
         },
       );
       Logger.debug('AdaApi::getTransactionRowsToExport: success');
-      return convertAdaTransactionsToExportRows(fetchedTxs);
+      return convertAdaTransactionsToExportRows(fetchedTxs.txs);
     } catch (error) {
       Logger.error('AdaApi::getTransactionRowsToExport: ' + stringifyError(error));
 
