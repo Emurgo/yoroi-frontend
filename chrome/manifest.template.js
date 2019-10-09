@@ -44,7 +44,7 @@ export default ({
     {
       matches: ['https://emurgo.github.io/yoroi-extension-ledger-connect/'],
       js: ['js/ledger-content-script.js']
-    }    
+    }
   ],
   content_security_policy: contentSecurityPolicy,
   ...(extensionKey ? { key: extensionKey } : {}),

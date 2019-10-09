@@ -1,6 +1,6 @@
+// @flow
 import { ConnectionTypeValue } from 'yoroi-extension-ledger-connect-handler';
 
-// @flow
 export default {
   wallets: {
     ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION: 2,
