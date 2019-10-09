@@ -696,7 +696,7 @@ export class AddAdhocPublicDeriver {
             PublicKeyId: keys.public,
             PrivateKeyId: keys.private,
             Parent: parentId,
-            Index: request.pathToPublic[request.pathToPublic.length].index,
+            Index: request.pathToPublic[request.pathToPublic.length - 1].index,
           }),
           levelInfo: id => ({
             KeyDerivationId: id,

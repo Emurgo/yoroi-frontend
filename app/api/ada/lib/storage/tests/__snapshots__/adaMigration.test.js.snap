@@ -1,0 +1,79 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Migrate storage v1 to storage v2 1`] = `
+Array [
+  Object {
+    "Bip44Account": Array [
+      Object {
+        "Bip44AccountId": 1,
+        "KeyDerivationId": 4,
+      },
+    ],
+  },
+  Object {
+    "Bip44Chain": Array [
+      Object {
+        "Bip44ChainId": 1,
+        "DisplayCutoff": 142,
+        "KeyDerivationId": 5,
+      },
+      Object {
+        "Bip44ChainId": 2,
+        "DisplayCutoff": null,
+        "KeyDerivationId": 26,
+      },
+    ],
+  },
+  Object {
+    "Bip44CoinType": Array [],
+  },
+  Object {
+    "Bip44Purpose": Array [
+      Object {
+        "Bip44PurposeId": 1,
+        "KeyDerivationId": 3,
+      },
+    ],
+  },
+  Object {
+    "Bip44Root": Array [
+      Object {
+        "Bip44RootId": 1,
+        "KeyDerivationId": 1,
+      },
+      Object {
+        "Bip44RootId": 2,
+        "KeyDerivationId": 2,
+      },
+    ],
+  },
+  Object {
+    "ConceptualWallet": Array [
+      Object {
+        "CoinType": 2147485463,
+        "ConceptualWalletId": 1,
+        "Name": "Wallet",
+      },
+    ],
+  },
+  Object {
+    "HwWalletMeta": Array [],
+  },
+  Object {
+    "Key": Array [
+      Object {
+        "Hash": "a4f667dd7dd4e242fdc082540f24996a54227f6bbf0e77f735fc192fca4dbe8fcad69edddcd0ab1c5d1db62717c6b733fba5f19bcf4cda7a17770408342c4eb25373ab7e47678ab20ad428301a39324a0f789f10901ce41a128b466568f863b9b7baa989aaf09ec746615ea2400430dadec18ada015841107bd2133dc3b2af107ecea49c1b345bdb51ebda9fed6ebe6546efa20524d2dcc66c8a5605",
+        "IsEncrypted": true,
+        "KeyId": 1,
+        "PasswordLastUpdate": "2019-07-31T13:40:16+03:00",
+      },
+      Object {
+        "Hash": "b2938f29eb965952b03baaf010b0f5fe4a2c116a1e255274c9ace24deb72450ce1c045821c42ed11b33db3124b1551793e76b8ad187efb92b28969b92bb95964",
+        "IsEncrypted": false,
+        "KeyId": 2,
+        "PasswordLastUpdate": null,
+      },
+    ],
+  },
+]
+`;

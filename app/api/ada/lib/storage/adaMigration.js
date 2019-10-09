@@ -165,7 +165,7 @@ async function bip44Migration(
  * This migrates to a new storage format to allow multiple wallets and different kinds of wallets
  * see v2 storage spec for more details
  */
-async function storagev2Migation(
+export async function storagev2Migation(
   persistentDb: lf$Database,
 ): Promise<boolean> {
   // all information in the v1 indexdb can be inferred from the blockchain
@@ -179,7 +179,7 @@ async function storagev2Migation(
     const settings = RustModule.Wallet.BlockchainSettings.from_json({
       protocol_magic: protocolMagic
     });
-    const migratedWallet = await migrateFromStorageV1({
+    await migrateFromStorageV1({
       db: persistentDb,
       accountPubKey: account.root_cached_key,
       displayCutoff: lastReceiveIndex,
