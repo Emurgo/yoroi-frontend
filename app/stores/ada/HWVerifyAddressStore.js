@@ -100,19 +100,21 @@ export default class AddressesStore extends Store {
   ): Promise<void> => {
     try {
       // trick to fix flow
-      this.ledgerConnent = new LedgerConnect({
+      this.ledgerConnect = new LedgerConnect({
         connectionType: Config.wallets.hardwareWallet.ledgerNanoS.DEFAULT_TRANSPORT_PROTOCOL,
         locale: this.stores.profile.currentLocale
       });
-      await prepareLedgerConnect(this.ledgerConnent);
+      await prepareLedgerConnect(this.ledgerConnect);
 
       Logger.info('AddressStore::_verifyAddress show path ' + JSON.stringify(path));
-      await this.ledgerConnent.showAddress(path, address);
+      if (this.ledgerConnect) {
+        await this.ledgerConnect.showAddress(path, address);
+      }
     } catch (error) {
       Logger.error('AddressStore::ledgerVerifyAddress::error: ' + stringifyError(error));
       this._setError(ledgerErrorToLocalized(error));
     } finally {
-      this.ledgerConnent && this.ledgerConnent.dispose();
+      this.ledgerConnect && this.ledgerConnect.dispose();
       this.ledgerConnect = undefined;
       Logger.info('HWVerifyStore::ledgerVerifyAddress finalized ');
     }
@@ -132,7 +134,7 @@ export default class AddressesStore extends Store {
   }
 
   @action _closeAddressDetailDialog = (): void => {
-    this.ledgerConnent && this.ledgerConnent.dispose();
+    this.ledgerConnect && this.ledgerConnect.dispose();
     this.ledgerConnect = undefined;
     this.selectedAddress = null;
     this._setError(null);

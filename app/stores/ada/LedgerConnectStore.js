@@ -155,13 +155,15 @@ export default class LedgerConnectStore
 
       // get Cardano's first account's
       // i.e hdPath = [2147483692, 2147485463, 2147483648]
-      const extendedPublicKeyResp: ExtendedPublicKeyResp
-        = await this.ledgerConnect.getExtendedPublicKey(accountPath);
+      let extendedPublicKeyResp: ExtendedPublicKeyResp;
+      if (this.ledgerConnect) {
+        extendedPublicKeyResp = await this.ledgerConnect.getExtendedPublicKey(accountPath);
 
-      this.hwDeviceInfo = this._normalizeHWResponse({
-        ePublicKey: extendedPublicKeyResp.ePublicKey,
-        deviceVersion: extendedPublicKeyResp.deviceVersion
-      });
+        this.hwDeviceInfo = this._normalizeHWResponse({
+          ePublicKey: extendedPublicKeyResp.ePublicKey,
+          deviceVersion: extendedPublicKeyResp.deviceVersion
+        });
+      }
 
       this._goToSaveLoad();
       Logger.info('Ledger device OK');
