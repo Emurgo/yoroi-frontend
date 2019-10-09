@@ -134,6 +134,7 @@ export default class LedgerSendStore extends Store {
         ledgerSignTxResp,
         params.signRequest.unsignedTx,
       );
+      Logger.info('Signing on Ledger device is OK');
     } catch (error) {
       Logger.error('LedgerSendStore::_send::error: ' + stringifyError(error));
       this._setError(convertToLocalizableError(error));
