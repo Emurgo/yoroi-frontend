@@ -631,6 +631,7 @@ export type AddAdhocPublicDeriverRequest = {|
   bip44WrapperId: number,
   publicKey: KeyInsert,
   parentDerivationId: null | number,
+  pathStartLevel: number,
   pathToPublic: InsertPath,
   publicDeriverInsert: {
     derivationId: number,
@@ -662,7 +663,7 @@ export class AddAdhocPublicDeriver {
   ): Promise<AddAdhocPublicDeriverResponse<Row>> {
     let parentId: number | null = request.parentDerivationId;
     for (let i = 0; i < request.pathToPublic.length - 1; i++) {
-      const levelResult = await AddPrivateDeriver.depTables.AddDerivation.add(
+      const levelResult = await AddAdhocPublicDeriver.depTables.AddDerivation.add(
         db, tx,
         {
           privateKeyInfo: null,
@@ -680,7 +681,7 @@ export class AddAdhocPublicDeriver {
             ...request.pathToPublic[i].insert,
           }),
         },
-        i,
+        request.pathStartLevel + i,
       );
       parentId = levelResult.KeyDerivation.KeyDerivationId;
     }

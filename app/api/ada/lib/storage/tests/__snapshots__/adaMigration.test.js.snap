@@ -25,13 +25,18 @@ Array [
     ],
   },
   Object {
-    "Bip44CoinType": Array [],
+    "Bip44CoinType": Array [
+      Object {
+        "Bip44CoinTypeId": 1,
+        "KeyDerivationId": 3,
+      },
+    ],
   },
   Object {
     "Bip44Purpose": Array [
       Object {
         "Bip44PurposeId": 1,
-        "KeyDerivationId": 3,
+        "KeyDerivationId": 2,
       },
     ],
   },
@@ -41,9 +46,17 @@ Array [
         "Bip44RootId": 1,
         "KeyDerivationId": 1,
       },
+    ],
+  },
+  Object {
+    "Bip44Wrapper": Array [
       Object {
-        "Bip44RootId": 2,
-        "KeyDerivationId": 2,
+        "Bip44WrapperId": 1,
+        "ConceptualWalletId": 1,
+        "IsBundled": false,
+        "PublicDeriverLevel": 3,
+        "SignerLevel": 0,
+        "Version": 2,
       },
     ],
   },

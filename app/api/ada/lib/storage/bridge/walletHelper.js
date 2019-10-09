@@ -304,7 +304,12 @@ export async function createHardwareWallet(request: {
             LastSyncInfoId: ids.lastSyncInfoId,
           }),
           parentDerivationId: null,
+          pathStartLevel: 0,
           pathToPublic: [
+            {
+              index: 0,
+              insert: {},
+            },
             {
               index: BIP44_PURPOSE,
               insert: {},
@@ -445,7 +450,15 @@ export async function migrateFromStorageV1(request: {
           parentDerivationId: finalState.privateDeriver == null
             ? null
             : finalState.privateDeriver.privateDeriverResult.KeyDerivationId,
+          pathStartLevel: finalState.privateDeriver == null ? 0 : 1,
           pathToPublic: [
+            ...(finalState.privateDeriver != null
+              ? []
+              : [{
+                index: 0,
+                insert: {},
+              }]
+            ),
             {
               index: BIP44_PURPOSE,
               insert: {},

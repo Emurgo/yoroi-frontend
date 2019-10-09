@@ -13,6 +13,9 @@ beforeAll(async () => {
   await RustModule.load();
 });
 
+beforeEach(() => {
+  mockDate();
+});
 
 test('Migrate storage v1 to storage v2', async (done) => {
   const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
@@ -25,6 +28,7 @@ test('Migrate storage v1 to storage v2', async (done) => {
   const keysForTest = [
     'ConceptualWallet',
     'Key',
+    'Bip44Wrapper',
     'Bip44Root', // why two roots?
     'Bip44Purpose',
     'Bip44CoinType', // TODO: why is this missing?
