@@ -8,12 +8,14 @@ import '../../../test-config';
 import type { RemoteTransaction } from '../../../../adaTypes';
 import {
   setup,
-  genCheckAddressesInUse,
-  genGetTransactionsHistoryForAddresses,
-  genGetBestBlock,
   mockDate,
   filterDbSnapshot,
 } from './common';
+import {
+  genCheckAddressesInUse,
+  genGetTransactionsHistoryForAddresses,
+  genGetBestBlock,
+} from './mockNetwork';
 import { loadLovefieldDB } from '../../database/index';
 
 import {

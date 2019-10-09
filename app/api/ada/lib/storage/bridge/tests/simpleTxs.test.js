@@ -9,12 +9,14 @@ import '../../../test-config';
 import type { RemoteTransaction } from '../../../../adaTypes';
 import {
   setup,
-  genCheckAddressesInUse,
-  genGetTransactionsHistoryForAddresses,
-  genGetBestBlock,
   filterDbSnapshot,
   mockDate,
 } from './common';
+import {
+  genCheckAddressesInUse,
+  genGetTransactionsHistoryForAddresses,
+  genGetBestBlock,
+} from './mockNetwork';
 import { loadLovefieldDB } from '../../database/index';
 
 import {
@@ -24,7 +26,7 @@ import {
 } from '../../models/PublicDeriver/index';
 
 import {
-  updateTransactions, getAllUtxoTransactions
+  updateTransactions,
 } from '../updateTransactions';
 
 const networkTransactions: Array<RemoteTransaction> = [{

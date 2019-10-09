@@ -1,12 +1,12 @@
 // @flow
 
 import { create, bodyParser, defaults } from 'json-server';
-import moment from 'moment';
 import BigNumber from 'bignumber.js';
 import type {
   AddressUtxoRequest, AddressUtxoResponse,
   UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
+  BestBlockRequest, BestBlockResponse,
   SignedRequest, SignedResponse,
   FilterUsedRequest, FilterUsedResponse,
   ServerStatusResponse
@@ -27,15 +27,6 @@ function _validateAddressesReq(
     throw new Error('Addresses request length should be (0, ' + addressesLimit + ']');
   }
   // TODO: Add address validation
-  return true;
-}
-
-function _validateDatetimeReq(
-  { dateFrom }: { dateFrom: Date } = {}
-): boolean {
-  if (!dateFrom || !moment(dateFrom).isValid()) {
-    throw new Error('DateFrom should be a valid datetime');
-  }
   return true;
 }
 
@@ -113,27 +104,27 @@ export function getMockServer(
       res.send({ sum: result });
     });
 
-    server.post('/api/txs/history', (
+    server.post('/api/v2/txs/history', async (
       req: {
         body: HistoryRequest
       },
       res: { send(arg: HistoryResponse): any }
-    ): void => {
+    ): Promise<void> => {
       chai.assert.isTrue(_validateAddressesReq(req.body));
-      chai.assert.isTrue(_validateDatetimeReq(req.body));
 
-      const addressSet = new Set(req.body.addresses);
-      const history = mockImporter.history();
-      const filteredTxs = history.filter(tx => {
-        if (moment(tx.last_update) < moment(req.body.dateFrom)) {
-          return false;
-        }
-        const includesAddress = tx.inputs_address.some(elem => addressSet.has(elem))
-          || tx.outputs_address.some(elem => addressSet.has(elem));
-        return includesAddress;
-      });
+      const history = await mockImporter.history(req.body);
       // Returns a chunk of txs
-      res.send(filteredTxs.slice(0, txsLimit));
+      res.send(history.slice(0, txsLimit));
+    });
+
+    server.get('/api/v2/bestblock', async (
+      req: {
+        body: BestBlockRequest
+      },
+      res: { send(arg: BestBlockResponse): any }
+    ): Promise<void> => {
+      const bestBlock = await mockImporter.getBestBlock(req.body);
+      res.send(bestBlock);
     });
 
     server.post('/api/txs/signed', (
@@ -151,16 +142,14 @@ export function getMockServer(
       }
     });
 
-    server.post('/api/addresses/filterUsed', (
+    server.post('/api/addresses/filterUsed', async (
       req: {
         body: FilterUsedRequest
       },
       res: { send(arg: FilterUsedResponse): any }
-    ): void => {
-      const usedAddresses = mockImporter.usedAddresses();
-      const filteredAddresses = req.body.addresses
-        .filter((address) => usedAddresses.has(address));
-      res.send(filteredAddresses);
+    ): Promise<void> => {
+      const response = await mockImporter.usedAddresses(req.body);
+      res.send(response);
     });
 
     server.get('/api/status', (

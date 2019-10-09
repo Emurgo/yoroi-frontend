@@ -123,6 +123,9 @@ export class RemoteFetcher implements IFetcher {
     ).then(response => {
       // TODO: remove this once we rename the field in the backend-service
       return response.data.map(resp => {
+        if (resp.height != null) {
+          return resp;
+        }
         const height = resp.block_num;
         delete resp.block_num;
         return {
