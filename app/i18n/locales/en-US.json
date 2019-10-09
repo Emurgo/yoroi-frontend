@@ -448,7 +448,7 @@
   "wallet.transaction.memo.edit.dialog.input.label": "Memo",
   "wallet.transaction.memo.edit.dialog.actions.submit": "Save",
   "wallet.transaction.memo.delete.dialog.title": "Delete memo",
-  "wallet.transaction.memo.delete.dialog.content": "Are you sure you want to remove the memo for this transaction? Doing so will erase all copies of it and you will not be able to restore it in the future.",
+  "wallet.transaction.memo.delete.dialog.content": "Are you sure you want to remove the memo for this transaction?<br />Doing so will erase all copies of it and you will not be able to restore it in the future.",
   "wallet.transaction.memo.delete.dialog.actions.cancel": "Cancel",
   "wallet.transaction.memo.delete.dialog.actions.delete": "Delete",
   "wallet.transaction.memo.invalid": "Memo requires at least 1 and at most 256 characters.",

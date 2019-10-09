@@ -8,7 +8,7 @@ import ErrorSvg from '../../assets/images/input/exclamationmark.inline.svg';
 import PasswordSvg from '../../assets/images/input/password.watch.inline.svg';
 import PasswordHiddenSvg from '../../assets/images/input/password.hiden.inline.svg';
 import SuccessSvg from '../../assets/images/widget/tick-green.inline.svg';
-import DeleteMemoSvg from '../../assets/images/close-cross.inline.svg';
+import DeleteMemoSvg from '../../assets/images/cross.inline.svg';
 import styles from './FormFieldOwnSkin.scss';
 
 // This type should be kept open (not "exact") because it is a react-polymorph skin

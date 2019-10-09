@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
@@ -94,7 +94,7 @@ export default class DeleteMemoDialog extends Component<Props, State> {
       >
         <div className={styles.content}>
           { error ? (<ErrorBlock error={error} />) : null }
-          <p>{intl.formatMessage(messages.deleteMemoContent)}</p>
+          <FormattedHTMLMessage {...messages.deleteMemoContent} />
         </div>
       </Dialog>);
   }
