@@ -107,9 +107,6 @@ export default class AddressesStore extends Store {
       await prepareLedgerConnect(ledgerConnent);
 
       Logger.info('AddressStore::_verifyAddress show path ' + JSON.stringify(path));
-      // the next line is used to get an error when
-      // Ledger is not connected or has issues.
-      // await LedgerConnect.getVersion();
       await ledgerConnent.showAddress(path, address);
     } catch (error) {
       Logger.error('AddressStore::ledgerVerifyAddress::error: ' + stringifyError(error));
