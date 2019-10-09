@@ -56,6 +56,7 @@ export default class LedgerConnectStore
   @observable progressInfo: ProgressInfo;
   error: ?LocalizableError;
   hwDeviceInfo: ?HWDeviceInfo;
+  ledgerConnect: ?LedgerConnect;
 
   get defaultWalletName(): string {
     // Ledger doesn’t provide any device name so using hard-coded name
@@ -95,6 +96,8 @@ export default class LedgerConnectStore
 
   @action _cancel = (): void => {
     this.teardown();
+    this.ledgerConnect && this.ledgerConnect.dispose();
+    this.ledgerConnect = undefined;
   };
 
   teardown(): void {
@@ -138,13 +141,12 @@ export default class LedgerConnectStore
   };
 
   _checkAndStoreHWDeviceInfo = async (): Promise<void> => {
-    let ledgerConnect: LedgerConnect;
     try {
-      ledgerConnect = new LedgerConnect({
+      this.ledgerConnect = new LedgerConnect({
         connectionType: Config.wallets.hardwareWallet.ledgerNanoS.DEFAULT_TRANSPORT_PROTOCOL,
         locale: this.stores.profile.currentLocale
       });
-      await prepareLedgerConnect(ledgerConnect);
+      await prepareLedgerConnect(this.ledgerConnect);
 
       // TODO: assume single account in Yoroi
       const accountPath = makeCardanoAccountBIP44Path(0);
@@ -154,7 +156,7 @@ export default class LedgerConnectStore
       // get Cardano's first account's
       // i.e hdPath = [2147483692, 2147485463, 2147483648]
       const extendedPublicKeyResp: ExtendedPublicKeyResp
-        = await ledgerConnect.getExtendedPublicKey(accountPath);
+        = await this.ledgerConnect.getExtendedPublicKey(accountPath);
 
       this.hwDeviceInfo = this._normalizeHWResponse({
         ePublicKey: extendedPublicKeyResp.ePublicKey,
@@ -166,7 +168,8 @@ export default class LedgerConnectStore
     } catch (error) {
       this._handleConnectError(error);
     } finally {
-      ledgerConnect && ledgerConnect.dispose();
+      this.ledgerConnect && this.ledgerConnect.dispose();
+      this.ledgerConnect = undefined;
     }
   };
 
