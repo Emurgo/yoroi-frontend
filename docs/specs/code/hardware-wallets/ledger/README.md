@@ -241,10 +241,10 @@ Hence proposing two new repository like:<br>
 **Steps:**<br>
 1. `Yoroi` requests `yoroi-extension-ledger-connect-handler`(Using function call).
 2. `yoroi-extension-ledger-connect-handler` opens target Website.
-3. `yoroi-extension-ledger-connect-handler` sends request message to `content-script`(Using browser port).
+3. `yoroi-extension-ledger-connect-handler` sends request message to `content-script`(Using extension port).
 4. `content-script` passes request to the target Website app(Using `postMessage()`).
 5. Target Website app processes the request and send response to `content-script`(Using `postMessage()`).
-6. `content-script` passes response to `yoroi-extension-ledger-connect-handler`(Using browser port).
+6. `content-script` passes response to `yoroi-extension-ledger-connect-handler`(Using extension port).
 7. Finally, `yoroi-extension-ledger-connect-handler` passes response to `Yoroi`(Using function return).
 
 **NOTE:**<br>
