@@ -38,6 +38,7 @@ export default class AddressesStore extends Store {
   @observable isActionProcessing: boolean = false;
   @observable error: ?LocalizableError = null;
   @observable selectedAddress: ?{ address: string, path: BIP32Path } = null;
+  ledgerConnect: ?LedgerConnect;
 
   setup() {
     const actions = this.actions[environment.API].hwVerifyAddress;
@@ -97,22 +98,22 @@ export default class AddressesStore extends Store {
     path: BIP32Path,
     address: string,
   ): Promise<void> => {
-    let ledgerConnent: LedgerConnect;
     try {
       // trick to fix flow
-      ledgerConnent = new LedgerConnect({
+      this.ledgerConnent = new LedgerConnect({
         connectionType: Config.wallets.hardwareWallet.ledgerNanoS.DEFAULT_TRANSPORT_PROTOCOL,
         locale: this.stores.profile.currentLocale
       });
-      await prepareLedgerConnect(ledgerConnent);
+      await prepareLedgerConnect(this.ledgerConnent);
 
       Logger.info('AddressStore::_verifyAddress show path ' + JSON.stringify(path));
-      await ledgerConnent.showAddress(path, address);
+      await this.ledgerConnent.showAddress(path, address);
     } catch (error) {
       Logger.error('AddressStore::ledgerVerifyAddress::error: ' + stringifyError(error));
       this._setError(ledgerErrorToLocalized(error));
     } finally {
-      ledgerConnent && ledgerConnent.dispose();
+      this.ledgerConnent && this.ledgerConnent.dispose();
+      this.ledgerConnect = undefined;
       Logger.info('HWVerifyStore::ledgerVerifyAddress finalized ');
     }
   }
@@ -131,6 +132,8 @@ export default class AddressesStore extends Store {
   }
 
   @action _closeAddressDetailDialog = (): void => {
+    this.ledgerConnent && this.ledgerConnent.dispose();
+    this.ledgerConnect = undefined;
     this.selectedAddress = null;
     this._setError(null);
     this._setActionProcessing(false);
