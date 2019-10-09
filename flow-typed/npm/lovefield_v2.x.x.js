@@ -178,7 +178,7 @@ declare module 'lovefield' {
     ): Promise<void>;
     createRow(payload: Object): lf$Row;
     getVersion(): number;
-    dump(): $ReadOnlyArray<$ReadOnly<Object>>;
+    dump(): Promise<{ [tableName: string]: Array<any> }>;
   }
 
   declare var npm$namespace$lf$schema: {

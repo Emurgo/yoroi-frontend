@@ -62,7 +62,7 @@ export const loadLovefieldDB = async (
 const populateAndCreate = async (
   storeType: $Values<typeof schema.DataStoreType>
 ): Promise<lf$Database> => {
-  const schemaBuilder = schema.create('yoroi-schema', 2);
+  const schemaBuilder = schema.create('yoroi-schema', 7);
 
   populateUncategorizedDb(schemaBuilder);
   populateBip44Db(schemaBuilder);
@@ -87,6 +87,13 @@ export async function clear(
   await tx.commit();
 }
 
+/**
+ * expose dump of previous DB version so we can use it for migration
+ * Note: all connection types reuse this variable unfortunately
+ * since there is no way to detect the database type given just the raw back store
+ */
+export const dumpByVersion: { [tableName: string]: Array<any> } = {};
+
 async function onUpgrade(
   rawDb: lf$raw$BackStore,
 ): Promise<void> {
@@ -95,10 +102,9 @@ async function onUpgrade(
     // defaults to 0 when first time launching ever
     return;
   }
+  const dump = await rawDb.dump();
   if (version === 1) {
-    // TODO: expose dump for migration
-    const dump = rawDb.dump();
-
+    Object.assign(dumpByVersion, dump);
     rawDb.dropTable('TxAddresses');
     rawDb.dropTable('Txs');
     rawDb.dropTable('Addresses');

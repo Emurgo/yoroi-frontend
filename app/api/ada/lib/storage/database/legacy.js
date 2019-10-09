@@ -1,9 +1,6 @@
 // @flow
 
-import type {
-  AdaAddress,
-} from '../../../adaTypes';
-import type { lf$Database } from 'lovefield';
+import { dumpByVersion } from './index';
 
 /**
  * This file contains methods used to extract information
@@ -12,12 +9,29 @@ import type { lf$Database } from 'lovefield';
  * to migrate to a new format
  */
 
-export const getLegacyAddressesList = (
-  db: lf$Database
-): Promise<Array<AdaAddress>> => {
-  const addressesTable = db.getSchema().table('Addresses');
-  return db.select()
-    .from(addressesTable)
-    .exec()
-    .then(rows => rows.map(row => row.value));
+export type LegacyAddressingInfo = {
+  account: number,
+  change: number,
+  index: number,
+};
+export type LegacyAdaAmount = {
+  getCCoin: string,
+};
+export type LegacyAdaAddress = {
+  cadAmount: LegacyAdaAmount,
+  cadId: string,
+  cadIsUsed: boolean,
+} & LegacyAddressingInfo;
+
+export const getLegacyAddressesList = (): Array<LegacyAdaAddress> => {
+  if (dumpByVersion.Addresses) {
+    return dumpByVersion.Addresses;
+  }
+  return [];
+};
+
+export const resetLegacy = (): void => {
+  for (const prop of Object.keys(dumpByVersion)) {
+    delete dumpByVersion[prop];
+  }
 };
