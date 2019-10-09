@@ -1016,9 +1016,6 @@ export default class AdaApi {
       // Note: we only restore for 0th account
       const accountIndex = HARD_DERIVATION_START + 0;
       const rootPk = generateWalletRootKey(recoveryPhrase);
-      const accountKey = rootPk.bip44_account(
-        RustModule.Wallet.AccountIndex.new(accountIndex)
-      );
 
       const wallet = await createStandardBip44Wallet({
         db: request.db,
@@ -1027,7 +1024,6 @@ export default class AdaApi {
         }),
         rootPk,
         password: walletPassword,
-        accountPublicKey: accountKey.public(),
         accountIndex,
         walletName,
         accountName: '', // set account name empty now

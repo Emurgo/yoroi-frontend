@@ -34,17 +34,11 @@ export async function setup(
   const entropy = RustModule.Wallet.Entropy.from_english_mnemonics(walletMnemonic);
   const rootPk = RustModule.Wallet.Bip44RootPrivateKey.recover(entropy, '');
 
-  const firstAccountIndex = 0 + HARD_DERIVATION_START;
-  const firstAccountPk = rootPk.bip44_account(
-    RustModule.Wallet.AccountIndex.new(firstAccountIndex)
-  );
-
   const state = await createStandardBip44Wallet({
     db,
     settings,
     rootPk,
     password: privateDeriverPassword,
-    accountPublicKey: firstAccountPk.public(),
     accountIndex: HARD_DERIVATION_START + 0,
     walletName: 'My Test Wallet',
     accountName: '',

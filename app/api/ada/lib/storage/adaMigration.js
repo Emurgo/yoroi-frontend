@@ -6,6 +6,11 @@ import type { lf$Database } from 'lovefield';
 import {
   resetLegacy,
   getLegacyAddressesList,
+  legacyGetLastReceiveAddressIndex,
+  legacySaveLastReceiveAddressIndex,
+  legacyGetLocalStorageWallet,
+  getCurrentCryptoAccount,
+  clearStorageV1,
 } from './database/legacy';
 import LocalStorageApi from '../../../localStorage/index';
 import {
@@ -17,6 +22,12 @@ import {
 import {
   OPEN_TAB_ID_KEY,
 } from '../../../../utils/tabManager';
+import { migrateFromStorageV1 } from './bridge/walletHelper';
+import { RustModule } from '../cardanoCrypto/rustLoader';
+import type { ConfigType } from '../../../../../config/config-types';
+
+declare var CONFIG: ConfigType;
+const protocolMagic = CONFIG.network.protocolMagic;
 
 export async function migrateToLatest(
   localStorageApi: LocalStorageApi,
@@ -134,7 +145,7 @@ async function bip44Migration(
 
   // if we had more than one address, then the WALLET key must exist in localstorage
   try {
-    await saveLastReceiveAddressIndex(maxIndex);
+    await legacySaveLastReceiveAddressIndex(maxIndex);
   } catch (_err) {
     // no wallet in storage
     return false;
@@ -158,8 +169,46 @@ async function storagev2Migation(
   persistentDb: lf$Database,
 ): Promise<boolean> {
   // all information in the v1 indexdb can be inferred from the blockchain
-  await reset(persistentDb);
+  await resetLegacy();
 
+  const wallet = await legacyGetLocalStorageWallet();
+  const account = await getCurrentCryptoAccount();
+  if (wallet != null && account != null) {
+    const lastReceiveIndex = await legacyGetLastReceiveAddressIndex();
 
+    const settings = RustModule.Wallet.BlockchainSettings.from_json({
+      protocol_magic: protocolMagic
+    });
+    const migratedWallet = await migrateFromStorageV1({
+      db: persistentDb,
+      accountPubKey: account.root_cached_key,
+      displayCutoff: lastReceiveIndex,
+      encryptedPk: wallet.masterKey == null
+        ? undefined
+        : {
+          Hash: wallet.masterKey,
+          IsEncrypted: true,
+          PasswordLastUpdate: wallet.adaWallet.cwPassphraseLU == null
+            ? null
+            : wallet.adaWallet.cwPassphraseLU,
+        },
+      hwWalletMetaInsert: wallet.adaWallet.cwHardwareInfo == null
+        ? undefined
+        : {
+          Vendor: wallet.adaWallet.cwHardwareInfo.vendor,
+          Model: wallet.adaWallet.cwHardwareInfo.model,
+          Label: wallet.adaWallet.cwHardwareInfo.deviceId,
+          DeviceId: wallet.adaWallet.cwHardwareInfo.label,
+          Language: wallet.adaWallet.cwHardwareInfo.language,
+          MajorVersion: wallet.adaWallet.cwHardwareInfo.majorVersion,
+          MinorVersion: wallet.adaWallet.cwHardwareInfo.minorVersion,
+          PatchVersion: wallet.adaWallet.cwHardwareInfo.patchVersion,
+        },
+      settings,
+      walletName: wallet.adaWallet.cwMeta.cwName,
+    });
+  }
+
+  await clearStorageV1();
   return true;
 }

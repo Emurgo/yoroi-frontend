@@ -84,7 +84,6 @@ test('Can add and fetch address in wallet', async (done) => {
     settings,
     rootPk,
     password: privateDeriverPassword,
-    accountPublicKey: firstAccountPk.public(),
     accountIndex: HARD_DERIVATION_START + 0,
     walletName: 'My Test Wallet',
     accountName: '',

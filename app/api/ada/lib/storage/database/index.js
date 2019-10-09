@@ -62,7 +62,7 @@ export const loadLovefieldDB = async (
 const populateAndCreate = async (
   storeType: $Values<typeof schema.DataStoreType>
 ): Promise<lf$Database> => {
-  const schemaBuilder = schema.create('yoroi-schema', 7);
+  const schemaBuilder = schema.create('yoroi-schema', 2);
 
   populateUncategorizedDb(schemaBuilder);
   populateBip44Db(schemaBuilder);

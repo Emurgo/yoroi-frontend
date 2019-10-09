@@ -9,6 +9,7 @@ import {
   CARDANO_COINTYPE,
   BIP44_PURPOSE,
   BIP44_SCAN_SIZE,
+  EXTERNAL,
 } from '../../../../../config/numbersConfig';
 
 import type {
@@ -17,6 +18,7 @@ import type {
 import {
   GetOrAddAddress,
 } from '../database/uncategorized/api/write';
+import type { KeyInsert } from '../database/uncategorized/tables';
 import type { HWFeatures, } from '../database/wallet/tables';
 
 import { WalletBuilder } from './walletBuilder';
@@ -108,8 +110,6 @@ export async function createStandardBip44Wallet(request: {
   settings: RustModule.Wallet.BlockchainSettings,
   rootPk: RustModule.Wallet.Bip44RootPrivateKey,
   password: string,
-  // TODO: remove since we know root PK and index
-  accountPublicKey: RustModule.Wallet.Bip44AccountPublic,
   accountIndex: number,
   walletName: string,
   accountName: string,
@@ -122,6 +122,10 @@ export async function createStandardBip44Wallet(request: {
     request.password,
     Buffer.from(request.rootPk.key().to_hex(), 'hex'),
   );
+
+  const accountPublicKey = request.rootPk.bip44_account(
+    RustModule.Wallet.AccountIndex.new(request.accountIndex)
+  ).public();
 
   // Note: we generate initial addresses in a separate database query
   // from creation of the actual wallet
@@ -141,7 +145,7 @@ export async function createStandardBip44Wallet(request: {
 
       return await getAccountDefaultDerivations(
         request.settings,
-        request.accountPublicKey,
+        accountPublicKey,
         hashToIdFunc,
       );
     }
@@ -299,6 +303,7 @@ export async function createHardwareWallet(request: {
             Name: request.accountName,
             LastSyncInfoId: ids.lastSyncInfoId,
           }),
+          parentDerivationId: null,
           pathToPublic: [
             {
               index: BIP44_PURPOSE,
@@ -321,6 +326,149 @@ export async function createHardwareWallet(request: {
         })
       )
       .commit();
+  }
+
+  return state;
+}
+
+export async function migrateFromStorageV1(request: {
+  db: lf$Database,
+  settings: RustModule.Wallet.BlockchainSettings,
+  encryptedPk: void | KeyInsert,
+  accountPubKey: string,
+  displayCutoff: number,
+  walletName: string,
+  hwWalletMetaInsert: void | HWFeatures,
+}): Promise<HasConceptualWallet & HasBip44Wrapper & HasPublicDeriver<mixed>> {
+
+  const accountIndex = HARD_DERIVATION_START + 0;
+  const accountName = '';
+
+  const accountPublicKey = RustModule.Wallet.Bip44AccountPublic.new(
+    RustModule.Wallet.PublicKey.from_hex(request.accountPubKey),
+    RustModule.Wallet.DerivationScheme.v2()
+  );
+
+  // Note: we generate initial addresses in a separate database query
+  // from creation of the actual wallet
+  const initialDerivations = await raii(
+    request.db,
+    getAllSchemaTables(request.db, GetOrAddAddress),
+    async tx => {
+      const hashToIdFunc = async (
+        addressHash: Array<string>
+      ): Promise<Array<number>> => {
+        const rows = await GetOrAddAddress.addByHash(
+          request.db, tx,
+          addressHash
+        );
+        return rows.map(row => row.AddressId);
+      };
+
+      const insert = await getAccountDefaultDerivations(
+        request.settings,
+        accountPublicKey,
+        hashToIdFunc,
+      );
+      // replace default display cutoff
+      const external = insert.find(chain => chain.index === EXTERNAL);
+      if (external == null) {
+        throw new Error('migrateFromStorageV1 cannot find external chain. Should never happen');
+      }
+      external.insert.DisplayCutoff = request.displayCutoff;
+
+      return insert;
+    }
+  );
+
+  let state;
+  {
+    let builder = WalletBuilder
+      .start(request.db)
+      .addConceptualWallet(
+        _finalState => ({
+          CoinType: CARDANO_COINTYPE,
+          Name: request.walletName,
+        })
+      )
+      .addBip44Wrapper(
+        finalState => ({
+          ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
+          IsBundled: false,
+          SignerLevel: DerivationLevels.ROOT.level,
+          PublicDeriverLevel: DerivationLevels.ACCOUNT.level,
+          Version: 2,
+        })
+      );
+    if (request.encryptedPk != null) {
+      const encryptedPk = request.encryptedPk;
+      builder = builder.addPrivateDeriver(
+        finalState => ({
+          // private deriver level === root level
+          pathToPrivate: [],
+          addLevelRequest: parent => ({
+            privateKeyInfo: encryptedPk,
+            publicKeyInfo: null,
+            derivationInfo: keys => ({
+              PublicKeyId: keys.public,
+              PrivateKeyId: keys.private,
+              Parent: parent,
+              Index: null,
+            }),
+            levelInfo: id => ({
+              KeyDerivationId: id,
+            })
+          }),
+          addPrivateDeriverRequest: derivationId => ({
+            Bip44WrapperId: finalState.bip44WrapperRow.Bip44WrapperId,
+            KeyDerivationId: derivationId,
+            Level: DerivationLevels.ROOT.level,
+          }),
+        })
+      );
+    }
+    builder = builder
+      .addAdhocPublicDeriver(
+        finalState => ({
+          bip44WrapperId: finalState.bip44WrapperRow.Bip44WrapperId,
+          publicKey: {
+            Hash: accountPublicKey.key().to_hex(),
+            IsEncrypted: false,
+            PasswordLastUpdate: null,
+          },
+          publicDeriverInsert: ids => ({
+            Bip44WrapperId: ids.wrapperId,
+            KeyDerivationId: ids.derivationId,
+            Name: accountName,
+            LastSyncInfoId: ids.lastSyncInfoId,
+          }),
+          parentDerivationId: finalState.privateDeriver == null
+            ? null
+            : finalState.privateDeriver.privateDeriverResult.KeyDerivationId,
+          pathToPublic: [
+            {
+              index: BIP44_PURPOSE,
+              insert: {},
+            },
+            {
+              index: CARDANO_COINTYPE,
+              insert: {},
+            },
+            {
+              index: accountIndex,
+              insert: {},
+            },
+          ],
+          initialDerivations,
+          hwWalletMetaInsert: request.hwWalletMetaInsert == null
+            ? undefined
+            : {
+              ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
+              ...request.hwWalletMetaInsert
+            },
+        })
+      );
+    state = builder.commit();
   }
 
   return state;

@@ -18,16 +18,16 @@ export async function saveSelectedExplorer(explorer: ExplorerType): Promise<void
 }
 
 export async function getSelectedExplorer(): Promise<ExplorerType> {
-  const explorer = await _getFromStorage(storageKeys.SELECTED_EXPLORER_KEY);
+  const explorer = await _getFromStorage<ExplorerType>(storageKeys.SELECTED_EXPLORER_KEY);
   return explorer || Explorer.SEIZA;
 }
 
 /* Util functions */
-async function _saveInStorage(key: string, toSave: any): Promise<void> {
+export async function _saveInStorage(key: string, toSave: any): Promise<void> {
   await setLocalItem(key, JSON.stringify(toSave));
 }
 
-async function _getFromStorage(key: string): any | void {
+export async function _getFromStorage<T>(key: string): Promise<T | void> {
   return await getLocalItem(key).then((result) => {
     if (result == null) {
       return result;

@@ -630,6 +630,7 @@ export class ModifyDisplayCutoff {
 export type AddAdhocPublicDeriverRequest = {|
   bip44WrapperId: number,
   publicKey: KeyInsert,
+  parentDerivationId: null | number,
   pathToPublic: InsertPath,
   publicDeriverInsert: {
     derivationId: number,
@@ -659,7 +660,7 @@ export class AddAdhocPublicDeriver {
     tx: lf$Transaction,
     request: AddAdhocPublicDeriverRequest,
   ): Promise<AddAdhocPublicDeriverResponse<Row>> {
-    let parentId: number | null = null;
+    let parentId: number | null = request.parentDerivationId;
     for (let i = 0; i < request.pathToPublic.length - 1; i++) {
       const levelResult = await AddPrivateDeriver.depTables.AddDerivation.add(
         db, tx,
