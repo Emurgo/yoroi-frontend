@@ -55,8 +55,8 @@ export default class AmountInputSkin extends Component<Props> {
           : null
         }
 
-        <span className={classnames([styles.total, error != null ? styles.error : ''])}>
-          {error != null ? `= ${total.toString()} ` : null}{currency}
+        <span className={classnames([styles.total, error !== '' ? styles.error : ''])}>
+          {error === '' ? `= ${total.toString()} ` : null}{currency}
         </span>
       </div>
     );
