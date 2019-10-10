@@ -24,7 +24,7 @@ export async function discoverAllAddressesFrom(
   requestSize: number,
   checkAddressesInUse: FilterFunc,
 ): Promise<Array<string>> {
-  let fetchedAddressesInfo = [];
+  let fetchedAddressesInfo: Array<AddressInfo> = [];
   let highestUsedIndex = initialHighestUsedIndex;
 
   // keep scanning until no new used addresses are found in batch
@@ -54,9 +54,15 @@ export async function discoverAllAddressesFrom(
     fetchedAddressesInfo = newFetchedAddressesInfo;
   }
 
+  let highestInBatch = -1;
+  for (const address of fetchedAddressesInfo) {
+    if (address.index > highestInBatch && address.isUsed) {
+      highestInBatch = address.index;
+    }
+  }
   return fetchedAddressesInfo
     // bip-44 requires scanSize buffer
-    .slice(0, (highestUsedIndex + scanSize) + 1) // +1 since range is exclusive
+    .slice(0, (highestInBatch + scanSize) + 1) // +1 since range is exclusive
     .map((addressInfo) => addressInfo.address);
 }
 
@@ -134,7 +140,6 @@ async function _scanNextBatch(
     newAddresses,
     usedAddresses,
     addressesIndex,
-    offset
   );
 
   return newFetchedAddressesInfo;
@@ -146,14 +151,13 @@ function _addFetchedAddressesInfo(
   newAddresses: Array<string>,
   usedAddresses: Array<string>,
   addressesIndex: Array<number>,
-  offset: number,
 ): Array<AddressInfo> {
   const isUsedSet = new Set(usedAddresses);
 
   const newAddressesInfo = newAddresses.map((address, position) => ({
     address,
     isUsed: isUsedSet.has(address),
-    index: addressesIndex[position] - offset
+    index: addressesIndex[position]
   }));
 
   return fetchedAddressesInfo.concat(newAddressesInfo);
