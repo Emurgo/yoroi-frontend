@@ -55,9 +55,9 @@ export async function discoverAllAddressesFrom(
   }
 
   let highestInBatch = -1;
-  for (const address of fetchedAddressesInfo) {
-    if (address.index > highestInBatch && address.isUsed) {
-      highestInBatch = address.index;
+  for (let i = 0; i < fetchedAddressesInfo.length; i++) {
+    if (i > highestInBatch && fetchedAddressesInfo[i].isUsed) {
+      highestInBatch = i;
     }
   }
   return fetchedAddressesInfo
