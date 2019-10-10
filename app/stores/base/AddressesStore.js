@@ -123,7 +123,7 @@ export default class AddressesStore extends Store {
   // REQUESTS
   @observable createAddressRequest: Request<CreateAddressFunc>;
 
-  setup() {
+  setup(): void {
     const actions = this.actions[environment.API].addresses;
     actions.createAddress.listen(this._createAddress);
     actions.resetErrors.listen(this._resetErrors);
@@ -148,7 +148,7 @@ export default class AddressesStore extends Store {
     );
   }
 
-  _createAddress = async () => {
+  _createAddress = async (): Promise<void> => {
     try {
       const publicDeriver = this.stores.substores[environment.API].wallets.selected;
       if (publicDeriver == null) return;
@@ -173,7 +173,7 @@ export default class AddressesStore extends Store {
     this.error = null;
   };
 
-  addObservedWallet = (publicDeriver: PublicDeriverWithCachedMeta) => {
+  addObservedWallet = (publicDeriver: PublicDeriverWithCachedMeta): void => {
     const withHasChains = asHasChains(publicDeriver.self);
     if (withHasChains == null) {
       this.allAddressesForDisplay.addObservedWallet(publicDeriver.self);
@@ -184,7 +184,7 @@ export default class AddressesStore extends Store {
     this.refreshAddresses(publicDeriver);
   }
 
-  refreshAddresses = (publicDeriver: PublicDeriverWithCachedMeta) => {
+  refreshAddresses = (publicDeriver: PublicDeriverWithCachedMeta): void => {
     const withHasChains = asHasChains(publicDeriver.self);
     if (withHasChains == null) {
       this.allAddressesForDisplay.refreshAddresses();
