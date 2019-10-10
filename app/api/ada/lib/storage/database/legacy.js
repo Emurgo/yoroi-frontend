@@ -1,7 +1,6 @@
 // @flow
 
 import { dumpByVersion } from './index';
-import { RustModule } from '../../cardanoCrypto/rustLoader';
 import {
   _getFromStorage,
   _saveInStorage,
@@ -49,7 +48,7 @@ export type LegacyAdaWallet = {
   cwId: string,
   cwMeta: LegacyAdaWalletMetaParams,
   cwType: LegacyAdaWalletType,
-  cwPassphraseLU?: Date,
+  cwPassphraseLU?: string,
   cwHardwareInfo?: LegacyAdaWalletHardwareInfo,
 };
 export type LegacyAdaWalletMetaParams = {

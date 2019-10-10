@@ -190,7 +190,7 @@ export async function storagev2Migation(
           IsEncrypted: true,
           PasswordLastUpdate: wallet.adaWallet.cwPassphraseLU == null
             ? null
-            : wallet.adaWallet.cwPassphraseLU,
+            : new Date(wallet.adaWallet.cwPassphraseLU),
         },
       hwWalletMetaInsert: wallet.adaWallet.cwHardwareInfo == null
         ? undefined
