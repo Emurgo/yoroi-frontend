@@ -35,6 +35,7 @@ async function baseTest(
     'Bip44Account',
     'Bip44Chain',
     'HwWalletMeta',
+    'KeyDerivation',
   ];
 
   const dump = (await db.export()).tables;

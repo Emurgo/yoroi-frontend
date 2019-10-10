@@ -432,6 +432,18 @@ export async function migrateFromStorageV1(request: {
         })
       );
     }
+    const pathToPublic = [{
+      index: BIP44_PURPOSE,
+      insert: {},
+    },
+    {
+      index: CARDANO_COINTYPE,
+      insert: {},
+    },
+    {
+      index: accountIndex,
+      insert: {},
+    }];
     builder = builder
       .addAdhocPublicDeriver(
         finalState => ({
@@ -451,27 +463,12 @@ export async function migrateFromStorageV1(request: {
             ? null
             : finalState.privateDeriver.privateDeriverResult.KeyDerivationId,
           pathStartLevel: finalState.privateDeriver == null ? 0 : 1,
-          pathToPublic: [
-            ...(finalState.privateDeriver != null
-              ? []
-              : [{
-                index: 0,
-                insert: {},
-              }]
-            ),
-            {
-              index: BIP44_PURPOSE,
+          pathToPublic: finalState.privateDeriver != null
+            ? pathToPublic
+            : [{
+              index: 0,
               insert: {},
-            },
-            {
-              index: CARDANO_COINTYPE,
-              insert: {},
-            },
-            {
-              index: accountIndex,
-              insert: {},
-            },
-          ],
+            }, ...pathToPublic],
           initialDerivations,
           hwWalletMetaInsert: request.hwWalletMetaInsert == null
             ? undefined
