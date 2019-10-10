@@ -344,49 +344,7 @@ export async function migrateFromStorageV1(request: {
   displayCutoff: number,
   walletName: string,
   hwWalletMetaInsert: void | HWFeatures,
-}): Promise<HasConceptualWallet & HasBip44Wrapper & HasPublicDeriver<mixed>> {
-
-  const accountIndex = HARD_DERIVATION_START + 0;
-  const accountName = '';
-
-  const accountPublicKey = RustModule.Wallet.Bip44AccountPublic.new(
-    RustModule.Wallet.PublicKey.from_hex(request.accountPubKey),
-    RustModule.Wallet.DerivationScheme.v2()
-  );
-
-  // Note: we generate initial addresses in a separate database query
-  // from creation of the actual wallet
-  const initialDerivations = await raii(
-    request.db,
-    getAllSchemaTables(request.db, GetOrAddAddress),
-    async tx => {
-      const hashToIdFunc = async (
-        addressHash: Array<string>
-      ): Promise<Array<number>> => {
-        const rows = await GetOrAddAddress.addByHash(
-          request.db, tx,
-          addressHash
-        );
-        return rows.map(row => row.AddressId);
-      };
-
-      const insert = await getAccountDefaultDerivations(
-        request.settings,
-        accountPublicKey,
-        hashToIdFunc,
-      );
-      // replace default display cutoff
-      const external = insert.find(chain => chain.index === EXTERNAL);
-      if (external == null) {
-        throw new Error('migrateFromStorageV1 cannot find external chain. Should never happen');
-      }
-      external.insert.DisplayCutoff = request.displayCutoff;
-
-      return insert;
-    }
-  );
-
-  let state;
+}): Promise<void> {
   {
     let builder = WalletBuilder
       .start(request.db)
@@ -431,22 +389,99 @@ export async function migrateFromStorageV1(request: {
           }),
         })
       );
+      builder = await addPublicDeriverToMigratedWallet({
+        builder,
+        db: request.db,
+        accountPubKey: request.accountPubKey,
+        settings: request.settings,
+        displayCutoff: request.displayCutoff,
+        hwWalletMetaInsert: request.hwWalletMetaInsert,
+      });
+      return await builder.commit();
     }
-    const pathToPublic = [{
-      index: BIP44_PURPOSE,
-      insert: {},
-    },
-    {
-      index: CARDANO_COINTYPE,
-      insert: {},
-    },
-    {
-      index: accountIndex,
-      insert: {},
-    }];
-    builder = builder
-      .addAdhocPublicDeriver(
-        finalState => ({
+    builder = await addPublicDeriverToMigratedWallet({
+      builder,
+      db: request.db,
+      accountPubKey: request.accountPubKey,
+      settings: request.settings,
+      displayCutoff: request.displayCutoff,
+      hwWalletMetaInsert: request.hwWalletMetaInsert,
+    });
+    await builder.commit();
+  }
+}
+async function addPublicDeriverToMigratedWallet<
+  T: $Shape<{||}> & HasConceptualWallet & HasBip44Wrapper
+>(request: {
+  builder: WalletBuilder<T>,
+  db: lf$Database,
+  accountPubKey: string,
+  settings: RustModule.Wallet.BlockchainSettings,
+  displayCutoff: number,
+  hwWalletMetaInsert: void | HWFeatures,
+}): Promise<WalletBuilder<T & HasPublicDeriver<mixed>>> {
+  const accountIndex = HARD_DERIVATION_START + 0;
+  const accountName = '';
+
+  const accountPublicKey = RustModule.Wallet.Bip44AccountPublic.new(
+    RustModule.Wallet.PublicKey.from_hex(request.accountPubKey),
+    RustModule.Wallet.DerivationScheme.v2()
+  );
+
+  // Note: we generate initial addresses in a separate database query
+  // from creation of the actual wallet
+  const initialDerivations = await raii(
+    request.db,
+    getAllSchemaTables(request.db, GetOrAddAddress),
+    async tx => {
+      const hashToIdFunc = async (
+        addressHash: Array<string>
+      ): Promise<Array<number>> => {
+        const rows = await GetOrAddAddress.addByHash(
+          request.db, tx,
+          addressHash
+        );
+        return rows.map(row => row.AddressId);
+      };
+
+      const insert = await getAccountDefaultDerivations(
+        request.settings,
+        accountPublicKey,
+        hashToIdFunc,
+      );
+      // replace default display cutoff
+      const external = insert.find(chain => chain.index === EXTERNAL);
+      if (external == null) {
+        throw new Error('migrateFromStorageV1 cannot find external chain. Should never happen');
+      }
+      external.insert.DisplayCutoff = request.displayCutoff;
+
+      return insert;
+    }
+  );
+
+  const pathToPublic = [{
+    index: BIP44_PURPOSE,
+    insert: {},
+  },
+  {
+    index: CARDANO_COINTYPE,
+    insert: {},
+  },
+  {
+    index: accountIndex,
+    insert: {},
+  }];
+
+  return request.builder
+    .addAdhocPublicDeriver(
+      finalState => {
+        // kind of hacky way to extract the ID without angering Flow
+        const maybePrivateDeriver = ((finalState: any): WithNullableFields<HasPrivateDeriver>);
+        const privateDeriverKeyDerivationId = maybePrivateDeriver.privateDeriver == null
+          ? null
+          : maybePrivateDeriver.privateDeriver.privateDeriverResult.KeyDerivationId;
+        return {
           bip44WrapperId: finalState.bip44WrapperRow.Bip44WrapperId,
           publicKey: {
             Hash: accountPublicKey.key().to_hex(),
@@ -459,11 +494,9 @@ export async function migrateFromStorageV1(request: {
             Name: accountName,
             LastSyncInfoId: ids.lastSyncInfoId,
           }),
-          parentDerivationId: finalState.privateDeriver == null
-            ? null
-            : finalState.privateDeriver.privateDeriverResult.KeyDerivationId,
-          pathStartLevel: finalState.privateDeriver == null ? 0 : 1,
-          pathToPublic: finalState.privateDeriver != null
+          parentDerivationId: privateDeriverKeyDerivationId,
+          pathStartLevel: privateDeriverKeyDerivationId == null ? 0 : 1,
+          pathToPublic: privateDeriverKeyDerivationId != null
             ? pathToPublic
             : [{
               index: 0,
@@ -476,10 +509,7 @@ export async function migrateFromStorageV1(request: {
               ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
               ...request.hwWalletMetaInsert
             },
-        })
-      );
-    state = builder.commit();
-  }
-
-  return state;
+        };
+      }
+    );
 }

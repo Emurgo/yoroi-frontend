@@ -277,17 +277,17 @@ function AsNotNull<T: {}>(
 }
 
 // types to represent requirements
-export type HasConceptualWallet = {
+export type HasConceptualWallet = {|
   conceptualWalletRow: PromisslessReturnType<typeof ModifyConceptualWallet.add>
-};
-export type HasBip44Wrapper = {
+|};
+export type HasBip44Wrapper = {|
   bip44WrapperRow: PromisslessReturnType<typeof AddBip44Wrapper.add>
-};
-export type HasPrivateDeriver = {
+|};
+export type HasPrivateDeriver = {|
   privateDeriver: PromisslessReturnType<typeof AddPrivateDeriver.add>
-};
+|};
 
-export type HasPublicDeriver<Row> = {
+export type HasPublicDeriver<Row> = {|
   // we have to re-specify the whole type since you can't use typeof on generic return types
   publicDeriver: Array<{
     publicDeriverResult: $ReadOnly<PublicDeriverRow>,
@@ -296,4 +296,4 @@ export type HasPublicDeriver<Row> = {
       specificDerivationResult: $ReadOnly<Row>
     }
   }>,
-};
+|};
