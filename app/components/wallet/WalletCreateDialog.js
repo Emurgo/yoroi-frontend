@@ -226,7 +226,6 @@ export default class WalletCreateDialog extends Component<Props, State> {
               error={repeatedPasswordField.error}
               skin={InputOwnSkin}
             />
-            <div />
           </div>
         </div>
 
