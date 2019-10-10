@@ -72,7 +72,7 @@ export default class WalletReceivePage extends Component<Props, State> {
 
     // Guard against potential null values
     if (!publicDeriver) throw new Error('Active wallet required for WalletReceivePage.');
- 
+
     // assume account-level wallet for now
     const withChains = asHasChains(publicDeriver.self);
     if (!withChains) throw new Error('WalletReceivePage only available for account-level wallets');

@@ -2,7 +2,7 @@
 
 # install same base as our CI build
 # TODO: make this use emurgornd once the emurgornd image auto-updates to latest chromedriver
-sudo docker run --name yoroi_ci -p 5900:5900 -dit circleci/node:8-browsers
+sudo docker run --name yoroi_ci -p 5900:5900 -dit circleci/node:10-browsers
 
 sudo docker cp features/localCI/. yoroi_ci:/CI
 user=$(sudo docker exec -t yoroi_ci whoami | tr -d '\r')

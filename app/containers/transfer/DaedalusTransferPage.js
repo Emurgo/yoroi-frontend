@@ -16,7 +16,6 @@ import { ROUTES } from '../../routes-config';
 import config from '../../config';
 
 import { formattedWalletAmount } from '../../utils/formatters';
-import type { PublicDeriverWithCachedMeta } from '../../stores/base/WalletStore';
 
 @observer
 export default class DaedalusTransferPage extends Component<InjectedProps> {
