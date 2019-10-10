@@ -26,7 +26,7 @@ export default class DialogTextBlock extends Component<Props> {
     const { title, message, subclass, children } = this.props;
 
     const messageStyle = classNames([
-      subclass != null ? styles[subclass] : styles.component
+      (subclass != null && subclass !== '') ? styles[subclass] : styles.component
     ]);
 
     if (children !== null) {
