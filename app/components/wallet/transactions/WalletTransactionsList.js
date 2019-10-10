@@ -63,9 +63,12 @@ export default class WalletTransactionsList extends Component<Props> {
 
   groupTransactionsByDay(transactions: Array<WalletTransaction>)
       : Array<{date: string, transactions: Array<WalletTransaction>}> {
-    const groups = [];
+    const groups: Array<{
+      date: string,
+      transactions: Array<WalletTransaction>
+    }> = [];
     for (const transaction of transactions) {
-      const date = moment(transaction.date).format(dateFormat);
+      const date: string = moment(transaction.date).format(dateFormat);
       // find the group this transaction belongs in
       let group = groups.find((g) => g.date === date);
       // if first transaltion in this group, create the group
