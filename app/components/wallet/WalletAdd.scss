@@ -60,6 +60,12 @@
   }
   
   .heroCardsItem {
+    width: var(--card-width);
+    height: var(--card-height);
+    border-radius: var(--card-border-radius);
+    background-color: var(--card-bg-color);
+    color: var(--card-text-color);
+    font-size: var(--card-text-size);
     font-family: var(--font-regular);
     padding: 32px 28px;
     text-align: center;
@@ -135,15 +141,6 @@
   .component {
     background-image: linear-gradient(to right, var(--theme-default-main-bg) 65%, var(--cmn-color-white) 65%);
 
-    .heroCardsItem {
-      width: var(--card-width);
-      height: var(--card-height);
-      border-radius: var(--card-border-radius);
-      background-color: var(--card-bg-color);
-      color: var(--card-text-color);
-      font-size: var(--card-text-size);
-    }
-
     .heroCardsItemLink {
       width: calc(var(--card-width) *2 + 15px);
       height: auto;
@@ -198,15 +195,6 @@
 
     .heroSubTitle {
       color: var(--theme-wallet-add-sub-title-color);      
-    }
-
-    .heroCardsItem {
-      width: var(--card-width);
-      height: var(--card-height);
-      border-radius: var(--card-border-radius);
-      background-color: var(--card-bg-color);
-      color: var(--card-text-color);
-      font-size: var(--card-text-size);
     }
 
     .heroCardsItemLink {
