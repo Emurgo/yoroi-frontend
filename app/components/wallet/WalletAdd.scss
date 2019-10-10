@@ -67,7 +67,7 @@
     color: var(--card-text-color);
     font-size: var(--card-text-size);
     font-family: var(--font-regular);
-    padding: 32px 22px;
+    padding: 32px 20px;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -85,7 +85,13 @@
     }
   
     .heroCardsItemTitle {
+      display: flex;
+      justify-content: center;
       letter-spacing: -0.03em;
+      .infoIcon {
+        display: flex;
+        margin-left: 3px;
+      }
     }
   
     .heroCardsItemBg {

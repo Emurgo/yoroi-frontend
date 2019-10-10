@@ -5,6 +5,7 @@ import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import classnames from 'classnames';
 
 import SvgInline from 'react-svg-inline';
+import infoIcon from '../../assets/images/info-icon.inline.svg';
 import logoIcon from '../../assets/images/yoroi-logo-white.inline.svg';
 import settingsIcon from '../../assets/images/top-bar/setting-active.inline.svg';
 import daedalusIcon from '../../assets/images/top-bar/daedalus-migration.inline.svg';
@@ -25,17 +26,33 @@ const messages = defineMessages({
     id: 'wallet.add.page.hw.title',
     defaultMessage: '!!!Connect to hardware wallet',
   },
+  connectToHWTooltip: {
+    id: 'wallet.add.page.hw.tooltip',
+    defaultMessage: '!!!Create or restore a Yoroi wallet using a hardware wallet, such as a Ledger (Ledger Nano S or Ledger Nano X) or Trezor (Trezor Model T).',
+  },
   createTitle: {
     id: 'wallet.add.page.create.title',
     defaultMessage: '!!!Create wallet',
+  },
+  createTooltip: {
+    id: 'wallet.add.page.create.tooltip',
+    defaultMessage: '!!!Generate a new 15-word recovery phrase and create a Yoroi wallet.',
   },
   restoreTitle: {
     id: 'wallet.add.page.restore.title',
     defaultMessage: '!!!Restore wallet',
   },
+  restoreTooltip: {
+    id: 'wallet.add.page.restore.tooltip',
+    defaultMessage: '!!!Enter a 15-word recovery phrase to restore an already-existing Yoroi wallet, or import an existing Yoroi paper wallet.',
+  },
   transferFundsTitle: {
     id: 'wallet.add.page.daedalusTransfer.title',
     defaultMessage: '!!!Transfer funds from a Daedalus wallet to Yoroi',
+  },
+  transferFundsTooltip: {
+    id: 'wallet.add.page.daedalusTransfer.tooltip',
+    defaultMessage: '!!!You can transfer funds from a Daedalus wallet to Yoroi, but first you will need to create a Yoroi wallet to store those funds.',
   },
   restoreNotificationMessage: {
     id: 'wallet.add.dialog.restoreNotificationMessage',
@@ -115,6 +132,13 @@ export default class WalletAdd extends Component<Props> {
                     <div className={classnames([styles.heroCardsItemBg, styles.bgConnectHW])} />
                     <div className={styles.heroCardsItemTitle}>
                       {intl.formatMessage(messages.connectToHWTitle)}
+                      <SvgInline
+                        svg={infoIcon}
+                        width="14"
+                        height="14"
+                        className={styles.infoIcon}
+                        title={intl.formatMessage(messages.connectToHWTooltip)}
+                      />
                     </div>
                   </div>
                 </button>
@@ -128,6 +152,13 @@ export default class WalletAdd extends Component<Props> {
                     <div className={classnames([styles.heroCardsItemBg, styles.bgCreateWallet])} />
                     <div className={styles.heroCardsItemTitle}>
                       {intl.formatMessage(messages.createTitle)}
+                      <SvgInline
+                        svg={infoIcon}
+                        width="14"
+                        height="14"
+                        className={styles.infoIcon}
+                        title={intl.formatMessage(messages.createTooltip)}
+                      />
                     </div>
                   </div>
                 </button>
@@ -143,6 +174,13 @@ export default class WalletAdd extends Component<Props> {
                     />
                     <div className={styles.heroCardsItemTitle}>
                       {intl.formatMessage(messages.restoreTitle)}
+                      <SvgInline
+                        svg={infoIcon}
+                        width="14"
+                        height="14"
+                        className={styles.infoIcon}
+                        title={intl.formatMessage(messages.restoreTooltip)}
+                      />
                     </div>
                   </div>
                 </button>
@@ -169,6 +207,13 @@ export default class WalletAdd extends Component<Props> {
                 />
                 <div className={styles.heroCardsItemTitle}>
                   {intl.formatMessage(messages.transferFundsTitle)}
+                  <SvgInline
+                    svg={infoIcon}
+                    width="14"
+                    height="14"
+                    className={styles.infoIcon}
+                    title={intl.formatMessage(messages.transferFundsTooltip)}
+                  />
                 </div>
               </button>
             </div>
