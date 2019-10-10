@@ -365,12 +365,11 @@ export async function rawGetAddressesForDisplay(
   );
   const balanceForAddresses = getUtxoBalanceForAddresses(utxoForAddresses);
 
-  const usedStatus = new Set(Object.keys(utxosForAddresses));
   return request.addresses.map(info => ({
     address: info.addr.Hash,
     value: balanceForAddresses[info.addr.AddressId],
     addressing: info.addressing,
-    isUsed: usedStatus.has(info.addr.AddressId),
+    isUsed: utxosForAddresses.has(info.addr.AddressId),
   }));
 }
 
