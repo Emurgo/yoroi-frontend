@@ -176,7 +176,7 @@ export default class TransactionsStore extends Store {
       .then((updatedBalance) => {
         if (
           walletsStore.selected &&
-          walletsStore.selected === publicDeriver
+          walletsStore.selected.self === publicDeriver
         ) {
           walletsActions.updateBalance.trigger(updatedBalance);
         }
