@@ -757,6 +757,7 @@ export async function updateTransactionBatch(
 
   // 3) Update UTXO set
 
+  const newTxIds = txsAddedToBlock.map(tx =>  tx.transaction.TransactionId);
   await markAllInputs(
     db, dbTx,
     {
@@ -765,8 +766,11 @@ export async function updateTransactionBatch(
       GetTransaction: depTables.GetTransaction,
     },
     {
-      inputTxIds: txsAddedToBlock.map(tx =>  tx.transaction.TransactionId),
-      allTxIds: txIds,
+      inputTxIds: newTxIds,
+      allTxIds: [
+        ...txIds,
+        ...newTxIds,
+      ],
       isUnspent: false,
       TransactionSeed,
     }
@@ -777,7 +781,7 @@ export async function updateTransactionBatch(
   const pendingTxs = await depTables.GetTransaction.withStatus(
     db, dbTx,
     {
-      txIds,
+      txIds, // note: we purposely don't include the txids of transactions we just added
       status: [TxStatusCodes.PENDING]
     }
   );
