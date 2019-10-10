@@ -965,7 +965,9 @@ export function networkTxHeaderToDb(
       Digest: digest,
       BlockId: blockId,
       Ordinal: tx.tx_ordinal,
-      LastUpdateTime: new Date(tx.last_update).getTime(),
+      LastUpdateTime: block == null
+        ? new Date(tx.last_update).getTime() // this is out best guess for txs not in a block
+        : new Date(tx.time).getTime(),
       Status: statusStringToCode(tx.tx_state),
       ErrorMessage: null, // TODO: add error message from backend if present
     }),
