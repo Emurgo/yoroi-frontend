@@ -158,11 +158,12 @@ test('Syncing simple transaction', async (done) => {
   const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
   const publicDeriver = await setup(db);
 
-  const checkAddressesInUse = genCheckAddressesInUse(networkTransactions);
+  const networkTransactionsClone = [...networkTransactions];
+  const checkAddressesInUse = genCheckAddressesInUse(networkTransactionsClone);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
-    networkTransactions
+    networkTransactionsClone
   );
-  const getBestBlock = genGetBestBlock(networkTransactions);
+  const getBestBlock = genGetBestBlock(networkTransactionsClone);
 
   const withDisplayCutoff = asDisplayCutoff(publicDeriver);
   if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
@@ -259,7 +260,7 @@ test('Syncing simple transaction', async (done) => {
 
   // test: add a 2nd transaction
   {
-    networkTransactions.push(nextRegularSpend);
+    networkTransactionsClone.push(nextRegularSpend);
 
     await updateTransactions(
       db,
@@ -343,7 +344,7 @@ test('Syncing simple transaction', async (done) => {
 
   // test: two txs in the same block
   {
-    networkTransactions.push(...twoTxsRegularSpend);
+    networkTransactionsClone.push(...twoTxsRegularSpend);
 
     await updateTransactions(
       db,
@@ -376,8 +377,8 @@ test('Syncing simple transaction', async (done) => {
 
   // test rollback
   {
-    networkTransactions.pop();
-    networkTransactions.pop();
+    networkTransactionsClone.pop();
+    networkTransactionsClone.pop();
 
     await updateTransactions(
       db,
@@ -429,6 +430,99 @@ test('Syncing simple transaction', async (done) => {
   ];
   const dump = (await db.export()).tables;
   filterDbSnapshot(dump, keysForTest);
+  done();
+});
+
+test('Utxo created and used in same sync', async (done) => {
+  const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
+  const publicDeriver = await setup(db);
+
+  const networkTransactionsClone = [...networkTransactions];
+  const checkAddressesInUse = genCheckAddressesInUse(networkTransactionsClone);
+  const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
+    networkTransactionsClone
+  );
+  const getBestBlock = genGetBestBlock(networkTransactionsClone);
+
+  const withDisplayCutoff = asDisplayCutoff(publicDeriver);
+  if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
+  const withUtxoBalance = asGetUtxoBalance(withDisplayCutoff);
+  if (!withUtxoBalance) throw new Error('missing utxo balance functionality');
+  const withGetAllAddresses = asGetAllAddresses(withUtxoBalance);
+  if (!withGetAllAddresses) throw new Error('missing get all addresses functionality');
+  const basePubDeriver = withGetAllAddresses;
+
+  expect(basePubDeriver != null).toEqual(true);
+  if (basePubDeriver == null) {
+    throw new Error('basePubDeriver missing a functionality');
+  }
+
+  {
+    networkTransactionsClone.push(nextRegularSpend);
+
+    await updateTransactions(
+      db,
+      basePubDeriver,
+      checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
+      getBestBlock,
+    );
+
+    {
+      const response = await basePubDeriver.getAllUtxos();
+      expect(response).toEqual([{
+        Transaction: {
+          ErrorMessage: null,
+          Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
+          Digest: 1.249559827714551e-31,
+          Ordinal: 0,
+          BlockId: 2,
+          LastUpdateTime: 1568392656000,
+          Status: 1,
+          TransactionId: 2
+        },
+        UtxoTransactionOutput: {
+          AddressId: 21,
+          Amount: '1100000',
+          IsUnspent: true,
+          OutputIndex: 0,
+          TransactionId: 2,
+          UtxoTransactionOutputId: 3
+        }
+      },
+      {
+        Transaction: {
+          ErrorMessage: null,
+          Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
+          Digest: 1.249559827714551e-31,
+          Ordinal: 0,
+          BlockId: 2,
+          LastUpdateTime: 1568392656000,
+          Status: 1,
+          TransactionId: 2
+        },
+        UtxoTransactionOutput: {
+          AddressId: 20,
+          Amount: '900000',
+          IsUnspent: true,
+          OutputIndex: 1,
+          TransactionId: 2,
+          UtxoTransactionOutputId: 4
+        }
+      },
+      ]);
+    }
+
+    {
+      const response = await basePubDeriver.getBalance();
+      expect(response).toEqual(new BigNumber('2000000'));
+    }
+
+    {
+      const response = await basePubDeriver.getBalance();
+      expect(response).toEqual(new BigNumber('2000000'));
+    }
+  }
   done();
 });
 
