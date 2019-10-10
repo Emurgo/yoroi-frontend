@@ -704,7 +704,7 @@ export class AddAdhocPublicDeriver {
             ...request.pathToPublic[request.pathToPublic.length - 1].insert,
           }),
         },
-        level: request.pathToPublic.length,
+        level: request.pathStartLevel + request.pathToPublic.length - 1,
         addPublicDeriverRequest: request.publicDeriverInsert
       }
     );
@@ -715,7 +715,7 @@ export class AddAdhocPublicDeriver {
         derivationId: publicDeriver.publicDeriverResult.KeyDerivationId,
         children: request.initialDerivations,
       },
-      request.pathToPublic.length,
+      request.pathStartLevel + request.pathToPublic.length - 1,
     );
 
     const hwWalletMeta = request.hwWalletMetaInsert == null

@@ -1,6 +1,104 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Migrate storage v1 to storage v2 1`] = `
+exports[`Migrate ledger storage v1 to storage v2 1`] = `
+Array [
+  Object {
+    "Bip44Account": Array [
+      Object {
+        "Bip44AccountId": 1,
+        "KeyDerivationId": 4,
+      },
+    ],
+  },
+  Object {
+    "Bip44Chain": Array [
+      Object {
+        "Bip44ChainId": 1,
+        "DisplayCutoff": 77,
+        "KeyDerivationId": 5,
+      },
+      Object {
+        "Bip44ChainId": 2,
+        "DisplayCutoff": null,
+        "KeyDerivationId": 26,
+      },
+    ],
+  },
+  Object {
+    "Bip44CoinType": Array [
+      Object {
+        "Bip44CoinTypeId": 1,
+        "KeyDerivationId": 3,
+      },
+    ],
+  },
+  Object {
+    "Bip44Purpose": Array [
+      Object {
+        "Bip44PurposeId": 1,
+        "KeyDerivationId": 2,
+      },
+    ],
+  },
+  Object {
+    "Bip44Root": Array [
+      Object {
+        "Bip44RootId": 1,
+        "KeyDerivationId": 1,
+      },
+    ],
+  },
+  Object {
+    "Bip44Wrapper": Array [
+      Object {
+        "Bip44WrapperId": 1,
+        "ConceptualWalletId": 1,
+        "IsBundled": false,
+        "PublicDeriverLevel": 3,
+        "SignerLevel": 0,
+        "Version": 2,
+      },
+    ],
+  },
+  Object {
+    "ConceptualWallet": Array [
+      Object {
+        "CoinType": 2147485463,
+        "ConceptualWalletId": 1,
+        "Name": "Yoroi-Ledger",
+      },
+    ],
+  },
+  Object {
+    "HwWalletMeta": Array [
+      Object {
+        "ConceptualWalletId": 1,
+        "DeviceId": "",
+        "HwWalletMetaId": 1,
+        "Label": "",
+        "Language": "",
+        "MajorVersion": 1,
+        "MinorVersion": 0,
+        "Model": "NanoS",
+        "PatchVersion": 0,
+        "Vendor": "ledger.com",
+      },
+    ],
+  },
+  Object {
+    "Key": Array [
+      Object {
+        "Hash": "76bca341ea86128125b49999ea1799fcd0d005a64b9150c33ed4648a3c11b20c26ea85882a1616bbf4ffae3fae6debe77169a3b299ec226409e2def1bffd35a9",
+        "IsEncrypted": false,
+        "KeyId": 1,
+        "PasswordLastUpdate": null,
+      },
+    ],
+  },
+]
+`;
+
+exports[`Migrate memory storage v1 to storage v2 1`] = `
 Array [
   Object {
     "Bip44Account": Array [
@@ -84,6 +182,104 @@ Array [
         "Hash": "b2938f29eb965952b03baaf010b0f5fe4a2c116a1e255274c9ace24deb72450ce1c045821c42ed11b33db3124b1551793e76b8ad187efb92b28969b92bb95964",
         "IsEncrypted": false,
         "KeyId": 2,
+        "PasswordLastUpdate": null,
+      },
+    ],
+  },
+]
+`;
+
+exports[`Migrate trezor storage v1 to storage v2 1`] = `
+Array [
+  Object {
+    "Bip44Account": Array [
+      Object {
+        "Bip44AccountId": 1,
+        "KeyDerivationId": 4,
+      },
+    ],
+  },
+  Object {
+    "Bip44Chain": Array [
+      Object {
+        "Bip44ChainId": 1,
+        "DisplayCutoff": 61,
+        "KeyDerivationId": 5,
+      },
+      Object {
+        "Bip44ChainId": 2,
+        "DisplayCutoff": null,
+        "KeyDerivationId": 26,
+      },
+    ],
+  },
+  Object {
+    "Bip44CoinType": Array [
+      Object {
+        "Bip44CoinTypeId": 1,
+        "KeyDerivationId": 3,
+      },
+    ],
+  },
+  Object {
+    "Bip44Purpose": Array [
+      Object {
+        "Bip44PurposeId": 1,
+        "KeyDerivationId": 2,
+      },
+    ],
+  },
+  Object {
+    "Bip44Root": Array [
+      Object {
+        "Bip44RootId": 1,
+        "KeyDerivationId": 1,
+      },
+    ],
+  },
+  Object {
+    "Bip44Wrapper": Array [
+      Object {
+        "Bip44WrapperId": 1,
+        "ConceptualWalletId": 1,
+        "IsBundled": false,
+        "PublicDeriverLevel": 3,
+        "SignerLevel": 0,
+        "Version": 2,
+      },
+    ],
+  },
+  Object {
+    "ConceptualWallet": Array [
+      Object {
+        "CoinType": 2147485463,
+        "ConceptualWalletId": 1,
+        "Name": "Trezorro",
+      },
+    ],
+  },
+  Object {
+    "HwWalletMeta": Array [
+      Object {
+        "ConceptualWalletId": 1,
+        "DeviceId": "Trezorro",
+        "HwWalletMetaId": 1,
+        "Label": "C875BA9D0C571FF4B8718FAA",
+        "Language": "english",
+        "MajorVersion": 2,
+        "MinorVersion": 1,
+        "Model": "T",
+        "PatchVersion": 1,
+        "Vendor": "trezor.io",
+      },
+    ],
+  },
+  Object {
+    "Key": Array [
+      Object {
+        "Hash": "bc772da2ba5a37bad47f51d6a4476b236aa6734b5cd79c81706d5018d3203f6c05d510314991bfd73c2a3e9da72d2e1205b54cf6342f588a4fbbaaa98e58211b",
+        "IsEncrypted": false,
+        "KeyId": 1,
         "PasswordLastUpdate": null,
       },
     ],
