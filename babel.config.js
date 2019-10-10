@@ -10,7 +10,7 @@ module.exports = function (api) {
         '@babel/preset-env',
         {
           corejs: 2,
-          modules: api.env('jest') ? 'commonjs' : 'auto',
+          modules: (api.env('test') || api.env('jest')) ? 'commonjs' : 'auto',
           useBuiltIns: 'entry'
         }
       ],
@@ -28,7 +28,7 @@ module.exports = function (api) {
         '@babel/plugin-transform-runtime',
         {
           // CoreJS breaks Jest mocks for some reason
-          corejs: api.env('jest') ? false : 2,
+          corejs: (api.env('test') || api.env('jest')) ? false : 2,
           helpers: true,
           regenerator: true
         }
