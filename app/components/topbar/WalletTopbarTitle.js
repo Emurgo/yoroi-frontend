@@ -73,7 +73,7 @@ export default class WalletTopbarTitle extends Component<Props> {
 
     // If we are looking at a wallet, show its name and balance
     const walletRoutesMatch = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
-    const showWalletInfo = walletRoutesMatch && publicDeriver;
+    const showWalletInfo = (walletRoutesMatch !== false) && (publicDeriver != null)
 
     const isHardwareWallet = publicDeriver != null &&
       publicDeriver.self.getConceptualWallet().getWalletType() === WalletTypeOption.HARDWARE_WALLET;

@@ -254,7 +254,7 @@ export default class WalletsStore extends Store {
 
   @computed get isWalletRoute(): boolean {
     const { currentRoute } = this.stores.app;
-    return matchRoute(ROUTES.WALLETS.ROOT + '(/*rest)', currentRoute);
+    return matchRoute(ROUTES.WALLETS.ROOT + '(/*rest)', currentRoute) !== false;
   }
 
   getWalletRoute = (
@@ -360,8 +360,8 @@ export default class WalletsStore extends Store {
 
   @computed get _canRedirectToWallet(): boolean {
     const currentRoute = this.stores.app.currentRoute;
-    const isRootRoute = matchRoute(ROUTES.WALLETS.ROOT, currentRoute);
-    const isNoWalletsRoute = matchRoute(ROUTES.NO_WALLETS, currentRoute);
+    const isRootRoute = matchRoute(ROUTES.WALLETS.ROOT, currentRoute) !== false;
+    const isNoWalletsRoute = matchRoute(ROUTES.NO_WALLETS, currentRoute) !== false;
     return isRootRoute || isNoWalletsRoute;
   }
 
@@ -395,7 +395,7 @@ export default class WalletsStore extends Store {
         return this._unsetActiveWallet();
       }
       const matchWalletRoute = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
-      if (matchWalletRoute) {
+      if (matchWalletRoute !== false) {
         // We have a route for a specific wallet -> lets try to find it
         let publicDeriverForRoute = undefined;
         for (const publicDeriver of this.publicDerivers) {

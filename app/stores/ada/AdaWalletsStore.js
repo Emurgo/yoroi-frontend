@@ -82,7 +82,7 @@ export default class AdaWalletsStore extends WalletStore {
 
   @action _onRouteChange = (options: { route: string, params: ?Object }): void => {
     // Reset the send request anytime we visit the send page (e.g: to remove any previous errors)
-    if (matchRoute(ROUTES.WALLETS.SEND, buildRoute(options.route, options.params))) {
+    if (matchRoute(ROUTES.WALLETS.SEND, buildRoute(options.route, options.params)) !== false) {
       this.sendMoneyRequest.reset();
     }
   };

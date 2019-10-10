@@ -85,7 +85,7 @@ export default class LoadingStore extends Store {
   }
 
   @computed get fromUriScheme(): boolean {
-    return matchRoute(ROUTES.SEND_FROM_URI.ROOT, this._originRoute.route);
+    return matchRoute(ROUTES.SEND_FROM_URI.ROOT, this._originRoute.route) !== false;
   }
 
   @computed get uriParams(): ?UriParams {
