@@ -15,11 +15,11 @@ type Props = InjectedContainerProps;
 @observer
 export default class Wallet extends Component<Props> {
 
-  isActiveScreen = (page: string) => {
+  isActiveScreen = (page: string): boolean => {
     const { app } = this.props.stores;
     const { wallets } = this.props.stores.substores.ada;
     const selected = wallets.selected;
-    if (selected == null) return;
+    if (selected == null) return false;
     const screenRoute = buildRoute(
       ROUTES.WALLETS.PAGE,
       {
@@ -30,7 +30,7 @@ export default class Wallet extends Component<Props> {
     return app.currentRoute === screenRoute;
   };
 
-  handleWalletNavItemClick = (page: string) => {
+  handleWalletNavItemClick = (page: string): void => {
     const { wallets } = this.props.stores.substores.ada;
     const selected = wallets.selected;
     if (selected == null) return;

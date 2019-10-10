@@ -458,6 +458,7 @@ test('Utxo created and used in same sync', async (done) => {
   }
 
   {
+    // add tx so that we  both created and used a utxo in the same sync
     networkTransactionsClone.push(nextRegularSpend);
 
     await updateTransactions(

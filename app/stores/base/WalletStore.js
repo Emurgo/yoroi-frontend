@@ -399,7 +399,7 @@ export default class WalletsStore extends Store {
         // We have a route for a specific wallet -> lets try to find it
         let publicDeriverForRoute = undefined;
         for (const publicDeriver of this.publicDerivers) {
-          if (publicDeriver.self.getPublicDeriverId().toString() === matchWalletRoute) {
+          if (publicDeriver.self.getPublicDeriverId().toString() === matchWalletRoute.id) {
             publicDeriverForRoute = publicDeriver;
           }
         }
