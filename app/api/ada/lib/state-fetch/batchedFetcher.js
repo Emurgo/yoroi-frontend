@@ -207,8 +207,16 @@ export function batchGetTransactionsHistoryForAddresses(
           )
         )
       );
-      // TODO: deduplicate
-      return transactions;
+      const seenTxIds = new Set();
+      const deduplicated = [];
+      for (const tx of transactions) {
+        if (seenTxIds.has(tx.hash)) {
+          continue;
+        }
+        deduplicated.push(tx);
+        seenTxIds.add(tx.hash);
+      }
+      return deduplicated;
     } catch (error) {
       Logger.error('batchedFetcher::batchGetTransactionsHistoryForAddresses error: ' + stringifyError(error));
       throw new GetTxHistoryForAddressesApiError();
