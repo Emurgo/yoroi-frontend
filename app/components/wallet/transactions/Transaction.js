@@ -227,7 +227,8 @@ export default class Transaction extends Component<Props, State> {
 
     const labelClasses = classNames([
       styles.label,
-      styles[`${state}Label`]
+      isFailedTransaction ? styles.failedLabel : '',
+      isPendingTransaction ? styles.pendingLabel : '',
     ]);
 
     const arrowClasses = isExpanded ? styles.collapseArrow : styles.expandArrow;
