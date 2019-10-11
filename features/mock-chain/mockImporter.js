@@ -126,6 +126,7 @@ const pendingTx2 = {
   hash: 'fa6f2c82fb511d0cc9c12a540b5fac6e5a9b0f288f2d140f909f981279e16fbe',
   inputs: [
     {
+      // simple-pending-wallet external
       address: 'Ae2tdPwUPEZ9ySSM18e2QGFnCgL8ViDqp8K3wU4i5DYTSf5w6e1cT2aGdSJ',
       txHash: distributorTx.hash,
       id: distributorTx.hash + '3',
@@ -268,7 +269,7 @@ const useChange = {
     }
   ],
   outputs: [
-    // many-tx-wallet external
+    // many-tx-wallet external (index 30)
     { address: 'Ae2tdPwUPEYzkKjrqPw1GHUty25Cj5fWrBVsWxiQYCxfoe2d9iLjTnt34Aj', amount: '1' },
     // many-tx-wallet internal
     { address: 'Ae2tdPwUPEZ7VKG9jy6jJTxQCWNXoMeL2Airvzjv3dc3WCLhSBA7XbSMhKd', amount: '650000' },

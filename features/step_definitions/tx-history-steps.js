@@ -45,6 +45,9 @@ Given(/^There are ([0-9]+) generated addresses$/, async function (lastReceiveInd
 });
 
 When(/^I see the transactions summary$/, async function () {
+  // sometimes this UI twitches on load when it starts fetching data from the server
+  // sleep to avoid the twitch breaking the test
+  await this.driver.sleep(500);
   await this.waitForElement('.WalletSummary_numberOfTransactions');
 });
 
@@ -147,8 +150,8 @@ Then(
 
 const displayInfo = {
   'many-tx-wallet': {
-    txType: 'ADA sent',
-    txAmount: '-0.170000',
+    txType: 'ADA intrawallet transaction',
+    txAmount: '-0.169999',
     txTime: '2019-04-21T15:13:33.000Z',
     txStatus: 'LOW',
     txFrom: ['Ae2tdPwUPEZ77uBBu8cMVxswVy1xfaMZR9wsUSwDNiB48MWqsVWfitHfUM9'],
@@ -163,7 +166,7 @@ const displayInfo = {
   'simple-pending-wallet': {
     txType: 'ADA intrawallet transaction',
     txAmount: '-0.999999',
-    txTime: '2019-04-20T15:13:34.000Z',
+    txTime: '2019-04-20T23:14:52.000Z',
     txStatus: 'PENDING',
     txFrom: ['Ae2tdPwUPEZ9ySSM18e2QGFnCgL8ViDqp8K3wU4i5DYTSf5w6e1cT2aGdSJ'],
     txTo: [
