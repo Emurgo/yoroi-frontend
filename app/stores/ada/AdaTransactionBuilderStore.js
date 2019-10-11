@@ -93,6 +93,7 @@ export default class AdaTransactionBuilderStore extends Store {
   )
 
   _updatePlannedTx = () => {
+    console.log('_updatePlannedTx');
     if (!this.createUnsignedTx.result) {
       runInAction(() => {
         this.plannedTx = null;
@@ -120,8 +121,11 @@ export default class AdaTransactionBuilderStore extends Store {
       // Note: will not trigger if re-asigned same value
       toJS(this.plannedTxInfo),
       this.shouldSendAll,
-      // whenever the user wallet updates, we probably have to refresh the utxo set
       this.stores.substores.ada.wallets.selected,
+      // wallet balance changed => utxo set changed
+      // TODO: this should be changed to UTXO set
+      this.stores.substores.ada.wallets.selected &&
+        this.stores.substores.ada.wallets.selected.amount,
       // need to recalculate when there are no more pending transactions
       this.stores.substores.ada.transactions.hasAnyPending,
     ],
@@ -147,6 +151,7 @@ export default class AdaTransactionBuilderStore extends Store {
    * Otherwise reaction won't trigger
    */
   _updateTxBuilder = async (): Promise<void> => {
+    console.log('_updateTxBuilder');
     runInAction(() => {
       this.createUnsignedTx.reset();
       this.plannedTx = null;
@@ -275,6 +280,7 @@ export default class AdaTransactionBuilderStore extends Store {
    * if they tries to send again (since it may change if UTXO changes)
    */
   _txMismatch = (): boolean => {
+    console.log('_txMismatch');
     if (!this.plannedTx || !this.tentativeTx) {
       // don't change the value when a tx is being recalculated
       // this avoids the UI flickering as the tx gets recalculated
