@@ -5,9 +5,9 @@ Feature: Main UI
     And I have completed the basic setup
 
   @it-81
-  Scenario: Restore wallet and get balance with many addresses
+  Scenario: Restore wallet and get balance with many addresses (IT-81)
     And There is a wallet stored named many-tx-wallet
-    Then I should see the balance number "3.110004 ADA"
+    Then I should see the balance number "3.110005 ADA"
 
   @it-15
   Scenario: Main Screen Tabs Switching (IT-15)
@@ -61,4 +61,4 @@ Feature: Main UI
     When I refresh the page
     Then I should see my balance hidden
     When I click on hide balance button
-    Then I should see the balance number "3.110004 ADA"
+    Then I should see the balance number "3.110005 ADA"

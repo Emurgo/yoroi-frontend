@@ -1,13 +1,14 @@
 // @flow
 
-import _ from 'lodash';
 import BigNumber from 'bignumber.js';
 import cryptoRandomString from 'crypto-random-string';
-import type { RemoteTransaction, RemoteUnspentOutput } from '../../app/api/ada/adaTypes';
+import type { RemoteTransaction } from '../../app/api/ada/adaTypes';
 import {
   genGetTransactionsHistoryForAddresses,
   genGetBestBlock,
   genCheckAddressesInUse,
+  genUtxoForAddresses,
+  genUtxoSumForAddresses,
 } from '../../app/api/ada/lib/storage/bridge/tests/mockNetwork';
 
 // based on abandon x 14 + share
@@ -398,39 +399,26 @@ export function resetChain() {
   addTransaction(failedTx);
 }
 
-// ====================
-//   Helper functinos
-// ====================
-
-function nullifyIfZero(num: BigNumber) {
-  if (num.isZero()) {
-    return null;
-  }
-  return num;
-}
-
 // =================
 //   Special UTXOs
 // =================
 
-const daedalusUtxoForAddresses = {
-  // eslint-disable-next-line max-len
-  DdzFFzCqrhstBgE23pfNLvukYhpTPUKgZsXWLN5GsawqFZd4Fq3aVuGEHk11LhfMfmfBCFCBGrdZHVExjiB4FY5Jkjj1EYcqfTTNcczb: [{
+const daedalusUtxoForAddresses = [
+  {
     utxo_id: 'd2f5bc49b3688bf11d09145583a1b337c288dd8384c7495b74fedb3aeb528b041',
     tx_hash: 'd2f5bc49b3688bf11d09145583a1b337c288dd8384c7495b74fedb3aeb528b04',
-    tx_index: 1,
+    tx_index: 0,
     receiver: 'DdzFFzCqrhstBgE23pfNLvukYhpTPUKgZsXWLN5GsawqFZd4Fq3aVuGEHk11LhfMfmfBCFCBGrdZHVExjiB4FY5Jkjj1EYcqfTTNcczb',
     amount: '500000'
-  }],
-  // eslint-disable-next-line max-len
-  DdzFFzCqrht74dr7DYmiyCobGFQcfLCsHJCCM6nEBTztrsEk5kwv48EWKVMFU9pswAkLX9CUs4yVhVxqZ7xCVDX1TdatFwX5W39cohvm: [{
+  },
+  {
     utxo_id: 'd2f5bc49b3688bf11d09145583a1b337c288dd8384c7495b74fedb3aeb528b041',
     tx_hash: 'd2f5bc49b3688bf11d09145583a1b337c288dd8384c7495b74fedb3aeb528b04',
     tx_index: 1,
     receiver: 'DdzFFzCqrht74dr7DYmiyCobGFQcfLCsHJCCM6nEBTztrsEk5kwv48EWKVMFU9pswAkLX9CUs4yVhVxqZ7xCVDX1TdatFwX5W39cohvm',
     amount: '500000'
-  }],
-};
+  },
+];
 
 // =========================
 //   server-status
@@ -463,70 +451,25 @@ export function serverFixed() {
   });
 }
 
-// =====================
-//   Recalculate state
-// =====================
-
-function calcUtxoMap(): { [key: string]: $Exact<RemoteUnspentOutput> }  {
-  const utxoMap = {};
-  for (const tx of transactions) {
-    for (let j = 0; j < tx.inputs.length; j++) {
-      const input = tx.inputs[j];
-      if (input.id === genesisTransaction) {
-        continue;
-      }
-
-      const key = JSON.stringify(input);
-      delete utxoMap[key];
-    }
-    for (let j = 0; j < tx.outputs.length; j++) {
-      const key = JSON.stringify({
-        id: tx.hash,
-        index: j
-      });
-      utxoMap[key] = {
-        utxo_id: tx.hash + j,
-        tx_hash: tx.hash,
-        tx_index: j,
-        receiver: tx.outputs[j].address,
-        amount: tx.outputs[j].amount.toString(),
-      };
-    }
-  }
-  return utxoMap;
-}
-
-
-function utxoForAddresses(): { [key: string]: Array<RemoteUnspentOutput> } {
-  const utxoMap = calcUtxoMap();
-  const utxos = Object.keys(utxoMap).map(key => utxoMap[key]);
-  const regularUtxoMapping = _.groupBy(utxos, utxo => utxo.receiver);
-  return Object.assign(
-    regularUtxoMapping,
-    daedalusUtxoForAddresses
-  );
-}
-function utxoSumForAddresses(): { [key: string]: ?string } {
-  const result = _.mapValues(
-    utxoForAddresses(),
-    arr => nullifyIfZero(arr
-      .reduce(
-        (sum, utxo) => sum.plus(new BigNumber(utxo.amount)),
-        new BigNumber(0),
-      ))
-  );
-  return result;
-}
-
 function getApiStatus(): boolean {
   return apiStatuses.slice(-1)[0].status;
 }
 
+const usedAddresses = genCheckAddressesInUse(transactions);
+const history = genGetTransactionsHistoryForAddresses(transactions);
+const getBestBlock = genGetBestBlock(transactions);
+const utxoForAddresses = genUtxoForAddresses(
+  history,
+  getBestBlock,
+  genesisTransaction
+);
+const utxoSumForAddresses = genUtxoSumForAddresses(utxoForAddresses);
+
 export default {
   utxoForAddresses,
   utxoSumForAddresses,
-  usedAddresses: genCheckAddressesInUse(transactions),
+  usedAddresses,
   getApiStatus,
-  history: genGetTransactionsHistoryForAddresses(transactions),
-  getBestBlock: genGetBestBlock(transactions),
+  history,
+  getBestBlock,
 };

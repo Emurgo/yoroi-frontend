@@ -1,10 +1,13 @@
 // @flow
 
-import type { RemoteTransaction } from '../../../../adaTypes';
+import BigNumber from 'bignumber.js';
+import type { RemoteTransaction, RemoteUnspentOutput } from '../../../../adaTypes';
 import type {
   FilterUsedRequest, FilterUsedResponse, FilterFunc,
   HistoryRequest, HistoryResponse, HistoryFunc,
   BestBlockRequest, BestBlockResponse, BestBlockFunc,
+  AddressUtxoRequest, AddressUtxoResponse, AddressUtxoFunc,
+  UtxoSumRequest, UtxoSumResponse, UtxoSumFunc,
 } from '../../../state-fetch/types';
 import { RollbackApiError, } from '../../../../errors';
 
@@ -148,5 +151,80 @@ export function genGetBestBlock(
       };
     }
     return bestInNetwork;
+  };
+}
+
+export function genUtxoForAddresses(
+  getHistory: HistoryFunc,
+  getBestBlock: BestBlockFunc,
+  genesisTransaction: string,
+): AddressUtxoFunc {
+  return async (
+    body: AddressUtxoRequest,
+  ): Promise<AddressUtxoResponse> => {
+    const bestBlock = await getBestBlock();
+    if (bestBlock.hash == null) {
+      return [];
+    }
+    const until = bestBlock.hash;
+    const history = await getHistory({
+      addresses: body.addresses,
+      untilBlock: until,
+    });
+    const ourAddressSet = new Set(body.addresses);
+
+    const utxoMap = new Map<string, RemoteUnspentOutput>();
+    for (const tx of history) {
+      for (let j = 0; j < tx.outputs.length; j++) {
+        const key = JSON.stringify({
+          id: tx.hash,
+          index: j
+        });
+        if (ourAddressSet.has(tx.outputs[j].address)) {
+          utxoMap.set(key, {
+            utxo_id: tx.hash + j,
+            tx_hash: tx.hash,
+            tx_index: j,
+            receiver: tx.outputs[j].address,
+            amount: tx.outputs[j].amount.toString(),
+          });
+        }
+      }
+    }
+    for (const tx of history) {
+      for (let j = 0; j < tx.inputs.length; j++) {
+        const input = tx.inputs[j];
+        if (input.txHash === genesisTransaction) {
+          continue;
+        }
+
+        const key = JSON.stringify({
+          id: input.txHash,
+          index: input.index,
+        });
+        utxoMap.delete(key);
+      }
+    }
+    return Array.from(utxoMap.values());
+  };
+}
+
+export function genUtxoSumForAddresses(
+  getAddressUtxo: AddressUtxoFunc,
+): UtxoSumFunc {
+  return async (
+    body: UtxoSumRequest,
+  ): Promise<UtxoSumResponse> => {
+    const utxos = await getAddressUtxo(body);
+    if (utxos.length === 0) {
+      return { sum: null };
+    }
+    const result = utxos.reduce(
+      (sum, utxo) => sum.plus(new BigNumber(utxo.amount)),
+      new BigNumber(0),
+    );
+    return {
+      sum: result.toString()
+    };
   };
 }

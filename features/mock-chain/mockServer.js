@@ -1,7 +1,6 @@
 // @flow
 
 import { create, bodyParser, defaults } from 'json-server';
-import BigNumber from 'bignumber.js';
 import type {
   AddressUtxoRequest, AddressUtxoResponse,
   UtxoSumRequest, UtxoSumResponse,
@@ -66,42 +65,26 @@ export function getMockServer(
 
     server.use(middlewares);
 
-    server.post('/api/txs/utxoForAddresses', (
+    server.post('/api/txs/utxoForAddresses', async (
       req: {
         body: AddressUtxoRequest
       },
       res: { send(arg: AddressUtxoResponse): any }
-    ): void => {
+    ): Promise<void> => {
       chai.assert.isTrue(_validateAddressesReq(req.body));
-      const utxoForAddresses = mockImporter.utxoForAddresses();
-      let filteredUtxos = Object.keys(utxoForAddresses)
-        .filter(addr => req.body.addresses.includes(addr))
-        .map(addr => utxoForAddresses[addr])
-        .reduce((utxos, arr) => {
-          utxos.push(...arr);
-          return utxos;
-        }, []);
-      if (utxoForAddressesHook.length) {
-        filteredUtxos = utxoForAddressesHook.pop()(filteredUtxos);
-      }
-      res.send(filteredUtxos);
+      const utxoForAddresses = await mockImporter.utxoForAddresses(req.body);
+      res.send(utxoForAddresses);
     });
 
-    server.post('/api/txs/utxoSumForAddresses', (
+    server.post('/api/txs/utxoSumForAddresses', async (
       req: {
         body: UtxoSumRequest
       },
       res: { send(arg: UtxoSumResponse): any }
-    ): void => {
+    ): Promise<void> => {
       chai.assert.isTrue(_validateAddressesReq(req.body));
-      const utxoSumForAddresses = mockImporter.utxoSumForAddresses();
-      const sumUtxos = Object.keys(utxoSumForAddresses)
-        .filter(addr => req.body.addresses.includes(addr))
-        .map(addr => utxoSumForAddresses[addr])
-        .map(val => (val != null ? new BigNumber(val) : new BigNumber(0)))
-        .reduce((sum, value) => value.plus(sum), new BigNumber(0));
-      const result = sumUtxos.isZero() ? null : sumUtxos.toString();
-      res.send({ sum: result });
+      const utxoSumForAddresses = await mockImporter.utxoSumForAddresses(req.body);
+      res.send(utxoSumForAddresses);
     });
 
     server.post('/api/v2/txs/history', async (

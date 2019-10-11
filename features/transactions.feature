@@ -24,8 +24,8 @@ Feature: Send transaction
 
     Examples:
       | amount              | fee       |
-      | 0.001000            | 0.199723  |
-      | 1.000000            | 0.207765  |
+      | 0.001000            | 0.183815  |
+      | 1.000000            | 0.199811  |
       | 2.000000            | 0.215719  |
 
   @it-90
@@ -66,7 +66,7 @@ Feature: Send transaction
 
   Examples:
       | address                                                     | amount    |fee      |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000  |0.199723 | 
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000  |0.167906 | 
 
   @it-46
   Scenario: User can't send funds to the invalid address (IT-46)
@@ -110,7 +110,7 @@ Feature: Send transaction
 
     Examples:
       | fee       |
-      | 0.221520  |
+      | 0.229474  |
 
   @invalidWitnessTest @it-20
   Scenario: Sending a Tx and receiving from the server an invalid signature error (IT-20)
@@ -120,7 +120,7 @@ Feature: Send transaction
     And I fill the form:
       | address                                                     | amount   |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000 |
-    And The transaction fees are "0.199723"
+    And The transaction fees are "0.183815"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
@@ -137,7 +137,7 @@ Feature: Send transaction
     And I fill the form:
       | address                                                     | amount   |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000 |
-    And The transaction fees are "0.199723"
+    And The transaction fees are "0.183815"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
@@ -204,7 +204,7 @@ Feature: Send transaction
     And I fill the form:
       | address                                                     | amount   |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000 |
-    And The transaction fees are "0.199723"
+    And The transaction fees are "0.183815"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
