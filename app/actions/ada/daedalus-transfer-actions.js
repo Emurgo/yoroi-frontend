@@ -1,8 +1,6 @@
 // @flow
 import Action from '../lib/Action';
-import type {
-  PublicDeriverWithCachedMeta
-} from '../../stores/base/WalletStore';
+import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 
 export default class DaedalusTranferActions {
   startTransferFunds: Action<void> = new Action();

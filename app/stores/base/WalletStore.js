@@ -19,11 +19,9 @@ import {
   asGetSigningKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import type { WalletAccountNumberPlate } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { createAccountPlate } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
-import type { AssuranceMode, } from '../../types/transactionAssuranceTypes';
-import { assuranceModes, } from '../../config/transactionAssuranceConfig';
+import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 
 type GroupedWallets = {|
   publicDerivers: Array<PublicDeriverWithCachedMeta>;
@@ -50,18 +48,6 @@ function groupWallets(
   }
   return Array.from(pairingMap.values());
 }
-
-// TODO: should be made into a Domain class
-export type PublicDeriverWithCachedMeta = {|
-  self: PublicDeriver,
-  // no plate if no public key
-  plate: null | WalletAccountNumberPlate,
-  publicDeriverName: string,
-  conceptualWalletName: string,
-  amount: BigNumber,
-  assuranceMode: AssuranceMode,
-  signingKeyUpdateDate: null | Date,
-|};
 
 /**
  * The base wallet store that contains the shared logic
@@ -107,44 +93,6 @@ export default class WalletsStore extends Store {
     }
   };
 
-  _addCachedData = async (
-    publicDeriver: PublicDeriver,
-  ): Promise<PublicDeriverWithCachedMeta> => {
-    const withPubKey = asGetPublicKey(publicDeriver);
-
-    let plate = null;
-    if (withPubKey != null) {
-      const publicKey = await withPubKey.getPublicKey();
-      if (publicKey.IsEncrypted) {
-        throw new Error('_addCachedData unexpected encrypted public key');
-      }
-      plate = createAccountPlate(publicKey.Hash);
-    }
-
-    const publicDeriverInfo = await publicDeriver.getFullPublicDeriverInfo();
-    const conceptualWalletInfo = await publicDeriver
-      .getConceptualWallet()
-      .getFullConceptualWalletInfo();
-
-    let signingKeyUpdateDate = null;
-    {
-      const withSigningKey = asGetSigningKey(publicDeriver);
-      if (withSigningKey) {
-        const key = await withSigningKey.getSigningKey();
-        signingKeyUpdateDate = key.row.PasswordLastUpdate;
-      }
-    }
-    return {
-      self: publicDeriver,
-      plate,
-      publicDeriverName: publicDeriverInfo.Name,
-      conceptualWalletName: conceptualWalletInfo.Name,
-      amount: new BigNumber(0), // assume 0 for now. Updated later if necessary
-      assuranceMode: assuranceModes.NORMAL,
-      signingKeyUpdateDate,
-    };
-  }
-
   @action
   _baseAddNewWallet = async (
     newWallet: RestoreWalletResponse,
@@ -152,7 +100,7 @@ export default class WalletsStore extends Store {
     // set the first created as the result
     const newWithCachedData: Array<PublicDeriverWithCachedMeta> = [];
     for (const newPublicDeriver of newWallet.publicDerivers) {
-      const withCache = await this._addCachedData(newPublicDeriver);
+      const withCache = await PublicDeriverWithCachedMeta.fromPublicDeriver(newPublicDeriver);
       newWithCachedData.push(withCache);
     }
     runInAction(() => {
@@ -280,7 +228,7 @@ export default class WalletsStore extends Store {
   addHwWallet = async (
     publicDeriver: PublicDeriver,
   ): Promise<void> => {
-    const withCache = await this._addCachedData(publicDeriver);
+    const withCache = await PublicDeriverWithCachedMeta.fromPublicDeriver(publicDeriver);
     // set the first created as the result
     this.publicDerivers.push(withCache);
 
@@ -314,7 +262,7 @@ export default class WalletsStore extends Store {
 
     const newWithCachedData: Array<PublicDeriverWithCachedMeta> = [];
     for (const newPublicDeriver of result) {
-      const withCache = await this._addCachedData(newPublicDeriver);
+      const withCache = await PublicDeriverWithCachedMeta.fromPublicDeriver(newPublicDeriver);
       newWithCachedData.push(withCache);
     }
     runInAction('refresh active wallet', () => {

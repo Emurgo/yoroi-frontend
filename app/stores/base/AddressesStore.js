@@ -23,7 +23,7 @@ import {
   Logger,
 } from '../../utils/logging';
 import { EXTERNAL, INTERNAL } from '../../config/numbersConfig';
-import type { PublicDeriverWithCachedMeta, } from  './WalletStore';
+import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 
 export type StandardAddress = {|
   ...Address, ...Value, ...Addressing, ...UsedStatus

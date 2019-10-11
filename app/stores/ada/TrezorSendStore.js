@@ -22,7 +22,7 @@ import {
   convertToLocalizableError
 } from '../../domain/TrezorLocalizedError';
 import LocalizableError from '../../i18n/LocalizableError';
-import type { PublicDeriverWithCachedMeta, } from  '../base/WalletStore';
+import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 
 /** Note: Handles Trezor Signing */
 export default class TrezorSendStore extends Store {

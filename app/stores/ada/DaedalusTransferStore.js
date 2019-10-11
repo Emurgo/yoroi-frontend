@@ -29,9 +29,7 @@ import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import {
   asHasChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type {
-  PublicDeriverWithCachedMeta
-} from '../base/WalletStore';
+import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 
 declare var CONFIG: ConfigType;
 const websocketUrl = CONFIG.network.websocketUrl;

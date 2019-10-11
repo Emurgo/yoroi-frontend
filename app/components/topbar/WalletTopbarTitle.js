@@ -12,7 +12,7 @@ import WalletAccountIcon from './WalletAccountIcon';
 import { defineMessages, intlShape } from 'react-intl';
 import hideBalanceIcon from '../../assets/images/top-bar/password.hide.inline.svg';
 import showBalanceIcon from '../../assets/images/top-bar/password.show.inline.svg';
-import type { PublicDeriverWithCachedMeta } from '../../stores/base/WalletStore';
+import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import type { WalletAccountNumberPlate } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 

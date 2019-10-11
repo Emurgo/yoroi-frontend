@@ -14,7 +14,7 @@ import {
   asGetAllAddresses,
   asGetBalance,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { PublicDeriverWithCachedMeta, } from  './WalletStore';
+import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 
 export default class TransactionsStore extends Store {
 

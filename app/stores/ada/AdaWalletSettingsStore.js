@@ -6,7 +6,7 @@ import type { ChangeModelPasswordFunc, RenameModelFunc } from '../../api/ada';
 import {
   asGetSigningKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { PublicDeriverWithCachedMeta } from '../base/WalletStore';
+import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 
 export default class AdaWalletSettingsStore extends WalletSettingsStore {
 

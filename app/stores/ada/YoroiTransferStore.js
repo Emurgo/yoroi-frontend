@@ -25,7 +25,7 @@ import { verifyAccountLevel } from '../../api/ada/lib/utils';
 import {
   asHasChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { PublicDeriverWithCachedMeta } from '../base/WalletStore';
+import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 
 type TransferFundsRequest = {
   signedTx: RustModule.Wallet.SignedTransaction,
