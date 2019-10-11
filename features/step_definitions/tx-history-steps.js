@@ -178,7 +178,7 @@ const displayInfo = {
   'failed-single-tx': {
     txType: 'ADA sent',
     txAmount: '-0.180000',
-    txTime: '2019-04-21T15:13:33.000Z',
+    txTime: '2019-04-20T23:14:51.000Z',
     txStatus: 'FAILED',
     txFrom: ['Ae2tdPwUPEYw8ScZrAvKbxai1TzG7BGC4n8PoF9JzE1abgHc3gBfkkDNBNv'],
     txTo: [

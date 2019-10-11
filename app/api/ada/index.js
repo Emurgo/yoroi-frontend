@@ -38,6 +38,7 @@ import {
 } from './lib/storage/database/bip44/api/utils';
 import {
   PublicDeriver,
+  asDisplayCutoff,
 } from './lib/storage/models/PublicDeriver/index';
 import type {
   IPublicDeriver,
@@ -47,7 +48,6 @@ import type {
   IGetSigningKey,
   IDisplayCutoff,
   IDisplayCutoffPopFunc,
-  IDisplayCutoffSetFunc,
   IDisplayCutoffPopResponse,
   IHasChains, IHasChainsRequest,
   IGetAllAddressesResponse,
@@ -351,7 +351,7 @@ export type CreateAddressFunc = (
 // saveLastReceiveAddressIndex
 
 export type SaveLastReceiveAddressIndexRequest = {
-  setFunc: IDisplayCutoffSetFunc,
+  publicDeriver: PublicDeriver,
   index: number,
 };
 export type SaveLastReceiveAddressIndexResponse = void;
@@ -921,7 +921,12 @@ export default class AdaApi {
   ): Promise<SaveLastReceiveAddressIndexResponse> {
     Logger.debug('AdaApi::saveLastReceiveAddressIndex called');
     try {
-      await request.setFunc({
+      // note: it's better to take a DisplayCutoff as a parameter to the function directly
+      // but this would be kind of ugly to do from the test code
+      // so we just pass a public deriver instead
+      const withDisplayCutoff = asDisplayCutoff(request.publicDeriver);
+      if (withDisplayCutoff == null) return;
+      await withDisplayCutoff.setCutoff({
         newIndex: request.index
       });
     } catch (error) {
