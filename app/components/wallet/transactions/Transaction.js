@@ -13,6 +13,7 @@ import WalletTransaction from '../../../domain/WalletTransaction';
 import { environmentSpecificMessages } from '../../../i18n/global-messages';
 import type { TransactionDirectionType, } from '../../../api/ada/adaTypes';
 import { transactionTypes } from '../../../api/ada/adaTypes';
+import type { AssuranceLevel } from '../../../types/transactionAssuranceTypes';
 import environment from '../../../environment';
 import { Logger } from '../../../utils/logging';
 import expandArrow from '../../../assets/images/expand-arrow.inline.svg';
@@ -119,7 +120,7 @@ type Props = {|
   data: WalletTransaction,
   state: TxStatusCodesType,
   selectedExplorer: ExplorerType,
-  assuranceLevel: string,
+  assuranceLevel: AssuranceLevel,
   isLastInList: boolean,
   formattedWalletAmount: Function,
 |};
@@ -178,6 +179,23 @@ export default class Transaction extends Component<Props, State> {
     ]);
   }
 
+  getStatusString(
+    intl: $npm$ReactIntl$IntlFormat,
+    state: number,
+    assuranceLevel: AssuranceLevel,
+  ) {
+    if (state === TxStatusCodes.IN_BLOCK) {
+      return intl.formatMessage(assuranceLevelTranslations[assuranceLevel]);
+    }
+    if (state === TxStatusCodes.PENDING) {
+      return intl.formatMessage(stateTranslations.pending);
+    }
+    if (state < 0) {
+      return intl.formatMessage(stateTranslations.failed);
+    }
+    throw new Error('getStatusString unexpected state ' + state);
+  }
+
   render() {
     const data = this.props.data;
     const { isLastInList, state, assuranceLevel, formattedWalletAmount } = this.props;
@@ -214,10 +232,7 @@ export default class Transaction extends Component<Props, State> {
 
     const arrowClasses = isExpanded ? styles.collapseArrow : styles.expandArrow;
 
-    const status = state === TxStatusCodes.IN_BLOCK
-      ? intl.formatMessage(assuranceLevelTranslations[assuranceLevel])
-      // $FlowFixMe flow doesn't support type refinments with enums
-      : intl.formatMessage(stateTranslations[state]);
+    const status = this.getStatusString(intl, state, assuranceLevel);
 
     const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
     const symbol = adaSymbol;

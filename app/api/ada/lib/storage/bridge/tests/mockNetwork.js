@@ -171,10 +171,11 @@ export function genUtxoForAddresses(
       addresses: body.addresses,
       untilBlock: until,
     });
+    const inBlockHistory = history.filter(tx => tx.block_hash != null);
     const ourAddressSet = new Set(body.addresses);
 
     const utxoMap = new Map<string, RemoteUnspentOutput>();
-    for (const tx of history) {
+    for (const tx of inBlockHistory) {
       for (let j = 0; j < tx.outputs.length; j++) {
         const key = JSON.stringify({
           id: tx.hash,
@@ -191,7 +192,7 @@ export function genUtxoForAddresses(
         }
       }
     }
-    for (const tx of history) {
+    for (const tx of inBlockHistory) {
       for (let j = 0; j < tx.inputs.length; j++) {
         const input = tx.inputs[j];
         if (input.txHash === genesisTransaction) {
