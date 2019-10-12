@@ -156,7 +156,7 @@ export async function buildTransferTx(
       receiver: outputAddr,
     };
   } catch (error) {
-    Logger.error(`daedalusTransfer::generateTransferTx ${stringifyError(error)}`);
+    Logger.error(`daedalusTransfer::buildTransferTx ${stringifyError(error)}`);
     throw new GenerateTransferTxError();
   }
 }

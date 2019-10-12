@@ -25,7 +25,6 @@ import {
 import type {
   Address, Addressing
 } from '../lib/storage/models/common/interfaces';
-import { inspect } from 'util';
 
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 import {
@@ -271,7 +270,7 @@ describe('Create signed transactions', () => {
             path: [BIP44_PURPOSE, CARDANO_COINTYPE, HARD_DERIVATION_START + 0, 0, 135],
             startLevel: 1
           }
-        } 
+        }
       ],
       unsignedTx: RustModule.Wallet.Transaction.from_json(
         {

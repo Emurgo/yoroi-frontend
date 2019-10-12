@@ -1,6 +1,10 @@
 // @flow
 
-import BigNumber from 'bignumber.js';
+import type {
+  AddressUtxoRequest,
+  AddressUtxoResponse,
+  AddressUtxoFunc,
+} from '../../app/api/ada/lib/state-fetch/types';
 import cryptoRandomString from 'crypto-random-string';
 import type { RemoteTransaction } from '../../app/api/ada/adaTypes';
 import {
@@ -288,6 +292,7 @@ export const postLaunchSuccessfulTx = {
   hash: '350632adedd456cf607ed01a84f8c6c49d32f17e0e63447be7f7b69cb37ef446',
   inputs: [
     {
+      // many-tx-wallet internal
       address: 'Ae2tdPwUPEZ5uzkzh1o2DHECiUi3iugvnnKHRisPgRRP3CTF4KCMvy54Xd3',
       txHash: manyTx2.hash,
       id: manyTx2.hash + '1',
@@ -313,6 +318,7 @@ export const postLaunchPendingTx = {
   hash: '350632adedd456cf607ed01a84f8c6c49d32f17e0e63447be7f7b69cb37ef446',
   inputs: [
     {
+      // many-tx-wallet internal
       address: 'Ae2tdPwUPEZ5uzkzh1o2DHECiUi3iugvnnKHRisPgRRP3CTF4KCMvy54Xd3',
       txHash: manyTx2.hash,
       id: manyTx2.hash + '1',
@@ -404,7 +410,8 @@ export function resetChain() {
 //   Special UTXOs
 // =================
 
-const daedalusUtxoForAddresses = [
+// TODO: this hack should probably be removed and replaced with proper trnansactions
+export const utxoForAddressesHook = [
   {
     utxo_id: 'd2f5bc49b3688bf11d09145583a1b337c288dd8384c7495b74fedb3aeb528b041',
     tx_hash: 'd2f5bc49b3688bf11d09145583a1b337c288dd8384c7495b74fedb3aeb528b04',
@@ -456,14 +463,24 @@ function getApiStatus(): boolean {
   return apiStatuses.slice(-1)[0].status;
 }
 
+
 const usedAddresses = genCheckAddressesInUse(transactions);
 const history = genGetTransactionsHistoryForAddresses(transactions);
 const getBestBlock = genGetBestBlock(transactions);
-const utxoForAddresses = genUtxoForAddresses(
+const baseUtxoForAddresses = genUtxoForAddresses(
   history,
   getBestBlock,
   genesisTransaction
 );
+// TODO
+const genUtxoForAddressesWithHook = (): AddressUtxoFunc => {
+  return async (request: AddressUtxoRequest): Promise<AddressUtxoResponse> => {
+    const result = await baseUtxoForAddresses(request);
+    // TODO: fails since these UTXO may not belong to you
+    return result.concat(utxoForAddressesHook);
+  };
+};
+const utxoForAddresses = baseUtxoForAddresses;
 const utxoSumForAddresses = genUtxoSumForAddresses(utxoForAddresses);
 
 export default {

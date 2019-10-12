@@ -41,7 +41,6 @@ function _defaultSignedTransaction(
 let MockServer = null;
 
 export const signedTransactionHandler = [];
-export const utxoForAddressesHook = [];
 
 export function getMockServer(
   settings: {

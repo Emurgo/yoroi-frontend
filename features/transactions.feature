@@ -66,7 +66,7 @@ Feature: Send transaction
 
   Examples:
       | address                                                     | amount    |fee      |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000  |0.167906 | 
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000  |0.183815 | 
 
   @it-46
   Scenario: User can't send funds to the invalid address (IT-46)

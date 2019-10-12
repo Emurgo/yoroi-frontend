@@ -15,11 +15,8 @@ import type {
 } from '../../api/ada';
 import {
   PublicDeriver,
-  asGetPublicKey,
-  asGetSigningKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { createAccountPlate } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 
