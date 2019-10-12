@@ -165,7 +165,7 @@ export default class LedgerConnectStore
 
         Logger.debug(stringifyData(versionResp));
 
-        // TODO: assume single account in Yoroi
+        // TODO: only support Ledger wallet on account 0
         const accountPath = makeCardanoAccountBIP44Path(0);
         // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#examples
         Logger.debug(stringifyData(accountPath));

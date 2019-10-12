@@ -23,7 +23,7 @@ import type {
 
 import type { IFetcher } from './IFetcher';
 
-import _ from 'lodash';
+import { chunk } from 'lodash';
 import {
   CheckAdressesInUseApiError,
   GetAllUTXOsForAddressesError,
@@ -101,7 +101,7 @@ function batchUTXOsForAddresses(
     try {
       // split up all addresses into chunks of equal size
       const groupsOfAddresses: Array<Array<string>>
-        = _.chunk(body.addresses, CONFIG.app.addressRequestSize);
+        = chunk(body.addresses, CONFIG.app.addressRequestSize);
 
       // convert chunks into list of Promises that call the backend-service
       const promises = groupsOfAddresses
@@ -129,7 +129,7 @@ function batchTxsBodiesForInputs(
   return async function (body) {
     try {
       // split up all txs into chunks of equal size
-      const groupsOfTxsHashes = _.chunk(body.txsHashes, CONFIG.app.txsBodiesRequestSize);
+      const groupsOfTxsHashes = chunk(body.txsHashes, CONFIG.app.txsBodiesRequestSize);
 
       // convert chunks into list of Promises that call the backend-service
       const promises = groupsOfTxsHashes
@@ -159,7 +159,7 @@ export function batchGetUTXOsSumsForAddresses(
   return async function (body) {
     try {
       // batch all addresses into chunks for API
-      const groupsOfAddresses = _.chunk(body.addresses, addressesLimit);
+      const groupsOfAddresses = chunk(body.addresses, addressesLimit);
       const promises =
         groupsOfAddresses.map(groupOfAddresses => getUTXOsSumsForAddresses(
           { addresses: groupOfAddresses }
@@ -228,7 +228,7 @@ async function _batchHistoryByAddresses(
   addresses: Array<string>,
   apiCall: (Array<string>) => Promise<HistoryResponse>,
 ): Promise<Array<RemoteTransaction>> {
-  const groupsOfAddresses = _.chunk(addresses, addressesLimit);
+  const groupsOfAddresses = chunk(addresses, addressesLimit);
   const groupedTxsPromises = groupsOfAddresses.map(apiCall);
   const groupedTxs = await Promise.all(groupedTxsPromises);
   // TODO: verify the latest block of each group is still in the blockchain
@@ -279,7 +279,7 @@ export function batchCheckAddressesInUse(
 ): FilterFunc {
   return async function (body) {
     try {
-      const groupsOfAddresses = _.chunk(body.addresses, addressesLimit);
+      const groupsOfAddresses = chunk(body.addresses, addressesLimit);
       const groupedAddrPromises = groupsOfAddresses.map(
         addr => checkAddressesInUse({ addresses: addr })
       );

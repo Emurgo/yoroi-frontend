@@ -1,9 +1,7 @@
 
 // @flow
 
-// TODO: this file is not a library so it shouldn't be in the "lib" folder
-
-import _ from 'lodash';
+import { range } from 'lodash';
 import type {
   FilterFunc,
 } from './state-fetch/types';
@@ -121,7 +119,7 @@ async function _scanNextBatch(
   }
 
   // create batch
-  const addressesIndex = _.range(
+  const addressesIndex = range(
     fetchedAddressesInfo.length + offset,
     fetchedAddressesInfo.length + offset + requestSize
   );

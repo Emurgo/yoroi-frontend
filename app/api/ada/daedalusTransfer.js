@@ -2,7 +2,7 @@
 
 // Handle data created by wallets using the v1 address scheme
 
-import _ from 'lodash';
+import { isEmpty } from 'lodash';
 import BigNumber from 'bignumber.js';
 import { coinToBigNumber } from './lib/utils';
 import {
@@ -80,7 +80,7 @@ export async function generateTransferTx(
   const senders = Object.keys(addressKeys);
   const senderUtxos = await getUTXOsForAddresses({ addresses: senders });
 
-  if (_.isEmpty(senderUtxos)) {
+  if (isEmpty(senderUtxos)) {
     const error = new NoInputsError();
     Logger.error(`daedalusTransfer::generateTransferTx ${stringifyError(error)}`);
     throw error;

@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import _ from 'lodash';
+import { map } from 'lodash';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import type { Node, Element } from 'react';
@@ -84,7 +84,7 @@ export default class Dialog extends Component<Props> {
 
           {actions && actions.length > 0 && (
             <div className={styles.actions}>
-              {_.map(actions, (action, i: number) => {
+              {map(actions, (action, i: number) => {
                 const buttonClasses = classnames([
                   action.className != null ? action.className : null,
                   action.primary === true ? 'primary' : secondaryButton,

@@ -192,7 +192,7 @@ export default class TrezorConnectStore
       this.hwDeviceInfo = undefined;
 
       const trezorResp = await TrezorConnect.cardanoGetPublicKey({
-        // TODO: only support Trezor wallest on account 0
+        // TODO: only support Trezor wallet on account 0
         path: derivePathPrefix(0)
       });
 

@@ -915,7 +915,7 @@ export default class AdaApi {
     }
   }
 
-  /** TODO: This method is exposed to allow injecting data when testing */
+  /** Note: This method is exposed to allow injecting data when testing */
   async saveLastReceiveAddressIndex(
     request: SaveLastReceiveAddressIndexRequest
   ): Promise<SaveLastReceiveAddressIndexResponse> {
