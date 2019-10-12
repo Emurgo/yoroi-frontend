@@ -247,7 +247,7 @@ async function exportIndexedDB(client, exportDir: string) {
   const indexedDBPath = `${exportDir}/indexedDB.json`;
   const indexedDB = await client.driver.executeAsyncScript((done) => {
     window.yoroi.api.ada.exportLocalDatabase(
-      yoroi.stores.loading.loadPersitentDbRequest.result,
+      window.yoroi.stores.loading.loadPersitentDbRequest.result,
     )
       .then(done)
       .catch(err => done(err));
@@ -301,7 +301,7 @@ async function importIndexedDB(client, importDir: string) {
     const indexedDBData = fs.readFileSync(indexedDBPath).toString();
     await client.driver.executeAsyncScript((data, done) => {
       window.yoroi.api.ada.importLocalDatabase(
-        yoroi.stores.loading.loadPersitentDbRequest.result,
+        window.yoroi.stores.loading.loadPersitentDbRequest.result,
         data
       )
         .then(done)
