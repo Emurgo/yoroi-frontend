@@ -23,9 +23,9 @@ export default class GridFlexContainer extends Component<Props> {
     return (
       <div>
         {
-          chunkedChildren.map((chunk, i) => (
+          chunkedChildren.map((childChunk, i) => (
             <HorizontalFlexContainer key={i}>
-              {chunk}
+              {childChunk}
             </HorizontalFlexContainer>
           ))
         }
