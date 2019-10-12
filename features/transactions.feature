@@ -4,7 +4,7 @@ Feature: Send transaction
     Given I have opened the extension
     And I have completed the basic setup
 
-  @it-54 @it-52
+  @it-54
   Scenario Outline: User can send funds from one Yoroi wallet to another (IT-54)
     Given I import a snapshot named many-tx-wallet
     And I have a wallet with funds

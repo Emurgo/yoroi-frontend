@@ -298,7 +298,10 @@ async function importIndexedDB(client, importDir: string) {
   try {
     const indexedDBData = fs.readFileSync(indexedDBPath).toString();
     await client.driver.executeAsyncScript((data, done) => {
-      window.yoroi.api.ada.importLocalDatabase(data)
+      window.yoroi.api.ada.importLocalDatabase(
+        yoroi.stores.loading.loadPersitentDbRequest.result,
+        data
+      )
         .then(done)
         .catch(err => done(err));
     }, JSON.parse(indexedDBData));

@@ -112,7 +112,7 @@ export default class WalletsStore extends Store {
     wallets.showWalletCreatedNotification();
 
     for (const pubDeriver of newWithCachedData) {
-      this.registerObserversForNewWallet(pubDeriver);
+      await this.registerObserversForNewWallet(pubDeriver);
     }
   }
 
@@ -232,7 +232,7 @@ export default class WalletsStore extends Store {
     this.selected = withCache;
     this.goToWalletRoute(withCache.self);
 
-    this.registerObserversForNewWallet(withCache);
+    await this.registerObserversForNewWallet(withCache);
   }
 
   // ACTIONS

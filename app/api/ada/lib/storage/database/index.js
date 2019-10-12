@@ -82,7 +82,7 @@ export async function clear(
   await tx.begin(db.getSchema().tables());
 
   for (const table of db.getSchema().tables()) {
-    tx.attach(db.delete().from(table));
+    await tx.attach(db.delete().from(table));
   }
   await tx.commit();
 }
@@ -105,9 +105,9 @@ async function onUpgrade(
   const dump = await rawDb.dump();
   if (version === 1) {
     Object.assign(dumpByVersion, dump);
-    rawDb.dropTable('TxAddresses');
-    rawDb.dropTable('Txs');
-    rawDb.dropTable('Addresses');
+    await rawDb.dropTable('TxAddresses');
+    await rawDb.dropTable('Txs');
+    await rawDb.dropTable('Addresses');
   } else {
     throw new Error('unexpected version number');
   }
