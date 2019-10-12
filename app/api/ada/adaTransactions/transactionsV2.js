@@ -325,11 +325,14 @@ function addWitnesses(
     if (lastLevelSpecified !== DerivationLevels.ADDRESS.level) {
       throw new Error('addWitnesses incorrect addressing size');
     }
+    if (keyLevel + 1 < utxo.addressing.startLevel) {
+      throw new Error('addWitnesses keyLevel < startLevel');
+    }
     let key = signingKey;
-    for (let i = 0; i < utxo.addressing.path.length; i++) {
+    for (let i = keyLevel - utxo.addressing.startLevel + 1; i < utxo.addressing.path.length; i++) {
       key = key.derive(
         RustModule.Wallet.DerivationScheme.v2(),
-        utxo.addressing.path[keyLevel - utxo.addressing.startLevel + i + 1]
+        utxo.addressing.path[i]
       );
     }
     return key;
