@@ -246,7 +246,9 @@ async function exportLocalStorage(client, exportDir: string) {
 async function exportIndexedDB(client, exportDir: string) {
   const indexedDBPath = `${exportDir}/indexedDB.json`;
   const indexedDB = await client.driver.executeAsyncScript((done) => {
-    window.yoroi.api.ada.exportLocalDatabase()
+    window.yoroi.api.ada.exportLocalDatabase(
+      yoroi.stores.loading.loadPersitentDbRequest.result,
+    )
       .then(done)
       .catch(err => done(err));
   });
