@@ -1,10 +1,5 @@
 // @flow
 
-import type {
-  AddressUtxoRequest,
-  AddressUtxoResponse,
-  AddressUtxoFunc,
-} from '../../app/api/ada/lib/state-fetch/types';
 import cryptoRandomString from 'crypto-random-string';
 import type { RemoteTransaction } from '../../app/api/ada/adaTypes';
 import {
@@ -87,6 +82,9 @@ const distributorTx = {
     { address: 'Ae2tdPwUPEYvzFpWJEGmSjLdz3DNY9WL5CbPjsouuM5M6YMsYWB1vsCS8j4', amount: '1000000' },
     // failed-single-tx
     { address: 'Ae2tdPwUPEYw8ScZrAvKbxai1TzG7BGC4n8PoF9JzE1abgHc3gBfkkDNBNv', amount: '1000000' },
+    // daedalus addresses
+    { address: 'DdzFFzCqrhstBgE23pfNLvukYhpTPUKgZsXWLN5GsawqFZd4Fq3aVuGEHk11LhfMfmfBCFCBGrdZHVExjiB4FY5Jkjj1EYcqfTTNcczb', amount: '500000' },
+    { address: 'DdzFFzCqrht74dr7DYmiyCobGFQcfLCsHJCCM6nEBTztrsEk5kwv48EWKVMFU9pswAkLX9CUs4yVhVxqZ7xCVDX1TdatFwX5W39cohvm', amount: '500000' },
   ],
   height: 1,
   epoch: 0,
@@ -406,28 +404,6 @@ export function resetChain() {
   addTransaction(failedTx);
 }
 
-// =================
-//   Special UTXOs
-// =================
-
-// TODO: this hack should probably be removed and replaced with proper trnansactions
-export const utxoForAddressesHook = [
-  {
-    utxo_id: 'd2f5bc49b3688bf11d09145583a1b337c288dd8384c7495b74fedb3aeb528b041',
-    tx_hash: 'd2f5bc49b3688bf11d09145583a1b337c288dd8384c7495b74fedb3aeb528b04',
-    tx_index: 0,
-    receiver: 'DdzFFzCqrhstBgE23pfNLvukYhpTPUKgZsXWLN5GsawqFZd4Fq3aVuGEHk11LhfMfmfBCFCBGrdZHVExjiB4FY5Jkjj1EYcqfTTNcczb',
-    amount: '500000'
-  },
-  {
-    utxo_id: 'd2f5bc49b3688bf11d09145583a1b337c288dd8384c7495b74fedb3aeb528b041',
-    tx_hash: 'd2f5bc49b3688bf11d09145583a1b337c288dd8384c7495b74fedb3aeb528b04',
-    tx_index: 1,
-    receiver: 'DdzFFzCqrht74dr7DYmiyCobGFQcfLCsHJCCM6nEBTztrsEk5kwv48EWKVMFU9pswAkLX9CUs4yVhVxqZ7xCVDX1TdatFwX5W39cohvm',
-    amount: '500000'
-  },
-];
-
 // =========================
 //   server-status
 // =========================
@@ -467,20 +443,11 @@ function getApiStatus(): boolean {
 const usedAddresses = genCheckAddressesInUse(transactions);
 const history = genGetTransactionsHistoryForAddresses(transactions);
 const getBestBlock = genGetBestBlock(transactions);
-const baseUtxoForAddresses = genUtxoForAddresses(
+const utxoForAddresses = genUtxoForAddresses(
   history,
   getBestBlock,
   genesisTransaction
 );
-// TODO
-const genUtxoForAddressesWithHook = (): AddressUtxoFunc => {
-  return async (request: AddressUtxoRequest): Promise<AddressUtxoResponse> => {
-    const result = await baseUtxoForAddresses(request);
-    // TODO: fails since these UTXO may not belong to you
-    return result.concat(utxoForAddressesHook);
-  };
-};
-const utxoForAddresses = baseUtxoForAddresses;
 const utxoSumForAddresses = genUtxoSumForAddresses(utxoForAddresses);
 
 export default {
