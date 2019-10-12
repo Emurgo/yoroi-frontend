@@ -7,7 +7,7 @@ Feature: Transfer Yoroi Wallet funds
 
   @it-114
   Scenario: Yoroi transfer fails when user transfers from an empty wallet (IT-114)
-    Given I import a snapshot named empty-wallet
+    Given There is a wallet stored named empty-wallet
     And I am on the Yoroi Transfer start screen
     And I should see the "CREATE YOROI WALLET" button disabled
     When I click on the next button on the Yoroi Transfer start screen
@@ -22,7 +22,7 @@ Feature: Transfer Yoroi Wallet funds
     # The recovery phrase and its balance(s) are defined in 
     # /features/mock-chain/TestWallets.js and
     # /features/mock-chain/mockImporter.js
-    Given I import a snapshot named empty-wallet
+    Given There is a wallet stored named empty-wallet
     And I am on the Yoroi Transfer start screen
     When I click on the next button on the Yoroi Transfer start screen
     And I enter the recovery phrase:
@@ -44,7 +44,7 @@ Feature: Transfer Yoroi Wallet funds
 
   @it-113
   Scenario: Wallet changes after transaction is generated (IT-113)
-    Given I import a snapshot named empty-wallet
+    Given There is a wallet stored named empty-wallet
     And I am on the Yoroi Transfer start screen
     When I click on the next button on the Yoroi Transfer start screen
     And I enter the recovery phrase:
@@ -74,7 +74,7 @@ Feature: Transfer Yoroi Wallet funds
 
   @it-115
   Scenario: Transfer UI should be reset when user leaves the transfer page (IT-115)
-    Given I import a snapshot named empty-wallet
+    Given There is a wallet stored named empty-wallet
     And I am on the Yoroi Transfer start screen
     When I click on the next button on the Yoroi Transfer start screen
     And I enter the recovery phrase:
