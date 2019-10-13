@@ -181,7 +181,7 @@ export class GetOrAddAddress {
     tx: lf$Transaction,
     addressHash: Array<string>,
   ): Promise<$ReadOnlyArray<$ReadOnly<AddressRow>>> {
-    const { AddressSeed } = await GetEncryptionMeta.get(db, tx);
+    const { AddressSeed } = await GetOrAddAddress.depTables.GetEncryptionMeta.get(db, tx);
     const digests = addressHash.map<number>(hash => digetForHash(hash, AddressSeed));
 
     const addressRows = await getRowIn<AddressRow>(
