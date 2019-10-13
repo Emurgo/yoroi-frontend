@@ -38,8 +38,8 @@ export default class DialogTextBlock extends Component<Props> {
     }
     return (
       <div className={messageStyle}>
-        {title != null ? (<h1>{title}</h1>) : null}
-        {message != null ? (<ReactMarkdown source={message} escapeHtml={false} />) : null}
+        {(title != null && title !== '') ? (<h1>{title}</h1>) : null}
+        {(message != null && message !== '') ? (<ReactMarkdown source={message} escapeHtml={false} />) : null}
       </div>
     );
   }

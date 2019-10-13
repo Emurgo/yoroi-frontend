@@ -66,7 +66,7 @@ export default class Dialog extends Component<Props> {
       >
 
         <div className={classnames([styles.component, className])}>
-          {title != null
+          {(title != null && title !== '')
             ? (
               <div className={styles.title}>
                 <h1>{title}</h1>

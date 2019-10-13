@@ -361,7 +361,7 @@ export default class WalletRestoreDialog extends Component<Props> {
       return isVerificationMode === true ? messages.titleVerify : messages.title;
     };
 
-    const introMessageBlock = introMessage != null
+    const introMessageBlock = (introMessage != null && introMessage !== '')
       ? (<DialogTextBlock message={introMessage} subclass="component-input" />)
       : null;
     return (
