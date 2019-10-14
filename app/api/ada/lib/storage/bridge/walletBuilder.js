@@ -9,14 +9,14 @@ import type {
   KeyDerivationRow,
 } from '../database/primitives/tables';
 import type {
-  ConceptualWalletInsert
+  ConceptualWalletInsert,
+  PublicDeriverRow,
 } from '../database/wallet/tables';
 import {
   ModifyConceptualWallet,
 } from '../database/wallet/api/write';
 import type {
   Bip44WrapperInsert,
-  PublicDeriverRow,
 } from '../database/bip44/tables';
 import {
   AddBip44Wrapper,

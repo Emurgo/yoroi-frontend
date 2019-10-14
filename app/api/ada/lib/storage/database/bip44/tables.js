@@ -5,7 +5,7 @@ import {
   KeyDerivationSchema,
 } from '../primitives/tables';
 import {
-  ConceptualWalletSchema, LastSyncInfoSchema,
+  ConceptualWalletSchema,
 } from '../wallet/tables';
 import { Type } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
@@ -55,30 +55,6 @@ export const PrivateDeriverSchema: {
     Bip44WrapperId: 'Bip44WrapperId',
     KeyDerivationId: 'KeyDerivationId',
     Level: 'Level',
-  }
-};
-
-export type PublicDeriverInsert = {|
-  Bip44WrapperId: number,
-  KeyDerivationId: number,
-  Name: string,
-  LastSyncInfoId: number,
-|};
-export type PublicDeriverRow = {|
-  PublicDeriverId: number, // serial
-  ...PublicDeriverInsert,
-|};
-export const PublicDeriverSchema: {
-  +name: 'PublicDeriver',
-  properties: $ObjMapi<PublicDeriverRow, ToSchemaProp>
-} = {
-  name: 'PublicDeriver',
-  properties: {
-    PublicDeriverId: 'PublicDeriverId',
-    Bip44WrapperId: 'Bip44WrapperId',
-    KeyDerivationId: 'KeyDerivationId',
-    Name: 'Name',
-    LastSyncInfoId: 'LastSyncInfoId',
   }
 };
 
@@ -235,30 +211,6 @@ export const populateBip44Db = (schemaBuilder: lf$schema$Builder) => {
     .addForeignKey('PrivateDeriver_Bip44Derivation', {
       local: PrivateDeriverSchema.properties.KeyDerivationId,
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`
-    });
-
-  // PublicDeriver
-  schemaBuilder.createTable(PublicDeriverSchema.name)
-    .addColumn(PublicDeriverSchema.properties.PublicDeriverId, Type.INTEGER)
-    .addColumn(PublicDeriverSchema.properties.Bip44WrapperId, Type.INTEGER)
-    .addColumn(PublicDeriverSchema.properties.KeyDerivationId, Type.INTEGER)
-    .addColumn(PublicDeriverSchema.properties.Name, Type.STRING)
-    .addColumn(PublicDeriverSchema.properties.LastSyncInfoId, Type.INTEGER)
-    .addPrimaryKey(
-      ([PublicDeriverSchema.properties.PublicDeriverId]: Array<string>),
-      true
-    )
-    .addForeignKey('PublicDeriver_Bip44Derivation', {
-      local: PublicDeriverSchema.properties.KeyDerivationId,
-      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`
-    })
-    .addForeignKey('PublicDeriver_Bip44Wrapper', {
-      local: PublicDeriverSchema.properties.Bip44WrapperId,
-      ref: `${Bip44WrapperSchema.name}.${Bip44WrapperSchema.properties.Bip44WrapperId}`
-    })
-    .addForeignKey('PublicDeriver_LastSyncInfo', {
-      local: PublicDeriverSchema.properties.LastSyncInfoId,
-      ref: `${LastSyncInfoSchema.name}.${LastSyncInfoSchema.properties.LastSyncInfoId}`
     });
 
   // Bip44Root

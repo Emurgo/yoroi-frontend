@@ -38,6 +38,7 @@ import {
 } from '../database/primitives/api/write';
 import {
   GetAddress,
+  GetPathWithSpecific,
 } from '../database/primitives/api/read';
 import {
   getAllSchemaTables,
@@ -45,9 +46,10 @@ import {
 } from '../database/utils';
 import {
   GetAllBip44Wallets,
-  GetPathWithSpecific,
+  GetDerivationSpecific,
 } from '../database/bip44/api/read';
-import type { GetPathWithSpecificByTreeRequest } from '../database/bip44/api/read';
+import { DerivationLevels } from '../database/bip44/api/utils';
+import type { GetPathWithSpecificByTreeRequest } from '../database/primitives/api/read';
 import type {
   Bip44AddressRow,
 } from '../database/bip44/tables';
@@ -193,8 +195,12 @@ export async function rawGetDerivationsByPath<
 >(
   db: lf$Database,
   tx: lf$Transaction,
-  depTables: { GetPathWithSpecific: Class<GetPathWithSpecific>, },
+  depTables: {|
+    GetDerivationSpecific: Class<GetDerivationSpecific>,
+    GetPathWithSpecific: Class<GetPathWithSpecific>,
+  |},
   request: GetPathWithSpecificByTreeRequest,
+  level: number,
 ): Promise<Array<{|
   row: $ReadOnly<Row>,
   ...Addressing,
@@ -202,6 +208,14 @@ export async function rawGetDerivationsByPath<
   const pathWithSpecific = await depTables.GetPathWithSpecific.getTree<Row>(
     db, tx,
     request,
+    async (derivationIds) => {
+      const result = await GetDerivationSpecific.get<Row>(
+        db, tx,
+        derivationIds,
+        level,
+      );
+      return result;
+    }
   );
   const result = pathWithSpecific.rows.map(row => {
     const path = pathWithSpecific.pathMap.get(row.KeyDerivationId);
@@ -275,6 +289,7 @@ export async function rawGetBip44AddressesByPath(
   depTables: {
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
+    GetDerivationSpecific: Class<GetDerivationSpecific>,
   },
   request: GetPathWithSpecificByTreeRequest,
 ): Promise<Array<{|
@@ -284,8 +299,12 @@ export async function rawGetBip44AddressesByPath(
 |}>> {
   const bip44Addresses = await rawGetDerivationsByPath<Bip44AddressRow>(
     db, tx,
-    { GetPathWithSpecific: depTables.GetPathWithSpecific, },
+    {
+      GetPathWithSpecific: depTables.GetPathWithSpecific,
+      GetDerivationSpecific: depTables.GetDerivationSpecific,
+    },
     request,
+    DerivationLevels.ADDRESS.level,
   );
   // Note: simple get since we know these addresses exist
   const addressRows = await depTables.GetAddress.getById(
@@ -378,7 +397,8 @@ export async function rawGetChainAddressesForDisplay(
   depTables: {|
     GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
     GetAddress: Class<GetAddress>,
-    GetPathWithSpecific: Class<GetPathWithSpecific>
+    GetPathWithSpecific: Class<GetPathWithSpecific>,
+    GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
   request: {
     publicDeriver: IPublicDeriver & IHasChains & IDisplayCutoff,
@@ -390,6 +410,7 @@ export async function rawGetChainAddressesForDisplay(
     {
       GetAddress: depTables.GetAddress,
       GetPathWithSpecific: depTables.GetPathWithSpecific,
+      GetDerivationSpecific: depTables.GetDerivationSpecific,
     },
     request.chainsRequest
   );
@@ -397,7 +418,10 @@ export async function rawGetChainAddressesForDisplay(
   if (request.chainsRequest.chainId === EXTERNAL) {
     const cutoff = await request.publicDeriver.rawGetCutoff(
       tx,
-      { GetPathWithSpecific: depTables.GetPathWithSpecific },
+      {
+        GetPathWithSpecific: depTables.GetPathWithSpecific,
+        GetDerivationSpecific: depTables.GetDerivationSpecific,
+      },
       undefined,
     );
     belowCutoff = addresses.filter(address => (
@@ -434,7 +458,8 @@ export async function getChainAddressesForDisplay(
   const deps = Object.freeze({
     GetUtxoTxOutputsWithTx,
     GetAddress,
-    GetPathWithSpecific
+    GetPathWithSpecific,
+    GetDerivationSpecific,
   });
   const depTables = Object
     .keys(deps)
@@ -455,7 +480,8 @@ export async function rawGetAllAddressesForDisplay(
   depTables: {|
     GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
     GetAddress: Class<GetAddress>,
-    GetPathWithSpecific: Class<GetPathWithSpecific>
+    GetPathWithSpecific: Class<GetPathWithSpecific>,
+    GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
   request: {
     publicDeriver: IPublicDeriver & IGetAllAddresses,
@@ -466,6 +492,7 @@ export async function rawGetAllAddressesForDisplay(
     {
       GetAddress: depTables.GetAddress,
       GetPathWithSpecific: depTables.GetPathWithSpecific,
+      GetDerivationSpecific: depTables.GetDerivationSpecific,
     },
     undefined,
   );
@@ -474,7 +501,10 @@ export async function rawGetAllAddressesForDisplay(
   if (hasCutoff != null) {
     const cutoff = await hasCutoff.rawGetCutoff(
       tx,
-      { GetPathWithSpecific: depTables.GetPathWithSpecific },
+      {
+        GetPathWithSpecific: depTables.GetPathWithSpecific,
+        GetDerivationSpecific: depTables.GetDerivationSpecific,
+      },
       undefined,
     );
     addresses = addresses.filter(address => (
@@ -495,7 +525,8 @@ export async function getAllAddressesForDisplay(
   const deps = Object.freeze({
     GetUtxoTxOutputsWithTx,
     GetAddress,
-    GetPathWithSpecific
+    GetPathWithSpecific,
+    GetDerivationSpecific,
   });
   const depTables = Object
     .keys(deps)

@@ -15,7 +15,7 @@ import type {
   TreeInsert,
 } from '../../database/bip44/api/write';
 import type {
-  Bip44AddressRow, PublicDeriverRow,
+  Bip44AddressRow,
 } from '../../database/bip44/tables';
 
 import {
@@ -27,27 +27,29 @@ import type {
   KeyRow,
   KeyDerivationRow,
 } from '../../database/primitives/tables';
-import type { LastSyncInfoRow, } from '../../database/wallet/tables';
+import type { PublicDeriverRow, LastSyncInfoRow, } from '../../database/wallet/tables';
 
 import type {
   IChangePasswordRequestFunc, IChangePasswordRequest,
   Addressing,
 } from '../common/interfaces';
 import {
-  GetPathWithSpecific,
-  GetDerivationsByPath,
   GetPublicDeriver,
   GetKeyForPublicDeriver,
-  GetKeyDerivation,
   GetLastSyncForPublicDeriver,
-} from '../../database/bip44/api/read';
+} from '../../database/wallet/api/read';
+import {
+  GetPathWithSpecific,
+  GetDerivationsByPath,
+  GetKeyDerivation,
+  GetKey,
+  GetAddress,
+} from '../../database/primitives/api/read';
 import {
   AddTree,
   ModifyDisplayCutoff,
 } from '../../database/bip44/api/write';
-import {
-  GetKey, GetAddress
-} from '../../database/primitives/api/read';
+import { GetDerivationSpecific } from '../../database/bip44/api/read';
 import { UpdateGet, GetOrAddAddress, } from '../../database/primitives/api/write';
 import type {
   FilterFunc,
@@ -112,6 +114,7 @@ export interface IAddFromPublic {
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     IAddFromPublicRequest
   >;
@@ -147,7 +150,11 @@ export type IGetAllAddressesFunc = (
 export interface IGetAllAddresses {
   +rawGetAllAddresses: RawVariation<
     IGetAllAddressesFunc,
-    {| GetPathWithSpecific: Class<GetPathWithSpecific>, GetAddress: Class<GetAddress> |},
+    {|
+      GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetAddress: Class<GetAddress>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
+    |},
     IGetAllAddressesRequest
   >;
   +getAllAddresses: IGetAllAddressesFunc
@@ -165,6 +172,7 @@ export interface IGetAllUtxos {
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     IGetAllUtxosRequest
   >;
@@ -212,7 +220,10 @@ export interface IDisplayCutoff {
 
   +rawGetCutoff: RawVariation<
     IDisplayCutoffGetFunc,
-    {| GetPathWithSpecific: Class<GetPathWithSpecific> |},
+    {|
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
+      GetPathWithSpecific: Class<GetPathWithSpecific>
+    |},
     IDisplayCutoffGetRequest
   >;
   +getCutoff: IDisplayCutoffGetFunc,
@@ -251,7 +262,8 @@ export interface IHasChains {
     IHasChainsGetAddressesFunc,
     {|
       GetAddress: Class<GetAddress>,
-      GetPathWithSpecific: Class<GetPathWithSpecific>
+      GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     IHasChainsRequest
   >;
@@ -263,6 +275,7 @@ export interface IHasChains {
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
       GetAddress: Class<GetAddress>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     IGetNextUnusedForChainRequest
   >;
@@ -281,6 +294,7 @@ export interface IGetUtxoBalance {
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     IGetUtxoBalanceRequest
   >;
@@ -377,6 +391,7 @@ export interface IScanAddresses {
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     IScanAddressesRequest
   >;

@@ -54,21 +54,21 @@ import {
 
 import type {
   Bip44ChainRow,
-  PublicDeriverRow,
 } from '../../database/bip44/tables';
+import type {
+  PublicDeriverRow,
+} from '../../database/wallet/tables';
 import {
-  GetPathWithSpecific,
-  GetDerivationsByPath,
   GetPublicDeriver,
   GetKeyForPublicDeriver,
-  GetKeyDerivation,
   GetLastSyncForPublicDeriver,
-} from '../../database/bip44/api/read';
+} from '../../database/wallet/api/read';
+import { ModifyPublicDeriver } from '../../database/wallet/api/write';
 import {
   AddTree,
   ModifyDisplayCutoff,
-  ModifyPublicDeriver,
 } from '../../database/bip44/api/write';
+import { GetDerivationSpecific } from '../../database/bip44/api/read';
 import {
   DerivationLevels,
 } from '../../database/bip44/api/utils';
@@ -82,7 +82,11 @@ import type {
   KeyDerivationRow,
 } from '../../database/primitives/tables';
 import {
-  GetKey, GetAddress
+  GetPathWithSpecific,
+  GetDerivationsByPath,
+  GetKeyDerivation,
+  GetKey,
+  GetAddress,
 } from '../../database/primitives/api/read';
 import { UpdateGet, GetOrAddAddress, } from '../../database/primitives/api/write';
 
@@ -362,6 +366,7 @@ const AddFromPublicMixin = (
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     body: IAddFromPublicRequest,
   ): Promise<IAddFromPublicResponse> => {
@@ -398,7 +403,10 @@ const AddFromPublicMixin = (
 
       const currentCutoff = await asDisplayCutoffInstance.rawGetCutoff(
         tx,
-        { GetPathWithSpecific: depTables.GetPathWithSpecific, },
+        {
+          GetPathWithSpecific: depTables.GetPathWithSpecific,
+          GetDerivationSpecific: depTables.GetDerivationSpecific,
+        },
         undefined,
       );
       if (bestNewCuttoff - BIP44_SCAN_SIZE > currentCutoff) {
@@ -424,6 +432,7 @@ const AddFromPublicMixin = (
         ...getAllSchemaTables(super.getDb(), ModifyDisplayCutoff),
         ...getAllSchemaTables(super.getDb(), GetDerivationsByPath),
         ...getAllSchemaTables(super.getDb(), GetPathWithSpecific),
+        ...getAllSchemaTables(super.getDb(), GetDerivationSpecific),
       ],
       async tx => this.rawAddFromPublic(tx, {
         GetPublicDeriver,
@@ -431,6 +440,7 @@ const AddFromPublicMixin = (
         ModifyDisplayCutoff,
         GetDerivationsByPath,
         GetPathWithSpecific,
+        GetDerivationSpecific,
       }, body)
     );
   }
@@ -726,7 +736,8 @@ const GetAllAddressesMixin = (
     tx: lf$Transaction,
     depTables: {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetAddress: Class<GetAddress>
+      GetAddress: Class<GetAddress>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     _body: IGetAllAddressesRequest,
   ): Promise<IGetAllAddressesResponse> => {
@@ -751,10 +762,11 @@ const GetAllAddressesMixin = (
       [
         ...getAllSchemaTables(super.getDb(), GetPathWithSpecific),
         ...getAllSchemaTables(super.getDb(), GetAddress),
+        ...getAllSchemaTables(super.getDb(), GetDerivationSpecific),
       ],
       async tx => this.rawGetAllAddresses(
         tx,
-        { GetPathWithSpecific, GetAddress, },
+        { GetPathWithSpecific, GetAddress, GetDerivationSpecific, },
         body
       )
     );
@@ -791,12 +803,17 @@ const GetAllUtxosMixin = (
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     _body: IGetAllUtxosRequest,
   ): Promise<IGetAllUtxosResponse> => {
     const addresses = await this.rawGetAllAddresses(
       tx,
-      { GetAddress: depTables.GetAddress, GetPathWithSpecific: depTables.GetPathWithSpecific },
+      {
+        GetAddress: depTables.GetAddress,
+        GetPathWithSpecific: depTables.GetPathWithSpecific,
+        GetDerivationSpecific: depTables.GetDerivationSpecific,
+      },
       undefined,
     );
     const addressIds = addresses.map(address => address.row.AddressId);
@@ -814,10 +831,11 @@ const GetAllUtxosMixin = (
         ...getAllSchemaTables(super.getDb(), GetPathWithSpecific),
         ...getAllSchemaTables(super.getDb(), GetAddress),
         ...getAllSchemaTables(super.getDb(), GetUtxoTxOutputsWithTx),
+        ...getAllSchemaTables(super.getDb(), GetDerivationSpecific),
       ],
       async tx => this.rawGetAllUtxos(
         tx,
-        { GetPathWithSpecific, GetAddress, GetUtxoTxOutputsWithTx, },
+        { GetPathWithSpecific, GetAddress, GetUtxoTxOutputsWithTx, GetDerivationSpecific },
         undefined
       )
     );
@@ -900,7 +918,10 @@ const DisplayCutoffMixin = (
 
   rawGetCutoff = async (
     tx: lf$Transaction,
-    depTables: {| GetPathWithSpecific: Class<GetPathWithSpecific>, |},
+    depTables: {|
+      GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
+    |},
     _body: IDisplayCutoffGetRequest,
   ): Promise<IDisplayCutoffGetResponse> => {
     if (this.getBip44Parent().getPublicDeriverLevel() !== DerivationLevels.ACCOUNT.level) {
@@ -914,6 +935,20 @@ const DisplayCutoffMixin = (
         pathToLevel: [0],
         level: DerivationLevels.CHAIN.level,
       },
+      async (derivationId) => {
+        const result = await GetDerivationSpecific.get<
+        Bip44ChainRow
+        >(
+          super.getDb(), tx,
+          [derivationId],
+          DerivationLevels.CHAIN.level,
+        );
+        const chainDerivation = result[0];
+        if (chainDerivation === undefined) {
+          throw new Error('DisplayCutoff::rawGetCutoff missing chain. Should never happen');
+        }
+        return chainDerivation;
+      }
     );
     if (chain === undefined) {
       throw new Error('DisplayCutoffMixin::getCutoff no chain found');
@@ -931,8 +966,12 @@ const DisplayCutoffMixin = (
       super.getDb(),
       [
         ...getAllSchemaTables(super.getDb(), GetPathWithSpecific),
+        ...getAllSchemaTables(super.getDb(), GetDerivationSpecific),
       ],
-      async tx => this.rawGetCutoff(tx, { GetPathWithSpecific, }, body)
+      async tx => this.rawGetCutoff(tx, {
+        GetPathWithSpecific,
+        GetDerivationSpecific,
+      }, body)
     );
   }
 
@@ -1007,6 +1046,7 @@ const HasChainsMixin = (
     depTables: {|
       GetAddress: Class<GetAddress>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     body: IHasChainsRequest,
   ): Promise<IHasChainsResponse> => {
@@ -1033,8 +1073,13 @@ const HasChainsMixin = (
       [
         ...getAllSchemaTables(super.getDb(), GetAddress),
         ...getAllSchemaTables(super.getDb(), GetPathWithSpecific),
+        ...getAllSchemaTables(super.getDb(), GetDerivationSpecific),
       ],
-      async tx => this.rawGetAddressesForChain(tx, { GetAddress, GetPathWithSpecific, }, body)
+      async tx => this.rawGetAddressesForChain(
+        tx,
+        { GetAddress, GetPathWithSpecific, GetDerivationSpecific, },
+        body
+      )
     );
   }
 
@@ -1044,12 +1089,17 @@ const HasChainsMixin = (
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
       GetAddress: Class<GetAddress>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     _body: IGetNextUnusedForChainRequest,
   ): Promise<IGetNextUnusedForChainResponse> => {
     const internalAddresses = await this.rawGetAddressesForChain(
       tx,
-      { GetAddress: depTables.GetAddress, GetPathWithSpecific: depTables.GetPathWithSpecific, },
+      {
+        GetAddress: depTables.GetAddress,
+        GetPathWithSpecific: depTables.GetPathWithSpecific,
+        GetDerivationSpecific: depTables.GetDerivationSpecific,
+      },
       { chainId: INTERNAL },
     );
     return await rawGetNextUnusedIndex(
@@ -1065,13 +1115,15 @@ const HasChainsMixin = (
       super.getDb(),
       [
         ...getAllSchemaTables(super.getDb(), GetUtxoTxOutputsWithTx),
+        ...getAllSchemaTables(super.getDb(), GetAddress),
         ...getAllSchemaTables(super.getDb(), GetPathWithSpecific),
-        ...getAllSchemaTables(super.getDb(), GetPathWithSpecific),
+        ...getAllSchemaTables(super.getDb(), GetDerivationSpecific),
       ],
       async tx => this.rawNextInternal(tx, {
         GetAddress,
         GetPathWithSpecific,
         GetUtxoTxOutputsWithTx,
+        GetDerivationSpecific,
       }, body)
     );
   }
@@ -1135,6 +1187,7 @@ const GetUtxoBalanceMixin = (
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     _body: IGetUtxoBalanceRequest,
   ): Promise<IGetUtxoBalanceResponse> => {
@@ -1144,6 +1197,7 @@ const GetUtxoBalanceMixin = (
         GetAddress: depTables.GetAddress,
         GetPathWithSpecific: depTables.GetPathWithSpecific,
         GetUtxoTxOutputsWithTx: depTables.GetUtxoTxOutputsWithTx,
+        GetDerivationSpecific: depTables.GetDerivationSpecific,
       },
       undefined
     );
@@ -1158,10 +1212,11 @@ const GetUtxoBalanceMixin = (
         ...getAllSchemaTables(super.getDb(), GetPathWithSpecific),
         ...getAllSchemaTables(super.getDb(), GetAddress),
         ...getAllSchemaTables(super.getDb(), GetUtxoTxOutputsWithTx),
+        ...getAllSchemaTables(super.getDb(), GetDerivationSpecific),
       ],
       async tx => this.rawGetBalance(
         tx,
-        { GetPathWithSpecific, GetAddress, GetUtxoTxOutputsWithTx, },
+        { GetPathWithSpecific, GetAddress, GetUtxoTxOutputsWithTx, GetDerivationSpecific, },
         undefined
       )
     );
@@ -1227,6 +1282,7 @@ const ScanUtxoAccountAddressesMixin = (
       AddTree: Class<AddTree>,
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     body: IScanAddressesRequest,
   ): Promise<IScanAddressesResponse> => {
@@ -1242,7 +1298,11 @@ const ScanUtxoAccountAddressesMixin = (
 
     const internalAddresses = await this.rawGetAddressesForChain(
       tx,
-      { GetAddress: depTables.GetAddress, GetPathWithSpecific: depTables.GetPathWithSpecific, },
+      {
+        GetAddress: depTables.GetAddress,
+        GetPathWithSpecific: depTables.GetPathWithSpecific,
+        GetDerivationSpecific: depTables.GetDerivationSpecific,
+      },
       { chainId: INTERNAL },
     );
     const nextUnusedInternal = await rawGetNextUnusedIndex(
@@ -1252,7 +1312,11 @@ const ScanUtxoAccountAddressesMixin = (
     );
     const externalAddresses = await this.rawGetAddressesForChain(
       tx,
-      { GetAddress: depTables.GetAddress, GetPathWithSpecific: depTables.GetPathWithSpecific, },
+      {
+        GetAddress: depTables.GetAddress,
+        GetPathWithSpecific: depTables.GetPathWithSpecific,
+        GetDerivationSpecific: depTables.GetDerivationSpecific,
+      },
       { chainId: EXTERNAL },
     );
     const nextUnusedExternal = await rawGetNextUnusedIndex(
@@ -1284,6 +1348,7 @@ const ScanUtxoAccountAddressesMixin = (
         ModifyDisplayCutoff: depTables.ModifyDisplayCutoff,
         GetDerivationsByPath: depTables.GetDerivationsByPath,
         GetPathWithSpecific: depTables.GetPathWithSpecific,
+        GetDerivationSpecific: depTables.GetDerivationSpecific,
       },
       { tree: newToInsert },
     );
@@ -1301,6 +1366,7 @@ const ScanUtxoAccountAddressesMixin = (
       AddTree,
       GetDerivationsByPath,
       ModifyDisplayCutoff,
+      GetDerivationSpecific,
     });
     const tables = Object
       .keys(depTables)

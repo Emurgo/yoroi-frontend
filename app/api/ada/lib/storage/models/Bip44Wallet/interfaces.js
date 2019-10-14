@@ -19,11 +19,11 @@ import {
   GetKeyForPrivateDeriver
 } from '../../database/bip44/api/read';
 import type {
-  AddPublicDeriverResponse,
   DerivePublicFromPrivateRequest as DbRequest,
   TreeInsert,
   AddAdhocPublicDeriverRequest, AddAdhocPublicDeriverResponse,
 } from '../../database/bip44/api/write';
+import type { AddPublicDeriverResponse } from '../../database/wallet/api/write';
 import { UpdateGet, } from '../../database/primitives/api/write';
 
 import type {

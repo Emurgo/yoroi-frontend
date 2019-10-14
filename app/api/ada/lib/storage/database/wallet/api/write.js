@@ -13,12 +13,16 @@ import type {
   ConceptualWalletInsert, ConceptualWalletRow,
   LastSyncInfoInsert, LastSyncInfoRow,
   HwWalletMetaInsert, HwWalletMetaRow,
-
+  PublicDeriverInsert, PublicDeriverRow,
 } from '../tables';
 
 import {
   addOrReplaceRow, addNewRowToTable,
 } from '../../utils';
+import type { KeyDerivationRow } from '../../primitives/tables';
+import type { AddDerivationRequest } from '../../primitives/api/write';
+import { AddDerivation } from '../../primitives/api/write';
+
 
 export class ModifyLastSyncInfo {
   static ownTables = Object.freeze({
@@ -52,6 +56,93 @@ export class ModifyLastSyncInfo {
       },
       ModifyLastSyncInfo.ownTables[Tables.LastSyncInfoSchema.name].name,
     );
+  }
+}
+
+export type PublicDeriverRequest<Insert> = {
+  addLevelRequest: AddDerivationRequest<Insert>,
+  levelSpecificTableName: string,
+  wrapperId: number,
+  addPublicDeriverRequest: {
+    derivationId: number,
+    wrapperId: number,
+    lastSyncInfoId: number,
+   } => PublicDeriverInsert,
+};
+export type AddPublicDeriverResponse<Row> = {
+  publicDeriverResult: $ReadOnly<PublicDeriverRow>,
+  levelResult: {
+    KeyDerivation: $ReadOnly<KeyDerivationRow>,
+    specificDerivationResult: $ReadOnly<Row>
+  },
+};
+
+export class AddPublicDeriver {
+  static ownTables = Object.freeze({
+    [Tables.PublicDeriverSchema.name]: Tables.PublicDeriverSchema,
+  });
+  static depTables = Object.freeze({
+    AddDerivation,
+    ModifyLastSyncInfo,
+  });
+
+  static async add<Insert, Row>(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: PublicDeriverRequest<Insert>,
+  ): Promise<AddPublicDeriverResponse<Row>> {
+    const levelResult = await AddPublicDeriver.depTables.AddDerivation.add<Insert, Row>(
+      db, tx,
+      request.addLevelRequest,
+      request.levelSpecificTableName,
+    );
+    const lastSyncInfo = await ModifyLastSyncInfo.create(db, tx);
+    const publicDeriverResult = await addNewRowToTable<PublicDeriverInsert, PublicDeriverRow>(
+      db, tx,
+      request.addPublicDeriverRequest({
+        derivationId: levelResult.KeyDerivation.KeyDerivationId,
+        wrapperId: request.wrapperId,
+        lastSyncInfoId: lastSyncInfo.LastSyncInfoId,
+      }),
+      AddPublicDeriver.ownTables[Tables.PublicDeriverSchema.name].name,
+    );
+    return {
+      publicDeriverResult,
+      levelResult,
+    };
+  }
+}
+
+export class ModifyPublicDeriver {
+  static ownTables = Object.freeze({
+    [Tables.PublicDeriverSchema.name]: Tables.PublicDeriverSchema,
+  });
+  static depTables = Object.freeze({});
+
+  static async rename(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {
+      pubDeriverId: number,
+      newName: string,
+    },
+  ): Promise<void> {
+    const publicDeriverTable = db.getSchema().table(
+      ModifyPublicDeriver.ownTables[Tables.PublicDeriverSchema.name].name
+    );
+    const updateQuery = db
+      .update(publicDeriverTable)
+      .set(
+        publicDeriverTable[Tables.PublicDeriverSchema.properties.Name],
+        request.newName
+      )
+      .where(op.and(
+        publicDeriverTable[Tables.PublicDeriverSchema.properties.PublicDeriverId].eq(
+          request.pubDeriverId
+        ),
+      ));
+
+    await tx.attach(updateQuery);
   }
 }
 

@@ -7,6 +7,7 @@ import type {
 
 import * as Tables from '../tables';
 import type {
+  KeyDerivationInsert, KeyDerivationRow,
   BlockInsert, BlockRow,
   KeyInsert, KeyRow,
   AddressInsert, AddressRow,
@@ -19,9 +20,11 @@ import {
   addNewRowToTable,
   addOrReplaceRow,
   getRowIn,
+  StaleStateError,
 } from '../../utils';
 
 import {
+  GetChildIfExists,
   GetBlock,
   GetEncryptionMeta,
 } from './read';
@@ -162,5 +165,121 @@ export class ModifyEncryptionMeta {
       initialData,
       ModifyEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].name,
     );
+  }
+}
+
+export type AddDerivationRequest<Insert> = {|
+  privateKeyInfo: KeyInsert | null,
+  publicKeyInfo: KeyInsert | null,
+  derivationInfo: {|
+      private: number | null,
+      public: number | null,
+    |} => KeyDerivationInsert,
+  levelInfo: number => Insert,
+|};
+
+export class AddDerivation {
+  static ownTables = Object.freeze({
+    [Tables.KeyDerivationSchema.name]: Tables.KeyDerivationSchema,
+  });
+  static depTables = Object.freeze({
+    AddKey,
+  });
+
+  static async add<Insert, Row>(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: AddDerivationRequest<Insert>,
+    levelSpecificTableName: string,
+  ): Promise<{
+    KeyDerivation: $ReadOnly<KeyDerivationRow>,
+    specificDerivationResult: $ReadOnly<Row>,
+  }> {
+    const privateKey = request.privateKeyInfo === null
+      ? null
+      : await AddDerivation.depTables.AddKey.add(
+        db, tx,
+        request.privateKeyInfo,
+      );
+    const publicKey = request.publicKeyInfo === null
+      ? null
+      : await AddDerivation.depTables.AddKey.add(
+        db, tx,
+        request.publicKeyInfo,
+      );
+
+    const KeyDerivation =
+      await addNewRowToTable<KeyDerivationInsert, KeyDerivationRow>(
+        db, tx,
+        request.derivationInfo({
+          private: privateKey ? privateKey.KeyId : null,
+          public: publicKey ? publicKey.KeyId : null,
+        }),
+        AddDerivation.ownTables[Tables.KeyDerivationSchema.name].name,
+      );
+
+    const specificDerivationResult =
+      await addNewRowToTable<Insert, Row>(
+        db,
+        tx,
+        request.levelInfo(KeyDerivation.KeyDerivationId),
+        levelSpecificTableName,
+      );
+
+    return {
+      KeyDerivation,
+      specificDerivationResult,
+    };
+  }
+}
+
+export class GetOrAddDerivation {
+  static ownTables = Object.freeze({
+    [Tables.KeyDerivationSchema.name]: Tables.KeyDerivationSchema,
+  });
+  static depTables = Object.freeze({
+    AddDerivation,
+    GetChildIfExists,
+  });
+
+  static async getOrAdd<Insert, Row>(
+    db: lf$Database,
+    tx: lf$Transaction,
+    parentDerivationId: number,
+    childIndex: number,
+    request: AddDerivationRequest<Insert>,
+    levelSpecificTableName: string,
+  ): Promise<{
+    KeyDerivation: $ReadOnly<KeyDerivationRow>,
+    specificDerivationResult: $ReadOnly<Row>,
+  }> {
+    const childResult = await GetOrAddDerivation.depTables.GetChildIfExists.get(
+      db, tx,
+      parentDerivationId,
+      childIndex,
+    );
+    if (childResult !== undefined) {
+      const specificDerivationResult = (
+        await getRowIn<Row>(
+          db, tx,
+          levelSpecificTableName,
+          GetOrAddDerivation.ownTables[Tables.KeyDerivationSchema.name].properties.KeyDerivationId,
+          [childResult.KeyDerivationId],
+        )
+      )[0];
+      if (specificDerivationResult == null) {
+        throw new StaleStateError('GetOrAddDerivation::getOrAdd no derivation found. Should not happen');
+      }
+      return {
+        KeyDerivation: childResult,
+        specificDerivationResult
+      };
+    }
+    const addResult = await GetOrAddDerivation.depTables.AddDerivation.add<Insert, Row>(
+      db, tx,
+      request,
+      levelSpecificTableName,
+    );
+    return addResult;
   }
 }

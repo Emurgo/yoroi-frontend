@@ -11,7 +11,11 @@ import {
 } from '../database/utils';
 import type { BlockInsert, BlockRow, } from '../database/primitives/tables';
 import {
-  GetAddress, GetBlock, GetEncryptionMeta,
+  GetAddress,
+  GetBlock,
+  GetEncryptionMeta,
+  GetPathWithSpecific,
+  GetDerivationsByPath,
 } from '../database/primitives/api/read';
 import { GetOrAddAddress, } from '../database/primitives/api/write';
 import { digetForHash, } from '../database/primitives/api/utils';
@@ -46,12 +50,11 @@ import {
 import type { IPublicDeriver, IGetAllAddresses, } from '../models/PublicDeriver/interfaces';
 import {
   GetLastSyncForPublicDeriver,
-  GetPathWithSpecific,
   GetPublicDeriver,
   GetKeyForPublicDeriver,
-  GetDerivationsByPath,
-} from '../database/bip44/api/read';
+} from '../database/wallet/api/read';
 import { AddTree, ModifyDisplayCutoff, } from '../database/bip44/api/write';
+import { GetDerivationSpecific, } from '../database/bip44/api/read';
 import { ModifyLastSyncInfo, } from '../database/wallet/api/write';
 import type { LastSyncInfoRow, } from '../database/wallet/tables';
 import { genToAbsoluteSlotNumber, rawGenHashToIdsFunc, } from  '../models/utils';
@@ -71,6 +74,7 @@ export async function rawGetUtxoTransactions(
     GetAddress: Class<GetAddress>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
     GetTxAndBlock: Class<GetTxAndBlock>,
+    GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
   request: {
     addressFetch: IGetAllAddresses,
@@ -90,6 +94,7 @@ export async function rawGetUtxoTransactions(
     {
       GetPathWithSpecific: depTables.GetPathWithSpecific,
       GetAddress: depTables.GetAddress,
+      GetDerivationSpecific: depTables.GetDerivationSpecific,
     },
     undefined,
   );
@@ -160,6 +165,7 @@ export async function getAllUtxoTransactions(
     GetAddress,
     AssociateTxWithUtxoIOs,
     GetTxAndBlock,
+    GetDerivationSpecific,
   });
   const depTables = Object
     .keys(deps)
@@ -177,6 +183,7 @@ export async function getAllUtxoTransactions(
           GetAddress: deps.GetAddress,
           AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
           GetTxAndBlock: deps.GetTxAndBlock,
+          GetDerivationSpecific: deps.GetDerivationSpecific,
         },
         {
           ...request,
@@ -208,6 +215,7 @@ export async function getPendingUtxoTransactions(
     GetAddress,
     AssociateTxWithUtxoIOs,
     GetTxAndBlock,
+    GetDerivationSpecific,
   });
   const depTables = Object
     .keys(deps)
@@ -225,6 +233,7 @@ export async function getPendingUtxoTransactions(
           GetAddress: deps.GetAddress,
           AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
           GetTxAndBlock: deps.GetTxAndBlock,
+          GetDerivationSpecific: deps.GetDerivationSpecific,
         },
         {
           ...request,
@@ -269,6 +278,7 @@ export async function updateTransactions(
       GetTransaction,
       GetUtxoInputs,
       GetTxAndBlock,
+      GetDerivationSpecific,
     });
     const updateTables = Object
       .keys(updateDepTables)
@@ -315,6 +325,7 @@ export async function updateTransactions(
       GetTransaction,
       GetUtxoInputs,
       GetEncryptionMeta,
+      GetDerivationSpecific,
     });
     const rollbackTables = Object
       .keys(rollbackDepTables)
@@ -364,6 +375,7 @@ async function rollback(
     GetTxAndBlock: Class<GetTxAndBlock>,
     GetUtxoInputs: Class<GetUtxoInputs>,
     GetEncryptionMeta: Class<GetEncryptionMeta>,
+    GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
   request: {
     publicDeriver: IPublicDeriver & IGetAllAddresses,
@@ -384,6 +396,7 @@ async function rollback(
     {
       GetPathWithSpecific: depTables.GetPathWithSpecific,
       GetAddress: depTables.GetAddress,
+      GetDerivationSpecific: depTables.GetDerivationSpecific,
     },
     undefined,
   );
@@ -503,6 +516,7 @@ async function rawUpdateTransactions(
     GetTransaction: Class<GetTransaction>,
     GetUtxoInputs: Class<GetUtxoInputs>,
     GetTxAndBlock: Class<GetTxAndBlock>,
+    GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
   publicDeriver: IPublicDeriver & IGetAllAddresses,
   lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
@@ -548,6 +562,7 @@ async function rawUpdateTransactions(
           AddTree: depTables.AddTree,
           ModifyDisplayCutoff: depTables.ModifyDisplayCutoff,
           GetDerivationsByPath: depTables.GetDerivationsByPath,
+          GetDerivationSpecific: depTables.GetDerivationSpecific,
         },
         { checkAddressesInUse },
       );
@@ -561,6 +576,7 @@ async function rawUpdateTransactions(
       {
         GetPathWithSpecific: depTables.GetPathWithSpecific,
         GetAddress: depTables.GetAddress,
+        GetDerivationSpecific: depTables.GetDerivationSpecific,
       },
       undefined,
     );

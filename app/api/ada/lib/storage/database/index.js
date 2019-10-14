@@ -15,7 +15,7 @@ import {
 import { GetEncryptionMeta, } from './primitives/api/read';
 import { ModifyEncryptionMeta, } from './primitives/api/write';
 
-import { populateUncategorizedDb } from './primitives/tables';
+import { populatePrimitivesDb } from './primitives/tables';
 import { populateBip44Db } from './bip44/tables';
 import { populateTransactionsDb } from './transactions/tables';
 import { populateWalletDb } from './wallet/tables';
@@ -64,10 +64,10 @@ const populateAndCreate = async (
 ): Promise<lf$Database> => {
   const schemaBuilder = schema.create('yoroi-schema', 2);
 
-  populateUncategorizedDb(schemaBuilder);
+  populatePrimitivesDb(schemaBuilder);
+  populateWalletDb(schemaBuilder);
   populateBip44Db(schemaBuilder);
   populateTransactionsDb(schemaBuilder);
-  populateWalletDb(schemaBuilder);
 
   return await schemaBuilder.connect({
     storeType,

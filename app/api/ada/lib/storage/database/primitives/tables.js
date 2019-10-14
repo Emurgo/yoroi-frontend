@@ -128,7 +128,7 @@ export type DbBlock = {|
   +block: $ReadOnly<BlockRow>;
 |};
 
-export const populateUncategorizedDb = (schemaBuilder: lf$schema$Builder) => {
+export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
   // Key Table
   schemaBuilder.createTable(KeySchema.name)
     .addColumn(KeySchema.properties.KeyId, Type.INTEGER)
