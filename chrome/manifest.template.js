@@ -34,7 +34,7 @@ export default ({
   permissions: [
     'storage',
     '*://connect.trezor.io/*',
-    'https://emurgo.github.io/yoroi-extension-ledger-connect/'
+    'https://emurgo.github.io/yoroi-extension-ledger-connect/*'
   ],
   content_scripts: [
     {
@@ -42,7 +42,7 @@ export default ({
       js: ['js/trezor-content-script.js'],
     },
     {
-      matches: ['https://emurgo.github.io/yoroi-extension-ledger-connect/'],
+      matches: ['https://emurgo.github.io/yoroi-extension-ledger-connect/*'],
       js: ['js/ledger-content-script.js']
     }
   ],

@@ -1,4 +1,7 @@
+console.debug('[CS-LEDGER] Loading');
 (function init () {
+  console.debug('[CS-LEDGER] Execution begins');
+
   const YOROI_LEDGER_CONNECT_TARGET_NAME = 'YOROI-LEDGER-CONNECT';
   const ORIGIN = 'https://emurgo.github.io';
   const closeWindowMsg = {
