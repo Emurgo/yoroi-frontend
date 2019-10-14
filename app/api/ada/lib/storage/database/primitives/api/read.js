@@ -5,7 +5,9 @@ import type {
   lf$Transaction,
   lf$Predicate,
 } from 'lovefield';
-import { op } from 'lovefield';
+import lf, {
+  op,
+} from 'lovefield';
 
 import type {
   AddressRow,
@@ -13,6 +15,8 @@ import type {
   BlockRow,
   EncryptionMetaRow,
   KeyRow,
+  TxStatusCodesType,
+  TransactionRow,
 } from '../tables';
 import * as Tables from '../tables';
 import { getRowFromKey, getRowIn, StaleStateError, } from '../../utils';
@@ -483,5 +487,258 @@ export class GetKeyForDerivation {
       publicKey,
       privateKey,
     };
+  }
+}
+
+export class GetTransaction {
+  static ownTables = Object.freeze({
+    [Tables.TransactionSchema.name]: Tables.TransactionSchema,
+  });
+  static depTables = Object.freeze({});
+
+  static async fromIds(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {
+      ids: Array<number>,
+    },
+  ): Promise<$ReadOnlyArray<$ReadOnly<TransactionRow>>> {
+    return await getRowIn<TransactionRow>(
+      db, tx,
+      GetTransaction.ownTables[Tables.TransactionSchema.name].name,
+      GetTransaction.ownTables[Tables.TransactionSchema.name].properties.TransactionId,
+      request.ids,
+    );
+  }
+
+  static async withStatus(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {
+      txIds: Array<number>,
+      status: Array<TxStatusCodesType>,
+    },
+  ): Promise<$ReadOnlyArray<$ReadOnly<TransactionRow>>> {
+    const txTableMeta = GetTransaction.ownTables[Tables.TransactionSchema.name];
+    const txTable = db.getSchema().table(
+      txTableMeta.name
+    );
+    const query = db
+      .select()
+      .from(txTable)
+      .where(op.and(
+        txTable[txTableMeta.properties.TransactionId].in(request.txIds),
+        txTable[txTableMeta.properties.Status].in(request.status),
+      ));
+    return await tx.attach(query);
+  }
+
+  static async byDigest(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {
+      txIds: Array<number>,
+      digests: Array<number>,
+    },
+  ): Promise<Map<string, $ReadOnly<TransactionRow>>> {
+    const txTableMeta = GetTransaction.ownTables[Tables.TransactionSchema.name];
+    const txTable = db.getSchema().table(
+      txTableMeta.name
+    );
+    const query = db
+      .select()
+      .from(txTable)
+      .where(op.and(
+        txTable[txTableMeta.properties.TransactionId].in(request.txIds),
+        txTable[txTableMeta.properties.Digest].in(request.digests),
+      ));
+    const rows: $ReadOnlyArray<$ReadOnly<TransactionRow>> = await tx.attach(query);
+
+    const mapToTx = new Map();
+    for (const row of rows) {
+      mapToTx.set(row.Hash, row);
+    }
+    return mapToTx;
+  }
+}
+
+export class GetTxAndBlock {
+  static ownTables = Object.freeze({
+    [Tables.TransactionSchema.name]: Tables.TransactionSchema,
+    [Tables.BlockSchema.name]: Tables.BlockSchema,
+  });
+  static depTables = Object.freeze({});
+
+  static async gteSlot(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {
+      txIds: Array<number>,
+      slot: number,
+    },
+  ): Promise<$ReadOnlyArray<{|
+    Block: $ReadOnly<BlockRow>,
+    Transaction: $ReadOnly<TransactionRow>,
+  |}>> {
+    const txTable = db.getSchema().table(
+      GetTxAndBlock.ownTables[Tables.TransactionSchema.name].name
+    );
+    const blockTable = db.getSchema().table(
+      GetTxAndBlock.ownTables[Tables.BlockSchema.name].name
+    );
+    const query = db.select()
+      .from(txTable)
+      .innerJoin(
+        blockTable,
+        txTable[Tables.TransactionSchema.properties.BlockId].eq(
+          blockTable[Tables.BlockSchema.properties.BlockId]
+        )
+      )
+      .where(op.and(
+        blockTable[Tables.BlockSchema.properties.SlotNum].gte(request.slot),
+        txTable[Tables.TransactionSchema.properties.TransactionId].in(request.txIds)
+      ));
+
+    const queryResult: $ReadOnlyArray<{|
+      Block: $ReadOnly<BlockRow>,
+      Transaction: $ReadOnly<TransactionRow>,
+    |}> = await tx.attach(query);
+
+    return queryResult;
+  }
+
+  static async firstTxBefore(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {
+      txIds: Array<number>,
+      slot: number,
+    },
+  ): Promise<void | {|
+    Block: $ReadOnly<BlockRow>,
+    Transaction: $ReadOnly<TransactionRow>,
+  |}> {
+    const txTable = db.getSchema().table(
+      GetTxAndBlock.ownTables[Tables.TransactionSchema.name].name
+    );
+    const blockTable = db.getSchema().table(
+      GetTxAndBlock.ownTables[Tables.BlockSchema.name].name
+    );
+    const query = db.select()
+      .from(txTable)
+      .innerJoin(
+        blockTable,
+        txTable[Tables.TransactionSchema.properties.BlockId].eq(
+          blockTable[Tables.BlockSchema.properties.BlockId]
+        )
+      )
+      .orderBy(blockTable[Tables.BlockSchema.properties.SlotNum], lf.Order.DESC)
+      .where(op.and(
+        blockTable[Tables.BlockSchema.properties.SlotNum].lt(request.slot),
+        txTable[Tables.TransactionSchema.properties.TransactionId].in(request.txIds)
+      ))
+      .limit(1);
+
+    const queryResult: $ReadOnlyArray<{|
+      Block: $ReadOnly<BlockRow>,
+      Transaction: $ReadOnly<TransactionRow>,
+    |}> = await tx.attach(query);
+
+    if (queryResult.length === 0) {
+      return undefined;
+    }
+    return queryResult[0];
+  }
+
+  static async byTime(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {
+      txIds: Array<number>,
+      skip?: number,
+      limit?: number,
+    },
+  ): Promise<$ReadOnlyArray<{
+    Transaction: $ReadOnly<TransactionRow>,
+    Block: null | $ReadOnly<BlockRow>
+  }>> {
+    const txTableMeta = GetTxAndBlock.ownTables[Tables.TransactionSchema.name];
+    const blockTableMeta = GetTxAndBlock.ownTables[Tables.BlockSchema.name];
+    const txTable = db.getSchema().table(txTableMeta.name);
+    const blockTable = db.getSchema().table(blockTableMeta.name);
+    const query = db
+      .select()
+      .from(txTable)
+      .leftOuterJoin(
+        blockTable,
+        txTable[txTableMeta.properties.BlockId].eq(
+          blockTable[blockTableMeta.properties.BlockId]
+        )
+      )
+      .orderBy(txTable[txTableMeta.properties.LastUpdateTime], lf.Order.DESC)
+      .where(op.and(
+        txTable[txTableMeta.properties.TransactionId].in(request.txIds),
+      ));
+    if (request.limit != null) {
+      query.limit(request.limit);
+    }
+    if (request.skip != null) {
+      query.skip(request.skip);
+    }
+    const result = await tx.attach(query);
+
+    // convert leftOuterJoin notation
+    return result.map(entry => {
+      if (entry.Block.BlockId === null) {
+        return {
+          Transaction: entry.Transaction,
+          Block: null
+        };
+      }
+      return entry;
+    });
+  }
+
+  static async withStatus(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {
+      txIds: Array<number>,
+      status: Array<TxStatusCodesType>,
+    },
+  ): Promise<$ReadOnlyArray<{
+    Transaction: $ReadOnly<TransactionRow>,
+    Block: null | $ReadOnly<BlockRow>
+  }>>  {
+    const txTableMeta = GetTxAndBlock.ownTables[Tables.TransactionSchema.name];
+    const blockTableMeta = GetTxAndBlock.ownTables[Tables.BlockSchema.name];
+    const txTable = db.getSchema().table(txTableMeta.name);
+    const blockTable = db.getSchema().table(blockTableMeta.name);
+    const query = db
+      .select()
+      .from(txTable)
+      .leftOuterJoin(
+        blockTable,
+        txTable[txTableMeta.properties.BlockId].eq(
+          blockTable[blockTableMeta.properties.BlockId]
+        )
+      )
+      .orderBy(txTable[txTableMeta.properties.LastUpdateTime], lf.Order.DESC)
+      .where(op.and(
+        txTable[txTableMeta.properties.TransactionId].in(request.txIds),
+        txTable[txTableMeta.properties.Status].in(request.status),
+      ));
+    const result = await tx.attach(query);
+
+    // convert leftOuterJoin notation
+    return result.map(entry => {
+      if (entry.Block.BlockId === null) {
+        return {
+          Transaction: entry.Transaction,
+          Block: null
+        };
+      }
+      return entry;
+    });
   }
 }

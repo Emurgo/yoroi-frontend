@@ -4,53 +4,10 @@ import { Type } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 
 import {
-  BlockSchema,
+  TransactionSchema,
   AddressSchema,
 } from '../primitives/tables';
-import type { DbBlock, } from '../primitives/tables';
-
-export const TxStatusCodes = Object.freeze({
-  NOT_IN_REMOTE: -3,
-  ROLLBACK_FAIL: -2,
-  FAIL_RESPONSE: -1,
-  PENDING: 0,
-  IN_BLOCK: 1,
-});
-export type TxStatusCodesType = $Values<typeof TxStatusCodes>
-
-export type TransactionInsert = {|
-  Digest: number,
-  Hash: string,
-  BlockId: null | number,
-  Ordinal: null | number,
-  /**
-   * Need this otherwise we wouldn't be able to sort transactions by time
-   * Can't only use slot+epoch as these aren't available for pending/failed txs
-   */
-  LastUpdateTime: number,
-  Status: TxStatusCodesType,
-  ErrorMessage: string | null,
-|};
-export type TransactionRow = {|
-  TransactionId: number,
-  ...TransactionInsert,
-|};
-export const TransactionSchema: {
-  +name: 'Transaction',
-  properties: $ObjMapi<TransactionRow, ToSchemaProp>
-} = {
-  name: 'Transaction',
-  properties: {
-    TransactionId: 'TransactionId',
-    Digest: 'Digest',
-    Hash: 'Hash',
-    BlockId: 'BlockId',
-    Ordinal: 'Ordinal',
-    LastUpdateTime: 'LastUpdateTime',
-    Status: 'Status',
-    ErrorMessage: 'ErrorMessage',
-  }
-};
+import type { DbTransaction, DbBlock, } from '../primitives/tables';
 
 export type UtxoTransactionInputInsert = {|
   /**
@@ -115,9 +72,6 @@ export const UtxoTransactionOutputSchema: {
   }
 };
 
-export type DbTransaction = {|
-  +transaction: $ReadOnly<TransactionRow>,
-|};
 export type DbUtxoInputs = {|
   +utxoInputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionInputRow>>;
 |};
@@ -129,35 +83,6 @@ export type DbTxInChain = {| ...DbTxIO, ...DbBlock |};
 
 
 export const populateTransactionsDb = (schemaBuilder: lf$schema$Builder) => {
-  // Transaction table
-  schemaBuilder.createTable(TransactionSchema.name)
-    .addColumn(TransactionSchema.properties.TransactionId, Type.INTEGER)
-    .addColumn(TransactionSchema.properties.Digest, Type.NUMBER)
-    .addColumn(TransactionSchema.properties.Hash, Type.STRING)
-    .addColumn(TransactionSchema.properties.BlockId, Type.INTEGER)
-    .addColumn(TransactionSchema.properties.Ordinal, Type.INTEGER)
-    .addColumn(TransactionSchema.properties.LastUpdateTime, Type.NUMBER)
-    .addColumn(TransactionSchema.properties.Status, Type.INTEGER)
-    .addColumn(TransactionSchema.properties.ErrorMessage, Type.STRING)
-    .addPrimaryKey(
-      ([TransactionSchema.properties.TransactionId]: Array<string>),
-      true,
-    )
-    .addForeignKey('Transaction_Block', {
-      local: TransactionSchema.properties.BlockId,
-      ref: `${BlockSchema.name}.${BlockSchema.properties.BlockId}`
-    })
-    .addNullable([
-      TransactionSchema.properties.BlockId,
-      TransactionSchema.properties.Ordinal,
-      TransactionSchema.properties.ErrorMessage,
-    ])
-    .addIndex(
-      'Transaction_Digest_Index',
-      ([TransactionSchema.properties.Digest]: Array<string>),
-      false // not unique. There is a (very small) chance of collisions
-    );
-
   // UtxoTransactionInput Table
   schemaBuilder.createTable(UtxoTransactionInputSchema.name)
     .addColumn(UtxoTransactionInputSchema.properties.UtxoTransactionInputId, Type.INTEGER)

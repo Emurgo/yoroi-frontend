@@ -9,22 +9,27 @@ import {
   getAllSchemaTables,
   raii,
 } from '../database/utils';
-import type { BlockInsert, BlockRow, } from '../database/primitives/tables';
+import type {
+  BlockInsert, BlockRow,
+  TransactionInsert, TransactionRow,
+  TxStatusCodesType,
+} from '../database/primitives/tables';
 import {
   GetAddress,
   GetBlock,
   GetEncryptionMeta,
   GetPathWithSpecific,
   GetDerivationsByPath,
+  GetTransaction,
+  GetTxAndBlock,
 } from '../database/primitives/api/read';
 import { GetOrAddAddress, } from '../database/primitives/api/write';
 import { digetForHash, } from '../database/primitives/api/utils';
 import {
-  ModifyTransaction, MarkUtxo,
+  ModifyUtxoTransaction, MarkUtxo,
 } from '../database/transactions/api/write';
 import {
-  AssociateTxWithUtxoIOs, GetUtxoTxOutputsWithTx, GetTransaction,
-  GetTxAndBlock,
+  AssociateTxWithUtxoIOs, GetUtxoTxOutputsWithTx,
   GetUtxoInputs,
 } from '../database/transactions/api/read';
 import type {
@@ -37,13 +42,10 @@ import type {
   ToAbsoluteSlotNumberFunc,
 } from '../models/utils';
 import type {
-  TransactionInsert,
-  TxStatusCodesType,
   UtxoTransactionInputInsert, UtxoTransactionOutputInsert,
   DbTxIO, DbTxInChain,
-  TransactionRow,
 } from '../database/transactions/tables';
-import { TxStatusCodes, } from '../database/transactions/tables';
+import { TxStatusCodes, } from '../database/primitives/tables';
 import {
   ScanAddressesInstance,
 } from '../models/PublicDeriver';
@@ -269,7 +271,7 @@ export async function updateTransactions(
       GetOrAddAddress,
       GetPublicDeriver,
       AddTree,
-      ModifyTransaction,
+      ModifyUtxoTransaction,
       MarkUtxo,
       AssociateTxWithUtxoIOs,
       ModifyDisplayCutoff,
@@ -320,7 +322,7 @@ export async function updateTransactions(
       GetLastSyncForPublicDeriver,
       ModifyLastSyncInfo,
       GetBlock,
-      ModifyTransaction,
+      ModifyUtxoTransaction,
       MarkUtxo,
       GetTransaction,
       GetUtxoInputs,
@@ -369,7 +371,7 @@ async function rollback(
     GetLastSyncForPublicDeriver: Class<GetLastSyncForPublicDeriver>,
     ModifyLastSyncInfo: Class<ModifyLastSyncInfo>,
     GetBlock: Class<GetBlock>,
-    ModifyTransaction: Class<ModifyTransaction>,
+    ModifyUtxoTransaction: Class<ModifyUtxoTransaction>,
     MarkUtxo: Class<MarkUtxo>,
     GetTransaction: Class<GetTransaction>,
     GetTxAndBlock: Class<GetTxAndBlock>,
@@ -431,7 +433,7 @@ async function rollback(
   for (const tx of txsToRevert) {
     // we keep both the block in the tx in history
     // because we need this information to show the fail tx information to the user
-    await ModifyTransaction.updateStatus(
+    await ModifyUtxoTransaction.updateStatus(
       db, dbTx,
       {
         status: TxStatusCodes.ROLLBACK_FAIL,
@@ -466,7 +468,7 @@ async function rollback(
   );
   for (const pendingTx of pendingTxs) {
     // TODO: would be faster if this was batched
-    await ModifyTransaction.updateStatus(
+    await ModifyUtxoTransaction.updateStatus(
       db, dbTx,
       {
         transaction: pendingTx,
@@ -507,7 +509,7 @@ async function rawUpdateTransactions(
     GetOrAddAddress: Class<GetOrAddAddress>,
     GetPublicDeriver: Class<GetPublicDeriver>,
     AddTree: Class<AddTree>,
-    ModifyTransaction: Class<ModifyTransaction>,
+    ModifyUtxoTransaction: Class<ModifyUtxoTransaction>,
     MarkUtxo: Class<MarkUtxo>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
     ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
@@ -612,7 +614,7 @@ async function rawUpdateTransactions(
       db,
       dbTx,
       {
-        ModifyTransaction: depTables.ModifyTransaction,
+        ModifyUtxoTransaction: depTables.ModifyUtxoTransaction,
         MarkUtxo: depTables.MarkUtxo,
         AssociateTxWithUtxoIOs: depTables.AssociateTxWithUtxoIOs,
         GetEncryptionMeta: depTables.GetEncryptionMeta,
@@ -653,7 +655,7 @@ export async function updateTransactionBatch(
   db: lf$Database,
   dbTx: lf$Transaction,
   depTables: {|
-    ModifyTransaction: Class<ModifyTransaction>,
+    ModifyUtxoTransaction: Class<ModifyUtxoTransaction>,
     MarkUtxo: Class<MarkUtxo>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
     GetEncryptionMeta: Class<GetEncryptionMeta>,
@@ -718,7 +720,7 @@ export async function updateTransactionBatch(
       BlockSeed
     );
     modifiedTxIds.add(matchInDb.transaction.TransactionId);
-    const result = await depTables.ModifyTransaction.updateExisting(
+    const result = await depTables.ModifyUtxoTransaction.updateExisting(
       db,
       dbTx,
       {
@@ -755,7 +757,7 @@ export async function updateTransactionBatch(
   );
   const newsTxsIdSet = new Set();
   for (const newTx of newTxsForDb) {
-    const result = await depTables.ModifyTransaction.addNew(
+    const result = await depTables.ModifyUtxoTransaction.addNew(
       db,
       dbTx,
       newTx,
@@ -812,7 +814,7 @@ export async function updateTransactionBatch(
       !newsTxsIdSet.has(pendingTx.TransactionId)
     ) {
       // TODO: would be faster if this was batched
-      await ModifyTransaction.updateStatus(
+      await ModifyUtxoTransaction.updateStatus(
         db, dbTx,
         {
           transaction: pendingTx,

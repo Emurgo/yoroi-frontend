@@ -20,8 +20,8 @@ import expandArrow from '../../../assets/images/expand-arrow.inline.svg';
 import RawHash from '../../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../../domain/Explorer';
-import { TxStatusCodes, } from '../../../api/ada/lib/storage/database/transactions/tables';
-import type { TxStatusCodesType, } from '../../../api/ada/lib/storage/database/transactions/tables';
+import { TxStatusCodes, } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { TxStatusCodesType, } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 const messages = defineMessages({
   type: {

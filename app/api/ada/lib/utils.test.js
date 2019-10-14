@@ -16,7 +16,7 @@ import type {
 } from './storage/database/transactions/tables';
 import {
   TxStatusCodes,
-} from './storage/database/transactions/tables';
+} from './storage/database/primitives/tables';
 import type {
   UtxoAnnotatedTransaction,
 } from '../adaTypes';

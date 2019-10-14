@@ -9,10 +9,12 @@ import type {
   UserAnnotation,
 } from '../api/ada/adaTypes';
 import type {
-  TxStatusCodesType,
   DbTxIO,
 } from '../api/ada/lib/storage/database/transactions/tables';
-import type { DbBlock, } from '../api/ada/lib/storage/database/primitives/tables';
+import type {
+  TxStatusCodesType,
+  DbBlock,
+} from '../api/ada/lib/storage/database/primitives/tables';
 
 export type TrasactionAddresses = { from: Array<string>, to: Array<string> };
 

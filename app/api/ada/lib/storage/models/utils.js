@@ -56,7 +56,7 @@ import type {
 import {
   GetUtxoTxOutputsWithTx,
 } from '../database/transactions/api/read';
-import { TxStatusCodes } from '../database/transactions/tables';
+import { TxStatusCodes } from '../database/primitives/tables';
 
 import { WrongPassphraseError } from '../../cardanoCrypto/cryptoErrors';
 

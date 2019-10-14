@@ -7,275 +7,23 @@ import type {
   lf$Transaction,
   lf$query$Select,
 } from 'lovefield';
-import lf, {
+import {
   op,
 } from 'lovefield';
 import { groupBy, } from 'lodash';
 
 import * as Tables from '../tables';
 import type {
-  TransactionRow,
   UtxoTransactionInputRow,
   UtxoTransactionOutputRow,
-  TxStatusCodesType,
   DbTxIO,
 } from '../tables';
-import { BlockSchema } from '../../primitives/tables';
-import type { BlockRow } from '../../primitives/tables';
+import { TxStatusCodes, TransactionSchema, } from '../../primitives/tables';
+import type {
+  TxStatusCodesType,
+  TransactionRow,
+} from '../../primitives/tables';
 import { getRowIn, } from '../../utils';
-
-export class GetTransaction {
-  static ownTables = Object.freeze({
-    [Tables.TransactionSchema.name]: Tables.TransactionSchema,
-  });
-  static depTables = Object.freeze({});
-
-  static async fromIds(
-    db: lf$Database,
-    tx: lf$Transaction,
-    request: {
-      ids: Array<number>,
-    },
-  ): Promise<$ReadOnlyArray<$ReadOnly<TransactionRow>>> {
-    return await getRowIn<TransactionRow>(
-      db, tx,
-      GetTransaction.ownTables[Tables.TransactionSchema.name].name,
-      GetTransaction.ownTables[Tables.TransactionSchema.name].properties.TransactionId,
-      request.ids,
-    );
-  }
-
-  static async withStatus(
-    db: lf$Database,
-    tx: lf$Transaction,
-    request: {
-      txIds: Array<number>,
-      status: Array<TxStatusCodesType>,
-    },
-  ): Promise<$ReadOnlyArray<$ReadOnly<TransactionRow>>> {
-    const txTableMeta = GetTransaction.ownTables[Tables.TransactionSchema.name];
-    const txTable = db.getSchema().table(
-      txTableMeta.name
-    );
-    const query = db
-      .select()
-      .from(txTable)
-      .where(op.and(
-        txTable[txTableMeta.properties.TransactionId].in(request.txIds),
-        txTable[txTableMeta.properties.Status].in(request.status),
-      ));
-    return await tx.attach(query);
-  }
-
-  static async byDigest(
-    db: lf$Database,
-    tx: lf$Transaction,
-    request: {
-      txIds: Array<number>,
-      digests: Array<number>,
-    },
-  ): Promise<Map<string, $ReadOnly<TransactionRow>>> {
-    const txTableMeta = GetTransaction.ownTables[Tables.TransactionSchema.name];
-    const txTable = db.getSchema().table(
-      txTableMeta.name
-    );
-    const query = db
-      .select()
-      .from(txTable)
-      .where(op.and(
-        txTable[txTableMeta.properties.TransactionId].in(request.txIds),
-        txTable[txTableMeta.properties.Digest].in(request.digests),
-      ));
-    const rows: $ReadOnlyArray<$ReadOnly<TransactionRow>> = await tx.attach(query);
-
-    const mapToTx = new Map();
-    for (const row of rows) {
-      mapToTx.set(row.Hash, row);
-    }
-    return mapToTx;
-  }
-}
-
-export class GetTxAndBlock {
-  static ownTables = Object.freeze({
-    [Tables.TransactionSchema.name]: Tables.TransactionSchema,
-    [BlockSchema.name]: BlockSchema,
-  });
-  static depTables = Object.freeze({});
-
-  static async gteSlot(
-    db: lf$Database,
-    tx: lf$Transaction,
-    request: {
-      txIds: Array<number>,
-      slot: number,
-    },
-  ): Promise<$ReadOnlyArray<{|
-    Block: $ReadOnly<BlockRow>,
-    Transaction: $ReadOnly<TransactionRow>,
-  |}>> {
-    const txTable = db.getSchema().table(
-      GetTxAndBlock.ownTables[Tables.TransactionSchema.name].name
-    );
-    const blockTable = db.getSchema().table(
-      GetTxAndBlock.ownTables[BlockSchema.name].name
-    );
-    const query = db.select()
-      .from(txTable)
-      .innerJoin(
-        blockTable,
-        txTable[Tables.TransactionSchema.properties.BlockId].eq(
-          blockTable[BlockSchema.properties.BlockId]
-        )
-      )
-      .where(op.and(
-        blockTable[BlockSchema.properties.SlotNum].gte(request.slot),
-        txTable[Tables.TransactionSchema.properties.TransactionId].in(request.txIds)
-      ));
-
-    const queryResult: $ReadOnlyArray<{|
-      Block: $ReadOnly<BlockRow>,
-      Transaction: $ReadOnly<TransactionRow>,
-    |}> = await tx.attach(query);
-
-    return queryResult;
-  }
-
-  static async firstTxBefore(
-    db: lf$Database,
-    tx: lf$Transaction,
-    request: {
-      txIds: Array<number>,
-      slot: number,
-    },
-  ): Promise<void | {|
-    Block: $ReadOnly<BlockRow>,
-    Transaction: $ReadOnly<TransactionRow>,
-  |}> {
-    const txTable = db.getSchema().table(
-      GetTxAndBlock.ownTables[Tables.TransactionSchema.name].name
-    );
-    const blockTable = db.getSchema().table(
-      GetTxAndBlock.ownTables[BlockSchema.name].name
-    );
-    const query = db.select()
-      .from(txTable)
-      .innerJoin(
-        blockTable,
-        txTable[Tables.TransactionSchema.properties.BlockId].eq(
-          blockTable[BlockSchema.properties.BlockId]
-        )
-      )
-      .orderBy(blockTable[BlockSchema.properties.SlotNum], lf.Order.DESC)
-      .where(op.and(
-        blockTable[BlockSchema.properties.SlotNum].lt(request.slot),
-        txTable[Tables.TransactionSchema.properties.TransactionId].in(request.txIds)
-      ))
-      .limit(1);
-
-    const queryResult: $ReadOnlyArray<{|
-      Block: $ReadOnly<BlockRow>,
-      Transaction: $ReadOnly<TransactionRow>,
-    |}> = await tx.attach(query);
-
-    if (queryResult.length === 0) {
-      return undefined;
-    }
-    return queryResult[0];
-  }
-
-  static async byTime(
-    db: lf$Database,
-    tx: lf$Transaction,
-    request: {
-      txIds: Array<number>,
-      skip?: number,
-      limit?: number,
-    },
-  ): Promise<$ReadOnlyArray<{
-    Transaction: $ReadOnly<TransactionRow>,
-    Block: null | $ReadOnly<BlockRow>
-  }>> {
-    const txTableMeta = GetTxAndBlock.ownTables[Tables.TransactionSchema.name];
-    const blockTableMeta = GetTxAndBlock.ownTables[BlockSchema.name];
-    const txTable = db.getSchema().table(txTableMeta.name);
-    const blockTable = db.getSchema().table(blockTableMeta.name);
-    const query = db
-      .select()
-      .from(txTable)
-      .leftOuterJoin(
-        blockTable,
-        txTable[txTableMeta.properties.BlockId].eq(
-          blockTable[blockTableMeta.properties.BlockId]
-        )
-      )
-      .orderBy(txTable[txTableMeta.properties.LastUpdateTime], lf.Order.DESC)
-      .where(op.and(
-        txTable[txTableMeta.properties.TransactionId].in(request.txIds),
-      ));
-    if (request.limit != null) {
-      query.limit(request.limit);
-    }
-    if (request.skip != null) {
-      query.skip(request.skip);
-    }
-    const result = await tx.attach(query);
-
-    // convert leftOuterJoin notation
-    return result.map(entry => {
-      if (entry.Block.BlockId === null) {
-        return {
-          Transaction: entry.Transaction,
-          Block: null
-        };
-      }
-      return entry;
-    });
-  }
-
-  static async withStatus(
-    db: lf$Database,
-    tx: lf$Transaction,
-    request: {
-      txIds: Array<number>,
-      status: Array<TxStatusCodesType>,
-    },
-  ): Promise<$ReadOnlyArray<{
-    Transaction: $ReadOnly<TransactionRow>,
-    Block: null | $ReadOnly<BlockRow>
-  }>>  {
-    const txTableMeta = GetTxAndBlock.ownTables[Tables.TransactionSchema.name];
-    const blockTableMeta = GetTxAndBlock.ownTables[BlockSchema.name];
-    const txTable = db.getSchema().table(txTableMeta.name);
-    const blockTable = db.getSchema().table(blockTableMeta.name);
-    const query = db
-      .select()
-      .from(txTable)
-      .leftOuterJoin(
-        blockTable,
-        txTable[txTableMeta.properties.BlockId].eq(
-          blockTable[blockTableMeta.properties.BlockId]
-        )
-      )
-      .orderBy(txTable[txTableMeta.properties.LastUpdateTime], lf.Order.DESC)
-      .where(op.and(
-        txTable[txTableMeta.properties.TransactionId].in(request.txIds),
-        txTable[txTableMeta.properties.Status].in(request.status),
-      ));
-    const result = await tx.attach(query);
-
-    // convert leftOuterJoin notation
-    return result.map(entry => {
-      if (entry.Block.BlockId === null) {
-        return {
-          Transaction: entry.Transaction,
-          Block: null
-        };
-      }
-      return entry;
-    });
-  }
-}
 
 export class GetUtxoInputs {
   static ownTables = Object.freeze({
@@ -357,7 +105,7 @@ export type UtxoTxOutput = {
 };
 export class GetUtxoTxOutputsWithTx {
   static ownTables = Object.freeze({
-    [Tables.TransactionSchema.name]: Tables.TransactionSchema,
+    [TransactionSchema.name]: TransactionSchema,
     [Tables.UtxoTransactionOutputSchema.name]: Tables.UtxoTransactionOutputSchema,
   });
   static depTables = Object.freeze({});
@@ -367,7 +115,7 @@ export class GetUtxoTxOutputsWithTx {
     predicate: (txTable: lf$schema$Table, outputTable: lf$schema$Table) => lf$Predicate,
   ) {
     const txTable = db.getSchema().table(
-      GetUtxoTxOutputsWithTx.ownTables[Tables.TransactionSchema.name].name
+      GetUtxoTxOutputsWithTx.ownTables[TransactionSchema.name].name
     );
     const outputTable = db.getSchema().table(
       GetUtxoTxOutputsWithTx.ownTables[Tables.UtxoTransactionOutputSchema.name].name
@@ -377,7 +125,7 @@ export class GetUtxoTxOutputsWithTx {
       .from(txTable)
       .innerJoin(
         outputTable,
-        txTable[Tables.TransactionSchema.properties.TransactionId].eq(
+        txTable[TransactionSchema.properties.TransactionId].eq(
           outputTable[Tables.UtxoTransactionOutputSchema.properties.TransactionId]
         )
       )
@@ -395,7 +143,7 @@ export class GetUtxoTxOutputsWithTx {
     const query = GetUtxoTxOutputsWithTx.baseQuery(
       db,
       (txTable, outputTable) => op.and(
-        txTable[Tables.TransactionSchema.properties.TransactionId].eq(request.txId),
+        txTable[TransactionSchema.properties.TransactionId].eq(request.txId),
         outputTable[Tables.UtxoTransactionOutputSchema.properties.OutputIndex].eq(
           request.outputIndex
         ),
@@ -421,7 +169,7 @@ export class GetUtxoTxOutputsWithTx {
     const query = GetUtxoTxOutputsWithTx.baseQuery(
       db,
       (txTable, outputTable) => op.and(
-        txTable[Tables.TransactionSchema.properties.Status].eq(Tables.TxStatusCodes.IN_BLOCK),
+        txTable[TransactionSchema.properties.Status].eq(TxStatusCodes.IN_BLOCK),
         outputTable[Tables.UtxoTransactionOutputSchema.properties.IsUnspent].eq(true),
         outputTable[Tables.UtxoTransactionOutputSchema.properties.AddressId].in(
           addressDerivationIds
@@ -441,7 +189,7 @@ export class GetUtxoTxOutputsWithTx {
     const query = GetUtxoTxOutputsWithTx.baseQuery(
       db,
       (txTable, outputTable) => op.and(
-        txTable[Tables.TransactionSchema.properties.Status].in(status),
+        txTable[TransactionSchema.properties.Status].in(status),
         outputTable[Tables.UtxoTransactionOutputSchema.properties.AddressId].in(
           addressDerivationIds
         ),
@@ -458,7 +206,7 @@ export type UtxoTxInput = {
 };
 export class GetUtxoTxInputsWithTx {
   static ownTables = Object.freeze({
-    [Tables.TransactionSchema.name]: Tables.TransactionSchema,
+    [TransactionSchema.name]: TransactionSchema,
     [Tables.UtxoTransactionInputSchema.name]: Tables.UtxoTransactionInputSchema,
   });
   static depTables = Object.freeze({});
@@ -468,7 +216,7 @@ export class GetUtxoTxInputsWithTx {
     predicate: (txTable: lf$schema$Table, outputTable: lf$schema$Table) => lf$Predicate,
   ): lf$query$Select {
     const txTable = db.getSchema().table(
-      GetUtxoTxInputsWithTx.ownTables[Tables.TransactionSchema.name].name
+      GetUtxoTxInputsWithTx.ownTables[TransactionSchema.name].name
     );
     const outputTable = db.getSchema().table(
       GetUtxoTxInputsWithTx.ownTables[Tables.UtxoTransactionInputSchema.name].name
@@ -478,7 +226,7 @@ export class GetUtxoTxInputsWithTx {
       .from(txTable)
       .innerJoin(
         outputTable,
-        txTable[Tables.TransactionSchema.properties.TransactionId].eq(
+        txTable[TransactionSchema.properties.TransactionId].eq(
           outputTable[Tables.UtxoTransactionInputSchema.properties.TransactionId]
         )
       )
@@ -494,7 +242,7 @@ export class GetUtxoTxInputsWithTx {
     const query = GetUtxoTxInputsWithTx.baseQuery(
       db,
       (txTable, outputTable) => op.and(
-        txTable[Tables.TransactionSchema.properties.Status].in(status),
+        txTable[TransactionSchema.properties.Status].in(status),
         outputTable[Tables.UtxoTransactionInputSchema.properties.AddressId].in(
           addressDerivationIds
         ),

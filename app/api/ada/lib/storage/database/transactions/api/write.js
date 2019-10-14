@@ -10,18 +10,25 @@ import {
 
 import * as Tables from '../tables';
 import type {
-  TransactionInsert, TransactionRow,
   UtxoTransactionInputInsert, UtxoTransactionInputRow,
   UtxoTransactionOutputInsert, UtxoTransactionOutputRow,
-  TxStatusCodesType,
-  DbTransaction, DbTxIO,
+  DbTxIO,
 } from '../tables';
+import {
+  TransactionSchema,
+} from '../../primitives/tables';
 import type {
+  TransactionInsert, TransactionRow,
+  TxStatusCodesType,
+  DbTransaction,
   BlockInsert, DbBlock,
 } from '../../primitives/tables';
 import {
   GetOrAddBlock
 } from '../../primitives/api/write';
+import {
+  GetTransaction
+} from '../../primitives/api/read';
 
 import {
   addNewRowToTable,
@@ -30,7 +37,6 @@ import {
 } from '../../utils';
 
 import {
-  GetTransaction,
   GetUtxoTxOutputsWithTx,
 } from './read';
 
@@ -92,9 +98,9 @@ export class MarkUtxo {
   }
 }
 
-export class ModifyTransaction {
+export class ModifyUtxoTransaction {
   static ownTables = Object.freeze({
-    [Tables.TransactionSchema.name]: Tables.TransactionSchema,
+    [TransactionSchema.name]: TransactionSchema,
     [Tables.UtxoTransactionInputSchema.name]: Tables.UtxoTransactionInputSchema,
     [Tables.UtxoTransactionOutputSchema.name]: Tables.UtxoTransactionOutputSchema,
   });
@@ -117,7 +123,7 @@ export class ModifyTransaction {
     },
   ): Promise<{| ...WithNullableFields<DbBlock>, ...DbTxIO |}> {
     const block = request.block !== null
-      ? await ModifyTransaction.depTables.GetOrAddBlock.getOrAdd(
+      ? await ModifyUtxoTransaction.depTables.GetOrAddBlock.getOrAdd(
         db, tx,
         request.block,
       )
@@ -126,19 +132,19 @@ export class ModifyTransaction {
     const transaction = await addNewRowToTable<TransactionInsert, TransactionRow>(
       db, tx,
       request.transaction(block != null ? block.BlockId : null),
-      ModifyTransaction.ownTables[Tables.TransactionSchema.name].name,
+      ModifyUtxoTransaction.ownTables[TransactionSchema.name].name,
     );
 
     const { utxoInputs, utxoOutputs } = request.ioGen(transaction.TransactionId);
     const newInputs = await addBatchToTable<UtxoTransactionInputInsert, UtxoTransactionInputRow>(
       db, tx,
       utxoInputs,
-      ModifyTransaction.ownTables[Tables.UtxoTransactionInputSchema.name].name
+      ModifyUtxoTransaction.ownTables[Tables.UtxoTransactionInputSchema.name].name
     );
     const newOutputs = await addBatchToTable<UtxoTransactionOutputInsert, UtxoTransactionOutputRow>(
       db, tx,
       utxoOutputs,
-      ModifyTransaction.ownTables[Tables.UtxoTransactionOutputSchema.name].name
+      ModifyUtxoTransaction.ownTables[Tables.UtxoTransactionOutputSchema.name].name
     );
 
     return {
@@ -166,7 +172,7 @@ export class ModifyTransaction {
     },
   ): Promise<{| ...WithNullableFields<DbBlock>, ...DbTransaction |}> {
     const block = request.block !== null
-      ? await ModifyTransaction.depTables.GetOrAddBlock.getOrAdd(
+      ? await ModifyUtxoTransaction.depTables.GetOrAddBlock.getOrAdd(
         db, tx,
         request.block,
       )
@@ -176,7 +182,7 @@ export class ModifyTransaction {
     const newTx = await addOrReplaceRow<TransactionRow, TransactionRow>(
       db, tx,
       request.transaction(block != null ? block.BlockId : null),
-      ModifyTransaction.ownTables[Tables.TransactionSchema.name].name,
+      ModifyUtxoTransaction.ownTables[TransactionSchema.name].name,
     );
 
     return {
@@ -199,7 +205,7 @@ export class ModifyTransaction {
         ...request.transaction,
         Status: request.status,
       },
-      ModifyTransaction.ownTables[Tables.TransactionSchema.name].name,
+      ModifyUtxoTransaction.ownTables[TransactionSchema.name].name,
     );
   }
 }
