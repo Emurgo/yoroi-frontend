@@ -82,7 +82,7 @@ export type DbTxIO = {| ...DbTransaction, ...DbUtxoInputs, ...DbUtxoOutputs |};
 export type DbTxInChain = {| ...DbTxIO, ...DbBlock |};
 
 
-export const populateTransactionsDb = (schemaBuilder: lf$schema$Builder) => {
+export const populateUtxoTransactionsDb = (schemaBuilder: lf$schema$Builder) => {
   // UtxoTransactionInput Table
   schemaBuilder.createTable(UtxoTransactionInputSchema.name)
     .addColumn(UtxoTransactionInputSchema.properties.UtxoTransactionInputId, Type.INTEGER)
