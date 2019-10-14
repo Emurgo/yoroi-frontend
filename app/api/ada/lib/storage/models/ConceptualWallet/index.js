@@ -17,11 +17,11 @@ import {
 
 import {
   ModifyConceptualWallet,
-} from '../../database/uncategorized/api/write';
+} from '../../database/primitives/api/write';
 import {
   GetConceptualWallet,
-} from '../../database/uncategorized/api/read';
-import type { ConceptualWalletRow, } from '../../database/uncategorized/tables';
+} from '../../database/primitives/api/read';
+import type { ConceptualWalletRow, } from '../../database/primitives/tables';
 
 import type {
   IRename, IRenameRequest, IRenameResponse,

@@ -80,11 +80,11 @@ import {
 import type {
   KeyRow,
   KeyDerivationRow,
-} from '../../database/uncategorized/tables';
+} from '../../database/primitives/tables';
 import {
   GetKey, GetAddress
-} from '../../database/uncategorized/api/read';
-import { UpdateGet, GetOrAddAddress, } from '../../database/uncategorized/api/write';
+} from '../../database/primitives/api/read';
+import { UpdateGet, GetOrAddAddress, } from '../../database/primitives/api/write';
 
 import { scanAccountByVersion, } from '../../../../restoreAdaWallet';
 

@@ -26,14 +26,14 @@ import {
 
 import {
   GetKey,
-} from '../../uncategorized/api/read';
+} from '../../primitives/api/read';
 import type {
   KeyRow,
   KeyDerivationRow,
-} from '../../uncategorized/tables';
+} from '../../primitives/tables';
 import {
   KeyDerivationSchema,
-} from '../../uncategorized/tables';
+} from '../../primitives/tables';
 import {
   ReadLastSyncInfo,
 } from '../../wallet/api/read';

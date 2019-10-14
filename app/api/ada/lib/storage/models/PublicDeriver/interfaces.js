@@ -26,7 +26,7 @@ import type {
   AddressRow,
   KeyRow,
   KeyDerivationRow,
-} from '../../database/uncategorized/tables';
+} from '../../database/primitives/tables';
 import type { LastSyncInfoRow, } from '../../database/wallet/tables';
 
 import type {
@@ -47,8 +47,8 @@ import {
 } from '../../database/bip44/api/write';
 import {
   GetKey, GetAddress
-} from '../../database/uncategorized/api/read';
-import { UpdateGet, GetOrAddAddress, } from '../../database/uncategorized/api/write';
+} from '../../database/primitives/api/read';
+import { UpdateGet, GetOrAddAddress, } from '../../database/primitives/api/write';
 import type {
   FilterFunc,
 } from '../../../state-fetch/types';

@@ -12,10 +12,10 @@ import {
   getAllSchemaTables,
   raii,
 } from './utils';
-import { GetEncryptionMeta, } from './uncategorized/api/read';
-import { ModifyEncryptionMeta, } from './uncategorized/api/write';
+import { GetEncryptionMeta, } from './primitives/api/read';
+import { ModifyEncryptionMeta, } from './primitives/api/write';
 
-import { populateUncategorizedDb } from './uncategorized/tables';
+import { populateUncategorizedDb } from './primitives/tables';
 import { populateBip44Db } from './bip44/tables';
 import { populateTransactionsDb } from './transactions/tables';
 import { populateWalletDb } from './wallet/tables';

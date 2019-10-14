@@ -17,8 +17,8 @@ import type {
 } from '../database/bip44/api/write';
 import {
   GetOrAddAddress,
-} from '../database/uncategorized/api/write';
-import type { KeyInsert } from '../database/uncategorized/tables';
+} from '../database/primitives/api/write';
+import type { KeyInsert } from '../database/primitives/tables';
 import type { HWFeatures, } from '../database/wallet/tables';
 
 import { WalletBuilder } from './walletBuilder';

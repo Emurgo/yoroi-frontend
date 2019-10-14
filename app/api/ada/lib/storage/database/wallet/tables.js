@@ -4,7 +4,7 @@ import { Type } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 import {
   ConceptualWalletSchema,
-} from '../uncategorized/tables';
+} from '../primitives/tables';
 
 export type LastSyncInfoInsert = {|
   /**

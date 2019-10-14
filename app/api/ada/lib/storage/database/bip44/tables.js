@@ -4,7 +4,7 @@ import {
   AddressSchema,
   ConceptualWalletSchema,
   KeyDerivationSchema,
-} from '../uncategorized/tables';
+} from '../primitives/tables';
 import {
   LastSyncInfoSchema,
 } from '../wallet/tables';

@@ -27,9 +27,9 @@ import {
 import type {
   KeyDerivationInsert, KeyDerivationRow,
   KeyInsert, KeyRow
-} from '../../uncategorized/tables';
-import { KeyDerivationSchema } from '../../uncategorized/tables';
-import { AddKey, } from '../../uncategorized/api/write';
+} from '../../primitives/tables';
+import { KeyDerivationSchema } from '../../primitives/tables';
+import { AddKey, } from '../../primitives/api/write';
 
 import {
   allDerivationTables,

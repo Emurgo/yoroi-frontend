@@ -18,10 +18,10 @@ import type {
 } from '../tables';
 import type {
   BlockInsert, DbBlock,
-} from '../../uncategorized/tables';
+} from '../../primitives/tables';
 import {
   GetOrAddBlock
-} from '../../uncategorized/api/write';
+} from '../../primitives/api/write';
 
 import {
   addNewRowToTable,

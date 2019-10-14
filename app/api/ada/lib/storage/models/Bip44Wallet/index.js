@@ -41,8 +41,8 @@ import {
   GetPrivateDeriver,
   GetKeyForPrivateDeriver
 } from '../../database/bip44/api/read';
-import type { KeyRow } from '../../database/uncategorized/tables';
-import { UpdateGet, } from '../../database/uncategorized/api/write';
+import type { KeyRow } from '../../database/primitives/tables';
+import { UpdateGet, } from '../../database/primitives/api/write';
 
 import {
   rawChangePassword,

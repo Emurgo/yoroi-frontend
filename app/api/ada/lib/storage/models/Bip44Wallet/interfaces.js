@@ -24,12 +24,12 @@ import type {
   TreeInsert,
   AddAdhocPublicDeriverRequest, AddAdhocPublicDeriverResponse,
 } from '../../database/bip44/api/write';
-import { UpdateGet, } from '../../database/uncategorized/api/write';
+import { UpdateGet, } from '../../database/primitives/api/write';
 
 import type {
   KeyRow,
   KeyDerivationRow
-} from '../../database/uncategorized/tables';
+} from '../../database/primitives/tables';
 
 import type {
   IChangePasswordRequest, IChangePasswordRequestFunc,

@@ -6,8 +6,8 @@ import type { lf$schema$Builder } from 'lovefield';
 import {
   BlockSchema,
   AddressSchema,
-} from '../uncategorized/tables';
-import type { DbBlock, } from '../uncategorized/tables';
+} from '../primitives/tables';
+import type { DbBlock, } from '../primitives/tables';
 
 export const TxStatusCodes = Object.freeze({
   NOT_IN_REMOTE: -3,

@@ -8,10 +8,10 @@ import type {
 import type {
   ConceptualWalletInsert,
   KeyDerivationRow,
-} from '../database/uncategorized/tables';
+} from '../database/primitives/tables';
 import {
   ModifyConceptualWallet,
-} from '../database/uncategorized/api/write';
+} from '../database/primitives/api/write';
 import type {
   Bip44WrapperInsert,
   PublicDeriverRow,

@@ -9,12 +9,12 @@ import {
   getAllSchemaTables,
   raii,
 } from '../database/utils';
-import type { BlockInsert, BlockRow, } from '../database/uncategorized/tables';
+import type { BlockInsert, BlockRow, } from '../database/primitives/tables';
 import {
   GetAddress, GetBlock, GetEncryptionMeta,
-} from '../database/uncategorized/api/read';
-import { GetOrAddAddress, } from '../database/uncategorized/api/write';
-import { digetForHash, } from '../database/uncategorized/api/utils';
+} from '../database/primitives/api/read';
+import { GetOrAddAddress, } from '../database/primitives/api/write';
+import { digetForHash, } from '../database/primitives/api/utils';
 import {
   ModifyTransaction, MarkUtxo,
 } from '../database/transactions/api/write';

@@ -6,7 +6,7 @@ import {
 
 import type {
   KeyRow,
-} from '../../database/uncategorized/tables';
+} from '../../database/primitives/tables';
 
 export type Address = {|
   +address: string,

@@ -20,8 +20,8 @@ import type {
   TxStatusCodesType,
   DbTxIO,
 } from '../tables';
-import { BlockSchema } from '../../uncategorized/tables';
-import type { BlockRow } from '../../uncategorized/tables';
+import { BlockSchema } from '../../primitives/tables';
+import type { BlockRow } from '../../primitives/tables';
 import { getRowIn, } from '../../utils';
 
 export class GetTransaction {

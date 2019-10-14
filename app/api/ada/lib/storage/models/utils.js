@@ -32,13 +32,13 @@ import type {
   Address, Value, Addressing, UsedStatus,
 } from './common/interfaces';
 
-import type { AddressRow, KeyInsert, KeyRow, } from '../database/uncategorized/tables';
+import type { AddressRow, KeyInsert, KeyRow, } from '../database/primitives/tables';
 import {
   UpdateGet, GetOrAddAddress,
-} from '../database/uncategorized/api/write';
+} from '../database/primitives/api/write';
 import {
   GetAddress,
-} from '../database/uncategorized/api/read';
+} from '../database/primitives/api/read';
 import {
   getAllSchemaTables,
   raii,

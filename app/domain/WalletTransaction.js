@@ -12,7 +12,7 @@ import type {
   TxStatusCodesType,
   DbTxIO,
 } from '../api/ada/lib/storage/database/transactions/tables';
-import type { DbBlock, } from '../api/ada/lib/storage/database/uncategorized/tables';
+import type { DbBlock, } from '../api/ada/lib/storage/database/primitives/tables';
 
 export type TrasactionAddresses = { from: Array<string>, to: Array<string> };
 
