@@ -95,27 +95,6 @@ export const KeyDerivationSchema: {
   }
 };
 
-export type ConceptualWalletInsert = {|
-  CoinType: number,
-  Name: string,
-  // NetworkId: number, // TODO
-|};
-export type ConceptualWalletRow = {|
-  ConceptualWalletId: number,
-  ...ConceptualWalletInsert,
-|};
-export const ConceptualWalletSchema: {
-  +name: 'ConceptualWallet',
-  properties: $ObjMapi<ConceptualWalletRow, ToSchemaProp>
-} = {
-  name: 'ConceptualWallet',
-  properties: {
-    ConceptualWalletId: 'ConceptualWalletId',
-    CoinType: 'CoinType',
-    Name: 'Name',
-  }
-};
-
 export type BlockInsert = {|
   SlotNum: number,
   /**
@@ -150,16 +129,6 @@ export type DbBlock = {|
 |};
 
 export const populateUncategorizedDb = (schemaBuilder: lf$schema$Builder) => {
-  // ConceptualWallet Table
-  schemaBuilder.createTable(ConceptualWalletSchema.name)
-    .addColumn(ConceptualWalletSchema.properties.ConceptualWalletId, Type.INTEGER)
-    .addColumn(ConceptualWalletSchema.properties.CoinType, Type.INTEGER)
-    .addColumn(ConceptualWalletSchema.properties.Name, Type.STRING)
-    .addPrimaryKey(
-      ([ConceptualWalletSchema.properties.ConceptualWalletId]: Array<string>),
-      true,
-    );
-
   // Key Table
   schemaBuilder.createTable(KeySchema.name)
     .addColumn(KeySchema.properties.KeyId, Type.INTEGER)

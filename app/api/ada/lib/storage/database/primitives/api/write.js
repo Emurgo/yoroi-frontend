@@ -4,15 +4,11 @@ import type {
   lf$Database,
   lf$Transaction,
 } from 'lovefield';
-import {
-  op,
-} from 'lovefield';
 
 import * as Tables from '../tables';
 import type {
   BlockInsert, BlockRow,
   KeyInsert, KeyRow,
-  ConceptualWalletInsert, ConceptualWalletRow,
   AddressInsert, AddressRow,
   EncryptionMetaInsert, EncryptionMetaRow,
 } from '../tables';
@@ -65,51 +61,6 @@ export class UpdateGet {
       request,
       UpdateGet.ownTables[Tables.KeySchema.name].name
     );
-  }
-}
-
-export class ModifyConceptualWallet {
-  static ownTables = Object.freeze({
-    [Tables.ConceptualWalletSchema.name]: Tables.ConceptualWalletSchema,
-  });
-  static depTables = Object.freeze({});
-
-  static async add(
-    db: lf$Database,
-    tx: lf$Transaction,
-    request: ConceptualWalletInsert,
-  ): Promise<ConceptualWalletRow> {
-    return await addNewRowToTable<ConceptualWalletInsert, ConceptualWalletRow>(
-      db, tx,
-      request,
-      ModifyConceptualWallet.ownTables[Tables.ConceptualWalletSchema.name].name,
-    );
-  }
-
-  static async rename(
-    db: lf$Database,
-    tx: lf$Transaction,
-    request: {
-      walletId: number,
-      newName: string,
-    },
-  ): Promise<void> {
-    const conceptualWalletTable = db.getSchema().table(
-      ModifyConceptualWallet.ownTables[Tables.ConceptualWalletSchema.name].name
-    );
-    const updateQuery = db
-      .update(conceptualWalletTable)
-      .set(
-        conceptualWalletTable[Tables.ConceptualWalletSchema.properties.Name],
-        request.newName
-      )
-      .where(op.and(
-        conceptualWalletTable[Tables.ConceptualWalletSchema.properties.ConceptualWalletId].eq(
-          request.walletId
-        ),
-      ));
-
-    await tx.attach(updateQuery);
   }
 }
 

@@ -8,33 +8,11 @@ import type {
 import type {
   AddressRow,
   BlockRow,
-  ConceptualWalletRow,
   EncryptionMetaRow,
   KeyRow,
 } from '../tables';
 import * as Tables from '../tables';
 import { getRowFromKey, getRowIn, } from '../../utils';
-
-export class GetConceptualWallet {
-  static ownTables = Object.freeze({
-    [Tables.ConceptualWalletSchema.name]: Tables.ConceptualWalletSchema,
-  });
-  static depTables = Object.freeze({});
-
-  static async get(
-    db: lf$Database,
-    tx: lf$Transaction,
-    key: number,
-  ): Promise<$ReadOnly<ConceptualWalletRow> | void> {
-    const walletSchema = GetConceptualWallet.ownTables[Tables.ConceptualWalletSchema.name];
-    return await getRowFromKey<ConceptualWalletRow>(
-      db, tx,
-      key,
-      walletSchema.name,
-      walletSchema.properties.ConceptualWalletId,
-    );
-  }
-}
 
 export class GetKey {
   static ownTables = Object.freeze({

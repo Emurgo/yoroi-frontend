@@ -15,19 +15,12 @@ import {
   StaleStateError,
 } from '../../database/utils';
 
-import {
-  ModifyConceptualWallet,
-} from '../../database/primitives/api/write';
-import {
-  GetConceptualWallet,
-} from '../../database/primitives/api/read';
-import type { ConceptualWalletRow, } from '../../database/primitives/tables';
-
 import type {
   IRename, IRenameRequest, IRenameResponse,
 } from '../common/interfaces';
-import type { HwWalletMetaRow } from '../../database/wallet/tables';
-import { GetHwWalletMeta } from '../../database/wallet/api/read';
+import { ModifyConceptualWallet, } from '../../database/wallet/api/write';
+import type { HwWalletMetaRow, ConceptualWalletRow } from '../../database/wallet/tables';
+import { GetConceptualWallet, GetHwWalletMeta } from '../../database/wallet/api/read';
 import Config from '../../../../../../config';
 
 /** Snapshot of a ConceptualWallet in the database */

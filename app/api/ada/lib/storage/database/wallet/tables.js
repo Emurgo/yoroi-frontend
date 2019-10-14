@@ -2,9 +2,27 @@
 
 import { Type } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
-import {
-  ConceptualWalletSchema,
-} from '../primitives/tables';
+
+export type ConceptualWalletInsert = {|
+  CoinType: number,
+  Name: string,
+  // NetworkId: number, // TODO
+|};
+export type ConceptualWalletRow = {|
+  ConceptualWalletId: number,
+  ...ConceptualWalletInsert,
+|};
+export const ConceptualWalletSchema: {
+  +name: 'ConceptualWallet',
+  properties: $ObjMapi<ConceptualWalletRow, ToSchemaProp>
+} = {
+  name: 'ConceptualWallet',
+  properties: {
+    ConceptualWalletId: 'ConceptualWalletId',
+    CoinType: 'CoinType',
+    Name: 'Name',
+  }
+};
 
 export type LastSyncInfoInsert = {|
   /**
@@ -76,6 +94,16 @@ export const HwWalletMetaSchema: {
 };
 
 export const populateWalletDb = (schemaBuilder: lf$schema$Builder) => {
+  // ConceptualWallet Table
+  schemaBuilder.createTable(ConceptualWalletSchema.name)
+    .addColumn(ConceptualWalletSchema.properties.ConceptualWalletId, Type.INTEGER)
+    .addColumn(ConceptualWalletSchema.properties.CoinType, Type.INTEGER)
+    .addColumn(ConceptualWalletSchema.properties.Name, Type.STRING)
+    .addPrimaryKey(
+      ([ConceptualWalletSchema.properties.ConceptualWalletId]: Array<string>),
+      true,
+    );
+
   // LastSyncInfoSchema Table
   schemaBuilder.createTable(LastSyncInfoSchema.name)
     .addColumn(LastSyncInfoSchema.properties.LastSyncInfoId, Type.INTEGER)

@@ -7,12 +7,33 @@ import type {
 
 import * as Tables from '../tables';
 import type {
-  LastSyncInfoRow, HwWalletMetaRow,
+  ConceptualWalletRow, LastSyncInfoRow, HwWalletMetaRow,
 } from '../tables';
 
 import {
   getRowFromKey,
 } from '../../utils';
+
+export class GetConceptualWallet {
+  static ownTables = Object.freeze({
+    [Tables.ConceptualWalletSchema.name]: Tables.ConceptualWalletSchema,
+  });
+  static depTables = Object.freeze({});
+
+  static async get(
+    db: lf$Database,
+    tx: lf$Transaction,
+    key: number,
+  ): Promise<$ReadOnly<ConceptualWalletRow> | void> {
+    const walletSchema = GetConceptualWallet.ownTables[Tables.ConceptualWalletSchema.name];
+    return await getRowFromKey<ConceptualWalletRow>(
+      db, tx,
+      key,
+      walletSchema.name,
+      walletSchema.properties.ConceptualWalletId,
+    );
+  }
+}
 
 export class ReadLastSyncInfo {
   static ownTables = Object.freeze({

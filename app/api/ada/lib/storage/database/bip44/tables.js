@@ -2,11 +2,10 @@
 
 import {
   AddressSchema,
-  ConceptualWalletSchema,
   KeyDerivationSchema,
 } from '../primitives/tables';
 import {
-  LastSyncInfoSchema,
+  ConceptualWalletSchema, LastSyncInfoSchema,
 } from '../wallet/tables';
 import { Type } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';

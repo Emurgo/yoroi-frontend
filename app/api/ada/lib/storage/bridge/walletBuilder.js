@@ -6,12 +6,14 @@ import type {
 } from 'lovefield';
 
 import type {
-  ConceptualWalletInsert,
   KeyDerivationRow,
 } from '../database/primitives/tables';
+import type {
+  ConceptualWalletInsert
+} from '../database/wallet/tables';
 import {
   ModifyConceptualWallet,
-} from '../database/primitives/api/write';
+} from '../database/wallet/api/write';
 import type {
   Bip44WrapperInsert,
   PublicDeriverRow,
