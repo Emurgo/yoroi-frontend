@@ -17,7 +17,7 @@ import { ModifyEncryptionMeta, } from './primitives/api/write';
 
 import { populatePrimitivesDb } from './primitives/tables';
 import { populateBip44Db } from './bip44/tables';
-import { populateTransactionsDb } from './transactions/tables';
+import { populateTransactionsDb } from './utxoTransactions/tables';
 import { populateWalletDb } from './wallet/tables';
 import environment from '../../../../../environment';
 

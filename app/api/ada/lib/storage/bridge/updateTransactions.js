@@ -27,11 +27,11 @@ import { GetOrAddAddress, } from '../database/primitives/api/write';
 import { digetForHash, } from '../database/primitives/api/utils';
 import {
   ModifyUtxoTransaction, MarkUtxo,
-} from '../database/transactions/api/write';
+} from '../database/utxoTransactions/api/write';
 import {
   AssociateTxWithUtxoIOs, GetUtxoTxOutputsWithTx,
   GetUtxoInputs,
-} from '../database/transactions/api/read';
+} from '../database/utxoTransactions/api/read';
 import type {
   RemoteTxState,
   RemoteTransaction,
@@ -44,7 +44,7 @@ import type {
 import type {
   UtxoTransactionInputInsert, UtxoTransactionOutputInsert,
   DbTxIO, DbTxInChain,
-} from '../database/transactions/tables';
+} from '../database/utxoTransactions/tables';
 import { TxStatusCodes, } from '../database/primitives/tables';
 import {
   ScanAddressesInstance,

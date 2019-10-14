@@ -7,7 +7,7 @@ import { RustModule } from './lib/cardanoCrypto/rustLoader';
 
 import type {
   DbTxIO
-} from './lib/storage/database/transactions/tables';
+} from './lib/storage/database/utxoTransactions/tables';
 import type { DbBlock, } from './lib/storage/database/primitives/tables';
 import type {
   Address, Value, Addressing,

@@ -13,7 +13,7 @@ import type {
 import type {
   UtxoTransactionInputRow,
   UtxoTransactionOutputRow,
-} from './storage/database/transactions/tables';
+} from './storage/database/utxoTransactions/tables';
 import {
   TxStatusCodes,
 } from './storage/database/primitives/tables';

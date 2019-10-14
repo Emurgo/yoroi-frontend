@@ -13,7 +13,7 @@ import {
 import type {
   UtxoTransactionInputRow,
   UtxoTransactionOutputRow,
-} from './storage/database/transactions/tables';
+} from './storage/database/utxoTransactions/tables';
 import type { TransactionExportRow } from '../../export';
 import {
   DECIMAL_PLACES_IN_ADA,

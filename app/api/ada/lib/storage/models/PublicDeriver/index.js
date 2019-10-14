@@ -75,7 +75,7 @@ import {
 
 import {
   GetUtxoTxOutputsWithTx,
-} from  '../../database/transactions/api/read';
+} from  '../../database/utxoTransactions/api/read';
 
 import type {
   KeyRow,

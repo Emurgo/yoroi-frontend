@@ -55,7 +55,7 @@ import type {
 } from '../database/bip44/tables';
 import {
   GetUtxoTxOutputsWithTx,
-} from '../database/transactions/api/read';
+} from '../database/utxoTransactions/api/read';
 import { TxStatusCodes } from '../database/primitives/tables';
 
 import { WrongPassphraseError } from '../../cardanoCrypto/cryptoErrors';
