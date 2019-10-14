@@ -25,7 +25,7 @@ import type {
   Addressing,
 } from './storage/models/common/interfaces';
 import {
-  DerivationLevels,
+  Bip44DerivationLevels,
 } from './storage/database/bip44/api/utils';
 
 export function getFromUserPerspective(data: {
@@ -172,11 +172,11 @@ export function verifyAccountLevel(
   addressingInfo: Addressing,
 ): void {
   const { addressing } = addressingInfo;
-  if (addressing.startLevel !== DerivationLevels.ACCOUNT.level) {
+  if (addressing.startLevel !== Bip44DerivationLevels.ACCOUNT.level) {
     throw new Error('_transformToTrezorInputs only accounts are supported');
   }
   const lastLevelSpecified = addressing.startLevel + addressing.path.length - 1;
-  if (lastLevelSpecified !== DerivationLevels.ADDRESS.level) {
+  if (lastLevelSpecified !== Bip44DerivationLevels.ADDRESS.level) {
     throw new Error('_transformToTrezorInputs incorrect addressing size');
   }
 }

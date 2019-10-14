@@ -55,8 +55,8 @@ import {
   GetPublicDeriver,
   GetKeyForPublicDeriver,
 } from '../database/wallet/api/read';
-import { AddTree, ModifyDisplayCutoff, } from '../database/bip44/api/write';
-import { GetDerivationSpecific, } from '../database/bip44/api/read';
+import { AddBip44Tree, ModifyDisplayCutoff, } from '../database/bip44/api/write';
+import { GetBip44DerivationSpecific, } from '../database/bip44/api/read';
 import { ModifyLastSyncInfo, } from '../database/wallet/api/write';
 import type { LastSyncInfoRow, } from '../database/wallet/tables';
 import { genToAbsoluteSlotNumber, rawGenHashToIdsFunc, } from  '../models/utils';
@@ -76,7 +76,7 @@ export async function rawGetUtxoTransactions(
     GetAddress: Class<GetAddress>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
     GetTxAndBlock: Class<GetTxAndBlock>,
-    GetDerivationSpecific: Class<GetDerivationSpecific>,
+    GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
   |},
   request: {
     addressFetch: IGetAllAddresses,
@@ -96,7 +96,7 @@ export async function rawGetUtxoTransactions(
     {
       GetPathWithSpecific: depTables.GetPathWithSpecific,
       GetAddress: depTables.GetAddress,
-      GetDerivationSpecific: depTables.GetDerivationSpecific,
+      GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
     },
     undefined,
   );
@@ -167,7 +167,7 @@ export async function getAllUtxoTransactions(
     GetAddress,
     AssociateTxWithUtxoIOs,
     GetTxAndBlock,
-    GetDerivationSpecific,
+    GetBip44DerivationSpecific,
   });
   const depTables = Object
     .keys(deps)
@@ -185,7 +185,7 @@ export async function getAllUtxoTransactions(
           GetAddress: deps.GetAddress,
           AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
           GetTxAndBlock: deps.GetTxAndBlock,
-          GetDerivationSpecific: deps.GetDerivationSpecific,
+          GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
         },
         {
           ...request,
@@ -217,7 +217,7 @@ export async function getPendingUtxoTransactions(
     GetAddress,
     AssociateTxWithUtxoIOs,
     GetTxAndBlock,
-    GetDerivationSpecific,
+    GetBip44DerivationSpecific,
   });
   const depTables = Object
     .keys(deps)
@@ -235,7 +235,7 @@ export async function getPendingUtxoTransactions(
           GetAddress: deps.GetAddress,
           AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
           GetTxAndBlock: deps.GetTxAndBlock,
-          GetDerivationSpecific: deps.GetDerivationSpecific,
+          GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
         },
         {
           ...request,
@@ -270,7 +270,7 @@ export async function updateTransactions(
       GetUtxoTxOutputsWithTx,
       GetOrAddAddress,
       GetPublicDeriver,
-      AddTree,
+      AddBip44Tree,
       ModifyUtxoTransaction,
       MarkUtxo,
       AssociateTxWithUtxoIOs,
@@ -280,7 +280,7 @@ export async function updateTransactions(
       GetTransaction,
       GetUtxoInputs,
       GetTxAndBlock,
-      GetDerivationSpecific,
+      GetBip44DerivationSpecific,
     });
     const updateTables = Object
       .keys(updateDepTables)
@@ -327,7 +327,7 @@ export async function updateTransactions(
       GetTransaction,
       GetUtxoInputs,
       GetEncryptionMeta,
-      GetDerivationSpecific,
+      GetBip44DerivationSpecific,
     });
     const rollbackTables = Object
       .keys(rollbackDepTables)
@@ -377,7 +377,7 @@ async function rollback(
     GetTxAndBlock: Class<GetTxAndBlock>,
     GetUtxoInputs: Class<GetUtxoInputs>,
     GetEncryptionMeta: Class<GetEncryptionMeta>,
-    GetDerivationSpecific: Class<GetDerivationSpecific>,
+    GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
   |},
   request: {
     publicDeriver: IPublicDeriver & IGetAllAddresses,
@@ -398,7 +398,7 @@ async function rollback(
     {
       GetPathWithSpecific: depTables.GetPathWithSpecific,
       GetAddress: depTables.GetAddress,
-      GetDerivationSpecific: depTables.GetDerivationSpecific,
+      GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
     },
     undefined,
   );
@@ -508,7 +508,7 @@ async function rawUpdateTransactions(
     GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
     GetOrAddAddress: Class<GetOrAddAddress>,
     GetPublicDeriver: Class<GetPublicDeriver>,
-    AddTree: Class<AddTree>,
+    AddBip44Tree: Class<AddBip44Tree>,
     ModifyUtxoTransaction: Class<ModifyUtxoTransaction>,
     MarkUtxo: Class<MarkUtxo>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
@@ -518,7 +518,7 @@ async function rawUpdateTransactions(
     GetTransaction: Class<GetTransaction>,
     GetUtxoInputs: Class<GetUtxoInputs>,
     GetTxAndBlock: Class<GetTxAndBlock>,
-    GetDerivationSpecific: Class<GetDerivationSpecific>,
+    GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
   |},
   publicDeriver: IPublicDeriver & IGetAllAddresses,
   lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
@@ -561,10 +561,10 @@ async function rawUpdateTransactions(
           GetUtxoTxOutputsWithTx: depTables.GetUtxoTxOutputsWithTx,
           GetOrAddAddress: depTables.GetOrAddAddress,
           GetPublicDeriver: depTables.GetPublicDeriver,
-          AddTree: depTables.AddTree,
+          AddBip44Tree: depTables.AddBip44Tree,
           ModifyDisplayCutoff: depTables.ModifyDisplayCutoff,
           GetDerivationsByPath: depTables.GetDerivationsByPath,
-          GetDerivationSpecific: depTables.GetDerivationSpecific,
+          GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
         },
         { checkAddressesInUse },
       );
@@ -578,7 +578,7 @@ async function rawUpdateTransactions(
       {
         GetPathWithSpecific: depTables.GetPathWithSpecific,
         GetAddress: depTables.GetAddress,
-        GetDerivationSpecific: depTables.GetDerivationSpecific,
+        GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
       },
       undefined,
     );

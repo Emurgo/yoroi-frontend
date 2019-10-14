@@ -34,7 +34,7 @@ import {
 import type { HWFeatures, } from './lib/storage/database/wallet/tables';
 import {
   flattenInsertTree,
-  DerivationLevels,
+  Bip44DerivationLevels,
 } from './lib/storage/database/bip44/api/utils';
 import {
   PublicDeriver,
@@ -1109,7 +1109,7 @@ export default class AdaApi {
         return {
           address,
           addressing: {
-            startLevel: DerivationLevels.ACCOUNT.level,
+            startLevel: Bip44DerivationLevels.ACCOUNT.level,
             path: [request.accountIndex].concat(leaf.path),
           },
         };

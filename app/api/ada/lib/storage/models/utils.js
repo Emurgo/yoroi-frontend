@@ -46,9 +46,9 @@ import {
 } from '../database/utils';
 import {
   GetAllBip44Wallets,
-  GetDerivationSpecific,
+  GetBip44DerivationSpecific,
 } from '../database/bip44/api/read';
-import { DerivationLevels } from '../database/bip44/api/utils';
+import { Bip44DerivationLevels } from '../database/bip44/api/utils';
 import type { GetPathWithSpecificByTreeRequest } from '../database/primitives/api/read';
 import type {
   Bip44AddressRow,
@@ -196,7 +196,7 @@ export async function rawGetDerivationsByPath<
   db: lf$Database,
   tx: lf$Transaction,
   depTables: {|
-    GetDerivationSpecific: Class<GetDerivationSpecific>,
+    GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
     GetPathWithSpecific: Class<GetPathWithSpecific>,
   |},
   request: GetPathWithSpecificByTreeRequest,
@@ -209,7 +209,7 @@ export async function rawGetDerivationsByPath<
     db, tx,
     request,
     async (derivationIds) => {
-      const result = await GetDerivationSpecific.get<Row>(
+      const result = await GetBip44DerivationSpecific.get<Row>(
         db, tx,
         derivationIds,
         level,
@@ -289,7 +289,7 @@ export async function rawGetBip44AddressesByPath(
   depTables: {
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
-    GetDerivationSpecific: Class<GetDerivationSpecific>,
+    GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
   },
   request: GetPathWithSpecificByTreeRequest,
 ): Promise<Array<{|
@@ -301,10 +301,10 @@ export async function rawGetBip44AddressesByPath(
     db, tx,
     {
       GetPathWithSpecific: depTables.GetPathWithSpecific,
-      GetDerivationSpecific: depTables.GetDerivationSpecific,
+      GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
     },
     request,
-    DerivationLevels.ADDRESS.level,
+    Bip44DerivationLevels.ADDRESS.level,
   );
   // Note: simple get since we know these addresses exist
   const addressRows = await depTables.GetAddress.getById(
@@ -398,7 +398,7 @@ export async function rawGetChainAddressesForDisplay(
     GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
     GetAddress: Class<GetAddress>,
     GetPathWithSpecific: Class<GetPathWithSpecific>,
-    GetDerivationSpecific: Class<GetDerivationSpecific>,
+    GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
   |},
   request: {
     publicDeriver: IPublicDeriver & IHasChains & IDisplayCutoff,
@@ -410,7 +410,7 @@ export async function rawGetChainAddressesForDisplay(
     {
       GetAddress: depTables.GetAddress,
       GetPathWithSpecific: depTables.GetPathWithSpecific,
-      GetDerivationSpecific: depTables.GetDerivationSpecific,
+      GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
     },
     request.chainsRequest
   );
@@ -420,7 +420,7 @@ export async function rawGetChainAddressesForDisplay(
       tx,
       {
         GetPathWithSpecific: depTables.GetPathWithSpecific,
-        GetDerivationSpecific: depTables.GetDerivationSpecific,
+        GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
       },
       undefined,
     );
@@ -459,7 +459,7 @@ export async function getChainAddressesForDisplay(
     GetUtxoTxOutputsWithTx,
     GetAddress,
     GetPathWithSpecific,
-    GetDerivationSpecific,
+    GetBip44DerivationSpecific,
   });
   const depTables = Object
     .keys(deps)
@@ -481,7 +481,7 @@ export async function rawGetAllAddressesForDisplay(
     GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
     GetAddress: Class<GetAddress>,
     GetPathWithSpecific: Class<GetPathWithSpecific>,
-    GetDerivationSpecific: Class<GetDerivationSpecific>,
+    GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
   |},
   request: {
     publicDeriver: IPublicDeriver & IGetAllAddresses,
@@ -492,7 +492,7 @@ export async function rawGetAllAddressesForDisplay(
     {
       GetAddress: depTables.GetAddress,
       GetPathWithSpecific: depTables.GetPathWithSpecific,
-      GetDerivationSpecific: depTables.GetDerivationSpecific,
+      GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
     },
     undefined,
   );
@@ -503,7 +503,7 @@ export async function rawGetAllAddressesForDisplay(
       tx,
       {
         GetPathWithSpecific: depTables.GetPathWithSpecific,
-        GetDerivationSpecific: depTables.GetDerivationSpecific,
+        GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
       },
       undefined,
     );
@@ -526,7 +526,7 @@ export async function getAllAddressesForDisplay(
     GetUtxoTxOutputsWithTx,
     GetAddress,
     GetPathWithSpecific,
-    GetDerivationSpecific,
+    GetBip44DerivationSpecific,
   });
   const depTables = Object
     .keys(deps)

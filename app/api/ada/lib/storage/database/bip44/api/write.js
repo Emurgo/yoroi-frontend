@@ -16,7 +16,7 @@ import type {
 } from '../tables';
 import * as Bip44Tables from '../tables';
 import {
-  GetDerivationSpecific,
+  GetBip44DerivationSpecific,
   GetKeyForPrivateDeriver,
 } from './read';
 
@@ -31,9 +31,9 @@ import {
 } from '../../primitives/api/read';
 
 import {
-  allDerivationTables,
-  TableMap,
-  DerivationLevels,
+  allBip44DerivationTables,
+  Bip44TableMap,
+  Bip44DerivationLevels,
 } from './utils';
 import { addNewRowToTable, StaleStateError, } from '../../utils';
 import { AddPublicDeriver, ModifyHwWalletMeta } from '../../wallet/api/write';
@@ -62,9 +62,9 @@ type InsertPath = Array<{
   insert: {},
 }>;
 
-export class AddTree {
+export class AddBip44Tree {
   static ownTables = Object.freeze({
-    ...allDerivationTables,
+    ...allBip44DerivationTables,
   });
   static depTables = Object.freeze({
     GetOrAddDerivation,
@@ -78,11 +78,11 @@ export class AddTree {
   ): Promise<{}> {
     const parentId = tree.derivationId;
     for (let i = 0; i < tree.children.length; i++) {
-      const tableName = TableMap.get(level + 1);
+      const tableName = Bip44TableMap.get(level + 1);
       if (tableName == null) {
         throw new Error('AddDerivation::add Unknown table queried');
       }
-      const result = await AddTree.depTables.GetOrAddDerivation.getOrAdd(
+      const result = await AddBip44Tree.depTables.GetOrAddDerivation.getOrAdd(
         db, tx,
         parentId,
         tree.children[i].index,
@@ -103,7 +103,7 @@ export class AddTree {
         tableName,
       );
       if (tree.children[i].children != null) {
-        await AddTree.add(
+        await AddBip44Tree.add(
           db, tx,
           {
             derivationId: result.KeyDerivation.KeyDerivationId,
@@ -148,7 +148,7 @@ export type PrivateDeriverRequest<Insert> = {
 };
 export class AddPrivateDeriver {
   static ownTables = Object.freeze({
-    ...allDerivationTables,
+    ...allBip44DerivationTables,
     [Bip44Tables.PrivateDeriverSchema.name]: Bip44Tables.PrivateDeriverSchema,
   });
   static depTables = Object.freeze({
@@ -168,7 +168,7 @@ export class AddPrivateDeriver {
   }> {
     let parentId: number | null = null;
     for (let i = 0; i < request.pathToPrivate.length - 1; i++) {
-      const tableName = TableMap.get(request.pathToPrivate.length);
+      const tableName = Bip44TableMap.get(request.pathToPrivate.length);
       if (tableName == null) {
         throw new Error('AddDerivation::add Unknown table queried');
       }
@@ -195,7 +195,7 @@ export class AddPrivateDeriver {
       parentId = levelResult.KeyDerivation.KeyDerivationId;
     }
 
-    const tableName = TableMap.get(request.pathToPrivate.length);
+    const tableName = Bip44TableMap.get(request.pathToPrivate.length);
     if (tableName == null) {
       throw new Error('AddDerivation::add Unknown table queried');
     }
@@ -231,13 +231,13 @@ export type DerivePublicFromPrivateRequest= {|
 |};
 export class DerivePublicFromPrivate {
   static ownTables = Object.freeze({
-    ...allDerivationTables,
+    ...allBip44DerivationTables,
   });
   static depTables = Object.freeze({
     AddPublicDeriver,
     GetKeyForPrivateDeriver,
     GetOrAddDerivation,
-    AddTree,
+    AddBip44Tree,
   });
 
   static async add<Row>(
@@ -281,7 +281,7 @@ export class DerivePublicFromPrivate {
       }
       let parentId = derivationAndKey.PrivateDeriver.KeyDerivationId;
       for (let i = 0; i < body.pathToPublic.length - 1; i++) {
-        const tableName = TableMap.get(derivationAndKey.PrivateDeriver.Level + i + 1);
+        const tableName = Bip44TableMap.get(derivationAndKey.PrivateDeriver.Level + i + 1);
         if (tableName == null) {
           throw new Error('AddDerivation::add Unknown table queried');
         }
@@ -308,7 +308,7 @@ export class DerivePublicFromPrivate {
         );
         parentId = nextLevel.KeyDerivation.KeyDerivationId;
       }
-      const tableName = TableMap.get(
+      const tableName = Bip44TableMap.get(
         derivationAndKey.PrivateDeriver.Level + body.pathToPublic.length
       );
       if (tableName == null) {
@@ -337,7 +337,7 @@ export class DerivePublicFromPrivate {
         }
       );
     }
-    await DerivePublicFromPrivate.depTables.AddTree.add(
+    await DerivePublicFromPrivate.depTables.AddBip44Tree.add(
       db, tx,
       {
         derivationId: pubDeriver.publicDeriverResult.KeyDerivationId,
@@ -359,7 +359,7 @@ export class ModifyDisplayCutoff {
   static depTables = Object.freeze({
     GetPathWithSpecific,
     GetChildWithSpecific,
-    GetDerivationSpecific,
+    GetBip44DerivationSpecific,
   });
 
   static async pop(
@@ -377,15 +377,15 @@ export class ModifyDisplayCutoff {
       db, tx,
       {
         ...request,
-        level: DerivationLevels.CHAIN.level,
+        level: Bip44DerivationLevels.CHAIN.level,
       },
       async (derivationId) => {
-        const result = await ModifyDisplayCutoff.depTables.GetDerivationSpecific.get<
+        const result = await ModifyDisplayCutoff.depTables.GetBip44DerivationSpecific.get<
         Bip44ChainRow
         >(
           db, tx,
           [derivationId],
-          DerivationLevels.CHAIN.level,
+          Bip44DerivationLevels.CHAIN.level,
         );
         const chainDerivation = result[0];
         if (chainDerivation === undefined) {
@@ -408,12 +408,12 @@ export class ModifyDisplayCutoff {
     const address = await ModifyDisplayCutoff.depTables.GetChildWithSpecific.get<Bip44AddressRow>(
       db, tx,
       async (derivationId) => {
-        const result = await ModifyDisplayCutoff.depTables.GetDerivationSpecific.get<
+        const result = await ModifyDisplayCutoff.depTables.GetBip44DerivationSpecific.get<
           Bip44AddressRow
         >(
           db, tx,
           [derivationId],
-          DerivationLevels.ADDRESS.level,
+          Bip44DerivationLevels.ADDRESS.level,
         );
         const addressDerivation = result[0];
         if (addressDerivation === undefined) {
@@ -496,14 +496,14 @@ export type AddAdhocPublicDeriverResponse<Row> = {|
 |}
 export class AddAdhocPublicDeriver {
   static ownTables = Object.freeze({
-    ...allDerivationTables,
+    ...allBip44DerivationTables,
     [PublicDeriverSchema.name]: PublicDeriverSchema,
   });
   static depTables = Object.freeze({
     AddDerivation,
     AddPublicDeriver,
     ModifyHwWalletMeta,
-    AddTree,
+    AddBip44Tree,
   });
 
   static async add<Row>(
@@ -513,7 +513,7 @@ export class AddAdhocPublicDeriver {
   ): Promise<AddAdhocPublicDeriverResponse<Row>> {
     let parentId: number | null = request.parentDerivationId;
     for (let i = 0; i < request.pathToPublic.length - 1; i++) {
-      const tableName = TableMap.get(request.pathStartLevel + i);
+      const tableName = Bip44TableMap.get(request.pathStartLevel + i);
       if (tableName == null) {
         throw new Error('AddDerivation::add Unknown table queried');
       }
@@ -540,7 +540,7 @@ export class AddAdhocPublicDeriver {
       parentId = levelResult.KeyDerivation.KeyDerivationId;
     }
 
-    const tableName = TableMap.get(request.pathStartLevel + request.pathToPublic.length - 1);
+    const tableName = Bip44TableMap.get(request.pathStartLevel + request.pathToPublic.length - 1);
     if (tableName == null) {
       throw new Error('AddDerivation::add Unknown table queried');
     }
@@ -567,7 +567,7 @@ export class AddAdhocPublicDeriver {
       }
     );
 
-    await AddAdhocPublicDeriver.depTables.AddTree.add(
+    await AddAdhocPublicDeriver.depTables.AddBip44Tree.add(
       db, tx,
       {
         derivationId: publicDeriver.publicDeriverResult.KeyDerivationId,

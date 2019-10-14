@@ -27,7 +27,7 @@ import { RustModule } from '../../cardanoCrypto/rustLoader';
 import { encryptWithPassword } from '../../../../../utils/passwordCipher';
 
 import {
-  DerivationLevels,
+  Bip44DerivationLevels,
 } from '../database/bip44/api/utils';
 import {
   getAllSchemaTables,
@@ -165,8 +165,8 @@ export async function createStandardBip44Wallet(request: {
         finalState => ({
           ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
           IsBundled: false,
-          SignerLevel: DerivationLevels.ROOT.level,
-          PublicDeriverLevel: DerivationLevels.ACCOUNT.level,
+          SignerLevel: Bip44DerivationLevels.ROOT.level,
+          PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
           Version: 2,
         })
       )
@@ -194,7 +194,7 @@ export async function createStandardBip44Wallet(request: {
           addPrivateDeriverRequest: derivationId => ({
             Bip44WrapperId: finalState.bip44WrapperRow.Bip44WrapperId,
             KeyDerivationId: derivationId,
-            Level: DerivationLevels.ROOT.level,
+            Level: Bip44DerivationLevels.ROOT.level,
           }),
         })
       )
@@ -284,8 +284,8 @@ export async function createHardwareWallet(request: {
         finalState => ({
           ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
           IsBundled: false,
-          SignerLevel: DerivationLevels.ROOT.level,
-          PublicDeriverLevel: DerivationLevels.ACCOUNT.level,
+          SignerLevel: Bip44DerivationLevels.ROOT.level,
+          PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
           Version: 2,
         })
       )
@@ -358,8 +358,8 @@ export async function migrateFromStorageV1(request: {
         finalState => ({
           ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
           IsBundled: false,
-          SignerLevel: DerivationLevels.ROOT.level,
-          PublicDeriverLevel: DerivationLevels.ACCOUNT.level,
+          SignerLevel: Bip44DerivationLevels.ROOT.level,
+          PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
           Version: 2,
         })
       );
@@ -385,7 +385,7 @@ export async function migrateFromStorageV1(request: {
           addPrivateDeriverRequest: derivationId => ({
             Bip44WrapperId: finalState.bip44WrapperRow.Bip44WrapperId,
             KeyDerivationId: derivationId,
-            Level: DerivationLevels.ROOT.level,
+            Level: Bip44DerivationLevels.ROOT.level,
           }),
         })
       );

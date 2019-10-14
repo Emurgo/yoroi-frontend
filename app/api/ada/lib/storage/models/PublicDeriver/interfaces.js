@@ -46,10 +46,10 @@ import {
   GetAddress,
 } from '../../database/primitives/api/read';
 import {
-  AddTree,
+  AddBip44Tree,
   ModifyDisplayCutoff,
 } from '../../database/bip44/api/write';
-import { GetDerivationSpecific } from '../../database/bip44/api/read';
+import { GetBip44DerivationSpecific } from '../../database/bip44/api/read';
 import { UpdateGet, GetOrAddAddress, } from '../../database/primitives/api/write';
 import type {
   FilterFunc,
@@ -110,11 +110,11 @@ export interface IAddFromPublic {
     IAddFromPublicFunc,
     {|
       GetPublicDeriver: Class<GetPublicDeriver>,
-      AddTree: Class<AddTree>,
+      AddBip44Tree: Class<AddBip44Tree>,
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
+      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
     |},
     IAddFromPublicRequest
   >;
@@ -153,7 +153,7 @@ export interface IGetAllAddresses {
     {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
+      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
     |},
     IGetAllAddressesRequest
   >;
@@ -172,7 +172,7 @@ export interface IGetAllUtxos {
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
+      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
     |},
     IGetAllUtxosRequest
   >;
@@ -221,7 +221,7 @@ export interface IDisplayCutoff {
   +rawGetCutoff: RawVariation<
     IDisplayCutoffGetFunc,
     {|
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
+      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
       GetPathWithSpecific: Class<GetPathWithSpecific>
     |},
     IDisplayCutoffGetRequest
@@ -263,7 +263,7 @@ export interface IHasChains {
     {|
       GetAddress: Class<GetAddress>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
+      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
     |},
     IHasChainsRequest
   >;
@@ -275,7 +275,7 @@ export interface IHasChains {
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
       GetAddress: Class<GetAddress>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
+      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
     |},
     IGetNextUnusedForChainRequest
   >;
@@ -294,7 +294,7 @@ export interface IGetUtxoBalance {
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
+      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
     |},
     IGetUtxoBalanceRequest
   >;
@@ -387,11 +387,11 @@ export interface IScanAddresses {
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
       GetOrAddAddress: Class<GetOrAddAddress>,
       GetPublicDeriver: Class<GetPublicDeriver>,
-      AddTree: Class<AddTree>,
+      AddBip44Tree: Class<AddBip44Tree>,
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
+      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
     |},
     IScanAddressesRequest
   >;

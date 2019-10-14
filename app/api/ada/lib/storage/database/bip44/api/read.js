@@ -12,8 +12,8 @@ import type {
 import * as Tables from '../tables';
 
 import {
-  TableMap,
-  allDerivationTables,
+  Bip44TableMap,
+  allBip44DerivationTables,
 } from './utils';
 import {
   getRowIn,
@@ -32,9 +32,9 @@ import { PublicDeriverSchema } from '../../wallet/tables';
 import type { PublicDeriverRow } from '../../wallet/tables';
 import { GetKeyForDerivation } from '../../primitives/api/read';
 
-export class GetDerivationSpecific {
+export class GetBip44DerivationSpecific {
   static ownTables = Object.freeze({
-    ...allDerivationTables,
+    ...allBip44DerivationTables,
     [KeyDerivationSchema.name]: KeyDerivationSchema,
   });
   static depTables = Object.freeze({});
@@ -45,14 +45,14 @@ export class GetDerivationSpecific {
     derivationIds: Array<number>,
     level: number,
   ): Promise<$ReadOnlyArray<$ReadOnly<Row>>> {
-    const tableName = TableMap.get(level);
+    const tableName = Bip44TableMap.get(level);
     if (tableName == null) {
-      throw new Error('GetDerivationSpecific::get Unknown table queried');
+      throw new Error('GetBip44DerivationSpecific::get Unknown table queried');
     }
     return await getRowIn<Row>(
       db, tx,
       tableName,
-      GetDerivationSpecific.ownTables[KeyDerivationSchema.name].properties.KeyDerivationId,
+      GetBip44DerivationSpecific.ownTables[KeyDerivationSchema.name].properties.KeyDerivationId,
       derivationIds,
     );
   }

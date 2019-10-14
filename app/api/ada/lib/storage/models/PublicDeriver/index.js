@@ -65,12 +65,12 @@ import {
 } from '../../database/wallet/api/read';
 import { ModifyPublicDeriver } from '../../database/wallet/api/write';
 import {
-  AddTree,
+  AddBip44Tree,
   ModifyDisplayCutoff,
 } from '../../database/bip44/api/write';
-import { GetDerivationSpecific } from '../../database/bip44/api/read';
+import { GetBip44DerivationSpecific } from '../../database/bip44/api/read';
 import {
-  DerivationLevels,
+  Bip44DerivationLevels,
 } from '../../database/bip44/api/utils';
 
 import {
@@ -250,7 +250,7 @@ export async function refreshPublicDeriverFunctionality(
 
   currClass = AddFromPublic(currClass);
 
-  if (conceptualWallet.getPublicDeriverLevel() === DerivationLevels.ACCOUNT.level) {
+  if (conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.ACCOUNT.level) {
     currClass = DisplayCutoff(currClass);
 
     currClass = HasChains(currClass);
@@ -286,7 +286,7 @@ export async function refreshPublicDeriverFunctionality(
     db,
     getAllSchemaTables(db, GetDerivationsByPath),
     async tx => {
-      const levelDiff = conceptualWallet.getPublicDeriverLevel() - DerivationLevels.ROOT.level;
+      const levelDiff = conceptualWallet.getPublicDeriverLevel() - Bip44DerivationLevels.ROOT.level;
       const path = await GetDerivationsByPath.getParentPath(
         db, tx,
         {
@@ -362,11 +362,11 @@ const AddFromPublicMixin = (
     tx: lf$Transaction,
     depTables: {|
       GetPublicDeriver: Class<GetPublicDeriver>,
-      AddTree: Class<AddTree>,
+      AddBip44Tree: Class<AddBip44Tree>,
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
+      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
     |},
     body: IAddFromPublicRequest,
   ): Promise<IAddFromPublicResponse> => {
@@ -377,7 +377,7 @@ const AddFromPublicMixin = (
     if (pubDeriver === undefined) {
       throw new Error('AddFromPublic::rawAddFromPublic pubDeriver');
     }
-    await depTables.AddTree.add(
+    await depTables.AddBip44Tree.add(
       super.getDb(), tx,
       {
         derivationId: pubDeriver.KeyDerivationId,
@@ -387,7 +387,7 @@ const AddFromPublicMixin = (
     );
     const asDisplayCutoffInstance = asDisplayCutoff(this);
     if (asDisplayCutoffInstance != null) {
-      if (this.getBip44Parent().getPublicDeriverLevel() !== DerivationLevels.ACCOUNT.level) {
+      if (this.getBip44Parent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
         throw new Error('DisplayCutoffMixin::getCutoff incorrect pubderiver level');
       }
       const external = body.tree.find(node => node.index === EXTERNAL);
@@ -405,7 +405,7 @@ const AddFromPublicMixin = (
         tx,
         {
           GetPathWithSpecific: depTables.GetPathWithSpecific,
-          GetDerivationSpecific: depTables.GetDerivationSpecific,
+          GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
         },
         undefined,
       );
@@ -428,19 +428,19 @@ const AddFromPublicMixin = (
       super.getDb(),
       [
         ...getAllSchemaTables(super.getDb(), GetPublicDeriver),
-        ...getAllSchemaTables(super.getDb(), AddTree),
+        ...getAllSchemaTables(super.getDb(), AddBip44Tree),
         ...getAllSchemaTables(super.getDb(), ModifyDisplayCutoff),
         ...getAllSchemaTables(super.getDb(), GetDerivationsByPath),
         ...getAllSchemaTables(super.getDb(), GetPathWithSpecific),
-        ...getAllSchemaTables(super.getDb(), GetDerivationSpecific),
+        ...getAllSchemaTables(super.getDb(), GetBip44DerivationSpecific),
       ],
       async tx => this.rawAddFromPublic(tx, {
         GetPublicDeriver,
-        AddTree,
+        AddBip44Tree,
         ModifyDisplayCutoff,
         GetDerivationsByPath,
         GetPathWithSpecific,
-        GetDerivationSpecific,
+        GetBip44DerivationSpecific,
       }, body)
     );
   }
@@ -737,7 +737,7 @@ const GetAllAddressesMixin = (
     depTables: {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
+      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
     |},
     _body: IGetAllAddressesRequest,
   ): Promise<IGetAllAddressesResponse> => {
@@ -749,7 +749,7 @@ const GetAllAddressesMixin = (
         derivationLevel: this.getBip44Parent().getPublicDeriverLevel(),
         commonPrefix: super.getPathToPublic(),
         queryPath: Array(
-          DerivationLevels.ADDRESS.level - this.getBip44Parent().getPublicDeriverLevel()
+          Bip44DerivationLevels.ADDRESS.level - this.getBip44Parent().getPublicDeriverLevel()
         ).fill(null),
       }
     );
@@ -762,11 +762,11 @@ const GetAllAddressesMixin = (
       [
         ...getAllSchemaTables(super.getDb(), GetPathWithSpecific),
         ...getAllSchemaTables(super.getDb(), GetAddress),
-        ...getAllSchemaTables(super.getDb(), GetDerivationSpecific),
+        ...getAllSchemaTables(super.getDb(), GetBip44DerivationSpecific),
       ],
       async tx => this.rawGetAllAddresses(
         tx,
-        { GetPathWithSpecific, GetAddress, GetDerivationSpecific, },
+        { GetPathWithSpecific, GetAddress, GetBip44DerivationSpecific, },
         body
       )
     );
@@ -803,7 +803,7 @@ const GetAllUtxosMixin = (
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
+      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
     |},
     _body: IGetAllUtxosRequest,
   ): Promise<IGetAllUtxosResponse> => {
@@ -812,7 +812,7 @@ const GetAllUtxosMixin = (
       {
         GetAddress: depTables.GetAddress,
         GetPathWithSpecific: depTables.GetPathWithSpecific,
-        GetDerivationSpecific: depTables.GetDerivationSpecific,
+        GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
       },
       undefined,
     );
@@ -831,11 +831,11 @@ const GetAllUtxosMixin = (
         ...getAllSchemaTables(super.getDb(), GetPathWithSpecific),
         ...getAllSchemaTables(super.getDb(), GetAddress),
         ...getAllSchemaTables(super.getDb(), GetUtxoTxOutputsWithTx),
-        ...getAllSchemaTables(super.getDb(), GetDerivationSpecific),
+        ...getAllSchemaTables(super.getDb(), GetBip44DerivationSpecific),
       ],
       async tx => this.rawGetAllUtxos(
         tx,
-        { GetPathWithSpecific, GetAddress, GetUtxoTxOutputsWithTx, GetDerivationSpecific },
+        { GetPathWithSpecific, GetAddress, GetUtxoTxOutputsWithTx, GetBip44DerivationSpecific },
         undefined
       )
     );
@@ -876,7 +876,7 @@ const DisplayCutoffMixin = (
     |},
     _body: IDisplayCutoffPopRequest,
   ): Promise<IDisplayCutoffPopResponse> => {
-    if (this.getBip44Parent().getPublicDeriverLevel() !== DerivationLevels.ACCOUNT.level) {
+    if (this.getBip44Parent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
       // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
       throw new Error('DisplayCutoffMixin::popAddress incorrect pubderiver level');
     }
@@ -920,11 +920,11 @@ const DisplayCutoffMixin = (
     tx: lf$Transaction,
     depTables: {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
+      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
     |},
     _body: IDisplayCutoffGetRequest,
   ): Promise<IDisplayCutoffGetResponse> => {
-    if (this.getBip44Parent().getPublicDeriverLevel() !== DerivationLevels.ACCOUNT.level) {
+    if (this.getBip44Parent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
       // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
       throw new Error('DisplayCutoffMixin::getCutoff incorrect pubderiver level');
     }
@@ -933,15 +933,15 @@ const DisplayCutoffMixin = (
       {
         pubDeriverKeyDerivationId: super.getDerivationId(),
         pathToLevel: [0],
-        level: DerivationLevels.CHAIN.level,
+        level: Bip44DerivationLevels.CHAIN.level,
       },
       async (derivationId) => {
-        const result = await GetDerivationSpecific.get<
+        const result = await GetBip44DerivationSpecific.get<
         Bip44ChainRow
         >(
           super.getDb(), tx,
           [derivationId],
-          DerivationLevels.CHAIN.level,
+          Bip44DerivationLevels.CHAIN.level,
         );
         const chainDerivation = result[0];
         if (chainDerivation === undefined) {
@@ -966,11 +966,11 @@ const DisplayCutoffMixin = (
       super.getDb(),
       [
         ...getAllSchemaTables(super.getDb(), GetPathWithSpecific),
-        ...getAllSchemaTables(super.getDb(), GetDerivationSpecific),
+        ...getAllSchemaTables(super.getDb(), GetBip44DerivationSpecific),
       ],
       async tx => this.rawGetCutoff(tx, {
         GetPathWithSpecific,
-        GetDerivationSpecific,
+        GetBip44DerivationSpecific,
       }, body)
     );
   }
@@ -983,7 +983,7 @@ const DisplayCutoffMixin = (
     |},
     body: IDisplayCutoffSetRequest,
   ): Promise<IDisplayCutoffSetResponse> => {
-    if (this.getBip44Parent().getPublicDeriverLevel() !== DerivationLevels.ACCOUNT.level) {
+    if (this.getBip44Parent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
       // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
       throw new Error('DisplayCutoffMixin::popAddress incorrect pubderiver level');
     }
@@ -1046,11 +1046,11 @@ const HasChainsMixin = (
     depTables: {|
       GetAddress: Class<GetAddress>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
+      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
     |},
     body: IHasChainsRequest,
   ): Promise<IHasChainsResponse> => {
-    if (this.getBip44Parent().getPublicDeriverLevel() !== DerivationLevels.ACCOUNT.level) {
+    if (this.getBip44Parent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
       // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
       throw new Error('HasChains::rawGetAddressesForChain incorrect pubderiver level');
     }
@@ -1073,11 +1073,11 @@ const HasChainsMixin = (
       [
         ...getAllSchemaTables(super.getDb(), GetAddress),
         ...getAllSchemaTables(super.getDb(), GetPathWithSpecific),
-        ...getAllSchemaTables(super.getDb(), GetDerivationSpecific),
+        ...getAllSchemaTables(super.getDb(), GetBip44DerivationSpecific),
       ],
       async tx => this.rawGetAddressesForChain(
         tx,
-        { GetAddress, GetPathWithSpecific, GetDerivationSpecific, },
+        { GetAddress, GetPathWithSpecific, GetBip44DerivationSpecific, },
         body
       )
     );
@@ -1089,7 +1089,7 @@ const HasChainsMixin = (
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
       GetAddress: Class<GetAddress>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
+      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
     |},
     _body: IGetNextUnusedForChainRequest,
   ): Promise<IGetNextUnusedForChainResponse> => {
@@ -1098,7 +1098,7 @@ const HasChainsMixin = (
       {
         GetAddress: depTables.GetAddress,
         GetPathWithSpecific: depTables.GetPathWithSpecific,
-        GetDerivationSpecific: depTables.GetDerivationSpecific,
+        GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
       },
       { chainId: INTERNAL },
     );
@@ -1117,13 +1117,13 @@ const HasChainsMixin = (
         ...getAllSchemaTables(super.getDb(), GetUtxoTxOutputsWithTx),
         ...getAllSchemaTables(super.getDb(), GetAddress),
         ...getAllSchemaTables(super.getDb(), GetPathWithSpecific),
-        ...getAllSchemaTables(super.getDb(), GetDerivationSpecific),
+        ...getAllSchemaTables(super.getDb(), GetBip44DerivationSpecific),
       ],
       async tx => this.rawNextInternal(tx, {
         GetAddress,
         GetPathWithSpecific,
         GetUtxoTxOutputsWithTx,
-        GetDerivationSpecific,
+        GetBip44DerivationSpecific,
       }, body)
     );
   }
@@ -1187,7 +1187,7 @@ const GetUtxoBalanceMixin = (
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
+      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
     |},
     _body: IGetUtxoBalanceRequest,
   ): Promise<IGetUtxoBalanceResponse> => {
@@ -1197,7 +1197,7 @@ const GetUtxoBalanceMixin = (
         GetAddress: depTables.GetAddress,
         GetPathWithSpecific: depTables.GetPathWithSpecific,
         GetUtxoTxOutputsWithTx: depTables.GetUtxoTxOutputsWithTx,
-        GetDerivationSpecific: depTables.GetDerivationSpecific,
+        GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
       },
       undefined
     );
@@ -1212,11 +1212,11 @@ const GetUtxoBalanceMixin = (
         ...getAllSchemaTables(super.getDb(), GetPathWithSpecific),
         ...getAllSchemaTables(super.getDb(), GetAddress),
         ...getAllSchemaTables(super.getDb(), GetUtxoTxOutputsWithTx),
-        ...getAllSchemaTables(super.getDb(), GetDerivationSpecific),
+        ...getAllSchemaTables(super.getDb(), GetBip44DerivationSpecific),
       ],
       async tx => this.rawGetBalance(
         tx,
-        { GetPathWithSpecific, GetAddress, GetUtxoTxOutputsWithTx, GetDerivationSpecific, },
+        { GetPathWithSpecific, GetAddress, GetUtxoTxOutputsWithTx, GetBip44DerivationSpecific, },
         undefined
       )
     );
@@ -1279,10 +1279,10 @@ const ScanUtxoAccountAddressesMixin = (
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
       GetOrAddAddress: Class<GetOrAddAddress>,
       GetPublicDeriver: Class<GetPublicDeriver>,
-      AddTree: Class<AddTree>,
+      AddBip44Tree: Class<AddBip44Tree>,
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
+      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
     |},
     body: IScanAddressesRequest,
   ): Promise<IScanAddressesResponse> => {
@@ -1301,7 +1301,7 @@ const ScanUtxoAccountAddressesMixin = (
       {
         GetAddress: depTables.GetAddress,
         GetPathWithSpecific: depTables.GetPathWithSpecific,
-        GetDerivationSpecific: depTables.GetDerivationSpecific,
+        GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
       },
       { chainId: INTERNAL },
     );
@@ -1315,7 +1315,7 @@ const ScanUtxoAccountAddressesMixin = (
       {
         GetAddress: depTables.GetAddress,
         GetPathWithSpecific: depTables.GetPathWithSpecific,
-        GetDerivationSpecific: depTables.GetDerivationSpecific,
+        GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
       },
       { chainId: EXTERNAL },
     );
@@ -1344,11 +1344,11 @@ const ScanUtxoAccountAddressesMixin = (
       tx,
       {
         GetPublicDeriver: depTables.GetPublicDeriver,
-        AddTree: depTables.AddTree,
+        AddBip44Tree: depTables.AddBip44Tree,
         ModifyDisplayCutoff: depTables.ModifyDisplayCutoff,
         GetDerivationsByPath: depTables.GetDerivationsByPath,
         GetPathWithSpecific: depTables.GetPathWithSpecific,
-        GetDerivationSpecific: depTables.GetDerivationSpecific,
+        GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
       },
       { tree: newToInsert },
     );
@@ -1363,10 +1363,10 @@ const ScanUtxoAccountAddressesMixin = (
       GetUtxoTxOutputsWithTx,
       GetOrAddAddress,
       GetPublicDeriver,
-      AddTree,
+      AddBip44Tree,
       GetDerivationsByPath,
       ModifyDisplayCutoff,
-      GetDerivationSpecific,
+      GetBip44DerivationSpecific,
     });
     const tables = Object
       .keys(depTables)

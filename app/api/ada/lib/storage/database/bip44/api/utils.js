@@ -4,7 +4,7 @@ import * as Bip44Tables from '../tables';
 import type { Bip44AddressInsert, } from '../tables';
 import type { TreeInsert, } from './write';
 
-export const DerivationLevels = Object.freeze({
+export const Bip44DerivationLevels = Object.freeze({
   ROOT: {
     level: 0,
     table: Bip44Tables.Bip44RootSchema,
@@ -30,9 +30,9 @@ export const DerivationLevels = Object.freeze({
     table: Bip44Tables.Bip44AddressSchema,
   },
 });
-export const TableMap = new Map<number, string>(
-  Object.keys(DerivationLevels)
-    .map(key => DerivationLevels[key])
+export const Bip44TableMap = new Map<number, string>(
+  Object.keys(Bip44DerivationLevels)
+    .map(key => Bip44DerivationLevels[key])
     .map(val => [val.level, val.table.name])
 );
 
@@ -45,7 +45,7 @@ export const TableMap = new Map<number, string>(
  * follow by a query at that level.
  * Since we cannot statically determine which level will be used, we just lock all tables.
  */
-export const allDerivationTables = {
+export const allBip44DerivationTables = {
   [Bip44Tables.Bip44RootSchema.name]: Bip44Tables.Bip44RootSchema,
   [Bip44Tables.Bip44PurposeSchema.name]: Bip44Tables.Bip44PurposeSchema,
   [Bip44Tables.Bip44CoinTypeSchema.name]: Bip44Tables.Bip44CoinTypeSchema,

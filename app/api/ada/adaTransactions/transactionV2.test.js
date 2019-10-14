@@ -20,7 +20,7 @@ import {
   loadLovefieldDB,
 } from '../lib/storage/database/index';
 import {
-  DerivationLevels,
+  Bip44DerivationLevels,
 } from '../lib/storage/database/bip44/api/utils';
 import type {
   Address, Addressing
@@ -79,21 +79,21 @@ const sampleAdaAddresses: Array<{| ...Address, ...Addressing |}> = [
     address: 'Ae2tdPwUPEZEtwz7LKtJn9ub8y7ireuj3sq2yUCZ57ccj6ZkJKn7xEiApV9',
     addressing: {
       path: [1, 11],
-      startLevel: DerivationLevels.CHAIN.level,
+      startLevel: Bip44DerivationLevels.CHAIN.level,
     },
   },
   {
     address: 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
     addressing: {
       path: [0, 135],
-      startLevel: DerivationLevels.CHAIN.level,
+      startLevel: Bip44DerivationLevels.CHAIN.level,
     },
   },
   {
     address: 'Ae2tdPwUPEZ4xAL3nxLq4Py7BfS1D2tJ3u2rxZGnrAXC8TNkWhTaz41J3FN',
     addressing: {
       path: [0, 70],
-      startLevel: DerivationLevels.CHAIN.level,
+      startLevel: Bip44DerivationLevels.CHAIN.level,
     },
   },
 ];
@@ -221,7 +221,7 @@ describe('Create signed transactions', () => {
     );
     const signedTx = signTransaction(
       signRequest,
-      DerivationLevels.ACCOUNT.level,
+      Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey.key(),
     );
     const witnesses = signedTx.to_json().witness;
@@ -295,7 +295,7 @@ describe('Create signed transactions', () => {
     };
     const signedTx = signTransaction(
       signRequest,
-      DerivationLevels.ACCOUNT.level,
+      Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey.key(),
     );
     const witnesses = signedTx.to_json().witness;

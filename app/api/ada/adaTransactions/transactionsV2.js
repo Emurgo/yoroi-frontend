@@ -21,7 +21,7 @@ import type { AddressUtxoFunc } from '../lib/state-fetch/types';
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 
 import {
-  DerivationLevels,
+  Bip44DerivationLevels,
 } from '../lib/storage/database/bip44/api/utils';
 import type {
   Address, Value, Addressing,
@@ -322,7 +322,7 @@ function addWitnesses(
   // get private keys
   const privateKeys = senderUtxos.map(utxo => {
     const lastLevelSpecified = utxo.addressing.startLevel + utxo.addressing.path.length - 1;
-    if (lastLevelSpecified !== DerivationLevels.ADDRESS.level) {
+    if (lastLevelSpecified !== Bip44DerivationLevels.ADDRESS.level) {
       throw new Error('addWitnesses incorrect addressing size');
     }
     if (keyLevel + 1 < utxo.addressing.startLevel) {
