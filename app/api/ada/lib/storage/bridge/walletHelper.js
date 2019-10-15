@@ -127,16 +127,24 @@ export async function createStandardBip44Wallet(request: {
     RustModule.Wallet.AccountIndex.new(request.accountIndex)
   ).public();
 
+  const deps = Object.freeze({
+    GetOrAddAddress,
+  });
+  const depTables = Object
+    .keys(deps)
+    .map(key => deps[key])
+    .flatMap(table => getAllSchemaTables(request.db, table));
+
   // Note: we generate initial addresses in a separate database query
   // from creation of the actual wallet
   const initialDerivations = await raii(
     request.db,
-    getAllSchemaTables(request.db, GetOrAddAddress),
+    depTables,
     async tx => {
       const hashToIdFunc = async (
         addressHash: Array<string>
       ): Promise<Array<number>> => {
-        const rows = await GetOrAddAddress.addByHash(
+        const rows = await deps.GetOrAddAddress.addByHash(
           request.db, tx,
           addressHash
         );
@@ -246,16 +254,23 @@ export async function createHardwareWallet(request: {
   if (request.accountIndex < HARD_DERIVATION_START) {
     throw new Error('createHardwareWallet needs hardened index');
   }
+  const deps = Object.freeze({
+    GetOrAddAddress,
+  });
+  const depTables = Object
+    .keys(deps)
+    .map(key => deps[key])
+    .flatMap(table => getAllSchemaTables(request.db, table));
   // Note: we generate initial addresses in a separate database query
   // from creation of the actual wallet
   const initialDerivations = await raii(
     request.db,
-    getAllSchemaTables(request.db, GetOrAddAddress),
+    depTables,
     async tx => {
       const hashToIdFunc = async (
         addressHash: Array<string>
       ): Promise<Array<number>> => {
-        const rows = await GetOrAddAddress.addByHash(
+        const rows = await deps.GetOrAddAddress.addByHash(
           request.db, tx,
           addressHash
         );
@@ -427,17 +442,24 @@ async function addPublicDeriverToMigratedWallet<
     RustModule.Wallet.PublicKey.from_hex(request.accountPubKey),
     RustModule.Wallet.DerivationScheme.v2()
   );
+  const deps = Object.freeze({
+    GetOrAddAddress,
+  });
+  const depTables = Object
+    .keys(deps)
+    .map(key => deps[key])
+    .flatMap(table => getAllSchemaTables(request.db, table));
 
   // Note: we generate initial addresses in a separate database query
   // from creation of the actual wallet
   const initialDerivations = await raii(
     request.db,
-    getAllSchemaTables(request.db, GetOrAddAddress),
+    depTables,
     async tx => {
       const hashToIdFunc = async (
         addressHash: Array<string>
       ): Promise<Array<number>> => {
-        const rows = await GetOrAddAddress.addByHash(
+        const rows = await deps.GetOrAddAddress.addByHash(
           request.db, tx,
           addressHash
         );

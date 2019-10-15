@@ -71,7 +71,7 @@ import type {
 export async function rawGetUtxoTransactions(
   db: lf$Database,
   dbTx: lf$Transaction,
-  depTables: {|
+  deps: {|
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
@@ -94,14 +94,14 @@ export async function rawGetUtxoTransactions(
   const addresses = await request.addressFetch.rawGetAllAddresses(
     dbTx,
     {
-      GetPathWithSpecific: depTables.GetPathWithSpecific,
-      GetAddress: depTables.GetAddress,
-      GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
+      GetPathWithSpecific: deps.GetPathWithSpecific,
+      GetAddress: deps.GetAddress,
+      GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
     },
     undefined,
   );
   const addressIds = addresses.map(address => address.addr.AddressId);
-  const txIds = await depTables.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
+  const txIds = await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
     db, dbTx,
     { addressIds }
   );
@@ -111,7 +111,7 @@ export async function rawGetUtxoTransactions(
   for (const tx of txs) {
     blockMap.set(tx.Transaction.TransactionId, tx.Block);
   }
-  const txsWithIOs = await depTables.AssociateTxWithUtxoIOs.mergeTxWithIO(
+  const txsWithIOs = await deps.AssociateTxWithUtxoIOs.mergeTxWithIO(
     db, dbTx,
     { txs: txs.map(txWithBlock => txWithBlock.Transaction) }
   );
@@ -364,7 +364,7 @@ export async function updateTransactions(
 async function rollback(
   db: lf$Database,
   dbTx: lf$Transaction,
-  depTables: {|
+  deps: {|
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
@@ -384,7 +384,7 @@ async function rollback(
     lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
   }
 ): Promise<void> {
-  const { TransactionSeed, } = await depTables.GetEncryptionMeta.get(db, dbTx);
+  const { TransactionSeed, } = await deps.GetEncryptionMeta.get(db, dbTx);
 
   // if we've never succcessfully sync'd from the server, no need to rollback
   const lastSyncSlotNum = request.lastSyncInfo.SlotNum;
@@ -396,17 +396,17 @@ async function rollback(
   const addresses = await request.publicDeriver.rawGetAllAddresses(
     dbTx,
     {
-      GetPathWithSpecific: depTables.GetPathWithSpecific,
-      GetAddress: depTables.GetAddress,
-      GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
+      GetPathWithSpecific: deps.GetPathWithSpecific,
+      GetAddress: deps.GetAddress,
+      GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
     },
     undefined,
   );
-  const txIds = await depTables.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
+  const txIds = await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
     db, dbTx,
     { addressIds: addresses.map(address => address.addr.AddressId) }
   );
-  const bestInStorage = await depTables.GetTxAndBlock.firstTxBefore(
+  const bestInStorage = await deps.GetTxAndBlock.firstTxBefore(
     db, dbTx,
     {
       txIds,
@@ -420,7 +420,7 @@ async function rollback(
 
   // 2) Get latest k transactions
 
-  const txsToRevert = await depTables.GetTxAndBlock.gteSlot(
+  const txsToRevert = await deps.GetTxAndBlock.gteSlot(
     db, dbTx,
     { txIds, slot: bestInStorage.Block.SlotNum - STABLE_SIZE }
   );
@@ -433,7 +433,7 @@ async function rollback(
   for (const tx of txsToRevert) {
     // we keep both the block in the tx in history
     // because we need this information to show the fail tx information to the user
-    await ModifyUtxoTransaction.updateStatus(
+    await deps.ModifyUtxoTransaction.updateStatus(
       db, dbTx,
       {
         status: TxStatusCodes.ROLLBACK_FAIL,
@@ -447,9 +447,9 @@ async function rollback(
   await markAllInputs(
     db, dbTx,
     {
-      MarkUtxo: depTables.MarkUtxo,
-      GetUtxoInputs: depTables.GetUtxoInputs,
-      GetTransaction: depTables.GetTransaction,
+      MarkUtxo: deps.MarkUtxo,
+      GetUtxoInputs: deps.GetUtxoInputs,
+      GetTransaction: deps.GetTransaction,
     }, {
       inputTxIds: txsToRevert.map(tx => tx.Transaction.TransactionId),
       allTxIds: txIds,
@@ -459,7 +459,7 @@ async function rollback(
   );
 
   // 5) marked pending transactions as failed
-  const pendingTxs = await depTables.GetTransaction.withStatus(
+  const pendingTxs = await deps.GetTransaction.withStatus(
     db, dbTx,
     {
       txIds,
@@ -468,7 +468,7 @@ async function rollback(
   );
   for (const pendingTx of pendingTxs) {
     // TODO: would be faster if this was batched
-    await ModifyUtxoTransaction.updateStatus(
+    await deps.ModifyUtxoTransaction.updateStatus(
       db, dbTx,
       {
         transaction: pendingTx,
@@ -478,11 +478,11 @@ async function rollback(
   }
 
   // 6) Rollback LastSyncTable
-  const bestStillIncluded = await depTables.GetTxAndBlock.firstTxBefore(
+  const bestStillIncluded = await deps.GetTxAndBlock.firstTxBefore(
     db, dbTx,
     { txIds, slot: bestInStorage.Block.SlotNum - STABLE_SIZE }
   );
-  await ModifyLastSyncInfo.overrideLastSyncInfo(
+  await deps.ModifyLastSyncInfo.overrideLastSyncInfo(
     db, dbTx,
     {
       LastSyncInfoId: request.lastSyncInfo.LastSyncInfoId,
@@ -499,7 +499,7 @@ async function rollback(
 async function rawUpdateTransactions(
   db: lf$Database,
   dbTx: lf$Transaction,
-  depTables: {|
+  deps: {|
     GetLastSyncForPublicDeriver: Class<GetLastSyncForPublicDeriver>,
     ModifyLastSyncInfo: Class<ModifyLastSyncInfo>,
     GetKeyForPublicDeriver: Class<GetKeyForPublicDeriver>,
@@ -555,16 +555,16 @@ async function rawUpdateTransactions(
       await iPublicDeriver.rawScanAddresses(
         dbTx,
         {
-          GetKeyForPublicDeriver: depTables.GetKeyForPublicDeriver,
-          GetAddress: depTables.GetAddress,
-          GetPathWithSpecific: depTables.GetPathWithSpecific,
-          GetUtxoTxOutputsWithTx: depTables.GetUtxoTxOutputsWithTx,
-          GetOrAddAddress: depTables.GetOrAddAddress,
-          GetPublicDeriver: depTables.GetPublicDeriver,
-          AddBip44Tree: depTables.AddBip44Tree,
-          ModifyDisplayCutoff: depTables.ModifyDisplayCutoff,
-          GetDerivationsByPath: depTables.GetDerivationsByPath,
-          GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
+          GetKeyForPublicDeriver: deps.GetKeyForPublicDeriver,
+          GetAddress: deps.GetAddress,
+          GetPathWithSpecific: deps.GetPathWithSpecific,
+          GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx,
+          GetOrAddAddress: deps.GetOrAddAddress,
+          GetPublicDeriver: deps.GetPublicDeriver,
+          AddBip44Tree: deps.AddBip44Tree,
+          ModifyDisplayCutoff: deps.ModifyDisplayCutoff,
+          GetDerivationsByPath: deps.GetDerivationsByPath,
+          GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
         },
         { checkAddressesInUse },
       );
@@ -576,18 +576,18 @@ async function rawUpdateTransactions(
     const addresses = await publicDeriver.rawGetAllAddresses(
       dbTx,
       {
-        GetPathWithSpecific: depTables.GetPathWithSpecific,
-        GetAddress: depTables.GetAddress,
-        GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
+        GetPathWithSpecific: deps.GetPathWithSpecific,
+        GetAddress: deps.GetAddress,
+        GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
       },
       undefined,
     );
     const addressIds = addresses.map(address => address.addr.AddressId);
-    const txIds = await depTables.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
+    const txIds = await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
       db, dbTx,
       { addressIds }
     );
-    const bestInStorage = await depTables.GetTxAndBlock.firstTxBefore(
+    const bestInStorage = await deps.GetTxAndBlock.firstTxBefore(
       db, dbTx,
       {
         txIds,
@@ -614,19 +614,19 @@ async function rawUpdateTransactions(
       db,
       dbTx,
       {
-        ModifyUtxoTransaction: depTables.ModifyUtxoTransaction,
-        MarkUtxo: depTables.MarkUtxo,
-        AssociateTxWithUtxoIOs: depTables.AssociateTxWithUtxoIOs,
-        GetEncryptionMeta: depTables.GetEncryptionMeta,
-        GetTransaction: depTables.GetTransaction,
-        GetUtxoInputs: depTables.GetUtxoInputs,
+        ModifyUtxoTransaction: deps.ModifyUtxoTransaction,
+        MarkUtxo: deps.MarkUtxo,
+        AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
+        GetEncryptionMeta: deps.GetEncryptionMeta,
+        GetTransaction: deps.GetTransaction,
+        GetUtxoInputs: deps.GetUtxoInputs,
       },
       {
         utxoAddressIds: addressIds,
         txsFromNetwork,
         hashToIds: rawGenHashToIdsFunc(
           db, dbTx,
-          { GetOrAddAddress: depTables.GetOrAddAddress },
+          { GetOrAddAddress: deps.GetOrAddAddress },
           new Set(addresses.map(address => address.addr.AddressId))
         ),
         toAbsoluteSlotNumber,
@@ -635,7 +635,7 @@ async function rawUpdateTransactions(
   }
 
   // 5) update last sync
-  await ModifyLastSyncInfo.overrideLastSyncInfo(
+  await deps.ModifyLastSyncInfo.overrideLastSyncInfo(
     db, dbTx,
     {
       LastSyncInfoId: lastSyncInfo.LastSyncInfoId,
@@ -654,7 +654,7 @@ async function rawUpdateTransactions(
 export async function updateTransactionBatch(
   db: lf$Database,
   dbTx: lf$Transaction,
-  depTables: {|
+  deps: {|
     ModifyUtxoTransaction: Class<ModifyUtxoTransaction>,
     MarkUtxo: Class<MarkUtxo>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
@@ -669,9 +669,9 @@ export async function updateTransactionBatch(
     hashToIds: HashToIdsFunc,
   }
 ): Promise<Array<DbTxInChain>> {
-  const { TransactionSeed, BlockSeed } = await depTables.GetEncryptionMeta.get(db, dbTx);
+  const { TransactionSeed, BlockSeed } = await deps.GetEncryptionMeta.get(db, dbTx);
 
-  const txIds = await depTables.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
+  const txIds = await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
     db, dbTx,
     { addressIds: request.utxoAddressIds }
   );
@@ -679,11 +679,11 @@ export async function updateTransactionBatch(
   const matchesInDb = new Map<string, DbTxIO>();
   {
     const digestsForNew = request.txsFromNetwork.map(tx => digetForHash(tx.hash, TransactionSeed));
-    const matchByDigest = await depTables.GetTransaction.byDigest(db, dbTx, {
+    const matchByDigest = await deps.GetTransaction.byDigest(db, dbTx, {
       digests: digestsForNew,
       txIds,
     });
-    const txsWithIOs = await depTables.AssociateTxWithUtxoIOs.mergeTxWithIO(
+    const txsWithIOs = await deps.AssociateTxWithUtxoIOs.mergeTxWithIO(
       db, dbTx,
       { txs: Array.from(matchByDigest.values()) }
     );
@@ -720,7 +720,7 @@ export async function updateTransactionBatch(
       BlockSeed
     );
     modifiedTxIds.add(matchInDb.transaction.TransactionId);
-    const result = await depTables.ModifyUtxoTransaction.updateExisting(
+    const result = await deps.ModifyUtxoTransaction.updateExisting(
       db,
       dbTx,
       {
@@ -757,7 +757,7 @@ export async function updateTransactionBatch(
   );
   const newsTxsIdSet = new Set();
   for (const newTx of newTxsForDb) {
-    const result = await depTables.ModifyUtxoTransaction.addNew(
+    const result = await deps.ModifyUtxoTransaction.addNew(
       db,
       dbTx,
       newTx,
@@ -779,9 +779,9 @@ export async function updateTransactionBatch(
   await markAllInputs(
     db, dbTx,
     {
-      MarkUtxo: depTables.MarkUtxo,
-      GetUtxoInputs: depTables.GetUtxoInputs,
-      GetTransaction: depTables.GetTransaction,
+      MarkUtxo: deps.MarkUtxo,
+      GetUtxoInputs: deps.GetUtxoInputs,
+      GetTransaction: deps.GetTransaction,
     },
     {
       inputTxIds: newTxIds,
@@ -796,7 +796,7 @@ export async function updateTransactionBatch(
 
   // 4) Mark any pending tx that is not found by remote as failed
 
-  const pendingTxs = await depTables.GetTransaction.withStatus(
+  const pendingTxs = await deps.GetTransaction.withStatus(
     db, dbTx,
     {
       txIds, // note: we purposely don't include the txids of transactions we just added
@@ -898,7 +898,7 @@ export async function networkTxToDbTx(
 async function markAllInputs(
   db: lf$Database,
   dbTx: lf$Transaction,
-  depTables: {|
+  deps: {|
     MarkUtxo: Class<MarkUtxo>,
     GetUtxoInputs: Class<GetUtxoInputs>,
     GetTransaction: Class<GetTransaction>,
@@ -910,12 +910,12 @@ async function markAllInputs(
     TransactionSeed: number,
   },
 ): Promise<void> {
-  const inputs = await depTables.GetUtxoInputs.fromTxIds(
+  const inputs = await deps.GetUtxoInputs.fromTxIds(
     db, dbTx,
     { ids: request.inputTxIds },
   );
   const digests = inputs.map(input => digetForHash(input.ParentTxHash, request.TransactionSeed));
-  const txMap = await depTables.GetTransaction.byDigest(
+  const txMap = await deps.GetTransaction.byDigest(
     db, dbTx,
     {
       digests,
@@ -933,7 +933,7 @@ async function markAllInputs(
       // this input doesn't belong to you, so just continue
       continue;
     }
-    await depTables.MarkUtxo.markAs(
+    await deps.MarkUtxo.markAs(
       db, dbTx,
       {
         txId: parentTx.TransactionId,

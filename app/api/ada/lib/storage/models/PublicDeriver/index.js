@@ -155,11 +155,18 @@ export class PublicDeriver implements IPublicDeriver, IRename, IGetLastSyncInfo 
   }
 
   getFullPublicDeriverInfo = async (): Promise<$ReadOnly<PublicDeriverRow>> => {
+    const deps = Object.freeze({
+      GetPublicDeriver,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(this.getDb(), table));
     return await raii(
       this.getDb(),
-      getAllSchemaTables(this.getDb(), GetPublicDeriver),
+      depTables,
       async tx => {
-        const row = await GetPublicDeriver.get(
+        const row = await deps.GetPublicDeriver.get(
           this.getDb(), tx,
           this.#publicDeriverId,
         );
@@ -173,10 +180,10 @@ export class PublicDeriver implements IPublicDeriver, IRename, IGetLastSyncInfo 
 
   rawRename = async (
     tx: lf$Transaction,
-    depTables: {| ModifyPublicDeriver: Class<ModifyPublicDeriver> |},
+    deps: {| ModifyPublicDeriver: Class<ModifyPublicDeriver> |},
     body: IRenameRequest,
   ): Promise<IRenameResponse> => {
-    return await depTables.ModifyPublicDeriver.rename(
+    return await deps.ModifyPublicDeriver.rename(
       this.getDb(), tx,
       {
         pubDeriverId: this.#publicDeriverId,
@@ -187,19 +194,26 @@ export class PublicDeriver implements IPublicDeriver, IRename, IGetLastSyncInfo 
   rename = async (
     body: IRenameRequest,
   ): Promise<IRenameResponse> => {
+    const deps = Object.freeze({
+      ModifyPublicDeriver,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(this.getDb(), table));
     return await raii(
       this.getDb(),
-      getAllSchemaTables(this.getDb(), ModifyPublicDeriver),
-      async tx => this.rawRename(tx, { ModifyPublicDeriver }, body)
+      depTables,
+      async tx => this.rawRename(tx, deps, body)
     );
   };
 
   rawGetLastSyncInfo = async (
     tx: lf$Transaction,
-    depTables: {| GetLastSyncForPublicDeriver: Class<GetLastSyncForPublicDeriver> |},
+    deps: {| GetLastSyncForPublicDeriver: Class<GetLastSyncForPublicDeriver> |},
     _body: IGetLastSyncInfoRequest,
   ): Promise<IGetLastSyncInfoResponse> => {
-    return await depTables.GetLastSyncForPublicDeriver.forId(
+    return await deps.GetLastSyncForPublicDeriver.forId(
       this.getDb(), tx,
       this.#publicDeriverId
     );
@@ -207,10 +221,17 @@ export class PublicDeriver implements IPublicDeriver, IRename, IGetLastSyncInfo 
   getLastSyncInfo = async (
     body: IGetLastSyncInfoRequest,
   ): Promise<IGetLastSyncInfoResponse> => {
+    const deps = Object.freeze({
+      GetLastSyncForPublicDeriver,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(this.getDb(), table));
     return await raii<IGetLastSyncInfoResponse>(
       this.getDb(),
-      getAllSchemaTables(this.getDb(), GetLastSyncForPublicDeriver),
-      async tx => this.rawGetLastSyncInfo(tx, { GetLastSyncForPublicDeriver }, body)
+      depTables,
+      async tx => this.rawGetLastSyncInfo(tx, deps, body)
     );
   }
 }
@@ -229,24 +250,32 @@ export async function refreshPublicDeriverFunctionality(
   currClass = GetAllAddresses(currClass);
   currClass = GetAllUtxos(currClass);
 
-  const publicKey = await raii<null | $ReadOnly<KeyRow>>(
-    db,
-    [
-      ...getAllSchemaTables(db, GetKeyForPublicDeriver),
-    ],
-    async tx => {
-      const derivationAndKey = await GetKeyForPublicDeriver.get(
-        db, tx,
-        pubDeriver.PublicDeriverId,
-        true,
-        false,
-      );
-      if (derivationAndKey.publicKey === undefined) {
-        throw new StaleStateError('implementations::refreshPublicDeriverFunctionality publicKey');
+  let publicKey;
+  {
+    const deps = Object.freeze({
+      GetKeyForPublicDeriver,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(db, table));
+    publicKey = await raii<null | $ReadOnly<KeyRow>>(
+      db,
+      depTables,
+      async tx => {
+        const derivationAndKey = await deps.GetKeyForPublicDeriver.get(
+          db, tx,
+          pubDeriver.PublicDeriverId,
+          true,
+          false,
+        );
+        if (derivationAndKey.publicKey === undefined) {
+          throw new StaleStateError('implementations::refreshPublicDeriverFunctionality publicKey');
+        }
+        return derivationAndKey.publicKey;
       }
-      return derivationAndKey.publicKey;
-    }
-  );
+    );
+  }
 
   currClass = AddFromPublic(currClass);
 
@@ -267,43 +296,63 @@ export async function refreshPublicDeriverFunctionality(
   }
   currClass = GetBalance(GetUtxoBalance(currClass));
 
-  const keyDerivation = await raii<$ReadOnly<KeyDerivationRow>>(
-    db,
-    getAllSchemaTables(db, GetKeyDerivation),
-    async tx => {
-      const keyDerivationRow = await GetKeyDerivation.get(
-        db, tx,
-        pubDeriver.KeyDerivationId,
-      );
-      if (keyDerivationRow === undefined) {
-        throw new StaleStateError('PublicDeriver::refreshPublicDeriverFunctionality keyDerivationRow');
-      }
-      return keyDerivationRow;
-    }
-  );
-
-  const pathToPublic = await raii<Array<number>>(
-    db,
-    getAllSchemaTables(db, GetDerivationsByPath),
-    async tx => {
-      const levelDiff = conceptualWallet.getPublicDeriverLevel() - Bip44DerivationLevels.ROOT.level;
-      const path = await GetDerivationsByPath.getParentPath(
-        db, tx,
-        {
-          startingKey: keyDerivation,
-          numLevels: levelDiff,
-        },
-      );
-      const result: Array<number> = [];
-      for (const derivation of path.slice(1)) {
-        if (derivation.Index == null) {
-          throw new Error('PublicDeriver::refreshPublicDeriverFunctionality null index');
+  let keyDerivation;
+  {
+    const deps = Object.freeze({
+      GetKeyDerivation,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(db, table));
+    keyDerivation = await raii<$ReadOnly<KeyDerivationRow>>(
+      db,
+      depTables,
+      async tx => {
+        const keyDerivationRow = await deps.GetKeyDerivation.get(
+          db, tx,
+          pubDeriver.KeyDerivationId,
+        );
+        if (keyDerivationRow === undefined) {
+          throw new StaleStateError('PublicDeriver::refreshPublicDeriverFunctionality keyDerivationRow');
         }
-        result.push(derivation.Index);
+        return keyDerivationRow;
       }
-      return result;
-    }
-  );
+    );
+  }
+
+  let pathToPublic;
+  {
+    const deps = Object.freeze({
+      GetDerivationsByPath,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(db, table));
+    pathToPublic = await raii<Array<number>>(
+      db,
+      depTables,
+      async tx => {
+        const lvlDiff = conceptualWallet.getPublicDeriverLevel() - Bip44DerivationLevels.ROOT.level;
+        const path = await deps.GetDerivationsByPath.getParentPath(
+          db, tx,
+          {
+            startingKey: keyDerivation,
+            numLevels: lvlDiff,
+          },
+        );
+        const result: Array<number> = [];
+        for (const derivation of path.slice(1)) {
+          if (derivation.Index == null) {
+            throw new Error('PublicDeriver::refreshPublicDeriverFunctionality null index');
+          }
+          result.push(derivation.Index);
+        }
+        return result;
+      }
+    );
+  }
 
   const instance = new currClass({
     publicDeriverId: pubDeriver.PublicDeriverId,
@@ -360,7 +409,7 @@ const AddFromPublicMixin = (
 
   rawAddFromPublic = async (
     tx: lf$Transaction,
-    depTables: {|
+    deps: {|
       GetPublicDeriver: Class<GetPublicDeriver>,
       AddBip44Tree: Class<AddBip44Tree>,
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
@@ -370,14 +419,14 @@ const AddFromPublicMixin = (
     |},
     body: IAddFromPublicRequest,
   ): Promise<IAddFromPublicResponse> => {
-    const pubDeriver = await depTables.GetPublicDeriver.get(
+    const pubDeriver = await deps.GetPublicDeriver.get(
       super.getDb(), tx,
       super.getPublicDeriverId(),
     );
     if (pubDeriver === undefined) {
       throw new Error('AddFromPublic::rawAddFromPublic pubDeriver');
     }
-    await depTables.AddBip44Tree.add(
+    await deps.AddBip44Tree.add(
       super.getDb(), tx,
       {
         derivationId: pubDeriver.KeyDerivationId,
@@ -404,8 +453,8 @@ const AddFromPublicMixin = (
       const currentCutoff = await asDisplayCutoffInstance.rawGetCutoff(
         tx,
         {
-          GetPathWithSpecific: depTables.GetPathWithSpecific,
-          GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
+          GetPathWithSpecific: deps.GetPathWithSpecific,
+          GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
         },
         undefined,
       );
@@ -413,8 +462,8 @@ const AddFromPublicMixin = (
         await asDisplayCutoffInstance.rawSetCutoff(
           tx,
           {
-            ModifyDisplayCutoff: depTables.ModifyDisplayCutoff,
-            GetDerivationsByPath: depTables.GetDerivationsByPath,
+            ModifyDisplayCutoff: deps.ModifyDisplayCutoff,
+            GetDerivationsByPath: deps.GetDerivationsByPath,
           },
           { newIndex: bestNewCuttoff - BIP44_SCAN_SIZE },
         );
@@ -424,24 +473,22 @@ const AddFromPublicMixin = (
   addFromPublic = async (
     body: IAddFromPublicRequest,
   ): Promise<IAddFromPublicResponse> => {
+    const deps = Object.freeze({
+      GetPublicDeriver,
+      AddBip44Tree,
+      ModifyDisplayCutoff,
+      GetDerivationsByPath,
+      GetPathWithSpecific,
+      GetBip44DerivationSpecific,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii<IAddFromPublicResponse>(
       super.getDb(),
-      [
-        ...getAllSchemaTables(super.getDb(), GetPublicDeriver),
-        ...getAllSchemaTables(super.getDb(), AddBip44Tree),
-        ...getAllSchemaTables(super.getDb(), ModifyDisplayCutoff),
-        ...getAllSchemaTables(super.getDb(), GetDerivationsByPath),
-        ...getAllSchemaTables(super.getDb(), GetPathWithSpecific),
-        ...getAllSchemaTables(super.getDb(), GetBip44DerivationSpecific),
-      ],
-      async tx => this.rawAddFromPublic(tx, {
-        GetPublicDeriver,
-        AddBip44Tree,
-        ModifyDisplayCutoff,
-        GetDerivationsByPath,
-        GetPathWithSpecific,
-        GetBip44DerivationSpecific,
-      }, body)
+      depTables,
+      async tx => this.rawAddFromPublic(tx, deps, body)
     );
   }
 };
@@ -472,10 +519,10 @@ const GetPublicKeyMixin = (
 
   rawGetPublicKey = async (
     tx: lf$Transaction,
-    depTables: {| GetKeyForPublicDeriver: Class<GetKeyForPublicDeriver> |},
+    deps: {| GetKeyForPublicDeriver: Class<GetKeyForPublicDeriver> |},
     _body: IGetPublicRequest,
   ): Promise<IGetPublicResponse> => {
-    const derivationAndKey = await depTables.GetKeyForPublicDeriver.get(
+    const derivationAndKey = await deps.GetKeyForPublicDeriver.get(
       super.getDb(), tx,
       super.getPublicDeriverId(),
       true,
@@ -489,16 +536,23 @@ const GetPublicKeyMixin = (
   getPublicKey = async (
     body: IGetPublicRequest,
   ): Promise<IGetPublicResponse> => {
+    const deps = Object.freeze({
+      GetKeyForPublicDeriver,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii(
       super.getDb(),
-      getAllSchemaTables(super.getDb(), GetKeyForPublicDeriver),
-      async tx => this.rawGetPublicKey(tx, { GetKeyForPublicDeriver }, body)
+      depTables,
+      async tx => this.rawGetPublicKey(tx, deps, body)
     );
   }
 
   rawChangePubDeriverPassword = async (
     tx: lf$Transaction,
-    depTables: {|
+    deps: {|
       UpdateGet: Class<UpdateGet>,
       GetKeyForPublicDeriver: Class<GetKeyForPublicDeriver>
     |},
@@ -506,12 +560,12 @@ const GetPublicKeyMixin = (
   ): Promise<IChangePasswordResponse> => {
     const currentRow = await this.rawGetPublicKey(
       tx,
-      { GetKeyForPublicDeriver: depTables.GetKeyForPublicDeriver, },
+      { GetKeyForPublicDeriver: deps.GetKeyForPublicDeriver, },
       undefined,
     );
     return rawChangePassword(
       super.getDb(), tx,
-      { UpdateGet: depTables.UpdateGet, },
+      { UpdateGet: deps.UpdateGet, },
       {
         ...body,
         oldKeyRow: currentRow
@@ -521,17 +575,18 @@ const GetPublicKeyMixin = (
   changePubDeriverPassword = async (
     body: IChangePasswordRequest,
   ): Promise<IChangePasswordResponse> => {
+    const deps = Object.freeze({
+      UpdateGet,
+      GetKeyForPublicDeriver,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii(
       super.getDb(),
-      [
-        ...getAllSchemaTables(super.getDb(), UpdateGet),
-        ...getAllSchemaTables(super.getDb(), GetKeyForPublicDeriver),
-      ],
-      async tx => this.rawChangePubDeriverPassword(
-        tx,
-        { UpdateGet, GetKeyForPublicDeriver },
-        body
-      )
+      depTables,
+      async tx => this.rawChangePubDeriverPassword(tx, deps, body)
     );
   }
 };
@@ -562,7 +617,7 @@ const GetSigningKeyMixin = (
 
   rawGetSigningKey = async (
     tx: lf$Transaction,
-    depTables: {|
+    deps: {|
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetPublicDeriver: Class<GetPublicDeriver>,
       GetKeyDerivation: Class<GetKeyDerivation>,
@@ -581,21 +636,21 @@ const GetSigningKeyMixin = (
       throw new StaleStateError('GetSigningKey::getSigningKey levelDifference<0');
     }
 
-    const pubDeriver = await depTables.GetPublicDeriver.get(
+    const pubDeriver = await deps.GetPublicDeriver.get(
       super.getDb(), tx,
       super.getPublicDeriverId(),
     );
     if (pubDeriver === undefined) {
       throw new Error('GetSigningKey::getSigningKey pubDeriver');
     }
-    const keyDerivation = await depTables.GetKeyDerivation.get(
+    const keyDerivation = await deps.GetKeyDerivation.get(
       super.getDb(), tx,
       pubDeriver.KeyDerivationId,
     );
     if (keyDerivation === undefined) {
       throw new Error('GetSigningKey::getSigningKey keyDerivation');
     }
-    const path = await depTables.GetDerivationsByPath.getParentPath(
+    const path = await deps.GetDerivationsByPath.getParentPath(
       super.getDb(), tx,
       {
         startingKey: keyDerivation,
@@ -606,7 +661,7 @@ const GetSigningKeyMixin = (
     if (privateKeyId === null) {
       throw new Error('GetSigningKey::getSigningKey privateKeyId');
     }
-    const privateKeyRow = await depTables.GetKey.get(
+    const privateKeyRow = await deps.GetKey.get(
       super.getDb(), tx,
       privateKeyId,
     );
@@ -622,25 +677,26 @@ const GetSigningKeyMixin = (
   getSigningKey = async (
     body: IGetSigningKeyRequest,
   ): Promise<IGetSigningKeyResponse> => {
+    const deps = Object.freeze({
+      GetDerivationsByPath,
+      GetPublicDeriver,
+      GetKeyDerivation,
+      GetKey,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii<IGetSigningKeyResponse>(
       super.getDb(),
-      [
-        ...getAllSchemaTables(super.getDb(), GetDerivationsByPath),
-        ...getAllSchemaTables(super.getDb(), GetPublicDeriver),
-        ...getAllSchemaTables(super.getDb(), GetKeyDerivation),
-        ...getAllSchemaTables(super.getDb(), GetKey),
-      ],
-      async tx => this.rawGetSigningKey(
-        tx,
-        { GetDerivationsByPath, GetPublicDeriver, GetKeyDerivation, GetKey },
-        body
-      )
+      depTables,
+      async tx => this.rawGetSigningKey(tx, deps, body)
     );
   }
 
   rawChangeSigningKeyPassword = async (
     tx: lf$Transaction,
-    depTables: {|
+    deps: {|
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetPublicDeriver: Class<GetPublicDeriver>,
       GetKeyDerivation: Class<GetKeyDerivation>,
@@ -652,16 +708,16 @@ const GetSigningKeyMixin = (
     const currentRow = await this.rawGetSigningKey(
       tx,
       {
-        GetDerivationsByPath: depTables.GetDerivationsByPath,
-        GetKey: depTables.GetKey,
-        GetKeyDerivation: depTables.GetKeyDerivation,
-        GetPublicDeriver: depTables.GetPublicDeriver,
+        GetDerivationsByPath: deps.GetDerivationsByPath,
+        GetKey: deps.GetKey,
+        GetKeyDerivation: deps.GetKeyDerivation,
+        GetPublicDeriver: deps.GetPublicDeriver,
       },
       undefined
     );
     return rawChangePassword(
       super.getDb(), tx,
-      { UpdateGet: depTables.UpdateGet, },
+      { UpdateGet: deps.UpdateGet, },
       {
         ...body,
         oldKeyRow: currentRow.row
@@ -671,20 +727,21 @@ const GetSigningKeyMixin = (
   changeSigningKeyPassword = async (
     body: IChangePasswordRequest,
   ): Promise<IChangePasswordResponse> => {
+    const deps = Object.freeze({
+      GetDerivationsByPath,
+      GetPublicDeriver,
+      GetKeyDerivation,
+      GetKey,
+      UpdateGet,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii(
       super.getDb(),
-      [
-        ...getAllSchemaTables(super.getDb(), GetDerivationsByPath),
-        ...getAllSchemaTables(super.getDb(), GetPublicDeriver),
-        ...getAllSchemaTables(super.getDb(), GetKeyDerivation),
-        ...getAllSchemaTables(super.getDb(), GetKey),
-        ...getAllSchemaTables(super.getDb(), UpdateGet),
-      ],
-      async tx => this.rawChangeSigningKeyPassword(
-        tx,
-        { GetDerivationsByPath, GetPublicDeriver, GetKeyDerivation, GetKey, UpdateGet },
-        body
-      )
+      depTables,
+      async tx => this.rawChangeSigningKeyPassword(tx, deps, body)
     );
   }
 
@@ -734,7 +791,7 @@ const GetAllAddressesMixin = (
 
   rawGetAllAddresses = async (
     tx: lf$Transaction,
-    depTables: {|
+    deps: {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
@@ -743,7 +800,7 @@ const GetAllAddressesMixin = (
   ): Promise<IGetAllAddressesResponse> => {
     return rawGetBip44AddressesByPath(
       super.getDb(), tx,
-      depTables,
+      deps,
       {
         startingDerivation: super.getDerivationId(),
         derivationLevel: this.getBip44Parent().getPublicDeriverLevel(),
@@ -757,18 +814,19 @@ const GetAllAddressesMixin = (
   getAllAddresses = async (
     body: IGetAllAddressesRequest,
   ): Promise<IGetAllAddressesResponse> => {
+    const deps = Object.freeze({
+      GetPathWithSpecific,
+      GetAddress,
+      GetBip44DerivationSpecific,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii(
       super.getDb(),
-      [
-        ...getAllSchemaTables(super.getDb(), GetPathWithSpecific),
-        ...getAllSchemaTables(super.getDb(), GetAddress),
-        ...getAllSchemaTables(super.getDb(), GetBip44DerivationSpecific),
-      ],
-      async tx => this.rawGetAllAddresses(
-        tx,
-        { GetPathWithSpecific, GetAddress, GetBip44DerivationSpecific, },
-        body
-      )
+      depTables,
+      async tx => this.rawGetAllAddresses(tx, deps, body)
     );
   }
 };
@@ -799,7 +857,7 @@ const GetAllUtxosMixin = (
 
   rawGetAllUtxos = async (
     tx: lf$Transaction,
-    depTables: {|
+    deps: {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
@@ -810,14 +868,14 @@ const GetAllUtxosMixin = (
     const addresses = await this.rawGetAllAddresses(
       tx,
       {
-        GetAddress: depTables.GetAddress,
-        GetPathWithSpecific: depTables.GetPathWithSpecific,
-        GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
+        GetAddress: deps.GetAddress,
+        GetPathWithSpecific: deps.GetPathWithSpecific,
+        GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
       },
       undefined,
     );
     const addressIds = addresses.map(address => address.row.AddressId);
-    return await depTables.GetUtxoTxOutputsWithTx.getUtxo(
+    return await deps.GetUtxoTxOutputsWithTx.getUtxo(
       super.getDb(), tx,
       addressIds,
     );
@@ -825,19 +883,20 @@ const GetAllUtxosMixin = (
   getAllUtxos = async (
     _body: IGetAllUtxosRequest,
   ): Promise<IGetAllUtxosResponse> => {
+    const deps = Object.freeze({
+      GetPathWithSpecific,
+      GetAddress,
+      GetUtxoTxOutputsWithTx,
+      GetBip44DerivationSpecific,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii<IGetAllUtxosResponse>(
       super.getDb(),
-      [
-        ...getAllSchemaTables(super.getDb(), GetPathWithSpecific),
-        ...getAllSchemaTables(super.getDb(), GetAddress),
-        ...getAllSchemaTables(super.getDb(), GetUtxoTxOutputsWithTx),
-        ...getAllSchemaTables(super.getDb(), GetBip44DerivationSpecific),
-      ],
-      async tx => this.rawGetAllUtxos(
-        tx,
-        { GetPathWithSpecific, GetAddress, GetUtxoTxOutputsWithTx, GetBip44DerivationSpecific },
-        undefined
-      )
+      depTables,
+      async tx => this.rawGetAllUtxos(tx, deps, undefined)
     );
   }
 };
@@ -870,7 +929,7 @@ const DisplayCutoffMixin = (
 
   rawPopAddress  = async (
     tx: lf$Transaction,
-    depTables: {|
+    deps: {|
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetAddress: Class<GetAddress>,
     |},
@@ -880,7 +939,7 @@ const DisplayCutoffMixin = (
       // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
       throw new Error('DisplayCutoffMixin::popAddress incorrect pubderiver level');
     }
-    const nextAddr = await depTables.ModifyDisplayCutoff.pop(
+    const nextAddr = await deps.ModifyDisplayCutoff.pop(
       super.getDb(), tx,
       {
         pubDeriverKeyDerivationId: super.getDerivationId(),
@@ -890,7 +949,7 @@ const DisplayCutoffMixin = (
     if (nextAddr === undefined) {
       throw new UnusedAddressesError();
     }
-    const addrRows = await depTables.GetAddress.getById(
+    const addrRows = await deps.GetAddress.getById(
       super.getDb(), tx,
       [nextAddr.row.AddressId],
     );
@@ -906,19 +965,24 @@ const DisplayCutoffMixin = (
   popAddress = async (
     body: IDisplayCutoffPopRequest,
   ): Promise<IDisplayCutoffPopResponse> => {
+    const deps = Object.freeze({
+      ModifyDisplayCutoff,
+      GetAddress,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii<IDisplayCutoffPopResponse>(
       super.getDb(),
-      [
-        ...getAllSchemaTables(super.getDb(), ModifyDisplayCutoff),
-        ...getAllSchemaTables(super.getDb(), GetAddress),
-      ],
-      async tx => this.rawPopAddress(tx, { ModifyDisplayCutoff, GetAddress, }, body)
+      depTables,
+      async tx => this.rawPopAddress(tx, deps, body)
     );
   }
 
   rawGetCutoff = async (
     tx: lf$Transaction,
-    depTables: {|
+    deps: {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
     |},
@@ -928,7 +992,7 @@ const DisplayCutoffMixin = (
       // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
       throw new Error('DisplayCutoffMixin::getCutoff incorrect pubderiver level');
     }
-    const chain = await depTables.GetPathWithSpecific.getPath<$ReadOnly<Bip44ChainRow>>(
+    const chain = await deps.GetPathWithSpecific.getPath<$ReadOnly<Bip44ChainRow>>(
       super.getDb(), tx,
       {
         pubDeriverKeyDerivationId: super.getDerivationId(),
@@ -962,22 +1026,24 @@ const DisplayCutoffMixin = (
   getCutoff = async (
     body: IDisplayCutoffGetRequest,
   ): Promise<IDisplayCutoffGetResponse> => {
+    const deps = Object.freeze({
+      GetPathWithSpecific,
+      GetBip44DerivationSpecific,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii<IDisplayCutoffGetResponse>(
       super.getDb(),
-      [
-        ...getAllSchemaTables(super.getDb(), GetPathWithSpecific),
-        ...getAllSchemaTables(super.getDb(), GetBip44DerivationSpecific),
-      ],
-      async tx => this.rawGetCutoff(tx, {
-        GetPathWithSpecific,
-        GetBip44DerivationSpecific,
-      }, body)
+      depTables,
+      async tx => this.rawGetCutoff(tx, deps, body)
     );
   }
 
   rawSetCutoff = async (
     tx: lf$Transaction,
-    depTables: {|
+    deps: {|
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
     |},
@@ -987,14 +1053,14 @@ const DisplayCutoffMixin = (
       // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
       throw new Error('DisplayCutoffMixin::popAddress incorrect pubderiver level');
     }
-    const path = await depTables.GetDerivationsByPath.getSinglePath(
+    const path = await deps.GetDerivationsByPath.getSinglePath(
       super.getDb(), tx,
       super.getDerivationId(),
       [0]
     );
     const chain = path[path.length - 1];
 
-    await depTables.ModifyDisplayCutoff.set(
+    await deps.ModifyDisplayCutoff.set(
       super.getDb(), tx,
       {
         derivationId: chain.KeyDerivationId,
@@ -1005,13 +1071,18 @@ const DisplayCutoffMixin = (
   setCutoff = async (
     body: IDisplayCutoffSetRequest,
   ): Promise<IDisplayCutoffSetResponse> => {
+    const deps = Object.freeze({
+      ModifyDisplayCutoff,
+      GetDerivationsByPath,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii<IDisplayCutoffSetResponse>(
       super.getDb(),
-      [
-        ...getAllSchemaTables(super.getDb(), ModifyDisplayCutoff),
-        ...getAllSchemaTables(super.getDb(), GetDerivationsByPath),
-      ],
-      async tx => this.rawSetCutoff(tx, { ModifyDisplayCutoff, GetDerivationsByPath, }, body)
+      depTables,
+      async tx => this.rawSetCutoff(tx, deps, body)
     );
   }
 };
@@ -1043,7 +1114,7 @@ const HasChainsMixin = (
 
   rawGetAddressesForChain = async (
     tx: lf$Transaction,
-    depTables: {|
+    deps: {|
       GetAddress: Class<GetAddress>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
@@ -1056,7 +1127,7 @@ const HasChainsMixin = (
     }
     return rawGetBip44AddressesByPath(
       super.getDb(), tx,
-      depTables,
+      deps,
       {
         startingDerivation: super.getDerivationId(),
         derivationLevel: this.getBip44Parent().getPublicDeriverLevel(),
@@ -1068,24 +1139,25 @@ const HasChainsMixin = (
   getAddressesForChain = async (
     body: IHasChainsRequest,
   ): Promise<IHasChainsResponse> => {
+    const deps = Object.freeze({
+      GetAddress,
+      GetPathWithSpecific,
+      GetBip44DerivationSpecific,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii(
       super.getDb(),
-      [
-        ...getAllSchemaTables(super.getDb(), GetAddress),
-        ...getAllSchemaTables(super.getDb(), GetPathWithSpecific),
-        ...getAllSchemaTables(super.getDb(), GetBip44DerivationSpecific),
-      ],
-      async tx => this.rawGetAddressesForChain(
-        tx,
-        { GetAddress, GetPathWithSpecific, GetBip44DerivationSpecific, },
-        body
-      )
+      depTables,
+      async tx => this.rawGetAddressesForChain(tx, deps, body)
     );
   }
 
   rawNextInternal = async (
     tx: lf$Transaction,
-    depTables: {|
+    deps: {|
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
       GetAddress: Class<GetAddress>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
@@ -1096,35 +1168,35 @@ const HasChainsMixin = (
     const internalAddresses = await this.rawGetAddressesForChain(
       tx,
       {
-        GetAddress: depTables.GetAddress,
-        GetPathWithSpecific: depTables.GetPathWithSpecific,
-        GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
+        GetAddress: deps.GetAddress,
+        GetPathWithSpecific: deps.GetPathWithSpecific,
+        GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
       },
       { chainId: INTERNAL },
     );
     return await rawGetNextUnusedIndex(
       super.getDb(), tx,
-      { GetUtxoTxOutputsWithTx: depTables.GetUtxoTxOutputsWithTx, },
+      { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx, },
       { addressesForChain: internalAddresses },
     );
   }
   nextInternal = async (
     body: IGetNextUnusedForChainRequest,
   ): Promise<IGetNextUnusedForChainResponse> => {
+    const deps = Object.freeze({
+      GetUtxoTxOutputsWithTx,
+      GetAddress,
+      GetPathWithSpecific,
+      GetBip44DerivationSpecific,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii(
       super.getDb(),
-      [
-        ...getAllSchemaTables(super.getDb(), GetUtxoTxOutputsWithTx),
-        ...getAllSchemaTables(super.getDb(), GetAddress),
-        ...getAllSchemaTables(super.getDb(), GetPathWithSpecific),
-        ...getAllSchemaTables(super.getDb(), GetBip44DerivationSpecific),
-      ],
-      async tx => this.rawNextInternal(tx, {
-        GetAddress,
-        GetPathWithSpecific,
-        GetUtxoTxOutputsWithTx,
-        GetBip44DerivationSpecific,
-      }, body)
+      depTables,
+      async tx => this.rawNextInternal(tx, deps, body)
     );
   }
 };
@@ -1183,7 +1255,7 @@ const GetUtxoBalanceMixin = (
 
   rawGetBalance = async (
     tx: lf$Transaction,
-    depTables: {|
+    deps: {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
@@ -1194,10 +1266,10 @@ const GetUtxoBalanceMixin = (
     const utxos = await this.rawGetAllUtxos(
       tx,
       {
-        GetAddress: depTables.GetAddress,
-        GetPathWithSpecific: depTables.GetPathWithSpecific,
-        GetUtxoTxOutputsWithTx: depTables.GetUtxoTxOutputsWithTx,
-        GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
+        GetAddress: deps.GetAddress,
+        GetPathWithSpecific: deps.GetPathWithSpecific,
+        GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx,
+        GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
       },
       undefined
     );
@@ -1206,19 +1278,20 @@ const GetUtxoBalanceMixin = (
   getBalance = async (
     _body: IGetUtxoBalanceRequest,
   ): Promise<IGetUtxoBalanceResponse> => {
+    const deps = Object.freeze({
+      GetPathWithSpecific,
+      GetAddress,
+      GetUtxoTxOutputsWithTx,
+      GetBip44DerivationSpecific,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii<IGetUtxoBalanceResponse>(
       super.getDb(),
-      [
-        ...getAllSchemaTables(super.getDb(), GetPathWithSpecific),
-        ...getAllSchemaTables(super.getDb(), GetAddress),
-        ...getAllSchemaTables(super.getDb(), GetUtxoTxOutputsWithTx),
-        ...getAllSchemaTables(super.getDb(), GetBip44DerivationSpecific),
-      ],
-      async tx => this.rawGetBalance(
-        tx,
-        { GetPathWithSpecific, GetAddress, GetUtxoTxOutputsWithTx, GetBip44DerivationSpecific, },
-        undefined
-      )
+      depTables,
+      async tx => this.rawGetBalance(tx, deps, undefined)
     );
   }
 };
@@ -1272,7 +1345,7 @@ const ScanUtxoAccountAddressesMixin = (
 ) => class ScanUtxoAccountAddresses extends superclass implements IScanAddresses {
   rawScanAddresses = async (
     tx: lf$Transaction,
-    depTables: {|
+    deps: {|
       GetKeyForPublicDeriver: Class<GetKeyForPublicDeriver>,
       GetAddress: Class<GetAddress>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
@@ -1288,7 +1361,7 @@ const ScanUtxoAccountAddressesMixin = (
   ): Promise<IScanAddressesResponse> => {
     const pubKey = await this.rawGetPublicKey(
       tx,
-      { GetKeyForPublicDeriver: depTables.GetKeyForPublicDeriver },
+      { GetKeyForPublicDeriver: deps.GetKeyForPublicDeriver },
       undefined
     );
     const decryptedKey = decryptKey(
@@ -1299,29 +1372,29 @@ const ScanUtxoAccountAddressesMixin = (
     const internalAddresses = await this.rawGetAddressesForChain(
       tx,
       {
-        GetAddress: depTables.GetAddress,
-        GetPathWithSpecific: depTables.GetPathWithSpecific,
-        GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
+        GetAddress: deps.GetAddress,
+        GetPathWithSpecific: deps.GetPathWithSpecific,
+        GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
       },
       { chainId: INTERNAL },
     );
     const nextUnusedInternal = await rawGetNextUnusedIndex(
       super.getDb(), tx,
-      { GetUtxoTxOutputsWithTx: depTables.GetUtxoTxOutputsWithTx, },
+      { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx, },
       { addressesForChain: internalAddresses },
     );
     const externalAddresses = await this.rawGetAddressesForChain(
       tx,
       {
-        GetAddress: depTables.GetAddress,
-        GetPathWithSpecific: depTables.GetPathWithSpecific,
-        GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
+        GetAddress: deps.GetAddress,
+        GetPathWithSpecific: deps.GetPathWithSpecific,
+        GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
       },
       { chainId: EXTERNAL },
     );
     const nextUnusedExternal = await rawGetNextUnusedIndex(
       super.getDb(), tx,
-      { GetUtxoTxOutputsWithTx: depTables.GetUtxoTxOutputsWithTx, },
+      { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx, },
       { addressesForChain: externalAddresses }
     );
     const newToInsert = await scanAccountByVersion({
@@ -1332,7 +1405,7 @@ const ScanUtxoAccountAddressesMixin = (
       checkAddressesInUse: body.checkAddressesInUse,
       hashToIds: rawGenHashToIdsFunc(
         super.getDb(), tx,
-        { GetOrAddAddress: depTables.GetOrAddAddress },
+        { GetOrAddAddress: deps.GetOrAddAddress },
         new Set([
           ...internalAddresses.map(address => address.addr.AddressId),
           ...externalAddresses.map(address => address.addr.AddressId),
@@ -1343,12 +1416,12 @@ const ScanUtxoAccountAddressesMixin = (
     await this.rawAddFromPublic(
       tx,
       {
-        GetPublicDeriver: depTables.GetPublicDeriver,
-        AddBip44Tree: depTables.AddBip44Tree,
-        ModifyDisplayCutoff: depTables.ModifyDisplayCutoff,
-        GetDerivationsByPath: depTables.GetDerivationsByPath,
-        GetPathWithSpecific: depTables.GetPathWithSpecific,
-        GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
+        GetPublicDeriver: deps.GetPublicDeriver,
+        AddBip44Tree: deps.AddBip44Tree,
+        ModifyDisplayCutoff: deps.ModifyDisplayCutoff,
+        GetDerivationsByPath: deps.GetDerivationsByPath,
+        GetPathWithSpecific: deps.GetPathWithSpecific,
+        GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
       },
       { tree: newToInsert },
     );

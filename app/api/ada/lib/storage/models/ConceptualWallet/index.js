@@ -65,11 +65,18 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
   rename = async (
     body: IRenameRequest,
   ): Promise<IRenameResponse> => {
+    const deps = Object.freeze({
+      ModifyConceptualWallet,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(this.db, table));
     return await raii<IRenameResponse>(
       this.db,
-      getAllSchemaTables(this.db, ModifyConceptualWallet),
+      depTables,
       async tx => {
-        await ModifyConceptualWallet.rename(
+        await deps.ModifyConceptualWallet.rename(
           this.db, tx,
           {
             walletId: this.#conceptualWalletId,
@@ -81,11 +88,18 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
   }
 
   getFullConceptualWalletInfo = async (): Promise<$ReadOnly<ConceptualWalletRow>> => {
+    const deps = Object.freeze({
+      GetConceptualWallet,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(this.db, table));
     return await raii(
       this.db,
-      getAllSchemaTables(this.db, GetConceptualWallet),
+      depTables,
       async tx => {
-        const row = await GetConceptualWallet.get(
+        const row = await deps.GetConceptualWallet.get(
           this.db, tx,
           this.#conceptualWalletId,
         );
@@ -137,10 +151,17 @@ export async function refreshConceptualWalletFunctionality(
   db: lf$Database,
   conceptualWalletId: number,
 ): Promise<IConceptualWalletConstructor> {
+  const deps = Object.freeze({
+    GetHwWalletMeta,
+  });
+  const depTables = Object
+    .keys(deps)
+    .map(key => deps[key])
+    .flatMap(table => getAllSchemaTables(db, table));
   const hardwareInfo = await raii<void | $ReadOnly<HwWalletMetaRow>>(
     db,
-    getAllSchemaTables(db, GetHwWalletMeta),
-    async tx => await GetHwWalletMeta.getMeta(
+    depTables,
+    async tx => await deps.GetHwWalletMeta.getMeta(
       db, tx,
       conceptualWalletId,
     )

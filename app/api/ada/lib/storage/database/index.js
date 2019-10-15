@@ -26,18 +26,23 @@ export const loadLovefieldDB = async (
 ): Promise<lf$Database> => {
   const db = await populateAndCreate(storeType);
 
+  const deps = Object.freeze({
+    GetEncryptionMeta,
+    ModifyEncryptionMeta,
+  });
+  const depTables = Object
+    .keys(deps)
+    .map(key => deps[key])
+    .flatMap(table => getAllSchemaTables(db, table));
   await raii(
     db,
-    [
-      ...getAllSchemaTables(db, GetEncryptionMeta),
-      ...getAllSchemaTables(db, ModifyEncryptionMeta),
-    ],
+    depTables,
     async tx => {
-      const hasMeta = await GetEncryptionMeta.exists(
+      const hasMeta = await deps.GetEncryptionMeta.exists(
         db, tx,
       );
       if (!hasMeta) {
-        await ModifyEncryptionMeta.setInitial(
+        await deps.ModifyEncryptionMeta.setInitial(
           db, tx,
           {
             EncryptionMetaId: 0,

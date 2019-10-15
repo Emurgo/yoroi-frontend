@@ -37,7 +37,7 @@ import type {
 
 type RawVariation<Func, Deps, Arg> = (
   tx: lf$Transaction,
-  depTables: Deps,
+  deps: Deps,
   // should be able to extract Arg type with a $Call on Func
   // but for some reason it isn't working :/
   body: Arg,

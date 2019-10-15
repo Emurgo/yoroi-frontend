@@ -195,7 +195,7 @@ export async function rawGetDerivationsByPath<
 >(
   db: lf$Database,
   tx: lf$Transaction,
-  depTables: {|
+  deps: {|
     GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
     GetPathWithSpecific: Class<GetPathWithSpecific>,
   |},
@@ -205,11 +205,11 @@ export async function rawGetDerivationsByPath<
   row: $ReadOnly<Row>,
   ...Addressing,
 |}>> {
-  const pathWithSpecific = await depTables.GetPathWithSpecific.getTree<Row>(
+  const pathWithSpecific = await deps.GetPathWithSpecific.getTree<Row>(
     db, tx,
     request,
     async (derivationIds) => {
-      const result = await GetBip44DerivationSpecific.get<Row>(
+      const result = await deps.GetBip44DerivationSpecific.get<Row>(
         db, tx,
         derivationIds,
         level,
@@ -237,13 +237,13 @@ export type HashToIdsFunc = Array<string> => Promise<Map<string, number>>;
 export function rawGenHashToIdsFunc(
   db: lf$Database,
   tx: lf$Transaction,
-  depTables: {| GetOrAddAddress: Class<GetOrAddAddress> |},
+  deps: {| GetOrAddAddress: Class<GetOrAddAddress> |},
   ownAddressIds: Set<number>,
 ): HashToIdsFunc {
   return async (
     hashes: Array<string>
   ): Promise<Map<string, number>> => {
-    const rows = await depTables.GetOrAddAddress.getByHash(db, tx, hashes);
+    const rows = await deps.GetOrAddAddress.getByHash(db, tx, hashes);
     const addressRowMap: Map<string, Array<$ReadOnly<AddressRow>>> = rows.reduce(
       (map, nextElement) => {
         const array = map.get(nextElement.Hash) || [];
@@ -275,7 +275,7 @@ export function rawGenHashToIdsFunc(
         notFound.push(address);
       }
     }
-    const newEntries = await depTables.GetOrAddAddress.addByHash(db, tx, notFound);
+    const newEntries = await deps.GetOrAddAddress.addByHash(db, tx, notFound);
     for (let i = 0; i < newEntries.length; i++) {
       finalMapping.set(notFound[i], newEntries[i].AddressId);
     }
@@ -286,7 +286,7 @@ export function rawGenHashToIdsFunc(
 export async function rawGetBip44AddressesByPath(
   db: lf$Database,
   tx: lf$Transaction,
-  depTables: {
+  deps: {
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
     GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
@@ -300,14 +300,14 @@ export async function rawGetBip44AddressesByPath(
   const bip44Addresses = await rawGetDerivationsByPath<Bip44AddressRow>(
     db, tx,
     {
-      GetPathWithSpecific: depTables.GetPathWithSpecific,
-      GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
+      GetPathWithSpecific: deps.GetPathWithSpecific,
+      GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
     },
     request,
     Bip44DerivationLevels.ADDRESS.level,
   );
   // Note: simple get since we know these addresses exist
-  const addressRows = await depTables.GetAddress.getById(
+  const addressRows = await deps.GetAddress.getById(
     db, tx,
     bip44Addresses.map(row => row.row.AddressId),
   );
@@ -349,12 +349,12 @@ export function getLastUsedIndex(request: {
 export async function rawGetUtxoUsedStatus(
   db: lf$Database,
   tx: lf$Transaction,
-  depTables: {| GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>, |},
+  deps: {| GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>, |},
   request: {
     addressIds: Array<number>,
   },
 ): Promise<Set<number>> {
-  const outputs = await depTables.GetUtxoTxOutputsWithTx.getOutputsForAddresses(
+  const outputs = await deps.GetUtxoTxOutputsWithTx.getOutputsForAddresses(
     db, tx,
     request.addressIds,
     [TxStatusCodes.IN_BLOCK]
@@ -365,7 +365,7 @@ export async function rawGetUtxoUsedStatus(
 export async function rawGetAddressesForDisplay(
   db: lf$Database,
   tx: lf$Transaction,
-  depTables: {|
+  deps: {|
     GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
   |},
   request: {
@@ -375,10 +375,10 @@ export async function rawGetAddressesForDisplay(
   const addressIds = request.addresses.map(address => address.addr.AddressId);
   const utxosForAddresses = await rawGetUtxoUsedStatus(
     db, tx,
-    { GetUtxoTxOutputsWithTx: depTables.GetUtxoTxOutputsWithTx },
+    { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx },
     { addressIds },
   );
-  const utxoForAddresses = await depTables.GetUtxoTxOutputsWithTx.getUtxo(
+  const utxoForAddresses = await deps.GetUtxoTxOutputsWithTx.getUtxo(
     db, tx,
     addressIds,
   );
@@ -394,7 +394,7 @@ export async function rawGetAddressesForDisplay(
 
 export async function rawGetChainAddressesForDisplay(
   tx: lf$Transaction,
-  depTables: {|
+  deps: {|
     GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
     GetAddress: Class<GetAddress>,
     GetPathWithSpecific: Class<GetPathWithSpecific>,
@@ -408,9 +408,9 @@ export async function rawGetChainAddressesForDisplay(
   const addresses = await request.publicDeriver.rawGetAddressesForChain(
     tx,
     {
-      GetAddress: depTables.GetAddress,
-      GetPathWithSpecific: depTables.GetPathWithSpecific,
-      GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
+      GetAddress: deps.GetAddress,
+      GetPathWithSpecific: deps.GetPathWithSpecific,
+      GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
     },
     request.chainsRequest
   );
@@ -419,8 +419,8 @@ export async function rawGetChainAddressesForDisplay(
     const cutoff = await request.publicDeriver.rawGetCutoff(
       tx,
       {
-        GetPathWithSpecific: depTables.GetPathWithSpecific,
-        GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
+        GetPathWithSpecific: deps.GetPathWithSpecific,
+        GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
       },
       undefined,
     );
@@ -430,7 +430,7 @@ export async function rawGetChainAddressesForDisplay(
   }
   let addressResponse = await rawGetAddressesForDisplay(
     request.publicDeriver.getDb(), tx,
-    { GetUtxoTxOutputsWithTx: depTables.GetUtxoTxOutputsWithTx },
+    { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx },
     { addresses: belowCutoff },
   );
   if (request.chainsRequest.chainId === INTERNAL) {
@@ -477,7 +477,7 @@ export async function getChainAddressesForDisplay(
 }
 export async function rawGetAllAddressesForDisplay(
   tx: lf$Transaction,
-  depTables: {|
+  deps: {|
     GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
     GetAddress: Class<GetAddress>,
     GetPathWithSpecific: Class<GetPathWithSpecific>,
@@ -490,9 +490,9 @@ export async function rawGetAllAddressesForDisplay(
   let addresses = await request.publicDeriver.rawGetAllAddresses(
     tx,
     {
-      GetAddress: depTables.GetAddress,
-      GetPathWithSpecific: depTables.GetPathWithSpecific,
-      GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
+      GetAddress: deps.GetAddress,
+      GetPathWithSpecific: deps.GetPathWithSpecific,
+      GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
     },
     undefined,
   );
@@ -502,8 +502,8 @@ export async function rawGetAllAddressesForDisplay(
     const cutoff = await hasCutoff.rawGetCutoff(
       tx,
       {
-        GetPathWithSpecific: depTables.GetPathWithSpecific,
-        GetBip44DerivationSpecific: depTables.GetBip44DerivationSpecific,
+        GetPathWithSpecific: deps.GetPathWithSpecific,
+        GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
       },
       undefined,
     );
@@ -513,7 +513,7 @@ export async function rawGetAllAddressesForDisplay(
   }
   return await rawGetAddressesForDisplay(
     request.publicDeriver.getDb(), tx,
-    { GetUtxoTxOutputsWithTx: depTables.GetUtxoTxOutputsWithTx },
+    { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx },
     { addresses },
   );
 }
@@ -546,7 +546,7 @@ export async function getAllAddressesForDisplay(
 export async function rawGetNextUnusedIndex(
   db: lf$Database,
   tx: lf$Transaction,
-  depTables: {|
+  deps: {|
     GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
   |},
   request:  {|
@@ -555,7 +555,7 @@ export async function rawGetNextUnusedIndex(
 ): Promise<IGetNextUnusedForChainResponse> {
   const usedStatus = await rawGetUtxoUsedStatus(
     db, tx,
-    { GetUtxoTxOutputsWithTx: depTables.GetUtxoTxOutputsWithTx },
+    { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx },
     { addressIds: request.addressesForChain.map(address => address.addr.AddressId) }
   );
   const lastUsedIndex = getLastUsedIndex({
@@ -607,7 +607,7 @@ export function getBalanceForUtxos(
 export async function rawChangePassword(
   db: lf$Database,
   tx: lf$Transaction,
-  depTables: { UpdateGet: Class<UpdateGet> },
+  deps: { UpdateGet: Class<UpdateGet> },
   request: IChangePasswordRequest & {
     oldKeyRow: $ReadOnly<KeyRow>,
   },
@@ -632,7 +632,7 @@ export async function rawChangePassword(
     PasswordLastUpdate: request.currentTime,
   };
 
-  return await depTables.UpdateGet.update(
+  return await deps.UpdateGet.update(
     db, tx,
     newRow,
   );

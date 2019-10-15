@@ -142,13 +142,18 @@ export async function refreshBip44WalletFunctionality(
 
   let currClass = Bip44Wallet;
 
+  const deps = Object.freeze({
+    GetPrivateDeriver,
+  });
+  const depTables = Object
+    .keys(deps)
+    .map(key => deps[key])
+    .flatMap(table => getAllSchemaTables(db, table));
   const privateDeriverRow = await raii<void | $ReadOnly<PrivateDeriverRow>>(
     db,
-    [
-      ...getAllSchemaTables(db, GetPrivateDeriver),
-    ],
+    depTables,
     async tx => {
-      const privateDeriver = await GetPrivateDeriver.fromBip44Wrapper(
+      const privateDeriver = await deps.GetPrivateDeriver.fromBip44Wrapper(
         db, tx,
         row.Bip44WrapperId,
       );
@@ -181,12 +186,12 @@ export async function refreshBip44WalletFunctionality(
 export async function derivePublicDeriver<Row>(
   db: lf$Database,
   tx: lf$Transaction,
-  depTables: {| DerivePublicFromPrivate: Class<DerivePublicFromPrivate> |},
+  deps: {| DerivePublicFromPrivate: Class<DerivePublicFromPrivate> |},
   bip44WrapperId: number,
   version: number,
   body: IDerivePublicFromPrivateRequest,
 ): Promise<IDerivePublicFromPrivateResponse<Row>> {
-  const result = await depTables.DerivePublicFromPrivate.add<Row>(
+  const result = await deps.DerivePublicFromPrivate.add<Row>(
     db, tx,
     bip44WrapperId,
     {
@@ -231,13 +236,13 @@ const PublicFromPrivateMixin = (
 
   rawDerivePublicDeriverFromPrivate = async <Row>(
     tx: lf$Transaction,
-    depTables: {| DerivePublicFromPrivate: Class<DerivePublicFromPrivate> |},
+    deps: {| DerivePublicFromPrivate: Class<DerivePublicFromPrivate> |},
     body: IDerivePublicFromPrivateRequest,
   ): Promise<IDerivePublicFromPrivateResponse<Row>> => {
     return await derivePublicDeriver<Row>(
       super.getDb(),
       tx,
-      { DerivePublicFromPrivate },
+      { DerivePublicFromPrivate: deps.DerivePublicFromPrivate },
       super.getWrapperId(),
       super.getVersion(),
       body,
@@ -246,10 +251,17 @@ const PublicFromPrivateMixin = (
   derivePublicDeriverFromPrivate = async <Row>(
     body: IDerivePublicFromPrivateRequest,
   ): Promise<IDerivePublicFromPrivateResponse<Row>> => {
+    const deps = Object.freeze({
+      DerivePublicFromPrivate,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii(
       super.getDb(),
-      getAllSchemaTables(super.getDb(), DerivePublicFromPrivate),
-      async tx => this.rawDerivePublicDeriverFromPrivate<Row>(tx, { DerivePublicFromPrivate }, body)
+      depTables,
+      async tx => this.rawDerivePublicDeriverFromPrivate<Row>(tx, deps, body)
     );
   }
 };
@@ -272,10 +284,10 @@ const GetPrivateDeriverKeyMixin = (
 
   rawGetPrivateDeriverKey = async (
     tx: lf$Transaction,
-    depTables: {| GetKeyForPrivateDeriver: Class<GetKeyForPrivateDeriver> |},
+    deps: {| GetKeyForPrivateDeriver: Class<GetKeyForPrivateDeriver> |},
     _body: IGetPrivateDeriverKeyRequest,
   ): Promise<IGetPrivateDeriverKeyResponse> => {
-    const result = await depTables.GetKeyForPrivateDeriver.get(
+    const result = await deps.GetKeyForPrivateDeriver.get(
       super.getDb(), tx,
       super.getWrapperId(),
       false,
@@ -293,16 +305,23 @@ const GetPrivateDeriverKeyMixin = (
   getPrivateDeriverKey = async (
     body: IGetPrivateDeriverKeyRequest,
   ): Promise<IGetPrivateDeriverKeyResponse> => {
+    const deps = Object.freeze({
+      GetKeyForPrivateDeriver,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii<IGetPrivateDeriverKeyResponse>(
       super.getDb(),
-      getAllSchemaTables(super.getDb(), GetKeyForPrivateDeriver),
-      async tx => this.rawGetPrivateDeriverKey(tx, { GetKeyForPrivateDeriver }, body)
+      depTables,
+      async tx => this.rawGetPrivateDeriverKey(tx, deps, body)
     );
   }
 
   rawChangePrivateDeriverPassword = async (
     tx: lf$Transaction,
-    depTables: {|
+    deps: {|
       GetKeyForPrivateDeriver: Class<GetKeyForPrivateDeriver>,
       UpdateGet: Class<UpdateGet>,
     |},
@@ -310,12 +329,12 @@ const GetPrivateDeriverKeyMixin = (
   ): Promise<IChangePasswordResponse> => {
     const currentRow = await this.rawGetPrivateDeriverKey(
       tx,
-      { GetKeyForPrivateDeriver: depTables.GetKeyForPrivateDeriver },
+      { GetKeyForPrivateDeriver: deps.GetKeyForPrivateDeriver },
       undefined,
     );
     return rawChangePassword(
       super.getDb(), tx,
-      { UpdateGet: depTables.UpdateGet, },
+      { UpdateGet: deps.UpdateGet, },
       {
         ...body,
         oldKeyRow: currentRow.keyRow
@@ -325,17 +344,18 @@ const GetPrivateDeriverKeyMixin = (
   changePrivateDeriverPassword = async (
     body: IChangePasswordRequest,
   ): Promise<IChangePasswordResponse> => {
+    const deps = Object.freeze({
+      GetKeyForPrivateDeriver,
+      UpdateGet
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii(
       super.getDb(),
-      [
-        ...getAllSchemaTables(super.getDb(), GetKeyForPrivateDeriver),
-        ...getAllSchemaTables(super.getDb(), UpdateGet),
-      ],
-      async tx => this.rawChangePrivateDeriverPassword(
-        tx,
-        { GetKeyForPrivateDeriver, UpdateGet },
-        body
-      )
+      depTables,
+      async tx => this.rawChangePrivateDeriverPassword(tx, deps, body)
     );
   }
 };
@@ -360,10 +380,10 @@ const AdhocPublicDeriverMixin = (
 
   rawAddAdhocPubicDeriver = async <Row>(
     tx: lf$Transaction,
-    depTables: {| AddAdhocPublicDeriver: Class<AddAdhocPublicDeriver> |},
+    deps: {| AddAdhocPublicDeriver: Class<AddAdhocPublicDeriver> |},
     body: IAddAdhocPublicDeriverRequest,
   ): Promise<IAddAdhocPublicDeriverResponse<Row>> => {
-    return await depTables.AddAdhocPublicDeriver.add<Row>(
+    return await deps.AddAdhocPublicDeriver.add<Row>(
       super.getDb(), tx,
       body,
     );
@@ -371,10 +391,17 @@ const AdhocPublicDeriverMixin = (
   addAdhocPubicDeriver = async <Row>(
     body: IAddAdhocPublicDeriverRequest,
   ): Promise<IAddAdhocPublicDeriverResponse<Row>> => {
+    const deps = Object.freeze({
+      AddAdhocPublicDeriver,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii(
       super.getDb(),
-      getAllSchemaTables(super.getDb(), AddAdhocPublicDeriver),
-      async tx => this.rawAddAdhocPubicDeriver<Row>(tx, { AddAdhocPublicDeriver }, body)
+      depTables,
+      async tx => this.rawAddAdhocPubicDeriver<Row>(tx, deps, body)
     );
   }
 };
