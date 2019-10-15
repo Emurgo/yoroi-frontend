@@ -654,7 +654,7 @@ export async function loadWalletsFromStorage(
     async tx => GetAllBip44Wallets.get(db, tx)
   );
   const bip44Map = new Map<number, Bip44Wallet>();
-  const result: Array<PublicDeriver> = [];
+  const result = [];
   for (const entry of bip44Wallets) {
     let bip44Wallet = bip44Map.get(entry.Bip44Wrapper.Bip44WrapperId);
     if (bip44Wallet == null) {
