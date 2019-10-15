@@ -218,10 +218,10 @@ export type GetTxLastUpdateDateFunc = (
 
 // refreshTransactions
 
-export type GetTransactionsRequestOptions = {
+export type GetTransactionsRequestOptions = {|
   skip: number,
   limit: number,
-};
+|};
 export type GetTransactionsRequest = {
   ...Inexact<GetTransactionsRequestOptions>,
   publicDeriver: IPublicDeriver & IGetAllAddresses & IGetLastSyncInfo,

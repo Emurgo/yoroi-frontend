@@ -36,7 +36,10 @@ export default class TransactionsStore extends Store {
     getBalanceRequest: CachedRequest<GetBalanceFunc>
   }> = [];
 
-  @observable _searchOptionsForWallets = observable.map();
+  @observable _searchOptionsForWallets = observable.map<
+      PublicDeriver,
+      GetTransactionsRequestOptions,
+    >();
 
   _hasAnyPending: boolean = false;
 
@@ -69,19 +72,19 @@ export default class TransactionsStore extends Store {
   @computed get searchOptions(): ?GetTransactionsRequestOptions {
     const publicDeriver = this.stores.substores[environment.API].wallets.selected;
     if (!publicDeriver) return null;
-    let options = this._searchOptionsForWallets.get(publicDeriver);
+    let options = this._searchOptionsForWallets.get(publicDeriver.self);
     if (!options) {
       // Setup options for each requested wallet
       runInAction(() => {
         this._searchOptionsForWallets.set(
-          publicDeriver,
+          publicDeriver.self,
           {
             limit: this.INITIAL_SEARCH_LIMIT,
             skip: this.SEARCH_SKIP
           }
         );
       });
-      options = this._searchOptionsForWallets.get(publicDeriver);
+      options = this._searchOptionsForWallets.get(publicDeriver.self);
     }
     return options;
   }
