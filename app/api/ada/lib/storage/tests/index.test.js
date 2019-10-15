@@ -42,8 +42,6 @@ import {
   createStandardBip44Wallet,
 } from '../bridge/walletHelper';
 
-import { snapshot } from './snapshot';
-
 import type { ConfigType } from '../../../../../../config/config-types';
 
 jest.mock('../../../../../utils/passwordCipher');
@@ -344,8 +342,8 @@ test('Can add and fetch address in wallet', async (done) => {
     });
   }
 
-  // console.log(stableStringify(await db.export()));
-  compareObject(await db.export(), snapshot);
+  const dump = (await db.export()).tables;
+  expect(dump).toMatchSnapshot();
   done();
 });
 
