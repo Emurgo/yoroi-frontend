@@ -881,8 +881,11 @@ export async function networkTxToDbTx(
           AddressId: getIdOrThrow(output.address),
           OutputIndex: i,
           Amount: output.amount,
-          /** we assume unspent for now but it will be updated after if necessary */
-          // TODO: if this output doesn't belong to you, it may be unspent forever. Do we want this? Not clear.
+          /**
+           * we assume unspent for now but it will be updated after if necessary
+           * Note: if this output doesn't belong to you, it will be true forever
+           * This is slightly misleading, but using null would require null-checks everywhere
+           */
           IsUnspent: true,
         })),
       }),
