@@ -346,31 +346,3 @@ test('Can add and fetch address in wallet', async (done) => {
   expect(dump).toMatchSnapshot();
   done();
 });
-
-/**
- * We want to compare the test result with a snapshot of the database
- * However, the diff is too big to reasonably compare with your eyes
- * Therefore, we test each table separately
- */
-function compareObject(obj1: { tables: any }, obj2: { tables: any }) {
-  for (const prop of Object.keys(obj1)) {
-    if (obj1[prop] !== undefined && obj2[prop] === undefined) {
-      expect(stableStringify(obj1)).toEqual(stableStringify(obj2));
-    }
-  }
-  for (const prop of Object.keys(obj2)) {
-    if (obj2[prop] !== undefined && obj1[prop] === undefined) {
-      expect(stableStringify(obj1)).toEqual(stableStringify(obj2));
-    }
-  }
-
-  const obj2KeySet = new Set(Object.keys(obj2));
-  const keysInBoth = Object.keys(obj1).filter(key => obj2KeySet.has(key));
-  for (const key of keysInBoth) {
-    if (key === 'tables') {
-      compareObject(obj1[key], obj2[key]);
-    } else {
-      expect(stableStringify(obj1[key])).toEqual(stableStringify(obj2[key]));
-    }
-  }
-}
