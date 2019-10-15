@@ -1,6 +1,6 @@
 // @flow
 
-import crypto from 'crypto';
+import { getInitialSeeds } from './initialSeed';
 import {
   schema,
 } from 'lovefield';
@@ -19,7 +19,6 @@ import { populatePrimitivesDb } from './primitives/tables';
 import { populateBip44Db } from './bip44/tables';
 import { populateUtxoTransactionsDb } from './utxoTransactions/tables';
 import { populateWalletDb } from './wallet/tables';
-import environment from '../../../../../environment';
 
 export const loadLovefieldDB = async (
   storeType: $Values<typeof schema.DataStoreType>
@@ -42,19 +41,14 @@ export const loadLovefieldDB = async (
         db, tx,
       );
       if (!hasMeta) {
+        const { AddressSeed, TransactionSeed, BlockSeed } = getInitialSeeds();
         await deps.ModifyEncryptionMeta.setInitial(
           db, tx,
           {
             EncryptionMetaId: 0,
-            AddressSeed: environment.isJest()
-              ? 1690513609
-              : crypto.randomBytes(4).readUInt32BE(0),
-            TransactionSeed: environment.isJest()
-              ? 769388545
-              : crypto.randomBytes(4).readUInt32BE(0),
-            BlockSeed: environment.isJest()
-              ? 371536492
-              : crypto.randomBytes(4).readUInt32BE(0),
+            AddressSeed,
+            TransactionSeed,
+            BlockSeed,
           }
         );
       }

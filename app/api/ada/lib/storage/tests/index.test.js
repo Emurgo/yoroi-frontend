@@ -47,6 +47,7 @@ import { snapshot } from './snapshot';
 import type { ConfigType } from '../../../../../../config/config-types';
 
 jest.mock('../../../../../utils/passwordCipher');
+jest.mock('../database/initialSeed');
 
 declare var CONFIG: ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;

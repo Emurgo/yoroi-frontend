@@ -29,6 +29,8 @@ import {
   updateTransactions
 } from '../updateTransactions';
 
+jest.mock('../../database/initialSeed');
+
 const networkTransactions: Array<RemoteTransaction> = [{
   // transaction that doesn't involve either wallet
   // just so blockchain isn't empty during tests

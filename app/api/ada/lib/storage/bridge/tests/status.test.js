@@ -28,6 +28,8 @@ import {
   updateTransactions, getAllUtxoTransactions
 } from '../updateTransactions';
 
+jest.mock('../../database/initialSeed');
+
 const initialPendingTx = (state: 'Pending' | 'Failed') => ({
   hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
   height: null,
