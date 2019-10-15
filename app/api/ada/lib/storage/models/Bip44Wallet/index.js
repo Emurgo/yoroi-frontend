@@ -142,25 +142,29 @@ export async function refreshBip44WalletFunctionality(
 
   let currClass = Bip44Wallet;
 
-  const deps = Object.freeze({
-    GetPrivateDeriver,
-  });
-  const depTables = Object
-    .keys(deps)
-    .map(key => deps[key])
-    .flatMap(table => getAllSchemaTables(db, table));
-  const privateDeriverRow = await raii<void | $ReadOnly<PrivateDeriverRow>>(
-    db,
-    depTables,
-    async tx => {
-      const privateDeriver = await deps.GetPrivateDeriver.fromBip44Wrapper(
-        db, tx,
-        row.Bip44WrapperId,
-      );
+  let privateDeriverRow;
+  {
+    const deps = Object.freeze({
+      GetPrivateDeriver,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(db, table));
+    privateDeriverRow = await raii<void | $ReadOnly<PrivateDeriverRow>>(
+      db,
+      depTables,
+      async tx => {
+        const privateDeriver = await deps.GetPrivateDeriver.fromBip44Wrapper(
+          db, tx,
+          row.Bip44WrapperId,
+        );
 
-      return privateDeriver;
-    }
-  );
+        return privateDeriver;
+      }
+    );
+  }
+
   if (privateDeriverRow !== undefined) {
     currClass = PublicFromPrivate(currClass);
     currClass = GetPrivateDeriverKey(currClass);
@@ -230,8 +234,9 @@ export async function derivePublicDeriver<Row>(
   return result;
 }
 
+type PublicFromPrivateDependencies = IBip44Wallet;
 const PublicFromPrivateMixin = (
-  superclass: Class<IBip44Wallet>
+  superclass: Class<PublicFromPrivateDependencies>
 ) => class PublicFromPrivate extends superclass implements IDerivePublicFromPrivate {
 
   rawDerivePublicDeriverFromPrivate = async <Row>(
@@ -265,21 +270,29 @@ const PublicFromPrivateMixin = (
     );
   }
 };
-type PublicFromPrivateClassType = ReturnType<typeof PublicFromPrivateMixin>;
 const PublicFromPrivate = Mixin<
-  IBip44Wallet,
+  PublicFromPrivateDependencies,
   IDerivePublicFromPrivate,
 >(PublicFromPrivateMixin);
-export const PublicFromPrivateInstance = (
-  (PublicFromPrivate: any): PublicFromPrivateClassType
+const PublicFromPrivateInstance = (
+  (PublicFromPrivate: any): ReturnType<typeof PublicFromPrivateMixin>
 );
+export function asPublicFromPrivate<T: IBip44Wallet>(
+  obj: T
+): void | (IDerivePublicFromPrivate & PublicFromPrivateDependencies & T) {
+  if (obj instanceof PublicFromPrivateInstance) {
+    return obj;
+  }
+  return undefined;
+}
 
 // ========================
 //   GetPrivateDeriverKey
 // ========================
 
+type GetPrivateDeriverKeyDependencies = IBip44Wallet;
 const GetPrivateDeriverKeyMixin = (
-  superclass: Class<IBip44Wallet>
+  superclass: Class<GetPrivateDeriverKeyDependencies>
 ) => class GetPrivateDeriverKey extends superclass implements IGetPrivateDeriverKey {
 
   rawGetPrivateDeriverKey = async (
@@ -360,22 +373,29 @@ const GetPrivateDeriverKeyMixin = (
   }
 };
 
-type GetPrivateDeriverKeyClassType = ReturnType<typeof GetPrivateDeriverKeyMixin>;
 const GetPrivateDeriverKey = Mixin<
-  IBip44Wallet,
+  GetPrivateDeriverKeyDependencies,
   IGetPrivateDeriverKey,
 >(GetPrivateDeriverKeyMixin);
-export const GetPrivateDeriverKeyInstance = (
-  (GetPrivateDeriverKey: any): GetPrivateDeriverKeyClassType
+const GetPrivateDeriverKeyInstance = (
+  (GetPrivateDeriverKey: any): ReturnType<typeof GetPrivateDeriverKeyMixin>
 );
-
+export function asGetPrivateDeriverKey<T: IBip44Wallet>(
+  obj: T
+): void | (IGetPrivateDeriverKey & GetPrivateDeriverKeyDependencies & T) {
+  if (obj instanceof GetPrivateDeriverKeyInstance) {
+    return obj;
+  }
+  return undefined;
+}
 
 // ======================
 //   AdhocPublicDeriver
 // ======================
 
+type AdhocPublicDeriverDepenencies = IBip44Wallet;
 const AdhocPublicDeriverMixin = (
-  superclass: Class<IBip44Wallet>
+  superclass: Class<AdhocPublicDeriverDepenencies>
 ) => class AdhocPublicDeriver extends superclass implements IAdhocPublicDeriver {
 
   rawAddAdhocPubicDeriver = async <Row>(
@@ -405,11 +425,18 @@ const AdhocPublicDeriverMixin = (
     );
   }
 };
-type AdhocPublicDeriverClassType = ReturnType<typeof AdhocPublicDeriverMixin>;
 const AdhocPublicDeriver = Mixin<
-  IBip44Wallet,
+  AdhocPublicDeriverDepenencies,
   IAdhocPublicDeriver,
 >(AdhocPublicDeriverMixin);
-export const AdhocPublicDeriverInstance = (
-  (AdhocPublicDeriver: any): AdhocPublicDeriverClassType
+const AdhocPublicDeriverInstance = (
+  (AdhocPublicDeriver: any): ReturnType<typeof AdhocPublicDeriverMixin>
 );
+export function asAdhocPublicDeriver<T: IBip44Wallet>(
+  obj: T
+): void | (IAdhocPublicDeriver & AdhocPublicDeriverDepenencies & T) {
+  if (obj instanceof AdhocPublicDeriverInstance) {
+    return obj;
+  }
+  return undefined;
+}

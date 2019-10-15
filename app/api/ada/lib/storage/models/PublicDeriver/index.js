@@ -342,7 +342,7 @@ export async function refreshPublicDeriverFunctionality(
             numLevels: lvlDiff,
           },
         );
-        const result: Array<number> = [];
+        const result = [];
         for (const derivation of path.slice(1)) {
           if (derivation.Index == null) {
             throw new Error('PublicDeriver::refreshPublicDeriverFunctionality null index');

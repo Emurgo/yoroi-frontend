@@ -25,8 +25,8 @@ import { RustModule } from '../../cardanoCrypto/rustLoader';
 
 import {
   Bip44Wallet,
-  PublicFromPrivateInstance,
-  GetPrivateDeriverKeyInstance,
+  asPublicFromPrivate,
+  asGetPrivateDeriverKey,
 } from '../models/Bip44Wallet';
 import {
   PublicDeriver,
@@ -98,9 +98,10 @@ test('Can add and fetch address in wallet', async (done) => {
       state.bip44WrapperRow,
       protocolMagic,
     );
-    expect(bipWallet instanceof PublicFromPrivateInstance).toEqual(true);
-    if (bipWallet instanceof PublicFromPrivateInstance) {
-      await bipWallet.derivePublicDeriverFromPrivate(
+    const withPublicFromPrivate = asPublicFromPrivate(bipWallet);
+    expect(withPublicFromPrivate != null).toEqual(true);
+    if (withPublicFromPrivate != null) {
+      await withPublicFromPrivate.derivePublicDeriverFromPrivate(
         {
           publicDeriverInsert: ids => ({
             Bip44WrapperId: ids.wrapperId,
@@ -147,16 +148,17 @@ test('Can add and fetch address in wallet', async (done) => {
       );
     }
 
-    expect(bipWallet instanceof GetPrivateDeriverKeyInstance).toEqual(true);
-    if (bipWallet instanceof GetPrivateDeriverKeyInstance) {
-      const key = await bipWallet.getPrivateDeriverKey();
+    const withPrivateDeriverKey = asGetPrivateDeriverKey(bipWallet);
+    expect(withPrivateDeriverKey != null).toEqual(true);
+    if (withPrivateDeriverKey != null) {
+      const key = await withPrivateDeriverKey.getPrivateDeriverKey();
       expect(key.keyDerivation.PrivateKeyId).toEqual(key.keyRow.KeyId);
       expect(key.keyRow.Hash).toEqual(rootPk.key().to_hex() + passwordHash);
       expect(key.keyRow.PasswordLastUpdate).toEqual(null);
       expect(key.keyRow.IsEncrypted).toEqual(true);
 
       const newDate = new Date(Date.now());
-      const newKey = await bipWallet.changePrivateDeriverPassword({
+      const newKey = await withPrivateDeriverKey.changePrivateDeriverPassword({
         oldPassword: privateDeriverPassword,
         newPassword: 'asdf',
         currentTime: newDate,
@@ -167,7 +169,7 @@ test('Can add and fetch address in wallet', async (done) => {
 
       // input previous password to make sure it no longer works
       try {
-        await bipWallet.changePrivateDeriverPassword({
+        await withPrivateDeriverKey.changePrivateDeriverPassword({
           oldPassword: privateDeriverPassword,
           newPassword: 'asdf',
           currentTime: newDate,
@@ -178,7 +180,7 @@ test('Can add and fetch address in wallet', async (done) => {
       }
 
       // reset after test
-      await bipWallet.changePrivateDeriverPassword({
+      await withPrivateDeriverKey.changePrivateDeriverPassword({
         oldPassword: 'asdf',
         newPassword: privateDeriverPassword,
         currentTime: key.keyRow.PasswordLastUpdate,
