@@ -13,11 +13,13 @@ import type {
   Bip44WrapperInsert, Bip44WrapperRow,
   Bip44ChainRow,
   Bip44AddressRow,
+  Bip44ToPublicDeriverInsert, Bip44ToPublicDeriverRow,
 } from '../tables';
 import * as Bip44Tables from '../tables';
 import {
   GetBip44DerivationSpecific,
   GetKeyForPrivateDeriver,
+  GetAllBip44Wallets,
 } from './read';
 
 import type {
@@ -136,6 +138,25 @@ export class AddBip44Wrapper {
   }
 }
 
+export class AddBipp44ToPublicDeriver {
+  static ownTables = Object.freeze({
+    [Bip44Tables.Bip44ToPublicDeriverSchema.name]: Bip44Tables.Bip44ToPublicDeriverSchema,
+  });
+  static depTables = Object.freeze({});
+
+  static async add(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: Bip44ToPublicDeriverInsert,
+  ): Promise<$ReadOnly<Bip44ToPublicDeriverRow>> {
+    return await addNewRowToTable<Bip44ToPublicDeriverInsert, Bip44ToPublicDeriverRow>(
+      db, tx,
+      request,
+      AddBipp44ToPublicDeriver.ownTables[Bip44Tables.Bip44ToPublicDeriverSchema.name].name,
+    );
+  }
+}
+
 export type PrivateDeriverRequest<Insert> = {
   /**
    * Path from root to the private deriver
@@ -220,7 +241,6 @@ export class AddPrivateDeriver {
 export type DerivePublicFromPrivateRequest= {|
   publicDeriverInsert: {
     derivationId: number,
-    wrapperId: number,
     lastSyncInfoId: number,
    } => PublicDeriverInsert,
   /**
@@ -238,6 +258,8 @@ export class DerivePublicFromPrivate {
     GetKeyForPrivateDeriver,
     GetOrAddDerivation,
     AddBip44Tree,
+    AddBipp44ToPublicDeriver,
+    GetAllBip44Wallets,
   });
 
   static async add<Row>(
@@ -317,7 +339,6 @@ export class DerivePublicFromPrivate {
       pubDeriver = await DerivePublicFromPrivate.depTables.AddPublicDeriver.add(
         db, tx,
         {
-          wrapperId: bip44WrapperId,
           addLevelRequest: {
             privateKeyInfo: newKeys.newPrivateKey,
             publicKeyInfo: newKeys.newPublicKey,
@@ -334,6 +355,22 @@ export class DerivePublicFromPrivate {
           },
           levelSpecificTableName: tableName,
           addPublicDeriverRequest: body.publicDeriverInsert
+        }
+      );
+    }
+
+    // add new row in mapping table
+    {
+      const children = await DerivePublicFromPrivate.depTables.GetAllBip44Wallets.forBip44Wallet(
+        db, tx,
+        bip44WrapperId
+      );
+      await DerivePublicFromPrivate.depTables.AddBipp44ToPublicDeriver.add(
+        db, tx,
+        {
+          Bip44WrapperId: bip44WrapperId,
+          PublicDeriverId: pubDeriver.publicDeriverResult.PublicDeriverId,
+          Index: children.length,
         }
       );
     }
@@ -484,7 +521,6 @@ export type AddAdhocPublicDeriverRequest = {|
   pathToPublic: InsertPath,
   publicDeriverInsert: {
     derivationId: number,
-    wrapperId: number,
     lastSyncInfoId: number,
    } => PublicDeriverInsert,
    initialDerivations: TreeInsert<any>,
@@ -504,6 +540,8 @@ export class AddAdhocPublicDeriver {
     AddPublicDeriver,
     ModifyHwWalletMeta,
     AddBip44Tree,
+    AddBipp44ToPublicDeriver,
+    GetAllBip44Wallets,
   });
 
   static async add<Row>(
@@ -566,6 +604,22 @@ export class AddAdhocPublicDeriver {
         addPublicDeriverRequest: request.publicDeriverInsert
       }
     );
+
+    // add new row in mapping table
+    {
+      const children = await AddAdhocPublicDeriver.depTables.GetAllBip44Wallets.forBip44Wallet(
+        db, tx,
+        request.bip44WrapperId
+      );
+      await AddAdhocPublicDeriver.depTables.AddBipp44ToPublicDeriver.add(
+        db, tx,
+        {
+          Bip44WrapperId: request.bip44WrapperId,
+          PublicDeriverId: publicDeriver.publicDeriverResult.PublicDeriverId,
+          Index: children.length,
+        }
+      );
+    }
 
     await AddAdhocPublicDeriver.depTables.AddBip44Tree.add(
       db, tx,

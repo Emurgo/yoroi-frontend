@@ -214,7 +214,6 @@ export async function createStandardBip44Wallet(request: {
             lastUpdate: null,
           },
           publicDeriverInsert: ids => ({
-            Bip44WrapperId: ids.wrapperId,
             KeyDerivationId: ids.derivationId,
             Name: request.accountName,
             LastSyncInfoId: ids.lastSyncInfoId,
@@ -313,7 +312,6 @@ export async function createHardwareWallet(request: {
             PasswordLastUpdate: null,
           },
           publicDeriverInsert: ids => ({
-            Bip44WrapperId: ids.wrapperId,
             KeyDerivationId: ids.derivationId,
             Name: request.accountName,
             LastSyncInfoId: ids.lastSyncInfoId,
@@ -511,7 +509,6 @@ async function addPublicDeriverToMigratedWallet<
             PasswordLastUpdate: null,
           },
           publicDeriverInsert: ids => ({
-            Bip44WrapperId: ids.wrapperId,
             KeyDerivationId: ids.derivationId,
             Name: accountName,
             LastSyncInfoId: ids.lastSyncInfoId,

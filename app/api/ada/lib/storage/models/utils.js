@@ -651,7 +651,7 @@ export async function loadWalletsFromStorage(
   const bip44Wallets = await raii(
     db,
     depTables,
-    async tx => GetAllBip44Wallets.get(db, tx)
+    async tx => deps.GetAllBip44Wallets.get(db, tx)
   );
   const bip44Map = new Map<number, Bip44Wallet>();
   const result = [];

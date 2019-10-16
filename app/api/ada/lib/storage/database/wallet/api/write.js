@@ -62,10 +62,8 @@ export class ModifyLastSyncInfo {
 export type PublicDeriverRequest<Insert> = {
   addLevelRequest: AddDerivationRequest<Insert>,
   levelSpecificTableName: string,
-  wrapperId: number,
   addPublicDeriverRequest: {
     derivationId: number,
-    wrapperId: number,
     lastSyncInfoId: number,
    } => PublicDeriverInsert,
 };
@@ -101,7 +99,6 @@ export class AddPublicDeriver {
       db, tx,
       request.addPublicDeriverRequest({
         derivationId: levelResult.KeyDerivation.KeyDerivationId,
-        wrapperId: request.wrapperId,
         lastSyncInfoId: lastSyncInfo.LastSyncInfoId,
       }),
       AddPublicDeriver.ownTables[Tables.PublicDeriverSchema.name].name,

@@ -105,7 +105,6 @@ test('Can add and fetch address in wallet', async (done) => {
       await withPublicFromPrivate.derivePublicDeriverFromPrivate(
         {
           publicDeriverInsert: ids => ({
-            Bip44WrapperId: ids.wrapperId,
             KeyDerivationId: ids.derivationId,
             Name: 'Checking account',
             LastSyncInfoId: ids.lastSyncInfoId,

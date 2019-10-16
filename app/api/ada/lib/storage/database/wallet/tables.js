@@ -4,9 +4,6 @@ import { Type } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 import { KeyDerivationSchema } from '../primitives/tables';
 
-// TODO: get rid of this import
-import { Bip44WrapperSchema }  from '../bip44/tables';
-
 export type ConceptualWalletInsert = {|
   CoinType: number,
   Name: string,
@@ -29,7 +26,6 @@ export const ConceptualWalletSchema: {
 };
 
 export type PublicDeriverInsert = {|
-  Bip44WrapperId: number,
   KeyDerivationId: number,
   Name: string,
   LastSyncInfoId: number,
@@ -45,7 +41,6 @@ export const PublicDeriverSchema: {
   name: 'PublicDeriver',
   properties: {
     PublicDeriverId: 'PublicDeriverId',
-    Bip44WrapperId: 'Bip44WrapperId',
     KeyDerivationId: 'KeyDerivationId',
     Name: 'Name',
     LastSyncInfoId: 'LastSyncInfoId',
@@ -135,7 +130,6 @@ export const populateWalletDb = (schemaBuilder: lf$schema$Builder) => {
   // PublicDeriver
   schemaBuilder.createTable(PublicDeriverSchema.name)
     .addColumn(PublicDeriverSchema.properties.PublicDeriverId, Type.INTEGER)
-    .addColumn(PublicDeriverSchema.properties.Bip44WrapperId, Type.INTEGER)
     .addColumn(PublicDeriverSchema.properties.KeyDerivationId, Type.INTEGER)
     .addColumn(PublicDeriverSchema.properties.Name, Type.STRING)
     .addColumn(PublicDeriverSchema.properties.LastSyncInfoId, Type.INTEGER)
@@ -146,10 +140,6 @@ export const populateWalletDb = (schemaBuilder: lf$schema$Builder) => {
     .addForeignKey('PublicDeriver_Bip44Derivation', {
       local: PublicDeriverSchema.properties.KeyDerivationId,
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`
-    })
-    .addForeignKey('PublicDeriver_Bip44Wrapper', {
-      local: PublicDeriverSchema.properties.Bip44WrapperId,
-      ref: `${Bip44WrapperSchema.name}.${Bip44WrapperSchema.properties.Bip44WrapperId}`
     })
     .addForeignKey('PublicDeriver_LastSyncInfo', {
       local: PublicDeriverSchema.properties.LastSyncInfoId,

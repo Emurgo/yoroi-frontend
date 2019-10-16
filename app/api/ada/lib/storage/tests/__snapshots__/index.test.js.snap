@@ -456,6 +456,20 @@ Object {
       "KeyDerivationId": 1,
     },
   ],
+  "Bip44ToPublicDeriver": Array [
+    Object {
+      "Bip44ToPublicDeriverId": 1,
+      "Bip44WrapperId": 1,
+      "Index": 0,
+      "PublicDeriverId": 1,
+    },
+    Object {
+      "Bip44ToPublicDeriverId": 2,
+      "Bip44WrapperId": 1,
+      "Index": 1,
+      "PublicDeriverId": 2,
+    },
+  ],
   "Bip44Wrapper": Array [
     Object {
       "Bip44WrapperId": 1,
@@ -880,14 +894,12 @@ Object {
   ],
   "PublicDeriver": Array [
     Object {
-      "Bip44WrapperId": 1,
       "KeyDerivationId": 4,
       "LastSyncInfoId": 1,
       "Name": "",
       "PublicDeriverId": 1,
     },
     Object {
-      "Bip44WrapperId": 1,
       "KeyDerivationId": 47,
       "LastSyncInfoId": 2,
       "Name": "Checking account",
