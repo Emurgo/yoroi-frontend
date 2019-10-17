@@ -19,7 +19,7 @@ import {
 import { loadLovefieldDB } from '../../database/index';
 
 import {
-  asGetAllAddresses,
+  asGetAllUtxos,
   asGetUtxoBalance,
   asDisplayCutoff,
   PublicDeriver,
@@ -251,14 +251,14 @@ test('Syncing simple transaction', async (done) => {
   );
   const getBestBlock = genGetBestBlock(networkTransactions);
 
-  const asGetAllAddressesInstance1 = asGetAllAddresses(publicDeriver1);
-  expect(asGetAllAddressesInstance1 != null).toEqual(true);
-  if (asGetAllAddressesInstance1 == null) {
+  const withUtxos1 = asGetAllUtxos(publicDeriver1);
+  expect(withUtxos1 != null).toEqual(true);
+  if (withUtxos1 == null) {
     throw new Error('Syncing txs publicDeriver1 != GetAllAddressesInstance');
   }
-  const asGetAllAddressesInstance2 = asGetAllAddresses(publicDeriver2);
-  expect(asGetAllAddressesInstance2 != null).toEqual(true);
-  if (asGetAllAddressesInstance2 == null) {
+  const withUtxos2 = asGetAllUtxos(publicDeriver2);
+  expect(withUtxos2 != null).toEqual(true);
+  if (withUtxos2 == null) {
     throw new Error('Syncing txs publicDeriver2 != GetAllAddressesInstance');
   }
 
@@ -266,7 +266,7 @@ test('Syncing simple transaction', async (done) => {
   {
     await updateTransactions(
       db,
-      asGetAllAddressesInstance1,
+      withUtxos1,
       checkAddressesInUse,
       getTransactionsHistoryForAddresses,
       getBestBlock,
@@ -305,7 +305,7 @@ test('Syncing simple transaction', async (done) => {
     // now sync and make sure it updated
     await updateTransactions(
       db,
-      asGetAllAddressesInstance2,
+      withUtxos2,
       checkAddressesInUse,
       getTransactionsHistoryForAddresses,
       getBestBlock,
@@ -331,7 +331,7 @@ test('Syncing simple transaction', async (done) => {
   {
     await updateTransactions(
       db,
-      asGetAllAddressesInstance2,
+      withUtxos2,
       checkAddressesInUse,
       getTransactionsHistoryForAddresses,
       getBestBlock,

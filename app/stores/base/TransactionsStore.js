@@ -11,7 +11,7 @@ import type { GetTransactionsFunc, GetBalanceFunc,
 import environment from '../../environment';
 import {
   PublicDeriver,
-  asGetAllAddresses,
+  asGetAllUtxos,
   asGetBalance,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
@@ -127,7 +127,7 @@ export default class TransactionsStore extends Store {
     const walletsStore = this.stores.substores[environment.API].wallets;
     const walletsActions = this.actions[environment.API].wallets;
 
-    const publicDeriver = asGetAllAddresses(basePubDeriver.self);
+    const publicDeriver = asGetAllUtxos(basePubDeriver.self);
     if (publicDeriver == null) {
       return;
     }

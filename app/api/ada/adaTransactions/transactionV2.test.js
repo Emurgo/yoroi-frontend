@@ -3,10 +3,9 @@
 import '../lib/test-config';
 import { schema } from 'lovefield';
 import type {
-  RemoteUnspentOutput,
+  RemoteUnspentOutput, AddressedUtxo,
 } from '../adaTypes';
 import {
-  generateAddressingInfo,
   newAdaUnsignedTx,
   newAdaUnsignedTxFromUtxo,
   sendAllUnsignedTxFromUtxo,
@@ -32,23 +31,6 @@ import {
   CARDANO_COINTYPE,
   BIP44_PURPOSE,
 } from '../../../config/numbersConfig';
-
-import type { AddressUtxoFunc } from '../lib/state-fetch/types';
-
-// function to mock our network call
-function makeNetworkMock(utxos): AddressUtxoFunc {
-  return async (body) => {
-    const senderUtxos = [];
-    for (const addr of body.addresses) {
-      for (const utxo of utxos) {
-        if (utxo.receiver === addr) {
-          senderUtxos.push(utxo);
-        }
-      }
-    }
-    return senderUtxos;
-  };
-}
 
 const sampleUtxos: Array<RemoteUnspentOutput> = [
   {
@@ -97,11 +79,18 @@ const sampleAdaAddresses: Array<{| ...Address, ...Addressing |}> = [
     },
   },
 ];
-
-const addressedUtxos = generateAddressingInfo(
-  sampleAdaAddresses,
-  sampleUtxos,
-);
+const addresssingMap = new Map<string, Addressing>();
+for (const address of sampleAdaAddresses) {
+  addresssingMap.set(address.address, { addressing: address.addressing });
+}
+const addressedUtxos: Array<AddressedUtxo> = sampleUtxos.map(utxo => {
+  const addressing = addresssingMap.get(utxo.receiver);
+  if (addressing == null) throw new Error('Should never happen');
+  return {
+    ...utxo,
+    ...addressing,
+  };
+});
 
 beforeAll(async () => {
   await RustModule.load();
@@ -178,13 +167,11 @@ describe('Create unsigned TX from UTXO', () => {
 
 describe('Create unsigned TX from addresses', () => {
   it('Should create a valid transaction withhout selection', async () => {
-    const utxos: Array<RemoteUnspentOutput> = sampleUtxos;
     const unsignedTxResponse = await newAdaUnsignedTx(
       'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
       '5001', // smaller than input
       [],
-      [sampleAdaAddresses[1]],
-      makeNetworkMock(utxos),
+      [addressedUtxos[0], addressedUtxos[1]],
     );
     expect(unsignedTxResponse.senderUtxos).toEqual([addressedUtxos[0], addressedUtxos[1]]);
     expect(unsignedTxResponse.txBuilder.get_input_total().to_str()).toEqual('1.007002');
@@ -199,13 +186,11 @@ describe('Create unsigned TX from addresses', () => {
 
 describe('Create signed transactions', () => {
   it('Witness should match on valid private key', async () => {
-    const utxos: Array<RemoteUnspentOutput> = sampleUtxos;
     const unsignedTxResponse = await newAdaUnsignedTx(
       'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
       '5001', // smaller than input
       [],
-      [sampleAdaAddresses[1]],
-      makeNetworkMock(utxos),
+      [addressedUtxos[0], addressedUtxos[1]],
     );
     const signRequest = {
       changeAddr: unsignedTxResponse.changeAddr,

@@ -16,7 +16,7 @@ import {
 import type {
   IPublicDeriver,
   PathWithAddrAndRow,
-  IGetAllAddresses,
+  IGetAllUtxos,
   IGetAllUtxosResponse,
   IGetUtxoBalanceResponse,
   IHasChainsRequest,
@@ -48,6 +48,7 @@ import {
   GetAllBip44Wallets,
   GetBip44DerivationSpecific,
 } from '../database/bip44/api/read';
+import type { UtxoTxOutput } from '../database/utxoTransactions/api/read';
 import { Bip44DerivationLevels } from '../database/bip44/api/utils';
 import type { GetPathWithSpecificByTreeRequest } from '../database/primitives/api/read';
 import type {
@@ -484,10 +485,10 @@ export async function rawGetAllAddressesForDisplay(
     GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
   |},
   request: {
-    publicDeriver: IPublicDeriver & IGetAllAddresses,
+    publicDeriver: IPublicDeriver & IGetAllUtxos,
   },
 ): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
-  let addresses = await request.publicDeriver.rawGetAllAddresses(
+  let addresses = await request.publicDeriver.rawGetAllUtxoAddresses(
     tx,
     {
       GetAddress: deps.GetAddress,
@@ -519,7 +520,7 @@ export async function rawGetAllAddressesForDisplay(
 }
 export async function getAllAddressesForDisplay(
   request: {
-    publicDeriver: IPublicDeriver & IGetAllAddresses,
+    publicDeriver: IPublicDeriver & IGetAllUtxos,
   },
 ): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
   const deps = Object.freeze({
@@ -579,7 +580,7 @@ export async function rawGetNextUnusedIndex(
 }
 
 export function getUtxoBalanceForAddresses(
-  utxos: IGetAllUtxosResponse,
+  utxos: $ReadOnlyArray<$ReadOnly<UtxoTxOutput>>,
 ): { [key: number]: IGetUtxoBalanceResponse } {
   const groupByAddress = groupBy(
     utxos,
@@ -596,7 +597,7 @@ export function getUtxoBalanceForAddresses(
 export function getBalanceForUtxos(
   utxos: IGetAllUtxosResponse,
 ): IGetUtxoBalanceResponse {
-  const amounts = utxos.map(utxo => new BigNumber(utxo.UtxoTransactionOutput.Amount));
+  const amounts = utxos.map(utxo => new BigNumber(utxo.output.UtxoTransactionOutput.Amount));
   const total = amounts.reduce(
     (acc, amount) => acc.plus(amount),
     new BigNumber(0)

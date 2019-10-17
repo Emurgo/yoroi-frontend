@@ -202,7 +202,7 @@ export function signRequestFee(req: BaseSignRequest, shift: boolean): BigNumber 
     .map(utxo => new BigNumber(utxo.amount))
     .reduce((sum, val) => sum.plus(val), new BigNumber(0));
 
-  const tx: TransactionType = req.unsignedTx.to_json();
+  const tx = req.unsignedTx.to_json();
   const outputTotal = tx.outputs
     .map(val => new BigNumber(val.value))
     .reduce((sum, val) => sum.plus(val), new BigNumber(0));
@@ -231,7 +231,7 @@ export function signRequestTotalInput(req: BaseSignRequest, shift: boolean): Big
 }
 
 export function signRequestReceivers(req: BaseSignRequest, includeChange: boolean): Array<string> {
-  const tx: TransactionType = req.unsignedTx.to_json();
+  const tx = req.unsignedTx.to_json();
   let receivers = tx.outputs
     .map(val => val.address);
 

@@ -43,15 +43,13 @@ import {
 import type {
   IPublicDeriver,
   IBip44Parent,
-  IGetAllAddresses,
+  IGetAllUtxos,
   IGetLastSyncInfo,
   IGetSigningKey,
   IDisplayCutoff,
   IDisplayCutoffPopFunc,
   IDisplayCutoffPopResponse,
   IHasChains, IHasChainsRequest,
-  IGetAllAddressesResponse,
-  IGetNextUnusedForChainResponse,
   IGetLastSyncInfoResponse,
   WalletAccountNumberPlate,
   IGetPublicResponse,
@@ -62,8 +60,9 @@ import type {
   Address, Addressing, UsedStatus, Value,
 } from './lib/storage/models/common/interfaces';
 import {
-  newAdaUnsignedTx,
   sendAllUnsignedTx,
+  newAdaUnsignedTx,
+  asAddressedUtxo,
   signTransaction,
 } from './adaTransactions/transactionsV2';
 import {
@@ -107,7 +106,6 @@ import LocalStorageApi from '../localStorage/index';
 import type {
   FilterFunc,
   HistoryFunc,
-  AddressUtxoFunc,
   SendFunc,
   SignedResponse,
   TxBodiesFunc,
@@ -174,7 +172,7 @@ export type GetWalletsFunc = (
 // getAllAddressesForDisplay
 
 export type GetAllAddressesForDisplayRequest = {
-  publicDeriver: IPublicDeriver & IGetAllAddresses,
+  publicDeriver: IPublicDeriver & IGetAllUtxos,
 };
 export type GetAllAddressesForDisplayResponse = Array<{|
   ...Address, ...Value, ...Addressing, ...UsedStatus
@@ -224,7 +222,7 @@ export type GetTransactionsRequestOptions = {|
 |};
 export type GetTransactionsRequest = {
   ...Inexact<GetTransactionsRequestOptions>,
-  publicDeriver: IPublicDeriver & IGetAllAddresses & IGetLastSyncInfo,
+  publicDeriver: IPublicDeriver & IGetAllUtxos & IGetLastSyncInfo,
   isLocalRequest: boolean,
   getTransactionsHistoryForAddresses: HistoryFunc,
   checkAddressesInUse: FilterFunc,
@@ -241,7 +239,7 @@ export type GetTransactionsFunc = (
 // refreshPendingTransactions
 
 export type RefreshPendingTransactionsRequest = {
-  publicDeriver: IPublicDeriver & IGetAllAddresses & IGetLastSyncInfo,
+  publicDeriver: IPublicDeriver & IGetAllUtxos & IGetLastSyncInfo,
 };
 export type RefreshPendingTransactionsResponse = Array<WalletTransaction>;
 export type RefreshPendingTransactionsFunc = (
@@ -273,7 +271,6 @@ export type SignAndBroadcastFunc = (
 
 export type CreateTrezorSignTxDataRequest = {
   signRequest: BaseSignRequest,
-  getUTXOsForAddresses: AddressUtxoFunc,
   getTxsBodiesForUTXOs: TxBodiesFunc,
 };
 export type CreateTrezorSignTxDataResponse = {
@@ -325,11 +322,9 @@ export type PrepareAndBroadcastLedgerSignedTxFunc = (
 // createUnsignedTx
 
 export type CreateUnsignedTxRequest = {
-  getAllAddresses: () => Promise<IGetAllAddressesResponse>,
-  GetNextUnusedForChain: () => Promise<IGetNextUnusedForChainResponse>,
+  publicDeriver: IGetAllUtxos & IHasChains,
   receiver: string,
   amount: string, // in lovelaces
-  getUTXOsForAddresses: AddressUtxoFunc,
   shouldSendAll: boolean,
 };
 export type CreateUnsignedTxResponse = UnsignedTxResponse;
@@ -503,7 +498,7 @@ export type CreateHardwareWalletFunc = (
 // getTransactionRowsToExport
 
 export type GetTransactionRowsToExportRequest = {
-  publicDeriver: IPublicDeriver & IGetAllAddresses,
+  publicDeriver: IPublicDeriver & IGetAllUtxos,
 };
 export type GetTransactionRowsToExportResponse = Array<TransactionExportRow>;
 export type GetTransactionRowsToExportFunc = (
@@ -853,26 +848,21 @@ export default class AdaApi {
     Logger.debug('AdaApi::createUnsignedTx called');
     const { receiver, amount, shouldSendAll } = request;
     try {
-      const allAdaAddresses = await request.getAllAddresses();
-      const rawAddresses = allAdaAddresses.map(addr => ({
-        address: addr.addr.Hash,
-        addressing: addr.addressing,
-      }));
+      const utxos = await request.publicDeriver.getAllUtxos();
+      const addressedUtxo = asAddressedUtxo(utxos);
 
       let unsignedTxResponse;
       if (shouldSendAll) {
         unsignedTxResponse = await sendAllUnsignedTx(
           receiver,
-          rawAddresses,
-          request.getUTXOsForAddresses
+          addressedUtxo
         );
       } else {
-        const nextUnusedInternal = await request.GetNextUnusedForChain();
+        const nextUnusedInternal = await request.publicDeriver.nextInternal();
         if (nextUnusedInternal.addressInfo == null) {
           throw new Error('createUnsignedTx no internal addresses left. Should never happen');
         }
         const changeAddr = nextUnusedInternal.addressInfo;
-        // TODO: should rely on UTXO locally and not from network
         unsignedTxResponse = await newAdaUnsignedTx(
           receiver,
           amount,
@@ -880,8 +870,7 @@ export default class AdaApi {
             address: changeAddr.addr.Hash,
             addressing: changeAddr.addressing,
           }],
-          rawAddresses,
-          request.getUTXOsForAddresses
+          addressedUtxo
         );
       }
       Logger.debug(

@@ -10,7 +10,7 @@ import type {
 } from '../../api/ada';
 import environment from '../../environment';
 import {
-  PublicDeriver, asGetAllAddresses, asHasChains, asDisplayCutoff,
+  PublicDeriver, asGetAllUtxos, asHasChains, asDisplayCutoff,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type {
   IHasChainsRequest
@@ -197,13 +197,13 @@ export default class AddressesStore extends Store {
   _wrapForAllAddresses = (request: {
     publicDeriver: PublicDeriver
   }): Promise<Array<StandardAddress>> => {
-    const withGetAllAddresses = asGetAllAddresses(request.publicDeriver);
-    if (withGetAllAddresses == null) {
+    const withUtxos = asGetAllUtxos(request.publicDeriver);
+    if (withUtxos == null) {
       Logger.error(`_wrapForAllAddresses incorrect public deriver`);
       return Promise.resolve([]);
     }
     return this.api[environment.API].getAllAddressesForDisplay({
-      publicDeriver: withGetAllAddresses
+      publicDeriver: withUtxos
     });
   }
   _wrapForChainAddresses = (request: {

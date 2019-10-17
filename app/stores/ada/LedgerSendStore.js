@@ -119,7 +119,6 @@ export default class LedgerSendStore extends Store {
         const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
         this.createLedgerSignTxDataRequest.execute({
           ...params,
-          getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
           getTxsBodiesForUTXOs: stateFetcher.getTxsBodiesForUTXOs,
         });
         if (!this.createLedgerSignTxDataRequest.promise) throw new Error('should never happen');

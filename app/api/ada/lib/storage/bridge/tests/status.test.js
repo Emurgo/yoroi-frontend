@@ -19,7 +19,7 @@ import {
 import { loadLovefieldDB } from '../../database/index';
 
 import {
-  asGetAllAddresses,
+  asGetAllUtxos,
   asGetUtxoBalance,
   asDisplayCutoff,
 } from '../../models/PublicDeriver/index';
@@ -168,11 +168,11 @@ async function baseTest(
 
   const withDisplayCutoff = asDisplayCutoff(publicDeriver);
   if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
+  const withUtxos = asGetAllUtxos(withDisplayCutoff);
+  if (!withUtxos) throw new Error('missing get all utxos functionality');
   const withUtxoBalance = asGetUtxoBalance(withDisplayCutoff);
   if (!withUtxoBalance) throw new Error('missing utxo balance functionality');
-  const withGetAllAddresses = asGetAllAddresses(withUtxoBalance);
-  if (!withGetAllAddresses) throw new Error('missing get all addresses functionality');
-  const basePubDeriver = withGetAllAddresses;
+  const basePubDeriver = withUtxoBalance;
 
   // single pending tx
   {
@@ -546,7 +546,7 @@ test('Pending dropped from backend without rollback', async (done) => {
   );
   const getBestBlock = genGetBestBlock(networkTransactions);
 
-  const basePubDeriver = asGetAllAddresses(publicDeriver);
+  const basePubDeriver = asGetAllUtxos(publicDeriver);
   expect(basePubDeriver != null).toEqual(true);
   if (basePubDeriver == null) {
     throw new Error('Syncing txs basePubDeriver != GetAllAddressesInstance');

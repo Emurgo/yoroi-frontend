@@ -20,7 +20,7 @@ import {
 import { loadLovefieldDB } from '../../database/index';
 
 import {
-  asGetAllAddresses,
+  asGetAllUtxos,
   asGetUtxoBalance,
   asDisplayCutoff,
 } from '../../models/PublicDeriver/index';
@@ -171,9 +171,9 @@ test('Syncing simple transaction', async (done) => {
   if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
   const withUtxoBalance = asGetUtxoBalance(withDisplayCutoff);
   if (!withUtxoBalance) throw new Error('missing utxo balance functionality');
-  const withGetAllAddresses = asGetAllAddresses(withUtxoBalance);
-  if (!withGetAllAddresses) throw new Error('missing get all addresses functionality');
-  const basePubDeriver = withGetAllAddresses;
+  const withUtxos = asGetAllUtxos(withUtxoBalance);
+  if (!withUtxos) throw new Error('missing get all addresses functionality');
+  const basePubDeriver = withUtxos;
 
   expect(basePubDeriver != null).toEqual(true);
   if (basePubDeriver == null) {
@@ -448,11 +448,11 @@ test('Utxo created and used in same sync', async (done) => {
 
   const withDisplayCutoff = asDisplayCutoff(publicDeriver);
   if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
-  const withUtxoBalance = asGetUtxoBalance(withDisplayCutoff);
+  const withUtxos = asGetAllUtxos(withDisplayCutoff);
+  if (!withUtxos) throw new Error('missing get all utxos functionality');
+  const withUtxoBalance = asGetUtxoBalance(withUtxos);
   if (!withUtxoBalance) throw new Error('missing utxo balance functionality');
-  const withGetAllAddresses = asGetAllAddresses(withUtxoBalance);
-  if (!withGetAllAddresses) throw new Error('missing get all addresses functionality');
-  const basePubDeriver = withGetAllAddresses;
+  const basePubDeriver = withUtxoBalance;
 
   expect(basePubDeriver != null).toEqual(true);
   if (basePubDeriver == null) {

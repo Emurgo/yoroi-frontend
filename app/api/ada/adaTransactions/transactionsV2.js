@@ -1,6 +1,6 @@
 // @flow
 
-// Handles interfacing w/ lovefieldDB and rust-cardano to create transaction
+// Handles interfacing w/ rust-cardano to create transaction
 
 import BigNumber from 'bignumber.js';
 import type {
@@ -16,8 +16,6 @@ import {
 import type { ConfigType } from '../../../../config/config-types';
 import { utxosToLookupMap, coinToBigNumber } from '../lib/utils';
 
-import type { AddressUtxoFunc } from '../lib/state-fetch/types';
-
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 
 import {
@@ -26,48 +24,38 @@ import {
 import type {
   Address, Value, Addressing,
 } from '../lib/storage/models/common/interfaces';
+import type { IGetAllUtxosResponse } from '../lib/storage/models/PublicDeriver/interfaces';
 
 declare var CONFIG: ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;
 
-export function generateAddressingInfo(
-  allInputAddresses: Array<{| ...Address, ...Addressing |}>,
-  utxos: Array<RemoteUnspentOutput>,
-): Array<AddressedUtxo> {
-  const addressingMap = new Map<string, Addressing>(
-    allInputAddresses.map(addr => [addr.address, { addressing: addr.addressing }])
-  );
-  const addressedUtxos: Array<AddressedUtxo> = [];
-  for (const utxo of utxos) {
-    const addressingInfo = addressingMap.get(utxo.receiver);
-    if (addressingInfo == null) {
-      throw new Error('generateAddressingInfo should never happen');
-    }
-    addressedUtxos.push({
-      ...utxo,
-      addressing: addressingInfo.addressing,
-    });
-  }
-
-  return addressedUtxos;
-}
-
 export async function sendAllUnsignedTx(
   receiver: string,
-  allInputAddresses: Array<{| ...Address, ...Addressing |}>,
-  getUTXOsForAddresses: AddressUtxoFunc,
+  allUtxos: Array<AddressedUtxo>,
 ): Promise<UnsignedTxResponse> {
-  const allUtxos = await getUTXOsForAddresses({
-    addresses: allInputAddresses.map(addr => addr.address)
-  });
+  const addressingMap = new Map<RemoteUnspentOutput, AddressedUtxo>();
+  for (const utxo of allUtxos) {
+    addressingMap.set({
+      amount: utxo.amount,
+      receiver: utxo.receiver,
+      tx_hash: utxo.tx_hash,
+      tx_index: utxo.tx_index,
+      utxo_id: utxo.utxo_id
+    }, utxo);
+  }
   const unsignedTxResponse = await sendAllUnsignedTxFromUtxo(
     receiver,
-    allUtxos
+    Array.from(addressingMap.keys())
   );
 
-  const addressedUtxos = generateAddressingInfo(
-    allInputAddresses,
-    unsignedTxResponse.senderUtxos,
+  const addressedUtxos = unsignedTxResponse.senderUtxos.map(
+    utxo => {
+      const addressedUtxo = addressingMap.get(utxo);
+      if (addressedUtxo == null) {
+        throw new Error('sendAllUnsignedTx utxo refernece was changed. Should not happen');
+      }
+      return addressedUtxo;
+    }
   );
 
   return {
@@ -134,22 +122,33 @@ export async function newAdaUnsignedTx(
   receiver: string,
   amount: string,
   changeAdaAddr: Array<{| ...Address, ...Addressing |}>,
-  possibleInputAddresses: Array<{| ...Address, ...Addressing |}>,
-  getUTXOsForAddresses: AddressUtxoFunc,
+  allUtxos: Array<AddressedUtxo>,
 ): Promise<UnsignedTxResponse> {
-  const allUtxos = await getUTXOsForAddresses({
-    addresses: possibleInputAddresses.map(addr => addr.address)
-  });
+  const addressingMap = new Map<RemoteUnspentOutput, AddressedUtxo>();
+  for (const utxo of allUtxos) {
+    addressingMap.set({
+      amount: utxo.amount,
+      receiver: utxo.receiver,
+      tx_hash: utxo.tx_hash,
+      tx_index: utxo.tx_index,
+      utxo_id: utxo.utxo_id
+    }, utxo);
+  }
   const unsignedTxResponse = await newAdaUnsignedTxFromUtxo(
     receiver,
     amount,
     changeAdaAddr,
-    allUtxos
+    Array.from(addressingMap.keys())
   );
 
-  const addressedUtxos = generateAddressingInfo(
-    possibleInputAddresses,
-    unsignedTxResponse.senderUtxos,
+  const addressedUtxos = unsignedTxResponse.senderUtxos.map(
+    utxo => {
+      const addressedUtxo = addressingMap.get(utxo);
+      if (addressedUtxo == null) {
+        throw new Error('newAdaUnsignedTx utxo refernece was changed. Should not happen');
+      }
+      return addressedUtxo;
+    }
   );
 
   return {
@@ -159,6 +158,12 @@ export async function newAdaUnsignedTx(
   };
 }
 
+/**
+ * This function operates on UTXOs without a way to generate the private key for them
+ * Private key needs to be added afterwards either through
+ * A) Addressing
+ * B) Having the key provided externally
+ */
 export async function newAdaUnsignedTxFromUtxo(
   receiver: string,
   amount: string,
@@ -210,7 +215,7 @@ export async function newAdaUnsignedTxFromUtxo(
 
 function filterToUsedChange(
   changeAdaAddr: Array<{| ...Address, ...Addressing |}>,
-  changeAddrTxOut: Array<TxOutType>
+  changeAddrTxOut: Array<TxOutType<string>>
 ): Array<{| ...Address, ...Value, ...Addressing |}> {
   const change = [];
   for (const txOut of changeAddrTxOut) {
@@ -243,7 +248,7 @@ export function signTransaction(
   return signedTx;
 }
 
-export function utxoToTxInput(
+function utxoToTxInput(
   utxos: Array<RemoteUnspentOutput>,
 ): Array<RustModule.Wallet.TxInput> {
   return utxos.map(utxo => {
@@ -291,7 +296,7 @@ function addTxIO(
   feeAlgorithm: RustModule.Wallet.LinearFeeAlgorithm,
   receiver: string,
   amount: string,
-): Array<TxOutType> {
+): Array<TxOutType<string>> {
   addTxInputs(txBuilder, senderInputs);
   addOutput(txBuilder, receiver, amount);
 
@@ -375,4 +380,19 @@ export function addOutput(
     RustModule.Wallet.Coin.from_str(value),
   );
   builder.add_output(txOut);
+}
+
+export function asAddressedUtxo(
+  utxos: IGetAllUtxosResponse,
+): Array<AddressedUtxo> {
+  return utxos.map(utxo => {
+    return {
+      amount: utxo.output.UtxoTransactionOutput.Amount,
+      receiver: utxo.address,
+      tx_hash: utxo.output.Transaction.Hash,
+      tx_index: utxo.output.UtxoTransactionOutput.OutputIndex,
+      utxo_id: utxo.output.Transaction.Hash + utxo.output.UtxoTransactionOutput.OutputIndex,
+      addressing: utxo.addressing,
+    };
+  });
 }

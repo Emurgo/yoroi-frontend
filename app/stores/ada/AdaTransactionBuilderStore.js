@@ -11,7 +11,7 @@ import type {
 import type { BaseSignRequest } from '../../api/ada/adaTypes';
 import { signRequestFee, signRequestTotalInput } from '../../api/ada/lib/utils';
 import {
-  asGetAllAddresses, asHasChains,
+  asGetAllUtxos, asHasChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 
@@ -26,7 +26,7 @@ export default class AdaTransactionBuilderStore extends Store {
 
   @observable shouldSendAll: boolean;
   /** Stores the tx information as the user is building it */
-  @observable plannedTxInfo: Array<{ ...Inexact<TxOutType> }>;
+  @observable plannedTxInfo: Array<{ ...Inexact<TxOutType<number>> }>;
   /** Stores the tx used to generate the information on the send form */
   @observable plannedTx: null | BaseSignRequest;
   /** Stores the tx that will be sent if the user confirms sending */
@@ -160,7 +160,7 @@ export default class AdaTransactionBuilderStore extends Store {
     }
 
     // type-cast to assert non-null
-    const plannedTxInfo: Array<TxOutType> = (this.plannedTxInfo: any);
+    const plannedTxInfo: Array<TxOutType<number>> = (this.plannedTxInfo: any);
 
     const receiver = plannedTxInfo[0].address;
     const amount = plannedTxInfo[0].value
@@ -168,26 +168,23 @@ export default class AdaTransactionBuilderStore extends Store {
       : '0'; // value is not relevant in sendall case
     const shouldSendAll = this.shouldSendAll;
 
-    const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
     if (this.createUnsignedTx.promise) {
       // eslint-disable-next-line no-unused-vars
       await this.createUnsignedTx.promise.catch(err => { /* do nothing */ });
     }
 
-    const withAddress = asGetAllAddresses(publicDeriver.self);
-    if (withAddress == null) {
-      throw new Error('_updateTxBuilder missing get address functionality');
+    const withUtxos = asGetAllUtxos(publicDeriver.self);
+    if (withUtxos == null) {
+      throw new Error('_updateTxBuilder missing utxo functionality');
     }
-    const withHasChains = asHasChains(withAddress);
+    const withHasChains = asHasChains(withUtxos);
     if (withHasChains == null) {
       throw new Error('_updateTxBuilder missing chains functionality');
     }
     this.createUnsignedTx.execute({
-      getAllAddresses: withAddress.getAllAddresses,
-      GetNextUnusedForChain: withHasChains.nextInternal,
+      publicDeriver: withHasChains,
       receiver,
       amount,
-      getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
       shouldSendAll,
     });
   }

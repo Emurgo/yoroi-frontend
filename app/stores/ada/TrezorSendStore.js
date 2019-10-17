@@ -74,7 +74,6 @@ export default class TrezorSendStore extends Store {
       const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
       this.createTrezorSignTxDataRequest.execute({
         ...params,
-        getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
         getTxsBodiesForUTXOs: stateFetcher.getTxsBodiesForUTXOs,
       });
       if (!this.createTrezorSignTxDataRequest.promise) throw new Error('should never happen');

@@ -20,7 +20,8 @@ import type {
 
 import {
   GetUtxoTxOutputsWithTx,
-} from  '../../database/utxoTransactions/api/read';
+} from '../../database/utxoTransactions/api/read';
+import type { UtxoTxOutput } from '../../database/utxoTransactions/api/read';
 
 import type {
   AddressRow,
@@ -31,7 +32,7 @@ import type { PublicDeriverRow, LastSyncInfoRow, } from '../../database/wallet/t
 
 import type {
   IChangePasswordRequestFunc, IChangePasswordRequest,
-  Addressing,
+  Address, Addressing,
 } from '../common/interfaces';
 import {
   GetPublicDeriver,
@@ -142,26 +143,17 @@ export interface IGetPublic {
   +changePubDeriverPassword: IChangePasswordRequestFunc,
 }
 
-export type IGetAllAddressesRequest = PathRequest;
-export type IGetAllAddressesResponse = Array<PathWithAddrAndRow>;
-export type IGetAllAddressesFunc = (
-  body: IGetAllAddressesRequest
-) => Promise<IGetAllAddressesResponse>;
-export interface IGetAllAddresses {
-  +rawGetAllAddresses: RawVariation<
-    IGetAllAddressesFunc,
-    {|
-      GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetAddress: Class<GetAddress>,
-      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
-    |},
-    IGetAllAddressesRequest
-  >;
-  +getAllAddresses: IGetAllAddressesFunc
-}
-
+export type IGetAllUtxoAddressesRequest = PathRequest;
+export type IGetAllUtxoAddressesResponse = Array<PathWithAddrAndRow>;
+export type IGetAllUtxoAddressesFunc = (
+  body: IGetAllUtxoAddressesRequest
+) => Promise<IGetAllUtxoAddressesResponse>;
 export type IGetAllUtxosRequest = void;
-export type IGetAllUtxosResponse = PromisslessReturnType<typeof GetUtxoTxOutputsWithTx.getUtxo>;
+export type IGetAllUtxosResponse = Array<{|
+  output: $ReadOnly<UtxoTxOutput>;
+  ...Addressing,
+  ...Address,
+|}>;
 export type IGetAllUtxosFunc = (
   body: IGetAllUtxosRequest
 ) => Promise<IGetAllUtxosResponse>;
@@ -177,6 +169,17 @@ export interface IGetAllUtxos {
     IGetAllUtxosRequest
   >;
   +getAllUtxos: IGetAllUtxosFunc;
+
+  +rawGetAllUtxoAddresses: RawVariation<
+    IGetAllUtxoAddressesFunc,
+    {|
+      GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetAddress: Class<GetAddress>,
+      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+    |},
+    IGetAllUtxoAddressesRequest
+  >;
+  +getAllUtxoAddresses: IGetAllUtxoAddressesFunc
 }
 
 export type IDisplayCutoffPopRequest = void;

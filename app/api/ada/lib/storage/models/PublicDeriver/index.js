@@ -15,7 +15,7 @@ import type {
   IPublicDeriver, IPublicDeriverConstructor,
   IAddFromPublic, IAddFromPublicRequest, IAddFromPublicResponse,
   IGetPublic, IGetPublicRequest, IGetPublicResponse,
-  IGetAllAddresses, IGetAllAddressesRequest, IGetAllAddressesResponse,
+  IGetAllUtxoAddressesRequest, IGetAllUtxoAddressesResponse,
   IGetAllUtxos, IGetAllUtxosRequest, IGetAllUtxosResponse,
   IDisplayCutoff,
   IDisplayCutoffPopRequest, IDisplayCutoffPopResponse,
@@ -31,6 +31,8 @@ import type {
   IBip44Parent,
 } from './interfaces';
 import type {
+  Address,
+  Addressing,
   IGetBalance,
   IChangePasswordRequest, IChangePasswordResponse,
   IRename, IRenameRequest, IRenameResponse,
@@ -247,7 +249,6 @@ export async function refreshPublicDeriverFunctionality(
     throw new Error('refreshPublicDeriverFunctionality unimplemented: non-Bip44Wallet type');
   }
   currClass = Bip44Parent(currClass);
-  currClass = GetAllAddresses(currClass);
   currClass = GetAllUtxos(currClass);
 
   let publicKey;
@@ -780,80 +781,14 @@ export function asGetSigningKey<T: IPublicDeriver>(
   return undefined;
 }
 
-// =================
-//   GetAddresses
-// =================
-
-type GetAllAddressesDependencies = IPublicDeriver & IBip44Parent;
-const GetAllAddressesMixin = (
-  superclass: Class<GetAllAddressesDependencies>,
-) => class GetAllAddresses extends superclass implements IGetAllAddresses {
-
-  rawGetAllAddresses = async (
-    tx: lf$Transaction,
-    deps: {|
-      GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetAddress: Class<GetAddress>,
-      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
-    |},
-    _body: IGetAllAddressesRequest,
-  ): Promise<IGetAllAddressesResponse> => {
-    return rawGetBip44AddressesByPath(
-      super.getDb(), tx,
-      deps,
-      {
-        startingDerivation: super.getDerivationId(),
-        derivationLevel: this.getBip44Parent().getPublicDeriverLevel(),
-        commonPrefix: super.getPathToPublic(),
-        queryPath: Array(
-          Bip44DerivationLevels.ADDRESS.level - this.getBip44Parent().getPublicDeriverLevel()
-        ).fill(null),
-      }
-    );
-  }
-  getAllAddresses = async (
-    body: IGetAllAddressesRequest,
-  ): Promise<IGetAllAddressesResponse> => {
-    const deps = Object.freeze({
-      GetPathWithSpecific,
-      GetAddress,
-      GetBip44DerivationSpecific,
-    });
-    const depTables = Object
-      .keys(deps)
-      .map(key => deps[key])
-      .flatMap(table => getAllSchemaTables(super.getDb(), table));
-    return await raii(
-      super.getDb(),
-      depTables,
-      async tx => this.rawGetAllAddresses(tx, deps, body)
-    );
-  }
-};
-const GetAllAddresses = Mixin<
-  GetAllAddressesDependencies,
-  IGetAllAddresses
->(GetAllAddressesMixin);
-const GetAllAddressesInstance = (
-  (GetAllAddresses: any): ReturnType<typeof GetAllAddressesMixin>
-);
-export function asGetAllAddresses<T: IPublicDeriver>(
-  obj: T
-): void | (IGetAllAddresses & GetAllAddressesDependencies & T) {
-  if (obj instanceof GetAllAddressesInstance) {
-    return obj;
-  }
-  return undefined;
-}
-
 // ===============
 //   GetAllUtxos
 // ===============
 
-type GetAllUtxosDependencies = IPublicDeriver & IGetAllAddresses;
+type GetAllUtxosDependencies = IPublicDeriver & IBip44Parent;
 const GetAllUtxosMixin = (
   superclass: Class<GetAllUtxosDependencies>,
-) => class GetAllUtxos extends superclass implements IGetAllUtxos {
+) => class GetAllUtxos extends superclass implements IGetAllUtxos { // TODO: probably rename
 
   rawGetAllUtxos = async (
     tx: lf$Transaction,
@@ -865,7 +800,7 @@ const GetAllUtxosMixin = (
     |},
     _body: IGetAllUtxosRequest,
   ): Promise<IGetAllUtxosResponse> => {
-    const addresses = await this.rawGetAllAddresses(
+    const addresses = await this.rawGetAllUtxoAddresses(
       tx,
       {
         GetAddress: deps.GetAddress,
@@ -875,10 +810,29 @@ const GetAllUtxosMixin = (
       undefined,
     );
     const addressIds = addresses.map(address => address.row.AddressId);
-    return await deps.GetUtxoTxOutputsWithTx.getUtxo(
+    const utxosInStorage = await deps.GetUtxoTxOutputsWithTx.getUtxo(
       super.getDb(), tx,
       addressIds,
     );
+    const addressingMap = new Map<number, {| ...Address, ...Addressing |}>(
+      addresses.map(addr => [addr.addr.AddressId, {
+        addressing: addr.addressing,
+        address: addr.addr.Hash,
+      }])
+    );
+    const addressedUtxos = [];
+    for (const utxo of utxosInStorage) {
+      const addressingInfo = addressingMap.get(utxo.UtxoTransactionOutput.AddressId);
+      if (addressingInfo == null) {
+        throw new Error('rawGetAllUtxos should never happen');
+      }
+      addressedUtxos.push({
+        output: utxo,
+        addressing: addressingInfo.addressing,
+        address: addressingInfo.address,
+      });
+    }
+    return addressedUtxos;
   }
   getAllUtxos = async (
     _body: IGetAllUtxosRequest,
@@ -897,6 +851,48 @@ const GetAllUtxosMixin = (
       super.getDb(),
       depTables,
       async tx => this.rawGetAllUtxos(tx, deps, undefined)
+    );
+  }
+
+  rawGetAllUtxoAddresses = async (
+    tx: lf$Transaction,
+    deps: {|
+      GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetAddress: Class<GetAddress>,
+      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+    |},
+    _body: IGetAllUtxoAddressesRequest,
+  ): Promise<IGetAllUtxoAddressesResponse> => {
+    // TODO: fix implementation for chain
+    return rawGetBip44AddressesByPath(
+      super.getDb(), tx,
+      deps,
+      {
+        startingDerivation: super.getDerivationId(),
+        derivationLevel: this.getBip44Parent().getPublicDeriverLevel(),
+        commonPrefix: super.getPathToPublic(),
+        queryPath: Array(
+          Bip44DerivationLevels.ADDRESS.level - this.getBip44Parent().getPublicDeriverLevel()
+        ).fill(null),
+      }
+    );
+  }
+  getAllUtxoAddresses = async (
+    body: IGetAllUtxoAddressesRequest,
+  ): Promise<IGetAllUtxoAddressesResponse> => {
+    const deps = Object.freeze({
+      GetPathWithSpecific,
+      GetAddress,
+      GetBip44DerivationSpecific,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
+    return await raii(
+      super.getDb(),
+      depTables,
+      async tx => this.rawGetAllUtxoAddresses(tx, deps, body)
     );
   }
 };
