@@ -121,7 +121,7 @@ export function normalizeToPubDeriverLevel(request: {
       request.privateKeyRow,
       request.password,
     );
-    const wasmKey = RustModule.Wallet.PrivateKey.from_hex(prvKey);
+    const wasmKey = RustModule.WalletV2.PrivateKey.from_hex(prvKey);
     const newKey = deriveKeyV2(
       wasmKey,
       request.path,
@@ -154,13 +154,13 @@ export function decryptKey(
 
 
 export function deriveKeyV2(
-  startingKey: RustModule.Wallet.PrivateKey,
+  startingKey: RustModule.WalletV2.PrivateKey,
   pathToPublic: Array<number>,
-): RustModule.Wallet.PrivateKey {
+): RustModule.WalletV2.PrivateKey {
   let currKey = startingKey;
   for (let i = 0; i < pathToPublic.length; i++) {
     currKey = currKey.derive(
-      RustModule.Wallet.DerivationScheme.v2(),
+      RustModule.WalletV2.DerivationScheme.v2(),
       pathToPublic[i],
     );
   }

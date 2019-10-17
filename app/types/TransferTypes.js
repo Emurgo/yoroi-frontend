@@ -18,7 +18,7 @@ export type TransferStatus =
 export type TransferTx = {
   recoveredBalance: BigNumber,
   fee: BigNumber,
-  signedTx: RustModule.Wallet.SignedTransaction,
+  signedTx: RustModule.WalletV2.SignedTransaction,
   senders: Array<string>,
   receiver: string,
 }

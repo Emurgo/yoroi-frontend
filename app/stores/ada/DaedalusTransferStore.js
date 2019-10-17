@@ -37,7 +37,7 @@ const MSG_TYPE_RESTORE = 'RESTORE';
 const WS_CODE_NORMAL_CLOSURE = 1000;
 
 type TransferFundsRequest = {
-  signedTx: RustModule.Wallet.SignedTransaction,
+  signedTx: RustModule.WalletV2.SignedTransaction,
 };
 type TransferFundsResponse = SignedResponse;
 type TransferFundsFunc = (
@@ -110,7 +110,7 @@ export default class DaedalusTransferStore extends Store {
    * Finally, generate the tx to transfer the wallet to Yoroi
    */
   _setupTransferWebSocket = async (
-    wallet: RustModule.Wallet.DaedalusWallet,
+    wallet: RustModule.WalletV2.DaedalusWallet,
     publicDeriver: PublicDeriverWithCachedMeta,
   ): Promise<void> => {
     const withChains = asHasChains(publicDeriver.self);
@@ -149,7 +149,7 @@ export default class DaedalusTransferStore extends Store {
         Logger.info(`[ws::message] on: ${data.msg}`);
         if (data.msg === MSG_TYPE_RESTORE) {
           this._updateStatus('checkingAddresses');
-          const checker = RustModule.Wallet.DaedalusAddressChecker.new(wallet);
+          const checker = RustModule.WalletV2.DaedalusAddressChecker.new(wallet);
           const addressKeys = getAddressesKeys({ checker, fullUtxo: data.addresses });
           this._updateStatus('generatingTx');
 
@@ -240,7 +240,7 @@ export default class DaedalusTransferStore extends Store {
 
   /** Send a transaction to the backend-service to be broadcast into the network */
   _transferFundsRequest = async (request: {
-    signedTx: RustModule.Wallet.SignedTransaction,
+    signedTx: RustModule.WalletV2.SignedTransaction,
   }): Promise<SignedResponse> => (
     this.stores.substores.ada.stateFetchStore.fetcher.sendTx({ signedTx: request.signedTx })
   )

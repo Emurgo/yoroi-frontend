@@ -49,18 +49,18 @@ export type AddressedUtxo = {|
 
 export type UnsignedTxFromUtxoResponse = {|
   senderUtxos: Array<RemoteUnspentOutput>,
-  txBuilder: RustModule.Wallet.TransactionBuilder,
+  txBuilder: RustModule.WalletV2.TransactionBuilder,
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
 |};
 export type UnsignedTxResponse = {|
   senderUtxos: Array<AddressedUtxo>,
-  txBuilder: RustModule.Wallet.TransactionBuilder,
+  txBuilder: RustModule.WalletV2.TransactionBuilder,
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
 |};
 export type BaseSignRequest = {|
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
   senderUtxos: Array<AddressedUtxo>,
-  unsignedTx: RustModule.Wallet.Transaction,
+  unsignedTx: RustModule.WalletV2.Transaction,
 |};
 
 /* Backend service Postgres data types */

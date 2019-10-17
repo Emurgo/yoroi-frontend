@@ -79,11 +79,11 @@ export async function sendAllUnsignedTxFromUtxo(
     throw new NotEnoughMoneyToSendError();
   }
 
-  const feeAlgorithm = RustModule.Wallet.LinearFeeAlgorithm.default();
+  const feeAlgorithm = RustModule.WalletV2.LinearFeeAlgorithm.default();
   let fee;
   {
     // firts build a transaction to see what the cost would be
-    const fakeTxBuilder = new RustModule.Wallet.TransactionBuilder();
+    const fakeTxBuilder = new RustModule.WalletV2.TransactionBuilder();
     const inputs = utxoToTxInput(allUtxos);
     addTxInputs(fakeTxBuilder, inputs);
     const inputAmount = coinToBigNumber(fakeTxBuilder.get_input_total());
@@ -170,7 +170,7 @@ export async function newAdaUnsignedTxFromUtxo(
   changeAdaAddr: Array<{| ...Address, ...Addressing |}>,
   allUtxos: Array<RemoteUnspentOutput>,
 ): Promise<UnsignedTxFromUtxoResponse> {
-  const feeAlgorithm = RustModule.Wallet.LinearFeeAlgorithm.default();
+  const feeAlgorithm = RustModule.WalletV2.LinearFeeAlgorithm.default();
 
   const txInputs = utxoToTxInput(allUtxos);
 
@@ -181,8 +181,8 @@ export async function newAdaUnsignedTxFromUtxo(
      * The current Rust code doesn't allow to separate input selection
      * from the chnage address output policy so we combinue it
      */
-    const changeAddr = RustModule.Wallet.Address.from_base58(changeAdaAddr[0].address);
-    outputPolicy = RustModule.Wallet.OutputPolicy.change_to_one_address(changeAddr);
+    const changeAddr = RustModule.WalletV2.Address.from_base58(changeAdaAddr[0].address);
+    outputPolicy = RustModule.WalletV2.OutputPolicy.change_to_one_address(changeAddr);
 
     let selectionResult;
     try {
@@ -192,7 +192,7 @@ export async function newAdaUnsignedTxFromUtxo(
     }
     senderInputs = txInputs.filter(input => (
       selectionResult.is_input(
-        RustModule.Wallet.TxoPointer.from_json(input.to_json().ptr)
+        RustModule.WalletV2.TxoPointer.from_json(input.to_json().ptr)
       )
     ));
   } else if (changeAdaAddr.length === 0) {
@@ -201,7 +201,7 @@ export async function newAdaUnsignedTxFromUtxo(
     throw new Error('only support single change address');
   }
 
-  const txBuilder = new RustModule.Wallet.TransactionBuilder();
+  const txBuilder = new RustModule.WalletV2.TransactionBuilder();
   const changeAddrTxOut = await addTxIO(
     txBuilder, senderInputs, outputPolicy, feeAlgorithm, receiver, amount
   );
@@ -234,10 +234,10 @@ function filterToUsedChange(
 export function signTransaction(
   signRequest: BaseSignRequest,
   keyLevel: number,
-  signingKey: RustModule.Wallet.PrivateKey
-): RustModule.Wallet.SignedTransaction {
+  signingKey: RustModule.WalletV2.PrivateKey
+): RustModule.WalletV2.SignedTransaction {
   const { senderUtxos, unsignedTx } = signRequest;
-  const txFinalizer = new RustModule.Wallet.TransactionFinalized(unsignedTx);
+  const txFinalizer = new RustModule.WalletV2.TransactionFinalized(unsignedTx);
   addWitnesses(
     txFinalizer,
     senderUtxos,
@@ -250,22 +250,22 @@ export function signTransaction(
 
 function utxoToTxInput(
   utxos: Array<RemoteUnspentOutput>,
-): Array<RustModule.Wallet.TxInput> {
+): Array<RustModule.WalletV2.TxInput> {
   return utxos.map(utxo => {
-    const txoPointer = RustModule.Wallet.TxoPointer.new(
-      RustModule.Wallet.TransactionId.from_hex(utxo.tx_hash),
+    const txoPointer = RustModule.WalletV2.TxoPointer.new(
+      RustModule.WalletV2.TransactionId.from_hex(utxo.tx_hash),
       utxo.tx_index
     );
-    const txOut = RustModule.Wallet.TxOut.new(
-      RustModule.Wallet.Address.from_base58(utxo.receiver),
-      RustModule.Wallet.Coin.from_str(utxo.amount),
+    const txOut = RustModule.WalletV2.TxOut.new(
+      RustModule.WalletV2.Address.from_base58(utxo.receiver),
+      RustModule.WalletV2.Coin.from_str(utxo.amount),
     );
-    return RustModule.Wallet.TxInput.new(txoPointer, txOut);
+    return RustModule.WalletV2.TxInput.new(txoPointer, txOut);
   });
 }
 
 function filterUtxo(
-  inputs: Array<RustModule.Wallet.TxInput>,
+  inputs: Array<RustModule.WalletV2.TxInput>,
   utxos: Array<RemoteUnspentOutput>,
 ): Array<RemoteUnspentOutput> {
   const lookupMap = utxosToLookupMap(utxos);
@@ -277,23 +277,23 @@ function filterUtxo(
 }
 
 function getInputSelection(
-  allInputs: Array<RustModule.Wallet.TxInput>,
-  outputPolicy: RustModule.Wallet.OutputPolicy,
-  feeAlgorithm: RustModule.Wallet.LinearFeeAlgorithm,
+  allInputs: Array<RustModule.WalletV2.TxInput>,
+  outputPolicy: RustModule.WalletV2.OutputPolicy,
+  feeAlgorithm: RustModule.WalletV2.LinearFeeAlgorithm,
   receiver: string,
   amount: string,
-): RustModule.Wallet.InputSelectionResult {
-  const inputSelection = RustModule.Wallet.InputSelectionBuilder.first_match_first();
+): RustModule.WalletV2.InputSelectionResult {
+  const inputSelection = RustModule.WalletV2.InputSelectionBuilder.first_match_first();
   allInputs.forEach(input => inputSelection.add_input(input));
   addOutput(inputSelection, receiver, amount);
   return inputSelection.select_inputs(feeAlgorithm, outputPolicy);
 }
 
 function addTxIO(
-  txBuilder: RustModule.Wallet.TransactionBuilder,
-  senderInputs: Array<RustModule.Wallet.TxInput>,
-  outputPolicy: ?RustModule.Wallet.OutputPolicy,
-  feeAlgorithm: RustModule.Wallet.LinearFeeAlgorithm,
+  txBuilder: RustModule.WalletV2.TransactionBuilder,
+  senderInputs: Array<RustModule.WalletV2.TxInput>,
+  outputPolicy: ?RustModule.WalletV2.OutputPolicy,
+  feeAlgorithm: RustModule.WalletV2.LinearFeeAlgorithm,
   receiver: string,
   amount: string,
 ): Array<TxOutType<string>> {
@@ -319,10 +319,10 @@ function addTxIO(
 }
 
 function addWitnesses(
-  txFinalizer: RustModule.Wallet.TransactionFinalized,
+  txFinalizer: RustModule.WalletV2.TransactionFinalized,
   senderUtxos: Array<AddressedUtxo>,
   keyLevel: number,
-  signingKey: RustModule.Wallet.PrivateKey
+  signingKey: RustModule.WalletV2.PrivateKey
 ): void {
   // get private keys
   const privateKeys = senderUtxos.map(utxo => {
@@ -336,7 +336,7 @@ function addWitnesses(
     let key = signingKey;
     for (let i = keyLevel - utxo.addressing.startLevel + 1; i < utxo.addressing.path.length; i++) {
       key = key.derive(
-        RustModule.Wallet.DerivationScheme.v2(),
+        RustModule.WalletV2.DerivationScheme.v2(),
         utxo.addressing.path[i]
       );
     }
@@ -344,11 +344,11 @@ function addWitnesses(
   });
 
   // sign the transactions
-  const setting = RustModule.Wallet.BlockchainSettings.from_json({
+  const setting = RustModule.WalletV2.BlockchainSettings.from_json({
     protocol_magic: protocolMagic
   });
   for (let i = 0; i < senderUtxos.length; i++) {
-    const witness = RustModule.Wallet.Witness.new_extended_key(
+    const witness = RustModule.WalletV2.Witness.new_extended_key(
       setting,
       privateKeys[i],
       txFinalizer.id()
@@ -358,26 +358,26 @@ function addWitnesses(
 }
 
 export function addTxInputs(
-  txBuilder: RustModule.Wallet.TransactionBuilder,
-  senderInputs: Array<RustModule.Wallet.TxInput>,
+  txBuilder: RustModule.WalletV2.TransactionBuilder,
+  senderInputs: Array<RustModule.WalletV2.TxInput>,
 ): void {
   senderInputs.forEach(input => {
     const jsonInput = input.to_json();
     txBuilder.add_input(
-      RustModule.Wallet.TxoPointer.from_json(jsonInput.ptr),
-      RustModule.Wallet.Coin.from_str(jsonInput.value.value)
+      RustModule.WalletV2.TxoPointer.from_json(jsonInput.ptr),
+      RustModule.WalletV2.Coin.from_str(jsonInput.value.value)
     );
   });
 }
 
 export function addOutput(
-  builder: RustModule.Wallet.TransactionBuilder | RustModule.Wallet.InputSelectionBuilder,
+  builder: RustModule.WalletV2.TransactionBuilder | RustModule.WalletV2.InputSelectionBuilder,
   address: string,
   value: string, // in lovelaces
 ): void {
-  const txOut = RustModule.Wallet.TxOut.new(
-    RustModule.Wallet.Address.from_base58(address),
-    RustModule.Wallet.Coin.from_str(value),
+  const txOut = RustModule.WalletV2.TxOut.new(
+    RustModule.WalletV2.Address.from_base58(address),
+    RustModule.WalletV2.Coin.from_str(value),
   );
   builder.add_output(txOut);
 }

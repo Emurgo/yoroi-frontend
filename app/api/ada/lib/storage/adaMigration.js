@@ -176,7 +176,7 @@ export async function storagev2Migation(
   if (wallet != null && account != null) {
     const lastReceiveIndex = await legacyGetLastReceiveAddressIndex();
 
-    const settings = RustModule.Wallet.BlockchainSettings.from_json({
+    const settings = RustModule.WalletV2.BlockchainSettings.from_json({
       protocol_magic: protocolMagic
     });
     await migrateFromStorageV1({

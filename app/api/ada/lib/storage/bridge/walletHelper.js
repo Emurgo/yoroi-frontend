@@ -42,8 +42,8 @@ import type {
 } from './walletBuilder';
 
 export async function getAccountDefaultDerivations(
-  settings: RustModule.Wallet.BlockchainSettings,
-  accountPublicKey: RustModule.Wallet.Bip44AccountPublic,
+  settings: RustModule.WalletV2.BlockchainSettings,
+  accountPublicKey: RustModule.WalletV2.Bip44AccountPublic,
   hashToIds: (addressHash: Array<string>) => Promise<Array<number>>,
 ): Promise<TreeInsert< { DisplayCutoff: null | number }>> {
   const addressesIndex = range(
@@ -55,7 +55,7 @@ export async function getAccountDefaultDerivations(
     addressesIndex.map(i => (
       accountPublicKey
         .bip44_chain(false)
-        .address_key(RustModule.Wallet.AddressKeyIndex.new(i))
+        .address_key(RustModule.WalletV2.AddressKeyIndex.new(i))
         .bootstrap_era_address(settings).to_base58()
     ))
   );
@@ -63,7 +63,7 @@ export async function getAccountDefaultDerivations(
     addressesIndex.map(i => (
       accountPublicKey
         .bip44_chain(true)
-        .address_key(RustModule.Wallet.AddressKeyIndex.new(i))
+        .address_key(RustModule.WalletV2.AddressKeyIndex.new(i))
         .bootstrap_era_address(settings).to_base58()
     ))
   );
@@ -107,8 +107,8 @@ export async function getAccountDefaultDerivations(
 
 export async function createStandardBip44Wallet(request: {
   db: lf$Database,
-  settings: RustModule.Wallet.BlockchainSettings,
-  rootPk: RustModule.Wallet.Bip44RootPrivateKey,
+  settings: RustModule.WalletV2.BlockchainSettings,
+  rootPk: RustModule.WalletV2.Bip44RootPrivateKey,
   password: string,
   accountIndex: number,
   walletName: string,
@@ -124,7 +124,7 @@ export async function createStandardBip44Wallet(request: {
   );
 
   const accountPublicKey = request.rootPk.bip44_account(
-    RustModule.Wallet.AccountIndex.new(request.accountIndex)
+    RustModule.WalletV2.AccountIndex.new(request.accountIndex)
   ).public();
 
   const deps = Object.freeze({
@@ -243,8 +243,8 @@ export async function createStandardBip44Wallet(request: {
 
 export async function createHardwareWallet(request: {
   db: lf$Database,
-  settings: RustModule.Wallet.BlockchainSettings,
-  accountPublicKey: RustModule.Wallet.Bip44AccountPublic,
+  settings: RustModule.WalletV2.BlockchainSettings,
+  accountPublicKey: RustModule.WalletV2.Bip44AccountPublic,
   accountIndex: number,
   walletName: string,
   accountName: string,
@@ -351,7 +351,7 @@ export async function createHardwareWallet(request: {
 
 export async function migrateFromStorageV1(request: {
   db: lf$Database,
-  settings: RustModule.Wallet.BlockchainSettings,
+  settings: RustModule.WalletV2.BlockchainSettings,
   encryptedPk: void | KeyInsert,
   accountPubKey: string,
   displayCutoff: number,
@@ -429,16 +429,16 @@ async function addPublicDeriverToMigratedWallet<
   builder: WalletBuilder<T>,
   db: lf$Database,
   accountPubKey: string,
-  settings: RustModule.Wallet.BlockchainSettings,
+  settings: RustModule.WalletV2.BlockchainSettings,
   displayCutoff: number,
   hwWalletMetaInsert: void | HWFeatures,
 }): Promise<WalletBuilder<T & HasPublicDeriver<mixed>>> {
   const accountIndex = HARD_DERIVATION_START + 0;
   const accountName = '';
 
-  const accountPublicKey = RustModule.Wallet.Bip44AccountPublic.new(
-    RustModule.Wallet.PublicKey.from_hex(request.accountPubKey),
-    RustModule.Wallet.DerivationScheme.v2()
+  const accountPublicKey = RustModule.WalletV2.Bip44AccountPublic.new(
+    RustModule.WalletV2.PublicKey.from_hex(request.accountPubKey),
+    RustModule.WalletV2.DerivationScheme.v2()
   );
   const deps = Object.freeze({
     GetOrAddAddress,

@@ -152,7 +152,7 @@ export default class LedgerSendStore extends Store {
 
   _prepareAndBroadcastSignedTx = async (
     ledgerSignTxResp: LedgerSignTxResponse,
-    unsignedTx: RustModule.Wallet.Transaction,
+    unsignedTx: RustModule.WalletV2.Transaction,
   ): Promise<void> => {
     const { wallets } = this.stores.substores[environment.API];
     const publicDeriver = wallets.selected;

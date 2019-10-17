@@ -181,7 +181,7 @@ export function verifyAccountLevel(
   }
 }
 
-export function coinToBigNumber(coin: RustModule.Wallet.Coin): BigNumber {
+export function coinToBigNumber(coin: RustModule.WalletV2.Coin): BigNumber {
   const ada = new BigNumber(coin.ada());
   const lovelace = ada.times(LOVELACES_PER_ADA).plus(coin.lovelace());
   return lovelace;

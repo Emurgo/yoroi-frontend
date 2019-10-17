@@ -110,7 +110,7 @@ describe('Create unsigned TX from UTXO', () => {
     expect(unsignedTxResponse.txBuilder.get_input_total().to_str()).toEqual('1.000001');
     expect(unsignedTxResponse.txBuilder.get_output_total().to_str()).toEqual('0.005001');
     expect(unsignedTxResponse.txBuilder.estimate_fee(
-      RustModule.Wallet.LinearFeeAlgorithm.default()
+      RustModule.WalletV2.LinearFeeAlgorithm.default()
     ).to_str()).toEqual('0.165753');
     // burns remaining amount
     expect(unsignedTxResponse.txBuilder.get_balance_without_fees().value().to_str()).toEqual('0.995000');
@@ -159,7 +159,7 @@ describe('Create unsigned TX from UTXO', () => {
     expect(unsignedTxResponse.txBuilder.get_input_total().to_str()).toEqual('1.007002');
     expect(unsignedTxResponse.txBuilder.get_output_total().to_str()).toEqual('0.831142');
     expect(unsignedTxResponse.txBuilder.estimate_fee(
-      RustModule.Wallet.LinearFeeAlgorithm.default()
+      RustModule.WalletV2.LinearFeeAlgorithm.default()
     ).to_str()).toEqual('0.175860');
   });
 });
@@ -177,7 +177,7 @@ describe('Create unsigned TX from addresses', () => {
     expect(unsignedTxResponse.txBuilder.get_input_total().to_str()).toEqual('1.007002');
     expect(unsignedTxResponse.txBuilder.get_output_total().to_str()).toEqual('0.005001');
     expect(unsignedTxResponse.txBuilder.estimate_fee(
-      RustModule.Wallet.LinearFeeAlgorithm.default()
+      RustModule.WalletV2.LinearFeeAlgorithm.default()
     ).to_str()).toEqual('0.173707');
     // burns remaining amount
     expect(unsignedTxResponse.txBuilder.get_balance_without_fees().value().to_str()).toEqual('1.002001');
@@ -198,11 +198,11 @@ describe('Create signed transactions', () => {
       unsignedTx: unsignedTxResponse.txBuilder.make_transaction(),
     };
 
-    const accountPrivateKey = RustModule.Wallet.Bip44AccountPrivate.new(
-      RustModule.Wallet.PrivateKey.from_hex(
+    const accountPrivateKey = RustModule.WalletV2.Bip44AccountPrivate.new(
+      RustModule.WalletV2.PrivateKey.from_hex(
         '70afd5ff1f7f551c481b7e3f3541f7c63f5f6bcb293af92565af3deea0bcd6481a6e7b8acbe38f3906c63ccbe8b2d9b876572651ac5d2afc0aca284d9412bb1b4839bf02e1d990056d0f06af22ce4bcca52ac00f1074324aab96bbaaaccf290d'
       ),
-      RustModule.Wallet.DerivationScheme.v2()
+      RustModule.WalletV2.DerivationScheme.v2()
     );
     const signedTx = signTransaction(
       signRequest,
@@ -225,11 +225,11 @@ describe('Create signed transactions', () => {
   });
 
   it('Witness should with addressing from root', async () => {
-    const accountPrivateKey = RustModule.Wallet.Bip44AccountPrivate.new(
-      RustModule.Wallet.PrivateKey.from_hex(
+    const accountPrivateKey = RustModule.WalletV2.Bip44AccountPrivate.new(
+      RustModule.WalletV2.PrivateKey.from_hex(
         '70afd5ff1f7f551c481b7e3f3541f7c63f5f6bcb293af92565af3deea0bcd6481a6e7b8acbe38f3906c63ccbe8b2d9b876572651ac5d2afc0aca284d9412bb1b4839bf02e1d990056d0f06af22ce4bcca52ac00f1074324aab96bbaaaccf290d'
       ),
-      RustModule.Wallet.DerivationScheme.v2()
+      RustModule.WalletV2.DerivationScheme.v2()
     );
     const signRequest = {
       changeAddr: [],
@@ -257,7 +257,7 @@ describe('Create signed transactions', () => {
           }
         }
       ],
-      unsignedTx: RustModule.Wallet.Transaction.from_json(
+      unsignedTx: RustModule.WalletV2.Transaction.from_json(
         {
           inputs: [
             {
@@ -312,7 +312,7 @@ describe('Create sendAll unsigned TX from UTXO', () => {
       expect(sendAllResponse.txBuilder.get_input_total().to_str()).toEqual('11.000002');
       expect(sendAllResponse.txBuilder.get_output_total().to_str()).toEqual('10.826207');
       expect(sendAllResponse.txBuilder.estimate_fee(
-        RustModule.Wallet.LinearFeeAlgorithm.default()
+        RustModule.WalletV2.LinearFeeAlgorithm.default()
       ).to_str()).toEqual('0.173795');
       // make sure we don't accidentally burn a lot of coins
       expect(sendAllResponse.txBuilder.get_balance_without_fees().value().to_str()).toEqual('0.173795');

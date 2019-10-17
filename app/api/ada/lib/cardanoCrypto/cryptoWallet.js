@@ -70,10 +70,10 @@ export const unscramblePaperAdaMnemonic = (
       const [scrambledMnemonics, passwordMnemonics] = [words.slice(0, 18), words.slice(18)];
       try {
         password = mnemonicToSeedHex(passwordMnemonics.join(' '));
-        const entropy = RustModule.Wallet.Entropy.from_english_mnemonics(
+        const entropy = RustModule.WalletV2.Entropy.from_english_mnemonics(
           scrambledMnemonics.join(' ')
         );
-        const newEntropy = RustModule.Wallet.paper_wallet_unscramble(
+        const newEntropy = RustModule.WalletV2.paper_wallet_unscramble(
           entropy.to_array(),
           password
         );
@@ -89,8 +89,11 @@ export const unscramblePaperAdaMnemonic = (
         throw new Error('Password is expected for a 21-word paper!');
       }
       try {
-        const entropy = RustModule.Wallet.Entropy.from_english_mnemonics(phrase);
-        const newEntropy = RustModule.Wallet.paper_wallet_unscramble(entropy.to_array(), password);
+        const entropy = RustModule.WalletV2.Entropy.from_english_mnemonics(phrase);
+        const newEntropy = RustModule.WalletV2.paper_wallet_unscramble(
+          entropy.to_array(),
+          password
+        );
         return [newEntropy.to_english_mnemonics(), 15];
       } catch (e) {
         Logger.error('Failed to unscramble paper mnemonic! ' + stringifyError(e));
@@ -107,8 +110,8 @@ export const scramblePaperAdaMnemonic = (
   password: string,
 ): string => {
   const salt = new Uint8Array(Buffer.from(cryptoRandomString({ length: 2 * 8 }), 'hex'));
-  const entropy = RustModule.Wallet.Entropy.from_english_mnemonics(phrase);
-  const bytes = RustModule.Wallet.paper_wallet_scramble(entropy, salt, password);
+  const entropy = RustModule.WalletV2.Entropy.from_english_mnemonics(phrase);
+  const bytes = RustModule.WalletV2.paper_wallet_scramble(entropy, salt, password);
   return entropyToMnemonic(Buffer.from(bytes), wordlists.ENGLISH);
 };
 
@@ -121,8 +124,8 @@ const mnemonicToSeedHex = (mnemonic: string, password: ?string) => {
 
 export function generateWalletRootKey(
   mnemonic: string
-): RustModule.Wallet.Bip44RootPrivateKey {
-  const entropy = RustModule.Wallet.Entropy.from_english_mnemonics(mnemonic);
+): RustModule.WalletV2.Bip44RootPrivateKey {
+  const entropy = RustModule.WalletV2.Entropy.from_english_mnemonics(mnemonic);
 
   /**
  * there is no wallet entropy password in yoroi
@@ -131,7 +134,7 @@ export function generateWalletRootKey(
  * it is NOT the spending PASSWORD
  */
   const EMPTY_PASSWORD = '';
-  const rootKey = RustModule.Wallet.Bip44RootPrivateKey.recover(
+  const rootKey = RustModule.WalletV2.Bip44RootPrivateKey.recover(
     entropy,
     EMPTY_PASSWORD
   );
@@ -158,18 +161,18 @@ export function updateWalletMasterKeyPassword(
 export function getCryptoWalletFromEncryptedMasterKey(
   encryptedMasterKey: string,
   password: string
-): RustModule.Wallet.Bip44RootPrivateKey {
+): RustModule.WalletV2.Bip44RootPrivateKey {
   const masterKeyBytes = decryptWithPassword(password, encryptedMasterKey);
   const masterKeyHex = Buffer.from(masterKeyBytes).toString('hex');
   return getCryptoWalletFromMasterKey(masterKeyHex);
 }
 export function getCryptoWalletFromMasterKey(
   masterKeyHex: string,
-): RustModule.Wallet.Bip44RootPrivateKey {
-  const privateKey = RustModule.Wallet.PrivateKey.from_hex(masterKeyHex);
-  const cryptoWallet = RustModule.Wallet.Bip44RootPrivateKey.new(
+): RustModule.WalletV2.Bip44RootPrivateKey {
+  const privateKey = RustModule.WalletV2.PrivateKey.from_hex(masterKeyHex);
+  const cryptoWallet = RustModule.WalletV2.Bip44RootPrivateKey.new(
     privateKey,
-    RustModule.Wallet.DerivationScheme.v2()
+    RustModule.WalletV2.DerivationScheme.v2()
   );
   return cryptoWallet;
 }
@@ -187,9 +190,9 @@ export function createAccountPlate(accountPubHash: string): WalletAccountNumberP
 /** Generate a Daedalus /wallet/ to create transactions. Do not save this. Regenerate every time. */
 export function getCryptoDaedalusWalletFromMnemonics(
   mnemonic: string,
-): RustModule.Wallet.DaedalusWallet {
-  const entropy = RustModule.Wallet.Entropy.from_english_mnemonics(mnemonic);
-  const wallet = RustModule.Wallet.DaedalusWallet.recover(entropy);
+): RustModule.WalletV2.DaedalusWallet {
+  const entropy = RustModule.WalletV2.Entropy.from_english_mnemonics(mnemonic);
+  const wallet = RustModule.WalletV2.DaedalusWallet.recover(entropy);
   return wallet;
 }
 
@@ -198,9 +201,9 @@ export function getCryptoDaedalusWalletFromMnemonics(
  */
 export function getCryptoDaedalusWalletFromMasterKey(
   masterKeyHex: string,
-): RustModule.Wallet.DaedalusWallet {
-  const privateKey = RustModule.Wallet.PrivateKey.from_hex(masterKeyHex);
-  const wallet = RustModule.Wallet.DaedalusWallet.new(privateKey);
+): RustModule.WalletV2.DaedalusWallet {
+  const privateKey = RustModule.WalletV2.PrivateKey.from_hex(masterKeyHex);
+  const wallet = RustModule.WalletV2.DaedalusWallet.new(privateKey);
   return wallet;
 }
 
@@ -213,7 +216,7 @@ export const generateStandardPlate = (
   const masterKey = generateWalletMasterKey(mnemonic, '');
   const cryptoWallet = getCryptoWalletFromEncryptedMasterKey(masterKey, '');
   const account = cryptoWallet.bip44_account(
-    RustModule.Wallet.AccountIndex.new(accountIndex + HARD_DERIVATION_START)
+    RustModule.WalletV2.AccountIndex.new(accountIndex + HARD_DERIVATION_START)
   );
   const accountPublic = account.public();
 
@@ -229,7 +232,7 @@ export const generateStandardPlate = (
 
 const mnemonicsToAddresses = (
   generateAddressFunc: GenerateAddressFunc,
-  pubKey: RustModule.Wallet.PublicKey,
+  pubKey: RustModule.WalletV2.PublicKey,
   count: number,
 ): { addresses: Array<string>, accountPlate: WalletAccountNumberPlate } => {
   const accountPlate = createAccountPlate(pubKey.to_hex());

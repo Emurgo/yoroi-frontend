@@ -28,7 +28,7 @@ import {
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 
 type TransferFundsRequest = {
-  signedTx: RustModule.Wallet.SignedTransaction,
+  signedTx: RustModule.WalletV2.SignedTransaction,
 };
 type TransferFundsResponse = SignedResponse;
 type TransferFundsFunc = (
@@ -126,22 +126,22 @@ export default class YoroiTransferStore extends Store {
     updateStatusCallback();
 
     // 3) Calculate private keys for restored wallet utxo
-    const accountKey = RustModule.Wallet.Bip44RootPrivateKey.new(
-      RustModule.Wallet.PrivateKey.from_hex(masterKey),
-      RustModule.Wallet.DerivationScheme.v2(),
+    const accountKey = RustModule.WalletV2.Bip44RootPrivateKey.new(
+      RustModule.WalletV2.PrivateKey.from_hex(masterKey),
+      RustModule.WalletV2.DerivationScheme.v2(),
     ).bip44_account(
-      RustModule.Wallet.AccountIndex.new(accountIndex)
+      RustModule.WalletV2.AccountIndex.new(accountIndex)
     ).key();
 
     const addressKeys = {};
     addresses.forEach(addressInfo => {
       verifyAccountLevel({ addressing: addressInfo.addressing });
       const chainPrv = accountKey.derive(
-        RustModule.Wallet.DerivationScheme.v2(),
+        RustModule.WalletV2.DerivationScheme.v2(),
         addressInfo.addressing.path[1]
       );
       const keyPrv = chainPrv.derive(
-        RustModule.Wallet.DerivationScheme.v2(),
+        RustModule.WalletV2.DerivationScheme.v2(),
         addressInfo.addressing.path[2]
       );
       addressKeys[addressInfo.address] = keyPrv;
@@ -277,7 +277,7 @@ export default class YoroiTransferStore extends Store {
 
   /** Send a transaction to the backend-service to be broadcast into the network */
   _transferFundsRequest = async (request: {
-    signedTx: RustModule.Wallet.SignedTransaction,
+    signedTx: RustModule.WalletV2.SignedTransaction,
   }): Promise<SignedResponse> => (
     this.stores.substores.ada.stateFetchStore.fetcher.sendTx({ signedTx: request.signedTx })
   )

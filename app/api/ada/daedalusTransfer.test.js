@@ -37,7 +37,7 @@ test('Daedalus transfer from single small UTXO', async () => {
   const outAddress = 'Ae2tdPwUPEZ4Gg5gmqwW2t7ottKBMjWunmPt7DwKkAGsxx9XNSfWqrE1Gbk';
 
   const daedalusWallet = getCryptoDaedalusWalletFromMnemonics(words);
-  const checker = RustModule.Wallet.DaedalusAddressChecker.new(daedalusWallet);
+  const checker = RustModule.WalletV2.DaedalusAddressChecker.new(daedalusWallet);
   const addressMap = getAddressesKeys({
     checker,
     fullUtxo: [address]
@@ -88,7 +88,7 @@ test('Daedalus transfer fails from too small UTXO', async () => {
   const outAddress = 'Ae2tdPwUPEZ4Gg5gmqwW2t7ottKBMjWunmPt7DwKkAGsxx9XNSfWqrE1Gbk';
 
   const daedalusWallet = getCryptoDaedalusWalletFromMnemonics(words);
-  const checker = RustModule.Wallet.DaedalusAddressChecker.new(daedalusWallet);
+  const checker = RustModule.WalletV2.DaedalusAddressChecker.new(daedalusWallet);
   const addressMap = getAddressesKeys({
     checker,
     fullUtxo: [address]
@@ -115,7 +115,7 @@ test('Daedalus transfer filters address not belonging to user', async () => {
   const notMyAddress = 'DdzFFzCqrhsf69sXiAinAVVE9ZazKaoiKk9aSTRLJZSP4wMFGi4ogmcwjvSPMFuGD4a74HWemc3zfh3Eh4GdFRvmt3Jf88e77wCEUJgH';
 
   const daedalusWallet = getCryptoDaedalusWalletFromMnemonics(words);
-  const checker = RustModule.Wallet.DaedalusAddressChecker.new(daedalusWallet);
+  const checker = RustModule.WalletV2.DaedalusAddressChecker.new(daedalusWallet);
   const addressMap = getAddressesKeys({
     checker,
     fullUtxo: [myAddress, notMyAddress]
@@ -134,7 +134,7 @@ test('Daedalus transfer from many UTXO', async () => {
   const outAddress = 'Ae2tdPwUPEZ4Gg5gmqwW2t7ottKBMjWunmPt7DwKkAGsxx9XNSfWqrE1Gbk';
 
   const daedalusWallet = getCryptoDaedalusWalletFromMnemonics(words);
-  const checker = RustModule.Wallet.DaedalusAddressChecker.new(daedalusWallet);
+  const checker = RustModule.WalletV2.DaedalusAddressChecker.new(daedalusWallet);
   const addressMap = getAddressesKeys({
     checker,
     fullUtxo: [address]

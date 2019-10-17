@@ -311,7 +311,7 @@ export type PrepareAndBroadcastLedgerSignedTxRequest = {
   getPublicKey: () => Promise<IGetPublicResponse>,
   keyLevel: number,
   ledgerSignTxResp: LedgerSignTxResponse,
-  unsignedTx: RustModule.Wallet.Transaction,
+  unsignedTx: RustModule.WalletV2.Transaction,
   sendTx: SendFunc,
 };
 export type PrepareAndBroadcastLedgerSignedTxResponse = SignedResponse;
@@ -710,7 +710,7 @@ export default class AdaApi {
       const signedTx = await signTransaction(
         signRequest,
         request.publicDeriver.getBip44Parent().getPublicDeriverLevel(),
-        RustModule.Wallet.PrivateKey.from_hex(normalizedKey.prvKeyHex)
+        RustModule.WalletV2.PrivateKey.from_hex(normalizedKey.prvKeyHex)
       );
       const response = request.sendTx({ signedTx });
       Logger.debug(
@@ -817,7 +817,7 @@ export default class AdaApi {
       if (publicKeyRow.IsEncrypted) {
         throw new Error('prepareAndBroadcastLedgerSignedTx unexpcted encrypted public key');
       }
-      const publicKey = RustModule.Wallet.PublicKey.from_hex(publicKeyRow.Hash);
+      const publicKey = RustModule.WalletV2.PublicKey.from_hex(publicKeyRow.Hash);
       const { ledgerSignTxResp, unsignedTx, sendTx } = request;
       const response = await prepareAndBroadcastLedgerSignedTx(
         ledgerSignTxResp,
@@ -952,7 +952,7 @@ export default class AdaApi {
     request: IsValidAddressRequest
   ): Promise<IsValidAddressResponse> {
     try {
-      RustModule.Wallet.Address.from_base58(request.address);
+      RustModule.WalletV2.Address.from_base58(request.address);
       return Promise.resolve(true);
     } catch (validateAddressError) {
       Logger.error('AdaApi::isValidAdaAddress error: ' +
@@ -1013,7 +1013,7 @@ export default class AdaApi {
 
       const wallet = await createStandardBip44Wallet({
         db: request.db,
-        settings: RustModule.Wallet.BlockchainSettings.from_json({
+        settings: RustModule.WalletV2.BlockchainSettings.from_json({
           protocol_magic: protocolMagic
         }),
         rootPk,
@@ -1064,7 +1064,7 @@ export default class AdaApi {
 
     const rootPk = generateWalletRootKey(recoveryPhrase);
     const accountKey = rootPk.bip44_account(
-      RustModule.Wallet.AccountIndex.new(request.accountIndex)
+      RustModule.WalletV2.AccountIndex.new(request.accountIndex)
     );
     try {
       const reverseAddressLookup = new Map<number, string>();
@@ -1166,12 +1166,12 @@ export default class AdaApi {
       Logger.debug('AdaApi::createHardwareWallet called');
       const wallet = await createHardwareWallet({
         db: request.db,
-        settings: RustModule.Wallet.BlockchainSettings.from_json({
+        settings: RustModule.WalletV2.BlockchainSettings.from_json({
           protocol_magic: protocolMagic
         }),
-        accountPublicKey: RustModule.Wallet.Bip44AccountPublic.new(
-          RustModule.Wallet.PublicKey.from_hex(request.publicKey),
-          RustModule.Wallet.DerivationScheme.v2()
+        accountPublicKey: RustModule.WalletV2.Bip44AccountPublic.new(
+          RustModule.WalletV2.PublicKey.from_hex(request.publicKey),
+          RustModule.WalletV2.DerivationScheme.v2()
         ),
         accountIndex: request.derivationIndex,
         walletName: request.walletName,
