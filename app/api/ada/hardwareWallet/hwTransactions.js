@@ -54,7 +54,7 @@ export async function createTrezorSignTxPayload(
   signRequest: BaseSignRequest,
   getTxsBodiesForUTXOs: TxBodiesFunc,
 ): Promise<$CardanoSignTransaction> {
-  const txJson: TransactionType = signRequest.unsignedTx.to_json();
+  const txJson = signRequest.unsignedTx.to_json();
 
   const utxoMap = utxosToLookupMap(
     signRequest.senderUtxos.map(utxo => ({
@@ -145,7 +145,7 @@ function _transformToTrezorInputs(
 }
 
 function _generateTrezorOutputs(
-  txOutputs: Array<TxOutType>,
+  txOutputs: Array<TxOutType<number>>,
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
 ): Array<CardanoOutput> {
   return txOutputs.map(txOutput => {
@@ -174,7 +174,7 @@ export async function createLedgerSignTxPayload(
   signRequest: BaseSignRequest,
   getTxsBodiesForUTXOs: TxBodiesFunc,
 ): Promise<LedgerSignTxPayload> {
-  const txJson: TransactionType = signRequest.unsignedTx.to_json();
+  const txJson = signRequest.unsignedTx.to_json();
   // Map inputs to UNIQUE tx hashes (there might be multiple inputs from the same tx)
   const txsHashes = [...new Set(txJson.inputs.map(x => x.id))];
   const txsBodiesMap = await getTxsBodiesForUTXOs({ txsHashes });
@@ -239,7 +239,7 @@ function _transformToLedgerInputs(
 }
 
 function _transformToLedgerOutputs(
-  txOutputs: Array<TxOutType>,
+  txOutputs: Array<TxOutType<number>>,
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
 ): Array<OutputTypeAddress | OutputTypeChange> {
   return txOutputs.map(txOutput => ({
@@ -249,7 +249,7 @@ function _transformToLedgerOutputs(
 }
 
 function _ledgerOutputAddress58OrPath(
-  txOutput: TxOutType,
+  txOutput: TxOutType<number>,
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
 ): { address58: string } | { path: BIP32Path }  {
   const change = changeAddr.find(addr => addr.address === txOutput.address);
@@ -275,7 +275,7 @@ export async function prepareAndBroadcastLedgerSignedTx(
   try {
     Logger.debug('hwTransactions::prepareAndBroadcastLedgerSignedTx: called');
 
-    const unsignedTxJson: TransactionType = unsignedTx.to_json();
+    const unsignedTxJson = unsignedTx.to_json();
     Logger.debug(`hwTransactions::prepareAndBroadcastLedgerSignedTx unsignedTx: ${stringifyData(
       unsignedTxJson
     )}`);

@@ -3,7 +3,6 @@
 import {
   schema,
 } from 'lovefield';
-import stableStringify from 'json-stable-stringify';
 import '../../test-config';
 import { loadLovefieldDB } from '../database/index';
 import {
@@ -31,7 +30,7 @@ import {
 import {
   PublicDeriver,
   asAddFromPublic,
-  asGetAllAddresses,
+  asGetAllUtxos,
   asGetPublicKey,
   asDisplayCutoff,
   asHasChains,
@@ -207,10 +206,10 @@ test('Can add and fetch address in wallet', async (done) => {
       });
     }
 
-    const asGetAllAddressesInstance = asGetAllAddresses(publicDeriver);
-    expect(asGetAllAddressesInstance != null).toEqual(true);
-    if (asGetAllAddressesInstance != null) {
-      const addresses = await asGetAllAddressesInstance.getAllAddresses();
+    const withUtxos = asGetAllUtxos(publicDeriver);
+    expect(withUtxos != null).toEqual(true);
+    if (withUtxos != null) {
+      const addresses = await withUtxos.getAllUtxoAddresses();
       expect(addresses.length).toEqual(40);
       expect(addresses[0].addr.Hash).toEqual(firstExternalAddressHash);
       expect(addresses[0].addressing.path).toEqual([

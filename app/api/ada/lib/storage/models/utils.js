@@ -16,8 +16,7 @@ import {
 import type {
   IPublicDeriver,
   PathWithAddrAndRow,
-  IGetAllAddresses,
-  IGetAllUtxosResponse,
+  IGetAllUtxos,
   IGetUtxoBalanceResponse,
   IHasChainsRequest,
   IGetNextUnusedForChainResponse,
@@ -48,6 +47,8 @@ import {
   GetAllBip44Wallets,
   GetBip44DerivationSpecific,
 } from '../database/bip44/api/read';
+import type { UtxoTxOutput } from '../database/utxoTransactions/api/read';
+import type { UtxoTransactionOutputRow } from '../database/utxoTransactions/tables';
 import { Bip44DerivationLevels } from '../database/bip44/api/utils';
 import type { GetPathWithSpecificByTreeRequest } from '../database/primitives/api/read';
 import type {
@@ -226,7 +227,7 @@ export async function rawGetDerivationsByPath<
       row,
       addressing: {
         path,
-        startLevel: request.startingDerivation - request.commonPrefix.length,
+        startLevel: request.derivationLevel - request.commonPrefix.length + 1,
       },
     };
   });
@@ -468,11 +469,7 @@ export async function getChainAddressesForDisplay(
   return await raii(
     request.publicDeriver.getDb(),
     depTables,
-    async tx => await rawGetChainAddressesForDisplay(
-      tx,
-      deps,
-      request,
-    )
+    async tx => await rawGetChainAddressesForDisplay(tx, deps, request)
   );
 }
 export async function rawGetAllAddressesForDisplay(
@@ -484,10 +481,10 @@ export async function rawGetAllAddressesForDisplay(
     GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
   |},
   request: {
-    publicDeriver: IPublicDeriver & IGetAllAddresses,
+    publicDeriver: IPublicDeriver & IGetAllUtxos,
   },
 ): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
-  let addresses = await request.publicDeriver.rawGetAllAddresses(
+  let addresses = await request.publicDeriver.rawGetAllUtxoAddresses(
     tx,
     {
       GetAddress: deps.GetAddress,
@@ -519,7 +516,7 @@ export async function rawGetAllAddressesForDisplay(
 }
 export async function getAllAddressesForDisplay(
   request: {
-    publicDeriver: IPublicDeriver & IGetAllAddresses,
+    publicDeriver: IPublicDeriver & IGetAllUtxos,
   },
 ): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
   const deps = Object.freeze({
@@ -579,7 +576,7 @@ export async function rawGetNextUnusedIndex(
 }
 
 export function getUtxoBalanceForAddresses(
-  utxos: IGetAllUtxosResponse,
+  utxos: $ReadOnlyArray<$ReadOnly<UtxoTxOutput>>,
 ): { [key: number]: IGetUtxoBalanceResponse } {
   const groupByAddress = groupBy(
     utxos,
@@ -587,16 +584,17 @@ export function getUtxoBalanceForAddresses(
   );
   const mapping = mapValues(
     groupByAddress,
-    utxoList => getBalanceForUtxos(utxoList)
+    (utxoList: Array<$ReadOnly<UtxoTxOutput>>) => getBalanceForUtxos(
+      utxoList.map(utxo => utxo.UtxoTransactionOutput)
+    )
   );
   return mapping;
 }
 
-
 export function getBalanceForUtxos(
-  utxos: IGetAllUtxosResponse,
+  utxos: $ReadOnlyArray<$ReadOnly<UtxoTransactionOutputRow>>,
 ): IGetUtxoBalanceResponse {
-  const amounts = utxos.map(utxo => new BigNumber(utxo.UtxoTransactionOutput.Amount));
+  const amounts = utxos.map(utxo => new BigNumber(utxo.Amount));
   const total = amounts.reduce(
     (acc, amount) => acc.plus(amount),
     new BigNumber(0)

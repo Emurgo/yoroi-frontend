@@ -20,7 +20,7 @@ import {
 import { loadLovefieldDB } from '../../database/index';
 
 import {
-  asGetAllAddresses,
+  asGetAllUtxos,
   asGetUtxoBalance,
   asDisplayCutoff,
 } from '../../models/PublicDeriver/index';
@@ -171,9 +171,9 @@ test('Syncing simple transaction', async (done) => {
   if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
   const withUtxoBalance = asGetUtxoBalance(withDisplayCutoff);
   if (!withUtxoBalance) throw new Error('missing utxo balance functionality');
-  const withGetAllAddresses = asGetAllAddresses(withUtxoBalance);
-  if (!withGetAllAddresses) throw new Error('missing get all addresses functionality');
-  const basePubDeriver = withGetAllAddresses;
+  const withUtxos = asGetAllUtxos(withUtxoBalance);
+  if (!withUtxos) throw new Error('missing get all addresses functionality');
+  const basePubDeriver = withUtxos;
 
   expect(basePubDeriver != null).toEqual(true);
   if (basePubDeriver == null) {
@@ -193,23 +193,30 @@ test('Syncing simple transaction', async (done) => {
     {
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
-        Transaction: {
-          ErrorMessage: null,
-          Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
-          Digest: 8.191593645542673e-27,
-          Ordinal: 0,
-          BlockId: 1,
-          LastUpdateTime: 1568392636000,
-          Status: 1,
-          TransactionId: 1
+        address: '2cWKMJemoBam9FHms2YNoTSaKGn5xCbN5FRhAa3seKgkfrAYujWrX8PRiFF2jVVMuM455',
+        addressing: {
+          path: [2147483692, 2147485463, 2147483648, 0, 4],
+          startLevel: 1,
         },
-        UtxoTransactionOutput: {
-          AddressId: 5,
-          Amount: '2100000',
-          IsUnspent: true,
-          OutputIndex: 0,
-          TransactionId: 1,
-          UtxoTransactionOutputId: 1
+        output: {
+          Transaction: {
+            ErrorMessage: null,
+            Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
+            Digest: 8.191593645542673e-27,
+            Ordinal: 0,
+            BlockId: 1,
+            LastUpdateTime: 1568392636000,
+            Status: 1,
+            TransactionId: 1
+          },
+          UtxoTransactionOutput: {
+            AddressId: 5,
+            Amount: '2100000',
+            IsUnspent: true,
+            OutputIndex: 0,
+            TransactionId: 1,
+            UtxoTransactionOutputId: 1
+          }
         }
       }]);
     }
@@ -275,45 +282,59 @@ test('Syncing simple transaction', async (done) => {
     {
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
-        Transaction: {
-          ErrorMessage: null,
-          Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
-          Digest: 1.249559827714551e-31,
-          Ordinal: 0,
-          BlockId: 2,
-          LastUpdateTime: 1568392656000,
-          Status: 1,
-          TransactionId: 2
+        address: '2cWKMJemoBai5YBzrvj8yR7AxofNVRRQ3HeGZ6ze2jedGJWAZuv1kk83DDHhbM4etgZoX',
+        addressing: {
+          path: [2147483692, 2147485463, 2147483648, 1, 0],
+          startLevel: 1,
         },
-        UtxoTransactionOutput: {
-          AddressId: 21,
-          Amount: '1100000',
-          IsUnspent: true,
-          OutputIndex: 0,
-          TransactionId: 2,
-          UtxoTransactionOutputId: 3
+        output: {
+          Transaction: {
+            ErrorMessage: null,
+            Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
+            Digest: 1.249559827714551e-31,
+            Ordinal: 0,
+            BlockId: 2,
+            LastUpdateTime: 1568392656000,
+            Status: 1,
+            TransactionId: 2
+          },
+          UtxoTransactionOutput: {
+            AddressId: 21,
+            Amount: '1100000',
+            IsUnspent: true,
+            OutputIndex: 0,
+            TransactionId: 2,
+            UtxoTransactionOutputId: 3
+          }
         }
       },
       {
-        Transaction: {
-          ErrorMessage: null,
-          Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
-          Digest: 1.249559827714551e-31,
-          Ordinal: 0,
-          BlockId: 2,
-          LastUpdateTime: 1568392656000,
-          Status: 1,
-          TransactionId: 2
+        address: '2cWKMJemoBajxKobGHH4FWX8MYipNcYd8QWU6GJNfam6H7HJ4CJFvv42jqiPayM6skcPs',
+        addressing: {
+          path: [2147483692, 2147485463, 2147483648, 0, 19],
+          startLevel: 1,
         },
-        UtxoTransactionOutput: {
-          AddressId: 20,
-          Amount: '900000',
-          IsUnspent: true,
-          OutputIndex: 1,
-          TransactionId: 2,
-          UtxoTransactionOutputId: 4
-        }
-      },
+        output: {
+          Transaction: {
+            ErrorMessage: null,
+            Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
+            Digest: 1.249559827714551e-31,
+            Ordinal: 0,
+            BlockId: 2,
+            LastUpdateTime: 1568392656000,
+            Status: 1,
+            TransactionId: 2
+          },
+          UtxoTransactionOutput: {
+            AddressId: 20,
+            Amount: '900000',
+            IsUnspent: true,
+            OutputIndex: 1,
+            TransactionId: 2,
+            UtxoTransactionOutputId: 4
+          }
+        },
+      }
       ]);
     }
 
@@ -448,11 +469,11 @@ test('Utxo created and used in same sync', async (done) => {
 
   const withDisplayCutoff = asDisplayCutoff(publicDeriver);
   if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
-  const withUtxoBalance = asGetUtxoBalance(withDisplayCutoff);
+  const withUtxos = asGetAllUtxos(withDisplayCutoff);
+  if (!withUtxos) throw new Error('missing get all utxos functionality');
+  const withUtxoBalance = asGetUtxoBalance(withUtxos);
   if (!withUtxoBalance) throw new Error('missing utxo balance functionality');
-  const withGetAllAddresses = asGetAllAddresses(withUtxoBalance);
-  if (!withGetAllAddresses) throw new Error('missing get all addresses functionality');
-  const basePubDeriver = withGetAllAddresses;
+  const basePubDeriver = withUtxoBalance;
 
   expect(basePubDeriver != null).toEqual(true);
   if (basePubDeriver == null) {
@@ -474,43 +495,57 @@ test('Utxo created and used in same sync', async (done) => {
     {
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
-        Transaction: {
-          ErrorMessage: null,
-          Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
-          Digest: 1.249559827714551e-31,
-          Ordinal: 0,
-          BlockId: 2,
-          LastUpdateTime: 1568392656000,
-          Status: 1,
-          TransactionId: 2
+        address: '2cWKMJemoBai5YBzrvj8yR7AxofNVRRQ3HeGZ6ze2jedGJWAZuv1kk83DDHhbM4etgZoX',
+        addressing: {
+          path: [2147483692, 2147485463, 2147483648, 1, 0],
+          startLevel: 1,
         },
-        UtxoTransactionOutput: {
-          AddressId: 21,
-          Amount: '1100000',
-          IsUnspent: true,
-          OutputIndex: 0,
-          TransactionId: 2,
-          UtxoTransactionOutputId: 3
+        output: {
+          Transaction: {
+            ErrorMessage: null,
+            Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
+            Digest: 1.249559827714551e-31,
+            Ordinal: 0,
+            BlockId: 2,
+            LastUpdateTime: 1568392656000,
+            Status: 1,
+            TransactionId: 2
+          },
+          UtxoTransactionOutput: {
+            AddressId: 21,
+            Amount: '1100000',
+            IsUnspent: true,
+            OutputIndex: 0,
+            TransactionId: 2,
+            UtxoTransactionOutputId: 3
+          }
         }
       },
       {
-        Transaction: {
-          ErrorMessage: null,
-          Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
-          Digest: 1.249559827714551e-31,
-          Ordinal: 0,
-          BlockId: 2,
-          LastUpdateTime: 1568392656000,
-          Status: 1,
-          TransactionId: 2
+        address: '2cWKMJemoBajxKobGHH4FWX8MYipNcYd8QWU6GJNfam6H7HJ4CJFvv42jqiPayM6skcPs',
+        addressing: {
+          path: [2147483692, 2147485463, 2147483648, 0, 19],
+          startLevel: 1,
         },
-        UtxoTransactionOutput: {
-          AddressId: 20,
-          Amount: '900000',
-          IsUnspent: true,
-          OutputIndex: 1,
-          TransactionId: 2,
-          UtxoTransactionOutputId: 4
+        output: {
+          Transaction: {
+            ErrorMessage: null,
+            Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
+            Digest: 1.249559827714551e-31,
+            Ordinal: 0,
+            BlockId: 2,
+            LastUpdateTime: 1568392656000,
+            Status: 1,
+            TransactionId: 2
+          },
+          UtxoTransactionOutput: {
+            AddressId: 20,
+            Amount: '900000',
+            IsUnspent: true,
+            OutputIndex: 1,
+            TransactionId: 2,
+            UtxoTransactionOutputId: 4
+          }
         }
       },
       ]);

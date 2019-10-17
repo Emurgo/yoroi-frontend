@@ -19,7 +19,7 @@ import {
 import { loadLovefieldDB } from '../../database/index';
 
 import {
-  asGetAllAddresses,
+  asGetAllUtxos,
   asGetUtxoBalance,
   asDisplayCutoff,
   PublicDeriver,
@@ -116,23 +116,30 @@ async function checkPub1HasTx(
   {
     const response = await basePubDeriver.getAllUtxos();
     expect(response).toEqual([{
-      Transaction: {
-        ErrorMessage: null,
-        Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
-        Digest: 8.191593645542673e-27,
-        Ordinal: 0,
-        BlockId: 1,
-        LastUpdateTime: 1568392636000,
-        Status: 1,
-        TransactionId: 1
+      address: '2cWKMJemoBam9FHms2YNoTSaKGn5xCbN5FRhAa3seKgkfrAYujWrX8PRiFF2jVVMuM455',
+      addressing: {
+        path: [2147483692, 2147485463, 2147483648, 0, 4],
+        startLevel: 1,
       },
-      UtxoTransactionOutput: {
-        AddressId: 5,
-        Amount: '2100000',
-        IsUnspent: true,
-        OutputIndex: 0,
-        TransactionId: 1,
-        UtxoTransactionOutputId: 1
+      output: {
+        Transaction: {
+          ErrorMessage: null,
+          Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
+          Digest: 8.191593645542673e-27,
+          Ordinal: 0,
+          BlockId: 1,
+          LastUpdateTime: 1568392636000,
+          Status: 1,
+          TransactionId: 1
+        },
+        UtxoTransactionOutput: {
+          AddressId: 5,
+          Amount: '2100000',
+          IsUnspent: true,
+          OutputIndex: 0,
+          TransactionId: 1,
+          UtxoTransactionOutputId: 1
+        }
       }
     }]);
   }
@@ -201,25 +208,33 @@ async function checkPub2HasTx(
   }
 
   {
+    console.log('sadf');
     const response = await basePubDeriver.getAllUtxos();
     expect(response).toEqual([{
-      Transaction: {
-        ErrorMessage: null,
-        Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
-        Digest: 8.191593645542673e-27,
-        Ordinal: 0,
-        BlockId: 1,
-        LastUpdateTime: 1568392636000,
-        Status: 1,
-        TransactionId: 2
+      address: '2cWKMJemoBajuCcDYHncArxP5JVaJ8FZeVtH1X49NEizHfSFAp6bSKppwhUyPZzi3mYMZ',
+      addressing: {
+        path: [2147483692, 2147485463, 2147483648, 0, 0],
+        startLevel: 1,
       },
-      UtxoTransactionOutput: {
-        AddressId: 41,
-        Amount: '2700000',
-        IsUnspent: true,
-        OutputIndex: 1,
-        TransactionId: 2,
-        UtxoTransactionOutputId: 4
+      output: {
+        Transaction: {
+          ErrorMessage: null,
+          Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
+          Digest: 8.191593645542673e-27,
+          Ordinal: 0,
+          BlockId: 1,
+          LastUpdateTime: 1568392636000,
+          Status: 1,
+          TransactionId: 2
+        },
+        UtxoTransactionOutput: {
+          AddressId: 41,
+          Amount: '2700000',
+          IsUnspent: true,
+          OutputIndex: 1,
+          TransactionId: 2,
+          UtxoTransactionOutputId: 4
+        }
       }
     }]);
   }
@@ -251,14 +266,14 @@ test('Syncing simple transaction', async (done) => {
   );
   const getBestBlock = genGetBestBlock(networkTransactions);
 
-  const asGetAllAddressesInstance1 = asGetAllAddresses(publicDeriver1);
-  expect(asGetAllAddressesInstance1 != null).toEqual(true);
-  if (asGetAllAddressesInstance1 == null) {
+  const withUtxos1 = asGetAllUtxos(publicDeriver1);
+  expect(withUtxos1 != null).toEqual(true);
+  if (withUtxos1 == null) {
     throw new Error('Syncing txs publicDeriver1 != GetAllAddressesInstance');
   }
-  const asGetAllAddressesInstance2 = asGetAllAddresses(publicDeriver2);
-  expect(asGetAllAddressesInstance2 != null).toEqual(true);
-  if (asGetAllAddressesInstance2 == null) {
+  const withUtxos2 = asGetAllUtxos(publicDeriver2);
+  expect(withUtxos2 != null).toEqual(true);
+  if (withUtxos2 == null) {
     throw new Error('Syncing txs publicDeriver2 != GetAllAddressesInstance');
   }
 
@@ -266,7 +281,7 @@ test('Syncing simple transaction', async (done) => {
   {
     await updateTransactions(
       db,
-      asGetAllAddressesInstance1,
+      withUtxos1,
       checkAddressesInUse,
       getTransactionsHistoryForAddresses,
       getBestBlock,
@@ -305,7 +320,7 @@ test('Syncing simple transaction', async (done) => {
     // now sync and make sure it updated
     await updateTransactions(
       db,
-      asGetAllAddressesInstance2,
+      withUtxos2,
       checkAddressesInUse,
       getTransactionsHistoryForAddresses,
       getBestBlock,
@@ -331,7 +346,7 @@ test('Syncing simple transaction', async (done) => {
   {
     await updateTransactions(
       db,
-      asGetAllAddressesInstance2,
+      withUtxos2,
       checkAddressesInUse,
       getTransactionsHistoryForAddresses,
       getBestBlock,

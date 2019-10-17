@@ -99,10 +99,10 @@ export class GetUtxoOutputs {
   }
 }
 
-export type UtxoTxOutput = {
+export type UtxoTxOutput = {|
   Transaction: $ReadOnly<TransactionRow>,
   UtxoTransactionOutput: $ReadOnly<UtxoTransactionOutputRow>,
-};
+|};
 export class GetUtxoTxOutputsWithTx {
   static ownTables = Object.freeze({
     [TransactionSchema.name]: TransactionSchema,
@@ -150,10 +150,10 @@ export class GetUtxoTxOutputsWithTx {
       )
     );
 
-    const queryResult: $ReadOnlyArray<{
+    const queryResult: $ReadOnlyArray<{|
       Transaction: $ReadOnly<TransactionRow>,
       UtxoTransactionOutput: $ReadOnly<UtxoTransactionOutputRow>,
-    }> = await tx.attach(query);
+    |}> = await tx.attach(query);
 
     if (queryResult.length === 0) {
       return undefined;

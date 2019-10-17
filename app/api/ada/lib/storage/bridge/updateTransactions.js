@@ -49,7 +49,7 @@ import { TxStatusCodes, } from '../database/primitives/tables';
 import {
   ScanAddressesInstance,
 } from '../models/PublicDeriver';
-import type { IPublicDeriver, IGetAllAddresses, } from '../models/PublicDeriver/interfaces';
+import type { IPublicDeriver, IGetAllUtxos, } from '../models/PublicDeriver/interfaces';
 import {
   GetLastSyncForPublicDeriver,
   GetPublicDeriver,
@@ -79,7 +79,7 @@ export async function rawGetUtxoTransactions(
     GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
   |},
   request: {
-    addressFetch: IGetAllAddresses,
+    addressFetch: IGetAllUtxos,
     getTxAndBlock: (txIds: Array<number>) => Promise<$ReadOnlyArray<{
       Block: null | $ReadOnly<BlockRow>,
       Transaction: $ReadOnly<TransactionRow>
@@ -91,7 +91,7 @@ export async function rawGetUtxoTransactions(
   addressLookupMap: Map<number, string>,
   txs: Array<UtxoAnnotatedTransaction>,
 |}> {
-  const addresses = await request.addressFetch.rawGetAllAddresses(
+  const addresses = await request.addressFetch.rawGetAllUtxoAddresses(
     dbTx,
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
@@ -154,7 +154,7 @@ export async function rawGetUtxoTransactions(
 export async function getAllUtxoTransactions(
   db: lf$Database,
   request: {
-    addressFetch: IGetAllAddresses,
+    addressFetch: IGetAllUtxos,
     skip?: number,
     limit?: number,
   },
@@ -206,7 +206,7 @@ export async function getAllUtxoTransactions(
 export async function getPendingUtxoTransactions(
   db: lf$Database,
   request: {
-    addressFetch: IGetAllAddresses,
+    addressFetch: IGetAllUtxos,
   },
 ): Promise<{|
   addressLookupMap: Map<number, string>,
@@ -254,7 +254,7 @@ export async function getPendingUtxoTransactions(
 
 export async function updateTransactions(
   db: lf$Database,
-  publicDeriver: IPublicDeriver & IGetAllAddresses,
+  publicDeriver: IPublicDeriver & IGetAllUtxos,
   checkAddressesInUse: FilterFunc,
   getTransactionsHistoryForAddresses: HistoryFunc,
   getBestBlock: BestBlockFunc,
@@ -380,7 +380,7 @@ async function rollback(
     GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
   |},
   request: {
-    publicDeriver: IPublicDeriver & IGetAllAddresses,
+    publicDeriver: IPublicDeriver & IGetAllUtxos,
     lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
   }
 ): Promise<void> {
@@ -393,7 +393,7 @@ async function rollback(
   }
 
   // 1) Get the best block we have in storage
-  const addresses = await request.publicDeriver.rawGetAllAddresses(
+  const addresses = await request.publicDeriver.rawGetAllUtxoAddresses(
     dbTx,
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
@@ -520,7 +520,7 @@ async function rawUpdateTransactions(
     GetTxAndBlock: Class<GetTxAndBlock>,
     GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
   |},
-  publicDeriver: IPublicDeriver & IGetAllAddresses,
+  publicDeriver: IPublicDeriver & IGetAllUtxos,
   lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
   checkAddressesInUse: FilterFunc,
   getTransactionsHistoryForAddresses: HistoryFunc,
@@ -573,7 +573,7 @@ async function rawUpdateTransactions(
     // 3) get new txs from fetcher
 
     // important: we fetched addresses AFTER scanning for new addresses
-    const addresses = await publicDeriver.rawGetAllAddresses(
+    const addresses = await publicDeriver.rawGetAllUtxoAddresses(
       dbTx,
       {
         GetPathWithSpecific: deps.GetPathWithSpecific,
