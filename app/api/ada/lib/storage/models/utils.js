@@ -227,7 +227,7 @@ export async function rawGetDerivationsByPath<
       row,
       addressing: {
         path,
-        startLevel: request.startingDerivation - request.commonPrefix.length,
+        startLevel: request.derivationLevel - request.commonPrefix.length + 1,
       },
     };
   });

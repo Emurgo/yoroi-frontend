@@ -231,23 +231,30 @@ async function baseTest(
     {
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
-        Transaction: {
-          ErrorMessage: null,
-          Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
-          Digest: 1.249559827714551e-31,
-          Ordinal: 0,
-          BlockId: 1,
-          LastUpdateTime: 1568392636000,
-          Status: 1,
-          TransactionId: 2
+        address: '2cWKMJemoBam9FHms2YNoTSaKGn5xCbN5FRhAa3seKgkfrAYujWrX8PRiFF2jVVMuM455',
+        addressing: {
+          path: [2147483692, 2147485463, 2147483648, 0, 4],
+          startLevel: 1,
         },
-        UtxoTransactionOutput: {
-          AddressId: 5,
-          Amount: '2100000',
-          IsUnspent: true,
-          OutputIndex: 0,
-          TransactionId: 2,
-          UtxoTransactionOutputId: 3
+        output: {
+          Transaction: {
+            ErrorMessage: null,
+            Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
+            Digest: 1.249559827714551e-31,
+            Ordinal: 0,
+            BlockId: 1,
+            LastUpdateTime: 1568392636000,
+            Status: 1,
+            TransactionId: 2
+          },
+          UtxoTransactionOutput: {
+            AddressId: 5,
+            Amount: '2100000',
+            IsUnspent: true,
+            OutputIndex: 0,
+            TransactionId: 2,
+            UtxoTransactionOutputId: 3
+          }
         }
       }]);
     }
@@ -308,43 +315,57 @@ async function baseTest(
     {
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
-        Transaction: {
-          ErrorMessage: null,
-          Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
-          Digest: 8.191593645542673e-27,
-          Ordinal: 0,
-          BlockId: 2,
-          LastUpdateTime: 1568392656000,
-          Status: 1,
-          TransactionId: 1
+        address: '2cWKMJemoBam9FHms2YNoTSaKGn5xCbN5FRhAa3seKgkfrAYujWrX8PRiFF2jVVMuM455',
+        addressing: {
+          path: [2147483692, 2147485463, 2147483648, 0, 4],
+          startLevel: 1,
         },
-        UtxoTransactionOutput: {
-          AddressId: 5,
-          Amount: '2100000',
-          IsUnspent: true,
-          OutputIndex: 0,
-          TransactionId: 1,
-          UtxoTransactionOutputId: 1,
+        output: {
+          Transaction: {
+            ErrorMessage: null,
+            Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
+            Digest: 8.191593645542673e-27,
+            Ordinal: 0,
+            BlockId: 2,
+            LastUpdateTime: 1568392656000,
+            Status: 1,
+            TransactionId: 1
+          },
+          UtxoTransactionOutput: {
+            AddressId: 5,
+            Amount: '2100000',
+            IsUnspent: true,
+            OutputIndex: 0,
+            TransactionId: 1,
+            UtxoTransactionOutputId: 1,
+          }
         }
       },
       {
-        Transaction: {
-          ErrorMessage: null,
-          Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
-          Digest: 1.249559827714551e-31,
-          Ordinal: 0,
-          BlockId: 1,
-          LastUpdateTime: 1568392636000,
-          Status: 1,
-          TransactionId: 2
+        address: '2cWKMJemoBam9FHms2YNoTSaKGn5xCbN5FRhAa3seKgkfrAYujWrX8PRiFF2jVVMuM455',
+        addressing: {
+          path: [2147483692, 2147485463, 2147483648, 0, 4],
+          startLevel: 1,
         },
-        UtxoTransactionOutput: {
-          AddressId: 5,
-          Amount: '2100000',
-          IsUnspent: true,
-          OutputIndex: 0,
-          TransactionId: 2,
-          UtxoTransactionOutputId: 3
+        output: {
+          Transaction: {
+            ErrorMessage: null,
+            Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
+            Digest: 1.249559827714551e-31,
+            Ordinal: 0,
+            BlockId: 1,
+            LastUpdateTime: 1568392636000,
+            Status: 1,
+            TransactionId: 2
+          },
+          UtxoTransactionOutput: {
+            AddressId: 5,
+            Amount: '2100000',
+            IsUnspent: true,
+            OutputIndex: 0,
+            TransactionId: 2,
+            UtxoTransactionOutputId: 3
+          }
         }
       }]);
     }
@@ -393,43 +414,57 @@ async function baseTest(
     {
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
-        Transaction: {
-          ErrorMessage: null,
-          Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
-          Digest: 8.191593645542673e-27,
-          Ordinal: 0,
-          BlockId: 2,
-          LastUpdateTime: 1568392656000,
-          Status: 1,
-          TransactionId: 1
+        address: '2cWKMJemoBam9FHms2YNoTSaKGn5xCbN5FRhAa3seKgkfrAYujWrX8PRiFF2jVVMuM455',
+        addressing: {
+          path: [2147483692, 2147485463, 2147483648, 0, 4],
+          startLevel: 1,
         },
-        UtxoTransactionOutput: {
-          AddressId: 5,
-          Amount: '2100000',
-          IsUnspent: true,
-          OutputIndex: 0,
-          TransactionId: 1,
-          UtxoTransactionOutputId: 1,
+        output: {
+          Transaction: {
+            ErrorMessage: null,
+            Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
+            Digest: 8.191593645542673e-27,
+            Ordinal: 0,
+            BlockId: 2,
+            LastUpdateTime: 1568392656000,
+            Status: 1,
+            TransactionId: 1
+          },
+          UtxoTransactionOutput: {
+            AddressId: 5,
+            Amount: '2100000',
+            IsUnspent: true,
+            OutputIndex: 0,
+            TransactionId: 1,
+            UtxoTransactionOutputId: 1,
+          }
         }
       },
       {
-        Transaction: {
-          ErrorMessage: null,
-          Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
-          Digest: 1.249559827714551e-31,
-          Ordinal: 0,
-          BlockId: 1,
-          LastUpdateTime: 1568392636000,
-          Status: 1,
-          TransactionId: 2
+        address: '2cWKMJemoBam9FHms2YNoTSaKGn5xCbN5FRhAa3seKgkfrAYujWrX8PRiFF2jVVMuM455',
+        addressing: {
+          path: [2147483692, 2147485463, 2147483648, 0, 4],
+          startLevel: 1,
         },
-        UtxoTransactionOutput: {
-          AddressId: 5,
-          Amount: '2100000',
-          IsUnspent: true,
-          OutputIndex: 0,
-          TransactionId: 2,
-          UtxoTransactionOutputId: 3
+        output: {
+          Transaction: {
+            ErrorMessage: null,
+            Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
+            Digest: 1.249559827714551e-31,
+            Ordinal: 0,
+            BlockId: 1,
+            LastUpdateTime: 1568392636000,
+            Status: 1,
+            TransactionId: 2
+          },
+          UtxoTransactionOutput: {
+            AddressId: 5,
+            Amount: '2100000',
+            IsUnspent: true,
+            OutputIndex: 0,
+            TransactionId: 2,
+            UtxoTransactionOutputId: 3
+          }
         }
       }]);
     }

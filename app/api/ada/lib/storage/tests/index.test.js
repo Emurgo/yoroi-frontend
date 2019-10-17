@@ -3,7 +3,6 @@
 import {
   schema,
 } from 'lovefield';
-import stableStringify from 'json-stable-stringify';
 import '../../test-config';
 import { loadLovefieldDB } from '../database/index';
 import {
