@@ -4,7 +4,13 @@
 // Utility functions for handling the private master key
 
 import cryptoRandomString from 'crypto-random-string';
-import { validateMnemonic, generateMnemonic, entropyToMnemonic, wordlists } from 'bip39';
+import {
+  validateMnemonic,
+  generateMnemonic,
+  entropyToMnemonic,
+  mnemonicToEntropy,
+  wordlists,
+} from 'bip39';
 
 import { Logger, stringifyError } from '../../../../utils/logging';
 
@@ -70,11 +76,11 @@ export const unscramblePaperAdaMnemonic = (
       const [scrambledMnemonics, passwordMnemonics] = [words.slice(0, 18), words.slice(18)];
       try {
         password = mnemonicToSeedHex(passwordMnemonics.join(' '));
-        const entropy = RustModule.WalletV2.Entropy.from_english_mnemonics(
+        const entropy = mnemonicToEntropy(
           scrambledMnemonics.join(' ')
         );
         const newEntropy = RustModule.WalletV2.paper_wallet_unscramble(
-          entropy.to_array(),
+          Buffer.from(entropy, 'hex'),
           password
         );
 
@@ -89,9 +95,9 @@ export const unscramblePaperAdaMnemonic = (
         throw new Error('Password is expected for a 21-word paper!');
       }
       try {
-        const entropy = RustModule.WalletV2.Entropy.from_english_mnemonics(phrase);
+        const entropy = mnemonicToEntropy(phrase);
         const newEntropy = RustModule.WalletV2.paper_wallet_unscramble(
-          entropy.to_array(),
+          Buffer.from(entropy, 'hex'),
           password
         );
         return [newEntropy.to_english_mnemonics(), 15];
@@ -115,7 +121,7 @@ export const scramblePaperAdaMnemonic = (
   return entropyToMnemonic(Buffer.from(bytes), wordlists.ENGLISH);
 };
 
-const mnemonicToSeedHex = (mnemonic: string, password: ?string) => {
+const mnemonicToSeedHex = (mnemonic: string, password: ?string): string => {
   const mnemonicBuffer = Buffer.from(unorm.nfkd(mnemonic), 'utf8');
   const salt = 'mnemonic' + (unorm.nfkd(password) || '');
   const saltBuffer = Buffer.from(salt, 'utf8');
