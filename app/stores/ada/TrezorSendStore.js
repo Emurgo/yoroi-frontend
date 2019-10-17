@@ -22,6 +22,7 @@ import {
   convertToLocalizableError
 } from '../../domain/TrezorLocalizedError';
 import LocalizableError from '../../i18n/LocalizableError';
+import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 
 /** Note: Handles Trezor Signing */
 export default class TrezorSendStore extends Store {
@@ -63,17 +64,11 @@ export default class TrezorSendStore extends Store {
       this._setError(null);
       this._setActionProcessing(true);
 
-      const { wallets, addresses } = this.stores.substores[environment.API];
-      const activeWallet = wallets.active;
-      if (!activeWallet) {
-        // this Error will be converted to LocalizableError()
-        throw new Error('Active wallet required before sending.');
-      }
-
-      const accountId = addresses._getAccountIdByWalletId(activeWallet.id);
-      if (accountId == null) {
-        // this Error will be converted to LocalizableError()
-        throw new Error('Active account required before sending.');
+      // capture what wallet is selected before the sending starts
+      const { wallets } = this.stores.substores[environment.API];
+      const publicDeriver = wallets.selected;
+      if (publicDeriver == null) {
+        throw new Error('_sendUsingTrezor no public deriver selected');
       }
 
       const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
@@ -95,7 +90,10 @@ export default class TrezorSendStore extends Store {
         throw new Error(trezorSignTxResp.payload.error);
       }
 
-      await this._brodcastSignedTx(trezorSignTxResp);
+      await this._brodcastSignedTx(
+        trezorSignTxResp,
+        publicDeriver
+      );
 
     } catch (error) {
       Logger.error('TrezorSendStore::_sendUsingTrezor error: ' + stringifyError(error));
@@ -109,6 +107,7 @@ export default class TrezorSendStore extends Store {
 
   _brodcastSignedTx = async (
     trezorSignTxResp: CardanoSignTransaction$,
+    publicDeriver: PublicDeriverWithCachedMeta,
   ): Promise<void> => {
     if (!trezorSignTxResp.success) {
       throw new Error('TrezorSendStore::_brodcastSignedTx should never happen');
@@ -120,13 +119,10 @@ export default class TrezorSendStore extends Store {
 
     this.actions.dialogs.closeActiveDialog.trigger();
     const { wallets } = this.stores.substores[environment.API];
-    await wallets.refreshWalletsData();
+    await wallets.refreshWallet(publicDeriver);
 
-    const activeWallet = wallets.active;
-    if (activeWallet) {
-      // go to transaction screen
-      wallets.goToWalletRoute(activeWallet.id);
-    }
+    // go to transaction screen
+    wallets.goToWalletRoute(publicDeriver.self);
 
     Logger.info('SUCCESS: ADA sent using Trezor SignTx');
   }

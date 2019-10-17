@@ -10,6 +10,10 @@ import type {
 
 import type { BaseSignRequest } from '../../api/ada/adaTypes';
 import { signRequestFee, signRequestTotalInput } from '../../api/ada/lib/utils';
+import {
+  asGetAllAddresses, asHasChains,
+} from '../../api/ada/lib/storage/models/PublicDeriver/index';
+
 
 /**
  * TODO: we make the following assumptions
@@ -99,7 +103,6 @@ export default class AdaTransactionBuilderStore extends Store {
 
     runInAction(() => {
       this.plannedTx = {
-        addressesMap: result.addressesMap,
         senderUtxos: result.senderUtxos,
         unsignedTx: result.txBuilder.make_transaction(),
         changeAddr: result.changeAddr,
@@ -117,8 +120,11 @@ export default class AdaTransactionBuilderStore extends Store {
       // Note: will not trigger if re-asigned same value
       toJS(this.plannedTxInfo),
       this.shouldSendAll,
-      // whenever the user wallet updates, we probably have to refresh the utxo set
-      this.stores.substores.ada.wallets.active,
+      this.stores.substores.ada.wallets.selected,
+      // wallet balance changed => utxo set changed
+      // TODO: this should be changed to UTXO set
+      this.stores.substores.ada.wallets.selected &&
+        this.stores.substores.ada.wallets.selected.amount,
       // need to recalculate when there are no more pending transactions
       this.stores.substores.ada.transactions.hasAnyPending,
     ],
@@ -148,8 +154,8 @@ export default class AdaTransactionBuilderStore extends Store {
       this.createUnsignedTx.reset();
       this.plannedTx = null;
     });
-    const account = this.stores.substores.ada.wallets.activeAccount;
-    if (!account || !this._canCompute()) {
+    const publicDeriver = this.stores.substores.ada.wallets.selected;
+    if (!publicDeriver || !this._canCompute()) {
       return;
     }
 
@@ -167,14 +173,23 @@ export default class AdaTransactionBuilderStore extends Store {
       // eslint-disable-next-line no-unused-vars
       await this.createUnsignedTx.promise.catch(err => { /* do nothing */ });
     }
+
+    const withAddress = asGetAllAddresses(publicDeriver.self);
+    if (withAddress == null) {
+      throw new Error('_updateTxBuilder missing get address functionality');
+    }
+    const withHasChains = asHasChains(withAddress);
+    if (withHasChains == null) {
+      throw new Error('_updateTxBuilder missing chains functionality');
+    }
     this.createUnsignedTx.execute({
-      accountId: account.account,
+      getAllAddresses: withAddress.getAllAddresses,
+      GetNextUnusedForChain: withHasChains.nextInternal,
       receiver,
       amount,
       getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
       shouldSendAll,
     });
-
   }
 
   // ===========

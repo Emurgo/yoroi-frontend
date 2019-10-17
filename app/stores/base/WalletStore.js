@@ -1,23 +1,50 @@
 // @flow
 import { observable, action, computed, runInAction } from 'mobx';
 import BigNumber from 'bignumber.js';
-import _ from 'lodash';
+import { debounce, } from 'lodash';
 import Store from './Store';
-import Wallet from '../../domain/Wallet';
 import Request from '../lib/LocalizedRequest';
 import { buildRoute, matchRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import environment from '../../environment';
-import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
 import type {
   CreateWalletFunc,
   GetWalletsFunc, RestoreWalletFunc,
   GenerateWalletRecoveryPhraseFunc,
+  RestoreWalletResponse,
 } from '../../api/ada';
-import type {
-  DeleteWalletFunc
-} from '../../api/common';
-import type { WalletAccount } from '../../domain/Wallet';
+import {
+  PublicDeriver,
+} from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
+import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+
+type GroupedWallets = {|
+  publicDerivers: Array<PublicDeriverWithCachedMeta>;
+  conceptualWallet: ConceptualWallet;
+|};
+
+function groupWallets(
+  publicDerivers: Array<PublicDeriverWithCachedMeta>,
+): Array<GroupedWallets> {
+  const pairingMap = new Map();
+  for (const publicDeriver of publicDerivers) {
+    // note: this may override previous entries but the result is the same
+    const parent = publicDeriver.self.getConceptualWallet();
+    pairingMap.set(parent, {
+      conceptualWallet: parent,
+      publicDerivers: [],
+    });
+  }
+  // now fill them with public derivers
+  for (const publicDeriver of publicDerivers) {
+    const parentEntry = pairingMap.get(publicDeriver.self.getConceptualWallet());
+    if (parentEntry == null) throw new Error('getPairing public deriver without parent');
+    parentEntry.publicDerivers.push(publicDeriver);
+  }
+  return Array.from(pairingMap.values());
+}
 
 /**
  * The base wallet store that contains the shared logic
@@ -28,18 +55,18 @@ export default class WalletsStore extends Store {
   WALLET_REFRESH_INTERVAL = environment.walletRefreshInterval;
   ON_VISIBLE_DEBOUNCE_WAIT = 1000;
 
-  @observable active: ?Wallet = null;
-  @observable activeAccount: ?WalletAccount = null;
-  @observable walletsRequest: Request<GetWalletsFunc>;
+  @observable publicDerivers: Array<PublicDeriverWithCachedMeta>;
+  @observable selected: null | PublicDeriverWithCachedMeta;
+  @observable getInitialWallets: Request<GetWalletsFunc>;
   @observable createWalletRequest: Request<CreateWalletFunc>;
-  @observable deleteWalletRequest: Request<DeleteWalletFunc>;
   @observable generateWalletRecoveryPhraseRequest: Request<GenerateWalletRecoveryPhraseFunc>;
   @observable restoreRequest: Request<RestoreWalletFunc>;
   @observable isImportActive: boolean = false;
 
   setup() {
+    this.publicDerivers = [];
     setInterval(this._pollRefresh, this.WALLET_REFRESH_INTERVAL);
-    document.addEventListener('visibilitychange', _.debounce(this._pollRefresh, this.ON_VISIBLE_DEBOUNCE_WAIT));
+    document.addEventListener('visibilitychange', debounce(this._pollRefresh, this.ON_VISIBLE_DEBOUNCE_WAIT));
 
     this.registerReactions([
       this._updateActiveWalletOnRouteChanges,
@@ -63,51 +90,49 @@ export default class WalletsStore extends Store {
     }
   };
 
-  /** Create the wallet and go to wallet summary screen */
-  _finishCreation = async () => {
-    const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
-    const wallet = await this.createWalletRequest.execute({
-      name: this.stores.walletBackup.name,
-      password: this.stores.walletBackup.password,
-      mnemonic: this.stores.walletBackup.recoveryPhrase.join(' '),
-      checkAddressesInUse: stateFetcher.checkAddressesInUse,
-    }).promise;
-    if (wallet) {
-      await this.walletsRequest.patch(result => { result.push(wallet); });
-      this.actions.dialogs.closeActiveDialog.trigger();
-      this.goToWalletRoute(wallet.id);
-    } else {
-      this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
+  @action
+  _baseAddNewWallet = async (
+    newWallet: RestoreWalletResponse,
+  ): Promise<void> => {
+    // set the first created as the result
+    const newWithCachedData: Array<PublicDeriverWithCachedMeta> = [];
+    for (const newPublicDeriver of newWallet.publicDerivers) {
+      const withCache = await PublicDeriverWithCachedMeta.fromPublicDeriver(newPublicDeriver);
+      newWithCachedData.push(withCache);
     }
+    runInAction(() => {
+      this.publicDerivers.push(...newWithCachedData);
+
+      this.selected = newWithCachedData[0];
+    });
+    this.actions.dialogs.closeActiveDialog.trigger();
+    this.goToWalletRoute(newWithCachedData[0].self);
+
     const { wallets } = this.stores.substores[environment.API];
     wallets.showWalletCreatedNotification();
-    this.stores.walletBackup.teardown();
-  };
 
-  /** Delete wallet and switch to another existing wallet (if another exists) */
-  _delete = async (params: { walletId: string }) => {
-    const walletToDelete = this.getWalletById(params.walletId);
-    if (!walletToDelete) return;
-    const indexOfWalletToDelete = this.all.indexOf(walletToDelete);
-    await this.deleteWalletRequest.execute({ walletId: params.walletId });
-    // TODO: add back once we support multiple wallets
-    // await this.walletsRequest.patch(result => {
-    //   result.splice(indexOfWalletToDelete, 1);
-    // });
-    runInAction('WalletsStore::_delete', () => {
-      if (this.hasAnyWallets) {
-        const nextIndexInList = Math.max(indexOfWalletToDelete - 1, 0);
-        const nextWalletInList = this.all[nextIndexInList];
-        this.actions.dialogs.closeActiveDialog.trigger();
-        this.goToWalletRoute(nextWalletInList.id);
-      } else {
-        this.active = null;
-        this.activeAccount = null;
-        this.actions.router.goToRoute.trigger({ route: ROUTES.NO_WALLETS });
-      }
-    });
-    this.deleteWalletRequest.reset();
-    await this.refreshWalletsData();
+    for (const pubDeriver of newWithCachedData) {
+      await this.registerObserversForNewWallet(pubDeriver);
+    }
+  }
+
+  /** Create the wallet and go to wallet summary screen */
+  _finishCreation = async () => {
+    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
+    if (persistentDb == null) {
+      throw new Error('_finishCreation db not loaded. Should never happen');
+    }
+    const createdWallet = await this.createWalletRequest.execute({
+      db: persistentDb,
+      walletName: this.stores.walletBackup.name,
+      walletPassword: this.stores.walletBackup.password,
+      recoveryPhrase: this.stores.walletBackup.recoveryPhrase.join(' '),
+    }).promise;
+    if (!createdWallet) throw new Error('_finishCreation should never happen');
+
+    await this._baseAddNewWallet(createdWallet);
+
+    this.stores.walletBackup.teardown();
   };
 
   /** Restore wallet and move to wallet summary screen */
@@ -118,17 +143,19 @@ export default class WalletsStore extends Store {
   }) => {
     this.restoreRequest.reset();
 
-    const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
-    const restoredWallet = await this.restoreRequest.execute({
+    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
+    if (persistentDb == null) {
+      throw new Error('_finishCreation db not loaded. Should never happen');
+    }
+    const createdWallet = await this.restoreRequest.execute({
+      db: persistentDb,
       ...params,
-      checkAddressesInUse: stateFetcher.checkAddressesInUse,
     }).promise;
-    if (!restoredWallet) throw new Error('Restored wallet was not received correctly');
-    await this._patchWalletRequestWithNewWallet(restoredWallet);
-    this.actions.dialogs.closeActiveDialog.trigger();
+    if (!createdWallet) throw new Error('Restored wallet was not received correctly');
+
+    await this._baseAddNewWallet(createdWallet);
+
     this.restoreRequest.reset();
-    this.goToWalletRoute(restoredWallet.id);
-    await this.refreshWalletsData();
   };
 
   // =================== PUBLIC API ==================== //
@@ -136,123 +163,160 @@ export default class WalletsStore extends Store {
   // GETTERS
 
   @computed get hasActiveWallet(): boolean {
-    return !!this.active;
+    return this.selected != null;
   }
 
   @computed get hasLoadedWallets(): boolean {
-    return this.walletsRequest.wasExecuted;
+    return this.getInitialWallets.wasExecuted;
   }
 
   @computed get hasAnyWallets(): boolean {
-    if (this.walletsRequest.result == null) return false;
-    return this.walletsRequest.wasExecuted && this.walletsRequest.result.length > 0;
+    if (!this.hasLoadedWallets) return false;
+    if (this.publicDerivers.length === 0) return false;
+    return this.publicDerivers.length > 0;
   }
 
-  @computed get all(): Array<Wallet> {
-    return this.walletsRequest.result ? this.walletsRequest.result : [];
+  @computed get grouped(): Array<GroupedWallets> {
+    return groupWallets(
+      this.publicDerivers,
+    );
   }
 
-  @computed get first(): ?Wallet {
-    return this.all.length > 0 ? this.all[0] : null;
+  @computed get first(): null | PublicDeriverWithCachedMeta {
+    return this.publicDerivers.length === 0
+      ? null
+      : this.publicDerivers[0];
   }
 
-  @computed get hasAnyLoaded(): boolean {
-    return this.all.length > 0;
+  @computed get hasAnyPublicDeriver(): boolean {
+    return this.publicDerivers.length > 0;
   }
 
   @computed get activeWalletRoute(): ?string {
-    if (!this.active) return null;
-    return this.getWalletRoute(this.active.id);
+    if (this.selected == null) return null;
+    return this.getWalletRoute(this.selected.self);
   }
 
   @computed get isWalletRoute(): boolean {
     const { currentRoute } = this.stores.app;
-    return matchRoute(ROUTES.WALLETS.ROOT + '(/*rest)', currentRoute);
+    return matchRoute(ROUTES.WALLETS.ROOT + '(/*rest)', currentRoute) !== false;
   }
 
-  getWalletById = (id: string): (?Wallet) => this.all.find(w => w.id === id);
-
-  getWalletByName = (name: string): (?Wallet) => this.all.find(w => w.name === name);
-
-  getWalletRoute = (walletId: string, page: string = 'transactions'): string => (
-    buildRoute(ROUTES.WALLETS.PAGE, { id: walletId, page })
+  getWalletRoute = (
+    publicDeriver: PublicDeriver,
+    page: string = 'transactions'
+  ): string => (
+    buildRoute(ROUTES.WALLETS.PAGE, { id: publicDeriver.getPublicDeriverId(), page })
   );
 
-  goToWalletRoute(walletId: string) {
-    const route = this.getWalletRoute(walletId);
+  goToWalletRoute(publicDeriver: PublicDeriver) {
+    const route = this.getWalletRoute(publicDeriver);
     this.actions.router.goToRoute.trigger({ route });
+  }
+
+  refreshWallet(
+    publicDeriver: PublicDeriverWithCachedMeta
+  ): void {
+    this.stores.substores[environment.API].addresses.addObservedWallet(publicDeriver);
+    this.stores.substores[environment.API].transactions.addObservedWallet(publicDeriver);
+  }
+
+  @action
+  addHwWallet = async (
+    publicDeriver: PublicDeriver,
+  ): Promise<void> => {
+    const withCache = await PublicDeriverWithCachedMeta.fromPublicDeriver(publicDeriver);
+    // set the first created as the result
+    this.publicDerivers.push(withCache);
+
+    this.selected = withCache;
+    this.goToWalletRoute(withCache.self);
+
+    await this.registerObserversForNewWallet(withCache);
   }
 
   // ACTIONS
 
   @action.bound _updateBalance(balance: BigNumber): void {
-    if (this.active) {
-      this.active.updateAmount(balance.dividedBy(
+    const selected = this.selected;
+    if (selected != null) {
+      selected.amount = balance.dividedBy(
         LOVELACES_PER_ADA
-      ));
+      );
     }
   }
 
   /** Make all API calls required to setup/update wallet */
-  @action refreshWalletsData = async () => {
-    const result = await this.walletsRequest.execute({}).promise;
-    if (!result) return;
+  @action restoreWalletsFromStorage = async (): Promise<void> => {
+    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
+    if (persistentDb == null) {
+      throw new Error('restoreWalletsFromStorage db not loaded. Should never happen');
+    }
+    const result = await this.getInitialWallets.execute({
+      db: persistentDb,
+    }).promise;
+    if (result == null || result.length === 0) return;
+
+    const newWithCachedData: Array<PublicDeriverWithCachedMeta> = [];
+    for (const newPublicDeriver of result) {
+      const withCache = await PublicDeriverWithCachedMeta.fromPublicDeriver(newPublicDeriver);
+      newWithCachedData.push(withCache);
+    }
     runInAction('refresh active wallet', () => {
-      if (this.active) {
-        this._setActiveWallet({ walletId: this.active.id });
+      if (this.selected == null) {
+        this._setActiveWallet({
+          wallet: newWithCachedData[0]
+        });
+        this.publicDerivers.push(...newWithCachedData);
       }
     });
-    const walletIds = result.map((wallet: Wallet) => wallet.id);
-    this.stores.substores[environment.API].addresses.updateObservedWallets(walletIds);
-    this.stores.substores[environment.API].transactions.updateObservedWallets(walletIds);
+    for (const publicDeriver of newWithCachedData) {
+      this.stores.substores[environment.API].addresses.addObservedWallet(publicDeriver);
+      this.stores.substores[environment.API].transactions.addObservedWallet(publicDeriver);
+    }
+  };
+
+  @action registerObserversForNewWallet = async (
+    publicDeriver: PublicDeriverWithCachedMeta
+  ) => {
+    this.stores.substores[environment.API].addresses.addObservedWallet(publicDeriver);
+    this.stores.substores[environment.API].transactions.addObservedWallet(publicDeriver);
   };
 
   /** Make all API calls required to setup imported wallet */
   @action refreshImportedWalletData = async () => {
-    if (this.hasAnyLoaded) this._setActiveWallet({ walletId: this.all[0].id });
-    return await this.refreshWalletsData();
+    if (this.hasAnyPublicDeriver) this._setActiveWallet({ wallet: this.publicDerivers[0] });
+    return await this.restoreWalletsFromStorage();
   };
 
   // =================== ACTIVE WALLET ==================== //
 
   @action _setActiveWallet = (
-    { walletId }: { walletId: string }
+    { wallet }: { wallet: PublicDeriverWithCachedMeta }
   ): void => {
-    if (this.hasAnyWallets) {
-      const newActiveWallet: ?Wallet = this.all.find(wallet => wallet.id === walletId);
-      this.active = newActiveWallet;
-      // Set first account as default current when wallet is changed
-      this.activeAccount = newActiveWallet &&
-        newActiveWallet.accounts &&
-        newActiveWallet.accounts[0];
-    }
+    this.selected = wallet;
   };
 
   @action _unsetActiveWallet = (): void => {
-    this.active = null;
-    this.activeAccount = null;
+    this.selected = null;
   };
 
   // =================== PRIVATE API ==================== //
 
   @computed get _canRedirectToWallet(): boolean {
     const currentRoute = this.stores.app.currentRoute;
-    const isRootRoute = matchRoute(ROUTES.WALLETS.ROOT, currentRoute);
-    const isNoWalletsRoute = matchRoute(ROUTES.NO_WALLETS, currentRoute);
+    const isRootRoute = matchRoute(ROUTES.WALLETS.ROOT, currentRoute) !== false;
+    const isNoWalletsRoute = matchRoute(ROUTES.NO_WALLETS, currentRoute) !== false;
     return isRootRoute || isNoWalletsRoute;
   }
-
-  _patchWalletRequestWithNewWallet = async (wallet: Wallet) => {
-    // Only add the new wallet if it does not exist yet in the result!
-    await this.walletsRequest.patch(result => {
-      if (!_.find(result, { id: wallet.id })) result.push(wallet);
-    });
-  };
 
   _pollRefresh = async (): Promise<void> => {
     // Do not update if screen not active
     if (!document.hidden) {
-      return await this.refreshWalletsData();
+      const selected = this.selected;
+      if (selected) {
+        this.refreshWallet(selected);
+      }
     }
   };
 
@@ -269,31 +333,38 @@ export default class WalletsStore extends Store {
   */
   _updateActiveWalletOnRouteChanges = () => {
     const currentRoute = this.stores.app.currentRoute;
-    const hasAnyWalletLoaded = this.hasAnyLoaded;
+    const hasAnyPublicDeriver = this.hasAnyPublicDeriver;
     runInAction('WalletsStore::_updateActiveWalletOnRouteChanges', () => {
       // There are not wallets loaded (yet) -> unset active and return
-      if (!hasAnyWalletLoaded) {
+      if (!hasAnyPublicDeriver) {
         return this._unsetActiveWallet();
       }
       const matchWalletRoute = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
-      if (matchWalletRoute) {
+      if (matchWalletRoute !== false) {
         // We have a route for a specific wallet -> lets try to find it
-        const walletForCurrentRoute = this.all.find(w => w.id === matchWalletRoute.id);
-        if (walletForCurrentRoute) {
+        let publicDeriverForRoute = undefined;
+        for (const publicDeriver of this.publicDerivers) {
+          if (publicDeriver.self.getPublicDeriverId().toString() === matchWalletRoute.id) {
+            publicDeriverForRoute = publicDeriver;
+          }
+        }
+        if (publicDeriverForRoute != null) {
           // The wallet exists, we are done
-          this._setActiveWallet({ walletId: walletForCurrentRoute.id });
-        } else if (hasAnyWalletLoaded) {
+          this._setActiveWallet({ wallet: publicDeriverForRoute });
+        } else if (hasAnyPublicDeriver) {
           // There is no wallet with given id -> pick first wallet
-          this._setActiveWallet({ walletId: this.all[0].id });
-          if (this.active) this.goToWalletRoute(this.active.id);
+          this._setActiveWallet({ wallet: this.publicDerivers[0] });
+          if (this.selected != null) {
+            this.goToWalletRoute(this.selected.self);
+          }
         }
       } else if (this._canRedirectToWallet) {
         // The route does not specify any wallet -> pick first wallet
-        if (!this.hasActiveWallet && hasAnyWalletLoaded) {
-          this._setActiveWallet({ walletId: this.all[0].id });
+        if (!this.hasActiveWallet && hasAnyPublicDeriver) {
+          this._setActiveWallet({ wallet: this.publicDerivers[0] });
         }
-        if (this.active) {
-          this.goToWalletRoute(this.active.id);
+        if (this.selected != null) {
+          this.goToWalletRoute(this.selected.self);
         }
       }
     });

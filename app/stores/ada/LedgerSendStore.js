@@ -18,6 +18,9 @@ import type {
   CreateLedgerSignTxDataFunc,
   PrepareAndBroadcastLedgerSignedTxFunc,
 } from '../../api/ada';
+import {
+  asGetPublicKey, asBip44Parent,
+} from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type {
   SendUsingLedgerParams
 } from '../../actions/ada/ledger-send-actions';
@@ -88,17 +91,11 @@ export default class LedgerSendStore extends Store {
       throw new Error('Can\'t send another transaction if one transaction is in progress.');
     }
 
-    const { wallets, addresses } = this.stores.substores[environment.API];
-    const activeWallet = wallets.active;
-    if (!activeWallet) {
+    const { wallets } = this.stores.substores[environment.API];
+    const publicDeriver = wallets.selected;
+    if (!publicDeriver) {
       // this Error will be converted to LocalizableError()
       throw new Error('Active wallet required before sending.');
-    }
-
-    const accountId = addresses._getAccountIdByWalletId(activeWallet.id);
-    if (accountId == null) {
-      // this Error will be converted to LocalizableError()
-      throw new Error('Active account required before sending.');
     }
   }
 
@@ -158,8 +155,24 @@ export default class LedgerSendStore extends Store {
     ledgerSignTxResp: LedgerSignTxResponse,
     unsignedTx: RustModule.Wallet.Transaction,
   ): Promise<void> => {
+    const { wallets } = this.stores.substores[environment.API];
+    const publicDeriver = wallets.selected;
+    if (publicDeriver == null) {
+      throw new Error('_prepareAndBroadcastSignedTx no public deriver selected');
+    }
+    const withPublicKey = asGetPublicKey(publicDeriver.self);
+    if (withPublicKey == null) {
+      throw new Error('_prepareAndBroadcastSignedTx public deriver has no public key.');
+    }
+    const bip44Wallet = asBip44Parent(withPublicKey);
+    if (bip44Wallet == null) {
+      throw new Error('_prepareAndBroadcastSignedTx public deriver not bip44.');
+    }
+
     try {
       await this.broadcastLedgerSignedTxRequest.execute({
+        getPublicKey: withPublicKey.getPublicKey,
+        keyLevel: bip44Wallet.getBip44Parent().getPublicDeriverLevel(),
         ledgerSignTxResp,
         unsignedTx,
         sendTx: this.stores.substores[environment.API].stateFetchStore.fetcher.sendTx,
@@ -169,14 +182,10 @@ export default class LedgerSendStore extends Store {
     }
 
     this.actions.dialogs.closeActiveDialog.trigger();
-    const { wallets } = this.stores.substores[environment.API];
-    await wallets.refreshWalletsData();
+    await wallets.refreshWallet(publicDeriver);
 
-    const activeWallet = wallets.active;
-    if (activeWallet) {
-      // go to transaction screen
-      wallets.goToWalletRoute(activeWallet.id);
-    }
+    // go to transaction screen
+    wallets.goToWalletRoute(publicDeriver.self);
 
     this._reset();
     Logger.info('SUCCESS: ADA sent using Ledger SignTx');

@@ -10,7 +10,6 @@ import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import BorderedBox from '../widgets/BorderedBox';
 import verifyIcon from '../../assets/images/verify-icon.inline.svg';
 import generateURIIcon from '../../assets/images/generate-uri.inline.svg';
-import WalletAddress from '../../domain/WalletAddress';
 import LocalizableError from '../../i18n/LocalizableError';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import styles from './WalletReceive.scss';
@@ -18,6 +17,7 @@ import CopyableAddress from '../widgets/CopyableAddress';
 import RawHash from '../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../domain/Explorer';
+import type { StandardAddress } from '../../stores/base/AddressesStore';
 
 const messages = defineMessages({
   walletAddressLabel: {
@@ -62,7 +62,7 @@ type Props = {|
   walletAddress: string,
   selectedExplorer: ExplorerType,
   isWalletAddressUsed: boolean,
-  walletAddresses: Array<WalletAddress>,
+  walletAddresses: Array<StandardAddress>,
   onGenerateAddress: Function,
   onCopyAddressTooltip: Function,
   getNotification: Function,
@@ -199,24 +199,24 @@ export default class WalletReceive extends Component<Props, State> {
             ]);
             const notificationElementId = `address-${index}-copyNotification`;
             return (
-              <div key={`gen-${address.id}`} className={addressClasses}>
+              <div key={`gen-${address.address}`} className={addressClasses}>
                 {/* Address Id */}
                 <CopyableAddress
-                  hash={address.id}
+                  hash={address.address}
                   elementId={notificationElementId}
                   onCopyAddress={
-                    onCopyAddressTooltip.bind(this, address.id, notificationElementId)
+                    onCopyAddressTooltip.bind(this, address.address, notificationElementId)
                   }
                   getNotification={getNotification}
                 >
                   <ExplorableHashContainer
                     selectedExplorer={this.props.selectedExplorer}
-                    hash={address.id}
+                    hash={address.address}
                     light={address.isUsed}
                     linkType="address"
                   >
                     <RawHash light={address.isUsed}>
-                      {address.id}
+                      {address.address}
                     </RawHash>
                   </ExplorableHashContainer>
                 </CopyableAddress>
@@ -230,7 +230,7 @@ export default class WalletReceive extends Component<Props, State> {
                   >
                     <button
                       type="button"
-                      onClick={onGeneratePaymentURI.bind(this, address.id)}
+                      onClick={onGeneratePaymentURI.bind(this, address.address)}
                       className={styles.btnGenerateURI}
                     >
                       <div className={styles.generateURLActionBlock}>
@@ -252,7 +252,10 @@ export default class WalletReceive extends Component<Props, State> {
                     <button
                       type="button"
                       onClick={
-                        onVerifyAddress.bind(this, { address: address.id, path: address.path })
+                        onVerifyAddress.bind(this, {
+                          address: address.address,
+                          path: address.addressing.path
+                        })
                       }
                     >
                       <div>

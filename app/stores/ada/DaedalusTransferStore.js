@@ -21,12 +21,15 @@ import {
 } from '../../api/ada/daedalusTransfer';
 import environment from '../../environment';
 import type { SignedResponse } from '../../api/ada/lib/state-fetch/types';
-import { getReceiverAddress } from '../../api/ada/lib/storage/adaAddress';
 import {
   getCryptoDaedalusWalletFromMnemonics,
   getCryptoDaedalusWalletFromMasterKey
 } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import {
+  asHasChains,
+} from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 
 declare var CONFIG: ConfigType;
 const websocketUrl = CONFIG.network.websocketUrl;
@@ -106,9 +109,18 @@ export default class DaedalusTransferStore extends Store {
    * Call the backend service to fetch all the UTXO then find which belong to the Daedalus wallet.
    * Finally, generate the tx to transfer the wallet to Yoroi
    */
-  _setupTransferWebSocket = (
+  _setupTransferWebSocket = async (
     wallet: RustModule.Wallet.DaedalusWallet,
-  ): void => {
+    publicDeriver: PublicDeriverWithCachedMeta,
+  ): Promise<void> => {
+    const withChains = asHasChains(publicDeriver.self);
+    if (!withChains) throw new Error('_setupTransferWebSocket missing chains functionality');
+    const nextInternal = await withChains.nextInternal();
+    if (nextInternal.addressInfo == null) {
+      throw new Error('_setupTransferWebSocket no internal addresses left. Should never happen');
+    }
+    const nextInternalAddress = nextInternal.addressInfo.addr.Hash;
+
     this._updateStatus('restoringAddresses');
     runInAction(() => {
       this.ws = new WebSocket(websocketUrl);
@@ -140,9 +152,9 @@ export default class DaedalusTransferStore extends Store {
           const checker = RustModule.Wallet.DaedalusAddressChecker.new(wallet);
           const addressKeys = getAddressesKeys({ checker, fullUtxo: data.addresses });
           this._updateStatus('generatingTx');
-          const outputAddr = await getReceiverAddress();
+
           const transferTx = await generateTransferTx({
-            outputAddr,
+            outputAddr: nextInternalAddress,
             addressKeys,
             getUTXOsForAddresses:
               this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
@@ -181,7 +193,10 @@ export default class DaedalusTransferStore extends Store {
     });
   };
 
-  _setupTransferFundsWithMnemonic = async (payload: { recoveryPhrase: string }): Promise<void> => {
+  _setupTransferFundsWithMnemonic = async (payload: {
+    recoveryPhrase: string,
+    publicDeriver: PublicDeriverWithCachedMeta,
+  }): Promise<void> => {
     let { recoveryPhrase: secretWords } = payload;
     if (secretWords.split(' ').length === 27) {
       const [newSecretWords, unscrambledLen] =
@@ -195,16 +210,21 @@ export default class DaedalusTransferStore extends Store {
       secretWords = newSecretWords;
     }
 
-    this._setupTransferWebSocket(
-      getCryptoDaedalusWalletFromMnemonics(secretWords)
+    await this._setupTransferWebSocket(
+      getCryptoDaedalusWalletFromMnemonics(secretWords),
+      payload.publicDeriver,
     );
   }
 
-  _setupTransferFundsWithMasterKey = (payload: { masterKey: string }): void => {
+  _setupTransferFundsWithMasterKey = async (payload: {
+    masterKey: string,
+    publicDeriver: PublicDeriverWithCachedMeta,
+  }): Promise<void> => {
     const { masterKey: key } = payload;
 
-    this._setupTransferWebSocket(
-      getCryptoDaedalusWalletFromMasterKey(key)
+    await this._setupTransferWebSocket(
+      getCryptoDaedalusWalletFromMasterKey(key),
+      payload.publicDeriver,
     );
   }
 
@@ -227,7 +247,8 @@ export default class DaedalusTransferStore extends Store {
 
   /** Broadcast the transfer transaction if one exists and proceed to continuation */
   _transferFunds = async (payload: {
-    next: Function
+    next: Function,
+    publicDeriver: PublicDeriverWithCachedMeta,
   }): Promise<void> => {
     try {
       const { next } = payload;
@@ -237,7 +258,7 @@ export default class DaedalusTransferStore extends Store {
       await this.transferFundsRequest.execute({
         signedTx: this.transferTx.signedTx
       });
-      // TBD: why do we need a continuation instead of just pustting the code here directly?
+      // TBD: why do we need a continuation instead of just putting the code here directly?
       next();
       this._reset();
     } catch (error) {

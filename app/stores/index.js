@@ -25,7 +25,7 @@ const storeClasses = {
   loading: LoadingStore,
 };
 
-export type StoresMap = {
+export type StoresMap = {|
   profile: ProfileStore,
   app: AppStore,
   topbar: TopbarStore,
@@ -36,7 +36,7 @@ export type StoresMap = {
 
   substores: { ada: AdaStoresMap },
   router: RouterStore,
-};
+|};
 
 /** Constant that represents the stores across the lifetime of the application */
 const stores = observable({

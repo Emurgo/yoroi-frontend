@@ -6,7 +6,7 @@ import paperWalletPage2Path from '../../../assets/images/paper-wallet/paper-wall
 import { Logger, stringifyError } from '../../../utils/logging';
 import type { Network } from '../../../../config/config-types';
 import { NetworkType } from '../../../../config/config-types';
-import type { WalletAccountNumberPlate } from '../../../domain/Wallet';
+import type { WalletAccountNumberPlate } from '../lib/storage/models/PublicDeriver/interfaces';
 import { createIcon as blockiesIcon } from '@download/blockies';
 
 export type PaperRequest = {

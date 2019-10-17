@@ -41,18 +41,31 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
     this._getYoroiTransferActions().startTransferFunds.trigger();
   }
 
-  setupTransferFundsWithMnemonic = (payload: { recoveryPhrase: string }) => {
-    this._getYoroiTransferActions().setupTransferFundsWithMnemonic.trigger(payload);
+  setupTransferFundsWithMnemonic = (payload: {
+    recoveryPhrase: string,
+  }) => {
+    const walletsStore = this._getWalletsStore();
+    const publicDeriver = walletsStore.selected;
+    if (publicDeriver == null) {
+      throw new Error('tranferFunds no wallet selected');
+    }
+    this._getYoroiTransferActions().setupTransferFundsWithMnemonic.trigger({
+      ...payload,
+      publicDeriver,
+    });
   };
 
   /** Broadcast the transfer transaction if one exists and return to wallet page */
   tranferFunds = () => {
     // broadcast transfer transaction then call continuation
+    const walletsStore = this._getWalletsStore();
+    const publicDeriver = walletsStore.selected;
+    if (publicDeriver == null) {
+      throw new Error('tranferFunds no wallet selected');
+    }
     this._getYoroiTransferActions().transferFunds.trigger({
       next: () => new Promise(resolve => {
-        const walletsStore = this._getWalletsStore();
-        walletsStore.refreshWalletsData();
-
+        walletsStore.refreshWallet(publicDeriver);
         setTimeout(() => {
           if (walletsStore.activeWalletRoute != null) {
             const newRoute = walletsStore.activeWalletRoute;
@@ -62,7 +75,8 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
           }
           resolve();
         }, SUCCESS_PAGE_STAY_TIME);
-      })
+      }),
+      publicDeriver,
     });
   }
 

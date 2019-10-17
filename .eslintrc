@@ -68,6 +68,7 @@
     "no-console": 0,
     "no-mixed-operators": 0,
     "no-multi-assign": 0,
+    "no-undef-init": 0, // need this to improve Flow type inference
     "no-unneeded-ternary": ["error", { "defaultAssignment": true }],
     "prefer-template": 0,
     "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],

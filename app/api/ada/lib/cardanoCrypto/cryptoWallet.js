@@ -14,11 +14,11 @@ import * as unorm from 'unorm';
 import { pbkdf2Sync as pbkdf2 } from 'pbkdf2';
 
 import { RustModule } from './rustLoader';
-import { generateAddressBatch } from '../adaAddressProcessing';
-import type { AddressType } from '../../adaTypes';
+import type { GenerateAddressFunc } from '../adaAddressProcessing';
+import { genAddressBatchFunc } from '../../restoreAdaWallet';
 import blakejs from 'blakejs';
 import crc32 from 'buffer-crc32';
-import type { WalletAccountNumberPlate } from '../../../../domain/Wallet';
+import type { WalletAccountNumberPlate } from '../storage/models/PublicDeriver/interfaces';
 import { HARD_DERIVATION_START } from '../../../../config/numbersConfig';
 
 
@@ -119,8 +119,9 @@ const mnemonicToSeedHex = (mnemonic: string, password: ?string) => {
   return pbkdf2(mnemonicBuffer, saltBuffer, 2048, 32, 'sha512').toString('hex');
 };
 
-/** Generate and encrypt HD wallet */
-export function generateWalletMasterKey(mnemonic : string, password : string): string {
+export function generateWalletRootKey(
+  mnemonic: string
+): RustModule.Wallet.Bip44RootPrivateKey {
   const entropy = RustModule.Wallet.Entropy.from_english_mnemonics(mnemonic);
 
   /**
@@ -134,6 +135,12 @@ export function generateWalletMasterKey(mnemonic : string, password : string): s
     entropy,
     EMPTY_PASSWORD
   );
+  return rootKey;
+}
+
+/** Generate and encrypt HD wallet */
+export function generateWalletMasterKey(mnemonic: string, password : string): string {
+  const rootKey = generateWalletRootKey(mnemonic);
   const masterKey = rootKey.key().to_hex();
   const encodedMasterKey = Buffer.from(masterKey, 'hex');
   return encryptWithPassword(password, encodedMasterKey);
@@ -197,11 +204,11 @@ export function getCryptoDaedalusWalletFromMasterKey(
   return wallet;
 }
 
-export const mnemonicsToAddresses = (
+export const generateStandardPlate = (
   mnemonic: string,
   accountIndex: number,
   count: number,
-  type: AddressType = 'External'
+  protocolMagic: number,
 ): { addresses: Array<string>, accountPlate: WalletAccountNumberPlate } => {
   const masterKey = generateWalletMasterKey(mnemonic, '');
   const cryptoWallet = getCryptoWalletFromEncryptedMasterKey(masterKey, '');
@@ -209,7 +216,24 @@ export const mnemonicsToAddresses = (
     RustModule.Wallet.AccountIndex.new(accountIndex + HARD_DERIVATION_START)
   );
   const accountPublic = account.public();
-  const accountPlate = createAccountPlate(accountPublic.key().to_hex());
-  const addresses = generateAddressBatch([...Array(count).keys()], accountPublic, type);
+
+  return mnemonicsToAddresses(
+    genAddressBatchFunc(
+      accountPublic.bip44_chain(false),
+      protocolMagic,
+    ),
+    accountPublic.key(),
+    count
+  );
+};
+
+const mnemonicsToAddresses = (
+  generateAddressFunc: GenerateAddressFunc,
+  pubKey: RustModule.Wallet.PublicKey,
+  count: number,
+): { addresses: Array<string>, accountPlate: WalletAccountNumberPlate } => {
+  const accountPlate = createAccountPlate(pubKey.to_hex());
+
+  const addresses = generateAddressFunc([...Array(count).keys()]);
   return { addresses, accountPlate };
 };

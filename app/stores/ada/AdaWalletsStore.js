@@ -9,29 +9,24 @@ import WalletStore from '../base/WalletStore';
 import { matchRoute, buildRoute } from '../../utils/routing';
 import Request from '../lib/LocalizedRequest';
 import { ROUTES } from '../../routes-config';
-import type { WalletImportFromFileParams } from '../../actions/ada/wallets-actions';
 import type {
   SignAndBroadcastFunc, CreateWalletFunc,
   GetWalletsFunc, RestoreWalletFunc,
   GenerateWalletRecoveryPhraseFunc
 } from '../../api/ada/index';
-import type { DeleteWalletFunc } from '../../api/common';
 import type { BaseSignRequest } from '../../api/ada/adaTypes';
+import {
+  asGetSigningKey, asBip44Parent,
+} from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 export default class AdaWalletsStore extends WalletStore {
 
   // REQUESTS
-  @observable walletsRequest: Request<GetWalletsFunc>
+  @observable getInitialWallets: Request<GetWalletsFunc>
     = new Request<GetWalletsFunc>(this.api.ada.getWallets);
-
-  @observable importFromFileRequest: Request<{} => Promise<{}>>
-    = new Request<{} => Promise<{}>>(() => Promise.resolve({}));
 
   @observable createWalletRequest: Request<CreateWalletFunc>
     = new Request<CreateWalletFunc>(this.api.ada.createWallet.bind(this.api.ada));
-
-  @observable deleteWalletRequestt: Request<DeleteWalletFunc>
-    = new Request<DeleteWalletFunc>(() => Promise.resolve(true));
 
   @observable sendMoneyRequest: Request<SignAndBroadcastFunc>
     = new Request<SignAndBroadcastFunc>(this.api.ada.signAndBroadcast);
@@ -47,10 +42,8 @@ export default class AdaWalletsStore extends WalletStore {
     const { router, walletBackup, ada } = this.actions;
     const { wallets } = ada;
     wallets.createWallet.listen(this._create);
-    wallets.deleteWallet.listen(this._delete);
     wallets.sendMoney.listen(this._sendMoney);
     wallets.restoreWallet.listen(this._restoreWallet);
-    wallets.importWalletFromFile.listen(this._importWalletFromFile);
     wallets.updateBalance.listen(this._updateBalance);
     router.goToRoute.listen(this._onRouteChange);
     walletBackup.finishWalletBackup.listen(this._finishCreation);
@@ -63,26 +56,33 @@ export default class AdaWalletsStore extends WalletStore {
     signRequest: BaseSignRequest,
     password: string,
   }): Promise<void> => {
-    const wallet = this.active;
-    if (!wallet) throw new Error('Active wallet required before sending.');
-    const accountId = this.stores.substores.ada.addresses._getAccountIdByWalletId(wallet.id);
-    if (accountId == null) throw new Error('Active account required before sending.');
+    const publicDeriver = this.selected;
+    if (!publicDeriver) throw new Error('Active wallet required before sending.');
 
+    const asBip44 = (asBip44Parent(publicDeriver.self));
+    if (asBip44 == null) {
+      throw new Error('_sendMoney public deriver missing bip44 functionality.');
+    }
+    const withSigning = (asGetSigningKey(publicDeriver.self));
+    if (withSigning == null) {
+      throw new Error('_sendMoney public deriver missing signing functionality.');
+    }
     await this.sendMoneyRequest.execute({
+      publicDeriver: withSigning,
       ...transactionDetails,
       sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
     });
 
-    await this.refreshWalletsData();
+    await this.refreshWallet(publicDeriver);
     this.actions.dialogs.closeActiveDialog.trigger();
     this.sendMoneyRequest.reset();
     // go to transaction screen
-    this.goToWalletRoute(wallet.id);
+    this.goToWalletRoute(publicDeriver.self);
   };
 
   @action _onRouteChange = (options: { route: string, params: ?Object }): void => {
     // Reset the send request anytime we visit the send page (e.g: to remove any previous errors)
-    if (matchRoute(ROUTES.WALLETS.SEND, buildRoute(options.route, options.params))) {
+    if (matchRoute(ROUTES.WALLETS.SEND, buildRoute(options.route, options.params)) !== false) {
       this.sendMoneyRequest.reset();
     }
   };
@@ -109,27 +109,6 @@ export default class AdaWalletsStore extends WalletStore {
     walletPassword: string,
   }) => {
     await this._restore(params);
-
-    this.showWalletRestoredNotification();
-  };
-
-  // =================== WALLET IMPORTING ==================== //
-
-  // Similar to wallet restoration
-  @action _importWalletFromFile = async (params: WalletImportFromFileParams) => {
-    this.importFromFileRequest.reset();
-
-    const { filePath, walletName, walletPassword } = params;
-    this.importFromFileRequest.execute({
-      filePath, walletName, walletPassword,
-    });
-    // $FlowFixMe fix if we ever implement this
-    const importedWallet = await this.importFromFileRequest.promise;
-
-    if (!importedWallet) throw new Error('Imported wallet was not received correctly');
-    this.importFromFileRequest.reset();
-    await this._patchWalletRequestWithNewWallet(importedWallet);
-    await this.refreshWalletsData();
   };
 
   // =================== NOTIFICATION ==================== //

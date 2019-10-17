@@ -78,7 +78,7 @@ export default class ProfileStore extends Store {
       isDone: () => this.hasRedirected,
       action: async () => {
         const { wallets } = this.stores.substores[environment.API];
-        await wallets.refreshWalletsData();
+        await wallets.restoreWalletsFromStorage();
         if (wallets.first) {
           const firstWallet = wallets.first;
 
@@ -87,7 +87,7 @@ export default class ProfileStore extends Store {
           } else {
             this.actions.router.goToRoute.trigger({
               route: ROUTES.WALLETS.TRANSACTIONS,
-              params: { id: firstWallet.id }
+              params: { id: firstWallet }
             });
           }
         } else {

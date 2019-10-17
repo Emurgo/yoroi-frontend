@@ -57,6 +57,11 @@ declare module 'lovefield' {
   declare interface lf$Row {}
 
   declare type lf$ValueLiteral = string | number | boolean | Date;
+  declare type lf$ValueLiteralArray =
+    $ReadOnlyArray<string> |
+    $ReadOnlyArray<number> |
+    $ReadOnlyArray<boolean> |
+    $ReadOnlyArray<Date>;
 
   declare interface lf$PredicateProvider {
     eq(operand: lf$ValueLiteral | lf$schema$Column | lf$Binder): lf$Predicate;
@@ -70,7 +75,7 @@ declare module 'lovefield' {
       from: lf$ValueLiteral | lf$Binder,
       to: lf$ValueLiteral | lf$Binder
     ): lf$Predicate;
-    in(values: lf$Binder | Array<lf$ValueLiteral>): lf$Predicate;
+    in(values: lf$Binder | lf$ValueLiteralArray): lf$Predicate;
     isNull(): lf$Predicate;
     isNotNull(): lf$Predicate;
   }
@@ -86,10 +91,12 @@ declare module 'lovefield' {
   }
 
   declare interface lf$Transaction {
-    attach(query: lf$query$Builder): Promise<Array<Object>>;
-    begin(scope: Array<lf$schema$Table>): Promise<void>;
+    attach(query: lf$query$Builder): Promise<$ReadOnlyArray<$ReadOnly<Object>>>;
+    begin(scope: $ReadOnlyArray<lf$schema$Table>): Promise<void>;
     commit(): Promise<void>;
-    exec(queries: Array<lf$query$Builder>): Promise<Array<Array<Object>>>;
+    exec(queries: $ReadOnlyArray<lf$query$Builder>): Promise<
+      $ReadOnlyArray<$ReadOnlyArray<$ReadOnly<Object>>>
+    >;
     rollback(): Promise<void>;
     stats(): lf$TransactionStats;
   }
@@ -117,7 +124,7 @@ declare module 'lovefield' {
 
   declare interface lf$query$Builder {
     bind(...values: any[]): lf$query$Builder;
-    exec(): Promise<Array<Object>>;
+    exec(): Promise<$ReadOnlyArray<$ReadOnly<Object>>>;
     explain(): string;
     toSql(): string;
   }
@@ -129,7 +136,7 @@ declare module 'lovefield' {
 
   declare type lf$query$Insert = {
     into(table: lf$schema$Table): lf$query$Insert,
-    values(rows: Array<lf$Row> | lf$Binder | Array<lf$Binder>): lf$query$Insert
+    values(rows: $ReadOnlyArray<lf$Row> | lf$Binder | $ReadOnlyArray<lf$Binder>): lf$query$Insert
   } & lf$query$Builder;
 
   declare type lf$query$Select = {
@@ -171,7 +178,7 @@ declare module 'lovefield' {
     ): Promise<void>;
     createRow(payload: Object): lf$Row;
     getVersion(): number;
-    dump(): Array<Object>;
+    dump(): Promise<{ [tableName: string]: Array<any> }>;
   }
 
   declare var npm$namespace$lf$schema: {
@@ -195,7 +202,7 @@ declare module 'lovefield' {
   declare interface lf$schema$Database {
     name(): string;
     pragma(): lf$schema$DatabasePragma;
-    tables(): Array<lf$schema$Table>;
+    tables(): $ReadOnlyArray<lf$schema$Table>;
     table(tableName: string): lf$schema$Table;
     version(): number;
   }
@@ -250,16 +257,16 @@ declare module 'lovefield' {
     ): lf$schema$TableBuilder;
     addIndex(
       name: string,
-      columns: Array<string> | Array<lf$schema$IndexedColumn>,
+      columns: $ReadOnlyArray<string> | $ReadOnlyArray<lf$schema$IndexedColumn>,
       unique?: boolean,
       order?: $Values<typeof lf$Order>
     ): lf$schema$TableBuilder;
-    addNullable(columns: Array<string>): lf$schema$TableBuilder;
+    addNullable(columns: $ReadOnlyArray<string>): lf$schema$TableBuilder;
     addPrimaryKey(
-      columns: Array<string> | Array<lf$schema$IndexedColumn>,
+      columns: $ReadOnlyArray<string> | $ReadOnlyArray<lf$schema$IndexedColumn>,
       autoInc?: boolean
     ): lf$schema$TableBuilder;
-    addUnique(name: string, columns: Array<string>): lf$schema$TableBuilder;
+    addUnique(name: string, columns: $ReadOnlyArray<string>): lf$schema$TableBuilder;
   }
 
   declare function lf$schema$create(

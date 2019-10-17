@@ -13,7 +13,6 @@ const CONFIG: ConfigType = {
     serverStatusRefreshInterval: 10,
     logsBufferSize: 10,
     logsFileSuffix: 'log',
-    addressScanSize: 20,
     addressRequestSize: 20,
     txsBodiesRequestSize: 20,
   },

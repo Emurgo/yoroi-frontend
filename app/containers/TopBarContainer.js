@@ -23,8 +23,7 @@ export default class TopBarContainer extends Component<Props> {
 
     const walletsStore = stores.substores[environment.API].wallets;
     const title = (<WalletTopbarTitle
-      wallet={walletsStore.active}
-      account={walletsStore.activeAccount}
+      publicDeriver={walletsStore.selected}
       currentRoute={app.currentRoute}
       formattedWalletAmount={formattedWalletAmount}
       themeProperties={{

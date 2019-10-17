@@ -25,7 +25,7 @@ Sometimes it is useful and faster to simulate running our CI on your local machi
 #### Updating image
 
 You sometimes need to update your docker image (for example get the latest version of browsers). This requires you to delete your existing image and recreate a new one
-1) `docker pull -a emurgornd/circleci-node-8-browsers`
+1) `docker pull -a emurgornd/circleci-node-12-browsers`
 1) `docker stop yoroi_ci`
 1) `docker rm yoroi_ci`
 1) See instructions for setting up LocalCI for the first time

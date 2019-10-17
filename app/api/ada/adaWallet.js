@@ -13,13 +13,13 @@ import {
   isValidEnglishAdaPaperMnemonic,
   unscramblePaperAdaMnemonic,
   scramblePaperAdaMnemonic,
-  mnemonicsToAddresses
+  generateStandardPlate
 } from './lib/cardanoCrypto/cryptoWallet';
 import type {
   UtxoSumFunc,
 } from './lib/state-fetch/types';
 import { GetBalanceError } from './errors';
-import type { WalletAccountNumberPlate } from '../../domain/Wallet';
+import type { WalletAccountNumberPlate } from './lib/storage/models/PublicDeriver/interfaces';
 
 /** Wrapper function to check mnemonic validity according to bip39 */
 export const isValidMnemonic = (
@@ -69,15 +69,16 @@ export const generatePaperWalletSecret = (password: string): PaperWalletSecret =
 export const mnemonicsToExternalAddresses = (
   mnemonics: string,
   accountIndex: number,
-  count: number
+  count: number,
+  protocolMagic: number,
 ): {
   addresses: Array<string>,
   accountPlate: WalletAccountNumberPlate
 } => (
-  mnemonicsToAddresses(mnemonics, accountIndex, count, 'External')
+  generateStandardPlate(mnemonics, accountIndex, count, protocolMagic)
 );
 
-export async function getBalance(
+export async function getBalanceFromRemote(
   addresses: Array<string>,
   getUTXOsSumsForAddresses: UtxoSumFunc,
 ): Promise<BigNumber> {

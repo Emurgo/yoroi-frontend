@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import _ from 'lodash';
+import { chunk } from 'lodash';
 
 import HorizontalFlexContainer from './HorizontalFlexContainer';
 
@@ -17,15 +17,15 @@ export default class GridFlexContainer extends Component<Props> {
     const { children, rowSize } = this.props;
 
     const childArray = React.Children.toArray(children);
-    const chunkedChildren = _.chunk(childArray, rowSize);
+    const chunkedChildren = chunk(childArray, rowSize);
 
     /* eslint-disable react/no-array-index-key */
     return (
       <div>
         {
-          chunkedChildren.map((chunk, i) => (
+          chunkedChildren.map((childChunk, i) => (
             <HorizontalFlexContainer key={i}>
-              {chunk}
+              {childChunk}
             </HorizontalFlexContainer>
           ))
         }

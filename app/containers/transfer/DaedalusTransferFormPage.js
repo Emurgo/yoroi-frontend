@@ -16,7 +16,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onSubmit: Function,
+  onSubmit: { recoveryPhrase: string } => void,
   onBack: Function,
   mnemonicValidator: Function,
   validWords: Array<string>,

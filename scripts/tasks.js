@@ -2,7 +2,7 @@
 import { rm, mkdir, cp } from 'shelljs';
 import { NetworkType } from '../config/config-types';
 import type { Network } from '../config/config-types';
-import _ from 'lodash';
+import { values } from 'lodash';
 import fs from 'fs';
 import path from 'path';
 
@@ -43,7 +43,7 @@ const buildManifest = (type: Network) => {
   }
 };
 
-const manifestTypes = _.values(NetworkType);
+const manifestTypes = values(NetworkType);
 exports.buildManifests = () => {
   manifestTypes.map((type) => buildManifest(type));
 };

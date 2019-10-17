@@ -18,15 +18,13 @@ import {
 
 import {
   loadLovefieldDB,
-} from './lib/storage/lovefieldDatabase';
+} from './lib/storage/database/index';
 
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
 
 beforeAll(async () => {
   await RustModule.load();
-  await loadLovefieldDB({
-    storeType: schema.DataStoreType.MEMORY,
-  });
+  await loadLovefieldDB(schema.DataStoreType.MEMORY);
   silenceLogsForTesting();
 });
 

@@ -1,7 +1,9 @@
 // @flow
 import RouteParser from 'route-parser';
 
-export const matchRoute = (pattern: string, path: string) => new RouteParser(pattern).match(path);
+export const matchRoute = (
+  pattern: string, path: string
+): false | { [param: string]: string } => new RouteParser(pattern).match(path);
 
 /**
  * Build a route from a pattern like `/wallets/:id` to `/wallets/123`
@@ -103,7 +105,7 @@ export const buildRoute = (pattern: string, params: ParamsT) => {
  * @returns {string}
  */
 export const getUrlParameterByName = (name: string, url?: string) => {
-  if (url == null) url = window.location.href;
+  if (url == null) url = (window.location.href: string);
   name = name.replace(/[[\]]/g, '\\$&');
   const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
   const results = regex.exec(url);

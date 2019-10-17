@@ -19,7 +19,7 @@ import {
 } from '../../utils/logging';
 import {
   loadLovefieldDB,
-} from './lib/storage/lovefieldDatabase';
+} from './lib/storage/database/index';
 
 const VALID_DD_PAPER = {
   words: 'fire shaft radar three ginger receive result phrase song staff scorpion food undo will have expire nice uncle dune until lift unlock exist step world slush disagree',
@@ -35,9 +35,7 @@ const UNEXPECTED_DD_ADDRESS =
 
 beforeAll(async () => {
   await RustModule.load();
-  await loadLovefieldDB({
-    storeType: schema.DataStoreType.MEMORY,
-  });
+  await loadLovefieldDB(schema.DataStoreType.MEMORY);
   silenceLogsForTesting();
 });
 

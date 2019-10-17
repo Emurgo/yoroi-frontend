@@ -11,6 +11,10 @@ import {
   CURRENCY_SPECIFIC_CATEGORIES,
   SETTINGS
 } from '../../config/topbarConfig';
+import {
+  isTrezorTWallet,
+  isLedgerNanoSWallet,
+} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 
 export default class TopbarStore extends Store {
 
@@ -19,7 +23,6 @@ export default class TopbarStore extends Store {
   setup() {
     this.isActiveCategory = this.isActiveCategory.bind(this);
     this.actions.topbar.activateTopbarCategory.listen(this._onActivateTopbarCategory);
-    this.actions.topbar.walletSelected.listen(this._onWalletSelected);
     this.registerReactions([
       this._syncTopbarRouteWithRouter,
     ]);
@@ -27,14 +30,20 @@ export default class TopbarStore extends Store {
 
   @computed get categories(): Array<Category> {
     const { wallets } = this.stores.substores[environment.API];
+
+    let isTrezorT = false;
+    let isNanoS = false;
+    const selected = wallets.selected;
+    if (selected != null) {
+      const conceptualWallet = selected.self.getConceptualWallet();
+      isTrezorT = isTrezorTWallet(conceptualWallet);
+      isNanoS = isLedgerNanoSWallet(conceptualWallet);
+    }
+
     return [
-      (wallets && !wallets.hasAnyLoaded) ? GO_BACK : WALLETS,
-      ...(
-        wallets && wallets.first &&
-        wallets.first.isTrezorTWallet) ? [WITH_TREZOR_T] : [],
-      ...(
-        wallets && wallets.first &&
-        wallets.first.isLedgerNanoSWallet) ? [WITH_LEDGER_NANO_S] : [],
+      (wallets && !wallets.hasAnyPublicDeriver) ? GO_BACK : WALLETS,
+      ...(isTrezorT ? [WITH_TREZOR_T] : []),
+      ...(isNanoS ? [WITH_LEDGER_NANO_S] : []),
       SETTINGS,
       ...CURRENCY_SPECIFIC_CATEGORIES[environment.API],
     ];
@@ -53,12 +62,6 @@ export default class TopbarStore extends Store {
     if (category !== this.activeTopbarCategory) {
       this.actions.router.goToRoute.trigger({ route: category });
     }
-  };
-
-  @action _onWalletSelected = (
-    { walletId }: { walletId: string }
-  ): void => {
-    this.stores.substores[environment.API].wallets.goToWalletRoute(walletId);
   };
 
   @action _setActivateTopbarCategory = (

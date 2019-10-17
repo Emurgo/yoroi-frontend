@@ -1,0 +1,1087 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Syncing with failed 1`] = `
+Object {
+  "addressLookupMap": Map {
+    5 => "2cWKMJemoBam9FHms2YNoTSaKGn5xCbN5FRhAa3seKgkfrAYujWrX8PRiFF2jVVMuM455",
+    46 => "2cWKMJemoBaiw2vnBSiChVe9owqcymJJUq9UdTFzn3QLjvqvoLRVadugTfMtcJXQKcoWW",
+    47 => "2cWKMJemoBakYwphS2CYUDzm9jTvoKGeyUy43JXdKmSzEEdWMMnjD7REMX4kCdWj5W5U6",
+    48 => "2cWKMJemoBakYwphS2CYUDzm9jTvoKGeyUy43JXdKmSzEEdWMMnjD7REMX4kCdWj5W5U6",
+  },
+  "txs": Array [
+    Object {
+      "amount": "-1900000",
+      "block": null,
+      "fee": "-200000",
+      "transaction": Object {
+        "BlockId": null,
+        "Digest": 1.9060984568373646e-36,
+        "ErrorMessage": null,
+        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed547",
+        "LastUpdateTime": 1568392676000,
+        "Ordinal": null,
+        "Status": -1,
+        "TransactionId": 3,
+      },
+      "type": "expend",
+      "utxoInputs": Array [
+        Object {
+          "AddressId": 5,
+          "Amount": "2100000",
+          "IndexInOwnTx": 0,
+          "IndexInParentTx": 0,
+          "ParentTxHash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546",
+          "TransactionId": 3,
+          "UtxoTransactionInputId": 3,
+        },
+      ],
+      "utxoOutputs": Array [
+        Object {
+          "AddressId": 48,
+          "Amount": "1900000",
+          "IsUnspent": true,
+          "OutputIndex": 0,
+          "TransactionId": 3,
+          "UtxoTransactionOutputId": 5,
+        },
+      ],
+    },
+    Object {
+      "amount": "2100000",
+      "block": Object {
+        "BlockId": 2,
+        "BlockTime": 2019-09-13T16:37:36.000Z,
+        "Digest": -9.690691258114666e-56,
+        "Hash": "a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26",
+        "Height": 218609,
+        "SlotNum": 219651,
+      },
+      "fee": "0",
+      "transaction": Object {
+        "BlockId": 2,
+        "Digest": 8.191593645542673e-27,
+        "ErrorMessage": null,
+        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545",
+        "LastUpdateTime": 1568392656000,
+        "Ordinal": 0,
+        "Status": -2,
+        "TransactionId": 1,
+      },
+      "type": "income",
+      "utxoInputs": Array [
+        Object {
+          "AddressId": 46,
+          "Amount": "4000000",
+          "IndexInOwnTx": 0,
+          "IndexInParentTx": 0,
+          "ParentTxHash": "9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20",
+          "TransactionId": 1,
+          "UtxoTransactionInputId": 1,
+        },
+      ],
+      "utxoOutputs": Array [
+        Object {
+          "AddressId": 5,
+          "Amount": "2100000",
+          "IsUnspent": true,
+          "OutputIndex": 0,
+          "TransactionId": 1,
+          "UtxoTransactionOutputId": 1,
+        },
+        Object {
+          "AddressId": 47,
+          "Amount": "1731391",
+          "IsUnspent": true,
+          "OutputIndex": 1,
+          "TransactionId": 1,
+          "UtxoTransactionOutputId": 2,
+        },
+      ],
+    },
+    Object {
+      "amount": "2100000",
+      "block": Object {
+        "BlockId": 1,
+        "BlockTime": 2019-09-13T16:37:16.000Z,
+        "Digest": -6.352946211521613e-51,
+        "Hash": "a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25",
+        "Height": 218608,
+        "SlotNum": 219650,
+      },
+      "fee": "0",
+      "transaction": Object {
+        "BlockId": 1,
+        "Digest": 1.249559827714551e-31,
+        "ErrorMessage": null,
+        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546",
+        "LastUpdateTime": 1568392636000,
+        "Ordinal": 0,
+        "Status": -2,
+        "TransactionId": 2,
+      },
+      "type": "income",
+      "utxoInputs": Array [
+        Object {
+          "AddressId": 46,
+          "Amount": "4000000",
+          "IndexInOwnTx": 0,
+          "IndexInParentTx": 0,
+          "ParentTxHash": "9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d21",
+          "TransactionId": 2,
+          "UtxoTransactionInputId": 2,
+        },
+      ],
+      "utxoOutputs": Array [
+        Object {
+          "AddressId": 5,
+          "Amount": "2100000",
+          "IsUnspent": true,
+          "OutputIndex": 0,
+          "TransactionId": 2,
+          "UtxoTransactionOutputId": 3,
+        },
+        Object {
+          "AddressId": 47,
+          "Amount": "1731391",
+          "IsUnspent": true,
+          "OutputIndex": 1,
+          "TransactionId": 2,
+          "UtxoTransactionOutputId": 4,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`Syncing with failed 2`] = `
+Array [
+  Object {
+    "Address": Array [
+      Object {
+        "AddressId": 1,
+        "Digest": 2.625159121708784e-245,
+        "Hash": "2cWKMJemoBahV1J8CooPHv6kiRwvURBHKH6x8qNyjXLEHQLPc36Z4Hz9pBHbhB2wdDS5Q",
+      },
+      Object {
+        "AddressId": 2,
+        "Digest": 5.722525766106571e-175,
+        "Hash": "2cWKMJemoBajVVEZhJEsjNHKgjsTsi9kWqejTQEghsNyg4fXD66D3YWvbRhfUVfHWooa7",
+      },
+      Object {
+        "AddressId": 3,
+        "Digest": -3.219045380546553e-79,
+        "Hash": "2cWKMJemoBajyD34hiLDYDKM4jDY65zcPQH9RfW1KyVURUWQtfrAtVQYKyBysMjFTiUUj",
+      },
+      Object {
+        "AddressId": 4,
+        "Digest": -1.2072712420728654e-129,
+        "Hash": "2cWKMJemoBajQf5KTfA8htULcbNh6ad6Do1UVeCEaj8PAhEDVsqq1zyDFrWn3gHwqbXWZ",
+      },
+      Object {
+        "AddressId": 5,
+        "Digest": 4.604445688743196e+269,
+        "Hash": "2cWKMJemoBam9FHms2YNoTSaKGn5xCbN5FRhAa3seKgkfrAYujWrX8PRiFF2jVVMuM455",
+      },
+      Object {
+        "AddressId": 6,
+        "Digest": -4.4796651863531186e-274,
+        "Hash": "2cWKMJemoBakQfaRgK4hzbneQU1cz1VQidgsCzRPNXZzRmFfpW9AoFvmeUdQBZbzhrKwf",
+      },
+      Object {
+        "AddressId": 7,
+        "Digest": 7.161673823755841e+143,
+        "Hash": "2cWKMJemoBajKQwmreignV6bWHMy52VAw2Xg1JNT7DkTX9VSCyQt45vjzu1oHks6aKBQ9",
+      },
+      Object {
+        "AddressId": 8,
+        "Digest": 6.420156535669085e+72,
+        "Hash": "2cWKMJemoBaieRPed6xgtaYeoAvrp8k4NFWeBv4noqYNfjkNX2EY7jkBAA9PbZmuY2fgX",
+      },
+      Object {
+        "AddressId": 9,
+        "Digest": 3792.7225960259916,
+        "Hash": "2cWKMJemoBam3EPRozJ36mHpcHHJuf1F3cTBAH8sN6kPS1HFSxUrPpDedysJKS3GFPss5",
+      },
+      Object {
+        "AddressId": 10,
+        "Digest": -1.0741353372289304e-84,
+        "Hash": "2cWKMJemoBak2H91XpvcvdQztZ4rJSmGg258XMfJANawzWcNcvxVF7WbE8pGQYovNYkcP",
+      },
+      Object {
+        "AddressId": 11,
+        "Digest": -1.464161111236789e-98,
+        "Hash": "2cWKMJemoBaikNBAKubYWG821tgjW8z7Tyi7NCKcZAuUgpXYEyb8yv6vhJ4jtEtGkfpRa",
+      },
+      Object {
+        "AddressId": 12,
+        "Digest": 1.9191719756549796e+224,
+        "Hash": "2cWKMJemoBajjnXhSiczSaPc48WWALFCaqipDmXh5j2KmQsmbW7pkEC8mEmNTefCmcSpT",
+      },
+      Object {
+        "AddressId": 13,
+        "Digest": 1.1721430977337218e-8,
+        "Hash": "2cWKMJemoBajN8htLpD7QC4nBmvUQH2HwPRYktCyFYUTNkQNzRu9qqV3U38yYQRDJpPHr",
+      },
+      Object {
+        "AddressId": 14,
+        "Digest": 2.0497331866122915e-175,
+        "Hash": "2cWKMJemoBahsfMnovpCAHsaF2CWb7ygu2yw9uAdeVRftL8B7hwuwrPDsmRgMGDC2XsxR",
+      },
+      Object {
+        "AddressId": 15,
+        "Digest": -5.033242376582583e-262,
+        "Hash": "2cWKMJemoBajVu74QGDFCe1wrwdNFVRrbKRAW4PnpqHrC7tXveRPsUnxGVScEFj5FWZcL",
+      },
+      Object {
+        "AddressId": 16,
+        "Digest": -4.5928679679194e+107,
+        "Hash": "2cWKMJemoBaiak5D1EHyqFYbpaqULHfKJBLDfFGu67Ze4EVFJSAS4wCqVG8CKCPACZbQL",
+      },
+      Object {
+        "AddressId": 17,
+        "Digest": 9.040293098460135e-234,
+        "Hash": "2cWKMJemoBajgeMibYfj8EdyqFvwbhVr6Xa6TEWub2qWWv1cgadLDzxCfNsuNcLdm4zfQ",
+      },
+      Object {
+        "AddressId": 18,
+        "Digest": -4.406302555475232e+110,
+        "Hash": "2cWKMJemoBahBG4bXa98bYLr2D4hAKrGeBchFSuamemTzKp2x5n79fuXYyVJQZ8D4GxzJ",
+      },
+      Object {
+        "AddressId": 19,
+        "Digest": -3.864821372571322e-247,
+        "Hash": "2cWKMJemoBaivNoG8BqCcU2P6qAjyGbvHbnEycQ219jKjtdnRDG8PTfxkDmynEbaN4aQg",
+      },
+      Object {
+        "AddressId": 20,
+        "Digest": -1.3868428914272181e-117,
+        "Hash": "2cWKMJemoBajxKobGHH4FWX8MYipNcYd8QWU6GJNfam6H7HJ4CJFvv42jqiPayM6skcPs",
+      },
+      Object {
+        "AddressId": 21,
+        "Digest": 3.042350486593611e+41,
+        "Hash": "2cWKMJemoBai5YBzrvj8yR7AxofNVRRQ3HeGZ6ze2jedGJWAZuv1kk83DDHhbM4etgZoX",
+      },
+      Object {
+        "AddressId": 22,
+        "Digest": 2417189.5135076824,
+        "Hash": "2cWKMJemoBakV7enMMUGQbWXqBKDN9FStBkBuhW4ygj7VrJZxFCA8PmwuDEvdM5dc3csF",
+      },
+      Object {
+        "AddressId": 23,
+        "Digest": 1.829585263112195e+294,
+        "Hash": "2cWKMJemoBai1bXTT8Lt3dPNtaAmgbfuQU3hU1c5qoveXj11dZypXXkVGxw9Enr1EyQDw",
+      },
+      Object {
+        "AddressId": 24,
+        "Digest": -1.8230633576816955e-25,
+        "Hash": "2cWKMJemoBakDXb35d6UZn6dnZ7cP5dTurMVcHm2GuUzYKvNCtAcboehN7Z6cMGzb52GU",
+      },
+      Object {
+        "AddressId": 25,
+        "Digest": 4.074532135366891e+207,
+        "Hash": "2cWKMJemoBajJqhkoKSDUXKn6XvTmyFP7K2pYhzz6aPZJWDrSoGamoMQDNWgKeJ5Gnb9o",
+      },
+      Object {
+        "AddressId": 26,
+        "Digest": 1.7622261527484512e-214,
+        "Hash": "2cWKMJemoBajkjfuEq85Bet3dvaboabvG8QX3fatHfYaySWF1NM7fubpSQDEGwSp45SCc",
+      },
+      Object {
+        "AddressId": 27,
+        "Digest": -7.689837290109897e+76,
+        "Hash": "2cWKMJemoBamPe6rXgdePGqKJEUVKEDWM3K3X5PzSQR8EcNAR7aYyNjuoCYNmmn1CcLAN",
+      },
+      Object {
+        "AddressId": 28,
+        "Digest": -3.720058212445789e+98,
+        "Hash": "2cWKMJemoBajQ1kxkMDvdRbQinwGKxbwybh482MN1vZMPxZsJPjE19HDD5WuE2TMASs5B",
+      },
+      Object {
+        "AddressId": 29,
+        "Digest": 1.4153889647676344e+49,
+        "Hash": "2cWKMJemoBah9w9PvS31gfSQmKz6d9P6j5VYDpdRNqDpdz7NkWdrFpJgoXdkAz3hodUTv",
+      },
+      Object {
+        "AddressId": 30,
+        "Digest": 4.492564910453611e+25,
+        "Hash": "2cWKMJemoBahtui5egjw6SzdpDEDXZLuqUcjvsx5natYKH1dvA9PQeUpprt6UKewxS56P",
+      },
+      Object {
+        "AddressId": 31,
+        "Digest": -7.329019949926326e+276,
+        "Hash": "2cWKMJemoBaigkuZU1JBwkxPsSwRCwZPYyVdgBxBJy5gYquNEGXWQnwnRopf4huHWuvqC",
+      },
+      Object {
+        "AddressId": 32,
+        "Digest": -2.2186464530075643e-207,
+        "Hash": "2cWKMJemoBaiNE2gK34iCPDzNcceSLXu9rP3sFhd95fB43Gim14UjTSVARgGAY6PCi7FM",
+      },
+      Object {
+        "AddressId": 33,
+        "Digest": -8.877983143732731e-109,
+        "Hash": "2cWKMJemoBaiyeqzjoMZXQwSQzDf4krS7ZYtqDDTxqxXtPHyW18eVSjfmUoMPqC9moHL2",
+      },
+      Object {
+        "AddressId": 34,
+        "Digest": 1.549626237036663e+96,
+        "Hash": "2cWKMJemoBakzR9zwfncvLGf7pi5xxyJe5jfGNRZpPcHirESTfjLHmMwsccoy5UzqRhaa",
+      },
+      Object {
+        "AddressId": 35,
+        "Digest": 4.244773980684407e+240,
+        "Hash": "2cWKMJemoBakYreGaDi8jzBN5biURcuo2Nn7GDB9Gi5oeEMRFZ5XCUMVGBX3jXDuzP916",
+      },
+      Object {
+        "AddressId": 36,
+        "Digest": -1.3410164263834876e+42,
+        "Hash": "2cWKMJemoBakux6kgScyBg2ZHW6fHSXaK8yoc6VZAby2Y9b3egcKVxnrLAYKz5BjN3MU3",
+      },
+      Object {
+        "AddressId": 37,
+        "Digest": -8.701727088867692e-124,
+        "Hash": "2cWKMJemoBahdTN3GAYRWUCGBWcW8MYWFCBJrqpW1zs8gGE82fKbUMqNrRq43C3av1PMr",
+      },
+      Object {
+        "AddressId": 38,
+        "Digest": -7.752625862832369e-69,
+        "Hash": "2cWKMJemoBamDTbp7ujJrhTWFTYCqSKicAKk3H7BTosHUw6Jxv4H7HgDfnTkqWCfhAihQ",
+      },
+      Object {
+        "AddressId": 39,
+        "Digest": -1.7107339843145492e+223,
+        "Hash": "2cWKMJemoBahNC1hWiToKRgoNTbC7ktxBwfQ3b5K63syJ1RC3g9piTw6dHmxGuxa71LUc",
+      },
+      Object {
+        "AddressId": 40,
+        "Digest": -9.225499329864712e+73,
+        "Hash": "2cWKMJemoBakuBi2eHUw159CQxQUHYn9eM8i23Q1bcvF4RNLAEzzbBTznrkzqkGdFYJYr",
+      },
+      Object {
+        "AddressId": 41,
+        "Digest": 1.7138943772052236e-151,
+        "Hash": "2cWKMJemoBaiygokUvMQveFM5sjRFxvzgJV5NAAFUi8mxpEPp9soUqDSvNq3MRfurzjyC",
+      },
+      Object {
+        "AddressId": 42,
+        "Digest": -7.4491953416285745e+267,
+        "Hash": "2cWKMJemoBajtEE6eboxcA4wFSXexa7ThmdGsggTm63kTFZWYdvBxRqNGDqrugujvJ3HH",
+      },
+      Object {
+        "AddressId": 43,
+        "Digest": 1.3750139716511047e+193,
+        "Hash": "2cWKMJemoBahgjnxDjC7etbhPsok2LT1fFKBJ5ys9vWpxyzXJV2q44J51nod6pYxSwuwe",
+      },
+      Object {
+        "AddressId": 44,
+        "Digest": 5.466181881286636e+104,
+        "Hash": "2cWKMJemoBamGjXtf3kwonwEJqiRwMChHoQDuCb97YNH7JQLxwx5Kt17gG271KHNqXyoz",
+      },
+      Object {
+        "AddressId": 45,
+        "Digest": -2.7144595676378545e+206,
+        "Hash": "2cWKMJemoBajEwar9YDH3zkLrcyLgKqWjw3wxLR3JEsXdLYwAiCjC1AvUZDebS5tWp5R2",
+      },
+      Object {
+        "AddressId": 46,
+        "Digest": -3.232697473883848e-77,
+        "Hash": "2cWKMJemoBaiw2vnBSiChVe9owqcymJJUq9UdTFzn3QLjvqvoLRVadugTfMtcJXQKcoWW",
+      },
+      Object {
+        "AddressId": 47,
+        "Digest": -4.643801820598492e+246,
+        "Hash": "2cWKMJemoBakYwphS2CYUDzm9jTvoKGeyUy43JXdKmSzEEdWMMnjD7REMX4kCdWj5W5U6",
+      },
+      Object {
+        "AddressId": 48,
+        "Digest": -4.643801820598492e+246,
+        "Hash": "2cWKMJemoBakYwphS2CYUDzm9jTvoKGeyUy43JXdKmSzEEdWMMnjD7REMX4kCdWj5W5U6",
+      },
+    ],
+  },
+  Object {
+    "Block": Array [
+      Object {
+        "BlockId": 1,
+        "BlockTime": 2019-09-13T16:37:16.000Z,
+        "Digest": -6.352946211521613e-51,
+        "Hash": "a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25",
+        "Height": 218608,
+        "SlotNum": 219650,
+      },
+      Object {
+        "BlockId": 2,
+        "BlockTime": 2019-09-13T16:37:36.000Z,
+        "Digest": -9.690691258114666e-56,
+        "Hash": "a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26",
+        "Height": 218609,
+        "SlotNum": 219651,
+      },
+    ],
+  },
+  Object {
+    "LastSyncInfo": Array [
+      Object {
+        "BlockHash": null,
+        "Height": 0,
+        "LastSyncInfoId": 1,
+        "SlotNum": null,
+        "Time": 1970-01-01T00:00:00.004Z,
+      },
+    ],
+  },
+  Object {
+    "Transaction": Array [
+      Object {
+        "BlockId": 2,
+        "Digest": 8.191593645542673e-27,
+        "ErrorMessage": null,
+        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545",
+        "LastUpdateTime": 1568392656000,
+        "Ordinal": 0,
+        "Status": -2,
+        "TransactionId": 1,
+      },
+      Object {
+        "BlockId": 1,
+        "Digest": 1.249559827714551e-31,
+        "ErrorMessage": null,
+        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546",
+        "LastUpdateTime": 1568392636000,
+        "Ordinal": 0,
+        "Status": -2,
+        "TransactionId": 2,
+      },
+      Object {
+        "BlockId": null,
+        "Digest": 1.9060984568373646e-36,
+        "ErrorMessage": null,
+        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed547",
+        "LastUpdateTime": 1568392676000,
+        "Ordinal": null,
+        "Status": -1,
+        "TransactionId": 3,
+      },
+    ],
+  },
+  Object {
+    "UtxoTransactionInput": Array [
+      Object {
+        "AddressId": 46,
+        "Amount": "4000000",
+        "IndexInOwnTx": 0,
+        "IndexInParentTx": 0,
+        "ParentTxHash": "9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20",
+        "TransactionId": 1,
+        "UtxoTransactionInputId": 1,
+      },
+      Object {
+        "AddressId": 46,
+        "Amount": "4000000",
+        "IndexInOwnTx": 0,
+        "IndexInParentTx": 0,
+        "ParentTxHash": "9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d21",
+        "TransactionId": 2,
+        "UtxoTransactionInputId": 2,
+      },
+      Object {
+        "AddressId": 5,
+        "Amount": "2100000",
+        "IndexInOwnTx": 0,
+        "IndexInParentTx": 0,
+        "ParentTxHash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546",
+        "TransactionId": 3,
+        "UtxoTransactionInputId": 3,
+      },
+    ],
+  },
+  Object {
+    "UtxoTransactionOutput": Array [
+      Object {
+        "AddressId": 5,
+        "Amount": "2100000",
+        "IsUnspent": true,
+        "OutputIndex": 0,
+        "TransactionId": 1,
+        "UtxoTransactionOutputId": 1,
+      },
+      Object {
+        "AddressId": 47,
+        "Amount": "1731391",
+        "IsUnspent": true,
+        "OutputIndex": 1,
+        "TransactionId": 1,
+        "UtxoTransactionOutputId": 2,
+      },
+      Object {
+        "AddressId": 5,
+        "Amount": "2100000",
+        "IsUnspent": true,
+        "OutputIndex": 0,
+        "TransactionId": 2,
+        "UtxoTransactionOutputId": 3,
+      },
+      Object {
+        "AddressId": 47,
+        "Amount": "1731391",
+        "IsUnspent": true,
+        "OutputIndex": 1,
+        "TransactionId": 2,
+        "UtxoTransactionOutputId": 4,
+      },
+      Object {
+        "AddressId": 48,
+        "Amount": "1900000",
+        "IsUnspent": true,
+        "OutputIndex": 0,
+        "TransactionId": 3,
+        "UtxoTransactionOutputId": 5,
+      },
+    ],
+  },
+]
+`;
+
+exports[`Syncing with pending 1`] = `
+Object {
+  "addressLookupMap": Map {
+    5 => "2cWKMJemoBam9FHms2YNoTSaKGn5xCbN5FRhAa3seKgkfrAYujWrX8PRiFF2jVVMuM455",
+    46 => "2cWKMJemoBaiw2vnBSiChVe9owqcymJJUq9UdTFzn3QLjvqvoLRVadugTfMtcJXQKcoWW",
+    47 => "2cWKMJemoBakYwphS2CYUDzm9jTvoKGeyUy43JXdKmSzEEdWMMnjD7REMX4kCdWj5W5U6",
+    48 => "2cWKMJemoBakYwphS2CYUDzm9jTvoKGeyUy43JXdKmSzEEdWMMnjD7REMX4kCdWj5W5U6",
+  },
+  "txs": Array [
+    Object {
+      "amount": "-1900000",
+      "block": null,
+      "fee": "-200000",
+      "transaction": Object {
+        "BlockId": null,
+        "Digest": 1.9060984568373646e-36,
+        "ErrorMessage": null,
+        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed547",
+        "LastUpdateTime": 1568392676000,
+        "Ordinal": null,
+        "Status": -2,
+        "TransactionId": 3,
+      },
+      "type": "expend",
+      "utxoInputs": Array [
+        Object {
+          "AddressId": 5,
+          "Amount": "2100000",
+          "IndexInOwnTx": 0,
+          "IndexInParentTx": 0,
+          "ParentTxHash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546",
+          "TransactionId": 3,
+          "UtxoTransactionInputId": 3,
+        },
+      ],
+      "utxoOutputs": Array [
+        Object {
+          "AddressId": 48,
+          "Amount": "1900000",
+          "IsUnspent": true,
+          "OutputIndex": 0,
+          "TransactionId": 3,
+          "UtxoTransactionOutputId": 5,
+        },
+      ],
+    },
+    Object {
+      "amount": "2100000",
+      "block": Object {
+        "BlockId": 2,
+        "BlockTime": 2019-09-13T16:37:36.000Z,
+        "Digest": -9.690691258114666e-56,
+        "Hash": "a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26",
+        "Height": 218609,
+        "SlotNum": 219651,
+      },
+      "fee": "0",
+      "transaction": Object {
+        "BlockId": 2,
+        "Digest": 8.191593645542673e-27,
+        "ErrorMessage": null,
+        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545",
+        "LastUpdateTime": 1568392656000,
+        "Ordinal": 0,
+        "Status": -2,
+        "TransactionId": 1,
+      },
+      "type": "income",
+      "utxoInputs": Array [
+        Object {
+          "AddressId": 46,
+          "Amount": "4000000",
+          "IndexInOwnTx": 0,
+          "IndexInParentTx": 0,
+          "ParentTxHash": "9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20",
+          "TransactionId": 1,
+          "UtxoTransactionInputId": 1,
+        },
+      ],
+      "utxoOutputs": Array [
+        Object {
+          "AddressId": 5,
+          "Amount": "2100000",
+          "IsUnspent": true,
+          "OutputIndex": 0,
+          "TransactionId": 1,
+          "UtxoTransactionOutputId": 1,
+        },
+        Object {
+          "AddressId": 47,
+          "Amount": "1731391",
+          "IsUnspent": true,
+          "OutputIndex": 1,
+          "TransactionId": 1,
+          "UtxoTransactionOutputId": 2,
+        },
+      ],
+    },
+    Object {
+      "amount": "2100000",
+      "block": Object {
+        "BlockId": 1,
+        "BlockTime": 2019-09-13T16:37:16.000Z,
+        "Digest": -6.352946211521613e-51,
+        "Hash": "a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25",
+        "Height": 218608,
+        "SlotNum": 219650,
+      },
+      "fee": "0",
+      "transaction": Object {
+        "BlockId": 1,
+        "Digest": 1.249559827714551e-31,
+        "ErrorMessage": null,
+        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546",
+        "LastUpdateTime": 1568392636000,
+        "Ordinal": 0,
+        "Status": -2,
+        "TransactionId": 2,
+      },
+      "type": "income",
+      "utxoInputs": Array [
+        Object {
+          "AddressId": 46,
+          "Amount": "4000000",
+          "IndexInOwnTx": 0,
+          "IndexInParentTx": 0,
+          "ParentTxHash": "9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d21",
+          "TransactionId": 2,
+          "UtxoTransactionInputId": 2,
+        },
+      ],
+      "utxoOutputs": Array [
+        Object {
+          "AddressId": 5,
+          "Amount": "2100000",
+          "IsUnspent": true,
+          "OutputIndex": 0,
+          "TransactionId": 2,
+          "UtxoTransactionOutputId": 3,
+        },
+        Object {
+          "AddressId": 47,
+          "Amount": "1731391",
+          "IsUnspent": true,
+          "OutputIndex": 1,
+          "TransactionId": 2,
+          "UtxoTransactionOutputId": 4,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`Syncing with pending 2`] = `
+Array [
+  Object {
+    "Address": Array [
+      Object {
+        "AddressId": 1,
+        "Digest": 2.625159121708784e-245,
+        "Hash": "2cWKMJemoBahV1J8CooPHv6kiRwvURBHKH6x8qNyjXLEHQLPc36Z4Hz9pBHbhB2wdDS5Q",
+      },
+      Object {
+        "AddressId": 2,
+        "Digest": 5.722525766106571e-175,
+        "Hash": "2cWKMJemoBajVVEZhJEsjNHKgjsTsi9kWqejTQEghsNyg4fXD66D3YWvbRhfUVfHWooa7",
+      },
+      Object {
+        "AddressId": 3,
+        "Digest": -3.219045380546553e-79,
+        "Hash": "2cWKMJemoBajyD34hiLDYDKM4jDY65zcPQH9RfW1KyVURUWQtfrAtVQYKyBysMjFTiUUj",
+      },
+      Object {
+        "AddressId": 4,
+        "Digest": -1.2072712420728654e-129,
+        "Hash": "2cWKMJemoBajQf5KTfA8htULcbNh6ad6Do1UVeCEaj8PAhEDVsqq1zyDFrWn3gHwqbXWZ",
+      },
+      Object {
+        "AddressId": 5,
+        "Digest": 4.604445688743196e+269,
+        "Hash": "2cWKMJemoBam9FHms2YNoTSaKGn5xCbN5FRhAa3seKgkfrAYujWrX8PRiFF2jVVMuM455",
+      },
+      Object {
+        "AddressId": 6,
+        "Digest": -4.4796651863531186e-274,
+        "Hash": "2cWKMJemoBakQfaRgK4hzbneQU1cz1VQidgsCzRPNXZzRmFfpW9AoFvmeUdQBZbzhrKwf",
+      },
+      Object {
+        "AddressId": 7,
+        "Digest": 7.161673823755841e+143,
+        "Hash": "2cWKMJemoBajKQwmreignV6bWHMy52VAw2Xg1JNT7DkTX9VSCyQt45vjzu1oHks6aKBQ9",
+      },
+      Object {
+        "AddressId": 8,
+        "Digest": 6.420156535669085e+72,
+        "Hash": "2cWKMJemoBaieRPed6xgtaYeoAvrp8k4NFWeBv4noqYNfjkNX2EY7jkBAA9PbZmuY2fgX",
+      },
+      Object {
+        "AddressId": 9,
+        "Digest": 3792.7225960259916,
+        "Hash": "2cWKMJemoBam3EPRozJ36mHpcHHJuf1F3cTBAH8sN6kPS1HFSxUrPpDedysJKS3GFPss5",
+      },
+      Object {
+        "AddressId": 10,
+        "Digest": -1.0741353372289304e-84,
+        "Hash": "2cWKMJemoBak2H91XpvcvdQztZ4rJSmGg258XMfJANawzWcNcvxVF7WbE8pGQYovNYkcP",
+      },
+      Object {
+        "AddressId": 11,
+        "Digest": -1.464161111236789e-98,
+        "Hash": "2cWKMJemoBaikNBAKubYWG821tgjW8z7Tyi7NCKcZAuUgpXYEyb8yv6vhJ4jtEtGkfpRa",
+      },
+      Object {
+        "AddressId": 12,
+        "Digest": 1.9191719756549796e+224,
+        "Hash": "2cWKMJemoBajjnXhSiczSaPc48WWALFCaqipDmXh5j2KmQsmbW7pkEC8mEmNTefCmcSpT",
+      },
+      Object {
+        "AddressId": 13,
+        "Digest": 1.1721430977337218e-8,
+        "Hash": "2cWKMJemoBajN8htLpD7QC4nBmvUQH2HwPRYktCyFYUTNkQNzRu9qqV3U38yYQRDJpPHr",
+      },
+      Object {
+        "AddressId": 14,
+        "Digest": 2.0497331866122915e-175,
+        "Hash": "2cWKMJemoBahsfMnovpCAHsaF2CWb7ygu2yw9uAdeVRftL8B7hwuwrPDsmRgMGDC2XsxR",
+      },
+      Object {
+        "AddressId": 15,
+        "Digest": -5.033242376582583e-262,
+        "Hash": "2cWKMJemoBajVu74QGDFCe1wrwdNFVRrbKRAW4PnpqHrC7tXveRPsUnxGVScEFj5FWZcL",
+      },
+      Object {
+        "AddressId": 16,
+        "Digest": -4.5928679679194e+107,
+        "Hash": "2cWKMJemoBaiak5D1EHyqFYbpaqULHfKJBLDfFGu67Ze4EVFJSAS4wCqVG8CKCPACZbQL",
+      },
+      Object {
+        "AddressId": 17,
+        "Digest": 9.040293098460135e-234,
+        "Hash": "2cWKMJemoBajgeMibYfj8EdyqFvwbhVr6Xa6TEWub2qWWv1cgadLDzxCfNsuNcLdm4zfQ",
+      },
+      Object {
+        "AddressId": 18,
+        "Digest": -4.406302555475232e+110,
+        "Hash": "2cWKMJemoBahBG4bXa98bYLr2D4hAKrGeBchFSuamemTzKp2x5n79fuXYyVJQZ8D4GxzJ",
+      },
+      Object {
+        "AddressId": 19,
+        "Digest": -3.864821372571322e-247,
+        "Hash": "2cWKMJemoBaivNoG8BqCcU2P6qAjyGbvHbnEycQ219jKjtdnRDG8PTfxkDmynEbaN4aQg",
+      },
+      Object {
+        "AddressId": 20,
+        "Digest": -1.3868428914272181e-117,
+        "Hash": "2cWKMJemoBajxKobGHH4FWX8MYipNcYd8QWU6GJNfam6H7HJ4CJFvv42jqiPayM6skcPs",
+      },
+      Object {
+        "AddressId": 21,
+        "Digest": 3.042350486593611e+41,
+        "Hash": "2cWKMJemoBai5YBzrvj8yR7AxofNVRRQ3HeGZ6ze2jedGJWAZuv1kk83DDHhbM4etgZoX",
+      },
+      Object {
+        "AddressId": 22,
+        "Digest": 2417189.5135076824,
+        "Hash": "2cWKMJemoBakV7enMMUGQbWXqBKDN9FStBkBuhW4ygj7VrJZxFCA8PmwuDEvdM5dc3csF",
+      },
+      Object {
+        "AddressId": 23,
+        "Digest": 1.829585263112195e+294,
+        "Hash": "2cWKMJemoBai1bXTT8Lt3dPNtaAmgbfuQU3hU1c5qoveXj11dZypXXkVGxw9Enr1EyQDw",
+      },
+      Object {
+        "AddressId": 24,
+        "Digest": -1.8230633576816955e-25,
+        "Hash": "2cWKMJemoBakDXb35d6UZn6dnZ7cP5dTurMVcHm2GuUzYKvNCtAcboehN7Z6cMGzb52GU",
+      },
+      Object {
+        "AddressId": 25,
+        "Digest": 4.074532135366891e+207,
+        "Hash": "2cWKMJemoBajJqhkoKSDUXKn6XvTmyFP7K2pYhzz6aPZJWDrSoGamoMQDNWgKeJ5Gnb9o",
+      },
+      Object {
+        "AddressId": 26,
+        "Digest": 1.7622261527484512e-214,
+        "Hash": "2cWKMJemoBajkjfuEq85Bet3dvaboabvG8QX3fatHfYaySWF1NM7fubpSQDEGwSp45SCc",
+      },
+      Object {
+        "AddressId": 27,
+        "Digest": -7.689837290109897e+76,
+        "Hash": "2cWKMJemoBamPe6rXgdePGqKJEUVKEDWM3K3X5PzSQR8EcNAR7aYyNjuoCYNmmn1CcLAN",
+      },
+      Object {
+        "AddressId": 28,
+        "Digest": -3.720058212445789e+98,
+        "Hash": "2cWKMJemoBajQ1kxkMDvdRbQinwGKxbwybh482MN1vZMPxZsJPjE19HDD5WuE2TMASs5B",
+      },
+      Object {
+        "AddressId": 29,
+        "Digest": 1.4153889647676344e+49,
+        "Hash": "2cWKMJemoBah9w9PvS31gfSQmKz6d9P6j5VYDpdRNqDpdz7NkWdrFpJgoXdkAz3hodUTv",
+      },
+      Object {
+        "AddressId": 30,
+        "Digest": 4.492564910453611e+25,
+        "Hash": "2cWKMJemoBahtui5egjw6SzdpDEDXZLuqUcjvsx5natYKH1dvA9PQeUpprt6UKewxS56P",
+      },
+      Object {
+        "AddressId": 31,
+        "Digest": -7.329019949926326e+276,
+        "Hash": "2cWKMJemoBaigkuZU1JBwkxPsSwRCwZPYyVdgBxBJy5gYquNEGXWQnwnRopf4huHWuvqC",
+      },
+      Object {
+        "AddressId": 32,
+        "Digest": -2.2186464530075643e-207,
+        "Hash": "2cWKMJemoBaiNE2gK34iCPDzNcceSLXu9rP3sFhd95fB43Gim14UjTSVARgGAY6PCi7FM",
+      },
+      Object {
+        "AddressId": 33,
+        "Digest": -8.877983143732731e-109,
+        "Hash": "2cWKMJemoBaiyeqzjoMZXQwSQzDf4krS7ZYtqDDTxqxXtPHyW18eVSjfmUoMPqC9moHL2",
+      },
+      Object {
+        "AddressId": 34,
+        "Digest": 1.549626237036663e+96,
+        "Hash": "2cWKMJemoBakzR9zwfncvLGf7pi5xxyJe5jfGNRZpPcHirESTfjLHmMwsccoy5UzqRhaa",
+      },
+      Object {
+        "AddressId": 35,
+        "Digest": 4.244773980684407e+240,
+        "Hash": "2cWKMJemoBakYreGaDi8jzBN5biURcuo2Nn7GDB9Gi5oeEMRFZ5XCUMVGBX3jXDuzP916",
+      },
+      Object {
+        "AddressId": 36,
+        "Digest": -1.3410164263834876e+42,
+        "Hash": "2cWKMJemoBakux6kgScyBg2ZHW6fHSXaK8yoc6VZAby2Y9b3egcKVxnrLAYKz5BjN3MU3",
+      },
+      Object {
+        "AddressId": 37,
+        "Digest": -8.701727088867692e-124,
+        "Hash": "2cWKMJemoBahdTN3GAYRWUCGBWcW8MYWFCBJrqpW1zs8gGE82fKbUMqNrRq43C3av1PMr",
+      },
+      Object {
+        "AddressId": 38,
+        "Digest": -7.752625862832369e-69,
+        "Hash": "2cWKMJemoBamDTbp7ujJrhTWFTYCqSKicAKk3H7BTosHUw6Jxv4H7HgDfnTkqWCfhAihQ",
+      },
+      Object {
+        "AddressId": 39,
+        "Digest": -1.7107339843145492e+223,
+        "Hash": "2cWKMJemoBahNC1hWiToKRgoNTbC7ktxBwfQ3b5K63syJ1RC3g9piTw6dHmxGuxa71LUc",
+      },
+      Object {
+        "AddressId": 40,
+        "Digest": -9.225499329864712e+73,
+        "Hash": "2cWKMJemoBakuBi2eHUw159CQxQUHYn9eM8i23Q1bcvF4RNLAEzzbBTznrkzqkGdFYJYr",
+      },
+      Object {
+        "AddressId": 41,
+        "Digest": 1.7138943772052236e-151,
+        "Hash": "2cWKMJemoBaiygokUvMQveFM5sjRFxvzgJV5NAAFUi8mxpEPp9soUqDSvNq3MRfurzjyC",
+      },
+      Object {
+        "AddressId": 42,
+        "Digest": -7.4491953416285745e+267,
+        "Hash": "2cWKMJemoBajtEE6eboxcA4wFSXexa7ThmdGsggTm63kTFZWYdvBxRqNGDqrugujvJ3HH",
+      },
+      Object {
+        "AddressId": 43,
+        "Digest": 1.3750139716511047e+193,
+        "Hash": "2cWKMJemoBahgjnxDjC7etbhPsok2LT1fFKBJ5ys9vWpxyzXJV2q44J51nod6pYxSwuwe",
+      },
+      Object {
+        "AddressId": 44,
+        "Digest": 5.466181881286636e+104,
+        "Hash": "2cWKMJemoBamGjXtf3kwonwEJqiRwMChHoQDuCb97YNH7JQLxwx5Kt17gG271KHNqXyoz",
+      },
+      Object {
+        "AddressId": 45,
+        "Digest": -2.7144595676378545e+206,
+        "Hash": "2cWKMJemoBajEwar9YDH3zkLrcyLgKqWjw3wxLR3JEsXdLYwAiCjC1AvUZDebS5tWp5R2",
+      },
+      Object {
+        "AddressId": 46,
+        "Digest": -3.232697473883848e-77,
+        "Hash": "2cWKMJemoBaiw2vnBSiChVe9owqcymJJUq9UdTFzn3QLjvqvoLRVadugTfMtcJXQKcoWW",
+      },
+      Object {
+        "AddressId": 47,
+        "Digest": -4.643801820598492e+246,
+        "Hash": "2cWKMJemoBakYwphS2CYUDzm9jTvoKGeyUy43JXdKmSzEEdWMMnjD7REMX4kCdWj5W5U6",
+      },
+      Object {
+        "AddressId": 48,
+        "Digest": -4.643801820598492e+246,
+        "Hash": "2cWKMJemoBakYwphS2CYUDzm9jTvoKGeyUy43JXdKmSzEEdWMMnjD7REMX4kCdWj5W5U6",
+      },
+    ],
+  },
+  Object {
+    "Block": Array [
+      Object {
+        "BlockId": 1,
+        "BlockTime": 2019-09-13T16:37:16.000Z,
+        "Digest": -6.352946211521613e-51,
+        "Hash": "a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25",
+        "Height": 218608,
+        "SlotNum": 219650,
+      },
+      Object {
+        "BlockId": 2,
+        "BlockTime": 2019-09-13T16:37:36.000Z,
+        "Digest": -9.690691258114666e-56,
+        "Hash": "a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26",
+        "Height": 218609,
+        "SlotNum": 219651,
+      },
+    ],
+  },
+  Object {
+    "LastSyncInfo": Array [
+      Object {
+        "BlockHash": null,
+        "Height": 0,
+        "LastSyncInfoId": 1,
+        "SlotNum": null,
+        "Time": 1970-01-01T00:00:00.004Z,
+      },
+    ],
+  },
+  Object {
+    "Transaction": Array [
+      Object {
+        "BlockId": 2,
+        "Digest": 8.191593645542673e-27,
+        "ErrorMessage": null,
+        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545",
+        "LastUpdateTime": 1568392656000,
+        "Ordinal": 0,
+        "Status": -2,
+        "TransactionId": 1,
+      },
+      Object {
+        "BlockId": 1,
+        "Digest": 1.249559827714551e-31,
+        "ErrorMessage": null,
+        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546",
+        "LastUpdateTime": 1568392636000,
+        "Ordinal": 0,
+        "Status": -2,
+        "TransactionId": 2,
+      },
+      Object {
+        "BlockId": null,
+        "Digest": 1.9060984568373646e-36,
+        "ErrorMessage": null,
+        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed547",
+        "LastUpdateTime": 1568392676000,
+        "Ordinal": null,
+        "Status": -2,
+        "TransactionId": 3,
+      },
+    ],
+  },
+  Object {
+    "UtxoTransactionInput": Array [
+      Object {
+        "AddressId": 46,
+        "Amount": "4000000",
+        "IndexInOwnTx": 0,
+        "IndexInParentTx": 0,
+        "ParentTxHash": "9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20",
+        "TransactionId": 1,
+        "UtxoTransactionInputId": 1,
+      },
+      Object {
+        "AddressId": 46,
+        "Amount": "4000000",
+        "IndexInOwnTx": 0,
+        "IndexInParentTx": 0,
+        "ParentTxHash": "9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d21",
+        "TransactionId": 2,
+        "UtxoTransactionInputId": 2,
+      },
+      Object {
+        "AddressId": 5,
+        "Amount": "2100000",
+        "IndexInOwnTx": 0,
+        "IndexInParentTx": 0,
+        "ParentTxHash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546",
+        "TransactionId": 3,
+        "UtxoTransactionInputId": 3,
+      },
+    ],
+  },
+  Object {
+    "UtxoTransactionOutput": Array [
+      Object {
+        "AddressId": 5,
+        "Amount": "2100000",
+        "IsUnspent": true,
+        "OutputIndex": 0,
+        "TransactionId": 1,
+        "UtxoTransactionOutputId": 1,
+      },
+      Object {
+        "AddressId": 47,
+        "Amount": "1731391",
+        "IsUnspent": true,
+        "OutputIndex": 1,
+        "TransactionId": 1,
+        "UtxoTransactionOutputId": 2,
+      },
+      Object {
+        "AddressId": 5,
+        "Amount": "2100000",
+        "IsUnspent": true,
+        "OutputIndex": 0,
+        "TransactionId": 2,
+        "UtxoTransactionOutputId": 3,
+      },
+      Object {
+        "AddressId": 47,
+        "Amount": "1731391",
+        "IsUnspent": true,
+        "OutputIndex": 1,
+        "TransactionId": 2,
+        "UtxoTransactionOutputId": 4,
+      },
+      Object {
+        "AddressId": 48,
+        "Amount": "1900000",
+        "IsUnspent": true,
+        "OutputIndex": 0,
+        "TransactionId": 3,
+        "UtxoTransactionOutputId": 5,
+      },
+    ],
+  },
+]
+`;

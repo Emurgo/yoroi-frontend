@@ -2,7 +2,7 @@
 
 // Handle data created by wallets using the v1 address scheme
 
-import _ from 'lodash';
+import { isEmpty } from 'lodash';
 import BigNumber from 'bignumber.js';
 import { coinToBigNumber } from './lib/utils';
 import {
@@ -17,7 +17,7 @@ import {
 } from './errors';
 import {
   sendAllUnsignedTxFromUtxo,
-} from './adaTransactions/adaNewTransactions';
+} from './adaTransactions/transactionsV2';
 import type {
   AddressUtxoFunc
 } from './lib/state-fetch/types';
@@ -26,7 +26,7 @@ import type {
 } from '../../types/TransferTypes';
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
 import type {
-  UTXO
+  RemoteUnspentOutput
 } from './adaTypes';
 
 import type { ConfigType } from '../../../config/config-types';
@@ -80,7 +80,7 @@ export async function generateTransferTx(
   const senders = Object.keys(addressKeys);
   const senderUtxos = await getUTXOsForAddresses({ addresses: senders });
 
-  if (_.isEmpty(senderUtxos)) {
+  if (isEmpty(senderUtxos)) {
     const error = new NoInputsError();
     Logger.error(`daedalusTransfer::generateTransferTx ${stringifyError(error)}`);
     throw error;
@@ -102,7 +102,7 @@ export async function generateTransferTx(
 export async function buildTransferTx(
   payload: {
     addressKeys: AddressKeyMap,
-    senderUtxos: Array<UTXO>,
+    senderUtxos: Array<RemoteUnspentOutput>,
     outputAddr: string,
     filterSenders?: boolean
   }
@@ -156,7 +156,7 @@ export async function buildTransferTx(
       receiver: outputAddr,
     };
   } catch (error) {
-    Logger.error(`daedalusTransfer::generateTransferTx ${stringifyError(error)}`);
+    Logger.error(`daedalusTransfer::buildTransferTx ${stringifyError(error)}`);
     throw new GenerateTransferTxError();
   }
 }
