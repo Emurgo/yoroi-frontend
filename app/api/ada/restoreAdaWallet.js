@@ -26,10 +26,10 @@ declare var CONFIG: ConfigType;
 const addressRequestSize = CONFIG.app.addressRequestSize;
 
 export function genAddressBatchFunc(
-  addressChain: RustModule.Wallet.Bip44ChainPublic,
+  addressChain: RustModule.WalletV2.Bip44ChainPublic,
   protocolMagic: number,
 ): GenerateAddressFunc {
-  const settings = RustModule.Wallet.BlockchainSettings.from_json({
+  const settings = RustModule.WalletV2.BlockchainSettings.from_json({
     protocol_magic: protocolMagic
   });
   return (
@@ -37,7 +37,7 @@ export function genAddressBatchFunc(
   ) => {
     return indices.map(i => {
       const pubKey = addressChain.address_key(
-        RustModule.Wallet.AddressKeyIndex.new(i)
+        RustModule.WalletV2.AddressKeyIndex.new(i)
       );
       const addr = pubKey.bootstrap_era_address(settings);
       return addr.to_base58();
@@ -83,9 +83,9 @@ export async function scanAccountByVersion(request: {
 }): Promise<TreeInsert<{ DisplayCutoff: null | number }>> {
   let insert;
   if (request.version ===  2) {
-    const key = RustModule.Wallet.Bip44AccountPublic.new(
-      RustModule.Wallet.PublicKey.from_hex(request.accountPublicKey),
-      RustModule.Wallet.DerivationScheme.v2()
+    const key = RustModule.WalletV2.Bip44AccountPublic.new(
+      RustModule.WalletV2.PublicKey.from_hex(request.accountPublicKey),
+      RustModule.WalletV2.DerivationScheme.v2()
     );
     insert = await scanAccount({
       generateInternalAddresses: genAddressBatchFunc(

@@ -103,7 +103,7 @@ export async function broadcastTrezorSignedTx(
 ): Promise<BroadcastTrezorSignedTxResponse> {
   Logger.debug('hwTransactions::broadcastTrezorSignedTx: called');
   const signedTxBytes = Buffer.from(signedTxHex, 'hex');
-  const signedTx = RustModule.Wallet.SignedTransaction.from_bytes(signedTxBytes);
+  const signedTx = RustModule.WalletV2.SignedTransaction.from_bytes(signedTxBytes);
 
   try {
     const body = { signedTx };
@@ -267,8 +267,8 @@ function _ledgerOutputAddress58OrPath(
 
 export async function prepareAndBroadcastLedgerSignedTx(
   ledgerSignTxResp: LedgerSignTxResponse,
-  unsignedTx: RustModule.Wallet.Transaction,
-  publicKey: RustModule.Wallet.PublicKey,
+  unsignedTx: RustModule.WalletV2.Transaction,
+  publicKey: RustModule.WalletV2.PublicKey,
   keyLevel: number,
   sendTx: SendFunc,
 ): Promise<PrepareAndBroadcastLedgerSignedTxResponse> {
@@ -279,7 +279,7 @@ export async function prepareAndBroadcastLedgerSignedTx(
     Logger.debug(`hwTransactions::prepareAndBroadcastLedgerSignedTx unsignedTx: ${stringifyData(
       unsignedTxJson
     )}`);
-    const finalizer = new RustModule.Wallet.TransactionFinalized(unsignedTx);
+    const finalizer = new RustModule.WalletV2.TransactionFinalized(unsignedTx);
     ledgerSignTxResp.witnesses.map((witness) => prepareWitness(
       finalizer,
       witness,
@@ -302,23 +302,23 @@ export async function prepareAndBroadcastLedgerSignedTx(
 }
 
 function prepareWitness(
-  finalizer: RustModule.Wallet.TransactionFinalized,
+  finalizer: RustModule.WalletV2.TransactionFinalized,
   ledgerWitness: Witness,
-  publicKey: RustModule.Wallet.PublicKey,
+  publicKey: RustModule.WalletV2.PublicKey,
   keyLevel: number,
 ): void {
   let finalKey = publicKey;
   for (let i = keyLevel; i < ledgerWitness.path.length; i++) {
     finalKey = finalKey.derive(
-      RustModule.Wallet.DerivationScheme.v2(),
+      RustModule.WalletV2.DerivationScheme.v2(),
       ledgerWitness.path[3]
     );
   }
 
-  const txSignature = RustModule.Wallet.TransactionSignature.from_hex(
+  const txSignature = RustModule.WalletV2.TransactionSignature.from_hex(
     ledgerWitness.witnessSignatureHex
   );
 
-  const witness = RustModule.Wallet.Witness.from_external(finalKey, txSignature);
+  const witness = RustModule.WalletV2.Witness.from_external(finalKey, txSignature);
   finalizer.add_witness(witness);
 }

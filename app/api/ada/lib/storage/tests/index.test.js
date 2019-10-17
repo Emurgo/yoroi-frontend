@@ -59,21 +59,21 @@ beforeAll(async () => {
 });
 
 test('Can add and fetch address in wallet', async (done) => {
-  const settings = RustModule.Wallet.BlockchainSettings.from_json({
+  const settings = RustModule.WalletV2.BlockchainSettings.from_json({
     protocol_magic: protocolMagic
   });
-  const entropy = RustModule.Wallet.Entropy.from_english_mnemonics(mnemonic);
-  const rootPk = RustModule.Wallet.Bip44RootPrivateKey.recover(entropy, '');
+  const entropy = RustModule.WalletV2.Entropy.from_english_mnemonics(mnemonic);
+  const rootPk = RustModule.WalletV2.Bip44RootPrivateKey.recover(entropy, '');
 
   const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
 
   const firstAccountIndex = 0 + HARD_DERIVATION_START;
   const firstAccountPk = rootPk.bip44_account(
-    RustModule.Wallet.AccountIndex.new(firstAccountIndex)
+    RustModule.WalletV2.AccountIndex.new(firstAccountIndex)
   );
   const firstExternalAddressKey = firstAccountPk
     .bip44_chain(false)
-    .address_key(RustModule.Wallet.AddressKeyIndex.new(0));
+    .address_key(RustModule.WalletV2.AddressKeyIndex.new(0));
   const firstExternalAddressHash = firstExternalAddressKey
     .public()
     .bootstrap_era_address(settings)
@@ -234,7 +234,7 @@ test('Can add and fetch address in wallet', async (done) => {
       expect(externalAddresses[0].addr.Hash).toEqual(
         firstAccountPk
           .bip44_chain(false)
-          .address_key(RustModule.Wallet.AddressKeyIndex.new(0))
+          .address_key(RustModule.WalletV2.AddressKeyIndex.new(0))
           .public()
           .bootstrap_era_address(settings)
           .to_base58()
@@ -247,7 +247,7 @@ test('Can add and fetch address in wallet', async (done) => {
       expect(internalAddresses[0].addr.Hash).toEqual(
         firstAccountPk
           .bip44_chain(true)
-          .address_key(RustModule.Wallet.AddressKeyIndex.new(0))
+          .address_key(RustModule.WalletV2.AddressKeyIndex.new(0))
           .public()
           .bootstrap_era_address(settings)
           .to_base58()
@@ -266,7 +266,7 @@ test('Can add and fetch address in wallet', async (done) => {
       expect(popped.index).toEqual(nextIndex);
       const expectedAddress = firstAccountPk
         .bip44_chain(false)
-        .address_key(RustModule.Wallet.AddressKeyIndex.new(nextIndex))
+        .address_key(RustModule.WalletV2.AddressKeyIndex.new(nextIndex))
         .public()
         .bootstrap_era_address(settings)
         .to_base58();

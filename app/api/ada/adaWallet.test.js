@@ -58,7 +58,7 @@ test('Unscramble Daedalus paper matches expected address', async () => {
   expect(words).toBeTruthy();
   if (words != null) {
     const daedalusWallet = getCryptoDaedalusWalletFromMnemonics(words);
-    const checker = RustModule.Wallet.DaedalusAddressChecker.new(daedalusWallet);
+    const checker = RustModule.WalletV2.DaedalusAddressChecker.new(daedalusWallet);
     const addressMap = getAddressesKeys({
       checker,
       fullUtxo: [VALID_DD_PAPER.address, UNEXPECTED_DD_ADDRESS]

@@ -28,11 +28,11 @@ export async function setup(
 ): Promise<PublicDeriver> {
   await RustModule.load();
 
-  const settings = RustModule.Wallet.BlockchainSettings.from_json({
+  const settings = RustModule.WalletV2.BlockchainSettings.from_json({
     protocol_magic: protocolMagic
   });
-  const entropy = RustModule.Wallet.Entropy.from_english_mnemonics(walletMnemonic);
-  const rootPk = RustModule.Wallet.Bip44RootPrivateKey.recover(entropy, '');
+  const entropy = RustModule.WalletV2.Entropy.from_english_mnemonics(walletMnemonic);
+  const rootPk = RustModule.WalletV2.Bip44RootPrivateKey.recover(entropy, '');
 
   const state = await createStandardBip44Wallet({
     db,
@@ -57,7 +57,7 @@ export async function setup(
   // const toPrint = [];
   // for (let i = 0; i < 60; i++) {
   //   const chain = firstAccountPk.bip44_chain(false);
-  //   const addressPk = chain.address_key(RustModule.Wallet.AddressKeyIndex.new(i));
+  //   const addressPk = chain.address_key(RustModule.WalletV2.AddressKeyIndex.new(i));
   //   const address = addressPk.public().bootstrap_era_address(settings).to_base58();
   //   toPrint.push(address);
   // }
