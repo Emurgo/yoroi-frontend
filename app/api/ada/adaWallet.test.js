@@ -50,6 +50,7 @@ test('Is valid Daedalus paper mnemonic', async () => {
 test('Unscramble Daedalus paper produces 12 valid words', async () => {
   const [words, count] = unscramblePaperMnemonic(VALID_DD_PAPER.words, 27);
   expect(count).toEqual(12);
+  if (words == null) throw new Error('failed to unscramble in test');
   expect(validateMnemonic(words)).toEqual(true);
 });
 
