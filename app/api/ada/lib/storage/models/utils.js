@@ -17,7 +17,6 @@ import type {
   IPublicDeriver,
   PathWithAddrAndRow,
   IGetAllUtxos,
-  IGetAllUtxosResponse,
   IGetUtxoBalanceResponse,
   IHasChainsRequest,
   IGetNextUnusedForChainResponse,
@@ -49,6 +48,7 @@ import {
   GetBip44DerivationSpecific,
 } from '../database/bip44/api/read';
 import type { UtxoTxOutput } from '../database/utxoTransactions/api/read';
+import type { UtxoTransactionOutputRow } from '../database/utxoTransactions/tables';
 import { Bip44DerivationLevels } from '../database/bip44/api/utils';
 import type { GetPathWithSpecificByTreeRequest } from '../database/primitives/api/read';
 import type {
@@ -469,11 +469,7 @@ export async function getChainAddressesForDisplay(
   return await raii(
     request.publicDeriver.getDb(),
     depTables,
-    async tx => await rawGetChainAddressesForDisplay(
-      tx,
-      deps,
-      request,
-    )
+    async tx => await rawGetChainAddressesForDisplay(tx, deps, request)
   );
 }
 export async function rawGetAllAddressesForDisplay(
@@ -588,16 +584,17 @@ export function getUtxoBalanceForAddresses(
   );
   const mapping = mapValues(
     groupByAddress,
-    utxoList => getBalanceForUtxos(utxoList)
+    (utxoList: Array<$ReadOnly<UtxoTxOutput>>) => getBalanceForUtxos(
+      utxoList.map(utxo => utxo.UtxoTransactionOutput)
+    )
   );
   return mapping;
 }
 
-
 export function getBalanceForUtxos(
-  utxos: IGetAllUtxosResponse,
+  utxos: $ReadOnlyArray<$ReadOnly<UtxoTransactionOutputRow>>,
 ): IGetUtxoBalanceResponse {
-  const amounts = utxos.map(utxo => new BigNumber(utxo.output.UtxoTransactionOutput.Amount));
+  const amounts = utxos.map(utxo => new BigNumber(utxo.Amount));
   const total = amounts.reduce(
     (acc, amount) => acc.plus(amount),
     new BigNumber(0)

@@ -1269,7 +1269,7 @@ const GetUtxoBalanceMixin = (
       },
       undefined
     );
-    return getBalanceForUtxos(utxos);
+    return getBalanceForUtxos(utxos.map(utxo => utxo.output.UtxoTransactionOutput));
   }
   getBalance = async (
     _body: IGetUtxoBalanceRequest,
