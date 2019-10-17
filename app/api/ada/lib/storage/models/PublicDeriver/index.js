@@ -863,8 +863,21 @@ const GetAllUtxosMixin = (
     |},
     _body: IGetAllUtxoAddressesRequest,
   ): Promise<IGetAllUtxoAddressesResponse> => {
-    // TODO: fix implementation for chain
-    return rawGetBip44AddressesByPath(
+    if (this.getBip44Parent().getPublicDeriverLevel() >= Bip44DerivationLevels.CHAIN.level) {
+      return rawGetBip44AddressesByPath(
+        super.getDb(), tx,
+        deps,
+        {
+          startingDerivation: super.getDerivationId(),
+          derivationLevel: this.getBip44Parent().getPublicDeriverLevel(),
+          commonPrefix: super.getPathToPublic(),
+          queryPath: Array(
+            Bip44DerivationLevels.ADDRESS.level - this.getBip44Parent().getPublicDeriverLevel()
+          ).fill(null),
+        }
+      );
+    }
+    const externalAddresses = await rawGetBip44AddressesByPath(
       super.getDb(), tx,
       deps,
       {
@@ -872,10 +885,26 @@ const GetAllUtxosMixin = (
         derivationLevel: this.getBip44Parent().getPublicDeriverLevel(),
         commonPrefix: super.getPathToPublic(),
         queryPath: Array(
-          Bip44DerivationLevels.ADDRESS.level - this.getBip44Parent().getPublicDeriverLevel()
-        ).fill(null),
+          Bip44DerivationLevels.ACCOUNT.level - this.getBip44Parent().getPublicDeriverLevel()
+        ).fill(null).concat([0, null]),
       }
     );
+    const internalAddresses = await rawGetBip44AddressesByPath(
+      super.getDb(), tx,
+      deps,
+      {
+        startingDerivation: super.getDerivationId(),
+        derivationLevel: this.getBip44Parent().getPublicDeriverLevel(),
+        commonPrefix: super.getPathToPublic(),
+        queryPath: Array(
+          Bip44DerivationLevels.ACCOUNT.level - this.getBip44Parent().getPublicDeriverLevel()
+        ).fill(null).concat([1, null]),
+      }
+    );
+    return [
+      ...externalAddresses,
+      ...internalAddresses,
+    ];
   }
   getAllUtxoAddresses = async (
     body: IGetAllUtxoAddressesRequest,
