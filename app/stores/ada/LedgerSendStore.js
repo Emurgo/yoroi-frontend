@@ -8,7 +8,6 @@ import type {
 
 import Store from '../base/Store';
 import environment from '../../environment';
-import Config from '../../config';
 
 import LocalizedRequest from '../lib/LocalizedRequest';
 import LocalizableError from '../../i18n/LocalizableError';
