@@ -64,7 +64,7 @@ import {
   newAdaUnsignedTx,
   asAddressedUtxo,
   signTransaction,
-} from './adaTransactions/transactionsV2';
+} from './transactions/legacy/transactionsV2';
 import {
   generateWalletRootKey,
 } from './lib/cardanoCrypto/cryptoWallet';
@@ -77,7 +77,7 @@ import {
   broadcastTrezorSignedTx,
   createLedgerSignTxPayload,
   prepareAndBroadcastLedgerSignedTx,
-} from './hardwareWallet/hwTransactions';
+} from './transactions/legacy/hwTransactions';
 import {
   GenericApiError,
   IncorrectWalletPasswordError,

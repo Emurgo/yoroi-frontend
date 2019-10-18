@@ -9,22 +9,22 @@ import type {
   UnsignedTxFromUtxoResponse,
   UnsignedTxResponse,
   AddressedUtxo,
-} from '../adaTypes';
+} from '../../adaTypes';
 import {
   NotEnoughMoneyToSendError,
-} from '../errors';
-import type { ConfigType } from '../../../../config/config-types';
-import { utxosToLookupMap, coinToBigNumber } from '../lib/utils';
+} from '../../errors';
+import type { ConfigType } from '../../../../../config/config-types';
+import { utxosToLookupMap, coinToBigNumber } from '../../lib/utils';
 
-import { RustModule } from '../lib/cardanoCrypto/rustLoader';
+import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 
 import {
   Bip44DerivationLevels,
-} from '../lib/storage/database/bip44/api/utils';
+} from '../../lib/storage/database/bip44/api/utils';
 import type {
   Address, Value, Addressing,
-} from '../lib/storage/models/common/interfaces';
-import type { IGetAllUtxosResponse } from '../lib/storage/models/PublicDeriver/interfaces';
+} from '../../lib/storage/models/common/interfaces';
+import type { IGetAllUtxosResponse } from '../../lib/storage/models/PublicDeriver/interfaces';
 
 declare var CONFIG: ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;

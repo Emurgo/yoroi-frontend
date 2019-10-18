@@ -42,12 +42,12 @@ export async function sendAllUnsignedTx(
       utxo_id: utxo.utxo_id
     }, utxo);
   }
-  const V3UnsignedTxResponse = await sendAllUnsignedTxFromUtxo(
+  const unsignedTxResponse = await sendAllUnsignedTxFromUtxo(
     receiver,
     Array.from(addressingMap.keys())
   );
 
-  const addressedUtxos = V3UnsignedTxResponse.senderUtxos.map(
+  const addressedUtxos = unsignedTxResponse.senderUtxos.map(
     utxo => {
       const addressedUtxo = addressingMap.get(utxo);
       if (addressedUtxo == null) {
@@ -59,8 +59,8 @@ export async function sendAllUnsignedTx(
 
   return {
     senderUtxos: addressedUtxos,
-    unsignedTx: V3UnsignedTxResponse.unsignedTx,
-    changeAddr: V3UnsignedTxResponse.changeAddr,
+    unsignedTx: unsignedTxResponse.unsignedTx,
+    changeAddr: unsignedTxResponse.changeAddr,
   };
 }
 
@@ -104,8 +104,8 @@ export async function sendAllUnsignedTxFromUtxo(
     throw new NotEnoughMoneyToSendError();
   }
   const newAmount = totalBalance.minus(fee).toString();
-  const V3UnsignedTxResponse = await newAdaUnsignedTxFromUtxo(receiver, newAmount, [], allUtxos);
-  return V3UnsignedTxResponse;
+  const unsignedTxResponse = await newAdaUnsignedTxFromUtxo(receiver, newAmount, [], allUtxos);
+  return unsignedTxResponse;
 }
 
 /**
@@ -129,14 +129,14 @@ export async function newAdaUnsignedTx(
       utxo_id: utxo.utxo_id
     }, utxo);
   }
-  const V3UnsignedTxResponse = await newAdaUnsignedTxFromUtxo(
+  const unsignedTxResponse = await newAdaUnsignedTxFromUtxo(
     receiver,
     amount,
     changeAdaAddr,
     Array.from(addressingMap.keys())
   );
 
-  const addressedUtxos = V3UnsignedTxResponse.senderUtxos.map(
+  const addressedUtxos = unsignedTxResponse.senderUtxos.map(
     utxo => {
       const addressedUtxo = addressingMap.get(utxo);
       if (addressedUtxo == null) {
@@ -148,8 +148,8 @@ export async function newAdaUnsignedTx(
 
   return {
     senderUtxos: addressedUtxos,
-    unsignedTx: V3UnsignedTxResponse.unsignedTx,
-    changeAddr: V3UnsignedTxResponse.changeAddr,
+    unsignedTx: unsignedTxResponse.unsignedTx,
+    changeAddr: unsignedTxResponse.changeAddr,
   };
 }
 
