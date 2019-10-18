@@ -98,7 +98,6 @@ export default class LedgerSendStore extends Store {
     try {
       Logger.debug('LedgerSendStore::_send::called: ' + stringifyData(params));
       ledgerConnect = new LedgerConnect({
-        connectionType: Config.wallets.hardwareWallet.ledgerNanoS.DEFAULT_TRANSPORT_PROTOCOL,
         locale: this.stores.profile.currentLocale
       });
 

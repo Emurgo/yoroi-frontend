@@ -11,7 +11,6 @@ import TrezorConnect from 'trezor-connect';
 
 import LocalizableError from '../../i18n/LocalizableError';
 
-import Config from '../../config';
 import environment from '../../environment';
 
 import type {
@@ -99,7 +98,6 @@ export default class AddressesStore extends Store {
     try {
       // trick to fix flow
       this.ledgerConnect = new LedgerConnect({
-        connectionType: Config.wallets.hardwareWallet.ledgerNanoS.DEFAULT_TRANSPORT_PROTOCOL,
         locale: this.stores.profile.currentLocale
       });
       await prepareLedgerConnect(this.ledgerConnect);

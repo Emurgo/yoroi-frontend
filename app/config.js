@@ -1,5 +1,4 @@
 // @flow
-import { CONNECTION_TYPE } from 'yoroi-extension-ledger-connect-handler';
 
 export default {
   wallets: {
@@ -27,7 +26,6 @@ export default {
         DEFAULT_WALLET_NAME: 'Yoroi-Ledger',
         VENDOR: 'ledger.com',
         MODEL: 'NanoS',
-        DEFAULT_TRANSPORT_PROTOCOL: CONNECTION_TYPE.WEB_AUTHN
       }
     }
   },

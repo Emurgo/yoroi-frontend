@@ -142,7 +142,6 @@ export default class LedgerConnectStore
   _checkAndStoreHWDeviceInfo = async (): Promise<void> => {
     try {
       this.ledgerConnect = new LedgerConnect({
-        connectionType: Config.wallets.hardwareWallet.ledgerNanoS.DEFAULT_TRANSPORT_PROTOCOL,
         locale: this.stores.profile.currentLocale
       });
       await prepareLedgerConnect(this.ledgerConnect);
