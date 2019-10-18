@@ -208,7 +208,6 @@ async function checkPub2HasTx(
   }
 
   {
-    console.log('sadf');
     const response = await basePubDeriver.getAllUtxos();
     expect(response).toEqual([{
       address: '2cWKMJemoBajuCcDYHncArxP5JVaJ8FZeVtH1X49NEizHfSFAp6bSKppwhUyPZzi3mYMZ',

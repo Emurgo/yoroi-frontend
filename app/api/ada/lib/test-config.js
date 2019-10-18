@@ -16,7 +16,7 @@ const CONFIG: ConfigType = {
     addressRequestSize: 20,
     txsBodiesRequestSize: 20,
     linearFee: {
-      constant: '2',
+      constant: '155381',
       coefficient: '1',
       certificate: '4'
     },

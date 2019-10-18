@@ -73,11 +73,6 @@ export type V3UnsignedTxResponse = {|
   unsignedTx: RustModule.WalletV3.Transaction,
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
 |};
-export type V3BaseSignRequest = {|
-  changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
-  senderUtxos: Array<AddressedUtxo>,
-  unsignedTx: RustModule.WalletV3.Transaction,
-|};
 
 /* Backend service Postgres data types */
 

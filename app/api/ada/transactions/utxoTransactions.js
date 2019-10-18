@@ -4,10 +4,9 @@
 
 import BigNumber from 'bignumber.js';
 import type {
-  V3BaseSignRequest,
+  V3UnsignedTxResponse,
   RemoteUnspentOutput,
   V3UnsignedTxFromUtxoResponse,
-  V3UnsignedTxResponse,
   AddressedUtxo,
 } from '../adaTypes';
 import {
@@ -24,7 +23,7 @@ import type {
   Address, Value, Addressing,
 } from '../lib/storage/models/common/interfaces';
 import type { IGetAllUtxosResponse } from '../lib/storage/models/PublicDeriver/interfaces';
-import { v2KeyToV3Key } from '../lib/utils';
+import { v2SkKeyToV3Key } from '../lib/utils';
 
 declare var CONFIG: ConfigType;
 
@@ -86,7 +85,7 @@ export async function sendAllUnsignedTxFromUtxo(
   let fee;
   {
     // firts build a transaction to see what the cost would be
-    const fakeTxBuilder = new RustModule.WalletV3.TransactionBuilder.new_no_payload();
+    const fakeTxBuilder = RustModule.WalletV3.TransactionBuilder.new_no_payload();
     for (const utxo of allUtxos) {
       const input = utxoToTxInput(utxo);
       fakeTxBuilder.add_input(input);
@@ -96,7 +95,7 @@ export async function sendAllUnsignedTxFromUtxo(
       RustModule.WalletV3.Value.from_str(totalBalance.toString())
     );
     const feeValue = fakeTxBuilder.estimate_fee(feeAlgorithm);
-    fee = new BigNumber(feeValue.to_str);
+    fee = new BigNumber(feeValue.to_str());
   }
 
   // create a new transaction subtracing the fee from your total UTXO
@@ -171,7 +170,7 @@ export async function newAdaUnsignedTxFromUtxo(
     RustModule.WalletV3.Value.from_str(CONFIG.app.linearFee.certificate),
   );
 
-  const txBuilder = new RustModule.WalletV3.TransactionBuilder.new_no_payload();
+  const txBuilder = RustModule.WalletV3.TransactionBuilder.new_no_payload();
   txBuilder.add_output(
     RustModule.WalletV3.Address.from_string(receiver),
     RustModule.WalletV3.Value.from_str(amount)
@@ -225,11 +224,15 @@ function firstMatchFirstInputSelection(
   feeAlgorithm: RustModule.WalletV3.Fee,
 ): Array<RemoteUnspentOutput> {
   const selectedOutputs = [];
+  if (allUtxos.length === 0) {
+    throw new NotEnoughMoneyToSendError();
+  }
   // add UTXOs in whatever order they're sorted until we have enough for amount+fee
   for (let i = 0; i < allUtxos.length; i++) {
     selectedOutputs.push(allUtxos[i]);
     txBuilder.add_input(utxoToTxInput(allUtxos[i]));
-    if (!txBuilder.get_balance(feeAlgorithm).is_negative()) {
+    const txBalance = txBuilder.get_balance(feeAlgorithm);
+    if (!txBalance.is_negative()) {
       break;
     }
     if (i === allUtxos.length - 1) {
@@ -258,7 +261,7 @@ function filterToUsedChange(
     const output = outputs.get(i);
     // we can't know which bech32 prefix was used
     // so we instead assume the suffix must match
-    const suffix = output.address().to_string('');
+    const suffix = output.address().to_string('dummy').slice('dummy'.length);
     const val = output.value().to_str();
     if (changeAddr.address.endsWith(suffix)) {
       const indexInInput = possibleDuplicates.findIndex(
@@ -279,7 +282,7 @@ function filterToUsedChange(
 }
 
 export function signTransaction(
-  signRequest: V3BaseSignRequest,
+  signRequest: V3UnsignedTxResponse,
   keyLevel: number,
   signingKey: RustModule.WalletV2.PrivateKey
 ): RustModule.WalletV3.AuthenticatedTransaction {
@@ -337,7 +340,7 @@ function addWitnesses(
     const witness = RustModule.WalletV3.Witness.for_utxo(
       RustModule.WalletV3.Hash.from_hex(CONFIG.app.genesisHash),
       txFinalizer.get_txid(),
-      v2KeyToV3Key(privateKeys[i]),
+      v2SkKeyToV3Key(privateKeys[i]),
     );
     txFinalizer.set_witness(i, witness);
   }

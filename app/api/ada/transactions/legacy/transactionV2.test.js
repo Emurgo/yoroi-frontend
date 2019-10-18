@@ -74,7 +74,7 @@ const sampleAdaAddresses: Array<{| ...Address, ...Addressing |}> = [
   {
     address: 'Ae2tdPwUPEZ4xAL3nxLq4Py7BfS1D2tJ3u2rxZGnrAXC8TNkWhTaz41J3FN',
     addressing: {
-      path: [0, 70],
+      path: [0, 134],
       startLevel: Bip44DerivationLevels.CHAIN.level,
     },
   },

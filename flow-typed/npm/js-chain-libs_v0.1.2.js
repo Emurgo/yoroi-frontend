@@ -155,6 +155,11 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {Transaction}
      */
     transaction(): Transaction;
+
+    /**
+     * @returns {Witnesses}
+     */
+    witnesses(): Witnesses;
   }
   /**
    * Amount of the balance in the transaction.
@@ -631,6 +636,12 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {string}
      */
     to_bech32(): string;
+
+    /**
+     * @param {Uint8Array} bytes
+     * @returns {PrivateKey}
+     */
+    static from_bytes(bytes: Uint8Array): PrivateKey;
   }
   /**
    * ED25519 key used as public key
@@ -653,6 +664,12 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {Uint8Array}
      */
     as_bytes(): Uint8Array;
+
+    /**
+     * @param {Uint8Array} bytes
+     * @returns {PublicKey}
+     */
+    static from_bytes(bytes: Uint8Array): PublicKey;
   }
   /**
    */
@@ -1092,5 +1109,22 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {string}
      */
     to_bech32(): string;
+  }
+
+  /**
+   */
+  declare export class Witnesses {
+    free(): void;
+
+    /**
+     * @returns {number}
+     */
+    size(): number;
+
+    /**
+     * @param {number} index
+     * @returns {Witness}
+     */
+    get(index: number): Witness;
   }
 }
