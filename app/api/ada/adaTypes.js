@@ -63,6 +63,22 @@ export type BaseSignRequest = {|
   unsignedTx: RustModule.WalletV2.Transaction,
 |};
 
+export type V3UnsignedTxFromUtxoResponse = {|
+  senderUtxos: Array<RemoteUnspentOutput>,
+  unsignedTx: RustModule.WalletV3.Transaction,
+  changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
+|};
+export type V3UnsignedTxResponse = {|
+  senderUtxos: Array<AddressedUtxo>,
+  unsignedTx: RustModule.WalletV3.Transaction,
+  changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
+|};
+export type V3BaseSignRequest = {|
+  changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
+  senderUtxos: Array<AddressedUtxo>,
+  unsignedTx: RustModule.WalletV3.Transaction,
+|};
+
 /* Backend service Postgres data types */
 
 export type RemoteTxState = 'Successful' | 'Failed' | 'Pending';

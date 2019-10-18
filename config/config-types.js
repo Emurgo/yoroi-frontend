@@ -12,6 +12,12 @@ export type AppConfigType = {
   logsFileSuffix: string,
   addressRequestSize: number,
   txsBodiesRequestSize: number,
+  linearFee: {|
+    constant: string,
+    coefficient: string,
+    certificate: string,
+  |},
+  genesisHash: string,
 }
 
 export type NetworkConfigType = {

@@ -27,6 +27,7 @@ import type {
 import {
   Bip44DerivationLevels,
 } from './storage/database/bip44/api/utils';
+import { encode, toWords, } from 'bech32';
 
 export function getFromUserPerspective(data: {
   txInputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionInputRow>>,
@@ -252,4 +253,12 @@ export function copySignRequest(req: BaseSignRequest): BaseSignRequest {
     senderUtxos: req.senderUtxos,
     unsignedTx: req.unsignedTx.clone(),
   };
+}
+
+export function v2KeyToV3Key(
+  v2Key: RustModule.WalletV2.PrivateKey,
+): RustModule.WalletV3.PrivateKey {
+  const content = toWords(Buffer.from(v2Key.to_hex(), 'hex'));
+  const bech32EncodedKey = encode('ed25519e_sk', content, Number.MAX_SAFE_INTEGER);
+  return RustModule.WalletV3.PrivateKey.from_bech32(bech32EncodedKey);
 }
