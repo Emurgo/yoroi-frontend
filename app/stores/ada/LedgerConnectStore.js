@@ -59,7 +59,7 @@ export default class LedgerConnectStore
 
   get defaultWalletName(): string {
     // Ledger doesn’t provide any device name so using hard-coded name
-    return Config.wallets.hardwareWallet.ledgerNanoS.DEFAULT_WALLET_NAME;
+    return Config.wallets.hardwareWallet.ledgerNano.DEFAULT_WALLET_NAME;
   }
 
   get isActionProcessing(): boolean {
@@ -183,8 +183,8 @@ export default class LedgerConnectStore
     return {
       publicMasterKey: ePublicKey.publicKeyHex + ePublicKey.chainCodeHex,
       hwFeatures: {
-        vendor: Config.wallets.hardwareWallet.ledgerNanoS.VENDOR,
-        model: Config.wallets.hardwareWallet.ledgerNanoS.MODEL,
+        vendor: Config.wallets.hardwareWallet.ledgerNano.VENDOR,
+        model: '', // Ledger does not provide device model info up till now
         label: '',
         deviceId: '',
         language: '',
@@ -307,7 +307,7 @@ export default class LedgerConnectStore
     await wallets.refreshWalletsData();
 
     // show success notification
-    wallets.showLedgerNanoSWalletIntegratedNotification();
+    wallets.showLedgerNanoWalletIntegratedNotification();
 
     this.teardown();
     Logger.info('SUCCESS: Ledger Connected Wallet created and loaded');

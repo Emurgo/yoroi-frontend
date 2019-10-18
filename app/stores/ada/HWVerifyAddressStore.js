@@ -63,7 +63,7 @@ export default class AddressesStore extends Store {
     this._setError(null);
     this._setActionProcessing(true);
 
-    if (params.wallet.isLedgerNanoSWallet) {
+    if (params.wallet.isLedgerNanoWallet) {
       await this.ledgerVerifyAddress(path, address);
     } else if (params.wallet.isTrezorTWallet) {
       await this.trezorVerifyAddress(path, address);
