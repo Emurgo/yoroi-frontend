@@ -114,7 +114,7 @@ export async function sendAllUnsignedTxFromUtxo(
 }
 
 /**
- * @param {*} possibleInputAddresses we send all UTXO associated with an address.
+ * we send all UTXO associated with an address.
  * This maximizes privacy.
  * The address will not be part of the input if it has no UTXO in it
  */

@@ -107,11 +107,6 @@ export async function sendAllUnsignedTxFromUtxo(
   return unsignedTxResponse;
 }
 
-/**
- * @param {*} possibleInputAddresses we send all UTXO associated with an address.
- * This maximizes privacy.
- * The address will not be part of the input if it has no UTXO in it
- */
 export async function newAdaUnsignedTx(
   receiver: string,
   amount: string,

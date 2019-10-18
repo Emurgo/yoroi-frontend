@@ -27,7 +27,6 @@ import type {
 import {
   Bip44DerivationLevels,
 } from './storage/database/bip44/api/utils';
-import { encode, toWords, } from 'bech32';
 
 export function getFromUserPerspective(data: {
   txInputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionInputRow>>,

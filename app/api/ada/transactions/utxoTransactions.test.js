@@ -34,7 +34,6 @@ import {
   getTxInputTotal,
   getTxOutputTotal,
 } from './utils';
-import { v2PkKeyToV3Key } from '../lib/utils';
 
 const keys = [
   {
