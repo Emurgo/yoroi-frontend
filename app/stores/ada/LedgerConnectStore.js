@@ -4,8 +4,7 @@
 import { observable, action } from 'mobx';
 
 import type { ExtendedPublicKeyResp } from 'yoroi-extension-ledger-connect-handler';
-import {
-  LedgerConnect,
+import LedgerConnect, {
   makeCardanoAccountBIP44Path,
 } from 'yoroi-extension-ledger-connect-handler';
 

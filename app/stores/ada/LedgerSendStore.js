@@ -1,9 +1,7 @@
 // @flow
 import { action, observable } from 'mobx';
 
-import {
-  LedgerConnect,
-} from 'yoroi-extension-ledger-connect-handler';
+import LedgerConnect from 'yoroi-extension-ledger-connect-handler';
 import type {
   SignTransactionResponse as LedgerSignTxResponse
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';

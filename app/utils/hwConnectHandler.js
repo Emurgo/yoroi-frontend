@@ -1,7 +1,5 @@
 // @flow
-import {
-  LedgerConnect,
-} from 'yoroi-extension-ledger-connect-handler';
+import LedgerConnect from 'yoroi-extension-ledger-connect-handler';
 
 const LEDGER_BRIDGE_CHECK_INTERVAL = 800; // in ms (1000ms = 1sec)
 const LEDGER_BRIDGE_CHECK_COUNT = 10;

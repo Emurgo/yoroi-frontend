@@ -6,9 +6,7 @@ import {
   prepareLedgerConnect,
 } from '../../utils/hwConnectHandler';
 
-import {
-  LedgerConnect,
-} from 'yoroi-extension-ledger-connect-handler';
+import LedgerConnect from 'yoroi-extension-ledger-connect-handler';
 import TrezorConnect from 'trezor-connect';
 
 import LocalizableError from '../../i18n/LocalizableError';
