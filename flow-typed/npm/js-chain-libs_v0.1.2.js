@@ -641,7 +641,13 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @param {Uint8Array} bytes
      * @returns {PrivateKey}
      */
-    static from_bytes(bytes: Uint8Array): PrivateKey;
+    static from_normal_bytes(bytes: Uint8Array): PrivateKey;
+
+    /**
+     * @param {Uint8Array} bytes
+     * @returns {PrivateKey}
+     */
+    static from_extended_bytes(bytes: Uint8Array): PrivateKey;
   }
   /**
    * ED25519 key used as public key
