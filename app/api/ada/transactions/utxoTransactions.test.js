@@ -233,10 +233,10 @@ describe('Create unsigned TX from UTXO', () => {
 
       expect(witnesses.size()).toEqual(2);
       expect(witnesses.get(0).to_bech32()).toEqual(
-        'witness1q9tuk0s75d4zwahpxzydwr3dfang74s3l0l7whmx8fgjzfz28s9pnpeuhxmvu8ksa3h0hl4guhyusdaa2u93usu0vgggsqlrcswt7cq9vlq8pr'
+        'witness1q8n7j65qjf5jraj3uqy0praq77fszhuxdsdxlagp706sh9jsz7x07gddztlx25s66lusjkjh7hlqct3d8xk6aujrhzq4rd54jnzn94ggppm0c7'
       );
       expect(witnesses.get(1).to_bech32()).toEqual(
-        'witness1q9tuk0s75d4zwahpxzydwr3dfang74s3l0l7whmx8fgjzfz28s9pnpeuhxmvu8ksa3h0hl4guhyusdaa2u93usu0vgggsqlrcswt7cq9vlq8pr'
+        'witness1q8n7j65qjf5jraj3uqy0praq77fszhuxdsdxlagp706sh9jsz7x07gddztlx25s66lusjkjh7hlqct3d8xk6aujrhzq4rd54jnzn94ggppm0c7'
       );
     });
 
@@ -286,10 +286,10 @@ describe('Create unsigned TX from UTXO', () => {
 
       expect(witnesses.size()).toEqual(2);
       expect(witnesses.get(0).to_bech32()).toEqual(
-        'witness1q9tuk0s75d4zwahpxzydwr3dfang74s3l0l7whmx8fgjzfz28s9pnpeuhxmvu8ksa3h0hl4guhyusdaa2u93usu0vgggsqlrcswt7cq9vlq8pr'
+        'witness1q8n7j65qjf5jraj3uqy0praq77fszhuxdsdxlagp706sh9jsz7x07gddztlx25s66lusjkjh7hlqct3d8xk6aujrhzq4rd54jnzn94ggppm0c7'
       );
       expect(witnesses.get(1).to_bech32()).toEqual(
-        'witness1q9tuk0s75d4zwahpxzydwr3dfang74s3l0l7whmx8fgjzfz28s9pnpeuhxmvu8ksa3h0hl4guhyusdaa2u93usu0vgggsqlrcswt7cq9vlq8pr'
+        'witness1q8n7j65qjf5jraj3uqy0praq77fszhuxdsdxlagp706sh9jsz7x07gddztlx25s66lusjkjh7hlqct3d8xk6aujrhzq4rd54jnzn94ggppm0c7'
       );
     });
   });
