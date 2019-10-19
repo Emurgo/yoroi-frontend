@@ -12,6 +12,8 @@ import daedalusIcon from '../../assets/images/top-bar/daedalus-migration.inline.
 import { MAX_ADA_WALLETS_COUNT } from '../../config/numbersConfig';
 import styles from './WalletAdd.scss';
 
+import environmnent from '../../environment';
+
 const messages = defineMessages({
   title: {
     id: 'wallet.add.page.title',
@@ -82,7 +84,6 @@ export default class WalletAdd extends Component<Props> {
     if (isRestoreActive) {
       activeNotification = 'restoreNotificationMessage';
     }
-
     return (
       <div className={styles.component}>
         {/* Setting button */}
@@ -106,18 +107,20 @@ export default class WalletAdd extends Component<Props> {
             <div className={styles.heroRight}>
               <div className={styles.heroCardsList}>
                 {/* Connect to hardware wallet */}
-                <button
-                  type="button"
-                  className="WalletAdd_btnConnectHW"
-                  onClick={onHardwareConnect}
-                >
-                  <div className={styles.heroCardsItem}>
-                    <div className={classnames([styles.heroCardsItemBg, styles.bgConnectHW])} />
-                    <div className={styles.heroCardsItemTitle}>
-                      {intl.formatMessage(messages.connectToHWTitle)}
+                {!environmnent.isShelley() &&
+                  <button
+                    type="button"
+                    className="WalletAdd_btnConnectHW"
+                    onClick={onHardwareConnect}
+                  >
+                    <div className={styles.heroCardsItem}>
+                      <div className={classnames([styles.heroCardsItemBg, styles.bgConnectHW])} />
+                      <div className={styles.heroCardsItemTitle}>
+                        {intl.formatMessage(messages.connectToHWTitle)}
+                      </div>
                     </div>
-                  </div>
-                </button>
+                  </button>
+                }
                 {/* Create wallet */}
                 <button
                   type="button"
