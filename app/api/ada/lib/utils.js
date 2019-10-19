@@ -258,7 +258,7 @@ export function v2SkKeyToV3Key(
   v2Key: RustModule.WalletV2.PrivateKey,
 ): RustModule.WalletV3.PrivateKey {
   return RustModule.WalletV3.PrivateKey.from_extended_bytes(
-     // need to slice out the chain code from the private key
+    // need to slice out the chain code from the private key
     Buffer.from(v2Key.to_hex().slice(0, 128), 'hex')
   );
 }
