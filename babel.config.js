@@ -59,6 +59,12 @@ module.exports = function (api) {
           'react-hot-loader/babel',
           '@babel/plugin-transform-runtime'
         ]
+      },
+      'shelley-dev': {
+        plugins: [
+          'react-hot-loader/babel',
+          '@babel/plugin-transform-runtime'
+        ]
       }
     }
   }

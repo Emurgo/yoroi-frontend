@@ -4,6 +4,7 @@
   "description": "Cardano ADA wallet",
   "scripts": {
     "dev": "babel-node scripts/start --env 'development'",
+    "shelley-dev": "babel-node scripts/start --env 'shelley-dev'",
     "dev-mock-backend": "babel-node scripts/startWithMockServer.js",
     "build": "babel-node scripts/build",
     "compress": "babel-node scripts/compress",

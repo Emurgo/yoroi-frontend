@@ -24,9 +24,19 @@ export type NetworkConfigType = {
   name: Network
 };
 
-export type Network = 'development' | 'mainnet' | 'staging' | 'testnet' | 'test';
+export type Network = 'shelley-dev' | 'development' | 'mainnet' | 'staging' | 'testnet' | 'test';
 export const NetworkType: {
-  DEVELOPMENT: Network, MAINNET: Network, STAGING: Network, TESTNET: Network, TEST: Network
+  SHELLEY_DEV: Network,
+  DEVELOPMENT: Network,
+  MAINNET: Network,
+  STAGING: Network,
+  TESTNET: Network,
+  TEST: Network
 } = {
-  DEVELOPMENT: 'development', MAINNET: 'mainnet', STAGING: 'staging', TESTNET: 'testnet', TEST: 'test',
+  SHELLEY_DEV: 'shelley-dev',
+  DEVELOPMENT: 'development',
+  MAINNET: 'mainnet',
+  STAGING: 'staging',
+  TESTNET: 'testnet',
+  TEST: 'test',
 };
