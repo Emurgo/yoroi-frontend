@@ -130,7 +130,6 @@ export default class LedgerSendStore extends Store {
         ledgerSignTxResp,
         params.signRequest.unsignedTx,
       );
-      Logger.info('Signing on Ledger device is OK');
     } catch (error) {
       Logger.error('LedgerSendStore::_send::error: ' + stringifyError(error));
       this._setError(convertToLocalizableError(error));
@@ -146,15 +145,11 @@ export default class LedgerSendStore extends Store {
     ledgerSignTxResp: LedgerSignTxResponse,
     unsignedTx: RustModule.Wallet.Transaction,
   ): Promise<void> => {
-    try {
-      await this.broadcastLedgerSignedTxRequest.execute({
-        ledgerSignTxResp,
-        unsignedTx,
-        sendTx: this.stores.substores[environment.API].stateFetchStore.fetcher.sendTx,
-      }).promise;
-    } catch (error) {
-      Logger.error('LedgerSendStore::_prepareAndBroadcastSignedTx error: ' + stringifyError(error));
-    }
+    await this.broadcastLedgerSignedTxRequest.execute({
+      ledgerSignTxResp,
+      unsignedTx,
+      sendTx: this.stores.substores[environment.API].stateFetchStore.fetcher.sendTx,
+    }).promise;
 
     this.actions.dialogs.closeActiveDialog.trigger();
     const { wallets } = this.stores.substores[environment.API];
@@ -164,6 +159,9 @@ export default class LedgerSendStore extends Store {
     if (activeWallet) {
       // go to transaction screen
       wallets.goToWalletRoute(activeWallet.id);
+    } else {
+      // this Error will be converted to LocalizableError()
+      throw new Error('No Active wallet Found.');
     }
 
     this._reset();
