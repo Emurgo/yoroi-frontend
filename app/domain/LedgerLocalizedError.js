@@ -17,6 +17,10 @@ const messages = defineMessages({
     id: 'wallet.hw.ledger.common.error.102',
     defaultMessage: '!!!Operation cancelled by user.',
   },
+  deviceLockedError103: {
+    id: 'wallet.hw.ledger.common.error.103',
+    defaultMessage: '!!!Ledger device is locked, please unlock it and retry.',
+  },
 });
 
 export function convertToLocalizableError(error: Error): LocalizableError {
@@ -37,6 +41,9 @@ export function convertToLocalizableError(error: Error): LocalizableError {
       case 'NotAllowedError: The operation either timed out or was not allowed. See: https://w3c.github.io/webauthn/#sec-assertion-privacy.':
       case 'Forcefully cancelled by user':
         localizableError = new LocalizableError(messages.cancleOnLedgerConnectError102);
+        break;
+      case 'TransportStatusError: Ledger device: Device is locked':
+        localizableError = new LocalizableError(messages.deviceLockedError103);
         break;
       default:
         /** we are not able to figure out why Error is thrown
