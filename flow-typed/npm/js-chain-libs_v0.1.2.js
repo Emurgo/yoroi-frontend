@@ -260,6 +260,44 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      */
     sign(private_key: PrivateKey): void;
   }
+
+  declare export class Ed25519Signature {
+    free(): void;
+
+    /**
+     * @returns {Uint8Array}
+     */
+    to_bytes(): Uint8Array;
+
+    /**
+     * @returns {string}
+     */
+    to_bech32(): string;
+
+    /**
+     * @returns {string}
+     */
+    to_hex(): string;
+
+    /**
+     * @param {Uint8Array} bytes
+     * @returns {Ed25519Signature}
+     */
+    static from_bytes(bytes: Uint8Array): Ed25519Signature;
+
+    /**
+     * @param {string} bech32_str
+     * @returns {Ed25519Signature}
+     */
+    static from_bech32(bech32_str: string): Ed25519Signature;
+
+    /**
+     * @param {string} input
+     * @returns {Ed25519Signature}
+     */
+    static from_hex(input: string): Ed25519Signature;
+  }
+
   /**
    * Algorithm used to compute transaction fees
    * Currently the only implementation if the Linear one
@@ -648,6 +686,12 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {PrivateKey}
      */
     static from_extended_bytes(bytes: Uint8Array): PrivateKey;
+
+    /**
+     * @param {Uint8Array} message
+     * @returns {Ed25519Signature}
+     */
+    sign(message: Uint8Array): Ed25519Signature;
   }
   /**
    * ED25519 key used as public key
@@ -676,6 +720,13 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {PublicKey}
      */
     static from_bytes(bytes: Uint8Array): PublicKey;
+
+    /**
+     * @param {Uint8Array} data
+     * @param {Ed25519Signature} signature
+     * @returns {boolean}
+     */
+    verify(data: Uint8Array, signature: Ed25519Signature): boolean;
   }
   /**
    */
