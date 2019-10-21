@@ -126,6 +126,12 @@ export default class LedgerSendStore extends Store {
           ledgerSignTxDataResp.ledgerSignTxPayload.outputs,
         );
 
+      // There is no need of ledgerConnect after this line.
+      // UI was getting blocked for few seconds
+      // because _prepareAndBroadcastSignedTx takes time.
+      // Disposing here will fix the UI issue.
+      ledgerConnect && ledgerConnect.dispose();
+
       await this._prepareAndBroadcastSignedTx(
         ledgerSignTxResp,
         params.signRequest.unsignedTx,
