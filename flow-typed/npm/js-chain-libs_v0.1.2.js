@@ -68,6 +68,44 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     to_hex(): string;
   }
   /**
+   */
+  declare export class AccountWitness {
+    free(): void;
+
+    /**
+     * @returns {Uint8Array}
+     */
+    to_bytes(): Uint8Array;
+
+    /**
+     * @returns {string}
+     */
+    to_bech32(): string;
+
+    /**
+     * @returns {string}
+     */
+    to_hex(): string;
+
+    /**
+     * @param {Uint8Array} bytes
+     * @returns {AccountWitness}
+     */
+    static from_bytes(bytes: Uint8Array): AccountWitness;
+
+    /**
+     * @param {string} bech32_str
+     * @returns {AccountWitness}
+     */
+    static from_bech32(bech32_str: string): AccountWitness;
+
+    /**
+     * @param {string} input
+     * @returns {AccountWitness}
+     */
+    static from_hex(input: string): AccountWitness;
+  }
+  /**
    * An address of any type, this can be one of
    * * A utxo-based address without delegation (single)
    * * A utxo-based address with delegation (group)
@@ -194,6 +232,133 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     get_value(): Value;
   }
   /**
+   */
+  declare export class Bip32PrivateKey {
+    free(): void;
+
+    /**
+     * derive this private key with the given index.
+     *
+     * # Security considerations
+     *
+     * * hard derivation index cannot be soft derived with the public key
+     *
+     * # Hard derivation vs Soft derivation
+     *
+     * If you pass an index below 0x80000000 then it is a soft derivation.
+     * The advantage of soft derivation is that it is possible to derive the
+     * public key too. I.e. derivation the private key with a soft derivation
+     * index and then retrieving the associated public key is equivalent to
+     * deriving the public key associated to the parent private key.
+     *
+     * Hard derivation index does not allow public key derivation.
+     *
+     * This is why deriving the private key should not fail while deriving
+     * the public key may fail (if the derivation index is invalid).
+     * @param {number} index
+     * @returns {Bip32PrivateKey}
+     */
+    derive(index: number): Bip32PrivateKey;
+
+    /**
+     * @returns {Bip32PrivateKey}
+     */
+    static generate_ed25519_bip32(): Bip32PrivateKey;
+
+    /**
+     * @returns {PrivateKey}
+     */
+    to_raw_key(): PrivateKey;
+
+    /**
+     * @returns {Bip32PublicKey}
+     */
+    to_public(): Bip32PublicKey;
+
+    /**
+     * @param {Uint8Array} bytes
+     * @returns {Bip32PrivateKey}
+     */
+    static from_bytes(bytes: Uint8Array): Bip32PrivateKey;
+
+    /**
+     * @returns {Uint8Array}
+     */
+    as_bytes(): Uint8Array;
+
+    /**
+     * @param {string} bech32_str
+     * @returns {Bip32PrivateKey}
+     */
+    static from_bech32(bech32_str: string): Bip32PrivateKey;
+
+    /**
+     * @returns {string}
+     */
+    to_bech32(): string;
+  }
+  /**
+   */
+  declare export class Bip32PublicKey {
+    free(): void;
+
+    /**
+     * derive this public key with the given index.
+     *
+     * # Errors
+     *
+     * If the index is not a soft derivation index (< 0x80000000) then
+     * calling this method will fail.
+     *
+     * # Security considerations
+     *
+     * * hard derivation index cannot be soft derived with the public key
+     *
+     * # Hard derivation vs Soft derivation
+     *
+     * If you pass an index below 0x80000000 then it is a soft derivation.
+     * The advantage of soft derivation is that it is possible to derive the
+     * public key too. I.e. derivation the private key with a soft derivation
+     * index and then retrieving the associated public key is equivalent to
+     * deriving the public key associated to the parent private key.
+     *
+     * Hard derivation index does not allow public key derivation.
+     *
+     * This is why deriving the private key should not fail while deriving
+     * the public key may fail (if the derivation index is invalid).
+     * @param {number} index
+     * @returns {Bip32PublicKey}
+     */
+    derive(index: number): Bip32PublicKey;
+
+    /**
+     * @returns {PublicKey}
+     */
+    to_raw_key(): PublicKey;
+
+    /**
+     * @param {Uint8Array} bytes
+     * @returns {Bip32PublicKey}
+     */
+    static from_bytes(bytes: Uint8Array): Bip32PublicKey;
+
+    /**
+     * @returns {Uint8Array}
+     */
+    as_bytes(): Uint8Array;
+
+    /**
+     * @param {string} bech32_str
+     * @returns {Bip32PublicKey}
+     */
+    static from_bech32(bech32_str: string): Bip32PublicKey;
+
+    /**
+     * @returns {string}
+     */
+    to_bech32(): string;
+  }
+  /**
    * `Block` is an element of the blockchain it contains multiple
    * transaction and a reference to the parent block. Alongside
    * with the position of that block in the chain.
@@ -260,7 +425,8 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      */
     sign(private_key: PrivateKey): void;
   }
-
+  /**
+   */
   declare export class Ed25519Signature {
     free(): void;
 
@@ -297,7 +463,6 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      */
     static from_hex(input: string): Ed25519Signature;
   }
-
   /**
    * Algorithm used to compute transaction fees
    * Currently the only implementation if the Linear one
@@ -676,16 +841,21 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     to_bech32(): string;
 
     /**
-     * @param {Uint8Array} bytes
-     * @returns {PrivateKey}
+     * @returns {Uint8Array}
      */
-    static from_normal_bytes(bytes: Uint8Array): PrivateKey;
+    as_bytes(): Uint8Array;
 
     /**
      * @param {Uint8Array} bytes
      * @returns {PrivateKey}
      */
     static from_extended_bytes(bytes: Uint8Array): PrivateKey;
+
+    /**
+     * @param {Uint8Array} bytes
+     * @returns {PrivateKey}
+     */
+    static from_normal_bytes(bytes: Uint8Array): PrivateKey;
 
     /**
      * @param {Uint8Array} message
@@ -709,6 +879,11 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {PublicKey}
      */
     static from_bech32(bech32_str: string): PublicKey;
+
+    /**
+     * @returns {string}
+     */
+    to_bech32(): string;
 
     /**
      * @returns {Uint8Array}
@@ -1076,6 +1251,44 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     ): UtxoPointer;
   }
   /**
+   */
+  declare export class UtxoWitness {
+    free(): void;
+
+    /**
+     * @returns {Uint8Array}
+     */
+    to_bytes(): Uint8Array;
+
+    /**
+     * @returns {string}
+     */
+    to_bech32(): string;
+
+    /**
+     * @returns {string}
+     */
+    to_hex(): string;
+
+    /**
+     * @param {Uint8Array} bytes
+     * @returns {UtxoWitness}
+     */
+    static from_bytes(bytes: Uint8Array): UtxoWitness;
+
+    /**
+     * @param {string} bech32_str
+     * @returns {UtxoWitness}
+     */
+    static from_bech32(bech32_str: string): UtxoWitness;
+
+    /**
+     * @param {string} input
+     * @returns {UtxoWitness}
+     */
+    static from_hex(input: string): UtxoWitness;
+  }
+  /**
    * Type used for representing certain amount of lovelaces.
    * It wraps an unsigned 64 bits number.
    * Strings are used for passing to and from javascript,
@@ -1146,6 +1359,12 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     ): Witness;
 
     /**
+     * @param {UtxoWitness} witness
+     * @returns {Witness}
+     */
+    static for_external_utxo(witness: UtxoWitness): Witness;
+
+    /**
      * Generate Witness for an account based transaction Input
      * the account-spending-counter should be incremented on each transaction from this account
      * @param {Hash} genesis_hash
@@ -1162,12 +1381,17 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     ): Witness;
 
     /**
+     * @param {AccountWitness} witness
+     * @returns {Witness}
+     */
+    static for_external_account(witness: AccountWitness): Witness;
+
+    /**
      * Get string representation
      * @returns {string}
      */
     to_bech32(): string;
   }
-
   /**
    */
   declare export class Witnesses {
@@ -1184,4 +1408,5 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      */
     get(index: number): Witness;
   }
+
 }
