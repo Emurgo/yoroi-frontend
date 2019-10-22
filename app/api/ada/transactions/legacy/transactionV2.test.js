@@ -1,10 +1,10 @@
 
 // @flow
-import '../lib/test-config';
+import '../../lib/test-config';
 import { schema } from 'lovefield';
 import type {
   RemoteUnspentOutput, AddressedUtxo,
-} from '../adaTypes';
+} from '../../adaTypes';
 import {
   newAdaUnsignedTx,
   newAdaUnsignedTxFromUtxo,
@@ -13,24 +13,24 @@ import {
 } from './transactionsV2';
 import {
   NotEnoughMoneyToSendError,
-} from '../errors';
+} from '../../errors';
 
 import {
   loadLovefieldDB,
-} from '../lib/storage/database/index';
+} from '../../lib/storage/database/index';
 import {
   Bip44DerivationLevels,
-} from '../lib/storage/database/bip44/api/utils';
+} from '../../lib/storage/database/bip44/api/utils';
 import type {
   Address, Addressing
-} from '../lib/storage/models/common/interfaces';
+} from '../../lib/storage/models/common/interfaces';
 
-import { RustModule } from '../lib/cardanoCrypto/rustLoader';
+import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import {
   HARD_DERIVATION_START,
   CARDANO_COINTYPE,
   BIP44_PURPOSE,
-} from '../../../config/numbersConfig';
+} from '../../../../config/numbersConfig';
 
 const sampleUtxos: Array<RemoteUnspentOutput> = [
   {
@@ -74,7 +74,7 @@ const sampleAdaAddresses: Array<{| ...Address, ...Addressing |}> = [
   {
     address: 'Ae2tdPwUPEZ4xAL3nxLq4Py7BfS1D2tJ3u2rxZGnrAXC8TNkWhTaz41J3FN',
     addressing: {
-      path: [0, 70],
+      path: [0, 134],
       startLevel: Bip44DerivationLevels.CHAIN.level,
     },
   },

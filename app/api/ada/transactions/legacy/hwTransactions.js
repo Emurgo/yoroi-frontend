@@ -3,27 +3,27 @@ import {
   Logger,
   stringifyError,
   stringifyData
-} from '../../../utils/logging';
+} from '../../../../utils/logging';
 import type {
   BaseSignRequest,
-} from '../adaTypes';
-import type { UtxoLookupMap }  from '../lib/utils';
-import { utxosToLookupMap, derivePathAsString, verifyAccountLevel }  from '../lib/utils';
+} from '../../adaTypes';
+import type { UtxoLookupMap }  from '../../lib/utils';
+import { utxosToLookupMap, derivePathAsString, verifyAccountLevel }  from '../../lib/utils';
 import type {
   SendFunc,
   TxBodiesFunc
-} from '../lib/state-fetch/types';
+} from '../../lib/state-fetch/types';
 import {
   SendTransactionError,
   InvalidWitnessError,
-} from '../errors';
+} from '../../errors';
 import type {
   BroadcastTrezorSignedTxResponse,
   PrepareAndBroadcastLedgerSignedTxResponse
-} from '../index';
+} from '../../index';
 import type {
   LedgerSignTxPayload,
-} from '../../../domain/HWSignTx';
+} from '../../../../domain/HWSignTx';
 import type {
   BIP32Path,
   InputTypeUTxO,
@@ -40,11 +40,11 @@ import type {
 } from 'trezor-connect/lib/types/cardano';
 import type {
   Address, Value, Addressing,
-} from '../lib/storage/models/common/interfaces';
+} from '../../lib/storage/models/common/interfaces';
 
-import type { ConfigType } from '../../../../config/config-types';
+import type { ConfigType } from '../../../../../config/config-types';
 
-import { RustModule } from '../lib/cardanoCrypto/rustLoader';
+import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 
 declare var CONFIG: ConfigType;
 

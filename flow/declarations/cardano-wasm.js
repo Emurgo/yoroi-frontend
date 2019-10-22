@@ -475,7 +475,7 @@ declare module 'cardano-wallet-browser' { // need to wrap flowgen output into mo
     /**
      * @returns {any}
      */
-    to_array(): any;
+    to_array(): Array<number>;
   }
   /**
    */
