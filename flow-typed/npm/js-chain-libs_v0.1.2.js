@@ -296,6 +296,13 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {string}
      */
     to_bech32(): string;
+
+    /**
+     * @param {Uint8Array} entropy
+     * @param {Uint8Array} password
+     * @returns {Bip32PrivateKey}
+     */
+    from_bip39_entropy(entropy: Uint8Array, password: Uint8Array): Bip32PrivateKey;
   }
   /**
    */
@@ -1362,7 +1369,7 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @param {UtxoWitness} witness
      * @returns {Witness}
      */
-    static for_external_utxo(witness: UtxoWitness): Witness;
+    static from_external_utxo(witness: UtxoWitness): Witness;
 
     /**
      * Generate Witness for an account based transaction Input
@@ -1384,7 +1391,7 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @param {AccountWitness} witness
      * @returns {Witness}
      */
-    static for_external_account(witness: AccountWitness): Witness;
+    static from_external_account(witness: AccountWitness): Witness;
 
     /**
      * Get string representation
