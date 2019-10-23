@@ -118,10 +118,10 @@ export async function buildTransferTx(
       );
 
     // first build a transaction to see what the fee will be
-    const txBuilder = await sendAllUnsignedTxFromUtxo(
+    const txBuilder = sendAllUnsignedTxFromUtxo(
       outputAddr,
       senderUtxos
-    ).then(resp => resp.txBuilder);
+    ).txBuilder;
     const fee = coinToBigNumber(txBuilder.get_balance_without_fees().value());
 
     // sign inputs

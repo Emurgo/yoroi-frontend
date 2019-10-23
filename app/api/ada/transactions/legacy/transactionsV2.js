@@ -29,10 +29,10 @@ import type { IGetAllUtxosResponse } from '../../lib/storage/models/PublicDerive
 declare var CONFIG: ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;
 
-export async function sendAllUnsignedTx(
+export function sendAllUnsignedTx(
   receiver: string,
   allUtxos: Array<AddressedUtxo>,
-): Promise<UnsignedTxResponse> {
+): UnsignedTxResponse {
   const addressingMap = new Map<RemoteUnspentOutput, AddressedUtxo>();
   for (const utxo of allUtxos) {
     addressingMap.set({
@@ -43,7 +43,7 @@ export async function sendAllUnsignedTx(
       utxo_id: utxo.utxo_id
     }, utxo);
   }
-  const unsignedTxResponse = await sendAllUnsignedTxFromUtxo(
+  const unsignedTxResponse = sendAllUnsignedTxFromUtxo(
     receiver,
     Array.from(addressingMap.keys())
   );
@@ -65,10 +65,10 @@ export async function sendAllUnsignedTx(
   };
 }
 
-export async function sendAllUnsignedTxFromUtxo(
+export function sendAllUnsignedTxFromUtxo(
   receiver: string,
   allUtxos: Array<RemoteUnspentOutput>,
-): Promise<UnsignedTxFromUtxoResponse> {
+): UnsignedTxFromUtxoResponse {
   const totalBalance = allUtxos
     .map(utxo => new BigNumber(utxo.amount))
     .reduce(
@@ -96,7 +96,7 @@ export async function sendAllUnsignedTxFromUtxo(
     throw new NotEnoughMoneyToSendError();
   }
   const newAmount = totalBalance.minus(fee).toString();
-  const unsignedTxResponse = await newAdaUnsignedTxFromUtxo(receiver, newAmount, [], allUtxos);
+  const unsignedTxResponse = newAdaUnsignedTxFromUtxo(receiver, newAmount, [], allUtxos);
 
   // sanity check
   const balance = unsignedTxResponse.txBuilder.get_balance(feeAlgorithm);
@@ -118,12 +118,12 @@ export async function sendAllUnsignedTxFromUtxo(
  * This maximizes privacy.
  * The address will not be part of the input if it has no UTXO in it
  */
-export async function newAdaUnsignedTx(
+export function newAdaUnsignedTx(
   receiver: string,
   amount: string,
   changeAdaAddr: Array<{| ...Address, ...Addressing |}>,
   allUtxos: Array<AddressedUtxo>,
-): Promise<UnsignedTxResponse> {
+): UnsignedTxResponse {
   const addressingMap = new Map<RemoteUnspentOutput, AddressedUtxo>();
   for (const utxo of allUtxos) {
     addressingMap.set({
@@ -134,7 +134,7 @@ export async function newAdaUnsignedTx(
       utxo_id: utxo.utxo_id
     }, utxo);
   }
-  const unsignedTxResponse = await newAdaUnsignedTxFromUtxo(
+  const unsignedTxResponse = newAdaUnsignedTxFromUtxo(
     receiver,
     amount,
     changeAdaAddr,
@@ -164,12 +164,12 @@ export async function newAdaUnsignedTx(
  * A) Addressing
  * B) Having the key provided externally
  */
-export async function newAdaUnsignedTxFromUtxo(
+export function newAdaUnsignedTxFromUtxo(
   receiver: string,
   amount: string,
   changeAdaAddr: Array<{| ...Address, ...Addressing |}>,
   allUtxos: Array<RemoteUnspentOutput>,
-): Promise<UnsignedTxFromUtxoResponse> {
+): UnsignedTxFromUtxoResponse {
   const feeAlgorithm = RustModule.WalletV2.LinearFeeAlgorithm.default();
 
   const txInputs = utxoToTxInput(allUtxos);
@@ -202,7 +202,7 @@ export async function newAdaUnsignedTxFromUtxo(
   }
 
   const txBuilder = new RustModule.WalletV2.TransactionBuilder();
-  const changeAddrTxOut = await addTxIO(
+  const changeAddrTxOut = addTxIO(
     txBuilder, senderInputs, outputPolicy, feeAlgorithm, receiver, amount
   );
   const change = filterToUsedChange(changeAdaAddr, changeAddrTxOut);

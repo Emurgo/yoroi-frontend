@@ -98,9 +98,9 @@ beforeAll(async () => {
 });
 
 describe('Create unsigned TX from UTXO', () => {
-  it('Should create a valid transaction withhout selection', async () => {
+  it('Should create a valid transaction withhout selection', () => {
     const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[1]];
-    const unsignedTxResponse = await newAdaUnsignedTxFromUtxo(
+    const unsignedTxResponse = newAdaUnsignedTxFromUtxo(
       'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
       '5001', // smaller than input
       [],
@@ -116,38 +116,38 @@ describe('Create unsigned TX from UTXO', () => {
     expect(unsignedTxResponse.txBuilder.get_balance_without_fees().value().to_str()).toEqual('0.995000');
   });
 
-  it('Should fail due to insufficient funds (bigger than all inputs)', async () => {
+  it('Should fail due to insufficient funds (bigger than all inputs)', () => {
     const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[1]];
-    expect(newAdaUnsignedTxFromUtxo(
+    expect(() => newAdaUnsignedTxFromUtxo(
       'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
       '1900001', // bigger than input including fees
       [],
       utxos
-    )).rejects.toThrow(NotEnoughMoneyToSendError);
+    )).toThrow(NotEnoughMoneyToSendError);
   });
 
-  it('Should fail due to insufficient funds (no inputs)', async () => {
-    expect(newAdaUnsignedTxFromUtxo(
+  it('Should fail due to insufficient funds (no inputs)', () => {
+    expect(() => newAdaUnsignedTxFromUtxo(
       'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
       '1', // bigger than input including fees
       [],
       [],
-    )).rejects.toThrow(NotEnoughMoneyToSendError);
+    )).toThrow(NotEnoughMoneyToSendError);
   });
 
-  it('Should fail due to insufficient funds (not enough to cover fees)', async () => {
+  it('Should fail due to insufficient funds (not enough to cover fees)', () => {
     const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[0]];
-    expect(newAdaUnsignedTxFromUtxo(
+    expect(() => newAdaUnsignedTxFromUtxo(
       'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
       '1', // bigger than input including fees
       [],
       utxos,
-    )).rejects.toThrow(NotEnoughMoneyToSendError);
+    )).toThrow(NotEnoughMoneyToSendError);
   });
 
-  it('Should pick inputs when using input selection', async () => {
+  it('Should pick inputs when using input selection', () => {
     const utxos: Array<RemoteUnspentOutput> = sampleUtxos;
-    const unsignedTxResponse = await newAdaUnsignedTxFromUtxo(
+    const unsignedTxResponse = newAdaUnsignedTxFromUtxo(
       'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
       '1001', // smaller than input
       [sampleAdaAddresses[0]],
@@ -166,8 +166,8 @@ describe('Create unsigned TX from UTXO', () => {
 
 
 describe('Create unsigned TX from addresses', () => {
-  it('Should create a valid transaction withhout selection', async () => {
-    const unsignedTxResponse = await newAdaUnsignedTx(
+  it('Should create a valid transaction withhout selection', () => {
+    const unsignedTxResponse = newAdaUnsignedTx(
       'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
       '5001', // smaller than input
       [],
@@ -185,8 +185,8 @@ describe('Create unsigned TX from addresses', () => {
 });
 
 describe('Create signed transactions', () => {
-  it('Witness should match on valid private key', async () => {
-    const unsignedTxResponse = await newAdaUnsignedTx(
+  it('Witness should match on valid private key', () => {
+    const unsignedTxResponse = newAdaUnsignedTx(
       'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
       '5001', // smaller than input
       [],
@@ -224,7 +224,7 @@ describe('Create signed transactions', () => {
     ]);
   });
 
-  it('Witness should with addressing from root', async () => {
+  it('Witness should with addressing from root', () => {
     const accountPrivateKey = RustModule.WalletV2.Bip44AccountPrivate.new(
       RustModule.WalletV2.PrivateKey.from_hex(
         '70afd5ff1f7f551c481b7e3f3541f7c63f5f6bcb293af92565af3deea0bcd6481a6e7b8acbe38f3906c63ccbe8b2d9b876572651ac5d2afc0aca284d9412bb1b4839bf02e1d990056d0f06af22ce4bcca52ac00f1074324aab96bbaaaccf290d'
@@ -301,9 +301,9 @@ describe('Create signed transactions', () => {
 
 describe('Create sendAll unsigned TX from UTXO', () => {
   describe('Create send-all TX from UTXO', () => {
-    it('Create a transaction involving all input with no change', async () => {
+    it('Create a transaction involving all input with no change', () => {
       const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[1], sampleUtxos[2]];
-      const sendAllResponse = await sendAllUnsignedTxFromUtxo(
+      const sendAllResponse = sendAllUnsignedTxFromUtxo(
         'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
         utxos,
       );
@@ -319,19 +319,19 @@ describe('Create sendAll unsigned TX from UTXO', () => {
     });
   });
 
-  it('Should fail due to insufficient funds (no inputs)', async () => {
-    expect(sendAllUnsignedTxFromUtxo(
+  it('Should fail due to insufficient funds (no inputs)', () => {
+    expect(() => sendAllUnsignedTxFromUtxo(
       'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
       [],
-    )).rejects.toThrow(NotEnoughMoneyToSendError);
+    )).toThrow(NotEnoughMoneyToSendError);
   });
 
-  it('Should fail due to insufficient funds (not enough to cover fees)', async () => {
+  it('Should fail due to insufficient funds (not enough to cover fees)', () => {
     const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[0]];
-    expect(sendAllUnsignedTxFromUtxo(
+    expect(() => sendAllUnsignedTxFromUtxo(
       'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
       utxos,
-    )).rejects.toThrow(NotEnoughMoneyToSendError);
+    )).toThrow(NotEnoughMoneyToSendError);
   });
 
 });

@@ -4,9 +4,9 @@
 
 import BigNumber from 'bignumber.js';
 import type {
-  V3UnsignedTxResponse,
+  V3UnsignedTxAddressedUtxoResponse,
   RemoteUnspentOutput,
-  V3UnsignedTxFromUtxoResponse,
+  V3UnsignedTxUtxoResponse,
   AddressedUtxo,
 } from '../adaTypes';
 import {
@@ -27,10 +27,10 @@ import { v2SkKeyToV3Key } from '../lib/utils';
 
 declare var CONFIG: ConfigType;
 
-export async function sendAllUnsignedTx(
+export function sendAllUnsignedTx(
   receiver: string,
   allUtxos: Array<AddressedUtxo>,
-): Promise<V3UnsignedTxResponse> {
+): V3UnsignedTxAddressedUtxoResponse {
   const addressingMap = new Map<RemoteUnspentOutput, AddressedUtxo>();
   for (const utxo of allUtxos) {
     addressingMap.set({
@@ -41,7 +41,7 @@ export async function sendAllUnsignedTx(
       utxo_id: utxo.utxo_id
     }, utxo);
   }
-  const unsignedTxResponse = await sendAllUnsignedTxFromUtxo(
+  const unsignedTxResponse = sendAllUnsignedTxFromUtxo(
     receiver,
     Array.from(addressingMap.keys())
   );
@@ -63,10 +63,10 @@ export async function sendAllUnsignedTx(
   };
 }
 
-export async function sendAllUnsignedTxFromUtxo(
+export function sendAllUnsignedTxFromUtxo(
   receiver: string,
   allUtxos: Array<RemoteUnspentOutput>,
-): Promise<V3UnsignedTxFromUtxoResponse> {
+): V3UnsignedTxUtxoResponse {
   const totalBalance = allUtxos
     .map(utxo => new BigNumber(utxo.amount))
     .reduce(
@@ -103,16 +103,16 @@ export async function sendAllUnsignedTxFromUtxo(
     throw new NotEnoughMoneyToSendError();
   }
   const newAmount = totalBalance.minus(fee).toString();
-  const unsignedTxResponse = await newAdaUnsignedTxFromUtxo(receiver, newAmount, [], allUtxos);
+  const unsignedTxResponse = newAdaUnsignedTxFromUtxo(receiver, newAmount, [], allUtxos);
   return unsignedTxResponse;
 }
 
-export async function newAdaUnsignedTx(
+export function newAdaUnsignedTx(
   receiver: string,
   amount: string,
   changeAdaAddr: Array<{| ...Address, ...Addressing |}>,
   allUtxos: Array<AddressedUtxo>,
-): Promise<V3UnsignedTxResponse> {
+): V3UnsignedTxAddressedUtxoResponse {
   const addressingMap = new Map<RemoteUnspentOutput, AddressedUtxo>();
   for (const utxo of allUtxos) {
     addressingMap.set({
@@ -123,7 +123,7 @@ export async function newAdaUnsignedTx(
       utxo_id: utxo.utxo_id
     }, utxo);
   }
-  const unsignedTxResponse = await newAdaUnsignedTxFromUtxo(
+  const unsignedTxResponse = newAdaUnsignedTxFromUtxo(
     receiver,
     amount,
     changeAdaAddr,
@@ -153,12 +153,12 @@ export async function newAdaUnsignedTx(
  * A) Addressing
  * B) Having the key provided externally
  */
-export async function newAdaUnsignedTxFromUtxo(
+export function newAdaUnsignedTxFromUtxo(
   receiver: string,
   amount: string,
   changeAddresses: Array<{| ...Address, ...Addressing |}>,
   allUtxos: Array<RemoteUnspentOutput>,
-): Promise<V3UnsignedTxFromUtxoResponse> {
+): V3UnsignedTxUtxoResponse {
   const feeAlgorithm = RustModule.WalletV3.Fee.linear_fee(
     RustModule.WalletV3.Value.from_str(CONFIG.app.linearFee.constant),
     RustModule.WalletV3.Value.from_str(CONFIG.app.linearFee.coefficient),
@@ -277,7 +277,7 @@ function filterToUsedChange(
 }
 
 export function signTransaction(
-  signRequest: V3UnsignedTxResponse,
+  signRequest: V3UnsignedTxAddressedUtxoResponse,
   keyLevel: number,
   signingKey: RustModule.WalletV2.PrivateKey
 ): RustModule.WalletV3.AuthenticatedTransaction {

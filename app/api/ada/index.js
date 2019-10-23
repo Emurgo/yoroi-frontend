@@ -707,7 +707,7 @@ export default class AdaApi {
         ...signingKey,
         password,
       });
-      const signedTx = await signTransaction(
+      const signedTx = signTransaction(
         signRequest,
         request.publicDeriver.getBip44Parent().getPublicDeriverLevel(),
         RustModule.WalletV2.PrivateKey.from_hex(normalizedKey.prvKeyHex)
@@ -853,7 +853,7 @@ export default class AdaApi {
 
       let unsignedTxResponse;
       if (shouldSendAll) {
-        unsignedTxResponse = await sendAllUnsignedTx(
+        unsignedTxResponse = sendAllUnsignedTx(
           receiver,
           addressedUtxo
         );
@@ -863,7 +863,7 @@ export default class AdaApi {
           throw new Error('createUnsignedTx no internal addresses left. Should never happen');
         }
         const changeAddr = nextUnusedInternal.addressInfo;
-        unsignedTxResponse = await newAdaUnsignedTx(
+        unsignedTxResponse = newAdaUnsignedTx(
           receiver,
           amount,
           [{
