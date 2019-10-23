@@ -1,4 +1,4 @@
-# Paper Wallets
+# Carteira de papel
 
 Uma **"Paper Wallet"** é um documento especial que contem um conjunto de palavras que garantem acesso a um seleto grupo de endereços. Quando uma paper wallet é criada, ela NÃO é armazenada pela Yoroi. O PDF gerado é a ÚNICA cópia da carteira que existe.
 
