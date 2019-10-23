@@ -57,6 +57,13 @@
           margin-top: 0;
           width: 350px;
         }
+
+        // Seems like this is the same class name as parent, but it's different.
+        // This class will apply to the child Input tag.
+        // Unfortunately for fixing this problem we also need to carefully fix basic E2E cases, as its used there.
+        :global .walletPassword {
+          margin-right: 25px;
+        }
     
         @include place-form-field-error-below-input;
       }
