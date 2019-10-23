@@ -137,7 +137,6 @@ export default class LedgerSendStore extends Store {
         params.signRequest.unsignedTx,
       );
     } catch (error) {
-      Logger.error('LedgerSendStore::_send::error: ' + stringifyError(error));
       this._setError(convertToLocalizableError(error));
     } finally {
       this.createLedgerSignTxDataRequest.reset();

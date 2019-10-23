@@ -107,7 +107,6 @@ export default class AddressesStore extends Store {
         await this.ledgerConnect.showAddress(path, address);
       }
     } catch (error) {
-      Logger.error('AddressStore::ledgerVerifyAddress::error: ' + stringifyError(error));
       this._setError(ledgerErrorToLocalized(error));
     } finally {
       this.ledgerConnect && this.ledgerConnect.dispose();

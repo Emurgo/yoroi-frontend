@@ -212,8 +212,6 @@ export default class LedgerConnectStore
   };
 
   _handleConnectError = (error: Error): void => {
-    Logger.error(`LedgerConnectStore::_checkAndStoreHWDeviceInfo ${stringifyError(error)}`);
-
     this.hwDeviceInfo = undefined;
     this.error = convertToLocalizableError(error);
 
