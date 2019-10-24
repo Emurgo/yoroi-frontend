@@ -26,6 +26,10 @@ const messages = defineMessages({
     id: 'wallet.hw.ledger.common.error.104',
     defaultMessage: '!!!Ledger device timeout, please retry.',
   },
+  networkError105: {
+    id: 'wallet.hw.ledger.common.error.105',
+    defaultMessage: '!!!Network error. Please check your internet connection.',
+  },
 });
 
 export function convertToLocalizableError(error: Error): LocalizableError {
@@ -59,6 +63,10 @@ export function convertToLocalizableError(error: Error): LocalizableError {
       case 'NotAllowedError: The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.':
         // Showing - Ledger device timeout, please retry.
         localizableError = new LocalizableError(messages.deviceLockedError104);
+        break;
+      case "LedgerConnect Error: Timeout happened, Couldn't connect to connect handler":
+        // Showing - Network error. Please check your internet connection.
+        localizableError = new LocalizableError(messages.networkError105);
         break;
       default:
         /** we are not able to figure out why Error is thrown

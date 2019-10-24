@@ -1,6 +1,8 @@
 // @flow
 import LedgerConnect from 'yoroi-extension-ledger-connect-handler';
 
+import { Logger } from './logging';
+
 const LEDGER_BRIDGE_CHECK_INTERVAL = 800; // in ms (1000ms = 1sec)
 const LEDGER_BRIDGE_CHECK_COUNT = 10;
 
@@ -18,7 +20,8 @@ export async function prepareLedgerConnect(ledgerConnect: LedgerConnect): Promis
       } else if (checkCounter > LEDGER_BRIDGE_CHECK_COUNT) {
         clearInterval(checkInterval);
         const timeSpentInSec = LEDGER_BRIDGE_CHECK_INTERVAL * LEDGER_BRIDGE_CHECK_COUNT / 1000;
-        reject(new Error(`LedgerConnect Error: Timeout. Couldn't connect to bridge in less than ${timeSpentInSec}seconds`));
+        Logger.error(`LedgerConnect Error: Timeout happened, Couldn't connect to connect handler in less than ${timeSpentInSec}seconds`);
+        reject(new Error("LedgerConnect Error: Timeout happened, Couldn't connect to connect handler"));
       }
       checkCounter++;
     }, LEDGER_BRIDGE_CHECK_INTERVAL);

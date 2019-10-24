@@ -312,6 +312,7 @@
   "wallet.hw.ledger.common.error.102": "Operation cancelled by user.",
   "wallet.hw.ledger.common.error.103": "Ledger device is locked, please unlock it and retry.",
   "wallet.hw.ledger.common.error.104": "Ledger device timeout, please retry.",
+  "wallet.hw.ledger.common.error.105": "Network error. Please check your internet connection.",
   "wallet.navigation.receive": "Receive",
   "wallet.navigation.send": "Send",
   "wallet.navigation.transactions": "Transactions",
