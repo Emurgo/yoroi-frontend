@@ -63,12 +63,12 @@ export type BaseSignRequest = {|
   unsignedTx: RustModule.WalletV2.Transaction,
 |};
 
-export type V3UnsignedTxFromUtxoResponse = {|
+export type V3UnsignedTxUtxoResponse = {|
   senderUtxos: Array<RemoteUnspentOutput>,
   unsignedTx: RustModule.WalletV3.Transaction,
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
 |};
-export type V3UnsignedTxResponse = {|
+export type V3UnsignedTxAddressedUtxoResponse = {|
   senderUtxos: Array<AddressedUtxo>,
   unsignedTx: RustModule.WalletV3.Transaction,
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
