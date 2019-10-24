@@ -1,6 +1,6 @@
 // @flow
 
-import { RustModule } from '../lib/cardanoCrypto/rustLoader';
+import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import BigNumber from 'bignumber.js';
 
 export function getTxInputTotal(

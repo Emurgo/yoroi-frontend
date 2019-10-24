@@ -1,9 +1,9 @@
 // @flow
-import '../lib/test-config';
+import '../../lib/test-config';
 import { schema } from 'lovefield';
 import type {
   RemoteUnspentOutput, AddressedUtxo,
-} from '../adaTypes';
+} from '../../adaTypes';
 import {
   newAdaUnsignedTx,
   newAdaUnsignedTxFromUtxo,
@@ -12,24 +12,24 @@ import {
 } from './utxoTransactions';
 import {
   NotEnoughMoneyToSendError,
-} from '../errors';
+} from '../../errors';
 
 import {
   loadLovefieldDB,
-} from '../lib/storage/database/index';
+} from '../../lib/storage/database/index';
 import {
   Bip44DerivationLevels,
-} from '../lib/storage/database/bip44/api/utils';
+} from '../../lib/storage/database/bip44/api/utils';
 import type {
   Address, Addressing
-} from '../lib/storage/models/common/interfaces';
+} from '../../lib/storage/models/common/interfaces';
 
-import { RustModule } from '../lib/cardanoCrypto/rustLoader';
+import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import {
   HARD_DERIVATION_START,
   CARDANO_COINTYPE,
   BIP44_PURPOSE,
-} from '../../../config/numbersConfig';
+} from '../../../../config/numbersConfig';
 import {
   getTxInputTotal,
   getTxOutputTotal,

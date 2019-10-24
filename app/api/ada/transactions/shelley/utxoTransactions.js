@@ -8,22 +8,22 @@ import type {
   RemoteUnspentOutput,
   V3UnsignedTxUtxoResponse,
   AddressedUtxo,
-} from '../adaTypes';
+} from '../../adaTypes';
 import {
   NotEnoughMoneyToSendError,
-} from '../errors';
-import type { ConfigType } from '../../../../config/config-types';
+} from '../../errors';
+import type { ConfigType } from '../../../../../config/config-types';
 
-import { RustModule } from '../lib/cardanoCrypto/rustLoader';
+import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 
 import {
   Bip44DerivationLevels,
-} from '../lib/storage/database/bip44/api/utils';
+} from '../../lib/storage/database/bip44/api/utils';
 import type {
   Address, Value, Addressing,
-} from '../lib/storage/models/common/interfaces';
-import type { IGetAllUtxosResponse } from '../lib/storage/models/PublicDeriver/interfaces';
-import { v2SkKeyToV3Key } from '../lib/utils';
+} from '../../lib/storage/models/common/interfaces';
+import type { IGetAllUtxosResponse } from '../../lib/storage/models/PublicDeriver/interfaces';
+import { v2SkKeyToV3Key } from '../../lib/utils';
 
 declare var CONFIG: ConfigType;
 

@@ -1,5 +1,5 @@
 // @flow
-import '../lib/test-config';
+import '../../lib/test-config';
 
 import {
   getTxInputTotal,
@@ -7,12 +7,12 @@ import {
 } from './utils';
 import {
   NotEnoughMoneyToSendError,
-} from '../errors';
+} from '../../errors';
 import {
   buildTransaction,
   signTransaction,
 } from './accountingTransactions';
-import { RustModule } from '../lib/cardanoCrypto/rustLoader';
+import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import BigNumber from 'bignumber.js';
 
 beforeAll(async () => {

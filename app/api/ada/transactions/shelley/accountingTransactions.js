@@ -2,9 +2,9 @@
 
 import {
   NotEnoughMoneyToSendError,
-} from '../errors';
-import type { ConfigType } from '../../../../config/config-types';
-import { RustModule } from '../lib/cardanoCrypto/rustLoader';
+} from '../../errors';
+import type { ConfigType } from '../../../../../config/config-types';
+import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import BigNumber from 'bignumber.js';
 
 declare var CONFIG: ConfigType;
