@@ -17,7 +17,7 @@ import {
 } from './errors';
 import {
   sendAllUnsignedTxFromUtxo,
-} from './transactions/legacy/transactionsV2';
+} from './transactions/byron/transactionsV2';
 import type {
   AddressUtxoFunc
 } from './lib/state-fetch/types';

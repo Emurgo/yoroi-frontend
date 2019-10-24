@@ -78,7 +78,7 @@ export type V3UnsignedTxAddressedUtxoResponse = {|
 
 export type RemoteTxState = 'Successful' | 'Failed' | 'Pending';
 
-export type RemotoeTransactionInput = {|
+export type RemoteTransactionInput = {|
   +address: string,
   +amount: string,
   +id: string, // concatenation of txHash || index
@@ -105,7 +105,7 @@ export type RemoteTxInfo = {|
   +hash: string,
   +last_update: string, // timestamp with timezone
   +tx_state: RemoteTxState,
-  +inputs: Array<RemotoeTransactionInput>,
+  +inputs: Array<RemoteTransactionInput>,
   +outputs: Array<RemoteTransactionOutput>,
 |};
 export type RemoteTransaction = {|
