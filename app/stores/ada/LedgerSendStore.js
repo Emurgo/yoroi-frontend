@@ -26,7 +26,6 @@ import {
 
 import {
   Logger,
-  stringifyError,
   stringifyData,
 } from '../../utils/logging';
 
