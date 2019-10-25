@@ -18,6 +18,7 @@ import { ModifyEncryptionMeta, } from './primitives/api/write';
 import { populatePrimitivesDb } from './primitives/tables';
 import { populateBip44Db } from './bip44/tables';
 import { populateUtxoTransactionsDb } from './utxoTransactions/tables';
+import { populateAccountingTransactionsDb } from './accountingTransactions/tables';
 import { populateWalletDb } from './wallet/tables';
 
 export const loadLovefieldDB = async (
@@ -67,6 +68,7 @@ const populateAndCreate = async (
   populateWalletDb(schemaBuilder);
   populateBip44Db(schemaBuilder);
   populateUtxoTransactionsDb(schemaBuilder);
+  populateAccountingTransactionsDb(schemaBuilder);
 
   return await schemaBuilder.connect({
     storeType,

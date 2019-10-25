@@ -3,6 +3,9 @@
 import { Type } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 import { KeyDerivationSchema } from '../primitives/tables';
+import type { DbTransaction, DbBlock, } from '../primitives/tables';
+import type { DbUtxoInputs, DbUtxoOutputs, } from '../utxoTransactions/tables';
+import type { DbAccountingInputs, DbAccountingOutputs, } from '../accountingTransactions/tables';
 
 export type ConceptualWalletInsert = {|
   CoinType: number,
@@ -115,6 +118,13 @@ export const HwWalletMetaSchema: {
     PatchVersion: 'PatchVersion',
   }
 };
+
+export type DbTxIO = {|
+  ...DbTransaction,
+  ...DbUtxoInputs, ...DbUtxoOutputs,
+  ...DbAccountingInputs, ...DbAccountingOutputs,
+|};
+export type DbTxInChain = {| ...DbTxIO, ...DbBlock |};
 
 export const populateWalletDb = (schemaBuilder: lf$schema$Builder) => {
   // ConceptualWallet Table

@@ -13,6 +13,7 @@ import type {
   BlockInsert, BlockRow,
   TransactionInsert, TransactionRow,
   TxStatusCodesType,
+  DbTxIO, DbTxInChain,
 } from '../database/primitives/tables';
 import {
   GetAddress,
@@ -23,7 +24,7 @@ import {
   GetTransaction,
   GetTxAndBlock,
 } from '../database/primitives/api/read';
-import { GetOrAddAddress, } from '../database/primitives/api/write';
+import { GetOrAddAddress, ModifyTransaction, } from '../database/primitives/api/write';
 import { digetForHash, } from '../database/primitives/api/utils';
 import {
   ModifyUtxoTransaction, MarkUtxo,
@@ -37,14 +38,19 @@ import type {
   RemoteTransaction,
   UtxoAnnotatedTransaction,
 } from '../../../adaTypes';
+import {
+  InputTypes,
+} from '../../../adaTypes';
 import type {
   HashToIdsFunc,
   ToAbsoluteSlotNumberFunc,
 } from '../models/utils';
 import type {
   UtxoTransactionInputInsert, UtxoTransactionOutputInsert,
-  DbTxIO, DbTxInChain,
 } from '../database/utxoTransactions/tables';
+import type {
+  AccountingTransactionInputInsert, AccountingTransactionOutputInsert,
+} from '../database/accountingTransactions/tables';
 import { TxStatusCodes, } from '../database/primitives/tables';
 import {
   ScanAddressesInstance,
@@ -281,6 +287,7 @@ export async function updateTransactions(
       GetUtxoInputs,
       GetTxAndBlock,
       GetBip44DerivationSpecific,
+      ModifyTransaction,
     });
     const updateTables = Object
       .keys(updateDepTables)
@@ -322,7 +329,7 @@ export async function updateTransactions(
       GetLastSyncForPublicDeriver,
       ModifyLastSyncInfo,
       GetBlock,
-      ModifyUtxoTransaction,
+      ModifyTransaction,
       MarkUtxo,
       GetTransaction,
       GetUtxoInputs,
@@ -371,13 +378,13 @@ async function rollback(
     GetLastSyncForPublicDeriver: Class<GetLastSyncForPublicDeriver>,
     ModifyLastSyncInfo: Class<ModifyLastSyncInfo>,
     GetBlock: Class<GetBlock>,
-    ModifyUtxoTransaction: Class<ModifyUtxoTransaction>,
     MarkUtxo: Class<MarkUtxo>,
     GetTransaction: Class<GetTransaction>,
     GetTxAndBlock: Class<GetTxAndBlock>,
     GetUtxoInputs: Class<GetUtxoInputs>,
     GetEncryptionMeta: Class<GetEncryptionMeta>,
     GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+    ModifyTransaction: Class<ModifyTransaction>,
   |},
   request: {
     publicDeriver: IPublicDeriver & IGetAllUtxos,
@@ -392,8 +399,8 @@ async function rollback(
     return;
   }
 
-  // 1) Get the best block we have in storage
-  const addresses = await request.publicDeriver.rawGetAllUtxoAddresses(
+  // 1) Get all UTXO transactions
+  const utxoAddresses = await request.publicDeriver.rawGetAllUtxoAddresses(
     dbTx,
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
@@ -402,10 +409,20 @@ async function rollback(
     },
     undefined,
   );
-  const txIds = await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
+  const utxoTxIds = await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
     db, dbTx,
-    { addressIds: addresses.map(address => address.addr.AddressId) }
+    { addressIds: utxoAddresses.map(address => address.addr.AddressId) }
   );
+
+  // 2) Get all Accounting transactions
+  // TODO
+  const accountingTxIds = [];
+
+  // 3) get best tx in block
+  const txIds = Array.from(new Set([
+    ...utxoTxIds,
+    ...accountingTxIds,
+  ]));
   const bestInStorage = await deps.GetTxAndBlock.firstTxBefore(
     db, dbTx,
     {
@@ -418,14 +435,14 @@ async function rollback(
     return;
   }
 
-  // 2) Get latest k transactions
+  // 4) Get latest k transactions
 
   const txsToRevert = await deps.GetTxAndBlock.gteSlot(
     db, dbTx,
     { txIds, slot: bestInStorage.Block.SlotNum - STABLE_SIZE }
   );
 
-  // 3) mark rollback transactions as failed
+  // 5) mark rollback transactions as failed
   // Note: theoretically we should mark rolled back transactions as pending
   // however, this is problematic for us because Yoroi doesn't allow multiple pending transactions
   // so instead, we mark them as failed
@@ -433,7 +450,7 @@ async function rollback(
   for (const tx of txsToRevert) {
     // we keep both the block in the tx in history
     // because we need this information to show the fail tx information to the user
-    await deps.ModifyUtxoTransaction.updateStatus(
+    await deps.ModifyTransaction.updateStatus(
       db, dbTx,
       {
         status: TxStatusCodes.ROLLBACK_FAIL,
@@ -442,7 +459,7 @@ async function rollback(
     );
   }
 
-  // 4) set all UTXO from these transactions as unspent
+  // 6) set all UTXO from these transactions as unspent
 
   await markAllInputs(
     db, dbTx,
@@ -458,7 +475,7 @@ async function rollback(
     }
   );
 
-  // 5) marked pending transactions as failed
+  // 7) marked pending transactions as failed
   const pendingTxs = await deps.GetTransaction.withStatus(
     db, dbTx,
     {
@@ -468,7 +485,7 @@ async function rollback(
   );
   for (const pendingTx of pendingTxs) {
     // TODO: would be faster if this was batched
-    await deps.ModifyUtxoTransaction.updateStatus(
+    await deps.ModifyTransaction.updateStatus(
       db, dbTx,
       {
         transaction: pendingTx,
@@ -477,7 +494,7 @@ async function rollback(
     );
   }
 
-  // 6) Rollback LastSyncTable
+  // 8) Rollback LastSyncTable
   const bestStillIncluded = await deps.GetTxAndBlock.firstTxBefore(
     db, dbTx,
     { txIds, slot: bestInStorage.Block.SlotNum - STABLE_SIZE }
@@ -519,6 +536,7 @@ async function rawUpdateTransactions(
     GetUtxoInputs: Class<GetUtxoInputs>,
     GetTxAndBlock: Class<GetTxAndBlock>,
     GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+    ModifyTransaction: Class<ModifyTransaction>,
   |},
   publicDeriver: IPublicDeriver & IGetAllUtxos,
   lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
@@ -620,6 +638,7 @@ async function rawUpdateTransactions(
         GetEncryptionMeta: deps.GetEncryptionMeta,
         GetTransaction: deps.GetTransaction,
         GetUtxoInputs: deps.GetUtxoInputs,
+        ModifyTransaction: deps.ModifyTransaction,
       },
       {
         utxoAddressIds: addressIds,
@@ -661,6 +680,7 @@ export async function updateTransactionBatch(
     GetEncryptionMeta: Class<GetEncryptionMeta>,
     GetTransaction: Class<GetTransaction>,
     GetUtxoInputs: Class<GetUtxoInputs>,
+    ModifyTransaction: Class<ModifyTransaction>,
   |},
   request: {
     toAbsoluteSlotNumber: ToAbsoluteSlotNumberFunc,
@@ -671,10 +691,15 @@ export async function updateTransactionBatch(
 ): Promise<Array<DbTxInChain>> {
   const { TransactionSeed, BlockSeed } = await deps.GetEncryptionMeta.get(db, dbTx);
 
-  const txIds = await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
+  const utxoTxIds = await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
     db, dbTx,
     { addressIds: request.utxoAddressIds }
   );
+  const accountingTxIds = []; // TODO
+  const txIds = Array.from(new Set([
+    ...utxoTxIds,
+    ...accountingTxIds,
+  ]));
 
   const matchesInDb = new Map<string, DbTxIO>();
   {
@@ -683,11 +708,13 @@ export async function updateTransactionBatch(
       digests: digestsForNew,
       txIds,
     });
-    const txsWithIOs = await deps.AssociateTxWithUtxoIOs.mergeTxWithIO(
+    const txsWithUtxoIOs = await deps.AssociateTxWithUtxoIOs.mergeTxWithIO(
       db, dbTx,
       { txs: Array.from(matchByDigest.values()) }
     );
-    for (const tx of txsWithIOs) {
+    // TODO: merge with accounting IO
+    const fullyMergedTx = txsWithUtxoIOs;
+    for (const tx of fullyMergedTx) {
       matchesInDb.set(tx.transaction.Hash, tx);
     }
   }
@@ -720,7 +747,7 @@ export async function updateTransactionBatch(
       BlockSeed
     );
     modifiedTxIds.add(matchInDb.transaction.TransactionId);
-    const result = await deps.ModifyUtxoTransaction.updateExisting(
+    const result = await deps.ModifyTransaction.updateExisting(
       db,
       dbTx,
       {
@@ -814,7 +841,7 @@ export async function updateTransactionBatch(
       !newsTxsIdSet.has(pendingTx.TransactionId)
     ) {
       // TODO: would be faster if this was batched
-      await ModifyUtxoTransaction.updateStatus(
+      await deps.ModifyTransaction.updateStatus(
         db, dbTx,
         {
           transaction: pendingTx,
@@ -839,6 +866,8 @@ export async function networkTxToDbTx(
   ioGen: (txRowId: number) => {|
     utxoInputs: Array<UtxoTransactionInputInsert>,
     utxoOutputs: Array<UtxoTransactionOutputInsert>,
+    accountingInputs: Array<AccountingTransactionInputInsert>,
+    accountingOutputs: Array<AccountingTransactionOutputInsert>,
   |},
 }>> {
   const allAddresses = Array.from(new Set(
@@ -867,28 +896,50 @@ export async function networkTxToDbTx(
     return {
       block,
       transaction,
-      ioGen: (txRowId) => ({
-        utxoInputs: networkTx.inputs.map((input, i) => ({
-          TransactionId: txRowId,
-          AddressId: getIdOrThrow(input.address),
-          ParentTxHash: input.txHash,
-          IndexInParentTx: input.index,
-          IndexInOwnTx: i,
-          Amount: input.amount,
-        })),
-        utxoOutputs: networkTx.outputs.map((output, i) => ({
-          TransactionId: txRowId,
-          AddressId: getIdOrThrow(output.address),
-          OutputIndex: i,
-          Amount: output.amount,
-          /**
-           * we assume unspent for now but it will be updated after if necessary
-           * Note: if this output doesn't belong to you, it will be true forever
-           * This is slightly misleading, but using null would require null-checks everywhere
-           */
-          IsUnspent: true,
-        })),
-      }),
+      ioGen: (txRowId) => {
+        const utxoInputs = [];
+        const utxoOutputs = [];
+        const accountingInputs = [];
+        const accountingOutputs = [];
+        for (let i = 0; i < networkTx.inputs.length; i++) {
+          const input = networkTx.inputs[i];
+          if (input.type === InputTypes.utxo) {
+            utxoInputs.push({
+              TransactionId: txRowId,
+              AddressId: getIdOrThrow(input.address),
+              ParentTxHash: input.txHash,
+              IndexInParentTx: input.index,
+              IndexInOwnTx: i,
+              Amount: input.amount,
+            });
+          }
+        }
+        for (let i = 0; i < networkTx.outputs.length; i++) {
+          const output = networkTx.outputs[i];
+          // TODO
+          if (output.type === InputTypes.utxo) {
+            utxoInputs.push({
+              TransactionId: txRowId,
+              AddressId: getIdOrThrow(output.address),
+              OutputIndex: i,
+              Amount: output.amount,
+              /**
+               * we assume unspent for now but it will be updated after if necessary
+               * Note: if this output doesn't belong to you, it will be true forever
+               * This is slightly misleading, but using null would require null-checks everywhere
+               */
+              IsUnspent: true,
+            });
+          }
+        }
+
+        return {
+          utxoInputs,
+          utxoOutputs,
+          accountingInputs,
+          accountingOutputs,
+        };
+      },
     };
   });
 
@@ -933,6 +984,7 @@ async function markAllInputs(
       // this input doesn't belong to you, so just continue
       continue;
     }
+    // note: this does nothing if the transaction output is not a UTXO output
     await deps.MarkUtxo.markAs(
       db, dbTx,
       {
