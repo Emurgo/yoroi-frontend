@@ -18,6 +18,13 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     +Test: 1 // 1
   |};
 
+  declare export var AddressKind: {|
+    +Single: 0, // 0
+    +Group: 1, // 1
+    +Account: 2, // 2
+    +Multisig: 3 // 3
+  |};
+
   /**
    * Allow to differentiate between address in
    * production and testing setting, so that
@@ -56,6 +63,16 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {AccountIdentifier}
      */
     to_identifier(): AccountIdentifier;
+  }
+  /**
+   */
+  declare export class AccountAddress {
+    free(): void;
+
+    /**
+     * @returns {PublicKey}
+     */
+    get_account_key(): PublicKey;
   }
   /**
    */
@@ -181,6 +198,36 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
       key: PublicKey,
       discrimination: number
     ): Address;
+
+    /**
+     * @returns {number}
+     */
+    get_discrimination(): number;
+
+    /**
+     * @returns {number}
+     */
+    get_kind(): number;
+
+    /**
+     * @returns {SingleAddress}
+     */
+    to_single_address(): SingleAddress | void;
+
+    /**
+     * @returns {GroupAddress}
+     */
+    to_group_address(): GroupAddress | void;
+
+    /**
+     * @returns {AccountAddress}
+     */
+    to_account_address(): AccountAddress | void;
+
+    /**
+     * @returns {MultisigAddress}
+     */
+    to_multisig_address(): MultisigAddress | void;
   }
   /**
    * Type for representing a Transaction with Witnesses (signatures)
@@ -610,6 +657,21 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     get(index: number): Fragment;
   }
   /**
+   */
+  declare export class GroupAddress {
+    free(): void;
+
+    /**
+     * @returns {PublicKey}
+     */
+    get_spending_key(): PublicKey;
+
+    /**
+     * @returns {PublicKey}
+     */
+    get_account_key(): PublicKey;
+  }
+  /**
    * Type for representing a generic Hash
    */
   declare export class Hash {
@@ -709,6 +771,16 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {KesPublicKey}
      */
     static from_bech32(bech32_str: string): KesPublicKey;
+  }
+  /**
+   */
+  declare export class MultisigAddress {
+    free(): void;
+
+    /**
+     * @returns {Uint8Array}
+     */
+    get_merkle_root(): Uint8Array;
   }
   /**
    * Type for representing a Transaction Output, composed of an Address and a Value
@@ -935,6 +1007,16 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @param {PublicKey} key
      */
     add(key: PublicKey): void;
+  }
+  /**
+   */
+  declare export class SingleAddress {
+    free(): void;
+
+    /**
+     * @returns {PublicKey}
+     */
+    get_spending_key(): PublicKey;
   }
   /**
    */
