@@ -73,6 +73,11 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {PublicKey}
      */
     get_account_key(): PublicKey;
+
+    /**
+     * @returns {Address}
+     */
+    to_base_address(): Address;
   }
   /**
    */
@@ -196,6 +201,16 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      */
     static account_from_public_key(
       key: PublicKey,
+      discrimination: number
+    ): Address;
+
+    /**
+     * @param {Uint8Array} merkle_root
+     * @param {number} discrimination
+     * @returns {Address}
+     */
+    static multisig_from_merkle_root(
+      merkle_root: Uint8Array,
       discrimination: number
     ): Address;
 
@@ -670,6 +685,11 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {PublicKey}
      */
     get_account_key(): PublicKey;
+
+    /**
+     * @returns {Address}
+     */
+    to_base_address(): Address;
   }
   /**
    * Type for representing a generic Hash
@@ -781,6 +801,11 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {Uint8Array}
      */
     get_merkle_root(): Uint8Array;
+
+    /**
+     * @returns {Address}
+     */
+    to_base_address(): Address;
   }
   /**
    * Type for representing a Transaction Output, composed of an Address and a Value
@@ -1017,6 +1042,11 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {PublicKey}
      */
     get_spending_key(): PublicKey;
+
+    /**
+     * @returns {Address}
+     */
+    to_base_address(): Address;
   }
   /**
    */
