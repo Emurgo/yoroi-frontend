@@ -127,7 +127,7 @@ WALLET = {
       "majorVersion": 1,      // majorVersion => getVersion().major
       "minorVersion": 0,      // minorVersion => getVersion().minor
       "patchVersion": 0,      // patchVersion => getVersion().patch
-      "model": "NanoS",       // presently there is no way get model, but if possible will try to figure out 
+      "model": "",       // presently there is no way get model, but if possible will try to figure out 
       "publicMasterKey": "master public key" // publicMasterKey => Ada.getExtendedPublicKey()
     }
   }

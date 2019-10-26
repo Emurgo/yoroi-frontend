@@ -3,14 +3,10 @@
 
 import { observable, action } from 'mobx';
 
-import {
-  LedgerBridge,
+import type { ExtendedPublicKeyResp } from 'yoroi-extension-ledger-connect-handler';
+import LedgerConnect, {
   makeCardanoAccountBIP44Path,
-} from 'yoroi-extension-ledger-bridge';
-import type {
-  GetVersionResponse,
-  GetExtendedPublicKeyResponse,
-} from '@cardano-foundation/ledgerjs-hw-app-cardano';
+} from 'yoroi-extension-ledger-connect-handler';
 
 import Config from '../../config';
 import environment from '../../environment';
@@ -38,9 +34,8 @@ import {
 import { StepState } from '../../components/widgets/ProgressSteps';
 
 import {
-  prepareLedgerBridger,
-  disposeLedgerBridgeIFrame
-} from '../../utils/iframeHandler';
+  prepareLedgerConnect,
+} from '../../utils/hwConnectHandler';
 
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
@@ -52,24 +47,19 @@ import {
   stringifyError
 } from '../../utils/logging';
 
-type LedgerConnectionResponse = {
-  versionResp: GetVersionResponse,
-  extendedPublicKeyResp: GetExtendedPublicKeyResponse,
-};
-
 export default class LedgerConnectStore
   extends Store
-  implements HWConnectStoreTypes<LedgerConnectionResponse> {
+  implements HWConnectStoreTypes<ExtendedPublicKeyResp> {
 
   // =================== VIEW RELATED =================== //
   @observable progressInfo: ProgressInfo;
   error: ?LocalizableError;
   hwDeviceInfo: ?HWDeviceInfo;
-  ledgerBridge: ?LedgerBridge;
+  ledgerConnect: ?LedgerConnect;
 
   get defaultWalletName(): string {
     // Ledger doesn’t provide any device name so using hard-coded name
-    return Config.wallets.hardwareWallet.ledgerNanoS.DEFAULT_WALLET_NAME;
+    return Config.wallets.hardwareWallet.ledgerNano.DEFAULT_WALLET_NAME;
   }
 
   get isActionProcessing(): boolean {
@@ -101,14 +91,12 @@ export default class LedgerConnectStore
     * _init() is called when connect dailog is about to show */
   _init = (): void => {
     Logger.debug('LedgerConnectStore::_init called');
-    if (this.ledgerBridge == null) {
-      Logger.debug('LedgerConnectStore::_init new LedgerBridge created');
-      this.ledgerBridge = new LedgerBridge();
-    }
   }
 
   @action _cancel = (): void => {
     this.teardown();
+    this.ledgerConnect && this.ledgerConnect.dispose();
+    this.ledgerConnect = undefined;
   };
 
   teardown(): void {
@@ -117,9 +105,6 @@ export default class LedgerConnectStore
   }
 
   @action _reset = (): void => {
-    disposeLedgerBridgeIFrame();
-    this.ledgerBridge = undefined;
-
     this.progressInfo = {
       currentStep: ProgressStep.CHECK,
       stepState: StepState.LOAD,
@@ -156,69 +141,70 @@ export default class LedgerConnectStore
 
   _checkAndStoreHWDeviceInfo = async (): Promise<void> => {
     try {
-      if (this.ledgerBridge) {
-        // Since this.ledgerBridge is undefinable flow need to know that it's a LedgerBridge
-        const ledgerBridge: LedgerBridge = this.ledgerBridge;
-        await prepareLedgerBridger(ledgerBridge);
+      this.ledgerConnect = new LedgerConnect({
+        locale: this.stores.profile.currentLocale
+      });
+      await prepareLedgerConnect(this.ledgerConnect);
 
-        const versionResp: GetVersionResponse = await ledgerBridge.getVersion();
+      // TODO: assume single account in Yoroi
+      const accountPath = makeCardanoAccountBIP44Path(0);
+      // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#examples
+      Logger.debug(stringifyData(accountPath));
 
-        Logger.debug(stringifyData(versionResp));
+      // get Cardano's first account's
+      // i.e hdPath = [2147483692, 2147485463, 2147483648]
+      let extendedPublicKeyResp: ExtendedPublicKeyResp;
+      if (this.ledgerConnect) {
+        extendedPublicKeyResp = await this.ledgerConnect.getExtendedPublicKey(accountPath);
 
-        // TODO: assume single account in Yoroi
-        const accountPath = makeCardanoAccountBIP44Path(0);
-        // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#examples
-        Logger.debug(stringifyData(accountPath));
-
-        // get Cardano's first account's
-        // i.e hdPath = [2147483692, 2147485463, 2147483648]
-        const extendedPublicKeyResp: GetExtendedPublicKeyResponse
-          = await ledgerBridge.getExtendedPublicKey(accountPath);
-
-        this.hwDeviceInfo = this._normalizeHWResponse({ versionResp, extendedPublicKeyResp });
-
-        this._goToSaveLoad();
-        Logger.info('Ledger device OK');
-      } else {
-        throw new Error(`LedgerBridge Error: LedgerBridge is undefined`);
+        this.hwDeviceInfo = this._normalizeHWResponse({
+          ePublicKey: extendedPublicKeyResp.ePublicKey,
+          deviceVersion: extendedPublicKeyResp.deviceVersion
+        });
       }
+
+      this._goToSaveLoad();
+      Logger.info('Ledger device OK');
     } catch (error) {
       this._handleConnectError(error);
+    } finally {
+      this.ledgerConnect && this.ledgerConnect.dispose();
+      this.ledgerConnect = undefined;
     }
   };
 
   _normalizeHWResponse = (
-    resp: LedgerConnectionResponse,
+    resp: ExtendedPublicKeyResp,
   ): HWDeviceInfo => {
     this._validateHWResponse(resp);
 
-    const { extendedPublicKeyResp, versionResp } = resp;
+    const { ePublicKey, deviceVersion } = resp;
 
     return {
-      publicMasterKey: extendedPublicKeyResp.publicKeyHex + extendedPublicKeyResp.chainCodeHex,
+      publicMasterKey: ePublicKey.publicKeyHex + ePublicKey.chainCodeHex,
       hwFeatures: {
-        vendor: Config.wallets.hardwareWallet.ledgerNanoS.VENDOR,
-        model: Config.wallets.hardwareWallet.ledgerNanoS.MODEL,
+        vendor: Config.wallets.hardwareWallet.ledgerNano.VENDOR,
+        model: '', // Ledger does not provide device model info up till now
         label: '',
         deviceId: '',
         language: '',
-        majorVersion: parseInt(versionResp.major, 10),
-        minorVersion: parseInt(versionResp.minor, 10),
-        patchVersion: parseInt(versionResp.patch, 10),
+        majorVersion: parseInt(deviceVersion.major, 10),
+        minorVersion: parseInt(deviceVersion.minor, 10),
+        patchVersion: parseInt(deviceVersion.patch, 10),
       }
     };
   }
 
   _validateHWResponse = (
-    resp: LedgerConnectionResponse,
+    resp: ExtendedPublicKeyResp,
   ): boolean => {
-    const { extendedPublicKeyResp, versionResp } = resp;
+    const { ePublicKey, deviceVersion } = resp;
 
-    if (versionResp == null) {
+    if (deviceVersion == null) {
       throw new Error('Ledger device version response is undefined');
     }
 
-    if (extendedPublicKeyResp == null) {
+    if (ePublicKey == null) {
       throw new Error('Ledger device extended public key response is undefined');
     }
 
@@ -226,8 +212,6 @@ export default class LedgerConnectStore
   };
 
   _handleConnectError = (error: Error): void => {
-    Logger.error(`LedgerConnectStore::_checkAndStoreHWDeviceInfo ${stringifyError(error)}`);
-
     this.hwDeviceInfo = undefined;
     this.error = convertToLocalizableError(error);
 
@@ -321,7 +305,7 @@ export default class LedgerConnectStore
     await wallets.refreshWalletsData();
 
     // show success notification
-    wallets.showLedgerNanoSWalletIntegratedNotification();
+    wallets.showLedgerNanoWalletIntegratedNotification();
 
     this.teardown();
     Logger.info('SUCCESS: Ledger Connected Wallet created and loaded');

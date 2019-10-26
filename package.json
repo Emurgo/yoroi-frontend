@@ -179,7 +179,7 @@
     "ua-parser-js": "0.7.20",
     "unorm": "1.6.0",
     "validator": "11.1.0",
-    "yoroi-extension-ledger-bridge": "git+https://github.com/Emurgo/yoroi-extension-ledger-bridge.git"
+    "yoroi-extension-ledger-connect-handler": "2.0.4"
   },
   "engineStrict": true,
   "engine": {

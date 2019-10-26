@@ -69,11 +69,10 @@ export default class Wallet {
       && this.hardwareInfo.model === Config.wallets.hardwareWallet.trezorT.MODEL);
   }
 
-  @computed get isLedgerNanoSWallet(): boolean {
+  @computed get isLedgerNanoWallet(): boolean {
     return (this.isHardwareWallet
       && !!this.hardwareInfo
-      && this.hardwareInfo.vendor === Config.wallets.hardwareWallet.ledgerNanoS.VENDOR
-      && this.hardwareInfo.model === Config.wallets.hardwareWallet.ledgerNanoS.MODEL);
+      && this.hardwareInfo.vendor === Config.wallets.hardwareWallet.ledgerNano.VENDOR);
   }
 
   @computed get assuranceMode(): AssuranceMode {

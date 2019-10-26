@@ -24,8 +24,9 @@ exports.copyAssets = (type: string, env: string) => {
   mkdir(`${type}/js`);
   cp(`chrome/manifest.${env}.json`, `${type}/manifest.json`);
   cp('-R', 'chrome/assets/*', type);
-  cp('chrome/3rd-party/trezor/*.js', `${type}/js/`);
-  cp('chrome/3rd-party/trezor/trezor-usb-permissions.html', `${type}/`);
+  cp('chrome/content-scripts/3rd-party-trezor/*.js', `${type}/js/`);
+  cp('chrome/content-scripts/3rd-party-trezor/trezor-usb-permissions.html', `${type}/`);
+  cp('chrome/content-scripts/ledger/*.js', `${type}/js/`);
 };
 
 const buildManifest = (type: Network) => {
