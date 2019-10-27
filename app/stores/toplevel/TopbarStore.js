@@ -4,7 +4,7 @@ import Store from '../base/Store';
 import environment from '../../environment';
 import type { Category } from '../../config/topbarConfig';
 import {
-  WITH_LEDGER_NANO_S,
+  WITH_LEDGER_NANO,
   WITH_TREZOR_T,
   GO_BACK,
   WALLETS,
@@ -13,7 +13,7 @@ import {
 } from '../../config/topbarConfig';
 import {
   isTrezorTWallet,
-  isLedgerNanoSWallet,
+  isLedgerNanoWallet,
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 
 export default class TopbarStore extends Store {
@@ -32,18 +32,18 @@ export default class TopbarStore extends Store {
     const { wallets } = this.stores.substores[environment.API];
 
     let isTrezorT = false;
-    let isNanoS = false;
+    let isNano = false;
     const selected = wallets.selected;
     if (selected != null) {
       const conceptualWallet = selected.self.getConceptualWallet();
       isTrezorT = isTrezorTWallet(conceptualWallet);
-      isNanoS = isLedgerNanoSWallet(conceptualWallet);
+      isNano = isLedgerNanoWallet(conceptualWallet);
     }
 
     return [
       (wallets && !wallets.hasAnyPublicDeriver) ? GO_BACK : WALLETS,
       ...(isTrezorT ? [WITH_TREZOR_T] : []),
-      ...(isNanoS ? [WITH_LEDGER_NANO_S] : []),
+      ...(isNano ? [WITH_LEDGER_NANO] : []),
       SETTINGS,
       ...CURRENCY_SPECIFIC_CATEGORIES[environment.API],
     ];

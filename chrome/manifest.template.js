@@ -31,12 +31,20 @@ export default ({
   background: {
     page: 'background.html',
   },
-  permissions: ['storage', '*://connect.trezor.io/*'],
+  permissions: [
+    'storage',
+    '*://connect.trezor.io/*',
+    'https://emurgo.github.io/yoroi-extension-ledger-connect/*'
+  ],
   content_scripts: [
     {
       matches: ['*://connect.trezor.io/*/popup.html'],
       js: ['js/trezor-content-script.js'],
     },
+    {
+      matches: ['https://emurgo.github.io/yoroi-extension-ledger-connect/*'],
+      js: ['js/ledger-content-script.js']
+    }
   ],
   content_security_policy: contentSecurityPolicy,
   ...(extensionKey ? { key: extensionKey } : {}),

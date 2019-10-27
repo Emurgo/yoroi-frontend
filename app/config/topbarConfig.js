@@ -3,7 +3,7 @@ import { ROUTES } from '../routes-config';
 import type { MessageDescriptor } from 'react-intl';
 import globalMessages from '../i18n/global-messages';
 import walletsIcon from '../assets/images/yoroi-logo-shape-white.inline.svg';
-import withLedgerNanoSIcon from '../assets/images/top-bar/with-ledger-nano-s-logo.inline.svg';
+import withLedgerNanoIcon from '../assets/images/top-bar/with-ledger-nano-logo.inline.svg';
 import withTrezorTIcon from '../assets/images/top-bar/with-trezor-t-logo-white.inline.svg';
 import settingsIcon from '../assets/images/top-bar/setting-active.inline.svg';
 import daedalusTransferIcon from '../assets/images/top-bar/daedalus-migration-active.inline.svg';
@@ -35,12 +35,12 @@ export const WITH_TREZOR_T: Category = {
   iconStyle: styles.withTrezorTIcon,
 };
 
-export const WITH_LEDGER_NANO_S: Category = {
-  name: 'WITH_LEDGER_NANO_S',
-  className: 'with-ledger-nano-s',
+export const WITH_LEDGER_NANO: Category = {
+  name: 'WITH_LEDGER_NANO',
+  className: 'with-ledger-nano',
   route: ROUTES.WALLETS.ROOT,
-  icon: withLedgerNanoSIcon,
-  iconStyle: styles.withLedgerNanoSIcon,
+  icon: withLedgerNanoIcon,
+  iconStyle: styles.withLedgerNanoIcon,
 };
 
 export const GO_BACK: Category = {

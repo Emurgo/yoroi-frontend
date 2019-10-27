@@ -1,17 +1,15 @@
 // @flow
 import { action, observable } from 'mobx';
 
-import {
-  LedgerBridge,
-} from 'yoroi-extension-ledger-bridge';
+import LedgerConnect from 'yoroi-extension-ledger-connect-handler';
 import type {
   SignTransactionResponse as LedgerSignTxResponse
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 import Store from '../base/Store';
 import environment from '../../environment';
-import LocalizedRequest from '../lib/LocalizedRequest';
 
+import LocalizedRequest from '../lib/LocalizedRequest';
 import LocalizableError from '../../i18n/LocalizableError';
 
 import type {
@@ -31,14 +29,12 @@ import {
 
 import {
   Logger,
-  stringifyError,
   stringifyData,
 } from '../../utils/logging';
 
 import {
-  prepareLedgerBridger,
-  disposeLedgerBridgeIFrame
-} from '../../utils/iframeHandler';
+  prepareLedgerConnect,
+} from '../../utils/hwConnectHandler';
 
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
@@ -47,7 +43,6 @@ export default class LedgerSendStore extends Store {
   // =================== VIEW RELATED =================== //
   @observable isActionProcessing: boolean = false;
   @observable error: ?LocalizableError;
-  ledgerBridge: ?LedgerBridge;
   // =================== VIEW RELATED =================== //
 
   // =================== API RELATED =================== //
@@ -71,16 +66,9 @@ export default class LedgerSendStore extends Store {
     * _init() is called when Confirmation dailog is about to show */
   _init = (): void => {
     Logger.debug('LedgerSendStore::_init called');
-    if (this.ledgerBridge == null) {
-      Logger.debug('LedgerSendStore::_init new LedgerBridge created');
-      this.ledgerBridge = new LedgerBridge();
-    }
   }
 
   _reset() {
-    disposeLedgerBridgeIFrame();
-    this.ledgerBridge = undefined;
-
     this._setActionProcessing(false);
     this._setError(null);
   }
@@ -101,8 +89,12 @@ export default class LedgerSendStore extends Store {
 
   /** Generates a payload with Ledger format and tries Send ADA using Ledger signing */
   _send = async (params: SendUsingLedgerParams): Promise<void> => {
+    let ledgerConnect: LedgerConnect;
     try {
       Logger.debug('LedgerSendStore::_send::called: ' + stringifyData(params));
+      ledgerConnect = new LedgerConnect({
+        locale: this.stores.profile.currentLocale
+      });
 
       this.createLedgerSignTxDataRequest.reset();
       this.broadcastLedgerSignedTxRequest.reset();
@@ -112,40 +104,38 @@ export default class LedgerSendStore extends Store {
       this._setError(null);
       this._setActionProcessing(true);
 
-      if (this.ledgerBridge) {
-        // Since this.ledgerBridge is undefinable flow need to know that it's a LedgerBridge
-        const ledgerBridge: LedgerBridge = this.ledgerBridge;
+      const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+      this.createLedgerSignTxDataRequest.execute({
+        ...params,
+        getTxsBodiesForUTXOs: stateFetcher.getTxsBodiesForUTXOs,
+      });
+      if (!this.createLedgerSignTxDataRequest.promise) throw new Error('should never happen');
+      const ledgerSignTxDataResp = await this.createLedgerSignTxDataRequest.promise;
 
-        const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
-        this.createLedgerSignTxDataRequest.execute({
-          ...params,
-          getTxsBodiesForUTXOs: stateFetcher.getTxsBodiesForUTXOs,
-        });
-        if (!this.createLedgerSignTxDataRequest.promise) throw new Error('should never happen');
-        const ledgerSignTxDataResp = await this.createLedgerSignTxDataRequest.promise;
+      await prepareLedgerConnect(ledgerConnect);
 
-        await prepareLedgerBridger(ledgerBridge);
-
-        const ledgerSignTxResp: LedgerSignTxResponse =
-          await ledgerBridge.signTransaction(
-            ledgerSignTxDataResp.ledgerSignTxPayload.inputs,
-            ledgerSignTxDataResp.ledgerSignTxPayload.outputs,
-          );
-
-        await this._prepareAndBroadcastSignedTx(
-          ledgerSignTxResp,
-          params.signRequest.unsignedTx,
+      const ledgerSignTxResp: LedgerSignTxResponse =
+        await ledgerConnect.signTransaction(
+          ledgerSignTxDataResp.ledgerSignTxPayload.inputs,
+          ledgerSignTxDataResp.ledgerSignTxPayload.outputs,
         );
 
-      } else {
-        throw new Error(`LedgerBridge Error: LedgerBridge is undefined`);
-      }
+      // There is no need of ledgerConnect after this line.
+      // UI was getting blocked for few seconds
+      // because _prepareAndBroadcastSignedTx takes time.
+      // Disposing here will fix the UI issue.
+      ledgerConnect && ledgerConnect.dispose();
+
+      await this._prepareAndBroadcastSignedTx(
+        ledgerSignTxResp,
+        params.signRequest.unsignedTx,
+      );
     } catch (error) {
-      Logger.error('LedgerSendStore::_send::error: ' + stringifyError(error));
       this._setError(convertToLocalizableError(error));
     } finally {
       this.createLedgerSignTxDataRequest.reset();
       this.broadcastLedgerSignedTxRequest.reset();
+      ledgerConnect && ledgerConnect.dispose();
       this._setActionProcessing(false);
     }
   };
@@ -168,17 +158,13 @@ export default class LedgerSendStore extends Store {
       throw new Error('_prepareAndBroadcastSignedTx public deriver not bip44.');
     }
 
-    try {
-      await this.broadcastLedgerSignedTxRequest.execute({
-        getPublicKey: withPublicKey.getPublicKey,
-        keyLevel: bip44Wallet.getBip44Parent().getPublicDeriverLevel(),
-        ledgerSignTxResp,
-        unsignedTx,
-        sendTx: this.stores.substores[environment.API].stateFetchStore.fetcher.sendTx,
-      }).promise;
-    } catch (error) {
-      Logger.error('LedgerSendStore::_prepareAndBroadcastSignedTx error: ' + stringifyError(error));
-    }
+    await this.broadcastLedgerSignedTxRequest.execute({
+      getPublicKey: withPublicKey.getPublicKey,
+      keyLevel: bip44Wallet.getBip44Parent().getPublicDeriverLevel(),
+      ledgerSignTxResp,
+      unsignedTx,
+      sendTx: this.stores.substores[environment.API].stateFetchStore.fetcher.sendTx,
+    }).promise;
 
     this.actions.dialogs.closeActiveDialog.trigger();
     await wallets.refreshWallet(publicDeriver);

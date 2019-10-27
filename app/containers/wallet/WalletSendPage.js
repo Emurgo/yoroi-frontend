@@ -28,7 +28,7 @@ import {
   signRequestTotalInput,
 } from '../../api/ada/lib/utils';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
-import { isLedgerNanoSWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 
 // Hardware Wallet Confirmation
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
@@ -184,7 +184,7 @@ export default class WalletSendPage extends Component<Props> {
 
     const conceptualWallet = publicDeriver.self.getConceptualWallet();
     let hwSendConfirmationDialog: Node = null;
-    if (isLedgerNanoSWallet(conceptualWallet)) {
+    if (isLedgerNanoWallet(conceptualWallet)) {
       const ledgerSendAction = this.props.actions[environment.API].ledgerSend;
       ledgerSendAction.init.trigger();
       const ledgerSendStore = this.props.stores.substores[environment.API].ledgerSend;
