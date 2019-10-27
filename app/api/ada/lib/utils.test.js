@@ -14,6 +14,10 @@ import type {
   UtxoTransactionInputRow,
   UtxoTransactionOutputRow,
 } from './storage/database/utxoTransactions/tables';
+import type {
+  AccountingTransactionInputRow,
+  AccountingTransactionOutputRow,
+} from './storage/database/accountingTransactions/tables';
 import {
   TxStatusCodes,
 } from './storage/database/primitives/tables';
@@ -74,18 +78,24 @@ test('convertAdaTransactionsToExportRows', () => {
     _tx(
       [testInputs[0]],
       [testOutputs[0], testOutputs[1]],
+      [],
+      [],
       new Set([4]),
       '2010-01-01 22:12:22',
     ),
     _tx(
       [testInputs[1]],
       [testOutputs[2], testOutputs[3]],
+      [],
+      [],
       new Set([6]),
       '2012-05-12 11:22:33'
     ),
     _tx(
       [testInputs[2], testInputs[3]],
       [testOutputs[4], testOutputs[5]],
+      [],
+      [],
       new Set([2, 3, 9]),
       '2015-12-13 10:20:30'
     ),
@@ -101,6 +111,8 @@ test('self tx', () => {
   const selfTx = _tx(
     [testInputs[0]],
     [testOutputs[0]],
+    [],
+    [],
     new Set([0, 4]),
     '2015-12-13 10:20:30'
   );
@@ -113,6 +125,8 @@ test('multi tx', () => {
   const selfTx = _tx(
     [testInputs[0], testInputs[1]],
     [testOutputs[0], testOutputs[1]],
+    [],
+    [],
     new Set([0, 4]),
     '2015-12-13 10:20:30'
   );
@@ -148,6 +162,8 @@ test('formatBigNumberToFloatString', () => {
 const _tx = (
   utxoInputs: Array<UtxoTransactionInputRow>,
   utxoOutputs: Array<UtxoTransactionOutputRow>,
+  accountingInputs: Array<AccountingTransactionInputRow>,
+  accountingOutputs: Array<AccountingTransactionOutputRow>,
   ownedAddresses: Set<number>,
   date: string,
 ): UtxoAnnotatedTransaction => {
@@ -178,6 +194,8 @@ const _tx = (
     },
     utxoInputs,
     utxoOutputs,
+    accountingInputs,
+    accountingOutputs,
     ...annotation,
   };
 };

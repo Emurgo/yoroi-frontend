@@ -172,6 +172,30 @@ export const Bip44AddressSchema: {
   }
 };
 
+export type AccountingDerivationInsert = {|
+  KeyDerivationId: number,
+  AddressId: number,
+|};
+export type AccountingDerivationRow = {|
+  AccountingDerivationId: number,
+  ...AccountingDerivationInsert,
+|};
+/**
+ * We don't cache the spending counter here
+ * As it would be hard to deal with rollbacks
+ */
+export const AccountingDerivationSchema: {
+  +name: 'AccountingDerivation',
+  properties: $ObjMapi<AccountingDerivationRow, ToSchemaProp>
+} = {
+  name: 'AccountingDerivation',
+  properties: {
+    AccountingDerivationId: 'AccountingDerivationId',
+    KeyDerivationId: 'KeyDerivationId',
+    AddressId: 'AddressId',
+  }
+};
+
 export type Bip44ToPublicDeriverInsert = {|
   Bip44WrapperId: number,
   PublicDeriverId: number,

@@ -19,6 +19,7 @@ import { populatePrimitivesDb } from './primitives/tables';
 import { populateBip44Db } from './bip44/tables';
 import { populateUtxoTransactionsDb } from './utxoTransactions/tables';
 import { populateAccountingTransactionsDb } from './accountingTransactions/tables';
+import { populateMultipartTransactionsDb } from './multipartTransactions/tables';
 import { populateWalletDb } from './wallet/tables';
 
 export const loadLovefieldDB = async (
@@ -69,6 +70,7 @@ const populateAndCreate = async (
   populateBip44Db(schemaBuilder);
   populateUtxoTransactionsDb(schemaBuilder);
   populateAccountingTransactionsDb(schemaBuilder);
+  populateMultipartTransactionsDb(schemaBuilder);
 
   return await schemaBuilder.connect({
     storeType,

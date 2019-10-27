@@ -91,7 +91,7 @@ export class ModifyUtxoTransaction {
   });
   static depTables = Object.freeze({});
 
-  static async addUtxoIOsToTx(
+  static async addIOsToTx(
     db: lf$Database,
     tx: lf$Transaction,
     request: {
@@ -100,12 +100,18 @@ export class ModifyUtxoTransaction {
     },
   ): Promise<{| ...DbUtxoInputs, ...DbUtxoOutputs, |}> {
     const { utxoInputs, utxoOutputs } = request;
-    const newInputs = await addBatchToTable<UtxoTransactionInputInsert, UtxoTransactionInputRow>(
+    const newInputs = await addBatchToTable<
+      UtxoTransactionInputInsert,
+      UtxoTransactionInputRow
+    >(
       db, tx,
       utxoInputs,
       ModifyUtxoTransaction.ownTables[Tables.UtxoTransactionInputSchema.name].name
     );
-    const newOutputs = await addBatchToTable<UtxoTransactionOutputInsert, UtxoTransactionOutputRow>(
+    const newOutputs = await addBatchToTable<
+      UtxoTransactionOutputInsert,
+      UtxoTransactionOutputRow
+    >(
       db, tx,
       utxoOutputs,
       ModifyUtxoTransaction.ownTables[Tables.UtxoTransactionOutputSchema.name].name

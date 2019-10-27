@@ -13,7 +13,6 @@ import type {
   BlockInsert, BlockRow,
   TransactionInsert, TransactionRow,
   TxStatusCodesType,
-  DbTxIO, DbTxInChain,
 } from '../database/primitives/tables';
 import {
   GetAddress,
@@ -25,14 +24,18 @@ import {
   GetTxAndBlock,
 } from '../database/primitives/api/read';
 import { GetOrAddAddress, ModifyTransaction, } from '../database/primitives/api/write';
+import { ModifyMultipartTx } from  '../database/multipartTransactions/api/write';
 import { digetForHash, } from '../database/primitives/api/utils';
 import {
-  ModifyUtxoTransaction, MarkUtxo,
+  MarkUtxo,
 } from '../database/utxoTransactions/api/write';
 import {
-  AssociateTxWithUtxoIOs, GetUtxoTxOutputsWithTx,
+  GetUtxoTxOutputsWithTx,
   GetUtxoInputs,
 } from '../database/utxoTransactions/api/read';
+import {
+  AssociateTxWithIOs
+} from '../database/multipartTransactions/api/read';
 import type {
   RemoteTxState,
   RemoteTransaction,
@@ -53,7 +56,7 @@ import type {
 } from '../database/accountingTransactions/tables';
 import { TxStatusCodes, } from '../database/primitives/tables';
 import {
-  ScanAddressesInstance,
+  asScanAddresses,
 } from '../models/PublicDeriver';
 import type { IPublicDeriver, IGetAllUtxos, } from '../models/PublicDeriver/interfaces';
 import {
@@ -65,11 +68,17 @@ import { AddBip44Tree, ModifyDisplayCutoff, } from '../database/bip44/api/write'
 import { GetBip44DerivationSpecific, } from '../database/bip44/api/read';
 import { ModifyLastSyncInfo, } from '../database/wallet/api/write';
 import type { LastSyncInfoRow, } from '../database/wallet/tables';
-import { genToAbsoluteSlotNumber, rawGenHashToIdsFunc, } from  '../models/utils';
+import type { DbTxIO, DbTxInChain } from '../database/multipartTransactions/tables';
+import {
+  genToAbsoluteSlotNumber,
+  rawGenHashToIdsFunc,
+  rawGetAddressRowsForWallet,
+} from  '../models/utils';
 import { STABLE_SIZE } from '../../../../../config/numbersConfig';
 import { RollbackApiError } from '../../../errors';
 import { getFromUserPerspective, } from '../../utils';
 
+import { RustModule } from '../../cardanoCrypto/rustLoader';
 import type {
   FilterFunc, HistoryFunc, BestBlockFunc,
 } from '../../state-fetch/types';
@@ -80,7 +89,7 @@ export async function rawGetUtxoTransactions(
   deps: {|
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
-    AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
+    AssociateTxWithIOs: Class<AssociateTxWithIOs>,
     GetTxAndBlock: Class<GetTxAndBlock>,
     GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
   |},
@@ -107,9 +116,12 @@ export async function rawGetUtxoTransactions(
     undefined,
   );
   const addressIds = addresses.map(address => address.addr.AddressId);
-  const txIds = await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
+  const txIds = await deps.AssociateTxWithIOs.getTxIdsForAddresses(
     db, dbTx,
-    { addressIds }
+    {
+      utxoAddressIds: addressIds,
+      accountingAddressIds: [],
+    }
   );
 
   const blockMap = new Map<number, null | $ReadOnly<BlockRow>>();
@@ -117,7 +129,7 @@ export async function rawGetUtxoTransactions(
   for (const tx of txs) {
     blockMap.set(tx.Transaction.TransactionId, tx.Block);
   }
-  const txsWithIOs = await deps.AssociateTxWithUtxoIOs.mergeTxWithIO(
+  const txsWithIOs = await deps.AssociateTxWithIOs.getIOsForTx(
     db, dbTx,
     { txs: txs.map(txWithBlock => txWithBlock.Transaction) }
   );
@@ -171,7 +183,7 @@ export async function getAllUtxoTransactions(
   const deps = Object.freeze({
     GetPathWithSpecific,
     GetAddress,
-    AssociateTxWithUtxoIOs,
+    AssociateTxWithIOs,
     GetTxAndBlock,
     GetBip44DerivationSpecific,
   });
@@ -189,7 +201,7 @@ export async function getAllUtxoTransactions(
         {
           GetPathWithSpecific: deps.GetPathWithSpecific,
           GetAddress: deps.GetAddress,
-          AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
+          AssociateTxWithIOs: deps.AssociateTxWithIOs,
           GetTxAndBlock: deps.GetTxAndBlock,
           GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
         },
@@ -221,7 +233,7 @@ export async function getPendingUtxoTransactions(
   const deps = Object.freeze({
     GetPathWithSpecific,
     GetAddress,
-    AssociateTxWithUtxoIOs,
+    AssociateTxWithIOs,
     GetTxAndBlock,
     GetBip44DerivationSpecific,
   });
@@ -239,7 +251,7 @@ export async function getPendingUtxoTransactions(
         {
           GetPathWithSpecific: deps.GetPathWithSpecific,
           GetAddress: deps.GetAddress,
-          AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
+          AssociateTxWithIOs: deps.AssociateTxWithIOs,
           GetTxAndBlock: deps.GetTxAndBlock,
           GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
         },
@@ -260,7 +272,7 @@ export async function getPendingUtxoTransactions(
 
 export async function updateTransactions(
   db: lf$Database,
-  publicDeriver: IPublicDeriver & IGetAllUtxos,
+  publicDeriver: IPublicDeriver,
   checkAddressesInUse: FilterFunc,
   getTransactionsHistoryForAddresses: HistoryFunc,
   getBestBlock: BestBlockFunc,
@@ -277,9 +289,7 @@ export async function updateTransactions(
       GetOrAddAddress,
       GetPublicDeriver,
       AddBip44Tree,
-      ModifyUtxoTransaction,
       MarkUtxo,
-      AssociateTxWithUtxoIOs,
       ModifyDisplayCutoff,
       GetDerivationsByPath,
       GetEncryptionMeta,
@@ -288,6 +298,8 @@ export async function updateTransactions(
       GetTxAndBlock,
       GetBip44DerivationSpecific,
       ModifyTransaction,
+      ModifyMultipartTx,
+      AssociateTxWithIOs,
     });
     const updateTables = Object
       .keys(updateDepTables)
@@ -302,9 +314,14 @@ export async function updateTransactions(
           db, dbTx,
           publicDeriver.getPublicDeriverId()
         );
+        const {
+          // need this hack to remove a single element from the list
+          GetLastSyncForPublicDeriver, // eslint-disable-line no-unused-vars, no-shadow
+          ...remainingDeps
+        } = updateDepTables;
         await rawUpdateTransactions(
           db, dbTx,
-          updateDepTables,
+          remainingDeps,
           publicDeriver,
           lastSyncInfo,
           checkAddressesInUse,
@@ -324,7 +341,6 @@ export async function updateTransactions(
     const rollbackDepTables = Object.freeze({
       GetPathWithSpecific,
       GetAddress,
-      AssociateTxWithUtxoIOs,
       GetTxAndBlock,
       GetLastSyncForPublicDeriver,
       ModifyLastSyncInfo,
@@ -335,6 +351,7 @@ export async function updateTransactions(
       GetUtxoInputs,
       GetEncryptionMeta,
       GetBip44DerivationSpecific,
+      AssociateTxWithIOs,
     });
     const rollbackTables = Object
       .keys(rollbackDepTables)
@@ -374,7 +391,7 @@ async function rollback(
   deps: {|
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
-    AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
+    AssociateTxWithIOs: Class<AssociateTxWithIOs>,
     GetLastSyncForPublicDeriver: Class<GetLastSyncForPublicDeriver>,
     ModifyLastSyncInfo: Class<ModifyLastSyncInfo>,
     GetBlock: Class<GetBlock>,
@@ -387,7 +404,7 @@ async function rollback(
     ModifyTransaction: Class<ModifyTransaction>,
   |},
   request: {
-    publicDeriver: IPublicDeriver & IGetAllUtxos,
+    publicDeriver: IPublicDeriver,
     lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
   }
 ): Promise<void> {
@@ -399,30 +416,30 @@ async function rollback(
     return;
   }
 
-  // 1) Get all UTXO transactions
-  const utxoAddresses = await request.publicDeriver.rawGetAllUtxoAddresses(
+  // 1) Get all transactions
+  const {
+    utxoAddresses,
+    accountingAddresses,
+  } = await rawGetAddressRowsForWallet(
     dbTx,
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
       GetAddress: deps.GetAddress,
       GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
     },
-    undefined,
+    { publicDeriver: request.publicDeriver },
   );
-  const utxoTxIds = await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
+  const utxoAddressIds = utxoAddresses.map(address => address.AddressId);
+  const accountingAddressIds = accountingAddresses.map(address => address.AddressId);
+  const txIds = await deps.AssociateTxWithIOs.getTxIdsForAddresses(
     db, dbTx,
-    { addressIds: utxoAddresses.map(address => address.addr.AddressId) }
+    {
+      utxoAddressIds,
+      accountingAddressIds,
+    }
   );
 
-  // 2) Get all Accounting transactions
-  // TODO
-  const accountingTxIds = [];
-
-  // 3) get best tx in block
-  const txIds = Array.from(new Set([
-    ...utxoTxIds,
-    ...accountingTxIds,
-  ]));
+  // 2) get best tx in block
   const bestInStorage = await deps.GetTxAndBlock.firstTxBefore(
     db, dbTx,
     {
@@ -435,14 +452,14 @@ async function rollback(
     return;
   }
 
-  // 4) Get latest k transactions
+  // 3) Get latest k transactions
 
   const txsToRevert = await deps.GetTxAndBlock.gteSlot(
     db, dbTx,
     { txIds, slot: bestInStorage.Block.SlotNum - STABLE_SIZE }
   );
 
-  // 5) mark rollback transactions as failed
+  // 4) mark rollback transactions as failed
   // Note: theoretically we should mark rolled back transactions as pending
   // however, this is problematic for us because Yoroi doesn't allow multiple pending transactions
   // so instead, we mark them as failed
@@ -459,7 +476,7 @@ async function rollback(
     );
   }
 
-  // 6) set all UTXO from these transactions as unspent
+  // 5) set all UTXO from these transactions as unspent
 
   await markAllInputs(
     db, dbTx,
@@ -475,7 +492,7 @@ async function rollback(
     }
   );
 
-  // 7) marked pending transactions as failed
+  // 6) marked pending transactions as failed
   const pendingTxs = await deps.GetTransaction.withStatus(
     db, dbTx,
     {
@@ -494,7 +511,7 @@ async function rollback(
     );
   }
 
-  // 8) Rollback LastSyncTable
+  // 7) Rollback LastSyncTable
   const bestStillIncluded = await deps.GetTxAndBlock.firstTxBefore(
     db, dbTx,
     { txIds, slot: bestInStorage.Block.SlotNum - STABLE_SIZE }
@@ -517,7 +534,6 @@ async function rawUpdateTransactions(
   db: lf$Database,
   dbTx: lf$Transaction,
   deps: {|
-    GetLastSyncForPublicDeriver: Class<GetLastSyncForPublicDeriver>,
     ModifyLastSyncInfo: Class<ModifyLastSyncInfo>,
     GetKeyForPublicDeriver: Class<GetKeyForPublicDeriver>,
     GetAddress: Class<GetAddress>,
@@ -526,9 +542,7 @@ async function rawUpdateTransactions(
     GetOrAddAddress: Class<GetOrAddAddress>,
     GetPublicDeriver: Class<GetPublicDeriver>,
     AddBip44Tree: Class<AddBip44Tree>,
-    ModifyUtxoTransaction: Class<ModifyUtxoTransaction>,
     MarkUtxo: Class<MarkUtxo>,
-    AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
     ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
     GetDerivationsByPath: Class<GetDerivationsByPath>,
     GetEncryptionMeta: Class<GetEncryptionMeta>,
@@ -537,14 +551,15 @@ async function rawUpdateTransactions(
     GetTxAndBlock: Class<GetTxAndBlock>,
     GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
     ModifyTransaction: Class<ModifyTransaction>,
+    ModifyMultipartTx: Class<ModifyMultipartTx>,
+    AssociateTxWithIOs: Class<AssociateTxWithIOs>,
   |},
-  publicDeriver: IPublicDeriver & IGetAllUtxos,
+  publicDeriver: IPublicDeriver,
   lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
   checkAddressesInUse: FilterFunc,
   getTransactionsHistoryForAddresses: HistoryFunc,
   getBestBlock: BestBlockFunc,
 ): Promise<void> {
-  const iPublicDeriver: IPublicDeriver = publicDeriver;
   const toAbsoluteSlotNumber = await genToAbsoluteSlotNumber();
   // 1) Check if backend is synced (avoid rollbacks if backend has to resync from block 1)
 
@@ -568,9 +583,9 @@ async function rawUpdateTransactions(
     const untilBlock = bestBlock.hash;
 
     // 2) sync our address set with remote to make sure txs are identified as ours
-
-    if (iPublicDeriver instanceof ScanAddressesInstance) {
-      await iPublicDeriver.rawScanAddresses(
+    const canScan = asScanAddresses(publicDeriver);
+    if (canScan != null) {
+      await canScan.rawScanAddresses(
         dbTx,
         {
           GetKeyForPublicDeriver: deps.GetKeyForPublicDeriver,
@@ -584,6 +599,7 @@ async function rawUpdateTransactions(
           GetDerivationsByPath: deps.GetDerivationsByPath,
           GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
         },
+        // TODO: race condition because we don't pass in best block here
         { checkAddressesInUse },
       );
     }
@@ -591,19 +607,26 @@ async function rawUpdateTransactions(
     // 3) get new txs from fetcher
 
     // important: we fetched addresses AFTER scanning for new addresses
-    const addresses = await publicDeriver.rawGetAllUtxoAddresses(
+    const {
+      utxoAddresses,
+      accountingAddresses,
+    } = await rawGetAddressRowsForWallet(
       dbTx,
       {
         GetPathWithSpecific: deps.GetPathWithSpecific,
         GetAddress: deps.GetAddress,
         GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
       },
-      undefined,
+      { publicDeriver },
     );
-    const addressIds = addresses.map(address => address.addr.AddressId);
-    const txIds = await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
+    const utxoAddressIds = utxoAddresses.map(address => address.AddressId);
+    const accountingAddressIds = accountingAddresses.map(address => address.AddressId);
+    const txIds = await deps.AssociateTxWithIOs.getTxIdsForAddresses(
       db, dbTx,
-      { addressIds }
+      {
+        utxoAddressIds,
+        accountingAddressIds,
+      }
     );
     const bestInStorage = await deps.GetTxAndBlock.firstTxBefore(
       db, dbTx,
@@ -623,7 +646,11 @@ async function rawUpdateTransactions(
       };
     const txsFromNetwork = await getTransactionsHistoryForAddresses({
       ...requestKind,
-      addresses: addresses.map(address => address.addr.Hash),
+      // TODO: don't send grop keys
+      addresses: [
+        ...utxoAddresses.map(address => address.Hash),
+        ...accountingAddresses.map(address => address.Hash),
+      ],
       untilBlock,
     });
 
@@ -632,21 +659,24 @@ async function rawUpdateTransactions(
       db,
       dbTx,
       {
-        ModifyUtxoTransaction: deps.ModifyUtxoTransaction,
         MarkUtxo: deps.MarkUtxo,
-        AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
+        AssociateTxWithIOs: deps.AssociateTxWithIOs,
         GetEncryptionMeta: deps.GetEncryptionMeta,
         GetTransaction: deps.GetTransaction,
         GetUtxoInputs: deps.GetUtxoInputs,
         ModifyTransaction: deps.ModifyTransaction,
+        ModifyMultipartTx: deps.ModifyMultipartTx,
       },
       {
-        utxoAddressIds: addressIds,
+        txIds,
         txsFromNetwork,
         hashToIds: rawGenHashToIdsFunc(
           db, dbTx,
           { GetOrAddAddress: deps.GetOrAddAddress },
-          new Set(addresses.map(address => address.addr.AddressId))
+          new Set([
+            ...utxoAddressIds,
+            ...accountingAddressIds,
+          ])
         ),
         toAbsoluteSlotNumber,
       }
@@ -674,47 +704,36 @@ export async function updateTransactionBatch(
   db: lf$Database,
   dbTx: lf$Transaction,
   deps: {|
-    ModifyUtxoTransaction: Class<ModifyUtxoTransaction>,
     MarkUtxo: Class<MarkUtxo>,
-    AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
+    AssociateTxWithIOs: Class<AssociateTxWithIOs>,
     GetEncryptionMeta: Class<GetEncryptionMeta>,
     GetTransaction: Class<GetTransaction>,
     GetUtxoInputs: Class<GetUtxoInputs>,
     ModifyTransaction: Class<ModifyTransaction>,
+    ModifyMultipartTx: Class<ModifyMultipartTx>,
   |},
   request: {
     toAbsoluteSlotNumber: ToAbsoluteSlotNumberFunc,
-    utxoAddressIds: Array<number>,
+    txIds: Array<number>,
     txsFromNetwork: Array<RemoteTransaction>,
     hashToIds: HashToIdsFunc,
   }
 ): Promise<Array<DbTxInChain>> {
   const { TransactionSeed, BlockSeed } = await deps.GetEncryptionMeta.get(db, dbTx);
 
-  const utxoTxIds = await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
-    db, dbTx,
-    { addressIds: request.utxoAddressIds }
-  );
-  const accountingTxIds = []; // TODO
-  const txIds = Array.from(new Set([
-    ...utxoTxIds,
-    ...accountingTxIds,
-  ]));
-
   const matchesInDb = new Map<string, DbTxIO>();
   {
     const digestsForNew = request.txsFromNetwork.map(tx => digetForHash(tx.hash, TransactionSeed));
     const matchByDigest = await deps.GetTransaction.byDigest(db, dbTx, {
       digests: digestsForNew,
-      txIds,
+      txIds: request.txIds,
     });
-    const txsWithUtxoIOs = await deps.AssociateTxWithUtxoIOs.mergeTxWithIO(
+    const txs: Array<$ReadOnly<TransactionRow>> = Array.from(matchByDigest.values());
+    const txsWithIOs = await deps.AssociateTxWithIOs.getIOsForTx(
       db, dbTx,
-      { txs: Array.from(matchByDigest.values()) }
+      { txs }
     );
-    // TODO: merge with accounting IO
-    const fullyMergedTx = txsWithUtxoIOs;
-    for (const tx of fullyMergedTx) {
+    for (const tx of txsWithIOs) {
       matchesInDb.set(tx.transaction.Hash, tx);
     }
   }
@@ -766,10 +785,10 @@ export async function updateTransactionBatch(
     }
     if (result.block !== null) {
       txsAddedToBlock.push({
+        ...matchInDb,
+        // override with updated
         block: result.block,
         transaction: result.transaction,
-        utxoInputs: matchInDb.utxoInputs,
-        utxoOutputs: matchInDb.utxoOutputs,
       });
     }
   }
@@ -784,7 +803,7 @@ export async function updateTransactionBatch(
   );
   const newsTxsIdSet = new Set();
   for (const newTx of newTxsForDb) {
-    const result = await deps.ModifyUtxoTransaction.addNew(
+    const result = await deps.ModifyMultipartTx.addTxWithIOs(
       db,
       dbTx,
       newTx,
@@ -796,6 +815,8 @@ export async function updateTransactionBatch(
         transaction: result.transaction,
         utxoInputs: result.utxoInputs,
         utxoOutputs: result.utxoOutputs,
+        accountingInputs: result.accountingInputs,
+        accountingOutputs: result.accountingOutputs,
       });
     }
   }
@@ -813,7 +834,7 @@ export async function updateTransactionBatch(
     {
       inputTxIds: newTxIds,
       allTxIds: [
-        ...txIds,
+        ...request.txIds,
         ...newTxIds,
       ],
       isUnspent: false,
@@ -826,7 +847,8 @@ export async function updateTransactionBatch(
   const pendingTxs = await deps.GetTransaction.withStatus(
     db, dbTx,
     {
-      txIds, // note: we purposely don't include the txids of transactions we just added
+      // note: we purposely don't include the txids of transactions we just added
+      txIds: request.txIds,
       status: [TxStatusCodes.PENDING]
     }
   );
@@ -879,6 +901,12 @@ export async function networkTxToDbTx(
   const idMapping = await hashToIds(allAddresses);
 
   const getIdOrThrow = (hash: string): number => {
+    // recall: we know all these ids should already be present
+    // because we synced our address list with the remote
+    // before we queries for the transaction history
+    // TODO: this is no longer true in Shelley
+    // because we could see a grouped address where we know the payment key
+    // but we've never seen the account key
     const id = idMapping.get(hash);
     if (id === undefined) {
       throw new Error('networkTxToDbTx should never happen id === undefined');
@@ -903,7 +931,7 @@ export async function networkTxToDbTx(
         const accountingOutputs = [];
         for (let i = 0; i < networkTx.inputs.length; i++) {
           const input = networkTx.inputs[i];
-          if (input.type === InputTypes.utxo) {
+          if (input.type === InputTypes.utxo || input.type === InputTypes.legacyUtxo) {
             utxoInputs.push({
               TransactionId: txRowId,
               AddressId: getIdOrThrow(input.address),
@@ -912,13 +940,42 @@ export async function networkTxToDbTx(
               IndexInOwnTx: i,
               Amount: input.amount,
             });
+          } else if (input.type === InputTypes.account) {
+            accountingInputs.push({
+              TransactionId: txRowId,
+              AddressId: getIdOrThrow(input.address),
+              SpendingCounter: input.spendingCounter,
+              IndexInOwnTx: i,
+              Amount: input.amount,
+            });
+          } else {
+            throw new Error('networkTxToDbTx Unhandled input type');
           }
         }
         for (let i = 0; i < networkTx.outputs.length; i++) {
           const output = networkTx.outputs[i];
-          // TODO
-          if (output.type === InputTypes.utxo) {
-            utxoInputs.push({
+          // assume single type since that's the type of legacy addresses
+          let txType;
+          try {
+            // Need to try parsing as a legacy address first
+            // Since parsing as bech32 directly may give a wrong result if the address contains a 1
+            RustModule.WalletV2.Address.from_base58(output.address);
+            txType = RustModule.WalletV3.AddressKind.Single;
+          } catch (_e1) {
+            try {
+              const wasmAddr = RustModule.WalletV3.Address.from_string(output.address);
+              txType = wasmAddr.get_discrimination();
+            } catch (_e2) {
+              throw new Error('networkTxToDbTx Unknown output type');
+            }
+          }
+          // consider a group address as a UTXO output
+          // since the payment (UTXO) key is the one that signs
+          if (
+            txType === RustModule.WalletV3.AddressKind.Single ||
+            txType === RustModule.WalletV3.AddressKind.Group
+          ) {
+            utxoOutputs.push({
               TransactionId: txRowId,
               AddressId: getIdOrThrow(output.address),
               OutputIndex: i,
@@ -930,6 +987,18 @@ export async function networkTxToDbTx(
                */
               IsUnspent: true,
             });
+          } else if (
+            txType === RustModule.WalletV3.AddressKind.Account
+          ) {
+            accountingOutputs.push({
+              TransactionId: txRowId,
+              AddressId: getIdOrThrow(output.address),
+              OutputIndex: i,
+              Amount: output.amount,
+            });
+          } else {
+            // TODO: handle multisig
+            throw new Error('networkTxToDbTx Unhandled output type');
           }
         }
 

@@ -1,6 +1,7 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
+import { InputTypes } from '../../../../adaTypes';
 import type { RemoteTransaction, RemoteUnspentOutput } from '../../../../adaTypes';
 import type {
   FilterUsedRequest, FilterUsedResponse, FilterFunc,
@@ -10,6 +11,7 @@ import type {
   UtxoSumRequest, UtxoSumResponse, UtxoSumFunc,
 } from '../../../state-fetch/types';
 import { RollbackApiError, } from '../../../../errors';
+import { RustModule } from '../../../cardanoCrypto/rustLoader';
 
 export function genCheckAddressesInUse(
   blockchain: Array<RemoteTransaction>,
@@ -177,11 +179,30 @@ export function genUtxoForAddresses(
     const utxoMap = new Map<string, RemoteUnspentOutput>();
     for (const tx of inBlockHistory) {
       for (let j = 0; j < tx.outputs.length; j++) {
-        const key = JSON.stringify({
-          id: tx.hash,
-          index: j
-        });
-        if (ourAddressSet.has(tx.outputs[j].address)) {
+        const address = tx.outputs[j].address;
+        if (ourAddressSet.has(address)) {
+          try {
+            // Need to try parsing as a legacy address first
+            // Since parsing as bech32 directly may give a wrong result if the address contains a 1
+            RustModule.WalletV2.Address.from_base58(address);
+          } catch (_e1) {
+            try {
+              const wasmAddr = RustModule.WalletV3.Address.from_string(address);
+              const txType = wasmAddr.get_discrimination();
+              if (
+                txType !== RustModule.WalletV3.AddressKind.Single &&
+                txType !== RustModule.WalletV3.AddressKind.Group
+              ) {
+                continue;
+              }
+            } catch (_e2) {
+              throw new Error('genUtxoForAddresses Unknown output type');
+            }
+          }
+          const key = JSON.stringify({
+            id: tx.hash,
+            index: j
+          });
           utxoMap.set(key, {
             utxo_id: tx.hash + j,
             tx_hash: tx.hash,
@@ -195,15 +216,18 @@ export function genUtxoForAddresses(
     for (const tx of inBlockHistory) {
       for (let j = 0; j < tx.inputs.length; j++) {
         const input = tx.inputs[j];
-        if (input.txHash === genesisTransaction) {
-          continue;
-        }
+        if (input.type === InputTypes.utxo) {
+          // TODO: I think this needs to be removed
+          if (input.txHash === genesisTransaction) {
+            continue;
+          }
 
-        const key = JSON.stringify({
-          id: input.txHash,
-          index: input.index,
-        });
-        utxoMap.delete(key);
+          const key = JSON.stringify({
+            id: input.txHash,
+            index: input.index,
+          });
+          utxoMap.delete(key);
+        }
       }
     }
     return Array.from(utxoMap.values());
