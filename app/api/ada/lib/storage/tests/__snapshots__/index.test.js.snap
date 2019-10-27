@@ -2,6 +2,8 @@
 
 exports[`Can add and fetch address in wallet 1`] = `
 Object {
+  "AccountingTransactionInput": Array [],
+  "AccountingTransactionOutput": Array [],
   "Address": Array [
     Object {
       "AddressId": 1,

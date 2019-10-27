@@ -16,7 +16,7 @@ import * as Tables from '../tables';
 import type {
   UtxoTransactionInputRow,
   UtxoTransactionOutputRow,
-  DbTxIO,
+  DbUtxoInputs, DbUtxoOutputs,
 } from '../tables';
 import { TxStatusCodes, TransactionSchema, } from '../../primitives/tables';
 import type {
@@ -38,10 +38,11 @@ export class GetUtxoInputs {
       ids: Array<number>,
     },
   ): Promise<$ReadOnlyArray<$ReadOnly<UtxoTransactionInputRow>>> {
+    const table = GetUtxoInputs.ownTables[Tables.UtxoTransactionInputSchema.name];
     return await getRowIn<UtxoTransactionInputRow>(
       db, tx,
-      GetUtxoInputs.ownTables[Tables.UtxoTransactionInputSchema.name].name,
-      GetUtxoInputs.ownTables[Tables.UtxoTransactionInputSchema.name].properties.AddressId,
+      table.name,
+      table.properties.AddressId,
       request.ids,
     );
   }
@@ -53,10 +54,11 @@ export class GetUtxoInputs {
       ids: Array<number>,
     },
   ): Promise<$ReadOnlyArray<$ReadOnly<UtxoTransactionInputRow>>> {
+    const table = GetUtxoInputs.ownTables[Tables.UtxoTransactionInputSchema.name];
     return await getRowIn<UtxoTransactionInputRow>(
       db, tx,
-      GetUtxoInputs.ownTables[Tables.UtxoTransactionInputSchema.name].name,
-      GetUtxoInputs.ownTables[Tables.UtxoTransactionInputSchema.name].properties.TransactionId,
+      table.name,
+      table.properties.TransactionId,
       request.ids,
     );
   }
@@ -75,10 +77,11 @@ export class GetUtxoOutputs {
       ids: Array<number>,
     },
   ): Promise<$ReadOnlyArray<$ReadOnly<UtxoTransactionOutputRow>>> {
+    const table = GetUtxoOutputs.ownTables[Tables.UtxoTransactionOutputSchema.name];
     return await getRowIn<UtxoTransactionOutputRow>(
       db, tx,
-      GetUtxoOutputs.ownTables[Tables.UtxoTransactionOutputSchema.name].name,
-      GetUtxoOutputs.ownTables[Tables.UtxoTransactionOutputSchema.name].properties.AddressId,
+      table.name,
+      table.properties.AddressId,
       request.ids,
     );
   }
@@ -90,10 +93,11 @@ export class GetUtxoOutputs {
       ids: Array<number>,
     },
   ): Promise<$ReadOnlyArray<$ReadOnly<UtxoTransactionOutputRow>>> {
+    const table = GetUtxoOutputs.ownTables[Tables.UtxoTransactionOutputSchema.name];
     return await getRowIn<UtxoTransactionOutputRow>(
       db, tx,
-      GetUtxoOutputs.ownTables[Tables.UtxoTransactionOutputSchema.name].name,
-      GetUtxoOutputs.ownTables[Tables.UtxoTransactionOutputSchema.name].properties.TransactionId,
+      table.name,
+      table.properties.TransactionId,
       request.ids,
     );
   }
@@ -267,51 +271,54 @@ export class AssociateTxWithUtxoIOs {
       addressIds: Array<number>,
     },
   ): Promise<Array<number>> {
-    const inputsForAddresses = await AssociateTxWithUtxoIOs.depTables.GetUtxoInputs.fromAddressIds(
+    const ins = await AssociateTxWithUtxoIOs.depTables.GetUtxoInputs.fromAddressIds(
       db, tx,
       { ids: request.addressIds },
     );
-    const outputForAddresses = await AssociateTxWithUtxoIOs.depTables.GetUtxoOutputs.fromAddressIds(
+    const outs = await AssociateTxWithUtxoIOs.depTables.GetUtxoOutputs.fromAddressIds(
       db, tx,
       { ids: request.addressIds },
     );
     return Array.from(new Set([
-      ...inputsForAddresses.map(input => input.TransactionId),
-      ...outputForAddresses.map(output => output.TransactionId),
+      ...ins.map(input => input.TransactionId),
+      ...outs.map(output => output.TransactionId),
     ]));
   }
 
-  static async mergeTxWithIO(
+  static async getIOsForTx(
     db: lf$Database,
     tx: lf$Transaction,
     request: {
       txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>,
     },
-  ): Promise<Array<DbTxIO>> {
+  ): Promise<Map<$ReadOnly<TransactionRow>, {| ...DbUtxoInputs, ...DbUtxoOutputs, |}>> {
     const ids = request.txs.map(transaction => transaction.TransactionId);
 
-    const inputsForTxs = await AssociateTxWithUtxoIOs.depTables.GetUtxoInputs.fromTxIds(
+    const inputs = await AssociateTxWithUtxoIOs.depTables.GetUtxoInputs.fromTxIds(
       db, tx,
       { ids },
     );
-    const outputsForTxs = await AssociateTxWithUtxoIOs.depTables.GetUtxoOutputs.fromTxIds(
+    const outputs = await AssociateTxWithUtxoIOs.depTables.GetUtxoOutputs.fromTxIds(
       db, tx,
       { ids },
     );
 
     const groupedInput = groupBy(
-      inputsForTxs,
+      inputs,
       input => input.TransactionId,
     );
     const groupedOutput = groupBy(
-      outputsForTxs,
+      outputs,
       output => output.TransactionId,
     );
 
-    return request.txs.map(transaction => ({
-      transaction,
-      utxoInputs: groupedInput[transaction.TransactionId] || [],
-      utxoOutputs: groupedOutput[transaction.TransactionId] || [],
-    }));
+    const txMap = new Map();
+    for (const transaction of request.txs) {
+      txMap.set(transaction, {
+        utxoInputs: groupedInput[transaction.TransactionId] || [],
+        utxoOutputs: groupedOutput[transaction.TransactionId] || [],
+      });
+    }
+    return txMap;
   }
 }

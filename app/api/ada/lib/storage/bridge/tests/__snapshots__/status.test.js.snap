@@ -10,6 +10,8 @@ Object {
   },
   "txs": Array [
     Object {
+      "accountingInputs": Array [],
+      "accountingOutputs": Array [],
       "amount": "-1900000",
       "block": null,
       "fee": "-200000",
@@ -47,6 +49,8 @@ Object {
       ],
     },
     Object {
+      "accountingInputs": Array [],
+      "accountingOutputs": Array [],
       "amount": "2100000",
       "block": Object {
         "BlockId": 2,
@@ -99,6 +103,8 @@ Object {
       ],
     },
     Object {
+      "accountingInputs": Array [],
+      "accountingOutputs": Array [],
       "amount": "2100000",
       "block": Object {
         "BlockId": 1,
@@ -553,6 +559,8 @@ Object {
   },
   "txs": Array [
     Object {
+      "accountingInputs": Array [],
+      "accountingOutputs": Array [],
       "amount": "-1900000",
       "block": null,
       "fee": "-200000",
@@ -590,6 +598,8 @@ Object {
       ],
     },
     Object {
+      "accountingInputs": Array [],
+      "accountingOutputs": Array [],
       "amount": "2100000",
       "block": Object {
         "BlockId": 2,
@@ -642,6 +652,8 @@ Object {
       ],
     },
     Object {
+      "accountingInputs": Array [],
+      "accountingOutputs": Array [],
       "amount": "2100000",
       "block": Object {
         "BlockId": 1,

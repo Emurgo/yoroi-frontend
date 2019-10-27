@@ -16,6 +16,7 @@ import type {
 } from '../../database/bip44/api/write';
 import type {
   Bip44AddressRow,
+  AccountingDerivationRow,
 } from '../../database/bip44/tables';
 
 import {
@@ -90,13 +91,17 @@ export interface IBip44Parent {
 }
 
 export type PathRequest = void;
-export type PathWithRow = {|
-  row: $ReadOnly<Bip44AddressRow>,
+type BaseAddressPath = {|
+  addr: $ReadOnly<AddressRow>,
   ...Addressing,
 |};
-export type PathWithAddrAndRow = {|
-  ...PathWithRow,
-  addr: $ReadOnly<AddressRow>,
+export type UtxoAddressPath = {|
+  ...BaseAddressPath,
+  row: $ReadOnly<Bip44AddressRow>,
+|};
+export type AccountingAddressPath = {|
+  ...BaseAddressPath,
+  row: $ReadOnly<AccountingDerivationRow>,
 |};
 
 export type IAddFromPublicRequest = {|
@@ -143,8 +148,26 @@ export interface IGetPublic {
   +changePubDeriverPassword: IChangePasswordRequestFunc,
 }
 
+export type IGetAllAccountingAddressesRequest = PathRequest;
+export type IGetAllAccountingAddressesResponse = Array<AccountingAddressPath>;
+export type IGetAllAccountingAddressesFunc = (
+  body: IGetAllAccountingAddressesRequest
+) => Promise<IGetAllAccountingAddressesResponse>;
+export interface IGetAllAccounting {
+  +rawGetAllAccountingAddresses: RawVariation<
+    IGetAllAccountingAddressesFunc,
+    {|
+      GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetAddress: Class<GetAddress>,
+      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+    |},
+    IGetAllAccountingAddressesRequest
+  >;
+  +getAllAccountingAddresses: IGetAllAccountingAddressesFunc
+}
+
 export type IGetAllUtxoAddressesRequest = PathRequest;
-export type IGetAllUtxoAddressesResponse = Array<PathWithAddrAndRow>;
+export type IGetAllUtxoAddressesResponse = Array<UtxoAddressPath>;
 export type IGetAllUtxoAddressesFunc = (
   body: IGetAllUtxoAddressesRequest
 ) => Promise<IGetAllUtxoAddressesResponse>;
@@ -244,7 +267,7 @@ export interface IDisplayCutoff {
 
 export type IGetNextUnusedForChainRequest = void;
 export type IGetNextUnusedForChainResponse = {
-  addressInfo: void | PathWithAddrAndRow,
+  addressInfo: void | UtxoAddressPath,
   index: number,
 };
 export type IGetNextUnusedForChainFunc = (
@@ -253,7 +276,7 @@ export type IGetNextUnusedForChainFunc = (
 export type IHasChainsRequest = {|
   chainId: number,
 |};
-export type IHasChainsResponse = Array<PathWithAddrAndRow>;
+export type IHasChainsResponse = Array<UtxoAddressPath>;
 export type IHasChainsGetAddressesFunc = (
   body: IHasChainsRequest
 ) => Promise<IHasChainsResponse>;

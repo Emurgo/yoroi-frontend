@@ -10,7 +10,7 @@ import type {
 } from '../api/ada/adaTypes';
 import type {
   DbTxIO,
-} from '../api/ada/lib/storage/database/utxoTransactions/tables';
+} from '../api/ada/lib/storage/database/multipartTransactions/tables';
 import type {
   TxStatusCodesType,
   DbBlock,

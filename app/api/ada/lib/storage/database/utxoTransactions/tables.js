@@ -7,7 +7,6 @@ import {
   TransactionSchema,
   AddressSchema,
 } from '../primitives/tables';
-import type { DbTransaction, DbBlock, } from '../primitives/tables';
 
 export type UtxoTransactionInputInsert = {|
   /**
@@ -78,9 +77,6 @@ export type DbUtxoInputs = {|
 export type DbUtxoOutputs = {|
   +utxoOutputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionOutputRow>>;
 |};
-export type DbTxIO = {| ...DbTransaction, ...DbUtxoInputs, ...DbUtxoOutputs |};
-export type DbTxInChain = {| ...DbTxIO, ...DbBlock |};
-
 
 export const populateUtxoTransactionsDb = (schemaBuilder: lf$schema$Builder) => {
   // UtxoTransactionInput Table

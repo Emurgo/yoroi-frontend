@@ -15,7 +15,7 @@ import {
 
 import type {
   IPublicDeriver,
-  PathWithAddrAndRow,
+  UtxoAddressPath,
   IGetAllUtxos,
   IGetUtxoBalanceResponse,
   IHasChainsRequest,
@@ -23,7 +23,11 @@ import type {
   IHasChains,
   IDisplayCutoff,
 } from './PublicDeriver/interfaces';
-import { PublicDeriver, asDisplayCutoff, } from './PublicDeriver/index';
+import {
+  PublicDeriver, asDisplayCutoff,
+  asGetAllAccounting,
+  asGetAllUtxos,
+} from './PublicDeriver/index';
 import { Bip44Wallet, } from './Bip44Wallet/index';
 
 import type {
@@ -329,7 +333,7 @@ export async function rawGetBip44AddressesByPath(
 }
 
 export function getLastUsedIndex(request: {
-  singleChainAddresses: Array<PathWithAddrAndRow>,
+  singleChainAddresses: Array<UtxoAddressPath>,
   usedStatus: Set<number>,
 }): number {
   request.singleChainAddresses.sort((a1, a2) => {
@@ -370,7 +374,7 @@ export async function rawGetAddressesForDisplay(
     GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
   |},
   request: {
-    addresses: Array<PathWithAddrAndRow>,
+    addresses: Array<UtxoAddressPath>,
   },
 ): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
   const addressIds = request.addresses.map(address => address.addr.AddressId);
@@ -547,7 +551,7 @@ export async function rawGetNextUnusedIndex(
     GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
   |},
   request:  {|
-    addressesForChain: Array<PathWithAddrAndRow>,
+    addressesForChain: Array<UtxoAddressPath>,
   |}
 ): Promise<IGetNextUnusedForChainResponse> {
   const usedStatus = await rawGetUtxoUsedStatus(
@@ -670,4 +674,57 @@ export async function loadWalletsFromStorage(
     result.push(publicDeriver);
   }
   return result;
+}
+
+export async function rawGetAddressRowsForWallet(
+  tx: lf$Transaction,
+  deps: {|
+    GetPathWithSpecific: Class<GetPathWithSpecific>,
+    GetAddress: Class<GetAddress>,
+    GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+  |},
+  request: {
+    publicDeriver: IPublicDeriver,
+  },
+): Promise<{|
+  utxoAddresses: Array<$ReadOnly<AddressRow>>,
+  accountingAddresses: Array<$ReadOnly<AddressRow>>,
+|}> {
+  const utxoAddresses = [];
+  const accountingAddresses = [];
+  const withUtxos = asGetAllUtxos(request.publicDeriver);
+  if (withUtxos != null) {
+    const addrResponse = await withUtxos.rawGetAllUtxoAddresses(
+      tx,
+      {
+        GetPathWithSpecific: deps.GetPathWithSpecific,
+        GetAddress: deps.GetAddress,
+        GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
+      },
+      undefined,
+    );
+    for (const address of addrResponse) {
+      utxoAddresses.push(address.addr);
+    }
+  }
+  const withAccounting = asGetAllAccounting(request.publicDeriver);
+  if (withAccounting != null) {
+    const addrResponse = await withAccounting.rawGetAllAccountingAddresses(
+      tx,
+      {
+        GetPathWithSpecific: deps.GetPathWithSpecific,
+        GetAddress: deps.GetAddress,
+        GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
+      },
+      undefined,
+    );
+    for (const address of addrResponse) {
+      accountingAddresses.push(address.addr);
+    }
+  }
+
+  return {
+    utxoAddresses,
+    accountingAddresses,
+  };
 }

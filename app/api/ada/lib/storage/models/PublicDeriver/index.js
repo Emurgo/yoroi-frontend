@@ -15,6 +15,8 @@ import type {
   IPublicDeriver, IPublicDeriverConstructor,
   IAddFromPublic, IAddFromPublicRequest, IAddFromPublicResponse,
   IGetPublic, IGetPublicRequest, IGetPublicResponse,
+  IGetAllAccountingAddressesRequest, IGetAllAccountingAddressesResponse,
+  IGetAllAccounting,
   IGetAllUtxoAddressesRequest, IGetAllUtxoAddressesResponse,
   IGetAllUtxos, IGetAllUtxosRequest, IGetAllUtxosResponse,
   IDisplayCutoff,
@@ -387,7 +389,7 @@ const Bip44Parent = Mixin<
   Bip44ParentDependencies,
   IBip44Parent,
 >(Bip44ParentMixin);
-export const Bip44ParentInstance = (
+const Bip44ParentInstance = (
   (Bip44Parent: any): ReturnType<typeof Bip44ParentMixin>
 );
 export function asBip44Parent<T: IPublicDeriver>(
@@ -788,7 +790,7 @@ export function asGetSigningKey<T: IPublicDeriver>(
 type GetAllUtxosDependencies = IPublicDeriver & IBip44Parent;
 const GetAllUtxosMixin = (
   superclass: Class<GetAllUtxosDependencies>,
-) => class GetAllUtxos extends superclass implements IGetAllUtxos { // TODO: probably rename
+) => class GetAllUtxos extends superclass implements IGetAllUtxos {
 
   rawGetAllUtxos = async (
     tx: lf$Transaction,
@@ -863,6 +865,7 @@ const GetAllUtxosMixin = (
     |},
     _body: IGetAllUtxoAddressesRequest,
   ): Promise<IGetAllUtxoAddressesResponse> => {
+    // TODO: some way to know if single chain is an account or not
     if (this.getBip44Parent().getPublicDeriverLevel() >= Bip44DerivationLevels.CHAIN.level) {
       return rawGetBip44AddressesByPath(
         super.getDb(), tx,
@@ -942,6 +945,62 @@ export function asGetAllUtxos<T: IPublicDeriver>(
   return undefined;
 }
 
+// ====================
+//   GetAllAccounting
+// ====================
+
+type GetAllAccountingDependencies = IPublicDeriver & IBip44Parent;
+const GetAllAccountingMixin = (
+  superclass: Class<GetAllAccountingDependencies>,
+) => class GetAllAccounting extends superclass implements IGetAllAccounting {
+
+  rawGetAllAccountingAddresses = async (
+    _tx: lf$Transaction,
+    _deps: {|
+      GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetAddress: Class<GetAddress>,
+      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+    |},
+    _body: IGetAllAccountingAddressesRequest,
+  ): Promise<IGetAllAccountingAddressesResponse> => {
+    // TODO: some way to know if single chain is an account or not
+    return []; // TODO
+  }
+  getAllAccountingAddresses = async (
+    body: IGetAllAccountingAddressesRequest,
+  ): Promise<IGetAllAccountingAddressesResponse> => {
+    const deps = Object.freeze({
+      GetPathWithSpecific,
+      GetAddress,
+      GetBip44DerivationSpecific,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
+    return await raii(
+      super.getDb(),
+      depTables,
+      async tx => this.rawGetAllAccountingAddresses(tx, deps, body)
+    );
+  }
+};
+
+const GetAllAccounting = Mixin<
+  GetAllAccountingDependencies,
+  IGetAllAccounting,
+>(GetAllAccountingMixin);
+const GetAllAccountingInstance = (
+  (GetAllAccounting: any): ReturnType<typeof GetAllAccountingMixin>
+);
+export function asGetAllAccounting<T: IPublicDeriver>(
+  obj: T
+): void | (IGetAllAccounting & GetAllAccountingDependencies & T) {
+  if (obj instanceof GetAllAccountingInstance) {
+    return obj;
+  }
+  return undefined;
+}
 
 // =================
 //   DisplayCutoff
@@ -1351,7 +1410,7 @@ const ScanAddresses = Mixin<
   ScanAddressesDependencies,
   IScanAddresses,
 >(ScanAddressesMixin);
-export const ScanAddressesInstance = (
+const ScanAddressesInstance = (
   (ScanAddresses: any): ReturnType<typeof ScanAddressesMixin>
 );
 export function asScanAddresses<T: IPublicDeriver>(
@@ -1384,6 +1443,7 @@ const ScanUtxoAccountAddressesMixin = (
     |},
     body: IScanAddressesRequest,
   ): Promise<IScanAddressesResponse> => {
+    // TODO: make sure we only scan payment keys
     const pubKey = await this.rawGetPublicKey(
       tx,
       { GetKeyForPublicDeriver: deps.GetKeyForPublicDeriver },

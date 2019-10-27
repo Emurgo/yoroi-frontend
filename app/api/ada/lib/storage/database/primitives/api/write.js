@@ -12,6 +12,10 @@ import type {
   KeyInsert, KeyRow,
   AddressInsert, AddressRow,
   EncryptionMetaInsert, EncryptionMetaRow,
+  TxStatusCodesType,
+  DbTransaction,
+  TransactionInsert, TransactionRow,
+  DbBlock,
 } from '../tables';
 import {
   digetForHash,
@@ -281,5 +285,95 @@ export class GetOrAddDerivation {
       levelSpecificTableName,
     );
     return addResult;
+  }
+}
+
+export class ModifyTransaction {
+  static ownTables = Object.freeze({
+    [Tables.TransactionSchema.name]: Tables.TransactionSchema,
+  });
+  static depTables = Object.freeze({
+    GetOrAddBlock,
+  });
+
+  static async addNew(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {
+      block: null | BlockInsert,
+      transaction: (blockId: null | number) => TransactionInsert,
+    },
+  ): Promise<{| ...WithNullableFields<DbBlock>, ...DbTransaction |}> {
+    const block = request.block !== null
+      ? await ModifyTransaction.depTables.GetOrAddBlock.getOrAdd(
+        db, tx,
+        request.block,
+      )
+      : null;
+
+    const transaction = await addNewRowToTable<TransactionInsert, TransactionRow>(
+      db, tx,
+      request.transaction(block != null ? block.BlockId : null),
+      ModifyTransaction.ownTables[Tables.TransactionSchema.name].name,
+    );
+
+    return {
+      block,
+      transaction,
+    };
+  }
+
+  /**
+   * Transaction may already exist in our DB and simlpy switching status
+   * ex: Successful -> rollback
+   *
+   * tx inputs & outputs stay constant even if status changes (since txhash is same)
+   * so we don't modify them.
+   * Notably, we don't remove them so we can still show input+output for failed txs, etc.
+   */
+  static async updateExisting(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {
+      block: null | BlockInsert,
+      transaction: (blockId: null | number) => TransactionRow,
+    },
+  ): Promise<{| ...WithNullableFields<DbBlock>, ...DbTransaction |}> {
+    const block = request.block !== null
+      ? await ModifyTransaction.depTables.GetOrAddBlock.getOrAdd(
+        db, tx,
+        request.block,
+      )
+      : null;
+
+    // replace existing row so it gets updated status and updated block info
+    const newTx = await addOrReplaceRow<TransactionRow, TransactionRow>(
+      db, tx,
+      request.transaction(block != null ? block.BlockId : null),
+      ModifyTransaction.ownTables[Tables.TransactionSchema.name].name,
+    );
+
+    return {
+      block,
+      transaction: newTx,
+    };
+  }
+
+  static async updateStatus(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {
+      status: TxStatusCodesType,
+      transaction: $ReadOnly<TransactionRow>,
+    },
+  ): Promise<void> {
+    await addOrReplaceRow<$ReadOnly<TransactionRow>, TransactionRow>(
+      db, tx,
+      {
+        ...request.transaction,
+        Status: request.status,
+      },
+      ModifyTransaction.ownTables[Tables.TransactionSchema.name].name,
+    );
   }
 }

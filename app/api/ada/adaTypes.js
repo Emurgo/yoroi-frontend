@@ -6,8 +6,8 @@ import {
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
 
 import type {
-  DbTxIO
-} from './lib/storage/database/utxoTransactions/tables';
+  DbTxIO,
+} from './lib/storage/database/multipartTransactions/tables';
 import type { DbBlock, } from './lib/storage/database/primitives/tables';
 import type {
   Address, Value, Addressing,
@@ -78,13 +78,42 @@ export type V3UnsignedTxAddressedUtxoResponse = {|
 
 export type RemoteTxState = 'Successful' | 'Failed' | 'Pending';
 
-export type RemoteTransactionInput = {|
-  +address: string,
-  +amount: string,
+export type RemoteTransactionUtxoInput = {|
   +id: string, // concatenation of txHash || index
   +index: number,
   +txHash: string,
-|}
+|};
+export type RemoteTransactionAccountingInput = {|
+  +id: string, // concatenation of accountAddress || spendingCounter
+  +spendingCounter: number,
+|};
+export type RemoteTransactionInputBase = {|
+  +address: string,
+  +amount: string,
+|};
+type InputTypesT = {|
+  legacyUtxo: void,
+  utxo: 'utxo',
+  account: 'account',
+|};
+export const InputTypes: InputTypesT = Object.freeze({
+  legacyUtxo: undefined,
+  utxo: 'utxo',
+  account: 'account',
+});
+export type RemoteTransactionInput = {|
+  +type?: $PropertyType<InputTypesT, 'legacyUtxo'>,
+  ...RemoteTransactionInputBase,
+  ...RemoteTransactionUtxoInput,
+|} | {|
+  +type: $PropertyType<InputTypesT, 'utxo'>,
+  ...RemoteTransactionInputBase,
+  ...RemoteTransactionUtxoInput,
+|} | {|
+  +type: $PropertyType<InputTypesT, 'account'>,
+  ...RemoteTransactionInputBase,
+  ...RemoteTransactionAccountingInput,
+|};
 export type RemoteTransactionOutput = {|
   +address: string,
   +amount: string,
