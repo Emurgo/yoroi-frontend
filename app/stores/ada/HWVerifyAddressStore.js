@@ -101,7 +101,6 @@ export default class AddressesStore extends Store {
     address: string,
   ): Promise<void> => {
     try {
-      // trick to fix flow
       this.ledgerConnect = new LedgerConnect({
         locale: this.stores.profile.currentLocale
       });
