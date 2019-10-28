@@ -4,6 +4,8 @@ import { observer } from 'mobx-react';
 import type { MessageDescriptor } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 import { intlShape } from 'react-intl';
+import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
+import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
 
 import styles from './InfoIcon.scss';
 import infoIcon from '../../assets/images/info-icon.inline.svg';
@@ -22,13 +24,18 @@ export default class InfoIcon extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <SvgInline
-          svg={infoIcon}
-          width="14"
-          height="14"
-          className={styles.infoIcon}
-          title={intl.formatMessage(toolTip)}
-        />
+        <Tooltip
+          className={styles.SimpleTooltip}
+          skin={TooltipSkin}
+          tip={intl.formatMessage(toolTip)}
+        >
+          <SvgInline
+            svg={infoIcon}
+            width="14"
+            height="14"
+            className={styles.infoIcon}
+          />
+        </Tooltip>
       </div>
     );
   }
