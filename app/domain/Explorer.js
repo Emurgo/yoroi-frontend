@@ -13,6 +13,7 @@ const ByronExplorers = Object.freeze({
   CARDANO_EXPLORER: 'cardano_explorer',
 });
 export function getDefaultExplorer(): ExplorerType {
+  // TODO: change default back to Seiza once we have a public URL
   return environment.isShelley()
     ? 'jormungandr'
     : 'seiza';
