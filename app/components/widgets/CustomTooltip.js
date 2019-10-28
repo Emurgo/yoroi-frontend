@@ -24,7 +24,7 @@ export default class CustomTooltip extends Component<Props> {
   render() {
     const { toolTip, children } = this.props;
     const tolltipComp = (<div><FormattedHTMLMessage {...toolTip} /></div>);
-    const child = (children !== null) ? children : this.makeDefaultChild();
+    const child = (children == null) ? this.makeDefaultChild() : children;
 
     return (
       <div className={styles.component}>
