@@ -5,7 +5,7 @@ import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import classnames from 'classnames';
 import SvgInline from 'react-svg-inline';
 
-import InfoIcon from '../widgets/InfoIcon';
+import CustomTooltip from '../widgets/CustomTooltip';
 import logoIcon from '../../assets/images/yoroi-logo-white.inline.svg';
 import settingsIcon from '../../assets/images/top-bar/setting-active.inline.svg';
 import daedalusIcon from '../../assets/images/top-bar/daedalus-migration.inline.svg';
@@ -28,7 +28,7 @@ const messages = defineMessages({
   },
   connectToHWTooltip: {
     id: 'wallet.add.page.hw.tooltip',
-    defaultMessage: '!!!Create or restore a Yoroi wallet using a hardware wallet, such as a Ledger (Ledger Nano S or Ledger Nano X) or Trezor (Trezor Model T).',
+    defaultMessage: '!!!Create or restore a Yoroi wallet<br/>using a Ledger or Trezor hardware wallet.',
   },
   createTitle: {
     id: 'wallet.add.page.create.title',
@@ -36,7 +36,7 @@ const messages = defineMessages({
   },
   createTooltip: {
     id: 'wallet.add.page.create.tooltip',
-    defaultMessage: '!!!Generate a new 15-word recovery phrase and create a Yoroi wallet.',
+    defaultMessage: '!!!Generate a new 15-word recovery phrase<br/>and create a Yoroi wallet.',
   },
   restoreTitle: {
     id: 'wallet.add.page.restore.title',
@@ -44,7 +44,7 @@ const messages = defineMessages({
   },
   restoreTooltip: {
     id: 'wallet.add.page.restore.tooltip',
-    defaultMessage: '!!!Enter a 15-word recovery phrase to restore an already-existing Yoroi wallet, or import an existing Yoroi paper wallet.',
+    defaultMessage: '!!!Enter a 15-word recovery phrase<br/>to restore an already-existing Yoroi wallet,<br/>or import an existing Yoroi paper wallet.',
   },
   transferFundsTitle: {
     id: 'wallet.add.page.daedalusTransfer.title',
@@ -52,7 +52,7 @@ const messages = defineMessages({
   },
   transferFundsTooltip: {
     id: 'wallet.add.page.daedalusTransfer.tooltip',
-    defaultMessage: '!!!You can transfer funds from a Daedalus wallet to Yoroi, but first you will need to create a Yoroi wallet to store those funds.',
+    defaultMessage: '!!!You can transfer funds from a Daedalus wallet<br/>to Yoroi, but first you will need to create<br/>a Yoroi wallet to store those funds.',
   },
   restoreNotificationMessage: {
     id: 'wallet.add.dialog.restoreNotificationMessage',
@@ -132,7 +132,7 @@ export default class WalletAdd extends Component<Props> {
                     <div className={classnames([styles.heroCardsItemBg, styles.bgConnectHW])} />
                     <div className={styles.heroCardsItemTitle}>
                       {intl.formatMessage(messages.connectToHWTitle)}
-                      <InfoIcon toolTip={messages.connectToHWTooltip} />
+                      <CustomTooltip toolTip={messages.connectToHWTooltip} />
                     </div>
                   </div>
                 </button>
@@ -146,7 +146,7 @@ export default class WalletAdd extends Component<Props> {
                     <div className={classnames([styles.heroCardsItemBg, styles.bgCreateWallet])} />
                     <div className={styles.heroCardsItemTitle}>
                       {intl.formatMessage(messages.createTitle)}
-                      <InfoIcon toolTip={messages.createTooltip} />
+                      <CustomTooltip toolTip={messages.createTooltip} />
                     </div>
                   </div>
                 </button>
@@ -162,7 +162,7 @@ export default class WalletAdd extends Component<Props> {
                     />
                     <div className={styles.heroCardsItemTitle}>
                       {intl.formatMessage(messages.restoreTitle)}
-                      <InfoIcon toolTip={messages.restoreTooltip} />
+                      <CustomTooltip toolTip={messages.restoreTooltip} />
                     </div>
                   </div>
                 </button>
@@ -189,7 +189,7 @@ export default class WalletAdd extends Component<Props> {
                 />
                 <div className={styles.heroCardsItemTitle}>
                   {intl.formatMessage(messages.transferFundsTitle)}
-                  <InfoIcon toolTip={messages.transferFundsTooltip} />
+                  <CustomTooltip toolTip={messages.transferFundsTooltip} />
                 </div>
               </button>
             </div>
