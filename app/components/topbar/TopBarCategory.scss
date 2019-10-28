@@ -49,7 +49,7 @@
   }
 }
 
-.withLedgerNanoSIcon {
+.withLedgerNanoIcon {
   flex-shrink: 0;
   & > svg {
     width: var(--cmn-topbar-icon-default-width);
@@ -100,7 +100,7 @@
       margin-left: 14px;
     }
 
-    &.with-ledger-nano-s {
+    &.with-ledger-nano {
       left: 56px;
       width: 72px;
       margin-left: 14px;

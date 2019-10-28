@@ -136,14 +136,13 @@ export function isTrezorTWallet(
     (hwWalletMeta) => hwWalletMeta.Vendor === tVendor && hwWalletMeta.Model === tModel
   );
 }
-export function isLedgerNanoSWallet(
+export function isLedgerNanoWallet(
   conceptualWallet: IConceptualWallet,
 ): boolean {
-  const sVendor = Config.wallets.hardwareWallet.ledgerNanoS.VENDOR;
-  const sModel = Config.wallets.hardwareWallet.ledgerNanoS.MODEL;
+  const vendor = Config.wallets.hardwareWallet.ledgerNano.VENDOR;
   return isHwKind(
     conceptualWallet,
-    (hwWalletMeta) => hwWalletMeta.Vendor === sVendor && hwWalletMeta.Model === sModel
+    (hwWalletMeta) => hwWalletMeta.Vendor === vendor
   );
 }
 

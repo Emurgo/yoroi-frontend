@@ -112,7 +112,7 @@ export default class AdaWalletsStore extends WalletStore {
   };
 
   // =================== NOTIFICATION ==================== //
-  showLedgerNanoSWalletIntegratedNotification = (): void => {
+  showLedgerNanoWalletIntegratedNotification = (): void => {
     const notification: Notification = {
       id: globalMessages.ledgerNanoSWalletIntegratedNotificationMessage.id,
       message: globalMessages.ledgerNanoSWalletIntegratedNotificationMessage,

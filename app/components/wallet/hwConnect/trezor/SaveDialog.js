@@ -53,7 +53,7 @@ type Props = {|
   isActionProcessing: boolean,
   defaultWalletName: string,
   onExternalLinkClick: Function,
-  submit: Function,
+  submit: string => void,
   cancel: Function,
   classicTheme: boolean
 |};

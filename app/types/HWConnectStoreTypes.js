@@ -32,6 +32,9 @@ export interface HWConnectStoreTypes<ConnectionResponse> {
   /** the only observable which manages state change */
   progressInfo: ProgressInfo;
 
+  /** which derivation index to export */
+  derivationIndex: number;
+
   /** only in ERROR state it will hold LocalizableError object */
   error: ?LocalizableError;
 
@@ -95,17 +98,13 @@ export interface HWConnectStoreTypes<ConnectionResponse> {
   _goToSaveLoad(): void;
 
   /** SAVE dialog submit (Save button) */
-  _submitSave(request: {
-    walletName: string,
-    derivationIndex: number,
-  }): Promise<void>;
+  _submitSave(walletName: string): Promise<void>;
 
   _goToSaveError(): void;
 
   /** creates new wallet and loads it */
   _saveHW(
     walletName: string,
-    derivationIndex: number,
   ): Promise<void>;
 
   _prepareCreateHWReqParams(

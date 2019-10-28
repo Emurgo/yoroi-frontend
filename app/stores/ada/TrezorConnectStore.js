@@ -37,7 +37,7 @@ import type {
   CreateHardwareWalletFunc,
 } from '../../api/ada';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
-
+import { HARD_DERIVATION_START } from '../../config/numbersConfig';
 
 type TrezorConnectionResponse = {
   trezorResp: CardanoGetPublicKey$,
@@ -51,6 +51,7 @@ export default class TrezorConnectStore
   // =================== VIEW RELATED =================== //
   /** the only observable which manages state change */
   @observable progressInfo: ProgressInfo;
+  @observable derivationIndex: number = 0; // assume single account
 
   /** only in ERROR state it will hold LocalizableError object */
   error: ?LocalizableError;
@@ -192,8 +193,7 @@ export default class TrezorConnectStore
       this.hwDeviceInfo = undefined;
 
       const trezorResp = await TrezorConnect.cardanoGetPublicKey({
-        // TODO: only support Trezor wallet on account 0
-        path: derivePathPrefix(0)
+        path: derivePathPrefix(this.derivationIndex)
       });
 
       const trezorEventDevice: DeviceMessage = { ...this.trezorEventDevice };
@@ -340,24 +340,21 @@ export default class TrezorConnectStore
   };
 
   /** SAVE dialog submit (Save button) */
-  @action _submitSave = async (request: {
+  @action _submitSave = async (
     walletName: string,
-    derivationIndex: number,
-  }): Promise<void> => {
+  ): Promise<void> => {
     this.error = null;
     this.progressInfo.currentStep = ProgressStep.SAVE;
     this.progressInfo.stepState = StepState.PROCESS;
 
     await this._saveHW(
-      request.walletName,
-      request.derivationIndex,
+      walletName,
     );
   };
 
   /** creates new wallet and loads it */
   _saveHW = async (
     walletName: string,
-    derivationIndex: number,
   ): Promise<void>  => {
     try {
       Logger.debug('TrezorConnectStore::_saveHW:: stated');
@@ -366,7 +363,7 @@ export default class TrezorConnectStore
 
       const reqParams = this._prepareCreateHWReqParams(
         walletName,
-        derivationIndex,
+        this.derivationIndex + HARD_DERIVATION_START,
       );
       this.createHWRequest.execute(reqParams);
       if (!this.createHWRequest.promise) throw new Error('should never happen');
