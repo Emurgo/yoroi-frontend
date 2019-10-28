@@ -66,7 +66,7 @@ export default class ProfileStore extends Store {
     },
     {
       isDone: () => (
-        environment.isShelley() || // disable for Shelley to overriding mainnet Yoroi URI
+        environment.isShelley() || // disable for Shelley to avoid overriding mainnet Yoroi URI
         !environment.userAgentInfo.canRegisterProtocol() ||
         this.isUriSchemeAccepted
       ),

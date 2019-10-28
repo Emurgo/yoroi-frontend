@@ -57,6 +57,7 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
       }));
     const { currentTheme } = this.props.stores.profile;
 
+    // disable for Shelley to avoid overriding mainnet Yoroi URI
     const uriSettings = environment.userAgentInfo.canRegisterProtocol() && !environment.isShelley()
       ? (
         <UriSettingsBlock
