@@ -18,6 +18,7 @@ import RawHash from '../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../domain/Explorer';
 import type { StandardAddress } from '../../stores/base/AddressesStore';
+import environment from '../../environment';
 
 const messages = defineMessages({
   walletAddressLabel: {
@@ -224,26 +225,28 @@ export default class WalletReceive extends Component<Props, State> {
                 {/* Address Action block start */}
                 <div className={styles.addressActions}>
                   {/* Generate payment URL for Address action */}
-                  <div className={classnames([
-                    styles.addressActionItemBlock,
-                    styles.generateURLActionBlock])}
-                  >
-                    <button
-                      type="button"
-                      onClick={onGeneratePaymentURI.bind(this, address.address)}
-                      className={styles.btnGenerateURI}
+                  {!environment.isShelley() && // disable URI for Shelley testnet
+                    <div className={classnames([
+                      styles.addressActionItemBlock,
+                      styles.generateURLActionBlock])}
                     >
-                      <div className={styles.generateURLActionBlock}>
-                        <SvgInline
-                          svg={generateURIIcon}
-                          className={styles.generateURIIcon}
-                        />
-                        <span className={styles.actionIconText}>
-                          {intl.formatMessage(messages.generatePaymentURLLabel)}
-                        </span>
-                      </div>
-                    </button>
-                  </div>
+                      <button
+                        type="button"
+                        onClick={onGeneratePaymentURI.bind(this, address.address)}
+                        className={styles.btnGenerateURI}
+                      >
+                        <div className={styles.generateURLActionBlock}>
+                          <SvgInline
+                            svg={generateURIIcon}
+                            className={styles.generateURIIcon}
+                          />
+                          <span className={styles.actionIconText}>
+                            {intl.formatMessage(messages.generatePaymentURLLabel)}
+                          </span>
+                        </div>
+                      </button>
+                    </div>
+                  }
                   {/* Verify Address action */}
                   <div className={classnames([
                     styles.addressActionItemBlock,
