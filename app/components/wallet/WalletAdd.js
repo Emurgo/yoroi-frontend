@@ -3,9 +3,9 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import classnames from 'classnames';
-
 import SvgInline from 'react-svg-inline';
-import infoIcon from '../../assets/images/info-icon.inline.svg';
+
+import InfoIcon from '../widgets/InfoIcon';
 import logoIcon from '../../assets/images/yoroi-logo-white.inline.svg';
 import settingsIcon from '../../assets/images/top-bar/setting-active.inline.svg';
 import daedalusIcon from '../../assets/images/top-bar/daedalus-migration.inline.svg';
@@ -132,13 +132,7 @@ export default class WalletAdd extends Component<Props> {
                     <div className={classnames([styles.heroCardsItemBg, styles.bgConnectHW])} />
                     <div className={styles.heroCardsItemTitle}>
                       {intl.formatMessage(messages.connectToHWTitle)}
-                      <SvgInline
-                        svg={infoIcon}
-                        width="14"
-                        height="14"
-                        className={styles.infoIcon}
-                        title={intl.formatMessage(messages.connectToHWTooltip)}
-                      />
+                      <InfoIcon toolTip={messages.connectToHWTooltip} />
                     </div>
                   </div>
                 </button>
@@ -152,13 +146,7 @@ export default class WalletAdd extends Component<Props> {
                     <div className={classnames([styles.heroCardsItemBg, styles.bgCreateWallet])} />
                     <div className={styles.heroCardsItemTitle}>
                       {intl.formatMessage(messages.createTitle)}
-                      <SvgInline
-                        svg={infoIcon}
-                        width="14"
-                        height="14"
-                        className={styles.infoIcon}
-                        title={intl.formatMessage(messages.createTooltip)}
-                      />
+                      <InfoIcon toolTip={messages.createTooltip} />
                     </div>
                   </div>
                 </button>
@@ -174,13 +162,7 @@ export default class WalletAdd extends Component<Props> {
                     />
                     <div className={styles.heroCardsItemTitle}>
                       {intl.formatMessage(messages.restoreTitle)}
-                      <SvgInline
-                        svg={infoIcon}
-                        width="14"
-                        height="14"
-                        className={styles.infoIcon}
-                        title={intl.formatMessage(messages.restoreTooltip)}
-                      />
+                      <InfoIcon toolTip={messages.restoreTooltip} />
                     </div>
                   </div>
                 </button>
@@ -207,13 +189,7 @@ export default class WalletAdd extends Component<Props> {
                 />
                 <div className={styles.heroCardsItemTitle}>
                   {intl.formatMessage(messages.transferFundsTitle)}
-                  <SvgInline
-                    svg={infoIcon}
-                    width="14"
-                    height="14"
-                    className={styles.infoIcon}
-                    title={intl.formatMessage(messages.transferFundsTooltip)}
-                  />
+                  <InfoIcon toolTip={messages.transferFundsTooltip} />
                 </div>
               </button>
             </div>
