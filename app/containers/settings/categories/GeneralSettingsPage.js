@@ -57,7 +57,7 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
       }));
     const { currentTheme } = this.props.stores.profile;
 
-    const uriSettings = environment.userAgentInfo.canRegisterProtocol()
+    const uriSettings = environment.userAgentInfo.canRegisterProtocol() && !environment.isShelley()
       ? (
         <UriSettingsBlock
           registerUriScheme={() => registerProtocols()}

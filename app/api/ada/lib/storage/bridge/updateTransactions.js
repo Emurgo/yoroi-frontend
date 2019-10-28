@@ -966,7 +966,7 @@ export async function networkTxToDbTx(
               const wasmAddr = RustModule.WalletV3.Address.from_string(output.address);
               txType = wasmAddr.get_discrimination();
             } catch (_e2) {
-              throw new Error('networkTxToDbTx Unknown output type');
+              throw new Error('networkTxToDbTx Unknown output type ' + output.address);
             }
           }
           // consider a group address as a UTXO output

@@ -65,7 +65,11 @@ export default class ProfileStore extends Store {
       },
     },
     {
-      isDone: () => !environment.userAgentInfo.canRegisterProtocol() || this.isUriSchemeAccepted,
+      isDone: () => (
+        environment.isShelley() || // disable for Shelley to overriding mainnet Yoroi URI
+        !environment.userAgentInfo.canRegisterProtocol() ||
+        this.isUriSchemeAccepted
+      ),
       action: () => {
         const route = ROUTES.PROFILE.URI_PROMPT;
         if (this.stores.app.currentRoute === route) {
