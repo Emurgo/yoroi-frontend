@@ -298,7 +298,7 @@ export async function createHardwareWallet(request: {
         finalState => ({
           ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
           IsBundled: false,
-          SignerLevel: Bip44DerivationLevels.ROOT.level,
+          SignerLevel: null,
           PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
           Version: 2,
         })

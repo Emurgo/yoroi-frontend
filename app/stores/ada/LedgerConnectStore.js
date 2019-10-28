@@ -46,6 +46,7 @@ import {
   stringifyData,
   stringifyError
 } from '../../utils/logging';
+import { HARD_DERIVATION_START } from '../../config/numbersConfig';
 
 export default class LedgerConnectStore
   extends Store
@@ -53,6 +54,7 @@ export default class LedgerConnectStore
 
   // =================== VIEW RELATED =================== //
   @observable progressInfo: ProgressInfo;
+  @observable derivationIndex: number = 0; // assume single account
   error: ?LocalizableError;
   hwDeviceInfo: ?HWDeviceInfo;
   ledgerConnect: ?LedgerConnect;
@@ -146,8 +148,7 @@ export default class LedgerConnectStore
       });
       await prepareLedgerConnect(this.ledgerConnect);
 
-      // TODO: only support Ledger wallet on account 0
-      const accountPath = makeCardanoAccountBIP44Path(0);
+      const accountPath = makeCardanoAccountBIP44Path(this.derivationIndex);
       // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#examples
       Logger.debug(stringifyData(accountPath));
 
@@ -232,23 +233,20 @@ export default class LedgerConnectStore
   };
 
   /** SAVE dialog submit (Save button) */
-  @action _submitSave = async (request: {
+  @action _submitSave = async (
     walletName: string,
-    derivationIndex: number,
-  }): Promise<void> => {
+  ): Promise<void> => {
     this.error = null;
     this.progressInfo.currentStep = ProgressStep.SAVE;
     this.progressInfo.stepState = StepState.PROCESS;
     await this._saveHW(
-      request.walletName,
-      request.derivationIndex,
+      walletName,
     );
   };
 
   /** creates new wallet and loads it */
   _saveHW = async (
     walletName: string,
-    derivationIndex: number,
   ): Promise<void>  => {
     try {
       Logger.debug('LedgerConnectStore::_saveHW:: called');
@@ -257,7 +255,7 @@ export default class LedgerConnectStore
 
       const reqParams = this._prepareCreateHWReqParams(
         walletName,
-        derivationIndex,
+        this.derivationIndex + HARD_DERIVATION_START,
       );
       this.createHWRequest.execute(reqParams);
       if (!this.createHWRequest.promise) throw new Error('should never happen');
