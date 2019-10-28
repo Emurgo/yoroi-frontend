@@ -15,7 +15,7 @@ import styles from './WalletAdd.scss';
 const messages = defineMessages({
   title: {
     id: 'wallet.add.page.title',
-    defaultMessage: '!!!Gateway to the financial world',
+    defaultMessage: '!!!Your gateway to the financial world',
   },
   subTitle: {
     id: 'wallet.add.page.subtitle.label',

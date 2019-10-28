@@ -249,7 +249,7 @@
   "wallet.add.page.hw.title": "Connect to  hardware wallet",
   "wallet.add.page.restore.title": "Restore wallet",
   "wallet.add.page.subtitle.label": "Yoroi light wallet for Cardano",
-  "wallet.add.page.title": "Gateway <br> to the <br> financial world",
+  "wallet.add.page.title": "Your gateway <br> to the <br> financial world",
   "wallet.amountInput.feesLabel": "+ {amount} of fees",
   "wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching": "Make sure nobody looks into your screen unless you want them to have access to your funds.",
   "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "On the following screen, you will see a set of 15 random words. This is your <strong>wallet backup phrase</strong>. It can be entered in any version of Yoroi in order to back up or restore your wallet’s funds and private key.",
