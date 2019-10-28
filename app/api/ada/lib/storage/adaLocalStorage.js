@@ -3,7 +3,7 @@
 // Wrapper API to Save&Load localstorage using JSON
 
 import type { ExplorerType } from '../../../../domain/Explorer';
-import { Explorer } from '../../../../domain/Explorer';
+import { getDefaultExplorer } from '../../../../domain/Explorer';
 import { getLocalItem, setLocalItem } from '../../../localStorage/primitives';
 
 // Use constant keys to store/load localstorage
@@ -19,7 +19,7 @@ export async function saveSelectedExplorer(explorer: ExplorerType): Promise<void
 
 export async function getSelectedExplorer(): Promise<ExplorerType> {
   const explorer = await _getFromStorage<ExplorerType>(storageKeys.SELECTED_EXPLORER_KEY);
-  return explorer || Explorer.SEIZA;
+  return explorer || getDefaultExplorer();
 }
 
 /* Util functions */

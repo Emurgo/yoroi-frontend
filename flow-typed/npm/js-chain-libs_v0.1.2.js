@@ -97,7 +97,7 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     /**
      * @returns {Uint8Array}
      */
-    to_bytes(): Uint8Array;
+    as_bytes(): Uint8Array;
 
     /**
      * @returns {string}
@@ -502,7 +502,7 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     /**
      * @returns {Uint8Array}
      */
-    to_bytes(): Uint8Array;
+    as_bytes(): Uint8Array;
 
     /**
      * @returns {string}
@@ -1377,7 +1377,7 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     /**
      * @returns {Uint8Array}
      */
-    to_bytes(): Uint8Array;
+    as_bytes(): Uint8Array;
 
     /**
      * @returns {string}

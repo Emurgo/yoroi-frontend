@@ -11,7 +11,7 @@ import registerProtocols from '../../../uri-protocols';
 import environment from '../../../environment';
 import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
 import type { ExplorerType } from '../../../domain/Explorer';
-import { Explorer, explorerInfo } from '../../../domain/Explorer';
+import { getExplorers } from '../../../domain/Explorer';
 
 @observer
 export default class GeneralSettingsPage extends Component<InjectedProps> {
@@ -50,11 +50,7 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
     } = this.props.stores.profile;
     const isSubmittingLocale = setProfileLocaleRequest.isExecuting;
     const isSubmittingExplorer = setSelectedExplorerRequest.isExecuting;
-    const explorerOptions = Object.keys(Explorer)
-      .map(key => ({
-        value: Explorer[key],
-        label: explorerInfo[Explorer[key]].name,
-      }));
+    const explorerOptions = getExplorers();
     const { currentTheme } = this.props.stores.profile;
 
     // disable for Shelley to avoid overriding mainnet Yoroi URI

@@ -2,13 +2,7 @@
 
 import type {
   lf$Database,
-  lf$Predicate,
-  lf$schema$Table,
   lf$Transaction,
-  lf$query$Select,
-} from 'lovefield';
-import {
-  op,
 } from 'lovefield';
 import { groupBy, } from 'lodash';
 
@@ -18,9 +12,7 @@ import type {
   AccountingTransactionOutputRow,
   DbAccountingInputs, DbAccountingOutputs,
 } from '../tables';
-import { TxStatusCodes, TransactionSchema, } from '../../primitives/tables';
 import type {
-  TxStatusCodesType,
   TransactionRow,
 } from '../../primitives/tables';
 import { getRowIn, } from '../../utils';
