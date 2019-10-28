@@ -19,11 +19,12 @@ type Props = {|
 @observer
 export default class CustomTooltip extends Component<Props> {
   static contextTypes = { intl: intlShape.isRequired };
-  static defaultProps = { children: CustomTooltip.makeDefaultChild() }
+  static defaultProps = { children: undefined }
 
   render() {
     const { toolTip, children } = this.props;
     const tolltipComp = (<div><FormattedHTMLMessage {...toolTip} /></div>);
+    const child = children ? children : this.makeDefaultChild();
 
     return (
       <div className={styles.component}>
@@ -32,13 +33,13 @@ export default class CustomTooltip extends Component<Props> {
           skin={TooltipSkin}
           tip={tolltipComp}
         >
-          {children}
+          {child}
         </Tooltip>
       </div>
     );
   }
 
-  static makeDefaultChild(): Node {
+  makeDefaultChild = (): Node => {
     return (
       <SvgInline
         svg={infoIcon}
