@@ -7,7 +7,7 @@ import {
   Logger,
   stringifyError
 } from '../../utils/logging';
-import { transactionTypes } from '../../api/ada/adaTypes';
+import { transactionTypes } from '../../api/ada/transactions/types';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import globalMessages from '../../i18n/global-messages';

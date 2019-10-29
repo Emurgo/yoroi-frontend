@@ -4,7 +4,7 @@
 
 import { isEmpty } from 'lodash';
 import BigNumber from 'bignumber.js';
-import { coinToBigNumber } from './lib/utils';
+import { coinToBigNumber } from './transactions/utils';
 import {
   Logger,
   stringifyError,
@@ -19,15 +19,13 @@ import {
   sendAllUnsignedTxFromUtxo,
 } from './transactions/byron/transactionsV2';
 import type {
-  AddressUtxoFunc
+  AddressUtxoFunc,
+  RemoteUnspentOutput
 } from './lib/state-fetch/types';
 import type {
   TransferTx
 } from '../../types/TransferTypes';
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
-import type {
-  RemoteUnspentOutput
-} from './adaTypes';
 
 import type { ConfigType } from '../../../config/config-types';
 

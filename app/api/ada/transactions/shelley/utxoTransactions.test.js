@@ -2,8 +2,11 @@
 import '../../lib/test-config';
 import { schema } from 'lovefield';
 import type {
-  RemoteUnspentOutput, AddressedUtxo,
-} from '../../adaTypes';
+  AddressedUtxo,
+} from '../types';
+import type {
+  RemoteUnspentOutput,
+} from '../../lib/state-fetch/types';
 import {
   newAdaUnsignedTx,
   newAdaUnsignedTxFromUtxo,

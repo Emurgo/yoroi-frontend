@@ -7,7 +7,7 @@ import { assuranceLevels } from '../config/transactionAssuranceConfig';
 import type {
   TransactionDirectionType,
   UserAnnotation,
-} from '../api/ada/adaTypes';
+} from '../api/ada/transactions/types';
 import type {
   DbTxIO,
 } from '../api/ada/lib/storage/database/multipartTransactions/tables';

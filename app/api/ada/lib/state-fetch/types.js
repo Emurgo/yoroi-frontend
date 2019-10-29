@@ -1,9 +1,5 @@
 // @flow
 
-import type {
-  RemoteUnspentOutput,
-  RemoteTransaction
-} from '../../adaTypes';
 import { RustModule } from '../cardanoCrypto/rustLoader';
 
 // getUTXOsForAddresses
@@ -82,3 +78,79 @@ export type ServerStatusResponse = {
   isServerOk: boolean
 };
 export type ServerStatusFunc = (body: ServerStatusRequest) => Promise<ServerStatusResponse>;
+
+/* Backend service data types */
+
+export type RemoteTxState = 'Successful' | 'Failed' | 'Pending';
+
+export type RemoteTransactionUtxoInput = {|
+  +id: string, // concatenation of txHash || index
+  +index: number,
+  +txHash: string,
+|};
+export type RemoteTransactionAccountingInput = {|
+  +id: string, // concatenation of accountAddress || spendingCounter
+  +spendingCounter: number,
+|};
+export type RemoteTransactionInputBase = {|
+  +address: string,
+  +amount: string,
+|};
+type InputTypesT = {|
+  legacyUtxo: void,
+  utxo: 'utxo',
+  account: 'account',
+|};
+export const InputTypes: InputTypesT = Object.freeze({
+  legacyUtxo: undefined,
+  utxo: 'utxo',
+  account: 'account',
+});
+export type RemoteTransactionInput = {|
+  +type?: $PropertyType<InputTypesT, 'legacyUtxo'>,
+  ...RemoteTransactionInputBase,
+  ...RemoteTransactionUtxoInput,
+|} | {|
+  +type: $PropertyType<InputTypesT, 'utxo'>,
+  ...RemoteTransactionInputBase,
+  ...RemoteTransactionUtxoInput,
+|} | {|
+  +type: $PropertyType<InputTypesT, 'account'>,
+  ...RemoteTransactionInputBase,
+  ...RemoteTransactionAccountingInput,
+|};
+export type RemoteTransactionOutput = {|
+  +address: string,
+  +amount: string,
+|};
+
+/**
+ * only present if TX is in a block
+ */
+export type RemoteTxBlockMeta = {|
+  +height: number,
+  +block_hash: string,
+  +tx_ordinal: number,
+  +time: string, // timestamp with timezone
+  +epoch: number,
+  +slot: number,
+|};
+export type RemoteTxInfo = {|
+  +hash: string,
+  +last_update: string, // timestamp with timezone
+  +tx_state: RemoteTxState,
+  +inputs: Array<RemoteTransactionInput>,
+  +outputs: Array<RemoteTransactionOutput>,
+|};
+export type RemoteTransaction = {|
+  ...WithNullableFields<RemoteTxBlockMeta>,
+  ...RemoteTxInfo,
+|};
+
+export type RemoteUnspentOutput = {|
+  +utxo_id: string, // concat tx_hash and tx_index
+  +tx_hash: string,
+  +tx_index: number,
+  +receiver: string,
+  +amount: string
+|};

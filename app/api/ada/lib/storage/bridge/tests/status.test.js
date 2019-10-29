@@ -5,7 +5,7 @@ import {
   schema,
 } from 'lovefield';
 import '../../../test-config';
-import type { RemoteTxBlockMeta, } from '../../../../adaTypes';
+import type { RemoteTxBlockMeta, } from '../../../state-fetch/types';
 import {
   setup,
   mockDate,

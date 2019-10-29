@@ -1,5 +1,5 @@
 // @flow
-import './test-config';
+import '../lib/test-config';
 import BigNumber from 'bignumber.js';
 import {
   convertAdaTransactionsToExportRows,
@@ -13,20 +13,20 @@ import type {
 import type {
   UtxoTransactionInputRow,
   UtxoTransactionOutputRow,
-} from './storage/database/utxoTransactions/tables';
+} from '../lib/storage/database/utxoTransactions/tables';
 import type {
   AccountingTransactionInputRow,
   AccountingTransactionOutputRow,
-} from './storage/database/accountingTransactions/tables';
+} from '../lib/storage/database/accountingTransactions/tables';
 import {
   TxStatusCodes,
-} from './storage/database/primitives/tables';
+} from '../lib/storage/database/primitives/tables';
 import type {
   UtxoAnnotatedTransaction,
-} from '../adaTypes';
+} from './types';
 import {
   transactionTypes,
-} from '../adaTypes';
+} from './types';
 
 const _input = (
   x: number,

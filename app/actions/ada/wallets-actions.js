@@ -1,7 +1,7 @@
 // @flow
 import BigNumber from 'bignumber.js';
 import Action from '../lib/Action';
-import type { BaseSignRequest } from '../../api/ada/adaTypes';
+import type { BaseSignRequest } from '../../api/ada/transactions/types';
 
 // ======= WALLET ACTIONS =======
 

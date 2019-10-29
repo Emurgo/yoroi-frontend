@@ -5,7 +5,7 @@ import {
   schema,
 } from 'lovefield';
 import '../../../test-config';
-import type { RemoteTransaction } from '../../../../adaTypes';
+import type { RemoteTransaction } from '../../../state-fetch/types';
 import {
   setup,
   mockDate,
