@@ -5,10 +5,10 @@
 import BigNumber from 'bignumber.js';
 import type {
   V3UnsignedTxAddressedUtxoResponse,
-  RemoteUnspentOutput,
   V3UnsignedTxUtxoResponse,
   AddressedUtxo,
-} from '../../adaTypes';
+} from '../types';
+import type { RemoteUnspentOutput, } from '../../lib/state-fetch/types';
 import {
   NotEnoughMoneyToSendError,
 } from '../../errors';
@@ -23,7 +23,7 @@ import type {
   Address, Value, Addressing,
 } from '../../lib/storage/models/common/interfaces';
 import type { IGetAllUtxosResponse } from '../../lib/storage/models/PublicDeriver/interfaces';
-import { v2SkKeyToV3Key } from '../../lib/utils';
+import { v2SkKeyToV3Key } from '../utils';
 
 declare var CONFIG: ConfigType;
 

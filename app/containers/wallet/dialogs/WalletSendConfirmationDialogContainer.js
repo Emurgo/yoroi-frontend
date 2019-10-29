@@ -3,13 +3,13 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import environment from '../../../environment';
 import type { InjectedProps } from '../../../types/injectedPropsType';
-import type { BaseSignRequest } from '../../../api/ada/adaTypes';
+import type { BaseSignRequest } from '../../../api/ada/transactions/types';
 import {
   copySignRequest,
   signRequestFee,
   signRequestReceivers,
   signRequestTotalInput,
-} from '../../../api/ada/lib/utils';
+} from '../../../api/ada/transactions/utils';
 import WalletSendConfirmationDialog from '../../../components/wallet/send/WalletSendConfirmationDialog';
 import {
   formattedWalletAmount,

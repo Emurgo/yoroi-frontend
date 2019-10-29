@@ -21,7 +21,7 @@ import type { SignedResponse } from '../../api/ada/lib/state-fetch/types';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { HARD_DERIVATION_START } from '../../config/numbersConfig';
 import type { RestoreWalletForTransferResponse, RestoreWalletForTransferFunc } from '../../api/ada/index';
-import { verifyAccountLevel } from '../../api/ada/lib/utils';
+import { verifyAccountLevel } from '../../api/ada/transactions/utils';
 import {
   asHasChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';

@@ -37,13 +37,11 @@ import {
   AssociateTxWithIOs
 } from '../database/multipartTransactions/api/read';
 import type {
-  RemoteTxState,
-  RemoteTransaction,
   UtxoAnnotatedTransaction,
-} from '../../../adaTypes';
+} from '../../../transactions/types';
 import {
   InputTypes,
-} from '../../../adaTypes';
+} from '../../state-fetch/types';
 import type {
   HashToIdsFunc,
   ToAbsoluteSlotNumberFunc,
@@ -76,11 +74,13 @@ import {
 } from  '../models/utils';
 import { STABLE_SIZE } from '../../../../../config/numbersConfig';
 import { RollbackApiError } from '../../../errors';
-import { getFromUserPerspective, } from '../../utils';
+import { getFromUserPerspective, } from '../../../transactions/utils';
 
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 import type {
   FilterFunc, HistoryFunc, BestBlockFunc,
+  RemoteTxState,
+  RemoteTransaction,
 } from '../../state-fetch/types';
 
 export async function rawGetUtxoTransactions(

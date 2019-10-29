@@ -6,7 +6,7 @@ import {
 } from 'lovefield';
 import stableStringify from 'json-stable-stringify';
 import '../../../test-config';
-import type { RemoteTransaction } from '../../../../adaTypes';
+import type { RemoteTransaction } from '../../../state-fetch/types';
 import {
   setup,
   filterDbSnapshot,

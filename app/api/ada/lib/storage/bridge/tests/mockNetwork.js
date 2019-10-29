@@ -1,14 +1,14 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
-import { InputTypes } from '../../../../adaTypes';
-import type { RemoteTransaction, RemoteUnspentOutput } from '../../../../adaTypes';
+import { InputTypes } from '../../../state-fetch/types';
 import type {
   FilterUsedRequest, FilterUsedResponse, FilterFunc,
   HistoryRequest, HistoryResponse, HistoryFunc,
   BestBlockRequest, BestBlockResponse, BestBlockFunc,
   AddressUtxoRequest, AddressUtxoResponse, AddressUtxoFunc,
   UtxoSumRequest, UtxoSumResponse, UtxoSumFunc,
+  RemoteTransaction, RemoteUnspentOutput
 } from '../../../state-fetch/types';
 import { RollbackApiError, } from '../../../../errors';
 import { RustModule } from '../../../cardanoCrypto/rustLoader';

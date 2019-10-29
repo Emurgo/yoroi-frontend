@@ -15,11 +15,8 @@ import type {
   HistoryFunc,
   TxBodiesFunc,
   UtxoSumFunc,
+  RemoteTransaction,
 } from './types';
-
-import type {
-  RemoteTransaction
-} from '../../adaTypes';
 
 import type { IFetcher } from './IFetcher';
 

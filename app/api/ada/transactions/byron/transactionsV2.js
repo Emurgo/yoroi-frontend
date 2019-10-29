@@ -5,16 +5,16 @@
 import BigNumber from 'bignumber.js';
 import type {
   BaseSignRequest,
-  RemoteUnspentOutput,
   UnsignedTxFromUtxoResponse,
   UnsignedTxResponse,
   AddressedUtxo,
-} from '../../adaTypes';
+} from '../types';
+import type { RemoteUnspentOutput, } from '../../lib/state-fetch/types';
 import {
   NotEnoughMoneyToSendError,
 } from '../../errors';
 import type { ConfigType } from '../../../../../config/config-types';
-import { utxosToLookupMap, coinToBigNumber } from '../../lib/utils';
+import { utxosToLookupMap, coinToBigNumber } from '../utils';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 

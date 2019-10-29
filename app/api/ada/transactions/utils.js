@@ -3,30 +3,32 @@ import { groupBy, keyBy, mapValues } from 'lodash';
 import BigNumber from 'bignumber.js';
 import type {
   BaseSignRequest,
-  RemoteUnspentOutput,
   UtxoAnnotatedTransaction,
   UserAnnotation,
-} from '../adaTypes';
+} from './types';
+import type {
+  RemoteUnspentOutput,
+} from '../lib/state-fetch/types';
 import {
   transactionTypes,
-} from '../adaTypes';
+} from './types';
 import type {
   UtxoTransactionInputRow,
   UtxoTransactionOutputRow,
-} from './storage/database/utxoTransactions/tables';
+} from '../lib/storage/database/utxoTransactions/tables';
 import type { TransactionExportRow } from '../../export';
 import {
   DECIMAL_PLACES_IN_ADA,
   LOVELACES_PER_ADA,
   HARD_DERIVATION_START,
 } from '../../../config/numbersConfig';
-import { RustModule } from './cardanoCrypto/rustLoader';
+import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 import type {
   Addressing,
-} from './storage/models/common/interfaces';
+} from '../lib/storage/models/common/interfaces';
 import {
   Bip44DerivationLevels,
-} from './storage/database/bip44/api/utils';
+} from '../lib/storage/database/bip44/api/utils';
 
 export function getFromUserPerspective(data: {
   txInputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionInputRow>>,

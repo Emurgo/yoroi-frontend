@@ -26,7 +26,7 @@ import {
   signRequestFee,
   signRequestReceivers,
   signRequestTotalInput,
-} from '../../api/ada/lib/utils';
+} from '../../api/ada/transactions/utils';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 

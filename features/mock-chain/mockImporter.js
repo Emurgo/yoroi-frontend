@@ -1,7 +1,7 @@
 // @flow
 
 import cryptoRandomString from 'crypto-random-string';
-import type { RemoteTransaction } from '../../app/api/ada/adaTypes';
+import type { RemoteTransaction } from '../../app/api/ada/lib/state-fetch/types';
 import {
   genGetTransactionsHistoryForAddresses,
   genGetBestBlock,

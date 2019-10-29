@@ -6,9 +6,9 @@ import {
 } from '../../../../utils/logging';
 import type {
   BaseSignRequest,
-} from '../../adaTypes';
-import type { UtxoLookupMap }  from '../../lib/utils';
-import { utxosToLookupMap, derivePathAsString, verifyAccountLevel }  from '../../lib/utils';
+} from '../types';
+import type { UtxoLookupMap }  from '../utils';
+import { utxosToLookupMap, derivePathAsString, verifyAccountLevel }  from '../utils';
 import type {
   SendFunc,
   TxBodiesFunc

@@ -14,7 +14,7 @@ import type {
   GetWalletsFunc, RestoreWalletFunc,
   GenerateWalletRecoveryPhraseFunc
 } from '../../api/ada/index';
-import type { BaseSignRequest } from '../../api/ada/adaTypes';
+import type { BaseSignRequest } from '../../api/ada/transactions/types';
 import {
   asGetSigningKey, asBip44Parent,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';

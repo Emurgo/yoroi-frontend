@@ -16,7 +16,7 @@ import LocalizedRequest from '../lib/LocalizedRequest';
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import { CheckAdressesInUseApiError } from '../../api/ada/errors';
-import { derivePathPrefix } from '../../api/ada/lib/utils';
+import { derivePathPrefix } from '../../api/ada/transactions/utils';
 
 // This is actually just an interface
 import {

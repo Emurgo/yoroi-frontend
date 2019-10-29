@@ -89,7 +89,7 @@ import { scanAccountByVersion, } from './restoreAdaWallet';
 import type {
   BaseSignRequest,
   UnsignedTxResponse,
-} from './adaTypes';
+} from './transactions/types';
 import type {
   SignTransactionResponse as LedgerSignTxResponse
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
@@ -116,7 +116,7 @@ import {
   getAllAddressesForDisplay,
   loadWalletsFromStorage,
 } from './lib/storage/models/utils';
-import { convertAdaTransactionsToExportRows } from './lib/utils';
+import { convertAdaTransactionsToExportRows } from './transactions/utils';
 import { migrateToLatest } from './lib/storage/adaMigration';
 import { generateAdaPaperPdf } from './paperWallet/paperWalletPdf';
 import type { PdfGenStepType } from './paperWallet/paperWalletPdf';
