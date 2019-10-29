@@ -46,7 +46,8 @@ export default class AmountInputSkin extends Component<Props> {
     return (
       <div className={styles.component}>
         <InputOwnSkin {...this.props} />
-        {(error != null && error !== '')
+        {/* Do not show fee in case of some error is showing */}
+        {(error == null || error === '')
           ? (
             <span className={styles.fees}>
               {intl.formatMessage(messages.feesLabel, { amount: fees })}
