@@ -10,10 +10,10 @@ import type { InjectedDialogContainerProps } from '../../../types/injectedPropsT
 import environment from '../../../environment';
 import {
   unscramblePaperAdaMnemonic,
-} from '../../../api/ada/lib/cardanoCrypto/cryptoWallet';
+} from '../../../api/ada/lib/cardanoCrypto/paperWallet';
 import {
-  mnemonicsToExternalAddresses,
-} from '../../../api/ada/adaWallet';
+  generateStandardPlate,
+} from '../../../api/ada/lib/cardanoCrypto/plate';
 import type { WalletAccountNumberPlate } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import globalMessages from '../../../i18n/global-messages';
 import type {
@@ -78,7 +78,7 @@ export default class WalletRestoreDialogContainer
       }
       resolvedRecoveryPhrase = newPhrase;
     }
-    const { addresses, accountPlate } =  mnemonicsToExternalAddresses(
+    const { addresses, accountPlate } =  generateStandardPlate(
       resolvedRecoveryPhrase,
       0, // show addresses for account #0
       isPaper ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER : NUMBER_OF_VERIFIED_ADDRESSES,

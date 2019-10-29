@@ -16,7 +16,7 @@ import type {
 import {
   loadLovefieldDB,
 } from './lib/storage/database/index';
-import { createAccountPlate, } from './lib/cardanoCrypto/cryptoWallet';
+import { createAccountPlate, } from './lib/cardanoCrypto/plate';
 import { asGetPublicKey } from './lib/storage/models/PublicDeriver/index';
 
 let db;

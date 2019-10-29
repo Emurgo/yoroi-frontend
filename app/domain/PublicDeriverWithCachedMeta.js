@@ -9,7 +9,7 @@ import {
   asGetPublicKey,
   asGetSigningKey,
 } from '../api/ada/lib/storage/models/PublicDeriver/index';
-import { createAccountPlate } from '../api/ada/lib/cardanoCrypto/cryptoWallet';
+import { createAccountPlate } from '../api/ada/lib/cardanoCrypto/plate';
 
 export default class PublicDeriverWithCachedMeta {
 
