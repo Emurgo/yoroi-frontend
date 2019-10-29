@@ -7,7 +7,7 @@ import classNames from 'classnames';
 
 type Props = {|
   localizedTermsOfUse: string,
-  fixedHeight?: bool,
+  fixedHeight?: boolean,
 |};
 
 @observer
