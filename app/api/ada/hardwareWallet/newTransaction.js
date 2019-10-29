@@ -36,7 +36,7 @@ import type {
   SignTransactionResponse as LedgerSignTxResponse,
   Witness
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { makeCardanoBIP44Path } from 'yoroi-extension-ledger-bridge';
+import { makeCardanoBIP44Path } from 'yoroi-extension-ledger-connect-handler';
 import type {
   $CardanoSignTransaction,
   CardanoInput,
