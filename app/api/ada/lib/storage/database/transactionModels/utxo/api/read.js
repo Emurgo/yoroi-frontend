@@ -18,12 +18,12 @@ import type {
   UtxoTransactionOutputRow,
   DbUtxoInputs, DbUtxoOutputs,
 } from '../tables';
-import { TxStatusCodes, TransactionSchema, } from '../../primitives/tables';
+import { TxStatusCodes, TransactionSchema, } from '../../../primitives/tables';
 import type {
   TxStatusCodesType,
   TransactionRow,
-} from '../../primitives/tables';
-import { getRowIn, } from '../../utils';
+} from '../../../primitives/tables';
+import { getRowIn, } from '../../../utils';
 
 export class GetUtxoInputs {
   static ownTables = Object.freeze({

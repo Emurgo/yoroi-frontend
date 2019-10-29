@@ -11,18 +11,18 @@ import type { IConceptualWalletConstructor, } from '../ConceptualWallet/interfac
 
 import type {
   Bip44WrapperRow,
-} from '../../database/bip44/tables';
+} from '../../database/walletTypes/bip44/tables';
 import {
   DerivePublicFromPrivate, AddAdhocPublicDeriver,
-} from '../../database/bip44/api/write';
+} from '../../database/walletTypes/bip44/api/write';
 import {
   GetKeyForPrivateDeriver
-} from '../../database/bip44/api/read';
+} from '../../database/walletTypes/bip44/api/read';
 import type {
   DerivePublicFromPrivateRequest as DbRequest,
   TreeInsert,
   AddAdhocPublicDeriverRequest, AddAdhocPublicDeriverResponse,
-} from '../../database/bip44/api/write';
+} from '../../database/walletTypes/bip44/api/write';
 import type { AddPublicDeriverResponse } from '../../database/wallet/api/write';
 import { UpdateGet, } from '../../database/primitives/api/write';
 

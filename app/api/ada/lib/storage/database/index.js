@@ -16,10 +16,10 @@ import { GetEncryptionMeta, } from './primitives/api/read';
 import { ModifyEncryptionMeta, } from './primitives/api/write';
 
 import { populatePrimitivesDb } from './primitives/tables';
-import { populateBip44Db } from './bip44/tables';
-import { populateUtxoTransactionsDb } from './utxoTransactions/tables';
-import { populateAccountingTransactionsDb } from './accountingTransactions/tables';
-import { populateMultipartTransactionsDb } from './multipartTransactions/tables';
+import { populateBip44Db } from './walletTypes/bip44/tables';
+import { populateUtxoTransactionsDb } from './transactionModels/utxo/tables';
+import { populateAccountingTransactionsDb } from './transactionModels/account/tables';
+import { populateMultipartTransactionsDb } from './transactionModels/multipart/tables';
 import { populateWalletDb } from './wallet/tables';
 
 export const loadLovefieldDB = async (

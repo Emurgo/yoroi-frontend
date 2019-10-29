@@ -58,7 +58,7 @@ import {
 
 import type {
   Bip44ChainRow,
-} from '../../database/bip44/tables';
+} from '../../database/walletTypes/bip44/tables';
 import type {
   PublicDeriverRow,
 } from '../../database/wallet/tables';
@@ -71,15 +71,15 @@ import { ModifyPublicDeriver } from '../../database/wallet/api/write';
 import {
   AddBip44Tree,
   ModifyDisplayCutoff,
-} from '../../database/bip44/api/write';
-import { GetBip44DerivationSpecific } from '../../database/bip44/api/read';
+} from '../../database/walletTypes/bip44/api/write';
+import { GetBip44DerivationSpecific } from '../../database/walletTypes/bip44/api/read';
 import {
   Bip44DerivationLevels,
-} from '../../database/bip44/api/utils';
+} from '../../database/walletTypes/bip44/api/utils';
 
 import {
   GetUtxoTxOutputsWithTx,
-} from  '../../database/utxoTransactions/api/read';
+} from  '../../database/transactionModels/utxo/api/read';
 
 import type {
   KeyRow,

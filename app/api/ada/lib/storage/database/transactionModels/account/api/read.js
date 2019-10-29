@@ -14,8 +14,8 @@ import type {
 } from '../tables';
 import type {
   TransactionRow,
-} from '../../primitives/tables';
-import { getRowIn, } from '../../utils';
+} from '../../../primitives/tables';
+import { getRowIn, } from '../../../utils';
 
 export class GetAccountingInputs {
   static ownTables = Object.freeze({

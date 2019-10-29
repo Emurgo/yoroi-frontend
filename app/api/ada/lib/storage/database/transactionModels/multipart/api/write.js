@@ -8,20 +8,20 @@ import type {
   BlockInsert,
   TransactionInsert,
   DbBlock, DbTransaction,
-} from '../../primitives/tables';
+} from '../../../primitives/tables';
 import type {
   UtxoTransactionInputInsert,
   UtxoTransactionOutputInsert,
   DbUtxoInputs, DbUtxoOutputs,
-} from '../../utxoTransactions/tables';
+} from '../../utxo/tables';
 import type {
   AccountingTransactionInputInsert,
   AccountingTransactionOutputInsert,
   DbAccountingInputs, DbAccountingOutputs,
-} from '../../accountingTransactions/tables';
-import { ModifyTransaction } from '../../primitives/api/write';
-import { ModifyUtxoTransaction } from '../../utxoTransactions/api/write';
-import { ModifyAccountingTransaction } from '../../accountingTransactions/api/write';
+} from '../../account/tables';
+import { ModifyTransaction } from '../../../primitives/api/write';
+import { ModifyUtxoTransaction } from '../../utxo/api/write';
+import { ModifyAccountingTransaction } from '../../account/api/write';
 
 
 export class ModifyMultipartTx {

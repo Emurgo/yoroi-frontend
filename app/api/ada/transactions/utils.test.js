@@ -13,11 +13,11 @@ import type {
 import type {
   UtxoTransactionInputRow,
   UtxoTransactionOutputRow,
-} from '../lib/storage/database/utxoTransactions/tables';
+} from '../lib/storage/database/transactionModels/utxo/tables';
 import type {
   AccountingTransactionInputRow,
   AccountingTransactionOutputRow,
-} from '../lib/storage/database/accountingTransactions/tables';
+} from '../lib/storage/database/transactionModels/account/tables';
 import {
   TxStatusCodes,
 } from '../lib/storage/database/primitives/tables';

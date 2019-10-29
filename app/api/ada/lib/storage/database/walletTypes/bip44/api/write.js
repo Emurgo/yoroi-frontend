@@ -25,27 +25,27 @@ import {
 import type {
   KeyDerivationRow,
   KeyInsert, KeyRow
-} from '../../primitives/tables';
-import { KeyDerivationSchema } from '../../primitives/tables';
-import { AddDerivation, GetOrAddDerivation, } from '../../primitives/api/write';
+} from '../../../primitives/tables';
+import { KeyDerivationSchema } from '../../../primitives/tables';
+import { AddDerivation, GetOrAddDerivation, } from '../../../primitives/api/write';
 import {
   GetChildWithSpecific, GetPathWithSpecific,
-} from '../../primitives/api/read';
+} from '../../../primitives/api/read';
 
 import {
   allBip44DerivationTables,
   Bip44TableMap,
   Bip44DerivationLevels,
 } from './utils';
-import { addNewRowToTable, StaleStateError, } from '../../utils';
-import { AddPublicDeriver, ModifyHwWalletMeta } from '../../wallet/api/write';
+import { addNewRowToTable, StaleStateError, } from '../../../utils';
+import { AddPublicDeriver, ModifyHwWalletMeta } from '../../../wallet/api/write';
 import type {
   PublicDeriverInsert, PublicDeriverRow,
   HwWalletMetaInsert, HwWalletMetaRow,
-} from '../../wallet/tables';
-import { PublicDeriverSchema } from '../../wallet/tables';
-import type { AddDerivationRequest } from '../../primitives/api/write';
-import type { AddPublicDeriverResponse } from '../../wallet/api/write';
+} from '../../../wallet/tables';
+import { PublicDeriverSchema } from '../../../wallet/tables';
+import type { AddDerivationRequest } from '../../../primitives/api/write';
+import type { AddPublicDeriverResponse } from '../../../wallet/api/write';
 
 export type TreeStart = {|
   derivationId: number,

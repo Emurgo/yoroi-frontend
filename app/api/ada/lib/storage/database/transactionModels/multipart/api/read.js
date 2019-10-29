@@ -6,15 +6,15 @@ import type {
 } from 'lovefield';
 import type {
   TransactionRow,
-} from '../../primitives/tables';
+} from '../../../primitives/tables';
 import type { DbTxIO } from '../tables';
 
 import {
   AssociateTxWithAccountingIOs,
-} from '../../accountingTransactions/api/read';
+} from '../../account/api/read';
 import {
   AssociateTxWithUtxoIOs,
-} from '../../utxoTransactions/api/read';
+} from '../../utxo/api/read';
 
 export class AssociateTxWithIOs {
   static ownTables = Object.freeze({});

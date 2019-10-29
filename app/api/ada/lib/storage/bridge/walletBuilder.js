@@ -17,16 +17,16 @@ import {
 } from '../database/wallet/api/write';
 import type {
   Bip44WrapperInsert,
-} from '../database/bip44/tables';
+} from '../database/walletTypes/bip44/tables';
 import {
   AddBip44Wrapper,
   AddPrivateDeriver,
   DerivePublicFromPrivate,
   AddAdhocPublicDeriver,
-} from '../database/bip44/api/write';
+} from '../database/walletTypes/bip44/api/write';
 import type {
   PrivateDeriverRequest, AddAdhocPublicDeriverRequest,
-} from '../database/bip44/api/write';
+} from '../database/walletTypes/bip44/api/write';
 import {
   getAllTables,
   raii,

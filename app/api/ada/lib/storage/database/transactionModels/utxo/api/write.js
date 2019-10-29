@@ -16,11 +16,11 @@ import type {
 } from '../tables';
 import type {
   TransactionRow,
-} from '../../primitives/tables';
+} from '../../../primitives/tables';
 
 import {
   addBatchToTable,
-} from '../../utils';
+} from '../../../utils';
 
 import {
   GetUtxoTxOutputsWithTx,

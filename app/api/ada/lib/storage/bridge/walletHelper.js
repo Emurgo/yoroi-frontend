@@ -14,7 +14,7 @@ import {
 
 import type {
   TreeInsert,
-} from '../database/bip44/api/write';
+} from '../database/walletTypes/bip44/api/write';
 import {
   GetOrAddAddress,
 } from '../database/primitives/api/write';
@@ -28,7 +28,7 @@ import { encryptWithPassword } from '../../../../../utils/passwordCipher';
 
 import {
   Bip44DerivationLevels,
-} from '../database/bip44/api/utils';
+} from '../database/walletTypes/bip44/api/utils';
 import {
   getAllSchemaTables,
   raii,

@@ -27,7 +27,7 @@ import type { HWFeatures, } from './lib/storage/database/wallet/tables';
 import {
   flattenInsertTree,
   Bip44DerivationLevels,
-} from './lib/storage/database/bip44/api/utils';
+} from './lib/storage/database/walletTypes/bip44/api/utils';
 import {
   PublicDeriver,
   asDisplayCutoff,

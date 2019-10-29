@@ -3,10 +3,10 @@
 import {
   AddressSchema,
   KeyDerivationSchema,
-} from '../primitives/tables';
+} from '../../primitives/tables';
 import {
   ConceptualWalletSchema, PublicDeriverSchema,
-} from '../wallet/tables';
+} from '../../wallet/tables';
 import { Type } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 

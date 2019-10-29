@@ -15,7 +15,7 @@ import {
 import type {
   UtxoTransactionInputRow,
   UtxoTransactionOutputRow,
-} from '../lib/storage/database/utxoTransactions/tables';
+} from '../lib/storage/database/transactionModels/utxo/tables';
 import type { TransactionExportRow } from '../../export';
 import {
   DECIMAL_PLACES_IN_ADA,
@@ -28,7 +28,7 @@ import type {
 } from '../lib/storage/models/common/interfaces';
 import {
   Bip44DerivationLevels,
-} from '../lib/storage/database/bip44/api/utils';
+} from '../lib/storage/database/walletTypes/bip44/api/utils';
 
 export function getFromUserPerspective(data: {
   txInputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionInputRow>>,

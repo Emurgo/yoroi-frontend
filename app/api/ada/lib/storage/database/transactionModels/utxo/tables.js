@@ -6,7 +6,7 @@ import type { lf$schema$Builder } from 'lovefield';
 import {
   TransactionSchema,
   AddressSchema,
-} from '../primitives/tables';
+} from '../../primitives/tables';
 
 export type UtxoTransactionInputInsert = {|
   /**

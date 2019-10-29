@@ -21,7 +21,7 @@ import {
 } from '../../lib/storage/database/index';
 import {
   Bip44DerivationLevels,
-} from '../../lib/storage/database/bip44/api/utils';
+} from '../../lib/storage/database/walletTypes/bip44/api/utils';
 import type {
   Address, Addressing
 } from '../../lib/storage/models/common/interfaces';
