@@ -14,7 +14,7 @@ import type {
 
 import {
   addBatchToTable,
-} from '../../utils';
+} from '../../../utils';
 
 
 export class ModifyAccountingTransaction {

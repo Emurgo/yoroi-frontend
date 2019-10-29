@@ -24,18 +24,18 @@ import {
   GetTxAndBlock,
 } from '../database/primitives/api/read';
 import { GetOrAddAddress, ModifyTransaction, } from '../database/primitives/api/write';
-import { ModifyMultipartTx } from  '../database/multipartTransactions/api/write';
+import { ModifyMultipartTx } from  '../database/transactionModels/multipart/api/write';
 import { digetForHash, } from '../database/primitives/api/utils';
 import {
   MarkUtxo,
-} from '../database/utxoTransactions/api/write';
+} from '../database/transactionModels/utxo/api/write';
 import {
   GetUtxoTxOutputsWithTx,
   GetUtxoInputs,
-} from '../database/utxoTransactions/api/read';
+} from '../database/transactionModels/utxo/api/read';
 import {
   AssociateTxWithIOs
-} from '../database/multipartTransactions/api/read';
+} from '../database/transactionModels/multipart/api/read';
 import type {
   UtxoAnnotatedTransaction,
 } from '../../../transactions/types';
@@ -48,10 +48,10 @@ import type {
 } from '../models/utils';
 import type {
   UtxoTransactionInputInsert, UtxoTransactionOutputInsert,
-} from '../database/utxoTransactions/tables';
+} from '../database/transactionModels/utxo/tables';
 import type {
   AccountingTransactionInputInsert, AccountingTransactionOutputInsert,
-} from '../database/accountingTransactions/tables';
+} from '../database/transactionModels/account/tables';
 import { TxStatusCodes, } from '../database/primitives/tables';
 import {
   asScanAddresses,
@@ -62,11 +62,11 @@ import {
   GetPublicDeriver,
   GetKeyForPublicDeriver,
 } from '../database/wallet/api/read';
-import { AddBip44Tree, ModifyDisplayCutoff, } from '../database/bip44/api/write';
-import { GetBip44DerivationSpecific, } from '../database/bip44/api/read';
+import { AddBip44Tree, ModifyDisplayCutoff, } from '../database/walletTypes/bip44/api/write';
+import { GetBip44DerivationSpecific, } from '../database/walletTypes/bip44/api/read';
 import { ModifyLastSyncInfo, } from '../database/wallet/api/write';
 import type { LastSyncInfoRow, } from '../database/wallet/tables';
-import type { DbTxIO, DbTxInChain } from '../database/multipartTransactions/tables';
+import type { DbTxIO, DbTxInChain } from '../database/transactionModels/multipart/tables';
 import {
   genToAbsoluteSlotNumber,
   rawGenHashToIdsFunc,

@@ -32,15 +32,15 @@ import {
 
 import {
   DerivePublicFromPrivate, AddAdhocPublicDeriver,
-} from '../../database/bip44/api/write';
+} from '../../database/walletTypes/bip44/api/write';
 import type {
   PrivateDeriverRow,
   Bip44WrapperRow,
-} from '../../database/bip44/tables';
+} from '../../database/walletTypes/bip44/tables';
 import {
   GetPrivateDeriver,
   GetKeyForPrivateDeriver
-} from '../../database/bip44/api/read';
+} from '../../database/walletTypes/bip44/api/read';
 import type { KeyRow } from '../../database/primitives/tables';
 import { UpdateGet, } from '../../database/primitives/api/write';
 

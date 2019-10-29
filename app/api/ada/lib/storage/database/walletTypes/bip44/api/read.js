@@ -20,18 +20,18 @@ import {
   getRowIn,
   getRowFromKey,
   StaleStateError,
-} from '../../utils';
+} from '../../../utils';
 
 import type {
   KeyRow,
   KeyDerivationRow,
-} from '../../primitives/tables';
+} from '../../../primitives/tables';
 import {
   KeyDerivationSchema,
-} from '../../primitives/tables';
-import { PublicDeriverSchema } from '../../wallet/tables';
-import type { PublicDeriverRow } from '../../wallet/tables';
-import { GetKeyForDerivation } from '../../primitives/api/read';
+} from '../../../primitives/tables';
+import { PublicDeriverSchema } from '../../../wallet/tables';
+import type { PublicDeriverRow } from '../../../wallet/tables';
+import { GetKeyForDerivation } from '../../../primitives/api/read';
 
 export class GetBip44DerivationSpecific {
   static ownTables = Object.freeze({

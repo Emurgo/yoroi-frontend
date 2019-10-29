@@ -50,17 +50,17 @@ import {
 import {
   GetAllBip44Wallets,
   GetBip44DerivationSpecific,
-} from '../database/bip44/api/read';
-import type { UtxoTxOutput } from '../database/utxoTransactions/api/read';
-import type { UtxoTransactionOutputRow } from '../database/utxoTransactions/tables';
-import { Bip44DerivationLevels } from '../database/bip44/api/utils';
+} from '../database/walletTypes/bip44/api/read';
+import type { UtxoTxOutput } from '../database/transactionModels/utxo/api/read';
+import type { UtxoTransactionOutputRow } from '../database/transactionModels/utxo/tables';
+import { Bip44DerivationLevels } from '../database/walletTypes/bip44/api/utils';
 import type { GetPathWithSpecificByTreeRequest } from '../database/primitives/api/read';
 import type {
   Bip44AddressRow,
-} from '../database/bip44/tables';
+} from '../database/walletTypes/bip44/tables';
 import {
   GetUtxoTxOutputsWithTx,
-} from '../database/utxoTransactions/api/read';
+} from '../database/transactionModels/utxo/api/read';
 import { TxStatusCodes } from '../database/primitives/tables';
 
 import { WrongPassphraseError } from '../../cardanoCrypto/cryptoErrors';
