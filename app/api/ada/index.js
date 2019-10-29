@@ -13,14 +13,6 @@ import type {
   ConfigType,
 } from '../../../config/config-types';
 import {
-  isValidMnemonic,
-  isValidPaperMnemonic,
-  unscramblePaperMnemonic,
-  generateAdaAccountRecoveryPhrase,
-  generatePaperWalletSecret,
-  mnemonicsToExternalAddresses,
-} from './adaWallet';
-import {
   createStandardBip44Wallet, createHardwareWallet,
 } from './lib/storage/bridge/walletHelper';
 import {
@@ -67,7 +59,15 @@ import {
 } from './transactions/byron/transactionsV2';
 import {
   generateWalletRootKey,
+  generateAdaMnemonic,
+  isValidEnglishAdaMnemonic,
 } from './lib/cardanoCrypto/cryptoWallet';
+import { generateStandardPlate } from './lib/cardanoCrypto/plate';
+import {
+  scramblePaperAdaMnemonic,
+  isValidEnglishAdaPaperMnemonic,
+  unscramblePaperAdaMnemonic,
+} from './lib/cardanoCrypto/paperWallet';
 import type {
   LedgerSignTxPayload,
 } from '../../domain/HWSignTx';
@@ -516,8 +516,9 @@ export default class AdaApi {
       numAddresses
     }: CreateAdaPaperRequest = {}
   ): AdaPaper {
-    const { words, scrambledWords } = generatePaperWalletSecret(password);
-    const { addresses, accountPlate } = mnemonicsToExternalAddresses(
+    const words = generateAdaMnemonic();
+    const scrambledWords = scramblePaperAdaMnemonic(words.join(' '), password).split(' ');
+    const { addresses, accountPlate } = generateStandardPlate(
       words.join(' '),
       0, // paper wallets always use account 0
       numAddresses != null ? numAddresses : DEFAULT_ADDRESSES_PER_PAPER,
@@ -966,26 +967,26 @@ export default class AdaApi {
   isValidMnemonic(
     request: IsValidMnemonicRequest,
   ): IsValidMnemonicResponse {
-    return isValidMnemonic(request.mnemonic, request.numberOfWords);
+    return isValidEnglishAdaMnemonic(request.mnemonic, request.numberOfWords);
   }
 
   isValidPaperMnemonic(
     request: IsValidPaperMnemonicRequest
   ): IsValidPaperMnemonicResponse {
-    return isValidPaperMnemonic(request.mnemonic, request.numberOfWords);
+    return isValidEnglishAdaPaperMnemonic(request.mnemonic, request.numberOfWords);
   }
 
   unscramblePaperMnemonic(
     request: UnscramblePaperMnemonicRequest
   ): UnscramblePaperMnemonicResponse {
-    return unscramblePaperMnemonic(request.mnemonic, request.numberOfWords, request.password);
+    return unscramblePaperAdaMnemonic(request.mnemonic, request.numberOfWords, request.password);
   }
 
   generateWalletRecoveryPhrase(): Promise<GenerateWalletRecoveryPhraseResponse> {
     Logger.debug('AdaApi::generateWalletRecoveryPhrase called');
     try {
       const response = new Promise(
-        resolve => resolve(generateAdaAccountRecoveryPhrase())
+        resolve => resolve(generateAdaMnemonic())
       );
       Logger.debug('AdaApi::generateWalletRecoveryPhrase success');
       return response;

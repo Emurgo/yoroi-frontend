@@ -1,25 +1,27 @@
-/* eslint-disable camelcase */
 // @flow
-import './lib/test-config';
+
+/* eslint-disable camelcase */
+
+import '../test-config';
 import { schema } from 'lovefield';
-import {
-  isValidPaperMnemonic,
-  unscramblePaperMnemonic
-} from './adaWallet';
 import { validateMnemonic } from 'bip39';
 import {
   getCryptoDaedalusWalletFromMnemonics,
-} from './lib/cardanoCrypto/cryptoWallet';
+} from './cryptoWallet';
+import {
+  isValidEnglishAdaPaperMnemonic,
+  unscramblePaperAdaMnemonic,
+} from './paperWallet';
 import {
   getAddressesKeys,
-} from './daedalusTransfer';
-import { RustModule } from './lib/cardanoCrypto/rustLoader';
+} from '../../daedalusTransfer';
+import { RustModule } from './rustLoader';
 import {
   silenceLogsForTesting,
-} from '../../utils/logging';
+} from '../../../../utils/logging';
 import {
   loadLovefieldDB,
-} from './lib/storage/database/index';
+} from '../storage/database/index';
 
 const VALID_DD_PAPER = {
   words: 'fire shaft radar three ginger receive result phrase song staff scorpion food undo will have expire nice uncle dune until lift unlock exist step world slush disagree',
@@ -40,22 +42,22 @@ beforeAll(async () => {
 });
 
 test('Is valid Daedalus paper mnemonic', async () => {
-  expect(isValidPaperMnemonic(VALID_DD_PAPER.words, 27)).toEqual(true);
-  expect(isValidPaperMnemonic(VALID_DD_PAPER.words, 30)).toEqual(false);
+  expect(isValidEnglishAdaPaperMnemonic(VALID_DD_PAPER.words, 27)).toEqual(true);
+  expect(isValidEnglishAdaPaperMnemonic(VALID_DD_PAPER.words, 30)).toEqual(false);
   // Note: expect these to print error to console
-  expect(isValidPaperMnemonic(INVALID_DD_PAPER_1, 27)).toEqual(false);
-  expect(isValidPaperMnemonic(INVALID_DD_PAPER_2, 27)).toEqual(false);
+  expect(isValidEnglishAdaPaperMnemonic(INVALID_DD_PAPER_1, 27)).toEqual(false);
+  expect(isValidEnglishAdaPaperMnemonic(INVALID_DD_PAPER_2, 27)).toEqual(false);
 });
 
 test('Unscramble Daedalus paper produces 12 valid words', async () => {
-  const [words, count] = unscramblePaperMnemonic(VALID_DD_PAPER.words, 27);
+  const [words, count] = unscramblePaperAdaMnemonic(VALID_DD_PAPER.words, 27);
   expect(count).toEqual(12);
   if (words == null) throw new Error('failed to unscramble in test');
   expect(validateMnemonic(words)).toEqual(true);
 });
 
 test('Unscramble Daedalus paper matches expected address', async () => {
-  const [words] = unscramblePaperMnemonic(VALID_DD_PAPER.words, 27);
+  const [words] = unscramblePaperAdaMnemonic(VALID_DD_PAPER.words, 27);
   expect(words).toBeTruthy();
   if (words != null) {
     const daedalusWallet = getCryptoDaedalusWalletFromMnemonics(words);
