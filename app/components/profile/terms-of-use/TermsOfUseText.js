@@ -7,7 +7,7 @@ import classNames from 'classnames';
 
 type Props = {|
   localizedTermsOfUse: string,
-  fixedHeight?: bool,
+  fixedHeight?: boolean,
 |};
 
 @observer
@@ -19,7 +19,7 @@ export default class TermsOfUseText extends Component<Props> {
   render() {
     const termsClassNames = classNames([
       styles.terms,
-      this.props.fixedHeight != null ? styles.fixedHeight : null,
+      this.props.fixedHeight === true ? styles.fixedHeight : null,
     ]);
 
     return (
