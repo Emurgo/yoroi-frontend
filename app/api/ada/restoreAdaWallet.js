@@ -45,6 +45,22 @@ export function v2genAddressBatchFunc(
   };
 }
 
+export function v3genAddressBatchFunc(
+  addressChain: RustModule.WalletV3.Bip32PublicKey,
+): GenerateAddressFunc {
+  return (
+    indices: Array<number>
+  ) => {
+    return indices.map(i => {
+      const addressKey = addressChain.derive(i).to_raw_key();
+      // recall: no canonical string representation of an address in Rust
+      // so instead we send the payment key
+      const asHex = Buffer.from(addressKey.as_bytes()).toString('hex');
+      return asHex;
+    });
+  };
+}
+
 
 export async function scanChain(request: {|
   generateAddressFunc: GenerateAddressFunc,
@@ -52,6 +68,7 @@ export async function scanChain(request: {|
   checkAddressesInUse: FilterFunc,
   hashToIds: HashToIdsFunc,
 |}): Promise<TreeInsert<{ AddressId: number }>> {
+  // TODO: this is made for v2 addresses. We can avoid this entirely for v3
   const addresses = await discoverAllAddressesFrom(
     request.generateAddressFunc,
     request.lastUsedIndex,
