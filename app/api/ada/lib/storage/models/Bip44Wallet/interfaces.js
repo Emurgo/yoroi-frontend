@@ -56,7 +56,6 @@ export interface IBip44Wallet {
   getPublicDeriverLevel(): number;
   getSigningLevel(): number | null;
   getPrivateDeriverLevel(): number | null;
-  getVersion(): number;
   getProtocolMagic(): number;
 }
 

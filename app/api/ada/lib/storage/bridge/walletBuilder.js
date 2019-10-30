@@ -252,7 +252,6 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
             this.txHolder.tx,
             { DerivePublicFromPrivate },
             finalData.bip44WrapperRow.Bip44WrapperId,
-            finalData.bip44WrapperRow.Version,
             request(finalData),
           )
         ];

@@ -43,7 +43,7 @@ import type {
 import {
   rawGetBip44AddressesByPath,
   getBalanceForUtxos,
-  normalizeToPubDeriverLevel,
+  normalizeBip32Ed25519ToPubDeriverLevel,
   rawChangePassword,
   decryptKey,
   rawGenHashToIdsFunc,
@@ -758,11 +758,10 @@ const GetSigningKeyMixin = (
       }
       return derivation.Index;
     });
-    return normalizeToPubDeriverLevel({
+    return normalizeBip32Ed25519ToPubDeriverLevel({
       privateKeyRow: body.row,
       password: body.password,
       path: indexPath,
-      version: this.getBip44Parent().getVersion(),
     });
   }
 };
@@ -1483,7 +1482,6 @@ const ScanUtxoAccountAddressesMixin = (
       { addressesForChain: externalAddresses }
     );
     const newToInsert = await scanAccountByVersion({
-      version: this.getBip44Parent().getVersion(),
       accountPublicKey: decryptedKey,
       lastUsedInternal: nextUnusedInternal.index - 1,
       lastUsedExternal: nextUnusedExternal.index - 1,

@@ -111,31 +111,27 @@ export async function genTimeSinceGenesis(): Promise<TimeSinceGenesisRequestFunc
   };
 }
 
-export function normalizeToPubDeriverLevel(request: {
+export function normalizeBip32Ed25519ToPubDeriverLevel(request: {
   privateKeyRow: $ReadOnly<KeyRow>,
   password: null | string,
   path: Array<number>,
-  version: number,
 }): {
   prvKeyHex: string,
   pubKeyHex: string,
 } {
-  if (request.version === 2) {
-    const prvKey = decryptKey(
-      request.privateKeyRow,
-      request.password,
-    );
-    const wasmKey = RustModule.WalletV2.PrivateKey.from_hex(prvKey);
-    const newKey = deriveKeyV2(
-      wasmKey,
-      request.path,
-    );
-    return {
-      prvKeyHex: newKey.to_hex(),
-      pubKeyHex: newKey.public().to_hex()
-    };
-  }
-  throw new Error('normalizeToPubDeriverLevel Only v2 supported for now');
+  const prvKey = decryptKey(
+    request.privateKeyRow,
+    request.password,
+  );
+  const wasmKey = RustModule.WalletV2.PrivateKey.from_hex(prvKey);
+  const newKey = deriveKeyV2(
+    wasmKey,
+    request.path,
+  );
+  return {
+    prvKeyHex: newKey.to_hex(),
+    pubKeyHex: newKey.public().to_hex()
+  };
 }
 
 export function decryptKey(

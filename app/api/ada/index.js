@@ -1075,7 +1075,6 @@ export default class AdaApi {
       // and we need keep a globally unique index
       const foundAddresses = new Map<string, number>();
       const insertTree = await scanAccountByVersion({
-        version: 2,
         accountPublicKey: accountKey.key().public().to_hex(),
         lastUsedInternal: -1,
         lastUsedExternal: -1,

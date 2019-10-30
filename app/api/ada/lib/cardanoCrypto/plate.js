@@ -5,7 +5,7 @@
 
 import { RustModule } from './rustLoader';
 import type { GenerateAddressFunc } from '../adaAddressProcessing';
-import { genAddressBatchFunc } from '../../restoreAdaWallet';
+import { v2genAddressBatchFunc } from '../../restoreAdaWallet';
 import blakejs from 'blakejs';
 import crc32 from 'buffer-crc32';
 import type { WalletAccountNumberPlate } from '../storage/models/PublicDeriver/interfaces';
@@ -46,7 +46,8 @@ export const generateStandardPlate = (
   const accountPublic = account.public();
 
   return mnemonicsToAddresses(
-    genAddressBatchFunc(
+    // TODO: change to v3 addresses
+    v2genAddressBatchFunc(
       accountPublic.bip44_chain(false),
       protocolMagic,
     ),

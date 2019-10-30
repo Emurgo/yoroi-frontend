@@ -12,10 +12,8 @@ import type { lf$schema$Builder } from 'lovefield';
 
 export type Bip44WrapperInsert = {|
   ConceptualWalletId: number,
-  IsBundled: boolean,
   SignerLevel: number | null,
   PublicDeriverLevel: number,
-  Version: number,
 |};
 export type Bip44WrapperRow = {|
   Bip44WrapperId: number, // serial
@@ -29,10 +27,8 @@ export const Bip44WrapperSchema: {
   properties: {
     Bip44WrapperId: 'Bip44WrapperId',
     ConceptualWalletId: 'ConceptualWalletId',
-    IsBundled: 'IsBundled',
     SignerLevel: 'SignerLevel',
     PublicDeriverLevel: 'PublicDeriverLevel',
-    Version: 'Version',
   }
 };
 
@@ -218,16 +214,13 @@ export const Bip44ToPublicDeriverSchema: {
   }
 };
 
-/** Ensure we are only creating a single instance of the lovefield database */
 export const populateBip44Db = (schemaBuilder: lf$schema$Builder) => {
   // Bip44Wrapper Table
   schemaBuilder.createTable(Bip44WrapperSchema.name)
     .addColumn(Bip44WrapperSchema.properties.Bip44WrapperId, Type.INTEGER)
     .addColumn(Bip44WrapperSchema.properties.ConceptualWalletId, Type.INTEGER)
-    .addColumn(Bip44WrapperSchema.properties.IsBundled, Type.BOOLEAN)
     .addColumn(Bip44WrapperSchema.properties.SignerLevel, Type.INTEGER)
     .addColumn(Bip44WrapperSchema.properties.PublicDeriverLevel, Type.INTEGER)
-    .addColumn(Bip44WrapperSchema.properties.Version, Type.INTEGER)
     .addPrimaryKey(
       ([Bip44WrapperSchema.properties.Bip44WrapperId]: Array<string>),
       true
