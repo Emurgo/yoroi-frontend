@@ -172,10 +172,8 @@ export async function createStandardBip44Wallet(request: {
       .addBip44Wrapper(
         finalState => ({
           ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
-          IsBundled: false,
           SignerLevel: Bip44DerivationLevels.ROOT.level,
           PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
-          Version: 2,
         })
       )
       .addPrivateDeriver(
@@ -297,10 +295,8 @@ export async function createHardwareWallet(request: {
       .addBip44Wrapper(
         finalState => ({
           ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
-          IsBundled: false,
           SignerLevel: null,
           PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
-          Version: 2,
         })
       )
       .addAdhocPublicDeriver(
@@ -370,10 +366,8 @@ export async function migrateFromStorageV1(request: {
       .addBip44Wrapper(
         finalState => ({
           ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
-          IsBundled: false,
           SignerLevel: Bip44DerivationLevels.ROOT.level,
           PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
-          Version: 2,
         })
       );
     if (request.encryptedPk != null) {

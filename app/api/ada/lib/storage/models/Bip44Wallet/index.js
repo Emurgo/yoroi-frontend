@@ -46,7 +46,7 @@ import { UpdateGet, } from '../../database/primitives/api/write';
 
 import {
   rawChangePassword,
-  normalizeToPubDeriverLevel,
+  normalizeBip32Ed25519ToPubDeriverLevel,
   toKeyInsert,
 } from '../utils';
 
@@ -64,7 +64,6 @@ export class Bip44Wallet extends ConceptualWallet implements IBip44Wallet {
   #publicDeriverLevel: number;
   #signingLevel: number | null;
   #privateDeriverLevel: number | null;
-  #version: number;
   #protocolMagic: number;
 
   /**
@@ -80,7 +79,6 @@ export class Bip44Wallet extends ConceptualWallet implements IBip44Wallet {
     super(conceptualWalletCtorData);
     this.#bip44WrapperId = row.Bip44WrapperId;
     this.#publicDeriverLevel = row.PublicDeriverLevel;
-    this.#version = row.Version;
     this.#signingLevel = row.SignerLevel;
     this.#privateDeriverLevel = privateDeriverLevel;
     this.#protocolMagic = protocolMagic;
@@ -105,10 +103,6 @@ export class Bip44Wallet extends ConceptualWallet implements IBip44Wallet {
 
   getPrivateDeriverLevel(): number | null {
     return this.#privateDeriverLevel;
-  }
-
-  getVersion(): number {
-    return this.#version;
   }
 
   getProtocolMagic(): number {
@@ -192,7 +186,6 @@ export async function derivePublicDeriver<Row>(
   tx: lf$Transaction,
   deps: {| DerivePublicFromPrivate: Class<DerivePublicFromPrivate> |},
   bip44WrapperId: number,
-  version: number,
   body: IDerivePublicFromPrivateRequest,
 ): Promise<IDerivePublicFromPrivateResponse<Row>> {
   const result = await deps.DerivePublicFromPrivate.add<Row>(
@@ -203,11 +196,10 @@ export async function derivePublicDeriver<Row>(
       pathToPublic: body.pathToPublic,
     },
     (privateKeyRow: $ReadOnly<KeyRow>) => {
-      const newKeys = normalizeToPubDeriverLevel({
+      const newKeys = normalizeBip32Ed25519ToPubDeriverLevel({
         privateKeyRow,
         password: body.decryptPrivateDeriverPassword,
         path: body.pathToPublic.map(step => step.index),
-        version
       });
 
       const newPrivateKey = body.publicDeriverPrivateKey
@@ -249,7 +241,6 @@ const PublicFromPrivateMixin = (
       tx,
       { DerivePublicFromPrivate: deps.DerivePublicFromPrivate },
       super.getWrapperId(),
-      super.getVersion(),
       body,
     );
   }

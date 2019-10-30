@@ -476,10 +476,8 @@ Object {
     Object {
       "Bip44WrapperId": 1,
       "ConceptualWalletId": 1,
-      "IsBundled": false,
       "PublicDeriverLevel": 3,
       "SignerLevel": 0,
-      "Version": 2,
     },
   ],
   "Block": Array [],

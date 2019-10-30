@@ -25,7 +25,7 @@ import type { HashToIdsFunc, } from './lib/storage/models/utils';
 declare var CONFIG: ConfigType;
 const addressRequestSize = CONFIG.app.addressRequestSize;
 
-export function genAddressBatchFunc(
+export function v2genAddressBatchFunc(
   addressChain: RustModule.WalletV2.Bip44ChainPublic,
   protocolMagic: number,
 ): GenerateAddressFunc {
@@ -73,7 +73,6 @@ export async function scanChain(request: {|
 }
 
 export async function scanAccountByVersion(request: {
-  version: number,
   accountPublicKey: string,
   lastUsedInternal: number,
   lastUsedExternal: number,
@@ -81,30 +80,28 @@ export async function scanAccountByVersion(request: {
   hashToIds: HashToIdsFunc,
   protocolMagic: number,
 }): Promise<TreeInsert<{ DisplayCutoff: null | number }>> {
-  let insert;
-  if (request.version ===  2) {
-    const key = RustModule.WalletV2.Bip44AccountPublic.new(
-      RustModule.WalletV2.PublicKey.from_hex(request.accountPublicKey),
-      RustModule.WalletV2.DerivationScheme.v2()
-    );
-    insert = await scanAccount({
-      generateInternalAddresses: genAddressBatchFunc(
-        key.bip44_chain(false),
-        request.protocolMagic,
-      ),
-      generateExternalAddresses: genAddressBatchFunc(
-        key.bip44_chain(true),
-        request.protocolMagic,
-      ),
-      lastUsedInternal: request.lastUsedInternal,
-      lastUsedExternal: request.lastUsedExternal,
-      checkAddressesInUse: request.checkAddressesInUse,
-      hashToIds: request.hashToIds,
-      protocolMagic: request.protocolMagic,
-    });
-  } else {
-    throw new Error('scanAccountByVersion unexpected version');
-  }
+  // TODO: needs to change depending on v2/v3
+  const genAddressBatchFunc = v2genAddressBatchFunc;
+
+  const key = RustModule.WalletV2.Bip44AccountPublic.new(
+    RustModule.WalletV2.PublicKey.from_hex(request.accountPublicKey),
+    RustModule.WalletV2.DerivationScheme.v2()
+  );
+  const insert = await scanAccount({
+    generateInternalAddresses: genAddressBatchFunc(
+      key.bip44_chain(false),
+      request.protocolMagic,
+    ),
+    generateExternalAddresses: genAddressBatchFunc(
+      key.bip44_chain(true),
+      request.protocolMagic,
+    ),
+    lastUsedInternal: request.lastUsedInternal,
+    lastUsedExternal: request.lastUsedExternal,
+    checkAddressesInUse: request.checkAddressesInUse,
+    hashToIds: request.hashToIds,
+    protocolMagic: request.protocolMagic,
+  });
   return insert;
 }
 export async function scanAccount(request: {|
