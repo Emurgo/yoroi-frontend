@@ -2,7 +2,7 @@
 
 import { Type } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
-import { KeyDerivationSchema } from '../primitives/tables';
+import { KeyDerivationSchema } from '../../primitives/tables';
 
 export type ConceptualWalletInsert = {|
   CoinType: number,

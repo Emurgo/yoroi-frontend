@@ -7,7 +7,6 @@ import type {
 
 import type {
   Bip44WrapperRow,
-  PrivateDeriverRow,
   Bip44ToPublicDeriverRow,
 } from '../tables';
 import * as Tables from '../tables';
@@ -19,19 +18,12 @@ import {
 import {
   getRowIn,
   getRowFromKey,
-  StaleStateError,
 } from '../../../utils';
-
-import type {
-  KeyRow,
-  KeyDerivationRow,
-} from '../../../primitives/tables';
 import {
   KeyDerivationSchema,
 } from '../../../primitives/tables';
-import { PublicDeriverSchema } from '../../../wallet/tables';
-import type { PublicDeriverRow } from '../../../wallet/tables';
-import { GetKeyForDerivation } from '../../../primitives/api/read';
+import { PublicDeriverSchema, } from '../../core/tables';
+import type { PublicDeriverRow, } from '../../core/tables';
 
 export class GetBip44DerivationSpecific {
   static ownTables = Object.freeze({
@@ -59,64 +51,23 @@ export class GetBip44DerivationSpecific {
   }
 }
 
-export class GetPrivateDeriver {
+export class GetBip44Wrapper {
   static ownTables = Object.freeze({
-    [Tables.PrivateDeriverSchema.name]: Tables.PrivateDeriverSchema,
+    [Tables.Bip44WrapperSchema.name]: Tables.Bip44WrapperSchema,
   });
   static depTables = Object.freeze({});
-
-  static async fromBip44Wrapper(
-    db: lf$Database,
-    tx: lf$Transaction,
-    key: number,
-  ): Promise<$ReadOnly<PrivateDeriverRow> | void> {
-    return await getRowFromKey<PrivateDeriverRow>(
-      db, tx,
-      key,
-      GetPrivateDeriver.ownTables[Tables.PrivateDeriverSchema.name].name,
-      GetPrivateDeriver.ownTables[Tables.PrivateDeriverSchema.name].properties.Bip44WrapperId,
-    );
-  }
-}
-
-export class GetKeyForPrivateDeriver {
-  static ownTables = Object.freeze({});
-  static depTables = Object.freeze({
-    GetKeyForDerivation,
-    GetPrivateDeriver,
-  });
 
   static async get(
     db: lf$Database,
     tx: lf$Transaction,
-    bip44WrapperId: number,
-    getPublic: boolean,
-    getPrivate: boolean,
-  ): Promise<{
-    PrivateDeriver: $ReadOnly<PrivateDeriverRow>,
-    KeyDerivation: $ReadOnly<KeyDerivationRow>,
-    publicKey: $ReadOnly<KeyRow> | null | void,
-    privateKey: $ReadOnly<KeyRow> | null | void,
-  }> {
-    const result = await GetKeyForPrivateDeriver.depTables.GetPrivateDeriver.fromBip44Wrapper(
+    key: number,
+  ): Promise<$ReadOnly<Bip44WrapperRow> | void> {
+    return await getRowFromKey<Bip44WrapperRow>(
       db, tx,
-      bip44WrapperId,
+      key,
+      GetBip44Wrapper.ownTables[Tables.Bip44WrapperSchema.name].name,
+      GetBip44Wrapper.ownTables[Tables.Bip44WrapperSchema.name].properties.Bip44WrapperId,
     );
-    if (result === undefined) {
-      throw new StaleStateError('GetKeyForPrivateDeriver::get GetPrivateDeriver');
-    }
-
-    const derivationAndKey = await GetKeyForPrivateDeriver.depTables.GetKeyForDerivation.get(
-      db, tx,
-      result.KeyDerivationId,
-      getPublic,
-      getPrivate,
-    );
-
-    return {
-      ...derivationAndKey,
-      PrivateDeriver: result,
-    };
   }
 }
 

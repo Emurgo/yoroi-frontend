@@ -34,15 +34,11 @@ import {
   DerivePublicFromPrivate, AddAdhocPublicDeriver,
 } from '../../database/walletTypes/bip44/api/write';
 import type {
-  PrivateDeriverRow,
   Bip44WrapperRow,
 } from '../../database/walletTypes/bip44/tables';
-import {
-  GetPrivateDeriver,
-  GetKeyForPrivateDeriver
-} from '../../database/walletTypes/bip44/api/read';
 import type { KeyRow } from '../../database/primitives/tables';
 import { UpdateGet, } from '../../database/primitives/api/write';
+import { GetKeyForDerivation, } from '../../database/primitives/api/read';
 
 import {
   rawChangePassword,
@@ -64,6 +60,7 @@ export class Bip44Wallet extends ConceptualWallet implements IBip44Wallet {
   #publicDeriverLevel: number;
   #signingLevel: number | null;
   #privateDeriverLevel: number | null;
+  #privateDeriverKeyDerivationId: number | null;
   #protocolMagic: number;
 
   /**
@@ -74,6 +71,7 @@ export class Bip44Wallet extends ConceptualWallet implements IBip44Wallet {
     conceptualWalletCtorData: IConceptualWalletConstructor,
     row: $ReadOnly<Bip44WrapperRow>,
     privateDeriverLevel: number | null,
+    privateDeriverKeyDerivationId: number | null,
     protocolMagic: number,
   ): Bip44Wallet {
     super(conceptualWalletCtorData);
@@ -81,6 +79,7 @@ export class Bip44Wallet extends ConceptualWallet implements IBip44Wallet {
     this.#publicDeriverLevel = row.PublicDeriverLevel;
     this.#signingLevel = row.SignerLevel;
     this.#privateDeriverLevel = privateDeriverLevel;
+    this.#privateDeriverKeyDerivationId = privateDeriverKeyDerivationId;
     this.#protocolMagic = protocolMagic;
     return this;
   }
@@ -103,6 +102,10 @@ export class Bip44Wallet extends ConceptualWallet implements IBip44Wallet {
 
   getPrivateDeriverLevel(): number | null {
     return this.#privateDeriverLevel;
+  }
+
+  getPrivateDeriverKeyDerivationId(): number | null {
+    return this.#privateDeriverKeyDerivationId;
   }
 
   getProtocolMagic(): number {
@@ -133,36 +136,15 @@ export async function refreshBip44WalletFunctionality(
   );
 
   let privateDeriverLevel = null;
+  let privateDeriverKeyDerivationId = null;
 
   let currClass = Bip44Wallet;
 
-  let privateDeriverRow;
-  {
-    const deps = Object.freeze({
-      GetPrivateDeriver,
-    });
-    const depTables = Object
-      .keys(deps)
-      .map(key => deps[key])
-      .flatMap(table => getAllSchemaTables(db, table));
-    privateDeriverRow = await raii<void | $ReadOnly<PrivateDeriverRow>>(
-      db,
-      depTables,
-      async tx => {
-        const privateDeriver = await deps.GetPrivateDeriver.fromBip44Wrapper(
-          db, tx,
-          row.Bip44WrapperId,
-        );
-
-        return privateDeriver;
-      }
-    );
-  }
-
-  if (privateDeriverRow !== undefined) {
+  if (row.PrivateDeriverLevel != null && row.PrivateDeriverKeyDerivationId != null) {
     currClass = PublicFromPrivate(currClass);
     currClass = GetPrivateDeriverKey(currClass);
-    privateDeriverLevel = privateDeriverRow.Level;
+    privateDeriverLevel = row.PrivateDeriverLevel;
+    privateDeriverKeyDerivationId = row.PrivateDeriverKeyDerivationId;
   } else {
     currClass = AdhocPublicDeriver(currClass);
   }
@@ -172,6 +154,7 @@ export async function refreshBip44WalletFunctionality(
     conceptualWalletCtorData,
     row,
     privateDeriverLevel,
+    privateDeriverKeyDerivationId,
     protocolMagic,
   );
   return instance;
@@ -288,12 +271,16 @@ const GetPrivateDeriverKeyMixin = (
 
   rawGetPrivateDeriverKey = async (
     tx: lf$Transaction,
-    deps: {| GetKeyForPrivateDeriver: Class<GetKeyForPrivateDeriver> |},
+    deps: {| GetKeyForDerivation: Class<GetKeyForDerivation> |},
     _body: IGetPrivateDeriverKeyRequest,
   ): Promise<IGetPrivateDeriverKeyResponse> => {
-    const result = await deps.GetKeyForPrivateDeriver.get(
+    const derivationId = super.getPrivateDeriverKeyDerivationId();
+    if (derivationId == null) {
+      throw new StaleStateError('GetPrivateDeriverKey::getPrivateDeriverKey derivationId=null');
+    }
+    const result = await deps.GetKeyForDerivation.get(
       super.getDb(), tx,
-      super.getWrapperId(),
+      derivationId,
       false,
       true,
     );
@@ -310,7 +297,7 @@ const GetPrivateDeriverKeyMixin = (
     body: IGetPrivateDeriverKeyRequest,
   ): Promise<IGetPrivateDeriverKeyResponse> => {
     const deps = Object.freeze({
-      GetKeyForPrivateDeriver,
+      GetKeyForDerivation,
     });
     const depTables = Object
       .keys(deps)
@@ -326,14 +313,14 @@ const GetPrivateDeriverKeyMixin = (
   rawChangePrivateDeriverPassword = async (
     tx: lf$Transaction,
     deps: {|
-      GetKeyForPrivateDeriver: Class<GetKeyForPrivateDeriver>,
+      GetKeyForDerivation: Class<GetKeyForDerivation>,
       UpdateGet: Class<UpdateGet>,
     |},
     body: IChangePasswordRequest,
   ): Promise<IChangePasswordResponse> => {
     const currentRow = await this.rawGetPrivateDeriverKey(
       tx,
-      { GetKeyForPrivateDeriver: deps.GetKeyForPrivateDeriver },
+      { GetKeyForDerivation: deps.GetKeyForDerivation },
       undefined,
     );
     return rawChangePassword(
@@ -349,7 +336,7 @@ const GetPrivateDeriverKeyMixin = (
     body: IChangePasswordRequest,
   ): Promise<IChangePasswordResponse> => {
     const deps = Object.freeze({
-      GetKeyForPrivateDeriver,
+      GetKeyForDerivation,
       UpdateGet
     });
     const depTables = Object

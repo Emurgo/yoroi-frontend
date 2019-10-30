@@ -19,7 +19,7 @@ import {
   GetOrAddAddress,
 } from '../database/primitives/api/write';
 import type { KeyInsert } from '../database/primitives/tables';
-import type { HWFeatures, } from '../database/wallet/tables';
+import type { HWFeatures, } from '../database/walletTypes/core/tables';
 
 import { WalletBuilder } from './walletBuilder';
 
@@ -41,6 +41,7 @@ import type {
   HasPublicDeriver,
 } from './walletBuilder';
 
+// TODO: maybe move this inside walletBuilder somehow so it's all done in the same transaction
 export async function getAccountDefaultDerivations(
   settings: RustModule.WalletV2.BlockchainSettings,
   accountPublicKey: RustModule.WalletV2.Bip44AccountPublic,
@@ -159,6 +160,7 @@ export async function createStandardBip44Wallet(request: {
     }
   );
 
+  const pathToPrivate = []; // private deriver level === root level
   let state;
   {
     state = await WalletBuilder
@@ -169,17 +171,9 @@ export async function createStandardBip44Wallet(request: {
           Name: request.walletName,
         })
       )
-      .addBip44Wrapper(
-        finalState => ({
-          ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
-          SignerLevel: Bip44DerivationLevels.ROOT.level,
-          PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
-        })
-      )
       .addPrivateDeriver(
-        finalState => ({
-          // private deriver level === root level
-          pathToPrivate: [],
+        _finalState => ({
+          pathToPrivate,
           addLevelRequest: parent => ({
             privateKeyInfo: {
               Hash: encryptedRoot,
@@ -197,11 +191,15 @@ export async function createStandardBip44Wallet(request: {
               KeyDerivationId: id,
             })
           }),
-          addPrivateDeriverRequest: derivationId => ({
-            Bip44WrapperId: finalState.bip44WrapperRow.Bip44WrapperId,
-            KeyDerivationId: derivationId,
-            Level: Bip44DerivationLevels.ROOT.level,
-          }),
+        })
+      )
+      .addBip44Wrapper(
+        finalState => ({
+          ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
+          SignerLevel: Bip44DerivationLevels.ROOT.level,
+          PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
+          PrivateDeriverKeyDerivationId: finalState.privateDeriver.KeyDerivation.KeyDerivationId,
+          PrivateDeriverLevel: pathToPrivate.length,
         })
       )
       .derivePublicDeriver(
@@ -297,6 +295,8 @@ export async function createHardwareWallet(request: {
           ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
           SignerLevel: null,
           PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
+          PrivateDeriverKeyDerivationId: null,
+          PrivateDeriverLevel: null,
         })
       )
       .addAdhocPublicDeriver(
@@ -354,7 +354,8 @@ export async function migrateFromStorageV1(request: {
   walletName: string,
   hwWalletMetaInsert: void | HWFeatures,
 }): Promise<void> {
-  {
+  // hardware wallet
+  if (request.encryptedPk == null) {
     let builder = WalletBuilder
       .start(request.db)
       .addConceptualWallet(
@@ -368,14 +369,33 @@ export async function migrateFromStorageV1(request: {
           ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
           SignerLevel: Bip44DerivationLevels.ROOT.level,
           PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
+          PrivateDeriverKeyDerivationId: null,
+          PrivateDeriverLevel: null,
         })
       );
-    if (request.encryptedPk != null) {
-      const encryptedPk = request.encryptedPk;
-      builder = builder.addPrivateDeriver(
-        finalState => ({
-          // private deriver level === root level
-          pathToPrivate: [],
+    builder = await addPublicDeriverToMigratedWallet({
+      builder,
+      db: request.db,
+      accountPubKey: request.accountPubKey,
+      settings: request.settings,
+      displayCutoff: request.displayCutoff,
+      hwWalletMetaInsert: request.hwWalletMetaInsert,
+    });
+    await builder.commit();
+  } else {
+    const pathToPrivate = []; // private deriver level === root level
+    const encryptedPk = request.encryptedPk;
+    let builder = WalletBuilder
+      .start(request.db)
+      .addConceptualWallet(
+        _finalState => ({
+          CoinType: CARDANO_COINTYPE,
+          Name: request.walletName,
+        })
+      )
+      .addPrivateDeriver(
+        _finalState => ({
+          pathToPrivate,
           addLevelRequest: parent => ({
             privateKeyInfo: encryptedPk,
             publicKeyInfo: null,
@@ -389,23 +409,17 @@ export async function migrateFromStorageV1(request: {
               KeyDerivationId: id,
             })
           }),
-          addPrivateDeriverRequest: derivationId => ({
-            Bip44WrapperId: finalState.bip44WrapperRow.Bip44WrapperId,
-            KeyDerivationId: derivationId,
-            Level: Bip44DerivationLevels.ROOT.level,
-          }),
+        })
+      )
+      .addBip44Wrapper(
+        finalState => ({
+          ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
+          SignerLevel: Bip44DerivationLevels.ROOT.level,
+          PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
+          PrivateDeriverKeyDerivationId: finalState.privateDeriver.KeyDerivation.KeyDerivationId,
+          PrivateDeriverLevel: pathToPrivate.length
         })
       );
-      builder = await addPublicDeriverToMigratedWallet({
-        builder,
-        db: request.db,
-        accountPubKey: request.accountPubKey,
-        settings: request.settings,
-        displayCutoff: request.displayCutoff,
-        hwWalletMetaInsert: request.hwWalletMetaInsert,
-      });
-      return await builder.commit();
-    }
     builder = await addPublicDeriverToMigratedWallet({
       builder,
       db: request.db,
@@ -414,9 +428,10 @@ export async function migrateFromStorageV1(request: {
       displayCutoff: request.displayCutoff,
       hwWalletMetaInsert: request.hwWalletMetaInsert,
     });
-    await builder.commit();
+    return await builder.commit();
   }
 }
+
 async function addPublicDeriverToMigratedWallet<
   T: $Shape<{||}> & HasConceptualWallet & HasBip44Wrapper
 >(request: {
@@ -487,6 +502,8 @@ async function addPublicDeriverToMigratedWallet<
     insert: {},
   }];
 
+  // We need to add ad-hoc even in the derived case
+  // because during migration, the private key is encrypted (can't derive with it)
   return request.builder
     .addAdhocPublicDeriver(
       finalState => {
@@ -494,7 +511,7 @@ async function addPublicDeriverToMigratedWallet<
         const maybePrivateDeriver = ((finalState: any): WithNullableFields<HasPrivateDeriver>);
         const privateDeriverKeyDerivationId = maybePrivateDeriver.privateDeriver == null
           ? null
-          : maybePrivateDeriver.privateDeriver.privateDeriverResult.KeyDerivationId;
+          : maybePrivateDeriver.privateDeriver.KeyDerivation.KeyDerivationId;
         return {
           bip44WrapperId: finalState.bip44WrapperRow.Bip44WrapperId,
           publicKey: {

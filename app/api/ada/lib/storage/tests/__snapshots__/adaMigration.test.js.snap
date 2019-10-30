@@ -25,36 +25,22 @@ Array [
     ],
   },
   Object {
-    "Bip44CoinType": Array [
-      Object {
-        "Bip44CoinTypeId": 1,
-        "KeyDerivationId": 3,
-      },
-    ],
-  },
-  Object {
-    "Bip44Purpose": Array [
-      Object {
-        "Bip44PurposeId": 1,
-        "KeyDerivationId": 2,
-      },
-    ],
-  },
-  Object {
-    "Bip44Root": Array [
-      Object {
-        "Bip44RootId": 1,
-        "KeyDerivationId": 1,
-      },
-    ],
-  },
-  Object {
     "Bip44Wrapper": Array [
       Object {
         "Bip44WrapperId": 1,
         "ConceptualWalletId": 1,
+        "PrivateDeriverKeyDerivationId": null,
+        "PrivateDeriverLevel": null,
         "PublicDeriverLevel": 3,
         "SignerLevel": 0,
+      },
+    ],
+  },
+  Object {
+    "CoinTypeDerivation": Array [
+      Object {
+        "CoinTypeDerivationId": 1,
+        "KeyDerivationId": 3,
       },
     ],
   },
@@ -419,6 +405,22 @@ Array [
       },
     ],
   },
+  Object {
+    "PurposeDerivation": Array [
+      Object {
+        "KeyDerivationId": 2,
+        "PurposeDerivationId": 1,
+      },
+    ],
+  },
+  Object {
+    "RootDerivation": Array [
+      Object {
+        "KeyDerivationId": 1,
+        "RootDerivationId": 1,
+      },
+    ],
+  },
 ]
 `;
 
@@ -447,36 +449,22 @@ Array [
     ],
   },
   Object {
-    "Bip44CoinType": Array [
-      Object {
-        "Bip44CoinTypeId": 1,
-        "KeyDerivationId": 3,
-      },
-    ],
-  },
-  Object {
-    "Bip44Purpose": Array [
-      Object {
-        "Bip44PurposeId": 1,
-        "KeyDerivationId": 2,
-      },
-    ],
-  },
-  Object {
-    "Bip44Root": Array [
-      Object {
-        "Bip44RootId": 1,
-        "KeyDerivationId": 1,
-      },
-    ],
-  },
-  Object {
     "Bip44Wrapper": Array [
       Object {
         "Bip44WrapperId": 1,
         "ConceptualWalletId": 1,
+        "PrivateDeriverKeyDerivationId": 1,
+        "PrivateDeriverLevel": 0,
         "PublicDeriverLevel": 3,
         "SignerLevel": 0,
+      },
+    ],
+  },
+  Object {
+    "CoinTypeDerivation": Array [
+      Object {
+        "CoinTypeDerivationId": 1,
+        "KeyDerivationId": 3,
       },
     ],
   },
@@ -834,6 +822,22 @@ Array [
       },
     ],
   },
+  Object {
+    "PurposeDerivation": Array [
+      Object {
+        "KeyDerivationId": 2,
+        "PurposeDerivationId": 1,
+      },
+    ],
+  },
+  Object {
+    "RootDerivation": Array [
+      Object {
+        "KeyDerivationId": 1,
+        "RootDerivationId": 1,
+      },
+    ],
+  },
 ]
 `;
 
@@ -862,36 +866,22 @@ Array [
     ],
   },
   Object {
-    "Bip44CoinType": Array [
-      Object {
-        "Bip44CoinTypeId": 1,
-        "KeyDerivationId": 3,
-      },
-    ],
-  },
-  Object {
-    "Bip44Purpose": Array [
-      Object {
-        "Bip44PurposeId": 1,
-        "KeyDerivationId": 2,
-      },
-    ],
-  },
-  Object {
-    "Bip44Root": Array [
-      Object {
-        "Bip44RootId": 1,
-        "KeyDerivationId": 1,
-      },
-    ],
-  },
-  Object {
     "Bip44Wrapper": Array [
       Object {
         "Bip44WrapperId": 1,
         "ConceptualWalletId": 1,
+        "PrivateDeriverKeyDerivationId": null,
+        "PrivateDeriverLevel": null,
         "PublicDeriverLevel": 3,
         "SignerLevel": 0,
+      },
+    ],
+  },
+  Object {
+    "CoinTypeDerivation": Array [
+      Object {
+        "CoinTypeDerivationId": 1,
+        "KeyDerivationId": 3,
       },
     ],
   },
@@ -1253,6 +1243,22 @@ Array [
         "Parent": 26,
         "PrivateKeyId": null,
         "PublicKeyId": null,
+      },
+    ],
+  },
+  Object {
+    "PurposeDerivation": Array [
+      Object {
+        "KeyDerivationId": 2,
+        "PurposeDerivationId": 1,
+      },
+    ],
+  },
+  Object {
+    "RootDerivation": Array [
+      Object {
+        "KeyDerivationId": 1,
+        "RootDerivationId": 1,
       },
     ],
   },

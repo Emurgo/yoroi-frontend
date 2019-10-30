@@ -440,24 +440,6 @@ Object {
       "KeyDerivationId": 49,
     },
   ],
-  "Bip44CoinType": Array [
-    Object {
-      "Bip44CoinTypeId": 1,
-      "KeyDerivationId": 3,
-    },
-  ],
-  "Bip44Purpose": Array [
-    Object {
-      "Bip44PurposeId": 1,
-      "KeyDerivationId": 2,
-    },
-  ],
-  "Bip44Root": Array [
-    Object {
-      "Bip44RootId": 1,
-      "KeyDerivationId": 1,
-    },
-  ],
   "Bip44ToPublicDeriver": Array [
     Object {
       "Bip44ToPublicDeriverId": 1,
@@ -476,11 +458,19 @@ Object {
     Object {
       "Bip44WrapperId": 1,
       "ConceptualWalletId": 1,
+      "PrivateDeriverKeyDerivationId": 1,
+      "PrivateDeriverLevel": 0,
       "PublicDeriverLevel": 3,
       "SignerLevel": 0,
     },
   ],
   "Block": Array [],
+  "CoinTypeDerivation": Array [
+    Object {
+      "CoinTypeDerivationId": 1,
+      "KeyDerivationId": 3,
+    },
+  ],
   "ConceptualWallet": Array [
     Object {
       "CoinType": 2147485463,
@@ -884,14 +874,6 @@ Object {
       "Time": null,
     },
   ],
-  "PrivateDeriver": Array [
-    Object {
-      "Bip44WrapperId": 1,
-      "KeyDerivationId": 1,
-      "Level": 0,
-      "PrivateDeriverId": 1,
-    },
-  ],
   "PublicDeriver": Array [
     Object {
       "KeyDerivationId": 4,
@@ -904,6 +886,18 @@ Object {
       "LastSyncInfoId": 2,
       "Name": "Checking account",
       "PublicDeriverId": 2,
+    },
+  ],
+  "PurposeDerivation": Array [
+    Object {
+      "KeyDerivationId": 2,
+      "PurposeDerivationId": 1,
+    },
+  ],
+  "RootDerivation": Array [
+    Object {
+      "KeyDerivationId": 1,
+      "RootDerivationId": 1,
     },
   ],
   "Transaction": Array [],

@@ -17,7 +17,7 @@ import type {
 import type {
   Bip44AddressRow,
   AccountingDerivationRow,
-} from '../../database/walletTypes/bip44/tables';
+} from '../../database/walletTypes/common/tables';
 
 import {
   GetUtxoTxOutputsWithTx,
@@ -29,7 +29,7 @@ import type {
   KeyRow,
   KeyDerivationRow,
 } from '../../database/primitives/tables';
-import type { PublicDeriverRow, LastSyncInfoRow, } from '../../database/wallet/tables';
+import type { PublicDeriverRow, LastSyncInfoRow, } from '../../database/walletTypes/core/tables';
 
 import type {
   IChangePasswordRequestFunc, IChangePasswordRequest,
@@ -39,7 +39,7 @@ import {
   GetPublicDeriver,
   GetKeyForPublicDeriver,
   GetLastSyncForPublicDeriver,
-} from '../../database/wallet/api/read';
+} from '../../database/walletTypes/core/api/read';
 import {
   GetPathWithSpecific,
   GetDerivationsByPath,

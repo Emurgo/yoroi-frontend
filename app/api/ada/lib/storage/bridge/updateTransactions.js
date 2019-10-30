@@ -61,11 +61,11 @@ import {
   GetLastSyncForPublicDeriver,
   GetPublicDeriver,
   GetKeyForPublicDeriver,
-} from '../database/wallet/api/read';
+} from '../database/walletTypes/core/api/read';
 import { AddBip44Tree, ModifyDisplayCutoff, } from '../database/walletTypes/bip44/api/write';
 import { GetBip44DerivationSpecific, } from '../database/walletTypes/bip44/api/read';
-import { ModifyLastSyncInfo, } from '../database/wallet/api/write';
-import type { LastSyncInfoRow, } from '../database/wallet/tables';
+import { ModifyLastSyncInfo, } from '../database/walletTypes/core/api/write';
+import type { LastSyncInfoRow, } from '../database/walletTypes/core/tables';
 import type { DbTxIO, DbTxInChain } from '../database/transactionModels/multipart/tables';
 import {
   genToAbsoluteSlotNumber,

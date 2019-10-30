@@ -16,12 +16,13 @@ import { GetEncryptionMeta, } from './primitives/api/read';
 import { ModifyEncryptionMeta, } from './primitives/api/write';
 
 import { populatePrimitivesDb } from './primitives/tables';
+import { populateCommonDb } from './walletTypes/common/tables';
 import { populateBip44Db } from './walletTypes/bip44/tables';
 import { populateCip1852Db } from './walletTypes/cip1852/tables';
 import { populateUtxoTransactionsDb } from './transactionModels/utxo/tables';
 import { populateAccountingTransactionsDb } from './transactionModels/account/tables';
 import { populateMultipartTransactionsDb } from './transactionModels/multipart/tables';
-import { populateWalletDb } from './wallet/tables';
+import { populateWalletDb } from './walletTypes/core/tables';
 
 export const loadLovefieldDB = async (
   storeType: $Values<typeof schema.DataStoreType>
@@ -68,6 +69,7 @@ const populateAndCreate = async (
 
   populatePrimitivesDb(schemaBuilder);
   populateWalletDb(schemaBuilder);
+  populateCommonDb(schemaBuilder);
   populateBip44Db(schemaBuilder);
   populateCip1852Db(schemaBuilder);
   populateUtxoTransactionsDb(schemaBuilder);

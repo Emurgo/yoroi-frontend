@@ -23,7 +23,7 @@ import {
 import {
   Bip44Wallet,
 } from './lib/storage/models/Bip44Wallet';
-import type { HWFeatures, } from './lib/storage/database/wallet/tables';
+import type { HWFeatures, } from './lib/storage/database/walletTypes/core/tables';
 import {
   flattenInsertTree,
   Bip44DerivationLevels,

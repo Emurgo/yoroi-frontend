@@ -8,7 +8,7 @@ import LocalizableError from '../i18n/LocalizableError';
 import type { CreateHardwareWalletRequest, CreateHardwareWalletFunc } from '../api/ada';
 import type { StepStateEnum } from '../components/widgets/ProgressSteps';
 import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
-import type { HWFeatures } from '../api/ada/lib/storage/database/wallet/tables';
+import type { HWFeatures } from '../api/ada/lib/storage/database/walletTypes/core/tables';
 
 export const ProgressStep = Object.freeze({
   CHECK: 0,

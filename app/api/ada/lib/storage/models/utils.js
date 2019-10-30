@@ -57,7 +57,7 @@ import { Bip44DerivationLevels } from '../database/walletTypes/bip44/api/utils';
 import type { GetPathWithSpecificByTreeRequest } from '../database/primitives/api/read';
 import type {
   Bip44AddressRow,
-} from '../database/walletTypes/bip44/tables';
+} from '../database/walletTypes/common/tables';
 import {
   GetUtxoTxOutputsWithTx,
 } from '../database/transactionModels/utxo/api/read';

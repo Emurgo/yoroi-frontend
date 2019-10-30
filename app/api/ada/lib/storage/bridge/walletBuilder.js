@@ -11,10 +11,10 @@ import type {
 import type {
   ConceptualWalletInsert,
   PublicDeriverRow,
-} from '../database/wallet/tables';
+} from '../database/walletTypes/core/tables';
 import {
   ModifyConceptualWallet,
-} from '../database/wallet/api/write';
+} from '../database/walletTypes/core/api/write';
 import type {
   Bip44WrapperInsert,
 } from '../database/walletTypes/bip44/tables';
@@ -190,13 +190,13 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
 
   addPrivateDeriver: StateConstraint<
     CurrentState,
-    HasBip44Wrapper,
+    HasConceptualWallet,
     CurrentState => PrivateDeriverRequest<mixed>,
     CurrentState & HasPrivateDeriver
   > = <Insert>(
     insert: CurrentState => PrivateDeriverRequest<Insert>,
   ) => {
-    return this.updateData<HasBip44Wrapper, HasPrivateDeriver>(
+    return this.updateData<HasConceptualWallet, HasPrivateDeriver>(
       AsNotNull<HasPrivateDeriver>({ privateDeriver: null }),
       Array.from(getAllTables(AddPrivateDeriver)),
       async (finalData) => {
