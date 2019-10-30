@@ -28,7 +28,6 @@ export const Bip44WrapperSchema: {
     ConceptualWalletId: 'ConceptualWalletId',
     SignerLevel: 'SignerLevel',
     PublicDeriverLevel: 'PublicDeriverLevel',
-    // TODO: remove A prefix after refactoring
     PrivateDeriverLevel: 'PrivateDeriverLevel',
     PrivateDeriverKeyDerivationId: 'PrivateDeriverKeyDerivationId',
   }

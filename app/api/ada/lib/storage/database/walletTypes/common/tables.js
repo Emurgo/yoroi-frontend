@@ -7,54 +7,54 @@ import {
 import { Type } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 
-export type Bip44RootInsert = {|
+export type RootDerivationInsert = {|
   KeyDerivationId: number,
 |};
-export type Bip44RootRow = {|
-  Bip44RootId: number,
-  ...Bip44RootInsert,
+export type RootDerivationRow = {|
+  RootDerivationId: number,
+  ...RootDerivationInsert,
 |};
-export const Bip44RootSchema: {
-  +name: 'Bip44Root',
-  properties: $ObjMapi<Bip44RootRow, ToSchemaProp>
+export const RootDerivationSchema: {
+  +name: 'RootDerivation',
+  properties: $ObjMapi<RootDerivationRow, ToSchemaProp>
 } = {
-  name: 'Bip44Root',
+  name: 'RootDerivation',
   properties: {
-    Bip44RootId: 'Bip44RootId',
+    RootDerivationId: 'RootDerivationId',
     KeyDerivationId: 'KeyDerivationId',
   }
 };
-export type Bip44PurposeInsert = {|
+export type PurposeDerivationInsert = {|
   KeyDerivationId: number,
 |};
-export type Bip44PurposeRow = {|
-  Bip44PurposeId: number,
-  ...Bip44PurposeInsert,
+export type PurposeDerivationRow = {|
+  PurposeDerivationId: number,
+  ...PurposeDerivationInsert,
 |};
-export const Bip44PurposeSchema: {
-  +name: 'Bip44Purpose',
-  properties: $ObjMapi<Bip44PurposeRow, ToSchemaProp>
+export const PurposeDerivationSchema: {
+  +name: 'PurposeDerivation',
+  properties: $ObjMapi<PurposeDerivationRow, ToSchemaProp>
 } = {
-  name: 'Bip44Purpose',
+  name: 'PurposeDerivation',
   properties: {
-    Bip44PurposeId: 'Bip44PurposeId',
+    PurposeDerivationId: 'PurposeDerivationId',
     KeyDerivationId: 'KeyDerivationId',
   }
 };
-export type Bip44CoinTypeInsert = {|
+export type CoinTypeDerivationInsert = {|
   KeyDerivationId: number,
 |};
-export type Bip44CoinTypeRow = {|
-  Bip44CoinTypeId: number,
-  ...Bip44CoinTypeInsert,
+export type CoinTypeDerivationRow = {|
+  CoinTypeDerivationId: number,
+  ...CoinTypeDerivationInsert,
 |};
-export const Bip44CoinTypeSchema: {
-  +name:'Bip44CoinType',
-  properties: $ObjMapi<Bip44CoinTypeRow, ToSchemaProp>
+export const CoinTypeDerivationSchema: {
+  +name:'CoinTypeDerivation',
+  properties: $ObjMapi<CoinTypeDerivationRow, ToSchemaProp>
 } = {
-  name: 'Bip44CoinType',
+  name: 'CoinTypeDerivation',
   properties: {
-    Bip44CoinTypeId: 'Bip44CoinTypeId',
+    CoinTypeDerivationId: 'CoinTypeDerivationId',
     KeyDerivationId: 'KeyDerivationId',
   }
 };
@@ -146,40 +146,40 @@ export const AccountingDerivationSchema: {
 };
 
 export const populateCommonDb = (schemaBuilder: lf$schema$Builder) => {
-  // Bip44Root
-  schemaBuilder.createTable(Bip44RootSchema.name)
-    .addColumn(Bip44RootSchema.properties.Bip44RootId, Type.INTEGER)
-    .addColumn(Bip44RootSchema.properties.KeyDerivationId, Type.INTEGER)
+  // RootDerivation
+  schemaBuilder.createTable(RootDerivationSchema.name)
+    .addColumn(RootDerivationSchema.properties.RootDerivationId, Type.INTEGER)
+    .addColumn(RootDerivationSchema.properties.KeyDerivationId, Type.INTEGER)
     .addPrimaryKey(
-      ([Bip44RootSchema.properties.Bip44RootId]: Array<string>),
+      ([RootDerivationSchema.properties.RootDerivationId]: Array<string>),
       true
     )
-    .addForeignKey('Bip44Root_Bip44Derivation', {
-      local: Bip44RootSchema.properties.KeyDerivationId,
+    .addForeignKey('RootDerivation_Bip44Derivation', {
+      local: RootDerivationSchema.properties.KeyDerivationId,
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`
     });
-  // Bip44Purpose
-  schemaBuilder.createTable(Bip44PurposeSchema.name)
-    .addColumn(Bip44PurposeSchema.properties.Bip44PurposeId, Type.INTEGER)
-    .addColumn(Bip44PurposeSchema.properties.KeyDerivationId, Type.INTEGER)
+  // PurposeDerivation
+  schemaBuilder.createTable(PurposeDerivationSchema.name)
+    .addColumn(PurposeDerivationSchema.properties.PurposeDerivationId, Type.INTEGER)
+    .addColumn(PurposeDerivationSchema.properties.KeyDerivationId, Type.INTEGER)
     .addPrimaryKey(
-      ([Bip44PurposeSchema.properties.Bip44PurposeId]: Array<string>),
+      ([PurposeDerivationSchema.properties.PurposeDerivationId]: Array<string>),
       true
     )
-    .addForeignKey('Bip44Purpose_Bip44Derivation', {
-      local: Bip44PurposeSchema.properties.KeyDerivationId,
+    .addForeignKey('PurposeDerivation_Bip44Derivation', {
+      local: PurposeDerivationSchema.properties.KeyDerivationId,
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`
     });
-  // Bip44CoinType
-  schemaBuilder.createTable(Bip44CoinTypeSchema.name)
-    .addColumn(Bip44CoinTypeSchema.properties.Bip44CoinTypeId, Type.INTEGER)
-    .addColumn(Bip44CoinTypeSchema.properties.KeyDerivationId, Type.INTEGER)
+  // CoinTypeDerivation
+  schemaBuilder.createTable(CoinTypeDerivationSchema.name)
+    .addColumn(CoinTypeDerivationSchema.properties.CoinTypeDerivationId, Type.INTEGER)
+    .addColumn(CoinTypeDerivationSchema.properties.KeyDerivationId, Type.INTEGER)
     .addPrimaryKey(
-      ([Bip44CoinTypeSchema.properties.Bip44CoinTypeId]: Array<string>),
+      ([CoinTypeDerivationSchema.properties.CoinTypeDerivationId]: Array<string>),
       true
     )
-    .addForeignKey('Bip44CoinType_Bip44Derivation', {
-      local: Bip44CoinTypeSchema.properties.KeyDerivationId,
+    .addForeignKey('CoinTypeDerivation_Bip44Derivation', {
+      local: CoinTypeDerivationSchema.properties.KeyDerivationId,
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`
     });
   // Bip44Account

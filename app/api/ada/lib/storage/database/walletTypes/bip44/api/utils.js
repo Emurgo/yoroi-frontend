@@ -1,9 +1,9 @@
 // @flow
 
 import {
-  Bip44RootSchema,
-  Bip44PurposeSchema,
-  Bip44CoinTypeSchema,
+  RootDerivationSchema,
+  PurposeDerivationSchema,
+  CoinTypeDerivationSchema,
   Bip44AccountSchema,
   Bip44ChainSchema,
   Bip44AddressSchema,
@@ -14,15 +14,15 @@ import type { TreeInsert, } from './write';
 export const Bip44DerivationLevels = Object.freeze({
   ROOT: {
     level: 0,
-    table: Bip44RootSchema,
+    table: RootDerivationSchema,
   },
   PURPOSE: {
     level: 1,
-    table: Bip44PurposeSchema,
+    table: PurposeDerivationSchema,
   },
   COIN_TYPE: {
     level: 2,
-    table: Bip44CoinTypeSchema,
+    table: CoinTypeDerivationSchema,
   },
   ACCOUNT: {
     level: 3,
@@ -53,9 +53,9 @@ export const Bip44TableMap = new Map<number, string>(
  * Since we cannot statically determine which level will be used, we just lock all tables.
  */
 export const allBip44DerivationTables = {
-  [Bip44RootSchema.name]: Bip44RootSchema,
-  [Bip44PurposeSchema.name]: Bip44PurposeSchema,
-  [Bip44CoinTypeSchema.name]: Bip44CoinTypeSchema,
+  [RootDerivationSchema.name]: RootDerivationSchema,
+  [PurposeDerivationSchema.name]: PurposeDerivationSchema,
+  [CoinTypeDerivationSchema.name]: CoinTypeDerivationSchema,
   [Bip44AccountSchema.name]: Bip44AccountSchema,
   [Bip44ChainSchema.name]: Bip44ChainSchema,
   [Bip44AddressSchema.name]: Bip44AddressSchema,

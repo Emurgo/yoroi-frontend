@@ -41,6 +41,7 @@ import type {
   HasPublicDeriver,
 } from './walletBuilder';
 
+// TODO: maybe move this inside walletBuilder somehow so it's all done in the same transaction
 export async function getAccountDefaultDerivations(
   settings: RustModule.WalletV2.BlockchainSettings,
   accountPublicKey: RustModule.WalletV2.Bip44AccountPublic,
