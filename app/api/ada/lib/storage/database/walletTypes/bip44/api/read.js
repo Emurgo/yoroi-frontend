@@ -7,9 +7,10 @@ import type {
 
 import type {
   Bip44WrapperRow,
-  PrivateDeriverRow,
   Bip44ToPublicDeriverRow,
 } from '../tables';
+import type { PrivateDeriverRow, } from '../../common/tables';
+import { PrivateDeriverSchema } from '../../common/tables';
 import * as Tables from '../tables';
 
 import {
@@ -29,8 +30,8 @@ import type {
 import {
   KeyDerivationSchema,
 } from '../../../primitives/tables';
-import { PublicDeriverSchema } from '../../../wallet/tables';
-import type { PublicDeriverRow } from '../../../wallet/tables';
+import { PublicDeriverSchema } from '../../core/tables';
+import type { PublicDeriverRow } from '../../core/tables';
 import { GetKeyForDerivation } from '../../../primitives/api/read';
 
 export class GetBip44DerivationSpecific {
@@ -59,9 +60,10 @@ export class GetBip44DerivationSpecific {
   }
 }
 
+// TODO: move to core
 export class GetPrivateDeriver {
   static ownTables = Object.freeze({
-    [Tables.PrivateDeriverSchema.name]: Tables.PrivateDeriverSchema,
+    [PrivateDeriverSchema.name]: PrivateDeriverSchema,
   });
   static depTables = Object.freeze({});
 
@@ -73,8 +75,8 @@ export class GetPrivateDeriver {
     return await getRowFromKey<PrivateDeriverRow>(
       db, tx,
       key,
-      GetPrivateDeriver.ownTables[Tables.PrivateDeriverSchema.name].name,
-      GetPrivateDeriver.ownTables[Tables.PrivateDeriverSchema.name].properties.Bip44WrapperId,
+      GetPrivateDeriver.ownTables[PrivateDeriverSchema.name].name,
+      GetPrivateDeriver.ownTables[PrivateDeriverSchema.name].properties.Bip44WrapperId,
     );
   }
 }

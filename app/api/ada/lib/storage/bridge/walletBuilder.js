@@ -11,10 +11,10 @@ import type {
 import type {
   ConceptualWalletInsert,
   PublicDeriverRow,
-} from '../database/wallet/tables';
+} from '../database/walletTypes/core/tables';
 import {
   ModifyConceptualWallet,
-} from '../database/wallet/api/write';
+} from '../database/walletTypes/core/api/write';
 import type {
   Bip44WrapperInsert,
 } from '../database/walletTypes/bip44/tables';

@@ -18,10 +18,10 @@ import type {
 
 import {
   addOrReplaceRow, addNewRowToTable,
-} from '../../utils';
-import type { KeyDerivationRow } from '../../primitives/tables';
-import type { AddDerivationRequest } from '../../primitives/api/write';
-import { AddDerivation } from '../../primitives/api/write';
+} from '../../../utils';
+import type { KeyDerivationRow } from '../../../primitives/tables';
+import type { AddDerivationRequest } from '../../../primitives/api/write';
+import { AddDerivation } from '../../../primitives/api/write';
 
 
 export class ModifyLastSyncInfo {

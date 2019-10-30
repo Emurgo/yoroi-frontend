@@ -3,7 +3,7 @@
 import type {
   lf$Database
 } from 'lovefield';
-import type { HwWalletMetaRow } from '../../database/wallet/tables';
+import type { HwWalletMetaRow } from '../../database/walletTypes/core/tables';
 
 export const WalletTypeOption = Object.freeze({
   WEB_WALLET: 0,

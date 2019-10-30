@@ -34,9 +34,11 @@ import {
   DerivePublicFromPrivate, AddAdhocPublicDeriver,
 } from '../../database/walletTypes/bip44/api/write';
 import type {
-  PrivateDeriverRow,
   Bip44WrapperRow,
 } from '../../database/walletTypes/bip44/tables';
+import type {
+  PrivateDeriverRow,
+} from '../../database/walletTypes/common/tables';
 import {
   GetPrivateDeriver,
   GetKeyForPrivateDeriver

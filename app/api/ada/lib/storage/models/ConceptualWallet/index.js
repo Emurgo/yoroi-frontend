@@ -18,9 +18,9 @@ import {
 import type {
   IRename, IRenameRequest, IRenameResponse,
 } from '../common/interfaces';
-import { ModifyConceptualWallet, } from '../../database/wallet/api/write';
-import type { HwWalletMetaRow, ConceptualWalletRow } from '../../database/wallet/tables';
-import { GetConceptualWallet, GetHwWalletMeta } from '../../database/wallet/api/read';
+import { ModifyConceptualWallet, } from '../../database/walletTypes/core/api/write';
+import type { HwWalletMetaRow, ConceptualWalletRow } from '../../database/walletTypes/core/tables';
+import { GetConceptualWallet, GetHwWalletMeta } from '../../database/walletTypes/core/api/read';
 import Config from '../../../../../../config';
 
 /** Snapshot of a ConceptualWallet in the database */

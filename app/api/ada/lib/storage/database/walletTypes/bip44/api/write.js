@@ -9,13 +9,20 @@ import {
 } from 'lovefield';
 
 import type {
-  PrivateDeriverInsert, PrivateDeriverRow,
   Bip44WrapperInsert, Bip44WrapperRow,
-  Bip44ChainRow,
-  Bip44AddressRow,
   Bip44ToPublicDeriverInsert, Bip44ToPublicDeriverRow,
 } from '../tables';
+import type {
+  PrivateDeriverInsert, PrivateDeriverRow,
+  Bip44ChainRow,
+  Bip44AddressRow,
+} from '../../common/tables';
 import * as Bip44Tables from '../tables';
+import {
+  PrivateDeriverSchema,
+  Bip44ChainSchema,
+  Bip44AddressSchema,
+} from '../../common/tables';
 import {
   GetBip44DerivationSpecific,
   GetKeyForPrivateDeriver,
@@ -38,14 +45,14 @@ import {
   Bip44DerivationLevels,
 } from './utils';
 import { addNewRowToTable, StaleStateError, } from '../../../utils';
-import { AddPublicDeriver, ModifyHwWalletMeta } from '../../../wallet/api/write';
+import { AddPublicDeriver, ModifyHwWalletMeta } from '../../core/api/write';
 import type {
   PublicDeriverInsert, PublicDeriverRow,
   HwWalletMetaInsert, HwWalletMetaRow,
-} from '../../../wallet/tables';
-import { PublicDeriverSchema } from '../../../wallet/tables';
+} from '../../core/tables';
+import { PublicDeriverSchema } from '../../core/tables';
 import type { AddDerivationRequest } from '../../../primitives/api/write';
-import type { AddPublicDeriverResponse } from '../../../wallet/api/write';
+import type { AddPublicDeriverResponse } from '../../core/api/write';
 
 export type TreeStart = {|
   derivationId: number,
@@ -170,7 +177,7 @@ export type PrivateDeriverRequest<Insert> = {
 export class AddPrivateDeriver {
   static ownTables = Object.freeze({
     ...allBip44DerivationTables,
-    [Bip44Tables.PrivateDeriverSchema.name]: Bip44Tables.PrivateDeriverSchema,
+    [PrivateDeriverSchema.name]: PrivateDeriverSchema,
   });
   static depTables = Object.freeze({
     AddDerivation,
@@ -228,7 +235,7 @@ export class AddPrivateDeriver {
     const privateDeriverResult = await addNewRowToTable<PrivateDeriverInsert, PrivateDeriverRow>(
       db, tx,
       request.addPrivateDeriverRequest(levelResult.KeyDerivation.KeyDerivationId),
-      AddPrivateDeriver.ownTables[Bip44Tables.PrivateDeriverSchema.name].name,
+      AddPrivateDeriver.ownTables[PrivateDeriverSchema.name].name,
     );
 
     return {
@@ -389,8 +396,8 @@ export class DerivePublicFromPrivate {
 
 export class ModifyDisplayCutoff {
   static ownTables = Object.freeze({
-    [Bip44Tables.Bip44ChainSchema.name]: Bip44Tables.Bip44ChainSchema,
-    [Bip44Tables.Bip44AddressSchema.name]: Bip44Tables.Bip44AddressSchema,
+    [Bip44ChainSchema.name]: Bip44ChainSchema,
+    [Bip44AddressSchema.name]: Bip44AddressSchema,
     [KeyDerivationSchema.name]: KeyDerivationSchema,
   });
   static depTables = Object.freeze({
@@ -495,16 +502,16 @@ export class ModifyDisplayCutoff {
     },
   ): Promise<void> {
     const chainTable = db.getSchema().table(
-      ModifyDisplayCutoff.ownTables[Bip44Tables.Bip44ChainSchema.name].name
+      ModifyDisplayCutoff.ownTables[Bip44ChainSchema.name].name
     );
     const updateQuery = db
       .update(chainTable)
       .set(
-        chainTable[Bip44Tables.Bip44ChainSchema.properties.DisplayCutoff],
+        chainTable[Bip44ChainSchema.properties.DisplayCutoff],
         request.newIndex
       )
       .where(op.and(
-        chainTable[Bip44Tables.Bip44ChainSchema.properties.KeyDerivationId].eq(
+        chainTable[Bip44ChainSchema.properties.KeyDerivationId].eq(
           request.derivationId
         ),
       ));

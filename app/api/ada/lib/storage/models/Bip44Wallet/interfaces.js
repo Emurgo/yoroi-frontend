@@ -23,7 +23,7 @@ import type {
   TreeInsert,
   AddAdhocPublicDeriverRequest, AddAdhocPublicDeriverResponse,
 } from '../../database/walletTypes/bip44/api/write';
-import type { AddPublicDeriverResponse } from '../../database/wallet/api/write';
+import type { AddPublicDeriverResponse } from '../../database/walletTypes/core/api/write';
 import { UpdateGet, } from '../../database/primitives/api/write';
 
 import type {

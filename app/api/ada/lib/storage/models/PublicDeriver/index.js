@@ -58,16 +58,16 @@ import {
 
 import type {
   Bip44ChainRow,
-} from '../../database/walletTypes/bip44/tables';
+} from '../../database/walletTypes/common/tables';
 import type {
   PublicDeriverRow,
-} from '../../database/wallet/tables';
+} from '../../database/walletTypes/core/tables';
 import {
   GetPublicDeriver,
   GetKeyForPublicDeriver,
   GetLastSyncForPublicDeriver,
-} from '../../database/wallet/api/read';
-import { ModifyPublicDeriver } from '../../database/wallet/api/write';
+} from '../../database/walletTypes/core/api/read';
+import { ModifyPublicDeriver } from '../../database/walletTypes/core/api/write';
 import {
   AddBip44Tree,
   ModifyDisplayCutoff,

@@ -10,11 +10,11 @@ import type {
   PublicDeriverRow,
   ConceptualWalletRow, LastSyncInfoRow, HwWalletMetaRow,
 } from '../tables';
-import type { KeyDerivationRow, KeyRow, } from '../../primitives/tables';
-import { GetKeyForDerivation } from '../../primitives/api/read';
+import type { KeyDerivationRow, KeyRow, } from '../../../primitives/tables';
+import { GetKeyForDerivation } from '../../../primitives/api/read';
 import {
   getRowFromKey, StaleStateError,
-} from '../../utils';
+} from '../../../utils';
 
 export class GetConceptualWallet {
   static ownTables = Object.freeze({

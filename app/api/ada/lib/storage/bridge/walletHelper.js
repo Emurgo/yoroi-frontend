@@ -19,7 +19,7 @@ import {
   GetOrAddAddress,
 } from '../database/primitives/api/write';
 import type { KeyInsert } from '../database/primitives/tables';
-import type { HWFeatures, } from '../database/wallet/tables';
+import type { HWFeatures, } from '../database/walletTypes/core/tables';
 
 import { WalletBuilder } from './walletBuilder';
 
