@@ -263,7 +263,7 @@ export default {
   '--theme-dialog-title-color': '#2b2c32',
   '--theme-dialog-title-margin': '0 0 38px 0',
   '--theme-dialog-input-margin': '10px 0 24px 0',
-  '--theme-dialog-input-actions-margin': '34px 0 0 0',
+  '--theme-dialog-input-actions-margin': '8px 0 0 0',
 
   '--theme-main-body-background-color': '#ffffff',
   '--theme-main-body-messages-color': '#353535',
