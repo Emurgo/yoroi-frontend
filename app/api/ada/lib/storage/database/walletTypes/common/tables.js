@@ -4,31 +4,8 @@ import {
   AddressSchema,
   KeyDerivationSchema,
 } from '../../primitives/tables';
-import { Bip44WrapperSchema } from '../bip44/tables';
 import { Type } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
-
-export type PrivateDeriverInsert = {|
-  Bip44WrapperId: number,
-  KeyDerivationId: number,
-  Level: number,
-|};
-export type PrivateDeriverRow = {|
-  PrivateDeriverId: number, // serial
-  ...PrivateDeriverInsert,
-|};
-export const PrivateDeriverSchema: {
-  +name: 'PrivateDeriver',
-  properties: $ObjMapi<PrivateDeriverRow, ToSchemaProp>
-} = {
-  name: 'PrivateDeriver',
-  properties: {
-    PrivateDeriverId: 'PrivateDeriverId',
-    Bip44WrapperId: 'Bip44WrapperId',
-    KeyDerivationId: 'KeyDerivationId',
-    Level: 'Level',
-  }
-};
 
 export type Bip44RootInsert = {|
   KeyDerivationId: number,
@@ -169,26 +146,6 @@ export const AccountingDerivationSchema: {
 };
 
 export const populateCommonDb = (schemaBuilder: lf$schema$Builder) => {
-  // PrivateDeriver
-  schemaBuilder.createTable(PrivateDeriverSchema.name)
-    .addColumn(PrivateDeriverSchema.properties.PrivateDeriverId, Type.INTEGER)
-    .addColumn(PrivateDeriverSchema.properties.Bip44WrapperId, Type.INTEGER)
-    .addColumn(PrivateDeriverSchema.properties.KeyDerivationId, Type.INTEGER)
-    .addColumn(PrivateDeriverSchema.properties.Level, Type.INTEGER)
-    .addPrimaryKey(
-      ([PrivateDeriverSchema.properties.PrivateDeriverId]: Array<string>),
-      true
-    )
-    // TODO: need to swap dependency order and move to /core/
-    .addForeignKey('PrivateDeriver_Bip44Wrapper', {
-      local: PrivateDeriverSchema.properties.Bip44WrapperId,
-      ref: `${Bip44WrapperSchema.name}.${Bip44WrapperSchema.properties.Bip44WrapperId}`
-    })
-    .addForeignKey('PrivateDeriver_Bip44Derivation', {
-      local: PrivateDeriverSchema.properties.KeyDerivationId,
-      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`
-    });
-
   // Bip44Root
   schemaBuilder.createTable(Bip44RootSchema.name)
     .addColumn(Bip44RootSchema.properties.Bip44RootId, Type.INTEGER)

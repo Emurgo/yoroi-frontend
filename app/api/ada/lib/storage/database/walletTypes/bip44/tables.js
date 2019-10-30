@@ -5,11 +5,14 @@ import {
 } from '../core/tables';
 import { Type } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
+import { KeyDerivationSchema } from '../../primitives/tables';
 
 export type Bip44WrapperInsert = {|
   ConceptualWalletId: number,
   SignerLevel: number | null,
   PublicDeriverLevel: number,
+  PrivateDeriverLevel: number | null,
+  PrivateDeriverKeyDerivationId: number | null,
 |};
 export type Bip44WrapperRow = {|
   Bip44WrapperId: number, // serial
@@ -25,6 +28,9 @@ export const Bip44WrapperSchema: {
     ConceptualWalletId: 'ConceptualWalletId',
     SignerLevel: 'SignerLevel',
     PublicDeriverLevel: 'PublicDeriverLevel',
+    // TODO: remove A prefix after refactoring
+    PrivateDeriverLevel: 'PrivateDeriverLevel',
+    PrivateDeriverKeyDerivationId: 'PrivateDeriverKeyDerivationId',
   }
 };
 
@@ -57,6 +63,8 @@ export const populateBip44Db = (schemaBuilder: lf$schema$Builder) => {
     .addColumn(Bip44WrapperSchema.properties.ConceptualWalletId, Type.INTEGER)
     .addColumn(Bip44WrapperSchema.properties.SignerLevel, Type.INTEGER)
     .addColumn(Bip44WrapperSchema.properties.PublicDeriverLevel, Type.INTEGER)
+    .addColumn(Bip44WrapperSchema.properties.PrivateDeriverLevel, Type.INTEGER)
+    .addColumn(Bip44WrapperSchema.properties.PrivateDeriverKeyDerivationId, Type.INTEGER)
     .addPrimaryKey(
       ([Bip44WrapperSchema.properties.Bip44WrapperId]: Array<string>),
       true
@@ -65,8 +73,14 @@ export const populateBip44Db = (schemaBuilder: lf$schema$Builder) => {
       local: Bip44WrapperSchema.properties.ConceptualWalletId,
       ref: `${ConceptualWalletSchema.name}.${ConceptualWalletSchema.properties.ConceptualWalletId}`
     })
+    .addForeignKey('Bip44Wrapper_KeyDerivation', {
+      local: Bip44WrapperSchema.properties.PrivateDeriverKeyDerivationId,
+      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`
+    })
     .addNullable([
       Bip44WrapperSchema.properties.SignerLevel,
+      Bip44WrapperSchema.properties.PrivateDeriverLevel,
+      Bip44WrapperSchema.properties.PrivateDeriverKeyDerivationId,
     ]);
   // Bip44ToPublicDeriver Tables
   schemaBuilder.createTable(Bip44ToPublicDeriverSchema.name)

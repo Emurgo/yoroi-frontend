@@ -476,6 +476,8 @@ Object {
     Object {
       "Bip44WrapperId": 1,
       "ConceptualWalletId": 1,
+      "PrivateDeriverKeyDerivationId": 1,
+      "PrivateDeriverLevel": 0,
       "PublicDeriverLevel": 3,
       "SignerLevel": 0,
     },
@@ -882,14 +884,6 @@ Object {
       "LastSyncInfoId": 2,
       "SlotNum": null,
       "Time": null,
-    },
-  ],
-  "PrivateDeriver": Array [
-    Object {
-      "Bip44WrapperId": 1,
-      "KeyDerivationId": 1,
-      "Level": 0,
-      "PrivateDeriverId": 1,
     },
   ],
   "PublicDeriver": Array [

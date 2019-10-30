@@ -53,6 +53,8 @@ Array [
       Object {
         "Bip44WrapperId": 1,
         "ConceptualWalletId": 1,
+        "PrivateDeriverKeyDerivationId": null,
+        "PrivateDeriverLevel": null,
         "PublicDeriverLevel": 3,
         "SignerLevel": 0,
       },
@@ -475,6 +477,8 @@ Array [
       Object {
         "Bip44WrapperId": 1,
         "ConceptualWalletId": 1,
+        "PrivateDeriverKeyDerivationId": 1,
+        "PrivateDeriverLevel": 0,
         "PublicDeriverLevel": 3,
         "SignerLevel": 0,
       },
@@ -890,6 +894,8 @@ Array [
       Object {
         "Bip44WrapperId": 1,
         "ConceptualWalletId": 1,
+        "PrivateDeriverKeyDerivationId": null,
+        "PrivateDeriverLevel": null,
         "PublicDeriverLevel": 3,
         "SignerLevel": 0,
       },

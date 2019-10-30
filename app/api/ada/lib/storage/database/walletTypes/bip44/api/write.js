@@ -13,20 +13,18 @@ import type {
   Bip44ToPublicDeriverInsert, Bip44ToPublicDeriverRow,
 } from '../tables';
 import type {
-  PrivateDeriverInsert, PrivateDeriverRow,
   Bip44ChainRow,
   Bip44AddressRow,
 } from '../../common/tables';
 import * as Bip44Tables from '../tables';
 import {
-  PrivateDeriverSchema,
   Bip44ChainSchema,
   Bip44AddressSchema,
 } from '../../common/tables';
 import {
   GetBip44DerivationSpecific,
-  GetKeyForPrivateDeriver,
   GetAllBip44Wallets,
+  GetBip44Wrapper,
 } from './read';
 
 import type {
@@ -37,6 +35,7 @@ import { KeyDerivationSchema } from '../../../primitives/tables';
 import { AddDerivation, GetOrAddDerivation, } from '../../../primitives/api/write';
 import {
   GetChildWithSpecific, GetPathWithSpecific,
+  GetKeyForDerivation,
 } from '../../../primitives/api/read';
 
 import {
@@ -50,7 +49,7 @@ import type {
   PublicDeriverInsert, PublicDeriverRow,
   HwWalletMetaInsert, HwWalletMetaRow,
 } from '../../core/tables';
-import { PublicDeriverSchema } from '../../core/tables';
+import { PublicDeriverSchema, } from '../../core/tables';
 import type { AddDerivationRequest } from '../../../primitives/api/write';
 import type { AddPublicDeriverResponse } from '../../core/api/write';
 
@@ -172,12 +171,10 @@ export type PrivateDeriverRequest<Insert> = {
    */
   pathToPrivate: InsertPath,
   addLevelRequest: (number | null) => AddDerivationRequest<Insert>,
-  addPrivateDeriverRequest: number => PrivateDeriverInsert,
 };
 export class AddPrivateDeriver {
   static ownTables = Object.freeze({
     ...allBip44DerivationTables,
-    [PrivateDeriverSchema.name]: PrivateDeriverSchema,
   });
   static depTables = Object.freeze({
     AddDerivation,
@@ -188,11 +185,8 @@ export class AddPrivateDeriver {
     tx: lf$Transaction,
     request: PrivateDeriverRequest<Insert>,
   ): Promise<{
-    privateDeriverResult: $ReadOnly<PrivateDeriverRow>,
-    levelResult: {
-      KeyDerivation: $ReadOnly<KeyDerivationRow>,
-      specificDerivationResult: $ReadOnly<Row>
-    },
+    KeyDerivation: $ReadOnly<KeyDerivationRow>,
+    specificDerivationResult: $ReadOnly<Row>
   }> {
     let parentId: number | null = null;
     for (let i = 0; i < request.pathToPrivate.length - 1; i++) {
@@ -232,15 +226,9 @@ export class AddPrivateDeriver {
       request.addLevelRequest(parentId),
       tableName,
     );
-    const privateDeriverResult = await addNewRowToTable<PrivateDeriverInsert, PrivateDeriverRow>(
-      db, tx,
-      request.addPrivateDeriverRequest(levelResult.KeyDerivation.KeyDerivationId),
-      AddPrivateDeriver.ownTables[PrivateDeriverSchema.name].name,
-    );
 
     return {
-      privateDeriverResult,
-      levelResult,
+      ...levelResult,
     };
   }
 }
@@ -251,6 +239,8 @@ export type DerivePublicFromPrivateRequest= {|
     lastSyncInfoId: number,
    } => PublicDeriverInsert,
   /**
+   * Need this as no guarantee the path is same for each key
+   * ex: different coin types
    * Path is relative to private deriver
    * Last index should be the index you want for the public deriver
    */
@@ -262,7 +252,8 @@ export class DerivePublicFromPrivate {
   });
   static depTables = Object.freeze({
     AddPublicDeriver,
-    GetKeyForPrivateDeriver,
+    GetBip44Wrapper,
+    GetKeyForDerivation,
     GetOrAddDerivation,
     AddBip44Tree,
     AddBipp44ToPublicDeriver,
@@ -288,9 +279,22 @@ export class DerivePublicFromPrivate {
       specificDerivationResult: $ReadOnly<Row>
     },
   }> {
-    const derivationAndKey = await DerivePublicFromPrivate.depTables.GetKeyForPrivateDeriver.get(
+    const wrapper = await DerivePublicFromPrivate.depTables.GetBip44Wrapper.get(
       db, tx,
-      bip44WrapperId,
+      bip44WrapperId
+    );
+    if (wrapper == null) {
+      throw new StaleStateError('DerivePublicFromPrivate::add wrapper');
+    }
+    if (wrapper.PrivateDeriverLevel == null || wrapper.PrivateDeriverKeyDerivationId == null) {
+      throw new StaleStateError('DerivePublicFromPrivate::add no private deriver');
+    }
+    const privateDeriverLevel = wrapper.PrivateDeriverLevel;
+    const privateDeriverKeyDerivationId = wrapper.PrivateDeriverKeyDerivationId;
+
+    const derivationAndKey = await DerivePublicFromPrivate.depTables.GetKeyForDerivation.get(
+      db, tx,
+      wrapper.PrivateDeriverKeyDerivationId,
       false,
       true,
     );
@@ -308,9 +312,9 @@ export class DerivePublicFromPrivate {
       if (body.pathToPublic.length === 0) {
         throw new Error('DerivePublicFromPrivate::add invalid pathToPublic length');
       }
-      let parentId = derivationAndKey.PrivateDeriver.KeyDerivationId;
+      let parentId = privateDeriverKeyDerivationId;
       for (let i = 0; i < body.pathToPublic.length - 1; i++) {
-        const tableName = Bip44TableMap.get(derivationAndKey.PrivateDeriver.Level + i + 1);
+        const tableName = Bip44TableMap.get(privateDeriverLevel + i + 1);
         if (tableName == null) {
           throw new Error('AddDerivation::add Unknown table queried');
         }
@@ -338,7 +342,7 @@ export class DerivePublicFromPrivate {
         parentId = nextLevel.KeyDerivation.KeyDerivationId;
       }
       const tableName = Bip44TableMap.get(
-        derivationAndKey.PrivateDeriver.Level + body.pathToPublic.length
+        wrapper.PrivateDeriverLevel + body.pathToPublic.length
       );
       if (tableName == null) {
         throw new Error('AddDerivation::add Unknown table queried');
@@ -387,7 +391,7 @@ export class DerivePublicFromPrivate {
         derivationId: pubDeriver.publicDeriverResult.KeyDerivationId,
         children: initialDerivations,
       },
-      derivationAndKey.PrivateDeriver.Level + body.pathToPublic.length,
+      privateDeriverLevel + body.pathToPublic.length,
     );
 
     return pubDeriver;
@@ -525,6 +529,11 @@ export type AddAdhocPublicDeriverRequest = {|
   publicKey: KeyInsert,
   parentDerivationId: null | number,
   pathStartLevel: number,
+  /**
+   * Need this as no guarantee the path is same for each key
+   * ex: different coin types
+   * Last index should be the index you want for the public deriver
+   */
   pathToPublic: InsertPath,
   publicDeriverInsert: {
     derivationId: number,

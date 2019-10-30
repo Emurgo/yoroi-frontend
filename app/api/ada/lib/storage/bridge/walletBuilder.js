@@ -190,13 +190,13 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
 
   addPrivateDeriver: StateConstraint<
     CurrentState,
-    HasBip44Wrapper,
+    HasConceptualWallet,
     CurrentState => PrivateDeriverRequest<mixed>,
     CurrentState & HasPrivateDeriver
   > = <Insert>(
     insert: CurrentState => PrivateDeriverRequest<Insert>,
   ) => {
-    return this.updateData<HasBip44Wrapper, HasPrivateDeriver>(
+    return this.updateData<HasConceptualWallet, HasPrivateDeriver>(
       AsNotNull<HasPrivateDeriver>({ privateDeriver: null }),
       Array.from(getAllTables(AddPrivateDeriver)),
       async (finalData) => {

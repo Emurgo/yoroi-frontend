@@ -15,9 +15,6 @@ import type {
 import {
   DerivePublicFromPrivate, AddAdhocPublicDeriver,
 } from '../../database/walletTypes/bip44/api/write';
-import {
-  GetKeyForPrivateDeriver
-} from '../../database/walletTypes/bip44/api/read';
 import type {
   DerivePublicFromPrivateRequest as DbRequest,
   TreeInsert,
@@ -25,6 +22,7 @@ import type {
 } from '../../database/walletTypes/bip44/api/write';
 import type { AddPublicDeriverResponse } from '../../database/walletTypes/core/api/write';
 import { UpdateGet, } from '../../database/primitives/api/write';
+import { GetKeyForDerivation } from '../../database/primitives/api/read';
 
 import type {
   KeyRow,
@@ -49,6 +47,7 @@ export interface IBip44Wallet {
     conceptualWalletCtorData: IConceptualWalletConstructor,
     row: $ReadOnly<Bip44WrapperRow>,
     privateDeriverLevel: number | null,
+    privateDeriverKeyDerivationId: number | null,
     protocolMagic: number,
   ): IBip44Wallet;
   getDb(): lf$Database;
@@ -56,6 +55,7 @@ export interface IBip44Wallet {
   getPublicDeriverLevel(): number;
   getSigningLevel(): number | null;
   getPrivateDeriverLevel(): number | null;
+  getPrivateDeriverKeyDerivationId(): number | null;
   getProtocolMagic(): number;
 }
 
@@ -93,7 +93,7 @@ export interface IGetPrivateDeriverKey {
   +rawGetPrivateDeriverKey: RawVariation<
     IGetPrivateDeriverKeyFunc,
     {|
-      GetKeyForPrivateDeriver: Class<GetKeyForPrivateDeriver>,
+      GetKeyForDerivation: Class<GetKeyForDerivation>,
     |},
     IGetPrivateDeriverKeyRequest
   >;
@@ -102,7 +102,7 @@ export interface IGetPrivateDeriverKey {
   +rawChangePrivateDeriverPassword: RawVariation<
     IChangePasswordRequestFunc,
     {|
-      GetKeyForPrivateDeriver: Class<GetKeyForPrivateDeriver>,
+      GetKeyForDerivation: Class<GetKeyForDerivation>,
       UpdateGet: Class<UpdateGet>,
     |},
     IChangePasswordRequest
