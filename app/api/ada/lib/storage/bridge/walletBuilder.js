@@ -100,6 +100,8 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
   ): WalletBuilder<
     CurrentState & NewAddition & Requirement
   > {
+    // $FlowFixMe we know this type holds due to StateConstraint before this function is called
+    const state: CurrentState & Requirement = this.state;
     return new WalletBuilder<
       CurrentState & NewAddition & Requirement
     >(
@@ -108,7 +110,7 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
       this.tables.concat(newTables),
       this.buildSteps.concat(newStep),
       {
-        ...this.state,
+        ...state,
         ...addition,
       },
     );

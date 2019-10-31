@@ -52,10 +52,10 @@ export default class AdaWalletsStore extends WalletStore {
   // =================== SEND MONEY ==================== //
 
   /** Send money and then return to transaction screen */
-  _sendMoney = async (transactionDetails: {
+  _sendMoney = async (transactionDetails: {|
     signRequest: BaseSignRequest,
     password: string,
-  }): Promise<void> => {
+  |}): Promise<void> => {
     const publicDeriver = this.selected;
     if (!publicDeriver) throw new Error('Active wallet required before sending.');
 
@@ -103,11 +103,11 @@ export default class AdaWalletsStore extends WalletStore {
 
   // =================== WALLET RESTORATION ==================== //
 
-  _restoreWallet = async (params: {
+  _restoreWallet = async (params: {|
     recoveryPhrase: string,
     walletName: string,
     walletPassword: string,
-  }) => {
+  |}) => {
     await this._restore(params);
   };
 

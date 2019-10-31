@@ -208,8 +208,8 @@ export class AddPrivateDeriver {
             Index: i === 0  ? null : request.pathToPrivate[i].index,
           }),
           levelInfo: id => ({
-            KeyDerivationId: id,
             ...request.pathToPrivate[i].insert,
+            KeyDerivationId: id,
           }),
         },
         tableName,
@@ -333,8 +333,8 @@ export class DerivePublicFromPrivate {
               Index: body.pathToPublic[i].index,
             }),
             levelInfo: id => ({
-              KeyDerivationId: id,
               ...body.pathToPublic[i].insert,
+              KeyDerivationId: id,
             }),
           },
           tableName,
@@ -360,8 +360,8 @@ export class DerivePublicFromPrivate {
               Index: body.pathToPublic[body.pathToPublic.length - 1].index,
             }),
             levelInfo: id => ({
-              KeyDerivationId: id,
               ...body.pathToPublic[body.pathToPublic.length - 1].insert,
+              KeyDerivationId: id,
             }),
           },
           levelSpecificTableName: tableName,
@@ -585,8 +585,8 @@ export class AddAdhocPublicDeriver {
             Index: request.pathStartLevel + i === 0  ? null : request.pathToPublic[i].index,
           }),
           levelInfo: id => ({
-            KeyDerivationId: id,
             ...request.pathToPublic[i].insert,
+            KeyDerivationId: id,
           }),
         },
         tableName,
@@ -612,8 +612,8 @@ export class AddAdhocPublicDeriver {
             Index: request.pathToPublic[request.pathToPublic.length - 1].index,
           }),
           levelInfo: id => ({
-            KeyDerivationId: id,
             ...request.pathToPublic[request.pathToPublic.length - 1].insert,
+            KeyDerivationId: id,
           }),
         },
         levelSpecificTableName: tableName,
