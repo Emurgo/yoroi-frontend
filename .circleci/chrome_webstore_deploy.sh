@@ -54,7 +54,7 @@ then
 
 else
 
-  if [ "${CIRCLE_BRANCH}" == "develop" ]
+  if [ "${CIRCLE_BRANCH}" == "develop" ] || [[ "${CIRCLE_BRANCH}" == "shelley" ]]
   then
     export TEMPLATE="testnet"
     export RELEASE_TAG="${TEMPLATE}-$(echo ${CIRCLE_BRANCH} | sed 's|/|-|g')-${GIT_SHORT_COMMIT}"
@@ -93,7 +93,7 @@ else
   fi
 fi
 
-if [[ ! -z $(echo ${BRANCH} | grep "^develop$\|^staging$\|^master$") ]] || [[ ! -z "${PR_NUMBER}" ]]
+if [[ ! -z $(echo ${BRANCH} | grep "^develop$\|^staging$\|^master$\|^shelley$") ]] || [[ ! -z "${PR_NUMBER}" ]]
 then
   tar -zcf artifacts/build-${RELEASE_TAG}.tar.gz build
   echo "Release sha256 checksums:"
