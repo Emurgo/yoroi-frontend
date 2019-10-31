@@ -72,7 +72,7 @@ export default class OptionBlock extends Component<Props, State> {
             </div>
           </button>
           {/* Learn more block */}
-          {learnMoreText != null
+          {(learnMoreText != null && learnMoreText !== '')
             ? (
               <div>
                 <div className={learnMoreTextBlockClasses}>

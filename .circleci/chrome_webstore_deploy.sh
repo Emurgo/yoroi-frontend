@@ -33,7 +33,7 @@ rm -rf artifacts/*
 
 if [ ! -z "${CIRCLE_PR_NUMBER}" ]
 then
-  export TEMPLATE="staging"
+  export TEMPLATE="testnet"
   export RELEASE_TAG="${TEMPLATE}-PR${CIRCLE_PR_NUMBER}-${GIT_SHORT_COMMIT}"
   export ZIP_NAME="yoroi-${RELEASE_TAG}.zip"
   export XPI_NAME="yoroi-${RELEASE_TAG}.xpi"
@@ -56,7 +56,7 @@ else
 
   if [ "${CIRCLE_BRANCH}" == "develop" ]
   then
-    export TEMPLATE="staging"
+    export TEMPLATE="testnet"
     export RELEASE_TAG="${TEMPLATE}-$(echo ${CIRCLE_BRANCH} | sed 's|/|-|g')-${GIT_SHORT_COMMIT}"
     export ZIP_NAME="yoroi-${RELEASE_TAG}.zip"
     export XPI_NAME="yoroi-${RELEASE_TAG}.xpi"
@@ -68,7 +68,7 @@ else
   fi
   if [ "${CIRCLE_BRANCH}" == "staging" ]
   then
-    export TEMPLATE="staging"
+    export TEMPLATE="testnet"
     export RELEASE_TAG="${TEMPLATE}-$(echo ${CIRCLE_BRANCH} | sed 's|/|-|g')-${GIT_SHORT_COMMIT}"
     export ZIP_NAME="yoroi-${RELEASE_TAG}.zip"
     export XPI_NAME="yoroi-${RELEASE_TAG}.xpi"
