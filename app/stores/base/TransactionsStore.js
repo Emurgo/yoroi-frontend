@@ -14,6 +14,10 @@ import {
   asGetAllUtxos,
   asGetBalance,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import type {
+  IGetAllUtxos,
+  IGetLastSyncInfo,
+} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 
 export default class TransactionsStore extends Store {
@@ -53,7 +57,11 @@ export default class TransactionsStore extends Store {
       this.searchOptions.limit += this.SEARCH_LIMIT_INCREASE;
       const publicDeriver = this.stores.substores[environment.API].wallets.selected;
       if (!publicDeriver) return;
-      this.refreshTransactionData(publicDeriver);
+      const withUtxos = asGetAllUtxos(publicDeriver.self);
+      if (withUtxos == null) {
+        return;
+      }
+      this.refreshLocal(withUtxos);
     }
   };
 
@@ -211,6 +219,32 @@ export default class TransactionsStore extends Store {
       })
       .catch(() => {}); // Do nothing. It's logged in the api call
   };
+
+  @action refreshLocal = (
+    publicDeriver: PublicDeriver & IGetAllUtxos & IGetLastSyncInfo,
+  ): void => {
+    const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+
+    const limit = this.searchOptions
+      ? this.searchOptions.limit
+      : this.INITIAL_SEARCH_LIMIT;
+    const skip = this.searchOptions
+      ? this.searchOptions.skip
+      : this.SEARCH_SKIP;
+
+    const requestParams: GetTransactionsRequest = {
+      publicDeriver,
+      isLocalRequest: true,
+      limit,
+      skip,
+      getTransactionsHistoryForAddresses: stateFetcher.getTransactionsHistoryForAddresses,
+      checkAddressesInUse: stateFetcher.checkAddressesInUse,
+      getBestBlock: stateFetcher.getBestBlock,
+    };
+    const recentRequest = this._getTransactionsRecentRequest(publicDeriver);
+    recentRequest.invalidate({ immediately: false });
+    recentRequest.execute(requestParams); // note: different params/cache than allRequests
+  }
 
   /** Add a new public deriver to track and refresh the data */
   @action addObservedWallet = (
