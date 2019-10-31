@@ -10,7 +10,7 @@ type Props = InjectedDialogContainerProps;
 @observer
 export default class WalletCreateDialogContainer extends Component<Props> {
 
-  onSubmit = (values: { name: string, password: string }) => {
+  onSubmit = (values: {| name: string, password: string |}) => {
     this.props.actions[environment.API].wallets.createWallet.trigger(values);
   };
 

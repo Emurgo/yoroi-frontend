@@ -30,7 +30,7 @@ const messages = defineMessages({
 type Props = {|
   isActionProcessing: ?boolean,
   error: ?LocalizableError,
-  submit: Function,
+  submit: void => void,
   cancel: Function,
   classicTheme: boolean,
 |};

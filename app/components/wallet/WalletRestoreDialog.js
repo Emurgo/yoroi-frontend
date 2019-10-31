@@ -84,12 +84,12 @@ const messages = defineMessages({
   },
 });
 
-export type WalletRestoreDialogValues = {
+export type WalletRestoreDialogValues = {|
   recoveryPhrase: string,
   walletName: string,
   walletPassword: string,
   paperPassword: string,
-}
+|};
 
 type Props = {|
   onSubmit: Function,

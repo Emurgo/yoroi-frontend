@@ -41,10 +41,10 @@ class App extends Component<{
     // Merged english messages with selected by user locale messages
     // In this case all english data would be overridden to user selected locale, but untranslated
     // (missed in object keys) just stay in english
-    const mergedMessages = {
-      ...translations['en-US'],
-      ...translations[locale]
-    };
+    const mergedMessages: { [key: string]: string } = Object.assign(
+      translations['en-US'],
+      translations[locale]
+    );
 
     const themeVars = Object.assign(
       stores.profile.currentThemeVars,

@@ -242,27 +242,26 @@ function _transformToLedgerOutputs(
   txOutputs: Array<TxOutType<number>>,
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
 ): Array<OutputTypeAddress | OutputTypeChange> {
-  return txOutputs.map(txOutput => ({
-    amountStr: txOutput.value.toString(),
-    ..._ledgerOutputAddress58OrPath(txOutput, changeAddr)
-  }));
-}
+  return txOutputs.map(txOutput => {
+    const amountStr = txOutput.value.toString();
+    const change = changeAddr.find(addr => addr.address === txOutput.address);
+    if (change != null) {
+      verifyAccountLevel({ addressing: change.addressing });
+      return {
+        path: makeCardanoBIP44Path(
+          change.addressing.path[0],
+          change.addressing.path[1],
+          change.addressing.path[2],
+        ),
+        amountStr,
+      };
+    }
 
-function _ledgerOutputAddress58OrPath(
-  txOutput: TxOutType<number>,
-  changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
-): { address58: string } | { path: BIP32Path }  {
-  const change = changeAddr.find(addr => addr.address === txOutput.address);
-  if (change != null) {
-    verifyAccountLevel({ addressing: change.addressing });
-    return { path: makeCardanoBIP44Path(
-      change.addressing.path[0],
-      change.addressing.path[1],
-      change.addressing.path[2],
-    ) };
-  }
-
-  return { address58: txOutput.address };
+    return {
+      address58: txOutput.address,
+      amountStr,
+    };
+  });
 }
 
 export async function prepareAndBroadcastLedgerSignedTx(

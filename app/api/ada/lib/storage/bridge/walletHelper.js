@@ -244,7 +244,7 @@ export async function createHardwareWallet(request: {
   accountIndex: number,
   walletName: string,
   accountName: string,
-  hwWalletMetaInsert?: HWFeatures,
+  hwWalletMetaInsert: HWFeatures,
 }): Promise<HasConceptualWallet & HasBip44Wrapper & HasPublicDeriver<mixed>> {
   if (request.accountIndex < HARD_DERIVATION_START) {
     throw new Error('createHardwareWallet needs hardened index');

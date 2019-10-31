@@ -136,11 +136,11 @@ export default class WalletsStore extends Store {
   };
 
   /** Restore wallet and move to wallet summary screen */
-  _restore = async (params: {
+  _restore = async (params: {|
     recoveryPhrase: string,
     walletName: string,
     walletPassword: string,
-  }) => {
+  |}) => {
     this.restoreRequest.reset();
 
     const persistentDb = this.stores.loading.loadPersitentDbRequest.result;

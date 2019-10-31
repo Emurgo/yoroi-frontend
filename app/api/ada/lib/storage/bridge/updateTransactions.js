@@ -155,7 +155,7 @@ export async function rawGetUtxoTransactions(
 
   const result = txsWithIOs.map(tx => ({
     ...tx,
-    block: blockMap.get(tx.transaction.TransactionId),
+    block: blockMap.get(tx.transaction.TransactionId) || null,
     ...getFromUserPerspective({
       txInputs: tx.utxoInputs,
       txOutputs: tx.utxoOutputs,

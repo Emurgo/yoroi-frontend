@@ -61,7 +61,11 @@ export default class WalletRestoreDialogContainer
     if (resolvedRecoveryPhrase != null) {
       submitValues.recoveryPhrase = resolvedRecoveryPhrase;
     }
-    this.props.actions[environment.API].wallets.restoreWallet.trigger(submitValues);
+    this.props.actions[environment.API].wallets.restoreWallet.trigger({
+      recoveryPhrase: submitValues.recoveryPhrase,
+      walletName: submitValues.walletName,
+      walletPassword: submitValues.walletPassword
+    });
   };
 
   onSubmit = (values: WalletRestoreDialogValues) => {

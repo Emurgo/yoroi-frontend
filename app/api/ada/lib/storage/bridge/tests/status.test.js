@@ -5,7 +5,7 @@ import {
   schema,
 } from 'lovefield';
 import '../../../test-config';
-import type { RemoteTxBlockMeta, } from '../../../state-fetch/types';
+import type { RemoteTransaction, RemoteTxBlockMeta, } from '../../../state-fetch/types';
 import {
   setup,
   mockDate,
@@ -30,7 +30,7 @@ import {
 
 jest.mock('../../database/initialSeed');
 
-const initialPendingTx = (state: 'Pending' | 'Failed') => ({
+const initialPendingTx = (state: 'Failed' | 'Pending') => Object.freeze({
   hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
   height: null,
   block_hash: null,
@@ -62,7 +62,7 @@ const initialPendingTx = (state: 'Pending' | 'Failed') => ({
   ]
 });
 
-const otherSpend = {
+const otherSpend = Object.freeze({
   hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
   height: 218608,
   block_hash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25',
@@ -92,9 +92,9 @@ const otherSpend = {
       amount: '1731391'
     }
   ]
-};
+});
 
-const pendingOutwards = (state: 'Pending' | 'Failed') => ({
+const pendingOutwards = (state: 'Pending' | 'Failed') => Object.freeze({
   hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed547',
   height: null,
   block_hash: null,
@@ -122,7 +122,7 @@ const pendingOutwards = (state: 'Pending' | 'Failed') => ({
   ]
 });
 
-const pointlessTx = {
+const pointlessTx = Object.freeze({
   hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed548',
   height: 218610,
   block_hash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba27',
@@ -147,7 +147,7 @@ const pointlessTx = {
       amount: '3800000'
     },
   ]
-};
+});
 
 beforeEach(() => {
   mockDate();
@@ -159,7 +159,7 @@ async function baseTest(
   const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
   const publicDeriver = await setup(db);
 
-  const networkTransactions = [initialPendingTx(type)];
+  const networkTransactions: Array<RemoteTransaction> = [initialPendingTx(type)];
   const checkAddressesInUse = genCheckAddressesInUse(networkTransactions);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
     networkTransactions
