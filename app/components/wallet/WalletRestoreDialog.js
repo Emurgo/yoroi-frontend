@@ -258,7 +258,8 @@ export default class WalletRestoreDialog extends Component<Props> {
   componentDidMount() {
     setTimeout(() => {
       if (this.props.isVerificationMode === true) {
-        this.recoveryPhraseInput.focus();
+        // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1009
+        // this.recoveryPhraseInput.focus();
       } else {
         this.walletNameInput.focus();
       }
@@ -266,7 +267,8 @@ export default class WalletRestoreDialog extends Component<Props> {
   }
 
   walletNameInput: Input;
-  recoveryPhraseInput: Autocomplete;
+  // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1009
+  // recoveryPhraseInput: Autocomplete;
 
   render() {
     const { intl } = this.context;
@@ -393,7 +395,8 @@ export default class WalletRestoreDialog extends Component<Props> {
         <Autocomplete
           options={validWords}
           maxSelections={this.props.numberOfMnemonics}
-          inputRef={(input) => { this.recoveryPhraseInput = input; }}
+          // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1009
+          // inputRef={(input) => { this.recoveryPhraseInput = input; }}
           {...recoveryPhraseField.bind()}
           done={mnemonicValidator(join(recoveryPhrase, ' '))}
           error={recoveryPhraseField.error}
