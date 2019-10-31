@@ -94,26 +94,6 @@ export const buildRoute = (pattern: string, params: ParamsT) => {
     .replace(/^$/, '/');
 };
 
-/**
- * Get a named url query parameter from given or current url.
- *
- * Taken from here:
- * https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
- *
- * @param name
- * @param url
- * @returns {string}
- */
-export const getUrlParameterByName = (name: string, url?: string) => {
-  if (url == null) url = (window.location.href: string);
-  name = name.replace(/[[\]]/g, '\\$&');
-  const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
-  const results = regex.exec(url);
-  if (!results) return null;
-  if (!results[2]) return '';
-  return decodeURIComponent(results[2].replace(/\+/g, ' '));
-};
-
 /** pre-req: either the target is an anchor or is the child of an anchor */
 export const handleExternalLinkClick = (event: MouseEvent) => {
   event.preventDefault();

@@ -167,7 +167,7 @@ export function batchGetUTXOsSumsForAddresses(
       const sum: BigNumber = partialAmounts.reduce(
         (acc: BigNumber, partialAmount) => (
           acc.plus(
-            partialAmount.sum != null // undefined if no addresses in the batch has any balance
+            partialAmount.sum != null && partialAmount.sum !== '' // undefined if no addresses in the batch has any balance
               ? new BigNumber(partialAmount.sum)
               : new BigNumber(0)
           )
