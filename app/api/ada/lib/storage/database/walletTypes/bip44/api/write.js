@@ -29,101 +29,26 @@ import {
 
 import type {
   KeyDerivationRow,
-  KeyInsert, KeyRow
 } from '../../../primitives/tables';
 import { KeyDerivationSchema } from '../../../primitives/tables';
-import { AddDerivation, GetOrAddDerivation, } from '../../../primitives/api/write';
 import {
   GetChildWithSpecific, GetPathWithSpecific,
-  GetKeyForDerivation,
 } from '../../../primitives/api/read';
 
 import {
-  allBip44DerivationTables,
-  Bip44TableMap,
   Bip44DerivationLevels,
+  GetBip44Tables,
 } from './utils';
 import { addNewRowToTable, StaleStateError, } from '../../../utils';
-import { AddPublicDeriver, ModifyHwWalletMeta } from '../../core/api/write';
 import type {
-  PublicDeriverInsert, PublicDeriverRow,
-  HwWalletMetaInsert, HwWalletMetaRow,
+  PublicDeriverRow,
 } from '../../core/tables';
-import { PublicDeriverSchema, } from '../../core/tables';
-import type { AddDerivationRequest } from '../../../primitives/api/write';
-import type { AddPublicDeriverResponse } from '../../core/api/write';
-
-export type TreeStart = {|
-  derivationId: number,
-  children: TreeInsert<any>,
-|};
-
-// TODO: recursively typedef with $CALL ?
-export type TreeInsert<T={}> = Array<{|
-  index: number,
-  insert: T,
-  children?: TreeInsert<any>,
-|}>;
-
-type InsertPath = Array<{
-  index: number,
-  insert: {},
-}>;
-
-export class AddBip44Tree {
-  static ownTables = Object.freeze({
-    ...allBip44DerivationTables,
-  });
-  static depTables = Object.freeze({
-    GetOrAddDerivation,
-  });
-
-  static async add(
-    db: lf$Database,
-    tx: lf$Transaction,
-    tree: TreeStart,
-    level: number,
-  ): Promise<{}> {
-    const parentId = tree.derivationId;
-    for (let i = 0; i < tree.children.length; i++) {
-      const tableName = Bip44TableMap.get(level + 1);
-      if (tableName == null) {
-        throw new Error('AddDerivation::add Unknown table queried');
-      }
-      const result = await AddBip44Tree.depTables.GetOrAddDerivation.getOrAdd(
-        db, tx,
-        parentId,
-        tree.children[i].index,
-        {
-          privateKeyInfo: null,
-          publicKeyInfo: null,
-          derivationInfo: keyInfo => ({
-            PublicKeyId: keyInfo.private,
-            PrivateKeyId: keyInfo.public,
-            Parent: parentId,
-            Index: tree.children[i].index,
-          }),
-          levelInfo: id => ({
-            KeyDerivationId: id,
-            ...tree.children[i].insert,
-          }),
-        },
-        tableName,
-      );
-      if (tree.children[i].children != null) {
-        await AddBip44Tree.add(
-          db, tx,
-          {
-            derivationId: result.KeyDerivation.KeyDerivationId,
-            children: tree.children[i].children,
-          },
-          level + 1,
-        );
-      }
-    }
-    return {};
-  }
-}
+import { DerivePublicDeriverFromKey, AddAdhocPublicDeriver, } from '../../common/api/write';
+import type {
+  DerivePublicDeriverFromKeyRequest,
+  AddAdhocPublicDeriverRequest,
+  AddAdhocPublicDeriverResponse,
+} from '../../common/api/write';
 
 export class AddBip44Wrapper {
   static ownTables = Object.freeze({
@@ -144,7 +69,7 @@ export class AddBip44Wrapper {
   }
 }
 
-export class AddBipp44ToPublicDeriver {
+export class AddBip44ToPublicDeriver {
   static ownTables = Object.freeze({
     [Bip44Tables.Bip44ToPublicDeriverSchema.name]: Bip44Tables.Bip44ToPublicDeriverSchema,
   });
@@ -158,120 +83,26 @@ export class AddBipp44ToPublicDeriver {
     return await addNewRowToTable<Bip44ToPublicDeriverInsert, Bip44ToPublicDeriverRow>(
       db, tx,
       request,
-      AddBipp44ToPublicDeriver.ownTables[Bip44Tables.Bip44ToPublicDeriverSchema.name].name,
+      AddBip44ToPublicDeriver.ownTables[Bip44Tables.Bip44ToPublicDeriverSchema.name].name,
     );
   }
 }
 
-export type PrivateDeriverRequest<Insert> = {
-  /**
-   * Path from root to the private deriver
-   * Path should NOT include the level for private deriver
-   * For ROOT, the index passed in is disregarded
-   */
-  pathToPrivate: InsertPath,
-  addLevelRequest: (number | null) => AddDerivationRequest<Insert>,
-};
-export class AddPrivateDeriver {
-  static ownTables = Object.freeze({
-    ...allBip44DerivationTables,
-  });
+export class DeriveBip44PublicFromPrivate {
+  static ownTables = Object.freeze({});
   static depTables = Object.freeze({
-    AddDerivation,
-  });
-
-  static async add<Insert, Row>(
-    db: lf$Database,
-    tx: lf$Transaction,
-    request: PrivateDeriverRequest<Insert>,
-  ): Promise<{
-    KeyDerivation: $ReadOnly<KeyDerivationRow>,
-    specificDerivationResult: $ReadOnly<Row>
-  }> {
-    let parentId: number | null = null;
-    for (let i = 0; i < request.pathToPrivate.length - 1; i++) {
-      const tableName = Bip44TableMap.get(request.pathToPrivate.length);
-      if (tableName == null) {
-        throw new Error('AddDerivation::add Unknown table queried');
-      }
-      const levelResult = await AddPrivateDeriver.depTables.AddDerivation.add(
-        db, tx,
-        {
-          privateKeyInfo: null,
-          publicKeyInfo: null,
-          // eslint-disable-next-line no-loop-func
-          derivationInfo: keyInfo => ({
-            PublicKeyId: keyInfo.private,
-            PrivateKeyId: keyInfo.public,
-            Parent: parentId,
-            // explicitly ignore index for ROOT since it has no index
-            Index: i === 0  ? null : request.pathToPrivate[i].index,
-          }),
-          levelInfo: id => ({
-            ...request.pathToPrivate[i].insert,
-            KeyDerivationId: id,
-          }),
-        },
-        tableName,
-      );
-      parentId = levelResult.KeyDerivation.KeyDerivationId;
-    }
-
-    const tableName = Bip44TableMap.get(request.pathToPrivate.length);
-    if (tableName == null) {
-      throw new Error('AddDerivation::add Unknown table queried');
-    }
-    const levelResult = await AddPrivateDeriver.depTables.AddDerivation.add(
-      db, tx,
-      request.addLevelRequest(parentId),
-      tableName,
-    );
-
-    return {
-      ...levelResult,
-    };
-  }
-}
-
-export type DerivePublicFromPrivateRequest= {|
-  publicDeriverInsert: {
-    derivationId: number,
-    lastSyncInfoId: number,
-   } => PublicDeriverInsert,
-  /**
-   * Need this as no guarantee the path is same for each key
-   * ex: different coin types
-   * Path is relative to private deriver
-   * Last index should be the index you want for the public deriver
-   */
-  pathToPublic: InsertPath,
-|};
-export class DerivePublicFromPrivate {
-  static ownTables = Object.freeze({
-    ...allBip44DerivationTables,
-  });
-  static depTables = Object.freeze({
-    AddPublicDeriver,
     GetBip44Wrapper,
-    GetKeyForDerivation,
-    GetOrAddDerivation,
-    AddBip44Tree,
-    AddBipp44ToPublicDeriver,
+    AddBip44ToPublicDeriver,
     GetAllBip44Wallets,
+    DerivePublicDeriverFromKey,
+    GetBip44Tables,
   });
 
   static async add<Row>(
     db: lf$Database,
     tx: lf$Transaction,
     bip44WrapperId: number,
-    body: DerivePublicFromPrivateRequest,
-    getKeyInserts: (
-      privateKeyRow: $ReadOnly<KeyRow>,
-    ) => {
-      newPrivateKey: KeyInsert | null,
-      newPublicKey: KeyInsert | null,
-    },
-    initialDerivations: TreeInsert<any>,
+    body: DerivePublicDeriverFromKeyRequest,
   ): Promise<{
     publicDeriverResult: $ReadOnly<PublicDeriverRow>,
     levelResult: {
@@ -279,122 +110,43 @@ export class DerivePublicFromPrivate {
       specificDerivationResult: $ReadOnly<Row>
     },
   }> {
-    const wrapper = await DerivePublicFromPrivate.depTables.GetBip44Wrapper.get(
+    const wrapper = await DeriveBip44PublicFromPrivate.depTables.GetBip44Wrapper.get(
       db, tx,
       bip44WrapperId
     );
     if (wrapper == null) {
-      throw new StaleStateError('DerivePublicFromPrivate::add wrapper');
+      throw new StaleStateError('DeriveBip44PublicFromPrivate::add wrapper');
     }
     if (wrapper.PrivateDeriverLevel == null || wrapper.PrivateDeriverKeyDerivationId == null) {
-      throw new StaleStateError('DerivePublicFromPrivate::add no private deriver');
+      throw new StaleStateError('DeriveBip44PublicFromPrivate::add no private deriver');
     }
     const privateDeriverLevel = wrapper.PrivateDeriverLevel;
     const privateDeriverKeyDerivationId = wrapper.PrivateDeriverKeyDerivationId;
-
-    const derivationAndKey = await DerivePublicFromPrivate.depTables.GetKeyForDerivation.get(
+    const bip44Tables = DeriveBip44PublicFromPrivate.depTables.GetBip44Tables.get();
+    return await DeriveBip44PublicFromPrivate.depTables.DerivePublicDeriverFromKey.add<Row>(
       db, tx,
-      wrapper.PrivateDeriverKeyDerivationId,
-      false,
-      true,
-    );
-
-    if (derivationAndKey.privateKey == null) {
-      throw new StaleStateError('DerivePublicFromPrivate::add privateKey');
-    }
-    const newKeys = getKeyInserts(
-      derivationAndKey.privateKey,
-    );
-
-    let pubDeriver;
-    {
-      // get parent of the new derivation
-      if (body.pathToPublic.length === 0) {
-        throw new Error('DerivePublicFromPrivate::add invalid pathToPublic length');
-      }
-      let parentId = privateDeriverKeyDerivationId;
-      for (let i = 0; i < body.pathToPublic.length - 1; i++) {
-        const tableName = Bip44TableMap.get(privateDeriverLevel + i + 1);
-        if (tableName == null) {
-          throw new Error('AddDerivation::add Unknown table queried');
-        }
-        const nextLevel = await DerivePublicFromPrivate.depTables.GetOrAddDerivation.getOrAdd(
+      body,
+      privateDeriverKeyDerivationId,
+      privateDeriverLevel,
+      bip44Tables,
+      async (pubDeriver) => {
+        // add new row in mapping table
+        const children = await DeriveBip44PublicFromPrivate
+          .depTables
+          .GetAllBip44Wallets.forBip44Wallet(
+            db, tx,
+            bip44WrapperId
+          );
+        await DeriveBip44PublicFromPrivate.depTables.AddBip44ToPublicDeriver.add(
           db, tx,
-          parentId,
-          body.pathToPublic[i].index,
           {
-            privateKeyInfo: null,
-            publicKeyInfo: null,
-            // eslint-disable-next-line no-loop-func
-            derivationInfo: keyInfo => ({
-              PublicKeyId: keyInfo.private,
-              PrivateKeyId: keyInfo.public,
-              Parent: parentId,
-              Index: body.pathToPublic[i].index,
-            }),
-            levelInfo: id => ({
-              ...body.pathToPublic[i].insert,
-              KeyDerivationId: id,
-            }),
-          },
-          tableName,
+            Bip44WrapperId: bip44WrapperId,
+            PublicDeriverId: pubDeriver.publicDeriverResult.PublicDeriverId,
+            Index: children.length,
+          }
         );
-        parentId = nextLevel.KeyDerivation.KeyDerivationId;
       }
-      const tableName = Bip44TableMap.get(
-        wrapper.PrivateDeriverLevel + body.pathToPublic.length
-      );
-      if (tableName == null) {
-        throw new Error('AddDerivation::add Unknown table queried');
-      }
-      pubDeriver = await DerivePublicFromPrivate.depTables.AddPublicDeriver.add(
-        db, tx,
-        {
-          addLevelRequest: {
-            privateKeyInfo: newKeys.newPrivateKey,
-            publicKeyInfo: newKeys.newPublicKey,
-            derivationInfo: keys => ({
-              PublicKeyId: keys.public,
-              PrivateKeyId: keys.private,
-              Parent: parentId,
-              Index: body.pathToPublic[body.pathToPublic.length - 1].index,
-            }),
-            levelInfo: id => ({
-              ...body.pathToPublic[body.pathToPublic.length - 1].insert,
-              KeyDerivationId: id,
-            }),
-          },
-          levelSpecificTableName: tableName,
-          addPublicDeriverRequest: body.publicDeriverInsert
-        }
-      );
-    }
-
-    // add new row in mapping table
-    {
-      const children = await DerivePublicFromPrivate.depTables.GetAllBip44Wallets.forBip44Wallet(
-        db, tx,
-        bip44WrapperId
-      );
-      await DerivePublicFromPrivate.depTables.AddBipp44ToPublicDeriver.add(
-        db, tx,
-        {
-          Bip44WrapperId: bip44WrapperId,
-          PublicDeriverId: pubDeriver.publicDeriverResult.PublicDeriverId,
-          Index: children.length,
-        }
-      );
-    }
-    await DerivePublicFromPrivate.depTables.AddBip44Tree.add(
-      db, tx,
-      {
-        derivationId: pubDeriver.publicDeriverResult.KeyDerivationId,
-        children: initialDerivations,
-      },
-      privateDeriverLevel + body.pathToPublic.length,
     );
-
-    return pubDeriver;
   }
 }
 
@@ -524,138 +276,45 @@ export class ModifyDisplayCutoff {
   }
 }
 
-export type AddAdhocPublicDeriverRequest = {|
-  bip44WrapperId: number,
-  publicKey: KeyInsert,
-  parentDerivationId: null | number,
-  pathStartLevel: number,
-  /**
-   * Need this as no guarantee the path is same for each key
-   * ex: different coin types
-   * Last index should be the index you want for the public deriver
-   */
-  pathToPublic: InsertPath,
-  publicDeriverInsert: {
-    derivationId: number,
-    lastSyncInfoId: number,
-   } => PublicDeriverInsert,
-   initialDerivations: TreeInsert<any>,
-  hwWalletMetaInsert?: HwWalletMetaInsert,
-|}
-export type AddAdhocPublicDeriverResponse<Row> = {|
-  publicDeriver: AddPublicDeriverResponse<Row>,
-  hwWalletMeta: void | $ReadOnly<HwWalletMetaRow>,
-|}
-export class AddAdhocPublicDeriver {
-  static ownTables = Object.freeze({
-    ...allBip44DerivationTables,
-    [PublicDeriverSchema.name]: PublicDeriverSchema,
-  });
+export class AddBip44AdhocPublicDeriver {
+  static ownTables = Object.freeze({});
   static depTables = Object.freeze({
-    AddDerivation,
-    AddPublicDeriver,
-    ModifyHwWalletMeta,
-    AddBip44Tree,
-    AddBipp44ToPublicDeriver,
+    GetBip44Tables,
+    AddBip44ToPublicDeriver,
     GetAllBip44Wallets,
+    AddAdhocPublicDeriver,
   });
 
   static async add<Row>(
     db: lf$Database,
     tx: lf$Transaction,
     request: AddAdhocPublicDeriverRequest,
+    bip44WrapperId: number,
   ): Promise<AddAdhocPublicDeriverResponse<Row>> {
-    let parentId: number | null = request.parentDerivationId;
-    for (let i = 0; i < request.pathToPublic.length - 1; i++) {
-      const tableName = Bip44TableMap.get(request.pathStartLevel + i);
-      if (tableName == null) {
-        throw new Error('AddDerivation::add Unknown table queried');
-      }
-      const levelResult = await AddAdhocPublicDeriver.depTables.AddDerivation.add(
-        db, tx,
-        {
-          privateKeyInfo: null,
-          publicKeyInfo: null,
-          // eslint-disable-next-line no-loop-func
-          derivationInfo: keyInfo => ({
-            PublicKeyId: keyInfo.private,
-            PrivateKeyId: keyInfo.public,
-            Parent: parentId,
-            // explicitly ignore index for ROOT since it has no index
-            Index: request.pathStartLevel + i === 0  ? null : request.pathToPublic[i].index,
-          }),
-          levelInfo: id => ({
-            ...request.pathToPublic[i].insert,
-            KeyDerivationId: id,
-          }),
-        },
-        tableName,
-      );
-      parentId = levelResult.KeyDerivation.KeyDerivationId;
-    }
+    const bip44Tables = AddBip44AdhocPublicDeriver.depTables.GetBip44Tables.get();
 
-    const tableName = Bip44TableMap.get(request.pathStartLevel + request.pathToPublic.length - 1);
-    if (tableName == null) {
-      throw new Error('AddDerivation::add Unknown table queried');
-    }
-    const publicDeriver = await AddAdhocPublicDeriver.depTables.AddPublicDeriver.add(
+    return await AddBip44AdhocPublicDeriver.depTables.AddAdhocPublicDeriver.add<Row>(
       db, tx,
-      {
-        wrapperId: request.bip44WrapperId,
-        addLevelRequest: {
-          privateKeyInfo: null,
-          publicKeyInfo: request.publicKey,
-          derivationInfo: keys => ({
-            PublicKeyId: keys.public,
-            PrivateKeyId: keys.private,
-            Parent: parentId,
-            Index: request.pathToPublic[request.pathToPublic.length - 1].index,
-          }),
-          levelInfo: id => ({
-            ...request.pathToPublic[request.pathToPublic.length - 1].insert,
-            KeyDerivationId: id,
-          }),
-        },
-        levelSpecificTableName: tableName,
-        addPublicDeriverRequest: request.publicDeriverInsert
+      request,
+      bip44Tables,
+      async (pubDeriver) => {
+        // add new row in mapping table
+        const children = await AddBip44AdhocPublicDeriver
+          .depTables
+          .GetAllBip44Wallets
+          .forBip44Wallet(
+            db, tx,
+            bip44WrapperId
+          );
+        await AddBip44AdhocPublicDeriver.depTables.AddBip44ToPublicDeriver.add(
+          db, tx,
+          {
+            Bip44WrapperId: bip44WrapperId,
+            PublicDeriverId: pubDeriver.publicDeriverResult.PublicDeriverId,
+            Index: children.length,
+          }
+        );
       }
     );
-
-    // add new row in mapping table
-    {
-      const children = await AddAdhocPublicDeriver.depTables.GetAllBip44Wallets.forBip44Wallet(
-        db, tx,
-        request.bip44WrapperId
-      );
-      await AddAdhocPublicDeriver.depTables.AddBipp44ToPublicDeriver.add(
-        db, tx,
-        {
-          Bip44WrapperId: request.bip44WrapperId,
-          PublicDeriverId: publicDeriver.publicDeriverResult.PublicDeriverId,
-          Index: children.length,
-        }
-      );
-    }
-
-    await AddAdhocPublicDeriver.depTables.AddBip44Tree.add(
-      db, tx,
-      {
-        derivationId: publicDeriver.publicDeriverResult.KeyDerivationId,
-        children: request.initialDerivations,
-      },
-      request.pathStartLevel + request.pathToPublic.length - 1,
-    );
-
-    const hwWalletMeta = request.hwWalletMetaInsert == null
-      ? undefined
-      : await AddAdhocPublicDeriver.depTables.ModifyHwWalletMeta.add(
-        db, tx,
-        request.hwWalletMetaInsert
-      );
-
-    return {
-      publicDeriver,
-      hwWalletMeta,
-    };
   }
 }

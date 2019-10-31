@@ -5,7 +5,7 @@ import Request from '../lib/LocalizedRequest';
 import type { ChangeModelPasswordFunc, RenameModelFunc } from '../../api/ada';
 import {
   asGetSigningKey,
-} from '../../api/ada/lib/storage/models/PublicDeriver/index';
+} from '../../api/ada/lib/storage/models/Bip44Wallet/traits';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 
 export default class AdaWalletSettingsStore extends WalletSettingsStore {

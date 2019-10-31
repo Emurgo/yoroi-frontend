@@ -12,8 +12,7 @@ import type {
 import * as Tables from '../tables';
 
 import {
-  Bip44TableMap,
-  allBip44DerivationTables,
+  GetBip44Tables,
 } from './utils';
 import {
   getRowIn,
@@ -27,10 +26,11 @@ import type { PublicDeriverRow, } from '../../core/tables';
 
 export class GetBip44DerivationSpecific {
   static ownTables = Object.freeze({
-    ...allBip44DerivationTables,
     [KeyDerivationSchema.name]: KeyDerivationSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables = Object.freeze({
+    GetBip44Tables,
+  });
 
   static async get<Row>(
     db: lf$Database,
@@ -38,7 +38,8 @@ export class GetBip44DerivationSpecific {
     derivationIds: Array<number>,
     level: number,
   ): Promise<$ReadOnlyArray<$ReadOnly<Row>>> {
-    const tableName = Bip44TableMap.get(level);
+    const bip44Tables = GetBip44DerivationSpecific.depTables.GetBip44Tables.get();
+    const tableName = bip44Tables.get(level);
     if (tableName == null) {
       throw new Error('GetBip44DerivationSpecific::get Unknown table queried');
     }
@@ -96,19 +97,20 @@ export class GetAllBip44Wallets {
     const bip44WrapperTable = db.getSchema().table(
       GetAllBip44Wallets.ownTables[Tables.Bip44WrapperSchema.name].name
     );
+    const properties = Tables.Bip44ToPublicDeriverSchema.properties;
     const query = db
       .select()
       .from(bip44ToPublicDeriverTable)
       .innerJoin(
         publicDeriverTable,
         publicDeriverTable[PublicDeriverSchema.properties.PublicDeriverId].eq(
-          bip44ToPublicDeriverTable[Tables.Bip44ToPublicDeriverSchema.properties.PublicDeriverId]
+          bip44ToPublicDeriverTable[properties.PublicDeriverId]
         )
       )
       .innerJoin(
         bip44WrapperTable,
         bip44WrapperTable[Tables.Bip44WrapperSchema.properties.Bip44WrapperId].eq(
-          bip44ToPublicDeriverTable[Tables.Bip44ToPublicDeriverSchema.properties.Bip44WrapperId]
+          bip44ToPublicDeriverTable[properties.Bip44WrapperId]
         )
       );
 
@@ -125,11 +127,12 @@ export class GetAllBip44Wallets {
     const bip44ToPublicDeriverTable = db.getSchema().table(
       GetAllBip44Wallets.ownTables[Tables.Bip44ToPublicDeriverSchema.name].name
     );
+    const properties = Tables.Bip44ToPublicDeriverSchema.properties;
     const query = db
       .select()
       .from(bip44ToPublicDeriverTable)
       .where(
-        bip44ToPublicDeriverTable[Tables.Bip44ToPublicDeriverSchema.properties.Bip44WrapperId].eq(
+        bip44ToPublicDeriverTable[properties.Bip44WrapperId].eq(
           bip44WrapperId
         )
       );

@@ -1,5 +1,6 @@
 // @flow
 
+import type { lf$Transaction } from 'lovefield';
 import {
   BigNumber
 } from 'bignumber.js';
@@ -7,6 +8,14 @@ import {
 import type {
   KeyRow,
 } from '../../database/primitives/tables';
+
+export type RawVariation<Func, Deps, Arg> = (
+  tx: lf$Transaction,
+  deps: Deps,
+  // should be able to extract Arg type with a $Call on Func
+  // but for some reason it isn't working :/
+  body: Arg,
+) => ReturnType<Func>;
 
 export type Address = {|
   +address: string,

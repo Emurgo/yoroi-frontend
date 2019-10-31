@@ -55,14 +55,16 @@ import type {
 import { TxStatusCodes, } from '../database/primitives/tables';
 import {
   asScanAddresses,
-} from '../models/PublicDeriver';
+} from '../models/common/traits';
 import type { IPublicDeriver, IGetAllUtxos, } from '../models/PublicDeriver/interfaces';
 import {
   GetLastSyncForPublicDeriver,
   GetPublicDeriver,
   GetKeyForPublicDeriver,
 } from '../database/walletTypes/core/api/read';
-import { AddBip44Tree, ModifyDisplayCutoff, } from '../database/walletTypes/bip44/api/write';
+import { ModifyDisplayCutoff, } from '../database/walletTypes/bip44/api/write';
+import { GetBip44Tables, } from '../database/walletTypes/bip44/api/utils';
+import { AddDerivationTree, } from '../database/walletTypes/common/api/write';
 import { GetBip44DerivationSpecific, } from '../database/walletTypes/bip44/api/read';
 import { ModifyLastSyncInfo, } from '../database/walletTypes/core/api/write';
 import type { LastSyncInfoRow, } from '../database/walletTypes/core/tables';
@@ -288,7 +290,8 @@ export async function updateTransactions(
       GetUtxoTxOutputsWithTx,
       GetOrAddAddress,
       GetPublicDeriver,
-      AddBip44Tree,
+      AddDerivationTree,
+      GetBip44Tables,
       MarkUtxo,
       ModifyDisplayCutoff,
       GetDerivationsByPath,
@@ -541,7 +544,8 @@ async function rawUpdateTransactions(
     GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
     GetOrAddAddress: Class<GetOrAddAddress>,
     GetPublicDeriver: Class<GetPublicDeriver>,
-    AddBip44Tree: Class<AddBip44Tree>,
+    GetBip44Tables: Class<GetBip44Tables>,
+    AddDerivationTree: Class<AddDerivationTree>,
     MarkUtxo: Class<MarkUtxo>,
     ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
     GetDerivationsByPath: Class<GetDerivationsByPath>,
@@ -594,7 +598,8 @@ async function rawUpdateTransactions(
           GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx,
           GetOrAddAddress: deps.GetOrAddAddress,
           GetPublicDeriver: deps.GetPublicDeriver,
-          AddBip44Tree: deps.AddBip44Tree,
+          GetBip44Tables: deps.GetBip44Tables,
+          AddDerivationTree: deps.AddDerivationTree,
           ModifyDisplayCutoff: deps.ModifyDisplayCutoff,
           GetDerivationsByPath: deps.GetDerivationsByPath,
           GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,

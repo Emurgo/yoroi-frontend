@@ -19,11 +19,15 @@ import {
 import { loadLovefieldDB } from '../../database/index';
 
 import {
-  asGetAllUtxos,
-  asGetUtxoBalance,
-  asDisplayCutoff,
   PublicDeriver,
 } from '../../models/PublicDeriver/index';
+import {
+  asGetAllUtxos,
+  asDisplayCutoff,
+} from '../../models/Bip44Wallet/traits';
+import {
+  asGetUtxoBalance,
+} from '../../models/common/traits';
 
 import {
   updateTransactions
@@ -145,12 +149,12 @@ async function checkPub1HasTx(
   }
 
   {
-    const response = await basePubDeriver.getBalance();
+    const response = await basePubDeriver.getUtxoBalance();
     expect(response).toEqual(new BigNumber('2100000'));
   }
 
   {
-    const response = await basePubDeriver.getBalance();
+    const response = await basePubDeriver.getUtxoBalance();
     expect(response).toEqual(new BigNumber('2100000'));
   }
 
@@ -179,12 +183,12 @@ async function checkPub2IsEmpty(
   }
 
   {
-    const response = await basePubDeriver.getBalance();
+    const response = await basePubDeriver.getUtxoBalance();
     expect(response).toEqual(new BigNumber('0'));
   }
 
   {
-    const response = await basePubDeriver.getBalance();
+    const response = await basePubDeriver.getUtxoBalance();
     expect(response).toEqual(new BigNumber('0'));
   }
 
@@ -239,12 +243,12 @@ async function checkPub2HasTx(
   }
 
   {
-    const response = await basePubDeriver.getBalance();
+    const response = await basePubDeriver.getUtxoBalance();
     expect(response).toEqual(new BigNumber('2700000'));
   }
 
   {
-    const response = await basePubDeriver.getBalance();
+    const response = await basePubDeriver.getUtxoBalance();
     expect(response).toEqual(new BigNumber('2700000'));
   }
 

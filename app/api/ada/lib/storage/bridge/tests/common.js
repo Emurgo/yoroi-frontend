@@ -3,7 +3,7 @@
 import type { lf$Database } from 'lovefield';
 import {
   Bip44Wallet,
-} from '../../models/Bip44Wallet';
+} from '../../models/Bip44Wallet/wrapper';
 import {
   PublicDeriver,
 } from '../../models/PublicDeriver/index';

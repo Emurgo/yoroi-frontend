@@ -26,16 +26,20 @@ import {
   Bip44Wallet,
   asPublicFromPrivate,
   asGetPrivateDeriverKey,
-} from '../models/Bip44Wallet';
+} from '../models/Bip44Wallet/wrapper';
 import {
   PublicDeriver,
-  asAddFromPublic,
+} from '../models/PublicDeriver/index';
+import {
+  asAddBip44FromPublic,
   asGetAllUtxos,
-  asGetPublicKey,
   asDisplayCutoff,
   asHasChains,
   asGetSigningKey,
-} from '../models/PublicDeriver/index';
+} from '../models/Bip44Wallet/traits';
+import {
+  asGetPublicKey,
+} from '../models/common/traits';
 
 import {
   createStandardBip44Wallet,
@@ -108,29 +112,8 @@ test('Can add and fetch address in wallet', async (done) => {
             Name: 'Checking account',
             LastSyncInfoId: ids.lastSyncInfoId,
           }),
-          pathToPublic: [
-            {
-              index: BIP44_PURPOSE,
-              insert: {},
-            },
-            {
-              index: CARDANO_COINTYPE,
-              insert: {},
-            },
-            {
-              index: accountIndex,
-              insert: {},
-            },
-          ],
+          path: [BIP44_PURPOSE, CARDANO_COINTYPE, accountIndex],
           decryptPrivateDeriverPassword: privateDeriverPassword,
-          publicDeriverPublicKey: {
-            password: null,
-            lastUpdate: null,
-          },
-          publicDeriverPrivateKey: {
-            password: null,
-            lastUpdate: null,
-          },
           initialDerivations: [
             {
               index: 0, // external chain,
@@ -321,9 +304,9 @@ test('Can add and fetch address in wallet', async (done) => {
       });
     }
 
-    const asAddFromPublicInstance = asAddFromPublic(publicDeriver);
-    expect(asAddFromPublicInstance != null).toEqual(true);
-    if (asAddFromPublicInstance != null) {
+    const asAddBip44FromPublicInstance = asAddBip44FromPublic(publicDeriver);
+    expect(asAddBip44FromPublicInstance != null).toEqual(true);
+    if (asAddBip44FromPublicInstance != null) {
       // TODO
     }
   }

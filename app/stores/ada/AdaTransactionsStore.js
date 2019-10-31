@@ -19,7 +19,7 @@ import { assuranceLevels, } from '../../config/transactionAssuranceConfig';
 import type {
   GetTransactionRowsToExportFunc,
 } from '../../api/ada';
-import { asGetAllUtxos, } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { asGetAllUtxos, } from '../../api/ada/lib/storage/models/Bip44Wallet/traits';
 
 import type {
   ExportTransactionsRequest,

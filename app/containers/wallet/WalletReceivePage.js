@@ -15,7 +15,7 @@ import {
 } from '../../config/numbersConfig';
 import globalMessages from '../../i18n/global-messages';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
-import { asHasChains } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { asHasChains } from '../../api/ada/lib/storage/models/Bip44Wallet/traits';
 
 type Props = {
   ...InjectedProps,

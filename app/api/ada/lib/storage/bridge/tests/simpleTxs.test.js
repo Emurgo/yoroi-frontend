@@ -21,9 +21,11 @@ import { loadLovefieldDB } from '../../database/index';
 
 import {
   asGetAllUtxos,
-  asGetUtxoBalance,
   asDisplayCutoff,
-} from '../../models/PublicDeriver/index';
+} from '../../models/Bip44Wallet/traits';
+import {
+  asGetUtxoBalance,
+} from '../../models/common/traits';
 
 import {
   updateTransactions,
@@ -222,12 +224,12 @@ test('Syncing simple transaction', async (done) => {
     }
 
     {
-      const response = await basePubDeriver.getBalance();
+      const response = await basePubDeriver.getUtxoBalance();
       expect(response).toEqual(new BigNumber('2100000'));
     }
 
     {
-      const response = await basePubDeriver.getBalance();
+      const response = await basePubDeriver.getUtxoBalance();
       expect(response).toEqual(new BigNumber('2100000'));
     }
 
@@ -339,12 +341,12 @@ test('Syncing simple transaction', async (done) => {
     }
 
     {
-      const response = await basePubDeriver.getBalance();
+      const response = await basePubDeriver.getUtxoBalance();
       expect(response).toEqual(new BigNumber('2000000'));
     }
 
     {
-      const response = await basePubDeriver.getBalance();
+      const response = await basePubDeriver.getUtxoBalance();
       expect(response).toEqual(new BigNumber('2000000'));
     }
 
@@ -383,12 +385,12 @@ test('Syncing simple transaction', async (done) => {
     }
 
     {
-      const response = await basePubDeriver.getBalance();
+      const response = await basePubDeriver.getUtxoBalance();
       expect(response).toEqual(new BigNumber('0'));
     }
 
     {
-      const response = await basePubDeriver.getBalance();
+      const response = await basePubDeriver.getUtxoBalance();
       expect(response).toEqual(new BigNumber('0'));
     }
 
@@ -417,12 +419,12 @@ test('Syncing simple transaction', async (done) => {
     }
 
     {
-      const response = await basePubDeriver.getBalance();
+      const response = await basePubDeriver.getUtxoBalance();
       expect(response).toEqual(new BigNumber('0'));
     }
 
     {
-      const response = await basePubDeriver.getBalance();
+      const response = await basePubDeriver.getUtxoBalance();
       expect(response).toEqual(new BigNumber('0'));
     }
 
@@ -552,12 +554,12 @@ test('Utxo created and used in same sync', async (done) => {
     }
 
     {
-      const response = await basePubDeriver.getBalance();
+      const response = await basePubDeriver.getUtxoBalance();
       expect(response).toEqual(new BigNumber('2000000'));
     }
 
     {
-      const response = await basePubDeriver.getBalance();
+      const response = await basePubDeriver.getUtxoBalance();
       expect(response).toEqual(new BigNumber('2000000'));
     }
   }

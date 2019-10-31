@@ -465,6 +465,8 @@ Object {
     },
   ],
   "Block": Array [],
+  "Cip1852ToPublicDeriver": Array [],
+  "Cip1852Wrapper": Array [],
   "CoinTypeDerivation": Array [
     Object {
       "CoinTypeDerivationId": 1,
@@ -501,15 +503,9 @@ Object {
       "PasswordLastUpdate": null,
     },
     Object {
-      "Hash": "b078646cd70aa2e46df819733ff847d5673465127a5a12d0404ae31fc4e5974439fee08adb3ffc2b335e04fe0bf5c21dfb02ab0446e6d01bd674cfd420bec9dc5991e29a6db8779a29421acbcad6e42af414ffcacd8b68f1c01589f739f93a08",
-      "IsEncrypted": false,
-      "KeyId": 3,
-      "PasswordLastUpdate": null,
-    },
-    Object {
       "Hash": "bc31c83c1b03a6b976ced49e524512ee11e46dcdcace361c2527df22fc78c6ec5991e29a6db8779a29421acbcad6e42af414ffcacd8b68f1c01589f739f93a08",
       "IsEncrypted": false,
-      "KeyId": 4,
+      "KeyId": 3,
       "PasswordLastUpdate": null,
     },
   ],
@@ -840,8 +836,8 @@ Object {
       "Index": 2147483649,
       "KeyDerivationId": 47,
       "Parent": 3,
-      "PrivateKeyId": 3,
-      "PublicKeyId": 4,
+      "PrivateKeyId": null,
+      "PublicKeyId": 3,
     },
     Object {
       "Index": 0,

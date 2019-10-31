@@ -24,11 +24,16 @@ import type {
   IDisplayCutoff,
 } from './PublicDeriver/interfaces';
 import {
-  PublicDeriver, asDisplayCutoff,
-  asGetAllAccounting,
-  asGetAllUtxos,
+  PublicDeriver,
 } from './PublicDeriver/index';
-import { Bip44Wallet, } from './Bip44Wallet/index';
+import {
+  asDisplayCutoff,
+  asGetAllUtxos,
+} from './Bip44Wallet/traits';
+import {
+  asGetAllAccounting,
+} from './Cip1852Wallet/traits';
+import { Bip44Wallet, } from './Bip44Wallet/wrapper';
 
 import type {
   IChangePasswordRequest, IChangePasswordResponse,
@@ -40,8 +45,15 @@ import {
   UpdateGet, GetOrAddAddress,
 } from '../database/primitives/api/write';
 import {
+  ModifyDisplayCutoff,
+} from '../database/walletTypes/bip44/api/write';
+import type {
+  TreeInsert
+} from '../database/walletTypes/common/utils';
+import {
   GetAddress,
   GetPathWithSpecific,
+  GetDerivationsByPath,
 } from '../database/primitives/api/read';
 import {
   getAllSchemaTables,
@@ -67,7 +79,7 @@ import { WrongPassphraseError } from '../../cardanoCrypto/cryptoErrors';
 
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 
-import { EXTERNAL, INTERNAL, } from  '../../../../../config/numbersConfig';
+import { EXTERNAL, INTERNAL, BIP44_SCAN_SIZE, } from  '../../../../../config/numbersConfig';
 import {
   encryptWithPassword,
   decryptWithPassword,
@@ -167,29 +179,6 @@ export function deriveKeyV2(
 
   return currKey;
 }
-
-export type KeyInfo = {
-  password: string | null,
-  lastUpdate: Date | null
-};
-export function toKeyInsert(
-  keyInfo: KeyInfo,
-  keyHex: string,
-): KeyInsert {
-  const hash = keyInfo.password != null
-    ? encryptWithPassword(
-      keyInfo.password,
-      Buffer.from(keyHex, 'hex')
-    )
-    : keyHex;
-
-  return {
-    Hash: hash,
-    IsEncrypted: keyInfo.password != null,
-    PasswordLastUpdate: keyInfo.lastUpdate,
-  };
-}
-
 
 export async function rawGetDerivationsByPath<
   Row: { +KeyDerivationId: number }
@@ -703,24 +692,75 @@ export async function rawGetAddressRowsForWallet(
       utxoAddresses.push(address.addr);
     }
   }
-  const withAccounting = asGetAllAccounting(request.publicDeriver);
-  if (withAccounting != null) {
-    const addrResponse = await withAccounting.rawGetAllAccountingAddresses(
-      tx,
-      {
-        GetPathWithSpecific: deps.GetPathWithSpecific,
-        GetAddress: deps.GetAddress,
-        GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
-      },
-      undefined,
-    );
-    for (const address of addrResponse) {
-      accountingAddresses.push(address.addr);
-    }
-  }
+  // TODO: behavior different for CIP1852 vs Bip44
+  // const withAccounting = asGetAllAccounting(request.publicDeriver);
+  // if (withAccounting != null) {
+  //   const addrResponse = await withAccounting.rawGetAllAccountingAddresses(
+  //     tx,
+  //     {
+  //       GetPathWithSpecific: deps.GetPathWithSpecific,
+  //       GetAddress: deps.GetAddress,
+  //       GetCip1852DerivationSpecific: deps.GetCip1852DerivationSpecific,
+  //     },
+  //     undefined,
+  //   );
+  //   for (const address of addrResponse) {
+  //     accountingAddresses.push(address.addr);
+  //   }
+  // }
 
   return {
     utxoAddresses,
     accountingAddresses,
   };
+}
+
+export async function updateCutoffFromInsert(
+  tx: lf$Transaction,
+  deps: {|
+    GetPathWithSpecific: Class<GetPathWithSpecific>,
+    GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+    GetDerivationsByPath: Class<GetDerivationsByPath>,
+    ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
+  |},
+  request: {|
+    publicDeriverLevel: number,
+    displayCutoffInstance: IDisplayCutoff,
+    tree: TreeInsert<any>,
+  |},
+): Promise<void> {
+  if (request.displayCutoffInstance != null) {
+    if (request.publicDeriverLevel !== Bip44DerivationLevels.ACCOUNT.level) {
+      throw new Error('updateCutoffFromInsert incorrect pubderiver level');
+    }
+    const external = request.tree.find(node => node.index === EXTERNAL);
+    if (external == null || external.children == null) {
+      throw new Error('updateCutoffFromInsert should never happen');
+    }
+    let bestNewCuttoff = 0;
+    for (const child of external.children) {
+      if (child.index > bestNewCuttoff) {
+        bestNewCuttoff = child.index;
+      }
+    }
+
+    const currentCutoff = await request.displayCutoffInstance.rawGetCutoff(
+      tx,
+      {
+        GetPathWithSpecific: deps.GetPathWithSpecific,
+        GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
+      },
+      undefined,
+    );
+    if (bestNewCuttoff - BIP44_SCAN_SIZE > currentCutoff) {
+      await request.displayCutoffInstance.rawSetCutoff(
+        tx,
+        {
+          ModifyDisplayCutoff: deps.ModifyDisplayCutoff,
+          GetDerivationsByPath: deps.GetDerivationsByPath,
+        },
+        { newIndex: bestNewCuttoff - BIP44_SCAN_SIZE },
+      );
+    }
+  }
 }

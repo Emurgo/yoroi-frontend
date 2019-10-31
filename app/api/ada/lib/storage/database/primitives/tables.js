@@ -74,8 +74,8 @@ export const EncryptionMetaSchema: {
 export type KeyDerivationInsert = {|
   PublicKeyId: number | null,
   PrivateKeyId: number | null,
-  Parent: number | null,
-  Index: number | null,
+  Parent: number | null, // no parent in root case
+  Index: number | null, // no index in root case
 |};
 export type KeyDerivationRow = {|
   KeyDerivationId: number, // serial

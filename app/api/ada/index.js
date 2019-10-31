@@ -22,7 +22,7 @@ import {
 } from './lib/storage/bridge/updateTransactions';
 import {
   Bip44Wallet,
-} from './lib/storage/models/Bip44Wallet';
+} from './lib/storage/models/Bip44Wallet/wrapper';
 import type { HWFeatures, } from './lib/storage/database/walletTypes/core/tables';
 import {
   flattenInsertTree,
@@ -30,11 +30,12 @@ import {
 } from './lib/storage/database/walletTypes/bip44/api/utils';
 import {
   PublicDeriver,
-  asDisplayCutoff,
 } from './lib/storage/models/PublicDeriver/index';
+import {
+  asDisplayCutoff,
+} from './lib/storage/models/Bip44Wallet/traits';
 import type {
   IPublicDeriver,
-  IBip44Parent,
   IGetAllUtxos,
   IGetLastSyncInfo,
   IGetSigningKey,
@@ -46,6 +47,9 @@ import type {
   WalletAccountNumberPlate,
   IGetPublicResponse,
 } from './lib/storage/models/PublicDeriver/interfaces';
+import type {
+  IBip44Parent,
+} from './lib/storage/models/Bip44Wallet/interfaces';
 import type {
   IRenameFunc, IRenameRequest, IRenameResponse,
   IChangePasswordRequestFunc, IChangePasswordRequest, IChangePasswordResponse,

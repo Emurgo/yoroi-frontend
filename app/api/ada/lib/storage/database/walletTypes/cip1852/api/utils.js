@@ -6,12 +6,9 @@ import {
   CoinTypeDerivationSchema,
   Bip44AccountSchema,
   Bip44ChainSchema,
-  Bip44AddressSchema,
 } from '../../common/tables';
-import type { Bip44AddressInsert, } from '../../common/tables';
-import type { TreeInsert, } from '../../common/utils';
 
-export const Bip44DerivationLevels = Object.freeze({
+export const Cip1852DerivationLevels = Object.freeze({
   ROOT: {
     level: 0,
     table: RootDerivationSchema,
@@ -28,18 +25,16 @@ export const Bip44DerivationLevels = Object.freeze({
     level: 3,
     table: Bip44AccountSchema,
   },
+  // TODO: add Account level somehow
   CHAIN: {
     level: 4,
     table: Bip44ChainSchema,
   },
-  ADDRESS: {
-    level: 5,
-    table: Bip44AddressSchema,
-  },
+  // TODO: add Address level
 });
-const Bip44TableMap = new Map<number, string>(
-  Object.keys(Bip44DerivationLevels)
-    .map(key => Bip44DerivationLevels[key])
+const Cip1852TableMap = new Map<number, string>(
+  Object.keys(Cip1852DerivationLevels)
+    .map(key => Cip1852DerivationLevels[key])
     .map(val => [val.level, val.table.name])
 );
 
@@ -52,49 +47,23 @@ const Bip44TableMap = new Map<number, string>(
  * follow by a query at that level.
  * Since we cannot statically determine which level will be used, we just lock all tables.
  */
-const allBip44DerivationTables = {
+const allCip1852DerivationTables = {
   [RootDerivationSchema.name]: RootDerivationSchema,
   [PurposeDerivationSchema.name]: PurposeDerivationSchema,
   [CoinTypeDerivationSchema.name]: CoinTypeDerivationSchema,
   [Bip44AccountSchema.name]: Bip44AccountSchema,
   [Bip44ChainSchema.name]: Bip44ChainSchema,
-  [Bip44AddressSchema.name]: Bip44AddressSchema,
+  // TODO: add missing tables
 };
 
-export class GetBip44Tables {
+export class GetCip1852Tables {
   static ownTables = Object.freeze({
-    ...allBip44DerivationTables,
+    ...allCip1852DerivationTables,
   });
   static depTables = Object.freeze({});
 
   static get(
   ): Map<number, string> {
-    return Bip44TableMap;
+    return Cip1852TableMap;
   }
-}
-
-export function flattenInsertTree(
-  tree: TreeInsert<any>,
-): Array<{|
-  path: Array<number>,
-  insert: Bip44AddressInsert,
-|}> {
-  const addresses = [];
-  for (const branch of tree) {
-    if (branch.children != null) {
-      const children = flattenInsertTree(branch.children);
-      for (const child of children) {
-        addresses.push({
-          path: [branch.index].concat(child.path),
-          insert: child.insert
-        });
-      }
-    } else {
-      addresses.push({
-        path: [branch.index],
-        insert: branch.insert
-      });
-    }
-  }
-  return addresses;
 }

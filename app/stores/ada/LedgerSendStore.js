@@ -17,8 +17,11 @@ import type {
   PrepareAndBroadcastLedgerSignedTxFunc,
 } from '../../api/ada';
 import {
-  asGetPublicKey, asBip44Parent,
-} from '../../api/ada/lib/storage/models/PublicDeriver/index';
+  asBip44Parent,
+} from '../../api/ada/lib/storage/models/Bip44Wallet/traits';
+import {
+  asGetPublicKey,
+} from '../../api/ada/lib/storage/models/common/traits';
 import type {
   SendUsingLedgerParams
 } from '../../actions/ada/ledger-send-actions';

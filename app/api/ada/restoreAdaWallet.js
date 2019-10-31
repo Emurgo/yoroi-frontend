@@ -19,7 +19,7 @@ import { RustModule } from './lib/cardanoCrypto/rustLoader';
 
 import type {
   TreeInsert,
-} from './lib/storage/database/walletTypes/bip44/api/write';
+} from './lib/storage/database/walletTypes/common/utils';
 import type { HashToIdsFunc, } from './lib/storage/models/utils';
 
 declare var CONFIG: ConfigType;

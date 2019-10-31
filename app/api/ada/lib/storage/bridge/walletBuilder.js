@@ -6,11 +6,7 @@ import type {
 } from 'lovefield';
 
 import type {
-  KeyDerivationRow,
-} from '../database/primitives/tables';
-import type {
   ConceptualWalletInsert,
-  PublicDeriverRow,
 } from '../database/walletTypes/core/tables';
 import {
   ModifyConceptualWallet,
@@ -18,15 +14,19 @@ import {
 import type {
   Bip44WrapperInsert,
 } from '../database/walletTypes/bip44/tables';
+import { GetBip44Tables } from '../database/walletTypes/bip44/api/utils';
 import {
   AddBip44Wrapper,
-  AddPrivateDeriver,
-  DerivePublicFromPrivate,
-  AddAdhocPublicDeriver,
+  DeriveBip44PublicFromPrivate,
+  AddBip44AdhocPublicDeriver,
 } from '../database/walletTypes/bip44/api/write';
 import type {
-  PrivateDeriverRequest, AddAdhocPublicDeriverRequest,
-} from '../database/walletTypes/bip44/api/write';
+  AddAdhocPublicDeriverRequest,
+} from '../database/walletTypes/common/api/write';
+import {
+  AddDerivationTree,
+} from '../database/walletTypes/common/api/write';
+import type { AddPublicDeriverResponse } from '../database/walletTypes/core/api/write';
 import {
   getAllTables,
   raii,
@@ -36,7 +36,9 @@ import type {
 } from '../models/Bip44Wallet/interfaces';
 import {
   derivePublicDeriver,
-} from '../models/Bip44Wallet/index';
+} from '../models/Bip44Wallet/wrapper';
+import type { AddDerivationRequest } from '../database/primitives/api/write';
+import type { TreeInsertStart } from '../database/walletTypes/common/utils';
 
 /**
  * We need to statically ensure that
@@ -190,22 +192,36 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
     );
   }
 
-  addPrivateDeriver: StateConstraint<
+  addFromRoot: StateConstraint<
     CurrentState,
     HasConceptualWallet,
-    CurrentState => PrivateDeriverRequest<mixed>,
-    CurrentState & HasPrivateDeriver
+    CurrentState => {|
+      rootInsert: AddDerivationRequest<any>,
+      tree: number => TreeInsertStart,
+    |},
+    CurrentState & HasRoot
   > = <Insert>(
-    insert: CurrentState => PrivateDeriverRequest<Insert>,
+    insert: CurrentState => {|
+      rootInsert: AddDerivationRequest<Insert>,
+      tree: number => TreeInsertStart,
+    |},
   ) => {
-    return this.updateData<HasConceptualWallet, HasPrivateDeriver>(
-      AsNotNull<HasPrivateDeriver>({ privateDeriver: null }),
-      Array.from(getAllTables(AddPrivateDeriver)),
+    return this.updateData<HasConceptualWallet, HasRoot>(
+      AsNotNull<HasRoot>({ root: null }),
+      Array.from([
+        ...getAllTables(AddDerivationTree),
+        ...getAllTables(GetBip44Tables),
+      ]),
       async (finalData) => {
-        finalData.privateDeriver = await AddPrivateDeriver.add(
+        const { rootInsert, tree } = insert(finalData);
+        const tableMap = GetBip44Tables.get();
+        finalData.root = await AddDerivationTree.includingParent<Insert, *>(
           this.db,
           this.txHolder.tx,
-          insert(finalData),
+          rootInsert,
+          tableMap,
+          0, // root
+          tree,
         );
       },
     );
@@ -221,14 +237,15 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
   ) => {
     return this.updateData<HasBip44Wrapper, HasPublicDeriver<mixed>>(
       { publicDeriver: [] },
-      Array.from(getAllTables(AddAdhocPublicDeriver)),
+      Array.from(getAllTables(AddBip44AdhocPublicDeriver)),
       async (finalData) => {
         finalData.publicDeriver = [
           ...finalData.publicDeriver,
-          (await AddAdhocPublicDeriver.add(
+          (await AddBip44AdhocPublicDeriver.add(
             this.db,
             this.txHolder.tx,
             request(finalData),
+            finalData.bip44WrapperRow.Bip44WrapperId,
           )).publicDeriver
         ];
       },
@@ -237,22 +254,22 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
 
   derivePublicDeriver: StateConstraint<
     CurrentState,
-    HasBip44Wrapper & HasPrivateDeriver,
+    HasBip44Wrapper & HasRoot,
     CurrentState => IDerivePublicFromPrivateRequest,
     CurrentState & HasPublicDeriver<mixed>
   > = (
     request: CurrentState => IDerivePublicFromPrivateRequest,
   ) => {
-    return this.updateData<HasBip44Wrapper & HasPrivateDeriver, HasPublicDeriver<mixed>>(
+    return this.updateData<HasBip44Wrapper & HasRoot, HasPublicDeriver<mixed>>(
       { publicDeriver: [] },
-      Array.from(getAllTables(DerivePublicFromPrivate)),
+      Array.from(getAllTables(DeriveBip44PublicFromPrivate)),
       async (finalData) => {
         finalData.publicDeriver = [
           ...finalData.publicDeriver,
           await derivePublicDeriver(
             this.db,
             this.txHolder.tx,
-            { DerivePublicFromPrivate },
+            { DeriveBip44PublicFromPrivate },
             finalData.bip44WrapperRow.Bip44WrapperId,
             request(finalData),
           )
@@ -286,17 +303,11 @@ export type HasConceptualWallet = {|
 export type HasBip44Wrapper = {|
   bip44WrapperRow: PromisslessReturnType<typeof AddBip44Wrapper.add>
 |};
-export type HasPrivateDeriver = {|
-  privateDeriver: PromisslessReturnType<typeof AddPrivateDeriver.add>
+export type HasRoot = {|
+  root: PromisslessReturnType<typeof AddDerivationTree.includingParent>
 |};
 
 export type HasPublicDeriver<Row> = {|
   // we have to re-specify the whole type since you can't use typeof on generic return types
-  publicDeriver: Array<{
-    publicDeriverResult: $ReadOnly<PublicDeriverRow>,
-    levelResult: {
-      KeyDerivation: $ReadOnly<KeyDerivationRow>,
-      specificDerivationResult: $ReadOnly<Row>
-    }
-  }>,
+  publicDeriver: Array<AddPublicDeriverResponse<Row>>,
 |};
