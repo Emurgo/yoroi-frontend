@@ -68,7 +68,7 @@ export default class WalletSummaryPage extends Component<Props> {
           <WalletTransactionsList
             transactions={recent}
             selectedExplorer={this.props.stores.profile.selectedExplorer}
-            isLoadingTransactions={!recentTransactionsRequest.wasExecuted}
+            isLoadingTransactions={!recentTransactionsRequest.wasExecuted || recentTransactionsRequest.isExecuting}
             hasMoreToLoad={totalAvailable > limit}
             onLoadMore={() => actions.ada.transactions.loadMoreTransactions.trigger()}
             assuranceMode={wallet.assuranceMode}
