@@ -196,25 +196,7 @@ export default class TransactionsStore extends Store {
       .then(() => {
         // Recent Request
         // Here we are sure that allRequest was resolved and the local database was updated
-        const limit = this.searchOptions
-          ? this.searchOptions.limit
-          : this.INITIAL_SEARCH_LIMIT;
-        const skip = this.searchOptions
-          ? this.searchOptions.skip
-          : this.SEARCH_SKIP;
-
-        const requestParams: GetTransactionsRequest = {
-          publicDeriver,
-          isLocalRequest: true,
-          limit,
-          skip,
-          getTransactionsHistoryForAddresses: stateFetcher.getTransactionsHistoryForAddresses,
-          checkAddressesInUse: stateFetcher.checkAddressesInUse,
-          getBestBlock: stateFetcher.getBestBlock,
-        };
-        const recentRequest = this._getTransactionsRecentRequest(publicDeriver);
-        recentRequest.invalidate({ immediately: false });
-        recentRequest.execute(requestParams); // note: different params/cache than allRequests
+        this.refreshLocal(publicDeriver);
         return undefined;
       })
       .catch(() => {}); // Do nothing. It's logged in the api call
