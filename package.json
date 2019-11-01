@@ -72,7 +72,7 @@
     "@babel/register": "7.6.2",
     "@babel/runtime": "7.6.2",
     "@babel/runtime-corejs2": "7.6.2",
-    "@storybook/addon-actions": "5.2.1",
+    "@storybook/addon-actions": "5.2.5",
     "@storybook/addon-knobs": "5.2.1",
     "@storybook/addon-links": "5.2.1",
     "@storybook/addon-notes": "5.2.1",
