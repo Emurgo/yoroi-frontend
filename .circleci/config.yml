@@ -135,7 +135,7 @@ jobs:
       BROWSER: brave
     working_directory: ~/repo
     docker:
-      - image: emurgornd/circleci-node-8-browsers:brave
+      - image: emurgornd/circleci-node-12-browsers:brave
 
     steps:
       - *attach_workspace
