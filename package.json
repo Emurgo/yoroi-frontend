@@ -170,7 +170,7 @@
     "react-copy-to-clipboard": "5.0.1",
     "react-css-themr": "2.1.2",
     "react-dom": "16.10.2",
-    "react-hot-loader": "4.12.14",
+    "react-hot-loader": "4.12.15",
     "react-intl": "2.9.0",
     "react-markdown": "4.2.2",
     "react-polymorph": "git+https://github.com/SebastienGllmt/react-polymorph-fix.git",
