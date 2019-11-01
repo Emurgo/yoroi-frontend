@@ -65,6 +65,6 @@
   }
 
   :global(.Dialog_actions) {
-    margin-top: 10px;
+    margin-top: var(--theme-dialog-password-input-actions-margin-top);
   }
 }
