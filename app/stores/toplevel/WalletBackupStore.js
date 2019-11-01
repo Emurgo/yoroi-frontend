@@ -69,7 +69,7 @@ class WalletBackupStore extends Store {
     this.isTermDeviceAccepted = false;
     this.isTermRecoveryAccepted = false;
     this.countdownRemaining = !environment.isMainnet() ? 0 : 10;
-    if (this.countdownTimerInterval) clearInterval(this.countdownTimerInterval);
+    clearInterval(this.countdownTimerInterval);
     this.countdownTimerInterval = setInterval(() => {
       if (this.countdownRemaining > 0) {
         action(() => this.countdownRemaining--)();
@@ -164,8 +164,9 @@ class WalletBackupStore extends Store {
     this.isEntering = false;
     this.isTermDeviceAccepted = false;
     this.isTermRecoveryAccepted = false;
-    this.countdownRemaining = 0;
 
+    this.countdownRemaining = 0;
+    clearInterval(this.countdownTimerInterval);
     this.countdownTimerInterval = null;
   };
 
