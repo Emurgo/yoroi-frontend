@@ -113,6 +113,7 @@ jobs:
       - *restore_cache
       - run: bash .circleci/rust_install.sh
 
+      - run: npm rebuild node-sass
       - run: npm ci
       - *save_cache
       
