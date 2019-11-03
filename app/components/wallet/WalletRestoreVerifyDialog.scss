@@ -56,6 +56,7 @@
 }
 
 :global(.YoroiModern) .dialog {
+  // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1052
   min-width: 680px;
   max-width: 680px; 
 }
