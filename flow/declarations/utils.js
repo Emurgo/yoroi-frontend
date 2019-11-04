@@ -8,7 +8,18 @@ declare type ReturnType<Func> = $Call<ExtractReturnType, Func>;
 declare type ExtractPromisslessReturnType = <R>((...arg: any) => Promise<R>) => R;
 declare type PromisslessReturnType<Func> = $Call<ExtractPromisslessReturnType, Func>;
 
+declare type ExtractInstance = <T>(Class<T>) => T;
+declare type InstanceOf<ClassType> = $Call<ExtractInstance, ClassType>;
+
+declare type ExtractElement = <T>(Array<T>) => T;
+declare type ElementOf<ArrayType> = $Call<ExtractElement, ArrayType>;
+
+declare type AddToArray<ArrayType, Field> = Array<ElementOf<ArrayType> & Field>;
+
 declare type ToSchemaProp = <K, V>(K, V) => K;
+
+declare type Nullable = <K>(K) => null | K;
+declare type WithNullableFields<T: {}> = $ObjMap<T, Nullable>;
 
 /* eslint-disable no-redeclare */
 declare function arguments<A>(() => any): []

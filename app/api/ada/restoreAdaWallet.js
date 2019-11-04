@@ -2,107 +2,157 @@
 
 // Handle restoring wallets that follow the v2 addressing scheme (bip44)
 
-import _ from 'lodash';
 import {
   discoverAllAddressesFrom,
-  generateAddressBatch
 } from './lib/adaAddressProcessing';
 import type {
-  AddressType,
-  AdaWallet,
-} from './adaTypes';
+  GenerateAddressFunc,
+} from './lib/adaAddressProcessing';
 import type { ConfigType } from '../../../config/config-types';
 import type { FilterFunc } from './lib/state-fetch/types';
-import type {
-  SaveAsAdaAddressesFunc,
-} from './lib/storage/types';
+
+import {
+  BIP44_SCAN_SIZE,
+} from '../../config/numbersConfig';
 
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
 
+import type {
+  TreeInsert,
+} from './lib/storage/database/walletTypes/bip44/api/write';
+import type { HashToIdsFunc, } from './lib/storage/models/utils';
+
 declare var CONFIG: ConfigType;
-const addressScanSize = CONFIG.app.addressScanSize;
 const addressRequestSize = CONFIG.app.addressRequestSize;
 
-/** Restore transaction and address history */
-export async function restoreBip44Wallet(
-  accountPublicKey: RustModule.Wallet.Bip44AccountPublic,
-  accountIndex: number,
-  adaWallet: AdaWallet,
-  masterKey?: string,
-  checkAddressesInUse: FilterFunc,
-  saveAsAdaAddresses: SaveAsAdaAddressesFunc,
-): Promise<void> {
-  /**
-   * If the user has no internet connection and scanning fails,
-   * we need to initialize our wallets with the bip44 gap size directly
-   *
-   * Otherwise the generated addresses won't be added to the wallet at all.
-   * This would violate our bip44 obligation to maintain a unused address gap
-   *
-   * Example:
-   * If we throw, no new addresses will be added
-   * so the user's balance would be stuck at 0 until they reinstall Yoroi.
-   */
-  await saveInitialAddresses(accountPublicKey, accountIndex, 'External', saveAsAdaAddresses);
-  await saveInitialAddresses(accountPublicKey, accountIndex, 'Internal', saveAsAdaAddresses);
-
-  await scanAndSaveAddresses(accountPublicKey, accountIndex, 'External', -1, checkAddressesInUse, saveAsAdaAddresses);
-  await scanAndSaveAddresses(accountPublicKey, accountIndex, 'Internal', -1, checkAddressesInUse, saveAsAdaAddresses);
-}
-
-async function saveInitialAddresses(
-  accountPublicKey: RustModule.Wallet.Bip44AccountPublic,
-  accountIndex: number,
-  addressType: AddressType,
-  saveAsAdaAddresses: SaveAsAdaAddressesFunc,
-) {
-  const addressesIndex = _.range(
-    0,
-    addressScanSize
-  );
-
-  const initialAddresses = generateAddressBatch(
-    addressesIndex,
-    accountPublicKey,
-    addressType
-  );
-
-  await saveAsAdaAddresses({
-    accountIndex,
-    addresses: initialAddresses,
-    offset: 0,
-    addressType
+export function v2genAddressBatchFunc(
+  addressChain: RustModule.WalletV2.Bip44ChainPublic,
+  protocolMagic: number,
+): GenerateAddressFunc {
+  const settings = RustModule.WalletV2.BlockchainSettings.from_json({
+    protocol_magic: protocolMagic
   });
+  return (
+    indices: Array<number>
+  ) => {
+    return indices.map(i => {
+      const pubKey = addressChain.address_key(
+        RustModule.WalletV2.AddressKeyIndex.new(i)
+      );
+      const addr = pubKey.bootstrap_era_address(settings);
+      return addr.to_base58();
+    });
+  };
 }
 
-/**
- * Find new addresses beyond last known used address
- * @param {*} startIndex optimize by only scanning addresses we know aren't used
- */
-export async function scanAndSaveAddresses(
-  accountPublicKey: RustModule.Wallet.Bip44AccountPublic,
-  accountIndex: number,
-  addressType: AddressType,
-  startIndex: number,
+export function v3genAddressBatchFunc(
+  addressChain: RustModule.WalletV3.Bip32PublicKey,
+): GenerateAddressFunc {
+  return (
+    indices: Array<number>
+  ) => {
+    return indices.map(i => {
+      const addressKey = addressChain.derive(i).to_raw_key();
+      // recall: no canonical string representation of an address in Rust
+      // so instead we send the payment key
+      const asHex = Buffer.from(addressKey.as_bytes()).toString('hex');
+      return asHex;
+    });
+  };
+}
+
+
+export async function scanChain(request: {|
+  generateAddressFunc: GenerateAddressFunc,
+  lastUsedIndex: number,
   checkAddressesInUse: FilterFunc,
-  saveAsAdaAddresses: SaveAsAdaAddressesFunc,
-): Promise<void> {
-  const addressesToSave = await discoverAllAddressesFrom(
-    accountPublicKey,
-    addressType,
-    startIndex,
-    addressScanSize,
+  hashToIds: HashToIdsFunc,
+|}): Promise<TreeInsert<{ AddressId: number }>> {
+  // TODO: this is made for v2 addresses. We can avoid this entirely for v3
+  const addresses = await discoverAllAddressesFrom(
+    request.generateAddressFunc,
+    request.lastUsedIndex,
+    BIP44_SCAN_SIZE,
     addressRequestSize,
-    checkAddressesInUse,
+    request.checkAddressesInUse,
   );
 
-  // Save all addresses in local DB
-  if (addressesToSave.length !== 0) {
-    await saveAsAdaAddresses({
-      accountIndex,
-      addresses: addressesToSave,
-      offset: startIndex + 1,
-      addressType
+  const idMapping = await request.hashToIds(addresses);
+  return addresses
+    .map((address, i) => {
+      const id = idMapping.get(address);
+      if (id == null) throw new Error('scanChain should never happen');
+      return {
+        index: i + request.lastUsedIndex + 1,
+        insert: { AddressId: id },
+      };
     });
-  }
+}
+
+export async function scanAccountByVersion(request: {
+  accountPublicKey: string,
+  lastUsedInternal: number,
+  lastUsedExternal: number,
+  checkAddressesInUse: FilterFunc,
+  hashToIds: HashToIdsFunc,
+  protocolMagic: number,
+}): Promise<TreeInsert<{ DisplayCutoff: null | number }>> {
+  // TODO: needs to change depending on v2/v3
+  const genAddressBatchFunc = v2genAddressBatchFunc;
+
+  const key = RustModule.WalletV2.Bip44AccountPublic.new(
+    RustModule.WalletV2.PublicKey.from_hex(request.accountPublicKey),
+    RustModule.WalletV2.DerivationScheme.v2()
+  );
+  const insert = await scanAccount({
+    generateInternalAddresses: genAddressBatchFunc(
+      key.bip44_chain(false),
+      request.protocolMagic,
+    ),
+    generateExternalAddresses: genAddressBatchFunc(
+      key.bip44_chain(true),
+      request.protocolMagic,
+    ),
+    lastUsedInternal: request.lastUsedInternal,
+    lastUsedExternal: request.lastUsedExternal,
+    checkAddressesInUse: request.checkAddressesInUse,
+    hashToIds: request.hashToIds,
+    protocolMagic: request.protocolMagic,
+  });
+  return insert;
+}
+export async function scanAccount(request: {|
+  generateInternalAddresses: GenerateAddressFunc,
+  generateExternalAddresses: GenerateAddressFunc,
+  lastUsedInternal: number,
+  lastUsedExternal: number,
+  checkAddressesInUse: FilterFunc,
+  hashToIds: HashToIdsFunc,
+  protocolMagic: number,
+|}): Promise<TreeInsert<{ DisplayCutoff: null | number }>> {
+  const externalAddresses = await scanChain({
+    generateAddressFunc: request.generateInternalAddresses,
+    lastUsedIndex: request.lastUsedExternal,
+    checkAddressesInUse: request.checkAddressesInUse,
+    hashToIds: request.hashToIds,
+  });
+  const internalAddresses = await scanChain({
+    generateAddressFunc: request.generateExternalAddresses,
+    lastUsedIndex: request.lastUsedInternal,
+    checkAddressesInUse: request.checkAddressesInUse,
+    hashToIds: request.hashToIds,
+  });
+
+  return [
+    {
+      index: 0, // external chain,
+      insert: { DisplayCutoff: 0 },
+      children: externalAddresses,
+    },
+    {
+      index: 1, // internal chain,
+      insert: { DisplayCutoff: null },
+      children: internalAddresses,
+    }
+  ];
 }

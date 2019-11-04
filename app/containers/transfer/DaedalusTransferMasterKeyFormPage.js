@@ -12,7 +12,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onSubmit: Function,
+  onSubmit: { masterKey: string, } => void,
   onBack: Function,
   classicTheme: boolean,
 |};

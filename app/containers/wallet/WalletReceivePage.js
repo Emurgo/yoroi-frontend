@@ -14,8 +14,12 @@ import {
   MAX_INTEGER_PLACES_IN_ADA
 } from '../../config/numbersConfig';
 import globalMessages from '../../i18n/global-messages';
+import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import { asHasChains } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
-type Props = InjectedProps;
+type Props = {
+  ...InjectedProps,
+};
 
 type State = {
   notificationElementId: string,
@@ -35,8 +39,8 @@ export default class WalletReceivePage extends Component<Props, State> {
 
   handleGenerateAddress = () => {
     const { wallets } = this.props.stores.substores.ada;
-    const walletIsActive = !!wallets.active;
-    if (walletIsActive) {
+    const publicDeriver = wallets.selected;
+    if (publicDeriver != null) {
       this.props.actions.ada.addresses.createAddress.trigger();
     }
   };
@@ -47,9 +51,9 @@ export default class WalletReceivePage extends Component<Props, State> {
 
   closeNotification = () => {
     const { wallets } = this.props.stores.substores.ada;
-    const wallet = wallets.active;
-    if (wallet) {
-      const notificationId = `${wallet.id}-copyNotification`;
+    const publicDeriver = wallets.selected;
+    if (publicDeriver) {
+      const notificationId = `${publicDeriver.self.getPublicDeriverId()}-copyNotification`;
       this.props.actions.notifications.closeActiveNotification.trigger({ id: notificationId });
     }
   };
@@ -63,22 +67,31 @@ export default class WalletReceivePage extends Component<Props, State> {
       hwVerifyAddress,
       transactions
     } = this.props.stores.substores.ada;
-    const wallet = wallets.active;
+    const publicDeriver = wallets.selected;
     const { validateAmount } = transactions;
 
     // Guard against potential null values
-    if (!wallet) throw new Error('Active wallet required for WalletReceivePage.');
+    if (!publicDeriver) throw new Error('Active wallet required for WalletReceivePage.');
+
+    // assume account-level wallet for now
+    const withChains = asHasChains(publicDeriver.self);
+    if (!withChains) throw new Error('WalletReceivePage only available for account-level wallets');
+    const addressTypeStore = addresses.externalForDisplay;
 
     // get info about the lattest address generated for special rendering
-    const walletAddress = addresses.active ? addresses.active.id : '';
-    const isWalletAddressUsed = addresses.active ? addresses.active.isUsed : false;
+    const lastAddress = addressTypeStore.last;
+    const walletAddress = lastAddress != null ? lastAddress.address : '';
+    const isWalletAddressUsed = lastAddress != null ? lastAddress.isUsed : false;
 
-    const walletAddresses = addresses.all.slice().reverse();
+    const walletAddresses = addressTypeStore.all.slice().reverse();
 
     const tooltipNotification = {
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
       message: globalMessages.copyTooltipMessage,
     };
+
+    const walletType = publicDeriver.self.getConceptualWallet().getWalletType();
+    const isHwWallet = walletType === WalletTypeOption.HARDWARE_WALLET;
 
     return (
       <VerticalFlexContainer>
@@ -158,8 +171,8 @@ export default class WalletReceivePage extends Component<Props, State> {
             error={hwVerifyAddress.error}
             walletAddress={hwVerifyAddress.selectedAddress.address}
             walletPath={hwVerifyAddress.selectedAddress.path}
-            isHardware={wallet.isHardwareWallet}
-            verify={() => actions.ada.hwVerifyAddress.verifyAddress.trigger({ wallet })}
+            isHardware={isHwWallet}
+            verify={() => actions.ada.hwVerifyAddress.verifyAddress.trigger(publicDeriver.self)}
             cancel={() => actions.ada.hwVerifyAddress.closeAddressDetailDialog.trigger()}
             classicTheme={profile.isClassicTheme}
           />

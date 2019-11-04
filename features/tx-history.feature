@@ -6,14 +6,14 @@ Feature: Txs History
 
   @it-101
   Scenario: Open the tx history of an empty wallet (IT-101)
-    Given I import a snapshot named empty-wallet
+    Given There is a wallet stored named empty-wallet
     When I see the transactions summary
     Then I should see that the number of transactions is 0
     And I should see no transactions
 
   @it-102
   Scenario: Open the tx history of a simple wallet (IT-102)
-    Given I import a snapshot named simple-pending-wallet
+    Given There is a wallet stored named simple-pending-wallet
     When I see the transactions summary
     Then I should see that the number of transactions is 3
     And I should see 2 pending transactions
@@ -39,21 +39,21 @@ Feature: Txs History
 
   @it-103
   Scenario: Open the tx history of a complex wallet (IT-103)
-    Given I import a snapshot named many-tx-wallet
+    Given There is a wallet stored named many-tx-wallet
     When I see the transactions summary
     Then I should see that the number of transactions is 6
     And I should see 6 successful transactions
 
   @it-104
   Scenario: Open the tx history of a wallet with a big input tx (IT-104)
-    Given I import a snapshot named tx-big-input-wallet
+    Given There is a wallet stored named tx-big-input-wallet
     When I see the transactions summary
     Then I should see that the number of transactions is 1
     And I should see 1 successful transactions
 
   @it-105
   Scenario: Open the tx history of an already loaded wallet (IT-105)
-    Given I import a snapshot named simple-pending-wallet
+    Given There is a wallet stored named simple-pending-wallet
     Given I see the transactions summary
     And I refresh the page
     Then I see the transactions summary

@@ -246,7 +246,9 @@ async function exportLocalStorage(client, exportDir: string) {
 async function exportIndexedDB(client, exportDir: string) {
   const indexedDBPath = `${exportDir}/indexedDB.json`;
   const indexedDB = await client.driver.executeAsyncScript((done) => {
-    window.yoroi.api.ada.exportLocalDatabase()
+    window.yoroi.api.ada.exportLocalDatabase(
+      window.yoroi.stores.loading.loadPersitentDbRequest.result,
+    )
       .then(done)
       .catch(err => done(err));
   });
@@ -298,7 +300,10 @@ async function importIndexedDB(client, importDir: string) {
   try {
     const indexedDBData = fs.readFileSync(indexedDBPath).toString();
     await client.driver.executeAsyncScript((data, done) => {
-      window.yoroi.api.ada.importLocalDatabase(data)
+      window.yoroi.api.ada.importLocalDatabase(
+        window.yoroi.stores.loading.loadPersitentDbRequest.result,
+        data
+      )
         .then(done)
         .catch(err => done(err));
     }, JSON.parse(indexedDBData));

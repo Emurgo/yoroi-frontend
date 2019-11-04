@@ -10,11 +10,19 @@ import type { InjectedDialogContainerProps } from '../../../types/injectedPropsT
 import environment from '../../../environment';
 import {
   unscramblePaperAdaMnemonic,
-  mnemonicsToAddresses,
-} from '../../../api/ada/lib/cardanoCrypto/cryptoWallet';
-import type { WalletAccountNumberPlate } from '../../../domain/Wallet';
+} from '../../../api/ada/lib/cardanoCrypto/paperWallet';
+import {
+  generateStandardPlate,
+} from '../../../api/ada/lib/cardanoCrypto/plate';
+import type { WalletAccountNumberPlate } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import globalMessages from '../../../i18n/global-messages';
 import { CheckAdressesInUseApiError } from '../../../api/ada/errors';
+import type {
+  ConfigType,
+} from '../../../../config/config-types';
+
+declare var CONFIG : ConfigType;
+const protocolMagic = CONFIG.network.protocolMagic;
 
 type Props = InjectedDialogContainerProps & {
   mode: "regular" | "paper",
@@ -54,7 +62,11 @@ export default class WalletRestoreDialogContainer
     if (resolvedRecoveryPhrase != null) {
       submitValues.recoveryPhrase = resolvedRecoveryPhrase;
     }
-    this.props.actions[environment.API].wallets.restoreWallet.trigger(submitValues);
+    this.props.actions[environment.API].wallets.restoreWallet.trigger({
+      recoveryPhrase: submitValues.recoveryPhrase,
+      walletName: submitValues.walletName,
+      walletPassword: submitValues.walletPassword
+    });
   };
 
   onSubmit = (values: WalletRestoreDialogValues) => {
@@ -71,11 +83,11 @@ export default class WalletRestoreDialogContainer
       }
       resolvedRecoveryPhrase = newPhrase;
     }
-    const { addresses, accountPlate } =  mnemonicsToAddresses(
+    const { addresses, accountPlate } =  generateStandardPlate(
       resolvedRecoveryPhrase,
       0, // show addresses for account #0
       isPaper ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER : NUMBER_OF_VERIFIED_ADDRESSES,
-      'External',
+      protocolMagic,
     );
     this.setState({
       verifyRestore: { addresses, accountPlate },

@@ -89,11 +89,3 @@ export type ExportTransactionsResponse = void;  // TODO: Implement in the Next i
 export type ExportTransactionsFunc = (
   request: ExportTransactionsRequest
 ) => Promise<ExportTransactionsResponse>;
-
-export type DeleteWalletRequest = {
-  walletId: string,
-};
-export type DeleteWalletResponse = boolean;
-export type DeleteWalletFunc = (
-  request: DeleteWalletRequest
-) => Promise<DeleteWalletResponse>;

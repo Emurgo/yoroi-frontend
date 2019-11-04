@@ -5,7 +5,7 @@ export default ({
   versionName,
   extensionKey
 }) => ({
-  version: '1.9.0',
+  version: '1.10.0',
   name: 'yoroi',
   manifest_version: 2,
   ...(versionName ? { version_name: versionName } : {}),

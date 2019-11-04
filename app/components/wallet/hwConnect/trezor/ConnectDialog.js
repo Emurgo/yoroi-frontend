@@ -49,7 +49,7 @@ type Props = {|
   error: ?LocalizableError,
   onExternalLinkClick: Function,
   goBack: Function,
-  submit: Function,
+  submit: void => void,
   cancel: Function,
   classicTheme: boolean
 |};

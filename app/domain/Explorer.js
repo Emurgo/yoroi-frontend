@@ -1,12 +1,41 @@
 // @flow
 
-export const Explorer = Object.freeze({
+import environment from '../environment';
+
+const ShelleyExplorers = Object.freeze({
+  SEIZA: 'seiza',
+  JORMUNGANDR: 'jormungandr',
+});
+const ByronExplorers = Object.freeze({
   SEIZA: 'seiza',
   CLIO: 'clio',
   ADA_SCAN: 'adascan',
   CARDANO_EXPLORER: 'cardano_explorer',
 });
-export type ExplorerType = $Values<typeof Explorer>;
+export function getDefaultExplorer(): ExplorerType {
+  // TODO: change default back to Seiza once we have a public URL
+  return environment.isShelley()
+    ? 'jormungandr'
+    : 'seiza';
+}
+export function getExplorers(): Array<{| value: ExplorerType, label: string |}> {
+  if (environment.isShelley()) {
+    return Object.keys(ShelleyExplorers)
+      .map(key => ({
+        value: ShelleyExplorers[key],
+        label: explorerInfo[ShelleyExplorers[key]].name,
+      }));
+  }
+  return Object.keys(ByronExplorers)
+    .map(key => ({
+      value: ByronExplorers[key],
+      label: explorerInfo[ByronExplorers[key]].name,
+    }));
+}
+export const Explorer = environment.isShelley()
+  ? ShelleyExplorers
+  : ByronExplorers;
+export type ExplorerType = $Values<typeof ShelleyExplorers> | $Values<typeof ByronExplorers>;
 
 export const Link = Object.freeze({
   address: 'address',
@@ -18,11 +47,18 @@ export type ExplorerInfo = {
   ...Inexact<typeof Link>,
   name: string,
 }
-const seiza = {
-  name: 'Seiza',
-  address: 'https://seiza.com/blockchain/address/',
-  transaction: 'https://seiza.com/blockchain/transaction/',
-};
+const seiza = environment.isShelley()
+  ? {
+    name: 'Seiza',
+    // TODO: proper URL for Shelley
+    address: 'https://seiza.com/blockchain/address/',
+    transaction: 'https://seiza.com/blockchain/transaction/',
+  }
+  : {
+    name: 'Seiza',
+    address: 'https://seiza.com/blockchain/address/',
+    transaction: 'https://seiza.com/blockchain/transaction/',
+  };
 
 export const explorerInfo: {
   [key: ExplorerType]: ExplorerInfo,
@@ -33,18 +69,29 @@ export const explorerInfo: {
   }
 } = Object.freeze({
   seiza,
-  clio: {
-    name: 'Clio.1',
-    address: 'https://clio.one/tracker/address/',
-  },
-  adascan: {
-    name: 'AdaScan',
-    address: 'https://adascan.net/address/',
-    transaction: 'https://adascan.net/transaction/',
-  },
-  cardano_explorer: {
-    name: 'CardanoExplorer',
-    address: 'https://cardanoexplorer.com/address/',
-    transaction: 'https://cardanoexplorer.com/tx/',
-  }
+  ...(!environment.isShelley()
+    ? {
+      clio: {
+        name: 'Clio.1',
+        address: 'https://clio.one/tracker/address/',
+      },
+      adascan: {
+        name: 'AdaScan',
+        address: 'https://adascan.net/address/',
+        transaction: 'https://adascan.net/transaction/',
+      },
+      cardano_explorer: {
+        name: 'CardanoExplorer',
+        address: 'https://cardanoexplorer.com/address/',
+        transaction: 'https://cardanoexplorer.com/tx/',
+      }
+    }
+    : {
+      jormungandr: {
+        name: 'Jormungandr Explorer',
+        address: 'https://explorer.jormungandr-testnet.iohkdev.io/address/',
+        transaction: 'https://explorer.jormungandr-testnet.iohkdev.io/tx/',
+      },
+    }
+  )
 });

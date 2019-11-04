@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import _ from 'lodash';
+import { map } from 'lodash';
 
 type Props = {|
   variables: { [key: string]: string },
@@ -25,7 +25,7 @@ export default class ThemeManager extends Component<Props> {
   }
 
   updateCSSVariables(variables: { [key: string]: string }) {
-    _.map(variables, (value, prop) => {
+    map(variables, (value, prop) => {
       if (document.documentElement) {
         document.documentElement.style.setProperty(prop, value);
       }

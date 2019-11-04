@@ -10,11 +10,14 @@ export type AppConfigType = {
   serverStatusRefreshInterval: number,
   logsBufferSize: number,
   logsFileSuffix: string,
-  /** Defined by bip44
-   * https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#address-gap-limit */
-  addressScanSize: number,
   addressRequestSize: number,
   txsBodiesRequestSize: number,
+  linearFee: {|
+    constant: string,
+    coefficient: string,
+    certificate: string,
+  |},
+  genesisHash: string,
 }
 
 export type NetworkConfigType = {
@@ -27,9 +30,19 @@ export type NetworkConfigType = {
   name: Network
 };
 
-export type Network = 'development' | 'mainnet' | 'staging' | 'testnet' | 'test';
+export type Network = 'shelley-dev' | 'development' | 'mainnet' | 'staging' | 'testnet' | 'test';
 export const NetworkType: {
-  DEVELOPMENT: Network, MAINNET: Network, STAGING: Network, TESTNET: Network, TEST: Network
+  SHELLEY_DEV: Network,
+  DEVELOPMENT: Network,
+  MAINNET: Network,
+  STAGING: Network,
+  TESTNET: Network,
+  TEST: Network
 } = {
-  DEVELOPMENT: 'development', MAINNET: 'mainnet', STAGING: 'staging', TESTNET: 'testnet', TEST: 'test',
+  SHELLEY_DEV: 'shelley-dev',
+  DEVELOPMENT: 'development',
+  MAINNET: 'mainnet',
+  STAGING: 'staging',
+  TESTNET: 'testnet',
+  TEST: 'test',
 };

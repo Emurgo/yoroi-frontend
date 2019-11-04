@@ -3,7 +3,7 @@ Feature: Transfer Daedalus Wallet funds
   Background:
     Given I have opened the extension
     And I have completed the basic setup
-    Given I import a snapshot named empty-wallet
+    Given There is a wallet stored named empty-wallet
 
   @it-99
   Scenario: Daedalus transfer fails when user type invalid mnemonic phrase (IT-99)

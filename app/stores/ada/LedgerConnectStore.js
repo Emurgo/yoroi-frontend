@@ -12,13 +12,13 @@ import Config from '../../config';
 import environment from '../../environment';
 
 import Store from '../base/Store';
-import Wallet from '../../domain/Wallet';
 import LocalizedRequest from '../lib/LocalizedRequest';
 
 import type {
   CreateHardwareWalletRequest,
   CreateHardwareWalletFunc,
 } from '../../api/ada';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 
 import {
   convertToLocalizableError
@@ -45,6 +45,7 @@ import {
   stringifyData,
   stringifyError
 } from '../../utils/logging';
+import { HARD_DERIVATION_START } from '../../config/numbersConfig';
 
 export default class LedgerConnectStore
   extends Store
@@ -52,6 +53,7 @@ export default class LedgerConnectStore
 
   // =================== VIEW RELATED =================== //
   @observable progressInfo: ProgressInfo;
+  @observable derivationIndex: number = 0; // assume single account
   error: ?LocalizableError;
   hwDeviceInfo: ?HWDeviceInfo;
   ledgerConnect: ?LedgerConnect;
@@ -145,8 +147,7 @@ export default class LedgerConnectStore
       });
       await prepareLedgerConnect(this.ledgerConnect);
 
-      // TODO: assume single account in Yoroi
-      const accountPath = makeCardanoAccountBIP44Path(0);
+      const accountPath = makeCardanoAccountBIP44Path(this.derivationIndex);
       // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#examples
       Logger.debug(stringifyData(accountPath));
 
@@ -182,14 +183,14 @@ export default class LedgerConnectStore
     return {
       publicMasterKey: ePublicKey.publicKeyHex + ePublicKey.chainCodeHex,
       hwFeatures: {
-        vendor: Config.wallets.hardwareWallet.ledgerNano.VENDOR,
-        model: '', // Ledger does not provide device model info up till now
-        label: '',
-        deviceId: '',
-        language: '',
-        majorVersion: parseInt(deviceVersion.major, 10),
-        minorVersion: parseInt(deviceVersion.minor, 10),
-        patchVersion: parseInt(deviceVersion.patch, 10),
+        Vendor: Config.wallets.hardwareWallet.ledgerNano.VENDOR,
+        Model: '', // Ledger does not provide device model info up till now
+        Label: '',
+        DeviceId: '',
+        Language: '',
+        MajorVersion: parseInt(deviceVersion.major, 10),
+        MinorVersion: parseInt(deviceVersion.minor, 10),
+        PatchVersion: parseInt(deviceVersion.patch, 10),
       }
     };
   }
@@ -231,26 +232,35 @@ export default class LedgerConnectStore
   };
 
   /** SAVE dialog submit (Save button) */
-  @action _submitSave = async (walletName: string): Promise<void> => {
+  @action _submitSave = async (
+    walletName: string,
+  ): Promise<void> => {
     this.error = null;
     this.progressInfo.currentStep = ProgressStep.SAVE;
     this.progressInfo.stepState = StepState.PROCESS;
-    await this._saveHW(walletName);
+    await this._saveHW(
+      walletName,
+    );
   };
 
   /** creates new wallet and loads it */
-  _saveHW = async (walletName: string): Promise<void>  => {
+  _saveHW = async (
+    walletName: string,
+  ): Promise<void>  => {
     try {
       Logger.debug('LedgerConnectStore::_saveHW:: called');
       this._setIsCreateHWActive(true);
       this.createHWRequest.reset();
 
-      const reqParams = this._prepareCreateHWReqParams(walletName);
+      const reqParams = this._prepareCreateHWReqParams(
+        walletName,
+        this.derivationIndex + HARD_DERIVATION_START,
+      );
       this.createHWRequest.execute(reqParams);
       if (!this.createHWRequest.promise) throw new Error('should never happen');
-      const ledgerWallet = await this.createHWRequest.promise;
+      const newWallet = await this.createHWRequest.promise;
 
-      await this._onSaveSucess(ledgerWallet);
+      await this._onSaveSucess(newWallet.publicDeriver);
     } catch (error) {
       Logger.error(`LedgerConnectStore::_saveHW::error ${stringifyError(error)}`);
 
@@ -278,37 +288,39 @@ export default class LedgerConnectStore
     }
   };
 
-  _prepareCreateHWReqParams = (walletName: string): CreateHardwareWalletRequest => {
+  _prepareCreateHWReqParams = (
+    walletName: string,
+    derivationIndex: number,
+  ): CreateHardwareWalletRequest => {
     if (this.hwDeviceInfo == null
       || this.hwDeviceInfo.publicMasterKey == null
       || this.hwDeviceInfo.hwFeatures == null) {
       throw new Error('Ledger device hardware info not valid');
     }
 
+    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
+    if (persistentDb == null) {
+      throw new Error('_prepareCreateHWReqParams db not loaded. Should never happen');
+    }
+
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     return {
+      db: persistentDb,
+      derivationIndex,
       walletName,
-      publicMasterKey: this.hwDeviceInfo.publicMasterKey,
+      publicKey: this.hwDeviceInfo.publicMasterKey,
       hwFeatures: this.hwDeviceInfo.hwFeatures,
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
     };
   };
 
-  async _onSaveSucess(ledgerWallet: Wallet): Promise<void> {
+  async _onSaveSucess(publicDeriver: PublicDeriver): Promise<void> {
     // close the active dialog
     Logger.debug('LedgerConnectStore::_onSaveSucess success, closing dialog');
     this.actions.dialogs.closeActiveDialog.trigger();
 
     const { wallets } = this.stores.substores[environment.API];
-    await wallets._patchWalletRequestWithNewWallet(ledgerWallet);
-
-    // goto the wallet transactions page
-    Logger.debug('LedgerConnectStore::_onSaveSucess setting new walles as active wallet');
-    wallets.goToWalletRoute(ledgerWallet.id);
-
-    // fetch its data
-    Logger.debug('LedgerConnectStore::_onSaveSucess loading wallet data');
-    await wallets.refreshWalletsData();
+    await wallets.addHwWallet(publicDeriver);
 
     // show success notification
     wallets.showLedgerNanoWalletIntegratedNotification();

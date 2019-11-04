@@ -11,7 +11,7 @@ import RawHash from '../widgets/hashWrappers/RawHash';
 import WalletAccountIcon from '../topbar/WalletAccountIcon';
 import Dialog from '../widgets/Dialog';
 import DialogTextBlock from '../widgets/DialogTextBlock';
-import type { WalletAccountNumberPlate } from '../../domain/Wallet';
+import type { WalletAccountNumberPlate } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import LocalizableError from '../../i18n/LocalizableError';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../domain/Explorer';

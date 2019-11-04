@@ -1,7 +1,7 @@
 // @flow
 
 import { Given, When, Then } from 'cucumber';
-import _ from 'lodash';
+import { camelCase } from 'lodash';
 import {
   waitUntilUrlEquals,
   navigateTo,
@@ -19,7 +19,7 @@ When(/^I navigate to the general settings screen$/, async function () {
 });
 
 When(/^I click on secondary menu "([^"]*)" item$/, async function (buttonName) {
-  const buttonSelector = `.SettingsMenuItem_component.${_.camelCase(buttonName)}`;
+  const buttonSelector = `.SettingsMenuItem_component.${camelCase(buttonName)}`;
   await this.click(buttonSelector);
   await this.waitForElement(
     `${buttonSelector}.SettingsMenuItem_active`
@@ -35,7 +35,7 @@ When(/^I open General Settings language selection dropdown$/, async function () 
 });
 
 Then(/^I should see secondary menu (.*) item disabled$/, async function (buttonName) {
-  const formattedButtonName = _.camelCase(buttonName);
+  const formattedButtonName = camelCase(buttonName);
   const buttonSelector =
     `.SettingsMenuItem_component.SettingsMenuItem_disabled.${formattedButtonName}`;
   const label = await i18n.formatMessage(this.driver, { id: `settings.menu.${formattedButtonName}.link.label` });

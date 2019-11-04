@@ -14,10 +14,10 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Injec
     const { wallets, walletSettings } = this.props.stores.substores[environment.API];
     const dialogData = uiDialogs.dataForActiveDialog;
     const { updateDataForActiveDialog } = actions.dialogs;
-    const activeWallet = wallets.active;
-    const { updateWalletPasswordRequest } = walletSettings;
+    const publicDeriver = wallets.selected;
+    const { changeSigningKeyRequest } = walletSettings;
 
-    if (!activeWallet) throw new Error('Active wallet required for ChangeWalletPasswordDialogContainer.');
+    if (!publicDeriver) throw new Error('Active wallet required for ChangeWalletPasswordDialogContainer.');
 
     return (
       <ChangeWalletPasswordDialog
@@ -25,24 +25,25 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Injec
         newPasswordValue={dialogData.newPasswordValue}
         repeatedPasswordValue={dialogData.repeatedPasswordValue}
         onSave={(values: { oldPassword: string, newPassword: string }) => {
-          const walletId = activeWallet.id;
           const { oldPassword, newPassword } = values;
-          actions[environment.API].walletSettings.updateWalletPassword.trigger({
-            walletId, oldPassword, newPassword
+          actions[environment.API].walletSettings.updateSigningPassword.trigger({
+            publicDeriver,
+            oldPassword,
+            newPassword
           });
         }}
         onCancel={() => {
           actions.dialogs.closeActiveDialog.trigger();
-          updateWalletPasswordRequest.reset();
+          changeSigningKeyRequest.reset();
         }}
         onPasswordSwitchToggle={() => {
-          updateWalletPasswordRequest.reset();
+          changeSigningKeyRequest.reset();
         }}
         onDataChange={data => {
           updateDataForActiveDialog.trigger({ data });
         }}
-        isSubmitting={updateWalletPasswordRequest.isExecuting}
-        error={updateWalletPasswordRequest.error}
+        isSubmitting={changeSigningKeyRequest.isExecuting}
+        error={changeSigningKeyRequest.error}
         classicTheme={profile.isClassicTheme}
       />
     );

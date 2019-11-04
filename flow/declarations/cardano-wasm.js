@@ -475,7 +475,7 @@ declare module 'cardano-wallet-browser' { // need to wrap flowgen output into mo
     /**
      * @returns {any}
      */
-    to_array(): any;
+    to_array(): Array<number>;
   }
   /**
    */
@@ -833,7 +833,7 @@ declare module 'cardano-wallet-browser' { // need to wrap flowgen output into mo
     /**
      * @returns {any}
      */
-    to_json(): any;
+    to_json(): SignedTransactionType;
 
     /**
      * @param {any} value
@@ -871,7 +871,7 @@ declare module 'cardano-wallet-browser' { // need to wrap flowgen output into mo
     /**
      * @returns {any}
      */
-    to_json(): any;
+    to_json(): TransactionType;
 
     /**
      * @param {any} value
@@ -928,7 +928,7 @@ declare module 'cardano-wallet-browser' { // need to wrap flowgen output into mo
     apply_output_policy(
       fee_algorithm: LinearFeeAlgorithm,
       policy: OutputPolicy
-    ): any;
+    ): Array<TxOutType<string>>;
 
     /**
      * @returns {Coin}
@@ -1031,7 +1031,7 @@ declare module 'cardano-wallet-browser' { // need to wrap flowgen output into mo
     /**
      * @returns {any}
      */
-    to_json(): any;
+    to_json(): TxInputType;
 
     /**
      * @param {any} value
@@ -1055,7 +1055,7 @@ declare module 'cardano-wallet-browser' { // need to wrap flowgen output into mo
      * serialize into a JsValue object
      * @returns {any}
      */
-    to_json(): any;
+    to_json(): TxOutType<string>;
 
     /**
      * retrieve the object from a JsValue.
@@ -1080,7 +1080,7 @@ declare module 'cardano-wallet-browser' { // need to wrap flowgen output into mo
      * serialize into a JsValue object
      * @returns {any}
      */
-    to_json(): any;
+    to_json(): TxoPointerType;
 
     /**
      * retrieve the object from a JsValue.
@@ -1141,17 +1141,30 @@ declare module 'cardano-wallet-browser' { // need to wrap flowgen output into mo
 // WASM bindings don't expose the underlying type of some Rust structs
 // so we expose the mourselves
 
-declare type TransactionType = {
-  inputs: Array<TxoPointerType>;
-  outputs: Array<TxOutType>;
-};
+declare type TransactionType = {|
+  inputs: Array<TxoPointerType>,
+  outputs: Array<TxOutType<number>>,
+|};
 
-declare type TxoPointerType = {
+declare type WitnessType = {|
+  PkWitness: Array<string>,
+|};
+declare type SignedTransactionType = {|
+  tx: TransactionType,
+  witness: Array<WitnessType>,
+|};
+
+declare type TxoPointerType = {|
   id: string,
-  index: number
-};
+  index: number,
+|};
 
-declare type TxOutType = {
+declare type TxOutType<T> = {|
   address: string,
-  value: number,
-};
+  value: T,
+|};
+
+declare type TxInputType = {|
+  ptr: TxoPointerType,
+  value: TxOutType<string>,
+|};
