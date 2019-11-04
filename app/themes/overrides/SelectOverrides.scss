@@ -1,8 +1,10 @@
 // Css module overrides go here …
 
+$IconBottom: 45px !important; 
+
 .selectInput {
   &::after {
-    bottom: 42px!important;
+    bottom: $IconBottom;
     left: calc(100% - 27px);
   }
 
@@ -34,6 +36,6 @@
 
   .selectInput::after {
     background-color: var(--rp-input-border-color-focus);
-    bottom: 42px!important;
+    bottom: $IconBottom;
   }
 }
