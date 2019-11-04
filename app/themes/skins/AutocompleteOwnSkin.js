@@ -106,7 +106,8 @@ export const AutocompleteOwnSkin = (props: Props) => {
           className={classnames([
             theme.autocompleteContent,
             props.isOpen ? theme.opened : null,
-            props.selectedOptions.length
+            (props.selectedOptions.length ||
+            (props.inputValue != null && props.inputValue.length > 0))
               ? 'hasSelectedWords'
               : null,
             props.error ? theme.errored : null

@@ -39,18 +39,6 @@ const messages = defineMessages({
     id: 'wallet.add.page.daedalusTransfer.title',
     defaultMessage: '!!!Transfer funds from a Daedalus wallet to Yoroi',
   },
-  restoreNotificationMessage: {
-    id: 'wallet.add.dialog.restoreNotificationMessage',
-    defaultMessage: '!!!Wallet restoration is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
-  },
-  createTrezorWalletNotificationMessage: {
-    id: 'wallet.add.dialog.createTrezorWalletNotificationMessage',
-    defaultMessage: '!!!Trezor Connect is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
-  },
-  createLedgerWalletNotificationMessage: {
-    id: 'wallet.add.dialog.createLedgerWalletNotificationMessage',
-    defaultMessage: '!!!Ledger Connect is currently in progress. Until it completes, it is not possible to restore or import new wallets.',
-  },
 });
 
 type Props = {|
@@ -59,7 +47,6 @@ type Props = {|
   onHardwareConnect: Function,
   onSettings: Function,
   onDaedalusTransfer: Function,
-  isRestoreActive: boolean,
   classicTheme: boolean,
 |};
 
@@ -77,13 +64,8 @@ export default class WalletAdd extends Component<Props> {
       onHardwareConnect,
       onSettings,
       onDaedalusTransfer,
-      isRestoreActive,
     } = this.props;
 
-    let activeNotification = null;
-    if (isRestoreActive) {
-      activeNotification = 'restoreNotificationMessage';
-    }
     return (
       <div className={styles.component}>
         {/* Setting button */}
@@ -149,14 +131,6 @@ export default class WalletAdd extends Component<Props> {
                     </div>
                   </div>
                 </button>
-                {activeNotification ? (
-                  <div className={styles.notification}>
-                    <FormattedHTMLMessage
-                      {...messages[activeNotification]}
-                      values={{ maxWalletsCount: MAX_ADA_WALLETS_COUNT }}
-                    />
-                  </div>
-                ) : null}
               </div>
               {/* Transfer funds from a Daedalus wallet to Yoroi */}
               <button

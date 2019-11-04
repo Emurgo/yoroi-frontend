@@ -34,8 +34,9 @@ const messages = defineMessages({
 });
 
 type Props = {
-  onSubmit: Function,
-  onCancel: Function,
+  onSubmit: void => void,
+  onBack: void => void,
+  onCancel: void => void,
   uriParams: UriParams,
   classicTheme: boolean,
   selectedExplorer: ExplorerType,
@@ -81,7 +82,7 @@ export default class URIVerifyDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         classicTheme={classicTheme}
         onClose={onCancel}
-        backButton={<DialogBackButton onBack={onCancel} />}
+        backButton={<DialogBackButton onBack={this.props.onBack} />}
       >
         <div>
           <h2 className={styles.label}>
