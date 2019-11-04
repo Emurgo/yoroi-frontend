@@ -254,6 +254,7 @@ export default class LedgerConnectStore
     } catch (error) {
       Logger.error(`LedgerConnectStore::_saveHW::error ${stringifyError(error)}`);
 
+      // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1055
       if (error instanceof CheckAdressesInUseApiError) {
         /**
          * This error happens when yoroi could not fetch Used Address.

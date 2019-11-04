@@ -118,6 +118,7 @@ export default class WalletRestoreDialogContainer
     const { verifyRestore, submitValues } = this.state;
     if (verifyRestore) {
       const { addresses, accountPlate } = verifyRestore;
+      // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1055
       let error;
       /**
        * CheckAdressesInUseApiError happens when yoroi could not fetch Used Address.

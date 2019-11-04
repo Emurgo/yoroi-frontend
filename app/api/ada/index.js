@@ -1091,6 +1091,7 @@ export default class AdaApi {
         throw new WalletAlreadyRestoredError();
       }
 
+      // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1055
       if (error instanceof CheckAdressesInUseApiError) {
         // CheckAdressesInUseApiError throw it as it is.
         throw error;
