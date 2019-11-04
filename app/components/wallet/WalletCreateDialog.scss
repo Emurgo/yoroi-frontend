@@ -63,4 +63,8 @@
       }
     }
   }
+
+  :global(.Dialog_actions) {
+    margin-top: var(--theme-dialog-password-input-actions-margin-top);
+  }
 }

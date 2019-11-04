@@ -50,6 +50,9 @@
   fieldset {
     background: white;
   }
+  .iconsWrapper {
+    padding-top: 0;
+  }
   .inputWrapper {
     input:valid + .legend, input:focus + .legend, input:disabled + .legend {
       color: var(--rp-formfield-label-text-color);

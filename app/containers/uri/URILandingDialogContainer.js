@@ -56,6 +56,7 @@ export default class URILandingDialogContainer extends Component<Props> {
       return (
         <URIVerifyDialog
           onSubmit={this.onVerifiedSubmit}
+          onBack={() => this.toggleShowDisclaimer()}
           onCancel={this.onCancel}
           uriParams={uriParams}
           classicTheme={this.props.classicTheme}
