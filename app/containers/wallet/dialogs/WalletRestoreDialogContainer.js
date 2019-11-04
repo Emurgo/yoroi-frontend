@@ -14,6 +14,7 @@ import {
 } from '../../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import type { WalletAccountNumberPlate } from '../../../domain/Wallet';
 import globalMessages from '../../../i18n/global-messages';
+import { CheckAdressesInUseApiError } from '../../../api/ada/errors';
 
 type Props = InjectedDialogContainerProps & {
   mode: "regular" | "paper",
@@ -117,6 +118,18 @@ export default class WalletRestoreDialogContainer
     const { verifyRestore, submitValues } = this.state;
     if (verifyRestore) {
       const { addresses, accountPlate } = verifyRestore;
+      let error;
+      /**
+       * CheckAdressesInUseApiError happens when yoroi could not fetch Used Address.
+       * Mostly because internet not connected or yoroi backend is down.
+       * At this point wallet is already created in the storage.
+       * When internet connection is back, everything will be loaded correctly.
+       */
+      if (restoreRequest.error instanceof CheckAdressesInUseApiError === false) {
+        error = restoreRequest.error;
+      }
+      const isSubmitting = restoreRequest.isExecuting ||
+        (restoreRequest.error instanceof CheckAdressesInUseApiError);
       return (
         <WalletRestoreVerifyDialog
           addresses={addresses}
@@ -137,9 +150,9 @@ export default class WalletRestoreDialogContainer
           getNotification={uiNotifications.getTooltipActiveNotification(
             this.state.notificationElementId
           )}
-          isSubmitting={restoreRequest.isExecuting}
+          isSubmitting={isSubmitting}
           classicTheme={this.props.classicTheme}
-          error={restoreRequest.error}
+          error={error}
         />
       );
     }

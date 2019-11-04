@@ -37,7 +37,6 @@ import {
   prepareLedgerConnect,
 } from '../../utils/hwConnectHandler';
 
-import globalMessages from '../../i18n/global-messages';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import { CheckAdressesInUseApiError } from '../../api/ada/errors';
 
@@ -256,10 +255,16 @@ export default class LedgerConnectStore
       Logger.error(`LedgerConnectStore::_saveHW::error ${stringifyError(error)}`);
 
       if (error instanceof CheckAdressesInUseApiError) {
-        // redirecting CheckAdressesInUseApiError -> hwConnectDialogSaveError101
-        // because for user hwConnectDialogSaveError101 is more meaningful in this context
-        this.error = new LocalizableError(globalMessages.hwConnectDialogSaveError101);
-      } else if (error instanceof LocalizableError) {
+        /**
+         * This error happens when yoroi could not fetch Used Address.
+         * Mostly because internet not connected or yoroi backend is down.
+         * At this point wallet is already created in the storage.
+         * When internet connection is back, everything will be loaded correctly.
+         */
+        return;
+      }
+
+      if (error instanceof LocalizableError) {
         this.error = error;
       } else {
         // some unknow error
