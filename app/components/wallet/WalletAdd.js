@@ -9,7 +9,6 @@ import logoIcon from '../../assets/images/yoroi-logo-white.inline.svg';
 import settingsIcon from '../../assets/images/top-bar/setting-active.inline.svg';
 import daedalusIcon from '../../assets/images/top-bar/daedalus-migration.inline.svg';
 
-import { MAX_ADA_WALLETS_COUNT } from '../../config/numbersConfig';
 import styles from './WalletAdd.scss';
 
 const messages = defineMessages({
