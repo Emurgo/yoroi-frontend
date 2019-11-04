@@ -393,7 +393,7 @@
   "wallet.settings.name.label": "Nom du Wallet",
   "wallet.settings.password": "Mot de passe de paiement",
   "wallet.settings.passwordLastUpdated": "Dernière mise à jour {lastUpdated}",
-  "wallet.settings.unchangedPassword": "Password unchanged since wallet creation",
+  "wallet.settings.unchangedPassword": "Le mot de passe n'a pas été modifié depuis la création du wallet",
   "wallet.summary.no.transaction": "Aucune transaction",
   "wallet.summary.page.ledgerNanoSWalletIntegratedNotificationMessage": "Vous avez connecté avec succès votre périphérique Ledger Nano S",
   "wallet.summary.page.pendingIncomingConfirmationLabel": "En attente de confirmation",
