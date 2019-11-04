@@ -81,7 +81,10 @@ import type {
 import type {
   SignTransactionResponse as LedgerSignTxResponse
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { InvalidWitnessError, } from './errors';
+import {
+  InvalidWitnessError,
+  CheckAdressesInUseApiError,
+} from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 import {
   getAdaWallet,
@@ -1087,8 +1090,15 @@ export default class AdaApi {
       if (error.message.includes('Wallet with that mnemonics already exists')) {
         throw new WalletAlreadyRestoredError();
       }
-      // We don't know what the problem was -> throw generic error
-      throw new GenericApiError();
+
+      // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1055
+      if (error instanceof CheckAdressesInUseApiError) {
+        // CheckAdressesInUseApiError throw it as it is.
+        throw error;
+      } else {
+        // We don't know what the problem was so throw a generic error
+        throw new GenericApiError();
+      }
     }
   }
 
