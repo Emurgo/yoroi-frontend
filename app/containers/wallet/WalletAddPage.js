@@ -8,10 +8,6 @@ import { ROUTES } from '../../routes-config';
 import RouterActions from '../../actions/router-actions';
 import type { InjectedProps } from '../../types/injectedPropsType';
 
-import AdaWalletsStore from '../../stores/ada/AdaWalletsStore';
-import TrezorConnectStore from '../../stores/ada/TrezorConnectStore';
-import LedgerConnectStore from '../../stores/ada/LedgerConnectStore';
-
 import MainLayout from '../MainLayout';
 import WalletAdd from '../../components/wallet/WalletAdd';
 
@@ -47,11 +43,9 @@ export default class WalletAddPage extends Component<Props> {
 
   render() {
     const { profile } = this.props.stores;
-    const wallets = this._getWalletsStore();
     const { actions, stores } = this.props;
     const { uiDialogs } = stores;
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
-    const { restoreRequest } = wallets;
 
     const openTrezorConnectDialog = () => {
       actions.dialogs.open.trigger({ dialog: WalletTrezorConnectDialogContainer });
@@ -143,7 +137,6 @@ export default class WalletAddPage extends Component<Props> {
         }
         onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
         onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreOptionDialog })}
-        isRestoreActive={restoreRequest.isExecuting}
         onSettings={this._goToSettingsRoot}
         onDaedalusTransfer={this._goToDaedalusTransferRoot}
         classicTheme={profile.isClassicTheme}
@@ -165,18 +158,6 @@ export default class WalletAddPage extends Component<Props> {
 
   _getRouter(): RouterActions {
     return this.props.actions.router;
-  }
-
-  _getWalletsStore(): AdaWalletsStore {
-    return this.props.stores.substores[environment.API].wallets;
-  }
-
-  _getTrezorConnectStore(): TrezorConnectStore {
-    return this.props.stores.substores[environment.API].trezorConnect;
-  }
-
-  _getLedgerConnectStore(): LedgerConnectStore {
-    return this.props.stores.substores[environment.API].ledgerConnect;
   }
 
   _goToSettingsRoot = (): void => {
