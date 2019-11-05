@@ -115,7 +115,7 @@
     "html-webpack-plugin": "4.0.0-beta.8",
     "husky": "3.0.9",
     "jest": "24.9.0",
-    "jest-canvas-mock": "2.1.1",
+    "jest-canvas-mock": "2.1.2",
     "js-chain-libs-node": "git+https://github.com/SebastienGllmt/js-chain-libs-node-pkg.git",
     "json-server": "0.15.1",
     "json-stable-stringify": "1.0.1",
