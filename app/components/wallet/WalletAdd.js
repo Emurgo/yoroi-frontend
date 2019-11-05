@@ -12,7 +12,7 @@ import daedalusIcon from '../../assets/images/top-bar/daedalus-migration.inline.
 import { MAX_ADA_WALLETS_COUNT } from '../../config/numbersConfig';
 import styles from './WalletAdd.scss';
 
-import environmnent from '../../environment';
+import environment from '../../environment';
 
 const messages = defineMessages({
   title: {
@@ -89,7 +89,7 @@ export default class WalletAdd extends Component<Props> {
             <div className={styles.heroRight}>
               <div className={styles.heroCardsList}>
                 {/* Connect to hardware wallet */}
-                {!environmnent.isShelley() &&
+                {!environment.isShelley() &&
                   <button
                     type="button"
                     className="WalletAdd_btnConnectHW"
