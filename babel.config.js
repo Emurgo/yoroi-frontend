@@ -37,7 +37,6 @@ module.exports = function (api) {
         'react-intl',
         {
           messagesDir: './translations/messages/',
-          enforceDescriptions: false,
           extractSourceLocation: true
         }
       ],
