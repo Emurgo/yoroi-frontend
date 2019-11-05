@@ -15,7 +15,7 @@
   "api.errors.getAddressesWithFundsError": "資金のアドレスを取得中にエラーが発生しました。",
   "api.errors.getAllUTXOsForAddressesError": "UTxOの取得中にAPI方式呼び出しからエラーを受信しました。",
   "api.errors.getBalanceError": "残高の取得中にエラーが発生しました。",
-  "api.errors.getBestBlockApiError": "Error received from server while getting best block.",
+  "api.errors.getBestBlockApiError": "ベストブロックを獲得中にサーバーからエラーを受信しました。",
   "api.errors.getTxHistoryForAddressesApiError": "トランザクション取得中にサーバーからエラーを受信しました。",
   "api.errors.getTxsBodiesForUTXOsApiError": "TxBodiesの取得中にサーバーからエラーを受信しました。",
   "api.errors.getTxsBodiesForUTXOsError": "TxBodiesの取得中にAPI方式呼び出しからエラーを受信しました。",
