@@ -38,7 +38,7 @@ module.exports = function (api) {
         {
           messagesDir: './translations/messages/',
           enforceDescriptions: false,
-          extractSourceLocationß: true
+          extractSourceLocation: true
         }
       ],
       '@babel/plugin-syntax-dynamic-import',
