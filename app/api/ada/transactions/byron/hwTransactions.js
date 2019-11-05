@@ -25,7 +25,6 @@ import type {
   LedgerSignTxPayload,
 } from '../../../../domain/HWSignTx';
 import type {
-  BIP32Path,
   InputTypeUTxO,
   OutputTypeAddress,
   OutputTypeChange,

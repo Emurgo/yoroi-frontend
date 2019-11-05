@@ -13,7 +13,7 @@ import type {
 import type { KeyDerivationRow, KeyRow, } from '../../../primitives/tables';
 import { GetKeyForDerivation } from '../../../primitives/api/read';
 import {
-  getRowFromKey, StaleStateError,
+  getRowFromKey, getRowIn, StaleStateError,
 } from '../../../utils';
 
 export class GetConceptualWallet {
@@ -94,6 +94,19 @@ export class GetPublicDeriver {
       key,
       GetPublicDeriver.ownTables[Tables.PublicDeriverSchema.name].name,
       GetPublicDeriver.ownTables[Tables.PublicDeriverSchema.name].properties.PublicDeriverId,
+    );
+  }
+
+  static async forWallet(
+    db: lf$Database,
+    tx: lf$Transaction,
+    conceptualWalletId: number,
+  ): Promise<$ReadOnlyArray<$ReadOnly<PublicDeriverRow>>> {
+    return await getRowIn<PublicDeriverRow>(
+      db, tx,
+      GetPublicDeriver.ownTables[Tables.PublicDeriverSchema.name].name,
+      GetPublicDeriver.ownTables[Tables.PublicDeriverSchema.name].properties.ConceptualWalletId,
+      [conceptualWalletId],
     );
   }
 }

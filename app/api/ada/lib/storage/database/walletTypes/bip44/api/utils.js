@@ -37,7 +37,8 @@ export const Bip44DerivationLevels = Object.freeze({
     table: Bip44AddressSchema,
   },
 });
-const Bip44TableMap = new Map<number, string>(
+
+export const Bip44TableMap = new Map<number, string>(
   Object.keys(Bip44DerivationLevels)
     .map(key => Bip44DerivationLevels[key])
     .map(val => [val.level, val.table.name])
@@ -61,6 +62,7 @@ const allBip44DerivationTables = {
   [Bip44AddressSchema.name]: Bip44AddressSchema,
 };
 
+// TODO: consider deleting this
 export class GetBip44Tables {
   static ownTables = Object.freeze({
     ...allBip44DerivationTables,

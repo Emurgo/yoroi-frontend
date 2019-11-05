@@ -1,7 +1,7 @@
 // @flow
 
 import {
-  ConceptualWalletSchema, PublicDeriverSchema,
+  ConceptualWalletSchema,
 } from '../core/tables';
 import { Type } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
@@ -33,29 +33,6 @@ export const Bip44WrapperSchema: {
   }
 };
 
-// TODO: this should be a generic table with an index "type" row
-export type Bip44ToPublicDeriverInsert = {|
-  Bip44WrapperId: number,
-  PublicDeriverId: number,
-  Index: number,
-|};
-export type Bip44ToPublicDeriverRow = {|
-  Bip44ToPublicDeriverId: number,
-  ...Bip44ToPublicDeriverInsert,
-|};
-export const Bip44ToPublicDeriverSchema: {
-  +name: 'Bip44ToPublicDeriver',
-  properties: $ObjMapi<Bip44ToPublicDeriverRow, ToSchemaProp>
-} = {
-  name: 'Bip44ToPublicDeriver',
-  properties: {
-    Bip44ToPublicDeriverId: 'Bip44ToPublicDeriverId',
-    Bip44WrapperId: 'Bip44WrapperId',
-    PublicDeriverId: 'PublicDeriverId',
-    Index: 'Index',
-  }
-};
-
 export const populateBip44Db = (schemaBuilder: lf$schema$Builder) => {
   // Bip44Wrapper Table
   schemaBuilder.createTable(Bip44WrapperSchema.name)
@@ -82,27 +59,4 @@ export const populateBip44Db = (schemaBuilder: lf$schema$Builder) => {
       Bip44WrapperSchema.properties.PrivateDeriverLevel,
       Bip44WrapperSchema.properties.PrivateDeriverKeyDerivationId,
     ]);
-  // Bip44ToPublicDeriver Tables
-  schemaBuilder.createTable(Bip44ToPublicDeriverSchema.name)
-    .addColumn(Bip44ToPublicDeriverSchema.properties.Bip44ToPublicDeriverId, Type.INTEGER)
-    .addColumn(Bip44ToPublicDeriverSchema.properties.Bip44WrapperId, Type.INTEGER)
-    .addColumn(Bip44ToPublicDeriverSchema.properties.PublicDeriverId, Type.INTEGER)
-    .addColumn(Bip44ToPublicDeriverSchema.properties.Index, Type.INTEGER)
-    .addPrimaryKey(
-      ([Bip44ToPublicDeriverSchema.properties.Bip44ToPublicDeriverId]: Array<string>),
-      true
-    )
-    .addForeignKey('Bip44ToPublicDeriver_PublicDeriver', {
-      local: Bip44ToPublicDeriverSchema.properties.PublicDeriverId,
-      ref: `${PublicDeriverSchema.name}.${PublicDeriverSchema.properties.PublicDeriverId}`
-    })
-    .addForeignKey('Bip44ToPublicDeriver_Bip44Wrapper', {
-      local: Bip44ToPublicDeriverSchema.properties.Bip44WrapperId,
-      ref: `${Bip44WrapperSchema.name}.${Bip44WrapperSchema.properties.Bip44WrapperId}`
-    })
-    .addIndex(
-      'Bip44ToPublicDeriver_Bip44Wrapper_Index',
-      ([Bip44ToPublicDeriverSchema.properties.Bip44WrapperId]: Array<string>),
-      false
-    );
 };

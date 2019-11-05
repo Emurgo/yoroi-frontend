@@ -1,7 +1,7 @@
 // @flow
 
 import {
-  ConceptualWalletSchema, PublicDeriverSchema,
+  ConceptualWalletSchema,
 } from '../core/tables';
 import { Type } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
@@ -33,28 +33,6 @@ export const Cip1852WrapperSchema: {
   }
 };
 
-export type Cip1852ToPublicDeriverInsert = {|
-  Cip1852WrapperId: number,
-  PublicDeriverId: number,
-  Index: number,
-|};
-export type Cip1852ToPublicDeriverRow = {|
-  Cip1852ToPublicDeriverId: number,
-  ...Cip1852ToPublicDeriverInsert,
-|};
-export const Cip1852ToPublicDeriverSchema: {
-  +name: 'Cip1852ToPublicDeriver',
-  properties: $ObjMapi<Cip1852ToPublicDeriverRow, ToSchemaProp>
-} = {
-  name: 'Cip1852ToPublicDeriver',
-  properties: {
-    Cip1852ToPublicDeriverId: 'Cip1852ToPublicDeriverId',
-    Cip1852WrapperId: 'Cip1852WrapperId',
-    PublicDeriverId: 'PublicDeriverId',
-    Index: 'Index',
-  }
-};
-
 export const populateCip1852Db = (schemaBuilder: lf$schema$Builder) => {
   // Cip1852Wrapper Table
   schemaBuilder.createTable(Cip1852WrapperSchema.name)
@@ -81,27 +59,4 @@ export const populateCip1852Db = (schemaBuilder: lf$schema$Builder) => {
       Cip1852WrapperSchema.properties.PrivateDeriverLevel,
       Cip1852WrapperSchema.properties.PrivateDeriverKeyDerivationId,
     ]);
-  // Cip1852ToPublicDeriver Tables
-  schemaBuilder.createTable(Cip1852ToPublicDeriverSchema.name)
-    .addColumn(Cip1852ToPublicDeriverSchema.properties.Cip1852ToPublicDeriverId, Type.INTEGER)
-    .addColumn(Cip1852ToPublicDeriverSchema.properties.Cip1852WrapperId, Type.INTEGER)
-    .addColumn(Cip1852ToPublicDeriverSchema.properties.PublicDeriverId, Type.INTEGER)
-    .addColumn(Cip1852ToPublicDeriverSchema.properties.Index, Type.INTEGER)
-    .addPrimaryKey(
-      ([Cip1852ToPublicDeriverSchema.properties.Cip1852ToPublicDeriverId]: Array<string>),
-      true
-    )
-    .addForeignKey('Cip1852ToPublicDeriver_PublicDeriver', {
-      local: Cip1852ToPublicDeriverSchema.properties.PublicDeriverId,
-      ref: `${PublicDeriverSchema.name}.${PublicDeriverSchema.properties.PublicDeriverId}`
-    })
-    .addForeignKey('Cip1852ToPublicDeriver_Cip1852Wrapper', {
-      local: Cip1852ToPublicDeriverSchema.properties.Cip1852WrapperId,
-      ref: `${Cip1852WrapperSchema.name}.${Cip1852WrapperSchema.properties.Cip1852WrapperId}`
-    })
-    .addIndex(
-      'Cip1852ToPublicDeriver_Cip1852Wrapper_Index',
-      ([Cip1852ToPublicDeriverSchema.properties.Cip1852WrapperId]: Array<string>),
-      false
-    );
 };

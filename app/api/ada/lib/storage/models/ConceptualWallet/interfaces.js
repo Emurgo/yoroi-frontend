@@ -16,6 +16,7 @@ export type IConceptualWalletConstructor = {|
   conceptualWalletId: number,
   walletType: WalletType,
   hardwareInfo: ?$ReadOnly<HwWalletMetaRow>,
+  derivationTables: Map<number, string>;
 |};
 
 export interface IConceptualWallet {
@@ -24,4 +25,5 @@ export interface IConceptualWallet {
   getHwWalletMeta(): ?$ReadOnly<HwWalletMetaRow>;
   getDb(): lf$Database;
   getConceptualWalletId(): number;
+  getDerivationTables(): Map<number, string>;
 }

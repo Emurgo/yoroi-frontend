@@ -8,7 +8,10 @@ import type {
 import {
   ConceptualWallet, refreshConceptualWalletFunctionality,
 } from '../ConceptualWallet/index';
-import type { IConceptualWalletConstructor, } from '../ConceptualWallet/interfaces';
+import type {
+  IConceptualWallet,
+  IConceptualWalletConstructor,
+} from '../ConceptualWallet/interfaces';
 
 import {
   Mixin,
@@ -29,15 +32,19 @@ import type {
 import {
   getAllSchemaTables,
   raii,
+  mapToTables,
   StaleStateError,
 } from '../../database/utils';
 
 import {
-  DeriveBip44PublicFromPrivate, AddBip44AdhocPublicDeriver,
-} from '../../database/walletTypes/bip44/api/write';
+  DerivePublicDeriverFromKey, AddAdhocPublicDeriver,
+} from '../../database/walletTypes/common/api/write';
 import type {
   Bip44WrapperRow,
 } from '../../database/walletTypes/bip44/tables';
+import {
+  Bip44TableMap,
+} from '../../database/walletTypes/bip44/api/utils';
 import { UpdateGet, } from '../../database/primitives/api/write';
 import { GetKeyForDerivation, } from '../../database/primitives/api/read';
 
@@ -133,6 +140,7 @@ export async function refreshBip44WalletFunctionality(
   const conceptualWalletCtorData = await refreshConceptualWalletFunctionality(
     db,
     row.ConceptualWalletId,
+    Bip44TableMap
   );
 
   let privateDeriverLevel = null;
@@ -167,15 +175,17 @@ export async function refreshBip44WalletFunctionality(
 export async function derivePublicDeriver<Row>(
   db: lf$Database,
   tx: lf$Transaction,
-  deps: {| DeriveBip44PublicFromPrivate: Class<DeriveBip44PublicFromPrivate> |},
-  bip44WrapperId: number,
+  deps: {| DerivePublicDeriverFromKey: Class<DerivePublicDeriverFromKey> |},
+  conceptualWalletId: number,
   body: IDerivePublicFromPrivateRequest,
+  privateDeriverKeyDerivationId: number,
+  privateDeriverLevel: number,
+  tableMap: Map<number, string>,
 ): Promise<IDerivePublicFromPrivateResponse<Row>> {
-  return await deps.DeriveBip44PublicFromPrivate.add<Row>(
+  return await deps.DerivePublicDeriverFromKey.add<Row>(
     db, tx,
-    bip44WrapperId,
     {
-      publicDeriverInsert: body.publicDeriverInsert,
+      publicDeriverMeta: body.publicDeriverMeta,
       pathToPublic: privateKeyRow => {
         const accountKey = normalizeBip32Ed25519ToPubDeriverLevel({
           privateKeyRow,
@@ -213,33 +223,47 @@ export async function derivePublicDeriver<Row>(
         ];
       },
       initialDerivations: body.initialDerivations,
-    }
+    },
+    privateDeriverKeyDerivationId,
+    privateDeriverLevel,
+    conceptualWalletId,
+    tableMap,
   );
 }
 
-type PublicFromPrivateDependencies = IBip44Wallet;
+type PublicFromPrivateDependencies = IBip44Wallet & IConceptualWallet;
 const PublicFromPrivateMixin = (
   superclass: Class<PublicFromPrivateDependencies>
 ) => class PublicFromPrivate extends superclass implements IDerivePublicFromPrivate {
 
   rawDerivePublicDeriverFromPrivate = async <Row>(
     tx: lf$Transaction,
-    deps: {| DeriveBip44PublicFromPrivate: Class<DeriveBip44PublicFromPrivate> |},
+    deps: {| DerivePublicDeriverFromKey: Class<DerivePublicDeriverFromKey> |},
     body: IDerivePublicFromPrivateRequest,
+    tableMap: Map<number, string>,
   ): Promise<IDerivePublicFromPrivateResponse<Row>> => {
+    const id = super.getPrivateDeriverKeyDerivationId();
+    const level = super.getPrivateDeriverLevel();
+    if (id == null || level == null) {
+      throw new StaleStateError('rawDerivePublicDeriverFromPrivate no private deriver');
+    }
     return await derivePublicDeriver<Row>(
       super.getDb(),
       tx,
-      { DeriveBip44PublicFromPrivate: deps.DeriveBip44PublicFromPrivate },
-      super.getWrapperId(),
+      { DerivePublicDeriverFromKey: deps.DerivePublicDeriverFromKey },
+      super.getConceptualWalletId(),
       body,
+      id,
+      level,
+      tableMap,
     );
   }
   derivePublicDeriverFromPrivate = async <Row>(
     body: IDerivePublicFromPrivateRequest,
   ): Promise<IDerivePublicFromPrivateResponse<Row>> => {
+    const derivationTables = this.getDerivationTables();
     const deps = Object.freeze({
-      DeriveBip44PublicFromPrivate,
+      DerivePublicDeriverFromKey,
     });
     const depTables = Object
       .keys(deps)
@@ -247,8 +271,13 @@ const PublicFromPrivateMixin = (
       .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii(
       super.getDb(),
-      depTables,
-      async tx => this.rawDerivePublicDeriverFromPrivate<Row>(tx, deps, body)
+      [
+        ...depTables,
+        ...mapToTables(super.getDb(), derivationTables),
+      ],
+      async tx => this.rawDerivePublicDeriverFromPrivate<Row>(
+        tx, deps, body, derivationTables
+      )
     );
   }
 };
@@ -379,27 +408,30 @@ export function asGetPrivateDeriverKey<T: IBip44Wallet>(
 //   AdhocPublicDeriver
 // ======================
 
-type AdhocPublicDeriverDepenencies = IBip44Wallet;
+type AdhocPublicDeriverDepenencies = IConceptualWallet & IBip44Wallet;
 const AdhocPublicDeriverMixin = (
   superclass: Class<AdhocPublicDeriverDepenencies>
 ) => class AdhocPublicDeriver extends superclass implements IAdhocPublicDeriver {
 
   rawAddAdhocPubicDeriver = async <Row>(
     tx: lf$Transaction,
-    deps: {| AddBip44AdhocPublicDeriver: Class<AddBip44AdhocPublicDeriver> |},
+    deps: {| AddAdhocPublicDeriver: Class<AddAdhocPublicDeriver> |},
     body: IAddAdhocPublicDeriverRequest,
+    tableMap: Map<number, string>,
   ): Promise<IAddAdhocPublicDeriverResponse<Row>> => {
-    return await deps.AddBip44AdhocPublicDeriver.add<Row>(
+    return await deps.AddAdhocPublicDeriver.add<Row>(
       super.getDb(), tx,
       body,
-      super.getWrapperId(),
+      super.getConceptualWalletId(),
+      tableMap,
     );
   }
   addAdhocPubicDeriver = async <Row>(
     body: IAddAdhocPublicDeriverRequest,
   ): Promise<IAddAdhocPublicDeriverResponse<Row>> => {
+    const derivationTables = this.getDerivationTables();
     const deps = Object.freeze({
-      AddBip44AdhocPublicDeriver,
+      AddAdhocPublicDeriver,
     });
     const depTables = Object
       .keys(deps)
@@ -407,8 +439,11 @@ const AdhocPublicDeriverMixin = (
       .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii(
       super.getDb(),
-      depTables,
-      async tx => this.rawAddAdhocPubicDeriver<Row>(tx, deps, body)
+      [
+        ...depTables,
+        ...mapToTables(super.getDb(), derivationTables),
+      ],
+      async tx => this.rawAddAdhocPubicDeriver<Row>(tx, deps, body, derivationTables)
     );
   }
 };

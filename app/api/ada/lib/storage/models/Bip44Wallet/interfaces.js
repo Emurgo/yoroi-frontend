@@ -10,8 +10,8 @@ import type {
   Bip44WrapperRow,
 } from '../../database/walletTypes/bip44/tables';
 import {
-  DeriveBip44PublicFromPrivate, AddBip44AdhocPublicDeriver,
-} from '../../database/walletTypes/bip44/api/write';
+  DerivePublicDeriverFromKey, AddAdhocPublicDeriver,
+} from '../../database/walletTypes/common/api/write';
 import type {
   ModifyDisplayCutoff,
 } from '../../database/walletTypes/bip44/api/write';
@@ -26,7 +26,6 @@ import type {
   TreeInsert,
 } from '../../database/walletTypes/common/utils';
 import type { AddPublicDeriverResponse } from '../../database/walletTypes/core/api/write';
-import type { PublicDeriverInsert } from '../../database/walletTypes/core/tables';
 import { UpdateGet, } from '../../database/primitives/api/write';
 import {
   GetKeyForDerivation,
@@ -41,7 +40,7 @@ import type {
 
 import type {
   IChangePasswordRequest, IChangePasswordRequestFunc,
-  RawVariation,
+  RawVariation, RawTableVariation,
 } from '../common/interfaces';
 import { Bip44Wallet } from './wrapper';
 import {
@@ -68,10 +67,9 @@ export interface IBip44Wallet {
 }
 
 export type IDerivePublicFromPrivateRequest = {|
-  publicDeriverInsert: ({
-    derivationId: number,
-    lastSyncInfoId: number
-  }) => PublicDeriverInsert,
+  publicDeriverMeta: {|
+    name: string,
+  |},
   decryptPrivateDeriverPassword: null | string,
   /**
    * void -> do not store key
@@ -87,10 +85,10 @@ export type IDerivePublicFromPrivateFunc<Row> = (
   body: IDerivePublicFromPrivateRequest
 ) => Promise<IDerivePublicFromPrivateResponse<Row>>;
 export interface IDerivePublicFromPrivate {
-  +rawDerivePublicDeriverFromPrivate: RawVariation<
+  +rawDerivePublicDeriverFromPrivate: RawTableVariation<
     IDerivePublicFromPrivateFunc<mixed>,
     {|
-      DeriveBip44PublicFromPrivate: Class<DeriveBip44PublicFromPrivate>,
+      DerivePublicDeriverFromKey: Class<DerivePublicDeriverFromKey>,
     |},
     IDerivePublicFromPrivateRequest
   >;
@@ -132,10 +130,10 @@ export type IAddAdhocPublicDeriverFunc<Row> = (
   body: IAddAdhocPublicDeriverRequest
 ) => Promise<IAddAdhocPublicDeriverResponse<Row>>;
 export interface IAdhocPublicDeriver {
-  +rawAddAdhocPubicDeriver: RawVariation<
+  +rawAddAdhocPubicDeriver: RawTableVariation<
     IAddAdhocPublicDeriverFunc<mixed>,
     {|
-      AddBip44AdhocPublicDeriver: Class<AddBip44AdhocPublicDeriver>,
+      AddAdhocPublicDeriver: Class<AddAdhocPublicDeriver>,
     |},
     IAddAdhocPublicDeriverRequest,
   >;

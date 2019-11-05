@@ -209,11 +209,9 @@ export async function createStandardBip44Wallet(request: {
       .derivePublicDeriver(
         _finalState => ({
           decryptPrivateDeriverPassword: request.password,
-          publicDeriverInsert: ids => ({
-            KeyDerivationId: ids.derivationId,
-            Name: request.accountName,
-            LastSyncInfoId: ids.lastSyncInfoId,
-          }),
+          publicDeriverMeta: {
+            name: request.accountName,
+          },
           path: [BIP44_PURPOSE, CARDANO_COINTYPE, request.accountIndex],
           initialDerivations
         })
@@ -311,11 +309,9 @@ export async function createHardwareWallet(request: {
         finalState => ({
           parentDerivationId: finalState.root.root.KeyDerivation.KeyDerivationId,
           pathStartLevel: 1,
-          publicDeriverInsert: ids => ({
-            KeyDerivationId: ids.derivationId,
-            Name: request.accountName,
-            LastSyncInfoId: ids.lastSyncInfoId,
-          }),
+          publicDeriverMeta: {
+            name: request.accountName,
+          },
           pathToPublic: [
             {
               index: BIP44_PURPOSE,
@@ -551,11 +547,9 @@ async function addPublicDeriverToMigratedWallet<
       finalState => ({
         parentDerivationId: finalState.root.root.KeyDerivation.KeyDerivationId,
         pathStartLevel: 1,
-        publicDeriverInsert: ids => ({
-          KeyDerivationId: ids.derivationId,
-          Name: accountName,
-          LastSyncInfoId: ids.lastSyncInfoId,
-        }),
+        publicDeriverMeta: {
+          name: accountName,
+        },
         pathToPublic,
         initialDerivations,
         hwWalletMetaInsert: request.hwWalletMetaInsert == null

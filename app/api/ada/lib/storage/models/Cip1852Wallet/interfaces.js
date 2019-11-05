@@ -3,7 +3,7 @@
 import type {
   AccountingDerivationRow,
 } from '../../database/walletTypes/common/tables';
-import { GetCip1852DerivationSpecific } from '../../database/walletTypes/cip1852/api/read';
+import { GetBip44DerivationSpecific } from '../../database/walletTypes/bip44/api/read';
 import {
   GetPathWithSpecific,
   GetAddress,
@@ -19,9 +19,6 @@ import type {
 import type {
   AddDerivationTree,
 } from '../../database/walletTypes/common/api/write';
-import {
-  GetCip1852Tables,
-} from '../../database/walletTypes/cip1852/api/utils';
 
 import type {
   lf$Database,
@@ -84,7 +81,7 @@ export interface IGetAllAccounting {
     {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
-      GetCip1852DerivationSpecific: Class<GetCip1852DerivationSpecific>,
+      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
     |},
     IGetAllAccountingAddressesRequest
   >;
@@ -98,17 +95,17 @@ export type IAddCip1852FromPublicResponse = void;
 export type IAddCip1852FromPublicFunc = (
   body: IAddCip1852FromPublicRequest
 ) => Promise<IAddCip1852FromPublicResponse>;
+// TODO: I think we this can be deleted (same as bip44 case now)
 export interface IAddCip1852FromPublic {
   +rawAddCip1852FromPublic: RawVariation<
     IAddCip1852FromPublicFunc,
     {|
       GetPublicDeriver: Class<GetPublicDeriver>,
       AddDerivationTree: Class<AddDerivationTree>,
-      GetCip1852Tables: Class<GetCip1852Tables>,
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetCip1852DerivationSpecific: Class<GetCip1852DerivationSpecific>,
+      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
     |},
     IAddCip1852FromPublicRequest
   >;

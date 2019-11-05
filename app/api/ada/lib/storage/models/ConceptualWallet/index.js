@@ -33,12 +33,14 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
   #conceptualWalletId: number;
   walletType: WalletType;
   hardwareInfo: ?$ReadOnly<HwWalletMetaRow>;
+  derivationTables: Map<number, string>;
 
   constructor(data: IConceptualWalletConstructor): IConceptualWallet {
     this.db = data.db;
     this.#conceptualWalletId = data.conceptualWalletId;
     this.walletType = data.walletType;
     this.hardwareInfo = data.hardwareInfo;
+    this.derivationTables = data.derivationTables;
     return this;
   }
 
@@ -60,6 +62,10 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
    */
   getHwWalletMeta = (): ?$ReadOnly<HwWalletMetaRow> => {
     return this.hardwareInfo;
+  }
+
+  getDerivationTables = (): Map<number, string> => {
+    return this.derivationTables;
   }
 
   rename = async (
@@ -149,6 +155,7 @@ export function isLedgerNanoWallet(
 export async function refreshConceptualWalletFunctionality(
   db: lf$Database,
   conceptualWalletId: number,
+  derivationTables: Map<number, string>,
 ): Promise<IConceptualWalletConstructor> {
   const deps = Object.freeze({
     GetHwWalletMeta,
@@ -174,5 +181,6 @@ export async function refreshConceptualWalletFunctionality(
     conceptualWalletId,
     walletType,
     hardwareInfo,
+    derivationTables,
   };
 }
