@@ -70,7 +70,7 @@
     "@babel/preset-flow": "7.0.0",
     "@babel/preset-react": "7.6.3",
     "@babel/register": "7.6.2",
-    "@babel/runtime": "7.6.2",
+    "@babel/runtime": "7.6.3",
     "@babel/runtime-corejs2": "7.6.2",
     "@przemyslawzalewski/babel-eslint": "11.0.0",
     "@storybook/addon-actions": "5.2.5",
