@@ -106,10 +106,17 @@ export default class WalletsStore extends Store {
       this.selected = newWithCachedData[0];
     });
     this.actions.dialogs.closeActiveDialog.trigger();
-    this.goToWalletRoute(newWithCachedData[0].self);
 
-    const { wallets } = this.stores.substores[environment.API];
-    wallets.showWalletCreatedNotification();
+    if (environment.isShelley()) {
+      // For Shelly we want to load Staking pages
+      console.log('TODO: For Shelly we want to load Staking pages');
+      this.goToStakingRoute(newWithCachedData[0].self);
+    } else {
+      this.goToWalletRoute(newWithCachedData[0].self);
+
+      const { wallets } = this.stores.substores[environment.API];
+      wallets.showWalletCreatedNotification();
+    }
 
     for (const pubDeriver of newWithCachedData) {
       await this.registerObserversForNewWallet(pubDeriver);
@@ -211,6 +218,11 @@ export default class WalletsStore extends Store {
 
   goToWalletRoute(publicDeriver: PublicDeriver) {
     const route = this.getWalletRoute(publicDeriver);
+    this.actions.router.goToRoute.trigger({ route });
+  }
+
+  goToStakingRoute(publicDeriver: PublicDeriver) {
+    const route = this.getWalletRoute(publicDeriver, 'staking');
     this.actions.router.goToRoute.trigger({ route });
   }
 
