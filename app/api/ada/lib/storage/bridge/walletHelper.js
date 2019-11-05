@@ -14,7 +14,7 @@ import {
 
 import type {
   TreeInsert,
-} from '../database/walletTypes/bip44/api/write';
+} from '../database/walletTypes/common/utils';
 import {
   GetOrAddAddress,
 } from '../database/primitives/api/write';
@@ -37,9 +37,10 @@ import {
 import type {
   HasConceptualWallet,
   HasBip44Wrapper,
-  HasPrivateDeriver,
   HasPublicDeriver,
+  HasRoot,
 } from './walletBuilder';
+
 
 // TODO: maybe move this inside walletBuilder somehow so it's all done in the same transaction
 export async function getAccountDefaultDerivations(
@@ -114,7 +115,7 @@ export async function createStandardBip44Wallet(request: {
   accountIndex: number,
   walletName: string,
   accountName: string,
-}): Promise<HasConceptualWallet & HasBip44Wrapper & HasPrivateDeriver & HasPublicDeriver<mixed>> {
+}): Promise<HasConceptualWallet & HasBip44Wrapper & HasRoot & HasPublicDeriver<mixed>> {
   if (request.accountIndex < HARD_DERIVATION_START) {
     throw new Error('createStandardBip44Wallet needs hardened index');
   }
@@ -171,10 +172,9 @@ export async function createStandardBip44Wallet(request: {
           Name: request.walletName,
         })
       )
-      .addPrivateDeriver(
+      .addFromRoot(
         _finalState => ({
-          pathToPrivate,
-          addLevelRequest: parent => ({
+          rootInsert: {
             privateKeyInfo: {
               Hash: encryptedRoot,
               IsEncrypted: true,
@@ -184,12 +184,16 @@ export async function createStandardBip44Wallet(request: {
             derivationInfo: keys => ({
               PublicKeyId: keys.public,
               PrivateKeyId: keys.private,
-              Parent: parent,
+              Parent: null,
               Index: null,
             }),
             levelInfo: id => ({
               KeyDerivationId: id,
-            })
+            }),
+          },
+          tree: rootDerivation => ({
+            derivationId: rootDerivation,
+            children: [],
           }),
         })
       )
@@ -198,36 +202,19 @@ export async function createStandardBip44Wallet(request: {
           ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
           SignerLevel: Bip44DerivationLevels.ROOT.level,
           PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
-          PrivateDeriverKeyDerivationId: finalState.privateDeriver.KeyDerivation.KeyDerivationId,
+          PrivateDeriverKeyDerivationId: finalState.root.root.KeyDerivation.KeyDerivationId,
           PrivateDeriverLevel: pathToPrivate.length,
         })
       )
       .derivePublicDeriver(
         _finalState => ({
           decryptPrivateDeriverPassword: request.password,
-          publicDeriverPublicKey: {
-            password: null,
-            lastUpdate: null,
-          },
           publicDeriverInsert: ids => ({
             KeyDerivationId: ids.derivationId,
             Name: request.accountName,
             LastSyncInfoId: ids.lastSyncInfoId,
           }),
-          pathToPublic: [
-            {
-              index: BIP44_PURPOSE,
-              insert: {},
-            },
-            {
-              index: CARDANO_COINTYPE,
-              insert: {},
-            },
-            {
-              index: request.accountIndex,
-              insert: {},
-            },
-          ],
+          path: [BIP44_PURPOSE, CARDANO_COINTYPE, request.accountIndex],
           initialDerivations
         })
       )
@@ -290,6 +277,27 @@ export async function createHardwareWallet(request: {
           Name: request.walletName,
         })
       )
+      .addFromRoot(
+        _finalState => ({
+          rootInsert: {
+            privateKeyInfo: null,
+            publicKeyInfo: null,
+            derivationInfo: keys => ({
+              PublicKeyId: keys.public,
+              PrivateKeyId: keys.private,
+              Parent: null,
+              Index: null,
+            }),
+            levelInfo: id => ({
+              KeyDerivationId: id,
+            }),
+          },
+          tree: rootDerivation => ({
+            derivationId: rootDerivation,
+            children: [],
+          }),
+        })
+      )
       .addBip44Wrapper(
         finalState => ({
           ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
@@ -301,35 +309,35 @@ export async function createHardwareWallet(request: {
       )
       .addAdhocPublicDeriver(
         finalState => ({
-          bip44WrapperId: finalState.bip44WrapperRow.Bip44WrapperId,
-          publicKey: {
-            Hash: request.accountPublicKey.key().to_hex(),
-            IsEncrypted: false,
-            PasswordLastUpdate: null,
-          },
+          parentDerivationId: finalState.root.root.KeyDerivation.KeyDerivationId,
+          pathStartLevel: 1,
           publicDeriverInsert: ids => ({
             KeyDerivationId: ids.derivationId,
             Name: request.accountName,
             LastSyncInfoId: ids.lastSyncInfoId,
           }),
-          parentDerivationId: null,
-          pathStartLevel: 0,
           pathToPublic: [
-            {
-              index: 0,
-              insert: {},
-            },
             {
               index: BIP44_PURPOSE,
               insert: {},
+              publicKey: null,
+              privateKey: null,
             },
             {
               index: CARDANO_COINTYPE,
               insert: {},
+              publicKey: null,
+              privateKey: null,
             },
             {
               index: request.accountIndex,
               insert: {},
+              publicKey: {
+                Hash: request.accountPublicKey.key().to_hex(),
+                IsEncrypted: false,
+                PasswordLastUpdate: null,
+              },
+              privateKey: null,
             },
           ],
           initialDerivations,
@@ -364,10 +372,31 @@ export async function migrateFromStorageV1(request: {
           Name: request.walletName,
         })
       )
+      .addFromRoot(
+        _finalState => ({
+          rootInsert: {
+            privateKeyInfo: null,
+            publicKeyInfo: null,
+            derivationInfo: keys => ({
+              PublicKeyId: keys.public,
+              PrivateKeyId: keys.private,
+              Parent: null,
+              Index: null,
+            }),
+            levelInfo: id => ({
+              KeyDerivationId: id,
+            }),
+          },
+          tree: rootDerivation => ({
+            derivationId: rootDerivation,
+            children: [],
+          }),
+        })
+      )
       .addBip44Wrapper(
         finalState => ({
           ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
-          SignerLevel: Bip44DerivationLevels.ROOT.level,
+          SignerLevel: null,
           PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
           PrivateDeriverKeyDerivationId: null,
           PrivateDeriverLevel: null,
@@ -393,21 +422,24 @@ export async function migrateFromStorageV1(request: {
           Name: request.walletName,
         })
       )
-      .addPrivateDeriver(
+      .addFromRoot(
         _finalState => ({
-          pathToPrivate,
-          addLevelRequest: parent => ({
+          rootInsert: {
             privateKeyInfo: encryptedPk,
             publicKeyInfo: null,
             derivationInfo: keys => ({
               PublicKeyId: keys.public,
               PrivateKeyId: keys.private,
-              Parent: parent,
+              Parent: null,
               Index: null,
             }),
             levelInfo: id => ({
               KeyDerivationId: id,
-            })
+            }),
+          },
+          tree: rootDerivation => ({
+            derivationId: rootDerivation,
+            children: [],
           }),
         })
       )
@@ -416,7 +448,7 @@ export async function migrateFromStorageV1(request: {
           ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
           SignerLevel: Bip44DerivationLevels.ROOT.level,
           PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
-          PrivateDeriverKeyDerivationId: finalState.privateDeriver.KeyDerivation.KeyDerivationId,
+          PrivateDeriverKeyDerivationId: finalState.root.root.KeyDerivation.KeyDerivationId,
           PrivateDeriverLevel: pathToPrivate.length
         })
       );
@@ -433,7 +465,7 @@ export async function migrateFromStorageV1(request: {
 }
 
 async function addPublicDeriverToMigratedWallet<
-  T: $Shape<{||}> & HasConceptualWallet & HasBip44Wrapper
+  T: $Shape<{||}> & HasConceptualWallet & HasRoot & HasBip44Wrapper
 >(request: {
   builder: WalletBuilder<T>,
   db: lf$Database,
@@ -492,54 +524,46 @@ async function addPublicDeriverToMigratedWallet<
   const pathToPublic = [{
     index: BIP44_PURPOSE,
     insert: {},
+    publicKey: null,
+    privateKey: null,
   },
   {
     index: CARDANO_COINTYPE,
     insert: {},
+    publicKey: null,
+    privateKey: null,
   },
   {
     index: accountIndex,
     insert: {},
+    publicKey: {
+      Hash: accountPublicKey.key().to_hex(),
+      IsEncrypted: false,
+      PasswordLastUpdate: null,
+    },
+    privateKey: null,
   }];
 
   // We need to add ad-hoc even in the derived case
   // because during migration, the private key is encrypted (can't derive with it)
   return request.builder
     .addAdhocPublicDeriver(
-      finalState => {
-        // kind of hacky way to extract the ID without angering Flow
-        const maybePrivateDeriver = ((finalState: any): WithNullableFields<HasPrivateDeriver>);
-        const privateDeriverKeyDerivationId = maybePrivateDeriver.privateDeriver == null
-          ? null
-          : maybePrivateDeriver.privateDeriver.KeyDerivation.KeyDerivationId;
-        return {
-          bip44WrapperId: finalState.bip44WrapperRow.Bip44WrapperId,
-          publicKey: {
-            Hash: accountPublicKey.key().to_hex(),
-            IsEncrypted: false,
-            PasswordLastUpdate: null,
+      finalState => ({
+        parentDerivationId: finalState.root.root.KeyDerivation.KeyDerivationId,
+        pathStartLevel: 1,
+        publicDeriverInsert: ids => ({
+          KeyDerivationId: ids.derivationId,
+          Name: accountName,
+          LastSyncInfoId: ids.lastSyncInfoId,
+        }),
+        pathToPublic,
+        initialDerivations,
+        hwWalletMetaInsert: request.hwWalletMetaInsert == null
+          ? undefined
+          : {
+            ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
+            ...request.hwWalletMetaInsert
           },
-          publicDeriverInsert: ids => ({
-            KeyDerivationId: ids.derivationId,
-            Name: accountName,
-            LastSyncInfoId: ids.lastSyncInfoId,
-          }),
-          parentDerivationId: privateDeriverKeyDerivationId,
-          pathStartLevel: privateDeriverKeyDerivationId == null ? 0 : 1,
-          pathToPublic: privateDeriverKeyDerivationId != null
-            ? pathToPublic
-            : [{
-              index: 0,
-              insert: {},
-            }, ...pathToPublic],
-          initialDerivations,
-          hwWalletMetaInsert: request.hwWalletMetaInsert == null
-            ? undefined
-            : {
-              ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
-              ...request.hwWalletMetaInsert
-            },
-        };
-      }
+      })
     );
 }

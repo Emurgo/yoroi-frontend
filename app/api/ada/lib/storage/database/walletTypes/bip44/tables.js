@@ -33,6 +33,7 @@ export const Bip44WrapperSchema: {
   }
 };
 
+// TODO: this should be a generic table with an index "type" row
 export type Bip44ToPublicDeriverInsert = {|
   Bip44WrapperId: number,
   PublicDeriverId: number,

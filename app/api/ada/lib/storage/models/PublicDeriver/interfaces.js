@@ -1,22 +1,17 @@
 // @flow
 
 import type {
-  lf$Database, lf$Transaction,
+  lf$Database,
 } from 'lovefield';
 
 import {
   BigNumber
 } from 'bignumber.js';
 
-import { Bip44Wallet } from '../Bip44Wallet/index';
 import { ConceptualWallet } from '../ConceptualWallet/index';
 
 import type {
-  TreeInsert,
-} from '../../database/walletTypes/bip44/api/write';
-import type {
   Bip44AddressRow,
-  AccountingDerivationRow,
 } from '../../database/walletTypes/common/tables';
 
 import {
@@ -34,6 +29,7 @@ import type { PublicDeriverRow, LastSyncInfoRow, } from '../../database/walletTy
 import type {
   IChangePasswordRequestFunc, IChangePasswordRequest,
   Address, Addressing,
+  RawVariation,
 } from '../common/interfaces';
 import {
   GetPublicDeriver,
@@ -48,9 +44,14 @@ import {
   GetAddress,
 } from '../../database/primitives/api/read';
 import {
-  AddBip44Tree,
   ModifyDisplayCutoff,
 } from '../../database/walletTypes/bip44/api/write';
+import {
+  GetBip44Tables,
+} from '../../database/walletTypes/bip44/api/utils';
+import {
+  AddDerivationTree,
+} from '../../database/walletTypes/common/api/write';
 import { GetBip44DerivationSpecific } from '../../database/walletTypes/bip44/api/read';
 import { UpdateGet, GetOrAddAddress, } from '../../database/primitives/api/write';
 import type {
@@ -61,14 +62,6 @@ export type WalletAccountNumberPlate = {
   hash: string,
   id: string,
 }
-
-type RawVariation<Func, Deps, Arg> = (
-  tx: lf$Transaction,
-  deps: Deps,
-  // should be able to extract Arg type with a $Call on Func
-  // but for some reason it isn't working :/
-  body: Arg,
-) => ReturnType<Func>;
 
 export type IPublicDeriverConstructor = {
   publicDeriverId: number,
@@ -86,12 +79,8 @@ export interface IPublicDeriver {
   getFullPublicDeriverInfo(): Promise<$ReadOnly<PublicDeriverRow>>;
 }
 
-export interface IBip44Parent {
-  +getBip44Parent: (body: void) => Bip44Wallet;
-}
-
 export type PathRequest = void;
-type BaseAddressPath = {|
+export type BaseAddressPath = {|
   addr: $ReadOnly<AddressRow>,
   ...Addressing,
 |};
@@ -99,33 +88,6 @@ export type UtxoAddressPath = {|
   ...BaseAddressPath,
   row: $ReadOnly<Bip44AddressRow>,
 |};
-export type AccountingAddressPath = {|
-  ...BaseAddressPath,
-  row: $ReadOnly<AccountingDerivationRow>,
-|};
-
-export type IAddFromPublicRequest = {|
-  tree: TreeInsert<any>,
-|};
-export type IAddFromPublicResponse = void;
-export type IAddFromPublicFunc = (
-  body: IAddFromPublicRequest
-) => Promise<IAddFromPublicResponse>;
-export interface IAddFromPublic {
-  +rawAddFromPublic: RawVariation<
-    IAddFromPublicFunc,
-    {|
-      GetPublicDeriver: Class<GetPublicDeriver>,
-      AddBip44Tree: Class<AddBip44Tree>,
-      ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
-      GetDerivationsByPath: Class<GetDerivationsByPath>,
-      GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
-    |},
-    IAddFromPublicRequest
-  >;
-  +addFromPublic: IAddFromPublicFunc;
-}
 
 export type IGetPublicRequest = void;
 export type IGetPublicResponse = $ReadOnly<KeyRow>;
@@ -146,24 +108,6 @@ export interface IGetPublic {
     IChangePasswordRequest
   >;
   +changePubDeriverPassword: IChangePasswordRequestFunc,
-}
-
-export type IGetAllAccountingAddressesRequest = PathRequest;
-export type IGetAllAccountingAddressesResponse = Array<AccountingAddressPath>;
-export type IGetAllAccountingAddressesFunc = (
-  body: IGetAllAccountingAddressesRequest
-) => Promise<IGetAllAccountingAddressesResponse>;
-export interface IGetAllAccounting {
-  +rawGetAllAccountingAddresses: RawVariation<
-    IGetAllAccountingAddressesFunc,
-    {|
-      GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetAddress: Class<GetAddress>,
-      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
-    |},
-    IGetAllAccountingAddressesRequest
-  >;
-  +getAllAccountingAddresses: IGetAllAccountingAddressesFunc
 }
 
 export type IGetAllUtxoAddressesRequest = PathRequest;
@@ -314,7 +258,7 @@ export type IGetUtxoBalanceFunc = (
   body: IGetUtxoBalanceRequest
 ) => Promise<IGetUtxoBalanceResponse>;
 export interface IGetUtxoBalance {
-  +rawGetBalance: RawVariation<
+  +rawGetUtxoBalance: RawVariation<
     IGetUtxoBalanceFunc,
     {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
@@ -324,7 +268,7 @@ export interface IGetUtxoBalance {
     |},
     IGetUtxoBalanceRequest
   >;
-  +getBalance: IGetUtxoBalanceFunc;
+  +getUtxoBalance: IGetUtxoBalanceFunc;
 }
 
 export type IGetSigningKeyRequest = void;
@@ -413,7 +357,8 @@ export interface IScanAddresses {
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
       GetOrAddAddress: Class<GetOrAddAddress>,
       GetPublicDeriver: Class<GetPublicDeriver>,
-      AddBip44Tree: Class<AddBip44Tree>,
+      AddDerivationTree: Class<AddDerivationTree>,
+      GetBip44Tables: Class<GetBip44Tables>,
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,

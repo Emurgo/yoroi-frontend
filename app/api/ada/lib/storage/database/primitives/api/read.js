@@ -136,6 +136,10 @@ export class GetChildIfExists {
   });
   static depTables = Object.freeze({});
 
+  /**
+   * Note: can't support ROOT level
+   * since you wouldn't be able to differentiate roots of different wallets
+   */
   static async get(
     db: lf$Database,
     tx: lf$Transaction,

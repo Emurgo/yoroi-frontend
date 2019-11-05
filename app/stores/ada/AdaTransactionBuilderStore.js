@@ -12,7 +12,7 @@ import type { BaseSignRequest } from '../../api/ada/transactions/types';
 import { signRequestFee, signRequestTotalInput } from '../../api/ada/transactions/utils';
 import {
   asGetAllUtxos, asHasChains,
-} from '../../api/ada/lib/storage/models/PublicDeriver/index';
+} from '../../api/ada/lib/storage/models/Bip44Wallet/traits';
 
 
 /**

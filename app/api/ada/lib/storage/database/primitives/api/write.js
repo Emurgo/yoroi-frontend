@@ -182,6 +182,11 @@ export type AddDerivationRequest<Insert> = {|
   levelInfo: number => Insert,
 |};
 
+export type DerivationQueryResult<Row> = {|
+  KeyDerivation: $ReadOnly<KeyDerivationRow>,
+  specificDerivationResult: $ReadOnly<Row>,
+|};
+
 export class AddDerivation {
   static ownTables = Object.freeze({
     [Tables.KeyDerivationSchema.name]: Tables.KeyDerivationSchema,
@@ -195,10 +200,7 @@ export class AddDerivation {
     tx: lf$Transaction,
     request: AddDerivationRequest<Insert>,
     levelSpecificTableName: string,
-  ): Promise<{
-    KeyDerivation: $ReadOnly<KeyDerivationRow>,
-    specificDerivationResult: $ReadOnly<Row>,
-  }> {
+  ): Promise<DerivationQueryResult<Row>> {
     const privateKey = request.privateKeyInfo === null
       ? null
       : await AddDerivation.depTables.AddKey.add(
@@ -237,6 +239,7 @@ export class AddDerivation {
   }
 }
 
+// TODO: move this and related classes to walletTypes/common/api
 export class GetOrAddDerivation {
   static ownTables = Object.freeze({
     [Tables.KeyDerivationSchema.name]: Tables.KeyDerivationSchema,
@@ -246,22 +249,25 @@ export class GetOrAddDerivation {
     GetChildIfExists,
   });
 
+  /**
+   * Note: We can't differentiate roots from different wallets (index&id are all null)
+   * so for root we always add
+   */
   static async getOrAdd<Insert, Row>(
     db: lf$Database,
     tx: lf$Transaction,
-    parentDerivationId: number,
-    childIndex: number,
+    parentDerivationId: number | null,
+    childIndex: number | null,
     request: AddDerivationRequest<Insert>,
     levelSpecificTableName: string,
-  ): Promise<{
-    KeyDerivation: $ReadOnly<KeyDerivationRow>,
-    specificDerivationResult: $ReadOnly<Row>,
-  }> {
-    const childResult = await GetOrAddDerivation.depTables.GetChildIfExists.get(
-      db, tx,
-      parentDerivationId,
-      childIndex,
-    );
+  ): Promise<DerivationQueryResult<Row>> {
+    const childResult = parentDerivationId == null || childIndex == null
+      ? undefined
+      : await GetOrAddDerivation.depTables.GetChildIfExists.get(
+        db, tx,
+        parentDerivationId,
+        childIndex,
+      );
     if (childResult !== undefined) {
       const specificDerivationResult = (
         await getRowIn<Row>(

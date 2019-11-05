@@ -11,9 +11,13 @@ import type { GetTransactionsFunc, GetBalanceFunc,
 import environment from '../../environment';
 import {
   PublicDeriver,
-  asGetAllUtxos,
-  asGetBalance,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import {
+  asGetBalance,
+} from '../../api/ada/lib/storage/models/common/traits';
+import {
+  asGetAllUtxos,
+} from '../../api/ada/lib/storage/models/Bip44Wallet/traits';
 import type {
   IGetAllUtxos,
   IGetLastSyncInfo,

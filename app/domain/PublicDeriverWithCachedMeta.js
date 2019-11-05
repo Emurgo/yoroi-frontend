@@ -6,9 +6,13 @@ import type { AssuranceMode, } from '../types/transactionAssuranceTypes';
 import type { WalletAccountNumberPlate } from '../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import {
   PublicDeriver,
-  asGetPublicKey,
-  asGetSigningKey,
 } from '../api/ada/lib/storage/models/PublicDeriver/index';
+import {
+  asGetSigningKey,
+} from '../api/ada/lib/storage/models/Bip44Wallet/traits';
+import {
+  asGetPublicKey,
+} from '../api/ada/lib/storage/models/common/traits';
 import { createAccountPlate } from '../api/ada/lib/cardanoCrypto/plate';
 
 export default class PublicDeriverWithCachedMeta {

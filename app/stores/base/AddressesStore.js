@@ -10,8 +10,11 @@ import type {
 } from '../../api/ada';
 import environment from '../../environment';
 import {
-  PublicDeriver, asGetAllUtxos, asHasChains, asDisplayCutoff,
+  PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import {
+  asGetAllUtxos, asHasChains, asDisplayCutoff,
+} from '../../api/ada/lib/storage/models/Bip44Wallet/traits';
 import type {
   IHasChainsRequest
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';

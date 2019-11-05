@@ -7,12 +7,14 @@ import type {
 
 import {
   ConceptualWallet, refreshConceptualWalletFunctionality,
-} from '../ConceptualWallet';
+} from '../ConceptualWallet/index';
 import type { IConceptualWalletConstructor, } from '../ConceptualWallet/interfaces';
 
 import {
   Mixin,
 } from 'mixwith';
+
+import { encryptWithPassword } from '../../../../../../utils/passwordCipher';
 
 import type {
   IBip44Wallet,
@@ -31,19 +33,17 @@ import {
 } from '../../database/utils';
 
 import {
-  DerivePublicFromPrivate, AddAdhocPublicDeriver,
+  DeriveBip44PublicFromPrivate, AddBip44AdhocPublicDeriver,
 } from '../../database/walletTypes/bip44/api/write';
 import type {
   Bip44WrapperRow,
 } from '../../database/walletTypes/bip44/tables';
-import type { KeyRow } from '../../database/primitives/tables';
 import { UpdateGet, } from '../../database/primitives/api/write';
 import { GetKeyForDerivation, } from '../../database/primitives/api/read';
 
 import {
   rawChangePassword,
   normalizeBip32Ed25519ToPubDeriverLevel,
-  toKeyInsert,
 } from '../utils';
 
 import type {
@@ -167,46 +167,54 @@ export async function refreshBip44WalletFunctionality(
 export async function derivePublicDeriver<Row>(
   db: lf$Database,
   tx: lf$Transaction,
-  deps: {| DerivePublicFromPrivate: Class<DerivePublicFromPrivate> |},
+  deps: {| DeriveBip44PublicFromPrivate: Class<DeriveBip44PublicFromPrivate> |},
   bip44WrapperId: number,
   body: IDerivePublicFromPrivateRequest,
 ): Promise<IDerivePublicFromPrivateResponse<Row>> {
-  const result = await deps.DerivePublicFromPrivate.add<Row>(
+  return await deps.DeriveBip44PublicFromPrivate.add<Row>(
     db, tx,
     bip44WrapperId,
     {
       publicDeriverInsert: body.publicDeriverInsert,
-      pathToPublic: body.pathToPublic,
-    },
-    (privateKeyRow: $ReadOnly<KeyRow>) => {
-      const newKeys = normalizeBip32Ed25519ToPubDeriverLevel({
-        privateKeyRow,
-        password: body.decryptPrivateDeriverPassword,
-        path: body.pathToPublic.map(step => step.index),
-      });
-
-      const newPrivateKey = body.publicDeriverPrivateKey
-        ? toKeyInsert(
-          body.publicDeriverPrivateKey,
-          newKeys.prvKeyHex,
-        )
-        : null;
-      const newPublicKey = body.publicDeriverPublicKey
-        ? toKeyInsert(
-          body.publicDeriverPublicKey,
-          newKeys.pubKeyHex,
-        )
-        : null;
-
-      return {
-        newPrivateKey,
-        newPublicKey,
-      };
-    },
-    body.initialDerivations,
+      pathToPublic: privateKeyRow => {
+        const accountKey = normalizeBip32Ed25519ToPubDeriverLevel({
+          privateKeyRow,
+          password: body.decryptPrivateDeriverPassword,
+          path: body.path,
+        });
+        return [
+          ...body.path.slice(0, body.path.length - 1).map(index => ({
+            index,
+            insert: {},
+            privateKey: null,
+            publicKey: null,
+          })),
+          {
+            index: body.path[body.path.length - 1],
+            insert: {},
+            privateKey: body.encryptPublicDeriverPassword === undefined
+              ? null
+              : {
+                Hash: body.encryptPublicDeriverPassword === null
+                  ? accountKey.prvKeyHex
+                  : encryptWithPassword(
+                    body.encryptPublicDeriverPassword,
+                    Buffer.from(accountKey.prvKeyHex, 'hex')
+                  ),
+                IsEncrypted: true,
+                PasswordLastUpdate: null,
+              },
+            publicKey: {
+              Hash: accountKey.pubKeyHex,
+              IsEncrypted: false,
+              PasswordLastUpdate: null,
+            },
+          },
+        ];
+      },
+      initialDerivations: body.initialDerivations,
+    }
   );
-
-  return result;
 }
 
 type PublicFromPrivateDependencies = IBip44Wallet;
@@ -216,13 +224,13 @@ const PublicFromPrivateMixin = (
 
   rawDerivePublicDeriverFromPrivate = async <Row>(
     tx: lf$Transaction,
-    deps: {| DerivePublicFromPrivate: Class<DerivePublicFromPrivate> |},
+    deps: {| DeriveBip44PublicFromPrivate: Class<DeriveBip44PublicFromPrivate> |},
     body: IDerivePublicFromPrivateRequest,
   ): Promise<IDerivePublicFromPrivateResponse<Row>> => {
     return await derivePublicDeriver<Row>(
       super.getDb(),
       tx,
-      { DerivePublicFromPrivate: deps.DerivePublicFromPrivate },
+      { DeriveBip44PublicFromPrivate: deps.DeriveBip44PublicFromPrivate },
       super.getWrapperId(),
       body,
     );
@@ -231,7 +239,7 @@ const PublicFromPrivateMixin = (
     body: IDerivePublicFromPrivateRequest,
   ): Promise<IDerivePublicFromPrivateResponse<Row>> => {
     const deps = Object.freeze({
-      DerivePublicFromPrivate,
+      DeriveBip44PublicFromPrivate,
     });
     const depTables = Object
       .keys(deps)
@@ -378,19 +386,20 @@ const AdhocPublicDeriverMixin = (
 
   rawAddAdhocPubicDeriver = async <Row>(
     tx: lf$Transaction,
-    deps: {| AddAdhocPublicDeriver: Class<AddAdhocPublicDeriver> |},
+    deps: {| AddBip44AdhocPublicDeriver: Class<AddBip44AdhocPublicDeriver> |},
     body: IAddAdhocPublicDeriverRequest,
   ): Promise<IAddAdhocPublicDeriverResponse<Row>> => {
-    return await deps.AddAdhocPublicDeriver.add<Row>(
+    return await deps.AddBip44AdhocPublicDeriver.add<Row>(
       super.getDb(), tx,
       body,
+      super.getWrapperId(),
     );
   }
   addAdhocPubicDeriver = async <Row>(
     body: IAddAdhocPublicDeriverRequest,
   ): Promise<IAddAdhocPublicDeriverResponse<Row>> => {
     const deps = Object.freeze({
-      AddAdhocPublicDeriver,
+      AddBip44AdhocPublicDeriver,
     });
     const depTables = Object
       .keys(deps)

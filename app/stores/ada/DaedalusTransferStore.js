@@ -28,7 +28,7 @@ import {
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import {
   asHasChains,
-} from '../../api/ada/lib/storage/models/PublicDeriver/index';
+} from '../../api/ada/lib/storage/models/Bip44Wallet/traits';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 
 declare var CONFIG: ConfigType;

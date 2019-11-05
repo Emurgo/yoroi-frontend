@@ -1,28 +1,38 @@
 // @flow
 
 import type {
-  lf$Database, lf$Transaction,
+  lf$Database,
 } from 'lovefield';
 
-import type {
-  KeyInfo,
-} from '../utils';
 import type { IConceptualWalletConstructor, } from '../ConceptualWallet/interfaces';
 
 import type {
   Bip44WrapperRow,
 } from '../../database/walletTypes/bip44/tables';
 import {
-  DerivePublicFromPrivate, AddAdhocPublicDeriver,
+  DeriveBip44PublicFromPrivate, AddBip44AdhocPublicDeriver,
 } from '../../database/walletTypes/bip44/api/write';
 import type {
-  DerivePublicFromPrivateRequest as DbRequest,
-  TreeInsert,
-  AddAdhocPublicDeriverRequest, AddAdhocPublicDeriverResponse,
+  ModifyDisplayCutoff,
 } from '../../database/walletTypes/bip44/api/write';
+import {
+  GetBip44Tables,
+} from '../../database/walletTypes/bip44/api/utils';
+import type {
+  AddAdhocPublicDeriverRequest, AddAdhocPublicDeriverResponse,
+  AddDerivationTree,
+} from '../../database/walletTypes/common/api/write';
+import type {
+  TreeInsert,
+} from '../../database/walletTypes/common/utils';
 import type { AddPublicDeriverResponse } from '../../database/walletTypes/core/api/write';
+import type { PublicDeriverInsert } from '../../database/walletTypes/core/tables';
 import { UpdateGet, } from '../../database/primitives/api/write';
-import { GetKeyForDerivation } from '../../database/primitives/api/read';
+import {
+  GetKeyForDerivation,
+  GetPathWithSpecific,
+  GetDerivationsByPath,
+} from '../../database/primitives/api/read';
 
 import type {
   KeyRow,
@@ -31,15 +41,13 @@ import type {
 
 import type {
   IChangePasswordRequest, IChangePasswordRequestFunc,
+  RawVariation,
 } from '../common/interfaces';
-
-type RawVariation<Func, Deps, Arg> = (
-  tx: lf$Transaction,
-  deps: Deps,
-  // should be able to extract Arg type with a $Call on Func
-  // but for some reason it isn't working :/
-  body: Arg,
-) => ReturnType<Func>;
+import { Bip44Wallet } from './wrapper';
+import {
+  GetPublicDeriver,
+} from '../../database/walletTypes/core/api/read';
+import { GetBip44DerivationSpecific } from '../../database/walletTypes/bip44/api/read';
 
 export interface IBip44Wallet {
   constructor(
@@ -60,11 +68,19 @@ export interface IBip44Wallet {
 }
 
 export type IDerivePublicFromPrivateRequest = {|
-  ...DbRequest,
+  publicDeriverInsert: ({
+    derivationId: number,
+    lastSyncInfoId: number
+  }) => PublicDeriverInsert,
   decryptPrivateDeriverPassword: null | string,
-  publicDeriverPublicKey?: KeyInfo,
-  publicDeriverPrivateKey?: KeyInfo,
+  /**
+   * void -> do not store key
+   * null -> store as unencrypted
+   * string  -> store and encrypt
+   */
+  encryptPublicDeriverPassword?: null | string,
   initialDerivations: TreeInsert<any>,
+  path: Array<number>,
 |};
 export type IDerivePublicFromPrivateResponse<Row> = AddPublicDeriverResponse<Row>;
 export type IDerivePublicFromPrivateFunc<Row> = (
@@ -74,7 +90,7 @@ export interface IDerivePublicFromPrivate {
   +rawDerivePublicDeriverFromPrivate: RawVariation<
     IDerivePublicFromPrivateFunc<mixed>,
     {|
-      DerivePublicFromPrivate: Class<DerivePublicFromPrivate>,
+      DeriveBip44PublicFromPrivate: Class<DeriveBip44PublicFromPrivate>,
     |},
     IDerivePublicFromPrivateRequest
   >;
@@ -119,9 +135,41 @@ export interface IAdhocPublicDeriver {
   +rawAddAdhocPubicDeriver: RawVariation<
     IAddAdhocPublicDeriverFunc<mixed>,
     {|
-      AddAdhocPublicDeriver: Class<AddAdhocPublicDeriver>,
+      AddBip44AdhocPublicDeriver: Class<AddBip44AdhocPublicDeriver>,
     |},
     IAddAdhocPublicDeriverRequest,
   >;
   +addAdhocPubicDeriver: IAddAdhocPublicDeriverFunc<mixed>;
+}
+
+// =====================
+//   For PublicDeriver
+// =====================
+
+export interface IBip44Parent {
+  +getBip44Parent: (body: void) => Bip44Wallet;
+}
+
+export type IAddBip44FromPublicRequest = {|
+  tree: TreeInsert<any>,
+|};
+export type IAddBip44FromPublicResponse = void;
+export type IAddBip44FromPublicFunc = (
+  body: IAddBip44FromPublicRequest
+) => Promise<IAddBip44FromPublicResponse>;
+export interface IAddBip44FromPublic {
+  +rawAddBip44FromPublic: RawVariation<
+    IAddBip44FromPublicFunc,
+    {|
+      GetPublicDeriver: Class<GetPublicDeriver>,
+      AddDerivationTree: Class<AddDerivationTree>,
+      GetBip44Tables: Class<GetBip44Tables>,
+      ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
+      GetDerivationsByPath: Class<GetDerivationsByPath>,
+      GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+    |},
+    IAddBip44FromPublicRequest
+  >;
+  +addBip44FromPublic: IAddBip44FromPublicFunc;
 }

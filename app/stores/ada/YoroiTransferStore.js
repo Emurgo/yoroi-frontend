@@ -24,7 +24,7 @@ import type { RestoreWalletForTransferResponse, RestoreWalletForTransferFunc } f
 import { verifyAccountLevel } from '../../api/ada/transactions/utils';
 import {
   asHasChains,
-} from '../../api/ada/lib/storage/models/PublicDeriver/index';
+} from '../../api/ada/lib/storage/models/Bip44Wallet/traits';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 
 type TransferFundsRequest = {
