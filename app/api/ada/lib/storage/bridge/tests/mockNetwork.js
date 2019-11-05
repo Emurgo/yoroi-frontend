@@ -159,7 +159,6 @@ export function genGetBestBlock(
 export function genUtxoForAddresses(
   getHistory: HistoryFunc,
   getBestBlock: BestBlockFunc,
-  genesisTransaction: string,
 ): AddressUtxoFunc {
   return async (
     body: AddressUtxoRequest,
@@ -193,7 +192,7 @@ export function genUtxoForAddresses(
                 txType !== RustModule.WalletV3.AddressKind.Single &&
                 txType !== RustModule.WalletV3.AddressKind.Group
               ) {
-                continue;
+                throw new Error('genUtxoForAddresses non-utxo address in utxo endpoint');
               }
             } catch (_e2) {
               throw new Error('genUtxoForAddresses Unknown output type');
@@ -216,12 +215,10 @@ export function genUtxoForAddresses(
     for (const tx of inBlockHistory) {
       for (let j = 0; j < tx.inputs.length; j++) {
         const input = tx.inputs[j];
-        if (input.type === InputTypes.utxo) {
-          // TODO: I think this needs to be removed
-          if (input.txHash === genesisTransaction) {
-            continue;
-          }
-
+        if (
+          input.type === InputTypes.utxo ||
+          input.type === InputTypes.legacyUtxo
+        ) {
           const key = JSON.stringify({
             id: input.txHash,
             index: input.index,
@@ -230,7 +227,8 @@ export function genUtxoForAddresses(
         }
       }
     }
-    return Array.from(utxoMap.values());
+    const result = Array.from(utxoMap.values());
+    return result;
   };
 }
 

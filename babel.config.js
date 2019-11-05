@@ -65,6 +65,17 @@ module.exports = function (api) {
           'react-hot-loader/babel',
           '@babel/plugin-transform-runtime'
         ]
+      },
+      cucumber: {
+        plugins: [
+          '@babel/plugin-transform-runtime',
+          ['module-resolver', {
+            alias: {
+              'cardano-wallet-browser': 'cardano-wallet',
+              'js-chain-libs': 'js-chain-libs-node',
+            }
+          }]
+        ]
       }
     }
   }

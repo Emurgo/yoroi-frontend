@@ -5,6 +5,7 @@ import { Builder, By, Key, until } from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome';
 import firefox from 'selenium-webdriver/firefox';
 import path from 'path';
+import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 
 const fs = require('fs');
 
@@ -252,5 +253,8 @@ function CustomWorld(cmdInput: WorldInput) {
   };
 }
 
-setWorldConstructor(CustomWorld);
-setDefaultTimeout(60 * 1000);
+RustModule.load().then(() => {
+  setWorldConstructor(CustomWorld);
+  setDefaultTimeout(60 * 1000);
+  return undefined;
+}).catch();
