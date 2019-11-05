@@ -85,7 +85,7 @@
     "babel-loader": "8.0.6",
     "babel-plugin-add-module-exports": "1.0.2",
     "babel-plugin-dynamic-import-node": "2.3.0",
-    "babel-plugin-module-resolver": "^3.2.0",
+    "babel-plugin-module-resolver": "3.2.0",
     "babel-plugin-react-intl": "4.1.20",
     "babel-preset-react-optimize": "1.0.1",
     "blake2b": "2.1.3",

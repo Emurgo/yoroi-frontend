@@ -158,6 +158,7 @@ const manyTx1 = {
   hash: cryptoRandomString({ length: 64 }),
   inputs: [
     {
+      // many-tx-wallet external
       address: 'Ae2tdPwUPEZ9uHfzhw3vXUrTFLowct5hMMHeNjfsrkQv5XSi5PhSs2yRNUb',
       txHash: distributorTx.hash,
       id: distributorTx.hash + '4',
@@ -184,6 +185,7 @@ const manyTx2 = {
   hash: '60493bf26e60b0b98f143647613be2ec1c6f50bd5fc15a14a2ff518f5fa36be0',
   inputs: [
     {
+      // many-tx-wallet external
       address: 'Ae2tdPwUPEZEXbmLnQ22Rxhv8a6hQ3C2673nkGsXKAgzqnuC1vqne9EtBkK',
       txHash: distributorTx.hash,
       id: distributorTx.hash + '5',
@@ -210,6 +212,7 @@ const manyTx3 = {
   hash: cryptoRandomString({ length: 64 }),
   inputs: [
     {
+      // many-tx-wallet external
       address: 'Ae2tdPwUPEYwBZD5hPWCm3PUDYdMBfnLHsQmgUiexnkvDMTFCQ4gzRkgAEQ',
       txHash: distributorTx.hash,
       id: distributorTx.hash + '6',
@@ -236,6 +239,7 @@ const manyTx4 = {
   hash: cryptoRandomString({ length: 64 }),
   inputs: [
     {
+      // many-tx-wallet external
       address: 'Ae2tdPwUPEYvzFpWJEGmSjLdz3DNY9WL5CbPjsouuM5M6YMsYWB1vsCS8j4',
       txHash: distributorTx.hash,
       id: distributorTx.hash + '7',
@@ -446,7 +450,6 @@ const getBestBlock = genGetBestBlock(transactions);
 const utxoForAddresses = genUtxoForAddresses(
   history,
   getBestBlock,
-  genesisTransaction
 );
 const utxoSumForAddresses = genUtxoSumForAddresses(utxoForAddresses);
 

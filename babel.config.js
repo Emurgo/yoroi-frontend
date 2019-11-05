@@ -68,6 +68,7 @@ module.exports = function (api) {
       },
       cucumber: {
         plugins: [
+          '@babel/plugin-transform-runtime',
           ['module-resolver', {
             alias: {
               'cardano-wallet-browser': 'cardano-wallet',
