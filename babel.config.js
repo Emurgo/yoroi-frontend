@@ -37,8 +37,7 @@ module.exports = function (api) {
         'react-intl',
         {
           messagesDir: './translations/messages/',
-          enforceDescriptions: false,
-          extractSourceLocationß: true
+          extractSourceLocation: true
         }
       ],
       '@babel/plugin-syntax-dynamic-import',
