@@ -137,6 +137,17 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     free(): void;
 
     /**
+     * @returns {Uint8Array}
+     */
+    as_bytes(): Uint8Array;
+
+    /**
+     * @param {Uint8Array} bytes
+     * @returns {Address}
+     */
+    static from_bytes(bytes: Uint8Array): Address;
+
+    /**
      * Construct Address from its bech32 representation
      * Example
      * ```javascript
@@ -222,7 +233,7 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     /**
      * @returns {number}
      */
-    get_kind(): number;
+    get_kind(): $Values<typeof AddressKind>;
 
     /**
      * @returns {SingleAddress}
@@ -437,10 +448,10 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
 
     /**
      * Deserialize a block from a byte array
-     * @param {any} bytes
+     * @param {Uint8Array} bytes
      * @returns {Block}
      */
-    static from_bytes(bytes: any): Block;
+    static from_bytes(bytes: Uint8Array): Block;
 
     /**
      * @returns {BlockId}
