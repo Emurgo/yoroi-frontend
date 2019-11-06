@@ -24,6 +24,7 @@ export const RootDerivationSchema: {
     KeyDerivationId: 'KeyDerivationId',
   }
 };
+
 export type PurposeDerivationInsert = {|
   KeyDerivationId: number,
 |};
@@ -31,6 +32,22 @@ export type PurposeDerivationRow = {|
   PurposeDerivationId: number,
   ...PurposeDerivationInsert,
 |};
+/**
+ * Note: we use "wrappers" instead of specifying any information in here
+ *
+ * We could choose to add the wrappers as different BIP32 tables
+ * since we could infer which wrapper table to query by looking at the derivation index
+ * we're guanrateed every level exists because even in the ad-hoc case we can add empty derivations
+ *
+ * pros: allows many different purposes for a single conceptual wallet
+ * cons: slower because to query the purpose for every public deriver indivually
+ * cons: doesn't work for wallets which have no actual purpose
+ *  ex:
+ *    - smart contract wallets
+ *    - address checker wallet
+ *        don't know what purpose these were derived from so it's strange to assign a puprpose
+ *        that is not actually a bip32 purpose but rather a semantic specification
+ */
 export const PurposeDerivationSchema: {
   +name: 'PurposeDerivation',
   properties: $ObjMapi<PurposeDerivationRow, ToSchemaProp>

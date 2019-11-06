@@ -10,10 +10,9 @@ import type {
 import type {
   IGetAllAccountingAddressesRequest, IGetAllAccountingAddressesResponse,
   IGetAllAccounting,
-  ICip1852Wallet,
   ICip1852Parent,
 } from './interfaces';
-import { GetCip1852DerivationSpecific } from '../../database/walletTypes/cip1852/api/read';
+import { GetDerivationSpecific } from '../../database/walletTypes/common/api/read';
 import {
   GetPathWithSpecific,
   GetAddress,
@@ -74,7 +73,7 @@ const GetAllAccountingMixin = (
     _deps: {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
-      GetCip1852DerivationSpecific: Class<GetCip1852DerivationSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     _body: IGetAllAccountingAddressesRequest,
   ): Promise<IGetAllAccountingAddressesResponse> => {
@@ -87,7 +86,7 @@ const GetAllAccountingMixin = (
     const deps = Object.freeze({
       GetPathWithSpecific,
       GetAddress,
-      GetCip1852DerivationSpecific,
+      GetDerivationSpecific,
     });
     const depTables = Object
       .keys(deps)

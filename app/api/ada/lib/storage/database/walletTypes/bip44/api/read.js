@@ -7,50 +7,14 @@ import type {
 
 import type {
   Bip44WrapperRow,
-  Bip44ToPublicDeriverRow,
 } from '../tables';
 import * as Tables from '../tables';
 
 import {
-  GetBip44Tables,
-} from './utils';
-import {
-  getRowIn,
   getRowFromKey,
 } from '../../../utils';
-import {
-  KeyDerivationSchema,
-} from '../../../primitives/tables';
 import { PublicDeriverSchema, } from '../../core/tables';
 import type { PublicDeriverRow, } from '../../core/tables';
-
-export class GetBip44DerivationSpecific {
-  static ownTables = Object.freeze({
-    [KeyDerivationSchema.name]: KeyDerivationSchema,
-  });
-  static depTables = Object.freeze({
-    GetBip44Tables,
-  });
-
-  static async get<Row>(
-    db: lf$Database,
-    tx: lf$Transaction,
-    derivationIds: Array<number>,
-    level: number,
-  ): Promise<$ReadOnlyArray<$ReadOnly<Row>>> {
-    const bip44Tables = GetBip44DerivationSpecific.depTables.GetBip44Tables.get();
-    const tableName = bip44Tables.get(level);
-    if (tableName == null) {
-      throw new Error('GetBip44DerivationSpecific::get Unknown table queried');
-    }
-    return await getRowIn<Row>(
-      db, tx,
-      tableName,
-      GetBip44DerivationSpecific.ownTables[KeyDerivationSchema.name].properties.KeyDerivationId,
-      derivationIds,
-    );
-  }
-}
 
 export class GetBip44Wrapper {
   static ownTables = Object.freeze({
@@ -75,7 +39,6 @@ export class GetBip44Wrapper {
 export class GetAllBip44Wallets {
   static ownTables = Object.freeze({
     [Tables.Bip44WrapperSchema.name]: Tables.Bip44WrapperSchema,
-    [Tables.Bip44ToPublicDeriverSchema.name]: Tables.Bip44ToPublicDeriverSchema,
     [PublicDeriverSchema.name]: PublicDeriverSchema,
   });
   static depTables = Object.freeze({});
@@ -83,34 +46,23 @@ export class GetAllBip44Wallets {
   static async get(
     db: lf$Database,
     tx: lf$Transaction,
-  ): Promise<$ReadOnlyArray<{
+  ): Promise<$ReadOnlyArray<{|
     Bip44Wrapper: $ReadOnly<Bip44WrapperRow>,
     PublicDeriver: $ReadOnly<PublicDeriverRow>,
-    Bip44ToPublicDeriver: $ReadOnly<Bip44ToPublicDeriverRow>,
-  }>> {
-    const bip44ToPublicDeriverTable = db.getSchema().table(
-      GetAllBip44Wallets.ownTables[Tables.Bip44ToPublicDeriverSchema.name].name
-    );
+  |}>> {
     const publicDeriverTable = db.getSchema().table(
       GetAllBip44Wallets.ownTables[PublicDeriverSchema.name].name
     );
     const bip44WrapperTable = db.getSchema().table(
       GetAllBip44Wallets.ownTables[Tables.Bip44WrapperSchema.name].name
     );
-    const properties = Tables.Bip44ToPublicDeriverSchema.properties;
     const query = db
       .select()
-      .from(bip44ToPublicDeriverTable)
+      .from(bip44WrapperTable)
       .innerJoin(
         publicDeriverTable,
-        publicDeriverTable[PublicDeriverSchema.properties.PublicDeriverId].eq(
-          bip44ToPublicDeriverTable[properties.PublicDeriverId]
-        )
-      )
-      .innerJoin(
-        bip44WrapperTable,
-        bip44WrapperTable[Tables.Bip44WrapperSchema.properties.Bip44WrapperId].eq(
-          bip44ToPublicDeriverTable[properties.Bip44WrapperId]
+        publicDeriverTable[PublicDeriverSchema.properties.ConceptualWalletId].eq(
+          bip44WrapperTable[PublicDeriverSchema.properties.ConceptualWalletId]
         )
       );
 
@@ -121,21 +73,30 @@ export class GetAllBip44Wallets {
     db: lf$Database,
     tx: lf$Transaction,
     bip44WrapperId: number,
-  ): Promise<$ReadOnlyArray<{
+  ): Promise<$ReadOnlyArray<{|
     PublicDeriver: $ReadOnly<PublicDeriverRow>,
-  }>> {
-    const bip44ToPublicDeriverTable = db.getSchema().table(
-      GetAllBip44Wallets.ownTables[Tables.Bip44ToPublicDeriverSchema.name].name
+  |}>> {
+    const publicDeriverTable = db.getSchema().table(
+      GetAllBip44Wallets.ownTables[PublicDeriverSchema.name].name
     );
-    const properties = Tables.Bip44ToPublicDeriverSchema.properties;
+    const bip44WrapperTable = db.getSchema().table(
+      GetAllBip44Wallets.ownTables[Tables.Bip44WrapperSchema.name].name
+    );
     const query = db
       .select()
-      .from(bip44ToPublicDeriverTable)
+      .from(bip44WrapperTable)
       .where(
-        bip44ToPublicDeriverTable[properties.Bip44WrapperId].eq(
+        bip44WrapperTable[Tables.Bip44WrapperSchema.properties.Bip44WrapperId].eq(
           bip44WrapperId
         )
+      )
+      .innerJoin(
+        publicDeriverTable,
+        publicDeriverTable[PublicDeriverSchema.properties.ConceptualWalletId].eq(
+          bip44WrapperTable[PublicDeriverSchema.properties.ConceptualWalletId]
+        )
       );
+
     return await tx.attach(query);
   }
 }

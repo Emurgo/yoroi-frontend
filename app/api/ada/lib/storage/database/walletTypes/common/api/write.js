@@ -14,7 +14,6 @@ import type {
   KeyRow,
 } from '../../../primitives/tables';
 import type {
-  PublicDeriverInsert,
   HwWalletMetaInsert, HwWalletMetaRow,
 } from '../../core/tables';
 import { StaleStateError, } from '../../../utils';
@@ -22,6 +21,7 @@ import {
   GetKeyForDerivation,
 } from '../../../primitives/api/read';
 import { AddPublicDeriver, ModifyHwWalletMeta, } from '../../core/api/write';
+import { GetPublicDeriver } from '../../core/api/read';
 import type { AddPublicDeriverResponse } from '../../core/api/write';
 
 import type {
@@ -41,14 +41,14 @@ export class AddDerivationTree {
     db: lf$Database,
     tx: lf$Transaction,
     tree: TreeInsertStart,
-    tableMap: Map<number, string>,
+    derivationTables: Map<number, string>,
     level: number,
   ): Promise<TreeResult<any>> {
     const parentId = tree.derivationId;
 
     const result = [];
     for (let i = 0; i < tree.children.length; i++) {
-      const tableName = tableMap.get(level + 1);
+      const tableName = derivationTables.get(level + 1);
       if (tableName == null) {
         throw new Error('AddDerivationTree::excludingParent Unknown table queried');
       }
@@ -81,7 +81,7 @@ export class AddDerivationTree {
             derivationId: child.KeyDerivation.KeyDerivationId,
             children: tree.children[i].children,
           },
-          tableMap,
+          derivationTables,
           level + 1,
         );
       result.push({
@@ -100,11 +100,11 @@ export class AddDerivationTree {
     db: lf$Database,
     tx: lf$Transaction,
     rootInsert: AddDerivationRequest<Insert>,
-    tableMap: Map<number, string>,
+    derivationTables: Map<number, string>,
     startingLevel: number,
     tree: number => TreeInsertStart,
   ): Promise<TreeResultStart<Row>> {
-    const tableName = tableMap.get(startingLevel);
+    const tableName = derivationTables.get(startingLevel);
     if (tableName == null) {
       throw new Error('AddDerivationTree::includingParent Unknown table queried');
     }
@@ -116,7 +116,7 @@ export class AddDerivationTree {
     const children = await AddDerivationTree.excludingParent(
       db, tx,
       tree(root.KeyDerivation.KeyDerivationId),
-      tableMap,
+      derivationTables,
       startingLevel + 1,
     );
     return {
@@ -134,12 +134,12 @@ export class AddDerivationTree {
       path: InsertPath,
       pathStartLevel: number,
     |},
-    tableMap: Map<number, string>,
+    derivationTables: Map<number, string>,
   ): Promise<Array<DerivationQueryResult<Row>>> {
     let parentId = request.parentDerivationId;
     const result = [];
     for (let i = 0; i < request.path.length; i++) {
-      const tableName = tableMap.get(request.pathStartLevel + i);
+      const tableName = derivationTables.get(request.pathStartLevel + i);
       if (tableName == null) {
         throw new Error('AddDerivationTree::fromSinglePath Unknown table queried');
       }
@@ -173,10 +173,9 @@ export class AddDerivationTree {
 }
 
 export type DerivePublicDeriverFromKeyRequest = {|
-  publicDeriverInsert: {
-    derivationId: number,
-    lastSyncInfoId: number,
-   } => PublicDeriverInsert,
+  publicDeriverMeta: {|
+    name: string,
+  |},
   /**
    * Need this as no guarantee the path is same for each key
    * ex: different coin types
@@ -193,6 +192,7 @@ export type DerivePublicDeriverFromKeyRequest = {|
 export class DerivePublicDeriverFromKey {
   static ownTables = Object.freeze({});
   static depTables = Object.freeze({
+    GetPublicDeriver,
     AddPublicDeriver,
     GetKeyForDerivation,
     GetOrAddDerivation,
@@ -205,8 +205,8 @@ export class DerivePublicDeriverFromKey {
     body: DerivePublicDeriverFromKeyRequest,
     privateDeriverKeyDerivationId: number,
     privateDeriverLevel: number,
-    tableMap: Map<number, string>,
-    insertPubicDeriverLink: AddPublicDeriverResponse<any> => Promise<void>,
+    conceptualWalletId: number,
+    derivationTables: Map<number, string>,
   ): Promise<AddPublicDeriverResponse<Row>> {
     const derivationAndKey = await DerivePublicDeriverFromKey.depTables.GetKeyForDerivation.get(
       db, tx,
@@ -232,12 +232,17 @@ export class DerivePublicDeriverFromKey {
         path: derivedPath.slice(0, derivedPath.length - 1),
         pathStartLevel: privateDeriverLevel + 1, // +1 since private deriver isn't included in path
       },
-      tableMap,
+      derivationTables,
+    );
+
+    const existingWallets = await AddAdhocPublicDeriver.depTables.GetPublicDeriver.forWallet(
+      db, tx,
+      conceptualWalletId,
     );
 
     let pubDeriver;
     {
-      const tableName = tableMap.get(
+      const tableName = derivationTables.get(
         privateDeriverLevel + derivedPath.length
       );
       if (tableName == null) {
@@ -263,22 +268,24 @@ export class DerivePublicDeriverFromKey {
             }),
           },
           levelSpecificTableName: tableName,
-          addPublicDeriverRequest: body.publicDeriverInsert
+          addPublicDeriverRequest: ids => ({
+            ConceptualWalletId: conceptualWalletId,
+            KeyDerivationId: ids.derivationId,
+            Name: body.publicDeriverMeta.name,
+            Index: existingWallets.length,
+            LastSyncInfoId: ids.lastSyncInfoId,
+          }),
         }
       );
     }
 
-    // add new row in mapping table
-    await insertPubicDeriverLink(
-      pubDeriver,
-    );
     await DerivePublicDeriverFromKey.depTables.AddDerivationTree.excludingParent(
       db, tx,
       {
         derivationId: pubDeriver.publicDeriverResult.KeyDerivationId,
         children: body.initialDerivations,
       },
-      tableMap,
+      derivationTables,
       privateDeriverLevel + derivedPath.length,
     );
 
@@ -297,10 +304,9 @@ export type AddAdhocPublicDeriverRequest = {|
    * Note: path should NOT include parent (if one exists)
    */
   pathToPublic: InsertPath,
-  publicDeriverInsert: {
-    derivationId: number,
-    lastSyncInfoId: number,
-   } => PublicDeriverInsert,
+  publicDeriverMeta: {|
+    name: string,
+  |},
   initialDerivations: TreeInsert<any>,
   hwWalletMetaInsert?: HwWalletMetaInsert,
 |}
@@ -311,6 +317,7 @@ export type AddAdhocPublicDeriverResponse<Row> = {|
 export class AddAdhocPublicDeriver {
   static ownTables = Object.freeze({});
   static depTables = Object.freeze({
+    GetPublicDeriver,
     AddDerivation,
     AddPublicDeriver,
     ModifyHwWalletMeta,
@@ -321,8 +328,8 @@ export class AddAdhocPublicDeriver {
     db: lf$Database,
     tx: lf$Transaction,
     request: AddAdhocPublicDeriverRequest,
-    tableMap: Map<number, string>,
-    insertPubicDeriverLink: AddPublicDeriverResponse<any> => Promise<void>,
+    conceptualWalletId: number,
+    derivationTables: Map<number, string>,
   ): Promise<AddAdhocPublicDeriverResponse<Row>> {
     const pathResult = await AddAdhocPublicDeriver.depTables.AddDerivationTree.fromSinglePath(
       db, tx,
@@ -331,16 +338,22 @@ export class AddAdhocPublicDeriver {
         path: request.pathToPublic.slice(0, request.pathToPublic.length - 1),
         pathStartLevel: request.pathStartLevel,
       },
-      tableMap,
+      derivationTables,
     );
 
-    const tableName = tableMap.get(
+    const tableName = derivationTables.get(
       // -1 since pathStartLevel is included in pathToPublic
       request.pathStartLevel + request.pathToPublic.length - 1
     );
     if (tableName == null) {
       throw new Error('AddDerivation::add Unknown table queried');
     }
+
+    const existingWallets = await AddAdhocPublicDeriver.depTables.GetPublicDeriver.forWallet(
+      db, tx,
+      conceptualWalletId,
+    );
+
     // TODO: refactor to use fromSinglePathWithKey ?
     const publicDeriver = await AddAdhocPublicDeriver.depTables.AddPublicDeriver.add(
       db, tx,
@@ -362,13 +375,14 @@ export class AddAdhocPublicDeriver {
           }),
         },
         levelSpecificTableName: tableName,
-        addPublicDeriverRequest: request.publicDeriverInsert
+        addPublicDeriverRequest: ids => ({
+          ConceptualWalletId: conceptualWalletId,
+          KeyDerivationId: ids.derivationId,
+          Name: request.publicDeriverMeta.name,
+          Index: existingWallets.length,
+          LastSyncInfoId: ids.lastSyncInfoId,
+        }),
       }
-    );
-
-    // add new row in mapping table
-    await insertPubicDeriverLink(
-      publicDeriver,
     );
 
     await AddAdhocPublicDeriver.depTables.AddDerivationTree.excludingParent(
@@ -377,7 +391,7 @@ export class AddAdhocPublicDeriver {
         derivationId: publicDeriver.publicDeriverResult.KeyDerivationId,
         children: request.initialDerivations,
       },
-      tableMap,
+      derivationTables,
       // -1 since pathStartLevel is included in pathToPublic
       request.pathStartLevel + request.pathToPublic.length - 1,
     );

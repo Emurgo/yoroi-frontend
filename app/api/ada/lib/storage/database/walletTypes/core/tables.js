@@ -26,8 +26,12 @@ export const ConceptualWalletSchema: {
 };
 
 export type PublicDeriverInsert = {|
+  // we hook into ConceptualWallet instead of the wrapper
+  // since there are many wrapper types
+  ConceptualWalletId: number,
   KeyDerivationId: number,
   Name: string,
+  Index: number, // a user may want to re-order the public deriverse in the UI
   LastSyncInfoId: number,
 |};
 export type PublicDeriverRow = {|
@@ -41,8 +45,10 @@ export const PublicDeriverSchema: {
   name: 'PublicDeriver',
   properties: {
     PublicDeriverId: 'PublicDeriverId',
+    ConceptualWalletId: 'ConceptualWalletId',
     KeyDerivationId: 'KeyDerivationId',
     Name: 'Name',
+    Index: 'Index',
     LastSyncInfoId: 'LastSyncInfoId',
   }
 };
@@ -130,21 +136,32 @@ export const populateWalletDb = (schemaBuilder: lf$schema$Builder) => {
   // PublicDeriver
   schemaBuilder.createTable(PublicDeriverSchema.name)
     .addColumn(PublicDeriverSchema.properties.PublicDeriverId, Type.INTEGER)
+    .addColumn(PublicDeriverSchema.properties.ConceptualWalletId, Type.INTEGER)
     .addColumn(PublicDeriverSchema.properties.KeyDerivationId, Type.INTEGER)
     .addColumn(PublicDeriverSchema.properties.Name, Type.STRING)
+    .addColumn(PublicDeriverSchema.properties.Index, Type.INTEGER)
     .addColumn(PublicDeriverSchema.properties.LastSyncInfoId, Type.INTEGER)
     .addPrimaryKey(
       ([PublicDeriverSchema.properties.PublicDeriverId]: Array<string>),
       true
     )
-    .addForeignKey('PublicDeriver_Bip44Derivation', {
+    .addForeignKey('PublicDeriver_ConceptualWallet', {
+      local: PublicDeriverSchema.properties.ConceptualWalletId,
+      ref: `${ConceptualWalletSchema.name}.${ConceptualWalletSchema.properties.ConceptualWalletId}`
+    })
+    .addForeignKey('PublicDeriver_KeyDerivation', {
       local: PublicDeriverSchema.properties.KeyDerivationId,
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`
     })
     .addForeignKey('PublicDeriver_LastSyncInfo', {
       local: PublicDeriverSchema.properties.LastSyncInfoId,
       ref: `${LastSyncInfoSchema.name}.${LastSyncInfoSchema.properties.LastSyncInfoId}`
-    });
+    })
+    .addIndex(
+      'Bip44ToPublicDeriver_ConceptualWalletr_Index',
+      ([PublicDeriverSchema.properties.ConceptualWalletId]: Array<string>),
+      false
+    );
 
   // LastSyncInfoSchema Table
   schemaBuilder.createTable(LastSyncInfoSchema.name)

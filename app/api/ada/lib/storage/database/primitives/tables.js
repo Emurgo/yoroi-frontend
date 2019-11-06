@@ -75,6 +75,14 @@ export type KeyDerivationInsert = {|
   PublicKeyId: number | null,
   PrivateKeyId: number | null,
   Parent: number | null, // no parent in root case
+  /**
+   * No index in root case
+   * Additionally, this is useful for adhoc wallet
+   * since it allows us to put empty derivations in a derivation chain
+   *
+   * ex: ad-hoc change wallet so we don't know the account
+   * but we can still specify the purpose & cointype by adding an empty account derivation
+   */
   Index: number | null, // no index in root case
 |};
 export type KeyDerivationRow = {|

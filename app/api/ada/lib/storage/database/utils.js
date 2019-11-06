@@ -147,6 +147,14 @@ export async function raii<T>(
   }
 }
 
+export function mapToTables(
+  db: lf$Database,
+  map: Map<number, string>
+): Array<lf$schema$Table> {
+  return Array.from(map.values())
+    .map(table => db.getSchema().table(table));
+}
+
 export function getAllSchemaTables(
   db: lf$Database,
   tableClass: TableClassType,

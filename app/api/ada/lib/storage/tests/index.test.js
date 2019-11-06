@@ -107,11 +107,9 @@ test('Can add and fetch address in wallet', async (done) => {
     if (withPublicFromPrivate != null) {
       await withPublicFromPrivate.derivePublicDeriverFromPrivate(
         {
-          publicDeriverInsert: ids => ({
-            KeyDerivationId: ids.derivationId,
-            Name: 'Checking account',
-            LastSyncInfoId: ids.lastSyncInfoId,
-          }),
+          publicDeriverMeta: {
+            name: 'Checking account',
+          },
           path: [BIP44_PURPOSE, CARDANO_COINTYPE, accountIndex],
           decryptPrivateDeriverPassword: privateDeriverPassword,
           initialDerivations: [

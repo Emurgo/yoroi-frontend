@@ -641,14 +641,11 @@ export default class AdaApi {
           request.getBestBlock,
         );
       }
-      const fetchedTxs = await getAllUtxoTransactions(
-        request.publicDeriver.getDb(),
-        {
-          addressFetch: request.publicDeriver,
-          skip,
-          limit,
-        },
-      );
+      const fetchedTxs = await getAllUtxoTransactions({
+        publicDeriver: request.publicDeriver,
+        skip,
+        limit,
+      },);
       Logger.debug('AdaApi::refreshTransactions success: ' + stringifyData(fetchedTxs));
 
       const lastSyncInfo = await request.publicDeriver.getLastSyncInfo();
@@ -674,12 +671,9 @@ export default class AdaApi {
   ): Promise<RefreshPendingTransactionsResponse> {
     Logger.debug('AdaApi::refreshPendingTransactions called');
     try {
-      const fetchedTxs = await getPendingUtxoTransactions(
-        request.publicDeriver.getDb(),
-        {
-          addressFetch: request.publicDeriver,
-        },
-      );
+      const fetchedTxs = await getPendingUtxoTransactions({
+        publicDeriver: request.publicDeriver,
+      });
       Logger.debug('AdaApi::refreshPendingTransactions success: ' + stringifyData(fetchedTxs));
 
       const lastSyncInfo = await request.publicDeriver.getLastSyncInfo();
@@ -1232,12 +1226,9 @@ export default class AdaApi {
     request: GetTransactionRowsToExportRequest
   ): Promise<GetTransactionRowsToExportResponse> {
     try {
-      const fetchedTxs = await getAllUtxoTransactions(
-        request.publicDeriver.getDb(),
-        {
-          addressFetch: request.publicDeriver,
-        },
-      );
+      const fetchedTxs = await getAllUtxoTransactions({
+        publicDeriver: request.publicDeriver,
+      });
       Logger.debug('AdaApi::getTransactionRowsToExport: success');
       return convertAdaTransactionsToExportRows(fetchedTxs.txs);
     } catch (error) {

@@ -58,11 +58,14 @@ import {
 import {
   getAllSchemaTables,
   raii,
+  mapToTables,
 } from '../database/utils';
 import {
   GetAllBip44Wallets,
-  GetBip44DerivationSpecific,
 } from '../database/walletTypes/bip44/api/read';
+import {
+  GetDerivationSpecific,
+} from '../database/walletTypes/common/api/read';
 import type { UtxoTxOutput } from '../database/transactionModels/utxo/api/read';
 import type { UtxoTransactionOutputRow } from '../database/transactionModels/utxo/tables';
 import { Bip44DerivationLevels } from '../database/walletTypes/bip44/api/utils';
@@ -186,11 +189,12 @@ export async function rawGetDerivationsByPath<
   db: lf$Database,
   tx: lf$Transaction,
   deps: {|
-    GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+    GetDerivationSpecific: Class<GetDerivationSpecific>,
     GetPathWithSpecific: Class<GetPathWithSpecific>,
   |},
   request: GetPathWithSpecificByTreeRequest,
   level: number,
+  derivationTables: Map<number, string>,
 ): Promise<Array<{|
   row: $ReadOnly<Row>,
   ...Addressing,
@@ -199,10 +203,11 @@ export async function rawGetDerivationsByPath<
     db, tx,
     request,
     async (derivationIds) => {
-      const result = await deps.GetBip44DerivationSpecific.get<Row>(
+      const result = await deps.GetDerivationSpecific.get<Row>(
         db, tx,
         derivationIds,
         level,
+        derivationTables,
       );
       return result;
     }
@@ -279,9 +284,10 @@ export async function rawGetBip44AddressesByPath(
   deps: {
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
-    GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+    GetDerivationSpecific: Class<GetDerivationSpecific>,
   },
   request: GetPathWithSpecificByTreeRequest,
+  derivationTables: Map<number, string>,
 ): Promise<Array<{|
   row: $ReadOnly<Bip44AddressRow>,
   ...Addressing,
@@ -291,10 +297,11 @@ export async function rawGetBip44AddressesByPath(
     db, tx,
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
-      GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
+      GetDerivationSpecific: deps.GetDerivationSpecific,
     },
     request,
     Bip44DerivationLevels.ADDRESS.level,
+    derivationTables,
   );
   // Note: simple get since we know these addresses exist
   const addressRows = await deps.GetAddress.getById(
@@ -388,21 +395,23 @@ export async function rawGetChainAddressesForDisplay(
     GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
     GetAddress: Class<GetAddress>,
     GetPathWithSpecific: Class<GetPathWithSpecific>,
-    GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+    GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
   request: {
     publicDeriver: IPublicDeriver & IHasChains & IDisplayCutoff,
     chainsRequest: IHasChainsRequest,
   },
+  derivationTables: Map<number, string>,
 ): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
   const addresses = await request.publicDeriver.rawGetAddressesForChain(
     tx,
     {
       GetAddress: deps.GetAddress,
       GetPathWithSpecific: deps.GetPathWithSpecific,
-      GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
+      GetDerivationSpecific: deps.GetDerivationSpecific,
     },
-    request.chainsRequest
+    request.chainsRequest,
+    derivationTables,
   );
   let belowCutoff = addresses;
   if (request.chainsRequest.chainId === EXTERNAL) {
@@ -410,9 +419,10 @@ export async function rawGetChainAddressesForDisplay(
       tx,
       {
         GetPathWithSpecific: deps.GetPathWithSpecific,
-        GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
+        GetDerivationSpecific: deps.GetDerivationSpecific,
       },
       undefined,
+      derivationTables,
     );
     belowCutoff = addresses.filter(address => (
       address.addressing.path[address.addressing.path.length - 1] <= cutoff
@@ -445,11 +455,12 @@ export async function getChainAddressesForDisplay(
     chainsRequest: IHasChainsRequest,
   },
 ): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
+  const derivationTables = request.publicDeriver.getConceptualWallet().getDerivationTables();
   const deps = Object.freeze({
     GetUtxoTxOutputsWithTx,
     GetAddress,
     GetPathWithSpecific,
-    GetBip44DerivationSpecific,
+    GetDerivationSpecific,
   });
   const depTables = Object
     .keys(deps)
@@ -457,8 +468,11 @@ export async function getChainAddressesForDisplay(
     .flatMap(table => getAllSchemaTables(request.publicDeriver.getDb(), table));
   return await raii(
     request.publicDeriver.getDb(),
-    depTables,
-    async tx => await rawGetChainAddressesForDisplay(tx, deps, request)
+    [
+      ...depTables,
+      ...mapToTables(request.publicDeriver.getDb(), derivationTables),
+    ],
+    async tx => await rawGetChainAddressesForDisplay(tx, deps, request, derivationTables)
   );
 }
 export async function rawGetAllAddressesForDisplay(
@@ -467,20 +481,22 @@ export async function rawGetAllAddressesForDisplay(
     GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
     GetAddress: Class<GetAddress>,
     GetPathWithSpecific: Class<GetPathWithSpecific>,
-    GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+    GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
   request: {
     publicDeriver: IPublicDeriver & IGetAllUtxos,
   },
+  derivationTables: Map<number, string>,
 ): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
   let addresses = await request.publicDeriver.rawGetAllUtxoAddresses(
     tx,
     {
       GetAddress: deps.GetAddress,
       GetPathWithSpecific: deps.GetPathWithSpecific,
-      GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
+      GetDerivationSpecific: deps.GetDerivationSpecific,
     },
     undefined,
+    derivationTables,
   );
   // when public deriver level = chain we still have a display cutoff
   const hasCutoff = asDisplayCutoff(request.publicDeriver);
@@ -489,9 +505,10 @@ export async function rawGetAllAddressesForDisplay(
       tx,
       {
         GetPathWithSpecific: deps.GetPathWithSpecific,
-        GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
+        GetDerivationSpecific: deps.GetDerivationSpecific,
       },
       undefined,
+      derivationTables,
     );
     addresses = addresses.filter(address => (
       address.addressing.path[address.addressing.path.length - 1] <= cutoff
@@ -508,11 +525,12 @@ export async function getAllAddressesForDisplay(
     publicDeriver: IPublicDeriver & IGetAllUtxos,
   },
 ): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
+  const derivationTables = request.publicDeriver.getConceptualWallet().getDerivationTables();
   const deps = Object.freeze({
     GetUtxoTxOutputsWithTx,
     GetAddress,
     GetPathWithSpecific,
-    GetBip44DerivationSpecific,
+    GetDerivationSpecific,
   });
   const depTables = Object
     .keys(deps)
@@ -520,11 +538,15 @@ export async function getAllAddressesForDisplay(
     .flatMap(table => getAllSchemaTables(request.publicDeriver.getDb(), table));
   return await raii(
     request.publicDeriver.getDb(),
-    depTables,
+    [
+      ...depTables,
+      ...mapToTables(request.publicDeriver.getDb(), derivationTables),
+    ],
     async tx => await rawGetAllAddressesForDisplay(
       tx,
       deps,
       request,
+      derivationTables,
     )
   );
 }
@@ -666,11 +688,12 @@ export async function rawGetAddressRowsForWallet(
   deps: {|
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
-    GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+    GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
   request: {
     publicDeriver: IPublicDeriver,
   },
+  derivationTables: Map<number, string>,
 ): Promise<{|
   utxoAddresses: Array<$ReadOnly<AddressRow>>,
   accountingAddresses: Array<$ReadOnly<AddressRow>>,
@@ -684,9 +707,10 @@ export async function rawGetAddressRowsForWallet(
       {
         GetPathWithSpecific: deps.GetPathWithSpecific,
         GetAddress: deps.GetAddress,
-        GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
+        GetDerivationSpecific: deps.GetDerivationSpecific,
       },
       undefined,
+      derivationTables,
     );
     for (const address of addrResponse) {
       utxoAddresses.push(address.addr);
@@ -719,7 +743,7 @@ export async function updateCutoffFromInsert(
   tx: lf$Transaction,
   deps: {|
     GetPathWithSpecific: Class<GetPathWithSpecific>,
-    GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+    GetDerivationSpecific: Class<GetDerivationSpecific>,
     GetDerivationsByPath: Class<GetDerivationsByPath>,
     ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
   |},
@@ -728,6 +752,7 @@ export async function updateCutoffFromInsert(
     displayCutoffInstance: IDisplayCutoff,
     tree: TreeInsert<any>,
   |},
+  derivationTables: Map<number, string>,
 ): Promise<void> {
   if (request.displayCutoffInstance != null) {
     if (request.publicDeriverLevel !== Bip44DerivationLevels.ACCOUNT.level) {
@@ -748,9 +773,10 @@ export async function updateCutoffFromInsert(
       tx,
       {
         GetPathWithSpecific: deps.GetPathWithSpecific,
-        GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
+        GetDerivationSpecific: deps.GetDerivationSpecific,
       },
       undefined,
+      derivationTables,
     );
     if (bestNewCuttoff - BIP44_SCAN_SIZE > currentCutoff) {
       await request.displayCutoffInstance.rawSetCutoff(

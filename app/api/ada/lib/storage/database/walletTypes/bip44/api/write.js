@@ -10,7 +10,6 @@ import {
 
 import type {
   Bip44WrapperInsert, Bip44WrapperRow,
-  Bip44ToPublicDeriverInsert, Bip44ToPublicDeriverRow,
 } from '../tables';
 import type {
   Bip44ChainRow,
@@ -22,14 +21,9 @@ import {
   Bip44AddressSchema,
 } from '../../common/tables';
 import {
-  GetBip44DerivationSpecific,
-  GetAllBip44Wallets,
-  GetBip44Wrapper,
-} from './read';
+  GetDerivationSpecific,
+} from '../../common/api/read';
 
-import type {
-  KeyDerivationRow,
-} from '../../../primitives/tables';
 import { KeyDerivationSchema } from '../../../primitives/tables';
 import {
   GetChildWithSpecific, GetPathWithSpecific,
@@ -37,18 +31,8 @@ import {
 
 import {
   Bip44DerivationLevels,
-  GetBip44Tables,
 } from './utils';
-import { addNewRowToTable, StaleStateError, } from '../../../utils';
-import type {
-  PublicDeriverRow,
-} from '../../core/tables';
-import { DerivePublicDeriverFromKey, AddAdhocPublicDeriver, } from '../../common/api/write';
-import type {
-  DerivePublicDeriverFromKeyRequest,
-  AddAdhocPublicDeriverRequest,
-  AddAdhocPublicDeriverResponse,
-} from '../../common/api/write';
+import { addNewRowToTable, } from '../../../utils';
 
 export class AddBip44Wrapper {
   static ownTables = Object.freeze({
@@ -69,87 +53,6 @@ export class AddBip44Wrapper {
   }
 }
 
-export class AddBip44ToPublicDeriver {
-  static ownTables = Object.freeze({
-    [Bip44Tables.Bip44ToPublicDeriverSchema.name]: Bip44Tables.Bip44ToPublicDeriverSchema,
-  });
-  static depTables = Object.freeze({});
-
-  static async add(
-    db: lf$Database,
-    tx: lf$Transaction,
-    request: Bip44ToPublicDeriverInsert,
-  ): Promise<$ReadOnly<Bip44ToPublicDeriverRow>> {
-    return await addNewRowToTable<Bip44ToPublicDeriverInsert, Bip44ToPublicDeriverRow>(
-      db, tx,
-      request,
-      AddBip44ToPublicDeriver.ownTables[Bip44Tables.Bip44ToPublicDeriverSchema.name].name,
-    );
-  }
-}
-
-export class DeriveBip44PublicFromPrivate {
-  static ownTables = Object.freeze({});
-  static depTables = Object.freeze({
-    GetBip44Wrapper,
-    AddBip44ToPublicDeriver,
-    GetAllBip44Wallets,
-    DerivePublicDeriverFromKey,
-    GetBip44Tables,
-  });
-
-  static async add<Row>(
-    db: lf$Database,
-    tx: lf$Transaction,
-    bip44WrapperId: number,
-    body: DerivePublicDeriverFromKeyRequest,
-  ): Promise<{
-    publicDeriverResult: $ReadOnly<PublicDeriverRow>,
-    levelResult: {
-      KeyDerivation: $ReadOnly<KeyDerivationRow>,
-      specificDerivationResult: $ReadOnly<Row>
-    },
-  }> {
-    const wrapper = await DeriveBip44PublicFromPrivate.depTables.GetBip44Wrapper.get(
-      db, tx,
-      bip44WrapperId
-    );
-    if (wrapper == null) {
-      throw new StaleStateError('DeriveBip44PublicFromPrivate::add wrapper');
-    }
-    if (wrapper.PrivateDeriverLevel == null || wrapper.PrivateDeriverKeyDerivationId == null) {
-      throw new StaleStateError('DeriveBip44PublicFromPrivate::add no private deriver');
-    }
-    const privateDeriverLevel = wrapper.PrivateDeriverLevel;
-    const privateDeriverKeyDerivationId = wrapper.PrivateDeriverKeyDerivationId;
-    const bip44Tables = DeriveBip44PublicFromPrivate.depTables.GetBip44Tables.get();
-    return await DeriveBip44PublicFromPrivate.depTables.DerivePublicDeriverFromKey.add<Row>(
-      db, tx,
-      body,
-      privateDeriverKeyDerivationId,
-      privateDeriverLevel,
-      bip44Tables,
-      async (pubDeriver) => {
-        // add new row in mapping table
-        const children = await DeriveBip44PublicFromPrivate
-          .depTables
-          .GetAllBip44Wallets.forBip44Wallet(
-            db, tx,
-            bip44WrapperId
-          );
-        await DeriveBip44PublicFromPrivate.depTables.AddBip44ToPublicDeriver.add(
-          db, tx,
-          {
-            Bip44WrapperId: bip44WrapperId,
-            PublicDeriverId: pubDeriver.publicDeriverResult.PublicDeriverId,
-            Index: children.length,
-          }
-        );
-      }
-    );
-  }
-}
-
 export class ModifyDisplayCutoff {
   static ownTables = Object.freeze({
     [Bip44ChainSchema.name]: Bip44ChainSchema,
@@ -159,7 +62,7 @@ export class ModifyDisplayCutoff {
   static depTables = Object.freeze({
     GetPathWithSpecific,
     GetChildWithSpecific,
-    GetBip44DerivationSpecific,
+    GetDerivationSpecific,
   });
 
   static async pop(
@@ -169,10 +72,11 @@ export class ModifyDisplayCutoff {
       pubDeriverKeyDerivationId: number,
       pathToLevel: Array<number>,
     },
-  ): Promise<void | {
+    derivationTables: Map<number, string>,
+  ): Promise<void | {|
     index: number,
     row: $ReadOnly<Bip44AddressRow>,
-  }> {
+  |}> {
     const path = await ModifyDisplayCutoff.depTables.GetPathWithSpecific.getPath<Bip44ChainRow>(
       db, tx,
       {
@@ -180,12 +84,13 @@ export class ModifyDisplayCutoff {
         level: Bip44DerivationLevels.CHAIN.level,
       },
       async (derivationId) => {
-        const result = await ModifyDisplayCutoff.depTables.GetBip44DerivationSpecific.get<
-        Bip44ChainRow
+        const result = await ModifyDisplayCutoff.depTables.GetDerivationSpecific.get<
+          Bip44ChainRow
         >(
           db, tx,
           [derivationId],
           Bip44DerivationLevels.CHAIN.level,
+          derivationTables,
         );
         const chainDerivation = result[0];
         if (chainDerivation === undefined) {
@@ -208,12 +113,13 @@ export class ModifyDisplayCutoff {
     const address = await ModifyDisplayCutoff.depTables.GetChildWithSpecific.get<Bip44AddressRow>(
       db, tx,
       async (derivationId) => {
-        const result = await ModifyDisplayCutoff.depTables.GetBip44DerivationSpecific.get<
+        const result = await ModifyDisplayCutoff.depTables.GetDerivationSpecific.get<
           Bip44AddressRow
         >(
           db, tx,
           [derivationId],
           Bip44DerivationLevels.ADDRESS.level,
+          derivationTables,
         );
         const addressDerivation = result[0];
         if (addressDerivation === undefined) {
@@ -273,48 +179,5 @@ export class ModifyDisplayCutoff {
       ));
 
     await tx.attach(updateQuery);
-  }
-}
-
-export class AddBip44AdhocPublicDeriver {
-  static ownTables = Object.freeze({});
-  static depTables = Object.freeze({
-    GetBip44Tables,
-    AddBip44ToPublicDeriver,
-    GetAllBip44Wallets,
-    AddAdhocPublicDeriver,
-  });
-
-  static async add<Row>(
-    db: lf$Database,
-    tx: lf$Transaction,
-    request: AddAdhocPublicDeriverRequest,
-    bip44WrapperId: number,
-  ): Promise<AddAdhocPublicDeriverResponse<Row>> {
-    const bip44Tables = AddBip44AdhocPublicDeriver.depTables.GetBip44Tables.get();
-
-    return await AddBip44AdhocPublicDeriver.depTables.AddAdhocPublicDeriver.add<Row>(
-      db, tx,
-      request,
-      bip44Tables,
-      async (pubDeriver) => {
-        // add new row in mapping table
-        const children = await AddBip44AdhocPublicDeriver
-          .depTables
-          .GetAllBip44Wallets
-          .forBip44Wallet(
-            db, tx,
-            bip44WrapperId
-          );
-        await AddBip44AdhocPublicDeriver.depTables.AddBip44ToPublicDeriver.add(
-          db, tx,
-          {
-            Bip44WrapperId: bip44WrapperId,
-            PublicDeriverId: pubDeriver.publicDeriverResult.PublicDeriverId,
-            Index: children.length,
-          }
-        );
-      }
-    );
   }
 }

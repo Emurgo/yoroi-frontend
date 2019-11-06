@@ -82,12 +82,12 @@ export class PublicDeriver implements IPublicDeriver, IRename, IGetLastSyncInfo 
 
   static async createPublicDeriver(
     pubDeriver: $ReadOnly<PublicDeriverRow>,
-    bip44Wallet: Bip44Wallet,
+    conceptualWallet: ConceptualWallet,
   ): Promise<PublicDeriver> {
     return await refreshPublicDeriverFunctionality(
-      bip44Wallet.getDb(),
+      conceptualWallet.getDb(),
       pubDeriver,
-      bip44Wallet,
+      conceptualWallet,
     );
   }
 

@@ -10,6 +10,9 @@ import {
 } from '../ConceptualWallet/index';
 import type { ICip1852Wallet } from './interfaces';
 import type { Cip1852WrapperRow } from '../../database/walletTypes/cip1852/tables';
+import {
+  Bip44TableMap,
+} from '../../database/walletTypes/bip44/api/utils';
 
 /** Snapshot of a Cip1852Wallet in the database */
 export class Cip1852Wallet extends ConceptualWallet implements ICip1852Wallet {
@@ -94,6 +97,8 @@ export async function refreshCip1852WalletFunctionality(
   const conceptualWalletCtorData = await refreshConceptualWalletFunctionality(
     db,
     row.ConceptualWalletId,
+    // recall: cip1852 is an extension of bip44 so the tables are the same
+    Bip44TableMap
   );
 
   let privateDeriverLevel = null;

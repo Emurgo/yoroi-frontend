@@ -17,6 +17,15 @@ export type RawVariation<Func, Deps, Arg> = (
   body: Arg,
 ) => ReturnType<Func>;
 
+export type RawTableVariation<Func, Deps, Arg> = (
+  tx: lf$Transaction,
+  deps: Deps,
+  // should be able to extract Arg type with a $Call on Func
+  // but for some reason it isn't working :/
+  body: Arg,
+  tableMap: Map<number, string>,
+) => ReturnType<Func>;
+
 export type Address = {|
   +address: string,
 |};

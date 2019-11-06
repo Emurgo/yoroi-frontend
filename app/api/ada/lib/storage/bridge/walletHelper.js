@@ -28,6 +28,7 @@ import { encryptWithPassword } from '../../../../../utils/passwordCipher';
 
 import {
   Bip44DerivationLevels,
+  Bip44TableMap,
 } from '../database/walletTypes/bip44/api/utils';
 import {
   getAllSchemaTables,
@@ -165,7 +166,10 @@ export async function createStandardBip44Wallet(request: {
   let state;
   {
     state = await WalletBuilder
-      .start(request.db)
+      .start(
+        request.db,
+        Bip44TableMap,
+      )
       .addConceptualWallet(
         _finalState => ({
           CoinType: CARDANO_COINTYPE,
@@ -209,11 +213,9 @@ export async function createStandardBip44Wallet(request: {
       .derivePublicDeriver(
         _finalState => ({
           decryptPrivateDeriverPassword: request.password,
-          publicDeriverInsert: ids => ({
-            KeyDerivationId: ids.derivationId,
-            Name: request.accountName,
-            LastSyncInfoId: ids.lastSyncInfoId,
-          }),
+          publicDeriverMeta: {
+            name: request.accountName,
+          },
           path: [BIP44_PURPOSE, CARDANO_COINTYPE, request.accountIndex],
           initialDerivations
         })
@@ -270,7 +272,10 @@ export async function createHardwareWallet(request: {
   let state;
   {
     state = await WalletBuilder
-      .start(request.db)
+      .start(
+        request.db,
+        Bip44TableMap,
+      )
       .addConceptualWallet(
         _finalState => ({
           CoinType: CARDANO_COINTYPE,
@@ -311,11 +316,9 @@ export async function createHardwareWallet(request: {
         finalState => ({
           parentDerivationId: finalState.root.root.KeyDerivation.KeyDerivationId,
           pathStartLevel: 1,
-          publicDeriverInsert: ids => ({
-            KeyDerivationId: ids.derivationId,
-            Name: request.accountName,
-            LastSyncInfoId: ids.lastSyncInfoId,
-          }),
+          publicDeriverMeta: {
+            name: request.accountName,
+          },
           pathToPublic: [
             {
               index: BIP44_PURPOSE,
@@ -365,7 +368,10 @@ export async function migrateFromStorageV1(request: {
   // hardware wallet
   if (request.encryptedPk == null) {
     let builder = WalletBuilder
-      .start(request.db)
+      .start(
+        request.db,
+        Bip44TableMap,
+      )
       .addConceptualWallet(
         _finalState => ({
           CoinType: CARDANO_COINTYPE,
@@ -415,7 +421,10 @@ export async function migrateFromStorageV1(request: {
     const pathToPrivate = []; // private deriver level === root level
     const encryptedPk = request.encryptedPk;
     let builder = WalletBuilder
-      .start(request.db)
+      .start(
+        request.db,
+        Bip44TableMap,
+      )
       .addConceptualWallet(
         _finalState => ({
           CoinType: CARDANO_COINTYPE,
@@ -551,11 +560,9 @@ async function addPublicDeriverToMigratedWallet<
       finalState => ({
         parentDerivationId: finalState.root.root.KeyDerivation.KeyDerivationId,
         pathStartLevel: 1,
-        publicDeriverInsert: ids => ({
-          KeyDerivationId: ids.derivationId,
-          Name: accountName,
-          LastSyncInfoId: ids.lastSyncInfoId,
-        }),
+        publicDeriverMeta: {
+          name: accountName,
+        },
         pathToPublic,
         initialDerivations,
         hwWalletMetaInsert: request.hwWalletMetaInsert == null

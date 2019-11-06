@@ -440,20 +440,6 @@ Object {
       "KeyDerivationId": 49,
     },
   ],
-  "Bip44ToPublicDeriver": Array [
-    Object {
-      "Bip44ToPublicDeriverId": 1,
-      "Bip44WrapperId": 1,
-      "Index": 0,
-      "PublicDeriverId": 1,
-    },
-    Object {
-      "Bip44ToPublicDeriverId": 2,
-      "Bip44WrapperId": 1,
-      "Index": 1,
-      "PublicDeriverId": 2,
-    },
-  ],
   "Bip44Wrapper": Array [
     Object {
       "Bip44WrapperId": 1,
@@ -465,7 +451,6 @@ Object {
     },
   ],
   "Block": Array [],
-  "Cip1852ToPublicDeriver": Array [],
   "Cip1852Wrapper": Array [],
   "CoinTypeDerivation": Array [
     Object {
@@ -872,12 +857,16 @@ Object {
   ],
   "PublicDeriver": Array [
     Object {
+      "ConceptualWalletId": 1,
+      "Index": 0,
       "KeyDerivationId": 4,
       "LastSyncInfoId": 1,
       "Name": "",
       "PublicDeriverId": 1,
     },
     Object {
+      "ConceptualWalletId": 1,
+      "Index": 1,
       "KeyDerivationId": 47,
       "LastSyncInfoId": 2,
       "Name": "Checking account",

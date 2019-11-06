@@ -8,6 +8,7 @@ import type {
 import {
   getAllSchemaTables,
   raii,
+  mapToTables,
 } from '../database/utils';
 import type {
   BlockInsert, BlockRow,
@@ -63,9 +64,8 @@ import {
   GetKeyForPublicDeriver,
 } from '../database/walletTypes/core/api/read';
 import { ModifyDisplayCutoff, } from '../database/walletTypes/bip44/api/write';
-import { GetBip44Tables, } from '../database/walletTypes/bip44/api/utils';
 import { AddDerivationTree, } from '../database/walletTypes/common/api/write';
-import { GetBip44DerivationSpecific, } from '../database/walletTypes/bip44/api/read';
+import { GetDerivationSpecific, } from '../database/walletTypes/common/api/read';
 import { ModifyLastSyncInfo, } from '../database/walletTypes/core/api/write';
 import type { LastSyncInfoRow, } from '../database/walletTypes/core/tables';
 import type { DbTxIO, DbTxInChain } from '../database/transactionModels/multipart/tables';
@@ -93,10 +93,10 @@ export async function rawGetUtxoTransactions(
     GetAddress: Class<GetAddress>,
     AssociateTxWithIOs: Class<AssociateTxWithIOs>,
     GetTxAndBlock: Class<GetTxAndBlock>,
-    GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+    GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
   request: {
-    addressFetch: IGetAllUtxos,
+    publicDeriver: IGetAllUtxos,
     getTxAndBlock: (txIds: Array<number>) => Promise<$ReadOnlyArray<{
       Block: null | $ReadOnly<BlockRow>,
       Transaction: $ReadOnly<TransactionRow>
@@ -104,18 +104,20 @@ export async function rawGetUtxoTransactions(
     skip?: number,
     limit?: number,
   },
+  derivationTables: Map<number, string>,
 ): Promise<{|
   addressLookupMap: Map<number, string>,
   txs: Array<UtxoAnnotatedTransaction>,
 |}> {
-  const addresses = await request.addressFetch.rawGetAllUtxoAddresses(
+  const addresses = await request.publicDeriver.rawGetAllUtxoAddresses(
     dbTx,
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
       GetAddress: deps.GetAddress,
-      GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
+      GetDerivationSpecific: deps.GetDerivationSpecific,
     },
     undefined,
+    derivationTables,
   );
   const addressIds = addresses.map(address => address.addr.AddressId);
   const txIds = await deps.AssociateTxWithIOs.getTxIdsForAddresses(
@@ -172,9 +174,8 @@ export async function rawGetUtxoTransactions(
 }
 
 export async function getAllUtxoTransactions(
-  db: lf$Database,
   request: {
-    addressFetch: IGetAllUtxos,
+    publicDeriver: IPublicDeriver & IGetAllUtxos,
     skip?: number,
     limit?: number,
   },
@@ -182,35 +183,39 @@ export async function getAllUtxoTransactions(
   addressLookupMap: Map<number, string>,
   txs: Array<UtxoAnnotatedTransaction>,
 |}> {
+  const derivationTables = request.publicDeriver.getConceptualWallet().getDerivationTables();
   const deps = Object.freeze({
     GetPathWithSpecific,
     GetAddress,
     AssociateTxWithIOs,
     GetTxAndBlock,
-    GetBip44DerivationSpecific,
+    GetDerivationSpecific,
   });
   const depTables = Object
     .keys(deps)
     .map(key => deps[key])
-    .flatMap(table => getAllSchemaTables(db, table));
+    .flatMap(table => getAllSchemaTables(request.publicDeriver.getDb(), table));
 
   return await raii(
-    db,
-    depTables,
+    request.publicDeriver.getDb(),
+    [
+      ...depTables,
+      ...mapToTables(request.publicDeriver.getDb(), derivationTables),
+    ],
     async dbTx => {
       return await rawGetUtxoTransactions(
-        db, dbTx,
+        request.publicDeriver.getDb(), dbTx,
         {
           GetPathWithSpecific: deps.GetPathWithSpecific,
           GetAddress: deps.GetAddress,
           AssociateTxWithIOs: deps.AssociateTxWithIOs,
           GetTxAndBlock: deps.GetTxAndBlock,
-          GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
+          GetDerivationSpecific: deps.GetDerivationSpecific,
         },
         {
           ...request,
           getTxAndBlock: async (txIds) => await deps.GetTxAndBlock.byTime(
-            db, dbTx,
+            request.publicDeriver.getDb(), dbTx,
             {
               txIds,
               skip: request.skip,
@@ -218,55 +223,60 @@ export async function getAllUtxoTransactions(
             }
           )
         },
+        derivationTables,
       );
     }
   );
 }
 
 export async function getPendingUtxoTransactions(
-  db: lf$Database,
   request: {
-    addressFetch: IGetAllUtxos,
+    publicDeriver: IPublicDeriver & IGetAllUtxos,
   },
 ): Promise<{|
   addressLookupMap: Map<number, string>,
   txs: Array<UtxoAnnotatedTransaction>,
 |}> {
+  const derivationTables = request.publicDeriver.getConceptualWallet().getDerivationTables();
   const deps = Object.freeze({
     GetPathWithSpecific,
     GetAddress,
     AssociateTxWithIOs,
     GetTxAndBlock,
-    GetBip44DerivationSpecific,
+    GetDerivationSpecific,
   });
   const depTables = Object
     .keys(deps)
     .map(key => deps[key])
-    .flatMap(table => getAllSchemaTables(db, table));
+    .flatMap(table => getAllSchemaTables(request.publicDeriver.getDb(), table));
 
   return await raii(
-    db,
-    depTables,
+    request.publicDeriver.getDb(),
+    [
+      ...depTables,
+      ...mapToTables(request.publicDeriver.getDb(), derivationTables),
+    ],
     async dbTx => {
       return await rawGetUtxoTransactions(
-        db, dbTx,
+        request.publicDeriver.getDb(), dbTx,
         {
           GetPathWithSpecific: deps.GetPathWithSpecific,
           GetAddress: deps.GetAddress,
           AssociateTxWithIOs: deps.AssociateTxWithIOs,
           GetTxAndBlock: deps.GetTxAndBlock,
-          GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
+          GetDerivationSpecific: deps.GetDerivationSpecific,
         },
         {
           ...request,
           getTxAndBlock: async (txIds) => await deps.GetTxAndBlock.withStatus(
-            db, dbTx,
+            request.publicDeriver.getDb(), dbTx,
             {
               txIds,
               status: [TxStatusCodes.PENDING],
             }
           )
         },
+        derivationTables,
       );
     }
   );
@@ -279,6 +289,7 @@ export async function updateTransactions(
   getTransactionsHistoryForAddresses: HistoryFunc,
   getBestBlock: BestBlockFunc,
 ) {
+  const derivationTables = publicDeriver.getConceptualWallet().getDerivationTables();
   let lastSyncInfo = undefined;
   try {
     const updateDepTables = Object.freeze({
@@ -291,7 +302,6 @@ export async function updateTransactions(
       GetOrAddAddress,
       GetPublicDeriver,
       AddDerivationTree,
-      GetBip44Tables,
       MarkUtxo,
       ModifyDisplayCutoff,
       GetDerivationsByPath,
@@ -299,7 +309,7 @@ export async function updateTransactions(
       GetTransaction,
       GetUtxoInputs,
       GetTxAndBlock,
-      GetBip44DerivationSpecific,
+      GetDerivationSpecific,
       ModifyTransaction,
       ModifyMultipartTx,
       AssociateTxWithIOs,
@@ -311,7 +321,10 @@ export async function updateTransactions(
 
     await raii(
       db,
-      updateTables,
+      [
+        ...updateTables,
+        ...mapToTables(db, derivationTables),
+      ],
       async dbTx => {
         lastSyncInfo = await updateDepTables.GetLastSyncForPublicDeriver.forId(
           db, dbTx,
@@ -330,6 +343,7 @@ export async function updateTransactions(
           checkAddressesInUse,
           getTransactionsHistoryForAddresses,
           getBestBlock,
+          derivationTables,
         );
       }
     );
@@ -353,7 +367,7 @@ export async function updateTransactions(
       GetTransaction,
       GetUtxoInputs,
       GetEncryptionMeta,
-      GetBip44DerivationSpecific,
+      GetDerivationSpecific,
       AssociateTxWithIOs,
     });
     const rollbackTables = Object
@@ -362,7 +376,10 @@ export async function updateTransactions(
       .flatMap(table => getAllSchemaTables(db, table));
     await raii(
       db,
-      rollbackTables,
+      [
+        ...rollbackTables,
+        ...mapToTables(db, derivationTables),
+      ],
       async dbTx => {
         const newLastSyncInfo = await rollbackDepTables.GetLastSyncForPublicDeriver.forId(
           db, dbTx,
@@ -381,7 +398,8 @@ export async function updateTransactions(
           {
             publicDeriver,
             lastSyncInfo: newLastSyncInfo,
-          }
+          },
+          derivationTables
         );
       }
     );
@@ -403,13 +421,14 @@ async function rollback(
     GetTxAndBlock: Class<GetTxAndBlock>,
     GetUtxoInputs: Class<GetUtxoInputs>,
     GetEncryptionMeta: Class<GetEncryptionMeta>,
-    GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+    GetDerivationSpecific: Class<GetDerivationSpecific>,
     ModifyTransaction: Class<ModifyTransaction>,
   |},
-  request: {
+  request: {|
     publicDeriver: IPublicDeriver,
     lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
-  }
+  |},
+  derivationTables: Map<number, string>,
 ): Promise<void> {
   const { TransactionSeed, } = await deps.GetEncryptionMeta.get(db, dbTx);
 
@@ -428,9 +447,10 @@ async function rollback(
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
       GetAddress: deps.GetAddress,
-      GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
+      GetDerivationSpecific: deps.GetDerivationSpecific,
     },
     { publicDeriver: request.publicDeriver },
+    derivationTables,
   );
   const utxoAddressIds = utxoAddresses.map(address => address.AddressId);
   const accountingAddressIds = accountingAddresses.map(address => address.AddressId);
@@ -544,7 +564,6 @@ async function rawUpdateTransactions(
     GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
     GetOrAddAddress: Class<GetOrAddAddress>,
     GetPublicDeriver: Class<GetPublicDeriver>,
-    GetBip44Tables: Class<GetBip44Tables>,
     AddDerivationTree: Class<AddDerivationTree>,
     MarkUtxo: Class<MarkUtxo>,
     ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
@@ -553,7 +572,7 @@ async function rawUpdateTransactions(
     GetTransaction: Class<GetTransaction>,
     GetUtxoInputs: Class<GetUtxoInputs>,
     GetTxAndBlock: Class<GetTxAndBlock>,
-    GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+    GetDerivationSpecific: Class<GetDerivationSpecific>,
     ModifyTransaction: Class<ModifyTransaction>,
     ModifyMultipartTx: Class<ModifyMultipartTx>,
     AssociateTxWithIOs: Class<AssociateTxWithIOs>,
@@ -563,6 +582,7 @@ async function rawUpdateTransactions(
   checkAddressesInUse: FilterFunc,
   getTransactionsHistoryForAddresses: HistoryFunc,
   getBestBlock: BestBlockFunc,
+  derivationTables: Map<number, string>,
 ): Promise<void> {
   const toAbsoluteSlotNumber = await genToAbsoluteSlotNumber();
   // 1) Check if backend is synced (avoid rollbacks if backend has to resync from block 1)
@@ -598,14 +618,14 @@ async function rawUpdateTransactions(
           GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx,
           GetOrAddAddress: deps.GetOrAddAddress,
           GetPublicDeriver: deps.GetPublicDeriver,
-          GetBip44Tables: deps.GetBip44Tables,
           AddDerivationTree: deps.AddDerivationTree,
           ModifyDisplayCutoff: deps.ModifyDisplayCutoff,
           GetDerivationsByPath: deps.GetDerivationsByPath,
-          GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
+          GetDerivationSpecific: deps.GetDerivationSpecific,
         },
         // TODO: race condition because we don't pass in best block here
         { checkAddressesInUse },
+        derivationTables,
       );
     }
 
@@ -620,9 +640,10 @@ async function rawUpdateTransactions(
       {
         GetPathWithSpecific: deps.GetPathWithSpecific,
         GetAddress: deps.GetAddress,
-        GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
+        GetDerivationSpecific: deps.GetDerivationSpecific,
       },
       { publicDeriver },
+      derivationTables,
     );
     const utxoAddressIds = utxoAddresses.map(address => address.AddressId);
     const accountingAddressIds = accountingAddresses.map(address => address.AddressId);

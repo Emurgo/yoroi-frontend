@@ -14,22 +14,22 @@ import {
 import type {
   Bip44WrapperInsert,
 } from '../database/walletTypes/bip44/tables';
-import { GetBip44Tables } from '../database/walletTypes/bip44/api/utils';
 import {
   AddBip44Wrapper,
-  DeriveBip44PublicFromPrivate,
-  AddBip44AdhocPublicDeriver,
 } from '../database/walletTypes/bip44/api/write';
 import type {
   AddAdhocPublicDeriverRequest,
 } from '../database/walletTypes/common/api/write';
 import {
+  AddAdhocPublicDeriver,
   AddDerivationTree,
+  DerivePublicDeriverFromKey,
 } from '../database/walletTypes/common/api/write';
 import type { AddPublicDeriverResponse } from '../database/walletTypes/core/api/write';
 import {
   getAllTables,
   raii,
+  StaleStateError,
 } from '../database/utils';
 import type {
   IDerivePublicFromPrivateRequest,
@@ -74,6 +74,7 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
 
   /** keep track of all tables we need to lock to build this wallet */
   tables: Array<string>;
+  derivationTables: Map<number, string>;
 
   /** keep track of all functions we need to call to build each part of this wallet */
   buildSteps: Array<CurrentState => Promise<void>>;
@@ -87,12 +88,14 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
     tables: Array<string>,
     buildSteps: Array<CurrentState => Promise<void>>,
     state: CurrentState,
+    derivationTables: Map<number, string>,
   ) {
     this.db = db;
     this.txHolder = txHolder;
     this.tables = tables;
     this.buildSteps = buildSteps;
     this.state = state;
+    this.derivationTables = derivationTables;
   }
 
   updateData<Requirement: {}, NewAddition>(
@@ -115,10 +118,14 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
         ...state,
         ...addition,
       },
+      this.derivationTables,
     );
   }
 
-  static start(db: lf$Database): WalletBuilder<$Shape<{||}>> {
+  static start(
+    db: lf$Database,
+    derivationTables: Map<number, string>,
+  ): WalletBuilder<$Shape<{||}>> {
     return new WalletBuilder(
       db,
       // only create the tx once commit is called
@@ -126,12 +133,17 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
       [],
       [],
       {},
+      derivationTables,
     );
   }
 
   async commit(): Promise<CurrentState> {
     // lock used tables
-    const usedTables = this.tables.map(
+    const allTables = Array.from([
+      ...this.tables,
+      ...Array.from(this.derivationTables.values()),
+    ]);
+    const usedTables = allTables.map(
       name => this.db.getSchema().table(name)
     );
 
@@ -208,18 +220,14 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
   ) => {
     return this.updateData<HasConceptualWallet, HasRoot>(
       AsNotNull<HasRoot>({ root: null }),
-      Array.from([
-        ...getAllTables(AddDerivationTree),
-        ...getAllTables(GetBip44Tables),
-      ]),
+      Array.from(getAllTables(AddDerivationTree)),
       async (finalData) => {
         const { rootInsert, tree } = insert(finalData);
-        const tableMap = GetBip44Tables.get();
         finalData.root = await AddDerivationTree.includingParent<Insert, *>(
           this.db,
           this.txHolder.tx,
           rootInsert,
-          tableMap,
+          this.derivationTables,
           0, // root
           tree,
         );
@@ -229,23 +237,24 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
 
   addAdhocPublicDeriver: StateConstraint<
     CurrentState,
-    HasBip44Wrapper,
+    HasBip44Wrapper & HasConceptualWallet,
     CurrentState => AddAdhocPublicDeriverRequest,
     CurrentState & HasPublicDeriver<mixed>
   > = (
     request: CurrentState => AddAdhocPublicDeriverRequest,
   ) => {
-    return this.updateData<HasBip44Wrapper, HasPublicDeriver<mixed>>(
+    return this.updateData<HasBip44Wrapper & HasConceptualWallet, HasPublicDeriver<mixed>>(
       { publicDeriver: [] },
-      Array.from(getAllTables(AddBip44AdhocPublicDeriver)),
+      Array.from(getAllTables(AddAdhocPublicDeriver)),
       async (finalData) => {
         finalData.publicDeriver = [
           ...finalData.publicDeriver,
-          (await AddBip44AdhocPublicDeriver.add(
+          (await AddAdhocPublicDeriver.add(
             this.db,
             this.txHolder.tx,
             request(finalData),
-            finalData.bip44WrapperRow.Bip44WrapperId,
+            finalData.conceptualWalletRow.ConceptualWalletId,
+            this.derivationTables,
           )).publicDeriver
         ];
       },
@@ -254,24 +263,32 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
 
   derivePublicDeriver: StateConstraint<
     CurrentState,
-    HasBip44Wrapper & HasRoot,
+    HasBip44Wrapper & HasConceptualWallet,
     CurrentState => IDerivePublicFromPrivateRequest,
     CurrentState & HasPublicDeriver<mixed>
   > = (
     request: CurrentState => IDerivePublicFromPrivateRequest,
   ) => {
-    return this.updateData<HasBip44Wrapper & HasRoot, HasPublicDeriver<mixed>>(
+    return this.updateData<HasBip44Wrapper & HasConceptualWallet, HasPublicDeriver<mixed>>(
       { publicDeriver: [] },
-      Array.from(getAllTables(DeriveBip44PublicFromPrivate)),
+      Array.from(getAllTables(DerivePublicDeriverFromKey)),
       async (finalData) => {
+        const id = finalData.bip44WrapperRow.PrivateDeriverKeyDerivationId;
+        const level = finalData.bip44WrapperRow.PrivateDeriverLevel;
+        if (id == null || level == null) {
+          throw new StaleStateError('derivePublicDeriver no private deriver');
+        }
         finalData.publicDeriver = [
           ...finalData.publicDeriver,
           await derivePublicDeriver(
             this.db,
             this.txHolder.tx,
-            { DeriveBip44PublicFromPrivate },
-            finalData.bip44WrapperRow.Bip44WrapperId,
+            { DerivePublicDeriverFromKey },
+            finalData.conceptualWalletRow.ConceptualWalletId,
             request(finalData),
+            id,
+            level,
+            this.derivationTables
           )
         ];
       },

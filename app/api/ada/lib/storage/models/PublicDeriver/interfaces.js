@@ -30,6 +30,7 @@ import type {
   IChangePasswordRequestFunc, IChangePasswordRequest,
   Address, Addressing,
   RawVariation,
+  RawTableVariation,
 } from '../common/interfaces';
 import {
   GetPublicDeriver,
@@ -47,12 +48,9 @@ import {
   ModifyDisplayCutoff,
 } from '../../database/walletTypes/bip44/api/write';
 import {
-  GetBip44Tables,
-} from '../../database/walletTypes/bip44/api/utils';
-import {
   AddDerivationTree,
 } from '../../database/walletTypes/common/api/write';
-import { GetBip44DerivationSpecific } from '../../database/walletTypes/bip44/api/read';
+import { GetDerivationSpecific } from '../../database/walletTypes/common/api/read';
 import { UpdateGet, GetOrAddAddress, } from '../../database/primitives/api/write';
 import type {
   FilterFunc,
@@ -125,24 +123,24 @@ export type IGetAllUtxosFunc = (
   body: IGetAllUtxosRequest
 ) => Promise<IGetAllUtxosResponse>;
 export interface IGetAllUtxos {
-  +rawGetAllUtxos: RawVariation<
+  +rawGetAllUtxos: RawTableVariation<
     IGetAllUtxosFunc,
     {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
-      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     IGetAllUtxosRequest
   >;
   +getAllUtxos: IGetAllUtxosFunc;
 
-  +rawGetAllUtxoAddresses: RawVariation<
+  +rawGetAllUtxoAddresses: RawTableVariation<
     IGetAllUtxoAddressesFunc,
     {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
-      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     IGetAllUtxoAddressesRequest
   >;
@@ -174,7 +172,7 @@ export type IDisplayCutoffSetFunc = (
 ) => Promise<IDisplayCutoffSetResponse>;
 
 export interface IDisplayCutoff {
-  +rawPopAddress: RawVariation<
+  +rawPopAddress: RawTableVariation<
     IDisplayCutoffPopFunc,
     {|
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
@@ -188,10 +186,10 @@ export interface IDisplayCutoff {
    */
   +popAddress: IDisplayCutoffPopFunc;
 
-  +rawGetCutoff: RawVariation<
+  +rawGetCutoff: RawTableVariation<
     IDisplayCutoffGetFunc,
     {|
-      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
       GetPathWithSpecific: Class<GetPathWithSpecific>
     |},
     IDisplayCutoffGetRequest
@@ -228,24 +226,24 @@ export type IHasChainsNextUnusedFunc = (
   body: IHasChainsRequest
 ) => Promise<IGetNextUnusedForChainResponse>;
 export interface IHasChains {
-  +rawGetAddressesForChain: RawVariation<
+  +rawGetAddressesForChain: RawTableVariation<
     IHasChainsGetAddressesFunc,
     {|
       GetAddress: Class<GetAddress>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     IHasChainsRequest
   >;
   +getAddressesForChain: IHasChainsGetAddressesFunc;
 
-  +rawNextInternal: RawVariation<
+  +rawNextInternal: RawTableVariation<
     IGetNextUnusedForChainFunc,
     {|
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
       GetAddress: Class<GetAddress>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     IGetNextUnusedForChainRequest
   >;
@@ -258,13 +256,13 @@ export type IGetUtxoBalanceFunc = (
   body: IGetUtxoBalanceRequest
 ) => Promise<IGetUtxoBalanceResponse>;
 export interface IGetUtxoBalance {
-  +rawGetUtxoBalance: RawVariation<
+  +rawGetUtxoBalance: RawTableVariation<
     IGetUtxoBalanceFunc,
     {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
-      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     IGetUtxoBalanceRequest
   >;
@@ -348,7 +346,7 @@ export type IScanAddressesFunc = (
   body: IScanAddressesRequest
 ) => Promise<IScanAddressesResponse>;
 export interface IScanAddresses {
-  +rawScanAddresses: RawVariation<
+  +rawScanAddresses: RawTableVariation<
     IScanAddressesFunc,
     {|
       GetKeyForPublicDeriver: Class<GetKeyForPublicDeriver>,
@@ -358,11 +356,10 @@ export interface IScanAddresses {
       GetOrAddAddress: Class<GetOrAddAddress>,
       GetPublicDeriver: Class<GetPublicDeriver>,
       AddDerivationTree: Class<AddDerivationTree>,
-      GetBip44Tables: Class<GetBip44Tables>,
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     IScanAddressesRequest
   >;
