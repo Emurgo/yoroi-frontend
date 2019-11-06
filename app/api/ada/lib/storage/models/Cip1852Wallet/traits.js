@@ -12,7 +12,7 @@ import type {
   IGetAllAccounting,
   ICip1852Parent,
 } from './interfaces';
-import { GetBip44DerivationSpecific } from '../../database/walletTypes/bip44/api/read';
+import { GetDerivationSpecific } from '../../database/walletTypes/common/api/read';
 import {
   GetPathWithSpecific,
   GetAddress,
@@ -73,7 +73,7 @@ const GetAllAccountingMixin = (
     _deps: {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
-      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     _body: IGetAllAccountingAddressesRequest,
   ): Promise<IGetAllAccountingAddressesResponse> => {
@@ -86,7 +86,7 @@ const GetAllAccountingMixin = (
     const deps = Object.freeze({
       GetPathWithSpecific,
       GetAddress,
-      GetBip44DerivationSpecific,
+      GetDerivationSpecific,
     });
     const depTables = Object
       .keys(deps)

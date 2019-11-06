@@ -21,8 +21,8 @@ import {
   Bip44AddressSchema,
 } from '../../common/tables';
 import {
-  GetBip44DerivationSpecific,
-} from './read';
+  GetDerivationSpecific,
+} from '../../common/api/read';
 
 import { KeyDerivationSchema } from '../../../primitives/tables';
 import {
@@ -62,7 +62,7 @@ export class ModifyDisplayCutoff {
   static depTables = Object.freeze({
     GetPathWithSpecific,
     GetChildWithSpecific,
-    GetBip44DerivationSpecific,
+    GetDerivationSpecific,
   });
 
   static async pop(
@@ -72,10 +72,11 @@ export class ModifyDisplayCutoff {
       pubDeriverKeyDerivationId: number,
       pathToLevel: Array<number>,
     },
-  ): Promise<void | {
+    derivationTables: Map<number, string>,
+  ): Promise<void | {|
     index: number,
     row: $ReadOnly<Bip44AddressRow>,
-  }> {
+  |}> {
     const path = await ModifyDisplayCutoff.depTables.GetPathWithSpecific.getPath<Bip44ChainRow>(
       db, tx,
       {
@@ -83,12 +84,13 @@ export class ModifyDisplayCutoff {
         level: Bip44DerivationLevels.CHAIN.level,
       },
       async (derivationId) => {
-        const result = await ModifyDisplayCutoff.depTables.GetBip44DerivationSpecific.get<
-        Bip44ChainRow
+        const result = await ModifyDisplayCutoff.depTables.GetDerivationSpecific.get<
+          Bip44ChainRow
         >(
           db, tx,
           [derivationId],
           Bip44DerivationLevels.CHAIN.level,
+          derivationTables,
         );
         const chainDerivation = result[0];
         if (chainDerivation === undefined) {
@@ -111,12 +113,13 @@ export class ModifyDisplayCutoff {
     const address = await ModifyDisplayCutoff.depTables.GetChildWithSpecific.get<Bip44AddressRow>(
       db, tx,
       async (derivationId) => {
-        const result = await ModifyDisplayCutoff.depTables.GetBip44DerivationSpecific.get<
+        const result = await ModifyDisplayCutoff.depTables.GetDerivationSpecific.get<
           Bip44AddressRow
         >(
           db, tx,
           [derivationId],
           Bip44DerivationLevels.ADDRESS.level,
+          derivationTables,
         );
         const addressDerivation = result[0];
         if (addressDerivation === undefined) {

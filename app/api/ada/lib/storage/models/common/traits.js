@@ -30,12 +30,13 @@ import {
   getAllSchemaTables,
   raii,
   StaleStateError,
+  mapToTables,
 } from '../../database/utils';
 
 import {
   GetKeyForPublicDeriver,
 } from '../../database/walletTypes/core/api/read';
-import { GetBip44DerivationSpecific } from '../../database/walletTypes/bip44/api/read';
+import { GetDerivationSpecific } from '../../database/walletTypes/common/api/read';
 
 import {
   GetUtxoTxOutputsWithTx,
@@ -192,9 +193,10 @@ const GetUtxoBalanceMixin = (
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
-      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     _body: IGetUtxoBalanceRequest,
+    derivationTables: Map<number, string>,
   ): Promise<IGetUtxoBalanceResponse> => {
     const utxos = await this.rawGetAllUtxos(
       tx,
@@ -202,20 +204,22 @@ const GetUtxoBalanceMixin = (
         GetAddress: deps.GetAddress,
         GetPathWithSpecific: deps.GetPathWithSpecific,
         GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx,
-        GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
+        GetDerivationSpecific: deps.GetDerivationSpecific,
       },
-      undefined
+      undefined,
+      derivationTables,
     );
     return getBalanceForUtxos(utxos.map(utxo => utxo.output.UtxoTransactionOutput));
   }
   getUtxoBalance = async (
     _body: IGetUtxoBalanceRequest,
   ): Promise<IGetUtxoBalanceResponse> => {
+    const derivationTables = this.getConceptualWallet().getDerivationTables();
     const deps = Object.freeze({
       GetPathWithSpecific,
       GetAddress,
       GetUtxoTxOutputsWithTx,
-      GetBip44DerivationSpecific,
+      GetDerivationSpecific,
     });
     const depTables = Object
       .keys(deps)
@@ -223,8 +227,11 @@ const GetUtxoBalanceMixin = (
       .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii<IGetUtxoBalanceResponse>(
       super.getDb(),
-      depTables,
-      async tx => this.rawGetUtxoBalance(tx, deps, undefined)
+      [
+        ...depTables,
+        ...mapToTables(super.getDb(), derivationTables),
+      ],
+      async tx => this.rawGetUtxoBalance(tx, deps, undefined, derivationTables)
     );
   }
 };

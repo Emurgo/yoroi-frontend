@@ -41,14 +41,14 @@ export class AddDerivationTree {
     db: lf$Database,
     tx: lf$Transaction,
     tree: TreeInsertStart,
-    tableMap: Map<number, string>,
+    derivationTables: Map<number, string>,
     level: number,
   ): Promise<TreeResult<any>> {
     const parentId = tree.derivationId;
 
     const result = [];
     for (let i = 0; i < tree.children.length; i++) {
-      const tableName = tableMap.get(level + 1);
+      const tableName = derivationTables.get(level + 1);
       if (tableName == null) {
         throw new Error('AddDerivationTree::excludingParent Unknown table queried');
       }
@@ -81,7 +81,7 @@ export class AddDerivationTree {
             derivationId: child.KeyDerivation.KeyDerivationId,
             children: tree.children[i].children,
           },
-          tableMap,
+          derivationTables,
           level + 1,
         );
       result.push({
@@ -100,11 +100,11 @@ export class AddDerivationTree {
     db: lf$Database,
     tx: lf$Transaction,
     rootInsert: AddDerivationRequest<Insert>,
-    tableMap: Map<number, string>,
+    derivationTables: Map<number, string>,
     startingLevel: number,
     tree: number => TreeInsertStart,
   ): Promise<TreeResultStart<Row>> {
-    const tableName = tableMap.get(startingLevel);
+    const tableName = derivationTables.get(startingLevel);
     if (tableName == null) {
       throw new Error('AddDerivationTree::includingParent Unknown table queried');
     }
@@ -116,7 +116,7 @@ export class AddDerivationTree {
     const children = await AddDerivationTree.excludingParent(
       db, tx,
       tree(root.KeyDerivation.KeyDerivationId),
-      tableMap,
+      derivationTables,
       startingLevel + 1,
     );
     return {
@@ -134,12 +134,12 @@ export class AddDerivationTree {
       path: InsertPath,
       pathStartLevel: number,
     |},
-    tableMap: Map<number, string>,
+    derivationTables: Map<number, string>,
   ): Promise<Array<DerivationQueryResult<Row>>> {
     let parentId = request.parentDerivationId;
     const result = [];
     for (let i = 0; i < request.path.length; i++) {
-      const tableName = tableMap.get(request.pathStartLevel + i);
+      const tableName = derivationTables.get(request.pathStartLevel + i);
       if (tableName == null) {
         throw new Error('AddDerivationTree::fromSinglePath Unknown table queried');
       }
@@ -206,7 +206,7 @@ export class DerivePublicDeriverFromKey {
     privateDeriverKeyDerivationId: number,
     privateDeriverLevel: number,
     conceptualWalletId: number,
-    tableMap: Map<number, string>,
+    derivationTables: Map<number, string>,
   ): Promise<AddPublicDeriverResponse<Row>> {
     const derivationAndKey = await DerivePublicDeriverFromKey.depTables.GetKeyForDerivation.get(
       db, tx,
@@ -232,7 +232,7 @@ export class DerivePublicDeriverFromKey {
         path: derivedPath.slice(0, derivedPath.length - 1),
         pathStartLevel: privateDeriverLevel + 1, // +1 since private deriver isn't included in path
       },
-      tableMap,
+      derivationTables,
     );
 
     const existingWallets = await AddAdhocPublicDeriver.depTables.GetPublicDeriver.forWallet(
@@ -242,7 +242,7 @@ export class DerivePublicDeriverFromKey {
 
     let pubDeriver;
     {
-      const tableName = tableMap.get(
+      const tableName = derivationTables.get(
         privateDeriverLevel + derivedPath.length
       );
       if (tableName == null) {
@@ -285,7 +285,7 @@ export class DerivePublicDeriverFromKey {
         derivationId: pubDeriver.publicDeriverResult.KeyDerivationId,
         children: body.initialDerivations,
       },
-      tableMap,
+      derivationTables,
       privateDeriverLevel + derivedPath.length,
     );
 
@@ -329,7 +329,7 @@ export class AddAdhocPublicDeriver {
     tx: lf$Transaction,
     request: AddAdhocPublicDeriverRequest,
     conceptualWalletId: number,
-    tableMap: Map<number, string>,
+    derivationTables: Map<number, string>,
   ): Promise<AddAdhocPublicDeriverResponse<Row>> {
     const pathResult = await AddAdhocPublicDeriver.depTables.AddDerivationTree.fromSinglePath(
       db, tx,
@@ -338,10 +338,10 @@ export class AddAdhocPublicDeriver {
         path: request.pathToPublic.slice(0, request.pathToPublic.length - 1),
         pathStartLevel: request.pathStartLevel,
       },
-      tableMap,
+      derivationTables,
     );
 
-    const tableName = tableMap.get(
+    const tableName = derivationTables.get(
       // -1 since pathStartLevel is included in pathToPublic
       request.pathStartLevel + request.pathToPublic.length - 1
     );
@@ -391,7 +391,7 @@ export class AddAdhocPublicDeriver {
         derivationId: publicDeriver.publicDeriverResult.KeyDerivationId,
         children: request.initialDerivations,
       },
-      tableMap,
+      derivationTables,
       // -1 since pathStartLevel is included in pathToPublic
       request.pathStartLevel + request.pathToPublic.length - 1,
     );

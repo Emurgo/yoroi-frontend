@@ -3,7 +3,7 @@
 import type {
   AccountingDerivationRow,
 } from '../../database/walletTypes/common/tables';
-import { GetBip44DerivationSpecific } from '../../database/walletTypes/bip44/api/read';
+import { GetDerivationSpecific } from '../../database/walletTypes/common/api/read';
 import {
   GetPathWithSpecific,
   GetAddress,
@@ -81,7 +81,7 @@ export interface IGetAllAccounting {
     {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
-      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     IGetAllAccountingAddressesRequest
   >;
@@ -105,7 +105,7 @@ export interface IAddCip1852FromPublic {
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     IAddCip1852FromPublicRequest
   >;

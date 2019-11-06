@@ -43,7 +43,7 @@ import { Bip44Wallet } from './wrapper';
 import {
   GetPublicDeriver,
 } from '../../database/walletTypes/core/api/read';
-import { GetBip44DerivationSpecific } from '../../database/walletTypes/bip44/api/read';
+import { GetDerivationSpecific } from '../../database/walletTypes/common/api/read';
 
 export interface IBip44Wallet {
   constructor(
@@ -161,7 +161,7 @@ export interface IAddBip44FromPublic {
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     IAddBip44FromPublicRequest
   >;

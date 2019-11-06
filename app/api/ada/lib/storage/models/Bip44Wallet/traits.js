@@ -69,9 +69,8 @@ import {
 import {
   AddDerivationTree,
 } from '../../database/walletTypes/common/api/write';
-import { GetBip44DerivationSpecific } from '../../database/walletTypes/bip44/api/read';
+import { GetDerivationSpecific } from '../../database/walletTypes/common/api/read';
 import {
-  Bip44TableMap,
   Bip44DerivationLevels,
 } from '../../database/walletTypes/bip44/api/utils';
 
@@ -257,7 +256,7 @@ const AddBip44FromPublicMixin = (
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     body: IAddBip44FromPublicRequest,
     derivationTables: Map<number, string>,
@@ -284,7 +283,7 @@ const AddBip44FromPublicMixin = (
         tx,
         {
           GetPathWithSpecific: deps.GetPathWithSpecific,
-          GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
+          GetDerivationSpecific: deps.GetDerivationSpecific,
           GetDerivationsByPath: deps.GetDerivationsByPath,
           ModifyDisplayCutoff: deps.ModifyDisplayCutoff,
         },
@@ -292,7 +291,8 @@ const AddBip44FromPublicMixin = (
           publicDeriverLevel: this.getBip44Parent().getPublicDeriverLevel(),
           displayCutoffInstance: asDisplayCutoffInstance,
           tree: body.tree,
-        }
+        },
+        derivationTables,
       );
     }
   }
@@ -306,7 +306,7 @@ const AddBip44FromPublicMixin = (
       ModifyDisplayCutoff,
       GetDerivationsByPath,
       GetPathWithSpecific,
-      GetBip44DerivationSpecific,
+      GetDerivationSpecific,
     });
     const depTables = Object
       .keys(deps)
@@ -527,18 +527,20 @@ const GetAllUtxosMixin = (
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
-      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     _body: IGetAllUtxosRequest,
+    derivationTables: Map<number, string>,
   ): Promise<IGetAllUtxosResponse> => {
     const addresses = await this.rawGetAllUtxoAddresses(
       tx,
       {
         GetAddress: deps.GetAddress,
         GetPathWithSpecific: deps.GetPathWithSpecific,
-        GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
+        GetDerivationSpecific: deps.GetDerivationSpecific,
       },
       undefined,
+      derivationTables,
     );
     const addressIds = addresses.map(address => address.row.AddressId);
     const utxosInStorage = await deps.GetUtxoTxOutputsWithTx.getUtxo(
@@ -568,11 +570,12 @@ const GetAllUtxosMixin = (
   getAllUtxos = async (
     _body: IGetAllUtxosRequest,
   ): Promise<IGetAllUtxosResponse> => {
+    const derivationTables = this.getConceptualWallet().getDerivationTables();
     const deps = Object.freeze({
       GetPathWithSpecific,
       GetAddress,
       GetUtxoTxOutputsWithTx,
-      GetBip44DerivationSpecific,
+      GetDerivationSpecific,
     });
     const depTables = Object
       .keys(deps)
@@ -580,8 +583,11 @@ const GetAllUtxosMixin = (
       .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii<IGetAllUtxosResponse>(
       super.getDb(),
-      depTables,
-      async tx => this.rawGetAllUtxos(tx, deps, undefined)
+      [
+        ...depTables,
+        ...mapToTables(super.getDb(), derivationTables),
+      ],
+      async tx => this.rawGetAllUtxos(tx, deps, undefined, derivationTables)
     );
   }
 
@@ -590,9 +596,10 @@ const GetAllUtxosMixin = (
     deps: {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
-      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     _body: IGetAllUtxoAddressesRequest,
+    derivationTables: Map<number, string>,
   ): Promise<IGetAllUtxoAddressesResponse> => {
     // TODO: some way to know if single chain is an account or not
     if (this.getBip44Parent().getPublicDeriverLevel() >= Bip44DerivationLevels.CHAIN.level) {
@@ -606,7 +613,8 @@ const GetAllUtxosMixin = (
           queryPath: Array(
             Bip44DerivationLevels.ADDRESS.level - this.getBip44Parent().getPublicDeriverLevel()
           ).fill(null),
-        }
+        },
+        derivationTables,
       );
     }
     const externalAddresses = await rawGetBip44AddressesByPath(
@@ -619,7 +627,8 @@ const GetAllUtxosMixin = (
         queryPath: Array(
           Bip44DerivationLevels.ACCOUNT.level - this.getBip44Parent().getPublicDeriverLevel()
         ).fill(null).concat([0, null]),
-      }
+      },
+      derivationTables,
     );
     const internalAddresses = await rawGetBip44AddressesByPath(
       super.getDb(), tx,
@@ -631,7 +640,8 @@ const GetAllUtxosMixin = (
         queryPath: Array(
           Bip44DerivationLevels.ACCOUNT.level - this.getBip44Parent().getPublicDeriverLevel()
         ).fill(null).concat([1, null]),
-      }
+      },
+      derivationTables,
     );
     return [
       ...externalAddresses,
@@ -641,10 +651,11 @@ const GetAllUtxosMixin = (
   getAllUtxoAddresses = async (
     body: IGetAllUtxoAddressesRequest,
   ): Promise<IGetAllUtxoAddressesResponse> => {
+    const derivationTables = this.getConceptualWallet().getDerivationTables();
     const deps = Object.freeze({
       GetPathWithSpecific,
       GetAddress,
-      GetBip44DerivationSpecific,
+      GetDerivationSpecific,
     });
     const depTables = Object
       .keys(deps)
@@ -652,8 +663,11 @@ const GetAllUtxosMixin = (
       .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii(
       super.getDb(),
-      depTables,
-      async tx => this.rawGetAllUtxoAddresses(tx, deps, body)
+      [
+        ...depTables,
+        ...mapToTables(super.getDb(), derivationTables),
+      ],
+      async tx => this.rawGetAllUtxoAddresses(tx, deps, body, derivationTables)
     );
   }
 };
@@ -691,6 +705,7 @@ const DisplayCutoffMixin = (
       GetAddress: Class<GetAddress>,
     |},
     _body: IDisplayCutoffPopRequest,
+    derivationTables: Map<number, string>,
   ): Promise<IDisplayCutoffPopResponse> => {
     if (this.getBip44Parent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
       // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
@@ -702,6 +717,7 @@ const DisplayCutoffMixin = (
         pubDeriverKeyDerivationId: super.getDerivationId(),
         pathToLevel: [0],
       },
+      derivationTables,
     );
     if (nextAddr === undefined) {
       throw new UnusedAddressesError();
@@ -722,6 +738,7 @@ const DisplayCutoffMixin = (
   popAddress = async (
     body: IDisplayCutoffPopRequest,
   ): Promise<IDisplayCutoffPopResponse> => {
+    const derivationTables = this.getConceptualWallet().getDerivationTables();
     const deps = Object.freeze({
       ModifyDisplayCutoff,
       GetAddress,
@@ -732,8 +749,11 @@ const DisplayCutoffMixin = (
       .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii<IDisplayCutoffPopResponse>(
       super.getDb(),
-      depTables,
-      async tx => this.rawPopAddress(tx, deps, body)
+      [
+        ...depTables,
+        ...mapToTables(super.getDb(), derivationTables),
+      ],
+      async tx => this.rawPopAddress(tx, deps, body, derivationTables)
     );
   }
 
@@ -741,9 +761,10 @@ const DisplayCutoffMixin = (
     tx: lf$Transaction,
     deps: {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     _body: IDisplayCutoffGetRequest,
+    derivationTables: Map<number, string>,
   ): Promise<IDisplayCutoffGetResponse> => {
     if (this.getBip44Parent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
       // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
@@ -757,13 +778,13 @@ const DisplayCutoffMixin = (
         level: Bip44DerivationLevels.CHAIN.level,
       },
       async (derivationId) => {
-        const result = await GetBip44DerivationSpecific.get<
+        const result = await GetDerivationSpecific.get<
           Bip44ChainRow
         >(
           super.getDb(), tx,
           [derivationId],
           Bip44DerivationLevels.CHAIN.level,
-          mapToTables,
+          derivationTables,
         );
         const chainDerivation = result[0];
         if (chainDerivation === undefined) {
@@ -784,9 +805,10 @@ const DisplayCutoffMixin = (
   getCutoff = async (
     body: IDisplayCutoffGetRequest,
   ): Promise<IDisplayCutoffGetResponse> => {
+    const derivationTables = this.getConceptualWallet().getDerivationTables();
     const deps = Object.freeze({
       GetPathWithSpecific,
-      GetBip44DerivationSpecific,
+      GetDerivationSpecific,
     });
     const depTables = Object
       .keys(deps)
@@ -794,8 +816,11 @@ const DisplayCutoffMixin = (
       .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii<IDisplayCutoffGetResponse>(
       super.getDb(),
-      depTables,
-      async tx => this.rawGetCutoff(tx, deps, body)
+      [
+        ...depTables,
+        ...mapToTables(super.getDb(), derivationTables),
+      ],
+      async tx => this.rawGetCutoff(tx, deps, body, derivationTables)
     );
   }
 
@@ -875,9 +900,10 @@ const HasChainsMixin = (
     deps: {|
       GetAddress: Class<GetAddress>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     body: IHasChainsRequest,
+    derivationTables: Map<number, string>,
   ): Promise<IHasChainsResponse> => {
     if (this.getBip44Parent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
       // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
@@ -892,15 +918,17 @@ const HasChainsMixin = (
         commonPrefix: super.getPathToPublic(),
         queryPath: [body.chainId, null],
       },
+      derivationTables,
     );
   }
   getAddressesForChain = async (
     body: IHasChainsRequest,
   ): Promise<IHasChainsResponse> => {
+    const derivationTables = this.getConceptualWallet().getDerivationTables();
     const deps = Object.freeze({
       GetAddress,
       GetPathWithSpecific,
-      GetBip44DerivationSpecific,
+      GetDerivationSpecific,
     });
     const depTables = Object
       .keys(deps)
@@ -908,8 +936,11 @@ const HasChainsMixin = (
       .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii(
       super.getDb(),
-      depTables,
-      async tx => this.rawGetAddressesForChain(tx, deps, body)
+      [
+        ...depTables,
+        ...mapToTables(super.getDb(), derivationTables),
+      ],
+      async tx => this.rawGetAddressesForChain(tx, deps, body, derivationTables)
     );
   }
 
@@ -919,18 +950,20 @@ const HasChainsMixin = (
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
       GetAddress: Class<GetAddress>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     _body: IGetNextUnusedForChainRequest,
+    derivationTables: Map<number, string>,
   ): Promise<IGetNextUnusedForChainResponse> => {
     const internalAddresses = await this.rawGetAddressesForChain(
       tx,
       {
         GetAddress: deps.GetAddress,
         GetPathWithSpecific: deps.GetPathWithSpecific,
-        GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
+        GetDerivationSpecific: deps.GetDerivationSpecific,
       },
       { chainId: INTERNAL },
+      derivationTables,
     );
     return await rawGetNextUnusedIndex(
       super.getDb(), tx,
@@ -941,11 +974,12 @@ const HasChainsMixin = (
   nextInternal = async (
     body: IGetNextUnusedForChainRequest,
   ): Promise<IGetNextUnusedForChainResponse> => {
+    const derivationTables = this.getConceptualWallet().getDerivationTables();
     const deps = Object.freeze({
       GetUtxoTxOutputsWithTx,
       GetAddress,
       GetPathWithSpecific,
-      GetBip44DerivationSpecific,
+      GetDerivationSpecific,
     });
     const depTables = Object
       .keys(deps)
@@ -954,7 +988,7 @@ const HasChainsMixin = (
     return await raii(
       super.getDb(),
       depTables,
-      async tx => this.rawNextInternal(tx, deps, body)
+      async tx => this.rawNextInternal(tx, deps, body, derivationTables)
     );
   }
 };
@@ -993,9 +1027,10 @@ const ScanUtxoAccountAddressesMixin = (
       AddDerivationTree: Class<AddDerivationTree>,
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
-      GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     body: IScanAddressesRequest,
+    derivationTables: Map<number, string>,
   ): Promise<IScanAddressesResponse> => {
     // TODO: make sure we only scan payment keys
     const pubKey = await this.rawGetPublicKey(
@@ -1013,9 +1048,10 @@ const ScanUtxoAccountAddressesMixin = (
       {
         GetAddress: deps.GetAddress,
         GetPathWithSpecific: deps.GetPathWithSpecific,
-        GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
+        GetDerivationSpecific: deps.GetDerivationSpecific,
       },
       { chainId: INTERNAL },
+      derivationTables
     );
     const nextUnusedInternal = await rawGetNextUnusedIndex(
       super.getDb(), tx,
@@ -1027,9 +1063,10 @@ const ScanUtxoAccountAddressesMixin = (
       {
         GetAddress: deps.GetAddress,
         GetPathWithSpecific: deps.GetPathWithSpecific,
-        GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
+        GetDerivationSpecific: deps.GetDerivationSpecific,
       },
       { chainId: EXTERNAL },
+      derivationTables
     );
     const nextUnusedExternal = await rawGetNextUnusedIndex(
       super.getDb(), tx,
@@ -1059,15 +1096,17 @@ const ScanUtxoAccountAddressesMixin = (
         ModifyDisplayCutoff: deps.ModifyDisplayCutoff,
         GetDerivationsByPath: deps.GetDerivationsByPath,
         GetPathWithSpecific: deps.GetPathWithSpecific,
-        GetBip44DerivationSpecific: deps.GetBip44DerivationSpecific,
+        GetDerivationSpecific: deps.GetDerivationSpecific,
       },
       { tree: newToInsert },
+      derivationTables,
     );
   }
   scanAddresses = async (
     body: IScanAddressesRequest,
   ): Promise<IScanAddressesResponse> => {
-    const depTables = Object.freeze({
+    const derivationTables = this.getConceptualWallet().getDerivationTables();
+    const deps = Object.freeze({
       GetKeyForPublicDeriver,
       GetAddress,
       GetPathWithSpecific,
@@ -1077,19 +1116,23 @@ const ScanUtxoAccountAddressesMixin = (
       AddDerivationTree,
       GetDerivationsByPath,
       ModifyDisplayCutoff,
-      GetBip44DerivationSpecific,
+      GetDerivationSpecific,
     });
-    const tables = Object
-      .keys(depTables)
-      .map(key => depTables[key])
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
       .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii(
       super.getDb(),
-      tables,
+      [
+        ...depTables,
+        ...mapToTables(super.getDb(), derivationTables),
+      ],
       async tx => this.rawScanAddresses(
         tx,
-        depTables,
-        body
+        deps,
+        body,
+        derivationTables,
       )
     );
   }

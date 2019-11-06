@@ -180,7 +180,7 @@ export async function derivePublicDeriver<Row>(
   body: IDerivePublicFromPrivateRequest,
   privateDeriverKeyDerivationId: number,
   privateDeriverLevel: number,
-  tableMap: Map<number, string>,
+  derivationTables: Map<number, string>,
 ): Promise<IDerivePublicFromPrivateResponse<Row>> {
   return await deps.DerivePublicDeriverFromKey.add<Row>(
     db, tx,
@@ -227,7 +227,7 @@ export async function derivePublicDeriver<Row>(
     privateDeriverKeyDerivationId,
     privateDeriverLevel,
     conceptualWalletId,
-    tableMap,
+    derivationTables,
   );
 }
 
@@ -240,7 +240,7 @@ const PublicFromPrivateMixin = (
     tx: lf$Transaction,
     deps: {| DerivePublicDeriverFromKey: Class<DerivePublicDeriverFromKey> |},
     body: IDerivePublicFromPrivateRequest,
-    tableMap: Map<number, string>,
+    derivationTables: Map<number, string>,
   ): Promise<IDerivePublicFromPrivateResponse<Row>> => {
     const id = super.getPrivateDeriverKeyDerivationId();
     const level = super.getPrivateDeriverLevel();
@@ -255,7 +255,7 @@ const PublicFromPrivateMixin = (
       body,
       id,
       level,
-      tableMap,
+      derivationTables,
     );
   }
   derivePublicDeriverFromPrivate = async <Row>(
@@ -417,13 +417,13 @@ const AdhocPublicDeriverMixin = (
     tx: lf$Transaction,
     deps: {| AddAdhocPublicDeriver: Class<AddAdhocPublicDeriver> |},
     body: IAddAdhocPublicDeriverRequest,
-    tableMap: Map<number, string>,
+    derivationTables: Map<number, string>,
   ): Promise<IAddAdhocPublicDeriverResponse<Row>> => {
     return await deps.AddAdhocPublicDeriver.add<Row>(
       super.getDb(), tx,
       body,
       super.getConceptualWalletId(),
-      tableMap,
+      derivationTables,
     );
   }
   addAdhocPubicDeriver = async <Row>(

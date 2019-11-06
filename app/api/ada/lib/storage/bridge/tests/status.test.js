@@ -544,8 +544,8 @@ async function baseTest(
     }
   }
 
-  const txList = await getAllUtxoTransactions(basePubDeriver.getDb(), {
-    addressFetch: basePubDeriver,
+  const txList = await getAllUtxoTransactions({
+    publicDeriver: basePubDeriver,
   });
   expect(txList).toMatchSnapshot();
 
