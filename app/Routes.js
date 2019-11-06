@@ -32,6 +32,9 @@ import YoroiTransferPage from './containers/transfer/YoroiTransferPage';
 import URILandingPage from './containers/uri/URILandingPage';
 import Transfer from './containers/transfer/Transfer';
 import Staking from './containers/staking/Staking';
+import StakingDashboardPage from './containers/staking/StakingDashboardPage';
+import StakingSimulatorPage from './containers/staking/StakingSimulatorPage';
+import StakingAdvancedSimulatorPage from './containers/staking/StakingAdvancedSimulatorPage';
 
 /* eslint-disable max-len */
 export const Routes = (
@@ -90,7 +93,9 @@ export const Routes = (
         exact
         path={ROUTES.STAKING.ROOT}
         component={(props) => (
-          <Staking {...props} stores={stores} actions={actions} />
+          <Staking {...props} stores={stores} actions={actions}>
+            {StakingSubpages(stores, actions)}
+          </Staking>
         )}
       />
       <Route
@@ -176,6 +181,27 @@ const TransferSubpages = (stores, actions) => (
       component={(props) => <DaedalusTransferPage {...props} stores={stores} actions={actions} />}
     />
     <Redirect to={ROUTES.TRANSFER.DAEDALUS} />
+  </Switch>
+);
+
+const StakingSubpages = (stores, actions) => (
+  <Switch>
+    <Route
+      exact
+      path={ROUTES.STAKING.DASHBOARD}
+      component={(props) => <StakingDashboardPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.STAKING.SIMULATOR}
+      component={(props) => <StakingSimulatorPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.STAKING.ADVANCED_SIMULATOR}
+      component={(props) => <StakingAdvancedSimulatorPage {...props} stores={stores} actions={actions} />}
+    />
+    <Redirect to={ROUTES.STAKING.DASHBOARD} />
   </Switch>
 );
 

@@ -32,6 +32,10 @@ export const ROUTES = {
     ROOT: '/send-from-uri',
   },
   STAKING: {
-    ROOT: '/staking'
+    ROOT: '/staking',
+    PAGE: '/staking/:id/:page',
+    DASHBOARD: '/staking/:id/dashboard',
+    SIMULATOR: '/staking/:id/simulator',
+    ADVANCED_SIMULATOR: '/staking/:id/advanced-simulator',
   }
 };

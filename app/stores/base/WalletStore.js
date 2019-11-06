@@ -109,7 +109,6 @@ export default class WalletsStore extends Store {
 
     if (environment.isShelley()) {
       // For Shelly we want to load Staking pages
-      console.log('TODO: For Shelly we want to load Staking pages');
       this.goToStakingRoute(newWithCachedData[0].self);
     } else {
       this.goToWalletRoute(newWithCachedData[0].self);
@@ -221,8 +220,15 @@ export default class WalletsStore extends Store {
     this.actions.router.goToRoute.trigger({ route });
   }
 
+  getStakingRoute = (
+    publicDeriver: PublicDeriver,
+    page: string = 'dashboard'
+  ): string => (
+    buildRoute(ROUTES.STAKING.PAGE, { id: publicDeriver.getPublicDeriverId(), page })
+  );
+
   goToStakingRoute(publicDeriver: PublicDeriver) {
-    const route = this.getWalletRoute(publicDeriver, 'staking');
+    const route = this.getStakingRoute(publicDeriver);
     this.actions.router.goToRoute.trigger({ route });
   }
 
@@ -353,7 +359,8 @@ export default class WalletsStore extends Store {
         return this._unsetActiveWallet();
       }
       const matchWalletRoute = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
-      if (matchWalletRoute !== false) {
+      const matchStakingRoute = matchRoute(`${ROUTES.STAKING.ROOT}/:id(*page)`, currentRoute);
+      if (matchWalletRoute !== false || (environment.isShelley() && matchStakingRoute !== false)) {
         // We have a route for a specific wallet -> lets try to find it
         let publicDeriverForRoute = undefined;
         for (const publicDeriver of this.publicDerivers) {
@@ -367,7 +374,13 @@ export default class WalletsStore extends Store {
         } else if (hasAnyPublicDeriver) {
           // There is no wallet with given id -> pick first wallet
           this._setActiveWallet({ wallet: this.publicDerivers[0] });
-          if (this.selected != null) {
+
+          if (environment.isShelley()) {
+            if (this.selected == null) return;
+            // For Shelly we want to load Staking pages
+            this.goToStakingRoute(this.selected.self);
+          } else {
+            if (this.selected == null) return;
             this.goToWalletRoute(this.selected.self);
           }
         }
@@ -376,7 +389,13 @@ export default class WalletsStore extends Store {
         if (!this.hasActiveWallet && hasAnyPublicDeriver) {
           this._setActiveWallet({ wallet: this.publicDerivers[0] });
         }
-        if (this.selected != null) {
+
+        if (environment.isShelley()) {
+          if (this.selected == null) return;
+          // For Shelly we want to load Staking pages
+          this.goToStakingRoute(this.selected.self);
+        } else {
+          if (this.selected == null) return;
           this.goToWalletRoute(this.selected.self);
         }
       }

@@ -1,63 +1,81 @@
 // @flow
-
-import React from 'react';
+import React, { Component } from 'react';
+import { observer } from 'mobx-react';
 import MainLayout from '../MainLayout';
 import TopBarContainer from '../TopBarContainer';
+import StakingWithNavigation from '../../components/staking/layouts/StakingWithNavigation';
+import LoadingSpinner from '../../components/widgets/LoadingSpinner';
+import { buildRoute } from '../../utils/routing';
+import { ROUTES } from '../../routes-config';
+import environment from '../../environment';
 import type { InjectedContainerProps } from '../../types/injectedPropsType';
 
-const prettifyReceivedPools = (pools: Array<{
-  name: string,
-  poolHash: string,
-}>) => {
-  return pools.map(({ name, poolHash }) => `${name}\n${poolHash}\n`)
-    .join('\n');
-};
+type Props = InjectedContainerProps;
 
-const messageHandler = (event) => {
-  if (event.origin !== process.env.SEIZA_FOR_YOROI_URL) return;
-  console.log('Received message from Seiza:', event.data);
+@observer
+export default class Staking extends Component<Props> {
 
-  // eslint-disable-next-line no-alert
-  alert('You have selected following pools:\n' + prettifyReceivedPools(event.data));
-};
+  isActiveScreen = (page: string): boolean => {
+    const { app } = this.props.stores;
+    const { wallets } = this.props.stores.substores.ada;
+    const selected = wallets.selected;
+    if (selected == null) return false;
+    const screenRoute = buildRoute(
+      ROUTES.STAKING.PAGE,
+      {
+        id: selected.self.getPublicDeriverId(),
+        page
+      }
+    );
+    return app.currentRoute === screenRoute;
+  };
 
-const useIframeMessageReceiver = () => {
-  React.useEffect(() => {
-    window.addEventListener('message', messageHandler, false);
+  handleStakingNavItemClick = (page: string): void => {
+    const { wallets } = this.props.stores.substores.ada;
+    const selected = wallets.selected;
+    if (selected == null) return;
+    this.props.actions.router.goToRoute.trigger({
+      route: ROUTES.STAKING.PAGE,
+      params: { id: selected.self.getPublicDeriverId(), page },
+    });
+  };
 
-    return () => {
-      window.removeEventListener('message', messageHandler);
-    };
+  render() {
+    const { wallets, } = this.props.stores.substores.ada;
+    const { actions, stores } = this.props;
+    const { profile } = stores;
+    const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
+    const topbarContainer = (<TopBarContainer actions={actions} stores={stores} />);
 
-  }, []);
-};
+    if (!wallets.selected) {
+      return (
+        <MainLayout
+          topbar={topbarContainer}
+          actions={actions}
+          stores={stores}
+          classicTheme={profile.isClassicTheme}
+          connectionErrorType={checkAdaServerStatus}
+        >
+          <LoadingSpinner />
+        </MainLayout>
+      );
+    }
 
-const Staking = (props: InjectedContainerProps) => {
-  const iframeRef = React.useRef(null);
-  const { actions, stores, children } = props;
-  const { profile } = stores;
-  const topbarContainer = (<TopBarContainer actions={actions} stores={stores} />);
-
-  useIframeMessageReceiver();
-
-  const seizaUrl = process.env.SEIZA_FOR_YOROI_URL;
-  if (seizaUrl == null) {
-    throw new Error('Staking undefined SEIZA_FOR_YOROI_URL should never happen');
+    return (
+      <MainLayout
+        topbar={topbarContainer}
+        actions={actions}
+        stores={stores}
+        classicTheme={profile.isClassicTheme}
+        connectionErrorType={checkAdaServerStatus}
+      >
+        <StakingWithNavigation
+          isActiveScreen={this.isActiveScreen}
+          onWalletNavItemClick={this.handleStakingNavItemClick}
+        >
+          {this.props.children}
+        </StakingWithNavigation>
+      </MainLayout>
+    );
   }
-  return (
-    <MainLayout
-      topbar={topbarContainer}
-      // TODO: Check Seiza server connection
-      connectionErrorType="healthy"
-      classicTheme={profile.isClassicTheme}
-      actions={actions}
-      stores={stores}
-    >
-      <iframe ref={iframeRef} title="Staking" src={`${seizaUrl}/staking?locale=${profile.currentLocale}`} frameBorder="0" width="100%" height="100%" />;
-      {children}
-    </MainLayout>
-  );
-
-};
-
-export default Staking;
+}

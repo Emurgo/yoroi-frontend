@@ -1,0 +1,10 @@
+.component {
+  display: flex;
+  height: 100%;
+}
+
+.navItem {
+  height: 100%;
+  width: 100%;
+  background-color: var(--theme-nav-item-background-color);
+}
