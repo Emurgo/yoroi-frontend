@@ -358,16 +358,24 @@ export default class WalletsStore extends Store {
       if (!hasAnyPublicDeriver) {
         return this._unsetActiveWallet();
       }
-      const matchWalletRoute = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
-      const matchStakingRoute = matchRoute(`${ROUTES.STAKING.ROOT}/:id(*page)`, currentRoute);
-      if (matchWalletRoute !== false || (environment.isShelley() && matchStakingRoute !== false)) {
+
+      let testRoute: string = '';
+      if (environment.isShelley()) {
+        testRoute = `${ROUTES.STAKING.ROOT}/:id(*page)`;
+      } else {
+        testRoute = `${ROUTES.WALLETS.ROOT}/:id(*page)`;
+      }
+
+      const matchedRoute = matchRoute(testRoute, currentRoute);
+      if (matchedRoute !== false) {
         // We have a route for a specific wallet -> lets try to find it
         let publicDeriverForRoute = undefined;
         for (const publicDeriver of this.publicDerivers) {
-          if (publicDeriver.self.getPublicDeriverId().toString() === matchWalletRoute.id) {
+          if (publicDeriver.self.getPublicDeriverId().toString() === matchedRoute.id) {
             publicDeriverForRoute = publicDeriver;
           }
         }
+
         if (publicDeriverForRoute != null) {
           // The wallet exists, we are done
           this._setActiveWallet({ wallet: publicDeriverForRoute });
