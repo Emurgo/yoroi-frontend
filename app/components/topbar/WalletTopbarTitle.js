@@ -5,8 +5,6 @@ import { observer } from 'mobx-react';
 import SvgInline from 'react-svg-inline';
 import classNames from 'classnames';
 import styles from './WalletTopbarTitle.scss';
-import { matchRoute } from '../../utils/routing';
-import { ROUTES } from '../../routes-config';
 import WalletAccountIcon from './WalletAccountIcon';
 
 import { defineMessages, intlShape } from 'react-intl';
@@ -25,13 +23,13 @@ const messages = defineMessages({
 
 type Props = {|
   publicDeriver: null | PublicDeriverWithCachedMeta,
-  currentRoute: string,
   formattedWalletAmount?: BigNumber => string,
   themeProperties?: {
     identiconSaturationFactor: number,
   },
   onUpdateHideBalance: void => void,
-  shouldHideBalance: boolean
+  shouldHideBalance: boolean,
+  showWalletInfo: boolean
 |};
 
 function constructPlate(
@@ -65,15 +63,11 @@ export default class WalletTopbarTitle extends Component<Props> {
 
   render() {
     const {
-      publicDeriver, currentRoute, formattedWalletAmount, themeProperties,
-      shouldHideBalance, onUpdateHideBalance
+      publicDeriver, formattedWalletAmount, themeProperties,
+      shouldHideBalance, onUpdateHideBalance, showWalletInfo
     } = this.props;
     const { identiconSaturationFactor } = themeProperties || {};
     const { intl } = this.context;
-
-    // If we are looking at a wallet, show its name and balance
-    const walletRoutesMatch = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
-    const showWalletInfo = (walletRoutesMatch !== false) && (publicDeriver != null);
 
     const isHardwareWallet = publicDeriver != null &&
       publicDeriver.self.getConceptualWallet().getWalletType() === WalletTypeOption.HARDWARE_WALLET;
