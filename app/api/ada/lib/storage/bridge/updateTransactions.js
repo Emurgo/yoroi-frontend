@@ -8,6 +8,7 @@ import type {
 import {
   getAllSchemaTables,
   raii,
+  mapToTables,
 } from '../database/utils';
 import type {
   BlockInsert, BlockRow,
@@ -63,7 +64,6 @@ import {
   GetKeyForPublicDeriver,
 } from '../database/walletTypes/core/api/read';
 import { ModifyDisplayCutoff, } from '../database/walletTypes/bip44/api/write';
-import { GetBip44Tables, } from '../database/walletTypes/bip44/api/utils';
 import { AddDerivationTree, } from '../database/walletTypes/common/api/write';
 import { GetBip44DerivationSpecific, } from '../database/walletTypes/bip44/api/read';
 import { ModifyLastSyncInfo, } from '../database/walletTypes/core/api/write';
@@ -279,6 +279,7 @@ export async function updateTransactions(
   getTransactionsHistoryForAddresses: HistoryFunc,
   getBestBlock: BestBlockFunc,
 ) {
+  const derivationTables = publicDeriver.getConceptualWallet().getDerivationTables();
   let lastSyncInfo = undefined;
   try {
     const updateDepTables = Object.freeze({
@@ -291,7 +292,6 @@ export async function updateTransactions(
       GetOrAddAddress,
       GetPublicDeriver,
       AddDerivationTree,
-      GetBip44Tables,
       MarkUtxo,
       ModifyDisplayCutoff,
       GetDerivationsByPath,
@@ -311,7 +311,10 @@ export async function updateTransactions(
 
     await raii(
       db,
-      updateTables,
+      [
+        ...updateTables,
+        ...mapToTables(db, derivationTables),
+      ],
       async dbTx => {
         lastSyncInfo = await updateDepTables.GetLastSyncForPublicDeriver.forId(
           db, dbTx,
@@ -330,6 +333,7 @@ export async function updateTransactions(
           checkAddressesInUse,
           getTransactionsHistoryForAddresses,
           getBestBlock,
+          derivationTables,
         );
       }
     );
@@ -544,7 +548,6 @@ async function rawUpdateTransactions(
     GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
     GetOrAddAddress: Class<GetOrAddAddress>,
     GetPublicDeriver: Class<GetPublicDeriver>,
-    GetBip44Tables: Class<GetBip44Tables>,
     AddDerivationTree: Class<AddDerivationTree>,
     MarkUtxo: Class<MarkUtxo>,
     ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
@@ -563,6 +566,7 @@ async function rawUpdateTransactions(
   checkAddressesInUse: FilterFunc,
   getTransactionsHistoryForAddresses: HistoryFunc,
   getBestBlock: BestBlockFunc,
+  derivationTables: Map<number, string>,
 ): Promise<void> {
   const toAbsoluteSlotNumber = await genToAbsoluteSlotNumber();
   // 1) Check if backend is synced (avoid rollbacks if backend has to resync from block 1)
@@ -598,7 +602,6 @@ async function rawUpdateTransactions(
           GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx,
           GetOrAddAddress: deps.GetOrAddAddress,
           GetPublicDeriver: deps.GetPublicDeriver,
-          GetBip44Tables: deps.GetBip44Tables,
           AddDerivationTree: deps.AddDerivationTree,
           ModifyDisplayCutoff: deps.ModifyDisplayCutoff,
           GetDerivationsByPath: deps.GetDerivationsByPath,
@@ -606,6 +609,7 @@ async function rawUpdateTransactions(
         },
         // TODO: race condition because we don't pass in best block here
         { checkAddressesInUse },
+        derivationTables,
       );
     }
 

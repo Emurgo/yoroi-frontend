@@ -179,10 +179,10 @@ export class GetChildWithSpecific {
     getSpecific: (derivationId: number) => Promise<$ReadOnly<Row>>,
     parentId: number,
     childIndex: number,
-  ): Promise<void | {
+  ): Promise<void | {|
     derivation:  $ReadOnly<KeyDerivationRow>,
     levelSpecific: $ReadOnly<Row>,
-  }> {
+  |}> {
     const derivation = await GetChildWithSpecific.depTables.GetChildIfExists.get(
       db, tx,
       parentId,
@@ -396,10 +396,10 @@ export class GetPathWithSpecific {
     tx: lf$Transaction,
     request: GetPathWithSpecificRequest,
     getSpecific: (derivationId: number) => Promise<$ReadOnly<Row>>,
-  ): Promise<{
+  ): Promise<{|
     path: $ReadOnlyArray<$ReadOnly<KeyDerivationRow>>,
     levelSpecific: Row,
-  }> {
+  |}> {
     const path = await GetPathWithSpecific.depTables.GetDerivationsByPath.getSinglePath(
       db, tx,
       request.pubDeriverKeyDerivationId,
@@ -418,10 +418,10 @@ export class GetPathWithSpecific {
     tx: lf$Transaction,
     request: GetPathWithSpecificByTreeRequest,
     getSpecific: (derivationIds: Array<number>) => Promise<$ReadOnlyArray<$ReadOnly<Row>>>,
-  ): Promise<{
+  ): Promise<{|
     pathMap: PathMapType,
     rows: $ReadOnlyArray<$ReadOnly<Row>>,
-  }> {
+  |}> {
     const pathMap = await GetDerivationsByPath.getTree(
       db, tx,
       request.startingDerivation,
@@ -450,11 +450,11 @@ export class GetKeyForDerivation {
     derivationId: number,
     getPublic: boolean,
     getPrivate: boolean,
-  ): Promise<{
+  ): Promise<{|
     KeyDerivation: $ReadOnly<KeyDerivationRow>,
     publicKey: $ReadOnly<KeyRow> | null | void,
     privateKey: $ReadOnly<KeyRow> | null | void,
-  }> {
+  |}> {
     const keyDerivationRow = await GetKeyForDerivation.depTables.GetKeyDerivation.get(
       db, tx,
       derivationId,

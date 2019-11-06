@@ -15,9 +15,6 @@ import {
 import type {
   ModifyDisplayCutoff,
 } from '../../database/walletTypes/bip44/api/write';
-import {
-  GetBip44Tables,
-} from '../../database/walletTypes/bip44/api/utils';
 import type {
   AddAdhocPublicDeriverRequest, AddAdhocPublicDeriverResponse,
   AddDerivationTree,
@@ -156,12 +153,11 @@ export type IAddBip44FromPublicFunc = (
   body: IAddBip44FromPublicRequest
 ) => Promise<IAddBip44FromPublicResponse>;
 export interface IAddBip44FromPublic {
-  +rawAddBip44FromPublic: RawVariation<
+  +rawAddBip44FromPublic: RawTableVariation<
     IAddBip44FromPublicFunc,
     {|
       GetPublicDeriver: Class<GetPublicDeriver>,
       AddDerivationTree: Class<AddDerivationTree>,
-      GetBip44Tables: Class<GetBip44Tables>,
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,

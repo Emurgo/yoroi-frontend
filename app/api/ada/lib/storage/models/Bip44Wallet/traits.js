@@ -50,6 +50,7 @@ import {
   getAllSchemaTables,
   raii,
   StaleStateError,
+  mapToTables,
 } from '../../database/utils';
 
 import type {
@@ -70,7 +71,7 @@ import {
 } from '../../database/walletTypes/common/api/write';
 import { GetBip44DerivationSpecific } from '../../database/walletTypes/bip44/api/read';
 import {
-  GetBip44Tables,
+  Bip44TableMap,
   Bip44DerivationLevels,
 } from '../../database/walletTypes/bip44/api/utils';
 
@@ -253,13 +254,13 @@ const AddBip44FromPublicMixin = (
     deps: {|
       GetPublicDeriver: Class<GetPublicDeriver>,
       AddDerivationTree: Class<AddDerivationTree>,
-      GetBip44Tables: Class<GetBip44Tables>,
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
     |},
     body: IAddBip44FromPublicRequest,
+    derivationTables: Map<number, string>,
   ): Promise<IAddBip44FromPublicResponse> => {
     const pubDeriver = await deps.GetPublicDeriver.get(
       super.getDb(), tx,
@@ -268,14 +269,13 @@ const AddBip44FromPublicMixin = (
     if (pubDeriver === undefined) {
       throw new Error('AddBip44FromPublic::rawAddBip44FromPublic pubDeriver');
     }
-    const bip44Tables = deps.GetBip44Tables.get();
     await deps.AddDerivationTree.excludingParent(
       super.getDb(), tx,
       {
         derivationId: pubDeriver.KeyDerivationId,
         children: body.tree,
       },
-      bip44Tables,
+      derivationTables,
       this.getBip44Parent().getPublicDeriverLevel(),
     );
     const asDisplayCutoffInstance = asDisplayCutoff(this);
@@ -299,10 +299,10 @@ const AddBip44FromPublicMixin = (
   addBip44FromPublic = async (
     body: IAddBip44FromPublicRequest,
   ): Promise<IAddBip44FromPublicResponse> => {
+    const derivationTables = this.getConceptualWallet().getDerivationTables();
     const deps = Object.freeze({
       GetPublicDeriver,
       AddDerivationTree,
-      GetBip44Tables,
       ModifyDisplayCutoff,
       GetDerivationsByPath,
       GetPathWithSpecific,
@@ -314,8 +314,11 @@ const AddBip44FromPublicMixin = (
       .flatMap(table => getAllSchemaTables(super.getDb(), table));
     return await raii<IAddBip44FromPublicResponse>(
       super.getDb(),
-      depTables,
-      async tx => this.rawAddBip44FromPublic(tx, deps, body)
+      [
+        ...depTables,
+        ...mapToTables(super.getDb(), derivationTables),
+      ],
+      async tx => this.rawAddBip44FromPublic(tx, deps, body, derivationTables)
     );
   }
 };
@@ -755,11 +758,12 @@ const DisplayCutoffMixin = (
       },
       async (derivationId) => {
         const result = await GetBip44DerivationSpecific.get<
-        Bip44ChainRow
+          Bip44ChainRow
         >(
           super.getDb(), tx,
           [derivationId],
           Bip44DerivationLevels.CHAIN.level,
+          mapToTables,
         );
         const chainDerivation = result[0];
         if (chainDerivation === undefined) {
@@ -987,7 +991,6 @@ const ScanUtxoAccountAddressesMixin = (
       GetOrAddAddress: Class<GetOrAddAddress>,
       GetPublicDeriver: Class<GetPublicDeriver>,
       AddDerivationTree: Class<AddDerivationTree>,
-      GetBip44Tables: Class<GetBip44Tables>,
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetBip44DerivationSpecific: Class<GetBip44DerivationSpecific>,
@@ -1053,7 +1056,6 @@ const ScanUtxoAccountAddressesMixin = (
       {
         GetPublicDeriver: deps.GetPublicDeriver,
         AddDerivationTree: deps.AddDerivationTree,
-        GetBip44Tables: deps.GetBip44Tables,
         ModifyDisplayCutoff: deps.ModifyDisplayCutoff,
         GetDerivationsByPath: deps.GetDerivationsByPath,
         GetPathWithSpecific: deps.GetPathWithSpecific,
@@ -1073,7 +1075,6 @@ const ScanUtxoAccountAddressesMixin = (
       GetOrAddAddress,
       GetPublicDeriver,
       AddDerivationTree,
-      GetBip44Tables,
       GetDerivationsByPath,
       ModifyDisplayCutoff,
       GetBip44DerivationSpecific,

@@ -38,12 +38,6 @@ export const Bip44DerivationLevels = Object.freeze({
   },
 });
 
-export const Bip44TableMap = new Map<number, string>(
-  Object.keys(Bip44DerivationLevels)
-    .map(key => Bip44DerivationLevels[key])
-    .map(val => [val.level, val.table.name])
-);
-
 /**
  * We sometimes need to lock all level-specific derivation tables
  * This is because we need to statically know which tables will be accessed by a query
@@ -53,27 +47,11 @@ export const Bip44TableMap = new Map<number, string>(
  * follow by a query at that level.
  * Since we cannot statically determine which level will be used, we just lock all tables.
  */
-const allBip44DerivationTables = {
-  [RootDerivationSchema.name]: RootDerivationSchema,
-  [PurposeDerivationSchema.name]: PurposeDerivationSchema,
-  [CoinTypeDerivationSchema.name]: CoinTypeDerivationSchema,
-  [Bip44AccountSchema.name]: Bip44AccountSchema,
-  [Bip44ChainSchema.name]: Bip44ChainSchema,
-  [Bip44AddressSchema.name]: Bip44AddressSchema,
-};
-
-// TODO: consider deleting this
-export class GetBip44Tables {
-  static ownTables = Object.freeze({
-    ...allBip44DerivationTables,
-  });
-  static depTables = Object.freeze({});
-
-  static get(
-  ): Map<number, string> {
-    return Bip44TableMap;
-  }
-}
+export const Bip44TableMap = new Map<number, string>(
+  Object.keys(Bip44DerivationLevels)
+    .map(key => Bip44DerivationLevels[key])
+    .map(val => [val.level, val.table.name])
+);
 
 export function flattenInsertTree(
   tree: TreeInsert<any>,

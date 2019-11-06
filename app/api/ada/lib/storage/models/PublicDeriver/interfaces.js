@@ -30,6 +30,7 @@ import type {
   IChangePasswordRequestFunc, IChangePasswordRequest,
   Address, Addressing,
   RawVariation,
+  RawTableVariation,
 } from '../common/interfaces';
 import {
   GetPublicDeriver,
@@ -46,9 +47,6 @@ import {
 import {
   ModifyDisplayCutoff,
 } from '../../database/walletTypes/bip44/api/write';
-import {
-  GetBip44Tables,
-} from '../../database/walletTypes/bip44/api/utils';
 import {
   AddDerivationTree,
 } from '../../database/walletTypes/common/api/write';
@@ -348,7 +346,7 @@ export type IScanAddressesFunc = (
   body: IScanAddressesRequest
 ) => Promise<IScanAddressesResponse>;
 export interface IScanAddresses {
-  +rawScanAddresses: RawVariation<
+  +rawScanAddresses: RawTableVariation<
     IScanAddressesFunc,
     {|
       GetKeyForPublicDeriver: Class<GetKeyForPublicDeriver>,
@@ -358,7 +356,6 @@ export interface IScanAddresses {
       GetOrAddAddress: Class<GetOrAddAddress>,
       GetPublicDeriver: Class<GetPublicDeriver>,
       AddDerivationTree: Class<AddDerivationTree>,
-      GetBip44Tables: Class<GetBip44Tables>,
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,

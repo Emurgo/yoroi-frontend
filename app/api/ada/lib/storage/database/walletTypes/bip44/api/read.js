@@ -11,9 +11,6 @@ import type {
 import * as Tables from '../tables';
 
 import {
-  GetBip44Tables,
-} from './utils';
-import {
   getRowIn,
   getRowFromKey,
 } from '../../../utils';
@@ -23,22 +20,21 @@ import {
 import { PublicDeriverSchema, } from '../../core/tables';
 import type { PublicDeriverRow, } from '../../core/tables';
 
+// TODO: this can be made entiirely generic
 export class GetBip44DerivationSpecific {
   static ownTables = Object.freeze({
     [KeyDerivationSchema.name]: KeyDerivationSchema,
   });
-  static depTables = Object.freeze({
-    GetBip44Tables,
-  });
+  static depTables = Object.freeze({});
 
   static async get<Row>(
     db: lf$Database,
     tx: lf$Transaction,
     derivationIds: Array<number>,
     level: number,
+    derivationTables: Map<number, string>,
   ): Promise<$ReadOnlyArray<$ReadOnly<Row>>> {
-    const bip44Tables = GetBip44DerivationSpecific.depTables.GetBip44Tables.get();
-    const tableName = bip44Tables.get(level);
+    const tableName = derivationTables.get(level);
     if (tableName == null) {
       throw new Error('GetBip44DerivationSpecific::get Unknown table queried');
     }
