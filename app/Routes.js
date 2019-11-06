@@ -90,7 +90,6 @@ export const Routes = (
         )}
       />
       <Route
-        exact
         path={ROUTES.STAKING.ROOT}
         component={(props) => (
           <Staking {...props} stores={stores} actions={actions}>
