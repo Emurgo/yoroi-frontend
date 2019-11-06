@@ -393,7 +393,7 @@
   "wallet.settings.name.label": "Имя кошелька",
   "wallet.settings.password": "Пароль",
   "wallet.settings.passwordLastUpdated": "Последнее обновление {lastUpdated}",
-  "wallet.settings.unchangedPassword": "Password unchanged since wallet creation",
+  "wallet.settings.unchangedPassword": "Пароль не менялся с момента создания кошелька",
   "wallet.summary.no.transaction": "Транзакции не найдены",
   "wallet.summary.page.ledgerNanoSWalletIntegratedNotificationMessage": "Вы успешно интегрировались со своим устройством Ledger Nano S",
   "wallet.summary.page.pendingIncomingConfirmationLabel": "Входящие, ожидающие подтверждения",
