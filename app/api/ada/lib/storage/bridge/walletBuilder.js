@@ -14,7 +14,6 @@ import {
 import type {
   Bip44WrapperInsert,
 } from '../database/walletTypes/bip44/tables';
-import { Bip44TableMap } from '../database/walletTypes/bip44/api/utils';
 import {
   AddBip44Wrapper,
 } from '../database/walletTypes/bip44/api/write';
@@ -75,6 +74,7 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
 
   /** keep track of all tables we need to lock to build this wallet */
   tables: Array<string>;
+  derivationTables: Map<number, string>;
 
   /** keep track of all functions we need to call to build each part of this wallet */
   buildSteps: Array<CurrentState => Promise<void>>;
@@ -88,12 +88,14 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
     tables: Array<string>,
     buildSteps: Array<CurrentState => Promise<void>>,
     state: CurrentState,
+    derivationTables: Map<number, string>,
   ) {
     this.db = db;
     this.txHolder = txHolder;
     this.tables = tables;
     this.buildSteps = buildSteps;
     this.state = state;
+    this.derivationTables = derivationTables;
   }
 
   updateData<Requirement: {}, NewAddition>(
@@ -116,10 +118,14 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
         ...state,
         ...addition,
       },
+      this.derivationTables,
     );
   }
 
-  static start(db: lf$Database): WalletBuilder<$Shape<{||}>> {
+  static start(
+    db: lf$Database,
+    derivationTables: Map<number, string>,
+  ): WalletBuilder<$Shape<{||}>> {
     return new WalletBuilder(
       db,
       // only create the tx once commit is called
@@ -127,12 +133,17 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
       [],
       [],
       {},
+      derivationTables,
     );
   }
 
   async commit(): Promise<CurrentState> {
     // lock used tables
-    const usedTables = this.tables.map(
+    const allTables = Array.from([
+      ...this.tables,
+      ...Array.from(this.derivationTables.values()),
+    ]);
+    const usedTables = allTables.map(
       name => this.db.getSchema().table(name)
     );
 
@@ -209,17 +220,14 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
   ) => {
     return this.updateData<HasConceptualWallet, HasRoot>(
       AsNotNull<HasRoot>({ root: null }),
-      Array.from([
-        ...getAllTables(AddDerivationTree),
-        ...Array.from(Bip44TableMap.values()),
-      ]),
+      Array.from(getAllTables(AddDerivationTree)),
       async (finalData) => {
         const { rootInsert, tree } = insert(finalData);
         finalData.root = await AddDerivationTree.includingParent<Insert, *>(
           this.db,
           this.txHolder.tx,
           rootInsert,
-          Bip44TableMap,
+          this.derivationTables,
           0, // root
           tree,
         );
@@ -237,10 +245,7 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
   ) => {
     return this.updateData<HasBip44Wrapper & HasConceptualWallet, HasPublicDeriver<mixed>>(
       { publicDeriver: [] },
-      [
-        ...Array.from(getAllTables(AddAdhocPublicDeriver)),
-        ...Array.from(Bip44TableMap.values()),
-      ],
+      Array.from(getAllTables(AddAdhocPublicDeriver)),
       async (finalData) => {
         finalData.publicDeriver = [
           ...finalData.publicDeriver,
@@ -249,7 +254,7 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
             this.txHolder.tx,
             request(finalData),
             finalData.conceptualWalletRow.ConceptualWalletId,
-            Bip44TableMap,
+            this.derivationTables,
           )).publicDeriver
         ];
       },
@@ -266,10 +271,7 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
   ) => {
     return this.updateData<HasBip44Wrapper & HasConceptualWallet, HasPublicDeriver<mixed>>(
       { publicDeriver: [] },
-      [
-        ...Array.from(getAllTables(DerivePublicDeriverFromKey)),
-        ...Array.from(Bip44TableMap.values()),
-      ],
+      Array.from(getAllTables(DerivePublicDeriverFromKey)),
       async (finalData) => {
         const id = finalData.bip44WrapperRow.PrivateDeriverKeyDerivationId;
         const level = finalData.bip44WrapperRow.PrivateDeriverLevel;
@@ -286,7 +288,7 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
             request(finalData),
             id,
             level,
-            Bip44TableMap
+            this.derivationTables
           )
         ];
       },

@@ -28,6 +28,7 @@ import { encryptWithPassword } from '../../../../../utils/passwordCipher';
 
 import {
   Bip44DerivationLevels,
+  Bip44TableMap,
 } from '../database/walletTypes/bip44/api/utils';
 import {
   getAllSchemaTables,
@@ -165,7 +166,10 @@ export async function createStandardBip44Wallet(request: {
   let state;
   {
     state = await WalletBuilder
-      .start(request.db)
+      .start(
+        request.db,
+        Bip44TableMap,
+      )
       .addConceptualWallet(
         _finalState => ({
           CoinType: CARDANO_COINTYPE,
@@ -268,7 +272,10 @@ export async function createHardwareWallet(request: {
   let state;
   {
     state = await WalletBuilder
-      .start(request.db)
+      .start(
+        request.db,
+        Bip44TableMap,
+      )
       .addConceptualWallet(
         _finalState => ({
           CoinType: CARDANO_COINTYPE,
@@ -361,7 +368,10 @@ export async function migrateFromStorageV1(request: {
   // hardware wallet
   if (request.encryptedPk == null) {
     let builder = WalletBuilder
-      .start(request.db)
+      .start(
+        request.db,
+        Bip44TableMap,
+      )
       .addConceptualWallet(
         _finalState => ({
           CoinType: CARDANO_COINTYPE,
@@ -411,7 +421,10 @@ export async function migrateFromStorageV1(request: {
     const pathToPrivate = []; // private deriver level === root level
     const encryptedPk = request.encryptedPk;
     let builder = WalletBuilder
-      .start(request.db)
+      .start(
+        request.db,
+        Bip44TableMap,
+      )
       .addConceptualWallet(
         _finalState => ({
           CoinType: CARDANO_COINTYPE,
