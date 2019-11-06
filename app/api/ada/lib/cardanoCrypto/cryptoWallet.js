@@ -10,7 +10,6 @@ import { Logger, stringifyError } from '../../../../utils/logging';
 
 import { encryptWithPassword, decryptWithPassword } from '../../../../utils/passwordCipher';
 
-import type { ConfigType } from '../../../../../config/config-types';
 import * as unorm from 'unorm';
 import { pbkdf2Sync as pbkdf2 } from 'pbkdf2';
 
@@ -22,7 +21,6 @@ import crc32 from 'buffer-crc32';
 import type { WalletAccountNumberPlate } from '../../../../domain/Wallet';
 import { HARD_DERIVATION_START } from '../../../../config/numbersConfig';
 
-declare var CONFIG : ConfigType;
 
 /** Generate a random mnemonic based on 160-bits of entropy (15 words) */
 export const generateAdaMnemonic: void => Array<string> = () => generateMnemonic(160).split(' ');
@@ -38,15 +36,6 @@ export const isValidEnglishAdaMnemonic = (
   if (split.length !== numberOfWords) {
     return false;
   }
-  /**
-   * Redemption mnemonics use 0-word menmonics.
-   * However, 9-word mnemonics were disallowed in a later version of BIP39
-   * Since our bip39 library now considers all 9-word mnemonics invalid
-   * we just return true for backwards compatibility
-   */
-  if (split.length === 9) {
-    return true;
-  }
   return validateMnemonic(phrase);
 };
 
@@ -60,7 +49,7 @@ export const isValidEnglishAdaPaperMnemonic = (
   const fakePassword = numberOfWords === 21 ? 'xxx' : undefined;
   const [unscrambled, unscrambledLen] =
     unscramblePaperAdaMnemonic(phrase, numberOfWords, fakePassword);
-  if (unscrambled && unscrambledLen) {
+  if (unscrambled != null && unscrambledLen) {
     return isValidEnglishAdaMnemonic(unscrambled, unscrambledLen);
   }
   return false;
@@ -75,7 +64,7 @@ export const unscramblePaperAdaMnemonic = (
   const words = phrase.split(' ');
   if (words.length === numberOfWords) {
     if (numberOfWords === 27) {
-      if (password) {
+      if (password != null) {
         throw new Error('Password is not expected for a 27-word paper!');
       }
       const [scrambledMnemonics, passwordMnemonics] = [words.slice(0, 18), words.slice(18)];
@@ -96,7 +85,7 @@ export const unscramblePaperAdaMnemonic = (
       }
     }
     if (numberOfWords === 21) {
-      if (!password) {
+      if (password == null) {
         throw new Error('Password is expected for a 21-word paper!');
       }
       try {
@@ -159,13 +148,17 @@ export function updateWalletMasterKeyPassword(
   return encryptWithPassword(newPassword, masterKey);
 }
 
-/** Decrypt a /wallet/ to create transactions. Do not save this. Regenerate every time. */
-export function getCryptoWalletFromMasterKey(
+export function getCryptoWalletFromEncryptedMasterKey(
   encryptedMasterKey: string,
   password: string
 ): RustModule.Wallet.Bip44RootPrivateKey {
   const masterKeyBytes = decryptWithPassword(password, encryptedMasterKey);
   const masterKeyHex = Buffer.from(masterKeyBytes).toString('hex');
+  return getCryptoWalletFromMasterKey(masterKeyHex);
+}
+export function getCryptoWalletFromMasterKey(
+  masterKeyHex: string,
+): RustModule.Wallet.Bip44RootPrivateKey {
   const privateKey = RustModule.Wallet.PrivateKey.from_hex(masterKeyHex);
   const cryptoWallet = RustModule.Wallet.Bip44RootPrivateKey.new(
     privateKey,
@@ -211,9 +204,9 @@ export const mnemonicsToAddresses = (
   type: AddressType = 'External'
 ): { addresses: Array<string>, accountPlate: WalletAccountNumberPlate } => {
   const masterKey = generateWalletMasterKey(mnemonic, '');
-  const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, '');
+  const cryptoWallet = getCryptoWalletFromEncryptedMasterKey(masterKey, '');
   const account = cryptoWallet.bip44_account(
-    RustModule.Wallet.AccountIndex.new(accountIndex | HARD_DERIVATION_START)
+    RustModule.Wallet.AccountIndex.new(accountIndex + HARD_DERIVATION_START)
   );
   const accountPublic = account.public();
   const accountPlate = createAccountPlate(accountPublic.key().to_hex());

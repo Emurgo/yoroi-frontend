@@ -1,9 +1,14 @@
-declare type $Inexact<T: Object> = {...T};
+// @flow
+
+declare type Inexact<T: {}> = $Rest<T, {}>;
+
 declare type ExtractReturnType = <R>((...arg: any) => R) => R;
 declare type ReturnType<Func> = $Call<ExtractReturnType, Func>;
 
 declare type ExtractPromisslessReturnType = <R>((...arg: any) => Promise<R>) => R;
 declare type PromisslessReturnType<Func> = $Call<ExtractPromisslessReturnType, Func>;
+
+declare type ToSchemaProp = <K, V>(K, V) => K;
 
 /* eslint-disable no-redeclare */
 declare function arguments<A>(() => any): []

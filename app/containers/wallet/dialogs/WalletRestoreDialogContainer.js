@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import config from '../../../config';
 import validWords from 'bip39/src/wordlists/english.json';
 import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog';
 import WalletRestoreVerifyDialog from '../../../components/wallet/WalletRestoreVerifyDialog';
@@ -12,6 +13,8 @@ import {
   mnemonicsToAddresses,
 } from '../../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import type { WalletAccountNumberPlate } from '../../../domain/Wallet';
+import globalMessages from '../../../i18n/global-messages';
+import { CheckAdressesInUseApiError } from '../../../api/ada/errors';
 
 type Props = InjectedDialogContainerProps & {
   mode: "regular" | "paper",
@@ -29,6 +32,7 @@ type WalletRestoreDialogContainerState = {
   },
   submitValues?: WalletRestoreDialogValues,
   resolvedRecoveryPhrase?: string,
+  notificationElementId: string,
 }
 
 @observer
@@ -39,6 +43,7 @@ export default class WalletRestoreDialogContainer
     verifyRestore: undefined,
     submitValues: undefined,
     resolvedRecoveryPhrase: undefined,
+    notificationElementId: ''
   };
 
   onVerifiedSubmit = () => {
@@ -46,7 +51,7 @@ export default class WalletRestoreDialogContainer
     if (!submitValues) {
       throw new Error('Cannot submit wallet restoration! No values are available in context!');
     }
-    if (resolvedRecoveryPhrase) {
+    if (resolvedRecoveryPhrase != null) {
       submitValues.recoveryPhrase = resolvedRecoveryPhrase;
     }
     this.props.actions[environment.API].wallets.restoreWallet.trigger(submitValues);
@@ -61,7 +66,7 @@ export default class WalletRestoreDialogContainer
         getWordsCount(this.props.mode),
         values.paperPassword
       );
-      if (!newPhrase) {
+      if (newPhrase == null) {
         throw new Error('Failed to restore a paper wallet! Invalid recovery phrase!');
       }
       resolvedRecoveryPhrase = newPhrase;
@@ -94,7 +99,8 @@ export default class WalletRestoreDialogContainer
   };
 
   render() {
-
+    const actions = this.props.actions;
+    const { uiNotifications, profile } = this.props.stores;
     const wallets = this._getWalletsStore();
     const { restoreRequest } = wallets;
 
@@ -104,19 +110,50 @@ export default class WalletRestoreDialogContainer
       throw new Error('Unexpected restore mode: ' + this.props.mode);
     }
 
+    const tooltipNotification = {
+      duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
+      message: globalMessages.copyTooltipMessage,
+    };
+
     const { verifyRestore, submitValues } = this.state;
     if (verifyRestore) {
       const { addresses, accountPlate } = verifyRestore;
+      // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1055
+      let error;
+      /**
+       * CheckAdressesInUseApiError happens when yoroi could not fetch Used Address.
+       * Mostly because internet not connected or yoroi backend is down.
+       * At this point wallet is already created in the storage.
+       * When internet connection is back, everything will be loaded correctly.
+       */
+      if (restoreRequest.error instanceof CheckAdressesInUseApiError === false) {
+        error = restoreRequest.error;
+      }
+      const isSubmitting = restoreRequest.isExecuting ||
+        (restoreRequest.error instanceof CheckAdressesInUseApiError);
       return (
         <WalletRestoreVerifyDialog
           addresses={addresses}
           accountPlate={accountPlate}
-          selectedExplorer={this.props.stores.profile.selectedExplorer}
+          selectedExplorer={profile.selectedExplorer}
           onNext={this.onVerifiedSubmit}
           onCancel={this.cancelVerification}
-          isSubmitting={restoreRequest.isExecuting}
+          onCopyAddressTooltip={(address, elementId) => {
+            if (!uiNotifications.isOpen(elementId)) {
+              this.setState({ notificationElementId: elementId });
+              actions.notifications.open.trigger({
+                id: elementId,
+                duration: tooltipNotification.duration,
+                message: tooltipNotification.message,
+              });
+            }
+          }}
+          getNotification={uiNotifications.getTooltipActiveNotification(
+            this.state.notificationElementId
+          )}
+          isSubmitting={isSubmitting}
           classicTheme={this.props.classicTheme}
-          error={restoreRequest.error}
+          error={error}
         />
       );
     }

@@ -1,3 +1,5 @@
+@import '../../themes/mixins/underline';
+
 .component {
   display: flex;
   flex-flow: column;
@@ -42,10 +44,8 @@
       font-size: 12px;
     }
     a, button {
-      border-bottom: 1px solid var(--theme-warning-color);
+      @include underline(var(--theme-warning-color));
       line-height: initial;
-      text-decoration: none;
-      cursor: pointer;
     }
   }  
 }

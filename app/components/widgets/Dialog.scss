@@ -9,7 +9,7 @@
     font-family: var(--font-medium);
     font-size: 16px;
     line-height: 19px;
-    margin-bottom: 20px;
+    margin: var(--theme-dialog-title-margin);
     text-align: center;
     text-transform: uppercase;
     letter-spacing: 0;
@@ -27,7 +27,7 @@
   & > .actions {
     display: flex;
     flex-shrink: 0;
-    margin-top: 20px;
+    margin: var(--theme-dialog-input-actions-margin);
 
     button {
       width: 50%;

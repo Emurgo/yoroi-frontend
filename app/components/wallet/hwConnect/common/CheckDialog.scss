@@ -1,4 +1,5 @@
 @import './DialogCommonStyle.scss';
+@import '../../../../themes/mixins/underline';
 
 .component {
   .prerequisiteBlock {
@@ -24,6 +25,7 @@
 
       a {
         color: var(--font-black);
+        @include underline(var(--theme-underline-dark-color));
       }
     }
   }
@@ -57,7 +59,7 @@
 :global(.YoroiModern) {
   .component {
     .prerequisiteBlock {
-      margin-top: 16px;
+      margin-top: 24px;
     }
 
     .prerequisiteHeaderText {

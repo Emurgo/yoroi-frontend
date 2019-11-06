@@ -37,12 +37,6 @@ export default class WalletsStore extends Store {
   @observable restoreRequest: Request<RestoreWalletFunc>;
   @observable isImportActive: boolean = false;
 
-  _newWalletDetails: { name: string, mnemonic: string, password: string } = {
-    name: '',
-    mnemonic: '',
-    password: '',
-  };
-
   setup() {
     setInterval(this._pollRefresh, this.WALLET_REFRESH_INTERVAL);
     document.addEventListener('visibilitychange', _.debounce(this._pollRefresh, this.ON_VISIBLE_DEBOUNCE_WAIT));
@@ -57,25 +51,25 @@ export default class WalletsStore extends Store {
     name: string,
     password: string,
   }) => {
-    Object.assign(this._newWalletDetails, params);
-    try {
-      const recoveryPhrase = await (
-        this.generateWalletRecoveryPhraseRequest.execute({}).promise
-      );
-      if (recoveryPhrase != null) {
-        this.actions.walletBackup.initiateWalletBackup.trigger({ recoveryPhrase });
-      }
-    } catch (error) {
-      throw error;
+    const recoveryPhrase = await (
+      this.generateWalletRecoveryPhraseRequest.execute({}).promise
+    );
+    if (recoveryPhrase != null) {
+      this.actions.walletBackup.initiateWalletBackup.trigger({
+        recoveryPhrase,
+        name: params.name,
+        password: params.password,
+      });
     }
   };
 
   /** Create the wallet and go to wallet summary screen */
   _finishCreation = async () => {
-    this._newWalletDetails.mnemonic = this.stores.walletBackup.recoveryPhrase.join(' ');
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     const wallet = await this.createWalletRequest.execute({
-      ...this._newWalletDetails,
+      name: this.stores.walletBackup.name,
+      password: this.stores.walletBackup.password,
+      mnemonic: this.stores.walletBackup.recoveryPhrase.join(' '),
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
     }).promise;
     if (wallet) {
@@ -85,6 +79,9 @@ export default class WalletsStore extends Store {
     } else {
       this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
     }
+    const { wallets } = this.stores.substores[environment.API];
+    wallets.showWalletCreatedNotification();
+    this.stores.walletBackup.teardown();
   };
 
   /** Delete wallet and switch to another existing wallet (if another exists) */
@@ -110,7 +107,7 @@ export default class WalletsStore extends Store {
       }
     });
     this.deleteWalletRequest.reset();
-    this.refreshWalletsData();
+    await this.refreshWalletsData();
   };
 
   /** Restore wallet and move to wallet summary screen */
@@ -131,7 +128,7 @@ export default class WalletsStore extends Store {
     this.actions.dialogs.closeActiveDialog.trigger();
     this.restoreRequest.reset();
     this.goToWalletRoute(restoredWallet.id);
-    this.refreshWalletsData();
+    await this.refreshWalletsData();
   };
 
   // =================== PUBLIC API ==================== //
@@ -208,6 +205,12 @@ export default class WalletsStore extends Store {
     const walletIds = result.map((wallet: Wallet) => wallet.id);
     this.stores.substores[environment.API].addresses.updateObservedWallets(walletIds);
     this.stores.substores[environment.API].transactions.updateObservedWallets(walletIds);
+  };
+
+  /** Make all API calls required to setup imported wallet */
+  @action refreshImportedWalletData = async () => {
+    if (this.hasAnyLoaded) this._setActiveWallet({ walletId: this.all[0].id });
+    return await this.refreshWalletsData();
   };
 
   // =================== ACTIVE WALLET ==================== //

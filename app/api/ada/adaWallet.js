@@ -83,7 +83,7 @@ export async function getBalance(
 ): Promise<BigNumber> {
   try {
     const { sum } = await getUTXOsSumsForAddresses({ addresses });
-    if (sum) {
+    if (sum != null) {
       return new BigNumber(sum);
     }
     return new BigNumber(0);

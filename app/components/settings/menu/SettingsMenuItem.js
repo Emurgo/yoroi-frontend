@@ -21,7 +21,7 @@ export default class SettingsMenuItem extends Component<Props> {
   render() {
     const { label, active, disabled, onClick, className } = this.props;
     let state = styles.enabled;
-    if (disabled) {
+    if (disabled === true) {
       state = styles.disabled;
     } else if (active) {
       state = styles.active;

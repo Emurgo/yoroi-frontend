@@ -18,10 +18,10 @@ import it from 'react-intl/locale-data/it';
 import { Routes } from './Routes';
 import { yoroiPolymorphTheme } from './themes/PolymorphThemes';
 import { themeOverrides } from './themes/overrides';
-import translations from './i18n/translations';
+import { translations } from './i18n/translations';
 import type { StoresMap } from './stores';
 import type { ActionsMap } from './actions';
-import { THEMES } from './themes';
+import { changeToplevelTheme } from './themes';
 import ThemeManager from './ThemeManager';
 import environment from './environment';
 
@@ -41,7 +41,10 @@ class App extends Component<{
     // Merged english messages with selected by user locale messages
     // In this case all english data would be overridden to user selected locale, but untranslated
     // (missed in object keys) just stay in english
-    const mergedMessages = Object.assign({}, translations['en-US'], translations[locale]);
+    const mergedMessages = {
+      ...translations['en-US'],
+      ...translations[locale]
+    };
 
     const themeVars = Object.assign(
       stores.profile.currentThemeVars,
@@ -54,16 +57,7 @@ class App extends Component<{
     );
     const currentTheme = stores.profile.currentTheme;
 
-    // Refer: https://github.com/Emurgo/yoroi-frontend/pull/497
-    if (document && document.body instanceof HTMLBodyElement) {
-      // Flow give error when directly assesing document.body.classList.[remove()]|[add()]
-      const bodyClassList = document.body.classList;
-      // we can't simply set the className because there can be other classes present
-      // therefore we only remove & add those related to the theme
-      const allThemes: Array<string> = Object.keys(THEMES).map(key => THEMES[key]);
-      bodyClassList.remove(...allThemes);
-      bodyClassList.add(currentTheme);
-    }
+    changeToplevelTheme(currentTheme);
 
     return (
       <div style={{ height: '100%' }}>

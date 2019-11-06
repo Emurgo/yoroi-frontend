@@ -14,8 +14,6 @@ import type {
 import chai from 'chai';
 import mockImporter from './mockImporter';
 
-const middlewares = [...defaults(), bodyParser];
-
 const port = 8080;
 
 // MockData should always be consistent with the following values
@@ -52,6 +50,9 @@ function _defaultSignedTransaction(
 
 let MockServer = null;
 
+export const signedTransactionHandler = [];
+export const utxoForAddressesHook = [];
+
 export function getMockServer(
   settings: {
     signedTransaction?: (
@@ -62,10 +63,14 @@ export function getMockServer(
         send(arg: SignedResponse): any,
         status: Function
       }
-    ) => void
+    ) => void,
+    // Whether to output request logs. Defaults to false.
+    outputLog?: boolean
   }
 ) {
   if (!MockServer) {
+    const middlewares = [...defaults({ logger: !!settings.outputLog }), bodyParser];
+
     const server = create();
 
     server.use(middlewares);
@@ -78,13 +83,16 @@ export function getMockServer(
     ): void => {
       chai.assert.isTrue(_validateAddressesReq(req.body));
       const utxoForAddresses = mockImporter.utxoForAddresses();
-      const filteredUtxos = Object.keys(utxoForAddresses)
+      let filteredUtxos = Object.keys(utxoForAddresses)
         .filter(addr => req.body.addresses.includes(addr))
         .map(addr => utxoForAddresses[addr])
         .reduce((utxos, arr) => {
           utxos.push(...arr);
           return utxos;
         }, []);
+      if (utxoForAddressesHook.length) {
+        filteredUtxos = utxoForAddressesHook.pop()(filteredUtxos);
+      }
       res.send(filteredUtxos);
     });
 
@@ -99,7 +107,7 @@ export function getMockServer(
       const sumUtxos = Object.keys(utxoSumForAddresses)
         .filter(addr => req.body.addresses.includes(addr))
         .map(addr => utxoSumForAddresses[addr])
-        .map(val => (val ? new BigNumber(val) : new BigNumber(0)))
+        .map(val => (val != null ? new BigNumber(val) : new BigNumber(0)))
         .reduce((sum, value) => value.plus(sum), new BigNumber(0));
       const result = sumUtxos.isZero() ? null : sumUtxos.toString();
       res.send({ sum: result });
@@ -128,8 +136,20 @@ export function getMockServer(
       res.send(filteredTxs.slice(0, txsLimit));
     });
 
-    server.post('/api/txs/signed', settings.signedTransaction ?
-      settings.signedTransaction : _defaultSignedTransaction);
+    server.post('/api/txs/signed', (
+      req: {
+        body: SignedRequest
+      },
+      res: { send(arg: SignedResponse): any, status: Function }
+    ): void => {
+      if (signedTransactionHandler.length) {
+        signedTransactionHandler.pop()(req, res);
+      } else if (settings.signedTransaction) {
+        settings.signedTransaction(req, res);
+      } else {
+        _defaultSignedTransaction(req, res);
+      }
+    });
 
     server.post('/api/addresses/filterUsed', (
       req: {

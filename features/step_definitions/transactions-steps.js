@@ -1,20 +1,17 @@
 // @flow
 
 import { Given, When, Then } from 'cucumber';
+import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 import i18n from '../support/helpers/i18n-helpers';
 import { addTransaction, postLaunchSuccessfulTx, postLaunchPendingTx } from '../mock-chain/mockImporter';
 
 Given(/^I have a wallet with funds$/, async function () {
-  await this.driver.wait(async () => {
-    try {
-      const { adaWallet } = await this.getFromLocalStorage('WALLET');
-      expect(Number(adaWallet.cwAmount.getCCoin), 'Available founds').to.be.above(0);
-      return true;
-    } catch (err) {
-      return false;
-    }
-  });
+  const amountWithCurrency = await this.driver.findElements(By.xpath("//div[@class='WalletTopbarTitle_walletAmount']"));
+  const matchedAmount = /^"([0-9]*\.[0-9]*)".*$/.exec(amountWithCurrency);
+  if (!matchedAmount) return false;
+  const amount = parseFloat(matchedAmount[1]);
+  expect(Number(amount), 'Available funds').to.be.above(0);
 });
 
 When(/^I go to the send transaction screen$/, async function () {
@@ -59,6 +56,22 @@ When(/^The transaction fees are "([^"]*)"$/, async function (fee) {
 
 When(/^I click on the next button in the wallet send form$/, async function () {
   await this.click('.WalletSendForm_nextButton');
+  /**
+   * Sometimes out tests fail because clicking this button isn't triggering a dialog
+   * However it works flawlessly both locally and on localci
+   *
+   * My only guess is that mobx re-disables this button in a way that only causes
+   * the condition to happen on low-resouruce machines like we use for CI
+   *
+   * I attempt to fix it by just clicking twice after a delay
+   */
+  await this.driver.sleep(500);
+  try {
+    await this.click('.WalletSendForm_nextButton');
+  } catch (e) {
+    // if the first click succeeded, the second will throw an exception
+    // saying that the button can't be clicked because a dialog is in the way
+  }
 });
 
 When(/^I click on "Send all my ADA" checkbox$/, async function () {

@@ -59,8 +59,8 @@ export default class Settings extends Component<InjectedContainerProps> {
             onCategoryClicked={category => {
               actions.topbar.activateTopbarCategory.trigger({ category });
             }}
-            categories={topbar.CATEGORIES}
-            activeTopbarCategory={topbar.activeTopbarCategory}
+            isActiveCategory={topbar.isActiveCategory}
+            categories={topbar.categories}
           />
         )}
         connectionErrorType={checkAdaServerStatus}
@@ -69,7 +69,7 @@ export default class Settings extends Component<InjectedContainerProps> {
         stores={stores}
       >
         <SettingsLayout menu={menu}>
-          {children || null /* the "|| null" part keeps flow happy */}
+          {children != null ? children : null}
         </SettingsLayout>
       </MainLayout>
     );

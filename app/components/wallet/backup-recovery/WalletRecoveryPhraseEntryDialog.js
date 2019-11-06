@@ -44,7 +44,7 @@ const messages = defineMessages({
 
 type Props = {|
   recoveryPhraseSorted: Array<{ word: string, isActive: boolean }>,
-  enteredPhrase: Array<{ word: string }>,
+  enteredPhrase: Array<{ word: string, index: number }>,
   isValid: boolean,
   isTermDeviceAccepted: boolean,
   isTermRecoveryAccepted: boolean,
@@ -116,7 +116,7 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
         className: isSubmitting ? styles.isSubmitting : null,
         label: intl.formatMessage(messages.buttonLabelConfirm),
         onClick: onFinishBackup,
-        disabled: !isTermDeviceAccepted || !isTermRecoveryAccepted,
+        disabled: isSubmitting || !isTermDeviceAccepted || !isTermRecoveryAccepted,
         primary: true
       });
     }

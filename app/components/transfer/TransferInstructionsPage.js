@@ -11,25 +11,9 @@ import globalMessages from '../../i18n/global-messages';
 import styles from './TransferInstructionsPage.scss';
 
 const messages = defineMessages({
-  instructionsText: {
-    id: 'transfer.instructions.instructions.text',
-    defaultMessage: '!!!Before you can transfer funds, you must create a Yoroi wallet and back it up. Upon completion, you will receive a 15-word recovery phrase which can be used to restore your Yoroi wallet at any time.',
-  },
-  instructionsButton: {
-    id: 'transfer.instructions.instructions.button.label',
-    defaultMessage: '!!!Create Yoroi wallet',
-  },
-  attentionTitle: {
-    id: 'transfer.instructions.attention.title.label',
-    defaultMessage: '!!!Attention',
-  },
   attentionText: {
     id: 'daedalusTransfer.instructions.attention.text',
     defaultMessage: '!!!Yoroi and Daedalus wallets use different key derivation scheme and they each have a separate format for addresses. For this reason, Daedalus wallets cannot be restored and continued to be used in Yoroi and vice versa. This will change in the future. For now, to use funds from your Daedalus wallet, you need to transfer them to your Yoroi wallet. Daedalus and Yoroi wallets are fully compatible for transferring of funds. If you don’t have a working copy of Daedalus, you can use your 12-word recovery phrase (or 27-words for a paper wallet) used to restore and transfer the balance from Daedalus into Yoroi.',
-  },
-  transferTitleText: {
-    id: 'daedalusTransfer.instructions.attention.title',
-    defaultMessage: '!!!Transfer all funds from'
   },
   transferText: {
     id: 'daedalusTransfer.instructions.attention.button.label',
@@ -89,7 +73,7 @@ export default class TransferInstructionsPage extends Component<Props> {
                   {intl.formatMessage(globalMessages.instructionTitle)}
                 </div>
                 <div className={styles.text}>
-                  <FormattedHTMLMessage {...messages.instructionsText} />
+                  <FormattedHTMLMessage {...globalMessages.transferInstructionsText} />
                 </div>
               </div>
 
@@ -99,7 +83,7 @@ export default class TransferInstructionsPage extends Component<Props> {
                 </div>
                 <Button
                   className={`createYoroiWallet ${commonClasses}`}
-                  label={intl.formatMessage(messages.instructionsButton)}
+                  label={intl.formatMessage(globalMessages.transferInstructionsButton)}
                   onClick={onFollowInstructionsPrerequisites}
                   disabled={!disableTransferFunds}
                   skin={ButtonSkin}
@@ -120,7 +104,7 @@ export default class TransferInstructionsPage extends Component<Props> {
 
               <div className={styles.infoBlock}>
                 <div className={styles.title}>
-                  {intl.formatMessage(messages.attentionTitle)}
+                  {intl.formatMessage(globalMessages.attentionTitle)}
                 </div>
                 <div className={styles.text}>
                   <FormattedHTMLMessage {...messages.attentionText} />
@@ -129,7 +113,7 @@ export default class TransferInstructionsPage extends Component<Props> {
 
               <div className={styles.operationBlock}>
                 <div className={styles.buttonTitle}>
-                  {intl.formatMessage(messages.transferTitleText)}
+                  {intl.formatMessage(globalMessages.transferTitleText)}
                 </div>
 
                 <Button

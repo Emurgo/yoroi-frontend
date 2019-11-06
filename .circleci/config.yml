@@ -43,7 +43,7 @@ aliases:
       SCREENSHOT_DIFF_THRESHOLD: 0
       SCREENSHOT_DIFF_COLOR: yellow
       BROWSERS: brave chrome firefox
-      GITHUB_BUILD_BRANCHES: develop staging master
+      GITHUB_BUILD_BRANCHES: develop staging master shelley
 
       # Encrypted env vars from ui:
       # AWS_ACCESS_KEY_ID: "${ARTIFACTS_KEY}"

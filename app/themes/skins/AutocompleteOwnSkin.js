@@ -106,8 +106,9 @@ export const AutocompleteOwnSkin = (props: Props) => {
           className={classnames([
             theme.autocompleteContent,
             props.isOpen ? theme.opened : null,
-            props.selectedOptions.length
-              ? theme.hasSelectedWords
+            (props.selectedOptions.length ||
+            (props.inputValue != null && props.inputValue.length > 0))
+              ? 'hasSelectedWords'
               : null,
             props.error ? theme.errored : null
           ])}
@@ -121,6 +122,7 @@ export const AutocompleteOwnSkin = (props: Props) => {
               value={props.inputValue}
               onChange={props.handleInputChange}
               onKeyDown={props.onKeyDown}
+              required="required"
             />
           </div>
         </div>

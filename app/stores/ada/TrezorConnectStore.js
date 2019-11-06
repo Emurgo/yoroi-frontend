@@ -114,6 +114,7 @@ export default class TrezorConnectStore
       TrezorConnect.manifest(trezorManifest);
 
       /** Preinitialization of TrezorConnect API will result in faster first response */
+      // we purposely don't want to await. Safe in practice.
       TrezorConnect.init({});
     } catch (error) {
       Logger.error(`TrezorConnectStore::setup:error: ${stringifyError(error)}`);
@@ -173,11 +174,11 @@ export default class TrezorConnectStore
   };
 
   /** CONNECT dialog submit (Connect button) */
-  @action _submitConnect = (): void => {
+  @action _submitConnect = async (): Promise<void> => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStep.CONNECT;
     this.progressInfo.stepState = StepState.PROCESS;
-    this._checkAndStoreHWDeviceInfo();
+    await this._checkAndStoreHWDeviceInfo();
   };
 
   @action _goToConnectError = (): void => {
@@ -338,12 +339,12 @@ export default class TrezorConnectStore
   };
 
   /** SAVE dialog submit (Save button) */
-  @action _submitSave = (walletName: string): void => {
+  @action _submitSave = async (walletName: string): Promise<void> => {
     this.error = null;
     this.progressInfo.currentStep = ProgressStep.SAVE;
     this.progressInfo.stepState = StepState.PROCESS;
 
-    this._saveHW(walletName);
+    await this._saveHW(walletName);
   };
 
   /** creates new wallet and loads it */
@@ -363,11 +364,18 @@ export default class TrezorConnectStore
     } catch (error) {
       Logger.error(`TrezorConnectStore::_saveHW::error ${stringifyError(error)}`);
 
+      // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1055
       if (error instanceof CheckAdressesInUseApiError) {
-        // redirecting CheckAdressesInUseApiError -> hwConnectDialogSaveError101
-        // because for user hwConnectDialogSaveError101 is more meaningful in this context
-        this.error = new LocalizableError(globalMessages.hwConnectDialogSaveError101);
-      } else if (error instanceof LocalizableError) {
+        /**
+         * This error happens when yoroi could not fetch Used Address.
+         * Mostly because internet not connected or yoroi backend is down.
+         * At this point wallet is already created in the storage.
+         * When internet connection is back, everything will be loaded correctly.
+         */
+        return;
+      }
+
+      if (error instanceof LocalizableError) {
         this.error = error;
       } else {
         // some unknow error
@@ -409,16 +417,13 @@ export default class TrezorConnectStore
     const { wallets } = this.stores.substores[environment.API];
     await wallets._patchWalletRequestWithNewWallet(trezorWallet);
 
-    // Dynamically update the topbar icons
-    this.stores.topbar.updateCategories();
-
     // goto the wallet transactions page
     Logger.debug('TrezorConnectStore::_saveTrezor setting new walles as active wallet');
     wallets.goToWalletRoute(trezorWallet.id);
 
     // fetch its data
     Logger.debug('TrezorConnectStore::_saveTrezor loading wallet data');
-    wallets.refreshWalletsData();
+    await wallets.refreshWalletsData();
 
     // show success notification
     wallets.showTrezorTWalletIntegratedNotification();

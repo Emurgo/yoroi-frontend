@@ -43,7 +43,7 @@ Then(/^I should see secondary menu (.*) item disabled$/, async function (buttonN
 });
 
 Then(/^The Japanese language should be selected$/, async function () {
-  this.driver.wait(async () => {
+  await this.driver.wait(async () => {
     const activeLanguage = await i18n.getActiveLanguage(this.driver);
     return activeLanguage === 'ja-JP';
   });

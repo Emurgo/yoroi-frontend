@@ -26,7 +26,6 @@ const messages = defineMessages({
 type Props = {|
   onConfirm: void => void,
   onBack: void => void,
-  openSettingsPage: void => void,
   classicTheme: boolean,
 |};
 

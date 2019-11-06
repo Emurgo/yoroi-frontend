@@ -10,7 +10,6 @@ import { uniq } from 'lodash';
 import styles from './Transaction.scss';
 import adaSymbol from '../../../assets/images/ada-symbol.inline.svg';
 import WalletTransaction, { transactionStates, transactionTypes } from '../../../domain/WalletTransaction';
-import { assuranceLevels } from '../../../config/transactionAssuranceConfig';
 import { environmentSpecificMessages } from '../../../i18n/global-messages';
 import type { TransactionState, TransactionDirectionType } from '../../../domain/WalletTransaction';
 import environment from '../../../environment';
@@ -88,26 +87,26 @@ const messages = defineMessages({
 });
 
 const assuranceLevelTranslations = defineMessages({
-  [assuranceLevels.LOW]: {
+  low: {
     id: 'wallet.transaction.assuranceLevel.low',
     defaultMessage: '!!!low',
   },
-  [assuranceLevels.MEDIUM]: {
+  medium: {
     id: 'wallet.transaction.assuranceLevel.medium',
     defaultMessage: '!!!medium',
   },
-  [assuranceLevels.HIGH]: {
+  high: {
     id: 'wallet.transaction.assuranceLevel.high',
     defaultMessage: '!!!high',
   },
 });
 
 const stateTranslations = defineMessages({
-  [transactionStates.PENDING]: {
+  pending: {
     id: 'wallet.transaction.state.pending',
     defaultMessage: '!!!pending',
   },
-  [transactionStates.FAILED]: {
+  failed: {
     id: 'wallet.transaction.state.failed',
     defaultMessage: '!!!failed',
   },

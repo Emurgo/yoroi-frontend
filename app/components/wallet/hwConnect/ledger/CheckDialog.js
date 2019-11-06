@@ -23,7 +23,7 @@ import aboutLedgerSVG from '../../../../assets/images/hardware-wallet/ledger/che
 
 import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 
-import styles from '../common/CheckDialog.scss';
+import styles from './CheckDialog.scss';
 
 const messages = defineMessages({
   aboutPrerequisite1Part1: {
@@ -142,7 +142,7 @@ export default class CheckDialog extends Component<Props> {
 
     return (
       <Dialog
-        className={classnames([styles.component, 'CheckDialog'])}
+        className={classnames([styles.component, 'CheckDialog', styles.ledger])}
         title={intl.formatMessage(globalMessages.ledgerConnectAllDialogTitle)}
         actions={dailogActions}
         closeOnOverlayClick={false}
@@ -153,7 +153,9 @@ export default class CheckDialog extends Component<Props> {
       >
         <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         {middleBlock}
-        <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
+        {error &&
+          <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
+        }
         <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
       </Dialog>);
   }

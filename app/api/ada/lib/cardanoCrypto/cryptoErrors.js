@@ -12,8 +12,3 @@ export class SeedWithInvalidLengthError extends ExtendableError {
     super(message);
   }
 }
-export class CreateRedeemTransactionError extends ExtendableError {
-  constructor(message: ?string = 'Error while creating redeem transaction') {
-    super(message);
-  }
-}

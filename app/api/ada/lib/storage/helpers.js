@@ -56,9 +56,9 @@ export async function getLatestUsedIndex(type: AddressType): Promise<number> {
 export async function updateLastReceiveAddressIndex(): Promise<void> {
   const latest = await getLatestUsedIndex('External');
 
-  const prevLastInStorage = getLastReceiveAddressIndex();
+  const prevLastInStorage = await getLastReceiveAddressIndex();
   if (latest > prevLastInStorage) {
-    saveLastReceiveAddressIndex(latest);
+    await saveLastReceiveAddressIndex(latest);
   }
 }
 
@@ -67,19 +67,22 @@ export const updateAdaWalletMetaParams = async (
   walletMeta : AdaWalletMetaParams
 ): Promise<?AdaWallet> => {
   // Get existing wallet or return if non exists
-  const persistentWallet = getAdaWallet();
+  const persistentWallet = await getAdaWallet();
   if (!persistentWallet) return Promise.resolve();
 
   // Swap out meta parameters
-  const updatedWallet = Object.assign({}, persistentWallet, { cwMeta: walletMeta });
+  const updatedWallet = {
+    ...persistentWallet,
+    cwMeta: walletMeta
+  };
 
   // Update the meta params cached in localstorage
-  saveAdaWallet(updatedWallet);
+  await saveAdaWallet(updatedWallet);
   return updatedWallet;
 };
 
 /** Update spending password and password last update time */
-export const changeAdaWalletSpendingPassword = (
+export const changeAdaWalletSpendingPassword = async (
   { oldPassword, newPassword }: {
     oldPassword: string,
     newPassword: string,
@@ -87,7 +90,7 @@ export const changeAdaWalletSpendingPassword = (
 ): Promise<?AdaWallet> => {
   // update spending password
   {
-    const walletMasterKey = getWalletMasterKey();
+    const walletMasterKey = await getWalletMasterKey();
     if (walletMasterKey == null) {
       throw new Error('No master key stored');
     }
@@ -96,22 +99,21 @@ export const changeAdaWalletSpendingPassword = (
       oldPassword,
       newPassword
     );
-    saveWalletMasterKey(updatedWalletMasterKey);
+    await saveWalletMasterKey(updatedWalletMasterKey);
   }
 
   // update password last update time
-  const wallet = getAdaWallet();
+  const wallet = await getAdaWallet();
   if (!wallet) {
     return Promise.resolve(null);
   }
-  const updatedWallet = Object.assign(
-    {},
-    wallet,
-    { cwPassphraseLU: moment().format() }
-  );
+  const updatedWallet = {
+    ...wallet,
+    cwPassphraseLU: moment().format()
+  };
 
   // save result in cache
-  saveAdaWallet(updatedWallet);
+  await saveAdaWallet(updatedWallet);
 
   return Promise.resolve(updatedWallet);
 };
@@ -119,9 +121,9 @@ export const changeAdaWalletSpendingPassword = (
 export const updateBestBlockNumber = async (
   request: UpdateBestBlockNumberRequest
 ): Promise<void> => {
-  const lastKnownBlockNumber = getLastBlockNumber();
+  const lastKnownBlockNumber = await getLastBlockNumber();
   if (request.bestBlockNum > lastKnownBlockNumber) {
-    saveLastBlockNumber(request.bestBlockNum);
+    await saveLastBlockNumber(request.bestBlockNum);
   }
 };
 
@@ -148,16 +150,17 @@ export const updateAdaWalletBalance = async (
   balance: BigNumber,
 ): Promise<void> => {
   // Get existing wallet or return if non exists
-  const persistentWallet = getAdaWallet();
+  const persistentWallet = await getAdaWallet();
   if (!persistentWallet) return Promise.resolve();
 
   // Calculate and set new user balance
-  const updatedWallet = Object.assign({}, persistentWallet, {
+  const updatedWallet = {
+    ...persistentWallet,
     cwAmount: {
       getCCoin: balance.toString()
     }
-  });
+  };
 
   // Update the balance cached in localstorage
-  saveAdaWallet(updatedWallet);
+  await saveAdaWallet(updatedWallet);
 };

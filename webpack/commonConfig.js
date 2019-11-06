@@ -5,19 +5,11 @@ const ConfigWebpackPlugin = require('config-webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
 const shell = require('shelljs');
+const manifestEnvs = require('../chrome/manifestEnvs');
 
 const plugins = (folder) => ([
   /** We remove non-English languages from BIP39 to avoid triggering bad word filtering */
   new webpack.IgnorePlugin(/^\.\/(?!english)/, /bip39\/src\/wordlists$/),
-  /**
-   * We need CardanoWallet for flow to get the WASM binding types.
-   * However, the flow definitions aren't available to webpack at runtime
-   * so we have to mock them out with a noop
-   */
-  new webpack.NormalModuleReplacementPlugin(
-    /CardanoWallet/,
-    'lodash/noop.js'
-  ),
   /**
    * We use the HtmlWebpackPlugin to group back together the chunks inside the HTML
    */
@@ -54,9 +46,6 @@ const rules = [
     use: [
       {
         loader: 'style-loader',
-        options: {
-          hmr: false,
-        },
       },
       {
         loader: 'css-loader',
@@ -82,10 +71,6 @@ const rules = [
     use: [
       {
         loader: 'style-loader',
-        options: {
-          hmr: false,
-          sourceMap: true,
-        },
       },
       {
         loader: 'css-loader',
@@ -104,10 +89,6 @@ const rules = [
     use: [
       {
         loader: 'style-loader',
-        options: {
-          hmr: false,
-          sourceMap: true,
-        },
       },
       {
         loader: 'css-loader',
@@ -171,7 +152,8 @@ const definePlugin = (networkName, isProd) => ({
   'process.env': {
     NODE_ENV: JSON.stringify(isProd ? 'production' : 'development'),
     COMMIT: JSON.stringify(shell.exec('git rev-parse HEAD', { silent: true }).trim()),
-    BRANCH: JSON.stringify(shell.exec('git rev-parse --abbrev-ref HEAD', { silent: true }).trim())
+    BRANCH: JSON.stringify(shell.exec('git rev-parse --abbrev-ref HEAD', { silent: true }).trim()),
+    SEIZA_FOR_YOROI_URL: JSON.stringify(manifestEnvs.SEIZA_FOR_YOROI_URL),
   }
 });
 

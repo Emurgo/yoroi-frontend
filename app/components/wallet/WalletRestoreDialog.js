@@ -9,7 +9,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import DialogCloseButton from '../widgets/DialogCloseButton';
-import InformativeMessage from '../widgets/InformativeMessage';
+import DialogTextBlock from '../widgets/DialogTextBlock';
 import Dialog from '../widgets/Dialog';
 import {
   isValidWalletName,
@@ -23,7 +23,6 @@ import headerMixin from '../mixins/HeaderBlock.scss';
 import config from '../../config';
 import DialogBackButton from '../widgets/DialogBackButton';
 import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
-import PasswordInstructions from '../widgets/forms/PasswordInstructions';
 import { AutocompleteOwnSkin } from '../../themes/skins/AutocompleteOwnSkin';
 
 const messages = defineMessages({
@@ -139,9 +138,10 @@ export default class WalletRestoreDialog extends Component<Props> {
 
   form = new ReactToolboxMobxForm({
     fields: {
-      walletName: this.props.isVerificationMode ? undefined : {
+      walletName: this.props.isVerificationMode === true ? undefined : {
         label: this.context.intl.formatMessage(messages.walletNameInputLabel),
-        placeholder: this.context.intl.formatMessage(messages.walletNameInputHint),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(messages.walletNameInputHint) : '',
         value: (this.props.initValues && this.props.initValues.walletName) || '',
         validators: [({ field }) => (
           [
@@ -152,7 +152,8 @@ export default class WalletRestoreDialog extends Component<Props> {
       },
       recoveryPhrase: {
         label: this.context.intl.formatMessage(messages.recoveryPhraseInputLabel),
-        placeholder: this.context.intl.formatMessage(messages.recoveryPhraseInputHint),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(messages.recoveryPhraseInputHint) : '',
         value: this.getInitRecoveryPhrase(),
         validators: [({ field }) => {
           const value = join(field.value, ' ');
@@ -171,10 +172,11 @@ export default class WalletRestoreDialog extends Component<Props> {
           ];
         }],
       },
-      paperPassword: this.props.showPaperPassword ? {
+      paperPassword: this.props.showPaperPassword === true ? {
         type: 'password',
         label: this.context.intl.formatMessage(messages.paperPasswordLabel),
-        placeholder: this.context.intl.formatMessage(messages.paperPasswordLabel),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(messages.paperPasswordLabel) : '',
         value: (this.props.initValues && this.props.initValues.paperPassword) || '',
         validators: [({ field }) => {
           const validatePassword = p => (
@@ -194,10 +196,11 @@ export default class WalletRestoreDialog extends Component<Props> {
         ]),
         ],
       } : undefined,
-      walletPassword: this.props.isVerificationMode ? undefined : {
+      walletPassword: this.props.isVerificationMode === true ? undefined : {
         type: 'password',
         label: this.context.intl.formatMessage(globalMessages.newPasswordLabel),
-        placeholder: this.context.intl.formatMessage(globalMessages.newPasswordFieldPlaceholder),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(globalMessages.newPasswordFieldPlaceholder) : '',
         value: (this.props.initValues && this.props.initValues.walletPassword) || '',
         validators: [({ field, form }) => {
           const repeatPasswordField = form.$('repeatPassword');
@@ -210,10 +213,11 @@ export default class WalletRestoreDialog extends Component<Props> {
           ];
         }],
       },
-      repeatPassword: this.props.isVerificationMode ? undefined : {
+      repeatPassword: this.props.isVerificationMode === true ? undefined : {
         type: 'password',
         label: this.context.intl.formatMessage(globalMessages.repeatPasswordLabel),
-        placeholder: this.context.intl.formatMessage(globalMessages.repeatPasswordFieldPlaceholder),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(globalMessages.repeatPasswordFieldPlaceholder) : '',
         value: (this.props.initValues && this.props.initValues.walletPassword) || '',
         validators: [({ field, form }) => {
           const walletPassword = form.$('walletPassword').value;
@@ -252,10 +256,19 @@ export default class WalletRestoreDialog extends Component<Props> {
   };
 
   componentDidMount() {
-    setTimeout(() => { this.walletNameInput.focus(); });
+    setTimeout(() => {
+      if (this.props.isVerificationMode === true) {
+        // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1009
+        // this.recoveryPhraseInput.focus();
+      } else {
+        this.walletNameInput.focus();
+      }
+    });
   }
 
   walletNameInput: Input;
+  // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1009
+  // recoveryPhraseInput: Autocomplete;
 
   render() {
     const { intl } = this.context;
@@ -307,7 +320,7 @@ export default class WalletRestoreDialog extends Component<Props> {
 
     const disabledCondition = () => {
       let condition = mnemonicValidator(join(recoveryPhrase, ' '));
-      if (!isVerificationMode) {
+      if (isVerificationMode !== true) {
         condition = condition &&
           isValidWalletName(walletName) &&
           isValidWalletPassword(walletPassword) &&
@@ -335,21 +348,24 @@ export default class WalletRestoreDialog extends Component<Props> {
       {
         className: isSubmitting ? styles.isSubmitting : null,
         label: intl.formatMessage(
-          isVerificationMode ? messages.verifyButtonLabel : messages.importButtonLabel
+          isVerificationMode === true ? messages.verifyButtonLabel : messages.importButtonLabel
         ),
         primary: true,
-        disabled: isSubmitting || (!classicTheme && disabledCondition()),
+        disabled: isSubmitting || disabledCondition(),
         onClick: this.submit,
       },
     ];
 
     const dialogTitle = () => {
-      if (isPaper) {
-        return isVerificationMode ? messages.titleVerifyPaper : messages.titlePaper;
+      if (isPaper === true) {
+        return isVerificationMode === true ? messages.titleVerifyPaper : messages.titlePaper;
       }
-      return isVerificationMode ? messages.titleVerify : messages.title;
+      return isVerificationMode === true ? messages.titleVerify : messages.title;
     };
 
+    const introMessageBlock = (introMessage != null && introMessage !== '')
+      ? (<DialogTextBlock message={introMessage} subclass="component-input" />)
+      : null;
     return (
       <Dialog
         className={dialogClasses}
@@ -362,24 +378,25 @@ export default class WalletRestoreDialog extends Component<Props> {
         classicTheme={classicTheme}
       >
 
-        {isVerificationMode ? (
-          introMessage && <InformativeMessage
-            message={introMessage}
-          />
-        ) : (
-          <Input
-            className={styles.walletName}
-            inputRef={(input) => { this.walletNameInput = input; }}
-            {...walletNameField.bind()}
-            done={isValidWalletName(walletName)}
-            error={walletNameField.error}
-            skin={InputOwnSkin}
-          />
-        )}
+        {isVerificationMode === true
+          ? introMessageBlock
+          : (
+            <Input
+              className={styles.walletName}
+              inputRef={(input) => { this.walletNameInput = input; }}
+              {...walletNameField.bind()}
+              done={isValidWalletName(walletName)}
+              error={walletNameField.error}
+              skin={InputOwnSkin}
+            />
+          )
+        }
 
         <Autocomplete
           options={validWords}
           maxSelections={this.props.numberOfMnemonics}
+          // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1009
+          // inputRef={(input) => { this.recoveryPhraseInput = input; }}
           {...recoveryPhraseField.bind()}
           done={mnemonicValidator(join(recoveryPhrase, ' '))}
           error={recoveryPhraseField.error}
@@ -389,10 +406,10 @@ export default class WalletRestoreDialog extends Component<Props> {
           preselectedOptions={recoveryPhraseField.value}
         />
 
-        {showPaperPassword ? (
+        {showPaperPassword === true ? (
           <div className={styles.walletPassword}>
             <div className={paperPasswordFieldClasses}>
-              {isVerificationMode ? '' : (
+              {isVerificationMode === true ? '' : (
                 <div className={headerBlockClasses}>
                   {intl.formatMessage(messages.passwordDisclaimer)}
                 </div>
@@ -408,7 +425,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           </div>
         ) : ''}
 
-        {isVerificationMode ? '' : (
+        {isVerificationMode === true ? '' : (
           <div className={styles.walletPassword}>
             <div className={walletPasswordFieldsClasses}>
               <Input
@@ -425,7 +442,6 @@ export default class WalletRestoreDialog extends Component<Props> {
                 error={repeatedPasswordField.error}
                 skin={InputOwnSkin}
               />
-              <PasswordInstructions />
             </div>
           </div>
         )}

@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import UserPasswordDialog from '../../../components/wallet/settings/paper-wallets/UserPasswordDialog';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import environment from '../../../environment';
+import config from '../../../config';
 import PaperWalletsActions from '../../../actions/ada/paper-wallets-actions';
 import PaperWalletCreateStore, { ProgressStep } from '../../../stores/ada/PaperWalletCreateStore';
 import { Logger } from '../../../utils/logging';
@@ -13,6 +14,7 @@ import validWords from 'bip39/src/wordlists/english.json';
 import FinalizeDialog from '../../../components/wallet/settings/paper-wallets/FinalizeDialog';
 import type { AdaPaper } from '../../../api/ada';
 import { defineMessages, intlShape } from 'react-intl';
+import globalMessages from '../../../i18n/global-messages';
 
 const messages = defineMessages({
   verifyPaperWallet: {
@@ -21,17 +23,25 @@ const messages = defineMessages({
   },
 });
 
+type State = {
+  notificationElementId: string,
+};
+
 @observer
-export default class CreatePaperWalletDialogContainer extends Component<InjectedProps> {
+export default class CreatePaperWalletDialogContainer extends Component<InjectedProps, State> {
 
   static contextTypes = {
     intl: intlShape.isRequired
   };
 
+  state = {
+    notificationElementId: ''
+  };
+
   render() {
     const { intl } = this.context;
     const { actions } = this.props;
-    const { uiDialogs, profile } = this.props.stores;
+    const { uiDialogs, uiNotifications, profile } = this.props.stores;
     const { updateDataForActiveDialog } = actions.dialogs;
     const dialogData = uiDialogs.dataForActiveDialog;
 
@@ -44,6 +54,11 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
         throw new Error('Internal error! Paper instance is not available when should be.');
       }
       return paper;
+    };
+
+    const tooltipNotification = {
+      duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
+      message: globalMessages.copyTooltipMessage,
     };
 
     const onCancel = () => {
@@ -113,6 +128,19 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
             onCancel={onCancel}
             onBack={paperActions.backToCreate.trigger}
             classicTheme={profile.isClassicTheme}
+            onCopyAddressTooltip={(address, elementId) => {
+              if (!uiNotifications.isOpen(elementId)) {
+                this.setState({ notificationElementId: elementId });
+                actions.notifications.open.trigger({
+                  id: elementId,
+                  duration: tooltipNotification.duration,
+                  message: tooltipNotification.message,
+                });
+              }
+            }}
+            getNotification={uiNotifications.getTooltipActiveNotification(
+              this.state.notificationElementId
+            )}
           />
         );
       default:

@@ -10,6 +10,7 @@ import CopyableAddress from '../widgets/CopyableAddress';
 import RawHash from '../widgets/hashWrappers/RawHash';
 import WalletAccountIcon from '../topbar/WalletAccountIcon';
 import Dialog from '../widgets/Dialog';
+import DialogTextBlock from '../widgets/DialogTextBlock';
 import type { WalletAccountNumberPlate } from '../../domain/Wallet';
 import LocalizableError from '../../i18n/LocalizableError';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
@@ -51,7 +52,8 @@ type Props = {|
   addresses: Array<string>,
   accountPlate: WalletAccountNumberPlate,
   selectedExplorer: ExplorerType,
-  onCopyAddress?: Function,
+  onCopyAddressTooltip: Function,
+  getNotification: Function,
   onNext: Function,
   onCancel: Function,
   isSubmitting: boolean,
@@ -62,7 +64,6 @@ type Props = {|
 @observer
 export default class WalletRestoreVerifyDialog extends Component<Props> {
   static defaultProps = {
-    onCopyAddress: undefined,
     error: undefined,
   };
 
@@ -80,7 +81,8 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
       onCancel,
       onNext,
       classicTheme,
-      onCopyAddress,
+      onCopyAddressTooltip,
+      getNotification,
     } = this.props;
 
     const dialogClasses = classnames(['walletRestoreVerifyDialog', styles.dialog]);
@@ -95,20 +97,12 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
         onClick: onNext,
         primary: true,
         className: classnames(['confirmButton', isSubmitting ? styles.isSubmitting : null]),
+        disabled: isSubmitting,
       },
     ];
 
-    return (
-      <Dialog
-        title={intl.formatMessage(messages.dialogTitleVerifyWalletRestoration)}
-        actions={actions}
-        closeOnOverlayClick={false}
-        onClose={onCancel}
-        className={dialogClasses}
-        backButton={<DialogBackButton onBack={onCancel} />}
-        classicTheme={classicTheme}
-      >
-
+    const introMessage = (
+      <div>
         <span>{intl.formatMessage(messages.walletRestoreVerifyIntroLine1)}</span><br />
         <ul>
           <li className={styles.smallTopMargin}>
@@ -121,43 +115,78 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
             <span><FormattedHTMLMessage {...messages.walletRestoreVerifyIntroLine4} /></span>
           </li>
         </ul>
+      </div>
+    );
 
-        <div>
-          <h2 className={styles.addressLabel}>
-            {intl.formatMessage(messages.walletRestoreVerifyAccountIdLabel)}
-          </h2>
-          <div className={styles.plateRowDiv}>
-            <WalletAccountIcon
-              iconSeed={accountPlate.hash}
-            />
-            <span className={styles.plateIdSpan}>{accountPlate.id}</span>
-          </div>
+    const walletPlate = (
+      <div>
+        <h2 className={styles.addressLabel}>
+          {intl.formatMessage(messages.walletRestoreVerifyAccountIdLabel)}
+        </h2>
+        <div className={styles.plateRowDiv}>
+          <WalletAccountIcon
+            iconSeed={accountPlate.hash}
+          />
+          <span className={styles.plateIdSpan}>{accountPlate.id}</span>
         </div>
+      </div>
+    );
 
-        <div>
-          <h2 className={styles.addressLabel}>
-            {intl.formatMessage(messages.walletRestoreVerifyAddressesLabel)}
-          </h2>
-          {addresses.map(a => (
+    const walletAddresses = (
+      <div>
+        <h2 className={styles.addressLabel}>
+          {intl.formatMessage(messages.walletRestoreVerifyAddressesLabel)}
+        </h2>
+        {addresses.map((address, index) => {
+          const notificationElementId = `${address}-${index}`;
+          return (
             <CopyableAddress
-              hash={a}
-              onCopyAddress={onCopyAddress}
-              key={a}
+              hash={address}
+              elementId={notificationElementId}
+              onCopyAddress={onCopyAddressTooltip.bind(this, address, notificationElementId)}
+              getNotification={getNotification}
+              tooltipOpensUpward
+              key={address}
             >
               <ExplorableHashContainer
                 selectedExplorer={this.props.selectedExplorer}
-                hash={a}
+                hash={address}
                 light
                 tooltipOpensUpward
                 linkType="address"
               >
                 <RawHash light>
-                  {a}
+                  {address}
                 </RawHash>
               </ExplorableHashContainer>
             </CopyableAddress>
-          ))}
-        </div>
+          );
+        })}
+      </div>
+    );
+
+    return (
+      <Dialog
+        title={intl.formatMessage(messages.dialogTitleVerifyWalletRestoration)}
+        actions={actions}
+        closeOnOverlayClick={false}
+        onClose={onCancel}
+        className={dialogClasses}
+        backButton={<DialogBackButton onBack={onCancel} />}
+        classicTheme={classicTheme}
+      >
+        <DialogTextBlock>
+          {introMessage}
+        </DialogTextBlock>
+
+        <DialogTextBlock>
+          {walletPlate}
+        </DialogTextBlock>
+
+        <DialogTextBlock subclass="component-bottom">
+          {walletAddresses}
+        </DialogTextBlock>
+
         <div className={styles.postCopyMargin} />
 
         {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}

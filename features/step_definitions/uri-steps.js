@@ -19,13 +19,13 @@ Then(/^I should see the URI displayed in a new dialog$/, async function () {
 });
 
 Then(/^I click on the copy to clipboard icon$/, async function () {
-  await this.click('.URIDisplayDialog_copyIcon');
+  await this.click('.URIDisplayDialog_uriDisplay .CopyableAddress_copyIconBig');
 });
 
-Then(/^I should see "URL successfully copied" notification:$/, async function (data) {
+Then(/^I should see URI "copied" tooltip message:$/, async function (data) {
   const notification = data.hashes()[0];
   const notificationMessage = await this.intl(notification.message);
-  await this.waitForElement(`//div[@class='NotificationMessage_message'][contains(text(), '${notificationMessage}')]`, By.xpath);
+  await this.waitForElement(`//div[@class='SimpleBubble_bubble'][contains(text(), '${notificationMessage}')]`, By.xpath);
 });
 
 When(/^I open a cardano URI for address (([^"]*)) and ([0-9]+) ADA$/, async function (address, amount) {
@@ -33,6 +33,7 @@ When(/^I open a cardano URI for address (([^"]*)) and ([0-9]+) ADA$/, async func
   const uri = this.getExtensionUrl() + '#/send-from-uri?q=web+cardano:' + address + '?amount=' + amount;
   await this.driver.get('about:blank'); // dummy step, but needed
   await this.driver.get(uri);
+  await this.driver.sleep(500);
 });
 
 Then(/^I should see and accept a warning dialog$/, async function () {

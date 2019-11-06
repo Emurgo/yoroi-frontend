@@ -1,10 +1,14 @@
 // Css module overrides go here …
 
 .autocompleteWrapper  {
+  input {
+    background: var(--rp-autocomplete-input-bg-color, transparent);
+    border: var(--rp-autocomplete-input-border, 0);
+  }
   .autocompleteContent {
     border: none;
     min-height: 140px;
-    padding: 0 40px 15px 15px;
+    padding: 10px 40px 15px 15px;
     border-radius: 8px;
 
     &:hover {
@@ -47,6 +51,19 @@
           margin-right: 6px;
         }
       }
+    }
+  }
+}
+
+:global(.YoroiModern) {
+  :global {
+    .SimpleAutocomplete_opened + .FormFieldOwnSkin_legend,
+    .hasSelectedWords + .FormFieldOwnSkin_legend {
+      color: var(--rp-formfield-label-text-color);
+      transform: translate(-10px, -24px);
+      font-size: 12px;
+      opacity: 1;
+      background: inherit;
     }
   }
 }

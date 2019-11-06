@@ -13,13 +13,21 @@
 ../node_modules/eslint-plugin-jsx-a11y
 
 [untyped]
-.*/node_modules/trezor-connect/lib/popup/PopupManager.js
-.*/node_modules/trezor-connect/lib/iframe/builder.js
+.*/node_modules/trezor-connect/lib/utils/networkUtils.js
+.*/node_modules/trezor-connect/lib/index.js
 
 [libs]
 flow/declarations/
 
+[lints]
+sketchy-null=warn
+sketchy-number=warn
+# re-enable this if it's ever shipped as part of Flow
+# no-floating-promises=warn
+
 [options]
+include_warnings=true
+server.max_workers=1
 esproposal.class_static_fields=enable
 esproposal.class_instance_fields=enable
 esproposal.export_star_as=enable
@@ -29,6 +37,5 @@ module.name_mapper.extension='scss' -> '<PROJECT_ROOT>/flow/mappers/CSSModule.js
 module.name_mapper.extension='png' -> '<PROJECT_ROOT>/flow/mappers/WebpackAsset.js.flow'
 module.name_mapper.extension='jpg' -> '<PROJECT_ROOT>/flow/mappers/WebpackAsset.js.flow'
 module.name_mapper.extension='svg' -> '<PROJECT_ROOT>/flow/mappers/WebpackAsset.js.flow'
-module.name_mapper='\(react-dropzone\)' -> '<PROJECT_ROOT>/flow/mappers/GeneralStub.js.flow'
 suppress_comment=\\(.\\|\n\\)*\\$FlowFixMe
 suppress_comment=\\(.\\|\n\\)*\\$FlowIssue

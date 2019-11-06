@@ -72,27 +72,29 @@ export default class OptionBlock extends Component<Props, State> {
             </div>
           </button>
           {/* Learn more block */}
-          {learnMoreText &&
-            <div>
-              <div className={learnMoreTextBlockClasses}>
-                <div className={styles.leramMoreTextWrapper}>
-                  <p className={styles.learnMoreText}>{learnMoreText}</p>
+          {(learnMoreText != null && learnMoreText !== '')
+            ? (
+              <div>
+                <div className={learnMoreTextBlockClasses}>
+                  <div className={styles.leramMoreTextWrapper}>
+                    <p className={styles.learnMoreText}>{learnMoreText}</p>
+                  </div>
                 </div>
-              </div>
-              <button
-                className={learnMoreButtonClasses}
-                type="button"
-                onClick={this.toggleLearnMore.bind(this)}
-              >
-                {intl.formatMessage(globalMessages.learnMore)}
-                <SvgInline
-                  svg={arrowDownSVG}
-                  width="20px"
-                  height="20px"
-                  className={styles.learnMoreButtonIcon}
-                />
-              </button>
-            </div>
+                <button
+                  className={learnMoreButtonClasses}
+                  type="button"
+                  onClick={this.toggleLearnMore.bind(this)}
+                >
+                  {intl.formatMessage(globalMessages.learnMore)}
+                  <SvgInline
+                    svg={arrowDownSVG}
+                    width="20px"
+                    height="20px"
+                    className={styles.learnMoreButtonIcon}
+                  />
+                </button>
+              </div>)
+            : null
           }
         </div>
       </li>

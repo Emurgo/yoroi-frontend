@@ -14,7 +14,6 @@ import globalMessages from '../../../../i18n/global-messages';
 import styles from './UserPasswordDialog.scss';
 import headerMixin from '../../../mixins/HeaderBlock.scss';
 import config from '../../../../config';
-import PasswordInstructions from '../../../widgets/forms/PasswordInstructions';
 
 const messages = defineMessages({
   dialogTitleUserPaperPassword: {
@@ -71,7 +70,8 @@ export default class UserPasswordDialog extends Component<Props> {
       paperPassword: {
         type: 'password',
         label: this.context.intl.formatMessage(messages.paperPasswordLabel),
-        placeholder: this.context.intl.formatMessage(messages.paperPasswordPlaceholder),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(messages.paperPasswordPlaceholder) : '',
         value: '',
         validators: [({ field, form }) => {
           const repeatPasswordField = form.$('repeatPassword');
@@ -87,7 +87,8 @@ export default class UserPasswordDialog extends Component<Props> {
       repeatPassword: {
         type: 'password',
         label: this.context.intl.formatMessage(messages.repeatPasswordLabel),
-        placeholder: this.context.intl.formatMessage(messages.repeatPasswordPlaceholder),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(messages.repeatPasswordPlaceholder) : '',
         value: '',
         validators: [({ field, form }) => {
           const paperPassword = form.$('paperPassword').value;
@@ -196,10 +197,6 @@ export default class UserPasswordDialog extends Component<Props> {
             skin={InputOwnSkin}
           />
         </div>
-        <PasswordInstructions
-          instructionDescriptor={globalMessages.passwordInstructionsPaperWallet}
-        />
-
       </Dialog>
     );
   }

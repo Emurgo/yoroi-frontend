@@ -1,5 +1,6 @@
 @import '../../themes/mixins/loading-spinner';
 @import '../../themes/mixins/error-message';
+@import '../../themes/mixins/underline';
 
 .component {
   flex: 1;
@@ -106,7 +107,7 @@
         text-transform: uppercase;
 
         &:hover {
-          text-decoration: underline;
+          @include underline(var(--theme-underline-dark-color));
         }
       }
     }
@@ -156,18 +157,11 @@
             object-fit: contain;
             margin-left: 4px;
             & > svg {
-              height: 14.5px;
-              width: 11.5px;
+              height: 20px;
+              width: 20px;
               path {
                 fill: var(--theme-icon-copy-address-color);
               }
-            }
-          }
-
-          .verifyIcon, .generateURIIcon {
-            & > svg {
-              height: 20px;
-              width: 20px;
             }
           }
 

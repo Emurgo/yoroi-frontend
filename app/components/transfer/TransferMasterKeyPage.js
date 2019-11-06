@@ -47,7 +47,8 @@ export default class TransferMasterKeyPage extends Component<Props> {
     fields: {
       masterKey: {
         label: this.context.intl.formatMessage(messages.masterKeyInputLabel),
-        placeholder: this.context.intl.formatMessage(messages.masterKeyInputHint),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(messages.masterKeyInputHint) : '',
         value: '',
         validators: [({ field }) => {
           const value = field.value;
@@ -118,14 +119,12 @@ export default class TransferMasterKeyPage extends Component<Props> {
               </div>
 
               <ul className={styles.instructionsList}>
-                {
-                  <div className={styles.text}>
-                    {step0}
-                    {intl.formatMessage(globalMessages.step1)}
-                    <br /><br />
-                    {intl.formatMessage(messages.masterKeyRequirements)}
-                  </div>
-                }
+                <div className={styles.text}>
+                  {step0}
+                  {intl.formatMessage(globalMessages.step1)}
+                  <br /><br />
+                  {intl.formatMessage(messages.masterKeyRequirements)}
+                </div>
               </ul>
             </div>
 

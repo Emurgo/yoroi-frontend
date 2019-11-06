@@ -66,24 +66,28 @@ export default class Dialog extends Component<Props> {
       >
 
         <div className={classnames([styles.component, className])}>
-          {title && (
-            <div className={styles.title}>
-              <h1>{title}</h1>
-            </div>)
+          {(title != null && title !== '')
+            ? (
+              <div className={styles.title}>
+                <h1>{title}</h1>
+              </div>)
+            : null
           }
 
-          {children && (
-            <div className={styles.content}>
-              {children}
-            </div>)
+          {children != null
+            ? (
+              <div className={styles.content}>
+                {children}
+              </div>)
+            : null
           }
 
-          {actions && (
+          {actions && actions.length > 0 && (
             <div className={styles.actions}>
               {_.map(actions, (action, i: number) => {
                 const buttonClasses = classnames([
-                  action.className ? action.className : null,
-                  action.primary ? 'primary' : secondaryButton,
+                  action.className != null ? action.className : null,
+                  action.primary === true ? 'primary' : secondaryButton,
                 ]);
                 return (
                   <Button

@@ -39,8 +39,8 @@ export default class TopBarContainer extends Component<Props> {
         onCategoryClicked={category => {
           actions.topbar.activateTopbarCategory.trigger({ category });
         }}
-        categories={topbar.CATEGORIES}
-        activeTopbarCategory={topbar.activeTopbarCategory}
+        isActiveCategory={topbar.isActiveCategory}
+        categories={topbar.categories}
       />
     );
   }

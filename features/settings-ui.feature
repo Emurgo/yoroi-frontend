@@ -6,7 +6,7 @@ Feature: Wallet UI Settings
 
   @it-12
   Scenario Outline: User can't change password if it doesn't meet complexity requirements (IT-12)
-    And There is a wallet stored named empty-wallet
+    And I import a snapshot named empty-wallet
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
     And I click on the "change" password label
@@ -14,8 +14,8 @@ Feature: Wallet UI Settings
     And I change wallet password:
     | currentPassword    | password     | repeatedPassword   |
     | <currentPassword>  | <password>   | <repeatedPassword> |
-    And I submit the wallet password dialog
-    Then I should see the following error messages:
+    Then I see the submit button is disabled
+    And I should see the following error messages:
     | message                             |
     | global.errors.invalidWalletPassword |
   Examples:
@@ -24,7 +24,7 @@ Feature: Wallet UI Settings
 
 @it-94
   Scenario Outline: User is able to change spending password (IT-94)
-    And There is a wallet stored named tx-big-input-wallet
+    And I import a snapshot named tx-big-input-wallet
     And I have a wallet with funds
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
@@ -56,7 +56,7 @@ Feature: Wallet UI Settings
   
   @it-91
   Scenario Outline: Password should be case-sensitive [Wallet password changing] (IT-91)
-    And There is a wallet stored named empty-wallet
+    And I import a snapshot named empty-wallet
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
     And I click on the "change" password label
@@ -77,7 +77,7 @@ Feature: Wallet UI Settings
   
   @it-8
   Scenario Outline: Wallet renaming (IT-8)
-    And There is a wallet stored named empty-wallet
+    And I import a snapshot named empty-wallet
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
     And I click on "name" input field
@@ -98,7 +98,7 @@ Feature: Wallet UI Settings
 
   @it-41
   Scenario Outline: Wallet can't be renamed if new wallet name doesn't meet requirements (IT-41)
-    And There is a wallet stored named empty-wallet
+    And I import a snapshot named empty-wallet
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
     And I click on "name" input field
@@ -115,7 +115,7 @@ Feature: Wallet UI Settings
 
   @it-14
   Scenario: User can't change the password without entering old password (IT-14)
-    And There is a wallet stored named empty-wallet
+    And I import a snapshot named empty-wallet
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
     And I click on the "change" password label
@@ -129,7 +129,7 @@ Feature: Wallet UI Settings
 
   @it-40
   Scenario: User can't change password without filling Password repeat field (IT-40)
-    And There is a wallet stored named empty-wallet
+    And I import a snapshot named empty-wallet
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
     And I click on the "change" password label
@@ -138,8 +138,8 @@ Feature: Wallet UI Settings
     | currentPassword    | password     | repeatedPassword |
     | aaSecret_123         | newSecret123 | newSecret123     |
     And I clear the current wallet repeat password newSecret123 
-    And I submit the wallet password dialog
-    Then I should stay in the change password dialog
+    Then I see the submit button is disabled
+    And I should stay in the change password dialog
     And I should see "Doesn't match" error message:
     | message                             |
     | global.errors.invalidRepeatPassword |

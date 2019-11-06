@@ -67,7 +67,8 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
       walletPassword: {
         type: 'password',
         label: this.context.intl.formatMessage(messages.walletPasswordLabel),
-        placeholder: this.context.intl.formatMessage(messages.walletPasswordFieldPlaceholder),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(messages.walletPasswordFieldPlaceholder) : '',
         value: '',
         validators: [({ field }) => {
           if (field.value === '') {
@@ -142,7 +143,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
         onClick: this.submit.bind(this),
         primary: true,
         className: confirmButtonClasses,
-        disabled: !walletPasswordField.isValid,
+        disabled: !walletPasswordField.isValid || isSubmitting,
       },
     ];
 
@@ -209,15 +210,14 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
             </div>
           </div>
 
-          {
-            <Input
-              type="password"
-              className={styles.walletPassword}
-              {...walletPasswordField.bind()}
-              error={walletPasswordField.error}
-              skin={InputOwnSkin}
-            />
-          }
+          <Input
+            type="password"
+            className={styles.walletPassword}
+            {...walletPasswordField.bind()}
+            disabled={isSubmitting}
+            error={walletPasswordField.error}
+            skin={InputOwnSkin}
+          />
         </div>
 
         {error ? <p className={styles.error}>{intl.formatMessage(error)}</p> : null}

@@ -3,7 +3,7 @@ Feature: URI scheme
   Background:
     Given I have opened the extension
     And I have completed the basic setup
-    And There is a wallet stored named empty-wallet
+    And I import a snapshot named empty-wallet
 
   @it-107
   Scenario: Ensure user can generate a wallet URI and copy it to clipboard (IT-107)
@@ -13,9 +13,9 @@ Feature: URI scheme
     And I generate a URI for 10 ADA
     Then I should see the URI displayed in a new dialog
     When I click on the copy to clipboard icon
-    Then I should see "URL successfully copied" notification:
-    | message                              |
-    | uri.display.dialog.copy.notification |
+    Then I should see URI "copied" tooltip message:
+    | message                                            |
+    | global.copyTooltipMessage |
 
   @it-108
   Scenario: Ensure user can send a tx from a URI link (IT-108)

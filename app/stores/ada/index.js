@@ -8,9 +8,9 @@ import TransactionsStore from './AdaTransactionsStore';
 import AdaWalletSettingsStore from './AdaWalletSettingsStore';
 import AddressesStore from './AdaAddressesStore';
 import DaedalusTransferStore from './DaedalusTransferStore';
+import YoroiTransferStore from './YoroiTransferStore';
 import TrezorConnectStore from './TrezorConnectStore';
 import TrezorSendStore from './TrezorSendStore';
-import AdaRedemptionStore from './AdaRedemptionStore';
 import AdaTransactionBuilderStore from './AdaTransactionBuilderStore';
 import LedgerConnectStore from './LedgerConnectStore';
 import LedgerSendStore from './LedgerSendStore';
@@ -20,13 +20,13 @@ import StateFetchStore from './StateFetchStore';
 import ServerConnectionStore from './ServerConnectionStore';
 
 export const adaStoreClasses = {
-  adaRedemption: AdaRedemptionStore,
   wallets: AdaWalletsStore,
   paperWallets: PaperWalletCreateStore,
   transactions: TransactionsStore,
   walletSettings: AdaWalletSettingsStore,
   addresses: AddressesStore,
   daedalusTransfer: DaedalusTransferStore,
+  yoroiTransfer: YoroiTransferStore,
   trezorConnect: TrezorConnectStore,
   trezorSend: TrezorSendStore,
   ledgerConnect: LedgerConnectStore,
@@ -38,13 +38,13 @@ export const adaStoreClasses = {
 };
 
 export type AdaStoresMap = {
-  adaRedemption: AdaRedemptionStore,
   wallets: AdaWalletsStore,
   paperWallets: PaperWalletCreateStore,
   transactions: TransactionsStore,
   walletSettings: AdaWalletSettingsStore,
   addresses: AddressesStore,
   daedalusTransfer: DaedalusTransferStore,
+  yoroiTransfer: YoroiTransferStore,
   trezorConnect: TrezorConnectStore,
   trezorSend: TrezorSendStore,
   ledgerConnect: LedgerConnectStore,
@@ -56,13 +56,13 @@ export type AdaStoresMap = {
 };
 
 const adaStores = observable({
-  adaRedemption: null,
   wallets: null,
   paperWallets: null,
   transactions: null,
   walletSettings: null,
   addresses: null,
   daedalusTransfer: null,
+  yoroiTransfer: null,
   trezorConnect: null,
   trezorSend: null,
   ledgerConnect: null,

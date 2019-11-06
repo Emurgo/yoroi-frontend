@@ -8,7 +8,6 @@ import type { InjectedProps } from '../../../types/injectedPropsType';
 import ThemeSettingsBlock from '../../../components/settings/categories/general-setting/ThemeSettingsBlock';
 import UriSettingsBlock from '../../../components/settings/categories/general-setting/UriSettingsBlock';
 import registerProtocols from '../../../uri-protocols';
-import { openSandboxedTab, handlersSettingUrl } from '../../../utils/tabManager';
 import environment from '../../../environment';
 import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
 import type { ExplorerType } from '../../../domain/Explorer';
@@ -61,7 +60,6 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
     const uriSettings = environment.userAgentInfo.canRegisterProtocol()
       ? (
         <UriSettingsBlock
-          openSettingsPage={() => openSandboxedTab(handlersSettingUrl)}
           registerUriScheme={() => registerProtocols()}
           isFirefox={environment.userAgentInfo.isFirefox}
         />

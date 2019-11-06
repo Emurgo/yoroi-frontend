@@ -1,7 +1,9 @@
+@import '../../../themes/mixins/underline';
+
 .testnetWarning {
   font-family: var(--rp-theme-font-bold);
   text-align: center;
-  color: white;
+  color: var(--cmn-color-white);
   background-color: var(--theme-banner-warning-background-color);
   padding: 4px;
   text-transform: uppercase;
@@ -15,8 +17,9 @@
   }
 
   a {
-    color: white;
+    color: var(--cmn-color-white);
     font-family: var(--rp-theme-font-bold);
     text-transform: uppercase;
+    @include underline(var(--cmn-color-white));
   }
 }

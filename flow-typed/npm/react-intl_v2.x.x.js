@@ -111,12 +111,13 @@ declare module "react-intl" {
     | "other";
 
   declare type $npm$ReactIntl$DateParseable = number | string | Date;
-  // PropType checker
-  declare function intlShape(
-    props: Object,
-    propName: string,
-    componentName: string
-  ): void;
+
+  /** This is a hack to trick React into resolving the right type for `intl`
+   * This won't be needed if we migration to react-intl 3.0
+   * so no need to spend time fixing it properly.
+   */
+  declare var intlShape: { isRequired: $npm$ReactIntl$IntlFormat };
+
   declare function addLocaleData(
     data: $npm$ReactIntl$LocaleData | Array<$npm$ReactIntl$LocaleData>
   ): void;

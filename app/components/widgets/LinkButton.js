@@ -36,23 +36,21 @@ export default class LinkButton extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        {
-          <a
-            href={url}
-            onClick={event => onExternalLinkClick(event)}
-            className={styles.block}
-            title={intl.formatMessage(message)}
-          >
-            <div className={styles.icon}>
-              <SvgInline svg={svg} className={svgClass} />
-            </div>
-            <div className={styles.text}>
-              <span className={textClassName}>
-                {intl.formatMessage(message)}
-              </span>
-            </div>
-          </a>
-        }
+        <a
+          href={url}
+          onClick={event => onExternalLinkClick(event)}
+          className={styles.block}
+          title={intl.formatMessage(message)}
+        >
+          <div className={styles.icon}>
+            <SvgInline svg={svg} className={svgClass} />
+          </div>
+          <div className={styles.text}>
+            <span className={textClassName}>
+              {intl.formatMessage(message)}
+            </span>
+          </div>
+        </a>
       </div>
     );
   }

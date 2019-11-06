@@ -180,7 +180,7 @@ export default class WalletSendPage extends Component<Props> {
     const receivers = signRequestReceivers(signRequest, false);
 
     let hwSendConfirmationDialog: Node = null;
-    if (active.isLedgerNanoSWallet) {
+    if (active.isLedgerNanoWallet) {
       const ledgerSendAction = this.props.actions[environment.API].ledgerSend;
       ledgerSendAction.init.trigger();
       const ledgerSendStore = this.props.stores.substores[environment.API].ledgerSend;

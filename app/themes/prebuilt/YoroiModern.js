@@ -188,7 +188,7 @@ const topbarGradient = {
 
 // Modal Margin
 const modalMargin = {
-  top: 25,
+  top: 24,
   right: 40,
   bottom: 40,
   left: 40,
@@ -221,11 +221,8 @@ export default {
   '--font-mono-bold': 'RobotoMono-Bold',
 
   '--theme-input-hint-font': 'Rubik-Regular',
-  '--theme-footer-text-font': 'Helvetica-Regular',
 
   // COLORS
-  '--theme-footer-background-color': '#fff',
-
   '--theme-scrollbar-thumb-background': '#c8ccce',
 
   '--theme-bordered-box-background-color': '#f0f3f5',
@@ -264,6 +261,10 @@ export default {
   '--theme-dialog-big-button-label-color': '#353535',
   '--theme-dialog-big-button-description-color': '#353535',
   '--theme-dialog-title-color': '#2b2c32',
+  '--theme-dialog-title-margin': '0 0 38px 0',
+  '--theme-dialog-input-margin': '10px 0 24px 0',
+  '--theme-dialog-input-actions-margin': '34px 0 0 0',
+  '--theme-dialog-password-input-actions-margin-top': '10px',
 
   '--theme-main-body-background-color': '#ffffff',
   '--theme-main-body-messages-color': '#353535',
@@ -340,27 +341,6 @@ export default {
   '--theme-transactions-sent-color': '#4a4a4a',
   '--theme-transactions-received-color': '#15d1aa',
 
-  '--theme-ada-redemption-headline-color': '#121327',
-  '--theme-ada-redemption-instructions-color': '#121327',
-  '--theme-ada-redemption-success-overlay-background-color': 'rgba(218, 164, 154, 0.88)',
-  '--theme-ada-redemption-success-overlay-border-color': '#fafbfc',
-  '--theme-ada-redemption-success-overlay-message-color': '#fafbfc',
-  '--theme-ada-redemption-success-overlay-button-text-color': '#fafbfc',
-  '--theme-ada-redemption-success-overlay-button-text-color-hover': '#daa49a',
-  '--theme-ada-redemption-success-overlay-button-background-color-hover': '#fafbfc',
-  '--theme-ada-redemption-disclaimer-background-color': 'rgba(171, 23, 0, 0.94)',
-  '--theme-ada-redemption-disclaimer-text-color': '#fafbfc',
-  '--theme-ada-redemption-disclaimer-button-background-color': '#ab1700',
-  '--theme-ada-redemption-disclaimer-button-text-color': '#fafbfc',
-  '--theme-ada-redemption-disclaimer-button-background-color-hover': '#fafbfc',
-  '--theme-ada-redemption-disclaimer-button-text-color-hover': '#ab1700',
-  '--theme-ada-redemption-disclaimer-checkbox-color-check': '#fafbfc',
-  '--theme-ada-redemption-disclaimer-checkbox-color-checked': '#fafbfc',
-  '--theme-ada-redemption-disclaimer-checkbox-color-after': '#ab1700',
-  '--theme-ada-redemption-disclaimer-checkbox-label-color': '#fafbfc',
-  '--theme-ada-redemption-disclaimer-button-border-color': '#fafbfc',
-  '--theme-ada-redemption-no-wallets-instructions-color': '#121327',
-
   '--theme-icon-nav-color': '#adaeb6',
   '--theme-icon-nav-color-active': '#ffffff',
   '--theme-icon-topbar-color': '#ffffff',
@@ -368,6 +348,7 @@ export default {
   '--theme-icon-ada-summary-wallet-amount-symbol-color': '#2b2c32',
   '--theme-icon-ada-summary-wallet-pending-confirmation-symbol-color': '#2b2c32',
   '--theme-icon-copy-address-color': '#353535',
+  '--theme-icon-copy-address-button-background-color': '#D9DDE0',
   '--theme-icon-back-button-color': '#353535',
   '--theme-icon-close-button-color': '#353535',
   '--theme-icon-transactions-ada-symbol-color': '#353535',
@@ -380,7 +361,6 @@ export default {
   '--theme-wallet-add-option-dialog-item-learn-more-button-color': '#ADAEB6',
   '--theme-wallet-add-option-dialog-item-learn-more-button-bg-color': '#F5F7F9',
   '--theme-wallet-add-translucent-color': 'rgba(255, 255, 255, 0.5)',
-  '--theme-wallet-add-footer-text-color': '#353535',
 
   '--theme-instructions-text-color': '#adaeb6',
   '--theme-instructions-recovery-text-color': '#2b2c32',
@@ -406,8 +386,8 @@ export default {
   '--theme-trezor-connect-dialog-middle-block-common-error-background-color': '#ffffff',
 
   '--theme-widgets-progress-step-common-color': '#15d1aa',
-  '--theme-widgets-explorable-hash-underline-light-color': '#adaeB6',
-  '--theme-widgets-explorable-hash-underline-dark-color': '#464749',
+  '--theme-underline-light-color': '#adaeB6',
+  '--theme-underline-dark-color': '#464749',
   '--theme-widgets-hash-dark-color': '#464749',
   '--theme-widgets-hash-light-color': '#adaeB6',
 

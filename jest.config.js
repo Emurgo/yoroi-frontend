@@ -1,13 +1,15 @@
 module.exports = {
-  "moduleNameMapper": {
-    // get rid of the fake module we use to trick flow
-    "CardanoWallet": "lodash/noop.js",
+  moduleNameMapper: {
     // mock out the browser version of WASM bindings with the nodejs bindings
-    "cardano-wallet-browser": "cardano-wallet",
-    "\\.png$": "lodash/noop.js",
-    "pdfParser$": "lodash/noop.js",
+    'cardano-wallet-browser': 'cardano-wallet',
+    '\\.png$': 'lodash/noop.js',
   },
-  "transformIgnorePatterns": [
-    "<rootDir>/node_modules/(?!yoroi-extension-ledger-bridge)"
+  transformIgnorePatterns: [
+    '<rootDir>/node_modules/(?!yoroi-extension-ledger-connect-handler)'
   ],
+  setupFiles: [
+    'jest-canvas-mock'
+  ],
+  // ignore manifest.test.js file, because it isn't a test
+  testPathIgnorePatterns: ['manifest.test.js']
 };

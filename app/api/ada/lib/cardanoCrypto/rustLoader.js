@@ -1,14 +1,12 @@
 // @flow
 
-import * as CardanoWallet from 'CardanoWallet'; // eslint-disable-line
-
-export type WalletType = typeof CardanoWallet;
+// eslint-disable-next-line
+import typeof * as WalletType from 'cardano-wallet-browser';
 
 class Module {
   _cardanoWallet: WalletType;
 
   async load() {
-    // $FlowFixMe flow fails on dynamic imports
     this._cardanoWallet = await import('cardano-wallet-browser');  // eslint-disable-line
   }
 

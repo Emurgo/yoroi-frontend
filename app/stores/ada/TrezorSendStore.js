@@ -71,7 +71,7 @@ export default class TrezorSendStore extends Store {
       }
 
       const accountId = addresses._getAccountIdByWalletId(activeWallet.id);
-      if (!accountId) {
+      if (accountId == null) {
         // this Error will be converted to LocalizableError()
         throw new Error('Active account required before sending.');
       }
@@ -90,7 +90,7 @@ export default class TrezorSendStore extends Store {
         { ...trezorSignTxDataResp.trezorSignTxPayload }
       );
 
-      if (trezorSignTxResp && trezorSignTxResp.payload && trezorSignTxResp.payload.error) {
+      if (trezorSignTxResp && trezorSignTxResp.payload && trezorSignTxResp.payload.error != null) {
         // this Error will be converted to LocalizableError()
         throw new Error(trezorSignTxResp.payload.error);
       }
@@ -120,7 +120,7 @@ export default class TrezorSendStore extends Store {
 
     this.actions.dialogs.closeActiveDialog.trigger();
     const { wallets } = this.stores.substores[environment.API];
-    wallets.refreshWalletsData();
+    await wallets.refreshWalletsData();
 
     const activeWallet = wallets.active;
     if (activeWallet) {

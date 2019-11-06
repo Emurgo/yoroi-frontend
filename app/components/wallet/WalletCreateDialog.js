@@ -13,7 +13,6 @@ import globalMessages from '../../i18n/global-messages';
 import styles from './WalletCreateDialog.scss';
 import config from '../../config';
 import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
-import PasswordInstructions from '../widgets/forms/PasswordInstructions';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -80,7 +79,8 @@ export default class WalletCreateDialog extends Component<Props, State> {
     fields: {
       walletName: {
         label: this.context.intl.formatMessage(messages.walletName),
-        placeholder: this.context.intl.formatMessage(messages.walletNameHint),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(messages.walletNameHint) : '',
         value: '',
         validators: [({ field }) => (
           [
@@ -92,7 +92,8 @@ export default class WalletCreateDialog extends Component<Props, State> {
       walletPassword: {
         type: 'password',
         label: this.context.intl.formatMessage(messages.walletPasswordLabel),
-        placeholder: this.context.intl.formatMessage(messages.passwordFieldPlaceholder),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(messages.passwordFieldPlaceholder) : '',
         value: '',
         validators: [({ field, form }) => {
           const repeatPasswordField = form.$('repeatPassword');
@@ -108,7 +109,8 @@ export default class WalletCreateDialog extends Component<Props, State> {
       repeatPassword: {
         type: 'password',
         label: this.context.intl.formatMessage(messages.repeatPasswordLabel),
-        placeholder: this.context.intl.formatMessage(messages.repeatPasswordFieldPlaceholder),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(messages.repeatPasswordFieldPlaceholder) : '',
         value: '',
         validators: [({ field, form }) => {
           const walletPassword = form.$('walletPassword').value;
@@ -180,7 +182,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
         label: this.context.intl.formatMessage(messages.createPersonalWallet),
         primary: true,
         onClick: this.submit,
-        disabled: isSubmitting || (!classicTheme && disabledCondition)
+        disabled: isSubmitting || disabledCondition
       },
     ];
 
@@ -224,8 +226,6 @@ export default class WalletCreateDialog extends Component<Props, State> {
               error={repeatedPasswordField.error}
               skin={InputOwnSkin}
             />
-
-            <PasswordInstructions />
           </div>
         </div>
 

@@ -26,8 +26,6 @@ import type {
   PrepareAndBroadcastLedgerSignedTxResponse
 } from '../index';
 import type {
-  CardanoInput,
-  CardanoOutput,
   LedgerSignTxPayload,
 } from '../../../domain/HWSignTx';
 import type {
@@ -38,8 +36,12 @@ import type {
   SignTransactionResponse as LedgerSignTxResponse,
   Witness
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { makeCardanoBIP44Path } from 'yoroi-extension-ledger-bridge';
-import type { $CardanoSignTransaction } from 'trezor-connect/lib/types/cardano';
+import { makeCardanoBIP44Path } from 'yoroi-extension-ledger-connect-handler';
+import type {
+  $CardanoSignTransaction,
+  CardanoInput,
+  CardanoOutput,
+} from 'trezor-connect/lib/types/cardano';
 
 import type { ConfigType } from '../../../../config/config-types';
 
