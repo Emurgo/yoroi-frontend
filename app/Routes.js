@@ -107,13 +107,24 @@ export const Routes = (
   </div>
 );
 
-const WalletsSubpages = (stores, actions) => {
-  let redirectRoute = undefined;
-  let routes = undefined;
-
-  if (environment.isShelley()) {
-    redirectRoute = ROUTES.WALLETS.STAKE_DASHBOARD;
-    routes = (
+const WalletsSubpages = (stores, actions) => (
+  <Switch>
+    <Route
+      exact
+      path={ROUTES.WALLETS.TRANSACTIONS}
+      component={(props) => <WalletSummaryPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.WALLETS.SEND}
+      component={(props) => <WalletSendPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.WALLETS.RECEIVE}
+      component={(props) => <WalletReceivePage {...props} stores={stores} actions={actions} />}
+    />
+    {environment.isShelley() && (
       <>
         <Route
           exact
@@ -130,36 +141,11 @@ const WalletsSubpages = (stores, actions) => {
           path={ROUTES.WALLETS.STAKE_ADVANCED_SIMULATOR}
           component={(props) => <StakingAdvancedSimulatorPage {...props} stores={stores} actions={actions} />}
         />
-      </>);
-  } else {
-    redirectRoute = ROUTES.WALLETS.TRANSACTIONS;
-    routes = (
-      <>
-        <Route
-          exact
-          path={ROUTES.WALLETS.TRANSACTIONS}
-          component={(props) => <WalletSummaryPage {...props} stores={stores} actions={actions} />}
-        />
-        <Route
-          exact
-          path={ROUTES.WALLETS.SEND}
-          component={(props) => <WalletSendPage {...props} stores={stores} actions={actions} />}
-        />
-        <Route
-          exact
-          path={ROUTES.WALLETS.RECEIVE}
-          component={(props) => <WalletReceivePage {...props} stores={stores} actions={actions} />}
-        />
-      </>);
-  }
-
-  return (
-    <Switch>
-      {routes}
-      <Redirect to={redirectRoute} />
-    </Switch>
-  );
-};
+      </>)
+    }
+    <Redirect to={ROUTES.WALLETS.TRANSACTIONS} />
+  </Switch>
+);
 
 const SettingsSubpages = (stores, actions) => (
   <Switch>

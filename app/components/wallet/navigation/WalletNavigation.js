@@ -52,80 +52,72 @@ export default class WalletNavigation extends Component<Props> {
     const { isActiveNavItem, onNavItemClick } = this.props;
     const { intl } = this.context;
 
-    let navItems = undefined;
-    if (environment.isShelley()) {
-      navItems = (
-        <>
-          <div className={styles.navItem}>
-            <WalletNavButton
-              className="stakeDashboard"
-              label={intl.formatMessage(messages.stakeDashboard)}
-              icon={summaryIcon}
-              isActive={isActiveNavItem('stake-dashboard')}
-              onClick={() => onNavItemClick('stake-dashboard')}
-            />
-          </div>
-
-          <div className={styles.navItem}>
-            <WalletNavButton
-              className="stakeSimulator"
-              label={intl.formatMessage(messages.stakeSimulator)}
-              icon={sendIcon}
-              isActive={isActiveNavItem('stake-simulator')}
-              onClick={() => onNavItemClick('stake-simulator')}
-            />
-          </div>
-
-          <div className={styles.navItem}>
-            <WalletNavButton
-              className="stakeAdvancedSimulator"
-              label={intl.formatMessage(messages.stakeAdvancedSimulator)}
-              icon={receiveIcon}
-              isActive={isActiveNavItem('stake-advanced-simulator')}
-              onClick={() => onNavItemClick('stake-advanced-simulator')}
-            />
-          </div>
-        </>
-      );
-    } else {
-      navItems = (
-        <>
-          <div className={styles.navItem}>
-            <WalletNavButton
-              className="summary"
-              label={intl.formatMessage(messages.transactions)}
-              icon={summaryIcon}
-              isActive={isActiveNavItem('transactions')}
-              onClick={() => onNavItemClick('transactions')}
-            />
-          </div>
-
-          <div className={styles.navItem}>
-            <WalletNavButton
-              className="send"
-              label={intl.formatMessage(messages.send)}
-              icon={sendIcon}
-              isActive={isActiveNavItem('send')}
-              onClick={() => onNavItemClick('send')}
-            />
-          </div>
-
-          <div className={styles.navItem}>
-            <WalletNavButton
-              className="receive"
-              label={intl.formatMessage(messages.receive)}
-              icon={receiveIcon}
-              isActive={isActiveNavItem('receive')}
-              onClick={() => onNavItemClick('receive')}
-            />
-          </div>
-        </>
-      );
-    }
-
     return (
       <div className={styles.component}>
-        {navItems}
+
+        <div className={styles.navItem}>
+          <WalletNavButton
+            className="summary"
+            label={intl.formatMessage(messages.transactions)}
+            icon={summaryIcon}
+            isActive={isActiveNavItem('transactions')}
+            onClick={() => onNavItemClick('transactions')}
+          />
+        </div>
+
+        <div className={styles.navItem}>
+          <WalletNavButton
+            className="send"
+            label={intl.formatMessage(messages.send)}
+            icon={sendIcon}
+            isActive={isActiveNavItem('send')}
+            onClick={() => onNavItemClick('send')}
+          />
+        </div>
+
+        <div className={styles.navItem}>
+          <WalletNavButton
+            className="receive"
+            label={intl.formatMessage(messages.receive)}
+            icon={receiveIcon}
+            isActive={isActiveNavItem('receive')}
+            onClick={() => onNavItemClick('receive')}
+          />
+        </div>
+
+        {environment.isShelley() && (
+          <>
+            <div className={styles.navItem}>
+              <WalletNavButton
+                className="stakeDashboard"
+                label={intl.formatMessage(messages.stakeDashboard)}
+                icon={summaryIcon}
+                isActive={isActiveNavItem('stake-dashboard')}
+                onClick={() => onNavItemClick('stake-dashboard')}
+              />
+            </div>
+
+            <div className={styles.navItem}>
+              <WalletNavButton
+                className="stakeSimulator"
+                label={intl.formatMessage(messages.stakeSimulator)}
+                icon={sendIcon}
+                isActive={isActiveNavItem('stake-simulator')}
+                onClick={() => onNavItemClick('stake-simulator')}
+              />
+            </div>
+
+            <div className={styles.navItem}>
+              <WalletNavButton
+                className="stakeAdvancedSimulator"
+                label={intl.formatMessage(messages.stakeAdvancedSimulator)}
+                icon={receiveIcon}
+                isActive={isActiveNavItem('stake-advanced-simulator')}
+                onClick={() => onNavItemClick('stake-advanced-simulator')}
+              />
+            </div>
+          </>
+        )}
       </div>
     );
   }

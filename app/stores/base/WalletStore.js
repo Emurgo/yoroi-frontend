@@ -210,8 +210,7 @@ export default class WalletsStore extends Store {
   );
 
   goToWalletRoute(publicDeriver: PublicDeriver) {
-    const page = environment.isShelley() ? 'stake-dashboard' : undefined;
-    const route = this.getWalletRoute(publicDeriver, page);
+    const route = this.getWalletRoute(publicDeriver);
     this.actions.router.goToRoute.trigger({ route });
   }
 
