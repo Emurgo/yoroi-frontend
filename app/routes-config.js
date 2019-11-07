@@ -14,6 +14,9 @@ export const ROUTES = {
     TRANSACTIONS: '/wallets/:id/transactions',
     SEND: '/wallets/:id/send',
     RECEIVE: '/wallets/:id/receive',
+    STAKE_DASHBOARD: '/wallets/:id/stake-dashboard',
+    STAKE_SIMULATOR: '/wallets/:id/stake-simulator',
+    STAKE_ADVANCED_SIMULATOR: '/wallets/:id/stake-advanced-simulator',
   },
   SETTINGS: {
     ROOT: '/settings',
@@ -30,8 +33,5 @@ export const ROUTES = {
   },
   SEND_FROM_URI: {
     ROOT: '/send-from-uri',
-  },
-  STAKING: {
-    ROOT: '/staking'
   }
 };

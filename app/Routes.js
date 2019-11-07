@@ -1,10 +1,11 @@
 // @flow
 import React from 'react';
+import type { Node } from 'react';
 import { Route, Redirect, Switch } from 'react-router-dom';
+import environment from './environment';
 import { ROUTES } from './routes-config';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';
-import type { Node } from 'react';
 
 // PAGES
 import NoWalletsPage from './containers/wallet/NoWalletsPage';
@@ -31,7 +32,9 @@ import DaedalusTransferPage from './containers/transfer/DaedalusTransferPage';
 import YoroiTransferPage from './containers/transfer/YoroiTransferPage';
 import URILandingPage from './containers/uri/URILandingPage';
 import Transfer from './containers/transfer/Transfer';
-import Staking from './containers/staking/Staking';
+import StakingDashboardPage from './containers/wallet/staking/StakingDashboardPage';
+import StakingSimulatorPage from './containers/wallet/staking/StakingSimulatorPage';
+import StakingAdvancedSimulatorPage from './containers/wallet/staking/StakingAdvancedSimulatorPage';
 
 /* eslint-disable max-len */
 export const Routes = (
@@ -87,13 +90,6 @@ export const Routes = (
         )}
       />
       <Route
-        exact
-        path={ROUTES.STAKING.ROOT}
-        component={(props) => (
-          <Staking {...props} stores={stores} actions={actions} />
-        )}
-      />
-      <Route
         path={ROUTES.TRANSFER.ROOT}
         component={(props) => (
           <Transfer {...props} stores={stores} actions={actions}>
@@ -128,6 +124,25 @@ const WalletsSubpages = (stores, actions) => (
       path={ROUTES.WALLETS.RECEIVE}
       component={(props) => <WalletReceivePage {...props} stores={stores} actions={actions} />}
     />
+    {environment.isShelley() && (
+      <>
+        <Route
+          exact
+          path={ROUTES.WALLETS.STAKE_DASHBOARD}
+          component={(props) => <StakingDashboardPage {...props} stores={stores} actions={actions} />}
+        />
+        <Route
+          exact
+          path={ROUTES.WALLETS.STAKE_SIMULATOR}
+          component={(props) => <StakingSimulatorPage {...props} stores={stores} actions={actions} />}
+        />
+        <Route
+          exact
+          path={ROUTES.WALLETS.STAKE_ADVANCED_SIMULATOR}
+          component={(props) => <StakingAdvancedSimulatorPage {...props} stores={stores} actions={actions} />}
+        />
+      </>)
+    }
     <Redirect to={ROUTES.WALLETS.TRANSACTIONS} />
   </Switch>
 );

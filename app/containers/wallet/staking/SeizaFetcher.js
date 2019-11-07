@@ -1,9 +1,9 @@
 // @flow
 
 import React from 'react';
-import MainLayout from '../MainLayout';
-import TopBarContainer from '../TopBarContainer';
-import type { InjectedContainerProps } from '../../types/injectedPropsType';
+import MainLayout from '../../MainLayout';
+import TopBarContainer from '../../TopBarContainer';
+import type { InjectedContainerProps } from '../../../types/injectedPropsType';
 
 const prettifyReceivedPools = (pools: Array<{
   name: string,

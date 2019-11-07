@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './WalletNavigation.scss';
 import WalletNavButton from './WalletNavButton';
+import environment from '../../../environment';
 import summaryIcon from '../../../assets/images/wallet-nav/summary-ic.inline.svg';
 import sendIcon from '../../../assets/images/wallet-nav/send-ic.inline.svg';
 import receiveIcon from '../../../assets/images/wallet-nav/receive-ic.inline.svg';
@@ -20,6 +21,18 @@ const messages = defineMessages({
   receive: {
     id: 'wallet.navigation.receive',
     defaultMessage: '!!!Receive',
+  },
+  stakeDashboard: {
+    id: 'wallet.navigation.stakeDashboard',
+    defaultMessage: '!!!Dashboard',
+  },
+  stakeAdvancedSimulator: {
+    id: 'wallet.navigation.stakeAdvancedSimulator',
+    defaultMessage: '!!!Advanced staking simulator',
+  },
+  stakeSimulator: {
+    id: 'wallet.navigation.stakeSimulator',
+    defaultMessage: '!!!Simple staking simulator',
   },
 });
 
@@ -38,6 +51,7 @@ export default class WalletNavigation extends Component<Props> {
   render() {
     const { isActiveNavItem, onNavItemClick } = this.props;
     const { intl } = this.context;
+
     return (
       <div className={styles.component}>
 
@@ -71,6 +85,39 @@ export default class WalletNavigation extends Component<Props> {
           />
         </div>
 
+        {environment.isShelley() && (
+          <>
+            <div className={styles.navItem}>
+              <WalletNavButton
+                className="stakeDashboard"
+                label={intl.formatMessage(messages.stakeDashboard)}
+                icon={summaryIcon}
+                isActive={isActiveNavItem('stake-dashboard')}
+                onClick={() => onNavItemClick('stake-dashboard')}
+              />
+            </div>
+
+            <div className={styles.navItem}>
+              <WalletNavButton
+                className="stakeSimulator"
+                label={intl.formatMessage(messages.stakeSimulator)}
+                icon={sendIcon}
+                isActive={isActiveNavItem('stake-simulator')}
+                onClick={() => onNavItemClick('stake-simulator')}
+              />
+            </div>
+
+            <div className={styles.navItem}>
+              <WalletNavButton
+                className="stakeAdvancedSimulator"
+                label={intl.formatMessage(messages.stakeAdvancedSimulator)}
+                icon={receiveIcon}
+                isActive={isActiveNavItem('stake-advanced-simulator')}
+                onClick={() => onNavItemClick('stake-advanced-simulator')}
+              />
+            </div>
+          </>
+        )}
       </div>
     );
   }
