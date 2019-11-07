@@ -33,7 +33,7 @@ rm -rf artifacts/*
 
 if [ ! -z "${CIRCLE_PR_NUMBER}" ]
 then
-  export TEMPLATE="staging"
+  export TEMPLATE="testnet"
   export RELEASE_TAG="${TEMPLATE}-PR${CIRCLE_PR_NUMBER}-${GIT_SHORT_COMMIT}"
   export ZIP_NAME="yoroi-${RELEASE_TAG}.zip"
   export XPI_NAME="yoroi-${RELEASE_TAG}.xpi"
@@ -54,9 +54,9 @@ then
 
 else
 
-  if [ "${CIRCLE_BRANCH}" == "develop" ]
+  if [ "${CIRCLE_BRANCH}" == "develop" ] || [[ "${CIRCLE_BRANCH}" == "shelley" ]]
   then
-    export TEMPLATE="staging"
+    export TEMPLATE="testnet"
     export RELEASE_TAG="${TEMPLATE}-$(echo ${CIRCLE_BRANCH} | sed 's|/|-|g')-${GIT_SHORT_COMMIT}"
     export ZIP_NAME="yoroi-${RELEASE_TAG}.zip"
     export XPI_NAME="yoroi-${RELEASE_TAG}.xpi"
@@ -68,7 +68,7 @@ else
   fi
   if [ "${CIRCLE_BRANCH}" == "staging" ]
   then
-    export TEMPLATE="staging"
+    export TEMPLATE="testnet"
     export RELEASE_TAG="${TEMPLATE}-$(echo ${CIRCLE_BRANCH} | sed 's|/|-|g')-${GIT_SHORT_COMMIT}"
     export ZIP_NAME="yoroi-${RELEASE_TAG}.zip"
     export XPI_NAME="yoroi-${RELEASE_TAG}.xpi"
@@ -93,7 +93,7 @@ else
   fi
 fi
 
-if [[ ! -z $(echo ${BRANCH} | grep "^develop$\|^staging$\|^master$") ]] || [[ ! -z "${PR_NUMBER}" ]]
+if [[ ! -z $(echo ${BRANCH} | grep "^develop$\|^staging$\|^master$\|^shelley$") ]] || [[ ! -z "${PR_NUMBER}" ]]
 then
   tar -zcf artifacts/build-${RELEASE_TAG}.tar.gz build
   echo "Release sha256 checksums:"

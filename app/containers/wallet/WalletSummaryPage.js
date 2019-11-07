@@ -64,11 +64,15 @@ export default class WalletSummaryPage extends Component<Props> {
       const { limit } = searchOptions;
       const noTransactionsFoundLabel = intl.formatMessage(globalMessages.noTransactionsFound);
       if (!recentTransactionsRequest.wasExecuted || hasAny) {
+
+        const isLoadingTx = (!recentTransactionsRequest.wasExecuted ||
+          recentTransactionsRequest.isExecuting);
+
         walletTransactions = (
           <WalletTransactionsList
             transactions={recent}
             selectedExplorer={this.props.stores.profile.selectedExplorer}
-            isLoadingTransactions={!recentTransactionsRequest.wasExecuted}
+            isLoadingTransactions={isLoadingTx}
             hasMoreToLoad={totalAvailable > limit}
             onLoadMore={() => actions.ada.transactions.loadMoreTransactions.trigger()}
             assuranceMode={wallet.assuranceMode}

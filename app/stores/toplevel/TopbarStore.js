@@ -4,7 +4,7 @@ import Store from '../base/Store';
 import environment from '../../environment';
 import type { Category } from '../../config/topbarConfig';
 import {
-  WITH_LEDGER_NANO_S,
+  WITH_LEDGER_NANO,
   WITH_TREZOR_T,
   GO_BACK,
   WALLETS,
@@ -34,7 +34,7 @@ export default class TopbarStore extends Store {
         wallets.first.isTrezorTWallet) ? [WITH_TREZOR_T] : [],
       ...(
         wallets && wallets.first &&
-        wallets.first.isLedgerNanoSWallet) ? [WITH_LEDGER_NANO_S] : [],
+        wallets.first.isLedgerNanoWallet) ? [WITH_LEDGER_NANO] : [],
       SETTINGS,
       ...CURRENCY_SPECIFIC_CATEGORIES[environment.API],
     ];

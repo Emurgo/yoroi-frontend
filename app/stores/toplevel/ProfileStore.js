@@ -208,7 +208,7 @@ export default class ProfileStore extends Store {
       return this.inMemoryLanguage;
     }
     const { result } = this.getProfileLocaleRequest.execute();
-    if (this.isCurrentLocaleSet && result != null) return result;
+    if (this.isCurrentLocaleSet && result != null && result !== '') return result;
 
     return ProfileStore.getDefaultLocale();
   }

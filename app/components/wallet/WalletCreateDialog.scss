@@ -61,10 +61,10 @@
       & > div {
         width: 100%;
       }
-
-      & > div:last-child {
-        padding-bottom: 0;
-      }
     }
+  }
+
+  :global(.Dialog_actions) {
+    margin-top: var(--theme-dialog-password-input-actions-margin-top);
   }
 }

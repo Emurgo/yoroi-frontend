@@ -85,7 +85,7 @@ export const InputOwnSkin = class extends React.Component<Props, State> {
             className={classnames([
               this.props.theme[this.props.themeId].input,
               this.props.disabled === true ? this.props.theme[this.props.themeId].disabled : null,
-              this.props.error != null ? this.props.theme[this.props.themeId].errored : null,
+              (this.props.error != null && this.props.error !== '') ? this.props.theme[this.props.themeId].errored : null,
               (this.props.error != null || this.props.type === 'password' || this.props.done === true) ? styles.icon : null,
               ((this.props.error != null || this.props.type === 'password') && this.props.done === true) ? styles.doubleIcon : null
             ])}

@@ -1,4 +1,5 @@
 // @flow
+
 export default {
   wallets: {
     ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION: 2,
@@ -20,11 +21,10 @@ export default {
           }
         }
       },
-      ledgerNanoS: {
-        // Ledger doesn’t provide any device name so using hard-coded name
+      ledgerNano: {
+        // Ledger does not provide device model info up till now
         DEFAULT_WALLET_NAME: 'Yoroi-Ledger',
         VENDOR: 'ledger.com',
-        MODEL: 'NanoS'
       }
     }
   },
