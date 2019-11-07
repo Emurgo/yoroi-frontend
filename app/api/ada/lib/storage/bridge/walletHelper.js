@@ -15,8 +15,9 @@ import {
 import type {
   TreeInsert,
 } from '../database/walletTypes/common/utils';
+import type { Bip44ChainMeta } from '../database/walletTypes/common/tables';
 import {
-  GetOrAddAddress,
+  AddAddress,
 } from '../database/primitives/api/write';
 import type { KeyInsert } from '../database/primitives/tables';
 import type { HWFeatures, } from '../database/walletTypes/core/tables';
@@ -48,7 +49,7 @@ export async function getAccountDefaultDerivations(
   settings: RustModule.WalletV2.BlockchainSettings,
   accountPublicKey: RustModule.WalletV2.Bip44AccountPublic,
   hashToIds: (addressHash: Array<string>) => Promise<Array<number>>,
-): Promise<TreeInsert< { DisplayCutoff: null | number }>> {
+): Promise<TreeInsert<Bip44ChainMeta>> {
   const addressesIndex = range(
     0,
     BIP44_SCAN_SIZE
@@ -131,7 +132,7 @@ export async function createStandardBip44Wallet(request: {
   ).public();
 
   const deps = Object.freeze({
-    GetOrAddAddress,
+    AddAddress,
   });
   const depTables = Object
     .keys(deps)
@@ -147,7 +148,7 @@ export async function createStandardBip44Wallet(request: {
       const hashToIdFunc = async (
         addressHash: Array<string>
       ): Promise<Array<number>> => {
-        const rows = await deps.GetOrAddAddress.addByHash(
+        const rows = await deps.AddAddress.addByHash(
           request.db, tx,
           addressHash
         );
@@ -239,7 +240,7 @@ export async function createHardwareWallet(request: {
     throw new Error('createHardwareWallet needs hardened index');
   }
   const deps = Object.freeze({
-    GetOrAddAddress,
+    AddAddress,
   });
   const depTables = Object
     .keys(deps)
@@ -254,7 +255,7 @@ export async function createHardwareWallet(request: {
       const hashToIdFunc = async (
         addressHash: Array<string>
       ): Promise<Array<number>> => {
-        const rows = await deps.GetOrAddAddress.addByHash(
+        const rows = await deps.AddAddress.addByHash(
           request.db, tx,
           addressHash
         );
@@ -491,7 +492,7 @@ async function addPublicDeriverToMigratedWallet<
     RustModule.WalletV2.DerivationScheme.v2()
   );
   const deps = Object.freeze({
-    GetOrAddAddress,
+    AddAddress,
   });
   const depTables = Object
     .keys(deps)
@@ -507,7 +508,7 @@ async function addPublicDeriverToMigratedWallet<
       const hashToIdFunc = async (
         addressHash: Array<string>
       ): Promise<Array<number>> => {
-        const rows = await deps.GetOrAddAddress.addByHash(
+        const rows = await deps.AddAddress.addByHash(
           request.db, tx,
           addressHash
         );

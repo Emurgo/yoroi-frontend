@@ -1,7 +1,6 @@
 // @flow
 
 import {
-  AddressSchema,
   KeyDerivationSchema,
 } from '../../primitives/tables';
 import { Type } from 'lovefield';
@@ -92,9 +91,12 @@ export const Bip44AccountSchema: {
     KeyDerivationId: 'KeyDerivationId',
   }
 };
+export type Bip44ChainMeta = {|
+  DisplayCutoff: number | null,
+|};
 export type Bip44ChainInsert = {|
   KeyDerivationId: number,
-  DisplayCutoff: number | null,
+  ...Bip44ChainMeta,
 |};
 export type Bip44ChainRow = {|
   Bip44ChainId: number,
@@ -109,56 +111,6 @@ export const Bip44ChainSchema: {
     Bip44ChainId: 'Bip44ChainId',
     KeyDerivationId: 'KeyDerivationId',
     DisplayCutoff: 'DisplayCutoff',
-  }
-};
-export type Bip44AddressInsert = {|
-  KeyDerivationId: number,
-  AddressId: number,
-|};
-export type Bip44AddressRow = {|
-  Bip44AddressId: number,
-  ...Bip44AddressInsert,
-|};
-export const Bip44AddressSchema: {
-  +name: 'Bip44Address',
-  properties: $ObjMapi<Bip44AddressRow, ToSchemaProp>
-} = {
-  name: 'Bip44Address',
-  properties: {
-    Bip44AddressId: 'Bip44AddressId',
-    KeyDerivationId: 'KeyDerivationId',
-    /**
-     * We need to specify an index into another table instead of storing the hash here directly
-     * This is because we need an address table entry for every input & output in a transaction
-     * even if it doesn't belong to you.
-     * We can't make that a foreign key to this table because this table has a "KeyDerivationId"
-     * We can't make the "KeyDerivationId" nullable because you can't create an index on a nullable
-     */
-    AddressId: 'AddressId',
-  }
-};
-
-export type AccountingDerivationInsert = {|
-  KeyDerivationId: number,
-  AddressId: number,
-|};
-export type AccountingDerivationRow = {|
-  AccountingDerivationId: number,
-  ...AccountingDerivationInsert,
-|};
-/**
- * We don't cache the spending counter here
- * As it would be hard to deal with rollbacks
- */
-export const AccountingDerivationSchema: {
-  +name: 'AccountingDerivation',
-  properties: $ObjMapi<AccountingDerivationRow, ToSchemaProp>
-} = {
-  name: 'AccountingDerivation',
-  properties: {
-    AccountingDerivationId: 'AccountingDerivationId',
-    KeyDerivationId: 'KeyDerivationId',
-    AddressId: 'AddressId',
   }
 };
 
@@ -227,26 +179,4 @@ export const populateCommonDb = (schemaBuilder: lf$schema$Builder) => {
     .addNullable([
       Bip44ChainSchema.properties.DisplayCutoff,
     ]);
-  // Bip44Address
-  schemaBuilder.createTable(Bip44AddressSchema.name)
-    .addColumn(Bip44AddressSchema.properties.Bip44AddressId, Type.INTEGER)
-    .addColumn(Bip44AddressSchema.properties.KeyDerivationId, Type.INTEGER)
-    .addColumn(Bip44AddressSchema.properties.AddressId, Type.INTEGER)
-    .addPrimaryKey(
-      ([Bip44AddressSchema.properties.Bip44AddressId]: Array<string>),
-      true
-    )
-    .addForeignKey('Bip44Address_Bip44Derivation', {
-      local: Bip44AddressSchema.properties.KeyDerivationId,
-      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`
-    })
-    .addForeignKey('Bip44Address_AddressId', {
-      local: Bip44AddressSchema.properties.AddressId,
-      ref: `${AddressSchema.name}.${AddressSchema.properties.AddressId}`
-    })
-    .addIndex(
-      'Bip44Address_KeyDerivation_Index',
-      ([Bip44AddressSchema.properties.KeyDerivationId]: Array<string>),
-      true
-    );
 };

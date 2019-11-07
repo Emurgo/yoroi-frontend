@@ -1,8 +1,6 @@
 // @flow
 
-// eslint-disable-next-line
 import typeof * as WasmV2 from 'cardano-wallet-browser';
-// eslint-disable-next-line
 import typeof * as WasmV3 from 'js-chain-libs';
 
 class Module {
@@ -10,8 +8,8 @@ class Module {
   _wasmv3: WasmV3;
 
   async load() {
-    this._wasmv2 = await import('cardano-wallet-browser'); // eslint-disable-line
-    this._wasmv3 = await import('js-chain-libs'); // eslint-disable-line
+    this._wasmv2 = await import('cardano-wallet-browser');
+    this._wasmv3 = await import('js-chain-libs');
   }
 
   // Need to expose through a getter to get Flow to detect the type correctly

@@ -11,7 +11,7 @@ import {
 import { ConceptualWallet } from '../ConceptualWallet/index';
 
 import type {
-  Bip44AddressRow,
+  CanonicalAddressRow,
 } from '../../database/walletTypes/common/tables';
 
 import {
@@ -51,7 +51,7 @@ import {
   AddDerivationTree,
 } from '../../database/walletTypes/common/api/write';
 import { GetDerivationSpecific } from '../../database/walletTypes/common/api/read';
-import { UpdateGet, GetOrAddAddress, } from '../../database/primitives/api/write';
+import { UpdateGet, AddAddress, } from '../../database/primitives/api/write';
 import type {
   FilterFunc,
 } from '../../../state-fetch/types';
@@ -80,11 +80,11 @@ export interface IPublicDeriver {
 export type PathRequest = void;
 export type BaseAddressPath = {|
   addr: $ReadOnly<AddressRow>,
+  row: $ReadOnly<CanonicalAddressRow>,
   ...Addressing,
 |};
 export type UtxoAddressPath = {|
   ...BaseAddressPath,
-  row: $ReadOnly<Bip44AddressRow>,
 |};
 
 export type IGetPublicRequest = void;
@@ -150,7 +150,7 @@ export interface IGetAllUtxos {
 export type IDisplayCutoffPopRequest = void;
 export type IDisplayCutoffPopResponse = {
   index: number,
-  row: $ReadOnly<Bip44AddressRow>,
+  row: $ReadOnly<CanonicalAddressRow>,
   addr: $ReadOnly<AddressRow>,
 };
 export type IDisplayCutoffPopFunc = (
@@ -353,7 +353,7 @@ export interface IScanAddresses {
       GetAddress: Class<GetAddress>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
-      GetOrAddAddress: Class<GetOrAddAddress>,
+      AddAddress: Class<AddAddress>,
       GetPublicDeriver: Class<GetPublicDeriver>,
       AddDerivationTree: Class<AddDerivationTree>,
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,

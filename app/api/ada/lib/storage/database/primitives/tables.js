@@ -25,8 +25,25 @@ export const KeySchema: {
   }
 };
 
+export const CoreAddressTypes = Object.freeze({
+  CARDANO_LEGACY: 0,
+  /**
+   * Note: we store Shelley addresses as the full payload (not just payment key)
+   * since it's easier to extract a key from a payload then the invverse
+   *
+   * This also matches how the remote works as it has to return the full payload
+   * so we can tell the address type
+   */
+  SHELLEY_SINGLE: 1,
+  SHELLEY_GROUP: 2,
+  SHELLEY_ACCOUNT: 3,
+  SHELLEY_MULTISIG: 4,
+});
+export type CoreAddressT = $Values<typeof CoreAddressTypes>;
+
 export type AddressInsert = {|
   Digest: number,
+  Type: number,
   Hash: string,
 |};
 export type AddressRow = {|
@@ -41,6 +58,7 @@ export const AddressSchema: {
   properties: {
     AddressId: 'AddressId',
     Digest: 'Digest',
+    Type: 'Type',
     Hash: 'Hash',
   }
 };
@@ -179,6 +197,65 @@ export const TransactionSchema: {
   }
 };
 
+export type CanonicalAddressMeta = {|
+|};
+export type CanonicalAddressInsert = {|
+  KeyDerivationId: number,
+  ...CanonicalAddressMeta,
+|};
+export type CanonicalAddressRow = {|
+  CanonicalAddressId: number,
+  ...CanonicalAddressInsert,
+|};
+/**
+ * We save here a "canonical address" instead of an address type depending on the purpose
+ * This is because some cryptocurrencies have multiple addresses per derivation path
+ *  ex: group addresses in Cardano Shelley
+ * We therefore need a 1-many mapping between canonical to hash
+ * but we can only build this mapping if we have 1 table for all purposes
+ *  - so we can use foreign key to this known table
+ *
+ * This means that metadata can't be stored directly here like other derivation levels
+ * that's okay since since any metadata would be associated w/ a hash and not the derivation anyway
+ */
+export const CanonicalAddressSchema: {
+  +name: 'CanonicalAddress',
+  properties: $ObjMapi<CanonicalAddressRow, ToSchemaProp>
+} = {
+  name: 'CanonicalAddress',
+  properties: {
+    CanonicalAddressId: 'CanonicalAddressId',
+    KeyDerivationId: 'KeyDerivationId',
+  }
+};
+
+export type AddressMappingInsert = {|
+  CanonicalAddressId: number,
+  AddressId: number,
+|};
+export type AddressMappingRow = {|
+  AddressMappingId: number,
+  ...AddressMappingInsert,
+|};
+export const AddressMappingSchema: {
+  +name: 'AddressMapping',
+  properties: $ObjMapi<AddressMappingRow, ToSchemaProp>
+} = {
+  name: 'AddressMapping',
+  properties: {
+    AddressMappingId: 'AddressMappingId',
+    CanonicalAddressId: 'CanonicalAddressId',
+    /**
+     * We need to specify an index into another table instead of storing the hash here directly
+     * This is because we need an address table entry for every input & output in a transaction
+     * even if it doesn't belong to you.
+     * We can't make that a foreign key to this table because this table has a "KeyDerivationId"
+     * We can't make the "KeyDerivationId" nullable because you can't create an index on a nullable
+     */
+    AddressId: 'AddressId',
+  }
+};
+
 export type DbTransaction = {|
   +transaction: $ReadOnly<TransactionRow>,
 |};
@@ -202,6 +279,7 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
   schemaBuilder.createTable(AddressSchema.name)
     .addColumn(AddressSchema.properties.AddressId, Type.INTEGER)
     .addColumn(AddressSchema.properties.Digest, Type.NUMBER)
+    .addColumn(AddressSchema.properties.Type, Type.NUMBER)
     .addColumn(AddressSchema.properties.Hash, Type.STRING)
     .addPrimaryKey(
       ([AddressSchema.properties.AddressId]: Array<string>),
@@ -211,6 +289,11 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
       'Address_Digest_Index',
       ([AddressSchema.properties.Digest]: Array<string>),
       false // not unique. There is a (very small) chance of collisions
+    )
+    .addIndex(
+      'Address_Type_Index',
+      ([AddressSchema.properties.Type]: Array<string>),
+      false
     );
 
 
@@ -299,5 +382,44 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
       'Transaction_Digest_Index',
       ([TransactionSchema.properties.Digest]: Array<string>),
       false // not unique. There is a (very small) chance of collisions
+    );
+  // CanonicalAddress
+  schemaBuilder.createTable(CanonicalAddressSchema.name)
+    .addColumn(CanonicalAddressSchema.properties.CanonicalAddressId, Type.INTEGER)
+    .addColumn(CanonicalAddressSchema.properties.KeyDerivationId, Type.INTEGER)
+    .addPrimaryKey(
+      ([CanonicalAddressSchema.properties.CanonicalAddressId]: Array<string>),
+      true
+    )
+    .addForeignKey('CanonicalAddress_Bip44Derivation', {
+      local: CanonicalAddressSchema.properties.KeyDerivationId,
+      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`
+    })
+    .addIndex(
+      'CanonicalAddress_KeyDerivation_Index',
+      ([CanonicalAddressSchema.properties.KeyDerivationId]: Array<string>),
+      true
+    );
+  // AddressMapping
+  schemaBuilder.createTable(AddressMappingSchema.name)
+    .addColumn(AddressMappingSchema.properties.AddressMappingId, Type.INTEGER)
+    .addColumn(AddressMappingSchema.properties.CanonicalAddressId, Type.INTEGER)
+    .addColumn(AddressMappingSchema.properties.AddressId, Type.INTEGER)
+    .addPrimaryKey(
+      ([AddressMappingSchema.properties.AddressMappingId]: Array<string>),
+      true
+    )
+    .addForeignKey('AddressMapping_CanonicalAddress', {
+      local: AddressMappingSchema.properties.CanonicalAddressId,
+      ref: `${CanonicalAddressSchema.name}.${CanonicalAddressSchema.properties.CanonicalAddressId}`
+    })
+    .addForeignKey('AddressMapping_Address', {
+      local: AddressMappingSchema.properties.AddressId,
+      ref: `${AddressSchema.name}.${AddressSchema.properties.AddressId}`
+    })
+    .addIndex(
+      'AddressMapping_CanonicalAddress_Index',
+      ([AddressMappingSchema.properties.CanonicalAddressId]: Array<string>),
+      false
     );
 };

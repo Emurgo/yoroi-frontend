@@ -216,208 +216,6 @@ Object {
       "KeyDerivationId": 47,
     },
   ],
-  "Bip44Address": Array [
-    Object {
-      "AddressId": 1,
-      "Bip44AddressId": 1,
-      "KeyDerivationId": 6,
-    },
-    Object {
-      "AddressId": 2,
-      "Bip44AddressId": 2,
-      "KeyDerivationId": 7,
-    },
-    Object {
-      "AddressId": 3,
-      "Bip44AddressId": 3,
-      "KeyDerivationId": 8,
-    },
-    Object {
-      "AddressId": 4,
-      "Bip44AddressId": 4,
-      "KeyDerivationId": 9,
-    },
-    Object {
-      "AddressId": 5,
-      "Bip44AddressId": 5,
-      "KeyDerivationId": 10,
-    },
-    Object {
-      "AddressId": 6,
-      "Bip44AddressId": 6,
-      "KeyDerivationId": 11,
-    },
-    Object {
-      "AddressId": 7,
-      "Bip44AddressId": 7,
-      "KeyDerivationId": 12,
-    },
-    Object {
-      "AddressId": 8,
-      "Bip44AddressId": 8,
-      "KeyDerivationId": 13,
-    },
-    Object {
-      "AddressId": 9,
-      "Bip44AddressId": 9,
-      "KeyDerivationId": 14,
-    },
-    Object {
-      "AddressId": 10,
-      "Bip44AddressId": 10,
-      "KeyDerivationId": 15,
-    },
-    Object {
-      "AddressId": 11,
-      "Bip44AddressId": 11,
-      "KeyDerivationId": 16,
-    },
-    Object {
-      "AddressId": 12,
-      "Bip44AddressId": 12,
-      "KeyDerivationId": 17,
-    },
-    Object {
-      "AddressId": 13,
-      "Bip44AddressId": 13,
-      "KeyDerivationId": 18,
-    },
-    Object {
-      "AddressId": 14,
-      "Bip44AddressId": 14,
-      "KeyDerivationId": 19,
-    },
-    Object {
-      "AddressId": 15,
-      "Bip44AddressId": 15,
-      "KeyDerivationId": 20,
-    },
-    Object {
-      "AddressId": 16,
-      "Bip44AddressId": 16,
-      "KeyDerivationId": 21,
-    },
-    Object {
-      "AddressId": 17,
-      "Bip44AddressId": 17,
-      "KeyDerivationId": 22,
-    },
-    Object {
-      "AddressId": 18,
-      "Bip44AddressId": 18,
-      "KeyDerivationId": 23,
-    },
-    Object {
-      "AddressId": 19,
-      "Bip44AddressId": 19,
-      "KeyDerivationId": 24,
-    },
-    Object {
-      "AddressId": 20,
-      "Bip44AddressId": 20,
-      "KeyDerivationId": 25,
-    },
-    Object {
-      "AddressId": 21,
-      "Bip44AddressId": 21,
-      "KeyDerivationId": 27,
-    },
-    Object {
-      "AddressId": 22,
-      "Bip44AddressId": 22,
-      "KeyDerivationId": 28,
-    },
-    Object {
-      "AddressId": 23,
-      "Bip44AddressId": 23,
-      "KeyDerivationId": 29,
-    },
-    Object {
-      "AddressId": 24,
-      "Bip44AddressId": 24,
-      "KeyDerivationId": 30,
-    },
-    Object {
-      "AddressId": 25,
-      "Bip44AddressId": 25,
-      "KeyDerivationId": 31,
-    },
-    Object {
-      "AddressId": 26,
-      "Bip44AddressId": 26,
-      "KeyDerivationId": 32,
-    },
-    Object {
-      "AddressId": 27,
-      "Bip44AddressId": 27,
-      "KeyDerivationId": 33,
-    },
-    Object {
-      "AddressId": 28,
-      "Bip44AddressId": 28,
-      "KeyDerivationId": 34,
-    },
-    Object {
-      "AddressId": 29,
-      "Bip44AddressId": 29,
-      "KeyDerivationId": 35,
-    },
-    Object {
-      "AddressId": 30,
-      "Bip44AddressId": 30,
-      "KeyDerivationId": 36,
-    },
-    Object {
-      "AddressId": 31,
-      "Bip44AddressId": 31,
-      "KeyDerivationId": 37,
-    },
-    Object {
-      "AddressId": 32,
-      "Bip44AddressId": 32,
-      "KeyDerivationId": 38,
-    },
-    Object {
-      "AddressId": 33,
-      "Bip44AddressId": 33,
-      "KeyDerivationId": 39,
-    },
-    Object {
-      "AddressId": 34,
-      "Bip44AddressId": 34,
-      "KeyDerivationId": 40,
-    },
-    Object {
-      "AddressId": 35,
-      "Bip44AddressId": 35,
-      "KeyDerivationId": 41,
-    },
-    Object {
-      "AddressId": 36,
-      "Bip44AddressId": 36,
-      "KeyDerivationId": 42,
-    },
-    Object {
-      "AddressId": 37,
-      "Bip44AddressId": 37,
-      "KeyDerivationId": 43,
-    },
-    Object {
-      "AddressId": 38,
-      "Bip44AddressId": 38,
-      "KeyDerivationId": 44,
-    },
-    Object {
-      "AddressId": 39,
-      "Bip44AddressId": 39,
-      "KeyDerivationId": 45,
-    },
-    Object {
-      "AddressId": 40,
-      "Bip44AddressId": 40,
-      "KeyDerivationId": 46,
-    },
-  ],
   "Bip44Chain": Array [
     Object {
       "Bip44ChainId": 1,
@@ -451,6 +249,208 @@ Object {
     },
   ],
   "Block": Array [],
+  "CanonicalAddress": Array [
+    Object {
+      "AddressId": 1,
+      "CanonicalAddressId": 1,
+      "KeyDerivationId": 6,
+    },
+    Object {
+      "AddressId": 2,
+      "CanonicalAddressId": 2,
+      "KeyDerivationId": 7,
+    },
+    Object {
+      "AddressId": 3,
+      "CanonicalAddressId": 3,
+      "KeyDerivationId": 8,
+    },
+    Object {
+      "AddressId": 4,
+      "CanonicalAddressId": 4,
+      "KeyDerivationId": 9,
+    },
+    Object {
+      "AddressId": 5,
+      "CanonicalAddressId": 5,
+      "KeyDerivationId": 10,
+    },
+    Object {
+      "AddressId": 6,
+      "CanonicalAddressId": 6,
+      "KeyDerivationId": 11,
+    },
+    Object {
+      "AddressId": 7,
+      "CanonicalAddressId": 7,
+      "KeyDerivationId": 12,
+    },
+    Object {
+      "AddressId": 8,
+      "CanonicalAddressId": 8,
+      "KeyDerivationId": 13,
+    },
+    Object {
+      "AddressId": 9,
+      "CanonicalAddressId": 9,
+      "KeyDerivationId": 14,
+    },
+    Object {
+      "AddressId": 10,
+      "CanonicalAddressId": 10,
+      "KeyDerivationId": 15,
+    },
+    Object {
+      "AddressId": 11,
+      "CanonicalAddressId": 11,
+      "KeyDerivationId": 16,
+    },
+    Object {
+      "AddressId": 12,
+      "CanonicalAddressId": 12,
+      "KeyDerivationId": 17,
+    },
+    Object {
+      "AddressId": 13,
+      "CanonicalAddressId": 13,
+      "KeyDerivationId": 18,
+    },
+    Object {
+      "AddressId": 14,
+      "CanonicalAddressId": 14,
+      "KeyDerivationId": 19,
+    },
+    Object {
+      "AddressId": 15,
+      "CanonicalAddressId": 15,
+      "KeyDerivationId": 20,
+    },
+    Object {
+      "AddressId": 16,
+      "CanonicalAddressId": 16,
+      "KeyDerivationId": 21,
+    },
+    Object {
+      "AddressId": 17,
+      "CanonicalAddressId": 17,
+      "KeyDerivationId": 22,
+    },
+    Object {
+      "AddressId": 18,
+      "CanonicalAddressId": 18,
+      "KeyDerivationId": 23,
+    },
+    Object {
+      "AddressId": 19,
+      "CanonicalAddressId": 19,
+      "KeyDerivationId": 24,
+    },
+    Object {
+      "AddressId": 20,
+      "CanonicalAddressId": 20,
+      "KeyDerivationId": 25,
+    },
+    Object {
+      "AddressId": 21,
+      "CanonicalAddressId": 21,
+      "KeyDerivationId": 27,
+    },
+    Object {
+      "AddressId": 22,
+      "CanonicalAddressId": 22,
+      "KeyDerivationId": 28,
+    },
+    Object {
+      "AddressId": 23,
+      "CanonicalAddressId": 23,
+      "KeyDerivationId": 29,
+    },
+    Object {
+      "AddressId": 24,
+      "CanonicalAddressId": 24,
+      "KeyDerivationId": 30,
+    },
+    Object {
+      "AddressId": 25,
+      "CanonicalAddressId": 25,
+      "KeyDerivationId": 31,
+    },
+    Object {
+      "AddressId": 26,
+      "CanonicalAddressId": 26,
+      "KeyDerivationId": 32,
+    },
+    Object {
+      "AddressId": 27,
+      "CanonicalAddressId": 27,
+      "KeyDerivationId": 33,
+    },
+    Object {
+      "AddressId": 28,
+      "CanonicalAddressId": 28,
+      "KeyDerivationId": 34,
+    },
+    Object {
+      "AddressId": 29,
+      "CanonicalAddressId": 29,
+      "KeyDerivationId": 35,
+    },
+    Object {
+      "AddressId": 30,
+      "CanonicalAddressId": 30,
+      "KeyDerivationId": 36,
+    },
+    Object {
+      "AddressId": 31,
+      "CanonicalAddressId": 31,
+      "KeyDerivationId": 37,
+    },
+    Object {
+      "AddressId": 32,
+      "CanonicalAddressId": 32,
+      "KeyDerivationId": 38,
+    },
+    Object {
+      "AddressId": 33,
+      "CanonicalAddressId": 33,
+      "KeyDerivationId": 39,
+    },
+    Object {
+      "AddressId": 34,
+      "CanonicalAddressId": 34,
+      "KeyDerivationId": 40,
+    },
+    Object {
+      "AddressId": 35,
+      "CanonicalAddressId": 35,
+      "KeyDerivationId": 41,
+    },
+    Object {
+      "AddressId": 36,
+      "CanonicalAddressId": 36,
+      "KeyDerivationId": 42,
+    },
+    Object {
+      "AddressId": 37,
+      "CanonicalAddressId": 37,
+      "KeyDerivationId": 43,
+    },
+    Object {
+      "AddressId": 38,
+      "CanonicalAddressId": 38,
+      "KeyDerivationId": 44,
+    },
+    Object {
+      "AddressId": 39,
+      "CanonicalAddressId": 39,
+      "KeyDerivationId": 45,
+    },
+    Object {
+      "AddressId": 40,
+      "CanonicalAddressId": 40,
+      "KeyDerivationId": 46,
+    },
+  ],
   "Cip1852Wrapper": Array [],
   "CoinTypeDerivation": Array [
     Object {

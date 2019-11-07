@@ -89,7 +89,7 @@ import {
   UnusedAddressesError,
 } from '../common';
 import LocalizableError from '../../i18n/LocalizableError';
-import { scanAccountByVersion, } from './restoreAdaWallet';
+import { scanBip44Account, } from './restoration/byron/scan';
 import type {
   BaseSignRequest,
   UnsignedTxResponse,
@@ -1082,7 +1082,7 @@ export default class AdaApi {
       // since the lambda is called multiple times
       // and we need keep a globally unique index
       const foundAddresses = new Map<string, number>();
-      const insertTree = await scanAccountByVersion({
+      const insertTree = await scanBip44Account({
         accountPublicKey: accountKey.key().public().to_hex(),
         lastUsedInternal: -1,
         lastUsedExternal: -1,

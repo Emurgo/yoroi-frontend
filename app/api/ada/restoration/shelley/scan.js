@@ -1,61 +1,48 @@
 // @flow
 
-// Handle restoring wallets that follow the v2 addressing scheme (bip44)
+// Handle restoring wallets that follow cip1852
 
 import {
   discoverAllAddressesFrom,
-} from './lib/adaAddressProcessing';
+} from '../../lib/adaAddressProcessing';
 import type {
   GenerateAddressFunc,
-} from './lib/adaAddressProcessing';
-import type { ConfigType } from '../../../config/config-types';
-import type { FilterFunc } from './lib/state-fetch/types';
+} from '../../lib/adaAddressProcessing';
+import type { ConfigType } from '../../../../../config/config-types';
+import type { FilterFunc } from '../../lib/state-fetch/types';
 
 import {
-  BIP44_SCAN_SIZE,
-} from '../../config/numbersConfig';
+  INTERNAL, EXTERNAL, BIP44_SCAN_SIZE,
+} from '../../../../config/numbersConfig';
+import environment from '../../../../environment';
 
-import { RustModule } from './lib/cardanoCrypto/rustLoader';
+import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 
 import type {
   TreeInsert,
-} from './lib/storage/database/walletTypes/common/utils';
-import type { HashToIdsFunc, } from './lib/storage/models/utils';
+} from '../../lib/storage/database/walletTypes/common/utils';
+import type { HashToIdsFunc, } from '../../lib/storage/models/utils';
+import type { AddressDiscriminationType } from 'js-chain-libs';
+import type { CanonicalAddressMeta } from '../../lib/storage/database/primitives/tables';
+import type { Bip44ChainMeta } from '../../lib/storage/database/walletTypes/common/tables';
 
 declare var CONFIG: ConfigType;
 const addressRequestSize = CONFIG.app.addressRequestSize;
 
-export function v2genAddressBatchFunc(
-  addressChain: RustModule.WalletV2.Bip44ChainPublic,
-  protocolMagic: number,
-): GenerateAddressFunc {
-  const settings = RustModule.WalletV2.BlockchainSettings.from_json({
-    protocol_magic: protocolMagic
-  });
-  return (
-    indices: Array<number>
-  ) => {
-    return indices.map(i => {
-      const pubKey = addressChain.address_key(
-        RustModule.WalletV2.AddressKeyIndex.new(i)
-      );
-      const addr = pubKey.bootstrap_era_address(settings);
-      return addr.to_base58();
-    });
-  };
-}
-
 export function v3genAddressBatchFunc(
   addressChain: RustModule.WalletV3.Bip32PublicKey,
+  discrimination: AddressDiscriminationType,
 ): GenerateAddressFunc {
   return (
     indices: Array<number>
   ) => {
     return indices.map(i => {
       const addressKey = addressChain.derive(i).to_raw_key();
-      // recall: no canonical string representation of an address in Rust
-      // so instead we send the payment key
-      const asHex = Buffer.from(addressKey.as_bytes()).toString('hex');
+      const address = RustModule.WalletV3.Address.single_from_public_key(
+        addressKey,
+        discrimination
+      );
+      const asHex = Buffer.from(address.as_bytes()).toString('hex');
       return asHex;
     });
   };
@@ -66,9 +53,9 @@ export async function scanChain(request: {|
   generateAddressFunc: GenerateAddressFunc,
   lastUsedIndex: number,
   checkAddressesInUse: FilterFunc,
+  stakingKey: RustModule.WalletV3.AccountAddress,
   hashToIds: HashToIdsFunc,
-|}): Promise<TreeInsert<{ AddressId: number }>> {
-  // TODO: this is made for v2 addresses. We can avoid this entirely for v3
+|}): Promise<TreeInsert<CanonicalAddressMeta>> {
   const addresses = await discoverAllAddressesFrom(
     request.generateAddressFunc,
     request.lastUsedIndex,
@@ -77,6 +64,7 @@ export async function scanChain(request: {|
     request.checkAddressesInUse,
   );
 
+  // TODO: Add group keys also
   const idMapping = await request.hashToIds(addresses);
   return addresses
     .map((address, i) => {
@@ -96,22 +84,24 @@ export async function scanAccountByVersion(request: {
   checkAddressesInUse: FilterFunc,
   hashToIds: HashToIdsFunc,
   protocolMagic: number,
-}): Promise<TreeInsert<{ DisplayCutoff: null | number }>> {
-  // TODO: needs to change depending on v2/v3
-  const genAddressBatchFunc = v2genAddressBatchFunc;
+}): Promise<TreeInsert<Bip44ChainMeta>> {
+  const genAddressBatchFunc = v3genAddressBatchFunc;
 
-  const key = RustModule.WalletV2.Bip44AccountPublic.new(
-    RustModule.WalletV2.PublicKey.from_hex(request.accountPublicKey),
-    RustModule.WalletV2.DerivationScheme.v2()
+  const key = RustModule.WalletV3.Bip32PublicKey.from_bytes(
+    Buffer.from(request.accountPublicKey, 'hex'),
   );
+  const discrimination = environment.isMainnet()
+    ? RustModule.WalletV3.AddressDiscrimination.Production
+    : RustModule.WalletV3.AddressDiscrimination.Test;
+
   const insert = await scanAccount({
     generateInternalAddresses: genAddressBatchFunc(
-      key.bip44_chain(false),
-      request.protocolMagic,
+      key.derive(INTERNAL),
+      discrimination,
     ),
     generateExternalAddresses: genAddressBatchFunc(
-      key.bip44_chain(true),
-      request.protocolMagic,
+      key.derive(EXTERNAL),
+      discrimination,
     ),
     lastUsedInternal: request.lastUsedInternal,
     lastUsedExternal: request.lastUsedExternal,
@@ -129,7 +119,7 @@ export async function scanAccount(request: {|
   checkAddressesInUse: FilterFunc,
   hashToIds: HashToIdsFunc,
   protocolMagic: number,
-|}): Promise<TreeInsert<{ DisplayCutoff: null | number }>> {
+|}): Promise<TreeInsert<Bip44ChainMeta>> {
   const externalAddresses = await scanChain({
     generateAddressFunc: request.generateInternalAddresses,
     lastUsedIndex: request.lastUsedExternal,
@@ -145,12 +135,13 @@ export async function scanAccount(request: {|
 
   return [
     {
-      index: 0, // external chain,
+      index: EXTERNAL,
+      // initial value. Doesn't override existing entry
       insert: { DisplayCutoff: 0 },
       children: externalAddresses,
     },
     {
-      index: 1, // internal chain,
+      index: INTERNAL,
       insert: { DisplayCutoff: null },
       children: internalAddresses,
     }

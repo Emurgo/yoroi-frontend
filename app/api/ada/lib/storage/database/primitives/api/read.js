@@ -17,8 +17,12 @@ import type {
   KeyRow,
   TxStatusCodesType,
   TransactionRow,
+  AddressMappingRow,
 } from '../tables';
 import * as Tables from '../tables';
+import {
+  digetForHash,
+} from './utils';
 import { getRowFromKey, getRowIn, StaleStateError, } from '../../utils';
 
 export class GetKey {
@@ -78,7 +82,9 @@ export class GetAddress {
   static ownTables = Object.freeze({
     [Tables.AddressSchema.name]: Tables.AddressSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables = Object.freeze({
+    GetEncryptionMeta
+  });
 
   static async getById(
     db: lf$Database,
@@ -91,6 +97,49 @@ export class GetAddress {
       GetAddress.ownTables[Tables.AddressSchema.name].properties.AddressId,
       ids
     );
+  }
+
+  static async getByHash(
+    db: lf$Database,
+    tx: lf$Transaction,
+    addressHash: Array<string>,
+  ): Promise<$ReadOnlyArray<$ReadOnly<AddressRow>>> {
+    const { AddressSeed } = await GetAddress.depTables.GetEncryptionMeta.get(db, tx);
+    const digests = addressHash.map<number>(hash => digetForHash(hash, AddressSeed));
+
+    const addressRows = await getRowIn<AddressRow>(
+      db, tx,
+      GetAddress.ownTables[Tables.AddressSchema.name].name,
+      GetAddress.ownTables[Tables.AddressSchema.name].properties.Digest,
+      digests
+    );
+
+    return addressRows;
+  }
+}
+
+// TODO: delete?
+export class GetCanonical {
+  static ownTables = Object.freeze({
+    [Tables.AddressMappingSchema.name]: Tables.AddressMappingSchema,
+  });
+  static depTables = Object.freeze({
+  });
+
+  static async byAddressId(
+    db: lf$Database,
+    tx: lf$Transaction,
+    addressId: number,
+  ): Promise<number | void> {
+    const row = await getRowFromKey<AddressMappingRow>(
+      db, tx,
+      addressId,
+      GetCanonical.ownTables[Tables.AddressMappingSchema.name].name,
+      GetCanonical.ownTables[Tables.AddressMappingSchema.name].properties.AddressId,
+    );
+    return row === undefined
+      ? row
+      : row.CanonicalAddressId;
   }
 }
 

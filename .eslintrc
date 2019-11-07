@@ -21,7 +21,9 @@
     "consistent-return": "off",
     "comma-dangle": "off",
     "generator-star-spacing": "off",
-    "import/no-unresolved": ["error", { "ignore": ["electron"] }],
+    "import/no-unresolved": ["error", {
+      "ignore": ["electron", "js-chain-libs", "cardano-wallet-browser"]
+    }],
     "import/no-extraneous-dependencies": "off",
     "import/no-dynamic-require": "off",
     "import/no-named-as-default": "off",

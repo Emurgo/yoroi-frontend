@@ -1,7 +1,7 @@
 // @flow
 
 import type {
-  AccountingDerivationRow,
+  CanonicalAddressRow,
 } from '../../database/walletTypes/common/tables';
 import { GetDerivationSpecific } from '../../database/walletTypes/common/api/read';
 import {
@@ -67,7 +67,6 @@ export interface ICip1852Parent {
 
 export type AccountingAddressPath = {|
   ...BaseAddressPath,
-  row: $ReadOnly<AccountingDerivationRow>,
 |};
 
 export type IGetAllAccountingAddressesRequest = PathRequest;

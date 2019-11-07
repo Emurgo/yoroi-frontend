@@ -11,7 +11,8 @@ import type {
   RemoteTransaction, RemoteUnspentOutput
 } from '../../../state-fetch/types';
 import { RollbackApiError, } from '../../../../errors';
-import { RustModule } from '../../../cardanoCrypto/rustLoader';
+import { addressToKind } from '../utils';
+import { CoreAddressTypes } from '../../database/primitives/tables';
 
 export function genCheckAddressesInUse(
   blockchain: Array<RemoteTransaction>,
@@ -180,23 +181,13 @@ export function genUtxoForAddresses(
       for (let j = 0; j < tx.outputs.length; j++) {
         const address = tx.outputs[j].address;
         if (ourAddressSet.has(address)) {
-          try {
-            // Need to try parsing as a legacy address first
-            // Since parsing as bech32 directly may give a wrong result if the address contains a 1
-            RustModule.WalletV2.Address.from_base58(address);
-          } catch (_e1) {
-            try {
-              const wasmAddr = RustModule.WalletV3.Address.from_string(address);
-              const txType = wasmAddr.get_discrimination();
-              if (
-                txType !== RustModule.WalletV3.AddressKind.Single &&
-                txType !== RustModule.WalletV3.AddressKind.Group
-              ) {
-                throw new Error('genUtxoForAddresses non-utxo address in utxo endpoint');
-              }
-            } catch (_e2) {
-              throw new Error('genUtxoForAddresses Unknown output type');
-            }
+          const kind = addressToKind(address);
+          if (
+            kind !== CoreAddressTypes.CARDANO_LEGACY &&
+            kind !== CoreAddressTypes.SHELLEY_SINGLE &&
+            kind !== CoreAddressTypes.SHELLEY_GROUP
+          ) {
+            throw new Error('genUtxoForAddresses non-utxo address in utxo endpoint');
           }
           const key = JSON.stringify({
             id: tx.hash,

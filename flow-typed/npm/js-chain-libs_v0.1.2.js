@@ -17,6 +17,7 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     +Production: 0, // 0
     +Test: 1 // 1
   |};
+  declare export type AddressDiscriminationType = $Values<typeof AddressDiscrimination>;
 
   declare export var AddressKind: {|
     +Single: 0, // 0
@@ -24,6 +25,7 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     +Account: 2, // 2
     +Multisig: 3 // 3
   |};
+  declare export type AddressKindType = $Values<typeof AddressKind>;
 
   /**
    * Allow to differentiate between address in
@@ -183,57 +185,57 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * let address = Address.single_from_public_key(public_key, AddressDiscrimination.Test);
      * ```
      * @param {PublicKey} key
-     * @param {number} discrimination
+     * @param {AddressDiscriminationType} discrimination
      * @returns {Address}
      */
     static single_from_public_key(
       key: PublicKey,
-      discrimination: number
+      discrimination: AddressDiscriminationType,
     ): Address;
 
     /**
      * Construct a non-account address from a pair of public keys, delegating founds from the first to the second
      * @param {PublicKey} key
      * @param {PublicKey} delegation
-     * @param {number} discrimination
+     * @param {AddressDiscriminationType} discrimination
      * @returns {Address}
      */
     static delegation_from_public_key(
       key: PublicKey,
       delegation: PublicKey,
-      discrimination: number
+      discrimination: AddressDiscriminationType,
     ): Address;
 
     /**
      * Construct address of account type from a public key
      * @param {PublicKey} key
-     * @param {number} discrimination
+     * @param {AddressDiscriminationType} discrimination
      * @returns {Address}
      */
     static account_from_public_key(
       key: PublicKey,
-      discrimination: number
+      discrimination: AddressDiscriminationType,
     ): Address;
 
     /**
      * @param {Uint8Array} merkle_root
-     * @param {number} discrimination
+     * @param {AddressDiscriminationType} discrimination
      * @returns {Address}
      */
     static multisig_from_merkle_root(
       merkle_root: Uint8Array,
-      discrimination: number
+      discrimination: AddressDiscriminationType,
     ): Address;
 
     /**
-     * @returns {number}
+     * @returns {AddressDiscriminationType}
      */
-    get_discrimination(): number;
+    get_discrimination(): AddressDiscriminationType;
 
     /**
-     * @returns {number}
+     * @returns {AddressKindType}
      */
-    get_kind(): $Values<typeof AddressKind>;
+    get_kind(): AddressKindType;
 
     /**
      * @returns {SingleAddress}

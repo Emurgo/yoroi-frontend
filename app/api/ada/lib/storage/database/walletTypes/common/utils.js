@@ -12,6 +12,10 @@ export type TreeInsertStart = {|
   children: TreeInsert<any>,
 |};
 
+/**
+ * T is the type of the data that will be inserted at this level
+ * Note: T should NOT include KeyDerivationId. It will be included automatically
+ */
 export type TreeInsert<T={}> = Array<{|
   index: number,
   insert: T,

@@ -40,9 +40,13 @@ import type {
   Address, Value, Addressing, UsedStatus,
 } from './common/interfaces';
 
-import type { AddressRow, KeyInsert, KeyRow, } from '../database/primitives/tables';
+import type {
+  AddressRow,
+  KeyInsert, KeyRow,
+  CanonicalAddressRow,
+} from '../database/primitives/tables';
 import {
-  UpdateGet, GetOrAddAddress,
+  UpdateGet, AddAddress,
 } from '../database/primitives/api/write';
 import {
   ModifyDisplayCutoff,
@@ -70,13 +74,13 @@ import type { UtxoTxOutput } from '../database/transactionModels/utxo/api/read';
 import type { UtxoTransactionOutputRow } from '../database/transactionModels/utxo/tables';
 import { Bip44DerivationLevels } from '../database/walletTypes/bip44/api/utils';
 import type { GetPathWithSpecificByTreeRequest } from '../database/primitives/api/read';
-import type {
-  Bip44AddressRow,
-} from '../database/walletTypes/common/tables';
+import {
+  addressToKind,
+} from '../bridge/utils';
 import {
   GetUtxoTxOutputsWithTx,
 } from '../database/transactionModels/utxo/api/read';
-import { TxStatusCodes } from '../database/primitives/tables';
+import { TxStatusCodes, CoreAddressTypes, } from '../database/primitives/tables';
 
 import { WrongPassphraseError } from '../../cardanoCrypto/cryptoErrors';
 
@@ -232,13 +236,17 @@ export type HashToIdsFunc = Array<string> => Promise<Map<string, number>>;
 export function rawGenHashToIdsFunc(
   db: lf$Database,
   tx: lf$Transaction,
-  deps: {| GetOrAddAddress: Class<GetOrAddAddress> |},
+  deps: {|
+    GetAddress: Class<GetAddress>,
+    AddAddress: Class<AddAddress>,
+  |},
   ownAddressIds: Set<number>,
 ): HashToIdsFunc {
   return async (
     hashes: Array<string>
   ): Promise<Map<string, number>> => {
-    const rows = await deps.GetOrAddAddress.getByHash(db, tx, hashes);
+    const dedupedHashes = Array.from(new Set(hashes));
+    const rows = await deps.GetAddress.getByHash(db, tx, dedupedHashes);
     const addressRowMap: Map<string, Array<$ReadOnly<AddressRow>>> = rows.reduce(
       (map, nextElement) => {
         const array = map.get(nextElement.Hash) || [];
@@ -250,9 +258,9 @@ export function rawGenHashToIdsFunc(
       },
       new Map()
     );
-    const notFound = [];
+    const notFound: Array<string> = [];
     const finalMapping: Map<string, number> = new Map();
-    for (const address of hashes) {
+    for (const address of dedupedHashes) {
       if (addressRowMap.has(address)) {
         const ids = addressRowMap.get(address);
         if (ids == null) throw new Error('should never happen');
@@ -270,7 +278,48 @@ export function rawGenHashToIdsFunc(
         notFound.push(address);
       }
     }
-    const newEntries = await deps.GetOrAddAddress.addByHash(db, tx, notFound);
+    const notFoundWithoutCanonical = [];
+    const addressWithType = notFound.map(addr => ({
+      data: addr,
+      type: addressToKind(addr),
+    }));
+    for (const address of addressWithType) {
+      if (address.type !== CoreAddressTypes.SHELLEY_GROUP) {
+        notFoundWithoutCanonical.push(address);
+      } else {
+        // for group addresses we have to look at the payment key
+        // to see if there exists a canonical address
+        const wasmAddress = RustModule.WalletV3.Address.from_bytes(
+          Buffer.from(address.data, 'hex')
+        );
+        const groupAddress = wasmAddress.to_group_address();
+        if (groupAddress == null) throw new Error('rawGenHashToIdsFunc Should never happen');
+        const canonical = RustModule.WalletV3.Address.single_from_public_key(
+          groupAddress.get_spending_key(),
+          wasmAddress.get_discrimination()
+        );
+        const hash = Buffer.from(canonical.as_bytes()).toString('hex');
+        // TODO: make this batched
+        const addressRow = await deps.GetAddress.getByHash(db, tx, [hash]);
+        if (addressRow.length === 0) {
+          notFoundWithoutCanonical.push(address);
+        } else {
+          const newAddr = await deps.AddAddress.addFromCanonicalByHash(db, tx, [{
+            canonicalAddressId: addressRow[0].AddressId,
+            data: address.data,
+            type: CoreAddressTypes.SHELLEY_GROUP,
+          }]);
+          finalMapping.set(address.data, newAddr[0].AddressId);
+          ownAddressIds.add(newAddr[0].AddressId);
+        }
+      }
+    }
+    // note: must be foreign
+    // because we should have synced address history before ever calling this
+    const newEntries = await deps.AddAddress.addForeignByHash(
+      db, tx,
+      addressWithType
+    );
     for (let i = 0; i < newEntries.length; i++) {
       finalMapping.set(notFound[i], newEntries[i].AddressId);
     }
@@ -289,11 +338,11 @@ export async function rawGetBip44AddressesByPath(
   request: GetPathWithSpecificByTreeRequest,
   derivationTables: Map<number, string>,
 ): Promise<Array<{|
-  row: $ReadOnly<Bip44AddressRow>,
+  row: $ReadOnly<CanonicalAddressRow>,
   ...Addressing,
   addr: $ReadOnly<AddressRow>
 |}>> {
-  const bip44Addresses = await rawGetDerivationsByPath<Bip44AddressRow>(
+  const canonicalAddresses = await rawGetDerivationsByPath<CanonicalAddressRow>(
     db, tx,
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
@@ -306,13 +355,13 @@ export async function rawGetBip44AddressesByPath(
   // Note: simple get since we know these addresses exist
   const addressRows = await deps.GetAddress.getById(
     db, tx,
-    bip44Addresses.map(row => row.row.AddressId),
+    canonicalAddresses.map(row => row.row.AddressId),
   );
   const infoMap = new Map<number, $ReadOnly<AddressRow>>(
     addressRows.map(row => [row.AddressId, row])
   );
 
-  return bip44Addresses.map(row => {
+  return canonicalAddresses.map(row => {
     const info = infoMap.get(row.row.AddressId);
     if (info == null) {
       throw new Error('getBip44AddressesByPath should never happen');

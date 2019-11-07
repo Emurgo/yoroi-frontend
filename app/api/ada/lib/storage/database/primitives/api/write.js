@@ -7,6 +7,8 @@ import type {
 
 import * as Tables from '../tables';
 import type {
+  AddressMappingInsert, AddressMappingRow,
+  CoreAddressT,
   KeyDerivationInsert, KeyDerivationRow,
   BlockInsert, BlockRow,
   KeyInsert, KeyRow,
@@ -22,6 +24,7 @@ import {
 } from './utils';
 import {
   addNewRowToTable,
+  addBatchToTable,
   addOrReplaceRow,
   getRowIn,
   StaleStateError,
@@ -102,54 +105,63 @@ export class GetOrAddBlock {
   }
 }
 
-export class GetOrAddAddress {
+export class AddAddress {
   static ownTables = Object.freeze({
     [Tables.AddressSchema.name]: Tables.AddressSchema,
+    [Tables.AddressMappingSchema.name]: Tables.AddressMappingSchema,
   });
   static depTables = Object.freeze({
     GetEncryptionMeta,
   });
 
-  static async addByHash(
+  static async addForeignByHash(
     db: lf$Database,
     tx: lf$Transaction,
-    addressHash: Array<string>,
+    address: Array<{|
+      data: string,
+      type: CoreAddressT,
+    |}>,
   ): Promise<Array<$ReadOnly<AddressRow>>> {
-    const { AddressSeed } = await GetOrAddAddress.depTables.GetEncryptionMeta.get(db, tx);
-    const digests = addressHash.map<number>(hash => digetForHash(hash, AddressSeed));
+    const { AddressSeed } = await AddAddress.depTables.GetEncryptionMeta.get(db, tx);
+    const digests = address.map<number>(meta => digetForHash(meta.data, AddressSeed));
 
-    const result = [];
-    for (let i = 0; i < addressHash.length; i++) {
-      const newRow = await addNewRowToTable<AddressInsert, AddressRow>(
-        db, tx,
-        {
-          Digest: digests[i],
-          Hash: addressHash[i],
-        },
-        GetOrAddAddress.ownTables[Tables.AddressSchema.name].name,
-      );
-      result.push(newRow);
-    }
+    const result = await addBatchToTable<AddressInsert, AddressRow>(
+      db, tx,
+      address.map((meta, i) => ({
+        Digest: digests[i],
+        Hash: meta.data,
+        Type: meta.type,
+      })),
+      AddAddress.ownTables[Tables.AddressSchema.name].name,
+    );
 
     return result;
   }
 
-  static async getByHash(
+  static async addFromCanonicalByHash(
     db: lf$Database,
     tx: lf$Transaction,
-    addressHash: Array<string>,
-  ): Promise<$ReadOnlyArray<$ReadOnly<AddressRow>>> {
-    const { AddressSeed } = await GetOrAddAddress.depTables.GetEncryptionMeta.get(db, tx);
-    const digests = addressHash.map<number>(hash => digetForHash(hash, AddressSeed));
-
-    const addressRows = await getRowIn<AddressRow>(
+    address: Array<{|
+      canonicalAddressId: number,
+      data: string,
+      type: CoreAddressT,
+    |}>,
+  ): Promise<Array<$ReadOnly<AddressRow>>> {
+    const addressEntries = await AddAddress.addForeignByHash(
       db, tx,
-      GetOrAddAddress.ownTables[Tables.AddressSchema.name].name,
-      GetOrAddAddress.ownTables[Tables.AddressSchema.name].properties.Digest,
-      digests
+      address.map(meta => ({ data: meta.data, type: meta.type }))
     );
 
-    return addressRows;
+    await addBatchToTable<AddressMappingInsert, AddressMappingRow>(
+      db, tx,
+      address.map((meta, i) => ({
+        CanonicalAddressId: meta.canonicalAddressId,
+        AddressId: addressEntries[i].AddressId,
+      })),
+      AddAddress.ownTables[Tables.AddressMappingSchema.name].name,
+    );
+
+    return addressEntries;
   }
 }
 
@@ -239,7 +251,6 @@ export class AddDerivation {
   }
 }
 
-// TODO: move this and related classes to walletTypes/common/api
 export class GetOrAddDerivation {
   static ownTables = Object.freeze({
     [Tables.KeyDerivationSchema.name]: Tables.KeyDerivationSchema,

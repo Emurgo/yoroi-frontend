@@ -6,9 +6,11 @@ import {
   CoinTypeDerivationSchema,
   Bip44AccountSchema,
   Bip44ChainSchema,
-  Bip44AddressSchema,
 } from '../../common/tables';
-import type { Bip44AddressInsert, } from '../../common/tables';
+import {
+  CanonicalAddressSchema,
+} from '../../../primitives/tables';
+import type { CanonicalAddressInsert, } from '../../../primitives/tables';
 import type { TreeInsert, } from '../../common/utils';
 
 export const Bip44DerivationLevels = Object.freeze({
@@ -34,7 +36,7 @@ export const Bip44DerivationLevels = Object.freeze({
   },
   ADDRESS: {
     level: 5,
-    table: Bip44AddressSchema,
+    table: CanonicalAddressSchema,
   },
 });
 
@@ -53,11 +55,12 @@ export const Bip44TableMap = new Map<number, string>(
     .map(val => [val.level, val.table.name])
 );
 
+// TODO: move to more generic file
 export function flattenInsertTree(
   tree: TreeInsert<any>,
 ): Array<{|
   path: Array<number>,
-  insert: Bip44AddressInsert,
+  insert: CanonicalAddressInsert,
 |}> {
   const addresses = [];
   for (const branch of tree) {

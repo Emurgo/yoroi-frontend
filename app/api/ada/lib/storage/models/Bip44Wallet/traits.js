@@ -86,9 +86,9 @@ import {
   GetAddress,
 } from '../../database/primitives/api/read';
 import type { KeyRow, KeyDerivationRow, } from '../../database/primitives/tables';
-import { UpdateGet, GetOrAddAddress, } from '../../database/primitives/api/write';
+import { UpdateGet, AddAddress, } from '../../database/primitives/api/write';
 
-import { scanAccountByVersion, } from '../../../../restoreAdaWallet';
+import { scanBip44Account, } from '../../../../restoration/byron/scan';
 
 import {
   UnusedAddressesError,
@@ -1022,7 +1022,7 @@ const ScanUtxoAccountAddressesMixin = (
       GetAddress: Class<GetAddress>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
-      GetOrAddAddress: Class<GetOrAddAddress>,
+      AddAddress: Class<AddAddress>,
       GetPublicDeriver: Class<GetPublicDeriver>,
       AddDerivationTree: Class<AddDerivationTree>,
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
@@ -1073,14 +1073,17 @@ const ScanUtxoAccountAddressesMixin = (
       { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx, },
       { addressesForChain: externalAddresses }
     );
-    const newToInsert = await scanAccountByVersion({
+    const newToInsert = await scanBip44Account({
       accountPublicKey: decryptedKey,
       lastUsedInternal: nextUnusedInternal.index - 1,
       lastUsedExternal: nextUnusedExternal.index - 1,
       checkAddressesInUse: body.checkAddressesInUse,
       hashToIds: rawGenHashToIdsFunc(
         super.getDb(), tx,
-        { GetOrAddAddress: deps.GetOrAddAddress },
+        {
+          AddAddress: deps.AddAddress,
+          GetAddress: deps.GetAddress,
+        },
         new Set([
           ...internalAddresses.map(address => address.addr.AddressId),
           ...externalAddresses.map(address => address.addr.AddressId),
@@ -1111,7 +1114,7 @@ const ScanUtxoAccountAddressesMixin = (
       GetAddress,
       GetPathWithSpecific,
       GetUtxoTxOutputsWithTx,
-      GetOrAddAddress,
+      AddAddress,
       GetPublicDeriver,
       AddDerivationTree,
       GetDerivationsByPath,
