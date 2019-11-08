@@ -13,18 +13,21 @@ import type {
 } from '../tables';
 import type {
   Bip44ChainRow,
-  Bip44AddressRow,
 } from '../../common/tables';
 import * as Bip44Tables from '../tables';
 import {
   Bip44ChainSchema,
-  Bip44AddressSchema,
 } from '../../common/tables';
 import {
   GetDerivationSpecific,
 } from '../../common/api/read';
-
-import { KeyDerivationSchema } from '../../../primitives/tables';
+import type {
+  CanonicalAddressRow,
+} from '../../../primitives/tables';
+import {
+  KeyDerivationSchema,
+  CanonicalAddressSchema,
+} from '../../../primitives/tables';
 import {
   GetChildWithSpecific, GetPathWithSpecific,
 } from '../../../primitives/api/read';
@@ -56,7 +59,7 @@ export class AddBip44Wrapper {
 export class ModifyDisplayCutoff {
   static ownTables = Object.freeze({
     [Bip44ChainSchema.name]: Bip44ChainSchema,
-    [Bip44AddressSchema.name]: Bip44AddressSchema,
+    [CanonicalAddressSchema.name]: CanonicalAddressSchema,
     [KeyDerivationSchema.name]: KeyDerivationSchema,
   });
   static depTables = Object.freeze({
@@ -75,7 +78,7 @@ export class ModifyDisplayCutoff {
     derivationTables: Map<number, string>,
   ): Promise<void | {|
     index: number,
-    row: $ReadOnly<Bip44AddressRow>,
+    row: $ReadOnly<CanonicalAddressRow>,
   |}> {
     const path = await ModifyDisplayCutoff.depTables.GetPathWithSpecific.getPath<Bip44ChainRow>(
       db, tx,
@@ -110,11 +113,13 @@ export class ModifyDisplayCutoff {
 
     // Get the address at this new index
 
-    const address = await ModifyDisplayCutoff.depTables.GetChildWithSpecific.get<Bip44AddressRow>(
+    const address = await ModifyDisplayCutoff.depTables.GetChildWithSpecific.get<
+      CanonicalAddressRow
+    >(
       db, tx,
       async (derivationId) => {
         const result = await ModifyDisplayCutoff.depTables.GetDerivationSpecific.get<
-          Bip44AddressRow
+          CanonicalAddressRow
         >(
           db, tx,
           [derivationId],

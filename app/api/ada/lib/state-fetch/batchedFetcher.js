@@ -228,7 +228,7 @@ async function _batchHistoryByAddresses(
   const groupsOfAddresses = chunk(addresses, addressesLimit);
   const groupedTxsPromises = groupsOfAddresses.map(apiCall);
   const groupedTxs = await Promise.all(groupedTxsPromises);
-  // TODO: verify the latest block of each group is still in the blockchain
+  // Note: all queries belong to the same chain since untilBlock is the same
   return groupedTxs.reduce((accum, chunkTxs) => accum.concat(chunkTxs), []);
 }
 

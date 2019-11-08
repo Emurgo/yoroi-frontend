@@ -121,20 +121,20 @@ export interface IGetPrivateDeriverKey {
   +changePrivateDeriverPassword: IChangePasswordRequestFunc,
 }
 
-export type IAddAdhocPublicDeriverRequest = AddAdhocPublicDeriverRequest;
+export type IAddAdhocPublicDeriverRequest<Insert> = AddAdhocPublicDeriverRequest<Insert>;
 export type IAddAdhocPublicDeriverResponse<Row> = AddAdhocPublicDeriverResponse<Row>;
-export type IAddAdhocPublicDeriverFunc<Row> = (
-  body: IAddAdhocPublicDeriverRequest
+export type IAddAdhocPublicDeriverFunc<Insert, Row> = (
+  body: IAddAdhocPublicDeriverRequest<Insert>
 ) => Promise<IAddAdhocPublicDeriverResponse<Row>>;
 export interface IAdhocPublicDeriver {
   +rawAddAdhocPubicDeriver: RawTableVariation<
-    IAddAdhocPublicDeriverFunc<mixed>,
+    IAddAdhocPublicDeriverFunc<mixed, mixed>,
     {|
       AddAdhocPublicDeriver: Class<AddAdhocPublicDeriver>,
     |},
-    IAddAdhocPublicDeriverRequest,
+    IAddAdhocPublicDeriverRequest<mixed>,
   >;
-  +addAdhocPubicDeriver: IAddAdhocPublicDeriverFunc<mixed>;
+  +addAdhocPubicDeriver: IAddAdhocPublicDeriverFunc<mixed, mixed>;
 }
 
 // =====================

@@ -15,11 +15,54 @@ import type {
   BlockRow,
   EncryptionMetaRow,
   KeyRow,
-  TxStatusCodesType,
   TransactionRow,
+  AddressMappingRow,
 } from '../tables';
+import type {
+  TxStatusCodesType,
+  CoreAddressT,
+} from '../enums';
 import * as Tables from '../tables';
+import {
+  digetForHash,
+} from './utils';
 import { getRowFromKey, getRowIn, StaleStateError, } from '../../utils';
+
+export class GetEncryptionMeta {
+  static ownTables = Object.freeze({
+    [Tables.EncryptionMetaSchema.name]: Tables.EncryptionMetaSchema,
+  });
+  static depTables = Object.freeze({});
+
+  static async exists(
+    db: lf$Database,
+    tx: lf$Transaction,
+  ): Promise<boolean> {
+    const row = await getRowFromKey<EncryptionMetaRow>(
+      db, tx,
+      0,
+      GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].name,
+      GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].properties.EncryptionMetaId,
+    );
+    return row !== undefined;
+  }
+
+  static async get(
+    db: lf$Database,
+    tx: lf$Transaction,
+  ): Promise<$ReadOnly<EncryptionMetaRow>> {
+    const row = await getRowFromKey<EncryptionMetaRow>(
+      db, tx,
+      0,
+      GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].name,
+      GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].properties.EncryptionMetaId,
+    );
+    if (row === undefined) {
+      throw new Error('GetEncryptionMeta::get no encryption meta found');
+    }
+    return row;
+  }
+}
 
 export class GetKey {
   static ownTables = Object.freeze({
@@ -77,8 +120,11 @@ export class GetBlock {
 export class GetAddress {
   static ownTables = Object.freeze({
     [Tables.AddressSchema.name]: Tables.AddressSchema,
+    [Tables.AddressMappingSchema.name]: Tables.AddressMappingSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables = Object.freeze({
+    GetEncryptionMeta
+  });
 
   static async getById(
     db: lf$Database,
@@ -92,41 +138,93 @@ export class GetAddress {
       ids
     );
   }
-}
 
-export class GetEncryptionMeta {
-  static ownTables = Object.freeze({
-    [Tables.EncryptionMetaSchema.name]: Tables.EncryptionMetaSchema,
-  });
-  static depTables = Object.freeze({});
-
-  static async exists(
+  static async getByHash(
     db: lf$Database,
     tx: lf$Transaction,
-  ): Promise<boolean> {
-    const row = await getRowFromKey<EncryptionMetaRow>(
+    addressHash: Array<string>,
+  ): Promise<$ReadOnlyArray<$ReadOnly<AddressRow>>> {
+    const { AddressSeed } = await GetAddress.depTables.GetEncryptionMeta.get(db, tx);
+    const digests = addressHash.map<number>(hash => digetForHash(hash, AddressSeed));
+
+    const addressRows = await getRowIn<AddressRow>(
       db, tx,
-      0,
-      GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].name,
-      GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].properties.EncryptionMetaId,
+      GetAddress.ownTables[Tables.AddressSchema.name].name,
+      GetAddress.ownTables[Tables.AddressSchema.name].properties.Digest,
+      digests
     );
-    return row !== undefined;
+
+    return addressRows;
   }
 
-  static async get(
+  static async fromCanonical(
     db: lf$Database,
     tx: lf$Transaction,
-  ): Promise<$ReadOnly<EncryptionMetaRow>> {
-    const row = await getRowFromKey<EncryptionMetaRow>(
-      db, tx,
-      0,
-      GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].name,
-      GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].properties.EncryptionMetaId,
+    keyDerivationId: Array<number>,
+    /**
+     * void -> do not filter by type
+     */
+    types: void | Array<CoreAddressT>,
+  ): Promise<Map<number, Array<$ReadOnly<AddressRow>>>> {
+    const mappingSchema = GetAddress.ownTables[Tables.AddressMappingSchema.name];
+    const mappingTable = db.getSchema().table(mappingSchema.name);
+    const addressSchema = GetAddress.ownTables[Tables.AddressSchema.name];
+    const addressTable = db.getSchema().table(addressSchema.name);
+    const query = db
+      .select()
+      .from(mappingTable)
+      .innerJoin(
+        addressTable,
+        op.and(
+          mappingTable[mappingSchema.properties.AddressId].eq(
+            addressTable[addressSchema.properties.AddressId]
+          ),
+          ...(types != null
+            ? [addressTable[addressSchema.properties.Type].in(
+              types
+            )]
+            : []
+          )
+        )
+      )
+      .where(
+        mappingTable[mappingSchema.properties.KeyDerivationId].in(
+          keyDerivationId
+        )
+      );
+    const result: $ReadOnlyArray<{|
+      AddressMapping: $ReadOnly<AddressMappingRow>,
+      Address: $ReadOnly<AddressRow>,
+    |}> = await tx.attach(query);
+
+    const addressRowMap: Map<number, Array<$ReadOnly<AddressRow>>> = result.reduce(
+      (map, nextElement) => {
+        const array = map.get(nextElement.AddressMapping.KeyDerivationId) || [];
+        map.set(
+          nextElement.AddressMapping.KeyDerivationId,
+          [...array, nextElement.Address]
+        );
+        return map;
+      },
+      new Map()
     );
-    if (row === undefined) {
-      throw new Error('GetEncryptionMeta::get no encryption meta found');
-    }
-    return row;
+    return addressRowMap;
+  }
+
+  static async getKeyForFamily(
+    db: lf$Database,
+    tx: lf$Transaction,
+    addressId: number,
+  ): Promise<number | void> {
+    const row = await getRowFromKey<AddressMappingRow>(
+      db, tx,
+      addressId,
+      GetAddress.ownTables[Tables.AddressMappingSchema.name].name,
+      GetAddress.ownTables[Tables.AddressMappingSchema.name].properties.AddressId,
+    );
+    return row === undefined
+      ? row
+      : row.KeyDerivationId;
   }
 }
 

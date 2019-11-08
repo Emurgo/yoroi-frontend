@@ -238,10 +238,10 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
   addAdhocPublicDeriver: StateConstraint<
     CurrentState,
     HasBip44Wrapper & HasConceptualWallet,
-    CurrentState => AddAdhocPublicDeriverRequest,
+    CurrentState => AddAdhocPublicDeriverRequest<any>,
     CurrentState & HasPublicDeriver<mixed>
-  > = (
-    request: CurrentState => AddAdhocPublicDeriverRequest,
+  > = <Insert>(
+    request: CurrentState => AddAdhocPublicDeriverRequest<Insert>,
   ) => {
     return this.updateData<HasBip44Wrapper & HasConceptualWallet, HasPublicDeriver<mixed>>(
       { publicDeriver: [] },
