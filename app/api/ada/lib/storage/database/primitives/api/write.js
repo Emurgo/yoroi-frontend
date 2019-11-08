@@ -142,7 +142,7 @@ export class AddAddress {
     db: lf$Database,
     tx: lf$Transaction,
     address: Array<{|
-      canonicalAddressId: number,
+      keyDerivationId: number,
       data: string,
       type: CoreAddressT,
     |}>,
@@ -155,7 +155,7 @@ export class AddAddress {
     await addBatchToTable<AddressMappingInsert, AddressMappingRow>(
       db, tx,
       address.map((meta, i) => ({
-        CanonicalAddressId: meta.canonicalAddressId,
+        KeyDerivationId: meta.keyDerivationId,
         AddressId: addressEntries[i].AddressId,
       })),
       AddAddress.ownTables[Tables.AddressMappingSchema.name].name,

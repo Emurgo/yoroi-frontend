@@ -44,7 +44,6 @@ import {
   InputTypes,
 } from '../../state-fetch/types';
 import type {
-  HashToIdsFunc,
   ToAbsoluteSlotNumberFunc,
 } from '../models/utils';
 import type {
@@ -71,9 +70,14 @@ import type { LastSyncInfoRow, } from '../database/walletTypes/core/tables';
 import type { DbTxIO, DbTxInChain } from '../database/transactionModels/multipart/tables';
 import {
   genToAbsoluteSlotNumber,
-  rawGenHashToIdsFunc,
   rawGetAddressRowsForWallet,
 } from  '../models/utils';
+import {
+  rawGenHashToIdsFunc,
+} from './hashMapper';
+import type {
+  HashToIdsFunc,
+} from './hashMapper';
 import { STABLE_SIZE } from '../../../../../config/numbersConfig';
 import { RollbackApiError } from '../../../errors';
 import { getFromUserPerspective, } from '../../../transactions/utils';
@@ -119,7 +123,7 @@ export async function rawGetUtxoTransactions(
     undefined,
     derivationTables,
   );
-  const addressIds = addresses.map(address => address.addr.AddressId);
+  const addressIds = addresses.flatMap(address => address.addrs.map(addr => addr.AddressId));
   const txIds = await deps.AssociateTxWithIOs.getTxIdsForAddresses(
     db, dbTx,
     {

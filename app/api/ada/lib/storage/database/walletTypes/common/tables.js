@@ -91,12 +91,10 @@ export const Bip44AccountSchema: {
     KeyDerivationId: 'KeyDerivationId',
   }
 };
-export type Bip44ChainMeta = {|
-  DisplayCutoff: number | null,
-|};
+
 export type Bip44ChainInsert = {|
   KeyDerivationId: number,
-  ...Bip44ChainMeta,
+  DisplayCutoff: number | null,
 |};
 export type Bip44ChainRow = {|
   Bip44ChainId: number,

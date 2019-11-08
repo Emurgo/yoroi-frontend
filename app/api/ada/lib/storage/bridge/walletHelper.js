@@ -15,10 +15,11 @@ import {
 import type {
   TreeInsert,
 } from '../database/walletTypes/common/utils';
-import type { Bip44ChainMeta } from '../database/walletTypes/common/tables';
+import type { Bip44ChainInsert } from '../database/walletTypes/common/tables';
 import {
   AddAddress,
 } from '../database/primitives/api/write';
+import { GetAddress } from '../database/primitives/api/read';
 import type { KeyInsert } from '../database/primitives/tables';
 import type { HWFeatures, } from '../database/walletTypes/core/tables';
 
@@ -42,35 +43,39 @@ import type {
   HasPublicDeriver,
   HasRoot,
 } from './walletBuilder';
+import type { AddByHashFunc } from './hashMapper';
+import { rawGenAddByHash } from './hashMapper';
+import { addByronAddress } from '../../../restoration/byron/scan';
 
 
 // TODO: maybe move this inside walletBuilder somehow so it's all done in the same transaction
+/**
+ * We generate addresses here instead of relying on scanning functions
+ * This is because scanning depends on having an internet connection
+ * But we need to ensure the address maintains the BIP44 gap regardless of internet connection
+ */
 export async function getAccountDefaultDerivations(
   settings: RustModule.WalletV2.BlockchainSettings,
   accountPublicKey: RustModule.WalletV2.Bip44AccountPublic,
-  hashToIds: (addressHash: Array<string>) => Promise<Array<number>>,
-): Promise<TreeInsert<Bip44ChainMeta>> {
+  addByHash: AddByHashFunc,
+): Promise<TreeInsert<Bip44ChainInsert>> {
   const addressesIndex = range(
     0,
     BIP44_SCAN_SIZE
   );
 
-  const externalIds = await hashToIds(
-    addressesIndex.map(i => (
-      accountPublicKey
-        .bip44_chain(false)
-        .address_key(RustModule.WalletV2.AddressKeyIndex.new(i))
-        .bootstrap_era_address(settings).to_base58()
-    ))
-  );
-  const internalIds = await hashToIds(
-    addressesIndex.map(i => (
-      accountPublicKey
-        .bip44_chain(true)
-        .address_key(RustModule.WalletV2.AddressKeyIndex.new(i))
-        .bootstrap_era_address(settings).to_base58()
-    ))
-  );
+  const externalAddrs = addressesIndex.map(i => (
+    accountPublicKey
+      .bip44_chain(false)
+      .address_key(RustModule.WalletV2.AddressKeyIndex.new(i))
+      .bootstrap_era_address(settings).to_base58()
+  ));
+  const internalAddrs = addressesIndex.map(i => (
+    accountPublicKey
+      .bip44_chain(true)
+      .address_key(RustModule.WalletV2.AddressKeyIndex.new(i))
+      .bootstrap_era_address(settings).to_base58()
+  ));
   /**
    * Even if the user has no internet connection and scanning fails,
    * we need to initialize our wallets with the bip44 gap size directly
@@ -84,26 +89,46 @@ export async function getAccountDefaultDerivations(
    */
   const externalAddresses = addressesIndex.map(i => ({
     index: i,
-    insert: {
-      AddressId: externalIds[i],
-    }
+    insert: async keyDerivationId => {
+      await addByronAddress(
+        addByHash,
+        keyDerivationId,
+        externalAddrs[i]
+      );
+      return {
+        KeyDerivationId: keyDerivationId,
+      };
+    },
   }));
   const internalAddresses = addressesIndex.map(i => ({
     index: i,
-    insert: {
-      AddressId: internalIds[i],
-    }
+    insert: async keyDerivationId => {
+      await addByronAddress(
+        addByHash,
+        keyDerivationId,
+        internalAddrs[i]
+      );
+      return {
+        KeyDerivationId: keyDerivationId,
+      };
+    },
   }));
 
   return [
     {
       index: 0,
-      insert: { DisplayCutoff: 0 },
+      insert: keyDerivationId => Promise.resolve({
+        KeyDerivationId: keyDerivationId,
+        DisplayCutoff: 0
+      }),
       children: externalAddresses,
     },
     {
       index: 1,
-      insert: { DisplayCutoff: null },
+      insert: keyDerivationId => Promise.resolve({
+        KeyDerivationId: keyDerivationId,
+        DisplayCutoff: null,
+      }),
       children: internalAddresses,
     }
   ];
@@ -133,6 +158,7 @@ export async function createStandardBip44Wallet(request: {
 
   const deps = Object.freeze({
     AddAddress,
+    GetAddress,
   });
   const depTables = Object
     .keys(deps)
@@ -145,20 +171,15 @@ export async function createStandardBip44Wallet(request: {
     request.db,
     depTables,
     async tx => {
-      const hashToIdFunc = async (
-        addressHash: Array<string>
-      ): Promise<Array<number>> => {
-        const rows = await deps.AddAddress.addByHash(
-          request.db, tx,
-          addressHash
-        );
-        return rows.map(row => row.AddressId);
-      };
-
+      const genFunc = rawGenAddByHash(
+        request.db, tx,
+        deps,
+        new Set(),
+      );
       return await getAccountDefaultDerivations(
         request.settings,
         accountPublicKey,
-        hashToIdFunc,
+        genFunc,
       );
     }
   );
@@ -192,8 +213,8 @@ export async function createStandardBip44Wallet(request: {
               Parent: null,
               Index: null,
             }),
-            levelInfo: id => ({
-              KeyDerivationId: id,
+            levelInfo: keyDerivationId => ({
+              KeyDerivationId: keyDerivationId,
             }),
           },
           tree: rootDerivation => ({
@@ -241,6 +262,7 @@ export async function createHardwareWallet(request: {
   }
   const deps = Object.freeze({
     AddAddress,
+    GetAddress,
   });
   const depTables = Object
     .keys(deps)
@@ -252,20 +274,15 @@ export async function createHardwareWallet(request: {
     request.db,
     depTables,
     async tx => {
-      const hashToIdFunc = async (
-        addressHash: Array<string>
-      ): Promise<Array<number>> => {
-        const rows = await deps.AddAddress.addByHash(
-          request.db, tx,
-          addressHash
-        );
-        return rows.map(row => row.AddressId);
-      };
-
+      const genFunc = rawGenAddByHash(
+        request.db, tx,
+        deps,
+        new Set(),
+      );
       return await getAccountDefaultDerivations(
         request.settings,
         request.accountPublicKey,
-        hashToIdFunc,
+        genFunc,
       );
     }
   );
@@ -294,8 +311,8 @@ export async function createHardwareWallet(request: {
               Parent: null,
               Index: null,
             }),
-            levelInfo: id => ({
-              KeyDerivationId: id,
+            levelInfo: keyDerivationId => ({
+              KeyDerivationId: keyDerivationId,
             }),
           },
           tree: rootDerivation => ({
@@ -323,19 +340,25 @@ export async function createHardwareWallet(request: {
           pathToPublic: [
             {
               index: BIP44_PURPOSE,
-              insert: {},
+              insert: keyDerivationId => Promise.resolve({
+                KeyDerivationId: keyDerivationId,
+              }),
               publicKey: null,
               privateKey: null,
             },
             {
               index: CARDANO_COINTYPE,
-              insert: {},
+              insert: keyDerivationId => Promise.resolve({
+                KeyDerivationId: keyDerivationId,
+              }),
               publicKey: null,
               privateKey: null,
             },
             {
               index: request.accountIndex,
-              insert: {},
+              insert: keyDerivationId => Promise.resolve({
+                KeyDerivationId: keyDerivationId,
+              }),
               publicKey: {
                 Hash: request.accountPublicKey.key().to_hex(),
                 IsEncrypted: false,
@@ -390,8 +413,8 @@ export async function migrateFromStorageV1(request: {
               Parent: null,
               Index: null,
             }),
-            levelInfo: id => ({
-              KeyDerivationId: id,
+            levelInfo: keyDerivationId => ({
+              KeyDerivationId: keyDerivationId,
             }),
           },
           tree: rootDerivation => ({
@@ -443,8 +466,8 @@ export async function migrateFromStorageV1(request: {
               Parent: null,
               Index: null,
             }),
-            levelInfo: id => ({
-              KeyDerivationId: id,
+            levelInfo: keyDerivationId => ({
+              KeyDerivationId: keyDerivationId,
             }),
           },
           tree: rootDerivation => ({
@@ -493,6 +516,7 @@ async function addPublicDeriverToMigratedWallet<
   );
   const deps = Object.freeze({
     AddAddress,
+    GetAddress
   });
   const depTables = Object
     .keys(deps)
@@ -505,27 +529,25 @@ async function addPublicDeriverToMigratedWallet<
     request.db,
     depTables,
     async tx => {
-      const hashToIdFunc = async (
-        addressHash: Array<string>
-      ): Promise<Array<number>> => {
-        const rows = await deps.AddAddress.addByHash(
-          request.db, tx,
-          addressHash
-        );
-        return rows.map(row => row.AddressId);
-      };
-
+      const genFunc = rawGenAddByHash(
+        request.db, tx,
+        deps,
+        new Set(),
+      );
       const insert = await getAccountDefaultDerivations(
         request.settings,
         accountPublicKey,
-        hashToIdFunc,
+        genFunc,
       );
       // replace default display cutoff
       const external = insert.find(chain => chain.index === EXTERNAL);
       if (external == null) {
         throw new Error('migrateFromStorageV1 cannot find external chain. Should never happen');
       }
-      external.insert.DisplayCutoff = request.displayCutoff;
+      external.insert = keyDerivationId => Promise.resolve({
+        KeyDerivationId: keyDerivationId,
+        DisplayCutoff: request.displayCutoff,
+      });
 
       return insert;
     }
@@ -533,19 +555,25 @@ async function addPublicDeriverToMigratedWallet<
 
   const pathToPublic = [{
     index: BIP44_PURPOSE,
-    insert: {},
+    insert: keyDerivationId => Promise.resolve({
+      KeyDerivationId: keyDerivationId,
+    }),
     publicKey: null,
     privateKey: null,
   },
   {
     index: CARDANO_COINTYPE,
-    insert: {},
+    insert: keyDerivationId => Promise.resolve({
+      KeyDerivationId: keyDerivationId,
+    }),
     publicKey: null,
     privateKey: null,
   },
   {
     index: accountIndex,
-    insert: {},
+    insert: keyDerivationId => Promise.resolve({
+      KeyDerivationId: keyDerivationId,
+    }),
     publicKey: {
       Hash: accountPublicKey.key().to_hex(),
       IsEncrypted: false,

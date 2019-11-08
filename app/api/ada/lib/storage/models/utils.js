@@ -22,6 +22,7 @@ import type {
   IGetNextUnusedForChainResponse,
   IHasChains,
   IDisplayCutoff,
+  BaseAddressPath,
 } from './PublicDeriver/interfaces';
 import {
   PublicDeriver,
@@ -44,6 +45,7 @@ import type {
   AddressRow,
   KeyInsert, KeyRow,
   CanonicalAddressRow,
+  CoreAddressT,
 } from '../database/primitives/tables';
 import {
   UpdateGet, AddAddress,
@@ -232,101 +234,6 @@ export async function rawGetDerivationsByPath<
   return result;
 }
 
-export type HashToIdsFunc = Array<string> => Promise<Map<string, number>>;
-export function rawGenHashToIdsFunc(
-  db: lf$Database,
-  tx: lf$Transaction,
-  deps: {|
-    GetAddress: Class<GetAddress>,
-    AddAddress: Class<AddAddress>,
-  |},
-  ownAddressIds: Set<number>,
-): HashToIdsFunc {
-  return async (
-    hashes: Array<string>
-  ): Promise<Map<string, number>> => {
-    const dedupedHashes = Array.from(new Set(hashes));
-    const rows = await deps.GetAddress.getByHash(db, tx, dedupedHashes);
-    const addressRowMap: Map<string, Array<$ReadOnly<AddressRow>>> = rows.reduce(
-      (map, nextElement) => {
-        const array = map.get(nextElement.Hash) || [];
-        map.set(
-          nextElement.Hash,
-          [...array, nextElement]
-        );
-        return map;
-      },
-      new Map()
-    );
-    const notFound: Array<string> = [];
-    const finalMapping: Map<string, number> = new Map();
-    for (const address of dedupedHashes) {
-      if (addressRowMap.has(address)) {
-        const ids = addressRowMap.get(address);
-        if (ids == null) throw new Error('should never happen');
-        const ownId = ids.filter(id => ownAddressIds.has(id.AddressId));
-        if (ownId.length > 1) {
-          throw new Error('Address associated multiple times with same wallet');
-        }
-        if (ownId.length === 1) {
-          finalMapping.set(address, ownId[0].AddressId);
-          continue;
-        }
-        // length = 0
-        notFound.push(address);
-      } else {
-        notFound.push(address);
-      }
-    }
-    const notFoundWithoutCanonical = [];
-    const addressWithType = notFound.map(addr => ({
-      data: addr,
-      type: addressToKind(addr),
-    }));
-    for (const address of addressWithType) {
-      if (address.type !== CoreAddressTypes.SHELLEY_GROUP) {
-        notFoundWithoutCanonical.push(address);
-      } else {
-        // for group addresses we have to look at the payment key
-        // to see if there exists a canonical address
-        const wasmAddress = RustModule.WalletV3.Address.from_bytes(
-          Buffer.from(address.data, 'hex')
-        );
-        const groupAddress = wasmAddress.to_group_address();
-        if (groupAddress == null) throw new Error('rawGenHashToIdsFunc Should never happen');
-        const canonical = RustModule.WalletV3.Address.single_from_public_key(
-          groupAddress.get_spending_key(),
-          wasmAddress.get_discrimination()
-        );
-        const hash = Buffer.from(canonical.as_bytes()).toString('hex');
-        // TODO: make this batched
-        const addressRow = await deps.GetAddress.getByHash(db, tx, [hash]);
-        if (addressRow.length === 0) {
-          notFoundWithoutCanonical.push(address);
-        } else {
-          const newAddr = await deps.AddAddress.addFromCanonicalByHash(db, tx, [{
-            canonicalAddressId: addressRow[0].AddressId,
-            data: address.data,
-            type: CoreAddressTypes.SHELLEY_GROUP,
-          }]);
-          finalMapping.set(address.data, newAddr[0].AddressId);
-          ownAddressIds.add(newAddr[0].AddressId);
-        }
-      }
-    }
-    // note: must be foreign
-    // because we should have synced address history before ever calling this
-    const newEntries = await deps.AddAddress.addForeignByHash(
-      db, tx,
-      addressWithType
-    );
-    for (let i = 0; i < newEntries.length; i++) {
-      finalMapping.set(notFound[i], newEntries[i].AddressId);
-    }
-    return finalMapping;
-  };
-}
-
 export async function rawGetBip44AddressesByPath(
   db: lf$Database,
   tx: lf$Transaction,
@@ -337,11 +244,7 @@ export async function rawGetBip44AddressesByPath(
   },
   request: GetPathWithSpecificByTreeRequest,
   derivationTables: Map<number, string>,
-): Promise<Array<{|
-  row: $ReadOnly<CanonicalAddressRow>,
-  ...Addressing,
-  addr: $ReadOnly<AddressRow>
-|}>> {
+): Promise<Array<BaseAddressPath>> {
   const canonicalAddresses = await rawGetDerivationsByPath<CanonicalAddressRow>(
     db, tx,
     {
@@ -352,23 +255,19 @@ export async function rawGetBip44AddressesByPath(
     Bip44DerivationLevels.ADDRESS.level,
     derivationTables,
   );
-  // Note: simple get since we know these addresses exist
-  const addressRows = await deps.GetAddress.getById(
+  const family = await deps.GetAddress.fromCanonical(
     db, tx,
-    canonicalAddresses.map(row => row.row.AddressId),
+    canonicalAddresses.map(addr => addr.row.KeyDerivationId),
+    undefined,
   );
-  const infoMap = new Map<number, $ReadOnly<AddressRow>>(
-    addressRows.map(row => [row.AddressId, row])
-  );
-
-  return canonicalAddresses.map(row => {
-    const info = infoMap.get(row.row.AddressId);
-    if (info == null) {
+  return canonicalAddresses.map(canonical => {
+    const addrs = family.get(canonical.row.KeyDerivationId);
+    if (addrs == null) {
       throw new Error('getBip44AddressesByPath should never happen');
     }
     return {
-      ...row,
-      addr: info,
+      ...canonical,
+      addrs,
     };
   });
 }
@@ -385,8 +284,10 @@ export function getLastUsedIndex(request: {
 
   let lastUsedIndex = -1;
   for (let i = 0; i < request.singleChainAddresses.length; i++) {
-    if (request.usedStatus.has(request.singleChainAddresses[i].row.AddressId)) {
-      lastUsedIndex = i;
+    for (const addr of request.singleChainAddresses[i].addrs) {
+      if (request.usedStatus.has(addr.AddressId)) {
+        lastUsedIndex = i;
+      }
     }
   }
   return lastUsedIndex;
@@ -416,9 +317,13 @@ export async function rawGetAddressesForDisplay(
   |},
   request: {
     addresses: Array<UtxoAddressPath>,
+    type: CoreAddressT,
   },
 ): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
-  const addressIds = request.addresses.map(address => address.addr.AddressId);
+  const addressIds = request.addresses
+    .flatMap(family => family.addrs)
+    .filter(addr => addr.Type === request.type)
+    .map(addr => addr.AddressId);
   const utxosForAddresses = await rawGetUtxoUsedStatus(
     db, tx,
     { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx },
@@ -430,12 +335,12 @@ export async function rawGetAddressesForDisplay(
   );
   const balanceForAddresses = getUtxoBalanceForAddresses(utxoForAddresses);
 
-  return request.addresses.map(info => ({
-    address: info.addr.Hash,
-    value: balanceForAddresses[info.addr.AddressId],
-    addressing: info.addressing,
-    isUsed: utxosForAddresses.has(info.addr.AddressId),
-  }));
+  return request.addresses.flatMap(family => family.addrs.map(addr => ({
+    address: addr.Hash,
+    value: balanceForAddresses[addr.AddressId],
+    addressing: family.addressing,
+    isUsed: utxosForAddresses.has(addr.AddressId),
+  })));
 }
 
 export async function rawGetChainAddressesForDisplay(
@@ -449,6 +354,7 @@ export async function rawGetChainAddressesForDisplay(
   request: {
     publicDeriver: IPublicDeriver & IHasChains & IDisplayCutoff,
     chainsRequest: IHasChainsRequest,
+    type: CoreAddressT,
   },
   derivationTables: Map<number, string>,
 ): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
@@ -480,7 +386,10 @@ export async function rawGetChainAddressesForDisplay(
   let addressResponse = await rawGetAddressesForDisplay(
     request.publicDeriver.getDb(), tx,
     { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx },
-    { addresses: belowCutoff },
+    {
+      addresses: belowCutoff,
+      type: request.type
+    },
   );
   if (request.chainsRequest.chainId === INTERNAL) {
     let bestUsed = -1;
@@ -502,6 +411,7 @@ export async function getChainAddressesForDisplay(
   request: {
     publicDeriver: IPublicDeriver & IHasChains & IDisplayCutoff,
     chainsRequest: IHasChainsRequest,
+    type: CoreAddressT,
   },
 ): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
   const derivationTables = request.publicDeriver.getConceptualWallet().getDerivationTables();
@@ -534,6 +444,7 @@ export async function rawGetAllAddressesForDisplay(
   |},
   request: {
     publicDeriver: IPublicDeriver & IGetAllUtxos,
+    type: CoreAddressT,
   },
   derivationTables: Map<number, string>,
 ): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
@@ -566,12 +477,16 @@ export async function rawGetAllAddressesForDisplay(
   return await rawGetAddressesForDisplay(
     request.publicDeriver.getDb(), tx,
     { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx },
-    { addresses },
+    {
+      addresses,
+      type: request.type
+    },
   );
 }
 export async function getAllAddressesForDisplay(
   request: {
     publicDeriver: IPublicDeriver & IGetAllUtxos,
+    type: CoreAddressT,
   },
 ): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
   const derivationTables = request.publicDeriver.getConceptualWallet().getDerivationTables();
@@ -609,11 +524,16 @@ export async function rawGetNextUnusedIndex(
   request:  {|
     addressesForChain: Array<UtxoAddressPath>,
   |}
-): Promise<IGetNextUnusedForChainResponse> {
+): Promise<{|
+  addressInfo: void | UtxoAddressPath,
+  index: number,
+|}> {
   const usedStatus = await rawGetUtxoUsedStatus(
     db, tx,
     { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx },
-    { addressIds: request.addressesForChain.map(address => address.addr.AddressId) }
+    { addressIds: request.addressesForChain
+      .flatMap(address => address.addrs.map(addr => addr.AddressId))
+    }
   );
   const lastUsedIndex = getLastUsedIndex({
     singleChainAddresses: request.addressesForChain,
@@ -761,8 +681,10 @@ export async function rawGetAddressRowsForWallet(
       undefined,
       derivationTables,
     );
-    for (const address of addrResponse) {
-      utxoAddresses.push(address.addr);
+    for (const family of addrResponse) {
+      for (const addr of family.addrs) {
+        utxoAddresses.push(addr);
+      }
     }
   }
   // TODO: behavior different for CIP1852 vs Bip44

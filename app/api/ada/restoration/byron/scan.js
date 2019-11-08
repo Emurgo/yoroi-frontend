@@ -20,9 +20,10 @@ import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import type {
   TreeInsert,
 } from '../../lib/storage/database/walletTypes/common/utils';
-import type { HashToIdsFunc, } from '../../lib/storage/models/utils';
-import type { CanonicalAddressMeta } from '../../lib/storage/database/primitives/tables';
-import type { Bip44ChainMeta } from '../../lib/storage/database/walletTypes/common/tables';
+import type { AddByHashFunc, } from '../../lib/storage/bridge/hashMapper';
+import type { CanonicalAddressInsert } from '../../lib/storage/database/primitives/tables';
+import { CoreAddressTypes } from '../../lib/storage/database/primitives/tables';
+import type { Bip44ChainInsert } from '../../lib/storage/database/walletTypes/common/tables';
 
 declare var CONFIG: ConfigType;
 const addressRequestSize = CONFIG.app.addressRequestSize;
@@ -47,12 +48,27 @@ export function v2genAddressBatchFunc(
   };
 }
 
+export async function addByronAddress(
+  addByHash: AddByHashFunc,
+  keyDerivationId: number,
+  address: string,
+) {
+  await addByHash({
+    type: CoreAddressTypes.CARDANO_LEGACY,
+    keyDerivationId,
+    data: address,
+  });
+  return {
+    KeyDerivationId: keyDerivationId,
+  };
+}
+
 async function scanChain(request: {|
   generateAddressFunc: GenerateAddressFunc,
   lastUsedIndex: number,
   checkAddressesInUse: FilterFunc,
-  hashToIds: HashToIdsFunc,
-|}): Promise<TreeInsert<CanonicalAddressMeta>> {
+  addByHash: AddByHashFunc,
+|}): Promise<TreeInsert<CanonicalAddressInsert>> {
   const addresses = await discoverAllAddressesFrom(
     request.generateAddressFunc,
     request.lastUsedIndex,
@@ -61,14 +77,20 @@ async function scanChain(request: {|
     request.checkAddressesInUse,
   );
 
-  const idMapping = await request.hashToIds(addresses);
   return addresses
     .map((address, i) => {
-      const id = idMapping.get(address);
-      if (id == null) throw new Error('scanChain should never happen');
       return {
         index: i + request.lastUsedIndex + 1,
-        insert: { AddressId: id },
+        insert: async keyDerivationId => {
+          await addByronAddress(
+            request.addByHash,
+            keyDerivationId,
+            address
+          );
+          return {
+            KeyDerivationId: keyDerivationId,
+          };
+        },
       };
     });
 }
@@ -78,9 +100,9 @@ export async function scanBip44Account(request: {
   lastUsedInternal: number,
   lastUsedExternal: number,
   checkAddressesInUse: FilterFunc,
-  hashToIds: HashToIdsFunc,
+  addByHash: AddByHashFunc,
   protocolMagic: number,
-}): Promise<TreeInsert<Bip44ChainMeta>> {
+}): Promise<TreeInsert<Bip44ChainInsert>> {
   const genAddressBatchFunc = v2genAddressBatchFunc;
 
   const key = RustModule.WalletV2.Bip44AccountPublic.new(
@@ -99,7 +121,7 @@ export async function scanBip44Account(request: {
     lastUsedInternal: request.lastUsedInternal,
     lastUsedExternal: request.lastUsedExternal,
     checkAddressesInUse: request.checkAddressesInUse,
-    hashToIds: request.hashToIds,
+    addByHash: request.addByHash,
     protocolMagic: request.protocolMagic,
   });
   return insert;
@@ -110,32 +132,38 @@ async function scanAccount(request: {|
   lastUsedInternal: number,
   lastUsedExternal: number,
   checkAddressesInUse: FilterFunc,
-  hashToIds: HashToIdsFunc,
+  addByHash: AddByHashFunc,
   protocolMagic: number,
-|}): Promise<TreeInsert<Bip44ChainMeta>> {
+|}): Promise<TreeInsert<Bip44ChainInsert>> {
   const externalAddresses = await scanChain({
     generateAddressFunc: request.generateInternalAddresses,
     lastUsedIndex: request.lastUsedExternal,
     checkAddressesInUse: request.checkAddressesInUse,
-    hashToIds: request.hashToIds,
+    addByHash: request.addByHash,
   });
   const internalAddresses = await scanChain({
     generateAddressFunc: request.generateExternalAddresses,
     lastUsedIndex: request.lastUsedInternal,
     checkAddressesInUse: request.checkAddressesInUse,
-    hashToIds: request.hashToIds,
+    addByHash: request.addByHash,
   });
 
   return [
     {
       index: EXTERNAL,
       // initial value. Doesn't override existing entry
-      insert: { DisplayCutoff: 0 },
+      insert: keyDerivationId => Promise.resolve({
+        KeyDerivationId: keyDerivationId,
+        DisplayCutoff: 0,
+      }),
       children: externalAddresses,
     },
     {
       index: INTERNAL,
-      insert: { DisplayCutoff: null },
+      insert: keyDerivationId => Promise.resolve({
+        KeyDerivationId: keyDerivationId,
+        DisplayCutoff: null,
+      }),
       children: internalAddresses,
     }
   ];

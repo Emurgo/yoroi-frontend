@@ -12,13 +12,9 @@ export type TreeInsertStart = {|
   children: TreeInsert<any>,
 |};
 
-/**
- * T is the type of the data that will be inserted at this level
- * Note: T should NOT include KeyDerivationId. It will be included automatically
- */
-export type TreeInsert<T={}> = Array<{|
+export type TreeInsert<T={ KeyDerivationId: number, }> = Array<{|
   index: number,
-  insert: T,
+  insert: number => Promise<T>,
   children?: TreeInsert<any>,
 |}>;
 
@@ -27,18 +23,15 @@ export type TreeResultStart<Row> = {|
   children: TreeResult<Row>,
 |};
 
-export type TreeResult<T={}> = Array<{|
+export type TreeResult<T={ KeyDerivationId: number, }> = Array<{|
   index: number,
-  result: {|
-    KeyDerivationId: number,
-    ...T,
-  |},
+  result: T,
   children?: TreeResult<any>,
 |}>;
 
-export type InsertPath = Array<{|
+export type InsertPath<T={ KeyDerivationId: number, }> = Array<{|
   index: number,
-  insert: {},
+  insert: number => Promise<T>,
   privateKey: KeyInsert | null,
   publicKey: KeyInsert | null,
 |}>;

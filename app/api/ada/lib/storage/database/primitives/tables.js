@@ -197,11 +197,8 @@ export const TransactionSchema: {
   }
 };
 
-export type CanonicalAddressMeta = {|
-|};
 export type CanonicalAddressInsert = {|
   KeyDerivationId: number,
-  ...CanonicalAddressMeta,
 |};
 export type CanonicalAddressRow = {|
   CanonicalAddressId: number,
@@ -230,7 +227,7 @@ export const CanonicalAddressSchema: {
 };
 
 export type AddressMappingInsert = {|
-  CanonicalAddressId: number,
+  KeyDerivationId: number,
   AddressId: number,
 |};
 export type AddressMappingRow = {|
@@ -244,7 +241,7 @@ export const AddressMappingSchema: {
   name: 'AddressMapping',
   properties: {
     AddressMappingId: 'AddressMappingId',
-    CanonicalAddressId: 'CanonicalAddressId',
+    KeyDerivationId: 'KeyDerivationId',
     /**
      * We need to specify an index into another table instead of storing the hash here directly
      * This is because we need an address table entry for every input & output in a transaction
@@ -403,23 +400,23 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
   // AddressMapping
   schemaBuilder.createTable(AddressMappingSchema.name)
     .addColumn(AddressMappingSchema.properties.AddressMappingId, Type.INTEGER)
-    .addColumn(AddressMappingSchema.properties.CanonicalAddressId, Type.INTEGER)
+    .addColumn(AddressMappingSchema.properties.KeyDerivationId, Type.INTEGER)
     .addColumn(AddressMappingSchema.properties.AddressId, Type.INTEGER)
     .addPrimaryKey(
       ([AddressMappingSchema.properties.AddressMappingId]: Array<string>),
       true
     )
-    .addForeignKey('AddressMapping_CanonicalAddress', {
-      local: AddressMappingSchema.properties.CanonicalAddressId,
-      ref: `${CanonicalAddressSchema.name}.${CanonicalAddressSchema.properties.CanonicalAddressId}`
+    .addForeignKey('AddressMapping_KeyDerivation', {
+      local: AddressMappingSchema.properties.KeyDerivationId,
+      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`
     })
     .addForeignKey('AddressMapping_Address', {
       local: AddressMappingSchema.properties.AddressId,
       ref: `${AddressSchema.name}.${AddressSchema.properties.AddressId}`
     })
     .addIndex(
-      'AddressMapping_CanonicalAddress_Index',
-      ([AddressMappingSchema.properties.CanonicalAddressId]: Array<string>),
+      'AddressMapping_KeyDerivation_Index',
+      ([AddressMappingSchema.properties.KeyDerivationId]: Array<string>),
       false
     );
 };

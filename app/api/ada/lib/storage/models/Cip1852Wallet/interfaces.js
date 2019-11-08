@@ -2,7 +2,7 @@
 
 import type {
   CanonicalAddressRow,
-} from '../../database/walletTypes/common/tables';
+} from '../../database/primitives/tables';
 import { GetDerivationSpecific } from '../../database/walletTypes/common/api/read';
 import {
   GetPathWithSpecific,

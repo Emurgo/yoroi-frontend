@@ -65,10 +65,7 @@ export class AddDerivationTree {
             Parent: parentId,
             Index: tree.children[i].index,
           }),
-          levelInfo: id => ({
-            KeyDerivationId: id,
-            ...tree.children[i].insert,
-          }),
+          levelInfo: id => tree.children[i].insert(id),
         },
         tableName,
       );
@@ -125,13 +122,13 @@ export class AddDerivationTree {
     };
   }
 
-  static async fromSinglePath<Row>(
+  static async fromSinglePath<Insert, Row>(
     db: lf$Database,
     tx: lf$Transaction,
     request: {|
       // note: create level
       parentDerivationId: number | null,
-      path: InsertPath,
+      path: InsertPath<Insert>,
       pathStartLevel: number,
     |},
     derivationTables: Map<number, string>,
@@ -158,10 +155,7 @@ export class AddDerivationTree {
             // explicitly ignore index for ROOT since it has no index
             Index: request.pathStartLevel + i === 0  ? null : request.path[i].index,
           }),
-          levelInfo: id => ({
-            ...request.path[i].insert,
-            KeyDerivationId: id,
-          }),
+          levelInfo: id => request.path[i].insert(id),
         },
         tableName,
       );
@@ -172,7 +166,7 @@ export class AddDerivationTree {
   }
 }
 
-export type DerivePublicDeriverFromKeyRequest = {|
+export type DerivePublicDeriverFromKeyRequest<Insert> = {|
   publicDeriverMeta: {|
     name: string,
   |},
@@ -186,7 +180,7 @@ export type DerivePublicDeriverFromKeyRequest = {|
    */
   pathToPublic: (
     privateKeyRow: $ReadOnly<KeyRow>,
-  ) => InsertPath,
+  ) => InsertPath<Insert>,
   initialDerivations: TreeInsert<any>,
 |};
 export class DerivePublicDeriverFromKey {
@@ -199,10 +193,10 @@ export class DerivePublicDeriverFromKey {
     AddDerivationTree,
   });
 
-  static async add<Row>(
+  static async add<Insert, Row>(
     db: lf$Database,
     tx: lf$Transaction,
-    body: DerivePublicDeriverFromKeyRequest,
+    body: DerivePublicDeriverFromKeyRequest<Insert>,
     privateDeriverKeyDerivationId: number,
     privateDeriverLevel: number,
     conceptualWalletId: number,
@@ -262,10 +256,7 @@ export class DerivePublicDeriverFromKey {
                 : pathResult[pathResult.length - 1].KeyDerivation.KeyDerivationId,
               Index: derivedPath[derivedPath.length - 1].index,
             }),
-            levelInfo: id => ({
-              ...derivedPath[derivedPath.length - 1].insert,
-              KeyDerivationId: id,
-            }),
+            levelInfo: id => derivedPath[derivedPath.length - 1].insert(id),
           },
           levelSpecificTableName: tableName,
           addPublicDeriverRequest: ids => ({
@@ -293,7 +284,7 @@ export class DerivePublicDeriverFromKey {
   }
 }
 
-export type AddAdhocPublicDeriverRequest = {|
+export type AddAdhocPublicDeriverRequest<Insert> = {|
   parentDerivationId: number,
   pathStartLevel: number,
   /**
@@ -303,7 +294,7 @@ export type AddAdhocPublicDeriverRequest = {|
    *
    * Note: path should NOT include parent (if one exists)
    */
-  pathToPublic: InsertPath,
+  pathToPublic: InsertPath<Insert>,
   publicDeriverMeta: {|
     name: string,
   |},
@@ -324,10 +315,10 @@ export class AddAdhocPublicDeriver {
     AddDerivationTree,
   });
 
-  static async add<Row>(
+  static async add<Insert, Row>(
     db: lf$Database,
     tx: lf$Transaction,
-    request: AddAdhocPublicDeriverRequest,
+    request: AddAdhocPublicDeriverRequest<Insert>,
     conceptualWalletId: number,
     derivationTables: Map<number, string>,
   ): Promise<AddAdhocPublicDeriverResponse<Row>> {
@@ -369,10 +360,7 @@ export class AddAdhocPublicDeriver {
               : pathResult[pathResult.length - 1].KeyDerivation.KeyDerivationId,
             Index: request.pathToPublic[request.pathToPublic.length - 1].index,
           }),
-          levelInfo: id => ({
-            ...request.pathToPublic[request.pathToPublic.length - 1].insert,
-            KeyDerivationId: id,
-          }),
+          levelInfo: id => request.pathToPublic[request.pathToPublic.length - 1].insert(id)
         },
         levelSpecificTableName: tableName,
         addPublicDeriverRequest: ids => ({

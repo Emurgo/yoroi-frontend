@@ -10,10 +10,6 @@ import {
 
 import { ConceptualWallet } from '../ConceptualWallet/index';
 
-import type {
-  CanonicalAddressRow,
-} from '../../database/walletTypes/common/tables';
-
 import {
   GetUtxoTxOutputsWithTx,
 } from '../../database/transactionModels/utxo/api/read';
@@ -22,6 +18,7 @@ import type { UtxoTxOutput } from '../../database/transactionModels/utxo/api/rea
 import type {
   AddressRow,
   KeyRow,
+  CanonicalAddressRow,
   KeyDerivationRow,
 } from '../../database/primitives/tables';
 import type { PublicDeriverRow, LastSyncInfoRow, } from '../../database/walletTypes/core/tables';
@@ -79,6 +76,11 @@ export interface IPublicDeriver {
 
 export type PathRequest = void;
 export type BaseAddressPath = {|
+  addrs: $ReadOnlyArray<$ReadOnly<AddressRow>>,
+  row: $ReadOnly<CanonicalAddressRow>,
+  ...Addressing,
+|};
+export type BaseSingleAddressPath = {|
   addr: $ReadOnly<AddressRow>,
   row: $ReadOnly<CanonicalAddressRow>,
   ...Addressing,
@@ -151,7 +153,7 @@ export type IDisplayCutoffPopRequest = void;
 export type IDisplayCutoffPopResponse = {
   index: number,
   row: $ReadOnly<CanonicalAddressRow>,
-  addr: $ReadOnly<AddressRow>,
+  addrs: $ReadOnlyArray<$ReadOnly<AddressRow>>,
 };
 export type IDisplayCutoffPopFunc = (
   body: IDisplayCutoffPopRequest
@@ -208,10 +210,10 @@ export interface IDisplayCutoff {
 }
 
 export type IGetNextUnusedForChainRequest = void;
-export type IGetNextUnusedForChainResponse = {
-  addressInfo: void | UtxoAddressPath,
+export type IGetNextUnusedForChainResponse = {|
+  addressInfo: void | BaseSingleAddressPath,
   index: number,
-};
+|};
 export type IGetNextUnusedForChainFunc = (
   body: IGetNextUnusedForChainRequest
 ) => Promise<IGetNextUnusedForChainResponse>;
@@ -222,9 +224,6 @@ export type IHasChainsResponse = Array<UtxoAddressPath>;
 export type IHasChainsGetAddressesFunc = (
   body: IHasChainsRequest
 ) => Promise<IHasChainsResponse>;
-export type IHasChainsNextUnusedFunc = (
-  body: IHasChainsRequest
-) => Promise<IGetNextUnusedForChainResponse>;
 export interface IHasChains {
   +rawGetAddressesForChain: RawTableVariation<
     IHasChainsGetAddressesFunc,
