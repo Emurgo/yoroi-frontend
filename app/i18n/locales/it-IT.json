@@ -313,7 +313,7 @@
   "wallet.navigation.send": "Invia",
   "wallet.navigation.stakeDashboard": "Dashboard",
   "wallet.navigation.stakeAdvancedSimulator": "Simulatore di staking avanzato",
-  "wallet.navigation.stakeSimulator": "Simple staking simulator",
+  "wallet.navigation.stakeSimulator": "Simulatore di staking semplice",
   "wallet.navigation.transactions": "Transazioni",
   "wallet.receive.confirmationDialog.addressDetailsTitleLabel": "Verifica indirizzo",
   "wallet.receive.confirmationDialog.addressLabel": "Indirizzo",
