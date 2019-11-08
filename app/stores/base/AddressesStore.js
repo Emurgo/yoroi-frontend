@@ -27,6 +27,7 @@ import {
 } from '../../utils/logging';
 import { EXTERNAL, INTERNAL } from '../../config/numbersConfig';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/tables';
 
 export type StandardAddress = {|
   ...Address, ...Value, ...Addressing, ...UsedStatus
@@ -206,7 +207,8 @@ export default class AddressesStore extends Store {
       return Promise.resolve([]);
     }
     return this.api[environment.API].getAllAddressesForDisplay({
-      publicDeriver: withUtxos
+      publicDeriver: withUtxos,
+      type: CoreAddressTypes.CARDANO_LEGACY,
     });
   }
   _wrapForChainAddresses = (request: {
@@ -223,6 +225,7 @@ export default class AddressesStore extends Store {
     return this.api[environment.API].getChainAddressesForDisplay({
       publicDeriver: withHasChains,
       chainsRequest: request.chainsRequest,
+      type: CoreAddressTypes.CARDANO_LEGACY,
     });
   }
 }
