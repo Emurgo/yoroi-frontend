@@ -17,6 +17,12 @@ import {
 import type { WalletAccountNumberPlate } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import globalMessages from '../../../i18n/global-messages';
 import { CheckAdressesInUseApiError } from '../../../api/ada/errors';
+import type {
+  ConfigType,
+} from '../../../../config/config-types';
+
+declare var CONFIG : ConfigType;
+const protocolMagic = CONFIG.network.protocolMagic;
 
 type Props = InjectedDialogContainerProps & {
   mode: "regular" | "paper",
