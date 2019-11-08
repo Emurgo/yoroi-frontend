@@ -160,6 +160,8 @@ Given(/^I have completed the basic setup$/, async function () {
 
   // uri prompt page
   await acceptUriPrompt(this);
+
+  await this.waitForElement('.WalletAdd_component');
 });
 
 Then(/^I accept uri registration$/, async function () {
