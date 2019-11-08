@@ -85,7 +85,7 @@ import {
   GetKey,
   GetAddress,
 } from '../../database/primitives/api/read';
-import { CoreAddressTypes } from '../../database/primitives/tables';
+import { CoreAddressTypes } from '../../database/primitives/enums';
 import type { KeyRow, KeyDerivationRow, } from '../../database/primitives/tables';
 import { UpdateGet, AddAddress, } from '../../database/primitives/api/write';
 

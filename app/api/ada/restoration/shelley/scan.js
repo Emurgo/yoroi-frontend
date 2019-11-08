@@ -24,7 +24,7 @@ import type {
 import type { AddByHashFunc, } from '../../lib/storage/bridge/hashMapper';
 import type { AddressDiscriminationType } from 'js-chain-libs';
 import type { CanonicalAddressInsert } from '../../lib/storage/database/primitives/tables';
-import { CoreAddressTypes } from '../../lib/storage/database/primitives/tables';
+import { CoreAddressTypes } from '../../lib/storage/database/primitives/enums';
 import type { Bip44ChainInsert } from '../../lib/storage/database/walletTypes/common/tables';
 
 declare var CONFIG: ConfigType;

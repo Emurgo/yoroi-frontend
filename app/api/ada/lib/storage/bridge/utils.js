@@ -1,7 +1,7 @@
 // @flow
 
-import type { CoreAddressT } from '../database/primitives/tables';
-import { CoreAddressTypes } from '../database/primitives/tables';
+import type { CoreAddressT } from '../database/primitives/enums';
+import { CoreAddressTypes } from '../database/primitives/enums';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 
 export function addressToKind(

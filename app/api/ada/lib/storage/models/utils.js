@@ -45,8 +45,10 @@ import type {
   AddressRow,
   KeyInsert, KeyRow,
   CanonicalAddressRow,
-  CoreAddressT,
 } from '../database/primitives/tables';
+import type {
+  CoreAddressT
+} from '../database/primitives/enums';
 import {
   UpdateGet, AddAddress,
 } from '../database/primitives/api/write';
@@ -82,7 +84,7 @@ import {
 import {
   GetUtxoTxOutputsWithTx,
 } from '../database/transactionModels/utxo/api/read';
-import { TxStatusCodes, CoreAddressTypes, } from '../database/primitives/tables';
+import { TxStatusCodes, CoreAddressTypes, } from '../database/primitives/enums';
 
 import { WrongPassphraseError } from '../../cardanoCrypto/cryptoErrors';
 

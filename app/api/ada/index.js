@@ -28,7 +28,7 @@ import {
   flattenInsertTree,
   Bip44DerivationLevels,
 } from './lib/storage/database/walletTypes/bip44/api/utils';
-import type { CoreAddressT } from './lib/storage/database/primitives/tables';
+import type { CoreAddressT } from './lib/storage/database/primitives/enums';
 import {
   PublicDeriver,
 } from './lib/storage/models/PublicDeriver/index';

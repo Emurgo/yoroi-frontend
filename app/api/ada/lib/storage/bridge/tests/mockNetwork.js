@@ -12,7 +12,7 @@ import type {
 } from '../../../state-fetch/types';
 import { RollbackApiError, } from '../../../../errors';
 import { addressToKind } from '../utils';
-import { CoreAddressTypes } from '../../database/primitives/tables';
+import { CoreAddressTypes } from '../../database/primitives/enums';
 
 export function genCheckAddressesInUse(
   blockchain: Array<RemoteTransaction>,

@@ -8,17 +8,19 @@ import type {
 import * as Tables from '../tables';
 import type {
   AddressMappingInsert, AddressMappingRow,
-  CoreAddressT,
   KeyDerivationInsert, KeyDerivationRow,
   BlockInsert, BlockRow,
   KeyInsert, KeyRow,
   AddressInsert, AddressRow,
   EncryptionMetaInsert, EncryptionMetaRow,
-  TxStatusCodesType,
   DbTransaction,
   TransactionInsert, TransactionRow,
   DbBlock,
 } from '../tables';
+import type {
+  CoreAddressT,
+  TxStatusCodesType,
+} from '../enums';
 import {
   digetForHash,
 } from './utils';

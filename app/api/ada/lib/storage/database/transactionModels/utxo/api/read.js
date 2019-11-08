@@ -18,11 +18,12 @@ import type {
   UtxoTransactionOutputRow,
   DbUtxoInputs, DbUtxoOutputs,
 } from '../tables';
-import { TxStatusCodes, TransactionSchema, } from '../../../primitives/tables';
+import { TransactionSchema, } from '../../../primitives/tables';
+import { TxStatusCodes } from '../../../primitives/enums';
 import type {
-  TxStatusCodesType,
   TransactionRow,
 } from '../../../primitives/tables';
+import type { TxStatusCodesType } from '../../../primitives/enums';
 import { getRowIn, } from '../../../utils';
 
 export class GetUtxoInputs {

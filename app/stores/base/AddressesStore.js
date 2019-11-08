@@ -27,7 +27,7 @@ import {
 } from '../../utils/logging';
 import { EXTERNAL, INTERNAL } from '../../config/numbersConfig';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
-import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/tables';
+import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 
 export type StandardAddress = {|
   ...Address, ...Value, ...Addressing, ...UsedStatus

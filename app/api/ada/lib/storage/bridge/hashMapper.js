@@ -8,10 +8,13 @@ import {
   GetAddress,
 } from '../database/primitives/api/read';
 import type {
-  AddressRow, CoreAddressT,
+  AddressRow,
 } from '../database/primitives/tables';
+import type {
+  CoreAddressT,
+} from '../database/primitives/enums';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
-import { CoreAddressTypes, } from '../database/primitives/tables';
+import { CoreAddressTypes, } from '../database/primitives/enums';
 import {
   addressToKind,
 } from './utils';

@@ -13,8 +13,10 @@ import {
 import type {
   BlockInsert, BlockRow,
   TransactionInsert, TransactionRow,
-  TxStatusCodesType,
 } from '../database/primitives/tables';
+import type {
+  TxStatusCodesType,
+} from '../database/primitives/enums';
 import {
   GetAddress,
   GetBlock,
@@ -52,7 +54,7 @@ import type {
 import type {
   AccountingTransactionInputInsert, AccountingTransactionOutputInsert,
 } from '../database/transactionModels/account/tables';
-import { TxStatusCodes, CoreAddressTypes, } from '../database/primitives/tables';
+import { TxStatusCodes, CoreAddressTypes, } from '../database/primitives/enums';
 import {
   asScanAddresses,
 } from '../models/common/traits';

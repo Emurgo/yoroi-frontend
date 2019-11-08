@@ -15,11 +15,13 @@ import type {
   BlockRow,
   EncryptionMetaRow,
   KeyRow,
-  TxStatusCodesType,
   TransactionRow,
   AddressMappingRow,
-  CoreAddressT,
 } from '../tables';
+import type {
+  TxStatusCodesType,
+  CoreAddressT,
+} from '../enums';
 import * as Tables from '../tables';
 import {
   digetForHash,

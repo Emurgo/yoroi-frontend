@@ -12,9 +12,11 @@ import type {
   DbTxIO,
 } from '../api/ada/lib/storage/database/transactionModels/multipart/tables';
 import type {
-  TxStatusCodesType,
   DbBlock,
 } from '../api/ada/lib/storage/database/primitives/tables';
+import type {
+  TxStatusCodesType,
+} from '../api/ada/lib/storage/database/primitives/enums';
 
 export type TrasactionAddresses = { from: Array<string>, to: Array<string> };
 
