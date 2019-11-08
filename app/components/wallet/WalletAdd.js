@@ -3,13 +3,13 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import classnames from 'classnames';
-
 import SvgInline from 'react-svg-inline';
+
+import CustomTooltip from '../widgets/CustomTooltip';
 import logoIcon from '../../assets/images/yoroi-logo-white.inline.svg';
 import settingsIcon from '../../assets/images/top-bar/setting-active.inline.svg';
 import daedalusIcon from '../../assets/images/top-bar/daedalus-migration.inline.svg';
 
-import { MAX_ADA_WALLETS_COUNT } from '../../config/numbersConfig';
 import styles from './WalletAdd.scss';
 
 import environmnent from '../../environment';
@@ -27,17 +27,33 @@ const messages = defineMessages({
     id: 'wallet.add.page.hw.title',
     defaultMessage: '!!!Connect to hardware wallet',
   },
+  connectToHWTooltip: {
+    id: 'wallet.add.page.hw.tooltip',
+    defaultMessage: '!!!Create or restore a Yoroi wallet<br/>using a Ledger or Trezor hardware wallet.',
+  },
   createTitle: {
     id: 'wallet.add.page.create.title',
     defaultMessage: '!!!Create wallet',
+  },
+  createTooltip: {
+    id: 'wallet.add.page.create.tooltip',
+    defaultMessage: '!!!Generate a new 15-word recovery phrase<br/>and create a Yoroi wallet.',
   },
   restoreTitle: {
     id: 'wallet.add.page.restore.title',
     defaultMessage: '!!!Restore wallet',
   },
+  restoreTooltip: {
+    id: 'wallet.add.page.restore.tooltip',
+    defaultMessage: '!!!Enter a 15-word recovery phrase<br/>to restore an already-existing Yoroi wallet,<br/>or import an existing Yoroi paper wallet.',
+  },
   transferFundsTitle: {
     id: 'wallet.add.page.daedalusTransfer.title',
     defaultMessage: '!!!Transfer funds from a Daedalus wallet to Yoroi',
+  },
+  transferFundsTooltip: {
+    id: 'wallet.add.page.daedalusTransfer.tooltip',
+    defaultMessage: '!!!You can transfer funds from a Daedalus wallet<br/>to Yoroi, but first you will need to create<br/>a Yoroi wallet to store those funds.',
   },
 });
 
@@ -99,6 +115,7 @@ export default class WalletAdd extends Component<Props> {
                       <div className={classnames([styles.heroCardsItemBg, styles.bgConnectHW])} />
                       <div className={styles.heroCardsItemTitle}>
                         {intl.formatMessage(messages.connectToHWTitle)}
+                        <CustomTooltip toolTip={messages.connectToHWTooltip} />
                       </div>
                     </div>
                   </button>
@@ -113,6 +130,7 @@ export default class WalletAdd extends Component<Props> {
                     <div className={classnames([styles.heroCardsItemBg, styles.bgCreateWallet])} />
                     <div className={styles.heroCardsItemTitle}>
                       {intl.formatMessage(messages.createTitle)}
+                      <CustomTooltip toolTip={messages.createTooltip} />
                     </div>
                   </div>
                 </button>
@@ -128,6 +146,7 @@ export default class WalletAdd extends Component<Props> {
                     />
                     <div className={styles.heroCardsItemTitle}>
                       {intl.formatMessage(messages.restoreTitle)}
+                      <CustomTooltip toolTip={messages.restoreTooltip} />
                     </div>
                   </div>
                 </button>
@@ -146,6 +165,7 @@ export default class WalletAdd extends Component<Props> {
                 />
                 <div className={styles.heroCardsItemTitle}>
                   {intl.formatMessage(messages.transferFundsTitle)}
+                  <CustomTooltip toolTip={messages.transferFundsTooltip} />
                 </div>
               </button>
             </div>

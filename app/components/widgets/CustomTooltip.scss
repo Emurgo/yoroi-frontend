@@ -1,0 +1,37 @@
+@import '../../themes/mixins/underline.scss';
+
+.component {
+  .infoIcon {
+    display: flex;
+    margin-left: 3px;
+  }
+  
+  .SimpleTooltip {
+    div[data-bubble-container] {
+      transform: translate(-50%, 0); // center the tooltip no matter how long is the text inside
+      margin-left: 20px; // offset = horizontal padding of icon and tooltip
+    }
+  }
+  
+  :global(.SimpleBubble_bubble) {
+    font-size: 13px;
+    font-family: var(--font-regular);
+    letter-spacing: 1px;
+    color: white;
+    background-color: rgba(56, 57, 61, 0.7);
+
+    // size tooltip to text contained inside
+    min-width: auto;
+    padding: 4px 12px 4px 12px !important;
+
+    // use this to vertical-align
+    line-height: 16px;
+  }
+
+  :global(.SimpleBubble_root:not(.SimpleBubble_openUpward))  {
+      margin-top: -8px !important;
+  }
+  :global(.SimpleBubble_root.SimpleBubble_transparent.SimpleBubble_openUpward)  {
+      margin-bottom: -8px !important;
+  }
+}

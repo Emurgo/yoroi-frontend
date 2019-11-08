@@ -17,7 +17,7 @@ import ProgressStepBlock from '../common/ProgressStepBlock';
 import HelpLinkBlock from './HelpLinkBlock';
 import HWErrorBlock from '../common/HWErrorBlock';
 
-import infoIconSVG from '../../../../assets/images/hardware-wallet/info-icon.inline.svg';
+import infoIconSVG from '../../../../assets/images/info-icon.inline.svg';
 
 import saveLoadImage from '../../../../assets/images/hardware-wallet/ledger/save-load-modern.inline.svg';
 import saveErrorImage from '../../../../assets/images/hardware-wallet/ledger/save-error-modern.inline.svg';
