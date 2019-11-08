@@ -241,7 +241,7 @@
   "wallet.add.page.daedalusTransfer.title": "Transférer des fonds à partir d'un wallet Daedalus vers Yoroi",
   "wallet.add.page.daedalusTransfer.tooltip": "Vous pouvez transférer des fonds à partir d’un wallet Daedalus<br/>vers Yoroi, mais vous devez tout d’abord créer<br/>un wallet Yoroi afin de pouvoir recevoir ces fonds.",
   "wallet.add.page.hw.title": "Se connecter au hardware wallet",
-  "wallet.add.page.hw.tooltip": "Create or restore a Yoroi wallet<br/>using a Ledger or Trezor hardware wallet.",
+  "wallet.add.page.hw.tooltip": "Créer ou restaurer un wallet Yoroi<br/>à l’aide d’un wallet matériel Ledger ou Trezor.",
   "wallet.add.page.restore.title": "Restaurer un wallet",
   "wallet.add.page.restore.tooltip": "Enter a 15-word recovery phrase<br/>to restore an already-existing Yoroi wallet,<br/>or import an existing Yoroi paper wallet.",
   "wallet.add.page.subtitle.label": "Wallet léger Yoroi pour Cardano",
