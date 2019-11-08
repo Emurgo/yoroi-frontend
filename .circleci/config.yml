@@ -20,14 +20,14 @@ aliases:
   - &restore_cache
       restore_cache:
         keys:
-          - generic-tools-cache-{{ checksum "package-lock.json" }}
+          - generic-tools-cache-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
   - &save_cache
       save_cache:
         paths:
          - ~/.npm
          - ~/.rustup
          - ~/.cargo
-        key: generic-tools-cache-{{ checksum "package-lock.json" }}
+        key: generic-tools-cache-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
   - &setenv
       run: bash .circleci/set_dynamic_env.sh
   - &global_environment
