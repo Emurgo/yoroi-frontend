@@ -706,17 +706,13 @@ async function rawUpdateTransactions(
         txIds,
         txsFromNetwork,
         hashToIds: rawGenHashToIdsFunc(
-          db, dbTx,
-          {
-            AddAddress: deps.AddAddress,
-            GetAddress: deps.GetAddress,
-          },
           new Set([
             ...utxoAddressIds,
             ...accountingAddressIds,
           ])
         ),
         toAbsoluteSlotNumber,
+        derivationTables,
       }
     );
   }
@@ -755,6 +751,7 @@ export async function updateTransactionBatch(
     txIds: Array<number>,
     txsFromNetwork: Array<RemoteTransaction>,
     hashToIds: HashToIdsFunc,
+    derivationTables: Map<number, string>,
   }
 ): Promise<Array<DbTxInChain>> {
   const { TransactionSeed, BlockSeed } = await deps.GetEncryptionMeta.get(db, dbTx);
@@ -833,6 +830,9 @@ export async function updateTransactionBatch(
 
   // 2) Add new transactions
   const newTxsForDb = await networkTxToDbTx(
+    db,
+    dbTx,
+    request.derivationTables,
     unseedNewTxs,
     request.hashToIds,
     request.toAbsoluteSlotNumber,
@@ -914,7 +914,10 @@ export async function updateTransactionBatch(
   return txsAddedToBlock;
 }
 
-export async function networkTxToDbTx(
+async function networkTxToDbTx(
+  db: lf$Database,
+  dbTx: lf$Transaction,
+  derivationTables: Map<number, string>,
   newTxs: Array<RemoteTransaction>,
   hashToIds: HashToIdsFunc,
   toAbsoluteSlotNumber: ToAbsoluteSlotNumberFunc,
@@ -936,7 +939,12 @@ export async function networkTxToDbTx(
       ...tx.outputs.map(output => output.address),
     ]),
   ));
-  const idMapping = await hashToIds(allAddresses);
+  const idMapping = await hashToIds({
+    db,
+    tx: dbTx,
+    lockedTables: Array.from(derivationTables.values()),
+    hashes: allAddresses
+  });
 
   const getIdOrThrow = (hash: string): number => {
     // recall: we know all these ids should already be present

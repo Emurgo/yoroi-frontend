@@ -35,6 +35,7 @@ import {
   GetBlock,
   GetEncryptionMeta,
 } from './read';
+import type { InsertRequest } from '../../walletTypes/common/utils';
 
 export class AddKey {
   static ownTables = Object.freeze({
@@ -191,7 +192,7 @@ export type AddDerivationRequest<Insert> = {|
       private: number | null,
       public: number | null,
     |} => KeyDerivationInsert,
-  levelInfo: number => Insert,
+  levelInfo: InsertRequest => Promise<Insert>,
 |};
 
 export type DerivationQueryResult<Row> = {|
@@ -211,6 +212,7 @@ export class AddDerivation {
     db: lf$Database,
     tx: lf$Transaction,
     request: AddDerivationRequest<Insert>,
+    lockedTables: Array<string>,
     levelSpecificTableName: string,
   ): Promise<DerivationQueryResult<Row>> {
     const privateKey = request.privateKeyInfo === null
@@ -240,7 +242,12 @@ export class AddDerivation {
       await addNewRowToTable<Insert, Row>(
         db,
         tx,
-        request.levelInfo(KeyDerivation.KeyDerivationId),
+        await request.levelInfo({
+          db,
+          tx,
+          lockedTables,
+          keyDerivationId: KeyDerivation.KeyDerivationId
+        }),
         levelSpecificTableName,
       );
 
@@ -270,6 +277,7 @@ export class GetOrAddDerivation {
     parentDerivationId: number | null,
     childIndex: number | null,
     request: AddDerivationRequest<Insert>,
+    lockedTables: Array<string>,
     levelSpecificTableName: string,
   ): Promise<DerivationQueryResult<Row>> {
     const childResult = parentDerivationId == null || childIndex == null
@@ -299,6 +307,7 @@ export class GetOrAddDerivation {
     const addResult = await GetOrAddDerivation.depTables.AddDerivation.add<Insert, Row>(
       db, tx,
       request,
+      lockedTables,
       levelSpecificTableName,
     );
     return addResult;

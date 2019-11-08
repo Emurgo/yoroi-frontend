@@ -26,6 +26,42 @@ import {
 } from './utils';
 import { getRowFromKey, getRowIn, StaleStateError, } from '../../utils';
 
+export class GetEncryptionMeta {
+  static ownTables = Object.freeze({
+    [Tables.EncryptionMetaSchema.name]: Tables.EncryptionMetaSchema,
+  });
+  static depTables = Object.freeze({});
+
+  static async exists(
+    db: lf$Database,
+    tx: lf$Transaction,
+  ): Promise<boolean> {
+    const row = await getRowFromKey<EncryptionMetaRow>(
+      db, tx,
+      0,
+      GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].name,
+      GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].properties.EncryptionMetaId,
+    );
+    return row !== undefined;
+  }
+
+  static async get(
+    db: lf$Database,
+    tx: lf$Transaction,
+  ): Promise<$ReadOnly<EncryptionMetaRow>> {
+    const row = await getRowFromKey<EncryptionMetaRow>(
+      db, tx,
+      0,
+      GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].name,
+      GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].properties.EncryptionMetaId,
+    );
+    if (row === undefined) {
+      throw new Error('GetEncryptionMeta::get no encryption meta found');
+    }
+    return row;
+  }
+}
+
 export class GetKey {
   static ownTables = Object.freeze({
     [Tables.KeySchema.name]: Tables.KeySchema,
@@ -135,11 +171,6 @@ export class GetAddress {
     const query = db
       .select()
       .from(mappingTable)
-      .where(
-        mappingTable[mappingSchema.properties.KeyDerivationId].in(
-          keyDerivationId
-        )
-      )
       .innerJoin(
         addressTable,
         op.and(
@@ -152,6 +183,11 @@ export class GetAddress {
             )]
             : []
           )
+        )
+      )
+      .where(
+        mappingTable[mappingSchema.properties.KeyDerivationId].in(
+          keyDerivationId
         )
       );
     const result: $ReadOnlyArray<{|
@@ -187,42 +223,6 @@ export class GetAddress {
     return row === undefined
       ? row
       : row.KeyDerivationId;
-  }
-}
-
-export class GetEncryptionMeta {
-  static ownTables = Object.freeze({
-    [Tables.EncryptionMetaSchema.name]: Tables.EncryptionMetaSchema,
-  });
-  static depTables = Object.freeze({});
-
-  static async exists(
-    db: lf$Database,
-    tx: lf$Transaction,
-  ): Promise<boolean> {
-    const row = await getRowFromKey<EncryptionMetaRow>(
-      db, tx,
-      0,
-      GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].name,
-      GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].properties.EncryptionMetaId,
-    );
-    return row !== undefined;
-  }
-
-  static async get(
-    db: lf$Database,
-    tx: lf$Transaction,
-  ): Promise<$ReadOnly<EncryptionMetaRow>> {
-    const row = await getRowFromKey<EncryptionMetaRow>(
-      db, tx,
-      0,
-      GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].name,
-      GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].properties.EncryptionMetaId,
-    );
-    if (row === undefined) {
-      throw new Error('GetEncryptionMeta::get no encryption meta found');
-    }
-    return row;
   }
 }
 

@@ -115,16 +115,16 @@ test('Can add and fetch address in wallet', async (done) => {
           initialDerivations: [
             {
               index: 0, // external chain,
-              insert: keyDerivationId => Promise.resolve({
-                KeyDerivationId: keyDerivationId,
+              insert: insertRequest => Promise.resolve({
+                KeyDerivationId: insertRequest.keyDerivationId,
                 DisplayCutoff: 0,
               }),
               children: [],
             },
             {
               index: 1, // internal chain,
-              insert: keyDerivationId => Promise.resolve({
-                KeyDerivationId: keyDerivationId,
+              insert: insertRequest => Promise.resolve({
+                KeyDerivationId: insertRequest.keyDerivationId,
                 DisplayCutoff: null,
               }),
               children: [],

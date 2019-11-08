@@ -195,16 +195,16 @@ export async function derivePublicDeriver<Row>(
         return [
           ...body.path.slice(0, body.path.length - 1).map(index => ({
             index,
-            insert: keyDerivationId => Promise.resolve({
-              KeyDerivationId: keyDerivationId,
+            insert: insertRequest => Promise.resolve({
+              KeyDerivationId: insertRequest.keyDerivationId,
             }),
             privateKey: null,
             publicKey: null,
           })),
           {
             index: body.path[body.path.length - 1],
-            insert: keyDerivationId => Promise.resolve({
-              KeyDerivationId: keyDerivationId,
+            insert: insertRequest => Promise.resolve({
+              KeyDerivationId: insertRequest.keyDerivationId,
             }),
             privateKey: body.encryptPublicDeriverPassword === undefined
               ? null

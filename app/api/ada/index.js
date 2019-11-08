@@ -1092,14 +1092,14 @@ export default class AdaApi {
         lastUsedExternal: -1,
         checkAddressesInUse,
         addByHash: (address) => {
-          if (!foundAddresses.has(address.data)) {
+          if (!foundAddresses.has(address.address.data)) {
             let family = reverseAddressLookup.get(address.keyDerivationId);
             if (family == null) {
               family = [];
               reverseAddressLookup.set(address.keyDerivationId, family);
             }
-            family.push(address.data);
-            foundAddresses.add(address.data);
+            family.push(address.address.data);
+            foundAddresses.add(address.address.data);
           }
           return Promise.resolve();
         },
@@ -1111,7 +1111,13 @@ export default class AdaApi {
       for (let i = 0; i < flattenedTree.length; i++) {
         const leaf = flattenedTree[i];
         // triggers the insert
-        await leaf.insert(i);
+        await leaf.insert({
+          // this is done in-memory so no need for a real DB
+          db: (null: any),
+          tx: (null: any),
+          lockedTables: [],
+          keyDerivationId: i
+        });
         const family = reverseAddressLookup.get(i);
         if (family == null) throw new Error('restoreWalletForTransfer should never happen');
         const result = family.map(address => ({

@@ -8,10 +8,10 @@ import {
   Bip44ChainSchema,
 } from '../../common/tables';
 import {
-  CanonicalAddressSchema, AddressMappingSchema, AddressSchema,
+  CanonicalAddressSchema, AddressMappingSchema, AddressSchema, EncryptionMetaSchema,
 } from '../../../primitives/tables';
 import type { CanonicalAddressInsert, } from '../../../primitives/tables';
-import type { TreeInsert, } from '../../common/utils';
+import type { TreeInsert, InsertRequest, } from '../../common/utils';
 
 export const Bip44DerivationLevels = Object.freeze({
   ROOT: {
@@ -42,7 +42,7 @@ export const Bip44DerivationLevels = Object.freeze({
   ADDRESS: {
     level: 5,
     table: CanonicalAddressSchema,
-    extra: [AddressMappingSchema, AddressSchema],
+    extra: [AddressMappingSchema, AddressSchema, EncryptionMetaSchema],
   },
 });
 
@@ -74,7 +74,7 @@ export function flattenInsertTree(
   tree: TreeInsert<any>,
 ): Array<{|
   path: Array<number>,
-  insert: number => Promise<CanonicalAddressInsert>,
+  insert: InsertRequest => Promise<CanonicalAddressInsert>,
 |}> {
   const addresses = [];
   for (const branch of tree) {

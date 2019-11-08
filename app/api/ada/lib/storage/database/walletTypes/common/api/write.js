@@ -65,8 +65,9 @@ export class AddDerivationTree {
             Parent: parentId,
             Index: tree.children[i].index,
           }),
-          levelInfo: id => tree.children[i].insert(id),
+          levelInfo: insertRequest => tree.children[i].insert(insertRequest),
         },
+        Array.from(derivationTables.values()),
         tableName,
       );
       // recursively call down to the next level
@@ -108,6 +109,7 @@ export class AddDerivationTree {
     const root = await AddDerivationTree.depTables.AddDerivation.add(
       db, tx,
       rootInsert,
+      Array.from(derivationTables.values()),
       tableName,
     );
     const children = await AddDerivationTree.excludingParent(
@@ -155,8 +157,9 @@ export class AddDerivationTree {
             // explicitly ignore index for ROOT since it has no index
             Index: request.pathStartLevel + i === 0  ? null : request.path[i].index,
           }),
-          levelInfo: id => request.path[i].insert(id),
+          levelInfo: insertRequest => request.path[i].insert(insertRequest),
         },
+        Array.from(derivationTables.values()),
         tableName,
       );
       parentId = levelResult.KeyDerivation.KeyDerivationId;
@@ -256,8 +259,9 @@ export class DerivePublicDeriverFromKey {
                 : pathResult[pathResult.length - 1].KeyDerivation.KeyDerivationId,
               Index: derivedPath[derivedPath.length - 1].index,
             }),
-            levelInfo: id => derivedPath[derivedPath.length - 1].insert(id),
+            levelInfo: insertRequest => derivedPath[derivedPath.length - 1].insert(insertRequest),
           },
+          derivationTables,
           levelSpecificTableName: tableName,
           addPublicDeriverRequest: ids => ({
             ConceptualWalletId: conceptualWalletId,
@@ -360,8 +364,11 @@ export class AddAdhocPublicDeriver {
               : pathResult[pathResult.length - 1].KeyDerivation.KeyDerivationId,
             Index: request.pathToPublic[request.pathToPublic.length - 1].index,
           }),
-          levelInfo: id => request.pathToPublic[request.pathToPublic.length - 1].insert(id)
+          levelInfo: insertRequest => request.pathToPublic[request.pathToPublic.length - 1].insert(
+            insertRequest
+          )
         },
+        derivationTables,
         levelSpecificTableName: tableName,
         addPublicDeriverRequest: ids => ({
           ConceptualWalletId: conceptualWalletId,

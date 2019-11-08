@@ -89,44 +89,38 @@ export async function getAccountDefaultDerivations(
    */
   const externalAddresses = addressesIndex.map(i => ({
     index: i,
-    insert: async keyDerivationId => {
-      await addByronAddress(
+    insert: async insertRequest => {
+      return await addByronAddress(
         addByHash,
-        keyDerivationId,
+        insertRequest,
         externalAddrs[i]
       );
-      return {
-        KeyDerivationId: keyDerivationId,
-      };
     },
   }));
   const internalAddresses = addressesIndex.map(i => ({
     index: i,
-    insert: async keyDerivationId => {
-      await addByronAddress(
+    insert: async insertRequest => {
+      return await addByronAddress(
         addByHash,
-        keyDerivationId,
+        insertRequest,
         internalAddrs[i]
       );
-      return {
-        KeyDerivationId: keyDerivationId,
-      };
     },
   }));
 
   return [
     {
       index: 0,
-      insert: keyDerivationId => Promise.resolve({
-        KeyDerivationId: keyDerivationId,
+      insert: insertRequest => Promise.resolve({
+        KeyDerivationId: insertRequest.keyDerivationId,
         DisplayCutoff: 0
       }),
       children: externalAddresses,
     },
     {
       index: 1,
-      insert: keyDerivationId => Promise.resolve({
-        KeyDerivationId: keyDerivationId,
+      insert: insertRequest => Promise.resolve({
+        KeyDerivationId: insertRequest.keyDerivationId,
         DisplayCutoff: null,
       }),
       children: internalAddresses,
@@ -156,32 +150,10 @@ export async function createStandardBip44Wallet(request: {
     RustModule.WalletV2.AccountIndex.new(request.accountIndex)
   ).public();
 
-  const deps = Object.freeze({
-    AddAddress,
-    GetAddress,
-  });
-  const depTables = Object
-    .keys(deps)
-    .map(key => deps[key])
-    .flatMap(table => getAllSchemaTables(request.db, table));
-
-  // Note: we generate initial addresses in a separate database query
-  // from creation of the actual wallet
-  const initialDerivations = await raii(
-    request.db,
-    depTables,
-    async tx => {
-      const genFunc = rawGenAddByHash(
-        request.db, tx,
-        deps,
-        new Set(),
-      );
-      return await getAccountDefaultDerivations(
-        request.settings,
-        accountPublicKey,
-        genFunc,
-      );
-    }
+  const initialDerivations = await getAccountDefaultDerivations(
+    request.settings,
+    accountPublicKey,
+    rawGenAddByHash(new Set()),
   );
 
   const pathToPrivate = []; // private deriver level === root level
@@ -213,8 +185,8 @@ export async function createStandardBip44Wallet(request: {
               Parent: null,
               Index: null,
             }),
-            levelInfo: keyDerivationId => ({
-              KeyDerivationId: keyDerivationId,
+            levelInfo: insertRequest => Promise.resolve({
+              KeyDerivationId: insertRequest.keyDerivationId,
             }),
           },
           tree: rootDerivation => ({
@@ -260,31 +232,10 @@ export async function createHardwareWallet(request: {
   if (request.accountIndex < HARD_DERIVATION_START) {
     throw new Error('createHardwareWallet needs hardened index');
   }
-  const deps = Object.freeze({
-    AddAddress,
-    GetAddress,
-  });
-  const depTables = Object
-    .keys(deps)
-    .map(key => deps[key])
-    .flatMap(table => getAllSchemaTables(request.db, table));
-  // Note: we generate initial addresses in a separate database query
-  // from creation of the actual wallet
-  const initialDerivations = await raii(
-    request.db,
-    depTables,
-    async tx => {
-      const genFunc = rawGenAddByHash(
-        request.db, tx,
-        deps,
-        new Set(),
-      );
-      return await getAccountDefaultDerivations(
-        request.settings,
-        request.accountPublicKey,
-        genFunc,
-      );
-    }
+  const initialDerivations = await getAccountDefaultDerivations(
+    request.settings,
+    request.accountPublicKey,
+    rawGenAddByHash(new Set()),
   );
 
   let state;
@@ -311,8 +262,8 @@ export async function createHardwareWallet(request: {
               Parent: null,
               Index: null,
             }),
-            levelInfo: keyDerivationId => ({
-              KeyDerivationId: keyDerivationId,
+            levelInfo: insertRequest => Promise.resolve({
+              KeyDerivationId: insertRequest.keyDerivationId,
             }),
           },
           tree: rootDerivation => ({
@@ -340,24 +291,24 @@ export async function createHardwareWallet(request: {
           pathToPublic: [
             {
               index: BIP44_PURPOSE,
-              insert: keyDerivationId => Promise.resolve({
-                KeyDerivationId: keyDerivationId,
+              insert: insertRequest => Promise.resolve({
+                KeyDerivationId: insertRequest.keyDerivationId,
               }),
               publicKey: null,
               privateKey: null,
             },
             {
               index: CARDANO_COINTYPE,
-              insert: keyDerivationId => Promise.resolve({
-                KeyDerivationId: keyDerivationId,
+              insert: insertRequest => Promise.resolve({
+                KeyDerivationId: insertRequest.keyDerivationId,
               }),
               publicKey: null,
               privateKey: null,
             },
             {
               index: request.accountIndex,
-              insert: keyDerivationId => Promise.resolve({
-                KeyDerivationId: keyDerivationId,
+              insert: insertRequest => Promise.resolve({
+                KeyDerivationId: insertRequest.keyDerivationId,
               }),
               publicKey: {
                 Hash: request.accountPublicKey.key().to_hex(),
@@ -413,8 +364,8 @@ export async function migrateFromStorageV1(request: {
               Parent: null,
               Index: null,
             }),
-            levelInfo: keyDerivationId => ({
-              KeyDerivationId: keyDerivationId,
+            levelInfo: insertRequest => Promise.resolve({
+              KeyDerivationId: insertRequest.keyDerivationId,
             }),
           },
           tree: rootDerivation => ({
@@ -466,8 +417,8 @@ export async function migrateFromStorageV1(request: {
               Parent: null,
               Index: null,
             }),
-            levelInfo: keyDerivationId => ({
-              KeyDerivationId: keyDerivationId,
+            levelInfo: insertRequest => Promise.resolve({
+              KeyDerivationId: insertRequest.keyDerivationId,
             }),
           },
           tree: rootDerivation => ({
@@ -514,65 +465,46 @@ async function addPublicDeriverToMigratedWallet<
     RustModule.WalletV2.PublicKey.from_hex(request.accountPubKey),
     RustModule.WalletV2.DerivationScheme.v2()
   );
-  const deps = Object.freeze({
-    AddAddress,
-    GetAddress
-  });
-  const depTables = Object
-    .keys(deps)
-    .map(key => deps[key])
-    .flatMap(table => getAllSchemaTables(request.db, table));
-
-  // Note: we generate initial addresses in a separate database query
-  // from creation of the actual wallet
-  const initialDerivations = await raii(
-    request.db,
-    depTables,
-    async tx => {
-      const genFunc = rawGenAddByHash(
-        request.db, tx,
-        deps,
-        new Set(),
-      );
-      const insert = await getAccountDefaultDerivations(
-        request.settings,
-        accountPublicKey,
-        genFunc,
-      );
-      // replace default display cutoff
-      const external = insert.find(chain => chain.index === EXTERNAL);
-      if (external == null) {
-        throw new Error('migrateFromStorageV1 cannot find external chain. Should never happen');
-      }
-      external.insert = keyDerivationId => Promise.resolve({
-        KeyDerivationId: keyDerivationId,
-        DisplayCutoff: request.displayCutoff,
-      });
-
-      return insert;
+  let initialDerivations;
+  {
+    const insert = await getAccountDefaultDerivations(
+      request.settings,
+      accountPublicKey,
+      rawGenAddByHash(new Set()),
+    );
+    // replace default display cutoff
+    const external = insert.find(chain => chain.index === EXTERNAL);
+    if (external == null) {
+      throw new Error('migrateFromStorageV1 cannot find external chain. Should never happen');
     }
-  );
+    external.insert = insertRequest => Promise.resolve({
+      KeyDerivationId: insertRequest.keyDerivationId,
+      DisplayCutoff: request.displayCutoff,
+    });
+
+    initialDerivations = insert;
+  }
 
   const pathToPublic = [{
     index: BIP44_PURPOSE,
-    insert: keyDerivationId => Promise.resolve({
-      KeyDerivationId: keyDerivationId,
+    insert: insertRequest => Promise.resolve({
+      KeyDerivationId: insertRequest.keyDerivationId,
     }),
     publicKey: null,
     privateKey: null,
   },
   {
     index: CARDANO_COINTYPE,
-    insert: keyDerivationId => Promise.resolve({
-      KeyDerivationId: keyDerivationId,
+    insert: insertRequest => Promise.resolve({
+      KeyDerivationId: insertRequest.keyDerivationId,
     }),
     publicKey: null,
     privateKey: null,
   },
   {
     index: accountIndex,
-    insert: keyDerivationId => Promise.resolve({
-      KeyDerivationId: keyDerivationId,
+    insert: insertRequest => Promise.resolve({
+      KeyDerivationId: insertRequest.keyDerivationId,
     }),
     publicKey: {
       Hash: accountPublicKey.key().to_hex(),

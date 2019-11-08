@@ -19,7 +19,7 @@ import environment from '../../../../environment';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 
 import type {
-  TreeInsert,
+  TreeInsert, InsertRequest,
 } from '../../lib/storage/database/walletTypes/common/utils';
 import type { AddByHashFunc, } from '../../lib/storage/bridge/hashMapper';
 import type { AddressDiscriminationType } from 'js-chain-libs';
@@ -49,6 +49,23 @@ export function v3genAddressBatchFunc(
   };
 }
 
+export async function addShelleyAddress(
+  addByHash: AddByHashFunc,
+  insertRequest: InsertRequest,
+  address: string,
+) {
+  await addByHash({
+    ...insertRequest,
+    address: {
+      // TODO: add group + shelley single
+      type: CoreAddressTypes.CARDANO_LEGACY,
+      data: address,
+    },
+  });
+  return {
+    KeyDerivationId: insertRequest.keyDerivationId,
+  };
+}
 
 export async function scanChain(request: {|
   generateAddressFunc: GenerateAddressFunc,
@@ -69,16 +86,12 @@ export async function scanChain(request: {|
     .map((address, i) => {
       return {
         index: i + request.lastUsedIndex + 1,
-        insert: async keyDerivationId => {
-          // TODO: add group + shelley single
-          await request.addByHash({
-            type: CoreAddressTypes.CARDANO_LEGACY,
-            keyDerivationId,
-            data: address,
-          });
-          return {
-            KeyDerivationId: keyDerivationId,
-          };
+        insert: async insertRequest => {
+          return await addShelleyAddress(
+            request.addByHash,
+            insertRequest,
+            address
+          );
         },
       };
     });
@@ -144,16 +157,16 @@ export async function scanAccount(request: {|
     {
       index: EXTERNAL,
       // initial value. Doesn't override existing entry
-      insert: keyDerivationId => Promise.resolve({
-        KeyDerivationId: keyDerivationId,
+      insert: insertRequest => Promise.resolve({
+        KeyDerivationId: insertRequest.keyDerivationId,
         DisplayCutoff: 0,
       }),
       children: externalAddresses,
     },
     {
       index: INTERNAL,
-      insert: keyDerivationId => Promise.resolve({
-        KeyDerivationId: keyDerivationId,
+      insert: insertRequest => Promise.resolve({
+        KeyDerivationId: insertRequest.keyDerivationId,
         DisplayCutoff: null,
       }),
       children: internalAddresses,

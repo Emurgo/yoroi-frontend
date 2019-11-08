@@ -18,7 +18,7 @@ import {
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 
 import type {
-  TreeInsert,
+  TreeInsert, InsertRequest,
 } from '../../lib/storage/database/walletTypes/common/utils';
 import type { AddByHashFunc, } from '../../lib/storage/bridge/hashMapper';
 import type { CanonicalAddressInsert } from '../../lib/storage/database/primitives/tables';
@@ -50,16 +50,18 @@ export function v2genAddressBatchFunc(
 
 export async function addByronAddress(
   addByHash: AddByHashFunc,
-  keyDerivationId: number,
+  insertRequest: InsertRequest,
   address: string,
 ) {
   await addByHash({
-    type: CoreAddressTypes.CARDANO_LEGACY,
-    keyDerivationId,
-    data: address,
+    ...insertRequest,
+    address: {
+      type: CoreAddressTypes.CARDANO_LEGACY,
+      data: address,
+    },
   });
   return {
-    KeyDerivationId: keyDerivationId,
+    KeyDerivationId: insertRequest.keyDerivationId,
   };
 }
 
@@ -81,15 +83,12 @@ async function scanChain(request: {|
     .map((address, i) => {
       return {
         index: i + request.lastUsedIndex + 1,
-        insert: async keyDerivationId => {
-          await addByronAddress(
+        insert: async insertRequest => {
+          return await addByronAddress(
             request.addByHash,
-            keyDerivationId,
+            insertRequest,
             address
           );
-          return {
-            KeyDerivationId: keyDerivationId,
-          };
         },
       };
     });
@@ -152,16 +151,16 @@ async function scanAccount(request: {|
     {
       index: EXTERNAL,
       // initial value. Doesn't override existing entry
-      insert: keyDerivationId => Promise.resolve({
-        KeyDerivationId: keyDerivationId,
+      insert: insertRequest => Promise.resolve({
+        KeyDerivationId: insertRequest.keyDerivationId,
         DisplayCutoff: 0,
       }),
       children: externalAddresses,
     },
     {
       index: INTERNAL,
-      insert: keyDerivationId => Promise.resolve({
-        KeyDerivationId: keyDerivationId,
+      insert: insertRequest => Promise.resolve({
+        KeyDerivationId: insertRequest.keyDerivationId,
         DisplayCutoff: null,
       }),
       children: internalAddresses,

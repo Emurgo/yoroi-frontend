@@ -1101,11 +1101,6 @@ const ScanUtxoAccountAddressesMixin = (
       lastUsedExternal: nextUnusedExternal.index - 1,
       checkAddressesInUse: body.checkAddressesInUse,
       addByHash: rawGenAddByHash(
-        super.getDb(), tx,
-        {
-          AddAddress: deps.AddAddress,
-          GetAddress: deps.GetAddress,
-        },
         new Set([
           ...internalAddresses.flatMap(address => address.addrs.map(addr => addr.AddressId)),
           ...externalAddresses.flatMap(address => address.addrs.map(addr => addr.AddressId)),

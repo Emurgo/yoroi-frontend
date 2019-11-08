@@ -15,53 +15,82 @@ import { CoreAddressTypes, } from '../database/primitives/tables';
 import {
   addressToKind,
 } from './utils';
+import { getAllTables } from '../database/utils';
+import type { InsertRequest } from '../database/walletTypes/common/utils';
 
-export type AddByHashFunc = {|
-  type: CoreAddressT,
-  keyDerivationId: number,
-  data: string,
-|} => Promise<void>;
-export function rawGenAddByHash(
-  db: lf$Database,
-  tx: lf$Transaction,
-  deps: {|
-    GetAddress: Class<GetAddress>,
-    AddAddress: Class<AddAddress>,
+export type AddByHashRequest = {|
+  ...InsertRequest,
+  address: {|
+    type: CoreAddressT,
+    data: string,
   |},
+|};
+export type AddByHashFunc = AddByHashRequest => Promise<void>;
+export function rawGenAddByHash(
   ownAddressIds: Set<number>,
 ) {
   return async (
-    address: {|
-      type: CoreAddressT,
-      keyDerivationId: number,
-      data: string,
-    |}
+    request: AddByHashRequest
   ): Promise<void> => {
-    const rows = await deps.GetAddress.getByHash(db, tx, [address.data]);
+    const deps = {
+      GetAddress, AddAddress
+    };
+    const depsTables = Array.from(
+      getAllTables(...Object.keys(deps).map(key => deps[key]))
+    );
+    const locked = new Set(request.lockedTables);
+    for (const table of depsTables) {
+      if (!locked.has(table)) {
+        throw new Error('rawGenAddByHash missing lock on ' + table);
+      }
+    }
+    const rows = await deps.GetAddress.getByHash(
+      request.db, request.tx,
+      [request.address.data]
+    );
     for (const row of rows) {
       if (ownAddressIds.has(row.AddressId)) {
         return;
       }
     }
-    await deps.AddAddress.addFromCanonicalByHash(db, tx, [address]);
+    await deps.AddAddress.addFromCanonicalByHash(
+      request.db, request.tx,
+      [{
+        ...request.address,
+        keyDerivationId: request.keyDerivationId,
+      }]
+    );
   };
 }
 
-export type HashToIdsFunc = Array<string> => Promise<Map<string, number>>;
-export function rawGenHashToIdsFunc(
+export type HashToIdsRequest = {|
   db: lf$Database,
   tx: lf$Transaction,
-  deps: {|
-    GetAddress: Class<GetAddress>,
-    AddAddress: Class<AddAddress>,
-  |},
+  lockedTables: Array<string>,
+  hashes: Array<string>,
+|};
+export type HashToIdsFunc = HashToIdsRequest => Promise<Map<string, number>>;
+export function rawGenHashToIdsFunc(
   ownAddressIds: Set<number>,
 ): HashToIdsFunc {
   return async (
-    hashes: Array<string>
+    request: HashToIdsRequest
   ): Promise<Map<string, number>> => {
-    const dedupedHashes = Array.from(new Set(hashes));
-    const rows = await deps.GetAddress.getByHash(db, tx, dedupedHashes);
+    const deps = {
+      GetAddress, AddAddress
+    };
+    const depsTables = Array.from(
+      getAllTables(...Object.keys(deps).map(key => deps[key]))
+    );
+    const locked = new Set(request.lockedTables);
+    for (const table of depsTables) {
+      if (!locked.has(table)) {
+        throw new Error('rawGenAddByHash missing lock on ' + table);
+      }
+    }
+
+    const dedupedHashes = Array.from(new Set(request.hashes));
+    const rows = await deps.GetAddress.getByHash(request.db, request.tx, dedupedHashes);
     const addressRowMap: Map<string, Array<$ReadOnly<AddressRow>>> = rows.reduce(
       (map, nextElement) => {
         const array = map.get(nextElement.Hash) || [];
@@ -115,7 +144,7 @@ export function rawGenHashToIdsFunc(
         );
         const hash = Buffer.from(canonical.as_bytes()).toString('hex');
         // TODO: make this batched
-        const addressRows = (await deps.GetAddress.getByHash(db, tx, [hash]))
+        const addressRows = (await deps.GetAddress.getByHash(request.db, request.tx, [hash]))
           .filter(addressRow => ownAddressIds.has(addressRow.AddressId));
 
         if (addressRows.length > 1) {
@@ -124,11 +153,11 @@ export function rawGenHashToIdsFunc(
           notFoundWithoutCanonical.push(address);
         } else {
           const keyDerivationId = await deps.GetAddress.getKeyForFamily(
-            db, tx,
+            request.db, request.tx,
             addressRows[0].AddressId
           );
           if (keyDerivationId == null) throw new Error('rawGenHashToIdsFunc Should never happen no mapping');
-          const newAddr = await deps.AddAddress.addFromCanonicalByHash(db, tx, [{
+          const newAddr = await deps.AddAddress.addFromCanonicalByHash(request.db, request.tx, [{
             keyDerivationId,
             data: address.data,
             type: CoreAddressTypes.SHELLEY_GROUP,
@@ -141,7 +170,7 @@ export function rawGenHashToIdsFunc(
     // note: must be foreign
     // because we should have synced address history before ever calling this
     const newEntries = await deps.AddAddress.addForeignByHash(
-      db, tx,
+      request.db, request.tx,
       addressWithType
     );
     for (let i = 0; i < newEntries.length; i++) {
