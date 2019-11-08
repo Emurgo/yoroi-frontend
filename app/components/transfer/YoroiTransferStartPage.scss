@@ -25,11 +25,10 @@
     .infoBlock {
       padding-right: 60px;
       .title {
+        font-size: 18px;
+        font-family: var(--font-semibold);
         line-height: 1.38;
         margin-bottom: 16px;
-        font-size: 11px;
-        font-family: var(--font-medium);
-        text-transform: capitalize;
       }
 
       .text {
@@ -46,23 +45,3 @@
     }
   }
 }
-
-:global(.YoroiClassic) .component {
-  .body {
-    .title {
-      font-weight: 600;
-      padding-left: 10px;
-      text-transform: uppercase;
-    }
-  }  
-}
-
-:global(.YoroiModern) .component {
-  .body {
-    .title {
-      font-size: 18px;
-      font-family: var(--font-semibold);
-    }
-  }
-}
-
