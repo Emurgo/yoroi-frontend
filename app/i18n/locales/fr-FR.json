@@ -239,7 +239,7 @@
   "wallet.add.page.create.title": "Créer un wallet",
   "wallet.add.page.create.tooltip": "Générer une phrase de secours de 15 mots<br/>et créer un wallet Yoroi.",
   "wallet.add.page.daedalusTransfer.title": "Transférer des fonds à partir d'un wallet Daedalus vers Yoroi",
-  "wallet.add.page.daedalusTransfer.tooltip": "You can transfer funds from a Daedalus wallet<br/>to Yoroi, but first you will need to create<br/>a Yoroi wallet to store those funds.",
+  "wallet.add.page.daedalusTransfer.tooltip": "Vous pouvez transférer des fonds à partir d’un wallet Daedalus<br/>vers Yoroi, mais vous devez tout d’abord créer<br/>un wallet Yoroi afin de pouvoir recevoir ces fonds.",
   "wallet.add.page.hw.title": "Se connecter au hardware wallet",
   "wallet.add.page.hw.tooltip": "Create or restore a Yoroi wallet<br/>using a Ledger or Trezor hardware wallet.",
   "wallet.add.page.restore.title": "Restaurer un wallet",
