@@ -2,37 +2,16 @@
 import React, { Component } from 'react';
 import { join } from 'lodash';
 import { observer } from 'mobx-react';
+import { action, observable } from 'mobx';
 import classnames from 'classnames';
-import { Autocomplete } from 'react-polymorph/lib/components/Autocomplete';
+import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import { defineMessages, intlShape } from 'react-intl';
-import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
-import vjf from 'mobx-react-form/lib/validators/VJF';
+import { intlShape } from 'react-intl';
 import BorderedBox from '../widgets/BorderedBox';
 import globalMessages from '../../i18n/global-messages';
 import styles from './TransferMnemonicPage.scss';
-import config from '../../config';
-import { AutocompleteOwnSkin } from '../../themes/skins/AutocompleteOwnSkin';
-
-const messages = defineMessages({
-  recoveryPhraseInputLabel: {
-    id: 'transfer.form.recovery.phrase.input.label',
-    defaultMessage: '!!!Recovery phrase',
-  },
-  recoveryPhraseInputHint: {
-    id: 'transfer.form.recovery.phrase.input.hint',
-    defaultMessage: '!!!Enter recovery phrase',
-  },
-  recoveryPhraseNoResults: {
-    id: 'transfer.form.recovery.phrase.input.noResults',
-    defaultMessage: '!!!No results',
-  },
-  invalidRecoveryPhrase: {
-    id: 'transfer.form.errors.invalidRecoveryPhrase',
-    defaultMessage: '!!!Invalid recovery phrase',
-  },
-});
+import MnemonicWidget from '../widgets/MnemonicWidget';
 
 type Props = {|
   onSubmit: { recoveryPhrase: string } => void,
@@ -51,43 +30,18 @@ export default class TransferMnemonicPage extends Component<Props> {
     intl: intlShape.isRequired
   };
 
-  form = new ReactToolboxMobxForm({
-    fields: {
-      recoveryPhrase: {
-        label: this.context.intl.formatMessage(messages.recoveryPhraseInputLabel),
-        placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(messages.recoveryPhraseInputHint) : '',
-        value: '',
-        validators: [({ field }) => {
-          const value = join(field.value, ' ');
-          const wordsLeft = this.props.mnemonicLength - field.value.length;
-          if (value === '') return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
-          if (wordsLeft > 0) {
-            return [
-              false,
-              this.context.intl.formatMessage(globalMessages.shortRecoveryPhrase,
-                { number: wordsLeft })
-            ];
-          }
-          return [
-            this.props.mnemonicValidator(value),
-            this.context.intl.formatMessage(messages.invalidRecoveryPhrase)
-          ];
-        }],
-      },
-    },
-  }, {
-    options: {
-      validateOnChange: true,
-      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
-    },
-    plugins: {
-      vjf: vjf()
-    },
-  });
+  @observable mnemonicForm: void | ReactToolboxMobxForm;
+
+  @action
+  setMnemonicFrom(form: ReactToolboxMobxForm) {
+    this.mnemonicForm = form;
+  }
 
   submit = () => {
-    this.form.submit({
+    if (this.mnemonicForm == null) {
+      throw new Error('TransferMnemonicPage form not set');
+    }
+    this.mnemonicForm.submit({
       onSuccess: (form) => {
         const { recoveryPhrase } = form.values();
         const payload = {
@@ -101,16 +55,11 @@ export default class TransferMnemonicPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { form } = this;
     const {
-      validWords,
       onBack,
       step0,
-      mnemonicValidator,
-      mnemonicLength,
       classicTheme
     } = this.props;
-    const { recoveryPhrase } = form.values();
 
     const nextButtonClasses = classnames([
       'proceedTransferButtonClasses',
@@ -122,8 +71,6 @@ export default class TransferMnemonicPage extends Component<Props> {
       classicTheme ? 'flat' : 'outlined',
       styles.button,
     ]);
-
-    const recoveryPhraseField = form.$('recoveryPhrase');
 
     return (
       <div className={styles.component}>
@@ -146,16 +93,12 @@ export default class TransferMnemonicPage extends Component<Props> {
               </ul>
             </div>
 
-            <Autocomplete
-              className={styles.inputWrapper}
-              options={validWords}
-              maxSelections={mnemonicLength}
-              {...recoveryPhraseField.bind()}
-              done={mnemonicValidator(join(recoveryPhrase, ' '))}
-              error={recoveryPhraseField.error}
-              maxVisibleOptions={5}
-              noResultsMessage={intl.formatMessage(messages.recoveryPhraseNoResults)}
-              skin={AutocompleteOwnSkin}
+            <MnemonicWidget
+              setForm={(form) => this.setMnemonicFrom(form)}
+              mnemonicValidator={this.props.mnemonicValidator}
+              validWords={this.props.validWords}
+              mnemonicLength={this.props.mnemonicLength}
+              classicTheme={this.props.classicTheme}
             />
 
             <div className={styles.buttonsWrapper}>

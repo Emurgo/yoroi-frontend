@@ -107,6 +107,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     const wallets = this._getWalletsStore();
     const daedalusTransfer = this._getDaedalusTransferStore();
 
+    console.log(daedalusTransfer.status);
     switch (daedalusTransfer.status) {
       case TransferStatus.UNINITIALIZED:
         return (
@@ -126,10 +127,10 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             <DaedalusTransferFormPage
               onSubmit={this.setupTransferFundsWithMnemonic}
               onBack={this.backToUninitialized}
-              mnemonicValidator={mnemonic => wallets.isValidMnemonic(
+              mnemonicValidator={mnemonic => wallets.isValidMnemonic({
                 mnemonic,
-                config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT
-              )}
+                numberOfWords: config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT
+              })}
               validWords={validWords}
               mnemonicLength={config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT}
               classicTheme={profile.isClassicTheme}
@@ -142,10 +143,10 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             <DaedalusTransferFormPage
               onSubmit={this.setupTransferFundsWithMnemonic}
               onBack={this.backToUninitialized}
-              mnemonicValidator={mnemonic => wallets.isValidPaperMnemonic(
+              mnemonicValidator={mnemonic => wallets.isValidPaperMnemonic({
                 mnemonic,
-                config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT
-              )}
+                numberOfWords: config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT
+              })}
               validWords={validWords}
               mnemonicLength={config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT}
               classicTheme={profile.isClassicTheme}

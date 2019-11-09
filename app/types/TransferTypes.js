@@ -11,8 +11,8 @@ export const TransferStatus = Object.freeze({
   CHECKING_ADDRESSES: 5,
   GENERATING_TX: 6,
   READY_TO_TRANSFER: 7,
-  ERROR: 7,
-  SUCCESS: 8,
+  ERROR: 8,
+  SUCCESS: 9,
 });
 export type TransferStatusT = $Values<typeof TransferStatus>;
 

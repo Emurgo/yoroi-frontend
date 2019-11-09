@@ -92,12 +92,12 @@ export type WalletRestoreDialogValues = {|
 |};
 
 type Props = {|
-  onSubmit: Function,
-  onCancel: Function,
-  onBack?: Function,
+  onSubmit: WalletRestoreDialogValues => void,
+  onCancel: void => void,
+  onBack?: void => void,
   isSubmitting: boolean,
-  mnemonicValidator: Function,
-  passwordValidator?: Function,
+  mnemonicValidator: string => boolean,
+  passwordValidator?: string => boolean,
   numberOfMnemonics: number,
   error?: ?LocalizableError,
   validWords: Array<string>,

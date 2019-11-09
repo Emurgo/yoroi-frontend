@@ -119,10 +119,10 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
             <YoroiTransferFormPage
               onSubmit={this.setupTransferFundsWithMnemonic}
               onBack={this.backToUninitialized}
-              mnemonicValidator={mnemonic => wallets.isValidMnemonic(
+              mnemonicValidator={mnemonic => wallets.isValidMnemonic({
                 mnemonic,
-                config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT
-              )}
+                numberOfWords: config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT
+              })}
               validWords={validWords}
               mnemonicLength={config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT}
               classicTheme={profile.isClassicTheme}
@@ -135,10 +135,10 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
             <YoroiTransferFormPage
               onSubmit={this.setupTransferFundsWithMnemonic}
               onBack={this.backToUninitialized}
-              mnemonicValidator={mnemonic => wallets.isValidPaperMnemonic(
+              mnemonicValidator={mnemonic => wallets.isValidPaperMnemonic({
                 mnemonic,
-                config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT
-              )}
+                numberOfWords: config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT
+              })}
               validWords={validWords}
               mnemonicLength={config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT}
               classicTheme={profile.isClassicTheme}
