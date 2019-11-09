@@ -187,6 +187,7 @@
   "settings.support.reportProblem.link": "Support request",
   "settings.support.reportProblem.title": "Reporting a problem",
   "testnet.label.message": "WARNING: This is a {network} network. ADA has no monetary value here. For more information, check out the FAQ at {faqLink}",
+  "testnet.shelley.label.message": "YOU ARE ON TESTNET NETWORK ({network}).",
   "transfer.form.errors.invalidRecoveryPhrase": "Invalid recovery phrase",
   "transfer.form.instructions.step1.text": "It will take about 1 minute to restore your balance. In the next step, you will be presented with a transaction that will move all of your funds. Please review the details of the transaction carefully. You will need to pay a standard transaction fee on the Cardano network to make the transaction.",
   "transfer.form.masterkey.input.hint": "Enter master key",
