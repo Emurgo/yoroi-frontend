@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import TransferMnemonicPage from '../../components/transfer/TransferMnemonicPage';
+import config from '../../config';
 
 const messages = defineMessages({
   step0: {
@@ -41,7 +42,9 @@ export default class DaedalusTransferFormPage extends Component<Props> {
       mnemonicLength,
       classicTheme
     } = this.props;
-    const message = mnemonicLength === 27 ? messages.step0Paper : messages.step0;
+    const message = mnemonicLength === config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT
+      ? messages.step0Paper
+      : messages.step0;
 
     return (
       <TransferMnemonicPage

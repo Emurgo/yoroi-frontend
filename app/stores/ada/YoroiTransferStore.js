@@ -12,9 +12,10 @@ import LocalizableError, {
   localizedError
 } from '../../i18n/LocalizableError';
 import type {
-  TransferStatus,
+  TransferStatusT,
   TransferTx
 } from '../../types/TransferTypes';
+import { TransferStatus } from '../../types/TransferTypes';
 import { generateTransferTx } from '../../api/ada/daedalusTransfer';
 import environment from '../../environment';
 import type { SignedResponse } from '../../api/ada/lib/state-fetch/types';
@@ -38,7 +39,7 @@ type TransferFundsFunc = (
 
 export default class YoroiTransferStore extends Store {
 
-  @observable status: TransferStatus = 'uninitialized';
+  @observable status: TransferStatusT = TransferStatus.UNINITIALIZED;
   @observable disableTransferFunds: boolean = true;
   @observable transferFundsRequest: Request<TransferFundsFunc>
     = new Request<TransferFundsFunc>(this._transferFundsRequest);
@@ -54,7 +55,7 @@ export default class YoroiTransferStore extends Store {
     } catch (error) {
       Logger.error(`YoroiTransferStore ${stringifyError(error)}`);
       runInAction(() => {
-        this.status = 'error';
+        this.status = TransferStatus.ERROR;
         this.error = localizedError(error);
       });
       throw error;
@@ -67,6 +68,7 @@ export default class YoroiTransferStore extends Store {
     ]);
     const actions = this.actions.ada.yoroiTransfer;
     actions.startTransferFunds.listen(this._startTransferFunds);
+    actions.startTransferPaperFunds.listen(this._startTransferPaperFunds);
     actions.setupTransferFundsWithMnemonic.listen(
       this._errorWrapper(this._setupTransferFundsWithMnemonic)
     );
@@ -81,7 +83,11 @@ export default class YoroiTransferStore extends Store {
   }
 
   _startTransferFunds = () => {
-    this._updateStatus('gettingMnemonics');
+    this._updateStatus(TransferStatus.GETTING_MNEMONICS);
+  }
+
+  _startTransferPaperFunds = () => {
+    this._updateStatus(TransferStatus.GETTING_PAPER_MNEMONICS);
   }
 
   /** @Attention:
@@ -163,27 +169,27 @@ export default class YoroiTransferStore extends Store {
     recoveryPhrase: string,
     publicDeriver: PublicDeriverWithCachedMeta,
   }): Promise<void> => {
-    this._updateStatus('checkingAddresses');
+    this._updateStatus(TransferStatus.CHECKING_ADDRESSES);
     this.recoveryPhrase = payload.recoveryPhrase;
     const transferTx = await this._generateTransferTxFromMnemonic(
       payload.recoveryPhrase,
-      () => this._updateStatus('generatingTx'),
+      () => this._updateStatus(TransferStatus.GENERATING_TX),
       payload.publicDeriver
     );
     runInAction(() => {
       this.transferTx = transferTx;
     });
 
-    this._updateStatus('readyToTransfer');
+    this._updateStatus(TransferStatus.READY_TO_TRANSFER);
   }
 
   _backToUninitialized = (): void => {
-    this._updateStatus('uninitialized');
+    this._updateStatus(TransferStatus.UNINITIALIZED);
   }
 
   /** Updates the status that we show to the user as transfer progresses */
   @action.bound
-  _updateStatus(s: TransferStatus): void {
+  _updateStatus(s: TransferStatusT): void {
     this.status = s;
   }
 
@@ -213,7 +219,7 @@ export default class YoroiTransferStore extends Store {
       await this.transferFundsRequest.execute({
         signedTx: transferTx.signedTx
       });
-      this._updateStatus('success');
+      this._updateStatus(TransferStatus.SUCCESS);
       await next();
       this.reset();
     } catch (error) {
@@ -251,7 +257,7 @@ export default class YoroiTransferStore extends Store {
 
   @action.bound
   reset(): void {
-    this.status = 'uninitialized';
+    this.status = TransferStatus.UNINITIALIZED;
     this.error = null;
     this.transferTx = null;
     this.transferFundsRequest.reset();

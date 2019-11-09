@@ -22,6 +22,7 @@ import {
 import {
   loadLovefieldDB,
 } from '../storage/database/index';
+import config from '../../../../config';
 
 const VALID_DD_PAPER = {
   words: 'fire shaft radar three ginger receive result phrase song staff scorpion food undo will have expire nice uncle dune until lift unlock exist step world slush disagree',
@@ -42,22 +43,37 @@ beforeAll(async () => {
 });
 
 test('Is valid Daedalus paper mnemonic', async () => {
-  expect(isValidEnglishAdaPaperMnemonic(VALID_DD_PAPER.words, 27)).toEqual(true);
+  expect(isValidEnglishAdaPaperMnemonic(
+    VALID_DD_PAPER.words,
+    config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT
+  )).toEqual(true);
   expect(isValidEnglishAdaPaperMnemonic(VALID_DD_PAPER.words, 30)).toEqual(false);
   // Note: expect these to print error to console
-  expect(isValidEnglishAdaPaperMnemonic(INVALID_DD_PAPER_1, 27)).toEqual(false);
-  expect(isValidEnglishAdaPaperMnemonic(INVALID_DD_PAPER_2, 27)).toEqual(false);
+  expect(isValidEnglishAdaPaperMnemonic(
+    INVALID_DD_PAPER_1,
+    config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT
+  )).toEqual(false);
+  expect(isValidEnglishAdaPaperMnemonic(
+    INVALID_DD_PAPER_2,
+    config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT
+  )).toEqual(false);
 });
 
 test('Unscramble Daedalus paper produces 12 valid words', async () => {
-  const [words, count] = unscramblePaperAdaMnemonic(VALID_DD_PAPER.words, 27);
-  expect(count).toEqual(12);
+  const [words, count] = unscramblePaperAdaMnemonic(
+    VALID_DD_PAPER.words,
+    config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT
+  );
+  expect(count).toEqual(config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT);
   if (words == null) throw new Error('failed to unscramble in test');
   expect(validateMnemonic(words)).toEqual(true);
 });
 
 test('Unscramble Daedalus paper matches expected address', async () => {
-  const [words] = unscramblePaperAdaMnemonic(VALID_DD_PAPER.words, 27);
+  const [words] = unscramblePaperAdaMnemonic(
+    VALID_DD_PAPER.words,
+    config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT
+  );
   expect(words).toBeTruthy();
   if (words != null) {
     const daedalusWallet = getCryptoDaedalusWalletFromMnemonics(words);

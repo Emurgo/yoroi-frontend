@@ -13,8 +13,8 @@ const messages = defineMessages({
 
 type Props = {|
   onSubmit: { recoveryPhrase: string } => void,
-  onBack: Function,
-  mnemonicValidator: Function,
+  onBack: void => void,
+  mnemonicValidator: string => boolean,
   validWords: Array<string>,
   mnemonicLength: number,
   classicTheme: boolean,

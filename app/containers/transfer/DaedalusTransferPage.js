@@ -14,6 +14,7 @@ import DaedalusTransferErrorPage from './DaedalusTransferErrorPage';
 import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
 import config from '../../config';
+import { TransferStatus } from '../../types/TransferTypes';
 
 import { formattedWalletAmount } from '../../utils/formatters';
 
@@ -107,7 +108,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     const daedalusTransfer = this._getDaedalusTransferStore();
 
     switch (daedalusTransfer.status) {
-      case 'uninitialized':
+      case TransferStatus.UNINITIALIZED:
         return (
           <TransferLayout>
             <TransferInstructionsPage
@@ -119,7 +120,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             />
           </TransferLayout>
         );
-      case 'gettingMnemonics':
+      case TransferStatus.GETTING_MNEMONICS:
         return (
           <TransferLayout>
             <DaedalusTransferFormPage
@@ -135,20 +136,23 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             />
           </TransferLayout>
         );
-      case 'gettingPaperMnemonics':
+      case TransferStatus.GETTING_PAPER_MNEMONICS:
         return (
           <TransferLayout>
             <DaedalusTransferFormPage
               onSubmit={this.setupTransferFundsWithMnemonic}
               onBack={this.backToUninitialized}
-              mnemonicValidator={mnemonic => wallets.isValidPaperMnemonic(mnemonic, 27)}
+              mnemonicValidator={mnemonic => wallets.isValidPaperMnemonic(
+                mnemonic,
+                config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT
+              )}
               validWords={validWords}
-              mnemonicLength={27}
+              mnemonicLength={config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT}
               classicTheme={profile.isClassicTheme}
             />
           </TransferLayout>
         );
-      case 'gettingMasterKey':
+      case TransferStatus.GETTING_MASTER_KEY:
         return (
           <TransferLayout>
             <DaedalusTransferMasterKeyFormPage
@@ -158,15 +162,15 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             />
           </TransferLayout>
         );
-      case 'restoringAddresses':
-      case 'checkingAddresses':
-      case 'generatingTx':
+      case TransferStatus.RESTORING_ADDRESSES:
+      case TransferStatus.CHECKING_ADDRESSES:
+      case TransferStatus.GENERATING_TX:
         return (
           <TransferLayout>
             <DaedalusTransferWaitingPage status={daedalusTransfer.status} />
           </TransferLayout>
         );
-      case 'readyToTransfer':
+      case TransferStatus.READY_TO_TRANSFER:
         if (daedalusTransfer.transferTx == null) {
           return null; // TODO: throw error? Shoudln't happen
         }
@@ -184,7 +188,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             />
           </TransferLayout>
         );
-      case 'error':
+      case TransferStatus.ERROR:
         return (
           <TransferLayout>
             <DaedalusTransferErrorPage
