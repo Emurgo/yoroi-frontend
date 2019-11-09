@@ -11,3 +11,9 @@
     flex-grow: 1;
   }  
 }
+
+:global(.YoroiShelleyTestnet) {
+  .topBar {
+    background: var(--theme-topbar-background-color);
+  }
+}
