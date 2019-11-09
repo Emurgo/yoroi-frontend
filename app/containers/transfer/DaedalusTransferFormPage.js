@@ -21,7 +21,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onSubmit: { recoveryPhrase: string } => void,
+  onSubmit: {| recoveryPhrase: string |} => void,
   onBack: Function,
   mnemonicValidator: string => boolean,
   validWords: Array<string>,
@@ -47,7 +47,7 @@ export default class DaedalusTransferFormPage extends Component<Props> {
     this.mnemonicForm = form;
   }
 
-  submit = () => {
+  submit = async () => {
     if (this.mnemonicForm == null) {
       throw new Error('DaedalusTransferFormPage form not set');
     }
@@ -77,6 +77,7 @@ export default class DaedalusTransferFormPage extends Component<Props> {
         onBack={this.props.onBack}
         step0={intl.formatMessage(message)}
         classicTheme={this.props.classicTheme}
+        isDisabled={this.mnemonicForm == null || this.mnemonicForm.hasError}
       >
         <MnemonicInput
           setForm={(form) => this.setMnemonicFrom(form)}

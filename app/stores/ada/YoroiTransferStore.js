@@ -27,6 +27,10 @@ import {
   asHasChains,
 } from '../../api/ada/lib/storage/models/Bip44Wallet/traits';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import {
+  unscramblePaperAdaMnemonic,
+} from '../../api/ada/lib/cardanoCrypto/paperWallet';
+import config from '../../config';
 
 type TransferFundsRequest = {
   signedTx: RustModule.WalletV2.SignedTransaction,
@@ -71,6 +75,9 @@ export default class YoroiTransferStore extends Store {
     actions.startTransferPaperFunds.listen(this._startTransferPaperFunds);
     actions.setupTransferFundsWithMnemonic.listen(
       this._errorWrapper(this._setupTransferFundsWithMnemonic)
+    );
+    actions.setupTransferFundsWithPaperMnemonic.listen(
+      this._errorWrapper(this._setupTransferFundsWithPaperMnemonic)
     );
     actions.backToUninitialized.listen(this._backToUninitialized);
     actions.transferFunds.listen(this._errorWrapper(this._transferFunds));
@@ -162,6 +169,26 @@ export default class YoroiTransferStore extends Store {
       getUTXOsForAddresses:
         this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
       filterSenders: true
+    });
+  }
+
+  _setupTransferFundsWithPaperMnemonic = async (payload: {
+    recoveryPhrase: string,
+    paperPassword: string,
+    publicDeriver: PublicDeriverWithCachedMeta,
+  }): Promise<void> => {
+    const result = unscramblePaperAdaMnemonic(
+      payload.recoveryPhrase,
+      config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT,
+      payload.paperPassword
+    );
+    const recoveryPhrase = result[0];
+    if (recoveryPhrase == null) {
+      throw new Error('_setupTransferFundsWithPaperMnemonic paper wallet failed');
+    }
+    await this._setupTransferFundsWithMnemonic({
+      recoveryPhrase,
+      publicDeriver: payload.publicDeriver,
     });
   }
 

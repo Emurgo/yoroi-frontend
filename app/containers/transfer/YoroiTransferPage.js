@@ -6,6 +6,7 @@ import validWords from 'bip39/src/wordlists/english.json';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import TransferLayout from '../../components/transfer/TransferLayout';
 import YoroiTransferFormPage from './YoroiTransferFormPage';
+import YoroiPaperWalletFormPage from './YoroiPaperWalletFormPage';
 import YoroiTransferSummaryPage from './YoroiTransferSummaryPage';
 import YoroiTransferWaitingPage from './YoroiTransferWaitingPage';
 import YoroiTransferErrorPage from './YoroiTransferErrorPage';
@@ -16,6 +17,9 @@ import { ROUTES } from '../../routes-config';
 import config from '../../config';
 import { formattedWalletAmount } from '../../utils/formatters';
 import { TransferStatus } from '../../types/TransferTypes';
+import {
+  isValidWalletPassword,
+} from '../../utils/validations';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
@@ -46,15 +50,30 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
     this._getYoroiTransferActions().startTransferPaperFunds.trigger();
   }
 
-  setupTransferFundsWithMnemonic = (payload: {
+  setupTransferFundsWithMnemonic = (payload: {|
     recoveryPhrase: string,
-  }) => {
+  |}) => {
     const walletsStore = this._getWalletsStore();
     const publicDeriver = walletsStore.selected;
     if (publicDeriver == null) {
       throw new Error('tranferFunds no wallet selected');
     }
     this._getYoroiTransferActions().setupTransferFundsWithMnemonic.trigger({
+      ...payload,
+      publicDeriver,
+    });
+  };
+
+  setupTransferFundsWithPaperMnemonic = (payload: {|
+    recoveryPhrase: string,
+    paperPassword: string,
+  |}) => {
+    const walletsStore = this._getWalletsStore();
+    const publicDeriver = walletsStore.selected;
+    if (publicDeriver == null) {
+      throw new Error('tranferFunds no wallet selected');
+    }
+    this._getYoroiTransferActions().setupTransferFundsWithPaperMnemonic.trigger({
       ...payload,
       publicDeriver,
     });
@@ -132,8 +151,8 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
       case TransferStatus.GETTING_PAPER_MNEMONICS:
         return (
           <TransferLayout>
-            <YoroiTransferFormPage
-              onSubmit={this.setupTransferFundsWithMnemonic}
+            <YoroiPaperWalletFormPage
+              onSubmit={this.setupTransferFundsWithPaperMnemonic}
               onBack={this.backToUninitialized}
               mnemonicValidator={mnemonic => wallets.isValidPaperMnemonic({
                 mnemonic,
@@ -141,6 +160,7 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
               })}
               validWords={validWords}
               mnemonicLength={config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT}
+              passwordValidator={isValidWalletPassword}
               classicTheme={profile.isClassicTheme}
             />
           </TransferLayout>

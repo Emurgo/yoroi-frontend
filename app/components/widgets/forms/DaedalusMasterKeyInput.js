@@ -8,6 +8,7 @@ import globalMessages from '../../../i18n/global-messages';
 import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import { Input } from 'react-polymorph/lib/components/Input';
+import isHexadecimal from 'validator/lib/isHexadecimal';
 
 const messages = defineMessages({
   masterKeyInputLabel: {
@@ -24,6 +25,8 @@ const messages = defineMessages({
   },
 });
 
+const daedalusMasterKeyLength = 192; // 96 bytes (2x because of hex representation)
+
 type Props = {|
   setForm: ReactToolboxMobxForm => void,
   classicTheme: boolean,
@@ -35,6 +38,13 @@ export default class DaedalusMasterKeyInput extends Component<Props> {
   static contextTypes = {
     intl: intlShape.isRequired
   };
+
+  keyValidator = (key: string) => {
+    if (key.length !== daedalusMasterKeyLength) {
+      return false;
+    }
+    return isHexadecimal(key);
+  }
 
   form = new ReactToolboxMobxForm({
     fields: {
@@ -48,10 +58,10 @@ export default class DaedalusMasterKeyInput extends Component<Props> {
           if (value === '') {
             return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
-          if (value.length !== 192) {
+          if (value.length !== daedalusMasterKeyLength) {
             return [false, this.context.intl.formatMessage(globalMessages.invalidMasterKey)];
           }
-          if (!value.match('^[0-9a-fA-F]+$')) {
+          if (!isHexadecimal(value)) {
             return [false, this.context.intl.formatMessage(globalMessages.invalidMasterKey)];
           }
           return true;
@@ -70,6 +80,9 @@ export default class DaedalusMasterKeyInput extends Component<Props> {
 
   render() {
     const { form } = this;
+    const {
+      masterKey,
+    } = form.values();
     this.props.setForm(this.form);
 
     const masterKeyField = form.$('masterKey');
@@ -81,6 +94,7 @@ export default class DaedalusMasterKeyInput extends Component<Props> {
         {...masterKeyField.bind()}
         error={masterKeyField.error}
         skin={InputOwnSkin}
+        done={this.keyValidator(masterKey)}
       />
     );
   }

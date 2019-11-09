@@ -34,7 +34,7 @@ export default class DaedalusTransferMasterKeyFormPage extends Component<Props> 
     this.masterKeyForm = form;
   }
 
-  submit = () => {
+  submit = async () => {
     if (this.masterKeyForm == null) {
       throw new Error('DaedalusTransferMasterKeyFormPage form not set');
     }
@@ -54,6 +54,7 @@ export default class DaedalusTransferMasterKeyFormPage extends Component<Props> 
         onBack={this.props.onBack}
         step0={intl.formatMessage(messages.step0)}
         classicTheme={this.props.classicTheme}
+        isDisabled={this.masterKeyForm == null || this.masterKeyForm.hasError}
       >
         <DaedalusMasterKeyInput
           setForm={(form) => this.setMasterKeyFrom(form)}

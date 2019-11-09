@@ -12,10 +12,11 @@ import styles from './BaseTransferPage.scss';
 
 type Props = {|
   children: Node,
-  onSubmit: void => void,
+  onSubmit: void => Promise<void>,
   onBack: void => void,
   step0: string,
-  classicTheme: boolean
+  classicTheme: boolean,
+  isDisabled: boolean
 |};
 
 @observer
@@ -73,6 +74,7 @@ export default class BaseTransferPage extends Component<Props> {
                 label={intl.formatMessage(globalMessages.nextButtonLabel)}
                 onClick={this.props.onSubmit}
                 skin={ButtonSkin}
+                disabled={this.props.isDisabled}
               />
 
               <Button

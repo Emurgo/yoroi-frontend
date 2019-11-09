@@ -16,7 +16,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onSubmit: { recoveryPhrase: string } => void,
+  onSubmit: {| recoveryPhrase: string |} => void,
   onBack: void => void,
   mnemonicValidator: string => boolean,
   validWords: Array<string>,
@@ -38,7 +38,7 @@ export default class YoroiTransferFormPage extends Component<Props> {
     this.mnemonicForm = form;
   }
 
-  submit = () => {
+  submit = async () => {
     if (this.mnemonicForm == null) {
       throw new Error('YoroiTransferFormPage form not set');
     }
@@ -62,6 +62,7 @@ export default class YoroiTransferFormPage extends Component<Props> {
         onBack={this.props.onBack}
         step0={intl.formatMessage(messages.step0)}
         classicTheme={this.props.classicTheme}
+        isDisabled={this.mnemonicForm == null || this.mnemonicForm.hasError}
       >
         <MnemonicInput
           setForm={(form) => this.setMnemonicFrom(form)}

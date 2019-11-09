@@ -9,6 +9,11 @@ export default class YoroiTranferActions {
     recoveryPhrase: string,
     publicDeriver: PublicDeriverWithCachedMeta,
   }> = new Action();
+  setupTransferFundsWithPaperMnemonic: Action<{
+    recoveryPhrase: string,
+    paperPassword: string,
+    publicDeriver: PublicDeriverWithCachedMeta,
+  }> = new Action();
   backToUninitialized: Action<void> = new Action();
   transferFunds: Action<{
     next: Function,
