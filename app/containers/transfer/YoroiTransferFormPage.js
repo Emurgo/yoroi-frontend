@@ -2,7 +2,11 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import TransferMnemonicPage from '../../components/transfer/TransferMnemonicPage';
+import { join } from 'lodash';
+import { action, observable } from 'mobx';
+import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
+import MnemonicInput from '../../components/widgets/forms/MnemonicInput';
+import BaseTransferPage from '../../components/transfer/BaseTransferPage';
 
 const messages = defineMessages({
   step0: {
@@ -27,28 +31,46 @@ export default class YoroiTransferFormPage extends Component<Props> {
     intl: intlShape.isRequired
   };
 
+  @observable mnemonicForm: void | ReactToolboxMobxForm;
+
+  @action
+  setMnemonicFrom(form: ReactToolboxMobxForm) {
+    this.mnemonicForm = form;
+  }
+
+  submit = () => {
+    if (this.mnemonicForm == null) {
+      throw new Error('YoroiTransferFormPage form not set');
+    }
+    this.mnemonicForm.submit({
+      onSuccess: (form) => {
+        const { recoveryPhrase } = form.values();
+        const payload = {
+          recoveryPhrase: join(recoveryPhrase, ' '),
+        };
+        this.props.onSubmit(payload);
+      },
+      onError: () => {}
+    });
+  };
+
   render() {
     const { intl } = this.context;
-    const {
-      validWords,
-      onBack,
-      onSubmit,
-      mnemonicValidator,
-      mnemonicLength,
-      classicTheme
-    } = this.props;
-    const message =  messages.step0;
-
     return (
-      <TransferMnemonicPage
-        onSubmit={onSubmit}
-        onBack={onBack}
-        mnemonicValidator={mnemonicValidator}
-        validWords={validWords}
-        step0={intl.formatMessage(message)}
-        mnemonicLength={mnemonicLength}
-        classicTheme={classicTheme}
-      />
+      <BaseTransferPage
+        onSubmit={this.submit}
+        onBack={this.props.onBack}
+        step0={intl.formatMessage(messages.step0)}
+        classicTheme={this.props.classicTheme}
+      >
+        <MnemonicInput
+          setForm={(form) => this.setMnemonicFrom(form)}
+          mnemonicValidator={this.props.mnemonicValidator}
+          validWords={this.props.validWords}
+          mnemonicLength={this.props.mnemonicLength}
+          classicTheme={this.props.classicTheme}
+        />
+      </BaseTransferPage>
     );
   }
 }

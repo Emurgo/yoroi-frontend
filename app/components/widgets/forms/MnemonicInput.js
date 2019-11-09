@@ -4,13 +4,12 @@ import { join } from 'lodash';
 import { observer } from 'mobx-react';
 import { Autocomplete } from 'react-polymorph/lib/components/Autocomplete';
 import { defineMessages, intlShape } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
+import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
-import globalMessages from '../../i18n/global-messages';
-import styles from './MnemonicWidget.scss';
-import config from '../../config';
-import { AutocompleteOwnSkin } from '../../themes/skins/AutocompleteOwnSkin';
+import globalMessages from '../../../i18n/global-messages';
+import styles from './MnemonicInput.scss';
+import config from '../../../config';
+import { AutocompleteOwnSkin } from '../../../themes/skins/AutocompleteOwnSkin';
 
 const messages = defineMessages({
   recoveryPhraseInputLabel: {
@@ -40,7 +39,7 @@ type Props = {|
 |};
 
 @observer
-export default class MnemonicWidget extends Component<Props> {
+export default class MnemonicInput extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired

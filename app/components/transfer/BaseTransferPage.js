@@ -1,56 +1,28 @@
 // @flow
 import React, { Component } from 'react';
-import { join } from 'lodash';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { action, observable } from 'mobx';
 import classnames from 'classnames';
-import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { intlShape } from 'react-intl';
 import BorderedBox from '../widgets/BorderedBox';
 import globalMessages from '../../i18n/global-messages';
-import styles from './TransferMnemonicPage.scss';
-import MnemonicWidget from '../widgets/MnemonicWidget';
+import styles from './BaseTransferPage.scss';
 
 type Props = {|
-  onSubmit: { recoveryPhrase: string } => void,
+  children: Node,
+  onSubmit: void => void,
   onBack: void => void,
-  mnemonicValidator: string => boolean,
-  validWords: Array<string>,
   step0: string,
-  mnemonicLength: number,
   classicTheme: boolean
 |};
 
 @observer
-export default class TransferMnemonicPage extends Component<Props> {
+export default class BaseTransferPage extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired
-  };
-
-  @observable mnemonicForm: void | ReactToolboxMobxForm;
-
-  @action
-  setMnemonicFrom(form: ReactToolboxMobxForm) {
-    this.mnemonicForm = form;
-  }
-
-  submit = () => {
-    if (this.mnemonicForm == null) {
-      throw new Error('TransferMnemonicPage form not set');
-    }
-    this.mnemonicForm.submit({
-      onSuccess: (form) => {
-        const { recoveryPhrase } = form.values();
-        const payload = {
-          recoveryPhrase: join(recoveryPhrase, ' '),
-        };
-        this.props.onSubmit(payload);
-      },
-      onError: () => {}
-    });
   };
 
   render() {
@@ -93,19 +65,13 @@ export default class TransferMnemonicPage extends Component<Props> {
               </ul>
             </div>
 
-            <MnemonicWidget
-              setForm={(form) => this.setMnemonicFrom(form)}
-              mnemonicValidator={this.props.mnemonicValidator}
-              validWords={this.props.validWords}
-              mnemonicLength={this.props.mnemonicLength}
-              classicTheme={this.props.classicTheme}
-            />
+            {this.props.children}
 
             <div className={styles.buttonsWrapper}>
               <Button
                 className={nextButtonClasses}
                 label={intl.formatMessage(globalMessages.nextButtonLabel)}
-                onClick={this.submit}
+                onClick={this.props.onSubmit}
                 skin={ButtonSkin}
               />
 
