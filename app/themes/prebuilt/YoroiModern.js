@@ -439,6 +439,8 @@ if (environment.isShelley()) {
     '--theme-button-primary-background-color-hover': '#4760FF',
     '--theme-button-primary-background-color-active': '#3154CB',
     '--theme-button-primary-background-color-disabled': 'rgba(49,84,203,0.35)',
+    // Language Selection
+    '--theme-select-language-color': '#3154CB',
   };
 }
 
