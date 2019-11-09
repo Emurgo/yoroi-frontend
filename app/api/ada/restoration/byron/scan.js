@@ -4,23 +4,26 @@
 
 import {
   discoverAllAddressesFrom,
-} from './lib/adaAddressProcessing';
+} from '../../lib/adaAddressProcessing';
 import type {
   GenerateAddressFunc,
-} from './lib/adaAddressProcessing';
-import type { ConfigType } from '../../../config/config-types';
-import type { FilterFunc } from './lib/state-fetch/types';
+} from '../../lib/adaAddressProcessing';
+import type { ConfigType } from '../../../../../config/config-types';
+import type { FilterFunc } from '../../lib/state-fetch/types';
 
 import {
-  BIP44_SCAN_SIZE,
-} from '../../config/numbersConfig';
+  INTERNAL, EXTERNAL, BIP44_SCAN_SIZE,
+} from '../../../../config/numbersConfig';
 
-import { RustModule } from './lib/cardanoCrypto/rustLoader';
+import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 
 import type {
-  TreeInsert,
-} from './lib/storage/database/walletTypes/common/utils';
-import type { HashToIdsFunc, } from './lib/storage/models/utils';
+  TreeInsert, InsertRequest,
+} from '../../lib/storage/database/walletTypes/common/utils';
+import type { AddByHashFunc, } from '../../lib/storage/bridge/hashMapper';
+import type { CanonicalAddressInsert } from '../../lib/storage/database/primitives/tables';
+import { CoreAddressTypes } from '../../lib/storage/database/primitives/enums';
+import type { Bip44ChainInsert } from '../../lib/storage/database/walletTypes/common/tables';
 
 declare var CONFIG: ConfigType;
 const addressRequestSize = CONFIG.app.addressRequestSize;
@@ -45,30 +48,29 @@ export function v2genAddressBatchFunc(
   };
 }
 
-export function v3genAddressBatchFunc(
-  addressChain: RustModule.WalletV3.Bip32PublicKey,
-): GenerateAddressFunc {
-  return (
-    indices: Array<number>
-  ) => {
-    return indices.map(i => {
-      const addressKey = addressChain.derive(i).to_raw_key();
-      // recall: no canonical string representation of an address in Rust
-      // so instead we send the payment key
-      const asHex = Buffer.from(addressKey.as_bytes()).toString('hex');
-      return asHex;
-    });
+export async function addByronAddress(
+  addByHash: AddByHashFunc,
+  insertRequest: InsertRequest,
+  address: string,
+) {
+  await addByHash({
+    ...insertRequest,
+    address: {
+      type: CoreAddressTypes.CARDANO_LEGACY,
+      data: address,
+    },
+  });
+  return {
+    KeyDerivationId: insertRequest.keyDerivationId,
   };
 }
 
-
-export async function scanChain(request: {|
+async function scanChain(request: {|
   generateAddressFunc: GenerateAddressFunc,
   lastUsedIndex: number,
   checkAddressesInUse: FilterFunc,
-  hashToIds: HashToIdsFunc,
-|}): Promise<TreeInsert<{ AddressId: number }>> {
-  // TODO: this is made for v2 addresses. We can avoid this entirely for v3
+  addByHash: AddByHashFunc,
+|}): Promise<TreeInsert<CanonicalAddressInsert>> {
   const addresses = await discoverAllAddressesFrom(
     request.generateAddressFunc,
     request.lastUsedIndex,
@@ -77,27 +79,29 @@ export async function scanChain(request: {|
     request.checkAddressesInUse,
   );
 
-  const idMapping = await request.hashToIds(addresses);
   return addresses
     .map((address, i) => {
-      const id = idMapping.get(address);
-      if (id == null) throw new Error('scanChain should never happen');
       return {
         index: i + request.lastUsedIndex + 1,
-        insert: { AddressId: id },
+        insert: async insertRequest => {
+          return await addByronAddress(
+            request.addByHash,
+            insertRequest,
+            address
+          );
+        },
       };
     });
 }
 
-export async function scanAccountByVersion(request: {
+export async function scanBip44Account(request: {
   accountPublicKey: string,
   lastUsedInternal: number,
   lastUsedExternal: number,
   checkAddressesInUse: FilterFunc,
-  hashToIds: HashToIdsFunc,
+  addByHash: AddByHashFunc,
   protocolMagic: number,
-}): Promise<TreeInsert<{ DisplayCutoff: null | number }>> {
-  // TODO: needs to change depending on v2/v3
+}): Promise<TreeInsert<Bip44ChainInsert>> {
   const genAddressBatchFunc = v2genAddressBatchFunc;
 
   const key = RustModule.WalletV2.Bip44AccountPublic.new(
@@ -116,42 +120,49 @@ export async function scanAccountByVersion(request: {
     lastUsedInternal: request.lastUsedInternal,
     lastUsedExternal: request.lastUsedExternal,
     checkAddressesInUse: request.checkAddressesInUse,
-    hashToIds: request.hashToIds,
+    addByHash: request.addByHash,
     protocolMagic: request.protocolMagic,
   });
   return insert;
 }
-export async function scanAccount(request: {|
+async function scanAccount(request: {|
   generateInternalAddresses: GenerateAddressFunc,
   generateExternalAddresses: GenerateAddressFunc,
   lastUsedInternal: number,
   lastUsedExternal: number,
   checkAddressesInUse: FilterFunc,
-  hashToIds: HashToIdsFunc,
+  addByHash: AddByHashFunc,
   protocolMagic: number,
-|}): Promise<TreeInsert<{ DisplayCutoff: null | number }>> {
+|}): Promise<TreeInsert<Bip44ChainInsert>> {
   const externalAddresses = await scanChain({
     generateAddressFunc: request.generateInternalAddresses,
     lastUsedIndex: request.lastUsedExternal,
     checkAddressesInUse: request.checkAddressesInUse,
-    hashToIds: request.hashToIds,
+    addByHash: request.addByHash,
   });
   const internalAddresses = await scanChain({
     generateAddressFunc: request.generateExternalAddresses,
     lastUsedIndex: request.lastUsedInternal,
     checkAddressesInUse: request.checkAddressesInUse,
-    hashToIds: request.hashToIds,
+    addByHash: request.addByHash,
   });
 
   return [
     {
-      index: 0, // external chain,
-      insert: { DisplayCutoff: 0 },
+      index: EXTERNAL,
+      // initial value. Doesn't override existing entry
+      insert: insertRequest => Promise.resolve({
+        KeyDerivationId: insertRequest.keyDerivationId,
+        DisplayCutoff: 0,
+      }),
       children: externalAddresses,
     },
     {
-      index: 1, // internal chain,
-      insert: { DisplayCutoff: null },
+      index: INTERNAL,
+      insert: insertRequest => Promise.resolve({
+        KeyDerivationId: insertRequest.keyDerivationId,
+        DisplayCutoff: null,
+      }),
       children: internalAddresses,
     }
   ];

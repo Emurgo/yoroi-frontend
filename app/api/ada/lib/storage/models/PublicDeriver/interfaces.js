@@ -10,10 +10,6 @@ import {
 
 import { ConceptualWallet } from '../ConceptualWallet/index';
 
-import type {
-  Bip44AddressRow,
-} from '../../database/walletTypes/common/tables';
-
 import {
   GetUtxoTxOutputsWithTx,
 } from '../../database/transactionModels/utxo/api/read';
@@ -22,6 +18,7 @@ import type { UtxoTxOutput } from '../../database/transactionModels/utxo/api/rea
 import type {
   AddressRow,
   KeyRow,
+  CanonicalAddressRow,
   KeyDerivationRow,
 } from '../../database/primitives/tables';
 import type { PublicDeriverRow, LastSyncInfoRow, } from '../../database/walletTypes/core/tables';
@@ -51,7 +48,7 @@ import {
   AddDerivationTree,
 } from '../../database/walletTypes/common/api/write';
 import { GetDerivationSpecific } from '../../database/walletTypes/common/api/read';
-import { UpdateGet, GetOrAddAddress, } from '../../database/primitives/api/write';
+import { UpdateGet, AddAddress, } from '../../database/primitives/api/write';
 import type {
   FilterFunc,
 } from '../../../state-fetch/types';
@@ -79,12 +76,17 @@ export interface IPublicDeriver {
 
 export type PathRequest = void;
 export type BaseAddressPath = {|
+  addrs: $ReadOnlyArray<$ReadOnly<AddressRow>>,
+  row: $ReadOnly<CanonicalAddressRow>,
+  ...Addressing,
+|};
+export type BaseSingleAddressPath = {|
   addr: $ReadOnly<AddressRow>,
+  row: $ReadOnly<CanonicalAddressRow>,
   ...Addressing,
 |};
 export type UtxoAddressPath = {|
   ...BaseAddressPath,
-  row: $ReadOnly<Bip44AddressRow>,
 |};
 
 export type IGetPublicRequest = void;
@@ -150,8 +152,8 @@ export interface IGetAllUtxos {
 export type IDisplayCutoffPopRequest = void;
 export type IDisplayCutoffPopResponse = {
   index: number,
-  row: $ReadOnly<Bip44AddressRow>,
-  addr: $ReadOnly<AddressRow>,
+  row: $ReadOnly<CanonicalAddressRow>,
+  addrs: $ReadOnlyArray<$ReadOnly<AddressRow>>,
 };
 export type IDisplayCutoffPopFunc = (
   body: IDisplayCutoffPopRequest
@@ -208,10 +210,10 @@ export interface IDisplayCutoff {
 }
 
 export type IGetNextUnusedForChainRequest = void;
-export type IGetNextUnusedForChainResponse = {
-  addressInfo: void | UtxoAddressPath,
+export type IGetNextUnusedForChainResponse = {|
+  addressInfo: void | BaseSingleAddressPath,
   index: number,
-};
+|};
 export type IGetNextUnusedForChainFunc = (
   body: IGetNextUnusedForChainRequest
 ) => Promise<IGetNextUnusedForChainResponse>;
@@ -222,9 +224,6 @@ export type IHasChainsResponse = Array<UtxoAddressPath>;
 export type IHasChainsGetAddressesFunc = (
   body: IHasChainsRequest
 ) => Promise<IHasChainsResponse>;
-export type IHasChainsNextUnusedFunc = (
-  body: IHasChainsRequest
-) => Promise<IGetNextUnusedForChainResponse>;
 export interface IHasChains {
   +rawGetAddressesForChain: RawTableVariation<
     IHasChainsGetAddressesFunc,
@@ -353,7 +352,7 @@ export interface IScanAddresses {
       GetAddress: Class<GetAddress>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
-      GetOrAddAddress: Class<GetOrAddAddress>,
+      AddAddress: Class<AddAddress>,
       GetPublicDeriver: Class<GetPublicDeriver>,
       AddDerivationTree: Class<AddDerivationTree>,
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,

@@ -115,12 +115,18 @@ test('Can add and fetch address in wallet', async (done) => {
           initialDerivations: [
             {
               index: 0, // external chain,
-              insert: { DisplayCutoff: 0 },
+              insert: insertRequest => Promise.resolve({
+                KeyDerivationId: insertRequest.keyDerivationId,
+                DisplayCutoff: 0,
+              }),
               children: [],
             },
             {
               index: 1, // internal chain,
-              insert: { DisplayCutoff: null },
+              insert: insertRequest => Promise.resolve({
+                KeyDerivationId: insertRequest.keyDerivationId,
+                DisplayCutoff: null,
+              }),
               children: [],
             }
           ]
@@ -192,7 +198,7 @@ test('Can add and fetch address in wallet', async (done) => {
     if (withUtxos != null) {
       const addresses = await withUtxos.getAllUtxoAddresses();
       expect(addresses.length).toEqual(40);
-      expect(addresses[0].addr.Hash).toEqual(firstExternalAddressHash);
+      expect(addresses[0].addrs[0].Hash).toEqual(firstExternalAddressHash);
       expect(addresses[0].addressing.path).toEqual([
         BIP44_PURPOSE, CARDANO_COINTYPE, firstAccountIndex, 0, 0
       ]);
@@ -212,7 +218,7 @@ test('Can add and fetch address in wallet', async (done) => {
         chainId: EXTERNAL,
       });
       expect(externalAddresses.length).toEqual(20);
-      expect(externalAddresses[0].addr.Hash).toEqual(
+      expect(externalAddresses[0].addrs[0].Hash).toEqual(
         firstAccountPk
           .bip44_chain(false)
           .address_key(RustModule.WalletV2.AddressKeyIndex.new(0))
@@ -225,7 +231,7 @@ test('Can add and fetch address in wallet', async (done) => {
         chainId: INTERNAL,
       });
       expect(internalAddresses.length).toEqual(20);
-      expect(internalAddresses[0].addr.Hash).toEqual(
+      expect(internalAddresses[0].addrs[0].Hash).toEqual(
         firstAccountPk
           .bip44_chain(true)
           .address_key(RustModule.WalletV2.AddressKeyIndex.new(0))
@@ -251,7 +257,7 @@ test('Can add and fetch address in wallet', async (done) => {
         .public()
         .bootstrap_era_address(settings)
         .to_base58();
-      expect(popped.addr.Hash).toEqual(expectedAddress);
+      expect(popped.addrs[0].Hash).toEqual(expectedAddress);
       expect(await asDisplayCutoffInstance.getCutoff()).toEqual(1);
 
       // test set

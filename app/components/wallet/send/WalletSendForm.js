@@ -174,7 +174,8 @@ export default class WalletSendForm extends Component<Props> {
     fields: {
       receiver: {
         label: this.context.intl.formatMessage(messages.receiverLabel),
-        placeholder: this.context.intl.formatMessage(messages.receiverHint),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(messages.receiverHint) : '',
         value: this.props.uriParams
           ? this.props.uriParams.address
           : '',
@@ -197,7 +198,8 @@ export default class WalletSendForm extends Component<Props> {
       },
       amount: {
         label: this.context.intl.formatMessage(messages.amountLabel),
-        placeholder: `0.${'0'.repeat(this.props.currencyMaxFractionalDigits)}`,
+        placeholder: this.props.classicTheme ?
+          `0.${'0'.repeat(this.props.currencyMaxFractionalDigits)}` : '',
         value: this.props.uriParams
           ? formattedWalletAmount(this.props.uriParams.amount)
           : '',

@@ -62,6 +62,7 @@ export class ModifyLastSyncInfo {
 export type PublicDeriverRequest<Insert> = {
   addLevelRequest: AddDerivationRequest<Insert>,
   levelSpecificTableName: string,
+  derivationTables: Map<number, string>,
   addPublicDeriverRequest: {
     derivationId: number,
     lastSyncInfoId: number,
@@ -92,6 +93,7 @@ export class AddPublicDeriver {
     const levelResult = await AddPublicDeriver.depTables.AddDerivation.add<Insert, Row>(
       db, tx,
       request.addLevelRequest,
+      Array.from(request.derivationTables.values()),
       request.levelSpecificTableName,
     );
     const lastSyncInfo = await ModifyLastSyncInfo.create(db, tx);

@@ -13,8 +13,10 @@ import {
 import type {
   BlockInsert, BlockRow,
   TransactionInsert, TransactionRow,
-  TxStatusCodesType,
 } from '../database/primitives/tables';
+import type {
+  TxStatusCodesType,
+} from '../database/primitives/enums';
 import {
   GetAddress,
   GetBlock,
@@ -24,7 +26,7 @@ import {
   GetTransaction,
   GetTxAndBlock,
 } from '../database/primitives/api/read';
-import { GetOrAddAddress, ModifyTransaction, } from '../database/primitives/api/write';
+import { AddAddress, ModifyTransaction, } from '../database/primitives/api/write';
 import { ModifyMultipartTx } from  '../database/transactionModels/multipart/api/write';
 import { digetForHash, } from '../database/primitives/api/utils';
 import {
@@ -44,7 +46,6 @@ import {
   InputTypes,
 } from '../../state-fetch/types';
 import type {
-  HashToIdsFunc,
   ToAbsoluteSlotNumberFunc,
 } from '../models/utils';
 import type {
@@ -53,7 +54,7 @@ import type {
 import type {
   AccountingTransactionInputInsert, AccountingTransactionOutputInsert,
 } from '../database/transactionModels/account/tables';
-import { TxStatusCodes, } from '../database/primitives/tables';
+import { TxStatusCodes, CoreAddressTypes, } from '../database/primitives/enums';
 import {
   asScanAddresses,
 } from '../models/common/traits';
@@ -71,19 +72,24 @@ import type { LastSyncInfoRow, } from '../database/walletTypes/core/tables';
 import type { DbTxIO, DbTxInChain } from '../database/transactionModels/multipart/tables';
 import {
   genToAbsoluteSlotNumber,
-  rawGenHashToIdsFunc,
   rawGetAddressRowsForWallet,
 } from  '../models/utils';
+import {
+  rawGenHashToIdsFunc,
+} from './hashMapper';
+import type {
+  HashToIdsFunc,
+} from './hashMapper';
 import { STABLE_SIZE } from '../../../../../config/numbersConfig';
 import { RollbackApiError } from '../../../errors';
 import { getFromUserPerspective, } from '../../../transactions/utils';
 
-import { RustModule } from '../../cardanoCrypto/rustLoader';
 import type {
   FilterFunc, HistoryFunc, BestBlockFunc,
   RemoteTxState,
   RemoteTransaction,
 } from '../../state-fetch/types';
+import { addressToKind } from './utils';
 
 export async function rawGetUtxoTransactions(
   db: lf$Database,
@@ -119,7 +125,7 @@ export async function rawGetUtxoTransactions(
     undefined,
     derivationTables,
   );
-  const addressIds = addresses.map(address => address.addr.AddressId);
+  const addressIds = addresses.flatMap(address => address.addrs.map(addr => addr.AddressId));
   const txIds = await deps.AssociateTxWithIOs.getTxIdsForAddresses(
     db, dbTx,
     {
@@ -299,7 +305,7 @@ export async function updateTransactions(
       GetAddress,
       GetPathWithSpecific,
       GetUtxoTxOutputsWithTx,
-      GetOrAddAddress,
+      AddAddress,
       GetPublicDeriver,
       AddDerivationTree,
       MarkUtxo,
@@ -562,7 +568,7 @@ async function rawUpdateTransactions(
     GetAddress: Class<GetAddress>,
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
-    GetOrAddAddress: Class<GetOrAddAddress>,
+    AddAddress: Class<AddAddress>,
     GetPublicDeriver: Class<GetPublicDeriver>,
     AddDerivationTree: Class<AddDerivationTree>,
     MarkUtxo: Class<MarkUtxo>,
@@ -616,7 +622,7 @@ async function rawUpdateTransactions(
           GetAddress: deps.GetAddress,
           GetPathWithSpecific: deps.GetPathWithSpecific,
           GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx,
-          GetOrAddAddress: deps.GetOrAddAddress,
+          AddAddress: deps.AddAddress,
           GetPublicDeriver: deps.GetPublicDeriver,
           AddDerivationTree: deps.AddDerivationTree,
           ModifyDisplayCutoff: deps.ModifyDisplayCutoff,
@@ -631,7 +637,7 @@ async function rawUpdateTransactions(
 
     // 3) get new txs from fetcher
 
-    // important: we fetched addresses AFTER scanning for new addresses
+    // important: get addresses for our wallet AFTER scanning for new addresses
     const {
       utxoAddresses,
       accountingAddresses,
@@ -672,15 +678,20 @@ async function rawUpdateTransactions(
       };
     const txsFromNetwork = await getTransactionsHistoryForAddresses({
       ...requestKind,
-      // TODO: don't send grop keys
       addresses: [
-        ...utxoAddresses.map(address => address.Hash),
+        ...utxoAddresses
+          // Note: don't send group keys
+          // Okay to filter them because the payment key is duplicated inside the single addresses
+          .filter(address => address.Type !== CoreAddressTypes.SHELLEY_GROUP)
+          .map(address => address.Hash),
         ...accountingAddresses.map(address => address.Hash),
       ],
       untilBlock,
     });
 
     // 4) save data to local DB
+    // WARNING: this can also modify the address set
+    // ex: a new group address is found
     await updateTransactionBatch(
       db,
       dbTx,
@@ -697,14 +708,13 @@ async function rawUpdateTransactions(
         txIds,
         txsFromNetwork,
         hashToIds: rawGenHashToIdsFunc(
-          db, dbTx,
-          { GetOrAddAddress: deps.GetOrAddAddress },
           new Set([
             ...utxoAddressIds,
             ...accountingAddressIds,
           ])
         ),
         toAbsoluteSlotNumber,
+        derivationTables,
       }
     );
   }
@@ -743,6 +753,7 @@ export async function updateTransactionBatch(
     txIds: Array<number>,
     txsFromNetwork: Array<RemoteTransaction>,
     hashToIds: HashToIdsFunc,
+    derivationTables: Map<number, string>,
   }
 ): Promise<Array<DbTxInChain>> {
   const { TransactionSeed, BlockSeed } = await deps.GetEncryptionMeta.get(db, dbTx);
@@ -821,6 +832,9 @@ export async function updateTransactionBatch(
 
   // 2) Add new transactions
   const newTxsForDb = await networkTxToDbTx(
+    db,
+    dbTx,
+    request.derivationTables,
     unseedNewTxs,
     request.hashToIds,
     request.toAbsoluteSlotNumber,
@@ -902,7 +916,10 @@ export async function updateTransactionBatch(
   return txsAddedToBlock;
 }
 
-export async function networkTxToDbTx(
+async function networkTxToDbTx(
+  db: lf$Database,
+  dbTx: lf$Transaction,
+  derivationTables: Map<number, string>,
   newTxs: Array<RemoteTransaction>,
   hashToIds: HashToIdsFunc,
   toAbsoluteSlotNumber: ToAbsoluteSlotNumberFunc,
@@ -924,7 +941,12 @@ export async function networkTxToDbTx(
       ...tx.outputs.map(output => output.address),
     ]),
   ));
-  const idMapping = await hashToIds(allAddresses);
+  const idMapping = await hashToIds({
+    db,
+    tx: dbTx,
+    lockedTables: Array.from(derivationTables.values()),
+    hashes: allAddresses
+  });
 
   const getIdOrThrow = (hash: string): number => {
     // recall: we know all these ids should already be present
@@ -980,26 +1002,13 @@ export async function networkTxToDbTx(
         }
         for (let i = 0; i < networkTx.outputs.length; i++) {
           const output = networkTx.outputs[i];
-          // assume single type since that's the type of legacy addresses
-          let txType;
-          try {
-            // Need to try parsing as a legacy address first
-            // Since parsing as bech32 directly may give a wrong result if the address contains a 1
-            RustModule.WalletV2.Address.from_base58(output.address);
-            txType = RustModule.WalletV3.AddressKind.Single;
-          } catch (_e1) {
-            try {
-              const wasmAddr = RustModule.WalletV3.Address.from_string(output.address);
-              txType = wasmAddr.get_discrimination();
-            } catch (_e2) {
-              throw new Error('networkTxToDbTx Unknown output type ' + output.address);
-            }
-          }
+          const txType = addressToKind(output.address);
           // consider a group address as a UTXO output
           // since the payment (UTXO) key is the one that signs
           if (
-            txType === RustModule.WalletV3.AddressKind.Single ||
-            txType === RustModule.WalletV3.AddressKind.Group
+            txType === CoreAddressTypes.CARDANO_LEGACY ||
+            txType === CoreAddressTypes.SHELLEY_SINGLE ||
+            txType === CoreAddressTypes.SHELLEY_GROUP
           ) {
             utxoOutputs.push({
               TransactionId: txRowId,
@@ -1014,7 +1023,7 @@ export async function networkTxToDbTx(
               IsUnspent: true,
             });
           } else if (
-            txType === RustModule.WalletV3.AddressKind.Account
+            txType === CoreAddressTypes.SHELLEY_ACCOUNT
           ) {
             accountingOutputs.push({
               TransactionId: txRowId,

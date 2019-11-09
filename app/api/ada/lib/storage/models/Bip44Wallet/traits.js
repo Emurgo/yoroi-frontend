@@ -41,10 +41,10 @@ import {
   normalizeBip32Ed25519ToPubDeriverLevel,
   rawChangePassword,
   decryptKey,
-  rawGenHashToIdsFunc,
   rawGetNextUnusedIndex,
   updateCutoffFromInsert,
 } from '../utils';
+import { rawGenHashToIdsFunc, rawGenAddByHash } from '../../bridge/hashMapper';
 
 import {
   getAllSchemaTables,
@@ -85,10 +85,11 @@ import {
   GetKey,
   GetAddress,
 } from '../../database/primitives/api/read';
+import { CoreAddressTypes } from '../../database/primitives/enums';
 import type { KeyRow, KeyDerivationRow, } from '../../database/primitives/tables';
-import { UpdateGet, GetOrAddAddress, } from '../../database/primitives/api/write';
+import { UpdateGet, AddAddress, } from '../../database/primitives/api/write';
 
-import { scanAccountByVersion, } from '../../../../restoreAdaWallet';
+import { scanBip44Account, } from '../../../../restoration/byron/scan';
 
 import {
   UnusedAddressesError,
@@ -542,16 +543,16 @@ const GetAllUtxosMixin = (
       undefined,
       derivationTables,
     );
-    const addressIds = addresses.map(address => address.row.AddressId);
+    const addressIds = addresses.flatMap(family => family.addrs.map(addr => addr.AddressId));
     const utxosInStorage = await deps.GetUtxoTxOutputsWithTx.getUtxo(
       super.getDb(), tx,
       addressIds,
     );
     const addressingMap = new Map<number, {| ...Address, ...Addressing |}>(
-      addresses.map(addr => [addr.addr.AddressId, {
-        addressing: addr.addressing,
-        address: addr.addr.Hash,
-      }])
+      addresses.flatMap(family => family.addrs.map(addr => [addr.AddressId, {
+        addressing: family.addressing,
+        address: addr.Hash,
+      }]))
     );
     const addressedUtxos = [];
     for (const utxo of utxosInStorage) {
@@ -722,17 +723,19 @@ const DisplayCutoffMixin = (
     if (nextAddr === undefined) {
       throw new UnusedAddressesError();
     }
-    const addrRows = await deps.GetAddress.getById(
+
+    const family = await deps.GetAddress.fromCanonical(
       super.getDb(), tx,
-      [nextAddr.row.AddressId],
+      [nextAddr.row.KeyDerivationId],
+      undefined,
     );
-    const addrRow = addrRows[0];
-    if (addrRow === undefined) {
+    const addrs = family.get(nextAddr.row.KeyDerivationId);
+    if (addrs == null) {
       throw new Error('DisplayCutoff::popAddress should never happen');
     }
     return {
       ...nextAddr,
-      addr: addrRow
+      addrs
     };
   }
   popAddress = async (
@@ -965,11 +968,30 @@ const HasChainsMixin = (
       { chainId: INTERNAL },
       derivationTables,
     );
-    return await rawGetNextUnusedIndex(
+    const nextUnused = await rawGetNextUnusedIndex(
       super.getDb(), tx,
       { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx, },
       { addressesForChain: internalAddresses },
     );
+    if (nextUnused.addressInfo == null) {
+      return {
+        addressInfo: undefined,
+        index: nextUnused.index
+      };
+    }
+    const info = nextUnused.addressInfo;
+    // TODO: this behavior is different for CIP-1852
+    const legacyAddr = nextUnused.addressInfo.addrs
+      .filter(addr => addr.Type === CoreAddressTypes.CARDANO_LEGACY);
+    if (legacyAddr.length !== 1) throw new Error('rawNextInternal no legacy address found');
+    return {
+      addressInfo: {
+        addr: legacyAddr[0],
+        row: info.row,
+        addressing: info.addressing,
+      },
+      index: nextUnused.index,
+    };
   }
   nextInternal = async (
     body: IGetNextUnusedForChainRequest,
@@ -1022,7 +1044,7 @@ const ScanUtxoAccountAddressesMixin = (
       GetAddress: Class<GetAddress>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
-      GetOrAddAddress: Class<GetOrAddAddress>,
+      AddAddress: Class<AddAddress>,
       GetPublicDeriver: Class<GetPublicDeriver>,
       AddDerivationTree: Class<AddDerivationTree>,
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
@@ -1073,17 +1095,15 @@ const ScanUtxoAccountAddressesMixin = (
       { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx, },
       { addressesForChain: externalAddresses }
     );
-    const newToInsert = await scanAccountByVersion({
+    const newToInsert = await scanBip44Account({
       accountPublicKey: decryptedKey,
       lastUsedInternal: nextUnusedInternal.index - 1,
       lastUsedExternal: nextUnusedExternal.index - 1,
       checkAddressesInUse: body.checkAddressesInUse,
-      hashToIds: rawGenHashToIdsFunc(
-        super.getDb(), tx,
-        { GetOrAddAddress: deps.GetOrAddAddress },
+      addByHash: rawGenAddByHash(
         new Set([
-          ...internalAddresses.map(address => address.addr.AddressId),
-          ...externalAddresses.map(address => address.addr.AddressId),
+          ...internalAddresses.flatMap(address => address.addrs.map(addr => addr.AddressId)),
+          ...externalAddresses.flatMap(address => address.addrs.map(addr => addr.AddressId)),
         ])
       ),
       protocolMagic: this.getBip44Parent().getProtocolMagic(),
@@ -1111,7 +1131,7 @@ const ScanUtxoAccountAddressesMixin = (
       GetAddress,
       GetPathWithSpecific,
       GetUtxoTxOutputsWithTx,
-      GetOrAddAddress,
+      AddAddress,
       GetPublicDeriver,
       AddDerivationTree,
       GetDerivationsByPath,

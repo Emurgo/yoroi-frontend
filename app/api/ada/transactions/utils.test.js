@@ -20,7 +20,7 @@ import type {
 } from '../lib/storage/database/transactionModels/account/tables';
 import {
   TxStatusCodes,
-} from '../lib/storage/database/primitives/tables';
+} from '../lib/storage/database/primitives/enums';
 import type {
   UtxoAnnotatedTransaction,
 } from './types';

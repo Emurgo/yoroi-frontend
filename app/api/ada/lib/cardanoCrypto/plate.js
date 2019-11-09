@@ -5,7 +5,7 @@
 
 import { RustModule } from './rustLoader';
 import type { GenerateAddressFunc } from '../adaAddressProcessing';
-import { v2genAddressBatchFunc } from '../../restoreAdaWallet';
+import { v2genAddressBatchFunc } from '../../restoration/byron/scan';
 import blakejs from 'blakejs';
 import crc32 from 'buffer-crc32';
 import type { WalletAccountNumberPlate } from '../storage/models/PublicDeriver/interfaces';

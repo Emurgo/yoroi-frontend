@@ -164,8 +164,12 @@ export function getAllSchemaTables(
 }
 
 /** recursively get all tables required for a database query */
-export function getAllTables(tableClass: TableClassType): Set<string> {
-  return new Set(_getAllTables(tableClass));
+export function getAllTables(...tableClass: Array<TableClassType>): Set<string> {
+  const tables = [];
+  for (const clazz of tableClass) {
+    tables.push(..._getAllTables(clazz));
+  }
+  return new Set(tables);
 }
 
 function _getAllTables(tableClass: TableClassType): Array<string> {

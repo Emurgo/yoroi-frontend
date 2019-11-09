@@ -28,6 +28,7 @@ import {
   flattenInsertTree,
   Bip44DerivationLevels,
 } from './lib/storage/database/walletTypes/bip44/api/utils';
+import type { CoreAddressT } from './lib/storage/database/primitives/enums';
 import {
   PublicDeriver,
 } from './lib/storage/models/PublicDeriver/index';
@@ -89,7 +90,7 @@ import {
   UnusedAddressesError,
 } from '../common';
 import LocalizableError from '../../i18n/LocalizableError';
-import { scanAccountByVersion, } from './restoreAdaWallet';
+import { scanBip44Account, } from './restoration/byron/scan';
 import type {
   BaseSignRequest,
   UnsignedTxResponse,
@@ -180,6 +181,7 @@ export type GetWalletsFunc = (
 
 export type GetAllAddressesForDisplayRequest = {
   publicDeriver: IPublicDeriver & IGetAllUtxos,
+  type: CoreAddressT,
 };
 export type GetAllAddressesForDisplayResponse = Array<{|
   ...Address, ...Value, ...Addressing, ...UsedStatus
@@ -193,6 +195,7 @@ export type GetAllAddressesForDisplayFunc = (
 export type GetChainAddressesForDisplayRequest = {
   publicDeriver: IPublicDeriver & IHasChains & IDisplayCutoff,
   chainsRequest: IHasChainsRequest,
+  type: CoreAddressT,
 };
 export type GetChainAddressesForDisplayResponse = Array<{|
   ...Address, ...Value, ...Addressing, ...UsedStatus
@@ -1076,47 +1079,62 @@ export default class AdaApi {
       RustModule.WalletV2.AccountIndex.new(request.accountIndex)
     );
     try {
-      const reverseAddressLookup = new Map<number, string>();
-
       // need this to persist outside the scope of the hashToIds lambda
       // since the lambda is called multiple times
       // and we need keep a globally unique index
-      const foundAddresses = new Map<string, number>();
-      const insertTree = await scanAccountByVersion({
+      const reverseAddressLookup = new Map<number, Array<string>>();
+      const foundAddresses = new Set<string>();
+
+      // TODO: this is using legacy scanning. Need an option for legacy vs shelley
+      const insertTree = await scanBip44Account({
         accountPublicKey: accountKey.key().public().to_hex(),
         lastUsedInternal: -1,
         lastUsedExternal: -1,
         checkAddressesInUse,
-        hashToIds: (addresses) => {
-          for (const address of addresses) {
-            if (!foundAddresses.has(address)) {
-              reverseAddressLookup.set(foundAddresses.size, address);
-              foundAddresses.set(address, foundAddresses.size);
+        addByHash: (address) => {
+          if (!foundAddresses.has(address.address.data)) {
+            let family = reverseAddressLookup.get(address.keyDerivationId);
+            if (family == null) {
+              family = [];
+              reverseAddressLookup.set(address.keyDerivationId, family);
             }
+            family.push(address.address.data);
+            foundAddresses.add(address.address.data);
           }
-          return Promise.resolve(foundAddresses);
+          return Promise.resolve();
         },
         protocolMagic,
       });
       const flattenedTree = flattenInsertTree(insertTree);
 
-      const addresses = flattenedTree.map(leaf => {
-        const address = reverseAddressLookup.get(leaf.insert.AddressId);
-        if (address == null) throw new Error('restoreWalletForTransfer should never happen');
-        return {
+      const addressResult = [];
+      for (let i = 0; i < flattenedTree.length; i++) {
+        const leaf = flattenedTree[i];
+        // triggers the insert
+        await leaf.insert({
+          // this is done in-memory so no need for a real DB
+          db: (null: any),
+          tx: (null: any),
+          lockedTables: [],
+          keyDerivationId: i
+        });
+        const family = reverseAddressLookup.get(i);
+        if (family == null) throw new Error('restoreWalletForTransfer should never happen');
+        const result = family.map(address => ({
           address,
           addressing: {
             startLevel: Bip44DerivationLevels.ACCOUNT.level,
             path: [request.accountIndex].concat(leaf.path),
           },
-        };
-      });
+        }));
+        addressResult.push(...result);
+      }
 
       Logger.debug('AdaApi::restoreWalletForTransfer success');
 
       return {
         masterKey: rootPk.key().to_hex(),
-        addresses,
+        addresses: addressResult,
       };
     } catch (error) {
       Logger.error('AdaApi::restoreWalletForTransfer error: ' + stringifyError(error));
