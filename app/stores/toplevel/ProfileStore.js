@@ -283,6 +283,10 @@ export default class ProfileStore extends Store {
       return THEMES.YOROI_CLASSIC;
     }
 
+    if (environment.isShelley()) {
+      return THEMES.YOROI_SHELLEY_TESTNET;
+    }
+
     const { result } = this.getThemeRequest.execute();
     if (this.isCurrentThemeSet && result != null) {
       // verify content is an actual theme
@@ -302,6 +306,10 @@ export default class ProfileStore extends Store {
 
   @computed get isClassicTheme(): boolean {
     return this.currentTheme === THEMES.YOROI_CLASSIC;
+  }
+
+  @computed get isShelleyTestnetTheme(): boolean {
+    return this.currentTheme === THEMES.YOROI_SHELLEY_TESTNET;
   }
 
   /* @Returns Merged Pre-Built Theme and Custom Theme */

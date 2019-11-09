@@ -57,6 +57,7 @@ export const themeOverrides = (theme: Theme): Object => {
         [SELECT]: SelectOverridesClassic,
         [SWITCH]: SwitchOverridesClassic,
       });
+    case THEMES.YOROI_SHELLEY_TESTNET:
     case THEMES.YOROI_MODERN:
       return ({
         [AUTOCOMPLETE]: AutocompleteOverrides,
