@@ -18,17 +18,17 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onSubmit: {|
+  +onSubmit: {|
     recoveryPhrase: string,
     paperPassword: string,
   |} => void,
-  onBack: void => void,
-  mnemonicValidator: string => boolean,
-  validWords: Array<string>,
-  mnemonicLength: number,
-  passwordMatches: string => boolean,
-  includeLengthCheck: boolean,
-  classicTheme: boolean,
+  +onBack: void => void,
+  +mnemonicValidator: string => boolean,
+  +validWords: Array<string>,
+  +mnemonicLength: number,
+  +passwordMatches: string => boolean,
+  +includeLengthCheck: boolean,
+  +classicTheme: boolean,
 |};
 
 @observer

@@ -15,9 +15,9 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onSubmit: { masterKey: string, } => void,
-  onBack: void => void,
-  classicTheme: boolean,
+  +onSubmit: { masterKey: string, } => void,
+  +onBack: void => void,
+  +classicTheme: boolean,
 |};
 
 @observer

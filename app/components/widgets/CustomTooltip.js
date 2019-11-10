@@ -12,8 +12,8 @@ import infoIcon from '../../assets/images/info-icon.inline.svg';
 import styles from './CustomTooltip.scss';
 
 type Props = {|
-  toolTip: MessageDescriptor,
-  children?: Node,
+  +toolTip: MessageDescriptor,
+  +children?: Node,
 |};
 
 @observer

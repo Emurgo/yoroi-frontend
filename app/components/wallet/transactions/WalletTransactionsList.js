@@ -32,14 +32,14 @@ const messages = defineMessages({
 const dateFormat = 'YYYY-MM-DD';
 
 type Props = {|
-  transactions: Array<WalletTransaction>,
-  isLoadingTransactions: boolean,
-  hasMoreToLoad: boolean,
-  selectedExplorer: ExplorerType,
-  assuranceMode: AssuranceMode,
-  walletId: string,
-  formattedWalletAmount: Function,
-  onLoadMore: Function,
+  +transactions: Array<WalletTransaction>,
+  +isLoadingTransactions: boolean,
+  +hasMoreToLoad: boolean,
+  +selectedExplorer: ExplorerType,
+  +assuranceMode: AssuranceMode,
+  +walletId: string,
+  +formattedWalletAmount: Function,
+  +onLoadMore: Function,
 |};
 
 @observer

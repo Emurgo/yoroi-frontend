@@ -28,12 +28,13 @@ import environment from './environment';
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr, ...id, ...es, ...it]);
 
+type Props = {|
+  +stores: StoresMap,
+  +actions: ActionsMap,
+  +history: Object,
+|};
 @observer
-class App extends Component<{
-  stores: StoresMap,
-  actions: ActionsMap,
-  history: Object,
-}> {
+class App extends Component<Props> {
   render() {
     const { stores, actions, history } = this.props;
     const locale = stores.profile.currentLocale;

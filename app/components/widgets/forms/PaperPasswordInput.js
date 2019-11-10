@@ -11,11 +11,11 @@ import { Input } from 'react-polymorph/lib/components/Input';
 import { isValidPaperPassword } from '../../../utils/validations';
 
 type Props = {|
-  setForm: ReactToolboxMobxForm => void,
-  classicTheme: boolean,
-  passwordMatches: string => boolean,
-  includeLengthCheck: boolean,
-  initValues?: string,
+  +setForm: ReactToolboxMobxForm => void,
+  +classicTheme: boolean,
+  +passwordMatches: string => boolean,
+  +includeLengthCheck: boolean,
+  +initValues?: string,
 
 |};
 

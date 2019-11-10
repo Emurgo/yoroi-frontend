@@ -5,8 +5,8 @@ import { observer } from 'mobx-react';
 import styles from './SettingsLayout.scss';
 
 type Props = {|
-  children: Node,
-  menu: Node,
+  +children: Node,
+  +menu: Node,
 |};
 
 @observer

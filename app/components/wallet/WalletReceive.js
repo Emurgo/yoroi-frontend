@@ -60,17 +60,17 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  walletAddress: string,
-  selectedExplorer: ExplorerType,
-  isWalletAddressUsed: boolean,
-  walletAddresses: Array<StandardAddress>,
-  onGenerateAddress: Function,
-  onCopyAddressTooltip: Function,
-  getNotification: Function,
-  onVerifyAddress: Function,
-  onGeneratePaymentURI: Function,
-  isSubmitting: boolean,
-  error?: ?LocalizableError,
+  +walletAddress: string,
+  +selectedExplorer: ExplorerType,
+  +isWalletAddressUsed: boolean,
+  +walletAddresses: Array<StandardAddress>,
+  +onGenerateAddress: Function,
+  +onCopyAddressTooltip: Function,
+  +getNotification: Function,
+  +onVerifyAddress: Function,
+  +onGeneratePaymentURI: Function,
+  +isSubmitting: boolean,
+  +error?: ?LocalizableError,
 |};
 
 type State = {

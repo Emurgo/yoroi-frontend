@@ -26,11 +26,11 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  on15Words: void => void,
-  onPaper: void => void,
-  classicTheme: boolean,
-  onFollowInstructionsPrerequisites: void => void,
-  disableTransferFunds: boolean,
+  +on15Words: void => void,
+  +onPaper: void => void,
+  +classicTheme: boolean,
+  +onFollowInstructionsPrerequisites: void => void,
+  +disableTransferFunds: boolean,
 |};
 
 @observer

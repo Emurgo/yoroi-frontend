@@ -6,9 +6,9 @@ import classNames from 'classnames';
 import styles from './NotificationMessage.scss';
 
 type Props = {|
-  icon: string,
-  show: boolean,
-  children?: Node,
+  +icon: string,
+  +show: boolean,
+  +children?: Node,
 |};
 
 export default class NotificationMessage extends Component<Props> {

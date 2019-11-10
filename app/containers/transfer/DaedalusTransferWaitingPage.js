@@ -5,7 +5,7 @@ import TransferWaitingPage from '../../components/transfer/TransferWaitingPage';
 import type { TransferStatusT } from '../../types/TransferTypes';
 
 type Props = {|
-  status: TransferStatusT
+  +status: TransferStatusT
 |};
 
 @observer

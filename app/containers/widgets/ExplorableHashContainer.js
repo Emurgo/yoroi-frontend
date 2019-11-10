@@ -11,12 +11,12 @@ import { Explorer, explorerInfo } from '../../domain/Explorer';
 import ExplorableHash from '../../components/widgets/hashWrappers/ExplorableHash';
 
 type Props = {|
-  children: ?Node,
-  selectedExplorer: ExplorerType,
-  hash: string,
-  light: boolean,
-  linkType: LinkType,
-  tooltipOpensUpward?: boolean,
+  +children: ?Node,
+  +selectedExplorer: ExplorerType,
+  +hash: string,
+  +light: boolean,
+  +linkType: LinkType,
+  +tooltipOpensUpward?: boolean,
 |};
 
 @observer

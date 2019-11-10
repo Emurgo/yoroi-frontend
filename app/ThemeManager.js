@@ -4,8 +4,8 @@ import type { Node } from 'react';
 import { map } from 'lodash';
 
 type Props = {|
-  variables: { [key: string]: string },
-  children?: Node,
+  +variables: { [key: string]: string },
+  +children?: Node,
 |};
 
 /** Allow to swap the CSS used at runtime to allow user-defined themes */

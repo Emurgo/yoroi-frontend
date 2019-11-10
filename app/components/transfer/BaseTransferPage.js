@@ -11,12 +11,12 @@ import globalMessages from '../../i18n/global-messages';
 import styles from './BaseTransferPage.scss';
 
 type Props = {|
-  children: Node,
-  onSubmit: void => Promise<void>,
-  onBack: void => void,
-  step0: string,
-  classicTheme: boolean,
-  isDisabled: boolean
+  +children: Node,
+  +onSubmit: void => Promise<void>,
+  +onBack: void => void,
+  +step0: string,
+  +classicTheme: boolean,
+  +isDisabled: boolean
 |};
 
 @observer

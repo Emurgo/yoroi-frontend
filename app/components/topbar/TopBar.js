@@ -7,11 +7,11 @@ import styles from './TopBar.scss';
 import type { Category } from '../../config/topbarConfig';
 
 type Props = {|
-  children?: ?Node,
-  title: ?Node,
-  categories?: Array<Category>,
-  isActiveCategory?: Function,
-  onCategoryClicked?: Function,
+  +children?: ?Node,
+  +title: ?Node,
+  +categories?: Array<Category>,
+  +isActiveCategory?: Function,
+  +onCategoryClicked?: Function,
 |};
 
 @observer

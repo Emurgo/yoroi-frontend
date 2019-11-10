@@ -26,18 +26,18 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  className?: string,
-  isActive: boolean,
-  inputFieldLabel: string,
-  inputFieldValue: string,
-  onStartEditing: Function,
-  onStopEditing: Function,
-  onCancelEditing: Function,
-  onSubmit: Function,
-  isValid: Function,
-  validationErrorMessage: string,
-  successfullyUpdated: boolean,
-  classicTheme: boolean,
+  +className?: string,
+  +isActive: boolean,
+  +inputFieldLabel: string,
+  +inputFieldValue: string,
+  +onStartEditing: Function,
+  +onStopEditing: Function,
+  +onCancelEditing: Function,
+  +onSubmit: Function,
+  +isValid: Function,
+  +validationErrorMessage: string,
+  +successfullyUpdated: boolean,
+  +classicTheme: boolean,
 |};
 
 type State = {

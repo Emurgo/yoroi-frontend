@@ -7,10 +7,10 @@ import classNames from 'classnames';
 import styles from './DialogTextBlock.scss';
 
 type Props = {|
-  title?: string,
-  message?: string,
-  subclass?: string,
-  children?: Node
+  +title?: string,
+  +message?: string,
+  +subclass?: string,
+  +children?: Node
 |};
 
 @observer

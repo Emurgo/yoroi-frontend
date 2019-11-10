@@ -35,13 +35,13 @@ const NUMBER_OF_VERIFIED_ADDRESSES = 1;
 const NUMBER_OF_VERIFIED_ADDRESSES_PAPER = 5;
 
 type WalletRestoreDialogContainerState = {
-  verifyRestore?: {
+  +verifyRestore?: {|
     addresses: Array<string>,
     accountPlate: WalletAccountNumberPlate,
-  },
-  submitValues?: WalletRestoreDialogValues,
-  resolvedRecoveryPhrase?: string,
-  notificationElementId: string,
+  |},
+  +submitValues?: WalletRestoreDialogValues,
+  +resolvedRecoveryPhrase?: string,
+  +notificationElementId: string,
 }
 
 @observer

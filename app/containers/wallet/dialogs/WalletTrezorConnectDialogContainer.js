@@ -17,7 +17,7 @@ import HWConnectActions from '../../../actions/ada/hw-connect-actions';
 
 type Props = {|
   ...InjectedDialogContainerProps,
-  onBack: void => void,
+  +onBack: void => void,
 |};
 
 @observer

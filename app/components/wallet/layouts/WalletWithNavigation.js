@@ -6,9 +6,9 @@ import WalletNavigation from '../navigation/WalletNavigation';
 import styles from './WalletWithNavigation.scss';
 
 type Props = {|
-  children?: Node,
-  isActiveScreen: string => boolean,
-  onWalletNavItemClick: string => void,
+  +children?: Node,
+  +isActiveScreen: string => boolean,
+  +onWalletNavItemClick: string => void,
 |};
 
 @observer

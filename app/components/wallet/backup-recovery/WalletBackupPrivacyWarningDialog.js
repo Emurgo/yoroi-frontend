@@ -27,13 +27,13 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  countdownRemaining: number,
-  canPhraseBeShown: boolean,
-  isPrivacyNoticeAccepted: boolean,
-  onAcceptPrivacyNotice: Function,
-  onContinue: Function,
-  onCancelBackup: Function,
-  classicTheme: boolean
+  +countdownRemaining: number,
+  +canPhraseBeShown: boolean,
+  +isPrivacyNoticeAccepted: boolean,
+  +onAcceptPrivacyNotice: Function,
+  +onContinue: Function,
+  +onCancelBackup: Function,
+  +classicTheme: boolean
 |};
 
 @observer

@@ -22,8 +22,8 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  progressInfo: ProgressInfo,
-  classicTheme: boolean
+  +progressInfo: ProgressInfo,
+  +classicTheme: boolean
 |};
 
 @observer

@@ -6,12 +6,12 @@ import classnames from 'classnames';
 import styles from './TopBarLayout.scss';
 
 type Props = {|
-  banner?: Node,
-  topbar?: Node,
-  children?: ?Node,
-  notification?: ?Node,
-  languageSelectionBackground?: boolean,
-  classicTheme?: boolean,
+  +banner?: Node,
+  +topbar?: Node,
+  +children?: ?Node,
+  +notification?: ?Node,
+  +languageSelectionBackground?: boolean,
+  +classicTheme?: boolean,
 |};
 
 /** Adds a top bar above the wrapped node */

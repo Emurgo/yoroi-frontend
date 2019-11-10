@@ -8,12 +8,12 @@ import classNames from 'classnames';
 import styles from './TopBarCategory.scss';
 
 type Props = {|
-  icon: string,
-  inlineTextMD: ?MessageDescriptor,
-  active: boolean,
-  onClick: Function,
-  className: string,
-  iconStyle?: string
+  +icon: string,
+  +inlineTextMD: ?MessageDescriptor,
+  +active: boolean,
+  +onClick: Function,
+  +className: string,
+  +iconStyle?: string
 |};
 
 @observer

@@ -11,23 +11,23 @@ import { ModalSkin } from 'react-polymorph/lib/skins/simple/ModalSkin';
 import styles from './Dialog.scss';
 
 type ActionType = {
-  label: string,
-  onClick: Function,
-  primary?: boolean,
-  disabled?: boolean,
-  className?: ?string
+  +label: string,
+  +onClick: Function,
+  +primary?: boolean,
+  +disabled?: boolean,
+  +className?: ?string
 };
 
 type Props = {|
-  title?: string,
-  children?: Node,
-  actions?: Array<ActionType>,
-  closeButton?: Element<any>,
-  backButton?: Node,
-  className?: string,
-  onClose?: ?Function,
-  closeOnOverlayClick?: boolean,
-  classicTheme: boolean
+  +title?: string,
+  +children?: Node,
+  +actions?: Array<ActionType>,
+  +closeButton?: Element<any>,
+  +backButton?: Node,
+  +className?: string,
+  +onClose?: ?Function,
+  +closeOnOverlayClick?: boolean,
+  +classicTheme: boolean
 |};
 
 @observer

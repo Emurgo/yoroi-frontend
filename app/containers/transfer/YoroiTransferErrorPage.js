@@ -14,9 +14,9 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  error?: ?LocalizableError,
-  onCancel: Function,
-  classicTheme: boolean,
+  +error?: ?LocalizableError,
+  +onCancel: Function,
+  +classicTheme: boolean,
 |};
 
 @observer

@@ -9,11 +9,11 @@ import LocalizableError from '../../i18n/LocalizableError';
 import styles from './ErrorPage.scss';
 
 type Props = {|
-  error?: ?LocalizableError,
-  onCancel: Function,
-  title: string,
-  backButtonLabel: string,
-  classicTheme: boolean,
+  +error?: ?LocalizableError,
+  +onCancel: Function,
+  +title: string,
+  +backButtonLabel: string,
+  +classicTheme: boolean,
 |};
 
 @observer

@@ -10,12 +10,12 @@ import arrowDownSVG from '../../../../assets/images/expand-arrow-grey.inline.svg
 import styles from './OptionBlock.scss';
 
 type Props = {|
-  parentName: string,
-  type: string,
-  title: string,
-  onSubmit: Function,
+  +parentName: string,
+  +type: string,
+  +title: string,
+  +onSubmit: Function,
   // If learnMoreText is not provided, learn more block will disabled
-  learnMoreText?: string,
+  +learnMoreText?: string,
 |};
 
 type State = {

@@ -29,13 +29,13 @@ const messages = defineMessages({
 });
 
 type Props = {
-  onClose: void => void,
-  classicTheme: boolean,
-  getNotification: Function,
-  onCopyAddressTooltip: Function,
-  onBack: void => void,
-  address: string,
-  amount: number,
+  +onClose: void => void,
+  +classicTheme: boolean,
+  +getNotification: Function,
+  +onCopyAddressTooltip: Function,
+  +onBack: void => void,
+  +address: string,
+  +amount: number,
 };
 
 @observer

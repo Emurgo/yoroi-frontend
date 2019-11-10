@@ -5,11 +5,11 @@ import classnames from 'classnames';
 import styles from './WalletNavButton.scss';
 
 type Props = {|
-  label: string,
-  icon: string,
-  isActive: boolean,
-  onClick: Function,
-  className?: string,
+  +label: string,
+  +icon: string,
+  +isActive: boolean,
+  +onClick: Function,
+  +className?: string,
 |};
 
 @observer

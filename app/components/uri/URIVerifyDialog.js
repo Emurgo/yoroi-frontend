@@ -34,12 +34,12 @@ const messages = defineMessages({
 });
 
 type Props = {
-  onSubmit: void => void,
-  onBack: void => void,
-  onCancel: void => void,
-  uriParams: UriParams,
-  classicTheme: boolean,
-  selectedExplorer: ExplorerType,
+  +onSubmit: void => void,
+  +onBack: void => void,
+  +onCancel: void => void,
+  +uriParams: UriParams,
+  +classicTheme: boolean,
+  +selectedExplorer: ExplorerType,
 };
 
 @observer

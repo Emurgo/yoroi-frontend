@@ -117,12 +117,12 @@ const stateTranslations = defineMessages({
 });
 
 type Props = {|
-  data: WalletTransaction,
-  state: TxStatusCodesType,
-  selectedExplorer: ExplorerType,
-  assuranceLevel: AssuranceLevel,
-  isLastInList: boolean,
-  formattedWalletAmount: Function,
+  +data: WalletTransaction,
+  +state: TxStatusCodesType,
+  +selectedExplorer: ExplorerType,
+  +assuranceLevel: AssuranceLevel,
+  +isLastInList: boolean,
+  +formattedWalletAmount: Function,
 |};
 
 type State = {

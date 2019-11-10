@@ -28,8 +28,8 @@ const messages = defineMessages({
 const daedalusMasterKeyLength = 192; // 96 bytes (2x because of hex representation)
 
 type Props = {|
-  setForm: ReactToolboxMobxForm => void,
-  classicTheme: boolean,
+  +setForm: ReactToolboxMobxForm => void,
+  +classicTheme: boolean,
 |};
 
 @observer

@@ -21,12 +21,12 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onSubmit: {| recoveryPhrase: string |} => void,
-  onBack: Function,
-  mnemonicValidator: string => boolean,
-  validWords: Array<string>,
-  mnemonicLength: number,
-  classicTheme: boolean,
+  +onSubmit: {| recoveryPhrase: string |} => void,
+  +onBack: Function,
+  +mnemonicValidator: string => boolean,
+  +validWords: Array<string>,
+  +mnemonicLength: number,
+  +classicTheme: boolean,
 |};
 
 @observer

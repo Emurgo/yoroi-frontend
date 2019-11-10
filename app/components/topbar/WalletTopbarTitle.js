@@ -24,14 +24,14 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  publicDeriver: null | PublicDeriverWithCachedMeta,
-  currentRoute: string,
-  formattedWalletAmount?: BigNumber => string,
-  themeProperties?: {
+  +publicDeriver: null | PublicDeriverWithCachedMeta,
+  +currentRoute: string,
+  +formattedWalletAmount?: BigNumber => string,
+  +themeProperties?: {|
     identiconSaturationFactor: number,
-  },
-  onUpdateHideBalance: void => void,
-  shouldHideBalance: boolean
+  |},
+  +onUpdateHideBalance: void => void,
+  +shouldHideBalance: boolean
 |};
 
 function constructPlate(

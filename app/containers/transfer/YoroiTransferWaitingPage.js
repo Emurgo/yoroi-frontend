@@ -28,7 +28,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  status: TransferStatusT
+  +status: TransferStatusT
 |};
 
 @observer

@@ -28,11 +28,11 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  isActionProcessing: ?boolean,
-  error: ?LocalizableError,
-  submit: void => void,
-  cancel: Function,
-  classicTheme: boolean,
+  +isActionProcessing: ?boolean,
+  +error: ?LocalizableError,
+  +submit: void => void,
+  +cancel: Function,
+  +classicTheme: boolean,
 |};
 
 @observer

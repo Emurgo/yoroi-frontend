@@ -20,10 +20,10 @@ export const StepState = Object.freeze({
 export type StepStateEnum = $Values<typeof StepState>;
 
 type Props = {|
-  stepsList: Array<string>,
-  currentStep : number, // example, 0 = pointing to stepsList[0]
-  stepState: StepStateEnum,
-  classicTheme: boolean
+  +stepsList: Array<string>,
+  +currentStep : number, // example, 0 = pointing to stepsList[0]
+  +stepState: StepStateEnum,
+  +classicTheme: boolean
 |};
 @observer
 export default class ProgressSteps extends Component<Props> {

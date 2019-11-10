@@ -7,8 +7,8 @@ import noTransactionClassicSvg from '../../../assets/images/transaction/no-trans
 import noTransactionModernSvg from '../../../assets/images/transaction/no-transactions-yet.modern.inline.svg';
 
 type Props = {|
-  label: string,
-  classicTheme: boolean,
+  +label: string,
+  +classicTheme: boolean,
 |};
 
 @observer

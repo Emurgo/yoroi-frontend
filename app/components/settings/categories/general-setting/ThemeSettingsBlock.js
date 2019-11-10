@@ -50,12 +50,12 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  currentTheme: Theme,
-  selectTheme: Function,
-  exportTheme: Function,
-  getThemeVars: Function,
-  hasCustomTheme: Function,
-  onExternalLinkClick: Function,
+  +currentTheme: Theme,
+  +selectTheme: Function,
+  +exportTheme: Function,
+  +getThemeVars: Function,
+  +hasCustomTheme: Function,
+  +onExternalLinkClick: Function,
 |};
 
 @observer
