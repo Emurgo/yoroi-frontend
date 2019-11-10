@@ -31,7 +31,7 @@ export type AddByHashRequest = {|
 export type AddByHashFunc = AddByHashRequest => Promise<void>;
 export function rawGenAddByHash(
   ownAddressIds: Set<number>,
-) {
+): AddByHashFunc {
   return async (
     request: AddByHashRequest
   ): Promise<void> => {

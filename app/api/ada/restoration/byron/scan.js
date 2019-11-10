@@ -52,7 +52,9 @@ export async function addByronAddress(
   addByHash: AddByHashFunc,
   insertRequest: InsertRequest,
   address: string,
-) {
+): Promise<{|
+  KeyDerivationId: number,
+|}> {
   await addByHash({
     ...insertRequest,
     address: {

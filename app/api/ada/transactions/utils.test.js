@@ -207,6 +207,6 @@ const _expRow = (
   date: string
 ): TransactionExportRow => ({ type, amount, fee, date: new Date(date) });
 
-function _expectEqual(a, b) {
+function _expectEqual(a: any, b: any): void {
   expect(a).toEqual(b);
 }

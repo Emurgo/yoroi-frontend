@@ -93,7 +93,7 @@ export class BatchedFetcher implements IFetcher {
 function batchUTXOsForAddresses(
   getUTXOsForAddresses: AddressUtxoFunc,
 ): AddressUtxoFunc {
-  return async function (body) {
+  return async function (body: AddressUtxoRequest): Promise<AddressUtxoResponse> {
     try {
       // split up all addresses into chunks of equal size
       const groupsOfAddresses: Array<Array<string>>
@@ -122,7 +122,7 @@ function batchUTXOsForAddresses(
 function batchTxsBodiesForInputs(
   getTxsBodiesForUTXOs: TxBodiesFunc,
 ): TxBodiesFunc {
-  return async function (body) {
+  return async function (body: TxBodiesRequest): Promise<TxBodiesResponse> {
     try {
       // split up all txs into chunks of equal size
       const groupsOfTxsHashes = chunk(body.txsHashes, CONFIG.app.txsBodiesRequestSize);
@@ -152,7 +152,7 @@ function batchTxsBodiesForInputs(
 export function batchGetUTXOsSumsForAddresses(
   getUTXOsSumsForAddresses: UtxoSumFunc,
 ): UtxoSumFunc {
-  return async function (body) {
+  return async function (body: UtxoSumRequest): Promise<UtxoSumResponse> {
     try {
       // batch all addresses into chunks for API
       const groupsOfAddresses = chunk(body.addresses, addressesLimit);
@@ -187,7 +187,7 @@ export function batchGetUTXOsSumsForAddresses(
 export function batchGetTransactionsHistoryForAddresses(
   getTransactionsHistoryForAddresses: HistoryFunc,
 ): HistoryFunc {
-  return async function (body: HistoryRequest) {
+  return async function (body: HistoryRequest): Promise<HistoryResponse> {
     try {
       // we need two levels of batching: addresses and then transactions
       const transactions = await _batchHistoryByAddresses(
@@ -273,7 +273,7 @@ async function _batchHistoryByTransaction(
 export function batchCheckAddressesInUse(
   checkAddressesInUse: FilterFunc,
 ): FilterFunc {
-  return async function (body) {
+  return async function (body: FilterUsedRequest): Promise<FilterUsedResponse> {
     try {
       const groupsOfAddresses = chunk(body.addresses, addressesLimit);
       const groupedAddrPromises = groupsOfAddresses.map(

@@ -66,7 +66,7 @@ export async function setup(
   return publicDeriver;
 }
 
-export function mockDate() {
+export function mockDate(): void {
   const time = [0];
   // $FlowFixMe flow doesn't like that we override built-in functions.
   Date.now = jest.spyOn(Date, 'now').mockImplementation(() => time[0]++);
@@ -75,7 +75,7 @@ export function mockDate() {
 export function filterDbSnapshot(
   dump: any,
   keys: Array<string>
-) {
+): void {
   // 1) test all keys we care about are present
   keys.sort();
 
