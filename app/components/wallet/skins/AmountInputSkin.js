@@ -17,17 +17,17 @@ const messages = defineMessages({
 // This type should be kept open (not "exact") because it is a react-polymorph skin
 // and should be able to pass any extra properties from react-polymorph down.
 type Props = {
-  currency: string,
-  fees: BigNumber,
-  total: BigNumber,
-  error?: string,
-  classicTheme: boolean,
+  +currency: string,
+  +fees: BigNumber,
+  +total: BigNumber,
+  +error?: string,
+  +classicTheme: boolean,
   // inherited from InputOwnSkin
-  inputRef: Ref<'input'>,
-  theme: Object,
-  themeId: string,
-  value: string,
-  type: string,
+  +inputRef: Ref<'input'>,
+  +theme: Object,
+  +themeId: string,
+  +value: string,
+  +type: string,
 };
 
 export default class AmountInputSkin extends Component<Props> {

@@ -33,10 +33,10 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onCancel: Function,
-  onTrezor: Function,
-  onLedger: Function,
-  classicTheme: boolean
+  +onCancel: Function,
+  +onTrezor: Function,
+  +onLedger: Function,
+  +classicTheme: boolean
 |};
 
 @observer

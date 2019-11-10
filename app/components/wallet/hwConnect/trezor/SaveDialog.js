@@ -48,14 +48,14 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  progressInfo: ProgressInfo,
-  error: ?LocalizableError,
-  isActionProcessing: boolean,
-  defaultWalletName: string,
-  onExternalLinkClick: Function,
-  submit: string => void,
-  cancel: Function,
-  classicTheme: boolean
+  +progressInfo: ProgressInfo,
+  +error: ?LocalizableError,
+  +isActionProcessing: boolean,
+  +defaultWalletName: string,
+  +onExternalLinkClick: Function,
+  +submit: string => void,
+  +cancel: Function,
+  +classicTheme: boolean
 |};
 
 @observer

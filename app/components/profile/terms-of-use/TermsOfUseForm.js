@@ -20,10 +20,10 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  localizedTermsOfUse: string,
-  onSubmit: Function,
-  isSubmitting: boolean,
-  error?: ?LocalizableError,
+  +localizedTermsOfUse: string,
+  +onSubmit: Function,
+  +isSubmitting: boolean,
+  +error?: ?LocalizableError,
 |};
 
 type State = {

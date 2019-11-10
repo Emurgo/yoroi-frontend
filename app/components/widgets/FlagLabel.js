@@ -4,10 +4,10 @@ import styles from './FlagLabel.scss';
 import SvgInline from 'react-svg-inline';
 
 type Props = {|
-  svg: string,
-  label: string,
-  width?: string,
-  height?: string
+  +svg: string,
+  +label: string,
+  +width?: string,
+  +height?: string
 |};
 
 export default class FlagLabel extends Component<Props> {

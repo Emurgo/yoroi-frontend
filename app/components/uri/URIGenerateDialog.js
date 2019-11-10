@@ -45,14 +45,14 @@ const messages = defineMessages({
 });
 
 type Props = {
-  onClose: void => void,
-  onGenerate: (address: string, amount: number) => void,
-  classicTheme: boolean,
-  walletAddress: string,
-  amount?: number,
-  currencyMaxIntegerDigits: number,
-  currencyMaxFractionalDigits: number,
-  validateAmount: (amountInNaturalUnits: string) => Promise<boolean>,
+  +onClose: void => void,
+  +onGenerate: (address: string, amount: number) => void,
+  +classicTheme: boolean,
+  +walletAddress: string,
+  +amount?: number,
+  +currencyMaxIntegerDigits: number,
+  +currencyMaxFractionalDigits: number,
+  +validateAmount: (amountInNaturalUnits: string) => Promise<boolean>,
 };
 
 @observer

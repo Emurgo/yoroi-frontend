@@ -13,19 +13,19 @@ import styles from './FormFieldOwnSkin.scss';
 // This type should be kept open (not "exact") because it is a react-polymorph skin
 // and should be able to pass any extra properties from react-polymorph down.
 type Props = {
-  className: string,
-  disabled: boolean,
-  error: string | Element<any>,
-  focusChild: MouseEvent=>void,
-  label: string | Element<any>,
-  onChange: Event=>void,
-  render: Object=>React$Element<any>,
-  setError: Function,
-  theme: Object,
-  themeId: string,
-  done?: boolean,
-  type: string,
-  focused: boolean,
+  +className: string,
+  +disabled: boolean,
+  +error: string | Element<any>,
+  +focusChild: MouseEvent=>void,
+  +label: string | Element<any>,
+  +onChange: Event=>void,
+  +render: Object=>React$Element<any>,
+  +setError: Function,
+  +theme: Object,
+  +themeId: string,
+  +done?: boolean,
+  +type: string,
+  +focused: boolean,
 };
 
 type State = {

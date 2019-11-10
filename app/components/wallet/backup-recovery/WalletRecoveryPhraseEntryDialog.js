@@ -43,22 +43,22 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  recoveryPhraseSorted: Array<{ word: string, isActive: boolean }>,
-  enteredPhrase: Array<{ word: string, index: number }>,
-  isValid: boolean,
-  isTermDeviceAccepted: boolean,
-  isTermRecoveryAccepted: boolean,
-  isSubmitting: boolean,
-  onAddWord: Function,
-  onClear: Function,
-  onAcceptTermDevice: Function,
-  onAcceptTermRecovery: Function,
-  onRestartBackup: Function,
-  onCancelBackup: Function,
-  onFinishBackup: Function,
-  removeWord: Function,
-  hasWord: Function,
-  classicTheme: boolean,
+  +recoveryPhraseSorted: Array<{ word: string, isActive: boolean }>,
+  +enteredPhrase: Array<{ word: string, index: number }>,
+  +isValid: boolean,
+  +isTermDeviceAccepted: boolean,
+  +isTermRecoveryAccepted: boolean,
+  +isSubmitting: boolean,
+  +onAddWord: Function,
+  +onClear: Function,
+  +onAcceptTermDevice: Function,
+  +onAcceptTermRecovery: Function,
+  +onRestartBackup: Function,
+  +onCancelBackup: Function,
+  +onFinishBackup: Function,
+  +removeWord: Function,
+  +hasWord: Function,
+  +classicTheme: boolean,
 |};
 
 @observer

@@ -5,8 +5,8 @@ import LoadingSpinner from '../widgets/LoadingSpinner';
 import styles from './AnnotatedLoader.scss';
 
 type Props = {|
-  title: string,
-  details: string,
+  +title: string,
+  +details: string,
 |};
 
 @observer

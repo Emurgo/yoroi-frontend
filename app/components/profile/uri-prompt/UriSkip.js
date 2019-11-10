@@ -24,9 +24,9 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onConfirm: void => void,
-  onBack: void => void,
-  classicTheme: boolean,
+  +onConfirm: void => void,
+  +onBack: void => void,
+  +classicTheme: boolean,
 |};
 
 @observer

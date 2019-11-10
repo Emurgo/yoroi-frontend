@@ -49,16 +49,16 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  addresses: Array<string>,
-  accountPlate: WalletAccountNumberPlate,
-  selectedExplorer: ExplorerType,
-  onCopyAddressTooltip: Function,
-  getNotification: Function,
-  onNext: Function,
-  onCancel: Function,
-  isSubmitting: boolean,
-  classicTheme: boolean,
-  error?: ?LocalizableError,
+  +addresses: Array<string>,
+  +accountPlate: WalletAccountNumberPlate,
+  +selectedExplorer: ExplorerType,
+  +onCopyAddressTooltip: Function,
+  +getNotification: Function,
+  +onNext: Function,
+  +onCancel: Function,
+  +isSubmitting: boolean,
+  +classicTheme: boolean,
+  +error?: ?LocalizableError,
 |};
 
 @observer

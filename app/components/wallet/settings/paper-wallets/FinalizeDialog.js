@@ -43,14 +43,14 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onCopyAddressTooltip: Function,
-  getNotification: Function,
-  selectedExplorer: ExplorerType,
-  paper: AdaPaper,
-  onNext: Function,
-  onCancel: Function,
-  onBack?: Function,
-  classicTheme: boolean,
+  +onCopyAddressTooltip: Function,
+  +getNotification: Function,
+  +selectedExplorer: ExplorerType,
+  +paper: AdaPaper,
+  +onNext: Function,
+  +onCancel: Function,
+  +onBack?: Function,
+  +classicTheme: boolean,
 |};
 
 @observer

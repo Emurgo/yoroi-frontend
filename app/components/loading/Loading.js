@@ -25,13 +25,13 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  api: string,
-  isLoadingDataForNextScreen: boolean,
-  hasLoadedCurrentLocale: boolean,
-  hasLoadedCurrentTheme: boolean,
-  error: ?LocalizableError,
-  onExternalLinkClick: Function,
-  downloadLogs: Function
+  +api: string,
+  +isLoadingDataForNextScreen: boolean,
+  +hasLoadedCurrentLocale: boolean,
+  +hasLoadedCurrentTheme: boolean,
+  +error: ?LocalizableError,
+  +onExternalLinkClick: Function,
+  +downloadLogs: Function
 |};
 
 @observer

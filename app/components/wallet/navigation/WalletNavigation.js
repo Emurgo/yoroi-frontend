@@ -37,8 +37,8 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  isActiveNavItem: string => boolean,
-  onNavItemClick: string => void,
+  +isActiveNavItem: string => boolean,
+  +onNavItemClick: string => void,
 |};
 
 @observer

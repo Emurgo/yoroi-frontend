@@ -68,21 +68,21 @@ export type WalletRestoreDialogValues = {|
 |};
 
 type Props = {|
-  onSubmit: WalletRestoreDialogValues => void,
-  onCancel: void => void,
-  onBack?: void => void,
-  isSubmitting: boolean,
-  mnemonicValidator: string => boolean,
-  passwordValidator?: string => boolean,
-  numberOfMnemonics: number,
-  error?: ?LocalizableError,
-  validWords: Array<string>,
-  isPaper?: boolean,
-  isVerificationMode?: boolean,
-  showPaperPassword?: boolean,
-  classicTheme: boolean,
-  initValues?: WalletRestoreDialogValues,
-  introMessage?: string,
+  +onSubmit: WalletRestoreDialogValues => void,
+  +onCancel: void => void,
+  +onBack?: void => void,
+  +isSubmitting: boolean,
+  +mnemonicValidator: string => boolean,
+  +passwordValidator?: string => boolean,
+  +numberOfMnemonics: number,
+  +error?: ?LocalizableError,
+  +validWords: Array<string>,
+  +isPaper?: boolean,
+  +isVerificationMode?: boolean,
+  +showPaperPassword?: boolean,
+  +classicTheme: boolean,
+  +initValues?: WalletRestoreDialogValues,
+  +introMessage?: string,
 |};
 
 @observer

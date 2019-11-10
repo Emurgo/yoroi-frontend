@@ -37,9 +37,9 @@ const messages = defineMessages({
 });
 
 type Props = {
-  onSubmit: void => void,
-  onClose: void => void,
-  classicTheme: boolean,
+  +onSubmit: void => void,
+  +onClose: void => void,
+  +classicTheme: boolean,
 };
 
 @observer

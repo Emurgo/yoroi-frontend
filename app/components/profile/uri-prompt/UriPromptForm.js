@@ -23,9 +23,9 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onAccept: void => void,
-  onSkip: void => void,
-  classicTheme: boolean
+  +onAccept: void => void,
+  +onSkip: void => void,
+  +classicTheme: boolean
 |};
 
 @observer

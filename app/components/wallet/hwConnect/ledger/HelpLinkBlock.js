@@ -19,7 +19,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onExternalLinkClick: Function,
+  +onExternalLinkClick: Function,
 |};
 
 @observer

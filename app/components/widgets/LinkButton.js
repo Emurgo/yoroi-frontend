@@ -6,12 +6,12 @@ import { intlShape } from 'react-intl';
 import styles from './LinkButton.scss';
 
 type Props = {|
-  url: string,
-  svg: string,
-  message: MessageDescriptor,
-  svgClass?: string,
-  textClassName: string,
-  onExternalLinkClick: Function,
+  +url: string,
+  +svg: string,
+  +message: MessageDescriptor,
+  +svgClass?: string,
+  +textClassName: string,
+  +onExternalLinkClick: Function,
 |};
 
 export default class LinkButton extends Component<Props> {

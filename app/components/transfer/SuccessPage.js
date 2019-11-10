@@ -7,9 +7,9 @@ import styles from './SuccessPage.scss';
 import successIcon from '../../assets/images/transfer-success.inline.svg';
 
 type Props = {|
-  title: string,
-  text: string,
-  classicTheme: boolean
+  +title: string,
+  +text: string,
+  +classicTheme: boolean
 |};
 
 @observer

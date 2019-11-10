@@ -50,9 +50,9 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onSubmit: Function,
-  onCancel: Function,
-  classicTheme: boolean
+  +onSubmit: Function,
+  +onCancel: Function,
+  +classicTheme: boolean
 |};
 
 type State = {

@@ -9,9 +9,9 @@ import styles from './TransferWithNavigation.scss';
 export type { TransferNavigationProps };
 
 type Props = {|
-  children?: Node,
-  isActiveScreen: $PropertyType<TransferNavigationProps, 'isActiveNavItem'>,
-  onTransferNavItemClick: $PropertyType<TransferNavigationProps, 'onNavItemClick'>,
+  +children?: Node,
+  +isActiveScreen: $PropertyType<TransferNavigationProps, 'isActiveNavItem'>,
+  +onTransferNavItemClick: $PropertyType<TransferNavigationProps, 'onNavItemClick'>,
 |};
 
 @observer

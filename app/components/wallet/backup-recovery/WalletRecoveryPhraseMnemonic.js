@@ -6,9 +6,9 @@ import classnames from 'classnames';
 import styles from './WalletRecoveryPhraseMnemonic.scss';
 
 type Props = {|
-  phrase: string | Element<any>,
-  classicTheme: boolean,
-  filled?: boolean
+  +phrase: string | Element<any>,
+  +classicTheme: boolean,
+  +filled?: boolean
 |};
 
 @observer

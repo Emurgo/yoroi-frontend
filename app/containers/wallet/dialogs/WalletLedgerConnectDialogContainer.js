@@ -18,7 +18,7 @@ import { ProgressStep } from '../../../types/HWConnectStoreTypes';
 
 type Props = {|
   ...InjectedDialogContainerProps,
-  onBack: void => void,
+  +onBack: void => void,
 |};
 
 @observer

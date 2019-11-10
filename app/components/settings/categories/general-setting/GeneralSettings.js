@@ -14,11 +14,11 @@ import { tier1Languages } from '../../../../config/languagesConfig';
 import globalMessages, { listOfTranslators } from '../../../../i18n/global-messages';
 
 type Props = {|
-  languages: Array<{ value: string, label: MessageDescriptor, svg: string }>,
-  currentLocale: string,
-  onSelectLanguage: Function,
-  isSubmitting: boolean,
-  error?: ?LocalizableError,
+  +languages: Array<{ value: string, label: MessageDescriptor, svg: string }>,
+  +currentLocale: string,
+  +onSelectLanguage: Function,
+  +isSubmitting: boolean,
+  +error?: ?LocalizableError,
 |};
 
 @observer

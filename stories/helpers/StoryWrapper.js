@@ -43,7 +43,7 @@ const themeNames = keys(themes);
 const langCode = LANGUAGES.map(item => item.value);
 
 type Props = {
-    children: any,
+    +children: any,
 };
 
 export default class StoryWrapper extends Component<Props> {

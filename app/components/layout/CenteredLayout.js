@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import styles from './CenteredLayout.scss';
 
 type Props = {|
-  children?: Node,
+  +children?: Node,
 |};
 
 @observer

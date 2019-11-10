@@ -44,14 +44,14 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  progressInfo: ProgressInfo,
-  isActionProcessing: boolean,
-  error: ?LocalizableError,
-  onExternalLinkClick: Function,
-  goBack: Function,
-  submit: void => void,
-  cancel: Function,
-  classicTheme: boolean,
+  +progressInfo: ProgressInfo,
+  +isActionProcessing: boolean,
+  +error: ?LocalizableError,
+  +onExternalLinkClick: Function,
+  +goBack: Function,
+  +submit: void => void,
+  +cancel: Function,
+  +classicTheme: boolean,
 |};
 
 @observer

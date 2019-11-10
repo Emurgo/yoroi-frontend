@@ -91,14 +91,15 @@ module.exports = {
     'react/jsx-indent': 1,
     'flowtype/define-flow-type': 1,
     'flowtype/use-flow-type': 1,
-    'flowtype/require-valid-file-annotation': 1,
+    'flowtype/require-valid-file-annotation': 2,
     'global-require': 'off',
     'no-await-in-loop': 0,
     'no-unused-expressions': 0,
     'no-lone-blocks': 0,
     'import/no-cycle': 0, // doesn't work with Flow unfortunately
     'max-classes-per-file': 0,
-    'no-floating-promise/no-floating-promise': 2
+    'no-floating-promise/no-floating-promise': 2,
+    "flowtype/no-primitive-constructor-types": 2
   },
   plugins: [
     'import',

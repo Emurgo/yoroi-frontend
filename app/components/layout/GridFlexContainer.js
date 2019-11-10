@@ -7,8 +7,8 @@ import { chunk } from 'lodash';
 import HorizontalFlexContainer from './HorizontalFlexContainer';
 
 type Props = {|
-  children: ?Node,
-  rowSize: number
+  +children: ?Node,
+  +rowSize: number
 |};
 
 @observer

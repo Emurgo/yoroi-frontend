@@ -20,13 +20,13 @@ const messages = defineMessages({
 });
 
 type Props = {
-  children: Node,
-  hash: string,
-  elementId?: string,
-  onCopyAddress?: Function,
-  tooltipOpensUpward?: boolean,
-  arrowRelativeToTip?: boolean,
-  getNotification: Function,
+  +children: Node,
+  +hash: string,
+  +elementId?: string,
+  +onCopyAddress?: Function,
+  +tooltipOpensUpward?: boolean,
+  +arrowRelativeToTip?: boolean,
+  +getNotification: Function,
 };
 
 @observer

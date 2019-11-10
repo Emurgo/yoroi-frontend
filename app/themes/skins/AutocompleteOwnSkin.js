@@ -47,7 +47,7 @@ type Props = {
   themeId: string,
   toggleMouseLocation: Function,
   toggleOpen: Function,
-  done: Boolean
+  done: boolean,
 };
 
 export const AutocompleteOwnSkin = (props: Props) => {

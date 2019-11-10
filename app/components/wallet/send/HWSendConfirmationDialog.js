@@ -26,20 +26,20 @@ type ExpectedMessages = {
 };
 
 type Props = {|
-  staleTx: boolean,
-  selectedExplorer: ExplorerType,
-  amount: string,
-  receivers: Array<string>,
-  totalAmount: string,
-  transactionFee: string,
-  currencyUnit: string,
-  amountToNaturalUnits: Function,
-  messages: ExpectedMessages,
-  isSubmitting: boolean,
-  error: ?LocalizableError,
-  onSubmit: void => void,
-  onCancel: Function,
-  classicTheme: boolean,
+  +staleTx: boolean,
+  +selectedExplorer: ExplorerType,
+  +amount: string,
+  +receivers: Array<string>,
+  +totalAmount: string,
+  +transactionFee: string,
+  +currencyUnit: string,
+  +amountToNaturalUnits: Function,
+  +messages: ExpectedMessages,
+  +isSubmitting: boolean,
+  +error: ?LocalizableError,
+  +onSubmit: void => void,
+  +onCancel: Function,
+  +classicTheme: boolean,
 |};
 
 @observer

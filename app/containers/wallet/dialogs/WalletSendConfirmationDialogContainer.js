@@ -17,9 +17,9 @@ import {
 } from '../../../utils/formatters';
 
 type DialogProps = {|
-  signRequest: BaseSignRequest,
-  currencyUnit: string,
-  staleTx: boolean,
+  +signRequest: BaseSignRequest,
+  +currencyUnit: string,
+  +staleTx: boolean,
 |};
 type Props = {|
   ...InjectedProps,

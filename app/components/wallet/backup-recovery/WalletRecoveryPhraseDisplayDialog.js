@@ -25,11 +25,11 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  recoveryPhrase: string,
-  onStartWalletBackup: Function,
-  onCancelBackup: Function,
-  onBack: Function,
-  classicTheme: boolean
+  +recoveryPhrase: string,
+  +onStartWalletBackup: Function,
+  +onCancelBackup: Function,
+  +onBack: Function,
+  +classicTheme: boolean
 |};
 
 @observer

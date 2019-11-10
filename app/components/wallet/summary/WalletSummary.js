@@ -30,10 +30,10 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  numberOfTransactions: number,
-  pendingAmount: UnconfirmedAmount,
-  isLoadingTransactions: boolean,
-  openExportTxToFileDialog: Function,
+  +numberOfTransactions: number,
+  +pendingAmount: UnconfirmedAmount,
+  +isLoadingTransactions: boolean,
+  +openExportTxToFileDialog: Function,
 |};
 
 @observer

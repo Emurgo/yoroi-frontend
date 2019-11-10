@@ -9,7 +9,7 @@ import failedIcon from '../../../assets/images/transaction/deny-ic.inline.svg';
 import styles from './TransactionTypeIcon.scss';
 
 type Props = {|
-  iconType: string,
+  +iconType: string,
 |};
 
 export default class TransactionTypeIcon extends Component<Props> {

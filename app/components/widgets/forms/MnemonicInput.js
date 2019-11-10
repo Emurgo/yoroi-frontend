@@ -12,11 +12,11 @@ import config from '../../../config';
 import { AutocompleteOwnSkin } from '../../../themes/skins/AutocompleteOwnSkin';
 
 type Props = {|
-  setForm: ReactToolboxMobxForm => void,
-  mnemonicValidator: string => boolean,
-  validWords: Array<string>,
-  mnemonicLength: number,
-  classicTheme: boolean,
+  +setForm: ReactToolboxMobxForm => void,
+  +mnemonicValidator: string => boolean,
+  +validWords: Array<string>,
+  +mnemonicLength: number,
+  +classicTheme: boolean,
 |};
 
 @observer

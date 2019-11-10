@@ -13,8 +13,8 @@ import type { UriParams } from '../../utils/URIHandling';
 
 type Props = {|
   ...InjectedDialogContainerProps,
-  onConfirm: void => void,
-  uriParams: ?UriParams,
+  +onConfirm: void => void,
+  +uriParams: ?UriParams,
 |};
 
 @observer
