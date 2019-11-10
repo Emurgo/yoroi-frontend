@@ -18,11 +18,16 @@ const messages = defineMessages({
   mnemonicLabel15: {
     id: 'yoroiTransfer.start.instructions.mnemonic-15',
     defaultMessage: '!!!15-word mnemonic',
-  }
+  },
+  yoroiPaperLabel: {
+    id: 'yoroiTransfer.start.instructions.yoroiPaper',
+    defaultMessage: '!!!Yoroi paper wallet',
+  },
 });
 
 type Props = {|
-  onNext: void => void,
+  on15Words: void => void,
+  onPaper: void => void,
   classicTheme: boolean,
   onFollowInstructionsPrerequisites: void => void,
   disableTransferFunds: boolean,
@@ -38,7 +43,8 @@ export default class YoroiTransferStartPage extends Component<Props> {
   render() {
     const { intl } = this.context;
     const {
-      onNext,
+      on15Words,
+      onPaper,
       onFollowInstructionsPrerequisites,
       disableTransferFunds,
     } = this.props;
@@ -104,9 +110,16 @@ export default class YoroiTransferStartPage extends Component<Props> {
                   {intl.formatMessage(globalMessages.transferTitleText)}
                 </div>
                 <Button
-                  className={`next ${commonClasses}`}
+                  className={`next standardMnemonic ${commonClasses}`}
                   label={intl.formatMessage(messages.mnemonicLabel15)}
-                  onClick={onNext}
+                  onClick={on15Words}
+                  skin={ButtonSkin}
+                  disabled={disableTransferFunds}
+                />
+                <Button
+                  className={`next yoroiPaper ${commonClasses}`}
+                  label={intl.formatMessage(messages.yoroiPaperLabel)}
+                  onClick={onPaper}
                   skin={ButtonSkin}
                   disabled={disableTransferFunds}
                 />

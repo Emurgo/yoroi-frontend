@@ -24,11 +24,12 @@ import type {
 declare var CONFIG : ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;
 
-type Props = InjectedDialogContainerProps & {
+type Props = {|
+  ...InjectedDialogContainerProps,
   mode: "regular" | "paper",
   introMessage?: string,
   onBack: void => void,
-};
+|};
 
 const NUMBER_OF_VERIFIED_ADDRESSES = 1;
 const NUMBER_OF_VERIFIED_ADDRESSES_PAPER = 5;
@@ -47,11 +48,15 @@ type WalletRestoreDialogContainerState = {
 export default class WalletRestoreDialogContainer
   extends Component<Props, WalletRestoreDialogContainerState> {
 
+  static defaultProps = {
+    introMessage: undefined
+  };
+
   state = {
     verifyRestore: undefined,
     submitValues: undefined,
     resolvedRecoveryPhrase: undefined,
-    notificationElementId: ''
+    notificationElementId: '',
   };
 
   onVerifiedSubmit = () => {
@@ -174,9 +179,15 @@ export default class WalletRestoreDialogContainer
       <WalletRestoreDialog
         mnemonicValidator={mnemonic => {
           if (isPaper) {
-            return wallets.isValidPaperMnemonic(mnemonic, wordsCount);
+            return wallets.isValidPaperMnemonic({
+              mnemonic,
+              numberOfWords: wordsCount
+            });
           }
-          return wallets.isValidMnemonic(mnemonic);
+          return wallets.isValidMnemonic({
+            mnemonic,
+            numberOfWords: wordsCount
+          });
         }}
         validWords={validWords}
         numberOfMnemonics={wordsCount}
@@ -204,5 +215,7 @@ function isPaperMode(mode: string): boolean {
 }
 
 function getWordsCount(mode: string): number {
-  return mode === 'paper' ? 21 : 15;
+  return mode === 'paper'
+    ? config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT
+    : config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT;
 }

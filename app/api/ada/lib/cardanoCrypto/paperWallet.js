@@ -16,6 +16,7 @@ import { RustModule } from './rustLoader';
 import {
   isValidEnglishAdaMnemonic
 } from './cryptoWallet';
+import config from '../../../../config';
 
 /**
  * Variation of the mnemonic to seed as defined by BIP39
@@ -32,11 +33,13 @@ const mnemonicToSeedHex = (mnemonic: string, password: ?string): string => {
 /** Check validty of paper mnemonic (including checksum) */
 export const isValidEnglishAdaPaperMnemonic = (
   phrase: string,
-  numberOfWords: ?number = 27
+  numberOfWords: number
 ) => {
   // Any password will return some valid unscrambled mnemonic
   // so we just pass a fake password to pass downstream validation
-  const fakePassword = numberOfWords === 21 ? 'xxx' : undefined;
+  const fakePassword = numberOfWords === config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT
+    ? 'xxx'
+    : undefined;
   const [unscrambled, unscrambledLen] =
     unscramblePaperAdaMnemonic(phrase, numberOfWords, fakePassword);
   if (unscrambled != null && unscrambledLen) {
@@ -49,14 +52,16 @@ export const isValidEnglishAdaPaperMnemonic = (
 /** Check validty of paper mnemonic (including checksum) */
 export const unscramblePaperAdaMnemonic = (
   phrase: string,
-  numberOfWords: ?number = 27,
+  numberOfWords: number,
   password?: string,
 ): [?string, number] => {
   const words = phrase.split(' ');
   if (words.length === numberOfWords) {
-    if (numberOfWords === 27) {
+    if (numberOfWords === config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT) {
       if (password != null) {
-        throw new Error('Password is not expected for a 27-word paper!');
+        throw new Error(
+          `Password is not expected for a ${config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT}-word paper!`
+        );
       }
       const [scrambledMnemonics, passwordMnemonics] = [words.slice(0, 18), words.slice(18)];
       try {
@@ -69,15 +74,20 @@ export const unscramblePaperAdaMnemonic = (
           password
         );
 
-        return [newEntropy.to_english_mnemonics(), 12];
+        return [
+          newEntropy.to_english_mnemonics(),
+          config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT
+        ];
       } catch (e) {
         Logger.error('Failed to unscramble paper mnemonic! ' + stringifyError(e));
         return [undefined, 0];
       }
     }
-    if (numberOfWords === 21) {
+    if (numberOfWords === config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT) {
       if (password == null) {
-        throw new Error('Password is expected for a 21-word paper!');
+        throw new Error(
+          `Password is expected for a ${config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT}-word paper!`
+        );
       }
       try {
         const entropy = mnemonicToEntropy(phrase);
@@ -85,7 +95,10 @@ export const unscramblePaperAdaMnemonic = (
           Buffer.from(entropy, 'hex'),
           password
         );
-        return [newEntropy.to_english_mnemonics(), 15];
+        return [
+          newEntropy.to_english_mnemonics(),
+          config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT
+        ];
       } catch (e) {
         Logger.error('Failed to unscramble paper mnemonic! ' + stringifyError(e));
         return [undefined, 0];

@@ -2,7 +2,10 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import TransferMasterKeyPage from '../../components/transfer/TransferMasterKeyPage';
+import { action, observable } from 'mobx';
+import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
+import DaedalusMasterKeyInput from '../../components/widgets/forms/DaedalusMasterKeyInput';
+import BaseTransferPage from '../../components/transfer/BaseTransferPage';
 
 const messages = defineMessages({
   step0: {
@@ -13,7 +16,7 @@ const messages = defineMessages({
 
 type Props = {|
   onSubmit: { masterKey: string, } => void,
-  onBack: Function,
+  onBack: void => void,
   classicTheme: boolean,
 |};
 
@@ -24,17 +27,40 @@ export default class DaedalusTransferMasterKeyFormPage extends Component<Props> 
     intl: intlShape.isRequired
   };
 
+  @observable masterKeyForm: void | ReactToolboxMobxForm;
+
+  @action
+  setMasterKeyFrom(form: ReactToolboxMobxForm) {
+    this.masterKeyForm = form;
+  }
+
+  submit = async () => {
+    if (this.masterKeyForm == null) {
+      throw new Error('DaedalusTransferMasterKeyFormPage form not set');
+    }
+    this.masterKeyForm.submit({
+      onSuccess: (form) => {
+        this.props.onSubmit(form.values());
+      },
+      onError: () => {}
+    });
+  };
+
   render() {
     const { intl } = this.context;
-    const { onBack, onSubmit, classicTheme } = this.props;
-
     return (
-      <TransferMasterKeyPage
-        onSubmit={onSubmit}
-        onBack={onBack}
+      <BaseTransferPage
+        onSubmit={this.submit}
+        onBack={this.props.onBack}
         step0={intl.formatMessage(messages.step0)}
-        classicTheme={classicTheme}
-      />
+        classicTheme={this.props.classicTheme}
+        isDisabled={this.masterKeyForm == null || this.masterKeyForm.hasError}
+      >
+        <DaedalusMasterKeyInput
+          setForm={(form) => this.setMasterKeyFrom(form)}
+          classicTheme={this.props.classicTheme}
+        />
+      </BaseTransferPage>
     );
   }
 }

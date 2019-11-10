@@ -11,7 +11,7 @@ export default class PaperWalletsActions {
   }> = new Action();
   submitUserPassword: Action<{ userPassword: string }> = new Action();
   submitCreate: Action<{}> = new Action();
-  backToCreate: Action<{}> = new Action();
+  backToCreate: Action<void> = new Action();
   submitVerify: Action<{}> = new Action();
   createPaperWallet: Action<{}> = new Action();
   createPdfDocument: Action<{}> = new Action();

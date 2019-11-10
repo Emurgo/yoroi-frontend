@@ -4,8 +4,14 @@ import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMet
 
 export default class YoroiTranferActions {
   startTransferFunds: Action<void> = new Action();
+  startTransferPaperFunds: Action<void> = new Action();
   setupTransferFundsWithMnemonic: Action<{
     recoveryPhrase: string,
+    publicDeriver: PublicDeriverWithCachedMeta,
+  }> = new Action();
+  setupTransferFundsWithPaperMnemonic: Action<{
+    recoveryPhrase: string,
+    paperPassword: string,
     publicDeriver: PublicDeriverWithCachedMeta,
   }> = new Action();
   backToUninitialized: Action<void> = new Action();

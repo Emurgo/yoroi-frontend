@@ -12,9 +12,10 @@ import LocalizableError, {
   localizedError
 } from '../../i18n/LocalizableError';
 import type {
-  TransferStatus,
+  TransferStatusT,
   TransferTx
 } from '../../types/TransferTypes';
+import { TransferStatus } from '../../types/TransferTypes';
 import {
   getAddressesKeys,
   generateTransferTx
@@ -46,7 +47,7 @@ type TransferFundsFunc = (
 
 export default class DaedalusTransferStore extends Store {
 
-  @observable status: TransferStatus = 'uninitialized';
+  @observable status: TransferStatusT = TransferStatus.UNINITIALIZED;
   @observable disableTransferFunds: boolean = true;
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
@@ -76,15 +77,15 @@ export default class DaedalusTransferStore extends Store {
   }
 
   _startTransferFunds = (): void => {
-    this._updateStatus('gettingMnemonics');
+    this._updateStatus(TransferStatus.GETTING_MNEMONICS);
   }
 
   _startTransferPaperFunds = (): void => {
-    this._updateStatus('gettingPaperMnemonics');
+    this._updateStatus(TransferStatus.GETTING_PAPER_MNEMONICS);
   }
 
   _startTransferMasterKey = (): void => {
-    this._updateStatus('gettingMasterKey');
+    this._updateStatus(TransferStatus.GETTING_MASTER_KEY);
   }
 
   /** @Attention:
@@ -121,7 +122,7 @@ export default class DaedalusTransferStore extends Store {
     }
     const nextInternalAddress = nextInternal.addressInfo.addr.Hash;
 
-    this._updateStatus('restoringAddresses');
+    this._updateStatus(TransferStatus.RESTORING_ADDRESSES);
     runInAction(() => {
       this.ws = new WebSocket(websocketUrl);
     });
@@ -148,10 +149,10 @@ export default class DaedalusTransferStore extends Store {
         const data = JSON.parse(event.data);
         Logger.info(`[ws::message] on: ${data.msg}`);
         if (data.msg === MSG_TYPE_RESTORE) {
-          this._updateStatus('checkingAddresses');
+          this._updateStatus(TransferStatus.CHECKING_ADDRESSES);
           const checker = RustModule.WalletV2.DaedalusAddressChecker.new(wallet);
           const addressKeys = getAddressesKeys({ checker, fullUtxo: data.addresses });
-          this._updateStatus('generatingTx');
+          this._updateStatus(TransferStatus.GENERATING_TX);
 
           const transferTx = await generateTransferTx({
             outputAddr: nextInternalAddress,
@@ -162,12 +163,12 @@ export default class DaedalusTransferStore extends Store {
           runInAction(() => {
             this.transferTx = transferTx;
           });
-          this._updateStatus('readyToTransfer');
+          this._updateStatus(TransferStatus.READY_TO_TRANSFER);
         }
       } catch (error) {
         Logger.error(`DaedalusTransferStore::_setupTransferWebSocket ${stringifyError(error)}`);
         runInAction(() => {
-          this.status = 'error';
+          this.status = TransferStatus.ERROR;
           this.error = localizedError(error);
         });
       }
@@ -182,7 +183,7 @@ export default class DaedalusTransferStore extends Store {
         );
 
         runInAction(() => {
-          this.status = 'error';
+          this.status = TransferStatus.ERROR;
           this.error = new WebSocketRestoreError();
         });
       } else {
@@ -229,12 +230,12 @@ export default class DaedalusTransferStore extends Store {
   }
 
   _backToUninitialized = (): void => {
-    this._updateStatus('uninitialized');
+    this._updateStatus(TransferStatus.UNINITIALIZED);
   }
 
   /** Updates the status that we show to the user as transfer progresses */
   @action.bound
-  _updateStatus(s: TransferStatus): void {
+  _updateStatus(s: TransferStatusT): void {
     this.status = s;
   }
 
@@ -271,7 +272,7 @@ export default class DaedalusTransferStore extends Store {
 
   @action.bound
   _reset(): void {
-    this.status = 'uninitialized';
+    this.status = TransferStatus.UNINITIALIZED;
     this.error = null;
     this.transferTx = null;
     this.transferFundsRequest.reset();

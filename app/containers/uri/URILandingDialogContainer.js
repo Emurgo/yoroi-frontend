@@ -11,11 +11,11 @@ import URIInvalidDialog from '../../components/uri/URIInvalidDialog';
 
 import type { UriParams } from '../../utils/URIHandling';
 
-type Props = InjectedDialogContainerProps & {
+type Props = {|
+  ...InjectedDialogContainerProps,
   onConfirm: void => void,
   uriParams: ?UriParams,
-};
-
+|};
 
 @observer
 export default class URILandingDialogContainer extends Component<Props> {

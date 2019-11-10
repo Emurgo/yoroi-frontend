@@ -38,7 +38,6 @@ import config from '../../../../config';
 
 declare var CONFIG: ConfigType;
 const addressesLimit = CONFIG.app.addressRequestSize;
-const transactionsLimit: number = config.wallets.TRANSACTION_REQUEST_SIZE;
 
 /**
  * Makes calls to Yoroi backend service
@@ -248,7 +247,7 @@ async function _batchHistoryByTransaction(
   const transactions = previousTxs.concat(history);
 
   // If we reached the API limit, call API again to get more results
-  if (history.length === transactionsLimit) {
+  if (history.length === config.wallets.TRANSACTION_REQUEST_SIZE) {
     const newBest = getLatestTransaction(history);
     if (newBest === undefined) {
       // if we don't have a single tx in a block

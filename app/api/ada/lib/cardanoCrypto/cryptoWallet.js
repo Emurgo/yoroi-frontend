@@ -16,7 +16,7 @@ export const generateAdaMnemonic: void => Array<string> = () => generateMnemonic
 /** Check validty of mnemonic (including checksum) */
 export const isValidEnglishAdaMnemonic = (
   phrase: string,
-  numberOfWords: ?number = 15
+  numberOfWords: number
 ) => {
   // Note: splitting on spaces will not work for Japanese-encoded mnemonics who use \u3000 instead
   // We only use English mnemonics in Yoroi so this is okay.
