@@ -187,6 +187,8 @@
   "settings.support.reportProblem.link": "Permintaan dukungan",
   "settings.support.reportProblem.title": "Melaporkan masalah",
   "testnet.label.message": "PERINGATAN: Ini adalah jaringan {network}. ADA tidak memiliki nilai moneter di sini. Untuk informasi lebih lanjut, lihat FAQ di {faqLink}",
+  "testnet.shelley.label.message": "YOU ARE ON TESTNET NETWORK ({network}).",
+  "transfer.form.errors.invalidRecoveryPhrase": "Frase pemulihan tidak valid",
   "transfer.form.instructions.step1.text": "Diperlukan sekitar 1 menit untuk mengembalikan saldo Anda. Pada langkah berikutnya, Anda akan diberikan transaksi yang akan memindahkan semua dana Anda. Harap tinjau detail transaksi dengan cermat. Anda harus membayar biaya transaksi standar pada jaringan Cardano untuk melakukan transaksi.",
   "transfer.form.masterkey.input.hint": "Masukkan master key",
   "transfer.form.masterkey.input.label": "Master key",
