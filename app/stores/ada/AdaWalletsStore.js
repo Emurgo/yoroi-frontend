@@ -89,7 +89,9 @@ export default class AdaWalletsStore extends WalletStore {
 
   // =================== VALIDITY CHECK ==================== //
 
-  isValidAddress = (address: string): Promise<boolean> => this.api.ada.isValidAddress({ address });
+  isValidAddress: string => Promise<boolean> = (
+    address: string
+  ): Promise<boolean> => this.api.ada.isValidAddress({ address });
 
   isValidMnemonic: {|
     mnemonic: string,
@@ -108,11 +110,11 @@ export default class AdaWalletsStore extends WalletStore {
     walletName: string,
     walletPassword: string,
   |}) => {
-    await this._restore(params);
+    await this.restore(params);
   };
 
   // =================== NOTIFICATION ==================== //
-  showLedgerNanoWalletIntegratedNotification = (): void => {
+  showLedgerNanoWalletIntegratedNotification: void => void = (): void => {
     const notification: Notification = {
       id: globalMessages.ledgerNanoSWalletIntegratedNotificationMessage.id,
       message: globalMessages.ledgerNanoSWalletIntegratedNotificationMessage,
@@ -121,7 +123,7 @@ export default class AdaWalletsStore extends WalletStore {
     this.actions.notifications.open.trigger(notification);
   }
 
-  showTrezorTWalletIntegratedNotification = (): void => {
+  showTrezorTWalletIntegratedNotification: void => void = (): void => {
     const notification: Notification = {
       id: globalMessages.trezorTWalletIntegratedNotificationMessage.id,
       message: globalMessages.trezorTWalletIntegratedNotificationMessage,
@@ -130,7 +132,7 @@ export default class AdaWalletsStore extends WalletStore {
     this.actions.notifications.open.trigger(notification);
   }
 
-  showWalletCreatedNotification = (): void => {
+  showWalletCreatedNotification: void => void = (): void => {
     const notification: Notification = {
       id: globalMessages.walletCreatedNotificationMessage.id,
       message: globalMessages.walletCreatedNotificationMessage,
@@ -139,7 +141,7 @@ export default class AdaWalletsStore extends WalletStore {
     this.actions.notifications.open.trigger(notification);
   }
 
-  showWalletRestoredNotification = (): void => {
+  showWalletRestoredNotification: void => void = (): void => {
     const notification: Notification = {
       id: globalMessages.walletRestoredNotificationMessage.id,
       message: globalMessages.walletRestoredNotificationMessage,

@@ -43,7 +43,7 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
     await this.props.stores.profile.getProfileLocaleRequest.execute();
   }
 
-  onSelectLanguage = (values: { locale: string }) => {
+  onSelectLanguage = (values: {| locale: string |}) => {
     this.props.actions.profile.updateTentativeLocale.trigger(values);
   };
 

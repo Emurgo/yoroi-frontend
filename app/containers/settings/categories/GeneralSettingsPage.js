@@ -16,15 +16,15 @@ import { getExplorers } from '../../../domain/Explorer';
 @observer
 export default class GeneralSettingsPage extends Component<InjectedProps> {
 
-  onSelectLanguage = (values: { locale: string }) => {
+  onSelectLanguage = (values: {| locale: string |}) => {
     this.props.actions.profile.updateLocale.trigger(values);
   };
 
-  onSelecExplorer = (values: { explorer: ExplorerType }) => {
+  onSelecExplorer = (values: {| explorer: ExplorerType |}) => {
     this.props.actions.profile.updateSelectedExplorer.trigger(values);
   };
 
-  selectTheme = (values: { theme: string }) => {
+  selectTheme = (values: {| theme: string |}) => {
     this.props.actions.profile.updateTheme.trigger(values);
   };
 
@@ -32,7 +32,7 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
     this.props.actions.profile.exportTheme.trigger();
   };
 
-  getThemeVars = (theme: { theme: string }) => (
+  getThemeVars = (theme: {| theme: string |}) => (
     this.props.stores.profile.getThemeVars(theme)
   )
 

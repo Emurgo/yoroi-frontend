@@ -127,8 +127,8 @@ export default class WalletReceivePage extends Component<Props, State> {
 
         {uiDialogs.isOpen(URIGenerateDialog) ? (
           <URIGenerateDialog
-            walletAddress={uiDialogs.getParam('address')}
-            amount={uiDialogs.getParam('amount')}
+            walletAddress={uiDialogs.getParam<string>('address')}
+            amount={uiDialogs.getParam<number>('amount')}
             onClose={() => actions.dialogs.closeActiveDialog.trigger()}
             onGenerate={(address, amount) => { this.generateURI(address, amount); }}
             classicTheme={profile.isClassicTheme}
@@ -140,12 +140,12 @@ export default class WalletReceivePage extends Component<Props, State> {
 
         {uiDialogs.isOpen(URIDisplayDialog) ? (
           <URIDisplayDialog
-            address={uiDialogs.getParam('address')}
-            amount={uiDialogs.getParam('amount')}
+            address={uiDialogs.getParam<string>('address')}
+            amount={uiDialogs.getParam<number>('amount')}
             onClose={() => actions.dialogs.closeActiveDialog.trigger()}
             onBack={() => this.openURIGenerateDialog(
-              uiDialogs.getParam('address'),
-              uiDialogs.getParam('amount'),
+              uiDialogs.getParam<string>('address'),
+              uiDialogs.getParam<number>('amount'),
             )}
             onCopyAddressTooltip={(elementId) => {
               if (!uiNotifications.isOpen(elementId)) {

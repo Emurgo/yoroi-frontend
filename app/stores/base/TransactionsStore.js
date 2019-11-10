@@ -133,7 +133,7 @@ export default class TransactionsStore extends Store {
   }
 
   /** Refresh transaction data for all wallets and update wallet balance */
-  @action refreshTransactionData = (
+  @action refreshTransactionData: PublicDeriverWithCachedMeta => void = (
     basePubDeriver: PublicDeriverWithCachedMeta,
   ): void => {
     const walletsStore = this.stores.substores[environment.API].wallets;
@@ -206,7 +206,7 @@ export default class TransactionsStore extends Store {
       .catch(() => {}); // Do nothing. It's logged in the api call
   };
 
-  @action refreshLocal = (
+  @action refreshLocal: (PublicDeriver & IGetAllUtxos & IGetLastSyncInfo) => void = (
     publicDeriver: PublicDeriver & IGetAllUtxos & IGetLastSyncInfo,
   ): void => {
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
@@ -233,7 +233,7 @@ export default class TransactionsStore extends Store {
   }
 
   /** Add a new public deriver to track and refresh the data */
-  @action addObservedWallet = (
+  @action addObservedWallet: PublicDeriverWithCachedMeta => void = (
     publicDeriver: PublicDeriverWithCachedMeta
   ): void => {
     this.transactionsRequests.push({

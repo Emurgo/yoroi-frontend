@@ -85,7 +85,7 @@ export default class WalletAddPage extends Component<Props> {
         />
       );
     } else if (uiDialogs.isOpen(WalletRestoreDialog)) {
-      const mode = uiDialogs.getParam('restoreType') || 'regular';
+      const mode = uiDialogs.getParam<string>('restoreType') || 'regular';
       if ((mode !== 'regular') && (mode !== 'paper')) {
         throw new Error('Invalid restore type');
       }

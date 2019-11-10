@@ -93,7 +93,7 @@ export default class LoadingStore extends Store {
   }
 
   @action
-  validateUriPath = async (): Promise<void> => {
+  validateUriPath: void => Promise<void> = async (): Promise<void> => {
     if (this.fromUriScheme) {
       const uriParams = await getURIParameters(
         decodeURIComponent(this._originRoute.location),
@@ -109,7 +109,7 @@ export default class LoadingStore extends Store {
    * Need to clear any data inijected by the URI after we've applied it
    */
   @action
-  resetUriParams = (): void => {
+  resetUriParams: void => void = (): void => {
     this._uriParams = null;
     this._originRoute = { route: '', location: '' };
   }

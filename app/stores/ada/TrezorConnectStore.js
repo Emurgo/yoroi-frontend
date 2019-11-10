@@ -284,7 +284,7 @@ export default class TrezorConnectStore
     return true;
   };
 
-  _handleConnectError = (error): void => {
+  _handleConnectError = (error: Error): void => {
     Logger.error(`TrezorConnectStore::_handleConnectError ${stringifyError(error)}`);
 
     this.hwDeviceInfo = undefined;
