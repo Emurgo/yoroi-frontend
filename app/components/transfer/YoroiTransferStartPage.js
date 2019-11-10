@@ -110,7 +110,7 @@ export default class YoroiTransferStartPage extends Component<Props> {
                   {intl.formatMessage(globalMessages.transferTitleText)}
                 </div>
                 <Button
-                  className={`next 15words ${commonClasses}`}
+                  className={`next standardMnemonic ${commonClasses}`}
                   label={intl.formatMessage(messages.mnemonicLabel15)}
                   onClick={on15Words}
                   skin={ButtonSkin}

@@ -10,7 +10,7 @@ Feature: Transfer Yoroi Wallet funds
     Given There is a wallet stored named empty-wallet
     And I am on the Yoroi Transfer start screen
     And I should see the "CREATE YOROI WALLET" button disabled
-    When I click on the 15words button on the Yoroi Transfer start screen
+    When I click on the standardMnemonic button on the Yoroi Transfer start screen
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                           |
     | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow monster |
@@ -24,7 +24,7 @@ Feature: Transfer Yoroi Wallet funds
     # /features/mock-chain/mockImporter.js
     Given There is a wallet stored named empty-wallet
     And I am on the Yoroi Transfer start screen
-    When I click on the 15words button on the Yoroi Transfer start screen
+    When I click on the standardMnemonic button on the Yoroi Transfer start screen
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                           |
     | dragon mango general very inmate idea rabbit pencil element bleak term cart critic kite pill |
@@ -46,7 +46,7 @@ Feature: Transfer Yoroi Wallet funds
   Scenario: Wallet changes after transaction is generated (IT-113)
     Given There is a wallet stored named empty-wallet
     And I am on the Yoroi Transfer start screen
-    When I click on the 15words button on the Yoroi Transfer start screen
+    When I click on the standardMnemonic button on the Yoroi Transfer start screen
     And I enter the recovery phrase:
     | recoveryPhrase                                                                            |
     | final autumn bacon fold horse scissors act pole country focus task blush basket move view |
@@ -76,7 +76,7 @@ Feature: Transfer Yoroi Wallet funds
   Scenario: Transfer UI should be reset when user leaves the transfer page (IT-115)
     Given There is a wallet stored named empty-wallet
     And I am on the Yoroi Transfer start screen
-    When I click on the 15words button on the Yoroi Transfer start screen
+    When I click on the standardMnemonic button on the Yoroi Transfer start screen
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                           |
     | dragon mango general very inmate idea rabbit pencil element bleak term cart critic kite pill |
