@@ -571,7 +571,7 @@ test('Utxo created and used in same sync', async (done) => {
  * However, the diff is too big to reasonably compare with your eyes
  * Therefore, we test each table separately
  */
-function compareObject(obj1: { tables: any }, obj2: { tables: any }) {
+function compareObject(obj1: { tables: any }, obj2: { tables: any }): void {
   for (const prop of Object.keys(obj1)) {
     if (obj1[prop] !== undefined && obj2[prop] === undefined) {
       expect(stableStringify(obj1)).toEqual(stableStringify(obj2));

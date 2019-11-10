@@ -118,7 +118,7 @@ export class GetUtxoTxOutputsWithTx {
   static baseQuery(
     db: lf$Database,
     predicate: (txTable: lf$schema$Table, outputTable: lf$schema$Table) => lf$Predicate,
-  ) {
+  ): lf$query$Select {
     const txTable = db.getSchema().table(
       GetUtxoTxOutputsWithTx.ownTables[TransactionSchema.name].name
     );

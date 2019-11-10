@@ -7,7 +7,7 @@ class Module {
   _wasmv2: WasmV2;
   _wasmv3: WasmV3;
 
-  async load() {
+  async load(): Promise<void> {
     this._wasmv2 = await import('cardano-wallet-browser');
     this._wasmv3 = await import('js-chain-libs');
   }

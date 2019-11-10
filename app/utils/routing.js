@@ -19,7 +19,7 @@ export const matchRoute = (
  */
 type ParamsT = ?{ [key: string]: Array<number|string>|number|string };
 export const buildRoute = (pattern: string, params: ParamsT) => {
-  function toArray(val) {
+  function toArray(val): Array<number | string> {
     return Array.isArray(val) ? val : [val];
   }
   const reRepeatingSlashes = /\/+/g; // '/some//path'

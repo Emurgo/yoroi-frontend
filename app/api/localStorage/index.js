@@ -155,7 +155,7 @@ export default class LocalStorageApi {
 
   unsetHideBalance = (): Promise<void> => removeLocalItem(storageKeys.HIDE_BALANCE);
 
-  async reset() {
+  async reset(): Promise<void> {
     await this.unsetUserLocale();
     await this.unsetTermsOfUseAcceptance();
     await this.unsetUserTheme();

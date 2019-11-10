@@ -294,7 +294,7 @@ export async function updateTransactions(
   checkAddressesInUse: FilterFunc,
   getTransactionsHistoryForAddresses: HistoryFunc,
   getBestBlock: BestBlockFunc,
-) {
+): Promise<void> {
   const derivationTables = publicDeriver.getConceptualWallet().getDerivationTables();
   let lastSyncInfo = undefined;
   try {

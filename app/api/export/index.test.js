@@ -46,7 +46,7 @@ test('convert random nonsense to CSV file body', async () => {
   expect(fileType).toEqual('csv');
 });
 
-async function extractStringFromBlob(b): Promise<string> {
+async function extractStringFromBlob(b: Blob): Promise<string> {
   return new Promise(resolve => {
     const reader = new FileReader();
     reader.addEventListener('loadend', () => {
