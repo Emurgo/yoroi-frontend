@@ -91,7 +91,7 @@ module.exports = {
     'react/jsx-indent': 1,
     'flowtype/define-flow-type': 1,
     'flowtype/use-flow-type': 1,
-    'flowtype/require-valid-file-annotation': 2,
+    'flowtype/require-valid-file-annotation': [2, 'always'],
     'global-require': 'off',
     'no-await-in-loop': 0,
     'no-unused-expressions': 0,

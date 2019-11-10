@@ -1,3 +1,5 @@
+// @flow
+
 const commonConfig = require('./commonConfig');
 
 const path = require('path');
@@ -9,7 +11,7 @@ const customPath = path.join(__dirname, './customPublicPath');
 const hotScript =
   'webpack-hot-middleware/client?path=__webpack_hmr&dynamicPublicPath=true';
 
-const baseDevConfig = (networkName) => ({
+const baseDevConfig = (networkName /*: string */) => ({
   mode: 'development',
   optimization: commonConfig.optimization,
   node: commonConfig.node,

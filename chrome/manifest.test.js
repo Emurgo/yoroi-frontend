@@ -1,3 +1,5 @@
+// @flow
+
 import buildManifest from './manifest.template';
 import { SEIZA_URL, SEIZA_FOR_YOROI_URL } from './manifestEnvs';
 
