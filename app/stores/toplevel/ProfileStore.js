@@ -304,6 +304,10 @@ export default class ProfileStore extends Store {
     return this.currentTheme === THEMES.YOROI_CLASSIC;
   }
 
+  @computed get isShelleyTestnetTheme(): boolean {
+    return environment.isShelley();
+  }
+
   /* @Returns Merged Pre-Built Theme and Custom Theme */
   @computed get currentThemeVars() {
     const { result } = this.getCustomThemeRequest.execute();

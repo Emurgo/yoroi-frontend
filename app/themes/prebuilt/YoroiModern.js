@@ -1,6 +1,6 @@
 // @flow
 //  ==== Theme: Yoroi Modern === //
-
+import environment from '../../environment';
 import common from './Common';
 
 // FONTS
@@ -194,7 +194,7 @@ const modalMargin = {
   left: 40,
 };
 
-export default {
+const YoroiModern = {
   // COMMON-THEME-INDEPENDENT
   ...common,
 
@@ -421,3 +421,29 @@ export default {
 
   '--theme-warning-color': `#FF1351`,
 };
+
+// *************************************************************
+// Here we are overriding YoroiModern theme for Shelley Testnet
+// Creating a new theme is costly because not only color
+// changes but layout is different in different theme.
+// e.g for new theme we need to override :global(.NewTheme)
+// is needed in UI style files or :global(.OldTheme, .NewTheme)
+// *************************************************************
+let ShelleyTestnetOverrides = {};
+if (environment.isShelley()) {
+  ShelleyTestnetOverrides = {
+    // Toolbar
+    '--theme-topbar-background-color': 'linear-gradient(225deg, #F14D78 0%, #1A44B7 100%)',
+    // Button
+    '--theme-button-primary-background-color': '#3154CB',
+    '--theme-button-primary-background-color-hover': '#4760FF',
+    '--theme-button-primary-background-color-active': '#3154CB',
+    '--theme-button-primary-background-color-disabled': 'rgba(49,84,203,0.35)',
+    // Language Selection
+    '--theme-select-language-color': '#3154CB',
+    // Top banner
+    '--theme-banner-warning-background-color': 'linear-gradient(41deg, #1A44B7 0%, #4760FF 100%)'
+  };
+}
+
+export default Object.assign(YoroiModern, ShelleyTestnetOverrides);

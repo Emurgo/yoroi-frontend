@@ -80,14 +80,16 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
           error={setSelectedExplorerRequest.error}
         />
         {uriSettings}
-        <ThemeSettingsBlock
-          currentTheme={currentTheme}
-          selectTheme={this.selectTheme}
-          getThemeVars={this.getThemeVars}
-          exportTheme={this.exportTheme}
-          hasCustomTheme={this.hasCustomTheme}
-          onExternalLinkClick={handleExternalLinkClick}
-        />
+        {!environment.isShelley() &&
+          <ThemeSettingsBlock
+            currentTheme={currentTheme}
+            selectTheme={this.selectTheme}
+            getThemeVars={this.getThemeVars}
+            exportTheme={this.exportTheme}
+            hasCustomTheme={this.hasCustomTheme}
+            onExternalLinkClick={handleExternalLinkClick}
+          />
+        }
         <AboutYoroiSettingsBlock />
       </div>
     );
