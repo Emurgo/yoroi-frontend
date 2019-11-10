@@ -187,6 +187,8 @@
   "settings.support.reportProblem.link": "Запрос в службу поддержки",
   "settings.support.reportProblem.title": "Сообщить о проблеме",
   "testnet.label.message": "ПРЕДУПРЕЖДЕНИЕ: Это {network}. ADA не имеет денежной стоимости в {network}. Для получения дополнительной информации, ознакомьтесь с разделом часто задаваемых вопросов {faqLink}",
+  "testnet.shelley.label.message": "YOU ARE ON TESTNET NETWORK ({network}).",
+  "transfer.form.errors.invalidRecoveryPhrase": "Неверная фраза восстановления",
   "transfer.form.instructions.step1.text": "Восстановление Вашего баланса займет около 1 минуты. На следующем этапе Вам будет показана транзакция, которая переместит все Ваши средства. Пожалуйста, тщательно просмотрите детали транзакции. Вам потребуется оплатить стандартную комиссию в сети Cardano за проведение транзакции.",
   "transfer.form.masterkey.input.hint": "Ввести мастер-ключ",
   "transfer.form.masterkey.input.label": "Мастер-ключ",
