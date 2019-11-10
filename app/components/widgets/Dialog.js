@@ -1,24 +1,36 @@
+// @flow
 import React, { Component } from 'react';
 import _ from 'lodash';
+import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import type { Node } from 'react';
+import type { Node, Element } from 'react';
 import { Modal } from 'react-polymorph/lib/components/Modal';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { ModalSkin } from 'react-polymorph/lib/skins/simple/ModalSkin';
 import styles from './Dialog.scss';
 
-type Props = {
-  title?: string,
-  children?: Node,
-  actions?: Node,
-  closeButton?: Node,
-  backButton?: Node,
-  className?: string,
-  onClose?: Function,
-  closeOnOverlayClick?: boolean,
+type ActionType = {
+  label: string,
+  onClick: Function,
+  primary?: boolean,
+  disabled?: boolean,
+  className?: ?string
 };
 
+type Props = {|
+  title?: string,
+  children?: Node,
+  actions?: Array<ActionType>,
+  closeButton?: Element<any>,
+  backButton?: Node,
+  className?: string,
+  onClose?: ?Function,
+  closeOnOverlayClick?: boolean,
+  classicTheme: boolean
+|};
+
+@observer
 export default class Dialog extends Component<Props> {
   static defaultProps = {
     title: undefined,
@@ -41,7 +53,9 @@ export default class Dialog extends Component<Props> {
       className,
       closeButton,
       backButton,
+      classicTheme
     } = this.props;
+    const secondaryButton = classicTheme ? 'flat' : 'outlined';
 
     return (
       <Modal
@@ -51,29 +65,33 @@ export default class Dialog extends Component<Props> {
         skin={ModalSkin}
       >
 
-        <div className={classnames([styles.dialogWrapper, className])}>
-          {title && (
-            <div className={styles.title}>
-              <h1>{title}</h1>
-            </div>)
+        <div className={classnames([styles.component, className])}>
+          {(title != null && title !== '')
+            ? (
+              <div className={styles.title}>
+                <h1>{title}</h1>
+              </div>)
+            : null
           }
 
-          {children && (
-            <div className={styles.content}>
-              {children}
-            </div>)
+          {children != null
+            ? (
+              <div className={styles.content}>
+                {children}
+              </div>)
+            : null
           }
 
-          {actions && (
+          {actions && actions.length > 0 && (
             <div className={styles.actions}>
-              {_.map(actions, (action, key) => {
+              {_.map(actions, (action, i: number) => {
                 const buttonClasses = classnames([
-                  action.className ? action.className : null,
-                  action.primary ? 'primary' : 'flat',
+                  action.className != null ? action.className : null,
+                  action.primary === true ? 'primary' : secondaryButton,
                 ]);
                 return (
                   <Button
-                    key={key}
+                    key={i}
                     className={buttonClasses}
                     label={action.label}
                     onClick={action.onClick}

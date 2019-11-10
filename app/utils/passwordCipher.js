@@ -1,20 +1,16 @@
 // @flow
 
-import { PasswordProtect } from 'rust-cardano-crypto';
 import cryptoRandomString from 'crypto-random-string';
-import { WrongPassphraseError, CardanoCryptoError } from '../api/ada/lib/cardanoCrypto/cryptoErrors';
+import { RustModule } from '../api/ada/lib/cardanoCrypto/rustLoader';
+import { WrongPassphraseError } from '../api/ada/lib/cardanoCrypto/cryptoErrors';
 
 export function encryptWithPassword(
   password: string,
   bytes: Uint8Array
 ): string {
-  const salt = Buffer.from(cryptoRandomString(2 * 32), 'hex');
-  const nonce = Buffer.from(cryptoRandomString(2 * 12), 'hex');
-  const formattedPassword: Uint8Array = new TextEncoder().encode(password);
-  const encryptedBytes = PasswordProtect.encryptWithPassword(formattedPassword, salt, nonce, bytes);
-  if (!encryptedBytes) {
-    throw new CardanoCryptoError('Result not defined');
-  }
+  const salt = Buffer.from(cryptoRandomString({ length: 2 * 32 }), 'hex');
+  const nonce = Buffer.from(cryptoRandomString({ length: 2 * 12 }), 'hex');
+  const encryptedBytes = RustModule.Wallet.password_encrypt(password, salt, nonce, bytes);
   const encryptedHex = Buffer.from(encryptedBytes).toString('hex');
   return encryptedHex;
 }
@@ -24,12 +20,11 @@ export function decryptWithPassword(
   encryptedHex: string
 ): Uint8Array {
   const encryptedBytes = Buffer.from(encryptedHex, 'hex');
-  const formattedPassword: Uint8Array = new TextEncoder().encode(password);
-  const decryptedBytes: ?Uint8Array | false =
-    PasswordProtect.decryptWithPassword(formattedPassword, encryptedBytes);
-  if (!decryptedBytes) {
+  let decryptedBytes;
+  try {
+    decryptedBytes = RustModule.Wallet.password_decrypt(password, encryptedBytes);
+  } catch (err) {
     throw new WrongPassphraseError();
-  } else {
-    return decryptedBytes;
   }
+  return decryptedBytes;
 }

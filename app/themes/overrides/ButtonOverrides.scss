@@ -1,8 +1,13 @@
 // Css module overrides go here …
 
 .root {
-  border-radius: 0;
+  font-size: 16px;
+  height: 52px;
+  border-radius: 8px;
+  padding: 12px 20px;
   position: relative;
+  text-transform: uppercase;
+  width: 400px;
 }
 
 :global {
@@ -28,25 +33,28 @@
     }
   }
 
-  .flat {
+  .outlined {
+    background: transparent;
     &[disabled] {
-      background: var(--theme-button-flat-background-color-disabled);
-      color: var(--theme-button-flat-text-color-disabled);
+      color: var(--theme-button-outlined-text-color-disabled);
+      border: 2px solid var(--theme-button-outlined-background-color-disabled);
       cursor: default !important;
       &:hover,
       &:active {
-        background: var(--theme-button-flat-background-color-disabled);
+        background: transparent;
       }
     }
     &:not([disabled]) {
-      background-color: var(--theme-button-flat-background-color);
-      color: var(--theme-button-flat-text-color);
+      color: var(--theme-button-outlined-text-color);
+      border: 2px solid var(--theme-button-outlined-border-color-hover);
       &:hover {
-        background-color: var(--theme-button-flat-background-color-hover);
-        color: var(--theme-button-flat-text-color);
+        background-color: var(--theme-button-outlined-background-color-hover);
+        color: var(--theme-button-outlined-text-color);
       }
       &:active {
-        background-color: var(--theme-button-flat-background-color-active);
+        background-color: var(--theme-button-outlined-background-color-active);
+        border: 2px solid var(--theme-button-outlined-background-color-active);
+        color: var(--theme-button-outlined-active-text-color);
       }
     }
   }

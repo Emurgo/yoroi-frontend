@@ -1,7 +1,33 @@
 // Css module overrides go here …
 
+.root {
+  align-items: center;
+
+  // Remove once this PR is merged
+  // https://github.com/input-output-hk/react-polymorph/pull/118
+  width: fit-content;
+  
+  .checked {
+    background-color: var(--rp-checkbox-check-bg-color);
+    border: 0px solid black;
+  
+    &:after {
+      top: 6px;
+      left: 11px;
+    }
+  }
+}
+  
 .check {
+  width: 28px;
+  height: 28px;
+  border: (--rp-checkbox-border);
   // manually setting the z-index is a temporary fix until this PR is merged & we upgrade the lib
   // https://github.com/input-output-hk/react-polymorph/pull/99
   z-index: 1;
+}
+  
+.label {
+  line-height: 1.5;
+  letter-spacing: 0;
 }

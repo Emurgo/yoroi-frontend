@@ -2,34 +2,100 @@
 @import '../../../themes/mixins/error-message';
 
 .component {
-  align-items: center;
   display: flex;
   height: 100%;
   justify-content: center;
+
+  .centeredBox {
+    overflow: visible;
+    width: 400px;
+  }
+
+  .submitButton,
+  .submitButtonSpinning {
+    display: block !important;
+    margin: 0 auto;
+    width: 100% !important;
+  }
+  
+  .submitButtonSpinning {
+    @include loading-spinner("../../../assets/images/spinner-light.svg");
+  }
+  
+  .error {
+    @include error-message;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
 }
 
-.centeredBox {
-  overflow: visible;
-  width: 400px;
+:global {
+  .LanguageSelectionForm_languageSelect.SelectOverrides_isOpen .SelectOverrides_selectInput {
+    input, input:hover {
+      border-color: var(--theme-select-language-color);
+      color: var(--theme-select-language-color);
+    }
+
+    &::after {
+      background-color: var(--theme-select-language-color)!important;
+    }
+  }
+
+  .LanguageSelectionForm_languageSelect {
+    .InputOverrides_input:not([disabled]):focus,
+    .InputOverrides_input:not([disabled]):active,
+    .InputOverrides_input:not([disabled]):focus:hover,
+    .InputOverrides_input:not([disabled]):active:hover {
+      border-color: var(--theme-select-language-color);
+    }
+  }
 }
 
-.languageSelect {
-  margin-bottom: 20px;
+:global(.YoroiClassic) .component {
+  align-items: center;
+  
+  .languageSelect {
+    margin-bottom: 20px;
+  }  
 }
 
-.submitButton,
-.submitButtonSpinning {
-  display: block !important;
-  margin: 0 auto;
-  width: 100% !important;
+:global(.YoroiModern) .component {
+  padding-top: 222px;
+
+  .languageSelect {
+    margin-bottom: 10px;
+  
+    label {
+      width: 100%;
+      left: 0;
+      top: -72px;
+      text-align: center;
+      font-size: 16px;
+      text-transform: uppercase;
+      font-family: var(--rp-theme-font-medium);
+    }
+  }  
 }
 
-.submitButtonSpinning {
-  @include loading-spinner("../../../assets/images/spinner-light.svg");
-}
+.info {
+  color: var(--theme-terms-of-use-text-color);
+  text-align: justify;
+  margin-top: 30px;
+  background-color: var(--theme-bordered-box-background-color);
+  border-radius: 8px;
+  padding: 16px;
 
-.error {
-  @include error-message;
-  text-align: center;
-  margin-bottom: 1rem;
+  h1 {
+    color: var(--rp-formfield-label-text-color);
+    font-family: var(--font-medium);
+    font-size: 14px;
+    margin-bottom: 11px;
+  }
+
+  p {
+    font-family: var(--font-regular);
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    line-height: 1.38;
+  }
 }

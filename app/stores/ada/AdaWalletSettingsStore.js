@@ -3,16 +3,15 @@ import { observable, action } from 'mobx';
 import _ from 'lodash';
 import WalletSettingsStore from '../base/WalletSettingsStore';
 import Request from '../lib/LocalizedRequest';
-import type { UpdateWalletPasswordResponse, UpdateWalletResponse } from '../../api/common';
+import type { UpdateWalletPasswordFunc, UpdateWalletFunc } from '../../api/ada';
 
 export default class AdaWalletSettingsStore extends WalletSettingsStore {
 
-  @observable updateWalletMetaRequest: Request<UpdateWalletResponse> = new Request(
-    this.api.ada.updateWalletMeta
-  );
-  @observable updateWalletPasswordRequest: Request<UpdateWalletPasswordResponse> = new Request(
-    this.api.ada.updateWalletPassword
-  );
+  @observable updateWalletMetaRequest: Request<UpdateWalletFunc>
+    = new Request<UpdateWalletFunc>(this.api.ada.updateWalletMeta);
+
+  @observable updateWalletPasswordRequest: Request<UpdateWalletPasswordFunc>
+    = new Request<UpdateWalletPasswordFunc>(this.api.ada.updateWalletPassword);
 
   setup() {
     const a = this.actions.ada.walletSettings;
@@ -30,14 +29,14 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
       newPassword
     }: {
       walletId: string,
-      oldPassword: ?string,
-      newPassword: ?string
+      oldPassword: string,
+      newPassword: string
     }
   ): Promise<void> => {
     await this.updateWalletPasswordRequest.execute({ walletId, oldPassword, newPassword });
     this.actions.dialogs.closeActiveDialog.trigger();
     this.updateWalletPasswordRequest.reset();
-    this.stores.substores.ada.wallets.refreshWalletsData();
+    await this.stores.substores.ada.wallets.refreshWalletsData();
   };
 
   /** Updates meta-parameters for the internal wallet representation */

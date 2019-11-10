@@ -1,0 +1,11 @@
+.component {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  position: relative;
+
+  &::-webkit-scrollbar-button {
+    width: 7px;
+    display: block;
+  }
+}

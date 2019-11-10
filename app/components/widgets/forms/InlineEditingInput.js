@@ -4,29 +4,28 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
-import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
+import vjf from 'mobx-react-form/lib/validators/VJF';
 import styles from './InlineEditingInput.scss';
+import config from '../../../config';
+import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 
 const messages = defineMessages({
   change: {
     id: 'inline.editing.input.change.label',
     defaultMessage: '!!!change',
-    description: 'Label "change" on inline editing inputs in inactive state.'
   },
   cancel: {
     id: 'inline.editing.input.cancel.label',
     defaultMessage: '!!!cancel',
-    description: 'Label "cancel" on inline editing inputs in inactive state.'
   },
   changesSaved: {
     id: 'inline.editing.input.changesSaved',
     defaultMessage: '!!!Your changes have been saved',
-    description: 'Message "Your changes have been saved" for inline editing (eg. on Profile Settings page).'
   }
 });
 
-type Props = {
+type Props = {|
   className?: string,
   isActive: boolean,
   inputFieldLabel: string,
@@ -38,7 +37,8 @@ type Props = {
   isValid: Function,
   validationErrorMessage: string,
   successfullyUpdated: boolean,
-};
+  classicTheme: boolean,
+|};
 
 type State = {
   isActive: boolean,
@@ -73,7 +73,10 @@ export default class InlineEditingInput extends Component<Props, State> {
   }, {
     options: {
       validateOnChange: true,
-      validationDebounceWait: 250,
+      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+    },
+    plugins: {
+      vjf: vjf()
     },
   });
 
@@ -121,7 +124,7 @@ export default class InlineEditingInput extends Component<Props, State> {
 
   componentDidUpdate() {
     if (this.props.isActive && this.inputField) {
-      this.inputField.getRef().focus();
+      this.inputField.focus();
     }
   }
 
@@ -134,7 +137,7 @@ export default class InlineEditingInput extends Component<Props, State> {
       inputFieldLabel,
       isActive,
       inputFieldValue,
-      successfullyUpdated
+      successfullyUpdated,
     } = this.props;
     const { intl } = this.context;
     const inputField = validator.$('inputField');
@@ -169,14 +172,14 @@ export default class InlineEditingInput extends Component<Props, State> {
           onKeyDown={event => this.handleInputKeyDown(event)}
           error={isActive ? inputField.error : null}
           disabled={!isActive}
-          ref={(input) => { this.inputField = input; }}
-          skin={InputSkin}
+          inputRef={(input) => { this.inputField = input; }}
+          skin={InputOwnSkin}
         />
 
         {isActive && (
           <button
             type="button"
-            className={styles.button}
+            className={classnames([styles.button, inputField.error ? styles.error : ''])}
             onMouseDown={this.onCancel}
           >
             {intl.formatMessage(messages.cancel)}

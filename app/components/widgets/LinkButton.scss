@@ -1,0 +1,41 @@
+$blockHeight: 27px;
+
+.component {
+  display: block;
+  width: 100%;
+  font-size: 12px;
+  font-family: var(--rp-theme-font-regular);
+  a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    font-family: var(--font-regular);
+    color: var(--theme-link-button-text-color);
+  }
+}
+
+.block {
+  height: $blockHeight;
+  display: inline-block;
+  padding-left: 13px;
+  border-radius: 4px;
+
+  .icon {
+    margin-right: 8px;
+    display: inline-block;
+    vertical-align: middle;
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+  .text {
+    display: inline-block;
+    vertical-align: middle;
+  }
+};
+
+.block:hover {
+  background-color: var(--theme-link-button-background-color-hover);
+  cursor: pointer;
+};

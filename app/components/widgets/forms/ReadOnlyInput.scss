@@ -9,7 +9,7 @@
   }
 
   .button {
-    bottom: 10px;
+    bottom: 20px;
     color: var(--theme-label-button-color);
     cursor: pointer;
     font-family: var(--font-light);
@@ -23,4 +23,24 @@
       opacity: 1;
     }
   }
+
+  .icon svg {
+    vertical-align: bottom;
+  }  
+}
+
+:global(.YoroiModern) .component {
+  .disabled {
+    background-color: transparent;
+  }
+
+  .button {
+    bottom: 37px;
+  }
+}
+
+:global(.YoroiClassic) .component {
+  .button {
+    bottom: 35px;
+  }  
 }

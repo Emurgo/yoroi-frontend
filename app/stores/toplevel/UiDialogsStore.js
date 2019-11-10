@@ -12,6 +12,7 @@ export default class UiDialogsStore extends Store {
 
   /** Arbitrary data that may be used to render the dialog */
   @observable dataForActiveDialog: Object = {};
+  @observable paramsForActiveDialog: Object = {};
 
   _secondsTimerInterval: ?IntervalID = null;
 
@@ -22,16 +23,21 @@ export default class UiDialogsStore extends Store {
     this.actions.dialogs.updateDataForActiveDialog.listen(this._onUpdateDataForActiveDialog);
   }
 
-  isOpen = (dialog: Function): boolean => this.activeDialog === dialog;
+  isOpen = (dialog: Function): boolean => (this.activeDialog
+    ? this.activeDialog.name === dialog.name
+    : false);
+
+  getParam = (key: string): string => this.paramsForActiveDialog[key];
 
   countdownSinceDialogOpened = (countDownTo: number) => (
     Math.max(countDownTo - this.secondsSinceActiveDialogIsOpen, 0)
   );
 
-  @action _onOpen = ({ dialog } : { dialog : Function }) => {
+  @action _onOpen = ({ dialog, params } : { dialog : Function, params?: Object }) => {
     this._reset();
     this.activeDialog = dialog;
-    this.dataForActiveDialog = observable(dialog.defaultProps);
+    this.paramsForActiveDialog = params || {};
+    this.dataForActiveDialog = observable.box(dialog.defaultProps);
     this.secondsSinceActiveDialogIsOpen = 0;
     if (this._secondsTimerInterval) clearInterval(this._secondsTimerInterval);
     this._secondsTimerInterval = setInterval(this._updateSeconds, 1000);

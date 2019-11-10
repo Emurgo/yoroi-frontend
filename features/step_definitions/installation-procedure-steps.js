@@ -9,7 +9,7 @@ Given(/^I am on the "Terms of use" screen$/, async function () {
   await this.waitForElement(TERMS_OF_USE_FORM);
 });
 
-When(/^I click on "I agree with terms of use" checkbox$/, async function () {
+When(/^I click on "I agree with the terms of use" checkbox$/, async function () {
   await this.click('.TermsOfUseForm_component .SimpleCheckbox_root');
 });
 

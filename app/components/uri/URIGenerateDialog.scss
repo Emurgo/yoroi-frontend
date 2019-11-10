@@ -1,0 +1,67 @@
+.component {
+  min-width: var(--theme-modal-min-max-width-lg) !important;
+  max-width: var(--theme-modal-min-max-width-lg) !important;
+
+  :global {
+    .Dialog_title {
+      margin-bottom: 30px;
+    }
+  }
+
+  .receiverLabel {
+    font-family: var(--font-regular);
+    margin-bottom: 10px;
+  }
+
+  .receiverInput {
+    position: relative;
+
+    :global {
+      .SimpleInput_input {
+        font-family: var(--font-mono-light);
+        letter-spacing: 0;
+      }
+    }
+  }  
+
+  .amountField {
+    margin-bottom: 15px;
+  }
+
+  .generateButton {
+    display: block !important;
+    margin: 30px auto 0;
+  }
+}
+
+:global(.YoroiClassic) .component {
+  .receiverInput {
+    margin-bottom: 10px;
+  }  
+}
+
+:global(.YoroiModern) .component {
+  :global {
+    .Dialog_title {
+      margin-bottom: 38px;
+    }
+  }
+
+  .receiverInput {
+    letter-spacing: 0;
+
+    :global {
+      .SimpleInput_input {
+        font-family: var(--font-mono-regular);
+      }
+    }
+  }
+
+  .amountField {
+    margin-bottom: 10px;
+  }
+
+  .generateButton {
+    margin: 0 auto;
+  }
+}

@@ -6,9 +6,17 @@
 
   :global {
     .Dialog_title {
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
   }
+
+  .warningBox {
+    margin-bottom: 24px;
+  }
+
+  .submitButtonSpinning {
+    @include loading-spinner("../../../assets/images/spinner-light.svg");
+  }  
 
   .currencySymbol {
     font-family: var(--font-light);
@@ -30,27 +38,28 @@
   }
 
   .addressTo {
-    font-family: var(--font-light);
     font-size: 15px;
     line-height: 1.38;
     margin-top: 6px;
-    opacity: 0.5;
-    word-wrap: break-word;
   }
 
   .amountFeesWrapper {
     display: flex;
     flex-direction: row;
+
     .amountWrapper,
     .feesWrapper {
       width: 50%;
     }
+
     .amountWrapper {
       margin-right: 10px;
     }
+
     .feesWrapper {
       margin-left: 10px;
     }
+
     .amountLabel,
     .feesLabel {
       font-size: 11px;
@@ -60,16 +69,13 @@
       margin-left: 10px;
       text-transform: uppercase;
     }
+
     .amount,
     .fees {
-      color: var(--theme-send-confirmation-dialog-send-values-color);
       font-size: 15px;
       line-height: 1.38;
       margin-top: 6px;
       word-break: break-word;
-    }
-    .fees {
-      opacity: 0.5;
     }
   }
 
@@ -96,10 +102,94 @@
   .error {
     @include error-message;
     text-align: center;
-    margin-top: 17px;
+    margin-top: 10px;
+    margin-bottom: 10px !important;
   }
 }
 
-.submitButtonSpinning {
-  @include loading-spinner("../../../assets/images/spinner-light.svg");
+:global(.YoroiClassic) .dialog {
+  .amountFeesWrapper {
+    .amount,
+    .fees {
+      color: var(--theme-send-confirmation-dialog-send-values-color);
+    }
+
+    .fees {
+      opacity: 0.5;
+    }
+  }
+}
+
+:global(.YoroiModern) .dialog {
+  min-width: var(--theme-modal-min-max-width-lg);
+  max-width: var(--theme-modal-min-max-width-lg);  
+  font-family: var(--font-regular);
+
+  .currencySymbol {
+    font-family: var(--font-regular);
+  }
+
+  .addressToLabelWrapper,
+  .amountFeesWrapper {
+    margin-bottom: 34px;
+  }
+
+  .addressToLabel {
+    font-size: 16px;
+    font-weight: normal;
+    letter-spacing: 0;
+    margin-left: 0;
+    text-transform: none;
+  }
+
+  .addressTo {
+    font-size: 14px;
+    line-height: 1.57;
+    margin-top: 2px;
+  }
+
+  .totalAmount {
+    margin-bottom: 24px;
+  }
+
+  .walletPassword {
+    margin-top: 0;
+  }
+
+  .amountFeesWrapper {
+    .amountLabel,
+    .feesLabel {
+      font-size: 16px;
+      font-weight: normal;
+      letter-spacing: 0;
+      margin-left: 0;
+      text-transform: none;
+    }
+
+    .amount,
+    .fees {
+      font-size: 14px;
+      line-height: 1.57;
+      margin-top: 2px;
+      opacity: 0.4;
+    }
+  }
+
+  .totalAmountLabel {
+    font-size: 16px;
+    font-weight: normal;
+    letter-spacing: 0;
+    margin-left: 0;
+    text-transform: none;
+  }
+
+  .totalAmount {
+    font-family: var(--font-medium);
+    line-height: 1.57;
+    margin-top: 2px;
+
+    .currencySymbol {
+      font-family: var(--font-medium);
+    }
+  }
 }

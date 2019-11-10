@@ -5,22 +5,22 @@ import WalletBackupPrivacyWarningDialog from './backup-recovery/WalletBackupPriv
 import WalletRecoveryPhraseDisplayDialog from './backup-recovery/WalletRecoveryPhraseDisplayDialog';
 import WalletRecoveryPhraseEntryDialog from './backup-recovery/WalletRecoveryPhraseEntryDialog';
 
-type Props = {
+type Props = {|
   currentStep: ?string,
   canPhraseBeShown: boolean,
   isPrivacyNoticeAccepted: boolean,
   countdownRemaining: number,
   isTermDeviceAccepted: boolean,
-  canFinishBackup: boolean,
   isTermRecoveryAccepted: boolean,
   isValid: boolean,
   isSubmitting: boolean,
   recoveryPhrase: string,
   recoveryPhraseSorted: Array<{ word: string, isActive: boolean }>,
-  enteredPhrase: Array<{ word: string }>,
+  enteredPhrase: Array<{ word: string, index: number }>,
   onCancelBackup: Function,
   onAcceptPrivacyNotice: Function,
   onContinue: Function,
+  onBack: Function,
   onStartWalletBackup: Function,
   onAcceptTermDevice: Function,
   onAcceptTermRecovery: Function,
@@ -28,7 +28,10 @@ type Props = {
   onClear: Function,
   onFinishBackup: Function,
   onRestartBackup: Function,
-};
+  removeWord: Function,
+  hasWord: Function,
+  classicTheme: boolean
+|};
 
 @observer
 export default class WalletBackupDialog extends Component<Props> {
@@ -38,13 +41,13 @@ export default class WalletBackupDialog extends Component<Props> {
       currentStep, onCancelBackup,
       canPhraseBeShown, isPrivacyNoticeAccepted,
       countdownRemaining, onAcceptPrivacyNotice,
-      onContinue, recoveryPhrase,
+      onContinue, onBack, recoveryPhrase,
       onStartWalletBackup, isTermDeviceAccepted,
-      enteredPhrase, canFinishBackup,
+      enteredPhrase, removeWord, hasWord,
       isTermRecoveryAccepted, isValid, isSubmitting,
       onAcceptTermDevice, onAcceptTermRecovery,
       onAddWord, onClear, onFinishBackup,
-      onRestartBackup, recoveryPhraseSorted,
+      onRestartBackup, recoveryPhraseSorted, classicTheme
     } = this.props;
 
     if (currentStep === 'privacyWarning') {
@@ -56,6 +59,7 @@ export default class WalletBackupDialog extends Component<Props> {
           onAcceptPrivacyNotice={onAcceptPrivacyNotice}
           onCancelBackup={onCancelBackup}
           onContinue={onContinue}
+          classicTheme={classicTheme}
         />
       );
     }
@@ -66,6 +70,8 @@ export default class WalletBackupDialog extends Component<Props> {
           recoveryPhrase={recoveryPhrase}
           onStartWalletBackup={onStartWalletBackup}
           onCancelBackup={onCancelBackup}
+          onBack={onBack}
+          classicTheme={classicTheme}
         />
       );
     }
@@ -75,7 +81,6 @@ export default class WalletBackupDialog extends Component<Props> {
         <WalletRecoveryPhraseEntryDialog
           isTermDeviceAccepted={isTermDeviceAccepted}
           enteredPhrase={enteredPhrase}
-          canFinishBackup={canFinishBackup}
           isTermRecoveryAccepted={isTermRecoveryAccepted}
           isValid={isValid}
           isSubmitting={isSubmitting}
@@ -84,9 +89,12 @@ export default class WalletBackupDialog extends Component<Props> {
           onAddWord={onAddWord}
           onCancelBackup={onCancelBackup}
           onClear={onClear}
-          onFinishBackup={onFinishBackup}
           onRestartBackup={onRestartBackup}
           recoveryPhraseSorted={recoveryPhraseSorted}
+          onFinishBackup={onFinishBackup}
+          removeWord={removeWord}
+          hasWord={hasWord}
+          classicTheme={classicTheme}
         />
       );
     }

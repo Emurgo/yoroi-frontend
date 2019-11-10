@@ -2,136 +2,161 @@
 
 // Handle data created by wallets using the v1 address scheme
 
-import BigNumber from 'bignumber.js';
 import _ from 'lodash';
-import {
-  RandomAddressChecker,
-  Wallet
-} from 'rust-cardano-crypto';
+import BigNumber from 'bignumber.js';
+import { coinToBigNumber } from './lib/utils';
 import {
   Logger,
   stringifyError,
 } from '../../utils/logging';
-import { getResultOrFail } from './lib/cardanoCrypto/cryptoUtils';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
-import { getBalance } from './adaWallet';
 import {
-  GetAddressesWithFundsError,
+  GetAddressesKeysError,
   NoInputsError,
   GenerateTransferTxError
 } from './errors';
 import {
-  getCryptoDaedalusWalletFromMnemonics
-} from './lib/cardanoCrypto/cryptoWallet';
-import {
-  getAdaAddressesByType
-} from './adaAddress';
-import {
-  getAllUTXOsForAddresses
+  sendAllUnsignedTxFromUtxo,
 } from './adaTransactions/adaNewTransactions';
 import type {
-  UTXO
-} from './adaTypes';
+  AddressUtxoFunc
+} from './lib/state-fetch/types';
 import type {
   TransferTx
 } from '../../types/TransferTypes';
+import { RustModule } from './lib/cardanoCrypto/rustLoader';
+import type {
+  UTXO
+} from './adaTypes';
 
-/** Go through the whole UTXO and see which belong to the walet and have non-empty balance
+import type { ConfigType } from '../../../config/config-types';
+
+declare var CONFIG : ConfigType;
+const protocolMagic = CONFIG.network.protocolMagic;
+
+type AddressKeyMap = { [addr: string]: RustModule.Wallet.PrivateKey };
+
+/** Go through the whole UTXO and find the addresses that belong to the user along with the keys
  * @param fullUtxo the full utxo of the Cardano blockchain
  */
-export function getAddressesWithFunds(payload: {
-  secretWords: string,
+export function getAddressesKeys(payload: {
+  checker: RustModule.Wallet.DaedalusAddressChecker,
   fullUtxo: Array<string>
-}): Array<CryptoDaedalusAddressRestored> {
+}): AddressKeyMap {
   try {
-    const { secretWords, fullUtxo } = payload;
-    const checker: CryptoAddressChecker = getResultOrFail(
-      RandomAddressChecker.newCheckerFromMnemonics(secretWords)
-    );
-    const addressesWithFunds: Array<CryptoDaedalusAddressRestored> = getResultOrFail(
-      RandomAddressChecker.checkAddresses(checker, fullUtxo)
-    );
-    return addressesWithFunds;
+    const { checker, fullUtxo } = payload;
+
+    const addrKeyMap = {};
+    for (const addr of fullUtxo) {
+      const rustAddr = RustModule.Wallet.Address.from_base58(addr);
+      const checkedAddr = checker.check_address(rustAddr);
+      if (checkedAddr.is_checked()) {
+        addrKeyMap[addr] = checkedAddr.private_key();
+      }
+    }
+    return addrKeyMap;
   } catch (error) {
-    Logger.error(`daedalusTransfer::getAddressesWithFunds ${stringifyError(error)}`);
-    throw new GetAddressesWithFundsError();
+    Logger.error(`daedalusTransfer::getAddressesKeys ${stringifyError(error)}`);
+    throw new GetAddressesKeysError();
   }
 }
 
-/** Generate transaction including all addresses with no change */
-export async function generateTransferTx(payload: {
-  secretWords: string,
-  addressesWithFunds: Array<CryptoDaedalusAddressRestored>
-}): Promise<TransferTx> {
+/**
+ Generate transaction including all addresses with no change.
+ If filterSenders is true, only include addresses that have outstanding
+ UTXOs in the senders property.
+*/
+export async function generateTransferTx(
+  payload: {
+    outputAddr: string,
+    addressKeys: AddressKeyMap,
+    getUTXOsForAddresses: AddressUtxoFunc,
+    filterSenders?: boolean
+  }
+): Promise<TransferTx> {
+  const { outputAddr, addressKeys, getUTXOsForAddresses, filterSenders = false } = payload;
+
+  // fetch data to make transaction
+  const senders = Object.keys(addressKeys);
+  const senderUtxos = await getUTXOsForAddresses({ addresses: senders });
+
+  if (_.isEmpty(senderUtxos)) {
+    const error = new NoInputsError();
+    Logger.error(`daedalusTransfer::generateTransferTx ${stringifyError(error)}`);
+    throw error;
+  }
+
+  return buildTransferTx({
+    addressKeys,
+    senderUtxos,
+    outputAddr,
+    filterSenders,
+  });
+}
+
+/**
+  Generate transaction including all addresses with no change.
+  If filterSenders is true, only include addresses that have outstanding
+  UTXOs in the senders property.
+*/
+export async function buildTransferTx(
+  payload: {
+    addressKeys: AddressKeyMap,
+    senderUtxos: Array<UTXO>,
+    outputAddr: string,
+    filterSenders?: boolean
+  }
+): Promise<TransferTx> {
   try {
+    const { addressKeys, senderUtxos, outputAddr, filterSenders = false } = payload;
 
-    const { secretWords, addressesWithFunds } = payload;
+    const totalBalance = senderUtxos
+      .map(utxo => new BigNumber(utxo.amount))
+      .reduce(
+        (acc, amount) => acc.plus(amount),
+        new BigNumber(0)
+      );
 
-    // fetch data to make transaction
-    const senders = addressesWithFunds.map(a => a.address);
-    const senderUtxos = await getAllUTXOsForAddresses(senders);
-    if (_.isEmpty(senderUtxos)) {
-      throw new NoInputsError();
+    // first build a transaction to see what the fee will be
+    const txBuilder = await sendAllUnsignedTxFromUtxo(
+      outputAddr,
+      senderUtxos
+    ).then(resp => resp.txBuilder);
+    const fee = coinToBigNumber(txBuilder.get_balance_without_fees().value());
+
+    // sign inputs
+    const txFinalizer = new RustModule.Wallet.TransactionFinalized(
+      txBuilder.make_transaction()
+    );
+    const setting = RustModule.Wallet.BlockchainSettings.from_json({
+      protocol_magic: protocolMagic
+    });
+    for (let i = 0; i < senderUtxos.length; i++) {
+      const witness = RustModule.Wallet.Witness.new_extended_key(
+        setting,
+        addressKeys[senderUtxos[i].receiver],
+        txFinalizer.id()
+      );
+      txFinalizer.add_witness(witness);
     }
-    const recoveredBalance = await getBalance(senders);
-    const inputWrappers: Array<DaedalusInputWrapper> = _getInputs(senderUtxos, addressesWithFunds);
-    const inputs = inputWrappers.map(w => w.input);
 
-    // pick which address to send transfer to
-    const output = await _getReceiverAddress();
+    const signedTx = txFinalizer.finalize();
 
-    // get wallet and make transaction
-    const wallet = getCryptoDaedalusWalletFromMnemonics(secretWords);
-    const tx: MoveResponse = getResultOrFail(Wallet.move(wallet, inputs, output));
+    let senders = Object.keys(addressKeys);
 
+    if (filterSenders) {
+      senders = senders.filter(addr => senderUtxos.some(({ receiver }) => receiver === addr));
+    }
     // return summary of transaction
     return {
-      recoveredBalance: recoveredBalance.dividedBy(LOVELACES_PER_ADA),
-      fee: new BigNumber(tx.fee).dividedBy(LOVELACES_PER_ADA),
-      cborEncodedTx: tx.cbor_encoded_tx,
+      recoveredBalance: totalBalance.dividedBy(LOVELACES_PER_ADA),
+      fee: fee.dividedBy(LOVELACES_PER_ADA),
+      signedTx,
       senders,
-      receiver: output,
+      receiver: outputAddr,
     };
   } catch (error) {
     Logger.error(`daedalusTransfer::generateTransferTx ${stringifyError(error)}`);
-    if (error instanceof NoInputsError) {
-      throw error;
-    }
     throw new GenerateTransferTxError();
   }
-}
-
-/** Follow heuristic to pick which address to send Daedalus transfer to */
-async function _getReceiverAddress(): Promise<string> {
-  // Note: Current heuristic is to pick the first address in the wallet
-  // rationale & better heuristic described at https://github.com/Emurgo/yoroi-frontend/issues/96
-  const addresses = await getAdaAddressesByType('External');
-  return addresses[0].cadId;
-}
-
-declare type DaedalusInputWrapper = {
-  input: TxDaedalusInput,
-  address: string
-}
-
-/** Create V1 addressing scheme inputs from Daedalus restoration info */
-function _getInputs(
-  utxos: Array<UTXO>,
-  addressesWithFunds: Array<CryptoDaedalusAddressRestored>
-): Array<DaedalusInputWrapper> {
-  const addressingByAddress = {};
-  addressesWithFunds.forEach(a => {
-    addressingByAddress[a.address] = a.addressing;
-  });
-  return utxos.map(utxo => ({
-    input: {
-      ptr: {
-        index: utxo.tx_index,
-        id: utxo.tx_hash
-      },
-      value: utxo.amount,
-      addressing: addressingByAddress[utxo.receiver]
-    },
-    address: utxo.receiver
-  }));
 }

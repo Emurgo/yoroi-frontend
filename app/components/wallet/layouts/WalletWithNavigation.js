@@ -5,11 +5,11 @@ import { observer } from 'mobx-react';
 import WalletNavigation from '../navigation/WalletNavigation';
 import styles from './WalletWithNavigation.scss';
 
-type Props = {
+type Props = {|
   children?: Node,
   isActiveScreen: Function,
   onWalletNavItemClick: Function,
-};
+|};
 
 @observer
 export default class WalletWithNavigation extends Component<Props> {

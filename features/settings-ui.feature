@@ -6,8 +6,7 @@ Feature: Wallet UI Settings
 
   @it-12
   Scenario Outline: User can't change password if it doesn't meet complexity requirements (IT-12)
-    When I am testing "Wallet Settings Screen"
-    And There is a wallet stored named Test
+    And I import a snapshot named empty-wallet
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
     And I click on the "change" password label
@@ -15,18 +14,17 @@ Feature: Wallet UI Settings
     And I change wallet password:
     | currentPassword    | password     | repeatedPassword   |
     | <currentPassword>  | <password>   | <repeatedPassword> |
-    And I submit the wallet password dialog
-    Then I should see the following error messages:
+    Then I see the submit button is disabled
+    And I should see the following error messages:
     | message                             |
     | global.errors.invalidWalletPassword |
   Examples:
   | currentPassword | password    | repeatedPassword | |
-  | aaSecret_123      | Secre1      | Secre1           | too short                 |
+  | asdfasdfasdf      | Secre1      | Secre1           | too short                 |
 
 @it-94
   Scenario Outline: User is able to change spending password (IT-94)
-    When I am testing "Send transaction"
-    And There is a wallet stored named Test
+    And I import a snapshot named tx-big-input-wallet
     And I have a wallet with funds
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
@@ -34,7 +32,7 @@ Feature: Wallet UI Settings
     And I should see the "change" wallet password dialog
     And I change wallet password:
     | currentPassword    | password     | repeatedPassword |
-    | aaSecret_123         | newSecret123 | newSecret123     |
+    | asdfasdfasdf         | newSecret123 | newSecret123     |
     And I submit the wallet password dialog
     Then I should not see the change password dialog anymore
 
@@ -58,8 +56,7 @@ Feature: Wallet UI Settings
   
   @it-91
   Scenario Outline: Password should be case-sensitive [Wallet password changing] (IT-91)
-    When I am testing "Wallet Settings Screen"
-    And There is a wallet stored named Test
+    And I import a snapshot named empty-wallet
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
     And I click on the "change" password label
@@ -80,8 +77,7 @@ Feature: Wallet UI Settings
   
   @it-8
   Scenario Outline: Wallet renaming (IT-8)
-    When I am testing "Wallet Settings Screen"
-    And There is a wallet stored named Test
+    And I import a snapshot named empty-wallet
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
     And I click on "name" input field
@@ -102,8 +98,7 @@ Feature: Wallet UI Settings
 
   @it-41
   Scenario Outline: Wallet can't be renamed if new wallet name doesn't meet requirements (IT-41)
-    When I am testing "Wallet Settings Screen"
-    And There is a wallet stored named Test
+    And I import a snapshot named empty-wallet
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
     And I click on "name" input field
@@ -120,23 +115,21 @@ Feature: Wallet UI Settings
 
   @it-14
   Scenario: User can't change the password without entering old password (IT-14)
-    When I am testing "Wallet Settings Screen"
-    And There is a wallet stored named Test
+    And I import a snapshot named empty-wallet
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
     And I click on the "change" password label
     And I should see the "change" wallet password dialog
     And I change wallet password:
     | currentPassword    | password     | repeatedPassword |
-    | aaSecret_123         | newSecret123 | newSecret123     |
-    And I clear the current wallet password aaSecret_123
+    | asdfasdfasdf         | newSecret123 | newSecret123     |
+    And I clear the current wallet password asdfasdfasdf
     And I submit the wallet password dialog
     Then I should stay in the change password dialog
 
   @it-40
   Scenario: User can't change password without filling Password repeat field (IT-40)
-    When I am testing "Wallet Settings Screen"
-    And There is a wallet stored named Test
+    And I import a snapshot named empty-wallet
     And I navigate to the general settings screen
     And I click on secondary menu "wallet" item
     And I click on the "change" password label
@@ -145,16 +138,14 @@ Feature: Wallet UI Settings
     | currentPassword    | password     | repeatedPassword |
     | aaSecret_123         | newSecret123 | newSecret123     |
     And I clear the current wallet repeat password newSecret123 
-    And I submit the wallet password dialog
-    Then I should stay in the change password dialog
+    Then I see the submit button is disabled
+    And I should stay in the change password dialog
     And I should see "Doesn't match" error message:
     | message                             |
     | global.errors.invalidRepeatPassword |
 
   @it-2
   Scenario: Change language in General Settings (IT-2)
-    Given I am testing "General Settings"
-    When There is a wallet stored named Test
     When I navigate to the general settings screen
     And I open General Settings language selection dropdown
     And I select Japanese language
@@ -164,22 +155,38 @@ Feature: Wallet UI Settings
 
   @it-3
   Scenario: Yoroi Settings Screen / Terms of Use in Default English(IT-3)
-    When I am testing "Wallet Settings Screen"
     And I navigate to the general settings screen
     And I click on secondary menu "Terms of use" item
     Then I should see the "Terms of use" screen
 
   @it-23
   Scenario: Wallet settings tab isn't active if wallet is not created (IT-23)
-    Given I am testing "General Settings"
     When There is no wallet stored
     And I navigate to the general settings screen
     Then I should see secondary menu "wallet" item disabled
 
   @it-4
   Scenario: Yoroi Settings Screen / Support (IT-4)
-    When I am testing "Wallet Settings Screen"
-    And There is a wallet stored named Test
     And I navigate to the general settings screen
     And I click on secondary menu "support" item
     Then I should see support screen
+
+  @it-77
+  Scenario: Paper wallet creation (IT-77)
+    And I navigate to the general settings screen
+    Then I click on secondary menu "paperWallet" item
+    Then I open Number of Adddresses selection dropdown
+    And I select 2 addresses
+    Then I click the create paper wallet button
+    Then I enter the paper wallet password "cool password"
+    And I repeat the wallet password "cool password"
+    Then I click the next button
+    # wait for paper wallet generation then go to next
+    Then I click the next button
+    And I enter the paper recovery phrase
+    And I enter the paper wallet password "cool password"
+    # swap addresses for UI testing
+    Given I swap the paper wallet addresses
+    Then I click then button labeled "Verify wallet"
+    Then I should see two addresses displayed
+    Then I click the next button

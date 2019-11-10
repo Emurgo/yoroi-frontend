@@ -16,14 +16,16 @@ import { isValidAmountInLovelaces } from '../../utils/validations';
 import TransactionsStore from '../base/TransactionsStore';
 import { transactionTypes } from '../../domain/WalletTransaction';
 import { assuranceLevels } from '../../config/transactionAssuranceConfig';
-import type { TransactionFeeResponse } from '../../api/ada/index';
+import type {
+  GetTransactionRowsToExportFunc,
+} from '../../api/ada';
 
 import type {
-  GetTransactionRowsToExportRequest,
-  GetTransactionRowsToExportResponse,
   ExportTransactionsRequest,
-  ExportTransactionsResponse,
+  ExportTransactionsFunc,
 } from '../../api/common';
+
+import type { TransactionRowsToExportRequest } from '../../actions/ada/transactions-actions';
 
 const EXPORT_START_DELAY = 800; // in milliseconds [1000 = 1sec]
 
@@ -36,11 +38,11 @@ export default class AdaTransactionsStore extends TransactionsStore {
     actions.closeExportTransactionDialog.listen(this._closeExportTransactionDialog);
   }
 
-  getTransactionRowsToExportRequest: LocalizedRequest<GetTransactionRowsToExportResponse>
-    = new LocalizedRequest(this.api.ada.getTransactionRowsToExport);
+  getTransactionRowsToExportRequest: LocalizedRequest<GetTransactionRowsToExportFunc>
+    = new LocalizedRequest<GetTransactionRowsToExportFunc>(this.api.ada.getTransactionRowsToExport);
 
-  exportTransactions: LocalizedRequest<ExportTransactionsResponse>
-    = new LocalizedRequest(this.api.export.exportTransactions);
+  exportTransactions: LocalizedRequest<ExportTransactionsFunc>
+    = new LocalizedRequest<ExportTransactionsFunc>(this.api.export.exportTransactions);
 
   @observable isExporting: boolean = false;
 
@@ -85,27 +87,13 @@ export default class AdaTransactionsStore extends TransactionsStore {
     return unconfirmedAmount;
   }
 
-  /** Calculate transaction fee without requiring spending password */
-  calculateTransactionFee = (
-    walletId: string,
-    receiver: string,
-    amount: string
-  ): Promise<TransactionFeeResponse> => {
-    // get HdWallet account
-    const accountId = this.stores.substores.ada.addresses._getAccountIdByWalletId(walletId);
-    if (!accountId) throw new Error('Active account required before calculating transaction fees.');
-
-    // calculate fee
-    return this.api.ada.calculateTransactionFee({ sender: accountId, receiver, amount });
-  };
-
   /** Wrap utility function to expose to components/containers */
   validateAmount = (amountInLovelaces: string): Promise<boolean> => (
     Promise.resolve(isValidAmountInLovelaces(amountInLovelaces))
   );
 
   @action _exportTransactionsToFile = async (
-    params: GetTransactionRowsToExportRequest
+    params: TransactionRowsToExportRequest
   ): Promise<void> => {
     try {
       this._setExporting(true);
@@ -113,8 +101,15 @@ export default class AdaTransactionsStore extends TransactionsStore {
       this.getTransactionRowsToExportRequest.reset();
       this.exportTransactions.reset();
 
-      const respTxRows: GetTransactionRowsToExportResponse =
-        await this.getTransactionRowsToExportRequest.execute(params).promise;
+      const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+      this.getTransactionRowsToExportRequest.execute({
+        ...params,
+        getTransactionsHistoryForAddresses: stateFetcher.getTransactionsHistoryForAddresses,
+        checkAddressesInUse: stateFetcher.checkAddressesInUse,
+      });
+      if (!this.getTransactionRowsToExportRequest.promise) throw new Error('should never happen');
+
+      const respTxRows = await this.getTransactionRowsToExportRequest.promise;
 
       if (respTxRows == null || respTxRows.length < 1) {
         throw new LocalizableError(globalMessages.noTransactionsFound);

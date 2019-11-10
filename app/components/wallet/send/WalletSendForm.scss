@@ -6,49 +6,71 @@
   padding-right: 20px;
   padding-bottom: 20px;
   padding-left: 20px;
-}
 
-.amountInput,
-.receiverInput {
-  position: relative;
-  margin-bottom: 20px;
-}
-
-.adaLabel {
-  bottom: 16px;
-  color: var(--theme-input-right-floating-text-color);
-  font-family: var(--font-light);
-  position: absolute;
-  right: 20px;
-  text-transform: uppercase;
-}
-
-.nextButton {
-  display: block !important;
-  margin: 30px auto 0;
-}
-
-.contentWarning{
-  display: flex;
-  flex-flow: column;
-  align-items: center;
-  margin-bottom: 1em;
-}
-
-.icon {
-  flex-shrink: 0;
-  & > svg {
-    width: 26px;
-    height: 26px;
+  .warningBox {
+    margin-bottom: 30px;
   }
-  margin: 1em 0;
+
+  .receiverInput {
+    position: relative;
+
+    :global {
+      .SimpleInput_input {
+        font-family: var(--font-mono-light);
+        letter-spacing: 0;
+      }
+    }
+  }
+  
+  .amountInput {
+    position: relative;
+    margin-bottom: 10px;
+  }
+  
+  .adaLabel {
+    bottom: 16px;
+    color: var(--theme-input-right-floating-text-color);
+    font-family: var(--font-light);
+    position: absolute;
+    right: 20px;
+    text-transform: uppercase;
+  }
+  
+  .nextButton {
+    display: block !important;
+    margin: 30px auto 0;
+  }
+
+  .checkbox {
+    font-family: var(--font-mono-light);
+    width: fit-content;
+  }
 }
 
-.warning {
-  font-family: var(--font-light);
-  text-transform: uppercase;
-  font-size: 12px;
-  font-weight: 600;
-  margin-bottom: 0.5em;
-  color: var(--theme-error-text-color);
+:global(.YoroiClassic) .component {
+  .receiverInput {
+    margin-bottom: 10px;
+  }
+}
+
+:global(.YoroiModern) .component {
+  padding: 30px;
+
+  .receiverInput {
+    letter-spacing: 0;
+
+    :global {
+      .SimpleInput_input {
+        font-family: var(--font-mono-regular);
+      }
+    }
+  }
+
+  .nextButton {
+    margin: 20px auto 0;
+  }
+
+  fieldset {
+    background: var(--theme-settings-pane-background-color);
+  }
 }

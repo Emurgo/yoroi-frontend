@@ -1,0 +1,44 @@
+@import './DialogCommonStyle.scss';
+
+.component {
+
+  .walletNameInfoWrapper {
+    display: flex;
+  }
+
+  .walletNameInfoIcon {
+    margin-right: 6px;
+  }
+
+  .walletNameInfo {
+    padding-top: 1px;
+    font-family: var(--font-regular);
+    font-size: 12px;
+    line-height: 14px;
+    opacity: 0.5;
+  }
+
+  .middleSaveLoadBlock {
+    padding: 0px;
+    text-align: center;
+  }
+
+  .middleSaveStartProcessBlock {
+    padding: 0px;
+    text-align: center;
+  }
+}
+
+:global(.YoroiClassic) {
+  .component {
+    .headerSaveBlock {
+      margin-bottom: 12px;
+    }
+
+    .middleSaveErrorBlock {
+      padding: 0px;
+      background-color: var(--theme-hw-connect-dialog-middle-block-common-error-background-color);
+      text-align: center;
+    }
+  }
+}

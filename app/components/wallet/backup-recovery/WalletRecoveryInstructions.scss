@@ -1,12 +1,27 @@
 .component {
-  font-family: var(--font-light);
-  font-size: 16px;
-  line-height: 1.38;
-  color: var(--theme-instructions-text-color);
+  line-height: 22px;
   margin-bottom: 10px;
-  text-align: center;
 
   strong {
     font-family: var(--font-medium);
+  }
+}
+
+:global(.YoroiClassic) {
+  .component {
+    font-family: var(--font-light);
+    font-size: 16px;
+    color: var(--theme-instructions-text-color);
+    text-align: center;
+  }
+}
+
+:global(.YoroiModern) {
+  .component {
+    font-family: var(--font-regular);
+    font-size: 14px;
+    color: var(--theme-instructions-recovery-text-color);
+    text-align: left;
+    letter-spacing: 0;
   }
 }

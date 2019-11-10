@@ -2,62 +2,67 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import classNames from 'classnames';
+import classnames from 'classnames';
 import styles from './TopBarLayout.scss';
 
-type Props = {
-  topbar: Node,
+type Props = {|
+  banner?: Node,
+  topbar?: Node,
   children?: ?Node,
   notification?: ?Node,
-  banner?: Node,
-  footer?: Node,
-};
+  languageSelectionBackground?: boolean,
+  classicTheme?: boolean,
+|};
 
 /** Adds a top bar above the wrapped node */
 @observer
 export default class TopBarLayout extends Component<Props> {
   static defaultProps = {
+    banner: undefined,
+    topbar: undefined,
     children: undefined,
     notification: undefined,
-    banner: undefined,
-    footer: undefined,
+    languageSelectionBackground: false,
+    classicTheme: false,
   };
 
   render() {
     const {
       banner,
-      children,
       topbar,
+      children,
       notification,
-      footer
+      languageSelectionBackground,
+      classicTheme
     } = this.props;
-
-    const contentStyle = classNames([
-      styles.content,
-      (footer) ? styles.contentWithFooter : null,
+    const componentClasses = classnames([
+      styles.component,
+      languageSelectionBackground === true && (classicTheme == null || classicTheme === false) ? styles.languageSelectionBackground : '',
     ]);
 
     return (
-      <div className={styles.component}>
+      <div className={componentClasses}>
         <div className={styles.main}>
-          <div className={styles.topbar}>
-            {topbar}
-          </div>
 
           {banner}
+
+          {topbar != null
+            ? (
+              <div className={styles.topbar}>
+                {topbar}
+              </div>
+            )
+            : null
+          }
 
           {notification}
 
           <div className={styles.contentWrapper}>
-            <div className={contentStyle}>
+            <div className={styles.content}>
               {children}
             </div>
           </div>
 
-          {footer &&
-            <div className={styles.footer}>
-              {footer}
-            </div>}
         </div>
       </div>
     );

@@ -8,40 +8,38 @@ const messages = defineMessages({
   apiMethodNotYetImplementedError: {
     id: 'api.errors.ApiMethodNotYetImplementedError',
     defaultMessage: '!!!This API method is not yet implemented.',
-    description: '"This API method is not yet implemented." error message.'
   },
   promiseNotCalledYetError: {
     id: 'api.errors.PromiseNotCalledYetError',
     defaultMessage: '!!!You have to call Request::execute before you can access it as promise.',
-    description: 'When call chain is not correct.'
   }
 });
 
-export type ApiCallType = {
-  args: Array<any>,
-  result: any,
+export type ApiCallType<Func: Function> = {
+  args: Arguments<Func>,
+  result: ?PromisslessReturnType<Func>,
 };
 
 // Note: Do not use this class directly. Only use LocalizedRequest or CachedLocalizedRequest
-export default class Request<Result, Err> {
+export default class Request<Func: (...args: any) => Promise<any>, Err> {
 
-  @observable result: ?Result = null;
+  @observable result: ?PromisslessReturnType<Func> = null;
   @observable error: ?Err = null;
   @observable isExecuting: boolean = false;
   @observable isError: boolean = false;
   @observable wasExecuted: boolean = false;
 
-  promise: ?Promise<Result> = null;
+  promise: ?Promise<PromisslessReturnType<Func>> = null;
 
-  _method: Function;
+  _method: Func;
   _isWaitingForResponse: boolean = false;
-  _currentApiCall: ?ApiCallType = null;
+  _currentApiCall: ?ApiCallType<Func> = null;
 
-  constructor(method: Function) {
+  constructor(method: Func) {
     this._method = method;
   }
 
-  execute(...callArgs: Array<any>): Request<Result, Err> {
+  execute(...callArgs: Arguments<Func>): Request<Func, Err> {
     // Do not continue if this request is already loading
     if (this._isWaitingForResponse) return this;
 
@@ -60,7 +58,6 @@ export default class Request<Result, Err> {
         .then((result) => {
           setTimeout(action('Request::execute/then', () => {
             if (this.result != null && isObservableArray(this.result) && Array.isArray(result)) {
-              // $FlowFixMe
               this.result.replace(result);
             } else {
               this.result = result;
@@ -68,6 +65,8 @@ export default class Request<Result, Err> {
             if (this._currentApiCall) this._currentApiCall.result = result;
             this.isExecuting = false;
             this.wasExecuted = true;
+            this.error = null;
+            this.isError = false;
             this._isWaitingForResponse = false;
             resolve(result);
           }), 1);
@@ -76,6 +75,7 @@ export default class Request<Result, Err> {
         .catch(action('Request::execute/catch', (error) => {
           setTimeout(action(() => {
             this.error = error;
+            this.result = null;
             this.isExecuting = false;
             this.isError = true;
             this.wasExecuted = true;
@@ -90,7 +90,7 @@ export default class Request<Result, Err> {
     return this;
   }
 
-  isExecutingWithArgs(...args: Array<any>): boolean {
+  isExecutingWithArgs(...args: Arguments<Func>): boolean {
     return (
       this.isExecuting &&
       (this._currentApiCall != null)
@@ -102,11 +102,11 @@ export default class Request<Result, Err> {
     return !this.wasExecuted && this.isExecuting;
   }
 
-  then(...args: Array<any>): Promise<Result> {
+  // Turn Requests into promise-like objects by adding "then" and "catch"
+  then(...args: Array<any>): Promise<PromisslessReturnType<Func>> {
     if (!this.promise) throw new NotExecutedYetError();
     return this.promise.then(...args);
   }
-
   catch(...args: Array<any>): Promise<any> {
     if (!this.promise) throw new NotExecutedYetError();
     return this.promise.catch(...args);
@@ -123,7 +123,9 @@ export default class Request<Result, Err> {
    *
    * @returns {Promise}
    */
-  patch(modify: Function): Promise<Request<Result, Err>> {
+  patch(
+    modify: PromisslessReturnType<Func> => ?PromisslessReturnType<Func>
+  ): Promise<Request<Func, Err>> {
     return new Promise((resolve) => {
       setTimeout(action(() => {
         const override = modify(this.result);
@@ -134,7 +136,7 @@ export default class Request<Result, Err> {
     });
   }
 
-  @action reset(): Request<Result, Err> {
+  @action reset(): Request<Func, Err> {
     this.result = null;
     this.error = null;
     this.isError = false;
@@ -150,7 +152,7 @@ export class ApiMethodNotYetImplementedError extends LocalizableError {
   constructor() {
     super({
       id: messages.apiMethodNotYetImplementedError.id,
-      defaultMessage: messages.apiMethodNotYetImplementedError.defaultMessage,
+      defaultMessage: messages.apiMethodNotYetImplementedError.defaultMessage || '',
     });
   }
 }
@@ -159,7 +161,7 @@ export class NotExecutedYetError extends LocalizableError {
   constructor() {
     super({
       id: messages.apiMethodNotYetImplementedError.id,
-      defaultMessage: messages.apiMethodNotYetImplementedError.defaultMessage,
+      defaultMessage: messages.apiMethodNotYetImplementedError.defaultMessage || '',
     });
   }
 }

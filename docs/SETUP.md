@@ -6,7 +6,9 @@ Tested on Ubuntu 18.04
 
 ### NodeJS
 
-- node [v8.9.4](https://nodejs.org/download/release/v8.9.4/) (if you are using nvm, just execute: `nvm use`)
+If you have `nvm`, just run `nvm use`
+
+Otherwise, you can download `node` manually from [here](https://nodejs.org) but you need to be careful the version matches the one specified in our `package.lock` file.
 
 ### Rust
 
@@ -32,42 +34,38 @@ $ rustup update
 $ rustup target add wasm32-unknown-unknown --toolchain nightly
 ```
 
-### Submodules
-
-```bash
-# clone the repository with the submodule js-cardano-wasm
-$ git clone --recursive git@github.com:Emurgo/yoroi-frontend.git
-$ git submodule update --init --recursive
-```
-
-To automate downloading and installation of `js-cardano-wasm` dependency run `setup_cardano_crypto.sh` to download latest `js-cardano-wasm` repository into `js-cardano-wasm` folder.
-```bash
-$ sh setup_cardano_crypto.sh
-```
-
 ### Packages
 To install other Yoroi-frontend related dependencies use:
 ```bash
 $ npm install
 ```
 
-Rebuild dll
-```bash
-$ npm run build-dll
+### Generating PEMs
+
+To build production versions of Yoroi that run on `testnet` (or any other network) you need a `pem` file (basically a key to sign your extension).
+Although the real `pem` is not uploaded to Github for security reasons, you can generate your own `pem` for testing purposes using the following steps:
+
 ```
+npm run compress-keygen
+mv key.pem testnet.pem
+npm run compress-keygen
+mv key.pem mainnet.pem
+```
+
+Notably, I  recommend running this for `testnet` and `mainnet`.
 
 ### Firefox
 
 Adding unsigned extensions is not supported for the regular version of Firefox.
-You can test Yoroi as a temporary extension, but the extension will disappear after every uninstall.
+You can test Yoroi as a temporary extension, but the extension will disappear every time you close your browser.
 To avoid this, we recommend the following:
-1) [setting up Firefox-dev](https://askubuntu.com/questions/548003/how-do-i-install-the-firefox-developer-edition)
+1) [Setting up Firefox-dev](https://askubuntu.com/questions/548003/how-do-i-install-the-firefox-developer-edition) (note that the Aurora PPA has been deprecated, so you might want to try another installation method).
 2) Setting `xpinstall.signatures.required` to `false` in `about:config`.
-3) Makeing sure typing `firefox` in your terminal opens firefox-dev (otherwise the unittests will not pass)
+3) Make sure typing `firefox` in your terminal opens firefox-dev or set the path of the binary using `setBinary(path)` in `firefox.Options()` in webdriver.js (otherwise the unittests will not pass).
 
 ### Git hooks
 
-To regiter the githooks locally you must run this command
+To register the githooks locally you must run this command
 
 ```bash
 $ git config core.hooksPath .githooks

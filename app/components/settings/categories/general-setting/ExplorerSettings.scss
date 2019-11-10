@@ -1,0 +1,30 @@
+@import '../../../../themes/mixins/error-message';
+
+.component {
+  margin-bottom: 20px;
+
+  h1 {
+    color: var(--theme-support-settings-text-color);
+    font-family: var(--font-semibold);
+    font-size: 16px;
+    line-height: 1.38;
+    margin-bottom: 10px;
+    padding-top: 10px;
+  }
+
+  :global(.SelectOverrides_selectInput) input {
+    // we don't want website names to be upper-cased on modern theme
+    text-transform: none;
+  }
+}
+
+.error {
+  @include error-message;
+  text-align: center;
+}
+
+.explorer {
+  label {
+    background-color: var(--theme-settings-pane-background-color);
+  }
+}

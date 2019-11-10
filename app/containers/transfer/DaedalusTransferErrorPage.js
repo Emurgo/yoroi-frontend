@@ -4,24 +4,20 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import LocalizableError from '../../i18n/LocalizableError';
 import ErrorPage from '../../components/transfer/ErrorPage';
+import globalMessages from '../../i18n/global-messages';
 
 const messages = defineMessages({
   title: {
     id: 'daedalusTransfer.errorPage.title.label',
     defaultMessage: '!!!Unable to restore Daedalus wallet',
-    description: 'Label "Unable to restore Daedalus wallet" on the Daedalus transfer error page.'
-  },
-  backButtonLabel: {
-    id: 'daedalusTransfer.errorPage.backButton.label',
-    defaultMessage: '!!!Back',
-    description: 'Label "Back" on the Daedalus transfer error page.'
   },
 });
 
-type Props = {
+type Props = {|
   error?: ?LocalizableError,
-  onCancel: Function
-};
+  onCancel: Function,
+  classicTheme: boolean,
+|};
 
 @observer
 export default class DaedalusTransferErrorPage extends Component<Props> {
@@ -35,13 +31,14 @@ export default class DaedalusTransferErrorPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { error, onCancel } = this.props;
+    const { error, onCancel, classicTheme } = this.props;
 
     return (<ErrorPage
       title={intl.formatMessage(messages.title)}
-      backButtonLabel={intl.formatMessage(messages.backButtonLabel)}
+      backButtonLabel={intl.formatMessage(globalMessages.backButtonLabel)}
       onCancel={onCancel}
       error={error}
+      classicTheme={classicTheme}
     />);
   }
 }

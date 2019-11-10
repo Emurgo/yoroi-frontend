@@ -1,0 +1,37 @@
+// Css module overrides go here …
+
+.autocompleteWrapper  {
+  input {
+    background: var(--rp-autocomplete-input-bg-color, transparent);
+    border: var(--rp-autocomplete-input-border, 0);
+  }
+  .autocompleteContent {
+    min-height: 73px;
+    padding: 0 40px 10px 10px;
+
+    .selectedWords {
+      input {
+        font-size: 15px;
+        margin: 5px 0;
+      }
+
+      .selectedWordBox {
+        border-radius: 2px;
+        margin: 5px 12px 0 -6px;
+        padding: 3px 6px;
+
+        .selectedWordValue {
+          font-size: 15px;
+
+          .selectedWordRemoveButton {
+            margin-left: 4px;
+          }
+        }
+
+        &:last-of-type {
+          margin-right: 6px;
+        }
+      }
+    }
+  }
+}

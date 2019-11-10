@@ -1,0 +1,13 @@
+// Css module overrides go here …
+
+.overlay {
+  z-index: 100;
+}
+
+.modal {
+  border-radius: 8px;
+  padding: 25px 30px 30px;
+  display: flex;
+  flex-direction: column;
+  max-width: 785px;
+}

@@ -1,5 +1,6 @@
 @import "../../themes/mixins/animations";
 @import '../../themes/mixins/error-message';
+@import '../../themes/mixins/underline';
 
 .component {
   height: 100%;
@@ -63,7 +64,13 @@ $adaLogoWidth: 43px;
 }
 
 .component, .headline, .logo, .error {
+  backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+}
+
+.link {
+  color: var(--theme-warning-color);
+  @include underline(var(--theme-warning-color));
 }
 
 .error {

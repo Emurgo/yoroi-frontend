@@ -12,24 +12,21 @@ const messages = defineMessages({
   transactions: {
     id: 'wallet.navigation.transactions',
     defaultMessage: '!!!Transactions',
-    description: 'Label for the "Transactions" nav button in the wallet navigation.'
   },
   send: {
     id: 'wallet.navigation.send',
     defaultMessage: '!!!Send',
-    description: 'Label for the "Send" nav button in the wallet navigation.'
   },
   receive: {
     id: 'wallet.navigation.receive',
     defaultMessage: '!!!Receive',
-    description: 'Label for the "Receive" nav button in the wallet navigation.'
   },
 });
 
-type Props = {
+type Props = {|
   isActiveNavItem: Function,
   onNavItemClick: Function,
-};
+|};
 
 @observer
 export default class WalletNavigation extends Component<Props> {

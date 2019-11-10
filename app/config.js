@@ -1,15 +1,34 @@
+// @flow
+
 export default {
   wallets: {
-    ADDRESS_COPY_NOTIFICATION_DURATION: 10,
-    TREZOR_WALLET_INTEGRATED_NOTIFICATION_DURATION: 8,
+    ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION: 2,
     WALLET_CREATED_NOTIFICATION_DURATION: 8,
     WALLET_RESTORED_NOTIFICATION_DURATION: 8,
     MAX_ALLOWED_UNUSED_ADDRESSES: 20,
-    TRANSACTION_REQUEST_SIZE: 20
+    TRANSACTION_REQUEST_SIZE: 20,
+    DAEDALUS_RECOVERY_PHRASE_WORD_COUNT: 12,
+    WALLET_RECOVERY_PHRASE_WORD_COUNT: 15,
+    hardwareWallet: {
+      trezorT: {
+        VENDOR: 'trezor.io',
+        MODEL: 'T',
+        manifest: {
+          EMAIL: 'rnd@emurgo.io',
+          appURL: {
+            CHROME: 'https://chrome.google.com/webstore/detail/yoroi/ffnbelfdoeiohenkjibnmadjiehjhajb',
+            FIREFOX: 'https://addons.mozilla.org/en-US/firefox/addon/yoroi/'
+          }
+        }
+      },
+      ledgerNano: {
+        // Ledger does not provide device model info up till now
+        DEFAULT_WALLET_NAME: 'Yoroi-Ledger',
+        VENDOR: 'ledger.com',
+      }
+    }
   },
-  trezor: {
-    // https://github.com/trezor/connect/blob/develop/docs/methods/cardanoGetPublicKey.md
-    // https://cardanolaunch.com/assets/Ed25519_BIP.pdf
-    DEFAULT_CARDANO_PATH: 'm/44\'/1815\'/0\''
-  }
+  forms: {
+    FORM_VALIDATION_DEBOUNCE_WAIT: 250
+  },
 };

@@ -3,13 +3,15 @@
 import { observable } from 'mobx';
 import AddressesStore from '../base/AddressesStore';
 import Request from '../lib/LocalizedRequest';
-import type WalletAddress from '../../domain/WalletAddress';
+import type {
+  CreateAddressFunc,
+} from '../../api/ada';
 
 export default class AdaAddressesStore extends AddressesStore {
 
   // REQUESTS
-  @observable createAddressRequest:
-    Request<WalletAddress> = new Request(this.api.ada.createAddress);
+  @observable createAddressRequest: Request<CreateAddressFunc>
+    = new Request<CreateAddressFunc>(this.api.ada.createAddress);
 
   setup() {
     super.setup();

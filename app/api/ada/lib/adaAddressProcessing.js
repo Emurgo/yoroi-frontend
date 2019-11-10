@@ -1,13 +1,21 @@
 
 // @flow
+
+// TODO: this file is not a library so it shouldn't be in the "lib" folder
+
 import _ from 'lodash';
-import { Wallet } from 'rust-cardano-crypto';
-import {
-  getResultOrFail
-} from './cardanoCrypto/cryptoUtils';
-import {
-  checkAddressesInUse,
-} from './yoroi-backend-api';
+import type {
+  FilterFunc,
+} from './state-fetch/types';
+import type {
+  AddressType
+} from '../adaTypes';
+
+import { RustModule } from './cardanoCrypto/rustLoader';
+import type { ConfigType } from '../../../../config/config-types';
+
+declare var CONFIG: ConfigType;
+const protocolMagic = CONFIG.network.protocolMagic;
 
 type AddressInfo = { address: string, isUsed: boolean, index: number };
 
@@ -15,16 +23,17 @@ type AddressInfo = { address: string, isUsed: boolean, index: number };
  * @returns all scanned addresses
  */
 export async function discoverAllAddressesFrom(
-  cryptoAccount: CryptoAccount,
+  cryptoAccount: RustModule.Wallet.Bip44AccountPublic,
   addressType: AddressType,
   initialHighestUsedIndex: number,
   scanSize: number,
   requestSize: number,
+  checkAddressesInUse: FilterFunc,
 ): Promise<Array<string>> {
   let fetchedAddressesInfo = [];
   let highestUsedIndex = initialHighestUsedIndex;
 
-  // keep scanning until no new unused addresses are found in batch
+  // keep scanning until no new used addresses are found in batch
   let shouldScanNewBatch = true;
   while (shouldScanNewBatch) {
     const newFetchedAddressesInfo =
@@ -33,13 +42,16 @@ export async function discoverAllAddressesFrom(
         fetchedAddressesInfo,
         cryptoAccount,
         addressType,
+        initialHighestUsedIndex + 1,
         highestUsedIndex + 1,
         scanSize,
-        requestSize
+        requestSize,
+        checkAddressesInUse,
       );
 
     const newHighestUsedIndex = _findNewHighestIndex(
       newFetchedAddressesInfo,
+      initialHighestUsedIndex + 1,
       highestUsedIndex,
       scanSize
     );
@@ -49,22 +61,23 @@ export async function discoverAllAddressesFrom(
     fetchedAddressesInfo = newFetchedAddressesInfo;
   }
 
-  // cutoff all the excess from `requestSize`
   return fetchedAddressesInfo
-    .slice(0, highestUsedIndex + 1)
+    // bip-44 requires scanSize buffer
+    .slice(0, highestUsedIndex - initialHighestUsedIndex + scanSize)
     .map((addressInfo) => addressInfo.address);
 }
 
 /** Scan a set of addresses and find the largest index that is used */
 function _findNewHighestIndex(
   newFetchedAddressesInfo: Array<AddressInfo>,
+  offset: number,
   highestUsedIndex: number,
   scanSize: number,
 ): number {
   // get all addresses added in this scan
   const newlyAddedAddresses = newFetchedAddressesInfo.slice(
-    highestUsedIndex + 1,
-    highestUsedIndex + 1 + scanSize // note: not `requestSize`
+    highestUsedIndex - offset + 1,
+    highestUsedIndex - offset + 1 + scanSize // note: not `requestSize`
   );
 
   // find new highest used
@@ -87,11 +100,13 @@ function _findNewHighestIndex(
  */
 async function _scanNextBatch(
   fetchedAddressesInfo: Array<AddressInfo>,
-  cryptoAccount: CryptoAccount,
+  cryptoAccount: RustModule.Wallet.Bip44AccountPublic,
   addressType: AddressType,
+  offset: number,
   fromIndex: number,
   scanSize: number,
   requestSize: number,
+  checkAddressesInUse: FilterFunc,
 ): Promise<Array<AddressInfo>> {
   let newFetchedAddressesInfo = fetchedAddressesInfo;
 
@@ -103,19 +118,21 @@ async function _scanNextBatch(
    */
 
   // check if already scanned in a previous batch
-  if (fetchedAddressesInfo.length >= fromIndex + scanSize) {
+  if (fetchedAddressesInfo.length + offset >= fromIndex + scanSize) {
     return fetchedAddressesInfo;
   }
 
   // create batch
   const addressesIndex = _.range(
-    fetchedAddressesInfo.length,
-    fetchedAddressesInfo.length + requestSize
+    fetchedAddressesInfo.length + offset,
+    fetchedAddressesInfo.length + offset + requestSize
   );
 
   // batch to cryptography backend
-  const newAddresses = getResultOrFail(
-    Wallet.generateAddresses(cryptoAccount, addressType, addressesIndex)
+  const newAddresses = generateAddressBatch(
+    addressesIndex,
+    cryptoAccount,
+    addressType
   );
 
   // batch to backend API
@@ -126,7 +143,8 @@ async function _scanNextBatch(
     fetchedAddressesInfo,
     newAddresses,
     usedAddresses,
-    addressesIndex
+    addressesIndex,
+    offset
   );
 
   return newFetchedAddressesInfo;
@@ -137,15 +155,34 @@ function _addFetchedAddressesInfo(
   fetchedAddressesInfo: Array<AddressInfo>,
   newAddresses: Array<string>,
   usedAddresses: Array<string>,
-  addressesIndex: Array<number>
+  addressesIndex: Array<number>,
+  offset: number,
 ): Array<AddressInfo> {
   const isUsedSet = new Set(usedAddresses);
 
   const newAddressesInfo = newAddresses.map((address, position) => ({
     address,
     isUsed: isUsedSet.has(address),
-    index: addressesIndex[position]
+    index: addressesIndex[position] - offset
   }));
 
   return fetchedAddressesInfo.concat(newAddressesInfo);
+}
+
+export function generateAddressBatch(
+  indices: Array<number>,
+  cryptoAccount: RustModule.Wallet.Bip44AccountPublic,
+  type: AddressType,
+): Array<string> {
+  const setting = RustModule.Wallet.BlockchainSettings.from_json({
+    protocol_magic: protocolMagic
+  });
+  return indices.map(i => {
+    const chain = cryptoAccount.bip44_chain(type === 'Internal');
+    const pubKey = chain.address_key(
+      RustModule.Wallet.AddressKeyIndex.new(i)
+    );
+    const addr = pubKey.bootstrap_era_address(setting);
+    return addr.to_base58();
+  });
 }

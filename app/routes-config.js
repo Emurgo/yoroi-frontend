@@ -5,6 +5,7 @@ export const ROUTES = {
   PROFILE: {
     LANGUAGE_SELECTION: '/profile/language-selection',
     TERMS_OF_USE: '/profile/terms-of-use',
+    URI_PROMPT: '/profile/uri-prompt',
   },
   WALLETS: {
     ROOT: '/wallets',
@@ -16,12 +17,21 @@ export const ROUTES = {
   },
   SETTINGS: {
     ROOT: '/settings',
-    WALLET: '/settings/wallet',
     GENERAL: '/settings/general',
+    PAPER_WALLET: '/settings/paper-wallet',
+    WALLET: '/settings/wallet',
     TERMS_OF_USE: '/settings/terms-of-use',
     SUPPORT: '/settings/support',
   },
-  DAEDALUS_TRANFER: {
-    ROOT: '/daedalus-transfer',
+  TRANSFER: {
+    ROOT: '/transfer',
+    DAEDALUS: '/transfer/daedalus',
+    YOROI: '/transfer/yoroi',
+  },
+  SEND_FROM_URI: {
+    ROOT: '/send-from-uri',
+  },
+  STAKING: {
+    ROOT: '/staking'
   }
 };

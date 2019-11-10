@@ -1,30 +1,41 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import SvgInline from 'react-svg-inline';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 import LoadingSpinner from '../widgets/LoadingSpinner';
+import adaLogo from '../../assets/images/ada-logo.inline.svg';
+import cardanoLogo from '../../assets/images/cardano-logo.inline.svg';
 import yoroiLogo from '../../assets/images/yoroi-logo-shape-white.inline.svg';
 import styles from './Loading.scss';
-import type { ReactIntlMessage } from '../../types/i18nTypes';
-import environment from '../../environment';
 import LocalizableError from '../../i18n/LocalizableError';
+import globalMessages from '../../i18n/global-messages';
 
-type State = {};
+const messages = defineMessages({
+  loading: {
+    id: 'loading.screen.loading',
+    defaultMessage: '!!!loading components',
+  },
+  error: {
+    id: 'loading.screen.error',
+    defaultMessage: '!!!For more help, you can {supportRequestLink}',
+  },
+});
 
-type Props = {
-  currencyIcon: string,
-  apiIcon: string,
+type Props = {|
+  api: string,
   isLoadingDataForNextScreen: boolean,
-  loadingDataForNextScreenMessage: ReactIntlMessage,
   hasLoadedCurrentLocale: boolean,
   hasLoadedCurrentTheme: boolean,
-  error: ?LocalizableError
-};
+  error: ?LocalizableError,
+  onExternalLinkClick: Function,
+  downloadLogs: Function
+|};
 
 @observer
-export default class Loading extends Component<Props, State> {
+export default class Loading extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -33,10 +44,8 @@ export default class Loading extends Component<Props, State> {
   render() {
     const { intl } = this.context;
     const {
-      currencyIcon,
-      apiIcon,
+      api,
       isLoadingDataForNextScreen,
-      loadingDataForNextScreenMessage,
       hasLoadedCurrentLocale,
       hasLoadedCurrentTheme,
       error
@@ -50,29 +59,29 @@ export default class Loading extends Component<Props, State> {
       styles.yoroiLogo
     ]);
     const currencyLogoStyles = classNames([
-      styles[`${environment.API}-logo`],
+      styles[`${api}-logo`],
     ]);
     const apiLogoStyles = classNames([
-      styles[`${environment.API}-apiLogo`],
+      styles[`${api}-apiLogo`],
     ]);
 
     const yoroiLoadingLogo = yoroiLogo;
-    const currencyLoadingLogo = currencyIcon;
-    const apiLoadingLogo = apiIcon;
+    const currencyLoadingLogo = adaLogo;
+    const apiLoadingLogo = cardanoLogo;
 
     return (
       <div className={componentStyles}>
         <div className={styles.logos}>
-          <SvgInline svg={currencyLoadingLogo} className={currencyLogoStyles} cleanup={['title']} />
-          <SvgInline svg={yoroiLoadingLogo} className={yoroiLogoStyles} cleanup={['title']} />
-          <SvgInline svg={apiLoadingLogo} className={apiLogoStyles} cleanup={['title']} />
+          <SvgInline svg={currencyLoadingLogo} className={currencyLogoStyles} />
+          <SvgInline svg={yoroiLoadingLogo} className={yoroiLogoStyles} />
+          <SvgInline svg={apiLoadingLogo} className={apiLogoStyles} />
         </div>
         {hasLoadedCurrentLocale && (
           <div>
             {isLoadingDataForNextScreen && (
               <div className={styles.loading}>
                 <h1 className={styles.headline}>
-                  {intl.formatMessage(loadingDataForNextScreenMessage)}
+                  {intl.formatMessage(messages.loading)}
                 </h1>
                 <LoadingSpinner />
               </div>
@@ -80,7 +89,8 @@ export default class Loading extends Component<Props, State> {
             {error && (
               <div className={styles.loading}>
                 <h1 className={styles.error}>
-                  {intl.formatMessage(error)}
+                  {intl.formatMessage(error)}<br />
+                  {this._getErrorMessageComponent()}
                 </h1>
               </div>
             )}
@@ -89,4 +99,41 @@ export default class Loading extends Component<Props, State> {
       </div>
     );
   }
+
+  _getErrorMessageComponent = (): Node => {
+    const { intl } = this.context;
+    const {
+      onExternalLinkClick,
+      downloadLogs
+    } = this.props;
+
+    const downloadLogsLink = (
+      // eslint-disable-next-line jsx-a11y/anchor-is-valid
+      <a
+        className={styles.link}
+        href="#"
+        onClick={_event => downloadLogs()}
+      >
+        {intl.formatMessage(globalMessages.downloadLogsLink)}
+      </a>
+    );
+
+    const supportRequestLink = (
+      <a
+        className={styles.link}
+        href={intl.formatMessage(globalMessages.supportRequestLinkUrl)}
+        onClick={event => onExternalLinkClick(event)}
+      >
+        {intl.formatMessage(globalMessages.contactSupport)}
+      </a>
+    );
+
+    return (
+      <p>
+        <FormattedMessage {...globalMessages.logsContent} values={{ downloadLogsLink }} /><br />
+        <FormattedMessage {...messages.error} values={{ supportRequestLink }} />
+      </p>
+    );
+  };
+
 }

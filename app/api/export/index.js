@@ -66,7 +66,7 @@ export default class ExportApi {
       Logger.debug('ExportApi::exportTransactions: called');
 
       const { rows, format, fileType, fileName } = request;
-      const dlFileName = fileName || ExportApi.createDefaultFileName();
+      const dlFileName = fileName != null ? fileName : ExportApi.createDefaultFileName();
       const data = ExportApi.convertExportRowsToCsv(rows, format);
       const fileResponse = ExportApi.convertCsvDataToFile(data, fileType);
 

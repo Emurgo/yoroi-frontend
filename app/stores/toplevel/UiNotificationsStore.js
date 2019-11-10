@@ -21,6 +21,17 @@ export default class UiNotificationsStore extends Store {
 
   isOpen = (id: string): boolean => !!this._findNotificationById(id);
 
+  getTooltipActiveNotification = (tooltipNotificationId : string): ?Notification => {
+    let notification = null;
+    const activeNotificationId = this.mostRecentActiveNotification ?
+      this.mostRecentActiveNotification.id :
+      '';
+    if (activeNotificationId === tooltipNotificationId) {
+      notification = this.mostRecentActiveNotification;
+    }
+    return notification;
+  }
+
   _findNotificationById = (id: string): ?Notification => (
     this.activeNotifications.find(notification => notification.id === id)
   );
@@ -29,8 +40,8 @@ export default class UiNotificationsStore extends Store {
     const notification: Notification = {
       id,
       message,
-      duration: duration || null,
-      secondsTimerInterval: duration ? setInterval(this._updateSeconds, 1000, id) : null,
+      duration: duration != null ? duration : null,
+      secondsTimerInterval: duration != null ? setInterval(this._updateSeconds, 1000, id) : null,
     };
 
     if (this.isOpen(id)) {
@@ -57,7 +68,7 @@ export default class UiNotificationsStore extends Store {
 
   @action _updateSeconds = (id: string) => {
     const notification = this._findNotificationById(id);
-    if (notification && notification.duration) {
+    if (notification && notification.duration != null) {
       notification.duration -= 1;
       if (notification.duration === 0) this._onClose({ id });
     }

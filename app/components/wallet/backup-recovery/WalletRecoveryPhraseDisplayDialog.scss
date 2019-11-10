@@ -1,7 +1,10 @@
-.component{
-  :global {
-    .WalletRecoveryInstructions_component {
-      text-align: center !important;
-    }
+.recoveryImage {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin: 8px 0 24px;
+
+  svg {
+    width: 180px;
   }
 }

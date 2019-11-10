@@ -3,7 +3,26 @@
 .component {
   background-color: var(--theme-settings-menu-box-background-color);
   border: var(--theme-settings-menu-box-border);
-  margin: 20px 0;
+  height: 100%;
+  overflow: overlay;
+}
+
+:global(.YoroiClassic) .component {
   padding: 16px 0;
   width: 200px;
+}
+
+:global(.YoroiModern) .component {
+  width: 250px;
+  padding: 20px 0;
+  border: none;
+  border-radius: 8px;
+}
+
+:global(.YoroiClassic) .componentWrapper {
+  padding: 20px 0;
+}
+
+:global(.YoroiModern) .componentWrapper {
+  padding: 30px 0;
 }

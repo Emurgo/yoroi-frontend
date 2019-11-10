@@ -6,39 +6,43 @@
   height: 100%;
   overflow-x: hidden;
   overflow-y: overlay;
+
   &::-webkit-scrollbar-button {
     height: 7px;
     display: block;
   }
-}
 
-.centeredBox {
-  margin: 0 auto;
-  width: 600px;
-}
-
-.submitButton,
-.submitButtonSpinning {
-  display: block !important;
-  margin: 0 auto;
-  width: 100% !important;
-}
-
-.submitButtonSpinning {
-  @include loading-spinner("../../../assets/images/spinner-light.svg");
-}
-
-.error {
-  @include error-message;
-  text-align: center;
-  margin-bottom: 1rem;
-}
-
-.checkbox {
-  margin-bottom: 30px;
-  padding-top: 10px;
-
-  :global .SimpleCheckbox_label {
-    font-family: var(--font-regular);
+  .centeredBox {
+    margin: 0 auto;
+    width: 800px;
   }
+  
+  .submitButton,
+  .submitButtonSpinning {
+    display: block !important;
+    margin: 0;
+    width: 350px;
+  }
+  
+  .submitButtonSpinning {
+    @include loading-spinner("../../../assets/images/spinner-light.svg");
+  }
+  
+  .error {
+    @include error-message;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  .checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-right: 15px;
+    padding-top: 40px;
+  
+    :global .SimpleCheckbox_label {
+      font-family: var(--rp-theme-font-regular);
+    }
+  }  
 }

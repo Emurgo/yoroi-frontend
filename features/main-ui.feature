@@ -4,20 +4,14 @@ Feature: Main UI
     Given I have opened the extension
     And I have completed the basic setup
 
-  Scenario: Get balance with 45 addresses
-    Given I am testing "Main UI"
-    And There is a wallet stored named complex-wallet
-    Then I should see the balance number "0.020295 ADA"
-
-  Scenario: Get balance with a big amount
-    Given I am testing "Main UI"
-    And There is a wallet stored named Test
-    Then I should see the balance number "9,007,199,254.720698 ADA"
+  @it-81
+  Scenario: Restore wallet and get balance with many addresses
+    And There is a wallet stored named many-tx-wallet
+    Then I should see the balance number "3.110004 ADA"
 
   @it-15
   Scenario: Main Screen Tabs Switching (IT-15)
-    Given I am testing "Main UI"
-    When There is a wallet stored named complex-wallet
+    When I import a snapshot named empty-wallet
     And I go to the send transaction screen
     Then I should see send transaction screen
     When I go to the receive screen
@@ -27,8 +21,7 @@ Feature: Main UI
 
   @it-21
   Scenario: Yoroi Wallet "Home Button" Test (IT-21)
-    Given I am testing "Main UI"
-    When There is a wallet stored named complex-wallet
+  When I import a snapshot named empty-wallet
     And I am on the Daedalus Transfer instructions screen
     And I go to the main screen
     Then I should see the transactions screen
@@ -38,18 +31,34 @@ Feature: Main UI
 
   @it-25
   Scenario: Ensure user can copy Wallet address to Windows clipboard via "Copy address" buttons (IT-25)
-    Given I am testing "Main UI"
-    When There is a wallet stored named complex-wallet
+    When I import a snapshot named empty-wallet
     When I go to the receive screen
     Then I should see the Receive screen
     When I click on "copy to clipboard" button
-    Then I should see "You have successfully copied wallet address" pop up:
+    Then I should see "copied" tooltip message:
     | message                                            |
-    | wallet.receive.page.addressCopyNotificationMessage |
+    | global.copyTooltipMessage |
 
   @it-30
   Scenario: User can't restore Daedalus wallet in Yoroi if Yoroi wallet is not created (IT-30)
-    Given I am testing "Main UI"
     When There is no wallet stored
     And I am on the Daedalus Transfer instructions screen
     Then I see transactions buttons are disabled
+
+  @serverDown @it-31
+  Scenario: The networkError banner must be displayed if the server is not reachable (IT-31)
+  Then I should see the networkError banner
+
+  @serverMaintenance @it-32
+  Scenario: The serverError banner must be displayed for as long as the server reports an issue (IT-32)
+  Then I should see the serverError banner
+
+  @it-110
+  Scenario: Ensure user can hide balance (IT-110)
+    And I import a snapshot named many-tx-wallet
+    And I click on hide balance button
+    Then I should see my balance hidden
+    When I refresh the page
+    Then I should see my balance hidden
+    When I click on hide balance button
+    Then I should see the balance number "3.110004 ADA"

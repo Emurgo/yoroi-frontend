@@ -1,6 +1,10 @@
 @import '../../themes/mixins/error-message';
 @import '../../themes/mixins/loading-spinner';
 
+.isSubmitting {
+  @include loading-spinner("../../assets/images/spinner-light.svg");
+}
+
 .component {
   padding: 20px;
 }
@@ -33,35 +37,31 @@
     line-height: 1.38;
   }
 
-  .addressLabel {
-    text-transform: uppercase;
-  }
-
   .addressSubLabel {
     margin-top: 6px;
   }
 
   .address {
-    font-family: var(--font-light);
     line-height: 1.38;
-    margin-top: 6px;
-    opacity: 0.5;
-    word-wrap: break-word;
   }
 
   .amountFeesWrapper {
     display: flex;
     flex-direction: row;
+
     .amountWrapper,
     .feesWrapper {
       width: 50%;
     }
+
     .amountWrapper {
       margin-right: 10px;
     }
+
     .feesWrapper {
       margin-left: 10px;
     }
+
     .amountLabel,
     .feesLabel {
       font-size: 12px;
@@ -70,6 +70,7 @@
       line-height: 1.38;
       text-transform: uppercase;
     }
+
     .amount,
     .fees {
       color: var(--theme-send-confirmation-dialog-send-values-color);
@@ -77,6 +78,7 @@
       margin-top: 6px;
       word-break: break-word;
     }
+
     .fees {
       opacity: 0.5;
     }
@@ -120,6 +122,32 @@
   }
 }
 
-.isSubmitting {
-  @include loading-spinner("../../assets/images/spinner-light.svg");
+:global(.YoroiClassic) .component {
+  .body {
+    .addressLabel {
+      text-transform: uppercase;
+    }
+  }
+}
+
+:global(.YoroiModern) .component {
+  .body {
+    .addressLabel {
+      font-size: 16px;
+      text-transform: capitalize;
+    }
+
+    .amountFeesWrapper {
+      .amountLabel,
+      .feesLabel {
+        font-size: 16px;
+        text-transform: capitalize;
+      }
+    }
+
+    .totalAmountLabel {
+      font-size: 16px;
+      text-transform: capitalize;
+    }
+  }
 }

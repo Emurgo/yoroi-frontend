@@ -18,47 +18,48 @@ const messages = defineMessages({
   verificationInstructions: {
     id: 'wallet.backup.recovery.phrase.entry.dialog.verification.instructions',
     defaultMessage: '!!!Tap each word in the correct order to verify your recovery phrase',
-    description: 'Instructions for verifying wallet recovery phrase on dialog for entering wallet recovery phrase.'
+  },
+  buttonLabelRemoveLast: {
+    id: 'wallet.recovery.phrase.show.entry.dialog.button.labelRemoveLast',
+    defaultMessage: '!!!Remove last',
   },
   buttonLabelConfirm: {
     id: 'wallet.recovery.phrase.show.entry.dialog.button.labelConfirm',
     defaultMessage: '!!!Confirm',
-    description: 'Label for button "Confirm" on wallet backup dialog'
   },
   buttonLabelClear: {
     id: 'wallet.recovery.phrase.show.entry.dialog.button.labelClear',
     defaultMessage: '!!!Clear',
-    description: 'Label for button "Clear" on wallet backup dialog'
   },
   termDevice: {
     id: 'wallet.backup.recovery.phrase.entry.dialog.terms.and.condition.device',
     defaultMessage: '!!!I understand that my money are held securely on this device only, not on the company servers',
-    description: 'Term and condition on wallet backup dialog describing that wallet is on a users device, not on company servers'
   },
   termRecovery: {
     id: 'wallet.backup.recovery.phrase.entry.dialog.terms.and.condition.recovery',
     defaultMessage: `!!!I understand that if this application is moved to another device or deleted, my money can
     be only recovered with the backup phrase which were written down in a secure place`,
-    description: 'Term and condition on wallet backup dialog describing that wallet can only be recovered with a security phrase'
   }
 });
 
-type Props = {
+type Props = {|
   recoveryPhraseSorted: Array<{ word: string, isActive: boolean }>,
-  enteredPhrase: Array<{ word: string }>,
+  enteredPhrase: Array<{ word: string, index: number }>,
   isValid: boolean,
   isTermDeviceAccepted: boolean,
   isTermRecoveryAccepted: boolean,
   isSubmitting: boolean,
   onAddWord: Function,
-  canFinishBackup: boolean,
   onClear: Function,
   onAcceptTermDevice: Function,
   onAcceptTermRecovery: Function,
   onRestartBackup: Function,
   onCancelBackup: Function,
   onFinishBackup: Function,
-};
+  removeWord: Function,
+  hasWord: Function,
+  classicTheme: boolean,
+|};
 
 @observer
 export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
@@ -80,10 +81,12 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
       onClear,
       onAcceptTermDevice,
       onAcceptTermRecovery,
-      canFinishBackup,
+      removeWord,
       onRestartBackup,
       onCancelBackup,
-      onFinishBackup
+      onFinishBackup,
+      hasWord,
+      classicTheme,
     } = this.props;
     const dialogClasses = classnames([
       styles.component,
@@ -94,55 +97,80 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
 
     const actions = [];
 
-    actions.push({
-      className: isSubmitting ? styles.isSubmitting : null,
-      label: intl.formatMessage(messages.buttonLabelConfirm),
-      onClick: onFinishBackup,
-      disabled: !canFinishBackup,
-      primary: true
-    });
-
     // Only show "Clear" button when user is not yet done with entering mnemonic
     if (!isValid) {
       actions.unshift({
+        label: intl.formatMessage(messages.buttonLabelRemoveLast),
+        onClick: removeWord,
+        disabled: !hasWord,
+        primary: true
+      });
+      actions.unshift({
         label: intl.formatMessage(messages.buttonLabelClear),
         onClick: onClear,
+        disabled: !hasWord,
+        primary: true
+      });
+    } else {
+      actions.push({
+        className: isSubmitting ? styles.isSubmitting : null,
+        label: intl.formatMessage(messages.buttonLabelConfirm),
+        onClick: onFinishBackup,
+        disabled: isSubmitting || !isTermDeviceAccepted || !isTermRecoveryAccepted,
+        primary: true
       });
     }
+
+    const phraseOld = enteredPhraseString;
+    const phrase = enteredPhrase.length ? (
+      <div className={styles.phraseWrapper}>
+        {enteredPhrase.map((item, i) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <div key={item.word + i} className={styles.phraseWord}>{item.word}</div>
+        ))}
+      </div>
+    ) : (
+      <p className={styles.phrasePlaceholder}>
+        {intl.formatMessage(messages.verificationInstructions)}
+      </p>
+    );
 
     return (
       <Dialog
         className={dialogClasses}
         title={intl.formatMessage(globalMessages.recoveryPhraseDialogTitle)}
         actions={actions}
-        closeOnOverlayClick
+        closeOnOverlayClick={false}
         onClose={onCancelBackup}
         closeButton={<DialogCloseButton onClose={onCancelBackup} />}
         backButton={!isValid ? <DialogBackButton onBack={onRestartBackup} /> : null}
+        classicTheme={classicTheme}
       >
-        {!isValid && (
+        {!isValid && classicTheme ? (
           <WalletRecoveryInstructions
             instructionsText={intl.formatMessage(messages.verificationInstructions)}
+            classicTheme={classicTheme}
           />
-        )}
+        ) : null}
 
-        <WalletRecoveryPhraseMnemonic phrase={enteredPhraseString} />
+        {!isValid && <WalletRecoveryPhraseMnemonic
+          filled={!classicTheme && Boolean(enteredPhrase.length)}
+          phrase={classicTheme ? phraseOld : phrase}
+          classicTheme={classicTheme}
+        />}
 
         {!isValid && (
           <div className={styles.words}>
-            {recoveryPhraseSorted.map(({ word, isActive }, index) => {
-              const handleClick = value => isActive && onAddWord(value);
-
-              return (
-                <MnemonicWord
-                  key={index} // eslint-disable-line react/no-array-index-key
-                  word={word}
-                  index={index}
-                  isActive={isActive}
-                  onClick={handleClick}
-                />
-              );
-            })}
+            {recoveryPhraseSorted.map(({ word, isActive }, index) => (
+              <MnemonicWord
+                key={word + index} // eslint-disable-line react/no-array-index-key
+                word={word}
+                index={index}
+                isActive={isActive}
+                onClick={(value) => isActive && onAddWord(value)}
+                classicTheme={classicTheme}
+              />
+            ))}
           </div>
         )}
 

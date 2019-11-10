@@ -8,29 +8,113 @@ aliases:
   - &attach_workspace
       attach_workspace:
         at: ~/repo
+  - &persist_repo_to_workspace
+      persist_to_workspace:
+        root: ~/repo
+        paths: .
+  - &persist_screenshots_to_workspace
+      persist_to_workspace:
+        root: ~/repo
+        paths:
+          - screenshots
+  - &restore_cache
+      restore_cache:
+        keys:
+          - generic-tools-cache-{{ checksum "package.json" }}
+  - &save_cache
+      save_cache:
+        paths:
+         - ~/.npm
+         - ~/.rustup
+         - ~/.cargo
+        key: generic-tools-cache-{{ checksum "package.json" }}
+  - &setenv
+      run: bash .circleci/set_dynamic_env.sh
+  - &global_environment
+      # runtime versions
+      RUST_VERSION: 1.32.0
+      RUST_TARGETS: wasm32-unknown-unknown
+      # misc
+      CHROME_CODEBASE_URL: https://www.sample.com/dw/yoroi-extension.crx
+      CHROME_WEBSTORE_API_ENDPOINT: https://www.googleapis.com/upload/chromewebstore/v1.1
+      CHROME_DEV_APP_ID: febkioblpijdgicianpklkmolpbagnbo
+      CHROME_STG_APP_ID: bbaanljemfingpglehbbpdlhhahliihe
+      CHROME_PRO_APP_ID: fkkmcnnpaaimcaikbjgklcibgncdgejc
+      SCREENSHOT_DIFF_THRESHOLD: 0
+      SCREENSHOT_DIFF_COLOR: yellow
+      BROWSERS: brave chrome firefox
+      GITHUB_BUILD_BRANCHES: develop staging master shelley
 
+      # Encrypted env vars from ui:
+      # AWS_ACCESS_KEY_ID: "${ARTIFACTS_KEY}"
+      # AWS_SECRET_ACCESS_KEY: "${ARTIFACTS_SECRET}"
+      # AWS_REGION: "${ARTIFACTS_REGION}"
+      # S3_BUCKET: "${ARTIFACTS_BUCKET}"
+      # DOCKER_USERNAME
+      # DOCKER_PASSWORD
+      # GITHUB_PAT
+      # GOOGLE_CLIENT_ID
+      # GOOGLE_CLIENT_SECRET
+      # GOOGLE_REFRESH_TOKEN
+
+#checkout:
+#  post:
 jobs:
   build-setup:
+    environment:
+      <<: *global_environment
+      POC: poc
     working_directory: ~/repo
     docker:
       - image: circleci/node:8-browsers
 
     steps:
       - checkout
+      - *setenv
+      - run:
+          # NOTES: step based on https://discuss.circleci.com/t/show-test-results-for-prospective-merge-of-a-github-pr/1662/8
+          # This is not working on circle's checkout/post hook for some reason, so we moved it here
+          name: Checkout merge-commit if this is a PR build
+          command: |
+            # Get PR number if there is some open PR for develop|staging|master,
+            # even if circle doesn't provide it (triggers are for the branches).
+            # NOTE: we could have multiple PRs from the same branch and this
+            # snippet would only pick the last one
+            test -z "${CIRCLE_PR_NUMBER}" && CIRCLE_PR_NUMBER=$(bash .circleci/get_github_pr_for_associated_branch.sh)
+            if [[ -n "${CIRCLE_PR_NUMBER}" ]]
+            then
+                CIRCLE_PR_BASE_BRANCH=$(bash .circleci/get_github_pr_base_branch.sh)
+                # Update PR refs for testing.
+                FETCH_REFS="+${CIRCLE_PR_BASE_BRANCH}:${CIRCLE_PR_BASE_BRANCH}"
+                FETCH_REFS="${FETCH_REFS} +refs/pull/${CIRCLE_PR_NUMBER}/head:pr/${CIRCLE_PR_NUMBER}/head"
+                FETCH_REFS="${FETCH_REFS} +refs/pull/${CIRCLE_PR_NUMBER}/merge:pr/${CIRCLE_PR_NUMBER}/merge"
 
-      # install rustup
-      - run: curl https://sh.rustup.rs -sSf | sh -s -- -y
-      - run: echo 'export PATH=$HOME/.cargo/bin/:$PATH' >> $BASH_ENV
-      # use 1.32.0 version. 
-      # // TODO: This is hardcoded but taken from js-cardano-wasm repo
-      # which is checked out later
-      - run: rustup install 1.32.0
-      - run: rustup target add wasm32-unknown-unknown --toolchain 1.32.0
+                # Retrieve the refs
+                git fetch -u origin ${FETCH_REFS}
 
-      # Because npm link will write in this path
-      - run: sudo chown -R "$(whoami):$(whoami)" /usr/local/lib/node_modules
-      - run: npm run build-js-cardano-wasm
-      - run: npm install
+                # Checkout PR merge ref.
+                git checkout -f "pr/${CIRCLE_PR_NUMBER}/merge"
+
+                # Test for merge conflicts.
+                git branch --merged | grep ${CIRCLE_PR_BASE_BRANCH} > /dev/null
+                git branch --merged | grep "pr/${CIRCLE_PR_NUMBER}/head" > /dev/null
+            fi
+
+            if [ "${CIRCLE_PR_BASE_BRANCH}" != "null" ]
+            then
+              echo "[+] Checked out '$(git rev-parse HEAD)' merge commit for PR${CIRCLE_PR_NUMBER} (${CIRCLE_BRANCH} + ${CIRCLE_PR_BASE_BRANCH})."
+              echo "    NOTE: commit used to tag artifacts will be the branch commit '${GIT_SHORT_COMMIT}' instead of the merge one so it's easily linked to this buildjob."
+            else
+              echo "[+] Building branch commit '${GIT_SHORT_COMMIT}'"
+            fi
+
+      # cancel builds from the same branch (since circle feature seems not working)
+      - run: bash .circleci/stop_redundant_jobs.sh
+      - *restore_cache
+      - run: bash .circleci/rust_install.sh
+
+      - run: npm ci
+      - *save_cache
       
       # code quality checks
       - run: npm run flow
@@ -40,71 +124,122 @@ jobs:
       - run: npm run jest
 
       # create extensions to be consumed by browsers
-      - run: npm run test-prepare
+      - run: bash .circleci/build_yoroi.sh
 
       # persist results to then use them in tests
-      - persist_to_workspace:
-          root: ~/repo
-          paths: .
+      - *persist_repo_to_workspace
+
+  test-brave:
+    environment:
+      <<: *global_environment
+      BROWSER: brave
+    working_directory: ~/repo
+    docker:
+      - image: emurgornd/circleci-node-8-browsers:brave
+
+    steps:
+      - *attach_workspace
+      - *setenv
+      # stop workflow here if '#skip-e2e' was provided in $GIT_COMMIT_MESSAGE
+      - run: bash .circleci/e2e_skip.sh
+      - run: bash .circleci/e2e_tests.sh
+      - *persist_screenshots_to_workspace
 
   test-chrome:
+    environment:
+      <<: *global_environment
+      BROWSER: chrome
     working_directory: ~/repo
     docker:
       - image: circleci/node:8-browsers
 
     steps:
-      - checkout
       - *attach_workspace
-      - run: npm run test-e2e-chrome
+      - *setenv
+      # stop workflow here if '#skip-e2e' was provided in $GIT_COMMIT_MESSAGE
+      - run: bash .circleci/e2e_skip.sh
+      - run: bash .circleci/e2e_tests.sh
+      - *persist_screenshots_to_workspace
 
   test-firefox:
+    environment:
+      <<: *global_environment
+      BROWSER: firefox
     working_directory: ~/repo
     docker:
-      - image: circleci/node:8-browsers
-
-    steps:
-      - checkout
-      - *attach_workspace
-
       # unsiggned addons are only supported in Firefox-dev, Firefox nightly and Firefox-esr
-      # CircleCI comes w/ Firefox but we need to replace it w/ Firefox-esr
-      # Firefox-esr is easier to install of Debian so we pick it
-      # https://www.mozilla.org/en-US/firefox/organizations/
-      - run: sudo rm -f /opt/firefox/firefox
-      - run: sudo rm -f /usr/local/bin/firefox
-      - run: sudo apt install firefox-esr
-      - run: sudo ln -s /usr/bin/firefox-esr /usr/local/bin/firefox
+      # CircleCI comes w/ Firefox but we need to replace it w/ Firefox-esr,
+      # so we use a custom image derivated from circleci's one:
+      - image: emurgornd/circleci-node-8-browsers:firefox-dev
 
-      - run: npm run test-e2e-firefox
+    steps:
+      - *attach_workspace
+      - *setenv
+      # stop workflow here if '#skip-e2e' was provided in $GIT_COMMIT_MESSAGE
+      - run: bash .circleci/e2e_skip.sh
+      - run: bash .circleci/e2e_tests.sh
+      - *persist_screenshots_to_workspace
 
-  deploy-testnet:
+  deploy-artifacts:
+    environment:
+      <<: *global_environment
     working_directory: ~/repo
     docker:
       - image: circleci/node:8-browsers
 
     steps:
       - *attach_workspace
+      - *setenv
+      - run: bash .circleci/deploy_depends_install.sh
+      - run: bash .circleci/s3_screenshots_upload.sh
+      - run: bash .circleci/chrome_webstore_deploy.sh
+      # TODO: GH releases deploy, this is a dummy script right now.
+      # We prolly could use dpl CLI tool from Travis: https://github.com/travis-ci/dpl#github-releases
+      - run: bash .circleci/s3_artifacts_upload.sh
+      - run: bash .circleci/pull_request_comment.sh
 
-      - run: npm run build -- --env "staging"
-      - run: npm run compress -- --env "staging" --zip-only --app-id $APP_ID --codebase "https://www.sample.com/dw/yoroi-extension.crx"
-      - run: sudo npm install -g chrome-webstore-upload-cli
-      - run: cd ~/build/repo/ && webstore upload --source yoroi.zip --extension-id="${APP_ID}" --client-id="${CLIENT_ID}" --client-secret="${CLIENT_SECRET}" --refresh-token="${REFRESH_TOKEN}" --auto-publish --trusted-testers
+  # this can be used to be triggered from other CI systems
+  ondemand-build:
+    environment:
+      <<: *global_environment
+    working_directory: ~/repo
+    docker:
+      - image: circleci/node:8-browsers
+    steps:
+      - *attach_workspace
+      - run: echo $RUN_EXTRA_TESTS
 
 workflows:
   version: 2
   build-deploy:
     jobs:
       - build-setup
+      - test-brave:
+          filters:
+            branches:
+              only:
+                - master
+          requires:
+            - build-setup
       - test-chrome:
+          filters:
+            branches:
+              ignore:
+                - l10n_develop
           requires:
             - build-setup
       - test-firefox:
+          filters:
+            branches:
+              ignore:
+                - l10n_develop
           requires:
             - build-setup
-      - deploy-testnet:
+      - deploy-artifacts:
           requires:
             - test-chrome
             - test-firefox
+      - ondemand-build:
           filters:
             branches:
-              only: staging
+              ignore: /.*/

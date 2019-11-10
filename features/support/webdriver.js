@@ -1,10 +1,16 @@
 // @flow
 
 import { setWorldConstructor, setDefaultTimeout } from 'cucumber';
-import seleniumWebdriver, { By, Key } from 'selenium-webdriver';
+import { Builder, By, Key, until } from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome';
 import firefox from 'selenium-webdriver/firefox';
 import path from 'path';
+
+const fs = require('fs');
+
+function encode(file) {
+  return fs.readFileSync(file, { encoding: 'base64' });
+}
 
 /**
  * Chrome extension URLs are fixed and never change. This is a security problem as it allows
@@ -24,34 +30,47 @@ import path from 'path';
 const firefoxExtensionId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 const firefoxUuidMapping = `{"{530f7c6c-6077-4703-8f71-cb368c663e35}":"${firefoxExtensionId}"}`;
 
-function getChromeBuilder() {
-  return new seleniumWebdriver.Builder()
-    .withCapabilities({
-      chromeOptions: {
-        args: [
-          'start-maximized'
-        ]
-      }
-    })
+function getBraveBuilder() {
+  return new Builder()
     .forBrowser('chrome')
-    .setChromeOptions(new chrome.Options().addExtensions(path.resolve(__dirname, '../../yoroi-test.crx')));
+    .setChromeOptions(new chrome.Options()
+      .setChromeBinaryPath('/usr/bin/brave-browser')
+      .addArguments(
+        '--start-maximized',
+        '--disable-setuid-sandbox',
+        '--no-sandbox',
+        '--disable-dev-shm-usage',
+      )
+      .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx'))));
+}
+
+function getChromeBuilder() {
+  return new Builder()
+    .forBrowser('chrome')
+    .setChromeOptions(new chrome.Options()
+      .addExtensions(encode(path.resolve(__dirname, '../../yoroi-test.crx')))
+      .addArguments(
+        '--start-maximized',
+        '--disable-setuid-sandbox',
+        '--no-sandbox',
+        '--disable-dev-shm-usage',
+      ));
 }
 
 function getFirefoxBuilder() {
-  const profile = new firefox.Profile();
+  const options = new firefox.Options()
+    // .setBinary(firefox.Channel.NIGHTLY)
+    .addExtensions(path.resolve(__dirname, '../../yoroi-test.xpi'))
+    /**
+     * Firefox disallows unsigned extensions by default. We solve this through a config change
+     * The proper way to do this is to use the "temporary addon" feature of Firefox
+     * However, our version of selenium doesn't support this yet
+     * The config is deprecated and may be removed in the future.
+     */
+    .setPreference('xpinstall.signatures.required', false)
+    .setPreference('extensions.webextensions.uuids', firefoxUuidMapping);
 
-  /**
-   * Firefox disallows unsigned extensions by default. We solve this through a config change
-   * The proper way to do this is to use the "temporary addon" feature of Firefox
-   * However, our version of selenium doesn't support this yet
-   * The config is deprecated and may be removed in the future.
-   */
-  profile.setPreference('xpinstall.signatures.required', false);
-  profile.setPreference('extensions.webextensions.uuids', firefoxUuidMapping);
-  profile.addExtension(path.resolve(__dirname, '../../yoroi-test.xpi'));
-  const options = new firefox.Options().setProfile(profile);
-
-  return new seleniumWebdriver.Builder()
+  return new Builder()
     .withCapabilities({
       chromeOptions: {
         args: [
@@ -65,19 +84,34 @@ function getFirefoxBuilder() {
 
 type WorldInput = {
   parameters: {
-    browser: 'chrome' | 'firefox'
+    browser: 'brave' | 'chrome' | 'firefox'
   }
 };
 
 // TODO: We should add methods to `this.driver` object, instead of use `this` directly
 function CustomWorld(cmdInput: WorldInput) {
-  const builder = cmdInput.parameters.browser === 'chrome'
-    ? getChromeBuilder()
-    : getFirefoxBuilder();
-  this.driver = builder.build();
+  switch (cmdInput.parameters.browser) {
+    case 'brave': {
+      const braveBuilder = getBraveBuilder();
+      this.driver = braveBuilder.build();
+      break;
+    }
+    case 'firefox': {
+      const firefoxBuilder = getFirefoxBuilder();
+      this.driver = firefoxBuilder.build();
+      break;
+    }
+    default: {
+      const chromeBuilder = getChromeBuilder();
+      this.driver = chromeBuilder.build();
+      break;
+    }
+  }
+
+  this.getBrowser = (): string => cmdInput.parameters.browser;
 
   this.getExtensionUrl = (): string => {
-    if (cmdInput.parameters.browser === 'chrome') {
+    if (cmdInput.parameters.browser === 'chrome' || cmdInput.parameters.browser === 'brave') {
       /**
        * Extension id is determinisitically calculated based on pubKey used to generate the crx file
        * so we can just hardcode this value if we keep e2etest-key.pem file
@@ -91,30 +125,33 @@ function CustomWorld(cmdInput: WorldInput) {
   this.getElementBy = (locator, method = By.css) => this.driver.findElement(method(locator));
   this.getElementsBy = (locator, method = By.css) => this.driver.findElements(method(locator));
   this.getText = (locator) => this.getElementBy(locator).getText();
+  // $FlowFixMe Flow doesn't like that we add a new function to driver
   this.getValue = this.driver.getValue =
     async (locator) => this.getElementBy(locator).getAttribute('value');
 
   this.waitForElementLocated = (locator, method = By.css) => {
-    const isLocated = seleniumWebdriver.until.elementLocated(method(locator));
+    const isLocated = until.elementLocated(method(locator));
     return this.driver.wait(isLocated);
   };
 
   // Returns a promise that resolves to the element
+  // $FlowFixMe Flow doesn't like that we add a new function to driver
   this.waitForElement = this.driver.waitForElement = async (locator, method = By.css) => {
     await this.waitForElementLocated(locator, method);
     const element = await this.getElementBy(locator, method);
-    const condition = seleniumWebdriver.until.elementIsVisible(element);
+    const condition = until.elementIsVisible(element);
     return this.driver.wait(condition);
   };
 
   this.waitElementTextMatches = async (regex, locator, method = By.css) => {
     await this.waitForElement(locator, method);
     const element = await this.getElementBy(locator, method);
-    const condition = seleniumWebdriver.until.elementTextMatches(element, regex);
+    const condition = until.elementTextMatches(element, regex);
     await this.driver.wait(condition);
     return element;
   };
 
+  // $FlowFixMe Flow doesn't like that we add a new function to driver
   this.waitForElementNotPresent = this.driver.waitForElementNotPresent =
     async (locator, method = By.css) => {
       await this.driver.wait(async () => {
@@ -125,11 +162,17 @@ function CustomWorld(cmdInput: WorldInput) {
 
   this.waitEnable = async (locator, method = By.css) => {
     const element = await this.getElementBy(locator, method);
-    const condition = seleniumWebdriver.until.elementIsEnabled(element);
+    const condition = until.elementIsEnabled(element);
     return this.driver.wait(condition);
   };
 
-  this.waitUntilText = async (locator, text, timeout = 60000) => {
+  this.waitDisable = async (locator, method = By.css) => {
+    const element = await this.getElementBy(locator, method);
+    const condition = until.elementIsDisabled(element);
+    return this.driver.wait(condition);
+  };
+
+  this.waitUntilText = async (locator, text, timeout = 75000) => {
     await this.driver.wait(async () => {
       try {
         const value = await this.getText(locator);
@@ -140,7 +183,7 @@ function CustomWorld(cmdInput: WorldInput) {
     }, timeout);
   };
 
-  this.waitUntilContainsText = async (locator, text, timeout = 10000) => {
+  this.waitUntilContainsText = async (locator, text, timeout = 15000) => {
     await this.driver.wait(async () => {
       try {
         const value = await this.getText(locator);
@@ -176,7 +219,7 @@ function CustomWorld(cmdInput: WorldInput) {
     }
   };
 
-  this.executeLocalStorageScript = (script) => this.driver.executeScript(`return window.localStorage.${script}`);
+  this.executeLocalStorageScript = (script) => this.driver.executeScript(`return window.yoroi.api.localStorage.${script}`);
 
   this.getFromLocalStorage = async (key) => {
     const result = await this.executeLocalStorageScript(`getItem("${key}")`);
@@ -193,20 +236,16 @@ function CustomWorld(cmdInput: WorldInput) {
     )
   );
 
-  this.saveAddressesToDB = addresses => (
-    this.driver.executeScript(addrs => {
-      addrs.forEach(addr => window.yoroi.api.ada.saveAddress(addr, 'External'));
-    }, addresses)
+  this.dropDB = () => (
+    this.driver.executeScript(() => window.yoroi.api.ada.dropDB())
   );
 
-  this.saveTxsToDB = transactions => {
-    this.driver.executeScript(txs => {
-      window.yoroi.api.ada.saveTxs(txs);
-    }, transactions);
+  this.saveLastReceiveAddressIndex = index => {
+    this.driver.executeScript(i => {
+      window.yoroi.api.ada.saveLastReceiveAddressIndex({ index: i });
+    }, index);
   };
 }
 
 setWorldConstructor(CustomWorld);
-// I'm setting this timeout to 10 seconds as usually it takes about 5 seconds
-// to startup
 setDefaultTimeout(60 * 1000);

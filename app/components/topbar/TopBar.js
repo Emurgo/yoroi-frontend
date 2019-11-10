@@ -1,51 +1,49 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import { kebabCase } from 'lodash';
-import classNames from 'classnames';
 import { observer } from 'mobx-react';
 import TopBarCategory from './TopBarCategory';
 import styles from './TopBar.scss';
 import type { Category } from '../../config/topbarConfig';
 
-type Props = {
+type Props = {|
   children?: ?Node,
   title: ?Node,
   categories?: Array<Category>,
-  activeTopbarCategory: string,
+  isActiveCategory?: Function,
   onCategoryClicked?: Function,
-};
+|};
 
 @observer
 export default class TopBar extends Component<Props> {
   static defaultProps = {
     children: undefined,
     categories: undefined,
-    onCategoryClicked: undefined
+    isActiveCategory: undefined,
+    onCategoryClicked: undefined,
   };
 
   render() {
     const {
       title,
-      categories, activeTopbarCategory, onCategoryClicked,
+      categories,
+      isActiveCategory,
+      onCategoryClicked,
     } = this.props;
 
-    const topBarStyles = classNames([
-      styles.topBar
-    ]);
-
     return (
-      <header className={topBarStyles}>
+      <header className={styles.topBar}>
         <div className={styles.topBarTitle}>{title}</div>
         {this.props.children}
-        {categories && categories.map(category => {
-          const categoryClassName = kebabCase(category.name);
+        {categories ? categories.map(category => {
           return (
             <TopBarCategory
               key={category.name}
-              className={categoryClassName}
+              className={category.className}
               icon={category.icon}
-              active={activeTopbarCategory === category.route}
+              iconStyle={category.iconStyle}
+              inlineTextMD={category.inlineText}
+              active={isActiveCategory !== undefined && isActiveCategory(category)}
               onClick={() => {
                 if (onCategoryClicked) {
                   onCategoryClicked(category.route);
@@ -53,7 +51,7 @@ export default class TopBar extends Component<Props> {
               }}
             />
           );
-        })}
+        }) : null}
       </header>
     );
   }

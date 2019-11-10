@@ -6,7 +6,7 @@ import CachedRequest from '../lib/LocalizedCachedRequest';
 import Request from '../lib/LocalizedRequest';
 import WalletAddress from '../../domain/WalletAddress';
 import LocalizableError, { localizedError } from '../../i18n/LocalizableError';
-import type { GetAddressesResponse } from '../../api/common';
+import type { GetAddressesFunc, CreateAddressFunc } from '../../api/ada';
 import environment from '../../environment';
 
 export default class AddressesStore extends Store {
@@ -14,12 +14,12 @@ export default class AddressesStore extends Store {
   /** Track addresses for a set of wallets */
   @observable addressesRequests: Array<{
     walletId: string,
-    allRequest: CachedRequest<GetAddressesResponse>
+    allRequest: CachedRequest<GetAddressesFunc>
   }> = [];
   @observable error: ?LocalizableError = null;
 
   // REQUESTS
-  @observable createAddressRequest: Request<WalletAddress>;
+  @observable createAddressRequest: Request<CreateAddressFunc>;
 
   setup() {
     const actions = this.actions[environment.API].addresses;
@@ -29,7 +29,7 @@ export default class AddressesStore extends Store {
 
   _createAddress = async () => {
     try {
-      const address: ?WalletAddress = await this.createAddressRequest.execute().promise;
+      const address: ?WalletAddress = await this.createAddressRequest.execute({}).promise;
       if (address != null) {
         this._refreshAddresses();
         runInAction('reset error', () => { this.error = null; });
@@ -93,14 +93,14 @@ export default class AddressesStore extends Store {
   };
 
   _getAccountIdByWalletId = (walletId: string): (?string) => {
+    // Note: assume single account in Yoroi
     const result = this._getAddressesAllRequest(walletId).result;
     return result ? result.accountId : null;
   };
 
-  _getAddressesAllRequest = (walletId: string): CachedRequest<GetAddressesResponse> => {
+  _getAddressesAllRequest = (walletId: string): CachedRequest<GetAddressesFunc> => {
     const foundRequest = _.find(this.addressesRequests, { walletId });
     if (foundRequest && foundRequest.allRequest) return foundRequest.allRequest;
-    return new CachedRequest(this.api[environment.API].getExternalAddresses);
+    return new CachedRequest<GetAddressesFunc>(this.api[environment.API].getExternalAddresses);
   };
-
 }

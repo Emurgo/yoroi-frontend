@@ -3,17 +3,20 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { intlShape } from 'react-intl';
+import SvgInline from 'react-svg-inline';
 import { Input } from 'react-polymorph/lib/components/Input';
-import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import globalMessages from '../../../i18n/global-messages';
+import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
+import editSvg from '../../../assets/images/edit.inline.svg';
 import styles from './ReadOnlyInput.scss';
 
-type Props = {
+type Props = {|
   label: string,
   value: string,
   isSet: boolean,
   onClick: Function,
-};
+  classicTheme: boolean,
+|};
 
 @observer
 export default class ReadOnlyInput extends Component<Props> {
@@ -28,6 +31,7 @@ export default class ReadOnlyInput extends Component<Props> {
       value,
       isSet,
       onClick,
+      classicTheme,
     } = this.props;
     const { intl } = this.context;
     const buttonLabel = intl.formatMessage(globalMessages[isSet ? 'change' : 'create']);
@@ -46,7 +50,7 @@ export default class ReadOnlyInput extends Component<Props> {
           label={label}
           value={value}
           disabled
-          skin={InputSkin}
+          skin={InputOwnSkin}
         />
 
         <button
@@ -54,7 +58,7 @@ export default class ReadOnlyInput extends Component<Props> {
           className={styles.button}
           onClick={onClick}
         >
-          {buttonLabel}
+          {classicTheme ? buttonLabel : <SvgInline svg={editSvg} className={styles.icon} />}
         </button>
 
       </div>

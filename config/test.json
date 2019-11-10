@@ -3,15 +3,15 @@
     "protocolMagic": 633343913,
     "backendUrl": "http://localhost:8080",
     "websocketUrl": "ws://localhost:8080",
-    "name": "test",
-    "trezorNetwork": 1
+    "name": "test"
   },
   "app": {
     "walletRefreshInterval": 2000,
+    "serverStatusRefreshInterval": 2000,
     "logsBufferSize": 500,
     "logsFileSuffix": "-yoroi.log",
-    "addressScanSize": 3,
-    "addressRequestSize": 5,
+    "addressScanSize": 20,
+    "addressRequestSize": 50,
     "txsBodiesRequestSize": 150
   }
 }

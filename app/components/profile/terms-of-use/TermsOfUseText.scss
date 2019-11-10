@@ -1,9 +1,14 @@
 .terms {
-  color: var(--theme-terms-of-use-text-color);
   text-align: justify;
 
+  &.fixedHeight {
+    padding-right: 10px;
+    max-height: calc(100vh - 260px);
+    overflow: auto;
+  }
+
   h1, h2 {
-    font-family: var(--font-medium);
+    font-family: var(--rp-theme-font-medium);
     font-size: 17px;
     margin-bottom: 11px;
   }
@@ -12,20 +17,46 @@
     margin-top: 22px;
   }
 
+  strong {
+    font-family: var(--rp-theme-font-regular);
+    font-size: 17px;
+  }
+
   ul {
     list-style: disc;
     margin-left: 20px;
   }
 
   p, li {
-    font-family: var(--font-regular);
+    font-family: var(--rp-theme-font-regular);
     font-size: 14px;
     letter-spacing: 0.5px;
     line-height: 1.38;
     margin-bottom: 11px;
 
-    strong {
-      font-weight: 500;
-    }
   }
+}
+
+:global(.YoroiClassic) .terms {
+  color: var(--theme-terms-of-use-text-color);
+}
+
+:global(.YoroiModern) .terms {
+  h1, h2 {
+    font-size: 16px;
+  }
+
+  h1 {
+    margin-top: 26px;
+  }
+
+  h2 {
+    margin-top: 46px;
+  }
+
+  p, li {
+    color: var(--theme-terms-of-use-text-color);
+    font-size: 13px;
+    line-height: 1.54;
+  }  
 }

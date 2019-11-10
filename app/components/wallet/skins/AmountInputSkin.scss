@@ -1,22 +1,50 @@
-.root {
+.component {
   position: relative;
+
+  .fees {
+    position: absolute;
+    bottom: 56px;
+    right: 10px;
+    color: var(--theme-input-right-floating-text-color);
+    font-family: var(--font-regular);
+    font-size: 11px;
+  }
+
+  .total {
+    position: absolute;
+    bottom: 22px;
+    right: 10px;
+    color: var(--theme-input-right-floating-text-color);
+    font-family: var(--font-light);
+    font-size: 15px;
+    text-transform: uppercase;
+  }
 }
 
-.fees {
-  position: absolute;
-  bottom: 46px;
-  right: 10px;
-  color: var(--theme-input-right-floating-text-color);
-  font-family: var(--font-regular);
-  font-size: 11px;
+:global(.YoroiClassic) .component {
+  .fees {
+    bottom: 75px;
+  }
+
+  .total {
+    bottom: 38px;
+  
+    &.error {
+      right: 42px;
+    }
+  }
 }
 
-.total {
-  position: absolute;
-  bottom: 12px;
-  right: 10px;
-  color: var(--theme-input-right-floating-text-color);
-  font-family: var(--font-light);
-  font-size: 15px;
-  text-transform: uppercase;
+:global(.YoroiModern) .component {
+  .fees {
+    bottom: 80px;
+  }
+
+  .total {
+    bottom: 40px;
+  
+    &.error {
+      right: 47px;
+    }
+  }
 }

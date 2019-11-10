@@ -1,14 +1,20 @@
 .component {
+  flex-direction: column;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-}
 
-.label {
-  opacity: 0.5;
-  font-size: 15px;
-  line-height: 1.38;
-  font-family: var(--font-regular);
-  color: var(--theme-main-body-messages-color);
+  .imageWrappper {
+    display: block;
+    margin-bottom: 42px;
+  }
+
+  .label {
+    opacity: 0.5;
+    font-size: 15px;
+    line-height: 1.38;
+    font-family: var(--font-regular);
+    color: var(--theme-main-body-messages-color);
+  }
 }

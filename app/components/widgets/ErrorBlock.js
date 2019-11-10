@@ -8,13 +8,12 @@ import { Logger, stringifyError } from '../../utils/logging';
 
 import styles from './ErrorBlock.scss';
 
-type Props = {
+type Props = {|
   error: ?LocalizableError,
-};
+|};
 
 @observer
 export default class ErrorBlock extends Component<Props> {
-
   static contextTypes = {
     intl: intlShape.isRequired
   };
@@ -31,7 +30,7 @@ export default class ErrorBlock extends Component<Props> {
     }
 
     return (
-      <div className={styles.errorBlock}>
+      <div className={styles.component}>
         <span>{errorText}</span>
       </div>);
   }

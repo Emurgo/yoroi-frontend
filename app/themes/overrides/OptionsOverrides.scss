@@ -1,1 +1,21 @@
 // Css module overrides go here …
+
+.options {
+  :global {
+    .SimpleBubble_bubble {
+      margin-top: -11px !important;
+    }
+  }
+
+  span[data-bubble-arrow] {
+    display: none;
+  }
+}
+
+.ul {
+  font-size: 16px;
+}
+
+.option {
+  padding: 15px;
+}

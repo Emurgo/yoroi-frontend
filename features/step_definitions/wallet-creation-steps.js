@@ -10,7 +10,7 @@ async function checkErrorByTranslationId(client, errorSelector, error) {
 }
 
 When(/^I click the create button$/, async function () {
-  await this.click('.createWalletButton');
+  await this.click('.WalletAdd_btnCreateWallet');
 });
 
 When(/^I enter the created wallet password:$/, async function (table) {
@@ -25,6 +25,19 @@ When(/^I clear the created wallet password ([^"]*)$/, async function (password) 
 
 When(/^I click the "Create personal wallet" button$/, async function () {
   await this.click('.WalletCreateDialog .primary');
+});
+
+Then(/^I should see the invalid password error message:$/, async function (data) {
+  const error = data.hashes()[0];
+  const errorSelector = '.walletPassword .SimpleFormField_error';
+  await checkErrorByTranslationId(this, errorSelector, error);
+});
+
+Then(/^I see the submit button is disabled$/, async function () {
+  const disabledButton = await this.driver.findElement(By.xpath("//div[@class='Dialog_actions']//button[contains(@class, 'SimpleButton_root') and contains(@class, 'disabled')]"));
+  const pageUrl = await this.driver.getCurrentUrl();
+  disabledButton.click();
+  expect(pageUrl).to.be.equal(await this.driver.getCurrentUrl());
 });
 
 When(/^I accept the creation terms$/, async function () {
@@ -46,7 +59,7 @@ When(/^I copy and enter the displayed mnemonic phrase$/, async function () {
 
     // same word can occur many times, so we look for any copy of the desired word still unselected
     await this.click(
-      "(//button[contains(@class, 'MnemonicWord_root') " + // any word
+      "(//button[contains(@class, 'SimpleButton_root') " + // any word
       "and not(contains(@class, 'MnemonicWord_disabled'))" + // unselected word
       ` and @label = '${word}'])[1]`, By.xpath // correct word
     );
@@ -76,7 +89,7 @@ Then(/^I see All selected words are cleared$/, async function () {
 });
 
 Then(/^I should stay in the create wallet dialog$/, async function () {
-  const createMessage = await i18n.formatMessage(this.driver, { id: 'wallet.add.dialog.create.description' });
+  const createMessage = await i18n.formatMessage(this.driver, { id: 'wallet.create.dialog.title' });
   await this.waitUntilText('.Dialog_title', createMessage.toUpperCase(), 2000);
 });
 

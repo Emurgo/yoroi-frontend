@@ -1,8 +1,9 @@
+preserve_hierarchy: true
 files:
-  - source: /app/i18n/locales/en-US.json
-    translation: /app/i18n/locales/%language%.json
+  - source: /app/i18n/locales/**/en-US.json
+    translation: /app/i18n/locales/**/%locale%.json
     languages_mapping:
-      language:
+      locale:
         zh-CN: zh-Hans
         zh-TW: zh-Hant
         ja: ja-JP
@@ -10,3 +11,23 @@ files:
         ru: ru-RU
         de: de-DE
         fr: fr-FR
+        id: id-ID
+        es: es-ES
+        it: it-IT
+
+  - source: /app/i18n/locales/**/en-US.md
+    translation: /app/i18n/locales/**/%locale%.md
+    languages_mapping:
+      locale:
+        zh-CN: zh-Hans
+        zh-TW: zh-Hant
+        ja: ja-JP
+        ko: ko-KR
+        ru: ru-RU
+        de: de-DE
+        fr: fr-FR
+        id: id-ID
+        es: es-ES
+        it: it-IT
+    content_segmentation: 0
+

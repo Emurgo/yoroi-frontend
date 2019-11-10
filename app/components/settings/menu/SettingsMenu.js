@@ -5,35 +5,38 @@ import { defineMessages, intlShape } from 'react-intl';
 import SettingsMenuItem from './SettingsMenuItem';
 import styles from './SettingsMenu.scss';
 import { ROUTES } from '../../../routes-config';
+import type { Theme } from '../../../themes';
 
 const messages = defineMessages({
   general: {
     id: 'settings.menu.general.link.label',
     defaultMessage: '!!!General',
-    description: 'Label for the "General" link in the settings menu.',
+  },
+  paperWallet: {
+    id: 'settings.menu.paperWallet.link.label',
+    defaultMessage: '!!!Paper Wallet',
   },
   wallet: {
     id: 'settings.menu.wallet.link.label',
     defaultMessage: '!!!Wallet',
-    description: 'Label for the "Wallet" link in the settings menu.',
   },
   support: {
     id: 'settings.menu.support.link.label',
     defaultMessage: '!!!Support',
-    description: 'Label for the "Support" link in the settings menu.',
   },
   termsOfUse: {
     id: 'settings.menu.termsOfUse.link.label',
     defaultMessage: '!!!Terms of use',
-    description: 'Label for the "Terms of use" link in the settings menu.',
   },
 });
 
-type Props = {
+type Props = {|
   isActiveItem: Function,
   onItemClick: Function,
   hasActiveWallet: boolean,
-};
+  currentLocale: string,
+  currentTheme: Theme,
+|};
 
 @observer
 export default class SettingsMenu extends Component<Props> {
@@ -44,16 +47,23 @@ export default class SettingsMenu extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onItemClick, isActiveItem, hasActiveWallet } = this.props;
+    const { onItemClick, isActiveItem, hasActiveWallet, } = this.props;
 
     return (
-      <div>
+      <div className={styles.componentWrapper}>
         <div className={styles.component}>
           <SettingsMenuItem
             label={intl.formatMessage(messages.general)}
             onClick={() => onItemClick(ROUTES.SETTINGS.GENERAL)}
             active={isActiveItem(ROUTES.SETTINGS.GENERAL)}
             className="general"
+          />
+
+          <SettingsMenuItem
+            label={intl.formatMessage(messages.paperWallet)}
+            onClick={() => onItemClick(ROUTES.SETTINGS.PAPER_WALLET)}
+            active={isActiveItem(ROUTES.SETTINGS.PAPER_WALLET)}
+            className="paperWallet"
           />
 
           <SettingsMenuItem

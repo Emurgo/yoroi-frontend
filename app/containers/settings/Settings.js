@@ -1,21 +1,21 @@
+// @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
+import environment from '../../environment';
 import SettingsLayout from '../../components/settings/SettingsLayout';
 import SettingsMenu from '../../components/settings/menu/SettingsMenu';
 import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import TopBar from '../../components/topbar/TopBar';
-import resolver from '../../utils/imports';
 import { buildRoute } from '../../utils/routing';
 import type { InjectedContainerProps } from '../../types/injectedPropsType';
 
-const Layout = resolver('containers/MainLayout');
+import MainLayout from '../MainLayout';
 
 const messages = defineMessages({
   title: {
     id: 'settings.general.title',
     defaultMessage: '!!!General Settings',
-    description: 'General Settings Title.'
   },
 });
 
@@ -36,34 +36,42 @@ export default class Settings extends Component<InjectedContainerProps> {
 
   render() {
     const { actions, stores, children } = this.props;
-    const { topbar } = stores;
+    const { profile, topbar } = stores;
+    const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
+
     const menu = (
       <SettingsMenu
         onItemClick={(route) => actions.router.goToRoute.trigger({ route })}
         isActiveItem={this.isActivePage}
         hasActiveWallet={stores.substores.ada.wallets.hasActiveWallet}
+        currentLocale={profile.currentLocale}
+        currentTheme={profile.currentTheme}
       />
     );
     const topbarTitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
     return (
-      <Layout
+      <MainLayout
         topbar={(
           <TopBar
             title={topbarTitle}
             onCategoryClicked={category => {
               actions.topbar.activateTopbarCategory.trigger({ category });
             }}
-            categories={topbar.CATEGORIES}
-            activeTopbarCategory={topbar.activeTopbarCategory}
+            isActiveCategory={topbar.isActiveCategory}
+            categories={topbar.categories}
           />
         )}
+        connectionErrorType={checkAdaServerStatus}
+        classicTheme={profile.isClassicTheme}
+        actions={actions}
+        stores={stores}
       >
         <SettingsLayout menu={menu}>
-          {children}
+          {children != null ? children : null}
         </SettingsLayout>
-      </Layout>
+      </MainLayout>
     );
   }
 }

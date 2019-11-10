@@ -12,36 +12,35 @@ import WalletTransaction from '../../../domain/WalletTransaction';
 import LoadingSpinner from '../../widgets/LoadingSpinner';
 import type { AssuranceMode } from '../../../types/transactionAssuranceTypes';
 import { Logger } from '../../../utils/logging';
+import type { ExplorerType } from '../../../domain/Explorer';
 
 const messages = defineMessages({
   today: {
     id: 'wallet.summary.page.todayLabel',
     defaultMessage: '!!!Today',
-    description: 'Label for the "Today" label on the wallet summary page.',
   },
   yesterday: {
     id: 'wallet.summary.page.yesterdayLabel',
     defaultMessage: '!!!Yesterday',
-    description: 'Label for the "Yesterday" label on the wallet summary page.',
   },
   showMoreTransactionsButtonLabel: {
     id: 'wallet.summary.page.showMoreTransactionsButtonLabel',
     defaultMessage: '!!!Show more transactions',
-    description: 'Label for the "Show more transactions" button on the wallet summary page.',
   },
 });
 
 const dateFormat = 'YYYY-MM-DD';
 
-type Props = {
+type Props = {|
   transactions: Array<WalletTransaction>,
   isLoadingTransactions: boolean,
   hasMoreToLoad: boolean,
+  selectedExplorer: ExplorerType,
   assuranceMode: AssuranceMode,
   walletId: string,
   formattedWalletAmount: Function,
   onLoadMore: Function,
-};
+|};
 
 @observer
 export default class WalletTransactionsList extends Component<Props> {
@@ -50,7 +49,8 @@ export default class WalletTransactionsList extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  componentWillMount() {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillMount() {
     this.localizedDateFormat = moment.localeData().longDateFormat('L');
     // Localized dateFormat:
     // English - MM/DD/YYYY
@@ -110,7 +110,7 @@ export default class WalletTransactionsList extends Component<Props> {
       assuranceMode,
       walletId,
       formattedWalletAmount,
-      onLoadMore
+      onLoadMore,
     } = this.props;
 
     const buttonClasses = classnames([
@@ -131,15 +131,15 @@ export default class WalletTransactionsList extends Component<Props> {
             <div className={styles.groupDate}>{this.localizedDate(group.date)}</div>
             <div className={styles.list}>
               {group.transactions.map((transaction, transactionIndex) => (
-                <div key={`${walletId}-${transaction.id}-${transaction.type}`}>
-                  <Transaction
-                    data={transaction}
-                    isLastInList={transactionIndex === group.transactions.length - 1}
-                    state={transaction.state}
-                    assuranceLevel={transaction.getAssuranceLevelForMode(assuranceMode)}
-                    formattedWalletAmount={formattedWalletAmount}
-                  />
-                </div>
+                <Transaction
+                  key={`${walletId}-${transaction.id}-${transaction.type}`}
+                  selectedExplorer={this.props.selectedExplorer}
+                  data={transaction}
+                  isLastInList={transactionIndex === group.transactions.length - 1}
+                  state={transaction.state}
+                  assuranceLevel={transaction.getAssuranceLevelForMode(assuranceMode)}
+                  formattedWalletAmount={formattedWalletAmount}
+                />
               ))}
             </div>
           </div>

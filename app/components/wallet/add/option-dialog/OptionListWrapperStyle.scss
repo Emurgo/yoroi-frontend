@@ -1,0 +1,45 @@
+// [NOT USED YET] TABS HEADER
+.tabsHeader {
+  font-family: var(--font-regular);
+  display: flex;
+  justify-content: center;
+  margin-bottom: 35px;
+  margin-top: 10px;
+}
+
+// [NOT USED YET] TABS LINK
+.tabsLink {
+  padding: 5px 0;
+  position: relative;
+  cursor: pointer;
+  margin: 0 50px;
+  opacity: .5;
+  color: var(--tab-link-text-color);
+  font-size: var(--tab-link-text-size);
+  line-height: var(--tab-link-line-height);
+  
+  &.active {
+    opacity: 1;
+  }
+
+  &.active::after {
+    background-color: var(--tab-link-border-color);
+  }  
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    border-radius: 2px;
+  }
+}
+
+// OPTION BLOCK LIST
+.optionBlockList {
+  padding: 10px 0 0 0;
+  max-width: 480px;
+  min-width: 100%;
+}

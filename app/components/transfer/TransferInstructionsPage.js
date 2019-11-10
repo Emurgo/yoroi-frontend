@@ -4,43 +4,38 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+
 import BorderedBox from '../widgets/BorderedBox';
 import globalMessages from '../../i18n/global-messages';
 import styles from './TransferInstructionsPage.scss';
 
 const messages = defineMessages({
-  instructionTitle: {
-    id: 'transfer.instructions.instructions.title.label',
-    defaultMessage: '!!!Instructions',
-    description: 'Label "Instructions" on the transfer instructions page.'
+  attentionText: {
+    id: 'daedalusTransfer.instructions.attention.text',
+    defaultMessage: '!!!Yoroi and Daedalus wallets use different key derivation scheme and they each have a separate format for addresses. For this reason, Daedalus wallets cannot be restored and continued to be used in Yoroi and vice versa. This will change in the future. For now, to use funds from your Daedalus wallet, you need to transfer them to your Yoroi wallet. Daedalus and Yoroi wallets are fully compatible for transferring of funds. If you don’t have a working copy of Daedalus, you can use your 12-word recovery phrase (or 27-words for a paper wallet) used to restore and transfer the balance from Daedalus into Yoroi.',
   },
-  instructionsText: {
-    id: 'transfer.instructions.instructions.text',
-    defaultMessage: '!!!Before you can transfer funds, you must create a Yoroi wallet and back it up. Upon completion, you will receive a 15-word recovery phrase which can be used to restore your Yoroi wallet at any time.',
-    description: 'Instructions text on the transfer instructions page.'
+  transferText: {
+    id: 'daedalusTransfer.instructions.attention.button.label',
+    defaultMessage: '!!!Daedalus Wallet',
   },
-  instructionsButton: {
-    id: 'transfer.instructions.instructions.button.label',
-    defaultMessage: '!!!Create Yoroi wallet',
-    description: 'Label "Create Yoroi wallet" on the transfer instructions page.'
+  transferPaperText: {
+    id: 'daedalusTransfer.instructions.attention.paper.button.label',
+    defaultMessage: '!!!Daedalus Paper Wallet',
   },
-  attentionTitle: {
-    id: 'transfer.instructions.attention.title.label',
-    defaultMessage: '!!!Attention',
-    description: 'Label "Attention" on the transfer instructions page.'
+  transferMasterKeyText: {
+    id: 'daedalusTransfer.instructions.attention.masterKey.button.label',
+    defaultMessage: '!!!Daedalus Master Key',
   },
 });
 
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
-
-type Props = {
+type Props = {|
   onFollowInstructionsPrerequisites: Function,
   onConfirm: Function,
+  onPaperConfirm: Function,
+  onMasterKeyConfirm: Function,
   disableTransferFunds: boolean,
-  attentionText: string,
-  confirmationText: string
-};
+|};
 
 @observer
 export default class TransferInstructionsPage extends Component<Props> {
@@ -54,19 +49,12 @@ export default class TransferInstructionsPage extends Component<Props> {
     const {
       onFollowInstructionsPrerequisites,
       onConfirm,
+      onPaperConfirm,
+      onMasterKeyConfirm,
       disableTransferFunds,
-      attentionText,
-      confirmationText
     } = this.props;
 
-    const instructionsButtonClasses = classnames([
-      'instructionsButton',
-      'primary',
-      styles.button,
-    ]);
-
-    const confirmButtonClasses = classnames([
-      'confirmButton',
+    const commonClasses = classnames([
       'primary',
       styles.button,
     ]);
@@ -80,22 +68,27 @@ export default class TransferInstructionsPage extends Component<Props> {
 
             <div className={styles.body}>
 
-              <div>
+              <div className={styles.infoBlock}>
                 <div className={styles.title}>
-                  {intl.formatMessage(messages.instructionTitle)}
+                  {intl.formatMessage(globalMessages.instructionTitle)}
                 </div>
                 <div className={styles.text}>
-                  {intl.formatMessage(messages.instructionsText)}
+                  <FormattedHTMLMessage {...globalMessages.transferInstructionsText} />
                 </div>
               </div>
 
-              <Button
-                className={instructionsButtonClasses}
-                label={intl.formatMessage(messages.instructionsButton)}
-                onClick={onFollowInstructionsPrerequisites}
-                disabled={!disableTransferFunds}
-                skin={ButtonSkin}
-              />
+              <div className={styles.operationBlock}>
+                <div className={styles.title}>
+                  &nbsp;{/* pretend we have a title to get the button alignment correct */}
+                </div>
+                <Button
+                  className={`createYoroiWallet ${commonClasses}`}
+                  label={intl.formatMessage(globalMessages.transferInstructionsButton)}
+                  onClick={onFollowInstructionsPrerequisites}
+                  disabled={!disableTransferFunds}
+                  skin={ButtonSkin}
+                />
+              </div>
 
             </div>
 
@@ -109,22 +102,44 @@ export default class TransferInstructionsPage extends Component<Props> {
 
             <div className={styles.body}>
 
-              <div>
+              <div className={styles.infoBlock}>
                 <div className={styles.title}>
-                  {intl.formatMessage(messages.attentionTitle)}
+                  {intl.formatMessage(globalMessages.attentionTitle)}
                 </div>
                 <div className={styles.text}>
-                  {attentionText}
+                  <FormattedHTMLMessage {...messages.attentionText} />
                 </div>
               </div>
 
-              <Button
-                className={confirmButtonClasses}
-                label={confirmationText}
-                onClick={onConfirm}
-                disabled={disableTransferFunds}
-                skin={ButtonSkin}
-              />
+              <div className={styles.operationBlock}>
+                <div className={styles.buttonTitle}>
+                  {intl.formatMessage(globalMessages.transferTitleText)}
+                </div>
+
+                <Button
+                  className={`confirmButton fromDaedalusWallet ${commonClasses}`}
+                  label={intl.formatMessage(messages.transferText)}
+                  onClick={onConfirm}
+                  disabled={disableTransferFunds}
+                  skin={ButtonSkin}
+                />
+
+                <Button
+                  className={`confirmButton fromDaedalusPaperWallet ${commonClasses}`}
+                  label={intl.formatMessage(messages.transferPaperText)}
+                  onClick={onPaperConfirm}
+                  disabled={disableTransferFunds}
+                  skin={ButtonSkin}
+                />
+
+                <Button
+                  className={`confirmButton fromDaedalusMasterKey ${commonClasses}`}
+                  label={intl.formatMessage(messages.transferMasterKeyText)}
+                  onClick={onMasterKeyConfirm}
+                  disabled={disableTransferFunds}
+                  skin={ButtonSkin}
+                />
+              </div>
 
             </div>
 

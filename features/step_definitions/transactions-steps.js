@@ -1,36 +1,17 @@
 // @flow
 
-import { Given, When, Then, Before, After } from 'cucumber';
+import { Given, When, Then } from 'cucumber';
+import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
-import { getMockServer, closeMockServer } from '../support/mockServer';
 import i18n from '../support/helpers/i18n-helpers';
-
-Before({ tags: '@invalidWitnessTest' }, () => {
-  closeMockServer();
-  getMockServer({
-    signedTransaction: (req, res) => {
-      res.status(400).jsonp({
-        message: 'Invalid witness'
-      });
-    }
-  });
-});
-
-After({ tags: '@invalidWitnessTest' }, () => {
-  closeMockServer();
-  getMockServer({});
-});
+import { addTransaction, postLaunchSuccessfulTx, postLaunchPendingTx } from '../mock-chain/mockImporter';
 
 Given(/^I have a wallet with funds$/, async function () {
-  await this.driver.wait(async () => {
-    try {
-      const { adaWallet } = await this.getFromLocalStorage('WALLET');
-      expect(adaWallet.cwAmount.getCCoin, 'Available founds').to.be.above(0);
-      return true;
-    } catch (err) {
-      return false;
-    }
-  });
+  const amountWithCurrency = await this.driver.findElements(By.xpath("//div[@class='WalletTopbarTitle_walletAmount']"));
+  const matchedAmount = /^"([0-9]*\.[0-9]*)".*$/.exec(amountWithCurrency);
+  if (!matchedAmount) return false;
+  const amount = parseFloat(matchedAmount[1]);
+  expect(Number(amount), 'Available funds').to.be.above(0);
 });
 
 When(/^I go to the send transaction screen$/, async function () {
@@ -41,6 +22,11 @@ When(/^I fill the form:$/, async function (table) {
   const fields = table.hashes()[0];
   await this.input("input[name='receiver']", fields.address);
   await this.input("input[name='amount']", fields.amount);
+});
+
+When(/^I fill the address of the form:$/, async function (table) {
+  const fields = table.hashes()[0];
+  await this.input("input[name='receiver']", fields.address);
 });
 
 When(/^I see CONFIRM TRANSACTION Pop up:$/, async function (table) {
@@ -56,6 +42,10 @@ When(/^I clear the receiver$/, async function () {
   await this.clearInput("input[name='receiver']");
 });
 
+When(/^I clear the wallet password ([^"]*)$/, async function (password) {
+  await this.clearInputUpdatingForm("input[name='walletPassword']", password.length);
+});
+
 When(/^I fill the receiver as "([^"]*)"$/, async function (receiver) {
   await this.input("input[name='receiver']", receiver);
 });
@@ -66,6 +56,26 @@ When(/^The transaction fees are "([^"]*)"$/, async function (fee) {
 
 When(/^I click on the next button in the wallet send form$/, async function () {
   await this.click('.WalletSendForm_nextButton');
+  /**
+   * Sometimes out tests fail because clicking this button isn't triggering a dialog
+   * However it works flawlessly both locally and on localci
+   *
+   * My only guess is that mobx re-disables this button in a way that only causes
+   * the condition to happen on low-resouruce machines like we use for CI
+   *
+   * I attempt to fix it by just clicking twice after a delay
+   */
+  await this.driver.sleep(500);
+  try {
+    await this.click('.WalletSendForm_nextButton');
+  } catch (e) {
+    // if the first click succeeded, the second will throw an exception
+    // saying that the button can't be clicked because a dialog is in the way
+  }
+});
+
+When(/^I click on "Send all my ADA" checkbox$/, async function () {
+  await this.click('.WalletSendForm_checkbox');
 });
 
 When(/^I see send money confirmation dialog$/, async function () {
@@ -106,4 +116,20 @@ Then(/^I should see an invalid signature error message$/, async function () {
 Then(/^I should see an incorrect wallet password error message$/, async function () {
   const errorMessage = await i18n.formatMessage(this.driver, { id: 'api.errors.IncorrectPasswordError' });
   await this.waitUntilText('.WalletSendConfirmationDialog_error', errorMessage);
+});
+
+Then(/^A successful tx gets sent from my wallet from another client$/, () => {
+  addTransaction(postLaunchSuccessfulTx);
+});
+
+Then(/^A pending tx gets sent from my wallet from another client$/, () => {
+  addTransaction(postLaunchPendingTx);
+});
+
+Then(/^I should see a warning block$/, async function () {
+  await this.waitForElement('.WarningBox_warning');
+});
+
+Then(/^I should see no warning block$/, async function () {
+  await this.waitForElementNotPresent('.WarningBox_warning');
 });

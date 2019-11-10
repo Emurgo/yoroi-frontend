@@ -2,247 +2,340 @@
 
 // Handles interfacing w/ lovefieldDB and rust-cardano to create transaction
 
-import _ from 'lodash';
-import { Wallet } from 'rust-cardano-crypto';
+import BigNumber from 'bignumber.js';
 import {
-  getUTXOsForAddresses,
-  sendTx
-} from '../lib/yoroi-backend-api';
-import {
-  decodeRustTx
-} from '../lib/utils';
-import {
-  Logger,
-  stringifyError
-} from '../../../utils/logging';
-import {
-  saveAdaAddress,
-  removeAdaAddress,
-  createAdaAddress,
   addressesToAddressMap,
-  getAdaAddressesList
-} from '../adaAddress';
-import {
-  getCryptoWalletFromMasterKey,
-  generateWalletMasterKey,
-  generateAdaMnemonic,
-} from '../lib/cardanoCrypto/cryptoWallet';
-import { getResultOrFail } from '../lib/cardanoCrypto/cryptoUtils';
+} from '../lib/storage/adaAddress';
 import type {
-  AdaAddresses,
   AdaAddress,
-  AdaFeeEstimateResponse,
-  UTXO
+  BaseSignRequest,
+  UTXO,
+  UnsignedTxFromUtxoResponse,
+  UnsignedTxResponse,
 } from '../adaTypes';
 import {
   NotEnoughMoneyToSendError,
-  TransactionError,
-  SendTransactionError,
-  GetAllUTXOsForAddressesError,
-  InvalidWitnessError
 } from '../errors';
-import { getSingleCryptoAccount, getWalletMasterKey } from '../adaLocalStorage';
 import type { ConfigType } from '../../../../config/config-types';
-import type { AdaAddressMap } from '../adaAddress';
-import type { SignedResponse } from '../lib/yoroi-backend-api';
+import type { AdaAddressMap } from '../lib/storage/adaAddress';
+import { utxosToLookupMap, coinToBigNumber } from '../lib/utils';
+
+import type { AddressUtxoFunc } from '../lib/state-fetch/types';
+
+import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 
 declare var CONFIG: ConfigType;
+const protocolMagic = CONFIG.network.protocolMagic;
 
-/** Calculate the transaction fee without actually sending the transaction */
-export function getAdaTransactionFee(
+export async function sendAllUnsignedTx(
   receiver: string,
-  amount: string
-): Promise<AdaFeeEstimateResponse> {
-  // To calculate the transaction fee without requiring the user to enter their password
-  // We create a fake mnemonic with a fixed contant password
-  const fakePassword = 'fake';
-  const fakeWalletMasterKey = generateWalletMasterKey(generateAdaMnemonic().join(' '), fakePassword);
-  return _getAdaTransaction(
+  allInputAddresses: Array<AdaAddress>,
+  getUTXOsForAddresses: AddressUtxoFunc
+): Promise<UnsignedTxResponse> {
+  const allUtxos = await getUTXOsForAddresses({
+    addresses: allInputAddresses.map(addr => addr.cadId)
+  });
+  const unsignedTxResponse = await sendAllUnsignedTxFromUtxo(
     receiver,
-    amount,
-    getCryptoWalletFromMasterKey(fakeWalletMasterKey, fakePassword)
-  )
-    // we extract the fee and inputs since it's all we care about
-    .then(response => {
-      const [{ fee }, changeAddress, tx] = response;
-      return { fee: { getCCoin: fee }, changeAdaAddress: changeAddress, txExt: tx };
-    })
-    .catch(err => {
-      Logger.error('adaNetTransactions::getAdaTransactionFee error: ' + stringifyError(err));
-      const notEnoughFunds = err.message === 'NotEnoughInput';
-      if (notEnoughFunds) throw new NotEnoughMoneyToSendError();
-      throw new TransactionError(err.message);
-    });
-}
-
-/** Send a transaction and save the new change address */
-export async function newAdaTransaction(
-  receiver: string,
-  amount: string,
-  password: string
-): Promise<SignedResponse> {
-  const masterKey = getWalletMasterKey();
-  const cryptoWallet = getCryptoWalletFromMasterKey(masterKey, password);
-  // eslint-disable-next-line camelcase
-  const [{ cbor_encoded_tx, changed_used }, changeAdaAddr] =
-    await _getAdaTransaction(receiver, amount, cryptoWallet);
-  const signedTx = Buffer.from(cbor_encoded_tx).toString('base64');
-  if (changed_used) { // eslint-disable-line camelcase
-    // tentatively assume that the transaction will succeed,
-    // so we save the change address to the wallet
-    await saveAdaAddress(changeAdaAddr, 'Internal');
-  }
-  try {
-    return await sendTx({ signedTx });
-  } catch (sendTxError) {
-    // On failure, we have to remove the change address we eagerly added
-    // Note: we don't await on this
-    removeAdaAddress(changeAdaAddr);
-    Logger.error('adaNewTransactions::newAdaTransaction error: ' +
-      stringifyError(sendTxError));
-    if (sendTxError instanceof InvalidWitnessError) {
-      throw new InvalidWitnessError();
-    }
-    throw new SendTransactionError();
-  }
-}
-
-/** Sum up the UTXO for a list of addresses by batching backend requests */
-export async function getAllUTXOsForAddresses(
-  addresses: Array<string>
-): Promise<Array<UTXO>> {
-  try {
-    // split up all addresses into chunks of equal size
-    const groupsOfAddresses = _.chunk(addresses, CONFIG.app.addressRequestSize);
-
-    // convert chunks into list of Promises that call the backend-service
-    const promises = groupsOfAddresses
-      .map(groupOfAddresses => getUTXOsForAddresses(
-        { addresses: groupOfAddresses }
-      ));
-
-    // Sum up all the utxo
-    return Promise.all(promises)
-      .then(groupsOfUTXOs => (
-        groupsOfUTXOs.reduce((acc, groupOfUTXOs) => acc.concat(groupOfUTXOs), [])
-      ));
-  } catch (getUtxosError) {
-    Logger.error('adaNewTransactions::getAllUTXOsForAddresses error: ' +
-      stringifyError(getUtxosError));
-    throw new GetAllUTXOsForAddressesError();
-  }
-}
-
-/** Gets the inputs necessary to create a transaction */
-export async function getAdaTransactionInputs(
-  senders: AdaAddresses,
-): Promise<Array<TxInput>> {
-  const [inputs] = await getAdaTransactionInputsAndUtxos(senders);
-  return inputs;
-}
-
-/** Gets the inputs and utxs necessary to create a transaction */
-export async function getAdaTransactionInputsAndUtxos(
-  senders: AdaAddresses,
-): Promise<[Array<TxInput>, Array<UTXO>]> {
-
-  // Convert senders to a map
-  const addressesMap: AdaAddressMap = addressesToAddressMap(senders);
-
-  // Get all user UTXOs
-  const senderUtxos = await getAllUTXOsForAddresses(addressesToPublicHash(senders));
-
-  // Consider any UTXO as a possible input
-  const inputs = mapUTXOsToInputs(senderUtxos, addressesMap);
-
-  // This is a tuple (not an array)
-  return [inputs, senderUtxos];
-}
-
-/** fetch new internal address from HD Wallet for change */
-export async function getAdaTransactionChangeAddr(): Promise<AdaAddress> {
-  // Get all addresses in the single account to a list
-  const cryptoAccount = getSingleCryptoAccount();
-  return await createAdaAddress(cryptoAccount, 'Internal');
-}
-
-/** Perform the cryptography required to create a transaction */
-export async function getAdaTransactionFromSenders(
-  senders: AdaAddresses,
-  receiver: string,
-  amount: string,
-  cryptoWallet: CryptoWallet
-): Promise<[SpendResponse, AdaAddress, UnsignedTransactionExt]> {
-  // fetch new internal address from HD Wallet for change
-  const changeAdaAddr: AdaAddress = await getAdaTransactionChangeAddr();
-
-  // Consider any UTXO as a possible input
-  const inputs = await getAdaTransactionInputs(senders);
-  const outputs = [{ address: receiver, value: amount }];
-
-  // Note: selection policy is decided on the js-cardano-wasm side
-  const result: SpendResponse = getResultOrFail(
-    Wallet.spend(cryptoWallet, inputs, outputs, changeAdaAddr.cadId)
+    allUtxos
   );
-  return [result, changeAdaAddr, decodeRustTxWithInputs(result, inputs, changeAdaAddr)];
-}
 
-function decodeRustTxWithInputs(
-  resp: SpendResponse,
-  availableInputs: Array<TxInput>,
-  changeAddress: AdaAddress
-): UnsignedTransactionExt {
-  const tx: CryptoTransaction = decodeRustTx(resp.cbor_encoded_tx);
-  const pointers: Array<TxInputPtr> = tx.tx.tx.inputs;
-  const pointerToStr = (p: TxInputPtr) => `${p.id}.${p.index}`;
-  const set: Set<string> = new Set(pointers.map(pointerToStr));
-  const selectedInputs = availableInputs.filter((inp: TxInput) => set.has(pointerToStr(inp.ptr)));
+  const addressesMap = addressesToAddressMap(allInputAddresses);
+
   return {
-    inputs: selectedInputs,
-    outputs: tx.tx.tx.outputs.map(x => {
-      if (x.address === changeAddress.cadId) {
-        x.isChange = true;
-        x.fullAddress = changeAddress;
-      }
-      return x;
-    })
+    ...unsignedTxResponse,
+    addressesMap
   };
 }
 
-/** Perform the cryptography required to create a transaction */
-async function _getAdaTransaction(
+export async function sendAllUnsignedTxFromUtxo(
+  receiver: string,
+  allUtxos: Array<UTXO>,
+): Promise<UnsignedTxFromUtxoResponse> {
+  const totalBalance = allUtxos
+    .map(utxo => new BigNumber(utxo.amount))
+    .reduce(
+      (acc, amount) => acc.plus(amount),
+      new BigNumber(0)
+    );
+  if (totalBalance.isZero()) {
+    throw new NotEnoughMoneyToSendError();
+  }
+
+  const feeAlgorithm = RustModule.Wallet.LinearFeeAlgorithm.default();
+  let fee;
+  {
+    // firts build a transaction to see what the cost would be
+    const fakeTxBuilder = new RustModule.Wallet.TransactionBuilder();
+    const inputs = utxoToTxInput(allUtxos);
+    addTxInputs(fakeTxBuilder, inputs);
+    const inputAmount = coinToBigNumber(fakeTxBuilder.get_input_total());
+    addOutput(fakeTxBuilder, receiver, inputAmount.toString());
+    fee = coinToBigNumber(fakeTxBuilder.estimate_fee(feeAlgorithm));
+  }
+
+  // create a new transaction subtracing the fee from your total UTXO
+  if (totalBalance.isLessThan(fee)) {
+    throw new NotEnoughMoneyToSendError();
+  }
+  const newAmount = totalBalance.minus(fee).toString();
+  const unsignedTxResponse = await newAdaUnsignedTxFromUtxo(receiver, newAmount, [], allUtxos);
+
+  // sanity check
+  const balance = unsignedTxResponse.txBuilder.get_balance(feeAlgorithm);
+  /**
+   * The balance may be slightly positive. This is because lowering the "amount" to send
+   * May reduce the amount of bytes required for the "amount", causing the fee to also drop
+   *
+   * Therefore we throw an error when the balance is negative, not when strictly equal to 0
+   */
+  if (balance.is_negative()) {
+    throw new NotEnoughMoneyToSendError();
+  }
+
+  return unsignedTxResponse;
+}
+
+/**
+ * @param {*} possibleInputAddresses we send all UTXO associated with an address.
+ * This maximizes privacy.
+ * The address will not be part of the input if it has no UTXO in it
+ */
+export async function newAdaUnsignedTx(
   receiver: string,
   amount: string,
-  cryptoWallet: CryptoWallet,
-): Promise<[SpendResponse, AdaAddress, UnsignedTransactionExt]> {
-  // Consider all user addresses valid for the source of a transaction
-  const senders = await getAdaAddressesList();
-  return getAdaTransactionFromSenders(senders, receiver, amount, cryptoWallet);
+  changeAdaAddr: Array<AdaAddress>,
+  possibleInputAddresses: Array<AdaAddress>,
+  getUTXOsForAddresses: AddressUtxoFunc
+): Promise<UnsignedTxResponse> {
+  const allUtxos = await getUTXOsForAddresses({
+    addresses: possibleInputAddresses.map(addr => addr.cadId)
+  });
+  const unsignedTxResponse = await newAdaUnsignedTxFromUtxo(
+    receiver,
+    amount,
+    changeAdaAddr,
+    allUtxos
+  );
+
+  const usedAddressSet = new Set(unsignedTxResponse.senderUtxos.map(utxo => utxo.receiver));
+  const usedAdaAddresses = possibleInputAddresses.filter(
+    adaAddress => usedAddressSet.has(adaAddress.cadId)
+  );
+
+  const addressesMap = addressesToAddressMap(usedAdaAddresses);
+
+  return {
+    ...unsignedTxResponse,
+    addressesMap
+  };
 }
 
-export function addressesToPublicHash(
-  adaAddresses: AdaAddresses
-): Array<string> {
-  return adaAddresses.map(addr => addr.cadId);
-}
+export async function newAdaUnsignedTxFromUtxo(
+  receiver: string,
+  amount: string,
+  changeAdaAddr: Array<AdaAddress>,
+  allUtxos: Array<UTXO>,
+): Promise<UnsignedTxFromUtxoResponse> {
+  const feeAlgorithm = RustModule.Wallet.LinearFeeAlgorithm.default();
 
-export function mapUTXOsToInputs(
-  utxos: Array<UTXO>,
-  adaAddressesMap: AdaAddressMap
-): Array<TxInput> {
-  return utxos.map((utxo) => ({
-    ptr: {
-      index: utxo.tx_index,
-      id: utxo.tx_hash
-    },
-    value: {
-      address: utxo.receiver,
-      value: utxo.amount
-    },
-    addressing: {
-      account: adaAddressesMap[utxo.receiver].account,
-      change: adaAddressesMap[utxo.receiver].change,
-      index: adaAddressesMap[utxo.receiver].index
+  const txInputs = utxoToTxInput(allUtxos);
+
+  let outputPolicy = null;
+  let senderInputs;
+  if (changeAdaAddr.length === 1) {
+    /**
+     * The current Rust code doesn't allow to separate input selection
+     * from the chnage address output policy so we combinue it
+     */
+    const changeAddr = RustModule.Wallet.Address.from_base58(changeAdaAddr[0].cadId);
+    outputPolicy = RustModule.Wallet.OutputPolicy.change_to_one_address(changeAddr);
+
+    let selectionResult;
+    try {
+      selectionResult = getInputSelection(txInputs, outputPolicy, feeAlgorithm, receiver, amount);
+    } catch (err) {
+      throw new NotEnoughMoneyToSendError();
     }
-  }));
+    senderInputs = txInputs.filter(input => (
+      selectionResult.is_input(
+        RustModule.Wallet.TxoPointer.from_json(input.to_json().ptr)
+      )
+    ));
+  } else if (changeAdaAddr.length === 0) {
+    senderInputs = txInputs;
+  } else {
+    throw new Error('only support single change address');
+  }
+
+  const txBuilder = new RustModule.Wallet.TransactionBuilder();
+  const changeAddrTxOut = await addTxIO(
+    txBuilder, senderInputs, outputPolicy, feeAlgorithm, receiver, amount
+  );
+  const change = filterToUsedChange(changeAdaAddr, changeAddrTxOut);
+  return {
+    senderUtxos: filterUtxo(senderInputs, allUtxos),
+    txBuilder,
+    changeAddr: change,
+  };
+}
+
+function filterToUsedChange(changeAdaAddr: Array<AdaAddress>, changeAddrTxOut: Array<TxOutType>) {
+  const change = [];
+  for (const txOut of changeAddrTxOut) {
+    for (const adaAddr of changeAdaAddr) {
+      if (txOut.address === adaAddr.cadId) {
+        change.push({
+          value: txOut.value,
+          address: txOut.address,
+          account: adaAddr.account,
+          change: adaAddr.change,
+          index: adaAddr.index,
+        });
+      }
+    }
+  }
+  return change;
+}
+
+export function signTransaction(
+  signRequest: BaseSignRequest,
+  accountPrivateKey: RustModule.Wallet.Bip44AccountPrivate
+): RustModule.Wallet.SignedTransaction {
+  const { addressesMap, senderUtxos, unsignedTx } = signRequest;
+  const txFinalizer = new RustModule.Wallet.TransactionFinalized(unsignedTx);
+  addWitnesses(
+    txFinalizer,
+    senderUtxos,
+    addressesMap,
+    accountPrivateKey
+  );
+  const signedTx = txFinalizer.finalize();
+  return signedTx;
+}
+
+export function utxoToTxInput(
+  utxos: Array<UTXO>,
+): Array<RustModule.Wallet.TxInput> {
+  return utxos.map(utxo => {
+    const txoPointer = RustModule.Wallet.TxoPointer.new(
+      RustModule.Wallet.TransactionId.from_hex(utxo.tx_hash),
+      utxo.tx_index
+    );
+    const txOut = RustModule.Wallet.TxOut.new(
+      RustModule.Wallet.Address.from_base58(utxo.receiver),
+      RustModule.Wallet.Coin.from_str(utxo.amount),
+    );
+    return RustModule.Wallet.TxInput.new(txoPointer, txOut);
+  });
+}
+
+function filterUtxo(
+  inputs: Array<RustModule.Wallet.TxInput>,
+  utxos: Array<UTXO>,
+): Array<UTXO> {
+  const lookupMap = utxosToLookupMap(utxos);
+
+  return inputs.map(input => {
+    const txoPointer = input.to_json().ptr;
+    return lookupMap[txoPointer.id][txoPointer.index];
+  });
+}
+
+function getInputSelection(
+  allInputs: Array<RustModule.Wallet.TxInput>,
+  outputPolicy: RustModule.Wallet.OutputPolicy,
+  feeAlgorithm: RustModule.Wallet.LinearFeeAlgorithm,
+  receiver: string,
+  amount: string,
+): RustModule.Wallet.InputSelectionResult {
+  const inputSelection = RustModule.Wallet.InputSelectionBuilder.first_match_first();
+  allInputs.forEach(input => inputSelection.add_input(input));
+  addOutput(inputSelection, receiver, amount);
+  return inputSelection.select_inputs(feeAlgorithm, outputPolicy);
+}
+
+function addTxIO(
+  txBuilder: RustModule.Wallet.TransactionBuilder,
+  senderInputs: Array<RustModule.Wallet.TxInput>,
+  outputPolicy: ?RustModule.Wallet.OutputPolicy,
+  feeAlgorithm: RustModule.Wallet.LinearFeeAlgorithm,
+  receiver: string,
+  amount: string,
+): Array<TxOutType> {
+  addTxInputs(txBuilder, senderInputs);
+  addOutput(txBuilder, receiver, amount);
+
+  if (outputPolicy) {
+    try {
+      return txBuilder.apply_output_policy(
+        feeAlgorithm,
+        outputPolicy
+      );
+    } catch (err) {
+      throw new NotEnoughMoneyToSendError();
+    }
+  }
+
+  const balance = txBuilder.get_balance(feeAlgorithm);
+  if (balance.is_negative()) {
+    throw new NotEnoughMoneyToSendError();
+  }
+  return [];
+}
+
+function addWitnesses(
+  txFinalizer: RustModule.Wallet.TransactionFinalized,
+  senderUtxos: Array<UTXO>,
+  addressesMap: AdaAddressMap,
+  accountPrivateKey: RustModule.Wallet.Bip44AccountPrivate,
+): void {
+  // get private keys
+  const privateKeys = senderUtxos.map(utxo => {
+    const addressInfo = addressesMap[utxo.receiver];
+    const chain = accountPrivateKey.bip44_chain(
+      addressInfo.change === 1
+    );
+    return chain.address_key(
+      RustModule.Wallet.AddressKeyIndex.new(addressInfo.index)
+    );
+  });
+
+  // sign the transactions
+  const setting = RustModule.Wallet.BlockchainSettings.from_json({
+    protocol_magic: protocolMagic
+  });
+  for (let i = 0; i < senderUtxos.length; i++) {
+    const witness = RustModule.Wallet.Witness.new_extended_key(
+      setting,
+      privateKeys[i],
+      txFinalizer.id()
+    );
+    txFinalizer.add_witness(witness);
+  }
+}
+
+export function addTxInputs(
+  txBuilder: RustModule.Wallet.TransactionBuilder,
+  senderInputs: Array<RustModule.Wallet.TxInput>,
+): void {
+  senderInputs.forEach(input => {
+    const jsonInput = input.to_json();
+    txBuilder.add_input(
+      RustModule.Wallet.TxoPointer.from_json(jsonInput.ptr),
+      RustModule.Wallet.Coin.from_str(jsonInput.value.value)
+    );
+  });
+}
+
+export function addOutput(
+  builder: RustModule.Wallet.TransactionBuilder | RustModule.Wallet.InputSelectionBuilder,
+  address: string,
+  value: string, // in lovelaces
+): void {
+  const txOut = RustModule.Wallet.TxOut.new(
+    RustModule.Wallet.Address.from_base58(address),
+    RustModule.Wallet.Coin.from_str(value),
+  );
+  builder.add_output(txOut);
 }

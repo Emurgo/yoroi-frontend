@@ -10,27 +10,26 @@ import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './LanguageSelectionForm.scss';
-import type { ReactIntlMessage } from '../../../types/i18nTypes';
+import type { MessageDescriptor } from 'react-intl';
+import FlagLabel from '../../widgets/FlagLabel';
+import { tier1Languages } from '../../../config/languagesConfig';
+import globalMessages, { listOfTranslators } from '../../../i18n/global-messages';
 
 const messages = defineMessages({
-  languageSelectLabel: {
-    id: 'profile.languageSelect.form.languageSelectLabel',
-    defaultMessage: '!!!Select your language',
-    description: 'Label for the language select.'
-  },
   submitLabel: {
     id: 'profile.languageSelect.form.submitLabel',
     defaultMessage: '!!!Continue',
-    description: 'Label for the "Language select" form submit button.'
   },
 });
 
-type Props = {
-  languages: Array<{ value: string, label: ReactIntlMessage }>,
+type Props = {|
+  onSelectLanguage: Function,
+  languages: Array<{ value: string, label: MessageDescriptor, svg: string }>,
   onSubmit: Function,
   isSubmitting: boolean,
+  currentLocale: string,
   error?: ?LocalizableError,
-};
+|};
 
 @observer
 export default class LanguageSelectionForm extends Component<Props> {
@@ -40,6 +39,10 @@ export default class LanguageSelectionForm extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
+  };
+
+  selectLanguage = (values: { locale: string }) => {
+    this.props.onSelectLanguage({ locale: values });
   };
 
   submit = () => {
@@ -55,24 +58,21 @@ export default class LanguageSelectionForm extends Component<Props> {
   form = new ReactToolboxMobxForm({
     fields: {
       languageId: {
-        label: this.context.intl.formatMessage(messages.languageSelectLabel),
-        value: this.props.languages[0].value,
+        label: this.context.intl.formatMessage(globalMessages.languageSelectLabel),
+        value: this.props.currentLocale,
       }
     }
-  }, {
-    options: {
-      validateOnChange: false,
-    },
   });
 
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { languages, isSubmitting, error } = this.props;
+    const { languages, isSubmitting, currentLocale, error } = this.props;
     const languageId = form.$('languageId');
     const languageOptions = languages.map(language => ({
       value: language.value,
-      label: intl.formatMessage(language.label)
+      label: intl.formatMessage(language.label),
+      svg: language.svg
     }));
     const buttonClasses = classnames([
       'primary',
@@ -86,8 +86,13 @@ export default class LanguageSelectionForm extends Component<Props> {
           <Select
             className={styles.languageSelect}
             options={languageOptions}
+            value={currentLocale}
             {...languageId.bind()}
             skin={SelectSkin}
+            onChange={this.selectLanguage}
+            optionRenderer={option => (
+              <FlagLabel svg={option.svg} label={option.label} />
+            )}
           />
 
           {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
@@ -98,6 +103,18 @@ export default class LanguageSelectionForm extends Component<Props> {
             onMouseUp={this.submit}
             skin={ButtonSkin}
           />
+
+          {!tier1Languages.includes(currentLocale) &&
+            <div className={styles.info}>
+              <h1>{intl.formatMessage(globalMessages.languageSelectLabelInfo)}</h1>
+              <p>
+                {intl.formatMessage(globalMessages.languageSelectInfo)}
+                {' '}
+                {listOfTranslators(intl.formatMessage(globalMessages.translationContributors),
+                  intl.formatMessage(globalMessages.translationAcknowledgment))}
+              </p>
+            </div>
+          }
 
         </div>
       </div>

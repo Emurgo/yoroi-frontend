@@ -3,57 +3,57 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
-import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
+import vjf from 'mobx-react-form/lib/validators/VJF';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import Dialog from '../widgets/Dialog';
 import { isValidWalletName, isValidWalletPassword, isValidRepeatPassword } from '../../utils/validations';
 import globalMessages from '../../i18n/global-messages';
 import styles from './WalletCreateDialog.scss';
+import config from '../../config';
+import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
 
 const messages = defineMessages({
   dialogTitle: {
     id: 'wallet.create.dialog.title',
     defaultMessage: '!!!Create a new wallet',
-    description: 'Title "Create a new wallet" in the wallet create form.'
   },
   walletName: {
     id: 'wallet.create.dialog.name.label',
-    defaultMessage: '!!!Wallet Name',
-    description: 'Label for the "Wallet Name" text input in the wallet create form.'
+    defaultMessage: '!!!Wallet name',
   },
   walletNameHint: {
     id: 'wallet.create.dialog.walletNameHint',
     defaultMessage: '!!!e.g: Shopping Wallet',
-    description: 'Hint for the "Wallet Name" text input in the wallet create form.'
   },
   createPersonalWallet: {
     id: 'wallet.create.dialog.create.personal.wallet.button.label',
     defaultMessage: '!!!Create personal wallet',
-    description: 'Label for the "Create personal wallet" button on create wallet dialog.'
   },
   walletPasswordLabel: {
     id: 'wallet.create.dialog.walletPasswordLabel',
-    defaultMessage: '!!!Wallet password',
-    description: 'Label for the "Wallet password" input in the create wallet dialog.',
-  },
-  repeatPasswordLabel: {
-    id: 'wallet.create.dialog.repeatPasswordLabel',
-    defaultMessage: '!!!Repeat password',
-    description: 'Label for the "Repeat password" input in the create wallet dialog.',
+    defaultMessage: '!!!Spending password',
   },
   passwordFieldPlaceholder: {
     id: 'wallet.create.dialog.passwordFieldPlaceholder',
-    defaultMessage: '!!!Password',
-    description: 'Placeholder for the "Password" inputs in the create wallet dialog.',
+    defaultMessage: '!!!Spending password',
+  },
+  repeatPasswordLabel: {
+    id: 'wallet.create.dialog.repeatPasswordLabel',
+    defaultMessage: '!!!Repeat spending password',
+  },
+  repeatPasswordFieldPlaceholder: {
+    id: 'wallet.create.dialog.repeatPasswordFieldPlaceholder',
+    defaultMessage: '!!!Repeat spending password',
   },
 });
 
-type Props = {
+type Props = {|
   onSubmit: Function,
   onCancel: Function,
-};
+  classicTheme: boolean
+|};
 
 type State = {
   isSubmitting: boolean,
@@ -61,7 +61,6 @@ type State = {
 
 @observer
 export default class WalletCreateDialog extends Component<Props, State> {
-
   static contextTypes = {
     intl: intlShape.isRequired,
   };
@@ -71,7 +70,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
   };
 
   componentDidMount() {
-    setTimeout(() => { this.walletNameInput.getRef().focus(); });
+    setTimeout(() => { this.walletNameInput.focus(); });
   }
 
   walletNameInput: Input;
@@ -80,7 +79,8 @@ export default class WalletCreateDialog extends Component<Props, State> {
     fields: {
       walletName: {
         label: this.context.intl.formatMessage(messages.walletName),
-        placeholder: this.context.intl.formatMessage(messages.walletNameHint),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(messages.walletNameHint) : '',
         value: '',
         validators: [({ field }) => (
           [
@@ -92,7 +92,8 @@ export default class WalletCreateDialog extends Component<Props, State> {
       walletPassword: {
         type: 'password',
         label: this.context.intl.formatMessage(messages.walletPasswordLabel),
-        placeholder: this.context.intl.formatMessage(messages.passwordFieldPlaceholder),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(messages.passwordFieldPlaceholder) : '',
         value: '',
         validators: [({ field, form }) => {
           const repeatPasswordField = form.$('repeatPassword');
@@ -108,7 +109,8 @@ export default class WalletCreateDialog extends Component<Props, State> {
       repeatPassword: {
         type: 'password',
         label: this.context.intl.formatMessage(messages.repeatPasswordLabel),
-        placeholder: this.context.intl.formatMessage(messages.passwordFieldPlaceholder),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(messages.repeatPasswordFieldPlaceholder) : '',
         value: '',
         validators: [({ field, form }) => {
           const walletPassword = form.$('walletPassword').value;
@@ -123,7 +125,10 @@ export default class WalletCreateDialog extends Component<Props, State> {
   }, {
     options: {
       validateOnChange: true,
-      validationDebounceWait: 250,
+      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+    },
+    plugins: {
+      vjf: vjf()
     },
   });
 
@@ -152,8 +157,9 @@ export default class WalletCreateDialog extends Component<Props, State> {
 
   render() {
     const { form } = this;
+    const { walletName, walletPassword, repeatPassword } = form.values();
     const { intl } = this.context;
-    const { onCancel } = this.props;
+    const { onCancel, classicTheme } = this.props;
     const { isSubmitting } = this.state;
     const dialogClasses = classnames([
       styles.component,
@@ -164,12 +170,19 @@ export default class WalletCreateDialog extends Component<Props, State> {
       styles.show,
     ]);
 
+    const disabledCondition = !(
+      isValidWalletName(walletName)
+      && isValidWalletPassword(walletPassword)
+      && isValidRepeatPassword(walletPassword, repeatPassword)
+    );
+
     const actions = [
       {
         className: isSubmitting ? styles.isSubmitting : null,
         label: this.context.intl.formatMessage(messages.createPersonalWallet),
         primary: true,
         onClick: this.submit,
+        disabled: isSubmitting || disabledCondition
       },
     ];
 
@@ -182,18 +195,19 @@ export default class WalletCreateDialog extends Component<Props, State> {
         className={dialogClasses}
         title={intl.formatMessage(messages.dialogTitle)}
         actions={actions}
-        closeOnOverlayClick
+        closeOnOverlayClick={false}
         onClose={!isSubmitting ? onCancel : null}
         closeButton={<DialogCloseButton />}
+        classicTheme={classicTheme}
       >
-
         <Input
           className="walletName"
           onKeyPress={this.checkForEnterKey.bind(this)}
-          ref={(input) => { this.walletNameInput = input; }}
+          inputRef={(input) => { this.walletNameInput = input; }}
           {...walletNameField.bind()}
+          done={isValidWalletName(walletName)}
           error={walletNameField.error}
-          skin={InputSkin}
+          skin={InputOwnSkin}
         />
 
         <div className={styles.walletPassword}>
@@ -201,23 +215,21 @@ export default class WalletCreateDialog extends Component<Props, State> {
             <Input
               className="walletPassword"
               {...walletPasswordField.bind()}
+              done={isValidWalletPassword(walletPassword)}
               error={walletPasswordField.error}
-              skin={InputSkin}
+              skin={InputOwnSkin}
             />
             <Input
               className="repeatedPassword"
               {...repeatedPasswordField.bind()}
+              done={repeatPassword && isValidRepeatPassword(walletPassword, repeatPassword)}
               error={repeatedPasswordField.error}
-              skin={InputSkin}
+              skin={InputOwnSkin}
             />
-            <p className={styles.passwordInstructions}>
-              {intl.formatMessage(globalMessages.passwordInstructions)}
-            </p>
           </div>
         </div>
 
       </Dialog>
     );
   }
-
 }

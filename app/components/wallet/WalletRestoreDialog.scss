@@ -2,69 +2,98 @@
 @import '../../themes/mixins/error-message';
 @import '../../themes/mixins/place-form-field-error-below-input';
 
-.walletName {
-  margin-bottom: 20px;
+.component {
+  .walletPassword {
+    .walletPasswordFields {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 400ms ease;
+
+      &.show {
+        max-height: 250px;
+        opacity: 1;
+        overflow: visible;
+      }
+
+      & > div {
+        margin-top: 30px;
+        width: 350px;
+      }
+
+      @include place-form-field-error-below-input;
+    }
+  }
+
+  .error {
+    @include error-message;
+    margin-top: 30px;
+    text-align: center;
+  }
+
+  .isSubmitting {
+    @include loading-spinner("../../assets/images/spinner-light.svg");
+  }
 }
 
-.walletPassword {
-  .walletPasswordSwitch {
-    border-top: 1px solid var(--theme-separation-border-color);
-    margin-top: 30px;
-    padding-top: 20px;
-
-    & > .passwordLabel {
-      color: var(--theme-wallet-password-switch-label-color);
-      font-family: var(--font-semibold);
-      font-size: 16px;
-      line-height: 1.38;
+:global(.YoroiClassic) {
+  .component {
+    .walletName {
       margin-bottom: 10px;
     }
 
-    :global {
-      .SimpleSwitch_root {
-        margin-bottom: 0;
+    .walletPassword {
+      .walletPasswordFields {
+        &.show {
+          max-height: 250px;
+          opacity: 1;
+          overflow: visible;
+        }
+    
+        & > div {
+          margin-top: 0;
+          width: 350px;
+        }
+
+        // Seems like this is the same class name as parent, but it's different.
+        // This class will apply to the child Input tag.
+        // Unfortunately for fixing this problem we also need to carefully fix basic E2E cases, as its used there.
+        :global .walletPassword {
+          margin-right: 25px;
+        }
+    
+        @include place-form-field-error-below-input;
+      }
+    
+      .paperPassword {
+        margin-top: 0;
       }
     }
   }
+}
 
-  .walletPasswordFields {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition: all 400ms ease;
-
-    &.show {
-      max-height: 250px;
-      opacity: 1;
-      overflow: visible;
+:global(.YoroiModern) {
+  .component {
+    .walletName {
+      margin-bottom: 0;
     }
 
-    & > div {
-      margin-top: 30px;
-      width: 350px;
-    }
-
-    @include place-form-field-error-below-input;
-
-    .passwordInstructions {
-      color: var(--theme-instructions-text-color);
-      font-family: var(--font-light);
-      line-height: 1.38;
-      margin-top: 16px;
-      opacity: 0.5;
+    .walletPassword {
+      .walletPasswordFields {
+    
+        &.show {
+          max-height: 600px;
+          opacity: 1;
+        }
+    
+        & > div {
+          margin-top: 0;
+          width: 100%;
+        }
+      }
     }
   }
-}
-
-.error {
-  @include error-message;
-  margin-top: 30px;
-  text-align: center;
-}
-
-.isSubmitting {
-  @include loading-spinner("../../assets/images/spinner-light.svg");
 }

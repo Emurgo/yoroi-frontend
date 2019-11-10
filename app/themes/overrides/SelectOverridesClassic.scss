@@ -1,0 +1,26 @@
+// Css module overrides go here …
+
+.selectInput {
+  &::after {
+    bottom: 42px!important;
+    left: calc(100% - 27px);
+  }
+
+  input {
+    height: 52px;
+    box-sizing: border-box;
+    padding: 0 15px;
+    background: none;
+
+    &:hover {
+      border-color: var(--rp-input-border-color-focus);
+    }
+  }
+}
+
+.isOpen {
+
+  .selectInput::after {
+    bottom: 42px!important;
+  }
+}

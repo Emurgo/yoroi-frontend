@@ -5,26 +5,11 @@
 }
 
 .modal {
-  border-radius: 5px;
+  border-radius: 8px;
+  padding: unset;
+  min-width: unset;
+  max-width: unset;
   display: flex;
   flex-direction: column;
-  max-width: 785px;
-
-  :global {
-    .WalletExportDialogChoices_component {
-      & > button {
-        color: var(--theme-dialog-choice-tabs-text-color);
-      }
-
-      & > .WalletExportDialogChoices_activeButton {
-        color: var(--theme-dialog-choice-tabs-text-color-active);
-        border-bottom: 2px solid var(--theme-dialog-choice-tabs-bottom-border-color-active);
-      }
-    }
-
-    .SimpleInput_input,
-    .SimpleAutocomplete_autocompleteContent {
-      background-color: transparent !important;
-    }
-  }
+  letter-spacing: 0;
 }

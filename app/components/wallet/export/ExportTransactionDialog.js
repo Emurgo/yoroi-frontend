@@ -16,26 +16,24 @@ const messages = defineMessages({
   dialogTitle: {
     id: 'wallet.transaction.export.dialog.title',
     defaultMessage: '!!!Export transactions to file',
-    description: 'Dialog title'
   },
   infoText1: {
     id: 'wallet.transaction.export.dialog.infoText1',
     defaultMessage: '!!!The entire transaction history within your wallet will be exported to a file',
-    description: 'info text about entire transaction history export'
   },
   exportButtonLabel: {
     id: 'wallet.transaction.export.dialog.exportButton.label',
     defaultMessage: '!!!Export',
-    description: '"Export" button label'
   }
 });
 
-type Props = {
+type Props = {|
   isActionProcessing: ?boolean,
   error: ?LocalizableError,
   submit: Function,
   cancel: Function,
-};
+  classicTheme: boolean,
+|};
 
 @observer
 export default class ExportTransactionDialog extends Component<Props> {
@@ -59,10 +57,10 @@ export default class ExportTransactionDialog extends Component<Props> {
       </div>);
 
     const dailogActions = [{
-      className: isActionProcessing ? styles.processing : null,
+      className: isActionProcessing === true ? styles.processing : null,
       label: intl.formatMessage(messages.exportButtonLabel),
       primary: true,
-      disabled: isActionProcessing,
+      disabled: isActionProcessing || false,
       onClick: submit,
     }];
 
@@ -74,9 +72,10 @@ export default class ExportTransactionDialog extends Component<Props> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={cancel}
+        classicTheme={this.props.classicTheme}
       >
         {infoBlock}
-        <ErrorBlock error={error} />
+        {error && <ErrorBlock error={error} />}
       </Dialog>);
   }
 }

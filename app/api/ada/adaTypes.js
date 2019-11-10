@@ -12,7 +12,8 @@
  * https://github.com/input-output-hk/cardano-sl/pull/3700
 */
 
-import BigNumber from 'bignumber.js';
+import type { AdaAddressMap } from './lib/storage/adaAddress';
+import { RustModule } from './lib/cardanoCrypto/rustLoader';
 
 /*
  * This file gives the flow equivalents of the the Haskell types given in the wallet API at
@@ -59,18 +60,30 @@ export type AdaHardwareWalletInitData = {
 };
 
 export type AdaAmount = {
-  getCCoin: BigNumber,
+  getCCoin: string,
 };
 export type AdaTransactionTag = 'CTIn' | 'CTOut';
 
-export type AdaAddress = {
-  cadAmount: AdaAmount,
-  cadId: string,
-  cadIsUsed: boolean,
+export type AddressingInfo = {
   account: number,
   change: number,
-  index: number
+  index: number,
 };
+
+export type AdaAddress = {
+  /**
+   * TODO: misleading as the value inside DB is always stale
+   * Is is only updated in-memory after DB fetch
+   * Is is, however, up-to-date in localstorage.
+  */
+  cadAmount: AdaAmount,
+  cadId: string,
+  /**
+   * TODO: misleading as the value inside DB is always stale
+   * Is is only updated in-memory after DB fetch
+  */
+  cadIsUsed: boolean,
+} & AddressingInfo;
 
 export type AdaAddresses = Array<AdaAddress>;
 
@@ -101,26 +114,27 @@ export type AdaTransaction = {
   ctCondition: AdaTransactionCondition,
 };
 
-export type AdaTransactions = [
-  Array<AdaTransaction>,
-  number, // length
-];
-
 export type AdaTransactionInputOutput = [
   string, // output address
   AdaAmount,
 ];
 
-export type AdaTransactionFee = AdaAmount;
-
-export type AdaFeeEstimateResponse = {
-  fee: AdaTransactionFee,
-  changeAdaAddress: AdaAddress,
-  txExt: UnsignedTransactionExt
+export type UnsignedTxFromUtxoResponse = {
+  senderUtxos: Array<UTXO>,
+  txBuilder: RustModule.Wallet.TransactionBuilder,
+  changeAddr: Array<TxOutType & AddressingInfo>,
+};
+export type UnsignedTxResponse = UnsignedTxFromUtxoResponse & {
+  addressesMap: AdaAddressMap,
+};
+export type BaseSignRequest = {
+  addressesMap: AdaAddressMap,
+  changeAddr: Array<TxOutType & AddressingInfo>,
+  senderUtxos: Array<UTXO>,
+  unsignedTx: RustModule.Wallet.Transaction,
 }
 
 export type AdaWallet = {
-  cwAccountsNumber: number,
   cwAmount: AdaAmount,
   cwId: string,
   cwMeta: AdaWalletMetaParams,
@@ -153,10 +167,10 @@ export type AdaHardwareWalletParams = {
 export type Transaction = {
   hash: string,
   inputs_address: Array<string>,
-  inputs_amount: Array<string>, // bingint[]
+  inputs_amount: Array<string>, // bigint[]
   outputs_address: Array<string>,
-  outputs_amount: Array<string>, // bingint[]
-  block_num: ?string, // null if transaction failed
+  outputs_amount: Array<string>, // bigint[]
+  block_num: ?string, // null if transaction pending/failed
   time: string, // timestamp with timezone
   best_block_num: string, // bigint
   last_update: string, // timestamp with timezone
@@ -164,9 +178,15 @@ export type Transaction = {
 };
 
 export type UTXO = {
-  utxo_id: string,
+  utxo_id: string, // concat tx_hash and tx_index
   tx_hash: string,
   tx_index: number,
   receiver: string,
   amount: string
 }
+
+export type PDF = {
+  getPage: Function
+}
+
+export type AddressType = "External" | "Internal";

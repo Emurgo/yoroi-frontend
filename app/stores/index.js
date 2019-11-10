@@ -41,6 +41,7 @@ export type StoresMap = {
 /** Constant that represents the stores across the lifetime of the application */
 const stores = observable({
   profile: null,
+  theme: null,
   app: null,
   topbar: null,
   walletBackup: null,
@@ -91,6 +92,11 @@ export default action(
         .keys(stores.substores.ada)
         .map(key => stores.substores.ada[key])
         .forEach(store => store.initialize());
+    }
+
+    // Perform load after all setup is done to ensure migration can modify store state
+    if (stores.loading) { // if condition to please flow (avoid thinkin "loading" is null)
+      stores.loading.load();
     }
 
     return (stores: any);

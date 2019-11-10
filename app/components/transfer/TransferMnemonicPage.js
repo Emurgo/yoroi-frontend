@@ -4,68 +4,45 @@ import { join } from 'lodash';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Autocomplete } from 'react-polymorph/lib/components/Autocomplete';
-import { AutocompleteSkin } from 'react-polymorph/lib/skins/simple/AutocompleteSkin';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
+import vjf from 'mobx-react-form/lib/validators/VJF';
 import BorderedBox from '../widgets/BorderedBox';
 import globalMessages from '../../i18n/global-messages';
 import styles from './TransferMnemonicPage.scss';
+import config from '../../config';
+import { AutocompleteOwnSkin } from '../../themes/skins/AutocompleteOwnSkin';
 
 const messages = defineMessages({
-  title: {
-    id: 'transfer.form.instructions.title.label',
-    defaultMessage: '!!!Instructions',
-    description: 'Label "Instructions" on the transfer mnemonic page.'
-  },
-  step1: {
-    id: 'transfer.form.instructions.step1.text',
-    defaultMessage: '!!!It will take about 1 minute to restore your balance. In the next step, you will be presented with a transaction that will move all of your funds. Please review the details of the transaction carefully. You will need to pay a standard transaction fee on the Cardano network to make the transaction.',
-    description: 'Text for instructions step 1 on the transfer mnemonic page.'
-  },
   recoveryPhraseInputLabel: {
     id: 'transfer.form.recovery.phrase.input.label',
     defaultMessage: '!!!Recovery phrase',
-    description: 'Label for the recovery phrase input on the transfer mnemonic page.'
   },
   recoveryPhraseInputHint: {
     id: 'transfer.form.recovery.phrase.input.hint',
     defaultMessage: '!!!Enter recovery phrase',
-    description: 'Hint "Enter recovery phrase" for the recovery phrase input on the transfer mnemonic page.'
   },
   recoveryPhraseNoResults: {
     id: 'transfer.form.recovery.phrase.input.noResults',
     defaultMessage: '!!!No results',
-    description: '"No results" message for the recovery phrase input search results.'
   },
   invalidRecoveryPhrase: {
     id: 'transfer.form.errors.invalidRecoveryPhrase',
     defaultMessage: '!!!Invalid recovery phrase',
-    description: 'Error message shown when invalid recovery phrase was entered.'
-  },
-  backButtonLabel: {
-    id: 'transfer.form.back',
-    defaultMessage: '!!!Back',
-    description: 'Label for the back button on the transfer mnemonic page.'
-  },
-  nextButtonLabel: {
-    id: 'transfer.form.next',
-    defaultMessage: '!!!Next',
-    description: 'Label for the next button on the transfer mnemonic page.'
   },
 });
 
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
-
-type Props = {
+type Props = {|
   onSubmit: Function,
   onBack: Function,
   mnemonicValidator: Function,
   validWords: Array<string>,
   step0: string,
-  mnemonicLength: number
-};
+  mnemonicLength: number,
+  classicTheme: boolean
+|};
 
 @observer
 export default class TransferMnemonicPage extends Component<Props> {
@@ -78,11 +55,20 @@ export default class TransferMnemonicPage extends Component<Props> {
     fields: {
       recoveryPhrase: {
         label: this.context.intl.formatMessage(messages.recoveryPhraseInputLabel),
-        placeholder: this.context.intl.formatMessage(messages.recoveryPhraseInputHint),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(messages.recoveryPhraseInputHint) : '',
         value: '',
         validators: [({ field }) => {
           const value = join(field.value, ' ');
-          if (value === '') return [false, this.context.intl.formatMessage(messages.fieldIsRequired)];
+          const wordsLeft = this.props.mnemonicLength - field.value.length;
+          if (value === '') return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+          if (wordsLeft > 0) {
+            return [
+              false,
+              this.context.intl.formatMessage(globalMessages.shortRecoveryPhrase,
+                { number: wordsLeft })
+            ];
+          }
           return [
             this.props.mnemonicValidator(value),
             this.context.intl.formatMessage(messages.invalidRecoveryPhrase)
@@ -93,7 +79,10 @@ export default class TransferMnemonicPage extends Component<Props> {
   }, {
     options: {
       validateOnChange: true,
-      validationDebounceWait: 250,
+      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+    },
+    plugins: {
+      vjf: vjf()
     },
   });
 
@@ -113,7 +102,15 @@ export default class TransferMnemonicPage extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { form } = this;
-    const { validWords, onBack, step0, mnemonicLength } = this.props;
+    const {
+      validWords,
+      onBack,
+      step0,
+      mnemonicValidator,
+      mnemonicLength,
+      classicTheme
+    } = this.props;
+    const { recoveryPhrase } = form.values();
 
     const nextButtonClasses = classnames([
       'proceedTransferButtonClasses',
@@ -122,7 +119,7 @@ export default class TransferMnemonicPage extends Component<Props> {
     ]);
     const backButtonClasses = classnames([
       'backTransferButtonClasses',
-      'flat',
+      classicTheme ? 'flat' : 'outlined',
       styles.button,
     ]);
 
@@ -137,40 +134,41 @@ export default class TransferMnemonicPage extends Component<Props> {
             { /* Instructions for how to transfer */ }
             <div>
               <div className={styles.title}>
-                {intl.formatMessage(messages.title)}
+                {intl.formatMessage(globalMessages.instructionTitle)}
               </div>
 
               <ul className={styles.instructionsList}>
-                {
-                  <div className={styles.text}>
-                    {step0}
-                    {intl.formatMessage(messages.step1)}
-                  </div>
-                }
+                <div className={styles.text}>
+                  {step0}
+                  &nbsp;
+                  {intl.formatMessage(globalMessages.step1)}
+                </div>
               </ul>
             </div>
 
             <Autocomplete
+              className={styles.inputWrapper}
               options={validWords}
               maxSelections={mnemonicLength}
               {...recoveryPhraseField.bind()}
+              done={mnemonicValidator(join(recoveryPhrase, ' '))}
               error={recoveryPhraseField.error}
               maxVisibleOptions={5}
               noResultsMessage={intl.formatMessage(messages.recoveryPhraseNoResults)}
-              skin={AutocompleteSkin}
+              skin={AutocompleteOwnSkin}
             />
 
             <div className={styles.buttonsWrapper}>
               <Button
                 className={nextButtonClasses}
-                label={intl.formatMessage(messages.nextButtonLabel)}
+                label={intl.formatMessage(globalMessages.nextButtonLabel)}
                 onClick={this.submit}
                 skin={ButtonSkin}
               />
 
               <Button
                 className={backButtonClasses}
-                label={intl.formatMessage(messages.backButtonLabel)}
+                label={intl.formatMessage(globalMessages.backButtonLabel)}
                 onClick={onBack}
                 skin={ButtonSkin}
               />

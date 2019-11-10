@@ -1,0 +1,43 @@
+@import '../../../themes/mixins/underline.scss';
+
+.component {
+  :global(.SimpleBubble_bubble) {
+    font-size: 12px;
+    height: 30px;
+    font-family: var(--font-regular);
+    letter-spacing: 1px;
+    color: white;
+    background-color: rgba(56, 57, 61, 0.7);
+
+    // size tooltip to text contained inside
+    min-width: auto;
+    padding: 4px 12px 4px 12px !important;
+
+    // use this to vertical-align
+    line-height: 22px;
+  }
+
+  :global(.SimpleBubble_root:not(.SimpleBubble_openUpward))  {
+      margin-top: -8px !important;
+  }
+  :global(.SimpleBubble_root.SimpleBubble_transparent.SimpleBubble_openUpward)  {
+      margin-bottom: -8px !important;
+  }
+}
+
+.url {
+  text-decoration: none;
+
+}
+
+.darkColor {
+  &:hover {
+    @include underline(var(--theme-underline-dark-color));
+  }
+}
+
+.lightColor {
+  &:hover {
+    @include underline(var(--theme-underline-light-color));
+  }
+}

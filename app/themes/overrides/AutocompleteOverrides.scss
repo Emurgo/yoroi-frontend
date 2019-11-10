@@ -1,9 +1,31 @@
 // Css module overrides go here …
 
 .autocompleteWrapper  {
+  input {
+    background: var(--rp-autocomplete-input-bg-color, transparent);
+    border: var(--rp-autocomplete-input-border, 0);
+  }
   .autocompleteContent {
-    min-height: 73px;
-    padding: 0 10px;
+    border: none;
+    min-height: 140px;
+    padding: 10px 40px 15px 15px;
+    border-radius: 8px;
+
+    &:hover {
+      border-color: var(--theme-autocomplete-hover-border-color);
+    }
+
+    &:focus, &:active, &.opened {
+      border-width: 2px;
+    }
+
+    &.errored {
+      border-color: var(--rp-theme-color-error);
+
+      &:active {
+        border-width: 2px;
+      }
+    }  
 
     .selectedWords {
       input {
@@ -12,12 +34,13 @@
       }
 
       .selectedWordBox {
-        border-radius: 2px;
+        border-radius: 8px;
         margin: 5px 12px 0 -6px;
-        padding: 3px 6px;
+        padding: 3px 13px;
 
         .selectedWordValue {
-          font-size: 15px;
+          font-size: 14px;
+          letter-spacing: 0;
 
           .selectedWordRemoveButton {
             margin-left: 4px;
@@ -28,6 +51,19 @@
           margin-right: 6px;
         }
       }
+    }
+  }
+}
+
+:global(.YoroiModern) {
+  :global {
+    .SimpleAutocomplete_opened + .FormFieldOwnSkin_legend,
+    .hasSelectedWords + .FormFieldOwnSkin_legend {
+      color: var(--rp-formfield-label-text-color);
+      transform: translate(-10px, -24px);
+      font-size: 12px;
+      opacity: 1;
+      background: inherit;
     }
   }
 }

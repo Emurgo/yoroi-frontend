@@ -2,11 +2,38 @@
 
 .selectInput {
   &::after {
-    bottom: 16px;
-    left: calc(100% - 22px);
+    bottom: 42px!important;
+    left: calc(100% - 27px);
+  }
+
+  label {
+    position: absolute;
   }
 
   input {
+    height: 52px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    padding: 0 15px;
     background: none;
+    text-transform: uppercase;
+
+    &:hover {
+      border-color: var(--rp-input-border-color-focus);
+    }
+  }
+}
+
+.isOpen {
+  input, input:hover {
+    border-width: 2px;
+    padding-left: 14px;
+    color: var(--rp-input-border-color-focus);
+    border-color: var(--rp-input-border-color-focus);
+  }
+
+  .selectInput::after {
+    background-color: var(--rp-input-border-color-focus);
+    bottom: 42px!important;
   }
 }

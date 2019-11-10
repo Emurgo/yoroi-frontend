@@ -19,98 +19,100 @@ $rightBlockWidth: $leftBlockWidth;
   margin-top: 20px;
   margin-left: 20px;
   margin-right: 20px;
-}
 
-.leftBlock {
-  float: left;
-  padding-top: 20px;
-  width: $leftBlockWidth;
-}
-
-.rightBlock {
-  float: right;
-  padding-top: 20px;
-  width: $rightBlockWidth;
-
-  .exportTxToFileSvg {
-    pointer-events: auto;
-    float: right;
+  .leftBlock {
+    float: left;
+    padding-top: 20px;
+    width: $leftBlockWidth;
   }
-
-  .exportTxToFileSvg:hover {
-    cursor: pointer;
-    circle {
-      fill: var(--theme-export-transactions-to-file);
+  
+  .rightBlock {
+    float: right;
+    padding-top: 20px;
+    width: $rightBlockWidth;
+  
+    .exportTxToFileSvg {
+      pointer-events: auto;
+      float: right;
+    }
+  
+    .exportTxToFileSvg:hover {
+      cursor: pointer;
+      circle {
+        fill: var(--theme-export-transactions-to-file);
+      }
     }
   }
+  
+  .middleBlock {
+    display: inline-block;
+    text-align: center;
+    border-bottom: 1px solid var(--theme-separation-border-color);
+    width: calc(100% - #{$leftBlockWidth + $rightBlockWidth});
+  
+    :global {
+      .BorderedBox_component {
+        background: none;
+        border: none;
+      }
+    }
+  }
+  
+  .pendingConfirmation {
+    @extend %smallText;
+    & > .currencySymbolSmallest {
+      display: inline-block;
+      margin-left: 1px;
+      & > svg {
+        height: 15px;
+        width: 19px;
+        & > g > g {
+          stroke: var(--theme-icon-ada-summary-wallet-pending-confirmation-symbol-color);
+        }
+      }
+    }
+  }
+  
+  .numberOfTransactions {
+    @extend %smallText;
+  }  
 }
 
-.middleBlock {
-  display: inline-block;
-  text-align: center;
-  border-bottom: 1px solid var(--theme-separation-border-color);
-  width: calc(100% - #{$leftBlockWidth + $rightBlockWidth});
+:global(.YoroiModern) .component {
+  margin-left: 30px;
+  margin-right: 30px;
 
   :global {
     .BorderedBox_component {
+      padding-left: 0;
       background: none;
       border: none;
-    }
-  }
-}
 
-.walletName {
-  font-family: var(--font-regular);
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1.38;
-  letter-spacing: 0.5px;
-  color: var(--theme-bordered-box-text-color);
-  margin-bottom: 5px;
-  text-transform: uppercase;
-}
+      > div {
+        height: auto;
+        font-family: var(--font-regular);
+        font-size: 30px;
+        letter-spacing: 0;
+      }
 
-.walletAmount {
-  font-family: var(--font-thin);
-  font-size: 40px;
-  line-height: 1.0;
-  color: var(--theme-bordered-box-text-color);
-  margin-bottom: 5px;
-  word-break: break-all;
-
-  & > .decimal {
-    font-family: var(--font-medium);
-    font-size: 18px;
-  }
-
-  & > .currencySymbolBig {
-    display: inline-block;
-    margin-left: 10px;
-    & > svg {
-      width: 25px;
-      height: 27.5px;
-      & > g > g {
-        stroke: var(--theme-icon-ada-summary-wallet-amount-symbol-color);
+      svg {
+        height: 21px;
+        width: 21px;
       }
     }
   }
-}
 
-.pendingConfirmation {
-  @extend %smallText;
-  & > .currencySymbolSmallest {
-    display: inline-block;
-    margin-left: 1px;
-    & > svg {
-      height: 15px;
-      width: 19px;
-      & > g > g {
-        stroke: var(--theme-icon-ada-summary-wallet-pending-confirmation-symbol-color);
-      }
-    }
+  .leftBlock {
+    display: none;
   }
-}
 
-.numberOfTransactions {
-  @extend %smallText;
+  .leftBlock,
+  .rightBlock {
+    padding-top: 33px;
+  }
+
+  .middleBlock {
+    border: none;
+    text-align: left;    
+  }
 }

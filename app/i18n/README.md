@@ -20,10 +20,11 @@ One advantage is that this setup allows us to include the `translation-manager` 
 
 ## How to add a new i18n text
 
-Let's see an example of how to add a new i18n text. For this example let's **assume** we have 3 supported locales.
+**Warning**: You can only add / modify text for `en-US`. To modify other languages, you **must** make the change in [Crowdin](https://crowdin.com/project/yoroi-app/), otherwise Crowdin will override your changes.
+
+Let's see an example of how to add a new i18n text. For this example let's **assume** we have the following supported locales.
 1. [en-US](https://github.com/Emurgo/yoroi-frontend/blob/develop/app/i18n/locales/en-US.json)
 2. [ja-JP](https://github.com/Emurgo/yoroi-frontend/blob/develop/app/i18n/locales/ja-JP.json)
-3. [ko-KR](https://github.com/Emurgo/yoroi-frontend/blob/develop/app/i18n/locales/ko-KR.json)
 
 The text we want to add is `I am testing i18n`
 
@@ -31,13 +32,9 @@ The text we want to add is `I am testing i18n`
 1. In [en-US](https://github.com/Emurgo/yoroi-frontend/blob/develop/app/i18n/locales/en-US.json) add a new key and the text.
 ```
 {
-    .
-    .
-    .
+    ...
     "test.text": "I am testing i18n"
-    .
-    .
-    .
+    ...
 }
 ```
 
@@ -52,7 +49,6 @@ const messages = defineMessages({
   testText: {
     id: 'test.text',
     defaultMessage: '!!!I am testing i18n',
-    description: 'Random test text'
   }
 });
 
@@ -77,39 +73,18 @@ export default class TestText extends Component {
 [en-US](https://github.com/Emurgo/yoroi-frontend/blob/develop/app/i18n/locales/en-US.json)
 ```
 {
-    .
-    .
-    .
+    ...
     "test.text": "I am testing i18n"
-    .
-    .
-    .
+    ...
 }
 ```
 
 [AUTO-ADDED] [ja-JP](https://github.com/Emurgo/yoroi-frontend/blob/develop/app/i18n/locales/ja-JP.json)
 ```
 {
-    .
-    .
-    .
+    ...
     "test.text": "!!!I am testing i18n"
-    .
-    .
-    .
-}
-```
-
-[AUTO-ADDED] [ko-KR](https://github.com/Emurgo/yoroi-frontend/blob/develop/app/i18n/locales/ko-KR.json)
-```
-{
-    .
-    .
-    .
-    "test.text": "!!!I am testing i18n"
-    .
-    .
-    .
+    ...
 }
 ```
 
@@ -118,5 +93,5 @@ export default class TestText extends Component {
 After making changes that affect the languages files, please do the following **AFTER** backing up your work (these actions may edit your files in a way you would like to reverse).
 
 1) `npm run purge-translations` (delete translation cache)
-2) `npm run dev` (rebuild translation cache. Note: you **need** to do this but it doesn't have to be `dev`. Any task that causes a rebuild is fine.)
+2) `npm run build` (rebuild translation cache. Note: you **need** to do this but it doesn't have to be `dev`. Any task that causes a rebuild is fine.)
 3) `npm run manage-translations` (check language config for mistakes. Note: auto-fix is dangerous)

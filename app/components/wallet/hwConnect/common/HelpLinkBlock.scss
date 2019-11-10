@@ -1,0 +1,38 @@
+@import '../../../../themes/mixins/underline';
+
+.component {
+  margin-top: 16px;
+  text-align: center;
+  font-family: var(--font-regular);
+  font-size: 15px;
+  height: 22px;
+  
+  a {
+    line-height: 20px;
+    display: inline-flex;
+    opacity: 0.7;
+    text-decoration: none;
+    color: var(--font-black);
+
+    span {
+      margin-left: 4px;
+      margin-top: 2px;
+      width: 14px;
+      height: 14px;
+    }
+
+    &:hover {
+      @include underline(var(--theme-underline-dark-color));
+    }
+  }  
+}
+
+:global(.YoroiClassic) .component {
+  width: 725px;
+}
+
+:global(.YoroiModern) .component {
+  margin-top: 24px;
+  font-size: 14px;
+  letter-spacing: 0;
+}

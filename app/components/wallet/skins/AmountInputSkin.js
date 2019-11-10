@@ -1,25 +1,39 @@
+// @flow
 import React, { Component } from 'react';
+import type { Ref } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
+import classnames from 'classnames';
 import BigNumber from 'bignumber.js';
-import { InputSkin } from 'react-polymorph/lib/skins/simple/InputSkin';
+import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import styles from './AmountInputSkin.scss';
 
 const messages = defineMessages({
   feesLabel: {
     id: 'wallet.amountInput.feesLabel',
     defaultMessage: '!!!+ {amount} of fees',
-    description: 'Label for the "+ 12.042481 of fees" message above amount input field.'
   },
 });
 
+// This type should be kept open (not "exact") because it is a react-polymorph skin
+// and should be able to pass any extra properties from react-polymorph down.
 type Props = {
   currency: string,
   fees: BigNumber,
   total: BigNumber,
-  error: boolean,
+  error?: string,
+  classicTheme: boolean,
+  // inherited from InputOwnSkin
+  inputRef: Ref<'input'>,
+  theme: Object,
+  themeId: string,
+  value: string,
+  type: string,
 };
 
 export default class AmountInputSkin extends Component<Props> {
+  static defaultProps = {
+    error: undefined,
+  };
 
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -30,15 +44,20 @@ export default class AmountInputSkin extends Component<Props> {
     const { intl } = this.context;
 
     return (
-      <div className={styles.root}>
-        <InputSkin {...this.props} />
-        {!error && (
-          <span className={styles.fees}>
-            {intl.formatMessage(messages.feesLabel, { amount: fees })}
-          </span>
-        )}
-        <span className={styles.total}>
-          {!error && `= ${total} `}{currency}
+      <div className={styles.component}>
+        <InputOwnSkin {...this.props} />
+        {/* Do not show fee in case of some error is showing */}
+        {(error == null || error === '')
+          ? (
+            <span className={styles.fees}>
+              {intl.formatMessage(messages.feesLabel, { amount: fees })}
+            </span>
+          )
+          : null
+        }
+
+        <span className={classnames([styles.total, (error != null && error !== '') ? styles.error : ''])}>
+          {(error === null || error === '') ? `= ${total.toString()} ` : null}{currency}
         </span>
       </div>
     );

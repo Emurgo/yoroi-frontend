@@ -1,70 +1,76 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import SvgInline from 'react-svg-inline';
 import classnames from 'classnames';
-import CopyToClipboard from 'react-copy-to-clipboard';
 import QRCode from 'qrcode.react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import BorderedBox from '../widgets/BorderedBox';
-import iconCopy from '../../assets/images/clipboard-ic.inline.svg';
+import verifyIcon from '../../assets/images/verify-icon.inline.svg';
+import generateURIIcon from '../../assets/images/generate-uri.inline.svg';
 import WalletAddress from '../../domain/WalletAddress';
-import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import styles from './WalletReceive.scss';
+import CopyableAddress from '../widgets/CopyableAddress';
+import RawHash from '../widgets/hashWrappers/RawHash';
+import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
+import type { ExplorerType } from '../../domain/Explorer';
 
 const messages = defineMessages({
   walletAddressLabel: {
     id: 'wallet.receive.page.walletAddressLabel',
     defaultMessage: '!!!Your wallet address',
-    description: 'Label for wallet address on the wallet "Receive page"',
   },
   walletReceiveInstructions: {
     id: 'wallet.receive.page.walletReceiveInstructions',
     defaultMessage: '!!!Share this wallet address to receive payments. To protect your privacy, new addresses are generated automatically once you use them.',
-    description: 'Wallet receive payments instructions on the wallet "Receive page"',
   },
   generateNewAddressButtonLabel: {
     id: 'wallet.receive.page.generateNewAddressButtonLabel',
     defaultMessage: '!!!Generate new address',
-    description: 'Label for "Generate new address" button on the wallet "Receive page"',
   },
   generatedAddressesSectionTitle: {
     id: 'wallet.receive.page.generatedAddressesSectionTitle',
     defaultMessage: '!!!Generated addresses',
-    description: '"Generated addresses" section title on the wallet "Receive page"',
   },
   hideUsedLabel: {
     id: 'wallet.receive.page.hideUsedLabel',
     defaultMessage: '!!!hide used',
-    description: 'Label for "hide used" wallet addresses link on the wallet "Receive page"',
   },
   showUsedLabel: {
     id: 'wallet.receive.page.showUsedLabel',
     defaultMessage: '!!!show used',
-    description: 'Label for "show used" wallet addresses link on the wallet "Receive page"',
   },
   copyAddressLabel: {
     id: 'wallet.receive.page.copyAddressLabel',
     defaultMessage: '!!!Copy address',
-    description: 'Label for "Copy address" link on the wallet "Receive page"',
+  },
+  verifyAddressLabel: {
+    id: 'wallet.receive.page.verifyAddressLabel',
+    defaultMessage: '!!!Verify address',
+  },
+  generatePaymentURLLabel: {
+    id: 'wallet.receive.page.generatePaymentURLLabel',
+    defaultMessage: '!!!Generate payment URL',
   },
 });
 
-messages.fieldIsRequired = globalMessages.fieldIsRequired;
-
-type Props = {
+type Props = {|
   walletAddress: string,
+  selectedExplorer: ExplorerType,
   isWalletAddressUsed: boolean,
   walletAddresses: Array<WalletAddress>,
   onGenerateAddress: Function,
-  onCopyAddress: Function,
+  onCopyAddressTooltip: Function,
+  getNotification: Function,
+  onVerifyAddress: Function,
+  onGeneratePaymentURI: Function,
   isSubmitting: boolean,
   error?: ?LocalizableError,
-};
+|};
 
 type State = {
   showUsed: boolean,
@@ -97,16 +103,13 @@ export default class WalletReceive extends Component<Props, State> {
   render() {
     const {
       walletAddress, walletAddresses,
-      onCopyAddress,
+      onVerifyAddress, onGeneratePaymentURI,
       isSubmitting, error, isWalletAddressUsed,
+      onCopyAddressTooltip, getNotification,
     } = this.props;
     const { intl } = this.context;
     const { showUsed } = this.state;
-
-    const walletAddressClasses = classnames([
-      styles.hash,
-      isWalletAddressUsed ? styles.usedHash : null,
-    ]);
+    const mainAddressNotificationId = 'mainAddress-copyNotification';
 
     const generateAddressButtonClasses = classnames([
       'primary',
@@ -124,6 +127,10 @@ export default class WalletReceive extends Component<Props, State> {
       />
     );
 
+    const copyableHashClass = classnames([
+      styles.copyableHash,
+    ]);
+
     // Get QRCode color value from active theme's CSS variable
     const qrCodeBackgroundColor = document.documentElement ?
       document.documentElement.style.getPropertyValue('--theme-receive-qr-code-background-color') : 'transparent';
@@ -137,20 +144,33 @@ export default class WalletReceive extends Component<Props, State> {
             <div className={styles.hashLabel}>
               {intl.formatMessage(messages.walletAddressLabel)}
             </div>
-            <div className={walletAddressClasses}>
-              {walletAddress}
-              <CopyToClipboard
-                text={walletAddress}
-                onCopy={onCopyAddress.bind(this, walletAddress)}
+            <CopyableAddress
+              hash={walletAddress}
+              elementId={mainAddressNotificationId}
+              onCopyAddress={
+                onCopyAddressTooltip.bind(this, walletAddress, mainAddressNotificationId)
+              }
+              getNotification={getNotification}
+            >
+              <ExplorableHashContainer
+                selectedExplorer={this.props.selectedExplorer}
+                hash={walletAddress}
+                light={isWalletAddressUsed}
+                linkType="address"
               >
-                <SvgInline svg={iconCopy} className={styles.copyIconBig} cleanup={['title']} />
-              </CopyToClipboard>
-            </div>
+                <RawHash light={isWalletAddressUsed}>
+                  <span className={copyableHashClass}>{walletAddress}</span>
+                </RawHash>
+              </ExplorableHashContainer>
+            </CopyableAddress>
+            <div className={styles.postCopyMargin} />
             <div className={styles.instructionsText}>
-              {intl.formatMessage(messages.walletReceiveInstructions)}
+              <FormattedHTMLMessage {...messages.walletReceiveInstructions} />
             </div>
-            {error ? <p className={styles.error}>{intl.formatMessage(error)}</p> : null}
             {generateAddressForm}
+            {error
+              ? <p className={styles.error}>{intl.formatMessage(error)}</p>
+              : <p className={styles.error}>&nbsp;</p>}
           </div>
           <div className={styles.qrCode}>
             <QRCode
@@ -177,20 +197,75 @@ export default class WalletReceive extends Component<Props, State> {
               styles.walletAddress,
               address.isUsed ? styles.usedWalletAddress : null,
             ]);
+            const notificationElementId = `address-${index}-copyNotification`;
             return (
               <div key={`gen-${address.id}`} className={addressClasses}>
-                <div className={styles.addressId}>{address.id}</div>
-                <div className={styles.addressActions}>
-                  <CopyToClipboard
-                    text={address.id}
-                    onCopy={onCopyAddress.bind(this, address.id)}
+                {/* Address Id */}
+                <CopyableAddress
+                  hash={address.id}
+                  elementId={notificationElementId}
+                  onCopyAddress={
+                    onCopyAddressTooltip.bind(this, address.id, notificationElementId)
+                  }
+                  getNotification={getNotification}
+                >
+                  <ExplorableHashContainer
+                    selectedExplorer={this.props.selectedExplorer}
+                    hash={address.id}
+                    light={address.isUsed}
+                    linkType="address"
                   >
-                    <span className={styles.copyAddress}>
-                      <SvgInline svg={iconCopy} className={styles.copyIcon} cleanup={['title']} />
-                      <span>{intl.formatMessage(messages.copyAddressLabel)}</span>
-                    </span>
-                  </CopyToClipboard>
+                    <RawHash light={address.isUsed}>
+                      {address.id}
+                    </RawHash>
+                  </ExplorableHashContainer>
+                </CopyableAddress>
+                <div className={styles.addressMargin} />
+                {/* Address Action block start */}
+                <div className={styles.addressActions}>
+                  {/* Generate payment URL for Address action */}
+                  <div className={classnames([
+                    styles.addressActionItemBlock,
+                    styles.generateURLActionBlock])}
+                  >
+                    <button
+                      type="button"
+                      onClick={onGeneratePaymentURI.bind(this, address.id)}
+                      className={styles.btnGenerateURI}
+                    >
+                      <div className={styles.generateURLActionBlock}>
+                        <SvgInline
+                          svg={generateURIIcon}
+                          className={styles.generateURIIcon}
+                        />
+                        <span className={styles.actionIconText}>
+                          {intl.formatMessage(messages.generatePaymentURLLabel)}
+                        </span>
+                      </div>
+                    </button>
+                  </div>
+                  {/* Verify Address action */}
+                  <div className={classnames([
+                    styles.addressActionItemBlock,
+                    styles.verifyActionBlock])}
+                  >
+                    <button
+                      type="button"
+                      onClick={
+                        onVerifyAddress.bind(this, { address: address.id, path: address.path })
+                      }
+                    >
+                      <div>
+                        <SvgInline
+                          svg={verifyIcon}
+                          className={styles.verifyIcon}
+                        />
+                        <span>{intl.formatMessage(messages.verifyAddressLabel)}</span>
+                      </div>
+                    </button>
+                  </div>
                 </div>
+                {/* Action block end */}
               </div>
             );
           })}
@@ -207,5 +282,4 @@ export default class WalletReceive extends Component<Props, State> {
       </div>
     );
   }
-
 }

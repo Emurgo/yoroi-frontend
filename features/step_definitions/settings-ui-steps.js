@@ -23,8 +23,11 @@ When(/^I enter new wallet name:$/, async function (table) {
    * https://github.com/seleniumhq/selenium-google-code-issue-archive/issues/214
    * We instead repeatedly delete characters until we've deleted the whole name
   */
-  const currentName = 'Test';  // can't programmtically get the wallet name due to the issue above
-  for (let i = 0; i < currentName.length; i++) {
+
+  // can't programmtically get the wallet name due to the issue above
+  // so assume max length
+  const maxNameLength = 40;
+  for (let i = 0; i < maxNameLength; i++) {
     // Chrome and Firefox select the text field starting at the left / right respectively
     await this.input(walletNameInputSelector, Key.BACK_SPACE); // Firefox
     await this.input(walletNameInputSelector, Key.DELETE); // Chrome
@@ -64,6 +67,10 @@ When(/^I submit the wallet password dialog$/, async function () {
   await this.click('.confirmButton');
 });
 
+When(/^I click the next button$/, async function () {
+  await this.click('.confirmButton');
+});
+
 Then(/^I should not see the change password dialog anymore$/, async function () {
   await this.waitForElementNotPresent('.changePasswordDialog');
 });
@@ -74,7 +81,7 @@ Then(/^I should see new wallet name "([^"]*)"$/, async function (walletName) {
 
 Then(/^I should see the following error messages:$/, async function (data) {
   const error = data.hashes()[0];
-  const errorSelector = '.ChangeWalletPasswordDialog_newPassword .SimpleFormField_error';
+  const errorSelector = '.ChangeWalletPasswordDialog_newPasswordClassic .SimpleFormField_error';
   await checkErrorByTranslationId(this, errorSelector, error);
 });
 

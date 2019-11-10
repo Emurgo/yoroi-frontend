@@ -1,9 +1,9 @@
 // @flow
-import type { ReactIntlMessage } from './i18nTypes';
+import type { MessageDescriptor } from 'react-intl';
 
 export type Notification = {
   id: string,
-  message: ReactIntlMessage,
+  message: MessageDescriptor,
   duration: ?number,
   secondsTimerInterval?: ?IntervalID,
 }

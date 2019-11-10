@@ -1,34 +1,36 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import classnames from 'classnames';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import SvgInline from 'react-svg-inline';
 import WalletRecoveryPhraseMnemonic from './WalletRecoveryPhraseMnemonic';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
+import DialogBackButton from '../../widgets/DialogBackButton';
 import Dialog from '../../widgets/Dialog';
 import WalletRecoveryInstructions from './WalletRecoveryInstructions';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletRecoveryPhraseDisplayDialog.scss';
+import recoveryPhraseSvg from '../../../assets/images/recovery-phrase.inline.svg';
 
 const messages = defineMessages({
   backupInstructions: {
     id: 'wallet.backup.recovery.phrase.display.dialog.backup.instructions',
     defaultMessage: `!!!Please, make sure you have carefully written down your recovery phrase somewhere safe.
     You will need this phrase later for next use and recover. Phrase is case sensitive.`,
-    description: 'Instructions for backing up wallet recovery phrase on dialog that displays wallet recovery phrase.'
   },
   buttonLabelIHaveWrittenItDown: {
     id: 'wallet.backup.recovery.phrase.display.dialog.button.label.iHaveWrittenItDown',
     defaultMessage: '!!!Yes, I’ve written it down',
-    description: 'Label for button "Yes, I’ve written it down" on wallet backup dialog'
   }
 });
 
-type Props = {
+type Props = {|
   recoveryPhrase: string,
   onStartWalletBackup: Function,
   onCancelBackup: Function,
-};
+  onBack: Function,
+  classicTheme: boolean
+|};
 
 @observer
 export default class WalletRecoveryPhraseDisplayDialog extends Component<Props> {
@@ -43,11 +45,9 @@ export default class WalletRecoveryPhraseDisplayDialog extends Component<Props> 
       recoveryPhrase,
       onStartWalletBackup,
       onCancelBackup,
+      onBack,
+      classicTheme
     } = this.props;
-    const dialogClasses = classnames([
-      styles.component,
-      'WalletRecoveryPhraseDisplayDialog',
-    ]);
 
     const actions = [
       {
@@ -59,17 +59,22 @@ export default class WalletRecoveryPhraseDisplayDialog extends Component<Props> 
 
     return (
       <Dialog
-        className={dialogClasses}
+        className="WalletRecoveryPhraseDisplayDialog"
         title={intl.formatMessage(globalMessages.recoveryPhraseDialogTitle)}
         actions={actions}
         onClose={onCancelBackup}
-        closeOnOverlayClick
+        closeOnOverlayClick={false}
         closeButton={<DialogCloseButton onClose={onCancelBackup} />}
+        backButton={<DialogBackButton onBack={onBack} />}
+        classicTheme={classicTheme}
       >
+        {!classicTheme && <SvgInline className={styles.recoveryImage} svg={recoveryPhraseSvg} />}
+
         <WalletRecoveryInstructions
           instructionsText={<FormattedHTMLMessage {...messages.backupInstructions} />}
+          classicTheme={classicTheme}
         />
-        <WalletRecoveryPhraseMnemonic phrase={recoveryPhrase} />
+        <WalletRecoveryPhraseMnemonic phrase={recoveryPhrase} classicTheme={classicTheme} />
       </Dialog>
     );
   }

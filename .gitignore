@@ -6,8 +6,8 @@ production-key.pem
 
 build/
 dev/
-dll/
 screenshots/
+coverage/
 
 *.zip
 *.xpi
@@ -27,3 +27,9 @@ Yoroi
 # IntelliJ IDEA config
 .idea
 **/*.iml
+
+# manifests are built dynamically
+chrome/manifest.*.json
+
+# history plugin for vscode
+.history

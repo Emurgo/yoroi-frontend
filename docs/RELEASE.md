@@ -2,28 +2,38 @@
 
 To create a release candidate you must compress a local build.
 
-## Unsigned build (zip)
+## Unsigned build
 
 Zip files can be shared
 
 ```bash
-# compress build folder to {manifest.name}.zip and crx
-$ npm run build -- --env "${network}"
-$ npm run compress -- --env "${network}" --zip-only --app-id "APP_ID" --codebase "https://www.sample.com/dw/yoroi-extension.crx"
+# compress build folder to {manifest.name}.zip
+# if CARDANO_NETWORK is not provided, it defaults to "testnet"
+$ CARDANO_NETWORK=staging npm run build-compress
 ```
 
-## (Chrome) Signed build (CRX)
+## (Chrome) Signed build
 
 Crx are compressed and signed chrome extension bundles
 
 ```bash
 # compress build folder to {manifest.name}.zip and crx
 $ npm run build -- --env "${network}"
-$ npm run compress -- --env "${network}" --app-id "APP_ID" --codebase "https://www.sample.com/dw/yoroi-extension.crx" --key ./production-key.pem
+$ npm run compress -- --env "${network}"  --zip-only --app-id "APP_ID" --codebase "https://www.sample.com/dw/yoroi-extension.crx" --key ./production-key.pem
 ```
 
 Note: Chrome extensions [update automatically](https://developer.chrome.com/extensions/autoupdate)
 
 ## (Firefox) Signed build (XPI)
 
-TODO: Firefox
+The same steps as Chrome also produce an `xpi` file. You can upload this directly to the [EMURGO AMO account](https://addons.mozilla.org/en-US/firefox/user/14971548/)
+
+# Deploying new version
+
+Update the version number in `manifest` files and in `package.json`
+
+**Note**: You must repeat these steps with the `network` changed for:
+- `mainnet`
+- `staging`
+1) Create a new [release on Github](https://github.com/Emurgo/yoroi-frontend/releases/)
+1) Upload to [Chrome store](https://chrome.google.com/webstore/developer/dashboard)

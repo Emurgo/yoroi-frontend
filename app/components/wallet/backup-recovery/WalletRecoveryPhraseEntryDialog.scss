@@ -1,29 +1,68 @@
 @import '../../../themes/mixins/loading-spinner';
 
-.words {
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-  justify-content: space-between;
-  margin-top: 20px;
-}
 
-.checkbox {
-  margin-top: 30px;
+.component {
 
-  & + .checkbox {
+  .checkbox {
+    margin-top: 30px;
+
+    & + .checkbox {
+      margin-top: 20px;
+    }
+  }
+
+  .words {
+    display: flex;
+    flex-wrap: wrap;
     margin-top: 20px;
+  }
+
+  .phrasePlaceholder {
+    word-spacing: normal;
+    font-size: 14px;
+    letter-spacing: 0;
+    line-height: 1.57;
+    padding: 30px 20px;
+    color: var(--theme-instructions-text-color);
+  }
+  
+  .phraseWrapper {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .phraseWord {
+    background-color: var(--theme-mnemonic-background-color);
+    font-size: 14px;
+    font-family: var(--font-regular);
+    margin: 0 10px 10px 0;
+    height: 30px;
+    line-height: 26px;
+    padding: 3px 13px;
+    color: var(--theme-mnemonic-button-text-color);
+    border-radius: 8px;
+    letter-spacing: 0;
+  }
+
+  .isSubmitting {
+    @include loading-spinner("../../../assets/images/spinner-light.svg");
   }
 }
 
-.component{
-  :global {
-    .WalletRecoveryInstructions_component {
-      text-align: center;
+:global(.YoroiClassic) {
+  .component {
+    .words {
+      justify-content: space-between;
     }
   }
 }
 
-.isSubmitting {
-  @include loading-spinner("../../../assets/images/spinner-light.svg");
+:global(.YoroiModern) {
+  .component {
+    text-align: left;
+
+    label {
+      font-size: 14px;
+    }
+  }  
 }

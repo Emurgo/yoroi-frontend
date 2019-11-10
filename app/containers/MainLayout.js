@@ -2,37 +2,37 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import type { Node } from 'react';
-import TopBarContainer from './TopBarContainer';
 import TopBarLayout from '../components/layout/TopBarLayout';
 import TestnetWarningBanner from '../components/topbar/banners/TestnetWarningBanner';
+import ServerErrorBanner from '../components/topbar/banners/ServerErrorBanner';
 import type { InjectedContainerProps } from '../types/injectedPropsType';
+import type { ServerStatusErrorType } from '../types/serverStatusErrorType';
 
 export type MainLayoutProps = InjectedContainerProps & {
-  topbar: ?Node,
-  footer: ?Node,
+  topbar?: Node,
+  classicTheme: boolean,
+  connectionErrorType: ServerStatusErrorType,
 };
 
 @observer
 export default class MainLayout extends Component<MainLayoutProps> {
   static defaultProps = {
     topbar: null,
-    footer: null,
+    connectionErrorType: null,
   };
 
+
   render() {
-    const {
-      actions,
-      stores,
-      topbar,
-      footer,
-    } = this.props;
-    const topbarComponent = topbar || (<TopBarContainer actions={actions} stores={stores} />);
+    const displayedBanner = this.props.connectionErrorType === 'healthy' ?
+      <TestnetWarningBanner /> :
+      <ServerErrorBanner errorType={this.props.connectionErrorType} />;
+
     return (
       <TopBarLayout
-        banner={<TestnetWarningBanner />}
-        topbar={topbarComponent}
+        banner={displayedBanner}
+        topbar={this.props.topbar}
         notification={<div />}
-        footer={footer}
+        classicTheme={this.props.classicTheme}
       >
         {this.props.children}
       </TopBarLayout>

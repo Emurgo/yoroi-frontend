@@ -1,0 +1,50 @@
+@import '../../../../themes/mixins/error-message';
+
+.component {
+  margin-bottom: 20px;
+
+  h1 {
+    color: var(--theme-support-settings-text-color);
+    font-family: var(--font-semibold);
+    font-size: 16px;
+    line-height: 1.38;
+    margin-bottom: 10px;
+    padding-top: 10px;
+  }
+}
+
+.error {
+  @include error-message;
+  text-align: center;
+}
+
+.language {
+  label {
+    background-color: var(--theme-settings-pane-background-color);
+  }
+}
+
+.info {
+  color: var(--theme-terms-of-use-text-color);
+  text-align: justify;
+  margin-top: 10px;
+
+  h1 {
+    color: var(--rp-formfield-label-text-color);
+    font-family: var(--font-medium);
+    font-size: 14px;
+    margin-bottom: 11px;
+  }
+
+  p {
+    font-family: var(--font-regular);
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    line-height: 1.38;
+    margin-bottom: 11px;
+  }
+}
+
+:global(.YoroiClassic) .component {
+  margin-bottom: 0;
+}

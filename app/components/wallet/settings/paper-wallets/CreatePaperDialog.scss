@@ -1,0 +1,83 @@
+@import '../../../../themes/mixins/loading-spinner';
+@import '../../../../themes/mixins/error-message';
+
+.component {
+  text-align: center;
+  font-family: var(--font-regular);
+  line-height: 22px;
+
+  .downloadIcon {
+    cursor: pointer;
+    display: inline-block;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center center;
+    margin-top: 16px;
+    margin-bottom: 24px;
+    width: 92px;
+    height: 92px;
+  }
+
+  .downloadIcon:focus {
+    outline: none;
+  }
+  
+  .labelDownload {
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+  
+  .labelDownloadSize {
+    font-size: 14px;
+    color: var(--cmn-default-color-grey-3);
+  }
+  
+  .walletLoaderWrapper {
+    .walletLoader {
+      display: inline-block;
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-position: center center;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      width: 170px;
+      height: 190px;
+    }    
+  
+    .walletLoaderTitle {
+      word-break: break-all;
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+  
+    .walletLoaderProgressInfo {
+      font-size: 14px;
+      color: var(--cmn-default-color-grey-3);
+      word-break: break-word;
+    }
+  }
+}
+
+:global(.YoroiClassic) {
+  .component {
+    .walletLoader {
+      background-image: url("../../../../assets/images/paper-wallet/create-paper-wallet-loader-classic.gif");
+    }
+
+    .downloadIcon {
+      background-image: url("../../../../assets/images/paper-wallet/download-certificate-classic.inline.svg");
+    }
+  }
+}
+
+:global(.YoroiModern) {
+  .component {
+    .walletLoader {
+      background-image: url("../../../../assets/images/paper-wallet/create-paper-wallet-loader-modern.gif");
+    }
+
+    .downloadIcon {
+      background-image: url("../../../../assets/images/paper-wallet/download-certificate-modern.inline.svg");
+    }    
+  }
+}

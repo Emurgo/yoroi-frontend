@@ -1,0 +1,20 @@
+// Css module overrides go here …
+
+.textarea {
+  padding-left: 15px;
+  padding-right: 15px;
+
+  &:hover {
+    border-color: var(--rp-textarea-border-color-focus);
+  }
+
+  &:focus {
+    border-width: 2px;
+    padding-left: 14px;
+    padding-top: 13px;
+  }
+
+  &.errored {
+    border-color: var(--rp-textarea-border-color-errored);
+  }
+}

@@ -1,59 +1,85 @@
 $common-color:var(--theme-widgets-progress-step-common-color);
 
-.outer {
+.component {
   text-align: center;
+  margin-bottom: 24px;
+
+  .stepBlock {
+    display: inline-block;
+    vertical-align: top;
+    padding-left: 5px;
+    padding-right: 5px; 
+  }
+  
+  .stepTopBar {
+    background-color: $common-color;
+    height: 6px;
+    border-radius: 3px;
+    opacity: 0.3;
+  }
+  
+  .stepTopBarDone {
+    opacity: 1.0;
+  }
+  
+  .stepTopBarActive {
+    opacity: 1.0;
+  }
+
+  .stepBottomBlock {
+    width: 117px;
+    margin-top: 2px;
+  
+    span {
+      margin-top: 1px;
+      display: inline-block;
+    }
+  
+    svg {
+      height: 10px;
+      width: 10px;
+    }
+  }
+  
+  .stepStateIconContainer {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-left: -16px;
+  }
+  
+  .stepTextContainer {
+    display: inline-block;
+    vertical-align: top;
+  }
+  
+  .stepText {
+    color: $common-color;
+    opacity: 0.3;
+    font-size: 13px;
+    font-family: var(--font-light);
+  }
+  
+  .stepTextDone {
+    opacity: 1.0;
+  }
+  
+  .stepTextActive {
+    opacity: 1.0;
+  }  
 }
 
-.stepBlock {
-  display: inline-block;
-  vertical-align: top;
-  padding-left: 5px;
-  padding-right: 5px; 
+:global(.YoroiClassic) .component {
 }
 
-.stepTopBar {
-  height: 6px;
-  background-color: $common-color;
-  border-radius: 3px;
-  opacity: 0.3;
-}
+:global(.YoroiModern) .component {
+  .stepTopBar {
+    height: 4px;
+    border-radius: 2px;
+  }
 
-.stepTopBarDone {
-  opacity: 1.0;
-}
-
-.stepTopBarActive {
-  opacity: 1.0;
-}
-
-.stepBottomBlock {
-  margin-top: 2px;
-  padding-left: 24px;
-  padding-right: 40px;
-}
-
-.stepStateIconContainer {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-}
-
-.stepTextContainer {
-  display: inline-block;
-  vertical-align: top;
-}
-
-.stepText {
-  color: $common-color;
-  opacity: 0.3;
-  font-size: 13px;
-  font-family: var(--font-light);
-}
-
-.stepTextDone {
-  opacity: 1.0;
-}
-
-.stepTextActive {
-  opacity: 1.0;
+  .stepText {
+    font-size: 12px;
+    font-family: var(--font-regular);
+  }  
 }

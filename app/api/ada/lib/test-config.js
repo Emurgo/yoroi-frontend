@@ -6,16 +6,16 @@ const CONFIG: ConfigType = {
     protocolMagic: 764824073,
     backendUrl: '',
     websocketUrl: '',
-    name: 'mainnet',
-    trezorNetwork: 2
+    name: 'mainnet'
   },
   app: {
     walletRefreshInterval: 10,
+    serverStatusRefreshInterval: 10,
     logsBufferSize: 10,
     logsFileSuffix: 'log',
     addressScanSize: 20,
     addressRequestSize: 20,
-    txsBodiesRequestSize: 20
+    txsBodiesRequestSize: 20,
   },
 };
 

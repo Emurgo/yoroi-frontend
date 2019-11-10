@@ -5,5 +5,5 @@ import Action from '../lib/Action';
 
 export default class AddressesActions {
   createAddress: Action<void> = new Action();
-  resetErrors: Action<any> = new Action();
+  resetErrors: Action<void> = new Action();
 }
