@@ -4,7 +4,7 @@
 
 ### Abstract
 
-This spec describes how we can implement "2FA" authentication for desktop Yoroi, using mobile Yoroi as the authentication device. This "2FA" is actually can be called like this, because it includes actual second-layer encryption of the private key on the desktop Yoroi, which only can then be decrypted via the same private key on the mobile device (or any other device, technically). The critical part - is proving that you possess and have full access to the same secret key on another device, without actully exposing it. At the same time the desktop private key is encrypted with additional layer of security (apart from the password) for the whole time - hence the "2FA".
+This spec describes how we can implement "2FA" authentication for desktop Yoroi, using mobile Yoroi as the authentication device. This "2FA" is actually can be called like this, because it includes actual second-layer encryption of the private key on the desktop Yoroi, which only can then be decrypted via the same private key on the mobile device (or any other device, technically). The critical part - is proving that you possess and have full access to the same secret key on another device, without actually exposing it. At the same time the desktop private key is encrypted with additional layer of security (apart from the password) for the whole time - hence the "2FA".
 
 ### Name explanation
 
@@ -26,7 +26,7 @@ We describe using of 44-bit long pseudo-random passwords to encrypt the private 
 
 #### Evolving
 
-We describe the scheme in which the password, used to encrypt the desktop private key is changed (evolved) after every use. This is required by the fact that, by design, we cannot store any additional secret (without the same 2FA protection) on the desktop reliably, under the assumtion that client spending password is already compromised (the whole point for the "2FA"). This means that the "2FA" code that user reads off the auth-device IS the second private-key password. And if we would use static key-schema - losing a single "2FA" code would mean the private key is compromised again. So the proposal is to encrypt the private key with a new password after every time is it used.
+We describe the scheme in which the password, used to encrypt the desktop private key is changed (evolved) after every use. This is required by the fact that, by design, we cannot store any additional secret (without the same 2FA protection) on the desktop reliably, under the assumption that client spending password is already compromised (the whole point for the "2FA"). This means that the "2FA" code that user reads off the auth-device IS the second private-key password. And if we would use static key-schema - losing a single "2FA" code would mean the private key is compromised again. So the proposal is to encrypt the private key with a new password after every time it is used.
 
 #### Client-side
 
@@ -86,14 +86,134 @@ So in this protocol we have a "timid external secret" which also takes the priva
 
 ![image](https://user-images.githubusercontent.com/5585355/52478125-6a0fb500-2bb5-11e9-95ea-4a24bdf1cd55.png)
 
-### Tech-spec
+## Tech-spec
+
+In this section we will describe a detailed spec for the `TimidES`, because this version is an extension of the regular `Timid` which means that the regular version can be implemented by using the `ES` version, but NOT vice versa.
+
+### Encryption bits
+
+Further we will always refer to the protocols as Timid and TimidES without specifying the exact number of encryption bits, just because it's not a protocol-critical value and every implementation or application can use whatever value they deem the best, or even make it a configurable setting.
+
+The only thing to remember is that we will describe the value as always being `11*N` bits, where `N` is the number of BIP39 mnemonic **words**. We use and describe mnemonics because protocol implies relatively long "arbitrary" numeric values being passed via user reading/typing. Implementors might choose any alternative schemes of encoding that might not require the 11-divisibility. It does not affect the scheme.
+
+For the clarity of this value being an open variable - in the technical spec we will always denote it as `BITS`
+
+```
+BITS = the bit-length of the generated (evolving) encryption key 
+``` 
+
+### Terminology
+
+#### TimidES operates with these values:   
+1. Payload (PL) - the value that requires protection
+2. Secret (S) - the static secret shared by both parties
+3. Ratchet seed (K) - the initial key `K0` used to setup the ratchet on both sides
+4. Ratchet key (Kn) - and iteration of the evolving key used for the encryption  
+5. Secret body (B) - the combined message body, prepared to be hidden
+6. Encrypted secret body (BE) - the combined message body, hidden under Timid
+7. Counter (n) - Evolving key iteration counter
+
+(Regular Timid is implemented on top of TimidES just by using the wallet private key as `S` and making `PL` empty.)
+
+#### Parties
+
+1. Desktop (D) - the party that holds the `PL` and needs it protected
+2. Mobile (M) - the party that is assumed to be more secure than `D`
+3. User (U) - the party that facilitates the interaction between `D` and `M`, **assumed to be secure** and able to transfer messages.
+
+(Note: the names are used just for the sake of clarity in accordance to the default setting of our wallets, but this protocol might as well be implemented in a setting where the same roles are executed by parties that has nothing to do with desktops, or mobiles, or real human users.)
+
+### Functions 
+
+This section lists all the functions required to implement TimidES, format is:
+```
+<party>:: <function>(<arguments>): <result>
+  1. Function operations
+  ...
+```
+
+Parties implementing functions are `D` and `M`, while `U` is the "caller" party, and calling algorithms are described later.
+
+```
+M::init_secret( id, password ): Words(S)
+  1. Generate S of length >= BITS (mod 11)
+  2. SE = encrypt(S, password)  
+  3. Store local: (id, SE)
+  4. Return: Words(S)
+```  
+
+```
+D::init_binding( S, PL ): ( Words(K), Timid(n, BE) )
+  1. Generate K of length >= BITS (mod 11)
+  2. Kn = key( K, S )
+  3. B = body( S, PL )
+  4. BE = encrypt(b, Kn)
+  5. Return: ( Words(K), Timid(1, BE) )
+```
+
+```
+E::init_binding( id, K ): ()
+  1. Read local: (id) -> (_, SE)
+  2. Assert: (SE)
+  3. Store local: ( id, K, SE, 0 )
+```
+
+```
+E::next( id, password ): ( Words(Kn), n )
+  1. Read local: (id) -> ( _, K, SE, n )
+  2. Assert: (SE)
+  3. S = decrypt(SE, password)
+  4. Kn = key( K, S )
+  5. Store local: ( id, Kn, SE, n+1 )
+  6. Return: ( Words(Kn), n+1 )
+```
+
+```
+D::next( Timid(n, BE), Kn, n2 ): ( S, PL, Timid(n, BE) )
+  1. Assert: (n == n2) // Or key iteration error 
+  2. B = decrypt(BE, Kn)
+  3. Assert: validate(b) // Or key error
+  4. ( S, PL ) = debody(b)
+  5. Kn2 = key( Kn, S )
+  6. BE2 = encrypt(b, Kn2)
+  7. Return: ( S, PL, Timid(n+1, BE) )
+```
+
+```
+::key( Kn, S ): Kn
+  1. h = hash( Kn || S )
+  2. Kn2 = right_bits( h, BITS )
+  3. Return: Kn2
+```
+
+```
+D::body( S, PL ): B
+  1. B = "timid:" || hex(S) || ":" || hex(PL)
+  2. Return: B
+```
+
+```
+D::debody( B ): ( S, PL )
+  1. ( _, s, pl ) = split( B, ":" )
+  2. Return: ( unhex(s), unhex(pl) )
+```
+
+```
+D::validate( B ): bool
+  1. v = starts_width( B, "timid:" )
+  2. Return: v
+```
+
+Where:
+- `Words` is the class implementing user-friendly conversion with BIP39 mnemonics.
+- `encrypt/decrypt` is any symmetric cryptography function of choice
+- `right_bits(a,b)` takes any value and returns `b` last bits of it
+- `hash` is any hashing function with result size of `>= BITS`
+
+## UX
 
 TODO
 
-### UX
-
-TODO
-
-#### Numbered chain
+### Numbered chain
 
 TODO
