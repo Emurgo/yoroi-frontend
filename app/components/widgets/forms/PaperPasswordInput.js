@@ -8,6 +8,7 @@ import globalMessages from '../../../i18n/global-messages';
 import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import { Input } from 'react-polymorph/lib/components/Input';
+import { isValidPaperPassword } from '../../../utils/validations';
 
 const messages = defineMessages({
   paperPasswordLabel: {
@@ -19,8 +20,10 @@ const messages = defineMessages({
 type Props = {|
   setForm: ReactToolboxMobxForm => void,
   classicTheme: boolean,
-  passwordValidator: string => boolean,
+  passwordMatches: string => boolean,
+  includeLengthCheck: boolean,
   initValues?: string,
+
 |};
 
 @observer
@@ -34,6 +37,16 @@ export default class PaperPasswordInput extends Component<Props> {
     intl: intlShape.isRequired
   };
 
+  baseCheck: string => boolean = (password) => {
+    // TODO: Should we allow 0-length paper wallet passwords?
+    // Disable for now to avoid user accidentally forgetting
+    // to enter his password and pressing restore
+    return password.length > 0;
+  }
+  lengthCheck: string => boolean = (password) => {
+    return !this.props.includeLengthCheck || isValidPaperPassword(password);
+  }
+
   form = new ReactToolboxMobxForm({
     fields: {
       paperPassword: {
@@ -43,17 +56,18 @@ export default class PaperPasswordInput extends Component<Props> {
           this.context.intl.formatMessage(messages.paperPasswordLabel) : '',
         value: (this.props.initValues) || '',
         validators: [({ field }) => {
-          const validatePassword = p => this.props.passwordValidator(p);
+          const validatePassword = p => this.props.passwordMatches(p);
           return [
             validatePassword(field.value),
             this.context.intl.formatMessage(globalMessages.invalidRepeatPassword)
           ];
         },
         ({ field }) => ([
-          // TODO: Should we allow 0-length paper wallet passwords?
-          // Disable for now to avoid user accidentally forgetting
-          // to enter his password and pressing restore
-          field.value.length > 0,
+          this.baseCheck(field.value),
+          this.context.intl.formatMessage(globalMessages.fieldIsRequired)
+        ]),
+        ({ field }) => ([
+          this.lengthCheck(field.value),
           this.context.intl.formatMessage(globalMessages.invalidPaperPassword)
         ]),
         ],
@@ -82,7 +96,7 @@ export default class PaperPasswordInput extends Component<Props> {
       <Input
         className="paperPassword"
         {...paperPasswordField.bind()}
-        done={() => this.props.passwordValidator(paperPassword)}
+        done={this.baseCheck(paperPassword) && this.lengthCheck(paperPassword) && this.props.passwordMatches(paperPassword)}
         error={paperPasswordField.error}
         skin={InputOwnSkin}
       />

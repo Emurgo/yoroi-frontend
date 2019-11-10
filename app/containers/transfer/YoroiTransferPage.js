@@ -160,7 +160,8 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
               })}
               validWords={validWords}
               mnemonicLength={config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT}
-              passwordValidator={isValidWalletPassword}
+              passwordMatches={_password => true}
+              includeLengthCheck={false}
               classicTheme={profile.isClassicTheme}
             />
           </TransferLayout>

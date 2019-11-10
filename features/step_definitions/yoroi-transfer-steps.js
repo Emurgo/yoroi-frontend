@@ -17,8 +17,11 @@ Given(/^I am on the Yoroi Transfer start screen$/, async function () {
   await this.waitForElement('.yoroiTransferStartPageComponent');
 });
 
-When(/^I click on the next button on the Yoroi Transfer start screen$/, async function () {
-  await this.click('.next');
+When(/^I click on the 15words button on the Yoroi Transfer start screen$/, async function () {
+  await this.click('.15words');
+});
+When(/^I click on the yoroiPaper button on the Yoroi Transfer start screen$/, async function () {
+  await this.click('.yoroiPaper');
 });
 
 Then(/^I should see the Yoroi transfer error screen$/, async function () {
