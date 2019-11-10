@@ -1,3 +1,5 @@
+// @flow
+
 const path = require('path');
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
@@ -7,7 +9,7 @@ const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
 const shell = require('shelljs');
 const manifestEnvs = require('../chrome/manifestEnvs');
 
-const plugins = (folder) => ([
+const plugins = (folder /*: string */) => ([
   /** We remove non-English languages from BIP39 to avoid triggering bad word filtering */
   new webpack.IgnorePlugin(/^\.\/(?!english)/, /bip39\/src\/wordlists$/),
   /**
@@ -148,7 +150,7 @@ const resolve = {
   extensions: ['*', '.js', '.wasm']
 };
 
-const definePlugin = (networkName, isProd) => ({
+const definePlugin = (networkName /*: string */, isProd /*: boolean */) => ({
   'process.env': {
     NODE_ENV: JSON.stringify(isProd ? 'production' : 'development'),
     COMMIT: JSON.stringify(shell.exec('git rev-parse HEAD', { silent: true }).trim()),

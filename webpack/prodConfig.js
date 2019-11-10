@@ -1,3 +1,5 @@
+// @flow
+
 const commonConfig = require('./commonConfig');
 
 const path = require('path');
@@ -5,7 +7,7 @@ const webpack = require('webpack');
 
 const customPath = path.join(__dirname, './customPublicPath');
 
-const baseProdConfig = (networkName) => ({
+const baseProdConfig = (networkName /*: string */) => ({
   mode: 'production',
   optimization: commonConfig.optimization,
   node: commonConfig.node,
