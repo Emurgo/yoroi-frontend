@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import globalMessages from '../../../i18n/global-messages';
@@ -9,13 +9,6 @@ import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import { Input } from 'react-polymorph/lib/components/Input';
 import { isValidPaperPassword } from '../../../utils/validations';
-
-const messages = defineMessages({
-  paperPasswordLabel: {
-    id: 'wallet.restore.dialog.paperPasswordLabel',
-    defaultMessage: '!!!Paper wallet password',
-  },
-});
 
 type Props = {|
   setForm: ReactToolboxMobxForm => void,
@@ -51,9 +44,9 @@ export default class PaperPasswordInput extends Component<Props> {
     fields: {
       paperPassword: {
         type: 'password',
-        label: this.context.intl.formatMessage(messages.paperPasswordLabel),
+        label: this.context.intl.formatMessage(globalMessages.paperPasswordLabel),
         placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(messages.paperPasswordLabel) : '',
+          this.context.intl.formatMessage(globalMessages.paperPasswordLabel) : '',
         value: (this.props.initValues) || '',
         validators: [({ field }) => {
           const validatePassword = p => this.props.passwordMatches(p);
@@ -85,6 +78,7 @@ export default class PaperPasswordInput extends Component<Props> {
 
   render() {
     const { form } = this;
+    const { intl } = this.context;
     const {
       paperPassword,
     } = form.values();
@@ -93,13 +87,20 @@ export default class PaperPasswordInput extends Component<Props> {
     const paperPasswordField = form.$('paperPassword');
 
     return (
-      <Input
-        className="paperPassword"
-        {...paperPasswordField.bind()}
-        done={this.baseCheck(paperPassword) && this.lengthCheck(paperPassword) && this.props.passwordMatches(paperPassword)}
-        error={paperPasswordField.error}
-        skin={InputOwnSkin}
-      />
+      <div>
+        {intl.formatMessage(globalMessages.passwordDisclaimer)}
+        <Input
+          className="paperPassword"
+          {...paperPasswordField.bind()}
+          done={
+            this.baseCheck(paperPassword) &&
+            this.lengthCheck(paperPassword) &&
+            this.props.passwordMatches(paperPassword)
+          }
+          error={paperPasswordField.error}
+          skin={InputOwnSkin}
+        />
+      </div>
     );
   }
 }

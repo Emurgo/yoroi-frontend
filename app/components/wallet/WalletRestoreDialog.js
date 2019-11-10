@@ -50,18 +50,6 @@ const messages = defineMessages({
     id: 'wallet.restore.dialog.wallet.name.input.hint',
     defaultMessage: '!!!Enter wallet name',
   },
-  recoveryPhraseInputLabel: {
-    id: 'wallet.restore.dialog.recovery.phrase.input.label',
-    defaultMessage: '!!!Recovery phrase',
-  },
-  recoveryPhraseInputHint: {
-    id: 'wallet.restore.dialog.recovery.phrase.input.hint',
-    defaultMessage: '!!!Enter recovery phrase',
-  },
-  recoveryPhraseNoResults: {
-    id: 'wallet.restore.dialog.recovery.phrase.input.noResults',
-    defaultMessage: '!!!No results',
-  },
   importButtonLabel: {
     id: 'wallet.restore.dialog.restore.wallet.button.label',
     defaultMessage: '!!!Restore wallet',
@@ -69,18 +57,6 @@ const messages = defineMessages({
   verifyButtonLabel: {
     id: 'wallet.restore.dialog.verify.wallet.button.label',
     defaultMessage: '!!!Verify wallet',
-  },
-  invalidRecoveryPhrase: {
-    id: 'wallet.restore.dialog.form.errors.invalidRecoveryPhrase',
-    defaultMessage: '!!!Invalid recovery phrase',
-  },
-  paperPasswordLabel: {
-    id: 'wallet.restore.dialog.paperPasswordLabel',
-    defaultMessage: '!!!Paper wallet password',
-  },
-  passwordDisclaimer: {
-    id: 'wallet.restore.dialog.passwordDisclaimer',
-    defaultMessage: '!!!Typing the wrong wallet password will give you a different wallet. This allows for plausible deniability.',
   },
 });
 
@@ -151,9 +127,9 @@ export default class WalletRestoreDialog extends Component<Props> {
         )],
       },
       recoveryPhrase: {
-        label: this.context.intl.formatMessage(messages.recoveryPhraseInputLabel),
+        label: this.context.intl.formatMessage(globalMessages.recoveryPhraseInputLabel),
         placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(messages.recoveryPhraseInputHint) : '',
+          this.context.intl.formatMessage(globalMessages.recoveryPhraseInputHint) : '',
         value: this.getInitRecoveryPhrase(),
         validators: [({ field }) => {
           const value = join(field.value, ' ');
@@ -168,15 +144,15 @@ export default class WalletRestoreDialog extends Component<Props> {
           }
           return [
             this.props.mnemonicValidator(value),
-            this.context.intl.formatMessage(messages.invalidRecoveryPhrase)
+            this.context.intl.formatMessage(globalMessages.invalidRecoveryPhrase)
           ];
         }],
       },
       paperPassword: this.props.showPaperPassword === true ? {
         type: 'password',
-        label: this.context.intl.formatMessage(messages.paperPasswordLabel),
+        label: this.context.intl.formatMessage(globalMessages.paperPasswordLabel),
         placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(messages.paperPasswordLabel) : '',
+          this.context.intl.formatMessage(globalMessages.paperPasswordLabel) : '',
         value: (this.props.initValues && this.props.initValues.paperPassword) || '',
         validators: [({ field }) => {
           const validatePassword = p => (
@@ -401,7 +377,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           done={mnemonicValidator(join(recoveryPhrase, ' '))}
           error={recoveryPhraseField.error}
           maxVisibleOptions={5}
-          noResultsMessage={intl.formatMessage(messages.recoveryPhraseNoResults)}
+          noResultsMessage={intl.formatMessage(globalMessages.recoveryPhraseNoResults)}
           skin={AutocompleteOwnSkin}
           preselectedOptions={recoveryPhraseField.value}
         />
@@ -411,7 +387,7 @@ export default class WalletRestoreDialog extends Component<Props> {
             <div className={paperPasswordFieldClasses}>
               {isVerificationMode === true ? '' : (
                 <div className={headerBlockClasses}>
-                  {intl.formatMessage(messages.passwordDisclaimer)}
+                  {intl.formatMessage(globalMessages.passwordDisclaimer)}
                 </div>
               )}
               <Input

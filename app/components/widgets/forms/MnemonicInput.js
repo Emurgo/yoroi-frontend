@@ -3,32 +3,13 @@ import React, { Component } from 'react';
 import { join } from 'lodash';
 import { observer } from 'mobx-react';
 import { Autocomplete } from 'react-polymorph/lib/components/Autocomplete';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './MnemonicInput.scss';
 import config from '../../../config';
 import { AutocompleteOwnSkin } from '../../../themes/skins/AutocompleteOwnSkin';
-
-const messages = defineMessages({
-  recoveryPhraseInputLabel: {
-    id: 'transfer.form.recovery.phrase.input.label',
-    defaultMessage: '!!!Recovery phrase',
-  },
-  recoveryPhraseInputHint: {
-    id: 'transfer.form.recovery.phrase.input.hint',
-    defaultMessage: '!!!Enter recovery phrase',
-  },
-  recoveryPhraseNoResults: {
-    id: 'transfer.form.recovery.phrase.input.noResults',
-    defaultMessage: '!!!No results',
-  },
-  invalidRecoveryPhrase: {
-    id: 'transfer.form.errors.invalidRecoveryPhrase',
-    defaultMessage: '!!!Invalid recovery phrase',
-  },
-});
 
 type Props = {|
   setForm: ReactToolboxMobxForm => void,
@@ -48,9 +29,9 @@ export default class MnemonicInput extends Component<Props> {
   form = new ReactToolboxMobxForm({
     fields: {
       recoveryPhrase: {
-        label: this.context.intl.formatMessage(messages.recoveryPhraseInputLabel),
+        label: this.context.intl.formatMessage(globalMessages.recoveryPhraseInputLabel),
         placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(messages.recoveryPhraseInputHint) : '',
+          this.context.intl.formatMessage(globalMessages.recoveryPhraseInputHint) : '',
         value: '',
         validators: [({ field }) => {
           const value = join(field.value, ' ');
@@ -65,7 +46,7 @@ export default class MnemonicInput extends Component<Props> {
           }
           return [
             this.props.mnemonicValidator(value),
-            this.context.intl.formatMessage(messages.invalidRecoveryPhrase)
+            this.context.intl.formatMessage(globalMessages.invalidRecoveryPhrase)
           ];
         }],
       },
@@ -102,7 +83,7 @@ export default class MnemonicInput extends Component<Props> {
         done={mnemonicValidator(join(recoveryPhrase, ' '))}
         error={recoveryPhraseField.error}
         maxVisibleOptions={5}
-        noResultsMessage={intl.formatMessage(messages.recoveryPhraseNoResults)}
+        noResultsMessage={intl.formatMessage(globalMessages.recoveryPhraseNoResults)}
         skin={AutocompleteOwnSkin}
       />
     );

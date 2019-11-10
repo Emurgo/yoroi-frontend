@@ -8,12 +8,12 @@ import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import MnemonicInput from '../../components/widgets/forms/MnemonicInput';
 import PaperPasswordInput from '../../components/widgets/forms/PaperPasswordInput';
 import BaseTransferPage from '../../components/transfer/BaseTransferPage';
+import globalMessages from '../../i18n/global-messages';
 
 const messages = defineMessages({
-  // TODO: update
   step0: {
-    id: 'yoroiTransfer.form.instructions.step0.text',
-    defaultMessage: '!!!Enter the 15-word recovery phrase used to back up your other wallet to restore the balance and transfer all the funds to current wallet.',
+    id: 'yoroiTransfer.form.instructions.step0Paper.text',
+    defaultMessage: '!!!Enter the 21-word recovery phrase used to back up your Yoroi Paper wallet and your paper password to restore the balance and transfer all the funds.',
   },
 });
 
