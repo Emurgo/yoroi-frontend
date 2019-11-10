@@ -187,6 +187,8 @@
   "settings.support.reportProblem.link": "Richiesta di supporto",
   "settings.support.reportProblem.title": "Segnala un problema",
   "testnet.label.message": "ATTENZIONE: questa è una rete {network}. ADA qui non ha alcun valore monetario. Per ulteriori informazioni, consulta le domande frequenti su {faqLink}",
+  "testnet.shelley.label.message": "YOU ARE ON TESTNET NETWORK ({network}).",
+  "transfer.form.errors.invalidRecoveryPhrase": "Frase di recupero non valida",
   "transfer.form.instructions.step1.text": "Ci vorrà circa 1 minuto per ripristinare il tuo saldo. Nel passaggio successivo, ti verrà presentata una transazione che trasferirà tutti i tuoi fondi. Si prega di rivedere attentamente i dettagli della transazione. Per effettuare la transazione dovrai pagare una tariffa di transazione standard sulla rete Cardano.",
   "transfer.form.masterkey.input.hint": "Inserisci la chiave principale",
   "transfer.form.masterkey.input.label": "Chiave principale",
