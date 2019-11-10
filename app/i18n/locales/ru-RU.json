@@ -14,7 +14,7 @@
   "api.errors.getAddressesWithFundsError": "Ошибка при получении адресов со средствами.",
   "api.errors.getAllUTXOsForAddressesError": "Получена ошибка при вызове метода api во время получения UTxOs.",
   "api.errors.getBalanceError": "Ошибка при получении баланса.",
-  "api.errors.getBestBlockApiError": "Error received from server while getting best block.",
+  "api.errors.getBestBlockApiError": "Получена ошибка от сервера при получении лучшего блока.",
   "api.errors.getTxHistoryForAddressesApiError": "Получена ошибка от сервера при получении транзакций.",
   "api.errors.getTxsBodiesForUTXOsApiError": "Получена ошибка от сервера при получении TxBodies.",
   "api.errors.getTxsBodiesForUTXOsError": "Получена ошибка при вызове метода Api во время получения TxBodies.",
