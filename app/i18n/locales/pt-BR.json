@@ -187,6 +187,8 @@
   "settings.support.reportProblem.link": "Solicitar suporte",
   "settings.support.reportProblem.title": "Relatar um problema",
   "testnet.label.message": "AVISO: esta é uma rede {network}. ADA não tem valor monetário aqui. Para mais informações, confira as perguntas frequentes em {faqLink}",
+  "testnet.shelley.label.message": "YOU ARE ON TESTNET NETWORK ({network}).",
+  "transfer.form.errors.invalidRecoveryPhrase": "Frase de recuperação inválida",
   "transfer.form.instructions.step1.text": "Demora cerca de 1 minuto para restaurar o seu saldo. Na próxima etapa, você será apresentado a uma transação que movimentará todos os seus fundos. Por favor, revise os detalhes da transação com cuidado. Você precisará pagar uma taxa de transação padrão na rede Cardano para realizar a transação.",
   "transfer.form.masterkey.input.hint": "Inserir chave mestra",
   "transfer.form.masterkey.input.label": "Chave mestra",
