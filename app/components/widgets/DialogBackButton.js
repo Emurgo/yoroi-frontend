@@ -5,7 +5,7 @@ import backArrow from '../../assets/images/back-arrow-ic.inline.svg';
 import styles from './DialogBackButton.scss';
 
 type Props = {|
-  onBack: Function
+  onBack: void => void
 |};
 
 export default class DialogBackButton extends Component<Props> {

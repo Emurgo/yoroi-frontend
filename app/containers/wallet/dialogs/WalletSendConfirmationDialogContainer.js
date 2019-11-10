@@ -16,12 +16,15 @@ import {
   formattedAmountToNaturalUnits,
 } from '../../../utils/formatters';
 
-type DialogProps = {
+type DialogProps = {|
   signRequest: BaseSignRequest,
   currencyUnit: string,
   staleTx: boolean,
-};
-type Props = InjectedProps & DialogProps;
+|};
+type Props = {|
+  ...InjectedProps,
+  ...DialogProps,
+|};
 
 @observer
 export default class WalletSendConfirmationDialogContainer extends Component<Props> {

@@ -10,7 +10,7 @@ Feature: Transfer Yoroi Wallet funds
     Given There is a wallet stored named empty-wallet
     And I am on the Yoroi Transfer start screen
     And I should see the "CREATE YOROI WALLET" button disabled
-    When I click on the next button on the Yoroi Transfer start screen
+    When I click on the standardMnemonic button on the Yoroi Transfer start screen
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                           |
     | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow monster |
@@ -24,7 +24,7 @@ Feature: Transfer Yoroi Wallet funds
     # /features/mock-chain/mockImporter.js
     Given There is a wallet stored named empty-wallet
     And I am on the Yoroi Transfer start screen
-    When I click on the next button on the Yoroi Transfer start screen
+    When I click on the standardMnemonic button on the Yoroi Transfer start screen
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                           |
     | dragon mango general very inmate idea rabbit pencil element bleak term cart critic kite pill |
@@ -46,7 +46,7 @@ Feature: Transfer Yoroi Wallet funds
   Scenario: Wallet changes after transaction is generated (IT-113)
     Given There is a wallet stored named empty-wallet
     And I am on the Yoroi Transfer start screen
-    When I click on the next button on the Yoroi Transfer start screen
+    When I click on the standardMnemonic button on the Yoroi Transfer start screen
     And I enter the recovery phrase:
     | recoveryPhrase                                                                            |
     | final autumn bacon fold horse scissors act pole country focus task blush basket move view |
@@ -76,7 +76,7 @@ Feature: Transfer Yoroi Wallet funds
   Scenario: Transfer UI should be reset when user leaves the transfer page (IT-115)
     Given There is a wallet stored named empty-wallet
     And I am on the Yoroi Transfer start screen
-    When I click on the next button on the Yoroi Transfer start screen
+    When I click on the standardMnemonic button on the Yoroi Transfer start screen
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                           |
     | dragon mango general very inmate idea rabbit pencil element bleak term cart critic kite pill |
@@ -86,3 +86,22 @@ Feature: Transfer Yoroi Wallet funds
     | Ae2tdPwUPEYx2dK1AMzRN1GqNd2eY7GCd7Z6aikMPJL3EkqqugoFQComQnV | 1234567898765    |
     Then I navigate to wallet transactions screen
     Then I am on the Yoroi Transfer start screen
+
+  @it-82
+  Scenario: User can transfer funds from another Yoroi paper wallet (IT-82)
+    # The recovery phrase and its balance(s) are defined in 
+    # /features/mock-chain/TestWallets.js and
+    # /features/mock-chain/mockImporter.js
+    Given There is a wallet stored named empty-wallet
+    And I am on the Yoroi Transfer start screen
+    When I click on the yoroiPaper button on the Yoroi Transfer start screen
+    And I enter the recovery phrase:
+    | recoveryPhrase                                                                                           |
+    | mushroom expose slogan wagon uphold train absurd fix snake unable rescue curious escape member resource garbage enemy champion airport matrix year |
+    And I enter the paper wallet password "cool password"
+    And I proceed with the recovery
+    Then I should see on the Yoroi transfer summary screen:
+    | fromAddress                                                 | amount           |   
+    | Ae2tdPwUPEZ7TQpzbJZCbA5BjW4zWYFn47jKo43ouvfe4EABoCfvEjwYvJr | 500000    |
+    When I confirm Yoroi transfer funds
+    Then I should see the Yoroi transfer success screen

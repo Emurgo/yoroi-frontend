@@ -15,9 +15,10 @@ import TrezorConnectStore from '../../../stores/ada/TrezorConnectStore';
 import { ProgressStep } from '../../../types/HWConnectStoreTypes';
 import HWConnectActions from '../../../actions/ada/hw-connect-actions';
 
-type Props = InjectedDialogContainerProps & {
+type Props = {|
+  ...InjectedDialogContainerProps,
   onBack: void => void,
-};
+|};
 
 @observer
 export default class WalletTrezorConnectDialogContainer extends Component<Props> {

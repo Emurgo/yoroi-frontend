@@ -107,8 +107,10 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
             onSubmit={paperActions.submitVerify.trigger}
             onCancel={onCancel}
             onBack={paperActions.backToCreate.trigger}
-            numberOfMnemonics={21}
-            mnemonicValidator={words => paperStore.paper && words === paperStore.paper.scrambledWords.join(' ')}
+            numberOfMnemonics={config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT}
+            mnemonicValidator={words => (
+              paperStore.paper != null && words === paperStore.paper.scrambledWords.join(' ')
+            )}
             passwordValidator={pass => pass === paperStore.userPassword}
             isSubmitting={false}
             validWords={validWords}

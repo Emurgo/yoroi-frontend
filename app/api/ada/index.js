@@ -396,7 +396,7 @@ export type IsValidAddressFunc = (
 
 export type IsValidMnemonicRequest = {
   mnemonic: string,
-  numberOfWords: ?number
+  numberOfWords: number
 };
 export type IsValidMnemonicResponse = boolean;
 export type IsValidMnemonicFunc = (
@@ -407,7 +407,7 @@ export type IsValidMnemonicFunc = (
 
 export type IsValidPaperMnemonicRequest = {
   mnemonic: string,
-  numberOfWords: ?number
+  numberOfWords: number
 };
 export type IsValidPaperMnemonicResponse = boolean;
 export type IsValidPaperMnemonicFunc = (
@@ -418,7 +418,7 @@ export type IsValidPaperMnemonicFunc = (
 
 export type UnscramblePaperMnemonicRequest = {
   mnemonic: string,
-  numberOfWords: ?number,
+  numberOfWords: number,
   password?: string,
 };
 export type UnscramblePaperMnemonicResponse = [?string, number];

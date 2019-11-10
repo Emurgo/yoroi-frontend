@@ -91,15 +91,15 @@ export default class AdaWalletsStore extends WalletStore {
 
   isValidAddress = (address: string): Promise<boolean> => this.api.ada.isValidAddress({ address });
 
-  isValidMnemonic = (
+  isValidMnemonic: {|
     mnemonic: string,
-    numberOfWords: ?number
-  ): boolean => this.api.ada.isValidMnemonic({ mnemonic, numberOfWords });
+    numberOfWords: number,
+  |} => boolean = request => this.api.ada.isValidMnemonic(request);
 
-  isValidPaperMnemonic = (
+  isValidPaperMnemonic: {|
     mnemonic: string,
-    numberOfWords: ?number
-  ): boolean => this.api.ada.isValidPaperMnemonic({ mnemonic, numberOfWords });
+    numberOfWords: number,
+  |} => boolean = request => this.api.ada.isValidPaperMnemonic(request);
 
   // =================== WALLET RESTORATION ==================== //
 
