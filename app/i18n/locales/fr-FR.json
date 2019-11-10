@@ -187,6 +187,8 @@
   "settings.support.reportProblem.link": "Contacter le service d'assistance",
   "settings.support.reportProblem.title": "Faire part d'un problème",
   "testnet.label.message": "AVERTISSEMENT : Il s’agit d’un réseau {network}. ADA n’a ici aucune valeur monétaire. Pour plus d’informations, veuillez consulter la FAQ à {faqLink}",
+  "testnet.shelley.label.message": "YOU ARE ON TESTNET NETWORK ({network}).",
+  "transfer.form.errors.invalidRecoveryPhrase": "Phrase de secours incorrecte",
   "transfer.form.instructions.step1.text": "La restauration du solde prend en moyenne 1 minute. Lors de l'étape suivante, vous verrez une transaction se proposer à vous afin de déplacer tous vos fonds vers Yoroi. Veuillez vérifier avec minutie les détails de la transaction. Vous devrez vous acquitter des frais de transactions standards sur le réseau Cardano afin d'effectuer la transaction.",
   "transfer.form.masterkey.input.hint": "Entrez la clé maître",
   "transfer.form.masterkey.input.label": "Clé maître",
