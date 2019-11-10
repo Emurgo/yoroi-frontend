@@ -187,6 +187,8 @@
   "settings.support.reportProblem.link": "支援要求",
   "settings.support.reportProblem.title": "報告問題",
   "testnet.label.message": "警告：這是一個網絡 {network}。網絡上的ADA並沒有貨幣價值。有關更多資訊，請查看{faqLink} 上的常見問題。",
+  "testnet.shelley.label.message": "YOU ARE ON TESTNET NETWORK ({network}).",
+  "transfer.form.errors.invalidRecoveryPhrase": "恢復短語不正確",
   "transfer.form.instructions.step1.text": "恢復你的餘額大約需要1分鐘。在下一步, 您將看到一筆將從Daedalus移動您所有資金到Yoroi的交易。請仔細閱讀交易細節。您需要在卡Cardano網絡上支付標準交易費用才能進行交易。",
   "transfer.form.masterkey.input.hint": "輸入主密鑰",
   "transfer.form.masterkey.input.label": "主密鑰",
