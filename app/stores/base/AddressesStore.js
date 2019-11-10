@@ -81,7 +81,7 @@ export class AddressTypeStore<T> {
   }
 
   /** Refresh addresses for all wallets */
-  @action refreshAddresses = () => {
+  @action refreshAddresses: void => void = () => {
     const publicDeriver = this.stores.substores[environment.API].wallets.selected;
     if (publicDeriver == null) return;
     const allRequest = this._getRequest(publicDeriver.self);
@@ -103,7 +103,7 @@ export class AddressTypeStore<T> {
     return new CachedRequest<SubRequestType<T>>(this.request);
   };
 
-  @action addObservedWallet = (
+  @action addObservedWallet: PublicDeriver => void = (
     publicDeriver: PublicDeriver
   ): void => {
     this.addressesRequests.push({
@@ -177,7 +177,9 @@ export default class AddressesStore extends Store {
     this.error = null;
   };
 
-  addObservedWallet = (publicDeriver: PublicDeriverWithCachedMeta): void => {
+  addObservedWallet: PublicDeriverWithCachedMeta => void = (
+    publicDeriver: PublicDeriverWithCachedMeta
+  ): void => {
     const withHasChains = asHasChains(publicDeriver.self);
     if (withHasChains == null) {
       this.allAddressesForDisplay.addObservedWallet(publicDeriver.self);
@@ -188,7 +190,9 @@ export default class AddressesStore extends Store {
     this.refreshAddresses(publicDeriver);
   }
 
-  refreshAddresses = (publicDeriver: PublicDeriverWithCachedMeta): void => {
+  refreshAddresses: PublicDeriverWithCachedMeta => void = (
+    publicDeriver: PublicDeriverWithCachedMeta
+  ): void => {
     const withHasChains = asHasChains(publicDeriver.self);
     if (withHasChains == null) {
       this.allAddressesForDisplay.refreshAddresses();

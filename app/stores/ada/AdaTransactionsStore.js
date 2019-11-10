@@ -90,7 +90,9 @@ export default class AdaTransactionsStore extends TransactionsStore {
   }
 
   /** Wrap utility function to expose to components/containers */
-  validateAmount = (amountInLovelaces: string): Promise<boolean> => (
+  validateAmount: string => Promise<boolean> = (
+    amountInLovelaces: string
+  ): Promise<boolean> => (
     Promise.resolve(isValidAmountInLovelaces(amountInLovelaces))
   );
 

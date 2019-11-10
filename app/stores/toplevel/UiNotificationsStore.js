@@ -19,9 +19,13 @@ export default class UiNotificationsStore extends Store {
     this.actions.notifications.closeActiveNotification.listen(this._onClose);
   }
 
-  isOpen = (id: string): boolean => !!this._findNotificationById(id);
+  isOpen: string => boolean = (
+    id: string
+  ): boolean => !!this._findNotificationById(id);
 
-  getTooltipActiveNotification = (tooltipNotificationId : string): ?Notification => {
+  getTooltipActiveNotification: string => ?Notification = (
+    tooltipNotificationId : string
+  ): ?Notification => {
     let notification = null;
     const activeNotificationId = this.mostRecentActiveNotification ?
       this.mostRecentActiveNotification.id :

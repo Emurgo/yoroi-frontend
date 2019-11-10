@@ -51,7 +51,9 @@ export default class TopbarStore extends Store {
 
   // @computed decorator for methods with parameters are not supported in this
   // version of mobx. Instead, making a regular function that calls `computed`
-  isActiveCategory = category => computed(
+  isActiveCategory: Category => boolean = (
+    category: Category
+  ): boolean => computed(
     () => this.activeTopbarCategory && this.activeTopbarCategory === category.route
   ).get();
 

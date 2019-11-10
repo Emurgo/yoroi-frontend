@@ -104,7 +104,14 @@ export default class ProfileStore extends Store {
     },
   ];
 
-  @observable bigNumberDecimalFormat = {
+  @observable bigNumberDecimalFormat: {|
+    decimalSeparator: string,
+    groupSeparator: string,
+    groupSize: number,
+    secondaryGroupSize: number,
+    fractionGroupSeparator: string,
+    fractionGroupSize: number,
+  |} = {
     decimalSeparator: '.',
     groupSeparator: ',',
     groupSize: 3,
@@ -309,7 +316,7 @@ export default class ProfileStore extends Store {
   }
 
   /* @Returns Merged Pre-Built Theme and Custom Theme */
-  @computed get currentThemeVars() {
+  @computed get currentThemeVars(): { [key: string]: string } {
     const { result } = this.getCustomThemeRequest.execute();
     const currentThemeVars = this.getThemeVars({ theme: this.currentTheme });
     let customThemeVars = {};
@@ -355,12 +362,14 @@ export default class ProfileStore extends Store {
     }
   };
 
-  getThemeVars = ({ theme }: { theme: string }) => {
+  getThemeVars: {| theme: string |} => { [key: string]: string } = (
+    { theme }
+  ): { [key: string]: string } => {
     if (theme) return require(`../../themes/prebuilt/${theme}.js`).default;
     return require(`../../themes/prebuilt/${ProfileStore.getDefaultTheme()}.js`); // default
   };
 
-  hasCustomTheme = (): boolean => {
+  hasCustomTheme: void => boolean = (): boolean => {
     const { result } = this.getCustomThemeRequest.execute();
     return result !== undefined;
   };
@@ -431,7 +440,9 @@ export default class ProfileStore extends Store {
     return result != null ? result : '0.0.0';
   }
 
-  setLastLaunchVersion = async (version: string) => {
+  setLastLaunchVersion: string => Promise<void> = async (
+    version: string
+  ): Promise<void> => {
     await this.setLastLaunchVersionRequest.execute(version);
     await this.getLastLaunchVersionRequest.execute(); // eagerly cache
   };
@@ -450,7 +461,9 @@ export default class ProfileStore extends Store {
     return result || 'seiza';
   }
 
-  setSelectedExplorer = async ({ explorer }: { explorer: ExplorerType }) => {
+  setSelectedExplorer: {| explorer: ExplorerType |} => Promise<void> = async (
+    { explorer }
+  ): Promise<void> => {
     await this.setSelectedExplorerRequest.execute({ explorer });
     await this.getSelectedExplorerRequest.execute(); // eagerly cache
   };

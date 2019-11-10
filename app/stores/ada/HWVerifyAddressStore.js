@@ -79,7 +79,7 @@ export default class AddressesStore extends Store {
     this._setActionProcessing(false);
   }
 
-  trezorVerifyAddress = async (
+  trezorVerifyAddress: (BIP32Path, string) => Promise<void> = async (
     path: BIP32Path,
     address: string
   ): Promise<void> => {
@@ -96,7 +96,7 @@ export default class AddressesStore extends Store {
     }
   }
 
-  ledgerVerifyAddress = async (
+  ledgerVerifyAddress: (BIP32Path, string) => Promise<void> = async (
     path: BIP32Path,
     address: string,
   ): Promise<void> => {

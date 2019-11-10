@@ -136,11 +136,11 @@ export default class WalletsStore extends Store {
   };
 
   /** Restore wallet and move to wallet summary screen */
-  _restore = async (params: {|
+  restore: {|
     recoveryPhrase: string,
     walletName: string,
     walletPassword: string,
-  |}) => {
+  |} => Promise<void> = async (params) => {
     this.restoreRequest.reset();
 
     const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
@@ -202,11 +202,16 @@ export default class WalletsStore extends Store {
     return matchRoute(ROUTES.WALLETS.ROOT + '(/*rest)', currentRoute) !== false;
   }
 
-  getWalletRoute = (
+  getWalletRoute: (PublicDeriver, ?string) => string = (
     publicDeriver: PublicDeriver,
-    page: string = 'transactions'
+    page: ?string
   ): string => (
-    buildRoute(ROUTES.WALLETS.PAGE, { id: publicDeriver.getPublicDeriverId(), page })
+    buildRoute(ROUTES.WALLETS.PAGE, {
+      id: publicDeriver.getPublicDeriverId(),
+      page: page == null
+        ? 'transactions'
+        : page
+    })
   );
 
   goToWalletRoute(publicDeriver: PublicDeriver) {
@@ -222,7 +227,7 @@ export default class WalletsStore extends Store {
   }
 
   @action
-  addHwWallet = async (
+  addHwWallet: PublicDeriver => Promise<void> = async (
     publicDeriver: PublicDeriver,
   ): Promise<void> => {
     const withCache = await PublicDeriverWithCachedMeta.fromPublicDeriver(publicDeriver);
@@ -248,7 +253,7 @@ export default class WalletsStore extends Store {
   }
 
   /** Make all API calls required to setup/update wallet */
-  @action restoreWalletsFromStorage = async (): Promise<void> => {
+  @action restoreWalletsFromStorage: void => Promise<void> = async (): Promise<void> => {
     const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
     if (persistentDb == null) {
       throw new Error('restoreWalletsFromStorage db not loaded. Should never happen');
@@ -277,15 +282,15 @@ export default class WalletsStore extends Store {
     }
   };
 
-  @action registerObserversForNewWallet = async (
+  @action registerObserversForNewWallet: PublicDeriverWithCachedMeta => Promise<void> = async (
     publicDeriver: PublicDeriverWithCachedMeta
-  ) => {
+  ): Promise<void> => {
     this.stores.substores[environment.API].addresses.addObservedWallet(publicDeriver);
     this.stores.substores[environment.API].transactions.addObservedWallet(publicDeriver);
   };
 
   /** Make all API calls required to setup imported wallet */
-  @action refreshImportedWalletData = async () => {
+  @action refreshImportedWalletData: void => Promise<void> = async (): Promise<void> => {
     if (this.hasAnyPublicDeriver) this._setActiveWallet({ wallet: this.publicDerivers[0] });
     return await this.restoreWalletsFromStorage();
   };
