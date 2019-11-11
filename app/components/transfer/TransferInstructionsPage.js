@@ -6,6 +6,7 @@ import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 
+import environment from '../../environment';
 import BorderedBox from '../widgets/BorderedBox';
 import globalMessages from '../../i18n/global-messages';
 import styles from './TransferInstructionsPage.scss';
@@ -63,38 +64,40 @@ export default class TransferInstructionsPage extends Component<Props> {
       <div className="transferInstructionsPageComponent">
 
         { /* Ask user to create a Yoroi wallet if they don't have one yet */ }
-        <div className={styles.component}>
-          <BorderedBox>
+        {!environment.isShelley() &&
+          <div className={styles.component}>
+            <BorderedBox>
 
-            <div className={styles.body}>
+              <div className={styles.body}>
 
-              <div className={styles.infoBlock}>
-                <div className={styles.title}>
-                  {intl.formatMessage(globalMessages.instructionTitle)}
+                <div className={styles.infoBlock}>
+                  <div className={styles.title}>
+                    {intl.formatMessage(globalMessages.instructionTitle)}
+                  </div>
+                  <div className={styles.text}>
+                    <FormattedHTMLMessage {...globalMessages.transferInstructionsText} />
+                  </div>
                 </div>
-                <div className={styles.text}>
-                  <FormattedHTMLMessage {...globalMessages.transferInstructionsText} />
+
+                <div className={styles.operationBlock}>
+                  <div className={styles.title}>
+                    &nbsp;{/* pretend we have a title to get the button alignment correct */}
+                  </div>
+                  <Button
+                    className={`createYoroiWallet ${commonClasses}`}
+                    label={intl.formatMessage(globalMessages.transferInstructionsButton)}
+                    onClick={onFollowInstructionsPrerequisites}
+                    disabled={!disableTransferFunds}
+                    skin={ButtonSkin}
+                  />
                 </div>
+
               </div>
 
-              <div className={styles.operationBlock}>
-                <div className={styles.title}>
-                  &nbsp;{/* pretend we have a title to get the button alignment correct */}
-                </div>
-                <Button
-                  className={`createYoroiWallet ${commonClasses}`}
-                  label={intl.formatMessage(globalMessages.transferInstructionsButton)}
-                  onClick={onFollowInstructionsPrerequisites}
-                  disabled={!disableTransferFunds}
-                  skin={ButtonSkin}
-                />
-              </div>
+            </BorderedBox>
 
-            </div>
-
-          </BorderedBox>
-
-        </div>
+          </div>
+        }
 
         { /* Confirm transferring funds */ }
         <div className={styles.component}>
