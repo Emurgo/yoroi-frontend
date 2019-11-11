@@ -49,7 +49,6 @@ const Staking = (props: InjectedContainerProps) => {
       topbar={topbarContainer}
       // TODO: Check Seiza server connection
       connectionErrorType="healthy"
-      classicTheme={profile.isClassicTheme}
       actions={actions}
       stores={stores}
     >

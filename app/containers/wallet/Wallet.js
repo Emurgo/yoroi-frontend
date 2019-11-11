@@ -43,7 +43,6 @@ export default class Wallet extends Component<Props> {
   render() {
     const { wallets, } = this.props.stores.substores.ada;
     const { actions, stores } = this.props;
-    const { profile } = stores;
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
     const topbarContainer = (<TopBarContainer actions={actions} stores={stores} />);
 
@@ -53,7 +52,6 @@ export default class Wallet extends Component<Props> {
           topbar={topbarContainer}
           actions={actions}
           stores={stores}
-          classicTheme={profile.isClassicTheme}
           connectionErrorType={checkAdaServerStatus}
         >
           <LoadingSpinner />
@@ -66,7 +64,6 @@ export default class Wallet extends Component<Props> {
         topbar={topbarContainer}
         actions={actions}
         stores={stores}
-        classicTheme={profile.isClassicTheme}
         connectionErrorType={checkAdaServerStatus}
       >
         <WalletWithNavigation

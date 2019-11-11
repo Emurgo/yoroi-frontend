@@ -147,7 +147,6 @@ export default class WalletAddPage extends Component<Props> {
       <MainLayout
         actions={actions}
         stores={stores}
-        classicTheme={profile.isClassicTheme}
         connectionErrorType={checkAdaServerStatus}
       >
         {content}

@@ -10,12 +10,10 @@ export default class NoWalletsPage extends Component<any> {
 
   render() {
     const { actions, stores } = this.props;
-    const { profile } = stores;
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
 
     return (
       <MainLayout
-        classicTheme={profile.isClassicTheme}
         connectionErrorType={checkAdaServerStatus}
         actions={actions}
         stores={stores}
