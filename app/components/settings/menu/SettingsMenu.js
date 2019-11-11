@@ -2,6 +2,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
+
+import environment from '../../../environment';
 import SettingsMenuItem from './SettingsMenuItem';
 import styles from './SettingsMenu.scss';
 import { ROUTES } from '../../../routes-config';
@@ -59,24 +61,28 @@ export default class SettingsMenu extends Component<Props> {
             className="general"
           />
 
-          <SettingsMenuItem
-            label={intl.formatMessage(messages.paperWallet)}
-            onClick={() => onItemClick(ROUTES.SETTINGS.PAPER_WALLET)}
-            active={isActiveItem(ROUTES.SETTINGS.PAPER_WALLET)}
-            className="paperWallet"
-          />
+          {!environment.isShelley() &&
+            <>
+              <SettingsMenuItem
+                label={intl.formatMessage(messages.paperWallet)}
+                onClick={() => onItemClick(ROUTES.SETTINGS.PAPER_WALLET)}
+                active={isActiveItem(ROUTES.SETTINGS.PAPER_WALLET)}
+                className="paperWallet"
+              />
 
-          <SettingsMenuItem
-            label={intl.formatMessage(messages.wallet)}
-            onClick={() => {
-              if (hasActiveWallet) {
-                onItemClick(ROUTES.SETTINGS.WALLET);
-              }
-            }}
-            active={isActiveItem(ROUTES.SETTINGS.WALLET)}
-            className="wallet"
-            disabled={!hasActiveWallet}
-          />
+              <SettingsMenuItem
+                label={intl.formatMessage(messages.wallet)}
+                onClick={() => {
+                  if (hasActiveWallet) {
+                    onItemClick(ROUTES.SETTINGS.WALLET);
+                  }
+                }}
+                active={isActiveItem(ROUTES.SETTINGS.WALLET)}
+                className="wallet"
+                disabled={!hasActiveWallet}
+              />
+            </>
+          }
 
           <SettingsMenuItem
             label={intl.formatMessage(messages.termsOfUse)}
