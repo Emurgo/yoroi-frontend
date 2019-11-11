@@ -434,6 +434,7 @@ if (environment.isShelley()) {
   ShelleyTestnetOverrides = {
     // Toolbar
     '--theme-topbar-background-color': 'linear-gradient(225deg, #F14D78 0%, #1A44B7 100%)',
+    '--theme-topbar-active-item-bottom-border': '5px solid #ffffff',
     // Button Primary
     '--theme-button-primary-background-color': '#3154CB',
     '--theme-button-primary-background-color-hover': '#4760FF',

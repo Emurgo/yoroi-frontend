@@ -8,6 +8,7 @@ import { handleExternalLinkClick } from '../../../utils/routing';
 import styles from './TestnetWarningBanner.scss';
 import environment from '../../../environment';
 import warningSvg from '../../../assets/images/warning.inline.svg';
+import shelleyTestnetWarningSvg from '../../../assets/images/shelley-testnet-warning.inline.svg';
 
 const messages = defineMessages({
   testnetLabel: {
@@ -51,7 +52,7 @@ export default class TestnetWarningBanner extends Component<Props> {
     if (environment.isShelley()) {
       children = (
         <div className={styles.shelleyTestnetWarning}>
-          <SvgInline key="0" svg={warningSvg} className={styles.warningIcon} />
+          <SvgInline key="0" svg={shelleyTestnetWarningSvg} className={styles.shelleyTestnetWarningIcon} />
           <div className={styles.text}>
             <FormattedMessage
               {...messages.shelleyTestnetLabel}
