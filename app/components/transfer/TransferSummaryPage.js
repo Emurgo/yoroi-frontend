@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import { defineMessages, intlShape } from 'react-intl';
+import {defineMessages, FormattedHTMLMessage, intlShape} from 'react-intl';
 import BorderedBox from '../widgets/BorderedBox';
 import styles from './TransferSummaryPage.scss';
 import type { TransferTx } from '../../types/TransferTypes';
@@ -43,6 +43,18 @@ const messages = defineMessages({
     id: 'transfer.summary.transferButton.label',
     defaultMessage: '!!!Transfer Funds',
   },
+  recoveryTitle: {
+    id: 'transfer.summary.recoverytitle.label',
+    defaultMessage: '!!!Recovery Successful',
+  },
+  attention: {
+    id: 'transfer.summary.attention.label',
+    defaultMessage: '!!!Attention',
+  },
+  attentionDescription: {
+    id: 'transfer.summary.attentionDescription.label',
+    defaultMessage: '!!!The balance check executed successfully, and we were able to match your wallet with the balance displayed below. Remember that the balance displayed should only match the one that you <strong>had on November 12th</strong>.',
+  },
 });
 
 type Props = {|
@@ -79,9 +91,18 @@ export default class TransferSummaryPage extends Component<Props> {
 
     return (
       <div className={styles.component}>
+          <div className={styles.recoveryTitle}>
+            {intl.formatMessage(messages.recoveryTitle)}
+          </div>
         <BorderedBox>
 
           <div className={styles.body}>
+            <div className={styles.attentionTitle}>
+              {intl.formatMessage(messages.attention)}
+            </div>
+            <div className={styles.attentionDescription}>
+              <FormattedHTMLMessage {...messages.attentionDescription} />
+            </div>
 
             <div className={styles.addressLabelWrapper}>
               <div className={styles.addressLabel}>
