@@ -150,7 +150,9 @@ export default class WalletAdd extends Component<Props> {
                     />
                     <div className={styles.heroCardsItemTitle}>
                       {intl.formatMessage(messages.restoreTitle)}
-                      <CustomTooltip toolTip={messages.restoreTooltip} />
+                      {!environmnent.isShelley() &&
+                        <CustomTooltip toolTip={messages.restoreTooltip} />
+                      }
                     </div>
                   </div>
                 </button>
