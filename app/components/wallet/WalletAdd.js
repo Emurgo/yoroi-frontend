@@ -152,22 +152,24 @@ export default class WalletAdd extends Component<Props> {
                 </button>
               </div>
               {/* Transfer funds from a Daedalus wallet to Yoroi */}
-              <button
-                type="button"
-                onClick={onDaedalusTransfer}
-                className={classnames([styles.heroCardsItem, styles.heroCardsItemLink])}
-              >
-                <SvgInline
-                  svg={daedalusIcon}
-                  width="45"
-                  height="40"
-                  className={styles.heroCardsItemLinkIcon}
-                />
-                <div className={styles.heroCardsItemTitle}>
-                  {intl.formatMessage(messages.transferFundsTitle)}
-                  <CustomTooltip toolTip={messages.transferFundsTooltip} />
-                </div>
-              </button>
+              {!environmnent.isShelley() &&
+                <button
+                  type="button"
+                  onClick={onDaedalusTransfer}
+                  className={classnames([styles.heroCardsItem, styles.heroCardsItemLink])}
+                >
+                  <SvgInline
+                    svg={daedalusIcon}
+                    width="45"
+                    height="40"
+                    className={styles.heroCardsItemLinkIcon}
+                  />
+                  <div className={styles.heroCardsItemTitle}>
+                    {intl.formatMessage(messages.transferFundsTitle)}
+                    <CustomTooltip toolTip={messages.transferFundsTooltip} />
+                  </div>
+                </button>
+              }
             </div>
           </div>
         </div>
