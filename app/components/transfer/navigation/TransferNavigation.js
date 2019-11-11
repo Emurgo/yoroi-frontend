@@ -51,7 +51,7 @@ export default class TransferNavigation extends Component<TransferNavigationProp
             isActive={isActiveNavItem('daedalus')}
             onClick={() => onNavItemClick('daedalus')}
             />
-            </div>
+          </div>
       </div>
     );
   }
