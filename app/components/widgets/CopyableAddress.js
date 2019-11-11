@@ -10,7 +10,7 @@ import iconCopied from '../../assets/images/copied.inline.svg';
 import styles from './CopyableAddress.scss';
 import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
 import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
-
+import type { Notification } from '../../types/notificationType';
 
 const messages = defineMessages({
   copyTooltipMessage: {
@@ -23,10 +23,10 @@ type Props = {
   +children: Node,
   +hash: string,
   +elementId?: string,
-  +onCopyAddress?: Function,
+  +onCopyAddress?: void => void,
   +tooltipOpensUpward?: boolean,
   +arrowRelativeToTip?: boolean,
-  +getNotification: Function,
+  +notification: ?Notification,
 };
 
 @observer
@@ -43,9 +43,8 @@ export default class CopyableAddress extends Component<Props> {
   };
 
   render() {
-    const { hash, elementId, onCopyAddress, getNotification } = this.props;
+    const { hash, elementId, onCopyAddress, notification } = this.props;
     const { intl } = this.context;
-    const notification = getNotification;
 
     const tooltipComponent = (
       <Tooltip
@@ -70,7 +69,10 @@ export default class CopyableAddress extends Component<Props> {
         <span>{this.props.children}</span>
         <CopyToClipboard
           text={hash}
-          onCopy={onCopyAddress && onCopyAddress.bind(this, tooltipComponent)}
+          onCopy={onCopyAddress == null
+            ? undefined
+            : (_text, _result) => onCopyAddress()
+          }
         >
           {tooltipComponent}
         </CopyToClipboard>

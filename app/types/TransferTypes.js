@@ -13,6 +13,7 @@ export const TransferStatus = Object.freeze({
   READY_TO_TRANSFER: 7,
   ERROR: 8,
   SUCCESS: 9,
+  DISPLAY_CHECKSUM: 10,
 });
 export type TransferStatusT = $Values<typeof TransferStatus>;
 

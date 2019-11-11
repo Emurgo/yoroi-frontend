@@ -14,6 +14,9 @@ export default class YoroiTranferActions {
     paperPassword: string,
     publicDeriver: PublicDeriverWithCachedMeta,
   }> = new Action();
+  checkAddresses: Action<{|
+    publicDeriver: PublicDeriverWithCachedMeta,
+  |}> = new Action();
   backToUninitialized: Action<void> = new Action();
   transferFunds: Action<{
     next: Function,
