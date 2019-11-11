@@ -3,7 +3,7 @@
 import environment from '../environment';
 
 const ShelleyExplorers = Object.freeze({
-  SEIZA: 'seiza',
+  // SEIZA: 'seiza',
   JORMUNGANDR: 'jormungandr',
 });
 const ByronExplorers = Object.freeze({
