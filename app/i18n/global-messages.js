@@ -373,6 +373,10 @@ const globalMessages = defineMessages({
     id: 'wallet.restore.dialog.form.errors.invalidRecoveryPhrase',
     defaultMessage: '!!!Invalid recovery phrase',
   },
+  pdfGenDone: {
+    id: 'settings.paperWallet.dialog.createPaper.done',
+    defaultMessage: '!!!All done!',
+  },
 });
 export default globalMessages;
 

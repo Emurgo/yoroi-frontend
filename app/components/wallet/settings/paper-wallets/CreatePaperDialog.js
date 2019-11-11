@@ -51,10 +51,6 @@ const messages = defineMessages({
     id: 'settings.paperWallet.dialog.createPaper.addresses',
     defaultMessage: '!!!Drawing the address',
   },
-  pdfGenDone: {
-    id: 'settings.paperWallet.dialog.createPaper.done',
-    defaultMessage: '!!!All done!',
-  },
 });
 
 type Props = {|
@@ -99,7 +95,7 @@ export default class CreatePaperDialog extends Component<Props> {
       case PdfGenSteps.addresses:
         return this.context.intl.formatMessage(messages.pdfGenAddresses);
       case PdfGenSteps.done:
-        return this.context.intl.formatMessage(messages.pdfGenDone);
+        return this.context.intl.formatMessage(globalMessages.pdfGenDone);
       default:
         return defaultMessage;
     }
