@@ -6,7 +6,8 @@ import classnames from 'classnames';
 import SvgInline from 'react-svg-inline';
 
 import CustomTooltip from '../widgets/CustomTooltip';
-import logoIcon from '../../assets/images/yoroi-logo-white.inline.svg';
+import logoYoroiIcon from '../../assets/images/yoroi-logo-white.inline.svg';
+import logoYoroiShelleyTestnetIcon from '../../assets/images/yoroi-logo-shelley-testnet-white.inline.svg';
 import settingsIcon from '../../assets/images/top-bar/setting-active.inline.svg';
 import daedalusIcon from '../../assets/images/top-bar/daedalus-migration.inline.svg';
 
@@ -87,6 +88,8 @@ export default class WalletAdd extends Component<Props> {
       environmnent.isShelley() ? styles.shelleyTestnet : null
     ]);
 
+    const logoIcon = environmnent.isShelley() ? logoYoroiShelleyTestnetIcon : logoYoroiIcon;
+
     return (
       <div className={componentStyle}>
         {/* Setting button */}
@@ -100,7 +103,7 @@ export default class WalletAdd extends Component<Props> {
           <div className={styles.heroInner}>
             {/* Left block  */}
             <div className={styles.heroLeft}>
-              <SvgInline svg={logoIcon} className={styles.heroLogo} />
+              <SvgInline svg={logoIcon} className={styles.heroLogo} width="156" height="50" />
               <h2 className={styles.heroTitle}>
                 <FormattedHTMLMessage {...(messages.title)} />
               </h2>
