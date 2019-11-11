@@ -10,42 +10,34 @@ import {
   BIP44_PURPOSE,
   BIP44_SCAN_SIZE,
   EXTERNAL,
-} from '../../../../../config/numbersConfig';
+} from '../../../../../../config/numbersConfig';
 
 import type {
   TreeInsert,
-} from '../database/walletTypes/common/utils';
-import type { Bip44ChainInsert } from '../database/walletTypes/common/tables';
-import {
-  AddAddress,
-} from '../database/primitives/api/write';
-import { GetAddress } from '../database/primitives/api/read';
-import type { KeyInsert } from '../database/primitives/tables';
-import type { HWFeatures, } from '../database/walletTypes/core/tables';
+} from '../../database/walletTypes/common/utils';
+import type { Bip44ChainInsert } from '../../database/walletTypes/common/tables';
+import type { KeyInsert } from '../../database/primitives/tables';
+import type { HWFeatures, } from '../../database/walletTypes/core/tables';
 
-import { WalletBuilder } from './walletBuilder';
+import { WalletBuilder } from './builder';
 
-import { RustModule } from '../../cardanoCrypto/rustLoader';
-import { encryptWithPassword } from '../../../../../utils/passwordCipher';
+import { RustModule } from '../../../cardanoCrypto/rustLoader';
+import { encryptWithPassword } from '../../../../../../utils/passwordCipher';
 
 import {
   Bip44DerivationLevels,
   Bip44TableMap,
-} from '../database/walletTypes/bip44/api/utils';
-import {
-  getAllSchemaTables,
-  raii,
-} from '../database/utils';
+} from '../../database/walletTypes/bip44/api/utils';
 
 import type {
   HasConceptualWallet,
   HasBip44Wrapper,
   HasPublicDeriver,
   HasRoot,
-} from './walletBuilder';
-import type { AddByHashFunc } from './hashMapper';
-import { rawGenAddByHash } from './hashMapper';
-import { addByronAddress } from '../../../restoration/byron/scan';
+} from './builder';
+import type { AddByHashFunc } from '../hashMapper';
+import { rawGenAddByHash } from '../hashMapper';
+import { addByronAddress } from '../../../../restoration/byron/scan';
 
 
 // TODO: maybe move this inside walletBuilder somehow so it's all done in the same transaction
@@ -205,14 +197,25 @@ export async function createStandardBip44Wallet(request: {
         })
       )
       .derivePublicDeriver(
-        _finalState => ({
-          decryptPrivateDeriverPassword: request.password,
-          publicDeriverMeta: {
-            name: request.accountName,
-          },
-          path: [BIP44_PURPOSE, CARDANO_COINTYPE, request.accountIndex],
-          initialDerivations
-        })
+        finalState => {
+          const id = finalState.bip44WrapperRow.PrivateDeriverKeyDerivationId;
+          const level = finalState.bip44WrapperRow.PrivateDeriverLevel;
+          if (id == null || level == null) {
+            throw new Error('createStandardBip44Wallet missing private deriver');
+          }
+          return {
+            deriverRequest: {
+              decryptPrivateDeriverPassword: request.password,
+              publicDeriverMeta: {
+                name: request.accountName,
+              },
+              path: [BIP44_PURPOSE, CARDANO_COINTYPE, request.accountIndex],
+              initialDerivations,
+            },
+            privateDeriverKeyDerivationId: id,
+            privateDeriverLevel: level,
+          };
+        }
       )
       .commit();
   }

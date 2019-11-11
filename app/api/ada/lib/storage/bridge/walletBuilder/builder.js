@@ -7,38 +7,43 @@ import type {
 
 import type {
   ConceptualWalletInsert,
-} from '../database/walletTypes/core/tables';
+} from '../../database/walletTypes/core/tables';
 import {
   ModifyConceptualWallet,
-} from '../database/walletTypes/core/api/write';
+} from '../../database/walletTypes/core/api/write';
 import type {
   Bip44WrapperInsert,
-} from '../database/walletTypes/bip44/tables';
+} from '../../database/walletTypes/bip44/tables';
+import type {
+  Cip1852WrapperInsert,
+} from '../../database/walletTypes/cip1852/tables';
 import {
   AddBip44Wrapper,
-} from '../database/walletTypes/bip44/api/write';
+} from '../../database/walletTypes/bip44/api/write';
+import {
+  AddCip1852Wrapper,
+} from '../../database/walletTypes/cip1852/api/write';
 import type {
   AddAdhocPublicDeriverRequest,
-} from '../database/walletTypes/common/api/write';
+} from '../../database/walletTypes/common/api/write';
 import {
   AddAdhocPublicDeriver,
   AddDerivationTree,
   DerivePublicDeriverFromKey,
-} from '../database/walletTypes/common/api/write';
-import type { AddPublicDeriverResponse } from '../database/walletTypes/core/api/write';
+} from '../../database/walletTypes/common/api/write';
+import type { AddPublicDeriverResponse } from '../../database/walletTypes/core/api/write';
 import {
   getAllTables,
   raii,
-  StaleStateError,
-} from '../database/utils';
+} from '../../database/utils';
 import type {
   IDerivePublicFromPrivateRequest,
-} from '../models/Bip44Wallet/interfaces';
+} from '../../models/Bip44Wallet/interfaces';
 import {
   derivePublicDeriver,
-} from '../models/Bip44Wallet/wrapper';
-import type { AddDerivationRequest } from '../database/primitives/api/write';
-import type { TreeInsertStart } from '../database/walletTypes/common/utils';
+} from '../../models/Bip44Wallet/wrapper';
+import type { AddDerivationRequest } from '../../database/primitives/api/write';
+import type { TreeInsertStart } from '../../database/walletTypes/common/utils';
 
 /**
  * We need to statically ensure that
@@ -204,6 +209,27 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
     );
   }
 
+  addCip1852Wrapper: StateConstraint<
+    CurrentState,
+    HasConceptualWallet,
+    CurrentState => Cip1852WrapperInsert,
+    CurrentState & HasCip1852Wrapper,
+  > = (
+    insert: CurrentState => Cip1852WrapperInsert,
+  ) => {
+    return this.updateData<HasConceptualWallet, HasCip1852Wrapper>(
+      AsNotNull<HasCip1852Wrapper>({ cip1852WrapperRow: null }),
+      Array.from(getAllTables(AddCip1852Wrapper)),
+      async (finalData) => {
+        finalData.cip1852WrapperRow = await AddCip1852Wrapper.add(
+          this.db,
+          this.txHolder.tx,
+          insert(finalData),
+        );
+      },
+    );
+  }
+
   addFromRoot: StateConstraint<
     CurrentState,
     HasConceptualWallet,
@@ -263,21 +289,29 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
 
   derivePublicDeriver: StateConstraint<
     CurrentState,
-    HasBip44Wrapper & HasConceptualWallet,
-    CurrentState => IDerivePublicFromPrivateRequest,
+    HasConceptualWallet,
+    CurrentState => {|
+      deriverRequest: IDerivePublicFromPrivateRequest,
+      privateDeriverKeyDerivationId: number,
+      privateDeriverLevel: number,
+    |},
     CurrentState & HasPublicDeriver<mixed>
   > = (
-    request: CurrentState => IDerivePublicFromPrivateRequest,
+    request: CurrentState => {|
+      deriverRequest: IDerivePublicFromPrivateRequest,
+      privateDeriverKeyDerivationId: number,
+      privateDeriverLevel: number,
+    |},
   ) => {
-    return this.updateData<HasBip44Wrapper & HasConceptualWallet, HasPublicDeriver<mixed>>(
+    return this.updateData<HasConceptualWallet, HasPublicDeriver<mixed>>(
       { publicDeriver: [] },
       Array.from(getAllTables(DerivePublicDeriverFromKey)),
       async (finalData) => {
-        const id = finalData.bip44WrapperRow.PrivateDeriverKeyDerivationId;
-        const level = finalData.bip44WrapperRow.PrivateDeriverLevel;
-        if (id == null || level == null) {
-          throw new StaleStateError('derivePublicDeriver no private deriver');
-        }
+        const {
+          privateDeriverKeyDerivationId,
+          privateDeriverLevel,
+          deriverRequest,
+        } = request(finalData);
         finalData.publicDeriver = [
           ...finalData.publicDeriver,
           await derivePublicDeriver(
@@ -285,9 +319,9 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
             this.txHolder.tx,
             { DerivePublicDeriverFromKey },
             finalData.conceptualWalletRow.ConceptualWalletId,
-            request(finalData),
-            id,
-            level,
+            deriverRequest,
+            privateDeriverKeyDerivationId,
+            privateDeriverLevel,
             this.derivationTables
           )
         ];
@@ -319,6 +353,9 @@ export type HasConceptualWallet = {|
 |};
 export type HasBip44Wrapper = {|
   bip44WrapperRow: PromisslessReturnType<typeof AddBip44Wrapper.add>
+|};
+export type HasCip1852Wrapper = {|
+  cip1852WrapperRow: PromisslessReturnType<typeof AddCip1852Wrapper.add>
 |};
 export type HasRoot = {|
   root: PromisslessReturnType<typeof AddDerivationTree.includingParent>
