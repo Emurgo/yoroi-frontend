@@ -21,6 +21,7 @@ export function getDefaultExplorer(): ExplorerType {
 export function getExplorers(): Array<{| value: ExplorerType, label: string |}> {
   if (environment.isShelley()) {
     return Object.keys(ShelleyExplorers)
+      .filter(explorer => ShelleyExplorers[explorer] === ShelleyExplorers.JORMUNGANDR)
       .map(key => ({
         value: ShelleyExplorers[key],
         label: explorerInfo[ShelleyExplorers[key]].name,
