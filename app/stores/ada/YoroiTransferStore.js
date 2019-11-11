@@ -118,16 +118,10 @@ export default class YoroiTransferStore extends Store {
   _generateTransferTxFromMnemonic = async (
     recoveryPhrase: string,
     updateStatusCallback: void => void,
-    publicDeriver: PublicDeriverWithCachedMeta,
   ): Promise<TransferTx> => {
     // 1) get receive address
-    const withChains = asHasChains(publicDeriver.self);
-    if (!withChains) throw new Error('_setupTransferWebSocket missing chains functionality');
-    const nextInternal = await withChains.nextInternal();
-    if (nextInternal.addressInfo == null) {
-      throw new Error('_setupTransferWebSocket no internal addresses left. Should never happen');
-    }
-    const nextInternalAddress = nextInternal.addressInfo.addr.Hash;
+    // need some dummy address to recover balance for balance check
+    const nextInternalAddress = 'Ae2tdPwUPEZ2QN5iNHXm84999w8Ax8t3QQZXEFec3AXaWKt6jEFeXTPWE3B';
 
     // 2) Perform restoration
     const accountIndex = 0 + HARD_DERIVATION_START;
@@ -175,7 +169,6 @@ export default class YoroiTransferStore extends Store {
   _setupTransferFundsWithPaperMnemonic = async (payload: {
     recoveryPhrase: string,
     paperPassword: string,
-    publicDeriver: PublicDeriverWithCachedMeta,
   }): Promise<void> => {
     const result = unscramblePaperAdaMnemonic(
       payload.recoveryPhrase,
@@ -188,20 +181,17 @@ export default class YoroiTransferStore extends Store {
     }
     await this._setupTransferFundsWithMnemonic({
       recoveryPhrase,
-      publicDeriver: payload.publicDeriver,
     });
   }
 
   _setupTransferFundsWithMnemonic = async (payload: {
     recoveryPhrase: string,
-    publicDeriver: PublicDeriverWithCachedMeta,
   }): Promise<void> => {
     this._updateStatus(TransferStatus.CHECKING_ADDRESSES);
     this.recoveryPhrase = payload.recoveryPhrase;
     const transferTx = await this._generateTransferTxFromMnemonic(
       payload.recoveryPhrase,
       () => this._updateStatus(TransferStatus.GENERATING_TX),
-      payload.publicDeriver
     );
     runInAction(() => {
       this.transferTx = transferTx;
@@ -231,7 +221,6 @@ export default class YoroiTransferStore extends Store {
      */
     const transferTx = await this._generateTransferTxFromMnemonic(
       this.recoveryPhrase, () => {},
-      payload.publicDeriver,
     );
     if (!this.transferTx) {
       throw new NoTransferTxError();
@@ -256,7 +245,6 @@ export default class YoroiTransferStore extends Store {
         */
         const newTransferTx = await this._generateTransferTxFromMnemonic(
           this.recoveryPhrase, () => {},
-          payload.publicDeriver,
         );
         if (this._isWalletChanged(newTransferTx, transferTx)) {
           return this._handleWalletChanged(newTransferTx);

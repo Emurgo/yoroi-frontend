@@ -54,13 +54,8 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
     recoveryPhrase: string,
   |}) => {
     const walletsStore = this._getWalletsStore();
-    const publicDeriver = walletsStore.selected;
-    if (publicDeriver == null) {
-      throw new Error('tranferFunds no wallet selected');
-    }
     this._getYoroiTransferActions().setupTransferFundsWithMnemonic.trigger({
       ...payload,
-      publicDeriver,
     });
   };
 
@@ -70,12 +65,8 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
   |}) => {
     const walletsStore = this._getWalletsStore();
     const publicDeriver = walletsStore.selected;
-    if (publicDeriver == null) {
-      throw new Error('tranferFunds no wallet selected');
-    }
     this._getYoroiTransferActions().setupTransferFundsWithPaperMnemonic.trigger({
       ...payload,
-      publicDeriver,
     });
   };
 
