@@ -82,8 +82,13 @@ export default class WalletAdd extends Component<Props> {
       onDaedalusTransfer,
     } = this.props;
 
+    const componentStyle = classnames([
+      styles.component,
+      environmnent.isShelley() ? styles.shelleyTestnet : null
+    ]);
+
     return (
-      <div className={styles.component}>
+      <div className={componentStyle}>
         {/* Setting button */}
         <div className={styles.hero}>
           <div className={styles.settingsBar}>
