@@ -12,6 +12,7 @@ import LocalizableError from '../../i18n/LocalizableError';
 import RawHash from '../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../domain/Explorer';
+import globalMessages from '../../i18n/global-messages';
 
 const messages = defineMessages({
   addressFromLabel: {
@@ -41,7 +42,7 @@ const messages = defineMessages({
   transferButtonLabel: {
     id: 'transfer.summary.transferButton.label',
     defaultMessage: '!!!Transfer Funds',
-  }
+  },
 });
 
 type Props = {|
@@ -66,24 +67,13 @@ export default class TransferSummaryPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { transferTx, isSubmitting, error, addressFromSubLabel, classicTheme } = this.props;
+    const { transferTx, isSubmitting, error, addressFromSubLabel } = this.props;
 
-    const receiver = transferTx.receiver;
     const recoveredBalance = this.props.formattedWalletAmount(transferTx.recoveredBalance);
-    const transactionFee = this.props.formattedWalletAmount(transferTx.fee);
-    const finalBalance = this.props.formattedWalletAmount(
-      transferTx.recoveredBalance.minus(transferTx.fee)
-    );
 
     const nextButtonClasses = classnames([
       'transferButton',
       isSubmitting ? styles.isSubmitting : 'primary',
-      styles.button,
-    ]);
-
-    const cancelButtonClasses = classnames([
-      'cancelTransferButton',
-      classicTheme ? 'flat' : 'outlined',
       styles.button,
     ]);
 
@@ -95,9 +85,6 @@ export default class TransferSummaryPage extends Component<Props> {
 
             <div className={styles.addressLabelWrapper}>
               <div className={styles.addressLabel}>
-                {intl.formatMessage(messages.addressFromLabel)}
-              </div>
-              <div className={styles.addressSubLabel}>
                 {addressFromSubLabel}
               </div>
               {
@@ -128,22 +115,6 @@ export default class TransferSummaryPage extends Component<Props> {
               }
             </div>
 
-            <div className={styles.addressLabelWrapper}>
-              <div className={styles.addressLabel}>
-                {intl.formatMessage(messages.addressToLabel)}
-              </div>
-              <ExplorableHashContainer
-                selectedExplorer={this.props.selectedExplorer}
-                light
-                hash={receiver}
-                linkType="address"
-              >
-                <RawHash light>
-                  <span className={styles.address}>{receiver}</span>
-                </RawHash>
-              </ExplorableHashContainer>
-            </div>
-
             <div className={styles.amountFeesWrapper}>
               <div className={styles.amountWrapper}>
                 <div className={styles.amountLabel}>
@@ -152,24 +123,6 @@ export default class TransferSummaryPage extends Component<Props> {
                 <div className={styles.amount}>{recoveredBalance}
                   <span className={styles.currencySymbol}>&nbsp;ADA</span>
                 </div>
-              </div>
-
-              <div className={styles.feesWrapper}>
-                <div className={styles.feesLabel}>
-                  {intl.formatMessage(messages.transactionFeeLabel)}
-                </div>
-                <div className={styles.fees}>+{transactionFee}
-                  <span className={styles.currencySymbol}>&nbsp;ADA</span>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.totalAmountWrapper}>
-              <div className={styles.totalAmountLabel}>
-                {intl.formatMessage(messages.finalBalanceLabel)}
-              </div>
-              <div className={styles.totalAmount}>{finalBalance}
-                <span className={styles.currencySymbol}>&nbsp;ADA</span>
               </div>
             </div>
 
@@ -182,17 +135,9 @@ export default class TransferSummaryPage extends Component<Props> {
 
             <div className={styles.buttonsWrapper}>
               <Button
-                className={cancelButtonClasses}
-                label={intl.formatMessage(messages.cancelTransferButtonLabel)}
-                onClick={this.props.onCancel}
-                disabled={isSubmitting}
-                skin={ButtonSkin}
-              />
-
-              <Button
                 className={nextButtonClasses}
-                label={intl.formatMessage(messages.transferButtonLabel)}
-                onClick={this.props.onSubmit}
+                label={intl.formatMessage(globalMessages.pdfGenDone)}
+                onClick={this.props.onCancel}
                 disabled={isSubmitting}
                 skin={ButtonSkin}
               />
