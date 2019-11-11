@@ -166,6 +166,13 @@ export default class WalletAddPage extends Component<Props> {
     });
   }
 
+  _goToYoroiTransferRoot = (): void => {
+    this._getRouter().goToRoute.trigger({
+      route: ROUTES.TRANSFER.YOROI
+    });
+  }
+
+
   _goToDaedalusTransferRoot = (): void => {
     this._getRouter().goToRoute.trigger({
       route: ROUTES.TRANSFER.DAEDALUS
@@ -174,7 +181,7 @@ export default class WalletAddPage extends Component<Props> {
 
   _onRestoreButtonClicked = (): void => {
     if (environment.isShelley()) {
-      this._goToDaedalusTransferRoot();
+      this._goToYoroiTransferRoot();
     } else {
       this.props.actions.dialogs.open.trigger({ dialog: WalletRestoreOptionDialog });
     }

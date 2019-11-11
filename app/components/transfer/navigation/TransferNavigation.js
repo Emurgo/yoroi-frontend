@@ -35,16 +35,6 @@ export default class TransferNavigation extends Component<TransferNavigationProp
     const { intl } = this.context;
     return (
       <div className={styles.component}>
-
-        <div className={styles.navItem}>
-          <TransferNavButton
-            className="from-daedalus"
-            label={intl.formatMessage(messages.fromDaedalus)}
-            isActive={isActiveNavItem('daedalus')}
-            onClick={() => onNavItemClick('daedalus')}
-          />
-        </div>
-
         <div className={styles.navItem}>
           <TransferNavButton
             className="from-yoroi"
@@ -54,6 +44,14 @@ export default class TransferNavigation extends Component<TransferNavigationProp
           />
         </div>
 
+          <div className={styles.navItem}>
+          <TransferNavButton
+            className="from-daedalus"
+            label={intl.formatMessage(messages.fromDaedalus)}
+            isActive={isActiveNavItem('daedalus')}
+            onClick={() => onNavItemClick('daedalus')}
+            />
+            </div>
       </div>
     );
   }
