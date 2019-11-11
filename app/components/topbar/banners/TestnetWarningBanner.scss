@@ -30,6 +30,9 @@
   justify-content: center;
   align-items: center;
   background: var(--theme-banner-warning-background-color);
+  .shelleyTestnetWarningIcon {
+    margin-right: 9px;
+  }
   .text {
     text-transform: uppercase;
     height: 20px;
