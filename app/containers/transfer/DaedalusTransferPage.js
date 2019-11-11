@@ -47,13 +47,8 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     recoveryPhrase: string,
   }): void => {
     const walletsStore = this._getWalletsStore();
-    const publicDeriver = walletsStore.selected;
-    if (publicDeriver == null) {
-      throw new Error('tranferFunds no wallet selected');
-    }
     this._getDaedalusTransferActions().setupTransferFundsWithMnemonic.trigger({
       ...payload,
-      publicDeriver
     });
   };
 
@@ -61,13 +56,8 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     masterKey: string,
   }): void => {
     const walletsStore = this._getWalletsStore();
-    const publicDeriver = walletsStore.selected;
-    if (publicDeriver == null) {
-      throw new Error('tranferFunds no wallet selected');
-    }
     this._getDaedalusTransferActions().setupTransferFundsWithMasterKey.trigger({
       ...payload,
-      publicDeriver
     });
   };
 

@@ -95,7 +95,7 @@ export default class DaedalusTransferStore extends Store {
   _enableDisableTransferFunds = (): void => {
     const { wallets } = this.stores.substores[environment.API];
     // User must first make a Yoroi wallet before being able to transfer a Daedalus wallet
-    if (wallets.hasActiveWallet) {
+    if (environment.isShelley() || wallets.hasActiveWallet) {
       runInAction(() => {
         this.disableTransferFunds = false;
       });
@@ -112,15 +112,9 @@ export default class DaedalusTransferStore extends Store {
    */
   _setupTransferWebSocket = async (
     wallet: RustModule.WalletV2.DaedalusWallet,
-    publicDeriver: PublicDeriverWithCachedMeta,
   ): Promise<void> => {
-    const withChains = asHasChains(publicDeriver.self);
-    if (!withChains) throw new Error('_setupTransferWebSocket missing chains functionality');
-    const nextInternal = await withChains.nextInternal();
-    if (nextInternal.addressInfo == null) {
-      throw new Error('_setupTransferWebSocket no internal addresses left. Should never happen');
-    }
-    const nextInternalAddress = nextInternal.addressInfo.addr.Hash;
+    // need some dummy address to recover balance for balance check
+    const nextInternalAddress = 'Ae2tdPwUPEZ2QN5iNHXm84999w8Ax8t3QQZXEFec3AXaWKt6jEFeXTPWE3B';
 
     this._updateStatus(TransferStatus.RESTORING_ADDRESSES);
     runInAction(() => {
@@ -196,7 +190,6 @@ export default class DaedalusTransferStore extends Store {
 
   _setupTransferFundsWithMnemonic = async (payload: {
     recoveryPhrase: string,
-    publicDeriver: PublicDeriverWithCachedMeta,
   }): Promise<void> => {
     let { recoveryPhrase: secretWords } = payload;
     if (secretWords.split(' ').length === 27) {
@@ -213,19 +206,16 @@ export default class DaedalusTransferStore extends Store {
 
     await this._setupTransferWebSocket(
       getCryptoDaedalusWalletFromMnemonics(secretWords),
-      payload.publicDeriver,
     );
   }
 
   _setupTransferFundsWithMasterKey = async (payload: {
     masterKey: string,
-    publicDeriver: PublicDeriverWithCachedMeta,
   }): Promise<void> => {
     const { masterKey: key } = payload;
 
     await this._setupTransferWebSocket(
       getCryptoDaedalusWalletFromMasterKey(key),
-      payload.publicDeriver,
     );
   }
 
