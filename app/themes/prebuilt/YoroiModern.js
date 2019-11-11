@@ -434,11 +434,19 @@ if (environment.isShelley()) {
   ShelleyTestnetOverrides = {
     // Toolbar
     '--theme-topbar-background-color': 'linear-gradient(225deg, #F14D78 0%, #1A44B7 100%)',
-    // Button
+    // Button Primary
     '--theme-button-primary-background-color': '#3154CB',
     '--theme-button-primary-background-color-hover': '#4760FF',
     '--theme-button-primary-background-color-active': '#3154CB',
     '--theme-button-primary-background-color-disabled': 'rgba(49,84,203,0.35)',
+    // Button Outline
+    '--theme-button-outlined-text-color': '#3154CB',
+    '--theme-button-outlined-border-color-hover': '#3154CB',
+    '--theme-button-outlined-background-color-hover': 'rgba(49, 84, 203, 0.15)',
+    '--theme-button-outlined-background-color-active': '#3154CB',
+    '--theme-button-outlined-active-text-color': '#ffffff',
+    '--theme-button-outlined-text-color-disabled': 'rgba(49, 84, 203, 0.35)',
+    '--theme-button-outlined-background-color-disabled': 'rgba(49, 84, 203, 0.35)',
     // Language Selection
     '--theme-select-language-color': '#3154CB',
     // Top banner
