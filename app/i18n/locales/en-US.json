@@ -205,6 +205,7 @@
   "transfer.summary.recoveredBalance.label": "Recovered balance",
   "transfer.summary.transactionFee.label": "Transaction fees",
   "transfer.summary.transferButton.label": "Transfer Funds",
+  "transfer.topbar.title": "Shelley incentivized testnet balance check",
   "uri.display.dialog.copy.notification": "URL successfully copied",
   "uri.display.dialog.title": "Generated URL",
   "uri.display.dialog.usabilityWarning": "This link can only be opened by users with Yoroi installed on their browser",
