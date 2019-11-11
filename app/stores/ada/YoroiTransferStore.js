@@ -104,7 +104,7 @@ export default class YoroiTransferStore extends Store {
   _enableDisableTransferFunds = (): void => {
     const { wallets } = this.stores.substores[environment.API];
     // User must first make a Yoroi wallet before being able to transfer a Daedalus wallet
-    if (wallets.hasActiveWallet) {
+    if (environment.isShelley() || wallets.hasActiveWallet) {
       runInAction(() => {
         this.disableTransferFunds = false;
       });
