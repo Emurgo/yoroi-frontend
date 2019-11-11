@@ -136,7 +136,7 @@ export default class WalletAddPage extends Component<Props> {
           () => actions.dialogs.open.trigger({ dialog: WalletConnectHWOptionDialog })
         }
         onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
-        onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreOptionDialog })}
+        onRestore={this._onRestoreButtonClicked}
         onSettings={this._goToSettingsRoot}
         onDaedalusTransfer={this._goToDaedalusTransferRoot}
         classicTheme={profile.isClassicTheme}
@@ -170,5 +170,13 @@ export default class WalletAddPage extends Component<Props> {
     this._getRouter().goToRoute.trigger({
       route: ROUTES.TRANSFER.DAEDALUS
     });
+  }
+
+  _onRestoreButtonClicked = (): void => {
+    if (environment.isShelley()) {
+      this._goToDaedalusTransferRoot();
+    } else {
+      this.props.actions.dialogs.open.trigger({ dialog: WalletRestoreOptionDialog });
+    }
   }
 }

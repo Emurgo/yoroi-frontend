@@ -121,19 +121,23 @@ export default class WalletAdd extends Component<Props> {
                   </button>
                 }
                 {/* Create wallet */}
-                <button
-                  type="button"
-                  className="WalletAdd_btnCreateWallet"
-                  onClick={onCreate}
-                >
-                  <div className={styles.heroCardsItem}>
-                    <div className={classnames([styles.heroCardsItemBg, styles.bgCreateWallet])} />
-                    <div className={styles.heroCardsItemTitle}>
-                      {intl.formatMessage(messages.createTitle)}
-                      <CustomTooltip toolTip={messages.createTooltip} />
+                {!environmnent.isShelley() &&
+                  <button
+                    type="button"
+                    className="WalletAdd_btnCreateWallet"
+                    onClick={onCreate}
+                  >
+                    <div className={styles.heroCardsItem}>
+                      <div
+                        className={classnames([styles.heroCardsItemBg, styles.bgCreateWallet])}
+                      />
+                      <div className={styles.heroCardsItemTitle}>
+                        {intl.formatMessage(messages.createTitle)}
+                        <CustomTooltip toolTip={messages.createTooltip} />
+                      </div>
                     </div>
-                  </div>
-                </button>
+                  </button>
+                }
                 {/* Restore wallet */}
                 <button
                   type="button"
@@ -146,28 +150,32 @@ export default class WalletAdd extends Component<Props> {
                     />
                     <div className={styles.heroCardsItemTitle}>
                       {intl.formatMessage(messages.restoreTitle)}
-                      <CustomTooltip toolTip={messages.restoreTooltip} />
+                      {!environmnent.isShelley() &&
+                        <CustomTooltip toolTip={messages.restoreTooltip} />
+                      }
                     </div>
                   </div>
                 </button>
               </div>
               {/* Transfer funds from a Daedalus wallet to Yoroi */}
-              <button
-                type="button"
-                onClick={onDaedalusTransfer}
-                className={classnames([styles.heroCardsItem, styles.heroCardsItemLink])}
-              >
-                <SvgInline
-                  svg={daedalusIcon}
-                  width="45"
-                  height="40"
-                  className={styles.heroCardsItemLinkIcon}
-                />
-                <div className={styles.heroCardsItemTitle}>
-                  {intl.formatMessage(messages.transferFundsTitle)}
-                  <CustomTooltip toolTip={messages.transferFundsTooltip} />
-                </div>
-              </button>
+              {!environmnent.isShelley() &&
+                <button
+                  type="button"
+                  onClick={onDaedalusTransfer}
+                  className={classnames([styles.heroCardsItem, styles.heroCardsItemLink])}
+                >
+                  <SvgInline
+                    svg={daedalusIcon}
+                    width="45"
+                    height="40"
+                    className={styles.heroCardsItemLinkIcon}
+                  />
+                  <div className={styles.heroCardsItemTitle}>
+                    {intl.formatMessage(messages.transferFundsTitle)}
+                    <CustomTooltip toolTip={messages.transferFundsTooltip} />
+                  </div>
+                </button>
+              }
             </div>
           </div>
         </div>
