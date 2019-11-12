@@ -24,6 +24,11 @@ import type { ActionsMap } from './actions';
 import { changeToplevelTheme } from './themes';
 import ThemeManager from './ThemeManager';
 import environment from './environment';
+import MetaTags from './components/MetaTags';
+import {
+  YOROI_PAGE_TITILE,
+  YOROI_PAGE_TITILE_SHELLEY_TESTNET,
+} from './config/metaInfo';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr, ...id, ...es, ...it]);
@@ -38,6 +43,9 @@ class App extends Component<Props> {
   render() {
     const { stores, actions, history } = this.props;
     const locale = stores.profile.currentLocale;
+    const yoroiTitle = environment.isShelley() ?
+      YOROI_PAGE_TITILE_SHELLEY_TESTNET :
+      YOROI_PAGE_TITILE;
 
     // Merged english messages with selected by user locale messages
     // In this case all english data would be overridden to user selected locale, but untranslated
@@ -62,6 +70,7 @@ class App extends Component<Props> {
 
     return (
       <div style={{ height: '100%' }}>
+        <MetaTags title={yoroiTitle} />
         <ThemeManager variables={themeVars} />
 
         {/* Automatically pass a theme prop to all componenets in this subtree. */}
