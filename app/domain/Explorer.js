@@ -90,8 +90,8 @@ export const explorerInfo: {
     : {
       jormungandr: {
         name: 'Jormungandr Explorer',
-        address: 'https://explorer.jormungandr-testnet.iohkdev.io/address/',
-        transaction: 'https://explorer.jormungandr-testnet.iohkdev.io/tx/',
+        address: 'https://shelleyexplorer.cardano.org/address/',
+        transaction: 'https://shelleyexplorer.cardano.org/tx/',
       },
     }
   )
