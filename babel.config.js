@@ -1,6 +1,12 @@
 // @flow
 
-module.exports = function (api) {
+/*::
+// https://babeljs.io/docs/en/config-files#config-function-api
+type ApiType = {
+  env: (void | string | Array<string>) => (string | boolean)
+};
+*/
+module.exports = function (api /*: ApiType */) {
   // when running jest we need to use nodejs and not browser configurations
   const nodePlugins = api.env('jest')
     ? ['dynamic-import-node']
