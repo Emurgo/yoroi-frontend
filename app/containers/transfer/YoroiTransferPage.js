@@ -208,7 +208,7 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
           </TransferLayout>
         );
       default:
-          throw new Error('YoroiTransferPage Unexpected state ' + yoroiTransfer.status);
+        throw new Error('YoroiTransferPage Unexpected state ' + yoroiTransfer.status);
     }
   }
 
