@@ -1,46 +1,57 @@
 // @flow
 
+/*::
+type Icons = {
+  '16': string,
+  '48': string,
+  '128': string,
+};
+*/
+
 export default ({
   description,
   defaultTitle,
   contentSecurityPolicy,
   versionName,
-  extensionKey
+  extensionKey,
+  iconOverride,
+  versionOverride,
 } /*: {
   description: string,
   defaultTitle: string,
   contentSecurityPolicy: string,
   versionName?: string,
   extensionKey?: string,
+  iconOverride?: Icons,
+  versionOverride?: string,
 } */
 ) => { // eslint-disable-line function-paren-newline
+  const icons = iconOverride == null
+    ? {
+      /* eslint-disable quote-props */
+      '16': 'img/icon-16.png',
+      '48': 'img/icon-48.png',
+      '128': 'img/icon-128.png',
+      /* eslint-enable quote-props */
+    }
+    : iconOverride;
   const base = {
-    version: '1.10.0',
+    version: versionOverride == null
+      ? '1.10.0'
+      : versionOverride,
     name: 'yoroi',
     manifest_version: 2,
     description,
     browser_action: {
       default_title: defaultTitle,
-      default_icon: {
-        /* eslint-disable quote-props */
-        '16': 'img/icon-16.png',
-        '48': 'img/icon-48.png',
-        '128': 'img/icon-128.png',
-        /* eslint-enable quote-props */
-      },
+      default_icon: icons,
     },
     browser_specific_settings: {
       gecko: {
         id: '{530f7c6c-6077-4703-8f71-cb368c663e35}',
       },
     },
-    icons: {
-      /* eslint-disable quote-props */
-      '16': 'img/icon-16.png',
-      '48': 'img/icon-48.png',
-      '128': 'img/icon-128.png',
-      /* eslint-enable quote-props */
-    },
+    icons,
     background: {
       page: 'background.html',
     },

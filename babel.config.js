@@ -1,3 +1,5 @@
+// @flow
+
 module.exports = function (api) {
   // when running jest we need to use nodejs and not browser configurations
   const nodePlugins = api.env('jest')
