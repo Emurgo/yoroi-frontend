@@ -26,23 +26,23 @@ const protocolMagic = CONFIG.network.protocolMagic;
 
 type Props = {|
   ...InjectedDialogContainerProps,
-  mode: "regular" | "paper",
-  introMessage?: string,
-  onBack: void => void,
+  +mode: "regular" | "paper",
+  +introMessage?: string,
+  +onBack: void => void,
 |};
 
 const NUMBER_OF_VERIFIED_ADDRESSES = 1;
 const NUMBER_OF_VERIFIED_ADDRESSES_PAPER = 5;
 
-type WalletRestoreDialogContainerState = {
-  +verifyRestore?: {|
+type WalletRestoreDialogContainerState = {|
+  verifyRestore?: {|
     addresses: Array<string>,
     accountPlate: WalletAccountNumberPlate,
   |},
-  +submitValues?: WalletRestoreDialogValues,
-  +resolvedRecoveryPhrase?: string,
-  +notificationElementId: string,
-}
+  submitValues?: WalletRestoreDialogValues,
+  resolvedRecoveryPhrase?: string,
+  notificationElementId: string,
+|}
 
 @observer
 export default class WalletRestoreDialogContainer
@@ -165,7 +165,7 @@ export default class WalletRestoreDialogContainer
               });
             }
           }}
-          getNotification={uiNotifications.getTooltipActiveNotification(
+          notification={uiNotifications.getTooltipActiveNotification(
             this.state.notificationElementId
           )}
           isSubmitting={isSubmitting}

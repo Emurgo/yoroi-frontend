@@ -19,6 +19,7 @@ import ExplorableHashContainer from '../../containers/widgets/ExplorableHashCont
 import type { ExplorerType } from '../../domain/Explorer';
 import type { StandardAddress } from '../../stores/base/AddressesStore';
 import environment from '../../environment';
+import type { Notification } from '../../types/notificationType';
 
 const messages = defineMessages({
   walletAddressLabel: {
@@ -65,8 +66,8 @@ type Props = {|
   +isWalletAddressUsed: boolean,
   +walletAddresses: Array<StandardAddress>,
   +onGenerateAddress: Function,
-  +onCopyAddressTooltip: Function,
-  +getNotification: Function,
+  +onCopyAddressTooltip: (string, string) => void,
+  +notification: ?Notification,
   +onVerifyAddress: Function,
   +onGeneratePaymentURI: Function,
   +isSubmitting: boolean,
@@ -106,7 +107,7 @@ export default class WalletReceive extends Component<Props, State> {
       walletAddress, walletAddresses,
       onVerifyAddress, onGeneratePaymentURI,
       isSubmitting, error, isWalletAddressUsed,
-      onCopyAddressTooltip, getNotification,
+      onCopyAddressTooltip, notification,
     } = this.props;
     const { intl } = this.context;
     const { showUsed } = this.state;
@@ -148,10 +149,8 @@ export default class WalletReceive extends Component<Props, State> {
             <CopyableAddress
               hash={walletAddress}
               elementId={mainAddressNotificationId}
-              onCopyAddress={
-                onCopyAddressTooltip.bind(this, walletAddress, mainAddressNotificationId)
-              }
-              getNotification={getNotification}
+              onCopyAddress={() => onCopyAddressTooltip(walletAddress, mainAddressNotificationId)}
+              notification={notification}
             >
               <ExplorableHashContainer
                 selectedExplorer={this.props.selectedExplorer}
@@ -206,9 +205,9 @@ export default class WalletReceive extends Component<Props, State> {
                   hash={address.address}
                   elementId={notificationElementId}
                   onCopyAddress={
-                    onCopyAddressTooltip.bind(this, address.address, notificationElementId)
+                    () => onCopyAddressTooltip(address.address, notificationElementId)
                   }
-                  getNotification={getNotification}
+                  notification={notification}
                 >
                   <ExplorableHashContainer
                     selectedExplorer={this.props.selectedExplorer}
