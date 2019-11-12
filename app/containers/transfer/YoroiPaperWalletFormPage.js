@@ -8,7 +8,6 @@ import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import MnemonicInput from '../../components/widgets/forms/MnemonicInput';
 import PaperPasswordInput from '../../components/widgets/forms/PaperPasswordInput';
 import BaseTransferPage from '../../components/transfer/BaseTransferPage';
-import globalMessages from '../../i18n/global-messages';
 
 const messages = defineMessages({
   step0: {

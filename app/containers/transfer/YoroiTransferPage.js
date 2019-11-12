@@ -18,9 +18,6 @@ import { ROUTES } from '../../routes-config';
 import config from '../../config';
 import { formattedWalletAmount } from '../../utils/formatters';
 import { TransferStatus } from '../../types/TransferTypes';
-import {
-  isValidWalletPassword,
-} from '../../utils/validations';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
@@ -228,7 +225,7 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
           </TransferLayout>
         );
       default:
-        return null; // TODO: throw error? Shouldn't happen
+        throw new Error('YoroiTransferPage Unexpected state ' + yoroiTransfer.status);
     }
   }
 

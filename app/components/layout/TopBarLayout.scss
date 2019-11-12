@@ -44,7 +44,7 @@
   (min-width: 1100px) and (min-height: 820px),
   (min-width: 1160px)
 {
-  :global(.YoroiModern):global(.YoroiShelley) .component {
+  :global(.YoroiModern):global(.YoroiShelley) .languageSelectionBackground {
     background-image: url(../../assets/images/select-language-shelley.svg);
     background-size: auto;
     background-repeat: no-repeat;
@@ -52,7 +52,7 @@
     background-position-x: right;
   }
 }
-:global(.YoroiModern):not(:global(.YoroiShelley)) .component {
+:global(.YoroiModern):not(:global(.YoroiShelley)) .languageSelectionBackground {
   background-image: url(../../assets/images/select-language.svg);
   background-size: cover;
   background-position-y: bottom;

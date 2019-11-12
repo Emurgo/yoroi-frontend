@@ -1,3 +1,5 @@
+// @flow
+
 /* eslint-disable camelcase */
 
 /**

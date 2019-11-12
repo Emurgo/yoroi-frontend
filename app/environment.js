@@ -32,7 +32,10 @@ export const environment = ((
     isJest: () => process.env.NODE_ENV === 'jest' || process.env.NODE_ENV === 'test',
     branch: process.env.BRANCH || '',
     isDev: () => CONFIG.network.name === NetworkType.DEVELOPMENT,
-    isShelley: () => CONFIG.network.name === NetworkType.SHELLEY_DEV,
+    isShelley: () => {
+      return CONFIG.network.name === NetworkType.SHELLEY_DEV ||
+        CONFIG.network.name === NetworkType.SHELLEY_TESTNET;
+    },
     isTest: () => CONFIG.network.name === NetworkType.TEST,
     isMainnet: () => environment.NETWORK === NetworkType.MAINNET,
     isAdaApi: () => environment.API === 'ada',

@@ -14,7 +14,7 @@ import type {
 } from '../../../config/config-types';
 import {
   createStandardBip44Wallet, createHardwareWallet,
-} from './lib/storage/bridge/walletHelper';
+} from './lib/storage/bridge/walletBuilder/byron';
 import {
   getAllUtxoTransactions,
   getPendingUtxoTransactions,

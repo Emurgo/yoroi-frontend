@@ -97,7 +97,6 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     const wallets = this._getWalletsStore();
     const daedalusTransfer = this._getDaedalusTransferStore();
 
-    console.log(daedalusTransfer.status);
     switch (daedalusTransfer.status) {
       case TransferStatus.UNINITIALIZED:
         return (
@@ -190,7 +189,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
           </TransferLayout>
         );
       default:
-        return null; // TODO: throw error? Shouldn't happen
+        throw new Error('DaedalusTransferPage Unexpected state ' + daedalusTransfer.status);
     }
   }
 

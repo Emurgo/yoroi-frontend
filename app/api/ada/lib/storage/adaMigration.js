@@ -22,7 +22,7 @@ import {
 import {
   OPEN_TAB_ID_KEY,
 } from '../../../../utils/tabManager';
-import { migrateFromStorageV1 } from './bridge/walletHelper';
+import { migrateFromStorageV1 } from './bridge/walletBuilder/byron';
 import { RustModule } from '../cardanoCrypto/rustLoader';
 import type { ConfigType } from '../../../../../config/config-types';
 
