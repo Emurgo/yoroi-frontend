@@ -15,7 +15,7 @@ const messages = defineMessages({
   },
   detail1: {
     id: 'profile.languageSelect.detail1',
-    defaultMessage: '!!!This is an indepdendent extension',
+    defaultMessage: '!!!This is an independent extension',
   },
   detail2: {
     id: 'profile.languageSelect.detail2',
