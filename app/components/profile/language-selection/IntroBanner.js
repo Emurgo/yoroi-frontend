@@ -11,15 +11,15 @@ type Props = {||};
 const messages = defineMessages({
   title: {
     id: 'profile.languageSelect.intro',
-    defaultMessage: '!!!You are on the Yoroi Testnet',
+    defaultMessage: '!!!You are on the Yoroi Shelley Testnet',
   },
   detail1: {
     id: 'profile.languageSelect.detail1',
-    defaultMessage: '!!!This is an independent extension',
+    defaultMessage: '!!!Currently, this version allows you to verify that',
   },
   detail2: {
     id: 'profile.languageSelect.detail2',
-    defaultMessage: '!!!changes here do not affect your funds on the mainnet',
+    defaultMessage: '!!!your balance was correctly taken into consideration during the first snapshot.',
   },
 });
 
