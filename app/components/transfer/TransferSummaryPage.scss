@@ -13,12 +13,35 @@
   margin: 0;
 }
 
+.recoveryTitle {
+  font-family: var(--font-regular);
+  font-size: 30px;
+  line-height: 1.36;
+  letter-spacing: 0.5px;
+  color: var(--theme-bordered-box-text-color);
+  margin-bottom: 20px;
+}
+
 .body {
   color: var(--theme-bordered-box-text-color);
   font-family: var(--font-regular);
   font-size: 14px;
   line-height: 19px;
-  
+
+  .attentionTitle {
+    font-size: 18px;
+    font-family: var(--font-semibold);
+    line-height: 1.38;
+    margin-bottom: 16px;
+  }
+
+  .attentionDescription {
+    font-size: 14px;
+    line-height: 22px;
+    margin-bottom: 12px;
+    word-break: break-word;
+  }
+
   .currencySymbol {
     font-family: var(--font-light);
     text-transform: uppercase;
