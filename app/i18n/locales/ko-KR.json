@@ -101,7 +101,7 @@
   "loading.screen.error": "도움을 받으시려면 {supportRequestLink} 를 참고하세요.",
   "loading.screen.loading": "구성 요소 로드 중",
   "networkError.label.message": "경고: 서버와의 연결에 실패했습니다. <br> 당신의 인터넷 연결 상태 또는  <a target='blank' href='https://twitter.com/YoroiWallet'> 저희의 트위터 계정 </a>을 참고해주세요.. <br> 현재 표시되어있는 잔액이나 거래 내역은 서버 연결이 성공할 때 까지는 정확하지 않을 수도 있지만, 실제 잔액에는 영향을 끼치지 않습니다.",
-  "profile.languageSelect.detail1": "This is an indepdendent extension",
+  "profile.languageSelect.detail1": "This is an independent extension",
   "profile.languageSelect.detail2": "changes here do not affect your funds on the mainnet",
   "profile.languageSelect.form.languageSelectLabel": "언어 선택",
   "profile.languageSelect.form.submitLabel": "계속",
