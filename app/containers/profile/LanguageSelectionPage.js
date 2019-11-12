@@ -71,6 +71,7 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
     return (
       <TopBarLayout
         topbar={topBar}
+        languageSelectionBackground
         banner={displayedBanner}
       >
         <LanguageSelectionForm
@@ -104,6 +105,7 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
     return (
       <TopBarLayout
         topbar={topBar}
+        languageSelectionBackground
         banner={displayedBanner}
       >
         <IntroBanner />

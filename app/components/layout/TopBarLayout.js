@@ -10,6 +10,7 @@ type Props = {|
   +topbar?: Node,
   +children?: ?Node,
   +notification?: ?Node,
+  +languageSelectionBackground?: boolean,
 |};
 
 /** Adds a top bar above the wrapped node */
@@ -20,6 +21,7 @@ export default class TopBarLayout extends Component<Props> {
     topbar: undefined,
     children: undefined,
     notification: undefined,
+    languageSelectionBackground: false,
   };
 
   render() {
@@ -31,6 +33,9 @@ export default class TopBarLayout extends Component<Props> {
     } = this.props;
     const componentClasses = classnames([
       styles.component,
+      this.props.languageSelectionBackground === true
+        ? styles.languageSelectionBackground
+        : '',
     ]);
 
     return (
