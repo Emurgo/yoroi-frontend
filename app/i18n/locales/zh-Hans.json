@@ -101,7 +101,7 @@
   "loading.screen.error": "获取更多帮助，您可以 {supportRequestLink}",
   "loading.screen.loading": "正在加载组件",
   "networkError.label.message": "警告：与服务器的连接失败。<br>请检查您的互联网连接或<a target='blank' href='https://twitter.com/YoroiWallet'>我们的Twitter帐户</a>。<br> 在我们的服务器恢复正常之前，显示的余额和交易记录可能不正确，但您的实际余额不受影响。",
-  "profile.languageSelect.detail1": "This is an indepdendent extension",
+  "profile.languageSelect.detail1": "This is an independent extension",
   "profile.languageSelect.detail2": "changes here do not affect your funds on the mainnet",
   "profile.languageSelect.form.languageSelectLabel": "请选择您的语言",
   "profile.languageSelect.form.submitLabel": "继续",
