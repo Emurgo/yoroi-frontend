@@ -3,12 +3,11 @@ import React, { Component } from 'react';
 import type { Element } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
-import SvgInline from 'react-svg-inline';
 
-import iconTickSVG from '../../assets/images/widget/tick.inline.svg';
-import iconTickGreenSVG from '../../assets/images/widget/tick-green.inline.svg';
-import iconCrossSVG from '../../assets/images/widget/cross.inline.svg';
-import iconCrossGreenSVG from '../../assets/images/widget/cross-green.inline.svg';
+import IconTickSVG from '../../assets/images/widget/tick.inline.svg';
+import IconTickGreenSVG from '../../assets/images/widget/tick-green.inline.svg';
+import IconCrossSVG from '../../assets/images/widget/cross.inline.svg';
+import IconCrossGreenSVG from '../../assets/images/widget/cross-green.inline.svg';
 import styles from './ProgressSteps.scss';
 
 // TODO: move to type folder?
@@ -66,13 +65,19 @@ export default class ProgressSteps extends Component<Props> {
         ]);
       }
 
+      const DoneIcon = classicTheme
+        ? IconTickSVG
+        : IconTickGreenSVG;
+      const ErrorIcon = classicTheme
+        ? IconCrossSVG
+        : IconCrossGreenSVG;
       steps.push(
         <div key={idx} className={styles.stepBlock}>
           <div className={stepTopBarStyle} />
           <div className={styles.stepBottomBlock}>
             <div className={styles.stepStateIconContainer}>
-              {(displayIcon === 'done') && <SvgInline svg={classicTheme ? iconTickSVG : iconTickGreenSVG} />}
-              {(displayIcon === 'error') && <SvgInline svg={classicTheme ? iconCrossSVG : iconCrossGreenSVG} />}
+              {(displayIcon === 'done') && <DoneIcon />}
+              {(displayIcon === 'error') && <ErrorIcon />}
             </div>
             <div className={styles.stepTextContainer}>
               <span className={stepTextStyle}>{stepText}</span>

@@ -3,10 +3,9 @@ import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import type { Node } from 'react';
-import SvgInline from 'react-svg-inline';
 import CopyToClipboard from 'react-copy-to-clipboard';
-import iconCopy from '../../assets/images/copy.inline.svg';
-import iconCopied from '../../assets/images/copied.inline.svg';
+import IconCopy from '../../assets/images/copy.inline.svg';
+import IconCopied from '../../assets/images/copied.inline.svg';
 import styles from './CopyableAddress.scss';
 import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
 import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
@@ -46,6 +45,9 @@ export default class CopyableAddress extends Component<Props> {
     const { hash, elementId, onCopyAddress, notification } = this.props;
     const { intl } = this.context;
 
+    const Icon = notification && notification.id === elementId
+      ? IconCopied
+      : IconCopy;
     const tooltipComponent = (
       <Tooltip
         className={styles.SimpleTooltip}
@@ -57,10 +59,8 @@ export default class CopyableAddress extends Component<Props> {
           : intl.formatMessage(messages.copyTooltipMessage)
         }
       >
-        <SvgInline
-          svg={notification && notification.id === elementId ? iconCopied : iconCopy}
-          className={styles.copyIconBig}
-        />
+
+        <span className={styles.copyIconBig}><Icon /></span>
       </Tooltip>
     );
 

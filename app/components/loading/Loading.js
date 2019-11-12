@@ -1,14 +1,13 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import SvgInline from 'react-svg-inline';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 import LoadingSpinner from '../widgets/LoadingSpinner';
-import adaLogo from '../../assets/images/ada-logo.inline.svg';
-import cardanoLogo from '../../assets/images/cardano-logo.inline.svg';
-import yoroiLogo from '../../assets/images/yoroi-logo-shape-white.inline.svg';
+import AdaLogo from '../../assets/images/ada-logo.inline.svg';
+import CardanoLogo from '../../assets/images/cardano-logo.inline.svg';
+import YoroiLogo from '../../assets/images/yoroi-logo-shape-white.inline.svg';
 import styles from './Loading.scss';
 import LocalizableError from '../../i18n/LocalizableError';
 import globalMessages from '../../i18n/global-messages';
@@ -65,16 +64,12 @@ export default class Loading extends Component<Props> {
       styles[`${api}-apiLogo`],
     ]);
 
-    const yoroiLoadingLogo = yoroiLogo;
-    const currencyLoadingLogo = adaLogo;
-    const apiLoadingLogo = cardanoLogo;
-
     return (
       <div className={componentStyles}>
         <div className={styles.logos}>
-          <SvgInline svg={currencyLoadingLogo} className={currencyLogoStyles} />
-          <SvgInline svg={yoroiLoadingLogo} className={yoroiLogoStyles} />
-          <SvgInline svg={apiLoadingLogo} className={apiLogoStyles} />
+          <span className={currencyLogoStyles}><AdaLogo /></span>
+          <span className={yoroiLogoStyles}><YoroiLogo /></span>
+          <span className={apiLogoStyles}><CardanoLogo /></span>
         </div>
         {hasLoadedCurrentLocale && (
           <div>

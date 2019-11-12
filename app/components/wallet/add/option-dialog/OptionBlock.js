@@ -3,10 +3,9 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import classnames from 'classnames';
-import SvgInline from 'react-svg-inline';
 
 import globalMessages from '../../../../i18n/global-messages';
-import arrowDownSVG from '../../../../assets/images/expand-arrow-grey.inline.svg';
+import ArrowDownSVG from '../../../../assets/images/expand-arrow-grey.inline.svg';
 import styles from './OptionBlock.scss';
 
 type Props = {|
@@ -86,12 +85,9 @@ export default class OptionBlock extends Component<Props, State> {
                   onClick={this.toggleLearnMore.bind(this)}
                 >
                   {intl.formatMessage(globalMessages.learnMore)}
-                  <SvgInline
-                    svg={arrowDownSVG}
-                    width="20px"
-                    height="20px"
-                    className={styles.learnMoreButtonIcon}
-                  />
+                  <span className={styles.learnMoreButtonIcon}>
+                    <ArrowDownSVG width="20px" height="20px" />
+                  </span>
                 </button>
               </div>)
             : null

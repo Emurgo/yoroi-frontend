@@ -1,11 +1,10 @@
 // @flow
 import React, { Component } from 'react';
 import classNames from 'classnames';
-import SvgInline from 'react-svg-inline';
-import expendIcon from '../../../assets/images/transaction/send-ic.inline.svg';
-import incomeIcon from '../../../assets/images/transaction/receive-ic.inline.svg';
-import exchangeIcon from '../../../assets/images/exchange-ic.inline.svg';
-import failedIcon from '../../../assets/images/transaction/deny-ic.inline.svg';
+import ExpendIcon from '../../../assets/images/transaction/send-ic.inline.svg';
+import IncomeIcon from '../../../assets/images/transaction/receive-ic.inline.svg';
+import ExchangeIcon from '../../../assets/images/exchange-ic.inline.svg';
+import FailedIcon from '../../../assets/images/transaction/deny-ic.inline.svg';
 import styles from './TransactionTypeIcon.scss';
 
 type Props = {|
@@ -22,28 +21,28 @@ export default class TransactionTypeIcon extends Component<Props> {
       styles[iconType],
     ]);
 
-    let icon;
+    let Icon;
     switch (iconType) {
       case 'expend':
-        icon = expendIcon;
+        Icon = ExpendIcon;
         break;
       case 'income':
-        icon = incomeIcon;
+        Icon = IncomeIcon;
         break;
       case 'exchange':
-        icon = exchangeIcon;
+        Icon = ExchangeIcon;
         break;
       case 'failed':
-        icon = failedIcon;
+        Icon = FailedIcon;
         break;
       default:
-        icon = '';
+        Icon = '';
         break;
     }
 
     return (
       <div className={transactionTypeIconClasses}>
-        <SvgInline svg={icon} className={styles.transactionTypeIcon} />
+        <span className={styles.transactionTypeIcon}><Icon /></span>
       </div>
     );
   }

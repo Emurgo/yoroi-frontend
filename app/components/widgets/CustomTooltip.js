@@ -4,11 +4,10 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import type { MessageDescriptor } from 'react-intl';
 import { intlShape, FormattedHTMLMessage } from 'react-intl';
-import SvgInline from 'react-svg-inline';
 import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
 import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
 
-import infoIcon from '../../assets/images/info-icon.inline.svg';
+import InfoIcon from '../../assets/images/info-icon.inline.svg';
 import styles from './CustomTooltip.scss';
 
 type Props = {|
@@ -41,12 +40,9 @@ export default class CustomTooltip extends Component<Props> {
 
   makeDefaultChild = (): Node => {
     return (
-      <SvgInline
-        svg={infoIcon}
-        width="14"
-        height="14"
-        className={styles.infoIcon}
-      />
+      <span className={styles.infoIcon}>
+        <InfoIcon width="14" height="14" />
+      </span>
     );
   }
 }

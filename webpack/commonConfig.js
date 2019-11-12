@@ -114,7 +114,16 @@ const rules = [
   {
     test: /\.inline\.svg$/,
     issuer: /\.js$/,
-    loader: 'svg-inline-loader?removeSVGTagAttrs=false&removeTags=true&removingTags[]=title&removingTags[]=desc&idPrefix=[sha512:hash:hex:5]-',
+    use: [{
+      loader: '@svgr/webpack',
+      options: {
+        svgoConfig: {
+          plugins: {
+            removeViewBox: false
+          }
+        }
+      }
+    }]
   },
   {
     test: /\.md$/,

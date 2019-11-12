@@ -3,13 +3,12 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import classnames from 'classnames';
-import SvgInline from 'react-svg-inline';
 
 import CustomTooltip from '../widgets/CustomTooltip';
-import logoYoroiIcon from '../../assets/images/yoroi-logo-white.inline.svg';
-import logoYoroiShelleyTestnetIcon from '../../assets/images/yoroi-logo-shelley-testnet-white.inline.svg';
-import settingsIcon from '../../assets/images/top-bar/setting-active.inline.svg';
-import daedalusIcon from '../../assets/images/top-bar/daedalus-migration.inline.svg';
+import LogoYoroiIcon from '../../assets/images/yoroi-logo-white.inline.svg';
+import LogoYoroiShelleyTestnetIcon from '../../assets/images/yoroi-logo-shelley-testnet-white.inline.svg';
+import SettingsIcon from '../../assets/images/top-bar/setting-active.inline.svg';
+import DaedalusIcon from '../../assets/images/top-bar/daedalus-migration.inline.svg';
 
 import styles from './WalletAdd.scss';
 
@@ -88,7 +87,7 @@ export default class WalletAdd extends Component<Props> {
       environmnent.isShelley() ? styles.shelleyTestnet : null
     ]);
 
-    const logoIcon = environmnent.isShelley() ? logoYoroiShelleyTestnetIcon : logoYoroiIcon;
+    const LogoIcon = environmnent.isShelley() ? LogoYoroiShelleyTestnetIcon : LogoYoroiIcon;
 
     return (
       <div className={componentStyle}>
@@ -96,14 +95,14 @@ export default class WalletAdd extends Component<Props> {
         <div className={styles.hero}>
           <div className={styles.settingsBar}>
             <button type="button" onClick={onSettings} className={styles.settingsBarLink}>
-              <SvgInline svg={settingsIcon} width="30" height="30" />
+              <SettingsIcon width="30" height="30" />
             </button>
           </div>
 
           <div className={styles.heroInner}>
             {/* Left block  */}
             <div className={styles.heroLeft}>
-              <SvgInline svg={logoIcon} className={styles.heroLogo} width="156" height="50" />
+              <span className={styles.heroLogo}><LogoIcon width="156" height="50" /></span>
               <h2 className={styles.heroTitle}>
                 <FormattedHTMLMessage {...(messages.title)} />
               </h2>
@@ -165,12 +164,9 @@ export default class WalletAdd extends Component<Props> {
                 onClick={onDaedalusTransfer}
                 className={classnames([styles.heroCardsItem, styles.heroCardsItemLink])}
               >
-                <SvgInline
-                  svg={daedalusIcon}
-                  width="45"
-                  height="40"
-                  className={styles.heroCardsItemLinkIcon}
-                />
+                <span className={styles.heroCardsItemLinkIcon}>
+                  <DaedalusIcon width="45" height="40" />
+                </span>
                 <div className={styles.heroCardsItemTitle}>
                   {intl.formatMessage(messages.transferFundsTitle)}
                   <CustomTooltip toolTip={messages.transferFundsTooltip} />

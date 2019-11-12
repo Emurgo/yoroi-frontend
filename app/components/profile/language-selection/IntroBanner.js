@@ -2,9 +2,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import styles from './IntroBanner.scss';
-import SvgInline from 'react-svg-inline';
 import { defineMessages, intlShape, } from 'react-intl';
-import testnetLogo from '../../../assets/images/yoroi-logotestnet-gradient.inline.svg';
+import TestnetLogo from '../../../assets/images/yoroi-logotestnet-gradient.inline.svg';
 
 type Props = {||};
 
@@ -34,7 +33,7 @@ export default class IntroBanner extends Component<Props> {
     const { intl } = this.context;
     return (
       <div className={styles.component}>
-        <SvgInline svg={testnetLogo} className={styles.banner} />
+        <span className={styles.banner}><TestnetLogo /></span>
         <div className={styles.mainTitle}>
           {intl.formatMessage(messages.title)}
         </div>

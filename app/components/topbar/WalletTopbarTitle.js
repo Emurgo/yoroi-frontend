@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
-import SvgInline from 'react-svg-inline';
 import classNames from 'classnames';
 import styles from './WalletTopbarTitle.scss';
 import { matchRoute } from '../../utils/routing';
@@ -10,8 +9,8 @@ import { ROUTES } from '../../routes-config';
 import WalletAccountIcon from './WalletAccountIcon';
 
 import { defineMessages, intlShape } from 'react-intl';
-import hideBalanceIcon from '../../assets/images/top-bar/password.hide.inline.svg';
-import showBalanceIcon from '../../assets/images/top-bar/password.show.inline.svg';
+import HideBalanceIcon from '../../assets/images/top-bar/password.hide.inline.svg';
+import ShowBalanceIcon from '../../assets/images/top-bar/password.show.inline.svg';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import type { WalletAccountNumberPlate } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
@@ -110,10 +109,12 @@ export default class WalletTopbarTitle extends Component<Props> {
                 onClick={onUpdateHideBalance}
                 className={classNames([styles.hideBalanceButton, 'hideBalanceButton'])}
               >
-                <SvgInline
-                  svg={shouldHideBalance ? showBalanceIcon : hideBalanceIcon}
-                  className={styles.showHideBalanceIcon}
-                />
+                <span className={styles.showHideBalanceIcon}>
+                  {shouldHideBalance
+                    ? <ShowBalanceIcon />
+                    : <HideBalanceIcon />
+                  }
+                </span>
               </button>
             </div>
           </div>
