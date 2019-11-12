@@ -101,7 +101,7 @@
   "loading.screen.error": "Untuk bantuan lebih lanjut, Anda bisa {supportRequestLink}",
   "loading.screen.loading": "Memuat komponen",
   "networkError.label.message": "PERINGATAN: Koneksi ke server gagal.<br>Harap periksa koneksi internet Anda atau <a target='blank' href='https://twitter.com/YoroiWallet'>akun Twitter kami</a>.<br>Saldo yang ditampilkan dan riwayat transaksi mungkin akan terlihat salah sampai server kami kembali normal, tetapi sebenarnya tidak mempengaruhi saldo Anda.",
-  "profile.languageSelect.detail1": "This is an indepdendent extension",
+  "profile.languageSelect.detail1": "This is an independent extension",
   "profile.languageSelect.detail2": "changes here do not affect your funds on the mainnet",
   "profile.languageSelect.form.languageSelectLabel": "Pilih Bahasa Anda",
   "profile.languageSelect.form.submitLabel": "Lanjutkan",
