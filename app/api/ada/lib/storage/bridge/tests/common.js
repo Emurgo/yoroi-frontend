@@ -9,7 +9,7 @@ import {
 } from '../../models/PublicDeriver/index';
 import {
   createStandardBip44Wallet,
-} from '../walletHelper';
+} from '../walletBuilder/byron';
 import {
   HARD_DERIVATION_START,
 } from '../../../../../../config/numbersConfig';

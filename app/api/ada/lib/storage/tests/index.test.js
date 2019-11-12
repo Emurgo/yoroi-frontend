@@ -43,7 +43,7 @@ import {
 
 import {
   createStandardBip44Wallet,
-} from '../bridge/walletHelper';
+} from '../bridge/walletBuilder/byron';
 
 import type { ConfigType } from '../../../../../../config/config-types';
 

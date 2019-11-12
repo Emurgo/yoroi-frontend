@@ -10,6 +10,7 @@ export const MAX_ADA_WALLETS_COUNT = 1;
 export const HARD_DERIVATION_START = 0x80000000;
 export const CARDANO_COINTYPE = HARD_DERIVATION_START + 1815;
 export const BIP44_PURPOSE = HARD_DERIVATION_START + 44;
+export const CIP_1852_PURPOSE = HARD_DERIVATION_START + 1852;
 
 /** Defined by bip44
    * https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#address-gap-limit */
