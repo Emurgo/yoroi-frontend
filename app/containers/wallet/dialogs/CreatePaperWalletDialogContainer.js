@@ -140,7 +140,7 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
                 });
               }
             }}
-            getNotification={uiNotifications.getTooltipActiveNotification(
+            notification={uiNotifications.getTooltipActiveNotification(
               this.state.notificationElementId
             )}
           />

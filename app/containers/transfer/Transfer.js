@@ -37,7 +37,7 @@ export default class Transfer extends Component<InjectedContainerProps> {
 
   render() {
     const { actions, stores } = this.props;
-    const { profile, topbar } = stores;
+    const { topbar } = stores;
     const topbarContainer = (<TopBarContainer actions={actions} stores={stores} />);
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
 
@@ -62,7 +62,6 @@ export default class Transfer extends Component<InjectedContainerProps> {
         topbar={topbarElement}
         actions={actions}
         stores={stores}
-        classicTheme={profile.isClassicTheme}
         connectionErrorType={checkAdaServerStatus}
       >
         <TransferWithNavigation

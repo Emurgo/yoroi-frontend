@@ -12,6 +12,9 @@ export default class YoroiTranferActions {
     recoveryPhrase: string,
     paperPassword: string,
   }> = new Action();
+  checkAddresses: Action<{|
+    publicDeriver: PublicDeriverWithCachedMeta,
+  |}> = new Action();
   backToUninitialized: Action<void> = new Action();
   transferFunds: Action<{
     next: Function,

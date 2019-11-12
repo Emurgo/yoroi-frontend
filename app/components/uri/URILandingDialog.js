@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
-import SVGInline from 'react-svg-inline';
+import SvgInline from 'react-svg-inline';
 
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
@@ -72,7 +72,7 @@ export default class URILandingDialog extends Component<Props> {
         onClose={onClose}
       >
         <div>
-          {!classicTheme && <SVGInline svg={performTxImg} className={styles.urlImage} />}
+          {!classicTheme && <SvgInline svg={performTxImg} className={styles.urlImage} />}
           <div className={styles.warningText}>
             {intl.formatMessage(messages.uriLandingDialogWarningLine1)}
             <ul>

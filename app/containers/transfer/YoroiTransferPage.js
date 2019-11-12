@@ -7,6 +7,7 @@ import type { InjectedProps } from '../../types/injectedPropsType';
 import TransferLayout from '../../components/transfer/TransferLayout';
 import YoroiTransferFormPage from './YoroiTransferFormPage';
 import YoroiPaperWalletFormPage from './YoroiPaperWalletFormPage';
+import YoroiPlatePage from './YoroiPlatePage';
 import YoroiTransferSummaryPage from './YoroiTransferSummaryPage';
 import YoroiTransferWaitingPage from './YoroiTransferWaitingPage';
 import YoroiTransferErrorPage from './YoroiTransferErrorPage';
@@ -67,6 +68,17 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
     const publicDeriver = walletsStore.selected;
     this._getYoroiTransferActions().setupTransferFundsWithPaperMnemonic.trigger({
       ...payload,
+    });
+  };
+
+  checkAddresses: void => void = () => {
+    const walletsStore = this._getWalletsStore();
+    const publicDeriver = walletsStore.selected;
+    if (publicDeriver == null) {
+      throw new Error('tranferFunds no wallet selected');
+    }
+    this._getYoroiTransferActions().checkAddresses.trigger({
+      publicDeriver,
     });
   };
 
@@ -153,6 +165,20 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
               mnemonicLength={config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT}
               passwordMatches={_password => true}
               includeLengthCheck={false}
+              classicTheme={profile.isClassicTheme}
+            />
+          </TransferLayout>
+        );
+      case TransferStatus.DISPLAY_CHECKSUM:
+        return (
+          <TransferLayout>
+            <YoroiPlatePage
+              stores={this.props.stores}
+              actions={this.props.actions}
+              onNext={this.checkAddresses}
+              onCancel={this.backToUninitialized}
+              recoveryPhrase={yoroiTransfer.recoveryPhrase}
+              selectedExplorer={this.props.stores.profile.selectedExplorer}
               classicTheme={profile.isClassicTheme}
             />
           </TransferLayout>

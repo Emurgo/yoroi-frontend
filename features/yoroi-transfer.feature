@@ -15,6 +15,8 @@ Feature: Transfer Yoroi Wallet funds
     | recoveryPhrase                                                                                           |
     | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow monster |
     And I proceed with the recovery
+    Then I should see a plate XJOD-1073
+    Then I click the next button
     Then I should see the Yoroi transfer error screen
   
   @it-111
@@ -29,6 +31,8 @@ Feature: Transfer Yoroi Wallet funds
     | recoveryPhrase                                                                                           |
     | dragon mango general very inmate idea rabbit pencil element bleak term cart critic kite pill |
     And I proceed with the recovery
+    Then I should see a plate EDAO-9229
+    Then I click the next button
     Then I should see on the Yoroi transfer summary screen:
     | fromAddress                                                 | amount           |   
     | Ae2tdPwUPEYx2dK1AMzRN1GqNd2eY7GCd7Z6aikMPJL3EkqqugoFQComQnV | 1234567898765    |
@@ -51,6 +55,8 @@ Feature: Transfer Yoroi Wallet funds
     | recoveryPhrase                                                                            |
     | final autumn bacon fold horse scissors act pole country focus task blush basket move view |
     And I proceed with the recovery
+    Then I should see a plate ZKTZ-4614
+    Then I click the next button
     Then I should see on the Yoroi transfer summary screen:
     | fromAddress                                                 | amount |   
     | Ae2tdPwUPEZLcUx5AGMACPyLAuVXHisVyNBuiSk3Ru7qddYyn9ujDp1Ejwr | 4      |
@@ -81,6 +87,8 @@ Feature: Transfer Yoroi Wallet funds
     | recoveryPhrase                                                                                           |
     | dragon mango general very inmate idea rabbit pencil element bleak term cart critic kite pill |
     And I proceed with the recovery
+    Then I should see a plate EDAO-9229
+    Then I click the next button
     Then I should see on the Yoroi transfer summary screen:
     | fromAddress                                                 | amount           |
     | Ae2tdPwUPEYx2dK1AMzRN1GqNd2eY7GCd7Z6aikMPJL3EkqqugoFQComQnV | 1234567898765    |
@@ -100,6 +108,8 @@ Feature: Transfer Yoroi Wallet funds
     | mushroom expose slogan wagon uphold train absurd fix snake unable rescue curious escape member resource garbage enemy champion airport matrix year |
     And I enter the paper wallet password "cool password"
     And I proceed with the recovery
+    Then I should see a plate KOTZ-1730
+    Then I click the next button
     Then I should see on the Yoroi transfer summary screen:
     | fromAddress                                                 | amount           |   
     | Ae2tdPwUPEZ7TQpzbJZCbA5BjW4zWYFn47jKo43ouvfe4EABoCfvEjwYvJr | 500000    |

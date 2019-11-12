@@ -85,7 +85,6 @@ export default class UriPromptPage extends Component<InjectedProps> {
 
   render() {
     const { stores } = this.props;
-    const { profile } = stores;
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
     const displayedBanner = checkAdaServerStatus === 'healthy' ?
       <TestnetWarningBanner /> :
@@ -100,7 +99,6 @@ export default class UriPromptPage extends Component<InjectedProps> {
     return (
       <TopBarLayout
         topbar={topbarElement}
-        classicTheme={profile.isClassicTheme}
         banner={displayedBanner}
       >
         {this._getContent()}
