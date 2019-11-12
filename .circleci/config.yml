@@ -226,6 +226,7 @@ workflows:
             branches:
               ignore:
                 - l10n_develop
+                - l10n_shelley
           requires:
             - build-setup
       - test-firefox:
@@ -233,6 +234,7 @@ workflows:
             branches:
               ignore:
                 - l10n_develop
+                - l10n_shelley
           requires:
             - build-setup
       - deploy-artifacts:
