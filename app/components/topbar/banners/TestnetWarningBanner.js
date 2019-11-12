@@ -56,7 +56,7 @@ export default class TestnetWarningBanner extends Component<Props> {
           <div className={styles.text}>
             <FormattedMessage
               {...messages.shelleyTestnetLabel}
-              values={{ network: environment.NETWORK }}
+              values={{ network: 'SHELLEY BALANCE CHECK' }}
               key="1"
             />
           </div>
