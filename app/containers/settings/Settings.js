@@ -64,7 +64,6 @@ export default class Settings extends Component<InjectedContainerProps> {
           />
         )}
         connectionErrorType={checkAdaServerStatus}
-        classicTheme={profile.isClassicTheme}
         actions={actions}
         stores={stores}
       >

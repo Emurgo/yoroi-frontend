@@ -11,7 +11,6 @@ import type { ServerStatusErrorType } from '../types/serverStatusErrorType';
 export type MainLayoutProps = {|
   ...InjectedContainerProps,
   topbar?: Node,
-  classicTheme: boolean,
   connectionErrorType: ServerStatusErrorType,
 |};
 
@@ -32,7 +31,6 @@ export default class MainLayout extends Component<MainLayoutProps> {
         banner={displayedBanner}
         topbar={this.props.topbar}
         notification={<div />}
-        classicTheme={this.props.classicTheme}
       >
         {this.props.children}
       </TopBarLayout>

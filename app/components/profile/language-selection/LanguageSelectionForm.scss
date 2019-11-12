@@ -59,16 +59,29 @@
   }  
 }
 
-:global(.YoroiModern) .component {
+:global(.YoroiModern):not(:global(.YoroiShelley)) .component {
   padding-top: 222px;
-
+  .languageSelect {
+    label {
+      top: -72px;
+    }
+  }
+}
+:global(.YoroiModern):global(.YoroiShelley) .component {
+  padding-top: 150px;
+  .languageSelect {
+    label {
+      top: -34px;
+    }
+  }
+}
+:global(.YoroiModern) .component {
   .languageSelect {
     margin-bottom: 10px;
   
     label {
       width: 100%;
       left: 0;
-      top: -72px;
       text-align: center;
       font-size: 16px;
       text-transform: uppercase;

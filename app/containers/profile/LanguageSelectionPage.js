@@ -11,6 +11,7 @@ import LanguageSelectionForm from '../../components/profile/language-selection/L
 import type { InjectedProps } from '../../types/injectedPropsType';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
+import IntroBanner from '../../components/profile/language-selection/IntroBanner';
 
 const messages = defineMessages({
   title: {
@@ -51,8 +52,7 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
     this.props.actions.profile.commitLocaleToStorage.trigger(values);
   };
 
-
-  render() {
+  renderByron() {
     const { setProfileLocaleRequest, currentLocale, LANGUAGE_OPTIONS } = this.props.stores.profile;
     const isSubmitting = setProfileLocaleRequest.isExecuting;
     const { stores } = this.props;
@@ -65,14 +65,12 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
       <TopBar
         title={topBartitle}
       />) : undefined;
-    const displayedBanner = checkAdaServerStatus === 'healthy' ?
-      <TestnetWarningBanner /> :
-      <ServerErrorBanner errorType={checkAdaServerStatus} />;
+    const displayedBanner = checkAdaServerStatus === 'healthy'
+      ? <TestnetWarningBanner />
+      : <ServerErrorBanner errorType={checkAdaServerStatus} />;
     return (
       <TopBarLayout
         topbar={topBar}
-        classicTheme={profile.isClassicTheme}
-        languageSelectionBackground
         banner={displayedBanner}
       >
         <LanguageSelectionForm
@@ -85,5 +83,46 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
         />
       </TopBarLayout>
     );
+  }
+
+  renderShelley() {
+    const { setProfileLocaleRequest, currentLocale, LANGUAGE_OPTIONS } = this.props.stores.profile;
+    const isSubmitting = setProfileLocaleRequest.isExecuting;
+    const { stores } = this.props;
+    const { profile } = stores;
+    const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
+    const topBartitle = (
+      <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
+    );
+    const topBar = profile.isClassicTheme ? (
+      <TopBar
+        title={topBartitle}
+      />) : undefined;
+    const displayedBanner = checkAdaServerStatus === 'healthy'
+      ? undefined
+      : <ServerErrorBanner errorType={checkAdaServerStatus} />;
+    return (
+      <TopBarLayout
+        topbar={topBar}
+        banner={displayedBanner}
+      >
+        <IntroBanner />
+        <LanguageSelectionForm
+          onSelectLanguage={this.onSelectLanguage}
+          onSubmit={this.onSubmit}
+          isSubmitting={isSubmitting}
+          currentLocale={currentLocale}
+          languages={LANGUAGE_OPTIONS}
+          error={setProfileLocaleRequest.error}
+        />
+      </TopBarLayout>
+    );
+  }
+
+  render() {
+    if (environment.isShelley()) {
+      return this.renderShelley();
+    }
+    return this.renderByron();
   }
 }
