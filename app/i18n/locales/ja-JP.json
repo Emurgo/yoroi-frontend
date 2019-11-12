@@ -235,7 +235,7 @@
   "wallet.add.optionDialog.restore.paperWallet.description": "通常印刷してオフラインで保管するものですが、ヨロイのペーパーウォレットをお持ちの方はこのオプションを選択してペーパーウォレットの残高をヨロイウォレットにインポートすることができます。",
   "wallet.add.optionDialog.restore.paperWallet.title": "ペーパーウォレット",
   "wallet.add.page.create.title": "ウォレットを作成する",
-  "wallet.add.page.create.tooltip": "Generate a new 15-word recovery phrase<br/>and create a Yoroi wallet.",
+  "wallet.add.page.create.tooltip": "新規に15単語からなる復元フレーズを生成し<br/>ヨロイウォレットを作成する",
   "wallet.add.page.daedalusTransfer.title": "ダイダロスウォレットからヨロイに資金を送金する",
   "wallet.add.page.daedalusTransfer.tooltip": "You can transfer funds from a Daedalus wallet<br/>to Yoroi, but first you will need to create<br/>a Yoroi wallet to store those funds.",
   "wallet.add.page.hw.title": "ハードウェアウォレットに接続",
