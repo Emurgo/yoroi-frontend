@@ -101,7 +101,7 @@
   "loading.screen.error": "For more help, you can {supportRequestLink}",
   "loading.screen.loading": "Loading components",
   "networkError.label.message": "WARNING: Connection to the server failed.<br>Please check your internet connection or <a target='blank' href='https://twitter.com/YoroiWallet'>our Twitter account</a>.<br>The displayed balance and transaction history may appear incorrect until our servers are back to normal, but your actual balance is not affected.",
-  "profile.languageSelect.detail1": "This is an indepdendent extension",
+  "profile.languageSelect.detail1": "This is an independent extension",
   "profile.languageSelect.detail2": "changes here do not affect your funds on the mainnet",
   "profile.languageSelect.form.languageSelectLabel": "Select your language",
   "profile.languageSelect.form.submitLabel": "Continue",
