@@ -14,6 +14,7 @@ import type { AdaPaper } from '../../../../api/ada';
 import WalletAccountIcon from '../../../topbar/WalletAccountIcon';
 import ExplorableHashContainer from '../../../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../../../domain/Explorer';
+import type { Notification } from '../../../../types/notificationType';
 
 const messages = defineMessages({
   dialogTitleFinalizePaper: {
@@ -43,8 +44,8 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +onCopyAddressTooltip: Function,
-  +getNotification: Function,
+  +onCopyAddressTooltip: (string, string) => void,
+  +notification: ?Notification,
   +selectedExplorer: ExplorerType,
   +paper: AdaPaper,
   +onNext: Function,
@@ -72,7 +73,7 @@ export default class FinalizeDialog extends Component<Props> {
       onBack,
       classicTheme,
       onCopyAddressTooltip,
-      getNotification,
+      notification,
     } = this.props;
 
     const dialogClasses = classnames(['finalizeDialog', styles.dialog]);
@@ -133,8 +134,8 @@ export default class FinalizeDialog extends Component<Props> {
               <CopyableAddress
                 hash={address}
                 elementId={notificationElementId}
-                onCopyAddress={onCopyAddressTooltip.bind(this, address, notificationElementId)}
-                getNotification={getNotification}
+                onCopyAddress={() => onCopyAddressTooltip(address, notificationElementId)}
+                notification={notification}
                 tooltipOpensUpward
                 key={address}
               >

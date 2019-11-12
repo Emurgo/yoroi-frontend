@@ -51,7 +51,7 @@ export default class YoroiTransferStore extends Store {
     = new Request(this.api.ada.restoreWalletForTransfer);
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
-  recoveryPhrase: string = '';
+  @observable recoveryPhrase: string = '';
 
   _errorWrapper = <PT, RT>(func: PT=>Promise<RT>): (PT => Promise<RT>) => (async (payload) => {
     try {
@@ -78,6 +78,9 @@ export default class YoroiTransferStore extends Store {
     );
     actions.setupTransferFundsWithPaperMnemonic.listen(
       this._errorWrapper(this._setupTransferFundsWithPaperMnemonic)
+    );
+    actions.checkAddresses.listen(
+      this._errorWrapper(this._checkAddresses)
     );
     actions.backToUninitialized.listen(this._backToUninitialized);
     actions.transferFunds.listen(this._errorWrapper(this._transferFunds));
@@ -196,10 +199,18 @@ export default class YoroiTransferStore extends Store {
     recoveryPhrase: string,
     publicDeriver: PublicDeriverWithCachedMeta,
   }): Promise<void> => {
+    runInAction(() => {
+      this.recoveryPhrase = payload.recoveryPhrase;
+    });
+    this._updateStatus(TransferStatus.DISPLAY_CHECKSUM);
+  }
+
+  _checkAddresses = async (payload: {
+    publicDeriver: PublicDeriverWithCachedMeta,
+  }): Promise<void> => {
     this._updateStatus(TransferStatus.CHECKING_ADDRESSES);
-    this.recoveryPhrase = payload.recoveryPhrase;
     const transferTx = await this._generateTransferTxFromMnemonic(
-      payload.recoveryPhrase,
+      this.recoveryPhrase,
       () => this._updateStatus(TransferStatus.GENERATING_TX),
       payload.publicDeriver
     );

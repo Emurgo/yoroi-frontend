@@ -111,7 +111,7 @@ export default class WalletReceivePage extends Component<Props, State> {
               });
             }
           }}
-          getNotification={uiNotifications.getTooltipActiveNotification(
+          notification={uiNotifications.getTooltipActiveNotification(
             this.state.notificationElementId
           )}
           onVerifyAddress={({ address, path }) => {
@@ -157,7 +157,7 @@ export default class WalletReceivePage extends Component<Props, State> {
                 });
               }
             }}
-            getNotification={uiNotifications.getTooltipActiveNotification(
+            notification={uiNotifications.getTooltipActiveNotification(
               this.state.notificationElementId
             )}
             classicTheme={profile.isClassicTheme}
