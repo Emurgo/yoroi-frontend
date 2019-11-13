@@ -197,7 +197,6 @@ export default class YoroiTransferStore extends Store {
   }
 
   _checkAddresses = async (payload: {
-    publicDeriver: PublicDeriverWithCachedMeta,
   }): Promise<void> => {
     this._updateStatus(TransferStatus.CHECKING_ADDRESSES);
     const transferTx = await this._generateTransferTxFromMnemonic(

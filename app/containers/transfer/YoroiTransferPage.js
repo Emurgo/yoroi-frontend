@@ -51,7 +51,6 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
   setupTransferFundsWithMnemonic = (payload: {|
     recoveryPhrase: string,
   |}) => {
-    const walletsStore = this._getWalletsStore();
     this._getYoroiTransferActions().setupTransferFundsWithMnemonic.trigger({
       ...payload,
     });
@@ -61,21 +60,13 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
     recoveryPhrase: string,
     paperPassword: string,
   |}) => {
-    const walletsStore = this._getWalletsStore();
-    const publicDeriver = walletsStore.selected;
     this._getYoroiTransferActions().setupTransferFundsWithPaperMnemonic.trigger({
       ...payload,
     });
   };
 
   checkAddresses: void => void = () => {
-    const walletsStore = this._getWalletsStore();
-    const publicDeriver = walletsStore.selected;
-    if (publicDeriver == null) {
-      throw new Error('tranferFunds no wallet selected');
-    }
     this._getYoroiTransferActions().checkAddresses.trigger({
-      publicDeriver,
     });
   };
 
