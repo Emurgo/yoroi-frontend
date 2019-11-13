@@ -9,7 +9,7 @@ import globalMessages from '../../i18n/global-messages';
 const messages = defineMessages({
   title: {
     id: 'yoroiTransfer.errorPage.title.label',
-    defaultMessage: '!!!Unable to verify your balance",
+    defaultMessage: '!!!Unable to verify your balance',
   },
 });
 
