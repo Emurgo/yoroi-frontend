@@ -52,8 +52,6 @@ export interface ICip1852Wallet {
   getWrapperId(): number;
   getPublicDeriverLevel(): number;
   getSigningLevel(): number | null;
-  getPrivateDeriverLevel(): number | null;
-  getPrivateDeriverKeyDerivationId(): number | null;
   getProtocolMagic(): number;
 }
 

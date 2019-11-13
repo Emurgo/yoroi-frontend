@@ -1,14 +1,13 @@
 // @flow
 import React, { Component } from 'react';
 import classnames from 'classnames';
-import SvgInline from 'react-svg-inline';
 import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './UriPromptForm.scss';
-import aboutUri from '../../../assets/images/uri/about-url.inline.svg';
-import aboutUriClassic from '../../../assets/images/uri/about-url-classic.inline.svg';
+import AboutUri from '../../../assets/images/uri/about-url.inline.svg';
+import AboutUriClassic from '../../../assets/images/uri/about-url-classic.inline.svg';
 import globalMessages from '../../../i18n/global-messages';
 
 const messages = defineMessages({
@@ -50,13 +49,12 @@ export default class UriPromptForm extends Component<Props> {
       <div className={styles.component}>
         <div className={styles.centeredBox}>
 
-          <SvgInline
-            svg={this.props.classicTheme
-              ? aboutUriClassic
-              : aboutUri
+          <span className={styles.aboutSvg}>
+            {this.props.classicTheme
+              ? <AboutUriClassic />
+              : <AboutUri />
             }
-            className={styles.aboutSvg}
-          />
+          </span>
 
           <div className={styles.explanation}>
             {intl.formatMessage(messages.explanationLine1)}&nbsp;

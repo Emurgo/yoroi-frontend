@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
-import SvgInline from 'react-svg-inline';
 
 import globalMessages from '../../../../i18n/global-messages';
 import LocalizableError from '../../../../i18n/LocalizableError';
@@ -16,10 +15,10 @@ import ProgressStepBlock from '../common/ProgressStepBlock';
 import HelpLinkBlock from './HelpLinkBlock';
 import HWErrorBlock from '../common/HWErrorBlock';
 
-import externalLinkSVG from '../../../../assets/images/link-external.inline.svg';
-import aboutPrerequisiteIconSVG from '../../../../assets/images/hardware-wallet/check-prerequisite-header-icon.inline.svg';
-import aboutPrerequisiteTrezorSVG from '../../../../assets/images/hardware-wallet/trezor/check.inline.svg';
-import aboutTrezorSvg from '../../../../assets/images/hardware-wallet/trezor/check-modern.inline.svg';
+import ExternalLinkSVG from '../../../../assets/images/link-external.inline.svg';
+import AboutPrerequisiteIconSVG from '../../../../assets/images/hardware-wallet/check-prerequisite-header-icon.inline.svg';
+import AboutPrerequisiteTrezorSVG from '../../../../assets/images/hardware-wallet/trezor/check.inline.svg';
+import AboutTrezorSvg from '../../../../assets/images/hardware-wallet/trezor/check-modern.inline.svg';
 
 import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 
@@ -84,11 +83,11 @@ export default class CheckDialog extends Component<Props> {
 
     const middleBlock = (
       <div className={classnames([styles.middleBlock, styles.component])}>
-        {!classicTheme && <SvgInline svg={aboutTrezorSvg} />}
+        {!classicTheme && <AboutTrezorSvg />}
 
         <div className={styles.prerequisiteBlock}>
           <div>
-            <SvgInline svg={aboutPrerequisiteIconSVG} />
+            <AboutPrerequisiteIconSVG />
             <span className={styles.prerequisiteHeaderText}>
               {intl.formatMessage(globalMessages.hwConnectDialogAboutPrerequisiteHeader)}
             </span>
@@ -100,7 +99,7 @@ export default class CheckDialog extends Component<Props> {
                 onClick={event => onExternalLinkClick(event)}
               >
                 {intl.formatMessage(messages.aboutPrerequisite1Part1Text) + ' '}
-                <SvgInline svg={externalLinkSVG} />
+                <ExternalLinkSVG />
               </a>
               {intl.formatMessage(messages.aboutPrerequisite1Part2)}
             </li>
@@ -113,7 +112,7 @@ export default class CheckDialog extends Component<Props> {
 
         {classicTheme && (
           <div className={styles.hwImageBlock}>
-            <SvgInline svg={aboutPrerequisiteTrezorSVG} />
+            <AboutPrerequisiteTrezorSVG />
           </div>
         )}
       </div>);

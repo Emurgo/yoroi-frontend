@@ -24,9 +24,11 @@ import { RustModule } from '../../cardanoCrypto/rustLoader';
 
 import {
   Bip44Wallet,
+} from '../models/Bip44Wallet/wrapper';
+import {
   asPublicFromPrivate,
   asGetPrivateDeriverKey,
-} from '../models/Bip44Wallet/wrapper';
+} from '../models/common/wrapper/traits';
 import {
   PublicDeriver,
 } from '../models/PublicDeriver/index';

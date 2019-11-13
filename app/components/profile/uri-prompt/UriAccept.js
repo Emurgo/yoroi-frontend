@@ -1,13 +1,12 @@
 // @flow
 import React, { Component } from 'react';
 import classnames from 'classnames';
-import SvgInline from 'react-svg-inline';
 import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import styles from './UriAccept.scss';
-import uriPrompt from '../../../assets/images/uri/uri-prompt.inline.svg';
+import UriPrompt from '../../../assets/images/uri/uri-prompt.inline.svg';
 import globalMessages from '../../../i18n/global-messages';
 
 const messages = defineMessages({
@@ -45,7 +44,7 @@ export default class UriAccept extends Component<Props> {
       <div className={styles.component}>
         <div className={styles.centeredBox}>
 
-          <SvgInline svg={uriPrompt} className={styles.aboutSvg} />
+          <span className={styles.aboutSvg}><UriPrompt /></span>
 
           <div className={styles.explanation}>
             <FormattedHTMLMessage {...messages.seePrompt} />
