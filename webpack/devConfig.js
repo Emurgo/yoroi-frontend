@@ -47,7 +47,7 @@ const baseDevConfig = (networkName /*: string */) => ({
     publicPath: 'http://localhost:3000/js/'
   },
   plugins: [
-    ...commonConfig.plugins('dev'),
+    ...commonConfig.plugins('dev', networkName),
     new webpack.DefinePlugin(commonConfig.definePlugin(networkName, false)),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
