@@ -16,7 +16,7 @@ export default class UiDialogsStore extends Store {
 
   _secondsTimerInterval: ?IntervalID = null;
 
-  setup() {
+  setup(): void {
     this.actions.dialogs.open.listen(this._onOpen);
     this.actions.dialogs.closeActiveDialog.listen(this._onClose);
     this.actions.dialogs.resetActiveDialog.listen(this._reset);

@@ -14,7 +14,7 @@ export default class UiNotificationsStore extends Store {
       null;
   }
 
-  setup() {
+  setup(): void {
     this.actions.notifications.open.listen(this._onOpen);
     this.actions.notifications.closeActiveNotification.listen(this._onClose);
   }

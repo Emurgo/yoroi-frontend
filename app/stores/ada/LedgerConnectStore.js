@@ -77,7 +77,7 @@ export default class LedgerConnectStore
   @observable isCreateHWActive: boolean = false;
   // =================== API RELATED =================== //
 
-  setup() {
+  setup(): void {
     this._reset();
     const ledgerConnectAction = this.actions.ada.ledgerConnect;
     ledgerConnectAction.init.listen(this._init);
