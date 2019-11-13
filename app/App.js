@@ -42,7 +42,9 @@ class App extends Component<Props> {
     // Merged english messages with selected by user locale messages
     // In this case all english data would be overridden to user selected locale, but untranslated
     // (missed in object keys) just stay in english
+    // eslint-disable-next-line prefer-object-spread
     const mergedMessages: { [key: string]: string } = Object.assign(
+      {},
       translations['en-US'],
       translations[locale]
     );
