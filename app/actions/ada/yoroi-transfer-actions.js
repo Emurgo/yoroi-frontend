@@ -13,7 +13,6 @@ export default class YoroiTranferActions {
     paperPassword: string,
   }> = new Action();
   checkAddresses: Action<{|
-    publicDeriver: PublicDeriverWithCachedMeta,
   |}> = new Action();
   backToUninitialized: Action<void> = new Action();
   transferFunds: Action<{
