@@ -53,7 +53,7 @@ const messages = defineMessages({
   },
   attentionDescription: {
     id: 'transfer.summary.attentionDescription.label',
-    defaultMessage: '!!!The balance check executed successfully, and we were able to match your wallet with the balance displayed below. Remember that the balance displayed should only match the one that you <strong>had on November 12th</strong>.',
+    defaultMessage: '!!!The balance result is shown below. Please make sure that is equivalent to the balance that you had in your Mainnet Yoroi Wallet on <strong>November 12th</strong>.',
   },
 });
 

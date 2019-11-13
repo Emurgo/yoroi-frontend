@@ -14,7 +14,7 @@ import globalMessages from '../../i18n/global-messages';
 const messages = defineMessages({
   text: {
     id: 'yoroiTransfer.start.instructions.text',
-    defaultMessage: '!!!Transfer funds from a <strong>non-Daedalus</strong> wallet (Yoroi, AdaLite, etc.). <br />More specifically, this will work for any wallet whose addresses start with Ae2',
+    defaultMessage: '!!!You can <strong>check the balance of your Yoroi wallet</strong> after the first snapshot here.<br/>The primary purpose of first Testnet is to help users assure that their balance got copied correctly.<br/>As a result, you will be able to validate the balance that got copied from Mainnet to the Testnet is correct. This balance should match the holdings you held on November 12th.',
   },
   mnemonicLabel15: {
     id: 'yoroiTransfer.start.instructions.mnemonic-15',
