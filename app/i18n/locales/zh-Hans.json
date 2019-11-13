@@ -46,7 +46,7 @@
   "daedalusTransfer.instructions.attention.masterKey.button.label": "Daedalus钱包主密钥",
   "daedalusTransfer.instructions.attention.paper.button.label": "Daedalus纸钱包",
   "daedalusTransfer.instructions.attention.text": "在<strong>第一个快照</ strong> (dry run) 后检查<strong> Daedalus钱包</ strong>的余额。 <br />第一个测试网只是为了帮助用户确保他们的余额被正确复制。<br />因此，您将能够看到从主网复制到测试网的余额是什么。 该余额应与您11月12日的持仓量相符。",
-  "daedalusTransfer.instructions.attention.title": "从这个地址转移全部资金：",
+  "daedalusTransfer.instructions.attention.title": "从此检查资金",
   "daedalusTransfer.summary.addressFrom.subLabel": "Daedalus 钱包地址",
   "daedalusTransfer.title": "检查Daedalus钱包的余额",
   "daedalusTransfer.waiting.checkingAddresses.generatingTx": "生成转账交易",
