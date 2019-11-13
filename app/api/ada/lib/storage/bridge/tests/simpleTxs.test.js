@@ -45,7 +45,7 @@ const networkTransactions: Array<RemoteTransaction> = [{
   slot: 3650,
   inputs: [
     {
-      address: '2cWKMJemoBaiw2vnBSiChVe9owqcymJJUq9UdTFzn3QLjvqvoLRVadugTfMtcJXQKcoWW',
+      address: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
       amount: '4000000',
       id: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d200',
       index: 0,
@@ -55,11 +55,11 @@ const networkTransactions: Array<RemoteTransaction> = [{
   outputs: [
     {
       // ours
-      address: '2cWKMJemoBam9FHms2YNoTSaKGn5xCbN5FRhAa3seKgkfrAYujWrX8PRiFF2jVVMuM455',
+      address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
       amount: '2100000'
     },
     {
-      address: '2cWKMJemoBakYwphS2CYUDzm9jTvoKGeyUy43JXdKmSzEEdWMMnjD7REMX4kCdWj5W5U6',
+      address: 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL',
       amount: '1731391'
     }
   ]
@@ -78,7 +78,7 @@ const nextRegularSpend = {
   inputs: [
     {
       // ours
-      address: '2cWKMJemoBam9FHms2YNoTSaKGn5xCbN5FRhAa3seKgkfrAYujWrX8PRiFF2jVVMuM455',
+      address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
       amount: '2100000',
       id: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed5450',
       index: 0,
@@ -88,12 +88,12 @@ const nextRegularSpend = {
   outputs: [
     {
       // ours
-      address: '2cWKMJemoBai5YBzrvj8yR7AxofNVRRQ3HeGZ6ze2jedGJWAZuv1kk83DDHhbM4etgZoX',
+      address: 'Ae2tdPwUPEZ3Kt2BJnDMQggxEA4c9MTagByH41rJkv2k82dBch2nqMAdyHJ',
       amount: '1100000'
     },
     {
       // ours
-      address: '2cWKMJemoBajxKobGHH4FWX8MYipNcYd8QWU6GJNfam6H7HJ4CJFvv42jqiPayM6skcPs',
+      address: 'Ae2tdPwUPEYxsngJhnW49jrmGuaCvQK34Hqrnx5w5SWxgfjDkSDcnrRdT5G',
       amount: '900000'
     }
   ]
@@ -112,7 +112,7 @@ const twoTxsRegularSpend = [{
   inputs: [
     {
       // ours
-      address: '2cWKMJemoBai5YBzrvj8yR7AxofNVRRQ3HeGZ6ze2jedGJWAZuv1kk83DDHhbM4etgZoX',
+      address: 'Ae2tdPwUPEZ3Kt2BJnDMQggxEA4c9MTagByH41rJkv2k82dBch2nqMAdyHJ',
       amount: '1100000',
       id: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed5460',
       index: 0,
@@ -121,7 +121,7 @@ const twoTxsRegularSpend = [{
   ],
   outputs: [
     {
-      address: '2cWKMJemoBaiw2vnBSiChVe9owqcymJJUq9UdTFzn3QLjvqvoLRVadugTfMtcJXQKcoWW',
+      address: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
       amount: '900000'
     },
   ]
@@ -139,7 +139,7 @@ const twoTxsRegularSpend = [{
   inputs: [
     {
       // ours
-      address: '2cWKMJemoBajxKobGHH4FWX8MYipNcYd8QWU6GJNfam6H7HJ4CJFvv42jqiPayM6skcPs',
+      address: 'Ae2tdPwUPEYxsngJhnW49jrmGuaCvQK34Hqrnx5w5SWxgfjDkSDcnrRdT5G',
       amount: '900000',
       id: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed5461',
       index: 1,
@@ -148,7 +148,7 @@ const twoTxsRegularSpend = [{
   ],
   outputs: [
     {
-      address: '2cWKMJemoBaiw2vnBSiChVe9owqcymJJUq9UdTFzn3QLjvqvoLRVadugTfMtcJXQKcoWW',
+      address: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
       amount: '700000'
     },
   ]
@@ -195,7 +195,7 @@ test('Syncing simple transaction', async (done) => {
     {
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
-        address: '2cWKMJemoBam9FHms2YNoTSaKGn5xCbN5FRhAa3seKgkfrAYujWrX8PRiFF2jVVMuM455',
+        address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
         addressing: {
           path: [2147483692, 2147485463, 2147483648, 0, 4],
           startLevel: 1,
@@ -284,7 +284,7 @@ test('Syncing simple transaction', async (done) => {
     {
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
-        address: '2cWKMJemoBai5YBzrvj8yR7AxofNVRRQ3HeGZ6ze2jedGJWAZuv1kk83DDHhbM4etgZoX',
+        address: 'Ae2tdPwUPEZ3Kt2BJnDMQggxEA4c9MTagByH41rJkv2k82dBch2nqMAdyHJ',
         addressing: {
           path: [2147483692, 2147485463, 2147483648, 1, 0],
           startLevel: 1,
@@ -311,7 +311,7 @@ test('Syncing simple transaction', async (done) => {
         }
       },
       {
-        address: '2cWKMJemoBajxKobGHH4FWX8MYipNcYd8QWU6GJNfam6H7HJ4CJFvv42jqiPayM6skcPs',
+        address: 'Ae2tdPwUPEYxsngJhnW49jrmGuaCvQK34Hqrnx5w5SWxgfjDkSDcnrRdT5G',
         addressing: {
           path: [2147483692, 2147485463, 2147483648, 0, 19],
           startLevel: 1,
@@ -497,7 +497,7 @@ test('Utxo created and used in same sync', async (done) => {
     {
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
-        address: '2cWKMJemoBai5YBzrvj8yR7AxofNVRRQ3HeGZ6ze2jedGJWAZuv1kk83DDHhbM4etgZoX',
+        address: 'Ae2tdPwUPEZ3Kt2BJnDMQggxEA4c9MTagByH41rJkv2k82dBch2nqMAdyHJ',
         addressing: {
           path: [2147483692, 2147485463, 2147483648, 1, 0],
           startLevel: 1,
@@ -524,7 +524,7 @@ test('Utxo created and used in same sync', async (done) => {
         }
       },
       {
-        address: '2cWKMJemoBajxKobGHH4FWX8MYipNcYd8QWU6GJNfam6H7HJ4CJFvv42jqiPayM6skcPs',
+        address: 'Ae2tdPwUPEYxsngJhnW49jrmGuaCvQK34Hqrnx5w5SWxgfjDkSDcnrRdT5G',
         addressing: {
           path: [2147483692, 2147485463, 2147483648, 0, 19],
           startLevel: 1,

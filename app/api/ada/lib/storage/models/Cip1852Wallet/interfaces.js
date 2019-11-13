@@ -48,11 +48,10 @@ export interface ICip1852Wallet {
     privateDeriverKeyDerivationId: number | null,
     protocolMagic: number,
   ): ICip1852Wallet;
+  // TODO: can get rid of this with getPArent
   getDb(): lf$Database;
+  // TODO: can get rid of this with getPArent
   getWrapperId(): number;
-  getPublicDeriverLevel(): number;
-  getSigningLevel(): number | null;
-  getProtocolMagic(): number;
 }
 
 // =====================

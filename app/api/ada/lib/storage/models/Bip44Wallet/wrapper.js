@@ -15,7 +15,9 @@ import type {
   IBip44Wallet,
 } from './interfaces';
 import type {
-  IPrivateDeriver,
+  IHasPrivateDeriver,
+  IHasLevels,
+  IHasSign,
 } from '../common/wrapper/interfaces';
 import {
   PublicFromPrivate,
@@ -31,7 +33,9 @@ import {
 } from '../../database/walletTypes/bip44/api/utils';
 
 /** Snapshot of a Bip44Wallet in the database */
-export class Bip44Wallet extends ConceptualWallet implements IBip44Wallet, IPrivateDeriver {
+export class Bip44Wallet
+  extends ConceptualWallet
+  implements IBip44Wallet, IHasPrivateDeriver, IHasLevels, IHasSign {
   /**
    * Should only cache information we know will never change
    */
@@ -64,6 +68,10 @@ export class Bip44Wallet extends ConceptualWallet implements IBip44Wallet, IPriv
     return this;
   }
 
+  getDerivationTables: void => Map<number, string> = () => {
+    return Bip44TableMap;
+  }
+
   getDb(): lf$Database {
     return this.db;
   }
@@ -88,10 +96,6 @@ export class Bip44Wallet extends ConceptualWallet implements IBip44Wallet, IPriv
     return this.#privateDeriverKeyDerivationId;
   }
 
-  getProtocolMagic(): number {
-    return this.#protocolMagic;
-  }
-
   static async createBip44Wallet(
     db: lf$Database,
     row: $ReadOnly<Bip44WrapperRow>,
@@ -113,7 +117,6 @@ export async function refreshBip44WalletFunctionality(
   const conceptualWalletCtorData = await refreshConceptualWalletFunctionality(
     db,
     row.ConceptualWalletId,
-    Bip44TableMap
   );
 
   let privateDeriverLevel = null;

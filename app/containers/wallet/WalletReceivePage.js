@@ -90,7 +90,7 @@ export default class WalletReceivePage extends Component<Props, State> {
       message: globalMessages.copyTooltipMessage,
     };
 
-    const walletType = publicDeriver.self.getConceptualWallet().getWalletType();
+    const walletType = publicDeriver.self.getParent().getWalletType();
     const isHwWallet = walletType === WalletTypeOption.HARDWARE_WALLET;
 
     return (

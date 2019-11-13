@@ -20,6 +20,11 @@ import type {
   IGetBalance, IGetBalanceRequest, IGetBalanceResponse,
   IChangePasswordRequest, IChangePasswordResponse,
 } from './interfaces';
+import { ConceptualWallet } from '../ConceptualWallet/index';
+import type { IConceptualWallet } from '../ConceptualWallet/interfaces';
+import type {
+  IHasLevels, IHasSign, IHasPrivateDeriver,
+} from './wrapper/interfaces';
 
 import {
   getBalanceForUtxos,
@@ -52,16 +57,16 @@ import { UpdateGet, } from '../../database/primitives/api/write';
 //   GetPublicKey
 // =================
 
-type GetPublicKeyDependencies = IPublicDeriver;
+type GetPublicKeyDependencies = IPublicDeriver<>;
 const GetPublicKeyMixin = (
   superclass: Class<GetPublicKeyDependencies>,
 ) => class GetPublicKey extends superclass implements IGetPublic {
 
-  rawGetPublicKey = async (
-    tx: lf$Transaction,
-    deps: {| GetKeyForPublicDeriver: Class<GetKeyForPublicDeriver> |},
-    _body: IGetPublicRequest,
-  ): Promise<IGetPublicResponse> => {
+  rawGetPublicKey: (
+    lf$Transaction,
+    {| GetKeyForPublicDeriver: Class<GetKeyForPublicDeriver> |},
+    IGetPublicRequest,
+  ) => Promise<IGetPublicResponse> = async (tx, deps, _body) => {
     const derivationAndKey = await deps.GetKeyForPublicDeriver.get(
       super.getDb(), tx,
       super.getPublicDeriverId(),
@@ -73,9 +78,7 @@ const GetPublicKeyMixin = (
     }
     return derivationAndKey.publicKey;
   }
-  getPublicKey = async (
-    body: IGetPublicRequest,
-  ): Promise<IGetPublicResponse> => {
+  getPublicKey: IGetPublicRequest => Promise<IGetPublicResponse> = async (body) => {
     const deps = Object.freeze({
       GetKeyForPublicDeriver,
     });
@@ -90,14 +93,14 @@ const GetPublicKeyMixin = (
     );
   }
 
-  rawChangePubDeriverPassword = async (
-    tx: lf$Transaction,
-    deps: {|
+  rawChangePubDeriverPassword: (
+    lf$Transaction,
+    {|
       UpdateGet: Class<UpdateGet>,
       GetKeyForPublicDeriver: Class<GetKeyForPublicDeriver>
     |},
-    body: IChangePasswordRequest,
-  ): Promise<IChangePasswordResponse> => {
+    IChangePasswordRequest,
+  ) => Promise<IChangePasswordResponse> = async (tx, deps, body) => {
     const currentRow = await this.rawGetPublicKey(
       tx,
       { GetKeyForPublicDeriver: deps.GetKeyForPublicDeriver, },
@@ -112,9 +115,7 @@ const GetPublicKeyMixin = (
       },
     );
   }
-  changePubDeriverPassword = async (
-    body: IChangePasswordRequest,
-  ): Promise<IChangePasswordResponse> => {
+  changePubDeriverPassword: IChangePasswordRequest => Promise<IChangePasswordResponse> = async (body) => {
     const deps = Object.freeze({
       UpdateGet,
       GetKeyForPublicDeriver,
@@ -137,7 +138,7 @@ export const GetPublicKey = Mixin<
 const GetPublicKeyInstance = (
   (GetPublicKey: any): ReturnType<typeof GetPublicKeyMixin>
 );
-export function asGetPublicKey<T: IPublicDeriver>(
+export function asGetPublicKey<T: IPublicDeriver<any>>(
   obj: T
 ): void | (IGetPublic & GetPublicKeyDependencies & T) {
   if (obj instanceof GetPublicKeyInstance) {
@@ -150,13 +151,11 @@ export function asGetPublicKey<T: IPublicDeriver>(
 //   GetBalance
 // ==============
 
-type GetBalanceDependencies = IPublicDeriver & IGetUtxoBalance;
+type GetBalanceDependencies = IPublicDeriver<> & IGetUtxoBalance;
 const GetBalanceMixin = (
   superclass: Class<GetBalanceDependencies>,
 ) => class GetBalance extends superclass implements IGetBalance {
-  getBalance = async (
-    body: IGetBalanceRequest,
-  ): Promise<IGetBalanceResponse> => {
+  getBalance: IGetBalanceRequest => Promise<IGetBalanceResponse> = async (body) => {
     return await this.getUtxoBalance(body);
   }
 };
@@ -168,7 +167,7 @@ export const GetBalance = Mixin<
 const GetBalanceInstance = (
   (GetBalance: any): ReturnType<typeof GetBalanceMixin>
 );
-export function asGetBalance<T: IPublicDeriver>(
+export function asGetBalance<T: IPublicDeriver<any>>(
   obj: T
 ): void | (IGetBalance & GetBalanceDependencies & T) {
   if (obj instanceof GetBalanceInstance) {
@@ -182,22 +181,22 @@ export function asGetBalance<T: IPublicDeriver>(
 //   GetUtxoBalance
 // ==================
 
-type GetUtxoBalanceDependencies = IPublicDeriver & IGetAllUtxos;
+type GetUtxoBalanceDependencies = IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos;
 const GetUtxoBalanceMixin = (
   superclass: Class<GetUtxoBalanceDependencies>,
 ) => class GetUtxoBalance extends superclass implements IGetUtxoBalance {
 
-  rawGetUtxoBalance = async (
-    tx: lf$Transaction,
-    deps: {|
+  rawGetUtxoBalance: (
+    lf$Transaction,
+    {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
-    _body: IGetUtxoBalanceRequest,
-    derivationTables: Map<number, string>,
-  ): Promise<IGetUtxoBalanceResponse> => {
+    IGetUtxoBalanceRequest,
+    Map<number, string>,
+  ) => Promise<IGetUtxoBalanceResponse> = async (tx, deps, _body, derivationTables) => {
     const utxos = await this.rawGetAllUtxos(
       tx,
       {
@@ -211,10 +210,8 @@ const GetUtxoBalanceMixin = (
     );
     return getBalanceForUtxos(utxos.map(utxo => utxo.output.UtxoTransactionOutput));
   }
-  getUtxoBalance = async (
-    _body: IGetUtxoBalanceRequest,
-  ): Promise<IGetUtxoBalanceResponse> => {
-    const derivationTables = this.getConceptualWallet().getDerivationTables();
+  getUtxoBalance: IGetUtxoBalanceRequest => Promise<IGetUtxoBalanceResponse> = async (_body) => {
+    const derivationTables = this.getParent().getDerivationTables();
     const deps = Object.freeze({
       GetPathWithSpecific,
       GetAddress,
@@ -243,7 +240,7 @@ export const GetUtxoBalance = Mixin<
 const GetUtxoBalanceInstance = (
   (GetUtxoBalance: any): ReturnType<typeof GetUtxoBalanceMixin>
 );
-export function asGetUtxoBalance<T: IPublicDeriver>(
+export function asGetUtxoBalance<T: IPublicDeriver<any>>(
   obj: T
 ): void | (IGetUtxoBalance & GetUtxoBalanceDependencies & T) {
   if (obj instanceof GetUtxoBalanceInstance) {
@@ -256,7 +253,7 @@ export function asGetUtxoBalance<T: IPublicDeriver>(
 //   ScanAddresses
 // =================
 
-type ScanAddressesDependencies = IPublicDeriver & IScanAddresses;
+type ScanAddressesDependencies = IPublicDeriver<> & IScanAddresses;
 const ScanAddressesMixin = (
   superclass: Class<ScanAddressesDependencies>,
 ) => class ScanAddresses extends superclass implements IScanAddresses {
@@ -269,10 +266,64 @@ export const ScanAddresses = Mixin<
 const ScanAddressesInstance = (
   (ScanAddresses: any): ReturnType<typeof ScanAddressesMixin>
 );
-export function asScanAddresses<T: IPublicDeriver>(
+export function asScanAddresses<T: IPublicDeriver<any>>(
   obj: T
 ): void | (IScanAddresses & ScanAddressesDependencies & T) {
   if (obj instanceof ScanAddressesInstance) {
+    return obj;
+  }
+  return undefined;
+}
+
+type HasPrivateDeriverDependencies = IPublicDeriver<ConceptualWallet & IHasPrivateDeriver>;
+const HasPrivateDeriverMixin = (
+  superclass: Class<HasPrivateDeriverDependencies>,
+) => class HasPrivateDeriver extends superclass {
+};
+export const HasPrivateDeriver = Mixin<
+  HasPrivateDeriverDependencies,
+  Object,
+>(HasPrivateDeriverMixin);
+export function asHasPrivateDeriver<Wrapper: ConceptualWallet, Rest>(
+  obj: IPublicDeriver<Wrapper> & Rest
+): void | (IPublicDeriver<Wrapper & IHasLevels> & Rest) {
+  if (obj instanceof HasPrivateDeriver) {
+    return obj;
+  }
+  return undefined;
+}
+
+type HasLevelsDependencies = IPublicDeriver<ConceptualWallet & IHasLevels>;
+const HasLevelsMixin = (
+  superclass: Class<HasLevelsDependencies>,
+) => class HasLevels extends superclass {
+};
+export const HasLevels = Mixin<
+  HasLevelsDependencies,
+  Object,
+>(HasLevelsMixin);
+export function asHasLevels<Wrapper: ConceptualWallet, Rest>(
+  obj: IPublicDeriver<Wrapper> & Rest
+): void | (IPublicDeriver<Wrapper & IHasLevels> & Rest) {
+  if (obj instanceof HasLevels) {
+    return obj;
+  }
+  return undefined;
+}
+
+type HasSignDependencies = IPublicDeriver<ConceptualWallet & IHasSign>;
+const HasSignMixin = (
+  superclass: Class<HasSignDependencies>,
+) => class HasSign extends superclass {
+};
+export const HasSign = Mixin<
+  HasSignDependencies,
+  Object,
+>(HasSignMixin);
+export function asHasSign<Wrapper: ConceptualWallet, Rest>(
+  obj: IPublicDeriver<Wrapper> & Rest
+): void | (IPublicDeriver<Wrapper & IHasSign> & Rest) {
+  if (obj instanceof HasSign) {
     return obj;
   }
   return undefined;

@@ -283,9 +283,9 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     free(): void;
 
     /**
-     * @returns {any}
+     * @returns {'positive' | 'negative' | 'zero'}
      */
-    get_sign(): any;
+    get_sign(): 'positive' | 'negative' | 'zero';
 
     /**
      * @returns {boolean}

@@ -16,7 +16,7 @@ import type {
 } from '../../api/ada/index';
 import type { BaseSignRequest } from '../../api/ada/transactions/types';
 import {
-  asGetSigningKey, asBip44Parent,
+  asGetSigningKey,
 } from '../../api/ada/lib/storage/models/Bip44Wallet/traits';
 
 export default class AdaWalletsStore extends WalletStore {
@@ -59,10 +59,6 @@ export default class AdaWalletsStore extends WalletStore {
     const publicDeriver = this.selected;
     if (!publicDeriver) throw new Error('Active wallet required before sending.');
 
-    const asBip44 = (asBip44Parent(publicDeriver.self));
-    if (asBip44 == null) {
-      throw new Error('_sendMoney public deriver missing bip44 functionality.');
-    }
     const withSigning = (asGetSigningKey(publicDeriver.self));
     if (withSigning == null) {
       throw new Error('_sendMoney public deriver missing signing functionality.');

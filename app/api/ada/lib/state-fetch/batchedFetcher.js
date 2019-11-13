@@ -51,40 +51,40 @@ export class BatchedFetcher implements IFetcher {
     this.baseFetcher = baseFetcher;
   }
 
-  getUTXOsForAddresses = (body: AddressUtxoRequest): Promise<AddressUtxoResponse> => (
+  getUTXOsForAddresses: AddressUtxoRequest => Promise<AddressUtxoResponse> = (body) => (
     batchUTXOsForAddresses(this.baseFetcher.getUTXOsForAddresses)(body)
   )
 
-  getTxsBodiesForUTXOs = (body: TxBodiesRequest): Promise<TxBodiesResponse> => (
+  getTxsBodiesForUTXOs: TxBodiesRequest => Promise<TxBodiesResponse> = (body) => (
     batchTxsBodiesForInputs(this.baseFetcher.getTxsBodiesForUTXOs)(body)
   )
 
-  getUTXOsSumsForAddresses = (body: UtxoSumRequest): Promise<UtxoSumResponse> => (
+  getUTXOsSumsForAddresses: UtxoSumRequest => Promise<UtxoSumResponse> = (body) => (
     batchGetUTXOsSumsForAddresses(this.baseFetcher.getUTXOsSumsForAddresses)(body)
   )
 
-  getTransactionsHistoryForAddresses = (body: HistoryRequest): Promise<HistoryResponse> => (
+  getTransactionsHistoryForAddresses: HistoryRequest => Promise<HistoryResponse> = (body) => (
     batchGetTransactionsHistoryForAddresses(
       this.baseFetcher.getTransactionsHistoryForAddresses
     )(body)
   )
 
-  getBestBlock = (body: BestBlockRequest): Promise<BestBlockResponse> => (
+  getBestBlock: BestBlockRequest => Promise<BestBlockResponse> = (body) => (
     // We don't batch transaction sending (it's just a single requeset)
     this.baseFetcher.getBestBlock(body)
   )
 
-  sendTx = (body: SignedRequest): Promise<SignedResponse> => (
+  sendTx: SignedRequest => Promise<SignedResponse> = (body) => (
     // We don't batch transaction sending (it's just a single requeset)
     // TODO: Should we support batching a list of transactions?
     this.baseFetcher.sendTx(body)
   )
 
-  checkAddressesInUse = (body: FilterUsedRequest): Promise<FilterUsedResponse> => (
+  checkAddressesInUse: FilterUsedRequest => Promise<FilterUsedResponse> = (body) => (
     batchCheckAddressesInUse(this.baseFetcher.checkAddressesInUse)(body)
   )
 
-  checkServerStatus = (body: ServerStatusRequest): Promise<ServerStatusResponse> => (
+  checkServerStatus: ServerStatusRequest => Promise<ServerStatusResponse> = (body) => (
     this.baseFetcher.checkServerStatus(body)
   )
 }

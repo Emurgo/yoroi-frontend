@@ -6,9 +6,11 @@ import type {
 
 import { Bip44Wallet } from '../Bip44Wallet/wrapper';
 import { ConceptualWallet } from '../ConceptualWallet/index';
+import type { IConceptualWallet } from '../ConceptualWallet/interfaces';
 
 import type {
-  IPublicDeriver, IPublicDeriverConstructor,
+  IPublicDeriver,
+  IPublicDeriverConstructor,
   IGetLastSyncInfo, IGetLastSyncInfoRequest, IGetLastSyncInfoResponse,
 } from './interfaces';
 import type {
@@ -39,37 +41,38 @@ import {
 import { addTraitsForBip44Child } from '../Bip44Wallet/traits';
 
 /** Snapshot of a PublicDeriver in the database */
-export class PublicDeriver implements IPublicDeriver, IRename, IGetLastSyncInfo {
+export class PublicDeriver<+Parent: ConceptualWallet = ConceptualWallet>
+implements IPublicDeriver<Parent>, IRename, IGetLastSyncInfo {
   /**
    * Should only cache information we know will never change
    */
 
   publicDeriverId: number;
-  conceptualWallet: ConceptualWallet;
+  +parent: Parent;
   derivationId: number;
   pathToPublic: Array<number>;
 
   /**
    * This constructor it will NOT populate functionality from db
    */
-  constructor(data: IPublicDeriverConstructor): PublicDeriver {
+  constructor(data: IPublicDeriverConstructor<Parent>): PublicDeriver<Parent> {
     this.publicDeriverId = data.publicDeriverId;
-    this.conceptualWallet = data.conceptualWallet;
+    this.parent = data.parent;
     this.pathToPublic = data.pathToPublic;
     this.derivationId = data.derivationId;
     return this;
   }
 
   getDb(): lf$Database {
-    return this.conceptualWallet.getDb();
+    return this.parent.getDb();
   }
 
   getPublicDeriverId(): number {
     return this.publicDeriverId;
   }
 
-  getConceptualWallet(): ConceptualWallet {
-    return this.conceptualWallet;
+  getParent(): Parent {
+    return this.parent;
   }
 
   getPathToPublic(): Array<number> {
@@ -82,16 +85,16 @@ export class PublicDeriver implements IPublicDeriver, IRename, IGetLastSyncInfo 
 
   static async createPublicDeriver(
     pubDeriver: $ReadOnly<PublicDeriverRow>,
-    conceptualWallet: ConceptualWallet,
-  ): Promise<PublicDeriver> {
+    parent: ConceptualWallet,
+  ): Promise<PublicDeriver<>> {
     return await refreshPublicDeriverFunctionality(
-      conceptualWallet.getDb(),
+      parent.getDb(),
       pubDeriver,
-      conceptualWallet,
+      parent,
     );
   }
 
-  getFullPublicDeriverInfo = async (): Promise<$ReadOnly<PublicDeriverRow>> => {
+  getFullPublicDeriverInfo: void => Promise<$ReadOnly<PublicDeriverRow>> = async () => {
     const deps = Object.freeze({
       GetPublicDeriver,
     });
@@ -115,11 +118,11 @@ export class PublicDeriver implements IPublicDeriver, IRename, IGetLastSyncInfo 
     );
   }
 
-  rawRename = async (
+  rawRename: (
     tx: lf$Transaction,
     deps: {| ModifyPublicDeriver: Class<ModifyPublicDeriver> |},
     body: IRenameRequest,
-  ): Promise<IRenameResponse> => {
+  ) => Promise<IRenameResponse> = async (tx, deps, body) => {
     return await deps.ModifyPublicDeriver.rename(
       this.getDb(), tx,
       {
@@ -128,9 +131,7 @@ export class PublicDeriver implements IPublicDeriver, IRename, IGetLastSyncInfo 
       }
     );
   }
-  rename = async (
-    body: IRenameRequest,
-  ): Promise<IRenameResponse> => {
+  rename: IRenameRequest => Promise<IRenameResponse> = async (body) => {
     const deps = Object.freeze({
       ModifyPublicDeriver,
     });
@@ -145,19 +146,17 @@ export class PublicDeriver implements IPublicDeriver, IRename, IGetLastSyncInfo 
     );
   };
 
-  rawGetLastSyncInfo = async (
+  rawGetLastSyncInfo: (
     tx: lf$Transaction,
     deps: {| GetLastSyncForPublicDeriver: Class<GetLastSyncForPublicDeriver> |},
     _body: IGetLastSyncInfoRequest,
-  ): Promise<IGetLastSyncInfoResponse> => {
+  ) => Promise<IGetLastSyncInfoResponse> = async (tx, deps, _body,) => {
     return await deps.GetLastSyncForPublicDeriver.forId(
       this.getDb(), tx,
       this.publicDeriverId
     );
   }
-  getLastSyncInfo = async (
-    body: IGetLastSyncInfoRequest,
-  ): Promise<IGetLastSyncInfoResponse> => {
+  getLastSyncInfo: IGetLastSyncInfoRequest => Promise<IGetLastSyncInfoResponse> = async (body) => {
     const deps = Object.freeze({
       GetLastSyncForPublicDeriver,
     });
@@ -176,8 +175,8 @@ export class PublicDeriver implements IPublicDeriver, IRename, IGetLastSyncInfo 
 export async function refreshPublicDeriverFunctionality(
   db: lf$Database,
   pubDeriver: $ReadOnly<PublicDeriverRow>,
-  conceptualWallet: ConceptualWallet,
-): Promise<IPublicDeriver> {
+  parent: ConceptualWallet,
+): Promise<PublicDeriver<>> {
   const keyDerivation = await getKeyDerivation(
     db,
     pubDeriver.KeyDerivationId,
@@ -185,12 +184,12 @@ export async function refreshPublicDeriverFunctionality(
   let pathToPublic;
   let finalClass;
 
-  if (conceptualWallet instanceof Bip44Wallet) {
+  if (parent instanceof Bip44Wallet) {
     const result = await addTraitsForBip44Child(
       db,
       pubDeriver,
       keyDerivation,
-      conceptualWallet,
+      parent,
       PublicDeriver,
     );
     pathToPublic = result.pathToPublic;
@@ -201,7 +200,7 @@ export async function refreshPublicDeriverFunctionality(
 
   const instance = new finalClass({
     publicDeriverId: pubDeriver.PublicDeriverId,
-    conceptualWallet,
+    parent,
     pathToPublic,
     derivationId: keyDerivation.KeyDerivationId,
   });

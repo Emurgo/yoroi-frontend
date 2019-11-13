@@ -75,7 +75,7 @@ export default class WalletTopbarTitle extends Component<Props> {
     const showWalletInfo = (walletRoutesMatch !== false) && (publicDeriver != null);
 
     const isHardwareWallet = publicDeriver != null &&
-      publicDeriver.self.getConceptualWallet().getWalletType() === WalletTypeOption.HARDWARE_WALLET;
+      publicDeriver.self.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET;
     const currency = ' ADA';
     const iconDivClass = isHardwareWallet ? styles.divIconHardware : styles.divIcon;
     const [accountPlateId, iconComponent] = (publicDeriver && publicDeriver.plate) ?

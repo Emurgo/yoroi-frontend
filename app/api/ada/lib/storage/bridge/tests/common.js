@@ -20,12 +20,12 @@ const mnemonic = 'prevent company field green slot measure chief hero apple task
 
 const privateDeriverPassword = 'greatest_password_ever';
 
-const protocolMagic = 1097911063; // testnet
+const protocolMagic = 764824073; // mainnet
 
 export async function setup(
   db: lf$Database,
   walletMnemonic: string = mnemonic,
-): Promise<PublicDeriver> {
+): Promise<PublicDeriver<>> {
   await RustModule.load();
 
   const settings = RustModule.WalletV2.BlockchainSettings.from_json({

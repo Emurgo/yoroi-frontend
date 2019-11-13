@@ -17,10 +17,7 @@ import type {
   PrepareAndBroadcastLedgerSignedTxFunc,
 } from '../../api/ada';
 import {
-  asBip44Parent,
-} from '../../api/ada/lib/storage/models/Bip44Wallet/traits';
-import {
-  asGetPublicKey,
+  asGetPublicKey, asHasLevels,
 } from '../../api/ada/lib/storage/models/common/traits';
 import type {
   SendUsingLedgerParams
@@ -156,14 +153,14 @@ export default class LedgerSendStore extends Store {
     if (withPublicKey == null) {
       throw new Error('_prepareAndBroadcastSignedTx public deriver has no public key.');
     }
-    const bip44Wallet = asBip44Parent(withPublicKey);
-    if (bip44Wallet == null) {
-      throw new Error('_prepareAndBroadcastSignedTx public deriver not bip44.');
+    const withLevels = asHasLevels(withPublicKey);
+    if (withLevels == null) {
+      throw new Error('_prepareAndBroadcastSignedTx public deriver has no levels');
     }
 
     await this.broadcastLedgerSignedTxRequest.execute({
       getPublicKey: withPublicKey.getPublicKey,
-      keyLevel: bip44Wallet.getBip44Parent().getPublicDeriverLevel(),
+      keyLevel: withLevels.getParent().getPublicDeriverLevel(),
       ledgerSignTxResp,
       unsignedTx,
       sendTx: this.stores.substores[environment.API].stateFetchStore.fetcher.sendTx,

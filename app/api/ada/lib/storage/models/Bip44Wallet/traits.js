@@ -32,7 +32,10 @@ import type {
   IChangePasswordRequest, IChangePasswordResponse,
 } from '../common/interfaces';
 import type {
-  IBip44Parent,
+  IHasPrivateDeriver, IHasLevels, IHasSign,
+} from '../common/wrapper/interfaces';
+import type { 
+  IBip44Wallet,
   IAddBip44FromPublic, IAddBip44FromPublicRequest, IAddBip44FromPublicResponse,
 } from './interfaces';
 
@@ -44,7 +47,7 @@ import {
   rawGetNextUnusedIndex,
   updateCutoffFromInsert,
 } from '../utils';
-import { rawGenHashToIdsFunc, rawGenAddByHash } from '../../bridge/hashMapper';
+import { rawGenAddByHash } from '../../bridge/hashMapper';
 
 import {
   getAllSchemaTables,
@@ -101,23 +104,34 @@ import {
   PublicDeriver,
 } from '../PublicDeriver/index';
 import { ConceptualWallet } from '../ConceptualWallet/index';
-import { GetPublicKey, ScanAddresses, GetUtxoBalance, GetBalance, } from '../common/traits';
+import type { IConceptualWallet } from '../ConceptualWallet/interfaces';
+import {
+  HasPrivateDeriver,
+  HasLevels,
+  HasSign,
+  GetPublicKey,
+  ScanAddresses,
+  GetUtxoBalance,
+  GetBalance,
+} from '../common/traits';
 
 export async function addTraitsForBip44Child(
   db: lf$Database,
   pubDeriver: $ReadOnly<PublicDeriverRow>,
   pubDeriverKeyDerivation: $ReadOnly<KeyDerivationRow>,
   conceptualWallet: ConceptualWallet,
-  startClass: Class<PublicDeriver>,
+  startClass: Class<PublicDeriver<Bip44Wallet>>,
 ): Promise<{|
-  finalClass: Class<PublicDeriver>,
+  finalClass: Class<PublicDeriver<Bip44Wallet>>,
   pathToPublic: Array<number>,
 |}> {
   if (!(conceptualWallet instanceof Bip44Wallet)) {
     throw new Error('addTraitsForBip44Child expected Bip44 type');
   }
   let currClass = startClass;
-  currClass = Bip44Parent(currClass);
+  currClass = HasPrivateDeriver(currClass);
+  currClass = HasLevels(currClass);
+  currClass = HasSign(currClass);
   currClass = GetAllUtxos(currClass);
 
   let publicKey;
@@ -205,53 +219,18 @@ export async function addTraitsForBip44Child(
   };
 }
 
-// ================
-//   Bip44Parent
-// ================
-
-type Bip44ParentDependencies = IPublicDeriver;
-const Bip44ParentMixin = (
-  superclass: Class<Bip44ParentDependencies>,
-) => class Bip44Parent extends superclass implements IBip44Parent {
-
-  getBip44Parent = (
-    _body: void,
-  ): Bip44Wallet => {
-    const conceptualWallet = this.getConceptualWallet();
-    if (conceptualWallet instanceof Bip44Wallet) {
-      return conceptualWallet;
-    }
-    throw new StaleStateError('getBip44Parent parent is not bip44');
-  }
-};
-const Bip44Parent = Mixin<
-  Bip44ParentDependencies,
-  IBip44Parent,
->(Bip44ParentMixin);
-const Bip44ParentInstance = (
-  (Bip44Parent: any): ReturnType<typeof Bip44ParentMixin>
-);
-export function asBip44Parent<T: IPublicDeriver>(
-  obj: T
-): void | (IBip44Parent & Bip44ParentDependencies & T) {
-  if (obj instanceof Bip44ParentInstance) {
-    return obj;
-  }
-  return undefined;
-}
-
 // ======================
 //   AddBip44FromPublic
 // =====================
 
-type AddBip44FromPublicDependencies = IPublicDeriver & IBip44Parent;
+type AddBip44FromPublicDependencies = IPublicDeriver<ConceptualWallet & IHasLevels>;
 const AddBip44FromPublicMixin = (
   superclass: Class<AddBip44FromPublicDependencies>,
 ) => class AddBip44FromPublic extends superclass implements IAddBip44FromPublic {
 
-  rawAddBip44FromPublic = async (
-    tx: lf$Transaction,
-    deps: {|
+  rawAddBip44FromPublic: (
+    lf$Transaction,
+    {|
       GetPublicDeriver: Class<GetPublicDeriver>,
       AddDerivationTree: Class<AddDerivationTree>,
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
@@ -259,9 +238,14 @@ const AddBip44FromPublicMixin = (
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
-    body: IAddBip44FromPublicRequest,
-    derivationTables: Map<number, string>,
-  ): Promise<IAddBip44FromPublicResponse> => {
+    IAddBip44FromPublicRequest,
+    Map<number, string>,
+  ) => Promise<IAddBip44FromPublicResponse> = async (
+    tx,
+    deps,
+    body,
+    derivationTables,
+  ) => {
     const pubDeriver = await deps.GetPublicDeriver.get(
       super.getDb(), tx,
       super.getPublicDeriverId(),
@@ -276,7 +260,7 @@ const AddBip44FromPublicMixin = (
         children: body.tree,
       },
       derivationTables,
-      this.getBip44Parent().getPublicDeriverLevel(),
+      this.getParent().getPublicDeriverLevel(),
     );
     const asDisplayCutoffInstance = asDisplayCutoff(this);
     if (asDisplayCutoffInstance != null) {
@@ -289,7 +273,7 @@ const AddBip44FromPublicMixin = (
           ModifyDisplayCutoff: deps.ModifyDisplayCutoff,
         },
         {
-          publicDeriverLevel: this.getBip44Parent().getPublicDeriverLevel(),
+          publicDeriverLevel: this.getParent().getPublicDeriverLevel(),
           displayCutoffInstance: asDisplayCutoffInstance,
           tree: body.tree,
         },
@@ -297,10 +281,10 @@ const AddBip44FromPublicMixin = (
       );
     }
   }
-  addBip44FromPublic = async (
-    body: IAddBip44FromPublicRequest,
-  ): Promise<IAddBip44FromPublicResponse> => {
-    const derivationTables = this.getConceptualWallet().getDerivationTables();
+  addBip44FromPublic: IAddBip44FromPublicRequest => Promise<IAddBip44FromPublicResponse> = async (
+    body,
+  ) => {
+    const derivationTables = this.getParent().getDerivationTables();
     const deps = Object.freeze({
       GetPublicDeriver,
       AddDerivationTree,
@@ -330,7 +314,7 @@ const AddBip44FromPublic = Mixin<
 const AddBip44FromPublicInstance = (
   (AddBip44FromPublic: any): ReturnType<typeof AddBip44FromPublicMixin>
 );
-export function asAddBip44FromPublic<T: IPublicDeriver>(
+export function asAddBip44FromPublic<T: IPublicDeriver<any>>(
   obj: T
 ): void | (IAddBip44FromPublic & AddBip44FromPublicDependencies & T) {
   if (obj instanceof AddBip44FromPublicInstance) {
@@ -343,27 +327,31 @@ export function asAddBip44FromPublic<T: IPublicDeriver>(
 //   GetSigningKey
 // ==================
 
-type GetSigningKeyDependencies = IPublicDeriver & IBip44Parent;
+type GetSigningKeyDependencies = IPublicDeriver<ConceptualWallet & IHasLevels & IHasSign>;
 const GetSigningKeyMixin = (
   superclass: Class<GetSigningKeyDependencies>,
 ) => class GetSigningKey extends superclass implements IGetSigningKey {
 
-  rawGetSigningKey = async (
-    tx: lf$Transaction,
-    deps: {|
+  rawGetSigningKey: (
+    lf$Transaction,
+    {|
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetPublicDeriver: Class<GetPublicDeriver>,
       GetKeyDerivation: Class<GetKeyDerivation>,
       GetKey: Class<GetKey>,
     |},
-    _body: IGetSigningKeyRequest,
+    IGetSigningKeyRequest,
+  ) => Promise<IGetSigningKeyResponse> = async (
+    tx,
+    deps,
+    _body,
   ): Promise<IGetSigningKeyResponse> => {
-    const signingLevel = this.getBip44Parent().getSigningLevel();
+    const signingLevel = this.getParent().getSigningLevel();
     if (signingLevel === null) {
       throw new StaleStateError('GetSigningKey::getSigningKey signingLevel=null');
     }
 
-    const levelDifference = this.getBip44Parent().getPublicDeriverLevel() - signingLevel;
+    const levelDifference = this.getParent().getPublicDeriverLevel() - signingLevel;
     // if bip44 wallet signing level == private deriver level
     if (levelDifference < 0) {
       throw new StaleStateError('GetSigningKey::getSigningKey levelDifference<0');
@@ -407,9 +395,9 @@ const GetSigningKeyMixin = (
       row: privateKeyRow,
     };
   }
-  getSigningKey = async (
-    body: IGetSigningKeyRequest,
-  ): Promise<IGetSigningKeyResponse> => {
+  getSigningKey: IGetSigningKeyRequest => Promise<IGetSigningKeyResponse> = async (
+    body
+  ) => {
     const deps = Object.freeze({
       GetDerivationsByPath,
       GetPublicDeriver,
@@ -427,16 +415,20 @@ const GetSigningKeyMixin = (
     );
   }
 
-  rawChangeSigningKeyPassword = async (
-    tx: lf$Transaction,
-    deps: {|
+  rawChangeSigningKeyPassword: (
+    lf$Transaction,
+    {|
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetPublicDeriver: Class<GetPublicDeriver>,
       GetKeyDerivation: Class<GetKeyDerivation>,
       GetKey: Class<GetKey>,
       UpdateGet: Class<UpdateGet>,
     |},
-    body: IChangePasswordRequest,
+    IChangePasswordRequest,
+  ) => Promise<IChangePasswordResponse> = async (
+    tx,
+    deps,
+    body,
   ): Promise<IChangePasswordResponse> => {
     const currentRow = await this.rawGetSigningKey(
       tx,
@@ -457,9 +449,9 @@ const GetSigningKeyMixin = (
       },
     );
   }
-  changeSigningKeyPassword = async (
-    body: IChangePasswordRequest,
-  ): Promise<IChangePasswordResponse> => {
+  changeSigningKeyPassword: IChangePasswordRequest => Promise<IChangePasswordResponse> = async (
+    body,
+  ) => {
     const deps = Object.freeze({
       GetDerivationsByPath,
       GetPublicDeriver,
@@ -478,9 +470,9 @@ const GetSigningKeyMixin = (
     );
   }
 
-  normalizeKey = async (
-    body: INormalizeKeyRequest,
-  ): Promise<INormalizeKeyResponse> => {
+  normalizeKey: INormalizeKeyRequest => Promise<INormalizeKeyResponse> = async (
+    body,
+  ) => {
     const pathToPublic = body.path.slice(1);
     const indexPath = pathToPublic.map(derivation => {
       if (derivation.Index === null) {
@@ -503,7 +495,7 @@ const GetSigningKey = Mixin<
 const GetSigningKeyInstance = (
   (GetSigningKey: any): ReturnType<typeof GetSigningKeyMixin>
 );
-export function asGetSigningKey<T: IPublicDeriver>(
+export function asGetSigningKey<T: IPublicDeriver<any>>(
   obj: T
 ): void | (IGetSigningKey & GetSigningKeyDependencies & T) {
   if (obj instanceof GetSigningKeyInstance) {
@@ -517,22 +509,27 @@ export function asGetSigningKey<T: IPublicDeriver>(
 //   GetAllUtxos
 // ===============
 
-type GetAllUtxosDependencies = IPublicDeriver & IBip44Parent;
+type GetAllUtxosDependencies = IPublicDeriver<ConceptualWallet & IHasLevels>;
 const GetAllUtxosMixin = (
   superclass: Class<GetAllUtxosDependencies>,
 ) => class GetAllUtxos extends superclass implements IGetAllUtxos {
 
-  rawGetAllUtxos = async (
-    tx: lf$Transaction,
-    deps: {|
+  rawGetAllUtxos: (
+    lf$Transaction,
+    {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
-    _body: IGetAllUtxosRequest,
-    derivationTables: Map<number, string>,
-  ): Promise<IGetAllUtxosResponse> => {
+    IGetAllUtxosRequest,
+    Map<number, string>,
+  ) => Promise<IGetAllUtxosResponse> = async (
+    tx,
+    deps,
+    _body,
+    derivationTables,
+  ) => {
     const addresses = await this.rawGetAllUtxoAddresses(
       tx,
       {
@@ -568,10 +565,10 @@ const GetAllUtxosMixin = (
     }
     return addressedUtxos;
   }
-  getAllUtxos = async (
-    _body: IGetAllUtxosRequest,
-  ): Promise<IGetAllUtxosResponse> => {
-    const derivationTables = this.getConceptualWallet().getDerivationTables();
+  getAllUtxos: IGetAllUtxosRequest => Promise<IGetAllUtxosResponse> = async (
+    _body
+  ) => {
+    const derivationTables = this.getParent().getDerivationTables();
     const deps = Object.freeze({
       GetPathWithSpecific,
       GetAddress,
@@ -592,27 +589,32 @@ const GetAllUtxosMixin = (
     );
   }
 
-  rawGetAllUtxoAddresses = async (
-    tx: lf$Transaction,
-    deps: {|
+  rawGetAllUtxoAddresses: (
+    lf$Transaction,
+    {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
-    _body: IGetAllUtxoAddressesRequest,
-    derivationTables: Map<number, string>,
+    IGetAllUtxoAddressesRequest,
+    Map<number, string>,
+  ) => Promise<IGetAllUtxoAddressesResponse> = async (
+    tx,
+    deps,
+    _body,
+    derivationTables,
   ): Promise<IGetAllUtxoAddressesResponse> => {
     // TODO: some way to know if single chain is an account or not
-    if (this.getBip44Parent().getPublicDeriverLevel() >= Bip44DerivationLevels.CHAIN.level) {
+    if (this.getParent().getPublicDeriverLevel() >= Bip44DerivationLevels.CHAIN.level) {
       return rawGetBip44AddressesByPath(
         super.getDb(), tx,
         deps,
         {
           startingDerivation: super.getDerivationId(),
-          derivationLevel: this.getBip44Parent().getPublicDeriverLevel(),
+          derivationLevel: this.getParent().getPublicDeriverLevel(),
           commonPrefix: super.getPathToPublic(),
           queryPath: Array(
-            Bip44DerivationLevels.ADDRESS.level - this.getBip44Parent().getPublicDeriverLevel()
+            Bip44DerivationLevels.ADDRESS.level - this.getParent().getPublicDeriverLevel()
           ).fill(null),
         },
         derivationTables,
@@ -623,10 +625,10 @@ const GetAllUtxosMixin = (
       deps,
       {
         startingDerivation: super.getDerivationId(),
-        derivationLevel: this.getBip44Parent().getPublicDeriverLevel(),
+        derivationLevel: this.getParent().getPublicDeriverLevel(),
         commonPrefix: super.getPathToPublic(),
         queryPath: Array(
-          Bip44DerivationLevels.ACCOUNT.level - this.getBip44Parent().getPublicDeriverLevel()
+          Bip44DerivationLevels.ACCOUNT.level - this.getParent().getPublicDeriverLevel()
         ).fill(null).concat([0, null]),
       },
       derivationTables,
@@ -636,10 +638,10 @@ const GetAllUtxosMixin = (
       deps,
       {
         startingDerivation: super.getDerivationId(),
-        derivationLevel: this.getBip44Parent().getPublicDeriverLevel(),
+        derivationLevel: this.getParent().getPublicDeriverLevel(),
         commonPrefix: super.getPathToPublic(),
         queryPath: Array(
-          Bip44DerivationLevels.ACCOUNT.level - this.getBip44Parent().getPublicDeriverLevel()
+          Bip44DerivationLevels.ACCOUNT.level - this.getParent().getPublicDeriverLevel()
         ).fill(null).concat([1, null]),
       },
       derivationTables,
@@ -649,10 +651,10 @@ const GetAllUtxosMixin = (
       ...internalAddresses,
     ];
   }
-  getAllUtxoAddresses = async (
-    body: IGetAllUtxoAddressesRequest,
-  ): Promise<IGetAllUtxoAddressesResponse> => {
-    const derivationTables = this.getConceptualWallet().getDerivationTables();
+  getAllUtxoAddresses: IGetAllUtxoAddressesRequest => Promise<IGetAllUtxoAddressesResponse> = async (
+    body,
+  ) => {
+    const derivationTables = this.getParent().getDerivationTables();
     const deps = Object.freeze({
       GetPathWithSpecific,
       GetAddress,
@@ -680,7 +682,7 @@ const GetAllUtxos = Mixin<
 const GetAllUtxosInstance = (
   (GetAllUtxos: any): ReturnType<typeof GetAllUtxosMixin>
 );
-export function asGetAllUtxos<T: IPublicDeriver>(
+export function asGetAllUtxos<T: IPublicDeriver<any>>(
   obj: T
 ): void | (IGetAllUtxos & GetAllUtxosDependencies & T) {
   if (obj instanceof GetAllUtxosInstance) {
@@ -694,21 +696,26 @@ export function asGetAllUtxos<T: IPublicDeriver>(
 //   DisplayCutoff
 // =================
 
-type DisplayCutoffDependencies = IPublicDeriver & IBip44Parent;
+type DisplayCutoffDependencies = IPublicDeriver<ConceptualWallet & IHasLevels>;
 const DisplayCutoffMixin = (
   superclass: Class<DisplayCutoffDependencies>,
 ) => class DisplayCutoff extends superclass implements IDisplayCutoff {
 
-  rawPopAddress  = async (
+  rawPopAddress: (
     tx: lf$Transaction,
-    deps: {|
+    {|
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetAddress: Class<GetAddress>,
     |},
-    _body: IDisplayCutoffPopRequest,
-    derivationTables: Map<number, string>,
+    IDisplayCutoffPopRequest,
+    Map<number, string>,
+  ) => Promise<IDisplayCutoffPopResponse> = async (
+    tx,
+    deps,
+    _body,
+    derivationTables,
   ): Promise<IDisplayCutoffPopResponse> => {
-    if (this.getBip44Parent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
+    if (this.getParent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
       // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
       throw new Error('DisplayCutoffMixin::popAddress incorrect pubderiver level');
     }
@@ -738,10 +745,10 @@ const DisplayCutoffMixin = (
       addrs
     };
   }
-  popAddress = async (
-    body: IDisplayCutoffPopRequest,
-  ): Promise<IDisplayCutoffPopResponse> => {
-    const derivationTables = this.getConceptualWallet().getDerivationTables();
+  popAddress: IDisplayCutoffPopRequest => Promise<IDisplayCutoffPopResponse> = async (
+    body,
+  ) => {
+    const derivationTables = this.getParent().getDerivationTables();
     const deps = Object.freeze({
       ModifyDisplayCutoff,
       GetAddress,
@@ -760,16 +767,21 @@ const DisplayCutoffMixin = (
     );
   }
 
-  rawGetCutoff = async (
-    tx: lf$Transaction,
-    deps: {|
+  rawGetCutoff: (
+    lf$Transaction,
+    {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
-    _body: IDisplayCutoffGetRequest,
-    derivationTables: Map<number, string>,
+    IDisplayCutoffGetRequest,
+     Map<number, string>,
+  ) => Promise<IDisplayCutoffGetResponse> = async (
+    tx,
+    deps,
+    _body,
+    derivationTables,
   ): Promise<IDisplayCutoffGetResponse> => {
-    if (this.getBip44Parent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
+    if (this.getParent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
       // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
       throw new Error('DisplayCutoffMixin::getCutoff incorrect pubderiver level');
     }
@@ -805,10 +817,10 @@ const DisplayCutoffMixin = (
     }
     return cutoff;
   }
-  getCutoff = async (
-    body: IDisplayCutoffGetRequest,
-  ): Promise<IDisplayCutoffGetResponse> => {
-    const derivationTables = this.getConceptualWallet().getDerivationTables();
+  getCutoff: IDisplayCutoffGetRequest => Promise<IDisplayCutoffGetResponse> = async (
+    body,
+  ) => {
+    const derivationTables = this.getParent().getDerivationTables();
     const deps = Object.freeze({
       GetPathWithSpecific,
       GetDerivationSpecific,
@@ -827,15 +839,19 @@ const DisplayCutoffMixin = (
     );
   }
 
-  rawSetCutoff = async (
+  rawSetCutoff: (
     tx: lf$Transaction,
-    deps: {|
+    {|
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
     |},
-    body: IDisplayCutoffSetRequest,
+    IDisplayCutoffSetRequest,
+  ) => Promise<IDisplayCutoffSetResponse> = async (
+    tx,
+    deps,
+    body,
   ): Promise<IDisplayCutoffSetResponse> => {
-    if (this.getBip44Parent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
+    if (this.getParent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
       // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
       throw new Error('DisplayCutoffMixin::popAddress incorrect pubderiver level');
     }
@@ -854,9 +870,9 @@ const DisplayCutoffMixin = (
       },
     );
   }
-  setCutoff = async (
-    body: IDisplayCutoffSetRequest,
-  ): Promise<IDisplayCutoffSetResponse> => {
+  setCutoff: IDisplayCutoffSetRequest => Promise<IDisplayCutoffSetResponse> = async (
+    body,
+  ) => {
     const deps = Object.freeze({
       ModifyDisplayCutoff,
       GetDerivationsByPath,
@@ -880,7 +896,7 @@ const DisplayCutoff = Mixin<
 const DisplayCutoffInstance = (
   (DisplayCutoff: any): ReturnType<typeof DisplayCutoffMixin>
 );
-export function asDisplayCutoff<T: IPublicDeriver>(
+export function asDisplayCutoff<T: IPublicDeriver<any>>(
   obj: T
 ): void | (IDisplayCutoff & DisplayCutoffDependencies & T) {
   if (obj instanceof DisplayCutoffInstance) {
@@ -893,22 +909,27 @@ export function asDisplayCutoff<T: IPublicDeriver>(
 //   HasChains
 // =============
 
-type HasChainsDependencies = IPublicDeriver & IBip44Parent & IDisplayCutoff;
+type HasChainsDependencies = IPublicDeriver<ConceptualWallet & IHasLevels> & IDisplayCutoff;
 const HasChainsMixin = (
   superclass: Class<HasChainsDependencies>,
 ) => class HasChains extends superclass implements IHasChains {
 
-  rawGetAddressesForChain = async (
-    tx: lf$Transaction,
-    deps: {|
+  rawGetAddressesForChain: (
+    lf$Transaction,
+    {|
       GetAddress: Class<GetAddress>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
-    body: IHasChainsRequest,
-    derivationTables: Map<number, string>,
-  ): Promise<IHasChainsResponse> => {
-    if (this.getBip44Parent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
+    IHasChainsRequest,
+    Map<number, string>,
+  ) => Promise<IHasChainsResponse> = async (
+    tx,
+    deps,
+    body,
+    derivationTables,
+  ) => {
+    if (this.getParent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
       // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
       throw new Error('HasChains::rawGetAddressesForChain incorrect pubderiver level');
     }
@@ -917,17 +938,17 @@ const HasChainsMixin = (
       deps,
       {
         startingDerivation: super.getDerivationId(),
-        derivationLevel: this.getBip44Parent().getPublicDeriverLevel(),
+        derivationLevel: this.getParent().getPublicDeriverLevel(),
         commonPrefix: super.getPathToPublic(),
         queryPath: [body.chainId, null],
       },
       derivationTables,
     );
   }
-  getAddressesForChain = async (
-    body: IHasChainsRequest,
-  ): Promise<IHasChainsResponse> => {
-    const derivationTables = this.getConceptualWallet().getDerivationTables();
+  getAddressesForChain: IHasChainsRequest => Promise<IHasChainsResponse> = async (
+    body,
+  ) => {
+    const derivationTables = this.getParent().getDerivationTables();
     const deps = Object.freeze({
       GetAddress,
       GetPathWithSpecific,
@@ -947,17 +968,22 @@ const HasChainsMixin = (
     );
   }
 
-  rawNextInternal = async (
-    tx: lf$Transaction,
-    deps: {|
+  rawNextInternal: (
+    lf$Transaction,
+    {|
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
       GetAddress: Class<GetAddress>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
-    _body: IGetNextUnusedForChainRequest,
-    derivationTables: Map<number, string>,
-  ): Promise<IGetNextUnusedForChainResponse> => {
+    IGetNextUnusedForChainRequest,
+    Map<number, string>,
+  ) => Promise<IGetNextUnusedForChainResponse> = async (
+    tx,
+    deps,
+    _body,
+    derivationTables,
+  ) => {
     const internalAddresses = await this.rawGetAddressesForChain(
       tx,
       {
@@ -993,10 +1019,10 @@ const HasChainsMixin = (
       index: nextUnused.index,
     };
   }
-  nextInternal = async (
-    body: IGetNextUnusedForChainRequest,
-  ): Promise<IGetNextUnusedForChainResponse> => {
-    const derivationTables = this.getConceptualWallet().getDerivationTables();
+  nextInternal: IGetNextUnusedForChainRequest => Promise<IGetNextUnusedForChainResponse> = async (
+    body,
+  ) => {
+    const derivationTables = this.getParent().getDerivationTables();
     const deps = Object.freeze({
       GetUtxoTxOutputsWithTx,
       GetAddress,
@@ -1022,7 +1048,7 @@ const HasChains = Mixin<
 const HasChainsInstance = (
   (HasChains: any): ReturnType<typeof HasChainsMixin>
 );
-export function asHasChains<T: IPublicDeriver>(
+export function asHasChains<T: IPublicDeriver<any>>(
   obj: T
 ): void | (IHasChains & HasChainsDependencies & T) {
   if (obj instanceof HasChainsInstance) {
@@ -1032,14 +1058,14 @@ export function asHasChains<T: IPublicDeriver>(
 }
 
 
-type ScanUtxoAccountAddressesDependencies = IPublicDeriver & IBip44Parent &
+type ScanUtxoAccountAddressesDependencies = IPublicDeriver<ConceptualWallet & IHasLevels> &
   IGetPublic & IHasChains & IAddBip44FromPublic;
 const ScanUtxoAccountAddressesMixin = (
   superclass: Class<ScanUtxoAccountAddressesDependencies>,
 ) => class ScanUtxoAccountAddresses extends superclass implements IScanAddresses {
-  rawScanAddresses = async (
-    tx: lf$Transaction,
-    deps: {|
+  rawScanAddresses: (
+    lf$Transaction,
+    {|
       GetKeyForPublicDeriver: Class<GetKeyForPublicDeriver>,
       GetAddress: Class<GetAddress>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
@@ -1051,8 +1077,13 @@ const ScanUtxoAccountAddressesMixin = (
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
-    body: IScanAddressesRequest,
-    derivationTables: Map<number, string>,
+    IScanAddressesRequest,
+    Map<number, string>,
+  ) => Promise<IScanAddressesResponse> = async (
+    tx,
+    deps,
+    body,
+    derivationTables,
   ): Promise<IScanAddressesResponse> => {
     // TODO: make sure we only scan payment keys
     const pubKey = await this.rawGetPublicKey(
@@ -1106,7 +1137,6 @@ const ScanUtxoAccountAddressesMixin = (
           ...externalAddresses.flatMap(address => address.addrs.map(addr => addr.AddressId)),
         ])
       ),
-      protocolMagic: this.getBip44Parent().getProtocolMagic(),
     });
     await this.rawAddBip44FromPublic(
       tx,
@@ -1122,10 +1152,10 @@ const ScanUtxoAccountAddressesMixin = (
       derivationTables,
     );
   }
-  scanAddresses = async (
-    body: IScanAddressesRequest,
-  ): Promise<IScanAddressesResponse> => {
-    const derivationTables = this.getConceptualWallet().getDerivationTables();
+  scanAddresses: IScanAddressesRequest => Promise<IScanAddressesResponse> = async (
+    body,
+  ) => {
+    const derivationTables = this.getParent().getDerivationTables();
     const deps = Object.freeze({
       GetKeyForPublicDeriver,
       GetAddress,
@@ -1165,7 +1195,9 @@ const ScanUtxoAccountAddresses = Mixin<
 const ScanUtxoAccountAddressesInstance = (
   (ScanUtxoAccountAddresses: any): ReturnType<typeof ScanUtxoAccountAddressesMixin>
 );
-export function asScanUtxoAccountAddressesInstance<T: IPublicDeriver>(
+export function asScanUtxoAccountAddressesInstance<
+  T: IPublicDeriver<any>
+>(
   obj: T
 ): void | (IScanAddresses & ScanUtxoAccountAddressesDependencies & T) {
   if (obj instanceof ScanUtxoAccountAddressesInstance) {

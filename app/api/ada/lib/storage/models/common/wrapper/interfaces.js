@@ -25,9 +25,18 @@ import type {
   RawVariation, RawTableVariation,
 } from '../interfaces';
 
-export interface IPrivateDeriver {
+export interface IHasPrivateDeriver {
   getPrivateDeriverLevel(): number | null;
   getPrivateDeriverKeyDerivationId(): number | null;
+}
+
+export interface IHasLevels {
+  getPublicDeriverLevel(): number;
+  getDerivationTables(): Map<number, string>;
+}
+
+export interface IHasSign {
+  getSigningLevel(): number | null;
 }
 
 export type IDerivePublicFromPrivateRequest = {|

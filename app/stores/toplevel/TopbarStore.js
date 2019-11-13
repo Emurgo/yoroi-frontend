@@ -35,7 +35,7 @@ export default class TopbarStore extends Store {
     let isNano = false;
     const selected = wallets.selected;
     if (selected != null) {
-      const conceptualWallet = selected.self.getConceptualWallet();
+      const conceptualWallet = selected.self.getParent();
       isTrezorT = isTrezorTWallet(conceptualWallet);
       isNano = isLedgerNanoWallet(conceptualWallet);
     }

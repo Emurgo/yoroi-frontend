@@ -40,7 +40,8 @@ import type {
   IChangePasswordRequest, IChangePasswordResponse,
   Address, Value, Addressing, UsedStatus,
 } from './common/interfaces';
-
+import type { IHasLevels } from './common/wrapper/interfaces';
+import { ConceptualWallet } from './ConceptualWallet/index';
 import type {
   AddressRow,
   KeyInsert, KeyRow,
@@ -354,7 +355,7 @@ export async function rawGetChainAddressesForDisplay(
     GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
   request: {
-    publicDeriver: IPublicDeriver & IHasChains & IDisplayCutoff,
+    publicDeriver: IPublicDeriver<> & IHasChains & IDisplayCutoff,
     chainsRequest: IHasChainsRequest,
     type: CoreAddressT,
   },
@@ -411,12 +412,12 @@ export async function rawGetChainAddressesForDisplay(
 }
 export async function getChainAddressesForDisplay(
   request: {
-    publicDeriver: IPublicDeriver & IHasChains & IDisplayCutoff,
+    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IHasChains & IDisplayCutoff,
     chainsRequest: IHasChainsRequest,
     type: CoreAddressT,
   },
 ): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
-  const derivationTables = request.publicDeriver.getConceptualWallet().getDerivationTables();
+  const derivationTables = request.publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
     GetUtxoTxOutputsWithTx,
     GetAddress,
@@ -433,7 +434,11 @@ export async function getChainAddressesForDisplay(
       ...depTables,
       ...mapToTables(request.publicDeriver.getDb(), derivationTables),
     ],
-    async tx => await rawGetChainAddressesForDisplay(tx, deps, request, derivationTables)
+    async tx => await rawGetChainAddressesForDisplay(tx, deps, {
+      publicDeriver: request.publicDeriver,
+      chainsRequest: request.chainsRequest,
+      type: request.type,
+    }, derivationTables)
   );
 }
 export async function rawGetAllAddressesForDisplay(
@@ -445,7 +450,7 @@ export async function rawGetAllAddressesForDisplay(
     GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
   request: {
-    publicDeriver: IPublicDeriver & IGetAllUtxos,
+    publicDeriver: IPublicDeriver<> & IGetAllUtxos,
     type: CoreAddressT,
   },
   derivationTables: Map<number, string>,
@@ -487,11 +492,11 @@ export async function rawGetAllAddressesForDisplay(
 }
 export async function getAllAddressesForDisplay(
   request: {
-    publicDeriver: IPublicDeriver & IGetAllUtxos,
+    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos,
     type: CoreAddressT,
   },
 ): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
-  const derivationTables = request.publicDeriver.getConceptualWallet().getDerivationTables();
+  const derivationTables = request.publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
     GetUtxoTxOutputsWithTx,
     GetAddress,
@@ -511,7 +516,10 @@ export async function getAllAddressesForDisplay(
     async tx => await rawGetAllAddressesForDisplay(
       tx,
       deps,
-      request,
+      {
+        publicDeriver: request.publicDeriver,
+        type: request.type,
+      },
       derivationTables,
     )
   );
@@ -620,7 +628,7 @@ export async function rawChangePassword(
 
 export async function loadWalletsFromStorage(
   db: lf$Database,
-): Promise<Array<PublicDeriver>> {
+): Promise<Array<PublicDeriver<>>> {
   const deps = Object.freeze({
     GetAllBip44Wallets,
   });
@@ -662,7 +670,7 @@ export async function rawGetAddressRowsForWallet(
     GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
   request: {
-    publicDeriver: IPublicDeriver,
+    publicDeriver: IPublicDeriver<>,
   },
   derivationTables: Map<number, string>,
 ): Promise<{|

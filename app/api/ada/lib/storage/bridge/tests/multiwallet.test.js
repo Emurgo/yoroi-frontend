@@ -49,7 +49,7 @@ const networkTransactions: Array<RemoteTransaction> = [{
   slot: 0,
   inputs: [
     {
-      address: '2cWKMJemoBaiw2vnBSiChVe9owqcymJJUq9UdTFzn3QLjvqvoLRVadugTfMtcJXQKcoWW',
+      address: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
       amount: '4000000',
       id: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d190',
       index: 0,
@@ -58,7 +58,7 @@ const networkTransactions: Array<RemoteTransaction> = [{
   ],
   outputs: [
     {
-      address: '2cWKMJemoBaiw2vnBSiChVe9owqcymJJUq9UdTFzn3QLjvqvoLRVadugTfMtcJXQKcoWW',
+      address: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
       amount: '3800000'
     },
   ]
@@ -75,7 +75,7 @@ const networkTransactions: Array<RemoteTransaction> = [{
   slot: 1,
   inputs: [
     {
-      address: '2cWKMJemoBaiw2vnBSiChVe9owqcymJJUq9UdTFzn3QLjvqvoLRVadugTfMtcJXQKcoWW',
+      address: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
       amount: '4000000',
       id: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d200',
       index: 0,
@@ -85,12 +85,12 @@ const networkTransactions: Array<RemoteTransaction> = [{
   outputs: [
     {
       // mnemonic1
-      address: '2cWKMJemoBam9FHms2YNoTSaKGn5xCbN5FRhAa3seKgkfrAYujWrX8PRiFF2jVVMuM455',
+      address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
       amount: '2100000'
     },
     {
       // mnemonic2
-      address: '2cWKMJemoBajuCcDYHncArxP5JVaJ8FZeVtH1X49NEizHfSFAp6bSKppwhUyPZzi3mYMZ',
+      address: 'Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc',
       amount: '2700000'
     }
   ]
@@ -104,7 +104,7 @@ beforeEach(() => {
 });
 
 async function checkPub1HasTx(
-  publicDeriver1: PublicDeriver,
+  publicDeriver1: PublicDeriver<>,
 ): Promise<void> {
   const withDisplayCutoff = asDisplayCutoff(publicDeriver1);
   if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
@@ -120,7 +120,7 @@ async function checkPub1HasTx(
   {
     const response = await basePubDeriver.getAllUtxos();
     expect(response).toEqual([{
-      address: '2cWKMJemoBam9FHms2YNoTSaKGn5xCbN5FRhAa3seKgkfrAYujWrX8PRiFF2jVVMuM455',
+      address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
       addressing: {
         path: [2147483692, 2147485463, 2147483648, 0, 4],
         startLevel: 1,
@@ -164,7 +164,7 @@ async function checkPub1HasTx(
   }
 }
 async function checkPub2IsEmpty(
-  publicDeriver2: PublicDeriver,
+  publicDeriver2: PublicDeriver<>,
 ): Promise<void> {
   const withDisplayCutoff = asDisplayCutoff(publicDeriver2);
   if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
@@ -198,7 +198,7 @@ async function checkPub2IsEmpty(
   }
 }
 async function checkPub2HasTx(
-  publicDeriver2: PublicDeriver,
+  publicDeriver2: PublicDeriver<>,
 ): Promise<void> {
   const withDisplayCutoff = asDisplayCutoff(publicDeriver2);
   if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
@@ -214,7 +214,7 @@ async function checkPub2HasTx(
   {
     const response = await basePubDeriver.getAllUtxos();
     expect(response).toEqual([{
-      address: '2cWKMJemoBajuCcDYHncArxP5JVaJ8FZeVtH1X49NEizHfSFAp6bSKppwhUyPZzi3mYMZ',
+      address: 'Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc',
       addressing: {
         path: [2147483692, 2147485463, 2147483648, 0, 0],
         startLevel: 1,

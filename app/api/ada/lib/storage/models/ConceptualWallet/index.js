@@ -31,16 +31,15 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
 
   db: lf$Database;
   #conceptualWalletId: number;
+  #protocolMagic: string;
   walletType: WalletType;
   hardwareInfo: ?$ReadOnly<HwWalletMetaRow>;
-  derivationTables: Map<number, string>;
 
   constructor(data: IConceptualWalletConstructor): IConceptualWallet {
     this.db = data.db;
     this.#conceptualWalletId = data.conceptualWalletId;
     this.walletType = data.walletType;
     this.hardwareInfo = data.hardwareInfo;
-    this.derivationTables = data.derivationTables;
     return this;
   }
 
@@ -52,7 +51,11 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
     return this.#conceptualWalletId;
   }
 
-  getWalletType = (): WalletType => {
+  getProtocolMagic(): string {
+    return this.#protocolMagic;
+  }
+
+  getWalletType: void => WalletType = () => {
     return this.walletType;
   }
   /**
@@ -60,17 +63,11 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
    * since information like device ID, firmware version, etc.
    * can change every time the user uses the HW wallet
    */
-  getHwWalletMeta = (): ?$ReadOnly<HwWalletMetaRow> => {
+  getHwWalletMeta: void => ?$ReadOnly<HwWalletMetaRow> = () => {
     return this.hardwareInfo;
   }
 
-  getDerivationTables = (): Map<number, string> => {
-    return this.derivationTables;
-  }
-
-  rename = async (
-    body: IRenameRequest,
-  ): Promise<IRenameResponse> => {
+  rename: IRenameRequest => Promise<IRenameResponse> = async (body) => {
     const deps = Object.freeze({
       ModifyConceptualWallet,
     });
@@ -93,7 +90,7 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
     );
   }
 
-  getFullConceptualWalletInfo = async (): Promise<$ReadOnly<ConceptualWalletRow>> => {
+  getFullConceptualWalletInfo: void => Promise<$ReadOnly<ConceptualWalletRow>> = async () => {
     const deps = Object.freeze({
       GetConceptualWallet,
     });
@@ -155,7 +152,6 @@ export function isLedgerNanoWallet(
 export async function refreshConceptualWalletFunctionality(
   db: lf$Database,
   conceptualWalletId: number,
-  derivationTables: Map<number, string>,
 ): Promise<IConceptualWalletConstructor> {
   const deps = Object.freeze({
     GetHwWalletMeta,
@@ -181,6 +177,5 @@ export async function refreshConceptualWalletFunctionality(
     conceptualWalletId,
     walletType,
     hardwareInfo,
-    derivationTables,
   };
 }

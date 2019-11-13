@@ -33,11 +33,11 @@ export type StandardAddress = {|
   ...Address, ...Value, ...Addressing, ...UsedStatus
 |};
 
-type SubRequestType<T> = { publicDeriver: PublicDeriver } => Promise<Array<T>>;
+type SubRequestType<T> = { publicDeriver: PublicDeriver<> } => Promise<Array<T>>;
 export class AddressTypeStore<T> {
 
   @observable addressesRequests: Array<{
-    publicDeriver: PublicDeriver,
+    publicDeriver: PublicDeriver<>,
     cachedRequest: CachedRequest<SubRequestType<T>>,
   }> = [];
 
@@ -95,7 +95,7 @@ export class AddressTypeStore<T> {
     return (request.result: any);
   }
 
-  _getRequest: (PublicDeriver) => CachedRequest<SubRequestType<T>> = (publicDeriver) => {
+  _getRequest: (PublicDeriver<>) => CachedRequest<SubRequestType<T>> = (publicDeriver) => {
     const foundRequest = find(this.addressesRequests, { publicDeriver });
     if (foundRequest && foundRequest.cachedRequest) {
       return foundRequest.cachedRequest;
@@ -103,8 +103,8 @@ export class AddressTypeStore<T> {
     return new CachedRequest<SubRequestType<T>>(this.request);
   };
 
-  @action addObservedWallet: PublicDeriver => void = (
-    publicDeriver: PublicDeriver
+  @action addObservedWallet: PublicDeriver<> => void = (
+    publicDeriver: PublicDeriver<>
   ): void => {
     this.addressesRequests.push({
       publicDeriver,
@@ -203,7 +203,7 @@ export default class AddressesStore extends Store {
   }
 
   _wrapForAllAddresses = (request: {
-    publicDeriver: PublicDeriver
+    publicDeriver: PublicDeriver<>,
   }): Promise<Array<StandardAddress>> => {
     const withUtxos = asGetAllUtxos(request.publicDeriver);
     if (withUtxos == null) {
@@ -216,7 +216,7 @@ export default class AddressesStore extends Store {
     });
   }
   _wrapForChainAddresses = (request: {
-    publicDeriver: PublicDeriver,
+    publicDeriver: PublicDeriver<>,
     chainsRequest: IHasChainsRequest,
   }): Promise<Array<StandardAddress>> => {
     const withHasChains = asHasChains(

@@ -13,7 +13,7 @@ import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
-  asGetBalance,
+  asGetBalance, asHasLevels,
 } from '../../api/ada/lib/storage/models/common/traits';
 import {
   asGetAllUtxos,
@@ -37,7 +37,7 @@ export default class TransactionsStore extends Store {
 
   /** Track transactions for a set of wallets */
   @observable transactionsRequests: Array<{
-    publicDeriver: PublicDeriver,
+    publicDeriver: PublicDeriver<>,
     pendingRequest: CachedRequest<RefreshPendingTransactionsFunc>,
     recentRequest: CachedRequest<GetTransactionsFunc>,
     allRequest: CachedRequest<GetTransactionsFunc>,
@@ -45,7 +45,7 @@ export default class TransactionsStore extends Store {
   }> = [];
 
   @observable _searchOptionsForWallets = observable.map<
-      PublicDeriver,
+      PublicDeriver<>,
       GetTransactionsRequestOptions,
     >();
 
@@ -206,8 +206,8 @@ export default class TransactionsStore extends Store {
       .catch(() => {}); // Do nothing. It's logged in the api call
   };
 
-  @action refreshLocal: (PublicDeriver & IGetAllUtxos & IGetLastSyncInfo) => void = (
-    publicDeriver: PublicDeriver & IGetAllUtxos & IGetLastSyncInfo,
+  @action refreshLocal: (PublicDeriver<> & IGetAllUtxos & IGetLastSyncInfo) => void = (
+    publicDeriver: PublicDeriver<> & IGetAllUtxos & IGetLastSyncInfo,
   ): void => {
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
 
@@ -218,8 +218,12 @@ export default class TransactionsStore extends Store {
       ? this.searchOptions.skip
       : this.SEARCH_SKIP;
 
+    const withLevels = asHasLevels(publicDeriver);
+    if (withLevels == null) {
+      throw new Error('refreshLocal no levels');
+    }
     const requestParams: GetTransactionsRequest = {
-      publicDeriver,
+      publicDeriver: withLevels,
       isLocalRequest: true,
       limit,
       skip,
@@ -247,7 +251,7 @@ export default class TransactionsStore extends Store {
   }
 
   _getTransactionsPendingRequest = (
-    publicDeriver: PublicDeriver
+    publicDeriver: PublicDeriver<>
   ): CachedRequest<RefreshPendingTransactionsFunc> => {
     const foundRequest = find(this.transactionsRequests, { publicDeriver });
     if (foundRequest && foundRequest.pendingRequest) return foundRequest.pendingRequest;
@@ -259,7 +263,7 @@ export default class TransactionsStore extends Store {
   /** Get request for fetching transaction data.
    * Should ONLY be executed to cache query WITH search options */
   _getTransactionsRecentRequest = (
-    publicDeriver: PublicDeriver
+    publicDeriver: PublicDeriver<>
   ): CachedRequest<GetTransactionsFunc> => {
     const foundRequest = find(this.transactionsRequests, { publicDeriver });
     if (foundRequest && foundRequest.recentRequest) return foundRequest.recentRequest;
@@ -269,7 +273,7 @@ export default class TransactionsStore extends Store {
   /** Get request for fetching transaction data.
    * Should ONLY be executed to cache query WITHOUT search options */
   _getTransactionsAllRequest = (
-    publicDeriver: PublicDeriver
+    publicDeriver: PublicDeriver<>
   ): CachedRequest<GetTransactionsFunc> => {
     const foundRequest = find(this.transactionsRequests, { publicDeriver });
     if (foundRequest && foundRequest.allRequest) return foundRequest.allRequest;
@@ -277,7 +281,7 @@ export default class TransactionsStore extends Store {
   };
 
   _getBalanceRequest = (
-    publicDeriver: PublicDeriver
+    publicDeriver: PublicDeriver<>
   ): CachedRequest<GetBalanceFunc> => {
     const foundRequest = find(this.transactionsRequests, { publicDeriver });
     if (foundRequest && foundRequest.getBalanceRequest) return foundRequest.getBalanceRequest;

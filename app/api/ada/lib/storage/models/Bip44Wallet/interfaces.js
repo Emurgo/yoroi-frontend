@@ -54,20 +54,15 @@ export interface IBip44Wallet {
     privateDeriverKeyDerivationId: number | null,
     protocolMagic: number,
   ): IBip44Wallet;
+  // TODO: can get rid of this with getPArent
   getDb(): lf$Database;
+  // TODO: can get rid of this with getPArent
   getWrapperId(): number;
-  getPublicDeriverLevel(): number;
-  getSigningLevel(): number | null;
-  getProtocolMagic(): number;
 }
 
 // =====================
 //   For PublicDeriver
 // =====================
-
-export interface IBip44Parent {
-  +getBip44Parent: (body: void) => Bip44Wallet;
-}
 
 export type IAddBip44FromPublicRequest = {|
   tree: TreeInsert<any>,
