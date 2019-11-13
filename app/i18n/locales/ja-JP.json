@@ -46,7 +46,7 @@
   "daedalusTransfer.instructions.attention.masterKey.button.label": "ダイダロス マスター鍵",
   "daedalusTransfer.instructions.attention.paper.button.label": "ダイダロス ペーパーウォレット",
   "daedalusTransfer.instructions.attention.text": "<strong>第一スナップショット</strong>（技術テスティング用）の為に、<strong>ダイダロスウォレット</strong>の残高を確認します。<br />今回のスナップショットの目的は、ユーザーの残高が正しく反映されるかどうかを試すことです。<br />表示される残高は、お使いのウォレットの11月12日の時点での残高と合致するはずです。",
-  "daedalusTransfer.instructions.attention.title": "資金を全て送金します：",
+  "daedalusTransfer.instructions.attention.title": "残高を確認する方法を選択してください",
   "daedalusTransfer.summary.addressFrom.subLabel": "ダイダロスウォレットのアドレス",
   "daedalusTransfer.title": "ダイダロスウォレットの残高を確認する",
   "daedalusTransfer.waiting.checkingAddresses.generatingTx": "送金トランザクションを生成しています",

@@ -351,7 +351,7 @@ const globalMessages = defineMessages({
   },
   transferTitleText: {
     id: 'daedalusTransfer.instructions.attention.title',
-    defaultMessage: '!!!Transfer all funds from'
+    defaultMessage: '!!!Check funds from'
   },
   passwordDisclaimer: {
     id: 'wallet.restore.dialog.passwordDisclaimer',
