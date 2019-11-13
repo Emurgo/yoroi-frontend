@@ -3,7 +3,6 @@ import React from 'react';
 import type { Element } from 'react';
 import { omit } from 'lodash';
 import classnames from 'classnames';
-import SvgInline from 'react-svg-inline';
 import ErrorSvg from '../../assets/images/input/exclamationmark.inline.svg';
 import PasswordSvg from '../../assets/images/input/password.watch.inline.svg';
 import PasswordHiddenSvg from '../../assets/images/input/password.hiden.inline.svg';
@@ -71,13 +70,13 @@ export const FormFieldOwnSkin = class extends React.Component<Props, State> {
         >
 
           <div className={styles.iconsWrapper}>
-            {this.props.done === true && <SvgInline svg={SuccessSvg} />}
-            {(this.props.error != null && this.props.error !== '') && <SvgInline svg={ErrorSvg} />}
+            {this.props.done === true && <SuccessSvg />}
+            {(this.props.error != null && this.props.error !== '') && <ErrorSvg />}
             {(this.props.type === 'password') ? (
               <button tabIndex="-1" type="button" onClick={this.showPassword}>
                 {isPasswordShown
-                  ? <SvgInline svg={PasswordSvg} />
-                  : <SvgInline svg={PasswordHiddenSvg} />}
+                  ? <PasswordSvg />
+                  : <PasswordHiddenSvg />}
               </button>
             ) : null}
           </div>

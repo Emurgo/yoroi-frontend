@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import type { MessageDescriptor } from 'react-intl';
 import { intlShape } from 'react-intl';
-import SvgInline from 'react-svg-inline';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import styles from './TopBarCategory.scss';
@@ -38,9 +37,10 @@ export default class TopBarCategory extends Component<Props> {
       iconStyle != null ? iconStyle : null,
       styles.icon
     ]);
+    const SvgElem = icon;
     return (
       <button type="button" className={componentStyles} onClick={onClick}>
-        <SvgInline svg={icon} className={iconStyles} />
+        <span className={iconStyles}><SvgElem /></span>
         {inlineTextMD
           && <span className={styles.iconInlineText}>{intl.formatMessage(inlineTextMD)}</span>}
       </button>

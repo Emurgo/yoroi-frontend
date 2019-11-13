@@ -2,14 +2,13 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
-import SvgInline from 'react-svg-inline';
 import classnames from 'classnames';
 import QRCode from 'qrcode.react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import BorderedBox from '../widgets/BorderedBox';
-import verifyIcon from '../../assets/images/verify-icon.inline.svg';
-import generateURIIcon from '../../assets/images/generate-uri.inline.svg';
+import VerifyIcon from '../../assets/images/verify-icon.inline.svg';
+import GenerateURIIcon from '../../assets/images/generate-uri.inline.svg';
 import LocalizableError from '../../i18n/LocalizableError';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import styles from './WalletReceive.scss';
@@ -235,10 +234,9 @@ export default class WalletReceive extends Component<Props, State> {
                         className={styles.btnGenerateURI}
                       >
                         <div className={styles.generateURLActionBlock}>
-                          <SvgInline
-                            svg={generateURIIcon}
-                            className={styles.generateURIIcon}
-                          />
+                          <span className={styles.generateURIIcon}>
+                            <GenerateURIIcon />
+                          </span>
                           <span className={styles.actionIconText}>
                             {intl.formatMessage(messages.generatePaymentURLLabel)}
                           </span>
@@ -261,10 +259,9 @@ export default class WalletReceive extends Component<Props, State> {
                       }
                     >
                       <div>
-                        <SvgInline
-                          svg={verifyIcon}
-                          className={styles.verifyIcon}
-                        />
+                        <span className={styles.verifyIcon}>
+                          <VerifyIcon />
+                        </span>
                         <span>{intl.formatMessage(messages.verifyAddressLabel)}</span>
                       </div>
                     </button>

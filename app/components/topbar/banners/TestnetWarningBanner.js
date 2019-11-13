@@ -2,13 +2,12 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages, FormattedMessage } from 'react-intl';
-import SvgInline from 'react-svg-inline';
 import globalMessages from '../../../i18n/global-messages';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import styles from './TestnetWarningBanner.scss';
 import environment from '../../../environment';
-import warningSvg from '../../../assets/images/warning.inline.svg';
-import shelleyTestnetWarningSvg from '../../../assets/images/shelley-testnet-warning.inline.svg';
+import WarningSvg from '../../../assets/images/warning.inline.svg';
+import ShelleyTestnetWarningSvg from '../../../assets/images/shelley-testnet-warning.inline.svg';
 
 const messages = defineMessages({
   testnetLabel: {
@@ -52,7 +51,7 @@ export default class TestnetWarningBanner extends Component<Props> {
     if (environment.isShelley()) {
       children = (
         <div className={styles.shelleyTestnetWarning}>
-          <SvgInline key="0" svg={shelleyTestnetWarningSvg} className={styles.shelleyTestnetWarningIcon} />
+          <span key="0" className={styles.shelleyTestnetWarningIcon}><ShelleyTestnetWarningSvg /></span>
           <div className={styles.text}>
             <FormattedMessage
               {...messages.shelleyTestnetLabel}
@@ -65,7 +64,7 @@ export default class TestnetWarningBanner extends Component<Props> {
     } else {
       children = (
         <div className={styles.testnetWarning}>
-          <SvgInline key="0" svg={warningSvg} className={styles.warningIcon} />
+          <span key="0" className={styles.warningIcon}><WarningSvg /></span>
           <FormattedMessage
             {...messages.testnetLabel}
             values={{ faqLink, network: environment.NETWORK }}
