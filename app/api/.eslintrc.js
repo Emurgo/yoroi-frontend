@@ -5,7 +5,7 @@ module.exports = {
       'always',
       {
         excludeArrowFunctions: true,
-        annotateUndefined: 'ignore',
+        annotateUndefined: 'always-enforce',
         excludeMatching: ['constructor'],
       }
     ],

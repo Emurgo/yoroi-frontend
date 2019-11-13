@@ -58,7 +58,7 @@ export default class LedgerSendStore extends Store {
     );
   // =================== API RELATED =================== //
 
-  setup() {
+  setup(): void {
     const ledgerSendAction = this.actions.ada.ledgerSend;
     ledgerSendAction.init.listen(this._init);
     ledgerSendAction.sendUsingLedger.listen(this._send);
@@ -71,7 +71,7 @@ export default class LedgerSendStore extends Store {
     Logger.debug('LedgerSendStore::_init called');
   }
 
-  _reset() {
+  _reset(): void {
     this._setActionProcessing(false);
     this._setError(null);
   }

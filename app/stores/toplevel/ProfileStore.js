@@ -176,7 +176,7 @@ export default class ProfileStore extends Store {
   @observable setHideBalanceRequest: Request<boolean => Promise<void>>
     = new Request<boolean => Promise<void>>(this.api.localStorage.setHideBalance);
 
-  setup() {
+  setup(): void {
     this.actions.profile.updateLocale.listen(this._updateLocale);
     this.actions.profile.updateTentativeLocale.listen(this._updateTentativeLocale);
     this.actions.profile.updateSelectedExplorer.listen(this.setSelectedExplorer);
@@ -195,7 +195,7 @@ export default class ProfileStore extends Store {
     this._getUriSchemeAcceptance(); // eagerly cache
   }
 
-  teardown() {
+  teardown(): void {
     super.teardown();
   }
 

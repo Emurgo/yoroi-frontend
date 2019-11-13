@@ -37,7 +37,7 @@ export default class AdaWalletsStore extends WalletStore {
   @observable restoreRequest: Request<RestoreWalletFunc>
     = new Request<RestoreWalletFunc>(this.api.ada.restoreWallet);
 
-  setup() {
+  setup(): void {
     super.setup();
     const { router, walletBackup, ada } = this.actions;
     const { wallets } = ada;

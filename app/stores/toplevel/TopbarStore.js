@@ -20,7 +20,7 @@ export default class TopbarStore extends Store {
 
   @observable activeTopbarCategory: string = WALLETS.route;
 
-  setup() {
+  setup(): void {
     this.isActiveCategory = this.isActiveCategory.bind(this);
     this.actions.topbar.activateTopbarCategory.listen(this._onActivateTopbarCategory);
     this.registerReactions([

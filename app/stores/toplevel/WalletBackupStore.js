@@ -31,7 +31,7 @@ class WalletBackupStore extends Store {
 
   countdownTimerInterval: ?IntervalID;
 
-  setup() {
+  setup(): void {
     this._reset();
     const a = this.actions.walletBackup;
     a.initiateWalletBackup.listen(this._initiateWalletBackup);

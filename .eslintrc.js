@@ -101,6 +101,7 @@ module.exports = {
     'max-classes-per-file': 0,
     'no-floating-promise/no-floating-promise': 2,
     "flowtype/no-primitive-constructor-types": 2,
+    "flowtype/no-dupe-keys": 2,
   },
   plugins: [
     'import',

@@ -42,7 +42,7 @@ export default class AddressesStore extends Store {
   @observable selectedAddress: ?{ address: string, path: BIP32Path } = null;
   ledgerConnect: ?LedgerConnect;
 
-  setup() {
+  setup(): void {
     const actions = this.actions[environment.API].hwVerifyAddress;
     actions.selectAddress.listen(this._selectAddress);
     actions.verifyAddress.listen(this._verifyAddress);

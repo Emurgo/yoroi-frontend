@@ -13,7 +13,7 @@ export default class AdaAddressesStore extends AddressesStore {
   @observable createAddressRequest: Request<CreateAddressFunc>
     = new Request<CreateAddressFunc>(this.api.ada.createAddress);
 
-  setup() {
+  setup(): void {
     super.setup();
   }
 }

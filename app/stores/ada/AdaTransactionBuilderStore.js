@@ -39,7 +39,7 @@ export default class AdaTransactionBuilderStore extends Store {
   @observable createUnsignedTx: LocalizedRequest<CreateUnsignedTxFunc>
     = new LocalizedRequest<CreateUnsignedTxFunc>(this.api.ada.createUnsignedTx);
 
-  setup() {
+  setup(): void {
     super.setup();
     this._preWaitReset();
     this._postWaitReset();

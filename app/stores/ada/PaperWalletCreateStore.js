@@ -42,7 +42,7 @@ export default class PaperWalletCreateStore extends Store {
   userPassword: ?string;
   paper: ?AdaPaper;
 
-  setup() {
+  setup(): void {
     this._reset();
     const a = this.actions.ada.paperWallets;
     a.submitInit.listen(this._submitInit);
