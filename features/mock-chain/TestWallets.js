@@ -24,7 +24,9 @@ function createWallet(payload: {
 // You can use this website to generate more mnemoncis if you need for testing
 // https://iancoleman.io/bip39/
 
+// eslint-disable-next-line prefer-object-spread
 export const testWallets: { [key: string]: RestorationInput } = Object.assign(
+  {},
   createWallet({
     name: 'small-single-tx',
     mnemonic: 'eight country switch draw meat scout mystery blade tip drift useless good keep usage title',
