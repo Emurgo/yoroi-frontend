@@ -8,17 +8,16 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
 const shell = require('shelljs');
 const manifestEnvs = require('../chrome/manifestEnvs');
-const metaInfo = require('../app/config/metaInfo');
 
 const plugins = (folder /*: string */, networkName /*: string */) => {
   let pageTitle = '';
   switch (networkName) {
     case 'shelley-dev':
     case 'shelley-testnet':
-      pageTitle = metaInfo.YOROI_PAGE_TITILE_SHELLEY_TESTNET;
+      pageTitle = 'Yoroi Staking Testnet';
       break;
     default:
-      pageTitle = metaInfo.YOROI_PAGE_TITILE;
+      pageTitle = 'Yoroi';
   }
 
   return [
