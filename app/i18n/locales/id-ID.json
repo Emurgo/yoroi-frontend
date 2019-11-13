@@ -46,7 +46,7 @@
   "daedalusTransfer.instructions.attention.masterKey.button.label": "Master Key Daedalus",
   "daedalusTransfer.instructions.attention.paper.button.label": "Paper Wallet Daedalus",
   "daedalusTransfer.instructions.attention.text": "Check the balance after the <strong>first snapshot</strong> (dry run) for a <strong>Daedalus Wallet</strong>. <br /> This first Testnet only has the purpose to help users assure that their balance got copied correctly.<br /> As a result, you will be able to see what was the balance that got copied from Mainnet to the Testnet. This balance should match your holdings on November 12th.",
-  "daedalusTransfer.instructions.attention.title": "Transfer semua uang dari",
+  "daedalusTransfer.instructions.attention.title": "Check funds from",
   "daedalusTransfer.summary.addressFrom.subLabel": "Address wallet Daedalus",
   "daedalusTransfer.title": "Check Balance For Daedalus Wallets",
   "daedalusTransfer.waiting.checkingAddresses.generatingTx": "Membuat transaksi transfer",

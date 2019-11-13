@@ -46,7 +46,7 @@
   "daedalusTransfer.instructions.attention.masterKey.button.label": "Daedalus 복구 구문",
   "daedalusTransfer.instructions.attention.paper.button.label": "Daedalus 종이 지갑",
   "daedalusTransfer.instructions.attention.text": "Check the balance after the <strong>first snapshot</strong> (dry run) for a <strong>Daedalus Wallet</strong>. <br /> This first Testnet only has the purpose to help users assure that their balance got copied correctly.<br /> As a result, you will be able to see what was the balance that got copied from Mainnet to the Testnet. This balance should match your holdings on November 12th.",
-  "daedalusTransfer.instructions.attention.title": "에서 전액 전송",
+  "daedalusTransfer.instructions.attention.title": "Check funds from",
   "daedalusTransfer.summary.addressFrom.subLabel": "Daedalus 지갑 주소",
   "daedalusTransfer.title": "Check Balance For Daedalus Wallets",
   "daedalusTransfer.waiting.checkingAddresses.generatingTx": "이체 거래 생성 중",
