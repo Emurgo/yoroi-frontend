@@ -29,7 +29,7 @@ const baseProdConfig = (networkName /*: string */) => ({
     publicPath: '/js/',
   },
   plugins: [
-    ...commonConfig.plugins('build'),
+    ...commonConfig.plugins('build', networkName),
     new webpack.DefinePlugin(commonConfig.definePlugin(networkName, true)),
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),

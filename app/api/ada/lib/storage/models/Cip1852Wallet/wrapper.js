@@ -13,9 +13,15 @@ import type { Cip1852WrapperRow } from '../../database/walletTypes/cip1852/table
 import {
   Bip44TableMap,
 } from '../../database/walletTypes/bip44/api/utils';
+import {
+  PublicFromPrivate,
+  GetPrivateDeriverKey,
+  AdhocPublicDeriver,
+} from '../common/wrapper/traits';
+import type { IPrivateDeriver } from '../common/wrapper/interfaces';
 
 /** Snapshot of a Cip1852Wallet in the database */
-export class Cip1852Wallet extends ConceptualWallet implements ICip1852Wallet {
+export class Cip1852Wallet extends ConceptualWallet implements ICip1852Wallet, IPrivateDeriver {
   /**
    * Should only cache information we know will never change
    */
@@ -107,12 +113,12 @@ export async function refreshCip1852WalletFunctionality(
   let currClass = Cip1852Wallet;
 
   if (row.PrivateDeriverLevel != null && row.PrivateDeriverKeyDerivationId != null) {
-    // currClass = PublicFromPrivate(currClass);
-    // currClass = GetPrivateDeriverKey(currClass);
+    currClass = PublicFromPrivate(currClass);
+    currClass = GetPrivateDeriverKey(currClass);
     privateDeriverLevel = row.PrivateDeriverLevel;
     privateDeriverKeyDerivationId = row.PrivateDeriverKeyDerivationId;
   } else {
-    // currClass = AdhocPublicDeriver(currClass);
+    currClass = AdhocPublicDeriver(currClass);
   }
 
   const instance = new currClass(

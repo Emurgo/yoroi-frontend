@@ -5,13 +5,12 @@ import classnames from 'classnames';
 import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
 import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
-import SvgInline from 'react-svg-inline';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import WalletRecoveryInstructions from './WalletRecoveryInstructions';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletBackupPrivacyWarningDialog.scss';
-import recoveryWatchingSvg from '../../../assets/images/recovery-watching.inline.svg';
+import RecoveryWatchingSvg from '../../../assets/images/recovery-watching.inline.svg';
 
 const messages = defineMessages({
   recoveryPhraseInstructions: {
@@ -79,7 +78,7 @@ export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
         closeButton={<DialogCloseButton onClose={onCancelBackup} />}
         classicTheme={classicTheme}
       >
-        {!classicTheme && <SvgInline className={styles.recoveryImage} svg={recoveryWatchingSvg} />}
+        {!classicTheme && <span className={styles.recoveryImage}><RecoveryWatchingSvg /></span>}
         <WalletRecoveryInstructions
           instructionsText={<FormattedHTMLMessage {...messages.recoveryPhraseInstructions} />}
           classicTheme={classicTheme}

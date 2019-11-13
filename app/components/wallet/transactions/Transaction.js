@@ -4,11 +4,10 @@ import BigNumber from 'bignumber.js';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import moment from 'moment';
-import SvgInline from 'react-svg-inline';
 import classNames from 'classnames';
 import { uniq } from 'lodash';
 import styles from './Transaction.scss';
-import adaSymbol from '../../../assets/images/ada-symbol.inline.svg';
+import AdaSymbol from '../../../assets/images/ada-symbol.inline.svg';
 import WalletTransaction from '../../../domain/WalletTransaction';
 import { environmentSpecificMessages } from '../../../i18n/global-messages';
 import type { TransactionDirectionType, } from '../../../api/ada/transactions/types';
@@ -16,7 +15,7 @@ import { transactionTypes } from '../../../api/ada/transactions/types';
 import type { AssuranceLevel } from '../../../types/transactionAssuranceTypes';
 import environment from '../../../environment';
 import { Logger } from '../../../utils/logging';
-import expandArrow from '../../../assets/images/expand-arrow.inline.svg';
+import ExpandArrow from '../../../assets/images/expand-arrow.inline.svg';
 import RawHash from '../../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../../domain/Explorer';
@@ -236,7 +235,6 @@ export default class Transaction extends Component<Props, State> {
     const status = this.getStatusString(intl, state, assuranceLevel);
 
     const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
-    const symbol = adaSymbol;
 
     return (
       <div className={componentStyles}>
@@ -264,11 +262,11 @@ export default class Transaction extends Component<Props, State> {
                   // hide currency (we are showing symbol instead)
                   formattedWalletAmount(data.amount, false)
                 }
-                <SvgInline svg={symbol} className={styles.currencySymbol} />
+                <span className={styles.currencySymbol}><AdaSymbol /></span>
               </div>
 
               <div className={styles.expandArrowBox}>
-                <SvgInline className={arrowClasses} svg={expandArrow} />
+                <span className={arrowClasses}><ExpandArrow /></span>
               </div>
             </div>
           </div>

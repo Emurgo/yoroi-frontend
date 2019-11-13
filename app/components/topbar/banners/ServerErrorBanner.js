@@ -2,9 +2,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
-import SvgInline from 'react-svg-inline';
 import styles from './ServerErrorBanner.scss';
-import warningSvg from '../../../assets/images/warning.inline.svg';
+import WarningSvg from '../../../assets/images/warning.inline.svg';
 import type { ServerStatusErrorType } from '../../../types/serverStatusErrorType';
 
 const messages = defineMessages({
@@ -50,7 +49,7 @@ export default class ServerErrorBanner extends Component<Props> {
       <div>
         {displayMessage === null ? null : (
           <div className={styles.serverError}>
-            <SvgInline key="0" svg={warningSvg} className={styles.warningIcon} />
+            <span key="0" className={styles.warningIcon}><WarningSvg /></span>
             <FormattedHTMLMessage {...displayMessage} key="1" />
 
           </div>)

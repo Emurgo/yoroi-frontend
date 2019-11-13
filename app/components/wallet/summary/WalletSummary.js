@@ -2,9 +2,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import SvgInline from 'react-svg-inline';
-import adaSymbolSmallest from '../../../assets/images/ada-symbol-smallest-dark.inline.svg';
-import exportTxToFileSvg from '../../../assets/images/transaction/export-tx-to-file.inline.svg';
+import AdaSymbolSmallest from '../../../assets/images/ada-symbol-smallest-dark.inline.svg';
+import ExportTxToFileSvg from '../../../assets/images/transaction/export-tx-to-file.inline.svg';
 import BorderedBox from '../../widgets/BorderedBox';
 import { DECIMAL_PLACES_IN_ADA } from '../../../config/numbersConfig';
 import type { UnconfirmedAmount } from '../../../types/unconfirmedAmountType';
@@ -61,14 +60,18 @@ export default class WalletSummary extends Component<Props> {
               <div className={styles.pendingConfirmation}>
                 {`${intl.formatMessage(messages.pendingIncomingConfirmationLabel)}`}
                 : <span>{pendingAmount.incoming.toFormat(DECIMAL_PLACES_IN_ADA)}</span>
-                <SvgInline svg={adaSymbolSmallest} className={styles.currencySymbolSmallest} />
+                <span className={styles.currencySymbolSmallest}>
+                  <AdaSymbolSmallest />
+                </span>
               </div>
             }
             {pendingAmount.outgoing.isGreaterThan(0) &&
               <div className={styles.pendingConfirmation}>
                 {`${intl.formatMessage(messages.pendingOutgoingConfirmationLabel)}`}
                 : <span>{pendingAmount.outgoing.toFormat(DECIMAL_PLACES_IN_ADA)}</span>
-                <SvgInline svg={adaSymbolSmallest} className={styles.currencySymbolSmallest} />
+                <span className={styles.currencySymbolSmallest}>
+                  <AdaSymbolSmallest />
+                </span>
               </div>
             }
             {!isLoadingTransactions ? (
@@ -80,13 +83,16 @@ export default class WalletSummary extends Component<Props> {
         </div>
         <div className={styles.rightBlock}>
           {!isLoadingTransactions ? (
-            <SvgInline
-              svg={exportTxToFileSvg}
-
+            <span
               className={styles.exportTxToFileSvg}
               title={intl.formatMessage(messages.exportIconTooltip)}
               onClick={openExportTxToFileDialog}
-            />
+              onKeyPress={openExportTxToFileDialog}
+              role="button"
+              tabIndex="0"
+            >
+              <ExportTxToFileSvg />
+            </span>
           ) : null}
         </div>
       </div>

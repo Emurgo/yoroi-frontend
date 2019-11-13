@@ -3,12 +3,11 @@ import React, { Component } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import SvgInline from 'react-svg-inline';
 
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import globalMessages from '../../i18n/global-messages';
-import invalidURIImg from '../../assets/images/uri/invalid-uri.inline.svg';
+import InvalidURIImg from '../../assets/images/uri/invalid-uri.inline.svg';
 
 import styles from './URIInvalidDialog.scss';
 
@@ -70,7 +69,7 @@ export default class URIInvalidDialog extends Component<Props> {
       >
         <div>
           <center>
-            <SvgInline svg={invalidURIImg} className={styles.invalidURIImg} />
+            <span className={styles.invalidURIImg}><InvalidURIImg /></span>
           </center>
           <div className={styles.warningText}>
             {intl.formatMessage(messages.uriInvalidDialogWarningText1)}
