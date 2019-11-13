@@ -38,10 +38,10 @@ import {
 } from '../../database/utils';
 import type {
   IDerivePublicFromPrivateRequest,
-} from '../../models/Bip44Wallet/interfaces';
+} from '../../models/common/wrapper/interfaces';
 import {
   derivePublicDeriver,
-} from '../../models/Bip44Wallet/wrapper';
+} from '../../models/common/wrapper/traits';
 import type { AddDerivationRequest } from '../../database/primitives/api/write';
 import type { TreeInsertStart } from '../../database/walletTypes/common/utils';
 
