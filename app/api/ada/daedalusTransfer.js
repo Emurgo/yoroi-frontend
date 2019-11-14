@@ -106,9 +106,14 @@ export async function buildTransferTx(
   }
 ): Promise<TransferTx> {
   try {
-    const { addressKeys, senderUtxos, outputAddr, filterSenders = false } = payload;
+    const fakeUtxos = payload.senderUtxos.map(utxo => ({
+      ...utxo,
+      tx_hash: '6bc4cb31187dbbe4430014b133e8c5dc97ba4358c6690e751f066c74209c780b',
+      utxo_id: '6bc4cb31187dbbe4430014b133e8c5dc97ba4358c6690e751f066c74209c780b0',
+    }));
+    const { addressKeys, outputAddr, filterSenders = false } = payload;
 
-    const totalBalance = senderUtxos
+    const totalBalance = fakeUtxos
       .map(utxo => new BigNumber(utxo.amount))
       .reduce(
         (acc, amount) => acc.plus(amount),
@@ -118,7 +123,7 @@ export async function buildTransferTx(
     // first build a transaction to see what the fee will be
     const txBuilder = sendAllUnsignedTxFromUtxo(
       outputAddr,
-      senderUtxos
+      fakeUtxos
     ).txBuilder;
     const fee = coinToBigNumber(txBuilder.get_balance_without_fees().value());
 
@@ -129,10 +134,10 @@ export async function buildTransferTx(
     const setting = RustModule.WalletV2.BlockchainSettings.from_json({
       protocol_magic: protocolMagic
     });
-    for (let i = 0; i < senderUtxos.length; i++) {
+    for (let i = 0; i < fakeUtxos.length; i++) {
       const witness = RustModule.WalletV2.Witness.new_extended_key(
         setting,
-        addressKeys[senderUtxos[i].receiver],
+        addressKeys[fakeUtxos[i].receiver],
         txFinalizer.id()
       );
       txFinalizer.add_witness(witness);
@@ -143,7 +148,7 @@ export async function buildTransferTx(
     let senders = Object.keys(addressKeys);
 
     if (filterSenders) {
-      senders = senders.filter(addr => senderUtxos.some(({ receiver }) => receiver === addr));
+      senders = senders.filter(addr => fakeUtxos.some(({ receiver }) => receiver === addr));
     }
     // return summary of transaction
     return {
