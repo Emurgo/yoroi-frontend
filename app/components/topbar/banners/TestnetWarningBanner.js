@@ -16,7 +16,7 @@ const messages = defineMessages({
   },
   shelleyTestnetLabel: {
     id: 'testnet.shelley.label.message',
-    defaultMessage: 'YOU ARE ON TESTNET NETWORK ({network}).',
+    defaultMessage: 'YOU ARE CURRENTLY ON THE BALANCE CHECK TESTNET.',
   },
 });
 

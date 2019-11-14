@@ -14,11 +14,11 @@ const messages = defineMessages({
   },
   detail1: {
     id: 'profile.languageSelect.detail1',
-    defaultMessage: '!!!Currently, this version allows you to verify that',
+    defaultMessage: '!!!This installation of Yoroi allows you to verify that',
   },
   detail2: {
     id: 'profile.languageSelect.detail2',
-    defaultMessage: '!!!your balance was correctly taken into consideration during the first snapshot.',
+    defaultMessage: '!!!your balance was correctly copied over during the first snapshot.',
   },
 });
 

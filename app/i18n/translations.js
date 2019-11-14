@@ -34,49 +34,49 @@ export const LANGUAGES = [
     label: globalMessages.languageJapanese,
     svg: JapaneseFlag
   },
-  {
-    value: 'ko-KR',
-    label: globalMessages.languageKorean,
-    svg: KoreanFlag
-  },
-  {
-    value: 'zh-Hans',
-    label: globalMessages.languageChineseSimplified,
-    svg: Chinese
-  },
-  {
-    value: 'zh-Hant',
-    label: globalMessages.languageChineseTraditional,
-    svg: Chinese
-  },
-  {
-    value: 'ru-RU',
-    label: globalMessages.languageRussian,
-    svg: RussianFlag
-  },
-  {
-    value: 'de-DE',
-    label: globalMessages.languageGerman,
-    svg: GermanFlag
-  },
-  {
-    value: 'fr-FR',
-    label: globalMessages.languageFrench,
-    svg: FrenchFlag
-  },
-  {
-    value: 'es-ES',
-    label: globalMessages.languageSpanish,
-    svg: SpanishFlag
-  },
-  {
-    value: 'it-IT',
-    label: globalMessages.languageItalian,
-    svg: ItalianFlag
-  },
-  {
-    value: 'id-ID',
-    label: globalMessages.languageIndonesian,
-    svg: IdonesianFlag
-  },
+  // {
+  //   value: 'ko-KR',
+  //   label: globalMessages.languageKorean,
+  //   svg: KoreanFlag
+  // },
+  // {
+  //   value: 'zh-Hans',
+  //   label: globalMessages.languageChineseSimplified,
+  //   svg: Chinese
+  // },
+  // {
+  //   value: 'zh-Hant',
+  //   label: globalMessages.languageChineseTraditional,
+  //   svg: Chinese
+  // },
+  // {
+  //   value: 'ru-RU',
+  //   label: globalMessages.languageRussian,
+  //   svg: RussianFlag
+  // },
+  // {
+  //   value: 'de-DE',
+  //   label: globalMessages.languageGerman,
+  //   svg: GermanFlag
+  // },
+  // {
+  //   value: 'fr-FR',
+  //   label: globalMessages.languageFrench,
+  //   svg: FrenchFlag
+  // },
+  // {
+  //   value: 'es-ES',
+  //   label: globalMessages.languageSpanish,
+  //   svg: SpanishFlag
+  // },
+  // {
+  //   value: 'it-IT',
+  //   label: globalMessages.languageItalian,
+  //   svg: ItalianFlag
+  // },
+  // {
+  //   value: 'id-ID',
+  //   label: globalMessages.languageIndonesian,
+  //   svg: IdonesianFlag
+  // },
 ];

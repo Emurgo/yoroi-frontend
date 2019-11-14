@@ -11,7 +11,7 @@ import BaseTransferPage from '../../components/transfer/BaseTransferPage';
 const messages = defineMessages({
   step0: {
     id: 'yoroiTransfer.form.instructions.step0.text',
-    defaultMessage: '!!!Enter the 15-word recovery phrase used to back up your other wallet to restore the balance and transfer all the funds to current wallet.',
+    defaultMessage: '!!!Enter the 15-word recovery phrase used to back up your wallet to validate the balance.',
   },
 });
 

@@ -12,11 +12,11 @@ import BaseTransferPage from '../../components/transfer/BaseTransferPage';
 const messages = defineMessages({
   step0: {
     id: 'daedalusTransfer.form.instructions.step0.text',
-    defaultMessage: '!!!Enter the 12-word recovery phrase used to back up your Daedalus wallet to restore the balance and transfer all the funds from Daedalus to Yoroi.',
+    defaultMessage: '!!!Enter the 12-word recovery phrase used to back up your wallet to validate the balance.',
   },
   step0Paper: {
     id: 'daedalusTransfer.form.instructions.step0Paper.text',
-    defaultMessage: '!!!Enter the 27-word recovery phrase used to back up your Daedalus Paper wallet to restore the balance and transfer all the funds from Daedalus to Yoroi.',
+    defaultMessage: '!!!Enter the 27-word recovery phrase used to back up your wallet to validate the balance.',
   },
 });
 

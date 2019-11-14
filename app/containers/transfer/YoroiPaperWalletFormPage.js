@@ -12,7 +12,7 @@ import BaseTransferPage from '../../components/transfer/BaseTransferPage';
 const messages = defineMessages({
   step0: {
     id: 'yoroiTransfer.form.instructions.step0Paper.text',
-    defaultMessage: '!!!Enter the 21-word recovery phrase used to back up your Yoroi Paper wallet and your paper password to restore the balance and transfer all the funds.',
+    defaultMessage: '!!!Enter the 21-word recovery phrase used to back up your Yoroi Paper wallet and your paper password to validate the balance.',
   },
 });
 

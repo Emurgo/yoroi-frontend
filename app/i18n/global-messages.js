@@ -234,7 +234,7 @@ const globalMessages = defineMessages({
   },
   step1: {
     id: 'transfer.form.instructions.step1.text',
-    defaultMessage: '!!!It will take about 1 minute to restore your balance. In the next step, you will be presented with a transaction that will move all of your funds. Please review the details of the transaction carefully. You will need to pay a standard transaction fee on the Cardano network to make the transaction.',
+    defaultMessage: '!!!It will take about 1 minute to verify your balance.',
   },
   languageSelectLabel: {
     id: 'profile.languageSelect.form.languageSelectLabel',

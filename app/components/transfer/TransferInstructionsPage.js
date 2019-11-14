@@ -14,7 +14,7 @@ import styles from './TransferInstructionsPage.scss';
 const messages = defineMessages({
   attentionText: {
     id: 'daedalusTransfer.instructions.attention.text',
-    defaultMessage: '!!!Yoroi and Daedalus wallets use different key derivation scheme and they each have a separate format for addresses. For this reason, Daedalus wallets cannot be restored and continued to be used in Yoroi and vice versa. This will change in the future. For now, to use funds from your Daedalus wallet, you need to transfer them to your Yoroi wallet. Daedalus and Yoroi wallets are fully compatible for transferring of funds. If you don’t have a working copy of Daedalus, you can use your 12-word recovery phrase (or 27-words for a paper wallet) used to restore and transfer the balance from Daedalus into Yoroi.',
+    defaultMessage: '!!!You can <strong>check the balance of your Daedalus wallet</strong> after the first snapshot here.<br/>The primary purpose of first Testnet is to help users assure that their balance got copied correctly.<br/>As a result, you will be able to validate the balance that got copied from Mainnet to the Testnet is correct. This balance should match the holdings you held on November 12th.',
   },
   transferText: {
     id: 'daedalusTransfer.instructions.attention.button.label',
