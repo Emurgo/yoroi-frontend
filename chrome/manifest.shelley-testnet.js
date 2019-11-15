@@ -17,4 +17,5 @@ export default buildManifest({
     /* eslint-enable quote-props */
   },
   versionOverride: '2.0.0',
+  geckoKey: '{842ae5af-a7ff-4e99-afb6-bd6c4043bcfa}',
 });
