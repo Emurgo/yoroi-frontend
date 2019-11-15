@@ -1,6 +1,4 @@
-
 // @flow
-
 
 import type {
   lf$Database,
@@ -9,15 +7,7 @@ import type {
 
 import type {
   IConceptualWallet,
-} from '../../ConceptualWallet/interfaces';
-
-import {
-  Mixin,
-} from 'mixwith';
-
-import { encryptWithPassword } from '../../../../../../../utils/passwordCipher';
-
-import type {
+  IConceptualWalletConstructor,
   IHasPrivateDeriver,
   IHasLevels,
   IDerivePublicFromPrivateRequest,
@@ -27,28 +17,44 @@ import type {
   IAddAdhocPublicDeriverRequest, IAddAdhocPublicDeriverResponse,
   IAdhocPublicDeriver,
 } from './interfaces';
-
+import { WalletTypeOption, } from './interfaces';
+import type {
+  Bip44WrapperRow,
+} from '../../database/walletTypes/bip44/tables';
+import type { IBip44Wallet } from '../Bip44Wallet/interfaces';
+import type { ICip1852Wallet } from '../Cip1852Wallet/interfaces';
+import type { Cip1852WrapperRow } from '../../database/walletTypes/cip1852/tables';
+import { Cip1852Wallet } from '../Cip1852Wallet/wrapper';
+import { Bip44Wallet } from '../Bip44Wallet/wrapper';
 import {
   getAllSchemaTables,
   raii,
   mapToTables,
   StaleStateError,
-} from '../../../database/utils';
+} from '../../database/utils';
+import type { HwWalletMetaRow, } from '../../database/walletTypes/core/tables';
+import { GetHwWalletMeta } from '../../database/walletTypes/core/api/read';
+
+import {
+  Mixin,
+} from 'mixwith';
+
+import { encryptWithPassword } from '../../../../../../utils/passwordCipher';
 
 import {
   DerivePublicDeriverFromKey, AddAdhocPublicDeriver,
-} from '../../../database/walletTypes/common/api/write';
-import { UpdateGet, } from '../../../database/primitives/api/write';
-import { GetKeyForDerivation, } from '../../../database/primitives/api/read';
+} from '../../database/walletTypes/common/api/write';
+import { UpdateGet, } from '../../database/primitives/api/write';
+import { GetKeyForDerivation, } from '../../database/primitives/api/read';
 
 import {
   rawChangePassword,
   normalizeBip32Ed25519ToPubDeriverLevel,
-} from '../../utils';
+} from '../utils';
 
 import type {
   IChangePasswordRequest, IChangePasswordResponse,
-} from '../interfaces';
+} from '../common/interfaces';
 
 // ===========================
 //   DerivePublicFromPrivate
@@ -350,4 +356,105 @@ export function asAdhocPublicDeriver<T: IConceptualWallet>(
     return obj;
   }
   return undefined;
+}
+
+
+export async function refreshConceptualWalletFunctionality(
+  db: lf$Database,
+  conceptualWalletId: number,
+): Promise<IConceptualWalletConstructor> {
+  const deps = Object.freeze({
+    GetHwWalletMeta,
+  });
+  const depTables = Object
+    .keys(deps)
+    .map(key => deps[key])
+    .flatMap(table => getAllSchemaTables(db, table));
+  const hardwareInfo = await raii<void | $ReadOnly<HwWalletMetaRow>>(
+    db,
+    depTables,
+    async tx => await deps.GetHwWalletMeta.getMeta(
+      db, tx,
+      conceptualWalletId,
+    )
+  );
+  const walletType = hardwareInfo == null
+    ? WalletTypeOption.WEB_WALLET
+    : WalletTypeOption.HARDWARE_WALLET;
+
+  return {
+    db,
+    conceptualWalletId,
+    walletType,
+    hardwareInfo,
+  };
+}
+
+export async function refreshCip1852WalletFunctionality(
+  db: lf$Database,
+  row: $ReadOnly<Cip1852WrapperRow>,
+  protocolMagic: number, // TODO: should be stored in a table somewhere in the future
+): Promise<ICip1852Wallet> {
+  const conceptualWalletCtorData = await refreshConceptualWalletFunctionality(
+    db,
+    row.ConceptualWalletId,
+  );
+
+  let privateDeriverLevel = null;
+  let privateDeriverKeyDerivationId = null;
+
+  let currClass = Cip1852Wallet;
+
+  if (row.PrivateDeriverLevel != null && row.PrivateDeriverKeyDerivationId != null) {
+    currClass = PublicFromPrivate(currClass);
+    currClass = GetPrivateDeriverKey(currClass);
+    privateDeriverLevel = row.PrivateDeriverLevel;
+    privateDeriverKeyDerivationId = row.PrivateDeriverKeyDerivationId;
+  } else {
+    currClass = AdhocPublicDeriver(currClass);
+  }
+
+  const instance = new currClass(
+    db,
+    conceptualWalletCtorData,
+    row,
+    privateDeriverLevel,
+    privateDeriverKeyDerivationId,
+    protocolMagic,
+  );
+  return instance;
+}
+
+export async function refreshBip44WalletFunctionality(
+  db: lf$Database,
+  row: $ReadOnly<Bip44WrapperRow>,
+  protocolMagic: number, // TODO: should be stored in a table somewhere in the future
+): Promise<IBip44Wallet> {
+  const conceptualWalletCtorData = await refreshConceptualWalletFunctionality(
+    db,
+    row.ConceptualWalletId,
+  );
+
+  let privateDeriverLevel = null;
+  let privateDeriverKeyDerivationId = null;
+
+  let currClass = Bip44Wallet;
+
+  if (row.PrivateDeriverLevel != null && row.PrivateDeriverKeyDerivationId != null) {
+    currClass = PublicFromPrivate(currClass);
+    currClass = GetPrivateDeriverKey(currClass);
+    privateDeriverLevel = row.PrivateDeriverLevel;
+    privateDeriverKeyDerivationId = row.PrivateDeriverKeyDerivationId;
+  } else {
+    currClass = AdhocPublicDeriver(currClass);
+  }
+
+  const instance = new currClass(
+    db,
+    conceptualWalletCtorData,
+    row,
+    privateDeriverLevel,
+    privateDeriverKeyDerivationId,
+  );
+  return instance;
 }

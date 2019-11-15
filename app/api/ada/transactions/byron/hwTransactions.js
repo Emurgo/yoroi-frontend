@@ -39,7 +39,7 @@ import type {
 } from 'trezor-connect/lib/types/cardano';
 import type {
   Address, Value, Addressing,
-} from '../../lib/storage/models/common/interfaces';
+} from '../../lib/storage/models/PublicDeriver/interfaces';
 
 import type { ConfigType } from '../../../../../config/config-types';
 

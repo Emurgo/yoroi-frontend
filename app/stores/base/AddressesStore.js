@@ -13,14 +13,12 @@ import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
-  asGetAllUtxos, asHasChains, asDisplayCutoff,
-} from '../../api/ada/lib/storage/models/Bip44Wallet/traits';
+  asGetAllUtxos, asHasUtxoChains, asDisplayCutoff,
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
-  IHasChainsRequest
-} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import type {
+  IHasUtxoChainsRequest,
   Address, Addressing, UsedStatus, Value,
-} from '../../api/ada/lib/storage/models/common/interfaces';
+} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { StoresMap } from '../index';
 import {
   Logger,
@@ -180,8 +178,8 @@ export default class AddressesStore extends Store {
   addObservedWallet: PublicDeriverWithCachedMeta => void = (
     publicDeriver: PublicDeriverWithCachedMeta
   ): void => {
-    const withHasChains = asHasChains(publicDeriver.self);
-    if (withHasChains == null) {
+    const withHasUtxoChains = asHasUtxoChains(publicDeriver.self);
+    if (withHasUtxoChains == null) {
       this.allAddressesForDisplay.addObservedWallet(publicDeriver.self);
     } else {
       this.externalForDisplay.addObservedWallet(publicDeriver.self);
@@ -193,8 +191,8 @@ export default class AddressesStore extends Store {
   refreshAddresses: PublicDeriverWithCachedMeta => void = (
     publicDeriver: PublicDeriverWithCachedMeta
   ): void => {
-    const withHasChains = asHasChains(publicDeriver.self);
-    if (withHasChains == null) {
+    const withHasUtxoChains = asHasUtxoChains(publicDeriver.self);
+    if (withHasUtxoChains == null) {
       this.allAddressesForDisplay.refreshAddresses();
     } else {
       this.externalForDisplay.refreshAddresses();
@@ -217,17 +215,17 @@ export default class AddressesStore extends Store {
   }
   _wrapForChainAddresses = (request: {
     publicDeriver: PublicDeriver<>,
-    chainsRequest: IHasChainsRequest,
+    chainsRequest: IHasUtxoChainsRequest,
   }): Promise<Array<StandardAddress>> => {
-    const withHasChains = asHasChains(
+    const withHasUtxoChains = asHasUtxoChains(
       request.publicDeriver
     );
-    if (withHasChains == null) {
+    if (withHasUtxoChains == null) {
       Logger.error(`_wrapForChainAddresses incorrect public deriver`);
       return Promise.resolve([]);
     }
     return this.api[environment.API].getChainAddressesForDisplay({
-      publicDeriver: withHasChains,
+      publicDeriver: withHasUtxoChains,
       chainsRequest: request.chainsRequest,
       type: CoreAddressTypes.CARDANO_LEGACY,
     });

@@ -15,7 +15,7 @@ import {
 } from '../../config/numbersConfig';
 import globalMessages from '../../i18n/global-messages';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
-import { asHasChains } from '../../api/ada/lib/storage/models/Bip44Wallet/traits';
+import { asHasUtxoChains } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 
 type Props = {
   ...InjectedProps,
@@ -74,7 +74,7 @@ export default class WalletReceivePage extends Component<Props, State> {
     if (!publicDeriver) throw new Error('Active wallet required for WalletReceivePage.');
 
     // assume account-level wallet for now
-    const withChains = asHasChains(publicDeriver.self);
+    const withChains = asHasUtxoChains(publicDeriver.self);
     if (!withChains) throw new Error('WalletReceivePage only available for account-level wallets');
     const addressTypeStore = addresses.externalForDisplay;
 

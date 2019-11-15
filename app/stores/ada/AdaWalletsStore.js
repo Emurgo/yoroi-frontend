@@ -17,7 +17,7 @@ import type {
 import type { BaseSignRequest } from '../../api/ada/transactions/types';
 import {
   asGetSigningKey,
-} from '../../api/ada/lib/storage/models/Bip44Wallet/traits';
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 
 export default class AdaWalletsStore extends WalletStore {
 

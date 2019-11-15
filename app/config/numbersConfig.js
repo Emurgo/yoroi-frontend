@@ -16,8 +16,9 @@ export const CIP_1852_PURPOSE = HARD_DERIVATION_START + 1852;
    * https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#address-gap-limit */
 export const BIP44_SCAN_SIZE =  20;
 
-export const EXTERNAL = 0;
-export const INTERNAL = 1;
+export const EXTERNAL: 0 = 0;
+export const INTERNAL: 1 = 1;
+export const ACCOUNT: 2 = 2;
 
 /**
  * Constant K as defined in Ouroboros Classic

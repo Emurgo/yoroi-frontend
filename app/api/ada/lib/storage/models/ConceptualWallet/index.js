@@ -20,7 +20,7 @@ import type {
 } from '../common/interfaces';
 import { ModifyConceptualWallet, } from '../../database/walletTypes/core/api/write';
 import type { HwWalletMetaRow, ConceptualWalletRow } from '../../database/walletTypes/core/tables';
-import { GetConceptualWallet, GetHwWalletMeta } from '../../database/walletTypes/core/api/read';
+import { GetConceptualWallet } from '../../database/walletTypes/core/api/read';
 import Config from '../../../../../../config';
 
 /** Snapshot of a ConceptualWallet in the database */
@@ -147,35 +147,4 @@ export function isLedgerNanoWallet(
     conceptualWallet,
     (hwWalletMeta) => hwWalletMeta.Vendor === vendor
   );
-}
-
-export async function refreshConceptualWalletFunctionality(
-  db: lf$Database,
-  conceptualWalletId: number,
-): Promise<IConceptualWalletConstructor> {
-  const deps = Object.freeze({
-    GetHwWalletMeta,
-  });
-  const depTables = Object
-    .keys(deps)
-    .map(key => deps[key])
-    .flatMap(table => getAllSchemaTables(db, table));
-  const hardwareInfo = await raii<void | $ReadOnly<HwWalletMetaRow>>(
-    db,
-    depTables,
-    async tx => await deps.GetHwWalletMeta.getMeta(
-      db, tx,
-      conceptualWalletId,
-    )
-  );
-  const walletType = hardwareInfo == null
-    ? WalletTypeOption.WEB_WALLET
-    : WalletTypeOption.HARDWARE_WALLET;
-
-  return {
-    db,
-    conceptualWalletId,
-    walletType,
-    hardwareInfo,
-  };
 }

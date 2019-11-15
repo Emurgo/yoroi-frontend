@@ -25,7 +25,7 @@ import {
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 import type {
   Addressing,
-} from '../lib/storage/models/common/interfaces';
+} from '../lib/storage/models/PublicDeriver/interfaces';
 import {
   Bip44DerivationLevels,
 } from '../lib/storage/database/walletTypes/bip44/api/utils';
