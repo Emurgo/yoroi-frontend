@@ -357,7 +357,6 @@ export interface IScanAddresses {
       AddDerivationTree: Class<AddDerivationTree>,
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
-      GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     IScanAddressesRequest

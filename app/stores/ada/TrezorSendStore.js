@@ -39,13 +39,13 @@ export default class TrezorSendStore extends Store {
     = new LocalizedRequest<BroadcastTrezorSignedTxFunc>(this.api.ada.broadcastTrezorSignedTx);
   // =================== API RELATED =================== //
 
-  setup() {
+  setup(): void {
     const trezorSendAction = this.actions.ada.trezorSend;
     trezorSendAction.sendUsingTrezor.listen(this._sendUsingTrezor);
     trezorSendAction.cancel.listen(this._cancel);
   }
 
-  _reset() {
+  _reset(): void {
     this._setActionProcessing(false);
     this._setError(null);
   }

@@ -16,7 +16,7 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
   @observable changeSigningKeyRequest: Request<ChangeModelPasswordFunc>
     = new Request<ChangeModelPasswordFunc>(this.api.ada.changeModelPassword);
 
-  setup() {
+  setup(): void {
     const a = this.actions.ada.walletSettings;
     a.startEditingWalletField.listen(this._startEditingWalletField);
     a.stopEditingWalletField.listen(this._stopEditingWalletField);

@@ -32,7 +32,7 @@ const EXPORT_START_DELAY = 800; // in milliseconds [1000 = 1sec]
 
 export default class AdaTransactionsStore extends TransactionsStore {
 
-  setup() {
+  setup(): void {
     super.setup();
     const actions = this.actions[environment.API].transactions;
     actions.exportTransactionsToFile.listen(this._exportTransactionsToFile);

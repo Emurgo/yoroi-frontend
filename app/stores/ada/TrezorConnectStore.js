@@ -88,7 +88,7 @@ export default class TrezorConnectStore
   @observable isCreateHWActive: boolean = false;
   // =================== API RELATED =================== //
 
-  setup() {
+  setup(): void {
     this._reset();
     const trezorConnectAction = this.actions.ada.trezorConnect;
     trezorConnectAction.init.listen(this._init);

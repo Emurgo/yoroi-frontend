@@ -63,7 +63,7 @@ export default class WalletsStore extends Store {
   @observable restoreRequest: Request<RestoreWalletFunc>;
   @observable isImportActive: boolean = false;
 
-  setup() {
+  setup(): void {
     this.publicDerivers = [];
     setInterval(this._pollRefresh, this.WALLET_REFRESH_INTERVAL);
     document.addEventListener('visibilitychange', debounce(this._pollRefresh, this.ON_VISIBLE_DEBOUNCE_WAIT));
@@ -214,7 +214,7 @@ export default class WalletsStore extends Store {
     })
   );
 
-  goToWalletRoute(publicDeriver: PublicDeriver) {
+  goToWalletRoute(publicDeriver: PublicDeriver): void {
     const route = this.getWalletRoute(publicDeriver);
     this.actions.router.goToRoute.trigger({ route });
   }
