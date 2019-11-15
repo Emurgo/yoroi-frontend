@@ -27,10 +27,16 @@ import type { Bip44ChainInsert } from '../../lib/storage/database/walletTypes/co
 
 declare var CONFIG: ConfigType;
 const addressRequestSize = CONFIG.app.addressRequestSize;
+/**
+ * Note: we purpose hardcode this in the Bip44 case
+ * because for Cardano we want to use the legacy Cardano protocol magic
+ * to be able to generate the right legacy addresses
+ * instead of the actual protocol magic the network is using (which is a block hash for Shelley
+ */
+const protocolMagic = CONFIG.network.protocolMagic;
 
 export function v2genAddressBatchFunc(
   addressChain: RustModule.WalletV2.Bip44ChainPublic,
-  protocolMagic: number,
 ): GenerateAddressFunc {
   const settings = RustModule.WalletV2.BlockchainSettings.from_json({
     protocol_magic: protocolMagic
@@ -43,7 +49,8 @@ export function v2genAddressBatchFunc(
         RustModule.WalletV2.AddressKeyIndex.new(i)
       );
       const addr = pubKey.bootstrap_era_address(settings);
-      return addr.to_base58();
+      const hex = addr.to_base58();
+      return hex;
     });
   };
 }
@@ -102,7 +109,6 @@ export async function scanBip44Account(request: {
   lastUsedExternal: number,
   checkAddressesInUse: FilterFunc,
   addByHash: AddByHashFunc,
-  protocolMagic: number,
 }): Promise<TreeInsert<Bip44ChainInsert>> {
   const genAddressBatchFunc = v2genAddressBatchFunc;
 
@@ -113,17 +119,14 @@ export async function scanBip44Account(request: {
   const insert = await scanAccount({
     generateInternalAddresses: genAddressBatchFunc(
       key.bip44_chain(false),
-      request.protocolMagic,
     ),
     generateExternalAddresses: genAddressBatchFunc(
       key.bip44_chain(true),
-      request.protocolMagic,
     ),
     lastUsedInternal: request.lastUsedInternal,
     lastUsedExternal: request.lastUsedExternal,
     checkAddressesInUse: request.checkAddressesInUse,
     addByHash: request.addByHash,
-    protocolMagic: request.protocolMagic,
   });
   return insert;
 }
@@ -134,7 +137,6 @@ async function scanAccount(request: {|
   lastUsedExternal: number,
   checkAddressesInUse: FilterFunc,
   addByHash: AddByHashFunc,
-  protocolMagic: number,
 |}): Promise<TreeInsert<Bip44ChainInsert>> {
   const externalAddresses = await scanChain({
     generateAddressFunc: request.generateInternalAddresses,

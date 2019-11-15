@@ -17,7 +17,7 @@ import { createAccountPlate } from '../api/ada/lib/cardanoCrypto/plate';
 
 export default class PublicDeriverWithCachedMeta {
 
-  @observable self: PublicDeriver;
+  @observable self: PublicDeriver<>;
   /**
    * no plate if no public key
    */
@@ -29,7 +29,7 @@ export default class PublicDeriverWithCachedMeta {
   @observable signingKeyUpdateDate: null | Date;
 
   constructor(data: {
-    self: PublicDeriver,
+    self: PublicDeriver<>,
     plate: null | WalletAccountNumberPlate,
     publicDeriverName: string,
     conceptualWalletName: string,
@@ -42,7 +42,7 @@ export default class PublicDeriverWithCachedMeta {
 
   @action
   static fromData(data: {
-    self: PublicDeriver,
+    self: PublicDeriver<>,
     plate: null | WalletAccountNumberPlate,
     publicDeriverName: string,
     conceptualWalletName: string,
@@ -54,7 +54,7 @@ export default class PublicDeriverWithCachedMeta {
   }
 
   static async fromPublicDeriver(
-    publicDeriver: PublicDeriver,
+    publicDeriver: PublicDeriver<>,
   ): Promise<PublicDeriverWithCachedMeta> {
     const withPubKey = asGetPublicKey(publicDeriver);
 
@@ -69,7 +69,7 @@ export default class PublicDeriverWithCachedMeta {
 
     const publicDeriverInfo = await publicDeriver.getFullPublicDeriverInfo();
     const conceptualWalletInfo = await publicDeriver
-      .getConceptualWallet()
+      .getParent()
       .getFullConceptualWalletInfo();
 
     let signingKeyUpdateDate = null;

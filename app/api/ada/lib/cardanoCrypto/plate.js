@@ -37,7 +37,7 @@ export const generateStandardPlate = (
   mnemonic: string,
   accountIndex: number,
   count: number,
-  protocolMagic: number,
+  _protocolMagic: number,
 ): {| addresses: Array<string>, accountPlate: WalletAccountNumberPlate |} => {
   const cryptoWallet = generateWalletRootKey(mnemonic);
   const account = cryptoWallet.bip44_account(
@@ -46,10 +46,9 @@ export const generateStandardPlate = (
   const accountPublic = account.public();
 
   return mnemonicsToAddresses(
-    // TODO: change to v3 addresses
+    // add: add v3 addresses options
     v2genAddressBatchFunc(
       accountPublic.bip44_chain(false),
-      protocolMagic,
     ),
     accountPublic.key(),
     count

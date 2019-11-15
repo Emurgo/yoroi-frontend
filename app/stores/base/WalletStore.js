@@ -17,6 +17,7 @@ import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import type  { IConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 
@@ -31,7 +32,7 @@ function groupWallets(
   const pairingMap = new Map();
   for (const publicDeriver of publicDerivers) {
     // note: this may override previous entries but the result is the same
-    const parent = publicDeriver.self.getConceptualWallet();
+    const parent = publicDeriver.self.getParent();
     pairingMap.set(parent, {
       conceptualWallet: parent,
       publicDerivers: [],
@@ -39,7 +40,7 @@ function groupWallets(
   }
   // now fill them with public derivers
   for (const publicDeriver of publicDerivers) {
-    const parentEntry = pairingMap.get(publicDeriver.self.getConceptualWallet());
+    const parentEntry = pairingMap.get(publicDeriver.self.getParent());
     if (parentEntry == null) throw new Error('getPairing public deriver without parent');
     parentEntry.publicDerivers.push(publicDeriver);
   }
@@ -202,8 +203,8 @@ export default class WalletsStore extends Store {
     return matchRoute(ROUTES.WALLETS.ROOT + '(/*rest)', currentRoute) !== false;
   }
 
-  getWalletRoute: (PublicDeriver, ?string) => string = (
-    publicDeriver: PublicDeriver,
+  getWalletRoute: (PublicDeriver<>, ?string) => string = (
+    publicDeriver: PublicDeriver<>,
     page: ?string
   ): string => (
     buildRoute(ROUTES.WALLETS.PAGE, {
@@ -214,7 +215,7 @@ export default class WalletsStore extends Store {
     })
   );
 
-  goToWalletRoute(publicDeriver: PublicDeriver): void {
+  goToWalletRoute(publicDeriver: PublicDeriver<>): void {
     const route = this.getWalletRoute(publicDeriver);
     this.actions.router.goToRoute.trigger({ route });
   }
@@ -227,8 +228,8 @@ export default class WalletsStore extends Store {
   }
 
   @action
-  addHwWallet: PublicDeriver => Promise<void> = async (
-    publicDeriver: PublicDeriver,
+  addHwWallet: PublicDeriver<> => Promise<void> = async (
+    publicDeriver: PublicDeriver<>,
   ): Promise<void> => {
     const withCache = await PublicDeriverWithCachedMeta.fromPublicDeriver(publicDeriver);
     // set the first created as the result

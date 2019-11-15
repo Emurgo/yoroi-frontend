@@ -314,7 +314,7 @@ export default class LedgerConnectStore
     };
   };
 
-  async _onSaveSucess(publicDeriver: PublicDeriver): Promise<void> {
+  async _onSaveSucess(publicDeriver: PublicDeriver<>): Promise<void> {
     // close the active dialog
     Logger.debug('LedgerConnectStore::_onSaveSucess success, closing dialog');
     this.actions.dialogs.closeActiveDialog.trigger();

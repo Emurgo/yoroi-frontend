@@ -24,65 +24,36 @@ import {
 } from '../../database/utils';
 import { Cip1852Wallet } from './wrapper';
 
-// =================
-//   Cip1852Parent
-// =================
-
-type Cip1852ParentDependencies = IPublicDeriver;
-const Cip1852ParentMixin = (
-  superclass: Class<Cip1852ParentDependencies>,
-) => class Cip1852Parent extends superclass implements ICip1852Parent {
-
-  getCip1852Parent = (
-    _body: void,
-  ): Cip1852Wallet => {
-    const conceptualWallet = this.getConceptualWallet();
-    if (conceptualWallet instanceof Cip1852Wallet) {
-      return conceptualWallet;
-    }
-    throw new StaleStateError('getCip1852Parent parent is not bip44');
-  }
-};
-const Cip1852Parent = Mixin<
-  Cip1852ParentDependencies,
-  ICip1852Parent,
->(Cip1852ParentMixin);
-const Cip1852ParentInstance = (
-  (Cip1852Parent: any): ReturnType<typeof Cip1852ParentMixin>
-);
-export function asCip1852Parent<T: IPublicDeriver>(
-  obj: T
-): void | (ICip1852Parent & Cip1852ParentDependencies & T) {
-  if (obj instanceof Cip1852ParentInstance) {
-    return obj;
-  }
-  return undefined;
-}
-
 // ====================
 //   GetAllAccounting
 // ====================
 
-type GetAllAccountingDependencies = IPublicDeriver;
+type GetAllAccountingDependencies = IPublicDeriver<>;
 const GetAllAccountingMixin = (
   superclass: Class<GetAllAccountingDependencies>,
 ) => class GetAllAccounting extends superclass implements IGetAllAccounting {
 
-  rawGetAllAccountingAddresses = async (
-    _tx: lf$Transaction,
-    _deps: {|
+  rawGetAllAccountingAddresses: (
+    lf$Transaction,
+    {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
-    _body: IGetAllAccountingAddressesRequest,
-  ): Promise<IGetAllAccountingAddressesResponse> => {
+    IGetAllAccountingAddressesRequest,
+  ) => Promise<IGetAllAccountingAddressesResponse> = async (
+    _tx,
+    _deps,
+    _body,
+  ) => {
     // TODO: some way to know if single chain is an account or not
     return []; // TODO
   }
-  getAllAccountingAddresses = async (
-    body: IGetAllAccountingAddressesRequest,
-  ): Promise<IGetAllAccountingAddressesResponse> => {
+  getAllAccountingAddresses: (
+    IGetAllAccountingAddressesRequest
+  ) => Promise<IGetAllAccountingAddressesResponse> = async (
+    body,
+  ) => {
     const deps = Object.freeze({
       GetPathWithSpecific,
       GetAddress,
@@ -107,7 +78,7 @@ const GetAllAccounting = Mixin<
 const GetAllAccountingInstance = (
   (GetAllAccounting: any): ReturnType<typeof GetAllAccountingMixin>
 );
-export function asGetAllAccounting<T: IPublicDeriver>(
+export function asGetAllAccounting<T: IPublicDeriver<any>>(
   obj: T
 ): void | (IGetAllAccounting & GetAllAccountingDependencies & T) {
   if (obj instanceof GetAllAccountingInstance) {

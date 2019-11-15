@@ -59,9 +59,9 @@ export default class ExportApi {
    *
    * No result will be returned. File is sent to user as side-effect.
    */
-  exportTransactions = async (
-    request : ExportTransactionsRequest
-  ): Promise<ExportTransactionsResponse> => {
+  exportTransactions: ExportTransactionsRequest => Promise<ExportTransactionsResponse> = async (
+    request
+  ) => {
     try {
       Logger.debug('ExportApi::exportTransactions: called');
 
@@ -119,7 +119,7 @@ export default class ExportApi {
   /** Creates a default export file name
     * SYNTAX: Yoroi-Transaction-History_YYYY-MM-DD
     * TODO: https://github.com/Emurgo/yoroi-frontend/issues/250 */
-  static createDefaultFileName = (): string => (
+  static createDefaultFileName: void => string = () => (
     DEFAULT_FILE_NAME_PREFIX
     + FN_SEPARATOR
     + moment().format(FN_TIME_FORMAT));

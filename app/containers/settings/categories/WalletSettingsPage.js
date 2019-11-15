@@ -32,7 +32,7 @@ export default class WalletSettingsPage extends Component<Props> {
     // Guard against potential null values
     if (!publicDeriver) throw new Error('Active wallet required for WalletSettingsPage.');
 
-    const walletType = publicDeriver.self.getConceptualWallet().getWalletType();
+    const walletType = publicDeriver.self.getParent().getWalletType();
     const isWebWallet = walletType === WalletTypeOption.WEB_WALLET;
 
     const changeDialog = (

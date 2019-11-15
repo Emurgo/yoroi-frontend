@@ -44,7 +44,7 @@ const initialPendingTx = (state: 'Failed' | 'Pending') => Object.freeze({
   slot: null,
   inputs: [
     {
-      address: '2cWKMJemoBaiw2vnBSiChVe9owqcymJJUq9UdTFzn3QLjvqvoLRVadugTfMtcJXQKcoWW',
+      address: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
       amount: '4000000',
       id: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d200',
       index: 0,
@@ -54,11 +54,11 @@ const initialPendingTx = (state: 'Failed' | 'Pending') => Object.freeze({
   outputs: [
     {
       // ours
-      address: '2cWKMJemoBam9FHms2YNoTSaKGn5xCbN5FRhAa3seKgkfrAYujWrX8PRiFF2jVVMuM455',
+      address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
       amount: '2100000'
     },
     {
-      address: '2cWKMJemoBakYwphS2CYUDzm9jTvoKGeyUy43JXdKmSzEEdWMMnjD7REMX4kCdWj5W5U6',
+      address: 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL',
       amount: '1731391'
     }
   ]
@@ -76,7 +76,7 @@ const otherSpend = Object.freeze({
   slot: 3650,
   inputs: [
     {
-      address: '2cWKMJemoBaiw2vnBSiChVe9owqcymJJUq9UdTFzn3QLjvqvoLRVadugTfMtcJXQKcoWW',
+      address: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
       amount: '4000000',
       id: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d210',
       index: 0,
@@ -86,11 +86,11 @@ const otherSpend = Object.freeze({
   outputs: [
     {
       // ours
-      address: '2cWKMJemoBam9FHms2YNoTSaKGn5xCbN5FRhAa3seKgkfrAYujWrX8PRiFF2jVVMuM455',
+      address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
       amount: '2100000'
     },
     {
-      address: '2cWKMJemoBakYwphS2CYUDzm9jTvoKGeyUy43JXdKmSzEEdWMMnjD7REMX4kCdWj5W5U6',
+      address: 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL',
       amount: '1731391'
     }
   ]
@@ -109,7 +109,7 @@ const pendingOutwards = (state: 'Pending' | 'Failed') => Object.freeze({
   inputs: [
     {
       // ours
-      address: '2cWKMJemoBam9FHms2YNoTSaKGn5xCbN5FRhAa3seKgkfrAYujWrX8PRiFF2jVVMuM455',
+      address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
       amount: '2100000',
       id: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed5460',
       index: 0,
@@ -118,7 +118,7 @@ const pendingOutwards = (state: 'Pending' | 'Failed') => Object.freeze({
   ],
   outputs: [
     {
-      address: '2cWKMJemoBakYwphS2CYUDzm9jTvoKGeyUy43JXdKmSzEEdWMMnjD7REMX4kCdWj5W5U6',
+      address: 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL',
       amount: '1900000'
     }
   ]
@@ -136,7 +136,7 @@ const pointlessTx = Object.freeze({
   slot: 3652,
   inputs: [
     {
-      address: '2cWKMJemoBakYwphS2CYUDzm9jTvoKGeyUy43JXdKmSzEEdWMMnjD7REMX4kCdWj5W5U6',
+      address: 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL',
       amount: '4000000',
       id: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed5461',
       index: 1,
@@ -145,7 +145,7 @@ const pointlessTx = Object.freeze({
   ],
   outputs: [
     {
-      address: '2cWKMJemoBakYwphS2CYUDzm9jTvoKGeyUy43JXdKmSzEEdWMMnjD7REMX4kCdWj5W5U6',
+      address: 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL',
       amount: '3800000'
     },
   ]
@@ -233,7 +233,7 @@ async function baseTest(
     {
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
-        address: '2cWKMJemoBam9FHms2YNoTSaKGn5xCbN5FRhAa3seKgkfrAYujWrX8PRiFF2jVVMuM455',
+        address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
         addressing: {
           path: [2147483692, 2147485463, 2147483648, 0, 4],
           startLevel: 1,
@@ -317,7 +317,7 @@ async function baseTest(
     {
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
-        address: '2cWKMJemoBam9FHms2YNoTSaKGn5xCbN5FRhAa3seKgkfrAYujWrX8PRiFF2jVVMuM455',
+        address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
         addressing: {
           path: [2147483692, 2147485463, 2147483648, 0, 4],
           startLevel: 1,
@@ -344,7 +344,7 @@ async function baseTest(
         }
       },
       {
-        address: '2cWKMJemoBam9FHms2YNoTSaKGn5xCbN5FRhAa3seKgkfrAYujWrX8PRiFF2jVVMuM455',
+        address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
         addressing: {
           path: [2147483692, 2147485463, 2147483648, 0, 4],
           startLevel: 1,
@@ -416,7 +416,7 @@ async function baseTest(
     {
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
-        address: '2cWKMJemoBam9FHms2YNoTSaKGn5xCbN5FRhAa3seKgkfrAYujWrX8PRiFF2jVVMuM455',
+        address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
         addressing: {
           path: [2147483692, 2147485463, 2147483648, 0, 4],
           startLevel: 1,
@@ -443,7 +443,7 @@ async function baseTest(
         }
       },
       {
-        address: '2cWKMJemoBam9FHms2YNoTSaKGn5xCbN5FRhAa3seKgkfrAYujWrX8PRiFF2jVVMuM455',
+        address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
         addressing: {
           path: [2147483692, 2147485463, 2147483648, 0, 4],
           startLevel: 1,

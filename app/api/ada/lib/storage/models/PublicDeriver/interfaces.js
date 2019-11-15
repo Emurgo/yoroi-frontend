@@ -9,6 +9,7 @@ import {
 } from 'bignumber.js';
 
 import { ConceptualWallet } from '../ConceptualWallet/index';
+import type { IConceptualWallet} from '../ConceptualWallet/interfaces';
 
 import {
   GetUtxoTxOutputsWithTx,
@@ -58,17 +59,17 @@ export type WalletAccountNumberPlate = {
   id: string,
 }
 
-export type IPublicDeriverConstructor = {
+export type IPublicDeriverConstructor<+Parent: IConceptualWallet> = {
   publicDeriverId: number,
-  conceptualWallet: ConceptualWallet,
+  +parent: Parent,
   pathToPublic: Array<number>;
   derivationId: number,
 };
-export interface IPublicDeriver {
-  constructor(data: IPublicDeriverConstructor): IPublicDeriver;
+export interface IPublicDeriver<+Parent: ConceptualWallet = ConceptualWallet> {
+  constructor(data: IPublicDeriverConstructor<Parent>): IPublicDeriver<Parent>;
   getDb(): lf$Database;
   getPublicDeriverId(): number;
-  getConceptualWallet(): ConceptualWallet;
+  getParent(): Parent;
   getPathToPublic(): Array<number>;
   getDerivationId(): number;
   getFullPublicDeriverInfo(): Promise<$ReadOnly<PublicDeriverRow>>;

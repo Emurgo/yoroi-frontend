@@ -35,6 +35,8 @@ import {
 import {
   asDisplayCutoff,
 } from './lib/storage/models/Bip44Wallet/traits';
+import { ConceptualWallet } from './lib/storage/models/ConceptualWallet/index';
+import type { IHasLevels } from './lib/storage/models/common/wrapper/interfaces';
 import type {
   IPublicDeriver,
   IGetAllUtxos,
@@ -48,9 +50,6 @@ import type {
   WalletAccountNumberPlate,
   IGetPublicResponse,
 } from './lib/storage/models/PublicDeriver/interfaces';
-import type {
-  IBip44Parent,
-} from './lib/storage/models/Bip44Wallet/interfaces';
 import type {
   IRenameFunc, IRenameRequest, IRenameResponse,
   IChangePasswordRequestFunc, IChangePasswordRequest, IChangePasswordResponse,
@@ -172,7 +171,7 @@ export type CreateAdaPaperPdfFunc = (
 export type GetWalletsRequest = {
   db: lf$Database,
 };
-export type GetWalletsResponse = Array<PublicDeriver>;
+export type GetWalletsResponse = Array<PublicDeriver<>>;
 export type GetWalletsFunc = (
   request: GetWalletsRequest
 ) => Promise<GetWalletsResponse>;
@@ -180,7 +179,7 @@ export type GetWalletsFunc = (
 // getAllAddressesForDisplay
 
 export type GetAllAddressesForDisplayRequest = {
-  publicDeriver: IPublicDeriver & IGetAllUtxos,
+  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos,
   type: CoreAddressT,
 };
 export type GetAllAddressesForDisplayResponse = Array<{|
@@ -193,7 +192,7 @@ export type GetAllAddressesForDisplayFunc = (
 // getChainAddressesForDisplay
 
 export type GetChainAddressesForDisplayRequest = {
-  publicDeriver: IPublicDeriver & IHasChains & IDisplayCutoff,
+  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IHasChains & IDisplayCutoff,
   chainsRequest: IHasChainsRequest,
   type: CoreAddressT,
 };
@@ -232,7 +231,7 @@ export type GetTransactionsRequestOptions = {|
 |};
 export type GetTransactionsRequest = {
   ...Inexact<GetTransactionsRequestOptions>,
-  publicDeriver: IPublicDeriver & IGetAllUtxos & IGetLastSyncInfo,
+  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos & IGetLastSyncInfo,
   isLocalRequest: boolean,
   getTransactionsHistoryForAddresses: HistoryFunc,
   checkAddressesInUse: FilterFunc,
@@ -249,7 +248,7 @@ export type GetTransactionsFunc = (
 // refreshPendingTransactions
 
 export type RefreshPendingTransactionsRequest = {
-  publicDeriver: IPublicDeriver & IGetAllUtxos & IGetLastSyncInfo,
+  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos & IGetLastSyncInfo,
 };
 export type RefreshPendingTransactionsResponse = Array<WalletTransaction>;
 export type RefreshPendingTransactionsFunc = (
@@ -267,7 +266,7 @@ export type CreateWalletFunc = (
 // signAndBroadcast
 
 export type SignAndBroadcastRequest = {
-  publicDeriver: IPublicDeriver & IBip44Parent & IGetSigningKey,
+  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey,
   signRequest: BaseSignRequest,
   password: string,
   sendTx: SendFunc,
@@ -356,7 +355,7 @@ export type CreateAddressFunc = (
 // saveLastReceiveAddressIndex
 
 export type SaveLastReceiveAddressIndexRequest = {
-  publicDeriver: PublicDeriver,
+  publicDeriver: PublicDeriver<>,
   index: number,
 };
 export type SaveLastReceiveAddressIndexResponse = void;
@@ -444,7 +443,7 @@ export type RestoreWalletRequest = {
 };
 export type RestoreWalletResponse = {
   bip44Wallet: Bip44Wallet,
-  publicDerivers: Array<PublicDeriver>,
+  publicDerivers: Array<PublicDeriver<>>,
 };
 export type RestoreWalletFunc = (
   request: RestoreWalletRequest
@@ -499,7 +498,7 @@ export type CreateHardwareWalletRequest = {
 };
 export type CreateHardwareWalletResponse = {
   bip44Wallet: Bip44Wallet,
-  publicDeriver: PublicDeriver,
+  publicDeriver: PublicDeriver<>,
 };
 export type CreateHardwareWalletFunc = (
   request: CreateHardwareWalletRequest
@@ -508,7 +507,7 @@ export type CreateHardwareWalletFunc = (
 // getTransactionRowsToExport
 
 export type GetTransactionRowsToExportRequest = {
-  publicDeriver: IPublicDeriver & IGetAllUtxos,
+  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos,
 };
 export type GetTransactionRowsToExportResponse = Array<TransactionExportRow>;
 export type GetTransactionRowsToExportFunc = (
@@ -714,7 +713,7 @@ export default class AdaApi {
       });
       const signedTx = signTransaction(
         signRequest,
-        request.publicDeriver.getBip44Parent().getPublicDeriverLevel(),
+        request.publicDeriver.getParent().getPublicDeriverLevel(),
         RustModule.WalletV2.PrivateKey.from_hex(normalizedKey.prvKeyHex)
       );
       const response = request.sendTx({ signedTx });
@@ -1262,27 +1261,27 @@ export default class AdaApi {
     }
   }
 
-  migrate = async (
+  async migrate(
     localstorageApi: LocalStorageApi,
     persistentDb: lf$Database,
-  ): Promise<boolean> => {
+  ): Promise<boolean> {
     return await migrateToLatest(
       localstorageApi,
       persistentDb,
     );
   }
 
-  importLocalDatabase = async (
+  async importLocalDatabase(
     db: lf$Database,
     data: {},
-  ): Promise<void> => {
+  ): Promise<void> {
     await clear(db);
     await db.import(data);
   }
 
-  exportLocalDatabase = async (
+  async exportLocalDatabase(
     db: lf$Database,
-  ): Promise<string> => {
+  ): Promise<string> {
     const data = await db.export();
     return JSON.stringify(data);
   }

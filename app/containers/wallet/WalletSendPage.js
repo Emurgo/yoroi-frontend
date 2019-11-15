@@ -90,7 +90,7 @@ export default class WalletSendPage extends Component<Props> {
       actions.dialogs.closeActiveDialog.trigger();
     }
 
-    const walletType = publicDeriver.self.getConceptualWallet().getWalletType();
+    const walletType = publicDeriver.self.getParent().getWalletType();
     const targetDialog = walletType === WalletTypeOption.HARDWARE_WALLET ?
       HWSendConfirmationDialog :
       WalletSendConfirmationDialog;
@@ -182,7 +182,7 @@ export default class WalletSendPage extends Component<Props> {
     const fee = signRequestFee(signRequest, true);
     const receivers = signRequestReceivers(signRequest, false);
 
-    const conceptualWallet = publicDeriver.self.getConceptualWallet();
+    const conceptualWallet = publicDeriver.self.getParent();
     let hwSendConfirmationDialog: Node = null;
     if (isLedgerNanoWallet(conceptualWallet)) {
       const ledgerSendAction = this.props.actions[environment.API].ledgerSend;

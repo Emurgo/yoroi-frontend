@@ -79,7 +79,7 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
     const publicDeriver = this.stores.substores.ada.wallets.selected;
     if (!publicDeriver) return;
 
-    const conceptualWallet = publicDeriver.self.getConceptualWallet();
+    const conceptualWallet = publicDeriver.self.getParent();
     // update the meta-parameters in the internal wallet representation
     await this.renameModelRequest.execute({
       func: conceptualWallet.rename,

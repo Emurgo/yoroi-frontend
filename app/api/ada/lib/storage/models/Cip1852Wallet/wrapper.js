@@ -18,10 +18,12 @@ import {
   GetPrivateDeriverKey,
   AdhocPublicDeriver,
 } from '../common/wrapper/traits';
-import type { IPrivateDeriver } from '../common/wrapper/interfaces';
+import type { IHasPrivateDeriver, IHasLevels, IHasSign } from '../common/wrapper/interfaces';
 
 /** Snapshot of a Cip1852Wallet in the database */
-export class Cip1852Wallet extends ConceptualWallet implements ICip1852Wallet, IPrivateDeriver {
+export class Cip1852Wallet
+  extends ConceptualWallet
+  implements ICip1852Wallet, IHasPrivateDeriver, IHasLevels, IHasSign {
   /**
    * Should only cache information we know will never change
    */
@@ -62,6 +64,11 @@ export class Cip1852Wallet extends ConceptualWallet implements ICip1852Wallet, I
     return this.#bip44WrapperId;
   }
 
+  getDerivationTables: void => Map<number, string> = () => {
+    // recall: cip1852 is an extension of bip44 so the tables are the same
+    return Bip44TableMap;
+  }
+
   getPublicDeriverLevel(): number {
     return this.#publicDeriverLevel;
   }
@@ -76,10 +83,6 @@ export class Cip1852Wallet extends ConceptualWallet implements ICip1852Wallet, I
 
   getPrivateDeriverKeyDerivationId(): number | null {
     return this.#privateDeriverKeyDerivationId;
-  }
-
-  getProtocolMagic(): number {
-    return this.#protocolMagic;
   }
 
   static async createCip1852Wallet(
@@ -103,8 +106,6 @@ export async function refreshCip1852WalletFunctionality(
   const conceptualWalletCtorData = await refreshConceptualWalletFunctionality(
     db,
     row.ConceptualWalletId,
-    // recall: cip1852 is an extension of bip44 so the tables are the same
-    Bip44TableMap
   );
 
   let privateDeriverLevel = null;

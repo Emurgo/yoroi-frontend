@@ -56,8 +56,10 @@ import type {
 } from '../database/transactionModels/account/tables';
 import { TxStatusCodes, CoreAddressTypes, } from '../database/primitives/enums';
 import {
-  asScanAddresses,
+  asScanAddresses, asHasLevels,
 } from '../models/common/traits';
+import type { IHasLevels } from '../models/common/wrapper/interfaces';
+import { ConceptualWallet } from '../models/ConceptualWallet/index';
 import type { IPublicDeriver, IGetAllUtxos, } from '../models/PublicDeriver/interfaces';
 import {
   GetLastSyncForPublicDeriver,
@@ -181,7 +183,7 @@ export async function rawGetUtxoTransactions(
 
 export async function getAllUtxoTransactions(
   request: {
-    publicDeriver: IPublicDeriver & IGetAllUtxos,
+    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos,
     skip?: number,
     limit?: number,
   },
@@ -189,7 +191,7 @@ export async function getAllUtxoTransactions(
   addressLookupMap: Map<number, string>,
   txs: Array<UtxoAnnotatedTransaction>,
 |}> {
-  const derivationTables = request.publicDeriver.getConceptualWallet().getDerivationTables();
+  const derivationTables = request.publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
     GetPathWithSpecific,
     GetAddress,
@@ -237,13 +239,13 @@ export async function getAllUtxoTransactions(
 
 export async function getPendingUtxoTransactions(
   request: {
-    publicDeriver: IPublicDeriver & IGetAllUtxos,
+    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos,
   },
 ): Promise<{|
   addressLookupMap: Map<number, string>,
   txs: Array<UtxoAnnotatedTransaction>,
 |}> {
-  const derivationTables = request.publicDeriver.getConceptualWallet().getDerivationTables();
+  const derivationTables = request.publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
     GetPathWithSpecific,
     GetAddress,
@@ -290,12 +292,15 @@ export async function getPendingUtxoTransactions(
 
 export async function updateTransactions(
   db: lf$Database,
-  publicDeriver: IPublicDeriver,
+  publicDeriver: IPublicDeriver<ConceptualWallet>,
   checkAddressesInUse: FilterFunc,
   getTransactionsHistoryForAddresses: HistoryFunc,
   getBestBlock: BestBlockFunc,
 ): Promise<void> {
-  const derivationTables = publicDeriver.getConceptualWallet().getDerivationTables();
+  const withLevels = asHasLevels(publicDeriver);
+  const derivationTables = withLevels == null
+    ? new Map<number, string>()
+    : withLevels.getParent().getDerivationTables();
   let lastSyncInfo = undefined;
   try {
     const updateDepTables = Object.freeze({
@@ -431,7 +436,7 @@ async function rollback(
     ModifyTransaction: Class<ModifyTransaction>,
   |},
   request: {|
-    publicDeriver: IPublicDeriver,
+    publicDeriver: IPublicDeriver<>,
     lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
   |},
   derivationTables: Map<number, string>,
@@ -583,7 +588,7 @@ async function rawUpdateTransactions(
     ModifyMultipartTx: Class<ModifyMultipartTx>,
     AssociateTxWithIOs: Class<AssociateTxWithIOs>,
   |},
-  publicDeriver: IPublicDeriver,
+  publicDeriver: IPublicDeriver<>,
   lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
   checkAddressesInUse: FilterFunc,
   getTransactionsHistoryForAddresses: HistoryFunc,

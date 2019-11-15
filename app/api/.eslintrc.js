@@ -15,5 +15,12 @@ module.exports = {
         "excludeArrowFunctions": true
       }
     ],
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "ClassProperty:not([typeAnnotation])[key.name!=/_.*/]",
+        "message": "Missing type annotation of class property. This has unexpected cross-module behavior."
+      },
+    ],
   },
 }

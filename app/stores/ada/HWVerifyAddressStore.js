@@ -50,7 +50,7 @@ export default class AddressesStore extends Store {
   }
 
   @action _verifyAddress = async (
-    publicDeriver: PublicDeriver,
+    publicDeriver: PublicDeriver<>,
   ): Promise<void> => {
     Logger.info('AddressStore::_verifyAddress called');
 
@@ -63,7 +63,7 @@ export default class AddressesStore extends Store {
     const path = toJS(selectedAddress.path);
     const address = toJS(selectedAddress.address);
 
-    const conceptualWallet = publicDeriver.getConceptualWallet();
+    const conceptualWallet = publicDeriver.getParent();
 
     this._setError(null);
     this._setActionProcessing(true);

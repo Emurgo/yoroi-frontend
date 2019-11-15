@@ -11,6 +11,7 @@ type Icons = {
 export default ({
   description,
   defaultTitle,
+  titleOverride,
   contentSecurityPolicy,
   versionName,
   extensionKey,
@@ -20,6 +21,7 @@ export default ({
 } /*: {
   description: string,
   defaultTitle: string,
+  titleOverride?: boolean,
   contentSecurityPolicy: string,
   versionName?: string,
   extensionKey?: string,
@@ -41,7 +43,9 @@ export default ({
     version: versionOverride == null
       ? '1.10.0'
       : versionOverride,
-    name: defaultTitle,
+    // the name shown in chrome://extensions
+    // we also reuse this to choose the filename on disk
+    name: titleOverride === true ? defaultTitle : 'yoroi',
     manifest_version: 2,
     description,
     browser_action: {

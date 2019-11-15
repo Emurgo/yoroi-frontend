@@ -49,7 +49,7 @@ export class RemoteFetcher implements IFetcher {
     this.currentLocale = currentLocale;
   }
 
-  getUTXOsForAddresses = (body: AddressUtxoRequest): Promise<AddressUtxoResponse> => (
+  getUTXOsForAddresses: AddressUtxoRequest => Promise<AddressUtxoResponse> = (body) => (
     axios(
       `${backendUrl}/api/txs/utxoForAddresses`,
       {
@@ -69,7 +69,7 @@ export class RemoteFetcher implements IFetcher {
       })
   )
 
-  getTxsBodiesForUTXOs = (body: TxBodiesRequest): Promise<TxBodiesResponse> => (
+  getTxsBodiesForUTXOs: TxBodiesRequest => Promise<TxBodiesResponse> = (body) => (
     axios(
       `${backendUrl}/api/txs/txBodies`,
       {
@@ -89,7 +89,7 @@ export class RemoteFetcher implements IFetcher {
       })
   )
 
-  getUTXOsSumsForAddresses = (body: UtxoSumRequest): Promise<UtxoSumResponse> => (
+  getUTXOsSumsForAddresses: UtxoSumRequest => Promise<UtxoSumResponse> = (body) => (
     axios(
       `${backendUrl}/api/txs/utxoSumForAddresses`,
       {
@@ -109,7 +109,7 @@ export class RemoteFetcher implements IFetcher {
       })
   )
 
-  getTransactionsHistoryForAddresses = (body: HistoryRequest): Promise<HistoryResponse> => (
+  getTransactionsHistoryForAddresses: HistoryRequest => Promise<HistoryResponse> = (body) => (
     axios(
       `${backendUrl}/api/v2/txs/history`,
       {
@@ -140,7 +140,7 @@ export class RemoteFetcher implements IFetcher {
       })
   )
 
-  getBestBlock = (_body: BestBlockRequest): Promise<BestBlockResponse> => (
+  getBestBlock: BestBlockRequest => Promise<BestBlockResponse> = (_body) => (
     axios(
       `${backendUrl}/api/v2/bestblock`,
       {
@@ -153,7 +153,7 @@ export class RemoteFetcher implements IFetcher {
       })
   )
 
-  sendTx = (body: SignedRequest): Promise<SignedResponse> => {
+  sendTx: SignedRequest => Promise<SignedResponse> = (body) => {
     const signedTxHex = Buffer.from(
       body.signedTx.to_hex(),
       'hex'
@@ -183,7 +183,7 @@ export class RemoteFetcher implements IFetcher {
       });
   }
 
-  checkAddressesInUse = (body: FilterUsedRequest): Promise<FilterUsedResponse> => (
+  checkAddressesInUse: FilterUsedRequest => Promise<FilterUsedResponse> = (body) => (
     axios(
       `${backendUrl}/api/addresses/filterUsed`,
       {
@@ -203,7 +203,7 @@ export class RemoteFetcher implements IFetcher {
       })
   )
 
-  checkServerStatus = (_body: ServerStatusRequest): Promise<ServerStatusResponse> => (
+  checkServerStatus: ServerStatusRequest => Promise<ServerStatusResponse> = (_body) => (
     axios(
       `${backendUrl}/api/status`,
       {

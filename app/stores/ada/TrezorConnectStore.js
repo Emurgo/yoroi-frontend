@@ -429,7 +429,7 @@ export default class TrezorConnectStore
     this.progressInfo.stepState = StepState.ERROR;
   };
 
-  _onSaveSucess = async (publicDeriver: PublicDeriver) => {
+  _onSaveSucess = async (publicDeriver: PublicDeriver<>) => {
     // close the active dialog
     Logger.debug('TrezorConnectStore::_saveTrezor success, closing dialog');
     this.actions.dialogs.closeActiveDialog.trigger();
