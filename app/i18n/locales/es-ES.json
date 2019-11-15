@@ -442,7 +442,7 @@
   "yoroiTransfer.form.instructions.step0Paper.text": "Introduzca la frase de recuperación de 21 palabras que se utiliza para hacer una copia de seguridad de su billetera de papel Yoroi y su contraseña de papel para restaurar el saldo y transferir todos los fondos.",
   "yoroiTransfer.start.instructions.mnemonic-15": "Mnemónico de 15 palabras",
   "yoroiTransfer.start.instructions.text": "Transferir fondos desde otra billetera <strong> no Daedalus </strong> (Yoroi, AdaLite, etc.). <br />Más específicamente, esto funcionará para cualquier billetera cuyas direcciones empiecen con Ae2",
-  "yoroiTransfer.start.instructions.yoroiPaper": "Yoroi paper wallet",
+  "yoroiTransfer.start.instructions.yoroiPaper": "Billetera de Papel Yoroi",
   "yoroiTransfer.successPage.text": "Sus fondos fueron transferidos con éxito.",
   "yoroiTransfer.successPage.title": "éxito",
   "yoroiTransfer.summary.addressFrom.subLabel": "Direcciones de la billetera",
