@@ -14,6 +14,7 @@ export default ({
   contentSecurityPolicy,
   versionName,
   extensionKey,
+  geckoKey,
   iconOverride,
   versionOverride,
 } /*: {
@@ -22,6 +23,7 @@ export default ({
   contentSecurityPolicy: string,
   versionName?: string,
   extensionKey?: string,
+  geckoKey: string,
   iconOverride?: Icons,
   versionOverride?: string,
 } */
@@ -39,7 +41,7 @@ export default ({
     version: versionOverride == null
       ? '1.10.0'
       : versionOverride,
-    name: 'yoroi',
+    name: defaultTitle,
     manifest_version: 2,
     description,
     browser_action: {
@@ -48,7 +50,7 @@ export default ({
     },
     browser_specific_settings: {
       gecko: {
-        id: '{530f7c6c-6077-4703-8f71-cb368c663e35}',
+        id: geckoKey,
       },
     },
     icons,
