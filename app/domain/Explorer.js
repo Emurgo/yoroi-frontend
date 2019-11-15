@@ -90,8 +90,8 @@ export const explorerInfo: {
     : {
       jormungandr: {
         name: 'Jormungandr Explorer',
-        address: 'https://shelleyexplorer.cardano.org/address/',
-        transaction: 'https://shelleyexplorer.cardano.org/tx/',
+        address: 'https://shelleyexplorer.cardano.org/address/?id=',
+        transaction: 'https://shelleyexplorer.cardano.org/transaction/?id=',
       },
     }
   )
