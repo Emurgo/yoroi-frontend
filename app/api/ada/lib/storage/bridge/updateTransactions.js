@@ -57,8 +57,8 @@ import type {
 import { TxStatusCodes, CoreAddressTypes, } from '../database/primitives/enums';
 import {
   asScanAddresses, asHasLevels,
-} from '../models/common/traits';
-import type { IHasLevels } from '../models/common/wrapper/interfaces';
+} from '../models/PublicDeriver/traits';
+import type { IHasLevels } from '../models/ConceptualWallet/interfaces';
 import { ConceptualWallet } from '../models/ConceptualWallet/index';
 import type { IPublicDeriver, IGetAllUtxos, } from '../models/PublicDeriver/interfaces';
 import {
@@ -297,7 +297,7 @@ export async function updateTransactions(
   getTransactionsHistoryForAddresses: HistoryFunc,
   getBestBlock: BestBlockFunc,
 ): Promise<void> {
-  const withLevels = asHasLevels(publicDeriver);
+  const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
   const derivationTables = withLevels == null
     ? new Map<number, string>()
     : withLevels.getParent().getDerivationTables();

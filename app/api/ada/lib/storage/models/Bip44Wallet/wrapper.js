@@ -5,25 +5,19 @@ import type {
 } from 'lovefield';
 
 import {
-  ConceptualWallet, refreshConceptualWalletFunctionality,
+  ConceptualWallet,
 } from '../ConceptualWallet/index';
 import type {
   IConceptualWalletConstructor,
+  IHasPrivateDeriver,
+  IHasLevels,
+  IHasSign,
 } from '../ConceptualWallet/interfaces';
+import { refreshBip44WalletFunctionality } from '../ConceptualWallet/traits';
 
 import type {
   IBip44Wallet,
 } from './interfaces';
-import type {
-  IHasPrivateDeriver,
-  IHasLevels,
-  IHasSign,
-} from '../common/wrapper/interfaces';
-import {
-  PublicFromPrivate,
-  GetPrivateDeriverKey,
-  AdhocPublicDeriver,
-} from '../common/wrapper/traits';
 
 import type {
   Bip44WrapperRow,
@@ -56,7 +50,6 @@ export class Bip44Wallet
     row: $ReadOnly<Bip44WrapperRow>,
     privateDeriverLevel: number | null,
     privateDeriverKeyDerivationId: number | null,
-    protocolMagic: number,
   ): Bip44Wallet {
     super(conceptualWalletCtorData);
     this.#bip44WrapperId = row.Bip44WrapperId;
@@ -64,16 +57,11 @@ export class Bip44Wallet
     this.#signingLevel = row.SignerLevel;
     this.#privateDeriverLevel = privateDeriverLevel;
     this.#privateDeriverKeyDerivationId = privateDeriverKeyDerivationId;
-    this.#protocolMagic = protocolMagic;
     return this;
   }
 
   getDerivationTables: void => Map<number, string> = () => {
     return Bip44TableMap;
-  }
-
-  getDb(): lf$Database {
-    return this.db;
   }
 
   getWrapperId(): number {
@@ -107,39 +95,4 @@ export class Bip44Wallet
       protocolMagic
     );
   }
-}
-
-export async function refreshBip44WalletFunctionality(
-  db: lf$Database,
-  row: $ReadOnly<Bip44WrapperRow>,
-  protocolMagic: number, // TODO: should be stored in a table somewhere in the future
-): Promise<IBip44Wallet> {
-  const conceptualWalletCtorData = await refreshConceptualWalletFunctionality(
-    db,
-    row.ConceptualWalletId,
-  );
-
-  let privateDeriverLevel = null;
-  let privateDeriverKeyDerivationId = null;
-
-  let currClass = Bip44Wallet;
-
-  if (row.PrivateDeriverLevel != null && row.PrivateDeriverKeyDerivationId != null) {
-    currClass = PublicFromPrivate(currClass);
-    currClass = GetPrivateDeriverKey(currClass);
-    privateDeriverLevel = row.PrivateDeriverLevel;
-    privateDeriverKeyDerivationId = row.PrivateDeriverKeyDerivationId;
-  } else {
-    currClass = AdhocPublicDeriver(currClass);
-  }
-
-  const instance = new currClass(
-    db,
-    conceptualWalletCtorData,
-    row,
-    privateDeriverLevel,
-    privateDeriverKeyDerivationId,
-    protocolMagic,
-  );
-  return instance;
 }

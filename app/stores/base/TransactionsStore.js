@@ -14,15 +14,14 @@ import {
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
   asGetBalance, asHasLevels,
-} from '../../api/ada/lib/storage/models/common/traits';
-import {
   asGetAllUtxos,
-} from '../../api/ada/lib/storage/models/Bip44Wallet/traits';
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   IGetAllUtxos,
   IGetLastSyncInfo,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
 
 export default class TransactionsStore extends Store {
 
@@ -218,7 +217,10 @@ export default class TransactionsStore extends Store {
       ? this.searchOptions.skip
       : this.SEARCH_SKIP;
 
-    const withLevels = asHasLevels(publicDeriver);
+    const withLevels = asHasLevels<
+      ConceptualWallet,
+      IGetAllUtxos & IGetLastSyncInfo
+    >(publicDeriver);
     if (withLevels == null) {
       throw new Error('refreshLocal no levels');
     }

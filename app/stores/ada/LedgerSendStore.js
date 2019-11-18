@@ -18,7 +18,7 @@ import type {
 } from '../../api/ada';
 import {
   asGetPublicKey, asHasLevels,
-} from '../../api/ada/lib/storage/models/common/traits';
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   SendUsingLedgerParams
 } from '../../actions/ada/ledger-send-actions';

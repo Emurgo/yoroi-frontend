@@ -28,8 +28,8 @@ import {
 } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import {
-  asHasChains,
-} from '../../api/ada/lib/storage/models/Bip44Wallet/traits';
+  asHasUtxoChains,
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 
 declare var CONFIG: ConfigType;
@@ -114,7 +114,7 @@ export default class DaedalusTransferStore extends Store {
     wallet: RustModule.WalletV2.DaedalusWallet,
     publicDeriver: PublicDeriverWithCachedMeta,
   ): Promise<void> => {
-    const withChains = asHasChains(publicDeriver.self);
+    const withChains = asHasUtxoChains(publicDeriver.self);
     if (!withChains) throw new Error('_setupTransferWebSocket missing chains functionality');
     const nextInternal = await withChains.nextInternal();
     if (nextInternal.addressInfo == null) {

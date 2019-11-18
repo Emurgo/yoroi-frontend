@@ -5,7 +5,7 @@
  * By Sebastien Guillemot (https://github.com/SebastienGllmt)
  */
 
-type MixinFunction<I, O> = (superclass: Class<I>) => Class<I & O>;
+type MixinFunction<I, +O> = (superclass: Class<I>) => Class<I & O>;
 
 declare module 'mixwith' {
   declare export function apply<I, O>(
@@ -39,7 +39,7 @@ declare module 'mixwith' {
   declare export function BareMixin<I, O>(
     mixin: MixinFunction<I, O>,
   ): MixinFunction<I, O>;
-  declare export function Mixin<I, O>(
+  declare export function Mixin<I, +O>(
     mixin: MixinFunction<I, O>,
   ): <T:I>(superclass: Class<T>) => Class<T & O>;
   declare export function mix<T>(

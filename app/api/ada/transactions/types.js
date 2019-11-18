@@ -11,7 +11,7 @@ import type {
 import type { DbBlock, } from '../lib/storage/database/primitives/tables';
 import type {
   Address, Value, Addressing,
-} from '../lib/storage/models/common/interfaces';
+} from '../lib/storage/models/PublicDeriver/interfaces';
 
 import type { RemoteUnspentOutput } from '../lib/state-fetch/types';
 

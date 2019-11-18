@@ -21,10 +21,8 @@ import { loadLovefieldDB } from '../../database/index';
 import {
   asGetAllUtxos,
   asDisplayCutoff,
-} from '../../models/Bip44Wallet/traits';
-import {
   asGetUtxoBalance,
-} from '../../models/common/traits';
+} from '../../models/PublicDeriver/traits';
 
 import {
   updateTransactions, getAllUtxoTransactions

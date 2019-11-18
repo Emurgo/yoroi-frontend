@@ -23,8 +23,8 @@ import {
 } from '../../lib/storage/database/walletTypes/bip44/api/utils';
 import type {
   Address, Value, Addressing,
-} from '../../lib/storage/models/common/interfaces';
-import type { IGetAllUtxosResponse } from '../../lib/storage/models/PublicDeriver/interfaces';
+  IGetAllUtxosResponse
+} from '../../lib/storage/models/PublicDeriver/interfaces';
 
 declare var CONFIG: ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;

@@ -34,9 +34,9 @@ import {
 } from './lib/storage/models/PublicDeriver/index';
 import {
   asDisplayCutoff,
-} from './lib/storage/models/Bip44Wallet/traits';
+} from './lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from './lib/storage/models/ConceptualWallet/index';
-import type { IHasLevels } from './lib/storage/models/common/wrapper/interfaces';
+import type { IHasLevels } from './lib/storage/models/ConceptualWallet/interfaces';
 import type {
   IPublicDeriver,
   IGetAllUtxos,
@@ -45,15 +45,15 @@ import type {
   IDisplayCutoff,
   IDisplayCutoffPopFunc,
   IDisplayCutoffPopResponse,
-  IHasChains, IHasChainsRequest,
+  IHasUtxoChains, IHasUtxoChainsRequest,
   IGetLastSyncInfoResponse,
   WalletAccountNumberPlate,
   IGetPublicResponse,
+  Address, Addressing, UsedStatus, Value,
 } from './lib/storage/models/PublicDeriver/interfaces';
 import type {
   IRenameFunc, IRenameRequest, IRenameResponse,
   IChangePasswordRequestFunc, IChangePasswordRequest, IChangePasswordResponse,
-  Address, Addressing, UsedStatus, Value,
 } from './lib/storage/models/common/interfaces';
 import {
   sendAllUnsignedTx,
@@ -192,8 +192,8 @@ export type GetAllAddressesForDisplayFunc = (
 // getChainAddressesForDisplay
 
 export type GetChainAddressesForDisplayRequest = {
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IHasChains & IDisplayCutoff,
-  chainsRequest: IHasChainsRequest,
+  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IHasUtxoChains & IDisplayCutoff,
+  chainsRequest: IHasUtxoChainsRequest,
   type: CoreAddressT,
 };
 export type GetChainAddressesForDisplayResponse = Array<{|
@@ -331,7 +331,7 @@ export type PrepareAndBroadcastLedgerSignedTxFunc = (
 // createUnsignedTx
 
 export type CreateUnsignedTxRequest = {
-  publicDeriver: IGetAllUtxos & IHasChains,
+  publicDeriver: IGetAllUtxos & IHasUtxoChains,
   receiver: string,
   amount: string, // in lovelaces
   shouldSendAll: boolean,

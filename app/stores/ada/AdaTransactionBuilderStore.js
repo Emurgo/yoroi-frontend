@@ -11,8 +11,8 @@ import type {
 import type { BaseSignRequest } from '../../api/ada/transactions/types';
 import { signRequestFee, signRequestTotalInput } from '../../api/ada/transactions/utils';
 import {
-  asGetAllUtxos, asHasChains,
-} from '../../api/ada/lib/storage/models/Bip44Wallet/traits';
+  asGetAllUtxos, asHasUtxoChains,
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 
 
 /**
@@ -177,12 +177,12 @@ export default class AdaTransactionBuilderStore extends Store {
     if (withUtxos == null) {
       throw new Error('_updateTxBuilder missing utxo functionality');
     }
-    const withHasChains = asHasChains(withUtxos);
-    if (withHasChains == null) {
+    const withHasUtxoChains = asHasUtxoChains(withUtxos);
+    if (withHasUtxoChains == null) {
       throw new Error('_updateTxBuilder missing chains functionality');
     }
     this.createUnsignedTx.execute({
-      publicDeriver: withHasChains,
+      publicDeriver: withHasUtxoChains,
       receiver,
       amount,
       shouldSendAll,

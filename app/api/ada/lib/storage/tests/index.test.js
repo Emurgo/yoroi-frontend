@@ -28,7 +28,7 @@ import {
 import {
   asPublicFromPrivate,
   asGetPrivateDeriverKey,
-} from '../models/common/wrapper/traits';
+} from '../models/ConceptualWallet/traits';
 import {
   PublicDeriver,
 } from '../models/PublicDeriver/index';
@@ -36,13 +36,10 @@ import {
   asAddBip44FromPublic,
   asGetAllUtxos,
   asDisplayCutoff,
-  asHasChains,
+  asHasUtxoChains,
   asGetSigningKey,
-} from '../models/Bip44Wallet/traits';
-import {
-  asGetPublicKey,
-} from '../models/common/traits';
-
+  asGetPublicKey
+} from '../models/PublicDeriver/traits';
 import {
   createStandardBip44Wallet,
 } from '../bridge/walletBuilder/byron';
@@ -213,10 +210,10 @@ test('Can add and fetch address in wallet', async (done) => {
       expect(pubKey.Hash).toEqual(firstAccountPk.public().key().to_hex());
     }
 
-    const asHasChainsInstance = asHasChains(publicDeriver);
-    expect(asHasChainsInstance != null).toEqual(true);
-    if (asHasChainsInstance != null) {
-      const externalAddresses = await asHasChainsInstance.getAddressesForChain({
+    const asHasUtxoChainsInstance = asHasUtxoChains(publicDeriver);
+    expect(asHasUtxoChainsInstance != null).toEqual(true);
+    if (asHasUtxoChainsInstance != null) {
+      const externalAddresses = await asHasUtxoChainsInstance.getAddressesForChain({
         chainId: EXTERNAL,
       });
       expect(externalAddresses.length).toEqual(20);
@@ -229,7 +226,7 @@ test('Can add and fetch address in wallet', async (done) => {
           .to_base58()
       );
 
-      const internalAddresses = await asHasChainsInstance.getAddressesForChain({
+      const internalAddresses = await asHasUtxoChainsInstance.getAddressesForChain({
         chainId: INTERNAL,
       });
       expect(internalAddresses.length).toEqual(20);

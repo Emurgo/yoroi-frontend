@@ -9,10 +9,8 @@ import {
 } from '../api/ada/lib/storage/models/PublicDeriver/index';
 import {
   asGetSigningKey,
-} from '../api/ada/lib/storage/models/Bip44Wallet/traits';
-import {
-  asGetPublicKey,
-} from '../api/ada/lib/storage/models/common/traits';
+  asGetPublicKey
+} from '../api/ada/lib/storage/models/PublicDeriver/traits';
 import { createAccountPlate } from '../api/ada/lib/cardanoCrypto/plate';
 
 export default class PublicDeriverWithCachedMeta {

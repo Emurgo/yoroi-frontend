@@ -17,7 +17,6 @@ import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import type  { IConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 

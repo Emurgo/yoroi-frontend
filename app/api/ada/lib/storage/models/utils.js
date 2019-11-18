@@ -18,11 +18,11 @@ import type {
   UtxoAddressPath,
   IGetAllUtxos,
   IGetUtxoBalanceResponse,
-  IHasChainsRequest,
-  IGetNextUnusedForChainResponse,
-  IHasChains,
+  IHasUtxoChainsRequest,
+  IHasUtxoChains,
   IDisplayCutoff,
   BaseAddressPath,
+  Address, Value, Addressing, UsedStatus,
 } from './PublicDeriver/interfaces';
 import {
   PublicDeriver,
@@ -30,28 +30,25 @@ import {
 import {
   asDisplayCutoff,
   asGetAllUtxos,
-} from './Bip44Wallet/traits';
-import {
-  asGetAllAccounting,
-} from './Cip1852Wallet/traits';
+  asGetAllAccounting
+} from './PublicDeriver/traits';
 import { Bip44Wallet, } from './Bip44Wallet/wrapper';
 
 import type {
   IChangePasswordRequest, IChangePasswordResponse,
-  Address, Value, Addressing, UsedStatus,
 } from './common/interfaces';
-import type { IHasLevels } from './common/wrapper/interfaces';
 import { ConceptualWallet } from './ConceptualWallet/index';
+import type { IHasLevels } from './ConceptualWallet/interfaces';
 import type {
   AddressRow,
-  KeyInsert, KeyRow,
+  KeyRow,
   CanonicalAddressRow,
 } from '../database/primitives/tables';
 import type {
   CoreAddressT
 } from '../database/primitives/enums';
 import {
-  UpdateGet, AddAddress,
+  UpdateGet,
 } from '../database/primitives/api/write';
 import {
   ModifyDisplayCutoff,
@@ -80,12 +77,9 @@ import type { UtxoTransactionOutputRow } from '../database/transactionModels/utx
 import { Bip44DerivationLevels } from '../database/walletTypes/bip44/api/utils';
 import type { GetPathWithSpecificByTreeRequest } from '../database/primitives/api/read';
 import {
-  addressToKind,
-} from '../bridge/utils';
-import {
   GetUtxoTxOutputsWithTx,
 } from '../database/transactionModels/utxo/api/read';
-import { TxStatusCodes, CoreAddressTypes, } from '../database/primitives/enums';
+import { TxStatusCodes, } from '../database/primitives/enums';
 
 import { WrongPassphraseError } from '../../cardanoCrypto/cryptoErrors';
 
@@ -355,8 +349,8 @@ export async function rawGetChainAddressesForDisplay(
     GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
   request: {
-    publicDeriver: IPublicDeriver<> & IHasChains & IDisplayCutoff,
-    chainsRequest: IHasChainsRequest,
+    publicDeriver: IPublicDeriver<> & IHasUtxoChains & IDisplayCutoff,
+    chainsRequest: IHasUtxoChainsRequest,
     type: CoreAddressT,
   },
   derivationTables: Map<number, string>,
@@ -412,8 +406,8 @@ export async function rawGetChainAddressesForDisplay(
 }
 export async function getChainAddressesForDisplay(
   request: {
-    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IHasChains & IDisplayCutoff,
-    chainsRequest: IHasChainsRequest,
+    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IHasUtxoChains & IDisplayCutoff,
+    chainsRequest: IHasUtxoChainsRequest,
     type: CoreAddressT,
   },
 ): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
@@ -525,6 +519,10 @@ export async function getAllAddressesForDisplay(
   );
 }
 
+export type NextUnusedResponose = {|
+  addressInfo: void | UtxoAddressPath,
+  index: number,
+|}
 export async function rawGetNextUnusedIndex(
   db: lf$Database,
   tx: lf$Transaction,
@@ -534,10 +532,7 @@ export async function rawGetNextUnusedIndex(
   request:  {|
     addressesForChain: Array<UtxoAddressPath>,
   |}
-): Promise<{|
-  addressInfo: void | UtxoAddressPath,
-  index: number,
-|}> {
+): Promise<NextUnusedResponose> {
   const usedStatus = await rawGetUtxoUsedStatus(
     db, tx,
     { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx },
@@ -697,22 +692,24 @@ export async function rawGetAddressRowsForWallet(
       }
     }
   }
-  // TODO: behavior different for CIP1852 vs Bip44
-  // const withAccounting = asGetAllAccounting(request.publicDeriver);
-  // if (withAccounting != null) {
-  //   const addrResponse = await withAccounting.rawGetAllAccountingAddresses(
-  //     tx,
-  //     {
-  //       GetPathWithSpecific: deps.GetPathWithSpecific,
-  //       GetAddress: deps.GetAddress,
-  //       GetCip1852DerivationSpecific: deps.GetCip1852DerivationSpecific,
-  //     },
-  //     undefined,
-  //   );
-  //   for (const address of addrResponse) {
-  //     accountingAddresses.push(address.addr);
-  //   }
-  // }
+  const withAccounting = asGetAllAccounting(request.publicDeriver);
+  if (withAccounting != null) {
+    const addrResponse = await withAccounting.rawGetAllAccountingAddresses(
+      tx,
+      {
+        GetPathWithSpecific: deps.GetPathWithSpecific,
+        GetAddress: deps.GetAddress,
+        GetDerivationSpecific: deps.GetDerivationSpecific,
+      },
+      undefined,
+      derivationTables,
+    );
+    for (const family of addrResponse) {
+      for (const addr of family.addrs) {
+        accountingAddresses.push(addr);
+      }
+    }
+  }
 
   return {
     utxoAddresses,

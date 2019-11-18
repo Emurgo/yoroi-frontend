@@ -5,8 +5,8 @@ import type {
 } from 'lovefield';
 
 import { Bip44Wallet } from '../Bip44Wallet/wrapper';
+import { Cip1852Wallet } from '../Cip1852Wallet/wrapper';
 import { ConceptualWallet } from '../ConceptualWallet/index';
-import type { IConceptualWallet } from '../ConceptualWallet/interfaces';
 
 import type {
   IPublicDeriver,
@@ -38,7 +38,7 @@ import type {
 import {
   GetKeyDerivation,
 } from '../../database/primitives/api/read';
-import { addTraitsForBip44Child } from '../Bip44Wallet/traits';
+import { addTraitsForBip44Child, addTraitsForCip1852Child } from './traits';
 
 /** Snapshot of a PublicDeriver in the database */
 export class PublicDeriver<+Parent: ConceptualWallet = ConceptualWallet>
@@ -181,8 +181,6 @@ export async function refreshPublicDeriverFunctionality(
     db,
     pubDeriver.KeyDerivationId,
   );
-  let pathToPublic;
-  let finalClass;
 
   if (parent instanceof Bip44Wallet) {
     const result = await addTraitsForBip44Child(
@@ -192,19 +190,34 @@ export async function refreshPublicDeriverFunctionality(
       parent,
       PublicDeriver,
     );
-    pathToPublic = result.pathToPublic;
-    finalClass = result.finalClass;
-  } else {
-    throw new Error('refreshPublicDeriverFunctionality unknown wallet type');
+    const finalClass = result.finalClass;
+    const instance = new finalClass({
+      publicDeriverId: pubDeriver.PublicDeriverId,
+      parent,
+      pathToPublic: result.pathToPublic,
+      derivationId: keyDerivation.KeyDerivationId,
+    });
+    return instance;
+  }
+  if (parent instanceof Cip1852Wallet) {
+    const result = await addTraitsForCip1852Child(
+      db,
+      pubDeriver,
+      keyDerivation,
+      parent,
+      PublicDeriver,
+    );
+    const finalClass = result.finalClass;
+    const instance = new finalClass({
+      publicDeriverId: pubDeriver.PublicDeriverId,
+      parent,
+      pathToPublic: result.pathToPublic,
+      derivationId: keyDerivation.KeyDerivationId,
+    });
+    return instance;
   }
 
-  const instance = new finalClass({
-    publicDeriverId: pubDeriver.PublicDeriverId,
-    parent,
-    pathToPublic,
-    derivationId: keyDerivation.KeyDerivationId,
-  });
-  return instance;
+  throw new Error('refreshPublicDeriverFunctionality unknown wallet type');
 }
 
 async function getKeyDerivation(

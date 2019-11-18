@@ -9,7 +9,7 @@ import {
 } from 'bignumber.js';
 
 import { ConceptualWallet } from '../ConceptualWallet/index';
-import type { IConceptualWallet} from '../ConceptualWallet/interfaces';
+import type { IConceptualWallet } from '../ConceptualWallet/interfaces';
 
 import {
   GetUtxoTxOutputsWithTx,
@@ -26,7 +26,6 @@ import type { PublicDeriverRow, LastSyncInfoRow, } from '../../database/walletTy
 
 import type {
   IChangePasswordRequestFunc, IChangePasswordRequest,
-  Address, Addressing,
   RawVariation,
   RawTableVariation,
 } from '../common/interfaces';
@@ -53,11 +52,42 @@ import { UpdateGet, AddAddress, } from '../../database/primitives/api/write';
 import type {
   FilterFunc,
 } from '../../../state-fetch/types';
+import {
+  EXTERNAL,
+  INTERNAL,
+} from '../../../../../../config/numbersConfig';
+import type {
+  TreeInsert,
+} from '../../database/walletTypes/common/utils';
+import type { Bip44ChainInsert } from '../../database/walletTypes/common/tables';
 
 export type WalletAccountNumberPlate = {
   hash: string,
   id: string,
 }
+
+export type Address = {|
+  +address: string,
+|};
+export type Value = {|
+  /**
+   * note: an undefined value is different than a value of 0
+   * since you can have a UTXO with a value of 0
+   * which is different from having no UTXO at all
+   */
+  +value: void | BigNumber,
+|};
+export type Addressing = {|
+  +addressing: {|
+    +path: Array<number>,
+    +startLevel: number,
+  |}
+|};
+
+export type UsedStatus = {|
+  isUsed: boolean,
+|};
+
 
 export type IPublicDeriverConstructor<+Parent: IConceptualWallet> = {
   publicDeriverId: number,
@@ -218,24 +248,24 @@ export type IGetNextUnusedForChainResponse = {|
 export type IGetNextUnusedForChainFunc = (
   body: IGetNextUnusedForChainRequest
 ) => Promise<IGetNextUnusedForChainResponse>;
-export type IHasChainsRequest = {|
-  chainId: number,
+export type IHasUtxoChainsRequest = {|
+  chainId: typeof EXTERNAL | typeof INTERNAL,
 |};
-export type IHasChainsResponse = Array<UtxoAddressPath>;
-export type IHasChainsGetAddressesFunc = (
-  body: IHasChainsRequest
-) => Promise<IHasChainsResponse>;
-export interface IHasChains {
+export type IHasUtxoChainsResponse = Array<UtxoAddressPath>;
+export type IHasUtxoChainsGetAddressesFunc = (
+  body: IHasUtxoChainsRequest
+) => Promise<IHasUtxoChainsResponse>;
+export interface IHasUtxoChains {
   +rawGetAddressesForChain: RawTableVariation<
-    IHasChainsGetAddressesFunc,
+    IHasUtxoChainsGetAddressesFunc,
     {|
       GetAddress: Class<GetAddress>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
-    IHasChainsRequest
+    IHasUtxoChainsRequest
   >;
-  +getAddressesForChain: IHasChainsGetAddressesFunc;
+  +getAddressesForChain: IHasUtxoChainsGetAddressesFunc;
 
   +rawNextInternal: RawTableVariation<
     IGetNextUnusedForChainFunc,
@@ -363,4 +393,104 @@ export interface IScanAddresses {
     IScanAddressesRequest
   >;
   +scanAddresses: IScanAddressesFunc;
+}
+
+export type IGetBalanceRequest = void;
+export type IGetBalanceResponse = BigNumber;
+export type IGetBalanceFunc = (
+  body: IGetBalanceRequest
+) => Promise<IGetBalanceResponse>;
+export interface IGetBalance {
+  +getBalance: IGetBalanceFunc;
+}
+
+export type IScanAccountRequest = {|
+  accountPublicKey: string,
+  lastUsedInternal: number,
+  lastUsedExternal: number,
+  internalAddresses: Array<number>,
+  externalAddresses: Array<number>,
+  checkAddressesInUse: FilterFunc,
+|};
+export type IScanAccountResponse = TreeInsert<Bip44ChainInsert>;
+export type IScanAccountFunc = (
+  body: IScanAccountRequest
+) => Promise<IScanAccountResponse>;
+
+export interface IScanUtxo {
+  +rawScanAccount: RawTableVariation<
+    IScanAccountFunc,
+    {|
+      GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetAddress: Class<GetAddress>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
+    |},
+    IScanAccountRequest
+  >;
+}
+
+export type AccountingAddressPath = {|
+  ...BaseAddressPath,
+|};
+
+export type IGetStakingKeyRequest = void;
+export type IGetStakingKeyResponse = AccountingAddressPath;
+export type IGetStakingKeyFunc = (
+  body: IGetStakingKeyRequest
+) => Promise<IGetStakingKeyResponse>;
+
+export interface IGetStakingKey {
+  +rawGetStakingKey: RawTableVariation<
+  IGetStakingKeyFunc,
+    {|
+      GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetAddress: Class<GetAddress>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
+    |},
+    IGetStakingKeyRequest
+  >;
+
+  +getStakingKey: IGetStakingKeyFunc
+}
+
+
+export type IGetAllAccountingAddressesRequest = void;
+export type IGetAllAccountingAddressesResponse = Array<AccountingAddressPath>;
+export type IGetAllAccountingAddressesFunc = (
+  body: IGetAllAccountingAddressesRequest
+) => Promise<IGetAllAccountingAddressesResponse>;
+export interface IGetAllAccounting {
+  +rawGetAllAccountingAddresses: RawTableVariation<
+    IGetAllAccountingAddressesFunc,
+    {|
+      GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetAddress: Class<GetAddress>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
+    |},
+    IGetAllAccountingAddressesRequest
+  >;
+  +getAllAccountingAddresses: IGetAllAccountingAddressesFunc
+}
+
+export type IAddBip44FromPublicRequest = {|
+  tree: TreeInsert<any>,
+|};
+export type IAddBip44FromPublicResponse = void;
+export type IAddBip44FromPublicFunc = (
+  body: IAddBip44FromPublicRequest
+) => Promise<IAddBip44FromPublicResponse>;
+export interface IAddBip44FromPublic {
+  +rawAddBip44FromPublic: RawTableVariation<
+    IAddBip44FromPublicFunc,
+    {|
+      GetPublicDeriver: Class<GetPublicDeriver>,
+      AddDerivationTree: Class<AddDerivationTree>,
+      ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
+      GetDerivationsByPath: Class<GetDerivationsByPath>,
+      GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
+    |},
+    IAddBip44FromPublicRequest
+  >;
+  +addBip44FromPublic: IAddBip44FromPublicFunc;
 }

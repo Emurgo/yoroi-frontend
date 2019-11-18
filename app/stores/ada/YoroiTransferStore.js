@@ -24,8 +24,8 @@ import { HARD_DERIVATION_START } from '../../config/numbersConfig';
 import type { RestoreWalletForTransferResponse, RestoreWalletForTransferFunc } from '../../api/ada/index';
 import { verifyAccountLevel } from '../../api/ada/transactions/utils';
 import {
-  asHasChains,
-} from '../../api/ada/lib/storage/models/Bip44Wallet/traits';
+  asHasUtxoChains,
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 import {
   unscramblePaperAdaMnemonic,
@@ -124,7 +124,7 @@ export default class YoroiTransferStore extends Store {
     publicDeriver: PublicDeriverWithCachedMeta,
   ): Promise<TransferTx> => {
     // 1) get receive address
-    const withChains = asHasChains(publicDeriver.self);
+    const withChains = asHasUtxoChains(publicDeriver.self);
     if (!withChains) throw new Error('_setupTransferWebSocket missing chains functionality');
     const nextInternal = await withChains.nextInternal();
     if (nextInternal.addressInfo == null) {
