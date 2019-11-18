@@ -59,7 +59,7 @@ export class ModifyLastSyncInfo {
   }
 }
 
-export type PublicDeriverRequest<Insert> = {
+export type PublicDeriverRequest<Insert> = {|
   addLevelRequest: AddDerivationRequest<Insert>,
   levelSpecificTableName: string,
   derivationTables: Map<number, string>,
@@ -67,14 +67,14 @@ export type PublicDeriverRequest<Insert> = {
     derivationId: number,
     lastSyncInfoId: number,
    } => PublicDeriverInsert,
-};
-export type AddPublicDeriverResponse<Row> = {
+|};
+export type AddPublicDeriverResponse<Row> = {|
   publicDeriverResult: $ReadOnly<PublicDeriverRow>,
   levelResult: {
     KeyDerivation: $ReadOnly<KeyDerivationRow>,
     specificDerivationResult: $ReadOnly<Row>
   },
-};
+|};
 
 export class AddPublicDeriver {
   static ownTables = Object.freeze({

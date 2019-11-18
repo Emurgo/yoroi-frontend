@@ -133,13 +133,19 @@ const PublicFromPrivateMixin = (
     {| DerivePublicDeriverFromKey: Class<DerivePublicDeriverFromKey> |},
     IDerivePublicFromPrivateRequest,
     Map<number, string>,
-  ) => Promise<IDerivePublicFromPrivateResponse<Row>> = async <Row>(tx, deps, body, derivationTables) => {
+    // eslint-disable-next-line no-unused-vars
+  ) => Promise<IDerivePublicFromPrivateResponse<Row>> = async <Row>(
+    tx,
+    deps,
+    body,
+    derivationTables
+  ) => {
     const id = super.getPrivateDeriverKeyDerivationId();
     const level = super.getPrivateDeriverLevel();
     if (id == null || level == null) {
       throw new StaleStateError('rawDerivePublicDeriverFromPrivate no private deriver');
     }
-    return await derivePublicDeriver(
+    const result = await derivePublicDeriver(
       super.getDb(),
       tx,
       { DerivePublicDeriverFromKey: deps.DerivePublicDeriverFromKey },
@@ -149,9 +155,11 @@ const PublicFromPrivateMixin = (
       level,
       derivationTables,
     );
+    return result;
   }
   derivePublicDeriverFromPrivate: <Row>(
     body: IDerivePublicFromPrivateRequest,
+    // eslint-disable-next-line no-unused-vars
   ) => Promise<IDerivePublicFromPrivateResponse<Row>> = async <Row>(body) => {
     const derivationTables = this.getDerivationTables();
     const deps = Object.freeze({
@@ -222,7 +230,9 @@ const GetPrivateDeriverKeyMixin = (
       keyDerivation: result.KeyDerivation,
     };
   }
-  getPrivateDeriverKey: IGetPrivateDeriverKeyRequest => Promise<IGetPrivateDeriverKeyResponse> = async (body) => {
+  getPrivateDeriverKey: (
+    IGetPrivateDeriverKeyRequest
+  ) => Promise<IGetPrivateDeriverKeyResponse> = async (body) => {
     const deps = Object.freeze({
       GetKeyForDerivation,
     });
@@ -308,6 +318,7 @@ const AdhocPublicDeriverMixin = (
     {| AddAdhocPublicDeriver: Class<AddAdhocPublicDeriver> |},
     IAddAdhocPublicDeriverRequest<any>,
     Map<number, string>,
+    // eslint-disable-next-line no-unused-vars
   ) => Promise<IAddAdhocPublicDeriverResponse<Row>> = async <Row>(
     tx,
     deps,
@@ -323,6 +334,7 @@ const AdhocPublicDeriverMixin = (
   }
   addAdhocPubicDeriver: <Row>(
     body: IAddAdhocPublicDeriverRequest<any>,
+    // eslint-disable-next-line no-unused-vars
   ) => Promise<IAddAdhocPublicDeriverResponse<Row>> = async <Row>(body) => {
     const derivationTables = this.getDerivationTables();
     const deps = Object.freeze({

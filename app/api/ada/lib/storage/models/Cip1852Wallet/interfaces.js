@@ -1,27 +1,6 @@
 // @flow
 
 import type {
-  CanonicalAddressRow,
-} from '../../database/primitives/tables';
-import { GetDerivationSpecific } from '../../database/walletTypes/common/api/read';
-import {
-  GetPathWithSpecific,
-  GetAddress,
-  GetDerivationsByPath,
-} from '../../database/primitives/api/read';
-import type {
-  PathRequest,
-  BaseAddressPath,
-} from '../PublicDeriver/interfaces';
-import type {
-  RawVariation,
-  RawTableVariation,
-} from '../common/interfaces';
-import type {
-  AddDerivationTree,
-} from '../../database/walletTypes/common/api/write';
-
-import type {
   lf$Database,
 } from 'lovefield';
 

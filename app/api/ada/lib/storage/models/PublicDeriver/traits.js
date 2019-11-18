@@ -312,7 +312,9 @@ const GetAllUtxosMixin = (
       ...internalAddresses,
     ];
   }
-  getAllUtxoAddresses: IGetAllUtxoAddressesRequest => Promise<IGetAllUtxoAddressesResponse> = async (
+  getAllUtxoAddresses: (
+    IGetAllUtxoAddressesRequest
+  ) => Promise<IGetAllUtxoAddressesResponse> = async (
     body,
   ) => {
     const derivationTables = this.getParent().getDerivationTables();
@@ -1034,7 +1036,9 @@ const GetPublicKeyMixin = (
       },
     );
   }
-  changePubDeriverPassword: IChangePasswordRequest => Promise<IChangePasswordResponse> = async (body) => {
+  changePubDeriverPassword: (
+    IChangePasswordRequest
+  ) => Promise<IChangePasswordResponse> = async (body) => {
     const deps = Object.freeze({
       UpdateGet,
       GetKeyForPublicDeriver,

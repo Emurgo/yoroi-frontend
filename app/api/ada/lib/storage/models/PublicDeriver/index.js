@@ -38,7 +38,7 @@ import type {
 import {
   GetKeyDerivation,
 } from '../../database/primitives/api/read';
-import { addTraitsForBip44Child, addTraitsForCip1852Child } from '../PublicDeriver/traits';
+import { addTraitsForBip44Child, addTraitsForCip1852Child } from './traits';
 
 /** Snapshot of a PublicDeriver in the database */
 export class PublicDeriver<+Parent: ConceptualWallet = ConceptualWallet>
