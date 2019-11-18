@@ -7,7 +7,11 @@ import {
   stringifyData
 } from '../../utils/logging';
 import WalletTransaction from '../../domain/WalletTransaction';
-import { HARD_DERIVATION_START, } from '../../config/numbersConfig';
+import {
+  HARD_DERIVATION_START,
+  BIP44_PURPOSE,
+  CARDANO_COINTYPE,
+} from '../../config/numbersConfig';
 import type {
   Network,
   ConfigType,
@@ -15,6 +19,9 @@ import type {
 import {
   createStandardBip44Wallet, createHardwareWallet,
 } from './lib/storage/bridge/walletBuilder/byron';
+import {
+  createStandardCip1852Wallet,
+} from './lib/storage/bridge/walletBuilder/shelley';
 import {
   getAllUtxoTransactions,
   getPendingUtxoTransactions,
@@ -131,6 +138,8 @@ import type { TransactionExportRow } from '../export';
 
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
 import { clear } from './lib/storage/database/index';
+import environment from '../../environment';
+import { Cip1852Wallet } from './lib/storage/models/Cip1852Wallet/wrapper';
 
 declare var CONFIG : ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;
@@ -139,15 +148,16 @@ const protocolMagic = CONFIG.network.protocolMagic;
 
 // createAdaPaper
 
-export type CreateAdaPaperRequest = {
+export type CreateAdaPaperRequest = {|
   password: string,
   numAddresses?: number,
-};
-export type AdaPaper = {
+  legacy: true,
+|};
+export type AdaPaper = {|
   addresses: Array<string>,
   scrambledWords: Array<string>,
   accountPlate: WalletAccountNumberPlate,
-};
+|};
 export type CreateAdaPaperFunc = (
   request: CreateAdaPaperRequest
 ) => Promise<AdaPaper>;
@@ -441,10 +451,9 @@ export type RestoreWalletRequest = {
   walletName: string,
   walletPassword: string,
 };
-export type RestoreWalletResponse = {
-  bip44Wallet: Bip44Wallet,
+export type RestoreWalletResponse = {|
   publicDerivers: Array<PublicDeriver<>>,
-};
+|};
 export type RestoreWalletFunc = (
   request: RestoreWalletRequest
 ) => Promise<RestoreWalletResponse>;
@@ -520,18 +529,21 @@ export default class AdaApi {
 
   // noinspection JSMethodCanBeStatic
   createAdaPaper(
-    {
-      password,
-      numAddresses
-    }: CreateAdaPaperRequest = {}
+    request: CreateAdaPaperRequest
   ): AdaPaper {
     const words = generateAdaMnemonic();
-    const scrambledWords = scramblePaperAdaMnemonic(words.join(' '), password).split(' ');
+    const scrambledWords = scramblePaperAdaMnemonic(
+      words.join(' '),
+      request.password
+    ).split(' ');
     const { addresses, accountPlate } = generateStandardPlate(
       words.join(' '),
       0, // paper wallets always use account 0
-      numAddresses != null ? numAddresses : DEFAULT_ADDRESSES_PER_PAPER,
-      protocolMagic,
+      request.numAddresses != null ? request.numAddresses : DEFAULT_ADDRESSES_PER_PAPER,
+      environment.isMainnet()
+        ? RustModule.WalletV3.AddressDiscrimination.Production
+        : RustModule.WalletV3.AddressDiscrimination.Test,
+      request.legacy,
     );
     return { addresses, scrambledWords, accountPlate };
   }
@@ -1014,35 +1026,65 @@ export default class AdaApi {
       // Note: we only restore for 0th account
       const accountIndex = HARD_DERIVATION_START + 0;
       const rootPk = generateWalletRootKey(recoveryPhrase);
-
-      const wallet = await createStandardBip44Wallet({
-        db: request.db,
-        settings: RustModule.WalletV2.BlockchainSettings.from_json({
-          protocol_magic: protocolMagic
-        }),
-        rootPk,
-        password: walletPassword,
-        accountIndex,
-        walletName,
-        accountName: '', // set account name empty now
-      });
-
-      const bip44Wallet = await Bip44Wallet.createBip44Wallet(
-        request.db,
-        wallet.bip44WrapperRow,
-        protocolMagic,
-      );
       const newPubDerivers = [];
-      for (const pubDeriver of wallet.publicDeriver) {
-        newPubDerivers.push(await PublicDeriver.createPublicDeriver(
-          pubDeriver.publicDeriverResult,
-          bip44Wallet,
-        ));
+
+      if (environment.isShelley()) {
+        const wallet = await createStandardCip1852Wallet({
+          db: request.db,
+          discrimination: environment.isMainnet()
+            ? RustModule.WalletV3.AddressDiscrimination.Production
+            : RustModule.WalletV3.AddressDiscrimination.Test,
+          rootPk,
+          password: walletPassword,
+          accountIndex,
+          walletName,
+          accountName: '', // set account name empty now
+        });
+
+        const cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(
+          request.db,
+          wallet.cip1852WrapperRow,
+          protocolMagic,
+        );
+        for (const pubDeriver of wallet.publicDeriver) {
+          newPubDerivers.push(await PublicDeriver.createPublicDeriver(
+            pubDeriver.publicDeriverResult,
+            cip1852Wallet,
+          ));
+        }
+      } else {
+        const wallet = await createStandardBip44Wallet({
+          db: request.db,
+          settings: RustModule.WalletV2.BlockchainSettings.from_json({
+            protocol_magic: protocolMagic
+          }),
+          rootPk: RustModule.WalletV2.Bip44RootPrivateKey.new(
+            RustModule.WalletV2.PrivateKey.from_hex(
+              Buffer.from(rootPk.as_bytes()).toString('hex')
+            ),
+            RustModule.WalletV2.DerivationScheme.v2()
+          ),
+          password: walletPassword,
+          accountIndex,
+          walletName,
+          accountName: '', // set account name empty now
+        });
+
+        const bip44Wallet = await Bip44Wallet.createBip44Wallet(
+          request.db,
+          wallet.bip44WrapperRow,
+          protocolMagic,
+        );
+        for (const pubDeriver of wallet.publicDeriver) {
+          newPubDerivers.push(await PublicDeriver.createPublicDeriver(
+            pubDeriver.publicDeriverResult,
+            bip44Wallet,
+          ));
+        }
       }
 
       Logger.debug('AdaApi::restoreWallet success');
       return {
-        bip44Wallet,
         publicDerivers: newPubDerivers,
       };
     } catch (error) {
@@ -1074,9 +1116,6 @@ export default class AdaApi {
     const { recoveryPhrase, checkAddressesInUse } = request;
 
     const rootPk = generateWalletRootKey(recoveryPhrase);
-    const accountKey = rootPk.bip44_account(
-      RustModule.WalletV2.AccountIndex.new(request.accountIndex)
-    );
     try {
       // need this to persist outside the scope of the hashToIds lambda
       // since the lambda is called multiple times
@@ -1084,9 +1123,14 @@ export default class AdaApi {
       const reverseAddressLookup = new Map<number, Array<string>>();
       const foundAddresses = new Set<string>();
 
+      // TODO: differentiate restoring legacy vs Shelley wallet
+      const accountKey = rootPk
+        .derive(BIP44_PURPOSE)
+        .derive(CARDANO_COINTYPE)
+        .derive(request.accountIndex);
       // TODO: this is using legacy scanning. Need an option for legacy vs shelley
       const insertTree = await scanBip44Account({
-        accountPublicKey: accountKey.key().public().to_hex(),
+        accountPublicKey: Buffer.from(accountKey.to_public().as_bytes()).toString('hex'),
         lastUsedInternal: -1,
         lastUsedExternal: -1,
         checkAddressesInUse,
@@ -1132,7 +1176,7 @@ export default class AdaApi {
       Logger.debug('AdaApi::restoreWalletForTransfer success');
 
       return {
-        masterKey: rootPk.key().to_hex(),
+        masterKey: Buffer.from(rootPk.as_bytes()).toString('hex'),
         addresses: addressResult,
       };
     } catch (error) {

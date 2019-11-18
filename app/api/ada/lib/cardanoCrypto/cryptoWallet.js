@@ -6,6 +6,7 @@
 import {
   validateMnemonic,
   generateMnemonic,
+  mnemonicToEntropy
 } from 'bip39';
 
 import { RustModule } from './rustLoader';
@@ -29,18 +30,17 @@ export const isValidEnglishAdaMnemonic = (
 
 export function generateWalletRootKey(
   mnemonic: string
-): RustModule.WalletV2.Bip44RootPrivateKey {
-  const entropy = RustModule.WalletV2.Entropy.from_english_mnemonics(mnemonic);
-
+): RustModule.WalletV3.Bip32PrivateKey {
+  const bip39entropy = mnemonicToEntropy(mnemonic);
   /**
  * there is no wallet entropy password in yoroi
  * the PASSWORD here is the password to add more _randomness_
  * when deriving the wallet root key from the entropy
  * it is NOT the spending PASSWORD
  */
-  const EMPTY_PASSWORD = '';
-  const rootKey = RustModule.WalletV2.Bip44RootPrivateKey.recover(
-    entropy,
+  const EMPTY_PASSWORD = Buffer.from('');
+  const rootKey = RustModule.WalletV3.Bip32PrivateKey.from_bip39_entropy(
+    Buffer.from(bip39entropy, 'hex'),
     EMPTY_PASSWORD
   );
   return rootKey;
