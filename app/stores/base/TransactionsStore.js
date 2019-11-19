@@ -127,7 +127,7 @@ export default class TransactionsStore extends Store {
   @computed get totalAvailable(): number {
     const publicDeriver = this.stores.substores[environment.API].wallets.selected;
     if (!publicDeriver) return 0;
-    const result = this._getTransactionsAllRequest(publicDeriver.self).result;
+    const result = this.getTransactionsAllRequest(publicDeriver.self).result;
     return result ? result.transactions.length : 0;
   }
 
@@ -150,7 +150,7 @@ export default class TransactionsStore extends Store {
       checkAddressesInUse,
       getBestBlock
     } = stateFetcher;
-    const allRequest = this._getTransactionsAllRequest(publicDeriver);
+    const allRequest = this.getTransactionsAllRequest(publicDeriver);
     allRequest.invalidate({ immediately: false });
     allRequest.execute({
       publicDeriver,
@@ -245,7 +245,7 @@ export default class TransactionsStore extends Store {
     this.transactionsRequests.push({
       publicDeriver: publicDeriver.self,
       recentRequest: this._getTransactionsRecentRequest(publicDeriver.self),
-      allRequest: this._getTransactionsAllRequest(publicDeriver.self),
+      allRequest: this.getTransactionsAllRequest(publicDeriver.self),
       getBalanceRequest: this._getBalanceRequest(publicDeriver.self),
       pendingRequest: this._getTransactionsPendingRequest(publicDeriver.self),
     });
@@ -274,9 +274,9 @@ export default class TransactionsStore extends Store {
 
   /** Get request for fetching transaction data.
    * Should ONLY be executed to cache query WITHOUT search options */
-  _getTransactionsAllRequest = (
-    publicDeriver: PublicDeriver<>
-  ): CachedRequest<GetTransactionsFunc> => {
+  getTransactionsAllRequest: PublicDeriver<> => CachedRequest<GetTransactionsFunc> = (
+    publicDeriver
+  ) => {
     const foundRequest = find(this.transactionsRequests, { publicDeriver });
     if (foundRequest && foundRequest.allRequest) return foundRequest.allRequest;
     return new CachedRequest<GetTransactionsFunc>(this.api[environment.API].refreshTransactions);

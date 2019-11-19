@@ -923,7 +923,7 @@ declare module 'cardano-wallet-browser' { // need to wrap flowgen output into mo
     /**
      * @param {LinearFeeAlgorithm} fee_algorithm
      * @param {OutputPolicy} policy
-     * @returns {any}
+     * @returns {Array<TxOutType<string>>}
      */
     apply_output_policy(
       fee_algorithm: LinearFeeAlgorithm,

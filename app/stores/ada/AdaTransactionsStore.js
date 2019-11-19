@@ -62,7 +62,7 @@ export default class AdaTransactionsStore extends TransactionsStore {
     if (!publicDeriver) return unconfirmedAmount;
 
     // Get current transactions for public deriver
-    const result = this._getTransactionsAllRequest(publicDeriver.self).result;
+    const result = this.getTransactionsAllRequest(publicDeriver.self).result;
     if (!result || !result.transactions) return unconfirmedAmount;
 
     for (const transaction of result.transactions) {

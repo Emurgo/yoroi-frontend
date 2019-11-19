@@ -58,7 +58,7 @@ export function sendAllUnsignedTx(
 
   return {
     senderUtxos: addressedUtxos,
-    unsignedTx: unsignedTxResponse.unsignedTx,
+    IOs: unsignedTxResponse.IOs,
     changeAddr: unsignedTxResponse.changeAddr,
   };
 }
@@ -85,17 +85,21 @@ export function sendAllUnsignedTxFromUtxo(
   let fee;
   {
     // firts build a transaction to see what the cost would be
-    const fakeTxBuilder = RustModule.WalletV3.TransactionBuilder.new_no_payload();
+    const fakeIOBuilder = RustModule.WalletV3.InputOutputBuilder.empty();
     for (const utxo of allUtxos) {
       const input = utxoToTxInput(utxo);
-      fakeTxBuilder.add_input(input);
+      fakeIOBuilder.add_input(input);
     }
-    fakeTxBuilder.add_output(
+    fakeIOBuilder.add_output(
       RustModule.WalletV3.Address.from_string(receiver),
       RustModule.WalletV3.Value.from_str(totalBalance.toString())
     );
-    const feeValue = fakeTxBuilder.estimate_fee(feeAlgorithm);
-    fee = new BigNumber(feeValue.to_str());
+    const feeValue = fakeIOBuilder.estimate_fee(
+      feeAlgorithm,
+      // can't add a certificate to a UTXO transaction
+      RustModule.WalletV3.Payload.no_payload()
+    ).to_str();
+    fee = new BigNumber(feeValue);
   }
 
   // create a new transaction subtracing the fee from your total UTXO
@@ -142,7 +146,7 @@ export function newAdaUnsignedTx(
 
   return {
     senderUtxos: addressedUtxos,
-    unsignedTx: unsignedTxResponse.unsignedTx,
+    IOs: unsignedTxResponse.IOs,
     changeAddr: unsignedTxResponse.changeAddr,
   };
 }
@@ -165,17 +169,21 @@ export function newAdaUnsignedTxFromUtxo(
     RustModule.WalletV3.Value.from_str(CONFIG.app.linearFee.certificate),
   );
 
-  const txBuilder = RustModule.WalletV3.TransactionBuilder.new_no_payload();
-  txBuilder.add_output(
+  const ioBuilder = RustModule.WalletV3.InputOutputBuilder.empty();
+  ioBuilder.add_output(
     RustModule.WalletV3.Address.from_string(receiver),
     RustModule.WalletV3.Value.from_str(amount)
   );
+  // can't add a certificate to a UTXO transaction
+  const payload = RustModule.WalletV3.Payload.no_payload();
+
   const selectedUtxos = firstMatchFirstInputSelection(
-    txBuilder,
+    ioBuilder,
     allUtxos,
-    feeAlgorithm
+    feeAlgorithm,
+    payload,
   );
-  let transaction;
+  let IOs;
   const change = [];
   if (changeAddresses.length === 1) {
     const changeAddr = changeAddresses[0];
@@ -186,7 +194,8 @@ export function newAdaUnsignedTxFromUtxo(
      * may be more expensive than the amount leftover
      * In this case we don't add a change address
      */
-    transaction = txBuilder.seal_with_output_policy(
+    IOs = ioBuilder.seal_with_output_policy(
+      payload,
       feeAlgorithm,
       RustModule.WalletV3.OutputPolicy.one(
         RustModule.WalletV3.Address.from_string(changeAddr.address)
@@ -194,11 +203,12 @@ export function newAdaUnsignedTxFromUtxo(
     );
     change.push(...filterToUsedChange(
       changeAddr,
-      transaction.outputs(),
+      IOs.outputs(),
       selectedUtxos
     ));
   } else if (changeAddresses.length === 0) {
-    transaction = txBuilder.seal_with_output_policy(
+    IOs = ioBuilder.seal_with_output_policy(
+      payload,
       feeAlgorithm,
       RustModule.WalletV3.OutputPolicy.forget()
     );
@@ -208,15 +218,16 @@ export function newAdaUnsignedTxFromUtxo(
 
   return {
     senderUtxos: selectedUtxos,
-    unsignedTx: transaction,
+    IOs,
     changeAddr: change,
   };
 }
 
 function firstMatchFirstInputSelection(
-  txBuilder: RustModule.WalletV3.TransactionBuilder,
+  txBuilder: RustModule.WalletV3.InputOutputBuilder,
   allUtxos: Array<RemoteUnspentOutput>,
   feeAlgorithm: RustModule.WalletV3.Fee,
+  payload: RustModule.WalletV3.Payload,
 ): Array<RemoteUnspentOutput> {
   const selectedOutputs = [];
   if (allUtxos.length === 0) {
@@ -226,7 +237,7 @@ function firstMatchFirstInputSelection(
   for (let i = 0; i < allUtxos.length; i++) {
     selectedOutputs.push(allUtxos[i]);
     txBuilder.add_input(utxoToTxInput(allUtxos[i]));
-    const txBalance = txBuilder.get_balance(feeAlgorithm);
+    const txBalance = txBuilder.get_balance(payload, feeAlgorithm);
     if (!txBalance.is_negative()) {
       break;
     }
@@ -280,16 +291,27 @@ export function signTransaction(
   signRequest: V3UnsignedTxAddressedUtxoResponse,
   keyLevel: number,
   signingKey: RustModule.WalletV2.PrivateKey
-): RustModule.WalletV3.AuthenticatedTransaction {
-  const { senderUtxos, unsignedTx } = signRequest;
-  const txFinalizer = new RustModule.WalletV3.TransactionFinalizer(unsignedTx);
-  addWitnesses(
-    txFinalizer,
+): RustModule.WalletV3.Transaction {
+  const { senderUtxos, IOs } = signRequest;
+
+  const txbuilder = new RustModule.WalletV3.TransactionBuilder();
+  const builderSetIOs = txbuilder.no_payload();
+  const builderSetWitness = builderSetIOs.set_ios(
+    IOs.inputs(),
+    IOs.outputs()
+  );
+
+  const builderSetAuthData = addWitnesses(
+    builderSetWitness,
     senderUtxos,
     keyLevel,
     signingKey
   );
-  const signedTx = txFinalizer.finalize();
+
+  const signedTx = builderSetAuthData.set_payload_auth(
+    // can't add a certificate to a UTXO transaction
+    RustModule.WalletV3.PayloadAuthData.for_no_payload()
+  );
   return signedTx;
 }
 
@@ -307,11 +329,11 @@ function utxoToTxInput(
 }
 
 function addWitnesses(
-  txFinalizer: RustModule.WalletV3.TransactionFinalizer,
+  builderSetWitnesses: RustModule.WalletV3.TransactionBuilderSetWitness,
   senderUtxos: Array<AddressedUtxo>,
   keyLevel: number,
   signingKey: RustModule.WalletV2.PrivateKey
-): void {
+): RustModule.WalletV3.TransactionBuilderSetAuthData {
   // get private keys
   const privateKeys = senderUtxos.map(utxo => {
     const lastLevelSpecified = utxo.addressing.startLevel + utxo.addressing.path.length - 1;
@@ -331,14 +353,16 @@ function addWitnesses(
     return key;
   });
 
+  const witnesses = RustModule.WalletV3.Witnesses.new();
   for (let i = 0; i < senderUtxos.length; i++) {
     const witness = RustModule.WalletV3.Witness.for_utxo(
       RustModule.WalletV3.Hash.from_hex(CONFIG.app.genesisHash),
-      txFinalizer.get_txid(),
+      builderSetWitnesses.get_auth_data_for_witness(),
       v2SkKeyToV3Key(privateKeys[i]),
     );
-    txFinalizer.set_witness(i, witness);
+    witnesses.add(witness);
   }
+  return builderSetWitnesses.set_witnesses(witnesses);
 }
 
 export function asAddressedUtxo(
