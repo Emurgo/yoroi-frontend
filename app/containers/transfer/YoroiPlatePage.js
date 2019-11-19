@@ -12,12 +12,6 @@ import {
 } from '../../api/ada/lib/cardanoCrypto/plate';
 import environment from '../../environment';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import type {
-  ConfigType,
-} from '../../../config/config-types';
-
-declare var CONFIG : ConfigType;
-const protocolMagic = CONFIG.network.protocolMagic;
 
 type Props = {|
   ...InjectedProps,
