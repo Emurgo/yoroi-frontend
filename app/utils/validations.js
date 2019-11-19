@@ -13,8 +13,20 @@ export const isValidPaperPassword = (paperPassword: string) => (
 );
 
 export const isValidWalletPassword = (walletPassword: string) => (
-  // https://xkcd.com/936/
-  walletPassword.length >= 12
+  /**
+   * No special chracter requirement: https://xkcd.com/936/
+   *
+   * We pick 10 letters as the requirement because Daedalus password requirements are:
+   * - 10 characters long
+   * - 1 uppercase
+   * - 1 lowercase
+   * - 1 number
+   *
+   * Since with Shelley both Yoroi and Daedalus use the same mnemonic scheme,
+   * many users may have the same wallet in both Daedalus and Yoroi
+   * It's easier if we allow them to also have the same password in this case.
+   */
+  walletPassword.length >= 10
 );
 
 // eslint-disable-next-line max-len
