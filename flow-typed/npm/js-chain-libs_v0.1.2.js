@@ -379,7 +379,7 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @param {Uint8Array} password
      * @returns {Bip32PrivateKey}
      */
-    from_bip39_entropy(entropy: Uint8Array, password: Uint8Array): Bip32PrivateKey;
+    static from_bip39_entropy(entropy: Uint8Array, password: Uint8Array): Bip32PrivateKey;
   }
   /**
    */

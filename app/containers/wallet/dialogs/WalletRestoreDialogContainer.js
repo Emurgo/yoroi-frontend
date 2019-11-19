@@ -17,12 +17,7 @@ import {
 import type { WalletAccountNumberPlate } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import globalMessages from '../../../i18n/global-messages';
 import { CheckAdressesInUseApiError } from '../../../api/ada/errors';
-import type {
-  ConfigType,
-} from '../../../../config/config-types';
-
-declare var CONFIG : ConfigType;
-const protocolMagic = CONFIG.network.protocolMagic;
+import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 
 type Props = {|
   ...InjectedDialogContainerProps,
@@ -88,11 +83,14 @@ export default class WalletRestoreDialogContainer
       }
       resolvedRecoveryPhrase = newPhrase;
     }
-    const { addresses, accountPlate } =  generateStandardPlate(
+    const { addresses, accountPlate } = generateStandardPlate(
       resolvedRecoveryPhrase,
       0, // show addresses for account #0
       isPaper ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER : NUMBER_OF_VERIFIED_ADDRESSES,
-      protocolMagic,
+      environment.isMainnet()
+        ? RustModule.WalletV3.AddressDiscrimination.Production
+        : RustModule.WalletV3.AddressDiscrimination.Test,
+      true,
     );
     this.setState({
       verifyRestore: { addresses, accountPlate },

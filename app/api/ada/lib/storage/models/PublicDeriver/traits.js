@@ -99,6 +99,7 @@ import type { KeyRow, KeyDerivationRow, } from '../../database/primitives/tables
 import { UpdateGet, AddAddress, } from '../../database/primitives/api/write';
 
 import { scanBip44Account, } from '../../../../restoration/byron/scan';
+import { scanCip1852Account } from '../../../../restoration/shelley/scan';
 
 import {
   UnusedAddressesError,
@@ -110,6 +111,7 @@ import {
   PublicDeriver,
 } from './index';
 import { ConceptualWallet } from '../ConceptualWallet/index';
+import { RustModule } from '../../../cardanoCrypto/rustLoader';
 
 interface Empty {}
 type HasPrivateDeriverDependencies = IPublicDeriver<ConceptualWallet & IHasPrivateDeriver>;
@@ -435,7 +437,19 @@ const GetAllAccountingMixin = (
     body,
     derivationTables,
   ) => {
-    return (await this.rawGetAllAccountingAddresses(tx, deps, body, derivationTables))[0];
+    const allAccounts = await this.rawGetAllAccountingAddresses(tx, deps, body, derivationTables);
+    const stakingKeyAccount = allAccounts[0];
+    const stakingAddr = stakingKeyAccount.addrs.find(
+      addr => addr.Type === CoreAddressTypes.SHELLEY_ACCOUNT
+    );
+    if (stakingAddr == null) {
+      throw new StaleStateError('rawGetStakingKey no account found at account derivation');
+    }
+    return {
+      row: stakingKeyAccount.row,
+      addressing: stakingKeyAccount.addressing,
+      addr: stakingAddr
+    };
   }
   getStakingKey: (
     IGetStakingKeyRequest
@@ -1308,6 +1322,77 @@ export function asScanLegacyCardanoUtxoInstance<
 }
 
 // ===================
+//   ScanShelleyUtxo
+// ===================
+
+type ScanShelleyUtxoDependencies = IPublicDeriver<> & IGetStakingKey;
+const ScanShelleyUtxoMixin = (
+  superclass: Class<ScanShelleyUtxoDependencies>,
+) => class ScanShelleyUtxo extends superclass implements IScanUtxo {
+  rawScanAccount: (
+    lf$Transaction,
+    {|
+      GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetAddress: Class<GetAddress>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
+    |},
+    IScanAccountRequest,
+    Map<number, string>,
+  ) => Promise<IScanAccountResponse> = async (
+    tx,
+    deps,
+    body,
+    derivationTables,
+  ): Promise<IScanAccountResponse> => {
+    const stakingAddressDbRow = await this.rawGetStakingKey(
+      tx,
+      deps,
+      undefined,
+      derivationTables
+    );
+
+    const address = RustModule.WalletV3.Address.from_bytes(
+      Buffer.from(stakingAddressDbRow.addr.Hash, 'hex')
+    );
+    const stakingAddress = address.to_account_address();
+    if (stakingAddress == null) {
+      throw new StaleStateError('Could non-account hash in staking key derivation');
+    }
+    return await scanCip1852Account({
+      accountPublicKey: body.accountPublicKey,
+      lastUsedInternal: body.lastUsedInternal,
+      lastUsedExternal: body.lastUsedExternal,
+      checkAddressesInUse: body.checkAddressesInUse,
+      addByHash: rawGenAddByHash(
+        new Set([
+          ...body.internalAddresses,
+          ...body.externalAddresses,
+        ])
+      ),
+      stakingKey: stakingAddress.get_account_key(),
+    });
+  }
+};
+
+const ScanShelleyUtxo = Mixin<
+  ScanShelleyUtxoDependencies,
+  IScanUtxo,
+>(ScanShelleyUtxoMixin);
+const ScanShelleyUtxoInstance = (
+  (ScanShelleyUtxo: any): ReturnType<typeof ScanShelleyUtxoMixin>
+);
+export function asScanShelleyUtxoInstance<
+  T: IPublicDeriver<any>
+>(
+  obj: T
+): void | (IScanUtxo & ScanShelleyUtxoDependencies & T) {
+  if (obj instanceof ScanShelleyUtxoInstance) {
+    return obj;
+  }
+  return undefined;
+}
+
+// ===================
 //   ScanUtxoAccount
 // ===================
 
@@ -1770,7 +1855,7 @@ export async function addTraitsForCip1852Child(
     currClass = HasUtxoChains(currClass);
     if (publicKey !== null) {
       currClass = GetPublicKey(currClass);
-      currClass = ScanLegacyCardanoUtxo(currClass); // TODO: replace w/ Shelley scan
+      currClass = ScanShelleyUtxo(currClass);
       currClass = ScanUtxoAccountAddresses(currClass);
       currClass = ScanAddresses(currClass);
     }

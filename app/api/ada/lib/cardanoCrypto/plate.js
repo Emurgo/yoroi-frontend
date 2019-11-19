@@ -6,18 +6,26 @@
 import { RustModule } from './rustLoader';
 import type { GenerateAddressFunc } from '../adaAddressProcessing';
 import { v2genAddressBatchFunc } from '../../restoration/byron/scan';
+import { v3genAddressBatchFunc } from '../../restoration/shelley/scan';
 import blakejs from 'blakejs';
 import crc32 from 'buffer-crc32';
 import type { WalletAccountNumberPlate } from '../storage/models/PublicDeriver/interfaces';
-import { HARD_DERIVATION_START } from '../../../../config/numbersConfig';
 import { generateWalletRootKey } from './cryptoWallet';
+import {
+  HARD_DERIVATION_START,
+  CARDANO_COINTYPE,
+  CIP_1852_PURPOSE,
+  BIP44_PURPOSE,
+  EXTERNAL,
+} from '../../../../config/numbersConfig';
+import type { AddressDiscriminationType } from 'js-chain-libs';
 
 const mnemonicsToAddresses = (
   generateAddressFunc: GenerateAddressFunc,
-  pubKey: RustModule.WalletV2.PublicKey,
+  pubKey: string,
   count: number,
 ): {| addresses: Array<string>, accountPlate: WalletAccountNumberPlate |} => {
-  const accountPlate = createAccountPlate(pubKey.to_hex());
+  const accountPlate = createAccountPlate(pubKey);
 
   const addresses = generateAddressFunc([...Array(count).keys()]);
   return { addresses, accountPlate };
@@ -37,20 +45,33 @@ export const generateStandardPlate = (
   mnemonic: string,
   accountIndex: number,
   count: number,
-  _protocolMagic: number,
+  discrimination: AddressDiscriminationType,
+  legacy: boolean,
 ): {| addresses: Array<string>, accountPlate: WalletAccountNumberPlate |} => {
   const cryptoWallet = generateWalletRootKey(mnemonic);
-  const account = cryptoWallet.bip44_account(
-    RustModule.WalletV2.AccountIndex.new(accountIndex + HARD_DERIVATION_START)
-  );
-  const accountPublic = account.public();
+  const accountKey = cryptoWallet
+    .derive(legacy ? BIP44_PURPOSE : CIP_1852_PURPOSE)
+    .derive(CARDANO_COINTYPE)
+    .derive(accountIndex + HARD_DERIVATION_START);
+  const accountPublic = accountKey.to_public();
+  const chainKey = accountPublic.derive(EXTERNAL);
 
   return mnemonicsToAddresses(
     // add: add v3 addresses options
-    v2genAddressBatchFunc(
-      accountPublic.bip44_chain(false),
-    ),
-    accountPublic.key(),
+    legacy
+      ? v2genAddressBatchFunc(
+        RustModule.WalletV2.Bip44ChainPublic.new(
+          RustModule.WalletV2.PublicKey.from_hex(
+            Buffer.from(chainKey.as_bytes()).toString('hex')
+          ),
+          RustModule.WalletV2.DerivationScheme.v2()
+        ),
+      )
+      : v3genAddressBatchFunc(
+        chainKey,
+        discrimination,
+      ),
+    Buffer.from(accountPublic.as_bytes()).toString('hex'),
     count
   );
 };

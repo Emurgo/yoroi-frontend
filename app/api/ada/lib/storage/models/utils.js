@@ -33,6 +33,7 @@ import {
   asGetAllAccounting
 } from './PublicDeriver/traits';
 import { Bip44Wallet, } from './Bip44Wallet/wrapper';
+import { Cip1852Wallet } from './Cip1852Wallet/wrapper';
 
 import type {
   IChangePasswordRequest, IChangePasswordResponse,
@@ -69,6 +70,7 @@ import {
 import {
   GetAllBip44Wallets,
 } from '../database/walletTypes/bip44/api/read';
+import { GetAllCip1852Wallets } from '../database/walletTypes/cip1852/api/read';
 import {
   GetDerivationSpecific,
 } from '../database/walletTypes/common/api/read';
@@ -79,12 +81,11 @@ import type { GetPathWithSpecificByTreeRequest } from '../database/primitives/ap
 import {
   GetUtxoTxOutputsWithTx,
 } from '../database/transactionModels/utxo/api/read';
-import { TxStatusCodes, } from '../database/primitives/enums';
+import { TxStatusCodes, CoreAddressTypes, } from '../database/primitives/enums';
 
 import { WrongPassphraseError } from '../../cardanoCrypto/cryptoErrors';
 
 import { RustModule } from '../../cardanoCrypto/rustLoader';
-
 import { EXTERNAL, INTERNAL, BIP44_SCAN_SIZE, } from  '../../../../../config/numbersConfig';
 import {
   encryptWithPassword,
@@ -332,12 +333,21 @@ export async function rawGetAddressesForDisplay(
   );
   const balanceForAddresses = getUtxoBalanceForAddresses(utxoForAddresses);
 
-  return request.addresses.flatMap(family => family.addrs.map(addr => ({
-    address: addr.Hash,
-    value: balanceForAddresses[addr.AddressId],
-    addressing: family.addressing,
-    isUsed: utxosForAddresses.has(addr.AddressId),
-  })));
+  return request.addresses.flatMap(family => family.addrs
+    .filter(addr => addr.Type === request.type)
+    .map(addr => {
+      const transformedAddress = addr.Type === CoreAddressTypes.CARDANO_LEGACY
+        ? addr.Hash
+        : RustModule.WalletV3.Address.from_bytes(
+          Buffer.from(addr.Hash, 'hex')
+        ).to_string('addr');
+      return {
+        address: transformedAddress,
+        value: balanceForAddresses[addr.AddressId],
+        addressing: family.addressing,
+        isUsed: utxosForAddresses.has(addr.AddressId),
+      };
+    }));
 }
 
 export async function rawGetChainAddressesForDisplay(
@@ -624,35 +634,62 @@ export async function rawChangePassword(
 export async function loadWalletsFromStorage(
   db: lf$Database,
 ): Promise<Array<PublicDeriver<>>> {
+  const result = [];
   const deps = Object.freeze({
     GetAllBip44Wallets,
+    GetAllCip1852Wallets,
   });
   const depTables = Object
     .keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(db, table));
-  const bip44Wallets = await raii(
+  const walletsInStorage = await raii(
     db,
     depTables,
-    async tx => deps.GetAllBip44Wallets.get(db, tx)
+    async tx => ({
+      bip44: await deps.GetAllBip44Wallets.get(db, tx),
+      cip1852: await deps.GetAllCip1852Wallets.get(db, tx),
+    })
   );
-  const bip44Map = new Map<number, Bip44Wallet>();
-  const result = [];
-  for (const entry of bip44Wallets) {
-    let bip44Wallet = bip44Map.get(entry.Bip44Wrapper.Bip44WrapperId);
-    if (bip44Wallet == null) {
-      bip44Wallet = await Bip44Wallet.createBip44Wallet(
-        db,
-        entry.Bip44Wrapper,
-        protocolMagic,
+  // Bip44
+  {
+    const bip44Map = new Map<number, Bip44Wallet>();
+    for (const entry of walletsInStorage.bip44) {
+      let bip44Wallet = bip44Map.get(entry.Bip44Wrapper.Bip44WrapperId);
+      if (bip44Wallet == null) {
+        bip44Wallet = await Bip44Wallet.createBip44Wallet(
+          db,
+          entry.Bip44Wrapper,
+          protocolMagic,
+        );
+        bip44Map.set(entry.Bip44Wrapper.Bip44WrapperId, bip44Wallet);
+      }
+      const publicDeriver = await PublicDeriver.createPublicDeriver(
+        entry.PublicDeriver,
+        bip44Wallet,
       );
-      bip44Map.set(entry.Bip44Wrapper.Bip44WrapperId, bip44Wallet);
+      result.push(publicDeriver);
     }
-    const publicDeriver = await PublicDeriver.createPublicDeriver(
-      entry.PublicDeriver,
-      bip44Wallet,
-    );
-    result.push(publicDeriver);
+  }
+  // Cip1852
+  {
+    const cip1852Map = new Map<number, Cip1852Wallet>();
+    for (const entry of walletsInStorage.cip1852) {
+      let cip1852Wallet = cip1852Map.get(entry.Cip1852Wrapper.Cip1852WrapperId);
+      if (cip1852Wallet == null) {
+        cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(
+          db,
+          entry.Cip1852Wrapper,
+          protocolMagic,
+        );
+        cip1852Map.set(entry.Cip1852Wrapper.Cip1852WrapperId, cip1852Wallet);
+      }
+      const publicDeriver = await PublicDeriver.createPublicDeriver(
+        entry.PublicDeriver,
+        cip1852Wallet,
+      );
+      result.push(publicDeriver);
+    }
   }
   return result;
 }

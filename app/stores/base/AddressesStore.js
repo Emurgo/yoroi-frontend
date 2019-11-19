@@ -210,7 +210,9 @@ export default class AddressesStore extends Store {
     }
     return this.api[environment.API].getAllAddressesForDisplay({
       publicDeriver: withUtxos,
-      type: CoreAddressTypes.CARDANO_LEGACY,
+      type: environment.isShelley()
+        ? CoreAddressTypes.SHELLEY_GROUP
+        : CoreAddressTypes.CARDANO_LEGACY,
     });
   }
   _wrapForChainAddresses = (request: {
@@ -227,7 +229,9 @@ export default class AddressesStore extends Store {
     return this.api[environment.API].getChainAddressesForDisplay({
       publicDeriver: withHasUtxoChains,
       chainsRequest: request.chainsRequest,
-      type: CoreAddressTypes.CARDANO_LEGACY,
+      type: environment.isShelley()
+        ? CoreAddressTypes.SHELLEY_GROUP
+        : CoreAddressTypes.CARDANO_LEGACY,
     });
   }
 }

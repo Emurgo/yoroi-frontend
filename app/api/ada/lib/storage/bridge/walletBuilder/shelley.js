@@ -11,6 +11,7 @@ import {
   BIP44_SCAN_SIZE,
   EXTERNAL,
   INTERNAL,
+  ACCOUNT,
 } from '../../../../../../config/numbersConfig';
 
 import type {
@@ -55,6 +56,7 @@ export async function getAccountDefaultDerivations(
     BIP44_SCAN_SIZE
   );
 
+  const stakingKey = accountPublicKey.derive(ACCOUNT).to_raw_key();
   const externalAddrs = addressesIndex.map(i => {
     const key = accountPublicKey
       .derive(EXTERNAL)
@@ -94,6 +96,7 @@ export async function getAccountDefaultDerivations(
       return await addShelleyAddress(
         addByHash,
         insertRequest,
+        stakingKey,
         externalAddrs[i]
       );
     },
@@ -104,6 +107,7 @@ export async function getAccountDefaultDerivations(
       return await addShelleyAddress(
         addByHash,
         insertRequest,
+        stakingKey,
         internalAddrs[i]
       );
     },

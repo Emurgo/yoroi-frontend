@@ -30,6 +30,7 @@ import type { Bip44ChainInsert } from '../../lib/storage/database/walletTypes/co
 declare var CONFIG: ConfigType;
 const addressRequestSize = CONFIG.app.addressRequestSize;
 
+// TODO: variation for group addresses
 export function v3genAddressBatchFunc(
   addressChain: RustModule.WalletV3.Bip32PublicKey,
   discrimination: AddressDiscriminationType,
@@ -52,16 +53,34 @@ export function v3genAddressBatchFunc(
 export async function addShelleyAddress(
   addByHash: AddByHashFunc,
   insertRequest: InsertRequest,
-  address: string,
+  stakingKey: RustModule.WalletV3.PublicKey,
+  singleAddress: string,
 ): Promise<{|
   KeyDerivationId: number,
 |}> {
+  const paymentAddr = RustModule.WalletV3.Address.from_bytes(Buffer.from(singleAddress, 'hex'));
+  const singleAddr = paymentAddr.to_single_address();
+  if (singleAddr == null) {
+    throw new Error('addShelleyAddress address is not a single address');
+  }
+  const paymentKey = singleAddr.get_spending_key();
   await addByHash({
     ...insertRequest,
     address: {
-      // TODO: add group + shelley single
-      type: CoreAddressTypes.CARDANO_LEGACY,
-      data: address,
+      type: CoreAddressTypes.SHELLEY_SINGLE,
+      data: singleAddress,
+    },
+  });
+  const groupAddr = RustModule.WalletV3.Address.delegation_from_public_key(
+    paymentKey,
+    stakingKey,
+    paymentAddr.get_discrimination()
+  );
+  await addByHash({
+    ...insertRequest,
+    address: {
+      type: CoreAddressTypes.SHELLEY_GROUP,
+      data: Buffer.from(groupAddr.as_bytes()).toString('hex'),
     },
   });
   return {
@@ -73,7 +92,7 @@ export async function scanChain(request: {|
   generateAddressFunc: GenerateAddressFunc,
   lastUsedIndex: number,
   checkAddressesInUse: FilterFunc,
-  // stakingKey: RustModule.WalletV3.AccountAddress,
+  stakingKey: RustModule.WalletV3.PublicKey,
   addByHash: AddByHashFunc,
 |}): Promise<TreeInsert<CanonicalAddressInsert>> {
   const addresses = await discoverAllAddressesFrom(
@@ -92,6 +111,7 @@ export async function scanChain(request: {|
           return await addShelleyAddress(
             request.addByHash,
             insertRequest,
+            request.stakingKey,
             address
           );
         },
@@ -99,13 +119,13 @@ export async function scanChain(request: {|
     });
 }
 
-export async function scanAccountByVersion(request: {
+export async function scanCip1852Account(request: {
   accountPublicKey: string,
   lastUsedInternal: number,
   lastUsedExternal: number,
   checkAddressesInUse: FilterFunc,
   addByHash: AddByHashFunc,
-  protocolMagic: number,
+  stakingKey: RustModule.WalletV3.PublicKey,
 }): Promise<TreeInsert<Bip44ChainInsert>> {
   const genAddressBatchFunc = v3genAddressBatchFunc;
 
@@ -129,7 +149,7 @@ export async function scanAccountByVersion(request: {
     lastUsedExternal: request.lastUsedExternal,
     checkAddressesInUse: request.checkAddressesInUse,
     addByHash: request.addByHash,
-    protocolMagic: request.protocolMagic,
+    stakingKey: request.stakingKey,
   });
   return insert;
 }
@@ -140,19 +160,21 @@ export async function scanAccount(request: {|
   lastUsedExternal: number,
   checkAddressesInUse: FilterFunc,
   addByHash: AddByHashFunc,
-  protocolMagic: number,
+  stakingKey: RustModule.WalletV3.PublicKey,
 |}): Promise<TreeInsert<Bip44ChainInsert>> {
   const externalAddresses = await scanChain({
     generateAddressFunc: request.generateInternalAddresses,
     lastUsedIndex: request.lastUsedExternal,
     checkAddressesInUse: request.checkAddressesInUse,
     addByHash: request.addByHash,
+    stakingKey: request.stakingKey,
   });
   const internalAddresses = await scanChain({
     generateAddressFunc: request.generateExternalAddresses,
     lastUsedIndex: request.lastUsedInternal,
     checkAddressesInUse: request.checkAddressesInUse,
     addByHash: request.addByHash,
+    stakingKey: request.stakingKey,
   });
 
   return [

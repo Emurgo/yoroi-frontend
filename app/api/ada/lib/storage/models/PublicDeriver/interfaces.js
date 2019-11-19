@@ -434,7 +434,7 @@ export type AccountingAddressPath = {|
 |};
 
 export type IGetStakingKeyRequest = void;
-export type IGetStakingKeyResponse = AccountingAddressPath;
+export type IGetStakingKeyResponse = BaseSingleAddressPath;
 export type IGetStakingKeyFunc = (
   body: IGetStakingKeyRequest
 ) => Promise<IGetStakingKeyResponse>;

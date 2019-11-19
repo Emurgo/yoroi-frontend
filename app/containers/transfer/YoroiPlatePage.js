@@ -10,13 +10,8 @@ import config from '../../config';
 import {
   generateStandardPlate,
 } from '../../api/ada/lib/cardanoCrypto/plate';
-
-import type {
-  ConfigType,
-} from '../../../config/config-types';
-
-declare var CONFIG : ConfigType;
-const protocolMagic = CONFIG.network.protocolMagic;
+import environment from '../../environment';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 type Props = {|
   ...InjectedProps,
@@ -37,11 +32,14 @@ export default class YoroiPlatePage extends Component<Props, WalletRestoreDialog
 
   initializeState = () => {
     const { yoroiTransfer } = this.props.stores.substores.ada;
-    const { addresses, accountPlate } =  generateStandardPlate(
+    const { addresses, accountPlate } = generateStandardPlate(
       yoroiTransfer.recoveryPhrase,
       0, // show addresses for account #0
       5,
-      protocolMagic,
+      environment.isMainnet()
+        ? RustModule.WalletV3.AddressDiscrimination.Production
+        : RustModule.WalletV3.AddressDiscrimination.Test,
+      true,
     );
     return {
       addresses,
