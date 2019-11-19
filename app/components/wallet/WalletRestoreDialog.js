@@ -303,7 +303,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           isValidRepeatPassword(walletPassword, repeatPassword);
       }
 
-      // Although we require 12 words for creation
+      // Although we require 10 characters for creation
       // We allow any password to be used for restoration
       // This is to ensure compatiblity with any other apps that use our paper wallet construction
 

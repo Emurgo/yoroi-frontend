@@ -259,7 +259,7 @@ const globalMessages = defineMessages({
   },
   passwordInstructionsPaperWallet: {
     id: 'global.passwordInstructionsPaperWallet',
-    defaultMessage: '!!!Note: Paper Wallet password needs to be at least 12 characters long.',
+    defaultMessage: '!!!Note: Paper Wallet password needs to be at least 10 characters long.',
   },
   paperPasswordLabel: {
     id: 'wallet.restore.dialog.paperPasswordLabel',
