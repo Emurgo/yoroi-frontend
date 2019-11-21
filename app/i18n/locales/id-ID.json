@@ -245,7 +245,7 @@
   "wallet.add.page.restore.title": "Kembalikan wallet",
   "wallet.add.page.restore.tooltip": "Enter a 15-word recovery phrase<br/>to restore an already-existing Yoroi wallet,<br/>or import an existing Yoroi paper wallet.",
   "wallet.add.page.subtitle.label": "Light wallet Yoroi untuk Cardano",
-  "wallet.add.page.title": "Gerbang <br> menuju <br> dunia finansial",
+  "wallet.add.page.title": "Your gateway <br> to the <br> financial world",
   "wallet.amountInput.feesLabel": "+ {amount} biaya",
   "wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching": "Pastikan tidak ada yang melihat layar Anda kecuali Anda menginginkan mereka mengakses dana Anda.",
   "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "Pada layar berikutnya, Anda akan melihat 15 kata acak. Ini adalah <strong>frasa backup wallet</strong> Anda. Ini dapat digunakan pada versi Yoroi apapun untuk mencadangkan atau mengembalikan dana dan private key Anda.",
