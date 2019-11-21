@@ -245,7 +245,7 @@
   "wallet.add.page.restore.title": "恢复钱包",
   "wallet.add.page.restore.tooltip": "Enter a 15-word recovery phrase<br/>to restore an already-existing Yoroi wallet,<br/>or import an existing Yoroi paper wallet.",
   "wallet.add.page.subtitle.label": "Cardano的Yoroi轻钱包",
-  "wallet.add.page.title": "通往金融世界的门户",
+  "wallet.add.page.title": "Your gateway <br> to the <br> financial world",
   "wallet.amountInput.feesLabel": "+ {amount} 手续费",
   "wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching": "除非您想让其他人有权访问您的资金，否则请不要让任何人看到您的屏幕。",
   "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "在下面的屏幕上，您将看到一组 15个 随机单词。这是您的<strong>钱包恢复短语</strong>。可将其输入任何版本的 Yoroi钱包，以备份或恢复钱包内的资金和私钥。",
