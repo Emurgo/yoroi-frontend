@@ -245,7 +245,7 @@
   "wallet.add.page.restore.title": "지갑 복구",
   "wallet.add.page.restore.tooltip": "15 단어 복구 구절을 입력하여 <br/> 기존 요로이 지갑을 복원하세요. <br/> 또는 기존의 요로이 종이 지갑을 불러오세요.",
   "wallet.add.page.subtitle.label": "카르다노용 요로이 라이트 지갑",
-  "wallet.add.page.title": "금융 세계로의 <br> 관문",
+  "wallet.add.page.title": "Your gateway <br> to the <br> financial world",
   "wallet.amountInput.feesLabel": "+ {amount}의 수수료",
   "wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching": "다른 사람이 귀하의 자금에 액세스하지 않도록 하려면 아무도 화면을 보지 않도록 하십시오.",
   "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "다음 화면에 일련의 무작위 문자 15개가 표시됩니다. 이것은 당신의 <strong>지갑 백업 구절</strong>입니다. 아무 버전의 Yoroi에 입력하여 지갑의 자금과 개인키를 백업하거나 복원할 수 있습니다.",
