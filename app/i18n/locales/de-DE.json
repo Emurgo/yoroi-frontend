@@ -245,7 +245,7 @@
   "wallet.add.page.restore.title": "Wallet wiederherstellen",
   "wallet.add.page.restore.tooltip": "Geben Sie eine 15-Wort-Wiederherstellungsphrase<br/> ein, um eine bereits vorhandene Yoroi-Wallet wiederherzustellen, <br/>oder importieren Sie eine bestehende Yoroi-Papier-Wallet.",
   "wallet.add.page.subtitle.label": "Yoroi Light-Wallet für Cardano",
-  "wallet.add.page.title": "Tor <br> zur <br> Finanzwelt",
+  "wallet.add.page.title": "Your gateway <br> to the <br> financial world",
   "wallet.amountInput.feesLabel": "+ {amount} an Gebühren",
   "wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching": "Stelle sicher, dass niemand deinen Bildschirm beobachtet, von dem du nicht möchtest, dass er Zugriff auf dein Guthaben hat.",
   "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "Auf der nächsten Seite wird ein Satz von 15 zufälligen Wörtern angezeigt. Das ist die <strong>Wiederherstellungs-Phrase deiner Wallet</strong>. Sie kann in jeder Yoroi-Version eingegeben werden, um das Guthaben deiner Wallet sowie den privaten Schlüssel zu sichern oder wiederherzustellen.",
