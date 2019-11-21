@@ -10,11 +10,21 @@
 declare module 'js-chain-libs' { // need to wrap flowgen output into module
 
   /**
-   * @param {any} input
+   * @param {Uint8Array} input
    * @returns {string}
    */
-  declare export function uint8array_to_hex(input: any): string;
+  declare export function uint8array_to_hex(input: Uint8Array): string;
 
+  /**
+   * Allow to differentiate between address in
+   * production and testing setting, so that
+   * one type of address is not used in another setting.
+   * Example
+   * ```javascript
+   * let discriminant = AddressDiscrimination.Test;
+   * let address = Address::single_from_public_key(public_key, discriminant);
+   * ```
+   */
   declare export var AddressDiscrimination: {|
     +Production: 0, // 0
     +Test: 1 // 1
@@ -29,16 +39,15 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
   |};
   declare export type AddressKindType = $Values<typeof AddressKind>;
 
-  /**
-   * Allow to differentiate between address in
-   * production and testing setting, so that
-   * one type of address is not used in another setting.
-   * Example
-   * ```javascript
-   * let discriminant = AddressDiscrimination.Test;
-   * let address = Address::single_from_public_key(public_key, discriminant);
-   * ```
-   */
+  declare export var CertificateType: {|
+    +StakeDelegation: 0, // 0
+    +OwnerStakeDelegation: 1, // 1
+    +PoolRegistration: 2, // 2
+    +PoolRetirement: 3, // 3
+    +PoolUpdate: 4 // 4
+  |};
+  declare export type CertificateTypeT = $Values<typeof CertificateType>;
+
   /**
    * This is either an single account or a multisig account depending on the witness type
    */
@@ -61,7 +70,7 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @param {PublicKey} key
      * @returns {Account}
      */
-    static from_public_key(key: PublicKey): Account;
+    static single_from_public_key(key: PublicKey): Account;
 
     /**
      * @returns {AccountIdentifier}
@@ -85,6 +94,21 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
   }
   /**
    */
+  declare export class AccountBindingSignature {
+    free(): void;
+
+    /**
+     * @param {PrivateKey} private_key
+     * @param {TransactionBindingAuthData} auth_data
+     * @returns {AccountBindingSignature}
+     */
+    static new_single(
+      private_key: PrivateKey,
+      auth_data: TransactionBindingAuthData
+    ): AccountBindingSignature;
+  }
+  /**
+   */
   declare export class AccountIdentifier {
     free(): void;
 
@@ -92,6 +116,16 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {string}
      */
     to_hex(): string;
+
+    /**
+     * @returns {Account}
+     */
+    to_account_single(): Account;
+
+    /**
+     * @returns {Account}
+     */
+    to_account_multi(): Account;
   }
   /**
    */
@@ -141,15 +175,15 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     free(): void;
 
     /**
-     * @returns {Uint8Array}
-     */
-    as_bytes(): Uint8Array;
-
-    /**
      * @param {Uint8Array} bytes
      * @returns {Address}
      */
     static from_bytes(bytes: Uint8Array): Address;
+
+    /**
+     * @returns {Uint8Array}
+     */
+    as_bytes(): Uint8Array;
 
     /**
      * Construct Address from its bech32 representation
@@ -260,23 +294,6 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     to_multisig_address(): MultisigAddress | void;
   }
   /**
-   * Type for representing a Transaction with Witnesses (signatures)
-   */
-  declare export class AuthenticatedTransaction {
-    free(): void;
-
-    /**
-     * Get a copy of the inner Transaction, discarding the signatures
-     * @returns {Transaction}
-     */
-    transaction(): Transaction;
-
-    /**
-     * @returns {Witnesses}
-     */
-    witnesses(): Witnesses;
-  }
-  /**
    * Amount of the balance in the transaction.
    */
   declare export class Balance {
@@ -379,7 +396,10 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @param {Uint8Array} password
      * @returns {Bip32PrivateKey}
      */
-    static from_bip39_entropy(entropy: Uint8Array, password: Uint8Array): Bip32PrivateKey;
+    static from_bip39_entropy(
+      entropy: Uint8Array,
+      password: Uint8Array
+    ): Bip32PrivateKey;
   }
   /**
    */
@@ -472,6 +492,31 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {Fragments}
      */
     fragments(): Fragments;
+
+    /**
+     * @returns {number}
+     */
+    epoch(): number;
+
+    /**
+     * @returns {number}
+     */
+    slot(): number;
+
+    /**
+     * @returns {number}
+     */
+    chain_length(): number;
+
+    /**
+     * @returns {PoolId}
+     */
+    leader_id(): PoolId | void;
+
+    /**
+     * @returns {number}
+     */
+    content_size(): number;
   }
   /**
    */
@@ -505,9 +550,88 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     ): Certificate;
 
     /**
-     * @param {PrivateKey} private_key
+     * Create a Certificate for PoolRetirement
+     * @param {PoolRetirement} pool_retirement
+     * @returns {Certificate}
      */
-    sign(private_key: PrivateKey): void;
+    static stake_pool_retirement(pool_retirement: PoolRetirement): Certificate;
+
+    /**
+     * @returns {CertificateTypeT}
+     */
+    get_type(): CertificateTypeT;
+
+    /**
+     * @returns {StakeDelegation}
+     */
+    get_stake_delegation(): StakeDelegation;
+
+    /**
+     * @returns {OwnerStakeDelegation}
+     */
+    get_owner_stake_delegation(): OwnerStakeDelegation;
+
+    /**
+     * @returns {PoolRegistration}
+     */
+    get_pool_registration(): PoolRegistration;
+
+    /**
+     * @returns {PoolRetirement}
+     */
+    get_pool_retirement(): PoolRetirement;
+  }
+  /**
+   * Delegation Ratio type express a number of parts
+   * and a list of pools and their individual parts
+   *
+   * E.g. parts: 7, pools: [(A,2), (B,1), (C,4)] means that
+   * A is associated with 2/7 of the stake, B has 1/7 of stake and C
+   * has 4/7 of the stake.
+   *
+   * It\'s invalid to have less than 2 elements in the array,
+   * and by extension parts need to be equal to the sum of individual
+   * pools parts.
+   */
+  declare export class DelegationRatio {
+    free(): void;
+
+    /**
+     * @param {number} parts
+     * @param {PoolDelegationRatios} pools
+     * @returns {DelegationRatio}
+     */
+    static new(
+      parts: number,
+      pools: PoolDelegationRatios
+    ): DelegationRatio | void;
+  }
+  /**
+   * Set the choice of delegation:
+   *
+   * * No delegation
+   * * Full delegation of this account to a specific pool
+   * * Ratio of stake to multiple pools
+   */
+  declare export class DelegationType {
+    free(): void;
+
+    /**
+     * @returns {DelegationType}
+     */
+    static non_delegated(): DelegationType;
+
+    /**
+     * @param {PoolId} pool_id
+     * @returns {DelegationType}
+     */
+    static full(pool_id: PoolId): DelegationType;
+
+    /**
+     * @param {DelegationRatio} r
+     * @returns {DelegationType}
+     */
+    static ratio(r: DelegationRatio): DelegationType;
   }
   /**
    */
@@ -549,7 +673,7 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
   }
   /**
    * Algorithm used to compute transaction fees
-   * Currently the only implementation if the Linear one
+   * Currently the only implementation is the Linear one
    */
   declare export class Fee {
     free(): void;
@@ -568,11 +692,10 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     ): Fee;
 
     /**
-     * Compute the fee if possible (it can fail in case the values are out of range)
      * @param {Transaction} tx
      * @returns {Value}
      */
-    calculate(tx: Transaction): Value | void;
+    calculate(tx: Transaction): Value;
   }
   /**
    * All possible messages recordable in the Block content
@@ -581,23 +704,16 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     free(): void;
 
     /**
-     * @param {AuthenticatedTransaction} tx
+     * @param {Transaction} tx
      * @returns {Fragment}
      */
-    static from_authenticated_transaction(tx: AuthenticatedTransaction): Fragment;
-
-    /**
-     * Deprecated: Use `from_authenticated_transaction` instead
-     * @param {AuthenticatedTransaction} tx
-     * @returns {Fragment}
-     */
-    static from_generated_transaction(tx: AuthenticatedTransaction): Fragment;
+    static from_transaction(tx: Transaction): Fragment;
 
     /**
      * Get a Transaction if the Fragment represents one
-     * @returns {AuthenticatedTransaction}
+     * @returns {Transaction}
      */
-    get_transaction(): AuthenticatedTransaction;
+    get_transaction(): Transaction;
 
     /**
      * @returns {Uint8Array}
@@ -632,7 +748,12 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     /**
      * @returns {boolean}
      */
-    is_pool_management(): boolean;
+    is_pool_retirement(): boolean;
+
+    /**
+     * @returns {boolean}
+     */
+    is_pool_update(): boolean;
 
     /**
      * @returns {boolean}
@@ -676,6 +797,11 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     free(): void;
 
     /**
+     * @returns {Fragments}
+     */
+    static new(): Fragments;
+
+    /**
      * @returns {number}
      */
     size(): number;
@@ -685,6 +811,11 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {Fragment}
      */
     get(index: number): Fragment;
+
+    /**
+     * @param {Fragment} item
+     */
+    add(item: Fragment): void;
   }
   /**
    */
@@ -728,6 +859,47 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {Uint8Array}
      */
     as_bytes(): Uint8Array;
+  }
+  /**
+   */
+  declare export class IndexSignatures {
+    free(): void;
+
+    /**
+     * @returns {IndexSignatures}
+     */
+    static new(): IndexSignatures;
+
+    /**
+     * @returns {number}
+     */
+    size(): number;
+
+    /**
+     * @param {number} index
+     * @returns {IndexedSignature}
+     */
+    get(index: number): IndexedSignature;
+
+    /**
+     * @param {IndexedSignature} item
+     */
+    add(item: IndexedSignature): void;
+  }
+  /**
+   */
+  declare export class IndexedSignature {
+    free(): void;
+
+    /**
+     * @param {number} index
+     * @param {AccountBindingSignature} signature
+     * @returns {IndexedSignature}
+     */
+    static new(
+      index: number,
+      signature: AccountBindingSignature
+    ): IndexedSignature;
   }
   /**
    */
@@ -776,14 +948,103 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
 
     /**
      * Get the source Account if the Input type is Account
-     * @returns {Account}
+     * @returns {AccountIdentifier}
      */
-    get_account(): Account;
+    get_account_identifier(): AccountIdentifier;
+  }
+  /**
+   */
+  declare export class InputOutput {
+    free(): void;
+
+    /**
+     * @returns {Inputs}
+     */
+    inputs(): Inputs;
+
+    /**
+     * @returns {Outputs}
+     */
+    outputs(): Outputs;
+  }
+  /**
+   */
+  declare export class InputOutputBuilder {
+    free(): void;
+
+    /**
+     * @returns {InputOutputBuilder}
+     */
+    static empty(): InputOutputBuilder;
+
+    /**
+     * Add input to the IO Builder
+     * @param {Input} input
+     */
+    add_input(input: Input): void;
+
+    /**
+     * Add output to the IO Builder
+     * @param {Address} address
+     * @param {Value} value
+     */
+    add_output(address: Address, value: Value): void;
+
+    /**
+     * Estimate fee with the currently added inputs, outputs and certificate based on the given algorithm
+     * @param {Fee} fee
+     * @param {Payload} payload
+     * @returns {Value}
+     */
+    estimate_fee(fee: Fee, payload: Payload): Value;
+
+    /**
+     * @param {Payload} payload
+     * @param {Fee} fee
+     * @returns {Balance}
+     */
+    get_balance(payload: Payload, fee: Fee): Balance;
+
+    /**
+     * @returns {Balance}
+     */
+    get_balance_without_fee(): Balance;
+
+    /**
+     * @returns {InputOutput}
+     */
+    build(): InputOutput;
+
+    /**
+     * Seal the transaction by passing fee rule
+     * @param {Payload} payload
+     * @param {Fee} fee_algorithm
+     * @returns {InputOutput}
+     */
+    seal(payload: Payload, fee_algorithm: Fee): InputOutput;
+
+    /**
+     * Seal the transaction by passing fee rule and the output policy
+     * @param {Payload} payload
+     * @param {Fee} fee_algorithm
+     * @param {OutputPolicy} policy
+     * @returns {InputOutput}
+     */
+    seal_with_output_policy(
+      payload: Payload,
+      fee_algorithm: Fee,
+      policy: OutputPolicy
+    ): InputOutput;
   }
   /**
    */
   declare export class Inputs {
     free(): void;
+
+    /**
+     * @returns {Inputs}
+     */
+    static new(): Inputs;
 
     /**
      * @returns {number}
@@ -795,6 +1056,11 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {Input}
      */
     get(index: number): Input;
+
+    /**
+     * @param {Input} item
+     */
+    add(item: Input): void;
   }
   /**
    */
@@ -806,6 +1072,44 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {KesPublicKey}
      */
     static from_bech32(bech32_str: string): KesPublicKey;
+  }
+  /**
+   */
+  declare export class LegacyUtxoWitness {
+    free(): void;
+
+    /**
+     * @returns {Uint8Array}
+     */
+    as_bytes(): Uint8Array;
+
+    /**
+     * @returns {string}
+     */
+    to_bech32(): string;
+
+    /**
+     * @returns {string}
+     */
+    to_hex(): string;
+
+    /**
+     * @param {Uint8Array} bytes
+     * @returns {LegacyUtxoWitness}
+     */
+    static from_bytes(bytes: Uint8Array): LegacyUtxoWitness;
+
+    /**
+     * @param {string} bech32_str
+     * @returns {LegacyUtxoWitness}
+     */
+    static from_bech32(bech32_str: string): LegacyUtxoWitness;
+
+    /**
+     * @param {string} input
+     * @returns {LegacyUtxoWitness}
+     */
+    static from_hex(input: string): LegacyUtxoWitness;
   }
   /**
    */
@@ -865,6 +1169,11 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     free(): void;
 
     /**
+     * @returns {Outputs}
+     */
+    static new(): Outputs;
+
+    /**
      * @returns {number}
      */
     size(): number;
@@ -874,6 +1183,126 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {Output}
      */
     get(index: number): Output;
+
+    /**
+     * @param {Output} item
+     */
+    add(item: Output): void;
+  }
+  /**
+   */
+  declare export class OwnerStakeDelegation {
+    free(): void;
+
+    /**
+     * @param {DelegationType} delegation_type
+     * @returns {OwnerStakeDelegation}
+     */
+    static new(delegation_type: DelegationType): OwnerStakeDelegation;
+
+    /**
+     * @returns {DelegationType}
+     */
+    delegation_type(): DelegationType;
+  }
+  /**
+   */
+  declare export class Payload {
+    free(): void;
+
+    /**
+     * @returns {Payload}
+     */
+    static no_payload(): Payload;
+
+    /**
+     * @param {Certificate} certificate
+     * @returns {Payload}
+     */
+    static certificate(certificate: Certificate): Payload;
+  }
+  /**
+   */
+  declare export class PayloadAuthData {
+    free(): void;
+
+    /**
+     * @returns {PayloadAuthData}
+     */
+    static for_no_payload(): PayloadAuthData;
+
+    /**
+     * @returns {PayloadAuthData}
+     */
+    static for_owner_stake_delegation(): PayloadAuthData;
+
+    /**
+     * @param {StakeDelegationAuthData} auth_data
+     * @returns {PayloadAuthData}
+     */
+    static for_stake_delegation(
+      auth_data: StakeDelegationAuthData
+    ): PayloadAuthData;
+
+    /**
+     * @param {PoolRegistrationAuthData} auth_data
+     * @returns {PayloadAuthData}
+     */
+    static for_pool_registration(
+      auth_data: PoolRegistrationAuthData
+    ): PayloadAuthData;
+
+    /**
+     * @param {PoolRetirementAuthData} auth_data
+     * @returns {PayloadAuthData}
+     */
+    static for_pool_retirement(
+      auth_data: PoolRetirementAuthData
+    ): PayloadAuthData;
+
+    /**
+     * @param {PoolUpdateAuthData} auth_data
+     * @returns {PayloadAuthData}
+     */
+    static for_pool_update(auth_data: PoolUpdateAuthData): PayloadAuthData;
+  }
+  /**
+   */
+  declare export class PoolDelegationRatio {
+    free(): void;
+
+    /**
+     * @param {PoolId} pool
+     * @param {number} part
+     * @returns {PoolDelegationRatio}
+     */
+    static new(pool: PoolId, part: number): PoolDelegationRatio;
+  }
+  /**
+   */
+  declare export class PoolDelegationRatios {
+    free(): void;
+
+    /**
+     * @returns {PoolDelegationRatios}
+     */
+    static new(): PoolDelegationRatios;
+
+    /**
+     * @returns {number}
+     */
+    size(): number;
+
+    /**
+     * @param {number} index
+     * @returns {PoolDelegationRatio}
+     */
+    get(index: number): PoolDelegationRatio;
+
+    /**
+     * @param {PoolDelegationRatio} item
+     */
+    add(item: PoolDelegationRatio): void;
   }
   /**
    */
@@ -899,6 +1328,7 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     /**
      * @param {U128} serial
      * @param {PublicKeys} owners
+     * @param {PublicKeys} operators
      * @param {number} management_threshold
      * @param {TimeOffsetSeconds} start_validity
      * @param {KesPublicKey} kes_public_key
@@ -908,6 +1338,7 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     constructor(
       serial: U128,
       owners: PublicKeys,
+      operators: PublicKeys,
       management_threshold: number,
       start_validity: TimeOffsetSeconds,
       kes_public_key: KesPublicKey,
@@ -918,6 +1349,59 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {PoolId}
      */
     id(): PoolId;
+
+    /**
+     * @returns {TimeOffsetSeconds}
+     */
+    start_validity(): TimeOffsetSeconds;
+
+    /**
+     * @returns {PublicKeys}
+     */
+    owners(): PublicKeys;
+
+    /**
+     * @returns {TaxType}
+     */
+    rewards(): TaxType;
+  }
+  /**
+   */
+  declare export class PoolRegistrationAuthData {
+    free(): void;
+
+    /**
+     * @param {IndexSignatures} signatures
+     * @returns {PoolRegistrationAuthData}
+     */
+    static new(signatures: IndexSignatures): PoolRegistrationAuthData;
+  }
+  /**
+   */
+  declare export class PoolRetirement {
+    free(): void;
+  }
+  /**
+   */
+  declare export class PoolRetirementAuthData {
+    free(): void;
+
+    /**
+     * @param {IndexSignatures} signatures
+     * @returns {PoolRetirementAuthData}
+     */
+    static new(signatures: IndexSignatures): PoolRetirementAuthData;
+  }
+  /**
+   */
+  declare export class PoolUpdateAuthData {
+    free(): void;
+
+    /**
+     * @param {IndexSignatures} signatures
+     * @returns {PoolUpdateAuthData}
+     */
+    static new(signatures: IndexSignatures): PoolUpdateAuthData;
   }
   /**
    * ED25519 signing key, either normal or extended
@@ -1086,11 +1570,40 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
 
     /**
      * Create a stake delegation object from account (stake key) to pool_id
-     * @param {PoolId} pool_id
+     * @param {DelegationType} delegation_type
      * @param {PublicKey} account
      * @returns {StakeDelegation}
      */
-    static new(pool_id: PoolId, account: PublicKey): StakeDelegation;
+    static new(
+      delegation_type: DelegationType,
+      account: PublicKey
+    ): StakeDelegation;
+
+    /**
+     * @returns {DelegationType}
+     */
+    delegation_type(): DelegationType;
+
+    /**
+     * @returns {AccountIdentifier}
+     */
+    account(): AccountIdentifier;
+  }
+  /**
+   */
+  declare export class StakeDelegationAuthData {
+    free(): void;
+
+    /**
+     * @param {AccountBindingSignature} signature
+     * @returns {StakeDelegationAuthData}
+     */
+    static new(signature: AccountBindingSignature): StakeDelegationAuthData;
+  }
+  /**
+   */
+  declare export class TaxType {
+    free(): void;
   }
   /**
    */
@@ -1103,6 +1616,11 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {TimeOffsetSeconds}
      */
     static from_string(number: string): TimeOffsetSeconds;
+
+    /**
+     * @returns {string}
+     */
+    to_string(): string;
   }
   /**
    * Type representing a unsigned transaction
@@ -1127,6 +1645,21 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {Outputs}
      */
     outputs(): Outputs;
+
+    /**
+     * @returns {Certificate}
+     */
+    certificate(): Certificate | void;
+
+    /**
+     * @returns {Witnesses}
+     */
+    witnesses(): Witnesses;
+  }
+  /**
+   */
+  declare export class TransactionBindingAuthData {
+    free(): void;
   }
   /**
    * Builder pattern implementation for making a Transaction
@@ -1134,201 +1667,90 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
    * Example
    *
    * ```javascript
-   * const txbuilder = new TransactionBuilder();
-   *
-   * const account = Account.from_address(Address.from_string(
-   *    &#39;ca1qh9u0nxmnfg7af8ycuygx57p5xgzmnmgtaeer9xun7hly6mlgt3pj2xk344&#39;
-   * ));
-   *
-   * const input = Input.from_account(account, Value.from_str(\'1000\'));
-   *
-   * txbuilder.add_input(input);
-   *
-   * txbuilder.add_output(
-   *    Address.from_string(
-   *      &#39;ca1q5nr5pvt9e5p009strshxndrsx5etcentslp2rwj6csm8sfk24a2w3swacn&#39;
-   *    ),
-   *    Value.from_str(\'500\')
-   * );
-   *
-   * const feeAlgorithm = Fee.linear_fee(
-   *    Value.from_str(\'20\'),
-   *    Value.from_str(\'5\'),
-   *    Value.from_str(\'0\')
-   * );
-   *
-   * const finalizedTx = txbuilder.finalize(
-   *    feeAlgorithm,
-   *    OutputPolicy.one(accountInputAddress)
-   * );
    * ```
    */
   declare export class TransactionBuilder {
     free(): void;
-
+  
     /**
-     * Deprecated. Use `new_no_payload()` instead
      * @returns {TransactionBuilder}
      */
     constructor(): this;
-
+  
     /**
-     * Create a TransactionBuilder for a transaction without certificate
-     * @returns {TransactionBuilder}
-     */
-    static new_no_payload(): TransactionBuilder;
-
-    /**
-     * Create a TransactionBuilder for a transaction with certificate
      * @param {Certificate} cert
-     * @returns {TransactionBuilder}
+     * @returns {TransactionBuilderSetIOs}
      */
-    static new_payload(cert: Certificate): TransactionBuilder;
-
+    payload(cert: Certificate): TransactionBuilderSetIOs;
+  
     /**
-     * Add input to the transaction
-     * @param {Input} input
+     * @returns {TransactionBuilderSetIOs}
      */
-    add_input(input: Input): void;
-
-    /**
-     * Add output to the transaction
-     * @param {Address} address
-     * @param {Value} value
-     */
-    add_output(address: Address, value: Value): void;
-
-    /**
-     * Estimate fee with the currently added inputs, outputs and certificate based on the given algorithm
-     * @param {Fee} fee
-     * @returns {Value}
-     */
-    estimate_fee(fee: Fee): Value;
-
-    /**
-     * @param {Fee} fee
-     * @returns {Balance}
-     */
-    get_balance(fee: Fee): Balance;
-
-    /**
-     * @returns {Balance}
-     */
-    get_balance_without_fee(): Balance;
-
-    /**
-     * Get the Transaction with the current inputs and outputs without computing the fees nor adding a change address
-     * @returns {Transaction}
-     */
-    unchecked_finalize(): Transaction;
-
-    /**
-     * Finalize the transaction by adding the change Address output
-     * leaving enough for paying the minimum fee computed by the given algorithm
-     * see the unchecked_finalize for the non-assisted version
-     *
-     * Example
-     *
-     * ```javascript
-     * const feeAlgorithm = Fee.linear_fee(
-     *      Value.from_str(\'20\'), Value.from_str(\'5\'), Value.from_str(\'10\')
-     * );
-     *
-     * const finalizedTx = txbuilder.finalize(
-     *    feeAlgorithm,
-     *    OutputPolicy.one(changeAddress)
-     * );
-     * ```
-     * @param {Fee} fee
-     * @param {OutputPolicy} output_policy
-     * @returns {Transaction}
-     */
-    seal_with_output_policy(fee: Fee, output_policy: OutputPolicy): Transaction;
-
-    /**
-     * Deprecated: use `seal_with_output_policy` instead
-     * @param {Fee} fee
-     * @param {OutputPolicy} output_policy
-     * @returns {Transaction}
-     */
-    finalize(fee: Fee, output_policy: OutputPolicy): Transaction;
+    no_payload(): TransactionBuilderSetIOs;
   }
   /**
-   * Builder pattern implementation for signing a Transaction (adding witnesses)
-   * Example (for an account as input)
-   *
-   * ```javascript
-   * //finalizedTx could be the result of the finalize method on a TransactionBuilder object
-   * const finalizer = new TransactionFinalizer(finalizedTx);
-   *
-   * const witness = Witness.for_account(
-   *    Hash.from_hex(genesisHashString),
-   *    finalizer.get_txid(),
-   *    inputAccountPrivateKey,
-   *    SpendingCounter.zero()
-   * );
-   *
-   * finalizer.set_witness(0, witness);
-   *
-   * const signedTx = finalizer.build();
-   * ```
    */
-  declare export class TransactionFinalizer {
+  declare export class TransactionBuilderSetAuthData {
     free(): void;
-
+  
     /**
-     * @param {Transaction} transaction
-     * @returns {TransactionFinalizer}
+     * @returns {TransactionBindingAuthData}
      */
-    constructor(transaction: Transaction): this;
-
+    get_auth_data(): TransactionBindingAuthData;
+  
     /**
-     * Set the witness for the corresponding index, the index corresponds to the order in which the inputs were added to the transaction
-     * @param {number} index
-     * @param {Witness} witness
+     * Set the authenticated data
+     * @param {PayloadAuthData} auth
+     * @returns {Transaction}
      */
-    set_witness(index: number, witness: Witness): void;
-
+    set_payload_auth(auth: PayloadAuthData): Transaction;
+  }
+  /**
+   */
+  declare export class TransactionBuilderSetIOs {
+    free(): void;
+  
     /**
-     * Deprecated: Use `get_tx_sign_data_hash` instead\
+     * @param {Inputs} inputs
+     * @param {Outputs} outputs
+     * @returns {TransactionBuilderSetWitness}
+     */
+    set_ios(inputs: Inputs, outputs: Outputs): TransactionBuilderSetWitness;
+  }
+  /**
+   */
+  declare export class TransactionBuilderSetWitness {
+    free(): void;
+  
+    /**
      * @returns {TransactionSignDataHash}
      */
-    get_txid(): TransactionSignDataHash;
-
+    get_auth_data_for_witness(): TransactionSignDataHash;
+  
     /**
-     * @returns {TransactionSignDataHash}
+     * @param {Witnesses} witnesses
+     * @returns {TransactionBuilderSetAuthData}
      */
-    get_tx_sign_data_hash(): TransactionSignDataHash;
-
-    /**
-     * Deprecated: Use `get_tx_sign_data_hash` instead\
-     * @returns {AuthenticatedTransaction}
-     */
-    build(): AuthenticatedTransaction;
-
-    /**
-     * @returns {AuthenticatedTransaction}
-     */
-    finalize(): AuthenticatedTransaction;
+    set_witnesses(witnesses: Witnesses): TransactionBuilderSetAuthData;
   }
   /**
    * Type for representing the hash of a Transaction, necessary for signing it
    */
   declare export class TransactionSignDataHash {
     free(): void;
-
+  
     /**
      * @param {Uint8Array} bytes
      * @returns {TransactionSignDataHash}
      */
     static from_bytes(bytes: Uint8Array): TransactionSignDataHash;
-
+  
     /**
      * @param {string} input
      * @returns {TransactionSignDataHash}
      */
     static from_hex(input: string): TransactionSignDataHash;
-
+  
     /**
      * @returns {Uint8Array}
      */
@@ -1340,16 +1762,16 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     free(): void;
 
     /**
-     * @param {any} bytes
+     * @param {Uint8Array} bytes
      * @returns {U128}
      */
-    static from_be_bytes(bytes: any): U128;
+    static from_be_bytes(bytes: Uint8Array): U128;
 
     /**
-     * @param {any} bytes
+     * @param {Uint8Array} bytes
      * @returns {U128}
      */
-    static from_le_bytes(bytes: any): U128;
+    static from_le_bytes(bytes: Uint8Array): U128;
 
     /**
      * @param {string} s
@@ -1383,6 +1805,16 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
       output_index: number,
       value: Value
     ): UtxoPointer;
+
+    /**
+     * @returns {number}
+     */
+    output_index(): number;
+
+    /**
+     * @returns {FragmentId}
+     */
+    fragment_id(): FragmentId;
   }
   /**
    */
@@ -1521,6 +1953,29 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     static from_external_account(witness: AccountWitness): Witness;
 
     /**
+     * Generate Witness for an legacy utxo-based transaction Input
+     * @param {Hash} genesis_hash
+     * @param {TransactionSignDataHash} transaction_id
+     * @param {Bip32PrivateKey} secret_key
+     * @returns {Witness}
+     */
+    static for_legacy_utxo(
+      genesis_hash: Hash,
+      transaction_id: TransactionSignDataHash,
+      secret_key: Bip32PrivateKey
+    ): Witness;
+
+    /**
+     * @param {Bip32PublicKey} key
+     * @param {LegacyUtxoWitness} witness
+     * @returns {Witness}
+     */
+    static from_external_legacy_utxo(
+      key: Bip32PublicKey,
+      witness: LegacyUtxoWitness
+    ): Witness;
+
+    /**
      * Get string representation
      * @returns {string}
      */
@@ -1530,17 +1985,26 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
    */
   declare export class Witnesses {
     free(): void;
-
+  
+    /**
+     * @returns {Witnesses}
+     */
+    static new(): Witnesses;
+  
     /**
      * @returns {number}
      */
     size(): number;
-
+  
     /**
      * @param {number} index
      * @returns {Witness}
      */
     get(index: number): Witness;
+  
+    /**
+     * @param {Witness} item
+     */
+    add(item: Witness): void;
   }
-
 }

@@ -9,7 +9,7 @@ import {
   NotEnoughMoneyToSendError,
 } from '../../errors';
 import {
-  buildTransaction,
+  buildUnsignedAccountTx,
   signTransaction,
 } from './accountingTransactions';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
@@ -25,10 +25,12 @@ describe('Create unsigned TX for account', () => {
       'ed25519_sk1ahfetf02qwwg4dkq7mgp4a25lx5vh9920cr5wnxmpzz9906qvm8qwvlts0'
     );
 
-    const unsignedTxResponse = buildTransaction(
+    const unsignedTxResponse = buildUnsignedAccountTx(
       senderKey.to_public(),
       'ca1qw8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqeh83d4',
-      new BigNumber(2000000),
+      {
+        amount: new BigNumber(2000000)
+      },
       new BigNumber(5000000),
     );
     const inputSum = getTxInputTotal(unsignedTxResponse);
@@ -40,6 +42,7 @@ describe('Create unsigned TX for account', () => {
     const signedTx = signTransaction(
       unsignedTxResponse,
       0,
+      undefined,
       senderKey,
     );
 
@@ -56,10 +59,12 @@ describe('Create unsigned TX for account', () => {
       'ed25519_sk1ahfetf02qwwg4dkq7mgp4a25lx5vh9920cr5wnxmpzz9906qvm8qwvlts0'
     );
 
-    expect(() => buildTransaction(
+    expect(() => buildUnsignedAccountTx(
       senderKey.to_public(),
       'ca1qw8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqeh83d4',
-      new BigNumber(2000000),
+      {
+        amount: new BigNumber(2000000),
+      },
       new BigNumber(2000000),
     )).toThrow(NotEnoughMoneyToSendError);
   });
@@ -69,10 +74,12 @@ describe('Create unsigned TX for account', () => {
       'ed25519_sk1ahfetf02qwwg4dkq7mgp4a25lx5vh9920cr5wnxmpzz9906qvm8qwvlts0'
     );
 
-    expect(() => buildTransaction(
+    expect(() => buildUnsignedAccountTx(
       senderKey.to_public(),
       'ca1qw8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqeh83d4',
-      new BigNumber(2000000),
+      {
+        amount: new BigNumber(2000000),
+      },
       new BigNumber(1000000),
     )).toThrow(NotEnoughMoneyToSendError);
   });

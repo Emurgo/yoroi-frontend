@@ -131,8 +131,8 @@ describe('Create unsigned TX from UTXO', () => {
       utxos
     );
     expect(unsignedTxResponse.senderUtxos).toEqual(utxos);
-    const inputSum = getTxInputTotal(unsignedTxResponse.unsignedTx);
-    const outputSum = getTxOutputTotal(unsignedTxResponse.unsignedTx);
+    const inputSum = getTxInputTotal(unsignedTxResponse.IOs);
+    const outputSum = getTxOutputTotal(unsignedTxResponse.IOs);
     expect(inputSum.toString()).toEqual('1000001');
     expect(outputSum.toString()).toEqual('5001');
     expect(inputSum.minus(outputSum).toString()).toEqual('995000');
@@ -178,8 +178,8 @@ describe('Create unsigned TX from UTXO', () => {
     // input selection will only take 2 of the 3 inputs
     // it takes 2 inputs because input selection algorithm
     expect(unsignedTxResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
-    const inputSum = getTxInputTotal(unsignedTxResponse.unsignedTx);
-    const outputSum = getTxOutputTotal(unsignedTxResponse.unsignedTx);
+    const inputSum = getTxInputTotal(unsignedTxResponse.IOs);
+    const outputSum = getTxOutputTotal(unsignedTxResponse.IOs);
     expect(inputSum.toString()).toEqual('1007002');
     expect(outputSum.toString()).toEqual('851617');
     expect(inputSum.minus(outputSum).toString()).toEqual('155385');
@@ -195,8 +195,8 @@ describe('Create unsigned TX from UTXO', () => {
         [addressedUtxos[0], addressedUtxos[1]],
       );
       expect(unsignedTxResponse.senderUtxos).toEqual([addressedUtxos[0], addressedUtxos[1]]);
-      const inputSum = getTxInputTotal(unsignedTxResponse.unsignedTx);
-      const outputSum = getTxOutputTotal(unsignedTxResponse.unsignedTx);
+      const inputSum = getTxInputTotal(unsignedTxResponse.IOs);
+      const outputSum = getTxOutputTotal(unsignedTxResponse.IOs);
       expect(inputSum.toString()).toEqual('1007002');
       expect(outputSum.toString()).toEqual('5001');
       expect(inputSum.minus(outputSum).toString()).toEqual('1002001');
@@ -298,8 +298,8 @@ describe('Create unsigned TX from UTXO', () => {
         );
 
         expect(sendAllResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
-        const inputSum = getTxInputTotal(sendAllResponse.unsignedTx);
-        const outputSum = getTxOutputTotal(sendAllResponse.unsignedTx);
+        const inputSum = getTxInputTotal(sendAllResponse.IOs);
+        const outputSum = getTxOutputTotal(sendAllResponse.IOs);
         expect(inputSum.toString()).toEqual('11000002');
         expect(outputSum.toString()).toEqual('10844618');
         expect(inputSum.minus(outputSum).toString()).toEqual('155384');
