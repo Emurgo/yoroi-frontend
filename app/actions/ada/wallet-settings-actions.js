@@ -1,19 +1,16 @@
 // @flow
 import Action from '../lib/Action';
-
-export type WalletExportToFileParams = {
-  walletId: string,
-  exportType: string,
-  filePath: string,
-  password: ?string
-};
+import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 
 export default class WalletSettingsActions {
   cancelEditingWalletField: Action<void> = new Action();
   startEditingWalletField: Action<{ field: string }> = new Action();
   stopEditingWalletField: Action<void> = new Action();
-  updateWalletField: Action<{ field: string, value: string }> = new Action();
-  // eslint-disable-next-line max-len
-  updateWalletPassword: Action<{ walletId: string, oldPassword: string, newPassword: string }> = new Action();
-  exportToFile: Action<WalletExportToFileParams> = new Action();
+  renamePublicDeriver: Action<{ newName: string }> = new Action();
+  renameConceptualWallet: Action<{ newName: string }> = new Action();
+  updateSigningPassword: Action<{
+    publicDeriver: PublicDeriverWithCachedMeta,
+    oldPassword: string,
+    newPassword: string
+  }> = new Action();
 }

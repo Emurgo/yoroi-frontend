@@ -1,0 +1,20 @@
+@import '../common/CheckDialog.scss';
+
+:global(.YoroiClassic) {
+  .component.ledger {
+    .prerequisiteBlock {
+      width: 550px;
+    }
+    .hwImageBlock {
+      width: 150px;
+    }    
+  }
+}
+
+:global(.YoroiModern) {
+  .component.ledger {
+    .prerequisiteBlock {
+      width: 500px
+    }
+  }
+}

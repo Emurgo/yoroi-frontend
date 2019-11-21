@@ -31,16 +31,16 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  currentPasswordValue: string,
-  newPasswordValue: string,
-  repeatedPasswordValue: string,
-  onSave: Function,
-  onCancel: Function,
-  onDataChange: Function,
-  onPasswordSwitchToggle: Function,
-  isSubmitting: boolean,
-  error: ?LocalizableError,
-  classicTheme: boolean,
+  +currentPasswordValue: string,
+  +newPasswordValue: string,
+  +repeatedPasswordValue: string,
+  +onSave: Function,
+  +onCancel: Function,
+  +onDataChange: Function,
+  +onPasswordSwitchToggle: Function,
+  +isSubmitting: boolean,
+  +error: ?LocalizableError,
+  +classicTheme: boolean,
 |};
 
 @observer

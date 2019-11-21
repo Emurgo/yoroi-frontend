@@ -9,16 +9,46 @@ import type {
 import { size } from 'lodash';
 import ExtendableError from 'es6-error';
 
-export async function addToTable<Insert, Row>(
+export async function addBatchToTable<Insert, Row>(
+  db: lf$Database,
+  tx: lf$Transaction,
+  request: $ReadOnlyArray<Insert>,
+  tableName: string,
+): Promise<$ReadOnlyArray<$ReadOnly<Row>>> {
+  const table = db.getSchema().table(tableName);
+  const newRows = request.map(insert => table.createRow(insert));
+
+  const results: $ReadOnlyArray<$ReadOnly<Row>> = (await tx.attach(
+    db
+      .insert()
+      .into(table)
+      .values((newRows: Array<lf$Row>))
+  ));
+
+  return results;
+}
+export async function addNewRowToTable<Insert, Row>(
   db: lf$Database,
   tx: lf$Transaction,
   request: Insert,
   tableName: string,
-): Promise<Row> {
+): Promise<$ReadOnly<Row>> {
+  const results = await addBatchToTable<Insert, Row>(
+    db, tx, [request], tableName
+  );
+  return results[0];
+}
+
+export async function addOrReplaceRow<Insert, Row>(
+  db: lf$Database,
+  tx: lf$Transaction,
+  request: Insert,
+  tableName: string,
+): Promise<$ReadOnly<Row>> {
   const table = db.getSchema().table(tableName);
   const newRow = table.createRow(request);
 
-  const result: Row = (await tx.attach(
+  const result: $ReadOnly<Row> = (await tx.attach(
     db
       .insertOrReplace()
       .into(table)
@@ -31,10 +61,10 @@ export async function addToTable<Insert, Row>(
 export const getRowFromKey = async <T>(
   db: lf$Database,
   tx: lf$Transaction,
-  key: number,
+  key: any,
   tableName: string,
   keyRowName: string,
-): Promise<T | void> => {
+): Promise<$ReadOnly<T> | void> => {
   const table = db.getSchema().table(tableName);
   const query = db
     .select()
@@ -53,7 +83,7 @@ export async function getRowIn<Row>(
   tableName: string,
   keyRowName: string,
   list: Array<any>,
-): Promise<Array<Row>> {
+): Promise<$ReadOnlyArray<$ReadOnly<Row>>> {
   const table = db.getSchema().table(tableName);
   const query = db
     .select()
@@ -102,7 +132,7 @@ export async function raii<T>(
   db: lf$Database,
   tables: Array<lf$schema$Table>,
   scope: lf$Transaction => Promise<T>,
-): Promise<T | void> {
+): Promise<T> {
   const tx = db.createTransaction();
   await tx.begin(tables);
   try {
@@ -110,9 +140,19 @@ export async function raii<T>(
     await tx.commit();
     return result;
   } catch (e) {
-    console.error(JSON.stringify(e));
+    const tableNames = tables.map(table => table.getName()).join('\n');
+    console.error('rolling back Lovefield query for\n' + tableNames + ' with error ' + JSON.stringify(e));
     await tx.rollback();
+    throw e;
   }
+}
+
+export function mapToTables(
+  db: lf$Database,
+  map: Map<number, string>
+): Array<lf$schema$Table> {
+  return Array.from(map.values())
+    .map(table => db.getSchema().table(table));
 }
 
 export function getAllSchemaTables(
@@ -124,11 +164,18 @@ export function getAllSchemaTables(
 }
 
 /** recursively get all tables required for a database query */
-export function getAllTables(tableClass: TableClassType): Set<string> {
-  return new Set(_getAllTables(tableClass));
+export function getAllTables(...tableClass: Array<TableClassType>): Set<string> {
+  const tables = [];
+  for (const clazz of tableClass) {
+    tables.push(..._getAllTables(clazz));
+  }
+  return new Set(tables);
 }
 
 function _getAllTables(tableClass: TableClassType): Array<string> {
+  if (tableClass === undefined) {
+    throw new Error('Found undefined table. Probably a static initialization order issue');
+  }
   const ownTables = Object.keys(tableClass.ownTables)
     .map(key => tableClass.ownTables[key])
     .map(schema => schema.name);

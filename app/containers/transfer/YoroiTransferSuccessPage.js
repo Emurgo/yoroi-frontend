@@ -17,7 +17,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  classicTheme: boolean,
+  +classicTheme: boolean,
 |};
 
 @observer

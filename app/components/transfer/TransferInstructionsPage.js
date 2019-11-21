@@ -30,11 +30,11 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onFollowInstructionsPrerequisites: Function,
-  onConfirm: Function,
-  onPaperConfirm: Function,
-  onMasterKeyConfirm: Function,
-  disableTransferFunds: boolean,
+  +onFollowInstructionsPrerequisites: Function,
+  +onConfirm: Function,
+  +onPaperConfirm: Function,
+  +onMasterKeyConfirm: Function,
+  +disableTransferFunds: boolean,
 |};
 
 @observer

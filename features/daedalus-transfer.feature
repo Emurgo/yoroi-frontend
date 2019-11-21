@@ -3,7 +3,7 @@ Feature: Transfer Daedalus Wallet funds
   Background:
     Given I have opened the extension
     And I have completed the basic setup
-    Given I import a snapshot named empty-wallet
+    Given There is a wallet stored named empty-wallet
 
   @it-99
   Scenario: Daedalus transfer fails when user type invalid mnemonic phrase (IT-99)
@@ -12,7 +12,6 @@ Feature: Transfer Daedalus Wallet funds
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                           |
     | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow monster |
-    And I proceed with the recovery
     Then I should see an "Invalid recovery phrase" error message
   
   @it-84
@@ -76,10 +75,7 @@ Feature: Transfer Daedalus Wallet funds
     And My Daedalus wallet hasn't funds
     And I am on the Daedalus Transfer instructions screen
     And I click on the transfer funds from Daedalus button
-    And I click next button on the Daedalus transfer page
-    Then I should see "This field is required." error message:
-    | message                                            |
-    | global.errors.fieldIsRequired                      |
+    Then I should not be able to submit
     When I click the back button
     Then I see all necessary elements on "TRANSFER FUNDS FROM DAEDALUS" screen:
 

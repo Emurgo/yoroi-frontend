@@ -46,10 +46,10 @@ export default class WalletSummaryPage extends Component<Props> {
       isExporting,
       exportError,
     } = transactions;
-    const wallet = wallets.active;
+    const publicDeriver = wallets.selected;
     let walletTransactions = null;
     // Guard against potential null values
-    if (!wallet) {
+    if (publicDeriver == null) {
       Logger.error('[WalletSummaryPage::render] Active wallet required');
       return null;
     }
@@ -64,15 +64,19 @@ export default class WalletSummaryPage extends Component<Props> {
       const { limit } = searchOptions;
       const noTransactionsFoundLabel = intl.formatMessage(globalMessages.noTransactionsFound);
       if (!recentTransactionsRequest.wasExecuted || hasAny) {
+
+        const isLoadingTx = (!recentTransactionsRequest.wasExecuted ||
+          recentTransactionsRequest.isExecuting);
+
         walletTransactions = (
           <WalletTransactionsList
             transactions={recent}
             selectedExplorer={this.props.stores.profile.selectedExplorer}
-            isLoadingTransactions={!recentTransactionsRequest.wasExecuted}
+            isLoadingTransactions={isLoadingTx}
             hasMoreToLoad={totalAvailable > limit}
             onLoadMore={() => actions.ada.transactions.loadMoreTransactions.trigger()}
-            assuranceMode={wallet.assuranceMode}
-            walletId={wallet.id}
+            assuranceMode={publicDeriver.assuranceMode}
+            walletId={publicDeriver.self.getPublicDeriverId().toString()}
             formattedWalletAmount={formattedWalletAmount}
           />
         );

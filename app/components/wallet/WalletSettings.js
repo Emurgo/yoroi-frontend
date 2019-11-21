@@ -24,26 +24,30 @@ const messages = defineMessages({
     id: 'wallet.settings.passwordLastUpdated',
     defaultMessage: '!!!Last updated',
   },
+  unchangedPassword: {
+    id: 'wallet.settings.unchangedPassword',
+    defaultMessage: '!!!Password unchanged since wallet creation',
+  },
 });
 
 type Props = {|
-  walletName: string,
-  walletPasswordUpdateDate: ?Date,
-  error?: ?LocalizableError,
-  openDialogAction: Function,
-  isDialogOpen: Function,
-  dialog: Node,
-  onFieldValueChange: Function,
-  onStartEditing: Function,
-  onStopEditing: Function,
-  onCancelEditing: Function,
-  nameValidator: Function,
-  activeField: ?string,
-  isSubmitting: boolean,
-  isInvalid: boolean,
-  lastUpdatedField: ?string,
-  showPasswordBlock: boolean,
-  classicTheme: boolean,
+  +walletName: string,
+  +walletPasswordUpdateDate: ?Date,
+  +error?: ?LocalizableError,
+  +openDialogAction: Function,
+  +isDialogOpen: Function,
+  +dialog: Node,
+  +onFieldValueChange: Function,
+  +onStartEditing: Function,
+  +onStopEditing: Function,
+  +onCancelEditing: Function,
+  +nameValidator: Function,
+  +activeField: ?string,
+  +isSubmitting: boolean,
+  +isInvalid: boolean,
+  +lastUpdatedField: ?string,
+  +showPasswordBlock: boolean,
+  +classicTheme: boolean,
 |};
 
 @observer
@@ -73,11 +77,13 @@ export default class WalletSettings extends Component<Props> {
       lastUpdatedField, dialog,
       showPasswordBlock, classicTheme,
     } = this.props;
-    const passwordMessage = (
-      intl.formatMessage(messages.passwordLastUpdated, {
-        lastUpdated: moment(walletPasswordUpdateDate).fromNow(),
-      })
-    );
+    const passwordMessage = walletPasswordUpdateDate == null
+      ? intl.formatMessage(messages.unchangedPassword)
+      : (
+        intl.formatMessage(messages.passwordLastUpdated, {
+          lastUpdated: moment(walletPasswordUpdateDate).fromNow(),
+        })
+      );
 
     return (
       <div>

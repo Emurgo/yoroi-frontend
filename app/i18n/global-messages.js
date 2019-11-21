@@ -259,7 +259,11 @@ const globalMessages = defineMessages({
   },
   passwordInstructionsPaperWallet: {
     id: 'global.passwordInstructionsPaperWallet',
-    defaultMessage: '!!!Note: Paper Wallet password needs to be at least 12 characters long.',
+    defaultMessage: '!!!Note: Paper Wallet password needs to be at least 10 characters long.',
+  },
+  paperPasswordLabel: {
+    id: 'wallet.restore.dialog.paperPasswordLabel',
+    defaultMessage: '!!!Paper wallet password',
   },
   shortRecoveryPhrase: {
     id: 'wallet.restore.dialog.form.errors.shortRecoveryPhrase',
@@ -348,6 +352,26 @@ const globalMessages = defineMessages({
   transferTitleText: {
     id: 'daedalusTransfer.instructions.attention.title',
     defaultMessage: '!!!Transfer all funds from'
+  },
+  passwordDisclaimer: {
+    id: 'wallet.restore.dialog.passwordDisclaimer',
+    defaultMessage: '!!!Typing the wrong wallet password will give you a different wallet. This allows for plausible deniability.',
+  },
+  recoveryPhraseInputLabel: {
+    id: 'wallet.restore.dialog.recovery.phrase.input.label',
+    defaultMessage: '!!!Recovery phrase',
+  },
+  recoveryPhraseInputHint: {
+    id: 'wallet.restore.dialog.recovery.phrase.input.hint',
+    defaultMessage: '!!!Enter recovery phrase',
+  },
+  recoveryPhraseNoResults: {
+    id: 'wallet.restore.dialog.recovery.phrase.input.noResults',
+    defaultMessage: '!!!No results',
+  },
+  invalidRecoveryPhrase: {
+    id: 'wallet.restore.dialog.form.errors.invalidRecoveryPhrase',
+    defaultMessage: '!!!Invalid recovery phrase',
   },
 });
 export default globalMessages;

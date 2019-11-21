@@ -6,7 +6,7 @@ import { ROUTES } from '../../routes-config';
 
 export default class AppStore extends Store {
 
-  setup() {
+  setup(): void {
     this.actions.router.goToRoute.listen(this._updateRouteLocation);
     this.actions.router.goToTransactionsList.listen(this._setRouteLocationToTransactionsList);
   }

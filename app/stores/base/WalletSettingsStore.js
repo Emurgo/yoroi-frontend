@@ -4,8 +4,8 @@ import Store from './Store';
 
 export default class WalletSettingsStore extends Store {
 
-  @observable walletFieldBeingEdited = null;
-  @observable lastUpdatedWalletField = null;
+  @observable walletFieldBeingEdited: string | null = null;
+  @observable lastUpdatedWalletField: string | null = null;
 
   @action _startEditingWalletField = ({ field }: { field: string }) => {
     this.walletFieldBeingEdited = field;

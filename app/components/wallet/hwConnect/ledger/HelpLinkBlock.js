@@ -2,9 +2,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import SvgInline from 'react-svg-inline';
 
-import externalLinkSVG from '../../../../assets/images/link-external.inline.svg';
+import ExternalLinkSVG from '../../../../assets/images/link-external.inline.svg';
 import styles from '../common/HelpLinkBlock.scss';
 
 const messages = defineMessages({
@@ -19,7 +18,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onExternalLinkClick: Function,
+  +onExternalLinkClick: Function,
 |};
 
 @observer
@@ -40,7 +39,7 @@ export default class HelpLinkBlock extends Component<Props> {
           onClick={event => onExternalLinkClick(event)}
         >
           {intl.formatMessage(messages.helpLinkYoroiWithLedgerText)}
-          <SvgInline svg={externalLinkSVG} />
+          <ExternalLinkSVG />
         </a>
       </div>);
   }

@@ -1,19 +1,19 @@
 // @flow
 import React, { Component } from 'react';
+import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
-import SvgInline from 'react-svg-inline';
 import classNames from 'classnames';
 import styles from './WalletTopbarTitle.scss';
 import { matchRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
-import Wallet from '../../domain/Wallet';
 import WalletAccountIcon from './WalletAccountIcon';
-import { WalletTypeOption } from '../../types/WalletType';
-import type { WalletAccount } from '../../domain/Wallet';
-import { defineMessages, intlShape } from 'react-intl';
-import hideBalanceIcon from '../../assets/images/top-bar/password.hide.inline.svg';
-import showBalanceIcon from '../../assets/images/top-bar/password.show.inline.svg';
 
+import { defineMessages, intlShape } from 'react-intl';
+import HideBalanceIcon from '../../assets/images/top-bar/password.hide.inline.svg';
+import ShowBalanceIcon from '../../assets/images/top-bar/password.show.inline.svg';
+import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import type { WalletAccountNumberPlate } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 const messages = defineMessages({
   totalBalance: {
@@ -23,23 +23,25 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  wallet: ?Wallet,
-  account: ?WalletAccount,
-  currentRoute: string,
-  formattedWalletAmount?: Function,
-  themeProperties?: {
+  +publicDeriver: null | PublicDeriverWithCachedMeta,
+  +currentRoute: string,
+  +formattedWalletAmount?: BigNumber => string,
+  +themeProperties?: {|
     identiconSaturationFactor: number,
-  },
-  onUpdateHideBalance: Function,
-  shouldHideBalance: boolean
+  |},
+  +onUpdateHideBalance: void => void,
+  +shouldHideBalance: boolean
 |};
 
-function constructPlate(account, saturationFactor, divClass): [string, React$Element<'div'>] {
-  const { plate: { hash, id } } = account;
-  return [id, (
+function constructPlate(
+  plate: WalletAccountNumberPlate,
+  saturationFactor: number,
+  divClass: string,
+): [string, React$Element<'div'>] {
+  return [plate.id, (
     <div className={divClass}>
       <WalletAccountIcon
-        iconSeed={hash}
+        iconSeed={plate.hash}
         saturationFactor={saturationFactor}
       />
     </div>
@@ -62,7 +64,7 @@ export default class WalletTopbarTitle extends Component<Props> {
 
   render() {
     const {
-      wallet, account, currentRoute, formattedWalletAmount, themeProperties,
+      publicDeriver, currentRoute, formattedWalletAmount, themeProperties,
       shouldHideBalance, onUpdateHideBalance
     } = this.props;
     const { identiconSaturationFactor } = themeProperties || {};
@@ -70,27 +72,30 @@ export default class WalletTopbarTitle extends Component<Props> {
 
     // If we are looking at a wallet, show its name and balance
     const walletRoutesMatch = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
-    const showWalletInfo = walletRoutesMatch && wallet;
+    const showWalletInfo = (walletRoutesMatch !== false) && (publicDeriver != null);
 
-    const isHardwareWallet = (wallet && wallet.type) === WalletTypeOption.HARDWARE_WALLET;
+    const isHardwareWallet = publicDeriver != null &&
+      publicDeriver.self.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET;
     const currency = ' ADA';
     const iconDivClass = isHardwareWallet ? styles.divIconHardware : styles.divIcon;
-    const [accountPlateId, iconComponent] = account ?
-      constructPlate(account, identiconSaturationFactor, iconDivClass)
+    const [accountPlateId, iconComponent] = (publicDeriver && publicDeriver.plate) ?
+      constructPlate(publicDeriver.plate, identiconSaturationFactor, iconDivClass)
       : [];
 
     const topbarTitle = showWalletInfo && formattedWalletAmount ? (
       <div className={styles.walletInfo}>
         {iconComponent}
         <div className={styles.divWalletInfo}>
-          <div className={styles.walletName}>{wallet && wallet.name}</div>
+          <div className={styles.walletName}>
+            { publicDeriver && publicDeriver.conceptualWalletName }
+          </div>
           <div className={styles.walletPlate}>{accountPlateId || ''}</div>
         </div>
         <div className={styles.divAmount}>
           <div className={styles.walletAmount}>
-            { wallet && shouldHideBalance ?
+            { publicDeriver && shouldHideBalance ?
               <span className={styles.hiddenWalletAmount}>******</span> :
-              wallet && formattedWalletAmount(wallet.amount)
+              publicDeriver && formattedWalletAmount(publicDeriver.amount)
             }
             { currency }
           </div>
@@ -104,10 +109,12 @@ export default class WalletTopbarTitle extends Component<Props> {
                 onClick={onUpdateHideBalance}
                 className={classNames([styles.hideBalanceButton, 'hideBalanceButton'])}
               >
-                <SvgInline
-                  svg={shouldHideBalance ? showBalanceIcon : hideBalanceIcon}
-                  className={styles.showHideBalanceIcon}
-                />
+                <span className={styles.showHideBalanceIcon}>
+                  {shouldHideBalance
+                    ? <ShowBalanceIcon />
+                    : <HideBalanceIcon />
+                  }
+                </span>
               </button>
             </div>
           </div>

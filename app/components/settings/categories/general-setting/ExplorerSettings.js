@@ -13,11 +13,11 @@ import type { ExplorerType } from '../../../../domain/Explorer';
 
 
 type Props = {|
-  explorers: Array<{ value: ExplorerType, label: string }>,
-  selectedExplorer: ExplorerType,
-  onSelectExplorer: Function,
-  isSubmitting: boolean,
-  error?: ?LocalizableError,
+  +explorers: Array<{| value: ExplorerType, label: string |}>,
+  +selectedExplorer: ExplorerType,
+  +onSelectExplorer: Function,
+  +isSubmitting: boolean,
+  +error?: ?LocalizableError,
 |};
 
 @observer

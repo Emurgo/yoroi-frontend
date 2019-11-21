@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import _ from 'lodash';
+import { map } from 'lodash';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import type { Node, Element } from 'react';
@@ -11,23 +11,23 @@ import { ModalSkin } from 'react-polymorph/lib/skins/simple/ModalSkin';
 import styles from './Dialog.scss';
 
 type ActionType = {
-  label: string,
-  onClick: Function,
-  primary?: boolean,
-  disabled?: boolean,
-  className?: ?string
+  +label: string,
+  +onClick: Function,
+  +primary?: boolean,
+  +disabled?: boolean,
+  +className?: ?string
 };
 
 type Props = {|
-  title?: string,
-  children?: Node,
-  actions?: Array<ActionType>,
-  closeButton?: Element<any>,
-  backButton?: Node,
-  className?: string,
-  onClose?: ?Function,
-  closeOnOverlayClick?: boolean,
-  classicTheme: boolean
+  +title?: string,
+  +children?: Node,
+  +actions?: Array<ActionType>,
+  +closeButton?: Element<any>,
+  +backButton?: Node,
+  +className?: string,
+  +onClose?: ?Function,
+  +closeOnOverlayClick?: boolean,
+  +classicTheme: boolean
 |};
 
 @observer
@@ -66,7 +66,7 @@ export default class Dialog extends Component<Props> {
       >
 
         <div className={classnames([styles.component, className])}>
-          {title != null
+          {(title != null && title !== '')
             ? (
               <div className={styles.title}>
                 <h1>{title}</h1>
@@ -84,7 +84,7 @@ export default class Dialog extends Component<Props> {
 
           {actions && actions.length > 0 && (
             <div className={styles.actions}>
-              {_.map(actions, (action, i: number) => {
+              {map(actions, (action, i: number) => {
                 const buttonClasses = classnames([
                   action.className != null ? action.className : null,
                   action.primary === true ? 'primary' : secondaryButton,

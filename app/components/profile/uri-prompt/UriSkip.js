@@ -1,15 +1,14 @@
 // @flow
 import React, { Component } from 'react';
 import classnames from 'classnames';
-import SvgInline from 'react-svg-inline';
 import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './UriSkip.scss';
 import globalMessages from '../../../i18n/global-messages';
-import noTransactionClassicSvg from '../../../assets/images/transaction/no-transactions-yet.classic.inline.svg';
-import noTransactionModernSvg from '../../../assets/images/transaction/no-transactions-yet.modern.inline.svg';
+import NoTransactionClassicSvg from '../../../assets/images/transaction/no-transactions-yet.classic.inline.svg';
+import NoTransactionModernSvg from '../../../assets/images/transaction/no-transactions-yet.modern.inline.svg';
 
 
 const messages = defineMessages({
@@ -24,9 +23,9 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onConfirm: void => void,
-  onBack: void => void,
-  classicTheme: boolean,
+  +onConfirm: void => void,
+  +onBack: void => void,
+  +classicTheme: boolean,
 |};
 
 @observer
@@ -48,14 +47,16 @@ export default class UriSkip extends Component<Props> {
     ]);
 
     const noTransactionSvg = this.props.classicTheme
-      ? noTransactionClassicSvg
-      : noTransactionModernSvg;
+      ? <NoTransactionClassicSvg />
+      : <NoTransactionModernSvg />;
 
     return (
       <div className={styles.component}>
         <div className={styles.centeredBox}>
 
-          <SvgInline svg={noTransactionSvg} className={styles.aboutSvg} />
+          <span className={styles.aboutSvg}>
+            {noTransactionSvg}
+          </span>
 
           <div className={styles.explanation}>
             {intl.formatMessage(messages.descriptionLine1)}&nbsp;

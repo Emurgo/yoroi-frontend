@@ -1,0 +1,22 @@
+{
+  "network": {
+    "protocolMagic": 764824073,
+    "backendUrl": "https://iohk-mainnet.yoroiwallet.com",
+    "websocketUrl": "wss://iohk-mainnet.yoroiwallet.com:443",
+    "name": "shelley-testnet"
+  },
+  "app": {
+    "walletRefreshInterval": 20000,
+    "serverStatusRefreshInterval": 20000,
+    "logsBufferSize": 500,
+    "logsFileSuffix": "-yoroi-shelley-testnet.log",
+    "addressRequestSize": 50,
+    "txsBodiesRequestSize": 150,
+    "linearFee": {
+      "constant": "2",
+      "coefficient": "1",
+      "certificate": "4"
+    },
+    "genesisHash": "todo"
+  }
+}

@@ -1,6 +1,6 @@
 // @flow
 //  ==== Theme: Yoroi Modern === //
-
+import environment from '../../environment';
 import common from './Common';
 
 // FONTS
@@ -194,7 +194,7 @@ const modalMargin = {
   left: 40,
 };
 
-export default {
+const YoroiModern = {
   // COMMON-THEME-INDEPENDENT
   ...common,
 
@@ -264,6 +264,7 @@ export default {
   '--theme-dialog-title-margin': '0 0 38px 0',
   '--theme-dialog-input-margin': '10px 0 24px 0',
   '--theme-dialog-input-actions-margin': '34px 0 0 0',
+  '--theme-dialog-password-input-actions-margin-top': '10px',
 
   '--theme-main-body-background-color': '#ffffff',
   '--theme-main-body-messages-color': '#353535',
@@ -420,3 +421,38 @@ export default {
 
   '--theme-warning-color': `#FF1351`,
 };
+
+// *************************************************************
+// Here we are overriding YoroiModern theme for Shelley Testnet
+// Creating a new theme is costly because not only color
+// changes but layout is different in different theme.
+// e.g for new theme we need to override :global(.NewTheme)
+// is needed in UI style files or :global(.OldTheme, .NewTheme)
+// *************************************************************
+let ShelleyTestnetOverrides = {};
+if (environment.isShelley()) {
+  ShelleyTestnetOverrides = {
+    // Toolbar
+    '--theme-topbar-background-color': 'linear-gradient(225deg, #F14D78 0%, #1A44B7 100%)',
+    '--theme-topbar-active-item-bottom-border': '5px solid #ffffff',
+    // Button Primary
+    '--theme-button-primary-background-color': '#3154CB',
+    '--theme-button-primary-background-color-hover': '#4760FF',
+    '--theme-button-primary-background-color-active': '#3154CB',
+    '--theme-button-primary-background-color-disabled': 'rgba(49,84,203,0.35)',
+    // Button Outline
+    '--theme-button-outlined-text-color': '#3154CB',
+    '--theme-button-outlined-border-color-hover': '#3154CB',
+    '--theme-button-outlined-background-color-hover': 'rgba(49, 84, 203, 0.15)',
+    '--theme-button-outlined-background-color-active': '#3154CB',
+    '--theme-button-outlined-active-text-color': '#ffffff',
+    '--theme-button-outlined-text-color-disabled': 'rgba(49, 84, 203, 0.35)',
+    '--theme-button-outlined-background-color-disabled': 'rgba(49, 84, 203, 0.35)',
+    // Language Selection
+    '--theme-select-language-color': '#3154CB',
+    // Top banner
+    '--theme-banner-warning-background-color': 'linear-gradient(41deg, #1A44B7 0%, #4760FF 100%)'
+  };
+}
+
+export default Object.assign(YoroiModern, ShelleyTestnetOverrides);

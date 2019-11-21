@@ -10,8 +10,13 @@
     "serverStatusRefreshInterval": 20000,
     "logsBufferSize": 500,
     "logsFileSuffix": "-yoroi.log",
-    "addressScanSize": 20,
     "addressRequestSize": 50,
-    "txsBodiesRequestSize": 150
+    "txsBodiesRequestSize": 150,
+    "linearFee": {
+      "constant": "2",
+      "coefficient": "1",
+      "certificate": "4"
+    },
+    "genesisHash": "todo"
   }
 }

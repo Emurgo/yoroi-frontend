@@ -31,11 +31,11 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  isActiveItem: Function,
-  onItemClick: Function,
-  hasActiveWallet: boolean,
-  currentLocale: string,
-  currentTheme: Theme,
+  +isActiveItem: Function,
+  +onItemClick: Function,
+  +hasActiveWallet: boolean,
+  +currentLocale: string,
+  +currentTheme: Theme,
 |};
 
 @observer

@@ -14,6 +14,7 @@ import DaedalusTransferErrorPage from './DaedalusTransferErrorPage';
 import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
 import config from '../../config';
+import { TransferStatus } from '../../types/TransferTypes';
 
 import { formattedWalletAmount } from '../../utils/formatters';
 
@@ -42,28 +43,53 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     this._getDaedalusTransferActions().startTransferMasterKey.trigger();
   }
 
-  setupTransferFundsWithMnemonic = (payload: { recoveryPhrase: string }) => {
-    this._getDaedalusTransferActions().setupTransferFundsWithMnemonic.trigger(payload);
+  setupTransferFundsWithMnemonic = (payload: {
+    recoveryPhrase: string,
+  }): void => {
+    const walletsStore = this._getWalletsStore();
+    const publicDeriver = walletsStore.selected;
+    if (publicDeriver == null) {
+      throw new Error('tranferFunds no wallet selected');
+    }
+    this._getDaedalusTransferActions().setupTransferFundsWithMnemonic.trigger({
+      ...payload,
+      publicDeriver
+    });
   };
 
-  setupTransferFundsWithMasterKey = (payload: { masterKey: string }) => {
-    this._getDaedalusTransferActions().setupTransferFundsWithMasterKey.trigger(payload);
+  setupTransferFundsWithMasterKey = (payload: {
+    masterKey: string,
+  }): void => {
+    const walletsStore = this._getWalletsStore();
+    const publicDeriver = walletsStore.selected;
+    if (publicDeriver == null) {
+      throw new Error('tranferFunds no wallet selected');
+    }
+    this._getDaedalusTransferActions().setupTransferFundsWithMasterKey.trigger({
+      ...payload,
+      publicDeriver
+    });
   };
 
   /** Broadcast the transfer transaction if one exists and return to wallet page */
   tranferFunds = () => {
+    const walletsStore = this._getWalletsStore();
+    const publicDeriver = walletsStore.selected;
+    if (publicDeriver == null) {
+      throw new Error('tranferFunds no wallet selected');
+    }
     // broadcast transfer transaction then call continuation
     this._getDaedalusTransferActions().transferFunds.trigger({
       next: () => {
-        const walletsStore = this._getWalletsStore();
-        walletsStore.refreshWalletsData();
+        walletsStore.refreshWallet(publicDeriver);
         if (walletsStore.activeWalletRoute != null) {
           const newRoute = walletsStore.activeWalletRoute;
           this._getRouter().goToRoute.trigger({
             route: newRoute
           });
         }
-      }
+      },
+      publicDeriver
     });
   }
 
@@ -82,7 +108,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     const daedalusTransfer = this._getDaedalusTransferStore();
 
     switch (daedalusTransfer.status) {
-      case 'uninitialized':
+      case TransferStatus.UNINITIALIZED:
         return (
           <TransferLayout>
             <TransferInstructionsPage
@@ -94,36 +120,39 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             />
           </TransferLayout>
         );
-      case 'gettingMnemonics':
+      case TransferStatus.GETTING_MNEMONICS:
         return (
           <TransferLayout>
             <DaedalusTransferFormPage
               onSubmit={this.setupTransferFundsWithMnemonic}
               onBack={this.backToUninitialized}
-              mnemonicValidator={mnemonic => wallets.isValidMnemonic(
+              mnemonicValidator={mnemonic => wallets.isValidMnemonic({
                 mnemonic,
-                config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT
-              )}
+                numberOfWords: config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT
+              })}
               validWords={validWords}
               mnemonicLength={config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT}
               classicTheme={profile.isClassicTheme}
             />
           </TransferLayout>
         );
-      case 'gettingPaperMnemonics':
+      case TransferStatus.GETTING_PAPER_MNEMONICS:
         return (
           <TransferLayout>
             <DaedalusTransferFormPage
               onSubmit={this.setupTransferFundsWithMnemonic}
               onBack={this.backToUninitialized}
-              mnemonicValidator={mnemonic => wallets.isValidPaperMnemonic(mnemonic, 27)}
+              mnemonicValidator={mnemonic => wallets.isValidPaperMnemonic({
+                mnemonic,
+                numberOfWords: config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT
+              })}
               validWords={validWords}
-              mnemonicLength={27}
+              mnemonicLength={config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT}
               classicTheme={profile.isClassicTheme}
             />
           </TransferLayout>
         );
-      case 'gettingMasterKey':
+      case TransferStatus.GETTING_MASTER_KEY:
         return (
           <TransferLayout>
             <DaedalusTransferMasterKeyFormPage
@@ -133,15 +162,15 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             />
           </TransferLayout>
         );
-      case 'restoringAddresses':
-      case 'checkingAddresses':
-      case 'generatingTx':
+      case TransferStatus.RESTORING_ADDRESSES:
+      case TransferStatus.CHECKING_ADDRESSES:
+      case TransferStatus.GENERATING_TX:
         return (
           <TransferLayout>
             <DaedalusTransferWaitingPage status={daedalusTransfer.status} />
           </TransferLayout>
         );
-      case 'readyToTransfer':
+      case TransferStatus.READY_TO_TRANSFER:
         if (daedalusTransfer.transferTx == null) {
           return null; // TODO: throw error? Shoudln't happen
         }
@@ -159,7 +188,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             />
           </TransferLayout>
         );
-      case 'error':
+      case TransferStatus.ERROR:
         return (
           <TransferLayout>
             <DaedalusTransferErrorPage
@@ -170,7 +199,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
           </TransferLayout>
         );
       default:
-        return null; // TODO: throw error? Shouldn't happen
+        throw new Error('DaedalusTransferPage Unexpected state ' + daedalusTransfer.status);
     }
   }
 

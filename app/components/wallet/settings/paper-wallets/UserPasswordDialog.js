@@ -51,12 +51,12 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  passwordValue: string,
-  repeatedPasswordValue: string,
-  onNext: Function,
-  onCancel: Function,
-  onDataChange: Function,
-  classicTheme: boolean,
+  +passwordValue: string,
+  +repeatedPasswordValue: string,
+  +onNext: Function,
+  +onCancel: Function,
+  +onDataChange: Function,
+  +classicTheme: boolean,
 |};
 
 @observer

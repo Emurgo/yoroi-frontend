@@ -5,10 +5,10 @@ import classnames from 'classnames';
 import styles from './TransferNavButton.scss';
 
 type Props = {|
-  label: string,
-  isActive: boolean,
-  onClick: Function,
-  className?: string,
+  +label: string,
+  +isActive: boolean,
+  +onClick: Function,
+  +className?: string,
 |};
 
 @observer

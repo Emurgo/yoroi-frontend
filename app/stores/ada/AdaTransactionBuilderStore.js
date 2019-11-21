@@ -8,8 +8,12 @@ import type {
   CreateUnsignedTxFunc,
 } from '../../api/ada';
 
-import type { BaseSignRequest } from '../../api/ada/adaTypes';
-import { signRequestFee, signRequestTotalInput } from '../../api/ada/lib/utils';
+import type { BaseSignRequest } from '../../api/ada/transactions/types';
+import { signRequestFee, signRequestTotalInput } from '../../api/ada/transactions/utils';
+import {
+  asGetAllUtxos, asHasUtxoChains,
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+
 
 /**
  * TODO: we make the following assumptions
@@ -22,7 +26,7 @@ export default class AdaTransactionBuilderStore extends Store {
 
   @observable shouldSendAll: boolean;
   /** Stores the tx information as the user is building it */
-  @observable plannedTxInfo: Array<{ ...Inexact<TxOutType> }>;
+  @observable plannedTxInfo: Array<{ ...Inexact<TxOutType<number>> }>;
   /** Stores the tx used to generate the information on the send form */
   @observable plannedTx: null | BaseSignRequest;
   /** Stores the tx that will be sent if the user confirms sending */
@@ -35,7 +39,7 @@ export default class AdaTransactionBuilderStore extends Store {
   @observable createUnsignedTx: LocalizedRequest<CreateUnsignedTxFunc>
     = new LocalizedRequest<CreateUnsignedTxFunc>(this.api.ada.createUnsignedTx);
 
-  setup() {
+  setup(): void {
     super.setup();
     this._preWaitReset();
     this._postWaitReset();
@@ -99,7 +103,6 @@ export default class AdaTransactionBuilderStore extends Store {
 
     runInAction(() => {
       this.plannedTx = {
-        addressesMap: result.addressesMap,
         senderUtxos: result.senderUtxos,
         unsignedTx: result.txBuilder.make_transaction(),
         changeAddr: result.changeAddr,
@@ -117,8 +120,11 @@ export default class AdaTransactionBuilderStore extends Store {
       // Note: will not trigger if re-asigned same value
       toJS(this.plannedTxInfo),
       this.shouldSendAll,
-      // whenever the user wallet updates, we probably have to refresh the utxo set
-      this.stores.substores.ada.wallets.active,
+      this.stores.substores.ada.wallets.selected,
+      // wallet balance changed => utxo set changed
+      // TODO: this should be changed to UTXO set
+      this.stores.substores.ada.wallets.selected &&
+        this.stores.substores.ada.wallets.selected.amount,
       // need to recalculate when there are no more pending transactions
       this.stores.substores.ada.transactions.hasAnyPending,
     ],
@@ -148,13 +154,13 @@ export default class AdaTransactionBuilderStore extends Store {
       this.createUnsignedTx.reset();
       this.plannedTx = null;
     });
-    const account = this.stores.substores.ada.wallets.activeAccount;
-    if (!account || !this._canCompute()) {
+    const publicDeriver = this.stores.substores.ada.wallets.selected;
+    if (!publicDeriver || !this._canCompute()) {
       return;
     }
 
     // type-cast to assert non-null
-    const plannedTxInfo: Array<TxOutType> = (this.plannedTxInfo: any);
+    const plannedTxInfo: Array<TxOutType<number>> = (this.plannedTxInfo: any);
 
     const receiver = plannedTxInfo[0].address;
     const amount = plannedTxInfo[0].value
@@ -162,19 +168,25 @@ export default class AdaTransactionBuilderStore extends Store {
       : '0'; // value is not relevant in sendall case
     const shouldSendAll = this.shouldSendAll;
 
-    const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
     if (this.createUnsignedTx.promise) {
       // eslint-disable-next-line no-unused-vars
       await this.createUnsignedTx.promise.catch(err => { /* do nothing */ });
     }
+
+    const withUtxos = asGetAllUtxos(publicDeriver.self);
+    if (withUtxos == null) {
+      throw new Error('_updateTxBuilder missing utxo functionality');
+    }
+    const withHasUtxoChains = asHasUtxoChains(withUtxos);
+    if (withHasUtxoChains == null) {
+      throw new Error('_updateTxBuilder missing chains functionality');
+    }
     this.createUnsignedTx.execute({
-      accountId: account.account,
+      publicDeriver: withHasUtxoChains,
       receiver,
       amount,
-      getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
       shouldSendAll,
     });
-
   }
 
   // ===========

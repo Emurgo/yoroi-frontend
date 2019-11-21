@@ -13,7 +13,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  children: ?Node
+  +children: ?Node
 |};
 
 export default class WarningBox extends Component<Props> {

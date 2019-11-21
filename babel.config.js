@@ -1,4 +1,12 @@
-module.exports = function (api) {
+// @flow
+
+/*::
+// https://babeljs.io/docs/en/config-files#config-function-api
+type ApiType = {
+  env: (void | string | Array<string>) => (string | boolean)
+};
+*/
+module.exports = function (api /*: ApiType */) {
   // when running jest we need to use nodejs and not browser configurations
   const nodePlugins = api.env('jest')
     ? ['dynamic-import-node']
@@ -10,7 +18,7 @@ module.exports = function (api) {
         '@babel/preset-env',
         {
           corejs: 2,
-          modules: api.env('jest') ? 'commonjs' : 'auto',
+          modules: (api.env('test') || api.env('jest')) ? 'commonjs' : 'auto',
           useBuiltIns: 'entry'
         }
       ],
@@ -27,7 +35,8 @@ module.exports = function (api) {
       [
         '@babel/plugin-transform-runtime',
         {
-          corejs: 2,
+          // CoreJS breaks Jest mocks for some reason
+          corejs: (api.env('test') || api.env('jest')) ? false : 2,
           helpers: true,
           regenerator: true
         }
@@ -36,8 +45,7 @@ module.exports = function (api) {
         'react-intl',
         {
           messagesDir: './translations/messages/',
-          enforceDescriptions: false,
-          extractSourceLocationß: true
+          extractSourceLocation: true
         }
       ],
       '@babel/plugin-syntax-dynamic-import',
@@ -58,7 +66,24 @@ module.exports = function (api) {
           'react-hot-loader/babel',
           '@babel/plugin-transform-runtime'
         ]
+      },
+      'shelley-dev': {
+        plugins: [
+          'react-hot-loader/babel',
+          '@babel/plugin-transform-runtime'
+        ]
+      },
+      cucumber: {
+        plugins: [
+          '@babel/plugin-transform-runtime',
+          ['module-resolver', {
+            alias: {
+              'cardano-wallet-browser': 'cardano-wallet',
+              'js-chain-libs': 'js-chain-libs-node',
+            }
+          }]
+        ]
       }
     }
-  }
+  };
 };

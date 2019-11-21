@@ -2,14 +2,13 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
-import SvgInline from 'react-svg-inline';
 import styles from './SuccessPage.scss';
-import successIcon from '../../assets/images/transfer-success.inline.svg';
+import SuccessIcon from '../../assets/images/transfer-success.inline.svg';
 
 type Props = {|
-  title: string,
-  text: string,
-  classicTheme: boolean
+  +title: string,
+  +text: string,
+  +classicTheme: boolean
 |};
 
 @observer
@@ -25,7 +24,7 @@ export default class SuccessPage extends Component<Props> {
     return (
       <div className={styles.component}>
         <div>
-          <SvgInline svg={successIcon}  />
+          <SuccessIcon />
           <div className={styles.title}>
             {title}
           </div>

@@ -5,6 +5,7 @@ import { Builder, By, Key, until } from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome';
 import firefox from 'selenium-webdriver/firefox';
 import path from 'path';
+import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 
 const fs = require('fs');
 
@@ -242,10 +243,18 @@ function CustomWorld(cmdInput: WorldInput) {
 
   this.saveLastReceiveAddressIndex = index => {
     this.driver.executeScript(i => {
-      window.yoroi.api.ada.saveLastReceiveAddressIndex({ index: i });
+      const selected = window.yoroi.stores.substores.ada.wallets.selected;
+      if (selected == null) throw new Error('executeScript no public deriver selected');
+      window.yoroi.api.ada.saveLastReceiveAddressIndex({
+        publicDeriver: selected.self,
+        index: i,
+      });
     }, index);
   };
 }
 
-setWorldConstructor(CustomWorld);
-setDefaultTimeout(60 * 1000);
+RustModule.load().then(() => {
+  setWorldConstructor(CustomWorld);
+  setDefaultTimeout(60 * 1000);
+  return undefined;
+}).catch();

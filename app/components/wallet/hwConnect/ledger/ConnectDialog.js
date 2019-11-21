@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
-import SvgInline from 'react-svg-inline';
 
 import globalMessages from '../../../../i18n/global-messages';
 import LocalizableError from '../../../../i18n/LocalizableError';
@@ -17,9 +16,9 @@ import HelpLinkBlock from './HelpLinkBlock';
 import HWErrorBlock from '../common/HWErrorBlock';
 
 import connectLoadGIF from '../../../../assets/images/hardware-wallet/ledger/connect-load.gif';
-import connectErrorSVG from '../../../../assets/images/hardware-wallet/ledger/connect-error.inline.svg';
+import ConnectErrorSVG from '../../../../assets/images/hardware-wallet/ledger/connect-error.inline.svg';
 
-import connectErrorLedgerSVG from '../../../../assets/images/hardware-wallet/ledger/connect-error-modern.inline.svg';
+import ConnectErrorLedgerSVG from '../../../../assets/images/hardware-wallet/ledger/connect-error-modern.inline.svg';
 import connectLoadLedgerGIF from '../../../../assets/images/hardware-wallet/ledger/connect-load-modern.inline.gif';
 
 import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
@@ -44,14 +43,14 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  progressInfo: ProgressInfo,
-  isActionProcessing: boolean,
-  error: ?LocalizableError,
-  onExternalLinkClick: Function,
-  goBack: Function,
-  submit: Function,
-  cancel: Function,
-  classicTheme: boolean,
+  +progressInfo: ProgressInfo,
+  +isActionProcessing: boolean,
+  +error: ?LocalizableError,
+  +onExternalLinkClick: Function,
+  +goBack: Function,
+  +submit: void => void,
+  +cancel: Function,
+  +classicTheme: boolean,
 |};
 
 @observer
@@ -115,7 +114,10 @@ export default class ConnectDialog extends Component<Props> {
         backButton = (<DialogBackButton onBack={goBack} />);
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectErrorBlock])}>
-            <SvgInline svg={classicTheme ? connectErrorSVG : connectErrorLedgerSVG} />
+            {classicTheme
+              ? <ConnectErrorSVG />
+              : <ConnectErrorLedgerSVG />
+            }
           </div>);
         break;
       default:

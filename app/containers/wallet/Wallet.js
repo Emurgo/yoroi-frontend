@@ -15,37 +15,43 @@ type Props = InjectedContainerProps;
 @observer
 export default class Wallet extends Component<Props> {
 
-  isActiveScreen = (page: string) => {
+  isActiveScreen = (page: string): boolean => {
     const { app } = this.props.stores;
     const { wallets } = this.props.stores.substores.ada;
-    if (!wallets.active) return false;
-    const screenRoute = buildRoute(ROUTES.WALLETS.PAGE, { id: wallets.active.id, page });
+    const selected = wallets.selected;
+    if (selected == null) return false;
+    const screenRoute = buildRoute(
+      ROUTES.WALLETS.PAGE,
+      {
+        id: selected.self.getPublicDeriverId(),
+        page
+      }
+    );
     return app.currentRoute === screenRoute;
   };
 
-  handleWalletNavItemClick = (page: string) => {
+  handleWalletNavItemClick = (page: string): void => {
     const { wallets } = this.props.stores.substores.ada;
-    if (!wallets.active) return;
+    const selected = wallets.selected;
+    if (selected == null) return;
     this.props.actions.router.goToRoute.trigger({
       route: ROUTES.WALLETS.PAGE,
-      params: { id: wallets.active.id, page },
+      params: { id: selected.self.getPublicDeriverId(), page },
     });
   };
 
   render() {
     const { wallets, } = this.props.stores.substores.ada;
     const { actions, stores } = this.props;
-    const { profile } = stores;
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
     const topbarContainer = (<TopBarContainer actions={actions} stores={stores} />);
 
-    if (!wallets.active) {
+    if (!wallets.selected) {
       return (
         <MainLayout
           topbar={topbarContainer}
           actions={actions}
           stores={stores}
-          classicTheme={profile.isClassicTheme}
           connectionErrorType={checkAdaServerStatus}
         >
           <LoadingSpinner />
@@ -58,7 +64,6 @@ export default class Wallet extends Component<Props> {
         topbar={topbarContainer}
         actions={actions}
         stores={stores}
-        classicTheme={profile.isClassicTheme}
         connectionErrorType={checkAdaServerStatus}
       >
         <WalletWithNavigation

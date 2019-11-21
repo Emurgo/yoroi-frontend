@@ -20,14 +20,14 @@ aliases:
   - &restore_cache
       restore_cache:
         keys:
-          - generic-tools-cache-{{ checksum "package.json" }}
+          - generic-tools-cache-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
   - &save_cache
       save_cache:
         paths:
          - ~/.npm
          - ~/.rustup
          - ~/.cargo
-        key: generic-tools-cache-{{ checksum "package.json" }}
+        key: generic-tools-cache-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
   - &setenv
       run: bash .circleci/set_dynamic_env.sh
   - &global_environment
@@ -43,7 +43,7 @@ aliases:
       SCREENSHOT_DIFF_THRESHOLD: 0
       SCREENSHOT_DIFF_COLOR: yellow
       BROWSERS: brave chrome firefox
-      GITHUB_BUILD_BRANCHES: develop staging master
+      GITHUB_BUILD_BRANCHES: develop staging master shelley
 
       # Encrypted env vars from ui:
       # AWS_ACCESS_KEY_ID: "${ARTIFACTS_KEY}"
@@ -66,7 +66,7 @@ jobs:
       POC: poc
     working_directory: ~/repo
     docker:
-      - image: circleci/node:8-browsers
+      - image: circleci/node:12-browsers
 
     steps:
       - checkout
@@ -135,7 +135,7 @@ jobs:
       BROWSER: brave
     working_directory: ~/repo
     docker:
-      - image: emurgornd/circleci-node-8-browsers:brave
+      - image: emurgornd/circleci-node-12-browsers:brave
 
     steps:
       - *attach_workspace
@@ -151,7 +151,7 @@ jobs:
       BROWSER: chrome
     working_directory: ~/repo
     docker:
-      - image: circleci/node:8-browsers
+      - image: circleci/node:12-browsers
 
     steps:
       - *attach_workspace
@@ -170,7 +170,7 @@ jobs:
       # unsiggned addons are only supported in Firefox-dev, Firefox nightly and Firefox-esr
       # CircleCI comes w/ Firefox but we need to replace it w/ Firefox-esr,
       # so we use a custom image derivated from circleci's one:
-      - image: emurgornd/circleci-node-8-browsers:firefox-dev
+      - image: emurgornd/circleci-node-12-browsers:firefox-dev
 
     steps:
       - *attach_workspace
@@ -185,7 +185,7 @@ jobs:
       <<: *global_environment
     working_directory: ~/repo
     docker:
-      - image: circleci/node:8-browsers
+      - image: circleci/node:12-browsers
 
     steps:
       - *attach_workspace
@@ -204,7 +204,7 @@ jobs:
       <<: *global_environment
     working_directory: ~/repo
     docker:
-      - image: circleci/node:8-browsers
+      - image: circleci/node:12-browsers
     steps:
       - *attach_workspace
       - run: echo $RUN_EXTRA_TESTS
@@ -226,6 +226,7 @@ workflows:
             branches:
               ignore:
                 - l10n_develop
+                - l10n_shelley
           requires:
             - build-setup
       - test-firefox:
@@ -233,6 +234,7 @@ workflows:
             branches:
               ignore:
                 - l10n_develop
+                - l10n_shelley
           requires:
             - build-setup
       - deploy-artifacts:

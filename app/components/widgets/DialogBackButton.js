@@ -1,11 +1,10 @@
 // @flow
 import React, { Component } from 'react';
-import SvgInline from 'react-svg-inline';
-import backArrow from '../../assets/images/back-arrow-ic.inline.svg';
+import BackArrow from '../../assets/images/back-arrow-ic.inline.svg';
 import styles from './DialogBackButton.scss';
 
 type Props = {|
-  onBack: Function
+  +onBack: void => void
 |};
 
 export default class DialogBackButton extends Component<Props> {
@@ -14,7 +13,7 @@ export default class DialogBackButton extends Component<Props> {
     const { onBack } = this.props;
     return (
       <button tabIndex="-1" type="button" onClick={onBack} className={styles.component}>
-        <SvgInline svg={backArrow} />
+        <BackArrow />
       </button>
     );
   }

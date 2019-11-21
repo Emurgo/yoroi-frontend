@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import styles from './StaticTopbarTitle.scss';
 
 type Props = {|
-  title: string,
+  +title: string,
 |};
 
 /** Static text styled for the center-text of a topbar */

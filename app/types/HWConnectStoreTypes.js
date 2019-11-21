@@ -1,13 +1,14 @@
 // @flow
 // Interface of Hardware Wallet Connect dialog
 
-import Wallet from '../domain/Wallet';
 import LocalizedRequest from '../stores/lib/LocalizedRequest';
 
 import LocalizableError from '../i18n/LocalizableError';
 
 import type { CreateHardwareWalletRequest, CreateHardwareWalletFunc } from '../api/ada';
 import type { StepStateEnum } from '../components/widgets/ProgressSteps';
+import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
+import type { HWFeatures } from '../api/ada/lib/storage/database/walletTypes/core/tables';
 
 export const ProgressStep = Object.freeze({
   CHECK: 0,
@@ -21,18 +22,6 @@ export interface ProgressInfo {
   stepState: StepStateEnum,
 }
 
-// Hardware wallet device Features object
-export interface HWFeatures {
-  vendor: string,
-  model: string,
-  label: string,
-  deviceId: string,
-  language: string,
-  majorVersion: number,
-  minorVersion: number,
-  patchVersion: number,
-}
-
 export interface HWDeviceInfo {
   publicMasterKey: string,
   hwFeatures: HWFeatures
@@ -42,6 +31,9 @@ export interface HWConnectStoreTypes<ConnectionResponse> {
   // =================== VIEW RELATED =================== //
   /** the only observable which manages state change */
   progressInfo: ProgressInfo;
+
+  /** which derivation index to export */
+  derivationIndex: number;
 
   /** only in ERROR state it will hold LocalizableError object */
   error: ?LocalizableError;
@@ -111,11 +103,16 @@ export interface HWConnectStoreTypes<ConnectionResponse> {
   _goToSaveError(): void;
 
   /** creates new wallet and loads it */
-  _saveHW(walletName: string): Promise<void>;
+  _saveHW(
+    walletName: string,
+  ): Promise<void>;
 
-  _prepareCreateHWReqParams(walletName: string): CreateHardwareWalletRequest;
+  _prepareCreateHWReqParams(
+    walletName: string,
+    derivationIndex: number,
+  ): CreateHardwareWalletRequest;
 
-  _onSaveSucess(hwWallet: Wallet): Promise<void>;
+  _onSaveSucess(publicDeriver: PublicDeriver<>): Promise<void>;
   // =================== SAVE =================== //
 
   // =================== API =================== //

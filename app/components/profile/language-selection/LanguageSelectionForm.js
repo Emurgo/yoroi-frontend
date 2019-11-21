@@ -23,12 +23,12 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onSelectLanguage: Function,
-  languages: Array<{ value: string, label: MessageDescriptor, svg: string }>,
-  onSubmit: Function,
-  isSubmitting: boolean,
-  currentLocale: string,
-  error?: ?LocalizableError,
+  +onSelectLanguage: Function,
+  +languages: Array<{ value: string, label: MessageDescriptor, svg: string }>,
+  +onSubmit: Function,
+  +isSubmitting: boolean,
+  +currentLocale: string,
+  +error?: ?LocalizableError,
 |};
 
 @observer

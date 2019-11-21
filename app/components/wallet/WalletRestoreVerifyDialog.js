@@ -11,10 +11,11 @@ import RawHash from '../widgets/hashWrappers/RawHash';
 import WalletAccountIcon from '../topbar/WalletAccountIcon';
 import Dialog from '../widgets/Dialog';
 import DialogTextBlock from '../widgets/DialogTextBlock';
-import type { WalletAccountNumberPlate } from '../../domain/Wallet';
+import type { WalletAccountNumberPlate } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import LocalizableError from '../../i18n/LocalizableError';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../domain/Explorer';
+import type { Notification } from '../../types/notificationType';
 
 const messages = defineMessages({
   dialogTitleVerifyWalletRestoration: {
@@ -49,16 +50,16 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  addresses: Array<string>,
-  accountPlate: WalletAccountNumberPlate,
-  selectedExplorer: ExplorerType,
-  onCopyAddressTooltip: Function,
-  getNotification: Function,
-  onNext: Function,
-  onCancel: Function,
-  isSubmitting: boolean,
-  classicTheme: boolean,
-  error?: ?LocalizableError,
+  +addresses: Array<string>,
+  +accountPlate: WalletAccountNumberPlate,
+  +selectedExplorer: ExplorerType,
+  +onCopyAddressTooltip: (string, string) => void,
+  +notification: ?Notification,
+  +onNext: void => void,
+  +onCancel: void => void,
+  +isSubmitting: boolean,
+  +classicTheme: boolean,
+  +error?: ?LocalizableError,
 |};
 
 @observer
@@ -82,7 +83,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
       onNext,
       classicTheme,
       onCopyAddressTooltip,
-      getNotification,
+      notification,
     } = this.props;
 
     const dialogClasses = classnames(['walletRestoreVerifyDialog', styles.dialog]);
@@ -143,8 +144,8 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
             <CopyableAddress
               hash={address}
               elementId={notificationElementId}
-              onCopyAddress={onCopyAddressTooltip.bind(this, address, notificationElementId)}
-              getNotification={getNotification}
+              onCopyAddress={() => onCopyAddressTooltip(address, notificationElementId)}
+              notification={notification}
               tooltipOpensUpward
               key={address}
             >

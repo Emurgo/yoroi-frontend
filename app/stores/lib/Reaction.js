@@ -13,12 +13,12 @@ export default class Reaction {
     this.hasBeenStarted = false;
   }
 
-  start() {
+  start(): void {
     this.dispose = autorun(() => this.reaction());
     this.hasBeenStarted = true;
   }
 
-  stop() {
+  stop(): void {
     if (this.hasBeenStarted) this.dispose();
   }
 }

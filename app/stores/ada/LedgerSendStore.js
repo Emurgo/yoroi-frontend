@@ -16,6 +16,9 @@ import type {
   CreateLedgerSignTxDataFunc,
   PrepareAndBroadcastLedgerSignedTxFunc,
 } from '../../api/ada';
+import {
+  asGetPublicKey, asHasLevels,
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   SendUsingLedgerParams
 } from '../../actions/ada/ledger-send-actions';
@@ -52,7 +55,7 @@ export default class LedgerSendStore extends Store {
     );
   // =================== API RELATED =================== //
 
-  setup() {
+  setup(): void {
     const ledgerSendAction = this.actions.ada.ledgerSend;
     ledgerSendAction.init.listen(this._init);
     ledgerSendAction.sendUsingLedger.listen(this._send);
@@ -65,7 +68,7 @@ export default class LedgerSendStore extends Store {
     Logger.debug('LedgerSendStore::_init called');
   }
 
-  _reset() {
+  _reset(): void {
     this._setActionProcessing(false);
     this._setError(null);
   }
@@ -76,17 +79,11 @@ export default class LedgerSendStore extends Store {
       throw new Error('Can\'t send another transaction if one transaction is in progress.');
     }
 
-    const { wallets, addresses } = this.stores.substores[environment.API];
-    const activeWallet = wallets.active;
-    if (!activeWallet) {
+    const { wallets } = this.stores.substores[environment.API];
+    const publicDeriver = wallets.selected;
+    if (!publicDeriver) {
       // this Error will be converted to LocalizableError()
       throw new Error('Active wallet required before sending.');
-    }
-
-    const accountId = addresses._getAccountIdByWalletId(activeWallet.id);
-    if (accountId == null) {
-      // this Error will be converted to LocalizableError()
-      throw new Error('Active account required before sending.');
     }
   }
 
@@ -107,11 +104,9 @@ export default class LedgerSendStore extends Store {
       this._setError(null);
       this._setActionProcessing(true);
 
-
       const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
       this.createLedgerSignTxDataRequest.execute({
         ...params,
-        getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
         getTxsBodiesForUTXOs: stateFetcher.getTxsBodiesForUTXOs,
       });
       if (!this.createLedgerSignTxDataRequest.promise) throw new Error('should never happen');
@@ -147,26 +142,35 @@ export default class LedgerSendStore extends Store {
 
   _prepareAndBroadcastSignedTx = async (
     ledgerSignTxResp: LedgerSignTxResponse,
-    unsignedTx: RustModule.Wallet.Transaction,
+    unsignedTx: RustModule.WalletV2.Transaction,
   ): Promise<void> => {
+    const { wallets } = this.stores.substores[environment.API];
+    const publicDeriver = wallets.selected;
+    if (publicDeriver == null) {
+      throw new Error('_prepareAndBroadcastSignedTx no public deriver selected');
+    }
+    const withPublicKey = asGetPublicKey(publicDeriver.self);
+    if (withPublicKey == null) {
+      throw new Error('_prepareAndBroadcastSignedTx public deriver has no public key.');
+    }
+    const withLevels = asHasLevels(withPublicKey);
+    if (withLevels == null) {
+      throw new Error('_prepareAndBroadcastSignedTx public deriver has no levels');
+    }
+
     await this.broadcastLedgerSignedTxRequest.execute({
+      getPublicKey: withPublicKey.getPublicKey,
+      keyLevel: withLevels.getParent().getPublicDeriverLevel(),
       ledgerSignTxResp,
       unsignedTx,
       sendTx: this.stores.substores[environment.API].stateFetchStore.fetcher.sendTx,
     }).promise;
 
     this.actions.dialogs.closeActiveDialog.trigger();
-    const { wallets } = this.stores.substores[environment.API];
-    await wallets.refreshWalletsData();
+    await wallets.refreshWallet(publicDeriver);
 
-    const activeWallet = wallets.active;
-    if (activeWallet) {
-      // go to transaction screen
-      wallets.goToWalletRoute(activeWallet.id);
-    } else {
-      // this Error will be converted to LocalizableError()
-      throw new Error('No Active wallet Found.');
-    }
+    // go to transaction screen
+    wallets.goToWalletRoute(publicDeriver.self);
 
     this._reset();
     Logger.info('SUCCESS: ADA sent using Ledger SignTx');

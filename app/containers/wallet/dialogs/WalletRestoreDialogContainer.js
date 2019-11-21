@@ -10,39 +10,48 @@ import type { InjectedDialogContainerProps } from '../../../types/injectedPropsT
 import environment from '../../../environment';
 import {
   unscramblePaperAdaMnemonic,
-  mnemonicsToAddresses,
-} from '../../../api/ada/lib/cardanoCrypto/cryptoWallet';
-import type { WalletAccountNumberPlate } from '../../../domain/Wallet';
+} from '../../../api/ada/lib/cardanoCrypto/paperWallet';
+import {
+  generateStandardPlate,
+} from '../../../api/ada/lib/cardanoCrypto/plate';
+import type { WalletAccountNumberPlate } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import globalMessages from '../../../i18n/global-messages';
+import { CheckAdressesInUseApiError } from '../../../api/ada/errors';
+import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 
-type Props = InjectedDialogContainerProps & {
-  mode: "regular" | "paper",
-  introMessage?: string,
-  onBack: void => void,
-};
+type Props = {|
+  ...InjectedDialogContainerProps,
+  +mode: "regular" | "paper",
+  +introMessage?: string,
+  +onBack: void => void,
+|};
 
 const NUMBER_OF_VERIFIED_ADDRESSES = 1;
 const NUMBER_OF_VERIFIED_ADDRESSES_PAPER = 5;
 
-type WalletRestoreDialogContainerState = {
-  verifyRestore?: {
+type WalletRestoreDialogContainerState = {|
+  verifyRestore?: {|
     addresses: Array<string>,
     accountPlate: WalletAccountNumberPlate,
-  },
+  |},
   submitValues?: WalletRestoreDialogValues,
   resolvedRecoveryPhrase?: string,
   notificationElementId: string,
-}
+|}
 
 @observer
 export default class WalletRestoreDialogContainer
   extends Component<Props, WalletRestoreDialogContainerState> {
 
+  static defaultProps = {
+    introMessage: undefined
+  };
+
   state = {
     verifyRestore: undefined,
     submitValues: undefined,
     resolvedRecoveryPhrase: undefined,
-    notificationElementId: ''
+    notificationElementId: '',
   };
 
   onVerifiedSubmit = () => {
@@ -53,7 +62,11 @@ export default class WalletRestoreDialogContainer
     if (resolvedRecoveryPhrase != null) {
       submitValues.recoveryPhrase = resolvedRecoveryPhrase;
     }
-    this.props.actions[environment.API].wallets.restoreWallet.trigger(submitValues);
+    this.props.actions[environment.API].wallets.restoreWallet.trigger({
+      recoveryPhrase: submitValues.recoveryPhrase,
+      walletName: submitValues.walletName,
+      walletPassword: submitValues.walletPassword
+    });
   };
 
   onSubmit = (values: WalletRestoreDialogValues) => {
@@ -70,11 +83,14 @@ export default class WalletRestoreDialogContainer
       }
       resolvedRecoveryPhrase = newPhrase;
     }
-    const { addresses, accountPlate } =  mnemonicsToAddresses(
+    const { addresses, accountPlate } = generateStandardPlate(
       resolvedRecoveryPhrase,
       0, // show addresses for account #0
       isPaper ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER : NUMBER_OF_VERIFIED_ADDRESSES,
-      'External',
+      environment.isMainnet()
+        ? RustModule.WalletV3.AddressDiscrimination.Production
+        : RustModule.WalletV3.AddressDiscrimination.Test,
+      true,
     );
     this.setState({
       verifyRestore: { addresses, accountPlate },
@@ -117,6 +133,19 @@ export default class WalletRestoreDialogContainer
     const { verifyRestore, submitValues } = this.state;
     if (verifyRestore) {
       const { addresses, accountPlate } = verifyRestore;
+      // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1055
+      let error;
+      /**
+       * CheckAdressesInUseApiError happens when yoroi could not fetch Used Address.
+       * Mostly because internet not connected or yoroi backend is down.
+       * At this point wallet is already created in the storage.
+       * When internet connection is back, everything will be loaded correctly.
+       */
+      if (restoreRequest.error instanceof CheckAdressesInUseApiError === false) {
+        error = restoreRequest.error;
+      }
+      const isSubmitting = restoreRequest.isExecuting ||
+        (restoreRequest.error instanceof CheckAdressesInUseApiError);
       return (
         <WalletRestoreVerifyDialog
           addresses={addresses}
@@ -134,12 +163,12 @@ export default class WalletRestoreDialogContainer
               });
             }
           }}
-          getNotification={uiNotifications.getTooltipActiveNotification(
+          notification={uiNotifications.getTooltipActiveNotification(
             this.state.notificationElementId
           )}
-          isSubmitting={restoreRequest.isExecuting}
+          isSubmitting={isSubmitting}
           classicTheme={this.props.classicTheme}
-          error={restoreRequest.error}
+          error={error}
         />
       );
     }
@@ -148,9 +177,15 @@ export default class WalletRestoreDialogContainer
       <WalletRestoreDialog
         mnemonicValidator={mnemonic => {
           if (isPaper) {
-            return wallets.isValidPaperMnemonic(mnemonic, wordsCount);
+            return wallets.isValidPaperMnemonic({
+              mnemonic,
+              numberOfWords: wordsCount
+            });
           }
-          return wallets.isValidMnemonic(mnemonic);
+          return wallets.isValidMnemonic({
+            mnemonic,
+            numberOfWords: wordsCount
+          });
         }}
         validWords={validWords}
         numberOfMnemonics={wordsCount}
@@ -178,5 +213,7 @@ function isPaperMode(mode: string): boolean {
 }
 
 function getWordsCount(mode: string): number {
-  return mode === 'paper' ? 21 : 15;
+  return mode === 'paper'
+    ? config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT
+    : config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT;
 }

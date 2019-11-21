@@ -93,17 +93,11 @@
           margin-top: 0;
           width: 100%;
         }
-
-        & > div:last-child {
-          padding-bottom: 0;
-        }
       }
+    }
 
-      .paperPassword {
-        div:first-of-type {
-          padding-bottom: 0!important;
-        }
-      }
+    :global(.Dialog_actions) {
+      margin-top: var(--theme-dialog-password-input-actions-margin-top);
     }
   }
 }

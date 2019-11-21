@@ -1,69 +1,31 @@
 // @flow
 
-import type { KeyInsert, KeyRow } from '../database/uncategorized/tables';
-
-import { WrongPassphraseError } from '../../cardanoCrypto/cryptoErrors';
-
-import {
-  getCryptoWalletFromEncryptedMasterKey,
-  getCryptoWalletFromMasterKey,
-} from '../../cardanoCrypto/cryptoWallet';
+import type { CoreAddressT } from '../database/primitives/enums';
+import { CoreAddressTypes } from '../database/primitives/enums';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 
-import { encryptWithPassword } from '../../../../../utils/passwordCipher';
-
-export function decryptKey(
-  privateKeyRow: KeyRow,
-  decryptPrivateDeriverPassword: ?string,
-): RustModule.Wallet.PrivateKey {
-  let rootPk;
-  if (privateKeyRow.IsEncrypted) {
-    if (decryptPrivateDeriverPassword == null) {
-      throw new WrongPassphraseError();
+export function addressToKind(
+  address: string
+): CoreAddressT {
+  try {
+    // Need to try parsing as a legacy address first
+    // Since parsing as bech32 directly may give a wrong result if the address contains a 1
+    RustModule.WalletV2.Address.from_base58(address);
+    return CoreAddressTypes.CARDANO_LEGACY;
+  } catch (_e1) {
+    try {
+      const wasmAddr = RustModule.WalletV3.Address.from_bytes(
+        Buffer.from(address, 'hex')
+      );
+      switch (wasmAddr.get_kind()) {
+        case RustModule.WalletV3.AddressKind.Single: return CoreAddressTypes.SHELLEY_SINGLE;
+        case RustModule.WalletV3.AddressKind.Group: return CoreAddressTypes.SHELLEY_GROUP;
+        case RustModule.WalletV3.AddressKind.Account: return CoreAddressTypes.SHELLEY_ACCOUNT;
+        case RustModule.WalletV3.AddressKind.Multisig: return CoreAddressTypes.SHELLEY_MULTISIG;
+        default: throw new Error('addressToKind unknown address type ' + address);
+      }
+    } catch (_e2) {
+      throw new Error('addressToKind failed to parse address type ' + address);
     }
-    rootPk = getCryptoWalletFromEncryptedMasterKey(
-      privateKeyRow.Hash,
-      decryptPrivateDeriverPassword
-    );
-  } else {
-    rootPk = getCryptoWalletFromMasterKey(privateKeyRow.Hash);
   }
-  return rootPk.key();
-}
-
-export function deriveKey(
-  startingKey: RustModule.Wallet.PrivateKey,
-  pathToPublic: Array<number>,
-): RustModule.Wallet.PrivateKey {
-  let currKey = startingKey;
-  for (let i = 0; i < pathToPublic.length; i++) {
-    currKey = currKey.derive(
-      RustModule.Wallet.DerivationScheme.v2(),
-      pathToPublic[i],
-    );
-  }
-
-  return currKey;
-}
-
-export type KeyInfo = {
-  password: string | null,
-  lastUpdate: Date | null
-};
-export function toKeyInsert(
-  keyInfo: KeyInfo,
-  keyHex: string,
-): KeyInsert {
-  const hash = keyInfo.password !== null
-    ? encryptWithPassword(
-      keyInfo.password,
-      Buffer.from(keyHex, 'hex')
-    )
-    : keyHex;
-
-  return {
-    Hash: hash,
-    IsEncrypted: keyInfo.password != null,
-    PasswordLastUpdate: keyInfo.lastUpdate,
-  };
 }

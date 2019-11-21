@@ -44,15 +44,15 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  isActionProcessing: boolean,
-  error: ?LocalizableError,
-  verify: Function,
-  cancel: Function,
-  selectedExplorer: ExplorerType,
-  isHardware: boolean,
-  walletAddress: string,
-  walletPath: BIP32Path,
-  classicTheme: boolean,
+  +isActionProcessing: boolean,
+  +error: ?LocalizableError,
+  +verify: Function,
+  +cancel: Function,
+  +selectedExplorer: ExplorerType,
+  +isHardware: boolean,
+  +walletAddress: string,
+  +walletPath: BIP32Path,
+  +classicTheme: boolean,
 |};
 
 @observer

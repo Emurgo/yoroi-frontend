@@ -7,8 +7,8 @@ import classnames from 'classnames';
 import styles from './RawHash.scss';
 
 type Props = {|
-  children: ?Node,
-  light: boolean,
+  +children: ?Node,
+  +light: boolean,
 |};
 
 @observer

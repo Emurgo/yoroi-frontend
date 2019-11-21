@@ -16,20 +16,26 @@ export default class UiDialogsStore extends Store {
 
   _secondsTimerInterval: ?IntervalID = null;
 
-  setup() {
+  setup(): void {
     this.actions.dialogs.open.listen(this._onOpen);
     this.actions.dialogs.closeActiveDialog.listen(this._onClose);
     this.actions.dialogs.resetActiveDialog.listen(this._reset);
     this.actions.dialogs.updateDataForActiveDialog.listen(this._onUpdateDataForActiveDialog);
   }
 
-  isOpen = (dialog: Function): boolean => (this.activeDialog
+  isOpen: Function => boolean = (
+    dialog: Function
+  ): boolean => (this.activeDialog
     ? this.activeDialog.name === dialog.name
     : false);
 
-  getParam = (key: string): string => this.paramsForActiveDialog[key];
+  getParam: <T>(number | string) => T = <T>(
+    key: (number | string)
+  ): T => this.paramsForActiveDialog[key];
 
-  countdownSinceDialogOpened = (countDownTo: number) => (
+  countdownSinceDialogOpened: number => number = (
+    countDownTo: number
+  ): number => (
     Math.max(countDownTo - this.secondsSinceActiveDialogIsOpen, 0)
   );
 

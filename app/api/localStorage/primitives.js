@@ -8,7 +8,9 @@ import environment from '../../environment';
  * so the WebPage will use the `localStorage`.
  */
 
+/*::
 declare var chrome;
+*/
 
 // =====
 //  get
@@ -141,16 +143,16 @@ export function addListener(
     });
   } else {
     window.addEventListener('storage', (e: StorageEvent) => {
-      // can't map behavior when key is null  (happens when .clear() is called)
+      // can't map behavior when key is null (happens when .clear() is called)
       if (e.key == null) {
         return;
       }
-      const oldValue = e.oldValue != null
+      const oldValue: {| oldValue?: any |} = e.oldValue != null
         ? { oldValue: JSON.parse(e.oldValue) }
-        : {};
-      const newValue = e.newValue != null
+        : Object.freeze({});
+      const newValue: {| newValue?: any |}  = e.newValue != null
         ? { newValue: JSON.parse(e.newValue) }
-        : {};
+        : Object.freeze({});
       listener({
         [e.key]: {
           ...oldValue,

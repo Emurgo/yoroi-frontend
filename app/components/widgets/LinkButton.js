@@ -1,17 +1,16 @@
 // @flow
 import React, { Component } from 'react';
 import type { MessageDescriptor } from 'react-intl';
-import SvgInline from 'react-svg-inline';
 import { intlShape } from 'react-intl';
 import styles from './LinkButton.scss';
 
 type Props = {|
-  url: string,
-  svg: string,
-  message: MessageDescriptor,
-  svgClass?: string,
-  textClassName: string,
-  onExternalLinkClick: Function,
+  +url: string,
+  +svg: string,
+  +message: MessageDescriptor,
+  +svgClass?: string,
+  +textClassName: string,
+  +onExternalLinkClick: Function,
 |};
 
 export default class LinkButton extends Component<Props> {
@@ -34,6 +33,7 @@ export default class LinkButton extends Component<Props> {
       onExternalLinkClick
     } = this.props;
 
+    const SvgElem = svg;
     return (
       <div className={styles.component}>
         <a
@@ -43,7 +43,7 @@ export default class LinkButton extends Component<Props> {
           title={intl.formatMessage(message)}
         >
           <div className={styles.icon}>
-            <SvgInline svg={svg} className={svgClass} />
+            <span className={svgClass}><SvgElem /></span>
           </div>
           <div className={styles.text}>
             <span className={textClassName}>

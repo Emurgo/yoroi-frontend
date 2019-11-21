@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
-import SvgInline from 'react-svg-inline';
 import { Input } from 'react-polymorph/lib/components/Input';
 import { InputOwnSkin } from '../../../../themes/skins/InputOwnSkin';
 
@@ -17,13 +16,13 @@ import ProgressStepBlock from '../common/ProgressStepBlock';
 import HelpLinkBlock from './HelpLinkBlock';
 import HWErrorBlock from '../common/HWErrorBlock';
 
-import infoIconSVG from '../../../../assets/images/hardware-wallet/info-icon.inline.svg';
+import InfoIconSVG from '../../../../assets/images/info-icon.inline.svg';
 
-import saveLoadImage from '../../../../assets/images/hardware-wallet/ledger/save-load-modern.inline.svg';
-import saveErrorImage from '../../../../assets/images/hardware-wallet/ledger/save-error-modern.inline.svg';
+import SaveLoadImage from '../../../../assets/images/hardware-wallet/ledger/save-load-modern.inline.svg';
+import SaveErrorImage from '../../../../assets/images/hardware-wallet/ledger/save-error-modern.inline.svg';
 
-import saveLoadSVG from '../../../../assets/images/hardware-wallet/ledger/save-load.inline.svg';
-import saveErrorSVG from '../../../../assets/images/hardware-wallet/ledger/save-error.inline.svg';
+import SaveLoadSVG from '../../../../assets/images/hardware-wallet/ledger/save-load.inline.svg';
+import SaveErrorSVG from '../../../../assets/images/hardware-wallet/ledger/save-error.inline.svg';
 
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
@@ -38,7 +37,7 @@ import styles from '../common/SaveDialog.scss';
 import headerMixin from '../../../mixins/HeaderBlock.scss';
 import config from '../../../../config';
 
-const saveStartSVG = saveLoadSVG;
+const SaveStartSVG = SaveLoadSVG;
 
 const messages = defineMessages({
   saveWalletNameInputBottomInfo: {
@@ -48,14 +47,14 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  progressInfo: ProgressInfo,
-  error: ?LocalizableError,
-  isActionProcessing: boolean,
-  defaultWalletName: string,
-  onExternalLinkClick: Function,
-  submit: Function,
-  cancel: Function,
-  classicTheme: boolean,
+  +progressInfo: ProgressInfo,
+  +error: ?LocalizableError,
+  +isActionProcessing: boolean,
+  +defaultWalletName: string,
+  +onExternalLinkClick: Function,
+  +submit: string => void,
+  +cancel: Function,
+  +classicTheme: boolean,
 |};
 
 @observer
@@ -122,7 +121,7 @@ export default class SaveDialog extends Component<Props> {
       <div className={classnames([headerMixin.headerBlock, styles.headerSaveBlock])}>
         <div className={styles.walletNameInfoWrapper}>
           <div className={styles.walletNameInfoIcon}>
-            <SvgInline svg={infoIconSVG} width="20" height="20" />
+            <InfoIconSVG width="20" height="20" />
           </div>
           <div className={styles.walletNameInfo}>
             {intl.formatMessage(messages.saveWalletNameInputBottomInfo)}
@@ -143,19 +142,28 @@ export default class SaveDialog extends Component<Props> {
       case StepState.LOAD:
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleSaveLoadBlock])}>
-            <SvgInline svg={classicTheme ? saveLoadSVG : saveLoadImage} />
+            {classicTheme
+              ? <SaveLoadSVG />
+              : <SaveLoadImage />
+            }
           </div>);
         break;
       case StepState.PROCESS:
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleSaveStartProcessBlock])}>
-            <SvgInline svg={classicTheme ? saveStartSVG : saveLoadImage} />
+            {classicTheme
+              ? <SaveStartSVG />
+              : <SaveLoadImage />
+            }
           </div>);
         break;
       case StepState.ERROR:
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleSaveErrorBlock])}>
-            <SvgInline svg={classicTheme ? saveErrorSVG : saveErrorImage} />
+            {classicTheme
+              ? <SaveErrorSVG />
+              : <SaveErrorImage />
+            }
           </div>);
         break;
       default:

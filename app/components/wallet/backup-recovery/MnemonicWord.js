@@ -7,11 +7,11 @@ import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import styles from './MnemonicWord.scss';
 
 type Props = {|
-  word: string,
-  index: number,
-  isActive: boolean,
-  onClick: Function,
-  classicTheme: boolean
+  +word: string,
+  +index: number,
+  +isActive: boolean,
+  +onClick: Function,
+  +classicTheme: boolean
 |};
 
 @observer

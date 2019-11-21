@@ -15,14 +15,14 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  formattedWalletAmount: Function,
-  selectedExplorer: ExplorerType,
-  transferTx: TransferTx,
-  onSubmit: Function,
-  isSubmitting: boolean,
-  onCancel: Function,
-  error: ?LocalizableError,
-  classicTheme: boolean
+  +formattedWalletAmount: Function,
+  +selectedExplorer: ExplorerType,
+  +transferTx: TransferTx,
+  +onSubmit: Function,
+  +isSubmitting: boolean,
+  +onCancel: Function,
+  +error: ?LocalizableError,
+  +classicTheme: boolean
 |};
 
 /** Show user what the transfer would do to get final confirmation */

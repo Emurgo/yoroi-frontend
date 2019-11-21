@@ -80,6 +80,14 @@ const messages = defineMessages({
     id: 'api.errors.getTxHistoryForAddressesApiError',
     defaultMessage: '!!!Error received from server while getting txs.',
   },
+  rollbackApiError: {
+    id: 'api.errors.rollbackApiError',
+    defaultMessage: '!!!Rollback was detected.',
+  },
+  getBestBlockApiError: {
+    id: 'api.errors.getBestBlockApiError',
+    defaultMessage: '!!!Error received from server while getting best block.',
+  },
   sendTransactionApiError: {
     id: 'api.errors.sendTransactionApiError',
     defaultMessage: '!!!Error received from server while sending tx.',
@@ -269,6 +277,24 @@ export class GetTxHistoryForAddressesApiError extends LocalizableError {
     super({
       id: messages.getTxHistoryForAddressesApiError.id,
       defaultMessage: messages.getTxHistoryForAddressesApiError.defaultMessage || '',
+    });
+  }
+}
+
+export class RollbackApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.rollbackApiError.id,
+      defaultMessage: messages.rollbackApiError.defaultMessage || '',
+    });
+  }
+}
+
+export class GetBestBlockError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getBestBlockApiError.id,
+      defaultMessage: messages.getBestBlockApiError.defaultMessage || '',
     });
   }
 }

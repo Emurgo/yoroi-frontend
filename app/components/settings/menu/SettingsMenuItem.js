@@ -5,11 +5,11 @@ import classNames from 'classnames';
 import styles from './SettingsMenuItem.scss';
 
 type Props = {|
-  label: string,
-  active: boolean,
-  onClick: Function,
-  className: string,
-  disabled?: boolean,
+  +label: string,
+  +active: boolean,
+  +onClick: Function,
+  +className: string,
+  +disabled?: boolean,
 |};
 
 @observer

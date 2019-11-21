@@ -4,20 +4,23 @@ import BigNumber from 'bignumber.js';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import moment from 'moment';
-import SvgInline from 'react-svg-inline';
 import classNames from 'classnames';
 import { uniq } from 'lodash';
 import styles from './Transaction.scss';
-import adaSymbol from '../../../assets/images/ada-symbol.inline.svg';
-import WalletTransaction, { transactionStates, transactionTypes } from '../../../domain/WalletTransaction';
+import AdaSymbol from '../../../assets/images/ada-symbol.inline.svg';
+import WalletTransaction from '../../../domain/WalletTransaction';
 import { environmentSpecificMessages } from '../../../i18n/global-messages';
-import type { TransactionState, TransactionDirectionType } from '../../../domain/WalletTransaction';
+import type { TransactionDirectionType, } from '../../../api/ada/transactions/types';
+import { transactionTypes } from '../../../api/ada/transactions/types';
+import type { AssuranceLevel } from '../../../types/transactionAssuranceTypes';
 import environment from '../../../environment';
 import { Logger } from '../../../utils/logging';
-import expandArrow from '../../../assets/images/expand-arrow.inline.svg';
+import ExpandArrow from '../../../assets/images/expand-arrow.inline.svg';
 import RawHash from '../../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../../domain/Explorer';
+import { TxStatusCodes, } from '../../../api/ada/lib/storage/database/primitives/enums';
+import type { TxStatusCodesType, } from '../../../api/ada/lib/storage/database/primitives/enums';
 
 const messages = defineMessages({
   type: {
@@ -113,12 +116,12 @@ const stateTranslations = defineMessages({
 });
 
 type Props = {|
-  data: WalletTransaction,
-  state: TransactionState,
-  selectedExplorer: ExplorerType,
-  assuranceLevel: string,
-  isLastInList: boolean,
-  formattedWalletAmount: Function,
+  +data: WalletTransaction,
+  +state: TxStatusCodesType,
+  +selectedExplorer: ExplorerType,
+  +assuranceLevel: AssuranceLevel,
+  +isLastInList: boolean,
+  +formattedWalletAmount: Function,
 |};
 
 type State = {
@@ -175,13 +178,30 @@ export default class Transaction extends Component<Props, State> {
     ]);
   }
 
+  getStatusString(
+    intl: $npm$ReactIntl$IntlFormat,
+    state: number,
+    assuranceLevel: AssuranceLevel,
+  ) {
+    if (state === TxStatusCodes.IN_BLOCK) {
+      return intl.formatMessage(assuranceLevelTranslations[assuranceLevel]);
+    }
+    if (state === TxStatusCodes.PENDING) {
+      return intl.formatMessage(stateTranslations.pending);
+    }
+    if (state < 0) {
+      return intl.formatMessage(stateTranslations.failed);
+    }
+    throw new Error('getStatusString unexpected state ' + state);
+  }
+
   render() {
     const data = this.props.data;
     const { isLastInList, state, assuranceLevel, formattedWalletAmount } = this.props;
     const { isExpanded } = this.state;
     const { intl } = this.context;
-    const isFailedTransaction = state === transactionStates.FAILED;
-    const isPendingTransaction = state === transactionStates.PENDING;
+    const isFailedTransaction = state < 0;
+    const isPendingTransaction = state === TxStatusCodes.PENDING;
 
     const componentStyles = classNames([
       styles.component,
@@ -206,18 +226,15 @@ export default class Transaction extends Component<Props, State> {
 
     const labelClasses = classNames([
       styles.label,
-      styles[`${state}Label`]
+      isFailedTransaction ? styles.failedLabel : '',
+      isPendingTransaction ? styles.pendingLabel : '',
     ]);
 
     const arrowClasses = isExpanded ? styles.collapseArrow : styles.expandArrow;
 
-    const status = state === transactionStates.OK
-      ? intl.formatMessage(assuranceLevelTranslations[assuranceLevel])
-      // $FlowFixMe flow doesn't support type refinments with enums
-      : intl.formatMessage(stateTranslations[state]);
+    const status = this.getStatusString(intl, state, assuranceLevel);
 
     const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
-    const symbol = adaSymbol;
 
     return (
       <div className={componentStyles}>
@@ -232,7 +249,7 @@ export default class Transaction extends Component<Props, State> {
               <div className={styles.time}>
                 {moment(data.date).format('hh:mm:ss A')}
               </div>
-              {state === transactionStates.OK ? (
+              {state === TxStatusCodes.IN_BLOCK ? (
                 <div className={labelOkClasses}>{status}</div>
               ) : (
                 <div className={labelClasses}>
@@ -245,11 +262,11 @@ export default class Transaction extends Component<Props, State> {
                   // hide currency (we are showing symbol instead)
                   formattedWalletAmount(data.amount, false)
                 }
-                <SvgInline svg={symbol} className={styles.currencySymbol} />
+                <span className={styles.currencySymbol}><AdaSymbol /></span>
               </div>
 
               <div className={styles.expandArrowBox}>
-                <SvgInline className={arrowClasses} svg={expandArrow} />
+                <span className={arrowClasses}><ExpandArrow /></span>
               </div>
             </div>
           </div>
@@ -317,7 +334,7 @@ export default class Transaction extends Component<Props, State> {
               {environment.isAdaApi() ? (
                 <div className={styles.row}>
                   <h2>{intl.formatMessage(messages.assuranceLevel)}</h2>
-                  {state === transactionStates.OK ? (
+                  {state === TxStatusCodes.IN_BLOCK ? (
                     <span className={styles.rowData}>
                       <span className={styles.assuranceLevel}>{status}</span>
                       . {data.numberOfConfirmations} {intl.formatMessage(messages.confirmations)}.

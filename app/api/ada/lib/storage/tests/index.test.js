@@ -1,278 +1,332 @@
 // @flow
 
+import {
+  schema,
+} from 'lovefield';
 import '../../test-config';
 import { loadLovefieldDB } from '../database/index';
 import {
-  GetAllBip44Wallets,
-} from '../database/uncategorized/api/get';
+  HARD_DERIVATION_START,
+  CARDANO_COINTYPE,
+  BIP44_PURPOSE,
+  EXTERNAL,
+  INTERNAL,
+} from '../../../../../config/numbersConfig';
+
 import {
-  GetDerivationsByPath,
-  GetDerivation,
-} from '../database/genericBip44/api/get';
+  UnusedAddressesError,
+} from '../../../../common';
 import {
-  DerivationLevels,
-} from '../database/genericBip44/api/utils';
-import type {
-  Bip44AddressRow,
-} from '../database/genericBip44/tables';
-import { HARD_DERIVATION_START } from '../../../../../config/numbersConfig';
+  WrongPassphraseError,
+} from '../../cardanoCrypto/cryptoErrors';
 
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 
-import { Bip44Wallet } from '../models/Bip44Wallet';
-import { LovefieldBridge } from '../bridge/lovefieldBridge';
-import { LovefieldDerive } from '../bridge/lovefieldDerive';
-import { WalletBuilder } from '../bridge/walletBuilder';
+import {
+  Bip44Wallet,
+} from '../models/Bip44Wallet/wrapper';
+import {
+  asPublicFromPrivate,
+  asGetPrivateDeriverKey,
+} from '../models/ConceptualWallet/traits';
+import {
+  PublicDeriver,
+} from '../models/PublicDeriver/index';
+import {
+  asAddBip44FromPublic,
+  asGetAllUtxos,
+  asDisplayCutoff,
+  asHasUtxoChains,
+  asGetSigningKey,
+  asGetPublicKey
+} from '../models/PublicDeriver/traits';
+import {
+  createStandardBip44Wallet,
+} from '../bridge/walletBuilder/byron';
 
-import { getAllSchemaTables, raii } from '../database/utils';
+import type { ConfigType } from '../../../../../../config/config-types';
 
-import { snapshot } from './snapshot';
+jest.mock('../../../../../utils/passwordCipher');
+jest.mock('../database/initialSeed');
+
+declare var CONFIG: ConfigType;
+const protocolMagic = CONFIG.network.protocolMagic;
 
 const mnemonic = 'prevent company field green slot measure chief hero apple task eagle sunset endorse dress seed';
-// TODO
-// const _password = 'greatest_password_ever';
-const coinTypeIndex = 0x80000000 + 1815;
-const purposeIndex = 0x80000000 + 44;
+
+const privateDeriverPassword = 'greatest_password_ever';
+const passwordHash = Buffer.from(privateDeriverPassword).toString('hex');
 
 beforeAll(async () => {
   await RustModule.load();
 });
 
-test('Can add and fetch address in wallet', async () => {
-  const setting = RustModule.Wallet.BlockchainSettings.from_json({
-    protocol_magic: 764824073 // mainnet
+test('Can add and fetch address in wallet', async (done) => {
+  const settings = RustModule.WalletV2.BlockchainSettings.from_json({
+    protocol_magic: protocolMagic
   });
-  const entropy = RustModule.Wallet.Entropy.from_english_mnemonics(mnemonic);
-  const rootPk = RustModule.Wallet.Bip44RootPrivateKey.recover(entropy, '');
+  const entropy = RustModule.WalletV2.Entropy.from_english_mnemonics(mnemonic);
+  const rootPk = RustModule.WalletV2.Bip44RootPrivateKey.recover(entropy, '');
 
-  const db = await loadLovefieldDB(true);
+  const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
 
   const firstAccountIndex = 0 + HARD_DERIVATION_START;
   const firstAccountPk = rootPk.bip44_account(
-    RustModule.Wallet.AccountIndex.new(firstAccountIndex)
+    RustModule.WalletV2.AccountIndex.new(firstAccountIndex)
   );
-  const firstAddress = firstAccountPk
+  const firstExternalAddressKey = firstAccountPk
     .bip44_chain(false)
-    .address_key(RustModule.Wallet.AddressKeyIndex.new(0));
-  const firstAddressHash = firstAddress.public().bootstrap_era_address(setting).to_base58();
+    .address_key(RustModule.WalletV2.AddressKeyIndex.new(0));
+  const firstExternalAddressHash = firstExternalAddressKey
+    .public()
+    .bootstrap_era_address(settings)
+    .to_base58();
 
-  let state;
-  {
-    state = await WalletBuilder
-      .start(db)
-      .addConceptualWallet(
-        _finalState => ({
-          CoinType: coinTypeIndex,
-          Name: 'My Test Wallet',
-        })
-      )
-      .addBip44Wrapper(
-        finalState => ({
-          ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
-          IsBundled: false,
-          SignerLevel: DerivationLevels.ACCOUNT.level,
-          PublicDeriverLevel: DerivationLevels.ACCOUNT.level,
-          Version: 2,
-        })
-      )
-      .addPrivateDeriver(
-        finalState => ({
-          pathToPrivate: [],
-          addLevelRequest: parent => ({
-            privateKeyInfo: {
-              Hash: rootPk.key().to_hex(),
-              IsEncrypted: false,
-              PasswordLastUpdate: null,
-            },
-            publicKeyInfo: null,
-            derivationInfo: keys => ({
-              PublicKeyId: keys.public,
-              PrivateKeyId: keys.private,
-              Parent: parent,
-              Index: null,
-            }),
-            levelInfo: id => ({
-              KeyDerivationId: id,
-            })
-          }),
-          addPrivateDeriverRequest: derivationId => ({
-            Bip44WrapperId: finalState.bip44WrapperRow.Bip44WrapperId,
-            KeyDerivationId: derivationId,
-            Level: DerivationLevels.ROOT.level,
-          }),
-        })
-      )
-      .derivePublicDeriver(
-        _finalState => ({
-          decryptPrivateDeriverPassword: null, // TODO
-          publicDeriverPublicKey: {
-            password: null,
-            lastUpdate: null, // purposely null to avoid  diff in test
-          },
-          publicDeriverPrivateKey: {
-            password: null, // TODO
-            lastUpdate: null, // purposely null to avoid  diff in test
-          },
-          publicDeriverInsert: id => ({
-            KeyDerivationId: id,
-            Name: 'First account',
-            LastBlockSync: 0,
-          }),
-          pathToPublic: [
-            {
-              index: purposeIndex,
-              insert: {},
-            },
-            {
-              index: coinTypeIndex,
-              insert: {},
-            },
-            {
-              index: firstAccountIndex,
-              insert: {},
-            },
-          ],
-        })
-      )
-      .deriveFromPublic(
-        finalState => ({
-          tree: {
-            derivationId: finalState.publicDeriver[0].levelResult.KeyDerivation.KeyDerivationId,
-            children: [
-              {
-                index: 0, // external chain,
-                insert: { LastReceiveIndex: 0 },
-                children: [
-                  {
-                    index: 0,
-                    insert: { Hash: firstAddressHash },
-                  }
-                ],
-              },
-              {
-                index: 1, // internal chain,
-                insert: { LastReceiveIndex: null },
-                children: [],
-              }
-            ]
-          },
-          level: finalState.bip44WrapperRow.PublicDeriverLevel
-        })
-      )
-      .commit();
-  }
+  const state = await createStandardBip44Wallet({
+    db,
+    settings,
+    rootPk,
+    password: privateDeriverPassword,
+    accountIndex: HARD_DERIVATION_START + 0,
+    walletName: 'My Test Wallet',
+    accountName: '',
+  });
 
   // test wallet functionality detection and usage
+  let bipWallet;
   {
     const accountIndex = 1 + HARD_DERIVATION_START;
-    const bridge = new LovefieldBridge(db);
-    const bipWallet = new Bip44Wallet(
-      state.conceptualWalletRow.ConceptualWalletId,
-      state.bip44WrapperRow.Bip44WrapperId,
+    bipWallet = await Bip44Wallet.createBip44Wallet(
+      db,
+      state.bip44WrapperRow,
+      protocolMagic,
     );
-    await bridge.addBip44WalletFunctionality(bipWallet);
-    expect(bipWallet instanceof LovefieldDerive).toEqual(true);
-    if (!(bipWallet instanceof LovefieldDerive)) {
-      throw new Error('should never happen due to assertion above');
+    const withPublicFromPrivate = asPublicFromPrivate(bipWallet);
+    expect(withPublicFromPrivate != null).toEqual(true);
+    if (withPublicFromPrivate != null) {
+      await withPublicFromPrivate.derivePublicDeriverFromPrivate(
+        {
+          publicDeriverMeta: {
+            name: 'Checking account',
+          },
+          path: [BIP44_PURPOSE, CARDANO_COINTYPE, accountIndex],
+          decryptPrivateDeriverPassword: privateDeriverPassword,
+          initialDerivations: [
+            {
+              index: 0, // external chain,
+              insert: insertRequest => Promise.resolve({
+                KeyDerivationId: insertRequest.keyDerivationId,
+                DisplayCutoff: 0,
+              }),
+              children: [],
+            },
+            {
+              index: 1, // internal chain,
+              insert: insertRequest => Promise.resolve({
+                KeyDerivationId: insertRequest.keyDerivationId,
+                DisplayCutoff: null,
+              }),
+              children: [],
+            }
+          ]
+        },
+      );
     }
-    await bipWallet.derive(
-      {
-        publicDeriverInsert: id => ({
-          KeyDerivationId: id,
-          Name: 'Checking account',
-          LastBlockSync: 0,
-        }),
-        pathToPublic: [
-          {
-            index: purposeIndex,
-            insert: {},
-          },
-          {
-            index: coinTypeIndex,
-            insert: {},
-          },
-          {
-            index: accountIndex,
-            insert: {},
-          },
-        ],
-        decryptPrivateDeriverPassword: null,
-        publicDeriverPublicKey: {
-          password: null, // TODO
-          lastUpdate: null,
-        },
-        publicDeriverPrivateKey: {
-          password: null, // TODO
-          lastUpdate: null,
-        },
-      },
-      {},
-    );
+
+    const withPrivateDeriverKey = asGetPrivateDeriverKey(bipWallet);
+    expect(withPrivateDeriverKey != null).toEqual(true);
+    if (withPrivateDeriverKey != null) {
+      const key = await withPrivateDeriverKey.getPrivateDeriverKey();
+      expect(key.keyDerivation.PrivateKeyId).toEqual(key.keyRow.KeyId);
+      expect(key.keyRow.Hash).toEqual(rootPk.key().to_hex() + passwordHash);
+      expect(key.keyRow.PasswordLastUpdate).toEqual(null);
+      expect(key.keyRow.IsEncrypted).toEqual(true);
+
+      const newDate = new Date(Date.now());
+      const newKey = await withPrivateDeriverKey.changePrivateDeriverPassword({
+        oldPassword: privateDeriverPassword,
+        newPassword: 'asdf',
+        currentTime: newDate,
+      });
+      expect(newKey.Hash).toEqual(rootPk.key().to_hex() + '61736466');
+      expect(newKey.PasswordLastUpdate).toEqual(newDate);
+      expect(newKey.IsEncrypted).toEqual(true);
+
+      // input previous password to make sure it no longer works
+      try {
+        await withPrivateDeriverKey.changePrivateDeriverPassword({
+          oldPassword: privateDeriverPassword,
+          newPassword: 'asdf',
+          currentTime: newDate,
+        });
+        done.fail(new Error('Above function should have thrown'));
+      } catch (e) {
+        expect(e).toBeInstanceOf(WrongPassphraseError);
+      }
+
+      // reset after test
+      await withPrivateDeriverKey.changePrivateDeriverPassword({
+        oldPassword: 'asdf',
+        newPassword: privateDeriverPassword,
+        currentTime: key.keyRow.PasswordLastUpdate,
+      });
+    }
   }
 
-  // test that all derivations are presetn as expected
-  await raii(
-    db,
-    [
-      ...getAllSchemaTables(db, GetDerivationsByPath),
-      ...getAllSchemaTables(db, GetDerivation),
-    ],
-    async tx => {
-      const addressesForAccount = await GetDerivationsByPath.get(
-        db,
-        tx,
-        state.publicDeriver[0].levelResult.KeyDerivation.KeyDerivationId,
-        [purposeIndex, coinTypeIndex, firstAccountIndex],
-        [null, null]
-      );
-      const dbAddresses = await GetDerivation.get<Bip44AddressRow>(
-        db,
-        tx,
-        Array.from(addressesForAccount.keys()),
-        DerivationLevels.ADDRESS.level,
-      );
-      const result = dbAddresses.map(row => (
-        { hash: row.Hash, addressing: addressesForAccount.get(row.KeyDerivationId) }
-      ));
+  // test Public Deriver functionality
+  {
+    const publicDeriver = await PublicDeriver.createPublicDeriver(
+      state.publicDeriver[0].publicDeriverResult,
+      bipWallet,
+    );
 
-      expect(result.length).toEqual(1);
-      expect(result[0].hash).toEqual(firstAddressHash);
-      expect(result[0].addressing).toEqual([
-        purposeIndex, coinTypeIndex, firstAccountIndex, 0, 0
+    // test renaming conceptual wallet
+    {
+      await publicDeriver.rename({
+        newName: 'rename test',
+      });
+      const info = await publicDeriver.getFullPublicDeriverInfo();
+      expect(info.Name).toEqual('rename test');
+      await publicDeriver.rename({
+        newName: '',
+      });
+    }
+
+    const withUtxos = asGetAllUtxos(publicDeriver);
+    expect(withUtxos != null).toEqual(true);
+    if (withUtxos != null) {
+      const addresses = await withUtxos.getAllUtxoAddresses();
+      expect(addresses.length).toEqual(40);
+      expect(addresses[0].addrs[0].Hash).toEqual(firstExternalAddressHash);
+      expect(addresses[0].addressing.path).toEqual([
+        BIP44_PURPOSE, CARDANO_COINTYPE, firstAccountIndex, 0, 0
       ]);
     }
-  );
 
-  // test GetAllBip44Wallets
-  await raii(
-    db,
-    getAllSchemaTables(db, GetAllBip44Wallets),
-    async tx => {
-      const bip44Wallets = await GetAllBip44Wallets.get(
-        db,
-        tx,
+    const asGetPublicKeyInstance = asGetPublicKey(publicDeriver);
+    expect(asGetPublicKeyInstance != null).toEqual(true);
+    if (asGetPublicKeyInstance != null) {
+      const pubKey = await asGetPublicKeyInstance.getPublicKey();
+      expect(pubKey.Hash).toEqual(firstAccountPk.public().key().to_hex());
+    }
+
+    const asHasUtxoChainsInstance = asHasUtxoChains(publicDeriver);
+    expect(asHasUtxoChainsInstance != null).toEqual(true);
+    if (asHasUtxoChainsInstance != null) {
+      const externalAddresses = await asHasUtxoChainsInstance.getAddressesForChain({
+        chainId: EXTERNAL,
+      });
+      expect(externalAddresses.length).toEqual(20);
+      expect(externalAddresses[0].addrs[0].Hash).toEqual(
+        firstAccountPk
+          .bip44_chain(false)
+          .address_key(RustModule.WalletV2.AddressKeyIndex.new(0))
+          .public()
+          .bootstrap_era_address(settings)
+          .to_base58()
       );
 
-      expect(JSON.stringify(bip44Wallets)).toEqual(JSON.stringify([
-        {
-          ConceptualWallet: {
-            CoinType: 2147485463,
-            Name: 'My Test Wallet',
-            ConceptualWalletId: 1
-          },
-          Bip44Wrapper: {
-            ConceptualWalletId: 1,
-            IsBundled: false,
-            SignerLevel: 3,
-            PublicDeriverLevel: 3,
-            Version: 2,
-            Bip44WrapperId: 1
-          }
-        }
-      ]));
+      const internalAddresses = await asHasUtxoChainsInstance.getAddressesForChain({
+        chainId: INTERNAL,
+      });
+      expect(internalAddresses.length).toEqual(20);
+      expect(internalAddresses[0].addrs[0].Hash).toEqual(
+        firstAccountPk
+          .bip44_chain(true)
+          .address_key(RustModule.WalletV2.AddressKeyIndex.new(0))
+          .public()
+          .bootstrap_era_address(settings)
+          .to_base58()
+      );
     }
-  );
 
-  // console.log(JSON.stringify(await db.export()));
-  expect(JSON.stringify(await db.export())).toEqual(JSON.stringify(snapshot));
+    const asDisplayCutoffInstance = asDisplayCutoff(publicDeriver);
+    expect(asDisplayCutoffInstance != null).toEqual(true);
+    if (asDisplayCutoffInstance != null) {
+      // test get
+      expect(await asDisplayCutoffInstance.getCutoff()).toEqual(0);
+
+      // test pop
+      const popped = await asDisplayCutoffInstance.popAddress();
+      const nextIndex = 1;
+      expect(popped.index).toEqual(nextIndex);
+      const expectedAddress = firstAccountPk
+        .bip44_chain(false)
+        .address_key(RustModule.WalletV2.AddressKeyIndex.new(nextIndex))
+        .public()
+        .bootstrap_era_address(settings)
+        .to_base58();
+      expect(popped.addrs[0].Hash).toEqual(expectedAddress);
+      expect(await asDisplayCutoffInstance.getCutoff()).toEqual(1);
+
+      // test set
+      await asDisplayCutoffInstance.setCutoff({ newIndex: 19 });
+      expect(await asDisplayCutoffInstance.getCutoff()).toEqual(19);
+
+      // test pop after no addresses left
+      try {
+        await asDisplayCutoffInstance.popAddress();
+        done.fail(new Error('Above function should have thrown'));
+      } catch (e) {
+        expect(e).toBeInstanceOf(UnusedAddressesError);
+      }
+
+      // reset state after test
+      await asDisplayCutoffInstance.setCutoff({ newIndex: 0 });
+    }
+
+    const asGetSigningKeyInstance = asGetSigningKey(publicDeriver);
+    expect(asGetSigningKeyInstance != null).toEqual(true);
+    if (asGetSigningKeyInstance != null) {
+      const signingKey = await asGetSigningKeyInstance.getSigningKey();
+      expect(signingKey.level).toEqual(0);
+      expect(signingKey.row.Hash).toEqual(rootPk.key().to_hex() + passwordHash);
+
+      const normalized = await asGetSigningKeyInstance.normalizeKey({
+        ...signingKey,
+        password: privateDeriverPassword
+      });
+      expect(normalized.prvKeyHex).toEqual(firstAccountPk.key().to_hex());
+      expect(normalized.pubKeyHex).toEqual(firstAccountPk.public().key().to_hex());
+
+      const newDate = new Date(Date.now());
+      const newKey = await asGetSigningKeyInstance.changeSigningKeyPassword({
+        oldPassword: privateDeriverPassword,
+        newPassword: 'asdf',
+        currentTime: newDate,
+      });
+      expect(newKey.Hash).toEqual(rootPk.key().to_hex() + '61736466');
+      expect(newKey.PasswordLastUpdate).toEqual(newDate);
+      expect(newKey.IsEncrypted).toEqual(true);
+
+      // reset after test
+      await asGetSigningKeyInstance.changeSigningKeyPassword({
+        oldPassword: 'asdf',
+        newPassword: privateDeriverPassword,
+        currentTime: signingKey.row.PasswordLastUpdate,
+      });
+    }
+
+    const asAddBip44FromPublicInstance = asAddBip44FromPublic(publicDeriver);
+    expect(asAddBip44FromPublicInstance != null).toEqual(true);
+    if (asAddBip44FromPublicInstance != null) {
+      // TODO
+    }
+  }
+
+  // test renaming conceptual wallet
+  {
+    await bipWallet.rename({
+      newName: 'rename test',
+    });
+    const info = await bipWallet.getFullConceptualWalletInfo();
+    expect(info.Name).toEqual('rename test');
+    await bipWallet.rename({
+      newName: 'My Test Wallet',
+    });
+  }
+
+  const dump = (await db.export()).tables;
+  expect(dump).toMatchSnapshot();
+  done();
 });

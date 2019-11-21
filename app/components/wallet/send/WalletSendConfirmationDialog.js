@@ -21,7 +21,7 @@ import RawHash from '../../widgets/hashWrappers/RawHash';
 import type { ExplorerType } from '../../../domain/Explorer';
 
 import WarningBox from '../../widgets/WarningBox';
-import type { BaseSignRequest } from '../../../api/ada/adaTypes';
+import type { BaseSignRequest } from '../../../api/ada/transactions/types';
 
 const messages = defineMessages({
   walletPasswordLabel: {
@@ -39,20 +39,20 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  staleTx: boolean,
-  selectedExplorer: ExplorerType,
-  amount: string,
-  receivers: Array<string>,
-  totalAmount: string,
-  transactionFee: string,
-  onSubmit: ({ password: string }) => void,
-  amountToNaturalUnits: (amountWithFractions: string) => string,
-  signRequest: BaseSignRequest,
-  onCancel: Function,
-  isSubmitting: boolean,
-  error: ?LocalizableError,
-  currencyUnit: string,
-  classicTheme: boolean,
+  +staleTx: boolean,
+  +selectedExplorer: ExplorerType,
+  +amount: string,
+  +receivers: Array<string>,
+  +totalAmount: string,
+  +transactionFee: string,
+  +onSubmit: ({ password: string }) => void,
+  +amountToNaturalUnits: (amountWithFractions: string) => string,
+  +signRequest: BaseSignRequest,
+  +onCancel: Function,
+  +isSubmitting: boolean,
+  +error: ?LocalizableError,
+  +currencyUnit: string,
+  +classicTheme: boolean,
 |};
 
 @observer

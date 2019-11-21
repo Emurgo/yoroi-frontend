@@ -29,8 +29,13 @@ export const environment = ((
     API: ('ada': Currency), // Note: can't change at runtime
     MOBX_DEV_TOOLS: process.env.MOBX_DEV_TOOLS,
     commit: process.env.COMMIT || '',
+    isJest: () => process.env.NODE_ENV === 'jest' || process.env.NODE_ENV === 'test',
     branch: process.env.BRANCH || '',
     isDev: () => CONFIG.network.name === NetworkType.DEVELOPMENT,
+    isShelley: () => {
+      return CONFIG.network.name === NetworkType.SHELLEY_DEV ||
+        CONFIG.network.name === NetworkType.SHELLEY_TESTNET;
+    },
     isTest: () => CONFIG.network.name === NetworkType.TEST,
     isMainnet: () => environment.NETWORK === NetworkType.MAINNET,
     isAdaApi: () => environment.API === 'ada',
@@ -46,7 +51,9 @@ export const environment = ((
   MOBX_DEV_TOOLS: ?string,
   commit: string,
   branch: string,
+  isJest: void => boolean,
   isDev: void => boolean,
+  isShelley: void => boolean,
   isTest: void => boolean,
   isMainnet: void => boolean,
   isAdaApi: void => boolean,

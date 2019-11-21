@@ -5,9 +5,10 @@ import type {
   TxBodiesRequest, TxBodiesResponse,
   UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
+  BestBlockRequest, BestBlockResponse,
   SignedRequest, SignedResponse,
   FilterUsedRequest, FilterUsedResponse,
-  ServerStatusResponse
+  ServerStatusRequest, ServerStatusResponse
 } from './types';
 
 import type { IFetcher } from './IFetcher';
@@ -22,6 +23,7 @@ import {
   GetUtxosForAddressesApiError,
   GetUtxosSumsForAddressesApiError,
   GetTxHistoryForAddressesApiError,
+  GetBestBlockError,
   SendTransactionApiError,
   CheckAdressesInUseApiError,
   InvalidWitnessError,
@@ -47,7 +49,7 @@ export class RemoteFetcher implements IFetcher {
     this.currentLocale = currentLocale;
   }
 
-  getUTXOsForAddresses = (body: AddressUtxoRequest): Promise<AddressUtxoResponse> => (
+  getUTXOsForAddresses: AddressUtxoRequest => Promise<AddressUtxoResponse> = (body) => (
     axios(
       `${backendUrl}/api/txs/utxoForAddresses`,
       {
@@ -67,7 +69,7 @@ export class RemoteFetcher implements IFetcher {
       })
   )
 
-  getTxsBodiesForUTXOs = (body: TxBodiesRequest): Promise<TxBodiesResponse> => (
+  getTxsBodiesForUTXOs: TxBodiesRequest => Promise<TxBodiesResponse> = (body) => (
     axios(
       `${backendUrl}/api/txs/txBodies`,
       {
@@ -87,7 +89,7 @@ export class RemoteFetcher implements IFetcher {
       })
   )
 
-  getUTXOsSumsForAddresses = (body: UtxoSumRequest): Promise<UtxoSumResponse> => (
+  getUTXOsSumsForAddresses: UtxoSumRequest => Promise<UtxoSumResponse> = (body) => (
     axios(
       `${backendUrl}/api/txs/utxoSumForAddresses`,
       {
@@ -107,28 +109,51 @@ export class RemoteFetcher implements IFetcher {
       })
   )
 
-  getTransactionsHistoryForAddresses = (body: HistoryRequest): Promise<HistoryResponse> => (
+  getTransactionsHistoryForAddresses: HistoryRequest => Promise<HistoryResponse> = (body) => (
     axios(
-      `${backendUrl}/api/txs/history`,
+      `${backendUrl}/api/v2/txs/history`,
       {
         method: 'post',
-        data: {
-          addresses: body.addresses,
-          dateFrom: body.dateFrom
-        },
+        data: body,
         headers: {
           'yoroi-version': this.lastLaunchVersion(),
           'yoroi-locale': this.currentLocale()
         }
       }
-    ).then(response => response.data)
+    ).then(response => {
+      // TODO: remove this once we rename the field in the backend-service
+      return response.data.map(resp => {
+        if (resp.height != null) {
+          return resp;
+        }
+        const height = resp.block_num;
+        delete resp.block_num;
+        return {
+          ...resp,
+          height,
+        };
+      });
+    })
       .catch((error) => {
         Logger.error('RemoteFetcher::getTransactionsHistoryForAddresses error: ' + stringifyError(error));
         throw new GetTxHistoryForAddressesApiError();
       })
   )
 
-  sendTx = (body: SignedRequest): Promise<SignedResponse> => {
+  getBestBlock: BestBlockRequest => Promise<BestBlockResponse> = (_body) => (
+    axios(
+      `${backendUrl}/api/v2/bestblock`,
+      {
+        method: 'get'
+      }
+    ).then(response => response.data)
+      .catch((error) => {
+        Logger.error('RemoteFetcher::getBestBlock error: ' + stringifyError(error));
+        throw new GetBestBlockError();
+      })
+  )
+
+  sendTx: SignedRequest => Promise<SignedResponse> = (body) => {
     const signedTxHex = Buffer.from(
       body.signedTx.to_hex(),
       'hex'
@@ -158,7 +183,7 @@ export class RemoteFetcher implements IFetcher {
       });
   }
 
-  checkAddressesInUse = (body: FilterUsedRequest): Promise<FilterUsedResponse> => (
+  checkAddressesInUse: FilterUsedRequest => Promise<FilterUsedResponse> = (body) => (
     axios(
       `${backendUrl}/api/addresses/filterUsed`,
       {
@@ -178,7 +203,7 @@ export class RemoteFetcher implements IFetcher {
       })
   )
 
-  checkServerStatus = (): Promise<ServerStatusResponse> => (
+  checkServerStatus: ServerStatusRequest => Promise<ServerStatusResponse> = (_body) => (
     axios(
       `${backendUrl}/api/status`,
       {

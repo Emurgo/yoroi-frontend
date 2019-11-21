@@ -2,6 +2,7 @@
 import RingBuffer from 'ringbufferjs';
 import moment from 'moment';
 import FileSaver from 'file-saver';
+import { inspect } from 'util';
 
 import type { ConfigType } from '../../config/config-types';
 
@@ -63,7 +64,7 @@ export const generateLogHeader = () => (
   + `----\r\n` // this like should be always the last line of the header block
 );
 
-export const stringifyData = (data : any) => JSON.stringify(data, null, 2);
+export const stringifyData = (data : any): string => inspect(data);
 
 export const stringifyError = (error : any) => (
   JSON.stringify(error, Object.getOwnPropertyNames(error), 2)

@@ -1,0 +1,22 @@
+{
+  "network": {
+    "protocolMagic": 1097911063,
+    "backendUrl": "https://testnet-yoroi-backend.yoroiwallet.com",
+    "websocketUrl": "wss://testnet-yoroi-backend.yoroiwallet.com:443",
+    "name": "shelley-dev"
+  },
+  "app": {
+    "walletRefreshInterval": 20000,
+    "serverStatusRefreshInterval": 20000,
+    "logsBufferSize": 500,
+    "logsFileSuffix": "-yoroi-shelley-dev.log",
+    "addressRequestSize": 50,
+    "txsBodiesRequestSize": 150,
+    "linearFee": {
+      "constant": "2",
+      "coefficient": "1",
+      "certificate": "4"
+    },
+    "genesisHash": "adbdd5ede31637f6c9bad5c271eec0bc3d0cb9efb86a5b913bb55cba549d0770"
+  }
+}

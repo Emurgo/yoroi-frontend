@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
-import SvgInline from 'react-svg-inline';
 import WalletRecoveryPhraseMnemonic from './WalletRecoveryPhraseMnemonic';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import DialogBackButton from '../../widgets/DialogBackButton';
@@ -10,7 +9,7 @@ import Dialog from '../../widgets/Dialog';
 import WalletRecoveryInstructions from './WalletRecoveryInstructions';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletRecoveryPhraseDisplayDialog.scss';
-import recoveryPhraseSvg from '../../../assets/images/recovery-phrase.inline.svg';
+import RecoveryPhraseSvg from '../../../assets/images/recovery-phrase.inline.svg';
 
 const messages = defineMessages({
   backupInstructions: {
@@ -25,11 +24,11 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  recoveryPhrase: string,
-  onStartWalletBackup: Function,
-  onCancelBackup: Function,
-  onBack: Function,
-  classicTheme: boolean
+  +recoveryPhrase: string,
+  +onStartWalletBackup: Function,
+  +onCancelBackup: Function,
+  +onBack: Function,
+  +classicTheme: boolean
 |};
 
 @observer
@@ -68,7 +67,7 @@ export default class WalletRecoveryPhraseDisplayDialog extends Component<Props> 
         backButton={<DialogBackButton onBack={onBack} />}
         classicTheme={classicTheme}
       >
-        {!classicTheme && <SvgInline className={styles.recoveryImage} svg={recoveryPhraseSvg} />}
+        {!classicTheme && <span className={styles.recoveryImage}><RecoveryPhraseSvg /></span>}
 
         <WalletRecoveryInstructions
           instructionsText={<FormattedHTMLMessage {...messages.backupInstructions} />}

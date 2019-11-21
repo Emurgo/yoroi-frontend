@@ -50,18 +50,6 @@ const messages = defineMessages({
     id: 'wallet.restore.dialog.wallet.name.input.hint',
     defaultMessage: '!!!Enter wallet name',
   },
-  recoveryPhraseInputLabel: {
-    id: 'wallet.restore.dialog.recovery.phrase.input.label',
-    defaultMessage: '!!!Recovery phrase',
-  },
-  recoveryPhraseInputHint: {
-    id: 'wallet.restore.dialog.recovery.phrase.input.hint',
-    defaultMessage: '!!!Enter recovery phrase',
-  },
-  recoveryPhraseNoResults: {
-    id: 'wallet.restore.dialog.recovery.phrase.input.noResults',
-    defaultMessage: '!!!No results',
-  },
   importButtonLabel: {
     id: 'wallet.restore.dialog.restore.wallet.button.label',
     defaultMessage: '!!!Restore wallet',
@@ -70,43 +58,31 @@ const messages = defineMessages({
     id: 'wallet.restore.dialog.verify.wallet.button.label',
     defaultMessage: '!!!Verify wallet',
   },
-  invalidRecoveryPhrase: {
-    id: 'wallet.restore.dialog.form.errors.invalidRecoveryPhrase',
-    defaultMessage: '!!!Invalid recovery phrase',
-  },
-  paperPasswordLabel: {
-    id: 'wallet.restore.dialog.paperPasswordLabel',
-    defaultMessage: '!!!Paper wallet password',
-  },
-  passwordDisclaimer: {
-    id: 'wallet.restore.dialog.passwordDisclaimer',
-    defaultMessage: '!!!Typing the wrong wallet password will give you a different wallet. This allows for plausible deniability.',
-  },
 });
 
-export type WalletRestoreDialogValues = {
+export type WalletRestoreDialogValues = {|
   recoveryPhrase: string,
   walletName: string,
   walletPassword: string,
   paperPassword: string,
-}
+|};
 
 type Props = {|
-  onSubmit: Function,
-  onCancel: Function,
-  onBack?: Function,
-  isSubmitting: boolean,
-  mnemonicValidator: Function,
-  passwordValidator?: Function,
-  numberOfMnemonics: number,
-  error?: ?LocalizableError,
-  validWords: Array<string>,
-  isPaper?: boolean,
-  isVerificationMode?: boolean,
-  showPaperPassword?: boolean,
-  classicTheme: boolean,
-  initValues?: WalletRestoreDialogValues,
-  introMessage?: string,
+  +onSubmit: WalletRestoreDialogValues => void,
+  +onCancel: void => void,
+  +onBack?: void => void,
+  +isSubmitting: boolean,
+  +mnemonicValidator: string => boolean,
+  +passwordValidator?: string => boolean,
+  +numberOfMnemonics: number,
+  +error?: ?LocalizableError,
+  +validWords: Array<string>,
+  +isPaper?: boolean,
+  +isVerificationMode?: boolean,
+  +showPaperPassword?: boolean,
+  +classicTheme: boolean,
+  +initValues?: WalletRestoreDialogValues,
+  +introMessage?: string,
 |};
 
 @observer
@@ -151,9 +127,9 @@ export default class WalletRestoreDialog extends Component<Props> {
         )],
       },
       recoveryPhrase: {
-        label: this.context.intl.formatMessage(messages.recoveryPhraseInputLabel),
+        label: this.context.intl.formatMessage(globalMessages.recoveryPhraseInputLabel),
         placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(messages.recoveryPhraseInputHint) : '',
+          this.context.intl.formatMessage(globalMessages.recoveryPhraseInputHint) : '',
         value: this.getInitRecoveryPhrase(),
         validators: [({ field }) => {
           const value = join(field.value, ' ');
@@ -168,15 +144,15 @@ export default class WalletRestoreDialog extends Component<Props> {
           }
           return [
             this.props.mnemonicValidator(value),
-            this.context.intl.formatMessage(messages.invalidRecoveryPhrase)
+            this.context.intl.formatMessage(globalMessages.invalidRecoveryPhrase)
           ];
         }],
       },
       paperPassword: this.props.showPaperPassword === true ? {
         type: 'password',
-        label: this.context.intl.formatMessage(messages.paperPasswordLabel),
+        label: this.context.intl.formatMessage(globalMessages.paperPasswordLabel),
         placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(messages.paperPasswordLabel) : '',
+          this.context.intl.formatMessage(globalMessages.paperPasswordLabel) : '',
         value: (this.props.initValues && this.props.initValues.paperPassword) || '',
         validators: [({ field }) => {
           const validatePassword = p => (
@@ -258,7 +234,8 @@ export default class WalletRestoreDialog extends Component<Props> {
   componentDidMount() {
     setTimeout(() => {
       if (this.props.isVerificationMode === true) {
-        this.recoveryPhraseInput.focus();
+        // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1009
+        // this.recoveryPhraseInput.focus();
       } else {
         this.walletNameInput.focus();
       }
@@ -266,7 +243,8 @@ export default class WalletRestoreDialog extends Component<Props> {
   }
 
   walletNameInput: Input;
-  recoveryPhraseInput: Autocomplete;
+  // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1009
+  // recoveryPhraseInput: Autocomplete;
 
   render() {
     const { intl } = this.context;
@@ -325,7 +303,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           isValidRepeatPassword(walletPassword, repeatPassword);
       }
 
-      // Although we require 12 words for creation
+      // Although we require 10 characters for creation
       // We allow any password to be used for restoration
       // This is to ensure compatiblity with any other apps that use our paper wallet construction
 
@@ -361,7 +339,7 @@ export default class WalletRestoreDialog extends Component<Props> {
       return isVerificationMode === true ? messages.titleVerify : messages.title;
     };
 
-    const introMessageBlock = introMessage != null
+    const introMessageBlock = (introMessage != null && introMessage !== '')
       ? (<DialogTextBlock message={introMessage} subclass="component-input" />)
       : null;
     return (
@@ -393,12 +371,13 @@ export default class WalletRestoreDialog extends Component<Props> {
         <Autocomplete
           options={validWords}
           maxSelections={this.props.numberOfMnemonics}
-          inputRef={(input) => { this.recoveryPhraseInput = input; }}
+          // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1009
+          // inputRef={(input) => { this.recoveryPhraseInput = input; }}
           {...recoveryPhraseField.bind()}
           done={mnemonicValidator(join(recoveryPhrase, ' '))}
           error={recoveryPhraseField.error}
           maxVisibleOptions={5}
-          noResultsMessage={intl.formatMessage(messages.recoveryPhraseNoResults)}
+          noResultsMessage={intl.formatMessage(globalMessages.recoveryPhraseNoResults)}
           skin={AutocompleteOwnSkin}
           preselectedOptions={recoveryPhraseField.value}
         />
@@ -408,7 +387,7 @@ export default class WalletRestoreDialog extends Component<Props> {
             <div className={paperPasswordFieldClasses}>
               {isVerificationMode === true ? '' : (
                 <div className={headerBlockClasses}>
-                  {intl.formatMessage(messages.passwordDisclaimer)}
+                  {intl.formatMessage(globalMessages.passwordDisclaimer)}
                 </div>
               )}
               <Input

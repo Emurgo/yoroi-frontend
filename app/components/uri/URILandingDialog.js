@@ -5,11 +5,10 @@ import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
-import SVGInline from 'react-svg-inline';
 
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
-import performTxImg from '../../assets/images/uri/perform-tx-uri.inline.svg';
+import PerformTxImg from '../../assets/images/uri/perform-tx-uri.inline.svg';
 
 import styles from './URILandingDialog.scss';
 
@@ -37,9 +36,9 @@ const messages = defineMessages({
 });
 
 type Props = {
-  onSubmit: void => void,
-  onClose: void => void,
-  classicTheme: boolean,
+  +onSubmit: void => void,
+  +onClose: void => void,
+  +classicTheme: boolean,
 };
 
 @observer
@@ -72,7 +71,7 @@ export default class URILandingDialog extends Component<Props> {
         onClose={onClose}
       >
         <div>
-          {!classicTheme && <SVGInline svg={performTxImg} className={styles.urlImage} />}
+          {!classicTheme && <span className={styles.urlImage}><PerformTxImg /></span>}
           <div className={styles.warningText}>
             {intl.formatMessage(messages.uriLandingDialogWarningLine1)}
             <ul>

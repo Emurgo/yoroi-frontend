@@ -5,6 +5,7 @@ import WalletSettings from '../../../components/wallet/WalletSettings';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import { isValidWalletName } from '../../../utils/validations';
 import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
+import { WalletTypeOption } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 
 type Props = InjectedProps
 
@@ -15,9 +16,9 @@ export default class WalletSettingsPage extends Component<Props> {
     const { uiDialogs, profile } = this.props.stores;
     const { wallets, walletSettings } = this.props.stores.substores.ada;
     const { actions, stores } = this.props;
-    const activeWallet = wallets.active;
+    const publicDeriver = wallets.selected;
     const {
-      updateWalletMetaRequest,
+      renameModelRequest,
       lastUpdatedWalletField,
       walletFieldBeingEdited,
     } = walletSettings;
@@ -25,11 +26,14 @@ export default class WalletSettingsPage extends Component<Props> {
       startEditingWalletField,
       stopEditingWalletField,
       cancelEditingWalletField,
-      updateWalletField,
+      renameConceptualWallet,
     } = actions.ada.walletSettings;
 
     // Guard against potential null values
-    if (!activeWallet) throw new Error('Active wallet required for WalletSettingsPage.');
+    if (!publicDeriver) throw new Error('Active wallet required for WalletSettingsPage.');
+
+    const walletType = publicDeriver.self.getParent().getWalletType();
+    const isWebWallet = walletType === WalletTypeOption.WEB_WALLET;
 
     const changeDialog = (
       <ChangeWalletPasswordDialogContainer
@@ -39,22 +43,30 @@ export default class WalletSettingsPage extends Component<Props> {
     );
     return (
       <WalletSettings
-        error={updateWalletMetaRequest.error}
+        error={renameModelRequest.error}
         openDialogAction={actions.dialogs.open.trigger}
-        walletPasswordUpdateDate={activeWallet.passwordUpdateDate}
+        walletPasswordUpdateDate={publicDeriver.signingKeyUpdateDate}
         isDialogOpen={uiDialogs.isOpen}
         dialog={changeDialog}
-        walletName={activeWallet.name}
-        isSubmitting={updateWalletMetaRequest.isExecuting}
-        isInvalid={updateWalletMetaRequest.wasExecuted && updateWalletMetaRequest.result === false}
+        walletName={publicDeriver.conceptualWalletName}
+        isSubmitting={renameModelRequest.isExecuting}
+        isInvalid={
+          renameModelRequest.wasExecuted
+          &&
+          renameModelRequest.result === false
+        }
         lastUpdatedField={lastUpdatedWalletField}
-        onFieldValueChange={(field, value) => updateWalletField.trigger({ field, value })}
+        onFieldValueChange={(field, value) => {
+          if (field === 'name') {
+            renameConceptualWallet.trigger({ newName: value });
+          }
+        }}
         onStartEditing={field => startEditingWalletField.trigger({ field })}
         onStopEditing={() => stopEditingWalletField.trigger()}
         onCancelEditing={() => cancelEditingWalletField.trigger()}
         activeField={walletFieldBeingEdited}
         nameValidator={name => isValidWalletName(name)}
-        showPasswordBlock={activeWallet.isWebWallet}
+        showPasswordBlock={isWebWallet}
         classicTheme={profile.isClassicTheme}
       />
     );

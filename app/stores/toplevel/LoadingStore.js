@@ -1,4 +1,6 @@
 // @flow
+import type { lf$Database, } from 'lovefield';
+import { schema, } from 'lovefield';
 import { action, observable, computed, when, runInAction } from 'mobx';
 import Store from '../base/Store';
 import environment from '../../environment';
@@ -13,6 +15,7 @@ import type { MigrationRequest } from '../../api';
 import { migrate } from '../../api';
 import { Logger, stringifyError } from '../../utils/logging';
 import { closeOtherInstances } from '../../utils/tabManager';
+import { loadLovefieldDB, } from '../../api/ada/lib/storage/database/index';
 
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
@@ -38,21 +41,28 @@ export default class LoadingStore extends Store {
   @observable migrationRequest: Request<MigrationRequest => Promise<void>>
     = new Request<MigrationRequest => Promise<void>>(migrate);
 
-  // TODO: Should not make currency-specific requests in a toplevel store
-  @observable loadDbRequest: Request<void => Promise<void>>
-    = new Request<void => Promise<void>>(this.api.ada.loadDB);
+  @observable loadPersitentDbRequest: Request<void => Promise<lf$Database>>
+    = new Request<void => Promise<lf$Database>>(
+      async () => await loadLovefieldDB(schema.DataStoreType.INDEXED_DB)
+    );
 
-  setup() {
+  setup(): void {
   }
 
-  load() {
+  load(): void {
     when(this._isRefresh, this._redirectToLoading);
     Promise
-      .all([this.loadRustRequest.execute().promise, this.loadDbRequest.execute().promise])
+      .all([
+        this.loadRustRequest.execute().promise,
+        this.loadPersitentDbRequest.execute().promise
+      ])
       .then(async () => {
         await closeOtherInstances();
+        const persistentDb = this.loadPersitentDbRequest.result;
+        if (persistentDb == null) throw new Error('load db was not loaded. Should never happen');
         await this.migrationRequest.execute({
           api: this.api,
+          persistentDb,
           currVersion: environment.version,
         }).promise;
         await this.validateUriPath();
@@ -75,7 +85,7 @@ export default class LoadingStore extends Store {
   }
 
   @computed get fromUriScheme(): boolean {
-    return matchRoute(ROUTES.SEND_FROM_URI.ROOT, this._originRoute.route);
+    return matchRoute(ROUTES.SEND_FROM_URI.ROOT, this._originRoute.route) !== false;
   }
 
   @computed get uriParams(): ?UriParams {
@@ -83,7 +93,7 @@ export default class LoadingStore extends Store {
   }
 
   @action
-  validateUriPath = async (): Promise<void> => {
+  validateUriPath: void => Promise<void> = async (): Promise<void> => {
     if (this.fromUriScheme) {
       const uriParams = await getURIParameters(
         decodeURIComponent(this._originRoute.location),
@@ -99,7 +109,7 @@ export default class LoadingStore extends Store {
    * Need to clear any data inijected by the URI after we've applied it
    */
   @action
-  resetUriParams = (): void => {
+  resetUriParams: void => void = (): void => {
     this._uriParams = null;
     this._originRoute = { route: '', location: '' };
   }
