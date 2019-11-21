@@ -184,141 +184,177 @@ describe('Create unsigned TX from UTXO', () => {
     expect(outputSum.toString()).toEqual('851617');
     expect(inputSum.minus(outputSum).toString()).toEqual('155385');
   });
+});
 
+describe('Create legacy witness TX from UTXO', () => {
+  it('Should create a valid transaction withhout selection', () => {
+    const unsignedTxResponse = newAdaUnsignedTx(
+      keys[0].bechAddress,
+      '5001', // smaller than input
+      [],
+      [addressedUtxos[0], addressedUtxos[1]],
+    );
+    console.log(JSON.stringify(addressedUtxos[0]));
+    console.log(JSON.stringify(addressedUtxos[1]));
+    console.log(JSON.stringify(unsignedTxResponse.changeAddr));
+    const accountPrivateKey = RustModule.WalletV3.Bip32PrivateKey.from_bytes(
+      Buffer.from(
+        '70afd5ff1f7f551c481b7e3f3541f7c63f5f6bcb293af92565af3deea0bcd6481a6e7b8acbe38f3906c63ccbe8b2d9b876572651ac5d2afc0aca284d9412bb1b4839bf02e1d990056d0f06af22ce4bcca52ac00f1074324aab96bbaaaccf290d',
+        'hex',
+      ),
+    );
+    const signedTx = signTransaction(
+      unsignedTxResponse,
+      Bip44DerivationLevels.ACCOUNT.level,
+      accountPrivateKey,
+      true,
+    );
+    const witnesses = signedTx.witnesses();
 
-  describe('Create unsigned TX from addresses', () => {
-    it('Should create a valid transaction withhout selection', () => {
-      const unsignedTxResponse = newAdaUnsignedTx(
-        keys[0].bechAddress,
-        '5001', // smaller than input
-        [],
-        [addressedUtxos[0], addressedUtxos[1]],
-      );
-      expect(unsignedTxResponse.senderUtxos).toEqual([addressedUtxos[0], addressedUtxos[1]]);
-      const inputSum = getTxInputTotal(unsignedTxResponse.IOs);
-      const outputSum = getTxOutputTotal(unsignedTxResponse.IOs);
-      expect(inputSum.toString()).toEqual('1007002');
-      expect(outputSum.toString()).toEqual('5001');
-      expect(inputSum.minus(outputSum).toString()).toEqual('1002001');
-    });
+    expect(witnesses.size()).toEqual(2);
+    expect(witnesses.get(0).to_bech32()).toEqual(
+      'witness1qz8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqf3rln4edvr5ppf35h9jt86ns3dr344k3y5w0sx8uwg0qa296rnzul5k4qyjdyslv50qprcglg8hjvq4lpnvrfhl2q0n759ev5qh3nljrtgjlej4yxkhlyy454l4lcxzutfe4kh0ysacs9gmd9v5c5ed2zql6kkea'
+    );
+    expect(witnesses.get(1).to_bech32()).toEqual(
+      'witness1qz8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqf3rln4edvr5ppf35h9jt86ns3dr344k3y5w0sx8uwg0qa296rnzul5k4qyjdyslv50qprcglg8hjvq4lpnvrfhl2q0n759ev5qh3nljrtgjlej4yxkhlyy454l4lcxzutfe4kh0ysacs9gmd9v5c5ed2zql6kkea'
+    );
+  });
+});
+
+describe('Create unsigned TX from addresses', () => {
+  it('Should create a valid transaction withhout selection', () => {
+    const unsignedTxResponse = newAdaUnsignedTx(
+      keys[0].bechAddress,
+      '5001', // smaller than input
+      [],
+      [addressedUtxos[0], addressedUtxos[1]],
+    );
+    expect(unsignedTxResponse.senderUtxos).toEqual([addressedUtxos[0], addressedUtxos[1]]);
+    const inputSum = getTxInputTotal(unsignedTxResponse.IOs);
+    const outputSum = getTxOutputTotal(unsignedTxResponse.IOs);
+    expect(inputSum.toString()).toEqual('1007002');
+    expect(outputSum.toString()).toEqual('5001');
+    expect(inputSum.minus(outputSum).toString()).toEqual('1002001');
+  });
+});
+
+describe('Create signed transactions', () => {
+  it('Witness should match on valid private key', () => {
+    const unsignedTxResponse = newAdaUnsignedTx(
+      keys[0].bechAddress,
+      '5001', // smaller than input
+      [],
+      [addressedUtxos[0], addressedUtxos[1]],
+    );
+
+    const accountPrivateKey = RustModule.WalletV3.Bip32PrivateKey.from_bytes(
+      Buffer.from(
+        '70afd5ff1f7f551c481b7e3f3541f7c63f5f6bcb293af92565af3deea0bcd6481a6e7b8acbe38f3906c63ccbe8b2d9b876572651ac5d2afc0aca284d9412bb1b4839bf02e1d990056d0f06af22ce4bcca52ac00f1074324aab96bbaaaccf290d',
+        'hex',
+      ),
+    );
+    const signedTx = signTransaction(
+      unsignedTxResponse,
+      Bip44DerivationLevels.ACCOUNT.level,
+      accountPrivateKey,
+      false,
+    );
+    const witnesses = signedTx.witnesses();
+
+    expect(witnesses.size()).toEqual(2);
+    expect(witnesses.get(0).to_bech32()).toEqual(
+      'witness1q8n7j65qjf5jraj3uqy0praq77fszhuxdsdxlagp706sh9jsz7x07gddztlx25s66lusjkjh7hlqct3d8xk6aujrhzq4rd54jnzn94ggppm0c7'
+    );
+    expect(witnesses.get(1).to_bech32()).toEqual(
+      'witness1q8n7j65qjf5jraj3uqy0praq77fszhuxdsdxlagp706sh9jsz7x07gddztlx25s66lusjkjh7hlqct3d8xk6aujrhzq4rd54jnzn94ggppm0c7'
+    );
   });
 
-  describe('Create signed transactions', () => {
-    it('Witness should match on valid private key', () => {
-      const unsignedTxResponse = newAdaUnsignedTx(
-        keys[0].bechAddress,
-        '5001', // smaller than input
-        [],
-        [addressedUtxos[0], addressedUtxos[1]],
-      );
-
-      const accountPrivateKey = RustModule.WalletV2.Bip44AccountPrivate.new(
-        RustModule.WalletV2.PrivateKey.from_hex(
-          '70afd5ff1f7f551c481b7e3f3541f7c63f5f6bcb293af92565af3deea0bcd6481a6e7b8acbe38f3906c63ccbe8b2d9b876572651ac5d2afc0aca284d9412bb1b4839bf02e1d990056d0f06af22ce4bcca52ac00f1074324aab96bbaaaccf290d'
-        ),
-        RustModule.WalletV2.DerivationScheme.v2()
-      );
-      const signedTx = signTransaction(
-        unsignedTxResponse,
-        Bip44DerivationLevels.ACCOUNT.level,
-        accountPrivateKey.key(),
-      );
-      const witnesses = signedTx.witnesses();
-
-      expect(witnesses.size()).toEqual(2);
-      expect(witnesses.get(0).to_bech32()).toEqual(
-        'witness1q8n7j65qjf5jraj3uqy0praq77fszhuxdsdxlagp706sh9jsz7x07gddztlx25s66lusjkjh7hlqct3d8xk6aujrhzq4rd54jnzn94ggppm0c7'
-      );
-      expect(witnesses.get(1).to_bech32()).toEqual(
-        'witness1q8n7j65qjf5jraj3uqy0praq77fszhuxdsdxlagp706sh9jsz7x07gddztlx25s66lusjkjh7hlqct3d8xk6aujrhzq4rd54jnzn94ggppm0c7'
-      );
-    });
-
-    it('Witness should with addressing from root', () => {
-      const unsignedTxResponse = newAdaUnsignedTx(
-        keys[0].bechAddress,
-        '5001', // smaller than input
-        [],
-        [
-          {
-            amount: '7001',
-            receiver: 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
-            tx_hash: '05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f',
-            tx_index: 0,
-            utxo_id: '05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f0',
-            addressing: {
-              path: [BIP44_PURPOSE, CARDANO_COINTYPE, HARD_DERIVATION_START + 0, 0, 135],
-              startLevel: 1
-            }
-          },
-          {
-            amount: '1000001',
-            receiver: 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
-            tx_hash: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe',
-            tx_index: 0,
-            utxo_id: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0',
-            addressing: {
-              path: [BIP44_PURPOSE, CARDANO_COINTYPE, HARD_DERIVATION_START + 0, 0, 135],
-              startLevel: 1
-            }
+  it('Witness should with addressing from root', () => {
+    const unsignedTxResponse = newAdaUnsignedTx(
+      keys[0].bechAddress,
+      '5001', // smaller than input
+      [],
+      [
+        {
+          amount: '7001',
+          receiver: 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
+          tx_hash: '05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f',
+          tx_index: 0,
+          utxo_id: '05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f0',
+          addressing: {
+            path: [BIP44_PURPOSE, CARDANO_COINTYPE, HARD_DERIVATION_START + 0, 0, 135],
+            startLevel: 1
           }
-        ],
-      );
+        },
+        {
+          amount: '1000001',
+          receiver: 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
+          tx_hash: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe',
+          tx_index: 0,
+          utxo_id: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0',
+          addressing: {
+            path: [BIP44_PURPOSE, CARDANO_COINTYPE, HARD_DERIVATION_START + 0, 0, 135],
+            startLevel: 1
+          }
+        }
+      ],
+    );
 
-      const accountPrivateKey = RustModule.WalletV2.Bip44AccountPrivate.new(
-        RustModule.WalletV2.PrivateKey.from_hex(
-          '70afd5ff1f7f551c481b7e3f3541f7c63f5f6bcb293af92565af3deea0bcd6481a6e7b8acbe38f3906c63ccbe8b2d9b876572651ac5d2afc0aca284d9412bb1b4839bf02e1d990056d0f06af22ce4bcca52ac00f1074324aab96bbaaaccf290d'
-        ),
-        RustModule.WalletV2.DerivationScheme.v2()
-      );
-      const signedTx = signTransaction(
-        unsignedTxResponse,
-        Bip44DerivationLevels.ACCOUNT.level,
-        accountPrivateKey.key(),
-      );
-      const witnesses = signedTx.witnesses();
+    const accountPrivateKey = RustModule.WalletV3.Bip32PrivateKey.from_bytes(
+      Buffer.from(
+        '70afd5ff1f7f551c481b7e3f3541f7c63f5f6bcb293af92565af3deea0bcd6481a6e7b8acbe38f3906c63ccbe8b2d9b876572651ac5d2afc0aca284d9412bb1b4839bf02e1d990056d0f06af22ce4bcca52ac00f1074324aab96bbaaaccf290d',
+        'hex',
+      ),
+    );
+    const signedTx = signTransaction(
+      unsignedTxResponse,
+      Bip44DerivationLevels.ACCOUNT.level,
+      accountPrivateKey,
+      false,
+    );
+    const witnesses = signedTx.witnesses();
 
-      expect(witnesses.size()).toEqual(2);
-      expect(witnesses.get(0).to_bech32()).toEqual(
-        'witness1q8n7j65qjf5jraj3uqy0praq77fszhuxdsdxlagp706sh9jsz7x07gddztlx25s66lusjkjh7hlqct3d8xk6aujrhzq4rd54jnzn94ggppm0c7'
-      );
-      expect(witnesses.get(1).to_bech32()).toEqual(
-        'witness1q8n7j65qjf5jraj3uqy0praq77fszhuxdsdxlagp706sh9jsz7x07gddztlx25s66lusjkjh7hlqct3d8xk6aujrhzq4rd54jnzn94ggppm0c7'
-      );
-    });
+    expect(witnesses.size()).toEqual(2);
+    expect(witnesses.get(0).to_bech32()).toEqual(
+      'witness1q8n7j65qjf5jraj3uqy0praq77fszhuxdsdxlagp706sh9jsz7x07gddztlx25s66lusjkjh7hlqct3d8xk6aujrhzq4rd54jnzn94ggppm0c7'
+    );
+    expect(witnesses.get(1).to_bech32()).toEqual(
+      'witness1q8n7j65qjf5jraj3uqy0praq77fszhuxdsdxlagp706sh9jsz7x07gddztlx25s66lusjkjh7hlqct3d8xk6aujrhzq4rd54jnzn94ggppm0c7'
+    );
   });
+});
 
-  describe('Create sendAll unsigned TX from UTXO', () => {
-    describe('Create send-all TX from UTXO', () => {
-      it('Create a transaction involving all input with no change', () => {
-        const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[1], sampleUtxos[2]];
-        const sendAllResponse = sendAllUnsignedTxFromUtxo(
-          keys[0].bechAddress,
-          utxos,
-        );
-
-        expect(sendAllResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
-        const inputSum = getTxInputTotal(sendAllResponse.IOs);
-        const outputSum = getTxOutputTotal(sendAllResponse.IOs);
-        expect(inputSum.toString()).toEqual('11000002');
-        expect(outputSum.toString()).toEqual('10844618');
-        expect(inputSum.minus(outputSum).toString()).toEqual('155384');
-      });
-    });
-
-    it('Should fail due to insufficient funds (no inputs)', () => {
-      expect(() => sendAllUnsignedTxFromUtxo(
-        keys[0].bechAddress,
-        [],
-      )).toThrow(NotEnoughMoneyToSendError);
-    });
-
-    it('Should fail due to insufficient funds (not enough to cover fees)', () => {
-      const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[0]];
-      expect(() => sendAllUnsignedTxFromUtxo(
+describe('Create sendAll unsigned TX from UTXO', () => {
+  describe('Create send-all TX from UTXO', () => {
+    it('Create a transaction involving all input with no change', () => {
+      const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[1], sampleUtxos[2]];
+      const sendAllResponse = sendAllUnsignedTxFromUtxo(
         keys[0].bechAddress,
         utxos,
-      )).toThrow(NotEnoughMoneyToSendError);
+      );
+
+      expect(sendAllResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
+      const inputSum = getTxInputTotal(sendAllResponse.IOs);
+      const outputSum = getTxOutputTotal(sendAllResponse.IOs);
+      expect(inputSum.toString()).toEqual('11000002');
+      expect(outputSum.toString()).toEqual('10844618');
+      expect(inputSum.minus(outputSum).toString()).toEqual('155384');
     });
+  });
+
+  it('Should fail due to insufficient funds (no inputs)', () => {
+    expect(() => sendAllUnsignedTxFromUtxo(
+      keys[0].bechAddress,
+      [],
+    )).toThrow(NotEnoughMoneyToSendError);
+  });
+
+  it('Should fail due to insufficient funds (not enough to cover fees)', () => {
+    const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[0]];
+    expect(() => sendAllUnsignedTxFromUtxo(
+      keys[0].bechAddress,
+      utxos,
+    )).toThrow(NotEnoughMoneyToSendError);
   });
 });

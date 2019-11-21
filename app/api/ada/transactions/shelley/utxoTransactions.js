@@ -23,7 +23,6 @@ import type {
   Address, Value, Addressing,
   IGetAllUtxosResponse
 } from '../../lib/storage/models/PublicDeriver/interfaces';
-import { v2SkKeyToV3Key } from '../utils';
 
 declare var CONFIG: ConfigType;
 
@@ -290,22 +289,24 @@ function filterToUsedChange(
 export function signTransaction(
   signRequest: V3UnsignedTxAddressedUtxoResponse,
   keyLevel: number,
-  signingKey: RustModule.WalletV2.PrivateKey
+  signingKey: RustModule.WalletV3.Bip32PrivateKey,
+  useLegacy: boolean,
 ): RustModule.WalletV3.Transaction {
   const { senderUtxos, IOs } = signRequest;
 
   const txbuilder = new RustModule.WalletV3.TransactionBuilder();
   const builderSetIOs = txbuilder.no_payload();
-  const builderSetWitness = builderSetIOs.set_ios(
+  const builderSetWitnesses = builderSetIOs.set_ios(
     IOs.inputs(),
     IOs.outputs()
   );
 
   const builderSetAuthData = addWitnesses(
-    builderSetWitness,
+    builderSetWitnesses,
     senderUtxos,
     keyLevel,
-    signingKey
+    signingKey,
+    useLegacy,
   );
 
   const signedTx = builderSetAuthData.set_payload_auth(
@@ -332,7 +333,8 @@ function addWitnesses(
   builderSetWitnesses: RustModule.WalletV3.TransactionBuilderSetWitness,
   senderUtxos: Array<AddressedUtxo>,
   keyLevel: number,
-  signingKey: RustModule.WalletV2.PrivateKey
+  signingKey: RustModule.WalletV3.Bip32PrivateKey,
+  useLegacy: boolean,
 ): RustModule.WalletV3.TransactionBuilderSetAuthData {
   // get private keys
   const privateKeys = senderUtxos.map(utxo => {
@@ -346,7 +348,6 @@ function addWitnesses(
     let key = signingKey;
     for (let i = keyLevel - utxo.addressing.startLevel + 1; i < utxo.addressing.path.length; i++) {
       key = key.derive(
-        RustModule.WalletV2.DerivationScheme.v2(),
         utxo.addressing.path[i]
       );
     }
@@ -355,11 +356,17 @@ function addWitnesses(
 
   const witnesses = RustModule.WalletV3.Witnesses.new();
   for (let i = 0; i < senderUtxos.length; i++) {
-    const witness = RustModule.WalletV3.Witness.for_utxo(
-      RustModule.WalletV3.Hash.from_hex(CONFIG.app.genesisHash),
-      builderSetWitnesses.get_auth_data_for_witness(),
-      v2SkKeyToV3Key(privateKeys[i]),
-    );
+    const witness = useLegacy
+      ? RustModule.WalletV3.Witness.for_legacy_utxo(
+        RustModule.WalletV3.Hash.from_hex(CONFIG.app.genesisHash),
+        builderSetWitnesses.get_auth_data_for_witness(),
+        privateKeys[i],
+      )
+      : RustModule.WalletV3.Witness.for_utxo(
+        RustModule.WalletV3.Hash.from_hex(CONFIG.app.genesisHash),
+        builderSetWitnesses.get_auth_data_for_witness(),
+        privateKeys[i].to_raw_key(),
+      );
     witnesses.add(witness);
   }
   return builderSetWitnesses.set_witnesses(witnesses);
