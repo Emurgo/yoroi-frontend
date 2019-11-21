@@ -245,7 +245,7 @@
   "wallet.add.page.restore.title": "Ripristina portafoglio",
   "wallet.add.page.restore.tooltip": "Inserisci una frase di recupero di 15 parole<br/>per ripristinare un portafoglio Yoroi già esistente,<br/>o importare un portafoglio cartaceo Yoroi esistente.",
   "wallet.add.page.subtitle.label": "Light wallet Yoroi per Cardano",
-  "wallet.add.page.title": "Your gateway <br> to the <br> financial world",
+  "wallet.add.page.title": "La tua porta d'accesso <br> al <br> mondo finanziario",
   "wallet.amountInput.feesLabel": "+ {amount} di commissioni",
   "wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching": "Assicurati che nessuno guardi il tuo schermo, a meno che tu voglia che abbiano accesso ai tuoi fondi.",
   "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "Nella seguente schermata, vedrai un insieme di 15 parole casuali. Questa è la tua <strong>frase di backup del portafoglio</strong>. Potrà essere inserita in qualsiasi versione di Yoroi per eseguire il backup o il ripristino dei fondi del tuo portafoglio e della chiave privata.",
