@@ -245,7 +245,7 @@
   "wallet.add.page.restore.title": "Restaurar billetera",
   "wallet.add.page.restore.tooltip": "Introduzca una frase de recuperación de 15 palabras <br/>para restaurar una billetera Yoroi ya existente, <br/>o importe una billetera de papel Yoroi existente.",
   "wallet.add.page.subtitle.label": "Billetera liviana Yoroi para Cardano",
-  "wallet.add.page.title": "Puerta de entrada <br> al <br> mundo financiero",
+  "wallet.add.page.title": "Your gateway <br> to the <br> financial world",
   "wallet.amountInput.feesLabel": "+ {amount} de las tarifas",
   "wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching": "Asegúrese de que nadie vea su pantalla a menos que desee que tengan acceso a sus fondos.",
   "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "En la siguiente pantalla, verás un conjunto de 15 palabras aleatorias. Esta es la <strong>frase de respaldo</strong> de tu billetera. Se puede ingresar en cualquier versión de Yoroi para respaldar o restaurar los fondos de tu billetera y llave privada.",
