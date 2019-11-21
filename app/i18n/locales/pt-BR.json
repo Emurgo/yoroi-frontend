@@ -245,7 +245,7 @@
   "wallet.add.page.restore.title": "Restaurar wallet",
   "wallet.add.page.restore.tooltip": "Enter a 15-word recovery phrase<br/>to restore an already-existing Yoroi wallet,<br/>or import an existing Yoroi paper wallet.",
   "wallet.add.page.subtitle.label": "Yoroi é uma carteira leve para Cardano",
-  "wallet.add.page.title": "Porta de entrada <br> para o <br> mundo financeiro",
+  "wallet.add.page.title": "Your gateway <br> to the <br> financial world",
   "wallet.amountInput.feesLabel": "+ {amount} das taxas",
   "wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching": "Tenha certeza de que não há ninguém olhando para sua tela, a menos que seja da sua vontade que essa pessoa tenha acesso a seus fundos.",
   "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "Na tela a seguir, você verá um conjunto de 15 palavras aleatórias. Esta é a sua <strong>frase de backup da carteira</strong>. Você pode inserir em qualquer versão da Yoroi para fazer backup ou restaurar os fundos e a chave privada da sua carteira.",
