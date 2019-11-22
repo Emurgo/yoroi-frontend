@@ -7,8 +7,8 @@ import {
 } from '../../lib/cardanoCrypto/cryptoWallet';
 import {
   getAddressesKeys,
-  buildDaedalusTransferTx,
-} from './daedalusTransfer';
+} from './legacyDaedalus';
+import { buildDaedalusTransferTx } from '../byron/daedalusTransfer';
 import {
   GenerateTransferTxError,
 } from '../../errors';
@@ -63,7 +63,8 @@ test('Daedalus transfer from single small UTXO', async () => {
   expect(transferInfo.receiver).toBe(outAddress);
 
   // check tx itself
-  const txJson = transferInfo.signedTx.to_json();
+  const signedTx = RustModule.WalletV2.SignedTransaction.from_bytes(transferInfo.encodedTx);
+  const txJson = signedTx.to_json();
   expect(txJson.tx.inputs).toHaveLength(1);
   expect(txJson.tx.inputs[0].id).toBe(txId);
   expect(txJson.tx.inputs[0].index).toBe(txIndex);
@@ -164,7 +165,8 @@ test('Daedalus transfer from many UTXO', async () => {
   expect(transferInfo.receiver).toBe(outAddress);
 
   // check tx itself
-  const txJson = transferInfo.signedTx.to_json();
+  const signedTx = RustModule.WalletV2.SignedTransaction.from_bytes(transferInfo.encodedTx);
+  const txJson = signedTx.to_json();
   expect(txJson.tx.inputs).toHaveLength(numUtxos);
   expect(txJson.tx.inputs[0].id).toBe(txId);
   expect(txJson.tx.inputs[0].index).toBe(txIndex);

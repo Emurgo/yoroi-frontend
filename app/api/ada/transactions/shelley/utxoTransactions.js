@@ -291,7 +291,7 @@ export function signTransaction(
   keyLevel: number,
   signingKey: RustModule.WalletV3.Bip32PrivateKey,
   useLegacy: boolean,
-): RustModule.WalletV3.Transaction {
+): RustModule.WalletV3.Fragment {
   const { senderUtxos, IOs } = signRequest;
 
   const txbuilder = new RustModule.WalletV3.TransactionBuilder();
@@ -313,7 +313,9 @@ export function signTransaction(
     // can't add a certificate to a UTXO transaction
     RustModule.WalletV3.PayloadAuthData.for_no_payload()
   );
-  return signedTx;
+
+  const fragment = RustModule.WalletV3.Fragment.from_transaction(signedTx);
+  return fragment;
 }
 
 function utxoToTxInput(
@@ -357,7 +359,7 @@ function addWitnesses(
   const witnesses = RustModule.WalletV3.Witnesses.new();
   for (let i = 0; i < senderUtxos.length; i++) {
     const witness = useLegacy
-      ? RustModule.WalletV3.Witness.for_legacy_utxo(
+      ? RustModule.WalletV3.Witness.for_legacy_icarus_utxo(
         RustModule.WalletV3.Hash.from_hex(CONFIG.app.genesisHash),
         builderSetWitnesses.get_auth_data_for_witness(),
         privateKeys[i],

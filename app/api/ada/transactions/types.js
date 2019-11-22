@@ -24,6 +24,8 @@ export const transactionTypes = Object.freeze({
 });
 export type TransactionDirectionType = $Values<typeof transactionTypes>;
 
+export type AddressKeyMap = { [addr: string]: RustModule.WalletV2.PrivateKey };
+
 export type UserAnnotation = {|
   +type: TransactionDirectionType,
   +amount: BigNumber,

@@ -112,7 +112,10 @@ export default class TrezorSendStore extends Store {
       throw new Error('TrezorSendStore::_brodcastSignedTx should never happen');
     }
     await this.broadcastTrezorSignedTxRequest.execute({
-      signedTxHex: trezorSignTxResp.payload.body,
+      signedTxRequest: {
+        id: trezorSignTxResp.payload.hash,
+        encodedTx: Buffer.from(trezorSignTxResp.payload.body, 'hex'),
+      },
       sendTx: this.stores.substores[environment.API].stateFetchStore.fetcher.sendTx,
     }).promise;
 

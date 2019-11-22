@@ -124,6 +124,7 @@ import type {
   SignedResponse,
   TxBodiesFunc,
   BestBlockFunc,
+  SignedRequest,
 } from './lib/state-fetch/types';
 import {
   getChainAddressesForDisplay,
@@ -303,7 +304,7 @@ export type CreateTrezorSignTxDataFunc = (
 // broadcastTrezorSignedTx
 
 export type BroadcastTrezorSignedTxRequest = {
-  signedTxHex: string,
+  signedTxRequest: SignedRequest,
   sendTx: SendFunc,
 };
 export type BroadcastTrezorSignedTxResponse = SignedResponse;
@@ -728,7 +729,10 @@ export default class AdaApi {
         request.publicDeriver.getParent().getPublicDeriverLevel(),
         RustModule.WalletV2.PrivateKey.from_hex(normalizedKey.prvKeyHex)
       );
-      const response = request.sendTx({ signedTx });
+      const response = request.sendTx({
+        id: signedTx.id(),
+        encodedTx: Buffer.from(signedTx.to_hex(), 'hex'),
+      });
       Logger.debug(
         'AdaApi::signAndBroadcast success: ' + stringifyData(response)
       );
@@ -773,11 +777,10 @@ export default class AdaApi {
     request: BroadcastTrezorSignedTxRequest
   ): Promise<BroadcastTrezorSignedTxResponse> {
     Logger.debug('AdaApi::broadcastTrezorSignedTx called');
-    const { signedTxHex, sendTx } = request;
     try {
       const response = await broadcastTrezorSignedTx(
-        signedTxHex,
-        sendTx
+        request.signedTxRequest,
+        request.sendTx
       );
       Logger.debug('AdaApi::broadcastTrezorSignedTx success: ' + stringifyData(response));
 

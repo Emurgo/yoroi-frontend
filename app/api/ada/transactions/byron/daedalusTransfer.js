@@ -1,8 +1,7 @@
 // @flow
 
-// Handle data created by wallets using the v1 address scheme
+// Create byron transactions for wallets created with the v1 address scheme
 
-import { isEmpty } from 'lodash';
 import BigNumber from 'bignumber.js';
 import { coinToBigNumber, } from '../utils';
 import {
@@ -11,20 +10,18 @@ import {
 } from '../../../../utils/logging';
 import { LOVELACES_PER_ADA } from '../../../../config/numbersConfig';
 import {
-  GetAddressesKeysError,
-  NoInputsError,
   GenerateTransferTxError
 } from '../../errors';
 import {
   sendAllUnsignedTxFromUtxo,
 } from './transactionsV2';
 import type {
-  AddressUtxoFunc,
   RemoteUnspentOutput
 } from '../../lib/state-fetch/types';
 import type {
-  TransferTx
+  TransferTx,
 } from '../../../../types/TransferTypes';
+import type { AddressKeyMap } from '../types';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 
 import type { ConfigType } from '../../../../../config/config-types';
@@ -32,74 +29,14 @@ import type { ConfigType } from '../../../../../config/config-types';
 declare var CONFIG : ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;
 
-type AddressKeyMap = { [addr: string]: RustModule.WalletV2.PrivateKey };
-
-/**
- * Go through the whole UTXO and find the addresses that belong to the user along with the keys
- * @param fullUtxo the full utxo of the Cardano blockchain
- */
-export function getAddressesKeys(payload: {
-  checker: RustModule.WalletV2.DaedalusAddressChecker,
-  fullUtxo: Array<string>
-}): AddressKeyMap {
-  try {
-    const { checker, fullUtxo } = payload;
-
-    const addrKeyMap: { [addr: string]: RustModule.WalletV2.PrivateKey } = {};
-    for (const addr of fullUtxo) {
-      const rustAddr = RustModule.WalletV2.Address.from_base58(addr);
-      const checkedAddr = checker.check_address(rustAddr);
-      if (checkedAddr.is_checked()) {
-        const v2Key = checkedAddr.private_key();
-        addrKeyMap[addr] = v2Key;
-      }
-    }
-    return addrKeyMap;
-  } catch (error) {
-    Logger.error(`daedalusTransfer::getAddressesKeys ${stringifyError(error)}`);
-    throw new GetAddressesKeysError();
-  }
-}
-
 /**
  * Generate transaction including all addresses with no change.
 */
-export async function generateDaedalusTransferTx(
-  payload: {
-    outputAddr: string,
-    addressKeys: AddressKeyMap,
-    getUTXOsForAddresses: AddressUtxoFunc,
-  }
-): Promise<TransferTx> {
-  const { outputAddr, addressKeys, getUTXOsForAddresses } = payload;
-
-  // fetch data to make transaction
-  const senders = Object.keys(addressKeys);
-  const senderUtxos = await getUTXOsForAddresses({ addresses: senders });
-
-  if (isEmpty(senderUtxos)) {
-    const error = new NoInputsError();
-    Logger.error(`daedalusTransfer::generateTransferTx ${stringifyError(error)}`);
-    throw error;
-  }
-
-  return buildDaedalusTransferTx({
-    addressKeys,
-    senderUtxos,
-    outputAddr,
-  });
-}
-
-/**
- * Generate transaction including all addresses with no change.
-*/
-export async function buildDaedalusTransferTx(
-  payload: {
-    addressKeys: AddressKeyMap,
-    senderUtxos: Array<RemoteUnspentOutput>,
-    outputAddr: string,
-  }
-): Promise<TransferTx> {
+export async function buildDaedalusTransferTx(payload: {
+  addressKeys: AddressKeyMap,
+  senderUtxos: Array<RemoteUnspentOutput>,
+  outputAddr: string,
+}): Promise<TransferTx> {
   try {
     const { addressKeys, senderUtxos, outputAddr } = payload;
 
@@ -128,7 +65,8 @@ export async function buildDaedalusTransferTx(
     return {
       recoveredBalance: totalBalance.dividedBy(LOVELACES_PER_ADA),
       fee: fee.dividedBy(LOVELACES_PER_ADA),
-      signedTx,
+      id: signedTx.id(),
+      encodedTx: Buffer.from(signedTx.to_hex(), 'hex'),
       senders: Object.keys(addressKeys),
       receiver: outputAddr,
     };
@@ -138,7 +76,7 @@ export async function buildDaedalusTransferTx(
   }
 }
 
-export function signDaedalusTransaction(
+function signDaedalusTransaction(
   unsignedTx: RustModule.WalletV2.Transaction,
   addressKeys: AddressKeyMap,
   senderUtxos: Array<RemoteUnspentOutput>,

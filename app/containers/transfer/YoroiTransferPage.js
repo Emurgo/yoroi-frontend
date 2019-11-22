@@ -17,7 +17,7 @@ import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
 import config from '../../config';
 import { formattedWalletAmount } from '../../utils/formatters';
-import { TransferStatus } from '../../types/TransferTypes';
+import { TransferStatus, TransferKind, } from '../../types/TransferTypes';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
@@ -85,6 +85,7 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
     }
     this._getYoroiTransferActions().checkAddresses.trigger({
       publicDeriver,
+      transferKind: TransferKind.BYRON,
     });
   };
 
@@ -110,6 +111,7 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
         }, SUCCESS_PAGE_STAY_TIME);
       }),
       publicDeriver,
+      transferKind: TransferKind.BYRON,
     });
   }
 

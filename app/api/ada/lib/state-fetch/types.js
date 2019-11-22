@@ -55,9 +55,10 @@ export type BestBlockFunc = (body: BestBlockRequest) => Promise<BestBlockRespons
 
 // sendTx
 
-export type SignedRequest = {
-  signedTx: RustModule.WalletV2.SignedTransaction
-};
+export type SignedRequest = {|
+  id: string,
+  encodedTx: Uint8Array,
+|};
 export type SignedResponse = {
   txId: string
 };
