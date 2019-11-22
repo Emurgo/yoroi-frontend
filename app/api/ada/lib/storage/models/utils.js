@@ -142,14 +142,14 @@ export function normalizeBip32Ed25519ToPubDeriverLevel(request: {
     request.privateKeyRow,
     request.password,
   );
-  const wasmKey = RustModule.WalletV2.PrivateKey.from_hex(prvKey);
+  const wasmKey = RustModule.WalletV3.Bip32PrivateKey.from_bytes(Buffer.from(prvKey, 'hex'));
   const newKey = deriveKeyV2(
     wasmKey,
     request.path,
   );
   return {
-    prvKeyHex: newKey.to_hex(),
-    pubKeyHex: newKey.public().to_hex()
+    prvKeyHex: Buffer.from(newKey.as_bytes()).toString('hex'),
+    pubKeyHex: Buffer.from(newKey.to_public().as_bytes()).toString('hex'),
   };
 }
 
@@ -173,13 +173,12 @@ export function decryptKey(
 
 
 export function deriveKeyV2(
-  startingKey: RustModule.WalletV2.PrivateKey,
+  startingKey: RustModule.WalletV3.Bip32PrivateKey,
   pathToPublic: Array<number>,
-): RustModule.WalletV2.PrivateKey {
+): RustModule.WalletV3.Bip32PrivateKey {
   let currKey = startingKey;
   for (let i = 0; i < pathToPublic.length; i++) {
     currKey = currKey.derive(
-      RustModule.WalletV2.DerivationScheme.v2(),
       pathToPublic[i],
     );
   }

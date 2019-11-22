@@ -12,13 +12,13 @@ declare module 'cardano-wallet-browser' { // need to wrap flowgen output into mo
    * @param {Entropy} entropy
    * @param {Uint8Array} iv
    * @param {string} password
-   * @returns {any}
+   * @returns {Uint8Array}
    */
   declare export function paper_wallet_scramble(
     entropy: Entropy,
     iv: Uint8Array,
     password: string
-  ): any;
+  ): Uint8Array;
 
   /**
    * @param {Uint8Array} paper
@@ -39,25 +39,25 @@ declare module 'cardano-wallet-browser' { // need to wrap flowgen output into mo
    * @param {Uint8Array} salt
    * @param {Uint8Array} nonce
    * @param {Uint8Array} data
-   * @returns {any}
+   * @returns {Uint8Array}
    */
   declare export function password_encrypt(
     password: string,
     salt: Uint8Array,
     nonce: Uint8Array,
     data: Uint8Array
-  ): any;
+  ): Uint8Array;
 
   /**
    * decrypt the data with the password
    * @param {string} password
    * @param {Uint8Array} encrypted_data
-   * @returns {any}
+   * @returns {aUint8Arrayny}
    */
   declare export function password_decrypt(
     password: string,
     encrypted_data: Uint8Array
-  ): any;
+  ): Uint8Array;
 
   /**
    */
@@ -266,16 +266,16 @@ declare module 'cardano-wallet-browser' { // need to wrap flowgen output into mo
      * Note that this is not recommended to change the settings on the fly. Doing
      * so you might not be able to recover your funds anymore or to send new
      * transactions.
-     * @returns {any}
+     * @returns {BlockchainSettingsType}
      */
-    to_json(): any;
+    to_json(): BlockchainSettingsType;
 
     /**
      * retrieve the object from a JsValue.
-     * @param {any} value
+     * @param {BlockchainSettingsType} value
      * @returns {BlockchainSettings}
      */
-    static from_json(value: any): BlockchainSettings;
+    static from_json(value: BlockchainSettingsType): BlockchainSettings;
 
     /**
      * default settings to work with Cardano Mainnet
@@ -473,7 +473,7 @@ declare module 'cardano-wallet-browser' { // need to wrap flowgen output into mo
     to_english_mnemonics(): string;
 
     /**
-     * @returns {any}
+     * @returns {Array<number>}
      */
     to_array(): Array<number>;
   }
@@ -831,15 +831,15 @@ declare module 'cardano-wallet-browser' { // need to wrap flowgen output into mo
     id(): string;
 
     /**
-     * @returns {any}
+     * @returns {SignedTransactionType}
      */
     to_json(): SignedTransactionType;
 
     /**
-     * @param {any} value
+     * @param {SignedTransactionType} value
      * @returns {SignedTransaction}
      */
-    static from_json(value: any): SignedTransaction;
+    static from_json(value: SignedTransactionType): SignedTransaction;
 
     /**
      * @param {Uint8Array} bytes
@@ -869,15 +869,15 @@ declare module 'cardano-wallet-browser' { // need to wrap flowgen output into mo
     id(): TransactionId;
 
     /**
-     * @returns {any}
+     * @returns {TransactionType}
      */
     to_json(): TransactionType;
 
     /**
-     * @param {any} value
+     * @param {TransactionType} value
      * @returns {Transaction}
      */
-    static from_json(value: any): Transaction;
+    static from_json(value: TransactionType): Transaction;
 
     /**
      * @returns {Transaction}
@@ -1029,15 +1029,15 @@ declare module 'cardano-wallet-browser' { // need to wrap flowgen output into mo
     static new(ptr: TxoPointer, value: TxOut): TxInput;
 
     /**
-     * @returns {any}
+     * @returns {TxInputType}
      */
     to_json(): TxInputType;
 
     /**
-     * @param {any} value
+     * @param {TxInputType} value
      * @returns {TxInput}
      */
-    static from_json(value: any): TxInput;
+    static from_json(value: TxInputType): TxInput;
   }
   /**
    */
@@ -1053,16 +1053,16 @@ declare module 'cardano-wallet-browser' { // need to wrap flowgen output into mo
 
     /**
      * serialize into a JsValue object
-     * @returns {any}
+     * @returns {TxOutType<string>}
      */
     to_json(): TxOutType<string>;
 
     /**
      * retrieve the object from a JsValue.
-     * @param {any} value
+     * @param {TxOutType<string>} value
      * @returns {TxOut}
      */
-    static from_json(value: any): TxOut;
+    static from_json(value: TxOutType<string>): TxOut;
   }
   /**
    */
@@ -1078,16 +1078,16 @@ declare module 'cardano-wallet-browser' { // need to wrap flowgen output into mo
 
     /**
      * serialize into a JsValue object
-     * @returns {any}
+     * @returns {TxoPointerType}
      */
     to_json(): TxoPointerType;
 
     /**
      * retrieve the object from a JsValue.
-     * @param {any} value
+     * @param {TxoPointerType} value
      * @returns {TxoPointer}
      */
-    static from_json(value: any): TxoPointer;
+    static from_json(value: TxoPointerType): TxoPointer;
   }
   /**
    * sign the inputs of the transaction (i.e. unlock the funds the input are
@@ -1167,4 +1167,8 @@ declare type TxOutType<T> = {|
 declare type TxInputType = {|
   ptr: TxoPointerType,
   value: TxOutType<string>,
+|};
+
+declare type BlockchainSettingsType = {|
+  protocol_magic: number
 |};

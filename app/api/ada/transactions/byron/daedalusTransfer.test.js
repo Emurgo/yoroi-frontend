@@ -1,26 +1,26 @@
 /* eslint-disable camelcase */
 // @flow
-import './lib/test-config';
+import '../../lib/test-config';
 import { schema } from 'lovefield';
 import {
   getCryptoDaedalusWalletFromMnemonics,
-} from './lib/cardanoCrypto/cryptoWallet';
+} from '../../lib/cardanoCrypto/cryptoWallet';
 import {
   getAddressesKeys,
-  buildTransferTx,
+  buildDaedalusTransferTx,
 } from './daedalusTransfer';
 import {
   GenerateTransferTxError,
-} from './errors';
+} from '../../errors';
 import {
   silenceLogsForTesting,
-} from '../../utils/logging';
+} from '../../../../utils/logging';
 
 import {
   loadLovefieldDB,
-} from './lib/storage/database/index';
+} from '../../lib/storage/database/index';
 
-import { RustModule } from './lib/cardanoCrypto/rustLoader';
+import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 
 beforeAll(async () => {
   await RustModule.load();
@@ -51,7 +51,7 @@ test('Daedalus transfer from single small UTXO', async () => {
     amount: inputAmount
   };
 
-  const transferInfo = await buildTransferTx({
+  const transferInfo = await buildDaedalusTransferTx({
     addressKeys: addressMap,
     senderUtxos: [utxo],
     outputAddr: outAddress
@@ -102,7 +102,7 @@ test('Daedalus transfer fails from too small UTXO', async () => {
     amount: inputAmount
   };
 
-  expect(buildTransferTx({
+  expect(buildDaedalusTransferTx({
     addressKeys: addressMap,
     senderUtxos: [utxo],
     outputAddr: outAddress
@@ -152,7 +152,7 @@ test('Daedalus transfer from many UTXO', async () => {
     });
   }
 
-  const transferInfo = await buildTransferTx({
+  const transferInfo = await buildDaedalusTransferTx({
     addressKeys: addressMap,
     senderUtxos: utxo,
     outputAddr: outAddress

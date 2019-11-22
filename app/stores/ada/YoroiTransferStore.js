@@ -16,13 +16,19 @@ import type {
   TransferTx
 } from '../../types/TransferTypes';
 import { TransferStatus } from '../../types/TransferTypes';
-import { generateTransferTx } from '../../api/ada/daedalusTransfer';
+import { generateYoroiTransferTx } from '../../api/ada/transactions/byron/yoroiTransfer';
 import environment from '../../environment';
 import type { SignedResponse } from '../../api/ada/lib/state-fetch/types';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import { HARD_DERIVATION_START } from '../../config/numbersConfig';
+import {
+  HARD_DERIVATION_START,
+  BIP44_PURPOSE,
+  CARDANO_COINTYPE,
+} from '../../config/numbersConfig';
 import type { RestoreWalletForTransferResponse, RestoreWalletForTransferFunc } from '../../api/ada/index';
-import { verifyAccountLevel } from '../../api/ada/transactions/utils';
+import {
+  Bip44DerivationLevels,
+} from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import {
   asHasUtxoChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
@@ -142,33 +148,20 @@ export default class YoroiTransferStore extends Store {
     updateStatusCallback();
 
     // 3) Calculate private keys for restored wallet utxo
-    const accountKey = RustModule.WalletV2.Bip44RootPrivateKey.new(
-      RustModule.WalletV2.PrivateKey.from_hex(masterKey),
-      RustModule.WalletV2.DerivationScheme.v2(),
-    ).bip44_account(
-      RustModule.WalletV2.AccountIndex.new(accountIndex)
-    ).key();
-
-    const addressKeys = {};
-    addresses.forEach(addressInfo => {
-      verifyAccountLevel({ addressing: addressInfo.addressing });
-      const chainPrv = accountKey.derive(
-        RustModule.WalletV2.DerivationScheme.v2(),
-        addressInfo.addressing.path[1]
-      );
-      const keyPrv = chainPrv.derive(
-        RustModule.WalletV2.DerivationScheme.v2(),
-        addressInfo.addressing.path[2]
-      );
-      addressKeys[addressInfo.address] = keyPrv;
-    });
+    const accountKey = RustModule.WalletV3.Bip32PrivateKey
+      .from_bytes(Buffer.from(masterKey, 'hex'))
+      .derive(BIP44_PURPOSE)
+      .derive(CARDANO_COINTYPE)
+      .derive(accountIndex);
 
     // 4) generate transaction
 
     // Possible exception: NotEnoughMoneyToSendError
-    return await generateTransferTx({
+    return await generateYoroiTransferTx({
+      addresses,
       outputAddr: nextInternalAddress,
-      addressKeys,
+      keyLevel: Bip44DerivationLevels.ACCOUNT.level,
+      signingKey: accountKey,
       getUTXOsForAddresses:
         this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
       filterSenders: true

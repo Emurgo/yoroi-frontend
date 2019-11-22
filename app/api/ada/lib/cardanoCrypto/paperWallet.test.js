@@ -14,7 +14,7 @@ import {
 } from './paperWallet';
 import {
   getAddressesKeys,
-} from '../../daedalusTransfer';
+} from '../../transactions/byron/daedalusTransfer';
 import { RustModule } from './rustLoader';
 import {
   silenceLogsForTesting,

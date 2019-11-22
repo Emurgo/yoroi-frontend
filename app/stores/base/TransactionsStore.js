@@ -170,6 +170,8 @@ export default class TransactionsStore extends Store {
         pendingRequest.execute(
           { publicDeriver }
         );
+        if (!pendingRequest.promise) throw new Error('should never happen');
+        await pendingRequest.promise;
 
         const canGetBalance = asGetBalance(basePubDeriver.self);
         if (canGetBalance == null) {
@@ -199,15 +201,16 @@ export default class TransactionsStore extends Store {
       .then(() => {
         // Recent Request
         // Here we are sure that allRequest was resolved and the local database was updated
-        this.refreshLocal(publicDeriver);
-        return undefined;
+        return this.refreshLocal(publicDeriver);
       })
       .catch(() => {}); // Do nothing. It's logged in the api call
   };
 
-  @action refreshLocal: (PublicDeriver<> & IGetAllUtxos & IGetLastSyncInfo) => void = (
+  @action refreshLocal: (
+    PublicDeriver<> & IGetAllUtxos & IGetLastSyncInfo
+  ) => Promise<PromisslessReturnType<GetTransactionsFunc>> = (
     publicDeriver: PublicDeriver<> & IGetAllUtxos & IGetLastSyncInfo,
-  ): void => {
+  ) => {
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
 
     const limit = this.searchOptions
@@ -236,6 +239,8 @@ export default class TransactionsStore extends Store {
     const recentRequest = this._getTransactionsRecentRequest(publicDeriver);
     recentRequest.invalidate({ immediately: false });
     recentRequest.execute(requestParams); // note: different params/cache than allRequests
+    if (!recentRequest.promise) throw new Error('should never happen');
+    return recentRequest.promise;
   }
 
   /** Add a new public deriver to track and refresh the data */

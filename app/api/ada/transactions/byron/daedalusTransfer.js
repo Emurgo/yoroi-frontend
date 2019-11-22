@@ -4,37 +4,38 @@
 
 import { isEmpty } from 'lodash';
 import BigNumber from 'bignumber.js';
-import { coinToBigNumber } from './transactions/utils';
+import { coinToBigNumber, } from '../utils';
 import {
   Logger,
   stringifyError,
-} from '../../utils/logging';
-import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
+} from '../../../../utils/logging';
+import { LOVELACES_PER_ADA } from '../../../../config/numbersConfig';
 import {
   GetAddressesKeysError,
   NoInputsError,
   GenerateTransferTxError
-} from './errors';
+} from '../../errors';
 import {
   sendAllUnsignedTxFromUtxo,
-} from './transactions/byron/transactionsV2';
+} from './transactionsV2';
 import type {
   AddressUtxoFunc,
   RemoteUnspentOutput
-} from './lib/state-fetch/types';
+} from '../../lib/state-fetch/types';
 import type {
   TransferTx
-} from '../../types/TransferTypes';
-import { RustModule } from './lib/cardanoCrypto/rustLoader';
+} from '../../../../types/TransferTypes';
+import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 
-import type { ConfigType } from '../../../config/config-types';
+import type { ConfigType } from '../../../../../config/config-types';
 
 declare var CONFIG : ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;
 
 type AddressKeyMap = { [addr: string]: RustModule.WalletV2.PrivateKey };
 
-/** Go through the whole UTXO and find the addresses that belong to the user along with the keys
+/**
+ * Go through the whole UTXO and find the addresses that belong to the user along with the keys
  * @param fullUtxo the full utxo of the Cardano blockchain
  */
 export function getAddressesKeys(payload: {
@@ -44,12 +45,13 @@ export function getAddressesKeys(payload: {
   try {
     const { checker, fullUtxo } = payload;
 
-    const addrKeyMap = {};
+    const addrKeyMap: { [addr: string]: RustModule.WalletV2.PrivateKey } = {};
     for (const addr of fullUtxo) {
       const rustAddr = RustModule.WalletV2.Address.from_base58(addr);
       const checkedAddr = checker.check_address(rustAddr);
       if (checkedAddr.is_checked()) {
-        addrKeyMap[addr] = checkedAddr.private_key();
+        const v2Key = checkedAddr.private_key();
+        addrKeyMap[addr] = v2Key;
       }
     }
     return addrKeyMap;
@@ -60,19 +62,16 @@ export function getAddressesKeys(payload: {
 }
 
 /**
- Generate transaction including all addresses with no change.
- If filterSenders is true, only include addresses that have outstanding
- UTXOs in the senders property.
+ * Generate transaction including all addresses with no change.
 */
-export async function generateTransferTx(
+export async function generateDaedalusTransferTx(
   payload: {
     outputAddr: string,
     addressKeys: AddressKeyMap,
     getUTXOsForAddresses: AddressUtxoFunc,
-    filterSenders?: boolean
   }
 ): Promise<TransferTx> {
-  const { outputAddr, addressKeys, getUTXOsForAddresses, filterSenders = false } = payload;
+  const { outputAddr, addressKeys, getUTXOsForAddresses } = payload;
 
   // fetch data to make transaction
   const senders = Object.keys(addressKeys);
@@ -84,29 +83,25 @@ export async function generateTransferTx(
     throw error;
   }
 
-  return buildTransferTx({
+  return buildDaedalusTransferTx({
     addressKeys,
     senderUtxos,
     outputAddr,
-    filterSenders,
   });
 }
 
 /**
-  Generate transaction including all addresses with no change.
-  If filterSenders is true, only include addresses that have outstanding
-  UTXOs in the senders property.
+ * Generate transaction including all addresses with no change.
 */
-export async function buildTransferTx(
+export async function buildDaedalusTransferTx(
   payload: {
     addressKeys: AddressKeyMap,
     senderUtxos: Array<RemoteUnspentOutput>,
     outputAddr: string,
-    filterSenders?: boolean
   }
 ): Promise<TransferTx> {
   try {
-    const { addressKeys, senderUtxos, outputAddr, filterSenders = false } = payload;
+    const { addressKeys, senderUtxos, outputAddr } = payload;
 
     const totalBalance = senderUtxos
       .map(utxo => new BigNumber(utxo.amount))
@@ -115,46 +110,53 @@ export async function buildTransferTx(
         new BigNumber(0)
       );
 
-    // first build a transaction to see what the fee will be
+    // build tx
     const txBuilder = sendAllUnsignedTxFromUtxo(
       outputAddr,
       senderUtxos
     ).txBuilder;
     const fee = coinToBigNumber(txBuilder.get_balance_without_fees().value());
 
-    // sign inputs
-    const txFinalizer = new RustModule.WalletV2.TransactionFinalized(
-      txBuilder.make_transaction()
+    // sign
+    const signedTx = signDaedalusTransaction(
+      txBuilder.make_transaction(),
+      addressKeys,
+      senderUtxos,
     );
-    const setting = RustModule.WalletV2.BlockchainSettings.from_json({
-      protocol_magic: protocolMagic
-    });
-    for (let i = 0; i < senderUtxos.length; i++) {
-      const witness = RustModule.WalletV2.Witness.new_extended_key(
-        setting,
-        addressKeys[senderUtxos[i].receiver],
-        txFinalizer.id()
-      );
-      txFinalizer.add_witness(witness);
-    }
 
-    const signedTx = txFinalizer.finalize();
-
-    let senders = Object.keys(addressKeys);
-
-    if (filterSenders) {
-      senders = senders.filter(addr => senderUtxos.some(({ receiver }) => receiver === addr));
-    }
     // return summary of transaction
     return {
       recoveredBalance: totalBalance.dividedBy(LOVELACES_PER_ADA),
       fee: fee.dividedBy(LOVELACES_PER_ADA),
       signedTx,
-      senders,
+      senders: Object.keys(addressKeys),
       receiver: outputAddr,
     };
   } catch (error) {
     Logger.error(`daedalusTransfer::buildTransferTx ${stringifyError(error)}`);
     throw new GenerateTransferTxError();
   }
+}
+
+export function signDaedalusTransaction(
+  unsignedTx: RustModule.WalletV2.Transaction,
+  addressKeys: AddressKeyMap,
+  senderUtxos: Array<RemoteUnspentOutput>,
+): RustModule.WalletV2.SignedTransaction {
+  const txFinalizer = new RustModule.WalletV2.TransactionFinalized(unsignedTx);
+
+  const setting = RustModule.WalletV2.BlockchainSettings.from_json({
+    protocol_magic: protocolMagic
+  });
+  for (let i = 0; i < senderUtxos.length; i++) {
+    const witness = RustModule.WalletV2.Witness.new_extended_key(
+      setting,
+      addressKeys[senderUtxos[i].receiver],
+      txFinalizer.id()
+    );
+    txFinalizer.add_witness(witness);
+  }
+
+  const signedTx = txFinalizer.finalize();
+  return signedTx;
 }

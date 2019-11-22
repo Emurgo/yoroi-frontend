@@ -18,8 +18,8 @@ import type {
 import { TransferStatus } from '../../types/TransferTypes';
 import {
   getAddressesKeys,
-  generateTransferTx
-} from '../../api/ada/daedalusTransfer';
+  generateDaedalusTransferTx
+} from '../../api/ada/transactions/byron/daedalusTransfer';
 import environment from '../../environment';
 import type { SignedResponse } from '../../api/ada/lib/state-fetch/types';
 import {
@@ -154,7 +154,7 @@ export default class DaedalusTransferStore extends Store {
           const addressKeys = getAddressesKeys({ checker, fullUtxo: data.addresses });
           this._updateStatus(TransferStatus.GENERATING_TX);
 
-          const transferTx = await generateTransferTx({
+          const transferTx = await generateDaedalusTransferTx({
             outputAddr: nextInternalAddress,
             addressKeys,
             getUTXOsForAddresses:

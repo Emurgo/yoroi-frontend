@@ -194,9 +194,6 @@ describe('Create legacy witness TX from UTXO', () => {
       [],
       [addressedUtxos[0], addressedUtxos[1]],
     );
-    console.log(JSON.stringify(addressedUtxos[0]));
-    console.log(JSON.stringify(addressedUtxos[1]));
-    console.log(JSON.stringify(unsignedTxResponse.changeAddr));
     const accountPrivateKey = RustModule.WalletV3.Bip32PrivateKey.from_bytes(
       Buffer.from(
         '70afd5ff1f7f551c481b7e3f3541f7c63f5f6bcb293af92565af3deea0bcd6481a6e7b8acbe38f3906c63ccbe8b2d9b876572651ac5d2afc0aca284d9412bb1b4839bf02e1d990056d0f06af22ce4bcca52ac00f1074324aab96bbaaaccf290d',
