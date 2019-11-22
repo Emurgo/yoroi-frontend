@@ -245,7 +245,7 @@
   "wallet.add.page.restore.title": "ウォレットを復元する",
   "wallet.add.page.restore.tooltip": "15単語の復元フレーズを入力し<br/>既存のヨロイウォレットを復元する<br/>またはペーパーウォレットをインポートする",
   "wallet.add.page.subtitle.label": "ヨロイ、CARDANOのライトウォレット",
-  "wallet.add.page.title": "Your gateway <br> to the <br> financial world",
+  "wallet.add.page.title": "金融世界<br>への<br>扉",
   "wallet.amountInput.feesLabel": "+{amount}の手数料",
   "wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching": "他人に画面を見られないよう注意してください。",
   "wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions": "次の画面では、15個のランダムな英単語のセットが表示されます。これは、    ウォレットをバックアップするための<strong>復元フレーズ</strong>です。ヨロイのどのバージョンにも入力でき、    ウォレットの資金と秘密鍵を、バックアップまたは復元することができます。",
