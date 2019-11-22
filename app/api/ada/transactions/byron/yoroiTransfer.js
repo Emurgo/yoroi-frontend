@@ -120,7 +120,8 @@ export async function buildYoroiTransferTx(payload: {
       recoveredBalance: totalBalance.dividedBy(LOVELACES_PER_ADA),
       fee: fee.dividedBy(LOVELACES_PER_ADA),
       signedTx,
-      senders: senderUtxos.map(utxo => utxo.receiver),
+      // only display unique addresses
+      senders: Array.from(new Set(senderUtxos.map(utxo => utxo.receiver))),
       receiver: outputAddr,
     };
   } catch (error) {
