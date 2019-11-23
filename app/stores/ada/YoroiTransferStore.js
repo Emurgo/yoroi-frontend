@@ -13,17 +13,19 @@ import LocalizableError, {
 } from '../../i18n/LocalizableError';
 import type {
   TransferStatusT,
-  TransferTx
+  TransferTx,
+  TransferType,
 } from '../../types/TransferTypes';
-import { TransferStatus } from '../../types/TransferTypes';
-import { generateYoroiTransferTx } from '../../api/ada/transactions/byron/yoroiTransfer';
+import { TransferStatus, TransferKind } from '../../types/TransferTypes';
+import { generateLegacyYoroiTransferTx } from '../../api/ada/transactions/transfer/legacyYoroi';
 import environment from '../../environment';
-import type { SignedResponse } from '../../api/ada/lib/state-fetch/types';
+import type { SendFunc, } from '../../api/ada/lib/state-fetch/types';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import {
   HARD_DERIVATION_START,
   BIP44_PURPOSE,
   CARDANO_COINTYPE,
+  CIP_1852_PURPOSE,
 } from '../../config/numbersConfig';
 import type { RestoreWalletForTransferResponse, RestoreWalletForTransferFunc } from '../../api/ada/index';
 import {
@@ -38,21 +40,12 @@ import {
 } from '../../api/ada/lib/cardanoCrypto/paperWallet';
 import config from '../../config';
 
-type TransferFundsRequest = {
-  signedTx: RustModule.WalletV2.SignedTransaction,
-};
-type TransferFundsResponse = SignedResponse;
-type TransferFundsFunc = (
-  request: TransferFundsRequest
-) => Promise<TransferFundsResponse>;
-
-
 export default class YoroiTransferStore extends Store {
 
   @observable status: TransferStatusT = TransferStatus.UNINITIALIZED;
   @observable disableTransferFunds: boolean = true;
-  @observable transferFundsRequest: Request<TransferFundsFunc>
-    = new Request<TransferFundsFunc>(this._transferFundsRequest);
+  @observable transferFundsRequest: Request<SendFunc>
+    = new Request<SendFunc>(this._transferFundsRequest);
   @observable restoreForTransferRequest: Request<RestoreWalletForTransferFunc>
     = new Request(this.api.ada.restoreWalletForTransfer);
   @observable error: ?LocalizableError = null;
@@ -128,13 +121,14 @@ export default class YoroiTransferStore extends Store {
     recoveryPhrase: string,
     updateStatusCallback: void => void,
     publicDeriver: PublicDeriverWithCachedMeta,
+    transferKind: TransferType,
   ): Promise<TransferTx> => {
     // 1) get receive address
     const withChains = asHasUtxoChains(publicDeriver.self);
-    if (!withChains) throw new Error('_setupTransferWebSocket missing chains functionality');
+    if (!withChains) throw new Error('_generateTransferTxFromMnemonic missing chains functionality');
     const nextInternal = await withChains.nextInternal();
     if (nextInternal.addressInfo == null) {
-      throw new Error('_setupTransferWebSocket no internal addresses left. Should never happen');
+      throw new Error('_generateTransferTxFromMnemonic no internal addresses left. Should never happen');
     }
     const nextInternalAddress = nextInternal.addressInfo.addr.Hash;
 
@@ -150,22 +144,26 @@ export default class YoroiTransferStore extends Store {
     // 3) Calculate private keys for restored wallet utxo
     const accountKey = RustModule.WalletV3.Bip32PrivateKey
       .from_bytes(Buffer.from(masterKey, 'hex'))
-      .derive(BIP44_PURPOSE)
+      .derive(transferKind === TransferKind.SHELLEY
+        ? CIP_1852_PURPOSE
+        : BIP44_PURPOSE)
       .derive(CARDANO_COINTYPE)
       .derive(accountIndex);
 
+    if (transferKind === TransferKind.SHELLEY) {
+      throw new Error('_generateTransferTxFromMnemonic Transfer for Shelley wallets not yet implemented');
+    }
     // 4) generate transaction
-
-    // Possible exception: NotEnoughMoneyToSendError
-    return await generateYoroiTransferTx({
+    const transferTx = await generateLegacyYoroiTransferTx({
       addresses,
       outputAddr: nextInternalAddress,
       keyLevel: Bip44DerivationLevels.ACCOUNT.level,
       signingKey: accountKey,
       getUTXOsForAddresses:
         this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
-      filterSenders: true
     });
+    // Possible exception: NotEnoughMoneyToSendError
+    return transferTx;
   }
 
   _setupTransferFundsWithPaperMnemonic = async (payload: {
@@ -200,12 +198,14 @@ export default class YoroiTransferStore extends Store {
 
   _checkAddresses = async (payload: {
     publicDeriver: PublicDeriverWithCachedMeta,
+    transferKind: TransferType,
   }): Promise<void> => {
     this._updateStatus(TransferStatus.CHECKING_ADDRESSES);
     const transferTx = await this._generateTransferTxFromMnemonic(
       this.recoveryPhrase,
       () => this._updateStatus(TransferStatus.GENERATING_TX),
-      payload.publicDeriver
+      payload.publicDeriver,
+      payload.transferKind,
     );
     runInAction(() => {
       this.transferTx = transferTx;
@@ -228,14 +228,17 @@ export default class YoroiTransferStore extends Store {
   _transferFunds = async (payload: {
     next: void => void,
     publicDeriver: PublicDeriverWithCachedMeta,
+    transferKind: TransferType,
   }): Promise<void> => {
     /*
      Always re-recover from the mnemonics to reduce the chance that the wallet
      changes before the tx is submit (we can't really eliminate it).
      */
     const transferTx = await this._generateTransferTxFromMnemonic(
-      this.recoveryPhrase, () => {},
+      this.recoveryPhrase,
+      () => {},
       payload.publicDeriver,
+      payload.transferKind,
     );
     if (!this.transferTx) {
       throw new NoTransferTxError();
@@ -248,7 +251,8 @@ export default class YoroiTransferStore extends Store {
       const { next } = payload;
 
       await this.transferFundsRequest.execute({
-        signedTx: transferTx.signedTx
+        id: transferTx.id,
+        encodedTx: transferTx.encodedTx,
       });
       this._updateStatus(TransferStatus.SUCCESS);
       await next();
@@ -259,8 +263,10 @@ export default class YoroiTransferStore extends Store {
            This should be very rare because the window is short.
         */
         const newTransferTx = await this._generateTransferTxFromMnemonic(
-          this.recoveryPhrase, () => {},
+          this.recoveryPhrase,
+          () => {},
           payload.publicDeriver,
+          payload.transferKind,
         );
         if (this._isWalletChanged(newTransferTx, transferTx)) {
           return this._handleWalletChanged(newTransferTx);
@@ -313,10 +319,8 @@ export default class YoroiTransferStore extends Store {
   };
 
   /** Send a transaction to the backend-service to be broadcast into the network */
-  _transferFundsRequest = async (request: {
-    signedTx: RustModule.WalletV2.SignedTransaction,
-  }): Promise<SignedResponse> => (
-    this.stores.substores.ada.stateFetchStore.fetcher.sendTx({ signedTx: request.signedTx })
+  _transferFundsRequest: SendFunc = async (request) => (
+    this.stores.substores.ada.stateFetchStore.fetcher.sendTx(request)
   )
 
 }

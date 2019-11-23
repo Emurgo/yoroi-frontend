@@ -39,6 +39,13 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
   |};
   declare export type AddressKindType = $Values<typeof AddressKind>;
 
+  declare export var DelegationKind: {|
+    +NonDelegated: 0, // 0
+    +Full: 1, // 1
+    +Ratio: 2 // 2
+  |};
+  declare export type DelegationKindType = $Values<typeof DelegationKind>;
+
   declare export var CertificateType: {|
     +StakeDelegation: 0, // 0
     +OwnerStakeDelegation: 1, // 1
@@ -632,6 +639,16 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {DelegationType}
      */
     static ratio(r: DelegationRatio): DelegationType;
+
+      /**
+     * @returns {DelegationKindType}
+     */
+    get_kind(): DelegationKindType;
+
+    /**
+     * @returns {PoolId}
+     */
+    get_full(): PoolId | void;
   }
   /**
    */
@@ -716,9 +733,20 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     get_transaction(): Transaction;
 
     /**
+     * @returns {OldUtxoDeclaration}
+     */
+    get_old_utxo_declaration(): OldUtxoDeclaration;
+
+    /**
      * @returns {Uint8Array}
      */
     as_bytes(): Uint8Array;
+
+    /**
+     * @param {Uint8Array} bytes
+     * @returns {Fragment}
+     */
+    static from_bytes(bytes: Uint8Array): Fragment;
 
     /**
      * @returns {boolean}
@@ -1075,6 +1103,22 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
   }
   /**
    */
+  declare export class LegacyDaedalusPrivateKey {
+    free(): void;
+
+    /**
+     * @param {Uint8Array} bytes
+     * @returns {LegacyDaedalusPrivateKey}
+     */
+    static from_bytes(bytes: Uint8Array): LegacyDaedalusPrivateKey;
+
+    /**
+     * @returns {Uint8Array}
+     */
+    as_bytes(): Uint8Array;
+  }
+  /**
+   */
   declare export class LegacyUtxoWitness {
     free(): void;
 
@@ -1125,6 +1169,28 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {Address}
      */
     to_base_address(): Address;
+  }
+  /**
+   */
+  declare export class OldUtxoDeclaration {
+    free(): void;
+
+    /**
+     * @returns {number}
+     */
+    size(): number;
+
+    /**
+     * @param {number} index
+     * @returns {string}
+     */
+    get_address(index: number): string;
+
+    /**
+     * @param {number} index
+     * @returns {Value}
+     */
+    get_value(index: number): Value;
   }
   /**
    * Type for representing a Transaction Output, composed of an Address and a Value
@@ -1623,7 +1689,6 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     to_string(): string;
   }
   /**
-   * Type representing a unsigned transaction
    */
   declare export class Transaction {
     free(): void;
@@ -1959,7 +2024,7 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @param {Bip32PrivateKey} secret_key
      * @returns {Witness}
      */
-    static for_legacy_utxo(
+    static for_legacy_icarus_utxo(
       genesis_hash: Hash,
       transaction_id: TransactionSignDataHash,
       secret_key: Bip32PrivateKey
@@ -1970,9 +2035,22 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @param {LegacyUtxoWitness} witness
      * @returns {Witness}
      */
-    static from_external_legacy_utxo(
+    static from_external_legacy_icarus_utxo(
       key: Bip32PublicKey,
       witness: LegacyUtxoWitness
+    ): Witness;
+
+    /**
+     * Generate Witness for a legacy daedalus utxo-based transaction Input
+     * @param {Hash} genesis_hash
+     * @param {TransactionSignDataHash} transaction_id
+     * @param {LegacyDaedalusPrivateKey} secret_key
+     * @returns {Witness}
+     */
+    static for_legacy_daedalus_utxo(
+      genesis_hash: Hash,
+      transaction_id: TransactionSignDataHash,
+      secret_key: LegacyDaedalusPrivateKey
     ): Witness;
 
     /**

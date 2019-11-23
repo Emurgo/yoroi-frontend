@@ -200,12 +200,13 @@ describe('Create legacy witness TX from UTXO', () => {
         'hex',
       ),
     );
-    const signedTx = signTransaction(
+    const fragment = signTransaction(
       unsignedTxResponse,
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
       true,
     );
+    const signedTx = fragment.get_transaction();
     const witnesses = signedTx.witnesses();
 
     expect(witnesses.size()).toEqual(2);
@@ -250,12 +251,13 @@ describe('Create signed transactions', () => {
         'hex',
       ),
     );
-    const signedTx = signTransaction(
+    const fragment = signTransaction(
       unsignedTxResponse,
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
       false,
     );
+    const signedTx = fragment.get_transaction();
     const witnesses = signedTx.witnesses();
 
     expect(witnesses.size()).toEqual(2);
@@ -304,12 +306,13 @@ describe('Create signed transactions', () => {
         'hex',
       ),
     );
-    const signedTx = signTransaction(
+    const fragment = signTransaction(
       unsignedTxResponse,
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
       false,
     );
+    const signedTx = fragment.get_transaction();
     const witnesses = signedTx.witnesses();
 
     expect(witnesses.size()).toEqual(2);

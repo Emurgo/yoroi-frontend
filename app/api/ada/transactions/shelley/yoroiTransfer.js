@@ -1,7 +1,7 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
-import { coinToBigNumber, v3SecretToV2, } from '../utils';
+import { getFee, } from './utils';
 import {
   Logger,
   stringifyError,
@@ -13,7 +13,7 @@ import {
 import {
   sendAllUnsignedTx,
   signTransaction,
-} from './transactionsV2';
+} from './utxoTransactions';
 import type { AddressedUtxo } from '../types';
 import type {
   TransferTx
@@ -23,12 +23,12 @@ import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 /**
  * Generate transaction including all addresses with no change.
 */
-export async function buildYoroiTransferTx(payload: {
+export async function buildYoroiTransferTx(payload: {|
   senderUtxos: Array<AddressedUtxo>,
   outputAddr: string,
   keyLevel: number,
   signingKey: RustModule.WalletV3.Bip32PrivateKey,
-}): Promise<TransferTx> {
+|}): Promise<TransferTx> {
   try {
     const { senderUtxos, outputAddr, } = payload;
 
@@ -44,28 +44,22 @@ export async function buildYoroiTransferTx(payload: {
       outputAddr,
       senderUtxos
     );
-    const fee = coinToBigNumber(
-      unsignedTxResponse.txBuilder.get_balance_without_fees().value()
-    );
+    const fee = getFee(unsignedTxResponse.IOs);
 
     // sign inputs
-    const signedTx = signTransaction(
-      {
-        senderUtxos: unsignedTxResponse.senderUtxos,
-        unsignedTx: unsignedTxResponse.txBuilder.make_transaction(),
-        changeAddr: unsignedTxResponse.changeAddr,
-      },
+    const fragment = signTransaction(
+      unsignedTxResponse,
       payload.keyLevel,
-      v3SecretToV2(payload.signingKey)
-      ,
+      payload.signingKey,
+      true,
     );
 
     // return summary of transaction
     return {
       recoveredBalance: totalBalance.dividedBy(LOVELACES_PER_ADA),
       fee: fee.dividedBy(LOVELACES_PER_ADA),
-      id: signedTx.id(),
-      encodedTx: Buffer.from(signedTx.to_hex(), 'hex'),
+      id: Buffer.from(fragment.id().as_bytes()).toString('hex'),
+      encodedTx: fragment.as_bytes(),
       // only display unique addresses
       senders: Array.from(new Set(senderUtxos.map(utxo => utxo.receiver))),
       receiver: outputAddr,

@@ -11,7 +11,8 @@ import type { UtxoLookupMap }  from '../utils';
 import { utxosToLookupMap, derivePathAsString, verifyAccountLevel }  from '../utils';
 import type {
   SendFunc,
-  TxBodiesFunc
+  TxBodiesFunc,
+  SignedRequest,
 } from '../../lib/state-fetch/types';
 import {
   SendTransactionError,
@@ -97,16 +98,12 @@ export async function createTrezorSignTxPayload(
 
 /** Send a transaction and save the new change address */
 export async function broadcastTrezorSignedTx(
-  signedTxHex: string,
-  sendTx: SendFunc
+  signedTxRequest: SignedRequest,
+  sendTx: SendFunc,
 ): Promise<BroadcastTrezorSignedTxResponse> {
   Logger.debug('hwTransactions::broadcastTrezorSignedTx: called');
-  const signedTxBytes = Buffer.from(signedTxHex, 'hex');
-  const signedTx = RustModule.WalletV2.SignedTransaction.from_bytes(signedTxBytes);
-
   try {
-    const body = { signedTx };
-    const backendResponse = await sendTx(body);
+    const backendResponse = await sendTx(signedTxRequest);
     Logger.debug('hwTransactions::broadcastTrezorSignedTx: success');
 
     return backendResponse;
@@ -285,7 +282,11 @@ export async function prepareAndBroadcastLedgerSignedTx(
       keyLevel,
     ));
 
-    const backendResponse = await sendTx({ signedTx: finalizer.finalize() });
+    const signedTx = finalizer.finalize();
+    const backendResponse = await sendTx({
+      id: signedTx.id(),
+      encodedTx: Buffer.from(signedTx.to_hex(), 'hex'),
+    });
     Logger.debug('hwTransactions::prepareAndBroadcastLedgerSignedTx: success');
 
     return backendResponse;

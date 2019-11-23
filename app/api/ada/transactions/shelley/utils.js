@@ -30,3 +30,11 @@ export function getTxOutputTotal(
   }
   return sum;
 }
+
+export function getFee(
+  IOs: RustModule.WalletV3.InputOutput,
+): BigNumber {
+  const out = getTxOutputTotal(IOs);
+  const ins = getTxInputTotal(IOs);
+  return ins.minus(out);
+}

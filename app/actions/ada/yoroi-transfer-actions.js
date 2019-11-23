@@ -1,6 +1,7 @@
 // @flow
 import Action from '../lib/Action';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import type { TransferType } from '../../types/TransferTypes';
 
 export default class YoroiTranferActions {
   startTransferFunds: Action<void> = new Action();
@@ -16,11 +17,13 @@ export default class YoroiTranferActions {
   }> = new Action();
   checkAddresses: Action<{|
     publicDeriver: PublicDeriverWithCachedMeta,
+    transferKind: TransferType,
   |}> = new Action();
   backToUninitialized: Action<void> = new Action();
   transferFunds: Action<{
     next: Function,
     publicDeriver: PublicDeriverWithCachedMeta,
+    transferKind: TransferType,
   }> = new Action();
   cancelTransferFunds: Action<void> = new Action();
 }

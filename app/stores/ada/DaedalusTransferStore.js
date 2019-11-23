@@ -18,10 +18,10 @@ import type {
 import { TransferStatus } from '../../types/TransferTypes';
 import {
   getAddressesKeys,
-  generateDaedalusTransferTx
-} from '../../api/ada/transactions/byron/daedalusTransfer';
+  buildDaedalusTransferTx,
+} from '../../api/ada/transactions/transfer/legacyDaedalus';
 import environment from '../../environment';
-import type { SignedResponse } from '../../api/ada/lib/state-fetch/types';
+import type { SendFunc } from '../../api/ada/lib/state-fetch/types';
 import {
   getCryptoDaedalusWalletFromMnemonics,
   getCryptoDaedalusWalletFromMasterKey
@@ -37,22 +37,14 @@ const websocketUrl = CONFIG.network.websocketUrl;
 const MSG_TYPE_RESTORE = 'RESTORE';
 const WS_CODE_NORMAL_CLOSURE = 1000;
 
-type TransferFundsRequest = {
-  signedTx: RustModule.WalletV2.SignedTransaction,
-};
-type TransferFundsResponse = SignedResponse;
-type TransferFundsFunc = (
-  request: TransferFundsRequest
-) => Promise<TransferFundsResponse>;
-
 export default class DaedalusTransferStore extends Store {
 
   @observable status: TransferStatusT = TransferStatus.UNINITIALIZED;
   @observable disableTransferFunds: boolean = true;
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
-  @observable transferFundsRequest: Request<TransferFundsFunc>
-    = new Request<TransferFundsFunc>(this._transferFundsRequest);
+  @observable transferFundsRequest: Request<SendFunc>
+    = new Request<SendFunc>(this._transferFundsRequest);
 
   @observable ws: ?WebSocket = null;
 
@@ -154,9 +146,9 @@ export default class DaedalusTransferStore extends Store {
           const addressKeys = getAddressesKeys({ checker, fullUtxo: data.addresses });
           this._updateStatus(TransferStatus.GENERATING_TX);
 
-          const transferTx = await generateDaedalusTransferTx({
-            outputAddr: nextInternalAddress,
+          const transferTx = await buildDaedalusTransferTx({
             addressKeys,
+            outputAddr: nextInternalAddress,
             getUTXOsForAddresses:
               this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
           });
@@ -240,10 +232,8 @@ export default class DaedalusTransferStore extends Store {
   }
 
   /** Send a transaction to the backend-service to be broadcast into the network */
-  _transferFundsRequest = async (request: {
-    signedTx: RustModule.WalletV2.SignedTransaction,
-  }): Promise<SignedResponse> => (
-    this.stores.substores.ada.stateFetchStore.fetcher.sendTx({ signedTx: request.signedTx })
+  _transferFundsRequest: SendFunc = async (request) => (
+    this.stores.substores.ada.stateFetchStore.fetcher.sendTx(request)
   )
 
   /** Broadcast the transfer transaction if one exists and proceed to continuation */
@@ -257,7 +247,8 @@ export default class DaedalusTransferStore extends Store {
         throw new NoTransferTxError();
       }
       await this.transferFundsRequest.execute({
-        signedTx: this.transferTx.signedTx
+        id: this.transferTx.id,
+        encodedTx: this.transferTx.encodedTx,
       });
       // TBD: why do we need a continuation instead of just putting the code here directly?
       next();

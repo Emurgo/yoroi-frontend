@@ -154,11 +154,7 @@ export class RemoteFetcher implements IFetcher {
   )
 
   sendTx: SignedRequest => Promise<SignedResponse> = (body) => {
-    const signedTxHex = Buffer.from(
-      body.signedTx.to_hex(),
-      'hex'
-    );
-    const signedTx64 = Buffer.from(signedTxHex).toString('base64');
+    const signedTx64 = Buffer.from(body.encodedTx).toString('base64');
     return axios(
       `${backendUrl}/api/txs/signed`,
       {
@@ -172,7 +168,7 @@ export class RemoteFetcher implements IFetcher {
         }
       }
     ).then(() => ({
-      txId: body.signedTx.id()
+      txId: body.id
     }))
       .catch((error) => {
         Logger.error('RemoteFetcher::sendTx error: ' + stringifyError(error));
