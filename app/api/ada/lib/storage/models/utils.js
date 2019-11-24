@@ -196,7 +196,7 @@ export async function rawGetDerivationsByPath<
     GetPathWithSpecific: Class<GetPathWithSpecific>,
   |},
   request: GetPathWithSpecificByTreeRequest,
-  level: number,
+  finalLevel: number,
   derivationTables: Map<number, string>,
 ): Promise<Array<{|
   row: $ReadOnly<Row>,
@@ -209,7 +209,7 @@ export async function rawGetDerivationsByPath<
       const result = await deps.GetDerivationSpecific.get<Row>(
         db, tx,
         derivationIds,
-        level,
+        finalLevel,
         derivationTables,
       );
       return result;

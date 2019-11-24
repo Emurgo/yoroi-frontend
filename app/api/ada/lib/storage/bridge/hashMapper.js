@@ -56,13 +56,17 @@ export function rawGenAddByHash(
         return;
       }
     }
-    await deps.AddAddress.addFromCanonicalByHash(
+    const newHashes = await deps.AddAddress.addFromCanonicalByHash(
       request.db, request.tx,
       [{
         ...request.address,
         keyDerivationId: request.keyDerivationId,
       }]
     );
+
+    for (const row of newHashes) {
+      ownAddressIds.add(row.AddressId);
+    }
   };
 }
 

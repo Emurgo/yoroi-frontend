@@ -37,7 +37,10 @@ import type {
 } from './builder';
 import type { AddByHashFunc } from '../hashMapper';
 import { rawGenAddByHash } from '../hashMapper';
-import { addShelleyAddress } from '../../../../restoration/shelley/scan';
+import {
+  addShelleyUtxoAddress,
+  addShelleyChimericAccountAddress,
+} from '../../../../restoration/shelley/scan';
 
 
 // TODO: maybe move this inside walletBuilder somehow so it's all done in the same transaction
@@ -93,7 +96,7 @@ export async function getAccountDefaultDerivations(
   const externalAddresses = addressesIndex.map(i => ({
     index: i,
     insert: async insertRequest => {
-      return await addShelleyAddress(
+      return await addShelleyUtxoAddress(
         addByHash,
         insertRequest,
         stakingKey,
@@ -104,7 +107,7 @@ export async function getAccountDefaultDerivations(
   const internalAddresses = addressesIndex.map(i => ({
     index: i,
     insert: async insertRequest => {
-      return await addShelleyAddress(
+      return await addShelleyUtxoAddress(
         addByHash,
         insertRequest,
         stakingKey,
@@ -112,10 +115,22 @@ export async function getAccountDefaultDerivations(
       );
     },
   }));
+  const accountAddress = [0].map(i => ({
+    index: i,
+    insert: async insertRequest => {
+      return await addShelleyChimericAccountAddress(
+        addByHash,
+        insertRequest,
+        stakingKey,
+        discrimination
+      );
+    },
+  }));
+
 
   return [
     {
-      index: 0,
+      index: EXTERNAL,
       insert: insertRequest => Promise.resolve({
         KeyDerivationId: insertRequest.keyDerivationId,
         DisplayCutoff: 0
@@ -123,12 +138,20 @@ export async function getAccountDefaultDerivations(
       children: externalAddresses,
     },
     {
-      index: 1,
+      index: INTERNAL,
       insert: insertRequest => Promise.resolve({
         KeyDerivationId: insertRequest.keyDerivationId,
         DisplayCutoff: null,
       }),
       children: internalAddresses,
+    },
+    {
+      index: ACCOUNT,
+      insert: insertRequest => Promise.resolve({
+        KeyDerivationId: insertRequest.keyDerivationId,
+        DisplayCutoff: null,
+      }),
+      children: accountAddress,
     }
   ];
 }
