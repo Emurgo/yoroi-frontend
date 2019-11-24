@@ -18,6 +18,7 @@ import type { BaseSignRequest } from '../../api/ada/transactions/types';
 import {
   asGetSigningKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 export default class AdaWalletsStore extends WalletStore {
 
@@ -53,7 +54,7 @@ export default class AdaWalletsStore extends WalletStore {
 
   /** Send money and then return to transaction screen */
   _sendMoney = async (transactionDetails: {|
-    signRequest: BaseSignRequest,
+    signRequest: BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>,
     password: string,
   |}): Promise<void> => {
     const publicDeriver = this.selected;

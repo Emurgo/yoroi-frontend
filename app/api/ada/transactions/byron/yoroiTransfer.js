@@ -1,7 +1,8 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
-import { coinToBigNumber, v3SecretToV2, } from '../utils';
+import { v3SecretToV2, } from '../utils';
+import { coinToBigNumber, } from './utils';
 import {
   Logger,
   stringifyError,

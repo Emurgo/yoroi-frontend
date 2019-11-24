@@ -63,11 +63,17 @@ import type {
   IChangePasswordRequestFunc, IChangePasswordRequest, IChangePasswordResponse,
 } from './lib/storage/models/common/interfaces';
 import {
-  sendAllUnsignedTx,
-  newAdaUnsignedTx,
-  asAddressedUtxo,
-  signTransaction,
+  sendAllUnsignedTx as byronSendAllUnsignedTx,
+  newAdaUnsignedTx as byronNewAdaUnsignedTx,
+  asAddressedUtxo as byronAsAddressedUtxo,
+  signTransaction as byronSignTransaction,
 } from './transactions/byron/transactionsV2';
+import {
+  sendAllUnsignedTx as shelleySendAllUnsignedTx,
+  newAdaUnsignedTx as shelleyNewAdaUnsignedTx,
+  asAddressedUtxo as shelleyAsAddressedUtxo,
+  signTransaction as shelleySignTransaction,
+} from './transactions/shelley/utxoTransactions';
 import {
   generateWalletRootKey,
   generateAdaMnemonic,
@@ -100,6 +106,7 @@ import { scanBip44Account, } from './restoration/byron/scan';
 import type {
   BaseSignRequest,
   UnsignedTxResponse,
+  V3UnsignedTxAddressedUtxoResponse,
 } from './transactions/types';
 import type {
   SignTransactionResponse as LedgerSignTxResponse
@@ -141,6 +148,7 @@ import { RustModule } from './lib/cardanoCrypto/rustLoader';
 import { clear } from './lib/storage/database/index';
 import environment from '../../environment';
 import { Cip1852Wallet } from './lib/storage/models/Cip1852Wallet/wrapper';
+import { verifyAddress } from './lib/storage/bridge/utils';
 
 declare var CONFIG : ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;
@@ -278,7 +286,7 @@ export type CreateWalletFunc = (
 
 export type SignAndBroadcastRequest = {
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey,
-  signRequest: BaseSignRequest,
+  signRequest: BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>,
   password: string,
   sendTx: SendFunc,
 };
@@ -290,7 +298,7 @@ export type SignAndBroadcastFunc = (
 // createTrezorSignTxData
 
 export type CreateTrezorSignTxDataRequest = {
-  signRequest: BaseSignRequest,
+  signRequest: BaseSignRequest<RustModule.WalletV2.Transaction>,
   getTxsBodiesForUTXOs: TxBodiesFunc,
 };
 export type CreateTrezorSignTxDataResponse = {
@@ -315,7 +323,7 @@ export type BroadcastTrezorSignedTxFunc = (
 // createLedgerSignTxData
 
 export type CreateLedgerSignTxDataRequest = {
-  signRequest: BaseSignRequest,
+  signRequest: BaseSignRequest<RustModule.WalletV2.Transaction>,
   getTxsBodiesForUTXOs: TxBodiesFunc,
 };
 export type CreateLedgerSignTxDataResponse = {
@@ -347,7 +355,7 @@ export type CreateUnsignedTxRequest = {
   amount: string, // in lovelaces
   shouldSendAll: boolean,
 };
-export type CreateUnsignedTxResponse = UnsignedTxResponse;
+export type CreateUnsignedTxResponse = UnsignedTxResponse | V3UnsignedTxAddressedUtxoResponse;
 
 export type CreateUnsignedTxFunc = (
   request: CreateUnsignedTxRequest
@@ -724,14 +732,42 @@ export default class AdaApi {
         ...signingKey,
         password,
       });
-      const signedTx = signTransaction(
-        signRequest,
-        request.publicDeriver.getParent().getPublicDeriverLevel(),
-        RustModule.WalletV2.PrivateKey.from_hex(normalizedKey.prvKeyHex)
-      );
+      const unsignedTx = signRequest.unsignedTx;
+      let id;
+      let encodedTx;
+      if (unsignedTx instanceof RustModule.WalletV2.Transaction) {
+        const signedTx = byronSignTransaction(
+          {
+            ...signRequest,
+            unsignedTx,
+          },
+          request.publicDeriver.getParent().getPublicDeriverLevel(),
+          RustModule.WalletV2.PrivateKey.from_hex(normalizedKey.prvKeyHex)
+        );
+        id = signedTx.id();
+        encodedTx = Buffer.from(signedTx.to_hex(), 'hex');
+      } else if (unsignedTx instanceof RustModule.WalletV3.InputOutput) {
+        const signedTx = shelleySignTransaction(
+          {
+            senderUtxos: signRequest.senderUtxos,
+            changeAddr: signRequest.changeAddr,
+            IOs: unsignedTx,
+          },
+          request.publicDeriver.getParent().getPublicDeriverLevel(),
+          RustModule.WalletV3.Bip32PrivateKey.from_bytes(
+            Buffer.from(normalizedKey.prvKeyHex, 'hex')
+          ),
+          // Note: always false because we should only do legacy txs for wallet transfers
+          false,
+        );
+        id = Buffer.from(signedTx.id().as_bytes()).toString('hex');
+        encodedTx = signedTx.as_bytes();
+      } else {
+        throw new Error('signAndBroadcast not supported');
+      }
       const response = request.sendTx({
-        id: signedTx.id(),
-        encodedTx: Buffer.from(signedTx.to_hex(), 'hex'),
+        id,
+        encodedTx,
       });
       Logger.debug(
         'AdaApi::signAndBroadcast success: ' + stringifyData(response)
@@ -868,29 +904,46 @@ export default class AdaApi {
     const { receiver, amount, shouldSendAll } = request;
     try {
       const utxos = await request.publicDeriver.getAllUtxos();
-      const addressedUtxo = asAddressedUtxo(utxos);
+      const addressedUtxo = environment.isShelley()
+        ? shelleyAsAddressedUtxo(utxos)
+        : byronAsAddressedUtxo(utxos);
 
       let unsignedTxResponse;
       if (shouldSendAll) {
-        unsignedTxResponse = sendAllUnsignedTx(
-          receiver,
-          addressedUtxo
-        );
+        unsignedTxResponse = environment.isShelley()
+          ? shelleySendAllUnsignedTx(
+            receiver,
+            addressedUtxo
+          )
+          : byronSendAllUnsignedTx(
+            receiver,
+            addressedUtxo
+          );
       } else {
         const nextUnusedInternal = await request.publicDeriver.nextInternal();
         if (nextUnusedInternal.addressInfo == null) {
           throw new Error('createUnsignedTx no internal addresses left. Should never happen');
         }
         const changeAddr = nextUnusedInternal.addressInfo;
-        unsignedTxResponse = newAdaUnsignedTx(
-          receiver,
-          amount,
-          [{
-            address: changeAddr.addr.Hash,
-            addressing: changeAddr.addressing,
-          }],
-          addressedUtxo
-        );
+        unsignedTxResponse = environment.isShelley()
+          ? shelleyNewAdaUnsignedTx(
+            receiver,
+            amount,
+            [{
+              address: changeAddr.addr.Hash,
+              addressing: changeAddr.addressing,
+            }],
+            addressedUtxo
+          )
+          : byronNewAdaUnsignedTx(
+            receiver,
+            amount,
+            [{
+              address: changeAddr.addr.Hash,
+              addressing: changeAddr.addressing,
+            }],
+            addressedUtxo
+          );
       }
       Logger.debug(
         'AdaApi::createUnsignedTx success: ' + stringifyData(unsignedTxResponse)
@@ -971,13 +1024,12 @@ export default class AdaApi {
     request: IsValidAddressRequest
   ): Promise<IsValidAddressResponse> {
     try {
-      RustModule.WalletV2.Address.from_base58(request.address);
-      return Promise.resolve(true);
+      return Promise.resolve(verifyAddress(request.address));
     } catch (validateAddressError) {
       Logger.error('AdaApi::isValidAdaAddress error: ' +
         stringifyError(validateAddressError));
 
-      // This error means the address is not valid
+      // If for some reason an is uncaught probably the address is not valid
       return Promise.resolve(false);
     }
   }

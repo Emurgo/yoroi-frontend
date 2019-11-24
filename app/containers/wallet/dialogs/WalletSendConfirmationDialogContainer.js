@@ -6,18 +6,19 @@ import type { InjectedProps } from '../../../types/injectedPropsType';
 import type { BaseSignRequest } from '../../../api/ada/transactions/types';
 import {
   copySignRequest,
-  signRequestFee,
-  signRequestReceivers,
-  signRequestTotalInput,
+  IGetFee,
+  IReceivers,
+  ITotalInput,
 } from '../../../api/ada/transactions/utils';
 import WalletSendConfirmationDialog from '../../../components/wallet/send/WalletSendConfirmationDialog';
 import {
   formattedWalletAmount,
   formattedAmountToNaturalUnits,
 } from '../../../utils/formatters';
+import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 
 type DialogProps = {|
-  +signRequest: BaseSignRequest,
+  +signRequest: BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>,
   +currencyUnit: string,
   +staleTx: boolean,
 |};
@@ -42,9 +43,9 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
 
     if (publicDeriver == null) throw new Error('Active wallet required for WalletSendPage.');
 
-    const totalInput = signRequestTotalInput(signRequest, true);
-    const fee = signRequestFee(signRequest, true);
-    const receivers = signRequestReceivers(signRequest, false);
+    const totalInput = ITotalInput(signRequest, true);
+    const fee = IGetFee(signRequest, true);
+    const receivers = IReceivers(signRequest, false);
     return (
       <WalletSendConfirmationDialog
         staleTx={this.props.staleTx}
@@ -54,7 +55,6 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         totalAmount={formattedWalletAmount(totalInput)}
         transactionFee={formattedWalletAmount(fee)}
         amountToNaturalUnits={formattedAmountToNaturalUnits}
-        signRequest={signRequest}
         onSubmit={({ password }) => {
           const copyRequest = copySignRequest(signRequest);
           sendMoney.trigger({

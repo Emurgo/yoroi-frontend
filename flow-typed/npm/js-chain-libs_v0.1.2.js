@@ -55,6 +55,12 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
   |};
   declare export type CertificateTypeT = $Values<typeof CertificateType>;
 
+  declare export var InputKind: {|
+    +Account: 0, // 0
+    +Utxo: 1 // 1
+  |};
+  declare export type InputKindType = $Values<typeof InputKind>;
+
   /**
    * This is either an single account or a multisig account depending on the witness type
    */
@@ -948,10 +954,9 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
     static from_account(account: Account, v: Value): Input;
 
     /**
-     * Get the kind of Input, this can be either \"Account\" or \"Utxo\
-     * @returns {string}
+     * @returns {InputKindType}
      */
-    get_type(): string;
+    get_type(): InputKindType;
 
     /**
      * @returns {boolean}
@@ -979,6 +984,17 @@ declare module 'js-chain-libs' { // need to wrap flowgen output into module
      * @returns {AccountIdentifier}
      */
     get_account_identifier(): AccountIdentifier;
+
+    /**
+     * @returns {Uint8Array}
+     */
+    as_bytes(): Uint8Array;
+
+    /**
+     * @param {Uint8Array} bytes
+     * @returns {Input}
+     */
+    static from_bytes(bytes: Uint8Array): Input;
   }
   /**
    */

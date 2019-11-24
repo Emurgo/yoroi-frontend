@@ -1,10 +1,11 @@
 // @flow
 import Action from '../lib/Action';
 import type { BaseSignRequest } from '../../api/ada/transactions/types';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
-export type SendUsingLedgerParams = {
-  signRequest: BaseSignRequest,
-};
+export type SendUsingLedgerParams = {|
+  signRequest: BaseSignRequest<RustModule.WalletV2.Transaction>,
+|};
 
 // ======= Sending ADA using Ledger ACTIONS =======
 

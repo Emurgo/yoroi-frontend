@@ -3,7 +3,7 @@
 // Create byron transactions for wallets created with the v1 address scheme
 
 import BigNumber from 'bignumber.js';
-import { coinToBigNumber, } from '../utils';
+import { coinToBigNumber, } from './utils';
 import {
   Logger,
   stringifyError,

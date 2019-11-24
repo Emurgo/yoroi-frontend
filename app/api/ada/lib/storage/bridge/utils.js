@@ -3,6 +3,7 @@
 import type { CoreAddressT } from '../database/primitives/enums';
 import { CoreAddressTypes } from '../database/primitives/enums';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
+import envrionment from '../../../../../environment';
 
 export function addressToKind(
   address: string
@@ -26,6 +27,26 @@ export function addressToKind(
       }
     } catch (_e2) {
       throw new Error('addressToKind failed to parse address type ' + address);
+    }
+  }
+}
+
+export function verifyAddress(
+  address: string
+): boolean {
+  if (envrionment.isShelley()) {
+    try {
+      RustModule.WalletV3.Address.from_string(address);
+      return true;
+    } catch (_e2) {
+      return false;
+    }
+  } else {
+    try {
+      RustModule.WalletV2.Address.from_base58(address);
+      return true;
+    } catch (_e1) {
+      return false;
     }
   }
 }
