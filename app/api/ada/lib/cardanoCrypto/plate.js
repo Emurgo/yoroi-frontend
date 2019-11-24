@@ -6,7 +6,7 @@
 import { RustModule } from './rustLoader';
 import type { GenerateAddressFunc } from '../adaAddressProcessing';
 import { v2genAddressBatchFunc } from '../../restoration/byron/scan';
-import { v3genAddressBatchFunc } from '../../restoration/shelley/scan';
+import { genSingleAddressBatchFunc } from '../../restoration/shelley/scan';
 import blakejs from 'blakejs';
 import crc32 from 'buffer-crc32';
 import type { WalletAccountNumberPlate } from '../storage/models/PublicDeriver/interfaces';
@@ -67,7 +67,7 @@ export const generateStandardPlate = (
           RustModule.WalletV2.DerivationScheme.v2()
         ),
       )
-      : v3genAddressBatchFunc(
+      : genSingleAddressBatchFunc(
         chainKey,
         discrimination,
       ),
