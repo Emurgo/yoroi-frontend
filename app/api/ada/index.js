@@ -1024,7 +1024,7 @@ export default class AdaApi {
     request: IsValidAddressRequest
   ): Promise<IsValidAddressResponse> {
     try {
-      return Promise.resolve(verifyAddress(request.address));
+      return Promise.resolve(verifyAddress(request.address, environment.isShelley()));
     } catch (validateAddressError) {
       Logger.error('AdaApi::isValidAdaAddress error: ' +
         stringifyError(validateAddressError));

@@ -3,7 +3,6 @@
 import type { CoreAddressT } from '../database/primitives/enums';
 import { CoreAddressTypes } from '../database/primitives/enums';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
-import envrionment from '../../../../../environment';
 
 export function addressToKind(
   address: string
@@ -32,9 +31,10 @@ export function addressToKind(
 }
 
 export function verifyAddress(
-  address: string
+  address: string,
+  isShelley: boolean,
 ): boolean {
-  if (envrionment.isShelley()) {
+  if (isShelley) {
     try {
       RustModule.WalletV3.Address.from_string(address);
       return true;
