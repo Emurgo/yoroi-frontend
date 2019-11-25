@@ -33,19 +33,19 @@ describe('Create unsigned TX for account', () => {
       },
       new BigNumber(5000000),
     );
-    const inputSum = getTxInputTotal(unsignedTxResponse);
-    const outputSum = getTxOutputTotal(unsignedTxResponse);
+    const inputSum = getTxInputTotal(unsignedTxResponse, false);
+    const outputSum = getTxOutputTotal(unsignedTxResponse, false);
     expect(inputSum.toString()).toEqual('2155383');
     expect(outputSum.toString()).toEqual('2000000');
     expect(inputSum.minus(outputSum).toString()).toEqual('155383');
 
-    const signedTx = signTransaction(
+    const fragment = signTransaction(
       unsignedTxResponse,
       0,
       undefined,
       senderKey,
     );
-
+    const signedTx = fragment.get_transaction();
     const witnesses = signedTx.witnesses();
 
     expect(witnesses.size()).toEqual(1);

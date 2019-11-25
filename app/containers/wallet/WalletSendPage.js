@@ -23,12 +23,13 @@ import {
 } from '../../utils/formatters';
 import {
   copySignRequest,
-  signRequestFee,
-  signRequestReceivers,
-  signRequestTotalInput,
+  IGetFee,
+  IReceivers,
+  ITotalInput,
 } from '../../api/ada/transactions/utils';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 // Hardware Wallet Confirmation
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
@@ -178,12 +179,21 @@ export default class WalletSendPage extends Component<Props> {
     }
     const signRequest = transactionBuilderStore.tentativeTx;
 
-    const totalInput = signRequestTotalInput(signRequest, true);
-    const fee = signRequestFee(signRequest, true);
-    const receivers = signRequestReceivers(signRequest, false);
+    const totalInput = ITotalInput(signRequest, true);
+    const fee = IGetFee(signRequest, true);
+    const receivers = IReceivers(signRequest, false);
 
     const conceptualWallet = publicDeriver.self.getParent();
     let hwSendConfirmationDialog: Node = null;
+
+    const unsignedTx = signRequest.unsignedTx;
+    if (!(unsignedTx instanceof RustModule.WalletV2.Transaction)) {
+      throw new Error('hardwareWalletDoConfirmation hw wallets unsupported for Shelley');
+    }
+    const v2Request = {
+      ...signRequest,
+      unsignedTx,
+    };
     if (isLedgerNanoWallet(conceptualWallet)) {
       const ledgerSendAction = this.props.actions[environment.API].ledgerSend;
       ledgerSendAction.init.trigger();
@@ -203,7 +213,7 @@ export default class WalletSendPage extends Component<Props> {
           error={ledgerSendStore.error}
           onSubmit={
             () => ledgerSendAction.sendUsingLedger.trigger({
-              signRequest: copySignRequest(signRequest)
+              signRequest: copySignRequest(v2Request)
             })
           }
           onCancel={ledgerSendAction.cancel.trigger}
@@ -227,7 +237,7 @@ export default class WalletSendPage extends Component<Props> {
           error={trezorSendStore.error}
           onSubmit={
             () => trezorSendAction.sendUsingTrezor.trigger({
-              signRequest: copySignRequest(signRequest)
+              signRequest: copySignRequest(v2Request)
             })
           }
           onCancel={trezorSendAction.cancel.trigger}

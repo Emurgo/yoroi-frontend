@@ -51,7 +51,7 @@ declare var CONFIG: ConfigType;
 // ==================== TREZOR ==================== //
 /** Generate a payload for Trezor SignTx */
 export async function createTrezorSignTxPayload(
-  signRequest: BaseSignRequest,
+  signRequest: BaseSignRequest<RustModule.WalletV2.Transaction>,
   getTxsBodiesForUTXOs: TxBodiesFunc,
 ): Promise<$CardanoSignTransaction> {
   const txJson = signRequest.unsignedTx.to_json();
@@ -167,7 +167,7 @@ function _generateTrezorOutputs(
 // ==================== LEDGER ==================== //
 /** Generate a payload for Ledger SignTx */
 export async function createLedgerSignTxPayload(
-  signRequest: BaseSignRequest,
+  signRequest: BaseSignRequest<RustModule.WalletV2.Transaction>,
   getTxsBodiesForUTXOs: TxBodiesFunc,
 ): Promise<LedgerSignTxPayload> {
   const txJson = signRequest.unsignedTx.to_json();

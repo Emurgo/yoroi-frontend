@@ -208,6 +208,7 @@ export default class AddressesStore extends Store {
       Logger.error(`_wrapForAllAddresses incorrect public deriver`);
       return Promise.resolve([]);
     }
+    // TODO: filter group keys to only get key with our staking key?
     return this.api[environment.API].getAllAddressesForDisplay({
       publicDeriver: withUtxos,
       type: environment.isShelley()
@@ -226,6 +227,7 @@ export default class AddressesStore extends Store {
       Logger.error(`_wrapForChainAddresses incorrect public deriver`);
       return Promise.resolve([]);
     }
+    // TODO: filter group keys to only get key with our staking key?
     return this.api[environment.API].getChainAddressesForDisplay({
       publicDeriver: withHasUtxoChains,
       chainsRequest: request.chainsRequest,

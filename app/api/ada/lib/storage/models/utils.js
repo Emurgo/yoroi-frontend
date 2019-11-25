@@ -528,7 +528,7 @@ export async function getAllAddressesForDisplay(
   );
 }
 
-export type NextUnusedResponose = {|
+export type NextUnusedResponse = {|
   addressInfo: void | UtxoAddressPath,
   index: number,
 |}
@@ -541,7 +541,7 @@ export async function rawGetNextUnusedIndex(
   request:  {|
     addressesForChain: Array<UtxoAddressPath>,
   |}
-): Promise<NextUnusedResponose> {
+): Promise<NextUnusedResponse> {
   const usedStatus = await rawGetUtxoUsedStatus(
     db, tx,
     { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx },

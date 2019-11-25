@@ -2,6 +2,7 @@
 import BigNumber from 'bignumber.js';
 import Action from '../lib/Action';
 import type { BaseSignRequest } from '../../api/ada/transactions/types';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 // ======= WALLET ACTIONS =======
 
@@ -13,7 +14,7 @@ export default class WalletsActions {
     walletPassword: string
   |}> = new Action();
   sendMoney: Action<{|
-    signRequest: BaseSignRequest,
+    signRequest: BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>,
     password: string,
   |}> = new Action();
   updateBalance: Action<BigNumber> = new Action();

@@ -29,3 +29,24 @@ export function addressToKind(
     }
   }
 }
+
+export function verifyAddress(
+  address: string,
+  isShelley: boolean,
+): boolean {
+  if (isShelley) {
+    try {
+      RustModule.WalletV3.Address.from_string(address);
+      return true;
+    } catch (_e2) {
+      return false;
+    }
+  } else {
+    try {
+      RustModule.WalletV2.Address.from_base58(address);
+      return true;
+    } catch (_e1) {
+      return false;
+    }
+  }
+}

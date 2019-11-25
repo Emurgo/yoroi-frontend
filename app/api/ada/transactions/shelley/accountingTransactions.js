@@ -118,7 +118,7 @@ export function signTransaction(
   accountCounter: number,
   certificate: ?RustModule.WalletV3.Certificate,
   accountPrivateKey: RustModule.WalletV3.PrivateKey
-): RustModule.WalletV3.Transaction {
+): RustModule.WalletV3.Fragment {
   const txbuilder = new RustModule.WalletV3.TransactionBuilder();
 
   const builderSetIOs = certificate != null
@@ -152,5 +152,6 @@ export function signTransaction(
   const signedTx = builderSignCertificate.set_payload_auth(
     payloadAuthData
   );
-  return signedTx;
+  const fragment = RustModule.WalletV3.Fragment.from_transaction(signedTx);
+  return fragment;
 }

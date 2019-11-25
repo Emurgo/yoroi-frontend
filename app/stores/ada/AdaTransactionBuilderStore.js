@@ -9,11 +9,11 @@ import type {
 } from '../../api/ada';
 
 import type { BaseSignRequest } from '../../api/ada/transactions/types';
-import { signRequestFee, signRequestTotalInput } from '../../api/ada/transactions/utils';
+import { IGetFee, ITotalInput, ITxEqual, copySignRequest } from '../../api/ada/transactions/utils';
 import {
   asGetAllUtxos, asHasUtxoChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 /**
  * TODO: we make the following assumptions
@@ -28,9 +28,13 @@ export default class AdaTransactionBuilderStore extends Store {
   /** Stores the tx information as the user is building it */
   @observable plannedTxInfo: Array<{ ...Inexact<TxOutType<number>> }>;
   /** Stores the tx used to generate the information on the send form */
-  @observable plannedTx: null | BaseSignRequest;
+  @observable plannedTx: null | BaseSignRequest<
+    RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput
+  >;
   /** Stores the tx that will be sent if the user confirms sending */
-  @observable tentativeTx: null | BaseSignRequest;
+  @observable tentativeTx: null | BaseSignRequest<
+    RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput
+  >;
 
   /** tracks mismatch between `plannedTx` and `tentativeTx` */
   @observable txMismatch: boolean = false;
@@ -60,7 +64,7 @@ export default class AdaTransactionBuilderStore extends Store {
     if (!this.plannedTx) {
       return undefined;
     }
-    return signRequestFee(this.plannedTx, true);
+    return IGetFee(this.plannedTx, true);
   }
 
   @computed get
@@ -68,7 +72,7 @@ export default class AdaTransactionBuilderStore extends Store {
     if (!this.plannedTx) {
       return undefined;
     }
-    return signRequestTotalInput(this.plannedTx, true);
+    return ITotalInput(this.plannedTx, true);
   }
 
   // ================
@@ -104,7 +108,9 @@ export default class AdaTransactionBuilderStore extends Store {
     runInAction(() => {
       this.plannedTx = {
         senderUtxos: result.senderUtxos,
-        unsignedTx: result.txBuilder.make_transaction(),
+        unsignedTx: result.txBuilder
+          ? result.txBuilder.make_transaction()
+          : result.IOs,
         changeAddr: result.changeAddr,
       };
     });
@@ -257,7 +263,9 @@ export default class AdaTransactionBuilderStore extends Store {
    * We need to clone to tentative tx to avoid the dialog changing
    * when the send page recalculates the utxo
    */
-  _cloneTx = (signRequest: BaseSignRequest): BaseSignRequest => {
+  _cloneTx = (
+    signRequest: BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>
+  ): BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput> => {
     // drop mobx observable behavior
     const copy = toJS(signRequest);
 
@@ -266,8 +274,7 @@ export default class AdaTransactionBuilderStore extends Store {
      *
      * To avoid the back button breaking the send page form, we clone the tx
      */
-    copy.unsignedTx = copy.unsignedTx.clone();
-    return copy;
+    return copySignRequest(copy);
   }
 
   /**
@@ -281,17 +288,6 @@ export default class AdaTransactionBuilderStore extends Store {
       return this.txMismatch;
     }
 
-    // cast to non-null
-    const plannedUnsignedTx = this.plannedTx.unsignedTx;
-
-    // to_json returns objects and not strings
-    // so we need to get rid of the object part with stringify
-    const tentativeTxJson = JSON.stringify((this.tentativeTx.unsignedTx.to_json()));
-    const plannedTxJson = JSON.stringify(plannedUnsignedTx.to_json());
-
-    if (tentativeTxJson !== plannedTxJson) {
-      return true;
-    }
-    return false;
+    return !ITxEqual(this.tentativeTx, this.plannedTx);
   }
 }

@@ -18,6 +18,8 @@ import type {
   IPublicDeriver,
   IGetAllUtxoAddressesRequest, IGetAllUtxoAddressesResponse,
   IGetAllUtxos, IGetAllUtxosRequest, IGetAllUtxosResponse,
+  IPickInternal,
+  IPickInternalRequest, IPickInternalResponse,
   IDisplayCutoff,
   IDisplayCutoffPopRequest, IDisplayCutoffPopResponse,
   IDisplayCutoffGetRequest, IDisplayCutoffGetResponse,
@@ -836,11 +838,102 @@ export function asDisplayCutoff<T: IPublicDeriver<any>>(
   return undefined;
 }
 
+// =====================
+//   Bip44PickInternal
+// =====================
+
+type Bip44PickInternalMixinDependencies = IPublicDeriver<>;
+const Bip44PickInternalMixin = (
+  superclass: Class<Bip44PickInternalMixinDependencies>,
+) => class Bip44PickInternal extends superclass implements IPickInternal {
+  rawPickInternal: (
+    lf$Transaction,
+    {|
+      GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetAddress: Class<GetAddress>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
+    |},
+    IPickInternalRequest,
+    Map<number, string>,
+  ) => Promise<IPickInternalResponse> = async (
+    _tx,
+    _deps,
+    body,
+    _derivationTables,
+  ) => {
+    const legacyAddr = body.addrs
+      .filter(addr => addr.Type === CoreAddressTypes.CARDANO_LEGACY);
+    if (legacyAddr.length !== 1) throw new Error('pickInternal no legacy address found');
+    return {
+      addr: legacyAddr[0],
+      row: body.row,
+      addressing: body.addressing,
+    };
+  }
+};
+const Bip44PickInternal = Mixin<
+  Bip44PickInternalMixinDependencies,
+  IPickInternal
+>(Bip44PickInternalMixin);
+
+// =======================
+//   Cip1852PickInternal
+// =======================
+
+type Cip1852PickInternalMixinDependencies = IPublicDeriver<> & IGetStakingKey;
+const Cip1852PickInternalMixin = (
+  superclass: Class<Cip1852PickInternalMixinDependencies>,
+) => class Cip1852PickInternal extends superclass implements IPickInternal {
+  rawPickInternal: (
+    lf$Transaction,
+    {|
+      GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetAddress: Class<GetAddress>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
+    |},
+    IPickInternalRequest,
+    Map<number, string>,
+  ) => Promise<IPickInternalResponse> = async (
+    tx,
+    deps,
+    body,
+    derivationTables,
+  ) => {
+    const stakingAddressDbRow = await this.rawGetStakingKey(
+      tx,
+      deps,
+      undefined,
+      derivationTables
+    );
+    const stakingAddr = RustModule.WalletV3.Address.from_bytes(
+      Buffer.from(stakingAddressDbRow.addr.Hash, 'hex')
+    ).to_account_address();
+    if (stakingAddr == null) {
+      throw new Error('pickInternal staking key invalid');
+    }
+    const stakingKey = Buffer.from(stakingAddr.get_account_key().as_bytes()).toString('hex');
+    const ourGroupAddress = body.addrs
+      .filter(addr => addr.Type === CoreAddressTypes.SHELLEY_GROUP)
+      .filter(addr => addr.Hash.includes(stakingKey));
+    if (ourGroupAddress.length !== 1) throw new Error('pickInternal no group address found');
+    return {
+      addr: ourGroupAddress[0],
+      row: body.row,
+      addressing: body.addressing,
+    };
+  }
+};
+const Cip1852PickInternal = Mixin<
+  Cip1852PickInternalMixinDependencies,
+  IPickInternal
+>(Cip1852PickInternalMixin);
+
 // =================
 //   HasUtxoChains
 // =================
 
-type HasUtxoChainsDependencies = IPublicDeriver<ConceptualWallet & IHasLevels> & IDisplayCutoff;
+type HasUtxoChainsDependencies = IPublicDeriver<ConceptualWallet & IHasLevels> &
+  IPickInternal & IDisplayCutoff;
 const HasUtxoChainsMixin = (
   superclass: Class<HasUtxoChainsDependencies>,
 ) => class HasUtxoChains extends superclass implements IHasUtxoChains {
@@ -915,13 +1008,14 @@ const HasUtxoChainsMixin = (
     _body,
     derivationTables,
   ) => {
+    const derivationDeps = {
+      GetAddress: deps.GetAddress,
+      GetPathWithSpecific: deps.GetPathWithSpecific,
+      GetDerivationSpecific: deps.GetDerivationSpecific,
+    };
     const internalAddresses = await this.rawGetAddressesForChain(
       tx,
-      {
-        GetAddress: deps.GetAddress,
-        GetPathWithSpecific: deps.GetPathWithSpecific,
-        GetDerivationSpecific: deps.GetDerivationSpecific,
-      },
+      derivationDeps,
       { chainId: INTERNAL },
       derivationTables,
     );
@@ -936,17 +1030,14 @@ const HasUtxoChainsMixin = (
         index: nextUnused.index
       };
     }
-    const info = nextUnused.addressInfo;
-    // TODO: this behavior is different for CIP-1852
-    const legacyAddr = nextUnused.addressInfo.addrs
-      .filter(addr => addr.Type === CoreAddressTypes.CARDANO_LEGACY);
-    if (legacyAddr.length !== 1) throw new Error('rawNextInternal no legacy address found');
+    const nextInternal = await this.rawPickInternal(
+      tx,
+      derivationDeps,
+      nextUnused.addressInfo,
+      derivationTables,
+    );
     return {
-      addressInfo: {
-        addr: legacyAddr[0],
-        row: info.row,
-        addressing: info.addressing,
-      },
+      addressInfo: nextInternal,
       index: nextUnused.index,
     };
   }
@@ -1739,7 +1830,7 @@ export async function addTraitsForBip44Child(
   if (conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.ACCOUNT.level) {
     currClass = DisplayCutoff(currClass);
 
-    currClass = HasUtxoChains(currClass);
+    currClass = HasUtxoChains(Bip44PickInternal(currClass));
     if (publicKey !== null) {
       currClass = GetPublicKey(currClass);
       currClass = ScanLegacyCardanoUtxo(currClass);
@@ -1852,7 +1943,7 @@ export async function addTraitsForCip1852Child(
   if (conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.ACCOUNT.level) {
     currClass = DisplayCutoff(currClass);
 
-    currClass = HasUtxoChains(currClass);
+    currClass = HasUtxoChains(Cip1852PickInternal(currClass));
     if (publicKey !== null) {
       currClass = GetPublicKey(currClass);
       currClass = ScanShelleyUtxo(currClass);

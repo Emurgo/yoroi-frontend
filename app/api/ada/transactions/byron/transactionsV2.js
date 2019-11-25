@@ -14,7 +14,8 @@ import {
   NotEnoughMoneyToSendError,
 } from '../../errors';
 import type { ConfigType } from '../../../../../config/config-types';
-import { utxosToLookupMap, coinToBigNumber } from '../utils';
+import { utxosToLookupMap, } from '../utils';
+import { coinToBigNumber } from './utils';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 
@@ -232,7 +233,7 @@ function filterToUsedChange(
 }
 
 export function signTransaction(
-  signRequest: BaseSignRequest,
+  signRequest: BaseSignRequest<RustModule.WalletV2.Transaction>,
   keyLevel: number,
   signingKey: RustModule.WalletV2.PrivateKey
 ): RustModule.WalletV2.SignedTransaction {
