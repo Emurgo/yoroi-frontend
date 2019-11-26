@@ -86,7 +86,7 @@ import { TxStatusCodes, CoreAddressTypes, } from '../database/primitives/enums';
 import { WrongPassphraseError } from '../../cardanoCrypto/cryptoErrors';
 
 import { RustModule } from '../../cardanoCrypto/rustLoader';
-import { EXTERNAL, INTERNAL, BIP44_SCAN_SIZE, } from  '../../../../../config/numbersConfig';
+import { ChainDerivations, BIP44_SCAN_SIZE, } from  '../../../../../config/numbersConfig';
 import {
   encryptWithPassword,
   decryptWithPassword,
@@ -375,7 +375,7 @@ export async function rawGetChainAddressesForDisplay(
     derivationTables,
   );
   let belowCutoff = addresses;
-  if (request.chainsRequest.chainId === EXTERNAL) {
+  if (request.chainsRequest.chainId === ChainDerivations.EXTERNAL) {
     const cutoff = await request.publicDeriver.rawGetCutoff(
       tx,
       {
@@ -397,7 +397,7 @@ export async function rawGetChainAddressesForDisplay(
       type: request.type
     },
   );
-  if (request.chainsRequest.chainId === INTERNAL) {
+  if (request.chainsRequest.chainId === ChainDerivations.INTERNAL) {
     let bestUsed = -1;
     for (const address of addressResponse) {
       if (address.isUsed) {
@@ -772,7 +772,7 @@ export async function updateCutoffFromInsert(
     if (request.publicDeriverLevel !== Bip44DerivationLevels.ACCOUNT.level) {
       throw new Error('updateCutoffFromInsert incorrect pubderiver level');
     }
-    const external = request.tree.find(node => node.index === EXTERNAL);
+    const external = request.tree.find(node => node.index === ChainDerivations.EXTERNAL);
     if (external == null || external.children == null) {
       throw new Error('updateCutoffFromInsert should never happen');
     }

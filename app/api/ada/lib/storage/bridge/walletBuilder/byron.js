@@ -6,10 +6,10 @@ import {
 } from 'lovefield';
 import {
   HARD_DERIVATION_START,
-  CARDANO_COINTYPE,
-  BIP44_PURPOSE,
+  CoinTypes,
+  WalletTypePurpose,
   BIP44_SCAN_SIZE,
-  EXTERNAL,
+  ChainDerivations,
 } from '../../../../../../config/numbersConfig';
 
 import type {
@@ -158,7 +158,7 @@ export async function createStandardBip44Wallet(request: {
       )
       .addConceptualWallet(
         _finalState => ({
-          CoinType: CARDANO_COINTYPE,
+          CoinType: CoinTypes.CARDANO,
           Name: request.walletName,
         })
       )
@@ -209,7 +209,7 @@ export async function createStandardBip44Wallet(request: {
               publicDeriverMeta: {
                 name: request.accountName,
               },
-              path: [BIP44_PURPOSE, CARDANO_COINTYPE, request.accountIndex],
+              path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, request.accountIndex],
               initialDerivations,
             },
             privateDeriverKeyDerivationId: id,
@@ -250,7 +250,7 @@ export async function createHardwareWallet(request: {
       )
       .addConceptualWallet(
         _finalState => ({
-          CoinType: CARDANO_COINTYPE,
+          CoinType: CoinTypes.CARDANO,
           Name: request.walletName,
         })
       )
@@ -293,7 +293,7 @@ export async function createHardwareWallet(request: {
           },
           pathToPublic: [
             {
-              index: BIP44_PURPOSE,
+              index: WalletTypePurpose.BIP44,
               insert: insertRequest => Promise.resolve({
                 KeyDerivationId: insertRequest.keyDerivationId,
               }),
@@ -301,7 +301,7 @@ export async function createHardwareWallet(request: {
               privateKey: null,
             },
             {
-              index: CARDANO_COINTYPE,
+              index: CoinTypes.CARDANO,
               insert: insertRequest => Promise.resolve({
                 KeyDerivationId: insertRequest.keyDerivationId,
               }),
@@ -352,7 +352,7 @@ export async function migrateFromStorageV1(request: {
       )
       .addConceptualWallet(
         _finalState => ({
-          CoinType: CARDANO_COINTYPE,
+          CoinType: CoinTypes.CARDANO,
           Name: request.walletName,
         })
       )
@@ -405,7 +405,7 @@ export async function migrateFromStorageV1(request: {
       )
       .addConceptualWallet(
         _finalState => ({
-          CoinType: CARDANO_COINTYPE,
+          CoinType: CoinTypes.CARDANO,
           Name: request.walletName,
         })
       )
@@ -476,7 +476,7 @@ async function addPublicDeriverToMigratedWallet<
       rawGenAddByHash(new Set()),
     );
     // replace default display cutoff
-    const external = insert.find(chain => chain.index === EXTERNAL);
+    const external = insert.find(chain => chain.index === ChainDerivations.EXTERNAL);
     if (external == null) {
       throw new Error('migrateFromStorageV1 cannot find external chain. Should never happen');
     }
@@ -489,7 +489,7 @@ async function addPublicDeriverToMigratedWallet<
   }
 
   const pathToPublic = [{
-    index: BIP44_PURPOSE,
+    index: WalletTypePurpose.BIP44,
     insert: insertRequest => Promise.resolve({
       KeyDerivationId: insertRequest.keyDerivationId,
     }),
@@ -497,7 +497,7 @@ async function addPublicDeriverToMigratedWallet<
     privateKey: null,
   },
   {
-    index: CARDANO_COINTYPE,
+    index: CoinTypes.CARDANO,
     insert: insertRequest => Promise.resolve({
       KeyDerivationId: insertRequest.keyDerivationId,
     }),

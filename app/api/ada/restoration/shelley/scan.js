@@ -12,7 +12,7 @@ import type { ConfigType } from '../../../../../config/config-types';
 import type { FilterFunc } from '../../lib/state-fetch/types';
 
 import {
-  INTERNAL, EXTERNAL, ACCOUNT, BIP44_SCAN_SIZE,
+  ChainDerivations, BIP44_SCAN_SIZE,
 } from '../../../../config/numbersConfig';
 import environment from '../../../../environment';
 
@@ -160,11 +160,11 @@ export async function scanCip1852Account(request: {
 
   const insert = await scanAccount({
     generateInternalAddresses: genSingleAddressBatchFunc(
-      key.derive(INTERNAL),
+      key.derive(ChainDerivations.INTERNAL),
       discrimination,
     ),
     generateExternalAddresses: genSingleAddressBatchFunc(
-      key.derive(EXTERNAL),
+      key.derive(ChainDerivations.EXTERNAL),
       discrimination,
     ),
     lastUsedInternal: request.lastUsedInternal,
@@ -187,14 +187,14 @@ export async function scanAccount(request: {|
   discrimination: AddressDiscriminationType,
 |}): Promise<TreeInsert<Bip44ChainInsert>> {
   const externalAddresses = await scanChain({
-    generateAddressFunc: request.generateInternalAddresses,
+    generateAddressFunc: request.generateExternalAddresses,
     lastUsedIndex: request.lastUsedExternal,
     checkAddressesInUse: request.checkAddressesInUse,
     addByHash: request.addByHash,
     stakingKey: request.stakingKey,
   });
   const internalAddresses = await scanChain({
-    generateAddressFunc: request.generateExternalAddresses,
+    generateAddressFunc: request.generateInternalAddresses,
     lastUsedIndex: request.lastUsedInternal,
     checkAddressesInUse: request.checkAddressesInUse,
     addByHash: request.addByHash,
@@ -215,7 +215,7 @@ export async function scanAccount(request: {|
 
   return [
     {
-      index: EXTERNAL,
+      index: ChainDerivations.EXTERNAL,
       // initial value. Doesn't override existing entry
       insert: insertRequest => Promise.resolve({
         KeyDerivationId: insertRequest.keyDerivationId,
@@ -224,7 +224,7 @@ export async function scanAccount(request: {|
       children: externalAddresses,
     },
     {
-      index: INTERNAL,
+      index: ChainDerivations.INTERNAL,
       insert: insertRequest => Promise.resolve({
         KeyDerivationId: insertRequest.keyDerivationId,
         DisplayCutoff: null,
@@ -232,7 +232,7 @@ export async function scanAccount(request: {|
       children: internalAddresses,
     },
     {
-      index: ACCOUNT,
+      index: ChainDerivations.CHIMERIC_ACCOUNT,
       insert: insertRequest => Promise.resolve({
         KeyDerivationId: insertRequest.keyDerivationId,
         DisplayCutoff: null,

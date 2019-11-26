@@ -9,8 +9,8 @@ import {
 import WalletTransaction from '../../domain/WalletTransaction';
 import {
   HARD_DERIVATION_START,
-  BIP44_PURPOSE,
-  CARDANO_COINTYPE,
+  WalletTypePurpose,
+  CoinTypes,
 } from '../../config/numbersConfig';
 import type {
   Network,
@@ -1180,8 +1180,8 @@ export default class AdaApi {
 
       // TODO: differentiate restoring legacy vs Shelley wallet
       const accountKey = rootPk
-        .derive(BIP44_PURPOSE)
-        .derive(CARDANO_COINTYPE)
+        .derive(WalletTypePurpose.BIP44)
+        .derive(CoinTypes.CARDANO)
         .derive(request.accountIndex);
       // TODO: this is using legacy scanning. Need an option for legacy vs shelley
       const insertTree = await scanBip44Account({

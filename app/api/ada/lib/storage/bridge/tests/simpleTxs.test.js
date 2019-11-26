@@ -11,12 +11,22 @@ import {
   setup,
   filterDbSnapshot,
   mockDate,
+  getAddressString,
+  ABANDON_SHARE,
+  TX_TEST_MNEMONIC_1,
 } from './common';
 import {
   genCheckAddressesInUse,
   genGetTransactionsHistoryForAddresses,
   genGetBestBlock,
 } from './mockNetwork';
+import {
+  HARD_DERIVATION_START,
+  WalletTypePurpose,
+  CoinTypes,
+  ChainDerivations,
+} from '../../../../../../config/numbersConfig';
+import type { WalletTypePurposeT } from '../../../../../../config/numbersConfig';
 import { loadLovefieldDB } from '../../database/index';
 
 import {
@@ -31,7 +41,7 @@ import {
 
 jest.mock('../../database/initialSeed');
 
-const networkTransactions: Array<RemoteTransaction> = [{
+const networkTransactions: number => Array<RemoteTransaction> = (purpose) => [{
   hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
   height: 218608,
   block_hash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25',
@@ -43,7 +53,17 @@ const networkTransactions: Array<RemoteTransaction> = [{
   slot: 3650,
   inputs: [
     {
-      address: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
+      // 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'
+      address: getAddressString(
+        ABANDON_SHARE,
+        [
+          purpose,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          7
+        ]
+      ),
       amount: '4000000',
       id: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d200',
       index: 0,
@@ -52,18 +72,37 @@ const networkTransactions: Array<RemoteTransaction> = [{
   ],
   outputs: [
     {
-      // ours
-      address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
+      // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
+      address: getAddressString(
+        TX_TEST_MNEMONIC_1,
+        [
+          purpose,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          4
+        ]
+      ),
       amount: '2100000'
     },
     {
-      address: 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL',
+      // 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'
+      address: getAddressString(
+        ABANDON_SHARE,
+        [
+          purpose,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.INTERNAL,
+          12
+        ]
+      ),
       amount: '1731391'
     }
   ]
 }];
 
-const nextRegularSpend = {
+const nextRegularSpend: number => RemoteTransaction = (purpose) => ({
   hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
   height: 218609,
   block_hash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26',
@@ -75,8 +114,17 @@ const nextRegularSpend = {
   slot: 3651,
   inputs: [
     {
-      // ours
-      address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
+      // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
+      address: getAddressString(
+        TX_TEST_MNEMONIC_1,
+        [
+          purpose,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          4
+        ]
+      ),
       amount: '2100000',
       id: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed5450',
       index: 0,
@@ -85,19 +133,37 @@ const nextRegularSpend = {
   ],
   outputs: [
     {
-      // ours
-      address: 'Ae2tdPwUPEZ3Kt2BJnDMQggxEA4c9MTagByH41rJkv2k82dBch2nqMAdyHJ',
+      // 'Ae2tdPwUPEZ3Kt2BJnDMQggxEA4c9MTagByH41rJkv2k82dBch2nqMAdyHJ'
+      address: getAddressString(
+        TX_TEST_MNEMONIC_1,
+        [
+          purpose,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.INTERNAL,
+          0
+        ]
+      ),
       amount: '1100000'
     },
     {
-      // ours
-      address: 'Ae2tdPwUPEYxsngJhnW49jrmGuaCvQK34Hqrnx5w5SWxgfjDkSDcnrRdT5G',
+      // Ae2tdPwUPEYxsngJhnW49jrmGuaCvQK34Hqrnx5w5SWxgfjDkSDcnrRdT5G
+      address: getAddressString(
+        TX_TEST_MNEMONIC_1,
+        [
+          purpose,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          19
+        ]
+      ),
       amount: '900000'
     }
   ]
-};
+});
 
-const twoTxsRegularSpend = [{
+const twoTxsRegularSpend: number => Array<RemoteTransaction> = (purpose) => [{
   hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed547',
   height: 218611,
   block_hash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba27',
@@ -109,8 +175,17 @@ const twoTxsRegularSpend = [{
   slot: 3653,
   inputs: [
     {
-      // ours
-      address: 'Ae2tdPwUPEZ3Kt2BJnDMQggxEA4c9MTagByH41rJkv2k82dBch2nqMAdyHJ',
+      // 'Ae2tdPwUPEZ3Kt2BJnDMQggxEA4c9MTagByH41rJkv2k82dBch2nqMAdyHJ'
+      address: getAddressString(
+        TX_TEST_MNEMONIC_1,
+        [
+          purpose,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.INTERNAL,
+          0
+        ]
+      ),
       amount: '1100000',
       id: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed5460',
       index: 0,
@@ -119,7 +194,17 @@ const twoTxsRegularSpend = [{
   ],
   outputs: [
     {
-      address: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
+      // 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'
+      address: getAddressString(
+        ABANDON_SHARE,
+        [
+          purpose,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          7
+        ]
+      ),
       amount: '900000'
     },
   ]
@@ -136,8 +221,17 @@ const twoTxsRegularSpend = [{
   slot: 3653,
   inputs: [
     {
-      // ours
-      address: 'Ae2tdPwUPEYxsngJhnW49jrmGuaCvQK34Hqrnx5w5SWxgfjDkSDcnrRdT5G',
+      // Ae2tdPwUPEYxsngJhnW49jrmGuaCvQK34Hqrnx5w5SWxgfjDkSDcnrRdT5G
+      address: getAddressString(
+        TX_TEST_MNEMONIC_1,
+        [
+          purpose,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          19
+        ]
+      ),
       amount: '900000',
       id: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed5461',
       index: 1,
@@ -146,7 +240,17 @@ const twoTxsRegularSpend = [{
   ],
   outputs: [
     {
-      address: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
+      // 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'
+      address: getAddressString(
+        ABANDON_SHARE,
+        [
+          purpose,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          7
+        ]
+      ),
       amount: '700000'
     },
   ]
@@ -156,16 +260,18 @@ beforeEach(() => {
   mockDate();
 });
 
-test('Syncing simple transaction', async (done) => {
+async function syncingSimpleTransaction(
+  purposeForTest: WalletTypePurposeT,
+): Promise<void> {
   const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
-  const publicDeriver = await setup(db);
+  const publicDeriver = await setup(db, TX_TEST_MNEMONIC_1, purposeForTest);
 
-  const networkTransactionsClone = [...networkTransactions];
-  const checkAddressesInUse = genCheckAddressesInUse(networkTransactionsClone);
+  const txHistory = networkTransactions(purposeForTest);
+  const checkAddressesInUse = genCheckAddressesInUse(txHistory);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
-    networkTransactionsClone
+    txHistory
   );
-  const getBestBlock = genGetBestBlock(networkTransactionsClone);
+  const getBestBlock = genGetBestBlock(txHistory);
 
   const withDisplayCutoff = asDisplayCutoff(publicDeriver);
   if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
@@ -191,11 +297,22 @@ test('Syncing simple transaction', async (done) => {
     );
 
     {
+      const expectedAddressing = [
+        purposeForTest,
+        CoinTypes.CARDANO,
+        0 + HARD_DERIVATION_START,
+        ChainDerivations.EXTERNAL,
+        4
+      ];
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
-        address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
+        // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
+        address: getAddressString(
+          TX_TEST_MNEMONIC_1,
+          expectedAddressing
+        ),
         addressing: {
-          path: [2147483692, 2147485463, 2147483648, 0, 4],
+          path: expectedAddressing,
           startLevel: 1,
         },
         output: {
@@ -210,7 +327,9 @@ test('Syncing simple transaction', async (done) => {
             TransactionId: 1
           },
           UtxoTransactionOutput: {
-            AddressId: 5,
+            AddressId: purposeForTest === WalletTypePurpose.CIP1852
+              ? 9
+              : 5,
             Amount: '2100000',
             IsUnspent: true,
             OutputIndex: 0,
@@ -269,7 +388,7 @@ test('Syncing simple transaction', async (done) => {
 
   // test: add a 2nd transaction
   {
-    networkTransactionsClone.push(nextRegularSpend);
+    txHistory.push(nextRegularSpend(purposeForTest));
 
     await updateTransactions(
       db,
@@ -280,11 +399,29 @@ test('Syncing simple transaction', async (done) => {
     );
 
     {
+      const expectedAddressing1 = [
+        purposeForTest,
+        CoinTypes.CARDANO,
+        0 + HARD_DERIVATION_START,
+        ChainDerivations.INTERNAL,
+        0
+      ];
+      const expectedAddressing2 = [
+        purposeForTest,
+        CoinTypes.CARDANO,
+        0 + HARD_DERIVATION_START,
+        ChainDerivations.EXTERNAL,
+        19
+      ];
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
-        address: 'Ae2tdPwUPEZ3Kt2BJnDMQggxEA4c9MTagByH41rJkv2k82dBch2nqMAdyHJ',
+        // 'Ae2tdPwUPEZ3Kt2BJnDMQggxEA4c9MTagByH41rJkv2k82dBch2nqMAdyHJ'
+        address: getAddressString(
+          TX_TEST_MNEMONIC_1,
+          expectedAddressing1,
+        ),
         addressing: {
-          path: [2147483692, 2147485463, 2147483648, 1, 0],
+          path: expectedAddressing1,
           startLevel: 1,
         },
         output: {
@@ -299,7 +436,9 @@ test('Syncing simple transaction', async (done) => {
             TransactionId: 2
           },
           UtxoTransactionOutput: {
-            AddressId: 21,
+            AddressId: purposeForTest === WalletTypePurpose.CIP1852
+              ? 41
+              : 21,
             Amount: '1100000',
             IsUnspent: true,
             OutputIndex: 0,
@@ -309,9 +448,13 @@ test('Syncing simple transaction', async (done) => {
         }
       },
       {
-        address: 'Ae2tdPwUPEYxsngJhnW49jrmGuaCvQK34Hqrnx5w5SWxgfjDkSDcnrRdT5G',
+        // Ae2tdPwUPEYxsngJhnW49jrmGuaCvQK34Hqrnx5w5SWxgfjDkSDcnrRdT5G
+        address: getAddressString(
+          TX_TEST_MNEMONIC_1,
+          expectedAddressing2
+        ),
         addressing: {
-          path: [2147483692, 2147485463, 2147483648, 0, 19],
+          path: expectedAddressing2,
           startLevel: 1,
         },
         output: {
@@ -326,7 +469,9 @@ test('Syncing simple transaction', async (done) => {
             TransactionId: 2
           },
           UtxoTransactionOutput: {
-            AddressId: 20,
+            AddressId: purposeForTest === WalletTypePurpose.CIP1852
+              ? 39
+              : 20,
             Amount: '900000',
             IsUnspent: true,
             OutputIndex: 1,
@@ -367,7 +512,7 @@ test('Syncing simple transaction', async (done) => {
 
   // test: two txs in the same block
   {
-    networkTransactionsClone.push(...twoTxsRegularSpend);
+    txHistory.push(...twoTxsRegularSpend(purposeForTest));
 
     await updateTransactions(
       db,
@@ -400,8 +545,8 @@ test('Syncing simple transaction', async (done) => {
 
   // test rollback
   {
-    networkTransactionsClone.pop();
-    networkTransactionsClone.pop();
+    txHistory.pop();
+    txHistory.pop();
 
     await updateTransactions(
       db,
@@ -453,19 +598,29 @@ test('Syncing simple transaction', async (done) => {
   ];
   const dump = (await db.export()).tables;
   filterDbSnapshot(dump, keysForTest);
+}
+test('Syncing simple transaction bip44', async (done) => {
+  await syncingSimpleTransaction(WalletTypePurpose.BIP44);
   done();
 });
 
-test('Utxo created and used in same sync', async (done) => {
-  const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
-  const publicDeriver = await setup(db);
+test('Syncing simple transaction cip1852', async (done) => {
+  await syncingSimpleTransaction(WalletTypePurpose.CIP1852);
+  done();
+});
 
-  const networkTransactionsClone = [...networkTransactions];
-  const checkAddressesInUse = genCheckAddressesInUse(networkTransactionsClone);
+async function utxoCreatedAndUsed(
+  purposeForTest: WalletTypePurposeT,
+): Promise<void> {
+  const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
+  const publicDeriver = await setup(db, TX_TEST_MNEMONIC_1, purposeForTest);
+
+  const txHistory = networkTransactions(purposeForTest);
+  const checkAddressesInUse = genCheckAddressesInUse(txHistory);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
-    networkTransactionsClone
+    txHistory
   );
-  const getBestBlock = genGetBestBlock(networkTransactionsClone);
+  const getBestBlock = genGetBestBlock(txHistory);
 
   const withDisplayCutoff = asDisplayCutoff(publicDeriver);
   if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
@@ -482,7 +637,7 @@ test('Utxo created and used in same sync', async (done) => {
 
   {
     // add tx so that we  both created and used a utxo in the same sync
-    networkTransactionsClone.push(nextRegularSpend);
+    txHistory.push(nextRegularSpend(purposeForTest));
 
     await updateTransactions(
       db,
@@ -493,11 +648,29 @@ test('Utxo created and used in same sync', async (done) => {
     );
 
     {
+      const expectedAddressing1 = [
+        purposeForTest,
+        CoinTypes.CARDANO,
+        0 + HARD_DERIVATION_START,
+        ChainDerivations.INTERNAL,
+        0
+      ];
+      const expectedAddressing2 = [
+        purposeForTest,
+        CoinTypes.CARDANO,
+        0 + HARD_DERIVATION_START,
+        ChainDerivations.EXTERNAL,
+        19
+      ];
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
-        address: 'Ae2tdPwUPEZ3Kt2BJnDMQggxEA4c9MTagByH41rJkv2k82dBch2nqMAdyHJ',
+        // 'Ae2tdPwUPEZ3Kt2BJnDMQggxEA4c9MTagByH41rJkv2k82dBch2nqMAdyHJ'
+        address: getAddressString(
+          TX_TEST_MNEMONIC_1,
+          expectedAddressing1
+        ),
         addressing: {
-          path: [2147483692, 2147485463, 2147483648, 1, 0],
+          path: expectedAddressing1,
           startLevel: 1,
         },
         output: {
@@ -512,7 +685,9 @@ test('Utxo created and used in same sync', async (done) => {
             TransactionId: 2
           },
           UtxoTransactionOutput: {
-            AddressId: 21,
+            AddressId: purposeForTest === WalletTypePurpose.CIP1852
+              ? 41
+              : 21,
             Amount: '1100000',
             IsUnspent: true,
             OutputIndex: 0,
@@ -522,9 +697,13 @@ test('Utxo created and used in same sync', async (done) => {
         }
       },
       {
-        address: 'Ae2tdPwUPEYxsngJhnW49jrmGuaCvQK34Hqrnx5w5SWxgfjDkSDcnrRdT5G',
+        // Ae2tdPwUPEYxsngJhnW49jrmGuaCvQK34Hqrnx5w5SWxgfjDkSDcnrRdT5G
+        address: getAddressString(
+          TX_TEST_MNEMONIC_1,
+          expectedAddressing2
+        ),
         addressing: {
-          path: [2147483692, 2147485463, 2147483648, 0, 19],
+          path: expectedAddressing2,
           startLevel: 1,
         },
         output: {
@@ -539,7 +718,9 @@ test('Utxo created and used in same sync', async (done) => {
             TransactionId: 2
           },
           UtxoTransactionOutput: {
-            AddressId: 20,
+            AddressId: purposeForTest === WalletTypePurpose.CIP1852
+              ? 39
+              : 20,
             Amount: '900000',
             IsUnspent: true,
             OutputIndex: 1,
@@ -561,6 +742,15 @@ test('Utxo created and used in same sync', async (done) => {
       expect(response).toEqual(new BigNumber('2000000'));
     }
   }
+}
+
+test('Utxo created and used in same sync bip44', async (done) => {
+  await utxoCreatedAndUsed(WalletTypePurpose.BIP44);
+  done();
+});
+
+test('Utxo created and used in same sync cip1852', async (done) => {
+  await utxoCreatedAndUsed(WalletTypePurpose.CIP1852);
   done();
 });
 

@@ -107,7 +107,7 @@ import {
   UnusedAddressesError,
 } from '../../../../../common';
 
-import { INTERNAL, EXTERNAL, ACCOUNT, } from  '../../../../../../config/numbersConfig';
+import { ChainDerivations, } from  '../../../../../../config/numbersConfig';
 
 import {
   PublicDeriver,
@@ -394,7 +394,7 @@ const GetAllAccountingMixin = (
         startingDerivation: super.getDerivationId(),
         derivationLevel: this.getParent().getPublicDeriverLevel(),
         commonPrefix: super.getPathToPublic(),
-        queryPath: [ACCOUNT, null],
+        queryPath: [ChainDerivations.CHIMERIC_ACCOUNT, null],
       },
       derivationTables,
     );
@@ -1016,7 +1016,7 @@ const HasUtxoChainsMixin = (
     const internalAddresses = await this.rawGetAddressesForChain(
       tx,
       derivationDeps,
-      { chainId: INTERNAL },
+      { chainId: ChainDerivations.INTERNAL },
       derivationTables,
     );
     const nextUnused = await rawGetNextUnusedIndex(
@@ -1514,7 +1514,6 @@ const ScanUtxoAccountAddressesMixin = (
     body,
     derivationTables,
   ): Promise<IScanAddressesResponse> => {
-    // TODO: make sure we only scan payment keys
     const pubKey = await this.rawGetPublicKey(
       tx,
       { GetKeyForPublicDeriver: deps.GetKeyForPublicDeriver },
@@ -1532,7 +1531,7 @@ const ScanUtxoAccountAddressesMixin = (
         GetPathWithSpecific: deps.GetPathWithSpecific,
         GetDerivationSpecific: deps.GetDerivationSpecific,
       },
-      { chainId: INTERNAL },
+      { chainId: ChainDerivations.INTERNAL },
       derivationTables
     );
     const nextUnusedInternal = await rawGetNextUnusedIndex(
@@ -1547,7 +1546,7 @@ const ScanUtxoAccountAddressesMixin = (
         GetPathWithSpecific: deps.GetPathWithSpecific,
         GetDerivationSpecific: deps.GetDerivationSpecific,
       },
-      { chainId: EXTERNAL },
+      { chainId: ChainDerivations.EXTERNAL },
       derivationTables
     );
     const nextUnusedExternal = await rawGetNextUnusedIndex(

@@ -23,7 +23,7 @@ import type { StoresMap } from '../index';
 import {
   Logger,
 } from '../../utils/logging';
-import { EXTERNAL, INTERNAL } from '../../config/numbersConfig';
+import { ChainDerivations } from '../../config/numbersConfig';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 
@@ -138,14 +138,14 @@ export default class AddressesStore extends Store {
       this.stores,
       (request) => this._wrapForChainAddresses({
         ...request,
-        chainsRequest: { chainId: EXTERNAL },
+        chainsRequest: { chainId: ChainDerivations.EXTERNAL },
       })
     );
     this.internalForDisplay = new AddressTypeStore(
       this.stores,
       (request) => this._wrapForChainAddresses({
         ...request,
-        chainsRequest: { chainId: INTERNAL },
+        chainsRequest: { chainId: ChainDerivations.INTERNAL },
       })
     );
   }

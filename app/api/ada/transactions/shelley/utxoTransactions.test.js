@@ -30,8 +30,8 @@ import type {
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import {
   HARD_DERIVATION_START,
-  CARDANO_COINTYPE,
-  BIP44_PURPOSE,
+  CoinTypes,
+  WalletTypePurpose,
 } from '../../../../config/numbersConfig';
 import {
   getTxInputTotal,
@@ -282,7 +282,7 @@ describe('Create signed transactions', () => {
           tx_index: 0,
           utxo_id: '05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f0',
           addressing: {
-            path: [BIP44_PURPOSE, CARDANO_COINTYPE, HARD_DERIVATION_START + 0, 0, 135],
+            path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START + 0, 0, 135],
             startLevel: 1
           }
         },
@@ -293,7 +293,7 @@ describe('Create signed transactions', () => {
           tx_index: 0,
           utxo_id: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0',
           addressing: {
-            path: [BIP44_PURPOSE, CARDANO_COINTYPE, HARD_DERIVATION_START + 0, 0, 135],
+            path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START + 0, 0, 135],
             startLevel: 1
           }
         }
