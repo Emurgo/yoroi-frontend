@@ -12,7 +12,7 @@ import type { ConfigType } from '../../../../../config/config-types';
 import type { FilterFunc } from '../../lib/state-fetch/types';
 
 import {
-  INTERNAL, EXTERNAL, BIP44_SCAN_SIZE,
+  ChainDerivations, BIP44_SCAN_SIZE,
 } from '../../../../config/numbersConfig';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
@@ -153,7 +153,7 @@ async function scanAccount(request: {|
 
   return [
     {
-      index: EXTERNAL,
+      index: ChainDerivations.EXTERNAL,
       // initial value. Doesn't override existing entry
       insert: insertRequest => Promise.resolve({
         KeyDerivationId: insertRequest.keyDerivationId,
@@ -162,7 +162,7 @@ async function scanAccount(request: {|
       children: externalAddresses,
     },
     {
-      index: INTERNAL,
+      index: ChainDerivations.INTERNAL,
       insert: insertRequest => Promise.resolve({
         KeyDerivationId: insertRequest.keyDerivationId,
         DisplayCutoff: null,

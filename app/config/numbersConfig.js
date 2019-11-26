@@ -7,18 +7,28 @@ export const MAX_INTEGER_PLACES_IN_ADA = 11;
 export const DECIMAL_PLACES_IN_ADA = 6;
 export const MAX_ADA_WALLETS_COUNT = 1;
 
-export const HARD_DERIVATION_START = 0x80000000;
-export const CARDANO_COINTYPE = HARD_DERIVATION_START + 1815;
-export const BIP44_PURPOSE = HARD_DERIVATION_START + 44;
-export const CIP_1852_PURPOSE = HARD_DERIVATION_START + 1852;
+export const HARD_DERIVATION_START: 2147483648 = 0x80000000;
 
-/** Defined by bip44
-   * https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#address-gap-limit */
-export const BIP44_SCAN_SIZE =  20;
+export const WalletTypePurpose = Object.freeze({
+  BIP44: 2147483692, // HARD_DERIVATION_START + 44;
+  CIP1852: 2147485500, // HARD_DERIVATION_START + 1852;
+});
+export type WalletTypePurposeT = $Values<typeof WalletTypePurpose>;
+export const CoinTypes = Object.freeze({
+  CARDANO: 2147485463, // HARD_DERIVATION_START + 1812;
+});
 
-export const EXTERNAL: 0 = 0;
-export const INTERNAL: 1 = 1;
-export const ACCOUNT: 2 = 2;
+/**
+ * Defined by bip44
+ * https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#address-gap-limit
+ */
+export const BIP44_SCAN_SIZE = 20;
+
+export const ChainDerivations = Object.freeze({
+  EXTERNAL: 0,
+  INTERNAL: 1,
+  CHIMERIC_ACCOUNT: 2,
+});
 
 /**
  * Constant K as defined in Ouroboros Classic

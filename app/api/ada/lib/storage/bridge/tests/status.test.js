@@ -10,6 +10,9 @@ import {
   setup,
   mockDate,
   filterDbSnapshot,
+  getAddressString,
+  ABANDON_SHARE,
+  TX_TEST_MNEMONIC_1,
 } from './common';
 import {
   genCheckAddressesInUse,
@@ -17,6 +20,13 @@ import {
   genGetBestBlock,
 } from './mockNetwork';
 import { loadLovefieldDB } from '../../database/index';
+import {
+  HARD_DERIVATION_START,
+  WalletTypePurpose,
+  CoinTypes,
+  ChainDerivations,
+} from '../../../../../../config/numbersConfig';
+import type { WalletTypePurposeT } from '../../../../../../config/numbersConfig';
 
 import {
   asGetAllUtxos,
@@ -30,7 +40,10 @@ import {
 
 jest.mock('../../database/initialSeed');
 
-const initialPendingTx = (state: 'Failed' | 'Pending') => Object.freeze({
+const initialPendingTx: ('Failed' | 'Pending', number) => RemoteTransaction = (
+  state,
+  purpose
+) => Object.freeze({
   hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
   height: null,
   block_hash: null,
@@ -42,7 +55,17 @@ const initialPendingTx = (state: 'Failed' | 'Pending') => Object.freeze({
   slot: null,
   inputs: [
     {
-      address: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
+      // 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'
+      address: getAddressString(
+        ABANDON_SHARE,
+        [
+          purpose,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          7
+        ]
+      ),
       amount: '4000000',
       id: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d200',
       index: 0,
@@ -51,18 +74,37 @@ const initialPendingTx = (state: 'Failed' | 'Pending') => Object.freeze({
   ],
   outputs: [
     {
-      // ours
-      address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
+      // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
+      address: getAddressString(
+        TX_TEST_MNEMONIC_1,
+        [
+          purpose,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          4
+        ]
+      ),
       amount: '2100000'
     },
     {
-      address: 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL',
+      // 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'
+      address: getAddressString(
+        ABANDON_SHARE,
+        [
+          purpose,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.INTERNAL,
+          12
+        ]
+      ),
       amount: '1731391'
     }
   ]
 });
 
-const otherSpend = Object.freeze({
+const otherSpend: number => RemoteTransaction = (purpose) => Object.freeze({
   hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
   height: 218608,
   block_hash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25',
@@ -74,7 +116,17 @@ const otherSpend = Object.freeze({
   slot: 3650,
   inputs: [
     {
-      address: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
+      // 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'
+      address: getAddressString(
+        ABANDON_SHARE,
+        [
+          purpose,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          7
+        ]
+      ),
       amount: '4000000',
       id: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d210',
       index: 0,
@@ -83,18 +135,40 @@ const otherSpend = Object.freeze({
   ],
   outputs: [
     {
-      // ours
-      address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
+      // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
+      address: getAddressString(
+        TX_TEST_MNEMONIC_1,
+        [
+          purpose,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          4
+        ]
+      ),
       amount: '2100000'
     },
     {
-      address: 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL',
+      // 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'
+      address: getAddressString(
+        ABANDON_SHARE,
+        [
+          purpose,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.INTERNAL,
+          12
+        ]
+      ),
       amount: '1731391'
     }
   ]
 });
 
-const pendingOutwards = (state: 'Pending' | 'Failed') => Object.freeze({
+const pendingOutwards: ('Failed' | 'Pending', number) => RemoteTransaction = (
+  state,
+  purpose
+) => Object.freeze({
   hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed547',
   height: null,
   block_hash: null,
@@ -106,8 +180,17 @@ const pendingOutwards = (state: 'Pending' | 'Failed') => Object.freeze({
   slot: null,
   inputs: [
     {
-      // ours
-      address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
+      // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
+      address: getAddressString(
+        TX_TEST_MNEMONIC_1,
+        [
+          purpose,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          4
+        ]
+      ),
       amount: '2100000',
       id: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed5460',
       index: 0,
@@ -116,13 +199,23 @@ const pendingOutwards = (state: 'Pending' | 'Failed') => Object.freeze({
   ],
   outputs: [
     {
-      address: 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL',
+      // 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'
+      address: getAddressString(
+        ABANDON_SHARE,
+        [
+          purpose,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.INTERNAL,
+          12
+        ]
+      ),
       amount: '1900000'
     }
   ]
 });
 
-const pointlessTx = Object.freeze({
+const pointlessTx: number => RemoteTransaction = purpose => Object.freeze({
   hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed548',
   height: 218610,
   block_hash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba27',
@@ -134,7 +227,17 @@ const pointlessTx = Object.freeze({
   slot: 3652,
   inputs: [
     {
-      address: 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL',
+      // 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'
+      address: getAddressString(
+        ABANDON_SHARE,
+        [
+          purpose,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.INTERNAL,
+          12
+        ]
+      ),
       amount: '4000000',
       id: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed5461',
       index: 1,
@@ -143,7 +246,17 @@ const pointlessTx = Object.freeze({
   ],
   outputs: [
     {
-      address: 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL',
+      // 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'
+      address: getAddressString(
+        ABANDON_SHARE,
+        [
+          purpose,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.INTERNAL,
+          12
+        ]
+      ),
       amount: '3800000'
     },
   ]
@@ -155,11 +268,12 @@ beforeEach(() => {
 
 async function baseTest(
   type: 'Pending' | 'Failed',
+  purposeForTest: WalletTypePurposeT,
 ): Promise<void> {
   const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
-  const publicDeriver = await setup(db);
+  const publicDeriver = await setup(db, TX_TEST_MNEMONIC_1, purposeForTest);
 
-  const networkTransactions: Array<RemoteTransaction> = [initialPendingTx(type)];
+  const networkTransactions: Array<RemoteTransaction> = [initialPendingTx(type, purposeForTest)];
   const checkAddressesInUse = genCheckAddressesInUse(networkTransactions);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
     networkTransactions
@@ -218,7 +332,7 @@ async function baseTest(
 
   // adding regular tx while pending tx still exists
   {
-    networkTransactions.push(otherSpend);
+    networkTransactions.push(otherSpend(purposeForTest));
 
     await updateTransactions(
       db,
@@ -229,11 +343,22 @@ async function baseTest(
     );
 
     {
+      const expectedAddressing = [
+        purposeForTest,
+        CoinTypes.CARDANO,
+        0 + HARD_DERIVATION_START,
+        ChainDerivations.EXTERNAL,
+        4
+      ];
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
-        address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
+        // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
+        address: getAddressString(
+          TX_TEST_MNEMONIC_1,
+          expectedAddressing
+        ),
         addressing: {
-          path: [2147483692, 2147485463, 2147483648, 0, 4],
+          path: expectedAddressing,
           startLevel: 1,
         },
         output: {
@@ -248,7 +373,9 @@ async function baseTest(
             TransactionId: 2
           },
           UtxoTransactionOutput: {
-            AddressId: 5,
+            AddressId: purposeForTest === WalletTypePurpose.CIP1852
+              ? 9
+              : 5,
             Amount: '2100000',
             IsUnspent: true,
             OutputIndex: 0,
@@ -313,11 +440,22 @@ async function baseTest(
     );
 
     {
+      const expectedAddressing = [
+        purposeForTest,
+        CoinTypes.CARDANO,
+        0 + HARD_DERIVATION_START,
+        ChainDerivations.EXTERNAL,
+        4
+      ];
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
-        address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
+        // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
+        address: getAddressString(
+          TX_TEST_MNEMONIC_1,
+          expectedAddressing
+        ),
         addressing: {
-          path: [2147483692, 2147485463, 2147483648, 0, 4],
+          path: expectedAddressing,
           startLevel: 1,
         },
         output: {
@@ -332,7 +470,9 @@ async function baseTest(
             TransactionId: 1
           },
           UtxoTransactionOutput: {
-            AddressId: 5,
+            AddressId: purposeForTest === WalletTypePurpose.CIP1852
+              ? 9
+              : 5,
             Amount: '2100000',
             IsUnspent: true,
             OutputIndex: 0,
@@ -342,9 +482,19 @@ async function baseTest(
         }
       },
       {
-        address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
+        // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
+        address: getAddressString(
+          TX_TEST_MNEMONIC_1,
+          [
+            purposeForTest,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            4
+          ]
+        ),
         addressing: {
-          path: [2147483692, 2147485463, 2147483648, 0, 4],
+          path: expectedAddressing,
           startLevel: 1,
         },
         output: {
@@ -359,7 +509,9 @@ async function baseTest(
             TransactionId: 2
           },
           UtxoTransactionOutput: {
-            AddressId: 5,
+            AddressId: purposeForTest === WalletTypePurpose.CIP1852
+              ? 9
+              : 5,
             Amount: '2100000',
             IsUnspent: true,
             OutputIndex: 0,
@@ -399,9 +551,9 @@ async function baseTest(
 
   // add pending outwards
   {
-    networkTransactions.push(pendingOutwards(type));
+    networkTransactions.push(pendingOutwards(type, purposeForTest));
     // need to add a pointless tx to advance the bestblock on the server
-    networkTransactions.push(pointlessTx);
+    networkTransactions.push(pointlessTx(purposeForTest));
 
     await updateTransactions(
       db,
@@ -413,10 +565,21 @@ async function baseTest(
 
     {
       const response = await basePubDeriver.getAllUtxos();
+      const expectedAddressing = [
+        purposeForTest,
+        CoinTypes.CARDANO,
+        0 + HARD_DERIVATION_START,
+        ChainDerivations.EXTERNAL,
+        4
+      ];
       expect(response).toEqual([{
-        address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
+        // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
+        address: getAddressString(
+          TX_TEST_MNEMONIC_1,
+          expectedAddressing
+        ),
         addressing: {
-          path: [2147483692, 2147485463, 2147483648, 0, 4],
+          path: expectedAddressing,
           startLevel: 1,
         },
         output: {
@@ -431,7 +594,9 @@ async function baseTest(
             TransactionId: 1
           },
           UtxoTransactionOutput: {
-            AddressId: 5,
+            AddressId: purposeForTest === WalletTypePurpose.CIP1852
+              ? 9
+              : 5,
             Amount: '2100000',
             IsUnspent: true,
             OutputIndex: 0,
@@ -441,9 +606,19 @@ async function baseTest(
         }
       },
       {
-        address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
+        // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
+        address: getAddressString(
+          TX_TEST_MNEMONIC_1,
+          [
+            purposeForTest,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            4
+          ]
+        ),
         addressing: {
-          path: [2147483692, 2147485463, 2147483648, 0, 4],
+          path: expectedAddressing,
           startLevel: 1,
         },
         output: {
@@ -458,7 +633,9 @@ async function baseTest(
             TransactionId: 2
           },
           UtxoTransactionOutput: {
-            AddressId: 5,
+            AddressId: purposeForTest === WalletTypePurpose.CIP1852
+              ? 9
+              : 5,
             Amount: '2100000',
             IsUnspent: true,
             OutputIndex: 0,
@@ -559,22 +736,35 @@ async function baseTest(
   filterDbSnapshot(dump, keysForTest);
 }
 
-test('Syncing with pending', async (done) => {
-  await baseTest('Pending');
+test('Syncing with pending bip44', async (done) => {
+  await baseTest('Pending', WalletTypePurpose.BIP44);
+  done();
+});
+test('Syncing with failed bip44', async (done) => {
+  await baseTest('Failed', WalletTypePurpose.BIP44);
   done();
 });
 
-test('Syncing with failed', async (done) => {
-  await baseTest('Failed');
+test('Syncing with pending cip1852', async (done) => {
+  await baseTest('Pending', WalletTypePurpose.CIP1852);
+  done();
+});
+test('Syncing with failed cip1852', async (done) => {
+  await baseTest('Failed', WalletTypePurpose.CIP1852);
   done();
 });
 
-test('Pending dropped from backend without rollback', async (done) => {
+async function pendingDropped(
+  purposeForTest: WalletTypePurposeT,
+): Promise<void> {
   const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
-  const publicDeriver = await setup(db);
+  const publicDeriver = await setup(db, TX_TEST_MNEMONIC_1, purposeForTest);
 
   // need pointless tx otherwise the remote response is ignore since remote has empty blockchain
-  const networkTransactions = [pointlessTx, initialPendingTx('Pending')];
+  const networkTransactions = [
+    pointlessTx(purposeForTest),
+    initialPendingTx('Pending', purposeForTest)
+  ];
   const checkAddressesInUse = genCheckAddressesInUse(networkTransactions);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
     networkTransactions
@@ -621,6 +811,13 @@ test('Pending dropped from backend without rollback', async (done) => {
       TransactionId: 1
     }
   ]);
+}
 
+test('Pending dropped from backend without rollback bip44', async (done) => {
+  await pendingDropped(WalletTypePurpose.BIP44);
+  done();
+});
+test('Pending dropped from backend without rollback cip1852', async (done) => {
+  await pendingDropped(WalletTypePurpose.CIP1852);
   done();
 });

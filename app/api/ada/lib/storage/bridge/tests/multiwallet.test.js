@@ -10,7 +10,17 @@ import {
   setup,
   mockDate,
   filterDbSnapshot,
+  getAddressString,
+  ABANDON_SHARE,
+  TX_TEST_MNEMONIC_1,
 } from './common';
+import {
+  HARD_DERIVATION_START,
+  WalletTypePurpose,
+  CoinTypes,
+  ChainDerivations,
+} from '../../../../../../config/numbersConfig';
+import type { WalletTypePurposeT } from '../../../../../../config/numbersConfig';
 import {
   genCheckAddressesInUse,
   genGetTransactionsHistoryForAddresses,
@@ -33,7 +43,9 @@ import {
 
 jest.mock('../../database/initialSeed');
 
-const networkTransactions: Array<RemoteTransaction> = [{
+const TX_TEST_MNEMONIC_2 = 'eight country switch draw meat scout mystery blade tip drift useless good keep usage title';
+
+const networkTransactions: number => Array<RemoteTransaction> = (purpose) => [{
   // transaction that doesn't involve either wallet
   // just so blockchain isn't empty during tests
   hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed544',
@@ -47,7 +59,17 @@ const networkTransactions: Array<RemoteTransaction> = [{
   slot: 0,
   inputs: [
     {
-      address: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
+      // 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'
+      address: getAddressString(
+        ABANDON_SHARE,
+        [
+          purpose,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          7
+        ]
+      ),
       amount: '4000000',
       id: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d190',
       index: 0,
@@ -56,7 +78,17 @@ const networkTransactions: Array<RemoteTransaction> = [{
   ],
   outputs: [
     {
-      address: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
+      // 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'
+      address: getAddressString(
+        ABANDON_SHARE,
+        [
+          purpose,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          7
+        ]
+      ),
       amount: '3800000'
     },
   ]
@@ -73,7 +105,17 @@ const networkTransactions: Array<RemoteTransaction> = [{
   slot: 1,
   inputs: [
     {
-      address: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
+      // 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'
+      address: getAddressString(
+        ABANDON_SHARE,
+        [
+          purpose,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          7
+        ]
+      ),
       amount: '4000000',
       id: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d200',
       index: 0,
@@ -82,26 +124,42 @@ const networkTransactions: Array<RemoteTransaction> = [{
   ],
   outputs: [
     {
-      // mnemonic1
-      address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
+      // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
+      address: getAddressString(
+        TX_TEST_MNEMONIC_1,
+        [
+          purpose,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          4
+        ]
+      ),
       amount: '2100000'
     },
     {
-      // mnemonic2
-      address: 'Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc',
+      // Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc
+      address: getAddressString(
+        TX_TEST_MNEMONIC_2,
+        [
+          purpose,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          0
+        ]
+      ),
       amount: '2700000'
     }
   ]
 }];
-
-const mnemonic1 = 'prevent company field green slot measure chief hero apple task eagle sunset endorse dress seed';
-const mnemonic2 = 'eight country switch draw meat scout mystery blade tip drift useless good keep usage title';
 
 beforeEach(() => {
   mockDate();
 });
 
 async function checkPub1HasTx(
+  purposeForTest: number,
   publicDeriver1: PublicDeriver<>,
 ): Promise<void> {
   const withDisplayCutoff = asDisplayCutoff(publicDeriver1);
@@ -116,11 +174,22 @@ async function checkPub1HasTx(
   }
 
   {
+    const expectedAddressing = [
+      purposeForTest,
+      CoinTypes.CARDANO,
+      0 + HARD_DERIVATION_START,
+      ChainDerivations.EXTERNAL,
+      4
+    ];
     const response = await basePubDeriver.getAllUtxos();
     expect(response).toEqual([{
-      address: 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo',
+      // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
+      address: getAddressString(
+        TX_TEST_MNEMONIC_1,
+        expectedAddressing
+      ),
       addressing: {
-        path: [2147483692, 2147485463, 2147483648, 0, 4],
+        path: expectedAddressing,
         startLevel: 1,
       },
       output: {
@@ -135,7 +204,9 @@ async function checkPub1HasTx(
           TransactionId: 1
         },
         UtxoTransactionOutput: {
-          AddressId: 5,
+          AddressId: purposeForTest === WalletTypePurpose.CIP1852
+            ? 9
+            : 5,
           Amount: '2100000',
           IsUnspent: true,
           OutputIndex: 0,
@@ -196,6 +267,7 @@ async function checkPub2IsEmpty(
   }
 }
 async function checkPub2HasTx(
+  purposeForTest: number,
   publicDeriver2: PublicDeriver<>,
 ): Promise<void> {
   const withDisplayCutoff = asDisplayCutoff(publicDeriver2);
@@ -210,11 +282,22 @@ async function checkPub2HasTx(
   }
 
   {
+    const expectedAddressing = [
+      purposeForTest,
+      CoinTypes.CARDANO,
+      0 + HARD_DERIVATION_START,
+      ChainDerivations.EXTERNAL,
+      0
+    ];
     const response = await basePubDeriver.getAllUtxos();
     expect(response).toEqual([{
-      address: 'Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc',
+      // Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc
+      address: getAddressString(
+        TX_TEST_MNEMONIC_2,
+        expectedAddressing
+      ),
       addressing: {
-        path: [2147483692, 2147485463, 2147483648, 0, 0],
+        path: expectedAddressing,
         startLevel: 1,
       },
       output: {
@@ -229,7 +312,9 @@ async function checkPub2HasTx(
           TransactionId: 2
         },
         UtxoTransactionOutput: {
-          AddressId: 41,
+          AddressId: purposeForTest === WalletTypePurpose.CIP1852
+            ? 82
+            : 41,
           Amount: '2700000',
           IsUnspent: true,
           OutputIndex: 1,
@@ -256,16 +341,19 @@ async function checkPub2HasTx(
   }
 }
 
-test('Syncing simple transaction', async (done) => {
+async function syncingSimpleTransaction(
+  purposeForTest: WalletTypePurposeT,
+): Promise<void> {
   const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
-  const publicDeriver1 = await setup(db, mnemonic1);
-  const publicDeriver2 = await setup(db, mnemonic2);
+  const publicDeriver1 = await setup(db, TX_TEST_MNEMONIC_1, purposeForTest);
+  const publicDeriver2 = await setup(db, TX_TEST_MNEMONIC_2, purposeForTest);
 
-  const checkAddressesInUse = genCheckAddressesInUse(networkTransactions);
+  const txHistory = networkTransactions(purposeForTest);
+  const checkAddressesInUse = genCheckAddressesInUse(txHistory);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
-    networkTransactions
+    txHistory
   );
-  const getBestBlock = genGetBestBlock(networkTransactions);
+  const getBestBlock = genGetBestBlock(txHistory);
 
   const withUtxos1 = asGetAllUtxos(publicDeriver1);
   expect(withUtxos1 != null).toEqual(true);
@@ -287,10 +375,9 @@ test('Syncing simple transaction', async (done) => {
       getTransactionsHistoryForAddresses,
       getBestBlock,
     );
-    await checkPub1HasTx(publicDeriver1);
+    await checkPub1HasTx(purposeForTest, publicDeriver1);
 
     {
-      // const foo: IGetLastSyncInfo = publicDeriver1;
       const response = await publicDeriver1.getLastSyncInfo();
       expect(response).toEqual({
         BlockHash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25',
@@ -327,7 +414,7 @@ test('Syncing simple transaction', async (done) => {
       getBestBlock,
     );
 
-    await checkPub2HasTx(publicDeriver2);
+    await checkPub2HasTx(purposeForTest, publicDeriver2);
     {
       const response = await publicDeriver2.getLastSyncInfo();
       expect(response).toEqual({
@@ -341,7 +428,7 @@ test('Syncing simple transaction', async (done) => {
   }
 
   // pop transaction to trigger rollback
-  networkTransactions.pop();
+  txHistory.pop();
 
   // check rollback on wallet 2
   {
@@ -368,7 +455,7 @@ test('Syncing simple transaction', async (done) => {
 
   // check rollback didn't affect wallet 1
   {
-    await checkPub1HasTx(publicDeriver1);
+    await checkPub1HasTx(purposeForTest, publicDeriver1);
   }
 
   const keysForTest = [
@@ -381,5 +468,13 @@ test('Syncing simple transaction', async (done) => {
   ];
   const dump = (await db.export()).tables;
   filterDbSnapshot(dump, keysForTest);
+}
+
+test('Syncing simple transaction bip44', async (done) => {
+  await syncingSimpleTransaction(WalletTypePurpose.BIP44);
+  done();
+});
+test('Syncing simple transaction cip1852', async (done) => {
+  await syncingSimpleTransaction(WalletTypePurpose.CIP1852);
   done();
 });

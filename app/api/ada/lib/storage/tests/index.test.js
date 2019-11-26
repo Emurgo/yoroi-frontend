@@ -7,10 +7,9 @@ import '../../test-config';
 import { loadLovefieldDB } from '../database/index';
 import {
   HARD_DERIVATION_START,
-  CARDANO_COINTYPE,
-  BIP44_PURPOSE,
-  EXTERNAL,
-  INTERNAL,
+  CoinTypes,
+  WalletTypePurpose,
+  ChainDerivations,
 } from '../../../../../config/numbersConfig';
 
 import {
@@ -109,7 +108,7 @@ test('Can add and fetch address in wallet', async (done) => {
           publicDeriverMeta: {
             name: 'Checking account',
           },
-          path: [BIP44_PURPOSE, CARDANO_COINTYPE, accountIndex],
+          path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, accountIndex],
           decryptPrivateDeriverPassword: privateDeriverPassword,
           initialDerivations: [
             {
@@ -199,7 +198,7 @@ test('Can add and fetch address in wallet', async (done) => {
       expect(addresses.length).toEqual(40);
       expect(addresses[0].addrs[0].Hash).toEqual(firstExternalAddressHash);
       expect(addresses[0].addressing.path).toEqual([
-        BIP44_PURPOSE, CARDANO_COINTYPE, firstAccountIndex, 0, 0
+        WalletTypePurpose.BIP44, CoinTypes.CARDANO, firstAccountIndex, 0, 0
       ]);
     }
 
@@ -214,7 +213,7 @@ test('Can add and fetch address in wallet', async (done) => {
     expect(asHasUtxoChainsInstance != null).toEqual(true);
     if (asHasUtxoChainsInstance != null) {
       const externalAddresses = await asHasUtxoChainsInstance.getAddressesForChain({
-        chainId: EXTERNAL,
+        chainId: ChainDerivations.EXTERNAL,
       });
       expect(externalAddresses.length).toEqual(20);
       expect(externalAddresses[0].addrs[0].Hash).toEqual(
@@ -227,7 +226,7 @@ test('Can add and fetch address in wallet', async (done) => {
       );
 
       const internalAddresses = await asHasUtxoChainsInstance.getAddressesForChain({
-        chainId: INTERNAL,
+        chainId: ChainDerivations.INTERNAL,
       });
       expect(internalAddresses.length).toEqual(20);
       expect(internalAddresses[0].addrs[0].Hash).toEqual(

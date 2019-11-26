@@ -13,10 +13,9 @@ import type { WalletAccountNumberPlate } from '../storage/models/PublicDeriver/i
 import { generateWalletRootKey } from './cryptoWallet';
 import {
   HARD_DERIVATION_START,
-  CARDANO_COINTYPE,
-  CIP_1852_PURPOSE,
-  BIP44_PURPOSE,
-  EXTERNAL,
+  CoinTypes,
+  WalletTypePurpose,
+  ChainDerivations,
 } from '../../../../config/numbersConfig';
 import type { AddressDiscriminationType } from 'js-chain-libs';
 
@@ -50,11 +49,11 @@ export const generateStandardPlate = (
 ): {| addresses: Array<string>, accountPlate: WalletAccountNumberPlate |} => {
   const cryptoWallet = generateWalletRootKey(mnemonic);
   const accountKey = cryptoWallet
-    .derive(legacy ? BIP44_PURPOSE : CIP_1852_PURPOSE)
-    .derive(CARDANO_COINTYPE)
+    .derive(legacy ? WalletTypePurpose.BIP44 : WalletTypePurpose.CIP1852)
+    .derive(CoinTypes.CARDANO)
     .derive(accountIndex + HARD_DERIVATION_START);
   const accountPublic = accountKey.to_public();
-  const chainKey = accountPublic.derive(EXTERNAL);
+  const chainKey = accountPublic.derive(ChainDerivations.EXTERNAL);
 
   return mnemonicsToAddresses(
     // add: add v3 addresses options

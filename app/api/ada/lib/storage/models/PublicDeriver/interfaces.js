@@ -53,8 +53,7 @@ import type {
   FilterFunc,
 } from '../../../state-fetch/types';
 import {
-  EXTERNAL,
-  INTERNAL,
+  ChainDerivations,
 } from '../../../../../../config/numbersConfig';
 import type {
   TreeInsert,
@@ -249,7 +248,7 @@ export type IGetNextUnusedForChainFunc = (
   body: IGetNextUnusedForChainRequest
 ) => Promise<IGetNextUnusedForChainResponse>;
 export type IHasUtxoChainsRequest = {|
-  chainId: typeof EXTERNAL | typeof INTERNAL,
+  chainId: typeof ChainDerivations.EXTERNAL | typeof ChainDerivations.INTERNAL,
 |};
 export type IHasUtxoChainsResponse = Array<UtxoAddressPath>;
 export type IHasUtxoChainsGetAddressesFunc = (

@@ -6,12 +6,10 @@ import {
 } from 'lovefield';
 import {
   HARD_DERIVATION_START,
-  CARDANO_COINTYPE,
-  CIP_1852_PURPOSE,
+  CoinTypes,
+  WalletTypePurpose,
   BIP44_SCAN_SIZE,
-  EXTERNAL,
-  INTERNAL,
-  ACCOUNT,
+  ChainDerivations,
 } from '../../../../../../config/numbersConfig';
 
 import type {
@@ -59,10 +57,10 @@ export async function getAccountDefaultDerivations(
     BIP44_SCAN_SIZE
   );
 
-  const stakingKey = accountPublicKey.derive(ACCOUNT).to_raw_key();
+  const stakingKey = accountPublicKey.derive(ChainDerivations.CHIMERIC_ACCOUNT).to_raw_key();
   const externalAddrs = addressesIndex.map(i => {
     const key = accountPublicKey
-      .derive(EXTERNAL)
+      .derive(ChainDerivations.EXTERNAL)
       .derive(i)
       .to_raw_key();
     const addr = RustModule.WalletV3.Address.single_from_public_key(
@@ -73,7 +71,7 @@ export async function getAccountDefaultDerivations(
   });
   const internalAddrs = addressesIndex.map(i => {
     const key = accountPublicKey
-      .derive(INTERNAL)
+      .derive(ChainDerivations.INTERNAL)
       .derive(i)
       .to_raw_key();
     const addr = RustModule.WalletV3.Address.single_from_public_key(
@@ -130,7 +128,7 @@ export async function getAccountDefaultDerivations(
 
   return [
     {
-      index: EXTERNAL,
+      index: ChainDerivations.EXTERNAL,
       insert: insertRequest => Promise.resolve({
         KeyDerivationId: insertRequest.keyDerivationId,
         DisplayCutoff: 0
@@ -138,7 +136,7 @@ export async function getAccountDefaultDerivations(
       children: externalAddresses,
     },
     {
-      index: INTERNAL,
+      index: ChainDerivations.INTERNAL,
       insert: insertRequest => Promise.resolve({
         KeyDerivationId: insertRequest.keyDerivationId,
         DisplayCutoff: null,
@@ -146,7 +144,7 @@ export async function getAccountDefaultDerivations(
       children: internalAddresses,
     },
     {
-      index: ACCOUNT,
+      index: ChainDerivations.CHIMERIC_ACCOUNT,
       insert: insertRequest => Promise.resolve({
         KeyDerivationId: insertRequest.keyDerivationId,
         DisplayCutoff: null,
@@ -175,8 +173,8 @@ export async function createStandardCip1852Wallet(request: {
   );
 
   const accountPublicKey = request.rootPk
-    .derive(CIP_1852_PURPOSE)
-    .derive(CARDANO_COINTYPE)
+    .derive(WalletTypePurpose.CIP1852)
+    .derive(CoinTypes.CARDANO)
     .derive(request.accountIndex)
     .to_public();
 
@@ -196,7 +194,7 @@ export async function createStandardCip1852Wallet(request: {
       )
       .addConceptualWallet(
         _finalState => ({
-          CoinType: CARDANO_COINTYPE,
+          CoinType: CoinTypes.CARDANO,
           Name: request.walletName,
         })
       )
@@ -247,7 +245,7 @@ export async function createStandardCip1852Wallet(request: {
               publicDeriverMeta: {
                 name: request.accountName,
               },
-              path: [CIP_1852_PURPOSE, CARDANO_COINTYPE, request.accountIndex],
+              path: [WalletTypePurpose.CIP1852, CoinTypes.CARDANO, request.accountIndex],
               initialDerivations,
             },
             privateDeriverKeyDerivationId: id,

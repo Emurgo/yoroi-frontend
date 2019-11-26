@@ -23,9 +23,8 @@ import type { SendFunc, } from '../../api/ada/lib/state-fetch/types';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import {
   HARD_DERIVATION_START,
-  BIP44_PURPOSE,
-  CARDANO_COINTYPE,
-  CIP_1852_PURPOSE,
+  WalletTypePurpose,
+  CoinTypes,
 } from '../../config/numbersConfig';
 import type { RestoreWalletForTransferResponse, RestoreWalletForTransferFunc } from '../../api/ada/index';
 import {
@@ -145,9 +144,9 @@ export default class YoroiTransferStore extends Store {
     const accountKey = RustModule.WalletV3.Bip32PrivateKey
       .from_bytes(Buffer.from(masterKey, 'hex'))
       .derive(transferKind === TransferKind.SHELLEY
-        ? CIP_1852_PURPOSE
-        : BIP44_PURPOSE)
-      .derive(CARDANO_COINTYPE)
+        ? WalletTypePurpose.CIP1852
+        : WalletTypePurpose.BIP44)
+      .derive(CoinTypes.CARDANO)
       .derive(accountIndex);
 
     if (transferKind === TransferKind.SHELLEY) {

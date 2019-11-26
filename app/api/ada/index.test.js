@@ -34,7 +34,7 @@ test('Restore wallet', async () => {
 
   const restoreRequest = {
     db,
-    recoveryPhrase: SEED,
+    recoveryPhrase: TX_TEST_MNEMONIC_1,
     walletName: 'mywallet',
     walletPassword: '123',
     checkAddressesInUse
@@ -57,7 +57,7 @@ test('Restore wallet for transfer', async () => {
     return [];
   }
 
-  const recoveryPhrase = SEED;
+  const recoveryPhrase = TX_TEST_MNEMONIC_1;
 
   const response  = await AdaApi.prototype.restoreWalletForTransfer({
     recoveryPhrase,
@@ -68,7 +68,7 @@ test('Restore wallet for transfer', async () => {
   expect(response).toEqual(RESTORED_ADDRESSES);
 });
 
-const SEED = 'prevent company field green slot measure chief hero apple task eagle sunset endorse dress seed';
+const TX_TEST_MNEMONIC_1 = 'prevent company field green slot measure chief hero apple task eagle sunset endorse dress seed';
 
 const RESTORED_ADDRESSES = {
   masterKey: 'c8bf95a562d0f668340b0dc383860596225422eaf69c592c66b70c19b5e59744d8eed3ad296a0e3335d9dbe7d2200d525653d2c3ff4be10d4a96e14eb1a503d66238b3b8cf2ab4e2df16f6e49a0f86dff6c9ed409e91492071624781bcaa12d5',
