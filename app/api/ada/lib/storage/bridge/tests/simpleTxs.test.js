@@ -11,7 +11,7 @@ import {
   setup,
   filterDbSnapshot,
   mockDate,
-  getAddressString,
+  getSingleAddressString,
   ABANDON_SHARE,
   TX_TEST_MNEMONIC_1,
 } from './common';
@@ -54,7 +54,7 @@ const networkTransactions: number => Array<RemoteTransaction> = (purpose) => [{
   inputs: [
     {
       // 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'
-      address: getAddressString(
+      address: getSingleAddressString(
         ABANDON_SHARE,
         [
           purpose,
@@ -73,7 +73,7 @@ const networkTransactions: number => Array<RemoteTransaction> = (purpose) => [{
   outputs: [
     {
       // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
-      address: getAddressString(
+      address: getSingleAddressString(
         TX_TEST_MNEMONIC_1,
         [
           purpose,
@@ -87,7 +87,7 @@ const networkTransactions: number => Array<RemoteTransaction> = (purpose) => [{
     },
     {
       // 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'
-      address: getAddressString(
+      address: getSingleAddressString(
         ABANDON_SHARE,
         [
           purpose,
@@ -115,7 +115,7 @@ const nextRegularSpend: number => RemoteTransaction = (purpose) => ({
   inputs: [
     {
       // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
-      address: getAddressString(
+      address: getSingleAddressString(
         TX_TEST_MNEMONIC_1,
         [
           purpose,
@@ -134,7 +134,7 @@ const nextRegularSpend: number => RemoteTransaction = (purpose) => ({
   outputs: [
     {
       // 'Ae2tdPwUPEZ3Kt2BJnDMQggxEA4c9MTagByH41rJkv2k82dBch2nqMAdyHJ'
-      address: getAddressString(
+      address: getSingleAddressString(
         TX_TEST_MNEMONIC_1,
         [
           purpose,
@@ -148,7 +148,7 @@ const nextRegularSpend: number => RemoteTransaction = (purpose) => ({
     },
     {
       // Ae2tdPwUPEYxsngJhnW49jrmGuaCvQK34Hqrnx5w5SWxgfjDkSDcnrRdT5G
-      address: getAddressString(
+      address: getSingleAddressString(
         TX_TEST_MNEMONIC_1,
         [
           purpose,
@@ -176,7 +176,7 @@ const twoTxsRegularSpend: number => Array<RemoteTransaction> = (purpose) => [{
   inputs: [
     {
       // 'Ae2tdPwUPEZ3Kt2BJnDMQggxEA4c9MTagByH41rJkv2k82dBch2nqMAdyHJ'
-      address: getAddressString(
+      address: getSingleAddressString(
         TX_TEST_MNEMONIC_1,
         [
           purpose,
@@ -195,7 +195,7 @@ const twoTxsRegularSpend: number => Array<RemoteTransaction> = (purpose) => [{
   outputs: [
     {
       // 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'
-      address: getAddressString(
+      address: getSingleAddressString(
         ABANDON_SHARE,
         [
           purpose,
@@ -222,7 +222,7 @@ const twoTxsRegularSpend: number => Array<RemoteTransaction> = (purpose) => [{
   inputs: [
     {
       // Ae2tdPwUPEYxsngJhnW49jrmGuaCvQK34Hqrnx5w5SWxgfjDkSDcnrRdT5G
-      address: getAddressString(
+      address: getSingleAddressString(
         TX_TEST_MNEMONIC_1,
         [
           purpose,
@@ -241,7 +241,7 @@ const twoTxsRegularSpend: number => Array<RemoteTransaction> = (purpose) => [{
   outputs: [
     {
       // 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'
-      address: getAddressString(
+      address: getSingleAddressString(
         ABANDON_SHARE,
         [
           purpose,
@@ -307,7 +307,7 @@ async function syncingSimpleTransaction(
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
         // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
-        address: getAddressString(
+        address: getSingleAddressString(
           TX_TEST_MNEMONIC_1,
           expectedAddressing
         ),
@@ -416,7 +416,7 @@ async function syncingSimpleTransaction(
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
         // 'Ae2tdPwUPEZ3Kt2BJnDMQggxEA4c9MTagByH41rJkv2k82dBch2nqMAdyHJ'
-        address: getAddressString(
+        address: getSingleAddressString(
           TX_TEST_MNEMONIC_1,
           expectedAddressing1,
         ),
@@ -449,7 +449,7 @@ async function syncingSimpleTransaction(
       },
       {
         // Ae2tdPwUPEYxsngJhnW49jrmGuaCvQK34Hqrnx5w5SWxgfjDkSDcnrRdT5G
-        address: getAddressString(
+        address: getSingleAddressString(
           TX_TEST_MNEMONIC_1,
           expectedAddressing2
         ),
@@ -665,7 +665,7 @@ async function utxoCreatedAndUsed(
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
         // 'Ae2tdPwUPEZ3Kt2BJnDMQggxEA4c9MTagByH41rJkv2k82dBch2nqMAdyHJ'
-        address: getAddressString(
+        address: getSingleAddressString(
           TX_TEST_MNEMONIC_1,
           expectedAddressing1
         ),
@@ -698,7 +698,7 @@ async function utxoCreatedAndUsed(
       },
       {
         // Ae2tdPwUPEYxsngJhnW49jrmGuaCvQK34Hqrnx5w5SWxgfjDkSDcnrRdT5G
-        address: getAddressString(
+        address: getSingleAddressString(
           TX_TEST_MNEMONIC_1,
           expectedAddressing2
         ),

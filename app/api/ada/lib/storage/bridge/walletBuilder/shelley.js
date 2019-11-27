@@ -57,7 +57,10 @@ export async function getAccountDefaultDerivations(
     BIP44_SCAN_SIZE
   );
 
-  const stakingKey = accountPublicKey.derive(ChainDerivations.CHIMERIC_ACCOUNT).to_raw_key();
+  const stakingKey = accountPublicKey
+    .derive(ChainDerivations.CHIMERIC_ACCOUNT)
+    .derive(0) // staking key is 0th index
+    .to_raw_key();
   const externalAddrs = addressesIndex.map(i => {
     const key = accountPublicKey
       .derive(ChainDerivations.EXTERNAL)

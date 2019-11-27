@@ -24,7 +24,11 @@ import type { WalletTypePurposeT } from '../../../../../../config/numbersConfig'
 import {
   mnemonicToEntropy
 } from 'bip39';
-
+import { CoreAddressTypes } from '../../database/primitives/enums';
+import type { CoreAddressT } from '../../database/primitives/enums';
+import {
+  Bip44DerivationLevels,
+} from '../../database/walletTypes/bip44/api/utils';
 
 import { RustModule } from '../../../cardanoCrypto/rustLoader';
 
@@ -120,7 +124,7 @@ async function setupCip1852(
   return publicDeriver;
 }
 
-export function getAddressString(
+export function getSingleAddressString(
   mnemonic: string,
   path: Array<number>,
 ): string {
@@ -130,13 +134,11 @@ export function getAddressString(
     Buffer.from(bip39entropy, 'hex'),
     EMPTY_PASSWORD
   );
-  let currKey = rootKey;
-  for (let i = 0; i < path.length; i++) {
-    currKey = currKey.derive(path[i]);
-  }
+  const derivedKey = derivePath(rootKey, path);
+
   if (path[0] === WalletTypePurpose.BIP44) {
     const v2Key = RustModule.WalletV2.PublicKey.from_hex(
-      Buffer.from(currKey.to_public().as_bytes()).toString('hex')
+      Buffer.from(derivedKey.to_public().as_bytes()).toString('hex')
     );
     const settings = RustModule.WalletV2.BlockchainSettings.from_json({
       protocol_magic: protocolMagic
@@ -147,12 +149,68 @@ export function getAddressString(
   }
   if (path[0] === WalletTypePurpose.CIP1852) {
     const addr = RustModule.WalletV3.Address.single_from_public_key(
-      currKey.to_public().to_raw_key(),
+      derivedKey.to_public().to_raw_key(),
       RustModule.WalletV3.AddressDiscrimination.Production,
     );
     return Buffer.from(addr.as_bytes()).toString('hex');
   }
   throw new Error('Unexpected purpose');
+}
+
+export function getAddressForType(
+  mnemonic: string,
+  path: Array<number>,
+  type: CoreAddressT,
+): string {
+  const bip39entropy = mnemonicToEntropy(mnemonic);
+  const EMPTY_PASSWORD = Buffer.from('');
+  const rootKey = RustModule.WalletV3.Bip32PrivateKey.from_bip39_entropy(
+    Buffer.from(bip39entropy, 'hex'),
+    EMPTY_PASSWORD
+  );
+  const derivedKey = derivePath(rootKey, path);
+
+  switch (type) {
+    case CoreAddressTypes.SHELLEY_SINGLE: {
+      const addr = RustModule.WalletV3.Address.single_from_public_key(
+        derivedKey.to_public().to_raw_key(),
+        RustModule.WalletV3.AddressDiscrimination.Production,
+      );
+      return Buffer.from(addr.as_bytes()).toString('hex');
+    }
+    case CoreAddressTypes.SHELLEY_ACCOUNT: {
+      const addr = RustModule.WalletV3.Address.account_from_public_key(
+        derivedKey.to_public().to_raw_key(),
+        RustModule.WalletV3.AddressDiscrimination.Production,
+      );
+      return Buffer.from(addr.as_bytes()).toString('hex');
+    }
+    case CoreAddressTypes.SHELLEY_GROUP: {
+      const newPath = [...path];
+      // -1 because newPath here starts at PURPOSE and not at ROOT
+      newPath[Bip44DerivationLevels.CHAIN.level - 1] = 2;
+      newPath[Bip44DerivationLevels.ADDRESS.level - 1] = 0;
+      const stakingKey = derivePath(rootKey, newPath);
+      const addr = RustModule.WalletV3.Address.delegation_from_public_key(
+        derivedKey.to_public().to_raw_key(),
+        stakingKey.to_public().to_raw_key(),
+        RustModule.WalletV3.AddressDiscrimination.Production,
+      );
+      return Buffer.from(addr.as_bytes()).toString('hex');
+    }
+    default: throw new Error('getAddressForType unknown type ' + type);
+  }
+}
+
+function derivePath(
+  startKey: RustModule.WalletV3.Bip32PrivateKey,
+  path: Array<number>
+): RustModule.WalletV3.Bip32PrivateKey {
+  let currKey = startKey;
+  for (let i = 0; i < path.length; i++) {
+    currKey = currKey.derive(path[i]);
+  }
+  return currKey;
 }
 
 export function mockDate(): void {

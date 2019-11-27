@@ -10,7 +10,7 @@ import {
   setup,
   mockDate,
   filterDbSnapshot,
-  getAddressString,
+  getSingleAddressString,
   ABANDON_SHARE,
   TX_TEST_MNEMONIC_1,
 } from './common';
@@ -56,7 +56,7 @@ const initialPendingTx: ('Failed' | 'Pending', number) => RemoteTransaction = (
   inputs: [
     {
       // 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'
-      address: getAddressString(
+      address: getSingleAddressString(
         ABANDON_SHARE,
         [
           purpose,
@@ -75,7 +75,7 @@ const initialPendingTx: ('Failed' | 'Pending', number) => RemoteTransaction = (
   outputs: [
     {
       // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
-      address: getAddressString(
+      address: getSingleAddressString(
         TX_TEST_MNEMONIC_1,
         [
           purpose,
@@ -89,7 +89,7 @@ const initialPendingTx: ('Failed' | 'Pending', number) => RemoteTransaction = (
     },
     {
       // 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'
-      address: getAddressString(
+      address: getSingleAddressString(
         ABANDON_SHARE,
         [
           purpose,
@@ -117,7 +117,7 @@ const otherSpend: number => RemoteTransaction = (purpose) => Object.freeze({
   inputs: [
     {
       // 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'
-      address: getAddressString(
+      address: getSingleAddressString(
         ABANDON_SHARE,
         [
           purpose,
@@ -136,7 +136,7 @@ const otherSpend: number => RemoteTransaction = (purpose) => Object.freeze({
   outputs: [
     {
       // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
-      address: getAddressString(
+      address: getSingleAddressString(
         TX_TEST_MNEMONIC_1,
         [
           purpose,
@@ -150,7 +150,7 @@ const otherSpend: number => RemoteTransaction = (purpose) => Object.freeze({
     },
     {
       // 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'
-      address: getAddressString(
+      address: getSingleAddressString(
         ABANDON_SHARE,
         [
           purpose,
@@ -181,7 +181,7 @@ const pendingOutwards: ('Failed' | 'Pending', number) => RemoteTransaction = (
   inputs: [
     {
       // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
-      address: getAddressString(
+      address: getSingleAddressString(
         TX_TEST_MNEMONIC_1,
         [
           purpose,
@@ -200,7 +200,7 @@ const pendingOutwards: ('Failed' | 'Pending', number) => RemoteTransaction = (
   outputs: [
     {
       // 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'
-      address: getAddressString(
+      address: getSingleAddressString(
         ABANDON_SHARE,
         [
           purpose,
@@ -228,7 +228,7 @@ const pointlessTx: number => RemoteTransaction = purpose => Object.freeze({
   inputs: [
     {
       // 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'
-      address: getAddressString(
+      address: getSingleAddressString(
         ABANDON_SHARE,
         [
           purpose,
@@ -247,7 +247,7 @@ const pointlessTx: number => RemoteTransaction = purpose => Object.freeze({
   outputs: [
     {
       // 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'
-      address: getAddressString(
+      address: getSingleAddressString(
         ABANDON_SHARE,
         [
           purpose,
@@ -353,7 +353,7 @@ async function baseTest(
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
         // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
-        address: getAddressString(
+        address: getSingleAddressString(
           TX_TEST_MNEMONIC_1,
           expectedAddressing
         ),
@@ -450,7 +450,7 @@ async function baseTest(
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
         // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
-        address: getAddressString(
+        address: getSingleAddressString(
           TX_TEST_MNEMONIC_1,
           expectedAddressing
         ),
@@ -483,7 +483,7 @@ async function baseTest(
       },
       {
         // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
-        address: getAddressString(
+        address: getSingleAddressString(
           TX_TEST_MNEMONIC_1,
           [
             purposeForTest,
@@ -574,7 +574,7 @@ async function baseTest(
       ];
       expect(response).toEqual([{
         // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
-        address: getAddressString(
+        address: getSingleAddressString(
           TX_TEST_MNEMONIC_1,
           expectedAddressing
         ),
@@ -607,7 +607,7 @@ async function baseTest(
       },
       {
         // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
-        address: getAddressString(
+        address: getSingleAddressString(
           TX_TEST_MNEMONIC_1,
           [
             purposeForTest,
