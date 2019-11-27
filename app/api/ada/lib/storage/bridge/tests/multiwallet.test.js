@@ -10,7 +10,7 @@ import {
   setup,
   mockDate,
   filterDbSnapshot,
-  getAddressString,
+  getSingleAddressString,
   ABANDON_SHARE,
   TX_TEST_MNEMONIC_1,
 } from './common';
@@ -60,7 +60,7 @@ const networkTransactions: number => Array<RemoteTransaction> = (purpose) => [{
   inputs: [
     {
       // 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'
-      address: getAddressString(
+      address: getSingleAddressString(
         ABANDON_SHARE,
         [
           purpose,
@@ -79,7 +79,7 @@ const networkTransactions: number => Array<RemoteTransaction> = (purpose) => [{
   outputs: [
     {
       // 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'
-      address: getAddressString(
+      address: getSingleAddressString(
         ABANDON_SHARE,
         [
           purpose,
@@ -106,7 +106,7 @@ const networkTransactions: number => Array<RemoteTransaction> = (purpose) => [{
   inputs: [
     {
       // 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'
-      address: getAddressString(
+      address: getSingleAddressString(
         ABANDON_SHARE,
         [
           purpose,
@@ -125,7 +125,7 @@ const networkTransactions: number => Array<RemoteTransaction> = (purpose) => [{
   outputs: [
     {
       // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
-      address: getAddressString(
+      address: getSingleAddressString(
         TX_TEST_MNEMONIC_1,
         [
           purpose,
@@ -139,7 +139,7 @@ const networkTransactions: number => Array<RemoteTransaction> = (purpose) => [{
     },
     {
       // Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc
-      address: getAddressString(
+      address: getSingleAddressString(
         TX_TEST_MNEMONIC_2,
         [
           purpose,
@@ -184,7 +184,7 @@ async function checkPub1HasTx(
     const response = await basePubDeriver.getAllUtxos();
     expect(response).toEqual([{
       // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
-      address: getAddressString(
+      address: getSingleAddressString(
         TX_TEST_MNEMONIC_1,
         expectedAddressing
       ),
@@ -292,7 +292,7 @@ async function checkPub2HasTx(
     const response = await basePubDeriver.getAllUtxos();
     expect(response).toEqual([{
       // Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc
-      address: getAddressString(
+      address: getSingleAddressString(
         TX_TEST_MNEMONIC_2,
         expectedAddressing
       ),

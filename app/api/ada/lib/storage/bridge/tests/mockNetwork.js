@@ -11,7 +11,7 @@ import type {
   RemoteTransaction, RemoteUnspentOutput
 } from '../../../state-fetch/types';
 import { RollbackApiError, } from '../../../../errors';
-import { addressToKind } from '../utils';
+import { addressToKind, groupToSingle, } from '../utils';
 import { CoreAddressTypes } from '../../database/primitives/enums';
 
 export function genCheckAddressesInUse(
@@ -26,19 +26,34 @@ export function genCheckAddressesInUse(
       if (tx.tx_state !== 'Successful') {
         continue;
       }
-      for (const input of tx.inputs) {
-        if (addressSet.has(input.address)) {
-          usedSet.add(input.address);
-        }
-      }
-      for (const output of tx.outputs) {
-        if (addressSet.has(output.address)) {
-          usedSet.add(output.address);
-        }
+      const oursInTx = ourAddressesInTx(tx, addressSet);
+      for (const found of oursInTx) {
+        usedSet.add(found);
       }
     }
     return Array.from(usedSet);
   };
+}
+
+function ourAddressesInTx(
+  tx: RemoteTransaction,
+  ownAddresses: Set<string>,
+): Set<string> {
+  const addresses = [
+    ...tx.inputs.map(input => input.address),
+    ...tx.outputs.map(output => output.address)
+  ];
+  const addressesUsed = new Set();
+  for (const addr of addresses) {
+    const kind = addressToKind(addr);
+    const payload = kind === CoreAddressTypes.SHELLEY_GROUP
+      ? groupToSingle(addr)
+      : addr;
+    if (ownAddresses.has(payload)) {
+      addressesUsed.add(payload);
+    }
+  }
+  return addressesUsed;
 }
 
 function filterForOwn(
@@ -47,9 +62,8 @@ function filterForOwn(
 ): Array<RemoteTransaction> {
   const ownTxs = [];
   for (const tx of txs) {
-    const ownInputs = tx.inputs.filter(input => ownAddresses.has(input.address));
-    const ownOutputs = tx.outputs.filter(output => ownAddresses.has(output.address));
-    if (ownInputs.length > 0 || ownOutputs.length > 0) {
+    const oursInTx = ourAddressesInTx(tx, ownAddresses);
+    if (oursInTx.size > 0) {
       ownTxs.push(tx);
     }
   }
@@ -75,7 +89,8 @@ export function genGetTransactionsHistoryForAddresses(
     }
     const ownAddresses = new Set(body.addresses);
     if (body.after == null)  {
-      return filterForOwn(subChain, ownAddresses);
+      const filtered = filterForOwn(subChain, ownAddresses);
+      return filtered;
     }
     const after = body.after;
 
@@ -116,8 +131,8 @@ export function genGetTransactionsHistoryForAddresses(
         }
       }
     }
-
-    return filterForOwn(txsToInclude, ownAddresses);
+    const filtered = filterForOwn(txsToInclude, ownAddresses);
+    return filtered;
   };
 }
 

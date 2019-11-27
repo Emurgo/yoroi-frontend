@@ -30,6 +30,25 @@ export function addressToKind(
   }
 }
 
+export function groupToSingle(
+  groupAddress: string
+): string {
+  const wasmAddr = RustModule.WalletV3.Address.from_bytes(
+    Buffer.from(groupAddress, 'hex')
+  );
+  const wasmGroupAddr = wasmAddr.to_group_address();
+  if (wasmGroupAddr == null) {
+    throw new Error('groupToSingle not a group address ' + groupAddress);
+  }
+  const singleWasm = RustModule.WalletV3.Address.single_from_public_key(
+    wasmGroupAddr.get_spending_key(),
+    wasmAddr.get_discrimination()
+  );
+  const asString = Buffer.from(singleWasm.as_bytes()).toString('hex');
+
+  return asString;
+}
+
 export function verifyAddress(
   address: string,
   isShelley: boolean,
