@@ -23,6 +23,7 @@ import type {
   Address, Value, Addressing,
   IGetAllUtxosResponse
 } from '../../lib/storage/models/PublicDeriver/interfaces';
+import { generateAuthData } from './utils';
 
 declare var CONFIG: ConfigType;
 
@@ -142,7 +143,6 @@ export function newAdaUnsignedTx(
       return addressedUtxo;
     }
   );
-
   return {
     senderUtxos: addressedUtxos,
     IOs: unsignedTxResponse.IOs,
@@ -161,6 +161,7 @@ export function newAdaUnsignedTxFromUtxo(
   amount: string,
   changeAddresses: Array<{| ...Address, ...Addressing |}>,
   allUtxos: Array<RemoteUnspentOutput>,
+  certificate: void | RustModule.WalletV3.Certificate,
 ): V3UnsignedTxUtxoResponse {
   const feeAlgorithm = RustModule.WalletV3.Fee.linear_fee(
     RustModule.WalletV3.Value.from_str(CONFIG.app.linearFee.constant),
@@ -173,8 +174,9 @@ export function newAdaUnsignedTxFromUtxo(
     RustModule.WalletV3.Address.from_string(receiver),
     RustModule.WalletV3.Value.from_str(amount)
   );
-  // can't add a certificate to a UTXO transaction
-  const payload = RustModule.WalletV3.Payload.no_payload();
+  const payload = certificate != null
+    ? RustModule.WalletV3.Payload.certificate(certificate)
+    : RustModule.WalletV3.Payload.no_payload();
 
   const selectedUtxos = firstMatchFirstInputSelection(
     ioBuilder,
@@ -200,11 +202,12 @@ export function newAdaUnsignedTxFromUtxo(
         RustModule.WalletV3.Address.from_string(changeAddr.address)
       )
     );
-    change.push(...filterToUsedChange(
+    const addedChange = filterToUsedChange(
       changeAddr,
       IOs.outputs(),
       selectedUtxos
-    ));
+    );
+    change.push(...addedChange);
   } else if (changeAddresses.length === 0) {
     IOs = ioBuilder.seal_with_output_policy(
       payload,
@@ -262,13 +265,14 @@ function filterToUsedChange(
   const possibleDuplicates = selectedUtxos.filter(utxo => utxo.receiver === changeAddr.address);
 
   const change = [];
+  const changeAddrWasm = RustModule.WalletV3.Address.from_string(changeAddr.address);
+  const changeAddrPayload = Buffer.from(changeAddrWasm.as_bytes()).toString('hex');
   for (let i = 0; i < outputs.size(); i++) {
     const output = outputs.get(i);
-    // we can't know which bech32 prefix was used
-    // so we instead assume the suffix must match
-    const suffix = output.address().to_string('dummy').slice('dummy'.length);
     const val = output.value().to_str();
-    if (changeAddr.address.endsWith(suffix)) {
+    // not: both change & outputs all cannot be legacy addresses
+    const outputPayload = Buffer.from(output.address().as_bytes()).toString('hex');
+    if (changeAddrPayload === outputPayload) {
       const indexInInput = possibleDuplicates.findIndex(
         utxo => utxo.amount === val
       );
@@ -291,11 +295,17 @@ export function signTransaction(
   keyLevel: number,
   signingKey: RustModule.WalletV3.Bip32PrivateKey,
   useLegacy: boolean,
+  payload: void | {|
+    stakingKey: RustModule.WalletV3.PrivateKey,
+    certificate: RustModule.WalletV3.Certificate,
+  |},
 ): RustModule.WalletV3.Fragment {
   const { senderUtxos, IOs } = signRequest;
 
   const txbuilder = new RustModule.WalletV3.TransactionBuilder();
-  const builderSetIOs = txbuilder.no_payload();
+  const builderSetIOs = payload != null
+    ? txbuilder.payload(payload.certificate)
+    : txbuilder.no_payload();
   const builderSetWitnesses = builderSetIOs.set_ios(
     IOs.inputs(),
     IOs.outputs()
@@ -309,9 +319,17 @@ export function signTransaction(
     useLegacy,
   );
 
+  const payloadAuthData = payload == null
+    ? RustModule.WalletV3.PayloadAuthData.for_no_payload()
+    : generateAuthData(
+      RustModule.WalletV3.AccountBindingSignature.new_single(
+        payload.stakingKey,
+        builderSetAuthData.get_auth_data()
+      ),
+      payload.certificate,
+    );
   const signedTx = builderSetAuthData.set_payload_auth(
-    // can't add a certificate to a UTXO transaction
-    RustModule.WalletV3.PayloadAuthData.for_no_payload()
+    payloadAuthData
   );
 
   const fragment = RustModule.WalletV3.Fragment.from_transaction(signedTx);

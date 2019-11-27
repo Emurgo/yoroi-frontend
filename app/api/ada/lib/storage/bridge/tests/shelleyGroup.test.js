@@ -41,7 +41,7 @@ import {
 
 jest.mock('../../database/initialSeed');
 
-const networkTransactions: void => Array<RemoteTransaction> = () => [{
+const firstTx: void => Array<RemoteTransaction> = () => [{
   hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
   height: 218608,
   block_hash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25',
@@ -72,8 +72,8 @@ const networkTransactions: void => Array<RemoteTransaction> = () => [{
   ],
   outputs: [
     {
-      // TODO: Update this comment
-      // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'
+      // eslint-disable-next-line max-len
+      // '0465267961fefd53aefe4cf741dc0df9902d360bca0de4c0abe88ca89d0d08dd3dd993c5b8ca62c78801d3228a8de6b9e18217b001820c24d60c1bcd91c895d585'
       address: getAddressForType(
         TX_TEST_MNEMONIC_1,
         [
@@ -104,6 +104,73 @@ const networkTransactions: void => Array<RemoteTransaction> = () => [{
   ]
 }];
 
+const nextRegularSpend: void => Array<RemoteTransaction> = () => [{
+  hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
+  height: 218609,
+  block_hash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26',
+  time: '2019-09-13T16:37:36.000Z',
+  last_update: '2019-09-13T16:37:36.000Z',
+  tx_state: 'Successful',
+  tx_ordinal: 0,
+  epoch: 10,
+  slot: 3651,
+  inputs: [
+    {
+      // eslint-disable-next-line max-len
+      // '0465267961fefd53aefe4cf741dc0df9902d360bca0de4c0abe88ca89d0d08dd3dd993c5b8ca62c78801d3228a8de6b9e18217b001820c24d60c1bcd91c895d585'
+      address: getAddressForType(
+        TX_TEST_MNEMONIC_1,
+        [
+          WalletTypePurpose.CIP1852,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          4
+        ],
+        CoreAddressTypes.SHELLEY_GROUP
+      ),
+      amount: '2100000',
+      id: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed5450',
+      index: 0,
+      txHash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545'
+    }
+  ],
+  outputs: [
+    {
+      // eslint-disable-next-line max-len
+      // '0465267961fefd53aefe4cf741dc0df9902d360bca0de4c0abe88ca89d0d08dd3dd993c5b8ca62c78801d3228a8de6b9e18217b001820c24d60c1bcd91c895d585'
+      address: getAddressForType(
+        TX_TEST_MNEMONIC_1,
+        [
+          WalletTypePurpose.CIP1852,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.INTERNAL,
+          0
+        ],
+        CoreAddressTypes.SHELLEY_GROUP
+      ),
+      amount: '1100000'
+    },
+    {
+      // eslint-disable-next-line max-len
+      // '0465267961fefd53aefe4cf741dc0df9902d360bca0de4c0abe88ca89d0d08dd3dd993c5b8ca62c78801d3228a8de6b9e18217b001820c24d60c1bcd91c895d585'
+      address: getAddressForType(
+        TX_TEST_MNEMONIC_1,
+        [
+          WalletTypePurpose.CIP1852,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          19
+        ],
+        CoreAddressTypes.SHELLEY_SINGLE
+      ),
+      amount: '900000'
+    }
+  ]
+}];
+
 
 beforeEach(() => {
   mockDate();
@@ -113,7 +180,7 @@ async function syncingSimpleTransaction(): Promise<void> {
   const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
   const publicDeriver = await setup(db, TX_TEST_MNEMONIC_1, WalletTypePurpose.CIP1852);
 
-  const txHistory = networkTransactions();
+  const txHistory = firstTx();
   const checkAddressesInUse = genCheckAddressesInUse(txHistory);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
     txHistory
@@ -133,6 +200,7 @@ async function syncingSimpleTransaction(): Promise<void> {
     throw new Error('basePubDeriver missing a functionality');
   }
 
+  // test legacy => group
   {
     await updateTransactions(
       db,
@@ -209,6 +277,129 @@ async function syncingSimpleTransaction(): Promise<void> {
         SlotNum: 219650,
         Height: 218608,
         Time: new Date(0),
+      });
+    }
+  }
+
+  // test group => change + single
+  {
+    txHistory.push(...nextRegularSpend());
+
+    await updateTransactions(
+      db,
+      basePubDeriver,
+      checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
+      getBestBlock,
+    );
+
+    {
+      const expectedAddressing1 = [
+        WalletTypePurpose.CIP1852,
+        CoinTypes.CARDANO,
+        0 + HARD_DERIVATION_START,
+        ChainDerivations.INTERNAL,
+        0
+      ];
+      const expectedAddressing2 = [
+        WalletTypePurpose.CIP1852,
+        CoinTypes.CARDANO,
+        0 + HARD_DERIVATION_START,
+        ChainDerivations.EXTERNAL,
+        19
+      ];
+      const response = await basePubDeriver.getAllUtxos();
+      expect(response).toEqual([{
+        // eslint-disable-next-line max-len
+        // '04c7cb0e3cd882555eeb8ddc58947eb40cba96c671ccf6806e377287ca087ad1e9d993c5b8ca62c78801d3228a8de6b9e18217b001820c24d60c1bcd91c895d585'
+        address: getAddressForType(
+          TX_TEST_MNEMONIC_1,
+          expectedAddressing1,
+          CoreAddressTypes.SHELLEY_GROUP
+        ),
+        addressing: {
+          path: expectedAddressing1,
+          startLevel: 1,
+        },
+        output: {
+          Transaction: {
+            ErrorMessage: null,
+            Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
+            Digest: 1.249559827714551e-31,
+            Ordinal: 0,
+            BlockId: 2,
+            LastUpdateTime: 1568392656000,
+            Status: 1,
+            TransactionId: 2
+          },
+          UtxoTransactionOutput: {
+            AddressId: 42,
+            Amount: '1100000',
+            IsUnspent: true,
+            OutputIndex: 0,
+            TransactionId: 2,
+            UtxoTransactionOutputId: 3
+          }
+        }
+      },
+      {
+        // '038e2840fed90d2138761d8a14a4cbed08ed00cf908b07f94ec5fa9db6f4d7e74f'
+        address: getAddressForType(
+          TX_TEST_MNEMONIC_1,
+          expectedAddressing2,
+          CoreAddressTypes.SHELLEY_SINGLE
+        ),
+        addressing: {
+          path: expectedAddressing2,
+          startLevel: 1,
+        },
+        output: {
+          Transaction: {
+            ErrorMessage: null,
+            Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
+            Digest: 1.249559827714551e-31,
+            Ordinal: 0,
+            BlockId: 2,
+            LastUpdateTime: 1568392656000,
+            Status: 1,
+            TransactionId: 2
+          },
+          UtxoTransactionOutput: {
+            AddressId: 39,
+            Amount: '900000',
+            IsUnspent: true,
+            OutputIndex: 1,
+            TransactionId: 2,
+            UtxoTransactionOutputId: 4
+          }
+        },
+      }
+      ]);
+    }
+
+    {
+      const response = await basePubDeriver.getUtxoBalance();
+      expect(response).toEqual(new BigNumber('2000000'));
+    }
+
+    {
+      const response = await basePubDeriver.getUtxoBalance();
+      expect(response).toEqual(new BigNumber('2000000'));
+    }
+
+    {
+      const response = await basePubDeriver.getCutoff();
+      expect(response).toEqual(19);
+    }
+
+    {
+      const response = await publicDeriver.getLastSyncInfo();
+      expect(response).toEqual({
+        BlockHash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26',
+        LastSyncInfoId: 1,
+        SlotNum: 219651,
+        Height: 218609,
+        Time: new Date(1),
       });
     }
   }

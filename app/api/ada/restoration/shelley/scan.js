@@ -22,7 +22,7 @@ import type {
   TreeInsert, InsertRequest,
 } from '../../lib/storage/database/walletTypes/common/utils';
 import type { AddByHashFunc, } from '../../lib/storage/bridge/hashMapper';
-import type { AddressDiscriminationType } from 'js-chain-libs';
+import type { AddressDiscriminationType } from '@emurgo/js-chain-libs/js_chain_libs';
 import type { CanonicalAddressInsert } from '../../lib/storage/database/primitives/tables';
 import { CoreAddressTypes } from '../../lib/storage/database/primitives/enums';
 import type { Bip44ChainInsert } from '../../lib/storage/database/walletTypes/common/tables';

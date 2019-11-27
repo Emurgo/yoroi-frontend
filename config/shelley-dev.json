@@ -13,10 +13,10 @@
     "addressRequestSize": 50,
     "txsBodiesRequestSize": 150,
     "linearFee": {
-      "constant": "2",
-      "coefficient": "1",
-      "certificate": "4"
+      "constant": "10",
+      "coefficient": "0",
+      "certificate": "0"
     },
-    "genesisHash": "adbdd5ede31637f6c9bad5c271eec0bc3d0cb9efb86a5b913bb55cba549d0770"
+    "genesisHash": "cef2c3d4670eec6a143aa4822d93c3af444444e848ffe1524a15e99ebff5dab2"
   }
 }

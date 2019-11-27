@@ -6,6 +6,7 @@ import {
 import type { ConfigType } from '../../../../../config/config-types';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import BigNumber from 'bignumber.js';
+import { generateAuthData } from './utils';
 
 declare var CONFIG: ConfigType;
 
@@ -93,26 +94,6 @@ export function buildUnsignedAccountTx(
   return IOs;
 }
 
-function generateAuthData(
-  bindingSignature: RustModule.WalletV3.AccountBindingSignature,
-  certificate: ?RustModule.WalletV3.Certificate,
-): RustModule.WalletV3.PayloadAuthData {
-  if (certificate == null) {
-    return RustModule.WalletV3.PayloadAuthData.for_no_payload();
-  }
-
-  switch (certificate.get_type()) {
-    case RustModule.WalletV3.StakeDelegation: {
-      return RustModule.WalletV3.PayloadAuthData.for_stake_delegation(
-        RustModule.WalletV3.StakeDelegationAuthData.new(
-          bindingSignature
-        )
-      );
-    }
-    default: throw new Error('generateAuthData unexptected cert type ' + certificate.get_type());
-  }
-}
-
 export function signTransaction(
   IOs: RustModule.WalletV3.InputOutput,
   accountCounter: number,
@@ -142,13 +123,15 @@ export function signTransaction(
   const builderSignCertificate = builderSetWitness.set_witnesses(
     witnesses
   );
-  const payloadAuthData = generateAuthData(
-    RustModule.WalletV3.AccountBindingSignature.new_single(
-      accountPrivateKey,
-      builderSignCertificate.get_auth_data()
-    ),
-    certificate,
-  );
+  const payloadAuthData = certificate == null
+    ? RustModule.WalletV3.PayloadAuthData.for_no_payload()
+    : generateAuthData(
+      RustModule.WalletV3.AccountBindingSignature.new_single(
+        accountPrivateKey,
+        builderSignCertificate.get_auth_data()
+      ),
+      certificate,
+    );
   const signedTx = builderSignCertificate.set_payload_auth(
     payloadAuthData
   );

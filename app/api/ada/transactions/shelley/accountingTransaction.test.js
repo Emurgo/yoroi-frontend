@@ -52,6 +52,8 @@ describe('Create unsigned TX for account', () => {
     expect(witnesses.get(0).to_bech32()).toEqual(
       'witness1qfmmw476z0hd33wfx32p0qkn3xc7j42h0gr37z3vgq9aanzn3v6vm93j7wzpdea3qg440a4vwtdta0vf7mv5vd2d96s2xjw8urj73dc93jsax4'
     );
+
+    // TODO: test fragment ID
   });
 
   it('Should fail due to insufficient funds (not enough to cover fees)', () => {

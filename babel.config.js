@@ -79,7 +79,7 @@ module.exports = function (api /*: ApiType */) {
           ['module-resolver', {
             alias: {
               'cardano-wallet-browser': 'cardano-wallet',
-              'js-chain-libs': 'js-chain-libs-node',
+              '@emurgo/js-chain-libs': '@emurgo/js-chain-libs-node',
             }
           }]
         ]
