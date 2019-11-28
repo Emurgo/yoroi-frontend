@@ -53,7 +53,8 @@ describe('Create unsigned TX for account', () => {
       'witness1qfmmw476z0hd33wfx32p0qkn3xc7j42h0gr37z3vgq9aanzn3v6vm93j7wzpdea3qg440a4vwtdta0vf7mv5vd2d96s2xjw8urj73dc93jsax4'
     );
 
-    // TODO: test fragment ID
+    expect(Buffer.from(fragment.id().as_bytes()).toString('hex')).toEqual('bea8a66eceb975ffd2ec5647b9554b59789aee2f0a09cb025007895cff3e9343');
+    expect(Buffer.from(fragment.get_transaction().id().as_bytes()).toString('hex')).toEqual('e7d62806bb7cddc74d8ae8ad99eae408f9a13c32ecd1fc8d5a2ea853832f78ee');
   });
 
   it('Should fail due to insufficient funds (not enough to cover fees)', () => {

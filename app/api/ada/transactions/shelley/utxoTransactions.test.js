@@ -388,6 +388,7 @@ describe('Create signed transactions', () => {
     expect(change.address().to_string('addr')).toEqual('addr1s5quq8utjkrfntnkngjxa9u9mdd8pcprjal2fwzkm7k0y0prx3k276qm0j8');
     expect(change.value().to_str()).toEqual('1839616');
 
+    expect(Buffer.from(fragment.id().as_bytes()).toString('hex')).toEqual('c83ef43e02d8286c67df55ae179dde18f22debeb3e7bf87d3ad9d620b1d97763');
     expect(Buffer.from(fragment.get_transaction().id().as_bytes()).toString('hex')).toEqual('314ea630977b20d21cc2dc8f861dc9bcfa2013dcbc32c75288d7a5067274662d');
 
     const witnesses = signedTx.witnesses();
