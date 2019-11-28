@@ -1,7 +1,7 @@
 // @flow
 
 import typeof * as WasmV2 from 'cardano-wallet-browser';
-import typeof * as WasmV3 from 'js-chain-libs';
+import typeof * as WasmV3 from '@emurgo/js-chain-libs/js_chain_libs';
 
 class Module {
   _wasmv2: WasmV2;
@@ -9,7 +9,7 @@ class Module {
 
   async load(): Promise<void> {
     this._wasmv2 = await import('cardano-wallet-browser');
-    this._wasmv3 = await import('js-chain-libs');
+    this._wasmv3 = await import('@emurgo/js-chain-libs/js_chain_libs');
   }
 
   // Need to expose through a getter to get Flow to detect the type correctly

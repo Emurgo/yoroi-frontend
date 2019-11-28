@@ -211,10 +211,10 @@ describe('Create legacy witness TX from UTXO', () => {
 
     expect(witnesses.size()).toEqual(2);
     expect(witnesses.get(0).to_bech32()).toEqual(
-      'witness1qz8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqf3rln4edvr5ppf35h9jt86ns3dr344k3y5w0sx8uwg0qa296rnzul5k4qyjdyslv50qprcglg8hjvq4lpnvrfhl2q0n759ev5qh3nljrtgjlej4yxkhlyy454l4lcxzutfe4kh0ysacs9gmd9v5c5ed2zql6kkea'
+      'witness1qz8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqf3rln4edvr5ppf35h9jt86ns3dr344k3y5w0sx8uwg0qa296rnzmjrqu3hs58hxk5l84n6luszrts7xzjwglzfzeskt4qdajh9zyfevevna69rev3qvkt4wvmwc7xljxn6qghhu3zt92jlx9095dn7jszcmr9n5s'
     );
     expect(witnesses.get(1).to_bech32()).toEqual(
-      'witness1qz8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqf3rln4edvr5ppf35h9jt86ns3dr344k3y5w0sx8uwg0qa296rnzul5k4qyjdyslv50qprcglg8hjvq4lpnvrfhl2q0n759ev5qh3nljrtgjlej4yxkhlyy454l4lcxzutfe4kh0ysacs9gmd9v5c5ed2zql6kkea'
+      'witness1qz8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqf3rln4edvr5ppf35h9jt86ns3dr344k3y5w0sx8uwg0qa296rnzmjrqu3hs58hxk5l84n6luszrts7xzjwglzfzeskt4qdajh9zyfevevna69rev3qvkt4wvmwc7xljxn6qghhu3zt92jlx9095dn7jszcmr9n5s'
     );
   });
 });
@@ -262,10 +262,10 @@ describe('Create signed transactions', () => {
 
     expect(witnesses.size()).toEqual(2);
     expect(witnesses.get(0).to_bech32()).toEqual(
-      'witness1q8n7j65qjf5jraj3uqy0praq77fszhuxdsdxlagp706sh9jsz7x07gddztlx25s66lusjkjh7hlqct3d8xk6aujrhzq4rd54jnzn94ggppm0c7'
+      'witness1q8wgvrjx7zs7u66nu7k0tljqgdwrcc2ferufytxzew5phk2u5g389n9j0hg509jypjew4endmrcm7g60gpz7ljyfv42tuc4uk3k062qt3pew9w'
     );
     expect(witnesses.get(1).to_bech32()).toEqual(
-      'witness1q8n7j65qjf5jraj3uqy0praq77fszhuxdsdxlagp706sh9jsz7x07gddztlx25s66lusjkjh7hlqct3d8xk6aujrhzq4rd54jnzn94ggppm0c7'
+      'witness1q8wgvrjx7zs7u66nu7k0tljqgdwrcc2ferufytxzew5phk2u5g389n9j0hg509jypjew4endmrcm7g60gpz7ljyfv42tuc4uk3k062qt3pew9w'
     );
   });
 
@@ -317,10 +317,84 @@ describe('Create signed transactions', () => {
 
     expect(witnesses.size()).toEqual(2);
     expect(witnesses.get(0).to_bech32()).toEqual(
-      'witness1q8n7j65qjf5jraj3uqy0praq77fszhuxdsdxlagp706sh9jsz7x07gddztlx25s66lusjkjh7hlqct3d8xk6aujrhzq4rd54jnzn94ggppm0c7'
+      'witness1q8wgvrjx7zs7u66nu7k0tljqgdwrcc2ferufytxzew5phk2u5g389n9j0hg509jypjew4endmrcm7g60gpz7ljyfv42tuc4uk3k062qt3pew9w'
     );
     expect(witnesses.get(1).to_bech32()).toEqual(
-      'witness1q8n7j65qjf5jraj3uqy0praq77fszhuxdsdxlagp706sh9jsz7x07gddztlx25s66lusjkjh7hlqct3d8xk6aujrhzq4rd54jnzn94ggppm0c7'
+      'witness1q8wgvrjx7zs7u66nu7k0tljqgdwrcc2ferufytxzew5phk2u5g389n9j0hg509jypjew4endmrcm7g60gpz7ljyfv42tuc4uk3k062qt3pew9w'
+    );
+  });
+
+  it('Transaction with a certificate is also valid', () => {
+    const unsignedTxResponse = newAdaUnsignedTx(
+      'ca1sw8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguq9rance',
+      '5000', // smaller than input
+      [{
+        address: 'addr1s5quq8utjkrfntnkngjxa9u9mdd8pcprjal2fwzkm7k0y0prx3k276qm0j8',
+        addressing: {
+          path: [1, 0],
+          startLevel: Bip44DerivationLevels.CHAIN.level,
+        },
+      }],
+      [{
+        amount: '2000000',
+        receiver: 'ca1ssuvzjs82mshgvyp4r4lmwgknvgjswnm7mpcq3wycjj7v2nk393e6qwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm906x2vwl',
+        tx_hash: '86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de5550',
+        tx_index: 0,
+        utxo_id: '86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de55500',
+        addressing: {
+          path: [0, 0],
+          startLevel: Bip44DerivationLevels.CHAIN.level,
+        },
+      }],
+    );
+
+    const accountPrivateKey = RustModule.WalletV3.Bip32PrivateKey.from_bytes(
+      Buffer.from(
+        '408a1cb637d615c49e8696c30dd54883302a20a7b9b8a9d1c307d2ed3cd50758c9402acd000461a8fc0f25728666e6d3b86d031b8eea8d2f69b21e8aa6ba2b153e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
+        'hex',
+      ),
+    );
+    const stakingKey = accountPrivateKey.derive(2).derive(0).to_raw_key();
+    const certificate = RustModule.WalletV3.Certificate.stake_delegation(
+      RustModule.WalletV3.StakeDelegation.new(
+        RustModule.WalletV3.DelegationType.full(
+          RustModule.WalletV3.PoolId.from_hex('312e3d449038372ba2fc3300cfedf1b152ae739201b3e5da47ab3f933a421b62')
+        ),
+        stakingKey.to_public()
+      )
+    );
+    const fragment = signTransaction(
+      unsignedTxResponse,
+      Bip44DerivationLevels.ACCOUNT.level,
+      accountPrivateKey,
+      false,
+      {
+        stakingKey,
+        certificate,
+      }
+    );
+    const signedTx = fragment.get_transaction();
+
+    const inputs = signedTx.inputs();
+    expect(inputs.size()).toEqual(1);
+    expect(inputs.get(0).value().to_str()).toEqual('2000000');
+    const pointer = inputs.get(0).get_utxo_pointer();
+    expect(Buffer.from(pointer.fragment_id().as_bytes()).toString('hex')).toEqual('86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de5550');
+    expect(pointer.output_index()).toEqual(0);
+
+    const outputs = signedTx.outputs();
+    expect(outputs.size()).toEqual(2);
+    const change = outputs.get(1);
+    expect(change.address().to_string('addr')).toEqual('addr1s5quq8utjkrfntnkngjxa9u9mdd8pcprjal2fwzkm7k0y0prx3k276qm0j8');
+    expect(change.value().to_str()).toEqual('1839616');
+
+    expect(Buffer.from(fragment.id().as_bytes()).toString('hex')).toEqual('c83ef43e02d8286c67df55ae179dde18f22debeb3e7bf87d3ad9d620b1d97763');
+    expect(Buffer.from(fragment.get_transaction().id().as_bytes()).toString('hex')).toEqual('314ea630977b20d21cc2dc8f861dc9bcfa2013dcbc32c75288d7a5067274662d');
+
+    const witnesses = signedTx.witnesses();
+    expect(witnesses.size()).toEqual(1);
+    expect(witnesses.get(0).to_bech32()).toEqual(
+      'witness1q9f0f9ekhwgnd8rkmaq0zst0ef48sd4fqhdvjfrylwcdkyuragsq4nvhwttxu6q7y50vcurwgmn7jy2438x6azzjtfhxdelzdcvayvcwqyjwtc'
     );
   });
 });

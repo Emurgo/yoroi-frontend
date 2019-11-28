@@ -21,7 +21,7 @@ import { WalletBuilder } from './builder';
 
 import { RustModule } from '../../../cardanoCrypto/rustLoader';
 import { encryptWithPassword } from '../../../../../../utils/passwordCipher';
-import type { AddressDiscriminationType } from 'js-chain-libs';
+import type { AddressDiscriminationType } from '@emurgo/js-chain-libs/js_chain_libs';
 
 import {
   Bip44DerivationLevels,

@@ -17,7 +17,7 @@ import {
   WalletTypePurpose,
   ChainDerivations,
 } from '../../../../config/numbersConfig';
-import type { AddressDiscriminationType } from 'js-chain-libs';
+import type { AddressDiscriminationType } from '@emurgo/js-chain-libs/js_chain_libs';
 
 const mnemonicsToAddresses = (
   generateAddressFunc: GenerateAddressFunc,

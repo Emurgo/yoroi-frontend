@@ -118,3 +118,23 @@ export function shelleyTxEqual(
 
   return true;
 }
+
+export function generateAuthData(
+  bindingSignature: RustModule.WalletV3.AccountBindingSignature,
+  certificate: RustModule.WalletV3.Certificate,
+): RustModule.WalletV3.PayloadAuthData {
+  if (certificate == null) {
+    return RustModule.WalletV3.PayloadAuthData.for_no_payload();
+  }
+
+  switch (certificate.get_type()) {
+    case RustModule.WalletV3.CertificateKind.StakeDelegation: {
+      return RustModule.WalletV3.PayloadAuthData.for_stake_delegation(
+        RustModule.WalletV3.StakeDelegationAuthData.new(
+          bindingSignature
+        )
+      );
+    }
+    default: throw new Error('generateAuthData unexptected cert type ' + certificate.get_type());
+  }
+}
