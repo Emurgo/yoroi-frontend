@@ -11,7 +11,12 @@
     "logsBufferSize": 500,
     "logsFileSuffix": "-yoroi-shelley-testnet.log",
     "addressRequestSize": 50,
-    "txsBodiesRequestSize": 150,
+    "txsBodiesRequestSize": 150
+  },
+  "genesis": {
+    "block0_date": 0,
+    "slots_per_epoch": 21600,
+    "slot_duration": 20,
     "linearFee": {
       "constant": "2",
       "coefficient": "1",

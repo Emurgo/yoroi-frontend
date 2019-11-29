@@ -11,12 +11,17 @@
     "logsBufferSize": 500,
     "logsFileSuffix": "-yoroi-shelley-dev.log",
     "addressRequestSize": 50,
-    "txsBodiesRequestSize": 150,
+    "txsBodiesRequestSize": 150
+  },
+  "genesis": {
+    "block0_date": 0,
+    "slots_per_epoch": 21600,
+    "slot_duration": 20,
     "linearFee": {
-      "constant": "10",
-      "coefficient": "0",
-      "certificate": "0"
+      "constant": "2",
+      "coefficient": "1",
+      "certificate": "4"
     },
-    "genesisHash": "cef2c3d4670eec6a143aa4822d93c3af444444e848ffe1524a15e99ebff5dab2"
+    "genesisHash": "todo"
   }
 }

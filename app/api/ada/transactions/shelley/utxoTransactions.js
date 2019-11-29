@@ -78,9 +78,9 @@ export function sendAllUnsignedTxFromUtxo(
   }
 
   const feeAlgorithm = RustModule.WalletV3.Fee.linear_fee(
-    RustModule.WalletV3.Value.from_str(CONFIG.app.linearFee.constant),
-    RustModule.WalletV3.Value.from_str(CONFIG.app.linearFee.coefficient),
-    RustModule.WalletV3.Value.from_str(CONFIG.app.linearFee.certificate),
+    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.constant),
+    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.coefficient),
+    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.certificate),
   );
   let fee;
   {
@@ -164,9 +164,9 @@ export function newAdaUnsignedTxFromUtxo(
   certificate: void | RustModule.WalletV3.Certificate,
 ): V3UnsignedTxUtxoResponse {
   const feeAlgorithm = RustModule.WalletV3.Fee.linear_fee(
-    RustModule.WalletV3.Value.from_str(CONFIG.app.linearFee.constant),
-    RustModule.WalletV3.Value.from_str(CONFIG.app.linearFee.coefficient),
-    RustModule.WalletV3.Value.from_str(CONFIG.app.linearFee.certificate),
+    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.constant),
+    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.coefficient),
+    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.certificate),
   );
 
   const ioBuilder = RustModule.WalletV3.InputOutputBuilder.empty();
@@ -378,12 +378,12 @@ function addWitnesses(
   for (let i = 0; i < senderUtxos.length; i++) {
     const witness = useLegacy
       ? RustModule.WalletV3.Witness.for_legacy_icarus_utxo(
-        RustModule.WalletV3.Hash.from_hex(CONFIG.app.genesisHash),
+        RustModule.WalletV3.Hash.from_hex(CONFIG.genesis.genesisHash),
         builderSetWitnesses.get_auth_data_for_witness(),
         privateKeys[i],
       )
       : RustModule.WalletV3.Witness.for_utxo(
-        RustModule.WalletV3.Hash.from_hex(CONFIG.app.genesisHash),
+        RustModule.WalletV3.Hash.from_hex(CONFIG.genesis.genesisHash),
         builderSetWitnesses.get_auth_data_for_witness(),
         privateKeys[i].to_raw_key(),
       );

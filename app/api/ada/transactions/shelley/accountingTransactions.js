@@ -34,9 +34,9 @@ export function buildUnsignedAccountTx(
   const sourceAccount = RustModule.WalletV3.Account.single_from_public_key(sender);
 
   const feeAlgorithm = RustModule.WalletV3.Fee.linear_fee(
-    RustModule.WalletV3.Value.from_str(CONFIG.app.linearFee.constant),
-    RustModule.WalletV3.Value.from_str(CONFIG.app.linearFee.coefficient),
-    RustModule.WalletV3.Value.from_str(CONFIG.app.linearFee.certificate),
+    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.constant),
+    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.coefficient),
+    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.certificate),
   );
 
   let fee;
@@ -112,7 +112,7 @@ export function signTransaction(
   );
 
   const witness = RustModule.WalletV3.Witness.for_account(
-    RustModule.WalletV3.Hash.from_hex(CONFIG.app.genesisHash),
+    RustModule.WalletV3.Hash.from_hex(CONFIG.genesis.genesisHash),
     builderSetWitness.get_auth_data_for_witness(),
     accountPrivateKey,
     RustModule.WalletV3.SpendingCounter.from_u32(accountCounter)

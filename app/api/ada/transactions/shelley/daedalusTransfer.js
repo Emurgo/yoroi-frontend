@@ -113,7 +113,7 @@ function addWitnesses(
   const witnesses = RustModule.WalletV3.Witnesses.new();
   for (let i = 0; i < senderUtxos.length; i++) {
     const witness = RustModule.WalletV3.Witness.for_legacy_daedalus_utxo(
-      RustModule.WalletV3.Hash.from_hex(CONFIG.app.genesisHash),
+      RustModule.WalletV3.Hash.from_hex(CONFIG.genesis.genesisHash),
       builderSetWitnesses.get_auth_data_for_witness(),
       RustModule.WalletV3.LegacyDaedalusPrivateKey.from_bytes(
         Buffer.from(addressKeys[senderUtxos[i].receiver].to_hex(), 'hex')
