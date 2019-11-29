@@ -753,13 +753,13 @@ export async function updateTransactionBatch(
     ModifyTransaction: Class<ModifyTransaction>,
     ModifyMultipartTx: Class<ModifyMultipartTx>,
   |},
-  request: {
+  request: {|
     toAbsoluteSlotNumber: ToAbsoluteSlotNumberFunc,
     txIds: Array<number>,
     txsFromNetwork: Array<RemoteTransaction>,
     hashToIds: HashToIdsFunc,
     derivationTables: Map<number, string>,
-  }
+  |}
 ): Promise<Array<DbTxInChain>> {
   const { TransactionSeed, BlockSeed } = await deps.GetEncryptionMeta.get(db, dbTx);
 
