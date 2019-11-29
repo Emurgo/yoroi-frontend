@@ -186,8 +186,25 @@ describe('Create unsigned TX from UTXO', () => {
   });
 });
 
-describe('Create legacy witness TX from UTXO', () => {
+describe('Create unsigned TX from addressed UTXOs', () => {
   it('Should create a valid transaction withhout selection', () => {
+    const unsignedTxResponse = newAdaUnsignedTx(
+      keys[0].bechAddress,
+      '5001', // smaller than input
+      [],
+      [addressedUtxos[0], addressedUtxos[1]],
+    );
+    expect(unsignedTxResponse.senderUtxos).toEqual([addressedUtxos[0], addressedUtxos[1]]);
+    const inputSum = getTxInputTotal(unsignedTxResponse.IOs, false);
+    const outputSum = getTxOutputTotal(unsignedTxResponse.IOs, false);
+    expect(inputSum.toString()).toEqual('1007002');
+    expect(outputSum.toString()).toEqual('5001');
+    expect(inputSum.minus(outputSum).toString()).toEqual('1002001');
+  });
+});
+
+describe('Create signed transactions with legacy witness', () => {
+  it('Witness should match on valid private key', () => {
     const unsignedTxResponse = newAdaUnsignedTx(
       keys[0].bechAddress,
       '5001', // smaller than input
@@ -216,23 +233,6 @@ describe('Create legacy witness TX from UTXO', () => {
     expect(witnesses.get(1).to_bech32()).toEqual(
       'witness1qz8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqf3rln4edvr5ppf35h9jt86ns3dr344k3y5w0sx8uwg0qa296rnzmjrqu3hs58hxk5l84n6luszrts7xzjwglzfzeskt4qdajh9zyfevevna69rev3qvkt4wvmwc7xljxn6qghhu3zt92jlx9095dn7jszcmr9n5s'
     );
-  });
-});
-
-describe('Create unsigned TX from addresses', () => {
-  it('Should create a valid transaction withhout selection', () => {
-    const unsignedTxResponse = newAdaUnsignedTx(
-      keys[0].bechAddress,
-      '5001', // smaller than input
-      [],
-      [addressedUtxos[0], addressedUtxos[1]],
-    );
-    expect(unsignedTxResponse.senderUtxos).toEqual([addressedUtxos[0], addressedUtxos[1]]);
-    const inputSum = getTxInputTotal(unsignedTxResponse.IOs, false);
-    const outputSum = getTxOutputTotal(unsignedTxResponse.IOs, false);
-    expect(inputSum.toString()).toEqual('1007002');
-    expect(outputSum.toString()).toEqual('5001');
-    expect(inputSum.minus(outputSum).toString()).toEqual('1002001');
   });
 });
 
@@ -269,7 +269,7 @@ describe('Create signed transactions', () => {
     );
   });
 
-  it('Witness should with addressing from root', () => {
+  it('Witness should match with addressing from root', () => {
     const unsignedTxResponse = newAdaUnsignedTx(
       keys[0].bechAddress,
       '5001', // smaller than input
@@ -400,21 +400,19 @@ describe('Create signed transactions', () => {
 });
 
 describe('Create sendAll unsigned TX from UTXO', () => {
-  describe('Create send-all TX from UTXO', () => {
-    it('Create a transaction involving all input with no change', () => {
-      const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[1], sampleUtxos[2]];
-      const sendAllResponse = sendAllUnsignedTxFromUtxo(
-        keys[0].bechAddress,
-        utxos,
-      );
+  it('Create a transaction involving all input with no change', () => {
+    const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[1], sampleUtxos[2]];
+    const sendAllResponse = sendAllUnsignedTxFromUtxo(
+      keys[0].bechAddress,
+      utxos,
+    );
 
-      expect(sendAllResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
-      const inputSum = getTxInputTotal(sendAllResponse.IOs, false);
-      const outputSum = getTxOutputTotal(sendAllResponse.IOs, false);
-      expect(inputSum.toString()).toEqual('11000002');
-      expect(outputSum.toString()).toEqual('10844618');
-      expect(inputSum.minus(outputSum).toString()).toEqual('155384');
-    });
+    expect(sendAllResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
+    const inputSum = getTxInputTotal(sendAllResponse.IOs, false);
+    const outputSum = getTxOutputTotal(sendAllResponse.IOs, false);
+    expect(inputSum.toString()).toEqual('11000002');
+    expect(outputSum.toString()).toEqual('10844618');
+    expect(inputSum.minus(outputSum).toString()).toEqual('155384');
   });
 
   it('Should fail due to insufficient funds (no inputs)', () => {
