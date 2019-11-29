@@ -110,7 +110,7 @@ export async function genToAbsoluteSlotNumber(): Promise<ToAbsoluteSlotNumberFun
   // and sidechains/networks can have different epoch sizes
   // so this needs to come from a DB
   return (request: ToAbsoluteSlotNumberRequest) => {
-    return (21600 * request.epoch) + request.slot;
+    return (CONFIG.genesis.slots_per_epoch * request.epoch) + request.slot;
   };
 }
 
@@ -126,7 +126,7 @@ export async function genTimeSinceGenesis(): Promise<TimeSinceGenesisRequestFunc
   // and sidechains/networks can have different epoch sizes
   // so this needs to come from a DB
   return (request: TimeSinceGenesisRequest) => {
-    return (20 * request.absoluteSlot);
+    return (CONFIG.genesis.slot_duration * request.absoluteSlot);
   };
 }
 

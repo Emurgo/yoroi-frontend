@@ -3,24 +3,19 @@
 export type ConfigType = {
   network: NetworkConfigType,
   app: AppConfigType,
+  genesis: GenesisConfigType,
 };
 
-export type AppConfigType = {
+export type AppConfigType = {|
   walletRefreshInterval: number,
   serverStatusRefreshInterval: number,
   logsBufferSize: number,
   logsFileSuffix: string,
   addressRequestSize: number,
   txsBodiesRequestSize: number,
-  linearFee: {|
-    constant: string,
-    coefficient: string,
-    certificate: string,
-  |},
-  genesisHash: string,
-}
+|}
 
-export type NetworkConfigType = {
+export type NetworkConfigType = {|
   protocolMagic:
   633343913  // staging protocol magic
   | 764824073 // mainnet protocol magic
@@ -28,7 +23,19 @@ export type NetworkConfigType = {
   backendUrl: string,
   websocketUrl: string,
   name: Network
-};
+|};
+
+export type GenesisConfigType = {|
+  linearFee: {|
+    constant: string,
+    coefficient: string,
+    certificate: string,
+  |},
+  genesisHash: string,
+  block0_date: number,
+  slots_per_epoch: number,
+  slot_duration: number,
+|};
 
 export type Network = 'shelley-dev' | 'shelley-testnet' | 'development' | 'mainnet' | 'staging' | 'testnet' | 'test';
 export const NetworkType: {
