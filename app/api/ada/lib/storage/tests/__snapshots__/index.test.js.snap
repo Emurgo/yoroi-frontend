@@ -653,6 +653,8 @@ Object {
       "KeyDerivationId": 46,
     },
   ],
+  "Certificate": Array [],
+  "CertificateAddress": Array [],
   "Cip1852Wrapper": Array [],
   "CoinTypeDerivation": Array [
     Object {

@@ -2,7 +2,11 @@
 
 import { Type } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
-import type { TxStatusCodesType } from './enums';
+import type {
+  TxStatusCodesType,
+  CertificateRelationType,
+} from './enums';
+import type { CertificateKindType } from '@emurgo/js-chain-libs/js_chain_libs';
 
 export type KeyInsert = {|
   Hash: string,
@@ -170,6 +174,49 @@ export const TransactionSchema: {
     LastUpdateTime: 'LastUpdateTime',
     Status: 'Status',
     ErrorMessage: 'ErrorMessage',
+  }
+};
+
+export type CertificateInsert = {|
+  TransactionId: number,
+  Kind: CertificateKindType,
+  Payload: string,
+|};
+export type CertificateRow = {|
+  CertificateId: number,
+  ...CertificateInsert,
+|};
+export const CertificateSchema: {
+  +name: 'Certificate',
+  properties: $ObjMapi<CertificateRow, ToSchemaProp>
+} = {
+  name: 'Certificate',
+  properties: {
+    CertificateId: 'CertificateId',
+    TransactionId: 'TransactionId',
+    Kind: 'Kind',
+    Payload: 'Payload',
+  }
+};
+export type CertificateAddressInsert = {|
+  CertificateId: number,
+  AddressId: number,
+  Relation: CertificateRelationType,
+|};
+export type CertificateAddressRow = {|
+  CertificateAddressId: number,
+  ...CertificateAddressInsert,
+|};
+export const CertificateAddressSchema: {
+  +name: 'CertificateAddress',
+  properties: $ObjMapi<CertificateAddressRow, ToSchemaProp>
+} = {
+  name: 'CertificateAddress',
+  properties: {
+    CertificateAddressId: 'CertificateAddressId',
+    CertificateId: 'CertificateId',
+    AddressId: 'AddressId',
+    Relation: 'Relation',
   }
 };
 
@@ -393,6 +440,55 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
     .addIndex(
       'AddressMapping_KeyDerivation_Index',
       ([AddressMappingSchema.properties.KeyDerivationId]: Array<string>),
+      false
+    );
+
+  // Certificate Table
+  schemaBuilder.createTable(CertificateSchema.name)
+    .addColumn(CertificateSchema.properties.CertificateId, Type.INTEGER)
+    .addColumn(CertificateSchema.properties.TransactionId, Type.INTEGER)
+    .addColumn(CertificateSchema.properties.Kind, Type.INTEGER)
+    .addColumn(CertificateSchema.properties.Payload, Type.STRING)
+    .addPrimaryKey(
+      ([CertificateSchema.properties.CertificateId]: Array<string>),
+      true
+    )
+    .addForeignKey('Certificate_Transaction', {
+      local: CertificateSchema.properties.TransactionId,
+      ref: `${TransactionSchema.name}.${TransactionSchema.properties.TransactionId}`
+    })
+    .addIndex(
+      'Certificate_Transaction_Index',
+      ([CertificateSchema.properties.TransactionId]: Array<string>),
+      true // only one certificate per transaction
+    );
+
+  // CertificateAddress Table
+  schemaBuilder.createTable(CertificateAddressSchema.name)
+    .addColumn(CertificateAddressSchema.properties.CertificateAddressId, Type.INTEGER)
+    .addColumn(CertificateAddressSchema.properties.CertificateId, Type.INTEGER)
+    .addColumn(CertificateAddressSchema.properties.AddressId, Type.INTEGER)
+    .addColumn(CertificateAddressSchema.properties.Relation, Type.INTEGER)
+    .addPrimaryKey(
+      ([CertificateAddressSchema.properties.CertificateAddressId]: Array<string>),
+      true
+    )
+    .addForeignKey('CertificateAddress_Certificate', {
+      local: CertificateAddressSchema.properties.CertificateId,
+      ref: `${CertificateSchema.name}.${CertificateSchema.properties.CertificateId}`
+    })
+    .addForeignKey('CertificateAddress_Address', {
+      local: CertificateAddressSchema.properties.AddressId,
+      ref: `${AddressSchema.name}.${AddressSchema.properties.AddressId}`
+    })
+    .addIndex(
+      'CertificateAddress_Certificate_Index',
+      ([CertificateAddressSchema.properties.CertificateId]: Array<string>),
+      false
+    )
+    .addIndex(
+      'Address_Transaction_Index',
+      ([CertificateAddressSchema.properties.AddressId]: Array<string>),
       false
     );
 };

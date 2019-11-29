@@ -1,6 +1,6 @@
 // @flow
 
-import { RustModule } from '../cardanoCrypto/rustLoader';
+import type { CertificateKindType } from '@emurgo/js-chain-libs/js_chain_libs';
 
 // getUTXOsForAddresses
 
@@ -136,12 +136,17 @@ export type RemoteTxBlockMeta = {|
   +epoch: number,
   +slot: number,
 |};
+export type RemoteCertificate = {|
+  kind: CertificateKindType,
+  payload: string,
+|};
 export type RemoteTxInfo = {|
   +hash: string,
   +last_update: string, // timestamp with timezone
   +tx_state: RemoteTxState,
   +inputs: Array<RemoteTransactionInput>,
   +outputs: Array<RemoteTransactionOutput>,
+  +certificate?: RemoteCertificate,
 |};
 export type RemoteTransaction = {|
   ...WithNullableFields<RemoteTxBlockMeta>,
