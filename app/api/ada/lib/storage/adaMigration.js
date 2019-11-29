@@ -47,7 +47,7 @@ export async function migrateToLatest(
      * We changed the place where Yoroi data is stored so  we must process this migration first
      * to ensure other migrations look at the right place for storage
      */
-    ['<1.9.0', async () => {
+    ['<1.8.3', async () => {
       const applied = await moveStorage(localStorageApi);
       if (applied) {
         // update last launch version to what's in the new storage location
@@ -92,7 +92,7 @@ async function testMigration(localStorageApi: LocalStorageApi): Promise<boolean>
  * This function must go before other modifications because they will work over storage.local.
  */
 async function moveStorage(localStorageApi: LocalStorageApi): Promise<boolean> {
-  // Note: this function assumes nobody is using Yoroi as a  website (at least before 1.9.0)
+  // Note: this function assumes nobody is using Yoroi as a  website (at least before 1.8.3)
   const oldStorage = await localStorageApi.getOldStorage();
   if (oldStorage.length === 0) {
     return false;

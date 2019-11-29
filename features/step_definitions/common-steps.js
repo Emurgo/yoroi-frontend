@@ -274,9 +274,9 @@ async function importLocalStorage(client, importDir: string) {
       .catch(err => done(err));
   });
 
-  if (satisfies(version, '<1.9.0')) {
+  if (satisfies(version, '<1.8.3')) {
     /**
-     * Version of Yoroi <1.9.0 used localStorage exclusively
+     * Version of Yoroi <1.8.3 used localStorage exclusively
      * we mimic this behavior when importing
      */
     await client.driver.executeScript(data => {

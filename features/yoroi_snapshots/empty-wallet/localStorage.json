@@ -4,6 +4,6 @@
   "test-URI-SCHEME-ACCEPTANCE":"true",
   "openTabId":"1562715181569",
   "ACCOUNT":"{\"account\":0,\"root_cached_key\":\"3a3d2131dda5d09491956a143aa7cc362c065fc9fc19f6f47632b87ac7e56c4839ebf9563cd3e3d54bd2c83307184d6bfd54804ce009817b6c1baf45deb828be\",\"derivation_scheme\":\"V2\"}",
-  "test-LAST-LAUNCH-VER":"1.9.0",
+  "test-LAST-LAUNCH-VER":"1.8.3",
   "test-TERMS-OF-USE-ACCEPTANCE":"true"
 }
