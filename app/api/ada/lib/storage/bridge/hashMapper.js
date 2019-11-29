@@ -129,7 +129,7 @@ export function rawGenHashToIdsFunc(
         notFound.push(address);
       }
     }
-    const notFoundWithoutCanonical = [];
+    const notFoundWithoutCanonical: Array<{| data: string, type: CoreAddressT |}> = [];
     const addressWithType = notFound.map(addr => ({
       data: addr,
       type: addressToKind(addr),
@@ -178,10 +178,10 @@ export function rawGenHashToIdsFunc(
     // because we should have synced address history before ever calling this
     const newEntries = await deps.AddAddress.addForeignByHash(
       request.db, request.tx,
-      addressWithType
+      notFoundWithoutCanonical
     );
-    for (let i = 0; i < newEntries.length; i++) {
-      finalMapping.set(notFound[i], newEntries[i].AddressId);
+    for (let i = 0; i < notFoundWithoutCanonical.length; i++) {
+      finalMapping.set(notFoundWithoutCanonical[i].data, newEntries[i].AddressId);
     }
     return finalMapping;
   };

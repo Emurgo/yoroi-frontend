@@ -171,6 +171,58 @@ const nextRegularSpend: void => Array<RemoteTransaction> = () => [{
   ]
 }];
 
+const swappedKeyAddr = '0465267961fefd53aefe4cf741dc0df9902d360bca0de4c0abe88ca89d0d08dd3dd993c5b8ca62c78801d3228a8de6b9e18217b001820c24d60c1bcd91c895d500';
+const txWithGroupSwapped: void => Array<RemoteTransaction> = () => [{
+  hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
+  height: 218608,
+  block_hash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25',
+  time: '2019-09-13T16:37:16.000Z',
+  last_update: '2019-09-13T16:37:16.000Z',
+  tx_state: 'Successful',
+  tx_ordinal: 0,
+  epoch: 10,
+  slot: 3650,
+  inputs: [
+    {
+      // 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'
+      address: getSingleAddressString(
+        ABANDON_SHARE,
+        [
+          WalletTypePurpose.BIP44, // purposely use leagcy address
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          7
+        ]
+      ),
+      amount: '4000000',
+      id: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d200',
+      index: 0,
+      txHash: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20'
+    }
+  ],
+  outputs: [
+    {
+      address: swappedKeyAddr,
+      amount: '2100000'
+    },
+    {
+      // 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'
+      address: getSingleAddressString(
+        ABANDON_SHARE,
+        [
+          WalletTypePurpose.BIP44, // purposely use leagcy address
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.INTERNAL,
+          12
+        ]
+      ),
+      amount: '1731391'
+    }
+  ]
+}];
+
 
 beforeEach(() => {
   mockDate();
@@ -416,7 +468,124 @@ async function syncingSimpleTransaction(): Promise<void> {
   filterDbSnapshot(dump, keysForTest);
 }
 
+async function syncWithSwappedGroup(): Promise<void> {
+  const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
+  const publicDeriver = await setup(db, TX_TEST_MNEMONIC_1, WalletTypePurpose.CIP1852);
+
+  const txHistory = txWithGroupSwapped();
+  const checkAddressesInUse = genCheckAddressesInUse(txHistory);
+  const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
+    txHistory
+  );
+  const getBestBlock = genGetBestBlock(txHistory);
+
+  const withDisplayCutoff = asDisplayCutoff(publicDeriver);
+  if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
+  const withUtxoBalance = asGetUtxoBalance(withDisplayCutoff);
+  if (!withUtxoBalance) throw new Error('missing utxo balance functionality');
+  const withUtxos = asGetAllUtxos(withUtxoBalance);
+  if (!withUtxos) throw new Error('missing get all addresses functionality');
+  const basePubDeriver = withUtxos;
+
+  expect(basePubDeriver != null).toEqual(true);
+  if (basePubDeriver == null) {
+    throw new Error('basePubDeriver missing a functionality');
+  }
+
+  // test tx with swapped staking key
+  {
+    await updateTransactions(
+      db,
+      basePubDeriver,
+      checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
+      getBestBlock,
+    );
+
+    {
+      const expectedAddressing = [
+        WalletTypePurpose.CIP1852,
+        CoinTypes.CARDANO,
+        0 + HARD_DERIVATION_START,
+        ChainDerivations.EXTERNAL,
+        4
+      ];
+      const response = await basePubDeriver.getAllUtxos();
+      expect(response).toEqual([{
+        address: swappedKeyAddr,
+        addressing: {
+          path: expectedAddressing,
+          startLevel: 1,
+        },
+        output: {
+          Transaction: {
+            ErrorMessage: null,
+            Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
+            Digest: 8.191593645542673e-27,
+            Ordinal: 0,
+            BlockId: 1,
+            LastUpdateTime: 1568392636000,
+            Status: 1,
+            TransactionId: 1
+          },
+          UtxoTransactionOutput: {
+            AddressId: 92,
+            Amount: '2100000',
+            IsUnspent: true,
+            OutputIndex: 0,
+            TransactionId: 1,
+            UtxoTransactionOutputId: 1
+          }
+        }
+      }]);
+    }
+
+    {
+      const response = await basePubDeriver.getUtxoBalance();
+      expect(response).toEqual(new BigNumber('2100000'));
+    }
+
+    {
+      const response = await basePubDeriver.getUtxoBalance();
+      expect(response).toEqual(new BigNumber('2100000'));
+    }
+
+    {
+      const response = await basePubDeriver.getCutoff();
+      expect(response).toEqual(4);
+    }
+
+    {
+      const response = await publicDeriver.getLastSyncInfo();
+      expect(response).toEqual({
+        BlockHash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25',
+        LastSyncInfoId: 1,
+        SlotNum: 219650,
+        Height: 218608,
+        Time: new Date(0),
+      });
+    }
+  }
+
+  const keysForTest = [
+    'Address',
+    'Transaction',
+    'UtxoTransactionInput',
+    'UtxoTransactionOutput',
+    'LastSyncInfo',
+    'Block'
+  ];
+  const dump = (await db.export()).tables;
+  filterDbSnapshot(dump, keysForTest);
+}
+
+
 test('Syncing group addresses for cip1852', async (done) => {
   await syncingSimpleTransaction();
+  done();
+});
+
+test('Syncing group address with swapped staking key', async (done) => {
+  await syncWithSwappedGroup();
   done();
 });
