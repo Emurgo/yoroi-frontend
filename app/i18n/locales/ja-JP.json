@@ -445,7 +445,7 @@
   "yoroiTransfer.form.instructions.step0.text": "ヨロイウォレットの15単語からなる復元フレーズを入力し残高を確認する。",
   "yoroiTransfer.form.instructions.step0Paper.text": "ヨロイペーパーウォレットの21単語からなる復元フレーズを入力し残高を確認する。",
   "yoroiTransfer.start.instructions.mnemonic-15": "15単語のフレーズ",
-  "yoroiTransfer.start.instructions.text": "ここで<strong>ヨロイウォレットの、第2スナップショットの時点での残高</strong>を確認できます。<br/>今回のテストネットの目的は、一人ひとりのユーザーの残高が正しくスナップショットに反映されているかどうかを確認することです。<br/>お使いのウォレットの残高が正しくメインネットからテストネットにコピーされたことを確認できます。表示されるテストネット残高は、11月12日の時点のメインネット残高と合致するはずです。",
+  "yoroiTransfer.start.instructions.text": "ここで<strong>ヨロイウォレットの、第2スナップショットの時点での残高</strong>を確認できます。<br/>今回のテストネットの目的は、一人ひとりのユーザーの残高が正しくスナップショットに反映されているかどうかを確認することです。<br/>お使いのウォレットの残高が正しくメインネットからテストネットにコピーされたことを確認できます。表示されるテストネット残高は、11月29日の時点のメインネット残高と合致するはずです。",
   "yoroiTransfer.start.instructions.yoroiPaper": "ヨロイペーパーウォレット",
   "yoroiTransfer.successPage.text": "資金の送金に成功しました。",
   "yoroiTransfer.successPage.title": "成功",

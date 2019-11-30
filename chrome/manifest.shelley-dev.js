@@ -17,6 +17,6 @@ export default buildManifest({
     '128': 'img/shelley-128.png',
     /* eslint-enable quote-props */
   },
-  versionOverride: '2.0.0',
+  versionOverride: '2.0.2',
   geckoKey: '{842ae5af-a7ff-4e99-afb6-bd6c4043bcfa}',
 });
