@@ -53,7 +53,7 @@ const messages = defineMessages({
   },
   attentionDescription: {
     id: 'transfer.summary.attentionDescription.label',
-    defaultMessage: '!!!The balance result is shown below. Please make sure that is equivalent to the balance that you had in your Mainnet Yoroi Wallet on <strong>November 12th</strong>.',
+    defaultMessage: '!!!The balance result is shown below. Please make sure that is equivalent to the balance that you had in your Mainnet Yoroi Wallet on <strong>November 29th</strong>.',
   },
 });
 
