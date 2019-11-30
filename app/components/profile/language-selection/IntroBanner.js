@@ -18,7 +18,7 @@ const messages = defineMessages({
   },
   detail2: {
     id: 'profile.languageSelect.detail2',
-    defaultMessage: '!!!your balance was correctly copied over during the first snapshot.',
+    defaultMessage: '!!!your balance was correctly copied over during the second snapshot.',
   },
 });
 
