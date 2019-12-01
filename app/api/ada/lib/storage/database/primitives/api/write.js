@@ -15,6 +15,8 @@ import type {
   EncryptionMetaInsert, EncryptionMetaRow,
   DbTransaction,
   TransactionInsert, TransactionRow,
+  CertificateInsert, CertificateRow,
+  CertificateAddressInsert, CertificateAddressRow,
   DbBlock,
 } from '../tables';
 import type {
@@ -403,5 +405,44 @@ export class ModifyTransaction {
       },
       ModifyTransaction.ownTables[Tables.TransactionSchema.name].name,
     );
+  }
+}
+
+export type AddCertificateRequest = {|
+  certificate: CertificateInsert,
+  relatedAddresses: number => $ReadOnlyArray<CertificateAddressInsert>,
+|};
+export class ModifyCertificate {
+  static ownTables = Object.freeze({
+    [Tables.CertificateSchema.name]: Tables.CertificateSchema,
+    [Tables.CertificateAddressSchema.name]: Tables.CertificateAddressSchema,
+  });
+  static depTables = Object.freeze({
+  });
+
+  static async addNew(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: AddCertificateRequest,
+  ): Promise<{|
+    certificate: $ReadOnly<CertificateRow>,
+    relatedAddresses: $ReadOnlyArray<$ReadOnly<CertificateAddressRow>>,
+  |}> {
+    const certificate = await addNewRowToTable<CertificateInsert, CertificateRow>(
+      db, tx,
+      request.certificate,
+      ModifyCertificate.ownTables[Tables.CertificateSchema.name].name,
+    );
+
+    const relatedAddresses = await addBatchToTable<CertificateAddressInsert, CertificateAddressRow>(
+      db, tx,
+      request.relatedAddresses(certificate.CertificateId),
+      ModifyCertificate.ownTables[Tables.CertificateAddressSchema.name].name,
+    );
+
+    return {
+      certificate,
+      relatedAddresses,
+    };
   }
 }

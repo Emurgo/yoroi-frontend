@@ -24,3 +24,12 @@ export const TxStatusCodes = Object.freeze({
   IN_BLOCK: 1,
 });
 export type TxStatusCodesType = $Values<typeof TxStatusCodes>;
+
+export const CertificateRelation = Object.freeze({
+  SIGNER: 0,
+  REWARD_ADDRESS: 1,
+  PLEDGE_ADDRESS: 2,
+  // note: we don't explicitly add the "delegator" of a StakeDelegation certificate as a type
+  // since the signer of this kind of certificate much match the delegator so it would be redundant
+});
+export type CertificateRelationType = $Values<typeof CertificateRelation>;

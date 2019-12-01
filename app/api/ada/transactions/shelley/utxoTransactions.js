@@ -96,7 +96,6 @@ export function sendAllUnsignedTxFromUtxo(
     );
     const feeValue = fakeIOBuilder.estimate_fee(
       feeAlgorithm,
-      // can't add a certificate to a UTXO transaction
       RustModule.WalletV3.Payload.no_payload()
     ).to_str();
     fee = new BigNumber(feeValue);
