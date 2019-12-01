@@ -113,7 +113,7 @@
     "html-loader": "0.5.5",
     "html-webpack-harddisk-plugin": "1.0.1",
     "html-webpack-plugin": "4.0.0-beta.8",
-    "husky": "3.0.9",
+    "husky": "3.1.0",
     "jest": "24.9.0",
     "jest-canvas-mock": "2.2.0",
     "@emurgo/js-chain-libs-node": "git+https://github.com/SebastienGllmt/js-chain-libs-node-pkg.git",
