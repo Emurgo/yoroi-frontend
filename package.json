@@ -165,7 +165,7 @@
     "moment": "2.21.0",
     "pbkdf2": "3.0.17",
     "qr-image": "3.2.0",
-    "qrcode.react": "0.9.3",
+    "qrcode.react": "1.0.0",
     "react": "16.11.0",
     "react-blockies": "1.4.1",
     "react-copy-to-clipboard": "5.0.2",
