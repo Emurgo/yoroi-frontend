@@ -724,7 +724,7 @@ export default class AdaApi {
   async signAndBroadcast(
     request: SignAndBroadcastRequest
   ): Promise<SignAndBroadcastResponse> {
-    Logger.debug('AdaApi::signAndBroadcast called');
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.signAndBroadcast)} called`);
     const { password, signRequest } = request;
     try {
       const signingKey = await request.publicDeriver.getSigningKey();
@@ -763,7 +763,7 @@ export default class AdaApi {
         id = Buffer.from(signedTx.id().as_bytes()).toString('hex');
         encodedTx = signedTx.as_bytes();
       } else {
-        throw new Error('signAndBroadcast not supported');
+        throw new Error(`${nameof(this.signAndBroadcast)} not supported`);
       }
       const response = request.sendTx({
         id,
@@ -1074,7 +1074,7 @@ export default class AdaApi {
   async restoreWallet(
     request: RestoreWalletRequest
   ): Promise<RestoreWalletResponse> {
-    Logger.debug('AdaApi::restoreWallet called');
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} called`);
     const { recoveryPhrase, walletName, walletPassword, } = request;
 
     try {

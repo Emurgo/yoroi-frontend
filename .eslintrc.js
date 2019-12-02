@@ -116,6 +116,7 @@ module.exports = {
     NETWORK: true,
     MOBX_DEV_TOOLS: true,
     CONFIG: true,
-    yoroi: true
+    yoroi: true,
+    nameof: true,
   }
 }

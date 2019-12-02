@@ -26,6 +26,7 @@ module.exports = function (api /*: ApiType */) {
       '@babel/preset-react'
     ],
     plugins: [
+      'nameof-js',
       [
         '@babel/plugin-proposal-decorators',
         {
