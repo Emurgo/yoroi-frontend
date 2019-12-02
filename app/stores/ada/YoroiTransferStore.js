@@ -160,6 +160,7 @@ export default class YoroiTransferStore extends Store {
       signingKey: accountKey,
       getUTXOsForAddresses:
         this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
+      legacy: !environment.isShelley(),
     });
     // Possible exception: NotEnoughMoneyToSendError
     return transferTx;

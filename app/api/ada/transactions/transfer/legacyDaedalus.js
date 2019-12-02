@@ -18,7 +18,6 @@ import type {
 } from '../../../../types/TransferTypes';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import type { AddressKeyMap } from '../types';
-import environment from '../../../../environment';
 import { buildDaedalusTransferTx as shelleyFormatDaedalusTx } from '../shelley/daedalusTransfer';
 import { buildDaedalusTransferTx as legacyFormatDaedalusTx } from '../byron/daedalusTransfer';
 
@@ -71,6 +70,7 @@ export async function buildDaedalusTransferTx(payload: {|
   addressKeys: AddressKeyMap,
   outputAddr: string,
   getUTXOsForAddresses: AddressUtxoFunc,
+  legacy: boolean,
 |}): Promise<TransferTx> {
   const senderUtxos = await toSenderUtxos({
     outputAddr: payload.outputAddr,
@@ -83,7 +83,7 @@ export async function buildDaedalusTransferTx(payload: {|
     addressKeys: payload.addressKeys,
     senderUtxos,
   };
-  return environment.isShelley()
-    ? shelleyFormatDaedalusTx(txRequest)
-    : legacyFormatDaedalusTx(txRequest);
+  return payload.legacy
+    ? legacyFormatDaedalusTx(txRequest)
+    : shelleyFormatDaedalusTx(txRequest);
 }

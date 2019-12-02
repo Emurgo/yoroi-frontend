@@ -156,8 +156,6 @@ const nextRegularSpend: void => Array<RemoteTransaction> = () => [{
       amount: '1100000'
     },
     {
-      // eslint-disable-next-line max-len
-      // '0465267961fefd53aefe4cf741dc0df9902d360bca0de4c0abe88ca89d0d08dd3dd993c5b8ca62c78801d3228a8de6b9e18217b001820c24d60c1bcd91c895d585'
       address: getAddressForType(
         TX_TEST_MNEMONIC_1,
         [
