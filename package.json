@@ -87,6 +87,7 @@
     "babel-plugin-add-module-exports": "1.0.2",
     "babel-plugin-dynamic-import-node": "2.3.0",
     "babel-plugin-module-resolver": "3.2.0",
+    "babel-plugin-nameof-js": "0.0.2",
     "babel-plugin-react-intl": "5.1.9",
     "babel-preset-react-optimize": "1.0.1",
     "blake2b": "2.1.3",
