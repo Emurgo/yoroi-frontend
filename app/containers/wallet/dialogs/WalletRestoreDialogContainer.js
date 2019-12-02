@@ -14,7 +14,7 @@ import {
 import {
   generateStandardPlate,
 } from '../../../api/ada/lib/cardanoCrypto/plate';
-import type { WalletAccountNumberPlate } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { PlateResponse } from '../../../api/ada/lib/cardanoCrypto/plate';
 import globalMessages from '../../../i18n/global-messages';
 import { CheckAdressesInUseApiError } from '../../../api/ada/errors';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
@@ -30,10 +30,8 @@ const NUMBER_OF_VERIFIED_ADDRESSES = 1;
 const NUMBER_OF_VERIFIED_ADDRESSES_PAPER = 5;
 
 type WalletRestoreDialogContainerState = {|
-  verifyRestore?: {|
-    addresses: Array<string>,
-    accountPlate: WalletAccountNumberPlate,
-  |},
+  byronVerifyRestore: void | PlateResponse,
+  shelleyVerifyRestore: void | PlateResponse,
   submitValues?: WalletRestoreDialogValues,
   resolvedRecoveryPhrase?: string,
   notificationElementId: string,
@@ -48,7 +46,8 @@ export default class WalletRestoreDialogContainer
   };
 
   state = {
-    verifyRestore: undefined,
+    byronVerifyRestore: undefined,
+    shelleyVerifyRestore: undefined,
     submitValues: undefined,
     resolvedRecoveryPhrase: undefined,
     notificationElementId: '',
@@ -83,7 +82,7 @@ export default class WalletRestoreDialogContainer
       }
       resolvedRecoveryPhrase = newPhrase;
     }
-    const { addresses, accountPlate } = generateStandardPlate(
+    const byronVerifyRestore = generateStandardPlate(
       resolvedRecoveryPhrase,
       0, // show addresses for account #0
       isPaper ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER : NUMBER_OF_VERIFIED_ADDRESSES,
@@ -92,8 +91,20 @@ export default class WalletRestoreDialogContainer
         : RustModule.WalletV3.AddressDiscrimination.Test,
       true,
     );
+    const shelleyVerifyRestore = !environment.isShelley()
+      ? undefined
+      : generateStandardPlate(
+        resolvedRecoveryPhrase,
+        0, // show addresses for account #0
+        isPaper ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER : NUMBER_OF_VERIFIED_ADDRESSES,
+        environment.isMainnet()
+          ? RustModule.WalletV3.AddressDiscrimination.Production
+          : RustModule.WalletV3.AddressDiscrimination.Test,
+        false,
+      );
     this.setState({
-      verifyRestore: { addresses, accountPlate },
+      byronVerifyRestore,
+      shelleyVerifyRestore,
       submitValues: values,
       resolvedRecoveryPhrase,
     });
@@ -101,7 +112,8 @@ export default class WalletRestoreDialogContainer
 
   cancelVerification = () => {
     this.setState({
-      verifyRestore: undefined,
+      byronVerifyRestore: undefined,
+      shelleyVerifyRestore: undefined,
       resolvedRecoveryPhrase: undefined,
     });
   };
@@ -130,9 +142,9 @@ export default class WalletRestoreDialogContainer
       message: globalMessages.copyTooltipMessage,
     };
 
-    const { verifyRestore, submitValues } = this.state;
-    if (verifyRestore) {
-      const { addresses, accountPlate } = verifyRestore;
+    const { byronVerifyRestore, shelleyVerifyRestore, submitValues } = this.state;
+
+    if (byronVerifyRestore || shelleyVerifyRestore) {
       // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1055
       let error;
       /**
@@ -148,8 +160,8 @@ export default class WalletRestoreDialogContainer
         (restoreRequest.error instanceof CheckAdressesInUseApiError);
       return (
         <WalletRestoreVerifyDialog
-          addresses={addresses}
-          accountPlate={accountPlate}
+          byronPlate={byronVerifyRestore}
+          shelleyPlate={shelleyVerifyRestore}
           selectedExplorer={profile.selectedExplorer}
           onNext={this.onVerifiedSubmit}
           onCancel={this.cancelVerification}

@@ -10,6 +10,7 @@ import {
   WalletTypePurpose,
   BIP44_SCAN_SIZE,
   ChainDerivations,
+  STAKING_KEY_INDEX,
 } from '../../../../../../config/numbersConfig';
 
 import type {
@@ -59,7 +60,7 @@ export async function getAccountDefaultDerivations(
 
   const stakingKey = accountPublicKey
     .derive(ChainDerivations.CHIMERIC_ACCOUNT)
-    .derive(0) // staking key is 0th index
+    .derive(STAKING_KEY_INDEX)
     .to_raw_key();
   const externalAddrs = addressesIndex.map(i => {
     const key = accountPublicKey
