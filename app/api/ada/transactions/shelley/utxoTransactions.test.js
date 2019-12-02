@@ -228,10 +228,10 @@ describe('Create signed transactions with legacy witness', () => {
 
     expect(witnesses.size()).toEqual(2);
     expect(witnesses.get(0).to_bech32()).toEqual(
-      'witness1qz8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqf3rln4edvr5ppf35h9jt86ns3dr344k3y5w0sx8uwg0qa296rnzmjrqu3hs58hxk5l84n6luszrts7xzjwglzfzeskt4qdajh9zyfevevna69rev3qvkt4wvmwc7xljxn6qghhu3zt92jlx9095dn7jszcmr9n5s'
+      'witness1qz8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqf3rln4edvr5ppf35h9jt86ns3dr344k3y5w0sx8uwg0qa296rnzxm3ev8glwecyunua4ufueka7485gqrum54q4tqsdx2yjj6hahzaz9wrjpz7gxq2nm6pftxvgf39g60t5hdfxc8jecqx3m5te0yl8jrg0jtvc2'
     );
     expect(witnesses.get(1).to_bech32()).toEqual(
-      'witness1qz8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqf3rln4edvr5ppf35h9jt86ns3dr344k3y5w0sx8uwg0qa296rnzmjrqu3hs58hxk5l84n6luszrts7xzjwglzfzeskt4qdajh9zyfevevna69rev3qvkt4wvmwc7xljxn6qghhu3zt92jlx9095dn7jszcmr9n5s'
+      'witness1qz8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqf3rln4edvr5ppf35h9jt86ns3dr344k3y5w0sx8uwg0qa296rnzxm3ev8glwecyunua4ufueka7485gqrum54q4tqsdx2yjj6hahzaz9wrjpz7gxq2nm6pftxvgf39g60t5hdfxc8jecqx3m5te0yl8jrg0jtvc2'
     );
   });
 });
@@ -262,10 +262,10 @@ describe('Create signed transactions', () => {
 
     expect(witnesses.size()).toEqual(2);
     expect(witnesses.get(0).to_bech32()).toEqual(
-      'witness1q8wgvrjx7zs7u66nu7k0tljqgdwrcc2ferufytxzew5phk2u5g389n9j0hg509jypjew4endmrcm7g60gpz7ljyfv42tuc4uk3k062qt3pew9w'
+      'witness1qxn2lhu9sfj24lpzr8sglzsc6h8qpsuvurylzc9zuhn37s9uerc6xwt0zjtfv7rtsa3r0d7cydd76s9fcsw5u576vy226ux9frnpqssf9gqfz6'
     );
     expect(witnesses.get(1).to_bech32()).toEqual(
-      'witness1q8wgvrjx7zs7u66nu7k0tljqgdwrcc2ferufytxzew5phk2u5g389n9j0hg509jypjew4endmrcm7g60gpz7ljyfv42tuc4uk3k062qt3pew9w'
+      'witness1qxn2lhu9sfj24lpzr8sglzsc6h8qpsuvurylzc9zuhn37s9uerc6xwt0zjtfv7rtsa3r0d7cydd76s9fcsw5u576vy226ux9frnpqssf9gqfz6'
     );
   });
 
@@ -317,10 +317,10 @@ describe('Create signed transactions', () => {
 
     expect(witnesses.size()).toEqual(2);
     expect(witnesses.get(0).to_bech32()).toEqual(
-      'witness1q8wgvrjx7zs7u66nu7k0tljqgdwrcc2ferufytxzew5phk2u5g389n9j0hg509jypjew4endmrcm7g60gpz7ljyfv42tuc4uk3k062qt3pew9w'
+      'witness1qxn2lhu9sfj24lpzr8sglzsc6h8qpsuvurylzc9zuhn37s9uerc6xwt0zjtfv7rtsa3r0d7cydd76s9fcsw5u576vy226ux9frnpqssf9gqfz6'
     );
     expect(witnesses.get(1).to_bech32()).toEqual(
-      'witness1q8wgvrjx7zs7u66nu7k0tljqgdwrcc2ferufytxzew5phk2u5g389n9j0hg509jypjew4endmrcm7g60gpz7ljyfv42tuc4uk3k062qt3pew9w'
+      'witness1qxn2lhu9sfj24lpzr8sglzsc6h8qpsuvurylzc9zuhn37s9uerc6xwt0zjtfv7rtsa3r0d7cydd76s9fcsw5u576vy226ux9frnpqssf9gqfz6'
     );
   });
 
@@ -388,13 +388,13 @@ describe('Create signed transactions', () => {
     expect(change.address().to_string('addr')).toEqual('addr1s5quq8utjkrfntnkngjxa9u9mdd8pcprjal2fwzkm7k0y0prx3k276qm0j8');
     expect(change.value().to_str()).toEqual('1839616');
 
-    expect(Buffer.from(fragment.id().as_bytes()).toString('hex')).toEqual('c83ef43e02d8286c67df55ae179dde18f22debeb3e7bf87d3ad9d620b1d97763');
+    expect(Buffer.from(fragment.id().as_bytes()).toString('hex')).toEqual('c3ef21699ee8937527b83942980b0739353ddd133f627d40832b98d3ef416a6d');
     expect(Buffer.from(fragment.get_transaction().id().as_bytes()).toString('hex')).toEqual('314ea630977b20d21cc2dc8f861dc9bcfa2013dcbc32c75288d7a5067274662d');
 
     const witnesses = signedTx.witnesses();
     expect(witnesses.size()).toEqual(1);
     expect(witnesses.get(0).to_bech32()).toEqual(
-      'witness1q9f0f9ekhwgnd8rkmaq0zst0ef48sd4fqhdvjfrylwcdkyuragsq4nvhwttxu6q7y50vcurwgmn7jy2438x6azzjtfhxdelzdcvayvcwqyjwtc'
+      'witness1q89jcq78wt4u773vrrjjwuqg8908wpyuv5j3sdj0mcs4dpe667f97yfc0k48dae9u29r07nkms764js84tgwxr09ah6e948s2u6ye8cgyzhd4j'
     );
   });
 });
