@@ -2,9 +2,15 @@
 
 export type ConfigType = {
   network: NetworkConfigType,
+  seiza: SeizaConfigType,
   app: AppConfigType,
   genesis: GenesisConfigType,
 };
+
+export type SeizaConfigType = {|
+    simple: string,
+    advance: string,
+|}
 
 export type AppConfigType = {|
   walletRefreshInterval: number,

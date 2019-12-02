@@ -5,6 +5,10 @@
     "websocketUrl": "wss://iohk-mainnet.yoroiwallet.com:443",
     "name": "mainnet"
   },
+  seiza: {
+    simple: "",
+    advance: ""
+  },
   "app": {
     "walletRefreshInterval": 20000,
     "serverStatusRefreshInterval": 20000,

@@ -5,6 +5,10 @@
     "websocketUrl": "wss://stg-yoroi-backend.yoroiwallet.com:443",
     "name": "staging"
   },
+  seiza: {
+    simple: "",
+    advance: ""
+  },
   "app": {
     "walletRefreshInterval": 20000,
     "serverStatusRefreshInterval": 20000,

@@ -14,9 +14,9 @@ export const ROUTES = {
     TRANSACTIONS: '/wallets/:id/transactions',
     SEND: '/wallets/:id/send',
     RECEIVE: '/wallets/:id/receive',
-    STAKE_DASHBOARD: '/wallets/:id/stake-dashboard',
-    STAKE_SIMULATOR: '/wallets/:id/stake-simulator',
-    STAKE_ADVANCED_SIMULATOR: '/wallets/:id/stake-advanced-simulator',
+    DELEGATION_DASHBOARD: '/wallets/:id/delegation-dashboard',
+    DELEGATION_SIMPLE: '/wallets/:id/delegation-simple',
+    DELEGATION_ADVANCE: '/wallets/:id/delegation-advance',
   },
   SETTINGS: {
     ROOT: '/settings',
