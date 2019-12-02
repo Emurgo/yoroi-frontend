@@ -1,5 +1,5 @@
-/* eslint-disable camelcase */
 // @flow
+
 import '../../lib/test-config';
 import { schema } from 'lovefield';
 import {
