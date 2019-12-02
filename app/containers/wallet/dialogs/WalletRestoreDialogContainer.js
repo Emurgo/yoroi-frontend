@@ -91,7 +91,10 @@ export default class WalletRestoreDialogContainer
         : RustModule.WalletV3.AddressDiscrimination.Test,
       true,
     );
-    const shelleyVerifyRestore = !environment.isShelley()
+    // TODO: we disable shelley restoration information for paper wallet restoration
+    // this is because we've temporarily disabled paper wallet creation for Shelley
+    // so no point in showing the Shelley checksum
+    const shelleyVerifyRestore = !environment.isShelley() || isPaper
       ? undefined
       : generateStandardPlate(
         resolvedRecoveryPhrase,

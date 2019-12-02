@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import globalMessages from '../../i18n/global-messages';
 import WalletRestoreVerifyDialog from '../../components/wallet/WalletRestoreVerifyDialog';
-import type { WalletAccountNumberPlate } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import type { ExplorerType } from '../../domain/Explorer';
 import config from '../../config';
@@ -12,6 +11,7 @@ import {
 } from '../../api/ada/lib/cardanoCrypto/plate';
 import environment from '../../environment';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import type { PlateResponse } from '../../api/ada/lib/cardanoCrypto/plate';
 
 type Props = {|
   ...InjectedProps,
@@ -22,28 +22,47 @@ type Props = {|
   +classicTheme: boolean,
 |};
 type WalletRestoreDialogContainerState = {|
-  addresses: Array<string>,
-  accountPlate: WalletAccountNumberPlate,
+  byronPlate: void | PlateResponse,
+  shelleyPlate: void | PlateResponse,
   notificationElementId: string,
 |}
+
+const NUMBER_OF_VERIFIED_ADDRESSES = 1;
+const NUMBER_OF_VERIFIED_ADDRESSES_PAPER = 5;
 
 @observer
 export default class YoroiPlatePage extends Component<Props, WalletRestoreDialogContainerState> {
 
   initializeState = () => {
     const { yoroiTransfer } = this.props.stores.substores.ada;
-    const { addresses, accountPlate } = generateStandardPlate(
+
+    const numAddresses = yoroiTransfer.isPaper
+      ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER
+      : NUMBER_OF_VERIFIED_ADDRESSES;
+
+    const byronPlate = generateStandardPlate(
       yoroiTransfer.recoveryPhrase,
       0, // show addresses for account #0
-      5,
+      numAddresses,
       environment.isMainnet()
         ? RustModule.WalletV3.AddressDiscrimination.Production
         : RustModule.WalletV3.AddressDiscrimination.Test,
       true,
     );
+    const shelleyPlate = yoroiTransfer.isPaper
+      ? undefined
+      : generateStandardPlate(
+        yoroiTransfer.recoveryPhrase,
+        0, // show addresses for account #0
+        numAddresses,
+        environment.isMainnet()
+          ? RustModule.WalletV3.AddressDiscrimination.Production
+          : RustModule.WalletV3.AddressDiscrimination.Test,
+        false,
+      );
     return {
-      addresses,
-      accountPlate,
+      byronPlate,
+      shelleyPlate,
       notificationElementId: '',
     };
   }
@@ -58,11 +77,11 @@ export default class YoroiPlatePage extends Component<Props, WalletRestoreDialog
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
       message: globalMessages.copyTooltipMessage,
     };
-    const { addresses, accountPlate } = this.state;
+    const { byronPlate, shelleyPlate } = this.state;
     return (
       <WalletRestoreVerifyDialog
-        addresses={addresses}
-        accountPlate={accountPlate}
+        byronPlate={byronPlate}
+        shelleyPlate={shelleyPlate}
         selectedExplorer={this.props.selectedExplorer}
         onCopyAddressTooltip={(address, elementId) => {
           if (!uiNotifications.isOpen(elementId)) {
