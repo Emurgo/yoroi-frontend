@@ -32,7 +32,9 @@ import {
   HARD_DERIVATION_START,
   CoinTypes,
   WalletTypePurpose,
+  STAKING_KEY_INDEX,
 } from '../../../../config/numbersConfig';
+import { Bech32Prefix } from '../../../../config/stringConfig';
 import {
   getTxInputTotal,
   getTxOutputTotal,
@@ -354,7 +356,7 @@ describe('Create signed transactions', () => {
         'hex',
       ),
     );
-    const stakingKey = accountPrivateKey.derive(2).derive(0).to_raw_key();
+    const stakingKey = accountPrivateKey.derive(2).derive(STAKING_KEY_INDEX).to_raw_key();
     const certificate = RustModule.WalletV3.Certificate.stake_delegation(
       RustModule.WalletV3.StakeDelegation.new(
         RustModule.WalletV3.DelegationType.full(
@@ -385,7 +387,7 @@ describe('Create signed transactions', () => {
     const outputs = signedTx.outputs();
     expect(outputs.size()).toEqual(2);
     const change = outputs.get(1);
-    expect(change.address().to_string('addr')).toEqual('addr1s5quq8utjkrfntnkngjxa9u9mdd8pcprjal2fwzkm7k0y0prx3k276qm0j8');
+    expect(change.address().to_string(Bech32Prefix.ADDRESS)).toEqual('addr1s5quq8utjkrfntnkngjxa9u9mdd8pcprjal2fwzkm7k0y0prx3k276qm0j8');
     expect(change.value().to_str()).toEqual('1839616');
 
     expect(Buffer.from(fragment.id().as_bytes()).toString('hex')).toEqual('c3ef21699ee8937527b83942980b0739353ddd133f627d40832b98d3ef416a6d');

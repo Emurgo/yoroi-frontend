@@ -6,7 +6,7 @@
 import { RustModule } from './rustLoader';
 import type { GenerateAddressFunc } from '../adaAddressProcessing';
 import { v2genAddressBatchFunc } from '../../restoration/byron/scan';
-import { genSingleAddressBatchFunc } from '../../restoration/shelley/scan';
+import { Bech32Prefix } from '../../../../config/stringConfig';
 import blakejs from 'blakejs';
 import crc32 from 'buffer-crc32';
 import type { WalletAccountNumberPlate } from '../storage/models/PublicDeriver/interfaces';
@@ -16,6 +16,7 @@ import {
   CoinTypes,
   WalletTypePurpose,
   ChainDerivations,
+  STAKING_KEY_INDEX,
 } from '../../../../config/numbersConfig';
 import type { AddressDiscriminationType } from '@emurgo/js-chain-libs/js_chain_libs';
 
@@ -40,13 +41,17 @@ export function createAccountPlate(accountPubHash: string): WalletAccountNumberP
   return { hash, id };
 }
 
+export type PlateResponse = {|
+  addresses: Array<string>,
+  accountPlate: WalletAccountNumberPlate
+|};
 export const generateStandardPlate = (
   mnemonic: string,
   accountIndex: number,
   count: number,
   discrimination: AddressDiscriminationType,
   legacy: boolean,
-): {| addresses: Array<string>, accountPlate: WalletAccountNumberPlate |} => {
+): PlateResponse => {
   const cryptoWallet = generateWalletRootKey(mnemonic);
   const accountKey = cryptoWallet
     .derive(legacy ? WalletTypePurpose.BIP44 : WalletTypePurpose.CIP1852)
@@ -55,8 +60,12 @@ export const generateStandardPlate = (
   const accountPublic = accountKey.to_public();
   const chainKey = accountPublic.derive(ChainDerivations.EXTERNAL);
 
+  const stakingKey = accountPublic
+    .derive(ChainDerivations.CHIMERIC_ACCOUNT)
+    .derive(STAKING_KEY_INDEX)
+    .to_raw_key();
+
   return mnemonicsToAddresses(
-    // add: add v3 addresses options
     legacy
       ? v2genAddressBatchFunc(
         RustModule.WalletV2.Bip44ChainPublic.new(
@@ -66,11 +75,32 @@ export const generateStandardPlate = (
           RustModule.WalletV2.DerivationScheme.v2()
         ),
       )
-      : genSingleAddressBatchFunc(
+      : genGroupAddressBatchFunc(
         chainKey,
+        stakingKey,
         discrimination,
       ),
     Buffer.from(accountPublic.as_bytes()).toString('hex'),
     count
   );
 };
+
+export function genGroupAddressBatchFunc(
+  addressChain: RustModule.WalletV3.Bip32PublicKey,
+  stakingKey: RustModule.WalletV3.PublicKey,
+  discrimination: AddressDiscriminationType,
+): GenerateAddressFunc {
+  return (
+    indices: Array<number>
+  ) => {
+    return indices.map(i => {
+      const addressKey = addressChain.derive(i).to_raw_key();
+      const address = RustModule.WalletV3.Address.delegation_from_public_key(
+        addressKey,
+        stakingKey,
+        discrimination
+      );
+      return address.to_string(Bech32Prefix.ADDRESS);
+    });
+  };
+}

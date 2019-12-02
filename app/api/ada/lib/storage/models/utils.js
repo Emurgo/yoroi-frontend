@@ -91,6 +91,7 @@ import { WrongPassphraseError } from '../../cardanoCrypto/cryptoErrors';
 
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 import { ChainDerivations, BIP44_SCAN_SIZE, } from  '../../../../../config/numbersConfig';
+import { Bech32Prefix } from '../../../../../config/stringConfig';
 import {
   encryptWithPassword,
   decryptWithPassword,
@@ -343,7 +344,7 @@ export async function rawGetAddressesForDisplay(
         ? addr.Hash
         : RustModule.WalletV3.Address.from_bytes(
           Buffer.from(addr.Hash, 'hex')
-        ).to_string('addr');
+        ).to_string(Bech32Prefix.ADDRESS);
       return {
         address: transformedAddress,
         value: balanceForAddresses[addr.AddressId],
