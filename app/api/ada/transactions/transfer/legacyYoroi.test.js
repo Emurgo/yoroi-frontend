@@ -17,6 +17,7 @@ import type {
 import {
   ChainDerivations,
 } from '../../../../config/numbersConfig';
+import { Bech32Prefix } from '../../../../config/stringConfig';
 
 import {
   loadLovefieldDB,
@@ -48,7 +49,7 @@ function getShelleyAddress(
     RustModule.WalletV3.AddressDiscrimination.Production
   );
   return {
-    address: addr.to_string('addr'),
+    address: Buffer.from(addr.as_bytes()).toString('hex'),
     addressing: {
       path: [ChainDerivations.EXTERNAL, derivationId],
       startLevel: Bip44DerivationLevels.CHAIN.level,
@@ -144,9 +145,10 @@ describe('Shelley era tx format tests', () => {
     const txId = '915f2e6865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c';
     const inputAmount = '1000000';
     const txIndex = 0;
-    const outAddress = RustModule.WalletV3.Address.from_bytes(
-      Buffer.from('038e2840fed90d2138761d8a14a4cbed08ed00cf908b07f94ec5fa9db6f4d7e74f', 'hex')
-    ).to_string('addr');
+    const bech32Addr = 'addr1qw8zss87myxjzwrkrk9pffxta5yw6qx0jz9s072wchafmdh56ln5704fx9z';
+    const outAddress = Buffer.from(RustModule.WalletV3.Address.from_string(
+      bech32Addr
+    ).as_bytes()).toString('hex');
 
     const accountPrivateKey = RustModule.WalletV3.Bip32PrivateKey.from_bytes(
       Buffer.from(
@@ -177,8 +179,12 @@ describe('Shelley era tx format tests', () => {
 
     expect(transferInfo.fee.toString()).toBe('0.155383');
     expect(transferInfo.recoveredBalance.toString()).toBe('1');
-    expect(transferInfo.senders).toEqual([addr1.address]);
-    expect(transferInfo.receiver).toBe(outAddress);
+    expect(transferInfo.senders).toEqual([
+      RustModule.WalletV3.Address.from_bytes(
+        Buffer.from(addr1.address, 'hex')
+      ).to_string(Bech32Prefix.ADDRESS)
+    ]);
+    expect(transferInfo.receiver).toBe(bech32Addr);
 
     // check tx itself
     const fragment = RustModule.WalletV3.Fragment.from_bytes(transferInfo.encodedTx);
@@ -194,7 +200,7 @@ describe('Shelley era tx format tests', () => {
     const outputs = signedTx.outputs();
     expect(outputs.size()).toEqual(1);
     const output = outputs.get(0);
-    expect(output.address().to_string('addr')).toEqual(outAddress);
+    expect(output.address().to_string('addr')).toEqual(bech32Addr);
     expect(output.value().to_str()).toEqual('844617');
 
     const witnesses = signedTx.witnesses();

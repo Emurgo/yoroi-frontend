@@ -91,7 +91,9 @@ export function sendAllUnsignedTxFromUtxo(
       fakeIOBuilder.add_input(input);
     }
     fakeIOBuilder.add_output(
-      RustModule.WalletV3.Address.from_string(receiver),
+      RustModule.WalletV3.Address.from_bytes(
+        Buffer.from(receiver, 'hex')
+      ),
       RustModule.WalletV3.Value.from_str(totalBalance.toString())
     );
     const feeValue = fakeIOBuilder.estimate_fee(
@@ -170,7 +172,9 @@ export function newAdaUnsignedTxFromUtxo(
 
   const ioBuilder = RustModule.WalletV3.InputOutputBuilder.empty();
   ioBuilder.add_output(
-    RustModule.WalletV3.Address.from_string(receiver),
+    RustModule.WalletV3.Address.from_bytes(
+      Buffer.from(receiver, 'hex')
+    ),
     RustModule.WalletV3.Value.from_str(amount)
   );
   const payload = certificate != null
@@ -198,7 +202,9 @@ export function newAdaUnsignedTxFromUtxo(
       payload,
       feeAlgorithm,
       RustModule.WalletV3.OutputPolicy.one(
-        RustModule.WalletV3.Address.from_string(changeAddr.address)
+        RustModule.WalletV3.Address.from_bytes(
+          Buffer.from(changeAddr.address, 'hex')
+        )
       )
     );
     const addedChange = filterToUsedChange(
@@ -264,7 +270,9 @@ function filterToUsedChange(
   const possibleDuplicates = selectedUtxos.filter(utxo => utxo.receiver === changeAddr.address);
 
   const change = [];
-  const changeAddrWasm = RustModule.WalletV3.Address.from_string(changeAddr.address);
+  const changeAddrWasm = RustModule.WalletV3.Address.from_bytes(
+    Buffer.from(changeAddr.address, 'hex')
+  );
   const changeAddrPayload = Buffer.from(changeAddrWasm.as_bytes()).toString('hex');
   for (let i = 0; i < outputs.size(); i++) {
     const output = outputs.get(i);

@@ -912,7 +912,9 @@ export default class AdaApi {
       if (shouldSendAll) {
         unsignedTxResponse = environment.isShelley()
           ? shelleySendAllUnsignedTx(
-            receiver,
+            Buffer.from(
+              RustModule.WalletV3.Address.from_string(receiver).as_bytes()
+            ).toString('hex'),
             addressedUtxo
           )
           : byronSendAllUnsignedTx(
@@ -927,7 +929,9 @@ export default class AdaApi {
         const changeAddr = nextUnusedInternal.addressInfo;
         unsignedTxResponse = environment.isShelley()
           ? shelleyNewAdaUnsignedTx(
-            receiver,
+            Buffer.from(
+              RustModule.WalletV3.Address.from_string(receiver).as_bytes()
+            ).toString('hex'),
             amount,
             [{
               address: changeAddr.addr.Hash,

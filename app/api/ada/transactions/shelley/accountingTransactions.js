@@ -25,6 +25,9 @@ export function buildUnsignedAccountTx(
   typeSpecific: SendType,
   accountBalance: BigNumber,
 ): RustModule.WalletV3.InputOutput {
+  const wasmReceiver = RustModule.WalletV3.Address.from_bytes(
+    Buffer.from(receiver, 'hex')
+  );
   if (typeSpecific.amount != null && typeSpecific.amount.gt(accountBalance)) {
     throw new NotEnoughMoneyToSendError();
   }
@@ -52,7 +55,7 @@ export function buildUnsignedAccountTx(
 
     if (typeSpecific.amount != null) {
       fakeTxBuilder.add_output(
-        RustModule.WalletV3.Address.from_string(receiver),
+        wasmReceiver,
         // the value we put in here is irrelevant. Just need some value to be able to calculate fee
         RustModule.WalletV3.Value.from_str('1')
       );
@@ -79,7 +82,7 @@ export function buildUnsignedAccountTx(
   if (typeSpecific.amount != null) {
     const value = RustModule.WalletV3.Value.from_str(typeSpecific.amount.toString());
     ioBuilder.add_output(
-      RustModule.WalletV3.Address.from_string(receiver),
+      wasmReceiver,
       value
     );
   }
