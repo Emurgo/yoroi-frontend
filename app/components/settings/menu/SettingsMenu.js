@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import SettingsMenuItem from './SettingsMenuItem';
 import styles from './SettingsMenu.scss';
-import environmnent from '../../../environment'
+import environmnent from '../../../environment';
 import { ROUTES } from '../../../routes-config';
 import type { Theme } from '../../../themes';
 
