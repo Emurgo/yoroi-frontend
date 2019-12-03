@@ -43,17 +43,20 @@ import {
 const keys = [
   {
     legacyAddress: 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
-    bechAddress: 'ca1qw8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqeh83d4',
+    // ca1qw8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqeh83d4
+    bechAddress: '038fb03c3aa052f51c086c54bd4059ead2d2e426ac89fa4b3ce41cbfd8800b51c0',
     pubKey: '8fb03c3aa052f51c086c54bd4059ead2d2e426ac89fa4b3ce41cbfd8800b51c02623fceb96b07408531a5cb259f53845a38d6b68928e7c0c7e390f07545d0e62',
   },
   {
     legacyAddress: 'Ae2tdPwUPEZ4xAL3nxLq4Py7BfS1D2tJ3u2rxZGnrAXC8TNkWhTaz41J3FN',
-    bechAddress: 'ca1q0j6cetm7zqsagm5zz5fmav9jg37n4cferj23h370kptrpfj095fxcy43lj',
+    // ca1q0j6cetm7zqsagm5zz5fmav9jg37n4cferj23h370kptrpfj095fxcy43lj 
+    bechAddress: '03e5ac657bf0810ea37410a89df5859223e9d709c8e4a8de3e7d82b18532796893',
     pubKey: 'e5ac657bf0810ea37410a89df5859223e9d709c8e4a8de3e7d82b185327968939a254def91bb75e94bda9c605f7f87481082742e1e51d8858965c9a40491fc94',
   },
   {
     legacyAddress: 'Ae2tdPwUPEZEtwz7LKtJn9ub8y7ireuj3sq2yUCZ57ccj6ZkJKn7xEiApV9',
-    bechAddress: 'ca1q0ewtxsk489t9g7vs64prkm0hfvz6aemtvtv57rkfwmxyp3yhtxtwhtm3gd',
+    // ca1q0ewtxsk489t9g7vs64prkm0hfvz6aemtvtv57rkfwmxyp3yhtxtwhtm3gd
+    bechAddress: '03f2e59a16a9cab2a3cc86aa11db6fba582d773b5b16ca78764bb6620624baccb7',
     pubKey: 'f2e59a16a9cab2a3cc86aa11db6fba582d773b5b16ca78764bb6620624baccb7c03adf6448459f2b8d5c32033a160de8b5412d1952794190c4fc6b4716a8b8eb',
   }
 ];
@@ -84,7 +87,8 @@ const sampleUtxos: Array<RemoteUnspentOutput> = [
 
 const sampleAdaAddresses: Array<{| ...Address, ...Addressing |}> = [
   {
-    address: 'ca1q0ewtxsk489t9g7vs64prkm0hfvz6aemtvtv57rkfwmxyp3yhtxtwhtm3gd',
+    // ca1q0ewtxsk489t9g7vs64prkm0hfvz6aemtvtv57rkfwmxyp3yhtxtwhtm3gd
+    address: '03f2e59a16a9cab2a3cc86aa11db6fba582d773b5b16ca78764bb6620624baccb7',
     addressing: {
       path: [1, 11],
       startLevel: Bip44DerivationLevels.CHAIN.level,
@@ -328,10 +332,14 @@ describe('Create signed transactions', () => {
 
   it('Transaction with a certificate is also valid', () => {
     const unsignedTxResponse = newAdaUnsignedTx(
-      'ca1sw8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguq9rance',
+      Buffer.from(RustModule.WalletV3.Address.from_string(
+        'ca1sw8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguq9rance'
+      ).as_bytes()).toString('hex'),
       '5000', // smaller than input
       [{
-        address: 'addr1s5quq8utjkrfntnkngjxa9u9mdd8pcprjal2fwzkm7k0y0prx3k276qm0j8',
+        address: Buffer.from(RustModule.WalletV3.Address.from_string(
+          'addr1s5quq8utjkrfntnkngjxa9u9mdd8pcprjal2fwzkm7k0y0prx3k276qm0j8'
+        ).as_bytes()).toString('hex'),
         addressing: {
           path: [1, 0],
           startLevel: Bip44DerivationLevels.CHAIN.level,
@@ -339,7 +347,9 @@ describe('Create signed transactions', () => {
       }],
       [{
         amount: '2000000',
-        receiver: 'ca1ssuvzjs82mshgvyp4r4lmwgknvgjswnm7mpcq3wycjj7v2nk393e6qwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm906x2vwl',
+        receiver: Buffer.from(RustModule.WalletV3.Address.from_string(
+          'ca1ssuvzjs82mshgvyp4r4lmwgknvgjswnm7mpcq3wycjj7v2nk393e6qwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm906x2vwl'
+        ).as_bytes()).toString('hex'),
         tx_hash: '86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de5550',
         tx_index: 0,
         utxo_id: '86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de55500',
