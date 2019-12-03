@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import SettingsMenuItem from './SettingsMenuItem';
 import styles from './SettingsMenu.scss';
+import environmnent from '../../../environment';
 import { ROUTES } from '../../../routes-config';
 import type { Theme } from '../../../themes';
 
@@ -59,12 +60,14 @@ export default class SettingsMenu extends Component<Props> {
             className="general"
           />
 
-          <SettingsMenuItem
-            label={intl.formatMessage(messages.paperWallet)}
-            onClick={() => onItemClick(ROUTES.SETTINGS.PAPER_WALLET)}
-            active={isActiveItem(ROUTES.SETTINGS.PAPER_WALLET)}
-            className="paperWallet"
-          />
+          {!environmnent.isShelley() &&
+            <SettingsMenuItem
+              label={intl.formatMessage(messages.paperWallet)}
+              onClick={() => onItemClick(ROUTES.SETTINGS.PAPER_WALLET)}
+              active={isActiveItem(ROUTES.SETTINGS.PAPER_WALLET)}
+              className="paperWallet"
+            />
+          }
 
           <SettingsMenuItem
             label={intl.formatMessage(messages.wallet)}
