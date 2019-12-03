@@ -17,6 +17,7 @@ import type {
 import {
   ChainDerivations,
 } from '../../../../config/numbersConfig';
+import { Bech32Prefix } from '../../../../config/stringConfig';
 
 import {
   loadLovefieldDB,
@@ -48,7 +49,7 @@ function getShelleyAddress(
     RustModule.WalletV3.AddressDiscrimination.Production
   );
   return {
-    address: addr.to_string('addr'),
+    address: Buffer.from(addr.as_bytes()).toString('hex'),
     addressing: {
       path: [ChainDerivations.EXTERNAL, derivationId],
       startLevel: Bip44DerivationLevels.CHAIN.level,
@@ -178,8 +179,12 @@ describe('Shelley era tx format tests', () => {
 
     expect(transferInfo.fee.toString()).toBe('0.155383');
     expect(transferInfo.recoveredBalance.toString()).toBe('1');
-    expect(transferInfo.senders).toEqual([addr1.address]);
-    expect(transferInfo.receiver).toBe(outAddress);
+    expect(transferInfo.senders).toEqual([
+      RustModule.WalletV3.Address.from_bytes(
+        Buffer.from(addr1.address, 'hex')
+      ).to_string(Bech32Prefix.ADDRESS)
+    ]);
+    expect(transferInfo.receiver).toBe(bech32Addr);
 
     // check tx itself
     const fragment = RustModule.WalletV3.Fragment.from_bytes(transferInfo.encodedTx);

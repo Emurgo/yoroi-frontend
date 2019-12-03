@@ -226,7 +226,7 @@ describe('Shelley era tx format tests', () => {
     expect(transferInfo.fee.toString()).toBe('0.155383');
     expect(transferInfo.recoveredBalance.toString()).toBe('1');
     expect(transferInfo.senders).toEqual([address]);
-    expect(transferInfo.receiver).toBe(outAddress);
+    expect(transferInfo.receiver).toBe(bech32Addr);
 
     // check tx itself
     const fragment = RustModule.WalletV3.Fragment.from_bytes(transferInfo.encodedTx);
@@ -323,7 +323,7 @@ describe('Shelley era tx format tests', () => {
     expect(transferInfo.fee.toString()).toBe('0.155482');
     expect(transferInfo.recoveredBalance.toString()).toBe('100.0001');
     expect(transferInfo.senders).toEqual([address]);
-    expect(transferInfo.receiver).toBe(outAddress);
+    expect(transferInfo.receiver).toBe(bech32Addr);
 
     // check tx itself
     const fragment = RustModule.WalletV3.Fragment.from_bytes(transferInfo.encodedTx);
