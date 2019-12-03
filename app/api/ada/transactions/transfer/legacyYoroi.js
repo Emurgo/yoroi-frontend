@@ -9,7 +9,6 @@ import {
   NoInputsError,
 } from '../../errors';
 import type { AddressedUtxo } from '../types';
-import environment from '../../../../environment';
 import type {
   AddressUtxoFunc,
 } from '../../lib/state-fetch/types';
@@ -71,8 +70,10 @@ export async function generateLegacyYoroiTransferTx(payload: {|
   keyLevel: number,
   signingKey: RustModule.WalletV3.Bip32PrivateKey,
   getUTXOsForAddresses: AddressUtxoFunc,
+  legacy: boolean,
 |}): Promise<TransferTx> {
-  const senderUtxos = await toSenderUtxos(payload);
+  const { legacy, ...rest } = payload;
+  const senderUtxos = await toSenderUtxos(rest);
 
   const txRequest = {
     outputAddr: payload.outputAddr,
@@ -80,7 +81,7 @@ export async function generateLegacyYoroiTransferTx(payload: {|
     signingKey: payload.signingKey,
     senderUtxos,
   };
-  return environment.isShelley()
-    ? shelleyFormatYoroiTx(txRequest)
-    : legacyFormatYoroiTx(txRequest);
+  return legacy
+    ? legacyFormatYoroiTx(txRequest)
+    : shelleyFormatYoroiTx(txRequest);
 }
