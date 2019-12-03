@@ -14,14 +14,14 @@
     "txsBodiesRequestSize": 150
   },
   "genesis": {
-    "block0_date": 0,
-    "slots_per_epoch": 21600,
-    "slot_duration": 20,
+    "block0_date": 1575295549000,
+    "slots_per_epoch": 5000,
+    "slot_duration": 10,
     "linearFee": {
-      "constant": "2",
-      "coefficient": "1",
-      "certificate": "4"
+      "constant": "10",
+      "coefficient": "0",
+      "certificate": "0"
     },
-    "genesisHash": "todo"
+    "genesisHash": "4d8b8ff16ce86f9436ac7c4b5ce454f3aaa3477c43b360c0646a258ab230b83e"
   }
 }
