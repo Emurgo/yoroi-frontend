@@ -345,7 +345,7 @@
   "wallet.restore.dialog.title.verify.paper.label": "Проверьте бумажный кошелек Yoroi",
   "wallet.restore.dialog.verify.accountId.byron.label": "Контрольная сумма счета Byron:",
   "wallet.restore.dialog.verify.accountId.label": "Контрольная сумма Вашего кошелька:",
-  "wallet.restore.dialog.verify.accountId.shelley.label": "Контрольная сумма аккаунта Shelley:",
+  "wallet.restore.dialog.verify.accountId.shelley.label": "Контрольная сумма счета Shelley:",
   "wallet.restore.dialog.verify.addressesLabel": "Адрес[а] Вашего кошелька:",
   "wallet.restore.dialog.verify.byron.addressesLabel": "Адрес[а] кошелька Byron:",
   "wallet.restore.dialog.verify.intro.line1": "Будьте осторожны при восстановлении кошелька:",
