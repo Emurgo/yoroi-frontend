@@ -112,7 +112,6 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
               paperStore.paper != null && words === paperStore.paper.scrambledWords.join(' ')
             )}
             passwordValidator={pass => pass === paperStore.userPassword}
-            isSubmitting={false}
             validWords={validWords}
             isPaper
             showPaperPassword

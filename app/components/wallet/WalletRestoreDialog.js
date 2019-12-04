@@ -71,7 +71,6 @@ type Props = {|
   +onSubmit: WalletRestoreDialogValues => void,
   +onCancel: void => void,
   +onBack?: void => void,
-  +isSubmitting: boolean,
   +mnemonicValidator: string => boolean,
   +passwordValidator?: string => boolean,
   +numberOfMnemonics: number,
@@ -251,7 +250,6 @@ export default class WalletRestoreDialog extends Component<Props> {
     const { form } = this;
     const {
       validWords,
-      isSubmitting,
       error,
       onCancel,
       onBack,
@@ -322,12 +320,12 @@ export default class WalletRestoreDialog extends Component<Props> {
 
     const actions = [
       {
-        className: isSubmitting ? styles.isSubmitting : null,
+        className: null,
         label: intl.formatMessage(
           isVerificationMode === true ? messages.verifyButtonLabel : messages.importButtonLabel
         ),
         primary: true,
-        disabled: isSubmitting || disabledCondition(),
+        disabled: disabledCondition(),
         onClick: this.submit,
       },
     ];
