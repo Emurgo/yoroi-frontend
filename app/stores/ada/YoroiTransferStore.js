@@ -66,6 +66,7 @@ export default class YoroiTransferStore extends Store {
   });
 
   setup(): void {
+    super.setup();
     this.registerReactions([
       this._enableDisableTransferFunds
     ]);

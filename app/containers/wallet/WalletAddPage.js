@@ -26,6 +26,9 @@ import WalletConnectHWOptionDialog from '../../components/wallet/add/option-dial
 import WalletTrezorConnectDialogContainer from './dialogs/WalletTrezorConnectDialogContainer';
 import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDialogContainer';
 
+import type { RestoreModeType } from '../../actions/ada/wallet-restore-actions';
+import { RestoreMode } from '../../actions/ada/wallet-restore-actions';
+
 type Props = InjectedProps;
 
 @observer
@@ -81,14 +84,14 @@ export default class WalletAddPage extends Component<Props> {
           onClose={this.onClose}
           classicTheme={profile.isClassicTheme}
           onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
-          onPaperRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog, params: { restoreType: 'paper' } })}
+          onPaperRestore={() => actions.dialogs.open.trigger({
+            dialog: WalletRestoreDialog,
+            params: { restoreType: (RestoreMode.PAPER: RestoreModeType)  }
+          })}
         />
       );
     } else if (uiDialogs.isOpen(WalletRestoreDialog)) {
-      const mode = uiDialogs.getParam<string>('restoreType') || 'regular';
-      if ((mode !== 'regular') && (mode !== 'paper')) {
-        throw new Error('Invalid restore type');
-      }
+      const mode = uiDialogs.getParam<?RestoreModeType>('restoreType') || RestoreMode.REGULAR;
       activeDialog = (
         <WalletRestoreDialogContainer
           actions={actions}
