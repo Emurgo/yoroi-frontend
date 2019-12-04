@@ -61,6 +61,7 @@ import {
   GetAddress,
   GetPathWithSpecific,
   GetDerivationsByPath,
+  GetCertificates,
 } from '../database/primitives/api/read';
 import {
   getAllSchemaTables,
@@ -77,7 +78,10 @@ import {
 import type { UtxoTxOutput } from '../database/transactionModels/utxo/api/read';
 import type { UtxoTransactionOutputRow } from '../database/transactionModels/utxo/tables';
 import { Bip44DerivationLevels } from '../database/walletTypes/bip44/api/utils';
-import type { GetPathWithSpecificByTreeRequest } from '../database/primitives/api/read';
+import type {
+  GetPathWithSpecificByTreeRequest,
+  CertificateForKey,
+} from '../database/primitives/api/read';
 import {
   GetUtxoTxOutputsWithTx,
 } from '../database/transactionModels/utxo/api/read';
@@ -87,6 +91,7 @@ import { WrongPassphraseError } from '../../cardanoCrypto/cryptoErrors';
 
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 import { ChainDerivations, BIP44_SCAN_SIZE, } from  '../../../../../config/numbersConfig';
+import { Bech32Prefix } from '../../../../../config/stringConfig';
 import {
   encryptWithPassword,
   decryptWithPassword,
@@ -339,7 +344,7 @@ export async function rawGetAddressesForDisplay(
         ? addr.Hash
         : RustModule.WalletV3.Address.from_bytes(
           Buffer.from(addr.Hash, 'hex')
-        ).to_string('addr');
+        ).to_string(Bech32Prefix.ADDRESS);
       return {
         address: transformedAddress,
         value: balanceForAddresses[addr.AddressId],
@@ -803,4 +808,22 @@ export async function updateCutoffFromInsert(
       );
     }
   }
+}
+
+export async function getCertificates(
+  db: lf$Database,
+  addressId: number,
+): Promise<Array<CertificateForKey>> {
+  const deps = Object.freeze({
+    GetCertificates,
+  });
+  const depTables = Object
+    .keys(deps)
+    .map(key => deps[key])
+    .flatMap(table => getAllSchemaTables(db, table));
+  return await raii(
+    db,
+    depTables,
+    async dbTx => await deps.GetCertificates.forAddress(db, dbTx, { addressId })
+  );
 }

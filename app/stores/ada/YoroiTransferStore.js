@@ -50,6 +50,7 @@ export default class YoroiTransferStore extends Store {
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
   @observable recoveryPhrase: string = '';
+  @observable isPaper: boolean = false;
 
   _errorWrapper = <PT, RT>(func: PT=>Promise<RT>): (PT => Promise<RT>) => (async (payload) => {
     try {
@@ -160,6 +161,7 @@ export default class YoroiTransferStore extends Store {
       signingKey: accountKey,
       getUTXOsForAddresses:
         this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
+      legacy: !environment.isShelley(),
     });
     // Possible exception: NotEnoughMoneyToSendError
     return transferTx;
@@ -170,6 +172,9 @@ export default class YoroiTransferStore extends Store {
     paperPassword: string,
     publicDeriver: PublicDeriverWithCachedMeta,
   }): Promise<void> => {
+    runInAction(() => {
+      this.isPaper = true;
+    });
     const result = unscramblePaperAdaMnemonic(
       payload.recoveryPhrase,
       config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT,
@@ -299,6 +304,7 @@ export default class YoroiTransferStore extends Store {
     this.transferFundsRequest.reset();
     this.restoreForTransferRequest.reset();
     this.recoveryPhrase = '';
+    this.isPaper = false;
   }
 
   _restoreWalletForTransfer = async (

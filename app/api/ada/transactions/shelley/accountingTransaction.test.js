@@ -27,7 +27,9 @@ describe('Create unsigned TX for account', () => {
 
     const unsignedTxResponse = buildUnsignedAccountTx(
       senderKey.to_public(),
-      'ca1qw8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqeh83d4',
+      Buffer.from(RustModule.WalletV3.Address.from_string(
+        'ca1qw8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqeh83d4'
+      ).as_bytes()).toString('hex'),
       {
         amount: new BigNumber(2000000)
       },
@@ -64,7 +66,9 @@ describe('Create unsigned TX for account', () => {
 
     expect(() => buildUnsignedAccountTx(
       senderKey.to_public(),
-      'ca1qw8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqeh83d4',
+      Buffer.from(RustModule.WalletV3.Address.from_string(
+        'ca1qw8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqeh83d4'
+      ).as_bytes()).toString('hex'),
       {
         amount: new BigNumber(2000000),
       },
@@ -79,7 +83,9 @@ describe('Create unsigned TX for account', () => {
 
     expect(() => buildUnsignedAccountTx(
       senderKey.to_public(),
-      'ca1qw8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqeh83d4',
+      Buffer.from(RustModule.WalletV3.Address.from_string(
+        'ca1qw8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqeh83d4'
+      ).as_bytes()).toString('hex'),
       {
         amount: new BigNumber(2000000),
       },

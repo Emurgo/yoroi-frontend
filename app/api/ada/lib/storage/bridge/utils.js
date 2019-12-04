@@ -2,6 +2,7 @@
 
 import type { CoreAddressT } from '../database/primitives/enums';
 import { CoreAddressTypes } from '../database/primitives/enums';
+import { Bech32Prefix } from '../../../../../config/stringConfig';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 
 export function addressToKind(
@@ -66,6 +67,26 @@ export function verifyAddress(
       return true;
     } catch (_e1) {
       return false;
+    }
+  }
+}
+
+export function addressToDisplayString(
+  address: string
+): string {
+  try {
+    // Need to try parsing as a legacy address first
+    // Since parsing as bech32 directly may give a wrong result if the address contains a 1
+    RustModule.WalletV2.Address.from_base58(address);
+    return address;
+  } catch (_e1) {
+    try {
+      const wasmAddr = RustModule.WalletV3.Address.from_bytes(
+        Buffer.from(address, 'hex')
+      );
+      return wasmAddr.to_string(Bech32Prefix.ADDRESS);
+    } catch (_e2) {
+      throw new Error('addressToKind failed to parse address type ' + address);
     }
   }
 }

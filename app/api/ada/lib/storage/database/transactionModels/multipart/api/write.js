@@ -19,10 +19,10 @@ import type {
   AccountingTransactionOutputInsert,
   DbAccountingInputs, DbAccountingOutputs,
 } from '../../account/tables';
-import { ModifyTransaction } from '../../../primitives/api/write';
+import { ModifyTransaction, ModifyCertificate, } from '../../../primitives/api/write';
+import type { AddCertificateRequest } from '../../../primitives/api/write';
 import { ModifyUtxoTransaction } from '../../utxo/api/write';
 import { ModifyAccountingTransaction } from '../../account/api/write';
-
 
 export class ModifyMultipartTx {
   static ownTables = Object.freeze({});
@@ -30,21 +30,23 @@ export class ModifyMultipartTx {
     ModifyTransaction,
     ModifyUtxoTransaction,
     ModifyAccountingTransaction,
+    ModifyCertificate,
   });
 
   static async addTxWithIOs(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
+    request: {|
       block: null | BlockInsert,
       transaction: (blockId: null | number) => TransactionInsert,
+      certificate: number => (void | AddCertificateRequest),
       ioGen: (txRowId: number) => {|
         utxoInputs: Array<UtxoTransactionInputInsert>,
         utxoOutputs: Array<UtxoTransactionOutputInsert>,
         accountingInputs: Array<AccountingTransactionInputInsert>,
         accountingOutputs: Array<AccountingTransactionOutputInsert>,
       |},
-    },
+    |},
   ): Promise<{|
     ...WithNullableFields<DbBlock>, ...DbTransaction,
     ...DbUtxoInputs, ...DbUtxoOutputs,
@@ -74,6 +76,14 @@ export class ModifyMultipartTx {
         accountingInputs, accountingOutputs,
       }
     );
+
+    const certRequest = request.certificate(newTx.transaction.TransactionId);
+    if (certRequest != null) {
+      await ModifyMultipartTx.depTables.ModifyCertificate.addNew(
+        db, tx,
+        certRequest,
+      );
+    }
 
     return {
       ...newTx,

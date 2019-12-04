@@ -32,7 +32,9 @@ import {
   HARD_DERIVATION_START,
   CoinTypes,
   WalletTypePurpose,
+  STAKING_KEY_INDEX,
 } from '../../../../config/numbersConfig';
+import { Bech32Prefix } from '../../../../config/stringConfig';
 import {
   getTxInputTotal,
   getTxOutputTotal,
@@ -41,17 +43,20 @@ import {
 const keys = [
   {
     legacyAddress: 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
-    bechAddress: 'ca1qw8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqeh83d4',
+    // ca1qw8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqeh83d4
+    bechAddress: '038fb03c3aa052f51c086c54bd4059ead2d2e426ac89fa4b3ce41cbfd8800b51c0',
     pubKey: '8fb03c3aa052f51c086c54bd4059ead2d2e426ac89fa4b3ce41cbfd8800b51c02623fceb96b07408531a5cb259f53845a38d6b68928e7c0c7e390f07545d0e62',
   },
   {
     legacyAddress: 'Ae2tdPwUPEZ4xAL3nxLq4Py7BfS1D2tJ3u2rxZGnrAXC8TNkWhTaz41J3FN',
-    bechAddress: 'ca1q0j6cetm7zqsagm5zz5fmav9jg37n4cferj23h370kptrpfj095fxcy43lj',
+    // ca1q0j6cetm7zqsagm5zz5fmav9jg37n4cferj23h370kptrpfj095fxcy43lj
+    bechAddress: '03e5ac657bf0810ea37410a89df5859223e9d709c8e4a8de3e7d82b18532796893',
     pubKey: 'e5ac657bf0810ea37410a89df5859223e9d709c8e4a8de3e7d82b185327968939a254def91bb75e94bda9c605f7f87481082742e1e51d8858965c9a40491fc94',
   },
   {
     legacyAddress: 'Ae2tdPwUPEZEtwz7LKtJn9ub8y7ireuj3sq2yUCZ57ccj6ZkJKn7xEiApV9',
-    bechAddress: 'ca1q0ewtxsk489t9g7vs64prkm0hfvz6aemtvtv57rkfwmxyp3yhtxtwhtm3gd',
+    // ca1q0ewtxsk489t9g7vs64prkm0hfvz6aemtvtv57rkfwmxyp3yhtxtwhtm3gd
+    bechAddress: '03f2e59a16a9cab2a3cc86aa11db6fba582d773b5b16ca78764bb6620624baccb7',
     pubKey: 'f2e59a16a9cab2a3cc86aa11db6fba582d773b5b16ca78764bb6620624baccb7c03adf6448459f2b8d5c32033a160de8b5412d1952794190c4fc6b4716a8b8eb',
   }
 ];
@@ -82,7 +87,8 @@ const sampleUtxos: Array<RemoteUnspentOutput> = [
 
 const sampleAdaAddresses: Array<{| ...Address, ...Addressing |}> = [
   {
-    address: 'ca1q0ewtxsk489t9g7vs64prkm0hfvz6aemtvtv57rkfwmxyp3yhtxtwhtm3gd',
+    // ca1q0ewtxsk489t9g7vs64prkm0hfvz6aemtvtv57rkfwmxyp3yhtxtwhtm3gd
+    address: '03f2e59a16a9cab2a3cc86aa11db6fba582d773b5b16ca78764bb6620624baccb7',
     addressing: {
       path: [1, 11],
       startLevel: Bip44DerivationLevels.CHAIN.level,
@@ -228,10 +234,10 @@ describe('Create signed transactions with legacy witness', () => {
 
     expect(witnesses.size()).toEqual(2);
     expect(witnesses.get(0).to_bech32()).toEqual(
-      'witness1qz8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqf3rln4edvr5ppf35h9jt86ns3dr344k3y5w0sx8uwg0qa296rnzmjrqu3hs58hxk5l84n6luszrts7xzjwglzfzeskt4qdajh9zyfevevna69rev3qvkt4wvmwc7xljxn6qghhu3zt92jlx9095dn7jszcmr9n5s'
+      'witness1qz8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqf3rln4edvr5ppf35h9jt86ns3dr344k3y5w0sx8uwg0qa296rnzxm3ev8glwecyunua4ufueka7485gqrum54q4tqsdx2yjj6hahzaz9wrjpz7gxq2nm6pftxvgf39g60t5hdfxc8jecqx3m5te0yl8jrg0jtvc2'
     );
     expect(witnesses.get(1).to_bech32()).toEqual(
-      'witness1qz8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqf3rln4edvr5ppf35h9jt86ns3dr344k3y5w0sx8uwg0qa296rnzmjrqu3hs58hxk5l84n6luszrts7xzjwglzfzeskt4qdajh9zyfevevna69rev3qvkt4wvmwc7xljxn6qghhu3zt92jlx9095dn7jszcmr9n5s'
+      'witness1qz8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguqf3rln4edvr5ppf35h9jt86ns3dr344k3y5w0sx8uwg0qa296rnzxm3ev8glwecyunua4ufueka7485gqrum54q4tqsdx2yjj6hahzaz9wrjpz7gxq2nm6pftxvgf39g60t5hdfxc8jecqx3m5te0yl8jrg0jtvc2'
     );
   });
 });
@@ -262,10 +268,10 @@ describe('Create signed transactions', () => {
 
     expect(witnesses.size()).toEqual(2);
     expect(witnesses.get(0).to_bech32()).toEqual(
-      'witness1q8wgvrjx7zs7u66nu7k0tljqgdwrcc2ferufytxzew5phk2u5g389n9j0hg509jypjew4endmrcm7g60gpz7ljyfv42tuc4uk3k062qt3pew9w'
+      'witness1qxn2lhu9sfj24lpzr8sglzsc6h8qpsuvurylzc9zuhn37s9uerc6xwt0zjtfv7rtsa3r0d7cydd76s9fcsw5u576vy226ux9frnpqssf9gqfz6'
     );
     expect(witnesses.get(1).to_bech32()).toEqual(
-      'witness1q8wgvrjx7zs7u66nu7k0tljqgdwrcc2ferufytxzew5phk2u5g389n9j0hg509jypjew4endmrcm7g60gpz7ljyfv42tuc4uk3k062qt3pew9w'
+      'witness1qxn2lhu9sfj24lpzr8sglzsc6h8qpsuvurylzc9zuhn37s9uerc6xwt0zjtfv7rtsa3r0d7cydd76s9fcsw5u576vy226ux9frnpqssf9gqfz6'
     );
   });
 
@@ -317,19 +323,23 @@ describe('Create signed transactions', () => {
 
     expect(witnesses.size()).toEqual(2);
     expect(witnesses.get(0).to_bech32()).toEqual(
-      'witness1q8wgvrjx7zs7u66nu7k0tljqgdwrcc2ferufytxzew5phk2u5g389n9j0hg509jypjew4endmrcm7g60gpz7ljyfv42tuc4uk3k062qt3pew9w'
+      'witness1qxn2lhu9sfj24lpzr8sglzsc6h8qpsuvurylzc9zuhn37s9uerc6xwt0zjtfv7rtsa3r0d7cydd76s9fcsw5u576vy226ux9frnpqssf9gqfz6'
     );
     expect(witnesses.get(1).to_bech32()).toEqual(
-      'witness1q8wgvrjx7zs7u66nu7k0tljqgdwrcc2ferufytxzew5phk2u5g389n9j0hg509jypjew4endmrcm7g60gpz7ljyfv42tuc4uk3k062qt3pew9w'
+      'witness1qxn2lhu9sfj24lpzr8sglzsc6h8qpsuvurylzc9zuhn37s9uerc6xwt0zjtfv7rtsa3r0d7cydd76s9fcsw5u576vy226ux9frnpqssf9gqfz6'
     );
   });
 
   it('Transaction with a certificate is also valid', () => {
     const unsignedTxResponse = newAdaUnsignedTx(
-      'ca1sw8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguq9rance',
+      Buffer.from(RustModule.WalletV3.Address.from_string(
+        'ca1sw8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguq9rance'
+      ).as_bytes()).toString('hex'),
       '5000', // smaller than input
       [{
-        address: 'addr1s5quq8utjkrfntnkngjxa9u9mdd8pcprjal2fwzkm7k0y0prx3k276qm0j8',
+        address: Buffer.from(RustModule.WalletV3.Address.from_string(
+          'addr1s5quq8utjkrfntnkngjxa9u9mdd8pcprjal2fwzkm7k0y0prx3k276qm0j8'
+        ).as_bytes()).toString('hex'),
         addressing: {
           path: [1, 0],
           startLevel: Bip44DerivationLevels.CHAIN.level,
@@ -337,7 +347,9 @@ describe('Create signed transactions', () => {
       }],
       [{
         amount: '2000000',
-        receiver: 'ca1ssuvzjs82mshgvyp4r4lmwgknvgjswnm7mpcq3wycjj7v2nk393e6qwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm906x2vwl',
+        receiver: Buffer.from(RustModule.WalletV3.Address.from_string(
+          'ca1ssuvzjs82mshgvyp4r4lmwgknvgjswnm7mpcq3wycjj7v2nk393e6qwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm906x2vwl'
+        ).as_bytes()).toString('hex'),
         tx_hash: '86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de5550',
         tx_index: 0,
         utxo_id: '86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de55500',
@@ -354,7 +366,7 @@ describe('Create signed transactions', () => {
         'hex',
       ),
     );
-    const stakingKey = accountPrivateKey.derive(2).derive(0).to_raw_key();
+    const stakingKey = accountPrivateKey.derive(2).derive(STAKING_KEY_INDEX).to_raw_key();
     const certificate = RustModule.WalletV3.Certificate.stake_delegation(
       RustModule.WalletV3.StakeDelegation.new(
         RustModule.WalletV3.DelegationType.full(
@@ -385,16 +397,16 @@ describe('Create signed transactions', () => {
     const outputs = signedTx.outputs();
     expect(outputs.size()).toEqual(2);
     const change = outputs.get(1);
-    expect(change.address().to_string('addr')).toEqual('addr1s5quq8utjkrfntnkngjxa9u9mdd8pcprjal2fwzkm7k0y0prx3k276qm0j8');
+    expect(change.address().to_string(Bech32Prefix.ADDRESS)).toEqual('addr1s5quq8utjkrfntnkngjxa9u9mdd8pcprjal2fwzkm7k0y0prx3k276qm0j8');
     expect(change.value().to_str()).toEqual('1839616');
 
-    expect(Buffer.from(fragment.id().as_bytes()).toString('hex')).toEqual('c83ef43e02d8286c67df55ae179dde18f22debeb3e7bf87d3ad9d620b1d97763');
+    expect(Buffer.from(fragment.id().as_bytes()).toString('hex')).toEqual('c3ef21699ee8937527b83942980b0739353ddd133f627d40832b98d3ef416a6d');
     expect(Buffer.from(fragment.get_transaction().id().as_bytes()).toString('hex')).toEqual('314ea630977b20d21cc2dc8f861dc9bcfa2013dcbc32c75288d7a5067274662d');
 
     const witnesses = signedTx.witnesses();
     expect(witnesses.size()).toEqual(1);
     expect(witnesses.get(0).to_bech32()).toEqual(
-      'witness1q9f0f9ekhwgnd8rkmaq0zst0ef48sd4fqhdvjfrylwcdkyuragsq4nvhwttxu6q7y50vcurwgmn7jy2438x6azzjtfhxdelzdcvayvcwqyjwtc'
+      'witness1q89jcq78wt4u773vrrjjwuqg8908wpyuv5j3sdj0mcs4dpe667f97yfc0k48dae9u29r07nkms764js84tgwxr09ah6e948s2u6ye8cgyzhd4j'
     );
   });
 });

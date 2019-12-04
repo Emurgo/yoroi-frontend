@@ -28,12 +28,16 @@ import {
 } from '../../../../../../config/numbersConfig';
 import { loadLovefieldDB } from '../../database/index';
 import { CoreAddressTypes } from '../../database/primitives/enums';
+import { RustModule } from '../../../cardanoCrypto/rustLoader';
 
 import {
+  asGetAllAccounting,
   asGetAllUtxos,
   asDisplayCutoff,
   asGetUtxoBalance,
 } from '../../models/PublicDeriver/traits';
+
+import { getCertificates } from '../../models/utils';
 
 import {
   updateTransactions,
@@ -88,7 +92,6 @@ const firstTx: void => Array<RemoteTransaction> = () => [{
       amount: '2100000'
     },
     {
-      // 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'
       address: getSingleAddressString(
         ABANDON_SHARE,
         [
@@ -153,8 +156,6 @@ const nextRegularSpend: void => Array<RemoteTransaction> = () => [{
       amount: '1100000'
     },
     {
-      // eslint-disable-next-line max-len
-      // '0465267961fefd53aefe4cf741dc0df9902d360bca0de4c0abe88ca89d0d08dd3dd993c5b8ca62c78801d3228a8de6b9e18217b001820c24d60c1bcd91c895d585'
       address: getAddressForType(
         TX_TEST_MNEMONIC_1,
         [
@@ -223,6 +224,139 @@ const txWithGroupSwapped: void => Array<RemoteTransaction> = () => [{
   ]
 }];
 
+const txWithCert: void => Array<RemoteTransaction> = () => [{
+  hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
+  height: 218608,
+  block_hash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25',
+  time: '2019-09-13T16:37:16.000Z',
+  last_update: '2019-09-13T16:37:16.000Z',
+  tx_state: 'Successful',
+  tx_ordinal: 0,
+  epoch: 10,
+  slot: 3650,
+  certificate: {
+    kind: RustModule.WalletV3.CertificateKind.StakeDelegation,
+    payload: 'd993c5b8ca62c78801d3228a8de6b9e18217b001820c24d60c1bcd91c895d58501312e3d449038372ba2fc3300cfedf1b152ae739201b3e5da47ab3f933a421b62',
+  },
+  inputs: [
+    {
+      // 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'
+      address: getSingleAddressString(
+        ABANDON_SHARE,
+        [
+          WalletTypePurpose.BIP44, // purposely use leagcy address
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          7
+        ]
+      ),
+      amount: '4000000',
+      id: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d200',
+      index: 0,
+      txHash: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20'
+    }
+  ],
+  outputs: [
+    {
+      // eslint-disable-next-line max-len
+      // '0465267961fefd53aefe4cf741dc0df9902d360bca0de4c0abe88ca89d0d08dd3dd993c5b8ca62c78801d3228a8de6b9e18217b001820c24d60c1bcd91c895d585'
+      address: getAddressForType(
+        TX_TEST_MNEMONIC_1,
+        [
+          WalletTypePurpose.CIP1852,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          4
+        ],
+        CoreAddressTypes.SHELLEY_GROUP
+      ),
+      amount: '2100000'
+    },
+    {
+      address: getAddressForType(
+        ABANDON_SHARE,
+        [
+          WalletTypePurpose.CIP1852,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.INTERNAL,
+          12
+        ],
+        CoreAddressTypes.SHELLEY_SINGLE
+      ),
+      amount: '1731391'
+    }
+  ]
+}];
+
+const secondCertTx: ('Pending' | 'Successful') => RemoteTransaction = status => Object.freeze({
+  hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
+  height: status === 'Pending' ? null : 218609,
+  block_hash: status === 'Pending' ? null : 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26',
+  time: status === 'Pending' ? null : '2019-09-13T16:37:36.000Z',
+  last_update: '2019-09-13T16:37:36.000Z',
+  tx_state: status,
+  tx_ordinal: status === 'Pending' ? null : 0,
+  epoch: status === 'Pending' ? null : 10,
+  slot: status === 'Pending' ? null : 3651,
+  certificate: {
+    kind: RustModule.WalletV3.CertificateKind.StakeDelegation,
+    payload: 'd993c5b8ca62c78801d3228a8de6b9e18217b001820c24d60c1bcd91c895d58501312e3d449038372ba2fc3300cfedf1b152ae739201b3e5da47ab3f933a421b62',
+  },
+  inputs: [
+    {
+      address: getAddressForType(
+        ABANDON_SHARE,
+        [
+          WalletTypePurpose.CIP1852,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.INTERNAL,
+          12
+        ],
+        CoreAddressTypes.SHELLEY_SINGLE
+      ),
+      amount: '1731391',
+      id: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed5451',
+      index: 1,
+      txHash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545'
+    }
+  ],
+  outputs: [
+    {
+      // eslint-disable-next-line max-len
+      // '0465267961fefd53aefe4cf741dc0df9902d360bca0de4c0abe88ca89d0d08dd3dd993c5b8ca62c78801d3228a8de6b9e18217b001820c24d60c1bcd91c895d585'
+      address: getAddressForType(
+        TX_TEST_MNEMONIC_1,
+        [
+          WalletTypePurpose.CIP1852,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.EXTERNAL,
+          4
+        ],
+        CoreAddressTypes.SHELLEY_GROUP
+      ),
+      amount: '1000000'
+    },
+    {
+      address: getAddressForType(
+        ABANDON_SHARE,
+        [
+          WalletTypePurpose.CIP1852,
+          CoinTypes.CARDANO,
+          0 + HARD_DERIVATION_START,
+          ChainDerivations.INTERNAL,
+          13
+        ],
+        CoreAddressTypes.SHELLEY_SINGLE
+      ),
+      amount: '200000'
+    }
+  ]
+});
 
 beforeEach(() => {
   mockDate();
@@ -579,6 +713,143 @@ async function syncWithSwappedGroup(): Promise<void> {
   filterDbSnapshot(dump, keysForTest);
 }
 
+async function syncWithCertificate(): Promise<void> {
+  const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
+  const publicDeriver = await setup(db, TX_TEST_MNEMONIC_1, WalletTypePurpose.CIP1852);
+
+  const txHistory = txWithCert();
+  const checkAddressesInUse = genCheckAddressesInUse(txHistory);
+  const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
+    txHistory
+  );
+  const getBestBlock = genGetBestBlock(txHistory);
+
+  const withDisplayCutoff = asDisplayCutoff(publicDeriver);
+  if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
+  const withUtxoBalance = asGetUtxoBalance(withDisplayCutoff);
+  if (!withUtxoBalance) throw new Error('missing utxo balance functionality');
+  const withUtxos = asGetAllUtxos(withUtxoBalance);
+  if (!withUtxos) throw new Error('missing get all addresses functionality');
+  const withStakingKey = asGetAllAccounting(withUtxos);
+  if (!withStakingKey) throw new Error('missing staking key functionality');
+  const basePubDeriver = withStakingKey;
+
+  expect(basePubDeriver != null).toEqual(true);
+  if (basePubDeriver == null) {
+    throw new Error('basePubDeriver missing a functionality');
+  }
+
+  const stakingAddr = await basePubDeriver.getStakingKey();
+
+  // make sure fetching certificates works when 0 certs exist
+  {
+    const certs = await getCertificates(db, stakingAddr.addr.AddressId);
+    expect(certs.length).toEqual(0);
+  }
+
+  const cert1 = {
+    block: {
+      BlockId: 1,
+      BlockTime: new Date('2019-09-13T16:37:16.000Z'),
+      Digest: -9.690691258114666e-56,
+      Hash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25',
+      Height: 218608,
+      SlotNum: 219650,
+    },
+    certificate: {
+      CertificateId: 1,
+      Kind: 0,
+      Payload: 'd993c5b8ca62c78801d3228a8de6b9e18217b001820c24d60c1bcd91c895d58501312e3d449038372ba2fc3300cfedf1b152ae739201b3e5da47ab3f933a421b62',
+      TransactionId: 1,
+    },
+    relations: [{
+      AddressId: 81,
+      CertificateAddressId: 1,
+      CertificateId: 1,
+      Relation: 0,
+    }],
+    transaction: {
+      BlockId: 1,
+      Digest: 8.191593645542673e-27,
+      ErrorMessage: null,
+      Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
+      LastUpdateTime: 1568392636000,
+      Ordinal: 0,
+      Status: 1,
+      TransactionId: 1,
+    },
+  };
+
+  // tx with cert
+  {
+    await updateTransactions(
+      db,
+      basePubDeriver,
+      checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
+      getBestBlock,
+    );
+
+    // certificate was added to wallet
+    const certs = await getCertificates(db, stakingAddr.addr.AddressId);
+    expect(certs).toEqual([cert1]);
+  }
+
+  const cert2 = {
+    block: null,
+    certificate: {
+      CertificateId: 2,
+      Kind: 0,
+      Payload: 'd993c5b8ca62c78801d3228a8de6b9e18217b001820c24d60c1bcd91c895d58501312e3d449038372ba2fc3300cfedf1b152ae739201b3e5da47ab3f933a421b62',
+      TransactionId: 2,
+    },
+    relations: [{
+      AddressId: 81,
+      CertificateAddressId: 2,
+      CertificateId: 2,
+      Relation: 0,
+    }],
+    transaction: {
+      BlockId: null,
+      Digest: 1.249559827714551e-31,
+      ErrorMessage: null,
+      Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
+      LastUpdateTime: 1568392656000,
+      Ordinal: null,
+      Status: 0,
+      TransactionId: 2,
+    },
+  };
+
+  // test with cert in pending tx
+  {
+    txHistory.push(secondCertTx('Pending'));
+    await updateTransactions(
+      db,
+      basePubDeriver,
+      checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
+      getBestBlock,
+    );
+
+    // certificate was added to wallet
+    const certs = await getCertificates(db, stakingAddr.addr.AddressId);
+    expect(certs).toEqual([cert1, cert2]);
+  }
+
+  const keysForTest = [
+    'Address',
+    'Transaction',
+    'UtxoTransactionInput',
+    'UtxoTransactionOutput',
+    'LastSyncInfo',
+    'Block',
+    'Certificate',
+    'CertificateAddress',
+  ];
+  const dump = (await db.export()).tables;
+  filterDbSnapshot(dump, keysForTest);
+}
 
 test('Syncing group addresses for cip1852', async (done) => {
   await syncingSimpleTransaction();
@@ -587,5 +858,10 @@ test('Syncing group addresses for cip1852', async (done) => {
 
 test('Syncing group address with swapped staking key', async (done) => {
   await syncWithSwappedGroup();
+  done();
+});
+
+test('Syncing tx with a certificate', async (done) => {
+  await syncWithCertificate();
   done();
 });

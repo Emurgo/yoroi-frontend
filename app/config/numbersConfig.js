@@ -30,6 +30,8 @@ export const ChainDerivations = Object.freeze({
   CHIMERIC_ACCOUNT: 2,
 });
 
+export const STAKING_KEY_INDEX = 0;
+
 /**
  * Constant K as defined in Ouroboros Classic
  * which says no reorg should be longer than 2160 slots

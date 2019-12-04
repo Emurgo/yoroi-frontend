@@ -17,6 +17,8 @@ import type {
   KeyRow,
   TransactionRow,
   AddressMappingRow,
+  CertificateRow,
+  CertificateAddressRow,
 } from '../tables';
 import type {
   TxStatusCodesType,
@@ -842,5 +844,93 @@ export class GetTxAndBlock {
       }
       return entry;
     });
+  }
+}
+
+export type CertificateForKey = {|
+  relations: Array<$ReadOnly<CertificateAddressRow>>,
+  certificate: $ReadOnly<CertificateRow>,
+  transaction: $ReadOnly<TransactionRow>,
+  block: null | $ReadOnly<BlockRow>,
+|};
+
+export class GetCertificates {
+  static ownTables = Object.freeze({
+    [Tables.CertificateAddressSchema.name]: Tables.CertificateAddressSchema,
+    [Tables.CertificateSchema.name]: Tables.CertificateSchema,
+    [Tables.TransactionSchema.name]: Tables.TransactionSchema,
+    [Tables.BlockSchema.name]: Tables.BlockSchema,
+  });
+  static depTables = Object.freeze({});
+
+  static async forAddress(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {
+      addressId: number,
+    },
+  ): Promise<Array<CertificateForKey>> {
+    const certAddrSchema = GetCertificates.ownTables[Tables.CertificateAddressSchema.name];
+    const certSchema = GetCertificates.ownTables[Tables.CertificateSchema.name];
+    const txSchema = GetCertificates.ownTables[Tables.TransactionSchema.name];
+    const blockSchema = GetCertificates.ownTables[Tables.BlockSchema.name];
+    const certAddrTable = db.getSchema().table(certAddrSchema.name);
+    const certTable = db.getSchema().table(certSchema.name);
+    const txTable = db.getSchema().table(txSchema.name);
+    const blockTable = db.getSchema().table(blockSchema.name);
+    const query = db
+      .select()
+      .from(certAddrTable)
+      .innerJoin(
+        certTable,
+        certTable[certSchema.properties.CertificateId].eq(
+          certAddrTable[certAddrSchema.properties.CertificateId]
+        )
+      )
+      .innerJoin(
+        txTable,
+        certTable[certSchema.properties.TransactionId].eq(
+          txTable[txSchema.properties.TransactionId]
+        )
+      )
+      .leftOuterJoin(
+        blockTable,
+        txTable[txSchema.properties.BlockId].eq(
+          blockTable[txSchema.properties.BlockId]
+        )
+      )
+      .where(certAddrTable[certAddrSchema.properties.AddressId].eq(
+        request.addressId
+      ))
+      .orderBy(blockTable[Tables.BlockSchema.properties.SlotNum], lf.Order.DESC);
+
+    const queryResult: $ReadOnlyArray<{|
+      CertificateAddress: $ReadOnly<CertificateAddressRow>,
+      Certificate: $ReadOnly<CertificateRow>,
+      Transaction: $ReadOnly<TransactionRow>,
+      Block: $ReadOnly<WithNullableFields<BlockRow>>,
+    |}> = await tx.attach(query);
+
+    const tempMap = new Map<number, CertificateForKey>();
+    for (const result of queryResult) {
+      const entry = tempMap.get(result.Certificate.CertificateId);
+      if (entry == null) {
+        tempMap.set(
+          result.Certificate.CertificateId,
+          {
+            relations: [result.CertificateAddress],
+            certificate: result.Certificate,
+            transaction: result.Transaction,
+            block: result.Block.BlockId == null
+              ? null
+              : ((result.Block: any): $ReadOnly<BlockRow>),
+          }
+        );
+      } else {
+        entry.relations.push(result.CertificateAddress);
+      }
+    }
+
+    return Array.from(tempMap.values());
   }
 }
