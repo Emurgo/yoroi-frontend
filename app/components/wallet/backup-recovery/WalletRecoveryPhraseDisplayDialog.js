@@ -71,7 +71,6 @@ export default class WalletRecoveryPhraseDisplayDialog extends Component<Props> 
 
         <WalletRecoveryInstructions
           instructionsText={<FormattedHTMLMessage {...messages.backupInstructions} />}
-          classicTheme={classicTheme}
         />
         <WalletRecoveryPhraseMnemonic phrase={recoveryPhrase} classicTheme={classicTheme} />
       </Dialog>

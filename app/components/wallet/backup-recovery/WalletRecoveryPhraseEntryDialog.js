@@ -149,7 +149,6 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
         {!isValid && classicTheme ? (
           <WalletRecoveryInstructions
             instructionsText={intl.formatMessage(messages.verificationInstructions)}
-            classicTheme={classicTheme}
           />
         ) : null}
 

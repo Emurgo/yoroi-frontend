@@ -5,12 +5,12 @@
   @include loading-spinner("../../assets/images/spinner-light.svg");
 }
 
-.component {
-  padding: 20px;
-}
-
 .button {
   margin: 0;
+
+  & + button {
+    margin-left: 20px;
+  }
 }
 
 .body {

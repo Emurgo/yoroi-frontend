@@ -5,7 +5,6 @@ import classnames from 'classnames';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
-import BorderedBox from '../widgets/BorderedBox';
 import styles from './TransferSummaryPage.scss';
 import type { TransferTx } from '../../types/TransferTypes';
 import LocalizableError from '../../i18n/LocalizableError';
@@ -41,6 +40,10 @@ const messages = defineMessages({
   transferButtonLabel: {
     id: 'transfer.summary.transferButton.label',
     defaultMessage: '!!!Transfer Funds',
+  },
+  addressFromSubLabel: {
+    id: 'yoroiTransfer.summary.addressFrom.subLabel',
+    defaultMessage: '!!!Wallet Addresses',
   }
 });
 
@@ -52,7 +55,6 @@ type Props = {|
   +isSubmitting: boolean,
   +onCancel: Function,
   +error: ?LocalizableError,
-  +addressFromSubLabel: string,
   +classicTheme: boolean
 |};
 
@@ -66,7 +68,7 @@ export default class TransferSummaryPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { transferTx, isSubmitting, error, addressFromSubLabel, classicTheme } = this.props;
+    const { transferTx, isSubmitting, error, classicTheme } = this.props;
 
     const receiver = transferTx.receiver;
     const recoveredBalance = this.props.formattedWalletAmount(transferTx.recoveredBalance);
@@ -88,119 +90,112 @@ export default class TransferSummaryPage extends Component<Props> {
     ]);
 
     return (
-      <div className={styles.component}>
-        <BorderedBox>
+      <div className={styles.body}>
 
-          <div className={styles.body}>
+        <div className={styles.addressLabelWrapper}>
+          <div className={styles.addressLabel}>
+            {intl.formatMessage(messages.addressFromLabel)}
+          </div>
+          <div className={styles.addressSubLabel}>
+            {intl.formatMessage(messages.addressFromSubLabel)}
+          </div>
+          {
+            transferTx.senders.map((sender, index) => {
+              const addressesClasses = classnames([
+                'addressRecovered-' + (index + 1),
+                styles.address
+              ]);
 
-            <div className={styles.addressLabelWrapper}>
-              <div className={styles.addressLabel}>
-                {intl.formatMessage(messages.addressFromLabel)}
-              </div>
-              <div className={styles.addressSubLabel}>
-                {addressFromSubLabel}
-              </div>
-              {
-                transferTx.senders.map((sender, index) => {
-                  const addressesClasses = classnames([
-                    'addressRecovered-' + (index + 1),
-                    styles.address
-                  ]);
-
-                  return (
-                    <div
-                      key={index /* eslint-disable-line react/no-array-index-key */}
-                    >
-                      <div className={styles.addressSubLabel} />
-                      <ExplorableHashContainer
-                        selectedExplorer={this.props.selectedExplorer}
-                        light
-                        hash={sender}
-                        linkType="address"
-                      >
-                        <RawHash light>
-                          <span className={addressesClasses}>{sender}</span>
-                        </RawHash>
-                      </ExplorableHashContainer>
-                    </div>
-                  );
-                })
-              }
-            </div>
-
-            <div className={styles.addressLabelWrapper}>
-              <div className={styles.addressLabel}>
-                {intl.formatMessage(messages.addressToLabel)}
-              </div>
-              <ExplorableHashContainer
-                selectedExplorer={this.props.selectedExplorer}
-                light
-                hash={receiver}
-                linkType="address"
-              >
-                <RawHash light>
-                  <span className={styles.address}>{receiver}</span>
-                </RawHash>
-              </ExplorableHashContainer>
-            </div>
-
-            <div className={styles.amountFeesWrapper}>
-              <div className={styles.amountWrapper}>
-                <div className={styles.amountLabel}>
-                  {intl.formatMessage(messages.recoveredBalanceLabel)}
+              return (
+                <div
+                  key={index /* eslint-disable-line react/no-array-index-key */}
+                >
+                  <div className={styles.addressSubLabel} />
+                  <ExplorableHashContainer
+                    selectedExplorer={this.props.selectedExplorer}
+                    light
+                    hash={sender}
+                    linkType="address"
+                  >
+                    <RawHash light>
+                      <span className={addressesClasses}>{sender}</span>
+                    </RawHash>
+                  </ExplorableHashContainer>
                 </div>
-                <div className={styles.amount}>{recoveredBalance}
-                  <span className={styles.currencySymbol}>&nbsp;ADA</span>
-                </div>
-              </div>
+              );
+            })
+          }
+        </div>
 
-              <div className={styles.feesWrapper}>
-                <div className={styles.feesLabel}>
-                  {intl.formatMessage(messages.transactionFeeLabel)}
-                </div>
-                <div className={styles.fees}>+{transactionFee}
-                  <span className={styles.currencySymbol}>&nbsp;ADA</span>
-                </div>
-              </div>
+        <div className={styles.addressLabelWrapper}>
+          <div className={styles.addressLabel}>
+            {intl.formatMessage(messages.addressToLabel)}
+          </div>
+          <ExplorableHashContainer
+            selectedExplorer={this.props.selectedExplorer}
+            light
+            hash={receiver}
+            linkType="address"
+          >
+            <RawHash light>
+              <span className={styles.address}>{receiver}</span>
+            </RawHash>
+          </ExplorableHashContainer>
+        </div>
+
+        <div className={styles.amountFeesWrapper}>
+          <div className={styles.amountWrapper}>
+            <div className={styles.amountLabel}>
+              {intl.formatMessage(messages.recoveredBalanceLabel)}
             </div>
-
-            <div className={styles.totalAmountWrapper}>
-              <div className={styles.totalAmountLabel}>
-                {intl.formatMessage(messages.finalBalanceLabel)}
-              </div>
-              <div className={styles.totalAmount}>{finalBalance}
-                <span className={styles.currencySymbol}>&nbsp;ADA</span>
-              </div>
+            <div className={styles.amount}>{recoveredBalance}
+              <span className={styles.currencySymbol}>&nbsp;ADA</span>
             </div>
-
-            <div className={styles.errorWrapper}>
-              {
-                error && !isSubmitting &&
-                  <p className={styles.error}>{intl.formatMessage(error)}</p>
-              }
-            </div>
-
-            <div className={styles.buttonsWrapper}>
-              <Button
-                className={cancelButtonClasses}
-                label={intl.formatMessage(messages.cancelTransferButtonLabel)}
-                onClick={this.props.onCancel}
-                disabled={isSubmitting}
-                skin={ButtonSkin}
-              />
-
-              <Button
-                className={nextButtonClasses}
-                label={intl.formatMessage(messages.transferButtonLabel)}
-                onClick={this.props.onSubmit}
-                disabled={isSubmitting}
-                skin={ButtonSkin}
-              />
-            </div>
-
           </div>
 
-        </BorderedBox>
+          <div className={styles.feesWrapper}>
+            <div className={styles.feesLabel}>
+              {intl.formatMessage(messages.transactionFeeLabel)}
+            </div>
+            <div className={styles.fees}>+{transactionFee}
+              <span className={styles.currencySymbol}>&nbsp;ADA</span>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.totalAmountWrapper}>
+          <div className={styles.totalAmountLabel}>
+            {intl.formatMessage(messages.finalBalanceLabel)}
+          </div>
+          <div className={styles.totalAmount}>{finalBalance}
+            <span className={styles.currencySymbol}>&nbsp;ADA</span>
+          </div>
+        </div>
+
+        <div className={styles.errorWrapper}>
+          {
+            error && !isSubmitting &&
+              <p className={styles.error}>{intl.formatMessage(error)}</p>
+          }
+        </div>
+
+        <div className={styles.buttonsWrapper}>
+          <Button
+            className={cancelButtonClasses}
+            label={intl.formatMessage(messages.cancelTransferButtonLabel)}
+            onClick={this.props.onCancel}
+            disabled={isSubmitting}
+            skin={ButtonSkin}
+          />
+
+          <Button
+            className={nextButtonClasses}
+            label={intl.formatMessage(messages.transferButtonLabel)}
+            onClick={this.props.onSubmit}
+            disabled={isSubmitting}
+            skin={ButtonSkin}
+          />
+        </div>
 
       </div>
     );

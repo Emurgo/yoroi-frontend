@@ -25,6 +25,7 @@ type Props = {|
   +closeButton?: Element<any>,
   +backButton?: Node,
   +className?: string,
+  +styleOveride?: {},
   +onClose?: ?Function,
   +closeOnOverlayClick?: boolean,
   +classicTheme: boolean
@@ -39,6 +40,7 @@ export default class Dialog extends Component<Props> {
     closeButton: undefined,
     backButton: undefined,
     className: undefined,
+    styleOveride: undefined,
     onClose: undefined,
     closeOnOverlayClick: undefined,
   };
@@ -65,7 +67,10 @@ export default class Dialog extends Component<Props> {
         skin={ModalSkin}
       >
 
-        <div className={classnames([styles.component, className])}>
+        <div
+          className={classnames([styles.component, className])}
+          style={this.props.styleOveride}
+        >
           {(title != null && title !== '')
             ? (
               <div className={styles.title}>

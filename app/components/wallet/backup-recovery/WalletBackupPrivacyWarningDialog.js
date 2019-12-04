@@ -81,7 +81,6 @@ export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
         {!classicTheme && <span className={styles.recoveryImage}><RecoveryWatchingSvg /></span>}
         <WalletRecoveryInstructions
           instructionsText={<FormattedHTMLMessage {...messages.recoveryPhraseInstructions} />}
-          classicTheme={classicTheme}
         />
         <div className={styles.checkbox}>
           <Checkbox

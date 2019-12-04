@@ -6,7 +6,6 @@ import styles from './WalletRecoveryInstructions.scss';
 
 type Props = {|
   +instructionsText: string | Element<any>,
-  +classicTheme: boolean
 |};
 
 @observer

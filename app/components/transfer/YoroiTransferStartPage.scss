@@ -1,6 +1,9 @@
 .component {
-  padding: 20px;
   min-width: 650px;
+
+  & + .component {
+    margin-top: 20px;
+  }
 
   .button {
     display: block !important;

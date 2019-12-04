@@ -5,10 +5,11 @@ import { intlShape, } from 'react-intl';
 import validWords from 'bip39/src/wordlists/english.json';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import TransferLayout from '../../components/transfer/TransferLayout';
+import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
+import BorderedBox from '../../components/widgets/BorderedBox';
 import YoroiTransferFormPage from './YoroiTransferFormPage';
 import YoroiPaperWalletFormPage from './YoroiPaperWalletFormPage';
 import YoroiPlatePage from './YoroiPlatePage';
-import YoroiTransferSummaryPage from './YoroiTransferSummaryPage';
 import YoroiTransferWaitingPage from './YoroiTransferWaitingPage';
 import YoroiTransferErrorPage from './YoroiTransferErrorPage';
 import YoroiTransferSuccessPage from './YoroiTransferSuccessPage';
@@ -51,14 +52,8 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
   setupTransferFundsWithMnemonic = (payload: {|
     recoveryPhrase: string,
   |}) => {
-    const walletsStore = this._getWalletsStore();
-    const publicDeriver = walletsStore.selected;
-    if (publicDeriver == null) {
-      throw new Error('tranferFunds no wallet selected');
-    }
     this._getYoroiTransferActions().setupTransferFundsWithMnemonic.trigger({
       ...payload,
-      publicDeriver,
     });
   };
 
@@ -66,39 +61,35 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
     recoveryPhrase: string,
     paperPassword: string,
   |}) => {
-    const walletsStore = this._getWalletsStore();
-    const publicDeriver = walletsStore.selected;
-    if (publicDeriver == null) {
-      throw new Error('tranferFunds no wallet selected');
-    }
     this._getYoroiTransferActions().setupTransferFundsWithPaperMnemonic.trigger({
       ...payload,
-      publicDeriver,
     });
   };
 
   checkAddresses: void => void = () => {
     const walletsStore = this._getWalletsStore();
+    const yoroiTransfer = this._getYoroiTransferStore();
     const publicDeriver = walletsStore.selected;
     if (publicDeriver == null) {
-      throw new Error('tranferFunds no wallet selected');
+      throw new Error(`${nameof(this.checkAddresses)} no wallet selected`);
     }
     this._getYoroiTransferActions().checkAddresses.trigger({
-      publicDeriver,
+      getDestinationAddress: yoroiTransfer.nextInternalAddress(publicDeriver),
       transferKind: TransferKind.BYRON,
     });
   };
 
   /** Broadcast the transfer transaction if one exists and return to wallet page */
-  tranferFunds = () => {
+  tranferFunds: void => void = () => {
     // broadcast transfer transaction then call continuation
     const walletsStore = this._getWalletsStore();
+    const yoroiTransfer = this._getYoroiTransferStore();
     const publicDeriver = walletsStore.selected;
     if (publicDeriver == null) {
-      throw new Error('tranferFunds no wallet selected');
+      throw new Error(`${nameof(this.tranferFunds)} no wallet selected`);
     }
     this._getYoroiTransferActions().transferFunds.trigger({
-      next: () => new Promise(resolve => {
+      next: () => {
         walletsStore.refreshWallet(publicDeriver);
         setTimeout(() => {
           if (walletsStore.activeWalletRoute != null) {
@@ -107,10 +98,9 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
               route: newRoute
             });
           }
-          resolve();
         }, SUCCESS_PAGE_STAY_TIME);
-      }),
-      publicDeriver,
+      },
+      getDestinationAddress: yoroiTransfer.nextInternalAddress(publicDeriver),
       transferKind: TransferKind.BYRON,
     });
   }
@@ -205,16 +195,18 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
         }
         return (
           <TransferLayout>
-            <YoroiTransferSummaryPage
-              formattedWalletAmount={formattedWalletAmount}
-              selectedExplorer={this.props.stores.profile.selectedExplorer}
-              transferTx={yoroiTransfer.transferTx}
-              onSubmit={this.tranferFunds}
-              isSubmitting={yoroiTransfer.transferFundsRequest.isExecuting}
-              onCancel={this.cancelTransferFunds}
-              error={yoroiTransfer.error}
-              classicTheme={profile.isClassicTheme}
-            />
+            <BorderedBox>
+              <TransferSummaryPage
+                formattedWalletAmount={formattedWalletAmount}
+                selectedExplorer={this.props.stores.profile.selectedExplorer}
+                transferTx={yoroiTransfer.transferTx}
+                onSubmit={this.tranferFunds}
+                isSubmitting={yoroiTransfer.transferFundsRequest.isExecuting}
+                onCancel={this.cancelTransferFunds}
+                error={yoroiTransfer.error}
+                classicTheme={profile.isClassicTheme}
+              />
+            </BorderedBox>
           </TransferLayout>
         );
       case TransferStatus.ERROR:

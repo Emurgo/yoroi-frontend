@@ -235,7 +235,7 @@ export default class WalletRestoreDialog extends Component<Props> {
       if (this.props.isVerificationMode === true) {
         // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1009
         // this.recoveryPhraseInput.focus();
-      } else {
+      } else if (this.walletNameInput != null) {
         this.walletNameInput.focus();
       }
     });
