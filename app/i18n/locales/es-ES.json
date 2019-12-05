@@ -360,7 +360,7 @@
   "wallet.restore.dialog.verify.wallet.button.label": "Verificar billetera",
   "wallet.restore.dialog.wallet.name.input.hint": "por ejemplo: Billetera de Compras",
   "wallet.restore.dialog.wallet.name.input.label": "Nombre de la billetera",
-  "wallet.restore.dialog.upgrade.noop": "Your wallet did not need to be upgraded",
+  "wallet.restore.dialog.upgrade.noop": "Su billetera no necesitaba ser actualizada",
   "wallet.send.confirmationDialog.addressToLabel": "Para",
   "wallet.send.confirmationDialog.amountLabel": "Importe",
   "wallet.send.confirmationDialog.feesLabel": "Tarifas",
