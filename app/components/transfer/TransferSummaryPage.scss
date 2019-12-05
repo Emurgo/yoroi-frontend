@@ -122,32 +122,28 @@
   }
 }
 
-:global(.YoroiClassic) .component {
-  .body {
-    .addressLabel {
-      text-transform: uppercase;
-    }
+:global(.YoroiClassic) .body {
+  .addressLabel {
+    text-transform: uppercase;
   }
 }
 
-:global(.YoroiModern) .component {
-  .body {
-    .addressLabel {
+:global(.YoroiModern) .body {
+  .addressLabel {
+    font-size: 16px;
+    text-transform: capitalize;
+  }
+
+  .amountFeesWrapper {
+    .amountLabel,
+    .feesLabel {
       font-size: 16px;
       text-transform: capitalize;
     }
+  }
 
-    .amountFeesWrapper {
-      .amountLabel,
-      .feesLabel {
-        font-size: 16px;
-        text-transform: capitalize;
-      }
-    }
-
-    .totalAmountLabel {
-      font-size: 16px;
-      text-transform: capitalize;
-    }
+  .totalAmountLabel {
+    font-size: 16px;
+    text-transform: capitalize;
   }
 }
