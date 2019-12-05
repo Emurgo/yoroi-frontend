@@ -69,3 +69,11 @@ export const SETTINGS: Category = {
   route: ROUTES.SETTINGS.ROOT,
   icon: settingsIcon,
 };
+
+export const NOTIFICATIONS: Category = {
+  name: 'NOTIFICATIONS',
+  className: 'notifications',
+  route: ROUTES.NOTIFICATIONS.ROOT,
+  icon: walletsIcon, // TODO : add icon
+  iconStyle: styles.notificaionsIcon,
+};

@@ -33,5 +33,8 @@ export const ROUTES = {
   },
   SEND_FROM_URI: {
     ROOT: '/send-from-uri',
-  }
+  },
+  NOTIFICATIONS: {
+    ROOT: '/notifications',
+  },
 };
