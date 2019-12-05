@@ -8,6 +8,10 @@ const CONFIG: ConfigType = {
     websocketUrl: '',
     name: 'mainnet'
   },
+  seiza: {
+    simple: '',
+    advance: ''
+  },
   app: {
     walletRefreshInterval: 10,
     serverStatusRefreshInterval: 10,

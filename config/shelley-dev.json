@@ -5,6 +5,10 @@
     "websocketUrl": "wss://testnet-yoroi-backend.yoroiwallet.com:443",
     "name": "shelley-dev"
   },
+  "seiza": {
+    "simple": "http://localhost:3001/staking-simple/list?sortBy=REVENUE&searchText=&performance[]=0&performance[]=100",
+    "advance": "http://localhost:3001/staking/list?sortBy=REVENUE&searchText=&performance[]=0&performance[]=100"
+  },
   "app": {
     "walletRefreshInterval": 20000,
     "serverStatusRefreshInterval": 20000,

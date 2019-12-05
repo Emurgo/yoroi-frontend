@@ -33,8 +33,8 @@ import YoroiTransferPage from './containers/transfer/YoroiTransferPage';
 import URILandingPage from './containers/uri/URILandingPage';
 import Transfer from './containers/transfer/Transfer';
 import StakingDashboardPage from './containers/wallet/staking/StakingDashboardPage';
-import StakingSimulatorPage from './containers/wallet/staking/StakingSimulatorPage';
-import StakingAdvancedSimulatorPage from './containers/wallet/staking/StakingAdvancedSimulatorPage';
+import StakingSimplePage from './containers/wallet/staking/StakingSimplePage';
+import StakingAdvancePage from './containers/wallet/staking/StakingAdvancePage';
 
 /* eslint-disable max-len */
 export const Routes = (
@@ -128,18 +128,18 @@ const WalletsSubpages = (stores, actions) => (
       <>
         <Route
           exact
-          path={ROUTES.WALLETS.STAKE_DASHBOARD}
+          path={ROUTES.WALLETS.DELEGATION_DASHBOARD}
           component={(props) => <StakingDashboardPage {...props} stores={stores} actions={actions} />}
         />
         <Route
           exact
-          path={ROUTES.WALLETS.STAKE_SIMULATOR}
-          component={(props) => <StakingSimulatorPage {...props} stores={stores} actions={actions} />}
+          path={ROUTES.WALLETS.DELEGATION_SIMPLE}
+          component={(props) => <StakingSimplePage {...props} stores={stores} actions={actions} />}
         />
         <Route
           exact
-          path={ROUTES.WALLETS.STAKE_ADVANCED_SIMULATOR}
-          component={(props) => <StakingAdvancedSimulatorPage {...props} stores={stores} actions={actions} />}
+          path={ROUTES.WALLETS.DELEGATION_ADVANCE}
+          component={(props) => <StakingAdvancePage {...props} stores={stores} actions={actions} />}
         />
       </>)
     }

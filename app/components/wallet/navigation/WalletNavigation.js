@@ -22,17 +22,17 @@ const messages = defineMessages({
     id: 'wallet.navigation.receive',
     defaultMessage: '!!!Receive',
   },
-  stakeDashboard: {
-    id: 'wallet.navigation.stakeDashboard',
+  delegationDashboard: {
+    id: 'wallet.navigation.delegationDashboard',
     defaultMessage: '!!!Dashboard',
   },
-  stakeAdvancedSimulator: {
-    id: 'wallet.navigation.stakeAdvancedSimulator',
-    defaultMessage: '!!!Advanced staking simulator',
+  delegationAdvance: {
+    id: 'wallet.navigation.delegationAdvance',
+    defaultMessage: '!!!Delegation (Advance)',
   },
-  stakeSimulator: {
-    id: 'wallet.navigation.stakeSimulator',
-    defaultMessage: '!!!Simple staking simulator',
+  delegationSimple: {
+    id: 'wallet.navigation.delegationSimple',
+    defaultMessage: '!!!Delegation (Simple)',
   },
 });
 
@@ -90,30 +90,30 @@ export default class WalletNavigation extends Component<Props> {
             <div className={styles.navItem}>
               <WalletNavButton
                 className="stakeDashboard"
-                label={intl.formatMessage(messages.stakeDashboard)}
+                label={intl.formatMessage(messages.delegationDashboard)}
                 icon={summaryIcon}
-                isActive={isActiveNavItem('stake-dashboard')}
-                onClick={() => onNavItemClick('stake-dashboard')}
+                isActive={isActiveNavItem('delegation-dashboard')}
+                onClick={() => onNavItemClick('delegation-dashboard')}
               />
             </div>
 
             <div className={styles.navItem}>
               <WalletNavButton
                 className="stakeSimulator"
-                label={intl.formatMessage(messages.stakeSimulator)}
+                label={intl.formatMessage(messages.delegationSimple)}
                 icon={sendIcon}
-                isActive={isActiveNavItem('stake-simulator')}
-                onClick={() => onNavItemClick('stake-simulator')}
+                isActive={isActiveNavItem('delegation-simple')}
+                onClick={() => onNavItemClick('delegation-simple')}
               />
             </div>
 
             <div className={styles.navItem}>
               <WalletNavButton
                 className="stakeAdvancedSimulator"
-                label={intl.formatMessage(messages.stakeAdvancedSimulator)}
+                label={intl.formatMessage(messages.delegationAdvance)}
                 icon={receiveIcon}
-                isActive={isActiveNavItem('stake-advanced-simulator')}
-                onClick={() => onNavItemClick('stake-advanced-simulator')}
+                isActive={isActiveNavItem('delegation-advance')}
+                onClick={() => onNavItemClick('delegation-advance')}
               />
             </div>
           </>
