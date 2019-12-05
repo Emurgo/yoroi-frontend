@@ -1,0 +1,22 @@
+.component {
+  text-align: left;
+
+  .checkbox {
+    margin-top: 20px;
+  
+    label {
+      font-size: 14px;
+    }
+  }
+
+  .recoveryImage {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin: 23px 0 36px;
+  
+    svg {
+      width: 212px;
+    }
+  }
+}

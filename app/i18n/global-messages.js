@@ -373,6 +373,22 @@ const globalMessages = defineMessages({
     id: 'wallet.restore.dialog.form.errors.invalidRecoveryPhrase',
     defaultMessage: '!!!Invalid recovery phrase',
   },
+  skipLabel: {
+    id: 'profile.uriPrompt.form.skipLabel',
+    defaultMessage: '!!!Skip',
+  },
+  checkLabel: {
+    id: 'wallet.connect.hw.dialog.step.about.label',
+    defaultMessage: '!!!CHECK',
+  },
+  walletUpgrade: {
+    id: 'wallet.backup.dialog.legacy.upgrade',
+    defaultMessage: `!!!Wallet Upgrade`
+  },
+  pdfGenDone: {
+    id: 'settings.paperWallet.dialog.createPaper.done',
+    defaultMessage: '!!!All done!',
+  },
 });
 export default globalMessages;
 

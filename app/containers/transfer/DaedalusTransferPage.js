@@ -6,10 +6,11 @@ import validWords from 'bip39/src/wordlists/english.json';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import TransferLayout from '../../components/transfer/TransferLayout';
 import TransferInstructionsPage from '../../components/transfer/TransferInstructionsPage';
+import BorderedBox from '../../components/widgets/BorderedBox';
+import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import DaedalusTransferFormPage from './DaedalusTransferFormPage';
 import DaedalusTransferMasterKeyFormPage from './DaedalusTransferMasterKeyFormPage';
 import DaedalusTransferWaitingPage from './DaedalusTransferWaitingPage';
-import DaedalusTransferSummaryPage from './DaedalusTransferSummaryPage';
 import DaedalusTransferErrorPage from './DaedalusTransferErrorPage';
 import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
@@ -176,16 +177,18 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
         }
         return (
           <TransferLayout>
-            <DaedalusTransferSummaryPage
-              formattedWalletAmount={formattedWalletAmount}
-              selectedExplorer={this.props.stores.profile.selectedExplorer}
-              transferTx={daedalusTransfer.transferTx}
-              onSubmit={this.tranferFunds}
-              isSubmitting={daedalusTransfer.transferFundsRequest.isExecuting}
-              onCancel={this.cancelTransferFunds}
-              error={daedalusTransfer.error}
-              classicTheme={profile.isClassicTheme}
-            />
+            <BorderedBox>
+              <TransferSummaryPage
+                formattedWalletAmount={formattedWalletAmount}
+                selectedExplorer={this.props.stores.profile.selectedExplorer}
+                transferTx={daedalusTransfer.transferTx}
+                onSubmit={this.tranferFunds}
+                isSubmitting={daedalusTransfer.transferFundsRequest.isExecuting}
+                onCancel={this.cancelTransferFunds}
+                error={daedalusTransfer.error}
+                classicTheme={profile.isClassicTheme}
+              />
+            </BorderedBox>
           </TransferLayout>
         );
       case TransferStatus.ERROR:

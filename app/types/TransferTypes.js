@@ -26,8 +26,8 @@ export type TransferTx = {
   receiver: string,
 }
 
-export const TransferKind = Object.freeze({
+export const TransferSource = Object.freeze({
   BYRON: 0,
   SHELLEY: 1,
 });
-export type TransferType = $Values<typeof TransferKind>;
+export type TransferType = $Values<typeof TransferSource>;

@@ -11,10 +11,6 @@ import AboutUriClassic from '../../../assets/images/uri/about-url-classic.inline
 import globalMessages from '../../../i18n/global-messages';
 
 const messages = defineMessages({
-  skipLabel: {
-    id: 'profile.uriPrompt.form.skipLabel',
-    defaultMessage: '!!!Skip',
-  },
   explanationLine1: {
     id: 'profile.uriPrompt.form.explanation',
     defaultMessage: '!!!Do you want to enable Cardano payment URLs?',
@@ -64,7 +60,7 @@ export default class UriPromptForm extends Component<Props> {
           <div className={styles.buttonsWrapper}>
             <Button
               className={skipButtonClasses}
-              label={intl.formatMessage(messages.skipLabel)}
+              label={intl.formatMessage(globalMessages.skipLabel)}
               onMouseUp={this.props.onSkip}
               skin={ButtonSkin}
             />

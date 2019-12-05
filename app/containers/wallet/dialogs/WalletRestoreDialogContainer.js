@@ -5,6 +5,8 @@ import config from '../../../config';
 import validWords from 'bip39/src/wordlists/english.json';
 import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog';
 import WalletRestoreVerifyDialog from '../../../components/wallet/WalletRestoreVerifyDialog';
+import TransferSummaryPage from '../../../components/transfer/TransferSummaryPage';
+import LegacyExplanation from '../../../components/wallet/restore/LegacyExplanation';
 import type { InjectedDialogContainerProps } from '../../../types/injectedPropsType';
 import environment from '../../../environment';
 import globalMessages from '../../../i18n/global-messages';
@@ -12,12 +14,25 @@ import { CheckAdressesInUseApiError } from '../../../api/ada/errors';
 import type { RestoreModeType } from '../../../actions/ada/wallet-restore-actions';
 import { RestoreMode } from '../../../actions/ada/wallet-restore-actions';
 import { RestoreSteps } from '../../../stores/ada/WalletRestoreStore';
+import { defineMessages, intlShape } from 'react-intl';
+import Dialog from '../../../components/widgets/Dialog';
+import YoroiTransferWaitingPage from '../../transfer/YoroiTransferWaitingPage';
+import SuccessPage from '../../../components/transfer/SuccessPage';
+import { TransferStatus, } from '../../../types/TransferTypes';
+import { formattedWalletAmount } from '../../../utils/formatters';
+
+const messages = defineMessages({
+  walletUpgradeNoop: {
+    id: 'wallet.restore.dialog.upgrade.noop',
+    defaultMessage: '!!!Your wallet did not need to be upgraded',
+  },
+});
 
 type Props = {|
   ...InjectedDialogContainerProps,
   +mode: RestoreModeType,
-  +introMessage?: string,
-  +onBack: void => void,
+    +introMessage ?: string,
+    +onBack: void => void,
 |};
 
 type WalletRestoreDialogContainerState = {|
@@ -27,6 +42,10 @@ type WalletRestoreDialogContainerState = {|
 @observer
 export default class WalletRestoreDialogContainer
   extends Component<Props, WalletRestoreDialogContainerState> {
+
+  static contextTypes = {
+    intl: intlShape.isRequired
+  };
 
   static defaultProps = {
     introMessage: undefined
@@ -48,11 +67,6 @@ export default class WalletRestoreDialogContainer
     walletRestore.reset.trigger();
   }
 
-  cancelVerification = () => {
-    const { walletRestore } = this.props.actions[environment.API];
-    walletRestore.back.trigger();
-  };
-
   onCancel = () => {
     this.props.onClose();
     // Restore request should be reset only in case restore is finished/errored
@@ -61,6 +75,8 @@ export default class WalletRestoreDialogContainer
   };
 
   render() {
+    const { intl } = this.context;
+    const walletRestoreActions = this.props.actions[environment.API].walletRestore;
     const actions = this.props.actions;
     const { uiNotifications, profile, } = this.props.stores;
     const { walletRestore, } = this.props.stores.substores[environment.API];
@@ -119,11 +135,11 @@ export default class WalletRestoreDialogContainer
           (restoreRequest.error instanceof CheckAdressesInUseApiError);
         return (
           <WalletRestoreVerifyDialog
-            byronPlate={walletRestore.recoveryResult?.byronPlate}
-            shelleyPlate={walletRestore.recoveryResult?.shelleyPlate}
+            byronPlate={walletRestore.recoveryResult ?.byronPlate}
+            shelleyPlate={walletRestore.recoveryResult ?.shelleyPlate}
             selectedExplorer={profile.selectedExplorer}
-            onNext={() => actions[environment.API].walletRestore.startRestore.trigger()}
-            onCancel={this.cancelVerification}
+            onNext={() => actions[environment.API].walletRestore.verifyMnemonic.trigger()}
+            onCancel={() => walletRestoreActions.back.trigger()}
             onCopyAddressTooltip={(address, elementId) => {
               if (!uiNotifications.isOpen(elementId)) {
                 this.setState({ notificationElementId: elementId });
@@ -143,12 +159,92 @@ export default class WalletRestoreDialogContainer
           />
         );
       }
+      case RestoreSteps.LEGACY_EXPLANATION: {
+        return (
+          <LegacyExplanation
+            onBack={() => walletRestoreActions.back.trigger()}
+            onClose={this.onCancel}
+            onSkip={() => walletRestoreActions.startRestore.trigger()}
+            onCheck={() => walletRestoreActions.startCheck.trigger()}
+            classicTheme={this.props.classicTheme}
+          />
+        );
+      }
+      case RestoreSteps.TRANSFER_TX_GEN: {
+        const { yoroiTransfer } = this.props.stores.substores[environment.API];
+        const content = this._transferDialogContent();
+
+        const completeButton = [
+          {
+            label: intl.formatMessage(globalMessages.continue),
+            onClick: () => walletRestoreActions.startRestore.trigger(),
+            primary: true,
+          },
+        ];
+        return (
+          <Dialog
+            styleOveride={{ '--theme-modal-min-max-width-cmn': '680px' }}
+            title={intl.formatMessage(globalMessages.walletUpgrade)}
+            closeOnOverlayClick={false}
+            classicTheme={profile.isClassicTheme}
+            actions={yoroiTransfer.status === TransferStatus.ERROR
+              ? completeButton
+              : undefined
+            }
+          >
+            {content}
+          </Dialog>
+        );
+      }
       default: return null;
     }
   }
 
   _getWalletsStore() {
     return this.props.stores.substores[environment.API].wallets;
+  }
+
+  _transferDialogContent() {
+    const { yoroiTransfer } = this.props.stores.substores[environment.API];
+    const walletRestoreActions = this.props.actions[environment.API].walletRestore;
+    const { profile, } = this.props.stores;
+    const { intl } = this.context;
+    switch (yoroiTransfer.status) {
+      // don't want to throw an error if TransferStatus updates
+      // before the yoroiTransfer store actually starts the its async task
+      case TransferStatus.DISPLAY_CHECKSUM: return null;
+      case TransferStatus.RESTORING_ADDRESSES:
+      case TransferStatus.CHECKING_ADDRESSES:
+      case TransferStatus.GENERATING_TX:
+        return (
+          <YoroiTransferWaitingPage status={yoroiTransfer.status} />
+        );
+      case TransferStatus.READY_TO_TRANSFER: {
+        if (yoroiTransfer.transferTx == null) {
+          return null; // TODO: throw error? Shoudln't happen
+        }
+        return (<TransferSummaryPage
+          formattedWalletAmount={formattedWalletAmount}
+          selectedExplorer={this.props.stores.profile.selectedExplorer}
+          transferTx={yoroiTransfer.transferTx}
+          onSubmit={() => walletRestoreActions.transferFromLegacy.trigger()}
+          isSubmitting={yoroiTransfer.transferFundsRequest.isExecuting}
+          onCancel={this.onCancel}
+          error={yoroiTransfer.error}
+          classicTheme={profile.isClassicTheme}
+        />);
+      }
+      case TransferStatus.ERROR: {
+        return (
+          <SuccessPage
+            title={intl.formatMessage(globalMessages.pdfGenDone)}
+            text={intl.formatMessage(messages.walletUpgradeNoop)}
+            classicTheme={profile.isClassicTheme}
+          />
+        );
+      }
+      default: throw new Error(`${nameof(WalletRestoreDialogContainer)} tx status ${yoroiTransfer.status}`);
+    }
   }
 }
 

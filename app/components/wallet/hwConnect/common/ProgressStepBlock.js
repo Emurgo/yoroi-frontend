@@ -5,12 +5,9 @@ import { defineMessages, intlShape } from 'react-intl';
 
 import ProgressSteps from '../../../widgets/ProgressSteps';
 import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
+import globalMessages from '../../../../i18n/global-messages';
 
 const messages = defineMessages({
-  stepAboutLabel: {
-    id: 'wallet.connect.hw.dialog.step.about.label',
-    defaultMessage: '!!!CHECK',
-  },
   stepConnectLabel: {
     id: 'wallet.connect.hw.dialog.step.connect.label',
     defaultMessage: '!!!CONNECT',
@@ -40,7 +37,7 @@ export default class ProgressStepBlock extends Component<Props> {
     return (
       <ProgressSteps
         stepsList={[
-          intl.formatMessage(messages.stepAboutLabel),
+          intl.formatMessage(globalMessages.checkLabel),
           intl.formatMessage(messages.stepConnectLabel),
           intl.formatMessage(messages.stepSaveLabel)
         ]}

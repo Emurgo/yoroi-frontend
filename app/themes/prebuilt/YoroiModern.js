@@ -432,6 +432,11 @@ const YoroiModern = {
 let ShelleyTestnetOverrides = {};
 if (environment.isShelley()) {
   ShelleyTestnetOverrides = {
+    // React Polymorph buttons
+    '--rp-button-bg-color': '#3154CB',
+    '--rp-button-bg-color-active': '#3154CB',
+    '--rp-button-bg-color-disabled': 'rgba(49, 84, 203, 0.3)', // #3154CB
+    '--rp-button-bg-color-hover': '#4760FF',
     // Toolbar
     '--theme-topbar-background-color': 'linear-gradient(225deg, #F14D78 0%, #1A44B7 100%)',
     '--theme-topbar-active-item-bottom-border': '5px solid #ffffff',

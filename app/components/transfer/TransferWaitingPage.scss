@@ -1,7 +1,6 @@
 $margin: 20px;
 
 .component {
-  margin: $margin;
   height: calc(100% - var(--theme-wallet-navigation-tab-height));
 
   .annotatedLoaderWrapper {

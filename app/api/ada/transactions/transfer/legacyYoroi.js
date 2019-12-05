@@ -57,7 +57,7 @@ export async function toSenderUtxos(payload: {|
 
   if (isEmpty(utxos)) {
     const error = new NoInputsError();
-    Logger.error(`yoroiTransfer::generateYoroiTransferTx ${stringifyError(error)}`);
+    Logger.error(`legacyYoroi::${nameof(toSenderUtxos)} ${stringifyError(error)}`);
     throw error;
   }
 

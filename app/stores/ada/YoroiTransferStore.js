@@ -16,7 +16,7 @@ import type {
   TransferTx,
   TransferType,
 } from '../../types/TransferTypes';
-import { TransferStatus, TransferKind } from '../../types/TransferTypes';
+import { TransferStatus, TransferSource } from '../../types/TransferTypes';
 import { generateLegacyYoroiTransferTx } from '../../api/ada/transactions/transfer/legacyYoroi';
 import environment from '../../environment';
 import type { SendFunc, } from '../../api/ada/lib/state-fetch/types';
@@ -74,13 +74,13 @@ export default class YoroiTransferStore extends Store {
     actions.startTransferFunds.listen(this._startTransferFunds);
     actions.startTransferPaperFunds.listen(this._startTransferPaperFunds);
     actions.setupTransferFundsWithMnemonic.listen(
-      this._errorWrapper(this._setupTransferFundsWithMnemonic)
+      this._errorWrapper(this.setupTransferFundsWithMnemonic)
     );
     actions.setupTransferFundsWithPaperMnemonic.listen(
       this._errorWrapper(this._setupTransferFundsWithPaperMnemonic)
     );
     actions.checkAddresses.listen(
-      this._errorWrapper(this._checkAddresses)
+      this._errorWrapper(this.checkAddresses)
     );
     actions.backToUninitialized.listen(this._backToUninitialized);
     actions.transferFunds.listen(this._errorWrapper(this._transferFunds));
@@ -118,20 +118,29 @@ export default class YoroiTransferStore extends Store {
     }
   }
 
+  nextInternalAddress: PublicDeriverWithCachedMeta => (void => Promise<string>) = (
+    publicDeriver
+  ) => {
+    return async () => {
+      const withChains = asHasUtxoChains(publicDeriver.self);
+      if (!withChains) throw new Error(`${nameof(this.nextInternalAddress)} missing chains functionality`);
+      const nextInternal = await withChains.nextInternal();
+      if (nextInternal.addressInfo == null) {
+        throw new Error(`${nameof(this.nextInternalAddress)} no internal addresses left. Should never happen`);
+      }
+      const nextInternalAddress = nextInternal.addressInfo.addr.Hash;
+      return nextInternalAddress;
+    };
+  }
+
   _generateTransferTxFromMnemonic = async (
     recoveryPhrase: string,
     updateStatusCallback: void => void,
-    publicDeriver: PublicDeriverWithCachedMeta,
-    transferKind: TransferType,
+    getDestinationAddress: void => Promise<string>,
+    transferSource: TransferType,
   ): Promise<TransferTx> => {
     // 1) get receive address
-    const withChains = asHasUtxoChains(publicDeriver.self);
-    if (!withChains) throw new Error('_generateTransferTxFromMnemonic missing chains functionality');
-    const nextInternal = await withChains.nextInternal();
-    if (nextInternal.addressInfo == null) {
-      throw new Error('_generateTransferTxFromMnemonic no internal addresses left. Should never happen');
-    }
-    const nextInternalAddress = nextInternal.addressInfo.addr.Hash;
+    const destinationAddress = await getDestinationAddress();
 
     // 2) Perform restoration
     const accountIndex = 0 + HARD_DERIVATION_START;
@@ -145,19 +154,19 @@ export default class YoroiTransferStore extends Store {
     // 3) Calculate private keys for restored wallet utxo
     const accountKey = RustModule.WalletV3.Bip32PrivateKey
       .from_bytes(Buffer.from(masterKey, 'hex'))
-      .derive(transferKind === TransferKind.SHELLEY
+      .derive(transferSource === TransferSource.SHELLEY
         ? WalletTypePurpose.CIP1852
         : WalletTypePurpose.BIP44)
       .derive(CoinTypes.CARDANO)
       .derive(accountIndex);
 
-    if (transferKind === TransferKind.SHELLEY) {
+    if (transferSource === TransferSource.SHELLEY) {
       throw new Error('_generateTransferTxFromMnemonic Transfer for Shelley wallets not yet implemented');
     }
     // 4) generate transaction
     const transferTx = await generateLegacyYoroiTransferTx({
       addresses,
-      outputAddr: nextInternalAddress,
+      outputAddr: destinationAddress,
       keyLevel: Bip44DerivationLevels.ACCOUNT.level,
       signingKey: accountKey,
       getUTXOsForAddresses:
@@ -168,11 +177,10 @@ export default class YoroiTransferStore extends Store {
     return transferTx;
   }
 
-  _setupTransferFundsWithPaperMnemonic = async (payload: {
+  _setupTransferFundsWithPaperMnemonic = async (payload: {|
     recoveryPhrase: string,
     paperPassword: string,
-    publicDeriver: PublicDeriverWithCachedMeta,
-  }): Promise<void> => {
+  |}): Promise<void> => {
     runInAction(() => {
       this.isPaper = true;
     });
@@ -185,32 +193,32 @@ export default class YoroiTransferStore extends Store {
     if (recoveryPhrase == null) {
       throw new Error('_setupTransferFundsWithPaperMnemonic paper wallet failed');
     }
-    await this._setupTransferFundsWithMnemonic({
+    await this.setupTransferFundsWithMnemonic({
       recoveryPhrase,
-      publicDeriver: payload.publicDeriver,
     });
   }
 
-  _setupTransferFundsWithMnemonic = async (payload: {
-    recoveryPhrase: string,
-    publicDeriver: PublicDeriverWithCachedMeta,
-  }): Promise<void> => {
+  setupTransferFundsWithMnemonic: {| recoveryPhrase: string |} => Promise<void> = async (
+    payload
+  ) => {
     runInAction(() => {
       this.recoveryPhrase = payload.recoveryPhrase;
     });
     this._updateStatus(TransferStatus.DISPLAY_CHECKSUM);
   }
 
-  _checkAddresses = async (payload: {
-    publicDeriver: PublicDeriverWithCachedMeta,
-    transferKind: TransferType,
-  }): Promise<void> => {
+  checkAddresses: {|
+    getDestinationAddress: void => Promise<string>,
+    transferSource: TransferType,
+  |} => Promise<void> = async (
+    payload
+  ): Promise<void> => {
     this._updateStatus(TransferStatus.CHECKING_ADDRESSES);
     const transferTx = await this._generateTransferTxFromMnemonic(
       this.recoveryPhrase,
       () => this._updateStatus(TransferStatus.GENERATING_TX),
-      payload.publicDeriver,
-      payload.transferKind,
+      payload.getDestinationAddress,
+      payload.transferSource,
     );
     runInAction(() => {
       this.transferTx = transferTx;
@@ -231,25 +239,37 @@ export default class YoroiTransferStore extends Store {
 
   /** Broadcast the transfer transaction if one exists and proceed to continuation */
   _transferFunds = async (payload: {
-    next: void => void,
-    publicDeriver: PublicDeriverWithCachedMeta,
-    transferKind: TransferType,
-  }): Promise<void> => {
+    next: void => Promise<void>,
+    getDestinationAddress: void => Promise<string>,
+    transferSource: TransferType,
     /*
-     Always re-recover from the mnemonics to reduce the chance that the wallet
+     re-recover from the mnemonics to reduce the chance that the wallet
      changes before the tx is submit (we can't really eliminate it).
      */
-    const transferTx = await this._generateTransferTxFromMnemonic(
-      this.recoveryPhrase,
-      () => {},
-      payload.publicDeriver,
-      payload.transferKind,
-    );
-    if (!this.transferTx) {
-      throw new NoTransferTxError();
-    }
-    if (this._isWalletChanged(transferTx, this.transferTx)) {
-      return this._handleWalletChanged(transferTx);
+    rebuildTx: boolean,
+  }): Promise<void> => {
+    const oldTx = (() => {
+      const tx = this.transferTx;
+      if (tx == null) {
+        throw new NoTransferTxError();
+      }
+      return tx;
+    })();
+
+    let transferTx;
+    if (payload.rebuildTx) {
+      const newTx = await this._generateTransferTxFromMnemonic(
+        this.recoveryPhrase,
+        () => {},
+        payload.getDestinationAddress,
+        payload.transferSource,
+      );
+      if (this._isWalletChanged(oldTx, newTx)) {
+        return this._handleWalletChanged(newTx);
+      }
+      transferTx = newTx;
+    } else {
+      transferTx = oldTx;
     }
 
     try {
@@ -270,8 +290,8 @@ export default class YoroiTransferStore extends Store {
         const newTransferTx = await this._generateTransferTxFromMnemonic(
           this.recoveryPhrase,
           () => {},
-          payload.publicDeriver,
-          payload.transferKind,
+          payload.getDestinationAddress,
+          payload.transferSource,
         );
         if (this._isWalletChanged(newTransferTx, transferTx)) {
           return this._handleWalletChanged(newTransferTx);
