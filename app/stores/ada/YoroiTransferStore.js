@@ -16,7 +16,7 @@ import type {
   TransferTx,
   TransferType,
 } from '../../types/TransferTypes';
-import { TransferStatus, TransferKind } from '../../types/TransferTypes';
+import { TransferStatus, TransferSource } from '../../types/TransferTypes';
 import { generateLegacyYoroiTransferTx } from '../../api/ada/transactions/transfer/legacyYoroi';
 import environment from '../../environment';
 import type { SendFunc, } from '../../api/ada/lib/state-fetch/types';
@@ -137,7 +137,7 @@ export default class YoroiTransferStore extends Store {
     recoveryPhrase: string,
     updateStatusCallback: void => void,
     getDestinationAddress: void => Promise<string>,
-    transferKind: TransferType,
+    transferSource: TransferType,
   ): Promise<TransferTx> => {
     // 1) get receive address
     const destinationAddress = await getDestinationAddress();
@@ -154,13 +154,13 @@ export default class YoroiTransferStore extends Store {
     // 3) Calculate private keys for restored wallet utxo
     const accountKey = RustModule.WalletV3.Bip32PrivateKey
       .from_bytes(Buffer.from(masterKey, 'hex'))
-      .derive(transferKind === TransferKind.SHELLEY
+      .derive(transferSource === TransferSource.SHELLEY
         ? WalletTypePurpose.CIP1852
         : WalletTypePurpose.BIP44)
       .derive(CoinTypes.CARDANO)
       .derive(accountIndex);
 
-    if (transferKind === TransferKind.SHELLEY) {
+    if (transferSource === TransferSource.SHELLEY) {
       throw new Error('_generateTransferTxFromMnemonic Transfer for Shelley wallets not yet implemented');
     }
     // 4) generate transaction
@@ -209,7 +209,7 @@ export default class YoroiTransferStore extends Store {
 
   checkAddresses: {|
     getDestinationAddress: void => Promise<string>,
-    transferKind: TransferType,
+    transferSource: TransferType,
   |} => Promise<void> = async (
     payload
   ): Promise<void> => {
@@ -218,7 +218,7 @@ export default class YoroiTransferStore extends Store {
       this.recoveryPhrase,
       () => this._updateStatus(TransferStatus.GENERATING_TX),
       payload.getDestinationAddress,
-      payload.transferKind,
+      payload.transferSource,
     );
     runInAction(() => {
       this.transferTx = transferTx;
@@ -239,25 +239,37 @@ export default class YoroiTransferStore extends Store {
 
   /** Broadcast the transfer transaction if one exists and proceed to continuation */
   _transferFunds = async (payload: {
-    next: void => void,
+    next: void => Promise<void>,
     getDestinationAddress: void => Promise<string>,
-    transferKind: TransferType,
-  }): Promise<void> => {
+    transferSource: TransferType,
     /*
-     Always re-recover from the mnemonics to reduce the chance that the wallet
+     re-recover from the mnemonics to reduce the chance that the wallet
      changes before the tx is submit (we can't really eliminate it).
      */
-    const transferTx = await this._generateTransferTxFromMnemonic(
-      this.recoveryPhrase,
-      () => {},
-      payload.getDestinationAddress,
-      payload.transferKind,
-    );
-    if (!this.transferTx) {
-      throw new NoTransferTxError();
-    }
-    if (this._isWalletChanged(transferTx, this.transferTx)) {
-      return this._handleWalletChanged(transferTx);
+    rebuildTx: boolean,
+  }): Promise<void> => {
+    const oldTx = (() => {
+      const tx = this.transferTx;
+      if (tx == null) {
+        throw new NoTransferTxError();
+      }
+      return tx;
+    })();
+
+    let transferTx;
+    if (payload.rebuildTx) {
+      const newTx = await this._generateTransferTxFromMnemonic(
+        this.recoveryPhrase,
+        () => {},
+        payload.getDestinationAddress,
+        payload.transferSource,
+      );
+      if (this._isWalletChanged(oldTx, newTx)) {
+        return this._handleWalletChanged(newTx);
+      }
+      transferTx = newTx;
+    } else {
+      transferTx = oldTx;
     }
 
     try {
@@ -279,7 +291,7 @@ export default class YoroiTransferStore extends Store {
           this.recoveryPhrase,
           () => {},
           payload.getDestinationAddress,
-          payload.transferKind,
+          payload.transferSource,
         );
         if (this._isWalletChanged(newTransferTx, transferTx)) {
           return this._handleWalletChanged(newTransferTx);

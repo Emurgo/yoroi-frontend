@@ -14,13 +14,14 @@ export default class YoroiTranferActions {
   |}> = new Action();
   checkAddresses: Action<{|
     getDestinationAddress: void => Promise<string>,
-    transferKind: TransferType,
+    transferSource: TransferType,
   |}> = new Action();
   backToUninitialized: Action<void> = new Action();
-  transferFunds: Action<{
-    next: void => void,
+  transferFunds: Action<{|
+    next: void => Promise<void>,
     getDestinationAddress: void => Promise<string>,
-    transferKind: TransferType,
-  }> = new Action();
+    transferSource: TransferType,
+    rebuildTx: boolean,
+  |}> = new Action();
   cancelTransferFunds: Action<void> = new Action();
 }

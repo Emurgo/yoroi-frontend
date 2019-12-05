@@ -18,7 +18,7 @@ import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
 import config from '../../config';
 import { formattedWalletAmount } from '../../utils/formatters';
-import { TransferStatus, TransferKind, } from '../../types/TransferTypes';
+import { TransferStatus, TransferSource, } from '../../types/TransferTypes';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
@@ -75,7 +75,7 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
     }
     this._getYoroiTransferActions().checkAddresses.trigger({
       getDestinationAddress: yoroiTransfer.nextInternalAddress(publicDeriver),
-      transferKind: TransferKind.BYRON,
+      transferSource: TransferSource.BYRON,
     });
   };
 
@@ -89,7 +89,7 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
       throw new Error(`${nameof(this.tranferFunds)} no wallet selected`);
     }
     this._getYoroiTransferActions().transferFunds.trigger({
-      next: () => {
+      next: () => new Promise(resolve => {
         walletsStore.refreshWallet(publicDeriver);
         setTimeout(() => {
           if (walletsStore.activeWalletRoute != null) {
@@ -98,10 +98,12 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
               route: newRoute
             });
           }
+          resolve();
         }, SUCCESS_PAGE_STAY_TIME);
-      },
+      }),
       getDestinationAddress: yoroiTransfer.nextInternalAddress(publicDeriver),
-      transferKind: TransferKind.BYRON,
+      transferSource: TransferSource.BYRON,
+      rebuildTx: true,
     });
   }
 

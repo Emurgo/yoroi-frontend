@@ -18,7 +18,7 @@ import {
 } from '../../api/ada/lib/cardanoCrypto/plate';
 import config from '../../config';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import { TransferKind } from '../../types/TransferTypes';
+import { TransferSource } from '../../types/TransferTypes';
 import {
   HARD_DERIVATION_START,
   WalletTypePurpose,
@@ -76,9 +76,12 @@ export default class WalletRestoreStore extends Store {
       throw new Error(`${nameof(this._transferFromLegacy)} no recovery phrase set. Should never happen`);
     }
     this.actions.ada.yoroiTransfer.transferFunds.trigger({
-      next: this._startRestore,
+      next: async () => { this._startRestore(); },
       getDestinationAddress: () => Promise.resolve(this._getFirstInternalAddr(phrase)),
-      transferKind: TransferKind.BYRON,
+      transferSource: TransferSource.BYRON,
+      // funds in genesis block should be either entirely claimed or not claimed
+      // so if another wallet instance claims the funds, it's not a big deal
+      rebuildTx: false,
     });
   }
 
@@ -124,7 +127,7 @@ export default class WalletRestoreStore extends Store {
     const internalAddrHash = this._getFirstInternalAddr(phrase);
     this.actions.ada.yoroiTransfer.checkAddresses.trigger({
       getDestinationAddress: () => Promise.resolve(internalAddrHash),
-      transferKind: TransferKind.BYRON,
+      transferSource: TransferSource.BYRON,
     });
   }
 
