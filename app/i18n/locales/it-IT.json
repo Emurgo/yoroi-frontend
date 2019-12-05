@@ -247,7 +247,7 @@
   "wallet.add.page.subtitle.label": "Light wallet Yoroi per Cardano",
   "wallet.add.page.title": "La tua porta d'accesso <br> al <br> mondo finanziario",
   "wallet.amountInput.feesLabel": "+ {amount} di commissioni",
-  "wallet.backup.dialog.legacy.checkConfirm": "Do you want to check if your wallet needs to be upgraded?",
+  "wallet.backup.dialog.legacy.checkConfirm": "Vuoi verificare se il tuo portafoglio necessita di essere aggiornato?",
   "wallet.backup.dialog.legacy.explanation": "If you had any ADA in your wallet on November 29th, 2019\n    you will have to upgrade your wallet to a Shelley \"reward wallet\".",
   "wallet.backup.dialog.legacy.upgrade": "Wallet Upgrade",
   "wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching": "Assicurati che nessuno guardi il tuo schermo, a meno che tu voglia che abbiano accesso ai tuoi fondi.",
