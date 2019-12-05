@@ -11,6 +11,7 @@ import DialogCloseButton from '../widgets/DialogCloseButton';
 import PerformTxImg from '../../assets/images/uri/perform-tx-uri.inline.svg';
 
 import styles from './URILandingDialog.scss';
+import globalMessages from '../../i18n/global-messages';
 
 const messages = defineMessages({
   uriLandingDialogTitle: {
@@ -28,10 +29,6 @@ const messages = defineMessages({
   uriLandingDialogWarningLine3: {
     id: 'uri.landing.dialog.warning.line3',
     defaultMessage: '!!!You are not being victim of a phishing or man-in-the-middle attack.',
-  },
-  uriLandingDialogConfirmLabel: {
-    id: 'uri.landing.dialog.confirm.label',
-    defaultMessage: '!!!I understand',
   },
 });
 
@@ -84,7 +81,7 @@ export default class URILandingDialog extends Component<Props> {
             </ul>
           </div>
           <Button
-            label={intl.formatMessage(messages.uriLandingDialogConfirmLabel)}
+            label={intl.formatMessage(globalMessages.uriLandingDialogConfirmLabel)}
             onMouseUp={this.submit}
             disabled={false}
             skin={ButtonSkin}

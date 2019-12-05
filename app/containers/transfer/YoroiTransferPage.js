@@ -1,4 +1,7 @@
 // @flow
+import {
+  validateMnemonic,
+} from 'bip39';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, } from 'react-intl';
@@ -6,9 +9,11 @@ import validWords from 'bip39/src/wordlists/english.json';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import TransferLayout from '../../components/transfer/TransferLayout';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
+import HardwareDisclaimerPage from './HardwareDisclaimerPage';
 import BorderedBox from '../../components/widgets/BorderedBox';
 import YoroiTransferFormPage from './YoroiTransferFormPage';
 import YoroiPaperWalletFormPage from './YoroiPaperWalletFormPage';
+import HardwareTransferFormPage from './HardwareTransferFormPage';
 import YoroiPlatePage from './YoroiPlatePage';
 import YoroiTransferWaitingPage from './YoroiTransferWaitingPage';
 import YoroiTransferErrorPage from './YoroiTransferErrorPage';
@@ -41,17 +46,31 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
     });
   }
 
-  startTransferFunds = () => {
-    this._getYoroiTransferActions().startTransferFunds.trigger();
+  startLegacyTransferFunds: void => void = () => {
+    this._getYoroiTransferActions().startTransferFunds.trigger({
+      source: TransferSource.BYRON
+    });
   }
 
-  startTransferPaperFunds = () => {
-    this._getYoroiTransferActions().startTransferPaperFunds.trigger();
+  startShelleyTransferFunds: void => void = () => {
+    this._getYoroiTransferActions().startTransferFunds.trigger({
+      source: TransferSource.SHELLEY_UTXO
+    });
   }
 
-  setupTransferFundsWithMnemonic = (payload: {|
+  startTransferPaperFunds: void => void = () => {
+    this._getYoroiTransferActions().startTransferPaperFunds.trigger({
+      source: TransferSource.BYRON
+    });
+  }
+
+  startTransferLegacyHardwareFunds: void => void = () => {
+    this._getYoroiTransferActions().startTransferLegacyHardwareFunds.trigger();
+  }
+
+  setupTransferFundsWithMnemonic: {|
     recoveryPhrase: string,
-  |}) => {
+  |} => void = (payload) => {
     this._getYoroiTransferActions().setupTransferFundsWithMnemonic.trigger({
       ...payload,
     });
@@ -75,7 +94,6 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
     }
     this._getYoroiTransferActions().checkAddresses.trigger({
       getDestinationAddress: yoroiTransfer.nextInternalAddress(publicDeriver),
-      transferSource: TransferSource.BYRON,
     });
   };
 
@@ -102,7 +120,6 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
         }, SUCCESS_PAGE_STAY_TIME);
       }),
       getDestinationAddress: yoroiTransfer.nextInternalAddress(publicDeriver),
-      transferSource: TransferSource.BYRON,
       rebuildTx: true,
     });
   }
@@ -127,8 +144,10 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
         return (
           <TransferLayout>
             <YoroiTransferStartPage
-              on15Words={this.startTransferFunds}
-              onPaper={this.startTransferPaperFunds}
+              onLegacy15Words={this.startLegacyTransferFunds}
+              onShelley15Words={this.startShelleyTransferFunds}
+              onLegacyPaper={this.startTransferPaperFunds}
+              onLegacyHardware={this.startTransferLegacyHardwareFunds}
               classicTheme={profile.isClassicTheme}
               onFollowInstructionsPrerequisites={this.goToCreateWallet}
               disableTransferFunds={yoroiTransfer.disableTransferFunds}
@@ -165,6 +184,31 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
               mnemonicLength={config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT}
               passwordMatches={_password => true}
               includeLengthCheck={false}
+              classicTheme={profile.isClassicTheme}
+            />
+          </TransferLayout>
+        );
+      case TransferStatus.HARDWARE_DISCLAIMER:
+        return (
+          <TransferLayout>
+            <HardwareDisclaimerPage
+              actions={this.props.actions}
+              stores={this.props.stores}
+              onBack={() => this._getYoroiTransferActions().cancelTransferFunds.trigger()}
+              onNext={() => this._getYoroiTransferActions().startHardwareMnemnoic.trigger()}
+            />
+          </TransferLayout>
+        );
+      case TransferStatus.GETTING_HARDWARE_MNEMONIC:
+        return (
+          <TransferLayout>
+            <HardwareTransferFormPage
+              onSubmit={this.setupTransferFundsWithMnemonic}
+              onBack={this.backToUninitialized}
+              // different hardware wallet support different lengths
+              // so we just allow any lenght as long as the mnemonic is valid
+              mnemonicValidator={mnemonic => validateMnemonic(mnemonic)}
+              validWords={validWords}
               classicTheme={profile.isClassicTheme}
             />
           </TransferLayout>

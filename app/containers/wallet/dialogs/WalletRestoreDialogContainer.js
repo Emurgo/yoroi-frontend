@@ -210,8 +210,8 @@ export default class WalletRestoreDialogContainer
     const { profile, } = this.props.stores;
     const { intl } = this.context;
     switch (yoroiTransfer.status) {
-      // don't want to throw an error if TransferStatus updates
-      // before the yoroiTransfer store actually starts the its async task
+      // we have to verify briefly go through this step
+      // and we don't want to throw an error for it
       case TransferStatus.DISPLAY_CHECKSUM: return null;
       case TransferStatus.RESTORING_ADDRESSES:
       case TransferStatus.CHECKING_ADDRESSES:

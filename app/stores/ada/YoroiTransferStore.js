@@ -14,9 +14,10 @@ import LocalizableError, {
 import type {
   TransferStatusT,
   TransferTx,
-  TransferType,
+  TransferSourceType,
+  TransferKindType,
 } from '../../types/TransferTypes';
-import { TransferStatus, TransferSource } from '../../types/TransferTypes';
+import { TransferStatus, TransferSource, TransferKind, } from '../../types/TransferTypes';
 import { generateLegacyYoroiTransferTx } from '../../api/ada/transactions/transfer/legacyYoroi';
 import environment from '../../environment';
 import type { SendFunc, } from '../../api/ada/lib/state-fetch/types';
@@ -50,7 +51,8 @@ export default class YoroiTransferStore extends Store {
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
   @observable recoveryPhrase: string = '';
-  @observable isPaper: boolean = false;
+  @observable transferKind: TransferKindType = TransferKind.NORMAL;
+  @observable transferSource: TransferSourceType = TransferSource.BYRON;
 
   _errorWrapper = <PT, RT>(func: PT=>Promise<RT>): (PT => Promise<RT>) => (async (payload) => {
     try {
@@ -72,7 +74,9 @@ export default class YoroiTransferStore extends Store {
     ]);
     const actions = this.actions.ada.yoroiTransfer;
     actions.startTransferFunds.listen(this._startTransferFunds);
+    actions.startTransferLegacyHardwareFunds.listen(this._startTransferLegacyHardwareFunds);
     actions.startTransferPaperFunds.listen(this._startTransferPaperFunds);
+    actions.startHardwareMnemnoic.listen(this._startHardwareMnemnoic);
     actions.setupTransferFundsWithMnemonic.listen(
       this._errorWrapper(this.setupTransferFundsWithMnemonic)
     );
@@ -92,19 +96,43 @@ export default class YoroiTransferStore extends Store {
     this.reset();
   }
 
-  _startTransferFunds = () => {
+  _startTransferFunds: {|
+    source: TransferSourceType,
+  |} => void = (payload) => {
+    runInAction(() => {
+      this.transferKind = TransferKind.NORMAL;
+      this.transferSource = payload.source;
+    });
     this._updateStatus(TransferStatus.GETTING_MNEMONICS);
   }
 
-  _startTransferPaperFunds = () => {
+  _startTransferPaperFunds: {|
+    source: TransferSourceType,
+  |} => void = (payload) => {
+    runInAction(() => {
+      this.transferKind = TransferKind.PAPER;
+      this.transferSource = payload.source;
+    });
     this._updateStatus(TransferStatus.GETTING_PAPER_MNEMONICS);
+  }
+
+  _startTransferLegacyHardwareFunds: void => void = () => {
+    runInAction(() => {
+      this.transferKind = TransferKind.HARDWARE;
+      this.transferSource = TransferSource.BYRON;
+    });
+    this._updateStatus(TransferStatus.HARDWARE_DISCLAIMER);
+  }
+
+  _startHardwareMnemnoic: void => void = () => {
+    this._updateStatus(TransferStatus.GETTING_HARDWARE_MNEMONIC);
   }
 
   /** @Attention:
       You should check wallets state outside of the runInAction,
       because this method run as a reaction.
   */
-  _enableDisableTransferFunds = (): void => {
+  _enableDisableTransferFunds: void => void = (): void => {
     const { wallets } = this.stores.substores[environment.API];
     // User must first make a Yoroi wallet before being able to transfer a Daedalus wallet
     if (wallets.hasActiveWallet) {
@@ -137,7 +165,6 @@ export default class YoroiTransferStore extends Store {
     recoveryPhrase: string,
     updateStatusCallback: void => void,
     getDestinationAddress: void => Promise<string>,
-    transferSource: TransferType,
   ): Promise<TransferTx> => {
     // 1) get receive address
     const destinationAddress = await getDestinationAddress();
@@ -146,7 +173,7 @@ export default class YoroiTransferStore extends Store {
     const accountIndex = 0 + HARD_DERIVATION_START;
     const { masterKey, addresses } = await this._restoreWalletForTransfer(
       recoveryPhrase,
-      accountIndex
+      accountIndex,
     );
 
     updateStatusCallback();
@@ -154,15 +181,12 @@ export default class YoroiTransferStore extends Store {
     // 3) Calculate private keys for restored wallet utxo
     const accountKey = RustModule.WalletV3.Bip32PrivateKey
       .from_bytes(Buffer.from(masterKey, 'hex'))
-      .derive(transferSource === TransferSource.SHELLEY
+      .derive(this.transferSource === TransferSource.SHELLEY_UTXO
         ? WalletTypePurpose.CIP1852
         : WalletTypePurpose.BIP44)
       .derive(CoinTypes.CARDANO)
       .derive(accountIndex);
 
-    if (transferSource === TransferSource.SHELLEY) {
-      throw new Error('_generateTransferTxFromMnemonic Transfer for Shelley wallets not yet implemented');
-    }
     // 4) generate transaction
     const transferTx = await generateLegacyYoroiTransferTx({
       addresses,
@@ -181,9 +205,6 @@ export default class YoroiTransferStore extends Store {
     recoveryPhrase: string,
     paperPassword: string,
   |}): Promise<void> => {
-    runInAction(() => {
-      this.isPaper = true;
-    });
     const result = unscramblePaperAdaMnemonic(
       payload.recoveryPhrase,
       config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT,
@@ -191,14 +212,16 @@ export default class YoroiTransferStore extends Store {
     );
     const recoveryPhrase = result[0];
     if (recoveryPhrase == null) {
-      throw new Error('_setupTransferFundsWithPaperMnemonic paper wallet failed');
+      throw new Error(`${nameof(this._setupTransferFundsWithPaperMnemonic)} paper wallet failed`);
     }
     await this.setupTransferFundsWithMnemonic({
       recoveryPhrase,
     });
   }
 
-  setupTransferFundsWithMnemonic: {| recoveryPhrase: string |} => Promise<void> = async (
+  setupTransferFundsWithMnemonic: {|
+    recoveryPhrase: string,
+  |} => Promise<void> = async (
     payload
   ) => {
     runInAction(() => {
@@ -209,7 +232,6 @@ export default class YoroiTransferStore extends Store {
 
   checkAddresses: {|
     getDestinationAddress: void => Promise<string>,
-    transferSource: TransferType,
   |} => Promise<void> = async (
     payload
   ): Promise<void> => {
@@ -218,7 +240,6 @@ export default class YoroiTransferStore extends Store {
       this.recoveryPhrase,
       () => this._updateStatus(TransferStatus.GENERATING_TX),
       payload.getDestinationAddress,
-      payload.transferSource,
     );
     runInAction(() => {
       this.transferTx = transferTx;
@@ -241,7 +262,6 @@ export default class YoroiTransferStore extends Store {
   _transferFunds = async (payload: {
     next: void => Promise<void>,
     getDestinationAddress: void => Promise<string>,
-    transferSource: TransferType,
     /*
      re-recover from the mnemonics to reduce the chance that the wallet
      changes before the tx is submit (we can't really eliminate it).
@@ -262,7 +282,6 @@ export default class YoroiTransferStore extends Store {
         this.recoveryPhrase,
         () => {},
         payload.getDestinationAddress,
-        payload.transferSource,
       );
       if (this._isWalletChanged(oldTx, newTx)) {
         return this._handleWalletChanged(newTx);
@@ -291,7 +310,6 @@ export default class YoroiTransferStore extends Store {
           this.recoveryPhrase,
           () => {},
           payload.getDestinationAddress,
-          payload.transferSource,
         );
         if (this._isWalletChanged(newTransferTx, transferTx)) {
           return this._handleWalletChanged(newTransferTx);
@@ -325,7 +343,8 @@ export default class YoroiTransferStore extends Store {
     this.transferFundsRequest.reset();
     this.restoreForTransferRequest.reset();
     this.recoveryPhrase = '';
-    this.isPaper = false;
+    this.transferKind = TransferKind.NORMAL;
+    this.transferSource = TransferSource.BYRON;
   }
 
   _restoreWalletForTransfer = async (
@@ -339,6 +358,7 @@ export default class YoroiTransferStore extends Store {
       recoveryPhrase,
       accountIndex,
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
+      transferSource: this.transferSource,
     }).promise;
     if (!restoreResult) throw new Error('Restored wallet was not received correctly');
     return restoreResult;

@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './TransferNavigation.scss';
 import TransferNavButton from './TransferNavButton';
+import environment from '../../../environment';
 
 const messages = defineMessages({
   fromDaedalus: {
@@ -13,6 +14,10 @@ const messages = defineMessages({
   fromYoroi: {
     id: 'transfer.navigation.fromYoroi',
     defaultMessage: '!!!Transfer funds from another wallet',
+  },
+  fromLeagcyDaedalus: {
+    id: 'daedalusTransfer.legacy.title',
+    defaultMessage: '!!!Transfer funds from legacy Daedalus',
   },
 });
 
@@ -39,7 +44,10 @@ export default class TransferNavigation extends Component<TransferNavigationProp
         <div className={styles.navItem}>
           <TransferNavButton
             className="from-daedalus"
-            label={intl.formatMessage(messages.fromDaedalus)}
+            label={environment.isShelley()
+              ? intl.formatMessage(messages.fromLeagcyDaedalus)
+              : intl.formatMessage(messages.fromDaedalus)
+            }
             isActive={isActiveNavItem('daedalus')}
             onClick={() => onNavItemClick('daedalus')}
           />

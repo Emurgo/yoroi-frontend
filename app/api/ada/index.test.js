@@ -4,6 +4,7 @@ import { schema } from 'lovefield';
 import AdaApi from './index';
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
 import { HARD_DERIVATION_START, } from '../../config/numbersConfig';
+import { TransferSource } from '../../types/TransferTypes';
 import {
   silenceLogsForTesting,
 } from '../../utils/logging';
@@ -63,6 +64,7 @@ test('Restore wallet for transfer', async () => {
     recoveryPhrase,
     checkAddressesInUse,
     accountIndex: HARD_DERIVATION_START + 0,
+    transferSource: TransferSource.BYRON,
   });
 
   expect(response).toEqual(RESTORED_ADDRESSES);

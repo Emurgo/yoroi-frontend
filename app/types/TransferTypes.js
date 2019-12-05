@@ -13,6 +13,8 @@ export const TransferStatus = Object.freeze({
   ERROR: 8,
   SUCCESS: 9,
   DISPLAY_CHECKSUM: 10,
+  HARDWARE_DISCLAIMER: 11,
+  GETTING_HARDWARE_MNEMONIC: 12,
 });
 export type TransferStatusT = $Values<typeof TransferStatus>;
 
@@ -28,6 +30,14 @@ export type TransferTx = {
 
 export const TransferSource = Object.freeze({
   BYRON: 0,
-  SHELLEY: 1,
+  SHELLEY_UTXO: 1,
+  SHELLEY_CHIMERIC_ACCOUNT: 2,
 });
-export type TransferType = $Values<typeof TransferSource>;
+export type TransferSourceType = $Values<typeof TransferSource>;
+
+export const TransferKind = Object.freeze({
+  NORMAL: 0,
+  PAPER: 1,
+  HARDWARE: 2,
+});
+export type TransferKindType = $Values<typeof TransferKind>;

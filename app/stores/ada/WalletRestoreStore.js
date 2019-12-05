@@ -78,7 +78,6 @@ export default class WalletRestoreStore extends Store {
     this.actions.ada.yoroiTransfer.transferFunds.trigger({
       next: async () => { this._startRestore(); },
       getDestinationAddress: () => Promise.resolve(this._getFirstInternalAddr(phrase)),
-      transferSource: TransferSource.BYRON,
       // funds in genesis block should be either entirely claimed or not claimed
       // so if another wallet instance claims the funds, it's not a big deal
       rebuildTx: false,
@@ -119,6 +118,10 @@ export default class WalletRestoreStore extends Store {
     if (phrase == null) {
       throw new Error(`${nameof(this._startCheck)} no recovery phrase set. Should never happen`);
     }
+
+    this.actions.ada.yoroiTransfer.startTransferFunds.trigger({
+      source: TransferSource.BYRON,
+    });
     this.actions.ada.yoroiTransfer.setupTransferFundsWithMnemonic.trigger({
       recoveryPhrase: phrase
     });
@@ -127,7 +130,6 @@ export default class WalletRestoreStore extends Store {
     const internalAddrHash = this._getFirstInternalAddr(phrase);
     this.actions.ada.yoroiTransfer.checkAddresses.trigger({
       getDestinationAddress: () => Promise.resolve(internalAddrHash),
-      transferSource: TransferSource.BYRON,
     });
   }
 
