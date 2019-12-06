@@ -41,7 +41,7 @@
   margin-right: 6px;
 }
 
-.notificaionsIcon,
+.noticeBoardIcon,
 .walletsIcon {
   flex-shrink: 0;
   & > svg {
@@ -124,7 +124,7 @@
       width: 72px;
     }
 
-    &.notifications {
+    &.notice-board {
       right: 158px;
       width: 72px;
     }

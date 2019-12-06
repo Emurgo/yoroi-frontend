@@ -70,10 +70,10 @@ export const SETTINGS: Category = {
   icon: settingsIcon,
 };
 
-export const NOTIFICATIONS: Category = {
-  name: 'NOTIFICATIONS',
-  className: 'notifications',
-  route: ROUTES.NOTIFICATIONS.ROOT,
+export const NOTICE_BOARD: Category = {
+  name: 'NOTICE_BOARD',
+  className: 'notice-board',
+  route: ROUTES.NOTICE_BOARD.ROOT,
   icon: walletsIcon, // TODO : add icon
-  iconStyle: styles.notificaionsIcon,
+  iconStyle: styles.noticeBoardIcon,
 };

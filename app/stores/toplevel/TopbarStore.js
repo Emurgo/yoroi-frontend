@@ -10,7 +10,7 @@ import {
   WALLETS,
   CURRENCY_SPECIFIC_CATEGORIES,
   SETTINGS,
-  NOTIFICATIONS,
+  NOTICE_BOARD,
 } from '../../config/topbarConfig';
 import {
   isTrezorTWallet,
@@ -47,7 +47,7 @@ export default class TopbarStore extends Store {
       ...(isNano ? [WITH_LEDGER_NANO] : []),
       SETTINGS,
       ...CURRENCY_SPECIFIC_CATEGORIES[environment.API],
-      NOTIFICATIONS,
+      NOTICE_BOARD,
     ];
   }
 

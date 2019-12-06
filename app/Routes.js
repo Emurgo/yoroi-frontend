@@ -35,6 +35,7 @@ import Transfer from './containers/transfer/Transfer';
 import StakingDashboardPage from './containers/wallet/staking/StakingDashboardPage';
 import StakingSimplePage from './containers/wallet/staking/StakingSimplePage';
 import StakingAdvancePage from './containers/wallet/staking/StakingAdvancePage';
+import NoticeBoardPage from './containers/notice-board/NoticeBoardPage';
 
 /* eslint-disable max-len */
 export const Routes = (
@@ -101,6 +102,11 @@ export const Routes = (
         exact
         path={ROUTES.SEND_FROM_URI.ROOT}
         component={(props) => <URILandingPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.NOTICE_BOARD.ROOT}
+        component={(props) => <NoticeBoardPage {...props} stores={stores} actions={actions} />}
       />
       <Redirect to={ROUTES.WALLETS.ADD} />
     </Switch>
