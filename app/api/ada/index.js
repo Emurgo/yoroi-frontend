@@ -57,6 +57,7 @@ import type {
   IGetAllUtxos,
   IGetLastSyncInfo,
   IGetSigningKey,
+  IGetStakingKey,
   IDisplayCutoff,
   IDisplayCutoffPopFunc,
   IDisplayCutoffPopResponse,
@@ -369,6 +370,32 @@ export type CreateUnsignedTxResponse = UnsignedTxResponse | V3UnsignedTxAddresse
 export type CreateUnsignedTxFunc = (
   request: CreateUnsignedTxRequest
 ) => Promise<CreateUnsignedTxResponse>;
+
+// createDelegationTx
+
+export type CreateDelegationTxRequest = {
+  publicDeriver: IGetAllUtxos & IHasUtxoChains,
+  certificate: RustModule.WalletV3.Certificate,
+};
+export type CreateDelegationTxResponse = V3UnsignedTxAddressedUtxoResponse;
+
+export type CreateDelegationTxFunc = (
+  request: CreateDelegationTxRequest
+) => Promise<CreateDelegationTxResponse>;
+
+// signAndBroadcastDelegationTx
+
+export type SignAndBroadcastDelegationTxRequest = {
+  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey & IGetStakingKey,
+  signRequest: BaseSignRequest<RustModule.WalletV3.InputOutput>,
+  password: string,
+  sendTx: SendFunc,
+};
+export type SignAndBroadcastDelegationTxResponse = SignedResponse;
+
+export type SignAndBroadcastDelegationTxFunc = (
+  request: SignAndBroadcastDelegationTxRequest
+) => Promise<SignAndBroadcastDelegationTxResponse>;
 
 // createAddress
 
@@ -762,6 +789,7 @@ export default class AdaApi {
             senderUtxos: signRequest.senderUtxos,
             changeAddr: signRequest.changeAddr,
             IOs: unsignedTx,
+            certificate: signRequest.certificate,
           },
           request.publicDeriver.getParent().getPublicDeriverLevel(),
           RustModule.WalletV3.Bip32PrivateKey.from_bytes(
@@ -910,7 +938,7 @@ export default class AdaApi {
   async createUnsignedTx(
     request: CreateUnsignedTxRequest
   ): Promise<CreateUnsignedTxResponse> {
-    Logger.debug('AdaApi::createUnsignedTx called');
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} called`);
     const { receiver, amount, shouldSendAll } = request;
     try {
       const utxos = await request.publicDeriver.getAllUtxos();
@@ -934,15 +962,17 @@ export default class AdaApi {
       } else {
         const nextUnusedInternal = await request.publicDeriver.nextInternal();
         if (nextUnusedInternal.addressInfo == null) {
-          throw new Error('createUnsignedTx no internal addresses left. Should never happen');
+          throw new Error(`${nameof(this.createUnsignedTx)} no internal addresses left. Should never happen`);
         }
         const changeAddr = nextUnusedInternal.addressInfo;
         unsignedTxResponse = environment.isShelley()
           ? shelleyNewAdaUnsignedTx(
-            Buffer.from(
-              RustModule.WalletV3.Address.from_string(receiver).as_bytes()
-            ).toString('hex'),
-            amount,
+            [{
+              address: Buffer.from(
+                RustModule.WalletV3.Address.from_string(receiver).as_bytes()
+              ).toString('hex'),
+              amount
+            }],
             [{
               address: changeAddr.addr.Hash,
               addressing: changeAddr.addressing,
@@ -968,6 +998,94 @@ export default class AdaApi {
         'AdaApi::createUnsignedTx error: ' + stringifyError(error)
       );
       if (error.id.includes('NotEnoughMoneyToSendError')) throw error;
+      throw new GenericApiError();
+    }
+  }
+
+  async createDelegationTx(
+    request: CreateDelegationTxRequest
+  ): Promise<CreateDelegationTxResponse> {
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.createDelegationTx)} called`);
+    const utxos = await request.publicDeriver.getAllUtxos();
+    const addressedUtxo = shelleyAsAddressedUtxo(utxos);
+    const nextUnusedInternal = await request.publicDeriver.nextInternal();
+    if (nextUnusedInternal.addressInfo == null) {
+      throw new Error(`${nameof(this.createDelegationTx)} no internal addresses left. Should never happen`);
+    }
+    const changeAddr = nextUnusedInternal.addressInfo;
+    return shelleyNewAdaUnsignedTx(
+      [],
+      [{
+        address: changeAddr.addr.Hash,
+        addressing: changeAddr.addressing,
+      }],
+      addressedUtxo,
+      request.certificate
+    );
+  }
+
+  async signAndBroadcastDelegationTx(
+    request: SignAndBroadcastDelegationTxRequest
+  ): Promise<SignAndBroadcastDelegationTxResponse> {
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.signAndBroadcastDelegationTx)} called`);
+    const { password, signRequest } = request;
+    try {
+      const signingKeyFromStorage = await request.publicDeriver.getSigningKey();
+      const stakingAddr = await request.publicDeriver.getStakingKey();
+      const normalizedKey = await request.publicDeriver.normalizeKey({
+        ...signingKeyFromStorage,
+        password,
+      });
+      const normalizedSigningKey = RustModule.WalletV3.Bip32PrivateKey.from_bytes(
+        Buffer.from(normalizedKey.prvKeyHex, 'hex')
+      );
+      let normalizedStakingKey;
+      {
+        let key = normalizedSigningKey;
+        for (const derivation of stakingAddr.addressing.path) {
+          key = key.derive(derivation);
+        }
+        normalizedStakingKey = key.to_raw_key();
+      }
+      const unsignedTx = signRequest.unsignedTx;
+      if (request.signRequest.certificate == null) {
+        throw new Error(`${nameof(this.signAndBroadcastDelegationTx)} missing certificate`);
+      }
+      const certificate = request.signRequest.certificate;
+      const signedTx = shelleySignTransaction(
+        {
+          senderUtxos: signRequest.senderUtxos,
+          changeAddr: signRequest.changeAddr,
+          certificate,
+          IOs: unsignedTx,
+        },
+        request.publicDeriver.getParent().getPublicDeriverLevel(),
+        normalizedSigningKey,
+        // Note: always false because we should only do legacy txs for wallet transfers
+        false,
+        {
+          certificate,
+          stakingKey: normalizedStakingKey,
+        },
+      );
+      const id = Buffer.from(signedTx.id().as_bytes()).toString('hex');
+      const encodedTx = signedTx.as_bytes();
+      const response = request.sendTx({
+        id,
+        encodedTx,
+      });
+      Logger.debug(
+        `${nameof(AdaApi)}::${nameof(this.signAndBroadcastDelegationTx)} success: ` + stringifyData(response)
+      );
+      return response;
+    } catch (error) {
+      if (error instanceof WrongPassphraseError) {
+        throw new IncorrectWalletPasswordError();
+      }
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.signAndBroadcastDelegationTx)} error: ` + stringifyError(error));
+      if (error instanceof InvalidWitnessError) {
+        throw new InvalidWitnessError();
+      }
       throw new GenericApiError();
     }
   }

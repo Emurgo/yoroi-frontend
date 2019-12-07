@@ -23,6 +23,7 @@ import type {
   IDisplayCutoff,
   BaseAddressPath,
   Address, Value, Addressing, UsedStatus,
+  IGetAllUtxosResponse,
 } from './PublicDeriver/interfaces';
 import {
   PublicDeriver,

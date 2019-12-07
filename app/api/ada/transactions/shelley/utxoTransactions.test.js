@@ -131,8 +131,10 @@ describe('Create unsigned TX from UTXO', () => {
   it('Should create a valid transaction withhout selection', () => {
     const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[1]];
     const unsignedTxResponse = newAdaUnsignedTxFromUtxo(
-      keys[0].bechAddress,
-      '5001', // smaller than input
+      [{
+        address: keys[0].bechAddress,
+        amount: '5001', // smaller than input
+      }],
       [],
       utxos
     );
@@ -147,8 +149,10 @@ describe('Create unsigned TX from UTXO', () => {
   it('Should fail due to insufficient funds (bigger than all inputs)', () => {
     const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[1]];
     expect(() => newAdaUnsignedTxFromUtxo(
-      keys[0].bechAddress,
-      '1900001', // bigger than input including fees
+      [{
+        address: keys[0].bechAddress,
+        amount: '1900001', // bigger than input including fees
+      }],
       [],
       utxos
     )).toThrow(NotEnoughMoneyToSendError);
@@ -156,8 +160,10 @@ describe('Create unsigned TX from UTXO', () => {
 
   it('Should fail due to insufficient funds (no inputs)', () => {
     expect(() => newAdaUnsignedTxFromUtxo(
-      keys[0].bechAddress,
-      '1', // bigger than input including fees
+      [{
+        address: keys[0].bechAddress,
+        amount: '1', // bigger than input including fees
+      }],
       [],
       [],
     )).toThrow(NotEnoughMoneyToSendError);
@@ -166,8 +172,10 @@ describe('Create unsigned TX from UTXO', () => {
   it('Should fail due to insufficient funds (not enough to cover fees)', () => {
     const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[0]];
     expect(() => newAdaUnsignedTxFromUtxo(
-      keys[0].bechAddress,
-      '1', // bigger than input including fees
+      [{
+        address: keys[0].bechAddress,
+        amount: '1', // bigger than input including fees
+      }],
       [],
       utxos,
     )).toThrow(NotEnoughMoneyToSendError);
@@ -176,8 +184,10 @@ describe('Create unsigned TX from UTXO', () => {
   it('Should pick inputs when using input selection', () => {
     const utxos: Array<RemoteUnspentOutput> = sampleUtxos;
     const unsignedTxResponse = newAdaUnsignedTxFromUtxo(
-      keys[0].bechAddress,
-      '1001', // smaller than input
+      [{
+        address: keys[0].bechAddress,
+        amount: '1001', // smaller than input
+      }],
       [sampleAdaAddresses[0]],
       utxos
     );
@@ -195,8 +205,10 @@ describe('Create unsigned TX from UTXO', () => {
 describe('Create unsigned TX from addressed UTXOs', () => {
   it('Should create a valid transaction withhout selection', () => {
     const unsignedTxResponse = newAdaUnsignedTx(
-      keys[0].bechAddress,
-      '5001', // smaller than input
+      [{
+        address: keys[0].bechAddress,
+        amount: '5001', // smaller than input
+      }],
       [],
       [addressedUtxos[0], addressedUtxos[1]],
     );
@@ -212,8 +224,10 @@ describe('Create unsigned TX from addressed UTXOs', () => {
 describe('Create signed transactions with legacy witness', () => {
   it('Witness should match on valid private key', () => {
     const unsignedTxResponse = newAdaUnsignedTx(
-      keys[0].bechAddress,
-      '5001', // smaller than input
+      [{
+        address: keys[0].bechAddress,
+        amount: '5001', // smaller than input
+      }],
       [],
       [addressedUtxos[0], addressedUtxos[1]],
     );
@@ -245,8 +259,10 @@ describe('Create signed transactions with legacy witness', () => {
 describe('Create signed transactions', () => {
   it('Witness should match on valid private key', () => {
     const unsignedTxResponse = newAdaUnsignedTx(
-      keys[0].bechAddress,
-      '5001', // smaller than input
+      [{
+        address: keys[0].bechAddress,
+        amount: '5001', // smaller than input
+      }],
       [],
       [addressedUtxos[0], addressedUtxos[1]],
     );
@@ -277,8 +293,10 @@ describe('Create signed transactions', () => {
 
   it('Witness should match with addressing from root', () => {
     const unsignedTxResponse = newAdaUnsignedTx(
-      keys[0].bechAddress,
-      '5001', // smaller than input
+      [{
+        address: keys[0].bechAddress,
+        amount: '5001', // smaller than input
+      }],
       [],
       [
         {
@@ -330,12 +348,14 @@ describe('Create signed transactions', () => {
     );
   });
 
-  it('Transaction with a certificate is also valid', () => {
+  it('Transaction with a certificate and output is also valid', () => {
     const unsignedTxResponse = newAdaUnsignedTx(
-      Buffer.from(RustModule.WalletV3.Address.from_string(
-        'ca1sw8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguq9rance'
-      ).as_bytes()).toString('hex'),
-      '5000', // smaller than input
+      [{
+        address: Buffer.from(RustModule.WalletV3.Address.from_string(
+          'ca1sw8mq0p65pf028qgd32t6szeatfd9epx4jyl5jeuuswtlkyqpdguq9rance'
+        ).as_bytes()).toString('hex'),
+        amount: '5000', // smaller than input
+      }],
       [{
         address: Buffer.from(RustModule.WalletV3.Address.from_string(
           'addr1s5quq8utjkrfntnkngjxa9u9mdd8pcprjal2fwzkm7k0y0prx3k276qm0j8'
@@ -407,6 +427,83 @@ describe('Create signed transactions', () => {
     expect(witnesses.size()).toEqual(1);
     expect(witnesses.get(0).to_bech32()).toEqual(
       'witness1q89jcq78wt4u773vrrjjwuqg8908wpyuv5j3sdj0mcs4dpe667f97yfc0k48dae9u29r07nkms764js84tgwxr09ah6e948s2u6ye8cgyzhd4j'
+    );
+  });
+
+  it('Transaction with a certificate without output is also valid', () => {
+    const unsignedTxResponse = newAdaUnsignedTx(
+      [],
+      [{
+        address: Buffer.from(RustModule.WalletV3.Address.from_string(
+          'addr1s5quq8utjkrfntnkngjxa9u9mdd8pcprjal2fwzkm7k0y0prx3k276qm0j8'
+        ).as_bytes()).toString('hex'),
+        addressing: {
+          path: [1, 0],
+          startLevel: Bip44DerivationLevels.CHAIN.level,
+        },
+      }],
+      [{
+        amount: '2000000',
+        receiver: Buffer.from(RustModule.WalletV3.Address.from_string(
+          'ca1ssuvzjs82mshgvyp4r4lmwgknvgjswnm7mpcq3wycjj7v2nk393e6qwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm906x2vwl'
+        ).as_bytes()).toString('hex'),
+        tx_hash: '86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de5550',
+        tx_index: 0,
+        utxo_id: '86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de55500',
+        addressing: {
+          path: [0, 0],
+          startLevel: Bip44DerivationLevels.CHAIN.level,
+        },
+      }],
+    );
+
+    const accountPrivateKey = RustModule.WalletV3.Bip32PrivateKey.from_bytes(
+      Buffer.from(
+        '408a1cb637d615c49e8696c30dd54883302a20a7b9b8a9d1c307d2ed3cd50758c9402acd000461a8fc0f25728666e6d3b86d031b8eea8d2f69b21e8aa6ba2b153e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
+        'hex',
+      ),
+    );
+    const stakingKey = accountPrivateKey.derive(2).derive(STAKING_KEY_INDEX).to_raw_key();
+    const certificate = RustModule.WalletV3.Certificate.stake_delegation(
+      RustModule.WalletV3.StakeDelegation.new(
+        RustModule.WalletV3.DelegationType.full(
+          RustModule.WalletV3.PoolId.from_hex('312e3d449038372ba2fc3300cfedf1b152ae739201b3e5da47ab3f933a421b62')
+        ),
+        stakingKey.to_public()
+      )
+    );
+    const fragment = signTransaction(
+      unsignedTxResponse,
+      Bip44DerivationLevels.ACCOUNT.level,
+      accountPrivateKey,
+      false,
+      {
+        stakingKey,
+        certificate,
+      }
+    );
+    const signedTx = fragment.get_transaction();
+
+    const inputs = signedTx.inputs();
+    expect(inputs.size()).toEqual(1);
+    expect(inputs.get(0).value().to_str()).toEqual('2000000');
+    const pointer = inputs.get(0).get_utxo_pointer();
+    expect(Buffer.from(pointer.fragment_id().as_bytes()).toString('hex')).toEqual('86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de5550');
+    expect(pointer.output_index()).toEqual(0);
+
+    const outputs = signedTx.outputs();
+    expect(outputs.size()).toEqual(1);
+    const change = outputs.get(0);
+    expect(change.address().to_string(Bech32Prefix.ADDRESS)).toEqual('addr1s5quq8utjkrfntnkngjxa9u9mdd8pcprjal2fwzkm7k0y0prx3k276qm0j8');
+    expect(change.value().to_str()).toEqual('1844617');
+
+    expect(Buffer.from(fragment.id().as_bytes()).toString('hex')).toEqual('fdbb1fe40618b8ded1300483c99cd3c4f1b2c2745f86c01b1018e593d2710951');
+    expect(Buffer.from(fragment.get_transaction().id().as_bytes()).toString('hex')).toEqual('433c14a1f1bb654e569c381e45e49c97738ecc4e0064e04daaf284b531d56e22');
+
+    const witnesses = signedTx.witnesses();
+    expect(witnesses.size()).toEqual(1);
+    expect(witnesses.get(0).to_bech32()).toEqual(
+      'witness1q9ukepgn8dchhvc4ynnz3he0ymf9ax5jggfvz2602tqqu62sym0cpfdc5qe7x7v6skf03mv3h8huqgna7x495t4e85r3wg6m5rg25ms9sqh95g'
     );
   });
 });

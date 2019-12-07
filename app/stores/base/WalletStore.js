@@ -16,6 +16,9 @@ import type {
 import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import type {
+  IGetLastSyncInfoResponse,
+} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
@@ -249,6 +252,14 @@ export default class WalletsStore extends Store {
       selected.amount = balance.dividedBy(
         LOVELACES_PER_ADA
       );
+    }
+  }
+
+  @action.bound
+  _updateLastSync(lastSync: IGetLastSyncInfoResponse): void {
+    const selected = this.selected;
+    if (selected != null) {
+      selected.lastSyncInfo = lastSync;
     }
   }
 

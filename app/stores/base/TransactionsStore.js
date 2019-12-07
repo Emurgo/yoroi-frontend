@@ -180,6 +180,7 @@ export default class TransactionsStore extends Store {
         const lastUpdateDate = await this.api[environment.API].getTxLastUpdatedDate({
           getLastSyncInfo: publicDeriver.getLastSyncInfo
         });
+        walletsActions.updateLastSync.trigger(lastUpdateDate);
         // Note: cache based on last slot synced  (not used in balanceRequest)
         const req = this._getBalanceRequest(publicDeriver);
         req.execute({

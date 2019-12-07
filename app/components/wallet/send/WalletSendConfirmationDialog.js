@@ -7,7 +7,7 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import Dialog from '../../widgets/Dialog';
@@ -22,21 +22,6 @@ import type { ExplorerType } from '../../../domain/Explorer';
 
 import WarningBox from '../../widgets/WarningBox';
 
-const messages = defineMessages({
-  walletPasswordLabel: {
-    id: 'wallet.send.confirmationDialog.walletPasswordLabel',
-    defaultMessage: '!!!Spending password',
-  },
-  walletPasswordFieldPlaceholder: {
-    id: 'wallet.send.confirmationDialog.walletPasswordFieldPlaceholder',
-    defaultMessage: '!!!Type your spending password',
-  },
-  sendButtonLabel: {
-    id: 'wallet.send.confirmationDialog.submit',
-    defaultMessage: '!!!Send',
-  },
-});
-
 type Props = {|
   +staleTx: boolean,
   +selectedExplorer: ExplorerType,
@@ -44,7 +29,7 @@ type Props = {|
   +receivers: Array<string>,
   +totalAmount: string,
   +transactionFee: string,
-  +onSubmit: ({ password: string }) => void,
+  +onSubmit: ({| password: string |}) => void,
   +amountToNaturalUnits: (amountWithFractions: string) => string,
   +onCancel: Function,
   +isSubmitting: boolean,
@@ -64,9 +49,9 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
     fields: {
       walletPassword: {
         type: 'password',
-        label: this.context.intl.formatMessage(messages.walletPasswordLabel),
+        label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
         placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(messages.walletPasswordFieldPlaceholder) : '',
+          this.context.intl.formatMessage(globalMessages.walletPasswordFieldPlaceholder) : '',
         value: '',
         validators: [({ field }) => {
           if (field.value === '') {
@@ -137,7 +122,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
           : onCancel
       },
       {
-        label: intl.formatMessage(messages.sendButtonLabel),
+        label: intl.formatMessage(globalMessages.sendButtonLabel),
         onClick: this.submit.bind(this),
         primary: true,
         className: confirmButtonClasses,

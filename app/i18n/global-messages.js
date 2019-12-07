@@ -403,6 +403,18 @@ const globalMessages = defineMessages({
     // eslint-disable-next-line max-len
     // defaultMessage: '!!!When you originally setup your hardware wallet, you were asked to write down a recovery phrase on a piece of paper. Entering this phrase will allow you to transfer your funds out of your hardware wallet and into the current wallet.',
   },
+  sendButtonLabel: {
+    id: 'wallet.send.confirmationDialog.submit',
+    defaultMessage: '!!!Send',
+  },
+  walletPasswordLabel: {
+    id: 'wallet.send.confirmationDialog.walletPasswordLabel',
+    defaultMessage: '!!!Spending password',
+  },
+  walletPasswordFieldPlaceholder: {
+    id: 'wallet.send.confirmationDialog.walletPasswordFieldPlaceholder',
+    defaultMessage: '!!!Type your spending password',
+  },
 });
 export default globalMessages;
 

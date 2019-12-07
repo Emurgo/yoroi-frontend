@@ -27,9 +27,15 @@ import { generateAuthData } from './utils';
 
 declare var CONFIG: ConfigType;
 
+type TxOutput = {|
+  address: string,
+  amount: string,
+|};
+
 export function sendAllUnsignedTx(
   receiver: string,
   allUtxos: Array<AddressedUtxo>,
+  certificate: void | RustModule.WalletV3.Certificate,
 ): V3UnsignedTxAddressedUtxoResponse {
   const addressingMap = new Map<RemoteUnspentOutput, AddressedUtxo>();
   for (const utxo of allUtxos) {
@@ -43,7 +49,8 @@ export function sendAllUnsignedTx(
   }
   const unsignedTxResponse = sendAllUnsignedTxFromUtxo(
     receiver,
-    Array.from(addressingMap.keys())
+    Array.from(addressingMap.keys()),
+    certificate,
   );
 
   const addressedUtxos = unsignedTxResponse.senderUtxos.map(
@@ -60,12 +67,14 @@ export function sendAllUnsignedTx(
     senderUtxos: addressedUtxos,
     IOs: unsignedTxResponse.IOs,
     changeAddr: unsignedTxResponse.changeAddr,
+    certificate,
   };
 }
 
 export function sendAllUnsignedTxFromUtxo(
   receiver: string,
   allUtxos: Array<RemoteUnspentOutput>,
+  certificate: void | RustModule.WalletV3.Certificate,
 ): V3UnsignedTxUtxoResponse {
   const totalBalance = allUtxos
     .map(utxo => new BigNumber(utxo.amount))
@@ -96,9 +105,12 @@ export function sendAllUnsignedTxFromUtxo(
       ),
       RustModule.WalletV3.Value.from_str(totalBalance.toString())
     );
+    const payload = certificate != null
+      ? RustModule.WalletV3.Payload.certificate(certificate)
+      : RustModule.WalletV3.Payload.no_payload();
     const feeValue = fakeIOBuilder.estimate_fee(
       feeAlgorithm,
-      RustModule.WalletV3.Payload.no_payload()
+      payload
     ).to_str();
     fee = new BigNumber(feeValue);
   }
@@ -108,15 +120,23 @@ export function sendAllUnsignedTxFromUtxo(
     throw new NotEnoughMoneyToSendError();
   }
   const newAmount = totalBalance.minus(fee).toString();
-  const unsignedTxResponse = newAdaUnsignedTxFromUtxo(receiver, newAmount, [], allUtxos);
+  const unsignedTxResponse = newAdaUnsignedTxFromUtxo(
+    [{
+      address: receiver,
+      amount: newAmount,
+    }],
+    [],
+    allUtxos,
+    certificate,
+  );
   return unsignedTxResponse;
 }
 
 export function newAdaUnsignedTx(
-  receiver: string,
-  amount: string,
+  outputs: Array<TxOutput>,
   changeAdaAddr: Array<{| ...Address, ...Addressing |}>,
   allUtxos: Array<AddressedUtxo>,
+  certificate: void | RustModule.WalletV3.Certificate,
 ): V3UnsignedTxAddressedUtxoResponse {
   const addressingMap = new Map<RemoteUnspentOutput, AddressedUtxo>();
   for (const utxo of allUtxos) {
@@ -129,10 +149,10 @@ export function newAdaUnsignedTx(
     }, utxo);
   }
   const unsignedTxResponse = newAdaUnsignedTxFromUtxo(
-    receiver,
-    amount,
+    outputs,
     changeAdaAddr,
-    Array.from(addressingMap.keys())
+    Array.from(addressingMap.keys()),
+    certificate,
   );
 
   const addressedUtxos = unsignedTxResponse.senderUtxos.map(
@@ -148,6 +168,7 @@ export function newAdaUnsignedTx(
     senderUtxos: addressedUtxos,
     IOs: unsignedTxResponse.IOs,
     changeAddr: unsignedTxResponse.changeAddr,
+    certificate,
   };
 }
 
@@ -158,8 +179,7 @@ export function newAdaUnsignedTx(
  * B) Having the key provided externally
  */
 export function newAdaUnsignedTxFromUtxo(
-  receiver: string,
-  amount: string,
+  outputs: Array<TxOutput>,
   changeAddresses: Array<{| ...Address, ...Addressing |}>,
   allUtxos: Array<RemoteUnspentOutput>,
   certificate: void | RustModule.WalletV3.Certificate,
@@ -171,12 +191,14 @@ export function newAdaUnsignedTxFromUtxo(
   );
 
   const ioBuilder = RustModule.WalletV3.InputOutputBuilder.empty();
-  ioBuilder.add_output(
-    RustModule.WalletV3.Address.from_bytes(
-      Buffer.from(receiver, 'hex')
-    ),
-    RustModule.WalletV3.Value.from_str(amount)
-  );
+  for (const output of outputs) {
+    ioBuilder.add_output(
+      RustModule.WalletV3.Address.from_bytes(
+        Buffer.from(output.address, 'hex')
+      ),
+      RustModule.WalletV3.Value.from_str(output.amount)
+    );
+  }
   const payload = certificate != null
     ? RustModule.WalletV3.Payload.certificate(certificate)
     : RustModule.WalletV3.Payload.no_payload();
@@ -277,7 +299,7 @@ function filterToUsedChange(
   for (let i = 0; i < outputs.size(); i++) {
     const output = outputs.get(i);
     const val = output.value().to_str();
-    // not: both change & outputs all cannot be legacy addresses
+    // note: both change & outputs all cannot be legacy addresses
     const outputPayload = Buffer.from(output.address().as_bytes()).toString('hex');
     if (changeAddrPayload === outputPayload) {
       const indexInInput = possibleDuplicates.findIndex(

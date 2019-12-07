@@ -3,7 +3,10 @@ import { observable, action } from 'mobx';
 import BigNumber from 'bignumber.js';
 import { assuranceModes, } from '../config/transactionAssuranceConfig';
 import type { AssuranceMode, } from '../types/transactionAssuranceTypes';
-import type { WalletAccountNumberPlate } from '../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type {
+  WalletAccountNumberPlate,
+  IGetLastSyncInfoResponse,
+} from '../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import {
   PublicDeriver,
 } from '../api/ada/lib/storage/models/PublicDeriver/index';
@@ -25,6 +28,7 @@ export default class PublicDeriverWithCachedMeta {
   @observable amount: BigNumber;
   @observable assuranceMode: AssuranceMode;
   @observable signingKeyUpdateDate: null | Date;
+  @observable lastSyncInfo: IGetLastSyncInfoResponse
 
   constructor(data: {
     self: PublicDeriver<>,
@@ -34,6 +38,7 @@ export default class PublicDeriverWithCachedMeta {
     amount: BigNumber,
     assuranceMode: AssuranceMode,
     signingKeyUpdateDate: null | Date,
+    lastSyncInfo: IGetLastSyncInfoResponse,
   }) {
     Object.assign(this, data);
   }
@@ -47,6 +52,7 @@ export default class PublicDeriverWithCachedMeta {
     amount: BigNumber,
     assuranceMode: AssuranceMode,
     signingKeyUpdateDate: null | Date,
+    lastSyncInfo: IGetLastSyncInfoResponse,
   }) {
     return new PublicDeriverWithCachedMeta(data);
   }
@@ -79,6 +85,7 @@ export default class PublicDeriverWithCachedMeta {
       }
     }
 
+    const lastSyncInfo = await publicDeriver.getLastSyncInfo();
     return PublicDeriverWithCachedMeta.fromData({
       self: publicDeriver,
       plate,
@@ -87,6 +94,7 @@ export default class PublicDeriverWithCachedMeta {
       amount: new BigNumber(0), // assume 0 for now. Updated later if necessary
       assuranceMode: assuranceModes.NORMAL,
       signingKeyUpdateDate,
+      lastSyncInfo,
     });
   }
 }

@@ -197,6 +197,7 @@ describe('Create signed transactions', () => {
       changeAddr: unsignedTxResponse.changeAddr,
       senderUtxos: unsignedTxResponse.senderUtxos,
       unsignedTx: unsignedTxResponse.txBuilder.make_transaction(),
+      certificate: undefined,
     };
 
     const accountPrivateKey = RustModule.WalletV2.Bip44AccountPrivate.new(
@@ -277,7 +278,8 @@ describe('Create signed transactions', () => {
             }
           ]
         }
-      )
+      ),
+      certificate: undefined,
     };
     const signedTx = signTransaction(
       signRequest,

@@ -90,3 +90,34 @@ export function addressToDisplayString(
     }
   }
 }
+
+export function groupAddrContainsAccountKey(
+  address: string,
+  targetAccountKey: string,
+): boolean {
+  const wasmAddr = RustModule.WalletV3.Address.from_bytes(
+    Buffer.from(address, 'hex')
+  );
+  if (wasmAddr.get_kind() !== RustModule.WalletV3.AddressKind.Group) {
+    return false;
+  }
+  const groupKey = wasmAddr.to_group_address();
+  if (groupKey == null) return false;
+  const accountKey = groupKey.get_account_key();
+  const accountKeyString = Buffer.from(accountKey.as_bytes()).toString('hex');
+  return targetAccountKey === accountKeyString;
+}
+
+export function filterAddressesByStakingKey<T: { address: string }>(
+  stakingKey: RustModule.WalletV3.PublicKey,
+  utxos: Array<T>,
+): Array<T> {
+  const stakingKeyString = Buffer.from(stakingKey.as_bytes()).toString('hex');
+  const result = [];
+  for (const utxo of utxos) {
+    if (groupAddrContainsAccountKey(utxo.address, stakingKeyString)) {
+      result.push(utxo);
+    }
+  }
+  return result;
+}
