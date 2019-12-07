@@ -399,7 +399,9 @@ const globalMessages = defineMessages({
   },
   hardwareTransferInstructions: {
     id: 'transfer.instructions.hardware.disclaimer.instructions1',
-    defaultMessage: '!!!When you originally setup your hardware wallet, you were asked to write down a recovery phrase on a piece of paper. Entering this phrase will allow you to transfer your funds out of your hardware wallet and into the current wallet.',
+    defaultMessage: '',
+    // eslint-disable-next-line max-len
+    // defaultMessage: '!!!When you originally setup your hardware wallet, you were asked to write down a recovery phrase on a piece of paper. Entering this phrase will allow you to transfer your funds out of your hardware wallet and into the current wallet.',
   },
 });
 export default globalMessages;

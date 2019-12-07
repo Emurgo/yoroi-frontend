@@ -150,6 +150,12 @@ export default class YoroiTransferStartPage extends Component<Props> {
                         skin={ButtonSkin}
                         disabled={disableTransferFunds}
                       />
+                    </>)
+                  : null
+                }
+                {environment.isShelley() && environment.isDev()
+                  ? (
+                    <>
                       <Button
                         className={`next hardwareMnemonic ${commonClasses}`}
                         label={intl.formatMessage(messages.hardwareLabel)}
@@ -157,18 +163,14 @@ export default class YoroiTransferStartPage extends Component<Props> {
                         skin={ButtonSkin}
                         disabled={disableTransferFunds}
                       />
+                      <Button
+                        className={`next yoroiShelleyPaper ${commonClasses}`}
+                        label={intl.formatMessage(messages.yoroiPaperLabel)}
+                        onClick={this.props.onLegacyPaper} // TODO: not implemented yet
+                        skin={ButtonSkin}
+                        disabled={disableTransferFunds}
+                      />
                     </>)
-                  : null
-                }
-                {environment.isShelley() && environment.isDev()
-                  ? (
-                    <Button
-                      className={`next yoroiShelleyPaper ${commonClasses}`}
-                      label={intl.formatMessage(messages.yoroiPaperLabel)}
-                      onClick={this.props.onLegacyPaper} // TODO: not implemented yet
-                      skin={ButtonSkin}
-                      disabled={disableTransferFunds}
-                    />)
                   : null
                 }
               </div>
