@@ -389,6 +389,20 @@ const globalMessages = defineMessages({
     id: 'settings.paperWallet.dialog.createPaper.done',
     defaultMessage: '!!!All done!',
   },
+  legacyAttentionText: {
+    id: 'transfer.instructions.attention.legacy',
+    defaultMessage: '!!!Legacy wallets created during the Byron-era (before November 29th, 2019) can no longer be used. However, you can transfer your legacy funds to your current wallet to access your funds.',
+  },
+  uriLandingDialogConfirmLabel: {
+    id: 'uri.landing.dialog.confirm.label',
+    defaultMessage: '!!!I understand',
+  },
+  hardwareTransferInstructions: {
+    id: 'transfer.instructions.hardware.disclaimer.instructions1',
+    defaultMessage: '',
+    // eslint-disable-next-line max-len
+    // defaultMessage: '!!!When you originally setup your hardware wallet, you were asked to write down a recovery phrase on a piece of paper. Entering this phrase will allow you to transfer your funds out of your hardware wallet and into the current wallet.',
+  },
 });
 export default globalMessages;
 

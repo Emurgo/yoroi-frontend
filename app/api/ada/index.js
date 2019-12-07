@@ -11,7 +11,15 @@ import {
   HARD_DERIVATION_START,
   WalletTypePurpose,
   CoinTypes,
+  ChainDerivations,
+  STAKING_KEY_INDEX,
 } from '../../config/numbersConfig';
+import type {
+  TransferSourceType,
+} from '../../types/TransferTypes';
+import {
+  TransferSource,
+} from '../../types/TransferTypes';
 import type {
   Network,
   ConfigType,
@@ -103,6 +111,7 @@ import {
 } from '../common';
 import LocalizableError from '../../i18n/LocalizableError';
 import { scanBip44Account, } from './restoration/byron/scan';
+import { scanCip1852Account, } from './restoration/shelley/scan';
 import type {
   BaseSignRequest,
   UnsignedTxResponse,
@@ -469,11 +478,12 @@ export type RestoreWalletFunc = (
 
 // restoreWalletForTransfer
 
-export type RestoreWalletForTransferRequest = {
+export type RestoreWalletForTransferRequest = {|
   recoveryPhrase: string,
+  transferSource: TransferSourceType,
   accountIndex: number,
   checkAddressesInUse: FilterFunc,
-};
+|};
 export type RestoreWalletForTransferResponse = {
   masterKey: string,
   addresses: Array<{| ...Address, ...Addressing |}>
@@ -1166,7 +1176,6 @@ export default class AdaApi {
 
   /**
    * Restore all addresses like restoreWallet() but do not touch storage.
-   * TBD: this function is based on restoreWallet() and duplicate parts of it.
    */
   async restoreWalletForTransfer(
     request: RestoreWalletForTransferRequest
@@ -1182,31 +1191,68 @@ export default class AdaApi {
       const reverseAddressLookup = new Map<number, Array<string>>();
       const foundAddresses = new Set<string>();
 
-      // TODO: differentiate restoring legacy vs Shelley wallet
+      const isShelley = request.transferSource === TransferSource.SHELLEY_UTXO ||
+        request.transferSource === TransferSource.SHELLEY_CHIMERIC_ACCOUNT;
       const accountKey = rootPk
-        .derive(WalletTypePurpose.BIP44)
+        .derive(isShelley
+          ? WalletTypePurpose.CIP1852
+          : WalletTypePurpose.BIP44)
         .derive(CoinTypes.CARDANO)
         .derive(request.accountIndex);
-      // TODO: this is using legacy scanning. Need an option for legacy vs shelley
-      const insertTree = await scanBip44Account({
-        accountPublicKey: Buffer.from(accountKey.to_public().as_bytes()).toString('hex'),
-        lastUsedInternal: -1,
-        lastUsedExternal: -1,
-        checkAddressesInUse,
-        addByHash: (address) => {
-          if (!foundAddresses.has(address.address.data)) {
-            let family = reverseAddressLookup.get(address.keyDerivationId);
-            if (family == null) {
-              family = [];
-              reverseAddressLookup.set(address.keyDerivationId, family);
-            }
-            family.push(address.address.data);
-            foundAddresses.add(address.address.data);
+
+      const addByHash = (address) => {
+        if (!foundAddresses.has(address.address.data)) {
+          let family = reverseAddressLookup.get(address.keyDerivationId);
+          if (family == null) {
+            family = [];
+            reverseAddressLookup.set(address.keyDerivationId, family);
           }
-          return Promise.resolve();
-        },
-        protocolMagic,
-      });
+          family.push(address.address.data);
+          foundAddresses.add(address.address.data);
+        }
+        return Promise.resolve();
+      };
+
+      let insertTree;
+      if (request.transferSource === TransferSource.BYRON) {
+        insertTree = await scanBip44Account({
+          accountPublicKey: Buffer.from(accountKey.to_public().as_bytes()).toString('hex'),
+          lastUsedInternal: -1,
+          lastUsedExternal: -1,
+          checkAddressesInUse,
+          addByHash,
+          protocolMagic,
+        });
+      } else if (isShelley) {
+        const stakingKey = accountKey
+          .derive(ChainDerivations.CHIMERIC_ACCOUNT)
+          .derive(STAKING_KEY_INDEX)
+          .to_public()
+          .to_raw_key();
+
+        const cip1852InsertTree = await scanCip1852Account({
+          accountPublicKey: Buffer.from(accountKey.to_public().as_bytes()).toString('hex'),
+          lastUsedInternal: -1,
+          lastUsedExternal: -1,
+          checkAddressesInUse,
+          addByHash,
+          stakingKey,
+        });
+
+        if (request.transferSource === TransferSource.SHELLEY_UTXO) {
+          insertTree = cip1852InsertTree.filter(child => (
+            child.index === ChainDerivations.EXTERNAL || child.index === ChainDerivations.INTERNAL
+          ));
+        } else if (request.transferSource === TransferSource.SHELLEY_CHIMERIC_ACCOUNT) {
+          insertTree = cip1852InsertTree.filter(child => (
+            child.index === ChainDerivations.CHIMERIC_ACCOUNT
+          ));
+        } else {
+          throw new Error(`${nameof(this.restoreWalletForTransfer)} unexpected shelley type ${request.transferSource}`);
+        }
+      } else {
+        throw new Error(`${nameof(this.restoreWalletForTransfer)} unexpected wallet type ${request.transferSource}`);
+      }
       const flattenedTree = flattenInsertTree(insertTree);
 
       const addressResult = [];
@@ -1221,7 +1267,7 @@ export default class AdaApi {
           keyDerivationId: i
         });
         const family = reverseAddressLookup.get(i);
-        if (family == null) throw new Error('restoreWalletForTransfer should never happen');
+        if (family == null) throw new Error(`${nameof(this.restoreWalletForTransfer)} should never happen`);
         const result = family.map(address => ({
           address,
           addressing: {
@@ -1232,14 +1278,14 @@ export default class AdaApi {
         addressResult.push(...result);
       }
 
-      Logger.debug('AdaApi::restoreWalletForTransfer success');
+      Logger.debug(`${nameof(this.restoreWalletForTransfer)} success`);
 
       return {
         masterKey: Buffer.from(rootPk.as_bytes()).toString('hex'),
         addresses: addressResult,
       };
     } catch (error) {
-      Logger.error('AdaApi::restoreWalletForTransfer error: ' + stringifyError(error));
+      Logger.error(`${nameof(this.restoreWalletForTransfer)} error: ` + stringifyError(error));
       // TODO: backend will return something different here, if multiple wallets
       // are restored from the key and if there are duplicate wallets we will get
       // some kind of error and present the user with message that some wallets

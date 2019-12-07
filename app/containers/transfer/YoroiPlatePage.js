@@ -12,6 +12,7 @@ import {
 import environment from '../../environment';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import type { PlateResponse } from '../../api/ada/lib/cardanoCrypto/plate';
+import { TransferKind } from '../../types/TransferTypes';
 
 type Props = {|
   ...InjectedProps,
@@ -36,7 +37,7 @@ export default class YoroiPlatePage extends Component<Props, WalletRestoreDialog
   initializeState = () => {
     const { yoroiTransfer } = this.props.stores.substores.ada;
 
-    const numAddresses = yoroiTransfer.isPaper
+    const numAddresses = yoroiTransfer.transferKind === TransferKind.PAPER
       ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER
       : NUMBER_OF_VERIFIED_ADDRESSES;
 
@@ -49,7 +50,7 @@ export default class YoroiPlatePage extends Component<Props, WalletRestoreDialog
         : RustModule.WalletV3.AddressDiscrimination.Test,
       true,
     );
-    const shelleyPlate = yoroiTransfer.isPaper
+    const shelleyPlate = yoroiTransfer.transferKind === TransferKind.PAPER
       ? undefined
       : generateStandardPlate(
         yoroiTransfer.recoveryPhrase,
