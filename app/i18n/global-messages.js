@@ -32,6 +32,14 @@ const globalMessages = defineMessages({
     id: 'global.errors.invalidRepeatPassword',
     defaultMessage: '!!!Doesn\'t match.',
   },
+  errorLabel: {
+    id: 'global.labels.error',
+    defaultMessage: '!!!Error',
+  },
+  processingLabel: {
+    id: 'global.labels.processing',
+    defaultMessage: '!!!Processing...',
+  },
   nextButtonLabel: {
     id: 'global.labels.next',
     defaultMessage: '!!!Next',

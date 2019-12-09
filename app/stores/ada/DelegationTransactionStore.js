@@ -1,6 +1,7 @@
 // @flow
 
 import { observable, action, reaction, runInAction } from 'mobx';
+import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import environment from '../../environment';
@@ -21,7 +22,6 @@ import type {
   IGetAllUtxosResponse
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { PoolRequest } from '../../actions/ada/delegation-transaction-actions';
-import BigNumber from 'bignumber.js';
 import {
   filterAddressesByStakingKey,
   groupAddrContainsAccountKey,
