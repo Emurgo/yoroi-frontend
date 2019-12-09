@@ -389,6 +389,14 @@ const globalMessages = defineMessages({
     id: 'settings.paperWallet.dialog.createPaper.done',
     defaultMessage: '!!!All done!',
   },
+  dateToday: {
+    id: 'wallet.summary.page.todayLabel',
+    defaultMessage: '!!!Today',
+  },
+  dateYesterday: {
+    id: 'wallet.summary.page.yesterdayLabel',
+    defaultMessage: '!!!Yesterday',
+  }
 });
 export default globalMessages;
 

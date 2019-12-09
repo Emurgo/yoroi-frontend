@@ -1,0 +1,24 @@
+.component {
+  width: 674px;
+  height: 90px;
+  display: flex;
+  .iconBlock {
+    width: 48px;
+    background-color: aqua; // TODO delete
+  }
+  .textBlock {
+    .primary {
+      display: flex;
+      flex-direction: row;
+      .title {
+        background-color: chartreuse;   // TODO delete
+        width: 580px; 
+      }
+    }
+  }
+  .line {
+    height: 10px;
+    // opacity: 0.3;
+    background-color: #ADAEB6;
+  }
+}

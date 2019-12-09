@@ -22,6 +22,7 @@ export default class NoticeBoardPage extends Component<Props> {
     const { actions, stores } = this.props;
     const topbarContainer = (<TopBarContainer actions={actions} stores={stores} />);
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
+    const { noticeBoard } = stores;
 
     return (
       <MainLayout
@@ -30,7 +31,10 @@ export default class NoticeBoardPage extends Component<Props> {
         stores={stores}
         connectionErrorType={checkAdaServerStatus}
       >
-        <NoticeBoard />
+        <NoticeBoard
+          loadedNotices={noticeBoard.loadedNotices}
+          allLoaded={noticeBoard.allLoaded}
+        />
       </MainLayout>
     );
   }

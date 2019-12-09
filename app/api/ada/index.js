@@ -88,6 +88,7 @@ import {
 import type {
   LedgerSignTxPayload,
 } from '../../domain/HWSignTx';
+import Notice from '../../domain/Notice';
 import type { $CardanoSignTransaction } from 'trezor-connect/lib/types/cardano';
 import {
   createTrezorSignTxPayload,
@@ -273,6 +274,19 @@ export type RefreshPendingTransactionsResponse = Array<WalletTransaction>;
 export type RefreshPendingTransactionsFunc = (
   request: RefreshPendingTransactionsRequest
 ) => Promise<RefreshPendingTransactionsResponse>;
+
+// notices
+
+export type GetNoticesRequest = {|
+  skip: number,
+  limit: number,
+|};
+
+export type GetNoticesResponse = Array<Notice>;
+
+export type GetNoticesFunc = (
+  request: GetNoticesRequest
+) => Promise<GetNoticesResponse>;
 
 // createWallet
 
@@ -710,6 +724,24 @@ export default class AdaApi {
       return mappedTransactions;
     } catch (error) {
       Logger.error('AdaApi::refreshPendingTransactions error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  async getNotices(
+    request: GetNoticesRequest
+  ): Promise<GetNoticesResponse> {
+    Logger.debug('AdaApi::getNotices called: ' + stringifyData(request));
+    try {
+      return [
+        new Notice({ id: '1', kind: 0, date: new Date() }),
+        new Notice({ id: '2', kind: 1, date: new Date() }),
+        new Notice({ id: '3', kind: 2, date: new Date() }),
+        new Notice({ id: '4', kind: 3, date: new Date() }),
+        new Notice({ id: '5', kind: 4, date: new Date() }),
+      ];
+    } catch (error) {
+      Logger.error('AdaApi::getNotices error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }

@@ -1,12 +1,16 @@
 // @flow
-
-export const EmumNotice = Object.freeze({
-  reward_recieved: 'reward_recieved',
-  stake_pool_will_retire: 'stake_pool_will_retire',
-});
-export type NoticeType = $Values<typeof EmumNotice>;
+import type { CertificateKindType } from '@emurgo/js-chain-libs/js_chain_libs';
 
 export default class Notice {
   id: string = '';
-  type: NoticeType
+  kind: CertificateKindType;
+  date: Date
+
+  constructor(data: {
+    id: string,
+    kind: CertificateKindType,
+    date: Date,
+  }) {
+    Object.assign(this, data);
+  }
 }
