@@ -64,7 +64,7 @@ type Props = {|
   +poolHash: string,
   +amountToDelegate: BigNumber,
   +transactionFee: BigNumber,
-  +approximateReward: string,
+  +approximateReward: BigNumber,
   +isSubmitting: boolean,
   +onCancel: void => void,
   +onSubmit: ({| password: string |}) => void,
@@ -225,7 +225,9 @@ export default class DelegationTxDialog extends Component<Props> {
         </div>
         <div className={styles.headerBlock}>
           <p className={styles.header}>{intl.formatMessage(messages.approximateLabel)}</p>
-          <p className={styles.rewardAmount}>{this.props.approximateReward}</p>
+          <p className={styles.rewardAmount}>
+            {this.props.approximateReward.toFormat(DECIMAL_PLACES_IN_ADA)}
+          </p>
         </div>
         {this.props.error
           ? <p className={styles.error}>{intl.formatMessage(this.props.error)}</p>

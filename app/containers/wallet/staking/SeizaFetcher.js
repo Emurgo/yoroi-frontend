@@ -2,9 +2,10 @@
 
 import React, { Component } from 'react';
 import { action, observable } from 'mobx';
+import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import type { InjectedContainerProps } from '../../../types/injectedPropsType';
-import { defineMessages, intlShape, } from 'react-intl';
+import { intlShape, } from 'react-intl';
 import DelegationTxDialog from '../../../components/wallet/staking/DelegationTxDialog';
 import environment from '../../../environment';
 import { getShelleyTxFee } from '../../../api/ada/transactions/shelley/utils';
@@ -14,13 +15,11 @@ import ErrorBlock from '../../../components/widgets/ErrorBlock';
 import Dialog from '../../../components/widgets/Dialog';
 import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
 import globalMessages from '../../../i18n/global-messages';
+import InvalidURIImg from '../../../assets/images/uri/invalid-uri.inline.svg';
+import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
+import type { ConfigType } from '../../../../config/config-types';
 
-const messages = defineMessages({
-  txGeneration: {
-    id: 'wallet.delegation.transaction.generation',
-    defaultMessage: '!!!generating tx', // TODO
-  },
-});
+declare var CONFIG: ConfigType;
 
 type SelectedPool = {|
   +name: string,
@@ -38,6 +37,7 @@ export default class Staking extends Component<Props> {
   @observable selectedPools = [];
   iframe: ?HTMLElement;
 
+  @action
   messageHandler = (event: any) => {
     if (event.origin !== process.env.SEIZA_FOR_YOROI_URL) return;
     const pools: Array<SelectedPool> = JSON.parse(decodeURI(event.data));
@@ -90,6 +90,16 @@ export default class Staking extends Component<Props> {
       },
     ];
 
+    const approximateReward: BigNumber => BigNumber = (amount) => {
+      // TODO: based on https://staking.cardano.org/en/calculator/
+      // needs to be update per-network
+      const result = amount
+        .times(CONFIG.genesis.epoch_reward)
+        .div(LOVELACES_PER_ADA)
+        .div(100);
+      return result;
+    };
+
     return (
       <>
         {delegationTxStore.createDelegationTx.isExecuting &&
@@ -102,7 +112,7 @@ export default class Staking extends Component<Props> {
           >
             <AnnotatedLoader
               title={intl.formatMessage(globalMessages.processingLabel)}
-              details={intl.formatMessage(messages.txGeneration)}
+              details={intl.formatMessage(globalMessages.txGeneration)}
             />
           </Dialog>
         }
@@ -115,9 +125,12 @@ export default class Staking extends Component<Props> {
             closeButton={<DialogCloseButton onClose={this.cancel} />}
             actions={dialogBackButton}
           >
-            <ErrorBlock
-              error={delegationTxStore.createDelegationTx.error}
-            />
+            <>
+              <center><InvalidURIImg /></center>
+              <ErrorBlock
+                error={delegationTxStore.createDelegationTx.error}
+              />
+            </>
           </Dialog>
         }
         {delegationTx != null &&
@@ -127,7 +140,7 @@ export default class Staking extends Component<Props> {
             poolHash={this.selectedPools[0].poolHash}
             transactionFee={getShelleyTxFee(delegationTx.IOs, false)}
             amountToDelegate={delegationTxStore.amountToDelegate}
-            approximateReward="0.0" // TODO
+            approximateReward={approximateReward(delegationTxStore.amountToDelegate)}
             isSubmitting={
               delegationTxStore.signAndBroadcastDelegationTx.isExecuting
             }

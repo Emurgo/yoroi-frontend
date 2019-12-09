@@ -37,6 +37,12 @@ export type GenesisConfigType = {|
     coefficient: string,
     certificate: string,
   |},
+  /**
+   * Reward for a single epoch
+   * To avoid rounding errors, this should be an integer
+   * ex: 0.0000001 => 1
+   */
+  epoch_reward: number,
   genesisHash: string,
   block0_date: number,
   slots_per_epoch: number,

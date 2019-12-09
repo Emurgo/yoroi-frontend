@@ -423,6 +423,10 @@ const globalMessages = defineMessages({
     id: 'wallet.send.confirmationDialog.walletPasswordFieldPlaceholder',
     defaultMessage: '!!!Type your spending password',
   },
+  txGeneration: {
+    id: 'wallet.delegation.transaction.generation',
+    defaultMessage: '!!!Generating transaction',
+  },
 });
 export default globalMessages;
 

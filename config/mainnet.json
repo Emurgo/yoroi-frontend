@@ -5,9 +5,9 @@
     "websocketUrl": "wss://iohk-mainnet.yoroiwallet.com:443",
     "name": "mainnet"
   },
-  seiza: {
-    simple: "",
-    advance: ""
+  "seiza": {
+    "simple": "",
+    "advance": ""
   },
   "app": {
     "walletRefreshInterval": 20000,
@@ -21,6 +21,7 @@
     "block0_date": 0,
     "slots_per_epoch": 21600,
     "slot_duration": 20,
+    "epoch_reward": 21414,
     "linearFee": {
       "constant": "2",
       "coefficient": "1",
