@@ -137,8 +137,9 @@ export type RemoteTxBlockMeta = {|
   +slot: number,
 |};
 export type RemoteCertificate = {|
-  kind: CertificateKindType,
-  payload: string,
+  payloadKind: 'PoolRegistration' | 'PoolUpdate' | 'PoolRetirement' | 'StakeDelegation' | 'OwnerStakeDelegation',
+  payloadKindId: CertificateKindType,
+  payloadHex: string,
 |};
 export type RemoteTxInfo = {|
   +hash: string,

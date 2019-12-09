@@ -10,7 +10,11 @@ import LegacyExplanation from '../../../components/wallet/restore/LegacyExplanat
 import type { InjectedDialogContainerProps } from '../../../types/injectedPropsType';
 import environment from '../../../environment';
 import globalMessages from '../../../i18n/global-messages';
-import { CheckAdressesInUseApiError } from '../../../api/ada/errors';
+import {
+  CheckAdressesInUseApiError,
+  NoInputsError,
+} from '../../../api/ada/errors';
+import ErrorBlock from '../../../components/widgets/ErrorBlock';
 import type { RestoreModeType } from '../../../actions/ada/wallet-restore-actions';
 import { RestoreMode } from '../../../actions/ada/wallet-restore-actions';
 import { RestoreSteps } from '../../../stores/ada/WalletRestoreStore';
@@ -20,6 +24,7 @@ import YoroiTransferWaitingPage from '../../transfer/YoroiTransferWaitingPage';
 import SuccessPage from '../../../components/transfer/SuccessPage';
 import { TransferStatus, } from '../../../types/TransferTypes';
 import { formattedWalletAmount } from '../../../utils/formatters';
+import InvalidURIImg from '../../../assets/images/uri/invalid-uri.inline.svg';
 
 const messages = defineMessages({
   walletUpgradeNoop: {
@@ -174,13 +179,20 @@ export default class WalletRestoreDialogContainer
         const { yoroiTransfer } = this.props.stores.substores[environment.API];
         const content = this._transferDialogContent();
 
-        const completeButton = [
-          {
+        const getDoneButton = () => {
+          if (!(yoroiTransfer.error instanceof NoInputsError)) {
+            return [{
+              label: intl.formatMessage(globalMessages.cancel),
+              onClick: this.onCancel,
+              primary: true,
+            }];
+          }
+          return [{
             label: intl.formatMessage(globalMessages.continue),
             onClick: () => walletRestoreActions.startRestore.trigger(),
             primary: true,
-          },
-        ];
+          }];
+        };
         return (
           <Dialog
             styleOveride={{ '--theme-modal-min-max-width-cmn': '680px' }}
@@ -188,7 +200,7 @@ export default class WalletRestoreDialogContainer
             closeOnOverlayClick={false}
             classicTheme={profile.isClassicTheme}
             actions={yoroiTransfer.status === TransferStatus.ERROR
-              ? completeButton
+              ? getDoneButton()
               : undefined
             }
           >
@@ -235,6 +247,16 @@ export default class WalletRestoreDialogContainer
         />);
       }
       case TransferStatus.ERROR: {
+        if (!(yoroiTransfer.error instanceof NoInputsError)) {
+          return (
+            <>
+              <center><InvalidURIImg /></center>
+              <ErrorBlock
+                error={yoroiTransfer.error}
+              />
+            </>
+          );
+        }
         return (
           <SuccessPage
             title={intl.formatMessage(globalMessages.pdfGenDone)}
