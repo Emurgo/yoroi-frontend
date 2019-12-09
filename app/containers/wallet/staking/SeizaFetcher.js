@@ -2,10 +2,20 @@
 
 import React from 'react';
 import type { InjectedContainerProps } from '../../../types/injectedPropsType';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { defineMessages, intlShape, } from 'react-intl';
 import DelegationTxDialog from '../../../components/wallet/staking/DelegationTxDialog';
 import environment from '../../../environment';
 import { getShelleyTxFee } from '../../../api/ada/transactions/shelley/utils';
 import type { PoolRequest } from '../../../actions/ada/delegation-transaction-actions';
+import AnnotatedLoader from '../../../components/transfer/AnnotatedLoader';
+
+const messages = defineMessages({
+  txGeneration: {
+    id: 'wallet.delegation.transaction.generation',
+    defaultMessage: '!!!generating tx', // TODO
+  },
+});
 
 type SelectedPool = {|
   +name: string,
@@ -36,10 +46,13 @@ const useIframeMessageReceiver: ({|
   }, []);
 };
 
-const Staking = (props: {|
+const Staking = (
+  props: {|
     ...InjectedContainerProps,
     stakingUrl: string,
-|}) => {
+  |},
+  context: {| intl: $npm$ReactIntl$IntlFormat |},
+) => {
   const [selectedPools, setSelectedPools] = React.useState([]);
   React.useEffect(() => {
     props.actions.ada.delegationTransaction.reset.trigger();
@@ -65,10 +78,17 @@ const Staking = (props: {|
   if (stakingUrl == null) {
     throw new Error('Staking undefined SEIZA_FOR_YOROI_URL should never happen');
   }
+
   // TODO: some dialog component that loads when createDelegationTx is executing
   // screen also needs to be able to handle not enough ada error
   return (
     <>
+      {delegationTxStore.createDelegationTx.isExecuting &&
+        <AnnotatedLoader
+          title={context.intl.formatMessage(messages.txGeneration)}
+          details={context.intl.formatMessage(messages.txGeneration)}
+        />
+      }
       {delegationTx != null &&
         <DelegationTxDialog
           staleTx={delegationTxStore.isStale}
@@ -95,6 +115,10 @@ const Staking = (props: {|
       <iframe ref={iframeRef} title="Staking" src={`${stakingUrl}&locale=${profile.currentLocale}`} frameBorder="0" width="100%" height="100%" />
     </>
   );
+};
+
+Staking.contextTypes = {
+  intl: intlShape.isRequired,
 };
 
 export default Staking;
