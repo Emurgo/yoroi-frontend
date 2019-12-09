@@ -314,7 +314,7 @@
   "wallet.delegation.transaction.explanationLine3": "Puede cancelar su delegación en cualquier momento",
   "wallet.delegation.transaction.generation": "Generando la transacción",
   "wallet.delegation.transaction.stakePoolHash": "Stake pool hash",
-  "wallet.delegation.transaction.stakePoolName": "Stake pool name",
+  "wallet.delegation.transaction.stakePoolName": "Nombre de la Stake pool",
   "wallet.hw.common.error.101": "Los permisos necesarios no fueron concedidos por el usuario. Por favor, inténtalo de nuevo.",
   "wallet.hw.ledger.common.error.101": "Operación cancelada en el dispositivo Ledger.",
   "wallet.hw.ledger.common.error.102": "Operación cancelada por el usuario.",
