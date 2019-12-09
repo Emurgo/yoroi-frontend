@@ -452,7 +452,7 @@
   "yoroiTransfer.errorPage.title.label": "Не удалось перевести средства с другого кошелька",
   "yoroiTransfer.form.instructions.step0.text": "Введите фразу восстановления из 15 слов, используемую для резервного копирования другого Вашего кошелька, чтобы восстановить баланс и перевести все средства в этот кошелек.",
   "yoroiTransfer.form.instructions.step0Paper.text": "Введите фразу восстановления из 21-го слова, используемую для резервного копирования вашего бумажного кошелька Yoroi, и ваш пароль от него, чтобы восстановить баланс и перевести все средства.",
-  "yoroiTransfer.start.instructions.hardware": "Hardware wallet",
+  "yoroiTransfer.start.instructions.hardware": "Аппаратный кошелек",
   "yoroiTransfer.start.instructions.legacy-yoroiPaper": "Legacy Yoroi paper wallet",
   "yoroiTransfer.start.instructions.mnemonic-15": "мнемоническая фраза из 15 слов",
   "yoroiTransfer.start.instructions.mnemonic-legacy-15": "Legacy 15-word mnemonic",
