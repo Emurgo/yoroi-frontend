@@ -24,6 +24,7 @@ const CONFIG: ConfigType = {
     block0_date: 0,
     slots_per_epoch: 21600,
     slot_duration: 20,
+    epoch_reward: 21414,
     linearFee: {
       constant: '155381',
       coefficient: '1',

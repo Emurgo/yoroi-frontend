@@ -909,7 +909,7 @@ const Cip1852PickInternalMixin = (
       Buffer.from(stakingAddressDbRow.addr.Hash, 'hex')
     ).to_account_address();
     if (stakingAddr == null) {
-      throw new Error('pickInternal staking key invalid');
+      throw new Error(`${nameof(this.rawPickInternal)} staking key invalid`);
     }
     const stakingKey = Buffer.from(stakingAddr.get_account_key().as_bytes()).toString('hex');
     const ourGroupAddress = body.addrs

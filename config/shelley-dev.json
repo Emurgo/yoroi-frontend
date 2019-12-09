@@ -21,6 +21,7 @@
     "block0_date": 1575295549000,
     "slots_per_epoch": 5000,
     "slot_duration": 10,
+    "epoch_reward": 21414,
     "linearFee": {
       "constant": "10",
       "coefficient": "0",

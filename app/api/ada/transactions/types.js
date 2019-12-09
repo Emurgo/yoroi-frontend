@@ -59,6 +59,7 @@ export type BaseSignRequest<
   senderUtxos: Array<AddressedUtxo>,
   unsignedTx: T,
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
+  certificate: void | RustModule.WalletV3.Certificate,
 |};
 
 export type V3UnsignedTxUtxoResponse = {|
@@ -70,4 +71,5 @@ export type V3UnsignedTxAddressedUtxoResponse = {|
   senderUtxos: Array<AddressedUtxo>,
   IOs: RustModule.WalletV3.InputOutput,
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
+  certificate: void | RustModule.WalletV3.Certificate,
 |};

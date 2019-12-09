@@ -46,6 +46,7 @@ export default class AdaWalletsStore extends WalletStore {
     wallets.sendMoney.listen(this._sendMoney);
     wallets.restoreWallet.listen(this._restoreWallet);
     wallets.updateBalance.listen(this._updateBalance);
+    wallets.updateLastSync.listen(this._updateLastSync);
     router.goToRoute.listen(this._onRouteChange);
     walletBackup.finishWalletBackup.listen(this._finishCreation);
   }
@@ -62,7 +63,7 @@ export default class AdaWalletsStore extends WalletStore {
 
     const withSigning = (asGetSigningKey(publicDeriver.self));
     if (withSigning == null) {
-      throw new Error('_sendMoney public deriver missing signing functionality.');
+      throw new Error(`${nameof(this._sendMoney)} public deriver missing signing functionality.`);
     }
     await this.sendMoneyRequest.execute({
       publicDeriver: withSigning,

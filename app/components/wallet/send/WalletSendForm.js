@@ -49,10 +49,6 @@ const messages = defineMessages({
     id: 'wallet.send.form.receiver.hint',
     defaultMessage: '!!!Wallet Address',
   },
-  amountLabel: {
-    id: 'wallet.send.form.amount.label',
-    defaultMessage: '!!!Amount',
-  },
   equalsAdaHint: {
     id: 'wallet.send.form.amount.equalsAda',
     defaultMessage: '!!!equals {amount} ADA',
@@ -197,7 +193,7 @@ export default class WalletSendForm extends Component<Props> {
         }],
       },
       amount: {
-        label: this.context.intl.formatMessage(messages.amountLabel),
+        label: this.context.intl.formatMessage(globalMessages.walletSendConfirmationAmountLabel),
         placeholder: this.props.classicTheme ?
           `0.${'0'.repeat(this.props.currencyMaxFractionalDigits)}` : '',
         value: this.props.uriParams
@@ -297,7 +293,7 @@ export default class WalletSendForm extends Component<Props> {
             <NumericInput
               {...amountFieldProps}
               className="amount"
-              label={intl.formatMessage(messages.amountLabel)}
+              label={intl.formatMessage(globalMessages.walletSendConfirmationAmountLabel)}
               maxBeforeDot={currencyMaxIntegerDigits}
               maxAfterDot={currencyMaxFractionalDigits}
               disabled={this.props.shouldSendAll}

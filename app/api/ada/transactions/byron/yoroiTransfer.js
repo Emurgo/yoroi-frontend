@@ -55,6 +55,7 @@ export async function buildYoroiTransferTx(payload: {
         senderUtxos: unsignedTxResponse.senderUtxos,
         unsignedTx: unsignedTxResponse.txBuilder.make_transaction(),
         changeAddr: unsignedTxResponse.changeAddr,
+        certificate: undefined,
       },
       payload.keyLevel,
       v3SecretToV2(payload.signingKey)

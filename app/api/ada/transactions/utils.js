@@ -328,6 +328,7 @@ export function copySignRequest<
     return {
       changeAddr: signRequest.changeAddr,
       senderUtxos: signRequest.senderUtxos,
+      certificate: signRequest.certificate,
       unsignedTx: unsignedTx.clone(),
     };
   }

@@ -40,6 +40,7 @@ export type ExplorerType = $Values<typeof ShelleyExplorers> | $Values<typeof Byr
 export const Link = Object.freeze({
   address: 'address',
   transaction: 'transaction',
+  pool: 'pool',
 });
 export type LinkType = $Values<typeof Link>;
 
@@ -53,11 +54,13 @@ const seiza = environment.isShelley()
     // TODO: proper URL for Shelley
     address: 'https://seiza.com/blockchain/address/',
     transaction: 'https://seiza.com/blockchain/transaction/',
+    pool: 'https://seiza.com/blockchain/stakepool/',
   }
   : {
     name: 'Seiza',
     address: 'https://seiza.com/blockchain/address/',
     transaction: 'https://seiza.com/blockchain/transaction/',
+    pool: 'https://seiza.com/blockchain/stakepool/',
   };
 
 export const explorerInfo: {
@@ -89,8 +92,9 @@ export const explorerInfo: {
     : {
       jormungandr: {
         name: 'Jormungandr Explorer',
-        address: 'https://explorer.jormungandr-testnet.iohkdev.io/address/',
-        transaction: 'https://explorer.jormungandr-testnet.iohkdev.io/tx/',
+        address: 'https://explorer.nightly.jormungandr-testnet.iohkdev.io//address/',
+        transaction: 'https://explorer.nightly.jormungandr-testnet.iohkdev.io//tx/',
+        pool: 'https://explorer.nightly.jormungandr-testnet.iohkdev.io/pool/',
       },
     }
   )

@@ -32,6 +32,14 @@ const globalMessages = defineMessages({
     id: 'global.errors.invalidRepeatPassword',
     defaultMessage: '!!!Doesn\'t match.',
   },
+  errorLabel: {
+    id: 'global.labels.error',
+    defaultMessage: '!!!Error',
+  },
+  processingLabel: {
+    id: 'global.labels.processing',
+    defaultMessage: '!!!Processing...',
+  },
   nextButtonLabel: {
     id: 'global.labels.next',
     defaultMessage: '!!!Next',
@@ -63,6 +71,10 @@ const globalMessages = defineMessages({
   change: {
     id: 'global.labels.change',
     defaultMessage: '!!!Change',
+  },
+  delegateLabel: {
+    id: 'global.labels.delegate',
+    defaultMessage: '!!!Delegate',
   },
   create: {
     id: 'global.labels.create',
@@ -402,6 +414,22 @@ const globalMessages = defineMessages({
     defaultMessage: '',
     // eslint-disable-next-line max-len
     // defaultMessage: '!!!When you originally setup your hardware wallet, you were asked to write down a recovery phrase on a piece of paper. Entering this phrase will allow you to transfer your funds out of your hardware wallet and into the current wallet.',
+  },
+  sendButtonLabel: {
+    id: 'wallet.send.confirmationDialog.submit',
+    defaultMessage: '!!!Send',
+  },
+  walletPasswordLabel: {
+    id: 'wallet.send.confirmationDialog.walletPasswordLabel',
+    defaultMessage: '!!!Spending password',
+  },
+  walletPasswordFieldPlaceholder: {
+    id: 'wallet.send.confirmationDialog.walletPasswordFieldPlaceholder',
+    defaultMessage: '!!!Type your spending password',
+  },
+  txGeneration: {
+    id: 'wallet.delegation.transaction.generation',
+    defaultMessage: '!!!Generating transaction',
   },
 });
 export default globalMessages;
