@@ -452,7 +452,7 @@
   "yoroiTransfer.errorPage.title.label": "他のウォレットから送金できませんでした",
   "yoroiTransfer.form.instructions.step0.text": "他のウォレットの15単語の復元フレーズ入力してください。全残高がこちらのヨロイウォレットに転送されます。",
   "yoroiTransfer.form.instructions.step0Paper.text": "ヨロイペーパーウォレットの21単語からなる復元フレーズとペーパウォレットパスワードを入力し全残高を送金します",
-  "yoroiTransfer.start.instructions.hardware": "Hardware wallet",
+  "yoroiTransfer.start.instructions.hardware": "ハードウエアウォレット",
   "yoroiTransfer.start.instructions.legacy-yoroiPaper": "Legacy Yoroi paper wallet",
   "yoroiTransfer.start.instructions.mnemonic-15": "15単語のフレーズ",
   "yoroiTransfer.start.instructions.mnemonic-legacy-15": "Legacy 15-word mnemonic",
