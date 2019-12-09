@@ -44,9 +44,7 @@ export default class Staking extends Component<Props> {
 
     const delegationTxActions = this.props.actions[environment.API].delegationTransaction;
     delegationTxActions.createTransaction.trigger({
-      // TODO: fix pool ids from Seiza
-      id: '938d890d29f86128ec6864cfc6921d37f45cb3a477a348ef87b5c9b18c82a050',
-      // id: pools[0].poolHash,
+      id: pools[0].poolHash,
     });
     this.selectedPools = pools;
   }
