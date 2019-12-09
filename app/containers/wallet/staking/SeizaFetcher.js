@@ -9,14 +9,16 @@ import { intlShape, } from 'react-intl';
 import DelegationTxDialog from '../../../components/wallet/staking/DelegationTxDialog';
 import environment from '../../../environment';
 import { getShelleyTxFee } from '../../../api/ada/transactions/shelley/utils';
-import type { PoolRequest } from '../../../actions/ada/delegation-transaction-actions';
 import AnnotatedLoader from '../../../components/transfer/AnnotatedLoader';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
 import Dialog from '../../../components/widgets/Dialog';
 import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
 import globalMessages from '../../../i18n/global-messages';
 import InvalidURIImg from '../../../assets/images/uri/invalid-uri.inline.svg';
-import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
+import {
+  LOVELACES_PER_ADA,
+  EPOCH_REWARD_DENOMINATOR,
+} from '../../../config/numbersConfig';
 import type { ConfigType } from '../../../../config/config-types';
 
 declare var CONFIG: ConfigType;
@@ -93,10 +95,13 @@ export default class Staking extends Component<Props> {
     const approximateReward: BigNumber => BigNumber = (amount) => {
       // TODO: based on https://staking.cardano.org/en/calculator/
       // needs to be update per-network
-      const result = amount
+      const rewardMultiplier = (number) => number
         .times(CONFIG.genesis.epoch_reward)
-        .div(LOVELACES_PER_ADA)
+        .div(EPOCH_REWARD_DENOMINATOR)
         .div(100);
+
+      const result = rewardMultiplier(amount)
+        .div(LOVELACES_PER_ADA);
       return result;
     };
 

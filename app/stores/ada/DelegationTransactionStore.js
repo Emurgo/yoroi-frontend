@@ -46,9 +46,8 @@ export default class DelegationTransactionStore extends Store {
   _updateTxBuilderReaction = reaction(
     () => [
       this.stores.substores.ada.wallets.selected,
-      // last tx sync changed => utxo set may have changed
-      this.stores.substores.ada.wallets.selected &&
-        this.stores.substores.ada.wallets.selected.lastSyncInfo.SlotNum,
+      // num tx sync changed => valid inputs may have changed
+      this.stores.substores.ada.transactions.totalAvailable,
       // need to recalculate when there are no more pending transactions
       this.stores.substores.ada.transactions.hasAnyPending,
     ],

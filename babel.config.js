@@ -86,6 +86,17 @@ module.exports = function (api /*: ApiType */) {
             }
           }]
         ]
+      },
+      test: {
+        plugins: [
+          '@babel/plugin-transform-runtime',
+          ['module-resolver', {
+            alias: {
+              'cardano-wallet-browser': 'cardano-wallet',
+              '@emurgo/js-chain-libs': '@emurgo/js-chain-libs-node',
+            }
+          }]
+        ]
       }
     }
   };

@@ -1,9 +1,4 @@
 // @flow
-const { getMockServer } = require('../features/mock-chain/mockServer');
-const { resetChain } = require('../features/mock-chain/mockImporter');
-
-getMockServer({ outputLog: true });
-resetChain();
 
 const tasks = require('./tasks');
 
@@ -29,6 +24,23 @@ console.log('-'.repeat(80));
 console.log('If you\'re developing Inject page,');
 console.log('please allow `https://localhost:3000` connections in Google Chrome,');
 console.log('and load unpacked extensions with `./dev` folder. (see https://developer.chrome.com/extensions/getstarted#unpacked)\n');
+
+// mock backend script runus the same babel for compiling the server as for compiling the website
+// this is problematic because we need the nodejs version of the WASM bindings for the server
+// we hack it by just loading the nodejs versions here and swapping it into the variables
+const { RustModule } = require('../app/api/ada/lib/cardanoCrypto/rustLoader');
+const wasmv2 = require('cardano-wallet');
+const wasmv3 = require('@emurgo/js-chain-libs-node/js_chain_libs');
+
+RustModule._wasmv2 = wasmv2;
+// $FlowFixMe node type is incompatible with browser type but their API is the same so it's not an error
+RustModule._wasmv3 = wasmv3;
+
+const { getMockServer } = require('../features/mock-chain/mockServer');
+const { resetChain } = require('../features/mock-chain/mockImporter');
+
+getMockServer({ outputLog: true });
+resetChain();
 
 createWebpackServer(config.baseDevConfig(ENV), {
   host: 'localhost',

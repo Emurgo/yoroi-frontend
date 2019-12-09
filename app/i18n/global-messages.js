@@ -72,6 +72,10 @@ const globalMessages = defineMessages({
     id: 'global.labels.change',
     defaultMessage: '!!!Change',
   },
+  delegateLabel: {
+    id: 'global.labels.delegate',
+    defaultMessage: '!!!Delegate',
+  },
   create: {
     id: 'global.labels.create',
     defaultMessage: '!!!Create',

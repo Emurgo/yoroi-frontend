@@ -145,7 +145,7 @@ export default class DelegationTxDialog extends Component<Props> {
           : this.props.onCancel
       },
       {
-        label: intl.formatMessage(globalMessages.sendButtonLabel),
+        label: intl.formatMessage(globalMessages.delegateLabel),
         onClick: this.submit.bind(this),
         primary: true,
         className: confirmButtonClasses,
@@ -181,7 +181,7 @@ export default class DelegationTxDialog extends Component<Props> {
         </div>
         <div className={styles.headerBlock}>
           <p className={styles.header}>{intl.formatMessage(messages.stakePoolHash)}</p>
-          <p className={styles.content}>
+          <div className={styles.content}>
             <ExplorableHashContainer
               selectedExplorer={this.props.selectedExplorer}
               hash={this.props.poolHash}
@@ -193,7 +193,7 @@ export default class DelegationTxDialog extends Component<Props> {
                 {this.props.poolHash}
               </RawHash>
             </ExplorableHashContainer>
-          </p>
+          </div>
         </div>
 
         <div className={styles.amountInput}>
@@ -208,7 +208,11 @@ export default class DelegationTxDialog extends Component<Props> {
             fees={this.props.transactionFee.toFormat(DECIMAL_PLACES_IN_ADA)}
             // note: we purposely don't put "total" since it doesn't really make sense here
             // since the fee is unrelated to the amount you're about to stake
-            value={this.props.amountToDelegate.toFormat(DECIMAL_PLACES_IN_ADA)}
+            total=""
+            value={this.props.amountToDelegate
+              .shiftedBy(-DECIMAL_PLACES_IN_ADA)
+              .toFormat(DECIMAL_PLACES_IN_ADA)
+            }
             skin={AmountInputSkin}
             classicTheme={this.props.classicTheme}
           />
@@ -226,7 +230,8 @@ export default class DelegationTxDialog extends Component<Props> {
         <div className={styles.headerBlock}>
           <p className={styles.header}>{intl.formatMessage(messages.approximateLabel)}</p>
           <p className={styles.rewardAmount}>
-            {this.props.approximateReward.toFormat(DECIMAL_PLACES_IN_ADA)}
+            {this.props.approximateReward.toFormat(DECIMAL_PLACES_IN_ADA)}&nbsp;
+            {intl.formatMessage(globalMessages.unitAda).toUpperCase()}
           </p>
         </div>
         {this.props.error
