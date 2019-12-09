@@ -235,8 +235,9 @@ const txWithCert: void => Array<RemoteTransaction> = () => [{
   epoch: 10,
   slot: 3650,
   certificate: {
-    kind: RustModule.WalletV3.CertificateKind.StakeDelegation,
-    payload: 'd993c5b8ca62c78801d3228a8de6b9e18217b001820c24d60c1bcd91c895d58501312e3d449038372ba2fc3300cfedf1b152ae739201b3e5da47ab3f933a421b62',
+    payloadKind: 'StakeDelegation',
+    payloadKindId: RustModule.WalletV3.CertificateKind.StakeDelegation,
+    payloadHex: 'd993c5b8ca62c78801d3228a8de6b9e18217b001820c24d60c1bcd91c895d58501312e3d449038372ba2fc3300cfedf1b152ae739201b3e5da47ab3f933a421b62',
   },
   inputs: [
     {
@@ -302,8 +303,9 @@ const secondCertTx: ('Pending' | 'Successful') => RemoteTransaction = status => 
   epoch: status === 'Pending' ? null : 10,
   slot: status === 'Pending' ? null : 3651,
   certificate: {
-    kind: RustModule.WalletV3.CertificateKind.StakeDelegation,
-    payload: 'd993c5b8ca62c78801d3228a8de6b9e18217b001820c24d60c1bcd91c895d58501312e3d449038372ba2fc3300cfedf1b152ae739201b3e5da47ab3f933a421b62',
+    payloadKind: 'StakeDelegation',
+    payloadKindId: RustModule.WalletV3.CertificateKind.StakeDelegation,
+    payloadHex: 'd993c5b8ca62c78801d3228a8de6b9e18217b001820c24d60c1bcd91c895d58501312e3d449038372ba2fc3300cfedf1b152ae739201b3e5da47ab3f933a421b62',
   },
   inputs: [
     {

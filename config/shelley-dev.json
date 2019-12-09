@@ -1,8 +1,8 @@
 {
   "network": {
     "protocolMagic": 1097911063,
-    "backendUrl": "https://testnet-yoroi-backend.yoroiwallet.com",
-    "websocketUrl": "wss://testnet-yoroi-backend.yoroiwallet.com:443",
+    "backendUrl": "https://shelley-emurgo-yoroi-backend.yoroiwallet.com:443",
+    "websocketUrl": "wss://shelley-emurgo-yoroi-backend.yoroiwallet.com:443",
     "name": "shelley-dev"
   },
   "seiza": {
@@ -26,6 +26,6 @@
       "coefficient": "0",
       "certificate": "0"
     },
-    "genesisHash": "4d8b8ff16ce86f9436ac7c4b5ce454f3aaa3477c43b360c0646a258ab230b83e"
+    "genesisHash": "c511043dda377d7764d9f01d721ddea323f2a01b1e89f62c8ee587a65d7a1487"
   }
 }

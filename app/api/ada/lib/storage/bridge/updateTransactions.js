@@ -1216,11 +1216,11 @@ async function certificateToDb(
     return id;
   };
 
-  const kind = request.certificate.kind;
+  const kind = request.certificate.payloadKindId;
   switch (kind) {
     case RustModule.WalletV3.CertificateKind.StakeDelegation: {
       const cert = RustModule.WalletV3.StakeDelegation.from_bytes(
-        Buffer.from(request.certificate.payload, 'hex')
+        Buffer.from(request.certificate.payloadHex, 'hex')
       );
       const accountIdentifier = cert.account();
       // TODO: this could be a multi sig instead of a single account
@@ -1232,7 +1232,7 @@ async function certificateToDb(
       return (txId: number) => ({
         certificate: {
           Kind: kind,
-          Payload: request.certificate.payload,
+          Payload: request.certificate.payloadHex,
           TransactionId: txId,
         },
         relatedAddresses: (certId: number) => [{
@@ -1256,7 +1256,7 @@ async function certificateToDb(
       return (txId: number) => ({
         certificate: {
           Kind: kind,
-          Payload: request.certificate.payload,
+          Payload: request.certificate.payloadHex,
           TransactionId: txId,
         },
         relatedAddresses: (certId: number) => [{
@@ -1268,7 +1268,7 @@ async function certificateToDb(
     }
     case RustModule.WalletV3.CertificateKind.PoolRegistration: {
       const cert = RustModule.WalletV3.PoolRegistration.from_bytes(
-        Buffer.from(request.certificate.payload, 'hex')
+        Buffer.from(request.certificate.payloadHex, 'hex')
       );
       const accountIdentifier = cert.reward_account();
       const rewardAccountId = accountIdentifier == null
@@ -1278,7 +1278,7 @@ async function certificateToDb(
       return (txId: number) => ({
         certificate: {
           Kind: kind,
-          Payload: request.certificate.payload,
+          Payload: request.certificate.payloadHex,
           TransactionId: txId,
         },
         // TODO - can't know signer
@@ -1297,7 +1297,7 @@ async function certificateToDb(
       return (txId: number) => ({
         certificate: {
           Kind: kind,
-          Payload: request.certificate.payload,
+          Payload: request.certificate.payloadHex,
           TransactionId: txId,
         },
         // TODO - can't know signer
@@ -1308,7 +1308,7 @@ async function certificateToDb(
       return (txId: number) => ({
         certificate: {
           Kind: kind,
-          Payload: request.certificate.payload,
+          Payload: request.certificate.payloadHex,
           TransactionId: txId,
         },
         // TODO - can't know signer
