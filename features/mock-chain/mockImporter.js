@@ -139,7 +139,6 @@ export const generateTransction = () => {
         ),
         amount: '1000000'
       },
-      // many-tx-wallet
       {
         // Ae2tdPwUPEZ9uHfzhw3vXUrTFLowct5hMMHeNjfsrkQv5XSi5PhSs2yRNUb
         address: getSingleAddressString(
@@ -411,7 +410,7 @@ export const generateTransction = () => {
     ],
     outputs: [
       {
-        // Ae2tdPwUPEZEXbmLnQ22Rxhv8a6hQ3C2673nkGsXKAgzqnuC1vqne9EtBkK
+        // Ae2tdPwUPEZLcUx5AGMACPyLAuVXHisVyNBuiSk3Ru7qddYyn9ujDp1Ejwr
         address: getSingleAddressString(
           testWallets['many-tx-wallet'].mnemonic,
           [
@@ -419,7 +418,7 @@ export const generateTransction = () => {
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.EXTERNAL,
-            1
+            9
           ]
         ),
         amount: '1'
@@ -470,7 +469,6 @@ export const generateTransction = () => {
       }
     ],
     outputs: [
-      // many-tx-wallet external
       {
         // Ae2tdPwUPEZLcUx5AGMACPyLAuVXHisVyNBuiSk3Ru7qddYyn9ujDp1Ejwr
         address: getSingleAddressString(
@@ -531,7 +529,6 @@ export const generateTransction = () => {
       }
     ],
     outputs: [
-      // many-tx-wallet external
       {
         // Ae2tdPwUPEZLcUx5AGMACPyLAuVXHisVyNBuiSk3Ru7qddYyn9ujDp1Ejwr
         address: getSingleAddressString(
@@ -546,7 +543,6 @@ export const generateTransction = () => {
         ),
         amount: '1'
       },
-      // many-tx-wallet internal
       {
         // Ae2tdPwUPEZHG9AGUYWqFcM5zFn74qdEx2TqyZxuU68CQ33EBodWAVJ523w
         address: getSingleAddressString(
@@ -594,7 +590,6 @@ export const generateTransction = () => {
       }
     ],
     outputs: [
-      // many-tx-wallet external (index 30)
       {
         // Ae2tdPwUPEYzkKjrqPw1GHUty25Cj5fWrBVsWxiQYCxfoe2d9iLjTnt34Aj
         address: getSingleAddressString(
@@ -609,7 +604,6 @@ export const generateTransction = () => {
         ),
         amount: '1'
       },
-      // many-tx-wallet internal
       {
         // Ae2tdPwUPEZ7VKG9jy6jJTxQCWNXoMeL2Airvzjv3dc3WCLhSBA7XbSMhKd
         address: getSingleAddressString(
@@ -769,7 +763,6 @@ export const generateTransction = () => {
         ),
         amount: '1'
       },
-      // failed-single-tx internal
       {
         // Ae2tdPwUPEZCqWsJkibw8BK2SgbmJ1rRG142Ru1CjSnRvKwDWbL4UYPN3eU
         address: getSingleAddressString(
