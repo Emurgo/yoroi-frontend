@@ -20,7 +20,7 @@ import {
 } from '../../app/config/numbersConfig';
 import { testWallets } from './TestWallets';
 
-const isShelley = true;
+const isShelley = false;
 
 // based on abandon x 14 + share
 const genesisTransaction = '52929ce6f1ab83b439e65f6613bad9590bd264c0d6c4f910e36e2369bb987b35';
@@ -886,9 +886,11 @@ const utxoForAddresses = genUtxoForAddresses(
 );
 const utxoSumForAddresses = genUtxoSumForAddresses(utxoForAddresses);
 const sendTx = (request: SignedRequestInternal): SignedResponse => {
-  const remoteTx = toRemoteTx(transactions, request);
-  addTransaction(remoteTx);
-  return { txId: remoteTx.hash };
+  if (isShelley) {
+    const remoteTx = toRemoteTx(transactions, request);
+    addTransaction(remoteTx);
+  }
+  return { txId: '52929ce6f1ab83b439e65f6613bad9590bd264c0d6c4f910e36e2369bb987b31' };
 };
 
 export default {
