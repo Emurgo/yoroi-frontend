@@ -10,6 +10,7 @@ import type {
   FilterUsedRequest, FilterUsedResponse,
   ServerStatusRequest, ServerStatusResponse,
   SignedRequestInternal,
+  RemoteTransaction,
 } from './types';
 
 import type { IFetcher } from './IFetcher';
@@ -122,12 +123,18 @@ export class RemoteFetcher implements IFetcher {
         }
       }
     ).then(response => {
-      // TODO: remove this once we rename the field in the backend-service
-      return response.data.map(resp => {
+      return response.data.map((resp: RemoteTransaction) => {
+        for (const input of resp.inputs) {
+          // backend stores inputs as numbers but outputs as strings
+          // we solve this mismatch locally
+          input.amount = input.amount.toString();
+        }
         if (resp.height != null) {
           return resp;
         }
+        // $FlowFixMe remove this if we ever rename the field in the backend-service
         const height = resp.block_num;
+        // $FlowFixMe remove this if we ever rename the field in the backend-service
         delete resp.block_num;
         return {
           ...resp,
