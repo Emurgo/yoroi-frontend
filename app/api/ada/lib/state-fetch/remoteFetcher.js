@@ -8,7 +8,8 @@ import type {
   BestBlockRequest, BestBlockResponse,
   SignedRequest, SignedResponse,
   FilterUsedRequest, FilterUsedResponse,
-  ServerStatusRequest, ServerStatusResponse
+  ServerStatusRequest, ServerStatusResponse,
+  SignedRequestInternal,
 } from './types';
 
 import type { IFetcher } from './IFetcher';
@@ -159,9 +160,9 @@ export class RemoteFetcher implements IFetcher {
       `${backendUrl}/api/txs/signed`,
       {
         method: 'post',
-        data: {
+        data: ({
           signedTx: signedTx64
-        },
+        }: SignedRequestInternal),
         headers: {
           'yoroi-version': this.lastLaunchVersion(),
           'yoroi-locale': this.currentLocale()

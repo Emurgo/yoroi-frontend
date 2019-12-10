@@ -6,9 +6,10 @@ import type {
   UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
   BestBlockRequest, BestBlockResponse,
-  SignedRequest, SignedResponse,
+  SignedResponse,
   FilterUsedRequest, FilterUsedResponse,
-  ServerStatusResponse
+  ServerStatusResponse,
+  SignedRequestInternal,
 } from '../../app/api/ada/lib/state-fetch/types';
 import chai from 'chai';
 import mockImporter from './mockImporter';
@@ -31,22 +32,21 @@ function _validateAddressesReq(
 
 function _defaultSignedTransaction(
   req: {
-    body: SignedRequest
+    body: SignedRequestInternal
   },
   res: { send(arg: SignedResponse): any }
 ): void {
-  res.send({ txId: 'id' });
+  const response = mockImporter.sendTx(req.body);
+  res.send(response);
 }
 
 let MockServer = null;
-
-export const signedTransactionHandler = [];
 
 export function getMockServer(
   settings: {
     signedTransaction?: (
       req: {
-        body: SignedRequest
+        body: SignedRequestInternal
       },
       res: {
         send(arg: SignedResponse): any,
@@ -111,13 +111,11 @@ export function getMockServer(
 
     server.post('/api/txs/signed', (
       req: {
-        body: SignedRequest
+        body: SignedRequestInternal
       },
       res: { send(arg: SignedResponse): any, status: Function }
     ): void => {
-      if (signedTransactionHandler.length) {
-        signedTransactionHandler.pop()(req, res);
-      } else if (settings.signedTransaction) {
+      if (settings.signedTransaction) {
         settings.signedTransaction(req, res);
       } else {
         _defaultSignedTransaction(req, res);
