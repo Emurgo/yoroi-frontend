@@ -101,7 +101,9 @@ export default class LoadingStore extends Store {
         decodeURIComponent(this._originRoute.location),
         address => {
           const addressKind = tryAddressToKind(address, 'bech32');
-          const valid = addressKind != null && addressKind !== CoreAddressTypes.CARDANO_LEGACY;
+          const valid = environment.isShelley()
+            ? addressKind != null && addressKind !== CoreAddressTypes.CARDANO_LEGACY
+            : addressKind != null && addressKind === CoreAddressTypes.CARDANO_LEGACY;
           return Promise.resolve(valid);
         }
       );

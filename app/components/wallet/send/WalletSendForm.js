@@ -187,6 +187,9 @@ export default class WalletSendForm extends Component<Props> {
             return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
           const isValidLegacy = this.props.isValidLegacyAddress(receiverValue);
+          if (!environment.isShelley()) {
+            return [isValidLegacy, this.context.intl.formatMessage(messages.invalidAddress)];
+          }
           if (isValidLegacy) {
             return [false, this.context.intl.formatMessage(messages.cannotSendtoLegacy)];
           }
