@@ -1,14 +1,21 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
+import { intlShape, defineMessages } from 'react-intl';
 
 import environment from '../../environment';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import MainLayout from '../MainLayout';
-import TopBarContainer from '../TopBarContainer';
-
+import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
+import TopBar from '../../components/topbar/TopBar';
 import NoticeBoard from '../../components/notice-board/NoticeBoard';
+
+const messages = defineMessages({
+  title: {
+    id: 'noticeBoard.topbar.title',
+    defaultMessage: '!!!Notifications',
+  },
+});
 
 type Props = InjectedProps;
 
@@ -20,13 +27,25 @@ export default class NoticeBoardPage extends Component<Props> {
 
   render() {
     const { actions, stores } = this.props;
-    const topbarContainer = (<TopBarContainer actions={actions} stores={stores} />);
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
-    const { noticeBoard } = stores;
+    const { noticeBoard, topbar } = stores;
 
+    const topbarTitle = (
+      <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
+    );
+    const topbarComp = (
+      <TopBar
+        title={topbarTitle}
+        onCategoryClicked={category => {
+          actions.topbar.activateTopbarCategory.trigger({ category });
+        }}
+        isActiveCategory={topbar.isActiveCategory}
+        categories={topbar.categories}
+      />
+    );
     return (
       <MainLayout
-        topbar={topbarContainer}
+        topbar={topbarComp}
         actions={actions}
         stores={stores}
         connectionErrorType={checkAdaServerStatus}
