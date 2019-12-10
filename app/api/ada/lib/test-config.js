@@ -30,7 +30,7 @@ const CONFIG: ConfigType = {
       coefficient: '1',
       certificate: '4'
     },
-    genesisHash: 'c511043dda377d7764d9f01d721ddea323f2a01b1e89f62c8ee587a65d7a1487',
+    genesisHash: 'adbdd5ede31637f6c9bad5c271eec0bc3d0cb9efb86a5b913bb55cba549d0770',
   }
 };
 
