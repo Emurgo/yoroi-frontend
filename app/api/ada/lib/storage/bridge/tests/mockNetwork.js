@@ -8,7 +8,9 @@ import type {
   BestBlockRequest, BestBlockResponse, BestBlockFunc,
   AddressUtxoRequest, AddressUtxoResponse, AddressUtxoFunc,
   UtxoSumRequest, UtxoSumResponse, UtxoSumFunc,
-  RemoteTransaction, RemoteUnspentOutput
+  RemoteTransaction, RemoteUnspentOutput,
+  SignedRequestInternal, RemoteCertificate,
+  RemoteTransactionInput, RemoteTransactionOutput,
 } from '../../../state-fetch/types';
 import { RollbackApiError, } from '../../../../errors';
 import { addressToKind, groupToSingle, } from '../utils';
@@ -358,4 +360,145 @@ function derivePath(
     currKey = currKey.derive(path[i]);
   }
   return currKey;
+}
+
+function getCertificate(
+  certificate: RustModule.WalletV3.Certificate | void
+): void | RemoteCertificate {
+  if (certificate == null) return certificate;
+
+  const toStruct = (kindEnum: $PropertyType<RemoteCertificate, 'payloadKind'>) => ({
+    payloadKind: kindEnum,
+    payloadKindId: RustModule.WalletV3.CertificateKind.StakeDelegation,
+    payloadHex: Buffer.from(certificate.as_bytes()).toString('hex')
+  });
+  switch (certificate.get_type()) {
+    case RustModule.WalletV3.CertificateKind.PoolRegistration:
+      return toStruct('PoolRegistration');
+    case RustModule.WalletV3.CertificateKind.PoolUpdate:
+      return toStruct('PoolUpdate');
+    case RustModule.WalletV3.CertificateKind.PoolRetirement:
+      return toStruct('PoolRetirement');
+    case RustModule.WalletV3.CertificateKind.StakeDelegation:
+      return toStruct('StakeDelegation');
+    case RustModule.WalletV3.CertificateKind.OwnerStakeDelegation:
+      return toStruct('OwnerStakeDelegation');
+    default: throw new Error(`${nameof(getCertificate)} unexpected kind ${certificate.get_type()}`);
+  }
+}
+
+function getInputs(
+  blockchain: Array<RemoteTransaction>,
+  inputs: RustModule.WalletV3.Inputs
+): Array<RemoteTransactionInput> {
+  const result: Array<RemoteTransactionInput> = [];
+  for (let i = 0; i < inputs.size(); i++) {
+    const input = inputs.get(i);
+    if (input.is_utxo()) {
+      const pointer = input.get_utxo_pointer();
+
+      const hash = Buffer.from(pointer.fragment_id().as_bytes()).toString('hex');
+      const index = pointer.output_index();
+
+      const pointedTx = blockchain.find(tx => tx.hash === hash);
+      if (pointedTx == null) {
+        throw new Error(`${nameof(getInputs)} no tx found ${hash}`);
+      }
+      const pointedOutput = pointedTx.outputs[index];
+      const addressKind = addressToKind(pointedOutput.address);
+      if (addressKind === CoreAddressTypes.CARDANO_LEGACY) {
+        result.push({
+          address: pointedOutput.address,
+          amount: pointedOutput.amount,
+          id: hash + index,
+          index,
+          txHash: hash,
+        });
+      } else {
+        result.push({
+          type: 'utxo',
+          address: pointedOutput.address,
+          amount: pointedOutput.amount,
+          id: hash + index,
+          index,
+          txHash: hash,
+        });
+      }
+      continue;
+    }
+    if (input.is_account()) {
+      const account = input.get_account_identifier();
+      // TODO: multisig
+      const accountAddr = account
+        .to_account_single()
+        .to_address(RustModule.WalletV3.AddressDiscrimination.Production);
+      const addressHex = Buffer.from(accountAddr.as_bytes()).toString('hex');
+
+      // TODO: should calculate this from witness
+      let nextSpendingCounter = 0;
+      for (const txInBlock of blockchain) {
+        for (const inputOfBlock of txInBlock.inputs) {
+          if (inputOfBlock.type === 'account' && inputOfBlock.address === addressHex) {
+            const counter = inputOfBlock.spendingCounter;
+            if (counter > nextSpendingCounter) {
+              nextSpendingCounter = counter + 1;
+            }
+          }
+        }
+      }
+      result.push({
+        type: 'account',
+        address: addressHex,
+        amount: input.value().to_str(),
+        id: addressHex + nextSpendingCounter.toString(),
+        spendingCounter: nextSpendingCounter,
+      });
+      continue;
+    }
+    throw new Error(`${nameof(getInputs)} unexpected input type ${input.get_type()}`);
+  }
+  return result;
+}
+function getOutputs(
+  blockchain: Array<RemoteTransaction>,
+  outputs: RustModule.WalletV3.Outputs
+): Array<RemoteTransactionOutput> {
+  const result = [];
+  for (let i = 0; i < outputs.size(); i++) {
+    const output = outputs.get(i);
+    result.push({
+      address: Buffer.from(output.address().as_bytes()).toString('hex'),
+      amount: output.value().to_str(),
+    });
+  }
+  return result;
+}
+
+export function toRemoteTx(
+  blockchain: Array<RemoteTransaction>,
+  request: SignedRequestInternal,
+): RemoteTransaction {
+  const fragment = RustModule.WalletV3.Fragment
+    .from_bytes(Buffer.from(request.signedTx, 'base64'));
+  const hash = Buffer.from(fragment.id().as_bytes()).toString('hex');
+  const transaction = fragment.get_transaction();
+
+  const base = {
+    hash,
+    last_update: new Date().toString(),
+    tx_state: 'Pending',
+    inputs: getInputs(blockchain, transaction.inputs()),
+    outputs: getOutputs(blockchain, transaction.outputs()),
+    certificate: getCertificate(transaction.certificate()),
+  };
+
+  return {
+    ...base,
+    height: null,
+    block_hash: null,
+    tx_ordinal: null,
+    time: null,
+    epoch: null,
+    slot: null,
+  };
 }
