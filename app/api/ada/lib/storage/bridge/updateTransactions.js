@@ -166,7 +166,9 @@ export async function rawGetUtxoTransactions(
   {
     const allAddressIds = txsWithIOs.flatMap(txWithIO => [
       ...txWithIO.utxoInputs.map(input => input.AddressId),
-      ...txWithIO.utxoOutputs.map(output => output.AddressId)
+      ...txWithIO.utxoOutputs.map(output => output.AddressId),
+      ...txWithIO.accountingInputs.map(input => input.AddressId),
+      ...txWithIO.accountingOutputs.map(output => output.AddressId),
     ]);
     const addressRows = await GetAddress.getById(
       db, dbTx,

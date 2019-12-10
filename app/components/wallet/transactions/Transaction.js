@@ -21,6 +21,7 @@ import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashC
 import type { ExplorerType } from '../../../domain/Explorer';
 import { TxStatusCodes, } from '../../../api/ada/lib/storage/database/primitives/enums';
 import type { TxStatusCodesType, } from '../../../api/ada/lib/storage/database/primitives/enums';
+import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
 
 const messages = defineMessages({
   type: {
@@ -304,12 +305,12 @@ export default class Transaction extends Component<Props, State> {
                 <ExplorableHashContainer
                   key={`${data.id}-from-${address}`}
                   selectedExplorer={this.props.selectedExplorer}
-                  hash={address}
+                  hash={addressToDisplayString(address)}
                   light
                   linkType="address"
                 >
                   <RawHash light>
-                    {address}<br />
+                    {addressToDisplayString(address)}<br />
                   </RawHash>
                 </ExplorableHashContainer>
               ))}
@@ -321,12 +322,12 @@ export default class Transaction extends Component<Props, State> {
                   // eslint-disable-next-line react/no-array-index-key
                   key={`${data.id}-to-${address}-${addressIndex}`}
                   selectedExplorer={this.props.selectedExplorer}
-                  hash={address}
+                  hash={addressToDisplayString(address)}
                   light
                   linkType="address"
                 >
                   <RawHash light>
-                    {address}<br />
+                    {addressToDisplayString(address)}<br />
                   </RawHash>
                 </ExplorableHashContainer>
               ))}
