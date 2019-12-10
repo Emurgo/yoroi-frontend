@@ -10,7 +10,6 @@ import {
   setup,
   mockDate,
   filterDbSnapshot,
-  getSingleAddressString,
   ABANDON_SHARE,
   TX_TEST_MNEMONIC_1,
 } from './common';
@@ -25,6 +24,7 @@ import {
   genCheckAddressesInUse,
   genGetTransactionsHistoryForAddresses,
   genGetBestBlock,
+  getSingleAddressString,
 } from './mockNetwork';
 import { loadLovefieldDB } from '../../database/index';
 

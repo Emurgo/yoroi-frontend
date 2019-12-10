@@ -710,7 +710,7 @@ export default class AdaApi {
 
       const lastSyncInfo = await request.publicDeriver.getLastSyncInfo();
       const mappedTransactions = fetchedTxs.txs.map(tx => {
-        return WalletTransaction.fromAnnotatedUtxoTx({
+        return WalletTransaction.fromAnnotatedTx({
           tx,
           addressLookupMap: fetchedTxs.addressLookupMap,
           lastBlockNumber: lastSyncInfo.SlotNum,
@@ -738,7 +738,7 @@ export default class AdaApi {
 
       const lastSyncInfo = await request.publicDeriver.getLastSyncInfo();
       const mappedTransactions = fetchedTxs.txs.map(tx => {
-        return WalletTransaction.fromAnnotatedUtxoTx({
+        return WalletTransaction.fromAnnotatedTx({
           tx,
           addressLookupMap: fetchedTxs.addressLookupMap,
           lastBlockNumber: lastSyncInfo.SlotNum,
