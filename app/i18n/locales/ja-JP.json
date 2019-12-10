@@ -47,7 +47,7 @@
   "daedalusTransfer.instructions.attention.paper.button.label": "ダイダロス ペーパーウォレット",
   "daedalusTransfer.instructions.attention.text": "ヨロイウォレットとダイダロスウォレットは、それぞれ異なる鍵導出スキームおよび異なるアドレス形式を使用しています。このため現時点では、ダイダロスウォレットの資金を直接ヨロイにインポートすることはできず、ヨロイウォレットの作成後にダイダロスから資金を送金する必要があります (ダイダロスウォレットとヨロイウォレットは、送金される資金については完全な互換性を有しています)。<br><br>ダイダロスをインストールしていない場合、または立ち上げることができない場合、12単語から成る復元フレーズ (または27単語から成るペーパーウォレット) を使用してダイダロスからヨロイウォレットに残高を送金する事ができます。",
   "daedalusTransfer.instructions.attention.title": "資金を全て送金します：",
-  "daedalusTransfer.legacy.title": "Transfer funds from legacy Daedalus",
+  "daedalusTransfer.legacy.title": "従来のダイダロスウォレットから送金",
   "daedalusTransfer.title": "ダイダロスから送金",
   "daedalusTransfer.waiting.checkingAddresses.generatingTx": "送金トランザクションを生成しています",
   "daedalusTransfer.waiting.progressInfo.checkingAddresses": "アドレスファンドを確認中",
