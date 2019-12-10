@@ -5,8 +5,20 @@ import { CoreAddressTypes } from '../database/primitives/enums';
 import { Bech32Prefix } from '../../../../../config/stringConfig';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 
+export function tryAddressToKind(
+  address: string,
+  parseAs: 'bech32' | 'bytes',
+): void | CoreAddressT {
+  try {
+    return addressToKind(address, parseAs);
+  } catch (_e) {
+    return undefined;
+  }
+}
+
 export function addressToKind(
-  address: string
+  address: string,
+  parseAs: 'bech32' | 'bytes',
 ): CoreAddressT {
   try {
     // Need to try parsing as a legacy address first
@@ -15,9 +27,10 @@ export function addressToKind(
     return CoreAddressTypes.CARDANO_LEGACY;
   } catch (_e1) {
     try {
-      const wasmAddr = RustModule.WalletV3.Address.from_bytes(
-        Buffer.from(address, 'hex')
-      );
+      const wasmAddr = parseAs === 'bytes'
+        ? RustModule.WalletV3.Address.from_bytes(Buffer.from(address, 'hex'))
+        : RustModule.WalletV3.Address.from_string(address);
+
       switch (wasmAddr.get_kind()) {
         case RustModule.WalletV3.AddressKind.Single: return CoreAddressTypes.SHELLEY_SINGLE;
         case RustModule.WalletV3.AddressKind.Group: return CoreAddressTypes.SHELLEY_GROUP;
@@ -48,27 +61,6 @@ export function groupToSingle(
   const asString = Buffer.from(singleWasm.as_bytes()).toString('hex');
 
   return asString;
-}
-
-export function verifyAddress(
-  address: string,
-  isShelley: boolean,
-): boolean {
-  if (isShelley) {
-    try {
-      RustModule.WalletV3.Address.from_string(address);
-      return true;
-    } catch (_e2) {
-      return false;
-    }
-  } else {
-    try {
-      RustModule.WalletV2.Address.from_base58(address);
-      return true;
-    } catch (_e1) {
-      return false;
-    }
-  }
 }
 
 export function addressToDisplayString(

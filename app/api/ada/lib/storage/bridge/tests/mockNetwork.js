@@ -56,7 +56,7 @@ function ourAddressesInTx(
   ];
   const addressesUsed = new Set();
   for (const addr of addresses) {
-    const kind = addressToKind(addr);
+    const kind = addressToKind(addr, 'bytes');
     const payload = kind === CoreAddressTypes.SHELLEY_GROUP
       ? groupToSingle(addr)
       : addr;
@@ -207,7 +207,7 @@ export function genUtxoForAddresses(
       for (let j = 0; j < tx.outputs.length; j++) {
         const address = tx.outputs[j].address;
         if (ourAddressSet.has(address)) {
-          const kind = addressToKind(address);
+          const kind = addressToKind(address, 'bytes');
           if (
             kind !== CoreAddressTypes.CARDANO_LEGACY &&
             kind !== CoreAddressTypes.SHELLEY_SINGLE &&
