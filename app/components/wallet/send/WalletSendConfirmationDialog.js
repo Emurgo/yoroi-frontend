@@ -19,6 +19,7 @@ import config from '../../../config';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../../widgets/hashWrappers/RawHash';
 import type { ExplorerType } from '../../../domain/Explorer';
+import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
 
 import WarningBox from '../../widgets/WarningBox';
 
@@ -151,13 +152,13 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
               <ExplorableHashContainer
                 key={receiver + i} // eslint-disable-line react/no-array-index-key
                 selectedExplorer={this.props.selectedExplorer}
-                hash={receiver}
+                hash={addressToDisplayString(receiver)}
                 light
                 linkType="address"
               >
                 <RawHash light>
                   <span className={styles.addressTo}>
-                    {receiver}
+                    {addressToDisplayString(receiver)}
                   </span>
                 </RawHash>
               </ExplorableHashContainer>

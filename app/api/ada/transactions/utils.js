@@ -273,19 +273,13 @@ export function ITotalInput(
   shift: boolean
 ): BigNumber {
   const unsignedTx = signRequest.unsignedTx;
-  if (unsignedTx instanceof RustModule.WalletV2.Transaction) {
-    return signRequestTotalInput(
-      {
-        ...signRequest,
-        unsignedTx,
-      },
-      shift,
-    );
-  }
-  if (unsignedTx instanceof RustModule.WalletV3.InputOutput) {
-    return getTxInputTotal(unsignedTx, shift);
-  }
-  throw new Error('ITotalInput Unimplemented');
+  return signRequestTotalInput(
+    {
+      ...signRequest,
+      unsignedTx,
+    },
+    shift,
+  );
 }
 
 export function IReceivers(

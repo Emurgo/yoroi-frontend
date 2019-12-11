@@ -5,8 +5,20 @@ import { CoreAddressTypes } from '../database/primitives/enums';
 import { Bech32Prefix } from '../../../../../config/stringConfig';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 
+export function tryAddressToKind(
+  address: string,
+  parseAs: 'bech32' | 'bytes',
+): void | CoreAddressT {
+  try {
+    return addressToKind(address, parseAs);
+  } catch (_e) {
+    return undefined;
+  }
+}
+
 export function addressToKind(
-  address: string
+  address: string,
+  parseAs: 'bech32' | 'bytes',
 ): CoreAddressT {
   try {
     // Need to try parsing as a legacy address first
@@ -15,15 +27,16 @@ export function addressToKind(
     return CoreAddressTypes.CARDANO_LEGACY;
   } catch (e1) {
     try {
-      const wasmAddr = RustModule.WalletV3.Address.from_bytes(
-        Buffer.from(address, 'hex')
-      );
+      const wasmAddr = parseAs === 'bytes'
+        ? RustModule.WalletV3.Address.from_bytes(Buffer.from(address, 'hex'))
+        : RustModule.WalletV3.Address.from_string(address);
+
       switch (wasmAddr.get_kind()) {
         case RustModule.WalletV3.AddressKind.Single: return CoreAddressTypes.SHELLEY_SINGLE;
         case RustModule.WalletV3.AddressKind.Group: return CoreAddressTypes.SHELLEY_GROUP;
         case RustModule.WalletV3.AddressKind.Account: return CoreAddressTypes.SHELLEY_ACCOUNT;
         case RustModule.WalletV3.AddressKind.Multisig: return CoreAddressTypes.SHELLEY_MULTISIG;
-        default: throw new Error('addressToKind unknown address type ' + address);
+        default: throw new Error(`${nameof(addressToKind)} unknown address type ` + address);
       }
     } catch (e2) {
       throw new Error(`${nameof(addressToKind)} failed to parse address type ${e1} ${e2} ${address}`);
@@ -50,27 +63,6 @@ export function groupToSingle(
   return asString;
 }
 
-export function verifyAddress(
-  address: string,
-  isShelley: boolean,
-): boolean {
-  if (isShelley) {
-    try {
-      RustModule.WalletV3.Address.from_string(address);
-      return true;
-    } catch (_e2) {
-      return false;
-    }
-  } else {
-    try {
-      RustModule.WalletV2.Address.from_base58(address);
-      return true;
-    } catch (_e1) {
-      return false;
-    }
-  }
-}
-
 export function addressToDisplayString(
   address: string
 ): string {
@@ -86,7 +78,7 @@ export function addressToDisplayString(
       );
       return wasmAddr.to_string(Bech32Prefix.ADDRESS);
     } catch (_e2) {
-      throw new Error('addressToKind failed to parse address type ' + address);
+      throw new Error(`${nameof(addressToDisplayString)} failed to parse address type ` + address);
     }
   }
 }

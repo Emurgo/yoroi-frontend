@@ -158,7 +158,6 @@ import { RustModule } from './lib/cardanoCrypto/rustLoader';
 import { clear } from './lib/storage/database/index';
 import environment from '../../environment';
 import { Cip1852Wallet } from './lib/storage/models/Cip1852Wallet/wrapper';
-import { verifyAddress } from './lib/storage/bridge/utils';
 
 declare var CONFIG : ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;
@@ -435,16 +434,6 @@ export type SaveSelectedExplorerResponse = void;
 export type SaveSelectedExplorerFunc = (
   request: SaveSelectedExplorerRequest
 ) => Promise<SaveSelectedExplorerResponse>;
-
-// isValidAddress
-
-export type IsValidAddressRequest = {
-  address: string
-};
-export type IsValidAddressResponse = boolean;
-export type IsValidAddressFunc = (
-  request: IsValidAddressRequest
-) => Promise<IsValidAddressResponse>;
 
 // isValidMnemonic
 
@@ -1149,20 +1138,6 @@ export default class AdaApi {
     } catch (error) {
       Logger.error('AdaApi::saveSelectedExplorer error: ' + stringifyError(error));
       throw new GenericApiError();
-    }
-  }
-
-  isValidAddress(
-    request: IsValidAddressRequest
-  ): Promise<IsValidAddressResponse> {
-    try {
-      return Promise.resolve(verifyAddress(request.address, environment.isShelley()));
-    } catch (validateAddressError) {
-      Logger.error('AdaApi::isValidAdaAddress error: ' +
-        stringifyError(validateAddressError));
-
-      // If for some reason an is uncaught probably the address is not valid
-      return Promise.resolve(false);
     }
   }
 

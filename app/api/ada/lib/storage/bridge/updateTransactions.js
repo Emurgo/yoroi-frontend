@@ -1034,7 +1034,7 @@ async function networkTxToDbTx(
         }
         for (let i = 0; i < networkTx.outputs.length; i++) {
           const output = networkTx.outputs[i];
-          const txType = addressToKind(output.address);
+          const txType = addressToKind(output.address, 'bytes');
           // consider a group address as a UTXO output
           // since the payment (UTXO) key is the one that signs
           if (

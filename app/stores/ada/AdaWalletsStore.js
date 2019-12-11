@@ -87,10 +87,6 @@ export default class AdaWalletsStore extends WalletStore {
 
   // =================== VALIDITY CHECK ==================== //
 
-  isValidAddress: string => Promise<boolean> = (
-    address: string
-  ): Promise<boolean> => this.api.ada.isValidAddress({ address });
-
   isValidMnemonic: {|
     mnemonic: string,
     numberOfWords: number,

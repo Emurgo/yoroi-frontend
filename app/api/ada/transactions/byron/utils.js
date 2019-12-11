@@ -37,7 +37,7 @@ export function signRequestFee(
 }
 
 export function signRequestTotalInput(
-  signRequest: BaseSignRequest<RustModule.WalletV2.Transaction>,
+  signRequest: BaseSignRequest<any>,
   shift: boolean
 ): BigNumber {
   const inputTotal = signRequest.senderUtxos
