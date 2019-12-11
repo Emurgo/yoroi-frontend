@@ -186,19 +186,23 @@ export default class WalletSendForm extends Component<Props> {
             this.props.updateReceiver();
             return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
+          const updateReceiver = (isValid) => {
+            if (isValid) {
+              this.props.updateReceiver(receiverValue);
+            } else {
+              this.props.updateReceiver();
+            }
+          };
           const isValidLegacy = this.props.isValidLegacyAddress(receiverValue);
           if (!environment.isShelley()) {
+            updateReceiver(isValidLegacy);
             return [isValidLegacy, this.context.intl.formatMessage(messages.invalidAddress)];
           }
           if (isValidLegacy) {
             return [false, this.context.intl.formatMessage(messages.cannotSendtoLegacy)];
           }
           const isValidShelley = this.props.isValidShelleyAddress(receiverValue);
-          if (isValidShelley) {
-            this.props.updateReceiver(receiverValue);
-          } else {
-            this.props.updateReceiver();
-          }
+          updateReceiver(isValidShelley);
           return [isValidShelley, this.context.intl.formatMessage(messages.invalidAddress)];
         }],
       },
