@@ -380,6 +380,7 @@
   "wallet.send.confirmationDialog.walletPasswordLabel": "Kata sandi pengeluaran",
   "wallet.send.form.amount.equalsAda": "sama dengan {amount} ADA",
   "wallet.send.form.calculatingFee": "Menghitung biaya...",
+  "wallet.send.form.cannotSendToLegacy": "You cannot send to legacy addresses (any address created before November 29th, 2019)",
   "wallet.send.form.description.hint": "Anda bisa menambahkan pesan jika Anda menginginkan nya",
   "wallet.send.form.description.label": "Deskripsi",
   "wallet.send.form.errors.invalidAddress": "Harap masukkan address yang benar.",
