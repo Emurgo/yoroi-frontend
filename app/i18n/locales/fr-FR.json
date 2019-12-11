@@ -380,6 +380,7 @@
   "wallet.send.confirmationDialog.walletPasswordLabel": "Mot de passe de paiement",
   "wallet.send.form.amount.equalsAda": "équivaut à {amount} ADA",
   "wallet.send.form.calculatingFee": "Calcul des frais de transaction...",
+  "wallet.send.form.cannotSendToLegacy": "You cannot send to legacy addresses (any address created before November 29th, 2019)",
   "wallet.send.form.description.hint": "Vous pouvez ajouter un message si vous le souhaitez",
   "wallet.send.form.description.label": "Description",
   "wallet.send.form.errors.invalidAddress": "Veuillez entrer une adresse valide.",
