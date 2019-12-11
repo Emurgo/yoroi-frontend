@@ -380,6 +380,7 @@
   "wallet.send.confirmationDialog.walletPasswordLabel": "支付密码",
   "wallet.send.form.amount.equalsAda": "等于 {amount} ADA",
   "wallet.send.form.calculatingFee": "正在计算手续费...",
+  "wallet.send.form.cannotSendToLegacy": "You cannot send to legacy addresses (any address created before November 29th, 2019)",
   "wallet.send.form.description.hint": "如果愿意，您可以添加一条消息",
   "wallet.send.form.description.label": "描述",
   "wallet.send.form.errors.invalidAddress": "请输入有效地址。",
