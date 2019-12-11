@@ -405,7 +405,7 @@ function getInputs(
         throw new Error(`${nameof(getInputs)} no tx found ${hash}`);
       }
       const pointedOutput = pointedTx.outputs[index];
-      const addressKind = addressToKind(pointedOutput.address);
+      const addressKind = addressToKind(pointedOutput.address, 'bytes');
       if (addressKind === CoreAddressTypes.CARDANO_LEGACY) {
         result.push({
           address: pointedOutput.address,

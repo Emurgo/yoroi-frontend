@@ -36,7 +36,7 @@ export function addressToKind(
         case RustModule.WalletV3.AddressKind.Group: return CoreAddressTypes.SHELLEY_GROUP;
         case RustModule.WalletV3.AddressKind.Account: return CoreAddressTypes.SHELLEY_ACCOUNT;
         case RustModule.WalletV3.AddressKind.Multisig: return CoreAddressTypes.SHELLEY_MULTISIG;
-        default: throw new Error('addressToKind unknown address type ' + address);
+        default: throw new Error(`${nameof(addressToKind)} unknown address type ` + address);
       }
     } catch (e2) {
       throw new Error(`${nameof(addressToKind)} failed to parse address type ${e1} ${e2} ${address}`);
@@ -78,7 +78,7 @@ export function addressToDisplayString(
       );
       return wasmAddr.to_string(Bech32Prefix.ADDRESS);
     } catch (_e2) {
-      throw new Error('addressToKind failed to parse address type ' + address);
+      throw new Error(`${nameof(addressToDisplayString)} failed to parse address type ` + address);
     }
   }
 }
