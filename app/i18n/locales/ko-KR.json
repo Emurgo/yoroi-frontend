@@ -380,6 +380,7 @@
   "wallet.send.confirmationDialog.walletPasswordLabel": "지출 암호",
   "wallet.send.form.amount.equalsAda": "= {amount} ADA",
   "wallet.send.form.calculatingFee": "수수료 계산 중...",
+  "wallet.send.form.cannotSendToLegacy": "You cannot send to legacy addresses (any address created before November 29th, 2019)",
   "wallet.send.form.description.hint": "원하는 메시지를 추가할 수 있습니다",
   "wallet.send.form.description.label": "설명",
   "wallet.send.form.errors.invalidAddress": "정확한 주소를 입력하십시오.",
