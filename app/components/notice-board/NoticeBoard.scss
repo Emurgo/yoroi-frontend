@@ -1,6 +1,16 @@
 .component {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 36px;
+  .group {
+    margin-bottom: 30px;
+    .groupDate {
+      font-family: var(--font-regular);
+      font-size: 16px;
+      line-height: 21px;
+      color: var(--theme-main-body-messages-color);
+    }
+  }
 }

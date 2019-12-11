@@ -22,6 +22,13 @@ type Props = {|
 
 const DATE_FORMAT = 'YYYY-MM-DD';
 
+type NoticesByDate = {|
+  +strDate: string,
+  +isToday: boolean,
+  +isYesterday: boolean,
+  +notices: Array<Notice>
+|};
+
 export default class NoticeBoard extends Component<Props> {
   static contextTypes = { intl: intlShape.isRequired };
   localizedDateFormat: string = 'MM/DD/YYYY';
@@ -34,37 +41,41 @@ export default class NoticeBoard extends Component<Props> {
     // Japanese - YYYY/MM/DD
   }
 
-  groupNoticesByDay(notices: Array<Notice>): Array<{date: string, notices: Array<Notice>}> {
-    const groups: Array<{
-      date: string,
-      notices: Array<Notice>
-    }> = [];
+  groupNoticesByDay(notices: Array<Notice>): Array<NoticesByDate> {
+    const groups: Array<NoticesByDate> = [];
 
     for (const notice of notices) {
-      const date: string = moment(notice.date).format(DATE_FORMAT);
+      const strDate: string = moment(notice.date).format(DATE_FORMAT);
       // find the group this notice belongs in
-      let group = groups.find((g) => g.date === date);
+      let group = groups.find((g) => g.strDate === strDate);
       // if first notice in this group, create the group
       if (!group) {
-        group = { date, notices: [] };
+        group = { strDate, notices: [] };
         groups.push(group);
       }
       group.notices.push(notice);
     }
+
+    for (const group of groups) {
+      const today = moment().format(DATE_FORMAT);
+      group.isToday = (group.strDate === today);
+
+      const yesterday = moment().subtract(1, 'days').format(DATE_FORMAT);
+      group.isYesterday = (group.strDate === yesterday);
+    }
+
     return groups.sort(
       (a, b) => b.notices[0].date.getTime() - a.notices[0].date.getTime()
     );
   }
 
-  localizedDate(date: string) {
+  localizedDate(noticesByDate: NoticesByDate) {
     const { intl } = this.context;
-    const today = moment().format(DATE_FORMAT);
-    if (date === today) return intl.formatMessage(globalMessages.dateToday);
+    if (noticesByDate.isToday) return intl.formatMessage(globalMessages.dateToday);
 
-    const yesterday = moment().subtract(1, 'days').format(DATE_FORMAT);
-    if (date === yesterday) return intl.formatMessage(globalMessages.dateYesterday);
+    if (noticesByDate.isYesterday) return intl.formatMessage(globalMessages.dateYesterday);
 
-    return moment(date).format(this.localizedDateFormat);
+    return moment(noticesByDate.strDate).format(this.localizedDateFormat);
   }
 
   render() {
@@ -74,13 +85,14 @@ export default class NoticeBoard extends Component<Props> {
     return (
       <div className={styles.component}>
         {noticeGroup.map(group => (
-          <div className={styles.group} key={group.date}>
-            <div className={styles.groupDate}>{this.localizedDate(group.date)}</div>
-            <div className={styles.list}>
+          <div className={styles.group} key={group.strDate}>
+            <div className={styles.groupDate}>{this.localizedDate(group)}</div>
+            <div>
               {group.notices.map((notice) => (
                 <NoticeBlock
-                  key={`${group.date}-${notice.id}-${notice.kind}`}
+                  key={`${group.strDate}-${notice.id}-${notice.kind}`}
                   notice={notice}
+                  isToday={group.isToday}
                 />
               ))}
             </div>

@@ -1,33 +1,44 @@
 .component {
+  font-family: var(--font-regular);  
+  margin-top: 24px;
   display: flex;
   flex-direction: column;
   .wrap {
-    height: 90px;
+    margin-bottom: 24px;
     display: flex;
     .iconBlock {
       width: 48px;
-      background-color: aqua; // TODO delete
+      margin-right: 16px;
     }
-    .textBlock {
-      .primary {
+    .infoBlock {
+      .firstRow {
         display: flex;
         flex-direction: row;
+        height: 22px;
         .title {
-          background-color: chartreuse;   // TODO delete
           width: 474px;
+          font-size: 18px;
+          font-weight: 500;
+          color: var(--cmn-default-color-grey);
         }
         .date {
           width: 200px;
           display: flex;
           justify-content: flex-end;
-
+          font-size: 12px;
+          color: var(--cmn-default-color-grey-3);
         }
+      }
+      .secondRow {
+        margin-top: 5px;
+        font-size: 14px;
+        color: var(--cmn-default-color-grey);
       }
     }
   }
   .line {
     height: 1px;
     opacity: 0.3;
-    background-color: #ADAEB6; // TODO delete
+    background-color: var(--cmn-default-color-grey-3);
   }
 }

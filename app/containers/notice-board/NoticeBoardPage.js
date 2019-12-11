@@ -13,7 +13,7 @@ import NoticeBoard from '../../components/notice-board/NoticeBoard';
 const messages = defineMessages({
   title: {
     id: 'noticeBoard.topbar.title',
-    defaultMessage: '!!!Notifications',
+    defaultMessage: '!!!Notification',
   },
 });
 
