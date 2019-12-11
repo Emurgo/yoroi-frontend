@@ -380,7 +380,7 @@
   "wallet.send.confirmationDialog.walletPasswordLabel": "Password di spesa",
   "wallet.send.form.amount.equalsAda": "equivalente {importo} ADA",
   "wallet.send.form.calculatingFee": "Calcolo della commissione...",
-  "wallet.send.form.cannotSendToLegacy": "You cannot send to legacy addresses (any address created before November 29th, 2019)",
+  "wallet.send.form.cannotSendToLegacy": "Non è possibile inviare a indirizzi legacy (qualsiasi indirizzo creato prima del 29 novembre 2019)",
   "wallet.send.form.description.hint": "Se vuoi puoi aggiungere un messaggio",
   "wallet.send.form.description.label": "Descrizione",
   "wallet.send.form.errors.invalidAddress": "Si prega di inserire un indirizzo valido.",
