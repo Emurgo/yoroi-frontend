@@ -240,6 +240,7 @@ const YoroiModern = {
 
   '--theme-button-outlined-background-color': '#15d1aa',
   '--theme-button-outlined-background-color-hover': 'rgba(23, 226, 184, 0.1)',
+  '--theme-button-outlined-border-color': '#3154CB',
   '--theme-button-outlined-border-color-hover': 'rgb(23, 226, 184)',
   '--theme-button-outlined-background-color-active': '#12b190',
   '--theme-button-outlined-background-color-disabled': '#c9ede5',
@@ -421,6 +422,42 @@ const YoroiModern = {
   '--theme-warning-box-bg-color': 'rgba(255, 19, 81, 0.06)', // #FF1351
 
   '--theme-warning-color': `#FF1351`,
+
+  // Dashboard
+  '--theme-dashboard-page-background-color': '#F9FBFF',
+  '--theme-dashboard-link-color': '#ADAEB6',
+  '--theme-dashboard-text-color': '#38393D',
+  '--theme-dashboard-label-color': '#676970',
+  '--theme-dashboard-label-underline-color': 'rgba(135, 145, 173, 0.8)',
+  '--theme-dashboard-card-shadow-color': 'rgba(65, 37, 150, 0.07)',
+  '--theme-dashboard-card-border-color': 'rgba(77, 32, 192, 0.08)',
+  '--theme-dashboard-card-vertical-separator-color': '#E6E6E6',
+  '--theme-dashboard-tooltip-background-color': 'rgba(56, 57, 61, 0.75)',
+  '--theme-dashboard-tooltip-text-color': '#FFFFFF',
+  '--theme-dashboard-stakepool-head-background-color': '#F4F6FC',
+  '--theme-dashboard-epoch-time-background': '#F0F3F5',
+  '--theme-dashboard-percentage-epoch-base': '#B7C3ED',
+  '--theme-dashboard-percentage-epoch-circle': '#3154CB',
+  '--theme-dashboard-percentage-stake-base': '#FFEDF2',
+  '--theme-dashboard-percentage-stake-circle': '#FF1755',
+  '--theme-dashboard-graph-tab-color': '#ADAEB6',
+  '--theme-dashboard-graph-active-tab-color': '#3D60CD',
+  '--theme-dashboard-graph-radio-color': '#93979C',
+  '--theme-dashboard-graph-active-radio-color': '#17D1AA',
+  '--theme-dashboard-graph-axis-tick-color': '#ADAEB6',
+  '--theme-dashboard-graph-axis-text-color': '#38393D',
+  '--theme-dashboard-graph-legend-text-color': '#676970',
+  '--theme-dashboard-graph-legend-icon-size': 12,
+  '--theme-dashboard-graph-bar-hover-background-color': '#D9DDE0',
+  '--theme-dashboard-graph-bar-primary-color': '#6D80FF',
+  '--theme-dashboard-graph-bar-secondary-color': '#1A44B7',
+  '--theme-dashboard-graph-bar-width': 16,
+  '--theme-dashboard-graph-font-size': 12,
+  '--theme-dashboard-graph-line-height': 14,
+  '--theme-dashboard-graph-tooltip-font-size': '11px',
+  '--theme-dashboard-graph-tooltip-line-height': '14px',
+  '--theme-dashboard-graph-tooltip-text-color': '#FFFFFF',
+  '--theme-dashboard-graph-tooltip-background': 'rgba(56, 57, 61, 0.7)',
 };
 
 // *************************************************************
@@ -449,6 +486,7 @@ if (environment.isShelley()) {
     // Button Outline
     '--theme-button-outlined-text-color': '#3154CB',
     '--theme-button-outlined-border-color-hover': '#3154CB',
+    '--theme-button-outlined-background-color': '#FFFFFF',
     '--theme-button-outlined-background-color-hover': 'rgba(49, 84, 203, 0.15)',
     '--theme-button-outlined-background-color-active': '#3154CB',
     '--theme-button-outlined-active-text-color': '#ffffff',

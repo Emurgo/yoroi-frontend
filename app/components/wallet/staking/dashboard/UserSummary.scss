@@ -1,0 +1,29 @@
+.wrapper {
+    display: flex;
+    height: 100%;
+}
+
+.column {
+    padding: 20px 24px;
+    flex: 1;
+    border-right: 1px solid var(--theme-dashboard-card-vertical-separator-color);
+}
+
+.icon {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 11px;
+}
+
+.label {
+    color: var(--theme-dashboard-label-color);
+    font-size: 14px;
+    line-height: 22px;
+    margin-bottom: 1px;
+}
+
+.value {
+    font-family: var(--font-medium);
+    font-size: 18px;
+    line-height: 22px;
+}

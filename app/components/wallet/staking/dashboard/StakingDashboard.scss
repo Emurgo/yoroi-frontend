@@ -1,0 +1,43 @@
+.page {
+  background-color: var(--theme-dashboard-page-background-color);
+  padding: 12px 16px 26px 16px;
+  font-family: var(--font-regular);
+  color: var(--theme-dashboard-text-color);
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.contentWrap {
+  max-width: 1178px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.rewards {
+  min-width: 420px;
+  align-self: flex-end;
+}
+
+.statsWrapper {
+  margin-bottom: 25px;
+  margin-top: 4px;
+  display: flex;
+}
+
+.summary {
+  flex: 1;
+  margin-left: 32px;
+}
+
+.bodyWrapper {
+  display: flex;
+}
+
+.graphsWrapper {
+  flex: 1;
+  margin-right: 30px;
+}
