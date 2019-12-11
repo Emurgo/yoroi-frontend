@@ -55,6 +55,9 @@ export type BestBlockFunc = (body: BestBlockRequest) => Promise<BestBlockRespons
 
 // sendTx
 
+export type SignedRequestInternal = {|
+  signedTx: string,
+|};
 export type SignedRequest = {|
   id: string,
   encodedTx: Uint8Array,

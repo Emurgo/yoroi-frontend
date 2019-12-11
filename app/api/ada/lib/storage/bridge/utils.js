@@ -25,7 +25,7 @@ export function addressToKind(
     // Since parsing as bech32 directly may give a wrong result if the address contains a 1
     RustModule.WalletV2.Address.from_base58(address);
     return CoreAddressTypes.CARDANO_LEGACY;
-  } catch (_e1) {
+  } catch (e1) {
     try {
       const wasmAddr = parseAs === 'bytes'
         ? RustModule.WalletV3.Address.from_bytes(Buffer.from(address, 'hex'))
@@ -38,8 +38,8 @@ export function addressToKind(
         case RustModule.WalletV3.AddressKind.Multisig: return CoreAddressTypes.SHELLEY_MULTISIG;
         default: throw new Error('addressToKind unknown address type ' + address);
       }
-    } catch (_e2) {
-      throw new Error('addressToKind failed to parse address type ' + address);
+    } catch (e2) {
+      throw new Error(`${nameof(addressToKind)} failed to parse address type ${e1} ${e2} ${address}`);
     }
   }
 }

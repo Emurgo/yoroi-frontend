@@ -1,7 +1,7 @@
 // @flow
 
 import cryptoRandomString from 'crypto-random-string';
-import type { RemoteTransaction } from '../../app/api/ada/lib/state-fetch/types';
+import type { SignedRequestInternal, SignedResponse, RemoteTransaction } from '../../app/api/ada/lib/state-fetch/types';
 import {
   genGetTransactionsHistoryForAddresses,
   genGetBestBlock,
@@ -10,6 +10,7 @@ import {
   genUtxoSumForAddresses,
   getAddressForType,
   getSingleAddressString,
+  toRemoteTx,
 } from '../../app/api/ada/lib/storage/bridge/tests/mockNetwork';
 import {
   HARD_DERIVATION_START,
@@ -354,7 +355,7 @@ export const generateTransction = () => {
         address: getSingleAddressString(
           testWallets['many-tx-wallet'].mnemonic,
           [
-            WalletTypePurpose.BIP44,
+            isShelley ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44,
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.EXTERNAL,
@@ -368,7 +369,7 @@ export const generateTransction = () => {
         address: getSingleAddressString(
           testWallets['many-tx-wallet'].mnemonic,
           [
-            WalletTypePurpose.BIP44,
+            isShelley ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44,
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.INTERNAL,
@@ -414,7 +415,7 @@ export const generateTransction = () => {
         address: getSingleAddressString(
           testWallets['many-tx-wallet'].mnemonic,
           [
-            WalletTypePurpose.BIP44,
+            isShelley ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44,
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.EXTERNAL,
@@ -428,7 +429,7 @@ export const generateTransction = () => {
         address: getSingleAddressString(
           testWallets['many-tx-wallet'].mnemonic,
           [
-            WalletTypePurpose.BIP44,
+            isShelley ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44,
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.INTERNAL,
@@ -474,7 +475,7 @@ export const generateTransction = () => {
         address: getSingleAddressString(
           testWallets['many-tx-wallet'].mnemonic,
           [
-            WalletTypePurpose.BIP44,
+            isShelley ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44,
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.EXTERNAL,
@@ -488,7 +489,7 @@ export const generateTransction = () => {
         address: getSingleAddressString(
           testWallets['many-tx-wallet'].mnemonic,
           [
-            WalletTypePurpose.BIP44,
+            isShelley ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44,
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.INTERNAL,
@@ -534,7 +535,7 @@ export const generateTransction = () => {
         address: getSingleAddressString(
           testWallets['many-tx-wallet'].mnemonic,
           [
-            WalletTypePurpose.BIP44,
+            isShelley ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44,
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.EXTERNAL,
@@ -548,7 +549,7 @@ export const generateTransction = () => {
         address: getSingleAddressString(
           testWallets['many-tx-wallet'].mnemonic,
           [
-            WalletTypePurpose.BIP44,
+            isShelley ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44,
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.INTERNAL,
@@ -576,7 +577,7 @@ export const generateTransction = () => {
         address: getSingleAddressString(
           testWallets['many-tx-wallet'].mnemonic,
           [
-            WalletTypePurpose.BIP44,
+            isShelley ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44,
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.INTERNAL,
@@ -595,7 +596,7 @@ export const generateTransction = () => {
         address: getSingleAddressString(
           testWallets['many-tx-wallet'].mnemonic,
           [
-            WalletTypePurpose.BIP44,
+            isShelley ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44,
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.EXTERNAL,
@@ -609,7 +610,7 @@ export const generateTransction = () => {
         address: getSingleAddressString(
           testWallets['many-tx-wallet'].mnemonic,
           [
-            WalletTypePurpose.BIP44,
+            isShelley ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44,
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.INTERNAL,
@@ -637,7 +638,7 @@ export const generateTransction = () => {
         address: getSingleAddressString(
           testWallets['many-tx-wallet'].mnemonic,
           [
-            WalletTypePurpose.BIP44,
+            isShelley ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44,
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.INTERNAL,
@@ -656,7 +657,7 @@ export const generateTransction = () => {
         address: getSingleAddressString(
           testWallets['dump-wallet'].mnemonic,
           [
-            WalletTypePurpose.BIP44,
+            isShelley ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44,
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.EXTERNAL,
@@ -684,7 +685,7 @@ export const generateTransction = () => {
         address: getSingleAddressString(
           testWallets['many-tx-wallet'].mnemonic,
           [
-            WalletTypePurpose.BIP44,
+            isShelley ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44,
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.INTERNAL,
@@ -703,7 +704,7 @@ export const generateTransction = () => {
         address: getSingleAddressString(
           testWallets['dump-wallet'].mnemonic,
           [
-            WalletTypePurpose.BIP44,
+            isShelley ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44,
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.EXTERNAL,
@@ -754,7 +755,7 @@ export const generateTransction = () => {
         address: getSingleAddressString(
           testWallets['dump-wallet'].mnemonic,
           [
-            WalletTypePurpose.BIP44,
+            isShelley ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44,
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.EXTERNAL,
@@ -768,7 +769,7 @@ export const generateTransction = () => {
         address: getSingleAddressString(
           testWallets['failed-single-tx'].mnemonic,
           [
-            WalletTypePurpose.BIP44,
+            isShelley ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44,
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.INTERNAL,
@@ -884,6 +885,13 @@ const utxoForAddresses = genUtxoForAddresses(
   getBestBlock,
 );
 const utxoSumForAddresses = genUtxoSumForAddresses(utxoForAddresses);
+const sendTx = (request: SignedRequestInternal): SignedResponse => {
+  if (isShelley) {
+    const remoteTx = toRemoteTx(transactions, request);
+    addTransaction(remoteTx);
+  }
+  return { txId: '52929ce6f1ab83b439e65f6613bad9590bd264c0d6c4f910e36e2369bb987b31' };
+};
 
 export default {
   utxoForAddresses,
@@ -892,4 +900,5 @@ export default {
   getApiStatus,
   history,
   getBestBlock,
+  sendTx,
 };

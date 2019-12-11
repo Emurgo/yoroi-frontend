@@ -265,6 +265,12 @@ export default class WalletRestoreDialogContainer
           />
         );
       }
+      case TransferStatus.SUCCESS: {
+        return null;
+      }
+      case TransferStatus.UNINITIALIZED: {
+        return null;
+      }
       default: throw new Error(`${nameof(WalletRestoreDialogContainer)} tx status ${yoroiTransfer.status}`);
     }
   }
