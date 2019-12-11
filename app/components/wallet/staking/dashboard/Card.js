@@ -10,6 +10,12 @@ type Props = {|
 |};
 
 export default class Card extends Component<Props> {
+
+  static defaultProps = {
+    children: undefined,
+    title: undefined,
+  };
+
   render() {
     const { title, children } = this.props;
     return (

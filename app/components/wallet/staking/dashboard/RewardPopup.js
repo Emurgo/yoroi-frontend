@@ -40,6 +40,8 @@ export default class RewardPopup extends Component<Props> {
     const { intl } = this.context;
     const { currentText, followingText } = this.props;
 
+    // TODO: real link
+    const learnMoreLink = '#';
     return (
       <div>
         <Card>
@@ -58,7 +60,9 @@ export default class RewardPopup extends Component<Props> {
         </Card>
         <p className={styles.note}>
           {intl.formatMessage(messages.note)}{' '}
-          <a href="#" className={styles.link}>{intl.formatMessage(messages.learnMore)}</a>
+          <a href={learnMoreLink} className={styles.link}>
+            {intl.formatMessage(messages.learnMore)}
+          </a>
         </p>
       </div>
     );
