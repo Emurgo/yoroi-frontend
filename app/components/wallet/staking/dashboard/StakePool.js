@@ -8,6 +8,7 @@ import Card from './Card';
 import ProgressCircle from './ProgressCircle';
 import Address from './Address';
 import styles from './StakePool.scss';
+import globalMessages from '../../../../i18n/global-messages';
 
 const messages = defineMessages({
   title: {
@@ -30,10 +31,6 @@ const messages = defineMessages({
     id: 'wallet.dashboard.stakePool.fullness',
     defaultMessage: '!!!Fullness',
   },
-  margins: {
-    id: 'wallet.dashboard.stakePool.margins',
-    defaultMessage: '!!!Margins',
-  },
   created: {
     id: 'wallet.dashboard.stakePool.created',
     defaultMessage: '!!!Created',
@@ -49,10 +46,6 @@ const messages = defineMessages({
   pledge: {
     id: 'wallet.dashboard.stakePool.pledge',
     defaultMessage: '!!!Pledge',
-  },
-  rewards: {
-    id: 'wallet.dashboard.stakePool.rewards',
-    defaultMessage: '!!!Rewards',
   },
   age: {
     id: 'wallet.dashboard.stakePool.age',
@@ -84,39 +77,39 @@ export default class StakePool extends Component<Props> {
 
     const tableData = [
       {
-        labelKey: 'performance',
+        label: intl.formatMessage(messages.performance),
         value: data.percentage + ' %',
       },
       {
-        labelKey: 'fullness',
+        label: intl.formatMessage(messages.fullness),
         value: data.fullness + ' %',
       },
       {
-        labelKey: 'margins',
+        label: intl.formatMessage(globalMessages.marginsLabel),
         value: data.margins + ' %',
       },
       {
-        labelKey: 'created',
+        label: intl.formatMessage(messages.created),
         value: data.created,
       },
       {
-        labelKey: 'cost',
+        label: intl.formatMessage(messages.cost),
         value: data.cost + ' ADA',
       },
       {
-        labelKey: 'stake',
+        label: intl.formatMessage(messages.stake),
         value: data.stake + ' ADA',
       },
       {
-        labelKey: 'pledge',
+        label: intl.formatMessage(messages.pledge),
         value: data.pledge + ' ADA',
       },
       {
-        labelKey: 'rewards',
+        label: intl.formatMessage(globalMessages.rewardsLabel),
         value: data.rewards + ' ADA',
       },
       {
-        labelKey: 'age',
+        label: intl.formatMessage(messages.age),
         value: data.age + ' Epochs',
       },
     ];
@@ -139,9 +132,9 @@ export default class StakePool extends Component<Props> {
           <ul className={styles.data}>
             {tableData.map((v) => {
               return (
-                <li className={styles.row} key={v.labelKey}>
+                <li className={styles.row} key={v.label}>
                   <span className={styles.label}>
-                    {intl.formatMessage(messages[v.labelKey])}:
+                    {v.label}:
                   </span>
                   {v.value}
                 </li>

@@ -8,6 +8,7 @@ import Card from './Card';
 import Tooltip from './Tooltip';
 import ProgressCircle from './ProgressCircle';
 import styles from './EpochProgress.scss';
+import globalMessages from '../../../../i18n/global-messages';
 
 const messages = defineMessages({
   title: {
@@ -17,10 +18,6 @@ const messages = defineMessages({
   tooltip: {
     id: 'wallet.dashboard.epochTooltip',
     defaultMessage: '!!!Note: only to receive the first reward will take longer then 1 epoch, after you will receive rewards every next epoch.'
-  },
-  currentTitle: {
-    id: 'wallet.dashboard.epochCurrentTitle',
-    defaultMessage: '!!!Epoch',
   },
   endTitle: {
     id: 'wallet.dashboard.epochEndTitle',
@@ -57,7 +54,7 @@ export default class EpochProgress extends Component<Props> {
           <div className={styles.stats}>
             <div>
               <p className={classnames(styles.label, styles.dashed)}>
-                {intl.formatMessage(messages.currentTitle)}:
+                {intl.formatMessage(globalMessages.epochLabel)}:
               </p>
               <p className={styles.value}>{currentEpoch}</p>
             </div>

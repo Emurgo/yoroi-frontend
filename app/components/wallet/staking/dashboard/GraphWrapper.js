@@ -7,16 +7,21 @@ import { defineMessages, intlShape } from 'react-intl';
 
 import styles from './GraphWrapper.scss';
 import Card from './Card';
+import globalMessages from '../../../../i18n/global-messages';
 
 const messages = defineMessages({
-  tooltipTotalAda: {
-    id: 'wallet.dashboard.graph.tooltip.totalAda',
-    defaultMessage: '!!!Epoch',
-  },
   tooltipEpoch: {
     id: 'wallet.dashboard.graph.tooltip.epoch',
     defaultMessage: '!!!Total ADA Sent',
   },
+  epochAxisLabel: {
+    id: 'wallet.dashboard.graph.epochAxisLabel',
+    defaultMessage: '!!!Epoch (5 days)',
+  },
+  dayToggleLabel: {
+    id: 'wallet.dashboard.graph.dayToggleLabel',
+    defaultMessage: '!!!Day (UTC)',
+  }
 });
 
 const GraphTabs = ({ tabs }) => {
@@ -39,22 +44,31 @@ const GraphTabs = ({ tabs }) => {
   );
 };
 
-const GraphToggles = ({ graphName }) => {
+const GraphToggles = ({ graphName, dayLabel, epochLabel }) => {
   return (
     <div className={styles.radiosWrapper}>
       <label htmlFor={graphName + '_day'} className={styles.checkboxLabel}>
         <input type="radio" id={graphName + '_day'} name={graphName} value="day" defaultChecked className={styles.checkbox} />
-        Day (UTC)
+        {dayLabel}
       </label>
       <label htmlFor={graphName + '_epoch'} className={styles.checkboxLabel}>
         <input type="radio" id={graphName + '_epoch'} name={graphName} value="epoch" className={styles.checkbox} />
-        Epoch
+        {epochLabel}
       </label>
     </div>
   );
 };
 
-const Graph = ({ themeVars, data, epochTitle, totalAdaTitle }) => {
+const Graph = ({
+  themeVars,
+  data,
+  epochTitle,
+  totalAdaTitle,
+  xAxisLabel,
+  yAxisLabel,
+  primaryBarLabel,
+  secondaryBarLabel,
+}) => {
 
   const graphVars = {
     axisTickColor: themeVars['--theme-dashboard-graph-axis-tick-color'],
@@ -75,7 +89,9 @@ const Graph = ({ themeVars, data, epochTitle, totalAdaTitle }) => {
     </span>
   );
 
-  const GraphTooltip = ({ active, payload, label }) => {
+  const GraphTooltip = (
+    { active, payload, label }: {| active: boolean, payload: Array<any>, label: string |}
+  ) => {
     if (active) {
       return (
         <div className={styles.tooltip}>
@@ -93,6 +109,8 @@ const Graph = ({ themeVars, data, epochTitle, totalAdaTitle }) => {
     return null;
   };
 
+  // $FlowFixMe promps are passed implicitly which causes a flow error
+  const graphTooltip = (<GraphTooltip />);
   return (
     <ResponsiveContainer height={240}>
       <BarChart
@@ -113,7 +131,7 @@ const Graph = ({ themeVars, data, epochTitle, totalAdaTitle }) => {
           dataKey="name"
           height={50}
           label={{
-            value: 'Epoch (5 days)',
+            value: xAxisLabel,
             position: 'insideBottom',
             fontSize: graphVars.fontSize,
             fill: graphVars.axisTextColor
@@ -127,7 +145,7 @@ const Graph = ({ themeVars, data, epochTitle, totalAdaTitle }) => {
           }}
         >
           <Label
-            value="Total ADA Sent"
+            value={yAxisLabel}
             position="insideLeft"
             angle={-90}
             offset={-5}
@@ -135,7 +153,7 @@ const Graph = ({ themeVars, data, epochTitle, totalAdaTitle }) => {
           />
         </YAxis>
         <Tooltip
-          content={<GraphTooltip />}
+          content={graphTooltip}
           cursor={{ fill: graphVars.barHoverBgColor }}
         />
         <Legend
@@ -151,14 +169,14 @@ const Graph = ({ themeVars, data, epochTitle, totalAdaTitle }) => {
           }}
         />
         <Bar
-          name="Total ADA"
+          name={primaryBarLabel}
           maxBarSize={graphVars.barWidth}
           dataKey="rewards"
           stackId="a"
           fill={graphVars.barPrimaryColor}
         />
         <Bar
-          name="Rewards"
+          name={secondaryBarLabel}
           radius={[6, 6, 0, 0]}
           maxBarSize={graphVars.barWidth}
           dataKey="ada"
@@ -191,10 +209,18 @@ export default class GraphWrapper extends Component<Props> {
         <GraphTabs tabs={tabs} />
         <Card>
           <div className={styles.graphContainer}>
-            <GraphToggles graphName={graphName} />
+            <GraphToggles
+              graphName={graphName}
+              dayLabel={intl.formatMessage(messages.dayToggleLabel)}
+              epochLabel={intl.formatMessage(globalMessages.epochLabel)}
+            />
             <Graph
-              epochTitle={intl.formatMessage(messages.tooltipTotalAda)}
+              epochTitle={intl.formatMessage(globalMessages.epochLabel)}
               totalAdaTitle={intl.formatMessage(messages.tooltipEpoch)}
+              xAxisLabel={intl.formatMessage(messages.epochAxisLabel)}
+              yAxisLabel={intl.formatMessage(messages.tooltipEpoch)}
+              primaryBarLabel={intl.formatMessage(globalMessages.totalAdaLabel)}
+              secondaryBarLabel={intl.formatMessage(globalMessages.rewardsLabel)}
               themeVars={themeVars}
               data={data}
             />

@@ -8,15 +8,12 @@ import styles from './UserSummary.scss';
 import IconAda from '../../../../assets/images/dashboard/total-ada.inline.svg';
 import IconRewards from '../../../../assets/images/dashboard/total-rewards.inline.svg';
 import IconDelegated from '../../../../assets/images/dashboard/total-delegated.inline.svg';
+import globalMessages from '../../../../i18n/global-messages';
 
 const messages = defineMessages({
   title: {
     id: 'wallet.dashboard.summary.title',
     defaultMessage: '!!!Your Summary',
-  },
-  adaLabel: {
-    id: 'wallet.dashboard.summary.adaTitle',
-    defaultMessage: '!!!Total ADA',
   },
   rewardsLabel: {
     id: 'wallet.dashboard.summary.rewardsTitle',
@@ -51,7 +48,7 @@ export default class UserSummary extends Component<Props> {
               <IconAda />
             </div>
             <h3 className={styles.label}>
-              {intl.formatMessage(messages.adaLabel)}:
+              {intl.formatMessage(globalMessages.totalAdaLabel)}:
             </h3>
             <p className={styles.value}>{totalAdaSum} ADA</p>
           </div>

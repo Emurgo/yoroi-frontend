@@ -431,6 +431,22 @@ const globalMessages = defineMessages({
     id: 'wallet.delegation.transaction.generation',
     defaultMessage: '!!!Generating transaction',
   },
+  epochLabel: {
+    id: 'global.labels.epoch',
+    defaultMessage: '!!!Epoch',
+  },
+  rewardsLabel: {
+    id: 'global.labels.rewardsLabel',
+    defaultMessage: '!!!Rewards',
+  },
+  totalAdaLabel: {
+    id: 'wallet.dashboard.summary.adaTitle',
+    defaultMessage: '!!!Total ADA',
+  },
+  marginsLabel: {
+    id: 'wallet.dashboard.stakePool.margins',
+    defaultMessage: '!!!Margins',
+  },
 });
 export default globalMessages;
 
