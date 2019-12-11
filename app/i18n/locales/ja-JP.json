@@ -380,6 +380,7 @@
   "wallet.send.confirmationDialog.walletPasswordLabel": "送金パスワード",
   "wallet.send.form.amount.equalsAda": "{amount}ADAと同額",
   "wallet.send.form.calculatingFee": "手数料を計算中...",
+  "wallet.send.form.cannotSendToLegacy": "You cannot send to legacy addresses (any address created before November 29th, 2019)",
   "wallet.send.form.description.hint": "必要に応じてメッセージを追加することができます",
   "wallet.send.form.description.label": "説明",
   "wallet.send.form.errors.invalidAddress": "有効なアドレスを入力してください。",
