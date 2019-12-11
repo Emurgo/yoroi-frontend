@@ -24,9 +24,9 @@ const DATE_FORMAT = 'YYYY-MM-DD';
 
 type NoticesByDate = {|
   +strDate: string,
-  +isToday: boolean,
-  +isYesterday: boolean,
-  +notices: Array<Notice>
+  +notices: Array<Notice>,
+  isToday: boolean,
+  isYesterday: boolean,
 |};
 
 export default class NoticeBoard extends Component<Props> {
@@ -50,7 +50,12 @@ export default class NoticeBoard extends Component<Props> {
       let group = groups.find((g) => g.strDate === strDate);
       // if first notice in this group, create the group
       if (!group) {
-        group = { strDate, notices: [] };
+        group = {
+          strDate,
+          isToday: false,
+          isYesterday: false,
+          notices: []
+        };
         groups.push(group);
       }
       group.notices.push(notice);
