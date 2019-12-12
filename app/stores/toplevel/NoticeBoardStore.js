@@ -1,5 +1,5 @@
 // @flow
-import { observable, runInAction } from 'mobx';
+import { action, observable, runInAction } from 'mobx';
 import moment from 'moment'; // TODO remove
 
 import Store from '../base/Store';
@@ -19,7 +19,8 @@ const SEARCH_LIMIT_INCREASE = 5;
 export default class NoticeBoardStore extends Store {
 
   @observable loadedNotices: Array<Notice> = [];
-  @observable allLoaded: boolean = false;
+  @observable hasMoreToLoad: boolean = false;
+  @observable isLoading: boolean = false;
 
   getNoticesRequest: LocalizedRequest<GetNoticesFunc>
     = new LocalizedRequest<GetNoticesFunc>(this.api.ada.getNotices);
@@ -29,8 +30,15 @@ export default class NoticeBoardStore extends Store {
     this._loadMore();
   }
 
+  @action
+  setLoading(loading: boolean): void {
+    this.isLoading = loading;
+  }
+
   _loadMore = async () => {
     try {
+      this.setLoading(true);
+
       this.getNoticesRequest.reset();
       this.getNoticesRequest.execute({
         skip: 0,
@@ -55,16 +63,16 @@ export default class NoticeBoardStore extends Store {
         new Notice({ id: (next++).toString(), kind: 4, date: moment().subtract(1, 'days').toDate() }),
         new Notice({ id: (next++).toString(), kind: 1, date: new Date(2019, 11, 5, 10, 15, 20) }),
         new Notice({ id: (next++).toString(), kind: 5, date: new Date(2019, 11, 5, 8, 20, 20) }),
-        new Notice({ id: (next++).toString(), kind: 6, date: new Date(2019, 11, 4, 11, 55, 29) }),
         new Notice({ id: (next++).toString(), kind: 3, date: new Date(2019, 11, 4, 2, 15, 20) }),
         new Notice({ id: (next++).toString(), kind: 7, date: new Date(2019, 11, 4, 10, 40, 20) }),
+        new Notice({ id: (next++).toString(), kind: 6, date: new Date(2019, 11, 4, 18, 55, 29) }),
         new Notice({ id: (next++).toString(), kind: 0, date: new Date(2019, 11, 2, 10, 45, 20) }),
         new Notice({ id: (next++).toString(), kind: 7, date: new Date(2019, 11, 1, 10, 18, 20) }),
       ];
 
       runInAction(() => {
-        if (newNotices == null || newNotices.length < SEARCH_LIMIT_INCREASE) {
-          this.allLoaded = true;
+        if (newNotices != null) {
+          this.hasMoreToLoad = true;
         }
 
         if (newNotices) {
@@ -73,6 +81,9 @@ export default class NoticeBoardStore extends Store {
       });
     } finally {
       this.getNoticesRequest.reset();
+      setTimeout(() => {
+        this.setLoading(false);
+      }, 3000); // TODO: remove setTimeout
     }
   }
 }

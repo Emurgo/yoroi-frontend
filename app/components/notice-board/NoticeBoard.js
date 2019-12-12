@@ -1,23 +1,22 @@
 // @flow
 import React, { Component } from 'react';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
 import moment from 'moment';
+import classnames from 'classnames';
+import { Button } from 'react-polymorph/lib/components/Button';
+import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+
+import Notice from '../../domain/Notice';
+import NoticeBlock from './NoticeBlock';
+import globalMessages from '../../i18n/global-messages';
 
 import styles from './NoticeBoard.scss';
-import Notice from '../../domain/Notice';
-import globalMessages from '../../i18n/global-messages';
-import NoticeBlock from './NoticeBlock';
-
-const messages = defineMessages({
-  type: {
-    id: 'wallet.transaction.type',
-    defaultMessage: '!!!{currency} transaction',
-  },
-});
 
 type Props = {|
   +loadedNotices: Array<Notice>,
-  +allLoaded: boolean
+  +onLoadMore: Function,
+  +isLoading: boolean,
+  +hasMoreToLoad: boolean
 |};
 
 const DATE_FORMAT = 'YYYY-MM-DD';
@@ -82,8 +81,19 @@ export default class NoticeBoard extends Component<Props> {
   }
 
   render() {
-    const { loadedNotices, allLoaded } = this.props;
+    const { intl } = this.context;
+    const {
+      loadedNotices,
+      hasMoreToLoad,
+      onLoadMore,
+      isLoading,
+    } = this.props;
     const noticeGroup = this.groupNoticesByDay(loadedNotices);
+
+    const buttonClasses = classnames([
+      'primary',
+      styles.loadMoreNoticesButton,
+    ]);
 
     return (
       <div className={styles.component}>
@@ -101,6 +111,15 @@ export default class NoticeBoard extends Component<Props> {
             </div>
           </div>
         ))}
+        {hasMoreToLoad &&
+          <Button
+            disabled={isLoading}
+            className={buttonClasses}
+            label={intl.formatMessage(globalMessages.loadMoreButtonLabel)}
+            onClick={onLoadMore}
+            skin={ButtonSkin}
+          />
+        }
       </div>
     );
   }

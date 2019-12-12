@@ -52,7 +52,9 @@ export default class NoticeBoardPage extends Component<Props> {
       >
         <NoticeBoard
           loadedNotices={noticeBoard.loadedNotices}
-          allLoaded={noticeBoard.allLoaded}
+          hasMoreToLoad={noticeBoard.hasMoreToLoad}
+          isLoading={noticeBoard.isLoading}
+          onLoadMore={() => actions.noticeBoard.loadMore.trigger()}
         />
       </MainLayout>
     );

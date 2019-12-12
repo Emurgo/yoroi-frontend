@@ -455,6 +455,10 @@ const globalMessages = defineMessages({
     id: 'wallet.dashboard.stakePool.margins',
     defaultMessage: '!!!Margins',
   },
+  loadMoreButtonLabel: {
+    id: 'global.labels.loadMore',
+    defaultMessage: '!!!Load more',
+  }
 });
 export default globalMessages;
 
