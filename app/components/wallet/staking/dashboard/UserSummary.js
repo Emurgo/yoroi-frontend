@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
@@ -9,6 +10,8 @@ import IconAda from '../../../../assets/images/dashboard/total-ada.inline.svg';
 import IconRewards from '../../../../assets/images/dashboard/total-rewards.inline.svg';
 import IconDelegated from '../../../../assets/images/dashboard/total-delegated.inline.svg';
 import globalMessages from '../../../../i18n/global-messages';
+
+import LoadingSpinner from '../../../widgets/LoadingSpinner';
 
 const messages = defineMessages({
   title: {
@@ -26,9 +29,9 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  totalAdaSum: string,
-  totalRewards: string,
-  totalDelegated: string,
+  totalAdaSum: void | string,
+  totalRewards: void | string,
+  totalDelegated: void | string,
 |};
 
 @observer
@@ -39,39 +42,68 @@ export default class UserSummary extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { totalAdaSum, totalRewards, totalDelegated } = this.props;
     return (
       <Card title={intl.formatMessage(messages.title)}>
         <div className={styles.wrapper}>
-          <div className={styles.column}>
-            <div className={styles.icon}>
-              <IconAda />
-            </div>
-            <h3 className={styles.label}>
-              {intl.formatMessage(globalMessages.totalAdaLabel)}:
-            </h3>
-            <p className={styles.value}>{totalAdaSum} ADA</p>
-          </div>
-          <div className={styles.column}>
-            <div className={styles.icon}>
-              <IconRewards />
-            </div>
-            <h3 className={styles.label}>
-              {intl.formatMessage(messages.rewardsLabel)}:
-            </h3>
-            <p className={styles.value}>{totalRewards} ADA</p>
-          </div>
-          <div className={styles.column}>
-            <div className={styles.icon}>
-              <IconDelegated />
-            </div>
-            <h3 className={styles.label}>
-              {intl.formatMessage(messages.delegatedLabel)}:
-            </h3>
-            <p className={styles.value}>{totalDelegated} ADA</p>
-          </div>
+          {this.getTotalAda()}
+          {this.getTotalRewards()}
+          {this.getTotalDelegated()}
         </div>
       </Card>
+    );
+  }
+
+  getTotalAda: void => Node = () => {
+    const { intl } = this.context;
+    return (
+      <div className={styles.column}>
+        <div className={styles.icon}>
+          <IconAda />
+        </div>
+        <h3 className={styles.label}>
+          {intl.formatMessage(globalMessages.totalAdaLabel)}:
+        </h3>
+        {this.props.totalAdaSum != null
+          ? (<p className={styles.value}>{this.props.totalAdaSum} ADA</p>)
+          : (<LoadingSpinner small />)
+        }
+      </div>
+    );
+  }
+
+  getTotalRewards: void => Node = () => {
+    const { intl } = this.context;
+    return (
+      <div className={styles.column}>
+        <div className={styles.icon}>
+          <IconRewards />
+        </div>
+        <h3 className={styles.label}>
+          {intl.formatMessage(messages.rewardsLabel)}:
+        </h3>
+        {this.props.totalRewards != null
+          ? (<p className={styles.value}>{this.props.totalRewards} ADA</p>)
+          : (<LoadingSpinner small />)
+        }
+      </div>
+    );
+  }
+
+  getTotalDelegated: void => Node = () => {
+    const { intl } = this.context;
+    return (
+      <div className={styles.column}>
+        <div className={styles.icon}>
+          <IconDelegated />
+        </div>
+        <h3 className={styles.label}>
+          {intl.formatMessage(messages.delegatedLabel)}:
+        </h3>
+        {this.props.totalDelegated != null
+          ? (<p className={styles.value}>{this.props.totalDelegated} ADA</p>)
+          : (<LoadingSpinner small />)
+        }
+      </div>
     );
   }
 }

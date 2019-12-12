@@ -1,37 +1,27 @@
 // @flow
 
-import { observable, action, reaction, runInAction } from 'mobx';
+import { observable, action, reaction } from 'mobx';
 import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';
-import environment from '../../environment';
-import type {
-  CreateDelegationTxFunc,
-  SignAndBroadcastDelegationTxFunc,
-} from '../../api/ada';
-import { buildRoute } from '../../utils/routing';
-import { ROUTES } from '../../routes-config';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import {
-  asGetAllUtxos, asHasUtxoChains, asGetAllAccounting,
+  asGetAllUtxos, asGetAllAccounting,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type {
-  IGetAllUtxosResponse, IGetStakingKey,
+  IGetStakingKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import type { PoolRequest } from '../../actions/ada/delegation-transaction-actions';
 import {
   filterAddressesByStakingKey,
-  groupAddrContainsAccountKey,
 } from '../../api/ada/lib/storage/bridge/utils';
-import type { V3UnsignedTxAddressedUtxoResponse } from '../../api/ada/transactions/types';
 
 export default class DelegationStore extends Store {
 
   @observable getDelegatedBalance: LocalizedRequest<GetDelegatedBalanceFunc>
-    = new LocalizedRequest<GetDelegatedBalanceFunc>(getDelegatedBalance);
+    = new LocalizedRequest<GetDelegatedBalanceFunc>(_getDelegatedBalance);
 
   _recalculateDelegationInfoDisposer: void => void = () => {};
 
@@ -59,9 +49,14 @@ export default class DelegationStore extends Store {
         if (publicDeriver == null) {
           throw new Error(`${nameof(this._startWatch)} no public deriver selected`);
         }
-        await getDelegatedBalance({
+        const delegatedBalance = this.getDelegatedBalance.execute({
           publicDeriver: publicDeriver.self,
-        });
+        }).promise;
+        if (delegatedBalance == null) throw new Error('Should never happen');
+        await delegatedBalance;
+      },
+      {
+        fireImmediately: true,
       }
     );
   }
@@ -85,14 +80,14 @@ type GetDelegatedBalanceFunc = (
   request: GetDelegatedBalanceRequest
 ) => Promise<GetDelegatedBalanceResponse>;
 
-async function getDelegatedBalance(
+async function _getDelegatedBalance(
   request: GetDelegatedBalanceRequest,
 ): Promise<GetDelegatedBalanceResponse> {
   // TODO: return 0 if not delegated to any pool
 
   const withStakingKey = asGetAllAccounting(request.publicDeriver);
   if (withStakingKey == null) {
-    throw new Error(`${nameof(getDelegatedBalance)} missing staking key functionality`);
+    throw new Error(`${nameof(_getDelegatedBalance)} missing staking key functionality`);
   }
 
   const utxoPart = await getUtxoDelegatedBalance(withStakingKey);

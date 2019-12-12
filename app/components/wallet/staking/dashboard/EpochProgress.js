@@ -55,7 +55,7 @@ export default class EpochProgress extends Component<Props> {
     );
   }
 
-  getContent: void => null | Node = () => {
+  getContent: void => Node = () => {
     if (this.props.loading) {
       return <LoadingSpinner />;
     }

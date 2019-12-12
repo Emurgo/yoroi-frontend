@@ -4,7 +4,6 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
-import UserSummary from './UserSummary';
 import GraphWrapper from './GraphWrapper';
 import StakePool from './StakePool';
 import RewardPopup from './RewardPopup';
@@ -25,9 +24,6 @@ const messages = defineMessages({
 
 type Props = {|
   themeVars: Object,
-  totalAdaSum: string,
-  totalRewards: string,
-  totalDelegated: string,
   currentReward: string,
   followingReward: string,
   hasDelegation: bool,
@@ -37,6 +33,7 @@ type Props = {|
   totalGraphData: Array<Object>,
   positionsGraphData: Array<Object>,
   epochProgress: Node,
+  userSummary: Node,
 |};
 
 @observer
@@ -48,9 +45,6 @@ export default class StakingDashboard extends Component<Props> {
   render() {
     const {
       themeVars,
-      totalAdaSum,
-      totalRewards,
-      totalDelegated,
       currentReward,
       followingReward,
       hasDelegation,
@@ -98,11 +92,7 @@ export default class StakingDashboard extends Component<Props> {
           <div className={styles.statsWrapper}>
             {this.props.epochProgress}
             <div className={styles.summary}>
-              <UserSummary
-                totalAdaSum={totalAdaSum}
-                totalRewards={totalRewards}
-                totalDelegated={totalDelegated}
-              />
+              {this.props.userSummary}
             </div>
           </div>
           {hasDelegation ? (

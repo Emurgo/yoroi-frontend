@@ -7,7 +7,9 @@ import BigNumber from 'bignumber.js';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import StakingDashboard from '../../../components/wallet/staking/dashboard/StakingDashboard';
 import EpochProgress from '../../../components/wallet/staking/dashboard/EpochProgress';
+import UserSummary from '../../../components/wallet/staking/dashboard/UserSummary';
 import environment from '../../../environment';
+import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
 
 import { formattedWalletAmount } from '../../../utils/formatters';
 
@@ -74,6 +76,8 @@ export default class StakingDashboardPage extends Component<Props, State> {
       throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
     }
 
+    const delegationStore = this.props.stores.substores[environment.API].delegation;
+
     const hideOrFormat: BigNumber => string = (amount) => {
       return this.props.stores.profile.shouldHideBalance
         ? '******'
@@ -88,9 +92,24 @@ export default class StakingDashboardPage extends Component<Props, State> {
         themeVars={getThemeVars({ theme: 'YoroiModern' })}
         hasDelegation
         epochProgress={epochProgress}
-        totalAdaSum={hideOrFormat(publicDeriver.amount)}
-        totalRewards="0"
-        totalDelegated="0"
+        userSummary={<UserSummary
+          totalAdaSum={hideOrFormat(publicDeriver.amount)}
+          totalRewards={delegationStore.getDelegatedBalance.result == null
+            ? undefined
+            : hideOrFormat(
+              delegationStore.getDelegatedBalance.result
+                .accountPart
+                .dividedBy(LOVELACES_PER_ADA)
+            )}
+          totalDelegated={
+            delegationStore.getDelegatedBalance.result == null
+              ? undefined
+              : hideOrFormat(
+                delegationStore.getDelegatedBalance.result.utxoPart.plus(
+                  delegationStore.getDelegatedBalance.result.accountPart
+                ).dividedBy(LOVELACES_PER_ADA)
+              )}
+        />}
         currentReward="Tue, 13th at 18:30:27"
         followingReward="every 2 days"
         stakePoolName={"Warren's stake pool"}
