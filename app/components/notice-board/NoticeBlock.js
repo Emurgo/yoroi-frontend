@@ -91,6 +91,7 @@ export default class NoticeBlock extends Component<Props> {
   static contextTypes = { intl: intlShape.isRequired };
 
   formatTime(notice: Notice, isToday: boolean): string {
+    if (isToday) return moment(notice.date).fromNow();
     return moment(notice.date).format('HH:mm:ss');
   }
 

@@ -759,20 +759,9 @@ export default class AdaApi {
   ): Promise<GetNoticesResponse> {
     Logger.debug('AdaApi::getNotices called: ' + stringifyData(request));
     try {
-      const todaysDate = new Date();
-      const yesterdayDate = new Date(new Date().setDate(new Date().getDate() - 1));
-      return [
-        new Notice({ id: '1', kind: 0, date: new Date() }),
-        new Notice({ id: '2', kind: 2, date: new Date() }),
-        new Notice({ id: '3', kind: 3, date: yesterdayDate }),
-        new Notice({ id: '4', kind: 4, date: yesterdayDate }),
-        new Notice({ id: '5', kind: 1, date: new Date(2019, 11, 5) }),
-        new Notice({ id: '6', kind: 5, date: new Date(2019, 11, 5) }),
-        new Notice({ id: '7', kind: 6, date: new Date(2019, 11, 4) }),
-        new Notice({ id: '8', kind: 3, date: new Date(2019, 11, 4) }),
-        new Notice({ id: '9', kind: 7, date: new Date(2019, 11, 4) }),
-        new Notice({ id: '10', kind: 7, date: new Date(2019, 11, 4) }),
-      ];
+      if (true) {
+        return [];
+      }
     } catch (error) {
       Logger.error('AdaApi::getNotices error: ' + stringifyError(error));
       throw new GenericApiError();

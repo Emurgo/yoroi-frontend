@@ -35,10 +35,8 @@ export default class NoticeBoard extends Component<Props> {
 
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillMount() {
-    this.localizedDateFormat = moment.localeData().longDateFormat('L');
-    // Localized dateFormat:
-    // English - MM/DD/YYYY
-    // Japanese - YYYY/MM/DD
+    // https://momentjs.com/docs/#/i18n/
+    this.localizedDateFormat = moment.localeData().longDateFormat('LL');
   }
 
   groupNoticesByDay(notices: Array<Notice>): Array<NoticesByDate> {

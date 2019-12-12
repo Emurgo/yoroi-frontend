@@ -1,3 +1,7 @@
+:global(.TopBarLayout_content) {
+  overflow: overlay;
+};
+
 .component {
   display: flex;
   flex-direction: column;
