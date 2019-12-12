@@ -211,7 +211,7 @@ export class RemoteFetcher implements IFetcher {
 
   getAccountState: AccountStateRequest => Promise<AccountStateResponse> = (body) => (
     axios(
-      `${backendUrl}/api/account/state`,
+      `${backendUrl}/api/v2/account/state`,
       {
         method: 'post',
         data: {
