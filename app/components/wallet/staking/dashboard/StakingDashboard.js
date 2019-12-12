@@ -1,9 +1,9 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
-import EpochProgress from './EpochProgress';
 import UserSummary from './UserSummary';
 import GraphWrapper from './GraphWrapper';
 import StakePool from './StakePool';
@@ -28,17 +28,15 @@ type Props = {|
   totalAdaSum: string,
   totalRewards: string,
   totalDelegated: string,
-  currentEpoch: number,
-  epochProgress: number,
   currentReward: string,
   followingReward: string,
   hasDelegation: bool,
-  endTime: Object,
   stakePoolName: string,
   stakePoolData: Object,
   hash: string,
   totalGraphData: Array<Object>,
   positionsGraphData: Array<Object>,
+  epochProgress: Node,
 |};
 
 @observer
@@ -53,12 +51,9 @@ export default class StakingDashboard extends Component<Props> {
       totalAdaSum,
       totalRewards,
       totalDelegated,
-      currentEpoch,
-      epochProgress,
       currentReward,
       followingReward,
       hasDelegation,
-      endTime,
       stakePoolName,
       stakePoolData,
       hash,
@@ -101,11 +96,7 @@ export default class StakingDashboard extends Component<Props> {
             <RewardPopup currentText={currentReward} followingText={followingReward} />
           </div>
           <div className={styles.statsWrapper}>
-            <EpochProgress
-              currentEpoch={currentEpoch}
-              percentage={epochProgress}
-              endTime={endTime}
-            />
+            {this.props.epochProgress}
             <div className={styles.summary}>
               <UserSummary
                 totalAdaSum={totalAdaSum}

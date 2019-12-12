@@ -1,10 +1,12 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import BigNumber from 'bignumber.js';
 
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import StakingDashboard from '../../../components/wallet/staking/dashboard/StakingDashboard';
+import EpochProgress from '../../../components/wallet/staking/dashboard/EpochProgress';
 import environment from '../../../environment';
 
 import { formattedWalletAmount } from '../../../utils/formatters';
@@ -66,24 +68,6 @@ export default class StakingDashboardPage extends Component<Props, State> {
 
   render() {
     // TODO: render something else if there is a pending tx that modifies delegation?
-    if (this.state == null) return null; // TODO: render spinner
-    const absoluteSlot = this.state.timeToSlot({
-      time: this.state.currentTime
-    });
-    const relativeTime = this.state.toRelativeSlotNumber(absoluteSlot.slot);
-
-    const epochLength = this.state.currentEpochLength();
-    const slotLength = this.state.currentSlotLength();
-
-    const secondsLeftInEpoch = (epochLength - relativeTime.slot) * slotLength;
-    const timeLeftInEpoch = new Date(
-      (1000 * secondsLeftInEpoch) - absoluteSlot.msIntoSlot
-    );
-
-    const leftPadDate: number => string = (num) => {
-      if (num < 10) return '0' + num;
-      return num.toString();
-    };
 
     const publicDeriver = this.props.stores.substores[environment.API].wallets.selected;
     if (publicDeriver == null) {
@@ -96,21 +80,17 @@ export default class StakingDashboardPage extends Component<Props, State> {
         : formattedWalletAmount(amount);
     };
 
+    const epochProgress = this.getEpochProgress();
+
     const { getThemeVars } = this.props.stores.profile;
     return (
       <StakingDashboard
         themeVars={getThemeVars({ theme: 'YoroiModern' })}
         hasDelegation
-        endTime={{
-          h: leftPadDate(timeLeftInEpoch.getHours()),
-          m: leftPadDate(timeLeftInEpoch.getMinutes()),
-          s: leftPadDate(timeLeftInEpoch.getSeconds()),
-        }}
+        epochProgress={epochProgress}
         totalAdaSum={hideOrFormat(publicDeriver.amount)}
         totalRewards="0"
         totalDelegated="0"
-        currentEpoch={relativeTime.epoch}
-        epochProgress={Math.floor(100 * relativeTime.slot / epochLength)}
         currentReward="Tue, 13th at 18:30:27"
         followingReward="every 2 days"
         stakePoolName={"Warren's stake pool"}
@@ -320,6 +300,42 @@ export default class StakingDashboardPage extends Component<Props, State> {
             rewards: 14590,
           },
         ]}
+      />
+    );
+  }
+
+  getEpochProgress: void => null | Node = () => {
+    if (this.state == null) {
+      return (<EpochProgress loading />);
+    }
+
+    const absoluteSlot = this.state.timeToSlot({
+      time: this.state.currentTime
+    });
+    const relativeTime = this.state.toRelativeSlotNumber(absoluteSlot.slot);
+
+    const epochLength = this.state.currentEpochLength();
+    const slotLength = this.state.currentSlotLength();
+
+    const secondsLeftInEpoch = (epochLength - relativeTime.slot) * slotLength;
+    const timeLeftInEpoch = new Date(
+      (1000 * secondsLeftInEpoch) - absoluteSlot.msIntoSlot
+    );
+
+    const leftPadDate: number => string = (num) => {
+      if (num < 10) return '0' + num;
+      return num.toString();
+    };
+
+    return (
+      <EpochProgress
+        currentEpoch={relativeTime.epoch}
+        percentage={Math.floor(100 * relativeTime.slot / epochLength)}
+        endTime={{
+          h: leftPadDate(timeLeftInEpoch.getHours()),
+          m: leftPadDate(timeLeftInEpoch.getMinutes()),
+          s: leftPadDate(timeLeftInEpoch.getSeconds()),
+        }}
       />
     );
   }
