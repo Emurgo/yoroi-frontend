@@ -1,6 +1,6 @@
 // @flow
 
-import { observable, action, reaction } from 'mobx';
+import { observable, action, reaction, runInAction } from 'mobx';
 import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';
@@ -17,11 +17,19 @@ import type {
 import {
   filterAddressesByStakingKey,
 } from '../../api/ada/lib/storage/bridge/utils';
+import environment from '../../environment';
+import type {
+  AccountStateResponse,
+  AccountStateSuccess,
+  AccountStateFunc,
+} from '../../api/ada/lib/state-fetch/types';
 
 export default class DelegationStore extends Store {
 
   @observable getDelegatedBalance: LocalizedRequest<GetDelegatedBalanceFunc>
     = new LocalizedRequest<GetDelegatedBalanceFunc>(_getDelegatedBalance);
+
+  @observable stakingKeyState: void | AccountStateSuccess;
 
   _recalculateDelegationInfoDisposer: void => void = () => {};
 
@@ -49,11 +57,37 @@ export default class DelegationStore extends Store {
         if (publicDeriver == null) {
           throw new Error(`${nameof(this._startWatch)} no public deriver selected`);
         }
-        const delegatedBalance = this.getDelegatedBalance.execute({
-          publicDeriver: publicDeriver.self,
-        }).promise;
-        if (delegatedBalance == null) throw new Error('Should never happen');
-        await delegatedBalance;
+        const withStakingKey = asGetAllAccounting(publicDeriver.self);
+        if (withStakingKey == null) {
+          throw new Error(`${nameof(this._startWatch)} missing staking key functionality`);
+        }
+
+        const stakingKeyResp = await withStakingKey.getStakingKey();
+
+        const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+        const accountStateResp = await stateFetcher.getAccountState({
+          addresses: [stakingKeyResp.addr.Hash],
+        });
+        const stateForStakingKey = accountStateResp[stakingKeyResp.addr.Hash];
+
+        if (!stateForStakingKey.delegation) {
+          runInAction(() => {
+            this.stakingKeyState = undefined;
+            throw new Error(`${stateForStakingKey.error} - ${stateForStakingKey.comment}`);
+          });
+        } else {
+          runInAction(() => {
+            this.stakingKeyState = stateForStakingKey;
+          });
+
+          const delegatedBalance = this.getDelegatedBalance.execute({
+            publicDeriver: withStakingKey,
+            accountState: stateForStakingKey,
+            stakingPubKey: stakingKeyResp.addr.Hash,
+          }).promise;
+          if (delegatedBalance == null) throw new Error('Should never happen');
+          await delegatedBalance;
+        }
       },
       {
         fireImmediately: true,
@@ -70,7 +104,9 @@ export default class DelegationStore extends Store {
 }
 
 type GetDelegatedBalanceRequest = {|
-  publicDeriver: PublicDeriver<>
+  publicDeriver: PublicDeriver<> & IGetStakingKey,
+  accountState: AccountStateSuccess,
+  stakingPubKey: string,
 |};
 type GetDelegatedBalanceResponse = {|
   utxoPart: BigNumber,
@@ -83,23 +119,26 @@ type GetDelegatedBalanceFunc = (
 async function _getDelegatedBalance(
   request: GetDelegatedBalanceRequest,
 ): Promise<GetDelegatedBalanceResponse> {
-  // TODO: return 0 if not delegated to any pool
-
-  const withStakingKey = asGetAllAccounting(request.publicDeriver);
-  if (withStakingKey == null) {
-    throw new Error(`${nameof(_getDelegatedBalance)} missing staking key functionality`);
+  if (request.accountState.delegation.pools.length === 0) {
+    return {
+      utxoPart: new BigNumber(0),
+      accountPart: new BigNumber(0),
+    };
   }
-
-  const utxoPart = await getUtxoDelegatedBalance(withStakingKey);
+  const utxoPart = await getUtxoDelegatedBalance(
+    request.publicDeriver,
+    request.stakingPubKey,
+  );
 
   return {
     utxoPart,
-    accountPart: new BigNumber(0), // TODO
+    accountPart: new BigNumber(request.accountState.value),
   };
 }
 
 async function getUtxoDelegatedBalance(
-  publicDeriver: PublicDeriver<> & IGetStakingKey
+  publicDeriver: PublicDeriver<>,
+  stakingPubKey: string,
 ): Promise<BigNumber> {
   const withUtxos = asGetAllUtxos(publicDeriver);
   if (withUtxos == null) {
@@ -109,9 +148,8 @@ async function getUtxoDelegatedBalance(
 
   let stakingKey;
   {
-    const stakingKeyResp = await basePubDeriver.getStakingKey();
     const accountAddress = RustModule.WalletV3.Address.from_bytes(
-      Buffer.from(stakingKeyResp.addr.Hash, 'hex')
+      Buffer.from(stakingPubKey, 'hex')
     ).to_account_address();
     if (accountAddress == null) {
       throw new Error(`${nameof(getUtxoDelegatedBalance)} staking key invalid`);

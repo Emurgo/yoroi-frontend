@@ -10,11 +10,13 @@ import type {
   FilterUsedRequest, FilterUsedResponse,
   BestBlockRequest, BestBlockResponse,
   ServerStatusRequest, ServerStatusResponse,
+  AccountStateRequest, AccountStateResponse,
   AddressUtxoFunc,
   FilterFunc,
   HistoryFunc,
   TxBodiesFunc,
   UtxoSumFunc,
+  AccountStateFunc,
   RemoteTransaction,
 } from './types';
 
@@ -27,6 +29,7 @@ import {
   GetTxsBodiesForUTXOsError,
   GetUtxosSumsForAddressesApiError,
   GetTxHistoryForAddressesApiError,
+  GetAccountStateApiError,
 } from '../../errors';
 import {
   Logger,
@@ -82,6 +85,10 @@ export class BatchedFetcher implements IFetcher {
 
   checkAddressesInUse: FilterUsedRequest => Promise<FilterUsedResponse> = (body) => (
     batchCheckAddressesInUse(this.baseFetcher.checkAddressesInUse)(body)
+  )
+
+  getAccountState: AccountStateRequest => Promise<AccountStateResponse> = (body) => (
+    batchGetAccountState(this.baseFetcher.getAccountState)(body)
   )
 
   checkServerStatus: ServerStatusRequest => Promise<ServerStatusResponse> = (body) => (
@@ -284,6 +291,24 @@ export function batchCheckAddressesInUse(
     } catch (error) {
       Logger.error('batchedFetcher::batchCheckAddressesInUse error: ' + stringifyError(error));
       throw new CheckAdressesInUseApiError();
+    }
+  };
+}
+
+export function batchGetAccountState(
+  getAccountState: AccountStateFunc,
+): AccountStateFunc {
+  return async function (body: AccountStateRequest): Promise<AccountStateResponse> {
+    try {
+      const chimericAccountAddresses = chunk(body.addresses, addressesLimit);
+      const chimericAccountPromises = chimericAccountAddresses.map(
+        addr => getAccountState({ addresses: addr })
+      );
+      const chimericAccounutStates = await Promise.all(chimericAccountPromises);
+      return Object.assign({}, ...chimericAccounutStates);
+    } catch (error) {
+      Logger.error(`batchedFetcher::${nameof(batchCheckAddressesInUse)} error: ` + stringifyError(error));
+      throw new GetAccountStateApiError();
     }
   };
 }

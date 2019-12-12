@@ -96,6 +96,10 @@ const messages = defineMessages({
     id: 'api.errors.checkAdressesInUseApiError',
     defaultMessage: '!!!Error received from server while checking used addresses.',
   },
+  getAccountStateApiError: {
+    id: 'api.errors.getAccountStateApiError',
+    defaultMessage: '!!!Error received from server while getting account state.',
+  },
   invalidWitnessError: {
     id: 'api.errors.invalidWitnessError',
     defaultMessage: '!!!The signature is invalid.',
@@ -313,6 +317,15 @@ export class CheckAdressesInUseApiError extends LocalizableError {
     super({
       id: messages.checkAdressesInUseApiError.id,
       defaultMessage: messages.checkAdressesInUseApiError.defaultMessage || '',
+    });
+  }
+}
+
+export class GetAccountStateApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getAccountStateApiError.id,
+      defaultMessage: messages.getAccountStateApiError.defaultMessage || '',
     });
   }
 }
