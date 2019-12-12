@@ -8,11 +8,24 @@ import type {
   BestBlockRequest, BestBlockResponse, BestBlockFunc,
   AddressUtxoRequest, AddressUtxoResponse, AddressUtxoFunc,
   UtxoSumRequest, UtxoSumResponse, UtxoSumFunc,
-  RemoteTransaction, RemoteUnspentOutput
+  RemoteTransaction, RemoteUnspentOutput,
+  SignedRequestInternal, RemoteCertificate,
+  RemoteTransactionInput, RemoteTransactionOutput,
 } from '../../../state-fetch/types';
 import { RollbackApiError, } from '../../../../errors';
 import { addressToKind, groupToSingle, } from '../utils';
 import { CoreAddressTypes } from '../../database/primitives/enums';
+import type { CoreAddressT } from '../../database/primitives/enums';
+import {
+  mnemonicToEntropy
+} from 'bip39';
+import {
+  WalletTypePurpose,
+} from '../../../../../../config/numbersConfig';
+
+import { RustModule } from '../../../cardanoCrypto/rustLoader';
+
+const protocolMagic = 764824073; // mainnet
 
 export function genCheckAddressesInUse(
   blockchain: Array<RemoteTransaction>,
@@ -45,7 +58,7 @@ function ourAddressesInTx(
   ];
   const addressesUsed = new Set();
   for (const addr of addresses) {
-    const kind = addressToKind(addr);
+    const kind = addressToKind(addr, 'bytes');
     const payload = kind === CoreAddressTypes.SHELLEY_GROUP
       ? groupToSingle(addr)
       : addr;
@@ -196,7 +209,7 @@ export function genUtxoForAddresses(
       for (let j = 0; j < tx.outputs.length; j++) {
         const address = tx.outputs[j].address;
         if (ourAddressSet.has(address)) {
-          const kind = addressToKind(address);
+          const kind = addressToKind(address, 'bytes');
           if (
             kind !== CoreAddressTypes.CARDANO_LEGACY &&
             kind !== CoreAddressTypes.SHELLEY_SINGLE &&
@@ -255,5 +268,237 @@ export function genUtxoSumForAddresses(
     return {
       sum: result.toString()
     };
+  };
+}
+
+export function getSingleAddressString(
+  mnemonic: string,
+  path: Array<number>,
+): string {
+  const bip39entropy = mnemonicToEntropy(mnemonic);
+  const EMPTY_PASSWORD = Buffer.from('');
+  const rootKey = RustModule.WalletV3.Bip32PrivateKey.from_bip39_entropy(
+    Buffer.from(bip39entropy, 'hex'),
+    EMPTY_PASSWORD
+  );
+  const derivedKey = derivePath(rootKey, path);
+
+  if (path[0] === WalletTypePurpose.BIP44) {
+    const v2Key = RustModule.WalletV2.PublicKey.from_hex(
+      Buffer.from(derivedKey.to_public().as_bytes()).toString('hex')
+    );
+    const settings = RustModule.WalletV2.BlockchainSettings.from_json({
+      protocol_magic: protocolMagic
+    });
+    const addr = v2Key.bootstrap_era_address(settings);
+    const hex = addr.to_base58();
+    return hex;
+  }
+  if (path[0] === WalletTypePurpose.CIP1852) {
+    const addr = RustModule.WalletV3.Address.single_from_public_key(
+      derivedKey.to_public().to_raw_key(),
+      RustModule.WalletV3.AddressDiscrimination.Production,
+    );
+    return Buffer.from(addr.as_bytes()).toString('hex');
+  }
+  throw new Error('Unexpected purpose');
+}
+
+export function getAddressForType(
+  mnemonic: string,
+  path: Array<number>,
+  type: CoreAddressT,
+): string {
+  const bip39entropy = mnemonicToEntropy(mnemonic);
+  const EMPTY_PASSWORD = Buffer.from('');
+  const rootKey = RustModule.WalletV3.Bip32PrivateKey.from_bip39_entropy(
+    Buffer.from(bip39entropy, 'hex'),
+    EMPTY_PASSWORD
+  );
+  const derivedKey = derivePath(rootKey, path);
+
+  switch (type) {
+    case CoreAddressTypes.SHELLEY_SINGLE: {
+      const addr = RustModule.WalletV3.Address.single_from_public_key(
+        derivedKey.to_public().to_raw_key(),
+        RustModule.WalletV3.AddressDiscrimination.Production,
+      );
+      return Buffer.from(addr.as_bytes()).toString('hex');
+    }
+    case CoreAddressTypes.SHELLEY_ACCOUNT: {
+      const addr = RustModule.WalletV3.Address.account_from_public_key(
+        derivedKey.to_public().to_raw_key(),
+        RustModule.WalletV3.AddressDiscrimination.Production,
+      );
+      return Buffer.from(addr.as_bytes()).toString('hex');
+    }
+    case CoreAddressTypes.SHELLEY_GROUP: {
+      const newPath = [...path];
+      // -1 because newPath here starts at PURPOSE and not at ROOT
+      const chainLevel = 4 - 1;
+      const addressLevel = 5 - 1;
+      newPath[chainLevel] = 2;
+      newPath[addressLevel] = 0;
+      const stakingKey = derivePath(rootKey, newPath);
+      const addr = RustModule.WalletV3.Address.delegation_from_public_key(
+        derivedKey.to_public().to_raw_key(),
+        stakingKey.to_public().to_raw_key(),
+        RustModule.WalletV3.AddressDiscrimination.Production,
+      );
+      return Buffer.from(addr.as_bytes()).toString('hex');
+    }
+    default: throw new Error('getAddressForType unknown type ' + type);
+  }
+}
+
+function derivePath(
+  startKey: RustModule.WalletV3.Bip32PrivateKey,
+  path: Array<number>
+): RustModule.WalletV3.Bip32PrivateKey {
+  let currKey = startKey;
+  for (let i = 0; i < path.length; i++) {
+    currKey = currKey.derive(path[i]);
+  }
+  return currKey;
+}
+
+function getCertificate(
+  certificate: RustModule.WalletV3.Certificate | void
+): void | RemoteCertificate {
+  if (certificate == null) return certificate;
+
+  const toStruct = (kindEnum: $PropertyType<RemoteCertificate, 'payloadKind'>) => ({
+    payloadKind: kindEnum,
+    payloadKindId: RustModule.WalletV3.CertificateKind.StakeDelegation,
+    payloadHex: Buffer.from(certificate.as_bytes()).toString('hex')
+  });
+  switch (certificate.get_type()) {
+    case RustModule.WalletV3.CertificateKind.PoolRegistration:
+      return toStruct('PoolRegistration');
+    case RustModule.WalletV3.CertificateKind.PoolUpdate:
+      return toStruct('PoolUpdate');
+    case RustModule.WalletV3.CertificateKind.PoolRetirement:
+      return toStruct('PoolRetirement');
+    case RustModule.WalletV3.CertificateKind.StakeDelegation:
+      return toStruct('StakeDelegation');
+    case RustModule.WalletV3.CertificateKind.OwnerStakeDelegation:
+      return toStruct('OwnerStakeDelegation');
+    default: throw new Error(`${nameof(getCertificate)} unexpected kind ${certificate.get_type()}`);
+  }
+}
+
+function getInputs(
+  blockchain: Array<RemoteTransaction>,
+  inputs: RustModule.WalletV3.Inputs
+): Array<RemoteTransactionInput> {
+  const result: Array<RemoteTransactionInput> = [];
+  for (let i = 0; i < inputs.size(); i++) {
+    const input = inputs.get(i);
+    if (input.is_utxo()) {
+      const pointer = input.get_utxo_pointer();
+
+      const hash = Buffer.from(pointer.fragment_id().as_bytes()).toString('hex');
+      const index = pointer.output_index();
+
+      const pointedTx = blockchain.find(tx => tx.hash === hash);
+      if (pointedTx == null) {
+        throw new Error(`${nameof(getInputs)} no tx found ${hash}`);
+      }
+      const pointedOutput = pointedTx.outputs[index];
+      const addressKind = addressToKind(pointedOutput.address, 'bytes');
+      if (addressKind === CoreAddressTypes.CARDANO_LEGACY) {
+        result.push({
+          address: pointedOutput.address,
+          amount: pointedOutput.amount,
+          id: hash + index,
+          index,
+          txHash: hash,
+        });
+      } else {
+        result.push({
+          type: 'utxo',
+          address: pointedOutput.address,
+          amount: pointedOutput.amount,
+          id: hash + index,
+          index,
+          txHash: hash,
+        });
+      }
+      continue;
+    }
+    if (input.is_account()) {
+      const account = input.get_account_identifier();
+      // TODO: multisig
+      const accountAddr = account
+        .to_account_single()
+        .to_address(RustModule.WalletV3.AddressDiscrimination.Production);
+      const addressHex = Buffer.from(accountAddr.as_bytes()).toString('hex');
+
+      // TODO: should calculate this from witness
+      let nextSpendingCounter = 0;
+      for (const txInBlock of blockchain) {
+        for (const inputOfBlock of txInBlock.inputs) {
+          if (inputOfBlock.type === 'account' && inputOfBlock.address === addressHex) {
+            const counter = inputOfBlock.spendingCounter;
+            if (counter > nextSpendingCounter) {
+              nextSpendingCounter = counter + 1;
+            }
+          }
+        }
+      }
+      result.push({
+        type: 'account',
+        address: addressHex,
+        amount: input.value().to_str(),
+        id: addressHex + nextSpendingCounter.toString(),
+        spendingCounter: nextSpendingCounter,
+      });
+      continue;
+    }
+    throw new Error(`${nameof(getInputs)} unexpected input type ${input.get_type()}`);
+  }
+  return result;
+}
+function getOutputs(
+  blockchain: Array<RemoteTransaction>,
+  outputs: RustModule.WalletV3.Outputs
+): Array<RemoteTransactionOutput> {
+  const result = [];
+  for (let i = 0; i < outputs.size(); i++) {
+    const output = outputs.get(i);
+    result.push({
+      address: Buffer.from(output.address().as_bytes()).toString('hex'),
+      amount: output.value().to_str(),
+    });
+  }
+  return result;
+}
+
+export function toRemoteTx(
+  blockchain: Array<RemoteTransaction>,
+  request: SignedRequestInternal,
+): RemoteTransaction {
+  const fragment = RustModule.WalletV3.Fragment
+    .from_bytes(Buffer.from(request.signedTx, 'base64'));
+  const hash = Buffer.from(fragment.id().as_bytes()).toString('hex');
+  const transaction = fragment.get_transaction();
+
+  const base = {
+    hash,
+    last_update: new Date().toString(),
+    tx_state: 'Pending',
+    inputs: getInputs(blockchain, transaction.inputs()),
+    outputs: getOutputs(blockchain, transaction.outputs()),
+    certificate: getCertificate(transaction.certificate()),
+  };
+
+  return {
+    ...base,
+    height: null,
+    block_hash: null,
+    tx_ordinal: null,
+    time: null,
+    epoch: null,
+    slot: null,
   };
 }

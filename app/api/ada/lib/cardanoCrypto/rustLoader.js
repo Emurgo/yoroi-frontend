@@ -8,6 +8,7 @@ class Module {
   _wasmv3: WasmV3;
 
   async load(): Promise<void> {
+    if (this._wasmv2 != null || this._wasmv3 != null) return;
     this._wasmv2 = await import('cardano-wallet-browser');
     this._wasmv3 = await import('@emurgo/js-chain-libs/js_chain_libs');
   }

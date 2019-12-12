@@ -7,6 +7,8 @@ import { defineMessages, intlShape } from 'react-intl';
 import environment from '../../environment';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import globalMessages from '../../i18n/global-messages';
+import { tryAddressToKind } from '../../api/ada/lib/storage/bridge/utils';
+import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 
 import {
   DECIMAL_PLACES_IN_ADA,
@@ -82,7 +84,6 @@ export default class WalletSendPage extends Component<Props> {
     const { intl } = this.context;
     const { uiDialogs, profile } = this.props.stores;
     const { actions } = this.props;
-    const { isValidAddress } = wallets;
     const { validateAmount, hasAnyPending } = transactions;
     const { txBuilderActions } = this.props.actions.ada;
 
@@ -111,7 +112,18 @@ export default class WalletSendPage extends Component<Props> {
           currencyMaxFractionalDigits={DECIMAL_PLACES_IN_ADA}
           validateAmount={validateAmount}
           onSubmit={onSubmit}
-          addressValidator={isValidAddress}
+          isValidShelleyAddress={address => {
+            const kind = tryAddressToKind(address, 'bech32');
+            if (kind == null) return false;
+            if (kind === CoreAddressTypes.CARDANO_LEGACY) return false;
+            return true;
+          }}
+          isValidLegacyAddress={address => {
+            const kind = tryAddressToKind(address, 'bech32');
+            if (kind == null) return false;
+            if (kind === CoreAddressTypes.CARDANO_LEGACY) return true;
+            return false;
+          }}
           totalInput={transactionBuilderStore.totalInput}
           hasAnyPending={hasAnyPending}
           classicTheme={profile.isClassicTheme}

@@ -15,7 +15,7 @@ const messages = defineMessages({
   legacyExplanation: {
     id: 'wallet.backup.dialog.legacy.explanation',
     defaultMessage: `!!!If you had any ADA in your wallet on November 29th, 2019
-    you will have to upgrade your wallet to a Shelley "reward wallet".`
+    you have to upgrade your wallet to a Shelley "reward wallet".`
   },
   checkConfirm: {
     id: 'wallet.backup.dialog.legacy.checkConfirm',

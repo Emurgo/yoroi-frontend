@@ -11,7 +11,6 @@ import {
   setup,
   filterDbSnapshot,
   mockDate,
-  getSingleAddressString,
   ABANDON_SHARE,
   TX_TEST_MNEMONIC_1,
 } from './common';
@@ -19,6 +18,7 @@ import {
   genCheckAddressesInUse,
   genGetTransactionsHistoryForAddresses,
   genGetBestBlock,
+  getSingleAddressString,
 } from './mockNetwork';
 import {
   HARD_DERIVATION_START,

@@ -11,7 +11,15 @@ import {
   HARD_DERIVATION_START,
   WalletTypePurpose,
   CoinTypes,
+  ChainDerivations,
+  STAKING_KEY_INDEX,
 } from '../../config/numbersConfig';
+import type {
+  TransferSourceType,
+} from '../../types/TransferTypes';
+import {
+  TransferSource,
+} from '../../types/TransferTypes';
 import type {
   Network,
   ConfigType,
@@ -49,6 +57,7 @@ import type {
   IGetAllUtxos,
   IGetLastSyncInfo,
   IGetSigningKey,
+  IGetStakingKey,
   IDisplayCutoff,
   IDisplayCutoffPopFunc,
   IDisplayCutoffPopResponse,
@@ -104,6 +113,7 @@ import {
 } from '../common';
 import LocalizableError from '../../i18n/LocalizableError';
 import { scanBip44Account, } from './restoration/byron/scan';
+import { scanCip1852Account, } from './restoration/shelley/scan';
 import type {
   BaseSignRequest,
   UnsignedTxResponse,
@@ -149,7 +159,6 @@ import { RustModule } from './lib/cardanoCrypto/rustLoader';
 import { clear } from './lib/storage/database/index';
 import environment from '../../environment';
 import { Cip1852Wallet } from './lib/storage/models/Cip1852Wallet/wrapper';
-import { verifyAddress } from './lib/storage/bridge/utils';
 
 declare var CONFIG : ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;
@@ -375,6 +384,32 @@ export type CreateUnsignedTxFunc = (
   request: CreateUnsignedTxRequest
 ) => Promise<CreateUnsignedTxResponse>;
 
+// createDelegationTx
+
+export type CreateDelegationTxRequest = {
+  publicDeriver: IGetAllUtxos & IHasUtxoChains,
+  certificate: RustModule.WalletV3.Certificate,
+};
+export type CreateDelegationTxResponse = V3UnsignedTxAddressedUtxoResponse;
+
+export type CreateDelegationTxFunc = (
+  request: CreateDelegationTxRequest
+) => Promise<CreateDelegationTxResponse>;
+
+// signAndBroadcastDelegationTx
+
+export type SignAndBroadcastDelegationTxRequest = {
+  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey & IGetStakingKey,
+  signRequest: BaseSignRequest<RustModule.WalletV3.InputOutput>,
+  password: string,
+  sendTx: SendFunc,
+};
+export type SignAndBroadcastDelegationTxResponse = SignedResponse;
+
+export type SignAndBroadcastDelegationTxFunc = (
+  request: SignAndBroadcastDelegationTxRequest
+) => Promise<SignAndBroadcastDelegationTxResponse>;
+
 // createAddress
 
 export type CreateAddressRequest = {
@@ -413,16 +448,6 @@ export type SaveSelectedExplorerResponse = void;
 export type SaveSelectedExplorerFunc = (
   request: SaveSelectedExplorerRequest
 ) => Promise<SaveSelectedExplorerResponse>;
-
-// isValidAddress
-
-export type IsValidAddressRequest = {
-  address: string
-};
-export type IsValidAddressResponse = boolean;
-export type IsValidAddressFunc = (
-  request: IsValidAddressRequest
-) => Promise<IsValidAddressResponse>;
 
 // isValidMnemonic
 
@@ -483,11 +508,12 @@ export type RestoreWalletFunc = (
 
 // restoreWalletForTransfer
 
-export type RestoreWalletForTransferRequest = {
+export type RestoreWalletForTransferRequest = {|
   recoveryPhrase: string,
+  transferSource: TransferSourceType,
   accountIndex: number,
   checkAddressesInUse: FilterFunc,
-};
+|};
 export type RestoreWalletForTransferResponse = {
   masterKey: string,
   addresses: Array<{| ...Address, ...Addressing |}>
@@ -687,7 +713,7 @@ export default class AdaApi {
 
       const lastSyncInfo = await request.publicDeriver.getLastSyncInfo();
       const mappedTransactions = fetchedTxs.txs.map(tx => {
-        return WalletTransaction.fromAnnotatedUtxoTx({
+        return WalletTransaction.fromAnnotatedTx({
           tx,
           addressLookupMap: fetchedTxs.addressLookupMap,
           lastBlockNumber: lastSyncInfo.SlotNum,
@@ -715,7 +741,7 @@ export default class AdaApi {
 
       const lastSyncInfo = await request.publicDeriver.getLastSyncInfo();
       const mappedTransactions = fetchedTxs.txs.map(tx => {
-        return WalletTransaction.fromAnnotatedUtxoTx({
+        return WalletTransaction.fromAnnotatedTx({
           tx,
           addressLookupMap: fetchedTxs.addressLookupMap,
           lastBlockNumber: lastSyncInfo.SlotNum,
@@ -791,6 +817,7 @@ export default class AdaApi {
             senderUtxos: signRequest.senderUtxos,
             changeAddr: signRequest.changeAddr,
             IOs: unsignedTx,
+            certificate: signRequest.certificate,
           },
           request.publicDeriver.getParent().getPublicDeriverLevel(),
           RustModule.WalletV3.Bip32PrivateKey.from_bytes(
@@ -939,7 +966,7 @@ export default class AdaApi {
   async createUnsignedTx(
     request: CreateUnsignedTxRequest
   ): Promise<CreateUnsignedTxResponse> {
-    Logger.debug('AdaApi::createUnsignedTx called');
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} called`);
     const { receiver, amount, shouldSendAll } = request;
     try {
       const utxos = await request.publicDeriver.getAllUtxos();
@@ -963,15 +990,17 @@ export default class AdaApi {
       } else {
         const nextUnusedInternal = await request.publicDeriver.nextInternal();
         if (nextUnusedInternal.addressInfo == null) {
-          throw new Error('createUnsignedTx no internal addresses left. Should never happen');
+          throw new Error(`${nameof(this.createUnsignedTx)} no internal addresses left. Should never happen`);
         }
         const changeAddr = nextUnusedInternal.addressInfo;
         unsignedTxResponse = environment.isShelley()
           ? shelleyNewAdaUnsignedTx(
-            Buffer.from(
-              RustModule.WalletV3.Address.from_string(receiver).as_bytes()
-            ).toString('hex'),
-            amount,
+            [{
+              address: Buffer.from(
+                RustModule.WalletV3.Address.from_string(receiver).as_bytes()
+              ).toString('hex'),
+              amount
+            }],
             [{
               address: changeAddr.addr.Hash,
               addressing: changeAddr.addressing,
@@ -997,6 +1026,94 @@ export default class AdaApi {
         'AdaApi::createUnsignedTx error: ' + stringifyError(error)
       );
       if (error.id.includes('NotEnoughMoneyToSendError')) throw error;
+      throw new GenericApiError();
+    }
+  }
+
+  async createDelegationTx(
+    request: CreateDelegationTxRequest
+  ): Promise<CreateDelegationTxResponse> {
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.createDelegationTx)} called`);
+    const utxos = await request.publicDeriver.getAllUtxos();
+    const addressedUtxo = shelleyAsAddressedUtxo(utxos);
+    const nextUnusedInternal = await request.publicDeriver.nextInternal();
+    if (nextUnusedInternal.addressInfo == null) {
+      throw new Error(`${nameof(this.createDelegationTx)} no internal addresses left. Should never happen`);
+    }
+    const changeAddr = nextUnusedInternal.addressInfo;
+    return shelleyNewAdaUnsignedTx(
+      [],
+      [{
+        address: changeAddr.addr.Hash,
+        addressing: changeAddr.addressing,
+      }],
+      addressedUtxo,
+      request.certificate
+    );
+  }
+
+  async signAndBroadcastDelegationTx(
+    request: SignAndBroadcastDelegationTxRequest
+  ): Promise<SignAndBroadcastDelegationTxResponse> {
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.signAndBroadcastDelegationTx)} called`);
+    const { password, signRequest } = request;
+    try {
+      const signingKeyFromStorage = await request.publicDeriver.getSigningKey();
+      const stakingAddr = await request.publicDeriver.getStakingKey();
+      const normalizedKey = await request.publicDeriver.normalizeKey({
+        ...signingKeyFromStorage,
+        password,
+      });
+      const normalizedSigningKey = RustModule.WalletV3.Bip32PrivateKey.from_bytes(
+        Buffer.from(normalizedKey.prvKeyHex, 'hex')
+      );
+      let normalizedStakingKey;
+      {
+        let key = normalizedSigningKey;
+        for (const derivation of stakingAddr.addressing.path) {
+          key = key.derive(derivation);
+        }
+        normalizedStakingKey = key.to_raw_key();
+      }
+      const unsignedTx = signRequest.unsignedTx;
+      if (request.signRequest.certificate == null) {
+        throw new Error(`${nameof(this.signAndBroadcastDelegationTx)} missing certificate`);
+      }
+      const certificate = request.signRequest.certificate;
+      const signedTx = shelleySignTransaction(
+        {
+          senderUtxos: signRequest.senderUtxos,
+          changeAddr: signRequest.changeAddr,
+          certificate,
+          IOs: unsignedTx,
+        },
+        request.publicDeriver.getParent().getPublicDeriverLevel(),
+        normalizedSigningKey,
+        // Note: always false because we should only do legacy txs for wallet transfers
+        false,
+        {
+          certificate,
+          stakingKey: normalizedStakingKey,
+        },
+      );
+      const id = Buffer.from(signedTx.id().as_bytes()).toString('hex');
+      const encodedTx = signedTx.as_bytes();
+      const response = request.sendTx({
+        id,
+        encodedTx,
+      });
+      Logger.debug(
+        `${nameof(AdaApi)}::${nameof(this.signAndBroadcastDelegationTx)} success: ` + stringifyData(response)
+      );
+      return response;
+    } catch (error) {
+      if (error instanceof WrongPassphraseError) {
+        throw new IncorrectWalletPasswordError();
+      }
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.signAndBroadcastDelegationTx)} error: ` + stringifyError(error));
+      if (error instanceof InvalidWitnessError) {
+        throw new InvalidWitnessError();
+      }
       throw new GenericApiError();
     }
   }
@@ -1060,20 +1177,6 @@ export default class AdaApi {
     } catch (error) {
       Logger.error('AdaApi::saveSelectedExplorer error: ' + stringifyError(error));
       throw new GenericApiError();
-    }
-  }
-
-  isValidAddress(
-    request: IsValidAddressRequest
-  ): Promise<IsValidAddressResponse> {
-    try {
-      return Promise.resolve(verifyAddress(request.address, environment.isShelley()));
-    } catch (validateAddressError) {
-      Logger.error('AdaApi::isValidAdaAddress error: ' +
-        stringifyError(validateAddressError));
-
-      // If for some reason an is uncaught probably the address is not valid
-      return Promise.resolve(false);
     }
   }
 
@@ -1205,7 +1308,6 @@ export default class AdaApi {
 
   /**
    * Restore all addresses like restoreWallet() but do not touch storage.
-   * TBD: this function is based on restoreWallet() and duplicate parts of it.
    */
   async restoreWalletForTransfer(
     request: RestoreWalletForTransferRequest
@@ -1221,31 +1323,68 @@ export default class AdaApi {
       const reverseAddressLookup = new Map<number, Array<string>>();
       const foundAddresses = new Set<string>();
 
-      // TODO: differentiate restoring legacy vs Shelley wallet
+      const isShelley = request.transferSource === TransferSource.SHELLEY_UTXO ||
+        request.transferSource === TransferSource.SHELLEY_CHIMERIC_ACCOUNT;
       const accountKey = rootPk
-        .derive(WalletTypePurpose.BIP44)
+        .derive(isShelley
+          ? WalletTypePurpose.CIP1852
+          : WalletTypePurpose.BIP44)
         .derive(CoinTypes.CARDANO)
         .derive(request.accountIndex);
-      // TODO: this is using legacy scanning. Need an option for legacy vs shelley
-      const insertTree = await scanBip44Account({
-        accountPublicKey: Buffer.from(accountKey.to_public().as_bytes()).toString('hex'),
-        lastUsedInternal: -1,
-        lastUsedExternal: -1,
-        checkAddressesInUse,
-        addByHash: (address) => {
-          if (!foundAddresses.has(address.address.data)) {
-            let family = reverseAddressLookup.get(address.keyDerivationId);
-            if (family == null) {
-              family = [];
-              reverseAddressLookup.set(address.keyDerivationId, family);
-            }
-            family.push(address.address.data);
-            foundAddresses.add(address.address.data);
+
+      const addByHash = (address) => {
+        if (!foundAddresses.has(address.address.data)) {
+          let family = reverseAddressLookup.get(address.keyDerivationId);
+          if (family == null) {
+            family = [];
+            reverseAddressLookup.set(address.keyDerivationId, family);
           }
-          return Promise.resolve();
-        },
-        protocolMagic,
-      });
+          family.push(address.address.data);
+          foundAddresses.add(address.address.data);
+        }
+        return Promise.resolve();
+      };
+
+      let insertTree;
+      if (request.transferSource === TransferSource.BYRON) {
+        insertTree = await scanBip44Account({
+          accountPublicKey: Buffer.from(accountKey.to_public().as_bytes()).toString('hex'),
+          lastUsedInternal: -1,
+          lastUsedExternal: -1,
+          checkAddressesInUse,
+          addByHash,
+          protocolMagic,
+        });
+      } else if (isShelley) {
+        const stakingKey = accountKey
+          .derive(ChainDerivations.CHIMERIC_ACCOUNT)
+          .derive(STAKING_KEY_INDEX)
+          .to_public()
+          .to_raw_key();
+
+        const cip1852InsertTree = await scanCip1852Account({
+          accountPublicKey: Buffer.from(accountKey.to_public().as_bytes()).toString('hex'),
+          lastUsedInternal: -1,
+          lastUsedExternal: -1,
+          checkAddressesInUse,
+          addByHash,
+          stakingKey,
+        });
+
+        if (request.transferSource === TransferSource.SHELLEY_UTXO) {
+          insertTree = cip1852InsertTree.filter(child => (
+            child.index === ChainDerivations.EXTERNAL || child.index === ChainDerivations.INTERNAL
+          ));
+        } else if (request.transferSource === TransferSource.SHELLEY_CHIMERIC_ACCOUNT) {
+          insertTree = cip1852InsertTree.filter(child => (
+            child.index === ChainDerivations.CHIMERIC_ACCOUNT
+          ));
+        } else {
+          throw new Error(`${nameof(this.restoreWalletForTransfer)} unexpected shelley type ${request.transferSource}`);
+        }
+      } else {
+        throw new Error(`${nameof(this.restoreWalletForTransfer)} unexpected wallet type ${request.transferSource}`);
+      }
       const flattenedTree = flattenInsertTree(insertTree);
 
       const addressResult = [];
@@ -1260,7 +1399,7 @@ export default class AdaApi {
           keyDerivationId: i
         });
         const family = reverseAddressLookup.get(i);
-        if (family == null) throw new Error('restoreWalletForTransfer should never happen');
+        if (family == null) throw new Error(`${nameof(this.restoreWalletForTransfer)} should never happen`);
         const result = family.map(address => ({
           address,
           addressing: {
@@ -1271,14 +1410,14 @@ export default class AdaApi {
         addressResult.push(...result);
       }
 
-      Logger.debug('AdaApi::restoreWalletForTransfer success');
+      Logger.debug(`${nameof(this.restoreWalletForTransfer)} success`);
 
       return {
         masterKey: Buffer.from(rootPk.as_bytes()).toString('hex'),
         addresses: addressResult,
       };
     } catch (error) {
-      Logger.error('AdaApi::restoreWalletForTransfer error: ' + stringifyError(error));
+      Logger.error(`${nameof(this.restoreWalletForTransfer)} error: ` + stringifyError(error));
       // TODO: backend will return something different here, if multiple wallets
       // are restored from the key and if there are duplicate wallets we will get
       // some kind of error and present the user with message that some wallets

@@ -57,7 +57,7 @@ export default class WalletTransaction {
   }
 
   @action
-  static fromAnnotatedUtxoTx(request: {
+  static fromAnnotatedTx(request: {
     tx: {|
       ...DbTxIO,
       ...WithNullableFields<DbBlock>,
@@ -73,7 +73,7 @@ export default class WalletTransaction {
       for (const row of rows) {
         const val = addressLookupMap.get(row.AddressId);
         if (val == null) {
-          throw new Error('fromAnnotatedUtxoTx address not in map');
+          throw new Error(`${nameof(WalletTransaction.fromAnnotatedTx)} address not in map`);
         }
         result.push(val);
       }
@@ -91,8 +91,14 @@ export default class WalletTransaction {
         ? request.lastBlockNumber - tx.block.SlotNum
         : 0,
       addresses: {
-        from: toAddr(tx.utxoInputs),
-        to: toAddr(tx.utxoOutputs),
+        from: [
+          ...toAddr(tx.utxoInputs),
+          ...toAddr(tx.accountingInputs),
+        ],
+        to: [
+          ...toAddr(tx.utxoOutputs),
+          ...toAddr(tx.accountingOutputs),
+        ]
       },
       state: tx.transaction.Status,
       errorMsg: tx.transaction.ErrorMessage,

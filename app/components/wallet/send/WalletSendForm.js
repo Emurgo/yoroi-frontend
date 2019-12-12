@@ -49,10 +49,6 @@ const messages = defineMessages({
     id: 'wallet.send.form.receiver.hint',
     defaultMessage: '!!!Wallet Address',
   },
-  amountLabel: {
-    id: 'wallet.send.form.amount.label',
-    defaultMessage: '!!!Amount',
-  },
   equalsAdaHint: {
     id: 'wallet.send.form.amount.equalsAda',
     defaultMessage: '!!!equals {amount} ADA',
@@ -93,6 +89,10 @@ const messages = defineMessages({
     id: 'wallet.send.form.sendingIsDisabled',
     defaultMessage: '!!!Cannot send a transaction while there is a pending one',
   },
+  cannotSendtoLegacy: {
+    id: 'wallet.send.form.cannotSendToLegacy',
+    defaultMessage: '!!!You cannot send to legacy addresses (any address created before November 29th, 2019)',
+  },
 });
 
 type Props = {|
@@ -102,7 +102,8 @@ type Props = {|
   +hasAnyPending: boolean,
   +validateAmount: (amountInNaturalUnits: string) => Promise<boolean>,
   +onSubmit: void => void,
-  +addressValidator: Function,
+  +isValidShelleyAddress: string => boolean,
+  +isValidLegacyAddress: string => boolean,
   +totalInput: ?BigNumber,
   +classicTheme: boolean,
   +updateReceiver: (void | string) => void,
@@ -185,19 +186,28 @@ export default class WalletSendForm extends Component<Props> {
             this.props.updateReceiver();
             return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
-          return this.props.addressValidator(receiverValue)
-            .then(isValidReceiver => {
-              if (isValidReceiver) {
-                this.props.updateReceiver(receiverValue);
-              } else {
-                this.props.updateReceiver();
-              }
-              return [isValidReceiver, this.context.intl.formatMessage(messages.invalidAddress)];
-            });
+          const updateReceiver = (isValid) => {
+            if (isValid) {
+              this.props.updateReceiver(receiverValue);
+            } else {
+              this.props.updateReceiver();
+            }
+          };
+          const isValidLegacy = this.props.isValidLegacyAddress(receiverValue);
+          if (!environment.isShelley()) {
+            updateReceiver(isValidLegacy);
+            return [isValidLegacy, this.context.intl.formatMessage(messages.invalidAddress)];
+          }
+          if (isValidLegacy) {
+            return [false, this.context.intl.formatMessage(messages.cannotSendtoLegacy)];
+          }
+          const isValidShelley = this.props.isValidShelleyAddress(receiverValue);
+          updateReceiver(isValidShelley);
+          return [isValidShelley, this.context.intl.formatMessage(messages.invalidAddress)];
         }],
       },
       amount: {
-        label: this.context.intl.formatMessage(messages.amountLabel),
+        label: this.context.intl.formatMessage(globalMessages.walletSendConfirmationAmountLabel),
         placeholder: this.props.classicTheme ?
           `0.${'0'.repeat(this.props.currencyMaxFractionalDigits)}` : '',
         value: this.props.uriParams
@@ -297,7 +307,7 @@ export default class WalletSendForm extends Component<Props> {
             <NumericInput
               {...amountFieldProps}
               className="amount"
-              label={intl.formatMessage(messages.amountLabel)}
+              label={intl.formatMessage(globalMessages.walletSendConfirmationAmountLabel)}
               maxBeforeDot={currencyMaxIntegerDigits}
               maxAfterDot={currencyMaxFractionalDigits}
               disabled={this.props.shouldSendAll}

@@ -6,7 +6,7 @@ import styles from './BigButtonForDialogs.scss';
 type Props = {|
   +label: string,
   +description: string,
-  +onClick: Function,
+  +onClick: void => void,
   +isDisabled: boolean,
   +className: string,
 |};

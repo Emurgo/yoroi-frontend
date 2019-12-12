@@ -9,6 +9,7 @@ import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import BorderedBox from '../widgets/BorderedBox';
 import globalMessages from '../../i18n/global-messages';
 import styles from './TransferInstructionsPage.scss';
+import environment from '../../environment';
 
 const messages = defineMessages({
   attentionText: {
@@ -107,7 +108,11 @@ export default class TransferInstructionsPage extends Component<Props> {
                   {intl.formatMessage(globalMessages.attentionTitle)}
                 </div>
                 <div className={styles.text}>
-                  <FormattedHTMLMessage {...messages.attentionText} />
+                  <FormattedHTMLMessage {...(environment.isShelley()
+                    ? globalMessages.legacyAttentionText
+                    : messages.attentionText)
+                  }
+                  />
                 </div>
               </div>
 

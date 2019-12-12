@@ -26,6 +26,7 @@ module.exports = function (api /*: ApiType */) {
       '@babel/preset-react'
     ],
     plugins: [
+      '@babel/plugin-proposal-nullish-coalescing-operator',
       '@babel/plugin-proposal-optional-chaining',
       'nameof-js',
       [
@@ -76,6 +77,17 @@ module.exports = function (api /*: ApiType */) {
         ]
       },
       cucumber: {
+        plugins: [
+          '@babel/plugin-transform-runtime',
+          ['module-resolver', {
+            alias: {
+              'cardano-wallet-browser': 'cardano-wallet',
+              '@emurgo/js-chain-libs': '@emurgo/js-chain-libs-node',
+            }
+          }]
+        ]
+      },
+      test: {
         plugins: [
           '@babel/plugin-transform-runtime',
           ['module-resolver', {

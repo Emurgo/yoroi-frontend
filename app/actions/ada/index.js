@@ -12,6 +12,7 @@ import TxBuilderActions from './tx-builder-actions';
 import LedgerSendActions from './ledger-send-actions';
 import HWVerifyAddressActions from './hw-verify-address-actions';
 import WalletRestoreActions from './wallet-restore-actions';
+import DelegationTransaction from './delegation-transaction-actions';
 
 export type AdaActionsMap = {
   txBuilderActions: TxBuilderActions,
@@ -28,6 +29,7 @@ export type AdaActionsMap = {
   ledgerSend: LedgerSendActions,
   hwVerifyAddress: HWVerifyAddressActions,
   walletRestore: WalletRestoreActions,
+  delegationTransaction: DelegationTransaction,
 };
 
 const adaActionsMap: AdaActionsMap = {
@@ -45,6 +47,7 @@ const adaActionsMap: AdaActionsMap = {
   ledgerSend: new LedgerSendActions(),
   hwVerifyAddress: new HWVerifyAddressActions(),
   walletRestore: new WalletRestoreActions(),
+  delegationTransaction: new DelegationTransaction(),
 };
 
 export default adaActionsMap;

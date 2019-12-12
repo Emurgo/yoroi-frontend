@@ -55,6 +55,9 @@ export type BestBlockFunc = (body: BestBlockRequest) => Promise<BestBlockRespons
 
 // sendTx
 
+export type SignedRequestInternal = {|
+  signedTx: string,
+|};
 export type SignedRequest = {|
   id: string,
   encodedTx: Uint8Array,
@@ -137,8 +140,9 @@ export type RemoteTxBlockMeta = {|
   +slot: number,
 |};
 export type RemoteCertificate = {|
-  kind: CertificateKindType,
-  payload: string,
+  payloadKind: 'PoolRegistration' | 'PoolUpdate' | 'PoolRetirement' | 'StakeDelegation' | 'OwnerStakeDelegation',
+  payloadKindId: CertificateKindType,
+  payloadHex: string,
 |};
 export type RemoteTxInfo = {|
   +hash: string,

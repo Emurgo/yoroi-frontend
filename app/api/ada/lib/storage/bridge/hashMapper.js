@@ -132,7 +132,7 @@ export function rawGenHashToIdsFunc(
     const notFoundWithoutCanonical: Array<{| data: string, type: CoreAddressT |}> = [];
     const addressWithType = notFound.map(addr => ({
       data: addr,
-      type: addressToKind(addr),
+      type: addressToKind(addr, 'bytes'),
     }));
     for (const address of addressWithType) {
       if (address.type !== CoreAddressTypes.SHELLEY_GROUP) {

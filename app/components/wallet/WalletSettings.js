@@ -16,10 +16,6 @@ const messages = defineMessages({
     id: 'wallet.settings.name.label',
     defaultMessage: '!!!Wallet name',
   },
-  passwordLabel: {
-    id: 'wallet.settings.password',
-    defaultMessage: '!!!Spending password',
-  },
   passwordLastUpdated: {
     id: 'wallet.settings.passwordLastUpdated',
     defaultMessage: '!!!Last updated',
@@ -104,7 +100,7 @@ export default class WalletSettings extends Component<Props> {
 
         {showPasswordBlock &&
           <ReadOnlyInput
-            label={intl.formatMessage(messages.passwordLabel)}
+            label={intl.formatMessage(globalMessages.walletPasswordLabel)}
             value={passwordMessage}
             isSet
             onClick={() => openDialogAction({

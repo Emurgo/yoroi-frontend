@@ -182,7 +182,7 @@ const displayInfo = {
     txStatus: 'FAILED',
     txFrom: ['Ae2tdPwUPEYw8ScZrAvKbxai1TzG7BGC4n8PoF9JzE1abgHc3gBfkkDNBNv'],
     txTo: [
-      'Ae2tdPwUPEZCvDkc6R9oNE7Qh1yFLDyu4mpVbGhqUHkNsoVjd2UPiWGoVes',
+      'Ae2tdPwUPEZCdSLM7bHhoC6xptW9SRW155PFFf4WYCKnpX4JrxJPmFzi6G2',
       'Ae2tdPwUPEZCqWsJkibw8BK2SgbmJ1rRG142Ru1CjSnRvKwDWbL4UYPN3eU',
     ],
     txId: 'fc6a5f086c0810de3048651ddd9075e6e5543bf59cdfe5e0c73bf1ed9dcec1ab',

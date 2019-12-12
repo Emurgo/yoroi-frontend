@@ -16,6 +16,8 @@ import { migrate } from '../../api';
 import { Logger, stringifyError } from '../../utils/logging';
 import { closeOtherInstances } from '../../utils/tabManager';
 import { loadLovefieldDB, } from '../../api/ada/lib/storage/database/index';
+import { tryAddressToKind } from '../../api/ada/lib/storage/bridge/utils';
+import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
@@ -97,7 +99,13 @@ export default class LoadingStore extends Store {
     if (this.fromUriScheme) {
       const uriParams = await getURIParameters(
         decodeURIComponent(this._originRoute.location),
-        this.stores.substores.ada.wallets.isValidAddress
+        address => {
+          const addressKind = tryAddressToKind(address, 'bech32');
+          const valid = environment.isShelley()
+            ? addressKind != null && addressKind !== CoreAddressTypes.CARDANO_LEGACY
+            : addressKind != null && addressKind === CoreAddressTypes.CARDANO_LEGACY;
+          return Promise.resolve(valid);
+        }
       );
       runInAction(() => {
         this._uriParams = uriParams;

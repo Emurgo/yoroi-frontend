@@ -5,9 +5,9 @@
     "websocketUrl": "wss://testnet-yoroi-backend.yoroiwallet.com:443",
     "name": "testnet"
   },
-  seiza: {
-    simple: "",
-    advance: ""
+  "seiza": {
+    "simple": "",
+    "advance": ""
   },
   "app": {
     "walletRefreshInterval": 20000,
@@ -21,11 +21,12 @@
     "block0_date": 0,
     "slots_per_epoch": 21600,
     "slot_duration": 20,
+    "epoch_reward": 21414,
     "linearFee": {
       "constant": "2",
       "coefficient": "1",
       "certificate": "4"
     },
-    "genesisHash": "todo"
+    "genesisHash": "c511043dda377d7764d9f01d721ddea323f2a01b1e89f62c8ee587a65d7a1487"
   }
 }
