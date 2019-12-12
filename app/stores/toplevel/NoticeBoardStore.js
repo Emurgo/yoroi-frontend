@@ -76,7 +76,8 @@ export default class NoticeBoardStore extends Store {
         }
 
         if (newNotices) {
-          this.loadedNotices.push(...newNotices);
+          // this.loadedNotices.push(...newNotices);
+          this.loadedNotices = newNotices;
         }
       });
     } finally {

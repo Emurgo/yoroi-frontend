@@ -9,6 +9,7 @@
   align-items: center;
   padding: 36px;
   .group {
+    width: 675px;
     margin-bottom: 30px;
     .groupDate {
       font-family: var(--font-regular);
@@ -19,7 +20,6 @@
   }
   .loadMoreNoticesButton {
     display: block !important;
-    margin: 30px auto;
     width: 287px;
   }
 }

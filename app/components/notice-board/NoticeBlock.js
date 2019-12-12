@@ -175,7 +175,7 @@ export default class NoticeBlock extends Component<Props> {
           <div className={styles.infoBlock}>
             <div className={styles.firstRow}>
               <div className={styles.title}>{title}</div>
-              <div className={styles.date}>{time}</div>
+              <div className={styles.time}>{time}</div>
             </div>
             <div className={styles.secondRow}>{subMessage}</div>
           </div>

@@ -4,6 +4,7 @@
   display: flex;
   flex-direction: column;
   .wrap {
+    width: 100%;
     margin-bottom: 24px;
     display: flex;
     .iconBlock {
@@ -11,18 +12,18 @@
       margin-right: 16px;
     }
     .infoBlock {
+      width: 100%;
       .firstRow {
         display: flex;
-        flex-direction: row;
-        height: 22px;
+        line-height: 22px;
         .title {
-          width: 474px;
+          flex-grow: 1;
           font-size: 18px;
           font-weight: 600;
           color: var(--cmn-default-color-grey);
         }
-        .date {
-          width: 200px;
+        .time {
+          min-width: 160px;
           display: flex;
           justify-content: flex-end;
           font-size: 12px;
@@ -32,6 +33,7 @@
       .secondRow {
         margin-top: 5px;
         font-size: 14px;
+        line-height: 18px;
         color: var(--cmn-default-color-grey);
       }
     }
