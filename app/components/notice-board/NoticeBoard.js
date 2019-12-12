@@ -97,20 +97,22 @@ export default class NoticeBoard extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        {noticeGroup.map(group => (
-          <div className={styles.group} key={group.strDate}>
-            <div className={styles.groupDate}>{this.localizedDate(group)}</div>
-            <div>
-              {group.notices.map((notice) => (
-                <NoticeBlock
-                  key={`${group.strDate}-${notice.id}-${notice.kind}`}
-                  notice={notice}
-                  isToday={group.isToday}
-                />
-              ))}
+        <div className={styles.notices}>
+          {noticeGroup.map(group => (
+            <div className={styles.group} key={group.strDate}>
+              <div className={styles.groupDate}>{this.localizedDate(group)}</div>
+              <div>
+                {group.notices.map((notice) => (
+                  <NoticeBlock
+                    key={`${group.strDate}-${notice.id}-${notice.kind}`}
+                    notice={notice}
+                    isToday={group.isToday}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
         {hasMoreToLoad &&
           <Button
             disabled={isLoading}
