@@ -17,7 +17,7 @@ const messages = defineMessages({
   },
   tooltip: {
     id: 'wallet.dashboard.epochTooltip',
-    defaultMessage: '!!!Note: only to receive the first reward will take longer then 1 epoch, after you will receive rewards every next epoch.'
+    defaultMessage: '!!!Note: only the first reward after delegating will take 2 epochs. Afterwards, rewards come every epoch.'
   },
   endTitle: {
     id: 'wallet.dashboard.epochEndTitle',

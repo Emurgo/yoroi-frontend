@@ -101,40 +101,6 @@ import type { ConfigType } from '../../../../../../config/config-types';
 declare var CONFIG: ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;
 
-export type ToAbsoluteSlotNumberRequest = {
-  epoch: number,
-  slot: number,
-};
-export type ToAbsoluteSlotNumberResponse = number;
-export type ToAbsoluteSlotNumberFunc = (
-  request: ToAbsoluteSlotNumberRequest
-) => ToAbsoluteSlotNumberResponse;
-
-export async function genToAbsoluteSlotNumber(): Promise<ToAbsoluteSlotNumberFunc> {
-  // TODO: Cardano in the future will have a variable epoch size
-  // and sidechains/networks can have different epoch sizes
-  // so this needs to come from a DB
-  return (request: ToAbsoluteSlotNumberRequest) => {
-    return (CONFIG.genesis.slots_per_epoch * request.epoch) + request.slot;
-  };
-}
-
-export type TimeSinceGenesisRequest = {
-  absoluteSlot: number,
-};
-export type TimeSinceGenesisResponse = number;
-export type TimeSinceGenesisRequestFunc = (
-  request: TimeSinceGenesisRequest
-) => TimeSinceGenesisResponse;
-export async function genTimeSinceGenesis(): Promise<TimeSinceGenesisRequestFunc> {
-  // TODO: Cardano in the future will have a variable slot length
-  // and sidechains/networks can have different epoch sizes
-  // so this needs to come from a DB
-  return (request: TimeSinceGenesisRequest) => {
-    return (CONFIG.genesis.slot_duration * request.absoluteSlot);
-  };
-}
-
 export function normalizeBip32Ed25519ToPubDeriverLevel(request: {
   privateKeyRow: $ReadOnly<KeyRow>,
   password: null | string,

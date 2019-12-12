@@ -51,7 +51,7 @@ import {
 } from '../../state-fetch/types';
 import type {
   ToAbsoluteSlotNumberFunc,
-} from '../models/utils';
+} from './timeUtils';
 import type {
   UtxoTransactionInputInsert, UtxoTransactionOutputInsert,
 } from '../database/transactionModels/utxo/tables';
@@ -81,9 +81,11 @@ import { ModifyLastSyncInfo, } from '../database/walletTypes/core/api/write';
 import type { LastSyncInfoRow, } from '../database/walletTypes/core/tables';
 import type { DbTxIO, DbTxInChain } from '../database/transactionModels/multipart/tables';
 import {
-  genToAbsoluteSlotNumber,
   rawGetAddressRowsForWallet,
 } from  '../models/utils';
+import {
+  genToAbsoluteSlotNumber,
+} from './timeUtils';
 import {
   rawGenHashToIdsFunc,
 } from './hashMapper';

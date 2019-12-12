@@ -1,29 +1,116 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import BigNumber from 'bignumber.js';
 
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import StakingDashboard from '../../../components/wallet/staking/dashboard/StakingDashboard';
+import environment from '../../../environment';
+
+import { formattedWalletAmount } from '../../../utils/formatters';
+
+import {
+  genTimeToSlot,
+  genToRelativeSlotNumber,
+  genCurrentSlotLength,
+  genCurrentEpochLength,
+} from '../../../api/ada/lib/storage/bridge/timeUtils';
+import type {
+  TimeToAbsoluteSlotFunc,
+  ToRelativeSlotNumberFunc,
+  CurrentSlotLengthFunc,
+  CurrentEpochLengthFunc,
+} from '../../../api/ada/lib/storage/bridge/timeUtils';
 
 type Props = {
   ...InjectedProps,
 };
 
+type State = {|
+  +currentTime: Date,
+  +timeToSlot: TimeToAbsoluteSlotFunc;
+  +toRelativeSlotNumber: ToRelativeSlotNumberFunc;
+  +currentSlotLength: CurrentSlotLengthFunc;
+  +currentEpochLength: CurrentEpochLengthFunc;
+|};
+
 @observer
-export default class StakingDashboardPage extends Component<Props> {
+export default class StakingDashboardPage extends Component<Props, State> {
+
+  async componentDidMount() {
+    const timeToSlot = await genTimeToSlot();
+    const toRelativeSlotNumber = await genToRelativeSlotNumber();
+    const currentSlotLength = await genCurrentSlotLength();
+    const currentEpochLength = await genCurrentEpochLength();
+    this.setState({
+      timeToSlot,
+      toRelativeSlotNumber,
+      currentSlotLength,
+      currentEpochLength,
+      currentTime: new Date(),
+    });
+    setInterval(
+      () => this.setState(prevState => ({
+        ...prevState,
+        currentTime: new Date()
+      })),
+      1000
+    );
+
+    this.props.actions.ada.delegation.startWatch.trigger();
+  }
+
+  componentWillUnmount() {
+    this.props.actions.ada.delegation.reset.trigger();
+  }
 
   render() {
+    // TODO: render something else if there is a pending tx that modifies delegation?
+    if (this.state == null) return null; // TODO: render spinner
+    const absoluteSlot = this.state.timeToSlot({
+      time: this.state.currentTime
+    });
+    const relativeTime = this.state.toRelativeSlotNumber(absoluteSlot.slot);
+
+    const epochLength = this.state.currentEpochLength();
+    const slotLength = this.state.currentSlotLength();
+
+    const secondsLeftInEpoch = (epochLength - relativeTime.slot) * slotLength;
+    const timeLeftInEpoch = new Date(
+      (1000 * secondsLeftInEpoch) - absoluteSlot.msIntoSlot
+    );
+
+    const leftPadDate: number => string = (num) => {
+      if (num < 10) return '0' + num;
+      return num.toString();
+    };
+
+    const publicDeriver = this.props.stores.substores[environment.API].wallets.selected;
+    if (publicDeriver == null) {
+      throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
+    }
+
+    const hideOrFormat: BigNumber => string = (amount) => {
+      return this.props.stores.profile.shouldHideBalance
+        ? '******'
+        : formattedWalletAmount(amount);
+    };
+
     const { getThemeVars } = this.props.stores.profile;
     return (
       <StakingDashboard
         themeVars={getThemeVars({ theme: 'YoroiModern' })}
         hasDelegation
-        endTime={{ h: '07', m: '10', s: '55' }}
-        totalAdaSum="100,000.000000"
+        endTime={{
+          h: leftPadDate(timeLeftInEpoch.getHours()),
+          m: leftPadDate(timeLeftInEpoch.getMinutes()),
+          s: leftPadDate(timeLeftInEpoch.getSeconds()),
+        }}
+        totalAdaSum={hideOrFormat(publicDeriver.amount)}
         totalRewards="0"
         totalDelegated="0"
-        currentEpoch={5}
-        epochProgress={55}
+        currentEpoch={relativeTime.epoch}
+        epochProgress={Math.floor(100 * relativeTime.slot / epochLength)}
         currentReward="Tue, 13th at 18:30:27"
         followingReward="every 2 days"
         stakePoolName={"Warren's stake pool"}

@@ -1,8 +1,6 @@
 // @flow
 import Action from '../lib/Action';
 
-// ======= ADDRESSES ACTIONS =======
-
 export type PoolRequest =
   void |
   {| id: string |} |
