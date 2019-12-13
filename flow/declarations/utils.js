@@ -1,6 +1,7 @@
 // @flow
 
-declare type Inexact<T: {}> = $Rest<T, {}>;
+declare type InexactSubset<T: {}> = $Rest<T, {}>;
+declare type Inexact<T: {}> = { ...T };
 
 declare type ExtractReturnType = <R>((...arg: any) => R) => R;
 declare type ReturnType<Func> = $Call<ExtractReturnType, Func>;

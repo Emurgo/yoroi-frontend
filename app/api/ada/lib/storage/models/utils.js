@@ -114,7 +114,7 @@ export function normalizeBip32Ed25519ToPubDeriverLevel(request: {
     request.password,
   );
   const wasmKey = RustModule.WalletV3.Bip32PrivateKey.from_bytes(Buffer.from(prvKey, 'hex'));
-  const newKey = deriveKeyV2(
+  const newKey = deriveKey(
     wasmKey,
     request.path,
   );
@@ -143,7 +143,7 @@ export function decryptKey(
 }
 
 
-export function deriveKeyV2(
+export function deriveKey(
   startingKey: RustModule.WalletV3.Bip32PrivateKey,
   pathToPublic: Array<number>,
 ): RustModule.WalletV3.Bip32PrivateKey {

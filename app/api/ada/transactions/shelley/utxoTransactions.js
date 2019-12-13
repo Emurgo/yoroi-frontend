@@ -16,14 +16,11 @@ import type { ConfigType } from '../../../../../config/config-types';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 
-import {
-  Bip44DerivationLevels,
-} from '../../lib/storage/database/walletTypes/bip44/api/utils';
 import type {
   Address, Value, Addressing,
   IGetAllUtxosResponse
 } from '../../lib/storage/models/PublicDeriver/interfaces';
-import { generateAuthData } from './utils';
+import { generateAuthData, normalizeKey, } from './utils';
 
 declare var CONFIG: ConfigType;
 
@@ -385,23 +382,13 @@ function addWitnesses(
   signingKey: RustModule.WalletV3.Bip32PrivateKey,
   useLegacy: boolean,
 ): RustModule.WalletV3.TransactionBuilderSetAuthData {
-  // get private keys
-  const privateKeys = senderUtxos.map(utxo => {
-    const lastLevelSpecified = utxo.addressing.startLevel + utxo.addressing.path.length - 1;
-    if (lastLevelSpecified !== Bip44DerivationLevels.ADDRESS.level) {
-      throw new Error('addWitnesses incorrect addressing size');
-    }
-    if (keyLevel + 1 < utxo.addressing.startLevel) {
-      throw new Error('addWitnesses keyLevel < startLevel');
-    }
-    let key = signingKey;
-    for (let i = keyLevel - utxo.addressing.startLevel + 1; i < utxo.addressing.path.length; i++) {
-      key = key.derive(
-        utxo.addressing.path[i]
-      );
-    }
-    return key;
-  });
+  const privateKeys = senderUtxos.map(utxo => normalizeKey({
+    addressing: utxo.addressing,
+    startingFrom: {
+      key: signingKey,
+      level: keyLevel,
+    },
+  }));
 
   const witnesses = RustModule.WalletV3.Witnesses.new();
   for (let i = 0; i < senderUtxos.length; i++) {

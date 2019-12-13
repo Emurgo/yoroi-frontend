@@ -84,6 +84,9 @@ import {
   signTransaction as shelleySignTransaction,
 } from './transactions/shelley/utxoTransactions';
 import {
+  normalizeKey
+} from './transactions/shelley/utils';
+import {
   generateWalletRootKey,
   generateAdaMnemonic,
   isValidEnglishAdaMnemonic,
@@ -258,7 +261,7 @@ export type GetTransactionsRequestOptions = {|
   limit: number,
 |};
 export type GetTransactionsRequest = {
-  ...Inexact<GetTransactionsRequestOptions>,
+  ...InexactSubset<GetTransactionsRequestOptions>,
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos & IGetLastSyncInfo,
   isLocalRequest: boolean,
   getTransactionsHistoryForAddresses: HistoryFunc,
@@ -1028,14 +1031,13 @@ export default class AdaApi {
       const normalizedSigningKey = RustModule.WalletV3.Bip32PrivateKey.from_bytes(
         Buffer.from(normalizedKey.prvKeyHex, 'hex')
       );
-      let normalizedStakingKey;
-      {
-        let key = normalizedSigningKey;
-        for (const derivation of stakingAddr.addressing.path) {
-          key = key.derive(derivation);
-        }
-        normalizedStakingKey = key.to_raw_key();
-      }
+      const normalizedStakingKey = normalizeKey({
+        addressing: stakingAddr.addressing,
+        startingFrom: {
+          key: normalizedSigningKey,
+          level: request.publicDeriver.getParent().getPublicDeriverLevel(),
+        },
+      }).to_raw_key();
       const unsignedTx = signRequest.unsignedTx;
       if (request.signRequest.certificate == null) {
         throw new Error(`${nameof(this.signAndBroadcastDelegationTx)} missing certificate`);
