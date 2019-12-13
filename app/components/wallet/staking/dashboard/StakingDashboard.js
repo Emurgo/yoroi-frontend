@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
 import GraphWrapper from './GraphWrapper';
-import StakePool from './StakePool';
 import RewardPopup from './RewardPopup';
 import EmptyDashboard from './EmptyDashboard';
 import styles from './StakingDashboard.scss';
@@ -26,12 +25,9 @@ type Props = {|
   themeVars: Object,
   currentReward: string,
   followingReward: string,
-  hasDelegation: bool,
-  stakePoolName: string,
-  stakePoolData: Object,
-  hash: string,
   totalGraphData: Array<Object>,
   positionsGraphData: Array<Object>,
+  stakePools: Array<Node>,
   epochProgress: Node,
   userSummary: Node,
 |};
@@ -47,10 +43,6 @@ export default class StakingDashboard extends Component<Props> {
       themeVars,
       currentReward,
       followingReward,
-      hasDelegation,
-      stakePoolName,
-      stakePoolData,
-      hash,
       totalGraphData,
       positionsGraphData,
     } = this.props;
@@ -95,10 +87,10 @@ export default class StakingDashboard extends Component<Props> {
               {this.props.userSummary}
             </div>
           </div>
-          {hasDelegation ? (
+          {this.props.stakePools.length > 0 ? (
             <div className={styles.bodyWrapper}>
               <div className={styles.stakePool}>
-                <StakePool poolName={stakePoolName} data={stakePoolData} hash={hash} />
+                {this.props.stakePools}
               </div>
             </div>
           ) : (

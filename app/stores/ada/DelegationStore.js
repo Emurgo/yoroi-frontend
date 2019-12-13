@@ -19,9 +19,7 @@ import {
 } from '../../api/ada/lib/storage/bridge/utils';
 import environment from '../../environment';
 import type {
-  AccountStateResponse,
   AccountStateSuccess,
-  AccountStateFunc,
 } from '../../api/ada/lib/state-fetch/types';
 
 export default class DelegationStore extends Store {

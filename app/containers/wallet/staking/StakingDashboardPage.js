@@ -8,6 +8,7 @@ import type { InjectedProps } from '../../../types/injectedPropsType';
 import StakingDashboard from '../../../components/wallet/staking/dashboard/StakingDashboard';
 import EpochProgress from '../../../components/wallet/staking/dashboard/EpochProgress';
 import UserSummary from '../../../components/wallet/staking/dashboard/UserSummary';
+import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
 import environment from '../../../environment';
 import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
 
@@ -86,11 +87,13 @@ export default class StakingDashboardPage extends Component<Props, State> {
 
     const epochProgress = this.getEpochProgress();
 
+    const stakePools = this.getStakePools();
+
     const { getThemeVars } = this.props.stores.profile;
     return (
       <StakingDashboard
         themeVars={getThemeVars({ theme: 'YoroiModern' })}
-        hasDelegation
+        stakePools={stakePools}
         epochProgress={epochProgress}
         userSummary={<UserSummary
           totalAdaSum={hideOrFormat(publicDeriver.amount)}
@@ -112,19 +115,6 @@ export default class StakingDashboardPage extends Component<Props, State> {
         />}
         currentReward="Tue, 13th at 18:30:27"
         followingReward="every 2 days"
-        stakePoolName={"Warren's stake pool"}
-        stakePoolData={{
-          percentage: '30',
-          fullness: '18',
-          margins: '12',
-          created: '29/02/2019 12:42:41 PM',
-          cost: '12,688.00000',
-          stake: '9,688.00000',
-          pledge: '85.567088',
-          rewards: '81.000088',
-          age: '23',
-        }}
-        hash="addr1ssuvzjs82mshgvyp4r4lmwgknvgjswnm7mpcq3wycjj7v2nk393e6qwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm9078ssez"
         totalGraphData={[
           {
             name: 1,
@@ -357,5 +347,28 @@ export default class StakingDashboardPage extends Component<Props, State> {
         }}
       />
     );
+  }
+
+  getStakePools: void => Array<Node> = () => {
+    const delegationStore = this.props.stores.substores[environment.API].delegation;
+    if (delegationStore.stakingKeyState == null) {
+      return [];
+    }
+    return delegationStore.stakingKeyState.delegation.pools.map(pool => (
+      <StakePool
+        poolName={"Warren's stake pool"}
+        data={{
+          percentage: '30',
+          fullness: '18',
+          margins: '12',
+          created: '29/02/2019 12:42:41 PM',
+          cost: '12,688.00000',
+          stake: '9,688.00000',
+          pledge: '85.567088',
+          rewards: '81.000088',
+          age: '23',
+        }}
+        hash={pool[0]}
+      />));
   }
 }
