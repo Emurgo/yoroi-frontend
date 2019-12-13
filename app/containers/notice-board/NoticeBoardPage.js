@@ -9,6 +9,7 @@ import MainLayout from '../MainLayout';
 import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import TopBar from '../../components/topbar/TopBar';
 import NoticeBoard from '../../components/notice-board/NoticeBoard';
+import NoNotice from '../../components/notice-board/NoNotice';
 
 const messages = defineMessages({
   title: {
@@ -28,7 +29,7 @@ export default class NoticeBoardPage extends Component<Props> {
   render() {
     const { actions, stores } = this.props;
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
-    const { noticeBoard, topbar } = stores;
+    const { noticeBoard, topbar, profile } = stores;
 
     const topbarTitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
@@ -43,6 +44,8 @@ export default class NoticeBoardPage extends Component<Props> {
         categories={topbar.categories}
       />
     );
+    const hasAny = noticeBoard.loadedNotices.length > 0;
+
     return (
       <MainLayout
         topbar={topbarComp}
@@ -50,12 +53,16 @@ export default class NoticeBoardPage extends Component<Props> {
         stores={stores}
         connectionErrorType={checkAdaServerStatus}
       >
-        <NoticeBoard
-          loadedNotices={noticeBoard.loadedNotices}
-          hasMoreToLoad={noticeBoard.hasMoreToLoad}
-          isLoading={noticeBoard.isLoading}
-          onLoadMore={() => actions.noticeBoard.loadMore.trigger()}
-        />
+        {hasAny ? (
+          <NoticeBoard
+            loadedNotices={noticeBoard.loadedNotices}
+            hasMoreToLoad={noticeBoard.hasMoreToLoad}
+            isLoading={noticeBoard.isLoading}
+            onLoadMore={() => actions.noticeBoard.loadMore.trigger()}
+          />
+        ) : (
+          <NoNotice classicTheme={profile.isClassicTheme} />
+        )}
       </MainLayout>
     );
   }

@@ -107,6 +107,8 @@
   "loading.screen.error": "For more help, you can {supportRequestLink}",
   "loading.screen.loading": "Loading components",
   "networkError.label.message": "WARNING: Connection to the server failed.<br>Please check your internet connection or <a target='blank' href='https://twitter.com/YoroiWallet'>our Twitter account</a>.<br>The displayed balance and transaction history may appear incorrect until our servers are back to normal, but your actual balance is not affected.",
+  "noticeBoard.noNoticeText.notDelegatedYet": "You have not delegated a stake yet.",
+  "noticeBoard.noNoticeText.chooseAPool": "To view notifications here, first <strong>choose a stake pool</strong> and delegate your ADA.",
   "noticeBoard.notice.stakeDelegated.title": "You have delegated to the pool [{poolTicker}]",
   "noticeBoard.notice.stakeDelegated.subMessage": "You will start getting rewards from next epoch",
   "noticeBoard.notice.stakeUndelegated.title": "You have undelegated from the pool [{poolTicker}]",
