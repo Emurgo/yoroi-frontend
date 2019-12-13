@@ -31,7 +31,8 @@ type WalletNames =
   'empty-wallet' |
   'simple-pending-wallet' |
   'tx-big-input-wallet' |
-  'dump-wallet';
+  'dump-wallet' |
+  'shelley-test';
 
 // eslint-disable-next-line prefer-object-spread
 export const testWallets: { [key: WalletNames]: RestorationInput } = Object.assign(
@@ -71,6 +72,11 @@ export const testWallets: { [key: WalletNames]: RestorationInput } = Object.assi
     // but don't want to affect the other wallets for testing
     name: ('dump-wallet': WalletNames),
     mnemonic: 'proud nuclear patch arm digital theory peasant winner person knock mirror across immune certain power',
+    plate: 'XXXX-1111',
+  }),
+  createWallet({
+    name: ('shelley-test': WalletNames),
+    mnemonic: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon address',
     plate: 'XXXX-1111',
   }),
 );

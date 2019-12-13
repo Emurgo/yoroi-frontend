@@ -40,7 +40,8 @@ export const environment = ((
         CONFIG.network.name === NetworkType.SHELLEY_TESTNET;
     },
     isTest: () => CONFIG.network.name === NetworkType.TEST,
-    isMainnet: () => environment.NETWORK === NetworkType.MAINNET,
+    isMainnet: () => environment.NETWORK === NetworkType.MAINNET ||
+      CONFIG.network.name === NetworkType.TEST,
     isAdaApi: () => environment.API === 'ada',
     walletRefreshInterval: CONFIG.app.walletRefreshInterval,
     serverStatusRefreshInterval: CONFIG.app.serverStatusRefreshInterval,
