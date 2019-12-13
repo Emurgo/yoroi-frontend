@@ -18,27 +18,27 @@ import styles from './NoticeBlock.scss';
 const messages = defineMessages({
   titleStakeDelegated: {
     id: 'noticeBoard.notice.stakeDelegated.title',
-    defaultMessage: '!!!You have delegated to the pool {poolTicker}',
+    defaultMessage: '!!!You have delegated to the pool [{poolTicker}]',
   },
   subMessageStakeDelegated: {
     id: 'noticeBoard.notice.stakeDelegated.subMessage',
-    defaultMessage: '!!!TBD',
+    defaultMessage: '!!!You will start getting rewards from next epoch',
   },
   titleStakeUndelegated: {
     id: 'noticeBoard.notice.stakeUndelegated.title',
-    defaultMessage: '!!!You have undelegated from the pool {poolTicker}',
+    defaultMessage: '!!!You have undelegated from the pool [{poolTicker}]',
   },
   subMessageStakeUndelegated: {
     id: 'noticeBoard.notice.stakeUndelegated.subMessage',
-    defaultMessage: '!!!TBD',
+    defaultMessage: '!!!Rewards for next two epochs will still be received',
   },
   titleStakeRedelegated: {
     id: 'noticeBoard.notice.stakeRedelegated.title',
-    defaultMessage: '!!!You have re-delegated to another pool {poolTicker}',
+    defaultMessage: '!!!You have re-delegated to another pool [{poolTicker}]',
   },
   subMessageStakeRedelegated: {
     id: 'noticeBoard.notice.stakeRedelegated.subMessage',
-    defaultMessage: '!!!Rewards for next two epochs will still be received from pool {poolTicker}',
+    defaultMessage: '!!!Rewards for next two epochs will still be received from pool [{poolTicker}]',
   },
   titlefeeChanged: {
     id: 'noticeBoard.notice.feeChanged.title',
@@ -46,7 +46,7 @@ const messages = defineMessages({
   },
   subMessagefeeChanged: {
     id: 'noticeBoard.notice.feeChanged.subMessage',
-    defaultMessage: '!!!TBD',
+    defaultMessage: '!!!Old fee was {oldFee} {currency} and new fee is {newFee} {currency}',
   },
   titleCostChanged: {
     id: 'noticeBoard.notice.costChanged.title',
@@ -54,23 +54,23 @@ const messages = defineMessages({
   },
   subMessageCostChanged: {
     id: 'noticeBoard.notice.costChanged.subMessage',
-    defaultMessage: '!!!TBD',
+    defaultMessage: '!!!Old cost was {oldCost} {currency} and new cost is {newCost} {currency}',
   },
   titleRewardRecieved: {
     id: 'noticeBoard.notice.rewardRecieved.title',
-    defaultMessage: '!!!Rewards have received',
+    defaultMessage: '!!!Rewards have been received',
   },
   subMessageRewardRecieved: {
     id: 'noticeBoard.notice.rewardRecieved.subMessage',
-    defaultMessage: '!!!TBD',
+    defaultMessage: '!!!You have received {rewardAmount} {currency} as rewards for epoch {epochNumber}',
   },
   titlePoolToRetire: {
     id: 'noticeBoard.notice.poolToRetire.title',
-    defaultMessage: '!!!Pool {poolTicker} is planning to retire',
+    defaultMessage: '!!!Pool [{poolTicker}] is planning to retire',
   },
   subMessagePoolToRetire: {
     id: 'noticeBoard.notice.poolToRetire.subMessage',
-    defaultMessage: '!!!TBD',
+    defaultMessage: '!!!To continue getting rewards you can delegate your stake to other pool',
   },
   titleNoRewardsForDelegation: {
     id: 'noticeBoard.notice.noRewardForUndelegation.title',
@@ -132,30 +132,44 @@ export default class NoticeBlock extends Component<Props> {
         subMessage =  (
           <FormattedHTMLMessage
             {...messages.subMessageStakeRedelegated}
-            values={{ poolTicker }}
+            values={{ poolTicker: notice.oldPoolTicker }}
           />);
         icon = (<span><RedelegatedIcon /></span>);
         break;
       case NoticeKind.FEE_CHANGED:
         title = intl.formatMessage(messages.titlefeeChanged);
         subMessage = intl.formatMessage(messages.subMessagefeeChanged);
+        subMessage =  (
+          <FormattedHTMLMessage
+            {...messages.subMessagefeeChanged}
+            values={{ oldFee: notice.oldFee, newFee: notice.newFee, currency: 'ADA' }}
+          />);
         icon = (<span><FeeChangedIcon /></span>);
         break;
       case NoticeKind.COST_CHANGED:
         title = intl.formatMessage(messages.titleCostChanged);
-        subMessage = intl.formatMessage(messages.subMessageCostChanged);
+        subMessage =  (
+          <FormattedHTMLMessage
+            {...messages.subMessageCostChanged}
+            values={{ oldCost: notice.oldCost, newCost: notice.newCost, currency: 'ADA' }}
+          />);
         icon = (<span><CostChangedIcon /></span>);
         break;
       case NoticeKind.REWARD_RECEIVED:
         title = intl.formatMessage(messages.titleRewardRecieved);
         subMessage = intl.formatMessage(messages.subMessageRewardRecieved);
+        subMessage =  (
+          <FormattedHTMLMessage
+            {...messages.subMessageRewardRecieved}
+            values={{ rewardAmount: notice.rewardAmount, epochNumber: notice.epochNumber, currency: 'ADA' }}
+          />);
         icon = (<span><RewardRecievedIcon /></span>);
         break;
       case NoticeKind.POOL_TO_RETIRE:
         title = (
           <FormattedHTMLMessage
             {...messages.titlePoolToRetire}
-            values={{ poolTicker: 'ZZZ' }}
+            values={{ poolTicker }}
           />);
         subMessage = intl.formatMessage(messages.subMessagePoolToRetire);
         icon = (<span><PoolToRetireIcon /></span>);
