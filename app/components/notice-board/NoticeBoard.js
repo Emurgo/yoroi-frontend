@@ -104,7 +104,7 @@ export default class NoticeBoard extends Component<Props> {
               <div>
                 {group.notices.map((notice) => (
                   <NoticeBlock
-                    key={`${group.strDate}-${notice.id}-${notice.kind}`}
+                    key={`${group.strDate}-${notice.id}`}
                     notice={notice}
                     isToday={group.isToday}
                   />

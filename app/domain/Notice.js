@@ -12,10 +12,13 @@ export const NoticeKind = {
 export type NoticeKindType = $Values<typeof NoticeKind>;
 
 export default class Notice {
-  id: string = ''; // TODO: this should be something which makes a relationship between a wallet and a stake pool
+  // TODO: something which makes a relationship between a wallet and a stake pool
+  id: string;
+  poolTicker: string = 'EMG1';
   kind: NoticeKindType;
   date: Date
 
+  // TODO: remove all defaults and accept all parameters
   constructor(data: {
     id: string,
     kind: NoticeKindType,

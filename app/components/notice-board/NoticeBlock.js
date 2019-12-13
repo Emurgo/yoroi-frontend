@@ -18,7 +18,7 @@ import styles from './NoticeBlock.scss';
 const messages = defineMessages({
   titleStakeDelegated: {
     id: 'noticeBoard.notice.stakeDelegated.title',
-    defaultMessage: '!!!You have delegated to the pool {poolName}',
+    defaultMessage: '!!!You have delegated to the pool {poolTicker}',
   },
   subMessageStakeDelegated: {
     id: 'noticeBoard.notice.stakeDelegated.subMessage',
@@ -26,7 +26,7 @@ const messages = defineMessages({
   },
   titleStakeUndelegated: {
     id: 'noticeBoard.notice.stakeUndelegated.title',
-    defaultMessage: '!!!You have undelegated from the pool {poolName}',
+    defaultMessage: '!!!You have undelegated from the pool {poolTicker}',
   },
   subMessageStakeUndelegated: {
     id: 'noticeBoard.notice.stakeUndelegated.subMessage',
@@ -34,11 +34,11 @@ const messages = defineMessages({
   },
   titleStakeRedelegated: {
     id: 'noticeBoard.notice.stakeRedelegated.title',
-    defaultMessage: '!!!You have re-delegated to another pool {poolName}',
+    defaultMessage: '!!!You have re-delegated to another pool {poolTicker}',
   },
   subMessageStakeRedelegated: {
     id: 'noticeBoard.notice.stakeRedelegated.subMessage',
-    defaultMessage: '!!!Rewards for next two epochs will still be received from pool {poolName}',
+    defaultMessage: '!!!Rewards for next two epochs will still be received from pool {poolTicker}',
   },
   titlefeeChanged: {
     id: 'noticeBoard.notice.feeChanged.title',
@@ -66,7 +66,7 @@ const messages = defineMessages({
   },
   titlePoolToRetire: {
     id: 'noticeBoard.notice.poolToRetire.title',
-    defaultMessage: '!!!Pool {poolName} is planning to retire',
+    defaultMessage: '!!!Pool {poolTicker} is planning to retire',
   },
   subMessagePoolToRetire: {
     id: 'noticeBoard.notice.poolToRetire.subMessage',
@@ -103,12 +103,13 @@ export default class NoticeBlock extends Component<Props> {
     let title;
     let subMessage;
     const time = this.formatTime(notice, isToday);
+    const { poolTicker } = notice;
     switch (notice.kind) {
       case NoticeKind.STAKE_DELEGATED:
         title = (
           <FormattedHTMLMessage
             {...messages.titleStakeDelegated}
-            values={{ poolName: 'ZZZ' }}
+            values={{ poolTicker }}
           />);
         subMessage = intl.formatMessage(messages.subMessageStakeDelegated);
         icon = (<span><DelegatedIcon /></span>);
@@ -117,7 +118,7 @@ export default class NoticeBlock extends Component<Props> {
         title = (
           <FormattedHTMLMessage
             {...messages.titleStakeUndelegated}
-            values={{ poolName: 'ZZZ' }}
+            values={{ poolTicker }}
           />);
         subMessage = intl.formatMessage(messages.subMessageStakeUndelegated);
         icon = (<span><UndelegatedIcon /></span>);
@@ -126,12 +127,12 @@ export default class NoticeBlock extends Component<Props> {
         title = (
           <FormattedHTMLMessage
             {...messages.titleStakeRedelegated}
-            values={{ poolName: 'YYY' }}
+            values={{ poolTicker }}
           />);
         subMessage =  (
           <FormattedHTMLMessage
             {...messages.subMessageStakeRedelegated}
-            values={{ poolName: 'ZZZ' }}
+            values={{ poolTicker }}
           />);
         icon = (<span><RedelegatedIcon /></span>);
         break;
@@ -154,7 +155,7 @@ export default class NoticeBlock extends Component<Props> {
         title = (
           <FormattedHTMLMessage
             {...messages.titlePoolToRetire}
-            values={{ poolName: 'ZZZ' }}
+            values={{ poolTicker: 'ZZZ' }}
           />);
         subMessage = intl.formatMessage(messages.subMessagePoolToRetire);
         icon = (<span><PoolToRetireIcon /></span>);
