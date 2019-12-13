@@ -9,6 +9,8 @@ import type {
   AddressUtxoRequest, AddressUtxoResponse, AddressUtxoFunc,
   UtxoSumRequest, UtxoSumResponse, UtxoSumFunc,
   RemoteTransaction, RemoteUnspentOutput,
+  AccountStateRequest, AccountStateResponse, AccountStateFunc,
+  AccountStateSuccess, AccountStateFailure, AccountStateDelegation,
   SignedRequestInternal, RemoteCertificate,
   RemoteTransactionInput, RemoteTransactionOutput,
 } from '../../../state-fetch/types';
@@ -387,6 +389,53 @@ function getCertificate(
   }
 }
 
+function getSpendingCounter(
+  blockchain: Array<RemoteTransaction>,
+  address: string,
+): number {
+  for (let i = blockchain.length - 1; i >= 0; i--) {
+    if (blockchain[i].tx_state !== 'Successful') {
+      continue;
+    }
+    // careful: there can be multiple inputs for the same account in a transaction
+    // with different spending counters
+    let nextSpendingCounter = undefined;
+    for (const input of blockchain[i].inputs) {
+      if (input.type === 'account' && input.address === address) {
+        const counter = input.spendingCounter;
+        if (nextSpendingCounter == null || counter > nextSpendingCounter) {
+          nextSpendingCounter = counter + 1;
+        }
+      }
+    }
+    if (nextSpendingCounter != null) {
+      return nextSpendingCounter;
+    }
+  }
+  return 0;
+}
+function getAccountBalance(
+  blockchain: Array<RemoteTransaction>,
+  address: string,
+): BigNumber {
+  let value = new BigNumber(0);
+  for (const tx of blockchain) {
+    if (tx.tx_state !== 'Successful') {
+      continue;
+    }
+    for (const output of tx.outputs) {
+      if (output.address === address) {
+        value = value.plus(output.amount);
+      }
+    }
+    for (const input of tx.inputs) {
+      if (input.type === 'account' && input.address === address) {
+        value = value.minus(input.amount);
+      }
+    }
+  }
+  return value;
+}
 function getInputs(
   blockchain: Array<RemoteTransaction>,
   inputs: RustModule.WalletV3.Inputs
@@ -434,18 +483,10 @@ function getInputs(
         .to_address(RustModule.WalletV3.AddressDiscrimination.Production);
       const addressHex = Buffer.from(accountAddr.as_bytes()).toString('hex');
 
-      // TODO: should calculate this from witness
-      let nextSpendingCounter = 0;
-      for (const txInBlock of blockchain) {
-        for (const inputOfBlock of txInBlock.inputs) {
-          if (inputOfBlock.type === 'account' && inputOfBlock.address === addressHex) {
-            const counter = inputOfBlock.spendingCounter;
-            if (counter > nextSpendingCounter) {
-              nextSpendingCounter = counter + 1;
-            }
-          }
-        }
-      }
+      const nextSpendingCounter = getSpendingCounter(
+        blockchain,
+        addressHex,
+      );
       result.push({
         type: 'account',
         address: addressHex,
@@ -500,5 +541,125 @@ export function toRemoteTx(
     time: null,
     epoch: null,
     slot: null,
+  };
+}
+
+function delegationTypeToResponse(
+  type: RustModule.WalletV3.DelegationType,
+): AccountStateDelegation {
+  const kind = type.get_kind();
+  switch (kind) {
+    case RustModule.WalletV3.DelegationKind.NonDelegated: return { pools: [], };
+    case RustModule.WalletV3.DelegationKind.Full: {
+      const poolId = type.get_full();
+      if (poolId == null) {
+        throw new Error(`${nameof(delegationTypeToResponse)} Should never happen`);
+      }
+      return {
+        pools: [[poolId.to_string(), 1]]
+      };
+    }
+    case RustModule.WalletV3.DelegationKind.Ratio: {
+      throw new Error(`${nameof(delegationTypeToResponse)} ratio certs not implemented yet`);
+    }
+    default: throw new Error(`${nameof(delegationTypeToResponse)} unexpected kind ${kind}`);
+  }
+}
+
+function getPoolInfoIfMatch(
+  tx: RemoteTransaction,
+  certificate: RemoteCertificate,
+  account: string,
+): void | AccountStateDelegation {
+  if (certificate.payloadKindId === RustModule.WalletV3.CertificateKind.StakeDelegation) {
+    const stakeDelegation = RustModule.WalletV3.StakeDelegation.from_bytes(
+      Buffer.from(certificate.payloadHex, 'hex')
+    );
+    const delegatorAddress = stakeDelegation
+      .account()
+      .to_account_single() // TODO multisig
+      .to_address(RustModule.WalletV3.AddressDiscrimination.Production);
+
+    const certPayloadAddr = Buffer.from(delegatorAddress.as_bytes()).toString('hex');
+    if (certPayloadAddr !== account) {
+      return undefined;
+    }
+
+    const type = stakeDelegation.delegation_type();
+    return delegationTypeToResponse(type);
+  }
+  if (certificate.payloadKindId === RustModule.WalletV3.CertificateKind.OwnerStakeDelegation) {
+    if (tx.inputs[0].address !== account) {
+      return undefined;
+    }
+    const ownerStakeDelegation = RustModule.WalletV3.StakeDelegation.from_bytes(
+      Buffer.from(certificate.payloadHex, 'hex')
+    );
+    const type = ownerStakeDelegation.delegation_type();
+    return delegationTypeToResponse(type);
+  }
+  return undefined;
+}
+
+function stateForAccount(
+  blockchain: Array<RemoteTransaction>,
+  account: string,
+): AccountStateSuccess | AccountStateFailure {
+  {
+    try {
+      RustModule.WalletV3.Address.from_bytes(
+        Buffer.from(account, 'hex')
+      );
+    } catch (_e) {
+      return {
+        error: 'Invalid address',
+        comment: account,
+      };
+    }
+  }
+
+  let latestCertificate = undefined;
+  // iterate backwards through the blockchain backwards to find the latest certificate
+  for (let i = blockchain.length - 1; i >= 0; i--) {
+    const tx = blockchain[i];
+    if (tx.tx_state !== 'Successful') {
+      continue;
+    }
+    const certificate = tx.certificate;
+    if (certificate == null) {
+      continue;
+    }
+    latestCertificate = getPoolInfoIfMatch(
+      tx,
+      certificate,
+      account
+    );
+    if (latestCertificate != null) {
+      break;
+    }
+  }
+  const nextSpendingCounter = getSpendingCounter(blockchain, account);
+  const value = getAccountBalance(blockchain, account);
+
+  return {
+    delegation: latestCertificate == null
+      ? { pools: [], }
+      : latestCertificate,
+    value: value.toNumber(),
+    counter: nextSpendingCounter,
+  };
+}
+export function genGetAccountState(
+  blockchain: Array<RemoteTransaction>,
+): AccountStateFunc {
+  return async (
+    body: AccountStateRequest,
+  ): Promise<AccountStateResponse> => {
+    const result: AccountStateResponse = {};
+    for (const address of body.addresses) {
+      const state = stateForAccount(blockchain, address);
+      result[address] = state;
+    }
+    return result;
   };
 }

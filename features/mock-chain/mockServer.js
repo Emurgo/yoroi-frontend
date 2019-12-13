@@ -8,6 +8,7 @@ import type {
   BestBlockRequest, BestBlockResponse,
   SignedResponse,
   FilterUsedRequest, FilterUsedResponse,
+  AccountStateRequest, AccountStateResponse,
   ServerStatusResponse,
   SignedRequestInternal,
 } from '../../app/api/ada/lib/state-fetch/types';
@@ -129,6 +130,16 @@ export function getMockServer(
       res: { send(arg: FilterUsedResponse): any }
     ): Promise<void> => {
       const response = await mockImporter.usedAddresses(req.body);
+      res.send(response);
+    });
+
+    server.post('/api/v2/account/state', async (
+      req: {
+        body: AccountStateRequest
+      },
+      res: { send(arg: AccountStateResponse): any }
+    ): Promise<void> => {
+      const response = await mockImporter.getAccountState(req.body);
       res.send(response);
     });
 
