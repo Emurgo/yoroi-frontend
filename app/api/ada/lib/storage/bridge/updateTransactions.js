@@ -186,8 +186,10 @@ export async function rawGetUtxoTransactions(
     ...tx,
     block: blockMap.get(tx.transaction.TransactionId) || null,
     ...getFromUserPerspective({
-      txInputs: tx.utxoInputs,
-      txOutputs: tx.utxoOutputs,
+      utxoInputs: tx.utxoInputs,
+      utxoOutputs: tx.utxoOutputs,
+      accountingInputs: tx.accountingInputs,
+      accountingOutputs: tx.accountingOutputs,
       allOwnedAddressIds: new Set(addressIds),
     })
   }));

@@ -168,8 +168,10 @@ const _tx = (
   date: string,
 ): UtxoAnnotatedTransaction => {
   const annotation = getFromUserPerspective({
-    txInputs: utxoInputs,
-    txOutputs: utxoOutputs,
+    utxoInputs,
+    utxoOutputs,
+    accountingInputs,
+    accountingOutputs,
     allOwnedAddressIds: ownedAddresses,
   });
 

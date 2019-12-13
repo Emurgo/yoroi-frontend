@@ -16,6 +16,10 @@ import type {
   UtxoTransactionInputRow,
   UtxoTransactionOutputRow,
 } from '../lib/storage/database/transactionModels/utxo/tables';
+import type {
+  AccountingTransactionInputRow,
+  AccountingTransactionOutputRow,
+} from '../lib/storage/database/transactionModels/account/tables';
 import type { TransactionExportRow } from '../../export';
 import {
   LOVELACES_PER_ADA,
@@ -42,31 +46,42 @@ import {
 } from './shelley/utils';
 
 export function getFromUserPerspective(data: {
-  txInputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionInputRow>>,
-  txOutputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionOutputRow>>,
+  utxoInputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionInputRow>>,
+  utxoOutputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionOutputRow>>,
+  accountingInputs: $ReadOnlyArray<$ReadOnly<AccountingTransactionInputRow>>,
+  accountingOutputs: $ReadOnlyArray<$ReadOnly<AccountingTransactionOutputRow>>,
   allOwnedAddressIds: Set<number>,
 }): UserAnnotation {
   // Note: logic taken from the mobile version of Yoroi
   // https://github.com/Emurgo/yoroi-mobile/blob/a3d72218b1e63f6362152aae2f03c8763c168795/src/crypto/transactionUtils.js#L73-L103
 
-  const ownInputs = data.txInputs.filter(input => (
+  const unifiedInputs = [
+    ...data.utxoInputs,
+    ...data.accountingInputs,
+  ];
+  const unifiedOutputs = [
+    ...data.utxoOutputs,
+    ...data.accountingOutputs,
+  ];
+  const ownInputs = unifiedInputs.filter(input => (
     data.allOwnedAddressIds.has(input.AddressId)
   ));
 
-  const ownOutputs = data.txOutputs.filter(output => (
+  const ownOutputs = unifiedOutputs.filter(output => (
     data.allOwnedAddressIds.has(output.AddressId)
   ));
 
-  const totalIn = sumInputsOutputs(data.txInputs);
-  const totalOut = sumInputsOutputs(data.txOutputs);
+  const totalIn = sumInputsOutputs(unifiedInputs);
+  const totalOut = sumInputsOutputs(unifiedOutputs);
   const ownIn = sumInputsOutputs(ownInputs);
   const ownOut = sumInputsOutputs(ownOutputs);
 
-  const hasOnlyOwnInputs = ownInputs.length === data.txInputs.length;
-  const hasOnlyOwnOutputs = ownOutputs.length === data.txOutputs.length;
+  const hasOnlyOwnInputs = ownInputs.length === unifiedInputs.length;
+  const hasOnlyOwnOutputs = ownOutputs.length === unifiedOutputs.length;
+
   const isIntraWallet = hasOnlyOwnInputs && hasOnlyOwnOutputs;
   const isMultiParty =
-    ownInputs.length > 0 && ownInputs.length !== data.txInputs.length;
+    ownInputs.length > 0 && ownInputs.length !== unifiedInputs.length;
 
   const brutto = ownOut.minus(ownIn);
   const totalFee = totalOut.minus(totalIn); // should be negative
@@ -119,7 +134,10 @@ export function convertAdaTransactionsToExportRows(
 }
 
 export function sumInputsOutputs(
-  ios: $ReadOnlyArray<$ReadOnly<UtxoTransactionInputRow | UtxoTransactionOutputRow>>
+  ios: $ReadOnlyArray<$ReadOnly<
+    UtxoTransactionInputRow | UtxoTransactionOutputRow |
+    AccountingTransactionInputRow | AccountingTransactionOutputRow
+  >>
 ): BigNumber {
   const amounts = ios.map(utxo => new BigNumber(utxo.Amount));
   const total = amounts.reduce(
