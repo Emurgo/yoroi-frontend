@@ -10,7 +10,7 @@ import type {
   UtxoSumRequest, UtxoSumResponse, UtxoSumFunc,
   RemoteTransaction, RemoteUnspentOutput,
   AccountStateRequest, AccountStateResponse, AccountStateFunc,
-  AccountStateSuccess, AccountStateFailure, AccountStateDelegation,
+  AccountStateSuccess, AccountStateFailure, AccountStateDelegation, PoolTuples,
   SignedRequestInternal, RemoteCertificate,
   RemoteTransactionInput, RemoteTransactionOutput,
 } from '../../../state-fetch/types';
@@ -560,7 +560,19 @@ function delegationTypeToResponse(
       };
     }
     case RustModule.WalletV3.DelegationKind.Ratio: {
-      throw new Error(`${nameof(delegationTypeToResponse)} ratio certs not implemented yet`);
+      const ratios = type.get_ratios();
+      if (ratios == null) {
+        throw new Error(`${nameof(delegationTypeToResponse)} Should never happen`);
+      }
+      const poolTuples: Array<PoolTuples> = [];
+      const pools = ratios.pools();
+      for (let i = 0; i < pools.size(); i++) {
+        const pool = pools.get(i);
+        poolTuples.push([pool.pool().to_string(), pool.parts()]);
+      }
+      return {
+        pools: poolTuples,
+      };
     }
     default: throw new Error(`${nameof(delegationTypeToResponse)} unexpected kind ${kind}`);
   }

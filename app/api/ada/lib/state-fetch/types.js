@@ -80,11 +80,12 @@ export type FilterFunc = (body: FilterUsedRequest) => Promise<FilterUsedResponse
 export type AccountStateRequest = {|
   addresses: Array<string>
 |};
+export type PoolTuples = [
+  string, // PoolId
+  number, // parts
+];
 export type AccountStateDelegation = {|
-  pools: Array<[
-    string, // PoolId
-    number, // parts
-  ]>,
+  pools: Array<PoolTuples>,
 |};
 export type AccountStateSuccess = {|
   delegation: AccountStateDelegation,
