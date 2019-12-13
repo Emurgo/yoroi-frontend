@@ -98,6 +98,7 @@ export default class DelegationStore extends Store {
     this._recalculateDelegationInfoDisposer();
     this._recalculateDelegationInfoDisposer = () => {};
     this.getDelegatedBalance.reset();
+    this.stakingKeyState = undefined;
   }
 }
 

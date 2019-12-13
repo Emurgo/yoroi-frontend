@@ -33,32 +33,30 @@ type Props = {
 
 type State = {|
   +currentTime: Date,
-  +timeToSlot: TimeToAbsoluteSlotFunc;
-  +toRelativeSlotNumber: ToRelativeSlotNumberFunc;
-  +currentSlotLength: CurrentSlotLengthFunc;
-  +currentEpochLength: CurrentEpochLengthFunc;
 |};
 
 @observer
 export default class StakingDashboardPage extends Component<Props, State> {
 
+  intervalId: void | IntervalID;
+
+  timeToSlot: TimeToAbsoluteSlotFunc;
+  toRelativeSlotNumber: ToRelativeSlotNumberFunc;
+  currentSlotLength: CurrentSlotLengthFunc;
+  currentEpochLength: CurrentEpochLengthFunc;
+
   async componentDidMount() {
-    const timeToSlot = await genTimeToSlot();
-    const toRelativeSlotNumber = await genToRelativeSlotNumber();
-    const currentSlotLength = await genCurrentSlotLength();
-    const currentEpochLength = await genCurrentEpochLength();
+    this.timeToSlot = await genTimeToSlot();
+    this.toRelativeSlotNumber = await genToRelativeSlotNumber();
+    this.currentSlotLength = await genCurrentSlotLength();
+    this.currentEpochLength = await genCurrentEpochLength();
     this.setState({
-      timeToSlot,
-      toRelativeSlotNumber,
-      currentSlotLength,
-      currentEpochLength,
       currentTime: new Date(),
     });
-    setInterval(
-      () => this.setState(prevState => ({
-        ...prevState,
+    this.intervalId = setInterval(
+      () => this.setState({
         currentTime: new Date()
-      })),
+      }),
       1000
     );
 
@@ -66,6 +64,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
   }
 
   componentWillUnmount() {
+    if (this.intervalId) clearInterval(this.intervalId);
     this.props.actions.ada.delegation.reset.trigger();
   }
 
@@ -318,13 +317,13 @@ export default class StakingDashboardPage extends Component<Props, State> {
       return (<EpochProgress loading />);
     }
 
-    const absoluteSlot = this.state.timeToSlot({
+    const absoluteSlot = this.timeToSlot({
       time: this.state.currentTime
     });
-    const relativeTime = this.state.toRelativeSlotNumber(absoluteSlot.slot);
+    const relativeTime = this.toRelativeSlotNumber(absoluteSlot.slot);
 
-    const epochLength = this.state.currentEpochLength();
-    const slotLength = this.state.currentSlotLength();
+    const epochLength = this.currentEpochLength();
+    const slotLength = this.currentSlotLength();
 
     const secondsLeftInEpoch = (epochLength - relativeTime.slot) * slotLength;
     const timeLeftInEpoch = new Date(
