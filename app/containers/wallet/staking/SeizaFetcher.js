@@ -34,7 +34,7 @@ type Props = {|
 |};
 
 @observer
-export default class Staking extends Component<Props> {
+export default class SeizaFetcher extends Component<Props> {
 
   @observable selectedPools = [];
   iframe: ?HTMLElement;

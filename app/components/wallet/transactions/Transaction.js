@@ -5,7 +5,6 @@ import BigNumber from 'bignumber.js';
 import { defineMessages, intlShape } from 'react-intl';
 import type {
   $npm$ReactIntl$IntlFormat,
-  $npm$ReactIntl$MessageDescriptor,
 } from 'react-intl';
 import moment from 'moment';
 import classNames from 'classnames';
@@ -28,7 +27,6 @@ import type { TxStatusCodesType, } from '../../../api/ada/lib/storage/database/p
 import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
 import type { CertificateRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
-import type { RemoteCertificate } from '../../../api/ada/lib/state-fetch/types';
 
 const messages = defineMessages({
   type: {
