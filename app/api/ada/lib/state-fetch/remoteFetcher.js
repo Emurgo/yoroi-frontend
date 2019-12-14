@@ -134,6 +134,13 @@ export class RemoteFetcher implements IFetcher {
         if (resp.height != null) {
           return resp;
         }
+        // There can only ever be one certificate per tx but our backend returns an array
+        // $FlowFixMe remove this if we ever fix this
+        if (resp.certificates != null && resp.certificates.length > 0) {
+          resp.certificate = resp.certificates[0];
+          // $FlowFixMe remove this if we ever fix this
+          delete resp.certificates;
+        }
         // $FlowFixMe remove this if we ever rename the field in the backend-service
         const height = resp.block_num;
         // $FlowFixMe remove this if we ever rename the field in the backend-service
