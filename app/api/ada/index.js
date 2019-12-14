@@ -31,8 +31,8 @@ import {
   createStandardCip1852Wallet,
 } from './lib/storage/bridge/walletBuilder/shelley';
 import {
-  getAllUtxoTransactions,
-  getPendingUtxoTransactions,
+  getAllTransactions,
+  getPendingTransactions,
   updateTransactions,
 } from './lib/storage/bridge/updateTransactions';
 import {
@@ -262,7 +262,7 @@ export type GetTransactionsRequestOptions = {|
 |};
 export type GetTransactionsRequest = {
   ...InexactSubset<GetTransactionsRequestOptions>,
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos & IGetLastSyncInfo,
+  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetLastSyncInfo,
   isLocalRequest: boolean,
   getTransactionsHistoryForAddresses: HistoryFunc,
   checkAddressesInUse: FilterFunc,
@@ -279,7 +279,7 @@ export type GetTransactionsFunc = (
 // refreshPendingTransactions
 
 export type RefreshPendingTransactionsRequest = {
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos & IGetLastSyncInfo,
+  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetLastSyncInfo,
 };
 export type RefreshPendingTransactionsResponse = Array<WalletTransaction>;
 export type RefreshPendingTransactionsFunc = (
@@ -554,7 +554,7 @@ export type CreateHardwareWalletFunc = (
 // getTransactionRowsToExport
 
 export type GetTransactionRowsToExportRequest = {
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos,
+  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
 };
 export type GetTransactionRowsToExportResponse = Array<TransactionExportRow>;
 export type GetTransactionRowsToExportFunc = (
@@ -693,7 +693,7 @@ export default class AdaApi {
           request.getBestBlock,
         );
       }
-      const fetchedTxs = await getAllUtxoTransactions({
+      const fetchedTxs = await getAllTransactions({
         publicDeriver: request.publicDeriver,
         skip,
         limit,
@@ -723,7 +723,7 @@ export default class AdaApi {
   ): Promise<RefreshPendingTransactionsResponse> {
     Logger.debug('AdaApi::refreshPendingTransactions called');
     try {
-      const fetchedTxs = await getPendingUtxoTransactions({
+      const fetchedTxs = await getPendingTransactions({
         publicDeriver: request.publicDeriver,
       });
       Logger.debug('AdaApi::refreshPendingTransactions success: ' + stringifyData(fetchedTxs));
@@ -1487,7 +1487,7 @@ export default class AdaApi {
     request: GetTransactionRowsToExportRequest
   ): Promise<GetTransactionRowsToExportResponse> {
     try {
-      const fetchedTxs = await getAllUtxoTransactions({
+      const fetchedTxs = await getAllTransactions({
         publicDeriver: request.publicDeriver,
       });
       Logger.debug('AdaApi::getTransactionRowsToExport: success');
