@@ -21,6 +21,7 @@ export function getDefaultExplorer(): ExplorerType {
 export function getExplorers(): Array<{| value: ExplorerType, label: string |}> {
   if (environment.isShelley()) {
     return Object.keys(ShelleyExplorers)
+      .filter(explorer => ShelleyExplorers[explorer] === ShelleyExplorers.JORMUNGANDR)
       .map(key => ({
         value: ShelleyExplorers[key],
         label: explorerInfo[ShelleyExplorers[key]].name,
@@ -63,6 +64,21 @@ const seiza = environment.isShelley()
     pool: 'https://seiza.com/blockchain/stakepool/',
   };
 
+
+function getIohkExplorer(): ExplorerInfo {
+  const domain = environment.isDev()
+    ? 'https://shelley-testnet-explorer-nightly.netlify.com'
+    : 'https://shelleyexplorer.cardano.org';
+
+  // TODO: send to different page based on locale
+  return {
+    name: 'Jormungandr Explorer',
+    address: `${domain}/en/address/`,
+    transaction: `${domain}/en/transaction/`,
+    pool: `${domain}/en/stake-pool/`,
+  };
+}
+
 export const explorerInfo: {
   [key: ExplorerType]: ExplorerInfo,
   // assert that Seiza always has a URL for every type
@@ -90,12 +106,7 @@ export const explorerInfo: {
       }
     }
     : {
-      jormungandr: {
-        name: 'Jormungandr Explorer',
-        address: 'https://explorer.nightly.jormungandr-testnet.iohkdev.io//address/',
-        transaction: 'https://explorer.nightly.jormungandr-testnet.iohkdev.io//tx/',
-        pool: 'https://explorer.nightly.jormungandr-testnet.iohkdev.io/pool/',
-      },
+      jormungandr: getIohkExplorer(),
     }
   )
 });
