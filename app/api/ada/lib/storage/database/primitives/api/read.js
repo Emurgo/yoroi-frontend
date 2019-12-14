@@ -19,6 +19,7 @@ import type {
   AddressMappingRow,
   CertificateRow,
   CertificateAddressRow,
+  CertificatePart,
 } from '../tables';
 import type {
   TxStatusCodesType,
@@ -848,8 +849,7 @@ export class GetTxAndBlock {
 }
 
 export type CertificateForKey = {|
-  relations: Array<$ReadOnly<CertificateAddressRow>>,
-  certificate: $ReadOnly<CertificateRow>,
+  ...CertificatePart,
   transaction: $ReadOnly<TransactionRow>,
   block: null | $ReadOnly<BlockRow>,
 |};
@@ -867,7 +867,7 @@ export class GetCertificates {
     db: lf$Database,
     tx: lf$Transaction,
     request: {
-      addressId: number,
+      addressIds: Array<number>,
     },
   ): Promise<Array<CertificateForKey>> {
     const certAddrSchema = GetCertificates.ownTables[Tables.CertificateAddressSchema.name];
@@ -899,8 +899,8 @@ export class GetCertificates {
           blockTable[txSchema.properties.BlockId]
         )
       )
-      .where(certAddrTable[certAddrSchema.properties.AddressId].eq(
-        request.addressId
+      .where(certAddrTable[certAddrSchema.properties.AddressId].in(
+        request.addressIds
       ))
       .orderBy(blockTable[Tables.BlockSchema.properties.SlotNum], lf.Order.DESC);
 
@@ -911,14 +911,19 @@ export class GetCertificates {
       Block: $ReadOnly<WithNullableFields<BlockRow>>,
     |}> = await tx.attach(query);
 
-    const tempMap = new Map<number, CertificateForKey>();
+    const tempMap = new Map<number, {|
+      transaction: $ReadOnly<TransactionRow>,
+      block: null | $ReadOnly<BlockRow>,
+      certificate: $ReadOnly<CertificateRow>,
+      relatedAddresses: Array<$ReadOnly<CertificateAddressRow>>,
+    |}>();
     for (const result of queryResult) {
       const entry = tempMap.get(result.Certificate.CertificateId);
       if (entry == null) {
         tempMap.set(
           result.Certificate.CertificateId,
           {
-            relations: [result.CertificateAddress],
+            relatedAddresses: [result.CertificateAddress],
             certificate: result.Certificate,
             transaction: result.Transaction,
             block: result.Block.BlockId == null
@@ -927,10 +932,70 @@ export class GetCertificates {
           }
         );
       } else {
-        entry.relations.push(result.CertificateAddress);
+        entry.relatedAddresses.push(result.CertificateAddress);
       }
     }
 
-    return Array.from(tempMap.values());
+    return Array.from(tempMap.values())
+      .map(result => ({ ...result })); // turn to read-only through shallow-copy
+  }
+
+  static async forTransactions(
+    db: lf$Database,
+    dbTx: lf$Transaction,
+    request: {|
+      txIds: Array<number>,
+    |},
+  ): Promise<Map<number, void | CertificatePart>> {
+    const certAddrSchema = GetCertificates.ownTables[Tables.CertificateAddressSchema.name];
+    const certSchema = GetCertificates.ownTables[Tables.CertificateSchema.name];
+    const certAddrTable = db.getSchema().table(certAddrSchema.name);
+    const certTable = db.getSchema().table(certSchema.name);
+    const query = db
+      .select()
+      .from(certAddrTable)
+      .innerJoin(
+        certTable,
+        certTable[certSchema.properties.CertificateId].eq(
+          certAddrTable[certAddrSchema.properties.CertificateId]
+        )
+      )
+      .where(certTable[certSchema.properties.TransactionId].in(
+        request.txIds
+      ));
+
+    const queryResult: $ReadOnlyArray<{|
+      CertificateAddress: $ReadOnly<CertificateAddressRow>,
+      Certificate: $ReadOnly<CertificateRow>,
+    |}> = await dbTx.attach(query);
+
+    // group relations together
+    const tempMap = new Map<number, {|
+      relatedAddresses: Array<$ReadOnly<CertificateAddressRow>>,
+      certificate: $ReadOnly<CertificateRow>,
+  |}>();
+    for (const result of queryResult) {
+      const entry = tempMap.get(result.Certificate.CertificateId);
+      if (entry == null) {
+        tempMap.set(
+          result.Certificate.CertificateId,
+          {
+            relatedAddresses: [result.CertificateAddress],
+            certificate: result.Certificate,
+          }
+        );
+      } else {
+        entry.relatedAddresses.push(result.CertificateAddress);
+      }
+    }
+    // note: there can only be a single certificate per transaction so this is safe
+    const certByTxId = new Map<number, _>(
+      Array.from(tempMap.values())
+        .map((cert: $ReadOnly<CertificatePart>) => [
+          cert.certificate.TransactionId,
+          { ...cert, } // turn to read-only through shallow-copy
+        ])
+    );
+    return certByTxId;
   }
 }

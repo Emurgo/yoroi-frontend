@@ -22,7 +22,7 @@ import {
   TxStatusCodes,
 } from '../lib/storage/database/primitives/enums';
 import type {
-  UtxoAnnotatedTransaction,
+  AnnotatedTransaction,
 } from './types';
 import {
   transactionTypes,
@@ -166,7 +166,7 @@ const _tx = (
   accountingOutputs: Array<AccountingTransactionOutputRow>,
   ownedAddresses: Set<number>,
   date: string,
-): UtxoAnnotatedTransaction => {
+): AnnotatedTransaction => {
   const annotation = getFromUserPerspective({
     utxoInputs,
     utxoOutputs,
@@ -194,6 +194,7 @@ const _tx = (
       Hash: '1',
       BlockTime: new Date(date),
     },
+    certificate: undefined,
     utxoInputs,
     utxoOutputs,
     accountingInputs,

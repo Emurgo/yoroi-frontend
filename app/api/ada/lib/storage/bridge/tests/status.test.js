@@ -35,7 +35,7 @@ import {
 } from '../../models/PublicDeriver/traits';
 
 import {
-  updateTransactions, getAllUtxoTransactions
+  updateTransactions, getAllTransactions
 } from '../updateTransactions';
 
 jest.mock('../../database/initialSeed');
@@ -719,7 +719,7 @@ async function baseTest(
     }
   }
 
-  const txList = await getAllUtxoTransactions({
+  const txList = await getAllTransactions({
     publicDeriver: basePubDeriver,
   });
   expect(txList).toMatchSnapshot();

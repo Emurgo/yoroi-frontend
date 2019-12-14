@@ -44,7 +44,7 @@ import {
   AssociateTxWithIOs
 } from '../database/transactionModels/multipart/api/read';
 import type {
-  UtxoAnnotatedTransaction,
+  AnnotatedTransaction,
 } from '../../../transactions/types';
 import {
   InputTypes,
@@ -64,11 +64,13 @@ import {
   CertificateRelation,
 } from '../database/primitives/enums';
 import {
-  asScanAddresses, asHasLevels,
+  asScanAddresses, asHasLevels, asGetAllUtxos, asGetAllAccounting,
 } from '../models/PublicDeriver/traits';
 import type { IHasLevels } from '../models/ConceptualWallet/interfaces';
 import { ConceptualWallet } from '../models/ConceptualWallet/index';
-import type { IPublicDeriver, IGetAllUtxos, } from '../models/PublicDeriver/interfaces';
+import type {
+  IPublicDeriver,
+} from '../models/PublicDeriver/interfaces';
 import {
   GetLastSyncForPublicDeriver,
   GetPublicDeriver,
@@ -108,7 +110,7 @@ import { addressToKind } from './utils';
 
 import environment from '../../../../../environment';
 
-export async function rawGetUtxoTransactions(
+export async function rawGetTransactions(
   db: lf$Database,
   dbTx: lf$Transaction,
   deps: {|
@@ -119,7 +121,7 @@ export async function rawGetUtxoTransactions(
     GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
   request: {
-    publicDeriver: IGetAllUtxos,
+    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
     getTxAndBlock: (txIds: Array<number>) => Promise<$ReadOnlyArray<{
       Block: null | $ReadOnly<BlockRow>,
       Transaction: $ReadOnly<TransactionRow>
@@ -130,24 +132,45 @@ export async function rawGetUtxoTransactions(
   derivationTables: Map<number, string>,
 ): Promise<{|
   addressLookupMap: Map<number, string>,
-  txs: Array<UtxoAnnotatedTransaction>,
+  txs: Array<AnnotatedTransaction>,
 |}> {
-  const addresses = await request.publicDeriver.rawGetAllUtxoAddresses(
-    dbTx,
-    {
-      GetPathWithSpecific: deps.GetPathWithSpecific,
-      GetAddress: deps.GetAddress,
-      GetDerivationSpecific: deps.GetDerivationSpecific,
-    },
-    undefined,
-    derivationTables,
-  );
-  const addressIds = addresses.flatMap(address => address.addrs.map(addr => addr.AddressId));
+  const utxoAddressIds = [];
+  const withUtxos = asGetAllUtxos(request.publicDeriver);
+  if (withUtxos != null) {
+    const foundAddresses = await withUtxos.rawGetAllUtxoAddresses(
+      dbTx,
+      {
+        GetPathWithSpecific: deps.GetPathWithSpecific,
+        GetAddress: deps.GetAddress,
+        GetDerivationSpecific: deps.GetDerivationSpecific,
+      },
+      undefined,
+      derivationTables,
+    );
+    const ids = foundAddresses.flatMap(address => address.addrs.map(addr => addr.AddressId));
+    utxoAddressIds.push(...ids);
+  }
+  const accountingAddressIds = [];
+  const withAccounuting = asGetAllAccounting(request.publicDeriver);
+  if (withAccounuting != null) {
+    const foundAddresses = await withAccounuting.rawGetAllAccountingAddresses(
+      dbTx,
+      {
+        GetPathWithSpecific: deps.GetPathWithSpecific,
+        GetAddress: deps.GetAddress,
+        GetDerivationSpecific: deps.GetDerivationSpecific,
+      },
+      undefined,
+      derivationTables,
+    );
+    const ids = foundAddresses.flatMap(address => address.addrs.map(addr => addr.AddressId));
+    accountingAddressIds.push(...ids);
+  }
   const txIds = await deps.AssociateTxWithIOs.getTxIdsForAddresses(
     db, dbTx,
     {
-      utxoAddressIds: addressIds,
-      accountingAddressIds: [],
+      utxoAddressIds,
+      accountingAddressIds,
     }
   );
 
@@ -190,7 +213,10 @@ export async function rawGetUtxoTransactions(
       utxoOutputs: tx.utxoOutputs,
       accountingInputs: tx.accountingInputs,
       accountingOutputs: tx.accountingOutputs,
-      allOwnedAddressIds: new Set(addressIds),
+      allOwnedAddressIds: new Set([
+        ...utxoAddressIds,
+        ...accountingAddressIds,
+      ]),
     })
   }));
 
@@ -200,15 +226,15 @@ export async function rawGetUtxoTransactions(
   };
 }
 
-export async function getAllUtxoTransactions(
+export async function getAllTransactions(
   request: {
-    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos,
+    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
     skip?: number,
     limit?: number,
   },
 ): Promise<{|
   addressLookupMap: Map<number, string>,
-  txs: Array<UtxoAnnotatedTransaction>,
+  txs: Array<AnnotatedTransaction>,
 |}> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
@@ -230,7 +256,7 @@ export async function getAllUtxoTransactions(
       ...mapToTables(request.publicDeriver.getDb(), derivationTables),
     ],
     async dbTx => {
-      return await rawGetUtxoTransactions(
+      return await rawGetTransactions(
         request.publicDeriver.getDb(), dbTx,
         {
           GetPathWithSpecific: deps.GetPathWithSpecific,
@@ -256,13 +282,13 @@ export async function getAllUtxoTransactions(
   );
 }
 
-export async function getPendingUtxoTransactions(
+export async function getPendingTransactions(
   request: {
-    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos,
+    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
   },
 ): Promise<{|
   addressLookupMap: Map<number, string>,
-  txs: Array<UtxoAnnotatedTransaction>,
+  txs: Array<AnnotatedTransaction>,
 |}> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
@@ -284,7 +310,7 @@ export async function getPendingUtxoTransactions(
       ...mapToTables(request.publicDeriver.getDb(), derivationTables),
     ],
     async dbTx => {
-      return await rawGetUtxoTransactions(
+      return await rawGetTransactions(
         request.publicDeriver.getDb(), dbTx,
         {
           GetPathWithSpecific: deps.GetPathWithSpecific,
@@ -877,6 +903,7 @@ export async function updateTransactionBatch(
       txsAddedToBlock.push({
         block: result.block,
         transaction: result.transaction,
+        certificate: result.certificate,
         utxoInputs: result.utxoInputs,
         utxoOutputs: result.utxoOutputs,
         accountingInputs: result.accountingInputs,

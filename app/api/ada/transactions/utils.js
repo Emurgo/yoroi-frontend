@@ -2,7 +2,7 @@
 import { groupBy, keyBy, mapValues } from 'lodash';
 import BigNumber from 'bignumber.js';
 import type {
-  UtxoAnnotatedTransaction,
+  AnnotatedTransaction,
   UserAnnotation,
   BaseSignRequest,
 } from './types';
@@ -116,7 +116,7 @@ export function getFromUserPerspective(data: {
 }
 
 export function convertAdaTransactionsToExportRows(
-  transactions: $ReadOnlyArray<$ReadOnly<UtxoAnnotatedTransaction>>
+  transactions: $ReadOnlyArray<$ReadOnly<AnnotatedTransaction>>
 ): Array<TransactionExportRow> {
   const result = [];
   for (const tx of transactions) {
