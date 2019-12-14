@@ -91,6 +91,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
     const { getThemeVars } = this.props.stores.profile;
     return (
       <StakingDashboard
+        hasAnyPending={this.props.stores.substores.ada.transactions.hasAnyPending}
         themeVars={getThemeVars({ theme: 'YoroiModern' })}
         stakePools={stakePools}
         epochProgress={epochProgress}
