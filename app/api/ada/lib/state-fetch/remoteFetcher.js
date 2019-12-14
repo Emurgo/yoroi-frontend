@@ -9,6 +9,7 @@ import type {
   SignedRequest, SignedResponse,
   FilterUsedRequest, FilterUsedResponse,
   ServerStatusRequest, ServerStatusResponse,
+  AccountStateRequest, AccountStateResponse,
   SignedRequestInternal,
   RemoteTransaction,
 } from './types';
@@ -30,6 +31,7 @@ import {
   CheckAdressesInUseApiError,
   InvalidWitnessError,
   ServerStatusError,
+  GetAccountStateApiError,
 } from '../../errors';
 
 import type { ConfigType } from '../../../../../config/config-types';
@@ -204,6 +206,26 @@ export class RemoteFetcher implements IFetcher {
       .catch((error) => {
         Logger.error('RemoteFetcher::checkAddressesInUse error: ' + stringifyError(error));
         throw new CheckAdressesInUseApiError();
+      })
+  )
+
+  getAccountState: AccountStateRequest => Promise<AccountStateResponse> = (body) => (
+    axios(
+      `${backendUrl}/api/v2/account/state`,
+      {
+        method: 'post',
+        data: {
+          addresses: body.addresses
+        },
+        headers: {
+          'yoroi-version': this.lastLaunchVersion(),
+          'yoroi-locale': this.currentLocale()
+        }
+      }
+    ).then(response => response.data)
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getAccountState)} error: ` + stringifyError(error));
+        throw new GetAccountStateApiError();
       })
   )
 

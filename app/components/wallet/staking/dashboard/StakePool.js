@@ -54,7 +54,17 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  data: Object,
+  data: {|
+    percentage: string,
+    fullness: string,
+    margins: string,
+    created: string,
+    cost: string,
+    stake: string,
+    pledge: string,
+    rewards: string,
+    age: string,
+  |},
   poolName: string,
   hash: string,
 |};

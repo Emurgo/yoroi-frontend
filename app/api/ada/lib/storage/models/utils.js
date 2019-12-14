@@ -101,40 +101,6 @@ import type { ConfigType } from '../../../../../../config/config-types';
 declare var CONFIG: ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;
 
-export type ToAbsoluteSlotNumberRequest = {
-  epoch: number,
-  slot: number,
-};
-export type ToAbsoluteSlotNumberResponse = number;
-export type ToAbsoluteSlotNumberFunc = (
-  request: ToAbsoluteSlotNumberRequest
-) => ToAbsoluteSlotNumberResponse;
-
-export async function genToAbsoluteSlotNumber(): Promise<ToAbsoluteSlotNumberFunc> {
-  // TODO: Cardano in the future will have a variable epoch size
-  // and sidechains/networks can have different epoch sizes
-  // so this needs to come from a DB
-  return (request: ToAbsoluteSlotNumberRequest) => {
-    return (CONFIG.genesis.slots_per_epoch * request.epoch) + request.slot;
-  };
-}
-
-export type TimeSinceGenesisRequest = {
-  absoluteSlot: number,
-};
-export type TimeSinceGenesisResponse = number;
-export type TimeSinceGenesisRequestFunc = (
-  request: TimeSinceGenesisRequest
-) => TimeSinceGenesisResponse;
-export async function genTimeSinceGenesis(): Promise<TimeSinceGenesisRequestFunc> {
-  // TODO: Cardano in the future will have a variable slot length
-  // and sidechains/networks can have different epoch sizes
-  // so this needs to come from a DB
-  return (request: TimeSinceGenesisRequest) => {
-    return (CONFIG.genesis.slot_duration * request.absoluteSlot);
-  };
-}
-
 export function normalizeBip32Ed25519ToPubDeriverLevel(request: {
   privateKeyRow: $ReadOnly<KeyRow>,
   password: null | string,
@@ -148,7 +114,7 @@ export function normalizeBip32Ed25519ToPubDeriverLevel(request: {
     request.password,
   );
   const wasmKey = RustModule.WalletV3.Bip32PrivateKey.from_bytes(Buffer.from(prvKey, 'hex'));
-  const newKey = deriveKeyV2(
+  const newKey = deriveKey(
     wasmKey,
     request.path,
   );
@@ -177,7 +143,7 @@ export function decryptKey(
 }
 
 
-export function deriveKeyV2(
+export function deriveKey(
   startingKey: RustModule.WalletV3.Bip32PrivateKey,
   pathToPublic: Array<number>,
 ): RustModule.WalletV3.Bip32PrivateKey {

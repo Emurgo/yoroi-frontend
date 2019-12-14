@@ -75,6 +75,30 @@ export type FilterUsedRequest = {
 export type FilterUsedResponse = Array<string>;
 export type FilterFunc = (body: FilterUsedRequest) => Promise<FilterUsedResponse>;
 
+// getAccountState
+
+export type AccountStateRequest = {|
+  addresses: Array<string>
+|};
+export type PoolTuples = [
+  string, // PoolId
+  number, // parts
+];
+export type AccountStateDelegation = {|
+  pools: Array<PoolTuples>,
+|};
+export type AccountStateSuccess = {|
+  delegation: AccountStateDelegation,
+  value: number,
+  counter: number,
+|};
+export type AccountStateFailure = {|
+  error: string,
+  comment: string,
+|};
+export type AccountStateResponse = { [key: string]: (AccountStateSuccess | AccountStateFailure) };
+export type AccountStateFunc = (body: AccountStateRequest) => Promise<AccountStateResponse>;
+
 // checkServer
 
 export type ServerStatusRequest = void;

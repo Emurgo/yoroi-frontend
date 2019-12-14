@@ -18,7 +18,7 @@
     "txsBodiesRequestSize": 150
   },
   "genesis": {
-    "block0_date": 1575295549000,
+    "block0_date": 1576239808000,
     "slots_per_epoch": 5000,
     "slot_duration": 10,
     "epoch_reward": 21414,
@@ -27,6 +27,6 @@
       "coefficient": "0",
       "certificate": "0"
     },
-    "genesisHash": "c511043dda377d7764d9f01d721ddea323f2a01b1e89f62c8ee587a65d7a1487"
+    "genesisHash": "6ab6eb91752987f546d679a10cc478fdf564273fdc4126843c3c2bbf795b12c2"
   }
 }

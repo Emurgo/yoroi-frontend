@@ -8,6 +8,36 @@ import {
 import type {
   BaseSignRequest,
 } from '../types';
+import {
+  Bip44DerivationLevels,
+} from '../../lib/storage/database/walletTypes/bip44/api/utils';
+import type {
+  Addressing,
+} from '../../lib/storage/models/PublicDeriver/interfaces';
+
+export function normalizeKey(request: {|
+  addressing: $PropertyType<Addressing, 'addressing'>,
+  startingFrom: {|
+    key: RustModule.WalletV3.Bip32PrivateKey,
+    level: number,
+  |},
+|}): RustModule.WalletV3.Bip32PrivateKey {
+  const startLevel = request.addressing.startLevel;
+  const pathLength = request.addressing.path.length;
+
+  const lastLevelSpecified = startLevel + pathLength - 1;
+  if (lastLevelSpecified !== Bip44DerivationLevels.ADDRESS.level) {
+    throw new Error(`${nameof(normalizeKey)} incorrect addressing size ${lastLevelSpecified}`);
+  }
+  if (request.startingFrom.level + 1 < startLevel) {
+    throw new Error(`${nameof(normalizeKey)} keyLevel < startLevel`);
+  }
+  let key = request.startingFrom.key;
+  for (let i = request.startingFrom.level - startLevel + 1; i < pathLength; i++) {
+    key = key.derive(request.addressing.path[i]);
+  }
+  return key;
+}
 
 export function getTxInputTotal(
   IOs: RustModule.WalletV3.InputOutput,

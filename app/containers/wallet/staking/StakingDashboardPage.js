@@ -1,44 +1,119 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
+import BigNumber from 'bignumber.js';
 
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import StakingDashboard from '../../../components/wallet/staking/dashboard/StakingDashboard';
+import EpochProgress from '../../../components/wallet/staking/dashboard/EpochProgress';
+import UserSummary from '../../../components/wallet/staking/dashboard/UserSummary';
+import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
+import environment from '../../../environment';
+import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
+
+import { formattedWalletAmount } from '../../../utils/formatters';
+
+import {
+  genTimeToSlot,
+  genToRelativeSlotNumber,
+  genCurrentSlotLength,
+  genCurrentEpochLength,
+} from '../../../api/ada/lib/storage/bridge/timeUtils';
+import type {
+  TimeToAbsoluteSlotFunc,
+  ToRelativeSlotNumberFunc,
+  CurrentSlotLengthFunc,
+  CurrentEpochLengthFunc,
+} from '../../../api/ada/lib/storage/bridge/timeUtils';
 
 type Props = {
   ...InjectedProps,
 };
 
+type State = {|
+  +currentTime: Date,
+|};
+
 @observer
-export default class StakingDashboardPage extends Component<Props> {
+export default class StakingDashboardPage extends Component<Props, State> {
+
+  intervalId: void | IntervalID;
+
+  timeToSlot: TimeToAbsoluteSlotFunc;
+  toRelativeSlotNumber: ToRelativeSlotNumberFunc;
+  currentSlotLength: CurrentSlotLengthFunc;
+  currentEpochLength: CurrentEpochLengthFunc;
+
+  async componentDidMount() {
+    this.timeToSlot = await genTimeToSlot();
+    this.toRelativeSlotNumber = await genToRelativeSlotNumber();
+    this.currentSlotLength = await genCurrentSlotLength();
+    this.currentEpochLength = await genCurrentEpochLength();
+    this.setState({
+      currentTime: new Date(),
+    });
+    this.intervalId = setInterval(
+      () => this.setState({
+        currentTime: new Date()
+      }),
+      1000
+    );
+
+    this.props.actions.ada.delegation.startWatch.trigger();
+  }
+
+  componentWillUnmount() {
+    if (this.intervalId) clearInterval(this.intervalId);
+    this.props.actions.ada.delegation.reset.trigger();
+  }
 
   render() {
+    // TODO: render something else if there is a pending tx that modifies delegation?
+
+    const publicDeriver = this.props.stores.substores[environment.API].wallets.selected;
+    if (publicDeriver == null) {
+      throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
+    }
+
+    const delegationStore = this.props.stores.substores[environment.API].delegation;
+
+    const hideOrFormat: BigNumber => string = (amount) => {
+      return this.props.stores.profile.shouldHideBalance
+        ? '******'
+        : formattedWalletAmount(amount);
+    };
+
+    const epochProgress = this.getEpochProgress();
+
+    const stakePools = this.getStakePools();
+
     const { getThemeVars } = this.props.stores.profile;
     return (
       <StakingDashboard
         themeVars={getThemeVars({ theme: 'YoroiModern' })}
-        hasDelegation
-        endTime={{ h: '07', m: '10', s: '55' }}
-        totalAdaSum="100,000.000000"
-        totalRewards="0"
-        totalDelegated="0"
-        currentEpoch={5}
-        epochProgress={55}
+        stakePools={stakePools}
+        epochProgress={epochProgress}
+        userSummary={<UserSummary
+          totalAdaSum={hideOrFormat(publicDeriver.amount)}
+          totalRewards={delegationStore.getDelegatedBalance.result == null
+            ? undefined
+            : hideOrFormat(
+              delegationStore.getDelegatedBalance.result
+                .accountPart
+                .dividedBy(LOVELACES_PER_ADA)
+            )}
+          totalDelegated={
+            delegationStore.getDelegatedBalance.result == null
+              ? undefined
+              : hideOrFormat(
+                delegationStore.getDelegatedBalance.result.utxoPart.plus(
+                  delegationStore.getDelegatedBalance.result.accountPart
+                ).dividedBy(LOVELACES_PER_ADA)
+              )}
+        />}
         currentReward="Tue, 13th at 18:30:27"
         followingReward="every 2 days"
-        stakePoolName={"Warren's stake pool"}
-        stakePoolData={{
-          percentage: '30',
-          fullness: '18',
-          margins: '12',
-          created: '29/02/2019 12:42:41 PM',
-          cost: '12,688.00000',
-          stake: '9,688.00000',
-          pledge: '85.567088',
-          rewards: '81.000088',
-          age: '23',
-        }}
-        hash="addr1ssuvzjs82mshgvyp4r4lmwgknvgjswnm7mpcq3wycjj7v2nk393e6qwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm9078ssez"
         totalGraphData={[
           {
             name: 1,
@@ -235,5 +310,64 @@ export default class StakingDashboardPage extends Component<Props> {
         ]}
       />
     );
+  }
+
+  getEpochProgress: void => null | Node = () => {
+    if (this.state == null) {
+      return (<EpochProgress loading />);
+    }
+
+    const absoluteSlot = this.timeToSlot({
+      time: this.state.currentTime
+    });
+    const relativeTime = this.toRelativeSlotNumber(absoluteSlot.slot);
+
+    const epochLength = this.currentEpochLength();
+    const slotLength = this.currentSlotLength();
+
+    const secondsLeftInEpoch = (epochLength - relativeTime.slot) * slotLength;
+    const timeLeftInEpoch = new Date(
+      (1000 * secondsLeftInEpoch) - absoluteSlot.msIntoSlot
+    );
+
+    const leftPadDate: number => string = (num) => {
+      if (num < 10) return '0' + num;
+      return num.toString();
+    };
+
+    return (
+      <EpochProgress
+        currentEpoch={relativeTime.epoch}
+        percentage={Math.floor(100 * relativeTime.slot / epochLength)}
+        endTime={{
+          h: leftPadDate(timeLeftInEpoch.getHours()),
+          m: leftPadDate(timeLeftInEpoch.getMinutes()),
+          s: leftPadDate(timeLeftInEpoch.getSeconds()),
+        }}
+      />
+    );
+  }
+
+  getStakePools: void => Array<Node> = () => {
+    const delegationStore = this.props.stores.substores[environment.API].delegation;
+    if (delegationStore.stakingKeyState == null) {
+      return [];
+    }
+    return delegationStore.stakingKeyState.delegation.pools.map(pool => (
+      <StakePool
+        poolName={"Warren's stake pool"}
+        data={{
+          percentage: '30',
+          fullness: '18',
+          margins: '12',
+          created: '29/02/2019 12:42:41 PM',
+          cost: '12,688.00000',
+          stake: '9,688.00000',
+          pledge: '85.567088',
+          rewards: '81.000088',
+          age: '23',
+        }}
+        hash={pool[0]}
+      />));
   }
 }

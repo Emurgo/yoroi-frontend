@@ -9,7 +9,7 @@ import styles from './RewardPopup.scss';
 const messages = defineMessages({
   current: {
     id: 'wallet.dashboard.rewards.current',
-    defaultMessage: '!!!Will receive reward',
+    defaultMessage: '!!!Next reward',
   },
   following: {
     id: 'wallet.dashboard.rewards.following',

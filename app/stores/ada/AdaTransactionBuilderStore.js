@@ -26,7 +26,7 @@ export default class AdaTransactionBuilderStore extends Store {
 
   @observable shouldSendAll: boolean;
   /** Stores the tx information as the user is building it */
-  @observable plannedTxInfo: Array<{ ...Inexact<TxOutType<number>> }>;
+  @observable plannedTxInfo: Array<{ ...InexactSubset<TxOutType<number>> }>;
   /** Stores the tx used to generate the information on the send form */
   @observable plannedTx: null | BaseSignRequest<
     RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput
