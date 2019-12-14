@@ -778,7 +778,7 @@ export async function updateCutoffFromInsert(
 
 export async function getCertificates(
   db: lf$Database,
-  addressId: number,
+  addressIds: Array<number>,
 ): Promise<Array<CertificateForKey>> {
   const deps = Object.freeze({
     GetCertificates,
@@ -790,6 +790,6 @@ export async function getCertificates(
   return await raii(
     db,
     depTables,
-    async dbTx => await deps.GetCertificates.forAddress(db, dbTx, { addressId })
+    async dbTx => await deps.GetCertificates.forAddress(db, dbTx, { addressIds })
   );
 }

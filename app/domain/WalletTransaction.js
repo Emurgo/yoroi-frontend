@@ -12,21 +12,13 @@ import type {
   DbTxIO,
 } from '../api/ada/lib/storage/database/transactionModels/multipart/tables';
 import type {
-  DbBlock,
+  DbBlock, CertificatePart,
 } from '../api/ada/lib/storage/database/primitives/tables';
 import type {
   TxStatusCodesType,
-  CertificateRelationType,
 } from '../api/ada/lib/storage/database/primitives/enums';
-import type { CertificateKindType } from '@emurgo/js-chain-libs/js_chain_libs';
 
 export type TrasactionAddresses = {| from: Array<string>, to: Array<string> |};
-
-export type TransactionCertificate = {|
-  relation: CertificateRelationType,
-  kind: CertificateKindType,
-  payload: string,
-|};
 
 export default class WalletTransaction {
 
@@ -37,7 +29,7 @@ export default class WalletTransaction {
   @observable date: Date;
   @observable numberOfConfirmations: number = 0;
   @observable addresses: TrasactionAddresses = { from: [], to: [] };
-  @observable certificate: void | TransactionCertificate;
+  @observable certificate: void | CertificatePart;
   @observable state: TxStatusCodesType;
   @observable errorMsg: null | string;
 
@@ -49,7 +41,7 @@ export default class WalletTransaction {
     date: Date,
     numberOfConfirmations: number,
     addresses: TrasactionAddresses,
-    certificate: void | TransactionCertificate;
+    certificate: void | CertificatePart;
     state: TxStatusCodesType,
     errorMsg: null | string,
   }) {
@@ -90,7 +82,6 @@ export default class WalletTransaction {
       return result;
     };
 
-    const certificate = undefined; // TODO
     return new WalletTransaction({
       id: tx.transaction.Hash,
       type: tx.type,
@@ -112,7 +103,7 @@ export default class WalletTransaction {
           ...toAddr(tx.accountingOutputs),
         ]
       },
-      certificate,
+      certificate: tx.certificate,
       state: tx.transaction.Status,
       errorMsg: tx.transaction.ErrorMessage,
     });

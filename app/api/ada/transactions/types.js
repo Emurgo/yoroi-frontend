@@ -32,7 +32,7 @@ export type UserAnnotation = {|
   +fee: BigNumber,
 |};
 
-export type UtxoAnnotatedTransaction = {|
+export type AnnotatedTransaction = {|
   ...DbTxIO,
   ...WithNullableFields<DbBlock>,
   ...UserAnnotation,

@@ -8,6 +8,7 @@ import type {
   BlockInsert,
   TransactionInsert,
   DbBlock, DbTransaction,
+  CertificatePart,
 } from '../../../primitives/tables';
 import type {
   UtxoTransactionInputInsert,
@@ -51,6 +52,7 @@ export class ModifyMultipartTx {
     ...WithNullableFields<DbBlock>, ...DbTransaction,
     ...DbUtxoInputs, ...DbUtxoOutputs,
     ...DbAccountingInputs, ...DbAccountingOutputs,
+    certificate: void | CertificatePart,
     |}> {
     const {
       block, transaction,
@@ -78,15 +80,16 @@ export class ModifyMultipartTx {
     );
 
     const certRequest = request.certificate(newTx.transaction.TransactionId);
-    if (certRequest != null) {
-      await ModifyMultipartTx.depTables.ModifyCertificate.addNew(
+    const certificate = certRequest == null
+      ? undefined
+      : await ModifyMultipartTx.depTables.ModifyCertificate.addNew(
         db, tx,
         certRequest,
       );
-    }
 
     return {
       ...newTx,
+      certificate,
       ...utxo,
       ...accounting,
     };

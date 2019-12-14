@@ -44,7 +44,7 @@ import {
   AssociateTxWithIOs
 } from '../database/transactionModels/multipart/api/read';
 import type {
-  UtxoAnnotatedTransaction,
+  AnnotatedTransaction,
 } from '../../../transactions/types';
 import {
   InputTypes,
@@ -70,7 +70,6 @@ import type { IHasLevels } from '../models/ConceptualWallet/interfaces';
 import { ConceptualWallet } from '../models/ConceptualWallet/index';
 import type {
   IPublicDeriver,
-  UtxoAddressPath,
 } from '../models/PublicDeriver/interfaces';
 import {
   GetLastSyncForPublicDeriver,
@@ -133,7 +132,7 @@ export async function rawGetTransactions(
   derivationTables: Map<number, string>,
 ): Promise<{|
   addressLookupMap: Map<number, string>,
-  txs: Array<UtxoAnnotatedTransaction>,
+  txs: Array<AnnotatedTransaction>,
 |}> {
   const utxoAddressIds = [];
   const withUtxos = asGetAllUtxos(request.publicDeriver);
@@ -235,7 +234,7 @@ export async function getAllTransactions(
   },
 ): Promise<{|
   addressLookupMap: Map<number, string>,
-  txs: Array<UtxoAnnotatedTransaction>,
+  txs: Array<AnnotatedTransaction>,
 |}> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
@@ -289,7 +288,7 @@ export async function getPendingTransactions(
   },
 ): Promise<{|
   addressLookupMap: Map<number, string>,
-  txs: Array<UtxoAnnotatedTransaction>,
+  txs: Array<AnnotatedTransaction>,
 |}> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
@@ -904,6 +903,7 @@ export async function updateTransactionBatch(
       txsAddedToBlock.push({
         block: result.block,
         transaction: result.transaction,
+        certificate: result.certificate,
         utxoInputs: result.utxoInputs,
         utxoOutputs: result.utxoOutputs,
         accountingInputs: result.accountingInputs,
