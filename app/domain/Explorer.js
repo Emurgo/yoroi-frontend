@@ -72,7 +72,7 @@ function getIohkExplorer(): ExplorerInfo {
 
   // TODO: send to different page based on locale
   return {
-    name: 'Jormungandr Explorer',
+    name: 'Cardano Explorer',
     address: `${domain}/en/address/`,
     transaction: `${domain}/en/transaction/`,
     pool: `${domain}/en/stake-pool/`,
