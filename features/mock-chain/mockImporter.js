@@ -8,10 +8,12 @@ import {
   genCheckAddressesInUse,
   genUtxoForAddresses,
   genUtxoSumForAddresses,
+  genGetAccountState,
   getAddressForType,
   getSingleAddressString,
   toRemoteTx,
 } from '../../app/api/ada/lib/storage/bridge/tests/mockNetwork';
+import { CoreAddressTypes } from '../../app/api/ada/lib/storage/database/primitives/enums';
 import {
   HARD_DERIVATION_START,
   WalletTypePurpose,
@@ -216,6 +218,23 @@ export const generateTransction = () => {
       { address: 'DdzFFzCqrht74dr7DYmiyCobGFQcfLCsHJCCM6nEBTztrsEk5kwv48EWKVMFU9pswAkLX9CUs4yVhVxqZ7xCVDX1TdatFwX5W39cohvm', amount: '500000' },
       // paper wallet
       { address: 'Ae2tdPwUPEZ7TQpzbJZCbA5BjW4zWYFn47jKo43ouvfe4EABoCfvEjwYvJr', amount: '500000' },
+      // abandon/address
+      {
+        // eslint-disable-next-line max-len
+        // addr1sjag9rgwe04haycr283datdrjv3mlttalc2waz34xcct0g4uvf6gdg3dpwrsne4uqng3y47ugp2pp5dvuq0jqlperwj83r4pwxvwuxsghptz42
+        address: getAddressForType(
+          testWallets['shelley-test'].mnemonic,
+          [
+            WalletTypePurpose.CIP1852,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            0
+          ],
+          CoreAddressTypes.SHELLEY_GROUP
+        ),
+        amount: '2100000'
+      },
     ],
     height: 1,
     epoch: 0,
@@ -226,6 +245,18 @@ export const generateTransction = () => {
     last_update: '2019-05-17T23:14:51.899Z',
     tx_state: 'Successful'
   };
+
+  console.log(getAddressForType(
+    testWallets['shelley-test'].mnemonic,
+    [
+      WalletTypePurpose.CIP1852,
+      CoinTypes.CARDANO,
+      0 + HARD_DERIVATION_START,
+      ChainDerivations.EXTERNAL,
+      0
+    ],
+    CoreAddressTypes.SHELLEY_GROUP
+  ));
 
   // =========================
   //   simple-pending-wallet
@@ -892,6 +923,7 @@ const sendTx = (request: SignedRequestInternal): SignedResponse => {
   }
   return { txId: '52929ce6f1ab83b439e65f6613bad9590bd264c0d6c4f910e36e2369bb987b31' };
 };
+const getAccountState = genGetAccountState(transactions);
 
 export default {
   utxoForAddresses,
@@ -900,5 +932,6 @@ export default {
   getApiStatus,
   history,
   getBestBlock,
+  getAccountState,
   sendTx,
 };
