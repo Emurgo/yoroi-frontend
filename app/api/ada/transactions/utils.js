@@ -40,7 +40,6 @@ import {
 } from './byron/utils';
 import {
   getShelleyTxFee,
-  getTxInputTotal,
   getShelleyTxReceivers,
   shelleyTxEqual,
 } from './shelley/utils';

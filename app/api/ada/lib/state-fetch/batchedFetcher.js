@@ -307,7 +307,7 @@ export function batchGetAccountState(
       const chimericAccounutStates = await Promise.all(chimericAccountPromises);
       return Object.assign({}, ...chimericAccounutStates);
     } catch (error) {
-      Logger.error(`batchedFetcher::${nameof(batchCheckAddressesInUse)} error: ` + stringifyError(error));
+      Logger.error(`batchedFetcher::${nameof(batchGetAccountState)} error: ` + stringifyError(error));
       throw new GetAccountStateApiError();
     }
   };
