@@ -324,12 +324,12 @@ export default class StakingDashboardPage extends Component<Props, State> {
 
   getTimeBasedElements: void => {|
     epochProgress: Node,
-    rewardPopup: null | Node,
+    rewardPopup: void | Node,
   |} = () => {
     if (this.state == null) {
       return {
         epochProgress: (<EpochProgress loading />),
-        rewardPopup: null,
+        rewardPopup: undefined,
       };
     }
 
@@ -351,35 +351,24 @@ export default class StakingDashboardPage extends Component<Props, State> {
       return num.toString();
     };
 
-    const epochProgress = (
-      <EpochProgress
-        currentEpoch={currentRelativeTime.epoch}
-        percentage={Math.floor(100 * currentRelativeTime.slot / epochLength)}
-        endTime={{
-          h: leftPadDate(timeLeftInEpoch.getHours()),
-          m: leftPadDate(timeLeftInEpoch.getMinutes()),
-          s: leftPadDate(timeLeftInEpoch.getSeconds()),
-        }}
-      />
-    );
-
     const delegationStore = this.props.stores.substores[environment.API].delegation;
-    let rewardPopup;
+    let rewardInfo = undefined;
     if (
       !delegationStore.getCurrentDelegation.wasExecuted ||
       delegationStore.getCurrentDelegation.isExecuting
     ) {
-      rewardPopup = null;
+      rewardInfo = undefined;
     } else {
       const { result } = delegationStore.getCurrentDelegation;
       if (result == null || result.block == null) {
-        rewardPopup = null;
+        rewardInfo = undefined;
       } else {
         const block = result.block;
         const certificateRelativeTime = this.toRelativeSlotNumber(block.SlotNum);
 
         let nextRewardEpoch;
-        if (certificateRelativeTime.epoch === currentRelativeTime.epoch) {
+        const recentDelegation = certificateRelativeTime.epoch === currentRelativeTime.epoch;
+        if (recentDelegation) {
           // first reward is slower than the rest
           nextRewardEpoch = currentRelativeTime.epoch + 2;
         } else {
@@ -397,17 +386,35 @@ export default class StakingDashboardPage extends Component<Props, State> {
             slot: 0,
           })
         });
-        rewardPopup = (
+        const rewardPopup = (
           <RewardPopup
             currentText={moment(nextRewardTime).format('MMM Do hh:mm A')}
             followingText={moment(followingRewardTime).format('MMM Do hh:mm A')}
           />
         );
+        rewardInfo = {
+          rewardPopup,
+          showWarning: recentDelegation,
+        };
       }
     }
+
+    const epochProgress = (
+      <EpochProgress
+        currentEpoch={currentRelativeTime.epoch}
+        percentage={Math.floor(100 * currentRelativeTime.slot / epochLength)}
+        endTime={{
+          h: leftPadDate(timeLeftInEpoch.getUTCHours()),
+          m: leftPadDate(timeLeftInEpoch.getUTCMinutes()),
+          s: leftPadDate(timeLeftInEpoch.getUTCSeconds()),
+        }}
+        showTooltip={rewardInfo != null && rewardInfo.showWarning}
+      />
+    );
+
     return {
       epochProgress,
-      rewardPopup,
+      rewardPopup: rewardInfo?.rewardPopup,
     };
   }
 
