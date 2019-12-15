@@ -9,6 +9,7 @@ import {
   genUtxoForAddresses,
   genUtxoSumForAddresses,
   genGetAccountState,
+  genGetPoolInfo,
   getAddressForType,
   getSingleAddressString,
   toRemoteTx,
@@ -989,6 +990,7 @@ const sendTx = (request: SignedRequestInternal): SignedResponse => {
   return { txId: '52929ce6f1ab83b439e65f6613bad9590bd264c0d6c4f910e36e2369bb987b31' };
 };
 const getAccountState = genGetAccountState(transactions);
+const getPoolInfo = genGetPoolInfo(transactions);
 
 export default {
   utxoForAddresses,
@@ -998,5 +1000,6 @@ export default {
   history,
   getBestBlock,
   getAccountState,
+  getPoolInfo,
   sendTx,
 };

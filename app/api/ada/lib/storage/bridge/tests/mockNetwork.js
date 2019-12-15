@@ -10,6 +10,7 @@ import type {
   UtxoSumRequest, UtxoSumResponse, UtxoSumFunc,
   RemoteTransaction, RemoteUnspentOutput,
   AccountStateRequest, AccountStateResponse, AccountStateFunc,
+  PoolInfoRequest, PoolInfoResponse, PoolInfoFunc,
   AccountStateSuccess, AccountStateFailure, AccountStateDelegation, PoolTuples,
   SignedRequestInternal, RemoteCertificate,
   RemoteTransactionInput, RemoteTransactionOutput,
@@ -671,6 +672,33 @@ export function genGetAccountState(
     for (const address of body.addresses) {
       const state = stateForAccount(blockchain, address);
       result[address] = state;
+    }
+    return result;
+  };
+}
+
+export function genGetPoolInfo(
+  _blockchain: Array<RemoteTransaction>,
+): PoolInfoFunc {
+  return async (
+    body: PoolInfoRequest,
+  ): Promise<PoolInfoResponse> => {
+    // TODO: scan the chain properly for this information
+    const mockPoolId = '312e3d449038372ba2fc3300cfedf1b152ae739201b3e5da47ab3f933a421b62';
+    const result: PoolInfoResponse = {};
+    for (const poolId of body.ids) {
+      if (poolId === mockPoolId) {
+        result[mockPoolId] = {
+          state: {},
+          poolMeta: {
+            name: 'Foo pool',
+            description: 'mock data for testing',
+            ticker: 'FOO',
+            homepage: 'https://google.com',
+          },
+          ownerMeta: {},
+        };
+      }
     }
     return result;
   };

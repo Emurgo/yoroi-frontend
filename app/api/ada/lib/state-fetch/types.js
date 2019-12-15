@@ -99,6 +99,34 @@ export type AccountStateFailure = {|
 export type AccountStateResponse = { [key: string]: (AccountStateSuccess | AccountStateFailure) };
 export type AccountStateFunc = (body: AccountStateRequest) => Promise<AccountStateResponse>;
 
+// getPoolInfo
+
+export type PoolInfoRequest = {|
+  ids: Array<string>
+|};
+export type RemotePoolMetaSuccess = {|
+  state: {|
+    // TODO
+  |},
+  poolMeta: ?{|
+    name: string,
+    description: string,
+    ticker: string,
+    homepage: string,
+  |},
+  ownerMeta: ?{
+    [key: string]: {|
+      // TODO
+    |}
+  },
+|};
+export type RemotePoolMetaFailure = {|
+  error: string,
+|};
+export type PoolInfoResponse = { [key: string]: (RemotePoolMetaSuccess | RemotePoolMetaFailure) };
+export type PoolInfoFunc = (body: PoolInfoRequest) => Promise<PoolInfoResponse>;
+
+
 // checkServer
 
 export type ServerStatusRequest = void;
