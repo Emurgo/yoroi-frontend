@@ -106,6 +106,7 @@ export type PoolInfoRequest = {|
 |};
 export type RemotePoolMetaSuccess = {|
   state: {|
+    keys: any,
     // TODO
   |},
   poolMeta: ?{|

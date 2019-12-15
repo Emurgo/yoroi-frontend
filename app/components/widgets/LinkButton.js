@@ -10,7 +10,7 @@ type Props = {|
   +message: MessageDescriptor,
   +svgClass?: string,
   +textClassName: string,
-  +onExternalLinkClick: Function,
+  +onExternalLinkClick: MouseEvent => void,
 |};
 
 export default class LinkButton extends Component<Props> {

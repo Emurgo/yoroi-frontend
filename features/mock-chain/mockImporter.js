@@ -248,18 +248,6 @@ export const generateTransction = () => {
     tx_state: 'Successful'
   };
 
-  console.log(getAddressForType(
-    testWallets['shelley-test'].mnemonic,
-    [
-      WalletTypePurpose.CIP1852,
-      CoinTypes.CARDANO,
-      0 + HARD_DERIVATION_START,
-      ChainDerivations.EXTERNAL,
-      0
-    ],
-    CoreAddressTypes.SHELLEY_GROUP
-  ));
-
   // =========================
   //   simple-pending-wallet
   // =========================

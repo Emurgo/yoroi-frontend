@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
+import { defineMessages, intlShape } from 'react-intl';
 import moment from 'moment';
 import { observer } from 'mobx-react';
 import BigNumber from 'bignumber.js';
@@ -13,6 +14,8 @@ import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
 import RewardPopup from '../../../components/wallet/staking/dashboard/RewardPopup';
 import environment from '../../../environment';
 import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
+import { digetForHash } from '../../../api/ada/lib/storage/database/primitives/api/utils';
+import { handleExternalLinkClick } from '../../../utils/routing';
 
 import { formattedWalletAmount } from '../../../utils/formatters';
 
@@ -33,6 +36,13 @@ import type {
   CurrentEpochLengthFunc,
 } from '../../../api/ada/lib/storage/bridge/timeUtils';
 
+const messages = defineMessages({
+  unknownPoolLabel: {
+    id: 'wallet.staking.pool.unknownLabel',
+    defaultMessage: '!!!Unknown pool',
+  },
+});
+
 type Props = {
   ...InjectedProps,
 };
@@ -43,6 +53,9 @@ type State = {|
 
 @observer
 export default class StakingDashboardPage extends Component<Props, State> {
+  static contextTypes = {
+    intl: intlShape.isRequired,
+  };
 
   intervalId: void | IntervalID;
 
@@ -428,21 +441,43 @@ export default class StakingDashboardPage extends Component<Props, State> {
     if (delegationStore.stakingKeyState == null) {
       return [];
     }
-    return delegationStore.stakingKeyState.delegation.pools.map(pool => (
-      <StakePool
-        poolName={"Warren's stake pool"}
-        data={{
-          percentage: '30',
-          fullness: '18',
-          margins: '12',
-          created: '29/02/2019 12:42:41 PM',
-          cost: '12,688.00000',
-          stake: '9,688.00000',
-          pledge: '85.567088',
-          rewards: '81.000088',
-          age: '23',
-        }}
-        hash={pool[0]}
-      />));
+    const keyState = delegationStore.stakingKeyState;
+    const { intl } = this.context;
+    return keyState.state.delegation.pools.map((pool, i) => {
+      const meta = keyState.poolInfo.get(pool[0]);
+      if (meta == null) {
+        throw new Error(`${nameof(this.getStakePools)} no meta for ${pool[0]}`);
+      }
+      const name = meta.poolMeta
+        ? meta.poolMeta.name
+        : intl.formatMessage(messages.unknownPoolLabel);
+
+      const moreInfo = meta.poolMeta
+        ? {
+          openPoolPage: handleExternalLinkClick,
+          url: meta.poolMeta.homepage,
+        }
+        : undefined;
+      return (
+        <StakePool
+          poolName={name}
+          key={digetForHash(JSON.stringify(meta), 0)}
+          data={{
+            percentage: '30',
+            fullness: '18',
+            margins: '12',
+            created: '29/02/2019 12:42:41 PM',
+            cost: '12,688.00000',
+            stake: '9,688.00000',
+            pledge: '85.567088',
+            rewards: '81.000088',
+            age: '23',
+          }}
+          hash={pool[0]}
+          moreInfo={moreInfo}
+          classicTheme={this.props.stores.profile.isClassicTheme}
+        />
+      );
+    });
   }
 }

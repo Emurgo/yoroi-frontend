@@ -1,8 +1,13 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import jdenticon from 'jdenticon';
+import classnames from 'classnames';
+
+import { Button } from 'react-polymorph/lib/components/Button';
+import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 
 import Card from './Card';
 import ProgressCircle from './ProgressCircle';
@@ -53,8 +58,13 @@ const messages = defineMessages({
   },
 });
 
+type MoreInfoProp = {|
+  openPoolPage: MouseEvent => void,
+  url: string,
+|};
+
 type Props = {|
-  data: {|
+  +data: {|
     percentage: string,
     fullness: string,
     margins: string,
@@ -65,8 +75,10 @@ type Props = {|
     rewards: string,
     age: string,
   |},
-  poolName: string,
-  hash: string,
+  +classicTheme: boolean,
+  +poolName: string,
+  +hash: string,
+  +moreInfo: void | MoreInfoProp,
 |};
 
 @observer
@@ -151,12 +163,28 @@ export default class StakePool extends Component<Props> {
               );
             })}
           </ul>
-          <button type="button" className={styles.button}>
-            {intl.formatMessage(messages.button)}
-          </button>
+          {this.props.moreInfo && this.getMoreInfoButton(this.props.moreInfo)}
         </div>
       </Card>
     );
   }
 
+  getMoreInfoButton: MoreInfoProp => Node = (info) => {
+    const { intl } = this.context;
+
+    const buttonClasses = classnames([
+      this.props.classicTheme ? 'flat' : 'outlined',
+    ]);
+    return (
+      <Button
+        type="button"
+        href={info.url}
+        onClick={info.openPoolPage}
+        className={buttonClasses}
+        skin={ButtonSkin}
+      >
+        {intl.formatMessage(messages.button)}
+      </Button>
+    );
+  }
 }
