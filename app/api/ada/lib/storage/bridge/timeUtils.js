@@ -112,3 +112,21 @@ export async function genTimeSinceGenesis(): Promise<TimeSinceGenesisRequestFunc
     return (CONFIG.genesis.slot_duration * request.absoluteSlot);
   };
 }
+
+export type ToRealTimeRequest = {|
+  absoluteSlotNum: number,
+|};
+export type ToRealTimeResponse = Date;
+export type ToRealTimeFunc = (
+  request: ToRealTimeRequest
+) => ToRealTimeResponse;
+export async function genToRealTime(): Promise<ToRealTimeFunc> {
+  // TODO: Cardano in the future will have a variable slot length
+  // and sidechains/networks can have different epoch sizes
+  // so this needs to come from a DB
+  return (request: ToRealTimeRequest) => {
+    const secondsSinceStart = request.absoluteSlotNum * CONFIG.genesis.slot_duration;
+    const time = (CONFIG.genesis.block0_date + (1000 * secondsSinceStart));
+    return new Date(time);
+  };
+}

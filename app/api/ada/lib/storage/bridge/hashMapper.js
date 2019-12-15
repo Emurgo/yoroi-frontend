@@ -35,9 +35,9 @@ export function rawGenAddByHash(
   return async (
     request: AddByHashRequest
   ): Promise<void> => {
-    const deps = {
+    const deps = Object.freeze({
       GetAddress, AddAddress
-    };
+    });
     const depsTables = Array.from(
       getAllTables(...Object.keys(deps).map(key => deps[key]))
     );
@@ -83,9 +83,9 @@ export function rawGenHashToIdsFunc(
   return async (
     request: HashToIdsRequest
   ): Promise<Map<string, number>> => {
-    const deps = {
+    const deps = Object.freeze({
       GetAddress, AddAddress
-    };
+    });
     const depsTables = Array.from(
       getAllTables(...Object.keys(deps).map(key => deps[key]))
     );

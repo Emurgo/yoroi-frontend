@@ -1,22 +1,19 @@
 // @flow
 
 import { observable, action, reaction, runInAction } from 'mobx';
-import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';
-import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import {
-  asGetAllUtxos, asGetAllAccounting,
+  asGetAllAccounting,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import {
-  PublicDeriver,
-} from '../../api/ada/lib/storage/models/PublicDeriver/index';
+  getDelegatedBalance,
+  getCurrentDelegation,
+} from '../../api/ada/lib/storage/bridge/delegationUtils';
 import type {
-  IGetStakingKey,
-} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import {
-  filterAddressesByStakingKey,
-} from '../../api/ada/lib/storage/bridge/utils';
+  GetDelegatedBalanceFunc,
+  GetCurrentDelegationFunc,
+} from '../../api/ada/lib/storage/bridge/delegationUtils';
 import environment from '../../environment';
 import type {
   AccountStateSuccess,
@@ -25,7 +22,10 @@ import type {
 export default class DelegationStore extends Store {
 
   @observable getDelegatedBalance: LocalizedRequest<GetDelegatedBalanceFunc>
-    = new LocalizedRequest<GetDelegatedBalanceFunc>(_getDelegatedBalance);
+    = new LocalizedRequest<GetDelegatedBalanceFunc>(getDelegatedBalance);
+
+  @observable getCurrentDelegation: LocalizedRequest<GetCurrentDelegationFunc>
+    = new LocalizedRequest<GetCurrentDelegationFunc>(getCurrentDelegation);
 
   @observable stakingKeyState: void | AccountStateSuccess;
 
@@ -51,6 +51,12 @@ export default class DelegationStore extends Store {
       ],
       // $FlowFixMe error in mobx types
       async () => {
+        this.getDelegatedBalance.reset();
+        this.getCurrentDelegation.reset();
+        runInAction(() => {
+          this.stakingKeyState = undefined;
+        });
+
         const publicDeriver = this.stores.substores.ada.wallets.selected;
         if (publicDeriver == null) {
           throw new Error(`${nameof(this._startWatch)} no public deriver selected`);
@@ -84,7 +90,17 @@ export default class DelegationStore extends Store {
             stakingPubKey: stakingKeyResp.addr.Hash,
           }).promise;
           if (delegatedBalance == null) throw new Error('Should never happen');
-          await delegatedBalance;
+
+          const currentDelegation = this.getCurrentDelegation.execute({
+            publicDeriver: withStakingKey,
+            stakingKeyAddressId: stakingKeyResp.addr.AddressId,
+          }).promise;
+          if (currentDelegation == null) throw new Error('Should never happen');
+
+          await Promise.all([
+            delegatedBalance,
+            currentDelegation,
+          ]);
         }
       },
       {
@@ -98,73 +114,7 @@ export default class DelegationStore extends Store {
     this._recalculateDelegationInfoDisposer();
     this._recalculateDelegationInfoDisposer = () => {};
     this.getDelegatedBalance.reset();
+    this.getCurrentDelegation.reset();
     this.stakingKeyState = undefined;
   }
-}
-
-type GetDelegatedBalanceRequest = {|
-  publicDeriver: PublicDeriver<> & IGetStakingKey,
-  accountState: AccountStateSuccess,
-  stakingPubKey: string,
-|};
-type GetDelegatedBalanceResponse = {|
-  utxoPart: BigNumber,
-  accountPart: BigNumber,
-|};
-type GetDelegatedBalanceFunc = (
-  request: GetDelegatedBalanceRequest
-) => Promise<GetDelegatedBalanceResponse>;
-
-async function _getDelegatedBalance(
-  request: GetDelegatedBalanceRequest,
-): Promise<GetDelegatedBalanceResponse> {
-  if (request.accountState.delegation.pools.length === 0) {
-    return {
-      utxoPart: new BigNumber(0),
-      accountPart: new BigNumber(0),
-    };
-  }
-  const utxoPart = await getUtxoDelegatedBalance(
-    request.publicDeriver,
-    request.stakingPubKey,
-  );
-
-  return {
-    utxoPart,
-    accountPart: new BigNumber(request.accountState.value),
-  };
-}
-
-async function getUtxoDelegatedBalance(
-  publicDeriver: PublicDeriver<>,
-  stakingPubKey: string,
-): Promise<BigNumber> {
-  const withUtxos = asGetAllUtxos(publicDeriver);
-  if (withUtxos == null) {
-    return new BigNumber(0);
-  }
-  const basePubDeriver = withUtxos;
-
-  let stakingKey;
-  {
-    const accountAddress = RustModule.WalletV3.Address.from_bytes(
-      Buffer.from(stakingPubKey, 'hex')
-    ).to_account_address();
-    if (accountAddress == null) {
-      throw new Error(`${nameof(getUtxoDelegatedBalance)} staking key invalid`);
-    }
-    stakingKey = accountAddress.get_account_key();
-  }
-
-  const allUtxo = await basePubDeriver.getAllUtxos();
-  const allUtxosForKey = filterAddressesByStakingKey(
-    stakingKey,
-    allUtxo
-  );
-  const utxoSum = allUtxosForKey.reduce(
-    (sum, utxo) => sum.plus(new BigNumber(utxo.output.UtxoTransactionOutput.Amount)),
-    new BigNumber(0)
-  );
-
-  return utxoSum;
 }
