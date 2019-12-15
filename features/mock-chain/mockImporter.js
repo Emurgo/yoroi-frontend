@@ -932,7 +932,9 @@ export function resetChain() {
   // failed-single-tx
   addTransaction(txs.failedTx);
   // shelley-test
-  addTransaction(txs.certificateTx);
+  if (isShelley) {
+    addTransaction(txs.certificateTx);
+  }
 }
 
 // =========================
