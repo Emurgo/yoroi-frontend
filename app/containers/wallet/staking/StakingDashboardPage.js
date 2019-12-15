@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
+import moment from 'moment';
 import { observer } from 'mobx-react';
 import BigNumber from 'bignumber.js';
 
@@ -9,6 +10,7 @@ import StakingDashboard from '../../../components/wallet/staking/dashboard/Staki
 import EpochProgress from '../../../components/wallet/staking/dashboard/EpochProgress';
 import UserSummary from '../../../components/wallet/staking/dashboard/UserSummary';
 import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
+import RewardPopup from '../../../components/wallet/staking/dashboard/RewardPopup';
 import environment from '../../../environment';
 import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
 
@@ -17,12 +19,16 @@ import { formattedWalletAmount } from '../../../utils/formatters';
 import {
   genTimeToSlot,
   genToRelativeSlotNumber,
+  genToAbsoluteSlotNumber,
+  genToRealTime,
   genCurrentSlotLength,
   genCurrentEpochLength,
 } from '../../../api/ada/lib/storage/bridge/timeUtils';
 import type {
   TimeToAbsoluteSlotFunc,
   ToRelativeSlotNumberFunc,
+  ToRealTimeFunc,
+  ToAbsoluteSlotNumberFunc,
   CurrentSlotLengthFunc,
   CurrentEpochLengthFunc,
 } from '../../../api/ada/lib/storage/bridge/timeUtils';
@@ -42,12 +48,16 @@ export default class StakingDashboardPage extends Component<Props, State> {
 
   timeToSlot: TimeToAbsoluteSlotFunc;
   toRelativeSlotNumber: ToRelativeSlotNumberFunc;
+  toRealTime: ToRealTimeFunc;
+  toAbsoluteSlot: ToAbsoluteSlotNumberFunc;
   currentSlotLength: CurrentSlotLengthFunc;
   currentEpochLength: CurrentEpochLengthFunc;
 
   async componentDidMount() {
     this.timeToSlot = await genTimeToSlot();
     this.toRelativeSlotNumber = await genToRelativeSlotNumber();
+    this.toRealTime = await genToRealTime();
+    this.toAbsoluteSlot = await genToAbsoluteSlotNumber();
     this.currentSlotLength = await genCurrentSlotLength();
     this.currentEpochLength = await genCurrentEpochLength();
     this.setState({
@@ -69,8 +79,6 @@ export default class StakingDashboardPage extends Component<Props, State> {
   }
 
   render() {
-    // TODO: render something else if there is a pending tx that modifies delegation?
-
     const publicDeriver = this.props.stores.substores[environment.API].wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
@@ -84,7 +92,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
         : formattedWalletAmount(amount);
     };
 
-    const epochProgress = this.getEpochProgress();
+    const getTimeBasedElements = this.getTimeBasedElements();
 
     const stakePools = this.getStakePools();
 
@@ -94,7 +102,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
         hasAnyPending={this.props.stores.substores.ada.transactions.hasAnyPending}
         themeVars={getThemeVars({ theme: 'YoroiModern' })}
         stakePools={stakePools}
-        epochProgress={epochProgress}
+        epochProgress={getTimeBasedElements.epochProgress}
         userSummary={<UserSummary
           totalAdaSum={hideOrFormat(publicDeriver.amount)}
           totalRewards={delegationStore.getDelegatedBalance.result == null
@@ -113,8 +121,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
                 ).dividedBy(LOVELACES_PER_ADA)
               )}
         />}
-        currentReward="Tue, 13th at 18:30:27"
-        followingReward="every 2 days"
+        rewardPopup={getTimeBasedElements.rewardPopup}
         totalGraphData={[
           {
             name: 1,
@@ -313,22 +320,28 @@ export default class StakingDashboardPage extends Component<Props, State> {
     );
   }
 
-  getEpochProgress: void => null | Node = () => {
+  getTimeBasedElements: void => {|
+    epochProgress: Node,
+    rewardPopup: void | Node,
+  |} = () => {
     if (this.state == null) {
-      return (<EpochProgress loading />);
+      return {
+        epochProgress: (<EpochProgress loading />),
+        rewardPopup: undefined,
+      };
     }
 
-    const absoluteSlot = this.timeToSlot({
+    const currentAbsoluteSlot = this.timeToSlot({
       time: this.state.currentTime
     });
-    const relativeTime = this.toRelativeSlotNumber(absoluteSlot.slot);
+    const currentRelativeTime = this.toRelativeSlotNumber(currentAbsoluteSlot.slot);
 
     const epochLength = this.currentEpochLength();
     const slotLength = this.currentSlotLength();
 
-    const secondsLeftInEpoch = (epochLength - relativeTime.slot) * slotLength;
+    const secondsLeftInEpoch = (epochLength - currentRelativeTime.slot) * slotLength;
     const timeLeftInEpoch = new Date(
-      (1000 * secondsLeftInEpoch) - absoluteSlot.msIntoSlot
+      (1000 * secondsLeftInEpoch) - currentAbsoluteSlot.msIntoSlot
     );
 
     const leftPadDate: number => string = (num) => {
@@ -336,21 +349,82 @@ export default class StakingDashboardPage extends Component<Props, State> {
       return num.toString();
     };
 
-    return (
+    const delegationStore = this.props.stores.substores[environment.API].delegation;
+    let rewardInfo = undefined;
+    if (
+      !delegationStore.getCurrentDelegation.wasExecuted ||
+      delegationStore.getCurrentDelegation.isExecuting
+    ) {
+      rewardInfo = undefined;
+    } else {
+      const { result } = delegationStore.getCurrentDelegation;
+      if (result == null || result.block == null) {
+        rewardInfo = undefined;
+      } else {
+        const block = result.block;
+        const certificateRelativeTime = this.toRelativeSlotNumber(block.SlotNum);
+
+        let nextRewardEpoch;
+        const recentDelegation = certificateRelativeTime.epoch === currentRelativeTime.epoch;
+        if (recentDelegation) {
+          // first reward is slower than the rest
+          nextRewardEpoch = currentRelativeTime.epoch + 2;
+        } else {
+          nextRewardEpoch = currentRelativeTime.epoch + 1;
+        }
+        const nextRewardTime = this.toRealTime({
+          absoluteSlotNum: this.toAbsoluteSlot({
+            epoch: nextRewardEpoch,
+            slot: 0,
+          })
+        });
+        const followingRewardTime = this.toRealTime({
+          absoluteSlotNum: this.toAbsoluteSlot({
+            epoch: nextRewardEpoch + 1,
+            slot: 0,
+          })
+        });
+        const rewardPopup = (
+          <RewardPopup
+            currentText={moment(nextRewardTime).format('MMM Do hh:mm A')}
+            followingText={moment(followingRewardTime).format('MMM Do hh:mm A')}
+            showDisclaimer={recentDelegation}
+          />
+        );
+        rewardInfo = {
+          rewardPopup,
+          showWarning: recentDelegation,
+        };
+      }
+    }
+
+    const epochProgress = (
       <EpochProgress
-        currentEpoch={relativeTime.epoch}
-        percentage={Math.floor(100 * relativeTime.slot / epochLength)}
+        currentEpoch={currentRelativeTime.epoch}
+        percentage={Math.floor(100 * currentRelativeTime.slot / epochLength)}
         endTime={{
-          h: leftPadDate(timeLeftInEpoch.getHours()),
-          m: leftPadDate(timeLeftInEpoch.getMinutes()),
-          s: leftPadDate(timeLeftInEpoch.getSeconds()),
+          h: leftPadDate(timeLeftInEpoch.getUTCHours()),
+          m: leftPadDate(timeLeftInEpoch.getUTCMinutes()),
+          s: leftPadDate(timeLeftInEpoch.getUTCSeconds()),
         }}
+        showTooltip={rewardInfo != null && rewardInfo.showWarning}
       />
     );
+
+    return {
+      epochProgress,
+      rewardPopup: rewardInfo?.rewardPopup,
+    };
   }
 
-  getStakePools: void => Array<Node> = () => {
+  getStakePools: void => null | Array<Node> = () => {
     const delegationStore = this.props.stores.substores[environment.API].delegation;
+    if (
+      !delegationStore.getCurrentDelegation.wasExecuted ||
+      delegationStore.getCurrentDelegation.isExecuting
+    ) {
+      return null;
+    }
     if (delegationStore.stakingKeyState == null) {
       return [];
     }

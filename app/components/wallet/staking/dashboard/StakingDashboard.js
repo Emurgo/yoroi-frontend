@@ -5,11 +5,12 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
 import GraphWrapper from './GraphWrapper';
-import RewardPopup from './RewardPopup';
 import styles from './StakingDashboard.scss';
 import globalMessages from '../../../../i18n/global-messages';
 import WarningBox from '../../../widgets/WarningBox';
 import InformativeError from '../../../widgets/InformativeError';
+import LoadingSpinner from '../../../widgets/LoadingSpinner';
+import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
 
 const messages = defineMessages({
   positionsLabel: {
@@ -39,13 +40,12 @@ const emptyDashboardMessages = defineMessages({
 
 type Props = {|
   themeVars: Object,
-  currentReward: string,
-  followingReward: string,
   totalGraphData: Array<Object>,
   positionsGraphData: Array<Object>,
-  stakePools: Array<Node>,
+  stakePools: null | Array<Node>,
   epochProgress: Node,
   userSummary: Node,
+  rewardPopup: void | Node,
   hasAnyPending: boolean,
 |};
 
@@ -58,8 +58,6 @@ export default class StakingDashboard extends Component<Props> {
   render() {
     const {
       themeVars,
-      currentReward,
-      followingReward,
       totalGraphData,
       positionsGraphData,
     } = this.props;
@@ -104,30 +102,46 @@ export default class StakingDashboard extends Component<Props> {
       <div className={styles.page}>
         <div className={styles.contentWrap}>
           {pendingTxWarningComponent}
-          <div className={styles.rewards}>
-            <RewardPopup currentText={currentReward} followingText={followingReward} />
-          </div>
+          {this.props.rewardPopup != null && (
+            <div className={styles.rewards}>
+              {this.props.rewardPopup}
+            </div>
+          )}
           <div className={styles.statsWrapper}>
             {this.props.epochProgress}
             <div className={styles.summary}>
               {this.props.userSummary}
             </div>
           </div>
-          {this.props.stakePools.length > 0 ? (
-            <div className={styles.bodyWrapper}>
-              <div className={styles.stakePool}>
-                {this.props.stakePools}
-              </div>
-            </div>
-          ) : (
-            <InformativeError
-              title={intl.formatMessage(emptyDashboardMessages.title)}
-              text={intl.formatMessage(emptyDashboardMessages.text)}
-            />
-          )}
+          {this.displayStakePools()}
         </div>
       </div>
     );
   }
 
+  displayStakePools: void => Node = () => {
+    const { intl } = this.context;
+    if (this.props.stakePools == null) {
+      return (
+        <VerticallyCenteredLayout>
+          <LoadingSpinner />
+        </VerticallyCenteredLayout>
+      );
+    }
+    if (this.props.stakePools.length === 0) {
+      return (
+        <InformativeError
+          title={intl.formatMessage(emptyDashboardMessages.title)}
+          text={intl.formatMessage(emptyDashboardMessages.text)}
+        />
+      );
+    }
+    return (
+      <div className={styles.bodyWrapper}>
+        <div className={styles.stakePool}>
+          {this.props.stakePools}
+        </div>
+      </div>
+    );
+  }
 }

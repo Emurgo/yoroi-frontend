@@ -21,6 +21,7 @@ import {
   ChainDerivations,
 } from '../../app/config/numbersConfig';
 import { testWallets } from './TestWallets';
+import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 
 const isShelley = false;
 
@@ -820,6 +821,65 @@ export const generateTransction = () => {
     tx_state: 'Failed'
   };
 
+  // ================
+  //   shelley-test
+  // ================
+
+  const certificateTx = {
+    hash: cryptoRandomString({ length: 64 }),
+    inputs: [
+      {
+        // eslint-disable-next-line max-len
+        // addr1sjag9rgwe04haycr283datdrjv3mlttalc2waz34xcct0g4uvf6gdg3dpwrsne4uqng3y47ugp2pp5dvuq0jqlperwj83r4pwxvwuxsghptz42
+        address: getAddressForType(
+          testWallets['shelley-test'].mnemonic,
+          [
+            WalletTypePurpose.CIP1852,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            0
+          ],
+          CoreAddressTypes.SHELLEY_GROUP
+        ),
+        txHash: distributorTx.hash,
+        id: distributorTx.hash + '12',
+        index: 12,
+        amount: '2100000'
+      }
+    ],
+    outputs: [
+      {
+        address: getAddressForType(
+          testWallets['shelley-test'].mnemonic,
+          [
+            WalletTypePurpose.CIP1852,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.INTERNAL,
+            0
+          ],
+          CoreAddressTypes.SHELLEY_GROUP
+        ),
+        amount: '2099990'
+      },
+    ],
+    certificate: {
+      payloadKind: 'StakeDelegation',
+      payloadKindId: RustModule.WalletV3.CertificateKind.StakeDelegation,
+      // delegates all ADA to pool 312e3d449038372ba2fc3300cfedf1b152ae739201b3e5da47ab3f933a421b62
+      payloadHex: 'a22d0b8709e6bc04d11257dc405410d1ace01f207c391ba4788ea17198ee1a0801312e3d449038372ba2fc3300cfedf1b152ae739201b3e5da47ab3f933a421b62',
+    },
+    height: 100,
+    block_hash: '100',
+    tx_ordinal: 3,
+    time: '2019-04-20T15:15:33.000Z',
+    epoch: 0,
+    slot: 100,
+    last_update: '2019-05-20T23:16:51.899Z',
+    tx_state: 'Successful'
+  };
+
   return {
     genesisTx,
     distributorTx,
@@ -833,6 +893,7 @@ export const generateTransction = () => {
     postLaunchSuccessfulTx,
     postLaunchPendingTx,
     failedTx,
+    certificateTx,
   };
 };
 
@@ -870,6 +931,8 @@ export function resetChain() {
   addTransaction(txs.useChange);
   // failed-single-tx
   addTransaction(txs.failedTx);
+  // shelley-test
+  addTransaction(txs.certificateTx);
 }
 
 // =========================

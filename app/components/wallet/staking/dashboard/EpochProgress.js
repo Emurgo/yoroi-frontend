@@ -35,6 +35,7 @@ type Props = {|
   percentage: number,
   currentEpoch: number,
   endTime: Object,
+  showTooltip: boolean,
 |};
 
 @observer
@@ -84,9 +85,11 @@ export default class EpochProgress extends Component<Props> {
                 :
                 <span className={styles.timeBlock}>{endTime.s}</span>
               </p>
-              <div className={styles.tooltip}>
-                <Tooltip text={intl.formatMessage(messages.tooltip)} />
-              </div>
+              {this.props.showTooltip === true && (
+                <div className={styles.tooltip}>
+                  <Tooltip text={intl.formatMessage(messages.tooltip)} />
+                </div>
+              )}
             </div>
           </div>
         </div>
