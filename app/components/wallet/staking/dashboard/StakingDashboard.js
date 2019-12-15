@@ -6,9 +6,10 @@ import { defineMessages, intlShape } from 'react-intl';
 
 import GraphWrapper from './GraphWrapper';
 import RewardPopup from './RewardPopup';
-import EmptyDashboard from './EmptyDashboard';
 import styles from './StakingDashboard.scss';
 import globalMessages from '../../../../i18n/global-messages';
+import WarningBox from '../../../widgets/WarningBox';
+import InformativeError from '../../../widgets/InformativeError';
 
 const messages = defineMessages({
   positionsLabel: {
@@ -19,6 +20,21 @@ const messages = defineMessages({
     id: 'wallet.dashboard.graphType.costs',
     defaultMessage: '!!!Costs',
   },
+  pendingTxWarning: {
+    id: 'wallet.dashboard.warning.pendingTx',
+    defaultMessage: '!!!Staking dashboard information will update once your pending transaction is confirmed',
+  },
+});
+
+const emptyDashboardMessages = defineMessages({
+  title: {
+    id: 'wallet.dashboard.empty.title',
+    defaultMessage: '!!!You have not delegated your ADA yet',
+  },
+  text: {
+    id: 'wallet.dashboard.empty.text',
+    defaultMessage: '!!!Go to Simple or Advance Staking to choce what stake pool you want to delegate in. Note, you may delegate only to one stake pool in this Tesnnet'
+  }
 });
 
 type Props = {|
@@ -30,6 +46,7 @@ type Props = {|
   stakePools: Array<Node>,
   epochProgress: Node,
   userSummary: Node,
+  hasAnyPending: boolean,
 |};
 
 @observer
@@ -48,6 +65,14 @@ export default class StakingDashboard extends Component<Props> {
     } = this.props;
 
     const { intl } = this.context;
+
+    const pendingTxWarningComponent = this.props.hasAnyPending
+      ? (
+        <WarningBox>
+          {this.context.intl.formatMessage(messages.pendingTxWarning)}
+        </WarningBox>
+      )
+      : (null);
 
     // TODO: enable graphs eventually
     // eslint-disable-next-line no-unused-vars
@@ -78,6 +103,7 @@ export default class StakingDashboard extends Component<Props> {
     return (
       <div className={styles.page}>
         <div className={styles.contentWrap}>
+          {pendingTxWarningComponent}
           <div className={styles.rewards}>
             <RewardPopup currentText={currentReward} followingText={followingReward} />
           </div>
@@ -94,7 +120,10 @@ export default class StakingDashboard extends Component<Props> {
               </div>
             </div>
           ) : (
-            <EmptyDashboard />
+            <InformativeError
+              title={intl.formatMessage(emptyDashboardMessages.title)}
+              text={intl.formatMessage(emptyDashboardMessages.text)}
+            />
           )}
         </div>
       </div>
