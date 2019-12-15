@@ -1,8 +1,8 @@
 {
   "network": {
     "protocolMagic": 764824073,
-    "backendUrl": "https://iohk-mainnet.yoroiwallet.com",
-    "websocketUrl": "wss://iohk-mainnet.yoroiwallet.com:443",
+    "backendUrl": "https://shelley-itn-yoroi-backend.yoroiwallet.com",
+    "websocketUrl": "wss://shelley-itn-yoroi-backend.yoroiwallet.com:443",
     "name": "shelley-testnet"
   },
   "seiza": {
