@@ -390,6 +390,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
           <RewardPopup
             currentText={moment(nextRewardTime).format('MMM Do hh:mm A')}
             followingText={moment(followingRewardTime).format('MMM Do hh:mm A')}
+            showDisclaimer={recentDelegation}
           />
         );
         rewardInfo = {

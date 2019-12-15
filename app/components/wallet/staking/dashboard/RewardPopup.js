@@ -28,6 +28,7 @@ const messages = defineMessages({
 type Props = {|
   currentText: string,
   followingText: string,
+  showDisclaimer: boolean,
 |};
 
 @observer
@@ -40,8 +41,14 @@ export default class RewardPopup extends Component<Props> {
     const { intl } = this.context;
     const { currentText, followingText } = this.props;
 
-    // TODO: real link
-    const learnMoreLink = '#';
+    // TODO: real link once we have one
+    // eslint-disable-next-line
+    const learnMoreLink = (
+      // eslint-disable-next-line
+      <a href={'#'} className={styles.link}>
+        {intl.formatMessage(messages.learnMore)}
+      </a>
+    );
     return (
       <div>
         <Card>
@@ -58,12 +65,11 @@ export default class RewardPopup extends Component<Props> {
             </div>
           </div>
         </Card>
-        <p className={styles.note}>
-          {intl.formatMessage(messages.note)}{' '}
-          <a href={learnMoreLink} className={styles.link}>
-            {intl.formatMessage(messages.learnMore)}
-          </a>
-        </p>
+        {this.props.showDisclaimer && (
+          <p className={styles.note}>
+            {intl.formatMessage(messages.note)}{' '}
+          </p>
+        )}
       </div>
     );
   }
