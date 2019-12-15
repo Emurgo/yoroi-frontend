@@ -79,8 +79,6 @@ export default class StakingDashboardPage extends Component<Props, State> {
   }
 
   render() {
-    // TODO: render something else if there is a pending tx that modifies delegation?
-
     const publicDeriver = this.props.stores.substores[environment.API].wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);

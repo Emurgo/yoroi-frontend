@@ -45,7 +45,7 @@ type Props = {|
   stakePools: null | Array<Node>,
   epochProgress: Node,
   userSummary: Node,
-  rewardPopup: Node,
+  rewardPopup: void | Node,
   hasAnyPending: boolean,
 |};
 
