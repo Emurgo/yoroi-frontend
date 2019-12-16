@@ -54,13 +54,11 @@
 
 **b. 分離解釈** 本規約のいずれかの規定またはいずれかの規定の一部が無効、違法または強制執行不能であるか、無効、違法または強制執行不能となる場合には、当該規定または当該規定の一部は、有効、適法かつ強制執行可能とするために必要な最小限度で変更されたものとみなします。かかる変更を行えない場合には、当該規定または当該規定の一部は削除されたものとみなします。本条に基づくいずれかの規定またはいずれかの規定の一部の変更または削除は、本規約の残りの規定の有効性および強制執行可能性に影響を及ぼさないものとします。
 
-**c. 完全合意 – 依拠の放棄** 本規約は、本規約の内容に関する両当事者間の完全な合意を構成し、両当事者間における従前のすべての合意事項および了解事項に優先します。ユーザーは、本規約に明記されるもの以外の陳述、了解事項、表明事項、期待事項または合意事項に依拠していないことを明示的に表明し、保証します。
-
 ## 11. その他
 
-**d. 本規約は、拘束力のある仲裁に服します** ユーザーは、本規約またはユーザーもしくはその他の者による本ソフトウェアへのアクセス、本ソフトウェアの利用もしくは本ソフトウェアのインストールに起因し、または何らかの点で関連する紛争またはいずれかの者に対する請求はすべて国際商業会議所の仲裁規則に基づき選任される１名ないし複数名の仲裁人による同規則に基づく拘束力のある仲裁に服するものとすることに同意します。また、仲裁地は日本とし、仲裁言語は英語とします。
+**a. Amendment.** The Company shall have the right, at any time and without notice, to add to or modify the terms of this Agreement, simply by delivering such amended terms to User by electronic message through any medium to any address provided to the Company by User. User's access to or use of the Software after the date such amended terms are delivered to User shall be deemed to constitute acceptance of such amended terms.
 
-**e. 言語** 本規約の翻訳は、現地における参照の便宜のためにのみ作成されるものであり、英語版と英語以外の言語版との間に齟齬がある場合には本規約の英語版がすべての点において優先するものとします。
+**b. Severance.** If any provision or part-provision of this Agreement is, or becomes invalid, illegal or unenforceable, it shall be deemed modified to the minimum extent necessary to make it valid, legal and enforceable. If such modification is not possible, the relevant provision or part-provision shall be deemed deleted. Any modification to or deletion of a provision or part-provision under this Article shall not affect the validity and enforceability of the rest of this Agreement.
 
 **c. 完全合意 – 依拠の放棄** 本規約は、本規約の内容に関する両当事者間の完全な合意を構成し、両当事者間における従前のすべての合意事項および了解事項に優先します。ユーザーは、本規約に明記されるもの以外の陳述、了解事項、表明事項、期待事項または合意事項に依拠していないことを明示的に表明し、保証します。
 
