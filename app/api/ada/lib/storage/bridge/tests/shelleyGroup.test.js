@@ -745,7 +745,7 @@ async function syncWithCertificate(): Promise<void> {
 
   // make sure fetching certificates works when 0 certs exist
   {
-    const certs = await getCertificates(db, stakingAddr.addr.AddressId);
+    const certs = await getCertificates(db, [stakingAddr.addr.AddressId]);
     expect(certs.length).toEqual(0);
   }
 
@@ -764,7 +764,7 @@ async function syncWithCertificate(): Promise<void> {
       Payload: 'd993c5b8ca62c78801d3228a8de6b9e18217b001820c24d60c1bcd91c895d58501312e3d449038372ba2fc3300cfedf1b152ae739201b3e5da47ab3f933a421b62',
       TransactionId: 1,
     },
-    relations: [{
+    relatedAddresses: [{
       AddressId: 81,
       CertificateAddressId: 1,
       CertificateId: 1,
@@ -793,7 +793,7 @@ async function syncWithCertificate(): Promise<void> {
     );
 
     // certificate was added to wallet
-    const certs = await getCertificates(db, stakingAddr.addr.AddressId);
+    const certs = await getCertificates(db, [stakingAddr.addr.AddressId]);
     expect(certs).toEqual([cert1]);
   }
 
@@ -805,7 +805,7 @@ async function syncWithCertificate(): Promise<void> {
       Payload: 'd993c5b8ca62c78801d3228a8de6b9e18217b001820c24d60c1bcd91c895d58501312e3d449038372ba2fc3300cfedf1b152ae739201b3e5da47ab3f933a421b62',
       TransactionId: 2,
     },
-    relations: [{
+    relatedAddresses: [{
       AddressId: 81,
       CertificateAddressId: 2,
       CertificateId: 2,
@@ -835,7 +835,7 @@ async function syncWithCertificate(): Promise<void> {
     );
 
     // certificate was added to wallet
-    const certs = await getCertificates(db, stakingAddr.addr.AddressId);
+    const certs = await getCertificates(db, [stakingAddr.addr.AddressId]);
     expect(certs).toEqual([cert1, cert2]);
   }
 

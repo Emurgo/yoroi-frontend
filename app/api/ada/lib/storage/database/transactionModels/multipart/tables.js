@@ -2,12 +2,13 @@
 
 import type { lf$schema$Builder } from 'lovefield';
 
-import type { DbTransaction, DbBlock, } from '../../primitives/tables';
+import type { DbTransaction, DbBlock, CertificatePart, } from '../../primitives/tables';
 import type { DbUtxoInputs, DbUtxoOutputs, } from '../utxo/tables';
 import type { DbAccountingInputs, DbAccountingOutputs, } from '../account/tables';
 
 export type DbTxIO = {|
   ...DbTransaction,
+  certificate: void | CertificatePart,
   ...DbUtxoInputs, ...DbUtxoOutputs,
   ...DbAccountingInputs, ...DbAccountingOutputs,
 |};

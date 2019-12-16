@@ -33,9 +33,12 @@ import YoroiTransferPage from './containers/transfer/YoroiTransferPage';
 import URILandingPage from './containers/uri/URILandingPage';
 import Transfer from './containers/transfer/Transfer';
 import StakingDashboardPage from './containers/wallet/staking/StakingDashboardPage';
-import StakingSimplePage from './containers/wallet/staking/StakingSimplePage';
-import StakingAdvancePage from './containers/wallet/staking/StakingAdvancePage';
+import StakingPage from './containers/wallet/staking/StakingPage';
 import NoticeBoardPage from './containers/notice-board/NoticeBoardPage';
+
+import type { ConfigType } from '../config/config-types';
+
+declare var CONFIG: ConfigType;
 
 /* eslint-disable max-len */
 export const Routes = (
@@ -140,12 +143,12 @@ const WalletsSubpages = (stores, actions) => (
         <Route
           exact
           path={ROUTES.WALLETS.DELEGATION_SIMPLE}
-          component={(props) => <StakingSimplePage {...props} stores={stores} actions={actions} />}
+          component={(props) => <StakingPage {...props} stores={stores} actions={actions} stakingUrl={CONFIG.seiza.simple} />}
         />
         <Route
           exact
           path={ROUTES.WALLETS.DELEGATION_ADVANCE}
-          component={(props) => <StakingAdvancePage {...props} stores={stores} actions={actions} />}
+          component={(props) => <StakingPage {...props} stores={stores} actions={actions} stakingUrl={CONFIG.seiza.advance} />}
         />
       </>)
     }

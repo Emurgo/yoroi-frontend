@@ -177,6 +177,11 @@ export const TransactionSchema: {
   }
 };
 
+export type CertificatePart = {|
+  relatedAddresses: $ReadOnlyArray<$ReadOnly<CertificateAddressRow>>,
+  certificate: $ReadOnly<CertificateRow>,
+|};
+
 export type CertificateInsert = {|
   TransactionId: number,
   Kind: CertificateKindType,

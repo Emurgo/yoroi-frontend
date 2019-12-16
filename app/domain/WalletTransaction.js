@@ -12,13 +12,13 @@ import type {
   DbTxIO,
 } from '../api/ada/lib/storage/database/transactionModels/multipart/tables';
 import type {
-  DbBlock,
+  DbBlock, CertificatePart,
 } from '../api/ada/lib/storage/database/primitives/tables';
 import type {
   TxStatusCodesType,
 } from '../api/ada/lib/storage/database/primitives/enums';
 
-export type TrasactionAddresses = { from: Array<string>, to: Array<string> };
+export type TrasactionAddresses = {| from: Array<string>, to: Array<string> |};
 
 export default class WalletTransaction {
 
@@ -29,6 +29,7 @@ export default class WalletTransaction {
   @observable date: Date;
   @observable numberOfConfirmations: number = 0;
   @observable addresses: TrasactionAddresses = { from: [], to: [] };
+  @observable certificate: void | CertificatePart;
   @observable state: TxStatusCodesType;
   @observable errorMsg: null | string;
 
@@ -40,6 +41,7 @@ export default class WalletTransaction {
     date: Date,
     numberOfConfirmations: number,
     addresses: TrasactionAddresses,
+    certificate: void | CertificatePart;
     state: TxStatusCodesType,
     errorMsg: null | string,
   }) {
@@ -79,6 +81,7 @@ export default class WalletTransaction {
       }
       return result;
     };
+
     return new WalletTransaction({
       id: tx.transaction.Hash,
       type: tx.type,
@@ -100,6 +103,7 @@ export default class WalletTransaction {
           ...toAddr(tx.accountingOutputs),
         ]
       },
+      certificate: tx.certificate,
       state: tx.transaction.Status,
       errorMsg: tx.transaction.ErrorMessage,
     });

@@ -20,6 +20,7 @@ import StateFetchStore from './StateFetchStore';
 import ServerConnectionStore from './ServerConnectionStore';
 import WalletRestoreStore from './WalletRestoreStore';
 import DelegationTransactionStore from './DelegationTransactionStore';
+import DelegationStore from './DelegationStore';
 import type { ActionsMap } from '../../actions/index';
 import type { Api } from '../../api/index';
 import type { StoresMap } from '../index';
@@ -42,6 +43,7 @@ export const adaStoreClasses = {
   serverConnectionStore: ServerConnectionStore,
   walletRestore: WalletRestoreStore,
   delegationTransaction: DelegationTransactionStore,
+  delegation: DelegationStore,
 };
 
 export type AdaStoresMap = {|
@@ -62,6 +64,7 @@ export type AdaStoresMap = {|
   serverConnectionStore: ServerConnectionStore,
   walletRestore: WalletRestoreStore,
   delegationTransaction: DelegationTransactionStore,
+  delegation: DelegationStore,
 |};
 
 const adaStores = observable({
@@ -82,6 +85,7 @@ const adaStores = observable({
   serverConnectionStore: null,
   walletRestore: null,
   delegationTransaction: null,
+  delegation: null,
 });
 
 /** See `stores` index for description of this weird behavior

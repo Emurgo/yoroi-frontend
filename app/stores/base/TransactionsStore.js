@@ -14,10 +14,8 @@ import {
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
   asGetBalance, asHasLevels,
-  asGetAllUtxos,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
-  IGetAllUtxos,
   IGetLastSyncInfo,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
@@ -60,11 +58,11 @@ export default class TransactionsStore extends Store {
       this.searchOptions.limit += this.SEARCH_LIMIT_INCREASE;
       const publicDeriver = this.stores.substores[environment.API].wallets.selected;
       if (!publicDeriver) return;
-      const withUtxos = asGetAllUtxos(publicDeriver.self);
-      if (withUtxos == null) {
+      const hasLevels = asHasLevels(publicDeriver.self);
+      if (hasLevels == null) {
         return;
       }
-      this.refreshLocal(withUtxos);
+      this.refreshLocal(hasLevels);
     }
   };
 
@@ -138,7 +136,7 @@ export default class TransactionsStore extends Store {
     const walletsStore = this.stores.substores[environment.API].wallets;
     const walletsActions = this.actions[environment.API].wallets;
 
-    const publicDeriver = asGetAllUtxos(basePubDeriver.self);
+    const publicDeriver = asHasLevels(basePubDeriver.self);
     if (publicDeriver == null) {
       return;
     }
@@ -208,9 +206,9 @@ export default class TransactionsStore extends Store {
   };
 
   @action refreshLocal: (
-    PublicDeriver<> & IGetAllUtxos & IGetLastSyncInfo
+    PublicDeriver<> & IGetLastSyncInfo
   ) => Promise<PromisslessReturnType<GetTransactionsFunc>> = (
-    publicDeriver: PublicDeriver<> & IGetAllUtxos & IGetLastSyncInfo,
+    publicDeriver: PublicDeriver<> & IGetLastSyncInfo,
   ) => {
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
 
@@ -223,7 +221,7 @@ export default class TransactionsStore extends Store {
 
     const withLevels = asHasLevels<
       ConceptualWallet,
-      IGetAllUtxos & IGetLastSyncInfo
+      IGetLastSyncInfo
     >(publicDeriver);
     if (withLevels == null) {
       throw new Error('refreshLocal no levels');

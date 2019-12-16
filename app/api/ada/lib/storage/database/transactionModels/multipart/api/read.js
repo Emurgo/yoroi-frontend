@@ -7,6 +7,7 @@ import type {
 import type {
   TransactionRow,
 } from '../../../primitives/tables';
+import { GetCertificates, } from '../../../primitives/api/read';
 import type { DbTxIO } from '../tables';
 
 import {
@@ -21,6 +22,7 @@ export class AssociateTxWithIOs {
   static depTables = Object.freeze({
     AssociateTxWithAccountingIOs,
     AssociateTxWithUtxoIOs,
+    GetCertificates,
   });
 
   static async getTxIdsForAddresses(
@@ -59,8 +61,14 @@ export class AssociateTxWithIOs {
       if (input == null) throw new Error('getIOsForTx no tx part found. Should never happen');
       return input;
     };
+
+    const certsForTxs = await AssociateTxWithIOs.depTables.GetCertificates.forTransactions(
+      db, tx,
+      { txIds: request.txs.map(transaction => transaction.TransactionId) },
+    );
     const fullTx = request.txs.map(transaction  => ({
       transaction,
+      certificate: certsForTxs.get(transaction.TransactionId),
       ...getOrThrow(utxo.get(transaction)),
       ...getOrThrow(accounting.get(transaction)),
     }));

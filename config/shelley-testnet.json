@@ -1,8 +1,8 @@
 {
   "network": {
     "protocolMagic": 764824073,
-    "backendUrl": "https://iohk-mainnet.yoroiwallet.com",
-    "websocketUrl": "wss://iohk-mainnet.yoroiwallet.com:443",
+    "backendUrl": "https://shelley-itn-yoroi-backend.yoroiwallet.com",
+    "websocketUrl": "wss://shelley-itn-yoroi-backend.yoroiwallet.com:443",
     "name": "shelley-testnet"
   },
   "seiza": {
@@ -18,15 +18,15 @@
     "txsBodiesRequestSize": 150
   },
   "genesis": {
-    "block0_date": 0,
-    "slots_per_epoch": 21600,
-    "slot_duration": 20,
-    "epoch_reward": 21414,
+    "block0_date": 1576264417000,
+    "slots_per_epoch": 43200,
+    "slot_duration": 2,
+    "epoch_reward": 19666,
     "linearFee": {
-      "constant": "2",
-      "coefficient": "1",
-      "certificate": "4"
+      "constant": "200000",
+      "coefficient": "100000",
+      "certificate": "10000"
     },
-    "genesisHash": "c511043dda377d7764d9f01d721ddea323f2a01b1e89f62c8ee587a65d7a1487"
+    "genesisHash": "8e4d2a343f3dcf9330ad9035b3e8d168e6728904262f2c434a4f8f934ec7b676"
   }
 }

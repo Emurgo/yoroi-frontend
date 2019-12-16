@@ -1,8 +1,11 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import BigNumber from 'bignumber.js';
 import { defineMessages, intlShape } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type {
+  $npm$ReactIntl$IntlFormat,
+} from 'react-intl';
 import moment from 'moment';
 import classNames from 'classnames';
 import { uniq } from 'lodash';
@@ -22,6 +25,8 @@ import type { ExplorerType } from '../../../domain/Explorer';
 import { TxStatusCodes, } from '../../../api/ada/lib/storage/database/primitives/enums';
 import type { TxStatusCodesType, } from '../../../api/ada/lib/storage/database/primitives/enums';
 import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
+import type { CertificateRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 
 const messages = defineMessages({
   type: {
@@ -84,9 +89,36 @@ const messages = defineMessages({
     id: 'wallet.transaction.addresses.to',
     defaultMessage: '!!!To addresses',
   },
+  certificateLabel: {
+    id: 'wallet.transaction.certificateLabel',
+    defaultMessage: '!!!Certificate',
+  },
   transactionAmount: {
     id: 'wallet.transaction.transactionAmount',
     defaultMessage: '!!!Transaction amount',
+  },
+});
+
+const certificateKinds = defineMessages({
+  PoolRegistration: {
+    id: 'wallet.transaction.certificate.PoolRegistration',
+    defaultMessage: '!!!Pool registration',
+  },
+  PoolUpdate: {
+    id: 'wallet.transaction.certificate.PoolUpdate',
+    defaultMessage: '!!!Pool update',
+  },
+  PoolRetirement: {
+    id: 'wallet.transaction.certificate.PoolRetirement',
+    defaultMessage: '!!!Pool retirement',
+  },
+  StakeDelegation: {
+    id: 'wallet.transaction.certificate.StakeDelegation',
+    defaultMessage: '!!!Stake delegation',
+  },
+  OwnerStakeDelegation: {
+    id: 'wallet.transaction.certificate.OwnerStakeDelegation',
+    defaultMessage: '!!!Owner stake delegation',
   },
 });
 
@@ -331,6 +363,7 @@ export default class Transaction extends Component<Props, State> {
                   </RawHash>
                 </ExplorableHashContainer>
               ))}
+              {this.getCerificate(data)}
 
               {environment.isAdaApi() ? (
                 <div className={styles.row}>
@@ -360,6 +393,44 @@ export default class Transaction extends Component<Props, State> {
         </div>
 
       </div>
+    );
+  }
+
+  certificateToText: $ReadOnly<CertificateRow> => string = (certificate) => {
+    const { intl } = this.context;
+    const kind = certificate.Kind;
+    switch (kind) {
+      case RustModule.WalletV3.CertificateKind.PoolRegistration:
+        return intl.formatMessage(certificateKinds.PoolRegistration);
+      case RustModule.WalletV3.CertificateKind.PoolUpdate:
+        return intl.formatMessage(certificateKinds.PoolUpdate);
+      case RustModule.WalletV3.CertificateKind.PoolRetirement:
+        return intl.formatMessage(certificateKinds.PoolRetirement);
+      case RustModule.WalletV3.CertificateKind.StakeDelegation:
+        return intl.formatMessage(certificateKinds.StakeDelegation);
+      case RustModule.WalletV3.CertificateKind.OwnerStakeDelegation:
+        return intl.formatMessage(certificateKinds.OwnerStakeDelegation);
+      default: {
+        throw new Error(`${nameof(this.certificateToText)} unexpected kind ${kind}`);
+      }
+    }
+  }
+
+  getCerificate: WalletTransaction => Node = (data) => {
+    const { intl } = this.context;
+    if (data.certificate == null) {
+      return (null);
+    }
+    const certificateText = this.certificateToText(data.certificate.certificate);
+    return (
+      <>
+        <h2>
+          {intl.formatMessage(messages.certificateLabel)}
+        </h2>
+        <span className={styles.rowData}>
+          {certificateText}
+        </span>
+      </>
     );
   }
 }

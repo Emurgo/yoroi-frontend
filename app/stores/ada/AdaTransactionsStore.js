@@ -19,7 +19,7 @@ import { assuranceLevels, } from '../../config/transactionAssuranceConfig';
 import type {
   GetTransactionRowsToExportFunc,
 } from '../../api/ada';
-import { asGetAllUtxos, } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { asHasLevels, } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 
 import type {
   ExportTransactionsRequest,
@@ -107,11 +107,11 @@ export default class AdaTransactionsStore extends TransactionsStore {
 
       const publicDeriver = this.stores.substores.ada.wallets.selected;
       if (!publicDeriver) return;
-      const withUtxos = asGetAllUtxos(publicDeriver.self);
-      if (!withUtxos) return;
+      const withLevels = asHasLevels(publicDeriver.self);
+      if (!withLevels) return;
 
       this.getTransactionRowsToExportRequest.execute({
-        publicDeriver: withUtxos,
+        publicDeriver: withLevels,
         ...params,
       });
       if (!this.getTransactionRowsToExportRequest.promise) throw new Error('should never happen');

@@ -31,8 +31,8 @@ import {
   createStandardCip1852Wallet,
 } from './lib/storage/bridge/walletBuilder/shelley';
 import {
-  getAllUtxoTransactions,
-  getPendingUtxoTransactions,
+  getAllTransactions,
+  getPendingTransactions,
   updateTransactions,
 } from './lib/storage/bridge/updateTransactions';
 import {
@@ -83,6 +83,9 @@ import {
   asAddressedUtxo as shelleyAsAddressedUtxo,
   signTransaction as shelleySignTransaction,
 } from './transactions/shelley/utxoTransactions';
+import {
+  normalizeKey
+} from './transactions/shelley/utils';
 import {
   generateWalletRootKey,
   generateAdaMnemonic,
@@ -259,8 +262,8 @@ export type GetTransactionsRequestOptions = {|
   limit: number,
 |};
 export type GetTransactionsRequest = {
-  ...Inexact<GetTransactionsRequestOptions>,
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos & IGetLastSyncInfo,
+  ...InexactSubset<GetTransactionsRequestOptions>,
+  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetLastSyncInfo,
   isLocalRequest: boolean,
   getTransactionsHistoryForAddresses: HistoryFunc,
   checkAddressesInUse: FilterFunc,
@@ -277,7 +280,7 @@ export type GetTransactionsFunc = (
 // refreshPendingTransactions
 
 export type RefreshPendingTransactionsRequest = {
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos & IGetLastSyncInfo,
+  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetLastSyncInfo,
 };
 export type RefreshPendingTransactionsResponse = Array<WalletTransaction>;
 export type RefreshPendingTransactionsFunc = (
@@ -565,7 +568,7 @@ export type CreateHardwareWalletFunc = (
 // getTransactionRowsToExport
 
 export type GetTransactionRowsToExportRequest = {
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos,
+  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
 };
 export type GetTransactionRowsToExportResponse = Array<TransactionExportRow>;
 export type GetTransactionRowsToExportFunc = (
@@ -704,7 +707,7 @@ export default class AdaApi {
           request.getBestBlock,
         );
       }
-      const fetchedTxs = await getAllUtxoTransactions({
+      const fetchedTxs = await getAllTransactions({
         publicDeriver: request.publicDeriver,
         skip,
         limit,
@@ -734,7 +737,7 @@ export default class AdaApi {
   ): Promise<RefreshPendingTransactionsResponse> {
     Logger.debug('AdaApi::refreshPendingTransactions called');
     try {
-      const fetchedTxs = await getPendingUtxoTransactions({
+      const fetchedTxs = await getPendingTransactions({
         publicDeriver: request.publicDeriver,
       });
       Logger.debug('AdaApi::refreshPendingTransactions success: ' + stringifyData(fetchedTxs));
@@ -1063,14 +1066,13 @@ export default class AdaApi {
       const normalizedSigningKey = RustModule.WalletV3.Bip32PrivateKey.from_bytes(
         Buffer.from(normalizedKey.prvKeyHex, 'hex')
       );
-      let normalizedStakingKey;
-      {
-        let key = normalizedSigningKey;
-        for (const derivation of stakingAddr.addressing.path) {
-          key = key.derive(derivation);
-        }
-        normalizedStakingKey = key.to_raw_key();
-      }
+      const normalizedStakingKey = normalizeKey({
+        addressing: stakingAddr.addressing,
+        startingFrom: {
+          key: normalizedSigningKey,
+          level: request.publicDeriver.getParent().getPublicDeriverLevel(),
+        },
+      }).to_raw_key();
       const unsignedTx = signRequest.unsignedTx;
       if (request.signRequest.certificate == null) {
         throw new Error(`${nameof(this.signAndBroadcastDelegationTx)} missing certificate`);
@@ -1520,7 +1522,7 @@ export default class AdaApi {
     request: GetTransactionRowsToExportRequest
   ): Promise<GetTransactionRowsToExportResponse> {
     try {
-      const fetchedTxs = await getAllUtxoTransactions({
+      const fetchedTxs = await getAllTransactions({
         publicDeriver: request.publicDeriver,
       });
       Logger.debug('AdaApi::getTransactionRowsToExport: success');
