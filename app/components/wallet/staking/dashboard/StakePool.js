@@ -173,18 +173,21 @@ export default class StakePool extends Component<Props> {
     const { intl } = this.context;
 
     const buttonClasses = classnames([
+      styles.descriptionButton,
       this.props.classicTheme ? 'flat' : 'outlined',
     ]);
     return (
-      <Button
-        type="button"
+      <a
         href={info.url}
         onClick={info.openPoolPage}
-        className={buttonClasses}
-        skin={ButtonSkin}
       >
-        {intl.formatMessage(messages.button)}
-      </Button>
+        <Button
+          type="button"
+          label={intl.formatMessage(messages.button)}
+          className={buttonClasses}
+          skin={ButtonSkin}
+        />
+      </a>
     );
   }
 }
