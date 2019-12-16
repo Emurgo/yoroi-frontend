@@ -4,6 +4,8 @@ import type { ConfigType, Network } from '../config/config-types';
 import { NetworkType } from '../config/config-types';
 import type { UserAgentInfo } from './utils/userAgentInfo';
 import userAgentInfo from './utils/userAgentInfo';
+import type { AddressDiscriminationType } from '@emurgo/js-chain-libs/js_chain_libs';
+import { RustModule } from './api/ada/lib/cardanoCrypto/rustLoader';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -40,8 +42,15 @@ export const environment = ((
         CONFIG.network.name === NetworkType.SHELLEY_TESTNET;
     },
     isTest: () => CONFIG.network.name === NetworkType.TEST,
-    isMainnet: () => environment.NETWORK === NetworkType.MAINNET ||
-      CONFIG.network.name === NetworkType.TEST,
+    isMainnet: () => environment.NETWORK === NetworkType.MAINNET,
+    isProduction: () => environment.NETWORK === NetworkType.MAINNET ||
+      CONFIG.network.name === NetworkType.SHELLEY_TESTNET,
+    getDiscriminant: () => {
+      if (CONFIG.network.name === NetworkType.TEST || process.env.NODE_ENV === 'jest') {
+        return RustModule.WalletV3.AddressDiscrimination.Production;
+      }
+      return RustModule.WalletV3.AddressDiscrimination.Test;
+    },
     isAdaApi: () => environment.API === 'ada',
     walletRefreshInterval: CONFIG.app.walletRefreshInterval,
     serverStatusRefreshInterval: CONFIG.app.serverStatusRefreshInterval,
@@ -60,7 +69,9 @@ export const environment = ((
   isShelley: void => boolean,
   isTest: void => boolean,
   isMainnet: void => boolean,
+  isProduction: void => boolean,
   isAdaApi: void => boolean,
+  getDiscriminant: void => AddressDiscriminationType,
   walletRefreshInterval: number,
   serverStatusRefreshInterval: number,
   userAgentInfo: UserAgentInfo

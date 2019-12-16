@@ -154,9 +154,7 @@ export async function scanCip1852Account(request: {
   const key = RustModule.WalletV3.Bip32PublicKey.from_bytes(
     Buffer.from(request.accountPublicKey, 'hex'),
   );
-  const discrimination = environment.isMainnet()
-    ? RustModule.WalletV3.AddressDiscrimination.Production
-    : RustModule.WalletV3.AddressDiscrimination.Test;
+  const discrimination = environment.getDiscriminant();
 
   const insert = await scanAccount({
     generateInternalAddresses: genSingleAddressBatchFunc(
