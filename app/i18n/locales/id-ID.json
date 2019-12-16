@@ -107,8 +107,6 @@
   "loading.screen.error": "Untuk bantuan lebih lanjut, Anda bisa {supportRequestLink}",
   "loading.screen.loading": "Memuat komponen",
   "networkError.label.message": "PERINGATAN: Koneksi ke server gagal.<br>Harap periksa koneksi internet Anda atau <a target='blank' href='https://twitter.com/YoroiWallet'>akun Twitter kami</a>.<br>Saldo yang ditampilkan dan riwayat transaksi mungkin akan terlihat salah sampai server kami kembali normal, tetapi sebenarnya tidak mempengaruhi saldo Anda.",
-  "profile.languageSelect.detail1": "Currently, this version allows you to verify that",
-  "profile.languageSelect.detail2": "your balance was correctly taken into consideration during the first snapshot.",
   "profile.languageSelect.form.languageSelectLabel": "Pilih Bahasa Anda",
   "profile.languageSelect.form.submitLabel": "Lanjutkan",
   "profile.languageSelect.intro": "You are on the Yoroi Shelley Testnet",
