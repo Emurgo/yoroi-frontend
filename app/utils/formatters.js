@@ -6,6 +6,15 @@ export const formattedWalletAmount = (amount: BigNumber): string => (
   amount.toFormat(DECIMAL_PLACES_IN_ADA)
 );
 
+/**
+ * Just removes all Lovelaces, without decimal place (does not round off)
+ * e.g 3657.9345 => 3657
+ * @param {*} amount
+ */
+export const formattedAmountWithoutLovelace = (amount: BigNumber): string => (
+  amount.decimalPlaces(0, 3).toString() // 3 = ROUND_FLOOR
+);
+
 /** removes commas */
 export const formattedAmountToBigNumber = (amount: string) => {
   const cleanedAmount = amount.replace(/,/g, '');

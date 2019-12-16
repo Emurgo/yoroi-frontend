@@ -5,6 +5,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import SeizaFetcher from './SeizaFetcher';
 import InformativeError from '../../../components/widgets/InformativeError';
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
+import { formattedAmountWithoutLovelace } from '../../../utils/formatters';
 
 import type { InjectedProps } from '../../../types/injectedPropsType';
 
@@ -30,6 +31,19 @@ export default class StakingPage extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  prepareStakingURL(): string {
+    let finalURL = this.props.stakingUrl;
+
+    // Add userAda
+    const publicDeriver = this.props.stores.substores.ada.wallets.selected;
+    if (publicDeriver) {
+      // Seiza does not understand decimal places, so removing all Lovelaces
+      finalURL += `&userAda=${formattedAmountWithoutLovelace(publicDeriver.amount)}`;
+    }
+
+    return finalURL;
+  }
+
   render() {
     const { stores } = this.props;
     const { intl } = this.context;
@@ -43,6 +57,6 @@ export default class StakingPage extends Component<Props> {
           />
         </VerticallyCenteredLayout>
       )
-      : (<SeizaFetcher {...this.props} stores={stores} stakingUrl={this.props.stakingUrl} />);
+      : (<SeizaFetcher {...this.props} stores={stores} stakingUrl={this.prepareStakingURL()} />);
   }
 }
