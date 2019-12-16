@@ -9,8 +9,8 @@ const CONFIG: ConfigType = {
     name: 'mainnet'
   },
   seiza: {
-    simple: '',
-    advance: ''
+    simpleTemplate: '',
+    advanceTemplate: '',
   },
   app: {
     walletRefreshInterval: 10,

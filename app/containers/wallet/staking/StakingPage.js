@@ -6,12 +6,13 @@ import SeizaFetcher from './SeizaFetcher';
 import InformativeError from '../../../components/widgets/InformativeError';
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
 import { formattedAmountWithoutLovelace } from '../../../utils/formatters';
+import environment from '../../../environment';
 
 import type { InjectedProps } from '../../../types/injectedPropsType';
 
 type Props = {|
   ...InjectedProps,
-  stakingUrl: string,
+  urlTemplate: string,
 |};
 
 const messages = defineMessages({
@@ -32,7 +33,13 @@ export default class StakingPage extends Component<Props> {
   };
 
   prepareStakingURL(): string {
-    let finalURL = this.props.stakingUrl;
+    let finalURL = this.props.urlTemplate
+      .replace(
+        '$$BROWSER$$',
+        environment.userAgentInfo.isFirefox
+          ? 'firefox'
+          : 'chrome',
+      );
 
     // Add userAda
     const publicDeriver = this.props.stores.substores.ada.wallets.selected;
@@ -45,7 +52,7 @@ export default class StakingPage extends Component<Props> {
   }
 
   render() {
-    const { stores } = this.props;
+    const { actions, stores } = this.props;
     const { intl } = this.context;
 
     return this.props.stores.substores.ada.transactions.hasAnyPending
@@ -57,6 +64,6 @@ export default class StakingPage extends Component<Props> {
           />
         </VerticallyCenteredLayout>
       )
-      : (<SeizaFetcher {...this.props} stores={stores} stakingUrl={this.prepareStakingURL()} />);
+      : (<SeizaFetcher actions={actions} stores={stores} stakingUrl={this.prepareStakingURL()} />);
   }
 }
