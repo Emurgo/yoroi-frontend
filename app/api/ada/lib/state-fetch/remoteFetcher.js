@@ -240,7 +240,7 @@ export class RemoteFetcher implements IFetcher {
 
   getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => (
     axios(
-      `${backendUrl}/api/v2/pools/info`,
+      `${backendUrl}/api/v2/pool/info`,
       {
         method: 'post',
         data: {

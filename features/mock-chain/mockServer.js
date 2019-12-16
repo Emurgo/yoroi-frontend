@@ -144,7 +144,7 @@ export function getMockServer(
       res.send(response);
     });
 
-    server.post('/api/v2/pools/info', async (
+    server.post('/api/v2/pool/info', async (
       req: {
         body: PoolInfoRequest
       },
