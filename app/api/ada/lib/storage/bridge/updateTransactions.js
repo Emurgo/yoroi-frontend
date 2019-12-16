@@ -1231,9 +1231,7 @@ async function certificateToDb(
   const accountToId = async (account: RustModule.WalletV3.Account): Promise<number> => {
     const address = account.to_address(
       // TODO: should come from the public deriver, not environment
-      environment.isMainnet()
-        ? RustModule.WalletV3.AddressDiscrimination.Production
-        : RustModule.WalletV3.AddressDiscrimination.Test,
+      environment.getDiscriminant(),
     );
     const hash = Buffer.from(address.as_bytes()).toString('hex');
     const idMap = await request.hashToIds({

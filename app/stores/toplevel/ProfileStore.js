@@ -21,7 +21,7 @@ export default class ProfileStore extends Store {
 
   LANGUAGE_OPTIONS = [
     ...LANGUAGES,
-    ...(!environment.isMainnet()
+    ...(!environment.isProduction()
       ? [
         // add any language that's mid-translation here
       ]

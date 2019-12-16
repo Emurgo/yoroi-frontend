@@ -31,7 +31,7 @@ export default class TestnetWarningBanner extends Component<Props> {
   };
 
   render() {
-    if (environment.isMainnet()) {
+    if (environment.isProduction() && !environment.isShelley()) {
       // banner will not shown in Mainnet
       return (null);
     }

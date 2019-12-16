@@ -104,9 +104,7 @@ export default class WalletRestoreStore extends Store {
     const internalAddr = RustModule.WalletV3.Address.delegation_from_public_key(
       internalKey,
       stakingKey,
-      environment.isMainnet()
-        ? RustModule.WalletV3.AddressDiscrimination.Production
-        : RustModule.WalletV3.AddressDiscrimination.Test,
+      environment.getDiscriminant(),
     );
     const internalAddrHash = Buffer.from(internalAddr.as_bytes()).toString('hex');
     return internalAddrHash;
@@ -177,9 +175,7 @@ export default class WalletRestoreStore extends Store {
       this.mode === RestoreMode.PAPER
         ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER
         : NUMBER_OF_VERIFIED_ADDRESSES,
-      environment.isMainnet()
-        ? RustModule.WalletV3.AddressDiscrimination.Production
-        : RustModule.WalletV3.AddressDiscrimination.Test,
+      environment.getDiscriminant(),
       true,
     );
     // TODO: we disable shelley restoration information for paper wallet restoration
@@ -193,9 +189,7 @@ export default class WalletRestoreStore extends Store {
         this.mode === RestoreMode.PAPER
           ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER
           : NUMBER_OF_VERIFIED_ADDRESSES,
-        environment.isMainnet()
-          ? RustModule.WalletV3.AddressDiscrimination.Production
-          : RustModule.WalletV3.AddressDiscrimination.Test,
+        environment.getDiscriminant(),
         false,
       );
 
