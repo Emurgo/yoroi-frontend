@@ -107,8 +107,6 @@
   "loading.screen.error": "Para más ayuda, puedes {supportRequestLink}",
   "loading.screen.loading": "Cargando componentes",
   "networkError.label.message": "ADVERTENCIA: La conexión con el servidor falló.<br>Por favor revisa tu conexión a internet o <a target='blank' href='https://twitter.com/YoroiWallet'>nuestra cuenta en Twitter</a>.<br>El balance desplegado y el historial de transacciones pueden mostrarse incorrectos hasta que nuestros servidores vuelvan a la normalidad, pero tu balance real no será afectado.",
-  "profile.languageSelect.detail1": "Actualmente, esta versión le permite verificar que",
-  "profile.languageSelect.detail2": "su saldo se tuvo en cuenta correctamente durante la primera instantánea.",
   "profile.languageSelect.form.languageSelectLabel": "Elige tu idioma",
   "profile.languageSelect.form.submitLabel": "Continuar",
   "profile.languageSelect.intro": "Usted está en la Red de Pruebas de Yoroi Shelley",
