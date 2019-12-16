@@ -105,19 +105,22 @@ export type PoolInfoRequest = {|
   ids: Array<string>
 |};
 export type RemotePoolMetaSuccess = {|
-  state: {|
-    keys: any,
-    // TODO
+  info: ?{|
+    name?: string,
+    ticker?: string,
+    description?: string,
+    homepage?: string,
   |},
-  poolMeta: ?{|
-    name: string,
-    description: string,
-    ticker: string,
-    homepage: string,
-  |},
-  ownerMeta: ?{
+  history: Array<{|
+    epoch: number,
+    slot: number,
+    tx_ordinal: number,
+    cert_ordinal: 0,
+    payload: RemoteCertificate,
+  |}>,
+  owners: ?{
     [key: string]: {|
-      // TODO
+      pledgeAddress: string,
     |}
   },
 |};

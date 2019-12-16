@@ -93,7 +93,7 @@ export default class DelegationStore extends Store {
         });
         const meta = new Map(stateForStakingKey.delegation.pools.map(delegation => {
           const info = poolInfoResp[delegation[0]];
-          if (!info.state) {
+          if (!info.history) {
             return runInAction(() => {
               this.stakingKeyState = undefined;
               throw new Error(`${nameof(this._startWatch)} pool info missing ${info.error}`);

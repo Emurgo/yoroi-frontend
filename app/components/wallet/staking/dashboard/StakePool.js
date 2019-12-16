@@ -10,10 +10,10 @@ import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 
 import Card from './Card';
-import ProgressCircle from './ProgressCircle';
+// import ProgressCircle from './ProgressCircle';
 import Address from './Address';
 import styles from './StakePool.scss';
-import globalMessages from '../../../../i18n/global-messages';
+// import globalMessages from '../../../../i18n/global-messages';
 
 const messages = defineMessages({
   title: {
@@ -65,15 +65,15 @@ type MoreInfoProp = {|
 
 type Props = {|
   +data: {|
-    percentage: string,
-    fullness: string,
-    margins: string,
-    created: string,
-    cost: string,
-    stake: string,
-    pledge: string,
-    rewards: string,
-    age: string,
+    // percentage: string,
+    // fullness: string,
+    // margins: string,
+    // created: string,
+    // cost: string,
+    // stake: string,
+    // pledge: string,
+    // rewards: string,
+    // age: string,
   |},
   +classicTheme: boolean,
   +poolName: string,
@@ -90,51 +90,51 @@ export default class StakePool extends Component<Props> {
   render() {
     const { intl } = this.context;
 
-    const { data, hash, poolName } = this.props;
+    const { hash, poolName } = this.props;
 
     const avatarSource = jdenticon.toSvg(hash, 36, { padding: 0 });
 
     // Taken from Seiza (dangerouslyEmbedIntoDataURI())
     const avatar = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
 
-    const tableData = [
-      {
-        label: intl.formatMessage(messages.performance),
-        value: data.percentage + ' %',
-      },
-      {
-        label: intl.formatMessage(messages.fullness),
-        value: data.fullness + ' %',
-      },
-      {
-        label: intl.formatMessage(globalMessages.marginsLabel),
-        value: data.margins + ' %',
-      },
-      {
-        label: intl.formatMessage(messages.created),
-        value: data.created,
-      },
-      {
-        label: intl.formatMessage(messages.cost),
-        value: data.cost + ' ADA',
-      },
-      {
-        label: intl.formatMessage(messages.stake),
-        value: data.stake + ' ADA',
-      },
-      {
-        label: intl.formatMessage(messages.pledge),
-        value: data.pledge + ' ADA',
-      },
-      {
-        label: intl.formatMessage(globalMessages.rewardsLabel),
-        value: data.rewards + ' ADA',
-      },
-      {
-        label: intl.formatMessage(messages.age),
-        value: data.age + ' Epochs',
-      },
-    ];
+    // const tableData = [
+    //   {
+    //     label: intl.formatMessage(messages.performance),
+    //     value: data.percentage + ' %',
+    //   },
+    //   {
+    //     label: intl.formatMessage(messages.fullness),
+    //     value: data.fullness + ' %',
+    //   },
+    //   {
+    //     label: intl.formatMessage(globalMessages.marginsLabel),
+    //     value: data.margins + ' %',
+    //   },
+    //   {
+    //     label: intl.formatMessage(messages.created),
+    //     value: data.created,
+    //   },
+    //   {
+    //     label: intl.formatMessage(messages.cost),
+    //     value: data.cost + ' ADA',
+    //   },
+    //   {
+    //     label: intl.formatMessage(messages.stake),
+    //     value: data.stake + ' ADA',
+    //   },
+    //   {
+    //     label: intl.formatMessage(messages.pledge),
+    //     value: data.pledge + ' ADA',
+    //   },
+    //   {
+    //     label: intl.formatMessage(globalMessages.rewardsLabel),
+    //     value: data.rewards + ' ADA',
+    //   },
+    //   {
+    //     label: intl.formatMessage(messages.age),
+    //     value: data.age + ' Epochs',
+    //   },
+    // ];
 
     return (
       <Card title={intl.formatMessage(messages.title)}>
@@ -148,8 +148,12 @@ export default class StakePool extends Component<Props> {
           </div>
         </div>
         <div className={styles.wrapper}>
-          <div className={styles.chart}>
-            <ProgressCircle percentage={25} text={intl.formatMessage(messages.circleText)} variant="stake" />
+          {/* <div className={styles.chart}>
+            <ProgressCircle
+              percentage={25}
+              text={intl.formatMessage(messages.circleText)}
+              variant="stake"
+            />
           </div>
           <ul className={styles.data}>
             {tableData.map((v) => {
@@ -162,7 +166,7 @@ export default class StakePool extends Component<Props> {
                 </li>
               );
             })}
-          </ul>
+          </ul> */}
           {this.props.moreInfo && this.getMoreInfoButton(this.props.moreInfo)}
         </div>
       </Card>

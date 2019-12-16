@@ -443,36 +443,37 @@ export default class StakingDashboardPage extends Component<Props, State> {
     }
     const keyState = delegationStore.stakingKeyState;
     const { intl } = this.context;
-    return keyState.state.delegation.pools.map((pool, i) => {
+    return keyState.state.delegation.pools.map(pool => {
       const meta = keyState.poolInfo.get(pool[0]);
       if (meta == null) {
         throw new Error(`${nameof(this.getStakePools)} no meta for ${pool[0]}`);
       }
-      const name = meta.poolMeta
-        ? meta.poolMeta.name
-        : intl.formatMessage(messages.unknownPoolLabel);
+      const name = meta.info?.name ?? intl.formatMessage(messages.unknownPoolLabel);
 
-      const moreInfo = meta.poolMeta
+      const moreInfo = meta.info?.homepage != null
         ? {
           openPoolPage: handleExternalLinkClick,
-          url: meta.poolMeta.homepage,
+          url: meta.info.homepage,
         }
         : undefined;
+
+      // TODO: implement this eventually
+      const stakePoolMeta = {
+        // percentage: '30',
+        // fullness: '18',
+        // margins: '12',
+        // created: '29/02/2019 12:42:41 PM',
+        // cost: '12,688.00000',
+        // stake: '9,688.00000',
+        // pledge: '85.567088',
+        // rewards: '81.000088',
+        // age: '23',
+      };
       return (
         <StakePool
           poolName={name}
           key={digetForHash(JSON.stringify(meta), 0)}
-          data={{
-            percentage: '30',
-            fullness: '18',
-            margins: '12',
-            created: '29/02/2019 12:42:41 PM',
-            cost: '12,688.00000',
-            stake: '9,688.00000',
-            pledge: '85.567088',
-            rewards: '81.000088',
-            age: '23',
-          }}
+          data={stakePoolMeta}
           hash={pool[0]}
           moreInfo={moreInfo}
           classicTheme={this.props.stores.profile.isClassicTheme}

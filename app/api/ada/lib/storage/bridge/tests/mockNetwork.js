@@ -689,16 +689,14 @@ export function genGetPoolInfo(
     for (const poolId of body.ids) {
       if (poolId === mockPoolId) {
         result[mockPoolId] = {
-          state: {
-            keys: null,
-          },
-          poolMeta: {
+          info: {
             name: 'Foo pool',
             description: 'mock data for testing',
             ticker: 'FOO',
             homepage: 'https://google.com',
           },
-          ownerMeta: {},
+          history: [],
+          owners: {},
         };
       }
     }
