@@ -7,7 +7,7 @@ import styles from './SettingsMenuItem.scss';
 type Props = {|
   +label: string,
   +active: boolean,
-  +onClick: Function,
+  +onClick: void => void,
   +className: string,
   +disabled?: boolean,
 |};

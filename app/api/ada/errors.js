@@ -100,6 +100,10 @@ const messages = defineMessages({
     id: 'api.errors.getAccountStateApiError',
     defaultMessage: '!!!Error received from server while getting account state.',
   },
+  getPoolInfoApiError: {
+    id: 'api.errors.getPoolInfoApiError',
+    defaultMessage: '!!!Error received from server while getting pool info.',
+  },
   invalidWitnessError: {
     id: 'api.errors.invalidWitnessError',
     defaultMessage: '!!!The signature is invalid.',
@@ -326,6 +330,15 @@ export class GetAccountStateApiError extends LocalizableError {
     super({
       id: messages.getAccountStateApiError.id,
       defaultMessage: messages.getAccountStateApiError.defaultMessage || '',
+    });
+  }
+}
+
+export class GetPoolInfoApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getPoolInfoApiError.id,
+      defaultMessage: messages.getPoolInfoApiError.defaultMessage || '',
     });
   }
 }

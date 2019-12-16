@@ -2,6 +2,10 @@
     display: block;
     padding: 20px 24px;
     min-width: 320px;
+
+    button {
+        width: 100%;
+    }
 }
 
 .data {
@@ -25,24 +29,6 @@
     border-bottom: 0.5px dashed var(--theme-dashboard-label-underline-color);
     margin-right: auto;
     color: var(--theme-dashboard-label-color);
-}
-
-.button {
-    display: block;
-    width: 100%;
-    border: 2px solid var(--theme-button-outlined-border-color);
-    border-radius: 8px;
-    color: var(--theme-button-outlined-text-color);
-    background-color: var(--theme-button-outlined-background-color);
-    padding: 12px 20px;
-    font-family: var(--font-medium);
-    font-size: 16px;
-    line-height: 21px;
-    text-transform: uppercase;
-    &:hover {
-        cursor: pointer;
-        background-color: var(--theme-button-outlined-background-color-hover);
-    }
 }
 
 .head {

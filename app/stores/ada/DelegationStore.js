@@ -17,6 +17,7 @@ import type {
 import environment from '../../environment';
 import type {
   AccountStateSuccess,
+  RemotePoolMetaSuccess,
 } from '../../api/ada/lib/state-fetch/types';
 
 export default class DelegationStore extends Store {
@@ -27,7 +28,14 @@ export default class DelegationStore extends Store {
   @observable getCurrentDelegation: LocalizedRequest<GetCurrentDelegationFunc>
     = new LocalizedRequest<GetCurrentDelegationFunc>(getCurrentDelegation);
 
-  @observable stakingKeyState: void | AccountStateSuccess;
+  @observable stakingKeyState: void | {|
+    state: AccountStateSuccess,
+    /**
+     * careful: there may be less entries in this map than # of pools in a certificate
+     * I think you can use ratio stake to stake to the same stake pool multiple times
+     */
+    poolInfo: Map<string, RemotePoolMetaSuccess>
+  |};
 
   _recalculateDelegationInfoDisposer: void => void = () => {};
 
@@ -75,33 +83,48 @@ export default class DelegationStore extends Store {
         const stateForStakingKey = accountStateResp[stakingKeyResp.addr.Hash];
 
         if (!stateForStakingKey.delegation) {
-          runInAction(() => {
+          return runInAction(() => {
             this.stakingKeyState = undefined;
-            throw new Error(`${stateForStakingKey.error} - ${stateForStakingKey.comment}`);
+            throw new Error(`${nameof(this._startWatch)} stake key invalid - ${stateForStakingKey.comment}`);
           });
-        } else {
-          runInAction(() => {
-            this.stakingKeyState = stateForStakingKey;
-          });
-
-          const delegatedBalance = this.getDelegatedBalance.execute({
-            publicDeriver: withStakingKey,
-            accountState: stateForStakingKey,
-            stakingPubKey: stakingKeyResp.addr.Hash,
-          }).promise;
-          if (delegatedBalance == null) throw new Error('Should never happen');
-
-          const currentDelegation = this.getCurrentDelegation.execute({
-            publicDeriver: withStakingKey,
-            stakingKeyAddressId: stakingKeyResp.addr.AddressId,
-          }).promise;
-          if (currentDelegation == null) throw new Error('Should never happen');
-
-          await Promise.all([
-            delegatedBalance,
-            currentDelegation,
-          ]);
         }
+        const poolInfoResp = await stateFetcher.getPoolInfo({
+          ids: stateForStakingKey.delegation.pools.map(delegation => delegation[0]),
+        });
+        const meta = new Map(stateForStakingKey.delegation.pools.map(delegation => {
+          const info = poolInfoResp[delegation[0]];
+          if (!info.history) {
+            return runInAction(() => {
+              this.stakingKeyState = undefined;
+              throw new Error(`${nameof(this._startWatch)} pool info missing ${info.error}`);
+            });
+          }
+          return [delegation[0], info];
+        }));
+        runInAction(() => {
+          this.stakingKeyState = {
+            state: stateForStakingKey,
+            poolInfo: meta,
+          };
+        });
+
+        const delegatedBalance = this.getDelegatedBalance.execute({
+          publicDeriver: withStakingKey,
+          accountState: stateForStakingKey,
+          stakingPubKey: stakingKeyResp.addr.Hash,
+        }).promise;
+        if (delegatedBalance == null) throw new Error('Should never happen');
+
+        const currentDelegation = this.getCurrentDelegation.execute({
+          publicDeriver: withStakingKey,
+          stakingKeyAddressId: stakingKeyResp.addr.AddressId,
+        }).promise;
+        if (currentDelegation == null) throw new Error('Should never happen');
+
+        await Promise.all([
+          delegatedBalance,
+          currentDelegation,
+        ]);
       },
       {
         fireImmediately: true,

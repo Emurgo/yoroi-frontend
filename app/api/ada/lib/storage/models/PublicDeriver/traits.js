@@ -1752,6 +1752,10 @@ const GetBalanceMixin = (
   superclass: Class<GetBalanceDependencies>,
 ) => class GetBalance extends superclass implements IGetBalance {
   getBalance: IGetBalanceRequest => Promise<IGetBalanceResponse> = async (body) => {
+    // TODO: also include chimeric account balance
+    // be careful because this could confuse users
+    // ex: topbar shows 50 ADA so user tries to send 50 ADA as a utxo transaction
+    // but they only have 30 UTXO and 20 chimeric-account
     return await this.getUtxoBalance(body);
   }
 };

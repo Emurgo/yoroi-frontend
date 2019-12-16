@@ -10,6 +10,7 @@ import type {
   FilterUsedRequest, FilterUsedResponse,
   ServerStatusRequest, ServerStatusResponse,
   AccountStateRequest, AccountStateResponse,
+  PoolInfoRequest, PoolInfoResponse,
   SignedRequestInternal,
   RemoteTransaction,
 } from './types';
@@ -32,6 +33,7 @@ import {
   InvalidWitnessError,
   ServerStatusError,
   GetAccountStateApiError,
+  GetPoolInfoApiError,
 } from '../../errors';
 
 import type { ConfigType } from '../../../../../config/config-types';
@@ -233,6 +235,26 @@ export class RemoteFetcher implements IFetcher {
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getAccountState)} error: ` + stringifyError(error));
         throw new GetAccountStateApiError();
+      })
+  )
+
+  getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => (
+    axios(
+      `${backendUrl}/api/v2/pools/info`,
+      {
+        method: 'post',
+        data: {
+          ids: body.ids
+        },
+        headers: {
+          'yoroi-version': this.lastLaunchVersion(),
+          'yoroi-locale': this.currentLocale()
+        }
+      }
+    ).then(response => response.data)
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getPoolInfo)} error: ` + stringifyError(error));
+        throw new GetPoolInfoApiError();
       })
   )
 

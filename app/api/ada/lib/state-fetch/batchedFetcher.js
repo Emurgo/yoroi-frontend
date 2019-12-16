@@ -11,12 +11,14 @@ import type {
   BestBlockRequest, BestBlockResponse,
   ServerStatusRequest, ServerStatusResponse,
   AccountStateRequest, AccountStateResponse,
+  PoolInfoRequest, PoolInfoResponse,
   AddressUtxoFunc,
   FilterFunc,
   HistoryFunc,
   TxBodiesFunc,
   UtxoSumFunc,
   AccountStateFunc,
+  PoolInfoFunc,
   RemoteTransaction,
 } from './types';
 
@@ -30,6 +32,7 @@ import {
   GetUtxosSumsForAddressesApiError,
   GetTxHistoryForAddressesApiError,
   GetAccountStateApiError,
+  GetPoolInfoApiError,
 } from '../../errors';
 import {
   Logger,
@@ -89,6 +92,10 @@ export class BatchedFetcher implements IFetcher {
 
   getAccountState: AccountStateRequest => Promise<AccountStateResponse> = (body) => (
     batchGetAccountState(this.baseFetcher.getAccountState)(body)
+  )
+
+  getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => (
+    batchGetPoolInfo(this.baseFetcher.getPoolInfo)(body)
   )
 
   checkServerStatus: ServerStatusRequest => Promise<ServerStatusResponse> = (body) => (
@@ -309,6 +316,24 @@ export function batchGetAccountState(
     } catch (error) {
       Logger.error(`batchedFetcher::${nameof(batchGetAccountState)} error: ` + stringifyError(error));
       throw new GetAccountStateApiError();
+    }
+  };
+}
+
+export function batchGetPoolInfo(
+  getPoolInfo: PoolInfoFunc,
+): PoolInfoFunc {
+  return async function (body: PoolInfoRequest): Promise<PoolInfoResponse> {
+    try {
+      const poolIds = chunk(body.ids, addressesLimit);
+      const poolInfoPromises = poolIds.map(
+        addr => getPoolInfo({ ids: addr })
+      );
+      const poolInfos = await Promise.all(poolInfoPromises);
+      return Object.assign({}, ...poolInfos);
+    } catch (error) {
+      Logger.error(`batchedFetcher::${nameof(batchGetPoolInfo)} error: ` + stringifyError(error));
+      throw new GetPoolInfoApiError();
     }
   };
 }
