@@ -6,8 +6,8 @@
     "name": "shelley-testnet"
   },
   "seiza": {
-    "simple": "",
-    "advance": ""
+    "simpleTemplate": "",
+    "advanceTemplate": ""
   },
   "app": {
     "walletRefreshInterval": 20000,
