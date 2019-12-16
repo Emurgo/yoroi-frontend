@@ -60,8 +60,8 @@
 
 **b. Severance.** If any provision or part-provision of this Agreement is, or becomes invalid, illegal or unenforceable, it shall be deemed modified to the minimum extent necessary to make it valid, legal and enforceable. If such modification is not possible, the relevant provision or part-provision shall be deemed deleted. Any modification to or deletion of a provision or part-provision under this Article shall not affect the validity and enforceability of the rest of this Agreement.
 
-**c. Entire Agreement – Disclaimer of Reliance**. This Agreement constitutes the entire agreement between the Parties with respect to the subject matter hereof and supersedes all prior agreements or understandings between the Parties. User expressly represents and warrants that it is not relying upon any statements, understandings, representations, expectations or agreements other than those expressly set forth in this Agreement.
+**c. 完全合意 – 依拠の放棄** 本規約は、本規約の内容に関する両当事者間の完全な合意を構成し、両当事者間における従前のすべての合意事項および了解事項に優先します。ユーザーは、本規約に明記されるもの以外の陳述、了解事項、表明事項、期待事項または合意事項に依拠していないことを明示的に表明し、保証します。
 
-**d. THIS AGREEMENT IS SUBJECT TO BINDING ARBITRATION.** User agrees that any and all disputes or claims against any person arising out of or in any way related to this Agreement or the access, use or installation of the Software by User or any other person shall be subject to binding arbitration under the Rules of Arbitration of the International Chamber of Commerce by one or more arbitrators appointed in accordance with the said Rules. The location of the arbitration shall be Japan. The language of the arbitration shall be English.
+**d. 本規約は、拘束力のある仲裁に服します** ユーザーは、本規約またはユーザーもしくはその他の者による本ソフトウェアへのアクセス、本ソフトウェアの利用もしくは本ソフトウェアのインストールに起因し、または何らかの点で関連する紛争またはいずれかの者に対する請求はすべて国際商業会議所の仲裁規則に基づき選任される１名ないし複数名の仲裁人による同規則に基づく拘束力のある仲裁に服するものとすることに同意します。また、仲裁地は日本とし、仲裁言語は英語とします。
 
-**e. LANGUAGE.** Any translation of this Agreement is made for purposes of local reference only and in the event of any inconsistency between the English and any non-English versions, the English version of this Agreement shall prevail and govern in all respects.
+**e. 言語** 本規約の翻訳は、現地における参照の便宜のためにのみ作成されるものであり、英語版と英語以外の言語版との間に齟齬がある場合には本規約の英語版がすべての点において優先するものとします。
