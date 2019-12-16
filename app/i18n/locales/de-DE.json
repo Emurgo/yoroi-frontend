@@ -107,8 +107,6 @@
   "loading.screen.error": "Für weitere Hilfe, kannst Du {supportRequestLink}",
   "loading.screen.loading": "Lade Komponenten",
   "networkError.label.message": "WARNUNG: Verbindung zum Server fehlgeschlagen.<br>Bitte überprüfe Deine Internetverbindung oder <a target='blank' href='https://twitter.com/YoroiWallet'>unser Twitter Konto</a>.<br>Das angezeigte Guthaben und der Transaktions-Verlauf könnte unvollständig erscheinen, bis unsere Server wieder in Normalbetrieb sind. Dein effektives Guthaben ist davon aber nicht betroffen.",
-  "profile.languageSelect.detail1": "Diese Version erlaubt Dir derzeit zu verifizieren, dass",
-  "profile.languageSelect.detail2": "Dein Guthaben beim ersten Snapshot korrekt berücksichtigt worden ist.",
   "profile.languageSelect.form.languageSelectLabel": "Wähle deine Sprache",
   "profile.languageSelect.form.submitLabel": "Weiter",
   "profile.languageSelect.intro": "Du bist im Yoroi Shelle Testnet",
