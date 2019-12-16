@@ -56,12 +56,12 @@
 
 ## 11. 其他事項
 
-**a. Amendment.** The Company shall have the right, at any time and without notice, to add to or modify the terms of this Agreement, simply by delivering such amended terms to User by electronic message through any medium to any address provided to the Company by User. User's access to or use of the Software after the date such amended terms are delivered to User shall be deemed to constitute acceptance of such amended terms.
+**a.修訂。** 本公司有權隨時且無需通知地增加或修改本條款之規定，僅透過向用戶提供給本公司的任何地址發送透過任何媒介之電子訊息，向用戶交付該等修訂後之規定。在該等修訂後之規定被交付給用戶後，用戶對於本軟體之訪問或使用視為構成對於該等修訂後規定之承認。
 
-**b. Severance.** If any provision or part-provision of this Agreement is, or becomes invalid, illegal or unenforceable, it shall be deemed modified to the minimum extent necessary to make it valid, legal and enforceable. If such modification is not possible, the relevant provision or part-provision shall be deemed deleted. Any modification to or deletion of a provision or part-provision under this Article shall not affect the validity and enforceability of the rest of this Agreement.
+**b.可分性。** 若本條款之任何規定或部分規定係無效或變為無效、違法或無法執行，則應視為在使其有效、合法且可執行所必要之最低限度內被修改。若該修改是不可能的，則相關規定或部分規定應視為被刪除。依本條所為之，任何對於規定或部分規定的修改或刪除，均不影響本條款其餘部分之有效性及可執行性。
 
-**c. Entire Agreement – Disclaimer of Reliance**. This Agreement constitutes the entire agreement between the Parties with respect to the subject matter hereof and supersedes all prior agreements or understandings between the Parties. User expressly represents and warrants that it is not relying upon any statements, understandings, representations, expectations or agreements other than those expressly set forth in this Agreement.
+**c.完全合意——信賴免責。** 本條款構成雙方當事人之間就本條款內容之完全合意，並取代雙方當事人之間所有先前之協議或理解。用戶明確聲明並保證，其不會信賴本條款中明示規定內容以外之任何表述、理解、聲明、預期或協議。
 
-**d. THIS AGREEMENT IS SUBJECT TO BINDING ARBITRATION.** User agrees that any and all disputes or claims against any person arising out of or in any way related to this Agreement or the access, use or installation of the Software by User or any other person shall be subject to binding arbitration under the Rules of Arbitration of the International Chamber of Commerce by one or more arbitrators appointed in accordance with the said Rules. The location of the arbitration shall be Japan. The language of the arbitration shall be English.
+**d.本條款受限於具拘束力的仲裁。** 用戶同意，因本條款或用戶或其他任何人對本軟體之訪問、使用或安裝所引起或與之有任何關聯的針對任何人的任何爭議或請求，均應受限於由按照國際商會仲裁規則委派的一名或多名仲裁人根據該仲裁規則做出之具拘束力的仲裁。仲裁地應為日本。仲裁語言為英文。
 
-**e. LANGUAGE.** Any translation of this Agreement is made for purposes of local reference only and in the event of any inconsistency between the English and any non-English versions, the English version of this Agreement shall prevail and govern in all respects.
+**e.語言。** 本條款之任何翻譯均僅為當地參考之用，若英文版本與非英文版本之間有任何不一致，在任何情況下均應以本條款之英文版本為準並有拘束力。
