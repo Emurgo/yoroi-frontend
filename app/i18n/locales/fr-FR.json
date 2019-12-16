@@ -107,8 +107,6 @@
   "loading.screen.error": "Pour obtenir plus d’aide, vous pouvez {supportRequestLink}",
   "loading.screen.loading": "Chargement",
   "networkError.label.message": "Avertissement : La connexion au serveur a échoué.<br>Veuillez vérifier votre connexion internet ou <a target='blank' href='https://twitter.com/YoroiWallet'>notre compte Twitter</a>.<br>Le solde affiché ainsi que l'historique des transactions peuvent apparaître erronés jusqu'à ce que la situation sur nos serveurs revienne à la normale, mais votre solde réel n'est pas affecté.",
-  "profile.languageSelect.detail1": "Actuellement, cette version vous permet de vérifier que",
-  "profile.languageSelect.detail2": "votre solde a été correctement pris en compte lors du premier instantané.",
   "profile.languageSelect.form.languageSelectLabel": "Choisissez votre langue",
   "profile.languageSelect.form.submitLabel": "Continuer",
   "profile.languageSelect.intro": "Vous êtes sur Yoroi Shelley Testnet",
