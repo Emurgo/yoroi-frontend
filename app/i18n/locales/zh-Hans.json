@@ -107,8 +107,6 @@
   "loading.screen.error": "获取更多帮助，您可以 {supportRequestLink}",
   "loading.screen.loading": "正在加载组件",
   "networkError.label.message": "警告：与服务器的连接失败。<br>请检查您的互联网连接或<a target='blank' href='https://twitter.com/YoroiWallet'>我们的Twitter帐户</a>。<br> 在我们的服务器恢复正常之前，显示的余额和交易记录可能不正确，但您的实际余额不受影响。",
-  "profile.languageSelect.detail1": "当前，此版本可让您验证",
-  "profile.languageSelect.detail2": "在第一个快照期间，您的余额已在正确考虑内。",
   "profile.languageSelect.form.languageSelectLabel": "请选择您的语言",
   "profile.languageSelect.form.submitLabel": "继续",
   "profile.languageSelect.intro": "您正在Yoroi Shelley测试网上",
