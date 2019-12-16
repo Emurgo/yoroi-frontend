@@ -107,8 +107,6 @@
   "loading.screen.error": "Для получения дополнительной помощи Вы можете {supportRequestLink}",
   "loading.screen.loading": "Загрузка компонентов",
   "networkError.label.message": "ПРЕДУПРЕЖДЕНИЕ: Не удалось подключиться к серверу.<br>Пожалуйста, проверьте подключение к Интернету или <a target='blank' href='https://twitter.com/YoroiWallet'>наш Twitter-аккаунт</a>.<br>Отображаемый баланс и история транзакций могут отображаться неккоректно, пока наши серверы не вернутся в нормальное состояние, но на Ваш фактический баланс это никоим образом не влияет.",
-  "profile.languageSelect.detail1": "В настоящее время эта версия позволяет проверить, что",
-  "profile.languageSelect.detail2": "что ваш баланс был правильно учтен во время первого снапшота.",
   "profile.languageSelect.form.languageSelectLabel": "Выберите язык",
   "profile.languageSelect.form.submitLabel": "Продолжить",
   "profile.languageSelect.intro": "Вы в тестнете Yoroi Shelley",
