@@ -231,7 +231,22 @@ export class RemoteFetcher implements IFetcher {
           'yoroi-locale': this.currentLocale()
         }
       }
-    ).then(response => response.data)
+    ).then(response => {
+      const mapped = {};
+      for (const key of Object.keys(response.data)) {
+        // Jormungandr returns '' when the address is valid but it hasn't appeared in the blockchain
+        if (response.data[key] === '') {
+          mapped[key] = {
+            delegation: { pools: [], },
+            value: 0,
+            counter: 0,
+          };
+        } else {
+          mapped[key] = response.data[key];
+        }
+      }
+      return mapped;
+    })
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getAccountState)} error: ` + stringifyError(error));
         throw new GetAccountStateApiError();
