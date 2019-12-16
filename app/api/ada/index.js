@@ -1193,9 +1193,7 @@ export default class AdaApi {
       if (environment.isShelley()) {
         const wallet = await createStandardCip1852Wallet({
           db: request.db,
-          discrimination: environment.isMainnet()
-            ? RustModule.WalletV3.AddressDiscrimination.Production
-            : RustModule.WalletV3.AddressDiscrimination.Test,
+          discrimination: environment.getDiscriminant(),
           rootPk,
           password: walletPassword,
           accountIndex,

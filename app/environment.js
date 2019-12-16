@@ -39,15 +39,16 @@ export const environment = ((
     },
     isShelley: () => {
       return CONFIG.network.name === NetworkType.SHELLEY_DEV ||
-        CONFIG.network.name === NetworkType.SHELLEY_TESTNET ||
-        CONFIG.network.name === NetworkType.TEST;
+        CONFIG.network.name === NetworkType.SHELLEY_TESTNET;
     },
     isTest: () => CONFIG.network.name === NetworkType.TEST,
     isMainnet: () => environment.NETWORK === NetworkType.MAINNET,
     isProduction: () => environment.NETWORK === NetworkType.MAINNET ||
       CONFIG.network.name === NetworkType.SHELLEY_TESTNET,
     getDiscriminant: () => {
-      // currently all networks use test discrimination
+      if (CONFIG.network.name === NetworkType.TEST || process.env.NODE_ENV === 'jest') {
+        return RustModule.WalletV3.AddressDiscrimination.Production;
+      }
       return RustModule.WalletV3.AddressDiscrimination.Test;
     },
     isAdaApi: () => environment.API === 'ada',
