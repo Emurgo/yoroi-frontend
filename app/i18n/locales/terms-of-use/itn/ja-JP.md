@@ -16,6 +16,6 @@
 
 12.8 **保証** サービスは、ユーザーに「現状有姿」および「利用可能な範囲」ベースで提供され、サービスに関するすべての保証は明示、黙示、法律上の如何を問わず本規約により免責となります。ユーザーは、インセンティブ付きテストネットが正常に動作しない場合があり、エラー、設計上の欠陥その他の不具合が発生し得ることを認識するものとします。ユーザーによるインセンティブ付きテストネットの使用は、ユーザーの責任および裁量で行うものとします。エマーゴは、システムにエラーや悪意のある行為が生じた場合、インセンティブ付きテストネットを再起動する、または報酬の全部もしくは一部を取り消す権利を留保します。
 
-12.9 **Termination of the Incentivised Testnet.** User understands and agrees that Company may change, withdraw, terminate access to and/or discontinue the Incentivized Testnet (or any portion thereof) at any time and in its sole discretion. User may end participation in the Incentivized Testnet at any time and any Rewards gained up to that time will still be transferred to User’s Daedalus or Yoroi mainet wallet once the Incentivized Testnet is discontinued.
+12.9 **インセンティブ付きテストネットの終了** ユーザーは、当社がいつでもその単独の裁量でインセンティブ付きテストネット（またはそのいずれの部分）を変更、撤回、もしくは終了する、またはこれへのアクセスを終了することができることを理解し、これに合意します。ユーザーは、インセンティブ付きテストネットへの参加をいつでも終了することがき、その時点までに得た報酬はインセンティブ付きテストネットが終了するとユーザーのDaedalusまたはYoroiメインネットウォレットに移されます。
 
-12.10 **Feedback.** Users may provide suggestions, comments or ideas and report issues or problems related to their use of the Incentivized Testnet at any time by using any of the official feedback channels.
+12.10 **フィードバック** ユーザーは、随時フィードバック公式チャネルを使用して自身のインセンティブ付きテストネットの使用に関連し、提案、コメント、発案を提供する、または不具合を報告することができます。
