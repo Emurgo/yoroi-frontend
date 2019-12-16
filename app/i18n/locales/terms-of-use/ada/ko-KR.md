@@ -60,8 +60,8 @@
 
 **b. Severance.** If any provision or part-provision of this Agreement is, or becomes invalid, illegal or unenforceable, it shall be deemed modified to the minimum extent necessary to make it valid, legal and enforceable. If such modification is not possible, the relevant provision or part-provision shall be deemed deleted. Any modification to or deletion of a provision or part-provision under this Article shall not affect the validity and enforceability of the rest of this Agreement.
 
-**c. Entire Agreement – Disclaimer of Reliance**. This Agreement constitutes the entire agreement between the Parties with respect to the subject matter hereof and supersedes all prior agreements or understandings between the Parties. User expressly represents and warrants that it is not relying upon any statements, understandings, representations, expectations or agreements other than those expressly set forth in this Agreement.
+**c. 완전합의-의거 포기:** 본 규약은, 본 규약의 내용에 관한 양 당사자 간의 완전한 합의를 구성하며, 양 당사자 간의 기존의 모든 합의 사항 및 양해 사항에 우선합니다. 유저는 본 규약에 명기된 것 외의 진술, 양해 사항, 표명 사항, 기대 사항 또는 합의 사항에 의거하지 않았음을 명시적으로 진술, 보장합니다.
 
-**d. THIS AGREEMENT IS SUBJECT TO BINDING ARBITRATION.** User agrees that any and all disputes or claims against any person arising out of or in any way related to this Agreement or the access, use or installation of the Software by User or any other person shall be subject to binding arbitration under the Rules of Arbitration of the International Chamber of Commerce by one or more arbitrators appointed in accordance with the said Rules. The location of the arbitration shall be Japan. The language of the arbitration shall be English.
+**d. 본 규약은 구속력 있는 중재에 따릅니다:** 유저는 본 규약 또는 유저나 기타의 자에 의한 본 소프트웨어에 대한 액세스, 본 소프트웨어의 이용 또는 본 소프트웨어의 설치에 기인하거나, 어떠한 형태로든 관련된 분쟁 또는 여하한 자에 대한 청구는, 모두 국제상업회의소의 중재규칙에 근거하여 선임된 1명 내지 여러 명의 중재인에 의한 동 규칙에 근거한 구속력 있는 중재에 따른다는 점에 동의합니다. 중재지는 일본으로 하며, 중재 언어는 영어로 합니다.
 
-**e. LANGUAGE.** Any translation of this Agreement is made for purposes of local reference only and in the event of any inconsistency between the English and any non-English versions, the English version of this Agreement shall prevail and govern in all respects.
+**e. 언어:** 본 규약의 번역은 현지에서의 참조 편의를 위해 작성되는 것이며, 영어판과 영어 외 언어판과의 사이에 불일치가 있는 경우에는, 본 규약의 영어판이 모든 점에서 우선합니다.
