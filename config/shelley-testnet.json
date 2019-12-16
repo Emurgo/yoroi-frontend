@@ -6,8 +6,8 @@
     "name": "shelley-testnet"
   },
   "seiza": {
-    "simpleTemplate": "",
-    "advanceTemplate": ""
+    "simpleTemplate": "https://testnet.seiza-website.emurgo.io/staking-simple/list?sortBy=REVENUE&searchText=&performance[]=0&performance[]=100&source=$$BROWSER$$",
+    "advanceTemplate": "https://testnet.seiza-website.emurgo.io/staking/list?sortBy=REVENUE&searchText=&performance[]=0&performance[]=100&source=$$BROWSER$$"
   },
   "app": {
     "walletRefreshInterval": 20000,
