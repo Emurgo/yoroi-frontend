@@ -107,15 +107,17 @@ export default class WalletNavigation extends Component<Props> {
               />
             </div>
 
-            <div className={styles.navItem}>
-              <WalletNavButton
-                className="stakeAdvancedSimulator"
-                label={intl.formatMessage(messages.delegationAdvance)}
-                icon={receiveIcon}
-                isActive={isActiveNavItem('delegation-advance')}
-                onClick={() => onNavItemClick('delegation-advance')}
-              />
-            </div>
+            {environment.isTest() && ( // Hide temporarily
+              <div className={styles.navItem}>
+                <WalletNavButton
+                  className="stakeAdvancedSimulator"
+                  label={intl.formatMessage(messages.delegationAdvance)}
+                  icon={receiveIcon}
+                  isActive={isActiveNavItem('delegation-advance')}
+                  onClick={() => onNavItemClick('delegation-advance')}
+                />
+              </div>)
+            }
           </>
         )}
       </div>
