@@ -162,7 +162,7 @@ export default class DelegationTransactionStore extends Store {
     if (result == null) {
       throw new Error(`${nameof(this._signTransaction)} no tx to broadcast`);
     }
-    this.signAndBroadcastDelegationTx.execute({
+    const broadcastTx = this.signAndBroadcastDelegationTx.execute({
       publicDeriver: basePubDeriver,
       signRequest: {
         certificate: result.certificate,
@@ -172,7 +172,9 @@ export default class DelegationTransactionStore extends Store {
       },
       password: request.password,
       sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
-    });
+    }).promise;
+    if (broadcastTx == null) throw new Error(`${nameof(this._signTransaction)} should never happen`);
+    await broadcastTx;
 
     this.actions.dialogs.closeActiveDialog.trigger();
     const { wallets } = this.stores.substores[environment.API];

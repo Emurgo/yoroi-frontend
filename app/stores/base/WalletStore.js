@@ -225,8 +225,8 @@ export default class WalletsStore extends Store {
   refreshWallet(
     publicDeriver: PublicDeriverWithCachedMeta
   ): void {
-    this.stores.substores[environment.API].addresses.addObservedWallet(publicDeriver);
-    this.stores.substores[environment.API].transactions.addObservedWallet(publicDeriver);
+    this.stores.substores[environment.API].addresses.refreshAddresses(publicDeriver);
+    this.stores.substores[environment.API].transactions.refreshTransactionData(publicDeriver);
   }
 
   @action
