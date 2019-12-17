@@ -1,30 +1,12 @@
 // @flow
 
-import BigNumber from 'bignumber.js';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import classnames from 'classnames';
-import { Input } from 'react-polymorph/lib/components/Input';
-import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
-import AmountInputSkin from '../skins/AmountInputSkin';
-import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
 import { defineMessages, intlShape } from 'react-intl';
-import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
-import vjf from 'mobx-react-form/lib/validators/VJF';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
-import globalMessages from '../../../i18n/global-messages';
-import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './DelegationTxDialog.scss';
-import config from '../../../config';
-import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
-import RawHash from '../../widgets/hashWrappers/RawHash';
-import type { ExplorerType } from '../../../domain/Explorer';
-
-import {
-  DECIMAL_PLACES_IN_ADA,
-  MAX_INTEGER_PLACES_IN_ADA
-} from '../../../config/numbersConfig';
+import SuccessPage from '../../transfer/SuccessPage';
 
 const messages = defineMessages({
   title: {
@@ -54,6 +36,16 @@ export default class DelegationSuccessDialog extends Component<Props> {
   };
 
   render() {
+    const { intl } = this.context;
+
+    const actions = [
+      {
+        label: intl.formatMessage(messages.buttonLabel),
+        onClick: this.props.onClose,
+        primary: true
+      }
+    ];
+
     return (
       <Dialog
         title=""
@@ -64,7 +56,11 @@ export default class DelegationSuccessDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         classicTheme={this.props.classicTheme}
       >
-
+        <SuccessPage
+          title={intl.formatMessage(messages.title)}
+          text={intl.formatMessage(messages.explanation)}
+          classicTheme={this.props.classicTheme}
+        />
       </Dialog>
     );
   }

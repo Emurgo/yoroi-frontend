@@ -12,5 +12,6 @@ export type PoolRequest =
 export default class DelegationTransactionActions {
   createTransaction: Action<PoolRequest> = new Action();
   signTransaction: Action<{| password: string |}> = new Action();
+  complete: Action<void> = new Action();
   reset: Action<void> = new Action();
 }
