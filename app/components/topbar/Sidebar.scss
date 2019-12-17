@@ -2,11 +2,15 @@
   min-height: 100%;
   display: flex;
   flex-direction: column;
+  background: var(--theme-sidebar-background-color);
 }
 
 .header {
   padding: 18px;
   min-height: 74px;
+  & svg > path {
+    fill: var(--theme-sidebar-icon-color);
+  }
 }
 
 .categories {
@@ -20,10 +24,13 @@
   align-self: flex-end;
   display: flex;
   justify-content: center;
+  & svg > path {
+    fill: var(--theme-sidebar-icon-color);
+  }
   &:hover {
     cursor: pointer;
     & svg > path {
-      fill: #17D1AA;
+      fill: var(--theme-sidebar-icon-color-hover);
     }
   }
   & .iconRotate {

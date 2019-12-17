@@ -458,6 +458,17 @@ const YoroiModern = {
   '--theme-dashboard-graph-tooltip-line-height': '14px',
   '--theme-dashboard-graph-tooltip-text-color': '#FFFFFF',
   '--theme-dashboard-graph-tooltip-background': 'rgba(56, 57, 61, 0.7)',
+
+  // Sidebar
+  '--theme-sidebar-background-color': 'linear-gradient(22.58deg, rgba(36,74,191,1) 0%, rgba(71,96,255,1) 100%)',
+  '--theme-sidebar-text-left-spacing': '16px',
+  '--theme-sidebar-text-color': '#FFFFFF',
+  '--theme-sidebar-text-font-size': '14px',
+  '--theme-sidebar-text-line-height': '22px',
+  '--theme-sidebar-icon-color': '#FFFFFF',
+  '--theme-sidebar-icon-color-hover': '#17D1AA',
+  '--theme-sidebar-icon-color-active': '#17D1AA',
+  '--theme-sidebar-item-background-color-hover': '#2C30D1',
 };
 
 // *************************************************************

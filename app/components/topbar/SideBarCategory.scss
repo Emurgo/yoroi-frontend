@@ -1,19 +1,21 @@
 .component {
-  height: 66px;
   padding: 20px 24px;
   width: 100%;
   display: flex;
   align-items: center;
+  & svg > path {
+    fill: var(--theme-sidebar-icon-color);
+  }
   &:hover {
     cursor: pointer;
     & svg > path {
-      fill: #17D1AA;
+      fill: var(--theme-sidebar-icon-color-hover);
     }
   }
   &.active {
-    background-color: #2C30D1;
+    background-color: var(--theme-sidebar-item-background-color-hover);
     & svg > path {
-      fill: #17D1AA;
+      fill: var(--theme-sidebar-icon-color-active);
     }
   }
 }
@@ -27,9 +29,9 @@
 
 .label {
   display: block;
-  color: #FFFFFF;
+  color: var(--theme-sidebar-text-color);
   font-family: var(--font-regular);
-  font-size: 14px;
-  line-height: 22px;
-  margin-left: 16px;
+  font-size: var(--theme-sidebar-text-font-size);
+  line-height: var(--theme-sidebar-text-line-height);
+  margin-left: var(--theme-sidebar-text-left-spacing);
 }
