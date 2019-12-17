@@ -11,6 +11,7 @@ import type { ServerStatusErrorType } from '../types/serverStatusErrorType';
 export type MainLayoutProps = {|
   ...InjectedContainerProps,
   topbar?: Node,
+  sidebar?: Node,
   connectionErrorType: ServerStatusErrorType,
 |};
 
@@ -18,6 +19,7 @@ export type MainLayoutProps = {|
 export default class MainLayout extends Component<MainLayoutProps> {
   static defaultProps = {
     topbar: null,
+    sidebar: null,
   };
 
 
@@ -30,6 +32,7 @@ export default class MainLayout extends Component<MainLayoutProps> {
       <TopBarLayout
         banner={displayedBanner}
         topbar={this.props.topbar}
+        sidebar={this.props.sidebar}
         notification={<div />}
       >
         {this.props.children}

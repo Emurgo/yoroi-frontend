@@ -7,10 +7,12 @@ import SettingsLayout from '../../components/settings/SettingsLayout';
 import SettingsMenu from '../../components/settings/menu/SettingsMenu';
 import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import TopBar from '../../components/topbar/TopBar';
+import Sidebar from '../../components/topbar/Sidebar';
 import { buildRoute } from '../../utils/routing';
 import type { InjectedContainerProps } from '../../types/injectedPropsType';
 
 import MainLayout from '../MainLayout';
+import SidebarContainer from '../SidebarContainer';
 
 const messages = defineMessages({
   title: {
@@ -38,6 +40,7 @@ export default class Settings extends Component<InjectedContainerProps> {
     const { actions, stores, children } = this.props;
     const { profile, topbar } = stores;
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
+    const sidebarContainer = (<SidebarContainer actions={actions} stores={stores} />);
 
     const menu = (
       <SettingsMenu
@@ -63,6 +66,7 @@ export default class Settings extends Component<InjectedContainerProps> {
             categories={topbar.categories}
           />
         )}
+        sidebar={sidebarContainer}
         connectionErrorType={checkAdaServerStatus}
         actions={actions}
         stores={stores}

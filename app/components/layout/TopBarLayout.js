@@ -8,6 +8,7 @@ import styles from './TopBarLayout.scss';
 type Props = {|
   +banner?: Node,
   +topbar?: Node,
+  +sidebar?: Node,
   +children?: ?Node,
   +notification?: ?Node,
   +languageSelectionBackground?: boolean,
@@ -19,6 +20,7 @@ export default class TopBarLayout extends Component<Props> {
   static defaultProps = {
     banner: undefined,
     topbar: undefined,
+    sidebar: undefined,
     children: undefined,
     notification: undefined,
     languageSelectionBackground: false,
@@ -28,6 +30,7 @@ export default class TopBarLayout extends Component<Props> {
     const {
       banner,
       topbar,
+      sidebar,
       children,
       notification,
     } = this.props;
@@ -40,27 +43,36 @@ export default class TopBarLayout extends Component<Props> {
 
     return (
       <div className={componentClasses}>
-        <div className={styles.main}>
+        <div className={styles.windowWrapper}>
 
-          {banner}
-
-          {topbar != null
+          {sidebar != null
             ? (
-              <div className={styles.topbar}>
-                {topbar}
+              <div className={styles.sidebar}>
+                {sidebar}
               </div>
             )
             : null
           }
 
-          {notification}
+          <div className={styles.main}>
+            {banner}
 
-          <div className={styles.contentWrapper}>
-            <div className={styles.content}>
-              {children}
+            {topbar != null
+              ? (
+                <div className={styles.topbar}>
+                  {topbar}
+                </div>
+              )
+              : null
+            }
+
+            {notification}
+            <div className={styles.contentWrapper}>
+              <div className={styles.content}>
+                {children}
+              </div>
             </div>
           </div>
-
         </div>
       </div>
     );
