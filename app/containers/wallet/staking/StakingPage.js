@@ -79,7 +79,12 @@ export default class StakingPage extends Component<Props> {
     const { actions, stores } = this.props;
     const { intl } = this.context;
 
-    if (this.props.stores.substores.ada.transactions.hasAnyPending) {
+    const delegationTxStore = stores.substores[environment.API].delegationTransaction;
+    const showSignDialog = delegationTxStore.signAndBroadcastDelegationTx.isExecuting ||
+      !delegationTxStore.signAndBroadcastDelegationTx.wasExecuted ||
+      delegationTxStore.signAndBroadcastDelegationTx.error;
+
+    if (!showSignDialog && this.props.stores.substores.ada.transactions.hasAnyPending) {
       return (
         <VerticallyCenteredLayout>
           <InformativeError
@@ -98,6 +103,13 @@ export default class StakingPage extends Component<Props> {
         </VerticallyCenteredLayout>
       );
     }
-    return (<SeizaFetcher actions={actions} stores={stores} stakingUrl={url} />);
+    return (
+      <SeizaFetcher
+        actions={actions}
+        stores={stores}
+        stakingUrl={url}
+        showSuccessDialog={!showSignDialog}
+      />
+    );
   }
 }

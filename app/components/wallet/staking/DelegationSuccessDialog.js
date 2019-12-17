@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import Dialog from '../../widgets/Dialog';
+import CenteredLayout from '../../layout/CenteredLayout';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import styles from './DelegationTxDialog.scss';
 import SuccessPage from '../../transfer/SuccessPage';
@@ -56,11 +57,13 @@ export default class DelegationSuccessDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         classicTheme={this.props.classicTheme}
       >
-        <SuccessPage
-          title={intl.formatMessage(messages.title)}
-          text={intl.formatMessage(messages.explanation)}
-          classicTheme={this.props.classicTheme}
-        />
+        <CenteredLayout>
+          <SuccessPage
+            title={intl.formatMessage(messages.title)}
+            text={intl.formatMessage(messages.explanation)}
+            classicTheme={this.props.classicTheme}
+          />
+        </CenteredLayout>
       </Dialog>
     );
   }

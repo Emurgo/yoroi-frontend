@@ -32,6 +32,7 @@ type SelectedPool = {|
 type Props = {|
   ...InjectedContainerProps,
   stakingUrl: string,
+  showSuccessDialog: boolean,
 |};
 
 @observer
@@ -106,10 +107,6 @@ export default class SeizaFetcher extends Component<Props> {
       return result;
     };
 
-    const showSignDialog = delegationTxStore.signAndBroadcastDelegationTx.isExecuting ||
-      !delegationTxStore.signAndBroadcastDelegationTx.wasExecuted ||
-      delegationTxStore.signAndBroadcastDelegationTx.error;
-
     return (
       <>
         {delegationTxStore.createDelegationTx.isExecuting &&
@@ -143,7 +140,7 @@ export default class SeizaFetcher extends Component<Props> {
             </>
           </Dialog>
         }
-        {delegationTx != null && showSignDialog &&
+        {delegationTx != null && !this.props.showSuccessDialog &&
           <DelegationTxDialog
             staleTx={delegationTxStore.isStale}
             poolName={this.selectedPools[0].name}
@@ -163,7 +160,7 @@ export default class SeizaFetcher extends Component<Props> {
             selectedExplorer={stores.profile.selectedExplorer}
           />
         }
-        {delegationTx != null && !showSignDialog &&
+        {delegationTx != null && this.props.showSuccessDialog &&
           <DelegationSuccessDialog
             onClose={() => delegationTxActions.complete.trigger()}
             classicTheme={profile.isClassicTheme}
