@@ -27,20 +27,33 @@ const messages = defineMessages({
   },
 });
 
+/*::
+declare var chrome;
+*/
+
 @observer
 export default class StakingPage extends Component<Props> {
   static contextTypes = {
     intl: intlShape.isRequired,
   };
 
+  getBrowserReplacement(): string {
+    if (environment.userAgentInfo.isFirefox) {
+      return 'firefox';
+    }
+    // otherwise assume Chrome
+    if (environment.userAgentInfo.isExtension) {
+      return 'chrome&chromeId=' + chrome.runtime.id;
+    }
+    // return 'chrome';
+    throw new Error('TODO: support staking page on browser builds');
+  }
+
   prepareStakingURL(): null | string {
     let finalURL = this.props.urlTemplate
       .replace(
         '$$BROWSER$$',
-        environment.userAgentInfo.isFirefox
-          ? 'firefox'
-            // $FlowFixMe
-          : 'chrome&chromeId=' + chrome.runtime.id,
+        this.getBrowserReplacement()
       );
 
     // Add userAda
