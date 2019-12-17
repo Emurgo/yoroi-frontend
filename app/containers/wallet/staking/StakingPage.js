@@ -45,7 +45,8 @@ export default class StakingPage extends Component<Props> {
     if (environment.userAgentInfo.isExtension) {
       return 'chrome&chromeId=' + chrome.runtime.id;
     }
-    return 'chrome';
+    // return 'chrome';
+    throw new Error('TODO: support staking page on browser builds');
   }
 
   prepareStakingURL(): null | string {
