@@ -38,6 +38,7 @@ export default class StakingPage extends Component<Props> {
         '$$BROWSER$$',
         environment.userAgentInfo.isFirefox
           ? 'firefox'
+            // $FlowFixMe
           : 'chrome&chromeId=' + chrome.runtime.id,
       );
 
