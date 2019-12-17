@@ -1,0 +1,35 @@
+.component {
+  height: 66px;
+  padding: 20px 24px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  &:hover {
+    cursor: pointer;
+    & svg > path {
+      fill: #17D1AA;
+    }
+  }
+  &.active {
+    background-color: #2C30D1;
+    & svg > path {
+      fill: #17D1AA;
+    }
+  }
+}
+
+.icon {
+  & > svg {
+    max-width: 24px;
+    max-height: 24px;
+  }
+}
+
+.label {
+  display: block;
+  color: #FFFFFF;
+  font-family: var(--font-regular);
+  font-size: 14px;
+  line-height: 22px;
+  margin-left: 16px;
+}
