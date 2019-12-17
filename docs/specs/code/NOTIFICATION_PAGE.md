@@ -1,6 +1,6 @@
 # Abstract
 
-Provides ability to see wallet's various stakepool or rewards specific messages
+Provides ability to see wallet's various stakepool or rewards specific messages/certificates
 
 # Motivation
 
@@ -14,11 +14,15 @@ Meaasges will displayed on per wallet basis. So when user makes a new wallet by 
 
 Messages will be grouped by per day in reverse chronological order (latest will be shown first).
 
-One message would contain:
-1. Title
-2. Messeage [OPTIONAL]
-3. Type
-4. Time
+Initially, certificates would be:
+1. STAKE_DELEGATED
+2. STAKE_UNDELEGATED
+3. STAKE_REDELEGATED
+4. FEE_CHANGED
+5. COST_CHANGED
+6. REWARD_RECEIVED
+7. POOL_TO_RETIRE
+8. NO_REWARDS_FOR_UNDELEGATION
 
 Each type of message will have an unique icon.
 A group of messages will look like. <br/>
