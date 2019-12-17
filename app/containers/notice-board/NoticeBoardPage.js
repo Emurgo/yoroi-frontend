@@ -30,6 +30,12 @@ export default class NoticeBoardPage extends Component<Props> {
     const { actions, stores } = this.props;
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
     const { noticeBoard, topbar, profile } = stores;
+    const {
+      loadedNotices,
+      searchOptions,
+      isLoading,
+      hasMoreToLoad,
+    } = noticeBoard;
 
     const topbarTitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
@@ -44,7 +50,23 @@ export default class NoticeBoardPage extends Component<Props> {
         categories={topbar.categories}
       />
     );
-    const hasAny = noticeBoard.loadedNotices.length > 0;
+    const hasAny = loadedNotices.length > 0;
+
+    let noticeComp = null;
+    if (searchOptions) {
+      if (hasAny) {
+        noticeComp = (
+          <NoticeBoard
+            loadedNotices={loadedNotices}
+            hasMoreToLoad={hasMoreToLoad}
+            isLoading={isLoading}
+            onLoadMore={() => actions.noticeBoard.loadMore.trigger()}
+          />
+        );
+      } else  {
+        noticeComp = (<NoNotice classicTheme={profile.isClassicTheme} />);
+      }
+    }
 
     return (
       <MainLayout
@@ -53,16 +75,7 @@ export default class NoticeBoardPage extends Component<Props> {
         stores={stores}
         connectionErrorType={checkAdaServerStatus}
       >
-        {hasAny ? (
-          <NoticeBoard
-            loadedNotices={noticeBoard.loadedNotices}
-            hasMoreToLoad={noticeBoard.hasMoreToLoad}
-            isLoading={noticeBoard.isLoading}
-            onLoadMore={() => actions.noticeBoard.loadMore.trigger()}
-          />
-        ) : (
-          <NoNotice classicTheme={profile.isClassicTheme} />
-        )}
+        {noticeComp}
       </MainLayout>
     );
   }
