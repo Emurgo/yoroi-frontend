@@ -24,7 +24,7 @@ import type { ConfigType } from '../../../../config/config-types';
 declare var CONFIG: ConfigType;
 
 type SelectedPool = {|
-  +name: string,
+  +name: null | string,
   +poolHash: string
 |};
 

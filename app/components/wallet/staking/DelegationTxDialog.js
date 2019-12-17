@@ -60,7 +60,7 @@ const messages = defineMessages({
 type Props = {|
   +staleTx: boolean,
   +selectedExplorer: ExplorerType,
-  +poolName: string,
+  +poolName: null | string,
   +poolHash: string,
   +amountToDelegate: BigNumber,
   +transactionFee: BigNumber,
@@ -177,7 +177,10 @@ export default class DelegationTxDialog extends Component<Props> {
         </ul>
         <div className={styles.headerBlock}>
           <p className={styles.header}>{intl.formatMessage(messages.stakePoolName)}</p>
-          <p className={styles.content}>{this.props.poolName}</p>
+          <p className={styles.content}>{
+            this.props.poolName ?? intl.formatMessage(globalMessages.unknownPoolLabel)
+          }
+          </p>
         </div>
         <div className={styles.headerBlock}>
           <p className={styles.header}>{intl.formatMessage(messages.stakePoolHash)}</p>

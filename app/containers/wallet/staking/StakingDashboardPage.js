@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
 import moment from 'moment';
 import { observer } from 'mobx-react';
 import BigNumber from 'bignumber.js';
@@ -35,13 +35,7 @@ import type {
   CurrentSlotLengthFunc,
   CurrentEpochLengthFunc,
 } from '../../../api/ada/lib/storage/bridge/timeUtils';
-
-const messages = defineMessages({
-  unknownPoolLabel: {
-    id: 'wallet.staking.pool.unknownLabel',
-    defaultMessage: '!!!Unknown pool',
-  },
-});
+import globalMessages from '../../../i18n/global-messages';
 
 type Props = {
   ...InjectedProps,
@@ -445,7 +439,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
       if (meta == null) {
         throw new Error(`${nameof(this.getStakePools)} no meta for ${pool[0]}`);
       }
-      const name = meta.info?.name ?? intl.formatMessage(messages.unknownPoolLabel);
+      const name = meta.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel);
 
       const moreInfo = meta.info?.homepage != null
         ? {

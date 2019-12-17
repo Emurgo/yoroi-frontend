@@ -447,6 +447,10 @@ const globalMessages = defineMessages({
     id: 'wallet.dashboard.stakePool.margins',
     defaultMessage: '!!!Margins',
   },
+  unknownPoolLabel: {
+    id: 'wallet.staking.pool.unknownLabel',
+    defaultMessage: '!!!Unknown pool',
+  },
 });
 export default globalMessages;
 
