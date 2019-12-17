@@ -47,7 +47,7 @@ export default class TopbarStore extends Store {
       ...(isNano ? [WITH_LEDGER_NANO] : []),
       SETTINGS,
       ...CURRENCY_SPECIFIC_CATEGORIES[environment.API],
-      NOTICE_BOARD,
+      ...(environment.isTest() ? [NOTICE_BOARD] : []), // Temporarily Hide
     ];
   }
 
