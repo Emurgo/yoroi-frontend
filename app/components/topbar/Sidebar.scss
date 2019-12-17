@@ -17,12 +17,11 @@
 
 .toggleButton {
   padding: 20px 24px;
-  width: 100%;
+  align-self: flex-end;
   display: flex;
   justify-content: center;
   &:hover {
     cursor: pointer;
-    background-color: #2C30D1;
     & svg > path {
       fill: #17D1AA;
     }
