@@ -42,9 +42,7 @@ export default class DelegationStore extends Store {
   setup(): void {
     super.setup();
     this.reset();
-    const a = this.actions.ada.delegation;
-    a.startWatch.listen(this._startWatch);
-    a.reset.listen(this.reset);
+    this._startWatch();
   }
 
   @action.bound
@@ -56,6 +54,8 @@ export default class DelegationStore extends Store {
         this.stores.substores.ada.transactions.totalAvailable,
         // need to recalculate when there are no more pending transactions
         this.stores.substores.ada.transactions.hasAnyPending,
+        // if query failed due to server issue, need to re-query when it comes back online
+        this.stores.substores.ada.serverConnectionStore.checkAdaServerStatus,
       ],
       // $FlowFixMe error in mobx types
       async () => {
@@ -126,9 +126,6 @@ export default class DelegationStore extends Store {
           currentDelegation,
         ]);
       },
-      {
-        fireImmediately: true,
-      }
     );
   }
 
