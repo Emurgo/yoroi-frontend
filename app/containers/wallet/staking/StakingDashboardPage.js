@@ -369,9 +369,13 @@ export default class StakingDashboardPage extends Component<Props, State> {
         const certificateRelativeTime = this.toRelativeSlotNumber(block.SlotNum);
 
         let nextRewardEpoch;
-        const recentDelegation = certificateRelativeTime.epoch === currentRelativeTime.epoch;
-        if (recentDelegation) {
-          // first reward is slower than the rest
+        const epochsSinceCert = currentRelativeTime.epoch - certificateRelativeTime.epoch;
+        // first reward is slower than the rest
+        // it takes 2 epochs for stake delegation to update
+        // then after the start of the 3rd epoch, you get the reward
+        if (epochsSinceCert === 0) {
+          nextRewardEpoch = currentRelativeTime.epoch + 3;
+        } else if (epochsSinceCert === 1) {
           nextRewardEpoch = currentRelativeTime.epoch + 2;
         } else {
           nextRewardEpoch = currentRelativeTime.epoch + 1;
@@ -392,12 +396,12 @@ export default class StakingDashboardPage extends Component<Props, State> {
           <RewardPopup
             currentText={moment(nextRewardTime).format('MMM Do hh:mm A')}
             followingText={moment(followingRewardTime).format('MMM Do hh:mm A')}
-            showDisclaimer={recentDelegation}
+            showDisclaimer={epochsSinceCert <= 1}
           />
         );
         rewardInfo = {
           rewardPopup,
-          showWarning: recentDelegation,
+          showWarning: epochsSinceCert <= 1,
         };
       }
     }
