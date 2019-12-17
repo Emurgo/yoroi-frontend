@@ -310,7 +310,7 @@
   "wallet.create.dialog.repeatPasswordLabel": "Ulangi kata sandi pengeluaran",
   "wallet.create.dialog.title": "Buat wallet",
   "wallet.create.dialog.walletNameHint": "misal: Wallet belanja",
-  "wallet.dashboard.empty.text": "Go to Simple or Advance Staking to choce what stake pool you want to delegate in. Note, you may delegate only to one stake pool in this Tesnnet",
+  "wallet.dashboard.empty.text": "Go to Simple or Advance Staking to choose what stake pool you want to delegate in. Note, you may delegate only to one stake pool in this Tesnnet",
   "wallet.dashboard.empty.title": "You have not delegated your ADA yet",
   "wallet.dashboard.epochEndTitle": "Time until Epoch end",
   "wallet.dashboard.epochProgress": "Epoch progress",

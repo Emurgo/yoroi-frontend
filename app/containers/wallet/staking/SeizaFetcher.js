@@ -143,7 +143,7 @@ export default class SeizaFetcher extends Component<Props> {
             staleTx={delegationTxStore.isStale}
             poolName={this.selectedPools[0].name}
             poolHash={this.selectedPools[0].poolHash}
-            transactionFee={getShelleyTxFee(delegationTx.IOs, false)}
+            transactionFee={getShelleyTxFee(delegationTx.IOs, true)}
             amountToDelegate={delegationTxStore.amountToDelegate}
             approximateReward={approximateReward(delegationTxStore.amountToDelegate)}
             isSubmitting={

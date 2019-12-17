@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "babel-node scripts/start --env 'development'",
     "shelley-dev": "babel-node scripts/start --env 'shelley-dev'",
-    "shelley-testnet": "babel-node scripts/start --env 'shelley-testnet'",
+    "shelley-testnet": "babel-node scripts/build --env 'shelley-testnet'",
     "dev-mock-backend": "babel-node scripts/startWithMockServer.js",
     "build": "babel-node scripts/build",
     "compress": "babel-node scripts/compress",

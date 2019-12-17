@@ -310,7 +310,7 @@
   "wallet.create.dialog.repeatPasswordLabel": "再次輸入支付密碼",
   "wallet.create.dialog.title": "創建錢包",
   "wallet.create.dialog.walletNameHint": "諸如：購物錢包",
-  "wallet.dashboard.empty.text": "Go to Simple or Advance Staking to choce what stake pool you want to delegate in. Note, you may delegate only to one stake pool in this Tesnnet",
+  "wallet.dashboard.empty.text": "Go to Simple or Advance Staking to choose what stake pool you want to delegate in. Note, you may delegate only to one stake pool in this Tesnnet",
   "wallet.dashboard.empty.title": "You have not delegated your ADA yet",
   "wallet.dashboard.epochEndTitle": "Time until Epoch end",
   "wallet.dashboard.epochProgress": "Epoch progress",
