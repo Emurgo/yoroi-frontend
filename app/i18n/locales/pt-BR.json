@@ -339,7 +339,7 @@
   "wallet.dashboard.summary.delegatedTitle": "Total Delegated",
   "wallet.dashboard.summary.rewardsTitle": "Total Rewards",
   "wallet.dashboard.summary.title": "Your Summary",
-  "wallet.dashboard.warning.pendingTx": "Staking dashboard information will update once your pending transaction is confirmed wallet",
+  "wallet.dashboard.warning.pendingTx": "Staking dashboard information will update once your pending transaction is confirmed",
   "wallet.delegation.transaction.approximationLabel": "Current approximation of rewards that you will receive per epoch:",
   "wallet.delegation.transaction.explanationLine1": "You can only delegate to one stake pool at a time",
   "wallet.delegation.transaction.explanationLine2": "You can switch to delegate to a different stake pool at any time",
