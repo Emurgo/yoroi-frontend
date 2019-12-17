@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import styles from './SuccessPage.scss';
-import SuccessIcon from '../../assets/images/transfer-success.inline.svg';
 
 type Props = {|
   +title: string,
@@ -24,7 +23,7 @@ export default class SuccessPage extends Component<Props> {
     return (
       <div className={styles.component}>
         <div>
-          <SuccessIcon />
+          <div className={styles.successImg} />
           <div className={styles.title}>
             {title}
           </div>

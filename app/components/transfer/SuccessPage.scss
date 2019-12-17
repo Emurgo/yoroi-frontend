@@ -23,5 +23,23 @@
     line-height: 22px;
     text-align: center;
   }
+}
 
+:global(.YoroiModern):not(:global(.YoroiShelley)) .component {
+  .successImg {
+    background-image: url('../../assets/images/transfer-success.inline.svg');
+    background-size: auto;
+    background-repeat: no-repeat;
+    width: 252px;
+    height: 194px;
+  }
+}
+:global(.YoroiModern):global(.YoroiShelley) .component {
+  .successImg {
+    background-image: url('../../assets/images/transfer-success-shelley.inline.svg');
+    background-size: auto;
+    background-repeat: no-repeat;
+    width: 369px;
+    height: 251px;
+  }
 }
