@@ -39,7 +39,8 @@ export default class StakingPage extends Component<Props> {
         '$$BROWSER$$',
         environment.userAgentInfo.isFirefox
           ? 'firefox'
-          : 'chrome',
+            // $FlowFixMe
+          : 'chrome&chromeId=' + chrome.runtime.id,
       );
 
     // Add userAda
