@@ -138,7 +138,6 @@ export default class NoticeBlock extends Component<Props> {
         break;
       case NoticeKind.FEE_CHANGED:
         title = intl.formatMessage(messages.titlefeeChanged);
-        subMessage = intl.formatMessage(messages.subMessagefeeChanged);
         subMessage =  (
           <FormattedHTMLMessage
             {...messages.subMessagefeeChanged}
@@ -157,7 +156,6 @@ export default class NoticeBlock extends Component<Props> {
         break;
       case NoticeKind.REWARD_RECEIVED:
         title = intl.formatMessage(messages.titleRewardRecieved);
-        subMessage = intl.formatMessage(messages.subMessageRewardRecieved);
         subMessage =  (
           <FormattedHTMLMessage
             {...messages.subMessageRewardRecieved}
