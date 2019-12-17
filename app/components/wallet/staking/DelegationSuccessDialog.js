@@ -14,7 +14,7 @@ const messages = defineMessages({
     defaultMessage: '!!!Successfully delegated',
   },
   buttonLabel: {
-    id: 'wallet.delegation.transaction.success.explanation',
+    id: 'wallet.delegation.transaction.success.button.label',
     defaultMessage: '!!!Dashboard page',
   },
   explanation: {
