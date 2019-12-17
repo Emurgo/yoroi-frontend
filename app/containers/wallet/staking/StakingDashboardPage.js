@@ -82,13 +82,10 @@ export default class StakingDashboardPage extends Component<Props, State> {
       }),
       1000
     );
-
-    this.props.actions.ada.delegation.startWatch.trigger();
   }
 
   componentWillUnmount() {
     if (this.intervalId) clearInterval(this.intervalId);
-    this.props.actions.ada.delegation.reset.trigger();
   }
 
   render() {

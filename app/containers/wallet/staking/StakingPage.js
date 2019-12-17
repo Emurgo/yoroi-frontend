@@ -9,6 +9,7 @@ import { formattedAmountWithoutLovelace } from '../../../utils/formatters';
 import environment from '../../../environment';
 
 import type { InjectedProps } from '../../../types/injectedPropsType';
+import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 
 type Props = {|
   ...InjectedProps,
@@ -32,7 +33,7 @@ export default class StakingPage extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  prepareStakingURL(): string {
+  prepareStakingURL(): null | string {
     let finalURL = this.props.urlTemplate
       .replace(
         '$$BROWSER$$',
@@ -43,11 +44,20 @@ export default class StakingPage extends Component<Props> {
 
     // Add userAda
     const publicDeriver = this.props.stores.substores.ada.wallets.selected;
-    if (publicDeriver) {
-      // Seiza does not understand decimal places, so removing all Lovelaces
-      finalURL += `&userAda=${formattedAmountWithoutLovelace(publicDeriver.amount)}`;
+    if (!publicDeriver) {
+      return null;
     }
+    // Seiza does not understand decimal places, so removing all Lovelaces
+    finalURL += `&userAda=${formattedAmountWithoutLovelace(publicDeriver.amount)}`;
 
+    const delegation = this.props.stores.substores.ada.delegation.stakingKeyState;
+    if (!delegation) {
+      return null;
+    }
+    const poolList = Array.from(
+      new Set(delegation.state.delegation.pools.map(pool => pool[0]))
+    );
+    finalURL += `&delegated=${encodeURIComponent(JSON.stringify(poolList))}`;
     return finalURL;
   }
 
@@ -55,15 +65,25 @@ export default class StakingPage extends Component<Props> {
     const { actions, stores } = this.props;
     const { intl } = this.context;
 
-    return this.props.stores.substores.ada.transactions.hasAnyPending
-      ? (
+    if (this.props.stores.substores.ada.transactions.hasAnyPending) {
+      return (
         <VerticallyCenteredLayout>
           <InformativeError
             title={intl.formatMessage(messages.title)}
             text={intl.formatMessage(messages.pendingTxWarning)}
           />
         </VerticallyCenteredLayout>
-      )
-      : (<SeizaFetcher actions={actions} stores={stores} stakingUrl={this.prepareStakingURL()} />);
+      );
+    }
+
+    const url = this.prepareStakingURL();
+    if (url == null) {
+      return (
+        <VerticallyCenteredLayout>
+          <LoadingSpinner />
+        </VerticallyCenteredLayout>
+      );
+    }
+    return (<SeizaFetcher actions={actions} stores={stores} stakingUrl={url} />);
   }
 }

@@ -42,9 +42,7 @@ export default class DelegationStore extends Store {
   setup(): void {
     super.setup();
     this.reset();
-    const a = this.actions.ada.delegation;
-    a.startWatch.listen(this._startWatch);
-    a.reset.listen(this.reset);
+    this._startWatch();
   }
 
   @action.bound
@@ -126,9 +124,6 @@ export default class DelegationStore extends Store {
           currentDelegation,
         ]);
       },
-      {
-        fireImmediately: true,
-      }
     );
   }
 
