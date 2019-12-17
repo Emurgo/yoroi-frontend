@@ -32,8 +32,8 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +isActiveItem: Function,
-  +onItemClick: Function,
+  +isActiveItem: string => boolean,
+  +onItemClick: string => void,
   +hasActiveWallet: boolean,
   +currentLocale: string,
   +currentTheme: Theme,

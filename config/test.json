@@ -6,8 +6,8 @@
     "name": "test"
   },
   "seiza": {
-    "simple": "",
-    "advance": ""
+    "simpleTemplate": "",
+    "advanceTemplate": ""
   },
   "app": {
     "walletRefreshInterval": 2000,

@@ -12,14 +12,6 @@ const messages = defineMessages({
     id: 'profile.languageSelect.intro',
     defaultMessage: '!!!You are on the Yoroi Shelley Testnet',
   },
-  detail1: {
-    id: 'profile.languageSelect.detail1',
-    defaultMessage: '!!!Currently, this version allows you to verify that',
-  },
-  detail2: {
-    id: 'profile.languageSelect.detail2',
-    defaultMessage: '!!!your balance was correctly taken into consideration during the first snapshot.',
-  },
 });
 
 @observer
@@ -36,10 +28,6 @@ export default class IntroBanner extends Component<Props> {
         <span className={styles.banner}><TestnetLogo /></span>
         <div className={styles.mainTitle}>
           {intl.formatMessage(messages.title)}
-        </div>
-        <div className={styles.detail}>
-          {intl.formatMessage(messages.detail1)}<br />
-          {intl.formatMessage(messages.detail2)}
         </div>
       </div>
     );

@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
+import { intlShape } from 'react-intl';
 import moment from 'moment';
 import { observer } from 'mobx-react';
 import BigNumber from 'bignumber.js';
@@ -13,6 +14,8 @@ import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
 import RewardPopup from '../../../components/wallet/staking/dashboard/RewardPopup';
 import environment from '../../../environment';
 import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
+import { digetForHash } from '../../../api/ada/lib/storage/database/primitives/api/utils';
+import { handleExternalLinkClick } from '../../../utils/routing';
 
 import { formattedWalletAmount } from '../../../utils/formatters';
 
@@ -32,6 +35,7 @@ import type {
   CurrentSlotLengthFunc,
   CurrentEpochLengthFunc,
 } from '../../../api/ada/lib/storage/bridge/timeUtils';
+import globalMessages from '../../../i18n/global-messages';
 
 type Props = {
   ...InjectedProps,
@@ -43,6 +47,9 @@ type State = {|
 
 @observer
 export default class StakingDashboardPage extends Component<Props, State> {
+  static contextTypes = {
+    intl: intlShape.isRequired,
+  };
 
   intervalId: void | IntervalID;
 
@@ -69,13 +76,10 @@ export default class StakingDashboardPage extends Component<Props, State> {
       }),
       1000
     );
-
-    this.props.actions.ada.delegation.startWatch.trigger();
   }
 
   componentWillUnmount() {
     if (this.intervalId) clearInterval(this.intervalId);
-    this.props.actions.ada.delegation.reset.trigger();
   }
 
   render() {
@@ -365,9 +369,13 @@ export default class StakingDashboardPage extends Component<Props, State> {
         const certificateRelativeTime = this.toRelativeSlotNumber(block.SlotNum);
 
         let nextRewardEpoch;
-        const recentDelegation = certificateRelativeTime.epoch === currentRelativeTime.epoch;
-        if (recentDelegation) {
-          // first reward is slower than the rest
+        const epochsSinceCert = currentRelativeTime.epoch - certificateRelativeTime.epoch;
+        // first reward is slower than the rest
+        // it takes 2 epochs for stake delegation to update
+        // then after the start of the 3rd epoch, you get the reward
+        if (epochsSinceCert === 0) {
+          nextRewardEpoch = currentRelativeTime.epoch + 3;
+        } else if (epochsSinceCert === 1) {
           nextRewardEpoch = currentRelativeTime.epoch + 2;
         } else {
           nextRewardEpoch = currentRelativeTime.epoch + 1;
@@ -388,12 +396,12 @@ export default class StakingDashboardPage extends Component<Props, State> {
           <RewardPopup
             currentText={moment(nextRewardTime).format('MMM Do hh:mm A')}
             followingText={moment(followingRewardTime).format('MMM Do hh:mm A')}
-            showDisclaimer={recentDelegation}
+            showDisclaimer={epochsSinceCert <= 1}
           />
         );
         rewardInfo = {
           rewardPopup,
-          showWarning: recentDelegation,
+          showWarning: epochsSinceCert <= 1,
         };
       }
     }
@@ -428,21 +436,44 @@ export default class StakingDashboardPage extends Component<Props, State> {
     if (delegationStore.stakingKeyState == null) {
       return [];
     }
-    return delegationStore.stakingKeyState.delegation.pools.map(pool => (
-      <StakePool
-        poolName={"Warren's stake pool"}
-        data={{
-          percentage: '30',
-          fullness: '18',
-          margins: '12',
-          created: '29/02/2019 12:42:41 PM',
-          cost: '12,688.00000',
-          stake: '9,688.00000',
-          pledge: '85.567088',
-          rewards: '81.000088',
-          age: '23',
-        }}
-        hash={pool[0]}
-      />));
+    const keyState = delegationStore.stakingKeyState;
+    const { intl } = this.context;
+    return keyState.state.delegation.pools.map(pool => {
+      const meta = keyState.poolInfo.get(pool[0]);
+      if (meta == null) {
+        throw new Error(`${nameof(this.getStakePools)} no meta for ${pool[0]}`);
+      }
+      const name = meta.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel);
+
+      const moreInfo = meta.info?.homepage != null
+        ? {
+          openPoolPage: handleExternalLinkClick,
+          url: meta.info.homepage,
+        }
+        : undefined;
+
+      // TODO: implement this eventually
+      const stakePoolMeta = {
+        // percentage: '30',
+        // fullness: '18',
+        // margins: '12',
+        // created: '29/02/2019 12:42:41 PM',
+        // cost: '12,688.00000',
+        // stake: '9,688.00000',
+        // pledge: '85.567088',
+        // rewards: '81.000088',
+        // age: '23',
+      };
+      return (
+        <StakePool
+          poolName={name}
+          key={digetForHash(JSON.stringify(meta), 0)}
+          data={stakePoolMeta}
+          hash={pool[0]}
+          moreInfo={moreInfo}
+          classicTheme={this.props.stores.profile.isClassicTheme}
+        />
+      );
+    });
   }
 }

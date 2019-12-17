@@ -21,7 +21,7 @@ export default class ProfileStore extends Store {
 
   LANGUAGE_OPTIONS = [
     ...LANGUAGES,
-    ...(!environment.isMainnet()
+    ...(!environment.isProduction()
       ? [
         // add any language that's mid-translation here
       ]
@@ -388,7 +388,12 @@ export default class ProfileStore extends Store {
 
   @computed get termsOfUse(): string {
     const API = environment.API;
-    return require(`../../i18n/locales/terms-of-use/${API}/${this.currentLocale}.md`);
+    const tos = require(`../../i18n/locales/terms-of-use/${API}/${this.currentLocale}.md`);
+    if (environment.isShelley()) {
+      const testnetAddition = require(`../../i18n/locales/terms-of-use/itn/${this.currentLocale}.md`);
+      return tos + '\n\n' + testnetAddition;
+    }
+    return tos;
   }
 
   @computed get hasLoadedTermsOfUseAcceptance(): boolean {

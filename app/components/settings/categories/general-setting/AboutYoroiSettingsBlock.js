@@ -147,7 +147,7 @@ export default class AboutYoroiSettingsBlock extends Component<{}> {
             </RawHash>
           </ExplorableHash>
         </div>
-        {!environment.isMainnet() &&
+        {!environment.isProduction() &&
           <div className={styles.aboutLine}>
             <strong>{intl.formatMessage(messages.branchLabel)}</strong>&nbsp;
             <ExplorableHash

@@ -458,7 +458,11 @@ const globalMessages = defineMessages({
   loadMoreButtonLabel: {
     id: 'global.labels.loadMore',
     defaultMessage: '!!!Load more',
-  }
+  },
+  unknownPoolLabel: {
+    id: 'wallet.staking.pool.unknownLabel',
+    defaultMessage: '!!!Unknown pool',
+  },
 });
 export default globalMessages;
 

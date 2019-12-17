@@ -10,6 +10,7 @@ import type {
   FilterUsedRequest, FilterUsedResponse,
   ServerStatusRequest, ServerStatusResponse,
   AccountStateRequest, AccountStateResponse,
+  PoolInfoRequest, PoolInfoResponse,
   SignedRequestInternal,
   RemoteTransaction,
 } from './types';
@@ -32,6 +33,7 @@ import {
   InvalidWitnessError,
   ServerStatusError,
   GetAccountStateApiError,
+  GetPoolInfoApiError,
 } from '../../errors';
 
 import type { ConfigType } from '../../../../../config/config-types';
@@ -229,10 +231,45 @@ export class RemoteFetcher implements IFetcher {
           'yoroi-locale': this.currentLocale()
         }
       }
-    ).then(response => response.data)
+    ).then(response => {
+      const mapped = {};
+      for (const key of Object.keys(response.data)) {
+        // Jormungandr returns '' when the address is valid but it hasn't appeared in the blockchain
+        if (response.data[key] === '') {
+          mapped[key] = {
+            delegation: { pools: [], },
+            value: 0,
+            counter: 0,
+          };
+        } else {
+          mapped[key] = response.data[key];
+        }
+      }
+      return mapped;
+    })
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getAccountState)} error: ` + stringifyError(error));
         throw new GetAccountStateApiError();
+      })
+  )
+
+  getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => (
+    axios(
+      `${backendUrl}/api/v2/pool/info`,
+      {
+        method: 'post',
+        data: {
+          ids: body.ids
+        },
+        headers: {
+          'yoroi-version': this.lastLaunchVersion(),
+          'yoroi-locale': this.currentLocale()
+        }
+      }
+    ).then(response => response.data)
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getPoolInfo)} error: ` + stringifyError(error));
+        throw new GetPoolInfoApiError();
       })
   )
 

@@ -143,12 +143,12 @@ const WalletsSubpages = (stores, actions) => (
         <Route
           exact
           path={ROUTES.WALLETS.DELEGATION_SIMPLE}
-          component={(props) => <StakingPage {...props} stores={stores} actions={actions} stakingUrl={CONFIG.seiza.simple} />}
+          component={(props) => <StakingPage {...props} stores={stores} actions={actions} urlTemplate={CONFIG.seiza.simpleTemplate} />}
         />
         <Route
           exact
           path={ROUTES.WALLETS.DELEGATION_ADVANCE}
-          component={(props) => <StakingPage {...props} stores={stores} actions={actions} stakingUrl={CONFIG.seiza.advance} />}
+          component={(props) => <StakingPage {...props} stores={stores} actions={actions} urlTemplate={CONFIG.seiza.advanceTemplate} />}
         />
       </>)
     }

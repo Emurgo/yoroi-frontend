@@ -592,9 +592,7 @@ export default class AdaApi {
       words.join(' '),
       0, // paper wallets always use account 0
       request.numAddresses != null ? request.numAddresses : DEFAULT_ADDRESSES_PER_PAPER,
-      environment.isMainnet()
-        ? RustModule.WalletV3.AddressDiscrimination.Production
-        : RustModule.WalletV3.AddressDiscrimination.Test,
+      environment.getDiscriminant(),
       request.legacy,
     );
     return { addresses, scrambledWords, accountPlate };
@@ -1248,9 +1246,7 @@ export default class AdaApi {
       if (environment.isShelley()) {
         const wallet = await createStandardCip1852Wallet({
           db: request.db,
-          discrimination: environment.isMainnet()
-            ? RustModule.WalletV3.AddressDiscrimination.Production
-            : RustModule.WalletV3.AddressDiscrimination.Test,
+          discrimination: environment.getDiscriminant(),
           rootPk,
           password: walletPassword,
           accountIndex,

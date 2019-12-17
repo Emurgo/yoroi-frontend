@@ -45,9 +45,7 @@ export default class YoroiPlatePage extends Component<Props, WalletRestoreDialog
       yoroiTransfer.recoveryPhrase,
       0, // show addresses for account #0
       numAddresses,
-      environment.isMainnet()
-        ? RustModule.WalletV3.AddressDiscrimination.Production
-        : RustModule.WalletV3.AddressDiscrimination.Test,
+      environment.getDiscriminant(),
       true,
     );
     const shelleyPlate = yoroiTransfer.transferKind === TransferKind.PAPER
@@ -56,9 +54,7 @@ export default class YoroiPlatePage extends Component<Props, WalletRestoreDialog
         yoroiTransfer.recoveryPhrase,
         0, // show addresses for account #0
         numAddresses,
-        environment.isMainnet()
-          ? RustModule.WalletV3.AddressDiscrimination.Production
-          : RustModule.WalletV3.AddressDiscrimination.Test,
+        environment.getDiscriminant(),
         false,
       );
     return {

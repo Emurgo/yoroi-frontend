@@ -10,6 +10,7 @@ import type {
   BestBlockRequest, BestBlockResponse,
   ServerStatusRequest, ServerStatusResponse,
   AccountStateRequest, AccountStateResponse,
+  PoolInfoRequest, PoolInfoResponse,
 } from './types';
 
 export interface IFetcher {
@@ -22,4 +23,5 @@ export interface IFetcher {
   checkAddressesInUse(body: FilterUsedRequest): Promise<FilterUsedResponse>;
   checkServerStatus(body: ServerStatusRequest): Promise<ServerStatusResponse>;
   getAccountState(body: AccountStateRequest): Promise<AccountStateResponse>;
+  getPoolInfo(body: PoolInfoRequest): Promise<PoolInfoResponse>;
 }
