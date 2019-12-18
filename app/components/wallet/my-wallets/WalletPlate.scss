@@ -1,0 +1,24 @@
+.wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 12px;
+}
+
+.name {
+    font-family: var(--font-medium);
+    font-size: 18px;
+    line-height: 22px;
+    color:#242838;
+    margin-bottom: 2px;
+}
+
+.icon {
+    width: 35px;
+    height: 35px;
+}

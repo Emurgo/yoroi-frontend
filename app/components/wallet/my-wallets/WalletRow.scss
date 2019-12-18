@@ -1,0 +1,96 @@
+.wrapper {
+    font-family: var(--font-regular);
+    display: block;
+    width: 100%;
+    box-shadow: 0 5px 20px 0 rgba(24,26,30,0.08);
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    & + & {
+        margin-top: 24px;
+    }
+}
+
+.content {
+    display: flex;
+    padding: 16px 0 16px 24px;
+}
+
+.section {
+    display: flex;
+    align-items: center;
+    border-right: 1px solid #E0E3EB;
+}
+
+.nameSection {
+    @extend .section;
+    padding-top: 13px;
+    padding-bottom: 13px;
+    padding-left: 24px;
+    padding-right: 70px;
+    min-width: 305px;
+}
+
+.detailsSection {
+    @extend .section;
+    padding-left: 24px;
+    padding-right: 74px;
+    min-width: 260px;
+}
+
+.currencySection {
+    @extend .section;
+    flex: 1;
+    justify-content: space-between;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+.plateSection {
+    @extend .nameSection;
+}
+
+.expandedCurrencySection {
+    @extend .currencySection;
+    border-right: none;
+}
+
+.expandContent {
+    padding: 24px;
+    background-color: #FAFAFC;
+    box-shadow: inset 0 -1px 10px 0 rgba(255,255,255,0.5), inset 0 2px 4px 0 rgba(56,57,61,0.2);
+    border-radius: 0 0 8px 8px;
+    & .section {
+        border-right-color: #DFE3EB;
+    }
+}
+
+.toggle {
+    padding: 24px;
+    &:hover {
+        cursor: pointer;
+    }
+    &.toggleExpanded {
+        transform: rotate(180deg);
+    }
+}
+
+.add {
+    background-color: #17D1AA;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.contentHead {
+    display: flex;
+}
+
+.walletNumber {
+    margin-right: 44px;
+    color: #6B7384;
+    font-size: 14px;
+    line-height: 22px;
+}
