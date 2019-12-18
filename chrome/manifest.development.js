@@ -9,6 +9,7 @@ import {
   serverToPermission,
 } from '../scripts/connections';
 import { SEIZA_URL, SEIZA_FOR_YOROI_URL } from './manifestEnvs';
+import { Version } from './constants';
 
 export default buildManifest({
   description: '[dev] Cardano ADA wallet',
@@ -22,6 +23,7 @@ export default buildManifest({
     `style-src * 'unsafe-inline' 'self' blob:;`,
     `img-src 'self' ${portToPermission(Ports.WebpackDev)} data:;`
   ].join(' '),
+  version: Version.Byron,
   extensionKey: 'pojejnpjgcacmnpkdiklhlnlbkjechfh',
   geckoKey: '{530f7c6c-6077-4703-8f71-cb368c663e35}',
 });

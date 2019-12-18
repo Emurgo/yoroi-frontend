@@ -6,6 +6,7 @@ import {
   serverToPermission,
 } from '../scripts/connections';
 import { SEIZA_URL, SEIZA_FOR_YOROI_URL } from './manifestEnvs';
+import { Version } from './constants';
 
 export default buildManifest({
   description: 'A simple, secure and fast Cardano ADA wallet.',
@@ -26,6 +27,7 @@ export default buildManifest({
     '128': 'img/shelley-128.png',
     /* eslint-enable quote-props */
   },
+  version: Version.Shelley,
   versionOverride: '2.1.1',
   geckoKey: '{842ae5af-a7ff-4e99-afb6-bd6c4043bcfa}',
 });
