@@ -39,8 +39,6 @@
 
 .inner {
   height: 100%;
-  // overflow-x: hidden;
-  // overflow-y: hidden;
   position: relative;
   &::-webkit-scrollbar-button {
     height: 7px;
@@ -51,14 +49,17 @@
 .containerInner {
   margin-top: 4px;
   background-color: var(--theme-page-content-background-color);
-  box-shadow: var(--theme-page-content-box-shadow);
-  border-radius: var(--theme-page-content-border-radius);
   width: 100%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   flex: 0 1 auto;
   height: initial;
+}
+
+.containerCard {
+  box-shadow: var(--theme-page-content-box-shadow);
+  border-radius: var(--theme-page-content-border-radius);
 }
 
 .content {
@@ -79,6 +80,7 @@
 }
 
 // avoid background image overlapping with language select form
+
 @media
   (min-width: 1100px) and (min-height: 820px),
   (min-width: 1160px)

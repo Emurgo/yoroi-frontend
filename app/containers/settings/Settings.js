@@ -63,6 +63,7 @@ export default class Settings extends Component<InjectedContainerProps> {
         actions={actions}
         stores={stores}
         showInContainer
+        showAsCard
       >
         <SettingsLayout menu={menu}>
           {children != null ? children : null}

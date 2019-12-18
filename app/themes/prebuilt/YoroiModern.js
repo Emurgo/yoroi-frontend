@@ -510,6 +510,24 @@ const YoroiModern = {
   '--theme-navbar-height': '60px',
   '--theme-navbar-background-color': '#F0F3F5',
   '--theme-navbar-color': '#6B7384',
+
+  // My Wallets page
+  '--theme-mywallets-page-background-color': '#F0F3F5',
+  '--theme-mywallets-page-title-color': '#6B7384',
+  '--theme-mywallets-row-background-color': '#FFFFFF',
+  '--theme-mywallets-row-box-shadow': '0 5px 20px 0 rgba(24, 26, 30, 0.08)',
+  '--theme-mywallets-expandable-background-color': '#FAFAFC',
+  '--theme-mywallets-expandable-box-shadow': 'inset 0 -1px 10px 0 rgba(255,255,255,0.5), inset 0 2px 4px 0 rgba(56,57,61,0.2)',
+  '--theme-mywallets-separator-color': '#E0E3EB',
+  '--theme-mywallets-separator-dark-color': '#DFE3EB',
+  '--theme-mywallets-main-text-color': '#242838',
+  '--theme-mywallets-secondary-text-color': '#6B7384',
+  '--theme-mywallets-ada-amount-decimal-color': 'rgba(36, 40, 56, 0.5)',
+  '--theme-mywallets-tooltip-background-color': 'rgba(56, 57, 61, 0.7)',
+  '--theme-mywallets-tooltip-text-color': '#FFFFFF',
+  '--theme-mywallets-add-button-background-color': '#17D1AA',
+  '--theme-mywallets-sync-time-text-color': '#38393D',
+  '--theme-mywallets-sync-time-label-color': '#6B7384',
 };
 
 // *************************************************************

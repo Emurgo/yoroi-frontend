@@ -1,0 +1,86 @@
+.wrapper {
+    font-family: var(--font-regular);
+    display: block;
+    width: 100%;
+    box-shadow: var(--theme-mywallets-row-box-shadow);
+    background-color: var(--theme-mywallets-row-background-color);
+    border-radius: 8px;
+    
+    & + & {
+        margin-top: 24px;
+    }
+}
+
+.content {
+    display: flex;
+}
+
+.section {
+    display: flex;
+    align-items: center;
+    border-left: 1px solid var(--theme-mywallets-separator-color);
+    padding: 31px 24px;
+}
+
+.nameSection {
+    min-width: 300px;
+    padding: 31px 24px;
+
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.detailsSection {
+    @extend .section;
+    width: 100%;
+    max-width: 560px;
+}
+
+.syncSection {
+    @extend .section;
+    min-width: 114px;
+}
+
+.currencySection {
+    @extend .section;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex: 1;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+.addSection {
+    @extend .section;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+.contentBody {
+    border-radius: 0 0 8px 8px;
+    box-shadow: var(--theme-mywallets-expandable-box-shadow);
+    background-color: var(--theme-mywallets-expandable-background-color);
+}
+
+.toggle {
+    @extend .section;
+    padding: 24px;
+    &:hover {
+        cursor: pointer;
+    }
+    &.toggleExpanded {
+        transform: rotate(180deg);
+    }
+}
+
+.add {
+    background-color: var(--theme-mywallets-add-button-background-color);
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    &:hover {
+        cursor: pointer;
+    }
+}

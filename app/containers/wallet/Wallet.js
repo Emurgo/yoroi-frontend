@@ -60,6 +60,7 @@ export default class Wallet extends Component<Props> {
           stores={stores}
           connectionErrorType={checkAdaServerStatus}
           showInContainer
+          showAsCard
         >
           <VerticallyCenteredLayout>
             <LoadingSpinner />
@@ -76,6 +77,7 @@ export default class Wallet extends Component<Props> {
         stores={stores}
         connectionErrorType={checkAdaServerStatus}
         showInContainer
+        showAsCard
       >
         <WalletWithNavigation
           isActiveScreen={this.isActiveScreen}

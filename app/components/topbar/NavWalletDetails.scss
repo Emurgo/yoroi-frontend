@@ -3,10 +3,16 @@
 .wrapper {
     flex: 1;
     display: flex;
+    flex-direction: column;
+    justify-content: center;
     height: 100%;
     min-height: var(--theme-navbar-height);
     color: var(--theme-wallet-dropdown-main-text-color);
     font-family: var(--font-regular);
+}
+
+.outerWrapper {
+    display: flex;
 }
 
 .content {
@@ -76,5 +82,11 @@
 
 .label {
     display: inline-block;
+    color: var(--theme-wallet-dropdown-secondary-text-color);
+}
+
+.info {
+    font-size: 12px;
+    line-height: 20px;
     color: var(--theme-wallet-dropdown-secondary-text-color);
 }
