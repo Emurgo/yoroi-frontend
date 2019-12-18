@@ -22,12 +22,14 @@ export default class SuccessPage extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <div className={styles.successImg} />
-        <div className={styles.title}>
-          {title}
-        </div>
-        <div className={styles.text}>
-          {text}
+        <div>
+          <div className={styles.successImg} />
+          <div className={styles.title}>
+            {title}
+          </div>
+          <div className={styles.text}>
+            {text}
+          </div>
         </div>
       </div>
     );
