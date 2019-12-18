@@ -42,15 +42,23 @@ export default class StakingPage extends Component<Props> {
   }
 
   getBrowserReplacement(): string {
-    if (environment.userAgentInfo.isFirefox) {
-      return 'firefox';
-    }
-    // otherwise assume Chrome
+    // 1) handle Yoroi running as an extension
+
     if (environment.userAgentInfo.isExtension) {
+      if (environment.userAgentInfo.isFirefox) {
+        return 'firefox&mozId=' + location.hostname;
+      }
+      // otherwise assume Chrome
       return 'chrome&chromeId=' + chrome.runtime.id;
     }
-    // return 'chrome';
-    throw new Error('TODO: support staking page on browser builds');
+
+    // 2) Handle Yoroi running as a website
+
+    if (environment.userAgentInfo.isFirefox) {
+      return 'firefox&host' + location.host;
+    }
+    // otherwise assume Chrome
+    return 'chrome&chromeId=' + location.host;
   }
 
   prepareStakingURL(): null | string {
