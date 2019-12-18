@@ -24,6 +24,14 @@ import { populateAccountingTransactionsDb } from './transactionModels/account/ta
 import { populateMultipartTransactionsDb } from './transactionModels/multipart/tables';
 import { populateWalletDb } from './walletTypes/core/tables';
 
+declare var indexedDB;
+
+const deleteDb = () => new Promise(resolve => {
+  const deleteRequest = indexedDB.deleteDatabase('yoroi-schema');
+  deleteRequest.onsuccess = () => resolve();
+  deleteRequest.onerror = () => resolve();
+});
+
 export const loadLovefieldDB = async (
   storeType: $Values<typeof schema.DataStoreType>
 ): Promise<lf$Database> => {
@@ -65,7 +73,7 @@ export const loadLovefieldDB = async (
 const populateAndCreate = async (
   storeType: $Values<typeof schema.DataStoreType>
 ): Promise<lf$Database> => {
-  const schemaBuilder = schema.create('yoroi-schema', 3);
+  const schemaBuilder = schema.create('yoroi-schema', 4);
 
   populatePrimitivesDb(schemaBuilder);
   populateWalletDb(schemaBuilder);
@@ -116,8 +124,13 @@ async function onUpgrade(
     await rawDb.dropTable('Txs');
     await rawDb.dropTable('Addresses');
   } if (version === 2) {
-    for (const table of Object.keys(dump)) {
-      await rawDb.dropTable(table);
+    await deleteDb();
+    window.location.reload();
+  } if (version === 3) {
+    const numKeys = Object.keys(dump).length;
+    if (numKeys === 0) {
+      await deleteDb();
+      window.location.reload();
     }
   } else {
     throw new Error('unexpected version number');
