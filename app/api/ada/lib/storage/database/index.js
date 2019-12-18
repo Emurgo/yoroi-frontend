@@ -65,7 +65,7 @@ export const loadLovefieldDB = async (
 const populateAndCreate = async (
   storeType: $Values<typeof schema.DataStoreType>
 ): Promise<lf$Database> => {
-  const schemaBuilder = schema.create('yoroi-schema', 2);
+  const schemaBuilder = schema.create('yoroi-schema', 3);
 
   populatePrimitivesDb(schemaBuilder);
   populateWalletDb(schemaBuilder);
@@ -115,6 +115,10 @@ async function onUpgrade(
     await rawDb.dropTable('TxAddresses');
     await rawDb.dropTable('Txs');
     await rawDb.dropTable('Addresses');
+  } if (version === 2) {
+    for (const table of Object.keys(dump)) {
+      await rawDb.dropTable(table);
+    }
   } else {
     throw new Error('unexpected version number');
   }
