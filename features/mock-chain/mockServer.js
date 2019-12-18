@@ -15,8 +15,7 @@ import type {
 } from '../../app/api/ada/lib/state-fetch/types';
 import chai from 'chai';
 import mockImporter from './mockImporter';
-
-const port = 8080;
+import { Ports } from '../../scripts/connections';
 
 // MockData should always be consistent with the following values
 const addressesLimit = 50;
@@ -162,8 +161,8 @@ export function getMockServer(
       res.send({ isServerOk });
     });
 
-    MockServer = server.listen(port, () => {
-      console.log(`JSON Server is running at ${port}`);
+    MockServer = server.listen(Ports.DevBackendServe, () => {
+      console.log(`JSON Server is running at ${Ports.DevBackendServe}`);
     });
   }
   return MockServer;
