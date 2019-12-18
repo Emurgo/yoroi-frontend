@@ -124,10 +124,23 @@ async function onUpgrade(
     await rawDb.dropTable('Txs');
     await rawDb.dropTable('Addresses');
   } if (version === 2) {
+    // if user was in the balance-check version of Yoroi
+    // they have an incompatible DB and we don't care about it
+    // so we just delete it entirely
     await deleteDb();
+    // need to refresh for page to re-create new DB
     window.location.reload();
   } if (version === 3) {
+    // In https://github.com/Emurgo/yoroi-frontend/pull/1229
+    // I tried to delete balance-check databases but it didn't work
+
+    // only two kinds of people on version 3:
+    // 1) People who opened Yoroi after #1229 and are now stuck with the same issue on v3
+    // 2) Fresh installs of Yoroi when v3 was most recent
+
     const numKeys = Object.keys(dump).length;
+    // numKeys = 0 means that these are people stuck after #1229 so we clear their db
+    // for fresh install users, we don't need to do anything
     if (numKeys === 0) {
       await deleteDb();
       window.location.reload();
