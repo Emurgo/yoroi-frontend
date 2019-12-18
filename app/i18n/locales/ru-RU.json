@@ -310,7 +310,7 @@
   "wallet.create.dialog.repeatPasswordLabel": "Повторите пароль",
   "wallet.create.dialog.title": "Создать кошелек",
   "wallet.create.dialog.walletNameHint": "например: Кошелек для шоппинга",
-  "wallet.dashboard.empty.text": "Перейдите Простой или Расширенный стейкинг, чтобы выбрать стейк-пул для делегирования вашей ADA. Обратите внимание, что вы можете делегировать только в один стейк-пул в этом тестнете.",
+  "wallet.dashboard.empty.text": "Перейдите в Простой или Расширенный стейкинг, чтобы выбрать стейк-пул в который вы хотите делегировать. Обратите внимание, что вы можете делегировать только в один стейк-пул в этом тестнете",
   "wallet.dashboard.empty.title": "Вы еще не делегировали вашу ADA",
   "wallet.dashboard.epochEndTitle": "Время до конца эпохи",
   "wallet.dashboard.epochProgress": "Прогресс эпохи",
