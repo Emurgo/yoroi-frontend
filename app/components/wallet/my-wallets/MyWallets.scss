@@ -1,3 +1,21 @@
 .page {
+    min-height: 100%;
+    padding: 20px 40px;
+    background-color: #F0F3F5;
     font-family: var(--font-regular);
+    display: flex;
+    flex-direction: column;
+}
+
+.pageTitle {
+    font-family: var(--font-medium);
+    color: #6B7384;
+    font-size: 18px;
+    line-height: 22px;
+    margin-bottom: 21px;
+}
+
+.content {
+    flex: 1;
+    display: flex;
 }

@@ -1,20 +1,27 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 
 import styles from './MyWallets.scss';
 
 type Props = {|
-    wallets: Array<Object>,
+  +children: Node,
+  +pageTitle: string,
 |};
 
 @observer
 export default class MyWallets extends Component<Props> {
 
   render() {
+    const { children, pageTitle } = this.props;
+
     return (
       <div className={styles.page}>
-          MY_WALLETS_PAGE
+        <h1 className={styles.pageTitle}>{pageTitle}</h1>
+        <div className={styles.content}>
+          {children}
+        </div>
       </div>
     );
   }
