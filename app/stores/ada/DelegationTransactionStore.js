@@ -69,6 +69,7 @@ export default class DelegationTransactionStore extends Store {
     const a = this.actions.ada.delegationTransaction;
     a.createTransaction.listen(this._createTransaction);
     a.signTransaction.listen(this._signTransaction);
+    a.complete.listen(this._complete);
     a.reset.listen(this.reset);
   }
 
@@ -175,7 +176,13 @@ export default class DelegationTransactionStore extends Store {
     }).promise;
     if (broadcastTx == null) throw new Error(`${nameof(this._signTransaction)} should never happen`);
     await broadcastTx;
+  }
 
+  _complete: void => Promise<void> = async () => {
+    const publicDeriver = this.stores.substores.ada.wallets.selected;
+    if (publicDeriver == null) {
+      throw new Error(`${nameof(this._complete)} no public deriver selected`);
+    }
     this.actions.dialogs.closeActiveDialog.trigger();
     const { wallets } = this.stores.substores[environment.API];
     await wallets.refreshWallet(publicDeriver);

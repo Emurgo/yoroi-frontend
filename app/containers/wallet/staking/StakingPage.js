@@ -37,6 +37,10 @@ export default class StakingPage extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  componentWillUnmount() {
+    this.props.actions.ada.delegationTransaction.reset.trigger();
+  }
+
   getBrowserReplacement(): string {
     if (environment.userAgentInfo.isFirefox) {
       return 'firefox';
@@ -79,7 +83,13 @@ export default class StakingPage extends Component<Props> {
     const { actions, stores } = this.props;
     const { intl } = this.context;
 
-    if (this.props.stores.substores.ada.transactions.hasAnyPending) {
+    const delegationTxStore = stores.substores[environment.API].delegationTransaction;
+
+    if (
+      !delegationTxStore.signAndBroadcastDelegationTx.isExecuting &&
+      !delegationTxStore.signAndBroadcastDelegationTx.wasExecuted &&
+      this.props.stores.substores.ada.transactions.hasAnyPending
+    ) {
       return (
         <VerticallyCenteredLayout>
           <InformativeError
@@ -98,6 +108,12 @@ export default class StakingPage extends Component<Props> {
         </VerticallyCenteredLayout>
       );
     }
-    return (<SeizaFetcher actions={actions} stores={stores} stakingUrl={url} />);
+    return (
+      <SeizaFetcher
+        actions={actions}
+        stores={stores}
+        stakingUrl={url}
+      />
+    );
   }
 }

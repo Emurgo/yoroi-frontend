@@ -13,6 +13,7 @@ import AnnotatedLoader from '../../../components/transfer/AnnotatedLoader';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
 import Dialog from '../../../components/widgets/Dialog';
 import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
+import DelegationSuccessDialog from '../../../components/wallet/staking/DelegationSuccessDialog';
 import globalMessages from '../../../i18n/global-messages';
 import InvalidURIImg from '../../../assets/images/uri/invalid-uri.inline.svg';
 import {
@@ -57,7 +58,6 @@ export default class SeizaFetcher extends Component<Props> {
   }
 
   componentWillUnmount() {
-    this.props.actions.ada.delegationTransaction.reset.trigger();
     window.removeEventListener('message', this.messageHandler);
   }
 
@@ -105,6 +105,10 @@ export default class SeizaFetcher extends Component<Props> {
       return result;
     };
 
+    const showSignDialog = delegationTxStore.signAndBroadcastDelegationTx.isExecuting ||
+      !delegationTxStore.signAndBroadcastDelegationTx.wasExecuted ||
+      delegationTxStore.signAndBroadcastDelegationTx.error;
+
     return (
       <>
         {delegationTxStore.createDelegationTx.isExecuting &&
@@ -138,7 +142,7 @@ export default class SeizaFetcher extends Component<Props> {
             </>
           </Dialog>
         }
-        {delegationTx != null &&
+        {delegationTx != null && showSignDialog &&
           <DelegationTxDialog
             staleTx={delegationTxStore.isStale}
             poolName={this.selectedPools[0].name}
@@ -156,6 +160,12 @@ export default class SeizaFetcher extends Component<Props> {
             classicTheme={profile.isClassicTheme}
             error={delegationTxStore.signAndBroadcastDelegationTx.error}
             selectedExplorer={stores.profile.selectedExplorer}
+          />
+        }
+        {delegationTx != null && !showSignDialog &&
+          <DelegationSuccessDialog
+            onClose={() => delegationTxActions.complete.trigger()}
+            classicTheme={profile.isClassicTheme}
           />
         }
         <iframe ref={iframe => { this.iframe = iframe; }} title="Staking" src={`${stakingUrl}&locale=${profile.currentLocale}`} frameBorder="0" width="100%" height="100%" />
