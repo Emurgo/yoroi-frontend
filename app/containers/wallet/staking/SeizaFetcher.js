@@ -58,6 +58,7 @@ export default class SeizaFetcher extends Component<Props> {
   }
 
   componentWillUnmount() {
+    this.props.actions.ada.delegationTransaction.reset.trigger();
     window.removeEventListener('message', this.messageHandler);
   }
 

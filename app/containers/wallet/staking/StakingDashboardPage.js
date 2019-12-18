@@ -108,7 +108,10 @@ export default class StakingDashboardPage extends Component<Props, State> {
         stakePools={stakePools}
         epochProgress={getTimeBasedElements.epochProgress}
         userSummary={<UserSummary
-          totalAdaSum={hideOrFormat(publicDeriver.amount)}
+          totalAdaSum={publicDeriver.amount == null
+            ? undefined
+            : hideOrFormat(publicDeriver.amount)
+          }
           totalRewards={delegationStore.getDelegatedBalance.result == null
             ? undefined
             : hideOrFormat(
