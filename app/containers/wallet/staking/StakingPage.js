@@ -37,6 +37,10 @@ export default class StakingPage extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  componentWillUnmount() {
+    this.props.actions.ada.delegationTransaction.reset.trigger();
+  }
+
   getBrowserReplacement(): string {
     if (environment.userAgentInfo.isFirefox) {
       return 'firefox';
@@ -80,11 +84,12 @@ export default class StakingPage extends Component<Props> {
     const { intl } = this.context;
 
     const delegationTxStore = stores.substores[environment.API].delegationTransaction;
-    const showSignDialog = delegationTxStore.signAndBroadcastDelegationTx.isExecuting ||
-      !delegationTxStore.signAndBroadcastDelegationTx.wasExecuted ||
-      delegationTxStore.signAndBroadcastDelegationTx.error;
 
-    if (!showSignDialog && this.props.stores.substores.ada.transactions.hasAnyPending) {
+    if (
+      !delegationTxStore.signAndBroadcastDelegationTx.isExecuting &&
+      !delegationTxStore.signAndBroadcastDelegationTx.wasExecuted &&
+      this.props.stores.substores.ada.transactions.hasAnyPending
+    ) {
       return (
         <VerticallyCenteredLayout>
           <InformativeError
@@ -108,7 +113,6 @@ export default class StakingPage extends Component<Props> {
         actions={actions}
         stores={stores}
         stakingUrl={url}
-        showSuccessDialog={!showSignDialog}
       />
     );
   }

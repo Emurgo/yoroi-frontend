@@ -57,13 +57,11 @@ export default class DelegationSuccessDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         classicTheme={this.props.classicTheme}
       >
-        <CenteredLayout>
-          <SuccessPage
-            title={intl.formatMessage(messages.title)}
-            text={intl.formatMessage(messages.explanation)}
-            classicTheme={this.props.classicTheme}
-          />
-        </CenteredLayout>
+        <SuccessPage
+          title={intl.formatMessage(messages.title)}
+          text={intl.formatMessage(messages.explanation)}
+          classicTheme={this.props.classicTheme}
+        />
       </Dialog>
     );
   }
