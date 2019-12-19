@@ -45,8 +45,7 @@ export default class AdaTransactionBuilderStore extends Store {
 
   setup(): void {
     super.setup();
-    this._preWaitReset();
-    this._postWaitReset();
+    this._reset();
     const actions = this.actions.ada.txBuilderActions;
     actions.updateReceiver.listen(this._updateReceiver);
     actions.updateAmount.listen(this._updateAmount);
@@ -136,8 +135,7 @@ export default class AdaTransactionBuilderStore extends Store {
       // need to recalculate when there are no more pending transactions
       this.stores.substores.ada.transactions.hasAnyPending,
     ],
-    // $FlowFixMe error in mobx types
-    async () => await this._updateTxBuilder(),
+    () => this._updateTxBuilder(),
   )
 
   _canCompute(): boolean {
@@ -157,7 +155,7 @@ export default class AdaTransactionBuilderStore extends Store {
    * Note: need to check state outside of runInAction
    * Otherwise reaction won't trigger
    */
-  _updateTxBuilder = async (): Promise<void> => {
+  _updateTxBuilder = (): void => {
     runInAction(() => {
       this.createUnsignedTx.reset();
       this.plannedTx = null;
@@ -176,9 +174,8 @@ export default class AdaTransactionBuilderStore extends Store {
       : '0'; // value is not relevant in sendall case
     const shouldSendAll = this.shouldSendAll;
 
-    if (this.createUnsignedTx.promise) {
-      // eslint-disable-next-line no-unused-vars
-      await this.createUnsignedTx.promise.catch(err => { /* do nothing */ });
+    if (this.createUnsignedTx.isExecuting) {
+      this.createUnsignedTx.cancel();
     }
 
     const withUtxos = asGetAllUtxos(publicDeriver.self);
@@ -229,32 +226,13 @@ export default class AdaTransactionBuilderStore extends Store {
   }
 
   @action
-  _preWaitReset = () => {
-    // resets that have to happen BEFORE waiting for createUnsignedTx to finish
+  _reset = () => {
     this.plannedTxInfo = [{ address: undefined, value: undefined }];
     this.shouldSendAll = false;
-  }
-  @action
-  _postWaitReset = () => {
-    // resets that have to happen AFTER waiting for createUnsignedTx to finish
+    this.createUnsignedTx.cancel();
     this.createUnsignedTx.reset();
     this.plannedTx = null;
     this.tentativeTx = null;
-  }
-
-  @action
-  _reset = async () => {
-    this._preWaitReset();
-
-    // creation of unsigned tx may still be running when we try and reset
-    // we need to wait for it to finish then clear the result since we can't cancel the promise
-    try {
-      await this.createUnsignedTx.promise;
-    } catch (err) {
-      // ignore
-    }
-
-    this._postWaitReset();
   }
 
   // =======================================

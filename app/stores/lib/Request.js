@@ -29,6 +29,7 @@ export default class Request<Func: (...args: any) => Promise<any>, Err> {
   @observable isError: boolean = false;
   @observable wasExecuted: boolean = false;
 
+  currentlyExecuting: Set<number> = new Set();
   promise: ?Promise<PromisslessReturnType<Func>> = null;
 
   _method: Func;
@@ -49,6 +50,8 @@ export default class Request<Func: (...args: any) => Promise<any>, Err> {
       this.isExecuting = true;
     }), 0);
 
+    const executionId = Math.random();
+    this.currentlyExecuting.add(executionId);
     // Issue api call & save it as promise that is handled to update the results of the operation
     this.promise = new Promise((resolve, reject) => {
       if (!this._method) {
@@ -56,6 +59,12 @@ export default class Request<Func: (...args: any) => Promise<any>, Err> {
       }
       this._method(...callArgs)
         .then((result) => {
+          if (this.currentlyExecuting.has(executionId)) {
+            this.currentlyExecuting.delete(executionId);
+          } else {
+            resolve(result);
+            return;
+          }
           setTimeout(action('Request::execute/then', () => {
             if (this.result != null && isObservableArray(this.result) && Array.isArray(result)) {
               this.result.replace(result);
@@ -73,6 +82,12 @@ export default class Request<Func: (...args: any) => Promise<any>, Err> {
           return result;
         })
         .catch(action('Request::execute/catch', (error) => {
+          if (this.currentlyExecuting.has(executionId)) {
+            this.currentlyExecuting.delete(executionId);
+          } else {
+            reject(error);
+            return;
+          }
           setTimeout(action(() => {
             this.error = error;
             this.result = null;
@@ -136,6 +151,12 @@ export default class Request<Func: (...args: any) => Promise<any>, Err> {
     });
   }
 
+  @action cancel(): Request<Func, Err> {
+    this.isExecuting = false;
+    this._isWaitingForResponse = false;
+    this._currentApiCall = null;
+    return this;
+  }
   @action reset(): Request<Func, Err> {
     this.result = null;
     this.error = null;
