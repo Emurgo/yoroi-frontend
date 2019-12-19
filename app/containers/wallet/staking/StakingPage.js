@@ -37,10 +37,6 @@ export default class StakingPage extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  componentWillUnmount() {
-    this.props.actions.ada.delegationTransaction.reset.trigger();
-  }
-
   getBrowserReplacement(): string {
     // 1) handle Yoroi running as an extension
 
@@ -73,8 +69,10 @@ export default class StakingPage extends Component<Props> {
     if (!publicDeriver) {
       return null;
     }
-    // Seiza does not understand decimal places, so removing all Lovelaces
-    finalURL += `&userAda=${formattedAmountWithoutLovelace(publicDeriver.amount)}`;
+    if (publicDeriver.amount) {
+      // Seiza does not understand decimal places, so removing all Lovelaces
+      finalURL += `&userAda=${formattedAmountWithoutLovelace(publicDeriver.amount)}`;
+    }
 
     const delegation = this.props.stores.substores.ada.delegation.stakingKeyState;
     if (!delegation) {
