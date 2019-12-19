@@ -143,7 +143,7 @@ export default class SeizaFetcher extends Component<Props> {
             </>
           </Dialog>
         }
-        {delegationTx != null && showSignDialog &&
+        {delegationTx != null && this.selectedPools.length >= 0 && showSignDialog &&
           <DelegationTxDialog
             staleTx={delegationTxStore.isStale}
             poolName={this.selectedPools[0].name}
