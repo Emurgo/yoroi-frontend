@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
+import { intlShape, defineMessages } from 'react-intl';
 import environment from '../../environment';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import { formattedWalletAmount } from '../../utils/formatters';
@@ -17,25 +17,77 @@ import WalletAddress from '../../components/wallet/my-wallets/WalletAddress';
 import WalletCurrency from '../../components/wallet/my-wallets/WalletCurrency';
 import WalletSubRow from '../../components/wallet/my-wallets/WalletSubRow';
 
+const messages = defineMessages({
+  title: {
+    id: 'myWallets.general.title',
+    defaultMessage: '!!!My wallets',
+  },
+  conceptualWallet: {
+    id: 'myWallets.wallets.conceptual',
+    defaultMessage: '!!!Conceptual wallet',
+  },
+  paperWallet: {
+    id: 'myWallets.wallets.paper',
+    defaultMessage: '!!!Paper wallet',
+  },
+  trezorWallet: {
+    id: 'myWallets.wallets.trezor',
+    defaultMessage: '!!!Trezor wallet',
+  },
+  lastSyncMessage: {
+    id: 'myWallets.wallets.lastSyncText',
+    defaultMessage: '!!!Last sync: {hours} ago',
+  },
+  hoursSingular: {
+    id: 'myWallets.wallets.hoursSingular',
+    defaultMessage: '!!!hour',
+  },
+  hoursPlural: {
+    id: 'myWallets.wallets.hoursPlural',
+    defaultMessage: '!!!hours',
+  },
+  addressSingular: {
+    id: 'myWallets.wallets.addressSingular',
+    defaultMessage: '!!!address',
+  },
+  addressPlural: {
+    id: 'myWallets.wallets.addressPlural',
+    defaultMessage: '!!!addresses',
+  },
+});
+
 type Props = InjectedProps
 
 @observer
 export default class MyWalletsPage extends Component<Props> {
+
+  static contextTypes = {
+    intl: intlShape.isRequired,
+  };
 
   updateHideBalance = () => {
     this.props.actions.profile.updateHideBalance.trigger();
   }
 
   render() {
+    const { intl } = this.context;
     const { wallets } = this.props.stores.substores.ada;
     const { actions, stores } = this.props;
     const { profile } = stores;
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
     const topbarContainer = (<TopBarContainer actions={actions} stores={stores} />);
 
+    const lastSyncHours = 3;
+
     const walletSumDetails = (
       <WalletDetails
-        text="Last sync: 3 hours ago"
+        text={
+          intl.formatMessage(messages.lastSyncMessage, {
+            hours: `${lastSyncHours} ${
+              intl.formatMessage(lastSyncHours > 1 ?
+                messages.hoursPlural : messages.hoursSingular)}`
+          })
+        }
         publicDeriver={wallets.selected}
         formattedWalletAmount={formattedWalletAmount}
         // TODO: This should be probably bound to an individual wallet
@@ -43,10 +95,21 @@ export default class MyWalletsPage extends Component<Props> {
         shouldHideBalance={profile.shouldHideBalance}
       />
     );
+
+    const walletAddresses = [
+      'Ae45dPwUPEZMen5UdmKCeiNqCooMVBpDQbmhM1dtFSFigvbvDTZdF4nbdf4u3',
+      'Ae2tdPwUPEZMen5UdmKCeiNqCooMVBpDQbmhM1dtFSFigvbvDTZdF4nmt4s7'
+    ];
+
+    const addressesLength = walletAddresses.length;
 
     const walletDetails = (
       <WalletDetails
-        text="2 addresses"
+        text={
+          `${addressesLength} ${
+            intl.formatMessage(addressesLength > 1 ?
+              messages.addressPlural : messages.addressSingular)}`
+        }
         publicDeriver={wallets.selected}
         formattedWalletAmount={formattedWalletAmount}
         // TODO: This should be probably bound to an individual wallet
@@ -55,10 +118,9 @@ export default class MyWalletsPage extends Component<Props> {
       />
     );
 
-    const walletAddresses = (
+    const walletAddressesComp = (
       <>
-        <WalletAddress hash="Ae45dPwUPEZMen5UdmKCeiNqCooMVBpDQbmhM1dtFSFigvbvDTZdF4nbdf4u3" />
-        <WalletAddress hash="Ae2tdPwUPEZMen5UdmKCeiNqCooMVBpDQbmhM1dtFSFigvbvDTZdF4nmt4s7" />
+        {walletAddresses.map((address) => <WalletAddress hash={address} />)}
       </>
     );
 
@@ -99,15 +161,15 @@ export default class MyWalletsPage extends Component<Props> {
     const staticWallets = [
       {
         walletType: 'conceptual',
-        walletTypeName: 'Conceptual Wallet'
+        walletTypeName: intl.formatMessage(messages.conceptualWallet),
       },
       {
         walletType: 'paper',
-        walletTypeName: 'Paper Wallet'
+        walletTypeName: intl.formatMessage(messages.paperWallet),
       },
       {
         walletType: 'trezor',
-        walletTypeName: 'Trezor Wallet'
+        walletTypeName: intl.formatMessage(messages.trezorWallet),
       },
     ];
 
@@ -116,7 +178,7 @@ export default class MyWalletsPage extends Component<Props> {
         publicDeriver={wallets.selected}
         walletDetails={walletDetails}
         walletNumber={1}
-        walletAddresses={walletAddresses}
+        walletAddresses={walletAddressesComp}
         walletCurrencies={walletCurrencies}
       />
     );
@@ -147,8 +209,7 @@ export default class MyWalletsPage extends Component<Props> {
         stores={stores}
         connectionErrorType={checkAdaServerStatus}
       >
-        {/* TODO: i18n */}
-        <MyWallets pageTitle="My wallets">
+        <MyWallets pageTitle={intl.formatMessage(messages.title)}>
           {walletsList}
         </MyWallets>
       </MainLayout>
