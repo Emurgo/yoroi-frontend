@@ -47,6 +47,7 @@
 
 .plateSection {
     @extend .nameSection;
+    padding-left: 0;
 }
 
 .expandedCurrencySection {
@@ -61,6 +62,19 @@
     border-radius: 0 0 8px 8px;
     & .section {
         border-right-color: #DFE3EB;
+    }
+    & .contentHead {
+        display: flex;
+    }
+    & .walletNumber {
+        margin-right: 44px;
+        color: #6B7384;
+        font-size: 14px;
+        line-height: 22px;
+    }
+    & .contentBody {
+        margin-top: 30px;
+        padding-left: 6px;
     }
 }
 
@@ -82,15 +96,4 @@
     &:hover {
         cursor: pointer;
     }
-}
-
-.contentHead {
-    display: flex;
-}
-
-.walletNumber {
-    margin-right: 44px;
-    color: #6B7384;
-    font-size: 14px;
-    line-height: 22px;
 }

@@ -23,6 +23,8 @@ type Props = {|
     +walletDetails: Node,
     +walletTypeName: string,
     +publicDeriver: null | PublicDeriverWithCachedMeta,
+    +walletNumber: number,
+    +walletAddresses: Node,
 |};
 
 type State = {
@@ -49,7 +51,9 @@ export default class WalletRow extends Component<Props, State> {
       walletType,
       walletTypeName,
       walletSumDetails,
-      walletDetails
+      walletDetails,
+      walletNumber,
+      walletAddresses,
     } = this.props;
 
     const walletName = publicDeriver ? publicDeriver.conceptualWalletName : '';
@@ -109,7 +113,7 @@ export default class WalletRow extends Component<Props, State> {
           <div className={styles.expandContent}>
             <div className={styles.contentHead}>
               <div className={styles.plateSection}>
-                <p className={styles.walletNumber}>1</p>
+                <p className={styles.walletNumber}>{walletNumber}</p>
                 <WalletPlate walletName={walletName} publicDeriver={publicDeriver} />
               </div>
               <div className={styles.detailsSection}>
@@ -118,6 +122,9 @@ export default class WalletRow extends Component<Props, State> {
               <div className={styles.expandedCurrencySection}>
                 {currencySection}
               </div>
+            </div>
+            <div className={styles.contentBody}>
+              {walletAddresses}
             </div>
           </div>
         ) : null}

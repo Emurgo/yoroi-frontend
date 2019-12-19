@@ -13,6 +13,7 @@ import TopBarContainer from '../TopBarContainer';
 import WalletsList from '../../components/wallet/my-wallets/WalletsList';
 import WalletRow from '../../components/wallet/my-wallets/WalletRow';
 import WalletDetails from '../../components/wallet/my-wallets/WalletDetails';
+import WalletAddress from '../../components/wallet/my-wallets/WalletAddress';
 
 type Props = InjectedProps
 
@@ -52,6 +53,13 @@ export default class MyWalletsPage extends Component<Props> {
       />
     );
 
+    const walletAddresses = (
+      <>
+        <WalletAddress hash="Ae45dPwUPEZMen5UdmKCeiNqCooMVBpDQbmhM1dtFSFigvbvDTZdF4nbdf4u3" />
+        <WalletAddress hash="Ae2tdPwUPEZMen5UdmKCeiNqCooMVBpDQbmhM1dtFSFigvbvDTZdF4nmt4s7" />
+      </>
+    );
+
     // TODO: Map this for all available wallets
     const walletsList = (
       <WalletsList>
@@ -61,6 +69,8 @@ export default class MyWalletsPage extends Component<Props> {
           publicDeriver={wallets.selected}
           walletSumDetails={walletSumDetails}
           walletDetails={walletDetails}
+          walletNumber={1}
+          walletAddresses={walletAddresses}
         />
         <WalletRow
           walletType="paper"
@@ -68,6 +78,8 @@ export default class MyWalletsPage extends Component<Props> {
           publicDeriver={wallets.selected}
           walletSumDetails={walletSumDetails}
           walletDetails={walletDetails}
+          walletNumber={1}
+          walletAddresses={walletAddresses}
         />
         <WalletRow
           walletType="trezor"
@@ -75,6 +87,8 @@ export default class MyWalletsPage extends Component<Props> {
           publicDeriver={wallets.selected}
           walletSumDetails={walletSumDetails}
           walletDetails={walletDetails}
+          walletNumber={1}
+          walletAddresses={walletAddresses}
         />
       </WalletsList>
     );
