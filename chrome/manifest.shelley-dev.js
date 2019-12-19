@@ -2,9 +2,6 @@
 
 import buildManifest from './manifest.template';
 import {
-  Ports,
-  portToPermission,
-  portToSocketPermission,
   Servers,
   serverToPermission,
 } from '../scripts/connections';

@@ -2,13 +2,9 @@
 
 import buildManifest from './manifest.template';
 import {
-  Ports,
-  portToPermission,
-  portToSocketPermission,
   Servers,
   serverToPermission,
 } from '../scripts/connections';
-import { SEIZA_URL, SEIZA_FOR_YOROI_URL } from './manifestEnvs';
 import {
   Version,
   genCSP,
