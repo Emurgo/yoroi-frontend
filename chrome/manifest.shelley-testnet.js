@@ -5,21 +5,21 @@ import {
   Servers,
   serverToPermission,
 } from '../scripts/connections';
-import { SEIZA_URL, SEIZA_FOR_YOROI_URL } from './manifestEnvs';
-import { Version } from './constants';
+import {
+  Version,
+  genCSP,
+} from './constants';
 
 export default buildManifest({
   description: 'A simple, secure and fast Cardano ADA wallet.',
   defaultTitle: 'Yoroi Shelley Testnet',
   titleOverride: true,
-  contentSecurityPolicy: [
-    `default-src 'self';`,
-    `frame-src ${SEIZA_FOR_YOROI_URL} ${SEIZA_URL} https://connect.trezor.io/ https://emurgo.github.io/yoroi-extension-ledger-bridge;`,
-    `script-src 'self' 'unsafe-eval' blob:;`,
-    `connect-src ${serverToPermission(Servers.ShelleyITN)};`,
-    `style-src * 'unsafe-inline' 'self' blob:;`,
-    `img-src 'self' data:;`,
-  ].join(' '),
+  contentSecurityPolicy: genCSP({
+    isDev: false,
+    additional: {
+      'connect-src': [serverToPermission(Servers.ShelleyITN)],
+    },
+  }),
   iconOverride: {
     /* eslint-disable quote-props */
     '16': 'img/shelley-16.png',
