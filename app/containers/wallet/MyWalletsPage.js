@@ -14,6 +14,8 @@ import WalletsList from '../../components/wallet/my-wallets/WalletsList';
 import WalletRow from '../../components/wallet/my-wallets/WalletRow';
 import WalletDetails from '../../components/wallet/my-wallets/WalletDetails';
 import WalletAddress from '../../components/wallet/my-wallets/WalletAddress';
+import WalletCurrency from '../../components/wallet/my-wallets/WalletCurrency';
+import WalletSubRow from '../../components/wallet/my-wallets/WalletSubRow';
 
 type Props = InjectedProps
 
@@ -60,36 +62,81 @@ export default class MyWalletsPage extends Component<Props> {
       </>
     );
 
-    // TODO: Map this for all available wallets
+    const walletSumCurrencies = (
+      <>
+        <WalletCurrency
+          currency="ADA"
+          tooltipText="1.320"
+        />
+        <WalletCurrency
+          currency="BTC"
+          tooltipText="0.060"
+        />
+        <WalletCurrency
+          currency="ETH"
+          tooltipText="3.132"
+        />
+      </>
+    );
+
+    const walletCurrencies = (
+      <>
+        <WalletCurrency
+          currency="ADA"
+          tooltipText="0.060"
+        />
+        <WalletCurrency
+          currency="BTC"
+          tooltipText="0.060"
+        />
+        <WalletCurrency
+          currency="ETH"
+          tooltipText="0.060"
+        />
+      </>
+    );
+
+    const staticWallets = [
+      {
+        walletType: 'conceptual',
+        walletTypeName: 'Conceptual Wallet'
+      },
+      {
+        walletType: 'paper',
+        walletTypeName: 'Paper Wallet'
+      },
+      {
+        walletType: 'trezor',
+        walletTypeName: 'Trezor Wallet'
+      },
+    ];
+
+    const walletSubRow = (
+      <WalletSubRow
+        publicDeriver={wallets.selected}
+        walletDetails={walletDetails}
+        walletNumber={1}
+        walletAddresses={walletAddresses}
+        walletCurrencies={walletCurrencies}
+      />
+    );
+
+    // TODO: Map this for all available wallets, not staticWallets
     const walletsList = (
       <WalletsList>
-        <WalletRow
-          walletType="conceptual"
-          walletTypeName="Conceptual Wallet"
-          publicDeriver={wallets.selected}
-          walletSumDetails={walletSumDetails}
-          walletDetails={walletDetails}
-          walletNumber={1}
-          walletAddresses={walletAddresses}
-        />
-        <WalletRow
-          walletType="paper"
-          walletTypeName="Paper Wallet"
-          publicDeriver={wallets.selected}
-          walletSumDetails={walletSumDetails}
-          walletDetails={walletDetails}
-          walletNumber={1}
-          walletAddresses={walletAddresses}
-        />
-        <WalletRow
-          walletType="trezor"
-          walletTypeName="Trezor Wallet"
-          publicDeriver={wallets.selected}
-          walletSumDetails={walletSumDetails}
-          walletDetails={walletDetails}
-          walletNumber={1}
-          walletAddresses={walletAddresses}
-        />
+        {
+          staticWallets.map((wallet) => {
+            return (
+              <WalletRow
+                walletType={wallet.walletType}
+                walletTypeName={wallet.walletTypeName}
+                walletSumDetails={walletSumDetails}
+                walletSumCurrencies={walletSumCurrencies}
+                walletSubRow={walletSubRow}
+              />
+            );
+          })
+        }
       </WalletsList>
     );
 

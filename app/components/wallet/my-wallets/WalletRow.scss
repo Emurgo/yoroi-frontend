@@ -38,44 +38,21 @@
 }
 
 .currencySection {
-    @extend .section;
+    display: flex;
+    align-items: center;
     flex: 1;
-    justify-content: space-between;
     padding-left: 24px;
     padding-right: 24px;
 }
 
-.plateSection {
-    @extend .nameSection;
-    padding-left: 0;
+.addSection {
+    @extend .section;
+    padding-left: 24px;
+    padding-right: 24px;
 }
 
-.expandedCurrencySection {
-    @extend .currencySection;
-    border-right: none;
-}
-
-.expandContent {
-    padding: 24px;
-    background-color: #FAFAFC;
+.contentBody {
     box-shadow: inset 0 -1px 10px 0 rgba(255,255,255,0.5), inset 0 2px 4px 0 rgba(56,57,61,0.2);
-    border-radius: 0 0 8px 8px;
-    & .section {
-        border-right-color: #DFE3EB;
-    }
-    & .contentHead {
-        display: flex;
-    }
-    & .walletNumber {
-        margin-right: 44px;
-        color: #6B7384;
-        font-size: 14px;
-        line-height: 22px;
-    }
-    & .contentBody {
-        margin-top: 30px;
-        padding-left: 6px;
-    }
 }
 
 .toggle {

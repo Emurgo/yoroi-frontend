@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import PublicDeriverWithCachedMeta from '../../../domain/PublicDeriverWithCachedMeta';
 
 import styles from './WalletRow.scss';
 
@@ -11,20 +10,16 @@ import ToggleIcon from '../../../assets/images/my-wallets/arrow_down.inline.svg'
 import ConceptualIcon from '../../../assets/images/my-wallets/conceptual_wallet.inline.svg';
 import PaperIcon from '../../../assets/images/my-wallets/paper_wallet.inline.svg';
 import TrezorIcon from '../../../assets/images/my-wallets/trezor_wallet.inline.svg';
-import SymbolADA from '../../../assets/images/my-wallets/symbol_ada.inline.svg';
 import PlusIcon from '../../../assets/images/my-wallets/icon_plus.inline.svg';
 
 import WalletName from './WalletName';
-import WalletPlate from './WalletPlate';
 
 type Props = {|
     +walletType: 'conceptual' | 'paper' | 'trezor',
     +walletSumDetails: Node,
-    +walletDetails: Node,
     +walletTypeName: string,
-    +publicDeriver: null | PublicDeriverWithCachedMeta,
-    +walletNumber: number,
-    +walletAddresses: Node,
+    +walletSumCurrencies:  Node,
+    +walletSubRow:  Node,
 |};
 
 type State = {
@@ -47,22 +42,12 @@ export default class WalletRow extends Component<Props, State> {
     const { isExpanded } = this.state;
 
     const {
-      publicDeriver,
       walletType,
       walletTypeName,
       walletSumDetails,
-      walletDetails,
-      walletNumber,
-      walletAddresses,
+      walletSumCurrencies,
+      walletSubRow,
     } = this.props;
-
-    const walletName = publicDeriver ? publicDeriver.conceptualWalletName : '';
-
-    const currencySection = (
-      <div>
-        <SymbolADA />
-      </div>
-    );
 
     let Icon;
 
@@ -93,7 +78,9 @@ export default class WalletRow extends Component<Props, State> {
             {walletSumDetails}
           </div>
           <div className={styles.currencySection}>
-            {currencySection}
+            {walletSumCurrencies}
+          </div>
+          <div className={styles.addSection}>
             <button
               type="button"
               className={styles.add}
@@ -109,25 +96,7 @@ export default class WalletRow extends Component<Props, State> {
             <ToggleIcon />
           </button>
         </div>
-        {isExpanded ? (
-          <div className={styles.expandContent}>
-            <div className={styles.contentHead}>
-              <div className={styles.plateSection}>
-                <p className={styles.walletNumber}>{walletNumber}</p>
-                <WalletPlate walletName={walletName} publicDeriver={publicDeriver} />
-              </div>
-              <div className={styles.detailsSection}>
-                {walletDetails}
-              </div>
-              <div className={styles.expandedCurrencySection}>
-                {currencySection}
-              </div>
-            </div>
-            <div className={styles.contentBody}>
-              {walletAddresses}
-            </div>
-          </div>
-        ) : null}
+        {isExpanded && (<div className={styles.contentBody}>{walletSubRow}</div>)}
       </div>
     );
   }

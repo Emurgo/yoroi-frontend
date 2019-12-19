@@ -1,0 +1,50 @@
+.content {
+    padding: 24px;
+    background-color: #FAFAFC;
+    border-radius: 0 0 8px 8px;
+}
+
+.section {
+    display: flex;
+    align-items: center;
+    border-right-color: #DFE3EB;
+}
+
+.contentHead {
+    display: flex;
+}
+
+.walletNumber {
+    margin-right: 44px;
+    color: #6B7384;
+    font-size: 14px;
+    line-height: 22px;
+}
+
+.contentBody {
+    margin-top: 30px;
+    padding-left: 6px;
+}
+
+.detailsSection {
+    @extend .section;
+    padding-left: 24px;
+    padding-right: 74px;
+    min-width: 250px;
+}
+
+.plateSection {
+    @extend .section;
+    padding-top: 13px;
+    padding-bottom: 13px;
+    padding-right: 70px;
+    min-width: 305px;
+}
+
+.currencySection {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    padding-left: 24px;
+    padding-right: 24px;
+}
