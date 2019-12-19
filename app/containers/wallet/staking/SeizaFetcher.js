@@ -112,9 +112,12 @@ export default class SeizaFetcher extends Component<Props> {
 
     return (
       <>
-        {delegationTxStore.createDelegationTx.isExecuting &&
+        {(
+          delegationTxStore.createDelegationTx.isExecuting ||
+          (delegationTx == null && this.selectedPools.length >= 1)
+        ) &&
           <Dialog
-            title={intl.formatMessage(globalMessages.errorLabel)}
+            title={intl.formatMessage(globalMessages.processingLabel)}
             closeOnOverlayClick={false}
             classicTheme={this.props.stores.profile.isClassicTheme}
             onClose={this.cancel}
@@ -143,7 +146,7 @@ export default class SeizaFetcher extends Component<Props> {
             </>
           </Dialog>
         }
-        {delegationTx != null && this.selectedPools.length >= 0 && showSignDialog &&
+        {delegationTx != null && this.selectedPools.length >= 1 && showSignDialog &&
           <DelegationTxDialog
             staleTx={delegationTxStore.isStale}
             poolName={this.selectedPools[0].name}
