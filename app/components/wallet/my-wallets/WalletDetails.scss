@@ -21,11 +21,11 @@
     font-family: var(--font-medium);
     font-size: 16px;
     line-height: 20px;
-    color: #242838;
+    color: var(--theme-mywallets-main-text-color);
 }
 
 .afterDecimal {
-    color: rgba(36,40,56,0.5);
+    color: var(--theme-mywallets-ada-amount-decimal-color);
     font-size: 12px;
 }
 
@@ -33,5 +33,5 @@
     font-size: 14px;
     line-height: 22px;
     margin-top: 2px;
-    color: #6B7384;
+    color: var(--theme-mywallets-secondary-text-color);
 }

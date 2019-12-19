@@ -14,14 +14,14 @@
 .content {
     display: none;
     width: 50px;
-    background-color: rgba(56, 57, 61, 0.7);
+    background-color: var(--theme-mywallets-tooltip-background-color);
     border-radius: 4px;
     padding: 2px 6px;
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
     top: 38px;
-    color: #FFFFFF;
+    color: var(--theme-mywallets-tooltip-text-color);
     font-size: 12px;
     line-height: 22px;
     text-align: center;
@@ -32,7 +32,7 @@
         height: 0;
         border-style: solid;
         border-width: 0 5px 3px 5px;
-        border-color: transparent transparent rgba(56, 57, 61, 0.7) transparent;
+        border-color: transparent transparent var(--theme-mywallets-tooltip-background-color) transparent;
         top: -3px;
         left: 0;
         right: 0;

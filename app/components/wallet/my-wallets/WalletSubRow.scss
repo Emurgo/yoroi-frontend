@@ -1,13 +1,11 @@
 .content {
     padding: 24px;
-    background-color: #FAFAFC;
-    border-radius: 0 0 8px 8px;
 }
 
 .section {
     display: flex;
     align-items: center;
-    border-right-color: #DFE3EB;
+    border-right: 1px solid var(--theme-mywallets-separator-dark-color);
 }
 
 .contentHead {
@@ -16,7 +14,7 @@
 
 .walletNumber {
     margin-right: 44px;
-    color: #6B7384;
+    color: var(--theme-mywallets-secondary-text-color);
     font-size: 14px;
     line-height: 22px;
 }
