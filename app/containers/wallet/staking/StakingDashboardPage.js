@@ -100,7 +100,10 @@ export default class StakingDashboardPage extends Component<Props, State> {
 
     const getTimeBasedElements = this.getTimeBasedElements();
 
-    const stakePools = this.getStakePools();
+    const errorIfPresent = this.getErrorInFetch();
+    const stakePools = errorIfPresent == null
+      ? this.getStakePools()
+      : errorIfPresent;
 
     const { getThemeVars } = this.props.stores.profile;
     return (
@@ -114,15 +117,17 @@ export default class StakingDashboardPage extends Component<Props, State> {
             ? undefined
             : hideOrFormat(publicDeriver.amount)
           }
-          totalRewards={delegationStore.getDelegatedBalance.result == null
-            ? undefined
-            : hideOrFormat(
-              delegationStore.getDelegatedBalance.result
-                .accountPart
-                .dividedBy(LOVELACES_PER_ADA)
-            )}
+          totalRewards={
+            delegationStore.getDelegatedBalance.result == null || errorIfPresent != null
+              ? undefined
+              : hideOrFormat(
+                delegationStore.getDelegatedBalance.result
+                  .accountPart
+                  .dividedBy(LOVELACES_PER_ADA)
+              )
+          }
           totalDelegated={
-            delegationStore.getDelegatedBalance.result == null
+            delegationStore.getDelegatedBalance.result == null || errorIfPresent != null
               ? undefined
               : hideOrFormat(
                 delegationStore.getDelegatedBalance.result.utxoPart.plus(
@@ -430,11 +435,24 @@ export default class StakingDashboardPage extends Component<Props, State> {
     };
   }
 
-  getStakePools: void => {| error: LocalizableError, |} | {| pools: null | Array<Node> |} = () => {
+  getErrorInFetch: void => void | {| error: LocalizableError, |} = () => {
     const delegationStore = this.props.stores.substores[environment.API].delegation;
     if (delegationStore.error != null) {
       return { error: delegationStore.error };
     }
+    const keyState = delegationStore.stakingKeyState;
+    if (
+      keyState &&
+      keyState.state.delegation.pools.length === 0 &&
+      delegationStore.getCurrentDelegation.result != null
+    ) {
+      return { error: new GetPoolInfoApiError() };
+    }
+    return undefined;
+  }
+
+  getStakePools: void => {| pools: null | Array<Node> |} = () => {
+    const delegationStore = this.props.stores.substores[environment.API].delegation;
     if (
       !delegationStore.getCurrentDelegation.wasExecuted ||
       delegationStore.getCurrentDelegation.isExecuting
@@ -445,12 +463,6 @@ export default class StakingDashboardPage extends Component<Props, State> {
       return { pools: [] };
     }
     const keyState = delegationStore.stakingKeyState;
-    if (
-      keyState.state.delegation.pools.length === 0 &&
-      delegationStore.getCurrentDelegation.result != null
-    ) {
-      return { error: new GetPoolInfoApiError() };
-    }
     const { intl } = this.context;
     return {
       pools: keyState.state.delegation.pools.map(pool => {
