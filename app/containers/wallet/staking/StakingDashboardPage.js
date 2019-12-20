@@ -105,6 +105,10 @@ export default class StakingDashboardPage extends Component<Props, State> {
       ? this.getStakePools()
       : errorIfPresent;
 
+    const showRewardAmount = delegationStore.getCurrentDelegation.wasExecuted &&
+      delegationStore.getCurrentDelegation.result != null &&
+      delegationStore.getDelegatedBalance.wasExecuted &&
+      errorIfPresent == null;
     const { getThemeVars } = this.props.stores.profile;
     return (
       <StakingDashboard
@@ -118,7 +122,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
             : hideOrFormat(publicDeriver.amount)
           }
           totalRewards={
-            delegationStore.getDelegatedBalance.result == null || errorIfPresent != null
+            !showRewardAmount || delegationStore.getDelegatedBalance.result == null
               ? undefined
               : hideOrFormat(
                 delegationStore.getDelegatedBalance.result
@@ -127,7 +131,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
               )
           }
           totalDelegated={
-            delegationStore.getDelegatedBalance.result == null || errorIfPresent != null
+            !showRewardAmount || delegationStore.getDelegatedBalance.result == null
               ? undefined
               : hideOrFormat(
                 delegationStore.getDelegatedBalance.result.utxoPart.plus(
