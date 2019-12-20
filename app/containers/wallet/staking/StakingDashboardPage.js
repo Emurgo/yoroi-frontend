@@ -16,6 +16,8 @@ import environment from '../../../environment';
 import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
 import { digetForHash } from '../../../api/ada/lib/storage/database/primitives/api/utils';
 import { handleExternalLinkClick } from '../../../utils/routing';
+import { GetPoolInfoApiError } from '../../../api/ada/errors';
+import LocalizableError from '../../../i18n/LocalizableError';
 
 import { formattedWalletAmount } from '../../../utils/formatters';
 
@@ -428,55 +430,66 @@ export default class StakingDashboardPage extends Component<Props, State> {
     };
   }
 
-  getStakePools: void => null | Array<Node> = () => {
+  getStakePools: void => {| error: LocalizableError, |} | {| pools: null | Array<Node> |} = () => {
     const delegationStore = this.props.stores.substores[environment.API].delegation;
+    if (delegationStore.error != null) {
+      return { error: delegationStore.error };
+    }
     if (
       !delegationStore.getCurrentDelegation.wasExecuted ||
       delegationStore.getCurrentDelegation.isExecuting
     ) {
-      return null;
+      return { pools: null };
     }
     if (delegationStore.stakingKeyState == null) {
-      return [];
+      return { pools: [] };
     }
     const keyState = delegationStore.stakingKeyState;
+    if (
+      keyState.state.delegation.pools.length === 0 &&
+      delegationStore.getCurrentDelegation.result != null
+    ) {
+      return { error: new GetPoolInfoApiError() };
+    }
     const { intl } = this.context;
-    return keyState.state.delegation.pools.map(pool => {
-      const meta = keyState.poolInfo.get(pool[0]);
-      if (meta == null) {
-        throw new Error(`${nameof(this.getStakePools)} no meta for ${pool[0]}`);
-      }
-      const name = meta.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel);
-
-      const moreInfo = meta.info?.homepage != null
-        ? {
-          openPoolPage: handleExternalLinkClick,
-          url: meta.info.homepage,
+    return {
+      pools: keyState.state.delegation.pools.map(pool => {
+        const meta = keyState.poolInfo.get(pool[0]);
+        if (meta == null) {
+          throw new Error(`${nameof(this.getStakePools)} no meta for ${pool[0]}`);
         }
-        : undefined;
+        const name = meta.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel);
 
-      // TODO: implement this eventually
-      const stakePoolMeta = {
-        // percentage: '30',
-        // fullness: '18',
-        // margins: '12',
-        // created: '29/02/2019 12:42:41 PM',
-        // cost: '12,688.00000',
-        // stake: '9,688.00000',
-        // pledge: '85.567088',
-        // rewards: '81.000088',
-        // age: '23',
-      };
-      return (
-        <StakePool
-          poolName={name}
-          key={digetForHash(JSON.stringify(meta), 0)}
-          data={stakePoolMeta}
-          hash={pool[0]}
-          moreInfo={moreInfo}
-          classicTheme={this.props.stores.profile.isClassicTheme}
-        />
-      );
-    });
+        const moreInfo = meta.info?.homepage != null
+          ? {
+            openPoolPage: handleExternalLinkClick,
+            url: meta.info.homepage,
+          }
+          : undefined;
+
+        // TODO: implement this eventually
+        const stakePoolMeta = {
+          // percentage: '30',
+          // fullness: '18',
+          // margins: '12',
+          // created: '29/02/2019 12:42:41 PM',
+          // cost: '12,688.00000',
+          // stake: '9,688.00000',
+          // pledge: '85.567088',
+          // rewards: '81.000088',
+          // age: '23',
+        };
+        return (
+          <StakePool
+            poolName={name}
+            key={digetForHash(JSON.stringify(meta), 0)}
+            data={stakePoolMeta}
+            hash={pool[0]}
+            moreInfo={moreInfo}
+            classicTheme={this.props.stores.profile.isClassicTheme}
+          />
+        );
+      })
+    };
   }
 }
