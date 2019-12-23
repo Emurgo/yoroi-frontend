@@ -127,7 +127,7 @@
   "noticeBoard.notice.poolToRetire.subMessage": "To continue getting rewards you can delegate your stake to other pool",
   "noticeBoard.notice.noRewardForUndelegation.title": "You have not received any rewards for passed epoch",
   "noticeBoard.notice.noRewardForUndelegation.subMessage": "As two epochs ago you have undelegated from everything",
-  "noticeBoard.topbar.title": "Notification",
+  "noticeBoard.topbar.title": "通知",
   "profile.languageSelect.detail1": "Currently, this version allows you to verify that",
   "profile.languageSelect.detail2": "your balance was correctly taken into consideration during the first snapshot.",
   "profile.languageSelect.form.languageSelectLabel": "请选择您的语言",
