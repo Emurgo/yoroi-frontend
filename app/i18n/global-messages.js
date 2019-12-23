@@ -401,6 +401,14 @@ const globalMessages = defineMessages({
     id: 'settings.paperWallet.dialog.createPaper.done',
     defaultMessage: '!!!All done!',
   },
+  dateToday: {
+    id: 'wallet.summary.page.todayLabel',
+    defaultMessage: '!!!Today',
+  },
+  dateYesterday: {
+    id: 'wallet.summary.page.yesterdayLabel',
+    defaultMessage: '!!!Yesterday',
+  },
   legacyAttentionText: {
     id: 'transfer.instructions.attention.legacy',
     defaultMessage: '!!!Legacy wallets created during the Byron-era (before November 29th, 2019) can no longer be used. However, you can transfer your legacy funds to your current wallet to access your funds.',
@@ -446,6 +454,10 @@ const globalMessages = defineMessages({
   marginsLabel: {
     id: 'wallet.dashboard.stakePool.margins',
     defaultMessage: '!!!Margins',
+  },
+  loadMoreButtonLabel: {
+    id: 'global.labels.loadMore',
+    defaultMessage: '!!!Load more',
   },
   unknownPoolLabel: {
     id: 'wallet.staking.pool.unknownLabel',

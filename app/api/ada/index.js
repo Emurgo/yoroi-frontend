@@ -1,4 +1,5 @@
 // @flow
+import moment from 'moment'; // TODO remove
 import BigNumber from 'bignumber.js';
 import type { lf$Database } from 'lovefield';
 import {
@@ -100,6 +101,7 @@ import {
 import type {
   LedgerSignTxPayload,
 } from '../../domain/HWSignTx';
+import Notice from '../../domain/Notice';
 import type { $CardanoSignTransaction } from 'trezor-connect/lib/types/cardano';
 import {
   createTrezorSignTxPayload,
@@ -285,6 +287,18 @@ export type RefreshPendingTransactionsResponse = Array<WalletTransaction>;
 export type RefreshPendingTransactionsFunc = (
   request: RefreshPendingTransactionsRequest
 ) => Promise<RefreshPendingTransactionsResponse>;
+
+// notices
+export type GetNoticesRequestOptions = GetTransactionsRequestOptions;
+
+export type GetNoticesResponse = {
+  notices: Array<Notice>,
+  total: number,
+};
+
+export type GetNoticesFunc = (
+  request: GetNoticesRequestOptions
+) => Promise<GetNoticesResponse>;
 
 // createWallet
 
@@ -737,6 +751,45 @@ export default class AdaApi {
       return mappedTransactions;
     } catch (error) {
       Logger.error('AdaApi::refreshPendingTransactions error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  async getNotices(
+    request: GetNoticesRequestOptions
+  ): Promise<GetNoticesResponse> {
+    Logger.debug('AdaApi::getNotices called: ' + stringifyData(request));
+    try {
+      let next = 0;
+      const dummyNotices =  [
+        new Notice({ id: (next++).toString(), kind: 2, date: new Date() }),
+        new Notice({ id: (next++).toString(), kind: 0, date: moment().subtract(1, 'seconds').toDate() }),
+        new Notice({ id: (next++).toString(), kind: 1, date: moment().subtract(5, 'seconds').toDate() }),
+        new Notice({ id: (next++).toString(), kind: 2, date: moment().subtract(40, 'seconds').toDate() }),
+        new Notice({ id: (next++).toString(), kind: 3, date: moment().subtract(1, 'minutes').toDate() }),
+        new Notice({ id: (next++).toString(), kind: 4, date: moment().subtract(2, 'minutes').toDate() }),
+        new Notice({ id: (next++).toString(), kind: 5, date: moment().subtract(5, 'minutes').toDate() }),
+        new Notice({ id: (next++).toString(), kind: 6, date: moment().subtract(15, 'minutes').toDate() }),
+        new Notice({ id: (next++).toString(), kind: 7, date: moment().subtract(30, 'minutes').toDate() }),
+        new Notice({ id: (next++).toString(), kind: 7, date: moment().subtract(88, 'minutes').toDate() }),
+        new Notice({ id: (next++).toString(), kind: 0, date: moment().subtract(10, 'hours').toDate() }),
+        new Notice({ id: (next++).toString(), kind: 3, date: moment().subtract(1, 'days').toDate() }),
+        new Notice({ id: (next++).toString(), kind: 4, date: moment().subtract(1, 'days').toDate() }),
+        new Notice({ id: (next++).toString(), kind: 1, date: new Date(2019, 11, 5, 10, 15, 20) }),
+        new Notice({ id: (next++).toString(), kind: 5, date: new Date(2019, 11, 5, 8, 20, 20) }),
+        new Notice({ id: (next++).toString(), kind: 3, date: new Date(2019, 11, 4, 2, 15, 20) }),
+        new Notice({ id: (next++).toString(), kind: 7, date: new Date(2019, 11, 4, 10, 40, 20) }),
+        new Notice({ id: (next++).toString(), kind: 6, date: new Date(2019, 11, 4, 18, 55, 29) }),
+        new Notice({ id: (next++).toString(), kind: 0, date: new Date(2019, 11, 2, 10, 45, 20) }),
+        new Notice({ id: (next++).toString(), kind: 7, date: new Date(2019, 11, 1, 10, 18, 20) }),
+      ];
+      const { skip = 0, limit } = request;
+      return {
+        notices: dummyNotices.slice(skip, limit),
+        total: dummyNotices.length
+      };
+    } catch (error) {
+      Logger.error('AdaApi::getNotices error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }

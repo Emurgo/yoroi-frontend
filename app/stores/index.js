@@ -6,6 +6,7 @@ import WalletBackupStore from './toplevel/WalletBackupStore';
 import TopbarStore from './toplevel/TopbarStore';
 import UiDialogsStore from './toplevel/UiDialogsStore';
 import UiNotificationsStore from './toplevel/UiNotificationsStore';
+import NoticeBoardStore from './toplevel/NoticeBoardStore';
 import LoadingStore from './toplevel/LoadingStore';
 import setupAdaStores from './ada/index';
 import type { AdaStoresMap } from './ada/index';
@@ -22,6 +23,7 @@ const storeClasses = {
   walletBackup: WalletBackupStore,
   uiDialogs: UiDialogsStore,
   uiNotifications: UiNotificationsStore,
+  noticeBoard: NoticeBoardStore,
   loading: LoadingStore,
 };
 
@@ -32,6 +34,7 @@ export type StoresMap = {|
   walletBackup: WalletBackupStore,
   uiDialogs: UiDialogsStore,
   uiNotifications: UiNotificationsStore,
+  noticeBoard: NoticeBoardStore,
   loading: LoadingStore,
 
   substores: { ada: AdaStoresMap },
@@ -47,6 +50,7 @@ const stores = observable({
   walletBackup: null,
   uiDialogs: null,
   uiNotifications: null,
+  noticeBoard: null,
   loading: null,
 
   substores: {},
