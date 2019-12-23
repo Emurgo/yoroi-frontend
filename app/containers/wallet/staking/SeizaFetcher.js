@@ -13,6 +13,7 @@ import AnnotatedLoader from '../../../components/transfer/AnnotatedLoader';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
 import Dialog from '../../../components/widgets/Dialog';
 import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
+import DelegationSuccessDialog from '../../../components/wallet/staking/DelegationSuccessDialog';
 import globalMessages from '../../../i18n/global-messages';
 import InvalidURIImg from '../../../assets/images/uri/invalid-uri.inline.svg';
 import {
@@ -105,11 +106,18 @@ export default class SeizaFetcher extends Component<Props> {
       return result;
     };
 
+    const showSignDialog = delegationTxStore.signAndBroadcastDelegationTx.isExecuting ||
+      !delegationTxStore.signAndBroadcastDelegationTx.wasExecuted ||
+      delegationTxStore.signAndBroadcastDelegationTx.error;
+
     return (
       <>
-        {delegationTxStore.createDelegationTx.isExecuting &&
+        {(
+          delegationTxStore.createDelegationTx.isExecuting ||
+          (delegationTx == null && this.selectedPools.length >= 1)
+        ) &&
           <Dialog
-            title={intl.formatMessage(globalMessages.errorLabel)}
+            title={intl.formatMessage(globalMessages.processingLabel)}
             closeOnOverlayClick={false}
             classicTheme={this.props.stores.profile.isClassicTheme}
             onClose={this.cancel}
@@ -138,12 +146,12 @@ export default class SeizaFetcher extends Component<Props> {
             </>
           </Dialog>
         }
-        {delegationTx != null &&
+        {delegationTx != null && this.selectedPools.length >= 1 && showSignDialog &&
           <DelegationTxDialog
             staleTx={delegationTxStore.isStale}
             poolName={this.selectedPools[0].name}
             poolHash={this.selectedPools[0].poolHash}
-            transactionFee={getShelleyTxFee(delegationTx.IOs, false)}
+            transactionFee={getShelleyTxFee(delegationTx.IOs, true)}
             amountToDelegate={delegationTxStore.amountToDelegate}
             approximateReward={approximateReward(delegationTxStore.amountToDelegate)}
             isSubmitting={
@@ -156,6 +164,12 @@ export default class SeizaFetcher extends Component<Props> {
             classicTheme={profile.isClassicTheme}
             error={delegationTxStore.signAndBroadcastDelegationTx.error}
             selectedExplorer={stores.profile.selectedExplorer}
+          />
+        }
+        {delegationTx != null && !showSignDialog &&
+          <DelegationSuccessDialog
+            onClose={() => delegationTxActions.complete.trigger()}
+            classicTheme={profile.isClassicTheme}
           />
         }
         <iframe ref={iframe => { this.iframe = iframe; }} title="Staking" src={`${stakingUrl}&locale=${profile.currentLocale}`} frameBorder="0" width="100%" height="100%" />

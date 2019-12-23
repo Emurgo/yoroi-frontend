@@ -20,7 +20,7 @@ import type {
   Address, Value, Addressing,
   IGetAllUtxosResponse
 } from '../../lib/storage/models/PublicDeriver/interfaces';
-import { generateAuthData, normalizeKey, } from './utils';
+import { generateAuthData, normalizeKey, generateFee, } from './utils';
 
 declare var CONFIG: ConfigType;
 
@@ -83,11 +83,7 @@ export function sendAllUnsignedTxFromUtxo(
     throw new NotEnoughMoneyToSendError();
   }
 
-  const feeAlgorithm = RustModule.WalletV3.Fee.linear_fee(
-    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.constant),
-    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.coefficient),
-    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.certificate),
-  );
+  const feeAlgorithm = generateFee();
   let fee;
   {
     // firts build a transaction to see what the cost would be
@@ -181,11 +177,7 @@ export function newAdaUnsignedTxFromUtxo(
   allUtxos: Array<RemoteUnspentOutput>,
   certificate: void | RustModule.WalletV3.Certificate,
 ): V3UnsignedTxUtxoResponse {
-  const feeAlgorithm = RustModule.WalletV3.Fee.linear_fee(
-    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.constant),
-    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.coefficient),
-    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.certificate),
-  );
+  const feeAlgorithm = generateFee();
 
   const ioBuilder = RustModule.WalletV3.InputOutputBuilder.empty();
   for (const output of outputs) {

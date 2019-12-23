@@ -25,7 +25,11 @@
     "linearFee": {
       "constant": "200000",
       "coefficient": "100000",
-      "certificate": "10000"
+      "certificate": "400000",
+      "per_certificate_fees": {
+        "certificate_pool_registration": "500000000",
+        "certificate_stake_delegation": "400000"
+      }
     },
     "genesisHash": "8e4d2a343f3dcf9330ad9035b3e8d168e6728904262f2c434a4f8f934ec7b676"
   }

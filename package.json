@@ -5,10 +5,12 @@
   "scripts": {
     "dev": "babel-node scripts/start --env 'development'",
     "shelley-dev": "babel-node scripts/start --env 'shelley-dev'",
+    "shelley-testnet": "babel-node scripts/build --env 'shelley-testnet'",
     "dev-mock-backend": "babel-node scripts/startWithMockServer.js",
     "build": "babel-node scripts/build",
     "compress": "babel-node scripts/compress",
     "compress-e2e-tests": "npm run compress -- --env 'test' --app-id 'yoroi' --codebase 'https://yoroiwallet.com/dw/yoroi-test-extension.crx' --key ./e2etest-key.pem",
+    "build-compress:shelley": "npm run build -- --env 'shelley-testnet' && npm run compress -- --env 'shelley-testnet' --app-id 'yoroi' --zip-only --codebase 'https://yoroiwallet.com/dw/yoroi-extension.crx' --key ./shelley-production.pem",
     "build-compress:production": "npm run build -- --env 'mainnet' && npm run compress -- --env 'mainnet' --app-id 'yoroi' --zip-only --codebase 'https://yoroiwallet.com/dw/yoroi-extension.crx' --key ./production-key.pem",
     "build-compress-crx:production": "npm run build -- --env 'mainnet' && npm run compress -- --env 'mainnet' --app-id 'yoroi' --codebase 'https://yoroiwallet.com/dw/yoroi-extension.crx' --key ./production-key.pem",
     "build-compress": "npm run build -- --env ${CARDANO_NETWORK:-testnet} && npm run compress -- --env ${CARDANO_NETWORK:-testnet} --app-id yoroi-${CARDANO_NETWORK:-testnet} --zip-only --codebase https://yoroiwallet.com/dw/yoroi-${CARDANO_NETWORK:-testnet}-extension.crx",

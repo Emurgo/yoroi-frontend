@@ -38,15 +38,23 @@ export default class StakingPage extends Component<Props> {
   };
 
   getBrowserReplacement(): string {
-    if (environment.userAgentInfo.isFirefox) {
-      return 'firefox';
-    }
-    // otherwise assume Chrome
+    // 1) handle Yoroi running as an extension
+
     if (environment.userAgentInfo.isExtension) {
+      if (environment.userAgentInfo.isFirefox) {
+        return 'firefox&mozId=' + location.hostname;
+      }
+      // otherwise assume Chrome
       return 'chrome&chromeId=' + chrome.runtime.id;
     }
-    // return 'chrome';
-    throw new Error('TODO: support staking page on browser builds');
+
+    // 2) Handle Yoroi running as a website
+
+    if (environment.userAgentInfo.isFirefox) {
+      return 'firefox&host' + location.host;
+    }
+    // otherwise assume Chrome
+    return 'chrome&chromeId=' + location.host;
   }
 
   prepareStakingURL(): null | string {
@@ -61,8 +69,10 @@ export default class StakingPage extends Component<Props> {
     if (!publicDeriver) {
       return null;
     }
-    // Seiza does not understand decimal places, so removing all Lovelaces
-    finalURL += `&userAda=${formattedAmountWithoutLovelace(publicDeriver.amount)}`;
+    if (publicDeriver.amount) {
+      // Seiza does not understand decimal places, so removing all Lovelaces
+      finalURL += `&userAda=${formattedAmountWithoutLovelace(publicDeriver.amount)}`;
+    }
 
     const delegation = this.props.stores.substores.ada.delegation.stakingKeyState;
     if (!delegation) {
@@ -79,7 +89,13 @@ export default class StakingPage extends Component<Props> {
     const { actions, stores } = this.props;
     const { intl } = this.context;
 
-    if (this.props.stores.substores.ada.transactions.hasAnyPending) {
+    const delegationTxStore = stores.substores[environment.API].delegationTransaction;
+
+    if (
+      !delegationTxStore.signAndBroadcastDelegationTx.isExecuting &&
+      !delegationTxStore.signAndBroadcastDelegationTx.wasExecuted &&
+      this.props.stores.substores.ada.transactions.hasAnyPending
+    ) {
       return (
         <VerticallyCenteredLayout>
           <InformativeError
@@ -98,6 +114,12 @@ export default class StakingPage extends Component<Props> {
         </VerticallyCenteredLayout>
       );
     }
-    return (<SeizaFetcher actions={actions} stores={stores} stakingUrl={url} />);
+    return (
+      <SeizaFetcher
+        actions={actions}
+        stores={stores}
+        stakingUrl={url}
+      />
+    );
   }
 }

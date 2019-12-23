@@ -1012,7 +1012,8 @@ async function networkTxToDbTx(
     return id;
   };
 
-  const mapped = newTxs.map(async networkTx => {
+  const result = [];
+  for (const networkTx of newTxs) {
     const { block, transaction } = networkTxHeaderToDb(
       networkTx,
       toAbsoluteSlotNumber,
@@ -1031,7 +1032,7 @@ async function networkTxToDbTx(
           firstInput: networkTx.inputs[0],
         }
       );
-    return {
+    result.push({
       block,
       transaction,
       certificate,
@@ -1107,10 +1108,10 @@ async function networkTxToDbTx(
           accountingOutputs,
         };
       },
-    };
-  });
+    });
+  }
 
-  return Promise.all(mapped);
+  return result;
 }
 
 async function markAllInputs(

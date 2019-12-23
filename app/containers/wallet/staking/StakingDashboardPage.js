@@ -16,6 +16,8 @@ import environment from '../../../environment';
 import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
 import { digetForHash } from '../../../api/ada/lib/storage/database/primitives/api/utils';
 import { handleExternalLinkClick } from '../../../utils/routing';
+import { GetPoolInfoApiError } from '../../../api/ada/errors';
+import LocalizableError from '../../../i18n/LocalizableError';
 
 import { formattedWalletAmount } from '../../../utils/formatters';
 
@@ -98,8 +100,15 @@ export default class StakingDashboardPage extends Component<Props, State> {
 
     const getTimeBasedElements = this.getTimeBasedElements();
 
-    const stakePools = this.getStakePools();
+    const errorIfPresent = this.getErrorInFetch();
+    const stakePools = errorIfPresent == null
+      ? this.getStakePools()
+      : errorIfPresent;
 
+    const showRewardAmount = delegationStore.getCurrentDelegation.wasExecuted &&
+      delegationStore.getCurrentDelegation.result != null &&
+      delegationStore.getDelegatedBalance.wasExecuted &&
+      errorIfPresent == null;
     const { getThemeVars } = this.props.stores.profile;
     return (
       <StakingDashboard
@@ -108,16 +117,21 @@ export default class StakingDashboardPage extends Component<Props, State> {
         stakePools={stakePools}
         epochProgress={getTimeBasedElements.epochProgress}
         userSummary={<UserSummary
-          totalAdaSum={hideOrFormat(publicDeriver.amount)}
-          totalRewards={delegationStore.getDelegatedBalance.result == null
+          totalAdaSum={publicDeriver.amount == null
             ? undefined
-            : hideOrFormat(
-              delegationStore.getDelegatedBalance.result
-                .accountPart
-                .dividedBy(LOVELACES_PER_ADA)
-            )}
+            : hideOrFormat(publicDeriver.amount)
+          }
+          totalRewards={
+            !showRewardAmount || delegationStore.getDelegatedBalance.result == null
+              ? undefined
+              : hideOrFormat(
+                delegationStore.getDelegatedBalance.result
+                  .accountPart
+                  .dividedBy(LOVELACES_PER_ADA)
+              )
+          }
           totalDelegated={
-            delegationStore.getDelegatedBalance.result == null
+            !showRewardAmount || delegationStore.getDelegatedBalance.result == null
               ? undefined
               : hideOrFormat(
                 delegationStore.getDelegatedBalance.result.utxoPart.plus(
@@ -425,55 +439,73 @@ export default class StakingDashboardPage extends Component<Props, State> {
     };
   }
 
-  getStakePools: void => null | Array<Node> = () => {
+  getErrorInFetch: void => void | {| error: LocalizableError, |} = () => {
+    const delegationStore = this.props.stores.substores[environment.API].delegation;
+    if (delegationStore.error != null) {
+      return { error: delegationStore.error };
+    }
+    const keyState = delegationStore.stakingKeyState;
+    if (
+      keyState &&
+      keyState.state.delegation.pools.length === 0 &&
+      delegationStore.getCurrentDelegation.result != null
+    ) {
+      return { error: new GetPoolInfoApiError() };
+    }
+    return undefined;
+  }
+
+  getStakePools: void => {| pools: null | Array<Node> |} = () => {
     const delegationStore = this.props.stores.substores[environment.API].delegation;
     if (
       !delegationStore.getCurrentDelegation.wasExecuted ||
       delegationStore.getCurrentDelegation.isExecuting
     ) {
-      return null;
+      return { pools: null };
     }
     if (delegationStore.stakingKeyState == null) {
-      return [];
+      return { pools: [] };
     }
     const keyState = delegationStore.stakingKeyState;
     const { intl } = this.context;
-    return keyState.state.delegation.pools.map(pool => {
-      const meta = keyState.poolInfo.get(pool[0]);
-      if (meta == null) {
-        throw new Error(`${nameof(this.getStakePools)} no meta for ${pool[0]}`);
-      }
-      const name = meta.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel);
-
-      const moreInfo = meta.info?.homepage != null
-        ? {
-          openPoolPage: handleExternalLinkClick,
-          url: meta.info.homepage,
+    return {
+      pools: keyState.state.delegation.pools.map(pool => {
+        const meta = keyState.poolInfo.get(pool[0]);
+        if (meta == null) {
+          throw new Error(`${nameof(this.getStakePools)} no meta for ${pool[0]}`);
         }
-        : undefined;
+        const name = meta.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel);
 
-      // TODO: implement this eventually
-      const stakePoolMeta = {
-        // percentage: '30',
-        // fullness: '18',
-        // margins: '12',
-        // created: '29/02/2019 12:42:41 PM',
-        // cost: '12,688.00000',
-        // stake: '9,688.00000',
-        // pledge: '85.567088',
-        // rewards: '81.000088',
-        // age: '23',
-      };
-      return (
-        <StakePool
-          poolName={name}
-          key={digetForHash(JSON.stringify(meta), 0)}
-          data={stakePoolMeta}
-          hash={pool[0]}
-          moreInfo={moreInfo}
-          classicTheme={this.props.stores.profile.isClassicTheme}
-        />
-      );
-    });
+        const moreInfo = meta.info?.homepage != null
+          ? {
+            openPoolPage: handleExternalLinkClick,
+            url: meta.info.homepage,
+          }
+          : undefined;
+
+        // TODO: implement this eventually
+        const stakePoolMeta = {
+          // percentage: '30',
+          // fullness: '18',
+          // margins: '12',
+          // created: '29/02/2019 12:42:41 PM',
+          // cost: '12,688.00000',
+          // stake: '9,688.00000',
+          // pledge: '85.567088',
+          // rewards: '81.000088',
+          // age: '23',
+        };
+        return (
+          <StakePool
+            poolName={name}
+            key={digetForHash(JSON.stringify(meta), 0)}
+            data={stakePoolMeta}
+            hash={pool[0]}
+            moreInfo={moreInfo}
+            classicTheme={this.props.stores.profile.isClassicTheme}
+          />
+        );
+      })
+    };
   }
 }

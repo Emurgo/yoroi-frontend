@@ -11,6 +11,9 @@ import WarningBox from '../../../widgets/WarningBox';
 import InformativeError from '../../../widgets/InformativeError';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
+import LocalizableError from '../../../../i18n/LocalizableError';
+import InvalidURIImg from '../../../../assets/images/uri/invalid-uri.inline.svg';
+import ErrorBlock from '../../../widgets/ErrorBlock';
 
 const messages = defineMessages({
   positionsLabel: {
@@ -34,7 +37,7 @@ const emptyDashboardMessages = defineMessages({
   },
   text: {
     id: 'wallet.dashboard.empty.text',
-    defaultMessage: '!!!Go to Simple or Advance Staking to choce what stake pool you want to delegate in. Note, you may delegate only to one stake pool in this Tesnnet'
+    defaultMessage: '!!!Go to Simple or Advance Staking to choose what stake pool you want to delegate in. Note, you may delegate only to one stake pool in this Tesnnet'
   }
 });
 
@@ -42,7 +45,7 @@ type Props = {|
   themeVars: Object,
   totalGraphData: Array<Object>,
   positionsGraphData: Array<Object>,
-  stakePools: null | Array<Node>,
+  stakePools: {| error: LocalizableError, |} | {| pools: null | Array<Node> |},
   epochProgress: Node,
   userSummary: Node,
   rewardPopup: void | Node,
@@ -121,14 +124,24 @@ export default class StakingDashboard extends Component<Props> {
 
   displayStakePools: void => Node = () => {
     const { intl } = this.context;
-    if (this.props.stakePools == null) {
+    if (this.props.stakePools.error) {
+      return (
+        <div className={styles.poolError}>
+          <center><InvalidURIImg /></center>
+          <ErrorBlock
+            error={this.props.stakePools.error}
+          />
+        </div>
+      );
+    }
+    if (this.props.stakePools.pools === null) {
       return (
         <VerticallyCenteredLayout>
           <LoadingSpinner />
         </VerticallyCenteredLayout>
       );
     }
-    if (this.props.stakePools.length === 0) {
+    if (this.props.stakePools.pools.length === 0) {
       return (
         <InformativeError
           title={intl.formatMessage(emptyDashboardMessages.title)}
@@ -139,7 +152,7 @@ export default class StakingDashboard extends Component<Props> {
     return (
       <div className={styles.bodyWrapper}>
         <div className={styles.stakePool}>
-          {this.props.stakePools}
+          {this.props.stakePools.pools}
         </div>
       </div>
     );

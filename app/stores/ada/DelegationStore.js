@@ -19,6 +19,7 @@ import type {
   AccountStateSuccess,
   RemotePoolMetaSuccess,
 } from '../../api/ada/lib/state-fetch/types';
+import LocalizableError from '../../i18n/LocalizableError';
 
 export default class DelegationStore extends Store {
 
@@ -27,6 +28,8 @@ export default class DelegationStore extends Store {
 
   @observable getCurrentDelegation: LocalizedRequest<GetCurrentDelegationFunc>
     = new LocalizedRequest<GetCurrentDelegationFunc>(getCurrentDelegation);
+
+  @observable error: LocalizableError | any;
 
   @observable stakingKeyState: void | {|
     state: AccountStateSuccess,
@@ -59,72 +62,79 @@ export default class DelegationStore extends Store {
       ],
       // $FlowFixMe error in mobx types
       async () => {
-        this.getDelegatedBalance.reset();
-        this.getCurrentDelegation.reset();
-        runInAction(() => {
-          this.stakingKeyState = undefined;
-        });
-
-        const publicDeriver = this.stores.substores.ada.wallets.selected;
-        if (publicDeriver == null) {
-          throw new Error(`${nameof(this._startWatch)} no public deriver selected`);
-        }
-        const withStakingKey = asGetAllAccounting(publicDeriver.self);
-        if (withStakingKey == null) {
-          throw new Error(`${nameof(this._startWatch)} missing staking key functionality`);
-        }
-
-        const stakingKeyResp = await withStakingKey.getStakingKey();
-
-        const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
-        const accountStateResp = await stateFetcher.getAccountState({
-          addresses: [stakingKeyResp.addr.Hash],
-        });
-        const stateForStakingKey = accountStateResp[stakingKeyResp.addr.Hash];
-
-        if (!stateForStakingKey.delegation) {
-          return runInAction(() => {
+        try {
+          this.getDelegatedBalance.reset();
+          this.getCurrentDelegation.reset();
+          runInAction(() => {
+            this.error = undefined;
             this.stakingKeyState = undefined;
-            throw new Error(`${nameof(this._startWatch)} stake key invalid - ${stateForStakingKey.comment}`);
           });
-        }
-        const poolInfoResp = await stateFetcher.getPoolInfo({
-          ids: stateForStakingKey.delegation.pools.map(delegation => delegation[0]),
-        });
-        const meta = new Map(stateForStakingKey.delegation.pools.map(delegation => {
-          const info = poolInfoResp[delegation[0]];
-          if (!info.history) {
+
+          const publicDeriver = this.stores.substores.ada.wallets.selected;
+          if (publicDeriver == null) {
+            throw new Error(`${nameof(this._startWatch)} no public deriver selected`);
+          }
+          const withStakingKey = asGetAllAccounting(publicDeriver.self);
+          if (withStakingKey == null) {
+            throw new Error(`${nameof(this._startWatch)} missing staking key functionality`);
+          }
+
+          const stakingKeyResp = await withStakingKey.getStakingKey();
+
+          const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+          const accountStateResp = await stateFetcher.getAccountState({
+            addresses: [stakingKeyResp.addr.Hash],
+          });
+          const stateForStakingKey = accountStateResp[stakingKeyResp.addr.Hash];
+
+          if (!stateForStakingKey.delegation) {
             return runInAction(() => {
               this.stakingKeyState = undefined;
-              throw new Error(`${nameof(this._startWatch)} pool info missing ${info.error}`);
+              throw new Error(`${nameof(this._startWatch)} stake key invalid - ${stateForStakingKey.comment}`);
             });
           }
-          return [delegation[0], info];
-        }));
-        runInAction(() => {
-          this.stakingKeyState = {
-            state: stateForStakingKey,
-            poolInfo: meta,
-          };
-        });
+          const poolInfoResp = await stateFetcher.getPoolInfo({
+            ids: stateForStakingKey.delegation.pools.map(delegation => delegation[0]),
+          });
+          const meta = new Map(stateForStakingKey.delegation.pools.map(delegation => {
+            const info = poolInfoResp[delegation[0]];
+            if (!info.history) {
+              return runInAction(() => {
+                this.stakingKeyState = undefined;
+                throw new Error(`${nameof(this._startWatch)} pool info missing ${info.error}`);
+              });
+            }
+            return [delegation[0], info];
+          }));
+          runInAction(() => {
+            this.stakingKeyState = {
+              state: stateForStakingKey,
+              poolInfo: meta,
+            };
+          });
 
-        const delegatedBalance = this.getDelegatedBalance.execute({
-          publicDeriver: withStakingKey,
-          accountState: stateForStakingKey,
-          stakingPubKey: stakingKeyResp.addr.Hash,
-        }).promise;
-        if (delegatedBalance == null) throw new Error('Should never happen');
+          const delegatedBalance = this.getDelegatedBalance.execute({
+            publicDeriver: withStakingKey,
+            accountState: stateForStakingKey,
+            stakingPubKey: stakingKeyResp.addr.Hash,
+          }).promise;
+          if (delegatedBalance == null) throw new Error('Should never happen');
 
-        const currentDelegation = this.getCurrentDelegation.execute({
-          publicDeriver: withStakingKey,
-          stakingKeyAddressId: stakingKeyResp.addr.AddressId,
-        }).promise;
-        if (currentDelegation == null) throw new Error('Should never happen');
+          const currentDelegation = this.getCurrentDelegation.execute({
+            publicDeriver: withStakingKey,
+            stakingKeyAddressId: stakingKeyResp.addr.AddressId,
+          }).promise;
+          if (currentDelegation == null) throw new Error('Should never happen');
 
-        await Promise.all([
-          delegatedBalance,
-          currentDelegation,
-        ]);
+          await Promise.all([
+            delegatedBalance,
+            currentDelegation,
+          ]);
+        } catch (e) {
+          runInAction(() => {
+            this.error = e;
+          });
+        }
       },
     );
   }
@@ -136,5 +146,6 @@ export default class DelegationStore extends Store {
     this.getDelegatedBalance.reset();
     this.getCurrentDelegation.reset();
     this.stakingKeyState = undefined;
+    this.error = undefined;
   }
 }

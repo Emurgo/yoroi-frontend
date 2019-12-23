@@ -69,6 +69,7 @@ export default class DelegationTransactionStore extends Store {
     const a = this.actions.ada.delegationTransaction;
     a.createTransaction.listen(this._createTransaction);
     a.signTransaction.listen(this._signTransaction);
+    a.complete.listen(this._complete);
     a.reset.listen(this.reset);
   }
 
@@ -162,7 +163,7 @@ export default class DelegationTransactionStore extends Store {
     if (result == null) {
       throw new Error(`${nameof(this._signTransaction)} no tx to broadcast`);
     }
-    this.signAndBroadcastDelegationTx.execute({
+    const broadcastTx = this.signAndBroadcastDelegationTx.execute({
       publicDeriver: basePubDeriver,
       signRequest: {
         certificate: result.certificate,
@@ -172,8 +173,16 @@ export default class DelegationTransactionStore extends Store {
       },
       password: request.password,
       sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
-    });
+    }).promise;
+    if (broadcastTx == null) throw new Error(`${nameof(this._signTransaction)} should never happen`);
+    await broadcastTx;
+  }
 
+  _complete: void => Promise<void> = async () => {
+    const publicDeriver = this.stores.substores.ada.wallets.selected;
+    if (publicDeriver == null) {
+      throw new Error(`${nameof(this._complete)} no public deriver selected`);
+    }
     this.actions.dialogs.closeActiveDialog.trigger();
     const { wallets } = this.stores.substores[environment.API];
     await wallets.refreshWallet(publicDeriver);

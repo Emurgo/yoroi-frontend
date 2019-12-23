@@ -36,6 +36,11 @@ export type GenesisConfigType = {|
     constant: string,
     coefficient: string,
     certificate: string,
+    per_certificate_fees?: {|
+      certificate_pool_registration?: string,
+      certificate_stake_delegation?: string,
+      certificate_owner_stake_delegation?: string,
+    |},
   |},
   /**
    * Reward for a single epoch

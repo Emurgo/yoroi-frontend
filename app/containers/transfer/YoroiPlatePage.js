@@ -10,7 +10,6 @@ import {
   generateStandardPlate,
 } from '../../api/ada/lib/cardanoCrypto/plate';
 import environment from '../../environment';
-import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import type { PlateResponse } from '../../api/ada/lib/cardanoCrypto/plate';
 import { TransferKind } from '../../types/TransferTypes';
 
