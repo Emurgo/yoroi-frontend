@@ -6,8 +6,8 @@
     "name": "shelley-dev"
   },
   "seiza": {
-    "simpleTemplate": "http://localhost:3001/staking-simple/list?sortBy=REVENUE&searchText=&performance[]=0&performance[]=100&source=$$BROWSER$$",
-    "advanceTemplate": "http://localhost:3001/staking/list?sortBy=REVENUE&searchText=&performance[]=0&performance[]=100&source=$$BROWSER$$"
+    "simpleTemplate": "http://localhost:3001/staking-simple/list?sortBy=RANDOM&searchText=&performance[]=0&performance[]=100&source=$$BROWSER$$",
+    "advanceTemplate": "http://localhost:3001/staking/list?sortBy=RANDOM&searchText=&performance[]=0&performance[]=100&source=$$BROWSER$$"
   },
   "app": {
     "walletRefreshInterval": 20000,
