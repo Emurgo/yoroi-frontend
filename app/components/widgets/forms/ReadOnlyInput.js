@@ -13,7 +13,7 @@ type Props = {|
   +label: string,
   +value: string,
   +isSet: boolean,
-  +onClick: Function,
+  +onClick: void => void,
   +classicTheme: boolean,
 |};
 

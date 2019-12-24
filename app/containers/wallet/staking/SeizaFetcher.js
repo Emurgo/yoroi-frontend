@@ -88,7 +88,7 @@ export default class SeizaFetcher extends Component<Props> {
     const dialogBackButton = [
       {
         label: intl.formatMessage(globalMessages.backButtonLabel),
-        onClick: () => this.cancel(),
+        onClick: this.cancel,
         primary: true,
       },
     ];

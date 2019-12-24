@@ -21,7 +21,7 @@ const messages = defineMessages({
 
 type Props = {|
   +localizedTermsOfUse: string,
-  +onSubmit: Function,
+  +onSubmit: void => void,
   +isSubmitting: boolean,
   +error?: ?LocalizableError,
 |};

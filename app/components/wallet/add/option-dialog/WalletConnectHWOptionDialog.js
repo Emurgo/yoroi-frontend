@@ -33,9 +33,9 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +onCancel: Function,
-  +onTrezor: Function,
-  +onLedger: Function,
+  +onCancel: void => void,
+  +onTrezor: void => void,
+  +onLedger: void => void,
   +classicTheme: boolean
 |};
 

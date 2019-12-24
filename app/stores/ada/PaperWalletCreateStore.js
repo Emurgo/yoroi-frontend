@@ -72,18 +72,18 @@ export default class PaperWalletCreateStore extends Store {
     this.progressInfo = ProgressStep.USER_PASSWORD;
   };
 
-  @action _submitUserPassword = async ({ userPassword }: { userPassword: string }) => {
+  @action _submitUserPassword = async ({ userPassword }: {| userPassword: string |}) => {
     if (this.userPassword != null) {
       throw new Error('User password is already initialized');
     }
     this.userPassword = userPassword;
     this.progressInfo = ProgressStep.CREATE;
-    this.actions.ada.paperWallets.createPaperWallet.trigger({});
+    this.actions.ada.paperWallets.createPaperWallet.trigger();
     // setTimeout is needed to fix:
     // https://github.com/Emurgo/yoroi-frontend/pull/584#pullrequestreview-249311058
     // createPdfDocument is heavyweight and blocking
     setTimeout(() => {
-      this.actions.ada.paperWallets.createPdfDocument.trigger({});
+      this.actions.ada.paperWallets.createPdfDocument.trigger();
     }, 0);
   };
 

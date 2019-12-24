@@ -46,8 +46,8 @@ const messages = defineMessages({
 type Props = {|
   +isActionProcessing: boolean,
   +error: ?LocalizableError,
-  +verify: Function,
-  +cancel: Function,
+  +verify: void => void,
+  +cancel: void => void,
   +selectedExplorer: ExplorerType,
   +isHardware: boolean,
   +walletAddress: string,

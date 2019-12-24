@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import BigNumber from 'bignumber.js';
 import classnames from 'classnames';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
@@ -48,12 +49,12 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +formattedWalletAmount: Function,
+  +formattedWalletAmount: BigNumber => string,
   +selectedExplorer: ExplorerType,
   +transferTx: TransferTx,
-  +onSubmit: Function,
+  +onSubmit: void => void,
   +isSubmitting: boolean,
-  +onCancel: Function,
+  +onCancel: void => void,
   +error: ?LocalizableError,
   +classicTheme: boolean
 |};

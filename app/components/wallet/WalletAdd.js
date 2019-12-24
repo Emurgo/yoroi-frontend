@@ -58,11 +58,11 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +onCreate: Function,
-  +onRestore: Function,
-  +onHardwareConnect: Function,
-  +onSettings: Function,
-  +onDaedalusTransfer: Function,
+  +onCreate: void => void,
+  +onRestore: void => void,
+  +onHardwareConnect: void => void,
+  +onSettings: void => void,
+  +onDaedalusTransfer: void => void,
   +classicTheme: boolean,
 |};
 

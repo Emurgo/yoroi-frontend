@@ -40,8 +40,8 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +onExternalLinkClick: Function,
-  +onDownloadLogs: Function,
+  +onExternalLinkClick: MouseEvent => void,
+  +onDownloadLogs: void => void,
 |};
 
 @observer

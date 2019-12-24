@@ -4,7 +4,7 @@ import CloseCross from '../../assets/images/close-cross.inline.svg';
 import styles from './DialogCloseButton.scss';
 
 type Props = {|
-  +onClose?: Function,
+  +onClose?: void => void,
   +icon?: ?string,
 |};
 

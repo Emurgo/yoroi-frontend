@@ -31,7 +31,7 @@ type Props = {|
   +isActionProcessing: ?boolean,
   +error: ?LocalizableError,
   +submit: void => void,
-  +cancel: Function,
+  +cancel: void => void,
   +classicTheme: boolean,
 |};
 

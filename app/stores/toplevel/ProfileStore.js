@@ -239,8 +239,8 @@ export default class ProfileStore extends Store {
   }
 
   @action
-  _updateTentativeLocale = ({ locale }: { locale: string }) => {
-    this.inMemoryLanguage = locale;
+  _updateTentativeLocale = (request: { locale: string }) => {
+    this.inMemoryLanguage = request.locale;
   };
 
   _updateLocale = async ({ locale }: { locale: string }) => {

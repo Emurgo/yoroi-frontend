@@ -12,6 +12,6 @@ export default class ProfileActions {
   updateSelectedExplorer: Action<{| explorer: ExplorerType |}> = new Action();
   updateTheme: Action<{| theme: string |}> = new Action();
   exportTheme: Action<void> = new Action();
-  commitLocaleToStorage: Action<{ locale: string }> = new Action();
+  commitLocaleToStorage: Action<{| locale: string |}> = new Action();
   updateHideBalance: Action<void> = new Action();
 }

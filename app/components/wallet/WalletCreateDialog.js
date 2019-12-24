@@ -42,8 +42,8 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +onSubmit: Function,
-  +onCancel: Function,
+  +onSubmit: {| name: string, password: string |} => void,
+  +onCancel: void => void,
   +classicTheme: boolean
 |};
 

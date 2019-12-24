@@ -21,6 +21,6 @@ export const navigateTo = function (requestedRoute: string) {
 
 export const navigateToTransactionsList = function (client: any) {
   return client.driver.executeScript(() => {
-    window.yoroi.actions.router.goToTransactionsList.trigger({});
+    window.yoroi.actions.router.goToTransactionsList.trigger();
   });
 };
