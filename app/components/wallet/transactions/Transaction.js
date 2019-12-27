@@ -154,7 +154,7 @@ type Props = {|
   +selectedExplorer: ExplorerType,
   +assuranceLevel: AssuranceLevel,
   +isLastInList: boolean,
-  +formattedWalletAmount: Function,
+  +formattedWalletAmount: BigNumber => string,
 |};
 
 type State = {
@@ -293,7 +293,7 @@ export default class Transaction extends Component<Props, State> {
               <div className={this.getAmountStyle(data.amount)}>
                 {
                   // hide currency (we are showing symbol instead)
-                  formattedWalletAmount(data.amount, false)
+                  formattedWalletAmount(data.amount)
                 }
                 <span className={styles.currencySymbol}><AdaSymbol /></span>
               </div>
@@ -326,7 +326,7 @@ export default class Transaction extends Component<Props, State> {
                     {intl.formatMessage(messages.fee)}
                   </h2>
                   <span className={styles.rowData}>
-                    {formattedWalletAmount(data.fee.abs(), false)}
+                    {formattedWalletAmount(data.fee.abs())}
                   </span>
                 </div>
               )}

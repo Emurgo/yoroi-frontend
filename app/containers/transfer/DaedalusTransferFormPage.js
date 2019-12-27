@@ -22,7 +22,7 @@ const messages = defineMessages({
 
 type Props = {|
   +onSubmit: {| recoveryPhrase: string |} => void,
-  +onBack: Function,
+  +onBack: void => void,
   +mnemonicValidator: string => boolean,
   +validWords: Array<string>,
   +mnemonicLength: number,

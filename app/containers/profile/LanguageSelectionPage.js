@@ -48,8 +48,8 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
     this.props.actions.profile.updateTentativeLocale.trigger(values);
   };
 
-  onSubmit = (values: { locale: string }) => {
-    this.props.actions.profile.commitLocaleToStorage.trigger(values);
+  onSubmit = (_values: {| locale: string |}) => {
+    this.props.actions.profile.commitLocaleToStorage.trigger();
   };
 
   renderByron() {

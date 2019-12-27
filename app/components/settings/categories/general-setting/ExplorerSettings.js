@@ -15,7 +15,7 @@ import type { ExplorerType } from '../../../../domain/Explorer';
 type Props = {|
   +explorers: Array<{| value: ExplorerType, label: string |}>,
   +selectedExplorer: ExplorerType,
-  +onSelectExplorer: Function,
+  +onSelectExplorer: {| explorer: ExplorerType |} => void,
   +isSubmitting: boolean,
   +error?: ?LocalizableError,
 |};
@@ -30,8 +30,8 @@ export default class ExplorerSettings extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  selectExplorer = (values: { explorer: ExplorerType }) => {
-    this.props.onSelectExplorer({ explorer: values });
+  selectExplorer = (explorer: ExplorerType) => {
+    this.props.onSelectExplorer({ explorer });
   };
 
   form = new ReactToolboxMobxForm({

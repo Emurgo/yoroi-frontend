@@ -49,15 +49,15 @@ type Props = {|
   +isTermDeviceAccepted: boolean,
   +isTermRecoveryAccepted: boolean,
   +isSubmitting: boolean,
-  +onAddWord: Function,
-  +onClear: Function,
-  +onAcceptTermDevice: Function,
-  +onAcceptTermRecovery: Function,
-  +onRestartBackup: Function,
-  +onCancelBackup: Function,
-  +onFinishBackup: Function,
-  +removeWord: Function,
-  +hasWord: Function,
+  +onAddWord: {| index: number, word: string |} => void,
+  +onClear: void => void,
+  +onAcceptTermDevice: void => void,
+  +onAcceptTermRecovery: void => void,
+  +onRestartBackup: void => void,
+  +onCancelBackup: void => void,
+  +onFinishBackup: void => void,
+  +removeWord: void => void,
+  +hasWord: boolean,
   +classicTheme: boolean,
 |};
 
@@ -166,7 +166,11 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
                 word={word}
                 index={index}
                 isActive={isActive}
-                onClick={(value) => isActive && onAddWord(value)}
+                onClick={(value) => {
+                  if (isActive) {
+                    onAddWord(value);
+                  }
+                }}
                 classicTheme={classicTheme}
               />
             ))}

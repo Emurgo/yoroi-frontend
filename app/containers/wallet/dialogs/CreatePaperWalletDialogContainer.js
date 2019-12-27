@@ -63,7 +63,7 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
 
     const onCancel = () => {
       actions.dialogs.closeActiveDialog.trigger();
-      paperActions.cancel.trigger({});
+      paperActions.cancel.trigger();
     };
 
     if (paperStore.progressInfo === ProgressStep.INIT) {
@@ -104,7 +104,7 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
       case ProgressStep.VERIFY:
         return (
           <WalletRestoreDialog
-            onSubmit={paperActions.submitVerify.trigger}
+            onSubmit={_data => paperActions.submitVerify.trigger()}
             onCancel={onCancel}
             onBack={paperActions.backToCreate.trigger}
             numberOfMnemonics={config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT}

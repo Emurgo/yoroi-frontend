@@ -12,7 +12,7 @@ type Props = {|
   +parentName: string,
   +type: string,
   +title: string,
-  +onSubmit: Function,
+  +onSubmit: void => void,
   // If learnMoreText is not provided, learn more block will disabled
   +learnMoreText?: string,
 |};

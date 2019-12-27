@@ -24,7 +24,7 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Injec
         currentPasswordValue={dialogData.currentPasswordValue}
         newPasswordValue={dialogData.newPasswordValue}
         repeatedPasswordValue={dialogData.repeatedPasswordValue}
-        onSave={(values: { oldPassword: string, newPassword: string }) => {
+        onSave={(values) => {
           const { oldPassword, newPassword } = values;
           actions[environment.API].walletSettings.updateSigningPassword.trigger({
             publicDeriver,

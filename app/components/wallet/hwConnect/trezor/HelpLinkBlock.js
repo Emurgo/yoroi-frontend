@@ -18,7 +18,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +onExternalLinkClick: Function,
+  +onExternalLinkClick: MouseEvent => void,
 |};
 
 @observer

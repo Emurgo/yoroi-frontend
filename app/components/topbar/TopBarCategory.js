@@ -10,7 +10,7 @@ type Props = {|
   +icon: string,
   +inlineTextMD: ?MessageDescriptor,
   +active: boolean,
-  +onClick: Function,
+  +onClick: void => void,
   +className: string,
   +iconStyle?: string
 |};

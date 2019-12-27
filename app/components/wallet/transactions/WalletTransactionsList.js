@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
@@ -31,8 +32,8 @@ type Props = {|
   +selectedExplorer: ExplorerType,
   +assuranceMode: AssuranceMode,
   +walletId: string,
-  +formattedWalletAmount: Function,
-  +onLoadMore: Function,
+  +formattedWalletAmount: BigNumber => string,
+  +onLoadMore: void => void,
 |};
 
 @observer

@@ -33,9 +33,9 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +onCancel: Function,
-  +onRestore: Function,
-  +onPaperRestore: Function,
+  +onCancel: void => void,
+  +onRestore: void => void,
+  +onPaperRestore: void => void,
   +classicTheme: boolean
 |};
 

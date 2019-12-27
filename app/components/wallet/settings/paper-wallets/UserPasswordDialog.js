@@ -53,9 +53,9 @@ const messages = defineMessages({
 type Props = {|
   +passwordValue: string,
   +repeatedPasswordValue: string,
-  +onNext: Function,
-  +onCancel: Function,
-  +onDataChange: Function,
+  +onNext: {| userPassword: string |} => void,
+  +onCancel: void => void,
+  +onDataChange: { [key: string]: any } => void,
   +classicTheme: boolean,
 |};
 

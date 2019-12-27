@@ -119,7 +119,10 @@ export default class AddressesStore extends Store {
     }
   }
 
-  @action _selectAddress = async (params: { address: string, path: BIP32Path }): Promise<void> => {
+  @action _selectAddress = async (params: {|
+    address: string,
+    path: BIP32Path,
+  |}): Promise<void> => {
     Logger.info('AddressStore::_selectAddress::called: ' + params.address);
     this.selectedAddress = { address: params.address, path: params.path };
   }

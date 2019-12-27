@@ -32,7 +32,7 @@ type Props = {|
   +transactionFee: string,
   +onSubmit: ({| password: string |}) => void,
   +amountToNaturalUnits: (amountWithFractions: string) => string,
-  +onCancel: Function,
+  +onCancel: void => void,
   +isSubmitting: boolean,
   +error: ?LocalizableError,
   +currencyUnit: string,
