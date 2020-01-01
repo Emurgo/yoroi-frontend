@@ -107,7 +107,7 @@
     "eslint": "6.6.0",
     "eslint-config-airbnb": "18.0.1",
     "eslint-plugin-flowtype": "4.5.2",
-    "eslint-plugin-import": "2.18.2",
+    "eslint-plugin-import": "2.19.1",
     "eslint-plugin-jsx-a11y": "6.2.3",
     "eslint-plugin-no-floating-promise": "git+https://github.com/SebastienGllmt/eslint-plugin-no-floating-promise.git",
     "eslint-plugin-promise": "4.2.1",
