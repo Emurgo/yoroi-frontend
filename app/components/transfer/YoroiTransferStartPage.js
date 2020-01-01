@@ -18,7 +18,7 @@ const messages = defineMessages({
   },
   mnemonicLabel15: {
     id: 'yoroiTransfer.start.instructions.mnemonic-15',
-    defaultMessage: '!!!15-word mnemonic',
+    defaultMessage: '!!!15-word recovery phrase',
   },
   hardwareLabel: {
     id: 'yoroiTransfer.start.instructions.hardware',
@@ -30,11 +30,19 @@ const messages = defineMessages({
   },
   legacyMnemonicLabel15: {
     id: 'yoroiTransfer.start.instructions.mnemonic-legacy-15',
-    defaultMessage: '!!!Legacy 15-word mnemonic',
+    defaultMessage: '!!!Legacy 15-word recovery phrase',
   },
   legacyYoroiPaperLabel: {
     id: 'yoroiTransfer.start.instructions.legacy-yoroiPaper',
     defaultMessage: '!!!Legacy Yoroi paper wallet',
+  },
+  legacyLedgerTitle: {
+    id: 'yoroiTransfer.start.instructions.legacy-ledger',
+    defaultMessage: '!!!Legacy Ledger Hardware Wallet',
+  },
+  legacyTrezorTitle: {
+    id: 'yoroiTransfer.start.instructions.legacy-trezor',
+    defaultMessage: '!!!Legacy Trezor Hardware Wallet',
   },
 });
 
@@ -42,7 +50,8 @@ type Props = {|
   +onLegacy15Words: void => void,
   +onLegacyPaper: void => void,
   +onShelley15Words: void => void,
-  +onLegacyHardware: void => void,
+  +onLegacyTrezor: void => void,
+  +onLegacyLedger: void => void,
   +classicTheme: boolean,
   +onFollowInstructionsPrerequisites: void => void,
   +disableTransferFunds: boolean,
@@ -144,6 +153,27 @@ export default class YoroiTransferStartPage extends Component<Props> {
                   ? (
                     <>
                       <Button
+                        className={`next trezorHardwareMnemonic ${commonClasses}`}
+                        label={intl.formatMessage(messages.legacyLedgerTitle)}
+                        onClick={this.props.onLegacyLedger}
+                        skin={ButtonSkin}
+                        disabled={disableTransferFunds}
+                      />
+                      <Button
+                        className={`next ledgerHardwareMnemonic ${commonClasses}`}
+                        label={intl.formatMessage(messages.legacyTrezorTitle)}
+                        onClick={this.props.onLegacyTrezor}
+                        skin={ButtonSkin}
+                        disabled={disableTransferFunds}
+                      />
+                    </>
+                  )
+                  : null
+                }
+                {environment.isShelley()
+                  ? (
+                    <>
+                      <Button
                         className={`next standardShelleyMnemonic ${commonClasses}`}
                         label={intl.formatMessage(messages.mnemonicLabel15)}
                         onClick={this.props.onShelley15Words}
@@ -156,13 +186,6 @@ export default class YoroiTransferStartPage extends Component<Props> {
                 {environment.isShelley() && environment.isDev()
                   ? (
                     <>
-                      <Button
-                        className={`next hardwareMnemonic ${commonClasses}`}
-                        label={intl.formatMessage(messages.hardwareLabel)}
-                        onClick={this.props.onLegacyHardware}
-                        skin={ButtonSkin}
-                        disabled={disableTransferFunds}
-                      />
                       <Button
                         className={`next yoroiShelleyPaper ${commonClasses}`}
                         label={intl.formatMessage(messages.yoroiPaperLabel)}

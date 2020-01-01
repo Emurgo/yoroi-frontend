@@ -169,8 +169,9 @@ export default class WalletRestoreStore extends Store {
       }
       resolvedRecoveryPhrase = newPhrase;
     }
+    const rootPk = generateWalletRootKey(resolvedRecoveryPhrase);
     const byronPlate = generateStandardPlate(
-      resolvedRecoveryPhrase,
+      rootPk,
       0, // show addresses for account #0
       this.mode === RestoreMode.PAPER
         ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER
@@ -184,7 +185,7 @@ export default class WalletRestoreStore extends Store {
     const shelleyPlate = !environment.isShelley() || this.mode === RestoreMode.PAPER
       ? undefined
       : generateStandardPlate(
-        resolvedRecoveryPhrase,
+        rootPk,
         0, // show addresses for account #0
         this.mode === RestoreMode.PAPER
           ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER

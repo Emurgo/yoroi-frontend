@@ -419,9 +419,7 @@ const globalMessages = defineMessages({
   },
   hardwareTransferInstructions: {
     id: 'transfer.instructions.hardware.disclaimer.instructions1',
-    defaultMessage: '',
-    // eslint-disable-next-line max-len
-    // defaultMessage: '!!!When you originally setup your hardware wallet, you were asked to write down a recovery phrase on a piece of paper. Entering this phrase will allow you to transfer your funds out of your hardware wallet and into the current wallet.',
+    defaultMessage: '!!!When you originally setup your hardware wallet, you were asked to write down a recovery phrase on a piece of paper. Entering this phrase will allow you to transfer your funds out of your hardware wallet and into the current wallet.',
   },
   sendButtonLabel: {
     id: 'wallet.send.confirmationDialog.submit',
@@ -462,6 +460,14 @@ const globalMessages = defineMessages({
   unknownPoolLabel: {
     id: 'wallet.staking.pool.unknownLabel',
     defaultMessage: '!!!Unknown pool',
+  },
+  ledgerTitle: {
+    id: 'wallet.add.optionDialog.connect.hw.ledger.title',
+    defaultMessage: '!!!Ledger Hardware Wallet',
+  },
+  trezorTitle: {
+    id: 'wallet.add.optionDialog.connect.hw.trezor.title',
+    defaultMessage: '!!!Trezor Hardware Wallet',
   },
 });
 export default globalMessages;

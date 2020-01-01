@@ -23,7 +23,7 @@ import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
 import config from '../../config';
 import { formattedWalletAmount } from '../../utils/formatters';
-import { TransferStatus, TransferSource, } from '../../types/TransferTypes';
+import { TransferKind, TransferStatus, TransferSource, } from '../../types/TransferTypes';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
@@ -64,8 +64,12 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
     });
   }
 
-  startTransferLegacyHardwareFunds: void => void = () => {
-    this._getYoroiTransferActions().startTransferLegacyHardwareFunds.trigger();
+  startTransferLegacyTrezorFunds: void => void = () => {
+    this._getYoroiTransferActions().startTransferLegacyHardwareFunds.trigger(TransferKind.TREZOR);
+  }
+
+  startTransferLegacyLedgerFunds: void => void = () => {
+    this._getYoroiTransferActions().startTransferLegacyHardwareFunds.trigger(TransferKind.LEDGER);
   }
 
   setupTransferFundsWithMnemonic: {|
@@ -147,7 +151,8 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
               onLegacy15Words={this.startLegacyTransferFunds}
               onShelley15Words={this.startShelleyTransferFunds}
               onLegacyPaper={this.startTransferPaperFunds}
-              onLegacyHardware={this.startTransferLegacyHardwareFunds}
+              onLegacyLedger={this.startTransferLegacyLedgerFunds}
+              onLegacyTrezor={this.startTransferLegacyTrezorFunds}
               classicTheme={profile.isClassicTheme}
               onFollowInstructionsPrerequisites={this.goToCreateWallet}
               disableTransferFunds={yoroiTransfer.disableTransferFunds}
@@ -203,7 +208,7 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
         return (
           <TransferLayout>
             <HardwareTransferFormPage
-              onSubmit={this.setupTransferFundsWithMnemonic}
+              onSubmit={this.setupTransferFundsWithMnemonic} // TODO: hw-specific
               onBack={this.backToUninitialized}
               // different hardware wallet support different lengths
               // so we just allow any lenght as long as the mnemonic is valid

@@ -22,6 +22,7 @@ import { generateLegacyYoroiTransferTx } from '../../api/ada/transactions/transf
 import environment from '../../environment';
 import type { SendFunc, } from '../../api/ada/lib/state-fetch/types';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { generateWalletRootKey, generateLedgerWalletRootKey, } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import {
   HARD_DERIVATION_START,
   WalletTypePurpose,
@@ -116,9 +117,9 @@ export default class YoroiTransferStore extends Store {
     this._updateStatus(TransferStatus.GETTING_PAPER_MNEMONICS);
   }
 
-  _startTransferLegacyHardwareFunds: void => void = () => {
+  _startTransferLegacyHardwareFunds: TransferKindType => void = (kind) => {
     runInAction(() => {
-      this.transferKind = TransferKind.HARDWARE;
+      this.transferKind = kind;
       this.transferSource = TransferSource.BYRON;
     });
     this._updateStatus(TransferStatus.HARDWARE_DISCLAIMER);
@@ -353,9 +354,12 @@ export default class YoroiTransferStore extends Store {
   ): Promise<RestoreWalletForTransferResponse> => {
     this.restoreForTransferRequest.reset();
 
+    const rootPk = this.transferKind === TransferKind.LEDGER
+      ? generateLedgerWalletRootKey(recoveryPhrase)
+      : generateWalletRootKey(recoveryPhrase);
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     const restoreResult = await this.restoreForTransferRequest.execute({
-      recoveryPhrase,
+      rootPk,
       accountIndex,
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
       transferSource: this.transferSource,

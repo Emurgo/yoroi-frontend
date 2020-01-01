@@ -512,7 +512,7 @@ export type RestoreWalletFunc = (
 // restoreWalletForTransfer
 
 export type RestoreWalletForTransferRequest = {|
-  recoveryPhrase: string,
+  rootPk: RustModule.WalletV3.Bip32PrivateKey,
   transferSource: TransferSourceType,
   accountIndex: number,
   checkAddressesInUse: FilterFunc,
@@ -584,12 +584,13 @@ export default class AdaApi {
     request: CreateAdaPaperRequest
   ): AdaPaper {
     const words = generateAdaMnemonic();
+    const rootPk = generateWalletRootKey(words.join(' '));
     const scrambledWords = scramblePaperAdaMnemonic(
       words.join(' '),
       request.password
     ).split(' ');
     const { addresses, accountPlate } = generateStandardPlate(
-      words.join(' '),
+      rootPk,
       0, // paper wallets always use account 0
       request.numAddresses != null ? request.numAddresses : DEFAULT_ADDRESSES_PER_PAPER,
       environment.getDiscriminant(),
@@ -1325,9 +1326,8 @@ export default class AdaApi {
     request: RestoreWalletForTransferRequest
   ): Promise<RestoreWalletForTransferResponse> {
     Logger.debug('AdaApi::restoreWalletForTransfer called');
-    const { recoveryPhrase, checkAddressesInUse } = request;
+    const { rootPk, checkAddressesInUse } = request;
 
-    const rootPk = generateWalletRootKey(recoveryPhrase);
     try {
       // need this to persist outside the scope of the hashToIds lambda
       // since the lambda is called multiple times
