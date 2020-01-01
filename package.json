@@ -189,7 +189,7 @@
     "semver": "6.3.0",
     "tinycolor2": "1.4.1",
     "trezor-connect": "7.0.5",
-    "ua-parser-js": "0.7.20",
+    "ua-parser-js": "0.7.21",
     "unorm": "1.6.0",
     "validator": "12.0.0",
     "yoroi-extension-ledger-connect-handler": "2.0.4"
