@@ -223,7 +223,7 @@
   "transfer.form.masterkey.requirement": "Hinweis: Generalschlüssel sind 192 Zeichen lang und hexadezimal-verschlüsselt",
   "transfer.instructions.attention.legacy": "Legacy Wallets, die während der Byron-Zeit (vor dem 29. November 2019) erstellt wurden, können nicht mehr verwendet werden. Du kannst jedoch deine alten Geldwerte in Deine aktuelle Wallet übertragen, um darauf zuzugreifen.",
   "transfer.instructions.attention.title.label": "Achtung",
-  "transfer.instructions.hardware.disclaimer.checkbox": "I acknowledge that entering my hardware wallet's recovery phrase carries significant risk.",
+  "transfer.instructions.hardware.disclaimer.checkbox": "Ich erkenne an, dass die Eingabe des Wiederherstellungssatzes meiner Hardware-Wallet ein erhebliches Risiko birgt.",
   "transfer.instructions.hardware.disclaimer.instructions1": "When you originally setup your hardware wallet, you were asked to write down a recovery phrase on a piece of paper. Entering this phrase will allow you to transfer your funds out of your hardware wallet and into the current wallet.",
   "transfer.instructions.hardware.disclaimer.instructions2": "If you use this feature, you should generate a new recovery phrase for your hardware wallet. If you don't know why or how to do this, we do not recommend you use this feature.",
   "transfer.instructions.instructions.button.label": "Yoroi Wallet erstellen",
