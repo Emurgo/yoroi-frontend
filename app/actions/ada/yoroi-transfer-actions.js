@@ -1,6 +1,6 @@
 // @flow
 import Action from '../lib/Action';
-import type { TransferSourceType, } from '../../types/TransferTypes';
+import type { TransferSourceType, TransferKindType, } from '../../types/TransferTypes';
 
 export default class YoroiTranferActions {
   startTransferFunds: Action<{|
@@ -10,7 +10,7 @@ export default class YoroiTranferActions {
     source: TransferSourceType,
   |}> = new Action();
   startHardwareMnemnoic: Action<void> = new Action();
-  startTransferLegacyHardwareFunds: Action<void> = new Action();
+  startTransferLegacyHardwareFunds: Action<TransferKindType> = new Action();
   setupTransferFundsWithMnemonic: Action<{|
     recoveryPhrase: string,
   |}> = new Action();

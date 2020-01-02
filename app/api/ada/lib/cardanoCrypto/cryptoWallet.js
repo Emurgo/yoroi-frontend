@@ -6,8 +6,10 @@
 import {
   validateMnemonic,
   generateMnemonic,
-  mnemonicToEntropy
+  mnemonicToEntropy,
+  mnemonicToSeedSync,
 } from 'bip39';
+import * as crypto from 'crypto';
 
 import { RustModule } from './rustLoader';
 
@@ -26,6 +28,54 @@ export const isValidEnglishAdaMnemonic = (
     return false;
   }
   return validateMnemonic(phrase);
+};
+
+export const hashRepeatedly = (seed: Buffer): [Buffer, Buffer] => {
+  let currSeed = seed;
+  let I;
+  let IL;
+  let IR;
+  do {
+    I = crypto.createHmac('sha512', Buffer.from('ed25519 seed', 'utf8'))
+      .update(currSeed)
+      .digest();
+    currSeed = I;
+    IL = I.slice(0, 32);
+    IR = I.slice(32);
+  } while ((IL[31] & 0b00100000) !== 0);
+
+  return [IL, IR];
+};
+
+/**
+  * Based on https://github.com/satoshilabs/slips/blob/master/slip-0010.md
+  */
+export const generateLedgerWalletRootKey = (
+  mnemonic: string
+): RustModule.WalletV3.Bip32PrivateKey => {
+  // Generate a seed byte sequence S of 512 bits according to BIP-0039.
+  const seed = mnemonicToSeedSync(mnemonic);
+
+  // note: prefix 1 and sha256 (not 512)
+  const chainCode = crypto.createHmac('sha256', Buffer.from('ed25519 seed', 'utf8'))
+    .update(Buffer.concat([Buffer.of(1), seed], 1 + seed.length))
+    .digest();
+
+  const [IL, IR] = hashRepeatedly(seed);
+
+  // As described in [RFC 8032 - 5.1.5](https://tools.ietf.org/html/rfc8032#section-5.1.5)
+
+  // Clear the lowest 3 bits of the first byte
+  IL[0] &= 248;
+  // Clear highest bit and set the second highest bit of the last byte
+  IL[31] &= 63;
+  IL[31] |= 64;
+
+  const buffer = Buffer.concat(
+    [IL, IR, chainCode],
+    IL.length + IR.length + chainCode.length
+  );
+  return RustModule.WalletV3.Bip32PrivateKey.from_bytes(buffer);
 };
 
 export function generateWalletRootKey(

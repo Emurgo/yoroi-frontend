@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
+import globalMessages from '../../../../i18n/global-messages';
 import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import OptionBlock from './OptionBlock';
@@ -14,17 +15,9 @@ const messages = defineMessages({
     id: 'wallet.add.optionDialog.connect.hw.dialogTitle',
     defaultMessage: '!!!Connect to hardware wallet',
   },
-  ledgerTitle: {
-    id: 'wallet.add.optionDialog.connect.hw.ledger.title',
-    defaultMessage: '!!!Ledger Hardware Wallet',
-  },
   ledgerDescription: {
     id: 'wallet.add.optionDialog.connect.hw.ledger.learnMoreText',
     defaultMessage: '!!!A Ledger hardware wallet is a small USB device that adds an extra level of security to your wallet. It is more secure because your private key never leaves the hardware wallet. This protects your funds even if your computer is compromised due to malware, phishing attempts, etc.',
-  },
-  trezorTitle: {
-    id: 'wallet.add.optionDialog.connect.hw.trezor.title',
-    defaultMessage: '!!!Trezor Hardware Wallet',
   },
   trezorDescription: {
     id: 'wallet.add.optionDialog.connect.hw.trezor.learnMoreText',
@@ -63,7 +56,7 @@ export default class WalletConnectHWOptionDialog extends Component<Props> {
             <OptionBlock
               parentName="WalletConnectHWOptionDialog"
               type="connectLedger"
-              title={intl.formatMessage(messages.ledgerTitle)}
+              title={intl.formatMessage(globalMessages.ledgerTitle)}
               learnMoreText={intl.formatMessage(messages.ledgerDescription)}
               onSubmit={onLedger}
             />
@@ -71,7 +64,7 @@ export default class WalletConnectHWOptionDialog extends Component<Props> {
               parentName="WalletConnectHWOptionDialog"
               type="connectTrezor"
               onSubmit={onTrezor}
-              title={intl.formatMessage(messages.trezorTitle)}
+              title={intl.formatMessage(globalMessages.trezorTitle)}
               learnMoreText={intl.formatMessage(messages.trezorDescription)}
             />
           </ul>
