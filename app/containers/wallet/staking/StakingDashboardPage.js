@@ -106,9 +106,9 @@ export default class StakingDashboardPage extends Component<Props, State> {
       : errorIfPresent;
 
     const showRewardAmount = delegationStore.getCurrentDelegation.wasExecuted &&
-      delegationStore.getCurrentDelegation.result != null &&
       delegationStore.getDelegatedBalance.wasExecuted &&
       errorIfPresent == null;
+
     const { getThemeVars } = this.props.stores.profile;
     return (
       <StakingDashboard
