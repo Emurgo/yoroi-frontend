@@ -18,6 +18,7 @@ import { digetForHash } from '../../../api/ada/lib/storage/database/primitives/a
 import { handleExternalLinkClick } from '../../../utils/routing';
 import { GetPoolInfoApiError } from '../../../api/ada/errors';
 import LocalizableError from '../../../i18n/LocalizableError';
+import config from '../../../config';
 
 import { formattedWalletAmount } from '../../../utils/formatters';
 
@@ -45,6 +46,7 @@ type Props = {
 
 type State = {|
   +currentTime: Date,
+  +notificationElementId: string,
 |};
 
 @observer
@@ -70,6 +72,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
     this.currentSlotLength = await genCurrentSlotLength();
     this.currentEpochLength = await genCurrentEpochLength();
     this.setState({
+      notificationElementId: '',
       currentTime: new Date(),
     });
     this.intervalId = setInterval(
@@ -85,6 +88,9 @@ export default class StakingDashboardPage extends Component<Props, State> {
   }
 
   render() {
+    if (this.state == null) {
+      return null;
+    }
     const publicDeriver = this.props.stores.substores[environment.API].wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
@@ -466,6 +472,12 @@ export default class StakingDashboardPage extends Component<Props, State> {
     if (delegationStore.stakingKeyState == null) {
       return { pools: [] };
     }
+    const tooltipNotification = {
+      duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
+      message: globalMessages.copyTooltipMessage,
+    };
+
+    const { uiNotifications, } = this.props.stores;
     const keyState = delegationStore.stakingKeyState;
     const { intl } = this.context;
     return {
@@ -500,9 +512,23 @@ export default class StakingDashboardPage extends Component<Props, State> {
             poolName={name}
             key={digetForHash(JSON.stringify(meta), 0)}
             data={stakePoolMeta}
+            selectedExplorer={this.props.stores.profile.selectedExplorer}
             hash={pool[0]}
             moreInfo={moreInfo}
             classicTheme={this.props.stores.profile.isClassicTheme}
+            onCopyAddressTooltip={(address, elementId) => {
+              if (!uiNotifications.isOpen(elementId)) {
+                this.setState({ notificationElementId: elementId });
+                this.props.actions.notifications.open.trigger({
+                  id: elementId,
+                  duration: tooltipNotification.duration,
+                  message: tooltipNotification.message,
+                });
+              }
+            }}
+            notification={uiNotifications.getTooltipActiveNotification(
+              this.state.notificationElementId
+            )}
           />
         );
       })
