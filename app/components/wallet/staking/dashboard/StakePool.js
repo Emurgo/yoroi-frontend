@@ -163,7 +163,7 @@ export default class StakePool extends Component<Props> {
                 selectedExplorer={this.props.selectedExplorer}
                 hash={hash}
                 light
-                linkType="address"
+                linkType="pool"
               >
                 <RawHash light>
                   <span className={styles.hash}>{
