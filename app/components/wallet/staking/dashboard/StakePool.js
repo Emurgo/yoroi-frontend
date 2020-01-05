@@ -11,8 +11,12 @@ import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 
 import Card from './Card';
 // import ProgressCircle from './ProgressCircle';
-import Address from './Address';
+import type { Notification } from '../../../../types/notificationType';
+import CopyableAddress from '../../../widgets/CopyableAddress';
+import RawHash from '../../../widgets/hashWrappers/RawHash';
+import ExplorableHashContainer from '../../../../containers/widgets/ExplorableHashContainer';
 import styles from './StakePool.scss';
+import type { ExplorerType } from '../../../../domain/Explorer';
 // import globalMessages from '../../../../i18n/global-messages';
 
 const messages = defineMessages({
@@ -79,6 +83,9 @@ type Props = {|
   +poolName: string,
   +hash: string,
   +moreInfo: void | MoreInfoProp,
+  +selectedExplorer: ExplorerType,
+  +onCopyAddressTooltip: (string, string) => void,
+  +notification: ?Notification,
 |};
 
 @observer
@@ -136,6 +143,8 @@ export default class StakePool extends Component<Props> {
     //   },
     // ];
 
+    const poolIdNotificationId = 'poolId-copyNotification';
+
     return (
       <Card title={intl.formatMessage(messages.title)}>
         <div className={styles.head}>
@@ -144,7 +153,26 @@ export default class StakePool extends Component<Props> {
           </div>
           <div className={styles.userInfo}>
             <h3 className={styles.userTitle}>{poolName}</h3>
-            <Address hash={hash} />
+            <CopyableAddress
+              hash={hash.substring(0, 6) + '...' + hash.substring(hash.length - 6, hash.length)}
+              elementId={poolIdNotificationId}
+              onCopyAddress={() => this.props.onCopyAddressTooltip(hash, poolIdNotificationId)}
+              notification={this.props.notification}
+            >
+              <ExplorableHashContainer
+                selectedExplorer={this.props.selectedExplorer}
+                hash={hash}
+                light
+                linkType="pool"
+              >
+                <RawHash light>
+                  <span className={styles.hash}>{
+                    hash.substring(0, 6) + '...' + hash.substring(hash.length - 6, hash.length)
+                  }
+                  </span>
+                </RawHash>
+              </ExplorableHashContainer>
+            </CopyableAddress>
           </div>
         </div>
         <div className={styles.wrapper}>

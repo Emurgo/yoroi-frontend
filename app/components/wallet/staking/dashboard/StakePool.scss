@@ -63,10 +63,9 @@
 }
 
 .hash {
-    width: 125px;
+    max-width: 135px;
     overflow: hidden;
     text-overflow: ellipsis;
-    display: inline-block;
     color: var(--theme-dashboard-label-color);
     font-size: 14px;
     line-height: 22px;
