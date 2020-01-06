@@ -188,7 +188,7 @@
     "route-parser": "0.0.5",
     "semver": "7.1.1",
     "tinycolor2": "1.4.1",
-    "trezor-connect": "7.0.5",
+    "trezor-connect": "8.0.13",
     "ua-parser-js": "0.7.21",
     "unorm": "1.6.0",
     "validator": "12.0.0",
