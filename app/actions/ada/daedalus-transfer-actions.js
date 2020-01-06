@@ -16,7 +16,7 @@ export default class DaedalusTranferActions {
   }> = new Action();
   backToUninitialized: Action<void> = new Action();
   transferFunds: Action<{|
-    next: Function,
+    next: () => void,
     publicDeriver: PublicDeriverWithCachedMeta,
   |}> = new Action();
   cancelTransferFunds: Action<void> = new Action();

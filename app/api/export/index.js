@@ -59,7 +59,7 @@ export default class ExportApi {
    *
    * No result will be returned. File is sent to user as side-effect.
    */
-  exportTransactions: ExportTransactionsRequest => Promise<ExportTransactionsResponse> = async (
+  exportTransactions: ExportTransactionsRequest => Promise<void> = async (
     request
   ) => {
     try {
