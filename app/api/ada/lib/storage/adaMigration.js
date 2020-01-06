@@ -16,9 +16,7 @@ import LocalStorageApi from '../../../localStorage/index';
 import {
   Logger,
 } from '../../../../utils/logging';
-import {
-  satisfies,
-} from 'semver';
+import satisfies from 'semver/functions/satisfies';
 import {
   OPEN_TAB_ID_KEY,
 } from '../../../../utils/tabManager';
