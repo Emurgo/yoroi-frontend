@@ -10,6 +10,8 @@ import globalMessages from '../../../../i18n/global-messages';
 import WarningBox from '../../../widgets/WarningBox';
 import InformativeError from '../../../widgets/InformativeError';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
+import BarDecoration from '../../../widgets/BarDecoration';
+import PageSelect from '../../../widgets/PageSelect';
 import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import InvalidURIImg from '../../../../assets/images/uri/invalid-uri.inline.svg';
@@ -42,14 +44,19 @@ const emptyDashboardMessages = defineMessages({
 });
 
 type Props = {|
-  themeVars: Object,
-  totalGraphData: Array<Object>,
-  positionsGraphData: Array<Object>,
-  stakePools: {| error: LocalizableError, |} | {| pools: null | Array<Node> |},
-  epochProgress: Node,
-  userSummary: Node,
-  rewardPopup: void | Node,
-  hasAnyPending: boolean,
+  +themeVars: Object,
+  +totalGraphData: Array<Object>,
+  +positionsGraphData: Array<Object>,
+  +stakePools: {| error: LocalizableError, |} | {| pools: null | Array<Node> |},
+  +epochProgress: Node,
+  +userSummary: Node,
+  +rewardPopup: void | Node,
+  +hasAnyPending: boolean,
+  +pageInfo: void | {|
+    +currentPage: number,
+    +numPages: number,
+    +goToPage: number => void,
+  |}
 |};
 
 @observer
@@ -116,6 +123,17 @@ export default class StakingDashboard extends Component<Props> {
               {this.props.userSummary}
             </div>
           </div>
+          {this.props.pageInfo != null &&
+            <div className={styles.pageSelect}>
+              <BarDecoration>
+                <PageSelect
+                  currentPage={this.props.pageInfo.currentPage}
+                  numPages={this.props.pageInfo.numPages}
+                  goToPage={this.props.pageInfo.goToPage}
+                />
+              </BarDecoration>
+            </div>
+          }
           {this.displayStakePools()}
         </div>
       </div>
@@ -134,13 +152,14 @@ export default class StakingDashboard extends Component<Props> {
         </div>
       );
     }
-    if (this.props.stakePools.pools === null) {
+    if (this.props.stakePools.pools === null || this.props.pageInfo == null) {
       return (
         <VerticallyCenteredLayout>
           <LoadingSpinner />
         </VerticallyCenteredLayout>
       );
     }
+    const currPool = this.props.pageInfo.currentPage;
     if (this.props.stakePools.pools.length === 0) {
       return (
         <InformativeError
@@ -152,7 +171,7 @@ export default class StakingDashboard extends Component<Props> {
     return (
       <div className={styles.bodyWrapper}>
         <div className={styles.stakePool}>
-          {this.props.stakePools.pools}
+          {this.props.stakePools.pools[currPool]}
         </div>
       </div>
     );

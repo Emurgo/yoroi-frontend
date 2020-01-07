@@ -1,0 +1,46 @@
+.component {
+  width: 315px;
+  height: 34px;
+}
+
+.content {
+  position: relative;
+  top: 50%;
+  margin: auto auto;
+}
+
+.enabled {
+  cursor: pointer;
+  & > path {
+    fill: #3154CB;
+  }
+}
+
+.disabled {
+  & > path {
+    fill: #BFC5D2;
+  }
+}
+
+.separator {
+  font-family: var(--font-regular);
+  color: #8791AD;
+  font-size: 13px;
+  line-height: 20px;
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+.pageNum {
+  font-family: var(--font-regular);
+  color: #120546;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.right {
+  transform: translateY(-50%);
+}
+.left {
+  transform: translateY(-50%) scaleX(-1);
+}

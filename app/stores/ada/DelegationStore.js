@@ -34,6 +34,10 @@ export default class DelegationStore extends Store {
   @observable stakingKeyState: void | {|
     state: AccountStateSuccess,
     /**
+     * Pool selected in the UI
+     */
+    selectedPool: number;
+    /**
      * careful: there may be less entries in this map than # of pools in a certificate
      * I think you can use ratio stake to stake to the same stake pool multiple times
      */
@@ -109,6 +113,7 @@ export default class DelegationStore extends Store {
           runInAction(() => {
             this.stakingKeyState = {
               state: stateForStakingKey,
+              selectedPool: 0,
               poolInfo: meta,
             };
           });

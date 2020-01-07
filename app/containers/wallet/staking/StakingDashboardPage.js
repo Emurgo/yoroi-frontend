@@ -40,6 +40,7 @@ import type {
   CurrentEpochLengthFunc,
 } from '../../../api/ada/lib/storage/bridge/timeUtils';
 import globalMessages from '../../../i18n/global-messages';
+import { runInAction } from 'mobx';
 
 type Props = {
   ...InjectedProps,
@@ -127,6 +128,20 @@ export default class StakingDashboardPage extends Component<Props, State> {
 
     const dashboard = (
       <StakingDashboard
+        pageInfo={
+          delegationStore.stakingKeyState == null ||
+          !delegationStore.getCurrentDelegation.wasExecuted ||
+          delegationStore.getCurrentDelegation.isExecuting
+            ? undefined
+            : {
+              currentPage: delegationStore.stakingKeyState.selectedPool,
+              numPages: delegationStore.stakingKeyState.state.delegation.pools.length,
+              goToPage: page => runInAction(() => {
+                if (delegationStore.stakingKeyState) {
+                  delegationStore.stakingKeyState.selectedPool = page;
+                }
+              })
+            }}
         hasAnyPending={this.props.stores.substores.ada.transactions.hasAnyPending}
         themeVars={getThemeVars({ theme: 'YoroiModern' })}
         stakePools={stakePools}
