@@ -344,7 +344,7 @@
   "wallet.dashboard.graph.tooltip.epoch": "Total des ADA envoyés",
   "wallet.dashboard.graphType.costs": "Coûts",
   "wallet.dashboard.graphType.positions": "Positions",
-  "wallet.dashboard.lessthan.header": "There are many reasons why you could be getting less rewards than you expected. We list some common ones here",
+  "wallet.dashboard.lessthan.header": "Il y a de nombreuses raisons pour lesquelles vous pourriez obtenir moins de récompenses que prévu. Nous en énumérons quelques-unes ici",
   "wallet.dashboard.lessthan.reason1": "A stake pool you are delegating to either was or is offline so it did not make any blocks",
   "wallet.dashboard.lessthan.reason2": "Not enough time has passed since you delegated",
   "wallet.dashboard.lessthan.reason3": "The amount earned was rounded down to 0 (if you delegated a very small amount)",
