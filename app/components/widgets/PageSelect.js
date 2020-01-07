@@ -36,14 +36,18 @@ export default class PageSelect extends Component<Props> {
       <div className={styles.component}>
         <NavAll style={{ marginRight: '16px' }} className={leftAll} onClick={() => goIfEnabled(leftIsEnabled, 0)} />
         <NavSingle style={{ marginRight: '40px' }} className={leftSingle} onClick={() => goIfEnabled(leftIsEnabled, this.props.currentPage - 1)} />
-        {this.props.numPages === 0
-          ? 0
-          : this.props.currentPage + 1
-        }
+        <span className={styles.pageNum}>
+          {this.props.numPages === 0
+            ? 0
+            : this.props.currentPage + 1
+          }
+        </span>
         <span className={styles.separator}>
           /
         </span>
-        {this.props.numPages}
+        <span className={styles.pageNum}>
+          {this.props.numPages}
+        </span>
         <NavSingle style={{ marginLeft: '40px' }} className={rightSingle} onClick={() => goIfEnabled(rightIsEnabled, this.props.currentPage + 1)} />
         <NavAll style={{ marginLeft: '16px' }} className={rightAll} onClick={() => goIfEnabled(rightIsEnabled, this.props.numPages - 1)} />
       </div>
