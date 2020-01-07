@@ -121,7 +121,7 @@
   "noticeBoard.notice.poolToRetire.subMessage": "継続して報酬を受け取るために、他のプールにステークを委任することができます",
   "noticeBoard.notice.poolToRetire.title": "ステークプール [{poolTicker}] は解散を予定しています",
   "noticeBoard.notice.rewardRecieved.subMessage": "{epochNumber} で、報酬として {rewardAmount}{currency} を受け取っています。",
-  "noticeBoard.notice.rewardRecieved.title": "Rewards have been received",
+  "noticeBoard.notice.rewardRecieved.title": "報酬が受け取られました",
   "noticeBoard.notice.stakeDelegated.subMessage": "You will start getting rewards from next epoch",
   "noticeBoard.notice.stakeDelegated.title": "You have delegated to the pool [{poolTicker}]",
   "noticeBoard.notice.stakeRedelegated.subMessage": "Rewards for next two epochs will still be received from pool [{poolTicker}]",
