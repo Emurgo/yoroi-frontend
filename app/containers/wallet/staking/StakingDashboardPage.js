@@ -12,6 +12,7 @@ import EpochProgress from '../../../components/wallet/staking/dashboard/EpochPro
 import UserSummary from '../../../components/wallet/staking/dashboard/UserSummary';
 import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
 import RewardPopup from '../../../components/wallet/staking/dashboard/RewardPopup';
+import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard/LessThanExpectedDialog';
 import environment from '../../../environment';
 import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
 import { digetForHash } from '../../../api/ada/lib/storage/database/primitives/api/utils';
@@ -116,7 +117,15 @@ export default class StakingDashboardPage extends Component<Props, State> {
       errorIfPresent == null;
 
     const { getThemeVars } = this.props.stores.profile;
-    return (
+
+    const dialog = this.props.stores.uiDialogs.isOpen(LessThanExpectedDialog) ? (
+      <LessThanExpectedDialog
+        close={() => this.props.actions.dialogs.closeActiveDialog.trigger()}
+        classicTheme={this.props.stores.profile.isClassicTheme}
+      />
+    ) : null;
+
+    const dashboard = (
       <StakingDashboard
         hasAnyPending={this.props.stores.substores.ada.transactions.hasAnyPending}
         themeVars={getThemeVars({ theme: 'YoroiModern' })}
@@ -136,6 +145,9 @@ export default class StakingDashboardPage extends Component<Props, State> {
                   .dividedBy(LOVELACES_PER_ADA)
               )
           }
+          openLearnMore={() => this.props.actions.dialogs.open.trigger({
+            dialog: LessThanExpectedDialog,
+          })}
           totalDelegated={
             !showRewardAmount || delegationStore.getDelegatedBalance.result == null
               ? undefined
@@ -145,7 +157,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
                 ).dividedBy(LOVELACES_PER_ADA)
               )}
         />}
-        rewardPopup={getTimeBasedElements.rewardPopup}
+        rewardPopup={getTimeBasedElements.rewardInfo?.rewardPopup}
         totalGraphData={[
           {
             name: 1,
@@ -342,16 +354,25 @@ export default class StakingDashboardPage extends Component<Props, State> {
         ]}
       />
     );
+
+    return (
+      <>
+        {dialog}
+        {dashboard}
+      </>);
   }
 
   getTimeBasedElements: void => {|
     epochProgress: Node,
-    rewardPopup: void | Node,
+    rewardInfo: void | {|
+      rewardPopup: Node,
+      showWarning: boolean,
+    |},
   |} = () => {
     if (this.state == null) {
       return {
         epochProgress: (<EpochProgress loading />),
-        rewardPopup: undefined,
+        rewardInfo: undefined,
       };
     }
 
@@ -441,7 +462,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
 
     return {
       epochProgress,
-      rewardPopup: rewardInfo?.rewardPopup,
+      rewardInfo,
     };
   }
 
