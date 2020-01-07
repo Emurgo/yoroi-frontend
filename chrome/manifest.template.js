@@ -18,7 +18,7 @@ export default ({
   geckoKey,
   iconOverride,
   version,
-} /*: {
+} /*: {|
   description: string,
   defaultTitle: string,
   titleOverride?: boolean,
@@ -28,7 +28,7 @@ export default ({
   geckoKey: string,
   iconOverride?: Icons,
   version: string,
-} */
+|} */
 ) => { // eslint-disable-line function-paren-newline
   const icons = iconOverride == null
     ? {
