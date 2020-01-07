@@ -25,13 +25,18 @@ const messages = defineMessages({
   delegatedLabel: {
     id: 'wallet.dashboard.summary.delegatedTitle',
     defaultMessage: '!!!Total Delegated',
-  }
+  },
+  note: {
+    id: 'wallet.dashboard.summary.note',
+    defaultMessage: '!!!Less than you expected?',
+  },
 });
 
 type Props = {|
-  totalAdaSum: void | string,
-  totalRewards: void | string,
-  totalDelegated: void | string,
+  +totalAdaSum: void | string,
+  +totalRewards: void | string,
+  +totalDelegated: void | string,
+  +openLearnMore: void => void,
 |};
 
 @observer
@@ -82,7 +87,22 @@ export default class UserSummary extends Component<Props> {
           {intl.formatMessage(messages.rewardsLabel)}:
         </h3>
         {this.props.totalRewards != null
-          ? (<p className={styles.value}>{this.props.totalRewards} ADA</p>)
+          ? (
+            <>
+              <p className={styles.value}>
+                {this.props.totalRewards} ADA
+              </p>
+              <span
+                className={styles.note}
+                role="button"
+                tabIndex={0}
+                onKeyPress={() => null}
+                onClick={this.props.openLearnMore}
+              >
+                {intl.formatMessage(messages.note)}
+              </span>
+            </>
+          )
           : (<LoadingSpinner small />)
         }
       </div>

@@ -1,0 +1,16 @@
+
+@import '../../../../themes/mixins/unordered-list';
+
+:global(.YoroiModern) .component {
+  min-width: var(--theme-modal-min-max-width-lg);
+  max-width: var(--theme-modal-min-max-width-lg); 
+}
+
+.component {
+  font-family: var(--font-regular);
+  @include unordered-list;
+
+  .header {
+    margin-bottom: 20px;
+  }
+}
