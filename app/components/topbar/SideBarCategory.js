@@ -9,7 +9,6 @@ type Props = {|
   +icon: string,
   +active: boolean,
   +onClick: Function,
-  +className: string,
   +showLabel?: boolean,
   +label?: string,
 |};
@@ -31,7 +30,6 @@ export default class SideBarCategory extends Component<Props> {
       icon,
       active,
       onClick,
-      className,
       label,
       showLabel
     } = this.props;
@@ -39,7 +37,6 @@ export default class SideBarCategory extends Component<Props> {
     const componentStyles = classNames([
       styles.component,
       active ? styles.active : null,
-      className
     ]);
 
     const SvgElem = icon;
@@ -47,7 +44,7 @@ export default class SideBarCategory extends Component<Props> {
     return (
       <button type="button" className={componentStyles} onClick={onClick}>
         <span className={styles.icon}><SvgElem /></span>
-        {label && showLabel && (
+        {label != null && showLabel === true && (
           <span className={styles.label}>{label}</span>
         )}
       </button>
