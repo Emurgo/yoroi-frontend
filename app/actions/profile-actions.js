@@ -14,4 +14,5 @@ export default class ProfileActions {
   exportTheme: Action<void> = new Action();
   commitLocaleToStorage: Action<{ locale: string }> = new Action();
   updateHideBalance: Action<void> = new Action();
+  toggleSidebar: Action<void> = new Action();
 }

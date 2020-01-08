@@ -176,6 +176,12 @@ export default class ProfileStore extends Store {
   @observable setHideBalanceRequest: Request<boolean => Promise<void>>
     = new Request<boolean => Promise<void>>(this.api.localStorage.setHideBalance);
 
+  @observable getToggleSidebarRequest: Request<void => Promise<boolean>>
+    = new Request<void => Promise<boolean>>(this.api.localStorage.getToggleSidebar);
+
+  @observable setToggleSidebarRequest: Request<boolean => Promise<void>>
+    = new Request<boolean => Promise<void>>(this.api.localStorage.setToggleSidebar);
+
   setup(): void {
     this.actions.profile.updateLocale.listen(this._updateLocale);
     this.actions.profile.updateTentativeLocale.listen(this._updateTentativeLocale);
@@ -186,6 +192,7 @@ export default class ProfileStore extends Store {
     this.actions.profile.exportTheme.listen(this._exportTheme);
     this.actions.profile.commitLocaleToStorage.listen(this._acceptLocale);
     this.actions.profile.updateHideBalance.listen(this._updateHideBalance);
+    this.actions.profile.toggleSidebar.listen(this._toggleSidebar);
     this.registerReactions([
       this._setBigNumberFormat,
       this._updateMomentJsLocaleAfterLocaleChange,
@@ -491,6 +498,19 @@ export default class ProfileStore extends Store {
     const shouldHideBalance = this.shouldHideBalance;
     await this.setHideBalanceRequest.execute(shouldHideBalance);
     await this.getHideBalanceRequest.execute();
+  };
+
+  // ========== Expand / Retract Sidebar ========== //
+
+  @computed get isSidebarExpanded(): boolean {
+    const { result } = this.getToggleSidebarRequest.execute();
+    return result === true;
+  }
+
+  _toggleSidebar = async () => {
+    const isSidebarExpanded = this.isSidebarExpanded;
+    await this.setToggleSidebarRequest.execute(isSidebarExpanded);
+    await this.getToggleSidebarRequest.execute();
   };
 
 

@@ -9,13 +9,13 @@ type Props = InjectedProps;
 @observer
 export default class SidebarContainer extends Component<Props> {
 
-  updateHideBalance = () => {
-    this.props.actions.profile.updateHideBalance.trigger();
+  toggleSidebar = () => {
+    this.props.actions.profile.toggleSidebar.trigger();
   }
 
   render() {
     const { actions, stores } = this.props;
-    const { topbar } = stores;
+    const { topbar, profile } = stores;
 
     return (
       <Sidebar
@@ -24,6 +24,8 @@ export default class SidebarContainer extends Component<Props> {
         }}
         isActiveCategory={topbar.isActiveCategory}
         categories={topbar.categories}
+        onToggleSidebar={this.toggleSidebar}
+        isSidebarExpanded={profile.isSidebarExpanded}
       />
     );
   }
