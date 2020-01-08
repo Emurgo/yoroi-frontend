@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { MessageDescriptor } from 'react-intl';
 import { intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
@@ -10,14 +11,13 @@ type Props = {|
   +active: boolean,
   +onClick: Function,
   +showLabel?: boolean,
-  +label?: string,
+  +label: ?MessageDescriptor,
 |};
 
 @observer
 export default class SideBarCategory extends Component<Props> {
   static defaultProps = {
     showLabel: false,
-    label: '',
   };
 
   static contextTypes = {
@@ -25,6 +25,8 @@ export default class SideBarCategory extends Component<Props> {
   };
 
   render() {
+
+    const { intl } = this.context;
 
     const {
       icon,
@@ -45,7 +47,7 @@ export default class SideBarCategory extends Component<Props> {
       <button type="button" className={componentStyles} onClick={onClick}>
         <span className={styles.icon}><SvgElem /></span>
         {label != null && showLabel === true && (
-          <span className={styles.label}>{label}</span>
+          <span className={styles.label}>{intl.formatMessage(label)}</span>
         )}
       </button>
     );
