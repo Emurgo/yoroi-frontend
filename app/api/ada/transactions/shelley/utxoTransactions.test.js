@@ -542,4 +542,36 @@ describe('Create sendAll unsigned TX from UTXO', () => {
       utxos,
     )).toThrow(NotEnoughMoneyToSendError);
   });
+
+  it('Should send all even if a UTXO is smaller than the fee', () => {
+    /**
+     * The 2nd UTXO is smaller than the fee so even if you remove it form the input,
+     * The 1st UTXO can cover the fee of the transaction
+     * Therefore including the 2nd UTXO does nothing but increase the transaction fee
+     * Need to make sure that even if this is the case, sendAll really does send the entire UTXO set
+     */
+    const unsignedTxResponse = sendAllUnsignedTxFromUtxo(
+      keys[0].bechAddress,
+      [{
+        utxo_id: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0',
+        tx_hash: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe',
+        tx_index: 0,
+        receiver: 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
+        amount: '1000000'
+      },
+      {
+        utxo_id: '05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f0',
+        tx_hash: '05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f',
+        tx_index: 0,
+        receiver: 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
+        amount: '1',
+      }],
+      undefined
+    );
+    const inputSum = getTxInputTotal(unsignedTxResponse.IOs, false);
+    const outputSum = getTxOutputTotal(unsignedTxResponse.IOs, false);
+    expect(inputSum.toString()).toEqual('1000001');
+    expect(outputSum.toString()).toEqual('844617');
+    expect(inputSum.minus(outputSum).toString()).toEqual('155384');
+  });
 });
