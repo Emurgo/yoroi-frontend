@@ -55,9 +55,21 @@ export default class YoroiTransferStore extends Store {
   @observable transferKind: TransferKindType = TransferKind.NORMAL;
   @observable transferSource: TransferSourceType = TransferSource.BYRON;
 
-  _errorWrapper = <PT, RT>(func: PT=>Promise<RT>): (PT => Promise<RT>) => (async (payload) => {
+  _asyncErrorWrapper = <PT, RT>(func: PT=>Promise<RT>): (PT => Promise<RT>) => (async (payload) => {
     try {
       return await func(payload);
+    } catch (error) {
+      Logger.error(`YoroiTransferStore ${stringifyError(error)}`);
+      runInAction(() => {
+        this.status = TransferStatus.ERROR;
+        this.error = localizedError(error);
+      });
+      throw error;
+    }
+  });
+  _errorWrapper = <PT, RT>(func: PT=>RT): (PT => RT) => ((payload) => {
+    try {
+      return func(payload);
     } catch (error) {
       Logger.error(`YoroiTransferStore ${stringifyError(error)}`);
       runInAction(() => {
@@ -78,17 +90,15 @@ export default class YoroiTransferStore extends Store {
     actions.startTransferLegacyHardwareFunds.listen(this._startTransferLegacyHardwareFunds);
     actions.startTransferPaperFunds.listen(this._startTransferPaperFunds);
     actions.startHardwareMnemnoic.listen(this._startHardwareMnemnoic);
-    actions.setupTransferFundsWithMnemonic.listen(
-      this._errorWrapper(this.setupTransferFundsWithMnemonic)
-    );
+    actions.setupTransferFundsWithMnemonic.listen(this.setupTransferFundsWithMnemonic);
     actions.setupTransferFundsWithPaperMnemonic.listen(
       this._errorWrapper(this._setupTransferFundsWithPaperMnemonic)
     );
     actions.checkAddresses.listen(
-      this._errorWrapper(this.checkAddresses)
+      this._asyncErrorWrapper(this.checkAddresses)
     );
     actions.backToUninitialized.listen(this._backToUninitialized);
-    actions.transferFunds.listen(this._errorWrapper(this._transferFunds));
+    actions.transferFunds.listen(this._asyncErrorWrapper(this._transferFunds));
     actions.cancelTransferFunds.listen(this.reset);
   }
 
@@ -202,10 +212,10 @@ export default class YoroiTransferStore extends Store {
     return transferTx;
   }
 
-  _setupTransferFundsWithPaperMnemonic = async (payload: {|
+  _setupTransferFundsWithPaperMnemonic = (payload: {|
     recoveryPhrase: string,
     paperPassword: string,
-  |}): Promise<void> => {
+  |}): void => {
     const result = unscramblePaperAdaMnemonic(
       payload.recoveryPhrase,
       config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT,
@@ -215,14 +225,14 @@ export default class YoroiTransferStore extends Store {
     if (recoveryPhrase == null) {
       throw new Error(`${nameof(this._setupTransferFundsWithPaperMnemonic)} paper wallet failed`);
     }
-    await this.setupTransferFundsWithMnemonic({
+    this.setupTransferFundsWithMnemonic({
       recoveryPhrase,
     });
   }
 
   setupTransferFundsWithMnemonic: {|
     recoveryPhrase: string,
-  |} => Promise<void> = async (
+  |} => void = (
     payload
   ) => {
     runInAction(() => {
