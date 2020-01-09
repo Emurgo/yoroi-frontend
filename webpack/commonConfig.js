@@ -60,7 +60,12 @@ const rules = (isProd /*: boolean */) => [
   {
     test: /\.css$/,
     use: [
-      'thread-loader',
+      {
+        loader: 'thread-loader',
+        options: process.env.CIRCLE_NODE_TOTAL != null ? {} : {
+          workers: process.env.CIRCLE_NODE_TOTAL,
+        },
+      },
       {
         loader: 'style-loader',
       },
@@ -86,7 +91,12 @@ const rules = (isProd /*: boolean */) => [
   {
     test: /\.global\.scss$/,
     use: [
-      'thread-loader',
+      {
+        loader: 'thread-loader',
+        options: process.env.CIRCLE_NODE_TOTAL != null ? {} : {
+          workers: process.env.CIRCLE_NODE_TOTAL,
+        },
+      },
       {
         loader: 'style-loader',
       },
@@ -105,7 +115,12 @@ const rules = (isProd /*: boolean */) => [
   {
     test: /^((?!\.global).)*\.scss$/,
     use: [
-      'thread-loader',
+      {
+        loader: 'thread-loader',
+        options: process.env.CIRCLE_NODE_TOTAL != null ? {} : {
+          workers: process.env.CIRCLE_NODE_TOTAL,
+        },
+      },
       {
         loader: 'style-loader',
       },
