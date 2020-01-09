@@ -51,7 +51,7 @@ const plugins = (folder /*: string */, networkName /*: string */) => {
   ];
 };
 
-const rules = [
+const rules = (isProd /*: boolean */) => [
   // Pdfjs Worker webpack config, reference to issue: https://github.com/mozilla/pdf.js/issues/7612#issuecomment-315179422
   {
     test: /pdf\.worker(\.min)?\.js$/,
@@ -60,6 +60,7 @@ const rules = [
   {
     test: /\.css$/,
     use: [
+      'thread-loader',
       {
         loader: 'style-loader',
       },
@@ -67,7 +68,7 @@ const rules = [
         loader: 'css-loader',
         options: {
           importLoaders: 1,
-          sourceMap: true,
+          sourceMap: !isProd,
           modules: {
             mode: 'local',
             localIdentName: '[name]__[local]___[hash:base64:5]',
@@ -85,24 +86,26 @@ const rules = [
   {
     test: /\.global\.scss$/,
     use: [
+      'thread-loader',
       {
         loader: 'style-loader',
       },
       {
         loader: 'css-loader',
         options: {
-          sourceMap: true,
+          sourceMap: !isProd,
           modules: {
             mode: 'global',
           },
         },
       },
-      'sass-loader?sourceMap'
+      isProd ? 'sass-loader' : 'sass-loader?sourceMap'
     ]
   },
   {
     test: /^((?!\.global).)*\.scss$/,
     use: [
+      'thread-loader',
       {
         loader: 'style-loader',
       },
@@ -110,14 +113,14 @@ const rules = [
         loader: 'css-loader',
         options: {
           importLoaders: 1,
-          sourceMap: true,
+          sourceMap: !isProd,
           modules: {
             mode: 'local',
             localIdentName: '[name]_[local]',
           }
         },
       },
-      'sass-loader?sourceMap'
+      isProd ? 'sass-loader' : 'sass-loader?sourceMap'
     ]
   },
   {

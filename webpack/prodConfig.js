@@ -9,6 +9,7 @@ const customPath = path.join(__dirname, './customPublicPath');
 
 const baseProdConfig = (networkName /*: string */) => ({
   mode: 'production',
+  devtool: false,
   optimization: commonConfig.optimization,
   node: commonConfig.node,
   resolve: commonConfig.resolve,
@@ -36,19 +37,24 @@ const baseProdConfig = (networkName /*: string */) => ({
   ],
   module: {
     rules: [
-      ...commonConfig.rules,
+      ...commonConfig.rules(true),
       {
         test: /\.js$/,
-        loader: 'babel-loader',
-        exclude: /node_modules/,
-        options: {
-          presets: []
-        }
+        use: [
+          'thread-loader',
+          {
+            loader: 'babel-loader',
+            options: {
+              presets: [],
+            },
+          },
+        ],
+        exclude: [/node_modules/],
       },
       {
         test: /\.(js|jsx)$/,
         exclude: [/node_modules/, /pdf\.worker(\.min)?\.js$/],
-        use: 'babel-loader',
+        use: ['thread-loader', 'babel-loader'],
       },
       {
         test: /\.(eot|otf|ttf|woff|woff2|gif|png)$/,

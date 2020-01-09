@@ -59,7 +59,7 @@ const baseDevConfig = (networkName /*: string */) => ({
   ],
   module: {
     rules: [
-      ...commonConfig.rules,
+      ...commonConfig.rules(false),
       {
         test: /\.js$/,
         loader: 'babel-loader?cacheDirectory',
