@@ -167,7 +167,7 @@
     "mobx": "5.15.1",
     "mobx-react": "6.1.4",
     "mobx-react-form": "2.0.8",
-    "mobx-react-router": "4.0.7",
+    "mobx-react-router": "4.1.0",
     "moment": "2.21.0",
     "pbkdf2": "3.0.17",
     "qr-image": "3.2.0",
