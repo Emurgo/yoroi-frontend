@@ -33,7 +33,7 @@ type Props = {|
   +assuranceMode: AssuranceMode,
   +walletId: string,
   +formattedWalletAmount: BigNumber => string,
-  +onLoadMore: void => void,
+  +onLoadMore: void => PossiblyAsync<void>,
 |};
 
 @observer

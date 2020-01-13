@@ -1,8 +1,8 @@
 // @flow
-import Action from './lib/Action';
+import { AsyncAction } from './lib/Action';
 
 // ======= NOTICE-BOARD ACTIONS =======
 
 export default class NoticeBoardActions {
-  loadMore: Action<void> = new Action();
+  loadMore: AsyncAction<void> = new AsyncAction();
 }

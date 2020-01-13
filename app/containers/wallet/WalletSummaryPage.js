@@ -74,7 +74,7 @@ export default class WalletSummaryPage extends Component<Props> {
             selectedExplorer={this.props.stores.profile.selectedExplorer}
             isLoadingTransactions={isLoadingTx}
             hasMoreToLoad={totalAvailable > limit}
-            onLoadMore={() => actions.ada.transactions.loadMoreTransactions.trigger()}
+            onLoadMore={actions.ada.transactions.loadMoreTransactions.trigger}
             assuranceMode={publicDeriver.assuranceMode}
             walletId={publicDeriver.self.getPublicDeriverId().toString()}
             formattedWalletAmount={formattedWalletAmount}

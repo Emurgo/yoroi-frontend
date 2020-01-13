@@ -48,7 +48,7 @@ type Props = {|
   +error: ?LocalizableError,
   +onExternalLinkClick: MouseEvent => void,
   +goBack: void => void,
-  +submit: void => void,
+  +submit: void => PossiblyAsync<void>,
   +cancel: void => void,
   +classicTheme: boolean
 |};

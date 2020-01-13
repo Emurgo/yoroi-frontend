@@ -30,7 +30,7 @@ type Props = {|
   +themeProperties?: {|
     identiconSaturationFactor: number,
   |},
-  +onUpdateHideBalance: void => void,
+  +onUpdateHideBalance: void => PossiblyAsync<void>,
   +shouldHideBalance: boolean,
 |};
 

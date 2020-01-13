@@ -16,7 +16,7 @@ import globalMessages, { listOfTranslators } from '../../../../i18n/global-messa
 type Props = {|
   +languages: Array<{ value: string, label: MessageDescriptor, svg: string }>,
   +currentLocale: string,
-  +onSelectLanguage: {| locale: string |} => void,
+  +onSelectLanguage: {| locale: string |} => PossiblyAsync<void>,
   +isSubmitting: boolean,
   +error?: ?LocalizableError,
 |};
@@ -31,8 +31,8 @@ export default class GeneralSettings extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  selectLanguage = (locale: string) => {
-    this.props.onSelectLanguage({ locale });
+  selectLanguage: string => Promise<void> = async (locale) => {
+    await this.props.onSelectLanguage({ locale });
   };
 
   form = new ReactToolboxMobxForm({

@@ -1,7 +1,7 @@
 // @flow
 
 import React, { Component } from 'react';
-import { action, observable } from 'mobx';
+import { runInAction, action, observable } from 'mobx';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import type { InjectedContainerProps } from '../../../types/injectedPropsType';
@@ -41,15 +41,15 @@ export default class SeizaFetcher extends Component<Props> {
   iframe: ?HTMLElement;
 
   @action
-  messageHandler = (event: any) => {
+  messageHandler: any => Promise<void> = async (event: any) => {
     if (event.origin !== process.env.SEIZA_FOR_YOROI_URL) return;
     const pools: Array<SelectedPool> = JSON.parse(decodeURI(event.data));
 
     const delegationTxActions = this.props.actions[environment.API].delegationTransaction;
-    delegationTxActions.createTransaction.trigger({
+    await delegationTxActions.createTransaction.trigger({
       id: pools[0].poolHash,
     });
-    this.selectedPools = pools;
+    runInAction(() => { this.selectedPools = pools; });
   }
 
   constructor(props: Props) {
@@ -158,9 +158,7 @@ export default class SeizaFetcher extends Component<Props> {
               delegationTxStore.signAndBroadcastDelegationTx.isExecuting
             }
             onCancel={this.cancel}
-            onSubmit={(request) => {
-              delegationTxActions.signTransaction.trigger(request);
-            }}
+            onSubmit={delegationTxActions.signTransaction.trigger}
             classicTheme={profile.isClassicTheme}
             error={delegationTxStore.signAndBroadcastDelegationTx.error}
             selectedExplorer={stores.profile.selectedExplorer}
@@ -168,7 +166,7 @@ export default class SeizaFetcher extends Component<Props> {
         }
         {delegationTx != null && !showSignDialog &&
           <DelegationSuccessDialog
-            onClose={() => delegationTxActions.complete.trigger()}
+            onClose={delegationTxActions.complete.trigger}
             classicTheme={profile.isClassicTheme}
           />
         }

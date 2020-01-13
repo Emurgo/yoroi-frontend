@@ -1,5 +1,5 @@
 // @flow
-import Action from './lib/Action';
+import { AsyncAction, Action } from './lib/Action';
 
 // ======= WALLET BACKUP ACTIONS =======
 
@@ -19,6 +19,6 @@ export default class WalletBackupActions {
   acceptWalletBackupTermRecovery: Action<void> = new Action();
   restartWalletBackup: Action<void> = new Action();
   cancelWalletBackup: Action<void> = new Action();
-  finishWalletBackup: Action<void> = new Action();
+  finishWalletBackup: AsyncAction<void> = new AsyncAction();
   removeOneMnemonicWord: Action<void> = new Action();
 }

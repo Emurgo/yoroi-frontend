@@ -169,8 +169,8 @@ export default class WalletRestoreDialogContainer
           <LegacyExplanation
             onBack={() => walletRestoreActions.back.trigger()}
             onClose={this.onCancel}
-            onSkip={() => walletRestoreActions.startRestore.trigger()}
-            onCheck={() => walletRestoreActions.startCheck.trigger()}
+            onSkip={walletRestoreActions.startRestore.trigger}
+            onCheck={walletRestoreActions.startCheck.trigger}
             classicTheme={this.props.classicTheme}
           />
         );

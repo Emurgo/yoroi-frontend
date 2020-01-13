@@ -1,5 +1,5 @@
 // @flow
-import Action from '../lib/Action';
+import { AsyncAction, Action } from '../lib/Action';
 import type { TransferSourceType, TransferKindType, } from '../../types/TransferTypes';
 
 export default class YoroiTranferActions {
@@ -18,14 +18,14 @@ export default class YoroiTranferActions {
     recoveryPhrase: string,
     paperPassword: string,
   |}> = new Action();
-  checkAddresses: Action<{|
+  checkAddresses: AsyncAction<{|
     getDestinationAddress: void => Promise<string>,
-  |}> = new Action();
+  |}> = new AsyncAction();
   backToUninitialized: Action<void> = new Action();
-  transferFunds: Action<{|
+  transferFunds: AsyncAction<{|
     next: void => Promise<void>,
     getDestinationAddress: void => Promise<string>,
     rebuildTx: boolean,
-  |}> = new Action();
+  |}> = new AsyncAction();
   cancelTransferFunds: Action<void> = new Action();
 }

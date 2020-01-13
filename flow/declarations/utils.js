@@ -22,6 +22,8 @@ declare type ToSchemaProp = <K, V>(K, V) => K;
 declare type Nullable = <K>(K) => null | K;
 declare type WithNullableFields<T: {}> = $ObjMap<T, Nullable>;
 
+declare type PossiblyAsync<T> = T | Promise<T>;
+
 /* eslint-disable no-redeclare */
 declare function arguments<A>(() => any): []
 declare function arguments<A>((A) => any): [A]

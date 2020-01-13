@@ -58,7 +58,7 @@ export default class PaperWalletCreateStore extends Store {
     a.cancel.listen(this._cancel);
   }
 
-  @action _submitInit = async (
+  @action _submitInit = (
     {
       numAddresses,
       printAccountPlate
@@ -66,40 +66,37 @@ export default class PaperWalletCreateStore extends Store {
       numAddresses: number,
       printAccountPlate: boolean
     }
-  ): Promise<void> => {
+  ): void => {
     this.numAddresses = numAddresses;
     this.printAccountPlate = printAccountPlate;
     this.progressInfo = ProgressStep.USER_PASSWORD;
   };
 
-  @action _submitUserPassword = async ({ userPassword }: {| userPassword: string |}) => {
+  @action _submitUserPassword: {|
+    userPassword: string
+  |} => Promise<void> = async ({ userPassword }) => {
     if (this.userPassword != null) {
       throw new Error('User password is already initialized');
     }
     this.userPassword = userPassword;
     this.progressInfo = ProgressStep.CREATE;
     this.actions.ada.paperWallets.createPaperWallet.trigger();
-    // setTimeout is needed to fix:
-    // https://github.com/Emurgo/yoroi-frontend/pull/584#pullrequestreview-249311058
-    // createPdfDocument is heavyweight and blocking
-    setTimeout(() => {
-      this.actions.ada.paperWallets.createPdfDocument.trigger();
-    }, 0);
+    await this.actions.ada.paperWallets.createPdfDocument.trigger();
   };
 
-  @action _backToCreatePaper = async () => {
+  @action _backToCreatePaper = () => {
     this.progressInfo = ProgressStep.CREATE;
   };
 
-  @action _submitCreatePaper = async () => {
+  @action _submitCreatePaper = () => {
     this.progressInfo = ProgressStep.VERIFY;
   };
 
-  @action _submitVerifyPaper = async () => {
+  @action _submitVerifyPaper = () => {
     this.progressInfo = ProgressStep.FINALIZE;
   };
 
-  @action _createPaperWallet = async () => {
+  @action _createPaperWallet = () => {
     if (this.numAddresses != null && this.userPassword != null) {
       this.paper = this.api.ada.createAdaPaper({
         numAddresses: this.numAddresses,
@@ -128,19 +125,19 @@ export default class PaperWalletCreateStore extends Store {
     }
   };
 
-  @action _setPdfRenderStatus = async ({ status }: { status: PdfGenStepType }) => {
+  @action _setPdfRenderStatus = ({ status }: {| status: PdfGenStepType |}) => {
     this.pdfRenderStatus = status;
   };
 
-  @action _setPdf = async ({ pdf }: { pdf: Blob }) => {
+  @action _setPdf = ({ pdf }: {| pdf: Blob |}) => {
     this.pdf = pdf;
   };
 
-  @action _downloadPaperWallet = async () => {
+  @action _downloadPaperWallet = () => {
     fileSaver.saveAs(this.pdf, 'Yoroi-Paper-Wallet.pdf');
   };
 
-  @action _cancel = async () => {
+  @action _cancel = () => {
     this.teardown();
   };
 

@@ -33,7 +33,7 @@ type Props = {|
   +openDialogAction: {| dialog: any, params?: any |} => void,
   +isDialogOpen: any => boolean,
   +dialog: Node,
-  +onFieldValueChange: (string, string) => void,
+  +onFieldValueChange: (string, string) => PossiblyAsync<void>,
   +onStartEditing: string => void,
   +onStopEditing: void => void,
   +onCancelEditing: void => void,
@@ -91,7 +91,7 @@ export default class WalletSettings extends Component<Props> {
           onStartEditing={() => onStartEditing('name')}
           onStopEditing={onStopEditing}
           onCancelEditing={onCancelEditing}
-          onSubmit={(value) => onFieldValueChange('name', value)}
+          onSubmit={async (value) => onFieldValueChange('name', value)}
           isValid={nameValidator}
           validationErrorMessage={intl.formatMessage(globalMessages.invalidWalletName)}
           successfullyUpdated={!isSubmitting && lastUpdatedField === 'name' && !isInvalid}

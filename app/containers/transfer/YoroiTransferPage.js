@@ -89,20 +89,20 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
     });
   };
 
-  checkAddresses: void => void = () => {
+  checkAddresses: void => Promise<void> = async () => {
     const walletsStore = this._getWalletsStore();
     const yoroiTransfer = this._getYoroiTransferStore();
     const publicDeriver = walletsStore.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(this.checkAddresses)} no wallet selected`);
     }
-    this._getYoroiTransferActions().checkAddresses.trigger({
+    await this._getYoroiTransferActions().checkAddresses.trigger({
       getDestinationAddress: yoroiTransfer.nextInternalAddress(publicDeriver),
     });
   };
 
   /** Broadcast the transfer transaction if one exists and return to wallet page */
-  tranferFunds: void => void = () => {
+  tranferFunds: void => Promise<void> = async () => {
     // broadcast transfer transaction then call continuation
     const walletsStore = this._getWalletsStore();
     const yoroiTransfer = this._getYoroiTransferStore();
@@ -110,7 +110,7 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
     if (publicDeriver == null) {
       throw new Error(`${nameof(this.tranferFunds)} no wallet selected`);
     }
-    this._getYoroiTransferActions().transferFunds.trigger({
+    await this._getYoroiTransferActions().transferFunds.trigger({
       next: () => new Promise(resolve => {
         walletsStore.refreshWallet(publicDeriver);
         setTimeout(() => {

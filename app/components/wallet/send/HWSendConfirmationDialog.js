@@ -36,7 +36,7 @@ type Props = {|
   +messages: ExpectedMessages,
   +isSubmitting: boolean,
   +error: ?LocalizableError,
-  +onSubmit: void => void,
+  +onSubmit: void => PossiblyAsync<void>,
   +onCancel: void => void,
   +classicTheme: boolean,
 |};

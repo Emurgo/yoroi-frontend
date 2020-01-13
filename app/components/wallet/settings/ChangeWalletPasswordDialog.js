@@ -34,7 +34,7 @@ type Props = {|
   +currentPasswordValue: string,
   +newPasswordValue: string,
   +repeatedPasswordValue: string,
-  +onSave: {| oldPassword: string, newPassword: string |} => void,
+  +onSave: {| oldPassword: string, newPassword: string |} => PossiblyAsync<void>,
   +onCancel: void => void,
   +onDataChange: { [key: string]: any } => void,
   +onPasswordSwitchToggle: void => void,
@@ -103,13 +103,13 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
 
   submit = () => {
     this.form.submit({
-      onSuccess: (form) => {
+      onSuccess: async (form) => {
         const { currentPassword, walletPassword } = form.values();
         const passwordData = {
           oldPassword: currentPassword || null,
           newPassword: walletPassword,
         };
-        this.props.onSave(passwordData);
+        await this.props.onSave(passwordData);
       },
       onError: () => {},
     });

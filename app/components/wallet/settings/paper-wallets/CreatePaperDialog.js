@@ -56,9 +56,9 @@ const messages = defineMessages({
 type Props = {|
   +renderStatus: ?PdfGenStepType,
   +paperFile: ?Blob,
-  +onNext: void => void,
-  +onCancel: void => void,
-  +onDownload: void => void,
+  +onNext: void => PossiblyAsync<void>,
+  +onCancel: void => PossiblyAsync<void>,
+  +onDownload: void => PossiblyAsync<void>,
   +onDataChange: { [key: string]: any } => void,
   +classicTheme: boolean,
 |};
