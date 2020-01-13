@@ -47,9 +47,9 @@ type Props = {|
   +classicTheme: boolean
 |};
 
-type State = {
+type State = {|
   isSubmitting: boolean,
-};
+|};
 
 @observer
 export default class WalletCreateDialog extends Component<Props, State> {

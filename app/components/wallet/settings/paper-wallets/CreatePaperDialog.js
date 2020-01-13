@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
@@ -60,6 +61,7 @@ type Props = {|
   +onCancel: void => PossiblyAsync<void>,
   +onDownload: void => PossiblyAsync<void>,
   +onDataChange: { [key: string]: any } => void,
+  +loadingGif: Node,
   +classicTheme: boolean,
 |};
 
@@ -165,7 +167,7 @@ export default class CreatePaperDialog extends Component<Props> {
         classicTheme={classicTheme}
       >
         <div className={styles.walletLoaderWrapper}>
-          <div className={styles.walletLoader} />
+          {this.props.loadingGif}
           <div className={styles.walletLoaderTitle}>
             {this.context.intl.formatMessage(messages.progressTitleCreatePaperWallet)}
           </div>

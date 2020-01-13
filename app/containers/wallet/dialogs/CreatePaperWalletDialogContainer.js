@@ -9,6 +9,7 @@ import PaperWalletsActions from '../../../actions/ada/paper-wallets-actions';
 import PaperWalletCreateStore, { ProgressStep } from '../../../stores/ada/PaperWalletCreateStore';
 import { Logger } from '../../../utils/logging';
 import CreatePaperDialog from '../../../components/wallet/settings/paper-wallets/CreatePaperDialog';
+import LoadingGif from '../../../components/wallet/settings/paper-wallets/LoadingGif';
 import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog';
 import validWords from 'bip39/src/wordlists/english.json';
 import FinalizeDialog from '../../../components/wallet/settings/paper-wallets/FinalizeDialog';
@@ -94,6 +95,7 @@ export default class CreatePaperWalletDialogContainer extends Component<Injected
             paperFile={paperStore.pdf}
             onNext={paperActions.submitCreate.trigger}
             onCancel={onCancel}
+            loadingGif={<LoadingGif />}
             onDownload={paperActions.downloadPaperWallet.trigger}
             onDataChange={data => {
               updateDataForActiveDialog.trigger({ data });
