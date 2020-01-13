@@ -19,7 +19,7 @@ import { TransferKind } from '../../types/TransferTypes';
 
 type Props = {|
   ...InjectedProps,
-  +onNext: void => void,
+  +onNext: void => PossiblyAsync<void>,
   +selectedExplorer: ExplorerType,
   +onCancel: void => void,
   +recoveryPhrase: string,

@@ -24,7 +24,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +onClose: void => void;
+  +onClose: void => PossiblyAsync<void>;
   +classicTheme: boolean,
 |};
 

@@ -1,5 +1,5 @@
 // @flow
-import Action from '../lib/Action';
+import { AsyncAction, Action } from '../lib/Action';
 
 export type PoolRequest =
   void |
@@ -10,8 +10,8 @@ export type PoolRequest =
   |}>;
 
 export default class DelegationTransactionActions {
-  createTransaction: Action<PoolRequest> = new Action();
-  signTransaction: Action<{| password: string |}> = new Action();
-  complete: Action<void> = new Action();
+  createTransaction: AsyncAction<PoolRequest> = new AsyncAction();
+  signTransaction: AsyncAction<{| password: string |}> = new AsyncAction();
+  complete: AsyncAction<void> = new AsyncAction();
   reset: Action<void> = new Action();
 }

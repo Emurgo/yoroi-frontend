@@ -21,7 +21,7 @@ const messages = defineMessages({
 
 type Props = {|
   +localizedTermsOfUse: string,
-  +onSubmit: void => void,
+  +onSubmit: void => PossiblyAsync<void>,
   +isSubmitting: boolean,
   +error?: ?LocalizableError,
 |};
@@ -47,10 +47,6 @@ export default class TermsOfUseForm extends Component<Props, State> {
   toggleAcceptance() {
     this.setState(prevState => ({ areTermsOfUseAccepted: !prevState.areTermsOfUseAccepted }));
   }
-
-  submit = () => {
-    this.props.onSubmit();
-  };
 
   render() {
     const { intl } = this.context;
@@ -80,7 +76,7 @@ export default class TermsOfUseForm extends Component<Props, State> {
             <Button
               className={buttonClasses}
               label={intl.formatMessage(globalMessages.continue)}
-              onMouseUp={this.submit}
+              onMouseUp={this.props.onSubmit}
               disabled={!areTermsOfUseAccepted}
               skin={ButtonSkin}
             />

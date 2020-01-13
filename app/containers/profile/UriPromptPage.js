@@ -53,10 +53,6 @@ export default class UriPromptPage extends Component<InjectedProps> {
     });
   };
 
-  onFinalSubmit = () => {
-    this.props.actions.profile.acceptUriScheme.trigger();
-  };
-
   _getContent = () => {
     const { profile } = this.props.stores;
     switch (this.selectedChoice) {
@@ -68,13 +64,13 @@ export default class UriPromptPage extends Component<InjectedProps> {
         />;
       case Choices.ACCEPT:
         return <UriAccept
-          onConfirm={this.onFinalSubmit}
+          onConfirm={this.props.actions.profile.acceptUriScheme.trigger}
           onBack={this.onBack}
           classicTheme={profile.isClassicTheme}
         />;
       case Choices.SKIP:
         return <UriSkip
-          onConfirm={this.onFinalSubmit}
+          onConfirm={this.props.actions.profile.acceptUriScheme.trigger}
           onBack={this.onBack}
           classicTheme={profile.isClassicTheme}
         />;

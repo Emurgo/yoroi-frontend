@@ -48,9 +48,9 @@ type Props = {|
   +notification: ?Notification,
   +selectedExplorer: ExplorerType,
   +paper: AdaPaper,
-  +onNext: void => void,
-  +onCancel: void => void,
-  +onBack?: void => void,
+  +onNext: void => PossiblyAsync<void>,
+  +onCancel: void => PossiblyAsync<void>,
+  +onBack?: void => PossiblyAsync<void>,
   +classicTheme: boolean,
 |};
 

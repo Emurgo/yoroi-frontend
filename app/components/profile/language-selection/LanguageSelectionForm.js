@@ -25,7 +25,7 @@ const messages = defineMessages({
 type Props = {|
   +onSelectLanguage: {| locale: string |} => void,
   +languages: Array<{ value: string, label: MessageDescriptor, svg: string }>,
-  +onSubmit: {| locale: string |} => void,
+  +onSubmit: {| locale: string |} => PossiblyAsync<void>,
   +isSubmitting: boolean,
   +currentLocale: string,
   +error?: ?LocalizableError,
@@ -41,15 +41,15 @@ export default class LanguageSelectionForm extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  selectLanguage = (locale: string) => {
+  selectLanguage: string => void = (locale) => {
     this.props.onSelectLanguage({ locale });
   };
 
-  submit = () => {
+  submit: void => void = () => {
     this.form.submit({
-      onSuccess: (form) => {
+      onSuccess: async (form) => {
         const { languageId } = form.values();
-        this.props.onSubmit({ locale: languageId });
+        await this.props.onSubmit({ locale: languageId });
       },
       onError: () => {}
     });

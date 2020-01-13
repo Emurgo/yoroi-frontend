@@ -53,7 +53,7 @@ export default class TransactionsStore extends Store {
     actions.loadMoreTransactions.listen(this._increaseSearchLimit);
   }
 
-  @action _increaseSearchLimit = () => {
+  @action _increaseSearchLimit = async (): Promise<void> => {
     if (this.searchOptions != null) {
       this.searchOptions.limit += this.SEARCH_LIMIT_INCREASE;
       const publicDeriver = this.stores.substores[environment.API].wallets.selected;
@@ -62,7 +62,7 @@ export default class TransactionsStore extends Store {
       if (hasLevels == null) {
         return;
       }
-      this.refreshLocal(hasLevels);
+      await this.refreshLocal(hasLevels);
     }
   };
 

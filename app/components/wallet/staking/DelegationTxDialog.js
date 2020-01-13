@@ -67,7 +67,7 @@ type Props = {|
   +approximateReward: BigNumber,
   +isSubmitting: boolean,
   +onCancel: void => void,
-  +onSubmit: ({| password: string |}) => void,
+  +onSubmit: ({| password: string |}) => PossiblyAsync<void>,
   +classicTheme: boolean,
   +error: ?LocalizableError,
 |};
@@ -107,12 +107,12 @@ export default class DelegationTxDialog extends Component<Props> {
 
   submit() {
     this.form.submit({
-      onSuccess: (form) => {
+      onSuccess: async (form) => {
         const { walletPassword } = form.values();
         const transactionData = {
           password: walletPassword,
         };
-        this.props.onSubmit(transactionData);
+        await this.props.onSubmit(transactionData);
       },
       onError: () => {}
     });

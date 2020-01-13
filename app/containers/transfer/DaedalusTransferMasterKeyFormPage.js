@@ -15,7 +15,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +onSubmit: { masterKey: string, } => void,
+  +onSubmit: {| masterKey: string, |} => PossiblyAsync<void>,
   +onBack: void => void,
   +classicTheme: boolean,
 |};
@@ -39,8 +39,8 @@ export default class DaedalusTransferMasterKeyFormPage extends Component<Props> 
       throw new Error('DaedalusTransferMasterKeyFormPage form not set');
     }
     this.masterKeyForm.submit({
-      onSuccess: (form) => {
-        this.props.onSubmit(form.values());
+      onSuccess: async (form) => {
+        await this.props.onSubmit(form.values());
       },
       onError: () => {}
     });

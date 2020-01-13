@@ -51,8 +51,8 @@ const messages = defineMessages({
 
 type Props = {|
   +currentTheme: Theme,
-  +selectTheme: {| theme: string |} => void,
-  +exportTheme: void => void,
+  +selectTheme: {| theme: string |} => PossiblyAsync<void>,
+  +exportTheme: void => PossiblyAsync<void>,
   +getThemeVars: {| theme: string |} => { [key: string]: string },
   +hasCustomTheme: void => boolean,
   +onExternalLinkClick: MouseEvent => void,

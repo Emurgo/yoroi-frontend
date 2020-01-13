@@ -67,10 +67,10 @@ type Props = {|
   +selectedExplorer: ExplorerType,
   +isWalletAddressUsed: boolean,
   +walletAddresses: Array<StandardAddress>,
-  +onGenerateAddress: void => void,
+  +onGenerateAddress: void => Promise<void>,
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
-  +onVerifyAddress: {| address: string, path: BIP32Path |} => void,
+  +onVerifyAddress: {| address: string, path: BIP32Path |} => Promise<void>,
   +onGeneratePaymentURI: string => void,
   +isSubmitting: boolean,
   +error?: ?LocalizableError,
@@ -98,8 +98,8 @@ export default class WalletReceive extends Component<Props, State> {
     this.setState(prevState => ({ showUsed: !prevState.showUsed }));
   };
 
-  submit = () => {
-    this.props.onGenerateAddress();
+  submit: void => Promise<void> = async () => {
+    await this.props.onGenerateAddress();
   }
 
   loadingSpinner: ?LoadingSpinner;

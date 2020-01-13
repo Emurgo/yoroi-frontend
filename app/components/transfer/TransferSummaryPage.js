@@ -52,7 +52,7 @@ type Props = {|
   +formattedWalletAmount: BigNumber => string,
   +selectedExplorer: ExplorerType,
   +transferTx: TransferTx,
-  +onSubmit: void => void,
+  +onSubmit: void => PossiblyAsync<void>,
   +isSubmitting: boolean,
   +onCancel: void => void,
   +error: ?LocalizableError,

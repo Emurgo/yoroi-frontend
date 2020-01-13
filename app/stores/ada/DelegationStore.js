@@ -53,7 +53,7 @@ export default class DelegationStore extends Store {
   }
 
   @action.bound
-  _startWatch: void => Promise<void> = async () => {
+  _startWatch: void => void = () => {
     this._recalculateDelegationInfoDisposer = reaction(
       () => [
         this.stores.substores.ada.wallets.selected,

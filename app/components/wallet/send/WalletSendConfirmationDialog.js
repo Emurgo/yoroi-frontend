@@ -30,7 +30,7 @@ type Props = {|
   +receivers: Array<string>,
   +totalAmount: string,
   +transactionFee: string,
-  +onSubmit: ({| password: string |}) => void,
+  +onSubmit: ({| password: string |}) => PossiblyAsync<void>,
   +amountToNaturalUnits: (amountWithFractions: string) => string,
   +onCancel: void => void,
   +isSubmitting: boolean,
@@ -74,12 +74,12 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
 
   submit() {
     this.form.submit({
-      onSuccess: (form) => {
+      onSuccess: async (form) => {
         const { walletPassword } = form.values();
         const transactionData = {
           password: walletPassword,
         };
-        this.props.onSubmit(transactionData);
+        await this.props.onSubmit(transactionData);
       },
       onError: () => {}
     });

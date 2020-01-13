@@ -56,9 +56,9 @@ export default class WalletSettingsPage extends Component<Props> {
           renameModelRequest.result === false
         }
         lastUpdatedField={lastUpdatedWalletField}
-        onFieldValueChange={(field, value) => {
+        onFieldValueChange={async (field, value) => {
           if (field === 'name') {
-            renameConceptualWallet.trigger({ newName: value });
+            await renameConceptualWallet.trigger({ newName: value });
           }
         }}
         onStartEditing={field => startEditingWalletField.trigger({ field })}

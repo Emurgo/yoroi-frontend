@@ -55,7 +55,7 @@ type Props = {|
   +onAcceptTermRecovery: void => void,
   +onRestartBackup: void => void,
   +onCancelBackup: void => void,
-  +onFinishBackup: void => void,
+  +onFinishBackup: void => PossiblyAsync<void>,
   +removeWord: void => void,
   +hasWord: boolean,
   +classicTheme: boolean,
