@@ -469,6 +469,16 @@ const YoroiModern = {
   '--theme-sidebar-icon-color-hover': '#17D1AA',
   '--theme-sidebar-icon-color-active': '#17D1AA',
   '--theme-sidebar-item-background-color-hover': '#2C30D1',
+
+  // Page
+
+  '--theme-page-container-width': '1215px',
+  '--theme-page-background-color': '#F0F3F5',
+  '--theme-page-content-background-color': '#FFFFFF',
+  '--theme-page-content-box-shadow': '0 2px 12px 0 rgba(0, 0, 0, 0.06)',
+  '--theme-page-content-border-radius': '8px',
+  '--theme-page-content-box-bottom': '24px',
+  '--theme-banner-height': '46px',
 };
 
 // *************************************************************
