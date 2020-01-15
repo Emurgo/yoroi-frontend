@@ -39,6 +39,7 @@ export default class Transfer extends Component<InjectedContainerProps> {
         actions={actions}
         stores={stores}
         connectionErrorType={checkAdaServerStatus}
+        showInContainer
       >
         <TransferWithNavigation
           isActiveScreen={this.isActiveScreen}

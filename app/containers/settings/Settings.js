@@ -69,6 +69,7 @@ export default class Settings extends Component<InjectedContainerProps> {
         connectionErrorType={checkAdaServerStatus}
         actions={actions}
         stores={stores}
+        showInContainer
       >
         <SettingsLayout menu={menu}>
           {children != null ? children : null}

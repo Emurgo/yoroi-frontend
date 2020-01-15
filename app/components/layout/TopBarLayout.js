@@ -12,6 +12,7 @@ type Props = {|
   +children?: ?Node,
   +notification?: ?Node,
   +languageSelectionBackground?: boolean,
+  +showInContainer?: boolean,
 |};
 
 /** Adds a top bar above the wrapped node */
@@ -24,6 +25,7 @@ export default class TopBarLayout extends Component<Props> {
     children: undefined,
     notification: undefined,
     languageSelectionBackground: false,
+    showInContainer: false,
   };
 
   render() {
@@ -33,7 +35,9 @@ export default class TopBarLayout extends Component<Props> {
       sidebar,
       children,
       notification,
+      showInContainer,
     } = this.props;
+
     const componentClasses = classnames([
       styles.component,
       this.props.languageSelectionBackground === true
@@ -54,25 +58,53 @@ export default class TopBarLayout extends Component<Props> {
             : null
           }
 
-          <div className={styles.main}>
+          <div
+            className={
+              classnames([
+                styles.main,
+                showInContainer !== null && showInContainer === true && styles.containerMain
+              ])
+            }
+          >
+
             {banner}
 
-            {topbar != null
-              ? (
-                <div className={styles.topbar}>
-                  {topbar}
-                </div>
-              )
-              : null
-            }
+            <div
+              className={
+                classnames([
+                  styles.content,
+                  showInContainer !== null && showInContainer === true && styles.containerContent
+                ])
+              }
+            >
 
-            {notification}
-            <div className={styles.contentWrapper}>
-              <div className={styles.content}>
-                {children}
+              {topbar != null
+                ? (
+                  <div className={styles.topbar}>
+                    {topbar}
+                  </div>
+                )
+                : null
+              }
+
+              {notification}
+
+              <div
+                className={
+                  classnames([
+                    styles.inner,
+                    showInContainer !== null && showInContainer === true && styles.containerInner
+                  ])
+                }
+              >
+                <div className={styles.content}>
+                  {children}
+                </div>
               </div>
+
             </div>
           </div>
+
         </div>
       </div>
     );

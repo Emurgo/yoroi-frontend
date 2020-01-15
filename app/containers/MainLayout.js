@@ -13,6 +13,7 @@ export type MainLayoutProps = {|
   topbar?: Node,
   sidebar?: Node,
   connectionErrorType: ServerStatusErrorType,
+  showInContainer?: boolean,
 |};
 
 @observer
@@ -20,6 +21,7 @@ export default class MainLayout extends Component<MainLayoutProps> {
   static defaultProps = {
     topbar: null,
     sidebar: null,
+    showInContainer: false,
   };
 
 
@@ -34,6 +36,7 @@ export default class MainLayout extends Component<MainLayoutProps> {
         topbar={this.props.topbar}
         sidebar={this.props.sidebar}
         notification={<div />}
+        showInContainer={this.props.showInContainer}
       >
         {this.props.children}
       </TopBarLayout>
