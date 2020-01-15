@@ -5,9 +5,10 @@ import { defineMessages, intlShape } from 'react-intl';
 import styles from './WalletNavigation.scss';
 import WalletNavButton from './WalletNavButton';
 import environment from '../../../environment';
-import summaryIcon from '../../../assets/images/wallet-nav/summary-ic.inline.svg';
-import sendIcon from '../../../assets/images/wallet-nav/send-ic.inline.svg';
-import receiveIcon from '../../../assets/images/wallet-nav/receive-ic.inline.svg';
+
+import transactionsIcon from '../../../assets/images/wallet-nav/tab-transactions.inline.svg';
+import sendIcon from '../../../assets/images/wallet-nav/tab-send.inline.svg';
+import receiveIcon from '../../../assets/images/wallet-nav/tab-receive.inline.svg';
 
 const messages = defineMessages({
   transactions: {
@@ -59,7 +60,7 @@ export default class WalletNavigation extends Component<Props> {
           <WalletNavButton
             className="summary"
             label={intl.formatMessage(messages.transactions)}
-            icon={summaryIcon}
+            icon={transactionsIcon}
             isActive={isActiveNavItem('transactions')}
             onClick={() => onNavItemClick('transactions')}
           />
@@ -91,7 +92,6 @@ export default class WalletNavigation extends Component<Props> {
               <WalletNavButton
                 className="stakeDashboard"
                 label={intl.formatMessage(messages.delegationDashboard)}
-                icon={summaryIcon}
                 isActive={isActiveNavItem('delegation-dashboard')}
                 onClick={() => onNavItemClick('delegation-dashboard')}
               />
@@ -101,7 +101,6 @@ export default class WalletNavigation extends Component<Props> {
               <WalletNavButton
                 className="stakeSimulator"
                 label={intl.formatMessage(messages.delegationSimple)}
-                icon={sendIcon}
                 isActive={isActiveNavItem('delegation-simple')}
                 onClick={() => onNavItemClick('delegation-simple')}
               />
@@ -112,7 +111,6 @@ export default class WalletNavigation extends Component<Props> {
                 <WalletNavButton
                   className="stakeAdvancedSimulator"
                   label={intl.formatMessage(messages.delegationAdvance)}
-                  icon={receiveIcon}
                   isActive={isActiveNavItem('delegation-advance')}
                   onClick={() => onNavItemClick('delegation-advance')}
                 />

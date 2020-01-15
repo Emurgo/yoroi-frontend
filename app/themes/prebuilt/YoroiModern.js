@@ -417,7 +417,9 @@ const YoroiModern = {
   '--theme-modal-min-max-width-sm': `${465 - (modalMargin.left + modalMargin.right)}px`,
   '--theme-modal-min-max-width-lg': `${680 - (modalMargin.left + modalMargin.right)}px`,
 
-  '--theme-wallet-navigation-tab-height': '50px',
+  '--theme-wallet-navigation-tab-height': '62px',
+  '--theme-wallet-navigation-tab-text-color': '#6B7384',
+  '--theme-wallet-navigation-tab-text-color-active': '#17D1AA',
 
   '--theme-warning-box-bg-color': 'rgba(255, 19, 81, 0.06)', // #FF1351
 
