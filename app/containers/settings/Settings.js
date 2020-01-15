@@ -5,13 +5,13 @@ import { defineMessages, intlShape } from 'react-intl';
 import environment from '../../environment';
 import SettingsLayout from '../../components/settings/SettingsLayout';
 import SettingsMenu from '../../components/settings/menu/SettingsMenu';
-import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
-import TopBar from '../../components/topbar/TopBar';
 import { buildRoute } from '../../utils/routing';
 import type { InjectedContainerProps } from '../../types/injectedPropsType';
 
 import MainLayout from '../MainLayout';
 import SidebarContainer from '../SidebarContainer';
+import NavBar from '../../components/topbar/NavBar';
+import NavBarTitle from '../../components/topbar/NavBarTitle';
 
 const messages = defineMessages({
   title: {
@@ -50,21 +50,14 @@ export default class Settings extends Component<InjectedContainerProps> {
         currentTheme={profile.currentTheme}
       />
     );
-    const topbarTitle = (
-      <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
+
+    const navbarTitle = (
+      <NavBarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
+
     return (
       <MainLayout
-        topbar={(
-          <TopBar
-            title={topbarTitle}
-            onCategoryClicked={category => {
-              actions.topbar.activateTopbarCategory.trigger({ category });
-            }}
-            isActiveCategory={topbar.isActiveCategory}
-            categories={topbar.categories}
-          />
-        )}
+        navbar={<NavBar title={navbarTitle} />}
         sidebar={sidebarContainer}
         connectionErrorType={checkAdaServerStatus}
         actions={actions}

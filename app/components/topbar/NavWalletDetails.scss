@@ -1,0 +1,39 @@
+.wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.toggleButton {
+    margin-left: 8px;
+
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.amount {
+    font-family: var(--font-medium);
+    font-size: 16px;
+    line-height: 20px;
+    color: var(--theme-mywallets-main-text-color);
+}
+
+.afterDecimal {
+    color: var(--theme-mywallets-ada-amount-decimal-color);
+    font-size: 12px;
+}
+
+.text {
+    font-size: 14px;
+    line-height: 22px;
+    margin-top: 2px;
+    color: var(--theme-mywallets-secondary-text-color);
+}

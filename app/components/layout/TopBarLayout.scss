@@ -8,7 +8,7 @@
   width: 100%;
 }
 
-.topbar {
+.topbar, .navbar {
   // Show elements that overflow the topbar above the content area
   z-index: 1;
 }

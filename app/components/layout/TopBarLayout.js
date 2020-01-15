@@ -8,6 +8,7 @@ import styles from './TopBarLayout.scss';
 type Props = {|
   +banner?: Node,
   +topbar?: Node,
+  +navbar?: Node,
   +sidebar?: Node,
   +children?: ?Node,
   +notification?: ?Node,
@@ -21,6 +22,7 @@ export default class TopBarLayout extends Component<Props> {
   static defaultProps = {
     banner: undefined,
     topbar: undefined,
+    navbar: undefined,
     sidebar: undefined,
     children: undefined,
     notification: undefined,
@@ -32,6 +34,7 @@ export default class TopBarLayout extends Component<Props> {
     const {
       banner,
       topbar,
+      navbar,
       sidebar,
       children,
       notification,
@@ -45,19 +48,29 @@ export default class TopBarLayout extends Component<Props> {
         : '',
     ]);
 
+    const sidebarComponent = (
+      <div className={styles.sidebar}>
+        {sidebar}
+      </div>
+    );
+
+    const topbarComponent = (
+      <div className={styles.topbar}>
+        {topbar}
+      </div>
+    );
+
+    const navbarComponent = (
+      <div className={styles.navbar}>
+        {navbar}
+      </div>
+    );
+
+
     return (
       <div className={componentClasses}>
         <div className={styles.windowWrapper}>
-
-          {sidebar != null
-            ? (
-              <div className={styles.sidebar}>
-                {sidebar}
-              </div>
-            )
-            : null
-          }
-
+          {sidebar != null ? sidebarComponent : null}
           <div
             className={
               classnames([
@@ -66,9 +79,7 @@ export default class TopBarLayout extends Component<Props> {
               ])
             }
           >
-
             {banner}
-
             <div
               className={
                 classnames([
@@ -77,18 +88,9 @@ export default class TopBarLayout extends Component<Props> {
                 ])
               }
             >
-
-              {topbar != null
-                ? (
-                  <div className={styles.topbar}>
-                    {topbar}
-                  </div>
-                )
-                : null
-              }
-
+              {topbar != null ? topbarComponent : null}
+              {navbar != null ? navbarComponent : null}
               {notification}
-
               <div
                 className={
                   classnames([
@@ -101,10 +103,8 @@ export default class TopBarLayout extends Component<Props> {
                   {children}
                 </div>
               </div>
-
             </div>
           </div>
-
         </div>
       </div>
     );

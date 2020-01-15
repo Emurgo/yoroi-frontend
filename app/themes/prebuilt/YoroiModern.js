@@ -481,6 +481,12 @@ const YoroiModern = {
   '--theme-page-content-border-radius': '8px',
   '--theme-page-content-box-bottom': '24px',
   '--theme-banner-height': '46px',
+
+  // Navbar
+
+  '--theme-navbar-height': '60px',
+  '--theme-navbar-background-color': '#F0F3F5',
+  '--theme-navbar-color': '#6B7384',
 };
 
 // *************************************************************

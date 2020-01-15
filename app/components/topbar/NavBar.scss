@@ -1,0 +1,29 @@
+.navbar {
+  display: flex;
+  position: relative;
+  z-index: 100;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  height: var(--theme-navbar-height);
+  background-color: var(--theme-navbar-background-color);
+  color: var(--theme-navbar-color);
+}
+
+.title {
+  flex: 0 0 auto;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.plate {
+  flex: 0;
+  margin-right: 62px;
+}
+
+.details {
+  flex: 0;
+}

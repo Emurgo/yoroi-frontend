@@ -24,6 +24,7 @@
 
   &:hover {
     cursor: default;
+    background-color: var(--theme-nav-item-background-color-active);
   }
 
   .icon {
@@ -68,5 +69,11 @@
     line-height: 22px;
     color: var(--theme-wallet-navigation-tab-text-color);
     text-transform: initial;
+  }
+
+  .active {
+    .label {
+      color: var(--theme-wallet-navigation-tab-text-color-active);
+    }
   }
 }
