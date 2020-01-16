@@ -33,6 +33,10 @@ const messages = defineMessages({
     id: 'wallet.dashboard.lessthan.reason4',
     defaultMessage: '!!!A stake pool you are delegating to charges a flat fee greater than the pool\'s total reward',
   },
+  reason5: {
+    id: 'wallet.dashboard.lessthan.reason5',
+    defaultMessage: '!!!A stake pool you are delegating to is saturated',
+  },
 });
 
 type Props = {|
@@ -70,6 +74,7 @@ export default class LessThanExpectedDialog extends Component<Props> {
           <li key="2">{intl.formatMessage(messages.reason2)}</li>
           <li key="3">{intl.formatMessage(messages.reason3)}</li>
           <li key="4">{intl.formatMessage(messages.reason4)}</li>
+          <li key="5">{intl.formatMessage(messages.reason5)}</li>
         </ul>
       </Dialog>);
   }
