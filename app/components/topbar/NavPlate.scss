@@ -9,20 +9,43 @@
   flex-direction: column;
   align-items: flex-start;
   margin-left: 12px;
-  color: var(--theme-mywallets-secondary-text-color);
+  color: var(--theme-wallet-plate-secondary-text-color);
   font-size: 14px;
-  line-height: 22px;
+  line-height: 19px;
 }
 
 .name {
   font-family: var(--font-medium);
-  font-size: 16px;
+  font-size: 18px;
   line-height: 22px;
-  margin-bottom: 2px;
-  text-transform: uppercase;
+  color: var(--theme-wallet-plate-main-text-color);
+  margin-right: 4px;
 }
 
 .icon {
-  width: 35px;
-  height: 35px;
+  width: 42px;
+  height: 42px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.type {
+  color: var(--theme-wallet-plate-secondary-text-color);
+  font-family: var(--font-regular);
+  font-size: 12px;
+  line-height: 18px;
+  display: flex;
+  align-items: center;
+  padding-top: 1px;
+}
+
+.typeIcon {
+  margin-right: 6px;
+  width: 18px;
+  height: 18px;
+  margin-top: -1px;
 }

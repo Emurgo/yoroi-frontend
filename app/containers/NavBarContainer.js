@@ -99,14 +99,13 @@ export default class NavBarContainer extends Component<Props> {
     );
 
     return (
-      // TODO: Change to i18n and move up to Wallets.js
       <NavBar
         title={title}
         walletPlate={
           <NavPlate
             publicDeriver={walletsStore.selected}
             walletName={walletName}
-            walletType="conceptual"
+            walletType="paper"
           />
         }
         walletDetails={dropdownComponent}

@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
 import type { InjectedContainerProps } from '../../types/injectedPropsType';
 import MainLayout from '../MainLayout';
 import SidebarContainer from '../SidebarContainer';
@@ -11,14 +11,7 @@ import { ROUTES } from '../../routes-config';
 import environment from '../../environment';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import NavBar from '../../components/topbar/NavBar';
-
-// Maybe change this to a separate i18n string
-const messages = defineMessages({
-  title: {
-    id: 'sidebar.transfer',
-    defaultMessage: '!!!Transfer wallets',
-  },
-});
+import globalMessages from '../../i18n/global-messages';
 
 @observer
 export default class Transfer extends Component<InjectedContainerProps> {
@@ -45,7 +38,7 @@ export default class Transfer extends Component<InjectedContainerProps> {
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
 
     const navbarTitle = (
-      <NavBarTitle title={this.context.intl.formatMessage(messages.title)} />
+      <NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarTransfer)} />
     );
 
     return (
