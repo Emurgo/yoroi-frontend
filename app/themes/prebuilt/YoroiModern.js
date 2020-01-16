@@ -474,13 +474,23 @@ const YoroiModern = {
 
   // Page
 
-  '--theme-page-container-width': '1215px',
+  '--theme-page-container-width': '1295px',
+  '--theme-page-container-side-padding': '40px',
   '--theme-page-background-color': '#F0F3F5',
   '--theme-page-content-background-color': '#FFFFFF',
   '--theme-page-content-box-shadow': '0 2px 12px 0 rgba(0, 0, 0, 0.06)',
   '--theme-page-content-border-radius': '8px',
   '--theme-page-content-box-bottom': '24px',
   '--theme-banner-height': '46px',
+  '--theme-wallet-dropdown-main-text-color': '#242838',
+  '--theme-wallet-dropdown-secondary-text-color': '#6B7384',
+  '--theme-wallet-dropdown-accent-text-color': '#17D1AA',
+  '--theme-wallet-dropdown-box-shadow': '0 10px 12px 0 rgba(0, 0, 0, 0.06)',
+  '--theme-wallet-dropdown-background-color': '#FFFFFF',
+  '--theme-wallet-dropdown-selected-background-color': '#F0F3F5',
+  '--theme-wallet-dropdown-row-border-color': '#E0E3EB',
+  '--theme-wallet-dropdown-border-radius': '8px',
+  '--theme-wallet-dropdown-min-width': '600px',
 
   // Navbar
 

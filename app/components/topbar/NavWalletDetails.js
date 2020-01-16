@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import classnames from 'classnames';
 import BigNumber from 'bignumber.js';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 import { DECIMAL_PLACES_IN_ADA } from '../../config/numbersConfig';
@@ -12,7 +13,8 @@ type Props = {|
     +formattedWalletAmount?: BigNumber => string,
     +publicDeriver: null | PublicDeriverWithCachedMeta,
     +onUpdateHideBalance: void => void,
-    +shouldHideBalance: boolean
+    +shouldHideBalance: boolean,
+    +highlightTitle?: boolean,
 |};
 
 function splitAmount(
@@ -29,6 +31,7 @@ function splitAmount(
 export default class NavWalletDetails extends Component<Props> {
   static defaultProps = {
     formattedWalletAmount: undefined,
+    highlightTitle: false,
   };
 
   render() {
@@ -36,7 +39,8 @@ export default class NavWalletDetails extends Component<Props> {
       formattedWalletAmount,
       publicDeriver,
       shouldHideBalance,
-      onUpdateHideBalance
+      onUpdateHideBalance,
+      highlightTitle,
     } = this.props;
 
     const walletAmount = formattedWalletAmount ? (
@@ -52,7 +56,12 @@ export default class NavWalletDetails extends Component<Props> {
     return (
       <div className={styles.wrapper}>
         <div className={styles.content}>
-          <div className={styles.amount}>
+          <div
+            className={classnames([
+              styles.amount,
+              highlightTitle !== null && highlightTitle === true && styles.highlightAmount
+            ])}
+          >
             { publicDeriver && shouldHideBalance ?
               <span className={styles.hiddenAmount}>******</span> :
               <>
@@ -62,14 +71,38 @@ export default class NavWalletDetails extends Component<Props> {
             }
             {currency}
           </div>
-          <button
-            type="button"
-            className={styles.toggleButton}
-            onClick={onUpdateHideBalance}
-          >
-            {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
-          </button>
+          <div className={styles.details}>
+            <div>
+              <p className={styles.label}>Wallet:&nbsp;</p>
+              { publicDeriver && shouldHideBalance ?
+                <span className={styles.hiddenAmount}>******</span> :
+                <>
+                  {beforeDecimal}
+                  <span className={styles.afterDecimal}>{afterDecimal}</span>
+                </>
+              }
+              {currency}
+            </div>
+            <div>
+              <p className={styles.label}>Rewards:&nbsp;</p>
+              { publicDeriver && shouldHideBalance ?
+                <span className={styles.hiddenAmount}>******</span> :
+                <>
+                  {beforeDecimal}
+                  <span className={styles.afterDecimal}>{afterDecimal}</span>
+                </>
+              }
+              {currency}
+            </div>
+          </div>
         </div>
+        <button
+          type="button"
+          className={styles.toggleButton}
+          onClick={onUpdateHideBalance}
+        >
+          {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
+        </button>
       </div>
     );
   }

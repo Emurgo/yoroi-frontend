@@ -3,7 +3,7 @@
   position: relative;
   z-index: 100;
   margin-top: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 4px;
   height: var(--theme-navbar-height);
   background-color: var(--theme-navbar-background-color);
   color: var(--theme-navbar-color);
@@ -20,10 +20,12 @@
 }
 
 .plate {
-  flex: 0;
-  margin-right: 62px;
+  flex: 0 0 auto;
+  padding-right: 62px;
+  min-width: 240px;
 }
 
 .details {
-  flex: 0;
+  flex: 0 0 auto;
+  min-width: 280px;
 }

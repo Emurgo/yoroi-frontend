@@ -9,6 +9,8 @@ import NavBar from '../components/topbar/NavBar';
 import NavPlate from '../components/topbar/NavPlate';
 import NavBarTitle from '../components/topbar/NavBarTitle';
 import NavWalletDetails from '../components/topbar/NavWalletDetails';
+import NavDropdown from '../components/topbar/NavDropdown';
+import NavDropdownRow from '../components/topbar/NavDropdownRow';
 
 type Props = InjectedProps;
 
@@ -29,6 +31,73 @@ export default class NavBarContainer extends Component<Props> {
 
     // TODO: Change to i18n
     const title = (<NavBarTitle title="My Wallets" />);
+
+    const plateComponent = (
+      <NavPlate
+        publicDeriver={walletsStore.selected}
+        walletName={walletName}
+        walletType="conceptual"
+      />
+    );
+
+    const dropdownHead = (
+      <NavWalletDetails
+        publicDeriver={walletsStore.selected}
+        formattedWalletAmount={formattedWalletAmount}
+        onUpdateHideBalance={this.updateHideBalance}
+        shouldHideBalance={profile.shouldHideBalance}
+      />
+    );
+
+    const dropdownContent = (
+      <>
+        <NavDropdownRow
+          title="All wallets"
+          detailComponent={
+            <NavWalletDetails
+              publicDeriver={walletsStore.selected}
+              formattedWalletAmount={formattedWalletAmount}
+              onUpdateHideBalance={this.updateHideBalance}
+              shouldHideBalance={profile.shouldHideBalance}
+              highlightTitle
+            />
+          }
+        />
+        <NavDropdownRow
+          plateComponent={plateComponent}
+          isCurrentWallet
+          syncTime="5 min ago"
+          detailComponent={
+            <NavWalletDetails
+              publicDeriver={walletsStore.selected}
+              formattedWalletAmount={formattedWalletAmount}
+              onUpdateHideBalance={this.updateHideBalance}
+              shouldHideBalance={profile.shouldHideBalance}
+            />
+          }
+        />
+        <NavDropdownRow
+          plateComponent={plateComponent}
+          syncTime="2 hours ago"
+          detailComponent={
+            <NavWalletDetails
+              publicDeriver={walletsStore.selected}
+              formattedWalletAmount={formattedWalletAmount}
+              onUpdateHideBalance={this.updateHideBalance}
+              shouldHideBalance={profile.shouldHideBalance}
+            />
+          }
+        />
+      </>
+    );
+
+    const dropdownComponent = (
+      <NavDropdown
+        headerComponent={dropdownHead}
+        contentComponents={dropdownContent}
+      />
+    );
+
     return (
       // TODO: Change to i18n and move up to Wallets.js
       <NavBar
@@ -40,14 +109,7 @@ export default class NavBarContainer extends Component<Props> {
             walletType="conceptual"
           />
         }
-        walletDetails={
-          <NavWalletDetails
-            publicDeriver={walletsStore.selected}
-            formattedWalletAmount={formattedWalletAmount}
-            onUpdateHideBalance={this.updateHideBalance}
-            shouldHideBalance={profile.shouldHideBalance}
-          />
-        }
+        walletDetails={dropdownComponent}
       />
     );
   }

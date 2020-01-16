@@ -67,6 +67,8 @@
 
 .containerContent {
   max-width: var(--theme-page-container-width);
+  padding-left: var(--theme-page-container-side-padding);
+  padding-right: var(--theme-page-container-side-padding);
   width: 100%;
   margin-left: auto;
   margin-right: auto;

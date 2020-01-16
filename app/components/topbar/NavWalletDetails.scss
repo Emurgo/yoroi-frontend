@@ -1,39 +1,60 @@
 .wrapper {
     flex: 1;
     display: flex;
-    align-items: center;
     height: 100%;
+    min-height: var(--theme-navbar-height);
+    color: var(--theme-wallet-dropdown-main-text-color);
+    font-family: var(--font-regular);
 }
 
 .content {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     justify-content: space-between;
+    flex: 1;
+}
+
+.amount {
+    font-family: var(--font-medium);
+    font-size: 16px;
+    line-height: 24px;
+}
+
+.highlightAmount {
+    color: var(--theme-wallet-dropdown-accent-text-color);
 }
 
 .toggleButton {
-    margin-left: 8px;
+    align-self: flex-start;
 
     &:hover {
         cursor: pointer;
     }
 }
 
-.amount {
-    font-family: var(--font-medium);
-    font-size: 16px;
-    line-height: 20px;
-    color: var(--theme-mywallets-main-text-color);
-}
-
 .afterDecimal {
-    color: var(--theme-mywallets-ada-amount-decimal-color);
     font-size: 12px;
+    font-family: var(--font-regular);
 }
 
 .text {
     font-size: 14px;
     line-height: 22px;
     margin-top: 2px;
-    color: var(--theme-mywallets-secondary-text-color);
+}
+
+.details {
+    font-size: 12px;
+    line-height: 16px;
+    margin-top: 2px;
+
+    .afterDecimal {
+        font-family: var(--font-light);
+    }
+}
+
+.label {
+    display: inline-block;
+    color: var(--theme-wallet-dropdown-secondary-text-color);
 }
