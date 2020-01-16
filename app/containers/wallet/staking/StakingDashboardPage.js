@@ -11,6 +11,12 @@ import StakingDashboard from '../../../components/wallet/staking/dashboard/Staki
 import EpochProgress from '../../../components/wallet/staking/dashboard/EpochProgress';
 import UserSummary from '../../../components/wallet/staking/dashboard/UserSummary';
 import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
+import UndelegateDialog from '../../../components/wallet/staking/dashboard/UndelegateDialog';
+import Dialog from '../../../components/widgets/Dialog';
+import { getShelleyTxFee } from '../../../api/ada/transactions/shelley/utils';
+import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
+import ErrorBlock from '../../../components/widgets/ErrorBlock';
+import InvalidURIImg from '../../../assets/images/uri/invalid-uri.inline.svg';
 import RewardPopup from '../../../components/wallet/staking/dashboard/RewardPopup';
 import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard/LessThanExpectedDialog';
 import environment from '../../../environment';
@@ -20,7 +26,6 @@ import { handleExternalLinkClick } from '../../../utils/routing';
 import { GetPoolInfoApiError } from '../../../api/ada/errors';
 import LocalizableError from '../../../i18n/LocalizableError';
 import config from '../../../config';
-
 import { formattedWalletAmount } from '../../../utils/formatters';
 
 import {
@@ -87,6 +92,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
 
   componentWillUnmount() {
     if (this.intervalId) clearInterval(this.intervalId);
+    this.props.actions[environment.API].delegationTransaction.reset.trigger();
   }
 
   render() {
@@ -370,13 +376,73 @@ export default class StakingDashboardPage extends Component<Props, State> {
       />
     );
 
+    const popup = this.generatePopupDialog();
     return (
       <>
+        {popup}
         {dialog}
         {dashboard}
       </>);
   }
 
+  generatePopupDialog: void => null | Node = () => {
+    const { uiDialogs } = this.props.stores;
+    const delegationTxStore = this.props.stores.substores[environment.API].delegationTransaction;
+
+    const cancel = () => {
+      this.props.actions.dialogs.closeActiveDialog.trigger();
+      this.props.actions[environment.API].delegationTransaction.reset.trigger();
+    };
+    if (delegationTxStore.createDelegationTx.error != null) {
+      const { intl } = this.context;
+
+      return (
+        <Dialog
+          title={intl.formatMessage(globalMessages.errorLabel)}
+          closeOnOverlayClick={false}
+          classicTheme={this.props.stores.profile.isClassicTheme}
+          onClose={cancel}
+          closeButton={<DialogCloseButton onClose={cancel} />}
+          actions={[{
+            label: intl.formatMessage(globalMessages.backButtonLabel),
+            onClick: cancel,
+            primary: true,
+          }]}
+        >
+          <>
+            <center><InvalidURIImg /></center>
+            <ErrorBlock
+              error={delegationTxStore.createDelegationTx.error}
+            />
+          </>
+        </Dialog>
+      );
+    }
+
+    if (!uiDialogs.isOpen(UndelegateDialog)) {
+      return null;
+    }
+    const delegationTx = delegationTxStore.createDelegationTx.result;
+    if (delegationTx == null) {
+      return null;
+    }
+
+    return (<UndelegateDialog
+      onCancel={cancel}
+      classicTheme={this.props.stores.profile.isClassicTheme}
+      error={delegationTxStore.signAndBroadcastDelegationTx.error}
+      onSubmit={async request => {
+        await this.props.actions[environment.API]
+          .delegationTransaction
+          .signTransaction
+          .trigger(request);
+        cancel();
+      }}
+      isSubmitting={delegationTxStore.signAndBroadcastDelegationTx.isExecuting}
+      transactionFee={getShelleyTxFee(delegationTx.IOs, true)}
+      staleTx={delegationTxStore.isStale}
+    />);
+  }
   getTimeBasedElements: void => {|
     epochProgress: Node,
     rewardInfo: void | {|
@@ -418,10 +484,13 @@ export default class StakingDashboardPage extends Component<Props, State> {
       rewardInfo = undefined;
     } else {
       const { result } = delegationStore.getCurrentDelegation;
-      if (result == null || result.block == null) {
+      if (result == null || result.currEpoch == null || result.currEpoch.pools.length === 0) {
         rewardInfo = undefined;
       } else {
-        const block = result.block;
+        const block = result.currEpoch.block;
+        if (block == null) {
+          throw new Error(`${nameof(this.getTimeBasedElements)} should never happen`);
+        }
         const certificateRelativeTime = this.toRelativeSlotNumber(block.SlotNum);
 
         let nextRewardEpoch;
@@ -492,7 +561,14 @@ export default class StakingDashboardPage extends Component<Props, State> {
       keyState.state.delegation.pools.length === 0 &&
       delegationStore.getCurrentDelegation.result != null
     ) {
-      return { error: new GetPoolInfoApiError() };
+      const currentDelegation = delegationStore.getCurrentDelegation.result;
+      const currEpochInfo = currentDelegation.currEpoch;
+      if (currEpochInfo == null) {
+        return undefined;
+      }
+      if (currEpochInfo.pools.length !== 0) {
+        return { error: new GetPoolInfoApiError() };
+      }
     }
     return undefined;
   }
@@ -565,6 +641,23 @@ export default class StakingDashboardPage extends Component<Props, State> {
             notification={uiNotifications.getTooltipActiveNotification(
               this.state.notificationElementId
             )}
+            undelegate={
+              keyState.state.delegation.pools.length === 1
+                ? async () => {
+                  await this.props.actions[environment.API]
+                    .delegationTransaction
+                    .createTransaction
+                    .trigger(undefined);
+                  this.props.actions.dialogs.open.trigger({ dialog: UndelegateDialog });
+                }
+                : undefined
+            }
+            isUndelegating={
+              this.props.stores.substores[environment.API]
+                .delegationTransaction
+                .createDelegationTx
+                .isExecuting
+            }
           />
         );
       })

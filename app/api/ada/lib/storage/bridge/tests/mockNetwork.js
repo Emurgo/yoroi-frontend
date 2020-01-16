@@ -11,7 +11,7 @@ import type {
   RemoteTransaction, RemoteUnspentOutput,
   AccountStateRequest, AccountStateResponse, AccountStateFunc,
   PoolInfoRequest, PoolInfoResponse, PoolInfoFunc,
-  AccountStateSuccess, AccountStateFailure, AccountStateDelegation, PoolTuples,
+  AccountStateSuccess, AccountStateFailure, AccountStateDelegation,
   SignedRequestInternal, RemoteCertificate,
   RemoteTransactionInput, RemoteTransactionOutput,
 } from '../../../state-fetch/types';
@@ -25,6 +25,7 @@ import {
 import {
   WalletTypePurpose,
 } from '../../../../../../config/numbersConfig';
+import { delegationTypeToResponse } from '../delegationUtils';
 
 import { RustModule } from '../../../cardanoCrypto/rustLoader';
 
@@ -543,40 +544,6 @@ export function toRemoteTx(
     epoch: null,
     slot: null,
   };
-}
-
-function delegationTypeToResponse(
-  type: RustModule.WalletV3.DelegationType,
-): AccountStateDelegation {
-  const kind = type.get_kind();
-  switch (kind) {
-    case RustModule.WalletV3.DelegationKind.NonDelegated: return { pools: [], };
-    case RustModule.WalletV3.DelegationKind.Full: {
-      const poolId = type.get_full();
-      if (poolId == null) {
-        throw new Error(`${nameof(delegationTypeToResponse)} Should never happen`);
-      }
-      return {
-        pools: [[poolId.to_string(), 1]]
-      };
-    }
-    case RustModule.WalletV3.DelegationKind.Ratio: {
-      const ratios = type.get_ratios();
-      if (ratios == null) {
-        throw new Error(`${nameof(delegationTypeToResponse)} Should never happen`);
-      }
-      const poolTuples: Array<PoolTuples> = [];
-      const pools = ratios.pools();
-      for (let i = 0; i < pools.size(); i++) {
-        const pool = pools.get(i);
-        poolTuples.push([pool.pool().to_string(), pool.parts()]);
-      }
-      return {
-        pools: poolTuples,
-      };
-    }
-    default: throw new Error(`${nameof(delegationTypeToResponse)} unexpected kind ${kind}`);
-  }
 }
 
 function getPoolInfoIfMatch(

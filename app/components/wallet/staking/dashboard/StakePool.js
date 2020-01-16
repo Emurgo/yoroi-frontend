@@ -17,7 +17,7 @@ import RawHash from '../../../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../../../containers/widgets/ExplorableHashContainer';
 import styles from './StakePool.scss';
 import type { ExplorerType } from '../../../../domain/Explorer';
-// import globalMessages from '../../../../i18n/global-messages';
+import globalMessages from '../../../../i18n/global-messages';
 
 const messages = defineMessages({
   title: {
@@ -86,6 +86,12 @@ type Props = {|
   +selectedExplorer: ExplorerType,
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
+  /**
+   * we don't allow to undelegate if the user is using ratio stake
+   * since the UX in this case is not obvious (undelegate from one pool or all pools)
+  */
+  +undelegate: void | (void => Promise<void>),
+  +isUndelegating: boolean,
 |};
 
 @observer
@@ -204,22 +210,40 @@ export default class StakePool extends Component<Props> {
   getMoreInfoButton: MoreInfoProp => Node = (info) => {
     const { intl } = this.context;
 
-    const buttonClasses = classnames([
-      styles.descriptionButton,
+    const moreInfoButtonClasses = classnames([
       this.props.classicTheme ? 'flat' : 'outlined',
     ]);
+    const undelegateButtonClasses = classnames([
+      this.props.classicTheme ? 'flat' : 'outlined',
+      this.props.isUndelegating ? styles.submitButtonSpinning : null,
+    ]);
     return (
-      <a
-        href={info.url}
-        onClick={info.openPoolPage}
-      >
-        <Button
-          type="button"
-          label={intl.formatMessage(messages.button)}
-          className={buttonClasses}
-          skin={ButtonSkin}
-        />
-      </a>
+      <>
+        <a
+          href={info.url}
+          onClick={info.openPoolPage}
+        >
+          <Button
+            type="button"
+            label={intl.formatMessage(messages.button)}
+            className={moreInfoButtonClasses}
+            skin={ButtonSkin}
+          />
+        </a>
+        {this.props.undelegate != null &&
+          <>
+            <div className={styles.data} />
+            <Button
+              type="button"
+              label={intl.formatMessage(globalMessages.undelegateLabel)}
+              className={undelegateButtonClasses}
+              skin={ButtonSkin}
+              onClick={this.props.undelegate}
+              disabled={this.props.isUndelegating}
+            />
+          </>
+        }
+      </>
     );
   }
 }

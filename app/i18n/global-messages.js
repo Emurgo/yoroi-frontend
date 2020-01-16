@@ -469,6 +469,10 @@ const globalMessages = defineMessages({
     id: 'wallet.add.optionDialog.connect.hw.trezor.title',
     defaultMessage: '!!!Trezor Hardware Wallet',
   },
+  undelegateLabel: {
+    id: 'global.labael.undelegate',
+    defaultMessage: '!!!Undelegate',
+  },
 });
 export default globalMessages;
 

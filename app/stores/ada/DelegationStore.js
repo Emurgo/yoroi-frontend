@@ -20,6 +20,10 @@ import type {
   RemotePoolMetaSuccess,
 } from '../../api/ada/lib/state-fetch/types';
 import LocalizableError from '../../i18n/LocalizableError';
+import {
+  genToRelativeSlotNumber,
+  genTimeToSlot,
+} from '../../api/ada/lib/storage/bridge/timeUtils';
 
 export default class DelegationStore extends Store {
 
@@ -125,9 +129,19 @@ export default class DelegationStore extends Store {
           }).promise;
           if (delegatedBalance == null) throw new Error('Should never happen');
 
+          const toRelativeSlotNumber = await genToRelativeSlotNumber();
+          const timeToSlot = await genTimeToSlot();
+          const currentEpoch = toRelativeSlotNumber(
+            timeToSlot({
+              time: new Date(),
+            }).slot
+          ).epoch;
+
           const currentDelegation = this.getCurrentDelegation.execute({
             publicDeriver: withStakingKey,
             stakingKeyAddressId: stakingKeyResp.addr.AddressId,
+            toRelativeSlotNumber,
+            currentEpoch,
           }).promise;
           if (currentDelegation == null) throw new Error('Should never happen');
 
