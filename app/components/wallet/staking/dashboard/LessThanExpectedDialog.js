@@ -35,7 +35,7 @@ const messages = defineMessages({
   },
   reason5: {
     id: 'wallet.dashboard.lessthan.reason5',
-    defaultMessage: '!!!A stake pool you are delegating to is saturated',
+    defaultMessage: '!!!A stake pool you are delegating to was or is saturated',
   },
 });
 
