@@ -349,7 +349,7 @@
   "wallet.dashboard.lessthan.reason2": "Il ne s'est pas passé assez de temps depuis que vous avez délégué",
   "wallet.dashboard.lessthan.reason3": "La somme des récompenses a été arrondie à 0 (si vous avez délégué un très petit montant)",
   "wallet.dashboard.lessthan.reason4": "Un groupe d'enjeu (pool) auquel vous déléguez à des frais fixes supérieurs à la récompense totale obtenue par le pool.",
-  "wallet.dashboard.lessthan.reason5": "A stake pool you are delegating to was or is saturated",
+  "wallet.dashboard.lessthan.reason5": "Un groupe d'enjeu (pool) auquel vous déléguez était ou est saturé",
   "wallet.dashboard.lessthan.title": "Explication en cas de récompense manquante",
   "wallet.dashboard.rewards.current": "Prochaine récompense",
   "wallet.dashboard.rewards.following": "Suivre les récompenses",
