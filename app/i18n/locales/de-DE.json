@@ -349,6 +349,7 @@
   "wallet.dashboard.lessthan.reason2": "Seit Deiner Delegierung ist noch nicht genug Zeit vergangen",
   "wallet.dashboard.lessthan.reason3": "Wenn Du einen sehr kleinen Betrag delegiert hast, wurde der Ertrag auf 0 abgerundet",
   "wallet.dashboard.lessthan.reason4": "Der Stake pool an den Du delegiert hast berechnet Fixkosten, die höher sind als der Gesamtbetrag den er erwirtschaftet",
+  "wallet.dashboard.lessthan.reason5": "A stake pool you are delegating to is saturated",
   "wallet.dashboard.lessthan.title": "Fehlende Erklärung zu Erträgen",
   "wallet.dashboard.rewards.current": "Nächster Ertrag",
   "wallet.dashboard.rewards.following": "Folgende Erträge",
