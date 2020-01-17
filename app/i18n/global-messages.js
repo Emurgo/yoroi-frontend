@@ -437,6 +437,10 @@ const globalMessages = defineMessages({
     id: 'wallet.delegation.transaction.generation',
     defaultMessage: '!!!Generating transaction',
   },
+  transactionId: {
+    id: 'wallet.transaction.transactionId',
+    defaultMessage: '!!!Transaction ID',
+  },
   epochLabel: {
     id: 'global.labels.epoch',
     defaultMessage: '!!!Epoch',
