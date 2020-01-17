@@ -358,6 +358,8 @@
   "wallet.hw.ledger.common.error.105": "Network error. Please check your internet connection.",
   "wallet.nav.backButton": "Back to my wallets",
   "wallet.nav.lastSync": "Last sync:",
+  "wallet.nav.sumLabel.rewards": "Rewards",
+  "wallet.nav.sumLabel.wallet": "Wallet",
   "wallet.nav.type.conceptual": "Conceptual wallet",
   "wallet.nav.type.paper": "Paper wallet",
   "wallet.nav.type.trezor": "Trezor wallet",

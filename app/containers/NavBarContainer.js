@@ -46,6 +46,11 @@ export default class NavBarContainer extends Component<Props> {
     const walletsStore = stores.substores[environment.API].wallets;
     const publicDeriver = walletsStore.selected;
     const walletName = publicDeriver ? publicDeriver.conceptualWalletName : '';
+    const walletAmount = formattedWalletAmount ? (
+      publicDeriver && (
+        profile.shouldHideBalance ? '******' : formattedWalletAmount(publicDeriver.amount)
+      )
+    ) : null;
 
     // TODO: Replace route with ROUTES.WALLETS.ROOT after merging MyWallets screen
     const title = (
@@ -66,10 +71,10 @@ export default class NavBarContainer extends Component<Props> {
 
     const dropdownHead = (
       <NavWalletDetails
-        publicDeriver={walletsStore.selected}
-        formattedWalletAmount={formattedWalletAmount}
         onUpdateHideBalance={this.updateHideBalance}
         shouldHideBalance={profile.shouldHideBalance}
+        rewards="2,565.000000"
+        walletAmount={walletAmount}
       />
     );
 
@@ -79,11 +84,11 @@ export default class NavBarContainer extends Component<Props> {
           title="All wallets"
           detailComponent={
             <NavWalletDetails
-              publicDeriver={walletsStore.selected}
-              formattedWalletAmount={formattedWalletAmount}
               onUpdateHideBalance={this.updateHideBalance}
               shouldHideBalance={profile.shouldHideBalance}
+              walletAmount={walletAmount}
               highlightTitle
+              rewards="565.000000"
             />
           }
         />
@@ -93,10 +98,10 @@ export default class NavBarContainer extends Component<Props> {
           syncTime="5 min ago"
           detailComponent={
             <NavWalletDetails
-              publicDeriver={walletsStore.selected}
-              formattedWalletAmount={formattedWalletAmount}
+              walletAmount={walletAmount}
               onUpdateHideBalance={this.updateHideBalance}
               shouldHideBalance={profile.shouldHideBalance}
+              rewards="1,472.000000"
             />
           }
         />
@@ -105,10 +110,10 @@ export default class NavBarContainer extends Component<Props> {
           syncTime="2 hours ago"
           detailComponent={
             <NavWalletDetails
-              publicDeriver={walletsStore.selected}
-              formattedWalletAmount={formattedWalletAmount}
+              walletAmount={walletAmount}
               onUpdateHideBalance={this.updateHideBalance}
               shouldHideBalance={profile.shouldHideBalance}
+              rewards="3,211.999811"
             />
           }
         />

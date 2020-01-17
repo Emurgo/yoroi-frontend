@@ -1,8 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import classnames from 'classnames';
-import BigNumber from 'bignumber.js';
-import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import { intlShape, defineMessages } from 'react-intl';
 import { DECIMAL_PLACES_IN_ADA } from '../../config/numbersConfig';
 
 import styles from './NavWalletDetails.scss';
@@ -10,48 +9,84 @@ import IconEyeOpen from '../../assets/images/my-wallets/icon_eye_open.inline.svg
 import IconEyeClosed from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
 
 type Props = {|
-    +formattedWalletAmount?: BigNumber => string,
-    +publicDeriver: null | PublicDeriverWithCachedMeta,
     +onUpdateHideBalance: void => void,
     +shouldHideBalance: boolean,
     +highlightTitle?: boolean,
+    +rewards: string,
+    +walletAmount: null | string,
 |};
+
+type SplitDecimalProps = ([string | null, string | null]);
 
 function splitAmount(
   value: string | null,
   index: number,
-): ([string | null, string | null]) {
-  if (value !== null) {
+): SplitDecimalProps {
+  if (value !== null && value !== undefined) {
     const startIndex = value.length - index;
     return [value.substring(0, startIndex), value.substring(startIndex)];
   }
   return [null, null];
 }
 
+const messages = defineMessages({
+  walletLabel: {
+    id: 'wallet.nav.sumLabel.wallet',
+    defaultMessage: '!!!Wallet',
+  },
+  rewardsLabel: {
+    id: 'wallet.nav.sumLabel.rewards',
+    defaultMessage: '!!!Rewards',
+  },
+});
+
 export default class NavWalletDetails extends Component<Props> {
+
   static defaultProps = {
-    formattedWalletAmount: undefined,
     highlightTitle: false,
   };
 
+  static contextTypes = {
+    intl: intlShape.isRequired,
+  };
+
   render() {
+
     const {
-      formattedWalletAmount,
-      publicDeriver,
       shouldHideBalance,
       onUpdateHideBalance,
       highlightTitle,
+      rewards,
+      walletAmount,
     } = this.props;
 
-    const walletAmount = formattedWalletAmount ? (
-      publicDeriver && formattedWalletAmount(publicDeriver.amount)
-    ) : null;
+    const { intl } = this.context;
 
-    const [
-      beforeDecimal, afterDecimal
-    ]:([string | null, string | null])  = splitAmount(walletAmount, DECIMAL_PLACES_IN_ADA);
+    const [beforeDecimalWallet, afterDecimalWallet]: SplitDecimalProps =
+      splitAmount(walletAmount, DECIMAL_PLACES_IN_ADA);
+
+    const [beforeDecimalRewards, afterDecimalRewards]: SplitDecimalProps =
+    splitAmount(rewards, DECIMAL_PLACES_IN_ADA);
 
     const currency = ' ADA';
+
+    const walletAmountSection = (
+      shouldHideBalance ?
+        <span>{walletAmount}</span> :
+        <>
+          {beforeDecimalWallet}
+          <span className={styles.afterDecimal}>{afterDecimalWallet}</span>
+        </>
+    );
+
+    const rewardsAmountSection = (
+      shouldHideBalance ?
+        <span>{walletAmount}</span> :
+        <>
+          {beforeDecimalRewards}
+          <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
+        </>
+    );
 
     return (
       <div className={styles.wrapper}>
@@ -62,37 +97,16 @@ export default class NavWalletDetails extends Component<Props> {
               highlightTitle !== null && highlightTitle === true && styles.highlightAmount
             ])}
           >
-            { publicDeriver && shouldHideBalance ?
-              <span className={styles.hiddenAmount}>******</span> :
-              <>
-                {beforeDecimal}
-                <span className={styles.afterDecimal}>{afterDecimal}</span>
-              </>
-            }
-            {currency}
+            {walletAmountSection} {currency}
           </div>
           <div className={styles.details}>
             <div>
-              <p className={styles.label}>Wallet:&nbsp;</p>
-              { publicDeriver && shouldHideBalance ?
-                <span className={styles.hiddenAmount}>******</span> :
-                <>
-                  {beforeDecimal}
-                  <span className={styles.afterDecimal}>{afterDecimal}</span>
-                </>
-              }
-              {currency}
+              <p className={styles.label}>{intl.formatMessage(messages.walletLabel)}&nbsp;</p>
+              {walletAmountSection} {currency}
             </div>
             <div>
-              <p className={styles.label}>Rewards:&nbsp;</p>
-              { publicDeriver && shouldHideBalance ?
-                <span className={styles.hiddenAmount}>******</span> :
-                <>
-                  {beforeDecimal}
-                  <span className={styles.afterDecimal}>{afterDecimal}</span>
-                </>
-              }
-              {currency}
+              <p className={styles.label}>{intl.formatMessage(messages.rewardsLabel)}&nbsp;</p>
+              {rewardsAmountSection} {currency}
             </div>
           </div>
         </div>
