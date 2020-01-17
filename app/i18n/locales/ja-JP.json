@@ -349,7 +349,7 @@
   "wallet.dashboard.lessthan.reason2": "委任してから十分な時間が経過していません",
   "wallet.dashboard.lessthan.reason3": "獲得した金額の端数を切り捨てると0になりました（非常に少額を委任した場合）",
   "wallet.dashboard.lessthan.reason4": "委任しているステークプールで、プールの合計報酬額よりも多額の定額料金が課金されました",
-  "wallet.dashboard.lessthan.reason5": "委任されたステークプールは、飽和状態にあります（現時点では解消されている可能性もあります）。",
+  "wallet.dashboard.lessthan.reason5": "委任されたステークプールは、飽和状態になりました。",
   "wallet.dashboard.lessthan.title": "報酬の説明が見つからない",
   "wallet.dashboard.rewards.current": "次の報酬",
   "wallet.dashboard.rewards.following": "以下の報酬",
