@@ -525,7 +525,7 @@
   "wallet.transaction.type.intrawallet": "{currency} transacción de intrabilletera",
   "wallet.transaction.type.multiparty": "{currency} transacción multipartita",
   "wallet.undelegation.transaction.explanationLine1": "NO es necesario que se deshaga de la delegación antes de cambiar de stakepool",
-  "wallet.undelegation.transaction.explanationLine2": "It will take 2 epochs after the end of the current epoch for undelegation to take effect",
+  "wallet.undelegation.transaction.explanationLine2": "Tomará 2 épocas después del final de la época actual para que la desdelegación surja efecto",
   "widgets.copyableaddress.addressCopyTooltipMessage": "Copiar al portapapeles",
   "widgets.explorer.tooltip": "Ir a {websiteName}",
   "widgets.warningBox.headerText": "ATENCIÓN:",
