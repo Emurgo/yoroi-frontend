@@ -356,6 +356,7 @@
   "wallet.hw.ledger.common.error.103": "Ledger device is locked, please unlock it and retry.",
   "wallet.hw.ledger.common.error.104": "Ledger device timeout, please retry.",
   "wallet.hw.ledger.common.error.105": "Network error. Please check your internet connection.",
+  "wallet.nav.backButton": "Back to my wallets",
   "wallet.nav.lastSync": "Last sync:",
   "wallet.nav.type.conceptual": "Conceptual wallet",
   "wallet.nav.type.paper": "Paper wallet",
