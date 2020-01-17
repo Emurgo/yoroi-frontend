@@ -16,7 +16,7 @@ import type {
   RemoteTransactionInput, RemoteTransactionOutput,
 } from '../../../state-fetch/types';
 import { RollbackApiError, } from '../../../../errors';
-import { addressToKind, groupToSingle, } from '../utils';
+import { addressToKind, groupToSingle, delegationTypeToResponse, } from '../utils';
 import { CoreAddressTypes } from '../../database/primitives/enums';
 import type { CoreAddressT } from '../../database/primitives/enums';
 import {
@@ -25,7 +25,6 @@ import {
 import {
   WalletTypePurpose,
 } from '../../../../../../config/numbersConfig';
-import { delegationTypeToResponse } from '../delegationUtils';
 
 import { RustModule } from '../../../cardanoCrypto/rustLoader';
 
