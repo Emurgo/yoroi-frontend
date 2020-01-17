@@ -11,6 +11,7 @@ import { LOVELACES_PER_ADA } from '../../../../config/numbersConfig';
 import {
   GenerateTransferTxError
 } from '../../errors';
+import LocalizableError from '../../../../i18n/LocalizableError';
 import {
   sendAllUnsignedTx,
   signTransaction,
@@ -74,6 +75,9 @@ export async function buildYoroiTransferTx(payload: {
     };
   } catch (error) {
     Logger.error(`transfer::buildTransferTx ${stringifyError(error)}`);
+    if (error instanceof LocalizableError) {
+      throw error;
+    }
     throw new GenerateTransferTxError();
   }
 }

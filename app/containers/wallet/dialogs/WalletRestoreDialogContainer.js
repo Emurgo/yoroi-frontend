@@ -233,7 +233,7 @@ export default class WalletRestoreDialogContainer
         );
       case TransferStatus.READY_TO_TRANSFER: {
         if (yoroiTransfer.transferTx == null) {
-          return null; // TODO: throw error? Shoudln't happen
+          return null; // TODO: throw error? Shouldn't happen
         }
         return (<TransferSummaryPage
           formattedWalletAmount={formattedWalletAmount}

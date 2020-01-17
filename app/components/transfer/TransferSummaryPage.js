@@ -12,6 +12,7 @@ import LocalizableError from '../../i18n/LocalizableError';
 import RawHash from '../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../domain/Explorer';
+import globalMessages from '../../i18n/global-messages';
 
 const messages = defineMessages({
   addressFromLabel: {
@@ -140,6 +141,22 @@ export default class TransferSummaryPage extends Component<Props> {
           >
             <RawHash light>
               <span className={styles.address}>{receiver}</span>
+            </RawHash>
+          </ExplorableHashContainer>
+        </div>
+
+        <div className={styles.addressLabelWrapper}>
+          <div className={styles.addressLabel}>
+            {intl.formatMessage(globalMessages.transactionId)}
+          </div>
+          <ExplorableHashContainer
+            selectedExplorer={this.props.selectedExplorer}
+            light
+            hash={transferTx.id}
+            linkType="transaction"
+          >
+            <RawHash light>
+              <span className={styles.address}>{transferTx.id}</span>
             </RawHash>
           </ExplorableHashContainer>
         </div>

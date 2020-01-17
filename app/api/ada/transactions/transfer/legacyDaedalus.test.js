@@ -10,7 +10,7 @@ import {
   buildDaedalusTransferTx,
 } from './legacyDaedalus';
 import {
-  GenerateTransferTxError,
+  NotEnoughMoneyToSendError,
 } from '../../errors';
 import {
   silenceLogsForTesting,
@@ -128,7 +128,7 @@ describe('Byron era tx format tests', () => {
       getUTXOsForAddresses: (_addresses) => Promise.resolve([utxo]),
       outputAddr: outAddress,
       legacy: true,
-    })).rejects.toThrow(GenerateTransferTxError);
+    })).rejects.toThrow(NotEnoughMoneyToSendError);
   });
 
   test('Daedalus transfer from many UTXO', async () => {
@@ -280,7 +280,7 @@ describe('Shelley era tx format tests', () => {
       getUTXOsForAddresses: (_addresses) => Promise.resolve([utxo]),
       outputAddr: outAddress,
       legacy: false,
-    })).rejects.toThrow(GenerateTransferTxError);
+    })).rejects.toThrow(NotEnoughMoneyToSendError);
   });
 
   test('Daedalus transfer from many UTXO', async () => {
