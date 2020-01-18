@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import WalletSettings from '../../../components/wallet/WalletSettings';
+import WalletSettings from '../../../components/wallet/settings/WalletSettings';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import { isValidWalletName } from '../../../utils/validations';
 import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
@@ -42,33 +42,35 @@ export default class WalletSettingsPage extends Component<Props> {
       />
     );
     return (
-      <WalletSettings
-        error={renameModelRequest.error}
-        openDialogAction={actions.dialogs.open.trigger}
-        walletPasswordUpdateDate={publicDeriver.signingKeyUpdateDate}
-        isDialogOpen={uiDialogs.isOpen}
-        dialog={changeDialog}
-        walletName={publicDeriver.conceptualWalletName}
-        isSubmitting={renameModelRequest.isExecuting}
-        isInvalid={
-          renameModelRequest.wasExecuted
-          &&
-          renameModelRequest.result === false
-        }
-        lastUpdatedField={lastUpdatedWalletField}
-        onFieldValueChange={async (field, value) => {
-          if (field === 'name') {
-            await renameConceptualWallet.trigger({ newName: value });
+      <>
+        <WalletSettings
+          error={renameModelRequest.error}
+          openDialogAction={actions.dialogs.open.trigger}
+          walletPasswordUpdateDate={publicDeriver.signingKeyUpdateDate}
+          isDialogOpen={uiDialogs.isOpen}
+          dialog={changeDialog}
+          walletName={publicDeriver.conceptualWalletName}
+          isSubmitting={renameModelRequest.isExecuting}
+          isInvalid={
+            renameModelRequest.wasExecuted
+            &&
+            renameModelRequest.result === false
           }
-        }}
-        onStartEditing={field => startEditingWalletField.trigger({ field })}
-        onStopEditing={() => stopEditingWalletField.trigger()}
-        onCancelEditing={() => cancelEditingWalletField.trigger()}
-        activeField={walletFieldBeingEdited}
-        nameValidator={name => isValidWalletName(name)}
-        showPasswordBlock={isWebWallet}
-        classicTheme={profile.isClassicTheme}
-      />
+          lastUpdatedField={lastUpdatedWalletField}
+          onFieldValueChange={async (field, value) => {
+            if (field === 'name') {
+              await renameConceptualWallet.trigger({ newName: value });
+            }
+          }}
+          onStartEditing={field => startEditingWalletField.trigger({ field })}
+          onStopEditing={() => stopEditingWalletField.trigger()}
+          onCancelEditing={() => cancelEditingWalletField.trigger()}
+          activeField={walletFieldBeingEdited}
+          nameValidator={name => isValidWalletName(name)}
+          showPasswordBlock={isWebWallet}
+          classicTheme={profile.isClassicTheme}
+        />
+      </>
     );
   }
 

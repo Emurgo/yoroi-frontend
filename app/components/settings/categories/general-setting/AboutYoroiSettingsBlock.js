@@ -104,7 +104,7 @@ const socialMediaLinks = [{
 const baseGithubUrl = 'https://github.com/Emurgo/yoroi-frontend/';
 
 @observer
-export default class AboutYoroiSettingsBlock extends Component<{}> {
+export default class AboutYoroiSettingsBlock extends Component<{||}> {
   static contextTypes = {
     intl: intlShape.isRequired,
   };
