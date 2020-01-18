@@ -5,8 +5,22 @@ import Request from '../lib/LocalizedRequest';
 import type { ChangeModelPasswordFunc, RenameModelFunc } from '../../api/ada';
 import {
   asGetSigningKey,
+  asHasLevels,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import type {
+  IHasLevels,
+} from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import {
+  ConceptualWallet
+} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import {
+  IPublicDeriver,
+} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import { removeAllTransactions } from '../../api/ada/lib/storage/bridge/updateTransactions';
+import {
+  Logger,
+} from '../../utils/logging';
 
 export default class AdaWalletSettingsStore extends WalletSettingsStore {
 
@@ -16,6 +30,9 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
   @observable changeSigningKeyRequest: Request<ChangeModelPasswordFunc>
     = new Request<ChangeModelPasswordFunc>(this.api.ada.changeModelPassword);
 
+  @observable clearHistory: Request<typeof _clearHistory>
+    = new Request<typeof _clearHistory>(_clearHistory);
+
   setup(): void {
     const a = this.actions.ada.walletSettings;
     a.startEditingWalletField.listen(this._startEditingWalletField);
@@ -24,6 +41,7 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
     a.renamePublicDeriver.listen(this._renamePublicDeriver);
     a.renameConceptualWallet.listen(this._renameConceptualWallet);
     a.updateSigningPassword.listen(this._changeSigningPassword);
+    a.resyncHistory.listen(this._resyncHistory);
   }
 
   @action _changeSigningPassword = async (request: {
@@ -93,4 +111,32 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
     });
   };
 
+  @action _resyncHistory = async (request: {|
+    publicDeriver: PublicDeriverWithCachedMeta,
+  |}): Promise<void> => {
+    const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver.self);
+    if (withLevels == null) {
+      throw new Error(`${nameof(this._resyncHistory)} missing levels`);
+    }
+    await this.clearHistory.execute({
+      publicDeriver: withLevels,
+      refreshWallet: () => this.stores.substores.ada.wallets.refreshWallet(request.publicDeriver),
+    }).promise;
+    this.clearHistory.reset();
+  };
+}
+
+async function _clearHistory(request: {|
+  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
+  refreshWallet: () => Promise<void>,
+|}): Promise<void> {
+  // 1) clear existing history
+  await removeAllTransactions({ publicDeriver: request.publicDeriver });
+
+  // 2) trigger a history sync
+  try {
+    await request.refreshWallet();
+  } catch (_e) {
+    Logger.warn(`${nameof(_clearHistory)} failed to connect to remote to resync. Data was still cleared locally`);
+  }
 }

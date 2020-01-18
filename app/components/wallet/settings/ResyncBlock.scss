@@ -1,0 +1,35 @@
+@import '../../../themes/mixins/loading-spinner';
+
+.component {
+  border-top: 1px solid rgba(173, 174, 182, 0.3);
+  padding-top: 30px;
+  margin-top: 32px;
+
+  font-family: var(--font-regular);
+  color: var(--theme-support-settings-text-color);
+
+  h2 {
+    color: var(--theme-support-settings-text-color);
+    font-family: var(--font-semibold);
+    font-size: 18px;
+    line-height: 22px;
+    margin-bottom: 12px;
+  }
+
+  p {
+    color: var(--theme-support-settings-text-color);
+    font-family: var(--font-regular);
+    font-size: 14px;
+    line-height: 19px;
+    margin-bottom: 10px;
+  }  
+
+  .submitButton,
+  .submitButtonSpinning {
+    margin-top: 20px;
+  }
+
+  .submitButtonSpinning {
+    @include loading-spinner("../../../assets/images/spinner-light.svg");
+  }
+}

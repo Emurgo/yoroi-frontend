@@ -69,7 +69,7 @@ export default class AdaWalletsStore extends WalletStore {
       publicDeriver: withSigning,
       ...transactionDetails,
       sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
-    });
+    }).promise;
 
     await this.refreshWallet(publicDeriver);
     this.actions.dialogs.closeActiveDialog.trigger();

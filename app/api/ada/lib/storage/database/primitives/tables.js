@@ -1,6 +1,6 @@
 // @flow
 
-import { Type } from 'lovefield';
+import { Type, ConstraintAction } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 import type {
   TxStatusCodesType,
@@ -460,7 +460,8 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
     )
     .addForeignKey('Certificate_Transaction', {
       local: CertificateSchema.properties.TransactionId,
-      ref: `${TransactionSchema.name}.${TransactionSchema.properties.TransactionId}`
+      ref: `${TransactionSchema.name}.${TransactionSchema.properties.TransactionId}`,
+      action: ConstraintAction.CASCADE,
     })
     .addIndex(
       'Certificate_Transaction_Index',
@@ -480,7 +481,8 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
     )
     .addForeignKey('CertificateAddress_Certificate', {
       local: CertificateAddressSchema.properties.CertificateId,
-      ref: `${CertificateSchema.name}.${CertificateSchema.properties.CertificateId}`
+      ref: `${CertificateSchema.name}.${CertificateSchema.properties.CertificateId}`,
+      action: ConstraintAction.CASCADE,
     })
     .addForeignKey('CertificateAddress_Address', {
       local: CertificateAddressSchema.properties.AddressId,

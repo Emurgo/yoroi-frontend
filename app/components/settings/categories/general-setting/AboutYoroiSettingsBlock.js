@@ -163,7 +163,7 @@ export default class AboutYoroiSettingsBlock extends Component<{||}> {
             </ExplorableHash>
           </div>
         }
-        <div className={styles.aboutScoial}>
+        <div className={styles.aboutSocial}>
           <GridFlexContainer rowSize={socialMediaLinks.length}>
             {socialMediaLinks.map(link => (
               <LinkButton

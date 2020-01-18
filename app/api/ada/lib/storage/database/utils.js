@@ -5,6 +5,7 @@ import type {
   lf$Row,
   lf$Transaction,
   lf$schema$Table,
+  lf$ValueLiteralArray,
 } from 'lovefield';
 import { size } from 'lodash';
 import ExtendableError from 'es6-error';
@@ -82,7 +83,7 @@ export async function getRowIn<Row>(
   tx: lf$Transaction,
   tableName: string,
   keyRowName: string,
-  list: Array<any>,
+  list: lf$ValueLiteralArray,
 ): Promise<$ReadOnlyArray<$ReadOnly<Row>>> {
   const table = db.getSchema().table(tableName);
   const query = db
@@ -90,6 +91,23 @@ export async function getRowIn<Row>(
     .from(table)
     .where(table[keyRowName].in(list));
   return await tx.attach(query);
+}
+
+export async function removeFromTableBatch(
+  db: lf$Database,
+  tx: lf$Transaction,
+  tableName: string,
+  rowName: string,
+  keys: lf$ValueLiteralArray,
+): Promise<void> {
+  const table = db.getSchema().table(tableName);
+
+  await tx.attach(
+    db
+      .delete()
+      .from(table)
+      .where(table[rowName].in(keys))
+  );
 }
 
 export class StaleStateError extends ExtendableError {

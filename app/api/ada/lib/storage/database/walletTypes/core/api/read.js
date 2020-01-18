@@ -106,7 +106,7 @@ export class GetPublicDeriver {
       db, tx,
       GetPublicDeriver.ownTables[Tables.PublicDeriverSchema.name].name,
       GetPublicDeriver.ownTables[Tables.PublicDeriverSchema.name].properties.ConceptualWalletId,
-      [conceptualWalletId],
+      ([conceptualWalletId]: Array<number>),
     );
   }
 }
