@@ -38,7 +38,8 @@ import {
 } from '../../models/PublicDeriver/traits';
 
 import {
-  updateTransactions
+  updateTransactions,
+  removeAllTransactions,
 } from '../updateTransactions';
 
 jest.mock('../../database/initialSeed');
@@ -428,7 +429,7 @@ async function syncingSimpleTransaction(
   }
 
   // pop transaction to trigger rollback
-  txHistory.pop();
+  const removedTx = txHistory.pop();
 
   // check rollback on wallet 2
   {
@@ -468,6 +469,29 @@ async function syncingSimpleTransaction(
   ];
   const dump = (await db.export()).tables;
   filterDbSnapshot(dump, keysForTest);
+
+  // add back the tx, resync and then clear the wallet
+  txHistory.push(removedTx);
+  {
+    // now sync and make sure it updated
+    await updateTransactions(
+      db,
+      withUtxos2,
+      checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
+      getBestBlock,
+    );
+
+    await checkPub2HasTx(purposeForTest, publicDeriver2);
+
+    await removeAllTransactions({ publicDeriver: withUtxos2 });
+
+    // wallet 1 should not be affected
+    await checkPub1HasTx(purposeForTest, publicDeriver1);
+
+    // wallet 2 should be cleared
+    await checkPub2IsEmpty(publicDeriver2);
+  }
 }
 
 test('Syncing simple transaction bip44', async (done) => {

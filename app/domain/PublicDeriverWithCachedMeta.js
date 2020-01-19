@@ -44,6 +44,11 @@ export default class PublicDeriverWithCachedMeta {
   }
 
   @action
+  clearCache(): void {
+    this.amount = null;
+  }
+
+  @action
   static fromData(data: {
     self: PublicDeriver<>,
     plate: null | WalletAccountNumberPlate,

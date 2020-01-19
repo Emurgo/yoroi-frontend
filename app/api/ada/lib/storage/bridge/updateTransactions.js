@@ -615,7 +615,7 @@ async function rollback(
   );
 
   // 2) get best tx in block
-  const bestInStorage = await deps.GetTxAndBlock.firstTxBefore(
+  const bestInStorage = await deps.GetTxAndBlock.firstSuccessTxBefore(
     db, dbTx,
     {
       txIds,
@@ -687,7 +687,7 @@ async function rollback(
   }
 
   // 7) Rollback LastSyncTable
-  const bestStillIncluded = await deps.GetTxAndBlock.firstTxBefore(
+  const bestStillIncluded = await deps.GetTxAndBlock.firstSuccessTxBefore(
     db, dbTx,
     { txIds, slot: bestInStorage.Block.SlotNum - STABLE_SIZE }
   );
@@ -806,7 +806,7 @@ async function rawUpdateTransactions(
         accountingAddressIds,
       }
     );
-    const bestInStorage = await deps.GetTxAndBlock.firstTxBefore(
+    const bestInStorage = await deps.GetTxAndBlock.firstSuccessTxBefore(
       db, dbTx,
       {
         txIds,

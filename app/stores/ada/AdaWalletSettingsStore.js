@@ -122,6 +122,7 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
       publicDeriver: withLevels,
       refreshWallet: () => this.stores.substores.ada.wallets.refreshWallet(request.publicDeriver),
     }).promise;
+    request.publicDeriver.clearCache();
     this.clearHistory.reset();
   };
 }
