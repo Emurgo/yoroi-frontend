@@ -31,6 +31,7 @@ import {
   ConceptualWallet
 } from './models/ConceptualWallet/index';
 import { loadWalletsFromStorage } from './models/utils';
+import environment from '../../../../environment';
 
 declare var CONFIG: ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;
@@ -177,7 +178,8 @@ export async function storagev2Migation(
 ): Promise<boolean> {
   // all information in the v1 indexdb can be inferred from the blockchain
   const hasEntries = await resetLegacy();
-  if (!hasEntries) {
+  // in test environment we don't have historic indexdb values before this version
+  if (!hasEntries && !environment.isTest()) {
     return false;
   }
 
