@@ -123,7 +123,7 @@ async function rawGetAllTxIds(
     GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
   request: {
-    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
+    publicDeriver: IPublicDeriver<ConceptualWallet>,
   },
   derivationTables: Map<number, string>,
 ): Promise<{|
@@ -188,7 +188,7 @@ export async function rawGetTransactions(
     GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
   request: {
-    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
+    publicDeriver: IPublicDeriver<ConceptualWallet>,
     getTxAndBlock: (txIds: Array<number>) => Promise<$ReadOnlyArray<{
       Block: null | $ReadOnly<BlockRow>,
       Transaction: $ReadOnly<TransactionRow>
