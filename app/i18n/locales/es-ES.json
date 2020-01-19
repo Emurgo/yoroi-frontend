@@ -478,7 +478,7 @@
   "wallet.settings.name.label": "Nombre de la billetera",
   "wallet.settings.passwordLastUpdated": "Última actualización {lastUpdated}",
   "wallet.settings.resync.buttonLabel": "Resync wallet",
-  "wallet.settings.resync.explanation": "If you are experiencing issues with your wallet, or think you have an incorrect balance or transaction history, you can delete the local data stored by Yoroi and resync with the blockchain.",
+  "wallet.settings.resync.explanation": "Si tiene problemas con su billetera, o piensa que tiene un saldo o historial de transacciones incorrectos, puede eliminar los datos locales almacenados por Yoroi y volver a sincronizar con la blockchain.",
   "wallet.settings.resync.label": "Resync wallet with the blockchain",
   "wallet.settings.unchangedPassword": "Contraseña sin cambios desde la creación de la billetera",
   "wallet.staking.pool.unknownLabel": "Unknown pool",
