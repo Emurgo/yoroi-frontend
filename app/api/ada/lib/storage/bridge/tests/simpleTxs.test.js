@@ -4,7 +4,6 @@ import BigNumber from 'bignumber.js';
 import {
   schema,
 } from 'lovefield';
-import stableStringify from 'json-stable-stringify';
 import '../../../test-config';
 import type { RemoteTransaction } from '../../../state-fetch/types';
 import {
@@ -13,6 +12,7 @@ import {
   mockDate,
   ABANDON_SHARE,
   TX_TEST_MNEMONIC_1,
+  compareObject,
 } from './common';
 import {
   genCheckAddressesInUse,
@@ -753,31 +753,3 @@ test('Utxo created and used in same sync cip1852', async (done) => {
   await utxoCreatedAndUsed(WalletTypePurpose.CIP1852);
   done();
 });
-
-/**
- * We want to compare the test result with a snapshot of the database
- * However, the diff is too big to reasonably compare with your eyes
- * Therefore, we test each table separately
- */
-function compareObject(obj1: { tables: any }, obj2: { tables: any }): void {
-  for (const prop of Object.keys(obj1)) {
-    if (obj1[prop] !== undefined && obj2[prop] === undefined) {
-      expect(stableStringify(obj1)).toEqual(stableStringify(obj2));
-    }
-  }
-  for (const prop of Object.keys(obj2)) {
-    if (obj2[prop] !== undefined && obj1[prop] === undefined) {
-      expect(stableStringify(obj1)).toEqual(stableStringify(obj2));
-    }
-  }
-
-  const obj2KeySet = new Set(Object.keys(obj2));
-  const keysInBoth = Object.keys(obj1).filter(key => obj2KeySet.has(key));
-  for (const key of keysInBoth) {
-    if (key === 'tables') {
-      compareObject(obj1[key], obj2[key]);
-    } else {
-      expect(stableStringify(obj1[key])).toEqual(stableStringify(obj2[key]));
-    }
-  }
-}

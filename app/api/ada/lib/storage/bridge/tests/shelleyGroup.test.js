@@ -12,6 +12,7 @@ import {
   mockDate,
   ABANDON_SHARE,
   TX_TEST_MNEMONIC_1,
+  compareObject,
 } from './common';
 import {
   genCheckAddressesInUse,
@@ -41,6 +42,7 @@ import { getCertificates } from '../../models/utils';
 
 import {
   updateTransactions,
+  removeAllTransactions,
 } from '../updateTransactions';
 
 jest.mock('../../database/initialSeed');
@@ -782,6 +784,16 @@ async function syncWithCertificate(): Promise<void> {
     },
   };
 
+  const keysForTest = [
+    'Transaction',
+    'UtxoTransactionInput',
+    'UtxoTransactionOutput',
+    'LastSyncInfo',
+    'Certificate',
+    'CertificateAddress',
+  ];
+  const beforeAnyTxs = (await db.export()).tables;
+
   // tx with cert
   {
     await updateTransactions(
@@ -839,18 +851,14 @@ async function syncWithCertificate(): Promise<void> {
     expect(certs).toEqual([cert1, cert2]);
   }
 
-  const keysForTest = [
-    'Address',
-    'Transaction',
-    'UtxoTransactionInput',
-    'UtxoTransactionOutput',
-    'LastSyncInfo',
-    'Block',
-    'Certificate',
-    'CertificateAddress',
-  ];
+  // snapshot test for certificate insertion
   const dump = (await db.export()).tables;
-  filterDbSnapshot(dump, keysForTest);
+  filterDbSnapshot(dump, ['Block', 'Address', ...keysForTest]);
+
+
+  await removeAllTransactions({ publicDeriver: basePubDeriver });
+  const afterRemoval = (await db.export()).tables;
+  compareObject(beforeAnyTxs, afterRemoval, new Set(keysForTest));
 }
 
 test('Syncing group addresses for cip1852', async (done) => {
