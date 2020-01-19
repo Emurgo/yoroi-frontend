@@ -46,7 +46,7 @@ export const environment = ((
     isProduction: () => environment.NETWORK === NetworkType.MAINNET ||
       CONFIG.network.name === NetworkType.SHELLEY_TESTNET,
     getDiscriminant: () => {
-      if (CONFIG.network.name === NetworkType.TEST || process.env.NODE_ENV === 'jest') {
+      if (CONFIG.network.name === NetworkType.TEST || process.env.NODE_ENV === 'jest' || process.env.NODE_ENV === 'test') {
         return RustModule.WalletV3.AddressDiscrimination.Production;
       }
       return RustModule.WalletV3.AddressDiscrimination.Test;

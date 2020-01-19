@@ -3,11 +3,11 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import moment from 'moment';
-import LocalizableError from '../../i18n/LocalizableError';
-import InlineEditingInput from '../widgets/forms/InlineEditingInput';
-import ReadOnlyInput from '../widgets/forms/ReadOnlyInput';
-import ChangeWalletPasswordDialog from './settings/ChangeWalletPasswordDialog';
-import globalMessages from '../../i18n/global-messages';
+import LocalizableError from '../../../i18n/LocalizableError';
+import InlineEditingInput from '../../widgets/forms/InlineEditingInput';
+import ReadOnlyInput from '../../widgets/forms/ReadOnlyInput';
+import ChangeWalletPasswordDialog from './ChangeWalletPasswordDialog';
+import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletSettings.scss';
 import type { Node } from 'react';
 

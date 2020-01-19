@@ -492,7 +492,7 @@ export default class ProfileStore extends Store {
   };
 
 
-  // ========== Redirec Logic ========== //
+  // ========== Redirect Logic ========== //
 
   _checkSetupSteps: void => Promise<void> = async () => {
     const { isLoading } = this.stores.loading;

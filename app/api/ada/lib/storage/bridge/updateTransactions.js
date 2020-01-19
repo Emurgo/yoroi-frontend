@@ -79,7 +79,10 @@ import {
 import { ModifyDisplayCutoff, } from '../database/walletTypes/bip44/api/write';
 import { AddDerivationTree, } from '../database/walletTypes/common/api/write';
 import { GetDerivationSpecific, } from '../database/walletTypes/common/api/read';
-import { ModifyLastSyncInfo, } from '../database/walletTypes/core/api/write';
+import {
+  ModifyLastSyncInfo,
+  DeleteAllTransactions,
+} from '../database/walletTypes/core/api/write';
 import type { LastSyncInfoRow, } from '../database/walletTypes/core/tables';
 import type { DbTxIO, DbTxInChain } from '../database/transactionModels/multipart/tables';
 import {
@@ -110,29 +113,23 @@ import { addressToKind } from './utils';
 
 import environment from '../../../../../environment';
 
-export async function rawGetTransactions(
+async function rawGetAllTxIds(
   db: lf$Database,
   dbTx: lf$Transaction,
   deps: {|
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
     AssociateTxWithIOs: Class<AssociateTxWithIOs>,
-    GetTxAndBlock: Class<GetTxAndBlock>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
   request: {
-    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
-    getTxAndBlock: (txIds: Array<number>) => Promise<$ReadOnlyArray<{
-      Block: null | $ReadOnly<BlockRow>,
-      Transaction: $ReadOnly<TransactionRow>
-    }>>,
-    skip?: number,
-    limit?: number,
+    publicDeriver: IPublicDeriver<ConceptualWallet>,
   },
   derivationTables: Map<number, string>,
 ): Promise<{|
-  addressLookupMap: Map<number, string>,
-  txs: Array<AnnotatedTransaction>,
+  utxoAddressIds: Array<number>,
+  accountingAddressIds: Array<number>,
+  txIds: Array<number>,
 |}> {
   const utxoAddressIds = [];
   const withUtxos = asGetAllUtxos(request.publicDeriver);
@@ -173,7 +170,52 @@ export async function rawGetTransactions(
       accountingAddressIds,
     }
   );
+  return {
+    txIds,
+    utxoAddressIds,
+    accountingAddressIds,
+  };
+}
 
+export async function rawGetTransactions(
+  db: lf$Database,
+  dbTx: lf$Transaction,
+  deps: {|
+    GetPathWithSpecific: Class<GetPathWithSpecific>,
+    GetAddress: Class<GetAddress>,
+    AssociateTxWithIOs: Class<AssociateTxWithIOs>,
+    GetTxAndBlock: Class<GetTxAndBlock>,
+    GetDerivationSpecific: Class<GetDerivationSpecific>,
+  |},
+  request: {
+    publicDeriver: IPublicDeriver<ConceptualWallet>,
+    getTxAndBlock: (txIds: Array<number>) => Promise<$ReadOnlyArray<{
+      Block: null | $ReadOnly<BlockRow>,
+      Transaction: $ReadOnly<TransactionRow>
+    }>>,
+    skip?: number,
+    limit?: number,
+  },
+  derivationTables: Map<number, string>,
+): Promise<{|
+  addressLookupMap: Map<number, string>,
+  txs: Array<AnnotatedTransaction>,
+|}> {
+  const {
+    utxoAddressIds,
+    accountingAddressIds,
+    txIds,
+  } = await rawGetAllTxIds(
+    db, dbTx,
+    {
+      GetPathWithSpecific: deps.GetPathWithSpecific,
+      GetAddress: deps.GetAddress,
+      AssociateTxWithIOs: deps.AssociateTxWithIOs,
+      GetDerivationSpecific: deps.GetDerivationSpecific,
+    },
+    { publicDeriver: request.publicDeriver },
+    derivationTables,
+  );
   const blockMap = new Map<number, null | $ReadOnly<BlockRow>>();
   const txs = await request.getTxAndBlock(txIds);
   for (const tx of txs) {
@@ -331,6 +373,60 @@ export async function getPendingTransactions(
         },
         derivationTables,
       );
+    }
+  );
+}
+
+export async function removeAllTransactions(
+  request: {
+    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
+  },
+): Promise<number> {
+  const derivationTables = request.publicDeriver.getParent().getDerivationTables();
+  const deps = Object.freeze({
+    GetPathWithSpecific,
+    GetAddress,
+    AssociateTxWithIOs,
+    GetTxAndBlock,
+    GetDerivationSpecific,
+    DeleteAllTransactions,
+  });
+  const db = request.publicDeriver.getDb();
+  const depTables = Object
+    .keys(deps)
+    .map(key => deps[key])
+    .flatMap(table => getAllSchemaTables(db, table));
+
+  return await raii(
+    db,
+    [
+      // need a lock on all tables to delete
+      ...db.getSchema().tables(),
+      ...depTables,
+      ...mapToTables(db, derivationTables),
+    ],
+    async dbTx => {
+      const { txIds, } = await rawGetAllTxIds(
+        db, dbTx,
+        {
+          GetPathWithSpecific: deps.GetPathWithSpecific,
+          GetAddress: deps.GetAddress,
+          AssociateTxWithIOs: deps.AssociateTxWithIOs,
+          GetDerivationSpecific: deps.GetDerivationSpecific,
+        },
+        { publicDeriver: request.publicDeriver },
+        derivationTables,
+      );
+
+      await deps.DeleteAllTransactions.delete(
+        db, dbTx,
+        {
+          publicDeriverId: request.publicDeriver.getPublicDeriverId(),
+          txIds,
+        }
+      );
+
+      return txIds.length;
     }
   );
 }
@@ -519,7 +615,7 @@ async function rollback(
   );
 
   // 2) get best tx in block
-  const bestInStorage = await deps.GetTxAndBlock.firstTxBefore(
+  const bestInStorage = await deps.GetTxAndBlock.firstSuccessTxBefore(
     db, dbTx,
     {
       txIds,
@@ -591,7 +687,7 @@ async function rollback(
   }
 
   // 7) Rollback LastSyncTable
-  const bestStillIncluded = await deps.GetTxAndBlock.firstTxBefore(
+  const bestStillIncluded = await deps.GetTxAndBlock.firstSuccessTxBefore(
     db, dbTx,
     { txIds, slot: bestInStorage.Block.SlotNum - STABLE_SIZE }
   );
@@ -710,7 +806,7 @@ async function rawUpdateTransactions(
         accountingAddressIds,
       }
     );
-    const bestInStorage = await deps.GetTxAndBlock.firstTxBefore(
+    const bestInStorage = await deps.GetTxAndBlock.firstSuccessTxBefore(
       db, dbTx,
       {
         txIds,

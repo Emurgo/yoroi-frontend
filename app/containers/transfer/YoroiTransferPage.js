@@ -108,21 +108,23 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
     const yoroiTransfer = this._getYoroiTransferStore();
     const publicDeriver = walletsStore.selected;
     if (publicDeriver == null) {
-      throw new Error(`${nameof(this.tranferFunds)} no wallet selected`);
+      throw new Error(`${nameof(this.tranferFunds)} no wallet elected`);
     }
     await this._getYoroiTransferActions().transferFunds.trigger({
-      next: () => new Promise(resolve => {
-        walletsStore.refreshWallet(publicDeriver);
-        setTimeout(() => {
-          if (walletsStore.activeWalletRoute != null) {
-            const newRoute = walletsStore.activeWalletRoute;
-            this._getRouter().goToRoute.trigger({
-              route: newRoute
-            });
-          }
-          resolve();
-        }, SUCCESS_PAGE_STAY_TIME);
-      }),
+      next: async () => {
+        await walletsStore.refreshWallet(publicDeriver);
+        await new Promise(resolve => {
+          setTimeout(() => {
+            if (walletsStore.activeWalletRoute != null) {
+              const newRoute = walletsStore.activeWalletRoute;
+              this._getRouter().goToRoute.trigger({
+                route: newRoute
+              });
+            }
+            resolve();
+          }, SUCCESS_PAGE_STAY_TIME);
+        });
+      },
       getDestinationAddress: yoroiTransfer.nextInternalAddress(publicDeriver),
       rebuildTx: true,
     });

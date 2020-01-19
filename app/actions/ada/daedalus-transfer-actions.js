@@ -16,7 +16,7 @@ export default class DaedalusTranferActions {
   }> = new AsyncAction();
   backToUninitialized: Action<void> = new Action();
   transferFunds: AsyncAction<{|
-    next: () => void,
+    next: () => Promise<void>,
     publicDeriver: PublicDeriverWithCachedMeta,
   |}> = new AsyncAction();
   cancelTransferFunds: Action<void> = new Action();

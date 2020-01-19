@@ -40,7 +40,7 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
       : null;
 
     return (
-      <div>
+      <>
         <GeneralSettings
           onSelectLanguage={this.props.actions.profile.updateLocale.trigger}
           isSubmitting={isSubmittingLocale}
@@ -67,7 +67,7 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
           />
         }
         <AboutYoroiSettingsBlock />
-      </div>
+      </>
     );
   }
 

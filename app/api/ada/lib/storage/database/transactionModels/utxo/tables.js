@@ -1,6 +1,6 @@
 // @flow
 
-import { Type } from 'lovefield';
+import { Type, ConstraintAction } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 
 import {
@@ -94,7 +94,8 @@ export const populateUtxoTransactionsDb = (schemaBuilder: lf$schema$Builder) => 
     )
     .addForeignKey('UtxoTransactionInput_Transaction', {
       local: UtxoTransactionInputSchema.properties.TransactionId,
-      ref: `${TransactionSchema.name}.${TransactionSchema.properties.TransactionId}`
+      ref: `${TransactionSchema.name}.${TransactionSchema.properties.TransactionId}`,
+      action: ConstraintAction.CASCADE,
     })
     .addForeignKey('UtxoTransactionInput_Address', {
       local: UtxoTransactionInputSchema.properties.AddressId,
@@ -115,7 +116,8 @@ export const populateUtxoTransactionsDb = (schemaBuilder: lf$schema$Builder) => 
     )
     .addForeignKey('UtxoTransactionOutput_Transaction', {
       local: UtxoTransactionOutputSchema.properties.TransactionId,
-      ref: `${TransactionSchema.name}.${TransactionSchema.properties.TransactionId}`
+      ref: `${TransactionSchema.name}.${TransactionSchema.properties.TransactionId}`,
+      action: ConstraintAction.CASCADE,
     })
     .addForeignKey('UtxoTransactionOutput_Address', {
       local: UtxoTransactionOutputSchema.properties.AddressId,

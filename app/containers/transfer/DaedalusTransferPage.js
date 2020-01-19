@@ -81,8 +81,8 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     }
     // broadcast transfer transaction then call continuation
     await this._getDaedalusTransferActions().transferFunds.trigger({
-      next: () => {
-        walletsStore.refreshWallet(publicDeriver);
+      next: async () => {
+        await walletsStore.refreshWallet(publicDeriver);
         if (walletsStore.activeWalletRoute != null) {
           const newRoute = walletsStore.activeWalletRoute;
           this._getRouter().goToRoute.trigger({

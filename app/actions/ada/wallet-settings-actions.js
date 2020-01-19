@@ -8,9 +8,12 @@ export default class WalletSettingsActions {
   stopEditingWalletField: Action<void> = new Action();
   renamePublicDeriver: AsyncAction<{| newName: string |}> = new AsyncAction();
   renameConceptualWallet: AsyncAction<{| newName: string |}> = new AsyncAction();
-  updateSigningPassword: AsyncAction<{
+  updateSigningPassword: AsyncAction<{|
     publicDeriver: PublicDeriverWithCachedMeta,
     oldPassword: string,
     newPassword: string
-  }> = new AsyncAction();
+  |}> = new AsyncAction();
+  resyncHistory: AsyncAction<{|
+    publicDeriver: PublicDeriverWithCachedMeta,
+  |}> = new AsyncAction();
 }

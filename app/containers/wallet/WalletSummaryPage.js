@@ -59,15 +59,15 @@ export default class WalletSummaryPage extends Component<Props> {
       closeExportTransactionDialog,
     } = actions[environment.API].transactions;
 
+    const isLoadingTx = (
+      !recentTransactionsRequest.wasExecuted || recentTransactionsRequest.isExecuting
+    );
+
     const { uiDialogs, profile } = this.props.stores;
     if (searchOptions) {
       const { limit } = searchOptions;
       const noTransactionsFoundLabel = intl.formatMessage(globalMessages.noTransactionsFound);
       if (!recentTransactionsRequest.wasExecuted || hasAny) {
-
-        const isLoadingTx = (!recentTransactionsRequest.wasExecuted ||
-          recentTransactionsRequest.isExecuting);
-
         walletTransactions = (
           <WalletTransactionsList
             transactions={recent}
@@ -105,7 +105,7 @@ export default class WalletSummaryPage extends Component<Props> {
         <WalletSummary
           numberOfTransactions={totalAvailable}
           pendingAmount={unconfirmedAmount}
-          isLoadingTransactions={recentTransactionsRequest.isExecutingFirstTime}
+          isLoadingTransactions={isLoadingTx}
           openExportTxToFileDialog={this.openExportTransactionDialog}
         />
 
