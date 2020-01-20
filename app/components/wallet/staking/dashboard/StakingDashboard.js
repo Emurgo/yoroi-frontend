@@ -76,9 +76,11 @@ export default class StakingDashboard extends Component<Props> {
 
     const pendingTxWarningComponent = this.props.hasAnyPending
       ? (
-        <WarningBox>
-          {this.context.intl.formatMessage(messages.pendingTxWarning)}
-        </WarningBox>
+        <div className={styles.warningBox}>
+          <WarningBox>
+            {this.context.intl.formatMessage(messages.pendingTxWarning)}
+          </WarningBox>
+        </div>
       )
       : (null);
 

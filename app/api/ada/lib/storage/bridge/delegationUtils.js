@@ -199,3 +199,49 @@ export function certificateToPoolList(
     }
   }
 }
+
+export type PoolRequest =
+  void |
+  {| id: string |} |
+  Array<{|
+    id: string,
+    part: number,
+  |}>;
+export function createCertificate(
+  stakingKey: RustModule.WalletV3.PublicKey,
+  poolRequest: PoolRequest,
+): RustModule.WalletV3.StakeDelegation {
+  if (poolRequest == null) {
+    return RustModule.WalletV3.StakeDelegation.new(
+      RustModule.WalletV3.DelegationType.non_delegated(),
+      stakingKey
+    );
+  }
+  if (Array.isArray(poolRequest)) {
+    const partsTotal = poolRequest.reduce((sum, pool) => sum + pool.part, 0);
+    const ratios = RustModule.WalletV3.PoolDelegationRatios.new();
+    for (const pool of poolRequest) {
+      ratios.add(RustModule.WalletV3.PoolDelegationRatio.new(
+        RustModule.WalletV3.PoolId.from_hex(pool.id),
+        pool.part
+      ));
+    }
+    const delegationRatio = RustModule.WalletV3.DelegationRatio.new(
+      partsTotal,
+      ratios,
+    );
+    if (delegationRatio == null) {
+      throw new Error(`${nameof(createCertificate)} invalid ratio`);
+    }
+    return RustModule.WalletV3.StakeDelegation.new(
+      RustModule.WalletV3.DelegationType.ratio(delegationRatio),
+      stakingKey
+    );
+  }
+  return RustModule.WalletV3.StakeDelegation.new(
+    RustModule.WalletV3.DelegationType.full(
+      RustModule.WalletV3.PoolId.from_hex(poolRequest.id)
+    ),
+    stakingKey
+  );
+}

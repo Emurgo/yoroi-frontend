@@ -142,7 +142,7 @@ export default class WalletTransactionsList extends Component<Props> {
           </div>
         ))}
         {loadingSpinner}
-        {hasMoreToLoad &&
+        {!isLoadingTransactions && hasMoreToLoad &&
           <Button
             disabled={isLoadingTransactions}
             className={buttonClasses}
