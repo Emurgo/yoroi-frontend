@@ -526,6 +526,8 @@ const YoroiModern = {
   '--theme-page-content-border-radius': '8px',
   '--theme-page-content-box-bottom': '24px',
   '--theme-banner-height': '46px',
+  '--theme-wallet-plate-main-text-color': '#242838',
+  '--theme-wallet-plate-secondary-text-color': '#6B7384',
 };
 
 // *************************************************************

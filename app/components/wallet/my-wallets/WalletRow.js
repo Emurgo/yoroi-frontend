@@ -7,19 +7,13 @@ import classnames from 'classnames';
 import styles from './WalletRow.scss';
 
 import ToggleIcon from '../../../assets/images/my-wallets/arrow_down.inline.svg';
-import ConceptualIcon from '../../../assets/images/my-wallets/conceptual_wallet.inline.svg';
-import PaperIcon from '../../../assets/images/my-wallets/paper_wallet.inline.svg';
-import TrezorIcon from '../../../assets/images/my-wallets/trezor_wallet.inline.svg';
 import PlusIcon from '../../../assets/images/my-wallets/icon_plus.inline.svg';
 
-import WalletName from './WalletName';
-
 type Props = {|
-    +walletType: 'conceptual' | 'paper' | 'trezor',
     +walletSumDetails: Node,
-    +walletTypeName: string,
     +walletSumCurrencies:  Node,
     +walletSubRow:  Node,
+    +walletPlate:  Node,
 |};
 
 type State = {
@@ -42,29 +36,11 @@ export default class WalletRow extends Component<Props, State> {
     const { isExpanded } = this.state;
 
     const {
-      walletType,
-      walletTypeName,
       walletSumDetails,
       walletSumCurrencies,
       walletSubRow,
+      walletPlate,
     } = this.props;
-
-    let Icon;
-
-    switch (walletType) {
-      case 'conceptual':
-        Icon = ConceptualIcon;
-        break;
-      case 'paper':
-        Icon = PaperIcon;
-        break;
-      case 'trezor':
-        Icon = TrezorIcon;
-        break;
-      default:
-        Icon = '';
-        break;
-    }
 
     return (
       <div
@@ -72,7 +48,7 @@ export default class WalletRow extends Component<Props, State> {
       >
         <div className={styles.content}>
           <div className={styles.nameSection}>
-            <WalletName name={walletTypeName} icon={<Icon />} />
+            {walletPlate}
           </div>
           <div className={styles.detailsSection}>
             {walletSumDetails}

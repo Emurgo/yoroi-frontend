@@ -16,23 +16,12 @@ import WalletDetails from '../../components/wallet/my-wallets/WalletDetails';
 import WalletAddress from '../../components/wallet/my-wallets/WalletAddress';
 import WalletCurrency from '../../components/wallet/my-wallets/WalletCurrency';
 import WalletSubRow from '../../components/wallet/my-wallets/WalletSubRow';
+import NavPlate from '../../components/topbar/NavPlate';
 
 const messages = defineMessages({
   title: {
     id: 'myWallets.general.title',
     defaultMessage: '!!!My wallets',
-  },
-  conceptualWallet: {
-    id: 'myWallets.wallets.conceptual',
-    defaultMessage: '!!!Conceptual wallet',
-  },
-  paperWallet: {
-    id: 'myWallets.wallets.paper',
-    defaultMessage: '!!!Paper wallet',
-  },
-  trezorWallet: {
-    id: 'myWallets.wallets.trezor',
-    defaultMessage: '!!!Trezor wallet',
   },
   lastSyncMessage: {
     id: 'myWallets.wallets.lastSyncText',
@@ -161,15 +150,12 @@ export default class MyWalletsPage extends Component<Props> {
     const staticWallets = [
       {
         walletType: 'conceptual',
-        walletTypeName: intl.formatMessage(messages.conceptualWallet),
       },
       {
         walletType: 'paper',
-        walletTypeName: intl.formatMessage(messages.paperWallet),
       },
       {
         walletType: 'trezor',
-        walletTypeName: intl.formatMessage(messages.trezorWallet),
       },
     ];
 
@@ -190,11 +176,14 @@ export default class MyWalletsPage extends Component<Props> {
           staticWallets.map((wallet) => {
             return (
               <WalletRow
-                walletType={wallet.walletType}
-                walletTypeName={wallet.walletTypeName}
                 walletSumDetails={walletSumDetails}
                 walletSumCurrencies={walletSumCurrencies}
                 walletSubRow={walletSubRow}
+                walletPlate={<NavPlate
+                  publicDeriver={wallets.selected}
+                  walletName={wallets.selected.conceptualWalletName}
+                  walletType={wallet.walletType}
+                />}
               />
             );
           })
