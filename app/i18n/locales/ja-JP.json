@@ -68,7 +68,7 @@
   "global.errors.invalidRepeatPassword": "一致しません。",
   "global.errors.invalidWalletName": "1文字以上40文字以下のウォレット名を入力してください。",
   "global.errors.invalidWalletPassword": "送金パスワードは10文字以上にする必要があります。",
-  "global.labael.undelegate": "Undelegate",
+  "global.labael.undelegate": "委任を解除",
   "global.label.allow": "承諾",
   "global.labels.LearnMore": "もっと詳しく見る",
   "global.labels.back": "戻る",
