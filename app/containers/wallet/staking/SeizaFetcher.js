@@ -45,9 +45,14 @@ export default class SeizaFetcher extends Component<Props> {
     if (event.origin !== process.env.SEIZA_FOR_YOROI_URL) return;
     const pools: Array<SelectedPool> = JSON.parse(decodeURI(event.data));
 
+    const selectedWallet = this.props.stores.substores[environment.API].wallets.selected;
+    if (selectedWallet == null) {
+      return;
+    }
     const delegationTxActions = this.props.actions[environment.API].delegationTransaction;
     await delegationTxActions.createTransaction.trigger({
-      id: pools[0].poolHash,
+      poolRequest: { id: pools[0].poolHash },
+      publicDeriver: selectedWallet,
     });
     runInAction(() => { this.selectedPools = pools; });
   }
@@ -151,9 +156,9 @@ export default class SeizaFetcher extends Component<Props> {
             staleTx={delegationTxStore.isStale}
             poolName={this.selectedPools[0].name}
             poolHash={this.selectedPools[0].poolHash}
-            transactionFee={getShelleyTxFee(delegationTx.IOs, true)}
-            amountToDelegate={delegationTxStore.amountToDelegate}
-            approximateReward={approximateReward(delegationTxStore.amountToDelegate)}
+            transactionFee={getShelleyTxFee(delegationTx.unsignedTx.IOs, true)}
+            amountToDelegate={delegationTx.totalAmountToDelegate}
+            approximateReward={approximateReward(delegationTx.totalAmountToDelegate)}
             isSubmitting={
               delegationTxStore.signAndBroadcastDelegationTx.isExecuting
             }

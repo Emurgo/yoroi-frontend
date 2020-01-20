@@ -6,6 +6,7 @@ import moment from 'moment';
 import { observer } from 'mobx-react';
 import BigNumber from 'bignumber.js';
 
+import PublicDeriverWithCachedMeta from '../../../domain/PublicDeriverWithCachedMeta';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import StakingDashboard from '../../../components/wallet/staking/dashboard/StakingDashboard';
 import EpochProgress from '../../../components/wallet/staking/dashboard/EpochProgress';
@@ -116,7 +117,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
 
     const errorIfPresent = this.getErrorInFetch();
     const stakePools = errorIfPresent == null
-      ? this.getStakePools()
+      ? this.getStakePools(publicDeriver)
       : errorIfPresent;
 
     const showRewardAmount = delegationStore.getCurrentDelegation.wasExecuted &&
@@ -439,7 +440,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
         cancel();
       }}
       isSubmitting={delegationTxStore.signAndBroadcastDelegationTx.isExecuting}
-      transactionFee={getShelleyTxFee(delegationTx.IOs, true)}
+      transactionFee={getShelleyTxFee(delegationTx.unsignedTx.IOs, true)}
       staleTx={delegationTxStore.isStale}
     />);
   }
@@ -573,7 +574,9 @@ export default class StakingDashboardPage extends Component<Props, State> {
     return undefined;
   }
 
-  getStakePools: void => {| pools: null | Array<Node> |} = () => {
+  getStakePools: PublicDeriverWithCachedMeta => {| pools: null | Array<Node> |} = (
+    publicDeriver
+  ) => {
     const delegationStore = this.props.stores.substores[environment.API].delegation;
     if (
       !delegationStore.getCurrentDelegation.wasExecuted ||
@@ -642,12 +645,16 @@ export default class StakingDashboardPage extends Component<Props, State> {
               this.state.notificationElementId
             )}
             undelegate={
+              // don't support undelegation for ratio stake since it's a less intuitive UX
               keyState.state.delegation.pools.length === 1
                 ? async () => {
                   await this.props.actions[environment.API]
                     .delegationTransaction
                     .createTransaction
-                    .trigger(undefined);
+                    .trigger({
+                      publicDeriver,
+                      poolRequest: undefined,
+                    });
                   this.props.actions.dialogs.open.trigger({ dialog: UndelegateDialog });
                 }
                 : undefined

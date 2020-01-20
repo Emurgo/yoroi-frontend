@@ -37,6 +37,12 @@ import {
   updateTransactions,
 } from './lib/storage/bridge/updateTransactions';
 import {
+  filterAddressesByStakingKey,
+  groupAddrContainsAccountKey,
+} from './lib/storage/bridge/utils';
+import { createCertificate } from './lib/storage/bridge/delegationUtils';
+import type { PoolRequest } from './lib/storage/bridge/delegationUtils';
+import {
   Bip44Wallet,
 } from './lib/storage/models/Bip44Wallet/wrapper';
 import type { HWFeatures, } from './lib/storage/database/walletTypes/core/tables';
@@ -62,6 +68,7 @@ import type {
   IDisplayCutoff,
   IDisplayCutoffPopFunc,
   IDisplayCutoffPopResponse,
+  IGetAllUtxosResponse,
   IHasUtxoChains, IHasUtxoChainsRequest,
   IGetLastSyncInfoResponse,
   WalletAccountNumberPlate,
@@ -389,11 +396,19 @@ export type CreateUnsignedTxFunc = (
 
 // createDelegationTx
 
-export type CreateDelegationTxRequest = {
-  publicDeriver: IGetAllUtxos & IHasUtxoChains,
-  certificate: RustModule.WalletV3.Certificate,
-};
-export type CreateDelegationTxResponse = V3UnsignedTxAddressedUtxoResponse;
+export type CreateDelegationTxRequest = {|
+  publicDeriver: IGetAllUtxos & IHasUtxoChains & IGetStakingKey,
+  poolRequest: PoolRequest,
+  /**
+   * TODO: right now we can only get this information from the network
+   * but it should be held in storage eventually
+   */
+  valueInAccount: number,
+|};
+export type CreateDelegationTxResponse = {|
+  unsignedTx: V3UnsignedTxAddressedUtxoResponse,
+  totalAmountToDelegate: BigNumber,
+|};
 
 export type CreateDelegationTxFunc = (
   request: CreateDelegationTxRequest
@@ -1050,22 +1065,62 @@ export default class AdaApi {
     request: CreateDelegationTxRequest
   ): Promise<CreateDelegationTxResponse> {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.createDelegationTx)} called`);
-    const utxos = await request.publicDeriver.getAllUtxos();
-    const addressedUtxo = shelleyAsAddressedUtxo(utxos);
+
+    let stakingKey;
+    {
+      const stakingKeyResp = await request.publicDeriver.getStakingKey();
+      const accountAddress = RustModule.WalletV3.Address.from_bytes(
+        Buffer.from(stakingKeyResp.addr.Hash, 'hex')
+      ).to_account_address();
+      if (accountAddress == null) {
+        throw new Error(`${nameof(this.createDelegationTx)} staking key invalid`);
+      }
+      stakingKey = accountAddress.get_account_key();
+    }
+
+    const stakeDelegationCert = createCertificate(stakingKey, request.poolRequest);
+    const certificate = RustModule.WalletV3.Certificate.stake_delegation(stakeDelegationCert);
+
+    const allUtxo = await request.publicDeriver.getAllUtxos();
+    const addressedUtxo = shelleyAsAddressedUtxo(allUtxo);
     const nextUnusedInternal = await request.publicDeriver.nextInternal();
     if (nextUnusedInternal.addressInfo == null) {
       throw new Error(`${nameof(this.createDelegationTx)} no internal addresses left. Should never happen`);
     }
     const changeAddr = nextUnusedInternal.addressInfo;
-    return shelleyNewAdaUnsignedTx(
+    const unsignedTx = shelleyNewAdaUnsignedTx(
       [],
       [{
         address: changeAddr.addr.Hash,
         addressing: changeAddr.addressing,
       }],
       addressedUtxo,
-      request.certificate
+      certificate
     );
+
+    const allUtxosForKey = filterAddressesByStakingKey(
+      stakingKey,
+      allUtxo
+    );
+    const utxoSum = allUtxosForKey.reduce(
+      (sum, utxo) => sum.plus(new BigNumber(utxo.output.UtxoTransactionOutput.Amount)),
+      new BigNumber(0)
+    );
+
+    const differenceAfterTx = getDifferenceAfterTx(
+      unsignedTx,
+      allUtxo,
+      stakingKey
+    );
+
+    const totalAmountToDelegate = utxoSum
+      .plus(differenceAfterTx) // subtract any part of the fee that comes from UTXO
+      .plus(request.valueInAccount); // recall: Jormungandr rewards are compounding
+
+    return {
+      unsignedTx,
+      totalAmountToDelegate
+    };
   }
 
   async signAndBroadcastDelegationTx(
@@ -1580,3 +1635,53 @@ export default class AdaApi {
   }
 }
 // ========== End of class AdaApi =========
+
+/**
+ * Sending the transaction may affect the amount delegated in a few ways:
+ * 1) The transaction fee for the transaction
+ *  - may be paid with UTXO that either does or doesn't belong to our staking key.
+ * 2) The change for the transaction
+ *  - may get turned into a group address for our staking key
+ */
+function getDifferenceAfterTx(
+  utxoResponse: V3UnsignedTxAddressedUtxoResponse,
+  allUtxos: IGetAllUtxosResponse,
+  stakingKey: RustModule.WalletV3.PublicKey,
+): BigNumber {
+  const stakingKeyString = Buffer.from(stakingKey.as_bytes()).toString('hex');
+
+  let sumInForKey = new BigNumber(0);
+  {
+    // note senderUtxos.length is approximately 1
+    // since it's just to cover transaction fees
+    // so this for loop is faster than building a map
+    for (const senderUtxo of utxoResponse.senderUtxos) {
+      const match = allUtxos.find(utxo => (
+        utxo.output.Transaction.Hash === senderUtxo.tx_hash &&
+        utxo.output.UtxoTransactionOutput.OutputIndex === senderUtxo.tx_index
+      ));
+      if (match == null) {
+        throw new Error(`${nameof(getDifferenceAfterTx)} utxo not found. Should not happen`);
+      }
+      const address = match.address;
+      if (groupAddrContainsAccountKey(address, stakingKeyString)) {
+        sumInForKey = sumInForKey.plus(new BigNumber(senderUtxo.amount));
+      }
+    }
+  }
+
+  let sumOutForKey = new BigNumber(0);
+  {
+    const outputs = utxoResponse.IOs.outputs();
+    for (let i = 0; i < outputs.size(); i++) {
+      const output = outputs.get(i);
+      const address = Buffer.from(output.address().as_bytes()).toString('hex');
+      if (groupAddrContainsAccountKey(address, stakingKeyString)) {
+        const value = new BigNumber(output.value().to_str());
+        sumOutForKey = sumOutForKey.plus(value);
+      }
+    }
+  }
+
+  return sumOutForKey.minus(sumInForKey);
+}
