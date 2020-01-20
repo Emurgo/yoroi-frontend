@@ -208,6 +208,7 @@ export default class MyWalletsPage extends Component<Props> {
         actions={actions}
         stores={stores}
         connectionErrorType={checkAdaServerStatus}
+        showInContainer
       >
         <MyWallets pageTitle={intl.formatMessage(messages.title)}>
           {walletsList}

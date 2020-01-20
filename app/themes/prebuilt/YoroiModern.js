@@ -515,6 +515,17 @@ const YoroiModern = {
   '--theme-mywallets-tooltip-background-color': 'rgba(56, 57, 61, 0.7)',
   '--theme-mywallets-tooltip-text-color': '#FFFFFF',
   '--theme-mywallets-add-button-background-color': '#17D1AA',
+
+  // Page
+
+  '--theme-page-container-width': '1295px',
+  '--theme-page-container-side-padding': '40px',
+  '--theme-page-background-color': '#F0F3F5',
+  '--theme-page-content-background-color': '#FFFFFF',
+  '--theme-page-content-box-shadow': '0 2px 12px 0 rgba(0, 0, 0, 0.06)',
+  '--theme-page-content-border-radius': '8px',
+  '--theme-page-content-box-bottom': '24px',
+  '--theme-banner-height': '46px',
 };
 
 // *************************************************************
