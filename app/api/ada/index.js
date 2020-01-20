@@ -733,7 +733,7 @@ export default class AdaApi {
         return WalletTransaction.fromAnnotatedTx({
           tx,
           addressLookupMap: fetchedTxs.addressLookupMap,
-          lastBlockNumber: lastSyncInfo.SlotNum,
+          lastBlockNumber: lastSyncInfo.Height,
         });
       });
       return {
@@ -761,7 +761,7 @@ export default class AdaApi {
         return WalletTransaction.fromAnnotatedTx({
           tx,
           addressLookupMap: fetchedTxs.addressLookupMap,
-          lastBlockNumber: lastSyncInfo.SlotNum,
+          lastBlockNumber: lastSyncInfo.Height,
         });
       });
       return mappedTransactions;
