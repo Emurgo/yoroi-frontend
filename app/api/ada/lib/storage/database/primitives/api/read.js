@@ -740,6 +740,7 @@ export class GetTxAndBlock {
         )
       )
       .orderBy(blockTable[Tables.BlockSchema.properties.SlotNum], lf.Order.DESC)
+      .orderBy(txTable[Tables.TransactionSchema.properties.Ordinal], lf.Order.DESC)
       .where(op.and(
         blockTable[Tables.BlockSchema.properties.SlotNum].lt(request.slot),
         txTable[Tables.TransactionSchema.properties.TransactionId].in(request.txIds),
@@ -905,7 +906,8 @@ export class GetCertificates {
       .where(certAddrTable[certAddrSchema.properties.AddressId].in(
         request.addressIds
       ))
-      .orderBy(blockTable[Tables.BlockSchema.properties.SlotNum], lf.Order.DESC);
+      .orderBy(blockTable[Tables.BlockSchema.properties.SlotNum], lf.Order.DESC)
+      .orderBy(txTable[Tables.TransactionSchema.properties.Ordinal], lf.Order.DESC);
 
     const queryResult: $ReadOnlyArray<{|
       CertificateAddress: $ReadOnly<CertificateAddressRow>,
