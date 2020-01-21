@@ -32,7 +32,7 @@ type Props = {|
   +numberOfTransactions: number,
   +pendingAmount: UnconfirmedAmount,
   +isLoadingTransactions: boolean,
-  +openExportTxToFileDialog: Function,
+  +openExportTxToFileDialog: void => void,
 |};
 
 @observer

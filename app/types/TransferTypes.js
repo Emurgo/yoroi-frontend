@@ -38,6 +38,7 @@ export type TransferSourceType = $Values<typeof TransferSource>;
 export const TransferKind = Object.freeze({
   NORMAL: 0,
   PAPER: 1,
-  HARDWARE: 2,
+  TREZOR: 2,
+  LEDGER: 3
 });
 export type TransferKindType = $Values<typeof TransferKind>;

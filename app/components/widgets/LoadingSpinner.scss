@@ -1,9 +1,15 @@
 .component {
-  background: url("../../assets/images/spinner-dark.svg") no-repeat center;
   :global {
     animation: loading-spin 1.5s linear;
     animation-iteration-count: infinite;
   }
+}
+
+.dark {
+  background: url("../../assets/images/spinner-dark.svg") no-repeat center;
+}
+.light {
+  background: url("../../assets/images/spinner-light.svg") no-repeat center;
 }
 
 .standardSize {

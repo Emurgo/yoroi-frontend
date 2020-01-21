@@ -6,7 +6,7 @@ import {
 import type { ConfigType } from '../../../../../config/config-types';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import BigNumber from 'bignumber.js';
-import { generateAuthData } from './utils';
+import { generateAuthData, generateFee, } from './utils';
 
 declare var CONFIG: ConfigType;
 
@@ -36,11 +36,7 @@ export function buildUnsignedAccountTx(
     : RustModule.WalletV3.Payload.no_payload();
   const sourceAccount = RustModule.WalletV3.Account.single_from_public_key(sender);
 
-  const feeAlgorithm = RustModule.WalletV3.Fee.linear_fee(
-    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.constant),
-    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.coefficient),
-    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.certificate),
-  );
+  const feeAlgorithm = generateFee();
 
   let fee;
   {

@@ -6,7 +6,6 @@
   height: 100%;
   overflow: hidden;
   width: 100%;
-  
   .topbar {
     height: var(--cmn-topbar-height);
     flex-shrink: 0;
@@ -56,4 +55,16 @@
   background-image: url(../../assets/images/select-language.svg);
   background-size: cover;
   background-position-y: bottom;
+}
+
+
+.windowWrapper {
+  font-family: var(--font-regular);
+  display: flex;
+  flex-wrap: nowrap;
+  min-height: 100%;
+}
+
+.sidebar {
+  flex: 1 0 auto;
 }

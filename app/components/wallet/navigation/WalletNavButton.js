@@ -8,7 +8,7 @@ type Props = {|
   +label: string,
   +icon: string,
   +isActive: boolean,
-  +onClick: Function,
+  +onClick: void => void,
   +className?: string,
 |};
 

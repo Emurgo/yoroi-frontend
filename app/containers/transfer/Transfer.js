@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import type { InjectedContainerProps } from '../../types/injectedPropsType';
 import MainLayout from '../MainLayout';
 import TopBarContainer from '../TopBarContainer';
+import SidebarContainer from '../SidebarContainer';
 import TransferWithNavigation from '../../components/transfer/layouts/TransferWithNavigation';
 import type { TransferNavigationProps } from '../../components/transfer/layouts/TransferWithNavigation';
 import { ROUTES } from '../../routes-config';
@@ -28,11 +29,13 @@ export default class Transfer extends Component<InjectedContainerProps> {
   render() {
     const { actions, stores } = this.props;
     const topbarContainer = (<TopBarContainer actions={actions} stores={stores} />);
+    const sidebarContainer = (<SidebarContainer actions={actions} stores={stores} />);
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
 
     return (
       <MainLayout
         topbar={topbarContainer}
+        sidebar={sidebarContainer}
         actions={actions}
         stores={stores}
         connectionErrorType={checkAdaServerStatus}

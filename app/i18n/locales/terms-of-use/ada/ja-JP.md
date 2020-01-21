@@ -56,9 +56,9 @@
 
 ## 11. その他
 
-**a. Amendment.** The Company shall have the right, at any time and without notice, to add to or modify the terms of this Agreement, simply by delivering such amended terms to User by electronic message through any medium to any address provided to the Company by User. User's access to or use of the Software after the date such amended terms are delivered to User shall be deemed to constitute acceptance of such amended terms.
+**a. 変更 **当社は、ユーザーから当社に届け出のあったアドレス宛てのいずれかの媒体を通じた電子メッセージにより、変更後の条項をユーザーに提示することにより、いつでも通知なく本規約の条項を追加し、または変更することができるものとします。かかる変更後の条項がユーザーに提示された日の後にユーザーが本ソフトウェアにアクセスし、または本ソフトウェアを利用した場合には、かかる変更後の条項が承諾されたものとみなします。
 
-**b. Severance.** If any provision or part-provision of this Agreement is, or becomes invalid, illegal or unenforceable, it shall be deemed modified to the minimum extent necessary to make it valid, legal and enforceable. If such modification is not possible, the relevant provision or part-provision shall be deemed deleted. Any modification to or deletion of a provision or part-provision under this Article shall not affect the validity and enforceability of the rest of this Agreement.
+**b. 分離解釈 **本規約のいずれかの規定またはいずれかの規定の一部が無効、違法または強制執行不能であるか、無効、違法または強制執行不能となる場合には、当該規定または当該規定の一部は、有効、適法かつ強制執行可能とするために必要な最小限度で変更されたものとみなします。かかる変更を行えない場合には、当該規定または当該規定の一部は削除されたものとみなします。本条に基づくいずれかの規定またはいずれかの規定の一部の変更または削除は、本規約の残りの規定の有効性および強制執行可能性に影響を及ぼさないものとします。
 
 **c. 完全合意 – 依拠の放棄** 本規約は、本規約の内容に関する両当事者間の完全な合意を構成し、両当事者間における従前のすべての合意事項および了解事項に優先します。ユーザーは、本規約に明記されるもの以外の陳述、了解事項、表明事項、期待事項または合意事項に依拠していないことを明示的に表明し、保証します。
 

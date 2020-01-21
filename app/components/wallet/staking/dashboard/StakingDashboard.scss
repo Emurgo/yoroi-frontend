@@ -8,6 +8,10 @@
   flex-direction: column;
 }
 
+.warningBox {
+  margin-bottom: 16px;
+}
+
 .contentWrap {
   max-width: 1178px;
   width: 100%;
@@ -15,6 +19,10 @@
   display: flex;
   flex-direction: column;
   flex: 1;
+}
+
+.poolError {
+  margin-top: 42px;
 }
 
 .rewards {
@@ -44,4 +52,8 @@
 .graphsWrapper {
   flex: 1;
   margin-right: 30px;
+}
+
+.pageSelect {
+  margin-bottom: 32px;
 }

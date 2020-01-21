@@ -29,9 +29,9 @@ type Props = {|
   +countdownRemaining: number,
   +canPhraseBeShown: boolean,
   +isPrivacyNoticeAccepted: boolean,
-  +onAcceptPrivacyNotice: Function,
-  +onContinue: Function,
-  +onCancelBackup: Function,
+  +onAcceptPrivacyNotice: void => void,
+  +onContinue: void => void,
+  +onCancelBackup: void => void,
   +classicTheme: boolean
 |};
 

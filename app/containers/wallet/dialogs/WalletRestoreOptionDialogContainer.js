@@ -4,10 +4,10 @@ import { observer } from 'mobx-react';
 import WalletRestoreOptionDialog from '../../../components/wallet/add/option-dialog/WalletRestoreOptionDialog';
 
 type Props = {|
-  +onClose: Function,
+  +onClose: void => void,
   +classicTheme: boolean,
-  +onRestore: Function,
-  +onPaperRestore: Function,
+  +onRestore: void => void,
+  +onPaperRestore: void => void,
 |};
 @observer
 export default class WalletRestoreOptionDialogContainer extends Component<Props> {

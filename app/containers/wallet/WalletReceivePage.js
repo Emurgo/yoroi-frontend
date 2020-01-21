@@ -37,11 +37,11 @@ export default class WalletReceivePage extends Component<Props, State> {
     this.resetErrors();
   }
 
-  handleGenerateAddress = () => {
+  handleGenerateAddress: void => Promise<void> = async () => {
     const { wallets } = this.props.stores.substores.ada;
     const publicDeriver = wallets.selected;
     if (publicDeriver != null) {
-      this.props.actions.ada.addresses.createAddress.trigger();
+      await this.props.actions.ada.addresses.createAddress.trigger();
     }
   };
 
@@ -114,8 +114,8 @@ export default class WalletReceivePage extends Component<Props, State> {
           notification={uiNotifications.getTooltipActiveNotification(
             this.state.notificationElementId
           )}
-          onVerifyAddress={({ address, path }) => {
-            actions.ada.hwVerifyAddress.selectAddress.trigger({ address, path });
+          onVerifyAddress={async ({ address, path }) => {
+            await actions.ada.hwVerifyAddress.selectAddress.trigger({ address, path });
             this.openVerifyAddressDialog();
           }}
           onGeneratePaymentURI={(address) => {

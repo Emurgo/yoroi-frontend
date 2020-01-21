@@ -12,7 +12,7 @@ import styles from './Dialog.scss';
 
 type ActionType = {
   +label: string,
-  +onClick: Function,
+  +onClick: void => PossiblyAsync<void>,
   +primary?: boolean,
   +disabled?: boolean,
   +className?: ?string
@@ -26,7 +26,7 @@ type Props = {|
   +backButton?: Node,
   +className?: string,
   +styleOveride?: {},
-  +onClose?: ?Function,
+  +onClose?: ?(void => PossiblyAsync<void>),
   +closeOnOverlayClick?: boolean,
   +classicTheme: boolean
 |};

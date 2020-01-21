@@ -17,8 +17,8 @@ export default ({
   extensionKey,
   geckoKey,
   iconOverride,
-  versionOverride,
-} /*: {
+  version,
+} /*: {|
   description: string,
   defaultTitle: string,
   titleOverride?: boolean,
@@ -27,8 +27,8 @@ export default ({
   extensionKey?: string,
   geckoKey: string,
   iconOverride?: Icons,
-  versionOverride?: string,
-} */
+  version: string,
+|} */
 ) => { // eslint-disable-line function-paren-newline
   const icons = iconOverride == null
     ? {
@@ -40,9 +40,7 @@ export default ({
     }
     : iconOverride;
   const base = {
-    version: versionOverride == null
-      ? '1.10.0'
-      : versionOverride,
+    version,
     // the name shown in chrome://extensions
     // we also reuse this to choose the filename on disk
     name: titleOverride === true ? defaultTitle : 'yoroi',

@@ -1,17 +1,18 @@
 // @flow
-import Action from './lib/Action';
+import { AsyncAction, Action } from './lib/Action';
 import type { ExplorerType } from '../domain/Explorer';
 
 // ======= PROFILE ACTIONS =======
 
 export default class ProfileActions {
-  acceptTermsOfUse: Action<void> = new Action();
-  acceptUriScheme: Action<void> = new Action();
+  acceptTermsOfUse: AsyncAction<void> = new AsyncAction();
+  acceptUriScheme: AsyncAction<void> = new AsyncAction();
   updateTentativeLocale: Action<{| locale: string |}> = new Action();
-  updateLocale: Action<{| locale: string |}> = new Action();
-  updateSelectedExplorer: Action<{| explorer: ExplorerType |}> = new Action();
-  updateTheme: Action<{| theme: string |}> = new Action();
-  exportTheme: Action<void> = new Action();
-  commitLocaleToStorage: Action<{ locale: string }> = new Action();
-  updateHideBalance: Action<void> = new Action();
+  updateLocale: AsyncAction<{| locale: string |}> = new AsyncAction();
+  updateSelectedExplorer: AsyncAction<{| explorer: ExplorerType |}> = new AsyncAction();
+  updateTheme: AsyncAction<{| theme: string |}> = new AsyncAction();
+  exportTheme: AsyncAction<void> = new AsyncAction();
+  commitLocaleToStorage: AsyncAction<void> = new AsyncAction();
+  updateHideBalance: AsyncAction<void> = new AsyncAction();
+  toggleSidebar: AsyncAction<void> = new AsyncAction();
 }

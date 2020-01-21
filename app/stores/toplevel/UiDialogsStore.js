@@ -39,7 +39,7 @@ export default class UiDialogsStore extends Store {
     Math.max(countDownTo - this.secondsSinceActiveDialogIsOpen, 0)
   );
 
-  @action _onOpen = ({ dialog, params } : { dialog : Function, params?: Object }) => {
+  @action _onOpen = ({ dialog, params } : {| dialog : Function, params?: Object |}) => {
     this._reset();
     this.activeDialog = dialog;
     this.paramsForActiveDialog = params || {};
@@ -57,7 +57,7 @@ export default class UiDialogsStore extends Store {
     this.secondsSinceActiveDialogIsOpen += 1;
   };
 
-  @action _onUpdateDataForActiveDialog = ({ data } : { data: Object }) => {
+  @action _onUpdateDataForActiveDialog = ({ data }: { [key: string]: any }) => {
     Object.assign(this.dataForActiveDialog, data);
   };
 

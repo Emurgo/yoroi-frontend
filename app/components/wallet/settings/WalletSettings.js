@@ -3,11 +3,11 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import moment from 'moment';
-import LocalizableError from '../../i18n/LocalizableError';
-import InlineEditingInput from '../widgets/forms/InlineEditingInput';
-import ReadOnlyInput from '../widgets/forms/ReadOnlyInput';
-import ChangeWalletPasswordDialog from './settings/ChangeWalletPasswordDialog';
-import globalMessages from '../../i18n/global-messages';
+import LocalizableError from '../../../i18n/LocalizableError';
+import InlineEditingInput from '../../widgets/forms/InlineEditingInput';
+import ReadOnlyInput from '../../widgets/forms/ReadOnlyInput';
+import ChangeWalletPasswordDialog from './ChangeWalletPasswordDialog';
+import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletSettings.scss';
 import type { Node } from 'react';
 
@@ -30,14 +30,14 @@ type Props = {|
   +walletName: string,
   +walletPasswordUpdateDate: ?Date,
   +error?: ?LocalizableError,
-  +openDialogAction: Function,
-  +isDialogOpen: Function,
+  +openDialogAction: {| dialog: any, params?: any |} => void,
+  +isDialogOpen: any => boolean,
   +dialog: Node,
-  +onFieldValueChange: Function,
-  +onStartEditing: Function,
-  +onStopEditing: Function,
-  +onCancelEditing: Function,
-  +nameValidator: Function,
+  +onFieldValueChange: (string, string) => PossiblyAsync<void>,
+  +onStartEditing: string => void,
+  +onStopEditing: void => void,
+  +onCancelEditing: void => void,
+  +nameValidator: string => boolean,
   +activeField: ?string,
   +isSubmitting: boolean,
   +isInvalid: boolean,
@@ -91,7 +91,7 @@ export default class WalletSettings extends Component<Props> {
           onStartEditing={() => onStartEditing('name')}
           onStopEditing={onStopEditing}
           onCancelEditing={onCancelEditing}
-          onSubmit={(value) => onFieldValueChange('name', value)}
+          onSubmit={async (value) => onFieldValueChange('name', value)}
           isValid={nameValidator}
           validationErrorMessage={intl.formatMessage(globalMessages.invalidWalletName)}
           successfullyUpdated={!isSubmitting && lastUpdatedField === 'name' && !isInvalid}

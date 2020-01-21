@@ -53,7 +53,7 @@ function groupWallets(
  * The base wallet store that contains the shared logic
  * dealing with wallets / accounts.
  */
-export default class WalletsStore extends Store {
+export default class WalletStore extends Store {
 
   WALLET_REFRESH_INTERVAL = environment.walletRefreshInterval;
   ON_VISIBLE_DEBOUNCE_WAIT = 1000;
@@ -222,11 +222,11 @@ export default class WalletsStore extends Store {
     this.actions.router.goToRoute.trigger({ route });
   }
 
-  refreshWallet(
+  async refreshWallet(
     publicDeriver: PublicDeriverWithCachedMeta
-  ): void {
-    this.stores.substores[environment.API].addresses.addObservedWallet(publicDeriver);
-    this.stores.substores[environment.API].transactions.addObservedWallet(publicDeriver);
+  ): Promise<void> {
+    await this.stores.substores[environment.API].addresses.refreshAddresses(publicDeriver);
+    await this.stores.substores[environment.API].transactions.refreshTransactionData(publicDeriver);
   }
 
   @action
@@ -288,6 +288,9 @@ export default class WalletsStore extends Store {
       }
     });
     for (const publicDeriver of newWithCachedData) {
+      // note: purposely don't await
+      // that way app loading page finishes sooner
+      // and user sees a loading screen for individual wallet instead
       this.stores.substores[environment.API].addresses.addObservedWallet(publicDeriver);
       this.stores.substores[environment.API].transactions.addObservedWallet(publicDeriver);
     }
@@ -296,8 +299,8 @@ export default class WalletsStore extends Store {
   @action registerObserversForNewWallet: PublicDeriverWithCachedMeta => Promise<void> = async (
     publicDeriver: PublicDeriverWithCachedMeta
   ): Promise<void> => {
-    this.stores.substores[environment.API].addresses.addObservedWallet(publicDeriver);
-    this.stores.substores[environment.API].transactions.addObservedWallet(publicDeriver);
+    await this.stores.substores[environment.API].addresses.addObservedWallet(publicDeriver);
+    await this.stores.substores[environment.API].transactions.addObservedWallet(publicDeriver);
   };
 
   /** Make all API calls required to setup imported wallet */
@@ -351,7 +354,7 @@ export default class WalletsStore extends Store {
   _updateActiveWalletOnRouteChanges = () => {
     const currentRoute = this.stores.app.currentRoute;
     const hasAnyPublicDeriver = this.hasAnyPublicDeriver;
-    runInAction('WalletsStore::_updateActiveWalletOnRouteChanges', () => {
+    runInAction(`${nameof(WalletStore)}::${nameof(this._updateActiveWalletOnRouteChanges)}`, () => {
       // There are not wallets loaded (yet) -> unset active and return
       if (!hasAnyPublicDeriver) {
         return this._unsetActiveWallet();

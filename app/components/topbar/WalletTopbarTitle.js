@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import styles from './WalletTopbarTitle.scss';
+import LoadingSpinner from '../widgets/LoadingSpinner';
 import { matchRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import WalletAccountIcon from './WalletAccountIcon';
@@ -29,8 +30,8 @@ type Props = {|
   +themeProperties?: {|
     identiconSaturationFactor: number,
   |},
-  +onUpdateHideBalance: void => void,
-  +shouldHideBalance: boolean
+  +onUpdateHideBalance: void => PossiblyAsync<void>,
+  +shouldHideBalance: boolean,
 |};
 
 function constructPlate(
@@ -92,13 +93,20 @@ export default class WalletTopbarTitle extends Component<Props> {
           <div className={styles.walletPlate}>{accountPlateId || ''}</div>
         </div>
         <div className={styles.divAmount}>
-          <div className={styles.walletAmount}>
-            { publicDeriver && shouldHideBalance ?
-              <span className={styles.hiddenWalletAmount}>******</span> :
-              publicDeriver && formattedWalletAmount(publicDeriver.amount)
-            }
-            { currency }
-          </div>
+          {publicDeriver?.amount != null
+            ? (
+              <div className={styles.walletAmount}>
+                { publicDeriver && shouldHideBalance ?
+                  <span className={styles.hiddenWalletAmount}>******</span> :
+                  publicDeriver && formattedWalletAmount(publicDeriver.amount)
+                }
+                { currency }
+              </div>
+            )
+            : (
+              <LoadingSpinner small light />
+            )
+          }
           <div className={styles.walletAmountLabelBlock}>
             <div className={styles.walletAmountLabel}>
               {intl.formatMessage(messages.totalBalance)}

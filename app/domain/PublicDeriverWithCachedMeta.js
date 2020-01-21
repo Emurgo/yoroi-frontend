@@ -25,7 +25,7 @@ export default class PublicDeriverWithCachedMeta {
   @observable plate: null | WalletAccountNumberPlate;
   @observable publicDeriverName: string;
   @observable conceptualWalletName: string;
-  @observable amount: BigNumber;
+  @observable amount: null | BigNumber;
   @observable assuranceMode: AssuranceMode;
   @observable signingKeyUpdateDate: null | Date;
   @observable lastSyncInfo: IGetLastSyncInfoResponse
@@ -35,7 +35,7 @@ export default class PublicDeriverWithCachedMeta {
     plate: null | WalletAccountNumberPlate,
     publicDeriverName: string,
     conceptualWalletName: string,
-    amount: BigNumber,
+    amount: null | BigNumber,
     assuranceMode: AssuranceMode,
     signingKeyUpdateDate: null | Date,
     lastSyncInfo: IGetLastSyncInfoResponse,
@@ -44,12 +44,17 @@ export default class PublicDeriverWithCachedMeta {
   }
 
   @action
+  clearCache(): void {
+    this.amount = null;
+  }
+
+  @action
   static fromData(data: {
     self: PublicDeriver<>,
     plate: null | WalletAccountNumberPlate,
     publicDeriverName: string,
     conceptualWalletName: string,
-    amount: BigNumber,
+    amount: null | BigNumber,
     assuranceMode: AssuranceMode,
     signingKeyUpdateDate: null | Date,
     lastSyncInfo: IGetLastSyncInfoResponse,
@@ -91,7 +96,7 @@ export default class PublicDeriverWithCachedMeta {
       plate,
       publicDeriverName: publicDeriverInfo.Name,
       conceptualWalletName: conceptualWalletInfo.Name,
-      amount: new BigNumber(0), // assume 0 for now. Updated later if necessary
+      amount: null,
       assuranceMode: assuranceModes.NORMAL,
       signingKeyUpdateDate,
       lastSyncInfo,

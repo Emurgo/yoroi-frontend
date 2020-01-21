@@ -79,12 +79,12 @@ export class AddressTypeStore<T> {
   }
 
   /** Refresh addresses for all wallets */
-  @action refreshAddresses: void => void = () => {
+  @action refreshAddresses: void => Promise<void> = async () => {
     const publicDeriver = this.stores.substores[environment.API].wallets.selected;
     if (publicDeriver == null) return;
     const allRequest = this._getRequest(publicDeriver.self);
     allRequest.invalidate({ immediately: false });
-    allRequest.execute({ publicDeriver: publicDeriver.self });
+    await allRequest.execute({ publicDeriver: publicDeriver.self }).promise;
   };
 
   _flowCoerceResult: CachedRequest<SubRequestType<T>> => ?Array<T> = (request) => {
@@ -101,14 +101,14 @@ export class AddressTypeStore<T> {
     return new CachedRequest<SubRequestType<T>>(this.request);
   };
 
-  @action addObservedWallet: PublicDeriver<> => void = (
-    publicDeriver: PublicDeriver<>
-  ): void => {
+  @action addObservedWallet: PublicDeriver<> => Promise<void> = async (
+    publicDeriver
+  ) => {
     this.addressesRequests.push({
       publicDeriver,
       cachedRequest: this._getRequest(publicDeriver),
     });
-    this.refreshAddresses();
+    await this.refreshAddresses();
   }
 }
 
@@ -163,7 +163,7 @@ export default class AddressesStore extends Store {
         popFunc: withDisplayCutoff.popAddress
       }).promise;
       if (address != null) {
-        this.refreshAddresses(publicDeriver);
+        await this.refreshAddresses(publicDeriver);
         runInAction('reset error', () => { this.error = null; });
       }
     } catch (error) {
@@ -175,28 +175,28 @@ export default class AddressesStore extends Store {
     this.error = null;
   };
 
-  addObservedWallet: PublicDeriverWithCachedMeta => void = (
-    publicDeriver: PublicDeriverWithCachedMeta
-  ): void => {
+  addObservedWallet: PublicDeriverWithCachedMeta => Promise<void> = async (
+    publicDeriver
+  ) => {
     const withHasUtxoChains = asHasUtxoChains(publicDeriver.self);
     if (withHasUtxoChains == null) {
-      this.allAddressesForDisplay.addObservedWallet(publicDeriver.self);
+      await this.allAddressesForDisplay.addObservedWallet(publicDeriver.self);
     } else {
-      this.externalForDisplay.addObservedWallet(publicDeriver.self);
-      this.internalForDisplay.addObservedWallet(publicDeriver.self);
+      await this.externalForDisplay.addObservedWallet(publicDeriver.self);
+      await this.internalForDisplay.addObservedWallet(publicDeriver.self);
     }
-    this.refreshAddresses(publicDeriver);
+    await this.refreshAddresses(publicDeriver);
   }
 
-  refreshAddresses: PublicDeriverWithCachedMeta => void = (
-    publicDeriver: PublicDeriverWithCachedMeta
-  ): void => {
+  refreshAddresses: PublicDeriverWithCachedMeta => Promise<void> = async (
+    publicDeriver
+  ) => {
     const withHasUtxoChains = asHasUtxoChains(publicDeriver.self);
     if (withHasUtxoChains == null) {
-      this.allAddressesForDisplay.refreshAddresses();
+      await this.allAddressesForDisplay.refreshAddresses();
     } else {
-      this.externalForDisplay.refreshAddresses();
-      this.internalForDisplay.refreshAddresses();
+      await this.externalForDisplay.refreshAddresses();
+      await this.internalForDisplay.refreshAddresses();
     }
   }
 

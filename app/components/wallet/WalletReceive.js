@@ -19,6 +19,9 @@ import type { ExplorerType } from '../../domain/Explorer';
 import type { StandardAddress } from '../../stores/base/AddressesStore';
 import environment from '../../environment';
 import type { Notification } from '../../types/notificationType';
+import type {
+  BIP32Path
+} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 const messages = defineMessages({
   walletAddressLabel: {
@@ -64,11 +67,11 @@ type Props = {|
   +selectedExplorer: ExplorerType,
   +isWalletAddressUsed: boolean,
   +walletAddresses: Array<StandardAddress>,
-  +onGenerateAddress: Function,
+  +onGenerateAddress: void => Promise<void>,
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
-  +onVerifyAddress: Function,
-  +onGeneratePaymentURI: Function,
+  +onVerifyAddress: {| address: string, path: BIP32Path |} => Promise<void>,
+  +onGeneratePaymentURI: string => void,
   +isSubmitting: boolean,
   +error?: ?LocalizableError,
 |};
@@ -95,8 +98,8 @@ export default class WalletReceive extends Component<Props, State> {
     this.setState(prevState => ({ showUsed: !prevState.showUsed }));
   };
 
-  submit = () => {
-    this.props.onGenerateAddress();
+  submit: void => Promise<void> = async () => {
+    await this.props.onGenerateAddress();
   }
 
   loadingSpinner: ?LoadingSpinner;

@@ -7,7 +7,7 @@ import styles from './TransferNavButton.scss';
 type Props = {|
   +label: string,
   +isActive: boolean,
-  +onClick: Function,
+  +onClick: void => void,
   +className?: string,
 |};
 

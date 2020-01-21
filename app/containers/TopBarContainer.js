@@ -13,8 +13,8 @@ type Props = InjectedProps;
 @observer
 export default class TopBarContainer extends Component<Props> {
 
-  updateHideBalance = () => {
-    this.props.actions.profile.updateHideBalance.trigger();
+  updateHideBalance = async (): Promise<void> => {
+    await this.props.actions.profile.updateHideBalance.trigger();
   }
 
   render() {

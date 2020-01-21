@@ -176,6 +176,12 @@ export default class ProfileStore extends Store {
   @observable setHideBalanceRequest: Request<boolean => Promise<void>>
     = new Request<boolean => Promise<void>>(this.api.localStorage.setHideBalance);
 
+  @observable getToggleSidebarRequest: Request<void => Promise<boolean>>
+    = new Request<void => Promise<boolean>>(this.api.localStorage.getToggleSidebar);
+
+  @observable setToggleSidebarRequest: Request<boolean => Promise<void>>
+    = new Request<boolean => Promise<void>>(this.api.localStorage.setToggleSidebar);
+
   setup(): void {
     this.actions.profile.updateLocale.listen(this._updateLocale);
     this.actions.profile.updateTentativeLocale.listen(this._updateTentativeLocale);
@@ -186,6 +192,7 @@ export default class ProfileStore extends Store {
     this.actions.profile.exportTheme.listen(this._exportTheme);
     this.actions.profile.commitLocaleToStorage.listen(this._acceptLocale);
     this.actions.profile.updateHideBalance.listen(this._updateHideBalance);
+    this.actions.profile.toggleSidebar.listen(this._toggleSidebar);
     this.registerReactions([
       this._setBigNumberFormat,
       this._updateMomentJsLocaleAfterLocaleChange,
@@ -239,16 +246,16 @@ export default class ProfileStore extends Store {
   }
 
   @action
-  _updateTentativeLocale = ({ locale }: { locale: string }) => {
-    this.inMemoryLanguage = locale;
+  _updateTentativeLocale: {| locale: string |} => void = (request) => {
+    this.inMemoryLanguage = request.locale;
   };
 
-  _updateLocale = async ({ locale }: { locale: string }) => {
+  _updateLocale: {| locale: string |} => Promise<void> = async ({ locale }) => {
     await this.setProfileLocaleRequest.execute(locale);
     await this.getProfileLocaleRequest.execute(); // eagerly cache
   };
 
-  _acceptLocale = async () => {
+  _acceptLocale: void => Promise<void> = async () => {
     // commit in-memory language to storage
     await this.setProfileLocaleRequest.execute(
       this.inMemoryLanguage != null
@@ -261,11 +268,11 @@ export default class ProfileStore extends Store {
     });
   }
 
-  _updateMomentJsLocaleAfterLocaleChange = () => {
+  _updateMomentJsLocaleAfterLocaleChange: void => void = () => {
     moment.locale(this._convertLocaleKeyToMomentJSLocalKey(this.currentLocale));
   };
 
-  _convertLocaleKeyToMomentJSLocalKey = (localeKey: string): string => {
+  _convertLocaleKeyToMomentJSLocalKey: string => string = (localeKey) => {
     // REF -> https://github.com/moment/moment/tree/develop/locale
     let momentJSLocalKey = localeKey;
     switch (localeKey) {
@@ -339,7 +346,7 @@ export default class ProfileStore extends Store {
     );
   }
 
-  _updateTheme = async ({ theme }: { theme: string }) => {
+  _updateTheme: {| theme: string |} => Promise<void> = async ({ theme }) => {
     // Unset / Clear the Customized Theme from LocalStorage
     await this.unsetCustomThemeRequest.execute();
     await this.getCustomThemeRequest.execute(); // eagerly cache
@@ -347,7 +354,7 @@ export default class ProfileStore extends Store {
     await this.getThemeRequest.execute(); // eagerly cache
   };
 
-  _exportTheme = async () => {
+  _exportTheme: void => Promise<void> = async () => {
     // TODO: It should be ok to access DOM Style from here
     // but not sure about project conventions about accessing the DOM (Clark)
     const html = document.querySelector('html');
@@ -362,9 +369,7 @@ export default class ProfileStore extends Store {
     }
   };
 
-  getThemeVars: {| theme: string |} => { [key: string]: string } = (
-    { theme }
-  ): { [key: string]: string } => {
+  getThemeVars: {| theme: string |} => { [key: string]: string } = ({ theme }) => {
     if (theme) return require(`../../themes/prebuilt/${theme}.js`).default;
     return require(`../../themes/prebuilt/${ProfileStore.getDefaultTheme()}.js`); // default
   };
@@ -407,12 +412,12 @@ export default class ProfileStore extends Store {
     return this.getTermsOfUseAcceptanceRequest.result === true;
   }
 
-  _acceptTermsOfUse = async () => {
+  _acceptTermsOfUse: void => Promise<void> = async () => {
     await this.setTermsOfUseAcceptanceRequest.execute();
     await this.getTermsOfUseAcceptanceRequest.execute(); // eagerly cache
   };
 
-  _getTermsOfUseAcceptance = () => {
+  _getTermsOfUseAcceptance: void => void = () => {
     this.getTermsOfUseAcceptanceRequest.execute();
   };
 
@@ -429,12 +434,12 @@ export default class ProfileStore extends Store {
     return this.getUriSchemeAcceptanceRequest.result === true;
   }
 
-  _acceptUriScheme = async () => {
+  _acceptUriScheme: void => Promise<void> = async () => {
     await this.setUriSchemeAcceptanceRequest.execute();
     await this.getUriSchemeAcceptanceRequest.execute(); // eagerly cache
   };
 
-  _getUriSchemeAcceptance = () => {
+  _getUriSchemeAcceptance: void => void = () => {
     this.getUriSchemeAcceptanceRequest.execute();
   };
 
@@ -487,16 +492,29 @@ export default class ProfileStore extends Store {
     return result === true;
   }
 
-  _updateHideBalance = async () => {
+  _updateHideBalance: void => Promise<void> = async () => {
     const shouldHideBalance = this.shouldHideBalance;
     await this.setHideBalanceRequest.execute(shouldHideBalance);
     await this.getHideBalanceRequest.execute();
   };
 
+  // ========== Expand / Retract Sidebar ========== //
 
-  // ========== Redirec Logic ========== //
+  @computed get isSidebarExpanded(): boolean {
+    const { result } = this.getToggleSidebarRequest.execute();
+    return result === true;
+  }
 
-  _checkSetupSteps = async () => {
+  _toggleSidebar: void => Promise<void> = async () => {
+    const isSidebarExpanded = this.isSidebarExpanded;
+    await this.setToggleSidebarRequest.execute(isSidebarExpanded);
+    await this.getToggleSidebarRequest.execute();
+  };
+
+
+  // ========== Redirect Logic ========== //
+
+  _checkSetupSteps: void => Promise<void> = async () => {
     const { isLoading } = this.stores.loading;
     if (isLoading) {
       return;

@@ -1,5 +1,5 @@
 // @flow
-import Action from '../lib/Action';
+import { AsyncAction, Action } from '../lib/Action';
 import type { BaseSignRequest } from '../../api/ada/transactions/types';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
@@ -12,5 +12,5 @@ export type SendUsingLedgerParams = {|
 export default class LedgerSendActions {
   init: Action<void> = new Action();
   cancel: Action<void> = new Action();
-  sendUsingLedger: Action<SendUsingLedgerParams> = new Action();
+  sendUsingLedger: AsyncAction<SendUsingLedgerParams> = new AsyncAction();
 }

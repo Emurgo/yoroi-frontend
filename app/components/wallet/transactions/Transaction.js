@@ -12,7 +12,7 @@ import { uniq } from 'lodash';
 import styles from './Transaction.scss';
 import AdaSymbol from '../../../assets/images/ada-symbol.inline.svg';
 import WalletTransaction from '../../../domain/WalletTransaction';
-import { environmentSpecificMessages } from '../../../i18n/global-messages';
+import globalMessages, { environmentSpecificMessages } from '../../../i18n/global-messages';
 import type { TransactionDirectionType, } from '../../../api/ada/transactions/types';
 import { transactionTypes } from '../../../api/ada/transactions/types';
 import type { AssuranceLevel } from '../../../types/transactionAssuranceTypes';
@@ -44,10 +44,6 @@ const messages = defineMessages({
   confirmations: {
     id: 'wallet.transaction.confirmations',
     defaultMessage: '!!!confirmations',
-  },
-  transactionId: {
-    id: 'wallet.transaction.transactionId',
-    defaultMessage: '!!!Transaction ID',
   },
   conversionRate: {
     id: 'wallet.transaction.conversion.rate',
@@ -154,7 +150,7 @@ type Props = {|
   +selectedExplorer: ExplorerType,
   +assuranceLevel: AssuranceLevel,
   +isLastInList: boolean,
-  +formattedWalletAmount: Function,
+  +formattedWalletAmount: BigNumber => string,
 |};
 
 type State = {
@@ -293,7 +289,7 @@ export default class Transaction extends Component<Props, State> {
               <div className={this.getAmountStyle(data.amount)}>
                 {
                   // hide currency (we are showing symbol instead)
-                  formattedWalletAmount(data.amount, false)
+                  formattedWalletAmount(data.amount)
                 }
                 <span className={styles.currencySymbol}><AdaSymbol /></span>
               </div>
@@ -326,7 +322,7 @@ export default class Transaction extends Component<Props, State> {
                     {intl.formatMessage(messages.fee)}
                   </h2>
                   <span className={styles.rowData}>
-                    {formattedWalletAmount(data.fee.abs(), false)}
+                    {formattedWalletAmount(data.fee.abs())}
                   </span>
                 </div>
               )}
@@ -377,7 +373,7 @@ export default class Transaction extends Component<Props, State> {
                 </div>
               ) : null}
 
-              <h2>{intl.formatMessage(messages.transactionId)}</h2>
+              <h2>{intl.formatMessage(globalMessages.transactionId)}</h2>
               <ExplorableHashContainer
                 selectedExplorer={this.props.selectedExplorer}
                 hash={data.id}

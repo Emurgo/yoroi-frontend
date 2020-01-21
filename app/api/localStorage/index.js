@@ -21,6 +21,7 @@ const storageKeys = {
   CUSTOM_THEME: networkForLocalStorage + '-CUSTOM-THEME',
   VERSION: networkForLocalStorage + '-LAST-LAUNCH-VER',
   HIDE_BALANCE: networkForLocalStorage + '-HIDE-BALANCE',
+  TOGGLE_SIDEBAR: networkForLocalStorage + '-TOGGLE-SIDEBAR',
 };
 
 export type SetCustomUserThemeRequest = {|
@@ -154,12 +155,28 @@ export default class LocalStorageApi {
 
   unsetHideBalance: void => Promise<void> = () => removeLocalItem(storageKeys.HIDE_BALANCE);
 
+  // ========== Expand / retract Sidebar ========== //
+
+  getToggleSidebar: void => Promise<boolean> = () => getLocalItem(
+    storageKeys.TOGGLE_SIDEBAR
+  ).then((accepted) => {
+    if (accepted !== 'true') return false;
+    return JSON.parse(accepted);
+  });
+
+  setToggleSidebar: boolean => Promise<void> = (toggleSidebar) => setLocalItem(
+    storageKeys.TOGGLE_SIDEBAR, JSON.stringify(!toggleSidebar)
+  );
+
+  unsetToggleSidebar: void => Promise<void> = () => removeLocalItem(storageKeys.TOGGLE_SIDEBAR);
+
   async reset(): Promise<void> {
     await this.unsetUserLocale();
     await this.unsetTermsOfUseAcceptance();
     await this.unsetUserTheme();
     await this.unsetLastLaunchVersion();
     await this.unsetHideBalance();
+    await this.unsetToggleSidebar();
   }
 
   getItem: string => Promise<?string> = (key) => getLocalItem(key);

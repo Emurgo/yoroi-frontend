@@ -41,12 +41,9 @@
   margin-right: 6px;
 }
 
+.noticeBoardIcon,
 .walletsIcon {
   flex-shrink: 0;
-  & > svg {
-    width: 36px;
-    height: 42.5px;
-  }
 }
 
 .withLedgerNanoIcon {
@@ -120,6 +117,11 @@
 
     &.settings {
       right: 14px;
+      width: 72px;
+    }
+
+    &.notice-board {
+      right: 158px;
       width: 72px;
     }
   }

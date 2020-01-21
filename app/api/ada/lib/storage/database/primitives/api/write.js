@@ -297,7 +297,7 @@ export class GetOrAddDerivation {
           db, tx,
           levelSpecificTableName,
           GetOrAddDerivation.ownTables[Tables.KeyDerivationSchema.name].properties.KeyDerivationId,
-          [childResult.KeyDerivationId],
+          ([childResult.KeyDerivationId]: Array<number>),
         )
       )[0];
       if (specificDerivationResult == null) {

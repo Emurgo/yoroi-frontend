@@ -401,6 +401,14 @@ const globalMessages = defineMessages({
     id: 'settings.paperWallet.dialog.createPaper.done',
     defaultMessage: '!!!All done!',
   },
+  dateToday: {
+    id: 'wallet.summary.page.todayLabel',
+    defaultMessage: '!!!Today',
+  },
+  dateYesterday: {
+    id: 'wallet.summary.page.yesterdayLabel',
+    defaultMessage: '!!!Yesterday',
+  },
   legacyAttentionText: {
     id: 'transfer.instructions.attention.legacy',
     defaultMessage: '!!!Legacy wallets created during the Byron-era (before November 29th, 2019) can no longer be used. However, you can transfer your legacy funds to your current wallet to access your funds.',
@@ -411,9 +419,7 @@ const globalMessages = defineMessages({
   },
   hardwareTransferInstructions: {
     id: 'transfer.instructions.hardware.disclaimer.instructions1',
-    defaultMessage: '',
-    // eslint-disable-next-line max-len
-    // defaultMessage: '!!!When you originally setup your hardware wallet, you were asked to write down a recovery phrase on a piece of paper. Entering this phrase will allow you to transfer your funds out of your hardware wallet and into the current wallet.',
+    defaultMessage: '!!!When you originally setup your hardware wallet, you were asked to write down a recovery phrase on a piece of paper. Entering this phrase will allow you to transfer your funds out of your hardware wallet and into the current wallet.',
   },
   sendButtonLabel: {
     id: 'wallet.send.confirmationDialog.submit',
@@ -431,6 +437,10 @@ const globalMessages = defineMessages({
     id: 'wallet.delegation.transaction.generation',
     defaultMessage: '!!!Generating transaction',
   },
+  transactionId: {
+    id: 'wallet.transaction.transactionId',
+    defaultMessage: '!!!Transaction ID',
+  },
   epochLabel: {
     id: 'global.labels.epoch',
     defaultMessage: '!!!Epoch',
@@ -447,9 +457,37 @@ const globalMessages = defineMessages({
     id: 'wallet.dashboard.stakePool.margins',
     defaultMessage: '!!!Margins',
   },
+  loadMoreButtonLabel: {
+    id: 'global.labels.loadMore',
+    defaultMessage: '!!!Load more',
+  },
   unknownPoolLabel: {
     id: 'wallet.staking.pool.unknownLabel',
     defaultMessage: '!!!Unknown pool',
+  },
+  sidebarWallets: {
+    id: 'sidebar.wallets',
+    defaultMessage: '!!!My wallets',
+  },
+  sidebarSettings: {
+    id: 'sidebar.settings',
+    defaultMessage: '!!!Settings',
+  },
+  sidebarTransfer: {
+    id: 'sidebar.transfer',
+    defaultMessage: '!!!Transfer wallets',
+  },
+  ledgerTitle: {
+    id: 'wallet.add.optionDialog.connect.hw.ledger.title',
+    defaultMessage: '!!!Ledger Hardware Wallet',
+  },
+  trezorTitle: {
+    id: 'wallet.add.optionDialog.connect.hw.trezor.title',
+    defaultMessage: '!!!Trezor Hardware Wallet',
+  },
+  undelegateLabel: {
+    id: 'global.labael.undelegate',
+    defaultMessage: '!!!Undelegate',
   },
 });
 export default globalMessages;

@@ -10,35 +10,11 @@ import UriSettingsBlock from '../../../components/settings/categories/general-se
 import registerProtocols from '../../../uri-protocols';
 import environment from '../../../environment';
 import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
-import type { ExplorerType } from '../../../domain/Explorer';
 import { getExplorers } from '../../../domain/Explorer';
 
 @observer
 export default class GeneralSettingsPage extends Component<InjectedProps> {
 
-  onSelectLanguage = (values: {| locale: string |}) => {
-    this.props.actions.profile.updateLocale.trigger(values);
-  };
-
-  onSelecExplorer = (values: {| explorer: ExplorerType |}) => {
-    this.props.actions.profile.updateSelectedExplorer.trigger(values);
-  };
-
-  selectTheme = (values: {| theme: string |}) => {
-    this.props.actions.profile.updateTheme.trigger(values);
-  };
-
-  exportTheme = () => {
-    this.props.actions.profile.exportTheme.trigger();
-  };
-
-  getThemeVars = (theme: {| theme: string |}) => (
-    this.props.stores.profile.getThemeVars(theme)
-  )
-
-  hasCustomTheme = (): boolean => (
-    this.props.stores.profile.hasCustomTheme()
-  )
 
   render() {
     const {
@@ -64,16 +40,16 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
       : null;
 
     return (
-      <div>
+      <>
         <GeneralSettings
-          onSelectLanguage={this.onSelectLanguage}
+          onSelectLanguage={this.props.actions.profile.updateLocale.trigger}
           isSubmitting={isSubmittingLocale}
           languages={LANGUAGE_OPTIONS}
           currentLocale={currentLocale}
           error={setProfileLocaleRequest.error}
         />
         <ExplorerSettings
-          onSelectExplorer={this.onSelecExplorer}
+          onSelectExplorer={this.props.actions.profile.updateSelectedExplorer.trigger}
           isSubmitting={isSubmittingExplorer}
           explorers={explorerOptions}
           selectedExplorer={selectedExplorer}
@@ -83,15 +59,15 @@ export default class GeneralSettingsPage extends Component<InjectedProps> {
         {!environment.isShelley() &&
           <ThemeSettingsBlock
             currentTheme={currentTheme}
-            selectTheme={this.selectTheme}
-            getThemeVars={this.getThemeVars}
-            exportTheme={this.exportTheme}
-            hasCustomTheme={this.hasCustomTheme}
+            selectTheme={this.props.actions.profile.updateTheme.trigger}
+            getThemeVars={this.props.stores.profile.getThemeVars}
+            exportTheme={this.props.actions.profile.exportTheme.trigger}
+            hasCustomTheme={this.props.stores.profile.hasCustomTheme}
             onExternalLinkClick={handleExternalLinkClick}
           />
         }
         <AboutYoroiSettingsBlock />
-      </div>
+      </>
     );
   }
 

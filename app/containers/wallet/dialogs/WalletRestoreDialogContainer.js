@@ -169,8 +169,8 @@ export default class WalletRestoreDialogContainer
           <LegacyExplanation
             onBack={() => walletRestoreActions.back.trigger()}
             onClose={this.onCancel}
-            onSkip={() => walletRestoreActions.startRestore.trigger()}
-            onCheck={() => walletRestoreActions.startCheck.trigger()}
+            onSkip={walletRestoreActions.startRestore.trigger}
+            onCheck={walletRestoreActions.startCheck.trigger}
             classicTheme={this.props.classicTheme}
           />
         );
@@ -233,7 +233,7 @@ export default class WalletRestoreDialogContainer
         );
       case TransferStatus.READY_TO_TRANSFER: {
         if (yoroiTransfer.transferTx == null) {
-          return null; // TODO: throw error? Shoudln't happen
+          return null; // TODO: throw error? Shouldn't happen
         }
         return (<TransferSummaryPage
           formattedWalletAmount={formattedWalletAmount}

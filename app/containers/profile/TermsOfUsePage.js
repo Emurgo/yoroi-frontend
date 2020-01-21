@@ -25,10 +25,6 @@ export default class TermsOfUsePage extends Component<InjectedProps> {
     intl: intlShape.isRequired,
   };
 
-  onSubmit = () => {
-    this.props.actions.profile.acceptTermsOfUse.trigger();
-  };
-
   render() {
     const { setTermsOfUseAcceptanceRequest, termsOfUse } = this.props.stores.profile;
     const isSubmitting = setTermsOfUseAcceptanceRequest.isExecuting;
@@ -51,7 +47,7 @@ export default class TermsOfUsePage extends Component<InjectedProps> {
       >
         <TermsOfUseForm
           localizedTermsOfUse={termsOfUse}
-          onSubmit={this.onSubmit}
+          onSubmit={this.props.actions.profile.acceptTermsOfUse.trigger}
           isSubmitting={isSubmitting}
           error={setTermsOfUseAcceptanceRequest.error}
         />

@@ -4,6 +4,10 @@ import type { CoreAddressT } from '../database/primitives/enums';
 import { CoreAddressTypes } from '../database/primitives/enums';
 import { Bech32Prefix } from '../../../../../config/stringConfig';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
+import type {
+  AccountStateDelegation,
+  PoolTuples,
+} from '../../state-fetch/types';
 
 export function tryAddressToKind(
   address: string,
@@ -112,4 +116,38 @@ export function filterAddressesByStakingKey<T: { address: string }>(
     }
   }
   return result;
+}
+
+export function delegationTypeToResponse(
+  type: RustModule.WalletV3.DelegationType,
+): AccountStateDelegation {
+  const kind = type.get_kind();
+  switch (kind) {
+    case RustModule.WalletV3.DelegationKind.NonDelegated: return { pools: [], };
+    case RustModule.WalletV3.DelegationKind.Full: {
+      const poolId = type.get_full();
+      if (poolId == null) {
+        throw new Error(`${nameof(delegationTypeToResponse)} Should never happen`);
+      }
+      return {
+        pools: [[poolId.to_string(), 1]]
+      };
+    }
+    case RustModule.WalletV3.DelegationKind.Ratio: {
+      const ratios = type.get_ratios();
+      if (ratios == null) {
+        throw new Error(`${nameof(delegationTypeToResponse)} Should never happen`);
+      }
+      const poolTuples: Array<PoolTuples> = [];
+      const pools = ratios.pools();
+      for (let i = 0; i < pools.size(); i++) {
+        const pool = pools.get(i);
+        poolTuples.push([pool.pool().to_string(), pool.parts()]);
+      }
+      return {
+        pools: poolTuples,
+      };
+    }
+    default: throw new Error(`${nameof(delegationTypeToResponse)} unexpected kind ${kind}`);
+  }
 }

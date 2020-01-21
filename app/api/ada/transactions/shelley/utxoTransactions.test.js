@@ -349,6 +349,22 @@ describe('Create signed transactions', () => {
   });
 
   it('Transaction with a certificate and output is also valid', () => {
+    const accountPrivateKey = RustModule.WalletV3.Bip32PrivateKey.from_bytes(
+      Buffer.from(
+        '408a1cb637d615c49e8696c30dd54883302a20a7b9b8a9d1c307d2ed3cd50758c9402acd000461a8fc0f25728666e6d3b86d031b8eea8d2f69b21e8aa6ba2b153e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
+        'hex',
+      ),
+    );
+    const stakingKey = accountPrivateKey.derive(2).derive(STAKING_KEY_INDEX).to_raw_key();
+    const certificate = RustModule.WalletV3.Certificate.stake_delegation(
+      RustModule.WalletV3.StakeDelegation.new(
+        RustModule.WalletV3.DelegationType.full(
+          RustModule.WalletV3.PoolId.from_hex('312e3d449038372ba2fc3300cfedf1b152ae739201b3e5da47ab3f933a421b62')
+        ),
+        stakingKey.to_public()
+      )
+    );
+
     const unsignedTxResponse = newAdaUnsignedTx(
       [{
         address: Buffer.from(RustModule.WalletV3.Address.from_string(
@@ -378,23 +394,9 @@ describe('Create signed transactions', () => {
           startLevel: Bip44DerivationLevels.CHAIN.level,
         },
       }],
+      certificate,
     );
 
-    const accountPrivateKey = RustModule.WalletV3.Bip32PrivateKey.from_bytes(
-      Buffer.from(
-        '408a1cb637d615c49e8696c30dd54883302a20a7b9b8a9d1c307d2ed3cd50758c9402acd000461a8fc0f25728666e6d3b86d031b8eea8d2f69b21e8aa6ba2b153e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
-        'hex',
-      ),
-    );
-    const stakingKey = accountPrivateKey.derive(2).derive(STAKING_KEY_INDEX).to_raw_key();
-    const certificate = RustModule.WalletV3.Certificate.stake_delegation(
-      RustModule.WalletV3.StakeDelegation.new(
-        RustModule.WalletV3.DelegationType.full(
-          RustModule.WalletV3.PoolId.from_hex('312e3d449038372ba2fc3300cfedf1b152ae739201b3e5da47ab3f933a421b62')
-        ),
-        stakingKey.to_public()
-      )
-    );
     const fragment = signTransaction(
       unsignedTxResponse,
       Bip44DerivationLevels.ACCOUNT.level,
@@ -418,19 +420,35 @@ describe('Create signed transactions', () => {
     expect(outputs.size()).toEqual(2);
     const change = outputs.get(1);
     expect(change.address().to_string(Bech32Prefix.ADDRESS)).toEqual('addr1s5quq8utjkrfntnkngjxa9u9mdd8pcprjal2fwzkm7k0y0prx3k276qm0j8');
-    expect(change.value().to_str()).toEqual('1839616');
+    expect(change.value().to_str()).toEqual('1839610');
 
-    expect(Buffer.from(fragment.id().as_bytes()).toString('hex')).toEqual('c3ef21699ee8937527b83942980b0739353ddd133f627d40832b98d3ef416a6d');
-    expect(Buffer.from(fragment.get_transaction().id().as_bytes()).toString('hex')).toEqual('314ea630977b20d21cc2dc8f861dc9bcfa2013dcbc32c75288d7a5067274662d');
+    expect(Buffer.from(fragment.id().as_bytes()).toString('hex')).toEqual('368f5b1b46c661b57e2d2c2e1715dea470900918f4f6e82e6060a0d91915985d');
+    expect(Buffer.from(fragment.get_transaction().id().as_bytes()).toString('hex')).toEqual('e48d9ae0957ebf9c6deb9eae861366e268522db78ae6077f688e4bb9f4791f85');
 
     const witnesses = signedTx.witnesses();
     expect(witnesses.size()).toEqual(1);
     expect(witnesses.get(0).to_bech32()).toEqual(
-      'witness1q89jcq78wt4u773vrrjjwuqg8908wpyuv5j3sdj0mcs4dpe667f97yfc0k48dae9u29r07nkms764js84tgwxr09ah6e948s2u6ye8cgyzhd4j'
+      'witness1q8m9yyyhx4dp3v220v4h7gtm3yv69x0u9amy3yllksphnhgeufj0s6ayncn33krpjp2vccv78d20nx20wd4upd9gtv0vum5c5v9f7qcplf5phl'
     );
   });
 
   it('Transaction with a certificate without output is also valid', () => {
+    const accountPrivateKey = RustModule.WalletV3.Bip32PrivateKey.from_bytes(
+      Buffer.from(
+        '408a1cb637d615c49e8696c30dd54883302a20a7b9b8a9d1c307d2ed3cd50758c9402acd000461a8fc0f25728666e6d3b86d031b8eea8d2f69b21e8aa6ba2b153e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
+        'hex',
+      ),
+    );
+    const stakingKey = accountPrivateKey.derive(2).derive(STAKING_KEY_INDEX).to_raw_key();
+    const certificate = RustModule.WalletV3.Certificate.stake_delegation(
+      RustModule.WalletV3.StakeDelegation.new(
+        RustModule.WalletV3.DelegationType.full(
+          RustModule.WalletV3.PoolId.from_hex('312e3d449038372ba2fc3300cfedf1b152ae739201b3e5da47ab3f933a421b62')
+        ),
+        stakingKey.to_public()
+      )
+    );
+
     const unsignedTxResponse = newAdaUnsignedTx(
       [],
       [{
@@ -455,23 +473,9 @@ describe('Create signed transactions', () => {
           startLevel: Bip44DerivationLevels.CHAIN.level,
         },
       }],
+      certificate,
     );
 
-    const accountPrivateKey = RustModule.WalletV3.Bip32PrivateKey.from_bytes(
-      Buffer.from(
-        '408a1cb637d615c49e8696c30dd54883302a20a7b9b8a9d1c307d2ed3cd50758c9402acd000461a8fc0f25728666e6d3b86d031b8eea8d2f69b21e8aa6ba2b153e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
-        'hex',
-      ),
-    );
-    const stakingKey = accountPrivateKey.derive(2).derive(STAKING_KEY_INDEX).to_raw_key();
-    const certificate = RustModule.WalletV3.Certificate.stake_delegation(
-      RustModule.WalletV3.StakeDelegation.new(
-        RustModule.WalletV3.DelegationType.full(
-          RustModule.WalletV3.PoolId.from_hex('312e3d449038372ba2fc3300cfedf1b152ae739201b3e5da47ab3f933a421b62')
-        ),
-        stakingKey.to_public()
-      )
-    );
     const fragment = signTransaction(
       unsignedTxResponse,
       Bip44DerivationLevels.ACCOUNT.level,
@@ -495,15 +499,15 @@ describe('Create signed transactions', () => {
     expect(outputs.size()).toEqual(1);
     const change = outputs.get(0);
     expect(change.address().to_string(Bech32Prefix.ADDRESS)).toEqual('addr1s5quq8utjkrfntnkngjxa9u9mdd8pcprjal2fwzkm7k0y0prx3k276qm0j8');
-    expect(change.value().to_str()).toEqual('1844617');
+    expect(change.value().to_str()).toEqual('1844611');
 
-    expect(Buffer.from(fragment.id().as_bytes()).toString('hex')).toEqual('fdbb1fe40618b8ded1300483c99cd3c4f1b2c2745f86c01b1018e593d2710951');
-    expect(Buffer.from(fragment.get_transaction().id().as_bytes()).toString('hex')).toEqual('433c14a1f1bb654e569c381e45e49c97738ecc4e0064e04daaf284b531d56e22');
+    expect(Buffer.from(fragment.id().as_bytes()).toString('hex')).toEqual('3b0ecc3c301b413d768f44c791ee1b2cb4f6763d4573699c87c7d39b1d81e607');
+    expect(Buffer.from(fragment.get_transaction().id().as_bytes()).toString('hex')).toEqual('86654959226b6316f5210c80fdf95ac3bea41aafcc0fc93558f3093821a20a0c');
 
     const witnesses = signedTx.witnesses();
     expect(witnesses.size()).toEqual(1);
     expect(witnesses.get(0).to_bech32()).toEqual(
-      'witness1q9ukepgn8dchhvc4ynnz3he0ymf9ax5jggfvz2602tqqu62sym0cpfdc5qe7x7v6skf03mv3h8huqgna7x495t4e85r3wg6m5rg25ms9sqh95g'
+      'witness1q9dt42g3h5qqz7fyrlfsvcmp27vvlzwnp747kt9wujm8tyy6hv5ugh6kv44lkcra2k4ugjt96q0u3z0r62w48ww4nz93n780e0n0ajsy8term5'
     );
   });
 });
@@ -537,5 +541,37 @@ describe('Create sendAll unsigned TX from UTXO', () => {
       keys[0].bechAddress,
       utxos,
     )).toThrow(NotEnoughMoneyToSendError);
+  });
+
+  it('Should send all even if a UTXO is smaller than the fee', () => {
+    /**
+     * The 2nd UTXO is smaller than the fee so even if you remove it form the input,
+     * The 1st UTXO can cover the fee of the transaction
+     * Therefore including the 2nd UTXO does nothing but increase the transaction fee
+     * Need to make sure that even if this is the case, sendAll really does send the entire UTXO set
+     */
+    const unsignedTxResponse = sendAllUnsignedTxFromUtxo(
+      keys[0].bechAddress,
+      [{
+        utxo_id: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0',
+        tx_hash: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe',
+        tx_index: 0,
+        receiver: 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
+        amount: '1000000'
+      },
+      {
+        utxo_id: '05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f0',
+        tx_hash: '05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f',
+        tx_index: 0,
+        receiver: 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
+        amount: '1',
+      }],
+      undefined
+    );
+    const inputSum = getTxInputTotal(unsignedTxResponse.IOs, false);
+    const outputSum = getTxOutputTotal(unsignedTxResponse.IOs, false);
+    expect(inputSum.toString()).toEqual('1000001');
+    expect(outputSum.toString()).toEqual('844617');
+    expect(inputSum.minus(outputSum).toString()).toEqual('155384');
   });
 });

@@ -51,11 +51,11 @@ const messages = defineMessages({
 
 type Props = {|
   +currentTheme: Theme,
-  +selectTheme: Function,
-  +exportTheme: Function,
-  +getThemeVars: Function,
-  +hasCustomTheme: Function,
-  +onExternalLinkClick: Function,
+  +selectTheme: {| theme: string |} => PossiblyAsync<void>,
+  +exportTheme: void => PossiblyAsync<void>,
+  +getThemeVars: {| theme: string |} => { [key: string]: string },
+  +hasCustomTheme: void => boolean,
+  +onExternalLinkClick: MouseEvent => void,
 |};
 
 @observer
@@ -148,7 +148,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
             className={exportButtonClasses}
             label={intl.formatMessage(messages.themeExportButton)}
             skin={ButtonSkin}
-            onClick={exportTheme.bind(this, {})}
+            onClick={exportTheme.bind(this)}
           />
         </div>
 
