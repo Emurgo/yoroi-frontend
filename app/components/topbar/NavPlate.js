@@ -82,13 +82,14 @@ export default class NavPlate extends Component<Props> {
         break;
     }
 
+    const fakeClassnameForTest = `${nameof(NavPlate)}_plate`;
     return (
       <div className={styles.wrapper}>
         {iconComponent}
         <div className={styles.content}>
           <div className={styles.head}>
             <h3 className={styles.name}>{walletName}</h3>
-            {accountPlateId}
+            <div className={fakeClassnameForTest}>{accountPlateId}</div>
           </div>
           <div className={styles.type}>
             {TypeIcon !== undefined &&

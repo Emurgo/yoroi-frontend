@@ -145,7 +145,7 @@ Given(/^There is a wallet stored named ([^"]*)$/, async function (walletName) {
   await this.click('.WalletRestoreDialog .primary');
   await assertPlate(this, restoreInfo.plate);
   await this.click('.confirmButton');
-  await this.waitUntilText('.WalletTopbarTitle_walletName', walletName.toUpperCase());
+  await this.waitUntilText('.NavPlate_name', walletName);
 });
 
 Given(/^I have completed the basic setup$/, async function () {
