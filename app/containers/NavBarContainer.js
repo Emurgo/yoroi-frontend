@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import type { InjectedProps } from '../types/injectedPropsType';
 import environment from '../environment';
@@ -38,6 +39,15 @@ export default class NavBarContainer extends Component<Props> {
     this.props.actions.router.goToRoute.trigger({ route: destination });
   }
 
+  getWalletAmount: (null | BigNumber) => null | string = (amount) => {
+    const { profile } = this.props.stores;
+
+    if (amount == null) return null;
+    return profile.shouldHideBalance
+      ? '******'
+      : formattedWalletAmount(amount);
+  }
+
   render() {
     const { intl } = this.context;
     const { stores } = this.props;
@@ -46,11 +56,9 @@ export default class NavBarContainer extends Component<Props> {
     const walletsStore = stores.substores[environment.API].wallets;
     const publicDeriver = walletsStore.selected;
     const walletName = publicDeriver ? publicDeriver.conceptualWalletName : '';
-    const walletAmount = formattedWalletAmount ? (
-      publicDeriver && (
-        profile.shouldHideBalance ? '******' : formattedWalletAmount(publicDeriver.amount)
-      )
-    ) : null;
+    const walletAmount = publicDeriver
+      ? this.getWalletAmount(publicDeriver.amount)
+      : null;
 
     // TODO: Replace route with ROUTES.WALLETS.ROOT after merging MyWallets screen
     const title = (
