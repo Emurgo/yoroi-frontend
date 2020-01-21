@@ -14,5 +14,5 @@ export default class ProfileActions {
   exportTheme: AsyncAction<void> = new AsyncAction();
   commitLocaleToStorage: AsyncAction<void> = new AsyncAction();
   updateHideBalance: AsyncAction<void> = new AsyncAction();
-  toggleSidebar: Action<void> = new Action();
+  toggleSidebar: AsyncAction<void> = new AsyncAction();
 }

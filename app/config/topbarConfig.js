@@ -11,15 +11,15 @@ import goBackIcon from '../assets/images/top-bar/back-arrow-white.inline.svg';
 import noticeBoardIcon from '../assets/images/notice-board/notice-board.inline.svg';
 import styles from '../components/topbar/TopBarCategory.scss';
 
-export type Category = {
+export type Category = {|
   name: string,
-  className?: string,
+  className: string,
   route: string,
   icon: string,
   iconStyle?: string,
   inlineText?: MessageDescriptor,
   label?: MessageDescriptor,
-}
+|};
 
 export const WALLETS: Category = {
   name: 'WALLETS',

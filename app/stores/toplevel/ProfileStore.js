@@ -505,7 +505,7 @@ export default class ProfileStore extends Store {
     return result === true;
   }
 
-  _toggleSidebar = async () => {
+  _toggleSidebar: void => Promise<void> = async () => {
     const isSidebarExpanded = this.isSidebarExpanded;
     await this.setToggleSidebarRequest.execute(isSidebarExpanded);
     await this.getToggleSidebarRequest.execute();

@@ -391,4 +391,15 @@ export default {
   '--theme-warning-box-bg-color': 'rgba(233, 72, 61, 0.06)', // #E9483D
 
   '--theme-warning-color': `#E9483D`,
+
+  // Sidebar
+  '--theme-sidebar-background-color': `linear-gradient(22.58deg, ${topbarGradient.start} 0%, ${topbarGradient.end} 100%)`,
+  '--theme-sidebar-text-left-spacing': '16px',
+  '--theme-sidebar-text-color': '#FFFFFF',
+  '--theme-sidebar-text-font-size': '14px',
+  '--theme-sidebar-text-line-height': '22px',
+  '--theme-sidebar-icon-color': '#FFFFFF',
+  '--theme-sidebar-icon-color-hover': '#DAA49A',
+  '--theme-sidebar-icon-color-active': '#DAA49A',
+  '--theme-sidebar-item-background-color-hover': `${topbarGradient.end}`,
 };
