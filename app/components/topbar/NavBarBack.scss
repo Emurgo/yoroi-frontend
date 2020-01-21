@@ -1,0 +1,19 @@
+.backButton {
+  font-size: 14px;
+  line-height: 22px;
+  font-family: var(--font-regular);
+  background-color: transparent;
+  color: var(--theme-navbar-color);
+  height: 100%;
+  display: block;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.backIcon {
+  width: 12px;
+  height: 12px;
+  margin-right: 16px;
+}

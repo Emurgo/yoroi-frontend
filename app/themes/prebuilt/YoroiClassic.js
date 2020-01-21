@@ -73,8 +73,8 @@ const rpFormfield = {
 
 // INPUT
 const rpInput = {
-  '--rp-input-bg-color': '#f3f3f5',
-  '--rp-input-bg-color-disabled': 'rgba(207, 207, 207, 0.05)', // #cfcfcf
+  '--rp-input-bg-color': 'transparent',
+  '--rp-input-bg-color-disabled': 'transparent',
   '--rp-input-border-color': '#c6cdd6',
   '--rp-input-border-color-disabled': 'rgba(207, 207, 207, 0.05)', // #cfcfcf
   '--rp-input-border-color-errored': '#ea4c5b',
@@ -219,8 +219,8 @@ export default {
   // COLORS
   '--theme-scrollbar-thumb-background': '#c8ccce',
 
-  '--theme-bordered-box-background-color': '#f3f3f5',
-  '--theme-bordered-box-border': '1px solid #f3f3f5',
+  '--theme-bordered-box-background-color': '#ffffff',
+  '--theme-bordered-box-border': '0px solid #ffffff',
   '--theme-bordered-box-text-color': '#121327',
 
   '--theme-bullet-point-color': '#adaeb5',
@@ -259,7 +259,7 @@ export default {
   '--theme-input-text-color': '#121327',
   '--theme-input-right-floating-text-color': 'rgba(94, 96, 102, 0.5)',
   '--theme-input-remove-color-light': '#ea4c5b',
-  '--theme-input-background-color': '#f3f3f5',
+  '--theme-input-background-color': 'transparent',
 
   '--theme-main-body-background-color': '#ffffff',
   '--theme-main-body-messages-color': '#121327',
@@ -280,8 +280,8 @@ export default {
   '--theme-hw-send-confirmation-info-block-background-color': '#f3f3f5',
 
   '--theme-settings-body-background-color': '#ffffff',
-  '--theme-settings-pane-background-color': '#f3f3f5',
-  '--theme-settings-pane-border': '1px solid #f3f3f5',
+  '--theme-settings-pane-background-color': '#ffffff',
+  '--theme-settings-pane-border': '1px solid #ffffff',
   '--theme-settings-menu-box-background-color': '#f3f3f5',
   '--theme-settings-menu-box-border': '1px solid #f3f3f5',
   '--theme-settings-menu-item-text-color': '#121327',
@@ -402,4 +402,32 @@ export default {
   '--theme-sidebar-icon-color-hover': '#DAA49A',
   '--theme-sidebar-icon-color-active': '#DAA49A',
   '--theme-sidebar-item-background-color-hover': `${topbarGradient.end}`,
+
+  // Page
+
+  '--theme-page-container-width': '1295px',
+  '--theme-page-container-side-padding': '40px',
+  '--theme-page-background-color': '#F0F3F5',
+  '--theme-page-content-background-color': '#FFFFFF',
+  '--theme-page-content-box-shadow': '0 2px 12px 0 rgba(0, 0, 0, 0.06)',
+  '--theme-page-content-border-radius': '8px',
+  '--theme-page-content-box-bottom': '24px',
+  '--theme-banner-height': '46px',
+  '--theme-wallet-dropdown-main-text-color': '#242838',
+  '--theme-wallet-dropdown-secondary-text-color': '#6B7384',
+  '--theme-wallet-dropdown-accent-text-color': '#DAA49A',
+  '--theme-wallet-dropdown-box-shadow': '0 10px 12px 0 rgba(0, 0, 0, 0.06)',
+  '--theme-wallet-dropdown-background-color': '#FFFFFF',
+  '--theme-wallet-dropdown-selected-background-color': '#F0F3F5',
+  '--theme-wallet-dropdown-row-border-color': '#E0E3EB',
+  '--theme-wallet-dropdown-border-radius': '8px',
+  '--theme-wallet-dropdown-min-width': '600px',
+  '--theme-wallet-plate-main-text-color': '#242838',
+  '--theme-wallet-plate-secondary-text-color': '#6B7384',
+
+  // Navbar
+
+  '--theme-navbar-height': '60px',
+  '--theme-navbar-background-color': '#F0F3F5',
+  '--theme-navbar-color': '#6B7384',
 };

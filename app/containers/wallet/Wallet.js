@@ -2,8 +2,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import MainLayout from '../MainLayout';
-import TopBarContainer from '../TopBarContainer';
 import SidebarContainer from '../SidebarContainer';
+import NavBarContainer from '../NavBarContainer';
 import WalletWithNavigation from '../../components/wallet/layouts/WalletWithNavigation';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { buildRoute } from '../../utils/routing';
@@ -45,16 +45,17 @@ export default class Wallet extends Component<Props> {
     const { wallets, } = this.props.stores.substores.ada;
     const { actions, stores } = this.props;
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
-    const topbarContainer = (<TopBarContainer actions={actions} stores={stores} />);
     const sidebarContainer = (<SidebarContainer actions={actions} stores={stores} />);
+    const navbarContainer = (<NavBarContainer actions={actions} stores={stores} />);
 
     if (!wallets.selected) {
       return (
         <MainLayout
-          topbar={topbarContainer}
+          navbar={navbarContainer}
           actions={actions}
           stores={stores}
           connectionErrorType={checkAdaServerStatus}
+          showInContainer
         >
           <LoadingSpinner />
         </MainLayout>
@@ -64,10 +65,11 @@ export default class Wallet extends Component<Props> {
     return (
       <MainLayout
         sidebar={sidebarContainer}
-        topbar={topbarContainer}
+        navbar={navbarContainer}
         actions={actions}
         stores={stores}
         connectionErrorType={checkAdaServerStatus}
+        showInContainer
       >
         <WalletWithNavigation
           isActiveScreen={this.isActiveScreen}

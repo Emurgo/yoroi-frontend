@@ -1,0 +1,60 @@
+.wrapper {
+    flex: 1;
+    display: flex;
+    height: 100%;
+    min-height: var(--theme-navbar-height);
+    color: var(--theme-wallet-dropdown-main-text-color);
+    font-family: var(--font-regular);
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex: 1;
+}
+
+.amount {
+    font-family: var(--font-medium);
+    font-size: 16px;
+    line-height: 24px;
+}
+
+.highlightAmount {
+    color: var(--theme-wallet-dropdown-accent-text-color);
+}
+
+.toggleButton {
+    align-self: flex-start;
+
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.afterDecimal {
+    font-size: 12px;
+    font-family: var(--font-regular);
+}
+
+.text {
+    font-size: 14px;
+    line-height: 22px;
+    margin-top: 2px;
+}
+
+.details {
+    font-size: 12px;
+    line-height: 16px;
+    margin-top: 2px;
+
+    .afterDecimal {
+        font-family: var(--font-light);
+    }
+}
+
+.label {
+    display: inline-block;
+    color: var(--theme-wallet-dropdown-secondary-text-color);
+}
