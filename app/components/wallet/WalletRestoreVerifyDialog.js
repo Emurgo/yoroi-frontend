@@ -73,7 +73,7 @@ type Props = {|
   +selectedExplorer: ExplorerType,
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
-  +onNext: void => void,
+  +onNext: void => PossiblyAsync<void>,
   +onCancel: void => void,
   +isSubmitting: boolean,
   +classicTheme: boolean,

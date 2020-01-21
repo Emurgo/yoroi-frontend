@@ -42,14 +42,14 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +onSubmit: Function,
-  +onCancel: Function,
+  +onSubmit: {| name: string, password: string |} => PossiblyAsync<void>,
+  +onCancel: void => void,
   +classicTheme: boolean
 |};
 
-type State = {
+type State = {|
   isSubmitting: boolean,
-};
+|};
 
 @observer
 export default class WalletCreateDialog extends Component<Props, State> {
@@ -126,14 +126,14 @@ export default class WalletCreateDialog extends Component<Props, State> {
 
   submit = () => {
     this.form.submit({
-      onSuccess: (form) => {
+      onSuccess: async (form) => {
         this.setState({ isSubmitting: true });
         const { walletName, walletPassword } = form.values();
         const walletData = {
           name: walletName,
           password: walletPassword,
         };
-        this.props.onSubmit(walletData);
+        await this.props.onSubmit(walletData);
       },
       onError: () => {
         this.setState({ isSubmitting: false });

@@ -84,10 +84,15 @@ export const getLegacyAddressesList = (): Array<LegacyAdaAddress> => {
   return [];
 };
 
-export const resetLegacy = (): void => {
-  for (const prop of Object.keys(dumpByVersion)) {
+export const resetLegacy = (): boolean => {
+  const keys = Object.keys(dumpByVersion);
+  if (keys.length === 0) {
+    return false;
+  }
+  for (const prop of keys) {
     delete dumpByVersion[prop];
   }
+  return true;
 };
 
 export async function legacySaveLastReceiveAddressIndex(index: number): Promise<void> {

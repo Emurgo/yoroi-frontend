@@ -1,4 +1,5 @@
 // @flow
+import moment from 'moment'; // TODO remove
 import BigNumber from 'bignumber.js';
 import type { lf$Database } from 'lovefield';
 import {
@@ -36,6 +37,12 @@ import {
   updateTransactions,
 } from './lib/storage/bridge/updateTransactions';
 import {
+  filterAddressesByStakingKey,
+  groupAddrContainsAccountKey,
+} from './lib/storage/bridge/utils';
+import { createCertificate } from './lib/storage/bridge/delegationUtils';
+import type { PoolRequest } from './lib/storage/bridge/delegationUtils';
+import {
   Bip44Wallet,
 } from './lib/storage/models/Bip44Wallet/wrapper';
 import type { HWFeatures, } from './lib/storage/database/walletTypes/core/tables';
@@ -61,6 +68,7 @@ import type {
   IDisplayCutoff,
   IDisplayCutoffPopFunc,
   IDisplayCutoffPopResponse,
+  IGetAllUtxosResponse,
   IHasUtxoChains, IHasUtxoChainsRequest,
   IGetLastSyncInfoResponse,
   WalletAccountNumberPlate,
@@ -100,6 +108,7 @@ import {
 import type {
   LedgerSignTxPayload,
 } from '../../domain/HWSignTx';
+import Notice from '../../domain/Notice';
 import type { $CardanoSignTransaction } from 'trezor-connect/lib/types/cardano';
 import {
   createTrezorSignTxPayload,
@@ -286,6 +295,18 @@ export type RefreshPendingTransactionsFunc = (
   request: RefreshPendingTransactionsRequest
 ) => Promise<RefreshPendingTransactionsResponse>;
 
+// notices
+export type GetNoticesRequestOptions = GetTransactionsRequestOptions;
+
+export type GetNoticesResponse = {
+  notices: Array<Notice>,
+  total: number,
+};
+
+export type GetNoticesFunc = (
+  request: GetNoticesRequestOptions
+) => Promise<GetNoticesResponse>;
+
 // createWallet
 
 export type CreateWalletRequest = RestoreWalletRequest;
@@ -375,11 +396,19 @@ export type CreateUnsignedTxFunc = (
 
 // createDelegationTx
 
-export type CreateDelegationTxRequest = {
-  publicDeriver: IGetAllUtxos & IHasUtxoChains,
-  certificate: RustModule.WalletV3.Certificate,
-};
-export type CreateDelegationTxResponse = V3UnsignedTxAddressedUtxoResponse;
+export type CreateDelegationTxRequest = {|
+  publicDeriver: IGetAllUtxos & IHasUtxoChains & IGetStakingKey,
+  poolRequest: PoolRequest,
+  /**
+   * TODO: right now we can only get this information from the network
+   * but it should be held in storage eventually
+   */
+  valueInAccount: number,
+|};
+export type CreateDelegationTxResponse = {|
+  unsignedTx: V3UnsignedTxAddressedUtxoResponse,
+  totalAmountToDelegate: BigNumber,
+|};
 
 export type CreateDelegationTxFunc = (
   request: CreateDelegationTxRequest
@@ -498,7 +527,7 @@ export type RestoreWalletFunc = (
 // restoreWalletForTransfer
 
 export type RestoreWalletForTransferRequest = {|
-  recoveryPhrase: string,
+  rootPk: RustModule.WalletV3.Bip32PrivateKey,
   transferSource: TransferSourceType,
   accountIndex: number,
   checkAddressesInUse: FilterFunc,
@@ -570,12 +599,13 @@ export default class AdaApi {
     request: CreateAdaPaperRequest
   ): AdaPaper {
     const words = generateAdaMnemonic();
+    const rootPk = generateWalletRootKey(words.join(' '));
     const scrambledWords = scramblePaperAdaMnemonic(
       words.join(' '),
       request.password
     ).split(' ');
     const { addresses, accountPlate } = generateStandardPlate(
-      words.join(' '),
+      rootPk,
       0, // paper wallets always use account 0
       request.numAddresses != null ? request.numAddresses : DEFAULT_ADDRESSES_PER_PAPER,
       environment.getDiscriminant(),
@@ -703,7 +733,7 @@ export default class AdaApi {
         return WalletTransaction.fromAnnotatedTx({
           tx,
           addressLookupMap: fetchedTxs.addressLookupMap,
-          lastBlockNumber: lastSyncInfo.SlotNum,
+          lastBlockNumber: lastSyncInfo.Height,
         });
       });
       return {
@@ -731,12 +761,51 @@ export default class AdaApi {
         return WalletTransaction.fromAnnotatedTx({
           tx,
           addressLookupMap: fetchedTxs.addressLookupMap,
-          lastBlockNumber: lastSyncInfo.SlotNum,
+          lastBlockNumber: lastSyncInfo.Height,
         });
       });
       return mappedTransactions;
     } catch (error) {
       Logger.error('AdaApi::refreshPendingTransactions error: ' + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  async getNotices(
+    request: GetNoticesRequestOptions
+  ): Promise<GetNoticesResponse> {
+    Logger.debug('AdaApi::getNotices called: ' + stringifyData(request));
+    try {
+      let next = 0;
+      const dummyNotices =  [
+        new Notice({ id: (next++).toString(), kind: 2, date: new Date() }),
+        new Notice({ id: (next++).toString(), kind: 0, date: moment().subtract(1, 'seconds').toDate() }),
+        new Notice({ id: (next++).toString(), kind: 1, date: moment().subtract(5, 'seconds').toDate() }),
+        new Notice({ id: (next++).toString(), kind: 2, date: moment().subtract(40, 'seconds').toDate() }),
+        new Notice({ id: (next++).toString(), kind: 3, date: moment().subtract(1, 'minutes').toDate() }),
+        new Notice({ id: (next++).toString(), kind: 4, date: moment().subtract(2, 'minutes').toDate() }),
+        new Notice({ id: (next++).toString(), kind: 5, date: moment().subtract(5, 'minutes').toDate() }),
+        new Notice({ id: (next++).toString(), kind: 6, date: moment().subtract(15, 'minutes').toDate() }),
+        new Notice({ id: (next++).toString(), kind: 7, date: moment().subtract(30, 'minutes').toDate() }),
+        new Notice({ id: (next++).toString(), kind: 7, date: moment().subtract(88, 'minutes').toDate() }),
+        new Notice({ id: (next++).toString(), kind: 0, date: moment().subtract(10, 'hours').toDate() }),
+        new Notice({ id: (next++).toString(), kind: 3, date: moment().subtract(1, 'days').toDate() }),
+        new Notice({ id: (next++).toString(), kind: 4, date: moment().subtract(1, 'days').toDate() }),
+        new Notice({ id: (next++).toString(), kind: 1, date: new Date(2019, 11, 5, 10, 15, 20) }),
+        new Notice({ id: (next++).toString(), kind: 5, date: new Date(2019, 11, 5, 8, 20, 20) }),
+        new Notice({ id: (next++).toString(), kind: 3, date: new Date(2019, 11, 4, 2, 15, 20) }),
+        new Notice({ id: (next++).toString(), kind: 7, date: new Date(2019, 11, 4, 10, 40, 20) }),
+        new Notice({ id: (next++).toString(), kind: 6, date: new Date(2019, 11, 4, 18, 55, 29) }),
+        new Notice({ id: (next++).toString(), kind: 0, date: new Date(2019, 11, 2, 10, 45, 20) }),
+        new Notice({ id: (next++).toString(), kind: 7, date: new Date(2019, 11, 1, 10, 18, 20) }),
+      ];
+      const { skip = 0, limit } = request;
+      return {
+        notices: dummyNotices.slice(skip, limit),
+        total: dummyNotices.length
+      };
+    } catch (error) {
+      Logger.error('AdaApi::getNotices error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }
@@ -996,22 +1065,62 @@ export default class AdaApi {
     request: CreateDelegationTxRequest
   ): Promise<CreateDelegationTxResponse> {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.createDelegationTx)} called`);
-    const utxos = await request.publicDeriver.getAllUtxos();
-    const addressedUtxo = shelleyAsAddressedUtxo(utxos);
+
+    let stakingKey;
+    {
+      const stakingKeyResp = await request.publicDeriver.getStakingKey();
+      const accountAddress = RustModule.WalletV3.Address.from_bytes(
+        Buffer.from(stakingKeyResp.addr.Hash, 'hex')
+      ).to_account_address();
+      if (accountAddress == null) {
+        throw new Error(`${nameof(this.createDelegationTx)} staking key invalid`);
+      }
+      stakingKey = accountAddress.get_account_key();
+    }
+
+    const stakeDelegationCert = createCertificate(stakingKey, request.poolRequest);
+    const certificate = RustModule.WalletV3.Certificate.stake_delegation(stakeDelegationCert);
+
+    const allUtxo = await request.publicDeriver.getAllUtxos();
+    const addressedUtxo = shelleyAsAddressedUtxo(allUtxo);
     const nextUnusedInternal = await request.publicDeriver.nextInternal();
     if (nextUnusedInternal.addressInfo == null) {
       throw new Error(`${nameof(this.createDelegationTx)} no internal addresses left. Should never happen`);
     }
     const changeAddr = nextUnusedInternal.addressInfo;
-    return shelleyNewAdaUnsignedTx(
+    const unsignedTx = shelleyNewAdaUnsignedTx(
       [],
       [{
         address: changeAddr.addr.Hash,
         addressing: changeAddr.addressing,
       }],
       addressedUtxo,
-      request.certificate
+      certificate
     );
+
+    const allUtxosForKey = filterAddressesByStakingKey(
+      stakingKey,
+      allUtxo
+    );
+    const utxoSum = allUtxosForKey.reduce(
+      (sum, utxo) => sum.plus(new BigNumber(utxo.output.UtxoTransactionOutput.Amount)),
+      new BigNumber(0)
+    );
+
+    const differenceAfterTx = getDifferenceAfterTx(
+      unsignedTx,
+      allUtxo,
+      stakingKey
+    );
+
+    const totalAmountToDelegate = utxoSum
+      .plus(differenceAfterTx) // subtract any part of the fee that comes from UTXO
+      .plus(request.valueInAccount); // recall: Jormungandr rewards are compounding
+
+    return {
+      unsignedTx,
+      totalAmountToDelegate
+    };
   }
 
   async signAndBroadcastDelegationTx(
@@ -1272,9 +1381,8 @@ export default class AdaApi {
     request: RestoreWalletForTransferRequest
   ): Promise<RestoreWalletForTransferResponse> {
     Logger.debug('AdaApi::restoreWalletForTransfer called');
-    const { recoveryPhrase, checkAddressesInUse } = request;
+    const { rootPk, checkAddressesInUse } = request;
 
-    const rootPk = generateWalletRootKey(recoveryPhrase);
     try {
       // need this to persist outside the scope of the hashToIds lambda
       // since the lambda is called multiple times
@@ -1527,3 +1635,53 @@ export default class AdaApi {
   }
 }
 // ========== End of class AdaApi =========
+
+/**
+ * Sending the transaction may affect the amount delegated in a few ways:
+ * 1) The transaction fee for the transaction
+ *  - may be paid with UTXO that either does or doesn't belong to our staking key.
+ * 2) The change for the transaction
+ *  - may get turned into a group address for our staking key
+ */
+function getDifferenceAfterTx(
+  utxoResponse: V3UnsignedTxAddressedUtxoResponse,
+  allUtxos: IGetAllUtxosResponse,
+  stakingKey: RustModule.WalletV3.PublicKey,
+): BigNumber {
+  const stakingKeyString = Buffer.from(stakingKey.as_bytes()).toString('hex');
+
+  let sumInForKey = new BigNumber(0);
+  {
+    // note senderUtxos.length is approximately 1
+    // since it's just to cover transaction fees
+    // so this for loop is faster than building a map
+    for (const senderUtxo of utxoResponse.senderUtxos) {
+      const match = allUtxos.find(utxo => (
+        utxo.output.Transaction.Hash === senderUtxo.tx_hash &&
+        utxo.output.UtxoTransactionOutput.OutputIndex === senderUtxo.tx_index
+      ));
+      if (match == null) {
+        throw new Error(`${nameof(getDifferenceAfterTx)} utxo not found. Should not happen`);
+      }
+      const address = match.address;
+      if (groupAddrContainsAccountKey(address, stakingKeyString)) {
+        sumInForKey = sumInForKey.plus(new BigNumber(senderUtxo.amount));
+      }
+    }
+  }
+
+  let sumOutForKey = new BigNumber(0);
+  {
+    const outputs = utxoResponse.IOs.outputs();
+    for (let i = 0; i < outputs.size(); i++) {
+      const output = outputs.get(i);
+      const address = Buffer.from(output.address().as_bytes()).toString('hex');
+      if (groupAddrContainsAccountKey(address, stakingKeyString)) {
+        const value = new BigNumber(output.value().to_str());
+        sumOutForKey = sumOutForKey.plus(value);
+      }
+    }
+  }
+
+  return sumOutForKey.minus(sumInForKey);
+}

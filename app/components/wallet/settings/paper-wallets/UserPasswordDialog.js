@@ -53,9 +53,9 @@ const messages = defineMessages({
 type Props = {|
   +passwordValue: string,
   +repeatedPasswordValue: string,
-  +onNext: Function,
-  +onCancel: Function,
-  +onDataChange: Function,
+  +onNext: {| userPassword: string |} => PossiblyAsync<void>,
+  +onCancel: void => PossiblyAsync<void>,
+  +onDataChange: { [key: string]: any } => void,
   +classicTheme: boolean,
 |};
 
@@ -112,9 +112,9 @@ export default class UserPasswordDialog extends Component<Props> {
 
   submit = () => {
     this.form.submit({
-      onSuccess: (form) => {
+      onSuccess: async (form) => {
         const { paperPassword } = form.values();
-        this.props.onNext({ userPassword: paperPassword });
+        await this.props.onNext({ userPassword: paperPassword });
       },
       onError: () => {},
     });

@@ -68,9 +68,9 @@ export type WalletRestoreDialogValues = {|
 |};
 
 type Props = {|
-  +onSubmit: WalletRestoreDialogValues => void,
-  +onCancel: void => void,
-  +onBack?: void => void,
+  +onSubmit: WalletRestoreDialogValues => PossiblyAsync<void>,
+  +onCancel: void => PossiblyAsync<void>,
+  +onBack?: void => PossiblyAsync<void>,
   +mnemonicValidator: string => boolean,
   +passwordValidator?: string => boolean,
   +numberOfMnemonics: number,
@@ -216,7 +216,7 @@ export default class WalletRestoreDialog extends Component<Props> {
 
   submit = () => {
     this.form.submit({
-      onSuccess: (form) => {
+      onSuccess: async (form) => {
         const { recoveryPhrase, walletName, walletPassword, paperPassword } = form.values();
         const walletData: WalletRestoreDialogValues = {
           recoveryPhrase: join(recoveryPhrase, ' '),
@@ -224,7 +224,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           walletPassword,
           paperPassword,
         };
-        this.props.onSubmit(walletData);
+        await this.props.onSubmit(walletData);
       },
       onError: () => {}
     });

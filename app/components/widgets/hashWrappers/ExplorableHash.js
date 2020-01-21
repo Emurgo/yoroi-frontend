@@ -23,7 +23,7 @@ type Props = {|
   +url: string,
   +light: boolean,
   +tooltipOpensUpward?: boolean,
-  +onExternalLinkClick: Function,
+  +onExternalLinkClick: MouseEvent => void,
   +arrowRelativeToTip?: boolean,
 |};
 

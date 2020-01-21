@@ -20,7 +20,12 @@ import type {
   Address, Value, Addressing,
   IGetAllUtxosResponse
 } from '../../lib/storage/models/PublicDeriver/interfaces';
-import { generateAuthData, normalizeKey, } from './utils';
+import { generateAuthData, normalizeKey, generateFee, } from './utils';
+import {
+  selectAllInputSelection,
+  firstMatchFirstInputSelection,
+  utxoToTxInput,
+} from './inputSelection';
 
 declare var CONFIG: ConfigType;
 
@@ -83,11 +88,7 @@ export function sendAllUnsignedTxFromUtxo(
     throw new NotEnoughMoneyToSendError();
   }
 
-  const feeAlgorithm = RustModule.WalletV3.Fee.linear_fee(
-    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.constant),
-    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.coefficient),
-    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.certificate),
-  );
+  const feeAlgorithm = generateFee();
   let fee;
   {
     // firts build a transaction to see what the cost would be
@@ -181,11 +182,7 @@ export function newAdaUnsignedTxFromUtxo(
   allUtxos: Array<RemoteUnspentOutput>,
   certificate: void | RustModule.WalletV3.Certificate,
 ): V3UnsignedTxUtxoResponse {
-  const feeAlgorithm = RustModule.WalletV3.Fee.linear_fee(
-    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.constant),
-    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.coefficient),
-    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.certificate),
-  );
+  const feeAlgorithm = generateFee();
 
   const ioBuilder = RustModule.WalletV3.InputOutputBuilder.empty();
   for (const output of outputs) {
@@ -200,15 +197,16 @@ export function newAdaUnsignedTxFromUtxo(
     ? RustModule.WalletV3.Payload.certificate(certificate)
     : RustModule.WalletV3.Payload.no_payload();
 
-  const selectedUtxos = firstMatchFirstInputSelection(
-    ioBuilder,
-    allUtxos,
-    feeAlgorithm,
-    payload,
-  );
+  let selectedUtxos;
   let IOs;
   const change = [];
   if (changeAddresses.length === 1) {
+    selectedUtxos = firstMatchFirstInputSelection(
+      ioBuilder,
+      allUtxos,
+      feeAlgorithm,
+      payload,
+    );
     const changeAddr = changeAddresses[0];
 
     /**
@@ -233,6 +231,12 @@ export function newAdaUnsignedTxFromUtxo(
     );
     change.push(...addedChange);
   } else if (changeAddresses.length === 0) {
+    selectedUtxos = selectAllInputSelection(
+      ioBuilder,
+      allUtxos,
+      feeAlgorithm,
+      payload
+    );
     IOs = ioBuilder.seal_with_output_policy(
       payload,
       feeAlgorithm,
@@ -247,31 +251,6 @@ export function newAdaUnsignedTxFromUtxo(
     IOs,
     changeAddr: change,
   };
-}
-
-function firstMatchFirstInputSelection(
-  txBuilder: RustModule.WalletV3.InputOutputBuilder,
-  allUtxos: Array<RemoteUnspentOutput>,
-  feeAlgorithm: RustModule.WalletV3.Fee,
-  payload: RustModule.WalletV3.Payload,
-): Array<RemoteUnspentOutput> {
-  const selectedOutputs = [];
-  if (allUtxos.length === 0) {
-    throw new NotEnoughMoneyToSendError();
-  }
-  // add UTXOs in whatever order they're sorted until we have enough for amount+fee
-  for (let i = 0; i < allUtxos.length; i++) {
-    selectedOutputs.push(allUtxos[i]);
-    txBuilder.add_input(utxoToTxInput(allUtxos[i]));
-    const txBalance = txBuilder.get_balance(payload, feeAlgorithm);
-    if (!txBalance.is_negative()) {
-      break;
-    }
-    if (i === allUtxos.length - 1) {
-      throw new NotEnoughMoneyToSendError();
-    }
-  }
-  return selectedOutputs;
 }
 
 /**
@@ -360,19 +339,6 @@ export function signTransaction(
 
   const fragment = RustModule.WalletV3.Fragment.from_transaction(signedTx);
   return fragment;
-}
-
-function utxoToTxInput(
-  utxo: RemoteUnspentOutput,
-): RustModule.WalletV3.Input {
-  const txoPointer = RustModule.WalletV3.UtxoPointer.new(
-    RustModule.WalletV3.FragmentId.from_bytes(
-      Buffer.from(utxo.tx_hash, 'hex')
-    ),
-    utxo.tx_index,
-    RustModule.WalletV3.Value.from_str(utxo.amount),
-  );
-  return RustModule.WalletV3.Input.from_utxo(txoPointer);
 }
 
 function addWitnesses(

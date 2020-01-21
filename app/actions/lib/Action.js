@@ -4,50 +4,51 @@ import { bindAll } from 'lodash';
 /**
  * Listener type as Function that takes specific params <P>
  */
-export type Listener<P> = (params: P) => Promise<void>|void;
+export type SyncListener<P> = (params: P) => void;
+export type AsyncListener<P> = (params: P) => Promise<void>;
 
-/**
- * Action class with typed params
- */
-export default class Action<Params> {
+class BaseAction<ListenerType, Params> {
 
   /**
    * Array of all defined actions in the system
-   * @type {[Action]}
+   * @type {[BaseAction]}
    */
-  static actions: Action<Params>[] = [];
+  static actions: BaseAction<ListenerType, Params>[] = [];
 
-  static resetAllActions() {
+  static resetAllActions(): void {
     Action.actions.forEach(action => action.removeAll());
   }
 
-  listeners: Listener<Params>[] = [];
+  listeners: ListenerType[] = [];
 
   constructor() {
     bindAll(this, ['trigger']);
-    Action.actions.push(this);
+    BaseAction.actions.push(this);
   }
 
-  listen(listener: Listener<Params>) {
+  listen(listener: ListenerType): void {
     this.listeners.push(listener);
   }
 
-  trigger(params: Params) {
-    this.listeners.forEach(listener => listener(params));
-  }
-
-  remove(listener: Listener<Params>) {
+  remove(listener: ListenerType): void {
     this.listeners.splice(this.listeners.indexOf(listener), 1);
   }
 
-  removeAll() {
+  removeAll(): void {
     this.listeners = [];
   }
+}
 
-  once(listener: Listener<Params>) {
-    this.listeners.push((...args) => {
-      this.remove(listener);
-      listener(...args);
-    });
+export class Action<Params> extends BaseAction<SyncListener<Params>, Params> {
+  trigger(params: Params): void {
+    this.listeners.forEach(listener => listener(params));
+  }
+}
+
+export class AsyncAction<Params> extends BaseAction<AsyncListener<Params>, Params> {
+  async trigger(params: Params): Promise<void> {
+    for (const listener of this.listeners) {
+      await listener(params);
+    }
   }
 }

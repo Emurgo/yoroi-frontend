@@ -32,6 +32,6 @@ export default {
     }
   },
   forms: {
-    FORM_VALIDATION_DEBOUNCE_WAIT: 250
+    FORM_VALIDATION_DEBOUNCE_WAIT: 500
   },
 };

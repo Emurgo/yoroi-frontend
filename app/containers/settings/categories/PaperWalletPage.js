@@ -9,7 +9,7 @@ import CreatePaperWalletDialogContainer from '../../wallet/dialogs/CreatePaperWa
 @observer
 export default class PaperWalletPage extends Component<InjectedProps> {
 
-  createPaperWallet = (data: { numAddresses: number, printAccountPlate: boolean }) => {
+  createPaperWallet = (data: {| numAddresses: number, printAccountPlate: boolean |}) => {
     this.props.actions.dialogs.open.trigger({ dialog: UserPasswordDialog });
     this.props.actions.dialogs.updateDataForActiveDialog.trigger({ data });
   };

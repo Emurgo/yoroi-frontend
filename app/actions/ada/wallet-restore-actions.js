@@ -1,6 +1,6 @@
 // @flow
 
-import Action from '../lib/Action';
+import { AsyncAction, Action } from '../lib/Action';
 
 export type WalletRestoreMeta = {|
   recoveryPhrase: string,
@@ -18,10 +18,10 @@ export type RestoreModeType = $Values<typeof RestoreMode>;
 
 export default class WalletRestoreActions {
   submitFields: Action<WalletRestoreMeta> = new Action();
-  startRestore: Action<void> = new Action();
-  verifyMnemonic: Action<void> = new Action();
-  startCheck: Action<void> = new Action();
-  transferFromLegacy: Action<void> = new Action();
+  startRestore: AsyncAction<void> = new AsyncAction();
+  verifyMnemonic: AsyncAction<void> = new AsyncAction();
+  startCheck: AsyncAction<void> = new AsyncAction();
+  transferFromLegacy: AsyncAction<void> = new AsyncAction();
   setMode: Action<RestoreModeType> = new Action();
   reset: Action<void> = new Action();
   back: Action<void> = new Action();

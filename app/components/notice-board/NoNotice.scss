@@ -1,0 +1,21 @@
+.component {
+  font-family: var(--font-regular);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 36px;
+  .textBlock {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    line-height: 22px;
+    color: var(--cmn-default-color-grey);
+    .notDelegatedYet {
+      margin-bottom: 12px;
+    }
+  }
+}

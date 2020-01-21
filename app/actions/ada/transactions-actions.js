@@ -1,12 +1,12 @@
 // @flow
-import Action from '../lib/Action';
+import { AsyncAction, Action } from '../lib/Action';
 
 // ======= TRANSACTIONS ACTIONS =======
 
 export type TransactionRowsToExportRequest = void;
 
 export default class TransactionsActions {
-  loadMoreTransactions: Action<void> = new Action();
-  exportTransactionsToFile: Action<TransactionRowsToExportRequest> = new Action();
+  loadMoreTransactions: AsyncAction<void> = new AsyncAction();
+  exportTransactionsToFile: AsyncAction<TransactionRowsToExportRequest> = new AsyncAction();
   closeExportTransactionDialog: Action<void> = new Action();
 }

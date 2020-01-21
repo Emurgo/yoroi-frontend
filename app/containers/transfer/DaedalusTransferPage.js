@@ -44,45 +44,45 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     this._getDaedalusTransferActions().startTransferMasterKey.trigger();
   }
 
-  setupTransferFundsWithMnemonic = (payload: {
+  setupTransferFundsWithMnemonic: {|
     recoveryPhrase: string,
-  }): void => {
+  |} => Promise<void> = async (payload) => {
     const walletsStore = this._getWalletsStore();
     const publicDeriver = walletsStore.selected;
     if (publicDeriver == null) {
       throw new Error('tranferFunds no wallet selected');
     }
-    this._getDaedalusTransferActions().setupTransferFundsWithMnemonic.trigger({
+    await this._getDaedalusTransferActions().setupTransferFundsWithMnemonic.trigger({
       ...payload,
       publicDeriver
     });
   };
 
-  setupTransferFundsWithMasterKey = (payload: {
+  setupTransferFundsWithMasterKey: {|
     masterKey: string,
-  }): void => {
+  |} => Promise<void> = async (payload) => {
     const walletsStore = this._getWalletsStore();
     const publicDeriver = walletsStore.selected;
     if (publicDeriver == null) {
       throw new Error('tranferFunds no wallet selected');
     }
-    this._getDaedalusTransferActions().setupTransferFundsWithMasterKey.trigger({
+    await this._getDaedalusTransferActions().setupTransferFundsWithMasterKey.trigger({
       ...payload,
       publicDeriver
     });
   };
 
   /** Broadcast the transfer transaction if one exists and return to wallet page */
-  tranferFunds = () => {
+  tranferFunds: void => Promise<void> = async () => {
     const walletsStore = this._getWalletsStore();
     const publicDeriver = walletsStore.selected;
     if (publicDeriver == null) {
       throw new Error('tranferFunds no wallet selected');
     }
     // broadcast transfer transaction then call continuation
-    this._getDaedalusTransferActions().transferFunds.trigger({
-      next: () => {
-        walletsStore.refreshWallet(publicDeriver);
+    await this._getDaedalusTransferActions().transferFunds.trigger({
+      next: async () => {
+        await walletsStore.refreshWallet(publicDeriver);
         if (walletsStore.activeWalletRoute != null) {
           const newRoute = walletsStore.activeWalletRoute;
           this._getRouter().goToRoute.trigger({

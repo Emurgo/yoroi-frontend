@@ -1,5 +1,21 @@
 // @flow
 
+/**
+ * when running jest we need to use nodejs and not browser configurations
+*/
+const nodePlugins = {
+  plugins: [
+    'dynamic-import-node',
+    '@babel/plugin-transform-runtime',
+    ['module-resolver', {
+      alias: {
+        'cardano-wallet-browser': 'cardano-wallet',
+        '@emurgo/js-chain-libs': '@emurgo/js-chain-libs-node',
+      }
+    }]
+  ]
+};
+
 /*::
 // https://babeljs.io/docs/en/config-files#config-function-api
 type ApiType = {
@@ -7,11 +23,6 @@ type ApiType = {
 };
 */
 module.exports = function (api /*: ApiType */) {
-  // when running jest we need to use nodejs and not browser configurations
-  const nodePlugins = api.env('jest')
-    ? ['dynamic-import-node']
-    : [];
-
   return {
     presets: [
       [
@@ -61,7 +72,6 @@ module.exports = function (api /*: ApiType */) {
       ],
       '@babel/plugin-proposal-export-default-from',
       '@babel/plugin-proposal-export-namespace-from',
-      ...nodePlugins,
     ],
     env: {
       development: {
@@ -76,28 +86,9 @@ module.exports = function (api /*: ApiType */) {
           '@babel/plugin-transform-runtime'
         ]
       },
-      cucumber: {
-        plugins: [
-          '@babel/plugin-transform-runtime',
-          ['module-resolver', {
-            alias: {
-              'cardano-wallet-browser': 'cardano-wallet',
-              '@emurgo/js-chain-libs': '@emurgo/js-chain-libs-node',
-            }
-          }]
-        ]
-      },
-      test: {
-        plugins: [
-          '@babel/plugin-transform-runtime',
-          ['module-resolver', {
-            alias: {
-              'cardano-wallet-browser': 'cardano-wallet',
-              '@emurgo/js-chain-libs': '@emurgo/js-chain-libs-node',
-            }
-          }]
-        ]
-      }
+      cucumber: nodePlugins,
+      test: nodePlugins,
+      jest: nodePlugins,
     }
   };
 };

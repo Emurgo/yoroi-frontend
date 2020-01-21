@@ -21,8 +21,8 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +onSubmit: {| recoveryPhrase: string |} => void,
-  +onBack: Function,
+  +onSubmit: {| recoveryPhrase: string |} => PossiblyAsync<void>,
+  +onBack: void => void,
   +mnemonicValidator: string => boolean,
   +validWords: Array<string>,
   +mnemonicLength: number,
@@ -52,12 +52,12 @@ export default class DaedalusTransferFormPage extends Component<Props> {
       throw new Error('DaedalusTransferFormPage form not set');
     }
     this.mnemonicForm.submit({
-      onSuccess: (form) => {
+      onSuccess: async (form) => {
         const { recoveryPhrase } = form.values();
         const payload = {
           recoveryPhrase: join(recoveryPhrase, ' '),
         };
-        this.props.onSubmit(payload);
+        await this.props.onSubmit(payload);
       },
       onError: () => {}
     });

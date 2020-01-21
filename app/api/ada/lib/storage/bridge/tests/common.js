@@ -21,6 +21,7 @@ import {
   WalletTypePurpose,
 } from '../../../../../../config/numbersConfig';
 import type { WalletTypePurposeT } from '../../../../../../config/numbersConfig';
+import stableStringify from 'json-stable-stringify';
 import {
   mnemonicToEntropy
 } from 'bip39';
@@ -144,4 +145,38 @@ export function filterDbSnapshot(
   }));
 
   expect(filteredDump).toMatchSnapshot();
+}
+
+/**
+ * We want to compare the test result with a snapshot of the database
+ * However, the diff is too big to reasonably compare with your eyes
+ * Therefore, we test each table separately
+ */
+export function compareObject(
+  obj1: { tables: any },
+  obj2: { tables: any },
+  filter: Set<string> = new Set(),
+): void {
+  const obj1FilteredKeys = Object.keys(obj1).filter(key => filter.has(key));
+  const obj2FilteredKeys = Object.keys(obj2).filter(key => filter.has(key));
+  for (const prop of obj1FilteredKeys) {
+    if (obj1[prop] !== undefined && obj2[prop] === undefined) {
+      expect(stableStringify(obj1)).toEqual(stableStringify(obj2));
+    }
+  }
+  for (const prop of obj2FilteredKeys) {
+    if (obj2[prop] !== undefined && obj1[prop] === undefined) {
+      expect(stableStringify(obj1)).toEqual(stableStringify(obj2));
+    }
+  }
+
+  const obj2KeySet = new Set(obj2FilteredKeys);
+  const keysInBoth = obj1FilteredKeys.filter(key => obj2KeySet.has(key));
+  for (const key of keysInBoth) {
+    if (key === 'tables') {
+      compareObject(obj1[key], obj2[key]);
+    } else {
+      expect(stableStringify(obj1[key])).toEqual(stableStringify(obj2[key]));
+    }
+  }
 }

@@ -1,3 +1,5 @@
+@import '../../../../themes/mixins/loading-spinner';
+
 .wrapper {
     display: block;
     padding: 20px 24px;
@@ -5,6 +7,10 @@
 
     button {
         width: 100%;
+    }
+
+    .submitButtonSpinning {
+        @include loading-spinner("../../../../assets/images/spinner-dark.svg");
     }
 }
 
@@ -63,10 +69,9 @@
 }
 
 .hash {
-    width: 125px;
+    max-width: 135px;
     overflow: hidden;
     text-overflow: ellipsis;
-    display: inline-block;
     color: var(--theme-dashboard-label-color);
     font-size: 14px;
     line-height: 22px;

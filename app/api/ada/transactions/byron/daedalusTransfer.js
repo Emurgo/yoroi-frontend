@@ -10,8 +10,9 @@ import {
 } from '../../../../utils/logging';
 import { LOVELACES_PER_ADA } from '../../../../config/numbersConfig';
 import {
-  GenerateTransferTxError
+  GenerateTransferTxError,
 } from '../../errors';
+import LocalizableError from '../../../../i18n/LocalizableError';
 import {
   sendAllUnsignedTxFromUtxo,
 } from './transactionsV2';
@@ -72,6 +73,9 @@ export async function buildDaedalusTransferTx(payload: {
     };
   } catch (error) {
     Logger.error(`daedalusTransfer::buildTransferTx ${stringifyError(error)}`);
+    if (error instanceof LocalizableError) {
+      throw error;
+    }
     throw new GenerateTransferTxError();
   }
 }

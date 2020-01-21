@@ -25,6 +25,8 @@ import type {
   TxStatusCodesType,
   CoreAddressT,
 } from '../enums';
+import { TxStatusCodes } from '../enums';
+
 import * as Tables from '../tables';
 import {
   digetForHash,
@@ -712,7 +714,7 @@ export class GetTxAndBlock {
     return queryResult;
   }
 
-  static async firstTxBefore(
+  static async firstSuccessTxBefore(
     db: lf$Database,
     tx: lf$Transaction,
     request: {
@@ -738,9 +740,11 @@ export class GetTxAndBlock {
         )
       )
       .orderBy(blockTable[Tables.BlockSchema.properties.SlotNum], lf.Order.DESC)
+      .orderBy(txTable[Tables.TransactionSchema.properties.Ordinal], lf.Order.DESC)
       .where(op.and(
         blockTable[Tables.BlockSchema.properties.SlotNum].lt(request.slot),
-        txTable[Tables.TransactionSchema.properties.TransactionId].in(request.txIds)
+        txTable[Tables.TransactionSchema.properties.TransactionId].in(request.txIds),
+        txTable[Tables.TransactionSchema.properties.Status].eq(TxStatusCodes.IN_BLOCK),
       ))
       .limit(1);
 
@@ -902,7 +906,8 @@ export class GetCertificates {
       .where(certAddrTable[certAddrSchema.properties.AddressId].in(
         request.addressIds
       ))
-      .orderBy(blockTable[Tables.BlockSchema.properties.SlotNum], lf.Order.DESC);
+      .orderBy(blockTable[Tables.BlockSchema.properties.SlotNum], lf.Order.DESC)
+      .orderBy(txTable[Tables.TransactionSchema.properties.Ordinal], lf.Order.DESC);
 
     const queryResult: $ReadOnlyArray<{|
       CertificateAddress: $ReadOnly<CertificateAddressRow>,

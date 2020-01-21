@@ -41,10 +41,18 @@ export default class CachedRequest<
       }
     }), 0);
 
+    const executionId = Math.random();
+    this.currentlyExecuting.add(executionId);
     // Issue api call & save it as promise that is handled to update the results of the operation
     this.promise = new Promise((resolve, reject) => {
       this._method(...callArgs)
         .then((result) => {
+          if (this.currentlyExecuting.has(executionId)) {
+            this.currentlyExecuting.delete(executionId);
+          } else {
+            resolve(result);
+            return;
+          }
           setTimeout(action(() => {
             this.result = result;
             if (this._currentApiCall) this._currentApiCall.result = result;
@@ -57,6 +65,12 @@ export default class CachedRequest<
           return result;
         })
         .catch(action((error) => {
+          if (this.currentlyExecuting.has(executionId)) {
+            this.currentlyExecuting.delete(executionId);
+          } else {
+            reject(error);
+            return;
+          }
           setTimeout(action(() => {
             this.error = error;
             this.isExecuting = false;

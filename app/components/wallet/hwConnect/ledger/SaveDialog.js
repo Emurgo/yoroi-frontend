@@ -51,9 +51,9 @@ type Props = {|
   +error: ?LocalizableError,
   +isActionProcessing: boolean,
   +defaultWalletName: string,
-  +onExternalLinkClick: Function,
-  +submit: string => void,
-  +cancel: Function,
+  +onExternalLinkClick: MouseEvent => void,
+  +submit: string => PossiblyAsync<void>,
+  +cancel: void => void,
   +classicTheme: boolean,
 |};
 
@@ -204,11 +204,11 @@ export default class SaveDialog extends Component<Props> {
       </Dialog>);
   }
 
-  save = async () => {
+  save: void => void = () => {
     this.form.submit({
       onSuccess: async (form) => {
         const { walletName } = form.values();
-        this.props.submit(walletName);
+        await this.props.submit(walletName);
       }
     });
   }

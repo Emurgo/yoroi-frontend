@@ -70,13 +70,13 @@ export default class WalletRestoreStore extends Store {
     actions.back.listen(this._back);
   }
 
-  _transferFromLegacy: void => void = () => {
+  _transferFromLegacy: void => Promise<void> = async () => {
     const phrase = this.recoveryResult?.phrase;
     if (phrase == null) {
       throw new Error(`${nameof(this._transferFromLegacy)} no recovery phrase set. Should never happen`);
     }
-    this.actions.ada.yoroiTransfer.transferFunds.trigger({
-      next: async () => { this._startRestore(); },
+    await this.actions.ada.yoroiTransfer.transferFunds.trigger({
+      next: async () => { await this._startRestore(); },
       getDestinationAddress: () => Promise.resolve(this._getFirstInternalAddr(phrase)),
       // funds in genesis block should be either entirely claimed or not claimed
       // so if another wallet instance claims the funds, it's not a big deal
@@ -111,7 +111,7 @@ export default class WalletRestoreStore extends Store {
   }
 
   @action
-  _startCheck: void => void = () => {
+  _startCheck: void => Promise<void> = async () => {
     const phrase = this.recoveryResult?.phrase;
     if (phrase == null) {
       throw new Error(`${nameof(this._startCheck)} no recovery phrase set. Should never happen`);
@@ -126,17 +126,17 @@ export default class WalletRestoreStore extends Store {
     runInAction(() => { this.step = RestoreSteps.TRANSFER_TX_GEN; });
 
     const internalAddrHash = this._getFirstInternalAddr(phrase);
-    this.actions.ada.yoroiTransfer.checkAddresses.trigger({
+    await this.actions.ada.yoroiTransfer.checkAddresses.trigger({
       getDestinationAddress: () => Promise.resolve(internalAddrHash),
     });
   }
 
   @action
-  _verifyMnemonic: void => void = () => {
+  _verifyMnemonic: void => Promise<void> = async () => {
     if (environment.isShelley()) {
       runInAction(() => { this.step = RestoreSteps.LEGACY_EXPLANATION; });
     } else {
-      this._startRestore();
+      await this._startRestore();
     }
   }
 
@@ -169,8 +169,9 @@ export default class WalletRestoreStore extends Store {
       }
       resolvedRecoveryPhrase = newPhrase;
     }
+    const rootPk = generateWalletRootKey(resolvedRecoveryPhrase);
     const byronPlate = generateStandardPlate(
-      resolvedRecoveryPhrase,
+      rootPk,
       0, // show addresses for account #0
       this.mode === RestoreMode.PAPER
         ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER
@@ -184,7 +185,7 @@ export default class WalletRestoreStore extends Store {
     const shelleyPlate = !environment.isShelley() || this.mode === RestoreMode.PAPER
       ? undefined
       : generateStandardPlate(
-        resolvedRecoveryPhrase,
+        rootPk,
         0, // show addresses for account #0
         this.mode === RestoreMode.PAPER
           ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER
@@ -203,13 +204,13 @@ export default class WalletRestoreStore extends Store {
   }
 
   @action
-  _startRestore: void => void = () => {
+  _startRestore: void => Promise<void> = async () => {
     if (this.recoveryResult == null || this.walletRestoreMeta == null) {
       throw new Error(
         `${nameof(this._startRestore)} Cannot submit wallet restoration! No values are available in context!`
       );
     }
-    this.actions[environment.API].wallets.restoreWallet.trigger({
+    await this.actions[environment.API].wallets.restoreWallet.trigger({
       recoveryPhrase: this.recoveryResult.phrase,
       walletName: this.walletRestoreMeta.walletName,
       walletPassword: this.walletRestoreMeta.walletPassword

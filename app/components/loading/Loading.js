@@ -29,8 +29,8 @@ type Props = {|
   +hasLoadedCurrentLocale: boolean,
   +hasLoadedCurrentTheme: boolean,
   +error: ?LocalizableError,
-  +onExternalLinkClick: Function,
-  +downloadLogs: Function
+  +onExternalLinkClick: MouseEvent => void,
+  +downloadLogs: void => void
 |};
 
 @observer

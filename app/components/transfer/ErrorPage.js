@@ -10,7 +10,7 @@ import styles from './ErrorPage.scss';
 
 type Props = {|
   +error?: ?LocalizableError,
-  +onCancel: Function,
+  +onCancel: void => void,
   +title: string,
   +backButtonLabel: string,
   +classicTheme: boolean,

@@ -9,14 +9,17 @@ import config from '../../config';
 import {
   generateStandardPlate,
 } from '../../api/ada/lib/cardanoCrypto/plate';
+import {
+  generateLedgerWalletRootKey,
+  generateWalletRootKey,
+} from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import environment from '../../environment';
-import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import type { PlateResponse } from '../../api/ada/lib/cardanoCrypto/plate';
 import { TransferKind } from '../../types/TransferTypes';
 
 type Props = {|
   ...InjectedProps,
-  +onNext: void => void,
+  +onNext: void => PossiblyAsync<void>,
   +selectedExplorer: ExplorerType,
   +onCancel: void => void,
   +recoveryPhrase: string,
@@ -41,8 +44,11 @@ export default class YoroiPlatePage extends Component<Props, WalletRestoreDialog
       ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER
       : NUMBER_OF_VERIFIED_ADDRESSES;
 
+    const rootPk = yoroiTransfer.transferKind === TransferKind.LEDGER
+      ? generateLedgerWalletRootKey(yoroiTransfer.recoveryPhrase)
+      : generateWalletRootKey(yoroiTransfer.recoveryPhrase);
     const byronPlate = generateStandardPlate(
-      yoroiTransfer.recoveryPhrase,
+      rootPk,
       0, // show addresses for account #0
       numAddresses,
       environment.getDiscriminant(),
@@ -51,7 +57,7 @@ export default class YoroiPlatePage extends Component<Props, WalletRestoreDialog
     const shelleyPlate = yoroiTransfer.transferKind === TransferKind.PAPER
       ? undefined
       : generateStandardPlate(
-        yoroiTransfer.recoveryPhrase,
+        rootPk,
         0, // show addresses for account #0
         numAddresses,
         environment.getDiscriminant(),

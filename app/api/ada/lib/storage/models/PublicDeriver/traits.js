@@ -1487,6 +1487,7 @@ export function asScanShelleyUtxoInstance<
 //   ScanUtxoAccount
 // ===================
 
+// Abstract way to scan for new addresses given wallet has functionality to scan UTXOs
 type ScanUtxoAccountAddressesDependencies = IPublicDeriver<ConceptualWallet & IHasLevels> &
   IHasUtxoChains & IGetPublic & IScanUtxo & IAddBip44FromPublic;
 const ScanUtxoAccountAddressesMixin = (
@@ -1941,6 +1942,7 @@ export async function addTraitsForCip1852Child(
     );
   }
 
+  // recall: adding addresses to public deriver in cip1852 is same as bip44
   currClass = AddBip44FromPublic(currClass);
 
   if (conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.ACCOUNT.level) {

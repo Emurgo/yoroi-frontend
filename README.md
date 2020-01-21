@@ -49,7 +49,7 @@ $ npm run build -- --env "testnet"
 
 Same as previous but connects to the [Byron testnet](https://testnet.iohkdev.io/cardano/byron/about/testnet-introduction/).
  
- You can get free testnet coins from public Faucet: [https://testnet.iohkdev.io/cardano/byron/faucet/](https://testnet.iohkdev.io/cardano/byron/faucet/).
+ You can get free testnet coins from public Faucet: [https://testnet.iohkdev.io/cardano/byron/tools/faucet/](https://testnet.iohkdev.io/cardano/byron/tools/faucet/).
  
  Note that testnet addresses look different from regular mainnet addresses. This is an intentional feature of "address segregation", mainnet addresses don't work on testnet and will be rejected by the Faucet and by core nodes.
 

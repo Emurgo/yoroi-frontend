@@ -30,11 +30,11 @@ type Props = {|
   +isActive: boolean,
   +inputFieldLabel: string,
   +inputFieldValue: string,
-  +onStartEditing: Function,
-  +onStopEditing: Function,
-  +onCancelEditing: Function,
-  +onSubmit: Function,
-  +isValid: Function,
+  +onStartEditing: void => void,
+  +onStopEditing: void => void,
+  +onCancelEditing: void => void,
+  +onSubmit: string => PossiblyAsync<void>,
+  +isValid: string => boolean,
   +validationErrorMessage: string,
   +successfullyUpdated: boolean,
   +classicTheme: boolean,
@@ -82,10 +82,10 @@ export default class InlineEditingInput extends Component<Props, State> {
 
   submit = () => {
     this.validator.submit({
-      onSuccess: (form) => {
+      onSuccess: async (form) => {
         const { inputField } = form.values();
         if (inputField !== this.props.inputFieldValue) {
-          this.props.onSubmit(inputField);
+          await this.props.onSubmit(inputField);
           this.props.onStopEditing();
         } else {
           this.props.onCancelEditing();

@@ -1,6 +1,7 @@
 // @flow
 
 const tasks = require('./tasks');
+const connections = require('./connections');
 
 const createWebpackServer = require('webpack-httpolyglot-server');
 
@@ -22,7 +23,7 @@ tasks.copyAssets('dev', ENV);
 console.log('[Webpack Dev]');
 console.log('-'.repeat(80));
 console.log('If you\'re developing Inject page,');
-console.log('please allow `https://localhost:3000` connections in Google Chrome,');
+console.log(`please allow 'https://localhost:${connections.Ports.WebpackDev}' connections in Google Chrome,`);
 console.log('and load unpacked extensions with `./dev` folder. (see https://developer.chrome.com/extensions/getstarted#unpacked)\n');
 
 // mock backend script runus the same babel for compiling the server as for compiling the website
@@ -44,5 +45,5 @@ resetChain();
 
 createWebpackServer(config.baseDevConfig(ENV), {
   host: 'localhost',
-  port: 3000
+  port: connections.Ports.WebpackDev,
 });
