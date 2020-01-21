@@ -31,10 +31,10 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +onFollowInstructionsPrerequisites: Function,
-  +onConfirm: Function,
-  +onPaperConfirm: Function,
-  +onMasterKeyConfirm: Function,
+  +onFollowInstructionsPrerequisites: void => void,
+  +onConfirm: void => void,
+  +onPaperConfirm: void => void,
+  +onMasterKeyConfirm: void => void,
   +disableTransferFunds: boolean,
 |};
 

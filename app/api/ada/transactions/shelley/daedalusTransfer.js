@@ -13,6 +13,7 @@ import { Bech32Prefix } from '../../../../config/stringConfig';
 import {
   GenerateTransferTxError
 } from '../../errors';
+import LocalizableError from '../../../../i18n/LocalizableError';
 import {
   sendAllUnsignedTxFromUtxo,
 } from './utxoTransactions';
@@ -79,6 +80,9 @@ export async function buildDaedalusTransferTx(payload: {|
     };
   } catch (error) {
     Logger.error(`daedalusTransfer::buildTransferTx ${stringifyError(error)}`);
+    if (error instanceof LocalizableError) {
+      throw error;
+    }
     throw new GenerateTransferTxError();
   }
 }

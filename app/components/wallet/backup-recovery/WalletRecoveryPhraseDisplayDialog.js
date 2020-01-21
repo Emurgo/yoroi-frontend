@@ -25,9 +25,9 @@ const messages = defineMessages({
 
 type Props = {|
   +recoveryPhrase: string,
-  +onStartWalletBackup: Function,
-  +onCancelBackup: Function,
-  +onBack: Function,
+  +onStartWalletBackup: void => void,
+  +onCancelBackup: void => void,
+  +onBack: void => void,
   +classicTheme: boolean
 |};
 

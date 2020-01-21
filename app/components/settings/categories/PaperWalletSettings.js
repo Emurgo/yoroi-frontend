@@ -35,7 +35,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +onCreatePaper: Function,
+  +onCreatePaper: {| numAddresses: number, printAccountPlate: boolean |} => void,
   +dialog: Node,
   +paperWalletsIntroText: string,
   +isDialogOpen: boolean,

@@ -8,6 +8,7 @@ import settingsIcon from '../assets/images/sidebar/settings.inline.svg';
 import withLedgerNanoIcon from '../assets/images/top-bar/with-ledger-nano-logo.inline.svg';
 import withTrezorTIcon from '../assets/images/top-bar/with-trezor-t-logo-white.inline.svg';
 import goBackIcon from '../assets/images/top-bar/back-arrow-white.inline.svg';
+import noticeBoardIcon from '../assets/images/notice-board/notice-board.inline.svg';
 import styles from '../components/topbar/TopBarCategory.scss';
 
 export type Category = {
@@ -72,4 +73,12 @@ export const SETTINGS: Category = {
   route: ROUTES.SETTINGS.ROOT,
   icon: settingsIcon,
   label: globalMessages.sidebarSettings
+};
+
+export const NOTICE_BOARD: Category = {
+  name: 'NOTICE_BOARD',
+  className: 'notice-board',
+  route: ROUTES.NOTICE_BOARD.ROOT,
+  icon: noticeBoardIcon,
+  iconStyle: styles.noticeBoardIcon,
 };

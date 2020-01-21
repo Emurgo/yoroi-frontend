@@ -10,7 +10,6 @@ import { Bech32Prefix } from '../../../../config/stringConfig';
 import blakejs from 'blakejs';
 import crc32 from 'buffer-crc32';
 import type { WalletAccountNumberPlate } from '../storage/models/PublicDeriver/interfaces';
-import { generateWalletRootKey } from './cryptoWallet';
 import {
   HARD_DERIVATION_START,
   CoinTypes,
@@ -46,14 +45,13 @@ export type PlateResponse = {|
   accountPlate: WalletAccountNumberPlate
 |};
 export const generateStandardPlate = (
-  mnemonic: string,
+  rootPk: RustModule.WalletV3.Bip32PrivateKey,
   accountIndex: number,
   count: number,
   discrimination: AddressDiscriminationType,
   legacy: boolean,
 ): PlateResponse => {
-  const cryptoWallet = generateWalletRootKey(mnemonic);
-  const accountKey = cryptoWallet
+  const accountKey = rootPk
     .derive(legacy ? WalletTypePurpose.BIP44 : WalletTypePurpose.CIP1852)
     .derive(CoinTypes.CARDANO)
     .derive(accountIndex + HARD_DERIVATION_START);

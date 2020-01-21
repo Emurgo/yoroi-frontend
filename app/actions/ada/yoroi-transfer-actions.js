@@ -1,6 +1,6 @@
 // @flow
-import Action from '../lib/Action';
-import type { TransferSourceType, } from '../../types/TransferTypes';
+import { AsyncAction, Action } from '../lib/Action';
+import type { TransferSourceType, TransferKindType, } from '../../types/TransferTypes';
 
 export default class YoroiTranferActions {
   startTransferFunds: Action<{|
@@ -10,7 +10,7 @@ export default class YoroiTranferActions {
     source: TransferSourceType,
   |}> = new Action();
   startHardwareMnemnoic: Action<void> = new Action();
-  startTransferLegacyHardwareFunds: Action<void> = new Action();
+  startTransferLegacyHardwareFunds: Action<TransferKindType> = new Action();
   setupTransferFundsWithMnemonic: Action<{|
     recoveryPhrase: string,
   |}> = new Action();
@@ -18,14 +18,14 @@ export default class YoroiTranferActions {
     recoveryPhrase: string,
     paperPassword: string,
   |}> = new Action();
-  checkAddresses: Action<{|
+  checkAddresses: AsyncAction<{|
     getDestinationAddress: void => Promise<string>,
-  |}> = new Action();
+  |}> = new AsyncAction();
   backToUninitialized: Action<void> = new Action();
-  transferFunds: Action<{|
+  transferFunds: AsyncAction<{|
     next: void => Promise<void>,
     getDestinationAddress: void => Promise<string>,
     rebuildTx: boolean,
-  |}> = new Action();
+  |}> = new AsyncAction();
   cancelTransferFunds: Action<void> = new Action();
 }

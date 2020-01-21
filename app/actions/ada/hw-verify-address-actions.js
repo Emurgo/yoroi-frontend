@@ -1,5 +1,5 @@
 // @flow
-import Action from '../lib/Action';
+import { AsyncAction, Action } from '../lib/Action';
 
 import type {
   BIP32Path
@@ -10,6 +10,6 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 
 export default class HWVerifyAddressActions {
   closeAddressDetailDialog: Action<void> = new Action();
-  selectAddress: Action<{ address: string, path: BIP32Path }> = new Action();
-  verifyAddress: Action<PublicDeriver<>> = new Action();
+  selectAddress: AsyncAction<{| address: string, path: BIP32Path |}> = new AsyncAction();
+  verifyAddress: AsyncAction<PublicDeriver<>> = new AsyncAction();
 }

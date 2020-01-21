@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
@@ -13,16 +14,9 @@ import LoadingSpinner from '../../widgets/LoadingSpinner';
 import type { AssuranceMode } from '../../../types/transactionAssuranceTypes';
 import { Logger } from '../../../utils/logging';
 import type { ExplorerType } from '../../../domain/Explorer';
+import globalMessages from '../../../i18n/global-messages';
 
 const messages = defineMessages({
-  today: {
-    id: 'wallet.summary.page.todayLabel',
-    defaultMessage: '!!!Today',
-  },
-  yesterday: {
-    id: 'wallet.summary.page.yesterdayLabel',
-    defaultMessage: '!!!Yesterday',
-  },
   showMoreTransactionsButtonLabel: {
     id: 'wallet.summary.page.showMoreTransactionsButtonLabel',
     defaultMessage: '!!!Show more transactions',
@@ -38,8 +32,8 @@ type Props = {|
   +selectedExplorer: ExplorerType,
   +assuranceMode: AssuranceMode,
   +walletId: string,
-  +formattedWalletAmount: Function,
-  +onLoadMore: Function,
+  +formattedWalletAmount: BigNumber => string,
+  +onLoadMore: void => PossiblyAsync<void>,
 |};
 
 @observer
@@ -86,9 +80,9 @@ export default class WalletTransactionsList extends Component<Props> {
   localizedDate(date: string) {
     const { intl } = this.context;
     const today = moment().format(dateFormat);
-    if (date === today) return intl.formatMessage(messages.today);
+    if (date === today) return intl.formatMessage(globalMessages.dateToday);
     const yesterday = moment().subtract(1, 'days').format(dateFormat);
-    if (date === yesterday) return intl.formatMessage(messages.yesterday);
+    if (date === yesterday) return intl.formatMessage(globalMessages.dateYesterday);
     return moment(date).format(this.localizedDateFormat);
   }
 
@@ -148,7 +142,7 @@ export default class WalletTransactionsList extends Component<Props> {
           </div>
         ))}
         {loadingSpinner}
-        {hasMoreToLoad &&
+        {!isLoadingTransactions && hasMoreToLoad &&
           <Button
             disabled={isLoadingTransactions}
             className={buttonClasses}

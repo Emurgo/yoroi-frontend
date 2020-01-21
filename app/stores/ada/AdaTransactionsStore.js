@@ -11,6 +11,9 @@ import { transactionTypes } from '../../api/ada/transactions/types';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import globalMessages from '../../i18n/global-messages';
+import {
+  ConceptualWallet
+} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 
 import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
 import { isValidAmountInLovelaces } from '../../utils/validations';
@@ -107,16 +110,13 @@ export default class AdaTransactionsStore extends TransactionsStore {
 
       const publicDeriver = this.stores.substores.ada.wallets.selected;
       if (!publicDeriver) return;
-      const withLevels = asHasLevels(publicDeriver.self);
+      const withLevels = asHasLevels<ConceptualWallet>(publicDeriver.self);
       if (!withLevels) return;
 
-      this.getTransactionRowsToExportRequest.execute({
+      const respTxRows = await this.getTransactionRowsToExportRequest.execute({
         publicDeriver: withLevels,
         ...params,
-      });
-      if (!this.getTransactionRowsToExportRequest.promise) throw new Error('should never happen');
-
-      const respTxRows = await this.getTransactionRowsToExportRequest.promise;
+      }).promise;
 
       if (respTxRows == null || respTxRows.length < 1) {
         throw new LocalizableError(globalMessages.noTransactionsFound);

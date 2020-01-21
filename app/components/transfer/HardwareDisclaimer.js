@@ -13,15 +13,11 @@ import globalMessages from '../../i18n/global-messages';
 const messages = defineMessages({
   instructions2: {
     id: 'transfer.instructions.hardware.disclaimer.instructions2',
-    defaultMessage: '',
-    // eslint-disable-next-line max-len
-    // defaultMessage: '!!!If you use this feature, you should generate a new recovery phrase for your hardware wallet. If you don\'t know why or how to do this, we do not recommend you use this feature.',
+    defaultMessage: '!!!If you use this feature, you should generate a new recovery phrase for your hardware wallet. If you don\'t know why or how to do this, we do not recommend you use this feature.',
   },
   hardwareDisclaimer: {
     id: 'transfer.instructions.hardware.disclaimer.checkbox',
-    defaultMessage: '',
-    // eslint-disable-next-line max-len
-    // defaultMessage: '!!!I acknowledge that entering my hardware wallet\'s recovery phrase carries significant risk.',
+    defaultMessage: '!!!I acknowledge that entering my hardware wallet\'s recovery phrase carries significant risk.',
   },
 });
 

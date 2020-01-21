@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import BigNumber from 'bignumber.js';
 import classnames from 'classnames';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
@@ -11,6 +12,7 @@ import LocalizableError from '../../i18n/LocalizableError';
 import RawHash from '../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../domain/Explorer';
+import globalMessages from '../../i18n/global-messages';
 
 const messages = defineMessages({
   addressFromLabel: {
@@ -48,12 +50,12 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +formattedWalletAmount: Function,
+  +formattedWalletAmount: BigNumber => string,
   +selectedExplorer: ExplorerType,
   +transferTx: TransferTx,
-  +onSubmit: Function,
+  +onSubmit: void => PossiblyAsync<void>,
   +isSubmitting: boolean,
-  +onCancel: Function,
+  +onCancel: void => void,
   +error: ?LocalizableError,
   +classicTheme: boolean
 |};
@@ -139,6 +141,22 @@ export default class TransferSummaryPage extends Component<Props> {
           >
             <RawHash light>
               <span className={styles.address}>{receiver}</span>
+            </RawHash>
+          </ExplorableHashContainer>
+        </div>
+
+        <div className={styles.addressLabelWrapper}>
+          <div className={styles.addressLabel}>
+            {intl.formatMessage(globalMessages.transactionId)}
+          </div>
+          <ExplorableHashContainer
+            selectedExplorer={this.props.selectedExplorer}
+            light
+            hash={transferTx.id}
+            linkType="transaction"
+          >
+            <RawHash light>
+              <span className={styles.address}>{transferTx.id}</span>
             </RawHash>
           </ExplorableHashContainer>
         </div>

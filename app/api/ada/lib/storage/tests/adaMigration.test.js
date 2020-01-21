@@ -8,7 +8,7 @@ import oldStorageMemory from '../../../../../../features/yoroi_snapshots/histori
 import oldStorageTrezor from '../../../../../../features/yoroi_snapshots/historical-versions/1_9_0/trezor/localStorage';
 import oldStorageLedger from '../../../../../../features/yoroi_snapshots/historical-versions/1_9_0/ledger/localStorage';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
-import { loadLovefieldDB } from '../database/index';
+import { dumpByVersion, loadLovefieldDB } from '../database/index';
 import { storagev2Migation } from '../adaMigration';
 import { mockDate, filterDbSnapshot } from '../bridge/tests/common';
 
@@ -23,6 +23,9 @@ beforeEach(() => {
 async function baseTest(
   db: lf$Database,
 ): Promise<void> {
+  // need to fake having data in the legacy DB format for migration to trigger
+  dumpByVersion.test = [];
+
   await storagev2Migation(db);
 
   const keysForTest = [

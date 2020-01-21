@@ -1,3 +1,5 @@
+@import '../../../../themes/mixins/underline';
+
 .wrapper {
     display: flex;
     height: 100%;
@@ -26,4 +28,18 @@
     font-family: var(--font-medium);
     font-size: 18px;
     line-height: 22px;
+}
+
+.note {
+    margin-top: 12px;
+    font-size: 12px;
+    line-height: 14px;
+    color: var(--theme-dashboard-link-color);
+    float: right;
+    margin-left: auto;
+    margin-right: 0px;
+    width: max-content;
+    &:hover {
+        @include underline(var(--theme-dashboard-link-color));
+    }
 }

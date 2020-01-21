@@ -63,9 +63,9 @@ type Props = {|
   +progressInfo: ProgressInfo,
   +isActionProcessing: boolean,
   +error: ?LocalizableError,
-  +onExternalLinkClick: Function,
-  +submit: Function,
-  +cancel: Function,
+  +onExternalLinkClick: MouseEvent => void,
+  +submit: void => void,
+  +cancel: void => void,
   +onBack: void => void,
   +classicTheme: boolean,
 |};

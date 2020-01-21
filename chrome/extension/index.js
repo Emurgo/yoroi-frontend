@@ -9,7 +9,7 @@ import { setupApi } from '../../app/api/index';
 import createStores from '../../app/stores/index';
 import { translations } from '../../app/i18n/translations';
 import actions from '../../app/actions/index';
-import Action from '../../app/actions/lib/Action';
+import { Action } from '../../app/actions/lib/Action';
 import App from '../../app/App';
 import '../../app/themes/index.global.scss';
 import BigNumber from 'bignumber.js';

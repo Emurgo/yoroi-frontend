@@ -55,9 +55,9 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         totalAmount={formattedWalletAmount(totalInput)}
         transactionFee={formattedWalletAmount(fee)}
         amountToNaturalUnits={formattedAmountToNaturalUnits}
-        onSubmit={({ password }) => {
+        onSubmit={async ({ password }) => {
           const copyRequest = copySignRequest(signRequest);
-          sendMoney.trigger({
+          await sendMoney.trigger({
             signRequest: copyRequest,
             password,
           });

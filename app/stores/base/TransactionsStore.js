@@ -53,16 +53,12 @@ export default class TransactionsStore extends Store {
     actions.loadMoreTransactions.listen(this._increaseSearchLimit);
   }
 
-  @action _increaseSearchLimit = () => {
+  @action _increaseSearchLimit = async (): Promise<void> => {
     if (this.searchOptions != null) {
       this.searchOptions.limit += this.SEARCH_LIMIT_INCREASE;
       const publicDeriver = this.stores.substores[environment.API].wallets.selected;
       if (!publicDeriver) return;
-      const hasLevels = asHasLevels(publicDeriver.self);
-      if (hasLevels == null) {
-        return;
-      }
-      this.refreshLocal(hasLevels);
+      await this.refreshLocal(publicDeriver.self);
     }
   };
 
@@ -130,13 +126,16 @@ export default class TransactionsStore extends Store {
   }
 
   /** Refresh transaction data for all wallets and update wallet balance */
-  @action refreshTransactionData: PublicDeriverWithCachedMeta => void = (
-    basePubDeriver: PublicDeriverWithCachedMeta,
-  ): void => {
+  @action refreshTransactionData: PublicDeriverWithCachedMeta => Promise<void> = async (
+    basePubDeriver
+  ) => {
     const walletsStore = this.stores.substores[environment.API].wallets;
     const walletsActions = this.actions[environment.API].wallets;
 
-    const publicDeriver = asHasLevels(basePubDeriver.self);
+    const publicDeriver = asHasLevels<
+      ConceptualWallet,
+      IGetLastSyncInfo
+    >(basePubDeriver.self);
     if (publicDeriver == null) {
       return;
     }
@@ -148,7 +147,7 @@ export default class TransactionsStore extends Store {
       checkAddressesInUse,
       getBestBlock
     } = stateFetcher;
-    const allRequest = this.getTransactionsAllRequest(publicDeriver);
+    const allRequest = this.getTransactionsAllRequest(basePubDeriver.self);
     allRequest.invalidate({ immediately: false });
     allRequest.execute({
       publicDeriver,
@@ -160,10 +159,10 @@ export default class TransactionsStore extends Store {
 
     if (!allRequest.promise) throw new Error('should never happen');
 
-    allRequest.promise
+    await allRequest.promise
       .then(async () => {
         // calculate pending tranactions just to cache the result
-        const pendingRequest = this._getTransactionsPendingRequest(publicDeriver);
+        const pendingRequest = this._getTransactionsPendingRequest(basePubDeriver.self);
         pendingRequest.invalidate({ immediately: false });
         pendingRequest.execute(
           { publicDeriver }
@@ -180,7 +179,7 @@ export default class TransactionsStore extends Store {
         });
         walletsActions.updateLastSync.trigger(lastUpdateDate);
         // Note: cache based on last slot synced  (not used in balanceRequest)
-        const req = this._getBalanceRequest(publicDeriver);
+        const req = this._getBalanceRequest(basePubDeriver.self);
         req.execute({
           slot: lastUpdateDate.SlotNum,
           getBalance: canGetBalance.getBalance,
@@ -200,7 +199,7 @@ export default class TransactionsStore extends Store {
       .then(() => {
         // Recent Request
         // Here we are sure that allRequest was resolved and the local database was updated
-        return this.refreshLocal(publicDeriver);
+        return this.refreshLocal(basePubDeriver.self);
       })
       .catch(() => {}); // Do nothing. It's logged in the api call
   };
@@ -243,9 +242,9 @@ export default class TransactionsStore extends Store {
   }
 
   /** Add a new public deriver to track and refresh the data */
-  @action addObservedWallet: PublicDeriverWithCachedMeta => void = (
-    publicDeriver: PublicDeriverWithCachedMeta
-  ): void => {
+  @action addObservedWallet: PublicDeriverWithCachedMeta => Promise<void> = async (
+    publicDeriver
+  ) => {
     this.transactionsRequests.push({
       publicDeriver: publicDeriver.self,
       recentRequest: this._getTransactionsRecentRequest(publicDeriver.self),
@@ -253,7 +252,7 @@ export default class TransactionsStore extends Store {
       getBalanceRequest: this._getBalanceRequest(publicDeriver.self),
       pendingRequest: this._getTransactionsPendingRequest(publicDeriver.self),
     });
-    this.refreshTransactionData(publicDeriver);
+    await this.refreshTransactionData(publicDeriver);
   }
 
   _getTransactionsPendingRequest = (

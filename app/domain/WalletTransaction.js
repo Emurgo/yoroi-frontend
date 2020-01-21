@@ -91,7 +91,7 @@ export default class WalletTransaction {
         ? tx.block.BlockTime
         : new Date(tx.transaction.LastUpdateTime),
       numberOfConfirmations: request.lastBlockNumber != null && tx.block != null
-        ? request.lastBlockNumber - tx.block.SlotNum
+        ? request.lastBlockNumber - tx.block.Height
         : 0,
       addresses: {
         from: [

@@ -33,12 +33,11 @@ type Props = {|
   +totalAmount: string,
   +transactionFee: string,
   +currencyUnit: string,
-  +amountToNaturalUnits: Function,
   +messages: ExpectedMessages,
   +isSubmitting: boolean,
   +error: ?LocalizableError,
-  +onSubmit: void => void,
-  +onCancel: Function,
+  +onSubmit: void => PossiblyAsync<void>,
+  +onCancel: void => void,
   +classicTheme: boolean,
 |};
 

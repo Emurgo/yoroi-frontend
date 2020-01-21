@@ -22,7 +22,7 @@ When(/^I go to the main screen$/, async function () {
 });
 
 Then(/^I should see the transactions screen$/, async function () {
-  await this.waitForElement("//div[@class='WalletSummary_numberOfTransactions']", By.xpath);
+  await this.waitForElement("//div[@class='WalletSummary_component']", By.xpath);
 });
 
 Then(/^I click on "copy to clipboard" button$/, async function () {

@@ -9,7 +9,8 @@ import {
   GO_BACK,
   WALLETS,
   CURRENCY_SPECIFIC_CATEGORIES,
-  SETTINGS
+  SETTINGS,
+  NOTICE_BOARD,
 } from '../../config/topbarConfig';
 import {
   isTrezorTWallet,
@@ -46,6 +47,7 @@ export default class TopbarStore extends Store {
       ...(isNano ? [WITH_LEDGER_NANO] : []),
       SETTINGS,
       ...CURRENCY_SPECIFIC_CATEGORIES[environment.API],
+      ...(environment.isTest() ? [NOTICE_BOARD] : []), // Temporarily Hide
     ];
   }
 

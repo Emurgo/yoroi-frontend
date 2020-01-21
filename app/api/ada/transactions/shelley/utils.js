@@ -15,6 +15,10 @@ import type {
   Addressing,
 } from '../../lib/storage/models/PublicDeriver/interfaces';
 
+import type { ConfigType } from '../../../../../config/config-types';
+
+declare var CONFIG: ConfigType;
+
 export function normalizeKey(request: {|
   addressing: $PropertyType<Addressing, 'addressing'>,
   startingFrom: {|
@@ -167,4 +171,35 @@ export function generateAuthData(
     }
     default: throw new Error('generateAuthData unexptected cert type ' + certificate.get_type());
   }
+}
+
+export function generateFee(): RustModule.WalletV3.Fee {
+  const perCertificate = RustModule.WalletV3.PerCertificateFee.new();
+  const genesisPerCert = CONFIG.genesis.linearFee.per_certificate_fees;
+  if (genesisPerCert) {
+    if (genesisPerCert.certificate_pool_registration != null) {
+      perCertificate.set_pool_registration(
+        RustModule.WalletV3.Value.from_str(genesisPerCert.certificate_pool_registration)
+      );
+    }
+    if (genesisPerCert.certificate_stake_delegation != null) {
+      perCertificate.set_stake_delegation(
+        RustModule.WalletV3.Value.from_str(genesisPerCert.certificate_stake_delegation)
+      );
+    }
+    if (genesisPerCert.certificate_owner_stake_delegation != null) {
+      perCertificate.set_owner_stake_delegation(
+        RustModule.WalletV3.Value.from_str(genesisPerCert.certificate_owner_stake_delegation)
+      );
+    }
+  }
+
+  const feeAlgorithm = RustModule.WalletV3.Fee.linear_fee(
+    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.constant),
+    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.coefficient),
+    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.certificate),
+    perCertificate,
+  );
+
+  return feeAlgorithm;
 }

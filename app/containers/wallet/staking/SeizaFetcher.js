@@ -1,7 +1,7 @@
 // @flow
 
 import React, { Component } from 'react';
-import { action, observable } from 'mobx';
+import { runInAction, action, observable } from 'mobx';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import type { InjectedContainerProps } from '../../../types/injectedPropsType';
@@ -13,6 +13,7 @@ import AnnotatedLoader from '../../../components/transfer/AnnotatedLoader';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
 import Dialog from '../../../components/widgets/Dialog';
 import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
+import DelegationSuccessDialog from '../../../components/wallet/staking/DelegationSuccessDialog';
 import globalMessages from '../../../i18n/global-messages';
 import InvalidURIImg from '../../../assets/images/uri/invalid-uri.inline.svg';
 import {
@@ -40,15 +41,20 @@ export default class SeizaFetcher extends Component<Props> {
   iframe: ?HTMLElement;
 
   @action
-  messageHandler = (event: any) => {
+  messageHandler: any => Promise<void> = async (event: any) => {
     if (event.origin !== process.env.SEIZA_FOR_YOROI_URL) return;
     const pools: Array<SelectedPool> = JSON.parse(decodeURI(event.data));
 
+    const selectedWallet = this.props.stores.substores[environment.API].wallets.selected;
+    if (selectedWallet == null) {
+      return;
+    }
     const delegationTxActions = this.props.actions[environment.API].delegationTransaction;
-    delegationTxActions.createTransaction.trigger({
-      id: pools[0].poolHash,
+    await delegationTxActions.createTransaction.trigger({
+      poolRequest: { id: pools[0].poolHash },
+      publicDeriver: selectedWallet,
     });
-    this.selectedPools = pools;
+    runInAction(() => { this.selectedPools = pools; });
   }
 
   constructor(props: Props) {
@@ -87,7 +93,7 @@ export default class SeizaFetcher extends Component<Props> {
     const dialogBackButton = [
       {
         label: intl.formatMessage(globalMessages.backButtonLabel),
-        onClick: () => this.cancel(),
+        onClick: this.cancel,
         primary: true,
       },
     ];
@@ -105,11 +111,18 @@ export default class SeizaFetcher extends Component<Props> {
       return result;
     };
 
+    const showSignDialog = delegationTxStore.signAndBroadcastDelegationTx.isExecuting ||
+      !delegationTxStore.signAndBroadcastDelegationTx.wasExecuted ||
+      delegationTxStore.signAndBroadcastDelegationTx.error;
+
     return (
       <>
-        {delegationTxStore.createDelegationTx.isExecuting &&
+        {(
+          delegationTxStore.createDelegationTx.isExecuting ||
+          (delegationTx == null && this.selectedPools.length >= 1)
+        ) &&
           <Dialog
-            title={intl.formatMessage(globalMessages.errorLabel)}
+            title={intl.formatMessage(globalMessages.processingLabel)}
             closeOnOverlayClick={false}
             classicTheme={this.props.stores.profile.isClassicTheme}
             onClose={this.cancel}
@@ -138,24 +151,28 @@ export default class SeizaFetcher extends Component<Props> {
             </>
           </Dialog>
         }
-        {delegationTx != null &&
+        {delegationTx != null && this.selectedPools.length >= 1 && showSignDialog &&
           <DelegationTxDialog
             staleTx={delegationTxStore.isStale}
             poolName={this.selectedPools[0].name}
             poolHash={this.selectedPools[0].poolHash}
-            transactionFee={getShelleyTxFee(delegationTx.IOs, false)}
-            amountToDelegate={delegationTxStore.amountToDelegate}
-            approximateReward={approximateReward(delegationTxStore.amountToDelegate)}
+            transactionFee={getShelleyTxFee(delegationTx.unsignedTx.IOs, true)}
+            amountToDelegate={delegationTx.totalAmountToDelegate}
+            approximateReward={approximateReward(delegationTx.totalAmountToDelegate)}
             isSubmitting={
               delegationTxStore.signAndBroadcastDelegationTx.isExecuting
             }
             onCancel={this.cancel}
-            onSubmit={(request) => {
-              delegationTxActions.signTransaction.trigger(request);
-            }}
+            onSubmit={delegationTxActions.signTransaction.trigger}
             classicTheme={profile.isClassicTheme}
             error={delegationTxStore.signAndBroadcastDelegationTx.error}
             selectedExplorer={stores.profile.selectedExplorer}
+          />
+        }
+        {delegationTx != null && !showSignDialog &&
+          <DelegationSuccessDialog
+            onClose={delegationTxActions.complete.trigger}
+            classicTheme={profile.isClassicTheme}
           />
         }
         <iframe ref={iframe => { this.iframe = iframe; }} title="Staking" src={`${stakingUrl}&locale=${profile.currentLocale}`} frameBorder="0" width="100%" height="100%" />

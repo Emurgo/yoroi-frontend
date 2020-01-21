@@ -10,8 +10,8 @@ type Props = {|
   +children?: ?Node,
   +title: ?Node,
   +categories?: Array<Category>,
-  +isActiveCategory?: Function,
-  +onCategoryClicked?: Function,
+  +isActiveCategory?: Category => boolean,
+  +onCategoryClicked?: string => void,
 |};
 
 @observer

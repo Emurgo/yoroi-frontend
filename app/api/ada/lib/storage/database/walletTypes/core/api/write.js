@@ -17,9 +17,11 @@ import type {
 } from '../tables';
 
 import {
-  addOrReplaceRow, addNewRowToTable,
+  addOrReplaceRow, addNewRowToTable, removeFromTableBatch,
 } from '../../../utils';
+import { GetLastSyncForPublicDeriver } from './read';
 import type { KeyDerivationRow } from '../../../primitives/tables';
+import { TransactionSchema } from '../../../primitives/tables';
 import type { AddDerivationRequest } from '../../../primitives/api/write';
 import { AddDerivation } from '../../../primitives/api/write';
 
@@ -58,6 +60,52 @@ export class ModifyLastSyncInfo {
     );
   }
 }
+
+
+export class DeleteAllTransactions {
+  static ownTables = Object.freeze({
+    [TransactionSchema.name]: TransactionSchema,
+  });
+  static depTables = Object.freeze({
+    ModifyLastSyncInfo,
+    GetLastSyncForPublicDeriver,
+  });
+
+  static async delete(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {|
+      publicDeriverId: number,
+      txIds: Array<number>,
+    |},
+  ): Promise<void> {
+    // 1) delete all transactions from the wallet
+    // note: this should cascade delete all related information
+    await removeFromTableBatch(
+      db, tx,
+      DeleteAllTransactions.ownTables[TransactionSchema.name].name,
+      DeleteAllTransactions.ownTables[TransactionSchema.name].properties.TransactionId,
+      request.txIds,
+    );
+
+    // 2) reset the last sync time
+    const lastSyncInfo = await DeleteAllTransactions.depTables.GetLastSyncForPublicDeriver.forId(
+      db, tx,
+      request.publicDeriverId
+    );
+    DeleteAllTransactions.depTables.ModifyLastSyncInfo.overrideLastSyncInfo(
+      db, tx,
+      {
+        LastSyncInfoId: lastSyncInfo.LastSyncInfoId,
+        BlockHash: null,
+        SlotNum: null,
+        Height: 0,
+        Time: null,
+      }
+    );
+  }
+}
+
 
 export type PublicDeriverRequest<Insert> = {|
   addLevelRequest: AddDerivationRequest<Insert>,

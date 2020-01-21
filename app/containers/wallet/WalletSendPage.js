@@ -21,7 +21,6 @@ import WalletSendConfirmationDialogContainer from './dialogs/WalletSendConfirmat
 import WalletSendConfirmationDialog from '../../components/wallet/send/WalletSendConfirmationDialog';
 import {
   formattedWalletAmount,
-  formattedAmountToNaturalUnits,
 } from '../../utils/formatters';
 import {
   copySignRequest,
@@ -218,7 +217,6 @@ export default class WalletSendPage extends Component<Props> {
           receivers={receivers}
           totalAmount={formattedWalletAmount(totalInput)}
           transactionFee={formattedWalletAmount(fee)}
-          amountToNaturalUnits={formattedAmountToNaturalUnits}
           currencyUnit={intl.formatMessage(globalMessages.unitAda)}
           messages={messagesLedger}
           isSubmitting={ledgerSendStore.isActionProcessing}
@@ -242,7 +240,6 @@ export default class WalletSendPage extends Component<Props> {
           receivers={receivers}
           totalAmount={formattedWalletAmount(totalInput)}
           transactionFee={formattedWalletAmount(fee)}
-          amountToNaturalUnits={formattedAmountToNaturalUnits}
           currencyUnit={intl.formatMessage(globalMessages.unitAda)}
           messages={messagesTrezor}
           isSubmitting={trezorSendStore.isActionProcessing}

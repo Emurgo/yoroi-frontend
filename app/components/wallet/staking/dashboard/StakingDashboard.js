@@ -10,7 +10,12 @@ import globalMessages from '../../../../i18n/global-messages';
 import WarningBox from '../../../widgets/WarningBox';
 import InformativeError from '../../../widgets/InformativeError';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
+import BarDecoration from '../../../widgets/BarDecoration';
+import PageSelect from '../../../widgets/PageSelect';
 import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
+import LocalizableError from '../../../../i18n/LocalizableError';
+import InvalidURIImg from '../../../../assets/images/uri/invalid-uri.inline.svg';
+import ErrorBlock from '../../../widgets/ErrorBlock';
 
 const messages = defineMessages({
   positionsLabel: {
@@ -34,19 +39,24 @@ const emptyDashboardMessages = defineMessages({
   },
   text: {
     id: 'wallet.dashboard.empty.text',
-    defaultMessage: '!!!Go to Simple or Advance Staking to choce what stake pool you want to delegate in. Note, you may delegate only to one stake pool in this Tesnnet'
+    defaultMessage: '!!!Go to Simple or Advance Staking to choose what stake pool you want to delegate in. Note, you may delegate only to one stake pool in this Tesnnet'
   }
 });
 
 type Props = {|
-  themeVars: Object,
-  totalGraphData: Array<Object>,
-  positionsGraphData: Array<Object>,
-  stakePools: null | Array<Node>,
-  epochProgress: Node,
-  userSummary: Node,
-  rewardPopup: void | Node,
-  hasAnyPending: boolean,
+  +themeVars: Object,
+  +totalGraphData: Array<Object>,
+  +positionsGraphData: Array<Object>,
+  +stakePools: {| error: LocalizableError, |} | {| pools: null | Array<Node> |},
+  +epochProgress: Node,
+  +userSummary: Node,
+  +rewardPopup: void | Node,
+  +hasAnyPending: boolean,
+  +pageInfo: void | {|
+    +currentPage: number,
+    +numPages: number,
+    +goToPage: number => void,
+  |}
 |};
 
 @observer
@@ -66,9 +76,11 @@ export default class StakingDashboard extends Component<Props> {
 
     const pendingTxWarningComponent = this.props.hasAnyPending
       ? (
-        <WarningBox>
-          {this.context.intl.formatMessage(messages.pendingTxWarning)}
-        </WarningBox>
+        <div className={styles.warningBox}>
+          <WarningBox>
+            {this.context.intl.formatMessage(messages.pendingTxWarning)}
+          </WarningBox>
+        </div>
       )
       : (null);
 
@@ -113,6 +125,17 @@ export default class StakingDashboard extends Component<Props> {
               {this.props.userSummary}
             </div>
           </div>
+          {this.props.pageInfo != null &&
+            <div className={styles.pageSelect}>
+              <BarDecoration>
+                <PageSelect
+                  currentPage={this.props.pageInfo.currentPage}
+                  numPages={this.props.pageInfo.numPages}
+                  goToPage={this.props.pageInfo.goToPage}
+                />
+              </BarDecoration>
+            </div>
+          }
           {this.displayStakePools()}
         </div>
       </div>
@@ -121,14 +144,25 @@ export default class StakingDashboard extends Component<Props> {
 
   displayStakePools: void => Node = () => {
     const { intl } = this.context;
-    if (this.props.stakePools == null) {
+    if (this.props.stakePools.error) {
+      return (
+        <div className={styles.poolError}>
+          <center><InvalidURIImg /></center>
+          <ErrorBlock
+            error={this.props.stakePools.error}
+          />
+        </div>
+      );
+    }
+    if (this.props.stakePools.pools === null || this.props.pageInfo == null) {
       return (
         <VerticallyCenteredLayout>
           <LoadingSpinner />
         </VerticallyCenteredLayout>
       );
     }
-    if (this.props.stakePools.length === 0) {
+    const currPool = this.props.pageInfo.currentPage;
+    if (this.props.stakePools.pools.length === 0) {
       return (
         <InformativeError
           title={intl.formatMessage(emptyDashboardMessages.title)}
@@ -139,7 +173,7 @@ export default class StakingDashboard extends Component<Props> {
     return (
       <div className={styles.bodyWrapper}>
         <div className={styles.stakePool}>
-          {this.props.stakePools}
+          {this.props.stakePools.pools[currPool]}
         </div>
       </div>
     );

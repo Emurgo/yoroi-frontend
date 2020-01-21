@@ -19,6 +19,9 @@ import type {
 import {
   asGetPublicKey, asHasLevels,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import {
+  ConceptualWallet
+} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import type {
   SendUsingLedgerParams
 } from '../../actions/ada/ledger-send-actions';
@@ -153,7 +156,7 @@ export default class LedgerSendStore extends Store {
     if (withPublicKey == null) {
       throw new Error('_prepareAndBroadcastSignedTx public deriver has no public key.');
     }
-    const withLevels = asHasLevels(withPublicKey);
+    const withLevels = asHasLevels<ConceptualWallet>(withPublicKey);
     if (withLevels == null) {
       throw new Error('_prepareAndBroadcastSignedTx public deriver has no levels');
     }

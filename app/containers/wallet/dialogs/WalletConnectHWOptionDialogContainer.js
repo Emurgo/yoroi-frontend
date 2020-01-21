@@ -4,10 +4,10 @@ import { observer } from 'mobx-react';
 import WalletConnectHWOptionDialog from '../../../components/wallet/add/option-dialog/WalletConnectHWOptionDialog';
 
 type Props = {|
-  +onClose: Function,
+  +onClose: void => void,
   +classicTheme: boolean,
-  +onTrezor: Function,
-  +onLedger: Function,
+  +onTrezor: void => void,
+  +onLedger: void => void,
 |};
 
 @observer

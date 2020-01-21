@@ -3,6 +3,7 @@ import './lib/test-config';
 import { schema } from 'lovefield';
 import AdaApi from './index';
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
+import { generateWalletRootKey } from './lib/cardanoCrypto/cryptoWallet';
 import { HARD_DERIVATION_START, } from '../../config/numbersConfig';
 import { TransferSource } from '../../types/TransferTypes';
 import {
@@ -61,7 +62,7 @@ test('Restore wallet for transfer', async () => {
   const recoveryPhrase = TX_TEST_MNEMONIC_1;
 
   const response  = await AdaApi.prototype.restoreWalletForTransfer({
-    recoveryPhrase,
+    rootPk: generateWalletRootKey(recoveryPhrase),
     checkAddressesInUse,
     accountIndex: HARD_DERIVATION_START + 0,
     transferSource: TransferSource.BYRON,

@@ -10,7 +10,7 @@ type Props = {|
   +word: string,
   +index: number,
   +isActive: boolean,
-  +onClick: Function,
+  +onClick: {| index: number, word: string |} => void,
   +classicTheme: boolean
 |};
 
