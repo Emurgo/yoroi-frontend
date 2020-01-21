@@ -515,6 +515,9 @@ const YoroiModern = {
   '--theme-mywallets-tooltip-background-color': 'rgba(56, 57, 61, 0.7)',
   '--theme-mywallets-tooltip-text-color': '#FFFFFF',
   '--theme-mywallets-add-button-background-color': '#17D1AA',
+  '--theme-mywallets-sync-time-text-color': '#38393D',
+  '--theme-mywallets-sync-time-label-color': '#6B7384',
+
 
   // Page
 

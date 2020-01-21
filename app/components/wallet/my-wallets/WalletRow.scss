@@ -5,6 +5,7 @@
     box-shadow: var(--theme-mywallets-row-box-shadow);
     background-color: var(--theme-mywallets-row-background-color);
     border-radius: 8px;
+    
     & + & {
         margin-top: 24px;
     }
@@ -12,32 +13,36 @@
 
 .content {
     display: flex;
-    padding: 16px 0 16px 24px;
 }
 
 .section {
     display: flex;
     align-items: center;
-    border-right: 1px solid var(--theme-mywallets-separator-color);
+    border-left: 1px solid var(--theme-mywallets-separator-color);
+    padding: 31px 24px;
 }
 
 .nameSection {
-    @extend .section;
-    padding-top: 13px;
-    padding-bottom: 13px;
-    padding-left: 24px;
-    padding-right: 70px;
-    min-width: 320px;
+    min-width: 300px;
+    padding: 31px 24px;
+
+    &:hover {
+        cursor: pointer;
+    }
 }
 
 .detailsSection {
     @extend .section;
-    padding-left: 24px;
-    padding-right: 74px;
-    min-width: 250px;
+    min-width: 560px;
+}
+
+.syncSection {
+    @extend .section;
+    min-width: 114px;
 }
 
 .currencySection {
+    @extend .section;
     display: flex;
     align-items: center;
     flex: 1;
@@ -58,6 +63,7 @@
 }
 
 .toggle {
+    @extend .section;
     padding: 24px;
     &:hover {
         cursor: pointer;

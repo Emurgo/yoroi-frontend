@@ -14,6 +14,9 @@ type Props = {|
     +walletSumCurrencies:  Node,
     +walletSubRow:  Node,
     +walletPlate:  Node,
+    +walletSync:  Node,
+    +onRowClicked: string => void,
+    +isExpandable: boolean,
 |};
 
 type State = {
@@ -40,6 +43,9 @@ export default class WalletRow extends Component<Props, State> {
       walletSumCurrencies,
       walletSubRow,
       walletPlate,
+      walletSync,
+      onRowClicked,
+      isExpandable,
     } = this.props;
 
     return (
@@ -47,15 +53,23 @@ export default class WalletRow extends Component<Props, State> {
         className={classnames([styles.wrapper, isExpanded && styles.wrapperExpanded])}
       >
         <div className={styles.content}>
-          <div className={styles.nameSection}>
+          <button
+            className={styles.nameSection}
+            onClick={() => onRowClicked('transactions')}
+            type="button"
+          >
             {walletPlate}
-          </div>
+          </button>
           <div className={styles.detailsSection}>
             {walletSumDetails}
+          </div>
+          <div className={styles.syncSection}>
+            {walletSync}
           </div>
           <div className={styles.currencySection}>
             {walletSumCurrencies}
           </div>
+          {/*
           <div className={styles.addSection}>
             <button
               type="button"
@@ -64,15 +78,18 @@ export default class WalletRow extends Component<Props, State> {
               <PlusIcon />
             </button>
           </div>
-          <button
-            type="button"
-            className={classnames([styles.toggle, isExpanded && styles.toggleExpanded])}
-            onClick={this.toggleExpansion.bind(this)}
-          >
-            <ToggleIcon />
-          </button>
+          */}
+          {isExpandable && (
+            <button
+              type="button"
+              className={classnames([styles.toggle, isExpanded && styles.toggleExpanded])}
+              onClick={this.toggleExpansion.bind(this)}
+            >
+              <ToggleIcon />
+            </button>
+          )}
         </div>
-        {isExpanded && (<div className={styles.contentBody}>{walletSubRow}</div>)}
+        {isExpandable && isExpanded && (<div className={styles.contentBody}>{walletSubRow}</div>)}
       </div>
     );
   }

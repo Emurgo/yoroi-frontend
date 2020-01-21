@@ -8,7 +8,6 @@ import { formattedWalletAmount } from '../../utils/formatters';
 
 import MyWallets from '../../components/wallet/my-wallets/MyWallets';
 import MainLayout from '../MainLayout';
-import TopBarContainer from '../TopBarContainer';
 
 import WalletsList from '../../components/wallet/my-wallets/WalletsList';
 import WalletRow from '../../components/wallet/my-wallets/WalletRow';
@@ -17,23 +16,40 @@ import WalletAddress from '../../components/wallet/my-wallets/WalletAddress';
 import WalletCurrency from '../../components/wallet/my-wallets/WalletCurrency';
 import WalletSubRow from '../../components/wallet/my-wallets/WalletSubRow';
 import NavPlate from '../../components/topbar/NavPlate';
+import SidebarContainer from '../SidebarContainer';
+import { ROUTES } from '../../routes-config';
+import NavBar from '../../components/topbar/NavBar';
+import NavBarTitle from '../../components/topbar/NavBarTitle';
+import WalletSync from '../../components/wallet/my-wallets/WalletSync';
 
 const messages = defineMessages({
   title: {
     id: 'myWallets.general.title',
     defaultMessage: '!!!My wallets',
   },
-  lastSyncMessage: {
-    id: 'myWallets.wallets.lastSyncText',
-    defaultMessage: '!!!Last sync: {hours} ago',
-  },
   hoursSingular: {
     id: 'myWallets.wallets.hoursSingular',
-    defaultMessage: '!!!hour',
+    defaultMessage: '!!!{time} hour ago',
   },
   hoursPlural: {
     id: 'myWallets.wallets.hoursPlural',
-    defaultMessage: '!!!hours',
+    defaultMessage: '!!!{time} hours ago',
+  },
+  daysSingular: {
+    id: 'myWallets.wallets.daysSingular',
+    defaultMessage: '!!!{time} day ago',
+  },
+  daysPlural: {
+    id: 'myWallets.wallets.daysPlural',
+    defaultMessage: '!!!{time} days ago',
+  },
+  minutesSingular: {
+    id: 'myWallets.wallets.minutesSingular',
+    defaultMessage: '!!!{time} minute ago',
+  },
+  minutesPlural: {
+    id: 'myWallets.wallets.minutesPlural',
+    defaultMessage: '!!!{time} minutes ago',
   },
   addressSingular: {
     id: 'myWallets.wallets.addressSingular',
@@ -58,25 +74,30 @@ export default class MyWalletsPage extends Component<Props> {
     this.props.actions.profile.updateHideBalance.trigger();
   }
 
+  handleWalletNavItemClick = (page: string): void => {
+    const { wallets } = this.props.stores.substores.ada;
+    const selected = wallets.selected;
+    if (selected == null) return;
+    this.props.actions.router.goToRoute.trigger({
+      route: ROUTES.WALLETS.PAGE,
+      params: { id: selected.self.getPublicDeriverId(), page },
+    });
+  };
+
   render() {
     const { intl } = this.context;
     const { wallets } = this.props.stores.substores.ada;
     const { actions, stores } = this.props;
     const { profile } = stores;
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
-    const topbarContainer = (<TopBarContainer actions={actions} stores={stores} />);
-
-    const lastSyncHours = 3;
+    const sidebarContainer = (<SidebarContainer actions={actions} stores={stores} />);
+    const navbarTitle = (
+      <NavBarTitle title={this.context.intl.formatMessage(messages.title)} />
+    );
+    const navbarElement = (<NavBar title={navbarTitle} />);
 
     const walletSumDetails = (
       <WalletDetails
-        text={
-          intl.formatMessage(messages.lastSyncMessage, {
-            hours: `${lastSyncHours} ${
-              intl.formatMessage(lastSyncHours > 1 ?
-                messages.hoursPlural : messages.hoursSingular)}`
-          })
-        }
         publicDeriver={wallets.selected}
         formattedWalletAmount={formattedWalletAmount}
         // TODO: This should be probably bound to an individual wallet
@@ -176,14 +197,20 @@ export default class MyWalletsPage extends Component<Props> {
           staticWallets.map((wallet) => {
             return (
               <WalletRow
+                onRowClicked={this.handleWalletNavItemClick}
                 walletSumDetails={walletSumDetails}
                 walletSumCurrencies={walletSumCurrencies}
                 walletSubRow={walletSubRow}
-                walletPlate={<NavPlate
-                  publicDeriver={wallets.selected}
-                  walletName={wallets.selected.conceptualWalletName}
-                  walletType={wallet.walletType}
-                />}
+                walletPlate={
+                  <NavPlate
+                    publicDeriver={wallets.selected}
+                    walletName={wallets.selected.conceptualWalletName}
+                    walletType={wallet.walletType}
+                  />
+                }
+                walletSync={
+                  <WalletSync time={intl.formatMessage(messages.hoursPlural, { time: 3 })} />
+                }
               />
             );
           })
@@ -193,7 +220,8 @@ export default class MyWalletsPage extends Component<Props> {
 
     return (
       <MainLayout
-        topbar={topbarContainer}
+        sidebar={sidebarContainer}
+        navbar={navbarElement}
         actions={actions}
         stores={stores}
         connectionErrorType={checkAdaServerStatus}

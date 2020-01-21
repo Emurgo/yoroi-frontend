@@ -60,10 +60,9 @@ export default class NavBarContainer extends Component<Props> {
       ? this.getWalletAmount(publicDeriver.amount)
       : null;
 
-    // TODO: Replace route with ROUTES.WALLETS.ROOT after merging MyWallets screen
     const title = (
       <NavBarBack
-        route={ROUTES.SETTINGS.ROOT}
+        route={ROUTES.MY_WALLETS}
         onBackClick={this.navigateToWallets}
         title={intl.formatMessage(messages.backButton)}
       />

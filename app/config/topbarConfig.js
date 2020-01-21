@@ -24,7 +24,7 @@ export type Category = {|
 export const WALLETS: Category = {
   name: 'WALLETS',
   className: 'wallets',
-  route: ROUTES.WALLETS.ROOT,
+  route: ROUTES.MY_WALLETS,
   icon: walletsIcon,
   iconStyle: styles.walletsIcon,
   label: globalMessages.sidebarWallets

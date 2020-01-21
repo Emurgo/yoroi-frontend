@@ -9,7 +9,6 @@ import IconEyeOpen from '../../../assets/images/my-wallets/icon_eye_open.inline.
 import IconEyeClosed from '../../../assets/images/my-wallets/icon_eye_closed.inline.svg';
 
 type Props = {|
-    +text: string,
     +formattedWalletAmount?: BigNumber => string,
     +publicDeriver: null | PublicDeriverWithCachedMeta,
     +onUpdateHideBalance: void => void,
@@ -34,7 +33,6 @@ export default class WalletDetails extends Component<Props> {
 
   render() {
     const {
-      text,
       formattedWalletAmount,
       publicDeriver,
       shouldHideBalance,
@@ -72,7 +70,6 @@ export default class WalletDetails extends Component<Props> {
             {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
           </button>
         </div>
-        <h2 className={styles.text}>{text}</h2>
       </div>
     );
   }
