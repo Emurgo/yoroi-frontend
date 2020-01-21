@@ -11,6 +11,7 @@
 
 .page {
   height: calc(100% - var(--theme-wallet-navigation-tab-height));
+  min-height: 200px;
   overflow: auto;
 }
 
