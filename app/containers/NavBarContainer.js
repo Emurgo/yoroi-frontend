@@ -1,11 +1,11 @@
 // @flow
+import moment from 'moment';
 import React, { Component } from 'react';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import type { InjectedProps } from '../types/injectedPropsType';
 import environment from '../environment';
 import { intlShape, defineMessages } from 'react-intl';
-import { formattedWalletAmount } from '../utils/formatters';
 import NavBar from '../components/topbar/NavBar';
 import NavPlate from '../components/topbar/NavPlate';
 import NavWalletDetails from '../components/topbar/NavWalletDetails';
@@ -18,6 +18,10 @@ const messages = defineMessages({
   backButton: {
     id: 'wallet.nav.backButton',
     defaultMessage: '!!!Back to my wallets',
+  },
+  allWalletsLabel: {
+    id: 'wallet.nav.allWalletsLabel',
+    defaultMessage: '!!!All wallets',
   },
 });
 
@@ -39,15 +43,6 @@ export default class NavBarContainer extends Component<Props> {
     this.props.actions.router.goToRoute.trigger({ route: destination });
   }
 
-  getWalletAmount: (null | BigNumber) => null | string = (amount) => {
-    const { profile } = this.props.stores;
-
-    if (amount == null) return null;
-    return profile.shouldHideBalance
-      ? '******'
-      : formattedWalletAmount(amount);
-  }
-
   render() {
     const { intl } = this.context;
     const { stores } = this.props;
@@ -56,9 +51,7 @@ export default class NavBarContainer extends Component<Props> {
     const walletsStore = stores.substores[environment.API].wallets;
     const publicDeriver = walletsStore.selected;
     const walletName = publicDeriver ? publicDeriver.conceptualWalletName : '';
-    const walletAmount = publicDeriver
-      ? this.getWalletAmount(publicDeriver.amount)
-      : null;
+    const walletAmount = new BigNumber(0);
 
     // TODO: Replace route with ROUTES.WALLETS.ROOT after merging MyWallets screen
     const title = (
@@ -73,58 +66,63 @@ export default class NavBarContainer extends Component<Props> {
       <NavPlate
         publicDeriver={walletsStore.selected}
         walletName={walletName}
-        walletType="conceptual"
+        walletType="standard"
       />
     );
 
+    const wallets = this.props.stores.substores.ada.wallets.publicDerivers;
+
+    let utxoTotal = new BigNumber(0);
+    for (const walletUtxoAmount of wallets.map(wallet => wallet.amount)) {
+      if (walletUtxoAmount == null) {
+        utxoTotal = null;
+        break;
+      }
+      utxoTotal = utxoTotal.plus(walletUtxoAmount);
+    }
     const dropdownHead = (
       <NavWalletDetails
         onUpdateHideBalance={this.updateHideBalance}
         shouldHideBalance={profile.shouldHideBalance}
-        rewards="2,565.000000"
-        walletAmount={walletAmount}
+        rewards={new BigNumber(5)}
+        walletAmount={utxoTotal}
       />
     );
 
+    const walletComponents = wallets.map(wallet => (
+      <NavDropdownRow
+        key={wallet.self.getPublicDeriverId()}
+        plateComponent={plateComponent}
+        isCurrentWallet={wallet === this.props.stores.substores.ada.wallets.selected}
+        syncTime={wallet.lastSyncInfo.Time
+          ? moment(wallet.lastSyncInfo.Time).fromNow()
+          : null
+        }
+        detailComponent={
+          <NavWalletDetails
+            walletAmount={walletAmount}
+            onUpdateHideBalance={this.updateHideBalance}
+            shouldHideBalance={profile.shouldHideBalance}
+            rewards={new BigNumber('565.000000') /* TODO */}
+          />
+        }
+      />
+    ));
     const dropdownContent = (
       <>
         <NavDropdownRow
-          title="All wallets"
+          title={intl.formatMessage(messages.allWalletsLabel)}
           detailComponent={
             <NavWalletDetails
-              onUpdateHideBalance={this.updateHideBalance}
-              shouldHideBalance={profile.shouldHideBalance}
-              walletAmount={walletAmount}
               highlightTitle
-              rewards="565.000000"
-            />
-          }
-        />
-        <NavDropdownRow
-          plateComponent={plateComponent}
-          isCurrentWallet
-          syncTime="5 min ago"
-          detailComponent={
-            <NavWalletDetails
-              walletAmount={walletAmount}
               onUpdateHideBalance={this.updateHideBalance}
               shouldHideBalance={profile.shouldHideBalance}
-              rewards="1,472.000000"
+              rewards={new BigNumber(5)}
+              walletAmount={utxoTotal}
             />
           }
         />
-        <NavDropdownRow
-          plateComponent={plateComponent}
-          syncTime="2 hours ago"
-          detailComponent={
-            <NavWalletDetails
-              walletAmount={walletAmount}
-              onUpdateHideBalance={this.updateHideBalance}
-              shouldHideBalance={profile.shouldHideBalance}
-              rewards="3,211.999811"
-            />
-          }
-        />
+        {walletComponents}
       </>
     );
 
@@ -142,7 +140,7 @@ export default class NavBarContainer extends Component<Props> {
           <NavPlate
             publicDeriver={walletsStore.selected}
             walletName={walletName}
-            walletType="paper"
+            walletType="standard"
           />
         }
         walletDetails={dropdownComponent}
