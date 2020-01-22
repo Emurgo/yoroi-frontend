@@ -1,13 +1,21 @@
+@import '../../../themes/mixins/loading-spinner';
+
 .wrapper {
     flex: 1;
     display: flex;
-    flex-direction: column;
+}
+
+.isLoading {
+    position: relative;
+    display: inline-block;
+    margin-left: 15px;
+    margin-bottom: 4px;
 }
 
 .content {
+    flex: 1;
     display: flex;
     align-items: center;
-    justify-content: space-between;
 }
 
 .toggleButton {
@@ -17,16 +25,44 @@
     }
 }
 
-.amount {
-    font-family: var(--font-medium);
-    font-size: 16px;
-    line-height: 20px;
-    color: var(--theme-mywallets-main-text-color);
-}
-
 .afterDecimal {
     color: var(--theme-mywallets-ada-amount-decimal-color);
+    font-size: 10px;
+}
+
+.amount {
+    font-family: var(--font-regular);
     font-size: 12px;
+    line-height: 22px;
+    color: var(--theme-mywallets-main-text-color);
+
+    .isLoading {
+        margin-left: 9px;
+        margin-bottom: 8px;
+        @include loading-spinner("../../../assets/images/spinner-dark.svg", 14);
+    }
+
+    & + & {
+        margin-left: 24px;
+    }
+}
+
+.amountBold {
+    font-family: var(--font-medium);
+    font-size: 16px;
+    line-height: 22px;
+
+    .afterDecimal {
+        font-size: 12px;
+    }
+}
+
+.amountLabel {
+    font-family: var(--font-regular);
+    display: block;
+    font-size: 12px;
+    line-height: 20px;
+    color: var(--theme-mywallets-secondary-text-color);
 }
 
 .text {

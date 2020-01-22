@@ -33,7 +33,8 @@
 
 .detailsSection {
     @extend .section;
-    min-width: 560px;
+    width: 100%;
+    max-width: 560px;
 }
 
 .syncSection {
@@ -45,6 +46,7 @@
     @extend .section;
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     flex: 1;
     padding-left: 24px;
     padding-right: 24px;

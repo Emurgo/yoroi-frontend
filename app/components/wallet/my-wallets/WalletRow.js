@@ -12,7 +12,7 @@ import PlusIcon from '../../../assets/images/my-wallets/icon_plus.inline.svg';
 type Props = {|
     +walletSumDetails: Node,
     +walletSumCurrencies:  Node,
-    +walletSubRow:  Node,
+    +walletSubRow?:  ?Node,
     +walletPlate:  Node,
     +walletSync:  Node,
     +onRowClicked: string => void,
@@ -26,6 +26,10 @@ type State = {
 
 @observer
 export default class WalletRow extends Component<Props, State> {
+
+  static defaultProps = {
+    walletSubRow: null,
+  }
 
   state = {
     isExpanded: false,

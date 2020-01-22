@@ -4,7 +4,6 @@ import { observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
 import environment from '../../environment';
 import type { InjectedProps } from '../../types/injectedPropsType';
-import { formattedWalletAmount } from '../../utils/formatters';
 
 import MyWallets from '../../components/wallet/my-wallets/MyWallets';
 import MainLayout from '../MainLayout';
@@ -21,35 +20,13 @@ import { ROUTES } from '../../routes-config';
 import NavBar from '../../components/topbar/NavBar';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import WalletSync from '../../components/wallet/my-wallets/WalletSync';
+import BigNumber from 'bignumber.js';
+import moment from 'moment';
 
 const messages = defineMessages({
   title: {
     id: 'myWallets.general.title',
     defaultMessage: '!!!My wallets',
-  },
-  hoursSingular: {
-    id: 'myWallets.wallets.hoursSingular',
-    defaultMessage: '!!!{time} hour ago',
-  },
-  hoursPlural: {
-    id: 'myWallets.wallets.hoursPlural',
-    defaultMessage: '!!!{time} hours ago',
-  },
-  daysSingular: {
-    id: 'myWallets.wallets.daysSingular',
-    defaultMessage: '!!!{time} day ago',
-  },
-  daysPlural: {
-    id: 'myWallets.wallets.daysPlural',
-    defaultMessage: '!!!{time} days ago',
-  },
-  minutesSingular: {
-    id: 'myWallets.wallets.minutesSingular',
-    defaultMessage: '!!!{time} minute ago',
-  },
-  minutesPlural: {
-    id: 'myWallets.wallets.minutesPlural',
-    defaultMessage: '!!!{time} minutes ago',
   },
   addressSingular: {
     id: 'myWallets.wallets.addressSingular',
@@ -86,20 +63,38 @@ export default class MyWalletsPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { wallets } = this.props.stores.substores.ada;
     const { actions, stores } = this.props;
     const { profile } = stores;
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
     const sidebarContainer = (<SidebarContainer actions={actions} stores={stores} />);
+
     const navbarTitle = (
       <NavBarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
+
     const navbarElement = (<NavBar title={navbarTitle} />);
+
+    const walletsStore = stores.substores[environment.API].wallets;
+    const publicDeriver = walletsStore.selected;
+    const walletName = publicDeriver ? publicDeriver.conceptualWalletName : '';
+
+    const walletAmount = new BigNumber(12);
+
+    const wallets = this.props.stores.substores.ada.wallets.publicDerivers;
+
+    let utxoTotal = new BigNumber(0);
+    for (const walletUtxoAmount of wallets.map(wallet => wallet.amount)) {
+      if (walletUtxoAmount == null) {
+        utxoTotal = null;
+        break;
+      }
+      utxoTotal = utxoTotal.plus(walletUtxoAmount);
+    }
 
     const walletSumDetails = (
       <WalletDetails
-        publicDeriver={wallets.selected}
-        formattedWalletAmount={formattedWalletAmount}
+        walletAmount={walletAmount}
+        rewards={new BigNumber('565.000000') /* TODO */}
         // TODO: This should be probably bound to an individual wallet
         onUpdateHideBalance={this.updateHideBalance}
         shouldHideBalance={profile.shouldHideBalance}
@@ -120,8 +115,6 @@ export default class MyWalletsPage extends Component<Props> {
             intl.formatMessage(addressesLength > 1 ?
               messages.addressPlural : messages.addressSingular)}`
         }
-        publicDeriver={wallets.selected}
-        formattedWalletAmount={formattedWalletAmount}
         // TODO: This should be probably bound to an individual wallet
         onUpdateHideBalance={this.updateHideBalance}
         shouldHideBalance={profile.shouldHideBalance}
@@ -130,7 +123,7 @@ export default class MyWalletsPage extends Component<Props> {
 
     const walletAddressesComp = (
       <>
-        {walletAddresses.map((address) => <WalletAddress hash={address} />)}
+        {walletAddresses.map((address) => <WalletAddress key={address} hash={address} />)}
       </>
     );
 
@@ -168,21 +161,9 @@ export default class MyWalletsPage extends Component<Props> {
       </>
     );
 
-    const staticWallets = [
-      {
-        walletType: 'conceptual',
-      },
-      {
-        walletType: 'paper',
-      },
-      {
-        walletType: 'trezor',
-      },
-    ];
-
     const walletSubRow = (
       <WalletSubRow
-        publicDeriver={wallets.selected}
+        publicDeriver={walletsStore.selected}
         walletDetails={walletDetails}
         walletNumber={1}
         walletAddresses={walletAddressesComp}
@@ -190,26 +171,32 @@ export default class MyWalletsPage extends Component<Props> {
       />
     );
 
-    // TODO: Map this for all available wallets, not staticWallets
     const walletsList = (
       <WalletsList>
         {
-          staticWallets.map((wallet) => {
+          wallets.map((wallet) => {
             return (
               <WalletRow
+                key={wallet.self.getPublicDeriverId()}
                 onRowClicked={this.handleWalletNavItemClick}
                 walletSumDetails={walletSumDetails}
                 walletSumCurrencies={walletSumCurrencies}
                 walletSubRow={walletSubRow}
                 walletPlate={
                   <NavPlate
-                    publicDeriver={wallets.selected}
-                    walletName={wallets.selected.conceptualWalletName}
-                    walletType={wallet.walletType}
+                    publicDeriver={walletsStore.selected}
+                    walletName={walletName}
+                    walletType="conceptual"
                   />
                 }
                 walletSync={
-                  <WalletSync time={intl.formatMessage(messages.hoursPlural, { time: 3 })} />
+                  <WalletSync
+                    time={
+                      wallet.lastSyncInfo.Time
+                        ? moment(wallet.lastSyncInfo.Time).fromNow()
+                        : null
+                    }
+                  />
                 }
               />
             );
