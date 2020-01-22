@@ -62,14 +62,6 @@ export default class NavBarContainer extends Component<Props> {
       />
     );
 
-    const plateComponent = (
-      <NavPlate
-        publicDeriver={walletsStore.selected}
-        walletName={walletName}
-        walletType="standard"
-      />
-    );
-
     const wallets = this.props.stores.substores.ada.wallets.publicDerivers;
 
     let utxoTotal = new BigNumber(0);
@@ -92,7 +84,11 @@ export default class NavBarContainer extends Component<Props> {
     const walletComponents = wallets.map(wallet => (
       <NavDropdownRow
         key={wallet.self.getPublicDeriverId()}
-        plateComponent={plateComponent}
+        plateComponent={<NavPlate
+          publicDeriver={wallet}
+          walletName={wallet.conceptualWalletName}
+          walletType="standard"
+        />}
         isCurrentWallet={wallet === this.props.stores.substores.ada.wallets.selected}
         syncTime={wallet.lastSyncInfo.Time
           ? moment(wallet.lastSyncInfo.Time).fromNow()
