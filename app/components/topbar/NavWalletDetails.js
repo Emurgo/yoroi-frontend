@@ -1,8 +1,11 @@
 // @flow
 import React, { Component } from 'react';
+import BigNumber from 'bignumber.js';
+import type { Node } from 'react';
 import classnames from 'classnames';
 import { intlShape, defineMessages } from 'react-intl';
 import { DECIMAL_PLACES_IN_ADA } from '../../config/numbersConfig';
+import { formattedWalletAmount } from '../../utils/formatters';
 
 import styles from './NavWalletDetails.scss';
 import IconEyeOpen from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
@@ -12,21 +15,20 @@ type Props = {|
     +onUpdateHideBalance: void => void,
     +shouldHideBalance: boolean,
     +highlightTitle?: boolean,
-    +rewards: string,
-    +walletAmount: null | string,
+    +rewards: null | BigNumber,
+    +walletAmount: null | BigNumber,
+    +infoText?: string,
+    +showDetails?: boolean,
 |};
 
-type SplitDecimalProps = ([string | null, string | null]);
+type SplitDecimalProps = [string, string];
 
 function splitAmount(
-  value: string | null,
+  value: string,
   index: number,
 ): SplitDecimalProps {
-  if (value !== null && value !== undefined) {
-    const startIndex = value.length - index;
-    return [value.substring(0, startIndex), value.substring(startIndex)];
-  }
-  return [null, null];
+  const startIndex = value.length - index;
+  return [value.substring(0, startIndex), value.substring(startIndex)];
 }
 
 const messages = defineMessages({
@@ -44,6 +46,8 @@ export default class NavWalletDetails extends Component<Props> {
 
   static defaultProps = {
     highlightTitle: false,
+    infoText: null,
+    showDetails: true,
   };
 
   static contextTypes = {
@@ -51,73 +55,95 @@ export default class NavWalletDetails extends Component<Props> {
   };
 
   render() {
-
     const {
       shouldHideBalance,
       onUpdateHideBalance,
       highlightTitle,
       rewards,
       walletAmount,
+      infoText,
+      showDetails
     } = this.props;
 
     const { intl } = this.context;
 
-    const [beforeDecimalWallet, afterDecimalWallet]: SplitDecimalProps =
-      splitAmount(walletAmount, DECIMAL_PLACES_IN_ADA);
-
-    const [beforeDecimalRewards, afterDecimalRewards]: SplitDecimalProps =
-    splitAmount(rewards, DECIMAL_PLACES_IN_ADA);
-
-    const currency = ' ADA';
-
-    const walletAmountSection = (
-      shouldHideBalance ?
-        <span>{walletAmount}</span> :
-        <>
-          {beforeDecimalWallet}
-          <span className={styles.afterDecimal}>{afterDecimalWallet}</span>
-        </>
+    return (
+      <div className={styles.wrapper}>
+        <div className={styles.outerWrapper}>
+          <div className={styles.content}>
+            <div
+              className={classnames([
+                styles.amount,
+                highlightTitle !== null && highlightTitle === true && styles.highlightAmount
+              ])}
+            >
+              {this.renderAmountDisplay({
+                shouldHideBalance,
+                amount: walletAmount != null && rewards != null
+                  ? walletAmount.plus(rewards)
+                  : null
+              })}
+            </div>
+            {
+              showDetails !== null && showDetails === true &&
+              (
+                <div className={styles.details}>
+                  <div>
+                    <p className={styles.label}>{intl.formatMessage(messages.walletLabel)}&nbsp;</p>
+                    {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
+                  </div>
+                  <div>
+                    <p className={styles.label}>{intl.formatMessage(messages.rewardsLabel)}&nbsp;</p>
+                    {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
+                  </div>
+                </div>
+              )
+            }
+          </div>
+          <button
+            type="button"
+            className={styles.toggleButton}
+            onClick={onUpdateHideBalance}
+          >
+            {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
+        </button>
+        </div>
+        {infoText !== null && (
+          <div className={styles.info}>
+            {infoText}
+          </div>
+        )}
+      </div>
     );
+  }
 
-    const rewardsAmountSection = (
-      shouldHideBalance ?
-        <span>{walletAmount}</span> :
+  renderAmountDisplay: {|
+    shouldHideBalance: boolean,
+    amount: BigNumber | null
+  |} => Node = (request) => {
+    if (request.amount == null) {
+      return <div className={styles.isLoading} />;
+    }
+
+    let balanceDisplay;
+    if (request.shouldHideBalance) {
+      balanceDisplay = (<span>******</span>);
+    } else {
+      const [beforeDecimalRewards, afterDecimalRewards]: SplitDecimalProps = splitAmount(
+        formattedWalletAmount(request.amount),
+        DECIMAL_PLACES_IN_ADA
+      );
+
+      balanceDisplay = (
         <>
           {beforeDecimalRewards}
           <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
         </>
-    );
+      );
+    }
 
-    return (
-      <div className={styles.wrapper}>
-        <div className={styles.content}>
-          <div
-            className={classnames([
-              styles.amount,
-              highlightTitle !== null && highlightTitle === true && styles.highlightAmount
-            ])}
-          >
-            {walletAmountSection} {currency}
-          </div>
-          <div className={styles.details}>
-            <div>
-              <p className={styles.label}>{intl.formatMessage(messages.walletLabel)}&nbsp;</p>
-              {walletAmountSection} {currency}
-            </div>
-            <div>
-              <p className={styles.label}>{intl.formatMessage(messages.rewardsLabel)}&nbsp;</p>
-              {rewardsAmountSection} {currency}
-            </div>
-          </div>
-        </div>
-        <button
-          type="button"
-          className={styles.toggleButton}
-          onClick={onUpdateHideBalance}
-        >
-          {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
-        </button>
-      </div>
-    );
+    const currency = ' ADA'; // TODO: get from variable
+
+    return (<>{balanceDisplay} {currency}</>);
   }
 }

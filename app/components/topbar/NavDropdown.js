@@ -5,6 +5,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import styles from './NavDropdown.scss';
 import CaretIcon from '../../assets/images/wallet-nav/caret-down.inline.svg';
+import NavBarAddButton from './NavBarAddButton';
 
 type Props = {|
   +headerComponent?: ?Node,
@@ -59,12 +60,8 @@ export default class NavDropdown extends Component<Props, State> {
           <div className={styles.content}>
             {contentComponents}
             <div className={styles.buttonWrapper}>
-              <button
-                type="button"
-                className={styles.button}
-              >
-                Add new wallet
-              </button>
+              {/* TODO: Add action onClick */}
+              <NavBarAddButton />
             </div>
           </div>
         )}

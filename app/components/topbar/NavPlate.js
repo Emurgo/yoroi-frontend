@@ -10,9 +10,9 @@ import PaperIcon from '../../assets/images/wallet-nav/paper-wallet.inline.svg';
 import TrezorIcon from '../../assets/images/wallet-nav/trezor-wallet.inline.svg';
 
 const messages = defineMessages({
-  conceptualWallet: {
-    id: 'wallet.nav.type.conceptual',
-    defaultMessage: '!!!Conceptual wallet',
+  standardWallet: {
+    id: 'wallet.nav.type.standard',
+    defaultMessage: '!!!Standard wallet',
   },
   paperWallet: {
     id: 'wallet.nav.type.paper',
@@ -27,7 +27,7 @@ const messages = defineMessages({
 type Props = {|
   +walletName: string,
   +publicDeriver: null | PublicDeriverWithCachedMeta,
-  +walletType: 'conceptual' | 'paper' | 'trezor',
+  +walletType: 'standard' | 'paper' | 'trezor',
 |};
 
 function constructPlate(
@@ -64,8 +64,8 @@ export default class NavPlate extends Component<Props> {
     let TypeIcon;
 
     switch (walletType) {
-      case 'conceptual':
-        typeText = messages.conceptualWallet;
+      case 'standard':
+        typeText = messages.standardWallet;
         TypeIcon = ConceptualIcon;
         break;
       case 'paper':

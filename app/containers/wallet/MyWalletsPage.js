@@ -22,6 +22,8 @@ import NavBarTitle from '../../components/topbar/NavBarTitle';
 import WalletSync from '../../components/wallet/my-wallets/WalletSync';
 import BigNumber from 'bignumber.js';
 import moment from 'moment';
+import NavBarAddButton from '../../components/topbar/NavBarAddButton';
+import NavWalletDetails from '../../components/topbar/NavWalletDetails';
 
 const messages = defineMessages({
   title: {
@@ -36,6 +38,10 @@ const messages = defineMessages({
     id: 'myWallets.wallets.addressPlural',
     defaultMessage: '!!!addresses',
   },
+  walletSumInfo: {
+    id: 'myWallets.wallets.sumInfoText',
+    defaultMessage: '!!!All wallets total balance considering rewards',
+  }
 });
 
 type Props = InjectedProps
@@ -68,12 +74,6 @@ export default class MyWalletsPage extends Component<Props> {
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
     const sidebarContainer = (<SidebarContainer actions={actions} stores={stores} />);
 
-    const navbarTitle = (
-      <NavBarTitle title={this.context.intl.formatMessage(messages.title)} />
-    );
-
-    const navbarElement = (<NavBar title={navbarTitle} />);
-
     const walletsStore = stores.substores[environment.API].wallets;
     const publicDeriver = walletsStore.selected;
     const walletName = publicDeriver ? publicDeriver.conceptualWalletName : '';
@@ -90,6 +90,30 @@ export default class MyWalletsPage extends Component<Props> {
       }
       utxoTotal = utxoTotal.plus(walletUtxoAmount);
     }
+
+
+    const navbarTitle = (
+      <NavBarTitle title={this.context.intl.formatMessage(messages.title)} />
+    );
+
+    const navbarElement = (
+      <NavBar
+        title={navbarTitle}
+        // TODO: Add action onClick
+        walletPlate={<NavBarAddButton />}
+        walletDetails={
+          <NavWalletDetails
+            showDetails={false}
+            highlightTitle
+            onUpdateHideBalance={this.updateHideBalance}
+            shouldHideBalance={profile.shouldHideBalance}
+            rewards={new BigNumber('565.000000') /* TODO */}
+            walletAmount={utxoTotal}
+            infoText={intl.formatMessage(messages.walletSumInfo)}
+          />
+        }
+      />
+    );
 
     const walletSumDetails = (
       <WalletDetails
@@ -186,7 +210,7 @@ export default class MyWalletsPage extends Component<Props> {
                   <NavPlate
                     publicDeriver={walletsStore.selected}
                     walletName={walletName}
-                    walletType="conceptual"
+                    walletType="standard"
                   />
                 }
                 walletSync={
