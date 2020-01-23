@@ -397,6 +397,7 @@
   "wallet.nav.lastSync": "Last sync:",
   "wallet.nav.sumLabel.rewards": "Rewards",
   "wallet.nav.sumLabel.wallet": "Wallet",
+  "wallet.nav.type.ledger": "Ledger wallet",
   "wallet.nav.type.paper": "Paper wallet",
   "wallet.nav.type.standard": "Standard wallet",
   "wallet.nav.type.trezor": "Trezor wallet",

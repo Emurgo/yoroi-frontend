@@ -37,7 +37,7 @@ export default class Settings extends Component<InjectedContainerProps> {
 
   render() {
     const { actions, stores, children } = this.props;
-    const { profile, topbar } = stores;
+    const { profile } = stores;
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
     const sidebarContainer = (<SidebarContainer actions={actions} stores={stores} />);
 

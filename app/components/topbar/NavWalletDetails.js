@@ -15,7 +15,7 @@ type Props = {|
     +onUpdateHideBalance: void => void,
     +shouldHideBalance: boolean,
     +highlightTitle?: boolean,
-    +rewards: null | BigNumber,
+    +rewards: ?BigNumber,
     +walletAmount: null | BigNumber,
 |};
 
@@ -101,7 +101,7 @@ export default class NavWalletDetails extends Component<Props> {
 
   renderAmountDisplay: {|
     shouldHideBalance: boolean,
-    amount: BigNumber | null
+    amount: ?BigNumber
   |} => Node = (request) => {
     if (request.amount == null) {
       return <div className={styles.isLoading} />;

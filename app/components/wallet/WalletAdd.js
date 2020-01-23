@@ -122,7 +122,11 @@ export default class WalletAdd extends Component<Props> {
                       <div className={classnames([styles.heroCardsItemBg, styles.bgConnectHW])} />
                       <div className={styles.heroCardsItemTitle}>
                         {intl.formatMessage(messages.connectToHWTitle)}
-                        <CustomTooltip toolTip={messages.connectToHWTooltip} />
+                        <CustomTooltip
+                          toolTip={
+                            <div><FormattedHTMLMessage {...messages.connectToHWTooltip} /></div>
+                          }
+                        />
                       </div>
                     </div>
                   </button>
@@ -137,7 +141,11 @@ export default class WalletAdd extends Component<Props> {
                     <div className={classnames([styles.heroCardsItemBg, styles.bgCreateWallet])} />
                     <div className={styles.heroCardsItemTitle}>
                       {intl.formatMessage(messages.createTitle)}
-                      <CustomTooltip toolTip={messages.createTooltip} />
+                      <CustomTooltip
+                        toolTip={
+                          <div><FormattedHTMLMessage {...messages.createTooltip} /></div>
+                        }
+                      />
                     </div>
                   </div>
                 </button>
@@ -153,7 +161,11 @@ export default class WalletAdd extends Component<Props> {
                     />
                     <div className={styles.heroCardsItemTitle}>
                       {intl.formatMessage(messages.restoreTitle)}
-                      <CustomTooltip toolTip={messages.restoreTooltip} />
+                      <CustomTooltip
+                        toolTip={
+                          <div><FormattedHTMLMessage {...messages.restoreTooltip} /></div>
+                        }
+                      />
                     </div>
                   </div>
                 </button>
@@ -169,7 +181,11 @@ export default class WalletAdd extends Component<Props> {
                 </span>
                 <div className={styles.heroCardsItemTitle}>
                   {intl.formatMessage(messages.transferFundsTitle)}
-                  <CustomTooltip toolTip={messages.transferFundsTooltip} />
+                  <CustomTooltip
+                    toolTip={
+                      <div><FormattedHTMLMessage {...messages.transferFundsTooltip} /></div>
+                    }
+                  />
                 </div>
               </button>
             </div>

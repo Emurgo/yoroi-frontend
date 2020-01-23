@@ -1,7 +1,6 @@
 // @flow
 
 import { observable, action, reaction } from 'mobx';
-import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import environment from '../../environment';
@@ -82,10 +81,13 @@ export default class DelegationTransactionStore extends Store {
     }
     const basePubDeriver = withStakingKey;
 
+    const delegationRequests = this.stores.substores.ada.delegation.getRequests(
+      request.publicDeriver.self
+    );
     const delegationTxPromise = this.createDelegationTx.execute({
       publicDeriver: basePubDeriver,
       poolRequest: request.poolRequest,
-      valueInAccount: this.stores.substores.ada.delegation.stakingKeyState?.state.value ?? 0
+      valueInAccount: delegationRequests.stakingKeyState?.state.value ?? 0
     }).promise;
     if (delegationTxPromise == null) {
       throw new Error(`${nameof(this._createTransaction)} should never happen`);

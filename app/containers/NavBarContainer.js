@@ -13,6 +13,9 @@ import NavDropdown from '../components/topbar/NavDropdown';
 import NavDropdownRow from '../components/topbar/NavDropdownRow';
 import NavBarBack from '../components/topbar/NavBarBack';
 import { ROUTES } from '../routes-config';
+import { LOVELACES_PER_ADA } from '../config/numbersConfig';
+import PublicDeriverWithCachedMeta from '../domain/PublicDeriverWithCachedMeta';
+import { isLedgerNanoWallet, isTrezorTWallet } from '../api/ada/lib/storage/models/ConceptualWallet/index';
 
 const messages = defineMessages({
   backButton: {
@@ -50,8 +53,7 @@ export default class NavBarContainer extends Component<Props> {
 
     const walletsStore = stores.substores[environment.API].wallets;
     const publicDeriver = walletsStore.selected;
-    const walletName = publicDeriver ? publicDeriver.conceptualWalletName : '';
-    const walletAmount = new BigNumber(0);
+    if (publicDeriver == null) return null;
 
     // TODO: Replace route with ROUTES.WALLETS.ROOT after merging MyWallets screen
     const title = (
@@ -72,12 +74,27 @@ export default class NavBarContainer extends Component<Props> {
       }
       utxoTotal = utxoTotal.plus(walletUtxoAmount);
     }
+
+    let rewardTotal = new BigNumber(0);
+    for (const accountPart of wallets.map(
+      wallet => this.props.stores.substores.ada.delegation
+        .getRequests(wallet.self)
+        .getDelegatedBalance.result?.accountPart.dividedBy(LOVELACES_PER_ADA)
+    )) {
+      if (accountPart == null) {
+        rewardTotal = null;
+        break;
+      }
+      rewardTotal = rewardTotal.plus(accountPart);
+    }
+
     const dropdownHead = (
       <NavWalletDetails
         onUpdateHideBalance={this.updateHideBalance}
         shouldHideBalance={profile.shouldHideBalance}
-        rewards={new BigNumber(5)}
-        walletAmount={utxoTotal}
+        rewards={this.props.stores.substores.ada.delegation.getRequests(publicDeriver.self)
+          .getDelegatedBalance.result?.accountPart.dividedBy(LOVELACES_PER_ADA)}
+        walletAmount={publicDeriver.amount}
       />
     );
 
@@ -87,7 +104,7 @@ export default class NavBarContainer extends Component<Props> {
         plateComponent={<NavPlate
           publicDeriver={wallet}
           walletName={wallet.conceptualWalletName}
-          walletType="standard"
+          walletType={getWalletType(wallet)}
         />}
         isCurrentWallet={wallet === this.props.stores.substores.ada.wallets.selected}
         syncTime={wallet.lastSyncInfo.Time
@@ -96,10 +113,13 @@ export default class NavBarContainer extends Component<Props> {
         }
         detailComponent={
           <NavWalletDetails
-            walletAmount={walletAmount}
+            walletAmount={wallet.amount}
             onUpdateHideBalance={this.updateHideBalance}
             shouldHideBalance={profile.shouldHideBalance}
-            rewards={new BigNumber('565.000000') /* TODO */}
+            rewards={
+              this.props.stores.substores.ada.delegation.getRequests(wallet.self)
+                .getDelegatedBalance.result?.accountPart.dividedBy(LOVELACES_PER_ADA)
+            }
           />
         }
       />
@@ -113,7 +133,7 @@ export default class NavBarContainer extends Component<Props> {
               highlightTitle
               onUpdateHideBalance={this.updateHideBalance}
               shouldHideBalance={profile.shouldHideBalance}
-              rewards={new BigNumber(5)}
+              rewards={rewardTotal}
               walletAmount={utxoTotal}
             />
           }
@@ -135,12 +155,23 @@ export default class NavBarContainer extends Component<Props> {
         walletPlate={
           <NavPlate
             publicDeriver={walletsStore.selected}
-            walletName={walletName}
-            walletType="standard"
+            walletName={publicDeriver.conceptualWalletName}
+            walletType={getWalletType(publicDeriver)}
           />
         }
         walletDetails={dropdownComponent}
       />
     );
   }
+}
+
+function getWalletType(publicDeriver: PublicDeriverWithCachedMeta) {
+  const conceptualWallet = publicDeriver.self.getParent();
+  if (isLedgerNanoWallet(conceptualWallet)) {
+    return 'ledger';
+  }
+  if (isTrezorTWallet(conceptualWallet)) {
+    return 'trezor';
+  }
+  return 'standard';
 }

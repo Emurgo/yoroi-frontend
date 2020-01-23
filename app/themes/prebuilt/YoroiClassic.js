@@ -416,7 +416,7 @@ export default {
   '--theme-wallet-dropdown-main-text-color': '#242838',
   '--theme-wallet-dropdown-secondary-text-color': '#6B7384',
   '--theme-wallet-dropdown-accent-text-color': '#DAA49A',
-  '--theme-wallet-dropdown-box-shadow': '0 10px 12px 0 rgba(0, 0, 0, 0.06)',
+  '--theme-wallet-dropdown-box-shadow': '0 10px 12px 0 rgba(0, 0, 0, 0.16)',
   '--theme-wallet-dropdown-background-color': '#FFFFFF',
   '--theme-wallet-dropdown-selected-background-color': '#F0F3F5',
   '--theme-wallet-dropdown-row-border-color': '#E0E3EB',

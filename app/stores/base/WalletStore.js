@@ -279,6 +279,18 @@ export default class WalletStore extends Store {
       const withCache = await PublicDeriverWithCachedMeta.fromPublicDeriver(newPublicDeriver);
       newWithCachedData.push(withCache);
     }
+    for (const publicDeriver of newWithCachedData) {
+      // note: purposely don't await
+      // that way app loading page finishes sooner
+      // and user sees a loading screen for individual wallet instead
+      // TODO: should probably remove the async calls in these
+      // and instead make them trigger when the selected wallet changes
+      this.stores.substores[environment.API].addresses.addObservedWallet(publicDeriver);
+      this.stores.substores[environment.API].transactions.addObservedWallet(publicDeriver);
+      if (environment.isShelley()) {
+        this.stores.substores[environment.API].delegation.addObservedWallet(publicDeriver);
+      }
+    }
     runInAction('refresh active wallet', () => {
       if (this.selected == null) {
         this._setActiveWallet({
@@ -287,13 +299,6 @@ export default class WalletStore extends Store {
         this.publicDerivers.push(...newWithCachedData);
       }
     });
-    for (const publicDeriver of newWithCachedData) {
-      // note: purposely don't await
-      // that way app loading page finishes sooner
-      // and user sees a loading screen for individual wallet instead
-      this.stores.substores[environment.API].addresses.addObservedWallet(publicDeriver);
-      this.stores.substores[environment.API].transactions.addObservedWallet(publicDeriver);
-    }
   };
 
   @action registerObserversForNewWallet: PublicDeriverWithCachedMeta => Promise<void> = async (
@@ -301,6 +306,9 @@ export default class WalletStore extends Store {
   ): Promise<void> => {
     await this.stores.substores[environment.API].addresses.addObservedWallet(publicDeriver);
     await this.stores.substores[environment.API].transactions.addObservedWallet(publicDeriver);
+    if (environment.isShelley()) {
+      this.stores.substores[environment.API].delegation.addObservedWallet(publicDeriver);
+    }
   };
 
   /** Make all API calls required to setup imported wallet */
