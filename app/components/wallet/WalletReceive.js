@@ -148,6 +148,7 @@ export default class WalletReceive extends Component<Props, State> {
               {intl.formatMessage(messages.walletAddressLabel)}
             </div>
             <CopyableAddress
+              darkVariant
               hash={walletAddress}
               elementId={mainAddressNotificationId}
               onCopyAddress={() => onCopyAddressTooltip(walletAddress, mainAddressNotificationId)}
@@ -160,7 +161,10 @@ export default class WalletReceive extends Component<Props, State> {
                 linkType="address"
               >
                 <RawHash light={isWalletAddressUsed}>
-                  <span className={copyableHashClass}>{walletAddress}</span>
+                  <span className={copyableHashClass}>
+                    {/* TODO: this may not be needed with new address types Ae2.. */}
+                    {walletAddress.substring(0, 60) + '...'}
+                  </span>
                 </RawHash>
               </ExplorableHashContainer>
             </CopyableAddress>
@@ -217,7 +221,15 @@ export default class WalletReceive extends Component<Props, State> {
                     linkType="address"
                   >
                     <RawHash light={address.isUsed}>
-                      {address.address}
+                      <span
+                        className={classnames([
+                          styles.addressHash,
+                          address.isUsed && styles.addressHashUsed
+                        ])}
+                      >
+                        {/* TODO: this may not be needed with new address types Ae2.. */}
+                        {address.address.substring(0, 60) + '...'}
+                      </span>
                     </RawHash>
                   </ExplorableHashContainer>
                 </CopyableAddress>
