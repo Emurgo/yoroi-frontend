@@ -156,9 +156,11 @@ export default class StakingDashboard extends Component<Props> {
     }
     if (this.props.stakePools.pools === null || this.props.pageInfo == null) {
       return (
-        <VerticallyCenteredLayout>
-          <LoadingSpinner />
-        </VerticallyCenteredLayout>
+        <div className={styles.loadingPools}>
+          <VerticallyCenteredLayout>
+            <LoadingSpinner />
+          </VerticallyCenteredLayout>
+        </div>
       );
     }
     const currPool = this.props.pageInfo.currentPage;

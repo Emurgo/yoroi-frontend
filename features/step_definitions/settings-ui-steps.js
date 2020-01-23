@@ -3,6 +3,7 @@
 import { When, Given, Then } from 'cucumber';
 import i18n from '../support/helpers/i18n-helpers';
 import { By, Key } from 'selenium-webdriver';
+import { truncateLongName, } from '../../app/utils/formatters';
 
 const walletNameInputSelector = '.SettingsLayout_settingsPane .walletName input';
 
@@ -24,7 +25,7 @@ When(/^I enter new wallet name:$/, async function (table) {
    * We instead repeatedly delete characters until we've deleted the whole name
   */
 
-  // can't programmtically get the wallet name due to the issue above
+  // can't programmatically get the wallet name due to the issue above
   // so assume max length
   const maxNameLength = 40;
   for (let i = 0; i < maxNameLength; i++) {
@@ -76,7 +77,7 @@ Then(/^I should not see the change password dialog anymore$/, async function () 
 });
 
 Then(/^I should see new wallet name "([^"]*)"$/, async function (walletName) {
-  await this.waitUntilText('.WalletTopbarTitle_walletName', walletName.toUpperCase());
+  await this.waitUntilText('.NavPlate_name', truncateLongName(walletName));
 });
 
 Then(/^I should see the following error messages:$/, async function (data) {

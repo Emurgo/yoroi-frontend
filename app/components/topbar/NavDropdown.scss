@@ -1,0 +1,59 @@
+.wrapper {
+  position: relative;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+
+  .component {
+    flex: 1;
+  }
+}
+
+.toggle {
+  margin-left: 58px;
+  width: 12px;
+  height: 12px;
+  display: block;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.toggleRotate {
+  transform: rotate(180deg);
+}
+
+.content {
+  border-radius: 0 0 var(--theme-wallet-dropdown-border-radius) var(--theme-wallet-dropdown-border-radius);
+  background-color: var(--theme-wallet-dropdown-background-color);
+  box-shadow: var(--theme-wallet-dropdown-box-shadow);
+  min-width: var(--theme-wallet-dropdown-min-width);
+  position: absolute;
+  top: calc(var(--theme-navbar-height) + 5px);
+  right: calc(-1 * var(--theme-page-container-side-padding));
+}
+
+.buttonWrapper {
+  padding: 32px 74px;
+}
+
+.button {
+  background-color: var(--theme-wallet-dropdown-accent-text-color);
+  border-radius: var(--theme-wallet-dropdown-border-radius);
+  padding: 16px 40px;
+  min-width: 230px;
+  color: var(--theme-wallet-dropdown-background-color);
+  font-family: var(--font-medium);
+  font-size: 16px;
+  line-height: 21px;
+  text-align: center;
+  display: block;
+  margin-left: auto;
+
+  &:hover {
+    cursor: pointer;
+  }
+}

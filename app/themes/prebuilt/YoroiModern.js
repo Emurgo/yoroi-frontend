@@ -225,8 +225,8 @@ const YoroiModern = {
   // COLORS
   '--theme-scrollbar-thumb-background': '#c8ccce',
 
-  '--theme-bordered-box-background-color': '#f0f3f5',
-  '--theme-bordered-box-border': '1px solid #f0f3f5',
+  '--theme-bordered-box-background-color': '#ffffff',
+  '--theme-bordered-box-border': '0px solid #ffffff',
   '--theme-bordered-box-text-color': '#2b2c32',
 
   '--theme-bullet-point-color': '#adaeb5',
@@ -290,8 +290,8 @@ const YoroiModern = {
   '--theme-hw-send-confirmation-info-block-background-color': '#f0f3f5',
 
   '--theme-settings-body-background-color': '#ffffff',
-  '--theme-settings-pane-background-color': '#f0f3f5',
-  '--theme-settings-pane-border': '1px solid #f0f3f5',
+  '--theme-settings-pane-background-color': '#ffffff',
+  '--theme-settings-pane-border': '1px solid #ffffff',
   '--theme-settings-menu-box-background-color': '#f0f3f5',
   '--theme-settings-menu-box-border': '1px solid #f0f3f5',
   '--theme-settings-menu-item-text-color': '#adaeb6',
@@ -417,14 +417,16 @@ const YoroiModern = {
   '--theme-modal-min-max-width-sm': `${465 - (modalMargin.left + modalMargin.right)}px`,
   '--theme-modal-min-max-width-lg': `${680 - (modalMargin.left + modalMargin.right)}px`,
 
-  '--theme-wallet-navigation-tab-height': '50px',
+  '--theme-wallet-navigation-tab-height': '62px',
+  '--theme-wallet-navigation-tab-text-color': '#6B7384',
+  '--theme-wallet-navigation-tab-text-color-active': '#17D1AA',
 
   '--theme-warning-box-bg-color': 'rgba(255, 19, 81, 0.06)', // #FF1351
 
   '--theme-warning-color': `#FF1351`,
 
   // Dashboard
-  '--theme-dashboard-page-background-color': '#F9FBFF',
+  '--theme-dashboard-page-background-color': '#ffffff',
   '--theme-dashboard-link-color': '#ADAEB6',
   '--theme-dashboard-text-color': '#38393D',
   '--theme-dashboard-label-color': '#676970',
@@ -458,6 +460,45 @@ const YoroiModern = {
   '--theme-dashboard-graph-tooltip-line-height': '14px',
   '--theme-dashboard-graph-tooltip-text-color': '#FFFFFF',
   '--theme-dashboard-graph-tooltip-background': 'rgba(56, 57, 61, 0.7)',
+
+  // Sidebar
+  '--theme-sidebar-background-color': 'linear-gradient(22.58deg, rgba(36,74,191,1) 0%, rgba(71,96,255,1) 100%)',
+  '--theme-sidebar-text-left-spacing': '16px',
+  '--theme-sidebar-text-color': '#FFFFFF',
+  '--theme-sidebar-text-font-size': '14px',
+  '--theme-sidebar-text-line-height': '22px',
+  '--theme-sidebar-icon-color': '#FFFFFF',
+  '--theme-sidebar-icon-color-hover': '#17D1AA',
+  '--theme-sidebar-icon-color-active': '#17D1AA',
+  '--theme-sidebar-item-background-color-hover': '#2C30D1',
+
+  // Page
+
+  '--theme-page-container-width': '1295px',
+  '--theme-page-container-side-padding': '40px',
+  '--theme-page-background-color': '#F0F3F5',
+  '--theme-page-content-background-color': '#FFFFFF',
+  '--theme-page-content-box-shadow': '0 2px 12px 0 rgba(0, 0, 0, 0.06)',
+  '--theme-page-content-border-radius': '8px',
+  '--theme-page-content-box-bottom': '24px',
+  '--theme-banner-height': '46px',
+  '--theme-wallet-dropdown-main-text-color': '#242838',
+  '--theme-wallet-dropdown-secondary-text-color': '#6B7384',
+  '--theme-wallet-dropdown-accent-text-color': '#17D1AA',
+  '--theme-wallet-dropdown-box-shadow': '0 10px 12px 0 rgba(0, 0, 0, 0.16)',
+  '--theme-wallet-dropdown-background-color': '#FFFFFF',
+  '--theme-wallet-dropdown-selected-background-color': '#F0F3F5',
+  '--theme-wallet-dropdown-row-border-color': '#E0E3EB',
+  '--theme-wallet-dropdown-border-radius': '8px',
+  '--theme-wallet-dropdown-min-width': '608px',
+  '--theme-wallet-plate-main-text-color': '#242838',
+  '--theme-wallet-plate-secondary-text-color': '#6B7384',
+
+  // Navbar
+
+  '--theme-navbar-height': '60px',
+  '--theme-navbar-background-color': '#F0F3F5',
+  '--theme-navbar-color': '#6B7384',
 };
 
 // *************************************************************

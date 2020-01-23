@@ -44,10 +44,6 @@
 .noticeBoardIcon,
 .walletsIcon {
   flex-shrink: 0;
-  & > svg {
-    width: 36px;
-    height: 42.5px;
-  }
 }
 
 .withLedgerNanoIcon {

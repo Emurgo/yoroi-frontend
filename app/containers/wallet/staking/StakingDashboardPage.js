@@ -106,6 +106,10 @@ export default class StakingDashboardPage extends Component<Props, State> {
     }
 
     const delegationStore = this.props.stores.substores[environment.API].delegation;
+    const delegationRequests = delegationStore.getRequests(publicDeriver.self);
+    if (delegationRequests == null) {
+      throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
+    }
 
     const hideOrFormat: BigNumber => string = (amount) => {
       return this.props.stores.profile.shouldHideBalance
@@ -113,15 +117,15 @@ export default class StakingDashboardPage extends Component<Props, State> {
         : formattedWalletAmount(amount);
     };
 
-    const getTimeBasedElements = this.getTimeBasedElements();
+    const getTimeBasedElements = this.getTimeBasedElements(publicDeriver);
 
-    const errorIfPresent = this.getErrorInFetch();
+    const errorIfPresent = this.getErrorInFetch(publicDeriver);
     const stakePools = errorIfPresent == null
       ? this.getStakePools(publicDeriver)
       : errorIfPresent;
 
-    const showRewardAmount = delegationStore.getCurrentDelegation.wasExecuted &&
-      delegationStore.getDelegatedBalance.wasExecuted &&
+    const showRewardAmount = delegationRequests.getCurrentDelegation.wasExecuted &&
+      delegationRequests.getDelegatedBalance.wasExecuted &&
       errorIfPresent == null;
 
     const { getThemeVars } = this.props.stores.profile;
@@ -136,16 +140,16 @@ export default class StakingDashboardPage extends Component<Props, State> {
     const dashboard = (
       <StakingDashboard
         pageInfo={
-          delegationStore.stakingKeyState == null ||
-          !delegationStore.getCurrentDelegation.wasExecuted ||
-          delegationStore.getCurrentDelegation.isExecuting
+          delegationRequests.stakingKeyState == null ||
+          !delegationRequests.getCurrentDelegation.wasExecuted ||
+          delegationRequests.getCurrentDelegation.isExecuting
             ? undefined
             : {
-              currentPage: delegationStore.stakingKeyState.selectedPool,
-              numPages: delegationStore.stakingKeyState.state.delegation.pools.length,
+              currentPage: delegationRequests.stakingKeyState.selectedPool,
+              numPages: delegationRequests.stakingKeyState.state.delegation.pools.length,
               goToPage: page => runInAction(() => {
-                if (delegationStore.stakingKeyState) {
-                  delegationStore.stakingKeyState.selectedPool = page;
+                if (delegationRequests.stakingKeyState) {
+                  delegationRequests.stakingKeyState.selectedPool = page;
                 }
               })
             }}
@@ -159,10 +163,10 @@ export default class StakingDashboardPage extends Component<Props, State> {
             : hideOrFormat(publicDeriver.amount)
           }
           totalRewards={
-            !showRewardAmount || delegationStore.getDelegatedBalance.result == null
+            !showRewardAmount || delegationRequests.getDelegatedBalance.result == null
               ? undefined
               : hideOrFormat(
-                delegationStore.getDelegatedBalance.result
+                delegationRequests.getDelegatedBalance.result
                   .accountPart
                   .dividedBy(LOVELACES_PER_ADA)
               )
@@ -171,11 +175,11 @@ export default class StakingDashboardPage extends Component<Props, State> {
             dialog: LessThanExpectedDialog,
           })}
           totalDelegated={
-            !showRewardAmount || delegationStore.getDelegatedBalance.result == null
+            !showRewardAmount || delegationRequests.getDelegatedBalance.result == null
               ? undefined
               : hideOrFormat(
-                delegationStore.getDelegatedBalance.result.utxoPart.plus(
-                  delegationStore.getDelegatedBalance.result.accountPart
+                delegationRequests.getDelegatedBalance.result.utxoPart.plus(
+                  delegationRequests.getDelegatedBalance.result.accountPart
                 ).dividedBy(LOVELACES_PER_ADA)
               )}
         />}
@@ -444,13 +448,14 @@ export default class StakingDashboardPage extends Component<Props, State> {
       staleTx={delegationTxStore.isStale}
     />);
   }
-  getTimeBasedElements: void => {|
+
+  getTimeBasedElements: PublicDeriverWithCachedMeta => {|
     epochProgress: Node,
     rewardInfo: void | {|
       rewardPopup: Node,
       showWarning: boolean,
     |},
-  |} = () => {
+  |} = (publicDeriver) => {
     if (this.state == null) {
       return {
         epochProgress: (<EpochProgress loading />),
@@ -477,14 +482,18 @@ export default class StakingDashboardPage extends Component<Props, State> {
     };
 
     const delegationStore = this.props.stores.substores[environment.API].delegation;
+    const delegationRequests = delegationStore.getRequests(publicDeriver.self);
+    if (delegationRequests == null) {
+      throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
+    }
     let rewardInfo = undefined;
     if (
-      !delegationStore.getCurrentDelegation.wasExecuted ||
-      delegationStore.getCurrentDelegation.isExecuting
+      !delegationRequests.getCurrentDelegation.wasExecuted ||
+      delegationRequests.getCurrentDelegation.isExecuting
     ) {
       rewardInfo = undefined;
     } else {
-      const { result } = delegationStore.getCurrentDelegation;
+      const { result } = delegationRequests.getCurrentDelegation;
       if (result == null || result.currEpoch == null || result.currEpoch.pools.length === 0) {
         rewardInfo = undefined;
       } else {
@@ -551,18 +560,24 @@ export default class StakingDashboardPage extends Component<Props, State> {
     };
   }
 
-  getErrorInFetch: void => void | {| error: LocalizableError, |} = () => {
+  getErrorInFetch: PublicDeriverWithCachedMeta => void | {| error: LocalizableError, |} = (
+    publicDeriver
+  ) => {
     const delegationStore = this.props.stores.substores[environment.API].delegation;
-    if (delegationStore.error != null) {
-      return { error: delegationStore.error };
+    const delegationRequests = delegationStore.getRequests(publicDeriver.self);
+    if (delegationRequests == null) {
+      throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
-    const keyState = delegationStore.stakingKeyState;
+    if (delegationRequests.error != null) {
+      return { error: delegationRequests.error };
+    }
+    const keyState = delegationRequests.stakingKeyState;
     if (
       keyState &&
       keyState.state.delegation.pools.length === 0 &&
-      delegationStore.getCurrentDelegation.result != null
+      delegationRequests.getCurrentDelegation.result != null
     ) {
-      const currentDelegation = delegationStore.getCurrentDelegation.result;
+      const currentDelegation = delegationRequests.getCurrentDelegation.result;
       const currEpochInfo = currentDelegation.currEpoch;
       if (currEpochInfo == null) {
         return undefined;
@@ -578,13 +593,17 @@ export default class StakingDashboardPage extends Component<Props, State> {
     publicDeriver
   ) => {
     const delegationStore = this.props.stores.substores[environment.API].delegation;
+    const delegationRequests = delegationStore.getRequests(publicDeriver.self);
+    if (delegationRequests == null) {
+      throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
+    }
     if (
-      !delegationStore.getCurrentDelegation.wasExecuted ||
-      delegationStore.getCurrentDelegation.isExecuting
+      !delegationRequests.getCurrentDelegation.wasExecuted ||
+      delegationRequests.getCurrentDelegation.isExecuting
     ) {
       return { pools: null };
     }
-    if (delegationStore.stakingKeyState == null) {
+    if (delegationRequests.stakingKeyState == null) {
       return { pools: [] };
     }
     const tooltipNotification = {
@@ -593,7 +612,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
     };
 
     const { uiNotifications, } = this.props.stores;
-    const keyState = delegationStore.stakingKeyState;
+    const keyState = delegationRequests.stakingKeyState;
     const { intl } = this.context;
     return {
       pools: keyState.state.delegation.pools.map(pool => {

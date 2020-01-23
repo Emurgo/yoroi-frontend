@@ -465,6 +465,18 @@ const globalMessages = defineMessages({
     id: 'wallet.staking.pool.unknownLabel',
     defaultMessage: '!!!Unknown pool',
   },
+  sidebarWallets: {
+    id: 'sidebar.wallets',
+    defaultMessage: '!!!My wallets',
+  },
+  sidebarSettings: {
+    id: 'sidebar.settings',
+    defaultMessage: '!!!Settings',
+  },
+  sidebarTransfer: {
+    id: 'sidebar.transfer',
+    defaultMessage: '!!!Transfer wallets',
+  },
   ledgerTitle: {
     id: 'wallet.add.optionDialog.connect.hw.ledger.title',
     defaultMessage: '!!!Ledger Hardware Wallet',

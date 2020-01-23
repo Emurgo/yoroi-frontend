@@ -38,7 +38,8 @@ type Props = {|
 export default class SeizaFetcher extends Component<Props> {
 
   @observable selectedPools = [];
-  iframe: ?HTMLElement;
+  @observable iframe: ?HTMLIFrameElement;
+  @observable frameHeight = 0;
 
   @action
   messageHandler: any => Promise<void> = async (event: any) => {
@@ -57,13 +58,23 @@ export default class SeizaFetcher extends Component<Props> {
     runInAction(() => { this.selectedPools = pools; });
   }
 
+  @action setFrame: (null | HTMLIFrameElement) => void = (frame) => {
+    this.iframe = frame;
+  }
+
   constructor(props: Props) {
     super(props);
     window.addEventListener('message', this.messageHandler, false);
   }
 
+  componentDidMount() {
+    window.addEventListener('resize', this.resize);
+    this.resize();
+  }
+
   componentWillUnmount() {
     this.props.actions.ada.delegationTransaction.reset.trigger();
+    window.removeEventListener('resize', this.resize);
     window.removeEventListener('message', this.messageHandler);
   }
 
@@ -175,8 +186,27 @@ export default class SeizaFetcher extends Component<Props> {
             classicTheme={profile.isClassicTheme}
           />
         }
-        <iframe ref={iframe => { this.iframe = iframe; }} title="Staking" src={`${stakingUrl}&locale=${profile.currentLocale}`} frameBorder="0" width="100%" height="100%" />
+        <iframe
+          ref={this.setFrame}
+          title="Staking"
+          src={`${stakingUrl}&locale=${profile.currentLocale}`}
+          frameBorder="0"
+          width="100%"
+          height={this.iframe != null && this.frameHeight != null ? this.frameHeight + 'px' : null}
+        />
       </>
+    );
+  }
+
+  @action
+  resize: void => void = () => {
+    if (this.iframe == null) {
+      this.frameHeight = 0;
+      return;
+    }
+    this.frameHeight = Math.max(
+      window.innerHeight - this.iframe.getBoundingClientRect().top - 30,
+      0
     );
   }
 }

@@ -91,7 +91,7 @@ export async function assertPlate(customWorld: any, plate: string): Promise<void
 
   // this makes this function also work for wallets that already exist
   if (plateElement.length === 0) {
-    plateElement = await customWorld.driver.findElements(By.css('.WalletTopbarTitle_walletPlate'));
+    plateElement = await customWorld.driver.findElements(By.css('.NavPlate_plate'));
   }
   const plateText = await plateElement[0].getText();
   expect(plateText).to.be.equal(plate);

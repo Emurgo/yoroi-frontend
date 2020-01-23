@@ -1,42 +1,80 @@
 .component {
   background-color: var(--theme-topbar-layout-body-background-color);
-  box-shadow: 0 0 70px 0 rgba(0,0,0,0.75);
+  box-shadow: 0 0 70px 0 rgba(0, 0, 0, 0.75);
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: hidden;
   width: 100%;
-  
-  .topbar {
-    height: var(--cmn-topbar-height);
-    flex-shrink: 0;
-    // Show elements that overflow the topbar above the content area
-    z-index: 1;
+}
+
+.topbar, .navbar {
+  // Show elements that overflow the topbar above the content area
+  z-index: 1;
+}
+
+.windowWrapper {
+  font-family: var(--font-regular);
+  display: flex;
+  flex-wrap: nowrap;
+  min-height: 100%;
+}
+
+.sidebar {
+  flex: 1 0 auto;
+}
+
+.main {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.containerMain {
+  background-color: var(--theme-page-background-color);
+}
+
+.inner {
+  height: 100%;
+  // overflow-x: hidden;
+  // overflow-y: hidden;
+  position: relative;
+  &::-webkit-scrollbar-button {
+    height: 7px;
+    display: block;
   }
-  
-  .content {
-    height: 100%;
-  }
-  
-  .contentWrapper {
-    height: 100%;
-    overflow-x: hidden;
-    overflow-y: hidden;
-    position: relative;
-    &::-webkit-scrollbar-button {
-      height: 7px;
-      display: block;
-    }
-  }
-  
-  .main {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-  }
+}
+
+.containerInner {
+  margin-top: 4px;
+  background-color: var(--theme-page-content-background-color);
+  box-shadow: var(--theme-page-content-box-shadow);
+  border-radius: var(--theme-page-content-border-radius);
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex: 0 1 auto;
+  height: initial;
+}
+
+.content {
+  height: 100%;
+}
+
+.containerContent {
+  max-width: var(--theme-page-container-width);
+  padding-left: var(--theme-page-container-side-padding);
+  padding-right: var(--theme-page-container-side-padding);
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100% - var(--theme-page-content-box-bottom) - var(--theme-banner-height));
 }
 
 // avoid background image overlapping with language select form

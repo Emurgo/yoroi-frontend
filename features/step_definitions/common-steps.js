@@ -10,6 +10,7 @@ import { expect } from 'chai';
 import {
   satisfies,
 } from 'semver';
+import { truncateLongName, } from '../../app/utils/formatters';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -145,11 +146,11 @@ Given(/^There is a wallet stored named ([^"]*)$/, async function (walletName) {
   await this.click('.WalletRestoreDialog .primary');
   await assertPlate(this, restoreInfo.plate);
   await this.click('.confirmButton');
-  await this.waitUntilText('.WalletTopbarTitle_walletName', walletName.toUpperCase());
+  await this.waitUntilText('.NavPlate_name', truncateLongName(walletName));
 });
 
 Given(/^I have completed the basic setup$/, async function () {
-  // langauge select page
+  // language select page
   await this.waitForElement('.LanguageSelectionForm_component');
   await this.click('.LanguageSelectionForm_submitButton');
 
