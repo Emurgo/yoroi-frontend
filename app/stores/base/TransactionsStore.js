@@ -242,7 +242,7 @@ export default class TransactionsStore extends Store {
   }
 
   /** Add a new public deriver to track and refresh the data */
-  @action addObservedWallet: PublicDeriverWithCachedMeta => Promise<void> = async (
+  @action addObservedWallet: PublicDeriverWithCachedMeta => void = (
     publicDeriver
   ) => {
     this.transactionsRequests.push({
@@ -252,7 +252,6 @@ export default class TransactionsStore extends Store {
       getBalanceRequest: this._getBalanceRequest(publicDeriver.self),
       pendingRequest: this._getTransactionsPendingRequest(publicDeriver.self),
     });
-    await this.refreshTransactionData(publicDeriver);
   }
 
   _getTransactionsPendingRequest = (

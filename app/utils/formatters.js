@@ -6,6 +6,13 @@ export const formattedWalletAmount = (amount: BigNumber): string => (
   amount.toFormat(DECIMAL_PLACES_IN_ADA)
 );
 
+export const maxNameLengthBeforeTruncation = 15;
+export const truncateLongName: string => string = (walletName) => {
+  return walletName.length > maxNameLengthBeforeTruncation
+    ? walletName.substring(0, maxNameLengthBeforeTruncation - 3) + '...'
+    : walletName;
+};
+
 /**
  * Just removes all Lovelaces, without decimal place (does not round off)
  * e.g 3657.9345 => 3657

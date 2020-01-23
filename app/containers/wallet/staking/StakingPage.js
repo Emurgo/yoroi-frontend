@@ -74,7 +74,12 @@ export default class StakingPage extends Component<Props> {
       finalURL += `&userAda=${formattedAmountWithoutLovelace(publicDeriver.amount)}`;
     }
 
-    const delegation = this.props.stores.substores.ada.delegation.stakingKeyState;
+    const delegationStore = this.props.stores.substores.ada.delegation;
+    const delegationRequests = delegationStore.getRequests(publicDeriver.self);
+    if (delegationRequests == null) {
+      throw new Error(`${nameof(StakingPage)} opened for non-reward wallet`);
+    }
+    const delegation = delegationRequests.stakingKeyState;
     if (!delegation) {
       return null;
     }

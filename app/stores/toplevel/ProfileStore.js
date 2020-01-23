@@ -270,6 +270,7 @@ export default class ProfileStore extends Store {
 
   _updateMomentJsLocaleAfterLocaleChange: void => void = () => {
     moment.locale(this._convertLocaleKeyToMomentJSLocalKey(this.currentLocale));
+    // moment.relativeTimeThreshold('ss', -1);
   };
 
   _convertLocaleKeyToMomentJSLocalKey: string => string = (localeKey) => {

@@ -16,7 +16,7 @@ type Props = {|
   +title?: string,
   +plateComponent?: ?Node,
   +detailComponent: Node,
-  +syncTime?: string,
+  +syncTime?: ?string,
   +isCurrentWallet?: boolean,
 |};
 
@@ -55,7 +55,7 @@ export default class NavDropdownRow extends Component<Props> {
         <div className={styles.details}>
           {detailComponent}
         </div>
-        {syncTime !== undefined &&
+        {syncTime != null &&
           <div className={styles.sync}>
             <span className={styles.syncLabel}>
               {intl.formatMessage(messages.lastSyncMessage)}
