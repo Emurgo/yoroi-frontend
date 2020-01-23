@@ -1,0 +1,35 @@
+// ========= LAYOUT =========
+
+.button {
+  display: inline-block;
+  color: var(--theme-wallet-navigation-tab-text-color);
+  padding: 7px 0;
+  border-bottom: 3px solid transparent;
+
+  &:hover {
+    border-bottom-color: var(--theme-wallet-navigation-tab-text-colorr);
+    cursor: pointer;
+  }
+
+  & + & {
+    margin-left: 34px;
+  }
+}
+
+.active {
+  border-bottom-color: var(--theme-wallet-navigation-tab-text-color-active);
+
+  &:hover {
+    border-bottom-color: var(--theme-wallet-navigation-tab-text-color-active);
+  }
+
+  .label {
+    color: var(--theme-wallet-navigation-tab-text-color-active);
+  }
+}
+
+.label {
+  font-size: 18px;
+  line-height: 22px;
+  font-family: var(--font-medium);
+}

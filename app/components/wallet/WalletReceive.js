@@ -6,7 +6,6 @@ import classnames from 'classnames';
 import QRCode from 'qrcode.react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import BorderedBox from '../widgets/BorderedBox';
 import VerifyIcon from '../../assets/images/verify-icon.inline.svg';
 import GenerateURIIcon from '../../assets/images/generate-uri.inline.svg';
 import LocalizableError from '../../i18n/LocalizableError';
@@ -142,13 +141,14 @@ export default class WalletReceive extends Component<Props, State> {
       document.documentElement.style.getPropertyValue('--theme-receive-qr-code-foreground-color') : '#000';
 
     const walletReceiveContent = (
-      <BorderedBox>
+      <>
         <div className={styles.qrCodeAndInstructions}>
           <div className={styles.instructions}>
             <div className={styles.hashLabel}>
               {intl.formatMessage(messages.walletAddressLabel)}
             </div>
             <CopyableAddress
+              darkVariant
               hash={walletAddress}
               elementId={mainAddressNotificationId}
               onCopyAddress={() => onCopyAddressTooltip(walletAddress, mainAddressNotificationId)}
@@ -161,7 +161,10 @@ export default class WalletReceive extends Component<Props, State> {
                 linkType="address"
               >
                 <RawHash light={isWalletAddressUsed}>
-                  <span className={copyableHashClass}>{walletAddress}</span>
+                  <span className={copyableHashClass}>
+                    {/* TODO: this may not be needed with new address types Ae2.. */}
+                    {walletAddress.substring(0, 60) + '...'}
+                  </span>
                 </RawHash>
               </ExplorableHashContainer>
             </CopyableAddress>
@@ -218,7 +221,15 @@ export default class WalletReceive extends Component<Props, State> {
                     linkType="address"
                   >
                     <RawHash light={address.isUsed}>
-                      {address.address}
+                      <span
+                        className={classnames([
+                          styles.addressHash,
+                          address.isUsed && styles.addressHashUsed
+                        ])}
+                      >
+                        {/* TODO: this may not be needed with new address types Ae2.. */}
+                        {address.address.substring(0, 60) + '...'}
+                      </span>
                     </RawHash>
                   </ExplorableHashContainer>
                 </CopyableAddress>
@@ -275,7 +286,7 @@ export default class WalletReceive extends Component<Props, State> {
             );
           })}
         </div>
-      </BorderedBox>
+      </>
     );
 
     const loadingSpinner =

@@ -6,10 +6,7 @@
   flex: 1;
   overflow-x: hidden;
   overflow-y: overlay;
-  padding-top: 40px;
-  padding-right: 20px;
-  padding-bottom: 20px;
-  padding-left: 20px;
+  padding: 40px 24px;
 
   &::-webkit-scrollbar-button {
     height: 7px;
@@ -27,7 +24,7 @@
     .qrCode {
       align-items: flex-start;
       display: flex;
-      margin-left: 150px;
+      margin-left: 80px;
 
       canvas {
         border: 4px solid var(--theme-receive-qr-code-background-color);
@@ -65,7 +62,7 @@
         font-size: 15px;
         letter-spacing: 0.5px;
         line-height: 22px;
-        margin-bottom: 40px;
+        margin-bottom: 12px;
         word-break: break-word;
       }
 
@@ -193,13 +190,14 @@
 }
 
 :global(.YoroiModern) .component {
-  padding: 30px;
-
+  
   .qrCodeAndInstructions {
     .instructions {
       .copyableHash {
         font-size: 14px;
-        line-height: 1.57;
+        line-height: 22px;
+        font-family: var(--font-medium);
+        color: var(--theme-wallet-receive-wallet-hash-text-color);
       }
 
       .instructionsText {
@@ -226,4 +224,15 @@
 
     }
   }
+}
+
+.addressHash {
+  font-size: 14px;
+  line-height: 22px;
+  font-family: var(--font-regular);
+  color: var(--theme-wallet-receive-hash-text-color);
+}
+
+.addressHashUsed {
+  color: var(--theme-wallet-receive-hash-used-text-color);
 }

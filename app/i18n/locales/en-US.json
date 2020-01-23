@@ -408,6 +408,8 @@
   "wallet.receive.confirmationDialog.addressLabel": "Address",
   "wallet.receive.confirmationDialog.derivationPathLabel": "Derivation Path",
   "wallet.receive.confirmationDialog.verifyAddressButtonLabel": "Verify on hardware wallet",
+  "wallet.receive.nav.external": "External",
+  "wallet.receive.nav.internal": "Internal",
   "wallet.receive.page.copyAddressLabel": "Copy address",
   "wallet.receive.page.generateNewAddressButtonLabel": "Generate new address",
   "wallet.receive.page.generatePaymentURLLabel": "Generate payment URL",
