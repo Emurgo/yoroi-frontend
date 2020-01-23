@@ -32,6 +32,7 @@ import DaedalusTransferPage from './containers/transfer/DaedalusTransferPage';
 import YoroiTransferPage from './containers/transfer/YoroiTransferPage';
 import URILandingPage from './containers/uri/URILandingPage';
 import Transfer from './containers/transfer/Transfer';
+import Receive from './containers/wallet/Receive';
 import StakingDashboardPage from './containers/wallet/staking/StakingDashboardPage';
 import StakingPage from './containers/wallet/staking/StakingPage';
 import NoticeBoardPage from './containers/notice-board/NoticeBoardPage';
@@ -129,9 +130,12 @@ const WalletsSubpages = (stores, actions) => (
       component={(props) => <WalletSendPage {...props} stores={stores} actions={actions} />}
     />
     <Route
-      exact
-      path={ROUTES.WALLETS.RECEIVE}
-      component={(props) => <WalletReceivePage {...props} stores={stores} actions={actions} />}
+      path={ROUTES.WALLETS.RECEIVE.ROOT}
+      component={(props) => (
+        <Receive {...props} stores={stores} actions={actions}>
+          {ReceiveSubpages(stores, actions)}
+        </Receive>
+      )}
     />
     {environment.isShelley() && (
       <>
@@ -200,6 +204,22 @@ const TransferSubpages = (stores, actions) => (
       component={(props) => <DaedalusTransferPage {...props} stores={stores} actions={actions} />}
     />
     <Redirect to={ROUTES.TRANSFER.DAEDALUS} />
+  </Switch>
+);
+
+const ReceiveSubpages = (stores, actions) => (
+  <Switch>
+    <Route
+      exact
+      path={ROUTES.WALLETS.RECEIVE.EXTERNAL}
+      component={(props) => <WalletReceivePage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.WALLETS.RECEIVE.INTERNAL}
+      component={(props) => <WalletReceivePage {...props} stores={stores} actions={actions} />}
+    />
+    <Redirect to={ROUTES.WALLETS.RECEIVE.EXTERNAL} />
   </Switch>
 );
 

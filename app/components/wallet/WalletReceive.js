@@ -6,7 +6,6 @@ import classnames from 'classnames';
 import QRCode from 'qrcode.react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import BorderedBox from '../widgets/BorderedBox';
 import VerifyIcon from '../../assets/images/verify-icon.inline.svg';
 import GenerateURIIcon from '../../assets/images/generate-uri.inline.svg';
 import LocalizableError from '../../i18n/LocalizableError';
@@ -142,7 +141,7 @@ export default class WalletReceive extends Component<Props, State> {
       document.documentElement.style.getPropertyValue('--theme-receive-qr-code-foreground-color') : '#000';
 
     const walletReceiveContent = (
-      <BorderedBox>
+      <>
         <div className={styles.qrCodeAndInstructions}>
           <div className={styles.instructions}>
             <div className={styles.hashLabel}>
@@ -275,7 +274,7 @@ export default class WalletReceive extends Component<Props, State> {
             );
           })}
         </div>
-      </BorderedBox>
+      </>
     );
 
     const loadingSpinner =
