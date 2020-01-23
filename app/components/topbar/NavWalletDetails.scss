@@ -29,8 +29,8 @@
 .amount {
     .isLoading {
         margin-left: 9px;
-        margin-bottom: 8px;
-        @include loading-spinner("../../assets/images/spinner-dark.svg", 14);
+        margin-bottom: 6px;
+        @include loading-spinner("../../assets/images/spinner-dark.svg", 16);
     }
     font-family: var(--font-medium);
     font-size: 16px;

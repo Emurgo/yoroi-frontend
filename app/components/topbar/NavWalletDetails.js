@@ -15,7 +15,12 @@ type Props = {|
     +onUpdateHideBalance: void => void,
     +shouldHideBalance: boolean,
     +highlightTitle?: boolean,
-    +rewards: ?BigNumber,
+    /**
+      * undefined => wallet doesn't is not a reward wallet
+      * null => still calculating
+      * value => done calculating
+    */
+    +rewards: null | void | BigNumber,
     +walletAmount: null | BigNumber,
 |};
 
@@ -61,6 +66,7 @@ export default class NavWalletDetails extends Component<Props> {
 
     const { intl } = this.context;
 
+    const totalAmount = this.getTotalAmount();
     return (
       <div className={styles.wrapper}>
         <div className={styles.content}>
@@ -72,11 +78,10 @@ export default class NavWalletDetails extends Component<Props> {
           >
             {this.renderAmountDisplay({
               shouldHideBalance,
-              amount: walletAmount != null && rewards != null
-                ? walletAmount.plus(rewards)
-                : null
+              amount: totalAmount
             })}
           </div>
+          {this.props.rewards !== undefined &&
           <div className={styles.details}>
             <div>
               <p className={styles.label}>{intl.formatMessage(messages.walletLabel)}&nbsp;</p>
@@ -87,16 +92,29 @@ export default class NavWalletDetails extends Component<Props> {
               {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
             </div>
           </div>
+        }
         </div>
-        <button
-          type="button"
-          className={styles.toggleButton}
-          onClick={onUpdateHideBalance}
-        >
-          {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
-        </button>
+        {totalAmount != null &&
+          <button
+            type="button"
+            className={styles.toggleButton}
+            onClick={onUpdateHideBalance}
+          >
+            {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
+          </button>
+        }
       </div>
     );
+  }
+
+  getTotalAmount: void => (null | BigNumber) = () => {
+    if (this.props.rewards === undefined) {
+      return this.props.walletAmount;
+    }
+    if (this.props.rewards === null || this.props.walletAmount === null) {
+      return null;
+    }
+    return this.props.rewards.plus(this.props.walletAmount);
   }
 
   renderAmountDisplay: {|

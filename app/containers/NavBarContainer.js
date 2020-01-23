@@ -76,24 +76,21 @@ export default class NavBarContainer extends Component<Props> {
     }
 
     let rewardTotal = new BigNumber(0);
-    for (const accountPart of wallets.map(
-      wallet => this.props.stores.substores.ada.delegation
-        .getRequests(wallet.self)
-        .getDelegatedBalance.result?.accountPart.dividedBy(LOVELACES_PER_ADA)
-    )) {
-      if (accountPart == null) {
+    for (const wallet of wallets) {
+      const amount = this.getRewardBalance(wallet);
+      if (amount === undefined) continue;
+      if (amount === null) {
         rewardTotal = null;
         break;
       }
-      rewardTotal = rewardTotal.plus(accountPart);
+      rewardTotal = rewardTotal?.plus(amount);
     }
 
     const dropdownHead = (
       <NavWalletDetails
         onUpdateHideBalance={this.updateHideBalance}
         shouldHideBalance={profile.shouldHideBalance}
-        rewards={this.props.stores.substores.ada.delegation.getRequests(publicDeriver.self)
-          .getDelegatedBalance.result?.accountPart.dividedBy(LOVELACES_PER_ADA)}
+        rewards={this.getRewardBalance(publicDeriver)}
         walletAmount={publicDeriver.amount}
       />
     );
@@ -116,10 +113,7 @@ export default class NavBarContainer extends Component<Props> {
             walletAmount={wallet.amount}
             onUpdateHideBalance={this.updateHideBalance}
             shouldHideBalance={profile.shouldHideBalance}
-            rewards={
-              this.props.stores.substores.ada.delegation.getRequests(wallet.self)
-                .getDelegatedBalance.result?.accountPart.dividedBy(LOVELACES_PER_ADA)
-            }
+            rewards={this.getRewardBalance(wallet)}
           />
         }
       />
@@ -162,6 +156,26 @@ export default class NavBarContainer extends Component<Props> {
         walletDetails={dropdownComponent}
       />
     );
+  }
+
+  /**
+   * undefined => wallet doesn't is not a reward wallet
+   * null => still calculating
+   * value => done calculating
+   */
+  getRewardBalance: PublicDeriverWithCachedMeta => null | void | BigNumber = (
+    publicDeriver
+  ) => {
+    const delegationRequest = this.props.stores.substores.ada.delegation.getRequests(
+      publicDeriver.self
+    );
+    if (delegationRequest == null) return undefined;
+
+    const balanceResult = delegationRequest.getDelegatedBalance.result;
+    if (balanceResult == null) {
+      return null;
+    }
+    return balanceResult.accountPart.dividedBy(LOVELACES_PER_ADA);
   }
 }
 

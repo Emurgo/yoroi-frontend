@@ -107,6 +107,9 @@ export default class StakingDashboardPage extends Component<Props, State> {
 
     const delegationStore = this.props.stores.substores[environment.API].delegation;
     const delegationRequests = delegationStore.getRequests(publicDeriver.self);
+    if (delegationRequests == null) {
+      throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
+    }
 
     const hideOrFormat: BigNumber => string = (amount) => {
       return this.props.stores.profile.shouldHideBalance
@@ -480,6 +483,9 @@ export default class StakingDashboardPage extends Component<Props, State> {
 
     const delegationStore = this.props.stores.substores[environment.API].delegation;
     const delegationRequests = delegationStore.getRequests(publicDeriver.self);
+    if (delegationRequests == null) {
+      throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
+    }
     let rewardInfo = undefined;
     if (
       !delegationRequests.getCurrentDelegation.wasExecuted ||
@@ -559,6 +565,9 @@ export default class StakingDashboardPage extends Component<Props, State> {
   ) => {
     const delegationStore = this.props.stores.substores[environment.API].delegation;
     const delegationRequests = delegationStore.getRequests(publicDeriver.self);
+    if (delegationRequests == null) {
+      throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
+    }
     if (delegationRequests.error != null) {
       return { error: delegationRequests.error };
     }
@@ -585,6 +594,9 @@ export default class StakingDashboardPage extends Component<Props, State> {
   ) => {
     const delegationStore = this.props.stores.substores[environment.API].delegation;
     const delegationRequests = delegationStore.getRequests(publicDeriver.self);
+    if (delegationRequests == null) {
+      throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
+    }
     if (
       !delegationRequests.getCurrentDelegation.wasExecuted ||
       delegationRequests.getCurrentDelegation.isExecuting

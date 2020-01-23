@@ -280,16 +280,7 @@ export default class WalletStore extends Store {
       newWithCachedData.push(withCache);
     }
     for (const publicDeriver of newWithCachedData) {
-      // note: purposely don't await
-      // that way app loading page finishes sooner
-      // and user sees a loading screen for individual wallet instead
-      // TODO: should probably remove the async calls in these
-      // and instead make them trigger when the selected wallet changes
-      this.stores.substores[environment.API].addresses.addObservedWallet(publicDeriver);
-      this.stores.substores[environment.API].transactions.addObservedWallet(publicDeriver);
-      if (environment.isShelley()) {
-        this.stores.substores[environment.API].delegation.addObservedWallet(publicDeriver);
-      }
+      this.registerObserversForNewWallet(publicDeriver);
     }
     runInAction('refresh active wallet', () => {
       if (this.selected == null) {
@@ -301,13 +292,14 @@ export default class WalletStore extends Store {
     });
   };
 
-  @action registerObserversForNewWallet: PublicDeriverWithCachedMeta => Promise<void> = async (
-    publicDeriver: PublicDeriverWithCachedMeta
-  ): Promise<void> => {
-    await this.stores.substores[environment.API].addresses.addObservedWallet(publicDeriver);
-    await this.stores.substores[environment.API].transactions.addObservedWallet(publicDeriver);
+  @action registerObserversForNewWallet: PublicDeriverWithCachedMeta => void = (
+    publicDeriver
+  ) => {
+    const stores = this.stores.substores[environment.API];
+    stores.addresses.addObservedWallet(publicDeriver);
+    stores.transactions.addObservedWallet(publicDeriver);
     if (environment.isShelley()) {
-      this.stores.substores[environment.API].delegation.addObservedWallet(publicDeriver);
+      stores.delegation.addObservedWallet(publicDeriver);
     }
   };
 
@@ -323,6 +315,8 @@ export default class WalletStore extends Store {
     { wallet }: { wallet: PublicDeriverWithCachedMeta }
   ): void => {
     this.selected = wallet;
+    // do not await on purpose since the UI will handle adding loaders while refresh is happening
+    this.refreshWallet(wallet);
   };
 
   @action _unsetActiveWallet = (): void => {

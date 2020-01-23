@@ -59,16 +59,16 @@ export default class DelegationStore extends Store {
 
   _recalculateDelegationInfoDisposer: void => void = () => {};
 
-  getRequests: PublicDeriver<> => DelegationRequests = (
+  getRequests: PublicDeriver<> => void | DelegationRequests = (
     publicDeriver
   ) => {
     const foundRequest = find(this.delegationRequests, { publicDeriver });
     if (foundRequest) return foundRequest;
 
-    throw new Error(`${nameof(DelegationStore)}::${nameof(this.getRequests)} should never happen`);
+    return undefined; // can happen if the wallet is not a Shelley wallet
   }
 
-  @action addObservedWallet: PublicDeriverWithCachedMeta => Promise<void> = async (
+  @action addObservedWallet: PublicDeriverWithCachedMeta => void = (
     publicDeriver
   ) => {
     const newObserved = {
@@ -79,7 +79,6 @@ export default class DelegationStore extends Store {
       error: undefined,
     };
     this.delegationRequests.push(newObserved);
-    await this._refreshForPublicDeriver(newObserved);
   }
 
   setup(): void {
@@ -88,9 +87,12 @@ export default class DelegationStore extends Store {
     this._startWatch();
   }
 
-  _refreshForPublicDeriver: DelegationRequests => Promise<void> = async (
-    delegationRequest
+  refreshDelegation: PublicDeriverWithCachedMeta => Promise<void> = async (
+    publicDeriver
   ) => {
+    const delegationRequest = this.getRequests(publicDeriver.self);
+    if (delegationRequest == null) return;
+
     try {
       delegationRequest.getDelegatedBalance.reset();
       delegationRequest.getCurrentDelegation.reset();
@@ -99,10 +101,9 @@ export default class DelegationStore extends Store {
         delegationRequest.stakingKeyState = undefined;
       });
 
-      const publicDeriver = delegationRequest.publicDeriver;
-      const withStakingKey = asGetAllAccounting(publicDeriver);
+      const withStakingKey = asGetAllAccounting(publicDeriver.self);
       if (withStakingKey == null) {
-        throw new Error(`${nameof(this._refreshForPublicDeriver)} missing staking key functionality`);
+        throw new Error(`${nameof(this.refreshDelegation)} missing staking key functionality`);
       }
 
       const stakingKeyResp = await withStakingKey.getStakingKey();
@@ -116,7 +117,7 @@ export default class DelegationStore extends Store {
       if (!stateForStakingKey.delegation) {
         return runInAction(() => {
           delegationRequest.stakingKeyState = undefined;
-          throw new Error(`${nameof(this._refreshForPublicDeriver)} stake key invalid - ${stateForStakingKey.comment}`);
+          throw new Error(`${nameof(this.refreshDelegation)} stake key invalid - ${stateForStakingKey.comment}`);
         });
       }
       const poolInfoResp = await stateFetcher.getPoolInfo({
@@ -127,7 +128,7 @@ export default class DelegationStore extends Store {
         if (!info.history) {
           return runInAction(() => {
             delegationRequest.stakingKeyState = undefined;
-            throw new Error(`${nameof(this._refreshForPublicDeriver)} pool info missing ${info.error}`);
+            throw new Error(`${nameof(this.refreshDelegation)} pool info missing ${info.error}`);
           });
         }
         return [delegation[0], info];
@@ -189,11 +190,8 @@ export default class DelegationStore extends Store {
       // $FlowFixMe error in mobx types
       async () => {
         const selected = this.stores.substores.ada.wallets.selected;
-        if (selected == null) {
-          return;
-        }
-        const requests = this.getRequests(selected.self);
-        await this._refreshForPublicDeriver(requests);
+        if (selected == null) return;
+        await this.refreshDelegation(selected);
       },
     );
   }

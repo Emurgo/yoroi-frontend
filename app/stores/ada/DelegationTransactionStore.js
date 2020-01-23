@@ -84,6 +84,9 @@ export default class DelegationTransactionStore extends Store {
     const delegationRequests = this.stores.substores.ada.delegation.getRequests(
       request.publicDeriver.self
     );
+    if (delegationRequests == null) {
+      throw new Error(`${nameof(DelegationTransactionStore)}::${nameof(this._createTransaction)} called for non-reward wallet`);
+    }
     const delegationTxPromise = this.createDelegationTx.execute({
       publicDeriver: basePubDeriver,
       poolRequest: request.poolRequest,

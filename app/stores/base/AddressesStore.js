@@ -101,14 +101,13 @@ export class AddressTypeStore<T> {
     return new CachedRequest<SubRequestType<T>>(this.request);
   };
 
-  @action addObservedWallet: PublicDeriver<> => Promise<void> = async (
+  @action addObservedWallet: PublicDeriver<> => void = (
     publicDeriver
   ) => {
     this.addressesRequests.push({
       publicDeriver,
       cachedRequest: this._getRequest(publicDeriver),
     });
-    await this.refreshAddresses();
   }
 }
 
@@ -175,17 +174,16 @@ export default class AddressesStore extends Store {
     this.error = null;
   };
 
-  addObservedWallet: PublicDeriverWithCachedMeta => Promise<void> = async (
+  addObservedWallet: PublicDeriverWithCachedMeta => void = (
     publicDeriver
   ) => {
     const withHasUtxoChains = asHasUtxoChains(publicDeriver.self);
     if (withHasUtxoChains == null) {
-      await this.allAddressesForDisplay.addObservedWallet(publicDeriver.self);
+      this.allAddressesForDisplay.addObservedWallet(publicDeriver.self);
     } else {
-      await this.externalForDisplay.addObservedWallet(publicDeriver.self);
-      await this.internalForDisplay.addObservedWallet(publicDeriver.self);
+      this.externalForDisplay.addObservedWallet(publicDeriver.self);
+      this.internalForDisplay.addObservedWallet(publicDeriver.self);
     }
-    await this.refreshAddresses(publicDeriver);
   }
 
   refreshAddresses: PublicDeriverWithCachedMeta => Promise<void> = async (

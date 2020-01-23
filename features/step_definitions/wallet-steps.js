@@ -2,6 +2,7 @@
 
 import { When, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
+import { truncateLongName, } from '../../app/utils/formatters';
 
 When(/^I enter the name "([^"]*)"$/, async function (walletName) {
   await this.input("input[name='walletName']", walletName);
@@ -17,5 +18,5 @@ When(/^I navigate to wallet transactions screen$/, async function () {
 });
 
 Then(/^I should see the opened wallet with name "([^"]*)"$/, async function (walletName) {
-  await this.waitUntilText('.NavPlate_name', walletName);
+  await this.waitUntilText('.NavPlate_name', truncateLongName(walletName));
 });

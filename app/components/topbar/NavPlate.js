@@ -11,6 +11,7 @@ import PaperIcon from '../../assets/images/wallet-nav/paper-wallet.inline.svg';
 import TrezorIcon from '../../assets/images/wallet-nav/trezor-wallet.inline.svg';
 import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
 import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
+import { truncateLongName, maxNameLengthBeforeTruncation } from '../../utils/formatters';
 
 const messages = defineMessages({
   standardWallet: {
@@ -115,11 +116,11 @@ export default class NavPlate extends Component<Props> {
   }
 
   generateNameElem: string => Node = (walletName) => {
-    if (walletName.length <= 15) {
+    if (walletName.length <= maxNameLengthBeforeTruncation) {
       return walletName;
     }
 
-    const truncatedName = walletName.substring(0, 12) + '...';
+    const truncatedName = truncateLongName(walletName);
     return (
       <Tooltip
         className={styles.SimpleTooltip}
