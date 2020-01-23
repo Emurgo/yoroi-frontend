@@ -2,12 +2,12 @@
 
 .button {
   display: inline-block;
-  color: var(--theme-nav-item-text-color);
+  color: var(--theme-wallet-navigation-tab-text-color);
   padding: 7px 0;
   border-bottom: 3px solid transparent;
 
   &:hover {
-    border-bottom-color: var(--theme-nav-item-text-color);
+    border-bottom-color: var(--theme-wallet-navigation-tab-text-colorr);
     cursor: pointer;
   }
 
