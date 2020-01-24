@@ -215,7 +215,7 @@
   "settings.support.reportProblem.content": "「よくある質問」で問題が解決しない場合は、{supportRequestLink}機能を使用してください。",
   "settings.support.reportProblem.link": "サポート依頼",
   "settings.support.reportProblem.title": "問題を報告する",
-  "sidebar.settings": "Settings",
+  "sidebar.settings": "設定",
   "sidebar.transfer": "Transfer wallets",
   "sidebar.wallets": "My wallets",
   "testnet.label.message": "注意：{network}上のADAには貨幣価値がありません。詳細は、FAQ({faqLink})をご参照ください。",
