@@ -6,12 +6,13 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
 import Card from './Card';
-import Tooltip from './Tooltip';
+import FirstRewardTooltip from './FirstRewardTooltip';
 import ProgressCircle from './ProgressCircle';
 import styles from './EpochProgress.scss';
 import globalMessages from '../../../../i18n/global-messages';
 
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
+import Timer from '../../../widgets/Timer';
 
 const messages = defineMessages({
   title: {
@@ -34,7 +35,11 @@ type Props = {|
 |} | {|
   percentage: number,
   currentEpoch: number,
-  endTime: Object,
+  endTime: {|
+    h: string,
+    m: string,
+    s: string,
+  |},
   showTooltip: boolean,
 |};
 
@@ -78,16 +83,10 @@ export default class EpochProgress extends Component<Props> {
           <div className={styles.row}>
             <p className={styles.label}>{intl.formatMessage(messages.endTitle)}:</p>
             <div className={styles.value}>
-              <p>
-                <span className={styles.timeBlock}>{endTime.h}</span>
-                :
-                <span className={styles.timeBlock}>{endTime.m}</span>
-                :
-                <span className={styles.timeBlock}>{endTime.s}</span>
-              </p>
+              <div className={styles.timer}><Timer time={endTime} /></div>
               {this.props.showTooltip === true && (
                 <div className={styles.tooltip}>
-                  <Tooltip text={intl.formatMessage(messages.tooltip)} />
+                  <FirstRewardTooltip text={intl.formatMessage(messages.tooltip)} />
                 </div>
               )}
             </div>

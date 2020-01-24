@@ -434,6 +434,7 @@ const YoroiModern = {
   '--theme-dashboard-card-shadow-color': 'rgba(65, 37, 150, 0.07)',
   '--theme-dashboard-card-border-color': 'rgba(77, 32, 192, 0.08)',
   '--theme-dashboard-card-vertical-separator-color': '#E6E6E6',
+  '--theme-dashboard-card-nodelegation-background-color': '#F9FBFF',
   '--theme-dashboard-tooltip-background-color': 'rgba(56, 57, 61, 0.75)',
   '--theme-dashboard-tooltip-text-color': '#FFFFFF',
   '--theme-dashboard-stakepool-head-background-color': '#F4F6FC',

@@ -92,7 +92,7 @@ export default class UserSummary extends Component<Props> {
               <p className={styles.value}>
                 {this.props.totalRewards} ADA
               </p>
-              <span
+              {/* <span
                 className={styles.note}
                 role="button"
                 tabIndex={0}
@@ -100,7 +100,7 @@ export default class UserSummary extends Component<Props> {
                 onClick={this.props.openLearnMore}
               >
                 {intl.formatMessage(messages.note)}
-              </span>
+              </span> */}
             </>
           )
           : (<LoadingSpinner small />)

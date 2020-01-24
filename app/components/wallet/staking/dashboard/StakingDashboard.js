@@ -50,7 +50,7 @@ type Props = {|
   +stakePools: {| error: LocalizableError, |} | {| pools: null | Array<Node> |},
   +epochProgress: Node,
   +userSummary: Node,
-  +rewardPopup: void | Node,
+  +upcomingRewards: void | Node,
   +hasAnyPending: boolean,
   +pageInfo: void | {|
     +currentPage: number,
@@ -114,15 +114,17 @@ export default class StakingDashboard extends Component<Props> {
       <div className={styles.page}>
         <div className={styles.contentWrap}>
           {pendingTxWarningComponent}
-          {this.props.rewardPopup != null && (
-            <div className={styles.rewards}>
-              {this.props.rewardPopup}
-            </div>
-          )}
           <div className={styles.statsWrapper}>
-            {this.props.epochProgress}
+            <div>
+              {this.props.epochProgress}
+            </div>
             <div className={styles.summary}>
-              {this.props.userSummary}
+              <div className={styles.summaryItem}>
+                {this.props.userSummary}
+              </div>
+              <div className={styles.summaryItem}>
+                {this.props.upcomingRewards}
+              </div>
             </div>
           </div>
           {this.props.pageInfo != null &&
