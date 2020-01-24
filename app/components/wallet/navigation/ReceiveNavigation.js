@@ -20,7 +20,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +isActiveTab: string => boolean,
+  +isActiveTab: ('internal' | 'external') => boolean,
   +onTabClick: string => void,
 |};
 

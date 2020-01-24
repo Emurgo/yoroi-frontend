@@ -81,7 +81,7 @@ export default class WalletNavigation extends Component<Props> {
             className="receive"
             label={intl.formatMessage(messages.receive)}
             icon={receiveIcon}
-            isActive={isActiveNavItem('receive', true)}
+            isActive={isActiveNavItem('receive')}
             onClick={() => onNavItemClick('receive')}
           />
         </div>

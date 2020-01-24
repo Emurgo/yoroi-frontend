@@ -19,21 +19,20 @@ export default class Receive extends Component<InjectedContainerProps> {
     intl: intlShape.isRequired,
   };
 
-  isActiveScreen = (page: string, subpage: string): boolean => {
+  isActiveTab: $Keys<typeof RECEIVE_ROUTES> => boolean = (
+    tab
+  ) => {
     const { app } = this.props.stores;
     const { wallets } = this.props.stores.substores.ada;
     const selected = wallets.selected;
     if (selected == null) return false;
     const screenRoute = buildRoute(
-      RECEIVE_ROUTES[page],
+      RECEIVE_ROUTES[tab],
       {
         id: selected.self.getPublicDeriverId(),
-        page
+        tab
       }
     );
-    if (subpage !== undefined) {
-      return app.currentRoute.indexOf(screenRoute) !== -1;
-    }
     return app.currentRoute === screenRoute;
   };
 
@@ -50,7 +49,7 @@ export default class Receive extends Component<InjectedContainerProps> {
   render() {
     return (
       <ReceiveWithNavigation
-        isActiveTab={this.isActiveScreen}
+        isActiveTab={this.isActiveTab}
         onTabClick={this.handleTabClick}
       >
         {this.props.children}

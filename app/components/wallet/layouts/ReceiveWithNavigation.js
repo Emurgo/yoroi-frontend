@@ -7,7 +7,7 @@ import styles from './ReceiveWithNavigation.scss';
 
 type Props = {|
   +children?: Node,
-  +isActiveTab: string => boolean,
+  +isActiveTab: ('internal' | 'external') => boolean,
   +onTabClick: string => void,
 |};
 

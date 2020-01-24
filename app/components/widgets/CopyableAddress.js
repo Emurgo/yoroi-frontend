@@ -71,7 +71,7 @@ export default class CopyableAddress extends Component<Props> {
       <div
         className={classnames([
           styles.component,
-          darkVariant && styles.componentDark
+          darkVariant === true && styles.componentDark
         ])}
       >
         <span>{this.props.children}</span>

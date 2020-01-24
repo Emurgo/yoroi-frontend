@@ -9,6 +9,7 @@ type Props = {|
   +isActive: boolean,
   +onClick: void => void,
   +className?: string,
+  +icon: string, // TODO: make use of this?
 |};
 
 @observer
