@@ -497,6 +497,7 @@ const YoroiModern = {
   '--theme-wallet-receive-hash-text-color': '#242838',
   '--theme-wallet-receive-hash-used-text-color': '#6B7384',
   '--theme-wallet-receive-wallet-hash-text-color': '#353535',
+  '--theme-wallet-receive-label-text-color': '#2B2C32',
 
   // Navbar
 
