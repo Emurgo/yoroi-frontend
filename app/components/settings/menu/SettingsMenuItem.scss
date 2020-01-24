@@ -23,15 +23,32 @@
 }
 
 :global(.YoroiModern) .component {
-  font-family: var(--font-medium);
+  font-family: var(--font-regular);
   font-size: 16px;
-  height: 60px;
-  padding: 10px 30px;
+  line-height: 22px;
+  padding: 6px 0px;
   text-transform: uppercase;
+  border-bottom: 3px solid transparent;
+  width: initial;
+
+  &:hover {
+    border-bottom-color: var(--theme-wallet-navigation-tab-text-color);
+    color: var(--theme-settings-menu-item-text-color);
+    cursor: pointer;
+  }
+
+  & + .component {
+    margin-left: 43px;
+  }
+
   &.active {
-    border-left: 7px solid var(--theme-settings-menu-item-left-border-color-active);
-    font-family: var(--font-medium);
-    padding-left: 23px;
+    border-bottom-color: var(--theme-wallet-navigation-tab-text-color-active);
+    color: var(--theme-wallet-navigation-tab-text-color-active);
+  
+    &:hover {
+      border-bottom-color: var(--theme-wallet-navigation-tab-text-color-active);
+    }
+  
   }
 }
 
