@@ -92,6 +92,10 @@ const globalMessages = defineMessages({
     id: 'global.labels.LearnMore',
     defaultMessage: '!!!Learn more',
   },
+  walletLabel: {
+    id: 'settings.menu.wallet.link.label',
+    defaultMessage: '!!!Wallet',
+  },
   languageEnglish: {
     id: 'global.language.english',
     defaultMessage: '!!!English',

@@ -7,6 +7,7 @@ import styles from './SettingsMenu.scss';
 import environmnent from '../../../environment';
 import { ROUTES } from '../../../routes-config';
 import type { Theme } from '../../../themes';
+import globalMessages from '../../../i18n/global-messages';
 
 const messages = defineMessages({
   general: {
@@ -16,10 +17,6 @@ const messages = defineMessages({
   paperWallet: {
     id: 'settings.menu.paperWallet.link.label',
     defaultMessage: '!!!Paper Wallet',
-  },
-  wallet: {
-    id: 'settings.menu.wallet.link.label',
-    defaultMessage: '!!!Wallet',
   },
   support: {
     id: 'settings.menu.support.link.label',
@@ -70,7 +67,7 @@ export default class SettingsMenu extends Component<Props> {
           }
 
           <SettingsMenuItem
-            label={intl.formatMessage(messages.wallet)}
+            label={intl.formatMessage(globalMessages.walletLabel)}
             onClick={() => {
               if (hasActiveWallet) {
                 onItemClick(ROUTES.SETTINGS.WALLET);

@@ -3,10 +3,11 @@ import React, { Component } from 'react';
 import BigNumber from 'bignumber.js';
 import type { Node } from 'react';
 import classnames from 'classnames';
-import { intlShape, defineMessages } from 'react-intl';
+import { intlShape, } from 'react-intl';
 import { DECIMAL_PLACES_IN_ADA } from '../../config/numbersConfig';
 import { formattedWalletAmount } from '../../utils/formatters';
 
+import globalMessages from '../../i18n/global-messages';
 import styles from './NavWalletDetails.scss';
 import IconEyeOpen from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
 import IconEyeClosed from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
@@ -33,17 +34,6 @@ function splitAmount(
   const startIndex = value.length - index;
   return [value.substring(0, startIndex), value.substring(startIndex)];
 }
-
-const messages = defineMessages({
-  walletLabel: {
-    id: 'wallet.nav.sumLabel.wallet',
-    defaultMessage: '!!!Wallet',
-  },
-  rewardsLabel: {
-    id: 'wallet.nav.sumLabel.rewards',
-    defaultMessage: '!!!Rewards',
-  },
-});
 
 export default class NavWalletDetails extends Component<Props> {
 
@@ -84,11 +74,11 @@ export default class NavWalletDetails extends Component<Props> {
           {this.props.rewards !== undefined &&
           <div className={styles.details}>
             <div>
-              <p className={styles.label}>{intl.formatMessage(messages.walletLabel)}&nbsp;</p>
+              <p className={styles.label}>{intl.formatMessage(globalMessages.walletLabel)}&nbsp;</p>
               {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
             </div>
             <div>
-              <p className={styles.label}>{intl.formatMessage(messages.rewardsLabel)}&nbsp;</p>
+              <p className={styles.label}>{intl.formatMessage(globalMessages.rewardsLabel)}&nbsp;</p>
               {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
             </div>
           </div>
