@@ -217,7 +217,7 @@
   "settings.support.reportProblem.title": "問題を報告する",
   "sidebar.settings": "設定",
   "sidebar.transfer": "Transfer wallets",
-  "sidebar.wallets": "My wallets",
+  "sidebar.wallets": "マイ・ウォレット",
   "testnet.label.message": "注意：{network}上のADAには貨幣価値がありません。詳細は、FAQ({faqLink})をご参照ください。",
   "testnet.shelley.label.message": "テストネットのネットワークを使用しています ({network})",
   "transfer.form.instructions.step1.text": "残高が復元されるまで1分程度かかります。復元後、ダイダロスウォレットからヨロイウォレットへの送金取引が表示されます。トランザクションの詳細を慎重に確認してください。 トランザクションを行うには、Cardanoネットワークの標準トランザクション手数料を支払う必要があります。",
