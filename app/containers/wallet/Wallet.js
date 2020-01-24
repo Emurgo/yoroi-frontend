@@ -16,7 +16,7 @@ type Props = InjectedContainerProps;
 @observer
 export default class Wallet extends Component<Props> {
 
-  isActiveScreen = (page: string): boolean => {
+  isActiveScreen = (page: string, subpage: boolean): boolean => {
     const { app } = this.props.stores;
     const { wallets } = this.props.stores.substores.ada;
     const selected = wallets.selected;
@@ -28,6 +28,9 @@ export default class Wallet extends Component<Props> {
         page
       }
     );
+    if (subpage === true) {
+      return app.currentRoute.indexOf(screenRoute) !== -1;
+    }
     return app.currentRoute === screenRoute;
   };
 
