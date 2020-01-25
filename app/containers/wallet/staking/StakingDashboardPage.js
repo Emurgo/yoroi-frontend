@@ -495,7 +495,32 @@ export default class StakingDashboardPage extends Component<Props, State> {
       delegationRequests.getCurrentDelegation.isExecuting
     )) {
       const { result } = delegationRequests.getCurrentDelegation;
-      if (!(result == null || result.currEpoch == null)) {
+      if (result == null || result.currEpoch == null) {
+        rewardInfo = {
+          rewardPopup: (
+            <UpcomingRewards
+              content={[
+                this.generateUpcomingRewardInfo({
+                  epoch: currentRelativeTime.epoch + 1,
+                  pools: [],
+                }),
+                this.generateUpcomingRewardInfo({
+                  epoch: currentRelativeTime.epoch + 2,
+                  pools: [],
+                }),
+                this.generateUpcomingRewardInfo({
+                  epoch: currentRelativeTime.epoch + 3,
+                  pools: [],
+                }),
+              ]}
+              showWarning={false}
+              onExternalLinkClick={handleExternalLinkClick}
+              baseUrl=""
+            />
+          ),
+          showWarning: false,
+        };
+      } else {
         const currEpochCert = result.currEpoch;
 
         // first reward is slower than the rest
