@@ -38,11 +38,13 @@ export default class ReceiveNavigation extends Component<Props> {
       <div className={styles.wrapper}>
         <div className={styles.content}>
           <ReceiveNavButton
+            className="external"
             label={intl.formatMessage(messages.externalTab)}
             isActive={isActiveTab('external')}
             onClick={() => onTabClick('external')}
           />
           <ReceiveNavButton
+            className="internal"
             label={intl.formatMessage(messages.internalTab)}
             icon={AttentionIcon}
             isActive={isActiveTab('internal')}
