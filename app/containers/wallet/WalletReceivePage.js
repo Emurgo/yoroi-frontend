@@ -3,6 +3,8 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import config from '../../config';
 import WalletReceive from '../../components/wallet/WalletReceive';
+import StandardHeader from '../../components/wallet/receive/StandardHeader';
+import InternalHeader from '../../components/wallet/receive/InternalHeader';
 import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer';
 import VerifyAddressDialog from '../../components/wallet/receive/VerifyAddressDialog';
 import URIGenerateDialog from '../../components/uri/URIGenerateDialog';
@@ -16,14 +18,15 @@ import {
 import globalMessages from '../../i18n/global-messages';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { asHasUtxoChains } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import type { StandardAddress, AddressTypeStore } from '../../stores/base/AddressesStore';
 
-type Props = {
+type Props = {|
   ...InjectedProps,
-};
+|};
 
-type State = {
+type State = {|
   notificationElementId: string,
-};
+|};
 
 @observer
 export default class WalletReceivePage extends Component<Props, State> {
@@ -76,7 +79,7 @@ export default class WalletReceivePage extends Component<Props, State> {
     // assume account-level wallet for now
     const withChains = asHasUtxoChains(publicDeriver.self);
     if (!withChains) throw new Error('WalletReceivePage only available for account-level wallets');
-    const addressTypeStore = addresses.externalForDisplay;
+    const addressTypeStore = this.getTypeStore();
 
     // get info about the lattest address generated for special rendering
     const lastAddress = addressTypeStore.last;
@@ -93,36 +96,58 @@ export default class WalletReceivePage extends Component<Props, State> {
     const walletType = publicDeriver.self.getParent().getWalletType();
     const isHwWallet = walletType === WalletTypeOption.HARDWARE_WALLET;
 
-    return (
-      <VerticalFlexContainer>
-        <WalletReceive
+    const onCopyAddressTooltip = (address, elementId) => {
+      if (!uiNotifications.isOpen(elementId)) {
+        this.setState({ notificationElementId: elementId });
+        actions.notifications.open.trigger({
+          id: elementId,
+          duration: tooltipNotification.duration,
+          message: tooltipNotification.message,
+        });
+      }
+    };
+
+    const notification = uiNotifications.getTooltipActiveNotification(
+      this.state.notificationElementId
+    );
+
+    const header = (() => {
+      if (addresses.isActiveTab('external')) {
+        return (<StandardHeader
           walletAddress={walletAddress}
           selectedExplorer={this.props.stores.profile.selectedExplorer}
           isWalletAddressUsed={isWalletAddressUsed}
-          walletAddresses={walletAddresses}
           onGenerateAddress={this.handleGenerateAddress}
-          onCopyAddressTooltip={(address, elementId) => {
-            if (!uiNotifications.isOpen(elementId)) {
-              this.setState({ notificationElementId: elementId });
-              actions.notifications.open.trigger({
-                id: elementId,
-                duration: tooltipNotification.duration,
-                message: tooltipNotification.message,
-              });
-            }
-          }}
-          notification={uiNotifications.getTooltipActiveNotification(
-            this.state.notificationElementId
-          )}
+          onCopyAddressTooltip={onCopyAddressTooltip}
+          notification={notification}
+          isSubmitting={addresses.createAddressRequest.isExecuting}
+          error={addresses.error}
+        />);
+      }
+      if (addresses.isActiveTab('internal')) {
+        return (<InternalHeader />);
+      }
+      throw new Error(`${nameof(WalletReceivePage)} unexpected address tab`);
+    })();
+
+    return (
+      <VerticalFlexContainer>
+        <WalletReceive
+          header={header}
+          selectedExplorer={this.props.stores.profile.selectedExplorer}
+          walletAddresses={walletAddresses}
+          onCopyAddressTooltip={onCopyAddressTooltip}
+          notification={notification}
           onVerifyAddress={async ({ address, path }) => {
             await actions.ada.hwVerifyAddress.selectAddress.trigger({ address, path });
             this.openVerifyAddressDialog();
           }}
-          onGeneratePaymentURI={(address) => {
-            this.openURIGenerateDialog(address);
-          }}
-          isSubmitting={addresses.createAddressRequest.isExecuting}
-          error={addresses.error}
+          onGeneratePaymentURI={addresses.isActiveTab('internal')
+            ? undefined
+            : (address) => {
+              this.openURIGenerateDialog(address);
+            }
+          }
         />
 
         {uiDialogs.isOpen(URIGenerateDialog) ? (
@@ -142,7 +167,7 @@ export default class WalletReceivePage extends Component<Props, State> {
           <URIDisplayDialog
             address={uiDialogs.getParam<string>('address')}
             amount={uiDialogs.getParam<number>('amount')}
-            onClose={() => actions.dialogs.closeActiveDialog.trigger()}
+            onClose={actions.dialogs.closeActiveDialog.trigger}
             onBack={() => this.openURIGenerateDialog(
               uiDialogs.getParam<string>('address'),
               uiDialogs.getParam<number>('amount'),
@@ -173,7 +198,7 @@ export default class WalletReceivePage extends Component<Props, State> {
             walletPath={hwVerifyAddress.selectedAddress.path}
             isHardware={isHwWallet}
             verify={() => actions.ada.hwVerifyAddress.verifyAddress.trigger(publicDeriver.self)}
-            cancel={() => actions.ada.hwVerifyAddress.closeAddressDetailDialog.trigger()}
+            cancel={actions.ada.hwVerifyAddress.closeAddressDetailDialog.trigger}
             classicTheme={profile.isClassicTheme}
           />
         ) : null}
@@ -182,7 +207,18 @@ export default class WalletReceivePage extends Component<Props, State> {
     );
   }
 
-  openVerifyAddressDialog = (): void => {
+  getTypeStore: void => AddressTypeStore<StandardAddress> = () => {
+    const { addresses } = this.props.stores.substores.ada;
+    if (addresses.isActiveTab('external')) {
+      return addresses.externalForDisplay;
+    }
+    if (addresses.isActiveTab('internal')) {
+      return addresses.internalForDisplay;
+    }
+    throw new Error(`${nameof(WalletReceivePage)} unexpected address tab`);
+  }
+
+  openVerifyAddressDialog: void => void = (): void => {
     const { actions } = this.props;
     actions.dialogs.open.trigger({ dialog: VerifyAddressDialog });
   }
@@ -195,7 +231,7 @@ export default class WalletReceivePage extends Component<Props, State> {
     });
   }
 
-  generateURI = (address: string, amount: number) => {
+  generateURI: (string, number) => void = (address, amount) => {
     const { actions } = this.props;
     actions.dialogs.open.trigger({
       dialog: URIDisplayDialog,

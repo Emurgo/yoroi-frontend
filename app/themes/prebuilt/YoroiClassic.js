@@ -147,10 +147,10 @@ const rpTextArea = {
 
 // TABS
 const tabs = {
-  '--tab-link-text-color': '#17D1AA',
+  '--tab-link-text-color': '#DAA49A',
   '--tab-link-text-size': '16px',
   '--tab-link-line-height': '19px',
-  '--tab-link-border-color': '#17D1AA',
+  '--tab-link-border-color': '#DAA49A',
 };
 
 // OPTION CARD
@@ -387,6 +387,8 @@ export default {
   '--theme-default-main-bg': '#F3F3F5',
 
   '--theme-wallet-navigation-tab-height': '40px',
+  '--theme-wallet-navigation-tab-text-color': '#6B7384',
+  '--theme-wallet-navigation-tab-text-color-active': '#DAA49A',
 
   '--theme-warning-box-bg-color': 'rgba(233, 72, 61, 0.06)', // #E9483D
 
@@ -424,6 +426,11 @@ export default {
   '--theme-wallet-dropdown-min-width': '608px',
   '--theme-wallet-plate-main-text-color': '#242838',
   '--theme-wallet-plate-secondary-text-color': '#6B7384',
+  '--theme-wallet-receive-submit-button-background-color': '#DAA49A',
+  '--theme-wallet-receive-hash-text-color': '#242838',
+  '--theme-wallet-receive-hash-used-text-color': '#6B7384',
+  '--theme-wallet-receive-wallet-hash-text-color': '#353535',
+  '--theme-wallet-receive-label-text-color': '#2B2C32',
 
   // Navbar
 

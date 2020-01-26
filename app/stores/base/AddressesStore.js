@@ -23,9 +23,16 @@ import type { StoresMap } from '../index';
 import {
   Logger,
 } from '../../utils/logging';
+import { ROUTES } from '../../routes-config';
+import { buildRoute } from '../../utils/routing';
 import { ChainDerivations } from '../../config/numbersConfig';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
+
+const RECEIVE_ROUTES = {
+  internal: ROUTES.WALLETS.RECEIVE.INTERNAL,
+  external: ROUTES.WALLETS.RECEIVE.EXTERNAL
+};
 
 export type StandardAddress = {|
   ...Address, ...Value, ...Addressing, ...UsedStatus
@@ -234,4 +241,31 @@ export default class AddressesStore extends Store {
         : CoreAddressTypes.CARDANO_LEGACY,
     });
   }
+
+  isActiveTab: $Keys<typeof RECEIVE_ROUTES> => boolean = (
+    tab
+  ) => {
+    const { app } = this.stores;
+    const { wallets } = this.stores.substores.ada;
+    const selected = wallets.selected;
+    if (selected == null) return false;
+    const screenRoute = buildRoute(
+      RECEIVE_ROUTES[tab],
+      {
+        id: selected.self.getPublicDeriverId(),
+        tab
+      }
+    );
+    return app.currentRoute === screenRoute;
+  };
+
+  handleTabClick: string => void = (page) => {
+    const { wallets } = this.stores.substores.ada;
+    const selected = wallets.selected;
+    if (selected == null) return;
+    this.actions.router.goToRoute.trigger({
+      route: RECEIVE_ROUTES[page],
+      params: { id: selected.self.getPublicDeriverId(), page },
+    });
+  };
 }
