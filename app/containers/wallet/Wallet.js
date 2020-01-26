@@ -16,7 +16,7 @@ type Props = InjectedContainerProps;
 @observer
 export default class Wallet extends Component<Props> {
 
-  isActiveScreen = (page: string, subpage: boolean): boolean => {
+  isActiveScreen = (page: string, subpage: ?boolean): boolean => {
     const { app } = this.props.stores;
     const { wallets } = this.props.stores.substores.ada;
     const selected = wallets.selected;

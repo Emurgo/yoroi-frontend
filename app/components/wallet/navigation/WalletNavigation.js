@@ -38,7 +38,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +isActiveNavItem: string => boolean,
+  +isActiveNavItem: (string, ?boolean) => boolean,
   +onNavItemClick: string => void,
 |};
 

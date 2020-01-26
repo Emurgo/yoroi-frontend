@@ -10,11 +10,11 @@ import globalMessages from '../../../i18n/global-messages';
 const messages = defineMessages({
   warning1: {
     id: 'wallet.receive.page.internalWarning1',
-    defaultMessage: 'Internal addresses (or "change" addresses) maintain your privacy by obscuring which addresses belong to you on the blockchain'
+    defaultMessage: '!!!Internal addresses (or "change" addresses) maintain your privacy by obscuring which addresses belong to you on the blockchain'
   },
   warning2: {
     id: 'wallet.receive.page.internalWarning2',
-    defaultMessage: 'Internal addresses are shown here for personal auditing purposes and you should <strong>never</strong> be used.'
+    defaultMessage: '!!!Internal addresses are shown here for personal auditing purposes and you should <strong>never</strong> be used.'
   },
 });
 
