@@ -32,7 +32,7 @@ export default class WalletNavButton extends Component<Props> {
 
     return (
       <button type="button" className={componentClasses} onClick={onClick}>
-        {IconComponent !== null && IconComponent !== undefined &&
+        {IconComponent != null &&
           <div className={styles.icon}>
             <IconComponent />
           </div>

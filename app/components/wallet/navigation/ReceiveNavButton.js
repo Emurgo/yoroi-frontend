@@ -9,13 +9,14 @@ type Props = {|
   +isActive: boolean,
   +onClick: void => void,
   +className?: string,
-  +icon: string, // TODO: make use of this?
+  +icon?: string,
 |};
 
 @observer
 export default class ReceiveNavButton extends Component<Props> {
   static defaultProps = {
     className: undefined,
+    icon: undefined,
   };
 
   render() {
@@ -27,10 +28,19 @@ export default class ReceiveNavButton extends Component<Props> {
       isActive && styles.active
     ]);
 
+    const IconComponent = this.props.icon;
+
     return (
-      <button type="button" className={componentClasses} onClick={onClick}>
-        <span className={styles.label}>{label}</span>
-      </button>
+      <>
+        <button type="button" className={componentClasses} onClick={onClick}>
+          <span className={styles.label}>{label}</span>
+        </button>
+        {IconComponent != null &&
+          <div className={styles.icon}>
+            <IconComponent />
+          </div>
+        }
+      </>
     );
   }
 }

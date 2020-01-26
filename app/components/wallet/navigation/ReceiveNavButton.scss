@@ -28,6 +28,24 @@
   }
 }
 
+.icon {
+  margin-left: 10px;
+  margin-top: 7px;
+
+  & > svg {
+    max-height: 24px;
+    max-width: 24px;
+
+    & > g {
+      fill: var(--theme-wallet-navigation-tab-text-color);
+    }
+  }
+
+  @media (max-width: 950px) {
+    display: none;
+  }
+}
+
 .label {
   font-size: 18px;
   line-height: 22px;
