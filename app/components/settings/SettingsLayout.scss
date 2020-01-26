@@ -3,6 +3,7 @@
 .component {
   background-color: var(--theme-settings-body-background-color);
   display: flex;
+  flex-direction: column;
   height: 100%;
 
   .settingsPaneWrapper {
@@ -13,30 +14,10 @@
 
   .settingsPane {
     min-height: 100%;
+    padding: 32px 24px;
     background-color: var(--theme-settings-pane-background-color);
     border: var(--theme-settings-pane-border);
     overflow: visible;
-  }
-}
-
-:global(.YoroiClassic) .component {
-  padding: 0 20px;
-
-  .settingsPaneWrapper {
-    padding: 20px 20px 20px 0;
-  }
-  .settingsPane {
-    padding: 20px;
-  }
-}
-
-:global(.YoroiModern) .component {
-
-  display: flex;
-  flex-direction: column;
-  
-  .settingsPane {
-    padding: 32px 24px;
   }
 
   fieldset {

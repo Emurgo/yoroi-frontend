@@ -1,28 +1,7 @@
 .component {
   color: var(--theme-settings-menu-item-text-color);
   display: block;
-  line-height: 1.38;
   text-align: left;
-  width: 100%;
-  &.active {
-    color: var(--theme-settings-menu-item-text-color-active);
-    background-color: var(--theme-settings-menu-item-background-color-active);
-  }
-}
-
-:global(.YoroiClassic) .component {
-  font-family: var(--font-regular);
-  font-size: 14px;
-  height: 40px;
-  padding: 10px 10px 10px 20px;
-  &.active {
-    border-left: 4px solid var(--theme-settings-menu-item-left-border-color-active);
-    font-family: var(--font-bold);
-    padding-left: 16px;
-  }
-}
-
-:global(.YoroiModern) .component {
   font-family: var(--font-regular);
   font-size: 16px;
   line-height: 22px;
@@ -30,6 +9,15 @@
   text-transform: uppercase;
   border-bottom: 3px solid transparent;
   width: initial;
+
+  &.active {
+    border-bottom-color: var(--theme-wallet-navigation-tab-text-color-active);
+    color: var(--theme-wallet-navigation-tab-text-color-active);
+  
+    &:hover {
+      border-bottom-color: var(--theme-wallet-navigation-tab-text-color-active);
+    }
+  }
 
   &:hover {
     border-bottom-color: var(--theme-wallet-navigation-tab-text-color);
@@ -39,16 +27,6 @@
 
   & + .component {
     margin-left: 43px;
-  }
-
-  &.active {
-    border-bottom-color: var(--theme-wallet-navigation-tab-text-color-active);
-    color: var(--theme-wallet-navigation-tab-text-color-active);
-  
-    &:hover {
-      border-bottom-color: var(--theme-wallet-navigation-tab-text-color-active);
-    }
-  
   }
 }
 
