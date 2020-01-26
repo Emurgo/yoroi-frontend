@@ -78,7 +78,9 @@ export default class NavWalletDetails extends Component<Props> {
               {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
             </div>
             <div>
-              <p className={styles.label}>{intl.formatMessage(globalMessages.rewardsLabel)}&nbsp;</p>
+              <p className={styles.label}>
+                {intl.formatMessage(globalMessages.rewardsLabel)}&nbsp;
+              </p>
               {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
             </div>
           </div>
