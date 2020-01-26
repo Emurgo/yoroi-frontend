@@ -144,6 +144,10 @@ const globalMessages = defineMessages({
     id: 'global.unit.ada',
     defaultMessage: '!!!Ada',
   },
+  attentionHeaderText: {
+    id: 'widgets.warningBox.headerText',
+    defaultMessage: '!!!ATTENTION:',
+  },
   recoveryPhraseDialogTitle: {
     id: 'wallet.backup.recovery.phrase.dialog.title',
     defaultMessage: '!!!Recovery phrase',

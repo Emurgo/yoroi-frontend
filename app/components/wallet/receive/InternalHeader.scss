@@ -6,11 +6,32 @@
   display: flex;
 
   .warningSection {
-    p {
+    border-radius: 8px;
+    background-color: var(--theme-warning-box-bg-color);
+    box-shadow: var(--cmn-warning-box-bg-shadow);
+    width: 80%;
+    .attentionLabel {
+      font-family: var(--font-medium);
+      font-size: 16px;
+      line-height: 19px;
+      color: var(--theme-warning-color);
+
+      padding-top: 24px;
+      margin-bottom: 12px;
+    }
+
+    .text {
+      font-family: var(--font-regular);
+      font-size: 14px;
+      line-height: 22px;
+      color: var(--theme-bordered-box-text-color);
       padding-top: 8px;
-      padding-left: 40px;
-      padding-right: 40px;
-      height: 50px;
+      padding-bottom: 12px;
+      padding-right: 12px;
+    }
+
+    p {
+      padding-left: 24px;
     }
   }
 }
