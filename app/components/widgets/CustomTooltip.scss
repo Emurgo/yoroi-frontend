@@ -1,12 +1,13 @@
 @import '../../themes/mixins/underline.scss';
 
 .component {
+  flex-direction: column;
   .infoIcon {
-    display: flex;
-    margin-left: 3px;
+    flex: 1;
   }
   
   .SimpleTooltip {
+    
     div[data-bubble-container] {
       transform: translate(-50%, 0); // center the tooltip no matter how long is the text inside
       margin-left: 20px; // offset = horizontal padding of icon and tooltip

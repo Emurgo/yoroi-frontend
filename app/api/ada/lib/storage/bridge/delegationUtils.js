@@ -101,9 +101,9 @@ export type CertificateForEpoch = {|
   ...AccountStateDelegation,
 |};
 export type GetCurrentDelegationResponse = {|
-  currEpoch: void| CertificateForEpoch,
-  prevEpoch: void| CertificateForEpoch,
-  prevPrevEpoch: void| CertificateForEpoch,
+  currEpoch: void | CertificateForEpoch,
+  prevEpoch: void | CertificateForEpoch,
+  prevPrevEpoch: void | CertificateForEpoch,
 |};
 export type GetCurrentDelegationFunc = (
   request: GetCurrentDelegationRequest

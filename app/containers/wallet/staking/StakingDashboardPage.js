@@ -7,6 +7,7 @@ import { observer } from 'mobx-react';
 import BigNumber from 'bignumber.js';
 
 import PublicDeriverWithCachedMeta from '../../../domain/PublicDeriverWithCachedMeta';
+import { getOrDefault } from '../../../domain/Explorer';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import StakingDashboard from '../../../components/wallet/staking/dashboard/StakingDashboard';
 import EpochProgress from '../../../components/wallet/staking/dashboard/EpochProgress';
@@ -18,7 +19,8 @@ import { getShelleyTxFee } from '../../../api/ada/transactions/shelley/utils';
 import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
 import InvalidURIImg from '../../../assets/images/uri/invalid-uri.inline.svg';
-import RewardPopup from '../../../components/wallet/staking/dashboard/RewardPopup';
+import UpcomingRewards from '../../../components/wallet/staking/dashboard/UpcomingRewards';
+import type { BoxInfo } from '../../../components/wallet/staking/dashboard/UpcomingRewards';
 import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard/LessThanExpectedDialog';
 import environment from '../../../environment';
 import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
@@ -28,6 +30,7 @@ import { GetPoolInfoApiError } from '../../../api/ada/errors';
 import LocalizableError from '../../../i18n/LocalizableError';
 import config from '../../../config';
 import { formattedWalletAmount } from '../../../utils/formatters';
+import type { PoolTuples } from '../../../api/ada/lib/state-fetch/types';
 
 import {
   genTimeToSlot,
@@ -48,9 +51,9 @@ import type {
 import globalMessages from '../../../i18n/global-messages';
 import { runInAction } from 'mobx';
 
-type Props = {
+type Props = {|
   ...InjectedProps,
-};
+|};
 
 type State = {|
   +currentTime: Date,
@@ -183,7 +186,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
                 ).dividedBy(LOVELACES_PER_ADA)
               )}
         />}
-        rewardPopup={getTimeBasedElements.rewardInfo?.rewardPopup}
+        upcomingRewards={getTimeBasedElements.rewardInfo?.rewardPopup}
         totalGraphData={[
           {
             name: 1,
@@ -487,56 +490,75 @@ export default class StakingDashboardPage extends Component<Props, State> {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
     let rewardInfo = undefined;
-    if (
+    if (!(
       !delegationRequests.getCurrentDelegation.wasExecuted ||
       delegationRequests.getCurrentDelegation.isExecuting
-    ) {
-      rewardInfo = undefined;
-    } else {
+    )) {
       const { result } = delegationRequests.getCurrentDelegation;
-      if (result == null || result.currEpoch == null || result.currEpoch.pools.length === 0) {
-        rewardInfo = undefined;
+      if (result == null || result.currEpoch == null) {
+        rewardInfo = {
+          rewardPopup: (
+            <UpcomingRewards
+              content={[
+                this.generateUpcomingRewardInfo({
+                  epoch: currentRelativeTime.epoch + 1,
+                  pools: [],
+                }),
+                this.generateUpcomingRewardInfo({
+                  epoch: currentRelativeTime.epoch + 2,
+                  pools: [],
+                }),
+                this.generateUpcomingRewardInfo({
+                  epoch: currentRelativeTime.epoch + 3,
+                  pools: [],
+                }),
+              ]}
+              showWarning={false}
+              onExternalLinkClick={handleExternalLinkClick}
+              baseUrl=""
+            />
+          ),
+          showWarning: false,
+        };
       } else {
-        const block = result.currEpoch.block;
-        if (block == null) {
-          throw new Error(`${nameof(this.getTimeBasedElements)} should never happen`);
-        }
-        const certificateRelativeTime = this.toRelativeSlotNumber(block.SlotNum);
+        const currEpochCert = result.currEpoch;
 
-        let nextRewardEpoch;
-        const epochsSinceCert = currentRelativeTime.epoch - certificateRelativeTime.epoch;
         // first reward is slower than the rest
         // it takes 2 epochs for stake delegation to update
         // then after the start of the 3rd epoch, you get the reward
-        if (epochsSinceCert === 0) {
-          nextRewardEpoch = currentRelativeTime.epoch + 3;
-        } else if (epochsSinceCert === 1) {
-          nextRewardEpoch = currentRelativeTime.epoch + 2;
-        } else {
-          nextRewardEpoch = currentRelativeTime.epoch + 1;
+        const upcomingRewards: Array<BoxInfo> = [];
+        for (let i = 4; i >= 2; i--) {
+          upcomingRewards.unshift(this.generateUpcomingRewardInfo({
+            epoch: currentRelativeTime.epoch + i + 1,
+            pools: currEpochCert.pools,
+          }));
         }
-        const nextRewardTime = this.toRealTime({
-          absoluteSlotNum: this.toAbsoluteSlot({
-            epoch: nextRewardEpoch,
-            slot: 0,
-          })
-        });
-        const followingRewardTime = this.toRealTime({
-          absoluteSlotNum: this.toAbsoluteSlot({
-            epoch: nextRewardEpoch + 1,
-            slot: 0,
-          })
-        });
+        if (result.prevEpoch) {
+          upcomingRewards.unshift(this.generateUpcomingRewardInfo({
+            epoch: currentRelativeTime.epoch + 2,
+            pools: result.prevEpoch.pools,
+          }));
+        }
+        if (result.prevPrevEpoch) {
+          upcomingRewards.unshift(this.generateUpcomingRewardInfo({
+            epoch: currentRelativeTime.epoch + 1,
+            pools: result.prevPrevEpoch.pools,
+          }));
+        }
+
+        const { baseUrl } = getOrDefault(this.props.stores.profile.selectedExplorer, 'pool');
+        const upcomingTuples = ((upcomingRewards.slice(0, 3): any): [?BoxInfo, ?BoxInfo, ?BoxInfo]);
         const rewardPopup = (
-          <RewardPopup
-            currentText={moment(nextRewardTime).format('MMM Do hh:mm A')}
-            followingText={moment(followingRewardTime).format('MMM Do hh:mm A')}
-            showDisclaimer={epochsSinceCert <= 1}
+          <UpcomingRewards
+            content={upcomingTuples}
+            showWarning={upcomingRewards.length === 3}
+            onExternalLinkClick={handleExternalLinkClick}
+            baseUrl={baseUrl}
           />
         );
         rewardInfo = {
           rewardPopup,
-          showWarning: epochsSinceCert <= 1,
+          showWarning: upcomingRewards.length === 3,
         };
       }
     }
@@ -556,7 +578,41 @@ export default class StakingDashboardPage extends Component<Props, State> {
 
     return {
       epochProgress,
-      rewardInfo,
+      rewardInfo: rewardInfo ?? ({
+        rewardPopup: (
+          <UpcomingRewards
+            content={[null, null, null]}
+            showWarning={false}
+            onExternalLinkClick={handleExternalLinkClick}
+            baseUrl=""
+          />
+        ),
+        showWarning: false,
+      }),
+    };
+  }
+
+  generateUpcomingRewardInfo: {|
+    epoch: number,
+    pools: Array<PoolTuples>,
+  |} => BoxInfo = (request) => {
+    const endEpochTime = this.toRealTime({
+      absoluteSlotNum: this.toAbsoluteSlot({
+        epoch: request.epoch,
+        slot: 0,
+      })
+    });
+    const endEpochMoment = moment(endEpochTime);
+    return {
+      pools: request.pools,
+      epoch: request.epoch,
+      time: [
+        endEpochMoment.format('MMM Do'),
+        endEpochMoment.format('hh'),
+        endEpochMoment.format('mm'),
+        endEpochMoment.format('ss'),
+        endEpochMoment.format('A'),
+      ],
     };
   }
 

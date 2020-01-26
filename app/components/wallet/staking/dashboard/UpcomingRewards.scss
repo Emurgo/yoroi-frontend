@@ -1,0 +1,98 @@
+@import '../../../../themes/mixins/underline';
+
+.wrapper {
+    display: flex;
+    min-height: 143px;
+}
+
+.column {
+    padding: 24px 24px;
+    flex: 1;
+    border-right: 1px solid var(--theme-dashboard-card-vertical-separator-color);
+}
+
+.loading {
+    position: relative;
+    transform: translateY(50%);
+    margin: auto auto;
+}
+
+.icon {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 11px;
+}
+
+.header {
+    margin-bottom: 19.5px;
+    display: flex;
+    justify-content: flex-end;
+
+    .label {
+        margin-right: auto;
+        color: var(--theme-dashboard-label-color);
+        font-family: var(--font-regular);
+        font-size: 14px;
+        line-height: 22px;
+    }
+}
+
+.time {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: -3px;
+
+    .monthDay {
+        margin-right: 4px;
+        width: max-content;
+        margin-top: 3px;
+    }
+
+    .timer {
+        margin-right: 4px;
+    }
+
+    .ampm {
+        margin-top: 3px;
+    }
+}
+
+.noDelegation {
+    background-color: var(--theme-dashboard-card-nodelegation-background-color);
+
+    .message {
+        height: 53px;
+        color: var(--cmn-default-color-grey-6);
+        font-family: var(--font-regular);
+        font-size: 12px;
+        line-height: 18px;
+
+        text-align: center;
+    }
+}
+
+.pools {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 1px;
+
+    .avatar {
+        cursor: pointer;
+        margin-top: 10px;
+        width: 24px;
+        height: 24px;
+        border-radius: 4px;
+        border: 1px solid rgba(111, 114, 144, 0.24);
+        & + .avatar {
+            margin-left: 16px;
+        }
+    }
+}
+
+.poolInfo {
+    padding: 4px 0px;
+    font-family: var(--font-light);
+    color: var(--theme-dashboard-tooltip-text-color);
+    font-size: 11px;
+    line-height: 14px;
+}

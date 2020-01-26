@@ -88,6 +88,11 @@
       display: flex;
       justify-content: center;
       letter-spacing: -0.03em;
+
+      .tooltip {
+        margin-left: 3px;
+        margin-top: 2px;
+      }
     }
   
     .heroCardsItemBg {

@@ -41,8 +41,19 @@
 }
 
 .summary {
-  flex: 1;
+  flex-direction: row;
   margin-left: 32px;
+  height: 100%;
+  width: 100%;
+
+  .summaryItem {
+    flex: 1;
+    min-height: 180px;
+
+    & + .summaryItem {
+      margin-top: 32px;
+    }
+  }
 }
 
 .bodyWrapper {

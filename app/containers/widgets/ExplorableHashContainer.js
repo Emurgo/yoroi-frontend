@@ -6,7 +6,7 @@ import { handleExternalLinkClick } from '../../utils/routing';
 import { intlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import type { ExplorerType, LinkType } from '../../domain/Explorer';
-import { Explorer, explorerInfo } from '../../domain/Explorer';
+import { Explorer, getOrDefault, } from '../../domain/Explorer';
 
 import ExplorableHash from '../../components/widgets/hashWrappers/ExplorableHash';
 
@@ -32,15 +32,7 @@ export default class ExplorableHashContainer extends Component<Props> {
   render() {
     const { intl } = this.context;
 
-    let explorer = explorerInfo[this.props.selectedExplorer];
-
-    // since not every explorer supports every feature
-    // we default to Seiza if the link type doesn't exist for the selected explorer
-    let baseUrl = explorer[this.props.linkType];
-    if (!baseUrl) {
-      explorer = explorerInfo.seiza;
-      baseUrl = explorer[this.props.linkType];
-    }
+    const { name, baseUrl } = getOrDefault(this.props.selectedExplorer, this.props.linkType);
 
     /**
      * We only add "blockchain explorer" after the name for Seiza
@@ -48,13 +40,13 @@ export default class ExplorableHashContainer extends Component<Props> {
      * that Seiza is a blockchain explorer.
      * If they've switched from the default, they should know what the names mean
      */
-    const name = this.props.selectedExplorer === Explorer.SEIZA
-      ? explorer.name + ' ' + intl.formatMessage(globalMessages.blockchainExplorer)
-      : explorer.name;
+    const displayName = this.props.selectedExplorer === Explorer.SEIZA
+      ? name + ' ' + intl.formatMessage(globalMessages.blockchainExplorer)
+      : name;
 
     return (
       <ExplorableHash
-        websiteName={name}
+        websiteName={displayName}
         url={baseUrl + this.props.hash}
         light={this.props.light}
         onExternalLinkClick={handleExternalLinkClick}

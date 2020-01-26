@@ -82,10 +82,10 @@ function getIohkExplorer(): ExplorerInfo {
 export const explorerInfo: {
   [key: ExplorerType]: ExplorerInfo,
   // assert that Seiza always has a URL for every type
-  seiza: {
+  seiza: {|
     ...typeof Link,
     name: string,
-  }
+  |}
 } = Object.freeze({
   seiza,
   ...(!environment.isShelley()
@@ -110,3 +110,25 @@ export const explorerInfo: {
     }
   )
 });
+
+export function getOrDefault(selectedExplorer: ExplorerType, linkType: LinkType): {|
+  name: string,
+  baseUrl: string,
+|} {
+  const explorer = explorerInfo[selectedExplorer];
+
+  // since not every explorer supports every feature
+  // we default to Seiza if the link type doesn't exist for the selected explorer
+  const baseUrl = explorer[linkType];
+  if (!baseUrl) {
+    return {
+      name: explorerInfo.seiza.name,
+      baseUrl: explorerInfo.seiza[linkType],
+    };
+  }
+
+  return {
+    name: explorer.name,
+    baseUrl,
+  };
+}
