@@ -109,19 +109,23 @@ export default class UpcomingRewards extends Component<Props> {
           {additional}
         </div>
         <div className={styles.time}>
-          <div className={styles.monthDay}>
-            {info.time[0]} {intl.formatMessage(messages.at)}
+          <div className={styles.broad}>
+            <div className={styles.monthDay}>
+              {info.time[0]} {intl.formatMessage(messages.at)}
+            </div>
           </div>
-          <div className={styles.timer}>
-            <Timer
-              time={{
-                h: info.time[1],
-                m: info.time[2],
-                s: info.time[3],
-              }}
-            />
+          <div className={styles.specific}>
+            <div className={styles.timer}>
+              <Timer
+                time={{
+                  h: info.time[1],
+                  m: info.time[2],
+                  s: info.time[3],
+                }}
+              />
+            </div>
+            <div className={styles.ampm}>{info.time[4]}</div>
           </div>
-          <div className={styles.ampm}>{info.time[4]}</div>
         </div>
         <div className={styles.pools}>
           {info.pools.map(pool => this.getAvatars(pool))}
@@ -139,7 +143,7 @@ export default class UpcomingRewards extends Component<Props> {
 
     return (
       <CustomTooltip
-        key={pool[0]}
+        key={pool[0] + pool[1]}
         toolTip={<div className={styles.poolInfo}>{pool[0]}</div>}
         isOpeningUpward={false}
       >

@@ -9,6 +9,7 @@ import WalletAccountIcon from './WalletAccountIcon';
 import ConceptualIcon from '../../assets/images/wallet-nav/conceptual-wallet.inline.svg';
 import PaperIcon from '../../assets/images/wallet-nav/paper-wallet.inline.svg';
 import TrezorIcon from '../../assets/images/wallet-nav/trezor-wallet.inline.svg';
+import LedgerIcon from '../../assets/images/wallet-nav/ledger-wallet.inline.svg';
 import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
 import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
 import { truncateLongName, maxNameLengthBeforeTruncation } from '../../utils/formatters';
@@ -86,7 +87,7 @@ export default class NavPlate extends Component<Props> {
         break;
       case 'ledger':
         typeText = messages.ledgerWallet;
-        TypeIcon = TrezorIcon; // TODO: replace with Ledger when we have the icon
+        TypeIcon = LedgerIcon;
         break;
       default:
         typeText = '';
