@@ -39,7 +39,7 @@ Then(/^I should see secondary menu (.*) item disabled$/, async function (buttonN
   const buttonSelector =
     `.SettingsMenuItem_component.SettingsMenuItem_disabled.${formattedButtonName}`;
   const label = await i18n.formatMessage(this.driver, { id: `settings.menu.${formattedButtonName}.link.label` });
-  await this.waitUntilText(buttonSelector, label);
+  await this.waitUntilText(buttonSelector, label.toUpperCase());
 });
 
 Then(/^The Japanese language should be selected$/, async function () {

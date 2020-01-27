@@ -387,6 +387,8 @@ export default {
   '--theme-default-main-bg': '#F3F3F5',
 
   '--theme-wallet-navigation-tab-height': '40px',
+  '--theme-wallet-navigation-tab-text-color': '#6B7384',
+  '--theme-wallet-navigation-tab-text-color-active': '#DAA49A',
 
   '--theme-warning-box-bg-color': 'rgba(233, 72, 61, 0.06)', // #E9483D
 

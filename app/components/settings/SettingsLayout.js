@@ -15,12 +15,12 @@ export default class SettingsLayout extends Component<Props> {
     const { menu, children } = this.props;
     return (
       <div className={styles.component}>
+        {menu}
         <div className={styles.settingsPaneWrapper}>
           <div className={styles.settingsPane}>
             {children}
           </div>
         </div>
-        {menu}
       </div>
     );
   }
