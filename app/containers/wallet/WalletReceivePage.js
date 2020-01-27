@@ -10,6 +10,8 @@ import VerifyAddressDialog from '../../components/wallet/receive/VerifyAddressDi
 import URIGenerateDialog from '../../components/uri/URIGenerateDialog';
 import URIDisplayDialog from '../../components/uri/URIDisplayDialog';
 import type { InjectedProps } from '../../types/injectedPropsType';
+import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
+import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 
 import {
   DECIMAL_PLACES_IN_ADA,
@@ -80,6 +82,14 @@ export default class WalletReceivePage extends Component<Props, State> {
     const withChains = asHasUtxoChains(publicDeriver.self);
     if (!withChains) throw new Error('WalletReceivePage only available for account-level wallets');
     const addressTypeStore = this.getTypeStore();
+
+    if (!addressTypeStore.getRequest(publicDeriver.self).wasExecuted) {
+      return (
+        <VerticallyCenteredLayout>
+          <LoadingSpinner />
+        </VerticallyCenteredLayout>
+      );
+    }
 
     // get info about the lattest address generated for special rendering
     const lastAddress = addressTypeStore.last;

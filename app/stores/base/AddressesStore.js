@@ -59,7 +59,7 @@ export class AddressTypeStore<T> {
   @computed get all(): Array<T> {
     const publicDeriver = this.stores.substores[environment.API].wallets.selected;
     if (!publicDeriver) return [];
-    const result = this._flowCoerceResult(this._getRequest(publicDeriver.self));
+    const result = this._flowCoerceResult(this.getRequest(publicDeriver.self));
     if (result == null) return [];
     return result;
   }
@@ -67,21 +67,21 @@ export class AddressTypeStore<T> {
   @computed get hasAny(): boolean {
     const publicDeriver = this.stores.substores[environment.API].wallets.selected;
     if (!publicDeriver) return false;
-    const result = this._flowCoerceResult(this._getRequest(publicDeriver.self));
+    const result = this._flowCoerceResult(this.getRequest(publicDeriver.self));
     return result ? result.length > 0 : false;
   }
 
   @computed get last(): ?T {
     const publicDeriver = this.stores.substores[environment.API].wallets.selected;
     if (!publicDeriver) return;
-    const result = this._flowCoerceResult(this._getRequest(publicDeriver.self));
+    const result = this._flowCoerceResult(this.getRequest(publicDeriver.self));
     return result ? result[result.length - 1] : null;
   }
 
   @computed get totalAvailable(): number {
     const publicDeriver = this.stores.substores[environment.API].wallets.selected;
     if (!publicDeriver) return 0;
-    const result = this._flowCoerceResult(this._getRequest(publicDeriver.self));
+    const result = this._flowCoerceResult(this.getRequest(publicDeriver.self));
     return result ? result.length : 0;
   }
 
@@ -89,7 +89,7 @@ export class AddressTypeStore<T> {
   @action refreshAddresses: void => Promise<void> = async () => {
     const publicDeriver = this.stores.substores[environment.API].wallets.selected;
     if (publicDeriver == null) return;
-    const allRequest = this._getRequest(publicDeriver.self);
+    const allRequest = this.getRequest(publicDeriver.self);
     allRequest.invalidate({ immediately: false });
     await allRequest.execute({ publicDeriver: publicDeriver.self }).promise;
   };
@@ -100,7 +100,7 @@ export class AddressTypeStore<T> {
     return (request.result: any);
   }
 
-  _getRequest: (PublicDeriver<>) => CachedRequest<SubRequestType<T>> = (publicDeriver) => {
+  getRequest: (PublicDeriver<>) => CachedRequest<SubRequestType<T>> = (publicDeriver) => {
     const foundRequest = find(this.addressesRequests, { publicDeriver });
     if (foundRequest && foundRequest.cachedRequest) {
       return foundRequest.cachedRequest;
@@ -113,7 +113,7 @@ export class AddressTypeStore<T> {
   ) => {
     this.addressesRequests.push({
       publicDeriver,
-      cachedRequest: this._getRequest(publicDeriver),
+      cachedRequest: this.getRequest(publicDeriver),
     });
   }
 }

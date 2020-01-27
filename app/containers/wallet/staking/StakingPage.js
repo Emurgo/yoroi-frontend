@@ -102,12 +102,10 @@ export default class StakingPage extends Component<Props> {
       this.props.stores.substores.ada.transactions.hasAnyPending
     ) {
       return (
-        <VerticallyCenteredLayout>
-          <InformativeError
-            title={intl.formatMessage(messages.title)}
-            text={intl.formatMessage(messages.pendingTxWarning)}
-          />
-        </VerticallyCenteredLayout>
+        <InformativeError
+          title={intl.formatMessage(messages.title)}
+          text={intl.formatMessage(messages.pendingTxWarning)}
+        />
       );
     }
 
