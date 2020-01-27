@@ -20,7 +20,9 @@
 
   .subTitle {
     font-size: 14px;
+    font-family: var(--font-regular);
     line-height: 22px;
+    text-align: center;
     color: var(--theme-support-settings-text-color);
   }
 
@@ -79,13 +81,14 @@
       padding: 10px;
     }
 
+    div {
+      box-shadow: 0 5px 30px 0px rgba(24,26,30, .12);
+    }
+
     &.inactive {
+      opacity: 0.5;
       &:hover {
         cursor: pointer;
-
-        div {
-          box-shadow: 0 5px 30px 0px rgba(24,26,30, .12);
-        }
       }
     }
   }

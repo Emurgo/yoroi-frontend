@@ -19,12 +19,6 @@
     }
   }
 
-  &:hover {
-    border-bottom-color: var(--theme-wallet-navigation-tab-text-color);
-    color: var(--theme-settings-menu-item-text-color);
-    cursor: pointer;
-  }
-
   & + .component {
     margin-left: 43px;
   }

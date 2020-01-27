@@ -35,13 +35,14 @@
 }
 
 .label {
-  font-size: 12px;
+  font-size: 18px;
   font-family: var(--font-regular);
   font-weight: 600;
   letter-spacing: 0.4px;
   display: block;
-  text-transform: uppercase;
   text-align: center;
+  line-height: 22px;
+  color: var(--theme-wallet-navigation-tab-text-color);
 }
 
 .icon {
@@ -63,14 +64,6 @@
 
 :global(.YoroiModern)
 {
-  .label {
-    font-size: 18px;
-    font-family: var(--font-regular);
-    line-height: 22px;
-    color: var(--theme-wallet-navigation-tab-text-color);
-    text-transform: initial;
-  }
-
   .active {
     .label {
       color: var(--theme-wallet-navigation-tab-text-color-active);
