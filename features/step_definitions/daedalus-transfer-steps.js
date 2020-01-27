@@ -98,7 +98,7 @@ Then(/^I should see the Create wallet screen$/, async function () {
 Then(/^I should see the Receive screen$/, async function () {
   const receiveTitle = await i18n.formatMessage(this.driver,
     { id: 'wallet.navigation.receive' });
-  await this.waitUntilText('.WalletNavButton_active', receiveTitle.toUpperCase());
+  await this.waitUntilText('.WalletNavButton_active', receiveTitle);
 });
 
 Then(/^I should see an Error screen$/, async function () {
