@@ -40,3 +40,10 @@ Feature: Generate Addresses
     | address                                                     |
     | Ae2tdPwUPEZAbDBFpgzALfryWbvDtx6H6BMynDxWFuThQthW7HX93yJ3wRS |
     And I shouldn't see the address "Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc"
+
+  @it-88
+  Scenario: Ensure user can see internal address in "Receive tab" (IT-88)
+    When I click on the internal tab
+    And I should see the addresses exactly list them
+    | address                                                     |
+    | Ae2tdPwUPEZ3o8HadjafhGnNEqxwQm4V98Nm3kADDsfTv8QE2Ytpe2L8TSL |

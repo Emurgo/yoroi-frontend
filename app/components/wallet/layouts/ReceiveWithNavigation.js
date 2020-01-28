@@ -2,29 +2,29 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import WalletNavigation from '../navigation/WalletNavigation';
-import styles from './WalletWithNavigation.scss';
+import ReceiveNavigation from '../navigation/ReceiveNavigation';
+import styles from './ReceiveWithNavigation.scss';
 
 type Props = {|
   +children?: Node,
-  +isActiveScreen: (string, ?boolean) => boolean,
-  +onWalletNavItemClick: string => void,
+  +isActiveTab: ('internal' | 'external') => boolean,
+  +onTabClick: string => void,
 |};
 
 @observer
-export default class WalletWithNavigation extends Component<Props> {
+export default class ReceiveWithNavigation extends Component<Props> {
   static defaultProps = {
     children: undefined
   };
 
   render() {
-    const { children, isActiveScreen, onWalletNavItemClick } = this.props;
+    const { children, isActiveTab, onTabClick } = this.props;
     return (
       <div className={styles.component}>
         <div className={styles.navigation}>
-          <WalletNavigation
-            isActiveNavItem={isActiveScreen}
-            onNavItemClick={onWalletNavItemClick}
+          <ReceiveNavigation
+            isActiveTab={isActiveTab}
+            onTabClick={onTabClick}
           />
         </div>
         <div className={styles.page}>

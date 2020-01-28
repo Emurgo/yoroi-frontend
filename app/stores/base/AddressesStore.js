@@ -23,9 +23,16 @@ import type { StoresMap } from '../index';
 import {
   Logger,
 } from '../../utils/logging';
+import { ROUTES } from '../../routes-config';
+import { buildRoute } from '../../utils/routing';
 import { ChainDerivations } from '../../config/numbersConfig';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
+
+const RECEIVE_ROUTES = {
+  internal: ROUTES.WALLETS.RECEIVE.INTERNAL,
+  external: ROUTES.WALLETS.RECEIVE.EXTERNAL
+};
 
 export type StandardAddress = {|
   ...Address, ...Value, ...Addressing, ...UsedStatus
@@ -52,7 +59,7 @@ export class AddressTypeStore<T> {
   @computed get all(): Array<T> {
     const publicDeriver = this.stores.substores[environment.API].wallets.selected;
     if (!publicDeriver) return [];
-    const result = this._flowCoerceResult(this._getRequest(publicDeriver.self));
+    const result = this._flowCoerceResult(this.getRequest(publicDeriver.self));
     if (result == null) return [];
     return result;
   }
@@ -60,21 +67,21 @@ export class AddressTypeStore<T> {
   @computed get hasAny(): boolean {
     const publicDeriver = this.stores.substores[environment.API].wallets.selected;
     if (!publicDeriver) return false;
-    const result = this._flowCoerceResult(this._getRequest(publicDeriver.self));
+    const result = this._flowCoerceResult(this.getRequest(publicDeriver.self));
     return result ? result.length > 0 : false;
   }
 
   @computed get last(): ?T {
     const publicDeriver = this.stores.substores[environment.API].wallets.selected;
     if (!publicDeriver) return;
-    const result = this._flowCoerceResult(this._getRequest(publicDeriver.self));
+    const result = this._flowCoerceResult(this.getRequest(publicDeriver.self));
     return result ? result[result.length - 1] : null;
   }
 
   @computed get totalAvailable(): number {
     const publicDeriver = this.stores.substores[environment.API].wallets.selected;
     if (!publicDeriver) return 0;
-    const result = this._flowCoerceResult(this._getRequest(publicDeriver.self));
+    const result = this._flowCoerceResult(this.getRequest(publicDeriver.self));
     return result ? result.length : 0;
   }
 
@@ -82,7 +89,7 @@ export class AddressTypeStore<T> {
   @action refreshAddresses: void => Promise<void> = async () => {
     const publicDeriver = this.stores.substores[environment.API].wallets.selected;
     if (publicDeriver == null) return;
-    const allRequest = this._getRequest(publicDeriver.self);
+    const allRequest = this.getRequest(publicDeriver.self);
     allRequest.invalidate({ immediately: false });
     await allRequest.execute({ publicDeriver: publicDeriver.self }).promise;
   };
@@ -93,7 +100,7 @@ export class AddressTypeStore<T> {
     return (request.result: any);
   }
 
-  _getRequest: (PublicDeriver<>) => CachedRequest<SubRequestType<T>> = (publicDeriver) => {
+  getRequest: (PublicDeriver<>) => CachedRequest<SubRequestType<T>> = (publicDeriver) => {
     const foundRequest = find(this.addressesRequests, { publicDeriver });
     if (foundRequest && foundRequest.cachedRequest) {
       return foundRequest.cachedRequest;
@@ -106,7 +113,7 @@ export class AddressTypeStore<T> {
   ) => {
     this.addressesRequests.push({
       publicDeriver,
-      cachedRequest: this._getRequest(publicDeriver),
+      cachedRequest: this.getRequest(publicDeriver),
     });
   }
 }
@@ -234,4 +241,31 @@ export default class AddressesStore extends Store {
         : CoreAddressTypes.CARDANO_LEGACY,
     });
   }
+
+  isActiveTab: $Keys<typeof RECEIVE_ROUTES> => boolean = (
+    tab
+  ) => {
+    const { app } = this.stores;
+    const { wallets } = this.stores.substores.ada;
+    const selected = wallets.selected;
+    if (selected == null) return false;
+    const screenRoute = buildRoute(
+      RECEIVE_ROUTES[tab],
+      {
+        id: selected.self.getPublicDeriverId(),
+        tab
+      }
+    );
+    return app.currentRoute === screenRoute;
+  };
+
+  handleTabClick: string => void = (page) => {
+    const { wallets } = this.stores.substores.ada;
+    const selected = wallets.selected;
+    if (selected == null) return;
+    this.actions.router.goToRoute.trigger({
+      route: RECEIVE_ROUTES[page],
+      params: { id: selected.self.getPublicDeriverId(), page },
+    });
+  };
 }

@@ -20,7 +20,11 @@
   bottom: 10%;	
   position: absolute;	
   text-align: center;	
-  width: 100%;	
+  width: 100%;
+
+  .spinner {
+    margin-top: 20px;
+  }
 }
 
 .ada-logo,

@@ -38,7 +38,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +isActiveNavItem: string => boolean,
+  +isActiveNavItem: (string, ?boolean) => boolean,
   +onNavItemClick: string => void,
 |};
 
@@ -81,7 +81,7 @@ export default class WalletNavigation extends Component<Props> {
             className="receive"
             label={intl.formatMessage(messages.receive)}
             icon={receiveIcon}
-            isActive={isActiveNavItem('receive')}
+            isActive={isActiveNavItem('receive', true)}
             onClick={() => onNavItemClick('receive')}
           />
         </div>

@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import MainLayout from '../MainLayout';
+import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import SidebarContainer from '../SidebarContainer';
 import NavBarContainer from '../NavBarContainer';
 import WalletWithNavigation from '../../components/wallet/layouts/WalletWithNavigation';
@@ -16,7 +17,7 @@ type Props = InjectedContainerProps;
 @observer
 export default class Wallet extends Component<Props> {
 
-  isActiveScreen = (page: string): boolean => {
+  isActiveScreen = (page: string, subpage: ?boolean): boolean => {
     const { app } = this.props.stores;
     const { wallets } = this.props.stores.substores.ada;
     const selected = wallets.selected;
@@ -28,6 +29,9 @@ export default class Wallet extends Component<Props> {
         page
       }
     );
+    if (subpage === true) {
+      return app.currentRoute.indexOf(screenRoute) !== -1;
+    }
     return app.currentRoute === screenRoute;
   };
 
@@ -57,7 +61,9 @@ export default class Wallet extends Component<Props> {
           connectionErrorType={checkAdaServerStatus}
           showInContainer
         >
-          <LoadingSpinner />
+          <VerticallyCenteredLayout>
+            <LoadingSpinner />
+          </VerticallyCenteredLayout>
         </MainLayout>
       );
     }

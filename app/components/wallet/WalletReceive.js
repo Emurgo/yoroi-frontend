@@ -1,16 +1,11 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, } from 'react-intl';
 import classnames from 'classnames';
-import QRCode from 'qrcode.react';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import BorderedBox from '../widgets/BorderedBox';
 import VerifyIcon from '../../assets/images/verify-icon.inline.svg';
 import GenerateURIIcon from '../../assets/images/generate-uri.inline.svg';
-import LocalizableError from '../../i18n/LocalizableError';
-import LoadingSpinner from '../widgets/LoadingSpinner';
 import styles from './WalletReceive.scss';
 import CopyableAddress from '../widgets/CopyableAddress';
 import RawHash from '../widgets/hashWrappers/RawHash';
@@ -24,18 +19,6 @@ import type {
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 const messages = defineMessages({
-  walletAddressLabel: {
-    id: 'wallet.receive.page.walletAddressLabel',
-    defaultMessage: '!!!Your wallet address',
-  },
-  walletReceiveInstructions: {
-    id: 'wallet.receive.page.walletReceiveInstructions',
-    defaultMessage: '!!!Share this wallet address to receive payments. To protect your privacy, new addresses are generated automatically once you use them.',
-  },
-  generateNewAddressButtonLabel: {
-    id: 'wallet.receive.page.generateNewAddressButtonLabel',
-    defaultMessage: '!!!Generate new address',
-  },
   generatedAddressesSectionTitle: {
     id: 'wallet.receive.page.generatedAddressesSectionTitle',
     defaultMessage: '!!!Generated addresses',
@@ -63,29 +46,21 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +walletAddress: string,
+  +header: Node,
   +selectedExplorer: ExplorerType,
-  +isWalletAddressUsed: boolean,
   +walletAddresses: Array<StandardAddress>,
-  +onGenerateAddress: void => Promise<void>,
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
   +onVerifyAddress: {| address: string, path: BIP32Path |} => Promise<void>,
-  +onGeneratePaymentURI: string => void,
-  +isSubmitting: boolean,
-  +error?: ?LocalizableError,
+  +onGeneratePaymentURI: void | (string => void),
 |};
 
-type State = {
+type State = {|
   showUsed: boolean,
-};
+|};
 
 @observer
 export default class WalletReceive extends Component<Props, State> {
-  static defaultProps = {
-    error: undefined
-  };
-
   static contextTypes = {
     intl: intlShape.isRequired,
   };
@@ -94,96 +69,21 @@ export default class WalletReceive extends Component<Props, State> {
     showUsed: true,
   };
 
-  toggleUsedAddresses = () => {
+  toggleUsedAddresses: void => void = () => {
     this.setState(prevState => ({ showUsed: !prevState.showUsed }));
   };
 
-  submit: void => Promise<void> = async () => {
-    await this.props.onGenerateAddress();
-  }
-
-  loadingSpinner: ?LoadingSpinner;
-
   render() {
     const {
-      walletAddress, walletAddresses,
+      walletAddresses,
       onVerifyAddress, onGeneratePaymentURI,
-      isSubmitting, error, isWalletAddressUsed,
       onCopyAddressTooltip, notification,
     } = this.props;
     const { intl } = this.context;
     const { showUsed } = this.state;
-    const mainAddressNotificationId = 'mainAddress-copyNotification';
-
-    const generateAddressButtonClasses = classnames([
-      'primary',
-      'generateAddressButton',
-      styles.submitButton,
-      isSubmitting ? styles.spinning : null,
-    ]);
-
-    const generateAddressForm = (
-      <Button
-        className={generateAddressButtonClasses}
-        label={intl.formatMessage(messages.generateNewAddressButtonLabel)}
-        onMouseUp={this.submit}
-        skin={ButtonSkin}
-      />
-    );
-
-    const copyableHashClass = classnames([
-      styles.copyableHash,
-    ]);
-
-    // Get QRCode color value from active theme's CSS variable
-    const qrCodeBackgroundColor = document.documentElement ?
-      document.documentElement.style.getPropertyValue('--theme-receive-qr-code-background-color') : 'transparent';
-    const qrCodeForegroundColor = document.documentElement ?
-      document.documentElement.style.getPropertyValue('--theme-receive-qr-code-foreground-color') : '#000';
 
     const walletReceiveContent = (
-      <BorderedBox>
-        <div className={styles.qrCodeAndInstructions}>
-          <div className={styles.instructions}>
-            <div className={styles.hashLabel}>
-              {intl.formatMessage(messages.walletAddressLabel)}
-            </div>
-            <CopyableAddress
-              hash={walletAddress}
-              elementId={mainAddressNotificationId}
-              onCopyAddress={() => onCopyAddressTooltip(walletAddress, mainAddressNotificationId)}
-              notification={notification}
-            >
-              <ExplorableHashContainer
-                selectedExplorer={this.props.selectedExplorer}
-                hash={walletAddress}
-                light={isWalletAddressUsed}
-                linkType="address"
-              >
-                <RawHash light={isWalletAddressUsed}>
-                  <span className={copyableHashClass}>{walletAddress}</span>
-                </RawHash>
-              </ExplorableHashContainer>
-            </CopyableAddress>
-            <div className={styles.postCopyMargin} />
-            <div className={styles.instructionsText}>
-              <FormattedHTMLMessage {...messages.walletReceiveInstructions} />
-            </div>
-            {generateAddressForm}
-            {error
-              ? <p className={styles.error}>{intl.formatMessage(error)}</p>
-              : <p className={styles.error}>&nbsp;</p>}
-          </div>
-          <div className={styles.qrCode}>
-            <QRCode
-              value={walletAddress}
-              bgColor={qrCodeBackgroundColor}
-              fgColor={qrCodeForegroundColor}
-              size={152}
-            />
-          </div>
-        </div>
-
+      <>
         <div className={styles.generatedAddresses}>
           <h2>
             {intl.formatMessage(messages.generatedAddressesSectionTitle)}
@@ -218,7 +118,14 @@ export default class WalletReceive extends Component<Props, State> {
                     linkType="address"
                   >
                     <RawHash light={address.isUsed}>
-                      {address.address}
+                      <span
+                        className={classnames([
+                          styles.addressHash,
+                          address.isUsed && styles.addressHashUsed
+                        ])}
+                      >
+                        {truncateAddress(address.address)}
+                      </span>
                     </RawHash>
                   </ExplorableHashContainer>
                 </CopyableAddress>
@@ -227,6 +134,7 @@ export default class WalletReceive extends Component<Props, State> {
                 <div className={styles.addressActions}>
                   {/* Generate payment URL for Address action */}
                   {!environment.isShelley() && // disable URI for Shelley testnet
+                    onGeneratePaymentURI != null &&
                     <div className={classnames([
                       styles.addressActionItemBlock,
                       styles.generateURLActionBlock])}
@@ -275,16 +183,21 @@ export default class WalletReceive extends Component<Props, State> {
             );
           })}
         </div>
-      </BorderedBox>
+      </>
     );
-
-    const loadingSpinner =
-      <LoadingSpinner ref={(component) => { this.loadingSpinner = component; }} />;
 
     return (
       <div className={styles.component}>
-        {walletAddress ? walletReceiveContent : loadingSpinner}
+        {this.props.header}
+        {walletReceiveContent}
       </div>
     );
   }
+}
+
+function truncateAddress(addr: string): string {
+  if (addr.length <= 63) {
+    return addr;
+  }
+  return addr.substring(0, 30) + '...' + addr.substring(addr.length - 30, addr.length);
 }

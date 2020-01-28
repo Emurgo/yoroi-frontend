@@ -1,6 +1,7 @@
 // @flow
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
+import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 import type { Node } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
@@ -26,6 +27,7 @@ type Props = {
   +tooltipOpensUpward?: boolean,
   +arrowRelativeToTip?: boolean,
   +notification: ?Notification,
+  +darkVariant?: boolean,
 };
 
 @observer
@@ -39,10 +41,11 @@ export default class CopyableAddress extends Component<Props> {
     tooltipOpensUpward: false,
     arrowRelativeToTip: true,
     elementId: undefined,
+    darkVariant: false
   };
 
   render() {
-    const { hash, elementId, onCopyAddress, notification } = this.props;
+    const { hash, elementId, onCopyAddress, notification, darkVariant } = this.props;
     const { intl } = this.context;
 
     const Icon = notification && notification.id === elementId
@@ -65,7 +68,12 @@ export default class CopyableAddress extends Component<Props> {
     );
 
     return (
-      <div className={styles.component}>
+      <div
+        className={classnames([
+          styles.component,
+          darkVariant === true && styles.componentDark
+        ])}
+      >
         <span>{this.props.children}</span>
         <CopyToClipboard
           text={hash}

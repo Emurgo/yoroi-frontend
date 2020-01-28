@@ -93,8 +93,8 @@ export default class VerifyAddressDialog extends Component<Props> {
       document.documentElement.style.getPropertyValue('--theme-receive-qr-code-foreground-color') : '#000';
 
     const labelStyle = classicTheme ?
-      'SimpleFormField_label FormFieldOverridesClassic_label VerifyAddressDialog_header' :
-      'SimpleFormField_label FormFieldOverrides_label VerifyAddressDialog_header';
+      'SimpleFormField_label FormFieldOverridesClassic_label' :
+      styles.label;
 
     const derivationClasses = classnames([styles.infoBlock, styles.derivation]);
 
@@ -131,7 +131,7 @@ export default class VerifyAddressDialog extends Component<Props> {
                   hash={walletAddress}
                   linkType="address"
                 >
-                  <RawHash light>
+                  <RawHash light={false} className={styles.hash}>
                     {walletAddress}
                   </RawHash>
                 </ExplorableHashContainer>
@@ -142,7 +142,7 @@ export default class VerifyAddressDialog extends Component<Props> {
               {intl.formatMessage(messages.derivationPathLabel)}
             </span>
             <div className={derivationClasses}>
-              <div className={styles.data}>
+              <div className={styles.hash}>
                 {toDerivationPathString(walletPath)}
               </div>
             </div>

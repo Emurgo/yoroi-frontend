@@ -1,94 +1,20 @@
-@import '../../themes/mixins/loading-spinner';
-@import '../../themes/mixins/error-message';
 @import '../../themes/mixins/underline';
 
 .component {
   flex: 1;
   overflow-x: hidden;
   overflow-y: overlay;
-  padding-top: 40px;
-  padding-right: 20px;
-  padding-bottom: 20px;
-  padding-left: 20px;
+  padding: 40px 24px;
 
   &::-webkit-scrollbar-button {
     height: 7px;
     display: block;
   }
 
-  .qrCodeAndInstructions {
-    border-bottom: 1px solid var(--theme-separation-border-color);
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 30px;
-    padding-bottom: 30px;
-    position: relative;
-
-    .qrCode {
-      align-items: flex-start;
-      display: flex;
-      margin-left: 150px;
-
-      canvas {
-        border: 4px solid var(--theme-receive-qr-code-background-color);
-        box-sizing: content-box;
-      }
-    }
-
-    .instructions {
-      color: var(--theme-bordered-box-text-color);
-      display: flex;
-      flex-direction: column;
-      font-family: var(--font-regular);
-      font-size: 14px;
-      justify-content: space-between;
-      line-height: 19px;
-      letter-spacing: 0;
-
-      .postCopyMargin {
-        margin-bottom: 16px;
-      }
-
-      .copyableHash {
-        letter-spacing: 0px;
-        font-size: 17px;
-      }
-
-      .hashLabel {
-        font-size: 18px;
-        font-family: var(--font-medium);
-        line-height: 22px;
-        margin-bottom: 16px;
-      }
-
-      .instructionsText {
-        font-size: 15px;
-        letter-spacing: 0.5px;
-        line-height: 22px;
-        margin-bottom: 40px;
-        word-break: break-word;
-      }
-
-      .submitWithPasswordButton {
-        max-width: 310px;
-        width: calc(50% - 10px);
-        &.spinning {
-          @include loading-spinner("../../assets/images/spinner-light.svg");
-        }
-      }
-
-      .error {
-        @include error-message;
-        text-align: left;
-        margin-top: 5px;
-      }
-    }
-  }
-
   .generatedAddresses {
     color: var(--theme-bordered-box-text-color);
     font-family: var(--font-regular);
-    font-size: 15px;
+    font-size: 14px;
     line-height: 22px;
 
     h2 {
@@ -184,46 +110,21 @@
   }
 }
 
-:global(.YoroiClassic) .component {
-  :global {
-    .BorderedBox_component {
-      padding-bottom: 6px;
+:global(.YoroiModern) .component {
+  .generatedAddresses {
+    .walletAddress {
+      padding: 12px 0;
     }
   }
 }
 
-:global(.YoroiModern) .component {
-  padding: 30px;
+.addressHash {
+  font-size: 14px;
+  line-height: 22px;
+  font-family: var(--font-mono-regular);
+  color: var(--theme-wallet-receive-hash-text-color);
+}
 
-  .qrCodeAndInstructions {
-    .instructions {
-      .copyableHash {
-        font-size: 14px;
-        line-height: 1.57;
-      }
-
-      .instructionsText {
-        font-size: 14px;
-        letter-spacing: 0;
-        line-height: 1.57;
-      }
-    }
-  }
-
-  .generatedAddresses {
-    font-size: 14px;
-
-    .walletAddress {
-      padding: 12px 0;
-
-      & + .walletAddress {
-        border-top: 1px solid var(--theme-separation-border-color);
-      }
-
-      .addressMargin {
-        margin-right: 32.5px;
-      }
-
-    }
-  }
+.addressHashUsed {
+  color: var(--theme-wallet-receive-hash-used-text-color);
 }
