@@ -103,11 +103,6 @@ export default class WalletStore extends Store {
       const withCache = await PublicDeriverWithCachedMeta.fromPublicDeriver(newPublicDeriver);
       newWithCachedData.push(withCache);
     }
-    runInAction(() => {
-      this.publicDerivers.push(...newWithCachedData);
-
-      this.selected = newWithCachedData[0];
-    });
     this.actions.dialogs.closeActiveDialog.trigger();
     this.goToWalletRoute(newWithCachedData[0].self);
 
@@ -115,8 +110,13 @@ export default class WalletStore extends Store {
     wallets.showWalletCreatedNotification();
 
     for (const pubDeriver of newWithCachedData) {
-      await this.registerObserversForNewWallet(pubDeriver);
+      this.registerObserversForNewWallet(pubDeriver);
     }
+    runInAction(() => {
+      this.publicDerivers.push(...newWithCachedData);
+
+      this.selected = newWithCachedData[0];
+    });
   }
 
   /** Create the wallet and go to wallet summary screen */
