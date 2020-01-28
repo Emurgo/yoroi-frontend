@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import MainLayout from '../MainLayout';
+import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import SidebarContainer from '../SidebarContainer';
 import NavBarContainer from '../NavBarContainer';
 import WalletWithNavigation from '../../components/wallet/layouts/WalletWithNavigation';
@@ -60,7 +61,9 @@ export default class Wallet extends Component<Props> {
           connectionErrorType={checkAdaServerStatus}
           showInContainer
         >
-          <LoadingSpinner />
+          <VerticallyCenteredLayout>
+            <LoadingSpinner />
+          </VerticallyCenteredLayout>
         </MainLayout>
       );
     }

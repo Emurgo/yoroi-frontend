@@ -118,7 +118,9 @@ export default class WalletTransactionsList extends Component<Props> {
     const transactionsGroups = this.groupTransactionsByDay(transactions);
 
     const loadingSpinner = isLoadingTransactions ? (
-      <LoadingSpinner ref={(component) => { this.loadingSpinner = component; }} />
+      <div className={styles.loading}>
+        <LoadingSpinner ref={(component) => { this.loadingSpinner = component; }} />
+      </div>
     ) : null;
 
     return (
