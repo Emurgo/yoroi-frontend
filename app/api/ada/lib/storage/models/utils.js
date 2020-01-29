@@ -306,13 +306,8 @@ export async function rawGetAddressesForDisplay(
   return request.addresses.flatMap(family => family.addrs
     .filter(addr => addr.Type === request.type)
     .map(addr => {
-      const transformedAddress = addr.Type === CoreAddressTypes.CARDANO_LEGACY
-        ? addr.Hash
-        : RustModule.WalletV3.Address.from_bytes(
-          Buffer.from(addr.Hash, 'hex')
-        ).to_string(Bech32Prefix.ADDRESS);
       return {
-        address: transformedAddress,
+        address: addr.Hash,
         value: balanceForAddresses[addr.AddressId],
         addressing: family.addressing,
         isUsed: utxosForAddresses.has(addr.AddressId),

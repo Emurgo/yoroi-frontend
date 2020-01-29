@@ -90,15 +90,16 @@ export function addressToDisplayString(
 export function groupAddrContainsAccountKey(
   address: string,
   targetAccountKey: string,
+  acceptTypeMismatch: boolean,
 ): boolean {
   const wasmAddr = RustModule.WalletV3.Address.from_bytes(
     Buffer.from(address, 'hex')
   );
   if (wasmAddr.get_kind() !== RustModule.WalletV3.AddressKind.Group) {
-    return false;
+    return acceptTypeMismatch;
   }
   const groupKey = wasmAddr.to_group_address();
-  if (groupKey == null) return false;
+  if (groupKey == null) return acceptTypeMismatch;
   const accountKey = groupKey.get_account_key();
   const accountKeyString = Buffer.from(accountKey.as_bytes()).toString('hex');
   return targetAccountKey === accountKeyString;
@@ -107,15 +108,30 @@ export function groupAddrContainsAccountKey(
 export function filterAddressesByStakingKey<T: { address: string }>(
   stakingKey: RustModule.WalletV3.PublicKey,
   utxos: Array<T>,
+  acceptTypeMismatch: boolean,
 ): Array<T> {
   const stakingKeyString = Buffer.from(stakingKey.as_bytes()).toString('hex');
   const result = [];
   for (const utxo of utxos) {
-    if (groupAddrContainsAccountKey(utxo.address, stakingKeyString)) {
+    if (groupAddrContainsAccountKey(utxo.address, stakingKeyString, acceptTypeMismatch)) {
       result.push(utxo);
     }
   }
   return result;
+}
+
+export function unwrapStakingKey(
+  stakingAddress: string,
+): RustModule.WalletV3.PublicKey {
+  const accountAddress = RustModule.WalletV3.Address.from_bytes(
+    Buffer.from(stakingAddress, 'hex')
+  ).to_account_address();
+  if (accountAddress == null) {
+    throw new Error(`${nameof(unwrapStakingKey)} staking key invalid`);
+  }
+  const stakingKey = accountAddress.get_account_key();
+
+  return stakingKey;
 }
 
 export function delegationTypeToResponse(

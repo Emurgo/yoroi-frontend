@@ -473,6 +473,14 @@ const globalMessages = defineMessages({
     id: 'wallet.staking.pool.unknownLabel',
     defaultMessage: '!!!Unknown pool',
   },
+  internalLabel: {
+    id: 'wallet.receive.nav.internal',
+    defaultMessage: '!!!Internal',
+  },
+  mangledLabel: {
+    id: 'wallet.receive.nav.mangled',
+    defaultMessage: '!!!Mangled',
+  },
   sidebarWallets: {
     id: 'sidebar.wallets',
     defaultMessage: '!!!My wallets',
@@ -496,6 +504,10 @@ const globalMessages = defineMessages({
   undelegateLabel: {
     id: 'global.labael.undelegate',
     defaultMessage: '!!!Undelegate',
+  },
+  auditAddressWarning: {
+    id: 'wallet.receive.page.internalWarning2',
+    defaultMessage: '!!!addresses are shown here for personal auditing purposes and should <strong>never</strong> be used.'
   },
 });
 export default globalMessages;

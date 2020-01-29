@@ -5,6 +5,7 @@ import config from '../../config';
 import WalletReceive from '../../components/wallet/WalletReceive';
 import StandardHeader from '../../components/wallet/receive/StandardHeader';
 import InternalHeader from '../../components/wallet/receive/InternalHeader';
+import MangledHeader from '../../components/wallet/receive/MangledHeader';
 import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer';
 import VerifyAddressDialog from '../../components/wallet/receive/VerifyAddressDialog';
 import URIGenerateDialog from '../../components/uri/URIGenerateDialog';
@@ -83,7 +84,7 @@ export default class WalletReceivePage extends Component<Props, State> {
     if (!withChains) throw new Error('WalletReceivePage only available for account-level wallets');
     const addressTypeStore = this.getTypeStore();
 
-    if (!addressTypeStore.getRequest(publicDeriver.self).wasExecuted) {
+    if (!addressTypeStore.getRequest(publicDeriver.self).wasExecuted || !addressTypeStore.hasAny) {
       return (
         <VerticallyCenteredLayout>
           <LoadingSpinner />
@@ -137,6 +138,14 @@ export default class WalletReceivePage extends Component<Props, State> {
       if (addresses.isActiveTab('internal')) {
         return (<InternalHeader />);
       }
+      if (addresses.isActiveTab('mangled')) {
+        return (
+          <MangledHeader
+            isSubmitting={false /* TODO */}
+            hasMangledUtxo={true /* TODO */}
+          />
+        );
+      }
       throw new Error(`${nameof(WalletReceivePage)} unexpected address tab`);
     })();
 
@@ -152,7 +161,7 @@ export default class WalletReceivePage extends Component<Props, State> {
             await actions.ada.hwVerifyAddress.selectAddress.trigger({ address, path });
             this.openVerifyAddressDialog();
           }}
-          onGeneratePaymentURI={addresses.isActiveTab('internal')
+          onGeneratePaymentURI={!addresses.isActiveTab('external')
             ? undefined
             : (address) => {
               this.openURIGenerateDialog(address);
@@ -224,6 +233,9 @@ export default class WalletReceivePage extends Component<Props, State> {
     }
     if (addresses.isActiveTab('internal')) {
       return addresses.internalForDisplay;
+    }
+    if (addresses.isActiveTab('mangled')) {
+      return addresses.mangledAddressesForDisplay;
     }
     throw new Error(`${nameof(WalletReceivePage)} unexpected address tab`);
   }

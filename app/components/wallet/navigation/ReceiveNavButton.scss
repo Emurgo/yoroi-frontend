@@ -1,5 +1,10 @@
 // ========= LAYOUT =========
 
+.wrapper {
+  display: flex;
+  margin-right: 34px;
+}
+
 .button {
   display: inline-block;
   color: var(--theme-wallet-navigation-tab-text-color);
@@ -9,10 +14,6 @@
   &:hover {
     border-bottom-color: var(--theme-wallet-navigation-tab-text-colorr);
     cursor: pointer;
-  }
-
-  & + & {
-    margin-left: 34px;
   }
 }
 
@@ -41,7 +42,7 @@
     }
   }
 
-  @media (max-width: 950px) {
+  @media (max-width: 550px) {
     display: none;
   }
 }

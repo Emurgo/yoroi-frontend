@@ -19,6 +19,7 @@ import type {
 import {
   filterAddressesByStakingKey,
   delegationTypeToResponse,
+  unwrapStakingKey,
 } from './utils';
 import type {
   AccountStateDelegation,
@@ -32,7 +33,7 @@ import type { CertificateKindType } from '@emurgo/js-chain-libs/js_chain_libs';
 export type GetDelegatedBalanceRequest = {|
   publicDeriver: PublicDeriver<> & IGetStakingKey,
   accountState: AccountStateSuccess,
-  stakingPubKey: string,
+  stakingAddress: string,
 |};
 export type GetDelegatedBalanceResponse = {|
   utxoPart: BigNumber,
@@ -47,7 +48,7 @@ export async function getDelegatedBalance(
 ): Promise<GetDelegatedBalanceResponse> {
   const utxoPart = await getUtxoDelegatedBalance(
     request.publicDeriver,
-    request.stakingPubKey,
+    request.stakingAddress,
   );
 
   return {
@@ -56,9 +57,9 @@ export async function getDelegatedBalance(
   };
 }
 
-async function getUtxoDelegatedBalance(
+export async function getUtxoDelegatedBalance(
   publicDeriver: PublicDeriver<>,
-  stakingPubKey: string,
+  stakingAddress: string,
 ): Promise<BigNumber> {
   const withUtxos = asGetAllUtxos(publicDeriver);
   if (withUtxos == null) {
@@ -66,21 +67,12 @@ async function getUtxoDelegatedBalance(
   }
   const basePubDeriver = withUtxos;
 
-  let stakingKey;
-  {
-    const accountAddress = RustModule.WalletV3.Address.from_bytes(
-      Buffer.from(stakingPubKey, 'hex')
-    ).to_account_address();
-    if (accountAddress == null) {
-      throw new Error(`${nameof(getUtxoDelegatedBalance)} staking key invalid`);
-    }
-    stakingKey = accountAddress.get_account_key();
-  }
-
+  const stakingKey = unwrapStakingKey(stakingAddress);
   const allUtxo = await basePubDeriver.getAllUtxos();
   const allUtxosForKey = filterAddressesByStakingKey(
     stakingKey,
-    allUtxo
+    allUtxo,
+    false,
   );
   const utxoSum = allUtxosForKey.reduce(
     (sum, utxo) => sum.plus(new BigNumber(utxo.output.UtxoTransactionOutput.Amount)),

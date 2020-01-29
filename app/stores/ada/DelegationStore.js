@@ -8,7 +8,7 @@ import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
-  asGetAllAccounting,
+  asGetStakingKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import {
   getDelegatedBalance,
@@ -101,7 +101,7 @@ export default class DelegationStore extends Store {
         delegationRequest.stakingKeyState = undefined;
       });
 
-      const withStakingKey = asGetAllAccounting(publicDeriver.self);
+      const withStakingKey = asGetStakingKey(publicDeriver.self);
       if (withStakingKey == null) {
         throw new Error(`${nameof(this.refreshDelegation)} missing staking key functionality`);
       }
@@ -144,7 +144,7 @@ export default class DelegationStore extends Store {
       const delegatedBalance = delegationRequest.getDelegatedBalance.execute({
         publicDeriver: withStakingKey,
         accountState: stateForStakingKey,
-        stakingPubKey: stakingKeyResp.addr.Hash,
+        stakingAddress: stakingKeyResp.addr.Hash,
       }).promise;
       if (delegatedBalance == null) throw new Error('Should never happen');
 

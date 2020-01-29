@@ -1,0 +1,19 @@
+@import '../../../themes/mixins/loading-spinner';
+
+.submitButton,
+.submitButtonSpinning {
+  display: block !important;
+  width: max-content !important;
+  margin-top: 24px;
+  margin-bottom: 16px;
+  margin-left: 24px;
+  padding: 6px 10px !important;
+  height: 40px !important;
+  background-color: rgba(233, 72, 61, 0.75) !important; // TODO: turn to css var
+  text-transform: unset !important;
+  font-family: var(--font-regular) !important;
+}
+
+.submitButtonSpinning {
+  @include loading-spinner("../../../assets/images/spinner-light.svg");
+}

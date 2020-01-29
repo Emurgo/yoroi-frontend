@@ -39,8 +39,9 @@ import {
 import {
   filterAddressesByStakingKey,
   groupAddrContainsAccountKey,
+  unwrapStakingKey,
 } from './lib/storage/bridge/utils';
-import { createCertificate } from './lib/storage/bridge/delegationUtils';
+import { createCertificate, } from './lib/storage/bridge/delegationUtils';
 import type { PoolRequest } from './lib/storage/bridge/delegationUtils';
 import {
   Bip44Wallet,
@@ -1066,17 +1067,8 @@ export default class AdaApi {
   ): Promise<CreateDelegationTxResponse> {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.createDelegationTx)} called`);
 
-    let stakingKey;
-    {
-      const stakingKeyResp = await request.publicDeriver.getStakingKey();
-      const accountAddress = RustModule.WalletV3.Address.from_bytes(
-        Buffer.from(stakingKeyResp.addr.Hash, 'hex')
-      ).to_account_address();
-      if (accountAddress == null) {
-        throw new Error(`${nameof(this.createDelegationTx)} staking key invalid`);
-      }
-      stakingKey = accountAddress.get_account_key();
-    }
+    const stakingKeyResp = await request.publicDeriver.getStakingKey();
+    const stakingKey = unwrapStakingKey(stakingKeyResp.addr.Hash);
 
     const stakeDelegationCert = createCertificate(stakingKey, request.poolRequest);
     const certificate = RustModule.WalletV3.Certificate.stake_delegation(stakeDelegationCert);
@@ -1100,7 +1092,8 @@ export default class AdaApi {
 
     const allUtxosForKey = filterAddressesByStakingKey(
       stakingKey,
-      allUtxo
+      allUtxo,
+      false,
     );
     const utxoSum = allUtxosForKey.reduce(
       (sum, utxo) => sum.plus(new BigNumber(utxo.output.UtxoTransactionOutput.Amount)),
@@ -1664,7 +1657,7 @@ function getDifferenceAfterTx(
         throw new Error(`${nameof(getDifferenceAfterTx)} utxo not found. Should not happen`);
       }
       const address = match.address;
-      if (groupAddrContainsAccountKey(address, stakingKeyString)) {
+      if (groupAddrContainsAccountKey(address, stakingKeyString, true)) {
         sumInForKey = sumInForKey.plus(new BigNumber(senderUtxo.amount));
       }
     }
@@ -1676,7 +1669,7 @@ function getDifferenceAfterTx(
     for (let i = 0; i < outputs.size(); i++) {
       const output = outputs.get(i);
       const address = Buffer.from(output.address().as_bytes()).toString('hex');
-      if (groupAddrContainsAccountKey(address, stakingKeyString)) {
+      if (groupAddrContainsAccountKey(address, stakingKeyString, true)) {
         const value = new BigNumber(output.value().to_str());
         sumOutForKey = sumOutForKey.plus(value);
       }
