@@ -40,9 +40,9 @@ type Props = {|
   +classicTheme: boolean,
 |};
 
-type State = {
+type State = {|
   isActive: boolean,
-};
+|};
 
 @observer
 export default class InlineEditingInput extends Component<Props, State> {

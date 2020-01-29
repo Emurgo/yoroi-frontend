@@ -425,6 +425,8 @@ const YoroiModern = {
 
   '--theme-warning-color': `#FF1351`,
 
+  '--theme-tooltipbox-border-color': 'rgba(77,32,192,0.08)', // 4d20c0
+
   // Dashboard
   '--theme-dashboard-page-background-color': '#ffffff',
   '--theme-dashboard-link-color': '#ADAEB6',

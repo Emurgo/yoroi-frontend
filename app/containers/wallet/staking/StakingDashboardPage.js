@@ -161,6 +161,16 @@ export default class StakingDashboardPage extends Component<Props, State> {
         stakePools={stakePools}
         epochProgress={getTimeBasedElements.epochProgress}
         userSummary={<UserSummary
+          mangledUtxoSum={new BigNumber(
+            this.props.stores.substores.ada.addresses.mangledAddressesForDisplay.all
+              .reduce(
+                (sum, addr) => {
+                  if (addr.value == null) return sum;
+                  return sum.plus(addr.value);
+                },
+                new BigNumber(0)
+              )
+          )}
           totalAdaSum={publicDeriver.amount == null
             ? undefined
             : hideOrFormat(publicDeriver.amount)

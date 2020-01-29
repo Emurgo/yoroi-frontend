@@ -11,9 +11,9 @@ type Props = {|
   +contentComponents?: ?Node,
 |};
 
-type State = {
+type State = {|
   isExpanded: boolean
-};
+|};
 
 @observer
 export default class NavDropdown extends Component<Props, State> {

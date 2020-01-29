@@ -394,6 +394,8 @@ export default {
 
   '--theme-warning-color': `#E9483D`,
 
+  '--theme-tooltipbox-border-color': 'rgba(77,32,192,0.08)', // 4d20c0
+
   // Sidebar
   '--theme-sidebar-background-color': `linear-gradient(22.58deg, ${topbarGradient.start} 0%, ${topbarGradient.end} 100%)`,
   '--theme-sidebar-text-left-spacing': '16px',

@@ -11,10 +11,36 @@
     border-right: 1px solid var(--theme-dashboard-card-vertical-separator-color);
 }
 
-.icon {
-    width: 44px;
-    height: 44px;
-    margin-bottom: 11px;
+.header {
+    margin-bottom: 19.5px;
+    display: flex;
+    justify-content: flex-end;
+
+    .icon {
+        margin-right: auto;
+        width: 44px;
+        height: 44px;
+        margin-bottom: 11px;
+    }
+
+    .mangledWarningIcon {
+        cursor: pointer;
+    }
+
+    .mangledPopup {
+        margin-top: calc(24px + 5px);
+
+        p {
+            font-family: var(--font-regular);
+            color: var(--cmn-default-color-grey-6);
+            font-size: 14px;
+            line-height: 22px;
+
+            .link {
+                @include underline(var(--theme-dashboard-link-color));
+            }
+        }
+    }
 }
 
 .label {
