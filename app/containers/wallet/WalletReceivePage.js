@@ -142,7 +142,7 @@ export default class WalletReceivePage extends Component<Props, State> {
         return (
           <MangledHeader
             isSubmitting={false /* TODO */}
-            hasMangledUtxo={true /* TODO */}
+            hasMangledUtxo /* TODO */
           />
         );
       }

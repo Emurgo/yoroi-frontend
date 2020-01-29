@@ -85,13 +85,12 @@ import type {
 import {
   GetUtxoTxOutputsWithTx,
 } from '../database/transactionModels/utxo/api/read';
-import { TxStatusCodes, CoreAddressTypes, } from '../database/primitives/enums';
+import { TxStatusCodes, } from '../database/primitives/enums';
 
 import { WrongPassphraseError } from '../../cardanoCrypto/cryptoErrors';
 
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 import { ChainDerivations, BIP44_SCAN_SIZE, } from  '../../../../../config/numbersConfig';
-import { Bech32Prefix } from '../../../../../config/stringConfig';
 import {
   encryptWithPassword,
   decryptWithPassword,
