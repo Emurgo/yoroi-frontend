@@ -32,6 +32,7 @@ import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer'
 import config from '../../../config';
 import { formattedWalletAmount } from '../../../utils/formatters';
 import type { PoolTuples } from '../../../api/ada/lib/state-fetch/types';
+import type { DelegationRequests } from '../../../stores/ada/DelegationStore';
 
 import {
   genTimeToSlot,
@@ -51,6 +52,11 @@ import type {
 } from '../../../api/ada/lib/storage/bridge/timeUtils';
 import globalMessages from '../../../i18n/global-messages';
 import { runInAction } from 'mobx';
+import type {
+  ConfigType,
+} from '../../../../config/config-types';
+
+declare var CONFIG : ConfigType;
 
 type Props = {|
   ...InjectedProps,
@@ -100,6 +106,12 @@ export default class StakingDashboardPage extends Component<Props, State> {
     this.props.actions[environment.API].delegationTransaction.reset.trigger();
   }
 
+  hideOrFormat: BigNumber => string = (amount) => {
+    return this.props.stores.profile.shouldHideBalance
+      ? '******'
+      : formattedWalletAmount(amount);
+  };
+
   render() {
     if (this.state == null) {
       return null;
@@ -115,22 +127,12 @@ export default class StakingDashboardPage extends Component<Props, State> {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
 
-    const hideOrFormat: BigNumber => string = (amount) => {
-      return this.props.stores.profile.shouldHideBalance
-        ? '******'
-        : formattedWalletAmount(amount);
-    };
-
     const getTimeBasedElements = this.getTimeBasedElements(publicDeriver);
 
     const errorIfPresent = this.getErrorInFetch(publicDeriver);
     const stakePools = errorIfPresent == null
       ? this.getStakePools(publicDeriver)
       : errorIfPresent;
-
-    const showRewardAmount = delegationRequests.getCurrentDelegation.wasExecuted &&
-      delegationRequests.getDelegatedBalance.wasExecuted &&
-      errorIfPresent == null;
 
     const { getThemeVars } = this.props.stores.profile;
 
@@ -154,45 +156,11 @@ export default class StakingDashboardPage extends Component<Props, State> {
         themeVars={getThemeVars({ theme: 'YoroiModern' })}
         stakePools={stakePools}
         epochProgress={getTimeBasedElements.epochProgress}
-        userSummary={<UserSummary
-          mangledUtxoSum={new BigNumber(
-            this.props.stores.substores.ada.addresses.mangledAddressesForDisplay.all
-              .reduce(
-                (sum, addr) => {
-                  if (addr.value == null) return sum;
-                  return sum.plus(addr.value);
-                },
-                new BigNumber(0)
-              )
-          )}
-          onUnmangle={() => this.props.actions.dialogs.open.trigger({
-            dialog: UnmangleTxDialogContainer,
-          })}
-          totalAdaSum={publicDeriver.amount == null
-            ? undefined
-            : hideOrFormat(publicDeriver.amount)
-          }
-          totalRewards={
-            !showRewardAmount || delegationRequests.getDelegatedBalance.result == null
-              ? undefined
-              : hideOrFormat(
-                delegationRequests.getDelegatedBalance.result
-                  .accountPart
-                  .dividedBy(LOVELACES_PER_ADA)
-              )
-          }
-          openLearnMore={() => this.props.actions.dialogs.open.trigger({
-            dialog: LessThanExpectedDialog,
-          })}
-          totalDelegated={
-            !showRewardAmount || delegationRequests.getDelegatedBalance.result == null
-              ? undefined
-              : hideOrFormat(
-                delegationRequests.getDelegatedBalance.result.utxoPart.plus(
-                  delegationRequests.getDelegatedBalance.result.accountPart
-                ).dividedBy(LOVELACES_PER_ADA)
-              )}
-        />}
+        userSummary={this._generateUserSummary({
+          delegationRequests,
+          publicDeriver,
+          errorIfPresent,
+        })}
         upcomingRewards={getTimeBasedElements.rewardInfo?.rewardPopup}
         totalGraphData={[
           {
@@ -774,5 +742,81 @@ export default class StakingDashboardPage extends Component<Props, State> {
     }
 
     return null;
+  }
+
+  _generateUserSummary: {|
+    delegationRequests: DelegationRequests,
+    publicDeriver: PublicDeriverWithCachedMeta,
+    errorIfPresent: void | {| error: LocalizableError |}
+  |} => Node = (request) => {
+    const showRewardAmount = request.delegationRequests.getCurrentDelegation.wasExecuted &&
+      request.delegationRequests.getDelegatedBalance.wasExecuted &&
+      request.errorIfPresent == null;
+
+    const canUnmangle = [];
+    const cannotUnmangle = [];
+    for (const addrInfo of this.props.stores.substores.ada.addresses
+      .mangledAddressesForDisplay.all
+    ) {
+      if (addrInfo.value != null) {
+        const value = addrInfo.value;
+        if (addrInfo.value.gt(CONFIG.genesis.linearFee.coefficient)) {
+          canUnmangle.push(value);
+        } else {
+          cannotUnmangle.push(value);
+        }
+      }
+    }
+    const canUnmangleSum = canUnmangle.reduce(
+      (sum, val) => sum.plus(val),
+      new BigNumber(0)
+    );
+    const expectedFee = new BigNumber(canUnmangle.length + 1)
+      .times(CONFIG.genesis.linearFee.coefficient)
+      .plus(CONFIG.genesis.linearFee.constant);
+
+    // if user would strictly lose ADA by making the transaction, don't prompt them to make it
+    if (expectedFee.lt(expectedFee)) {
+      while (canUnmangle.length > 0) {
+        cannotUnmangle.push(canUnmangle.pop());
+      }
+    }
+
+    return (
+      <UserSummary
+        canUnmangleSum={canUnmangleSum}
+        cannotUnmangleSum={cannotUnmangle.reduce(
+          (sum, val) => sum.plus(val),
+          new BigNumber(0)
+        )}
+        onUnmangle={() => this.props.actions.dialogs.open.trigger({
+          dialog: UnmangleTxDialogContainer,
+        })}
+        totalAdaSum={request.publicDeriver.amount == null
+          ? undefined
+          : this.hideOrFormat(request.publicDeriver.amount)
+        }
+        totalRewards={
+          !showRewardAmount || request.delegationRequests.getDelegatedBalance.result == null
+            ? undefined
+            : this.hideOrFormat(
+              request.delegationRequests.getDelegatedBalance.result
+                .accountPart
+                .dividedBy(LOVELACES_PER_ADA)
+            )
+        }
+        openLearnMore={() => this.props.actions.dialogs.open.trigger({
+          dialog: LessThanExpectedDialog,
+        })}
+        totalDelegated={
+          !showRewardAmount || request.delegationRequests.getDelegatedBalance.result == null
+            ? undefined
+            : this.hideOrFormat(
+              request.delegationRequests.getDelegatedBalance.result.utxoPart.plus(
+                request.delegationRequests.getDelegatedBalance.result.accountPart
+              ).dividedBy(LOVELACES_PER_ADA)
+            )}
+      />
+    );
   }
 }

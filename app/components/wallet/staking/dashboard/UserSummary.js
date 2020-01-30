@@ -4,6 +4,7 @@ import type { Node } from 'react';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage, } from 'react-intl';
+import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 
 import { DECIMAL_PLACES_IN_ADA } from '../../../../config/numbersConfig';
 import Card from './Card';
@@ -38,9 +39,17 @@ const messages = defineMessages({
     id: 'wallet.dashboard.summary.mangled.line1',
     defaultMessage: '!!!Your wallet has {adaAmount} ADA with a different delegation preferences.',
   },
+  canUnmangleLine: {
+    id: 'wallet.dashboard.summary.mangled.can',
+    defaultMessage: '!!!{adaAmount} ADA can be corrected',
+  },
+  cannotUnmangleLine: {
+    id: 'wallet.dashboard.summary.mangled.cannot',
+    defaultMessage: '!!!{adaAmount} ADA cannot be corrected',
+  },
   mangledPopupDialogLine2: {
     id: 'wallet.dashboard.summary.mangled.line2',
-    defaultMessage: '!!!We recommend to {transactionMessage} to delegate your ADA',
+    defaultMessage: '!!!We recommend to {transactionMessage} to delegate the ADA',
   },
   makeTransaction: {
     id: 'wallet.dashboard.summary.mangled.makeTx',
@@ -53,7 +62,8 @@ type Props = {|
   +totalRewards: void | string,
   +totalDelegated: void | string,
   +openLearnMore: void => void,
-  +mangledUtxoSum: BigNumber,
+  +canUnmangleSum: BigNumber,
+  +cannotUnmangleSum: BigNumber,
   +onUnmangle: void => void,
 |};
 
@@ -142,7 +152,7 @@ export default class UserSummary extends Component<Props, State> {
   getTotalDelegated: void => Node = () => {
     const { intl } = this.context;
 
-    const mangledWarningIcon = this.props.mangledUtxoSum.gt(0)
+    const mangledWarningIcon = this.props.canUnmangleSum.gt(0) || this.props.cannotUnmangleSum.gt(0)
       ? (
         <div className={styles.mangledWarningIcon}>
           <WarningIcon
@@ -169,33 +179,47 @@ export default class UserSummary extends Component<Props, State> {
                 onClose={() => this.setState(() => ({ mangledPopupOpen: false }))}
               >
                 <p>
-                  <FormattedMessage
-                    {...messages.mangledPopupDialogLine1}
-                    values={{
-                      adaAmount: this.props.mangledUtxoSum
-                        .shiftedBy(-DECIMAL_PLACES_IN_ADA)
-                        .toFormat(DECIMAL_PLACES_IN_ADA),
-                    }}
-                  />
+                  {this.formatWithAmount(
+                    messages.mangledPopupDialogLine1,
+                    this.props.canUnmangleSum.plus(this.props.cannotUnmangleSum)
+                  )}
                 </p>
-                <p>
-                  <FormattedMessage
-                    {...messages.mangledPopupDialogLine2}
-                    values={{
-                      transactionMessage: (
-                        <span
-                          className={styles.link}
-                          onClick={this.props.onUnmangle}
-                          role="button"
-                          tabIndex={0}
-                          onKeyPress={this.props.onUnmangle}
-                        >
-                          {intl.formatMessage(messages.makeTransaction)}
-                        </span>
-                      ),
-                    }}
-                  />
-                </p>
+                {this.props.cannotUnmangleSum.gt(0) && (
+                  <ul>
+                    <li>
+                      {this.formatWithAmount(
+                        messages.canUnmangleLine,
+                        this.props.canUnmangleSum
+                      )}
+                    </li>
+                    <li>
+                      {this.formatWithAmount(
+                        messages.cannotUnmangleLine,
+                        this.props.cannotUnmangleSum
+                      )}
+                    </li>
+                  </ul>
+                )}
+                {this.props.canUnmangleSum.gt(0) && (
+                  <p>
+                    <FormattedMessage
+                      {...messages.mangledPopupDialogLine2}
+                      values={{
+                        transactionMessage: (
+                          <span
+                            className={styles.link}
+                            onClick={this.props.onUnmangle}
+                            role="button"
+                            tabIndex={0}
+                            onKeyPress={this.props.onUnmangle}
+                          >
+                            {intl.formatMessage(messages.makeTransaction)}
+                          </span>
+                        ),
+                      }}
+                    />
+                  </p>
+                )}
               </TooltipBox>
             )}
           </div>
@@ -208,6 +232,18 @@ export default class UserSummary extends Component<Props, State> {
           : (<div><LoadingSpinner small /></div>)
         }
       </div>
+    );
+  }
+
+  formatWithAmount: ($npm$ReactIntl$MessageDescriptor, BigNumber) => Node = (message, amount) => {
+    return (<FormattedMessage
+      {...message}
+      values={{
+        adaAmount: amount
+          .shiftedBy(-DECIMAL_PLACES_IN_ADA)
+          .toFormat(DECIMAL_PLACES_IN_ADA),
+      }}
+    />
     );
   }
 }

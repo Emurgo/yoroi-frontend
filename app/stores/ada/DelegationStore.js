@@ -44,7 +44,7 @@ type StakingKeyState = {|
   poolInfo: Map<string, RemotePoolMetaSuccess>
 |};
 
-type DelegationRequests = {|
+export type DelegationRequests = {|
   publicDeriver: PublicDeriver<>,
   getDelegatedBalance: CachedRequest<GetDelegatedBalanceFunc>,
   getCurrentDelegation: CachedRequest<GetCurrentDelegationFunc>,

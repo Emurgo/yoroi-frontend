@@ -22,13 +22,10 @@ import {
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import SpendingPasswordInput from '../../components/widgets/forms/SpendingPasswordInput';
 import { addressToDisplayString, getAddressPayload } from '../../api/ada/lib/storage/bridge/utils';
+import globalMessages from '../../i18n/global-messages';
+import type { ConfigType } from '../../../config/config-types';
 
-const messages = defineMessages({
-  title: {
-    id: 'unmangle.dialog.title',
-    defaultMessage: '!!!Unmangle transaction',
-  },
-});
+declare var CONFIG: ConfigType;
 
 type Props = {|
   ...InjectedProps,
@@ -61,6 +58,8 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
 
     const filterTo = new Set(
       this.props.stores.substores.ada.addresses.mangledAddressesForDisplay.all
+        // we don't want to include any UTXO that would do nothing but increase the tx fee
+        .filter(info => info.value != null && info.value.gt(CONFIG.genesis.linearFee.coefficient))
         .map(info => getAddressPayload(info.address))
     );
 
@@ -70,7 +69,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
        * We filter to only UTXOs of mangled addresses
        * this ensures that the tx fee is also paid by a UTXO of a mangled address
        */
-      filter: utxo => filterTo.has(utxo.address), // TODO: filter UTXO smaller than tx fee for adding it
+      filter: utxo => filterTo.has(utxo.address),
     });
   }
 
@@ -104,7 +103,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
 
     return (
       <Dialog
-        title={intl.formatMessage(messages.title)}
+        title={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         classicTheme={this.props.stores.profile.isClassicTheme}

@@ -1,4 +1,5 @@
 @import '../../../../themes/mixins/underline';
+@import '../../../../themes/mixins/unordered-list';
 
 .wrapper {
     display: flex;
@@ -24,13 +25,15 @@
     }
 
     .mangledWarningIcon {
+        height: fit-content;
         cursor: pointer;
     }
 
     .mangledPopup {
         margin-top: calc(24px + 5px);
+        @include unordered-list;
 
-        p {
+        p, ul {
             font-family: var(--font-regular);
             color: var(--cmn-default-color-grey-6);
             font-size: 14px;
@@ -39,6 +42,11 @@
             .link {
                 @include underline(var(--theme-dashboard-link-color));
             }
+        }
+
+        ul {
+            margin-top: 8px;
+            margin-bottom: 8px;
         }
     }
 }
