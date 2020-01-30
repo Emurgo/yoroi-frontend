@@ -87,6 +87,25 @@ export function addressToDisplayString(
   }
 }
 
+export function getAddressPayload(
+  address: string
+): string {
+  try {
+    // Need to try parsing as a legacy address first
+    // Since parsing as bech32 directly may give a wrong result if the address contains a 1
+    RustModule.WalletV2.Address.from_base58(address);
+    return address;
+  } catch (_e1) {
+    try {
+      return Buffer.from(
+        RustModule.WalletV3.Address.from_string(address).as_bytes()
+      ).toString('hex');
+    } catch (_e2) {
+      throw new Error(`${nameof(getAddressPayload)} failed to parse address type ` + address);
+    }
+  }
+}
+
 export function groupAddrContainsAccountKey(
   address: string,
   targetAccountKey: string,

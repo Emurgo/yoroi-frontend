@@ -383,12 +383,16 @@ export type PrepareAndBroadcastLedgerSignedTxFunc = (
 
 // createUnsignedTx
 
-export type CreateUnsignedTxRequest = {
+export type CreateUnsignedTxRequest = {|
   publicDeriver: IGetAllUtxos & IHasUtxoChains,
   receiver: string,
-  amount: string, // in lovelaces
-  shouldSendAll: boolean,
-};
+  filter: ElementOf<IGetAllUtxosResponse> => boolean,
+  ...({|
+    amount: string, // in lovelaces
+  |} | {|
+    shouldSendAll: true,
+  |}),
+|};
 export type CreateUnsignedTxResponse = UnsignedTxResponse | V3UnsignedTxAddressedUtxoResponse;
 
 export type CreateUnsignedTxFunc = (
@@ -999,27 +1003,28 @@ export default class AdaApi {
     request: CreateUnsignedTxRequest
   ): Promise<CreateUnsignedTxResponse> {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} called`);
-    const { receiver, amount, shouldSendAll } = request;
+    const { receiver, } = request;
     try {
       const utxos = await request.publicDeriver.getAllUtxos();
+      const filteredUtxos = utxos.filter(utxo => request.filter(utxo));
+
       const addressedUtxo = environment.isShelley()
-        ? shelleyAsAddressedUtxo(utxos)
-        : byronAsAddressedUtxo(utxos);
+        ? shelleyAsAddressedUtxo(filteredUtxos)
+        : byronAsAddressedUtxo(filteredUtxos);
 
       let unsignedTxResponse;
-      if (shouldSendAll) {
+      if (request.shouldSendAll != null) {
         unsignedTxResponse = environment.isShelley()
           ? shelleySendAllUnsignedTx(
-            Buffer.from(
-              RustModule.WalletV3.Address.from_string(receiver).as_bytes()
-            ).toString('hex'),
+            receiver,
             addressedUtxo
           )
           : byronSendAllUnsignedTx(
             receiver,
             addressedUtxo
           );
-      } else {
+      } else if (request.amount != null) {
+        const amount = request.amount;
         const nextUnusedInternal = await request.publicDeriver.nextInternal();
         if (nextUnusedInternal.addressInfo == null) {
           throw new Error(`${nameof(this.createUnsignedTx)} no internal addresses left. Should never happen`);
@@ -1028,9 +1033,7 @@ export default class AdaApi {
         unsignedTxResponse = environment.isShelley()
           ? shelleyNewAdaUnsignedTx(
             [{
-              address: Buffer.from(
-                RustModule.WalletV3.Address.from_string(receiver).as_bytes()
-              ).toString('hex'),
+              address: receiver,
               amount
             }],
             [{
@@ -1048,6 +1051,8 @@ export default class AdaApi {
             }],
             addressedUtxo
           );
+      } else {
+        throw new Error(`${nameof(this.createUnsignedTx)} unknown param`);
       }
       Logger.debug(
         'AdaApi::createUnsignedTx success: ' + stringifyData(unsignedTxResponse)

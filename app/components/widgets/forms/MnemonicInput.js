@@ -63,6 +63,10 @@ export default class MnemonicInput extends Component<Props> {
     },
   });
 
+  componentDidMount() {
+    this.props.setForm(this.form);
+  }
+
   render() {
     const { intl } = this.context;
     const { form } = this;
@@ -71,7 +75,6 @@ export default class MnemonicInput extends Component<Props> {
       mnemonicValidator,
       mnemonicLength,
     } = this.props;
-    this.props.setForm(this.form);
     const { recoveryPhrase } = form.values();
 
     const recoveryPhraseField = form.$('recoveryPhrase');

@@ -28,6 +28,7 @@ import { digetForHash } from '../../../api/ada/lib/storage/database/primitives/a
 import { handleExternalLinkClick } from '../../../utils/routing';
 import { GetPoolInfoApiError } from '../../../api/ada/errors';
 import LocalizableError from '../../../i18n/LocalizableError';
+import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
 import config from '../../../config';
 import { formattedWalletAmount } from '../../../utils/formatters';
 import type { PoolTuples } from '../../../api/ada/lib/state-fetch/types';
@@ -133,13 +134,6 @@ export default class StakingDashboardPage extends Component<Props, State> {
 
     const { getThemeVars } = this.props.stores.profile;
 
-    const dialog = this.props.stores.uiDialogs.isOpen(LessThanExpectedDialog) ? (
-      <LessThanExpectedDialog
-        close={() => this.props.actions.dialogs.closeActiveDialog.trigger()}
-        classicTheme={this.props.stores.profile.isClassicTheme}
-      />
-    ) : null;
-
     const dashboard = (
       <StakingDashboard
         pageInfo={
@@ -171,6 +165,9 @@ export default class StakingDashboardPage extends Component<Props, State> {
                 new BigNumber(0)
               )
           )}
+          onUnmangle={() => this.props.actions.dialogs.open.trigger({
+            dialog: UnmangleTxDialogContainer,
+          })}
           totalAdaSum={publicDeriver.amount == null
             ? undefined
             : hideOrFormat(publicDeriver.amount)
@@ -398,7 +395,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
     return (
       <>
         {popup}
-        {dialog}
+        {this.getDialog()}
         {dashboard}
       </>);
   }
@@ -754,5 +751,28 @@ export default class StakingDashboardPage extends Component<Props, State> {
         );
       })
     };
+  }
+
+  getDialog: void => Node = () => {
+    if (this.props.stores.uiDialogs.isOpen(LessThanExpectedDialog)) {
+      return (
+        <LessThanExpectedDialog
+          close={() => this.props.actions.dialogs.closeActiveDialog.trigger()}
+          classicTheme={this.props.stores.profile.isClassicTheme}
+        />
+      );
+    }
+
+    if (this.props.stores.uiDialogs.isOpen(UnmangleTxDialogContainer)) {
+      return (
+        <UnmangleTxDialogContainer
+          actions={this.props.actions}
+          stores={this.props.stores}
+          onClose={() => this.props.actions.dialogs.closeActiveDialog.trigger()}
+        />
+      );
+    }
+
+    return null;
   }
 }

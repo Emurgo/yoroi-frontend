@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import BigNumber from 'bignumber.js';
 import classnames from 'classnames';
@@ -52,12 +53,19 @@ const messages = defineMessages({
 type Props = {|
   +formattedWalletAmount: BigNumber => string,
   +selectedExplorer: ExplorerType,
-  +transferTx: TransferTx,
+  +transferTx: {
+    +recoveredBalance: BigNumber,
+    +fee: BigNumber,
+    +id?: string,
+    +senders: Array<string>,
+    +receiver: string,
+  },
   +onSubmit: void => PossiblyAsync<void>,
   +isSubmitting: boolean,
   +onCancel: void => void,
   +error: ?LocalizableError,
-  +classicTheme: boolean
+  +classicTheme: boolean,
+  +form: ?Node,
 |};
 
 /** Show user what the transfer would do to get final confirmation */
@@ -145,21 +153,7 @@ export default class TransferSummaryPage extends Component<Props> {
           </ExplorableHashContainer>
         </div>
 
-        <div className={styles.addressLabelWrapper}>
-          <div className={styles.addressLabel}>
-            {intl.formatMessage(globalMessages.transactionId)}
-          </div>
-          <ExplorableHashContainer
-            selectedExplorer={this.props.selectedExplorer}
-            light
-            hash={transferTx.id}
-            linkType="transaction"
-          >
-            <RawHash light>
-              <span className={styles.address}>{transferTx.id}</span>
-            </RawHash>
-          </ExplorableHashContainer>
-        </div>
+        {transferTx.id != null && (this._getTxIdNode(transferTx.id))}
 
         <div className={styles.amountFeesWrapper}>
           <div className={styles.amountWrapper}>
@@ -190,6 +184,12 @@ export default class TransferSummaryPage extends Component<Props> {
           </div>
         </div>
 
+        {this.props.form != null && (
+          <div className={styles.form}>
+            {this.props.form}
+          </div>
+        )}
+
         <div className={styles.errorWrapper}>
           {
             error && !isSubmitting &&
@@ -215,6 +215,27 @@ export default class TransferSummaryPage extends Component<Props> {
           />
         </div>
 
+      </div>
+    );
+  }
+
+  _getTxIdNode: string => Node = (txId) => {
+    const { intl } = this.context;
+    return (
+      <div className={styles.addressLabelWrapper}>
+        <div className={styles.addressLabel}>
+          {intl.formatMessage(globalMessages.transactionId)}
+        </div>
+        <ExplorableHashContainer
+          selectedExplorer={this.props.selectedExplorer}
+          light
+          hash={txId}
+          linkType="transaction"
+        >
+          <RawHash light>
+            <span className={styles.address}>{txId}</span>
+          </RawHash>
+        </ExplorableHashContainer>
       </div>
     );
   }

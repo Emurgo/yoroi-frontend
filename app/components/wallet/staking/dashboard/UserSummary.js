@@ -54,6 +54,7 @@ type Props = {|
   +totalDelegated: void | string,
   +openLearnMore: void => void,
   +mangledUtxoSum: BigNumber,
+  +onUnmangle: void => void,
 |};
 
 type State = {|
@@ -182,7 +183,13 @@ export default class UserSummary extends Component<Props, State> {
                     {...messages.mangledPopupDialogLine2}
                     values={{
                       transactionMessage: (
-                        <span className={styles.link}>
+                        <span
+                          className={styles.link}
+                          onClick={this.props.onUnmangle}
+                          role="button"
+                          tabIndex={0}
+                          onKeyPress={this.props.onUnmangle}
+                        >
                           {intl.formatMessage(messages.makeTransaction)}
                         </span>
                       ),
