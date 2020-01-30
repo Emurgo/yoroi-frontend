@@ -16,13 +16,13 @@ const messages = defineMessages({
   },
   fixLabel: {
     id: 'wallet.receive.page.unmangeLabel',
-    defaultMessage: '!!!Click here to correct the delegation preference'
+    defaultMessage: '!!!Correct delegation preference'
   },
 });
 
 type Props = {|
-  +isSubmitting: boolean;
   +hasMangledUtxo: boolean;
+  +onClick: void => void,
 |};
 
 @observer
@@ -36,29 +36,31 @@ export default class MangledHeader extends Component<Props> {
 
     const buttonClasses = classnames([
       'primary',
-      this.props.isSubmitting ? styles.submitButtonSpinning : styles.submitButton,
+      styles.submitButton,
     ]);
     return (
-      <WarningHeader
-        message={(
-          <>
-            <p>{intl.formatMessage(messages.warning1)}</p><br />
-            <p>
-              {intl.formatMessage(globalMessages.mangledLabel)}&nbsp;
-              <FormattedHTMLMessage {...globalMessages.auditAddressWarning} />
-            </p>
-
-            {this.props.hasMangledUtxo && (
-              <Button
-                className={buttonClasses}
-                label={intl.formatMessage(messages.fixLabel)}
-                onMouseUp={() => {}}
-                skin={ButtonSkin}
-              />
-            )}
-          </>
-        )}
-      />
+      <>
+        <WarningHeader
+          message={(
+            <>
+              <p>{intl.formatMessage(messages.warning1)}</p><br />
+              <p>
+                {intl.formatMessage(globalMessages.mangledLabel)}&nbsp;
+                <FormattedHTMLMessage {...globalMessages.auditAddressWarning} />
+              </p>
+            </>
+          )}
+        >
+          {this.props.hasMangledUtxo && (
+            <Button
+              className={buttonClasses}
+              label={intl.formatMessage(messages.fixLabel)}
+              onClick={this.props.onClick}
+              skin={ButtonSkin}
+            />
+          )}
+        </WarningHeader>
+      </>
     );
   }
 }

@@ -22,6 +22,7 @@ import globalMessages from '../../i18n/global-messages';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { asHasUtxoChains } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type { StandardAddress, AddressTypeStore } from '../../stores/base/AddressesStore';
+import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
 
 type Props = {|
   ...InjectedProps,
@@ -122,6 +123,7 @@ export default class WalletReceivePage extends Component<Props, State> {
       this.state.notificationElementId
     );
 
+    const { canUnmangle } = this.props.stores.substores.ada.addresses.getUnmangleAmounts();
     const header = (() => {
       if (addresses.isActiveTab('external')) {
         return (<StandardHeader
@@ -141,8 +143,10 @@ export default class WalletReceivePage extends Component<Props, State> {
       if (addresses.isActiveTab('mangled')) {
         return (
           <MangledHeader
-            isSubmitting={false /* TODO */}
-            hasMangledUtxo /* TODO */
+            hasMangledUtxo={canUnmangle.length > 0}
+            onClick={() => this.props.actions.dialogs.open.trigger({
+              dialog: UnmangleTxDialogContainer,
+            })}
           />
         );
       }
@@ -207,6 +211,14 @@ export default class WalletReceivePage extends Component<Props, State> {
             classicTheme={profile.isClassicTheme}
           />
         ) : null}
+
+        {uiDialogs.isOpen(UnmangleTxDialogContainer) && (
+          <UnmangleTxDialogContainer
+            actions={this.props.actions}
+            stores={this.props.stores}
+            onClose={() => this.props.actions.dialogs.closeActiveDialog.trigger()}
+          />
+        )}
 
         {uiDialogs.isOpen(VerifyAddressDialog) && hwVerifyAddress.selectedAddress ? (
           <VerifyAddressDialog

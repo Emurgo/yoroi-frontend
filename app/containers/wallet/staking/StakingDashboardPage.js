@@ -52,11 +52,6 @@ import type {
 } from '../../../api/ada/lib/storage/bridge/timeUtils';
 import globalMessages from '../../../i18n/global-messages';
 import { runInAction } from 'mobx';
-import type {
-  ConfigType,
-} from '../../../../config/config-types';
-
-declare var CONFIG : ConfigType;
 
 type Props = {|
   ...InjectedProps,
@@ -753,42 +748,24 @@ export default class StakingDashboardPage extends Component<Props, State> {
       request.delegationRequests.getDelegatedBalance.wasExecuted &&
       request.errorIfPresent == null;
 
-    const canUnmangle = [];
-    const cannotUnmangle = [];
-    for (const addrInfo of this.props.stores.substores.ada.addresses
-      .mangledAddressesForDisplay.all
-    ) {
-      if (addrInfo.value != null) {
-        const value = addrInfo.value;
-        if (addrInfo.value.gt(CONFIG.genesis.linearFee.coefficient)) {
-          canUnmangle.push(value);
-        } else {
-          cannotUnmangle.push(value);
-        }
-      }
-    }
+    const {
+      canUnmangle,
+      cannotUnmangle,
+    } = this.props.stores.substores.ada.addresses.getUnmangleAmounts();
+
     const canUnmangleSum = canUnmangle.reduce(
       (sum, val) => sum.plus(val),
       new BigNumber(0)
     );
-    const expectedFee = new BigNumber(canUnmangle.length + 1)
-      .times(CONFIG.genesis.linearFee.coefficient)
-      .plus(CONFIG.genesis.linearFee.constant);
-
-    // if user would strictly lose ADA by making the transaction, don't prompt them to make it
-    if (expectedFee.lt(expectedFee)) {
-      while (canUnmangle.length > 0) {
-        cannotUnmangle.push(canUnmangle.pop());
-      }
-    }
+    const cannotUnmangleSum = cannotUnmangle.reduce(
+      (sum, val) => sum.plus(val),
+      new BigNumber(0)
+    );
 
     return (
       <UserSummary
         canUnmangleSum={canUnmangleSum}
-        cannotUnmangleSum={cannotUnmangle.reduce(
-          (sum, val) => sum.plus(val),
-          new BigNumber(0)
-        )}
+        cannotUnmangleSum={cannotUnmangleSum}
         onUnmangle={() => this.props.actions.dialogs.open.trigger({
           dialog: UnmangleTxDialogContainer,
         })}

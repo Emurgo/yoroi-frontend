@@ -1,6 +1,7 @@
 // @flow
 import { observable, computed, action, runInAction } from 'mobx';
 import { find } from 'lodash';
+import BigNumber from 'bignumber.js';
 import Store from './Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import Request from '../lib/LocalizedRequest';
@@ -33,6 +34,11 @@ import {
   unwrapStakingKey,
   addressToDisplayString,
 } from '../../api/ada/lib/storage/bridge/utils';
+import type {
+  ConfigType,
+} from '../../../config/config-types';
+
+declare var CONFIG : ConfigType;
 
 const RECEIVE_ROUTES = {
   internal: ROUTES.WALLETS.RECEIVE.INTERNAL,
@@ -298,6 +304,44 @@ export default class AddressesStore extends Store {
       params: { id: selected.self.getPublicDeriverId(), page },
     });
   };
+
+  getUnmangleAmounts: void => {|
+    canUnmangle: Array<BigNumber>,
+    cannotUnmangle: Array<BigNumber>,
+  |} = () => {
+    const canUnmangle = [];
+    const cannotUnmangle = [];
+    for (const addrInfo of this.mangledAddressesForDisplay.all
+    ) {
+      if (addrInfo.value != null) {
+        const value = addrInfo.value;
+        if (addrInfo.value.gt(CONFIG.genesis.linearFee.coefficient)) {
+          canUnmangle.push(value);
+        } else {
+          cannotUnmangle.push(value);
+        }
+      }
+    }
+    const canUnmangleSum = canUnmangle.reduce(
+      (sum, val) => sum.plus(val),
+      new BigNumber(0)
+    );
+    const expectedFee = new BigNumber(canUnmangle.length + 1)
+      .times(CONFIG.genesis.linearFee.coefficient)
+      .plus(CONFIG.genesis.linearFee.constant);
+
+    // if user would strictly lose ADA by making the transaction, don't prompt them to make it
+    if (canUnmangleSum.lt(expectedFee)) {
+      while (canUnmangle.length > 0) {
+        cannotUnmangle.push(canUnmangle.pop());
+      }
+    }
+
+    return {
+      canUnmangle,
+      cannotUnmangle
+    };
+  }
 }
 
 async function filterMangledAddresses(request: {|
