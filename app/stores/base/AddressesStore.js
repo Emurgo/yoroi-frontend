@@ -155,7 +155,9 @@ export default class AddressesStore extends Store {
     );
     this.mangledAddressesForDisplay = new AddressTypeStore(
       this.stores,
-      (request) => this._wrapForAllAddresses({ ...request, invertFilter: true })
+      (request) => (environment.isShelley()
+        ? this._wrapForAllAddresses({ ...request, invertFilter: true })
+        : Promise.resolve([]))
     );
     this.externalForDisplay = new AddressTypeStore(
       this.stores,
