@@ -416,7 +416,7 @@
   "wallet.receive.page.generatedAddressesSectionTitle": "生成されたアドレス",
   "wallet.receive.page.hideUsedLabel": "使用済のアドレスを非表示にする",
   "wallet.receive.page.internalWarning1": "内部アドレス（おつりアドレス）は、ブロックチェーン上でユーザーがどのアドレスを所有しているかを不明瞭にするすることで、ユーザーのプライバシーを保護します。",
-  "wallet.receive.page.internalWarning2": "Internal addresses are shown here for personal auditing purposes and you should <strong>never</strong> be used.",
+  "wallet.receive.page.internalWarning2": "内部アドレスはこちらに表示されます。個人的な確認のためにのみご利用ください。このアドレスは<strong>ご使用にならないでください</strong>。",
   "wallet.receive.page.showUsedLabel": "使用済のアドレスを表示する",
   "wallet.receive.page.verifyAddressLabel": "アドレスを確認する",
   "wallet.receive.page.walletAddressLabel": "あなたのウォレットのアドレス",
