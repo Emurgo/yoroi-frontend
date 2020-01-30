@@ -8,7 +8,6 @@ import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './TransferSummaryPage.scss';
-import type { TransferTx } from '../../types/TransferTypes';
 import LocalizableError from '../../i18n/LocalizableError';
 import RawHash from '../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
