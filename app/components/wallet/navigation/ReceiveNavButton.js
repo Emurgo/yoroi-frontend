@@ -31,7 +31,7 @@ export default class ReceiveNavButton extends Component<Props> {
     const IconComponent = this.props.icon;
 
     return (
-      <>
+      <div className={styles.wrapper}>
         <button type="button" className={componentClasses} onClick={onClick}>
           <span className={styles.label}>{label}</span>
         </button>
@@ -40,7 +40,7 @@ export default class ReceiveNavButton extends Component<Props> {
             <IconComponent />
           </div>
         }
-      </>
+      </div>
     );
   }
 }

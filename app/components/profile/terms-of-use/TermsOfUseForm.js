@@ -26,9 +26,9 @@ type Props = {|
   +error?: ?LocalizableError,
 |};
 
-type State = {
+type State = {|
   areTermsOfUseAccepted: boolean,
-};
+|};
 
 @observer
 export default class TermsOfUseForm extends Component<Props, State> {

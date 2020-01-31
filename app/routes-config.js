@@ -18,6 +18,7 @@ export const ROUTES = {
       ROOT: '/wallets/:id/receive',
       EXTERNAL: '/wallets/:id/receive/external',
       INTERNAL: '/wallets/:id/receive/internal',
+      MANGLED: '/wallets/:id/receive/mangled',
     },
     DELEGATION_DASHBOARD: '/wallets/:id/delegation-dashboard',
     DELEGATION_SIMPLE: '/wallets/:id/delegation-simple',

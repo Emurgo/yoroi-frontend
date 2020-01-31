@@ -153,9 +153,9 @@ type Props = {|
   +formattedWalletAmount: BigNumber => string,
 |};
 
-type State = {
+type State = {|
   isExpanded: boolean,
-};
+|};
 
 export default class Transaction extends Component<Props, State> {
 

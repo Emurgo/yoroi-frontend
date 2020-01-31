@@ -87,18 +87,38 @@ export function addressToDisplayString(
   }
 }
 
+export function getAddressPayload(
+  address: string
+): string {
+  try {
+    // Need to try parsing as a legacy address first
+    // Since parsing as bech32 directly may give a wrong result if the address contains a 1
+    RustModule.WalletV2.Address.from_base58(address);
+    return address;
+  } catch (_e1) {
+    try {
+      return Buffer.from(
+        RustModule.WalletV3.Address.from_string(address).as_bytes()
+      ).toString('hex');
+    } catch (_e2) {
+      throw new Error(`${nameof(getAddressPayload)} failed to parse address type ` + address);
+    }
+  }
+}
+
 export function groupAddrContainsAccountKey(
   address: string,
   targetAccountKey: string,
+  acceptTypeMismatch: boolean,
 ): boolean {
   const wasmAddr = RustModule.WalletV3.Address.from_bytes(
     Buffer.from(address, 'hex')
   );
   if (wasmAddr.get_kind() !== RustModule.WalletV3.AddressKind.Group) {
-    return false;
+    return acceptTypeMismatch;
   }
   const groupKey = wasmAddr.to_group_address();
-  if (groupKey == null) return false;
+  if (groupKey == null) return acceptTypeMismatch;
   const accountKey = groupKey.get_account_key();
   const accountKeyString = Buffer.from(accountKey.as_bytes()).toString('hex');
   return targetAccountKey === accountKeyString;
@@ -107,15 +127,30 @@ export function groupAddrContainsAccountKey(
 export function filterAddressesByStakingKey<T: { address: string }>(
   stakingKey: RustModule.WalletV3.PublicKey,
   utxos: Array<T>,
+  acceptTypeMismatch: boolean,
 ): Array<T> {
   const stakingKeyString = Buffer.from(stakingKey.as_bytes()).toString('hex');
   const result = [];
   for (const utxo of utxos) {
-    if (groupAddrContainsAccountKey(utxo.address, stakingKeyString)) {
+    if (groupAddrContainsAccountKey(utxo.address, stakingKeyString, acceptTypeMismatch)) {
       result.push(utxo);
     }
   }
   return result;
+}
+
+export function unwrapStakingKey(
+  stakingAddress: string,
+): RustModule.WalletV3.PublicKey {
+  const accountAddress = RustModule.WalletV3.Address.from_bytes(
+    Buffer.from(stakingAddress, 'hex')
+  ).to_account_address();
+  if (accountAddress == null) {
+    throw new Error(`${nameof(unwrapStakingKey)} staking key invalid`);
+  }
+  const stakingKey = accountAddress.get_account_key();
+
+  return stakingKey;
 }
 
 export function delegationTypeToResponse(

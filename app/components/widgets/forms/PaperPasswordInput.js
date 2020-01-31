@@ -76,13 +76,16 @@ export default class PaperPasswordInput extends Component<Props> {
     },
   });
 
+  componentDidMount() {
+    this.props.setForm(this.form);
+  }
+
   render() {
     const { form } = this;
     const { intl } = this.context;
     const {
       paperPassword,
     } = form.values();
-    this.props.setForm(this.form);
 
     const paperPasswordField = form.$('paperPassword');
 

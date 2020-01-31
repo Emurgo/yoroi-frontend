@@ -10,9 +10,12 @@
     font-family: var(--font-regular);
     display: list-item;
     margin-left: 12px;
-    margin-top: 8px;
     line-height: 1.38;
     font-size: 14px;
     color: var(--cmn-default-color-grey);
+
+    & + li {
+      margin-top: 8px;
+    }
   }
 }

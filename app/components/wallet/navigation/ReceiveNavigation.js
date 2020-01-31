@@ -3,15 +3,12 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './ReceiveNavigation.scss';
+import globalMessages from '../../../i18n/global-messages';
 
 import AttentionIcon from '../../../assets/images/attention-modern.inline.svg';
 import ReceiveNavButton from './ReceiveNavButton';
 
 const messages = defineMessages({
-  internalTab: {
-    id: 'wallet.receive.nav.internal',
-    defaultMessage: '!!!Internal',
-  },
   externalTab: {
     id: 'wallet.receive.nav.external',
     defaultMessage: '!!!External',
@@ -19,8 +16,9 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +isActiveTab: ('internal' | 'external') => boolean,
+  +isActiveTab: ('internal' | 'external' | 'mangled') => boolean,
   +onTabClick: string => void,
+  +showMangled: boolean,
 |};
 
 @observer
@@ -45,11 +43,20 @@ export default class ReceiveNavigation extends Component<Props> {
           />
           <ReceiveNavButton
             className="internal"
-            label={intl.formatMessage(messages.internalTab)}
+            label={intl.formatMessage(globalMessages.internalLabel)}
             icon={AttentionIcon}
             isActive={isActiveTab('internal')}
             onClick={() => onTabClick('internal')}
           />
+          {this.props.showMangled && (
+            <ReceiveNavButton
+              className="mangled"
+              label={intl.formatMessage(globalMessages.mangledLabel)}
+              icon={AttentionIcon}
+              isActive={isActiveTab('mangled')}
+              onClick={() => onTabClick('mangled')}
+            />
+          )}
         </div>
       </div>
     );

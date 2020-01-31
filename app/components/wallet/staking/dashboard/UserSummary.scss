@@ -1,4 +1,5 @@
 @import '../../../../themes/mixins/underline';
+@import '../../../../themes/mixins/unordered-list';
 
 .wrapper {
     display: flex;
@@ -11,10 +12,43 @@
     border-right: 1px solid var(--theme-dashboard-card-vertical-separator-color);
 }
 
-.icon {
-    width: 44px;
-    height: 44px;
-    margin-bottom: 11px;
+.header {
+    margin-bottom: 19.5px;
+    display: flex;
+    justify-content: flex-end;
+
+    .icon {
+        margin-right: auto;
+        width: 44px;
+        height: 44px;
+        margin-bottom: 11px;
+    }
+
+    .mangledWarningIcon {
+        height: fit-content;
+        cursor: pointer;
+    }
+
+    .mangledPopup {
+        margin-top: calc(24px + 5px);
+        @include unordered-list;
+
+        p, ul {
+            font-family: var(--font-regular);
+            color: var(--cmn-default-color-grey-6);
+            font-size: 14px;
+            line-height: 22px;
+
+            .link {
+                @include underline(var(--theme-dashboard-link-color));
+            }
+        }
+
+        ul {
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+    }
 }
 
 .label {

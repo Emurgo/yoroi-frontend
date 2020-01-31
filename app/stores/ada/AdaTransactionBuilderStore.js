@@ -13,7 +13,15 @@ import { IGetFee, ITotalInput, ITxEqual, copySignRequest } from '../../api/ada/t
 import {
   asGetAllUtxos, asHasUtxoChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import type {
+  IGetAllUtxosResponse, IHasUtxoChains,
+} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+
+type SetupSelfTxFunc = {|
+  publicDeriver: IHasUtxoChains,
+  filter: ElementOf<IGetAllUtxosResponse> => boolean,
+|} => Promise<void>;
 
 /**
  * TODO: we make the following assumptions
@@ -36,6 +44,8 @@ export default class AdaTransactionBuilderStore extends Store {
     RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput
   >;
 
+  @observable filter: ElementOf<IGetAllUtxosResponse> => boolean;
+
   /** tracks mismatch between `plannedTx` and `tentativeTx` */
   @observable txMismatch: boolean = false;
 
@@ -43,11 +53,15 @@ export default class AdaTransactionBuilderStore extends Store {
   @observable createUnsignedTx: LocalizedRequest<CreateUnsignedTxFunc>
     = new LocalizedRequest<CreateUnsignedTxFunc>(this.api.ada.createUnsignedTx);
 
+  @observable setupSelfTx: LocalizedRequest<SetupSelfTxFunc>
+    = new LocalizedRequest<SetupSelfTxFunc>(this._setupSelfTx);
+
   setup(): void {
     super.setup();
     this._reset();
     const actions = this.actions.ada.txBuilderActions;
     actions.updateReceiver.listen(this._updateReceiver);
+    actions.setFilter.listen(this._setFilter);
     actions.updateAmount.listen(this._updateAmount);
     actions.updateTentativeTx.listen(this._updateTentativeTx);
     actions.toggleSendAll.listen(this._toggleSendAll);
@@ -95,7 +109,7 @@ export default class AdaTransactionBuilderStore extends Store {
     () => this._updatePlannedTx(),
   )
 
-  _updatePlannedTx = () => {
+  _updatePlannedTx: void => void = () => {
     if (!this.createUnsignedTx.result) {
       runInAction(() => {
         this.plannedTx = null;
@@ -135,7 +149,8 @@ export default class AdaTransactionBuilderStore extends Store {
       // need to recalculate when there are no more pending transactions
       this.stores.substores.ada.transactions.hasAnyPending,
     ],
-    () => this._updateTxBuilder(),
+    // $FlowFixMe error in mobx types
+    async () => this._updateTxBuilder(),
   )
 
   _canCompute(): boolean {
@@ -155,7 +170,7 @@ export default class AdaTransactionBuilderStore extends Store {
    * Note: need to check state outside of runInAction
    * Otherwise reaction won't trigger
    */
-  _updateTxBuilder = (): void => {
+  _updateTxBuilder: void => Promise<void> = async () => {
     runInAction(() => {
       this.createUnsignedTx.reset();
       this.plannedTx = null;
@@ -166,12 +181,13 @@ export default class AdaTransactionBuilderStore extends Store {
     }
 
     // type-cast to assert non-null
-    const plannedTxInfo: Array<TxOutType<number>> = (this.plannedTxInfo: any);
+    const plannedTxInfo = (this.plannedTxInfo);
 
     const receiver = plannedTxInfo[0].address;
-    const amount = plannedTxInfo[0].value
+    if (receiver == null) return;
+    const amount = plannedTxInfo[0].value != null
       ? plannedTxInfo[0].value.toString()
-      : '0'; // value is not relevant in sendall case
+      : null;
     const shouldSendAll = this.shouldSendAll;
 
     if (this.createUnsignedTx.isExecuting) {
@@ -186,12 +202,21 @@ export default class AdaTransactionBuilderStore extends Store {
     if (withHasUtxoChains == null) {
       throw new Error('_updateTxBuilder missing chains functionality');
     }
-    this.createUnsignedTx.execute({
-      publicDeriver: withHasUtxoChains,
-      receiver,
-      amount,
-      shouldSendAll,
-    });
+    if (amount == null && shouldSendAll === true) {
+      await this.createUnsignedTx.execute({
+        publicDeriver: withHasUtxoChains,
+        receiver,
+        shouldSendAll,
+        filter: this.filter,
+      });
+    } else if (amount != null) {
+      await this.createUnsignedTx.execute({
+        publicDeriver: withHasUtxoChains,
+        receiver,
+        amount,
+        filter: this.filter,
+      });
+    }
   }
 
   // ===========
@@ -199,25 +224,30 @@ export default class AdaTransactionBuilderStore extends Store {
   // ===========
 
   @action
-  _toggleSendAll = () => {
+  _toggleSendAll: void => void = () => {
     this._updateAmount();
     this.shouldSendAll = !this.shouldSendAll;
   }
 
   /** Should only set to valid address or undefined */
   @action
-  _updateReceiver = (receiver: void | string) => {
+  _updateReceiver: (void | string) => void = (receiver) => {
     this.plannedTxInfo[0].address = receiver;
+  }
+
+  @action
+  _setFilter: (ElementOf<IGetAllUtxosResponse> => boolean) => void = (filter) => {
+    this.filter = filter;
   }
 
   /** Should only set to valid amount or undefined */
   @action
-  _updateAmount = (value: void | number) => {
+  _updateAmount: (void | number) => void = (value) => {
     this.plannedTxInfo[0].value = value;
   }
 
   @action
-  _updateTentativeTx = () => {
+  _updateTentativeTx: void => void = () => {
     if (!this.plannedTx) {
       this.tentativeTx = null;
       return;
@@ -226,13 +256,16 @@ export default class AdaTransactionBuilderStore extends Store {
   }
 
   @action
-  _reset = () => {
+  _reset: void => void = () => {
     this.plannedTxInfo = [{ address: undefined, value: undefined }];
     this.shouldSendAll = false;
+    this.filter = () => true;
     this.createUnsignedTx.cancel();
     this.createUnsignedTx.reset();
     this.plannedTx = null;
     this.tentativeTx = null;
+    this.setupSelfTx.cancel();
+    this.setupSelfTx.reset();
   }
 
   // =======================================
@@ -261,7 +294,7 @@ export default class AdaTransactionBuilderStore extends Store {
    * Check if tx in the confirm dialog matches what the tx would be
    * if they tries to send again (since it may change if UTXO changes)
    */
-  _txMismatch = (): boolean => {
+  _txMismatch: void => boolean = () => {
     if (!this.plannedTx || !this.tentativeTx) {
       // don't change the value when a tx is being recalculated
       // this avoids the UI flickering as the tx gets recalculated
@@ -269,5 +302,22 @@ export default class AdaTransactionBuilderStore extends Store {
     }
 
     return !ITxEqual(this.tentativeTx, this.plannedTx);
+  }
+
+  _setupSelfTx: SetupSelfTxFunc = async (request) => {
+    this._setFilter(request.filter);
+    const nextUnusedInternal = await request.publicDeriver.nextInternal();
+    const addressInfo = nextUnusedInternal.addressInfo;
+    if (addressInfo == null) {
+      throw new Error(`${nameof(this._setupSelfTx)} ${nameof(addressInfo)} == null`);
+    }
+    this._updateReceiver(addressInfo.addr.Hash);
+    if (this.shouldSendAll === false) {
+      this._toggleSendAll();
+    }
+
+    await this._updateTxBuilder();
+    this._updatePlannedTx();
+    this._updateTentativeTx();
   }
 }

@@ -78,12 +78,15 @@ export default class DaedalusMasterKeyInput extends Component<Props> {
     },
   });
 
+  componentDidMount() {
+    this.props.setForm(this.form);
+  }
+
   render() {
     const { form } = this;
     const {
       masterKey,
     } = form.values();
-    this.props.setForm(this.form);
 
     const masterKeyField = form.$('masterKey');
 

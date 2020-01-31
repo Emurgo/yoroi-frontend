@@ -236,6 +236,7 @@ export default class WalletRestoreDialogContainer
           return null; // TODO: throw error? Shouldn't happen
         }
         return (<TransferSummaryPage
+          form={null}
           formattedWalletAmount={formattedWalletAmount}
           selectedExplorer={this.props.stores.profile.selectedExplorer}
           transferTx={yoroiTransfer.transferTx}

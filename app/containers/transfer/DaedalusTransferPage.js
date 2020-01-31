@@ -50,7 +50,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     const walletsStore = this._getWalletsStore();
     const publicDeriver = walletsStore.selected;
     if (publicDeriver == null) {
-      throw new Error('tranferFunds no wallet selected');
+      throw new Error(`${nameof(this.setupTransferFundsWithMnemonic)} no wallet selected`);
     }
     await this._getDaedalusTransferActions().setupTransferFundsWithMnemonic.trigger({
       ...payload,
@@ -64,7 +64,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     const walletsStore = this._getWalletsStore();
     const publicDeriver = walletsStore.selected;
     if (publicDeriver == null) {
-      throw new Error('tranferFunds no wallet selected');
+      throw new Error('transferFunds no wallet selected');
     }
     await this._getDaedalusTransferActions().setupTransferFundsWithMasterKey.trigger({
       ...payload,
@@ -73,11 +73,11 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
   };
 
   /** Broadcast the transfer transaction if one exists and return to wallet page */
-  tranferFunds: void => Promise<void> = async () => {
+  transferFunds: void => Promise<void> = async () => {
     const walletsStore = this._getWalletsStore();
     const publicDeriver = walletsStore.selected;
     if (publicDeriver == null) {
-      throw new Error('tranferFunds no wallet selected');
+      throw new Error('transferFunds no wallet selected');
     }
     // broadcast transfer transaction then call continuation
     await this._getDaedalusTransferActions().transferFunds.trigger({
@@ -179,10 +179,11 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
           <TransferLayout>
             <BorderedBox>
               <TransferSummaryPage
+                form={null}
                 formattedWalletAmount={formattedWalletAmount}
                 selectedExplorer={this.props.stores.profile.selectedExplorer}
                 transferTx={daedalusTransfer.transferTx}
-                onSubmit={this.tranferFunds}
+                onSubmit={this.transferFunds}
                 isSubmitting={daedalusTransfer.transferFundsRequest.isExecuting}
                 onCancel={this.cancelTransferFunds}
                 error={daedalusTransfer.error}

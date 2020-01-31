@@ -17,9 +17,9 @@ type Props = {|
   +learnMoreText?: string,
 |};
 
-type State = {
+type State = {|
   showLearnMore: boolean,
-};
+|};
 
 @observer
 export default class OptionBlock extends Component<Props, State> {

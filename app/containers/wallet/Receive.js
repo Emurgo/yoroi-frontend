@@ -12,6 +12,7 @@ export default class Receive extends Component<InjectedContainerProps> {
       <ReceiveWithNavigation
         isActiveTab={this.props.stores.substores.ada.addresses.isActiveTab}
         onTabClick={this.props.stores.substores.ada.addresses.handleTabClick}
+        showMangled={this.props.stores.substores.ada.addresses.mangledAddressesForDisplay.hasAny}
       >
         {this.props.children}
       </ReceiveWithNavigation>

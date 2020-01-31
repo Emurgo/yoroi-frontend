@@ -1,6 +1,7 @@
 // @flow
 import { observable, computed, action, runInAction } from 'mobx';
 import { find } from 'lodash';
+import BigNumber from 'bignumber.js';
 import Store from './Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import Request from '../lib/LocalizedRequest';
@@ -13,7 +14,7 @@ import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
-  asGetAllUtxos, asHasUtxoChains, asDisplayCutoff,
+  asGetAllUtxos, asHasUtxoChains, asDisplayCutoff, asGetStakingKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   IHasUtxoChainsRequest,
@@ -28,10 +29,21 @@ import { buildRoute } from '../../utils/routing';
 import { ChainDerivations } from '../../config/numbersConfig';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
+import {
+  filterAddressesByStakingKey,
+  unwrapStakingKey,
+  addressToDisplayString,
+} from '../../api/ada/lib/storage/bridge/utils';
+import type {
+  ConfigType,
+} from '../../../config/config-types';
+
+declare var CONFIG : ConfigType;
 
 const RECEIVE_ROUTES = {
   internal: ROUTES.WALLETS.RECEIVE.INTERNAL,
-  external: ROUTES.WALLETS.RECEIVE.EXTERNAL
+  external: ROUTES.WALLETS.RECEIVE.EXTERNAL,
+  mangled: ROUTES.WALLETS.RECEIVE.MANGLED
 };
 
 export type StandardAddress = {|
@@ -123,6 +135,7 @@ export default class AddressesStore extends Store {
   /** warning: do NOT use this if public deriver level < Account */
   allAddressesForDisplay: AddressTypeStore<StandardAddress>;
 
+  mangledAddressesForDisplay: AddressTypeStore<StandardAddress>;
   externalForDisplay: AddressTypeStore<StandardAddress>;
   internalForDisplay: AddressTypeStore<StandardAddress>;
 
@@ -138,7 +151,13 @@ export default class AddressesStore extends Store {
 
     this.allAddressesForDisplay = new AddressTypeStore(
       this.stores,
-      (request) => this._wrapForAllAddresses(request)
+      (request) => this._wrapForAllAddresses({ ...request, invertFilter: false })
+    );
+    this.mangledAddressesForDisplay = new AddressTypeStore(
+      this.stores,
+      (request) => (environment.isShelley()
+        ? this._wrapForAllAddresses({ ...request, invertFilter: true })
+        : Promise.resolve([]))
     );
     this.externalForDisplay = new AddressTypeStore(
       this.stores,
@@ -190,6 +209,9 @@ export default class AddressesStore extends Store {
     } else {
       this.externalForDisplay.addObservedWallet(publicDeriver.self);
       this.internalForDisplay.addObservedWallet(publicDeriver.self);
+      if (environment.isShelley) {
+        this.mangledAddressesForDisplay.addObservedWallet(publicDeriver.self);
+      }
     }
   }
 
@@ -202,26 +224,37 @@ export default class AddressesStore extends Store {
     } else {
       await this.externalForDisplay.refreshAddresses();
       await this.internalForDisplay.refreshAddresses();
+      if (environment.isShelley) {
+        await this.mangledAddressesForDisplay.refreshAddresses();
+      }
     }
   }
 
-  _wrapForAllAddresses = (request: {
+  _wrapForAllAddresses = async (request: {
     publicDeriver: PublicDeriver<>,
+    invertFilter: boolean,
   }): Promise<Array<StandardAddress>> => {
     const withUtxos = asGetAllUtxos(request.publicDeriver);
     if (withUtxos == null) {
       Logger.error(`_wrapForAllAddresses incorrect public deriver`);
       return Promise.resolve([]);
     }
-    // TODO: filter group keys to only get key with our staking key?
-    return this.api[environment.API].getAllAddressesForDisplay({
+
+    const allAddresses = await this.api[environment.API].getAllAddressesForDisplay({
       publicDeriver: withUtxos,
       type: environment.isShelley()
         ? CoreAddressTypes.SHELLEY_GROUP
         : CoreAddressTypes.CARDANO_LEGACY,
     });
+
+    return filterMangledAddresses({
+      publicDeriver: request.publicDeriver,
+      baseAddresses: allAddresses,
+      invertFilter: request.invertFilter,
+    });
   }
-  _wrapForChainAddresses = (request: {
+
+  _wrapForChainAddresses = async (request: {
     publicDeriver: PublicDeriver<>,
     chainsRequest: IHasUtxoChainsRequest,
   }): Promise<Array<StandardAddress>> => {
@@ -232,13 +265,18 @@ export default class AddressesStore extends Store {
       Logger.error(`_wrapForChainAddresses incorrect public deriver`);
       return Promise.resolve([]);
     }
-    // TODO: filter group keys to only get key with our staking key?
-    return this.api[environment.API].getChainAddressesForDisplay({
+    const addresses = await this.api[environment.API].getChainAddressesForDisplay({
       publicDeriver: withHasUtxoChains,
       chainsRequest: request.chainsRequest,
       type: environment.isShelley()
         ? CoreAddressTypes.SHELLEY_GROUP
         : CoreAddressTypes.CARDANO_LEGACY,
+    });
+
+    return filterMangledAddresses({
+      publicDeriver: request.publicDeriver,
+      baseAddresses: addresses,
+      invertFilter: false,
     });
   }
 
@@ -268,4 +306,76 @@ export default class AddressesStore extends Store {
       params: { id: selected.self.getPublicDeriverId(), page },
     });
   };
+
+  getUnmangleAmounts: void => {|
+    canUnmangle: Array<BigNumber>,
+    cannotUnmangle: Array<BigNumber>,
+  |} = () => {
+    const canUnmangle = [];
+    const cannotUnmangle = [];
+    for (const addrInfo of this.mangledAddressesForDisplay.all
+    ) {
+      if (addrInfo.value != null) {
+        const value = addrInfo.value;
+        if (addrInfo.value.gt(CONFIG.genesis.linearFee.coefficient)) {
+          canUnmangle.push(value);
+        } else {
+          cannotUnmangle.push(value);
+        }
+      }
+    }
+    const canUnmangleSum = canUnmangle.reduce(
+      (sum, val) => sum.plus(val),
+      new BigNumber(0)
+    );
+    const expectedFee = new BigNumber(canUnmangle.length + 1)
+      .times(CONFIG.genesis.linearFee.coefficient)
+      .plus(CONFIG.genesis.linearFee.constant);
+
+    // if user would strictly lose ADA by making the transaction, don't prompt them to make it
+    if (canUnmangleSum.lt(expectedFee)) {
+      while (canUnmangle.length > 0) {
+        cannotUnmangle.push(canUnmangle.pop());
+      }
+    }
+
+    return {
+      canUnmangle,
+      cannotUnmangle
+    };
+  }
+}
+
+async function filterMangledAddresses(request: {|
+  publicDeriver: PublicDeriver<>,
+  baseAddresses: Array<StandardAddress>,
+  invertFilter: boolean,
+|}): Promise<Array<StandardAddress>> {
+  const withStakingKey = asGetStakingKey(request.publicDeriver);
+  if (withStakingKey == null) {
+    return request.baseAddresses.map(info => ({
+      ...info,
+      address: addressToDisplayString(info.address),
+    }));
+  }
+
+  const stakingKeyResp = await withStakingKey.getStakingKey();
+  const stakingKey = unwrapStakingKey(stakingKeyResp.addr.Hash);
+
+  const filterResult = filterAddressesByStakingKey(
+    stakingKey,
+    request.baseAddresses,
+    !request.invertFilter,
+  );
+
+  let result = filterResult;
+  if (request.invertFilter) {
+    const nonMangledSet = new Set(filterResult);
+    result = request.baseAddresses.filter(info => !nonMangledSet.has(info));
+  }
+
+  return result.map(info => ({
+    ...info,
+    address: addressToDisplayString(info.address),
+  }));
 }

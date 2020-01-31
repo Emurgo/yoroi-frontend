@@ -7,8 +7,9 @@ import styles from './ReceiveWithNavigation.scss';
 
 type Props = {|
   +children?: Node,
-  +isActiveTab: ('internal' | 'external') => boolean,
+  +isActiveTab: ('internal' | 'external' | 'mangled') => boolean,
   +onTabClick: string => void,
+  +showMangled: boolean,
 |};
 
 @observer
@@ -25,6 +26,7 @@ export default class ReceiveWithNavigation extends Component<Props> {
           <ReceiveNavigation
             isActiveTab={isActiveTab}
             onTabClick={onTabClick}
+            showMangled={this.props.showMangled}
           />
         </div>
         <div className={styles.page}>

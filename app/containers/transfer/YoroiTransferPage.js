@@ -102,13 +102,13 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
   };
 
   /** Broadcast the transfer transaction if one exists and return to wallet page */
-  tranferFunds: void => Promise<void> = async () => {
+  transferFunds: void => Promise<void> = async () => {
     // broadcast transfer transaction then call continuation
     const walletsStore = this._getWalletsStore();
     const yoroiTransfer = this._getYoroiTransferStore();
     const publicDeriver = walletsStore.selected;
     if (publicDeriver == null) {
-      throw new Error(`${nameof(this.tranferFunds)} no wallet elected`);
+      throw new Error(`${nameof(this.transferFunds)} no wallet elected`);
     }
     await this._getYoroiTransferActions().transferFunds.trigger({
       next: async () => {
@@ -250,10 +250,11 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
           <TransferLayout>
             <BorderedBox>
               <TransferSummaryPage
+                form={null}
                 formattedWalletAmount={formattedWalletAmount}
                 selectedExplorer={this.props.stores.profile.selectedExplorer}
                 transferTx={yoroiTransfer.transferTx}
-                onSubmit={this.tranferFunds}
+                onSubmit={this.transferFunds}
                 isSubmitting={yoroiTransfer.transferFundsRequest.isExecuting}
                 onCancel={this.cancelTransferFunds}
                 error={yoroiTransfer.error}

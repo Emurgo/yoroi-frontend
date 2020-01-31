@@ -39,8 +39,9 @@ import {
 import {
   filterAddressesByStakingKey,
   groupAddrContainsAccountKey,
+  unwrapStakingKey,
 } from './lib/storage/bridge/utils';
-import { createCertificate } from './lib/storage/bridge/delegationUtils';
+import { createCertificate, } from './lib/storage/bridge/delegationUtils';
 import type { PoolRequest } from './lib/storage/bridge/delegationUtils';
 import {
   Bip44Wallet,
@@ -382,12 +383,16 @@ export type PrepareAndBroadcastLedgerSignedTxFunc = (
 
 // createUnsignedTx
 
-export type CreateUnsignedTxRequest = {
+export type CreateUnsignedTxRequest = {|
   publicDeriver: IGetAllUtxos & IHasUtxoChains,
   receiver: string,
-  amount: string, // in lovelaces
-  shouldSendAll: boolean,
-};
+  filter: ElementOf<IGetAllUtxosResponse> => boolean,
+  ...({|
+    amount: string, // in lovelaces
+  |} | {|
+    shouldSendAll: true,
+  |}),
+|};
 export type CreateUnsignedTxResponse = UnsignedTxResponse | V3UnsignedTxAddressedUtxoResponse;
 
 export type CreateUnsignedTxFunc = (
@@ -998,27 +1003,28 @@ export default class AdaApi {
     request: CreateUnsignedTxRequest
   ): Promise<CreateUnsignedTxResponse> {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} called`);
-    const { receiver, amount, shouldSendAll } = request;
+    const { receiver, } = request;
     try {
       const utxos = await request.publicDeriver.getAllUtxos();
+      const filteredUtxos = utxos.filter(utxo => request.filter(utxo));
+
       const addressedUtxo = environment.isShelley()
-        ? shelleyAsAddressedUtxo(utxos)
-        : byronAsAddressedUtxo(utxos);
+        ? shelleyAsAddressedUtxo(filteredUtxos)
+        : byronAsAddressedUtxo(filteredUtxos);
 
       let unsignedTxResponse;
-      if (shouldSendAll) {
+      if (request.shouldSendAll != null) {
         unsignedTxResponse = environment.isShelley()
           ? shelleySendAllUnsignedTx(
-            Buffer.from(
-              RustModule.WalletV3.Address.from_string(receiver).as_bytes()
-            ).toString('hex'),
+            receiver,
             addressedUtxo
           )
           : byronSendAllUnsignedTx(
             receiver,
             addressedUtxo
           );
-      } else {
+      } else if (request.amount != null) {
+        const amount = request.amount;
         const nextUnusedInternal = await request.publicDeriver.nextInternal();
         if (nextUnusedInternal.addressInfo == null) {
           throw new Error(`${nameof(this.createUnsignedTx)} no internal addresses left. Should never happen`);
@@ -1027,9 +1033,7 @@ export default class AdaApi {
         unsignedTxResponse = environment.isShelley()
           ? shelleyNewAdaUnsignedTx(
             [{
-              address: Buffer.from(
-                RustModule.WalletV3.Address.from_string(receiver).as_bytes()
-              ).toString('hex'),
+              address: receiver,
               amount
             }],
             [{
@@ -1047,6 +1051,8 @@ export default class AdaApi {
             }],
             addressedUtxo
           );
+      } else {
+        throw new Error(`${nameof(this.createUnsignedTx)} unknown param`);
       }
       Logger.debug(
         'AdaApi::createUnsignedTx success: ' + stringifyData(unsignedTxResponse)
@@ -1066,17 +1072,8 @@ export default class AdaApi {
   ): Promise<CreateDelegationTxResponse> {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.createDelegationTx)} called`);
 
-    let stakingKey;
-    {
-      const stakingKeyResp = await request.publicDeriver.getStakingKey();
-      const accountAddress = RustModule.WalletV3.Address.from_bytes(
-        Buffer.from(stakingKeyResp.addr.Hash, 'hex')
-      ).to_account_address();
-      if (accountAddress == null) {
-        throw new Error(`${nameof(this.createDelegationTx)} staking key invalid`);
-      }
-      stakingKey = accountAddress.get_account_key();
-    }
+    const stakingKeyResp = await request.publicDeriver.getStakingKey();
+    const stakingKey = unwrapStakingKey(stakingKeyResp.addr.Hash);
 
     const stakeDelegationCert = createCertificate(stakingKey, request.poolRequest);
     const certificate = RustModule.WalletV3.Certificate.stake_delegation(stakeDelegationCert);
@@ -1100,7 +1097,8 @@ export default class AdaApi {
 
     const allUtxosForKey = filterAddressesByStakingKey(
       stakingKey,
-      allUtxo
+      allUtxo,
+      false,
     );
     const utxoSum = allUtxosForKey.reduce(
       (sum, utxo) => sum.plus(new BigNumber(utxo.output.UtxoTransactionOutput.Amount)),
@@ -1664,7 +1662,7 @@ function getDifferenceAfterTx(
         throw new Error(`${nameof(getDifferenceAfterTx)} utxo not found. Should not happen`);
       }
       const address = match.address;
-      if (groupAddrContainsAccountKey(address, stakingKeyString)) {
+      if (groupAddrContainsAccountKey(address, stakingKeyString, true)) {
         sumInForKey = sumInForKey.plus(new BigNumber(senderUtxo.amount));
       }
     }
@@ -1676,7 +1674,7 @@ function getDifferenceAfterTx(
     for (let i = 0; i < outputs.size(); i++) {
       const output = outputs.get(i);
       const address = Buffer.from(output.address().as_bytes()).toString('hex');
-      if (groupAddrContainsAccountKey(address, stakingKeyString)) {
+      if (groupAddrContainsAccountKey(address, stakingKeyString, true)) {
         const value = new BigNumber(output.value().to_str());
         sumOutForKey = sumOutForKey.plus(value);
       }

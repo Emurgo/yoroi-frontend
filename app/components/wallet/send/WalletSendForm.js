@@ -20,6 +20,7 @@ import styles from './WalletSendForm.scss';
 import globalMessages, { environmentSpecificMessages } from '../../../i18n/global-messages';
 import environment from '../../../environment';
 import type { UriParams } from '../../../utils/URIHandling';
+import { getAddressPayload } from '../../../api/ada/lib/storage/bridge/utils';
 
 import {
   formattedWalletAmount,
@@ -135,7 +136,7 @@ export default class WalletSendForm extends Component<Props> {
       const adjustedAmount = formattedAmountToNaturalUnits(uriParams.amount.toString());
       // note: assume these are validated externally
       this.props.updateAmount(Number(adjustedAmount));
-      this.props.updateReceiver(uriParams.address);
+      this.props.updateReceiver(getAddressPayload(uriParams.address));
       this.props.resetUriParams();
     }
 
@@ -188,7 +189,7 @@ export default class WalletSendForm extends Component<Props> {
           }
           const updateReceiver = (isValid) => {
             if (isValid) {
-              this.props.updateReceiver(receiverValue);
+              this.props.updateReceiver(getAddressPayload(receiverValue));
             } else {
               this.props.updateReceiver();
             }

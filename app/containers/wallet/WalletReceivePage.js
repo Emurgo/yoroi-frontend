@@ -5,6 +5,7 @@ import config from '../../config';
 import WalletReceive from '../../components/wallet/WalletReceive';
 import StandardHeader from '../../components/wallet/receive/StandardHeader';
 import InternalHeader from '../../components/wallet/receive/InternalHeader';
+import MangledHeader from '../../components/wallet/receive/MangledHeader';
 import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer';
 import VerifyAddressDialog from '../../components/wallet/receive/VerifyAddressDialog';
 import URIGenerateDialog from '../../components/uri/URIGenerateDialog';
@@ -21,6 +22,7 @@ import globalMessages from '../../i18n/global-messages';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { asHasUtxoChains } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type { StandardAddress, AddressTypeStore } from '../../stores/base/AddressesStore';
+import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
 
 type Props = {|
   ...InjectedProps,
@@ -83,7 +85,7 @@ export default class WalletReceivePage extends Component<Props, State> {
     if (!withChains) throw new Error('WalletReceivePage only available for account-level wallets');
     const addressTypeStore = this.getTypeStore();
 
-    if (!addressTypeStore.getRequest(publicDeriver.self).wasExecuted) {
+    if (!addressTypeStore.getRequest(publicDeriver.self).wasExecuted || !addressTypeStore.hasAny) {
       return (
         <VerticallyCenteredLayout>
           <LoadingSpinner />
@@ -121,6 +123,7 @@ export default class WalletReceivePage extends Component<Props, State> {
       this.state.notificationElementId
     );
 
+    const { canUnmangle } = this.props.stores.substores.ada.addresses.getUnmangleAmounts();
     const header = (() => {
       if (addresses.isActiveTab('external')) {
         return (<StandardHeader
@@ -137,6 +140,16 @@ export default class WalletReceivePage extends Component<Props, State> {
       if (addresses.isActiveTab('internal')) {
         return (<InternalHeader />);
       }
+      if (addresses.isActiveTab('mangled')) {
+        return (
+          <MangledHeader
+            hasMangledUtxo={canUnmangle.length > 0}
+            onClick={() => this.props.actions.dialogs.open.trigger({
+              dialog: UnmangleTxDialogContainer,
+            })}
+          />
+        );
+      }
       throw new Error(`${nameof(WalletReceivePage)} unexpected address tab`);
     })();
 
@@ -152,7 +165,7 @@ export default class WalletReceivePage extends Component<Props, State> {
             await actions.ada.hwVerifyAddress.selectAddress.trigger({ address, path });
             this.openVerifyAddressDialog();
           }}
-          onGeneratePaymentURI={addresses.isActiveTab('internal')
+          onGeneratePaymentURI={!addresses.isActiveTab('external')
             ? undefined
             : (address) => {
               this.openURIGenerateDialog(address);
@@ -199,6 +212,14 @@ export default class WalletReceivePage extends Component<Props, State> {
           />
         ) : null}
 
+        {uiDialogs.isOpen(UnmangleTxDialogContainer) && (
+          <UnmangleTxDialogContainer
+            actions={this.props.actions}
+            stores={this.props.stores}
+            onClose={() => this.props.actions.dialogs.closeActiveDialog.trigger()}
+          />
+        )}
+
         {uiDialogs.isOpen(VerifyAddressDialog) && hwVerifyAddress.selectedAddress ? (
           <VerifyAddressDialog
             isActionProcessing={hwVerifyAddress.isActionProcessing}
@@ -224,6 +245,9 @@ export default class WalletReceivePage extends Component<Props, State> {
     }
     if (addresses.isActiveTab('internal')) {
       return addresses.internalForDisplay;
+    }
+    if (addresses.isActiveTab('mangled')) {
+      return addresses.mangledAddressesForDisplay;
     }
     throw new Error(`${nameof(WalletReceivePage)} unexpected address tab`);
   }

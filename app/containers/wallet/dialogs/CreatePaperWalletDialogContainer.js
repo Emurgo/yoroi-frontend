@@ -24,9 +24,9 @@ const messages = defineMessages({
   },
 });
 
-type State = {
+type State = {|
   notificationElementId: string,
-};
+|};
 
 @observer
 export default class CreatePaperWalletDialogContainer extends Component<InjectedProps, State> {
