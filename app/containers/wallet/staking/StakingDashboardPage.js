@@ -22,6 +22,7 @@ import InvalidURIImg from '../../../assets/images/uri/invalid-uri.inline.svg';
 import UpcomingRewards from '../../../components/wallet/staking/dashboard/UpcomingRewards';
 import type { BoxInfo } from '../../../components/wallet/staking/dashboard/UpcomingRewards';
 import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard/LessThanExpectedDialog';
+import PoolWarningDialog from '../../../components/wallet/staking/dashboard/PoolWarningDialog';
 import environment from '../../../environment';
 import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
 import { digetForHash } from '../../../api/ada/lib/storage/database/primitives/api/utils';
@@ -31,7 +32,7 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
 import config from '../../../config';
 import { formattedWalletAmount } from '../../../utils/formatters';
-import type { PoolTuples } from '../../../api/ada/lib/state-fetch/types';
+import type { PoolTuples, ReputationObject, } from '../../../api/ada/lib/state-fetch/types';
 import type { DelegationRequests } from '../../../stores/ada/DelegationStore';
 
 import {
@@ -637,6 +638,8 @@ export default class StakingDashboardPage extends Component<Props, State> {
       message: globalMessages.copyTooltipMessage,
     };
 
+    const poolReputation = delegationStore.poolReputation.result ?? {};
+
     const { uiNotifications, } = this.props.stores;
     const keyState = delegationRequests.stakingKeyState;
     const { intl } = this.context;
@@ -710,6 +713,11 @@ export default class StakingDashboardPage extends Component<Props, State> {
                 .createDelegationTx
                 .isExecuting
             }
+            reputationInfo={poolReputation[pool[0]] ?? {}}
+            openReputationDialog={() => this.props.actions.dialogs.open.trigger({
+              dialog: PoolWarningDialog,
+              params: { reputation: (poolReputation[pool[0]] ?? {}) },
+            })}
           />
         );
       })
@@ -717,7 +725,9 @@ export default class StakingDashboardPage extends Component<Props, State> {
   }
 
   getDialog: void => Node = () => {
-    if (this.props.stores.uiDialogs.isOpen(LessThanExpectedDialog)) {
+    const uiDialogs = this.props.stores.uiDialogs;
+
+    if (uiDialogs.isOpen(LessThanExpectedDialog)) {
       return (
         <LessThanExpectedDialog
           close={() => this.props.actions.dialogs.closeActiveDialog.trigger()}
@@ -726,7 +736,17 @@ export default class StakingDashboardPage extends Component<Props, State> {
       );
     }
 
-    if (this.props.stores.uiDialogs.isOpen(UnmangleTxDialogContainer)) {
+    if (uiDialogs.isOpen(PoolWarningDialog)) {
+      return (
+        <PoolWarningDialog
+          close={() => this.props.actions.dialogs.closeActiveDialog.trigger()}
+          classicTheme={this.props.stores.profile.isClassicTheme}
+          reputationInfo={uiDialogs.getParam<ReputationObject>('reputation')}
+        />
+      );
+    }
+
+    if (uiDialogs.isOpen(UnmangleTxDialogContainer)) {
       return (
         <UnmangleTxDialogContainer
           actions={this.props.actions}

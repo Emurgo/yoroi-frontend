@@ -11,6 +11,7 @@ import type {
   ServerStatusRequest, ServerStatusResponse,
   AccountStateRequest, AccountStateResponse,
   PoolInfoRequest, PoolInfoResponse,
+  ReputationRequest, ReputationResponse,
 } from './types';
 
 export interface IFetcher {
@@ -24,4 +25,5 @@ export interface IFetcher {
   checkServerStatus(body: ServerStatusRequest): Promise<ServerStatusResponse>;
   getAccountState(body: AccountStateRequest): Promise<AccountStateResponse>;
   getPoolInfo(body: PoolInfoRequest): Promise<PoolInfoResponse>;
+  getReputation(body: ReputationRequest): Promise<ReputationResponse>;
 }

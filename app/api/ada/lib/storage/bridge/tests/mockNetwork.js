@@ -11,6 +11,7 @@ import type {
   RemoteTransaction, RemoteUnspentOutput,
   AccountStateRequest, AccountStateResponse, AccountStateFunc,
   PoolInfoRequest, PoolInfoResponse, PoolInfoFunc,
+  ReputationRequest, ReputationResponse, ReputationFunc,
   AccountStateSuccess, AccountStateFailure, AccountStateDelegation,
   SignedRequestInternal, RemoteCertificate,
   RemoteTransactionInput, RemoteTransactionOutput,
@@ -667,5 +668,14 @@ export function genGetPoolInfo(
       }
     }
     return result;
+  };
+}
+
+export function getGetReputation(
+): ReputationFunc {
+  return async (
+    _body: ReputationRequest,
+  ): Promise<ReputationResponse> => {
+    return {};
   };
 }
