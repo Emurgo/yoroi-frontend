@@ -67,8 +67,8 @@ export default class PoolWarningDialog extends Component<Props> {
           <ul>
             {this.getMessage().map((issue, i) => (
               // eslint-disable-next-line react/no-array-index-key
-              <li key={i}>{issue}</li>)
-            )}
+              <li key={i}>{issue}</li>
+            ))}
           </ul>
           <div className={styles.footer}>
             {intl.formatMessage(messages.suggested)}
