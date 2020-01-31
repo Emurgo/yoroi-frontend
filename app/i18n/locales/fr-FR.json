@@ -425,7 +425,7 @@
   "wallet.receive.page.internalWarning2": "les adresses sont indiquées ici à des fins d'audit personnel et ne doivent <strong>jamais</strong> être utilisées.",
   "wallet.receive.page.mangledWarning1": "Mangled addresses contribute to your ADA balance but have the incorrect delegation preference",
   "wallet.receive.page.showUsedLabel": "montrer les utilisées",
-  "wallet.receive.page.unmangeLabel": "Correct delegation preference",
+  "wallet.receive.page.unmangeLabel": "Corriger la préférence de délégation",
   "wallet.receive.page.verifyAddressLabel": "Vérifier l'adresse",
   "wallet.receive.page.walletAddressLabel": "Votre adresse de wallet",
   "wallet.receive.page.walletReceiveInstructions": "Partagez cette adresse de wallet pour recevoir des paiements.<br>Afin d'assurer votre sécurité, de nouvelles adresses sont générées à chaque utilisation.",
