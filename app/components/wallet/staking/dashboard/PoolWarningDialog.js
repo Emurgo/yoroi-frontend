@@ -27,7 +27,7 @@ const messages = defineMessages({
   },
   suggested: {
     id: 'wallet.dashboard.poolWarnings.suggested',
-    defaultMessage: '!!!We suggest to contact the pool owner through the stake pool’s webpage to ask about their behavior. Remember you can change your delegation at any time without any interruptions in rewards',
+    defaultMessage: '!!!We suggest contacting the pool owner through the stake pool\'s webpage to ask about their behavior. Remember, you can change your delegation at any time without any interruptions in rewards.',
   },
   unknown: {
     id: 'wallet.dashboard.poolWarnings.unknown',
