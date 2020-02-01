@@ -358,7 +358,7 @@
   "wallet.dashboard.poolWarnings.censoringTxs": "Il exclut délibérément des transactions des blocs (censurant le réseau)",
   "wallet.dashboard.poolWarnings.explanation": "Contrairement à la Preuve de Travail (PoW) où les utilisateurs ne peuvent rien faire contre un comportement antagoniste, les blockchains de Preuve des Enjeux (PoS) comme Cardano permettent aux utilisateurs de punir les mauvais acteurs",
   "wallet.dashboard.poolWarnings.header": "D'après l'activité du réseau, il semble que ce pool :",
-  "wallet.dashboard.poolWarnings.multiBlock": "Creates multiple blocks in the same slot (purposely causing forks)",
+  "wallet.dashboard.poolWarnings.multiBlock": "Crée plusieurs blocs dans la même tranche (provoquant délibérément des fourches)",
   "wallet.dashboard.poolWarnings.suggested": "We suggest contacting the pool owner through the stake pool's webpage to ask about their behavior. Remember, you can change your delegation at any time without any interruptions in rewards.",
   "wallet.dashboard.poolWarnings.unknown": "Causes some unknown issue (look online for more info)",
   "wallet.dashboard.rewards.note": "La première récompense est plus lente.",
