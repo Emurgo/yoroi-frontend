@@ -145,6 +145,7 @@ export default class AddressesStore extends Store {
   @observable createAddressRequest: Request<CreateAddressFunc>;
 
   setup(): void {
+    super.setup();
     const actions = this.actions[environment.API].addresses;
     actions.createAddress.listen(this._createAddress);
     actions.resetErrors.listen(this._resetErrors);

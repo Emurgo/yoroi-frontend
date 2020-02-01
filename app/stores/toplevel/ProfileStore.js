@@ -183,6 +183,7 @@ export default class ProfileStore extends Store {
     = new Request<boolean => Promise<void>>(this.api.localStorage.setToggleSidebar);
 
   setup(): void {
+    super.setup();
     this.actions.profile.updateLocale.listen(this._updateLocale);
     this.actions.profile.updateTentativeLocale.listen(this._updateTentativeLocale);
     this.actions.profile.updateSelectedExplorer.listen(this.setSelectedExplorer);

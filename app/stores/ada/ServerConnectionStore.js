@@ -12,6 +12,7 @@ export default class ServerConnectionStore extends Store {
   @observable serverStatus: ServerStatusErrorType = 'healthy';
 
   setup(): void {
+    super.setup();
     setInterval(this._checkServerStatus, this.SERVER_STATUS_REFRESH_INTERVAL);
   }
 

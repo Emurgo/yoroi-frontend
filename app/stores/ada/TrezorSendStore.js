@@ -40,6 +40,7 @@ export default class TrezorSendStore extends Store {
   // =================== API RELATED =================== //
 
   setup(): void {
+    super.setup();
     const trezorSendAction = this.actions.ada.trezorSend;
     trezorSendAction.sendUsingTrezor.listen(this._sendUsingTrezor);
     trezorSendAction.cancel.listen(this._cancel);

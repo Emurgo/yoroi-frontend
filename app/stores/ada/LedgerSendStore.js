@@ -59,6 +59,7 @@ export default class LedgerSendStore extends Store {
   // =================== API RELATED =================== //
 
   setup(): void {
+    super.setup();
     const ledgerSendAction = this.actions.ada.ledgerSend;
     ledgerSendAction.init.listen(this._init);
     ledgerSendAction.sendUsingLedger.listen(this._send);

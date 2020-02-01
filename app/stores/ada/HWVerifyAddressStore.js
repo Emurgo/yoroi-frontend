@@ -43,6 +43,7 @@ export default class AddressesStore extends Store {
   ledgerConnect: ?LedgerConnect;
 
   setup(): void {
+    super.setup();
     const actions = this.actions[environment.API].hwVerifyAddress;
     actions.selectAddress.listen(this._selectAddress);
     actions.verifyAddress.listen(this._verifyAddress);

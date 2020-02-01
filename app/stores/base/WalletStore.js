@@ -67,6 +67,7 @@ export default class WalletStore extends Store {
   @observable isImportActive: boolean = false;
 
   setup(): void {
+    super.setup();
     this.publicDerivers = [];
     setInterval(this._pollRefresh, this.WALLET_REFRESH_INTERVAL);
     document.addEventListener('visibilitychange', debounce(this._pollRefresh, this.ON_VISIBLE_DEBOUNCE_WAIT));

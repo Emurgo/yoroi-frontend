@@ -49,6 +49,7 @@ export default class TransactionsStore extends Store {
   _hasAnyPending: boolean = false;
 
   setup(): void {
+    super.setup();
     const actions = this.actions[environment.API].transactions;
     actions.loadMoreTransactions.listen(this._increaseSearchLimit);
   }

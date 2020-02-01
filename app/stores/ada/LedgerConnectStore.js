@@ -78,6 +78,7 @@ export default class LedgerConnectStore
   // =================== API RELATED =================== //
 
   setup(): void {
+    super.setup();
     this._reset();
     const ledgerConnectAction = this.actions.ada.ledgerConnect;
     ledgerConnectAction.init.listen(this._init);
