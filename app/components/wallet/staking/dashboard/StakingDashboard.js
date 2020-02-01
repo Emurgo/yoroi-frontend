@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
 import GraphWrapper from './GraphWrapper';
+import type { GraphItems } from './GraphWrapper';
 import styles from './StakingDashboard.scss';
 import globalMessages from '../../../../i18n/global-messages';
 import WarningBox from '../../../widgets/WarningBox';
@@ -43,10 +44,17 @@ const emptyDashboardMessages = defineMessages({
   }
 });
 
+export type SingleGraphData = {|
+  +items: ?Array<GraphItems>,
+  +error: ?LocalizableError,
+|};
+export type GraphData = {|
+  +rewardsGraphData: SingleGraphData,
+|};
+
 type Props = {|
   +themeVars: Object,
-  +totalGraphData: Array<Object>,
-  +positionsGraphData: Array<Object>,
+  +graphData: GraphData,
   +stakePools: {| error: LocalizableError, |} | {| pools: null | Array<Node> |},
   +epochProgress: Node,
   +userSummary: Node,
@@ -67,12 +75,8 @@ export default class StakingDashboard extends Component<Props> {
 
   render() {
     const {
-      themeVars,
-      totalGraphData,
-      positionsGraphData,
+      graphData,
     } = this.props;
-
-    const { intl } = this.context;
 
     const pendingTxWarningComponent = this.props.hasAnyPending
       ? (
@@ -84,21 +88,10 @@ export default class StakingDashboard extends Component<Props> {
       )
       : (null);
 
-    // TODO: enable graphs eventually
-    // eslint-disable-next-line no-unused-vars
     const graphs = (
       <div className={styles.graphsWrapper}>
-        <GraphWrapper
-          themeVars={themeVars}
-          tabs={[
-            intl.formatMessage(globalMessages.totalAdaLabel),
-            intl.formatMessage(globalMessages.marginsLabel),
-            intl.formatMessage(globalMessages.rewardsLabel),
-          ]}
-          graphName="total"
-          data={totalGraphData}
-        />
-        <GraphWrapper
+        {this._displayGraph(graphData.rewardsGraphData)}
+        {/* <GraphWrapper
           themeVars={themeVars}
           tabs={[
             intl.formatMessage(messages.positionsLabel),
@@ -106,8 +99,8 @@ export default class StakingDashboard extends Component<Props> {
             intl.formatMessage(messages.costsLabel),
           ]}
           graphName="positions"
-          data={positionsGraphData}
-        />
+          data={graphData.positionsGraphData}
+        /> */}
       </div>
     );
     return (
@@ -138,9 +131,48 @@ export default class StakingDashboard extends Component<Props> {
               </BarDecoration>
             </div>
           }
-          {this.displayStakePools()}
+          <div className={styles.bodyWrapper}>
+            {graphs}
+            {this.displayStakePools()}
+          </div>
         </div>
       </div>
+    );
+  }
+
+  _displayGraph: SingleGraphData => Node = (graphData) => {
+    const { intl } = this.context;
+    if (graphData.error) {
+      return (
+        <div className={styles.poolError}>
+          <center><InvalidURIImg /></center>
+          <ErrorBlock
+            error={graphData.error}
+          />
+        </div>
+      );
+    }
+    if (graphData.items == null) {
+      return (
+        <VerticallyCenteredLayout>
+          <LoadingSpinner />
+        </VerticallyCenteredLayout>
+      );
+    }
+    return (
+      <GraphWrapper
+        data={graphData.items}
+        themeVars={this.props.themeVars}
+        tabs={[
+          // intl.formatMessage(globalMessages.totalAdaLabel),
+          // intl.formatMessage(globalMessages.marginsLabel),
+          intl.formatMessage(globalMessages.rewardsLabel),
+        ]}
+        primaryBarLabel={intl.formatMessage(globalMessages.rewardsLabel)}
+        secondaryBarLabel={intl.formatMessage(globalMessages.totalAdaLabel)}
+        yAxisLabel={intl.formatMessage(globalMessages.rewardsLabel)}
+        graphName="total"
+      />
     );
   }
 
@@ -158,7 +190,7 @@ export default class StakingDashboard extends Component<Props> {
     }
     if (this.props.stakePools.pools === null || this.props.pageInfo == null) {
       return (
-        <div className={styles.loadingPools}>
+        <div className={styles.stakePool}>
           <VerticallyCenteredLayout>
             <LoadingSpinner />
           </VerticallyCenteredLayout>
@@ -168,17 +200,17 @@ export default class StakingDashboard extends Component<Props> {
     const currPool = this.props.pageInfo.currentPage;
     if (this.props.stakePools.pools.length === 0) {
       return (
-        <InformativeError
-          title={intl.formatMessage(emptyDashboardMessages.title)}
-          text={intl.formatMessage(emptyDashboardMessages.text)}
-        />
+        <div className={styles.stakePool}>
+          <InformativeError
+            title={intl.formatMessage(emptyDashboardMessages.title)}
+            text={intl.formatMessage(emptyDashboardMessages.text)}
+          />
+        </div>
       );
     }
     return (
-      <div className={styles.bodyWrapper}>
-        <div className={styles.stakePool}>
-          {this.props.stakePools.pools[currPool]}
-        </div>
+      <div className={styles.stakePool}>
+        {this.props.stakePools.pools[currPool]}
       </div>
     );
   }

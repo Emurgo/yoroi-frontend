@@ -21,10 +21,6 @@
   flex: 1;
 }
 
-.loadingPools {
-  height: 200px;
-}
-
 .poolError {
   margin-top: 42px;
 }
@@ -62,6 +58,7 @@
 
 .stakePool {
   margin-left: auto;
+  width: 320px;
 }
 
 .graphsWrapper {

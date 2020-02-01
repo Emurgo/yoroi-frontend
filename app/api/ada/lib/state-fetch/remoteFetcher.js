@@ -5,6 +5,7 @@ import type {
   TxBodiesRequest, TxBodiesResponse,
   UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
+  RewardHistoryRequest, RewardHistoryResponse,
   BestBlockRequest, BestBlockResponse,
   SignedRequest, SignedResponse,
   FilterUsedRequest, FilterUsedResponse,
@@ -28,6 +29,7 @@ import {
   GetUtxosForAddressesApiError,
   GetUtxosSumsForAddressesApiError,
   GetTxHistoryForAddressesApiError,
+  GetRewardHistoryApiError,
   GetBestBlockError,
   SendTransactionApiError,
   CheckAdressesInUseApiError,
@@ -161,11 +163,101 @@ export class RemoteFetcher implements IFetcher {
       })
   )
 
+  getRewardHistory: RewardHistoryRequest => Promise<RewardHistoryResponse> = (body) => (
+    Promise.resolve({
+      '85a22d0b8709e6bc04d11257dc405410d1ace01f207c391ba4788ea17198ee1a08': [
+        [
+          9,
+          73100664
+        ],
+        [
+          11,
+          179173245
+        ],
+        [
+          13,
+          1473085001
+        ],
+        [
+          15,
+          1206998837
+        ],
+        [
+          17,
+          948472625
+        ],
+        [
+          19,
+          1691506850
+        ],
+        [
+          20,
+          1329713867
+        ],
+        [
+          22,
+          1252968036
+        ],
+        [
+          24,
+          792417623
+        ],
+        [
+          26,
+          1328566607
+        ],
+        [
+          28,
+          1691506850
+        ],
+        [
+          31,
+          1436126155
+        ],
+        [
+          33,
+          1301159115
+        ],
+        [
+          35,
+          709475085
+        ],
+        [
+          36,
+          857079112
+        ],
+        [
+          37,
+          408294756
+        ]
+      ],
+    })
+    // axios(
+    //   `${backendUrl}/api/v2/account/rewards`,
+    //   {
+    //     method: 'post',
+    //     data: body,
+    //     headers: {
+    //       'yoroi-version': this.lastLaunchVersion(),
+    //       'yoroi-locale': this.currentLocale()
+    //     }
+    //   }
+    // ).then(response => response.data)
+    //   .catch((error) => {
+    //     Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getRewardHistory)} error: ` + stringifyError(error));
+    //     throw new GetRewardHistoryApiError();
+    //   })
+  )
+
   getBestBlock: BestBlockRequest => Promise<BestBlockResponse> = (_body) => (
     axios(
       `${backendUrl}/api/v2/bestblock`,
       {
-        method: 'get'
+        method: 'get',
+        headers: {
+          'yoroi-version': this.lastLaunchVersion(),
+          'yoroi-locale': this.currentLocale()
+        }
       }
     ).then(response => response.data)
       .catch((error) => {
@@ -202,7 +294,7 @@ export class RemoteFetcher implements IFetcher {
 
   checkAddressesInUse: FilterUsedRequest => Promise<FilterUsedResponse> = (body) => (
     axios(
-      `${backendUrl}/api/addresses/filterUsed`,
+      `${backendUrl}/api/v2/addresses/filterUsed`,
       {
         method: 'post',
         data: {
@@ -279,7 +371,11 @@ export class RemoteFetcher implements IFetcher {
     axios(
       `${backendUrl}/api/v2/pool/reputation`,
       {
-        method: 'get'
+        method: 'get',
+        headers: {
+          'yoroi-version': this.lastLaunchVersion(),
+          'yoroi-locale': this.currentLocale()
+        }
       }
     ).then(response => response.data)
       .catch((error) => {
@@ -292,7 +388,11 @@ export class RemoteFetcher implements IFetcher {
     axios(
       `${backendUrl}/api/status`,
       {
-        method: 'get'
+        method: 'get',
+        headers: {
+          'yoroi-version': this.lastLaunchVersion(),
+          'yoroi-locale': this.currentLocale()
+        }
       }
     ).then(response => response.data)
       .catch((error) => {

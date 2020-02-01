@@ -10,6 +10,8 @@ import PublicDeriverWithCachedMeta from '../../../domain/PublicDeriverWithCached
 import { getOrDefault } from '../../../domain/Explorer';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import StakingDashboard from '../../../components/wallet/staking/dashboard/StakingDashboard';
+import type { GraphData } from '../../../components/wallet/staking/dashboard/StakingDashboard';
+import type { GraphItems, } from '../../../components/wallet/staking/dashboard/GraphWrapper';
 import EpochProgress from '../../../components/wallet/staking/dashboard/EpochProgress';
 import UserSummary from '../../../components/wallet/staking/dashboard/UserSummary';
 import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
@@ -158,200 +160,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
           errorIfPresent,
         })}
         upcomingRewards={getTimeBasedElements.rewardInfo?.rewardPopup}
-        totalGraphData={[
-          {
-            name: 1,
-            ada: 4000,
-            rewards: 2400,
-          },
-          {
-            name: 2,
-            ada: 3000,
-            rewards: 1398,
-          },
-          {
-            name: 3,
-            ada: 2000,
-            rewards: 9000,
-          },
-          {
-            name: 4,
-            ada: 2780,
-            rewards: 3908,
-          },
-          {
-            name: 5,
-            ada: 1890,
-            rewards: 4800,
-          },
-          {
-            name: 6,
-            ada: 2390,
-            rewards: 3800,
-          },
-          {
-            name: 7,
-            ada: 3490,
-            rewards: 4300,
-          },
-          {
-            name: 8,
-            ada: 3490,
-            rewards: 4300,
-          },
-          {
-            name: 9,
-            ada: 3490,
-            rewards: 4300,
-          },
-          {
-            name: 10,
-            ada: 3490,
-            rewards: 4300,
-          },
-          {
-            name: 11,
-            ada: 3490,
-            rewards: 4300,
-          },
-          {
-            name: 12,
-            ada: 4000,
-            rewards: 2400,
-          },
-          {
-            name: 13,
-            ada: 3000,
-            rewards: 1398,
-          },
-          {
-            name: 14,
-            ada: 2000,
-            rewards: 9000,
-          },
-          {
-            name: 15,
-            ada: 2780,
-            rewards: 3908,
-          },
-          {
-            name: 16,
-            ada: 1890,
-            rewards: 4800,
-          },
-          {
-            name: 17,
-            ada: 2390,
-            rewards: 3800,
-          },
-          {
-            name: 18,
-            ada: 3490,
-            rewards: 4300,
-          },
-          {
-            name: 19,
-            ada: 3490,
-            rewards: 4300,
-          },
-        ]}
-        positionsGraphData={[
-          {
-            name: 1,
-            ada: 1200,
-            rewards: 8294,
-          },
-          {
-            name: 2,
-            ada: 1000,
-            rewards: 6000,
-          },
-          {
-            name: 3,
-            ada: 800,
-            rewards: 5789,
-          },
-          {
-            name: 4,
-            ada: 2780,
-            rewards: 3908,
-          },
-          {
-            name: 5,
-            ada: 1890,
-            rewards: 4800,
-          },
-          {
-            name: 6,
-            ada: 2000,
-            rewards: 4000,
-          },
-          {
-            name: 7,
-            ada: 3490,
-            rewards: 4000,
-          },
-          {
-            name: 8,
-            ada: 3490,
-            rewards: 4300,
-          },
-          {
-            name: 9,
-            ada: 3490,
-            rewards: 4300,
-          },
-          {
-            name: 10,
-            ada: 3490,
-            rewards: 4300,
-          },
-          {
-            name: 11,
-            ada: 3490,
-            rewards: 4300,
-          },
-          {
-            name: 12,
-            ada: 4000,
-            rewards: 2400,
-          },
-          {
-            name: 13,
-            ada: 3000,
-            rewards: 1398,
-          },
-          {
-            name: 14,
-            ada: 1400,
-            rewards: 3000,
-          },
-          {
-            name: 15,
-            ada: 2780,
-            rewards: 3908,
-          },
-          {
-            name: 16,
-            ada: 1890,
-            rewards: 4800,
-          },
-          {
-            name: 17,
-            ada: 2390,
-            rewards: 3800,
-          },
-          {
-            name: 18,
-            ada: 3490,
-            rewards: 4300,
-          },
-          {
-            name: 19,
-            ada: 3490,
-            rewards: 14590,
-          },
-        ]}
+        graphData={this._generateGraphData(delegationRequests)}
       />
     );
 
@@ -815,5 +624,61 @@ export default class StakingDashboardPage extends Component<Props, State> {
             )}
       />
     );
+  }
+
+  _generateRewardGraphData: {|
+    delegationRequests: DelegationRequests,
+    currentEpoch: number,
+  |} => (?Array<GraphItems>) = (
+    request
+  ) => {
+    const history = request.delegationRequests.rewardHistory.result;
+    if (history == null) {
+      return history;
+    }
+    if (history.length === 0) return [];
+    let historyIterator = 0;
+
+    // the reward history endpoint doesn't contain entries when the reward was 0
+    // so we need to insert these manually
+    const result: Array<GraphItems> = [];
+    let adaSum = new BigNumber(0);
+    // note: don't include the current epoch since we don't know what reward will be
+    for (let i = 0; i < request.currentEpoch - 1; i++) {
+      if (historyIterator < history.length && i === history[historyIterator][0]) {
+        // exists a reward for this epoch
+        const nextReward = history[historyIterator][1];
+        adaSum = adaSum.plus(nextReward);
+        result.push({
+          name: i,
+          secondary: adaSum.dividedBy(LOVELACES_PER_ADA).toNumber(),
+          primary: nextReward / LOVELACES_PER_ADA.toNumber(),
+        });
+        historyIterator++;
+      } else {
+        // no reward for this epoch
+        result.push({
+          name: i,
+          secondary: adaSum.dividedBy(LOVELACES_PER_ADA).toNumber(),
+          primary: 0,
+        });
+      }
+    }
+    return result;
+  }
+
+  _generateGraphData: DelegationRequests => GraphData = (delegationRequests) => {
+    const currentAbsoluteSlot = this.timeToSlot({
+      time: this.state.currentTime
+    });
+    const currentRelativeTime = this.toRelativeSlotNumber(currentAbsoluteSlot.slot);
+    const currentEpoch = currentRelativeTime.epoch;
+
+    return {
+      rewardsGraphData: {
+        error: delegationRequests.rewardHistory.error,
+        items: this._generateRewardGraphData({ delegationRequests, currentEpoch }),
+      }
+    };
   }
 }

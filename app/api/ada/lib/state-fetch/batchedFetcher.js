@@ -6,6 +6,7 @@ import type {
   TxBodiesRequest, TxBodiesResponse,
   UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
+  RewardHistoryRequest, RewardHistoryResponse,
   SignedRequest, SignedResponse,
   FilterUsedRequest, FilterUsedResponse,
   BestBlockRequest, BestBlockResponse,
@@ -16,6 +17,7 @@ import type {
   AddressUtxoFunc,
   FilterFunc,
   HistoryFunc,
+  RewardHistoryFunc,
   TxBodiesFunc,
   UtxoSumFunc,
   AccountStateFunc,
@@ -33,6 +35,7 @@ import {
   GetTxsBodiesForUTXOsError,
   GetUtxosSumsForAddressesApiError,
   GetTxHistoryForAddressesApiError,
+  GetRewardHistoryApiError,
   GetAccountStateApiError,
   GetPoolInfoApiError,
 } from '../../errors';
@@ -77,6 +80,12 @@ export class BatchedFetcher implements IFetcher {
     )(body)
   )
 
+  getRewardHistory: RewardHistoryRequest => Promise<RewardHistoryResponse> = (body) => (
+    batchGetRewardHistory(
+      this.baseFetcher.getRewardHistory
+    )(body)
+  )
+
   getBestBlock: BestBlockRequest => Promise<BestBlockResponse> = (body) => (
     // We don't batch transaction sending (it's just a single request)
     this.baseFetcher.getBestBlock(body)
@@ -97,7 +106,7 @@ export class BatchedFetcher implements IFetcher {
   )
 
   getReputation: ReputationRequest => Promise<ReputationResponse> = (body) => (
-    getReputation(this.baseFetcher.getReputation)(body)
+    batchGetReputation(this.baseFetcher.getReputation)(body)
   )
 
   getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => (
@@ -200,6 +209,24 @@ export function batchGetUTXOsSumsForAddresses(
     } catch (error) {
       Logger.error('batchedFetcher::batchGetUTXOsSumsForAddresses error: ' + stringifyError(error));
       throw new GetUtxosSumsForAddressesApiError();
+    }
+  };
+}
+
+export function batchGetRewardHistory(
+  getRewardHistory: RewardHistoryFunc,
+): RewardHistoryFunc {
+  return async function (body: RewardHistoryRequest): Promise<RewardHistoryResponse> {
+    try {
+      const chimericAccountAddresses = chunk(body.addresses, addressesLimit);
+      const chimericAccountPromises = chimericAccountAddresses.map(
+        addr => getRewardHistory({ addresses: addr })
+      );
+      const rewardHistories = await Promise.all(chimericAccountPromises);
+      return Object.assign({}, ...rewardHistories);
+    } catch (error) {
+      Logger.error(`batchedFetcher::${nameof(batchGetRewardHistory)} error: ` + stringifyError(error));
+      throw new GetRewardHistoryApiError();
     }
   };
 }
@@ -344,11 +371,11 @@ export function batchGetPoolInfo(
   };
 }
 
-export function getReputation(
-  getPoolInfo: ReputationFunc,
+export function batchGetReputation(
+  getReputation: ReputationFunc,
 ): ReputationFunc {
   return async function (body: ReputationRequest): Promise<ReputationResponse> {
-    return getPoolInfo(body);
+    return getReputation(body);
   };
 }
 

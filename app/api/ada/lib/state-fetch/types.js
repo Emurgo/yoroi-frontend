@@ -41,6 +41,18 @@ export type HistoryRequest = {|
 export type HistoryResponse = Array<RemoteTransaction>;
 export type HistoryFunc = (body: HistoryRequest) => Promise<HistoryResponse>;
 
+// getRewardHistory
+
+export type RewardHistoryRequest = {|
+  addresses: Array<string>,
+|};
+export type RewardTuple = [
+  number, /* epoch */
+  number /* amount in lovelaces */
+];
+export type RewardHistoryResponse = { [address: string]: Array<RewardTuple> };
+export type RewardHistoryFunc = (body: RewardHistoryRequest) => Promise<RewardHistoryResponse>;
+
 // getBestBlock
 
 export type BestBlockRequest = void;
