@@ -17,7 +17,7 @@
   "api.errors.getBalanceError": "Erreur lors de l’obtention du solde.",
   "api.errors.getBestBlockApiError": "Erreur reçue du serveur lors de l’obtention du meilleur block.",
   "api.errors.getPoolInfoApiError": "Erreur reçue du serveur lors de la récupération des informations du pool.",
-  "api.errors.getReputationError": "Error received from server while getting reputation.",
+  "api.errors.getReputationError": "Erreur reçue du serveur lors de l'obtention de la réputation.",
   "api.errors.getTxHistoryForAddressesApiError": "Erreur serveur lors de l’obtention des transactions.",
   "api.errors.getTxsBodiesForUTXOsApiError": "Erreur reçue du serveur lors de l'appel de TxBodies.",
   "api.errors.getTxsBodiesForUTXOsError": "Erreur reçue de l'Api lors de l'appel de TxBodies.",
