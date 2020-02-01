@@ -61,7 +61,7 @@ export default class LoadingStore extends Store {
       .then(async () => {
         await closeOtherInstances();
         const persistentDb = this.loadPersitentDbRequest.result;
-        if (persistentDb == null) throw new Error('load db was not loaded. Should never happen');
+        if (persistentDb == null) throw new Error(`${nameof(LoadingStore)}::${nameof(this.load)} load db was not loaded. Should never happen`);
         await this.migrationRequest.execute({
           api: this.api,
           persistentDb,
@@ -74,7 +74,7 @@ export default class LoadingStore extends Store {
         });
         return undefined;
       }).catch((error) => {
-        Logger.error('LoadingStore::setup Unable to load libraries ' + stringifyError(error));
+        Logger.error(`${nameof(LoadingStore)}::${nameof(this.load)} Unable to load libraries ` + stringifyError(error));
         runInAction(() => {
           this.error = new UnableToLoadError();
           this._loading = false;

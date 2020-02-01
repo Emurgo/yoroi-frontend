@@ -12,6 +12,7 @@ import type {
   ServerStatusRequest, ServerStatusResponse,
   AccountStateRequest, AccountStateResponse,
   PoolInfoRequest, PoolInfoResponse,
+  ReputationRequest, ReputationResponse,
   AddressUtxoFunc,
   FilterFunc,
   HistoryFunc,
@@ -19,6 +20,7 @@ import type {
   UtxoSumFunc,
   AccountStateFunc,
   PoolInfoFunc,
+  ReputationFunc,
   RemoteTransaction,
 } from './types';
 
@@ -76,12 +78,12 @@ export class BatchedFetcher implements IFetcher {
   )
 
   getBestBlock: BestBlockRequest => Promise<BestBlockResponse> = (body) => (
-    // We don't batch transaction sending (it's just a single requeset)
+    // We don't batch transaction sending (it's just a single request)
     this.baseFetcher.getBestBlock(body)
   )
 
   sendTx: SignedRequest => Promise<SignedResponse> = (body) => (
-    // We don't batch transaction sending (it's just a single requeset)
+    // We don't batch transaction sending (it's just a single request)
     // TODO: Should we support batching a list of transactions?
     this.baseFetcher.sendTx(body)
   )
@@ -92,6 +94,10 @@ export class BatchedFetcher implements IFetcher {
 
   getAccountState: AccountStateRequest => Promise<AccountStateResponse> = (body) => (
     batchGetAccountState(this.baseFetcher.getAccountState)(body)
+  )
+
+  getReputation: ReputationRequest => Promise<ReputationResponse> = (body) => (
+    getReputation(this.baseFetcher.getReputation)(body)
   )
 
   getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => (
@@ -335,6 +341,14 @@ export function batchGetPoolInfo(
       Logger.error(`batchedFetcher::${nameof(batchGetPoolInfo)} error: ` + stringifyError(error));
       throw new GetPoolInfoApiError();
     }
+  };
+}
+
+export function getReputation(
+  getPoolInfo: ReputationFunc,
+): ReputationFunc {
+  return async function (body: ReputationRequest): Promise<ReputationResponse> {
+    return getPoolInfo(body);
   };
 }
 

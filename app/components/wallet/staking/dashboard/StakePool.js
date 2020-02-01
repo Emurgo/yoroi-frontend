@@ -17,7 +17,9 @@ import RawHash from '../../../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../../../containers/widgets/ExplorableHashContainer';
 import styles from './StakePool.scss';
 import type { ExplorerType } from '../../../../domain/Explorer';
+import type { ReputationObject } from '../../../../api/ada/lib/state-fetch/types';
 import globalMessages from '../../../../i18n/global-messages';
+import WarningIcon from '../../../../assets/images/attention-modern.inline.svg';
 
 const messages = defineMessages({
   title: {
@@ -92,6 +94,8 @@ type Props = {|
   */
   +undelegate: void | (void => Promise<void>),
   +isUndelegating: boolean,
+  +reputationInfo: ReputationObject,
+  +openReputationDialog: void => void,
 |};
 
 @observer
@@ -151,6 +155,14 @@ export default class StakePool extends Component<Props> {
 
     const poolIdNotificationId = 'poolId-copyNotification';
 
+    const poolWarning = (this.props.reputationInfo.node_flags ?? 0) === 0
+      ? null
+      : (
+        <div className={styles.warningIcon}>
+          <WarningIcon onClick={this.props.openReputationDialog} />
+        </div>
+      );
+
     return (
       <Card title={intl.formatMessage(messages.title)}>
         <div className={styles.head}>
@@ -159,26 +171,29 @@ export default class StakePool extends Component<Props> {
           </div>
           <div className={styles.userInfo}>
             <h3 className={styles.userTitle}>{poolName}</h3>
-            <CopyableAddress
-              hash={hash}
-              elementId={poolIdNotificationId}
-              onCopyAddress={() => this.props.onCopyAddressTooltip(hash, poolIdNotificationId)}
-              notification={this.props.notification}
-            >
-              <ExplorableHashContainer
-                selectedExplorer={this.props.selectedExplorer}
+            <div className={styles.subTitle}>
+              {poolWarning}
+              <CopyableAddress
                 hash={hash}
-                light
-                linkType="pool"
+                elementId={poolIdNotificationId}
+                onCopyAddress={() => this.props.onCopyAddressTooltip(hash, poolIdNotificationId)}
+                notification={this.props.notification}
               >
-                <RawHash light>
-                  <span className={styles.hash}>{
-                    hash.substring(0, 6) + '...' + hash.substring(hash.length - 6, hash.length)
-                  }
-                  </span>
-                </RawHash>
-              </ExplorableHashContainer>
-            </CopyableAddress>
+                <ExplorableHashContainer
+                  selectedExplorer={this.props.selectedExplorer}
+                  hash={hash}
+                  light
+                  linkType="pool"
+                >
+                  <RawHash light>
+                    <span className={styles.hash}>{
+                      hash.substring(0, 6) + '...' + hash.substring(hash.length - 6, hash.length)
+                    }
+                    </span>
+                  </RawHash>
+                </ExplorableHashContainer>
+              </CopyableAddress>
+            </div>
           </div>
         </div>
         <div className={styles.wrapper}>

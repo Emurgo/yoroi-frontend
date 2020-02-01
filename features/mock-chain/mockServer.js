@@ -10,6 +10,7 @@ import type {
   FilterUsedRequest, FilterUsedResponse,
   AccountStateRequest, AccountStateResponse,
   PoolInfoRequest, PoolInfoResponse,
+  ReputationRequest, ReputationResponse,
   ServerStatusResponse,
   SignedRequestInternal,
 } from '../../app/api/ada/lib/state-fetch/types';
@@ -150,6 +151,16 @@ export function getMockServer(
       res: { send(arg: PoolInfoResponse): any }
     ): Promise<void> => {
       const response = await mockImporter.getPoolInfo(req.body);
+      res.send(response);
+    });
+
+    server.post('/api/v2/pool/reputation', async (
+      req: {
+        body: ReputationRequest
+      },
+      res: { send(arg: ReputationResponse): any }
+    ): Promise<void> => {
+      const response = await mockImporter.getReputation(req.body);
       res.send(response);
     });
 

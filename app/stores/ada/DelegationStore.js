@@ -22,6 +22,7 @@ import environment from '../../environment';
 import type {
   AccountStateSuccess,
   RemotePoolMetaSuccess,
+  ReputationFunc,
 } from '../../api/ada/lib/state-fetch/types';
 import LocalizableError from '../../i18n/LocalizableError';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
@@ -54,8 +55,15 @@ export type DelegationRequests = {|
 
 export default class DelegationStore extends Store {
 
-  /** Track transactions for a set of wallets */
   @observable delegationRequests: Array<DelegationRequests> = [];
+
+  @observable poolReputation: CachedRequest<ReputationFunc>
+    = new CachedRequest<ReputationFunc>(() => {
+      // we need to defer this call because the store may not be initialized yet
+      // by the time this constructor is called
+      const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+      return stateFetcher.getReputation();
+    });
 
   _recalculateDelegationInfoDisposer: void => void = () => {};
 
@@ -85,6 +93,9 @@ export default class DelegationStore extends Store {
     super.setup();
     this.reset();
     this._startWatch();
+    this.registerReactions([
+      this._loadPoolReputation,
+    ]);
   }
 
   refreshDelegation: PublicDeriverWithCachedMeta => Promise<void> = async (
@@ -201,5 +212,9 @@ export default class DelegationStore extends Store {
     this._recalculateDelegationInfoDisposer();
     this._recalculateDelegationInfoDisposer = () => {};
     this.delegationRequests = [];
+  }
+
+  _loadPoolReputation: void => Promise<void> = async () => {
+    await this.poolReputation.execute();
   }
 }

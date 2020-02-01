@@ -130,13 +130,22 @@ export type RemotePoolMetaFailure = {|
 export type PoolInfoResponse = { [key: string]: (RemotePoolMetaSuccess | RemotePoolMetaFailure) };
 export type PoolInfoFunc = (body: PoolInfoRequest) => Promise<PoolInfoResponse>;
 
+// getReputation
+
+export type ReputationObject = {
+  node_flags?: number,
+  // note: could be more metrics that are not handled
+};
+export type ReputationRequest = void;
+export type ReputationResponse = { [poolId: string]: ReputationObject };
+export type ReputationFunc = (body: ReputationRequest) => Promise<ReputationResponse>;
 
 // checkServer
 
 export type ServerStatusRequest = void;
-export type ServerStatusResponse = {
+export type ServerStatusResponse = {|
   isServerOk: boolean
-};
+|};
 export type ServerStatusFunc = (body: ServerStatusRequest) => Promise<ServerStatusResponse>;
 
 /* Backend service data types */

@@ -104,6 +104,10 @@ const messages = defineMessages({
     id: 'api.errors.getPoolInfoApiError',
     defaultMessage: '!!!Error received from server while getting pool info.',
   },
+  getReputationError: {
+    id: 'api.errors.getReputationError',
+    defaultMessage: '!!!Error received from server while getting reputation.',
+  },
   invalidWitnessError: {
     id: 'api.errors.invalidWitnessError',
     defaultMessage: '!!!The signature is invalid.',
@@ -339,6 +343,15 @@ export class GetPoolInfoApiError extends LocalizableError {
     super({
       id: messages.getPoolInfoApiError.id,
       defaultMessage: messages.getPoolInfoApiError.defaultMessage || '',
+    });
+  }
+}
+
+export class GetReputationError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getReputationError.id,
+      defaultMessage: messages.getReputationError.defaultMessage || '',
     });
   }
 }

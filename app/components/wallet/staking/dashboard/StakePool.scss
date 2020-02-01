@@ -68,6 +68,15 @@
     margin-bottom: 1px;
 }
 
+.subTitle {
+    display: flex;
+
+    .warningIcon {
+        margin-right: 5px;
+        cursor: pointer;
+    }
+}
+
 .hash {
     max-width: 135px;
     overflow: hidden;

@@ -9,6 +9,7 @@ import type {
   SignedRequest, SignedResponse,
   FilterUsedRequest, FilterUsedResponse,
   ServerStatusRequest, ServerStatusResponse,
+  ReputationRequest, ReputationResponse,
   AccountStateRequest, AccountStateResponse,
   PoolInfoRequest, PoolInfoResponse,
   SignedRequestInternal,
@@ -34,6 +35,7 @@ import {
   ServerStatusError,
   GetAccountStateApiError,
   GetPoolInfoApiError,
+  GetReputationError,
 } from '../../errors';
 
 import type { ConfigType } from '../../../../../config/config-types';
@@ -70,7 +72,7 @@ export class RemoteFetcher implements IFetcher {
       }
     ).then(response => response.data)
       .catch((error) => {
-        Logger.error('RemoteFetcher::getUTXOsForAddresses error: ' + stringifyError(error));
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getUTXOsForAddresses)} error: ` + stringifyError(error));
         throw new GetUtxosForAddressesApiError();
       })
   )
@@ -90,7 +92,7 @@ export class RemoteFetcher implements IFetcher {
       }
     ).then(response => response.data)
       .catch((error) => {
-        Logger.error('RemoteFetcher::getTxsBodiesForUTXOs error: ' + stringifyError(error));
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getTxsBodiesForUTXOs)} error: ` + stringifyError(error));
         throw new GetTxsBodiesForUTXOsApiError();
       })
   )
@@ -110,7 +112,7 @@ export class RemoteFetcher implements IFetcher {
       }
     ).then(response => response.data)
       .catch((error) => {
-        Logger.error('RemoteFetcher::getUTXOsSumsForAddresses error: ' + stringifyError(error));
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getUTXOsSumsForAddresses)} error: ` + stringifyError(error));
         throw new GetUtxosSumsForAddressesApiError();
       })
   )
@@ -154,7 +156,7 @@ export class RemoteFetcher implements IFetcher {
       });
     })
       .catch((error) => {
-        Logger.error('RemoteFetcher::getTransactionsHistoryForAddresses error: ' + stringifyError(error));
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getTransactionsHistoryForAddresses)} error: ` + stringifyError(error));
         throw new GetTxHistoryForAddressesApiError();
       })
   )
@@ -167,7 +169,7 @@ export class RemoteFetcher implements IFetcher {
       }
     ).then(response => response.data)
       .catch((error) => {
-        Logger.error('RemoteFetcher::getBestBlock error: ' + stringifyError(error));
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getBestBlock)} error: ` + stringifyError(error));
         throw new GetBestBlockError();
       })
   )
@@ -190,7 +192,7 @@ export class RemoteFetcher implements IFetcher {
       txId: body.id
     }))
       .catch((error) => {
-        Logger.error('RemoteFetcher::sendTx error: ' + stringifyError(error));
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.sendTx)} error: ` + stringifyError(error));
         if (error.request.response.includes('Invalid witness')) {
           throw new InvalidWitnessError();
         }
@@ -213,7 +215,7 @@ export class RemoteFetcher implements IFetcher {
       }
     ).then(response => response.data)
       .catch((error) => {
-        Logger.error('RemoteFetcher::checkAddressesInUse error: ' + stringifyError(error));
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.checkAddressesInUse)} error: ` + stringifyError(error));
         throw new CheckAdressesInUseApiError();
       })
   )
@@ -273,6 +275,19 @@ export class RemoteFetcher implements IFetcher {
       })
   )
 
+  getReputation: ReputationRequest => Promise<ReputationResponse> = (_body) => (
+    axios(
+      `${backendUrl}/api/v2/pool/reputation`,
+      {
+        method: 'get'
+      }
+    ).then(response => response.data)
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getReputation)} error: ` + stringifyError(error));
+        throw new GetReputationError();
+      })
+  )
+
   checkServerStatus: ServerStatusRequest => Promise<ServerStatusResponse> = (_body) => (
     axios(
       `${backendUrl}/api/status`,
@@ -281,7 +296,7 @@ export class RemoteFetcher implements IFetcher {
       }
     ).then(response => response.data)
       .catch((error) => {
-        Logger.error('RemoteFetcher::checkServerStatus error: ' + stringifyError(error));
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.checkServerStatus)} error: ` + stringifyError(error));
         throw new ServerStatusError();
       })
   )

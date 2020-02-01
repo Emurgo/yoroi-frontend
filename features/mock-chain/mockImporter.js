@@ -10,6 +10,7 @@ import {
   genUtxoSumForAddresses,
   genGetAccountState,
   genGetPoolInfo,
+  getGetReputation,
   getAddressForType,
   getSingleAddressString,
   toRemoteTx,
@@ -979,6 +980,7 @@ const sendTx = (request: SignedRequestInternal): SignedResponse => {
 };
 const getAccountState = genGetAccountState(transactions);
 const getPoolInfo = genGetPoolInfo(transactions);
+const getReputation = getGetReputation();
 
 export default {
   utxoForAddresses,
@@ -989,5 +991,6 @@ export default {
   getBestBlock,
   getAccountState,
   getPoolInfo,
+  getReputation,
   sendTx,
 };
