@@ -10,6 +10,7 @@ import type {
   IConceptualWalletConstructor,
   IHasPrivateDeriver,
   IHasLevels,
+  IHasSign,
   IDerivePublicFromPrivateRequest,
   IDerivePublicFromPrivateResponse,
   IDerivePublicFromPrivate,
@@ -24,8 +25,6 @@ import type {
 import type { IBip44Wallet } from '../Bip44Wallet/interfaces';
 import type { ICip1852Wallet } from '../Cip1852Wallet/interfaces';
 import type { Cip1852WrapperRow } from '../../database/walletTypes/cip1852/tables';
-import { Cip1852Wallet } from '../Cip1852Wallet/wrapper';
-import { Bip44Wallet } from '../Bip44Wallet/wrapper';
 import {
   getAllSchemaTables,
   raii,
@@ -50,7 +49,7 @@ import { GetKeyForDerivation, } from '../../database/primitives/api/read';
 import {
   rawChangePassword,
   normalizeBip32Ed25519ToPubDeriverLevel,
-} from '../utils';
+} from '../keyUtils';
 
 import type {
   IChangePasswordRequest, IChangePasswordResponse,
@@ -402,9 +401,12 @@ export async function refreshConceptualWalletFunctionality(
   };
 }
 
-export async function refreshCip1852WalletFunctionality(
+export async function refreshCip1852WalletFunctionality<
+  T: ICip1852Wallet & IHasPrivateDeriver & IHasLevels & IHasSign & IConceptualWallet
+>(
   db: lf$Database,
   row: $ReadOnly<Cip1852WrapperRow>,
+  base: Class<T>,
   protocolMagic: number, // TODO: should be stored in a table somewhere in the future
 ): Promise<ICip1852Wallet> {
   const conceptualWalletCtorData = await refreshConceptualWalletFunctionality(
@@ -415,7 +417,7 @@ export async function refreshCip1852WalletFunctionality(
   let privateDeriverLevel = null;
   let privateDeriverKeyDerivationId = null;
 
-  let currClass = Cip1852Wallet;
+  let currClass = base;
 
   if (row.PrivateDeriverLevel != null && row.PrivateDeriverKeyDerivationId != null) {
     currClass = PublicFromPrivate(currClass);
@@ -437,9 +439,12 @@ export async function refreshCip1852WalletFunctionality(
   return instance;
 }
 
-export async function refreshBip44WalletFunctionality(
+export async function refreshBip44WalletFunctionality<
+  T: IBip44Wallet & IHasPrivateDeriver & IHasLevels & IHasSign & IConceptualWallet
+>(
   db: lf$Database,
   row: $ReadOnly<Bip44WrapperRow>,
+  base: Class<T>,
   protocolMagic: number, // TODO: should be stored in a table somewhere in the future
 ): Promise<IBip44Wallet> {
   const conceptualWalletCtorData = await refreshConceptualWalletFunctionality(
@@ -450,7 +455,7 @@ export async function refreshBip44WalletFunctionality(
   let privateDeriverLevel = null;
   let privateDeriverKeyDerivationId = null;
 
-  let currClass = Bip44Wallet;
+  let currClass = base;
 
   if (row.PrivateDeriverLevel != null && row.PrivateDeriverKeyDerivationId != null) {
     currClass = PublicFromPrivate(currClass);

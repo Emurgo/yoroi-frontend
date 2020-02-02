@@ -5,9 +5,6 @@ import type {
   lf$Transaction,
 } from 'lovefield';
 
-import { Bip44Wallet } from '../Bip44Wallet/wrapper';
-import { Cip1852Wallet } from '../Cip1852Wallet/wrapper';
-
 import {
   Mixin,
 } from 'mixwith';
@@ -48,13 +45,15 @@ import type {
 
 import {
   rawGetBip44AddressesByPath,
-  normalizeBip32Ed25519ToPubDeriverLevel,
-  rawChangePassword,
-  decryptKey,
   rawGetNextUnusedIndex,
   updateCutoffFromInsert,
   getBalanceForUtxos,
 } from '../utils';
+import {
+  normalizeBip32Ed25519ToPubDeriverLevel,
+  rawChangePassword,
+  decryptKey,
+} from '../keyUtils';
 import { rawGenAddByHash } from '../../bridge/hashMapper';
 
 import {
@@ -109,8 +108,9 @@ import {
 
 import { ChainDerivations, } from  '../../../../../../config/numbersConfig';
 
-import {
-  PublicDeriver,
+import type {
+  Bip44PublicDeriver,
+  Cip1852PublicDeriver,
 } from './index';
 import { ConceptualWallet } from '../ConceptualWallet/index';
 import { RustModule } from '../../../cardanoCrypto/rustLoader';
@@ -1781,15 +1781,12 @@ export async function addTraitsForBip44Child(
   db: lf$Database,
   pubDeriver: $ReadOnly<PublicDeriverRow>,
   pubDeriverKeyDerivation: $ReadOnly<KeyDerivationRow>,
-  conceptualWallet: ConceptualWallet,
-  startClass: Class<PublicDeriver<Bip44Wallet>>,
+  conceptualWallet: IHasLevels & IHasSign,
+  startClass: Class<Bip44PublicDeriver>,
 ): Promise<{|
-  finalClass: Class<PublicDeriver<Bip44Wallet>>,
+  finalClass: Class<Bip44PublicDeriver>,
   pathToPublic: Array<number>,
 |}> {
-  if (!(conceptualWallet instanceof Bip44Wallet)) {
-    throw new Error('addTraitsForBip44Child expected Bip44 type');
-  }
   let currClass = startClass;
   /**
    * WARNING: If you get a weird error about dependencies in this function
@@ -1800,7 +1797,7 @@ export async function addTraitsForBip44Child(
   currClass = HasPrivateDeriver(currClass);
   currClass = HasLevels(currClass);
   currClass = HasSign(currClass);
-  currClass = (GetAllUtxos(currClass): Class<IGetAllUtxos & PublicDeriver<Bip44Wallet>>);
+  currClass = (GetAllUtxos(currClass): Class<IGetAllUtxos & Bip44PublicDeriver>);
 
   let publicKey;
   {
@@ -1893,15 +1890,12 @@ export async function addTraitsForCip1852Child(
   db: lf$Database,
   pubDeriver: $ReadOnly<PublicDeriverRow>,
   pubDeriverKeyDerivation: $ReadOnly<KeyDerivationRow>,
-  conceptualWallet: ConceptualWallet,
-  startClass: Class<PublicDeriver<Cip1852Wallet>>,
+  conceptualWallet: IHasLevels & IHasSign,
+  startClass: Class<Cip1852PublicDeriver>,
 ): Promise<{|
-  finalClass: Class<PublicDeriver<Cip1852Wallet>>,
+  finalClass: Class<Cip1852PublicDeriver>,
   pathToPublic: Array<number>,
 |}> {
-  if (!(conceptualWallet instanceof Cip1852Wallet)) {
-    throw new Error('addTraitsForCip1852Child expected Bip44 type');
-  }
   let currClass = startClass;
   /**
    * WARNING: If you get a weird error about dependencies in this function

@@ -149,7 +149,6 @@ export default class AdaTransactionBuilderStore extends Store {
       // need to recalculate when there are no more pending transactions
       this.stores.substores.ada.transactions.hasAnyPending,
     ],
-    // $FlowFixMe error in mobx types
     async () => this._updateTxBuilder(),
   )
 

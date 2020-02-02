@@ -16,7 +16,6 @@ import {
 import type {
   IPublicDeriver,
   UtxoAddressPath,
-  IGetAllUtxos,
   IGetUtxoBalanceResponse,
   IHasUtxoChainsRequest,
   IHasUtxoChains,
@@ -24,33 +23,15 @@ import type {
   BaseAddressPath,
   Address, Value, Addressing, UsedStatus,
 } from './PublicDeriver/interfaces';
-import {
-  PublicDeriver,
-} from './PublicDeriver/index';
-import {
-  asDisplayCutoff,
-  asGetAllUtxos,
-  asGetAllAccounting
-} from './PublicDeriver/traits';
-import { Bip44Wallet, } from './Bip44Wallet/wrapper';
-import { Cip1852Wallet } from './Cip1852Wallet/wrapper';
 
-import type {
-  IChangePasswordRequest, IChangePasswordResponse,
-} from './common/interfaces';
 import { ConceptualWallet } from './ConceptualWallet/index';
 import type { IHasLevels } from './ConceptualWallet/interfaces';
 import type {
-  AddressRow,
-  KeyRow,
   CanonicalAddressRow,
 } from '../database/primitives/tables';
 import type {
   CoreAddressT
 } from '../database/primitives/enums';
-import {
-  UpdateGet,
-} from '../database/primitives/api/write';
 import {
   ModifyDisplayCutoff,
 } from '../database/walletTypes/bip44/api/write';
@@ -69,10 +50,6 @@ import {
   mapToTables,
 } from '../database/utils';
 import {
-  GetAllBip44Wallets,
-} from '../database/walletTypes/bip44/api/read';
-import { GetAllCip1852Wallets } from '../database/walletTypes/cip1852/api/read';
-import {
   GetDerivationSpecific,
 } from '../database/walletTypes/common/api/read';
 import type { UtxoTxOutput } from '../database/transactionModels/utxo/api/read';
@@ -87,74 +64,7 @@ import {
 } from '../database/transactionModels/utxo/api/read';
 import { TxStatusCodes, } from '../database/primitives/enums';
 
-import { WrongPassphraseError } from '../../cardanoCrypto/cryptoErrors';
-
-import { RustModule } from '../../cardanoCrypto/rustLoader';
 import { ChainDerivations, BIP44_SCAN_SIZE, } from  '../../../../../config/numbersConfig';
-import {
-  encryptWithPassword,
-  decryptWithPassword,
-} from '../../../../../utils/passwordCipher';
-import type { ConfigType } from '../../../../../../config/config-types';
-
-declare var CONFIG: ConfigType;
-const protocolMagic = CONFIG.network.protocolMagic;
-
-export function normalizeBip32Ed25519ToPubDeriverLevel(request: {
-  privateKeyRow: $ReadOnly<KeyRow>,
-  password: null | string,
-  path: Array<number>,
-}): {
-  prvKeyHex: string,
-  pubKeyHex: string,
-} {
-  const prvKey = decryptKey(
-    request.privateKeyRow,
-    request.password,
-  );
-  const wasmKey = RustModule.WalletV3.Bip32PrivateKey.from_bytes(Buffer.from(prvKey, 'hex'));
-  const newKey = deriveKey(
-    wasmKey,
-    request.path,
-  );
-  return {
-    prvKeyHex: Buffer.from(newKey.as_bytes()).toString('hex'),
-    pubKeyHex: Buffer.from(newKey.to_public().as_bytes()).toString('hex'),
-  };
-}
-
-export function decryptKey(
-  keyRow: $ReadOnly<KeyRow>,
-  password: null | string,
-): string {
-  let rawKey;
-  if (keyRow.IsEncrypted) {
-    if (password === null) {
-      throw new WrongPassphraseError();
-    }
-    const keyBytes = decryptWithPassword(password, keyRow.Hash);
-    rawKey = Buffer.from(keyBytes).toString('hex');
-
-  } else {
-    rawKey = keyRow.Hash;
-  }
-  return rawKey;
-}
-
-
-export function deriveKey(
-  startingKey: RustModule.WalletV3.Bip32PrivateKey,
-  pathToPublic: Array<number>,
-): RustModule.WalletV3.Bip32PrivateKey {
-  let currKey = startingKey;
-  for (let i = 0; i < pathToPublic.length; i++) {
-    currKey = currKey.derive(
-      pathToPublic[i],
-    );
-  }
-
-  return currKey;
-}
 
 export async function rawGetDerivationsByPath<
   Row: { +KeyDerivationId: number }
@@ -409,89 +319,6 @@ export async function getChainAddressesForDisplay(
     }, derivationTables)
   );
 }
-export async function rawGetAllAddressesForDisplay(
-  tx: lf$Transaction,
-  deps: {|
-    GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
-    GetAddress: Class<GetAddress>,
-    GetPathWithSpecific: Class<GetPathWithSpecific>,
-    GetDerivationSpecific: Class<GetDerivationSpecific>,
-  |},
-  request: {
-    publicDeriver: IPublicDeriver<> & IGetAllUtxos,
-    type: CoreAddressT,
-  },
-  derivationTables: Map<number, string>,
-): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
-  let addresses = await request.publicDeriver.rawGetAllUtxoAddresses(
-    tx,
-    {
-      GetAddress: deps.GetAddress,
-      GetPathWithSpecific: deps.GetPathWithSpecific,
-      GetDerivationSpecific: deps.GetDerivationSpecific,
-    },
-    undefined,
-    derivationTables,
-  );
-  // when public deriver level = chain we still have a display cutoff
-  const hasCutoff = asDisplayCutoff(request.publicDeriver);
-  if (hasCutoff != null) {
-    const cutoff = await hasCutoff.rawGetCutoff(
-      tx,
-      {
-        GetPathWithSpecific: deps.GetPathWithSpecific,
-        GetDerivationSpecific: deps.GetDerivationSpecific,
-      },
-      undefined,
-      derivationTables,
-    );
-    addresses = addresses.filter(address => (
-      address.addressing.path[address.addressing.path.length - 1] <= cutoff
-    ));
-  }
-  return await rawGetAddressesForDisplay(
-    request.publicDeriver.getDb(), tx,
-    { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx },
-    {
-      addresses,
-      type: request.type
-    },
-  );
-}
-export async function getAllAddressesForDisplay(
-  request: {
-    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos,
-    type: CoreAddressT,
-  },
-): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
-  const derivationTables = request.publicDeriver.getParent().getDerivationTables();
-  const deps = Object.freeze({
-    GetUtxoTxOutputsWithTx,
-    GetAddress,
-    GetPathWithSpecific,
-    GetDerivationSpecific,
-  });
-  const depTables = Object
-    .keys(deps)
-    .map(key => deps[key])
-    .flatMap(table => getAllSchemaTables(request.publicDeriver.getDb(), table));
-  return await raii(
-    request.publicDeriver.getDb(),
-    [
-      ...depTables,
-      ...mapToTables(request.publicDeriver.getDb(), derivationTables),
-    ],
-    async tx => await rawGetAllAddressesForDisplay(
-      tx,
-      deps,
-      {
-        publicDeriver: request.publicDeriver,
-        type: request.type,
-      },
-      derivationTables,
-    )
-  );
-}
 
 export type NextUnusedResponse = {|
   addressInfo: void | UtxoAddressPath,
@@ -559,163 +386,6 @@ export function getBalanceForUtxos(
     new BigNumber(0)
   );
   return total;
-}
-
-export async function rawChangePassword(
-  db: lf$Database,
-  tx: lf$Transaction,
-  deps: { UpdateGet: Class<UpdateGet> },
-  request: IChangePasswordRequest & {
-    oldKeyRow: $ReadOnly<KeyRow>,
-  },
-): Promise<IChangePasswordResponse> {
-  const decryptedKey = decryptKey(
-    request.oldKeyRow,
-    request.oldPassword,
-  );
-
-  let newKey = decryptedKey;
-  if (request.newPassword !== null) {
-    newKey = encryptWithPassword(
-      request.newPassword,
-      Buffer.from(decryptedKey, 'hex'),
-    );
-  }
-
-  const newRow: KeyRow = {
-    KeyId: request.oldKeyRow.KeyId,
-    Hash: newKey,
-    IsEncrypted: request.newPassword !== null,
-    PasswordLastUpdate: request.currentTime,
-  };
-
-  return await deps.UpdateGet.update(
-    db, tx,
-    newRow,
-  );
-}
-
-export async function loadWalletsFromStorage(
-  db: lf$Database,
-): Promise<Array<PublicDeriver<>>> {
-  const result = [];
-  const deps = Object.freeze({
-    GetAllBip44Wallets,
-    GetAllCip1852Wallets,
-  });
-  const depTables = Object
-    .keys(deps)
-    .map(key => deps[key])
-    .flatMap(table => getAllSchemaTables(db, table));
-  const walletsInStorage = await raii(
-    db,
-    depTables,
-    async tx => ({
-      bip44: await deps.GetAllBip44Wallets.get(db, tx),
-      cip1852: await deps.GetAllCip1852Wallets.get(db, tx),
-    })
-  );
-  // Bip44
-  {
-    const bip44Map = new Map<number, Bip44Wallet>();
-    for (const entry of walletsInStorage.bip44) {
-      let bip44Wallet = bip44Map.get(entry.Bip44Wrapper.Bip44WrapperId);
-      if (bip44Wallet == null) {
-        bip44Wallet = await Bip44Wallet.createBip44Wallet(
-          db,
-          entry.Bip44Wrapper,
-          protocolMagic,
-        );
-        bip44Map.set(entry.Bip44Wrapper.Bip44WrapperId, bip44Wallet);
-      }
-      const publicDeriver = await PublicDeriver.createPublicDeriver(
-        entry.PublicDeriver,
-        bip44Wallet,
-      );
-      result.push(publicDeriver);
-    }
-  }
-  // Cip1852
-  {
-    const cip1852Map = new Map<number, Cip1852Wallet>();
-    for (const entry of walletsInStorage.cip1852) {
-      let cip1852Wallet = cip1852Map.get(entry.Cip1852Wrapper.Cip1852WrapperId);
-      if (cip1852Wallet == null) {
-        cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(
-          db,
-          entry.Cip1852Wrapper,
-          protocolMagic,
-        );
-        cip1852Map.set(entry.Cip1852Wrapper.Cip1852WrapperId, cip1852Wallet);
-      }
-      const publicDeriver = await PublicDeriver.createPublicDeriver(
-        entry.PublicDeriver,
-        cip1852Wallet,
-      );
-      result.push(publicDeriver);
-    }
-  }
-  return result;
-}
-
-export async function rawGetAddressRowsForWallet(
-  tx: lf$Transaction,
-  deps: {|
-    GetPathWithSpecific: Class<GetPathWithSpecific>,
-    GetAddress: Class<GetAddress>,
-    GetDerivationSpecific: Class<GetDerivationSpecific>,
-  |},
-  request: {
-    publicDeriver: IPublicDeriver<>,
-  },
-  derivationTables: Map<number, string>,
-): Promise<{|
-  utxoAddresses: Array<$ReadOnly<AddressRow>>,
-  accountingAddresses: Array<$ReadOnly<AddressRow>>,
-|}> {
-  const utxoAddresses = [];
-  const accountingAddresses = [];
-  const withUtxos = asGetAllUtxos(request.publicDeriver);
-  if (withUtxos != null) {
-    const addrResponse = await withUtxos.rawGetAllUtxoAddresses(
-      tx,
-      {
-        GetPathWithSpecific: deps.GetPathWithSpecific,
-        GetAddress: deps.GetAddress,
-        GetDerivationSpecific: deps.GetDerivationSpecific,
-      },
-      undefined,
-      derivationTables,
-    );
-    for (const family of addrResponse) {
-      for (const addr of family.addrs) {
-        utxoAddresses.push(addr);
-      }
-    }
-  }
-  const withAccounting = asGetAllAccounting(request.publicDeriver);
-  if (withAccounting != null) {
-    const addrResponse = await withAccounting.rawGetAllAccountingAddresses(
-      tx,
-      {
-        GetPathWithSpecific: deps.GetPathWithSpecific,
-        GetAddress: deps.GetAddress,
-        GetDerivationSpecific: deps.GetDerivationSpecific,
-      },
-      undefined,
-      derivationTables,
-    );
-    for (const family of addrResponse) {
-      for (const addr of family.addrs) {
-        accountingAddresses.push(addr);
-      }
-    }
-  }
-
-  return {
-    utxoAddresses,
-    accountingAddresses,
-  };
 }
 
 export async function updateCutoffFromInsert(

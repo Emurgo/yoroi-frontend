@@ -97,7 +97,6 @@ module.exports = {
     'no-await-in-loop': 0,
     'no-unused-expressions': 0,
     'no-lone-blocks': 0,
-    'import/no-cycle': 0, // doesn't work with Flow unfortunately
     'max-classes-per-file': 0,
     'no-floating-promise/no-floating-promise': 2,
     "flowtype/no-primitive-constructor-types": 2,

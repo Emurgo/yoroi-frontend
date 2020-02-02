@@ -92,6 +92,7 @@ export class Bip44Wallet
     return await refreshBip44WalletFunctionality(
       db,
       row,
+      Bip44Wallet,
       protocolMagic
     );
   }

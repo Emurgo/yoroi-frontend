@@ -246,3 +246,6 @@ async function getKeyDerivation(
     }
   );
 }
+
+export type Bip44PublicDeriver = PublicDeriver<Bip44Wallet>;
+export type Cip1852PublicDeriver = PublicDeriver<Cip1852Wallet>;
