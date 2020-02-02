@@ -87,6 +87,7 @@ export class Cip1852Wallet
     return await refreshCip1852WalletFunctionality(
       db,
       row,
+      Cip1852Wallet,
       protocolMagic
     );
   }
