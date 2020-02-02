@@ -18,6 +18,7 @@
   "api.errors.getBestBlockApiError": "Error received from server while getting best block.",
   "api.errors.getPoolInfoApiError": "Error received from server while getting pool info.",
   "api.errors.getReputationError": "Error received from server while getting reputation.",
+  "api.errors.getRewardHistoryApiError": "Error received from server while getting reward history.",
   "api.errors.getTxHistoryForAddressesApiError": "Error received from server while getting transactions.",
   "api.errors.getTxsBodiesForUTXOsApiError": "Error received from server while getting TxBodies.",
   "api.errors.getTxsBodiesForUTXOsError": "Error received from api method call while getting TxBodies.",

@@ -170,7 +170,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
     return epochLengthInDays;
   }
 
-  generatePopupDialog: void => null | Node = () => {
+  generatePopupDialog: void => (null | Node) = () => {
     const { uiDialogs } = this.props.stores;
     const delegationTxStore = this.props.stores.substores[environment.API].delegationTransaction;
 
