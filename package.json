@@ -164,7 +164,7 @@
     "lodash": "4.17.15",
     "lovefield": "2.1.12",
     "mixwith": "0.1.1",
-    "mobx": "5.15.1",
+    "mobx": "5.15.4",
     "mobx-react": "6.1.4",
     "mobx-react-form": "2.0.8",
     "mobx-react-router": "4.1.0",
