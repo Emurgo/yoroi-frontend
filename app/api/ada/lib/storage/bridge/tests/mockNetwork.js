@@ -12,6 +12,7 @@ import type {
   AccountStateRequest, AccountStateResponse, AccountStateFunc,
   PoolInfoRequest, PoolInfoResponse, PoolInfoFunc,
   ReputationRequest, ReputationResponse, ReputationFunc,
+  RewardHistoryRequest, RewardHistoryResponse, RewardHistoryFunc,
   AccountStateSuccess, AccountStateFailure, AccountStateDelegation,
   SignedRequestInternal, RemoteCertificate,
   RemoteTransactionInput, RemoteTransactionOutput,
@@ -671,11 +672,20 @@ export function genGetPoolInfo(
   };
 }
 
-export function getGetReputation(
+export function genGetReputation(
 ): ReputationFunc {
   return async (
     _body: ReputationRequest,
   ): Promise<ReputationResponse> => {
+    return {};
+  };
+}
+
+export function genGetRewardHistory(
+): RewardHistoryFunc {
+  return async (
+    _body: RewardHistoryRequest,
+  ): Promise<RewardHistoryResponse> => {
     return {};
   };
 }

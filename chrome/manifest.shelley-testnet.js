@@ -15,7 +15,7 @@ export default buildManifest({
   defaultTitle: 'Yoroi Shelley Testnet',
   titleOverride: true,
   contentSecurityPolicy: genCSP({
-    isDev: false,
+    isDev: true,
     additional: {
       'connect-src': [serverToPermission(Servers.ShelleyITN)],
     },
