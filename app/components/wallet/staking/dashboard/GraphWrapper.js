@@ -124,9 +124,9 @@ const Graph: {|
   );
 
   const GraphTooltip = (
-    { active, payload, label }: {| active: boolean, payload: [any, any], label: string |}
+    { active, payload, label }: {| active: boolean, payload: ?[any, any], label: string |}
   ) => {
-    if (active) {
+    if (active && payload != null) {
       return (
         <div className={styles.tooltip}>
           <p>

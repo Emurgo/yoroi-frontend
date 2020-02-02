@@ -12,7 +12,6 @@ import type { InjectedProps } from '../../../types/injectedPropsType';
 import StakingDashboard from '../../../components/wallet/staking/dashboard/StakingDashboard';
 import type { GraphData } from '../../../components/wallet/staking/dashboard/StakingDashboard';
 import type { GraphItems, } from '../../../components/wallet/staking/dashboard/GraphWrapper';
-import EpochProgress from '../../../components/wallet/staking/dashboard/EpochProgress';
 import UserSummary from '../../../components/wallet/staking/dashboard/UserSummary';
 import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
 import UndelegateDialog from '../../../components/wallet/staking/dashboard/UndelegateDialog';
@@ -36,6 +35,7 @@ import config from '../../../config';
 import { formattedWalletAmount } from '../../../utils/formatters';
 import type { PoolTuples, ReputationObject, } from '../../../api/ada/lib/state-fetch/types';
 import type { DelegationRequests } from '../../../stores/ada/DelegationStore';
+import EpochProgressContainer from './EpochProgressContainer';
 
 import type {
   ToRealTimeFunc,
@@ -70,9 +70,6 @@ export default class StakingDashboardPage extends Component<Props, State> {
       throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
     }
     const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver.self);
-    // calculate these so the cached result is available in the render function
-    await timeCalcRequests.currentEpochLength.execute().promise;
-    await timeCalcRequests.currentSlotLength.execute().promise;
     await timeCalcRequests.toAbsoluteSlot.execute().promise;
     await timeCalcRequests.toRealTime.execute().promise;
   }
@@ -88,9 +85,6 @@ export default class StakingDashboardPage extends Component<Props, State> {
   };
 
   render() {
-    if (this.state == null) {
-      return null;
-    }
     const publicDeriver = this.props.stores.substores[environment.API].wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
@@ -102,7 +96,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
 
-    const getTimeBasedElements = this.getTimeBasedElements(publicDeriver);
+    const rewardInfo = this.getRewardInfo(publicDeriver);
 
     const errorIfPresent = this.getErrorInFetch(publicDeriver);
     const stakePools = errorIfPresent == null
@@ -130,13 +124,18 @@ export default class StakingDashboardPage extends Component<Props, State> {
         hasAnyPending={this.props.stores.substores.ada.transactions.hasAnyPending}
         themeVars={getThemeVars({ theme: 'YoroiModern' })}
         stakePools={stakePools}
-        epochProgress={getTimeBasedElements.epochProgress}
+        epochProgress={<EpochProgressContainer
+          actions={this.props.actions}
+          stores={this.props.stores}
+          publicDeriver={publicDeriver}
+          showTooltip={rewardInfo != null && rewardInfo.showWarning}
+        />}
         userSummary={this._generateUserSummary({
           delegationRequests,
           publicDeriver,
           errorIfPresent,
         })}
-        upcomingRewards={getTimeBasedElements.rewardInfo?.rewardPopup}
+        upcomingRewards={rewardInfo?.rewardPopup}
         graphData={this._generateGraphData({
           delegationRequests,
           publicDeriver,
@@ -212,43 +211,17 @@ export default class StakingDashboardPage extends Component<Props, State> {
     />);
   }
 
-  getTimeBasedElements: PublicDeriverWithCachedMeta => {|
-    epochProgress: Node,
-    rewardInfo: void | {|
-      rewardPopup: Node,
-      showWarning: boolean,
-    |},
-  |} = (publicDeriver) => {
-    const renderLoading = () => ({
-      epochProgress: (<EpochProgress loading />),
-      rewardInfo: undefined,
-    });
-    if (this.state == null) {
-      return renderLoading();
-    }
-
+  getRewardInfo: PublicDeriverWithCachedMeta => (void | {|
+    rewardPopup: Node,
+    showWarning: boolean,
+  |}) = (publicDeriver) => {
     const timeStore = this.props.stores.substores.ada.time;
     const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver.self);
     const currTimeRequests = timeStore.getCurrentTimeRequests(publicDeriver.self);
-    const getEpochLength = timeCalcRequests.currentEpochLength.result;
-    if (getEpochLength == null) return renderLoading();
-    const getSlotLength = timeCalcRequests.currentSlotLength.result;
-    if (getSlotLength == null) return renderLoading();
     const toAbsoluteSlot = timeCalcRequests.toAbsoluteSlot.result;
-    if (toAbsoluteSlot == null) return renderLoading();
+    if (toAbsoluteSlot == null) return undefined;
     const toRealTime = timeCalcRequests.toRealTime.result;
-    if (toRealTime == null) return renderLoading();
-
-    const epochLength = getEpochLength();
-    const secondsLeftInEpoch = (epochLength - currTimeRequests.currentSlot) * getSlotLength();
-    const timeLeftInEpoch = new Date(
-      (1000 * secondsLeftInEpoch) - currTimeRequests.msIntoSlot
-    );
-
-    const leftPadDate: number => string = (num) => {
-      if (num < 10) return '0' + num;
-      return num.toString();
-    };
+    if (toRealTime == null) return undefined;
 
     const delegationStore = this.props.stores.substores[environment.API].delegation;
     const delegationRequests = delegationStore.getRequests(publicDeriver.self);
@@ -341,33 +314,17 @@ export default class StakingDashboardPage extends Component<Props, State> {
       }
     }
 
-    const epochProgress = (
-      <EpochProgress
-        currentEpoch={currTimeRequests.currentEpoch}
-        percentage={Math.floor(100 * currTimeRequests.currentSlot / epochLength)}
-        endTime={{
-          h: leftPadDate(timeLeftInEpoch.getUTCHours()),
-          m: leftPadDate(timeLeftInEpoch.getUTCMinutes()),
-          s: leftPadDate(timeLeftInEpoch.getUTCSeconds()),
-        }}
-        showTooltip={rewardInfo != null && rewardInfo.showWarning}
-      />
-    );
-
-    return {
-      epochProgress,
-      rewardInfo: rewardInfo ?? ({
-        rewardPopup: (
-          <UpcomingRewards
-            content={[null, null, null]}
-            showWarning={false}
-            onExternalLinkClick={handleExternalLinkClick}
-            baseUrl=""
-          />
-        ),
-        showWarning: false,
-      }),
-    };
+    return rewardInfo ?? ({
+      rewardPopup: (
+        <UpcomingRewards
+          content={[null, null, null]}
+          showWarning={false}
+          onExternalLinkClick={handleExternalLinkClick}
+          baseUrl=""
+        />
+      ),
+      showWarning: false,
+    });
   }
 
   generateUpcomingRewardInfo: {|
@@ -499,9 +456,12 @@ export default class StakingDashboardPage extends Component<Props, State> {
                 });
               }
             }}
-            notification={uiNotifications.getTooltipActiveNotification(
-              this.state.notificationElementId
-            )}
+            notification={this.state == null
+              ? null
+              : uiNotifications.getTooltipActiveNotification(
+                this.state.notificationElementId
+              )
+            }
             undelegate={
               // don't support undelegation for ratio stake since it's a less intuitive UX
               keyState.state.delegation.pools.length === 1
