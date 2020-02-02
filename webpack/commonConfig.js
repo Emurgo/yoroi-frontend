@@ -132,9 +132,9 @@ const rules = [
       loader: '@svgr/webpack',
       options: {
         svgoConfig: {
-          plugins: {
+          plugins: [{
             removeViewBox: false
-          }
+          }]
         }
       }
     }]
