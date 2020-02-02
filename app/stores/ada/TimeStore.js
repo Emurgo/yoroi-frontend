@@ -51,6 +51,8 @@ export type CurrentTimeRequests = {|
  * Different wallets can be on different networks and therefore have different measures of time
 */
 export default class TimeStore extends Store {
+  intervalId: void | IntervalID;
+
   @observable time: Date = new Date();
 
   /**
@@ -65,7 +67,7 @@ export default class TimeStore extends Store {
 
   setup(): void {
     super.setup();
-    setInterval(this._updateTime, 1000);
+    this.intervalId = setInterval(this._updateTime, 1000);
   }
 
   getTimeCalcRequests: PublicDeriver<> => TimeCalcRequests = (
@@ -86,7 +88,7 @@ export default class TimeStore extends Store {
     throw new Error(`${nameof(TimeStore)}::${nameof(this.getCurrentTimeRequests)} missing for public deriver`);
   }
 
-  @action addObserveTime: PublicDeriverWithCachedMeta => void = (
+  @action addObservedTime: PublicDeriverWithCachedMeta => void = (
     publicDeriver
   ) => {
     this.timeCalcRequests.push({
@@ -147,5 +149,10 @@ export default class TimeStore extends Store {
         currentTimeRequest.msIntoSlot = currentAbsoluteSlot.msIntoSlot;
       });
     }
+  }
+
+  teardown(): void {
+    super.teardown();
+    if (this.intervalId) clearInterval(this.intervalId);
   }
 }

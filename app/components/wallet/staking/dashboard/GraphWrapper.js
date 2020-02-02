@@ -134,11 +134,11 @@ const Graph: {|
             <span className={styles.tooltipValue}>{label}</span>
           </p>
           <p>
-            <span className={styles.tooltipLabel}>{secondaryBarLabel}:</span>&nbsp;
+            <span className={styles.tooltipLabel}>{primaryBarLabel}:</span>&nbsp;
             <span className={styles.tooltipValue}>{payload[0].value}</span>
           </p>
           <p>
-            <span className={styles.tooltipLabel}>{primaryBarLabel}:</span>&nbsp;
+            <span className={styles.tooltipLabel}>{secondaryBarLabel}:</span>&nbsp;
             <span className={styles.tooltipValue}>{payload[1].value}</span>
           </p>
         </div>

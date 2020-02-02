@@ -299,6 +299,7 @@ export default class WalletStore extends Store {
     const stores = this.stores.substores[environment.API];
     stores.addresses.addObservedWallet(publicDeriver);
     stores.transactions.addObservedWallet(publicDeriver);
+    stores.time.addObservedTime(publicDeriver);
     if (environment.isShelley()) {
       stores.delegation.addObservedWallet(publicDeriver);
     }
