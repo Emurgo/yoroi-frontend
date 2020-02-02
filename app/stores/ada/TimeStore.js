@@ -1,6 +1,6 @@
 // @flow
 
-import { action, observable, runInAction, } from 'mobx';
+import { action, computed, observable, runInAction, } from 'mobx';
 import { find } from 'lodash';
 import {
   PublicDeriver,
@@ -129,27 +129,38 @@ export default class TimeStore extends Store {
     const currTime = new Date();
     runInAction(() => { this.time = currTime; });
 
-    for (const timeCalcRequest of this.timeCalcRequests) {
-      const currentTimeRequest = this.getCurrentTimeRequests(timeCalcRequest.publicDeriver);
+    const selected = this.stores.substores.ada.wallets.selected;
+    if (selected == null) return;
 
-      const timeToSlot = await timeCalcRequest.timeToSlot.execute().promise;
-      if (!timeToSlot) throw new Error(`${nameof(this._updateTime)} should never happen`);
+    const timeCalcRequests = this.getTimeCalcRequests(selected.self);
+    const currTimeRequests = this.getCurrentTimeRequests(selected.self);
 
-      const currentAbsoluteSlot = timeToSlot({
-        time: currTime
-      });
+    const timeToSlot = await timeCalcRequests.timeToSlot.execute().promise;
+    if (!timeToSlot) throw new Error(`${nameof(this._updateTime)} should never happen`);
 
-      const toRelativeSlotNumber = await timeCalcRequest.toRelativeSlotNumber.execute().promise;
-      if (!toRelativeSlotNumber) throw new Error(`${nameof(this._updateTime)} should never happen`);
-      const currentRelativeTime = toRelativeSlotNumber(currentAbsoluteSlot.slot);
+    const currentAbsoluteSlot = timeToSlot({
+      time: currTime
+    });
 
-      runInAction(() => {
-        currentTimeRequest.currentEpoch = currentRelativeTime.epoch;
-        currentTimeRequest.currentSlot = currentRelativeTime.slot;
-        currentTimeRequest.msIntoSlot = currentAbsoluteSlot.msIntoSlot;
-      });
-    }
+    const toRelativeSlotNumber = await timeCalcRequests.toRelativeSlotNumber.execute().promise;
+    if (!toRelativeSlotNumber) throw new Error(`${nameof(this._updateTime)} should never happen`);
+    const currentRelativeTime = toRelativeSlotNumber(currentAbsoluteSlot.slot);
+
+    runInAction(() => {
+      currTimeRequests.currentEpoch = currentRelativeTime.epoch;
+      currTimeRequests.currentSlot = currentRelativeTime.slot;
+      currTimeRequests.msIntoSlot = currentAbsoluteSlot.msIntoSlot;
+    });
   }
+
+  @computed get currentTime(): ?CurrentTimeRequests {
+    // Get current public deriver
+    const publicDeriver = this.stores.substores.ada.wallets.selected;
+    if (!publicDeriver) return undefined;
+
+    return this.getCurrentTimeRequests(publicDeriver.self);
+  }
+
 
   teardown(): void {
     super.teardown();

@@ -241,6 +241,8 @@ export default class DelegationStore extends Store {
         this.stores.substores.ada.transactions.hasAnyPending,
         // if query failed due to server issue, need to re-query when it comes back online
         this.stores.substores.ada.serverConnectionStore.checkAdaServerStatus,
+        // reward grows every epoch so we have to refresh
+        this.stores.substores.ada.time.currentTime?.currentEpoch,
       ],
       // $FlowFixMe error in mobx types
       async () => {
