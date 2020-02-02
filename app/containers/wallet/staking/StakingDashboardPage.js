@@ -72,6 +72,8 @@ export default class StakingDashboardPage extends Component<Props, State> {
     const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver.self);
     await timeCalcRequests.toAbsoluteSlot.execute().promise;
     await timeCalcRequests.toRealTime.execute().promise;
+    await timeCalcRequests.currentEpochLength.execute().promise;
+    await timeCalcRequests.currentSlotLength.execute().promise;
   }
 
   componentWillUnmount() {
@@ -140,6 +142,8 @@ export default class StakingDashboardPage extends Component<Props, State> {
           delegationRequests,
           publicDeriver,
         })}
+        delegationHistory={delegationRequests.getCurrentDelegation.result?.fullHistory}
+        epochLength={this.getEpochLengthInDays(publicDeriver)}
       />
     );
 
@@ -150,6 +154,20 @@ export default class StakingDashboardPage extends Component<Props, State> {
         {this.getDialog()}
         {dashboard}
       </>);
+  }
+
+  getEpochLengthInDays: PublicDeriverWithCachedMeta => ?number = (publicDeriver) => {
+    const timeStore = this.props.stores.substores.ada.time;
+    const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver.self);
+    const getEpochLength = timeCalcRequests.currentEpochLength.result;
+    if (getEpochLength == null) return null;
+
+    const getSlotLength = timeCalcRequests.currentSlotLength.result;
+    if (getSlotLength == null) return null;
+
+    const epochLengthInSeconds = getEpochLength() * getSlotLength();
+    const epochLengthInDays = epochLengthInSeconds / (60 * 60 * 24);
+    return epochLengthInDays;
   }
 
   generatePopupDialog: void => null | Node = () => {
@@ -595,9 +613,11 @@ export default class StakingDashboardPage extends Component<Props, State> {
   ) => {
     const history = request.delegationRequests.rewardHistory.result;
     if (history == null) {
-      return history;
+      return null;
     }
-    if (history.length === 0) return [];
+    if (!request.delegationRequests.getCurrentDelegation.wasExecuted) {
+      return null;
+    }
     let historyIterator = 0;
 
     // the reward history endpoint doesn't contain entries when the reward was 0

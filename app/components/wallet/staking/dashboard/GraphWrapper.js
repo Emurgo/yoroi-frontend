@@ -18,7 +18,11 @@ const messages = defineMessages({
   },
   epochAxisLabel: {
     id: 'wallet.dashboard.graph.epochAxisLabel',
-    defaultMessage: '!!!Epoch (5 days)',
+    defaultMessage: '!!!Epoch ({epochLength} days)',
+  },
+  singleEpochAxisLabel: {
+    id: 'wallet.dashboard.graph.singleEpochAxisLabel',
+    defaultMessage: '!!!Epoch (1 day)',
   },
   dayToggleLabel: {
     id: 'wallet.dashboard.graph.dayToggleLabel',
@@ -234,6 +238,7 @@ type Props = {|
   primaryBarLabel: string,
   secondaryBarLabel: string,
   yAxisLabel: string,
+  epochLength: ?number,
 |};
 
 @observer
@@ -242,9 +247,22 @@ export default class GraphWrapper extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  _getEpochLengthLabel: void => string = () => {
+    const { intl } = this.context;
+    const { epochLength } = this.props;
+    if (epochLength == null) {
+      return intl.formatMessage(globalMessages.epochLabel);
+    }
+
+    return epochLength === 1
+      ? intl.formatMessage(messages.singleEpochAxisLabel)
+      : intl.formatMessage(messages.epochAxisLabel, { epochLength });
+  }
+
   render() {
     const { intl } = this.context;
     const { tabs, data, themeVars } = this.props;
+
     return (
       <div className={styles.wrapper}>
         <GraphTabs tabs={tabs} />
@@ -259,7 +277,7 @@ export default class GraphWrapper extends Component<Props> {
             */}
             <Graph
               epochTitle={intl.formatMessage(globalMessages.epochLabel)}
-              xAxisLabel={intl.formatMessage(messages.epochAxisLabel)}
+              xAxisLabel={this._getEpochLengthLabel()}
               yAxisLabel={this.props.yAxisLabel}
               primaryBarLabel={this.props.primaryBarLabel}
               secondaryBarLabel={this.props.secondaryBarLabel}

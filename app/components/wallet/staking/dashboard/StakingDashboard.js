@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
+import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
@@ -17,6 +18,7 @@ import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import InvalidURIImg from '../../../../assets/images/uri/invalid-uri.inline.svg';
 import ErrorBlock from '../../../widgets/ErrorBlock';
+import type { CertificateForKey } from '../../../../api/ada/lib/storage/database/primitives/api/read';
 
 const messages = defineMessages({
   positionsLabel: {
@@ -64,7 +66,9 @@ type Props = {|
     +currentPage: number,
     +numPages: number,
     +goToPage: number => void,
-  |}
+  |},
+  +delegationHistory: ?Array<CertificateForKey>,
+  +epochLength: ?number,
 |};
 
 @observer
@@ -88,21 +92,27 @@ export default class StakingDashboard extends Component<Props> {
       )
       : (null);
 
-    const graphs = (
-      <div className={styles.graphsWrapper}>
-        {this._displayGraph(graphData.rewardsGraphData)}
-        {/* <GraphWrapper
-          themeVars={themeVars}
-          tabs={[
-            intl.formatMessage(messages.positionsLabel),
-            intl.formatMessage(globalMessages.marginsLabel),
-            intl.formatMessage(messages.costsLabel),
-          ]}
-          graphName="positions"
-          data={graphData.positionsGraphData}
-        /> */}
-      </div>
-    );
+    // don't show anything when user has never delegated
+    const hideGraph = this.props.delegationHistory != null &&
+      this.props.delegationHistory.length === 0;
+
+    const graphs = hideGraph
+      ? null
+      : (
+        <div className={styles.graphsWrapper}>
+          {this._displayGraph(graphData.rewardsGraphData)}
+          {/* <GraphWrapper
+            themeVars={themeVars}
+            tabs={[
+              intl.formatMessage(messages.positionsLabel),
+              intl.formatMessage(globalMessages.marginsLabel),
+              intl.formatMessage(messages.costsLabel),
+            ]}
+            graphName="positions"
+            data={graphData.positionsGraphData}
+          /> */}
+        </div>
+      );
     return (
       <div className={styles.page}>
         <div className={styles.contentWrap}>
@@ -120,20 +130,18 @@ export default class StakingDashboard extends Component<Props> {
               </div>
             </div>
           </div>
-          {this.props.pageInfo != null &&
-            <div className={styles.pageSelect}>
-              <BarDecoration>
-                <PageSelect
-                  currentPage={this.props.pageInfo.currentPage}
-                  numPages={this.props.pageInfo.numPages}
-                  goToPage={this.props.pageInfo.goToPage}
-                />
-              </BarDecoration>
-            </div>
-          }
+          <div className={styles.pageSelect}>
+            <BarDecoration>
+              <PageSelect
+                currentPage={this.props.pageInfo?.currentPage ?? 0}
+                numPages={this.props.pageInfo?.numPages ?? 0}
+                goToPage={this.props.pageInfo?.goToPage ?? (() => {})}
+              />
+            </BarDecoration>
+          </div>
           <div className={styles.bodyWrapper}>
             {graphs}
-            {this.displayStakePools()}
+            {this.displayStakePools(hideGraph)}
           </div>
         </div>
       </div>
@@ -172,11 +180,17 @@ export default class StakingDashboard extends Component<Props> {
         secondaryBarLabel={intl.formatMessage(globalMessages.totalAdaLabel)}
         yAxisLabel={intl.formatMessage(globalMessages.rewardsLabel)}
         graphName="total"
+        epochLength={this.props.epochLength}
       />
     );
   }
 
-  displayStakePools: void => Node = () => {
+  displayStakePools: boolean => Node = (hideGraph) => {
+    const width = classnames([
+      // if they've delegated before we need to make space for the chart
+      !hideGraph ? styles.stakePoolMaxWidth : null,
+      styles.stakePool,
+    ]);
     const { intl } = this.context;
     if (this.props.stakePools.error) {
       return (
@@ -190,7 +204,7 @@ export default class StakingDashboard extends Component<Props> {
     }
     if (this.props.stakePools.pools === null || this.props.pageInfo == null) {
       return (
-        <div className={styles.stakePool}>
+        <div className={width}>
           <VerticallyCenteredLayout>
             <LoadingSpinner />
           </VerticallyCenteredLayout>
@@ -200,16 +214,20 @@ export default class StakingDashboard extends Component<Props> {
     const currPool = this.props.pageInfo.currentPage;
     if (this.props.stakePools.pools.length === 0) {
       return (
-        <div className={styles.stakePool}>
+        <div className={width}>
           <InformativeError
             title={intl.formatMessage(emptyDashboardMessages.title)}
-            text={intl.formatMessage(emptyDashboardMessages.text)}
+            text={!hideGraph
+              // no need to explain to user how to delegate their ADA if they've done it before
+              ? null
+              : intl.formatMessage(emptyDashboardMessages.text)
+            }
           />
         </div>
       );
     }
     return (
-      <div className={styles.stakePool}>
+      <div className={width}>
         {this.props.stakePools.pools[currPool]}
       </div>
     );

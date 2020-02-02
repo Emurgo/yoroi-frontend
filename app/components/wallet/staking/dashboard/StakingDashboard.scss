@@ -56,9 +56,13 @@
   display: flex;
 }
 
+.stakePoolMaxWidth {
+  width: 320px;
+}
+
 .stakePool {
   margin-left: auto;
-  width: 320px;
+  margin-right: auto;
 }
 
 .graphsWrapper {

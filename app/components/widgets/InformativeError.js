@@ -8,7 +8,7 @@ import styles from './InformativeError.scss';
 
 type Props = {|
   title: string,
-  text: string,
+  text: ?string,
 |};
 
 @observer
@@ -19,7 +19,9 @@ export default class InformativeError extends Component<Props> {
         <EmptyIllustration />
         <div className={styles.text}>
           <h3 className={styles.title}>{this.props.title}</h3>
-          <p className={styles.paragraph}>{this.props.text}</p>
+          {this.props.text != null && (
+            <p className={styles.paragraph}>{this.props.text}</p>
+          )}
         </div>
       </div>
     );
