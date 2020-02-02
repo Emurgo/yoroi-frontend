@@ -3,6 +3,10 @@
 import { observable, action, reaction, runInAction } from 'mobx';
 import { find } from 'lodash';
 import Store from '../base/Store';
+import {
+  Logger,
+  stringifyError,
+} from '../../utils/logging';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import {
   PublicDeriver,
@@ -134,29 +138,35 @@ export default class DelegationStore extends Store {
       const stakingKeyResp = await withStakingKey.getStakingKey();
 
       const accountStateCalcs = (async () => {
-        const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
-        const accountStateResp = await stateFetcher.getAccountState({
-          addresses: [stakingKeyResp.addr.Hash],
-        });
-        const stateForStakingKey = accountStateResp[stakingKeyResp.addr.Hash];
-        if (!stateForStakingKey.delegation) {
-          return runInAction(() => {
-            delegationRequest.stakingKeyState = undefined;
-            throw new Error(`${nameof(this.refreshDelegation)} stake key invalid - ${stateForStakingKey.comment}`);
+        try {
+          const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+          const accountStateResp = await stateFetcher.getAccountState({
+            addresses: [stakingKeyResp.addr.Hash],
+          });
+          const stateForStakingKey = accountStateResp[stakingKeyResp.addr.Hash];
+          if (!stateForStakingKey.delegation) {
+            return runInAction(() => {
+              delegationRequest.stakingKeyState = undefined;
+              throw new Error(`${nameof(this.refreshDelegation)} stake key invalid - ${stateForStakingKey.comment}`);
+            });
+          }
+          const delegatedBalance = delegationRequest.getDelegatedBalance.execute({
+            publicDeriver: withStakingKey,
+            accountState: stateForStakingKey,
+            stakingAddress: stakingKeyResp.addr.Hash,
+          }).promise;
+          if (delegatedBalance == null) throw new Error('Should never happen');
+
+          const poolInfoRequest = this._getPoolInfo({ delegationRequest, stateForStakingKey });
+          return await Promise.all([
+            delegatedBalance,
+            poolInfoRequest,
+          ]);
+        } catch (e) {
+          runInAction(() => {
+            delegationRequest.error = e;
           });
         }
-        const delegatedBalance = delegationRequest.getDelegatedBalance.execute({
-          publicDeriver: withStakingKey,
-          accountState: stateForStakingKey,
-          stakingAddress: stakingKeyResp.addr.Hash,
-        }).promise;
-        if (delegatedBalance == null) throw new Error('Should never happen');
-
-        const poolInfoRequest = this._getPoolInfo({ delegationRequest, stateForStakingKey });
-        return Promise.all([
-          delegatedBalance,
-          poolInfoRequest,
-        ]);
       })();
 
       const delegationHistory = this._getDelegationHistory({
@@ -175,9 +185,7 @@ export default class DelegationStore extends Store {
         rewardHistory,
       ]);
     } catch (e) {
-      runInAction(() => {
-        delegationRequest.error = e;
-      });
+      Logger.error(`${nameof(DelegationStore)}::${nameof(this.refreshDelegation)} error: ` + stringifyError(e));
     }
   }
 
