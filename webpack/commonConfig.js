@@ -97,7 +97,7 @@ const rules = [
           },
         },
       },
-      'sass-loader?sourceMap'
+      'sass-loader'
     ]
   },
   {
@@ -117,7 +117,7 @@ const rules = [
           }
         },
       },
-      'sass-loader?sourceMap'
+      'sass-loader'
     ]
   },
   {
