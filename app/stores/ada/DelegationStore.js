@@ -198,7 +198,6 @@ export default class DelegationStore extends Store {
         // if query failed due to server issue, need to re-query when it comes back online
         this.stores.substores.ada.serverConnectionStore.checkAdaServerStatus,
       ],
-      // $FlowFixMe error in mobx types
       async () => {
         const selected = this.stores.substores.ada.wallets.selected;
         if (selected == null) return;

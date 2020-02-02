@@ -48,13 +48,15 @@ import type {
 
 import {
   rawGetBip44AddressesByPath,
-  normalizeBip32Ed25519ToPubDeriverLevel,
-  rawChangePassword,
-  decryptKey,
   rawGetNextUnusedIndex,
   updateCutoffFromInsert,
   getBalanceForUtxos,
 } from '../utils';
+import {
+  normalizeBip32Ed25519ToPubDeriverLevel,
+  rawChangePassword,
+  decryptKey,
+} from '../keyUtils';
 import { rawGenAddByHash } from '../../bridge/hashMapper';
 
 import {

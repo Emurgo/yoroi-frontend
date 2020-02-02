@@ -30,7 +30,7 @@ import {
 import {
   ConceptualWallet
 } from './models/ConceptualWallet/index';
-import { loadWalletsFromStorage } from './models/utils';
+import { loadWalletsFromStorage } from './models/load';
 import environment from '../../../../environment';
 
 declare var CONFIG: ConfigType;

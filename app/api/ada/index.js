@@ -158,9 +158,13 @@ import type {
 } from './lib/state-fetch/types';
 import {
   getChainAddressesForDisplay,
-  getAllAddressesForDisplay,
-  loadWalletsFromStorage,
 } from './lib/storage/models/utils';
+import {
+  getAllAddressesForDisplay,
+} from './lib/storage/bridge/traitUtils';
+import {
+  loadWalletsFromStorage,
+} from './lib/storage/models/load';
 import { convertAdaTransactionsToExportRows } from './transactions/utils';
 import { migrateToLatest } from './lib/storage/adaMigration';
 import { generateAdaPaperPdf } from './paperWallet/paperWalletPdf';

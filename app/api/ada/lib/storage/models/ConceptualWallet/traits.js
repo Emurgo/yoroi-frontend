@@ -50,7 +50,7 @@ import { GetKeyForDerivation, } from '../../database/primitives/api/read';
 import {
   rawChangePassword,
   normalizeBip32Ed25519ToPubDeriverLevel,
-} from '../utils';
+} from '../keyUtils';
 
 import type {
   IChangePasswordRequest, IChangePasswordResponse,

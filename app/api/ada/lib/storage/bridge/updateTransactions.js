@@ -87,7 +87,7 @@ import type { LastSyncInfoRow, } from '../database/walletTypes/core/tables';
 import type { DbTxIO, DbTxInChain } from '../database/transactionModels/multipart/tables';
 import {
   rawGetAddressRowsForWallet,
-} from  '../models/utils';
+} from  './traitUtils';
 import {
   genToAbsoluteSlotNumber,
 } from './timeUtils';
