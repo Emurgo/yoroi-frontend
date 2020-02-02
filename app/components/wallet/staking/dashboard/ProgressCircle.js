@@ -32,15 +32,15 @@ export default class ProgressCircle extends Component<Props> {
           <path
             className={classnames(styles.circle, styles.baseCircle)}
             d="M18 2.0845
-                a 15.9155 15.9155 0 0 1 0 31.831
-                a 15.9155 15.9155 0 0 1 0 -31.831"
+              a 15.9155 15.9155 0 0 1 0 31.831
+              a 15.9155 15.9155 0 0 1 0 -31.831"
           />
           <path
             className={styles.circle}
             strokeDasharray={`${percentage}, 100`}
             d="M18 2.0845
-                  a 15.9155 15.9155 0 0 1 0 31.831
-                  a 15.9155 15.9155 0 0 1 0 -31.831"
+              a 15.9155 15.9155 0 0 1 0 31.831
+              a 15.9155 15.9155 0 0 1 0 -31.831"
           />
         </svg>
       </div>
