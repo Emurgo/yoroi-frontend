@@ -89,6 +89,7 @@ export default class TrezorConnectStore
   // =================== API RELATED =================== //
 
   setup(): void {
+    super.setup();
     this._reset();
     const trezorConnectAction = this.actions.ada.trezorConnect;
     trezorConnectAction.init.listen(this._init);

@@ -48,9 +48,6 @@ export default class LoadingStore extends Store {
       async () => await loadLovefieldDB(schema.DataStoreType.INDEXED_DB)
     );
 
-  setup(): void {
-  }
-
   load(): void {
     when(this._isRefresh, this._redirectToLoading);
     Promise

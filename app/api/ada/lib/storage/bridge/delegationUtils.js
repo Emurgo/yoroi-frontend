@@ -96,6 +96,7 @@ export type GetCurrentDelegationResponse = {|
   currEpoch: void | CertificateForEpoch,
   prevEpoch: void | CertificateForEpoch,
   prevPrevEpoch: void | CertificateForEpoch,
+  fullHistory: Array<CertificateForKey>,
 |};
 export type GetCurrentDelegationFunc = (
   request: GetCurrentDelegationRequest
@@ -127,6 +128,7 @@ export async function getCurrentDelegation(
     currEpoch: undefined,
     prevEpoch: undefined,
     prevPrevEpoch: undefined,
+    fullHistory: allDelegations,
   };
   for (const delegation of allDelegations) {
     const block = delegation.block;

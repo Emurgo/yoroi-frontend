@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Label, ResponsiveContainer } from 'recharts';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
@@ -10,13 +11,18 @@ import Card from './Card';
 import globalMessages from '../../../../i18n/global-messages';
 
 const messages = defineMessages({
+  // total ADA sent to the pool
   tooltipEpoch: {
     id: 'wallet.dashboard.graph.tooltip.epoch',
     defaultMessage: '!!!Total ADA Sent',
   },
   epochAxisLabel: {
     id: 'wallet.dashboard.graph.epochAxisLabel',
-    defaultMessage: '!!!Epoch (5 days)',
+    defaultMessage: '!!!Epoch ({epochLength} days)',
+  },
+  singleEpochAxisLabel: {
+    id: 'wallet.dashboard.graph.singleEpochAxisLabel',
+    defaultMessage: '!!!Epoch (1 day)',
   },
   dayToggleLabel: {
     id: 'wallet.dashboard.graph.dayToggleLabel',
@@ -24,7 +30,15 @@ const messages = defineMessages({
   }
 });
 
-const GraphTabs = ({ tabs }) => {
+export type GraphItems = {|
+  +name: number,
+  +secondary: number,
+  +primary: number,
+|};
+
+const GraphTabs: {|
+  tabs: Array<string>,
+|} => Node = ({ tabs }) => {
   return (
     <ul className={styles.tabsWrapper}>
       {
@@ -44,26 +58,50 @@ const GraphTabs = ({ tabs }) => {
   );
 };
 
-const GraphToggles = ({ graphName, dayLabel, epochLabel }) => {
-  return (
-    <div className={styles.radiosWrapper}>
-      <label htmlFor={graphName + '_day'} className={styles.checkboxLabel}>
-        <input type="radio" id={graphName + '_day'} name={graphName} value="day" defaultChecked className={styles.checkbox} />
-        {dayLabel}
-      </label>
-      <label htmlFor={graphName + '_epoch'} className={styles.checkboxLabel}>
-        <input type="radio" id={graphName + '_epoch'} name={graphName} value="epoch" className={styles.checkbox} />
-        {epochLabel}
-      </label>
-    </div>
-  );
-};
+// const GraphToggles: {|
+//   graphName: string,
+//   dayLabel: string,
+//   epochLabel: string,
+// |} => Node = ({ graphName, dayLabel, epochLabel }) => {
+//   return (
+//     <div className={styles.radiosWrapper}>
+//       <label htmlFor={graphName + '_day'} className={styles.checkboxLabel}>
+//         <input
+//           defaultChecked
+//           type="radio"
+//           id={graphName + '_day'}
+//           name={graphName}
+//           value="day"
+//           className={styles.checkbox}
+//         />
+//         {dayLabel}
+//       </label>
+//       <label htmlFor={graphName + '_epoch'} className={styles.checkboxLabel}>
+//         <input
+//           type="radio"
+//           id={graphName + '_epoch'}
+//           name={graphName}
+//           value="epoch"
+//           className={styles.checkbox}
+//         />
+//         {epochLabel}
+//       </label>
+//     </div>
+//   );
+// };
 
-const Graph = ({
+const Graph: {|
+  themeVars: Object,
+  data: Array<GraphItems>,
+  epochTitle: string,
+  xAxisLabel: string,
+  yAxisLabel: string,
+  primaryBarLabel: string,
+  secondaryBarLabel: string,
+|} => Node = ({
   themeVars,
   data,
   epochTitle,
-  totalAdaTitle,
   xAxisLabel,
   yAxisLabel,
   primaryBarLabel,
@@ -90,9 +128,9 @@ const Graph = ({
   );
 
   const GraphTooltip = (
-    { active, payload, label }: {| active: boolean, payload: Array<any>, label: string |}
+    { active, payload, label }: {| active: boolean, payload: ?[any, any], label: string |}
   ) => {
-    if (active) {
+    if (active && payload != null) {
       return (
         <div className={styles.tooltip}>
           <p>
@@ -100,8 +138,12 @@ const Graph = ({
             <span className={styles.tooltipValue}>{label}</span>
           </p>
           <p>
-            <span className={styles.tooltipLabel}>{totalAdaTitle}:</span>&nbsp;
+            <span className={styles.tooltipLabel}>{primaryBarLabel}:</span>&nbsp;
             <span className={styles.tooltipValue}>{payload[0].value}</span>
+          </p>
+          <p>
+            <span className={styles.tooltipLabel}>{secondaryBarLabel}:</span>&nbsp;
+            <span className={styles.tooltipValue}>{payload[1].value}</span>
           </p>
         </div>
       );
@@ -109,7 +151,7 @@ const Graph = ({
     return null;
   };
 
-  // $FlowFixMe promps are passed implicitly which causes a flow error
+  // $FlowFixMe props are passed implicitly which causes a flow error
   const graphTooltip = (<GraphTooltip />);
   return (
     <ResponsiveContainer height={240}>
@@ -171,7 +213,7 @@ const Graph = ({
         <Bar
           name={primaryBarLabel}
           maxBarSize={graphVars.barWidth}
-          dataKey="rewards"
+          dataKey="primary"
           stackId="a"
           fill={graphVars.barPrimaryColor}
         />
@@ -179,7 +221,7 @@ const Graph = ({
           name={secondaryBarLabel}
           radius={[6, 6, 0, 0]}
           maxBarSize={graphVars.barWidth}
-          dataKey="ada"
+          dataKey="secondary"
           stackId="a"
           fill={graphVars.barSecondaryColor}
         />
@@ -192,7 +234,11 @@ type Props = {|
   themeVars: Object,
   tabs: Array<string>,
   graphName: string,
-  data: Array<Object>,
+  data: Array<GraphItems>,
+  primaryBarLabel: string,
+  secondaryBarLabel: string,
+  yAxisLabel: string,
+  epochLength: ?number,
 |};
 
 @observer
@@ -201,26 +247,40 @@ export default class GraphWrapper extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  _getEpochLengthLabel: void => string = () => {
+    const { intl } = this.context;
+    const { epochLength } = this.props;
+    if (epochLength == null) {
+      return intl.formatMessage(globalMessages.epochLabel);
+    }
+
+    return epochLength === 1
+      ? intl.formatMessage(messages.singleEpochAxisLabel)
+      : intl.formatMessage(messages.epochAxisLabel, { epochLength });
+  }
+
   render() {
     const { intl } = this.context;
-    const { tabs, graphName, data, themeVars } = this.props;
+    const { tabs, data, themeVars } = this.props;
+
     return (
       <div className={styles.wrapper}>
         <GraphTabs tabs={tabs} />
         <Card>
           <div className={styles.graphContainer}>
+            {/*
             <GraphToggles
-              graphName={graphName}
+              graphName={this.props.graphName}
               dayLabel={intl.formatMessage(messages.dayToggleLabel)}
               epochLabel={intl.formatMessage(globalMessages.epochLabel)}
             />
+            */}
             <Graph
               epochTitle={intl.formatMessage(globalMessages.epochLabel)}
-              totalAdaTitle={intl.formatMessage(messages.tooltipEpoch)}
-              xAxisLabel={intl.formatMessage(messages.epochAxisLabel)}
-              yAxisLabel={intl.formatMessage(messages.tooltipEpoch)}
-              primaryBarLabel={intl.formatMessage(globalMessages.totalAdaLabel)}
-              secondaryBarLabel={intl.formatMessage(globalMessages.rewardsLabel)}
+              xAxisLabel={this._getEpochLengthLabel()}
+              yAxisLabel={this.props.yAxisLabel}
+              primaryBarLabel={this.props.primaryBarLabel}
+              secondaryBarLabel={this.props.secondaryBarLabel}
               themeVars={themeVars}
               data={data}
             />

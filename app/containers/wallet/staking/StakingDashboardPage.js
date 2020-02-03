@@ -10,7 +10,8 @@ import PublicDeriverWithCachedMeta from '../../../domain/PublicDeriverWithCached
 import { getOrDefault } from '../../../domain/Explorer';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import StakingDashboard from '../../../components/wallet/staking/dashboard/StakingDashboard';
-import EpochProgress from '../../../components/wallet/staking/dashboard/EpochProgress';
+import type { GraphData } from '../../../components/wallet/staking/dashboard/StakingDashboard';
+import type { GraphItems, } from '../../../components/wallet/staking/dashboard/GraphWrapper';
 import UserSummary from '../../../components/wallet/staking/dashboard/UserSummary';
 import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
 import UndelegateDialog from '../../../components/wallet/staking/dashboard/UndelegateDialog';
@@ -34,23 +35,13 @@ import config from '../../../config';
 import { formattedWalletAmount } from '../../../utils/formatters';
 import type { PoolTuples, ReputationObject, } from '../../../api/ada/lib/state-fetch/types';
 import type { DelegationRequests } from '../../../stores/ada/DelegationStore';
+import EpochProgressContainer from './EpochProgressContainer';
 
-import {
-  genTimeToSlot,
-  genToRelativeSlotNumber,
-  genToAbsoluteSlotNumber,
-  genToRealTime,
-  genCurrentSlotLength,
-  genCurrentEpochLength,
-} from '../../../api/ada/lib/storage/bridge/timeUtils';
 import type {
-  TimeToAbsoluteSlotFunc,
-  ToRelativeSlotNumberFunc,
   ToRealTimeFunc,
   ToAbsoluteSlotNumberFunc,
-  CurrentSlotLengthFunc,
-  CurrentEpochLengthFunc,
 } from '../../../api/ada/lib/storage/bridge/timeUtils';
+
 import globalMessages from '../../../i18n/global-messages';
 import { runInAction } from 'mobx';
 
@@ -59,7 +50,6 @@ type Props = {|
 |};
 
 type State = {|
-  +currentTime: Date,
   +notificationElementId: string,
 |};
 
@@ -69,36 +59,24 @@ export default class StakingDashboardPage extends Component<Props, State> {
     intl: intlShape.isRequired,
   };
 
-  intervalId: void | IntervalID;
-
-  timeToSlot: TimeToAbsoluteSlotFunc;
-  toRelativeSlotNumber: ToRelativeSlotNumberFunc;
-  toRealTime: ToRealTimeFunc;
-  toAbsoluteSlot: ToAbsoluteSlotNumberFunc;
-  currentSlotLength: CurrentSlotLengthFunc;
-  currentEpochLength: CurrentEpochLengthFunc;
-
   async componentDidMount() {
-    this.timeToSlot = await genTimeToSlot();
-    this.toRelativeSlotNumber = await genToRelativeSlotNumber();
-    this.toRealTime = await genToRealTime();
-    this.toAbsoluteSlot = await genToAbsoluteSlotNumber();
-    this.currentSlotLength = await genCurrentSlotLength();
-    this.currentEpochLength = await genCurrentEpochLength();
     this.setState({
       notificationElementId: '',
-      currentTime: new Date(),
     });
-    this.intervalId = setInterval(
-      () => this.setState({
-        currentTime: new Date()
-      }),
-      1000
-    );
+
+    const timeStore = this.props.stores.substores.ada.time;
+    const publicDeriver = this.props.stores.substores[environment.API].wallets.selected;
+    if (publicDeriver == null) {
+      throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
+    }
+    const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver.self);
+    await timeCalcRequests.toAbsoluteSlot.execute().promise;
+    await timeCalcRequests.toRealTime.execute().promise;
+    await timeCalcRequests.currentEpochLength.execute().promise;
+    await timeCalcRequests.currentSlotLength.execute().promise;
   }
 
   componentWillUnmount() {
-    if (this.intervalId) clearInterval(this.intervalId);
     this.props.actions[environment.API].delegationTransaction.reset.trigger();
   }
 
@@ -109,9 +87,6 @@ export default class StakingDashboardPage extends Component<Props, State> {
   };
 
   render() {
-    if (this.state == null) {
-      return null;
-    }
     const publicDeriver = this.props.stores.substores[environment.API].wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
@@ -123,7 +98,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
 
-    const getTimeBasedElements = this.getTimeBasedElements(publicDeriver);
+    const rewardInfo = this.getRewardInfo(publicDeriver);
 
     const errorIfPresent = this.getErrorInFetch(publicDeriver);
     const stakePools = errorIfPresent == null
@@ -151,207 +126,24 @@ export default class StakingDashboardPage extends Component<Props, State> {
         hasAnyPending={this.props.stores.substores.ada.transactions.hasAnyPending}
         themeVars={getThemeVars({ theme: 'YoroiModern' })}
         stakePools={stakePools}
-        epochProgress={getTimeBasedElements.epochProgress}
+        epochProgress={<EpochProgressContainer
+          actions={this.props.actions}
+          stores={this.props.stores}
+          publicDeriver={publicDeriver}
+          showTooltip={rewardInfo != null && rewardInfo.showWarning}
+        />}
         userSummary={this._generateUserSummary({
           delegationRequests,
           publicDeriver,
           errorIfPresent,
         })}
-        upcomingRewards={getTimeBasedElements.rewardInfo?.rewardPopup}
-        totalGraphData={[
-          {
-            name: 1,
-            ada: 4000,
-            rewards: 2400,
-          },
-          {
-            name: 2,
-            ada: 3000,
-            rewards: 1398,
-          },
-          {
-            name: 3,
-            ada: 2000,
-            rewards: 9000,
-          },
-          {
-            name: 4,
-            ada: 2780,
-            rewards: 3908,
-          },
-          {
-            name: 5,
-            ada: 1890,
-            rewards: 4800,
-          },
-          {
-            name: 6,
-            ada: 2390,
-            rewards: 3800,
-          },
-          {
-            name: 7,
-            ada: 3490,
-            rewards: 4300,
-          },
-          {
-            name: 8,
-            ada: 3490,
-            rewards: 4300,
-          },
-          {
-            name: 9,
-            ada: 3490,
-            rewards: 4300,
-          },
-          {
-            name: 10,
-            ada: 3490,
-            rewards: 4300,
-          },
-          {
-            name: 11,
-            ada: 3490,
-            rewards: 4300,
-          },
-          {
-            name: 12,
-            ada: 4000,
-            rewards: 2400,
-          },
-          {
-            name: 13,
-            ada: 3000,
-            rewards: 1398,
-          },
-          {
-            name: 14,
-            ada: 2000,
-            rewards: 9000,
-          },
-          {
-            name: 15,
-            ada: 2780,
-            rewards: 3908,
-          },
-          {
-            name: 16,
-            ada: 1890,
-            rewards: 4800,
-          },
-          {
-            name: 17,
-            ada: 2390,
-            rewards: 3800,
-          },
-          {
-            name: 18,
-            ada: 3490,
-            rewards: 4300,
-          },
-          {
-            name: 19,
-            ada: 3490,
-            rewards: 4300,
-          },
-        ]}
-        positionsGraphData={[
-          {
-            name: 1,
-            ada: 1200,
-            rewards: 8294,
-          },
-          {
-            name: 2,
-            ada: 1000,
-            rewards: 6000,
-          },
-          {
-            name: 3,
-            ada: 800,
-            rewards: 5789,
-          },
-          {
-            name: 4,
-            ada: 2780,
-            rewards: 3908,
-          },
-          {
-            name: 5,
-            ada: 1890,
-            rewards: 4800,
-          },
-          {
-            name: 6,
-            ada: 2000,
-            rewards: 4000,
-          },
-          {
-            name: 7,
-            ada: 3490,
-            rewards: 4000,
-          },
-          {
-            name: 8,
-            ada: 3490,
-            rewards: 4300,
-          },
-          {
-            name: 9,
-            ada: 3490,
-            rewards: 4300,
-          },
-          {
-            name: 10,
-            ada: 3490,
-            rewards: 4300,
-          },
-          {
-            name: 11,
-            ada: 3490,
-            rewards: 4300,
-          },
-          {
-            name: 12,
-            ada: 4000,
-            rewards: 2400,
-          },
-          {
-            name: 13,
-            ada: 3000,
-            rewards: 1398,
-          },
-          {
-            name: 14,
-            ada: 1400,
-            rewards: 3000,
-          },
-          {
-            name: 15,
-            ada: 2780,
-            rewards: 3908,
-          },
-          {
-            name: 16,
-            ada: 1890,
-            rewards: 4800,
-          },
-          {
-            name: 17,
-            ada: 2390,
-            rewards: 3800,
-          },
-          {
-            name: 18,
-            ada: 3490,
-            rewards: 4300,
-          },
-          {
-            name: 19,
-            ada: 3490,
-            rewards: 14590,
-          },
-        ]}
+        upcomingRewards={rewardInfo?.rewardPopup}
+        graphData={this._generateGraphData({
+          delegationRequests,
+          publicDeriver,
+        })}
+        delegationHistory={delegationRequests.getCurrentDelegation.result?.fullHistory}
+        epochLength={this.getEpochLengthInDays(publicDeriver)}
       />
     );
 
@@ -364,7 +156,21 @@ export default class StakingDashboardPage extends Component<Props, State> {
       </>);
   }
 
-  generatePopupDialog: void => null | Node = () => {
+  getEpochLengthInDays: PublicDeriverWithCachedMeta => ?number = (publicDeriver) => {
+    const timeStore = this.props.stores.substores.ada.time;
+    const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver.self);
+    const getEpochLength = timeCalcRequests.currentEpochLength.result;
+    if (getEpochLength == null) return null;
+
+    const getSlotLength = timeCalcRequests.currentSlotLength.result;
+    if (getSlotLength == null) return null;
+
+    const epochLengthInSeconds = getEpochLength() * getSlotLength();
+    const epochLengthInDays = epochLengthInSeconds / (60 * 60 * 24);
+    return epochLengthInDays;
+  }
+
+  generatePopupDialog: void => (null | Node) = () => {
     const { uiDialogs } = this.props.stores;
     const delegationTxStore = this.props.stores.substores[environment.API].delegationTransaction;
 
@@ -423,37 +229,17 @@ export default class StakingDashboardPage extends Component<Props, State> {
     />);
   }
 
-  getTimeBasedElements: PublicDeriverWithCachedMeta => {|
-    epochProgress: Node,
-    rewardInfo: void | {|
-      rewardPopup: Node,
-      showWarning: boolean,
-    |},
-  |} = (publicDeriver) => {
-    if (this.state == null) {
-      return {
-        epochProgress: (<EpochProgress loading />),
-        rewardInfo: undefined,
-      };
-    }
-
-    const currentAbsoluteSlot = this.timeToSlot({
-      time: this.state.currentTime
-    });
-    const currentRelativeTime = this.toRelativeSlotNumber(currentAbsoluteSlot.slot);
-
-    const epochLength = this.currentEpochLength();
-    const slotLength = this.currentSlotLength();
-
-    const secondsLeftInEpoch = (epochLength - currentRelativeTime.slot) * slotLength;
-    const timeLeftInEpoch = new Date(
-      (1000 * secondsLeftInEpoch) - currentAbsoluteSlot.msIntoSlot
-    );
-
-    const leftPadDate: number => string = (num) => {
-      if (num < 10) return '0' + num;
-      return num.toString();
-    };
+  getRewardInfo: PublicDeriverWithCachedMeta => (void | {|
+    rewardPopup: Node,
+    showWarning: boolean,
+  |}) = (publicDeriver) => {
+    const timeStore = this.props.stores.substores.ada.time;
+    const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver.self);
+    const currTimeRequests = timeStore.getCurrentTimeRequests(publicDeriver.self);
+    const toAbsoluteSlot = timeCalcRequests.toAbsoluteSlot.result;
+    if (toAbsoluteSlot == null) return undefined;
+    const toRealTime = timeCalcRequests.toRealTime.result;
+    if (toRealTime == null) return undefined;
 
     const delegationStore = this.props.stores.substores[environment.API].delegation;
     const delegationRequests = delegationStore.getRequests(publicDeriver.self);
@@ -472,16 +258,22 @@ export default class StakingDashboardPage extends Component<Props, State> {
             <UpcomingRewards
               content={[
                 this.generateUpcomingRewardInfo({
-                  epoch: currentRelativeTime.epoch + 1,
+                  epoch: currTimeRequests.currentEpoch + 1,
                   pools: [],
+                  toAbsoluteSlot,
+                  toRealTime,
                 }),
                 this.generateUpcomingRewardInfo({
-                  epoch: currentRelativeTime.epoch + 2,
+                  epoch: currTimeRequests.currentEpoch + 2,
                   pools: [],
+                  toAbsoluteSlot,
+                  toRealTime,
                 }),
                 this.generateUpcomingRewardInfo({
-                  epoch: currentRelativeTime.epoch + 3,
+                  epoch: currTimeRequests.currentEpoch + 3,
                   pools: [],
+                  toAbsoluteSlot,
+                  toRealTime,
                 }),
               ]}
               showWarning={false}
@@ -500,20 +292,26 @@ export default class StakingDashboardPage extends Component<Props, State> {
         const upcomingRewards: Array<BoxInfo> = [];
         for (let i = 4; i >= 2; i--) {
           upcomingRewards.unshift(this.generateUpcomingRewardInfo({
-            epoch: currentRelativeTime.epoch + i + 1,
+            epoch: currTimeRequests.currentEpoch + i + 1,
             pools: currEpochCert.pools,
+            toAbsoluteSlot,
+            toRealTime,
           }));
         }
         if (result.prevEpoch) {
           upcomingRewards.unshift(this.generateUpcomingRewardInfo({
-            epoch: currentRelativeTime.epoch + 2,
+            epoch: currTimeRequests.currentEpoch + 2,
             pools: result.prevEpoch.pools,
+            toAbsoluteSlot,
+            toRealTime,
           }));
         }
         if (result.prevPrevEpoch) {
           upcomingRewards.unshift(this.generateUpcomingRewardInfo({
-            epoch: currentRelativeTime.epoch + 1,
+            epoch: currTimeRequests.currentEpoch + 1,
             pools: result.prevPrevEpoch.pools,
+            toAbsoluteSlot,
+            toRealTime,
           }));
         }
 
@@ -534,41 +332,28 @@ export default class StakingDashboardPage extends Component<Props, State> {
       }
     }
 
-    const epochProgress = (
-      <EpochProgress
-        currentEpoch={currentRelativeTime.epoch}
-        percentage={Math.floor(100 * currentRelativeTime.slot / epochLength)}
-        endTime={{
-          h: leftPadDate(timeLeftInEpoch.getUTCHours()),
-          m: leftPadDate(timeLeftInEpoch.getUTCMinutes()),
-          s: leftPadDate(timeLeftInEpoch.getUTCSeconds()),
-        }}
-        showTooltip={rewardInfo != null && rewardInfo.showWarning}
-      />
-    );
-
-    return {
-      epochProgress,
-      rewardInfo: rewardInfo ?? ({
-        rewardPopup: (
-          <UpcomingRewards
-            content={[null, null, null]}
-            showWarning={false}
-            onExternalLinkClick={handleExternalLinkClick}
-            baseUrl=""
-          />
-        ),
-        showWarning: false,
-      }),
-    };
+    return rewardInfo ?? ({
+      rewardPopup: (
+        <UpcomingRewards
+          content={[null, null, null]}
+          showWarning={false}
+          onExternalLinkClick={handleExternalLinkClick}
+          baseUrl=""
+        />
+      ),
+      showWarning: false,
+    });
   }
 
   generateUpcomingRewardInfo: {|
     epoch: number,
     pools: Array<PoolTuples>,
+    toRealTime: ToRealTimeFunc,
+    toAbsoluteSlot: ToAbsoluteSlotNumberFunc,
   |} => BoxInfo = (request) => {
-    const endEpochTime = this.toRealTime({
-      absoluteSlotNum: this.toAbsoluteSlot({
+
+    const endEpochTime = request.toRealTime({
+      absoluteSlotNum: request.toAbsoluteSlot({
         epoch: request.epoch,
         slot: 0,
       })
@@ -689,9 +474,12 @@ export default class StakingDashboardPage extends Component<Props, State> {
                 });
               }
             }}
-            notification={uiNotifications.getTooltipActiveNotification(
-              this.state.notificationElementId
-            )}
+            notification={this.state == null
+              ? null
+              : uiNotifications.getTooltipActiveNotification(
+                this.state.notificationElementId
+              )
+            }
             undelegate={
               // don't support undelegation for ratio stake since it's a less intuitive UX
               keyState.state.delegation.pools.length === 1
@@ -815,5 +603,66 @@ export default class StakingDashboardPage extends Component<Props, State> {
             )}
       />
     );
+  }
+
+  _generateRewardGraphData: {|
+    delegationRequests: DelegationRequests,
+    currentEpoch: number,
+  |} => (?Array<GraphItems>) = (
+    request
+  ) => {
+    const history = request.delegationRequests.rewardHistory.result;
+    if (history == null) {
+      return null;
+    }
+    if (!request.delegationRequests.getCurrentDelegation.wasExecuted) {
+      return null;
+    }
+    let historyIterator = 0;
+
+    // the reward history endpoint doesn't contain entries when the reward was 0
+    // so we need to insert these manually
+    const result: Array<GraphItems> = [];
+    let adaSum = new BigNumber(0);
+    // note: don't include the current epoch since we don't know what reward will be
+    for (let i = 0; i < request.currentEpoch; i++) {
+      if (historyIterator < history.length && i === history[historyIterator][0]) {
+        // exists a reward for this epoch
+        const nextReward = history[historyIterator][1];
+        adaSum = adaSum.plus(nextReward);
+        result.push({
+          name: i,
+          secondary: adaSum.dividedBy(LOVELACES_PER_ADA).toNumber(),
+          primary: nextReward / LOVELACES_PER_ADA.toNumber(),
+        });
+        historyIterator++;
+      } else {
+        // no reward for this epoch
+        result.push({
+          name: i,
+          secondary: adaSum.dividedBy(LOVELACES_PER_ADA).toNumber(),
+          primary: 0,
+        });
+      }
+    }
+    return result;
+  }
+
+  _generateGraphData: {|
+    delegationRequests: DelegationRequests,
+    publicDeriver: PublicDeriverWithCachedMeta,
+  |} => GraphData = (request) => {
+    const timeStore = this.props.stores.substores.ada.time;
+    const currTimeRequests = timeStore.getCurrentTimeRequests(request.publicDeriver.self);
+
+    return {
+      rewardsGraphData: {
+        error: request.delegationRequests.rewardHistory.error,
+        items: this._generateRewardGraphData({
+          delegationRequests: request.delegationRequests,
+          currentEpoch: currTimeRequests.currentEpoch,
+        }),
+      }
+    };
   }
 }

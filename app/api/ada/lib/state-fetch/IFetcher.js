@@ -5,6 +5,7 @@ import type {
   TxBodiesRequest, TxBodiesResponse,
   UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
+  RewardHistoryRequest, RewardHistoryResponse,
   SignedRequest, SignedResponse,
   FilterUsedRequest, FilterUsedResponse,
   BestBlockRequest, BestBlockResponse,
@@ -19,6 +20,7 @@ export interface IFetcher {
   getTxsBodiesForUTXOs(body: TxBodiesRequest): Promise<TxBodiesResponse>;
   getUTXOsSumsForAddresses(body: UtxoSumRequest): Promise<UtxoSumResponse>;
   getTransactionsHistoryForAddresses(body: HistoryRequest): Promise<HistoryResponse>;
+  getRewardHistory(body: RewardHistoryRequest): Promise<RewardHistoryResponse>;
   getBestBlock(body: BestBlockRequest): Promise<BestBlockResponse>;
   sendTx(body: SignedRequest): Promise<SignedResponse>;
   checkAddressesInUse(body: FilterUsedRequest): Promise<FilterUsedResponse>;

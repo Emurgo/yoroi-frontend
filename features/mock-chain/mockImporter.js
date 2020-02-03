@@ -4,13 +4,14 @@ import cryptoRandomString from 'crypto-random-string';
 import type { SignedRequestInternal, SignedResponse, RemoteTransaction } from '../../app/api/ada/lib/state-fetch/types';
 import {
   genGetTransactionsHistoryForAddresses,
+  genGetRewardHistory,
   genGetBestBlock,
   genCheckAddressesInUse,
   genUtxoForAddresses,
   genUtxoSumForAddresses,
   genGetAccountState,
   genGetPoolInfo,
-  getGetReputation,
+  genGetReputation,
   getAddressForType,
   getSingleAddressString,
   toRemoteTx,
@@ -980,7 +981,8 @@ const sendTx = (request: SignedRequestInternal): SignedResponse => {
 };
 const getAccountState = genGetAccountState(transactions);
 const getPoolInfo = genGetPoolInfo(transactions);
-const getReputation = getGetReputation();
+const getReputation = genGetReputation();
+const getRewardHistory = genGetRewardHistory();
 
 export default {
   utxoForAddresses,
@@ -988,6 +990,7 @@ export default {
   usedAddresses,
   getApiStatus,
   history,
+  getRewardHistory,
   getBestBlock,
   getAccountState,
   getPoolInfo,

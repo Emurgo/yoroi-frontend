@@ -5,6 +5,7 @@ import type {
   AddressUtxoRequest, AddressUtxoResponse,
   UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
+  RewardHistoryRequest, RewardHistoryResponse,
   BestBlockRequest, BestBlockResponse,
   SignedResponse,
   FilterUsedRequest, FilterUsedResponse,
@@ -101,6 +102,18 @@ export function getMockServer(
       res.send(history.slice(0, txsLimit));
     });
 
+    server.post('/api/v2/account/rewards', async (
+      req: {
+        body: RewardHistoryRequest
+      },
+      res: { send(arg: RewardHistoryResponse): any }
+    ): Promise<void> => {
+      chai.assert.isTrue(_validateAddressesReq(req.body));
+
+      const history = await mockImporter.getRewardHistory(req.body);
+      res.send(history);
+    });
+
     server.get('/api/v2/bestblock', async (
       req: {
         body: BestBlockRequest
@@ -124,7 +137,7 @@ export function getMockServer(
       }
     });
 
-    server.post('/api/addresses/filterUsed', async (
+    server.post('/api/v2/addresses/filterUsed', async (
       req: {
         body: FilterUsedRequest
       },

@@ -1,10 +1,12 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
+import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
 import GraphWrapper from './GraphWrapper';
+import type { GraphItems } from './GraphWrapper';
 import styles from './StakingDashboard.scss';
 import globalMessages from '../../../../i18n/global-messages';
 import WarningBox from '../../../widgets/WarningBox';
@@ -16,6 +18,7 @@ import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import InvalidURIImg from '../../../../assets/images/uri/invalid-uri.inline.svg';
 import ErrorBlock from '../../../widgets/ErrorBlock';
+import type { CertificateForKey } from '../../../../api/ada/lib/storage/database/primitives/api/read';
 
 const messages = defineMessages({
   positionsLabel: {
@@ -39,14 +42,21 @@ const emptyDashboardMessages = defineMessages({
   },
   text: {
     id: 'wallet.dashboard.empty.text',
-    defaultMessage: '!!!Go to Simple or Advance Staking to choose what stake pool you want to delegate in. Note, you may delegate only to one stake pool in this Tesnnet'
+    defaultMessage: '!!!Go to Simple or Advance Staking to choose what stake pool you want to delegate in. Note, you may delegate only to one stake pool in this Testnet'
   }
 });
 
+export type SingleGraphData = {|
+  +items: ?Array<GraphItems>,
+  +error: ?LocalizableError,
+|};
+export type GraphData = {|
+  +rewardsGraphData: SingleGraphData,
+|};
+
 type Props = {|
   +themeVars: Object,
-  +totalGraphData: Array<Object>,
-  +positionsGraphData: Array<Object>,
+  +graphData: GraphData,
   +stakePools: {| error: LocalizableError, |} | {| pools: null | Array<Node> |},
   +epochProgress: Node,
   +userSummary: Node,
@@ -56,7 +66,9 @@ type Props = {|
     +currentPage: number,
     +numPages: number,
     +goToPage: number => void,
-  |}
+  |},
+  +delegationHistory: ?Array<CertificateForKey>,
+  +epochLength: ?number,
 |};
 
 @observer
@@ -67,12 +79,8 @@ export default class StakingDashboard extends Component<Props> {
 
   render() {
     const {
-      themeVars,
-      totalGraphData,
-      positionsGraphData,
+      graphData,
     } = this.props;
-
-    const { intl } = this.context;
 
     const pendingTxWarningComponent = this.props.hasAnyPending
       ? (
@@ -84,32 +92,27 @@ export default class StakingDashboard extends Component<Props> {
       )
       : (null);
 
-    // TODO: enable graphs eventually
-    // eslint-disable-next-line no-unused-vars
-    const graphs = (
-      <div className={styles.graphsWrapper}>
-        <GraphWrapper
-          themeVars={themeVars}
-          tabs={[
-            intl.formatMessage(globalMessages.totalAdaLabel),
-            intl.formatMessage(globalMessages.marginsLabel),
-            intl.formatMessage(globalMessages.rewardsLabel),
-          ]}
-          graphName="total"
-          data={totalGraphData}
-        />
-        <GraphWrapper
-          themeVars={themeVars}
-          tabs={[
-            intl.formatMessage(messages.positionsLabel),
-            intl.formatMessage(globalMessages.marginsLabel),
-            intl.formatMessage(messages.costsLabel),
-          ]}
-          graphName="positions"
-          data={positionsGraphData}
-        />
-      </div>
-    );
+    // don't show anything when user has never delegated
+    const hideGraph = this.props.delegationHistory != null &&
+      this.props.delegationHistory.length === 0;
+
+    const graphs = hideGraph
+      ? null
+      : (
+        <div className={styles.graphsWrapper}>
+          {this._displayGraph(graphData.rewardsGraphData)}
+          {/* <GraphWrapper
+            themeVars={themeVars}
+            tabs={[
+              intl.formatMessage(messages.positionsLabel),
+              intl.formatMessage(globalMessages.marginsLabel),
+              intl.formatMessage(messages.costsLabel),
+            ]}
+            graphName="positions"
+            data={graphData.positionsGraphData}
+          /> */}
+        </div>
+      );
     return (
       <div className={styles.page}>
         <div className={styles.contentWrap}>
@@ -127,24 +130,67 @@ export default class StakingDashboard extends Component<Props> {
               </div>
             </div>
           </div>
-          {this.props.pageInfo != null &&
-            <div className={styles.pageSelect}>
-              <BarDecoration>
-                <PageSelect
-                  currentPage={this.props.pageInfo.currentPage}
-                  numPages={this.props.pageInfo.numPages}
-                  goToPage={this.props.pageInfo.goToPage}
-                />
-              </BarDecoration>
-            </div>
-          }
-          {this.displayStakePools()}
+          <div className={styles.pageSelect}>
+            <BarDecoration>
+              <PageSelect
+                currentPage={this.props.pageInfo?.currentPage ?? 0}
+                numPages={this.props.pageInfo?.numPages ?? 0}
+                goToPage={this.props.pageInfo?.goToPage ?? (() => {})}
+              />
+            </BarDecoration>
+          </div>
+          <div className={styles.bodyWrapper}>
+            {graphs}
+            {this.displayStakePools(hideGraph)}
+          </div>
         </div>
       </div>
     );
   }
 
-  displayStakePools: void => Node = () => {
+  _displayGraph: SingleGraphData => Node = (graphData) => {
+    const { intl } = this.context;
+    if (graphData.error) {
+      return (
+        <div className={styles.poolError}>
+          <center><InvalidURIImg /></center>
+          <ErrorBlock
+            error={graphData.error}
+          />
+        </div>
+      );
+    }
+    if (graphData.items == null) {
+      return (
+        <VerticallyCenteredLayout>
+          <LoadingSpinner />
+        </VerticallyCenteredLayout>
+      );
+    }
+    return (
+      <GraphWrapper
+        data={graphData.items}
+        themeVars={this.props.themeVars}
+        tabs={[
+          // intl.formatMessage(globalMessages.totalAdaLabel),
+          // intl.formatMessage(globalMessages.marginsLabel),
+          intl.formatMessage(globalMessages.rewardsLabel),
+        ]}
+        primaryBarLabel={intl.formatMessage(globalMessages.rewardsLabel)}
+        secondaryBarLabel={intl.formatMessage(globalMessages.totalAdaLabel)}
+        yAxisLabel={intl.formatMessage(globalMessages.rewardsLabel)}
+        graphName="total"
+        epochLength={this.props.epochLength}
+      />
+    );
+  }
+
+  displayStakePools: boolean => Node = (hideGraph) => {
+    const width = classnames([
+      // if they've delegated before we need to make space for the chart
+      !hideGraph ? styles.stakePoolMaxWidth : null,
+      styles.stakePool,
+    ]);
     const { intl } = this.context;
     if (this.props.stakePools.error) {
       return (
@@ -158,7 +204,7 @@ export default class StakingDashboard extends Component<Props> {
     }
     if (this.props.stakePools.pools === null || this.props.pageInfo == null) {
       return (
-        <div className={styles.loadingPools}>
+        <div className={width}>
           <VerticallyCenteredLayout>
             <LoadingSpinner />
           </VerticallyCenteredLayout>
@@ -168,17 +214,21 @@ export default class StakingDashboard extends Component<Props> {
     const currPool = this.props.pageInfo.currentPage;
     if (this.props.stakePools.pools.length === 0) {
       return (
-        <InformativeError
-          title={intl.formatMessage(emptyDashboardMessages.title)}
-          text={intl.formatMessage(emptyDashboardMessages.text)}
-        />
+        <div className={width}>
+          <InformativeError
+            title={intl.formatMessage(emptyDashboardMessages.title)}
+            text={!hideGraph
+              // no need to explain to user how to delegate their ADA if they've done it before
+              ? null
+              : intl.formatMessage(emptyDashboardMessages.text)
+            }
+          />
+        </div>
       );
     }
     return (
-      <div className={styles.bodyWrapper}>
-        <div className={styles.stakePool}>
-          {this.props.stakePools.pools[currPool]}
-        </div>
+      <div className={width}>
+        {this.props.stakePools.pools[currPool]}
       </div>
     );
   }

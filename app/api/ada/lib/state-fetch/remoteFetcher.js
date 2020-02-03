@@ -5,6 +5,7 @@ import type {
   TxBodiesRequest, TxBodiesResponse,
   UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
+  RewardHistoryRequest, RewardHistoryResponse,
   BestBlockRequest, BestBlockResponse,
   SignedRequest, SignedResponse,
   FilterUsedRequest, FilterUsedResponse,
@@ -28,6 +29,7 @@ import {
   GetUtxosForAddressesApiError,
   GetUtxosSumsForAddressesApiError,
   GetTxHistoryForAddressesApiError,
+  GetRewardHistoryApiError,
   GetBestBlockError,
   SendTransactionApiError,
   CheckAdressesInUseApiError,
@@ -161,11 +163,33 @@ export class RemoteFetcher implements IFetcher {
       })
   )
 
+  getRewardHistory: RewardHistoryRequest => Promise<RewardHistoryResponse> = (body) => (
+    axios(
+      `${backendUrl}/api/v2/account/rewards`,
+      {
+        method: 'post',
+        data: body,
+        headers: {
+          'yoroi-version': this.lastLaunchVersion(),
+          'yoroi-locale': this.currentLocale()
+        }
+      }
+    ).then(response => response.data)
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getRewardHistory)} error: ` + stringifyError(error));
+        throw new GetRewardHistoryApiError();
+      })
+  )
+
   getBestBlock: BestBlockRequest => Promise<BestBlockResponse> = (_body) => (
     axios(
       `${backendUrl}/api/v2/bestblock`,
       {
-        method: 'get'
+        method: 'get',
+        headers: {
+          'yoroi-version': this.lastLaunchVersion(),
+          'yoroi-locale': this.currentLocale()
+        }
       }
     ).then(response => response.data)
       .catch((error) => {
@@ -202,7 +226,7 @@ export class RemoteFetcher implements IFetcher {
 
   checkAddressesInUse: FilterUsedRequest => Promise<FilterUsedResponse> = (body) => (
     axios(
-      `${backendUrl}/api/addresses/filterUsed`,
+      `${backendUrl}/api/v2/addresses/filterUsed`,
       {
         method: 'post',
         data: {
@@ -279,7 +303,11 @@ export class RemoteFetcher implements IFetcher {
     axios(
       `${backendUrl}/api/v2/pool/reputation`,
       {
-        method: 'get'
+        method: 'get',
+        headers: {
+          'yoroi-version': this.lastLaunchVersion(),
+          'yoroi-locale': this.currentLocale()
+        }
       }
     ).then(response => response.data)
       .catch((error) => {
@@ -292,7 +320,11 @@ export class RemoteFetcher implements IFetcher {
     axios(
       `${backendUrl}/api/status`,
       {
-        method: 'get'
+        method: 'get',
+        headers: {
+          'yoroi-version': this.lastLaunchVersion(),
+          'yoroi-locale': this.currentLocale()
+        }
       }
     ).then(response => response.data)
       .catch((error) => {

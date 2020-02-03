@@ -702,7 +702,7 @@ async function rollback(
     }
   );
 
-  // note: we don't modify the display cuttoff since it may confuse the user to suddenly shrink it
+  // note: we don't modify the display cutoff since it may confuse the user to suddenly shrink it
 }
 
 async function rawUpdateTransactions(
@@ -736,6 +736,7 @@ async function rawUpdateTransactions(
   getBestBlock: BestBlockFunc,
   derivationTables: Map<number, string>,
 ): Promise<void> {
+  // TODO: consider passing this function in as an argument instead of generating it here
   const toAbsoluteSlotNumber = await genToAbsoluteSlotNumber();
   // 1) Check if backend is synced (avoid rollbacks if backend has to resync from block 1)
 

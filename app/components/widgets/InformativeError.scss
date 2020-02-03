@@ -8,7 +8,9 @@
 }
 
 .text {
-  margin: 42px auto;
+  margin-top: 42px;
+  margin-left: auto;
+  margin-right: auto;
   text-align: center;
   color: var(--cmn-default-color-grey);
   font-family: var(--font-regular);
@@ -21,9 +23,9 @@
   color: var(--cmn-default-color-grey);
   font-family: var(--font-regular);
   line-height: 22px;
-  margin-bottom: 12px;
 }
 
 .paragraph {
+  margin-top: 12px;
   font-size: 14px;
 }

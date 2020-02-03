@@ -34,6 +34,7 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
     = new Request<typeof _clearHistory>(_clearHistory);
 
   setup(): void {
+    super.setup();
     const a = this.actions.ada.walletSettings;
     a.startEditingWalletField.listen(this._startEditingWalletField);
     a.stopEditingWalletField.listen(this._stopEditingWalletField);

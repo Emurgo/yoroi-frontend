@@ -49,6 +49,7 @@ export default class DaedalusTransferStore extends Store {
   @observable ws: ?WebSocket = null;
 
   setup(): void {
+    super.setup();
     this.registerReactions([
       this._enableDisableTransferFunds
     ]);

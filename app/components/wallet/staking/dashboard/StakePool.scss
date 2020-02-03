@@ -66,6 +66,10 @@
     line-height: 20px;
     text-transform: uppercase;
     margin-bottom: 1px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 220px;
 }
 
 .subTitle {

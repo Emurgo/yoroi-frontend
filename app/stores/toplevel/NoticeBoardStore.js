@@ -36,6 +36,7 @@ export default class NoticeBoardStore extends Store {
   searchOptions: GetNoticesRequestOptions;
 
   setup(): void {
+    super.setup();
     this.actions.noticeBoard.loadMore.listen(this._loadMore);
     this.init();
   }

@@ -446,7 +446,7 @@ const YoroiModern = {
   '--theme-dashboard-percentage-stake-base': '#FFEDF2',
   '--theme-dashboard-percentage-stake-circle': '#FF1755',
   '--theme-dashboard-graph-tab-color': '#ADAEB6',
-  '--theme-dashboard-graph-active-tab-color': '#3D60CD',
+  '--theme-dashboard-graph-active-tab-color': '#38393D', // temporary since we have one tab. For multi-tab use #3D60CD
   '--theme-dashboard-graph-radio-color': '#93979C',
   '--theme-dashboard-graph-active-radio-color': '#17D1AA',
   '--theme-dashboard-graph-axis-tick-color': '#ADAEB6',
