@@ -1,118 +1,140 @@
 $leftBlockWidth: 72px;
 $rightBlockWidth: $leftBlockWidth;
 
-%smallText {
-  height: 19px;
-  font-family: var(--font-light);
-  font-size: 20px;
-  line-height: 1.36;
-  letter-spacing: 0.5px;
-  color: var(--theme-bordered-box-text-color);
-  margin-bottom: 5px;
-  span {
-    font-family: var(--font-medium);
-    margin-right: 2px;
-  }
-}
+@import "../transactions/categoryData";
 
 .component {
-  margin-top: 20px;
-  margin-left: 20px;
-  margin-right: 20px;
+  box-shadow: 0 2px 4px 0 rgba(56,57,61,0.2);
 
-  .leftBlock {
-    float: left;
-    padding-top: 20px;
-    width: $leftBlockWidth;
-  }
-  
-  .rightBlock {
-    float: right;
-    padding-top: 20px;
-    width: $rightBlockWidth;
-  
-    .exportTxToFileSvg {
-      pointer-events: auto;
-      float: right;
-    }
-  
-    .exportTxToFileSvg:hover {
-      cursor: pointer;
-      circle {
-        fill: var(--theme-export-transactions-to-file);
-      }
-    }
-  }
-  
-  .middleBlock {
-    display: inline-block;
-    text-align: center;
-    border-bottom: 1px solid var(--theme-separation-border-color);
-    width: calc(100% - #{$leftBlockWidth + $rightBlockWidth});
-  
+  .content {
+    margin-left: 24px;
+    margin-right: 21px;
+
     :global {
       .BorderedBox_component {
+        padding-left: 0;
         background: none;
         border: none;
       }
     }
-  }
-  
-  .pendingConfirmation {
-    @extend %smallText;
-    & > .currencySymbolSmallest {
-      display: inline-block;
-      margin-left: 1px;
-      & > svg {
-        height: 15px;
-        width: 19px;
-        & > g > g {
-          stroke: var(--theme-icon-ada-summary-wallet-pending-confirmation-symbol-color);
+
+    .leftBlock {
+      display: none;
+      float: left;
+      padding-top: 20px;
+      width: $leftBlockWidth;
+    }
+
+    .leftBlock,
+    .rightBlock {
+      padding-top: 33px;
+    }
+
+    .rightBlock {
+      float: right;
+      width: $rightBlockWidth;
+    
+      .exportTxToFileSvg {
+        pointer-events: auto;
+        float: right;
+      }
+    
+      .exportTxToFileSvg:hover {
+        cursor: pointer;
+        circle {
+          fill: var(--theme-export-transactions-to-file);
         }
       }
     }
-  }
-  
-  .numberOfTransactions {
-    @extend %smallText;
-  }  
-}
 
-:global(.YoroiModern) .component {
-  margin-left: 30px;
-  margin-right: 30px;
-
-  :global {
-    .BorderedBox_component {
-      padding-left: 0;
-      background: none;
+    .middleBlock {
       border: none;
-
-      > div {
-        height: auto;
-        font-family: var(--font-regular);
-        font-size: 30px;
-        letter-spacing: 0;
+      text-align: left;    
+      display: inline-block;
+      min-height: 62px; // make space to avoid the UI growing in size when loading is done
+      width: calc(100% - #{$leftBlockWidth + $rightBlockWidth});
+    
+      :global {
+        .BorderedBox_component {
+          background: none;
+          border: none;
+        }
       }
+    }
 
-      svg {
-        height: 21px;
-        width: 21px;
+    .pendingSection {
+      margin-top: 7px;
+
+      .pendingConfirmation {
+        font-family: var(--font-regular);
+        font-size: 14px;
+        line-height: 21px;
+        font-weight: 500;
+        color: var(--cmn-default-color-grey-3);
+        span {
+          font-family: var(--font-medium);
+          margin-left: 8px;
+          color: var(--theme-transactions-list-text-color);
+        }
+        & > .currencySymbolSmallest {
+          display: inline-block;
+          margin-left: 8px;
+          & > svg {
+            height: 12px;
+            width: 9px;
+            & > g {
+              stroke: var(--theme-transactions-list-text-color);
+            }
+          }
+        }
+      }
+    }
+
+    .numberOfTransactions {
+      font-family: var(--font-medium);
+      font-size: 18px;
+      line-height: 22px;
+      font-weight: 500;
+      color: var(--cmn-default-color-grey-3);
+      span {
+        margin-left: 8px;
+        color: var(--theme-transactions-list-text-color);
+      }
+    } 
+
+    .sectionList {
+      display: flex;
+      justify-content: space-between;
+      margin-right: 27px;
+      margin-bottom: 10px;
+
+      .sectionTitle {
+        color: var(--theme-navbar-color);
+        font-family: var(--font-regular);
+        font-size: 14px;
+        line-height: 22px;
       }
     }
   }
+}
 
-  .leftBlock {
-    display: none;
-  }
-
-  .leftBlock,
-  .rightBlock {
-    padding-top: 33px;
-  }
-
-  .middleBlock {
-    border: none;
-    text-align: left;    
-  }
+.time {
+  min-width: $time-min-width;
+  text-align: $time-align;
+}
+.type {
+  min-width: $type-min-width;
+  text-align: $type-align;
+}
+.status {
+  width: $status-width;
+  text-align: $status-align;
+}
+.fee {
+  min-width: $min-fee-width;
+  text-align: $fee-align;
+}
+.amount {
+  min-width: $min-amount-width;
+  text-align: $amount-align;
 }

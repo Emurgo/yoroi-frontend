@@ -321,26 +321,28 @@ const YoroiModern = {
   '--theme-topbar-wallet-info-color': '#ffffff',
   '--theme-topbar-layout-body-background-color': '#ffffff',
 
+  '--theme-transactions-list-text-color': '#242838',
   '--theme-transactions-list-background-color': '#f0f3f5',
-  '--theme-transactions-list-failed-background-color': 'rgba(255, 19, 81, 0.07)', // #ff1351
   '--theme-transactions-list-border-color': '#f0f3f5',
   '--theme-transactions-list-group-date-color': '#2b2c32',
-  '--theme-transactions-list-item-details-color': '#2b2c32',
-  '--theme-transactions-state-failed-background-color': '#fa5380',
-  '--theme-transactions-state-failed-text-color': '#bdc5ce',
-  '--theme-transactions-state-pending-background-color': '#bdc5ce',
-  '--theme-transactions-state-pending-stripes-color': '#b2bac2',
-  '--theme-transactions-state-pending-text-color': '#adaeb6',
-  '--theme-transactions-priority-color': '#fff',
-  '--theme-transactions-priority-low-background-color': 'rgba(250, 83, 128, 0.3)',
-  '--theme-transactions-priority-medium-background-color': '#e7d5a3',
-  '--theme-transactions-priority-heigh-background-color': 'rgba(21, 209, 170, 0.5)',
+  '--theme-transactions-list-pending-text-color': '#C4CAD7',
+  '--theme-transactions-list-detail-background-color': '#FAFAFC',
+  '--theme-transactions-list-detail-row-text-color': '#6B7384',
+  '--theme-transactions-state-failed-background-color': 'rgba(255, 19, 81, 0.5)', // #ff1351
+  '--theme-transactions-state-failed-text-color': '#E8003D',
+  '--theme-transactions-state-pending-background-color': '#F0F3F5',
+  '--theme-transactions-state-pending-stripes-color': 'rgba(217, 221, 224, 0.2)', // #D9DDE0
+  '--theme-transactions-state-pending-text-color': '#ADAEB6',
+  '--theme-transactions-priority-low-background-color': 'rgba(255, 19, 81, 0.15)', // #ff1351
+  '--theme-transactions-priority-low-text-color': '#FA5F88',
+  '--theme-transactions-priority-medium-background-color': 'rgba(245, 166, 35, 0.3)', // F5A623
+  '--theme-transactions-priority-medium-text-color': '#F5A623',
+  '--theme-transactions-priority-high-background-color': '#C9EDE5',
+  '--theme-transactions-priority-high-text-color': '#17D1AA',
   '--theme-transactions-icon-type-expend-background-color': '#15d1aa',
   '--theme-transactions-icon-type-income-background-color': '#9ab2d9',
   '--theme-transactions-icon-type-exchange-background-color': '#10aca4',
   '--theme-transactions-icon-type-failed-background-color': '#eb6d7a',
-  '--theme-transactions-sent-color': '#4a4a4a',
-  '--theme-transactions-received-color': '#15d1aa',
   '--theme-transactions-amount-color': '#3154CB',
 
   '--theme-icon-nav-color': '#adaeb6',
@@ -354,6 +356,7 @@ const YoroiModern = {
   '--theme-icon-back-button-color': '#353535',
   '--theme-icon-close-button-color': '#353535',
   '--theme-icon-transactions-ada-symbol-color': '#353535',
+  '--theme-icon-transactions-ada-symbol-pending-color': '#D9DAE0',
   '--theme-icon-transaction-type-color': '#fafbfc',
 
   '--theme-wallet-add-title-color': '#ffffff',

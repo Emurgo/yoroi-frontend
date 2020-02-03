@@ -12,7 +12,7 @@ import globalMessages from '../../../../i18n/global-messages';
 import WarningBox from '../../../widgets/WarningBox';
 import InformativeError from '../../../widgets/InformativeError';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
-import BarDecoration from '../../../widgets/BarDecoration';
+import CenteredBarDecoration from '../../../widgets/CenteredBarDecoration';
 import PageSelect from '../../../widgets/PageSelect';
 import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
 import LocalizableError from '../../../../i18n/LocalizableError';
@@ -131,13 +131,13 @@ export default class StakingDashboard extends Component<Props> {
             </div>
           </div>
           <div className={styles.pageSelect}>
-            <BarDecoration>
+            <CenteredBarDecoration>
               <PageSelect
                 currentPage={this.props.pageInfo?.currentPage ?? 0}
                 numPages={this.props.pageInfo?.numPages ?? 0}
                 goToPage={this.props.pageInfo?.goToPage ?? (() => {})}
               />
-            </BarDecoration>
+            </CenteredBarDecoration>
           </div>
           <div className={styles.bodyWrapper}>
             {graphs}

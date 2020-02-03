@@ -2,6 +2,14 @@
 import BigNumber from 'bignumber.js';
 import { DECIMAL_PLACES_IN_ADA } from '../config/numbersConfig';
 
+export function splitAmount(
+  amount: BigNumber,
+): [string, string] {
+  const valString = formattedWalletAmount(amount);
+  const startIndex = valString.length - DECIMAL_PLACES_IN_ADA;
+  return [valString.substring(0, startIndex), valString.substring(startIndex)];
+}
+
 export const formattedWalletAmount = (amount: BigNumber): string => (
   amount.toFormat(DECIMAL_PLACES_IN_ADA)
 );

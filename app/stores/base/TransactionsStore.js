@@ -162,7 +162,7 @@ export default class TransactionsStore extends Store {
 
     await allRequest.promise
       .then(async () => {
-        // calculate pending tranactions just to cache the result
+        // calculate pending transactions just to cache the result
         const pendingRequest = this._getTransactionsPendingRequest(basePubDeriver.self);
         pendingRequest.invalidate({ immediately: false });
         pendingRequest.execute(

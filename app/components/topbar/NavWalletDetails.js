@@ -4,8 +4,7 @@ import BigNumber from 'bignumber.js';
 import type { Node } from 'react';
 import classnames from 'classnames';
 import { intlShape, } from 'react-intl';
-import { DECIMAL_PLACES_IN_ADA } from '../../config/numbersConfig';
-import { formattedWalletAmount } from '../../utils/formatters';
+import { splitAmount } from '../../utils/formatters';
 
 import globalMessages from '../../i18n/global-messages';
 import styles from './NavWalletDetails.scss';
@@ -24,16 +23,6 @@ type Props = {|
     +rewards: null | void | BigNumber,
     +walletAmount: null | BigNumber,
 |};
-
-type SplitDecimalProps = [string, string];
-
-function splitAmount(
-  value: string,
-  index: number,
-): SplitDecimalProps {
-  const startIndex = value.length - index;
-  return [value.substring(0, startIndex), value.substring(startIndex)];
-}
 
 export default class NavWalletDetails extends Component<Props> {
 
@@ -121,10 +110,7 @@ export default class NavWalletDetails extends Component<Props> {
     if (request.shouldHideBalance) {
       balanceDisplay = (<span>******</span>);
     } else {
-      const [beforeDecimalRewards, afterDecimalRewards]: SplitDecimalProps = splitAmount(
-        formattedWalletAmount(request.amount),
-        DECIMAL_PLACES_IN_ADA
-      );
+      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(request.amount);
 
       balanceDisplay = (
         <>

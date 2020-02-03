@@ -7,7 +7,7 @@ import type {
   $npm$ReactIntl$IntlFormat,
 } from 'react-intl';
 import moment from 'moment';
-import classNames from 'classnames';
+import classnames from 'classnames';
 import { uniq } from 'lodash';
 import styles from './Transaction.scss';
 import AdaSymbol from '../../../assets/images/ada-symbol.inline.svg';
@@ -18,8 +18,7 @@ import { transactionTypes } from '../../../api/ada/transactions/types';
 import type { AssuranceLevel } from '../../../types/transactionAssuranceTypes';
 import environment from '../../../environment';
 import { Logger } from '../../../utils/logging';
-import ExpandArrow from '../../../assets/images/expand-arrow.inline.svg';
-import RawHash from '../../widgets/hashWrappers/RawHash';
+import ExpandArrow from '../../../assets/images/expand-arrow-grey.inline.svg';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../../domain/Explorer';
 import { TxStatusCodes, } from '../../../api/ada/lib/storage/database/primitives/enums';
@@ -27,6 +26,7 @@ import type { TxStatusCodesType, } from '../../../api/ada/lib/storage/database/p
 import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
 import type { CertificateRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
+import { splitAmount } from '../../../utils/formatters';
 
 const messages = defineMessages({
   type: {
@@ -68,10 +68,6 @@ const messages = defineMessages({
   fromAddress: {
     id: 'wallet.transaction.address.from',
     defaultMessage: '!!!From address',
-  },
-  fee: {
-    id: 'wallet.transaction.fee',
-    defaultMessage: '!!!Fee',
   },
   fromAddresses: {
     id: 'wallet.transaction.addresses.from',
@@ -171,7 +167,7 @@ export default class Transaction extends Component<Props, State> {
     this.setState(prevState => ({ isExpanded: !prevState.isExpanded }));
   }
 
-  getTransactionHeaderMsg(
+  getTxTypeMsg(
     intl: $npm$ReactIntl$IntlFormat,
     currency: string,
     type: TransactionDirectionType
@@ -198,15 +194,6 @@ export default class Transaction extends Component<Props, State> {
     return '???';
   }
 
-  getAmountStyle(amt: BigNumber) {
-    return classNames([
-      styles.amount,
-      amt.lt(0)
-        ? styles.amountSent
-        : styles.amountReceived
-    ]);
-  }
-
   getStatusString(
     intl: $npm$ReactIntl$IntlFormat,
     state: number,
@@ -221,40 +208,84 @@ export default class Transaction extends Component<Props, State> {
     if (state < 0) {
       return intl.formatMessage(stateTranslations.failed);
     }
-    throw new Error('getStatusString unexpected state ' + state);
+    throw new Error(`${nameof(this.getStatusString)} unexpected state ` + state);
+  }
+
+  renderAmountDisplay: {|
+    shouldHideBalance: boolean,
+    amount: BigNumber,
+  |} => Node = (request) => {
+    if (request.shouldHideBalance) {
+      return (<span>******</span>);
+    }
+    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(request.amount);
+
+    // we may need to explicitly add + for positive values
+    const adjustedBefore = beforeDecimalRewards.startsWith('-')
+      ? beforeDecimalRewards
+      : '+' + beforeDecimalRewards;
+
+    return (
+      <>
+        {adjustedBefore}
+        <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
+      </>
+    );
+  }
+
+  renderFeeDisplay: {|
+    shouldHideBalance: boolean,
+    amount: BigNumber,
+    type: TransactionDirectionType,
+  |} => Node = (request) => {
+    if (request.shouldHideBalance) {
+      return (<span>******</span>);
+    }
+    if (request.type === transactionTypes.INCOME) {
+      return (<span>-</span>);
+    }
+    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(request.amount.abs());
+
+    return (
+      <>
+        {beforeDecimalRewards}
+        <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
+      </>
+    );
   }
 
   render() {
     const data = this.props.data;
-    const { isLastInList, state, assuranceLevel, formattedWalletAmount } = this.props;
+    const { isLastInList, state, assuranceLevel } = this.props;
     const { isExpanded } = this.state;
     const { intl } = this.context;
     const isFailedTransaction = state < 0;
     const isPendingTransaction = state === TxStatusCodes.PENDING;
 
-    const componentStyles = classNames([
+    const componentStyles = classnames([
       styles.component,
       isFailedTransaction ? styles.failed : null,
       isPendingTransaction ? styles.pending : null,
     ]);
 
-    const contentStyles = classNames([
+    const contentStyles = classnames([
       styles.content,
-      isLastInList ? styles.last : null
+      isLastInList ? styles.last : styles.notLast,
+      isExpanded ? styles.shadow : null,
     ]);
 
-    const detailsStyles = classNames([
+    const detailsStyles = classnames([
       styles.details,
       isExpanded ? styles.expanded : styles.closed
     ]);
 
-    const labelOkClasses = classNames([
-      styles.label,
+    const labelOkClasses = classnames([
+      styles.status,
       styles[assuranceLevel]
     ]);
 
-    const labelClasses = classNames([
-      styles.label,
+    const labelClasses = classnames([
+      styles.status,
       isFailedTransaction ? styles.failedLabel : '',
       isPendingTransaction ? styles.pendingLabel : '',
     ]);
@@ -272,11 +303,11 @@ export default class Transaction extends Component<Props, State> {
         <div className={styles.toggler} onClick={this.toggleDetails.bind(this)} role="presentation" aria-hidden>
           <div className={styles.togglerContent}>
             <div className={styles.header}>
-              <div className={styles.title}>
-                { this.getTransactionHeaderMsg(intl, currency, data.type) }
-              </div>
               <div className={styles.time}>
                 {moment(data.date).format('hh:mm:ss A')}
+              </div>
+              <div className={styles.type}>
+                { this.getTxTypeMsg(intl, currency, data.type) }
               </div>
               {state === TxStatusCodes.IN_BLOCK ? (
                 <div className={labelOkClasses}>{status}</div>
@@ -285,18 +316,23 @@ export default class Transaction extends Component<Props, State> {
                   {status}
                 </div>
               )}
-
-              <div className={this.getAmountStyle(data.amount)}>
-                {
-                  // hide currency (we are showing symbol instead)
-                  formattedWalletAmount(data.amount)
-                }
+              <div className={classnames([styles.currency, styles.fee])}>
+                {this.renderFeeDisplay({
+                  amount: data.fee,
+                  shouldHideBalance: false,
+                  type: data.type,
+                })}
+              </div>
+              <div className={classnames([styles.currency, styles.amount])}>
+                {this.renderAmountDisplay({
+                  amount: data.amount,
+                  shouldHideBalance: false,
+                })}
                 <span className={styles.currencySymbol}><AdaSymbol /></span>
               </div>
-
-              <div className={styles.expandArrowBox}>
-                <span className={arrowClasses}><ExpandArrow /></span>
-              </div>
+            </div>
+            <div className={styles.expandArrowBox}>
+              <span className={arrowClasses}><ExpandArrow /></span>
             </div>
           </div>
         </div>
@@ -316,16 +352,6 @@ export default class Transaction extends Component<Props, State> {
               </div>
             )}
             <div>
-              {data.type !== transactionTypes.INCOME && (
-                <div>
-                  <h2>
-                    {intl.formatMessage(messages.fee)}
-                  </h2>
-                  <span className={styles.rowData}>
-                    {formattedWalletAmount(data.fee.abs())}
-                  </span>
-                </div>
-              )}
               <h2>
                 {intl.formatMessage(messages.fromAddresses)}
               </h2>
@@ -337,9 +363,9 @@ export default class Transaction extends Component<Props, State> {
                   light
                   linkType="address"
                 >
-                  <RawHash light>
+                  <span className={classnames([styles.rowData, styles.hash])}>
                     {addressToDisplayString(address)}<br />
-                  </RawHash>
+                  </span>
                 </ExplorableHashContainer>
               ))}
               <h2>
@@ -354,24 +380,22 @@ export default class Transaction extends Component<Props, State> {
                   light
                   linkType="address"
                 >
-                  <RawHash light>
+                  <span className={classnames([styles.rowData, styles.hash])}>
                     {addressToDisplayString(address)}<br />
-                  </RawHash>
+                  </span>
                 </ExplorableHashContainer>
               ))}
               {this.getCerificate(data)}
 
-              {environment.isAdaApi() ? (
+              {(environment.isAdaApi() && state === TxStatusCodes.IN_BLOCK) && (
                 <div className={styles.row}>
                   <h2>{intl.formatMessage(messages.assuranceLevel)}</h2>
-                  {state === TxStatusCodes.IN_BLOCK ? (
-                    <span className={styles.rowData}>
-                      <span className={styles.assuranceLevel}>{status}</span>
-                      . {data.numberOfConfirmations} {intl.formatMessage(messages.confirmations)}.
-                    </span>
-                  ) : null}
+                  <span className={styles.rowData}>
+                    <span className={styles.assuranceLevel}>{status}</span>
+                    . {data.numberOfConfirmations} {intl.formatMessage(messages.confirmations)}.
+                  </span>
                 </div>
-              ) : null}
+              )}
 
               <h2>{intl.formatMessage(globalMessages.transactionId)}</h2>
               <ExplorableHashContainer
@@ -380,9 +404,9 @@ export default class Transaction extends Component<Props, State> {
                 light
                 linkType="transaction"
               >
-                <RawHash light>
+                <span className={classnames([styles.rowData, styles.hash])}>
                   {data.id}
-                </RawHash>
+                </span>
               </ExplorableHashContainer>
             </div>
           </div>

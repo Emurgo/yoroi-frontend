@@ -208,7 +208,7 @@ export default class WalletSendForm extends Component<Props> {
         }],
       },
       amount: {
-        label: this.context.intl.formatMessage(globalMessages.walletSendConfirmationAmountLabel),
+        label: this.context.intl.formatMessage(globalMessages.amountLabel),
         placeholder: this.props.classicTheme ?
           `0.${'0'.repeat(this.props.currencyMaxFractionalDigits)}` : '',
         value: this.props.uriParams
@@ -308,7 +308,7 @@ export default class WalletSendForm extends Component<Props> {
             <NumericInput
               {...amountFieldProps}
               className="amount"
-              label={intl.formatMessage(globalMessages.walletSendConfirmationAmountLabel)}
+              label={intl.formatMessage(globalMessages.amountLabel)}
               maxBeforeDot={currencyMaxIntegerDigits}
               maxAfterDot={currencyMaxFractionalDigits}
               disabled={this.props.shouldSendAll}

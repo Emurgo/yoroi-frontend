@@ -14,6 +14,7 @@ import LoadingSpinner from '../../widgets/LoadingSpinner';
 import type { AssuranceMode } from '../../../types/transactionAssuranceTypes';
 import { Logger } from '../../../utils/logging';
 import type { ExplorerType } from '../../../domain/Explorer';
+import OneSideBarDecoration from '../../widgets/OneSideBarDecoration';
 import globalMessages from '../../../i18n/global-messages';
 
 const messages = defineMessages({
@@ -127,7 +128,11 @@ export default class WalletTransactionsList extends Component<Props> {
       <div className={styles.component}>
         {transactionsGroups.map(group => (
           <div className={styles.group} key={walletId + '-' + this.getTransactionKey(group.transactions)}>
-            <div className={styles.groupDate}>{this.localizedDate(group.date)}</div>
+            <div className={styles.bar}>
+              <OneSideBarDecoration>
+                <div className={styles.groupDate}>{this.localizedDate(group.date)}</div>
+              </OneSideBarDecoration>
+            </div>
             <div className={styles.list}>
               {group.transactions.map((transaction, transactionIndex) => (
                 <Transaction

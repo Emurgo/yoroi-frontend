@@ -1,326 +1,92 @@
-.component {
-  color: var(--theme-transactions-list-item-details-color);
+@import "./categoryData";
 
+.component {
   // ========= TOGGLER =========
   .toggler {
     cursor: pointer;
-    display: flex;
-    padding: 20px;
-    -webkit-user-select: none;
+    padding: 25px 0;
   }
 
   .togglerContent {
-    flex: 1;
-    padding-top: 1px;
+    display: flex;
+    padding-left: 24px;
+    padding-right: 24px;
     white-space: nowrap;
   }
 
-  .header,
-  .details {
-    color: var(--theme-transactions-list-item-details-color);
+  .header {
     display: flex;
     width: 100%;
-  }
-
-  .title {
-    min-width: 325px;
-    padding-right: 30px;
-  }
-
-  .title,
-  .amount {
-    color: var(--theme-transactions-list-item-details-color);
-    font-size: 16px;
-    font-family: var(--font-semibold);
-    height: 22px;
-    line-height: 1.38;
-    text-align: left;
+    justify-content: space-between;
   }
 
   .time {
-    font-family: var(--font-light);
-    font-size: 14px;
-    min-width: 110px;
+    min-width: $time-min-width;
+    text-align: $time-align;
+  
+    font-family: var(--font-regular);
+    color: var(--theme-transactions-list-text-color);
+    font-size: 16px;
+    line-height: 25px;
   }
 
-  .label {
-    color: var(--theme-transactions-priority-color);
-    display: inline-block;
-    font-family: var(--font-bold);
-    font-size: 8px;
-    line-height: 16px;
-    text-transform: uppercase;
-    height: 17px;
-    margin-left: 130px;
-    text-align: center;
-    padding: 0px 9px;
+  .type {
+    min-width: $type-min-width;
+    text-align: $type-align;
 
-    @media (max-width: 1200px) {
-      margin-left: 50px;
+    text-align: left;
+    font-size: 16px;
+    line-height: 22px;
+    font-family: var(--font-regular);
+    color: var(--theme-transactions-list-text-color);
+  }
+
+  .status {
+    width: $status-width;
+    text-align: $status-align;
+
+    display: inline-block;
+    font-family: var(--font-regular);
+    font-size: 12px;
+    line-height: 21px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-align: center;
+    border-radius: 8px;
+    padding-top: 3px;
+    height: 25px;
+    user-select: none;
+  }
+
+  .currency {
+    color: var(--theme-transactions-list-text-color);
+    font-size: 16px;
+    line-height: 22px;
+     
+    .afterDecimal {
+        font-size: 12px;
     }
+  }
+
+  .fee {
+    min-width: $min-fee-width;
+    text-align: $fee-align;
+
+    text-align: right;
+    font-family: var(--font-regular);
+  }
+  .amount {
+    min-width: $min-amount-width;
+    text-align: $amount-align;
+
+    font-family: var(--font-medium);
+    text-align: right;
   }
 
   .pendingLabel {
     background-color: var(--theme-transactions-state-pending-background-color);
-    background-size: 50px 50px;
-    overflow: hidden;
-    background-image: linear-gradient(
-      -45deg,
-      var(--theme-transactions-state-pending-stripes-color) 25%,
-      transparent 25%,
-      transparent 50%,
-      var(--theme-transactions-state-pending-stripes-color) 50%,
-      var(--theme-transactions-state-pending-stripes-color) 75%,
-      transparent 75%,
-      transparent
-    );
-  }
-  
-  .amount {
-    margin-left: auto;
-    font-family: var(--font-medium);
-    font-size: 16px;
-    padding-left: 15px;
-  }
-
-  .amountSent {
-    color: var(--theme-transactions-sent-color);
-  
-    .currencySymbol {
-      & > svg > g > g {
-        stroke: var(--theme-transactions-sent-color);
-      }
-    }
-  }
-  
-  .amountReceived {
-    color: var(--theme-transactions-received-color);
-  
-    .currencySymbol {
-      & > svg > g > g {
-        stroke: var(--theme-transactions-received-color);
-      }
-    }
-  }
-
-  .failedLabel {
-    background-color: var(--theme-transactions-state-failed-background-color);
-  }
-  
-  .low {
-    background-color: var(--theme-transactions-priority-low-background-color);
-  }
-  
-  .medium {
-    background-color: var(--theme-transactions-priority-medium-background-color);
-  }
-  
-  .high {
-    background-color: var(--theme-transactions-priority-heigh-background-color);
-  }
-  
-  .assuranceLevel {
-    text-transform: capitalize;
-  }
-
-
-  &.failed {
-    .title, .amount, .details {
-      color: var(--theme-transactions-state-failed-text-color);
-    }
-    .currencySymbol {
-      & > svg > g > g {
-        stroke: var(--theme-transactions-state-failed-text-color);
-      }
-    }
-  }
- 
-  .expandArrowBox {
-    margin-left: 40px;
-    display: flex;
-    align-items: center;
-  }
-  
-  .expandArrow svg {
-    height: 8px;
-  }
-  
-  .collapseArrow svg {
-    height: 8px;
-    transform: rotate(180deg);
-  }
-  // ========= DETAILS =========
-  .content {
-    margin-left: 20px;
-    margin-right: 20px;
-  }
-
-  .last {
-    border: none;
-  }
-
-  .details {
-    height: auto;
-  
-    * + h2,
-    * + .row {
-      margin-top: 20px;
-    }
-  
-    h2 {
-      font-family: var(--font-medium);
-      font-size: 11px;
-      margin-bottom: 8px;
-    }
-  
-    .rowData {
-      font-size: 14px;
-      font-family: var(--font-regular);
-      word-break: break-all;
-      line-height: 22px;
-    }
-  }
-
-  .closed {
-    max-height: 0;
-    overflow: hidden;
-    padding-bottom: 0;
-  }
-  
-  .expanded {
-    max-height: 100%;
-    padding-bottom: 20px;
-  }
-  
-  .conversion {
-    display: flex;
-  }
-  
-  .conversionRate {
-    margin-left: 76px;
-  }
-
-  .currencySymbol {
-    display: inline-block;
-    margin-left: 4px;
-    & > svg {
-      width: 12px;
-      height: 12px;
-      & > g > g {
-        stroke: var(--theme-icon-transactions-ada-symbol-color);
-      }
-    }
-  }
-}
-
-:global(.YoroiClassic) .component {
-  // ========= TOGGLER =========
-  .time {
-    margin-top: 3px;
-  }
-
-  .label {
-    margin-top: 2px;
-    min-width: 90px;
-  }
-
-  .pendingLabel {
-    animation: pending-label-animation-classic 2s linear infinite;
-    :global {
-      @keyframes pending-label-animation-classic {
-        0% {
-          background-position: 0 0;
-        }
-        100% {
-          background-position: 50px 50px;
-        }
-      }
-    }
-  }
-  
-  .amount {
-    letter-spacing: 1px;
-  }
-  // ========= DETAILS =========
-  .content {
-    border-bottom: 1px solid var(--theme-separation-border-color);
-  }
-  .details {
-    h2 {
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-  }
-
-  .currencySymbol {
-    margin-bottom: -1px;
-  }  
-}
-
-:global(.YoroiClassic) .component:last-of-type {
-  .content {
-    border-bottom: 0;
-  }
-}
-
-:global(.YoroiModern) .component {
-  background-color: var(--theme-transactions-list-background-color);
-  border-radius: 8px;
-  margin-bottom: 10px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-
-  &.failed {
-    background-color: var(--theme-transactions-list-failed-background-color);
-  }
-
-  &.pending {
-    .title, .time, .amount, .details {
-      color: var(--theme-transactions-state-pending-text-color);
-    }
-    .currencySymbol {
-      & > svg > g > g {
-        stroke: var(--theme-transactions-state-pending-text-color);
-      }
-    }
-  }
-  // ========= TOGGLER =========
-  .toggler {
-    padding: 25px 30px;
-  }
-
-  .title,
-  .amount {
-    height: 25px;
-    line-height: 25px;
-    letter-spacing: 0;
-  }
-  
-  .title {
-    font-size: 18px;
-    font-family: var(--font-medium);
-  }
-
-  .time {
-    font-family: var(--font-regular);
-    font-size: 16px;
-    letter-spacing: 0;
-    line-height: 25px;
-  }
-
-  .label {
-    font-family: var(--font-regular);
-    font-size: 15px;
-    line-height: 25px;
-    height: 25px;
-    border-radius: 8px;
-    min-width: 130px;
-  }
-
-  .pendingLabel {
     background-size: 35px 50px;
+    overflow: hidden;
     background-image: linear-gradient(
       55deg,
       transparent  33.4%,
@@ -344,36 +110,143 @@
     }
   }
 
-  .amount {
-    font-family: var(--font-regular);
-    font-size: 25px;
+  .failedLabel {
+    color: var(--theme-transactions-state-failed-text-color);
+    background-color: var(--theme-transactions-state-failed-background-color);
+  }
+  
+  .low {
+    color: var(--theme-transactions-priority-low-text-color);
+    background-color: var(--theme-transactions-priority-low-background-color);
+  }
+  
+  .medium {
+    color: var(--theme-transactions-priority-medium-text-color);
+    background-color: var(--theme-transactions-priority-medium-background-color);
+  }
+  
+  .high {
+    color: var(--theme-transactions-priority-high-text-color);
+    background-color: var(--theme-transactions-priority-high-background-color);
+  }
+  
+  .assuranceLevel {
+    text-transform: capitalize;
+  }
+
+
+  &.pending {
+    .type, .time, .fee, .amount, .details {
+      color: var(--theme-transactions-list-pending-text-color);
+    }
+    .status {
+      color: var(--theme-transactions-state-pending-text-color);
+    }
+    .currencySymbol {
+      & > svg {
+        & > g {
+          stroke: var(--theme-icon-transactions-ada-symbol-pending-color);
+        }
+      }
+    }
+  }
+ 
+  .expandArrowBox {
+    margin-left: 16px;
+    align-items: center;
+  }
+  
+  .expandArrow svg {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .collapseArrow svg {
+    width: 24px;
+    height: 24px;
+    transform: rotate(180deg);
   }
   // ========= DETAILS =========
   .content {
-    margin-left: 30px;
-    margin-right: 30px;
+    background-color: var(--theme-transactions-list-detail-background-color);
+    padding-left: 24px;
+    padding-right: 24px;
+
+    .closed {
+      max-height: 0;
+      overflow: hidden;
+      padding-bottom: 0;
+    }
+    
+    .expanded {
+      max-height: 100%;
+      padding-top: 30px;
+      padding-bottom: 24px;
+    }
+  }
+  .shadow {
+    box-shadow: inset 0 -1px 10px 0 rgba(255,255,255,0.5), inset 0 2px 4px 0 rgba(56,57,61,0.2);
+  }
+
+  .last {
+    .expanded {
+      margin-bottom: 8px;
+    }
+  }
+  .notLast {
+    .closed {
+      border-bottom: 1px solid var(--cmn-default-color-grey-4);
+    }
   }
 
   .details {
+    height: auto;
+  
+    * + h2,
+    * + .row {
+      margin-top: 18px;
+    }
+  
     h2 {
       font-family: var(--font-regular);
-      font-size: 16px;
-      margin-bottom: 2px;
+      font-size: 14px;
+      margin-bottom: 3px;
       line-height: 1.38;
+      color: var(--theme-transactions-list-text-color);
     }
   
     .rowData {
-      color: var(--theme-widgets-hash-light-color);
-      line-height: 1.57;
+      font-size: 14px;
+      font-family: var(--font-regular);
+      color: var(--theme-transactions-list-detail-row-text-color);
+      word-break: break-all;
+      line-height: 22px;
     }
+
+    .hash {
+      font-family: var(--font-mono-regular);
+    }
+  }
+  
+  .conversion {
+    display: flex;
+  }
+  
+  .conversionRate {
+    margin-left: 76px;
   }
 
   .currencySymbol {
     margin-left: 12px;
     vertical-align: middle;
+    display: inline-block;
+    margin-left: 4px;
     & > svg {
       width: 21px;
       height: 21px;
+      & > g {
+        stroke: var(--theme-icon-transactions-ada-symbol-color);
+      }
     }
   }
 }

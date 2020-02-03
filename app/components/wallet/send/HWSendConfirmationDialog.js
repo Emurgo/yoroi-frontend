@@ -106,7 +106,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
       <div className={styles.amountFeesWrapper}>
         <div className={styles.amountWrapper}>
           <div className={styles.amountLabel}>
-            {intl.formatMessage(globalMessages.walletSendConfirmationAmountLabel)}
+            {intl.formatMessage(globalMessages.amountLabel)}
           </div>
           <div className={styles.amount}>{amount}
             <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
