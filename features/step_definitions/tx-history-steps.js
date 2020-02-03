@@ -29,11 +29,11 @@ function verifyAllTxsFields(txType, txAmount, txTime, txStatus, txFee, txFromLis
 
 function mapConditionalFields(txExpectedStatus, conditionalFields) {
   if (txExpectedStatus === 'pending') {
-    const [, txId] = conditionalFields;
+    const [txId] = conditionalFields;
     return [txId, undefined];
   }
   if (txExpectedStatus === 'failed') {
-    const [, , txId] = conditionalFields;
+    const [, txId] = conditionalFields;
     return [txId, undefined];
   }
   const [, txConfirmations, , txId] = conditionalFields;
@@ -123,9 +123,8 @@ Then(
     await topTx.click();
     const txData = await topTx.getText();
     const txDataFields = txData.split('\n');
-    const [txType, txTime, txStatus, txAmount] = txDataFields;
+    const [txTime, txType, txStatus, txFee, txAmount] = txDataFields;
 
-    let txFee;
     let txFrom;
     let txTo;
     let conditionalFields;
@@ -136,7 +135,7 @@ Then(
         = txDataFields;
 
     } else {
-      [, , , , , txFee, , txFrom, , txTo, , ...conditionalFields]
+      [, , , , , , txFrom, , txTo, , ...conditionalFields]
         = txDataFields;
     }
 
