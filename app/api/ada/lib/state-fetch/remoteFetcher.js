@@ -261,7 +261,8 @@ export class RemoteFetcher implements IFetcher {
       const mapped = {};
       for (const key of Object.keys(response.data)) {
         // Jormungandr returns '' when the address is valid but it hasn't appeared in the blockchain
-        if (response.data[key] === '') {
+        // edit: Jormungandr can now also return a description error whe not in the blockchain
+        if (response.data[key] === '' || response.data[key] === 'Account does not exist') {
           mapped[key] = {
             delegation: { pools: [], },
             value: 0,
