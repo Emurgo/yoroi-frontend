@@ -6,7 +6,7 @@ import LocalizedRequest from '../lib/LocalizedRequest';
 import environment from '../../environment';
 import type {
   CreateDelegationTxFunc,
-  SignAndBroadcastDelegationTxFunc,
+  SignAndBroadcastDelegationTxRequest, SignAndBroadcastDelegationTxResponse,
 } from '../../api/ada';
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
@@ -24,10 +24,11 @@ export default class DelegationTransactionStore extends Store {
   @observable createDelegationTx: LocalizedRequest<CreateDelegationTxFunc>
     = new LocalizedRequest<CreateDelegationTxFunc>(this.api.ada.createDelegationTx);
 
-  @observable signAndBroadcastDelegationTx: LocalizedRequest<SignAndBroadcastDelegationTxFunc>
-    = new LocalizedRequest<SignAndBroadcastDelegationTxFunc>(
-      this.api.ada.signAndBroadcastDelegationTx
-    );
+  @observable signAndBroadcastDelegationTx: LocalizedRequest<
+    typeof DelegationTransactionStore.prototype.sendAndRefresh
+  > = new LocalizedRequest<typeof DelegationTransactionStore.prototype.sendAndRefresh>(
+    this.sendAndRefresh
+  );
 
   /** tracks if wallet balance changed during confirmation screen */
   @observable isStale: boolean = false;
@@ -123,15 +124,20 @@ export default class DelegationTransactionStore extends Store {
       throw new Error(`${nameof(this._signTransaction)} no tx to broadcast`);
     }
     await this.signAndBroadcastDelegationTx.execute({
-      publicDeriver: basePubDeriver,
-      signRequest: {
-        certificate: result.unsignedTx.certificate,
-        changeAddr: result.unsignedTx.changeAddr,
-        senderUtxos: result.unsignedTx.senderUtxos,
-        unsignedTx: result.unsignedTx.IOs,
+      broadcastRequest: {
+        publicDeriver: basePubDeriver,
+        signRequest: {
+          certificate: result.unsignedTx.certificate,
+          changeAddr: result.unsignedTx.changeAddr,
+          senderUtxos: result.unsignedTx.senderUtxos,
+          unsignedTx: result.unsignedTx.IOs,
+        },
+        password: request.password,
+        sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
       },
-      password: request.password,
-      sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
+      refreshWallet: () => this.stores.substores[environment.API].wallets.refreshWallet(
+        publicDeriver
+      ),
     }).promise;
   }
 
@@ -142,8 +148,6 @@ export default class DelegationTransactionStore extends Store {
     }
     this.actions.dialogs.closeActiveDialog.trigger();
     this.goToDashboardRoute(publicDeriver.self);
-    const { wallets } = this.stores.substores[environment.API];
-    await wallets.refreshWallet(publicDeriver);
   }
 
   goToDashboardRoute(publicDeriver: PublicDeriver<>): void {
@@ -152,6 +156,20 @@ export default class DelegationTransactionStore extends Store {
       page: 'delegation-dashboard'
     });
     this.actions.router.goToRoute.trigger({ route });
+  }
+
+  sendAndRefresh: {|
+    broadcastRequest: SignAndBroadcastDelegationTxRequest,
+    refreshWallet: () => Promise<void>,
+  |} => Promise<SignAndBroadcastDelegationTxResponse> = async (request) => {
+    const result = await this.api.ada.signAndBroadcastDelegationTx(request.broadcastRequest);
+    try {
+      await request.refreshWallet();
+    } catch (_e) {
+      // even if refreshing the wallet fails, we don't want to fail the tx
+      // otherwise user may try and re-send the tx
+    }
+    return result;
   }
 
   @action.bound

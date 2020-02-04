@@ -10,7 +10,8 @@ import { matchRoute, buildRoute } from '../../utils/routing';
 import Request from '../lib/LocalizedRequest';
 import { ROUTES } from '../../routes-config';
 import type {
-  SignAndBroadcastFunc, CreateWalletFunc,
+  SignAndBroadcastRequest, SignAndBroadcastResponse,
+  CreateWalletFunc,
   GetWalletsFunc, RestoreWalletFunc,
   GenerateWalletRecoveryPhraseFunc
 } from '../../api/ada/index';
@@ -29,8 +30,8 @@ export default class AdaWalletsStore extends WalletStore {
   @observable createWalletRequest: Request<CreateWalletFunc>
     = new Request<CreateWalletFunc>(this.api.ada.createWallet.bind(this.api.ada));
 
-  @observable sendMoneyRequest: Request<SignAndBroadcastFunc>
-    = new Request<SignAndBroadcastFunc>(this.api.ada.signAndBroadcast);
+  @observable sendMoneyRequest: Request<typeof AdaWalletsStore.prototype.sendAndRefresh>
+    = new Request<typeof AdaWalletsStore.prototype.sendAndRefresh>(this.sendAndRefresh);
 
   @observable generateWalletRecoveryPhraseRequest: Request<GenerateWalletRecoveryPhraseFunc>
     = new Request<GenerateWalletRecoveryPhraseFunc>(this.api.ada.generateWalletRecoveryPhrase);
@@ -66,12 +67,14 @@ export default class AdaWalletsStore extends WalletStore {
       throw new Error(`${nameof(this._sendMoney)} public deriver missing signing functionality.`);
     }
     await this.sendMoneyRequest.execute({
-      publicDeriver: withSigning,
-      ...transactionDetails,
-      sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
+      broadcastRequest: {
+        publicDeriver: withSigning,
+        ...transactionDetails,
+        sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
+      },
+      refreshWallet: () => this.refreshWallet(publicDeriver),
     }).promise;
 
-    await this.refreshWallet(publicDeriver);
     this.actions.dialogs.closeActiveDialog.trigger();
     this.sendMoneyRequest.reset();
     // go to transaction screen
@@ -142,5 +145,19 @@ export default class AdaWalletsStore extends WalletStore {
       duration: config.wallets.WALLET_RESTORED_NOTIFICATION_DURATION,
     };
     this.actions.notifications.open.trigger(notification);
+  }
+
+  sendAndRefresh: {|
+    broadcastRequest: SignAndBroadcastRequest,
+    refreshWallet: () => Promise<void>,
+  |} => Promise<SignAndBroadcastResponse> = async (request) => {
+    const result = await this.api.ada.signAndBroadcast(request.broadcastRequest);
+    try {
+      await request.refreshWallet();
+    } catch (_e) {
+      // even if refreshing the wallet fails, we don't want to fail the tx
+      // otherwise user may try and re-send the tx
+    }
+    return result;
   }
 }
