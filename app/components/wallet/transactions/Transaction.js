@@ -146,7 +146,7 @@ type Props = {|
   +selectedExplorer: ExplorerType,
   +assuranceLevel: AssuranceLevel,
   +isLastInList: boolean,
-  +formattedWalletAmount: BigNumber => string,
+  +shouldHideBalance: boolean,
 |};
 
 type State = {|
@@ -212,10 +212,9 @@ export default class Transaction extends Component<Props, State> {
   }
 
   renderAmountDisplay: {|
-    shouldHideBalance: boolean,
     amount: BigNumber,
   |} => Node = (request) => {
-    if (request.shouldHideBalance) {
+    if (this.props.shouldHideBalance) {
       return (<span>******</span>);
     }
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(request.amount);
@@ -234,11 +233,10 @@ export default class Transaction extends Component<Props, State> {
   }
 
   renderFeeDisplay: {|
-    shouldHideBalance: boolean,
     amount: BigNumber,
     type: TransactionDirectionType,
   |} => Node = (request) => {
-    if (request.shouldHideBalance) {
+    if (this.props.shouldHideBalance) {
       return (<span>******</span>);
     }
     if (request.type === transactionTypes.INCOME) {
@@ -319,14 +317,12 @@ export default class Transaction extends Component<Props, State> {
               <div className={classnames([styles.currency, styles.fee])}>
                 {this.renderFeeDisplay({
                   amount: data.fee,
-                  shouldHideBalance: false,
                   type: data.type,
                 })}
               </div>
               <div className={classnames([styles.currency, styles.amount])}>
                 {this.renderAmountDisplay({
                   amount: data.amount,
-                  shouldHideBalance: false,
                 })}
                 <span className={styles.currencySymbol}><AdaSymbol /></span>
               </div>

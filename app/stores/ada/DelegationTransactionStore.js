@@ -141,9 +141,9 @@ export default class DelegationTransactionStore extends Store {
       throw new Error(`${nameof(this._complete)} no public deriver selected`);
     }
     this.actions.dialogs.closeActiveDialog.trigger();
+    this.goToDashboardRoute(publicDeriver.self);
     const { wallets } = this.stores.substores[environment.API];
     await wallets.refreshWallet(publicDeriver);
-    this.goToDashboardRoute(publicDeriver.self);
   }
 
   goToDashboardRoute(publicDeriver: PublicDeriver<>): void {
