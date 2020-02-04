@@ -624,8 +624,9 @@ export default class StakingDashboardPage extends Component<Props, State> {
     // so we need to insert these manually
     const result: Array<GraphItems> = [];
     let adaSum = new BigNumber(0);
-    // note: don't include the current epoch since we don't know what reward will be
-    for (let i = 0; i < request.currentEpoch; i++) {
+    // note: reward history includes the current epoch
+    // since it tells you the reward you got at slot 0 of the new epoch
+    for (let i = 0; i <= request.currentEpoch; i++) {
       if (historyIterator < history.length && i === history[historyIterator][0]) {
         // exists a reward for this epoch
         const nextReward = history[historyIterator][1];
