@@ -357,7 +357,7 @@
   "wallet.dashboard.lessthan.reason4": "委任しているステークプールで、プールの合計報酬額よりも多額の定額料金が課金されました",
   "wallet.dashboard.lessthan.reason5": "委任されたステークプールは、飽和状態になりました。",
   "wallet.dashboard.lessthan.title": "報酬の説明が見つからない",
-  "wallet.dashboard.poolWarnings.censoringTxs": "Purposely excludes transactions from blocks (censoring the network)",
+  "wallet.dashboard.poolWarnings.censoringTxs": "意図的にブロックからトランザクションを除外する（ネットワークの検閲）",
   "wallet.dashboard.poolWarnings.explanation": "Unlike Proof of Work (PoW) where users cannot do anything about adversarial behavior, Proof of Stake (PoS) blockchains like Cardano empower users to punish bad actors",
   "wallet.dashboard.poolWarnings.header": "Based on network activity, it seems this pool:",
   "wallet.dashboard.poolWarnings.multiBlock": "Creates multiple blocks in the same slot (purposely causing forks)",
