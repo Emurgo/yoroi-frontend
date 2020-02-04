@@ -58,14 +58,15 @@ export default class NavDropdown extends Component<Props, State> {
         {isExpanded !== null && isExpanded && (
           <div className={styles.content}>
             {contentComponents}
-            <div className={styles.buttonWrapper}>
+            {/* Re-enable once multi-wallet is fully supported */}
+            {/* <div className={styles.buttonWrapper}>
               <button
                 type="button"
                 className={styles.button}
               >
                 Add new wallet
               </button>
-            </div>
+            </div> */}
           </div>
         )}
       </div>
