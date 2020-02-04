@@ -515,7 +515,7 @@
   "wallet.staking.warning.pendingTx": "Du kannst Deine Delegationspräferenz nicht ändern, während eine Transaktion ausstehend ist",
   "wallet.staking.warning.title": "Delegierung vorübergehend deaktiviert",
   "wallet.summary.no.transaction": "Keine Transaktionen gefunden",
-  "wallet.summary.page.dateTime": "Date/time",
+  "wallet.summary.page.dateTime": "Datum/Uhrzeit",
   "wallet.summary.page.ledgerNanoSWalletIntegratedNotificationMessage": "Die Integration mit dem Ledger Nano S war erfolgreich",
   "wallet.summary.page.pendingIncomingConfirmationLabel": "Eingehende anstehende Bestätigung",
   "wallet.summary.page.pendingOutgoingConfirmationLabel": "Ausgehende anstehende Bestätigung",
