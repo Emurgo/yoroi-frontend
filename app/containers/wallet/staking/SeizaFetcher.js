@@ -189,7 +189,7 @@ export default class SeizaFetcher extends Component<Props> {
         <iframe
           ref={this.setFrame}
           title="Staking"
-          src={`${stakingUrl}&locale=${profile.currentLocale}`}
+          src={`${stakingUrl}`}
           frameBorder="0"
           width="100%"
           height={this.iframe != null && this.frameHeight != null ? this.frameHeight + 'px' : null}

@@ -11,8 +11,8 @@ import NavPlate from '../components/topbar/NavPlate';
 import NavWalletDetails from '../components/topbar/NavWalletDetails';
 import NavDropdown from '../components/topbar/NavDropdown';
 import NavDropdownRow from '../components/topbar/NavDropdownRow';
-import NavBarBack from '../components/topbar/NavBarBack';
-import { ROUTES } from '../routes-config';
+// import NavBarBack from '../components/topbar/NavBarBack';
+// import { ROUTES } from '../routes-config';
 import { LOVELACES_PER_ADA } from '../config/numbersConfig';
 import PublicDeriverWithCachedMeta from '../domain/PublicDeriverWithCachedMeta';
 import { isLedgerNanoWallet, isTrezorTWallet } from '../api/ada/lib/storage/models/ConceptualWallet/index';
@@ -56,13 +56,13 @@ export default class NavBarContainer extends Component<Props> {
     if (publicDeriver == null) return null;
 
     // TODO: Replace route with ROUTES.WALLETS.ROOT after merging MyWallets screen
-    const title = (
-      <NavBarBack
-        route={ROUTES.SETTINGS.ROOT}
-        onBackClick={this.navigateToWallets}
-        title={intl.formatMessage(messages.backButton)}
-      />
-    );
+    const title = (<></>);
+    //   <NavBarBack
+    //     route={ROUTES.SETTINGS.ROOT}
+    //     onBackClick={this.navigateToWallets}
+    //     title={intl.formatMessage(messages.backButton)}
+    //   />
+    // );
 
     const wallets = this.props.stores.substores.ada.wallets.publicDerivers;
 

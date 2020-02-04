@@ -74,6 +74,7 @@ export default class StakingPage extends Component<Props> {
       finalURL += `&userAda=${formattedAmountWithoutLovelace(publicDeriver.amount)}`;
     }
 
+    finalURL += `&locale=${this.props.stores.profile.currentLocale}`;
     const delegationStore = this.props.stores.substores.ada.delegation;
     const delegationRequests = delegationStore.getRequests(publicDeriver.self);
     if (delegationRequests == null) {
