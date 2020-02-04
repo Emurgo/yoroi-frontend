@@ -362,7 +362,7 @@
   "wallet.dashboard.poolWarnings.header": "ネットワークでの動作に基づき、プールは以下であると見なされます。",
   "wallet.dashboard.poolWarnings.multiBlock": "同一スロットに複数のブロックを作成する（意図的にフォークを生じる）",
   "wallet.dashboard.poolWarnings.suggested": "ステークプールのWebページ経由でプールの所有者に連絡を取り、彼らの行為について質問されることを推奨します。委任の変更はいつでも実施することが可能であり、報酬について妨害を受けることもありません。",
-  "wallet.dashboard.poolWarnings.unknown": "Causes some unknown issue (look online for more info)",
+  "wallet.dashboard.poolWarnings.unknown": "詳細不明の問題の原因となっています（詳細はオンラインでご確認ください）",
   "wallet.dashboard.rewards.note": "最初の報酬だけがより遅くなります。",
   "wallet.dashboard.stakePool.age": "歳月",
   "wallet.dashboard.stakePool.circleText": "収入",
