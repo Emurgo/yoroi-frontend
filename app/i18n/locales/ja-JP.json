@@ -515,7 +515,7 @@
   "wallet.staking.warning.pendingTx": "保留中のトランザクションがある時に委任の設定を変更できません",
   "wallet.staking.warning.title": "委任が一時的に無効になっています",
   "wallet.summary.no.transaction": "トランザクションが見つかりません",
-  "wallet.summary.page.dateTime": "Date/time",
+  "wallet.summary.page.dateTime": "日付/時間",
   "wallet.summary.page.ledgerNanoSWalletIntegratedNotificationMessage": "Ledger Nano Sデバイスとの統合が成功しました",
   "wallet.summary.page.pendingIncomingConfirmationLabel": "着信保留確認",
   "wallet.summary.page.pendingOutgoingConfirmationLabel": "送信保留確認",
