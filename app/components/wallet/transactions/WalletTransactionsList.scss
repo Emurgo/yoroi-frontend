@@ -1,23 +1,23 @@
 .component {
-  padding: 20px 20px 0;
+  margin-top: 22px;
+  overflow-y: overlay;
 
   .group {
-    margin-top: 20px;
-  
-    &:first-child {
-      margin-top: 0;
-    }
-  
     &:last-child {
-      margin-bottom: 20px;
+      margin-bottom: 17px;
     }
   }
 
-  .groupDate {
-    font-family: var(--font-regular);
-    font-size: 12px;
-    color: var(--theme-transactions-list-group-date-color);
-    margin-bottom: 10px;
+  .bar {
+    padding-right: 24px;
+
+    .groupDate {
+      padding-left: 24px;
+      font-family: var(--font-regular);
+      font-size: 14px;
+      line-height: 1.38;
+      color: var(--theme-navbar-color);
+    }
   }
 
   .list {
@@ -36,35 +36,4 @@
 
 .loading {
   margin: 20px 0;
-}
-
-:global(.YoroiClassic) .component {
-  .groupDate {
-    font-weight: 600;
-    text-align: center;
-    text-transform: uppercase;
-  }
-
-  .list {
-    background-color: var(--theme-transactions-list-background-color);
-    background-blend-mode: lighten;
-    border: solid 1px var(--theme-transactions-list-border-color);
-  }  
-}
-
-:global(.YoroiModern) .component {
-  padding: 0px 30px 0 30px;
-
-  .group {
-    margin-top: 50px;
-  
-    &:last-child {
-      margin-bottom: 50px;
-    }
-  }
-
-  .groupDate {
-    font-size: 16px;
-    line-height: 1.38;
-  }  
 }

@@ -101,7 +101,7 @@ export default class URIVerifyDialog extends Component<Props> {
         </div>
         <div>
           <h2 className={styles.label}>
-            {intl.formatMessage(globalMessages.walletSendConfirmationAmountLabel)}:
+            {intl.formatMessage(globalMessages.amountLabel)}:
           </h2>
           <span className={styles.amount}>
             {formattedWalletAmount(this.props.uriParams.amount)} {currency}

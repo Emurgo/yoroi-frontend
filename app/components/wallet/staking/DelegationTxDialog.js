@@ -202,7 +202,7 @@ export default class DelegationTxDialog extends Component<Props> {
         <div className={styles.amountInput}>
           <NumericInput
             className="amount"
-            label={intl.formatMessage(globalMessages.walletSendConfirmationAmountLabel)}
+            label={intl.formatMessage(globalMessages.amountLabel)}
             maxBeforeDot={MAX_INTEGER_PLACES_IN_ADA}
             maxAfterDot={DECIMAL_PLACES_IN_ADA}
             disabled

@@ -164,7 +164,7 @@ const globalMessages = defineMessages({
     id: 'wallet.send.confirmationDialog.addressToLabel',
     defaultMessage: '!!!To',
   },
-  walletSendConfirmationAmountLabel: {
+  amountLabel: {
     id: 'wallet.send.confirmationDialog.amountLabel',
     defaultMessage: '!!!Amount',
   },
@@ -255,6 +255,10 @@ const globalMessages = defineMessages({
   step1: {
     id: 'transfer.form.instructions.step1.text',
     defaultMessage: '!!!It will take about 1 minute to restore your balance. In the next step, you will be presented with a transaction that will move all of your funds. Please review the details of the transaction carefully. You will need to pay a standard transaction fee on the Cardano network to make the transaction.',
+  },
+  feeLabel: {
+    id: 'wallet.transaction.fee',
+    defaultMessage: '!!!Fee',
   },
   languageSelectLabel: {
     id: 'profile.languageSelect.form.languageSelectLabel',
