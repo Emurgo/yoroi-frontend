@@ -1,6 +1,5 @@
 // @flow
 import React, { Component } from 'react';
-import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
@@ -33,8 +32,8 @@ type Props = {|
   +selectedExplorer: ExplorerType,
   +assuranceMode: AssuranceMode,
   +walletId: string,
-  +formattedWalletAmount: BigNumber => string,
   +onLoadMore: void => PossiblyAsync<void>,
+  +shouldHideBalance: boolean,
 |};
 
 @observer
@@ -107,7 +106,6 @@ export default class WalletTransactionsList extends Component<Props> {
       hasMoreToLoad,
       assuranceMode,
       walletId,
-      formattedWalletAmount,
       onLoadMore,
     } = this.props;
 
@@ -142,7 +140,7 @@ export default class WalletTransactionsList extends Component<Props> {
                   isLastInList={transactionIndex === group.transactions.length - 1}
                   state={transaction.state}
                   assuranceLevel={transaction.getAssuranceLevelForMode(assuranceMode)}
-                  formattedWalletAmount={formattedWalletAmount}
+                  shouldHideBalance={this.props.shouldHideBalance}
                 />
               ))}
             </div>

@@ -15,8 +15,6 @@ import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer
 import ExportTransactionDialog from '../../components/wallet/export/ExportTransactionDialog';
 import { Logger } from '../../utils/logging';
 
-import { formattedWalletAmount } from '../../utils/formatters';
-
 type Props = InjectedProps
 
 const targetNotificationIds = [
@@ -77,7 +75,7 @@ export default class WalletSummaryPage extends Component<Props> {
             onLoadMore={actions.ada.transactions.loadMoreTransactions.trigger}
             assuranceMode={publicDeriver.assuranceMode}
             walletId={publicDeriver.self.getPublicDeriverId().toString()}
-            formattedWalletAmount={formattedWalletAmount}
+            shouldHideBalance={profile.shouldHideBalance}
           />
         );
       } else if (!hasAny) {
