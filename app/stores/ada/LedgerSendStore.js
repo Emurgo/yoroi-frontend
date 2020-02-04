@@ -14,7 +14,8 @@ import LocalizableError from '../../i18n/LocalizableError';
 
 import type {
   CreateLedgerSignTxDataFunc,
-  PrepareAndBroadcastLedgerSignedTxFunc,
+  PrepareAndBroadcastLedgerSignedTxRequest,
+  PrepareAndBroadcastLedgerSignedTxResponse,
 } from '../../api/ada';
 import {
   asGetPublicKey, asHasLevels,
@@ -52,9 +53,9 @@ export default class LedgerSendStore extends Store {
   createLedgerSignTxDataRequest: LocalizedRequest<CreateLedgerSignTxDataFunc>
     = new LocalizedRequest<CreateLedgerSignTxDataFunc>(this.api.ada.createLedgerSignTxData);
 
-  broadcastLedgerSignedTxRequest: LocalizedRequest<PrepareAndBroadcastLedgerSignedTxFunc>
-    = new LocalizedRequest<PrepareAndBroadcastLedgerSignedTxFunc>(
-      this.api.ada.prepareAndBroadcastLedgerSignedTx
+  broadcastLedgerSignedTxRequest: LocalizedRequest<typeof LedgerSendStore.prototype.sendAndRefresh>
+    = new LocalizedRequest<typeof LedgerSendStore.prototype.sendAndRefresh>(
+      this.sendAndRefresh
     );
   // =================== API RELATED =================== //
 
@@ -163,21 +164,37 @@ export default class LedgerSendStore extends Store {
     }
 
     await this.broadcastLedgerSignedTxRequest.execute({
-      getPublicKey: withPublicKey.getPublicKey,
-      keyLevel: withLevels.getParent().getPublicDeriverLevel(),
-      ledgerSignTxResp,
-      unsignedTx,
-      sendTx: this.stores.substores[environment.API].stateFetchStore.fetcher.sendTx,
+      broadcastRequest: {
+        getPublicKey: withPublicKey.getPublicKey,
+        keyLevel: withLevels.getParent().getPublicDeriverLevel(),
+        ledgerSignTxResp,
+        unsignedTx,
+        sendTx: this.stores.substores[environment.API].stateFetchStore.fetcher.sendTx,
+      },
+      refreshWallet: () => wallets.refreshWallet(publicDeriver),
     }).promise;
 
     this.actions.dialogs.closeActiveDialog.trigger();
-    await wallets.refreshWallet(publicDeriver);
 
     // go to transaction screen
     wallets.goToWalletRoute(publicDeriver.self);
 
     this._reset();
     Logger.info('SUCCESS: ADA sent using Ledger SignTx');
+  }
+
+  sendAndRefresh: {|
+    broadcastRequest: PrepareAndBroadcastLedgerSignedTxRequest,
+    refreshWallet: () => Promise<void>,
+  |} => Promise<PrepareAndBroadcastLedgerSignedTxResponse> = async (request) => {
+    const result = await this.api.ada.prepareAndBroadcastLedgerSignedTx(request.broadcastRequest);
+    try {
+      await request.refreshWallet();
+    } catch (_e) {
+      // even if refreshing the wallet fails, we don't want to fail the tx
+      // otherwise user may try and re-send the tx
+    }
+    return result;
   }
 
   _cancel = (): void => {

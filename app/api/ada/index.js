@@ -322,12 +322,12 @@ export type CreateWalletFunc = (
 
 // signAndBroadcast
 
-export type SignAndBroadcastRequest = {
+export type SignAndBroadcastRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey,
   signRequest: BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>,
   password: string,
   sendTx: SendFunc,
-};
+|};
 export type SignAndBroadcastResponse = SignedResponse;
 export type SignAndBroadcastFunc = (
   request: SignAndBroadcastRequest
@@ -349,10 +349,10 @@ export type CreateTrezorSignTxDataFunc = (
 
 // broadcastTrezorSignedTx
 
-export type BroadcastTrezorSignedTxRequest = {
+export type BroadcastTrezorSignedTxRequest = {|
   signedTxRequest: SignedRequest,
   sendTx: SendFunc,
-};
+|};
 export type BroadcastTrezorSignedTxResponse = SignedResponse;
 export type BroadcastTrezorSignedTxFunc = (
   request: BroadcastTrezorSignedTxRequest
@@ -373,13 +373,13 @@ export type CreateLedgerSignTxDataFunc = (
 
 // prepareAndBroadcastLedgerSignedTx
 
-export type PrepareAndBroadcastLedgerSignedTxRequest = {
+export type PrepareAndBroadcastLedgerSignedTxRequest = {|
   getPublicKey: () => Promise<IGetPublicResponse>,
   keyLevel: number,
   ledgerSignTxResp: LedgerSignTxResponse,
   unsignedTx: RustModule.WalletV2.Transaction,
   sendTx: SendFunc,
-};
+|};
 export type PrepareAndBroadcastLedgerSignedTxResponse = SignedResponse;
 export type PrepareAndBroadcastLedgerSignedTxFunc = (
   request: PrepareAndBroadcastLedgerSignedTxRequest
@@ -425,12 +425,12 @@ export type CreateDelegationTxFunc = (
 
 // signAndBroadcastDelegationTx
 
-export type SignAndBroadcastDelegationTxRequest = {
+export type SignAndBroadcastDelegationTxRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey & IGetStakingKey,
   signRequest: BaseSignRequest<RustModule.WalletV3.InputOutput>,
   password: string,
   sendTx: SendFunc,
-};
+|};
 export type SignAndBroadcastDelegationTxResponse = SignedResponse;
 
 export type SignAndBroadcastDelegationTxFunc = (
