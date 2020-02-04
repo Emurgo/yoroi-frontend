@@ -154,7 +154,7 @@ const Graph: {|
   // $FlowFixMe props are passed implicitly which causes a flow error
   const graphTooltip = (<GraphTooltip />);
   return (
-    <ResponsiveContainer height={240}>
+    <ResponsiveContainer width="100%" height={240}>
       <BarChart
         data={data}
         margin={{ top: 20,
