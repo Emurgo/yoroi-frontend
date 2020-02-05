@@ -58,7 +58,7 @@
 
 **a. 개정** 당사는 유저에 의해 제공된 주소로의 어떤 전자적 매체를 통해 수정 조항을 송부함으로 어느 때나 통보 없이 이 동의서의 조항들을 수정하거나 추가할 권한을 갖습니다. 수정일 후 소프트웨어에 접근하거나 사용한 유저'는 수정된 조항들을 받아들인 것으로 간주합니다.
 
-**b. Severance.** If any provision or part-provision of this Agreement is, or becomes invalid, illegal or unenforceable, it shall be deemed modified to the minimum extent necessary to make it valid, legal and enforceable. If such modification is not possible, the relevant provision or part-provision shall be deemed deleted. Any modification to or deletion of a provision or part-provision under this Article shall not affect the validity and enforceability of the rest of this Agreement.
+**b. 분리해석 ** 만일 이 규약의 어떤 조항이나 조항의 일부분이 무효하거나 위법하거나 시행할 수 없게 되면 최소한의 유효하고 합법적이고 시행 가능한 부분으로 수정 되는 것으로 간주합니다. 만일 이러한 수정이 불가능하다면, 관련된 조항이나 조항의 일부분은 삭제된 것으로 간주됩니다. 조항 또는 조항의 일부분의 어떠한 수정 또는 삭제는 규약의 나머지 부분의 타당성에 영향을 끼치지 않습니다.
 
 **c. 완전합의-의거 포기:** 본 규약은, 본 규약의 내용에 관한 양 당사자 간의 완전한 합의를 구성하며, 양 당사자 간의 기존의 모든 합의 사항 및 양해 사항에 우선합니다. 유저는 본 규약에 명기된 것 외의 진술, 양해 사항, 표명 사항, 기대 사항 또는 합의 사항에 의거하지 않았음을 명시적으로 진술, 보장합니다.
 
