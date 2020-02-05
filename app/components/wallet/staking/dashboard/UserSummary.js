@@ -23,10 +23,6 @@ const messages = defineMessages({
     id: 'wallet.dashboard.summary.title',
     defaultMessage: '!!!Your Summary',
   },
-  rewardsLabel: {
-    id: 'wallet.dashboard.summary.rewardsTitle',
-    defaultMessage: '!!!Total Rewards',
-  },
   delegatedLabel: {
     id: 'wallet.dashboard.summary.delegatedTitle',
     defaultMessage: '!!!Total Delegated',
@@ -124,7 +120,7 @@ export default class UserSummary extends Component<Props, State> {
           </div>
         </div>
         <h3 className={styles.label}>
-          {intl.formatMessage(messages.rewardsLabel)}:
+          {intl.formatMessage(globalMessages.totalRewardsLabel)}:
         </h3>
         {this.props.totalRewards != null
           ? (

@@ -176,17 +176,17 @@ export default class StakingDashboard extends Component<Props> {
         themeVars={this.props.themeVars}
         tabs={[
           {
-            tabName: intl.formatMessage(globalMessages.totalAdaLabel),
-            data: items.totalRewards,
-            primaryBarLabel: intl.formatMessage(globalMessages.totalAdaLabel),
-            yAxisLabel: intl.formatMessage(globalMessages.rewardsLabel),
-          },
-          {
             tabName: intl.formatMessage(globalMessages.rewardsLabel),
             data: items.perEpochRewards,
             primaryBarLabel: intl.formatMessage(globalMessages.rewardsLabel),
             yAxisLabel: intl.formatMessage(globalMessages.rewardsLabel),
-          }
+          },
+          {
+            tabName: intl.formatMessage(globalMessages.totalRewardsLabel),
+            data: items.totalRewards,
+            primaryBarLabel: intl.formatMessage(globalMessages.totalRewardsLabel),
+            yAxisLabel: intl.formatMessage(globalMessages.rewardsLabel),
+          },
           // intl.formatMessage(globalMessages.marginsLabel),
         ]}
         epochLength={this.props.epochLength}
