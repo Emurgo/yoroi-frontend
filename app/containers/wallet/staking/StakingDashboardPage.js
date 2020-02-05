@@ -608,7 +608,10 @@ export default class StakingDashboardPage extends Component<Props, State> {
   _generateRewardGraphData: {|
     delegationRequests: DelegationRequests,
     currentEpoch: number,
-  |} => (?Array<GraphItems>) = (
+  |} => (?{|
+    totalRewards: Array<GraphItems>,
+    perEpochRewards: Array<GraphItems>,
+  |}) = (
     request
   ) => {
     const history = request.delegationRequests.rewardHistory.result;
@@ -622,7 +625,8 @@ export default class StakingDashboardPage extends Component<Props, State> {
 
     // the reward history endpoint doesn't contain entries when the reward was 0
     // so we need to insert these manually
-    const result: Array<GraphItems> = [];
+    const totalRewards: Array<GraphItems> = [];
+    const perEpochRewards: Array<GraphItems> = [];
     let adaSum = new BigNumber(0);
     // note: reward history includes the current epoch
     // since it tells you the reward you got at slot 0 of the new epoch
@@ -631,22 +635,31 @@ export default class StakingDashboardPage extends Component<Props, State> {
         // exists a reward for this epoch
         const nextReward = history[historyIterator][1];
         adaSum = adaSum.plus(nextReward);
-        result.push({
+        totalRewards.push({
           name: i,
-          secondary: adaSum.dividedBy(LOVELACES_PER_ADA).toNumber(),
+          primary: adaSum.dividedBy(LOVELACES_PER_ADA).toNumber(),
+        });
+        perEpochRewards.push({
+          name: i,
           primary: nextReward / LOVELACES_PER_ADA.toNumber(),
         });
         historyIterator++;
       } else {
         // no reward for this epoch
-        result.push({
+        totalRewards.push({
           name: i,
-          secondary: adaSum.dividedBy(LOVELACES_PER_ADA).toNumber(),
+          primary: adaSum.dividedBy(LOVELACES_PER_ADA).toNumber(),
+        });
+        perEpochRewards.push({
+          name: i,
           primary: 0,
         });
       }
     }
-    return result;
+    return {
+      totalRewards,
+      perEpochRewards,
+    };
   }
 
   _generateGraphData: {|

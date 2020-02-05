@@ -397,6 +397,10 @@ const globalMessages = defineMessages({
     id: 'wallet.restore.dialog.form.errors.invalidRecoveryPhrase',
     defaultMessage: '!!!Invalid recovery phrase',
   },
+  totalRewardsLabel: {
+    id: 'wallet.dashboard.summary.rewardsTitle',
+    defaultMessage: '!!!Total Rewards',
+  },
   skipLabel: {
     id: 'profile.uriPrompt.form.skipLabel',
     defaultMessage: '!!!Skip',

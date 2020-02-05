@@ -13,6 +13,13 @@
 
 .tabsWrapper {
     margin-bottom: 16px;
+    display: flex;
+    flex-wrap: wrap;
+
+    li {
+        margin-right: 20px;
+        width: max-content;
+    }
 }
 
 .tab {

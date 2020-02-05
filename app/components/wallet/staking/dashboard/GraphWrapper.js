@@ -32,24 +32,32 @@ const messages = defineMessages({
 
 export type GraphItems = {|
   +name: number,
-  +secondary: number,
   +primary: number,
 |};
 
 const GraphTabs: {|
   tabs: Array<string>,
-|} => Node = ({ tabs }) => {
+  selected: number,
+  setSelected: number => void,
+|} => Node = ({ tabs, selected, setSelected, }) => {
   return (
     <ul className={styles.tabsWrapper}>
       {
         tabs.map(
           (tab, i) => (
-            <li
-              key={tab}
-              // TODO: Change to real isActive? condition for current tab
-              className={i === 0 ? classnames(styles.tab, styles.tabActive) : styles.tab}
-            >
-              {tab}
+            <li>
+              <button
+                type="button"
+                onClick={() => setSelected(i)}
+                onKeyPress={() => setSelected(i)}
+                key={tab}
+                className={i === selected
+                  ? classnames(styles.tab, styles.tabActive)
+                  : styles.tab
+                }
+              >
+                {tab}
+              </button>
             </li>
           )
         )
@@ -97,7 +105,6 @@ const Graph: {|
   xAxisLabel: string,
   yAxisLabel: string,
   primaryBarLabel: string,
-  secondaryBarLabel: string,
 |} => Node = ({
   themeVars,
   data,
@@ -105,7 +112,6 @@ const Graph: {|
   xAxisLabel,
   yAxisLabel,
   primaryBarLabel,
-  secondaryBarLabel,
 }) => {
 
   const graphVars = {
@@ -116,7 +122,6 @@ const Graph: {|
     barWidth: themeVars['--theme-dashboard-graph-bar-width'],
     barHoverBgColor: themeVars['--theme-dashboard-graph-bar-hover-background-color'],
     barPrimaryColor: themeVars['--theme-dashboard-graph-bar-primary-color'],
-    barSecondaryColor: themeVars['--theme-dashboard-graph-bar-secondary-color'],
     fontSize: themeVars['--theme-dashboard-graph-font-size'],
     lineHeight: themeVars['--theme-dashboard-graph-line-height'],
   };
@@ -128,7 +133,7 @@ const Graph: {|
   );
 
   const GraphTooltip = (
-    { active, payload, label }: {| active: boolean, payload: ?[any, any], label: string |}
+    { active, payload, label }: {| active: boolean, payload: ?[any], label: string |}
   ) => {
     if (active && payload != null) {
       return (
@@ -140,10 +145,6 @@ const Graph: {|
           <p>
             <span className={styles.tooltipLabel}>{primaryBarLabel}:</span>&nbsp;
             <span className={styles.tooltipValue}>{payload[0].value}</span>
-          </p>
-          <p>
-            <span className={styles.tooltipLabel}>{secondaryBarLabel}:</span>&nbsp;
-            <span className={styles.tooltipValue}>{payload[1].value}</span>
           </p>
         </div>
       );
@@ -217,14 +218,6 @@ const Graph: {|
           stackId="a"
           fill={graphVars.barPrimaryColor}
         />
-        <Bar
-          name={secondaryBarLabel}
-          radius={[6, 6, 0, 0]}
-          maxBarSize={graphVars.barWidth}
-          dataKey="secondary"
-          stackId="a"
-          fill={graphVars.barSecondaryColor}
-        />
       </BarChart>
     </ResponsiveContainer>
   );
@@ -232,20 +225,28 @@ const Graph: {|
 
 type Props = {|
   themeVars: Object,
-  tabs: Array<string>,
-  graphName: string,
-  data: Array<GraphItems>,
-  primaryBarLabel: string,
-  secondaryBarLabel: string,
-  yAxisLabel: string,
   epochLength: ?number,
+  tabs: Array<{|
+    tabName: string,
+    data: Array<GraphItems>,
+    primaryBarLabel: string,
+    yAxisLabel: string,
+  |}>,
+|};
+
+type State = {|
+  selectedTab: number,
 |};
 
 @observer
-export default class GraphWrapper extends Component<Props> {
+export default class GraphWrapper extends Component<Props, State> {
   static contextTypes = {
     intl: intlShape.isRequired,
   };
+
+  state = {
+    selectedTab: 0,
+  }
 
   _getEpochLengthLabel: void => string = () => {
     const { intl } = this.context;
@@ -261,11 +262,15 @@ export default class GraphWrapper extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { tabs, data, themeVars } = this.props;
+    const { tabs, themeVars } = this.props;
 
     return (
       <div className={styles.wrapper}>
-        <GraphTabs tabs={tabs} />
+        <GraphTabs
+          tabs={tabs.map(tab => tab.tabName)}
+          selected={this.state.selectedTab}
+          setSelected={tab => this.setState({ selectedTab: tab })}
+        />
         <Card>
           <div className={styles.graphContainer}>
             {/*
@@ -278,11 +283,10 @@ export default class GraphWrapper extends Component<Props> {
             <Graph
               epochTitle={intl.formatMessage(globalMessages.epochLabel)}
               xAxisLabel={this._getEpochLengthLabel()}
-              yAxisLabel={this.props.yAxisLabel}
-              primaryBarLabel={this.props.primaryBarLabel}
-              secondaryBarLabel={this.props.secondaryBarLabel}
+              yAxisLabel={tabs[this.state.selectedTab].yAxisLabel}
+              primaryBarLabel={tabs[this.state.selectedTab].primaryBarLabel}
               themeVars={themeVars}
-              data={data}
+              data={tabs[this.state.selectedTab].data}
             />
           </div>
         </Card>
