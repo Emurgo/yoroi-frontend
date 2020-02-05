@@ -46,12 +46,15 @@ const emptyDashboardMessages = defineMessages({
   }
 });
 
-export type SingleGraphData = {|
-  +items: ?Array<GraphItems>,
+export type RewardsGraphData = {|
+  +items: ?{|
+    totalRewards: Array<GraphItems>,
+    perEpochRewards: Array<GraphItems>,
+  |},
   +error: ?LocalizableError,
 |};
 export type GraphData = {|
-  +rewardsGraphData: SingleGraphData,
+  +rewardsGraphData: RewardsGraphData,
 |};
 
 type Props = {|
@@ -148,7 +151,7 @@ export default class StakingDashboard extends Component<Props> {
     );
   }
 
-  _displayGraph: SingleGraphData => Node = (graphData) => {
+  _displayGraph: RewardsGraphData => Node = (graphData) => {
     const { intl } = this.context;
     if (graphData.error) {
       return (
@@ -167,19 +170,25 @@ export default class StakingDashboard extends Component<Props> {
         </VerticallyCenteredLayout>
       );
     }
+    const items = graphData.items;
     return (
       <GraphWrapper
-        data={graphData.items}
         themeVars={this.props.themeVars}
         tabs={[
-          // intl.formatMessage(globalMessages.totalAdaLabel),
+          {
+            tabName: intl.formatMessage(globalMessages.totalAdaLabel),
+            data: items.totalRewards,
+            primaryBarLabel: intl.formatMessage(globalMessages.totalAdaLabel),
+            yAxisLabel: intl.formatMessage(globalMessages.rewardsLabel),
+          },
+          {
+            tabName: intl.formatMessage(globalMessages.rewardsLabel),
+            data: items.perEpochRewards,
+            primaryBarLabel: intl.formatMessage(globalMessages.rewardsLabel),
+            yAxisLabel: intl.formatMessage(globalMessages.rewardsLabel),
+          }
           // intl.formatMessage(globalMessages.marginsLabel),
-          intl.formatMessage(globalMessages.rewardsLabel),
         ]}
-        primaryBarLabel={intl.formatMessage(globalMessages.rewardsLabel)}
-        secondaryBarLabel={intl.formatMessage(globalMessages.totalAdaLabel)}
-        yAxisLabel={intl.formatMessage(globalMessages.rewardsLabel)}
-        graphName="total"
         epochLength={this.props.epochLength}
       />
     );

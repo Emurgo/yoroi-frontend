@@ -253,6 +253,10 @@ export default class DelegationStore extends Store {
         this.stores.substores.ada.time.currentTime?.currentEpoch,
       ],
       async () => {
+        if (!this.stores.substores.ada.serverConnectionStore.checkAdaServerStatus) {
+          // don't re-query when server goes offline -- only when it comes back online
+          return;
+        }
         const selected = this.stores.substores.ada.wallets.selected;
         if (selected == null) return;
         await this.refreshDelegation(selected);
