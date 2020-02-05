@@ -4,7 +4,7 @@
 
 ## 1. 권리 및 의무
 
-**a. 서술:** 본 소프트웨어는 무료 오픈소스 암호 화폐 지갑의 기능을 갖습니다. 본 소프트웨어는 당사 또는 기타 제3자가 사용자의 ADA 또는 기타 암호화폐에 대한 관리인 또는 중개하도록 구성되어 있지 않습니다. 본 소프트웨어는 베타 테스트를 진행중이며, 개발자 커뮤니티, 오픈소스 공헌자 및 베타 테스터들로부터 피드백 받아 계속해서 개선되지만, 당사는 본 소프트웨어에 버그가 없다는 것을 보증하지 않습니다. 사용자는 본 소프트웨어 이용에 대한 위험성과 책임을 이에 적용되는 모든 법률에 따른다는 점을 인지하고 있습니다. 사용자에게는 자신의 비밀번호, 개인식별번호(PIN), 개인 키, 환원 키, 보호된 벤딩 키, 백업된 복구 구절, ADA 패스 코드 및 기타 사용자가 소프트웨어나 기타 어떤 정보, ADA, 바우처, 또는 어떤 암호화폐 단위에 대해 접근하기 위해 사용하는 코드를 안전하게 보관할 책임이 있습니다. 만일 사용자가 자신의 암호화폐 지갑의 개인키 또는 백업 복구 구절과 패스워드를 분실한다면, 사용자는 관련된 해당 지갑의 모든 암호화폐에 대한 접근 권한을 잃는다는 것을 인지하고있으며 이에 동의합니다.  또한 제출된 모든 거래 요청은 철회 불가능합니다. 당사 및 주주, 이사, 임원, 종업원, 관련 회사 및 대리인은 거래 확인을 보증할 수 없으며, 유저가 유저의 프라이빗 키 또는 패스워드를 분실 또는 잊어버린 경우라 하더라도 이를 복구해 줄 수 없습니다.
+**a. 서술:** 본 소프트웨어는 무료 오픈소스 암호 화폐 지갑의 기능을 갖습니다. 본 소프트웨어는 당사 또는 기타 제3자가 유저의 ADA 또는 기타 암호화폐에 대한 관리인 또는 중개하도록 구성되어 있지 않습니다. 본 소프트웨어는 베타 테스트를 진행중이며, 개발자 커뮤니티, 오픈소스 공헌자 및 베타 테스터들로부터 피드백 받아 계속해서 개선되지만, 당사는 본 소프트웨어에 버그가 없다는 것을 보증하지 않습니다. 유저는 본 소프트웨어 이용에 대한 위험성과 책임을 이에 적용되는 모든 법률에 따른다는 점을 인지하고 있습니다. 유저에게는 자신의 비밀번호, 개인식별번호(PIN), 개인 키, 환원 키, 보호된 벤딩 키, 백업된 복구 구절, ADA 패스 코드 및 기타 사용자가 소프트웨어나 기타 어떤 정보, ADA, 바우처, 또는 어떤 암호화폐 단위에 대해 접근하기 위해 사용하는 코드를 안전하게 보관할 책임이 있습니다. 만일 유저가 자신의 암호화폐 지갑의 개인키 또는 백업 복구 구절과 패스워드를 분실한다면, 유저는 관련된 해당 지갑의 모든 암호화폐에 대한 접근 권한을 잃는다는 것을 인지하고있으며 이에 동의합니다.  또한 제출된 모든 거래 요청은 철회 불가능합니다. 당사 및 주주, 이사, 임원, 종업원, 관련 회사 및 대리인은 거래 확인을 보증할 수 없으며, 유저가 유저의 프라이빗 키 또는 패스워드를 분실 또는 잊어버린 경우라 하더라도 이를 복구해 줄 수 없습니다.
 
 **b. 접근성:** 유저는 본 소프트웨어가 제한 없이 때때로 어떤 이유, (i)기기 고장, (ii) 정기 점검 또는 때때로 당사에 의해 수행되는 유지보수, 또는 (iii) 당사가 제어할 수 없거나 당사가 합리적으로 예측할 수 없는 원인에 의해 접근 불가하거나 조작 불능이 될 가능성이 있다는 사실에 동의합니다.
 
@@ -56,7 +56,7 @@
 
 ## 11. 기타
 
-**a. Amendment.** The Company shall have the right, at any time and without notice, to add to or modify the terms of this Agreement, simply by delivering such amended terms to User by electronic message through any medium to any address provided to the Company by User. User's access to or use of the Software after the date such amended terms are delivered to User shall be deemed to constitute acceptance of such amended terms.
+**a. 개정** 당사는 유저에 의해 제공된 주소로의 어떤 전자적 매체를 통해 수정 조항을 송부함으로 어느 때나 통보 없이 이 동의서의 조항들을 수정하거나 추가할 권한을 갖습니다. 수정일 후 소프트웨어에 접근하거나 사용한 유저'는 수정된 조항들을 받아들인 것으로 간주합니다.
 
 **b. Severance.** If any provision or part-provision of this Agreement is, or becomes invalid, illegal or unenforceable, it shall be deemed modified to the minimum extent necessary to make it valid, legal and enforceable. If such modification is not possible, the relevant provision or part-provision shall be deemed deleted. Any modification to or deletion of a provision or part-provision under this Article shall not affect the validity and enforceability of the rest of this Agreement.
 
