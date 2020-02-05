@@ -14,8 +14,8 @@
 
 12.7 ** 금지된 사용. ** 유저는 인센티브화 테스트넷의 적합한 기능을 방해하는 제 3자의 어떠한 행위나 디바이스 또는 소프트웨어의 사용을 하지 않으며 허용하지 않습니다. 만일 이것이 위반된다면 유저의 참여는 이 것이 해결될 때 까지 통지 없이 중지되거나 해결되지 않는다면 통지 없이 종료될 수 있습니다.
 
-12.8 **Warranty.** The Service are provided to User on an "as is" and "as available" basis and all warranties, express, implied, statutory or otherwise, with respect to the Service are hereby excluded. User acknowledges that the Incentivized Testnet may not operate properly and that it may contain errors, design flaws or other issues. User’s use of the Incentivized Testnet remains at User’s risk and discretion. EMURGO reserves the right to restart the Incentivised Testnet and reverse all or some Rewards in the case of errors and/or malicious behaviour in the system.
+12.8 ** 보증. ** 본 서비스는 유저에게 있는 "그대로" 그리고 " 이용 가능한 것"에 기반하여 제공되며 모든 다른 보증과 명시적, 묵시적 법령 또는 다른 서비스와 관련된 것은 배제됩니다. 유저는 인센티브화 테스트넷이 적절하게 작동하지 않을 수도 있으며 오류나 디자인상의 결함 또는 다른 문제가 있을 수 있다는 것에 동의합니다. 인센티브화 테스트넷에 대한 유저의 사용은 유저 자신의 위험성과 분별의해 이루어집니다. EMURGO는 인센티브화 테스트넷을 재시작하거나 모든 또는 일부의 보상을 어떤 오류나 시스템의 악성적 행위가 발생 할 경우 되돌릴 수 있는 권리를 가집니다.
 
-12.9 **Termination of the Incentivised Testnet.** User understands and agrees that Company may change, withdraw, terminate access to and/or discontinue the Incentivized Testnet (or any portion thereof) at any time and in its sole discretion. User may end participation in the Incentivized Testnet at any time and any Rewards gained up to that time will still be transferred to User’s Daedalus or Yoroi mainet wallet once the Incentivized Testnet is discontinued.
+12.9 ** 인센티브화 테스트넷의 종료. ** 유저는 당사가 언제든지 단독적인 결정에 따라 인센티브화 테스트넷(또는 그것의 일부분) 에 대한 접근을 변경하거나 철회하거나 종료할 수 있음을 이해하고 동의합니다. 유저는 언제든지 인센티브화 테스트넷의 참여를 종료할 수 있으며 인센티브 테스트넷이 종료되면 그때까지 취득한 보상은 유저의 다이달로스 또는 요로이 메인넷 지갑으로 이동됩니다.
 
-12.10 **Feedback.** Users may provide suggestions, comments or ideas and report issues or problems related to their use of the Incentivized Testnet at any time by using any of the official feedback channels.
+12.10 ** 피드백. ** 유저는 인센티브화 테스트넷에 대한 제안이나 비평 또는 의견이나 문제에 대한 보고를 어느때나 공식적 피드백 채널을 통해 제시할 수 있습니다.
