@@ -12,7 +12,7 @@
 
 12.6 ** 도구. ** 당사는 유저들과 스테이킹 풀 운용자들에게 인센티브화 테스트넷에서 유저가 얻을 수 있는 보상의 양을 개산할 수 있게 고안된 도구를 제공합니다. 유저는 이러한 도구들이 오직 예시의 목적이며 정확하지 않을 수 있다는 것을 이해합니다. 당사는 도구나 스테이킹 풀에 의해 제시되는 보상의 양과 실제 지급받는 보상의 양이 같다는 것을 약속하지 않습니다.
 
-12.7 **Prohibited Use.** User will not, and will not permit any other third party to use any device, software or routine to interfere with the proper function of the Incentivised Testnet. If there is a complaint or notice of violation, a User’s participation may be suspended without notice until resolved, and terminated if not resolved promptly.
+12.7 ** 금지된 사용. ** 유저는 인센티브화 테스트넷의 적합한 기능을 방해하는 제 3자의 어떠한 행위나 디바이스 또는 소프트웨어의 사용을 하지 않으며 허용하지 않습니다. 만일 이것이 위반된다면 유저의 참여는 이 것이 해결될 때 까지 통지 없이 중지되거나 해결되지 않는다면 통지 없이 종료될 수 있습니다.
 
 12.8 **Warranty.** The Service are provided to User on an "as is" and "as available" basis and all warranties, express, implied, statutory or otherwise, with respect to the Service are hereby excluded. User acknowledges that the Incentivized Testnet may not operate properly and that it may contain errors, design flaws or other issues. User’s use of the Incentivized Testnet remains at User’s risk and discretion. EMURGO reserves the right to restart the Incentivised Testnet and reverse all or some Rewards in the case of errors and/or malicious behaviour in the system.
 
