@@ -354,7 +354,7 @@ export default class WalletStore extends Store {
   /* @Attention:
       This method has a really tricky logic because is in charge of some redirection rules
       related to app urls and wallet status. Also, this behaviour is trigger by mobx reactions,
-      so it's hard to reason about all the scenarios could happenedd.
+      so it's hard to reason about all the scenarios could happened.
   */
   _updateActiveWalletOnRouteChanges = () => {
     const currentRoute = this.stores.app.currentRoute;
