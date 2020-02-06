@@ -346,7 +346,7 @@
   "wallet.dashboard.epochTooltip": "Nota: sólo la primera recompensa después de la delegación tomará 2 épocas. Después, las recompensas llegan en cada época",
   "wallet.dashboard.graph.dayToggleLabel": "Día (UTC)",
   "wallet.dashboard.graph.epochAxisLabel": "Época ({epochLength} días)",
-  "wallet.dashboard.graph.singleEpochAxisLabel": "Época (1 día)",
+  "wallet.dashboard.graph.singleEpochAxisLabel": "Epoch (1 día)",
   "wallet.dashboard.graph.tooltip.epoch": "Total de ADA enviadas",
   "wallet.dashboard.graphType.costs": "Costos",
   "wallet.dashboard.graphType.positions": "Posiciones",
