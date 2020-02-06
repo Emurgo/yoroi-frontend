@@ -201,8 +201,7 @@ export default class TransactionsStore extends Store {
         // Recent Request
         // Here we are sure that allRequest was resolved and the local database was updated
         return this.refreshLocal(basePubDeriver.self);
-      })
-      .catch(() => {}); // Do nothing. It's logged in the api call
+      });
   };
 
   @action refreshLocal: (

@@ -22,6 +22,7 @@ import type {
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import { Logger, stringifyError } from '../../utils/logging';
 
 type GroupedWallets = {|
   publicDerivers: Array<PublicDeriverWithCachedMeta>;
@@ -226,8 +227,15 @@ export default class WalletStore extends Store {
   async refreshWallet(
     publicDeriver: PublicDeriverWithCachedMeta
   ): Promise<void> {
-    await this.stores.substores[environment.API].addresses.refreshAddresses(publicDeriver);
-    await this.stores.substores[environment.API].transactions.refreshTransactionData(publicDeriver);
+    try {
+      const substore = this.stores.substores[environment.API];
+      await substore.addresses.refreshAddresses(publicDeriver);
+      // note: only refresh txs if refreshing addresses succeeded
+      await substore.transactions.refreshTransactionData(publicDeriver);
+    } catch (error) {
+      Logger.error(`${nameof(WalletStore)}::${nameof(this.refreshWallet)} ` + stringifyError(error));
+      throw error;
+    }
   }
 
   @action

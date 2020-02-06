@@ -103,7 +103,9 @@ export class AddressTypeStore<T> {
   ) => {
     const allRequest = this.getRequest(publicDeriver.self);
     allRequest.invalidate({ immediately: false });
-    await allRequest.execute({ publicDeriver: publicDeriver.self }).promise;
+    const promise = allRequest.execute({ publicDeriver: publicDeriver.self }).promise;
+    if (promise == null) throw new Error('Should never happen');
+    await promise.catch(() => {}); // Do nothing. It's logged in the api call
   };
 
   _flowCoerceResult: CachedRequest<SubRequestType<T>> => ?Array<T> = (request) => {

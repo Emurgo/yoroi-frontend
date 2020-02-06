@@ -45,12 +45,11 @@ const GraphTabs: {|
       {
         tabs.map(
           (tab, i) => (
-            <li>
+            <li key={tab}>
               <button
                 type="button"
                 onClick={() => setSelected(i)}
                 onKeyPress={() => setSelected(i)}
-                key={tab}
                 className={i === selected
                   ? classnames(styles.tab, styles.tabActive)
                   : styles.tab
