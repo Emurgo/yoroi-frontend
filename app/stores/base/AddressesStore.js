@@ -98,9 +98,9 @@ export class AddressTypeStore<T> {
   }
 
   /** Refresh addresses for all wallets */
-  @action refreshAddresses: void => Promise<void> = async () => {
-    const publicDeriver = this.stores.substores[environment.API].wallets.selected;
-    if (publicDeriver == null) return;
+  @action refreshAddresses: PublicDeriverWithCachedMeta => Promise<void> = async (
+    publicDeriver,
+  ) => {
     const allRequest = this.getRequest(publicDeriver.self);
     allRequest.invalidate({ immediately: false });
     await allRequest.execute({ publicDeriver: publicDeriver.self }).promise;
@@ -176,13 +176,13 @@ export default class AddressesStore extends Store {
     );
   }
 
-  _createAddress = async (): Promise<void> => {
+  _createAddress: PublicDeriverWithCachedMeta => Promise<void> = async (
+    publicDeriver
+  ) => {
     try {
-      const publicDeriver = this.stores.substores[environment.API].wallets.selected;
-      if (publicDeriver == null) return;
       const withDisplayCutoff = asDisplayCutoff(publicDeriver.self);
       if (withDisplayCutoff == null) {
-        Logger.error(`_createAddress incorrect public deriver`);
+        Logger.error(`${nameof(this._createAddress)} incorrect public deriver`);
         return;
       }
       const address = await this.createAddressRequest.execute({
@@ -197,7 +197,7 @@ export default class AddressesStore extends Store {
     }
   };
 
-  @action _resetErrors = () => {
+  @action _resetErrors: void => void = () => {
     this.error = null;
   };
 
@@ -221,12 +221,12 @@ export default class AddressesStore extends Store {
   ) => {
     const withHasUtxoChains = asHasUtxoChains(publicDeriver.self);
     if (withHasUtxoChains == null) {
-      await this.allAddressesForDisplay.refreshAddresses();
+      await this.allAddressesForDisplay.refreshAddresses(publicDeriver);
     } else {
-      await this.externalForDisplay.refreshAddresses();
-      await this.internalForDisplay.refreshAddresses();
+      await this.externalForDisplay.refreshAddresses(publicDeriver);
+      await this.internalForDisplay.refreshAddresses(publicDeriver);
       if (environment.isShelley) {
-        await this.mangledAddressesForDisplay.refreshAddresses();
+        await this.mangledAddressesForDisplay.refreshAddresses(publicDeriver);
       }
     }
   }
@@ -281,30 +281,24 @@ export default class AddressesStore extends Store {
     });
   }
 
-  isActiveTab: $Keys<typeof RECEIVE_ROUTES> => boolean = (
-    tab
+  isActiveTab: ($Keys<typeof RECEIVE_ROUTES>, PublicDeriverWithCachedMeta) => boolean = (
+    tab, publicDeriver,
   ) => {
     const { app } = this.stores;
-    const { wallets } = this.stores.substores.ada;
-    const selected = wallets.selected;
-    if (selected == null) return false;
     const screenRoute = buildRoute(
       RECEIVE_ROUTES[tab],
       {
-        id: selected.self.getPublicDeriverId(),
+        id: publicDeriver.self.getPublicDeriverId(),
         tab
       }
     );
     return app.currentRoute === screenRoute;
   };
 
-  handleTabClick: string => void = (page) => {
-    const { wallets } = this.stores.substores.ada;
-    const selected = wallets.selected;
-    if (selected == null) return;
+  handleTabClick: (string, PublicDeriverWithCachedMeta) => void = (page, publicDeriver) => {
     this.actions.router.goToRoute.trigger({
       route: RECEIVE_ROUTES[page],
-      params: { id: selected.self.getPublicDeriverId(), page },
+      params: { id: publicDeriver.self.getPublicDeriverId(), page },
     });
   };
 

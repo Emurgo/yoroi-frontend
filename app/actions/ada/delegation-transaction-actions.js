@@ -8,7 +8,10 @@ export default class DelegationTransactionActions {
     publicDeriver: PublicDeriverWithCachedMeta,
     poolRequest: PoolRequest,
   |}> = new AsyncAction();
-  signTransaction: AsyncAction<{| password: string |}> = new AsyncAction();
-  complete: AsyncAction<void> = new AsyncAction();
+  signTransaction: AsyncAction<{|
+    password: string,
+    publicDeriver: PublicDeriverWithCachedMeta,
+  |}> = new AsyncAction();
+  complete: Action<PublicDeriverWithCachedMeta> = new Action();
   reset: Action<void> = new Action();
 }

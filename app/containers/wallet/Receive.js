@@ -8,10 +8,19 @@ import ReceiveWithNavigation from '../../components/wallet/layouts/ReceiveWithNa
 export default class Receive extends Component<InjectedContainerProps> {
 
   render() {
+    const publicDeriver = this.props.stores.substores.ada.wallets.selected;
+    if (publicDeriver == null) throw new Error(`${nameof(Receive)} no public deriver`);
+
     return (
       <ReceiveWithNavigation
-        isActiveTab={this.props.stores.substores.ada.addresses.isActiveTab}
-        onTabClick={this.props.stores.substores.ada.addresses.handleTabClick}
+        isActiveTab={(tab) => this.props.stores.substores.ada.addresses.isActiveTab(
+          tab,
+          publicDeriver
+        )}
+        onTabClick={(page) => this.props.stores.substores.ada.addresses.handleTabClick(
+          page,
+          publicDeriver
+        )}
         showMangled={this.props.stores.substores.ada.addresses.mangledAddressesForDisplay.hasAny}
       >
         {this.props.children}

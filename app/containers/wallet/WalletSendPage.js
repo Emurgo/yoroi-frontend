@@ -223,7 +223,8 @@ export default class WalletSendPage extends Component<Props> {
           error={ledgerSendStore.error}
           onSubmit={
             () => ledgerSendAction.sendUsingLedger.trigger({
-              signRequest: copySignRequest(v2Request)
+              params: { signRequest: copySignRequest(v2Request) },
+              publicDeriver,
             })
           }
           onCancel={ledgerSendAction.cancel.trigger}
@@ -246,7 +247,8 @@ export default class WalletSendPage extends Component<Props> {
           error={trezorSendStore.error}
           onSubmit={
             () => trezorSendAction.sendUsingTrezor.trigger({
-              signRequest: copySignRequest(v2Request)
+              params: { signRequest: copySignRequest(v2Request) },
+              publicDeriver,
             })
           }
           onCancel={trezorSendAction.cancel.trigger}

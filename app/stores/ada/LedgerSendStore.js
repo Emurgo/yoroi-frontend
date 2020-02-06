@@ -41,6 +41,7 @@ import {
 } from '../../utils/hwConnectHandler';
 
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 
 /** Note: Handles Ledger Signing */
 export default class LedgerSendStore extends Store {
@@ -69,8 +70,8 @@ export default class LedgerSendStore extends Store {
 
   /** setup() is called when stores are being created
     * _init() is called when Confirmation dailog is about to show */
-  _init = (): void => {
-    Logger.debug('LedgerSendStore::_init called');
+  _init: void => void = () => {
+    Logger.debug(`${nameof(LedgerSendStore)}::${nameof(this._init)} called`);
   }
 
   _reset(): void {
@@ -78,25 +79,21 @@ export default class LedgerSendStore extends Store {
     this._setError(null);
   }
 
-  _preSendValidation = (): void => {
+  _preSendValidation: void => void = () => {
     if (this.isActionProcessing) {
       // this Error will be converted to LocalizableError()
       throw new Error('Can\'t send another transaction if one transaction is in progress.');
     }
-
-    const { wallets } = this.stores.substores[environment.API];
-    const publicDeriver = wallets.selected;
-    if (!publicDeriver) {
-      // this Error will be converted to LocalizableError()
-      throw new Error('Active wallet required before sending.');
-    }
   }
 
   /** Generates a payload with Ledger format and tries Send ADA using Ledger signing */
-  _send = async (params: SendUsingLedgerParams): Promise<void> => {
+  _send: {|
+    params: SendUsingLedgerParams,
+    publicDeriver: PublicDeriverWithCachedMeta,
+  |} => Promise<void> = async (request) => {
     let ledgerConnect: LedgerConnect;
     try {
-      Logger.debug('LedgerSendStore::_send::called: ' + stringifyData(params));
+      Logger.debug(`${nameof(LedgerSendStore)}::${nameof(this._send)} called: ` + stringifyData(request.params));
       ledgerConnect = new LedgerConnect({
         locale: this.stores.profile.currentLocale
       });
@@ -111,7 +108,7 @@ export default class LedgerSendStore extends Store {
 
       const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
       this.createLedgerSignTxDataRequest.execute({
-        ...params,
+        ...request.params,
         getTxsBodiesForUTXOs: stateFetcher.getTxsBodiesForUTXOs,
       });
       if (!this.createLedgerSignTxDataRequest.promise) throw new Error('should never happen');
@@ -133,7 +130,8 @@ export default class LedgerSendStore extends Store {
 
       await this._prepareAndBroadcastSignedTx(
         ledgerSignTxResp,
-        params.signRequest.unsignedTx,
+        request.params.signRequest.unsignedTx,
+        request.publicDeriver,
       );
     } catch (error) {
       this._setError(convertToLocalizableError(error));
@@ -145,22 +143,23 @@ export default class LedgerSendStore extends Store {
     }
   };
 
-  _prepareAndBroadcastSignedTx = async (
-    ledgerSignTxResp: LedgerSignTxResponse,
-    unsignedTx: RustModule.WalletV2.Transaction,
-  ): Promise<void> => {
+  _prepareAndBroadcastSignedTx: (
+    LedgerSignTxResponse,
+    RustModule.WalletV2.Transaction,
+    PublicDeriverWithCachedMeta,
+  ) => Promise<void> = async (
+    ledgerSignTxResp,
+    unsignedTx,
+    publicDeriver,
+  ) => {
     const { wallets } = this.stores.substores[environment.API];
-    const publicDeriver = wallets.selected;
-    if (publicDeriver == null) {
-      throw new Error('_prepareAndBroadcastSignedTx no public deriver selected');
-    }
     const withPublicKey = asGetPublicKey(publicDeriver.self);
     if (withPublicKey == null) {
-      throw new Error('_prepareAndBroadcastSignedTx public deriver has no public key.');
+      throw new Error(`${nameof(this._prepareAndBroadcastSignedTx)} public deriver has no public key.`);
     }
     const withLevels = asHasLevels<ConceptualWallet>(withPublicKey);
     if (withLevels == null) {
-      throw new Error('_prepareAndBroadcastSignedTx public deriver has no levels');
+      throw new Error(`${nameof(this._prepareAndBroadcastSignedTx)} public deriver has no levels`);
     }
 
     await this.broadcastLedgerSignedTxRequest.execute({
@@ -197,18 +196,18 @@ export default class LedgerSendStore extends Store {
     return result;
   }
 
-  _cancel = (): void => {
+  _cancel: void => void = () => {
     if (!this.isActionProcessing) {
       this.actions.dialogs.closeActiveDialog.trigger();
       this._reset();
     }
   }
 
-  @action _setActionProcessing = (processing: boolean): void => {
+  @action _setActionProcessing: boolean => void = (processing) => {
     this.isActionProcessing = processing;
   }
 
-  @action _setError = (error: ?LocalizableError): void => {
+  @action _setError: ?LocalizableError => void = (error) => {
     this.error = error;
   }
 }

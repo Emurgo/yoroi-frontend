@@ -54,11 +54,11 @@ export default class TransactionsStore extends Store {
     actions.loadMoreTransactions.listen(this._increaseSearchLimit);
   }
 
-  @action _increaseSearchLimit = async (): Promise<void> => {
+  @action _increaseSearchLimit: PublicDeriverWithCachedMeta => Promise<void> = async (
+    publicDeriver
+  ) => {
     if (this.searchOptions != null) {
       this.searchOptions.limit += this.SEARCH_LIMIT_INCREASE;
-      const publicDeriver = this.stores.substores[environment.API].wallets.selected;
-      if (!publicDeriver) return;
       await this.refreshLocal(publicDeriver.self);
     }
   };
@@ -130,7 +130,6 @@ export default class TransactionsStore extends Store {
   @action refreshTransactionData: PublicDeriverWithCachedMeta => Promise<void> = async (
     basePubDeriver
   ) => {
-    const walletsStore = this.stores.substores[environment.API].wallets;
     const walletsActions = this.actions[environment.API].wallets;
 
     const publicDeriver = asHasLevels<
@@ -178,7 +177,10 @@ export default class TransactionsStore extends Store {
         const lastUpdateDate = await this.api[environment.API].getTxLastUpdatedDate({
           getLastSyncInfo: publicDeriver.getLastSyncInfo
         });
-        walletsActions.updateLastSync.trigger(lastUpdateDate);
+        walletsActions.updateLastSync.trigger({
+          lastSync: lastUpdateDate,
+          publicDeriver: basePubDeriver,
+        });
         // Note: cache based on last slot synced  (not used in balanceRequest)
         const req = this._getBalanceRequest(basePubDeriver.self);
         req.execute({
@@ -189,12 +191,10 @@ export default class TransactionsStore extends Store {
         return req.promise;
       })
       .then((updatedBalance) => {
-        if (
-          walletsStore.selected &&
-          walletsStore.selected.self === publicDeriver
-        ) {
-          walletsActions.updateBalance.trigger(updatedBalance);
-        }
+        walletsActions.updateBalance.trigger({
+          balance: updatedBalance,
+          publicDeriver: basePubDeriver,
+        });
         return undefined;
       })
       .then(() => {

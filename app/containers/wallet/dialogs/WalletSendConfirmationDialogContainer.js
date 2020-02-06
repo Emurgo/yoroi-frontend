@@ -60,6 +60,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
           await sendMoney.trigger({
             signRequest: copyRequest,
             password,
+            publicDeriver,
           });
         }}
         isSubmitting={sendMoneyRequest.isExecuting}

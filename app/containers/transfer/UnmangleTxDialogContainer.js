@@ -78,7 +78,11 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
     this._getWalletsStore().sendMoneyRequest.reset();
   }
 
-  submit = async () => {
+  submit: void => Promise<void> = async () => {
+    const selected = this._getWalletsStore().selected;
+    if (selected == null) {
+      throw new Error(`${nameof(UnmangleTxDialogContainer)} no wallet selected`);
+    }
     if (this.spendingPasswordForm == null) {
       throw new Error(`${nameof(UnmangleTxDialogContainer)} form not set`);
     }
@@ -91,6 +95,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
         this.props.actions.ada.wallets.sendMoney.trigger({
           signRequest: txBuilderStore.tentativeTx,
           password: walletPassword,
+          publicDeriver: selected,
         });
       },
       onError: () => {}

@@ -147,7 +147,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
       />
     );
 
-    const popup = this.generatePopupDialog();
+    const popup = this.generatePopupDialog(publicDeriver);
     return (
       <>
         {popup}
@@ -170,7 +170,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
     return epochLengthInDays;
   }
 
-  generatePopupDialog: void => (null | Node) = () => {
+  generatePopupDialog: PublicDeriverWithCachedMeta => (null | Node) = (publicDeriver) => {
     const { uiDialogs } = this.props.stores;
     const delegationTxStore = this.props.stores.substores[environment.API].delegationTransaction;
 
@@ -220,7 +220,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
         await this.props.actions[environment.API]
           .delegationTransaction
           .signTransaction
-          .trigger(request);
+          .trigger({ password: request.password, publicDeriver, });
         cancel();
       }}
       isSubmitting={delegationTxStore.signAndBroadcastDelegationTx.isExecuting}

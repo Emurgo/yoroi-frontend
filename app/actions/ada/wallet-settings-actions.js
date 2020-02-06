@@ -6,8 +6,14 @@ export default class WalletSettingsActions {
   cancelEditingWalletField: Action<void> = new Action();
   startEditingWalletField: Action<{| field: string |}> = new Action();
   stopEditingWalletField: Action<void> = new Action();
-  renamePublicDeriver: AsyncAction<{| newName: string |}> = new AsyncAction();
-  renameConceptualWallet: AsyncAction<{| newName: string |}> = new AsyncAction();
+  renamePublicDeriver: AsyncAction<{|
+    publicDeriver: PublicDeriverWithCachedMeta,
+    newName: string,
+  |}> = new AsyncAction();
+  renameConceptualWallet: AsyncAction<{|
+    publicDeriver: PublicDeriverWithCachedMeta,
+    newName: string,
+  |}> = new AsyncAction();
   updateSigningPassword: AsyncAction<{|
     publicDeriver: PublicDeriverWithCachedMeta,
     oldPassword: string,

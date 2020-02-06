@@ -104,12 +104,9 @@ export default class DelegationTransactionStore extends Store {
   @action
   _signTransaction: {|
     password: string,
+    publicDeriver: PublicDeriverWithCachedMeta,
   |} => Promise<void> = async (request) => {
-    const publicDeriver = this.stores.substores.ada.wallets.selected;
-    if (publicDeriver == null) {
-      throw new Error(`${nameof(this._signTransaction)} no public deriver selected`);
-    }
-    const withSigning = (asGetSigningKey(publicDeriver.self));
+    const withSigning = (asGetSigningKey(request.publicDeriver.self));
     if (withSigning == null) {
       throw new Error(`${nameof(this._signTransaction)} public deriver missing signing functionality.`);
     }
@@ -136,16 +133,12 @@ export default class DelegationTransactionStore extends Store {
         sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
       },
       refreshWallet: () => this.stores.substores[environment.API].wallets.refreshWallet(
-        publicDeriver
+        request.publicDeriver
       ),
     }).promise;
   }
 
-  _complete: void => Promise<void> = async () => {
-    const publicDeriver = this.stores.substores.ada.wallets.selected;
-    if (publicDeriver == null) {
-      throw new Error(`${nameof(this._complete)} no public deriver selected`);
-    }
+  _complete: PublicDeriverWithCachedMeta => void = (publicDeriver) => {
     this.actions.dialogs.closeActiveDialog.trigger();
     this.goToDashboardRoute(publicDeriver.self);
   }

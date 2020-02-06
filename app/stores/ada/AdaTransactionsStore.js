@@ -19,6 +19,7 @@ import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
 import { isValidAmountInLovelaces } from '../../utils/validations';
 import TransactionsStore from '../base/TransactionsStore';
 import { assuranceLevels, } from '../../config/transactionAssuranceConfig';
+import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 import type {
   GetTransactionRowsToExportFunc,
 } from '../../api/ada';
@@ -99,23 +100,22 @@ export default class AdaTransactionsStore extends TransactionsStore {
     Promise.resolve(isValidAmountInLovelaces(amountInLovelaces))
   );
 
-  @action _exportTransactionsToFile = async (
-    params: TransactionRowsToExportRequest
-  ): Promise<void> => {
+  @action _exportTransactionsToFile: {|
+    publicDeriver: PublicDeriverWithCachedMeta,
+    exportRequest: TransactionRowsToExportRequest,
+  |} => Promise<void> = async (request) => {
     try {
       this._setExporting(true);
 
       this.getTransactionRowsToExportRequest.reset();
       this.exportTransactions.reset();
 
-      const publicDeriver = this.stores.substores.ada.wallets.selected;
-      if (!publicDeriver) return;
-      const withLevels = asHasLevels<ConceptualWallet>(publicDeriver.self);
+      const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver.self);
       if (!withLevels) return;
 
       const respTxRows = await this.getTransactionRowsToExportRequest.execute({
         publicDeriver: withLevels,
-        ...params,
+        ...request.exportRequest,
       }).promise;
 
       if (respTxRows == null || respTxRows.length < 1) {
@@ -140,22 +140,22 @@ export default class AdaTransactionsStore extends TransactionsStore {
 
       this._setExportError(localizableError);
       this._setExporting(false);
-      Logger.error(`AdaTransactionsStore::_exportTransactionsToFile ${stringifyError(error)}`);
+      Logger.error(`${nameof(AdaTransactionsStore)}::${nameof(this._exportTransactionsToFile)} ${stringifyError(error)}`);
     } finally {
       this.getTransactionRowsToExportRequest.reset();
       this.exportTransactions.reset();
     }
   }
 
-  @action _setExporting = (isExporting: boolean): void  => {
+  @action _setExporting: boolean => void = (isExporting)  => {
     this.isExporting = isExporting;
   }
 
-  @action _setExportError = (error: ?LocalizableError): void => {
+  @action _setExportError: ?LocalizableError => void = (error) => {
     this.exportError = error;
   }
 
-  @action _closeExportTransactionDialog = (): void => {
+  @action _closeExportTransactionDialog: void => void = () => {
     if (!this.isExporting) {
       this.actions.dialogs.closeActiveDialog.trigger();
       this._setExporting(false);
