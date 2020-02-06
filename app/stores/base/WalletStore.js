@@ -70,18 +70,18 @@ export default class WalletStore extends Store {
     super.setup();
     this.publicDerivers = [];
     setInterval(this._pollRefresh, this.WALLET_REFRESH_INTERVAL);
+    // $FlowFixMe built-in types can't handle visibilitychange
     document.addEventListener('visibilitychange', debounce(this._pollRefresh, this.ON_VISIBLE_DEBOUNCE_WAIT));
-
     this.registerReactions([
       this._updateActiveWalletOnRouteChanges,
       this._showAddWalletPageWhenNoWallets,
     ]);
   }
 
-  _create = async (params: {
+  _create: {|
     name: string,
     password: string,
-  }) => {
+  |} => Promise<void> = async (params) => {
     const recoveryPhrase = await (
       this.generateWalletRecoveryPhraseRequest.execute({}).promise
     );
@@ -95,9 +95,9 @@ export default class WalletStore extends Store {
   };
 
   @action
-  _baseAddNewWallet = async (
-    newWallet: RestoreWalletResponse,
-  ): Promise<void> => {
+  _baseAddNewWallet: RestoreWalletResponse => Promise<void> = async (
+    newWallet,
+  ) => {
     // set the first created as the result
     const newWithCachedData: Array<PublicDeriverWithCachedMeta> = [];
     for (const newPublicDeriver of newWallet.publicDerivers) {
@@ -121,7 +121,7 @@ export default class WalletStore extends Store {
   }
 
   /** Create the wallet and go to wallet summary screen */
-  _finishCreation = async () => {
+  _finishCreation: void => Promise<void> = async () => {
     const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
     if (persistentDb == null) {
       throw new Error('_finishCreation db not loaded. Should never happen');
@@ -207,8 +207,8 @@ export default class WalletStore extends Store {
   }
 
   getWalletRoute: (PublicDeriver<>, ?string) => string = (
-    publicDeriver: PublicDeriver<>,
-    page: ?string
+    publicDeriver,
+    page,
   ): string => (
     buildRoute(ROUTES.WALLETS.PAGE, {
       id: publicDeriver.getPublicDeriverId(),
@@ -247,25 +247,25 @@ export default class WalletStore extends Store {
 
   // ACTIONS
 
-  @action.bound _updateBalance(balance: BigNumber): void {
-    const selected = this.selected;
-    if (selected != null) {
-      selected.amount = balance.dividedBy(
-        LOVELACES_PER_ADA
-      );
-    }
+  @action.bound _updateBalance(request: {|
+    balance: BigNumber,
+    publicDeriver: PublicDeriverWithCachedMeta,
+  |}): void {
+    request.publicDeriver.amount = request.balance.dividedBy(
+      LOVELACES_PER_ADA
+    );
   }
 
   @action.bound
-  _updateLastSync(lastSync: IGetLastSyncInfoResponse): void {
-    const selected = this.selected;
-    if (selected != null) {
-      selected.lastSyncInfo = lastSync;
-    }
+  _updateLastSync(request: {|
+    lastSync: IGetLastSyncInfoResponse,
+    publicDeriver: PublicDeriverWithCachedMeta,
+  |}): void {
+    request.publicDeriver.lastSyncInfo = request.lastSync;
   }
 
   /** Make all API calls required to setup/update wallet */
-  @action restoreWalletsFromStorage: void => Promise<void> = async (): Promise<void> => {
+  @action restoreWalletsFromStorage: void => Promise<void> = async () => {
     const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
     if (persistentDb == null) {
       throw new Error('restoreWalletsFromStorage db not loaded. Should never happen');
@@ -306,22 +306,22 @@ export default class WalletStore extends Store {
   };
 
   /** Make all API calls required to setup imported wallet */
-  @action refreshImportedWalletData: void => Promise<void> = async (): Promise<void> => {
+  @action refreshImportedWalletData: void => Promise<void> = async () => {
     if (this.hasAnyPublicDeriver) this._setActiveWallet({ wallet: this.publicDerivers[0] });
     return await this.restoreWalletsFromStorage();
   };
 
   // =================== ACTIVE WALLET ==================== //
 
-  @action _setActiveWallet = (
-    { wallet }: { wallet: PublicDeriverWithCachedMeta }
-  ): void => {
+  @action _setActiveWallet: {| wallet: PublicDeriverWithCachedMeta |} => void = (
+    { wallet }
+  ) => {
     this.selected = wallet;
     // do not await on purpose since the UI will handle adding loaders while refresh is happening
     this.refreshWallet(wallet);
   };
 
-  @action _unsetActiveWallet = (): void => {
+  @action _unsetActiveWallet: void => void = () => {
     this.selected = null;
   };
 
@@ -334,8 +334,9 @@ export default class WalletStore extends Store {
     return isRootRoute || isNoWalletsRoute;
   }
 
-  _pollRefresh = async (): Promise<void> => {
+  _pollRefresh: void => Promise<void> = async () => {
     // Do not update if screen not active
+    // TODO: use visibilityState instead
     if (!document.hidden) {
       const selected = this.selected;
       if (selected) {
@@ -353,7 +354,7 @@ export default class WalletStore extends Store {
   /* @Attention:
       This method has a really tricky logic because is in charge of some redirection rules
       related to app urls and wallet status. Also, this behaviour is trigger by mobx reactions,
-      so it's hard to reason about all the scenarios could happend.
+      so it's hard to reason about all the scenarios could happened.
   */
   _updateActiveWalletOnRouteChanges = () => {
     const currentRoute = this.stores.app.currentRoute;

@@ -20,6 +20,7 @@ import {
   asGetSigningKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 
 export default class AdaWalletsStore extends WalletStore {
 
@@ -55,30 +56,29 @@ export default class AdaWalletsStore extends WalletStore {
   // =================== SEND MONEY ==================== //
 
   /** Send money and then return to transaction screen */
-  _sendMoney = async (transactionDetails: {|
+  _sendMoney:  {|
     signRequest: BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>,
     password: string,
-  |}): Promise<void> => {
-    const publicDeriver = this.selected;
-    if (!publicDeriver) throw new Error('Active wallet required before sending.');
-
-    const withSigning = (asGetSigningKey(publicDeriver.self));
+    publicDeriver: PublicDeriverWithCachedMeta,
+  |} => Promise<void> = async (transactionDetails) => {
+    const withSigning = (asGetSigningKey(transactionDetails.publicDeriver.self));
     if (withSigning == null) {
       throw new Error(`${nameof(this._sendMoney)} public deriver missing signing functionality.`);
     }
     await this.sendMoneyRequest.execute({
       broadcastRequest: {
         publicDeriver: withSigning,
-        ...transactionDetails,
+        password: transactionDetails.password,
+        signRequest: transactionDetails.signRequest,
         sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
       },
-      refreshWallet: () => this.refreshWallet(publicDeriver),
+      refreshWallet: () => this.refreshWallet(transactionDetails.publicDeriver),
     }).promise;
 
     this.actions.dialogs.closeActiveDialog.trigger();
     this.sendMoneyRequest.reset();
     // go to transaction screen
-    this.goToWalletRoute(publicDeriver.self);
+    this.goToWalletRoute(transactionDetails.publicDeriver.self);
   };
 
   @action _onRouteChange = (options: { route: string, params: ?Object }): void => {

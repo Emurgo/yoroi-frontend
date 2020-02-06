@@ -72,7 +72,7 @@ export default class WalletSummaryPage extends Component<Props> {
             selectedExplorer={this.props.stores.profile.selectedExplorer}
             isLoadingTransactions={isLoadingTx}
             hasMoreToLoad={totalAvailable > limit}
-            onLoadMore={actions.ada.transactions.loadMoreTransactions.trigger}
+            onLoadMore={() => actions.ada.transactions.loadMoreTransactions.trigger(publicDeriver)}
             assuranceMode={publicDeriver.assuranceMode}
             walletId={publicDeriver.self.getPublicDeriverId().toString()}
             shouldHideBalance={profile.shouldHideBalance}
@@ -113,7 +113,10 @@ export default class WalletSummaryPage extends Component<Props> {
           <ExportTransactionDialog
             isActionProcessing={isExporting}
             error={exportError}
-            submit={exportTransactionsToFile.trigger}
+            submit={exportRequest => exportTransactionsToFile.trigger({
+              exportRequest,
+              publicDeriver
+            })}
             cancel={closeExportTransactionDialog.trigger}
             classicTheme={profile.isClassicTheme}
           />

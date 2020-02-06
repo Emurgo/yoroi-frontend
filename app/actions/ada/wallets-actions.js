@@ -6,6 +6,7 @@ import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import type {
   IGetLastSyncInfoResponse,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 
 // ======= WALLET ACTIONS =======
 
@@ -19,7 +20,14 @@ export default class WalletsActions {
   sendMoney: AsyncAction<{|
     signRequest: BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>,
     password: string,
+    publicDeriver: PublicDeriverWithCachedMeta,
   |}> = new AsyncAction();
-  updateBalance: Action<BigNumber> = new Action();
-  updateLastSync: Action<IGetLastSyncInfoResponse> = new Action();
+  updateBalance: Action<{|
+    balance: BigNumber,
+    publicDeriver: PublicDeriverWithCachedMeta,
+  |}> = new Action();
+  updateLastSync: Action<{|
+    lastSync: IGetLastSyncInfoResponse,
+    publicDeriver: PublicDeriverWithCachedMeta,
+  |}> = new Action();
 }

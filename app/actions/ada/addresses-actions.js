@@ -1,9 +1,10 @@
 // @flow
 import { AsyncAction, Action } from '../lib/Action';
+import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 
 // ======= ADDRESSES ACTIONS =======
 
 export default class AddressesActions {
-  createAddress: AsyncAction<void> = new AsyncAction();
+  createAddress: AsyncAction<PublicDeriverWithCachedMeta> = new AsyncAction();
   resetErrors: Action<void> = new Action();
 }

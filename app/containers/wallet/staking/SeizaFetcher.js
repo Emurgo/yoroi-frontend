@@ -101,6 +101,11 @@ export default class SeizaFetcher extends Component<Props> {
       throw new Error('Staking undefined SEIZA_FOR_YOROI_URL should never happen');
     }
 
+    const selectedWallet = this.props.stores.substores[environment.API].wallets.selected;
+    if (selectedWallet == null) {
+      return null;
+    }
+
     const dialogBackButton = [
       {
         label: intl.formatMessage(globalMessages.backButtonLabel),
@@ -174,7 +179,10 @@ export default class SeizaFetcher extends Component<Props> {
               delegationTxStore.signAndBroadcastDelegationTx.isExecuting
             }
             onCancel={this.cancel}
-            onSubmit={delegationTxActions.signTransaction.trigger}
+            onSubmit={({ password }) => delegationTxActions.signTransaction.trigger({
+              password,
+              publicDeriver: selectedWallet,
+            })}
             classicTheme={profile.isClassicTheme}
             error={delegationTxStore.signAndBroadcastDelegationTx.error}
             selectedExplorer={stores.profile.selectedExplorer}
@@ -182,7 +190,7 @@ export default class SeizaFetcher extends Component<Props> {
         }
         {delegationTx != null && !showSignDialog &&
           <DelegationSuccessDialog
-            onClose={delegationTxActions.complete.trigger}
+            onClose={() => delegationTxActions.complete.trigger(selectedWallet)}
             classicTheme={profile.isClassicTheme}
           />
         }

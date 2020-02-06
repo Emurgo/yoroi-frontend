@@ -54,7 +54,10 @@ export default class TrezorSendStore extends Store {
   }
 
   /** Generates a payload with Trezor format and tries Send ADA using Trezor signing */
-  _sendUsingTrezor = async (params: SendUsingTrezorParams): Promise<void> => {
+  _sendUsingTrezor: {|
+    params: SendUsingTrezorParams,
+    publicDeriver: PublicDeriverWithCachedMeta,
+  |} => Promise<void> = async (request) => {
     try {
       this.createTrezorSignTxDataRequest.reset();
       this.broadcastTrezorSignedTxRequest.reset();
@@ -67,16 +70,9 @@ export default class TrezorSendStore extends Store {
       this._setError(null);
       this._setActionProcessing(true);
 
-      // capture what wallet is selected before the sending starts
-      const { wallets } = this.stores.substores[environment.API];
-      const publicDeriver = wallets.selected;
-      if (publicDeriver == null) {
-        throw new Error('_sendUsingTrezor no public deriver selected');
-      }
-
       const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
       this.createTrezorSignTxDataRequest.execute({
-        ...params,
+        ...request.params,
         getTxsBodiesForUTXOs: stateFetcher.getTxsBodiesForUTXOs,
       });
       if (!this.createTrezorSignTxDataRequest.promise) throw new Error('should never happen');
@@ -94,11 +90,11 @@ export default class TrezorSendStore extends Store {
 
       await this._brodcastSignedTx(
         trezorSignTxResp,
-        publicDeriver
+        request.publicDeriver
       );
 
     } catch (error) {
-      Logger.error('TrezorSendStore::_sendUsingTrezor error: ' + stringifyError(error));
+      Logger.error(`${nameof(TrezorSendStore)}::${nameof(this._sendUsingTrezor)} error: ` + stringifyError(error));
       this._setError(convertToLocalizableError(error));
     } finally {
       this.createTrezorSignTxDataRequest.reset();
@@ -107,12 +103,15 @@ export default class TrezorSendStore extends Store {
     }
   };
 
-  _brodcastSignedTx = async (
-    trezorSignTxResp: CardanoSignTransaction$,
-    publicDeriver: PublicDeriverWithCachedMeta,
+  _brodcastSignedTx: (
+    CardanoSignTransaction$,
+    PublicDeriverWithCachedMeta,
+  ) => Promise<void> = async (
+    trezorSignTxResp,
+    publicDeriver,
   ): Promise<void> => {
     if (!trezorSignTxResp.success) {
-      throw new Error('TrezorSendStore::_brodcastSignedTx should never happen');
+      throw new Error(`${nameof(TrezorSendStore)}::${nameof(this._brodcastSignedTx)} should never happen`);
     }
     const { wallets } = this.stores.substores[environment.API];
     await this.broadcastTrezorSignedTxRequest.execute({
@@ -148,18 +147,18 @@ export default class TrezorSendStore extends Store {
     return result;
   }
 
-  _cancel = (): void => {
+  _cancel: void => void = () => {
     if (!this.isActionProcessing) {
       this.actions.dialogs.closeActiveDialog.trigger();
       this._reset();
     }
   }
 
-  @action _setActionProcessing = (processing: boolean): void => {
+  @action _setActionProcessing: boolean => void = (processing) => {
     this.isActionProcessing = processing;
   }
 
-  @action _setError = (error: ?LocalizableError): void => {
+  @action _setError: (?LocalizableError) => void = (error) => {
     this.error = error;
   }
 }

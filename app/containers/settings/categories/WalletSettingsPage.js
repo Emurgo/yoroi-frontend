@@ -66,7 +66,7 @@ export default class WalletSettingsPage extends Component<Props> {
           lastUpdatedField={lastUpdatedWalletField}
           onFieldValueChange={async (field, value) => {
             if (field === 'name') {
-              await renameConceptualWallet.trigger({ newName: value });
+              await renameConceptualWallet.trigger({ publicDeriver, newName: value });
             }
           }}
           onStartEditing={field => startEditingWalletField.trigger({ field })}

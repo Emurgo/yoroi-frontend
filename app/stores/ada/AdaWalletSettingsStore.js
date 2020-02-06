@@ -45,14 +45,14 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
     a.resyncHistory.listen(this._resyncHistory);
   }
 
-  @action _changeSigningPassword = async (request: {
+  @action _changeSigningPassword: {|
     publicDeriver: PublicDeriverWithCachedMeta,
     oldPassword: string,
     newPassword: string
-  }): Promise<void> => {
+  |} => Promise<void> = async (request) => {
     const withSigningKey = asGetSigningKey(request.publicDeriver.self);
     if (withSigningKey == null) {
-      throw new Error('_changeSigningPassword missing signing functionality');
+      throw new Error(`${nameof(this._changeSigningPassword)} missing signing functionality`);
     }
     const newUpdateDate = new Date(Date.now());
     await this.changeSigningKeyRequest.execute({
@@ -71,34 +71,28 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
     });
   };
 
-  @action _renamePublicDeriver = async (request: {
+  @action _renamePublicDeriver: {|
+    publicDeriver: PublicDeriverWithCachedMeta,
     newName: string
-  }): Promise<void> => {
-    // get public deriver
-    const publicDeriver = this.stores.substores.ada.wallets.selected;
-    if (!publicDeriver) return;
-
+  |} => Promise<void> = async (request) => {
     // update the meta-parameters in the internal wallet representation
     await this.renameModelRequest.execute({
-      func: publicDeriver.self.rename,
+      func: request.publicDeriver.self.rename,
       request: {
         newName: request.newName,
       },
     }).promise;
 
     runInAction(() => {
-      publicDeriver.publicDeriverName = request.newName;
+      request.publicDeriver.publicDeriverName = request.newName;
     });
   };
 
-  @action _renameConceptualWallet = async (request: {
+  @action _renameConceptualWallet: {|
+    publicDeriver: PublicDeriverWithCachedMeta,
     newName: string
-  }): Promise<void> => {
-    // get public deriver
-    const publicDeriver = this.stores.substores.ada.wallets.selected;
-    if (!publicDeriver) return;
-
-    const conceptualWallet = publicDeriver.self.getParent();
+  |} => Promise<void> = async (request) => {
+    const conceptualWallet = request.publicDeriver.self.getParent();
     // update the meta-parameters in the internal wallet representation
     await this.renameModelRequest.execute({
       func: conceptualWallet.rename,
@@ -108,13 +102,13 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
     }).promise;
 
     runInAction(() => {
-      publicDeriver.conceptualWalletName = request.newName;
+      request.publicDeriver.conceptualWalletName = request.newName;
     });
   };
 
-  @action _resyncHistory = async (request: {|
+  @action _resyncHistory: {|
     publicDeriver: PublicDeriverWithCachedMeta,
-  |}): Promise<void> => {
+  |} => Promise<void> = async (request) => {
     const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver.self);
     if (withLevels == null) {
       throw new Error(`${nameof(this._resyncHistory)} missing levels`);
