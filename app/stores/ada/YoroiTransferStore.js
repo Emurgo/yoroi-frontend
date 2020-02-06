@@ -292,6 +292,9 @@ export default class YoroiTransferStore extends Store {
      */
     rebuildTx: boolean,
   |} => Promise<void> = async (payload) => {
+    runInAction(() => {
+      this.error = null;
+    });
     const oldTx = (() => {
       const tx = this.transferTx;
       if (tx == null) {
@@ -321,9 +324,11 @@ export default class YoroiTransferStore extends Store {
     await this.transferFundsRequest.execute({
       getTransferTx,
     });
-    this._updateStatus(TransferStatus.SUCCESS);
-    await next();
-    this.reset();
+    if (this.error == null) {
+      this._updateStatus(TransferStatus.SUCCESS);
+      await next();
+      this.reset();
+    }
   }
 
   _isWalletChanged(transferTx1: TransferTx, transferTx2: TransferTx): boolean {
@@ -386,7 +391,10 @@ export default class YoroiTransferStore extends Store {
         /* See if the error is due to wallet change since last recovery.
            This should be very rare because the window is short.
         */
-        await request.getTransferTx(); // will update the tx if something changed
+        const newTx = await request.getTransferTx(); // will update the tx if something changed
+        if (newTx == null) {
+          return;
+        }
       }
 
       Logger.error(`${nameof(YoroiTransferStore)}::${nameof(this._checkAndTransfer)} ${stringifyError(error)}`);
