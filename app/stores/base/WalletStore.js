@@ -229,9 +229,8 @@ export default class WalletStore extends Store {
   ): Promise<void> {
     try {
       const substore = this.stores.substores[environment.API];
-      await substore.addresses.refreshAddresses(publicDeriver);
-      // note: only refresh txs if refreshing addresses succeeded
       await substore.transactions.refreshTransactionData(publicDeriver);
+      await substore.addresses.refreshAddressesFromDb(publicDeriver);
     } catch (error) {
       Logger.error(`${nameof(WalletStore)}::${nameof(this.refreshWallet)} ` + stringifyError(error));
       throw error;

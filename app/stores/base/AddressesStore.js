@@ -97,15 +97,13 @@ export class AddressTypeStore<T> {
     return result ? result.length : 0;
   }
 
-  /** Refresh addresses for all wallets */
-  @action refreshAddresses: PublicDeriverWithCachedMeta => Promise<void> = async (
+  /** Refresh addresses from database */
+  @action refreshAddressesFromDb: PublicDeriverWithCachedMeta => Promise<void> = async (
     publicDeriver,
   ) => {
     const allRequest = this.getRequest(publicDeriver.self);
     allRequest.invalidate({ immediately: false });
-    const promise = allRequest.execute({ publicDeriver: publicDeriver.self }).promise;
-    if (promise == null) throw new Error('Should never happen');
-    await promise.catch(() => {}); // Do nothing. It's logged in the api call
+    await allRequest.execute({ publicDeriver: publicDeriver.self }).promise;
   };
 
   _flowCoerceResult: CachedRequest<SubRequestType<T>> => ?Array<T> = (request) => {
@@ -191,7 +189,7 @@ export default class AddressesStore extends Store {
         popFunc: withDisplayCutoff.popAddress
       }).promise;
       if (address != null) {
-        await this.refreshAddresses(publicDeriver);
+        await this.refreshAddressesFromDb(publicDeriver);
         runInAction('reset error', () => { this.error = null; });
       }
     } catch (error) {
@@ -218,17 +216,17 @@ export default class AddressesStore extends Store {
     }
   }
 
-  refreshAddresses: PublicDeriverWithCachedMeta => Promise<void> = async (
+  refreshAddressesFromDb: PublicDeriverWithCachedMeta => Promise<void> = async (
     publicDeriver
   ) => {
     const withHasUtxoChains = asHasUtxoChains(publicDeriver.self);
     if (withHasUtxoChains == null) {
-      await this.allAddressesForDisplay.refreshAddresses(publicDeriver);
+      await this.allAddressesForDisplay.refreshAddressesFromDb(publicDeriver);
     } else {
-      await this.externalForDisplay.refreshAddresses(publicDeriver);
-      await this.internalForDisplay.refreshAddresses(publicDeriver);
+      await this.externalForDisplay.refreshAddressesFromDb(publicDeriver);
+      await this.internalForDisplay.refreshAddressesFromDb(publicDeriver);
       if (environment.isShelley) {
-        await this.mangledAddressesForDisplay.refreshAddresses(publicDeriver);
+        await this.mangledAddressesForDisplay.refreshAddressesFromDb(publicDeriver);
       }
     }
   }
