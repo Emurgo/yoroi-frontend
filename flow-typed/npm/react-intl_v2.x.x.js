@@ -1,5 +1,5 @@
-// flow-typed signature: 3902298e28ed22d8cd8d49828801a760
-// flow-typed version: eb50783110/react-intl_v2.x.x/flow_>=v0.63.x
+// flow-typed signature: 5243ea9e69743c504dd1a4eb277c2895
+// flow-typed version: 2cbbfd7d47/react-intl_v2.x.x/flow_>=v0.104.x
 
 /**
  * Original implementation of this file by @marudor at https://github.com/marudor/flowInterfaces
@@ -58,8 +58,11 @@ declare module "react-intl" {
     ...
   };
 
-  declare type $npm$ReactIntl$IntlShape = $npm$ReactIntl$IntlConfig &
-    $npm$ReactIntl$IntlFormat & { now: () => number, ... };
+  declare type $npm$ReactIntl$IntlShape = {|
+    ...$Exact<$npm$ReactIntl$IntlConfig>,
+    ...$Exact<$npm$ReactIntl$IntlFormat>,
+    ...{| now: () => number |},
+  |};
 
   declare type $npm$ReactIntl$DateTimeFormatOptions = {
     localeMatcher?: "best fit" | "lookup",
