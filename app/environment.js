@@ -13,10 +13,10 @@ declare var CONFIG: ConfigType;
 declare type Currency = 'ada';
 
 function getVersion(): string {
-  const manifest = require('../chrome/manifest.' + CONFIG.network.name);
-  const content = manifest.default !== undefined
-    ? manifest.default
-    : manifest;
+  const genManifest = require('../chrome/manifest.' + CONFIG.network.name);
+  const content = genManifest.default !== undefined
+    ? genManifest.default(true)
+    : genManifest();
   return content.version;
 }
 export const environment = ((
