@@ -29,9 +29,9 @@ exports.copyAssets = (type: string, env: string) => {
   cp('chrome/content-scripts/ledger/*.js', `${type}/js/`);
 };
 
-const buildManifest = (type: Network) => {
-  const manifestContent = require(`../chrome/manifest.${type}`);
-  const manifestContentJSON = JSON.stringify(manifestContent, null, 4);
+const buildManifest = (type: Network, isDebug: boolean) => {
+  const genManifestContent = require(`../chrome/manifest.${type}`);
+  const manifestContentJSON = JSON.stringify(genManifestContent(isDebug), null, 4);
 
   const OUTPUT_FILE_NAME = `manifest.${type}.json`;
   const manifestDestPath = path.resolve(`${__dirname}/../chrome`, OUTPUT_FILE_NAME);
@@ -45,6 +45,6 @@ const buildManifest = (type: Network) => {
 };
 
 const manifestTypes = values(NetworkType);
-exports.buildManifests = () => {
-  manifestTypes.map((type) => buildManifest(type));
+exports.buildManifests = (isDebug: boolean) => {
+  manifestTypes.map((type) => buildManifest(type, isDebug));
 };

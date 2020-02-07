@@ -11,11 +11,11 @@ import {
   genCSP,
 } from './constants';
 
-export default buildManifest({
+export default (isDebug: boolean) => buildManifest({
   description: '[localhost] Cardano ADA wallet',
   defaultTitle: '[localhost] Yoroi',
   contentSecurityPolicy: genCSP({
-    isDev: false,
+    isDev: isDebug,
     additional: {
       'connect-src': [portToPermission(Ports.DevBackendServe), portToSocketPermission(Ports.DevBackendServe)],
     },

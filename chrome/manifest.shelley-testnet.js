@@ -10,12 +10,12 @@ import {
   genCSP,
 } from './constants';
 
-export default buildManifest({
+export default (isDebug: boolean) => buildManifest({
   description: 'A simple, secure and fast Cardano ADA wallet.',
   defaultTitle: 'Yoroi Shelley Testnet',
   titleOverride: true,
   contentSecurityPolicy: genCSP({
-    isDev: false,
+    isDev: isDebug,
     additional: {
       'connect-src': [serverToPermission(Servers.ShelleyITN)],
     },

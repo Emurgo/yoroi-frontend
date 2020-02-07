@@ -2,8 +2,10 @@
 
 ### Download
 
-[<img src="https://pbs.twimg.com/profile_images/1138489258207899648/9_KBUEn7_400x400.jpg" width="48">](https://addons.mozilla.org/en-US/firefox/addon/yoroi/)
-[<img src="https://pbs.twimg.com/profile_images/1037025533182193664/aCWlGSZF_400x400.jpg" width="48">](https://chrome.google.com/webstore/detail/yoroi/ffnbelfdoeiohenkjibnmadjiehjhajb)
+|   | Firefox | Chrome |
+|---|---|----|
+| Mainnet | [<img src="https://pbs.twimg.com/profile_images/1138489258207899648/9_KBUEn7_400x400.jpg" width="48">](https://addons.mozilla.org/en-US/firefox/addon/yoroi/) | [<img src="https://pbs.twimg.com/profile_images/1037025533182193664/aCWlGSZF_400x400.jpg" width="48">](https://chrome.google.com/webstore/detail/yoroi/ffnbelfdoeiohenkjibnmadjiehjhajb) |
+| Shelley testnet | [<img src="https://pbs.twimg.com/profile_images/1138489258207899648/9_KBUEn7_400x400.jpg" width="48">](https://addons.mozilla.org/en-US/firefox/addon/yoroi-shelley-testnet/) |[ <img src="https://pbs.twimg.com/profile_images/1037025533182193664/aCWlGSZF_400x400.jpg" width="48">](https://chrome.google.com/webstore/detail/yoroi-shelley-testnet/bioklcnnnpdblghplkifbemcigeanmjn) |
 
 Looking for Yoroi Mobile? See [here](https://github.com/Emurgo/yoroi-mobile)
 
@@ -19,39 +21,37 @@ Check out our [documents](docs/specs/meta) on the governance of this project.
 
 ## Build Yoroi Chrome extension
 
-Extension can be built for both the Cardano mainnet and [Byron testnet](https://testnet.iohkdev.io/cardano/byron/about/testnet-introduction/):
+Extension can be built for both Byron mainnet and Jormungandr testnet:
 
-####  Run project with testnet _(recommended)_
+#### Debug build with byron mainnet
 ```bash
 # build files to './dev'
-$ npm run dev
+$ npm run byron-dev
 ```
 
 This command will run extension as locally-hosted, create a `./dev` directory in the project, and then you can "load unpacked" extension from there. When you stop the running process - extension will stop working, but it also means you can create code-changes while process is running and extension will be hot-reloaded with these changes.
 
-This build connects to the public testnet.
+This will connect to the Cardano mainnet with ADA coins having real monetary value.
 
-#### Mainnet
+#### Production build with byron mainnet
 ```bash
 # build files to './build'
-$ npm run build -- --env "mainnet"
+$ npm run byron-prod
 ```
 
 This command will create a full build of the extension in the `./build` directory, which you can also "load unpacked" into your browser, and it will not require you to keep a running process to continue working (standalone build).
 
-This one will connect to the Cardano mainnet with ADA coins having real monetary value (equal to what users are downloading from browser stores). 
+This will connect to the Cardano mainnet with ADA coins having real monetary value (equal to what users are downloading from browser stores).
 
-#### Testnet
+#### Jormungandr testnet
 ```bash
+# build files to './dev'
+$ npm run shelley-dev
 # build files to './build'
-$ npm run build -- --env "testnet"
+$ npm run shelley-prod
 ```
 
-Same as previous but connects to the [Byron testnet](https://testnet.iohkdev.io/cardano/byron/about/testnet-introduction/).
- 
- You can get free testnet coins from public Faucet: [https://testnet.iohkdev.io/cardano/byron/tools/faucet/](https://testnet.iohkdev.io/cardano/byron/tools/faucet/).
- 
- Note that testnet addresses look different from regular mainnet addresses. This is an intentional feature of "address segregation", mainnet addresses don't work on testnet and will be rejected by the Faucet and by core nodes.
+Same as previous but connects to the [Jormungandr testnet]https://staking.cardano.org/).
 
 ## Run Yoroi Chrome extension
 
