@@ -47,7 +47,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-push": "npm run flow && npm run eslint && npm run jest"
+      "pre-push": "npm run flow && npm run eslint && npm run jest",
+      "post-checkout": "npm run purge-translations"
     }
   },
   "keywords": [

@@ -1,8 +1,0 @@
-#!/bin/bash                                                                      
-
-set -e
-
-# not purging your cache when you switch to a branch
-# which changed translation files can cause issues
-echo 'purging translation cache'
-npm run purge-translations
