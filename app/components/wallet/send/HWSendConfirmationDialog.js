@@ -19,11 +19,11 @@ import type { ExplorerType } from '../../../domain/Explorer';
 
 import styles from './HWSendConfirmationDialog.scss';
 
-type ExpectedMessages = {
+type ExpectedMessages = {|
   infoLine1: MessageDescriptor,
   infoLine2: MessageDescriptor,
   sendUsingHWButtonLabel: MessageDescriptor,
-};
+|};
 
 type Props = {|
   +staleTx: boolean,

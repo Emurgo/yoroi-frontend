@@ -124,12 +124,12 @@ export class GetKeyForPublicDeriver {
     key: number,
     getPublic: boolean,
     getPrivate: boolean,
-  ): Promise<{
+  ): Promise<{|
     PublicDeriver: $ReadOnly<PublicDeriverRow>,
     KeyDerivation: $ReadOnly<KeyDerivationRow>,
     publicKey: $ReadOnly<KeyRow> | null | void,
     privateKey: $ReadOnly<KeyRow> | null | void,
-  }> {
+  |}> {
     const result = await GetKeyForPublicDeriver.depTables.GetPublicDeriver.get(
       db, tx,
       key,

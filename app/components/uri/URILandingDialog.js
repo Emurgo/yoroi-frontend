@@ -32,11 +32,11 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   +onSubmit: void => void,
   +onClose: void => void,
   +classicTheme: boolean,
-};
+|};
 
 @observer
 export default class URILandingDialog extends Component<Props> {

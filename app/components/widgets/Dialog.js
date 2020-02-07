@@ -10,13 +10,13 @@ import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { ModalSkin } from 'react-polymorph/lib/skins/simple/ModalSkin';
 import styles from './Dialog.scss';
 
-type ActionType = {
+type ActionType = {|
   +label: string,
   +onClick: void => PossiblyAsync<void>,
   +primary?: boolean,
   +disabled?: boolean,
-  +className?: ?string
-};
+  +className?: ?string,
+|};
 
 type Props = {|
   +title?: string,
@@ -25,7 +25,7 @@ type Props = {|
   +closeButton?: Element<any>,
   +backButton?: Node,
   +className?: string,
-  +styleOveride?: {},
+  +styleOveride?: {...},
   +onClose?: ?(void => PossiblyAsync<void>),
   +closeOnOverlayClick?: boolean,
   +classicTheme: boolean

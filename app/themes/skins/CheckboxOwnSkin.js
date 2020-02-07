@@ -20,6 +20,7 @@ type Props = {
   theme: Object,
   themeId: string,
   showCheckInCenter: boolean,
+  ...
 };
 
 /**

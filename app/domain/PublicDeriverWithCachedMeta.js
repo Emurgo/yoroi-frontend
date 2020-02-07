@@ -30,7 +30,7 @@ export default class PublicDeriverWithCachedMeta {
   @observable signingKeyUpdateDate: null | Date;
   @observable lastSyncInfo: IGetLastSyncInfoResponse
 
-  constructor(data: {
+  constructor(data: {|
     self: PublicDeriver<>,
     plate: null | WalletAccountNumberPlate,
     publicDeriverName: string,
@@ -39,7 +39,7 @@ export default class PublicDeriverWithCachedMeta {
     assuranceMode: AssuranceMode,
     signingKeyUpdateDate: null | Date,
     lastSyncInfo: IGetLastSyncInfoResponse,
-  }) {
+  |}) {
     Object.assign(this, data);
   }
 
@@ -49,7 +49,7 @@ export default class PublicDeriverWithCachedMeta {
   }
 
   @action
-  static fromData(data: {
+  static fromData(data: {|
     self: PublicDeriver<>,
     plate: null | WalletAccountNumberPlate,
     publicDeriverName: string,
@@ -58,7 +58,7 @@ export default class PublicDeriverWithCachedMeta {
     assuranceMode: AssuranceMode,
     signingKeyUpdateDate: null | Date,
     lastSyncInfo: IGetLastSyncInfoResponse,
-  }) {
+  |}) {
     return new PublicDeriverWithCachedMeta(data);
   }
 

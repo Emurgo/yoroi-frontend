@@ -6,8 +6,11 @@ import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
 
 export type walletBackupSteps = 'privacyWarning' | 'recoveryPhraseDisplay' | 'recoveryPhraseEntry' | null;
 
-type RecoveryPhraseWordArray = Array<{ word: string }>;
-type recoveryPhraseSortedArray = Array<{ word: string, isActive: boolean }>;
+type RecoveryPhraseWordArray = Array<{| word: string, |}>;
+type recoveryPhraseSortedArray = Array<{|
+  word: string,
+  isActive: boolean,
+|}>;
 
 /** Pipeline for users to create their wallet and backing up their mnemonic somewhere safe */
 export default
@@ -22,7 +25,10 @@ class WalletBackupStore extends Store {
   /** Sorted recovery phrase the user clicks on to make sure they remember their mnemonic */
   @observable recoveryPhraseSorted: recoveryPhraseSortedArray;
   @observable completed: boolean;
-  @observable enteredPhrase: Array<{ word: string, index: number }>;
+  @observable enteredPhrase: Array<{|
+    word: string,
+    index: number,
+  |}>;
   @observable isPrivacyNoticeAccepted: boolean;
   @observable isEntering: boolean;
   @observable isTermDeviceAccepted: boolean;

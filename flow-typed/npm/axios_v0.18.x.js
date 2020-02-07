@@ -11,6 +11,7 @@ declare module 'axios' {
     auth?: {
       username: string,
       password: string,
+      ...
     };
   }
   declare interface Cancel {
@@ -36,6 +37,7 @@ declare module 'axios' {
     auth?: {
       username: string,
       password: string,
+      ...
     };
     baseURL?: string;
     cancelToken?: CancelToken;
@@ -135,8 +137,9 @@ declare module 'axios' {
     interceptors: {
       request: AxiosRequestInterceptor<mixed>,
       response: AxiosResponseInterceptor<mixed>,
+      ...
     };
-    defaults: { headers: Object } & AxiosXHRConfig<*, *>;
+    defaults: { headers: Object, ... } & AxiosXHRConfig<*, *>;
   }
 
   declare class AxiosError<T, R = T> extends Error {

@@ -15,7 +15,7 @@ import { RouterStore } from 'mobx-react-router';
 import type { ActionsMap } from '../actions/index';
 import type { Api } from '../api/index';
 
-/** Map of var name to class. Allows dyanmic lookup of class so we can init all stores one loop */
+/** Map of var name to class. Allows dynamic lookup of class so we can init all stores one loop */
 const storeClasses = {
   profile: ProfileStore,
   app: AppStore,
@@ -37,7 +37,7 @@ export type StoresMap = {|
   noticeBoard: NoticeBoardStore,
   loading: LoadingStore,
 
-  substores: { ada: AdaStoresMap },
+  substores: {| ada: AdaStoresMap, |},
   router: RouterStore,
 |};
 

@@ -3,7 +3,7 @@ import RouteParser from 'route-parser';
 
 export const matchRoute = (
   pattern: string, path: string
-): false | { [param: string]: string } => new RouteParser(pattern).match(path);
+): false | { [param: string]: string, ... } => new RouteParser(pattern).match(path);
 
 /**
  * Build a route from a pattern like `/wallets/:id` to `/wallets/123`
@@ -17,7 +17,7 @@ export const matchRoute = (
  * @param pattern
  * @param params
  */
-type ParamsT = ?{ [key: string]: Array<number|string>|number|string };
+type ParamsT = ?{ [key: string]: Array<number|string>|number|string, ... };
 export const buildRoute = (pattern: string, params: ParamsT) => {
   function toArray(val): Array<number | string> {
     return Array.isArray(val) ? val : [val];

@@ -9,7 +9,7 @@ declare var yoroi;
 export default {
   setActiveLanguage: async (
     client: any,
-    { language }: { language: string } = {}
+    { language }: {| language: string,  |} = {}
   ) => (
     await client.executeScript(locale => {
       yoroi.actions.profile.updateTentativeLocale.trigger({ locale });

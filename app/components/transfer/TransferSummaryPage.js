@@ -52,13 +52,14 @@ const messages = defineMessages({
 type Props = {|
   +formattedWalletAmount: BigNumber => string,
   +selectedExplorer: ExplorerType,
-  +transferTx: {
+  +transferTx: {|
     +recoveredBalance: BigNumber,
     +fee: BigNumber,
     +id?: string,
     +senders: Array<string>,
     +receiver: string,
-  },
+    +encodedTx?: Uint8Array,
+  |},
   +onSubmit: void => PossiblyAsync<void>,
   +isSubmitting: boolean,
   +onCancel: void => void,

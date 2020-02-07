@@ -44,7 +44,7 @@ const messages = defineMessages({
   }
 });
 
-type Props = {
+type Props = {|
   +onClose: void => void,
   +onGenerate: (address: string, amount: number) => void,
   +classicTheme: boolean,
@@ -53,7 +53,7 @@ type Props = {
   +currencyMaxIntegerDigits: number,
   +currencyMaxFractionalDigits: number,
   +validateAmount: (amountInNaturalUnits: string) => Promise<boolean>,
-};
+|};
 
 @observer
 export default class URIGenerateDialog extends Component<Props> {

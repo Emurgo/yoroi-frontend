@@ -48,6 +48,7 @@ type Props = {
   toggleMouseLocation: Function,
   toggleOpen: Function,
   done: boolean,
+  ...
 };
 
 export const AutocompleteOwnSkin = (props: Props) => {

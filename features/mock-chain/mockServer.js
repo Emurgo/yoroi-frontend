@@ -24,7 +24,7 @@ const addressesLimit = 50;
 const txsLimit = 20;
 
 function _validateAddressesReq(
-  { addresses }: { addresses: Array<string> } = {}
+  { addresses }: { addresses: Array<string>, ... } = {}
 ): boolean {
   if (!addresses || addresses.length > addressesLimit || addresses.length === 0) {
     throw new Error('Addresses request length should be (0, ' + addressesLimit + ']');
@@ -34,10 +34,8 @@ function _validateAddressesReq(
 }
 
 function _defaultSignedTransaction(
-  req: {
-    body: SignedRequestInternal
-  },
-  res: { send(arg: SignedResponse): any }
+  req: { body: SignedRequestInternal, ... },
+  res: { send(arg: SignedResponse): any, ... }
 ): void {
   const response = mockImporter.sendTx(req.body);
   res.send(response);
@@ -48,16 +46,16 @@ let MockServer = null;
 export function getMockServer(
   settings: {
     signedTransaction?: (
-      req: {
-        body: SignedRequestInternal
-      },
+      req: { body: SignedRequestInternal, ... },
       res: {
         send(arg: SignedResponse): any,
-        status: Function
+        status: Function,
+        ...
       }
     ) => void,
     // Whether to output request logs. Defaults to false.
-    outputLog?: boolean
+    outputLog?: boolean,
+    ...
   }
 ) {
   if (!MockServer) {
@@ -68,10 +66,8 @@ export function getMockServer(
     server.use(middlewares);
 
     server.post('/api/txs/utxoForAddresses', async (
-      req: {
-        body: AddressUtxoRequest
-      },
-      res: { send(arg: AddressUtxoResponse): any }
+      req: { body: AddressUtxoRequest, ... },
+      res: { send(arg: AddressUtxoResponse): any, ... }
     ): Promise<void> => {
       chai.assert.isTrue(_validateAddressesReq(req.body));
       const utxoForAddresses = await mockImporter.utxoForAddresses(req.body);
@@ -79,10 +75,8 @@ export function getMockServer(
     });
 
     server.post('/api/txs/utxoSumForAddresses', async (
-      req: {
-        body: UtxoSumRequest
-      },
-      res: { send(arg: UtxoSumResponse): any }
+      req: { body: UtxoSumRequest, ... },
+      res: { send(arg: UtxoSumResponse): any, ... }
     ): Promise<void> => {
       chai.assert.isTrue(_validateAddressesReq(req.body));
       const utxoSumForAddresses = await mockImporter.utxoSumForAddresses(req.body);
@@ -90,10 +84,8 @@ export function getMockServer(
     });
 
     server.post('/api/v2/txs/history', async (
-      req: {
-        body: HistoryRequest
-      },
-      res: { send(arg: HistoryResponse): any }
+      req: { body: HistoryRequest, ... },
+      res: { send(arg: HistoryResponse): any, ... }
     ): Promise<void> => {
       chai.assert.isTrue(_validateAddressesReq(req.body));
 
@@ -103,10 +95,8 @@ export function getMockServer(
     });
 
     server.post('/api/v2/account/rewards', async (
-      req: {
-        body: RewardHistoryRequest
-      },
-      res: { send(arg: RewardHistoryResponse): any }
+      req: { body: RewardHistoryRequest, ... },
+      res: { send(arg: RewardHistoryResponse): any, ... }
     ): Promise<void> => {
       chai.assert.isTrue(_validateAddressesReq(req.body));
 
@@ -115,20 +105,20 @@ export function getMockServer(
     });
 
     server.get('/api/v2/bestblock', async (
-      req: {
-        body: BestBlockRequest
-      },
-      res: { send(arg: BestBlockResponse): any }
+      req: { body: BestBlockRequest, ... },
+      res: { send(arg: BestBlockResponse): any, ... }
     ): Promise<void> => {
       const bestBlock = await mockImporter.getBestBlock(req.body);
       res.send(bestBlock);
     });
 
     server.post('/api/txs/signed', (
-      req: {
-        body: SignedRequestInternal
-      },
-      res: { send(arg: SignedResponse): any, status: Function }
+      req: { body: SignedRequestInternal, ... },
+      res: {
+        send(arg: SignedResponse): any,
+        status: Function,
+        ...
+      }
     ): void => {
       if (settings.signedTransaction) {
         settings.signedTransaction(req, res);
@@ -138,40 +128,32 @@ export function getMockServer(
     });
 
     server.post('/api/v2/addresses/filterUsed', async (
-      req: {
-        body: FilterUsedRequest
-      },
-      res: { send(arg: FilterUsedResponse): any }
+      req: { body: FilterUsedRequest, ... },
+      res: { send(arg: FilterUsedResponse): any, ... }
     ): Promise<void> => {
       const response = await mockImporter.usedAddresses(req.body);
       res.send(response);
     });
 
     server.post('/api/v2/account/state', async (
-      req: {
-        body: AccountStateRequest
-      },
-      res: { send(arg: AccountStateResponse): any }
+      req: { body: AccountStateRequest, ... },
+      res: { send(arg: AccountStateResponse): any, ... }
     ): Promise<void> => {
       const response = await mockImporter.getAccountState(req.body);
       res.send(response);
     });
 
     server.post('/api/v2/pool/info', async (
-      req: {
-        body: PoolInfoRequest
-      },
-      res: { send(arg: PoolInfoResponse): any }
+      req: { body: PoolInfoRequest, ... },
+      res: { send(arg: PoolInfoResponse): any, ... }
     ): Promise<void> => {
       const response = await mockImporter.getPoolInfo(req.body);
       res.send(response);
     });
 
     server.post('/api/v2/pool/reputation', async (
-      req: {
-        body: ReputationRequest
-      },
-      res: { send(arg: ReputationResponse): any }
+      req: { body: ReputationRequest, ... },
+      res: { send(arg: ReputationResponse): any, ... }
     ): Promise<void> => {
       const response = await mockImporter.getReputation(req.body);
       res.send(response);
@@ -179,7 +161,7 @@ export function getMockServer(
 
     server.get('/api/status', (
       req,
-      res: { send(arg: ServerStatusResponse): any }
+      res: { send(arg: ServerStatusResponse): any, ... }
     ): void => {
       const isServerOk = mockImporter.getApiStatus();
       res.send({ isServerOk });

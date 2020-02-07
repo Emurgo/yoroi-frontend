@@ -18,10 +18,10 @@ export type Bip44WrapperRow = {|
   Bip44WrapperId: number, // serial
   ...Bip44WrapperInsert,
 |};
-export const Bip44WrapperSchema: {
+export const Bip44WrapperSchema: {|
   +name: 'Bip44Wrapper',
-  properties: $ObjMapi<Bip44WrapperRow, ToSchemaProp>
-} = {
+  properties: $ObjMapi<Bip44WrapperRow, ToSchemaProp>,
+|} = {
   name: 'Bip44Wrapper',
   properties: {
     Bip44WrapperId: 'Bip44WrapperId',

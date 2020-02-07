@@ -6,7 +6,11 @@ import type {
   FilterFunc,
 } from './state-fetch/types';
 
-type AddressInfo = { address: string, isUsed: boolean, index: number };
+type AddressInfo = {|
+  address: string,
+  isUsed: boolean,
+  index: number,
+|};
 
 export type GenerateAddressFunc = (
   indices: Array<number>,

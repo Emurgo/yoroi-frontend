@@ -24,10 +24,10 @@ export type UtxoTransactionInputRow = {|
   UtxoTransactionInputId: number,
   ...UtxoTransactionInputInsert,
 |};
-export const UtxoTransactionInputSchema: {
+export const UtxoTransactionInputSchema: {|
   +name: 'UtxoTransactionInput',
-  properties: $ObjMapi<UtxoTransactionInputRow, ToSchemaProp>
-} = {
+  properties: $ObjMapi<UtxoTransactionInputRow, ToSchemaProp>,
+|} = {
   name: 'UtxoTransactionInput',
   properties: {
     UtxoTransactionInputId: 'UtxoTransactionInputId',
@@ -56,10 +56,10 @@ export type UtxoTransactionOutputRow = {|
  * utxo outputs are a super-set of inputs because for an address to be an input,
  * it must have received coins (been an output) previously
  */
-export const UtxoTransactionOutputSchema: {
+export const UtxoTransactionOutputSchema: {|
   +name: 'UtxoTransactionOutput',
-  properties: $ObjMapi<UtxoTransactionOutputRow, ToSchemaProp>
-} = {
+  properties: $ObjMapi<UtxoTransactionOutputRow, ToSchemaProp>,
+|} = {
   name: 'UtxoTransactionOutput',
   properties: {
     UtxoTransactionOutputId: 'UtxoTransactionOutputId',

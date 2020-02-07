@@ -39,7 +39,10 @@ import {
 export default class AddressesStore extends Store {
   @observable isActionProcessing: boolean = false;
   @observable error: ?LocalizableError = null;
-  @observable selectedAddress: ?{ address: string, path: BIP32Path } = null;
+  @observable selectedAddress: ?{|
+    address: string,
+    path: BIP32Path,
+  |} = null;
   ledgerConnect: ?LedgerConnect;
 
   setup(): void {

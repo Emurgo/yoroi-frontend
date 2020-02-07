@@ -23,19 +23,17 @@ export type RawTableVariation<Func, Deps, Arg> = (
   tableMap: Map<number, string>,
 ) => ReturnType<Func>;
 
-export type IChangePasswordRequest = {
+export type IChangePasswordRequest = {|
   oldPassword: null | string,
   newPassword: null | string,
   currentTime: null | Date,
-};
+|};
 export type IChangePasswordResponse = $ReadOnly<KeyRow>;
 export type IChangePasswordRequestFunc = (
   body: IChangePasswordRequest
 ) => Promise<IChangePasswordResponse>;
 
-export type IRenameRequest = {
-  newName: string,
-};
+export type IRenameRequest = {| newName: string, |};
 export type IRenameResponse = void;
 export type IRenameFunc = (
   body: IRenameRequest

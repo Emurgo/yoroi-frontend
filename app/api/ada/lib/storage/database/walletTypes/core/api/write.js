@@ -111,17 +111,17 @@ export type PublicDeriverRequest<Insert> = {|
   addLevelRequest: AddDerivationRequest<Insert>,
   levelSpecificTableName: string,
   derivationTables: Map<number, string>,
-  addPublicDeriverRequest: {
+  addPublicDeriverRequest: {|
     derivationId: number,
     lastSyncInfoId: number,
-   } => PublicDeriverInsert,
+  |} => PublicDeriverInsert,
 |};
 export type AddPublicDeriverResponse<Row> = {|
   publicDeriverResult: $ReadOnly<PublicDeriverRow>,
-  levelResult: {
+  levelResult: {|
     KeyDerivation: $ReadOnly<KeyDerivationRow>,
-    specificDerivationResult: $ReadOnly<Row>
-  },
+    specificDerivationResult: $ReadOnly<Row>,
+  |},
 |};
 
 export class AddPublicDeriver {
@@ -169,10 +169,10 @@ export class ModifyPublicDeriver {
   static async rename(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
+    request: {|
       pubDeriverId: number,
       newName: string,
-    },
+    |},
   ): Promise<void> {
     const publicDeriverTable = db.getSchema().table(
       ModifyPublicDeriver.ownTables[Tables.PublicDeriverSchema.name].name
@@ -233,10 +233,10 @@ export class ModifyConceptualWallet {
   static async rename(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
+    request: {|
       walletId: number,
       newName: string,
-    },
+    |},
   ): Promise<void> {
     const conceptualWalletTable = db.getSchema().table(
       ModifyConceptualWallet.ownTables[Tables.ConceptualWalletSchema.name].name

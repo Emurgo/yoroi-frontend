@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { map } from 'lodash';
 
 type Props = {|
-  +variables: { [key: string]: string },
+  +variables: { [key: string]: string, ... },
   +children?: Node,
 |};
 
@@ -24,7 +24,7 @@ export default class ThemeManager extends Component<Props> {
     }
   }
 
-  updateCSSVariables(variables: { [key: string]: string }) {
+  updateCSSVariables(variables: { [key: string]: string, ... }) {
     map(variables, (value, prop) => {
       if (document.documentElement) {
         document.documentElement.style.setProperty(prop, value);

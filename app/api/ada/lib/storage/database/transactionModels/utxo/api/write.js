@@ -27,11 +27,11 @@ import {
 } from './read';
 
 
-export type MarkAsRequest = {
+export type MarkAsRequest = {|
   txId: number,
   outputIndex: number,
   isUnspent: boolean,
-};
+|};
 export type MarkAsResponse = void | {|
   Transaction: $ReadOnly<TransactionRow>,
   UtxoTransactionOutput: $ReadOnly<UtxoTransactionOutputRow>,
@@ -51,7 +51,10 @@ export class MarkUtxo {
   ): Promise<MarkAsResponse> {
     const output = await MarkUtxo.depTables.GetUtxoTxOutputsWithTx.getSingleOutput(
       db, tx,
-      request,
+      {
+        txId: request.txId,
+        outputIndex: request.outputIndex,
+      },
     );
     if (output === undefined) {
       return undefined;
@@ -94,10 +97,10 @@ export class ModifyUtxoTransaction {
   static async addIOsToTx(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
+    request: {|
       utxoInputs: Array<UtxoTransactionInputInsert>,
       utxoOutputs: Array<UtxoTransactionOutputInsert>,
-    },
+    |},
   ): Promise<{| ...DbUtxoInputs, ...DbUtxoOutputs, |}> {
     const { utxoInputs, utxoOutputs } = request;
     const newInputs = await addBatchToTable<

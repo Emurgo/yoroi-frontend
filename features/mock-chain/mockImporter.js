@@ -38,11 +38,12 @@ const genesisTxReceiver = 'Ae2tdPwUPEZ4YjgvykNpoFeYUxoyhNj2kg8KfKWN2FizsSpLUPv68
 
 type MockTx = RemoteTransaction;
 
-type ServerStatus = {
+type ServerStatus = {|
   id: number,
   status: boolean,
-  time: string // timestamp with timezone
-}
+  // timestamp with timezone
+  time: string,
+|}
 
 /**
  * To simplify, our genesis is a single address which gives all its ada to a "distributor"

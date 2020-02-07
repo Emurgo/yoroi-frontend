@@ -3,7 +3,7 @@
 
 type $npm$classnames$Classes =
   | string
-  | { [className: string]: * }
+  | { [className: string]: *, ... }
   | false
   | void
   | null;

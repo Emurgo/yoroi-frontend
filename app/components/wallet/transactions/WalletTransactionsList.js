@@ -56,11 +56,14 @@ export default class WalletTransactionsList extends Component<Props> {
   localizedDateFormat: 'MM/DD/YYYY';
 
   groupTransactionsByDay(transactions: Array<WalletTransaction>)
-      : Array<{date: string, transactions: Array<WalletTransaction>}> {
-    const groups: Array<{
+      : Array<{|
+        date: string,
+        transactions: Array<WalletTransaction>,
+      |}> {
+    const groups: Array<{|
       date: string,
-      transactions: Array<WalletTransaction>
-    }> = [];
+      transactions: Array<WalletTransaction>,
+    |}> = [];
     for (const transaction of transactions) {
       const date: string = moment(transaction.date).format(dateFormat);
       // find the group this transaction belongs in

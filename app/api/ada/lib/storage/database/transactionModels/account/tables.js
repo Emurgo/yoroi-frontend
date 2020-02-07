@@ -19,10 +19,10 @@ export type AccountingTransactionInputRow = {|
   AccountingTransactionInputId: number,
   ...AccountingTransactionInputInsert,
 |};
-export const AccountingTransactionInputSchema: {
+export const AccountingTransactionInputSchema: {|
   +name: 'AccountingTransactionInput',
-  properties: $ObjMapi<AccountingTransactionInputRow, ToSchemaProp>
-} = {
+  properties: $ObjMapi<AccountingTransactionInputRow, ToSchemaProp>,
+|} = {
   name: 'AccountingTransactionInput',
   properties: {
     AccountingTransactionInputId: 'AccountingTransactionInputId',
@@ -49,10 +49,10 @@ export type AccountingTransactionOutputRow = {|
  * Accounting outputs are a super-set of inputs because for an address to be an input,
  * it must have received coins (been an output) previously
  */
-export const AccountingTransactionOutputSchema: {
+export const AccountingTransactionOutputSchema: {|
   +name: 'AccountingTransactionOutput',
-  properties: $ObjMapi<AccountingTransactionOutputRow, ToSchemaProp>
-} = {
+  properties: $ObjMapi<AccountingTransactionOutputRow, ToSchemaProp>,
+|} = {
   name: 'AccountingTransactionOutput',
   properties: {
     AccountingTransactionOutputId: 'AccountingTransactionOutputId',

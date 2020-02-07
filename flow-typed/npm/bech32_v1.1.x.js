@@ -8,7 +8,11 @@ declare module "bech32" {
   declare export function decode(
     str: string,
     limit?: number
-  ): { prefix: string, words: number[] };
+  ): {
+    prefix: string,
+    words: number[],
+    ...
+  };
 
   /**
    * Takes a bech32 encoded string and returns the human readable part ("prefix") and
@@ -19,7 +23,11 @@ declare module "bech32" {
   declare export function decodeUnsafe(
     str: string,
     limit?: number
-  ): ({ prefix: string, words: number[] }) | void;
+  ): ({
+    prefix: string,
+    words: number[],
+    ...
+  }) | void;
 
   /**
    * Takes a human readable part ("prefix") and a list of character positions in the

@@ -16,50 +16,52 @@ import {
  * to migrate to a new format
  */
 
-export type LegacyAddressingInfo = {
+export type LegacyAddressingInfo = {|
   account: number,
   change: number,
   index: number,
-};
-export type LegacyAdaAmount = {
-  getCCoin: string,
-};
-export type LegacyAdaAddress = {
+|};
+export type LegacyAdaAmount = {| getCCoin: string, |};
+export type LegacyAdaAddress = {|
   cadAmount: LegacyAdaAmount,
   cadId: string,
   cadIsUsed: boolean,
-} & LegacyAddressingInfo;
+  ...LegacyAddressingInfo,
 
-type LegacyLocalStorageWallet = {
+|};
+
+type LegacyLocalStorageWallet = {|
   adaWallet: LegacyAdaWallet,
-  masterKey?: string, // unused in hardware wallets
+  // unused in hardware wallets
+  masterKey?: string,
   // this is a per-account setting but we only have 1 account per wallet in storage v1 Yoroi
-  lastReceiveAddressIndex: number
-}
+  lastReceiveAddressIndex: number,
+|}
 
-type LegacyLocalStorageCryptoAccount = {
+type LegacyLocalStorageCryptoAccount = {|
   account: number,
-  root_cached_key: string, // MasterPublicKey
-  derivation_scheme: string
-}
+  // MasterPublicKey
+  root_cached_key: string,
+  derivation_scheme: string,
+|}
 
-export type LegacyAdaWallet = {
+export type LegacyAdaWallet = {|
   cwAmount: LegacyAdaAmount,
   cwId: string,
   cwMeta: LegacyAdaWalletMetaParams,
   cwType: LegacyAdaWalletType,
   cwPassphraseLU?: string,
   cwHardwareInfo?: LegacyAdaWalletHardwareInfo,
-};
-export type LegacyAdaWalletMetaParams = {
+|};
+export type LegacyAdaWalletMetaParams = {|
   cwName: string,
   cwAssurance: LegacyAdaAssurance,
   // This was never used but is supposed to represent 0 = (bitcoin, ada); 1 = (satoshi, lovelace)
-  cwUnit: number
-};
+  cwUnit: number,
+|};
 export type LegacyAdaAssurance = 'CWANormal' | 'CWAStrict';
 export type LegacyAdaWalletType = 'CWTWeb' | 'CWTHardware';
-export type LegacyAdaWalletHardwareInfo = {
+export type LegacyAdaWalletHardwareInfo = {|
   vendor : string,
   model: string,
   deviceId: string,
@@ -69,7 +71,7 @@ export type LegacyAdaWalletHardwareInfo = {
   patchVersion: number,
   language: string,
   publicMasterKey: string,
-};
+|};
 
 const legacyStorageKeys = {
   ACCOUNT_KEY: 'ACCOUNT', // Note: only a single account

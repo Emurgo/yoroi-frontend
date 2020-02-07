@@ -122,9 +122,7 @@ async function rawGetAllTxIds(
     AssociateTxWithIOs: Class<AssociateTxWithIOs>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
-  request: {
-    publicDeriver: IPublicDeriver<ConceptualWallet>,
-  },
+  request: {| publicDeriver: IPublicDeriver<ConceptualWallet>, |},
   derivationTables: Map<number, string>,
 ): Promise<{|
   utxoAddressIds: Array<number>,
@@ -187,15 +185,15 @@ export async function rawGetTransactions(
     GetTxAndBlock: Class<GetTxAndBlock>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
-  request: {
+  request: {|
     publicDeriver: IPublicDeriver<ConceptualWallet>,
-    getTxAndBlock: (txIds: Array<number>) => Promise<$ReadOnlyArray<{
+    getTxAndBlock: (txIds: Array<number>) => Promise<$ReadOnlyArray<{|
       Block: null | $ReadOnly<BlockRow>,
-      Transaction: $ReadOnly<TransactionRow>
-    }>>,
+      Transaction: $ReadOnly<TransactionRow>,
+    |}>>,
     skip?: number,
     limit?: number,
-  },
+  |},
   derivationTables: Map<number, string>,
 ): Promise<{|
   addressLookupMap: Map<number, string>,
@@ -269,11 +267,11 @@ export async function rawGetTransactions(
 }
 
 export async function getAllTransactions(
-  request: {
+  request: {|
     publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
     skip?: number,
     limit?: number,
-  },
+  |},
 ): Promise<{|
   addressLookupMap: Map<number, string>,
   txs: Array<AnnotatedTransaction>,
@@ -325,9 +323,7 @@ export async function getAllTransactions(
 }
 
 export async function getPendingTransactions(
-  request: {
-    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
-  },
+  request: {| publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>, |},
 ): Promise<{|
   addressLookupMap: Map<number, string>,
   txs: Array<AnnotatedTransaction>,
@@ -378,9 +374,7 @@ export async function getPendingTransactions(
 }
 
 export async function removeAllTransactions(
-  request: {
-    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
-  },
+  request: {| publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>, |},
 ): Promise<number> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
@@ -1224,6 +1218,7 @@ async function markAllInputs(
     allTxIds: Array<number>,
     isUnspent: boolean,
     TransactionSeed: number,
+    ...
   },
 ): Promise<void> {
   const inputs = await deps.GetUtxoInputs.fromTxIds(
@@ -1284,6 +1279,7 @@ export function networkTxHeaderToDb(
 ): {
   block: null | BlockInsert,
   transaction: (blockId: null | number) => TransactionInsert,
+  ...
 } {
   const block =
     tx.epoch != null &&

@@ -15,10 +15,10 @@ const messages = defineMessages({
   }
 });
 
-export type ApiCallType<Func: Function> = {
+export type ApiCallType<Func: Function> = {|
   args: Arguments<Func>,
   result: ?PromisslessReturnType<Func>,
-};
+|};
 
 // Note: Do not use this class directly. Only use LocalizedRequest or CachedLocalizedRequest
 export default class Request<Func: (...args: any) => Promise<any>, Err> {

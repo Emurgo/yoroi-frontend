@@ -19,7 +19,7 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   +children: Node,
   +hash: string,
   +elementId?: string,
@@ -28,7 +28,7 @@ type Props = {
   +arrowRelativeToTip?: boolean,
   +notification: ?Notification,
   +darkVariant?: boolean,
-};
+|};
 
 @observer
 export default class CopyableAddress extends Component<Props> {

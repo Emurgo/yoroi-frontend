@@ -30,16 +30,11 @@ beforeAll(async () => {
 });
 
 test('Restore wallet', async () => {
-  async function checkAddressesInUse(_body: FilterUsedRequest): Promise<FilterUsedResponse> {
-    return [];
-  }
-
   const restoreRequest = {
     db,
     recoveryPhrase: TX_TEST_MNEMONIC_1,
     walletName: 'mywallet',
     walletPassword: '123',
-    checkAddressesInUse
   };
 
   const response = await AdaApi.prototype.restoreWallet(restoreRequest);

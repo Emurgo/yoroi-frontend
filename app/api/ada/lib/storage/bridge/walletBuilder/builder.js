@@ -65,9 +65,7 @@ type StateConstraint<CurrentState, Requirement, Input, Output> = $Call<
  * This is so we can capture the reference to the holder in a closure
  * but only populate the actual transaction once `commit` is called.
  */
-type TxHolder = {
-  tx: lf$Transaction,
-};
+type TxHolder = {| tx: lf$Transaction, |};
 
 /**
  * Allows to easily create a wallet with all the information you need in one transactional query
@@ -103,7 +101,7 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
     this.derivationTables = derivationTables;
   }
 
-  updateData<Requirement: {}, NewAddition>(
+  updateData<Requirement: {...}, NewAddition>(
     addition: NewAddition,
     newTables: Array<string>,
     newStep: (CurrentState & NewAddition & Requirement) => Promise<void>,
@@ -169,13 +167,13 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
 
   addConceptualWallet: StateConstraint<
     CurrentState,
-    {},
+    {...},
     CurrentState => ConceptualWalletInsert,
     CurrentState & HasConceptualWallet,
   > = (
     insert: CurrentState => ConceptualWalletInsert,
   ) => {
-    return this.updateData<{}, HasConceptualWallet>(
+    return this.updateData<{...}, HasConceptualWallet>(
       AsNotNull<HasConceptualWallet>({ conceptualWalletRow: null }),
       Array.from(getAllTables(ModifyConceptualWallet)),
       async (finalData) => {
@@ -339,7 +337,7 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
  * since we know it will be filled once the lambda is called.
  * Therefore when we insert null values but coerce the type as if they are non-null and available.
  */
-function AsNotNull<T: {}>(
+function AsNotNull<T: {...}>(
   /** Assert argument is right type but with every field possibly null */
   data: WithNullableFields<T>
 ): T {

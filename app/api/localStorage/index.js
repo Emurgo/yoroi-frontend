@@ -187,7 +187,7 @@ export default class LocalStorageApi {
     resolve(localStorage);
   });
 
-  setStorage: { [key: string]: string } => Promise<void> = async (localStorageData) => {
+  setStorage: { [key: string]: string, ... } => Promise<void> = async (localStorageData) => {
     await Object.keys(localStorageData).forEach(async key => {
       // changing this key would cause the tab to close
       if (key !== OPEN_TAB_ID_KEY) {

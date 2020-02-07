@@ -329,10 +329,10 @@ export class ModifyTransaction {
   static async addNew(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
+    request: {|
       block: null | BlockInsert,
       transaction: (blockId: null | number) => TransactionInsert,
-    },
+    |},
   ): Promise<{| ...WithNullableFields<DbBlock>, ...DbTransaction |}> {
     const block = request.block !== null
       ? await ModifyTransaction.depTables.GetOrAddBlock.getOrAdd(
@@ -364,10 +364,10 @@ export class ModifyTransaction {
   static async updateExisting(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
+    request: {|
       block: null | BlockInsert,
       transaction: (blockId: null | number) => TransactionRow,
-    },
+    |},
   ): Promise<{| ...WithNullableFields<DbBlock>, ...DbTransaction |}> {
     const block = request.block !== null
       ? await ModifyTransaction.depTables.GetOrAddBlock.getOrAdd(
@@ -392,10 +392,10 @@ export class ModifyTransaction {
   static async updateStatus(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
+    request: {|
       status: TxStatusCodesType,
       transaction: $ReadOnly<TransactionRow>,
-    },
+    |},
   ): Promise<void> {
     await addOrReplaceRow<$ReadOnly<TransactionRow>, TransactionRow>(
       db, tx,

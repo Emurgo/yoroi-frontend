@@ -1,7 +1,7 @@
 // @flow
 
-declare type InexactSubset<T: {}> = $Rest<T, {}>;
-declare type Inexact<T: {}> = { ...T };
+declare type InexactSubset<T: {...}> = $Rest<T, {...}>;
+declare type Inexact<T: {...}> = { ...T, ... };
 
 declare type ExtractReturnType = <R>((...arg: any) => R) => R;
 declare type ReturnType<Func> = $Call<ExtractReturnType, Func>;
@@ -20,7 +20,7 @@ declare type AddToArray<ArrayType, Field> = Array<ElementOf<ArrayType> & Field>;
 declare type ToSchemaProp = <K, V>(K, V) => K;
 
 declare type Nullable = <K>(K) => null | K;
-declare type WithNullableFields<T: {}> = $ObjMap<T, Nullable>;
+declare type WithNullableFields<T: {...}> = $ObjMap<T, Nullable>;
 
 declare type PossiblyAsync<T> = T | Promise<T>;
 

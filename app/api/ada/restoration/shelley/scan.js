@@ -143,14 +143,14 @@ export async function scanChain(request: {|
     });
 }
 
-export async function scanCip1852Account(request: {
+export async function scanCip1852Account(request: {|
   accountPublicKey: string,
   lastUsedInternal: number,
   lastUsedExternal: number,
   checkAddressesInUse: FilterFunc,
   addByHash: AddByHashFunc,
   stakingKey: RustModule.WalletV3.PublicKey,
-}): Promise<TreeInsert<Bip44ChainInsert>> {
+|}): Promise<TreeInsert<Bip44ChainInsert>> {
   const key = RustModule.WalletV3.Bip32PublicKey.from_bytes(
     Buffer.from(request.accountPublicKey, 'hex'),
   );

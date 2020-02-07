@@ -33,7 +33,7 @@ export default class WalletTransaction {
   @observable state: TxStatusCodesType;
   @observable errorMsg: null | string;
 
-  constructor(data: {
+  constructor(data: {|
     id: string,
     type: TransactionDirectionType,
     amount: BigNumber,
@@ -41,10 +41,10 @@ export default class WalletTransaction {
     date: Date,
     numberOfConfirmations: number,
     addresses: TrasactionAddresses,
-    certificate: void | CertificatePart;
+    certificate: void | CertificatePart,
     state: TxStatusCodesType,
     errorMsg: null | string,
-  }) {
+  |}) {
     Object.assign(this, data);
   }
 
@@ -59,7 +59,7 @@ export default class WalletTransaction {
   }
 
   @action
-  static fromAnnotatedTx(request: {
+  static fromAnnotatedTx(request: {|
     tx: {|
       ...DbTxIO,
       ...WithNullableFields<DbBlock>,
@@ -67,7 +67,7 @@ export default class WalletTransaction {
     |},
     addressLookupMap: Map<number, string>,
     lastBlockNumber: null | number,
-  }): WalletTransaction {
+  |}): WalletTransaction {
     const { addressLookupMap, tx } = request;
 
     const toAddr = rows => {

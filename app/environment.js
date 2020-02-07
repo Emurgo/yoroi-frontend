@@ -57,24 +57,25 @@ export const environment = ((
     userAgentInfo,
   }
 ): {
-  NETWORK: Network,
-  version: string,
-  env_type: ?string,
-  API: Currency,
-  MOBX_DEV_TOOLS: ?string,
-  commit: string,
-  branch: string,
-  isJest: void => boolean,
-  isDev: void => boolean,
-  isShelley: void => boolean,
-  isTest: void => boolean,
-  isMainnet: void => boolean,
-  isProduction: void => boolean,
-  isAdaApi: void => boolean,
-  getDiscriminant: void => AddressDiscriminationType,
-  walletRefreshInterval: number,
-  serverStatusRefreshInterval: number,
-  userAgentInfo: UserAgentInfo
+    NETWORK: Network,
+    version: string,
+    env_type: ?string,
+    API: Currency,
+    MOBX_DEV_TOOLS: ?string,
+    commit: string,
+    branch: string,
+    isJest: void => boolean,
+    isDev: void => boolean,
+    isShelley: void => boolean,
+    isTest: void => boolean,
+    isMainnet: void => boolean,
+    isProduction: void => boolean,
+    isAdaApi: void => boolean,
+    getDiscriminant: void => AddressDiscriminationType,
+    walletRefreshInterval: number,
+    serverStatusRefreshInterval: number,
+    userAgentInfo: UserAgentInfo,
+    ...
 });
 
 export default environment;

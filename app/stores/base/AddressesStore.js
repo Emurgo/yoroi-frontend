@@ -53,10 +53,10 @@ export type StandardAddress = {|
 type SubRequestType<T> = {| publicDeriver: PublicDeriver<> |} => Promise<Array<T>>;
 export class AddressTypeStore<T> {
 
-  @observable addressesRequests: Array<{
+  @observable addressesRequests: Array<{|
     publicDeriver: PublicDeriver<>,
     cachedRequest: CachedRequest<SubRequestType<T>>,
-  }> = [];
+  |}> = [];
 
   stores: StoresMap;
   request: SubRequestType<T>;

@@ -58,7 +58,7 @@ export default class UiDialogsStore extends Store {
     this.secondsSinceActiveDialogIsOpen += 1;
   };
 
-  @action _onUpdateDataForActiveDialog: { [key: string]: any } => void = ({ data }) => {
+  @action _onUpdateDataForActiveDialog: { [key: string]: any, ... } => void = ({ data }) => {
     Object.assign(this.dataForActiveDialog, data);
   };
 

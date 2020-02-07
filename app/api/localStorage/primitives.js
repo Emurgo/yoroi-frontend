@@ -19,7 +19,7 @@ declare var chrome;
 const getStorageItemInExtension = async (
   key: string | void
 ): Promise<?string> => new Promise((resolve, reject) => {
-  chrome.storage.local.get(key, (data: {}) => {
+  chrome.storage.local.get(key, (data: {...}) => {
     if (chrome.runtime.lastError) reject(chrome.runtime.lastError);
     if (key === undefined) {
       resolve(JSON.stringify(data));
@@ -115,12 +115,10 @@ export async function clear(): Promise<void> {
 //  listener
 // ==========
 
-type StorageChange = {
-  [key: string]: {
-    +oldValue?: any,
-    +newValue?: any,
-  }
-}
+type StorageChange = { [key: string]: {|
+  +oldValue?: any,
+  +newValue?: any,
+|}, ... }
 /**
  * Warning!
  * There are a lof of differences between localStorage and storage.local listeners

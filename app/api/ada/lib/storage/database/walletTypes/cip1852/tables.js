@@ -18,10 +18,10 @@ export type Cip1852WrapperRow = {|
   Cip1852WrapperId: number, // serial
   ...Cip1852WrapperInsert,
 |};
-export const Cip1852WrapperSchema: {
+export const Cip1852WrapperSchema: {|
   +name: 'Cip1852Wrapper',
-  properties: $ObjMapi<Cip1852WrapperRow, ToSchemaProp>
-} = {
+  properties: $ObjMapi<Cip1852WrapperRow, ToSchemaProp>,
+|} = {
   name: 'Cip1852Wrapper',
   properties: {
     Cip1852WrapperId: 'Cip1852WrapperId',

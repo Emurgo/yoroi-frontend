@@ -199,12 +199,12 @@ export type CreateAdaPaperFunc = (
 
 // createAdaPaperPdf
 
-export type CreateAdaPaperPdfRequest = {
+export type CreateAdaPaperPdfRequest = {|
   paper: AdaPaper,
   network: Network,
   printAccountPlate?: boolean,
   updateStatus?: PdfGenStepType => boolean,
-};
+|};
 
 export type CreateAdaPaperPdfResponse = ?Blob;
 export type CreateAdaPaperPdfFunc = (
@@ -213,9 +213,7 @@ export type CreateAdaPaperPdfFunc = (
 
 // getWallets
 
-export type GetWalletsRequest = {
-  db: lf$Database,
-};
+export type GetWalletsRequest = {| db: lf$Database, |};
 export type GetWalletsResponse = Array<PublicDeriver<>>;
 export type GetWalletsFunc = (
   request: GetWalletsRequest
@@ -223,10 +221,10 @@ export type GetWalletsFunc = (
 
 // getAllAddressesForDisplay
 
-export type GetAllAddressesForDisplayRequest = {
+export type GetAllAddressesForDisplayRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos,
   type: CoreAddressT,
-};
+|};
 export type GetAllAddressesForDisplayResponse = Array<{|
   ...Address, ...Value, ...Addressing, ...UsedStatus
 |}>;
@@ -236,11 +234,11 @@ export type GetAllAddressesForDisplayFunc = (
 
 // getChainAddressesForDisplay
 
-export type GetChainAddressesForDisplayRequest = {
+export type GetChainAddressesForDisplayRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IHasUtxoChains & IDisplayCutoff,
   chainsRequest: IHasUtxoChainsRequest,
   type: CoreAddressT,
-};
+|};
 export type GetChainAddressesForDisplayResponse = Array<{|
   ...Address, ...Value, ...Addressing, ...UsedStatus
 |}>;
@@ -250,9 +248,7 @@ export type GetChainAddressesForDisplayFunc = (
 
 // getBalance
 
-export type GetBalanceRequest = {
-  getBalance: () => Promise<BigNumber>,
-};
+export type GetBalanceRequest = {| getBalance: () => Promise<BigNumber>, |};
 export type GetBalanceResponse = BigNumber;
 export type GetBalanceFunc = (
   request: GetBalanceRequest
@@ -260,9 +256,9 @@ export type GetBalanceFunc = (
 
 // getTxLastUpdatedDate
 
-export type GetTxLastUpdateDateRequest = {
+export type GetTxLastUpdateDateRequest = {|
   getLastSyncInfo: () => Promise<IGetLastSyncInfoResponse>,
-};
+|};
 export type GetTxLastUpdateDateResponse = IGetLastSyncInfoResponse;
 export type GetTxLastUpdateDateFunc = (
   request: GetTxLastUpdateDateRequest
@@ -274,17 +270,18 @@ export type GetTransactionsRequestOptions = {|
   skip: number,
   limit: number,
 |};
-export type GetTransactionsRequest = {
+export type GetTransactionsRequest = {|
   ...InexactSubset<GetTransactionsRequestOptions>,
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetLastSyncInfo,
   isLocalRequest: boolean,
   getTransactionsHistoryForAddresses: HistoryFunc,
   checkAddressesInUse: FilterFunc,
   getBestBlock: BestBlockFunc,
-};
+|};
 export type GetTransactionsResponse = {
   transactions: Array<WalletTransaction>,
   total: number,
+  ...
 };
 export type GetTransactionsFunc = (
   request: GetTransactionsRequest
@@ -292,9 +289,9 @@ export type GetTransactionsFunc = (
 
 // refreshPendingTransactions
 
-export type RefreshPendingTransactionsRequest = {
+export type RefreshPendingTransactionsRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetLastSyncInfo,
-};
+|};
 export type RefreshPendingTransactionsResponse = Array<WalletTransaction>;
 export type RefreshPendingTransactionsFunc = (
   request: RefreshPendingTransactionsRequest
@@ -303,10 +300,10 @@ export type RefreshPendingTransactionsFunc = (
 // notices
 export type GetNoticesRequestOptions = GetTransactionsRequestOptions;
 
-export type GetNoticesResponse = {
+export type GetNoticesResponse = {|
   notices: Array<Notice>,
   total: number,
-};
+|};
 
 export type GetNoticesFunc = (
   request: GetNoticesRequestOptions
@@ -335,14 +332,14 @@ export type SignAndBroadcastFunc = (
 
 // createTrezorSignTxData
 
-export type CreateTrezorSignTxDataRequest = {
+export type CreateTrezorSignTxDataRequest = {|
   signRequest: BaseSignRequest<RustModule.WalletV2.Transaction>,
   getTxsBodiesForUTXOs: TxBodiesFunc,
-};
-export type CreateTrezorSignTxDataResponse = {
+|};
+export type CreateTrezorSignTxDataResponse = {|
   // https://github.com/trezor/connect/blob/develop/docs/methods/cardanoSignTransaction.md
   trezorSignTxPayload: $CardanoSignTransaction,
-};
+|};
 export type CreateTrezorSignTxDataFunc = (
   request: CreateTrezorSignTxDataRequest
 ) => Promise<CreateTrezorSignTxDataResponse>;
@@ -360,13 +357,11 @@ export type BroadcastTrezorSignedTxFunc = (
 
 // createLedgerSignTxData
 
-export type CreateLedgerSignTxDataRequest = {
+export type CreateLedgerSignTxDataRequest = {|
   signRequest: BaseSignRequest<RustModule.WalletV2.Transaction>,
   getTxsBodiesForUTXOs: TxBodiesFunc,
-};
-export type CreateLedgerSignTxDataResponse = {
-  ledgerSignTxPayload: LedgerSignTxPayload,
-};
+|};
+export type CreateLedgerSignTxDataResponse = {| ledgerSignTxPayload: LedgerSignTxPayload, |};
 export type CreateLedgerSignTxDataFunc = (
   request: CreateLedgerSignTxDataRequest
 ) => Promise<CreateLedgerSignTxDataResponse>;
@@ -439,9 +434,7 @@ export type SignAndBroadcastDelegationTxFunc = (
 
 // createAddress
 
-export type CreateAddressRequest = {
-  popFunc: IDisplayCutoffPopFunc,
-};
+export type CreateAddressRequest = {| popFunc: IDisplayCutoffPopFunc, |};
 export type CreateAddressResponse = IDisplayCutoffPopResponse;
 export type CreateAddressFunc = (
   request: CreateAddressRequest
@@ -449,10 +442,10 @@ export type CreateAddressFunc = (
 
 // saveLastReceiveAddressIndex
 
-export type SaveLastReceiveAddressIndexRequest = {
+export type SaveLastReceiveAddressIndexRequest = {|
   publicDeriver: PublicDeriver<>,
   index: number,
-};
+|};
 export type SaveLastReceiveAddressIndexResponse = void;
 export type SaveLastReceiveAddressIndexFunc = (
   request: SaveLastReceiveAddressIndexRequest
@@ -468,9 +461,7 @@ export type GetSelectedExplorerFunc = (
 
 // saveSelectedExplorer
 
-export type SaveSelectedExplorerRequest = {
-  explorer: ExplorerType,
-};
+export type SaveSelectedExplorerRequest = {| explorer: ExplorerType, |};
 export type SaveSelectedExplorerResponse = void;
 export type SaveSelectedExplorerFunc = (
   request: SaveSelectedExplorerRequest
@@ -478,10 +469,10 @@ export type SaveSelectedExplorerFunc = (
 
 // isValidMnemonic
 
-export type IsValidMnemonicRequest = {
+export type IsValidMnemonicRequest = {|
   mnemonic: string,
-  numberOfWords: number
-};
+  numberOfWords: number,
+|};
 export type IsValidMnemonicResponse = boolean;
 export type IsValidMnemonicFunc = (
   request: IsValidMnemonicRequest
@@ -489,10 +480,10 @@ export type IsValidMnemonicFunc = (
 
 // isValidPaperMnemonic
 
-export type IsValidPaperMnemonicRequest = {
+export type IsValidPaperMnemonicRequest = {|
   mnemonic: string,
-  numberOfWords: number
-};
+  numberOfWords: number,
+|};
 export type IsValidPaperMnemonicResponse = boolean;
 export type IsValidPaperMnemonicFunc = (
   request: IsValidPaperMnemonicRequest
@@ -500,11 +491,11 @@ export type IsValidPaperMnemonicFunc = (
 
 // unscramblePaperMnemonic
 
-export type UnscramblePaperMnemonicRequest = {
+export type UnscramblePaperMnemonicRequest = {|
   mnemonic: string,
   numberOfWords: number,
   password?: string,
-};
+|};
 export type UnscramblePaperMnemonicResponse = [?string, number];
 export type UnscramblePaperMnemonicFunc = (
   request: UnscramblePaperMnemonicRequest
@@ -512,7 +503,7 @@ export type UnscramblePaperMnemonicFunc = (
 
 // generateWalletRecoveryPhrase
 
-export type GenerateWalletRecoveryPhraseRequest = {};
+export type GenerateWalletRecoveryPhraseRequest = {||};
 export type GenerateWalletRecoveryPhraseResponse = Array<string>;
 export type GenerateWalletRecoveryPhraseFunc = (
   request: GenerateWalletRecoveryPhraseRequest
@@ -520,12 +511,12 @@ export type GenerateWalletRecoveryPhraseFunc = (
 
 // restoreWallet
 
-export type RestoreWalletRequest = {
+export type RestoreWalletRequest = {|
   db: lf$Database,
   recoveryPhrase: string,
   walletName: string,
   walletPassword: string,
-};
+|};
 export type RestoreWalletResponse = {|
   publicDerivers: Array<PublicDeriver<>>,
 |};
@@ -541,20 +532,20 @@ export type RestoreWalletForTransferRequest = {|
   accountIndex: number,
   checkAddressesInUse: FilterFunc,
 |};
-export type RestoreWalletForTransferResponse = {
+export type RestoreWalletForTransferResponse = {|
   masterKey: string,
-  addresses: Array<{| ...Address, ...Addressing |}>
-};
+  addresses: Array<{| ...Address, ...Addressing |}>,
+|};
 export type RestoreWalletForTransferFunc = (
   request: RestoreWalletForTransferRequest
 ) => Promise<RestoreWalletForTransferResponse>;
 
 // renameModel
 
-export type RenameModelRequest = {
+export type RenameModelRequest = {|
   func: IRenameFunc,
   request: IRenameRequest,
-};
+|};
 export type RenameModelResponse = IRenameResponse;
 export type RenameModelFunc = (
   request: RenameModelRequest
@@ -562,10 +553,10 @@ export type RenameModelFunc = (
 
 // changeModelPassword
 
-export type ChangeModelPasswordRequest = {
+export type ChangeModelPasswordRequest = {|
   func: IChangePasswordRequestFunc,
   request: IChangePasswordRequest,
-};
+|};
 export type ChangeModelPasswordResponse = IChangePasswordResponse;
 export type ChangeModelPasswordFunc = (
   request: ChangeModelPasswordRequest
@@ -573,27 +564,27 @@ export type ChangeModelPasswordFunc = (
 
 // createHardwareWallet
 
-export type CreateHardwareWalletRequest = {
+export type CreateHardwareWalletRequest = {|
   db: lf$Database,
   walletName: string,
   publicKey: string,
   derivationIndex: number,
   hwFeatures: HWFeatures,
   checkAddressesInUse: FilterFunc,
-};
-export type CreateHardwareWalletResponse = {
+|};
+export type CreateHardwareWalletResponse = {|
   bip44Wallet: Bip44Wallet,
   publicDeriver: PublicDeriver<>,
-};
+|};
 export type CreateHardwareWalletFunc = (
   request: CreateHardwareWalletRequest
 ) => Promise<CreateHardwareWalletResponse>;
 
 // getTransactionRowsToExport
 
-export type GetTransactionRowsToExportRequest = {
+export type GetTransactionRowsToExportRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
-};
+|};
 export type GetTransactionRowsToExportResponse = Array<TransactionExportRow>;
 export type GetTransactionRowsToExportFunc = (
   request: GetTransactionRowsToExportRequest
@@ -1422,7 +1413,6 @@ export default class AdaApi {
           lastUsedExternal: -1,
           checkAddressesInUse,
           addByHash,
-          protocolMagic,
         });
       } else if (isShelley) {
         const stakingKey = accountKey
@@ -1623,7 +1613,7 @@ export default class AdaApi {
 
   async importLocalDatabase(
     db: lf$Database,
-    data: {},
+    data: {...},
   ): Promise<void> {
     await clear(db);
     await db.import(data);

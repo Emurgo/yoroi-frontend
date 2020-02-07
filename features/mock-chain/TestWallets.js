@@ -1,17 +1,17 @@
 // @flow
 
-type RestorationInput = {
+type RestorationInput = {|
   name: string,
   password: string,
   mnemonic: string,
   plate: string,
-};
+|};
 
-function createWallet(payload: {
+function createWallet(payload: {|
   name: string,
   mnemonic: string,
   plate: string,
-}) {
+|}) {
   const { name, mnemonic, plate } = payload;
   return { [name]: {
     name,
@@ -35,7 +35,7 @@ type WalletNames =
   'shelley-test';
 
 // eslint-disable-next-line prefer-object-spread
-export const testWallets: { [key: WalletNames]: RestorationInput } = Object.assign(
+export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object.assign(
   {},
   createWallet({
     name: ('small-single-tx': WalletNames),

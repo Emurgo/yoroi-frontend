@@ -26,9 +26,7 @@ export class GetAccountingInputs {
   static async fromAddressIds(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
-      ids: Array<number>,
-    },
+    request: {| ids: Array<number>, |},
   ): Promise<$ReadOnlyArray<$ReadOnly<AccountingTransactionInputRow>>> {
     const table = GetAccountingInputs.ownTables[Tables.AccountingTransactionInputSchema.name];
     return await getRowIn<AccountingTransactionInputRow>(
@@ -42,9 +40,7 @@ export class GetAccountingInputs {
   static async fromTxIds(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
-      ids: Array<number>,
-    },
+    request: {| ids: Array<number>, |},
   ): Promise<$ReadOnlyArray<$ReadOnly<AccountingTransactionInputRow>>> {
     const table = GetAccountingInputs.ownTables[Tables.AccountingTransactionInputSchema.name];
     return await getRowIn<AccountingTransactionInputRow>(
@@ -65,9 +61,7 @@ export class GetAccountingOutputs {
   static async fromAddressIds(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
-      ids: Array<number>,
-    },
+    request: {| ids: Array<number>, |},
   ): Promise<$ReadOnlyArray<$ReadOnly<AccountingTransactionOutputRow>>> {
     const table = GetAccountingOutputs.ownTables[Tables.AccountingTransactionOutputSchema.name];
     return await getRowIn<AccountingTransactionOutputRow>(
@@ -81,9 +75,7 @@ export class GetAccountingOutputs {
   static async fromTxIds(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
-      ids: Array<number>,
-    },
+    request: {| ids: Array<number>, |},
   ): Promise<$ReadOnlyArray<$ReadOnly<AccountingTransactionOutputRow>>> {
     const table = GetAccountingOutputs.ownTables[Tables.AccountingTransactionOutputSchema.name];
     return await getRowIn<AccountingTransactionOutputRow>(
@@ -105,9 +97,7 @@ export class AssociateTxWithAccountingIOs {
   static async getTxIdsForAddresses(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
-      addressIds: Array<number>,
-    },
+    request: {| addressIds: Array<number>, |},
   ): Promise<Array<number>> {
     const ins = await AssociateTxWithAccountingIOs.depTables.GetAccountingInputs.fromAddressIds(
       db, tx,
@@ -126,9 +116,7 @@ export class AssociateTxWithAccountingIOs {
   static async getIOsForTx(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
-      txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>,
-    },
+    request: {| txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>, |},
   ): Promise<Map<$ReadOnly<TransactionRow>, {| ...DbAccountingInputs, ...DbAccountingOutputs, |}>> {
     const ids = request.txs.map(transaction => transaction.TransactionId);
 

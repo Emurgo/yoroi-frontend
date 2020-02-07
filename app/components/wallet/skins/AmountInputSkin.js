@@ -28,6 +28,7 @@ type Props = {
   +themeId: string,
   +value: string,
   +type: string,
+  ...
 };
 
 export default class AmountInputSkin extends Component<Props> {

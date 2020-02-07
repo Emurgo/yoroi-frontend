@@ -45,10 +45,10 @@ export const Link = Object.freeze({
 });
 export type LinkType = $Values<typeof Link>;
 
-export type ExplorerInfo = {
+export type ExplorerInfo = {|
   ...InexactSubset<typeof Link>,
   name: string,
-}
+|}
 const seiza = environment.isShelley()
   ? {
     name: 'Seiza',
@@ -85,7 +85,8 @@ export const explorerInfo: {
   seiza: {|
     ...typeof Link,
     name: string,
-  |}
+  |},
+  ...
 } = Object.freeze({
   seiza,
   ...(!environment.isShelley()

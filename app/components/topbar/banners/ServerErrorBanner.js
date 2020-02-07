@@ -17,9 +17,7 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
-  +errorType: ServerStatusErrorType,
-};
+type Props = {| +errorType: ServerStatusErrorType, |};
 
 
 @observer

@@ -103,13 +103,13 @@ async function scanChain(request: {|
     });
 }
 
-export async function scanBip44Account(request: {
+export async function scanBip44Account(request: {|
   accountPublicKey: string,
   lastUsedInternal: number,
   lastUsedExternal: number,
   checkAddressesInUse: FilterFunc,
   addByHash: AddByHashFunc,
-}): Promise<TreeInsert<Bip44ChainInsert>> {
+|}): Promise<TreeInsert<Bip44ChainInsert>> {
   const genAddressBatchFunc = v2genAddressBatchFunc;
 
   const key = RustModule.WalletV2.Bip44AccountPublic.new(

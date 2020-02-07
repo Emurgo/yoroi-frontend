@@ -153,8 +153,8 @@ export function filterDbSnapshot(
  * Therefore, we test each table separately
  */
 export function compareObject(
-  obj1: { tables: any },
-  obj2: { tables: any },
+  obj1: { tables: any, ... },
+  obj2: { tables: any, ... },
   filter: Set<string> = new Set(),
 ): void {
   const obj1FilteredKeys = Object.keys(obj1).filter(key => filter.has(key));

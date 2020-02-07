@@ -55,7 +55,7 @@ type Props = {|
   +repeatedPasswordValue: string,
   +onNext: {| userPassword: string |} => PossiblyAsync<void>,
   +onCancel: void => PossiblyAsync<void>,
-  +onDataChange: { [key: string]: any } => void,
+  +onDataChange: { [key: string]: any, ... } => void,
   +classicTheme: boolean,
 |};
 

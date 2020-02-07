@@ -67,7 +67,7 @@ import { TxStatusCodes, } from '../database/primitives/enums';
 import { ChainDerivations, BIP44_SCAN_SIZE, } from  '../../../../../config/numbersConfig';
 
 export async function rawGetDerivationsByPath<
-  Row: { +KeyDerivationId: number }
+  Row: { +KeyDerivationId: number, ... }
 >(
   db: lf$Database,
   tx: lf$Transaction,
@@ -114,11 +114,11 @@ export async function rawGetDerivationsByPath<
 export async function rawGetBip44AddressesByPath(
   db: lf$Database,
   tx: lf$Transaction,
-  deps: {
+  deps: {|
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
-  },
+  |},
   request: GetPathWithSpecificByTreeRequest,
   derivationTables: Map<number, string>,
 ): Promise<Array<BaseAddressPath>> {
@@ -149,10 +149,10 @@ export async function rawGetBip44AddressesByPath(
   });
 }
 
-export function getLastUsedIndex(request: {
+export function getLastUsedIndex(request: {|
   singleChainAddresses: Array<UtxoAddressPath>,
   usedStatus: Set<number>,
-}): number {
+|}): number {
   request.singleChainAddresses.sort((a1, a2) => {
     const index1 = a1.addressing.path[a1.addressing.path.length - 1];
     const index2 = a2.addressing.path[a2.addressing.path.length - 1];
@@ -174,9 +174,7 @@ export async function rawGetUtxoUsedStatus(
   db: lf$Database,
   tx: lf$Transaction,
   deps: {| GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>, |},
-  request: {
-    addressIds: Array<number>,
-  },
+  request: {| addressIds: Array<number>, |},
 ): Promise<Set<number>> {
   const outputs = await deps.GetUtxoTxOutputsWithTx.getOutputsForAddresses(
     db, tx,
@@ -192,10 +190,10 @@ export async function rawGetAddressesForDisplay(
   deps: {|
     GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
   |},
-  request: {
+  request: {|
     addresses: Array<UtxoAddressPath>,
     type: CoreAddressT,
-  },
+  |},
 ): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
   const addressIds = request.addresses
     .flatMap(family => family.addrs)
@@ -232,11 +230,11 @@ export async function rawGetChainAddressesForDisplay(
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
-  request: {
+  request: {|
     publicDeriver: IPublicDeriver<> & IHasUtxoChains & IDisplayCutoff,
     chainsRequest: IHasUtxoChainsRequest,
     type: CoreAddressT,
-  },
+  |},
   derivationTables: Map<number, string>,
 ): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
   const addresses = await request.publicDeriver.rawGetAddressesForChain(
@@ -289,11 +287,11 @@ export async function rawGetChainAddressesForDisplay(
   return addressResponse;
 }
 export async function getChainAddressesForDisplay(
-  request: {
+  request: {|
     publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IHasUtxoChains & IDisplayCutoff,
     chainsRequest: IHasUtxoChainsRequest,
     type: CoreAddressT,
-  },
+  |},
 ): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
@@ -363,7 +361,7 @@ export async function rawGetNextUnusedIndex(
 
 export function getUtxoBalanceForAddresses(
   utxos: $ReadOnlyArray<$ReadOnly<UtxoTxOutput>>,
-): { [key: number]: IGetUtxoBalanceResponse } {
+): { [key: number]: IGetUtxoBalanceResponse, ... } {
   const groupByAddress = groupBy(
     utxos,
     utxo => utxo.UtxoTransactionOutput.AddressId

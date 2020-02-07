@@ -13,10 +13,10 @@ export type RootDerivationRow = {|
   RootDerivationId: number,
   ...RootDerivationInsert,
 |};
-export const RootDerivationSchema: {
+export const RootDerivationSchema: {|
   +name: 'RootDerivation',
-  properties: $ObjMapi<RootDerivationRow, ToSchemaProp>
-} = {
+  properties: $ObjMapi<RootDerivationRow, ToSchemaProp>,
+|} = {
   name: 'RootDerivation',
   properties: {
     RootDerivationId: 'RootDerivationId',
@@ -36,21 +36,21 @@ export type PurposeDerivationRow = {|
  *
  * We could choose to add the wrappers as different BIP32 tables
  * since we could infer which wrapper table to query by looking at the derivation index
- * we're guanrateed every level exists because even in the ad-hoc case we can add empty derivations
+ * we're guaranteed every level exists because even in the ad-hoc case we can add empty derivations
  *
  * pros: allows many different purposes for a single conceptual wallet
- * cons: slower because to query the purpose for every public deriver indivually
+ * cons: slower because to query the purpose for every public deriver individually
  * cons: doesn't work for wallets which have no actual purpose
  *  ex:
  *    - smart contract wallets
  *    - address checker wallet
- *        don't know what purpose these were derived from so it's strange to assign a puprpose
+ *        don't know what purpose these were derived from so it's strange to assign a purpose
  *        that is not actually a bip32 purpose but rather a semantic specification
  */
-export const PurposeDerivationSchema: {
+export const PurposeDerivationSchema: {|
   +name: 'PurposeDerivation',
-  properties: $ObjMapi<PurposeDerivationRow, ToSchemaProp>
-} = {
+  properties: $ObjMapi<PurposeDerivationRow, ToSchemaProp>,
+|} = {
   name: 'PurposeDerivation',
   properties: {
     PurposeDerivationId: 'PurposeDerivationId',
@@ -64,10 +64,10 @@ export type CoinTypeDerivationRow = {|
   CoinTypeDerivationId: number,
   ...CoinTypeDerivationInsert,
 |};
-export const CoinTypeDerivationSchema: {
+export const CoinTypeDerivationSchema: {|
   +name:'CoinTypeDerivation',
-  properties: $ObjMapi<CoinTypeDerivationRow, ToSchemaProp>
-} = {
+  properties: $ObjMapi<CoinTypeDerivationRow, ToSchemaProp>,
+|} = {
   name: 'CoinTypeDerivation',
   properties: {
     CoinTypeDerivationId: 'CoinTypeDerivationId',
@@ -81,10 +81,10 @@ export type Bip44AccountRow = {|
   Bip44AccountId: number,
   ...Bip44AccountInsert,
 |};
-export const Bip44AccountSchema: {
+export const Bip44AccountSchema: {|
   +name: 'Bip44Account',
-  properties: $ObjMapi<Bip44AccountRow, ToSchemaProp>
-} = {
+  properties: $ObjMapi<Bip44AccountRow, ToSchemaProp>,
+|} = {
   name: 'Bip44Account',
   properties: {
     Bip44AccountId: 'Bip44AccountId',
@@ -100,10 +100,10 @@ export type Bip44ChainRow = {|
   Bip44ChainId: number,
   ...Bip44ChainInsert,
 |};
-export const Bip44ChainSchema: {
+export const Bip44ChainSchema: {|
   +name: 'Bip44Chain',
-  properties: $ObjMapi<Bip44ChainRow, ToSchemaProp>
-} = {
+  properties: $ObjMapi<Bip44ChainRow, ToSchemaProp>,
+|} = {
   name: 'Bip44Chain',
   properties: {
     Bip44ChainId: 'Bip44ChainId',

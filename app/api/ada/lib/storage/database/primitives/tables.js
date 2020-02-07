@@ -17,10 +17,10 @@ export type KeyRow = {|
   KeyId: number,
   ...KeyInsert,
 |};
-export const KeySchema: {
+export const KeySchema: {|
   +name: 'Key',
-  properties: $ObjMapi<KeyRow, ToSchemaProp>
-} = {
+  properties: $ObjMapi<KeyRow, ToSchemaProp>,
+|} = {
   name: 'Key',
   properties: {
     KeyId: 'KeyId',
@@ -39,10 +39,10 @@ export type AddressRow = {|
   AddressId: number,
   ...AddressInsert,
 |};
-export const AddressSchema: {
+export const AddressSchema: {|
   +name: 'Address',
-  properties: $ObjMapi<AddressRow, ToSchemaProp>
-} = {
+  properties: $ObjMapi<AddressRow, ToSchemaProp>,
+|} = {
   name: 'Address',
   properties: {
     AddressId: 'AddressId',
@@ -65,10 +65,10 @@ export type EncryptionMetaInsert = {|
 export type EncryptionMetaRow = {|
   ...EncryptionMetaInsert,
 |};
-export const EncryptionMetaSchema: {
+export const EncryptionMetaSchema: {|
   +name: 'EncryptionMeta',
-  properties: $ObjMapi<EncryptionMetaRow, ToSchemaProp>
-} = {
+  properties: $ObjMapi<EncryptionMetaRow, ToSchemaProp>,
+|} = {
   name: 'EncryptionMeta',
   properties: {
     EncryptionMetaId: 'EncryptionMetaId',
@@ -96,10 +96,10 @@ export type KeyDerivationRow = {|
   KeyDerivationId: number, // serial
   ...KeyDerivationInsert,
 |};
-export const KeyDerivationSchema: {
+export const KeyDerivationSchema: {|
   +name: 'KeyDerivation',
-  properties: $ObjMapi<KeyDerivationRow, ToSchemaProp>
-} = {
+  properties: $ObjMapi<KeyDerivationRow, ToSchemaProp>,
+|} = {
   name: 'KeyDerivation',
   properties: {
     KeyDerivationId: 'KeyDerivationId',
@@ -124,10 +124,10 @@ export type BlockRow = {|
   BlockId: number,
   ...BlockInsert,
 |};
-export const BlockSchema: {
+export const BlockSchema: {|
   +name: 'Block',
-  properties: $ObjMapi<BlockRow, ToSchemaProp>
-} = {
+  properties: $ObjMapi<BlockRow, ToSchemaProp>,
+|} = {
   name: 'Block',
   properties: {
     BlockId: 'BlockId',
@@ -160,10 +160,10 @@ export type TransactionRow = {|
   TransactionId: number,
   ...TransactionInsert,
 |};
-export const TransactionSchema: {
+export const TransactionSchema: {|
   +name: 'Transaction',
-  properties: $ObjMapi<TransactionRow, ToSchemaProp>
-} = {
+  properties: $ObjMapi<TransactionRow, ToSchemaProp>,
+|} = {
   name: 'Transaction',
   properties: {
     TransactionId: 'TransactionId',
@@ -191,10 +191,10 @@ export type CertificateRow = {|
   CertificateId: number,
   ...CertificateInsert,
 |};
-export const CertificateSchema: {
+export const CertificateSchema: {|
   +name: 'Certificate',
-  properties: $ObjMapi<CertificateRow, ToSchemaProp>
-} = {
+  properties: $ObjMapi<CertificateRow, ToSchemaProp>,
+|} = {
   name: 'Certificate',
   properties: {
     CertificateId: 'CertificateId',
@@ -212,10 +212,10 @@ export type CertificateAddressRow = {|
   CertificateAddressId: number,
   ...CertificateAddressInsert,
 |};
-export const CertificateAddressSchema: {
+export const CertificateAddressSchema: {|
   +name: 'CertificateAddress',
-  properties: $ObjMapi<CertificateAddressRow, ToSchemaProp>
-} = {
+  properties: $ObjMapi<CertificateAddressRow, ToSchemaProp>,
+|} = {
   name: 'CertificateAddress',
   properties: {
     CertificateAddressId: 'CertificateAddressId',
@@ -243,10 +243,10 @@ export type CanonicalAddressRow = {|
  * This means that metadata can't be stored directly here like other derivation levels
  * that's okay since since any metadata would be associated w/ a hash and not the derivation anyway
  */
-export const CanonicalAddressSchema: {
+export const CanonicalAddressSchema: {|
   +name: 'CanonicalAddress',
-  properties: $ObjMapi<CanonicalAddressRow, ToSchemaProp>
-} = {
+  properties: $ObjMapi<CanonicalAddressRow, ToSchemaProp>,
+|} = {
   name: 'CanonicalAddress',
   properties: {
     CanonicalAddressId: 'CanonicalAddressId',
@@ -262,10 +262,10 @@ export type AddressMappingRow = {|
   AddressMappingId: number,
   ...AddressMappingInsert,
 |};
-export const AddressMappingSchema: {
+export const AddressMappingSchema: {|
   +name: 'AddressMapping',
-  properties: $ObjMapi<AddressMappingRow, ToSchemaProp>
-} = {
+  properties: $ObjMapi<AddressMappingRow, ToSchemaProp>,
+|} = {
   name: 'AddressMapping',
   properties: {
     AddressMappingId: 'AddressMappingId',

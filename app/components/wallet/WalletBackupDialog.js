@@ -15,8 +15,14 @@ type Props = {|
   +isValid: boolean,
   +isSubmitting: boolean,
   +recoveryPhrase: string,
-  +recoveryPhraseSorted: Array<{ word: string, isActive: boolean }>,
-  +enteredPhrase: Array<{ word: string, index: number }>,
+  +recoveryPhraseSorted: Array<{|
+    word: string,
+    isActive: boolean,
+  |}>,
+  +enteredPhrase: Array<{|
+    word: string,
+    index: number,
+  |}>,
   +onCancelBackup: void => void,
   +onAcceptPrivacyNotice: void => void,
   +onContinue: void => void,

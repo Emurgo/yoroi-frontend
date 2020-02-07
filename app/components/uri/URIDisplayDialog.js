@@ -29,7 +29,7 @@ const messages = defineMessages({
   }
 });
 
-type Props = {
+type Props = {|
   +onClose: void => void,
   +classicTheme: boolean,
   +notification: ?Notification,
@@ -37,7 +37,7 @@ type Props = {
   +onBack: void => void,
   +address: string,
   +amount: number,
-};
+|};
 
 @observer
 export default class URIDisplayDialog extends Component<Props> {

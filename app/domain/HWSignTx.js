@@ -6,7 +6,7 @@ import type {
   OutputTypeChange,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
-export type LedgerSignTxPayload = {
+export type LedgerSignTxPayload = {|
   inputs: Array<InputTypeUTxO>,
   outputs: Array<OutputTypeAddress | OutputTypeChange>,
-}
+|};
