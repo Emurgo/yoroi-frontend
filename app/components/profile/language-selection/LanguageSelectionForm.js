@@ -9,8 +9,8 @@ import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
+import type { LanguageType } from '../../../i18n/translations';
 import styles from './LanguageSelectionForm.scss';
-import type { MessageDescriptor } from 'react-intl';
 import FlagLabel from '../../widgets/FlagLabel';
 import { tier1Languages } from '../../../config/languagesConfig';
 import globalMessages, { listOfTranslators } from '../../../i18n/global-messages';
@@ -24,7 +24,7 @@ const messages = defineMessages({
 
 type Props = {|
   +onSelectLanguage: {| locale: string |} => void,
-  +languages: Array<{ value: string, label: MessageDescriptor, svg: string }>,
+  +languages: Array<LanguageType>,
   +onSubmit: {| locale: string |} => PossiblyAsync<void>,
   +isSubmitting: boolean,
   +currentLocale: string,

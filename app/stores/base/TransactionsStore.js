@@ -24,13 +24,13 @@ import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWal
 export default class TransactionsStore extends Store {
 
   /** How many transactions to display */
-  INITIAL_SEARCH_LIMIT = 5;
+  INITIAL_SEARCH_LIMIT: number = 5;
 
-  /** How many additonall transactions to display when user wants to show more */
-  SEARCH_LIMIT_INCREASE = 5;
+  /** How many additonal transactions to display when user wants to show more */
+  SEARCH_LIMIT_INCREASE: number = 5;
 
   /** Skip first n transactions from api */
-  SEARCH_SKIP = 0;
+  SEARCH_SKIP: number = 0;
 
   /** Track transactions for a set of wallets */
   @observable transactionsRequests: Array<{
@@ -41,10 +41,10 @@ export default class TransactionsStore extends Store {
     getBalanceRequest: CachedRequest<GetBalanceFunc>
   }> = [];
 
-  @observable _searchOptionsForWallets = observable.map<
-      PublicDeriver<>,
-      GetTransactionsRequestOptions,
-    >();
+  @observable _searchOptionsForWallets: Map<
+    PublicDeriver<>,
+    GetTransactionsRequestOptions
+  > = observable.map();
 
   _hasAnyPending: boolean = false;
 
@@ -254,9 +254,11 @@ export default class TransactionsStore extends Store {
     });
   }
 
-  _getTransactionsPendingRequest = (
-    publicDeriver: PublicDeriver<>
-  ): CachedRequest<RefreshPendingTransactionsFunc> => {
+  _getTransactionsPendingRequest: (
+    PublicDeriver<>
+  ) => CachedRequest<RefreshPendingTransactionsFunc> = (
+    publicDeriver
+  ) => {
     const foundRequest = find(this.transactionsRequests, { publicDeriver });
     if (foundRequest && foundRequest.pendingRequest) return foundRequest.pendingRequest;
     return new CachedRequest<RefreshPendingTransactionsFunc>(
@@ -266,9 +268,9 @@ export default class TransactionsStore extends Store {
 
   /** Get request for fetching transaction data.
    * Should ONLY be executed to cache query WITH search options */
-  _getTransactionsRecentRequest = (
-    publicDeriver: PublicDeriver<>
-  ): CachedRequest<GetTransactionsFunc> => {
+  _getTransactionsRecentRequest: PublicDeriver<> => CachedRequest<GetTransactionsFunc> = (
+    publicDeriver
+  ) => {
     const foundRequest = find(this.transactionsRequests, { publicDeriver });
     if (foundRequest && foundRequest.recentRequest) return foundRequest.recentRequest;
     return new CachedRequest<GetTransactionsFunc>(this.api[environment.API].refreshTransactions);
@@ -284,9 +286,9 @@ export default class TransactionsStore extends Store {
     return new CachedRequest<GetTransactionsFunc>(this.api[environment.API].refreshTransactions);
   };
 
-  _getBalanceRequest = (
-    publicDeriver: PublicDeriver<>
-  ): CachedRequest<GetBalanceFunc> => {
+  _getBalanceRequest: (PublicDeriver<>) => CachedRequest<GetBalanceFunc> = (
+    publicDeriver
+  ) => {
     const foundRequest = find(this.transactionsRequests, { publicDeriver });
     if (foundRequest && foundRequest.getBalanceRequest) return foundRequest.getBalanceRequest;
     return new CachedRequest<GetBalanceFunc>(this.api[environment.API].getBalance);

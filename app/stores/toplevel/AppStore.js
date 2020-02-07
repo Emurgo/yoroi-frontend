@@ -16,17 +16,17 @@ export default class AppStore extends Store {
     return this.stores.router.location.pathname;
   }
 
-  _updateRouteLocation = (
-    options: { route: string, params: ?Object }
-  ): void => {
+  _updateRouteLocation: {| route: string, params: ?Object |} => void = (
+    options
+  ) => {
     const routePath = buildRoute(options.route, options.params);
     const currentRoute = this.stores.router.location.pathname;
     if (currentRoute !== routePath) this.stores.router.push(routePath);
   };
 
-  _setRouteLocationToTransactionsList = (
-    options: { params: ?Object }
-  ): void => {
+  _setRouteLocationToTransactionsList: {| params: ?Object |} => void = (
+    options
+  ) => {
     const routePath = buildRoute(ROUTES.WALLETS.TRANSACTIONS, options.params);
     const currentRoute = this.stores.router.location.pathname;
     if (currentRoute !== routePath) this.stores.router.push(routePath);

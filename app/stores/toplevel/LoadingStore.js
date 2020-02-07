@@ -119,9 +119,9 @@ export default class LoadingStore extends Store {
     this._originRoute = { route: '', location: '' };
   }
 
-  _isRefresh = (): boolean => this.isLoading;
+  _isRefresh: void => boolean = () => this.isLoading;
 
-  _redirectToLoading = (): void => {
+  _redirectToLoading: void => void = () => {
     // before redirecting, save origin route in case we need to come back to
     // it later (this is the case when user comes from a URI link)
     runInAction(() => {

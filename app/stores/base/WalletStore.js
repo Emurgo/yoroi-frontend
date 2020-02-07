@@ -56,8 +56,8 @@ function groupWallets(
  */
 export default class WalletStore extends Store {
 
-  WALLET_REFRESH_INTERVAL = environment.walletRefreshInterval;
-  ON_VISIBLE_DEBOUNCE_WAIT = 1000;
+  WALLET_REFRESH_INTERVAL: number = environment.walletRefreshInterval;
+  ON_VISIBLE_DEBOUNCE_WAIT: number = 1000;
 
   @observable publicDerivers: Array<PublicDeriverWithCachedMeta>;
   @observable selected: null | PublicDeriverWithCachedMeta;
@@ -352,7 +352,7 @@ export default class WalletStore extends Store {
     }
   };
 
-  _showAddWalletPageWhenNoWallets = () => {
+  _showAddWalletPageWhenNoWallets: void => void = () => {
     if (this.isWalletRoute && !this.hasAnyWallets) {
       this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
     }
@@ -363,7 +363,7 @@ export default class WalletStore extends Store {
       related to app urls and wallet status. Also, this behaviour is trigger by mobx reactions,
       so it's hard to reason about all the scenarios could happened.
   */
-  _updateActiveWalletOnRouteChanges = () => {
+  _updateActiveWalletOnRouteChanges: void => void = () => {
     const currentRoute = this.stores.app.currentRoute;
     const hasAnyPublicDeriver = this.hasAnyPublicDeriver;
     runInAction(`${nameof(WalletStore)}::${nameof(this._updateActiveWalletOnRouteChanges)}`, () => {

@@ -18,7 +18,7 @@ module.exports = {
     "no-restricted-syntax": [
       "error",
       {
-        "selector": "ClassProperty:not([typeAnnotation])[key.name!=/_.*/]",
+        "selector": "ClassProperty:not([typeAnnotation])",
         "message": "Missing type annotation of class property. This has unexpected cross-module behavior."
       },
     ],
