@@ -146,7 +146,7 @@ declare module "react-intl" {
     props: TOwnProps
   }
 
-  declare type IntlInjectedComponentClass<TOwnProps, TDefaultProps: {...} = {}> = Class<
+  declare type IntlInjectedComponentClass<TOwnProps, TDefaultProps: {...} = {...}> = Class<
     IntlInjectedComponent<TOwnProps, TDefaultProps>
   >;
 
