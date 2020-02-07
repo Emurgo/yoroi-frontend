@@ -4,11 +4,11 @@ import AdaApi from './ada/index';
 import LocalStorageApi from './localStorage/index';
 import ExportApi from './export/index';
 
-export type Api = {
+export type Api = {|
   ada: AdaApi,
   localStorage: LocalStorageApi,
   export: ExportApi,
-};
+|};
 
 export const setupApi = async (): Promise<Api> => ({
   ada: new AdaApi(),
@@ -16,11 +16,11 @@ export const setupApi = async (): Promise<Api> => ({
   export: new ExportApi(),
 });
 
-export type MigrationRequest = {
+export type MigrationRequest = {|
   api: Api,
   persistentDb: lf$Database,
   currVersion: string,
-}
+|}
 
 export const migrate = async (migrationRequest: MigrationRequest): Promise<void> => {
   const lastLaunchVersion = await migrationRequest.api.localStorage.getLastLaunchVersion();

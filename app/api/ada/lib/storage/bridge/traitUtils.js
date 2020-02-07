@@ -51,10 +51,10 @@ export async function rawGetAllAddressesForDisplay(
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
-  request: {
+  request: {|
     publicDeriver: IPublicDeriver<> & IGetAllUtxos,
     type: CoreAddressT,
-  },
+   |},
   derivationTables: Map<number, string>,
 ): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
   let addresses = await request.publicDeriver.rawGetAllUtxoAddresses(
@@ -94,10 +94,10 @@ export async function rawGetAllAddressesForDisplay(
 }
 
 export async function getAllAddressesForDisplay(
-  request: {
+  request: {|
     publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos,
     type: CoreAddressT,
-  },
+  |},
 ): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
@@ -135,9 +135,7 @@ export async function rawGetAddressRowsForWallet(
     GetAddress: Class<GetAddress>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
-  request: {
-    publicDeriver: IPublicDeriver<>,
-  },
+  request: {| publicDeriver: IPublicDeriver<>, |},
   derivationTables: Map<number, string>,
 ): Promise<{|
   utxoAddresses: Array<$ReadOnly<AddressRow>>,

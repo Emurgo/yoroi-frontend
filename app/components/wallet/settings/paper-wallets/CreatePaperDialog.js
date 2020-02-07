@@ -60,7 +60,7 @@ type Props = {|
   +onNext: void => PossiblyAsync<void>,
   +onCancel: void => PossiblyAsync<void>,
   +onDownload: void => PossiblyAsync<void>,
-  +onDataChange: { [key: string]: any } => void,
+  +onDataChange: { [key: string]: any, ... } => void,
   +loadingGif: Node,
   +classicTheme: boolean,
 |};

@@ -90,7 +90,7 @@ export default class CachedRequest<
    * @param immediately call the request right away after invalidating
    */
   invalidate(
-    options: { immediately: boolean } = { immediately: false }
+    options: {| immediately: boolean, |} = { immediately: false }
   ): CachedRequest<Func, Error> {
     this._isInvalidated = true;
     if (options.immediately && this._currentApiCall) {

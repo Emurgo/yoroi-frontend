@@ -29,9 +29,7 @@ declare module 'bip39' {
   ): void;
   declare export function getDefaultWordlist(): string;
 
-  declare export var wordlists: {
-    [index: string]: string[];
-  };
+  declare export var wordlists: { [index: string]: string[], ... };
   declare export var _default: string[] | void;
 
 }

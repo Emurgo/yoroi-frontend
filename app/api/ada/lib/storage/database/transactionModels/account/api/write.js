@@ -27,10 +27,10 @@ export class ModifyAccountingTransaction {
   static async addIOsToTx(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
+    request: {|
       accountingInputs: Array<AccountingTransactionInputInsert>,
       accountingOutputs: Array<AccountingTransactionOutputInsert>,
-    },
+    |},
   ): Promise<{| ...DbAccountingInputs, ...DbAccountingOutputs, |}> {
     const { accountingInputs, accountingOutputs } = request;
     const newInputs = await addBatchToTable<

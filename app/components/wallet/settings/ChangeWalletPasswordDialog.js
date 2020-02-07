@@ -36,7 +36,7 @@ type Props = {|
   +repeatedPasswordValue: string,
   +onSave: {| oldPassword: string, newPassword: string |} => PossiblyAsync<void>,
   +onCancel: void => void,
-  +onDataChange: { [key: string]: any } => void,
+  +onDataChange: { [key: string]: any, ... } => void,
   +onPasswordSwitchToggle: void => void,
   +isSubmitting: boolean,
   +error: ?LocalizableError,

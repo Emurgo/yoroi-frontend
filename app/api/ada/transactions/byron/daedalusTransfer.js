@@ -33,11 +33,11 @@ const protocolMagic = CONFIG.network.protocolMagic;
 /**
  * Generate transaction including all addresses with no change.
 */
-export async function buildDaedalusTransferTx(payload: {
+export async function buildDaedalusTransferTx(payload: {|
   addressKeys: AddressKeyMap,
   senderUtxos: Array<RemoteUnspentOutput>,
   outputAddr: string,
-}): Promise<TransferTx> {
+|}): Promise<TransferTx> {
   try {
     const { addressKeys, senderUtxos, outputAddr } = payload;
 

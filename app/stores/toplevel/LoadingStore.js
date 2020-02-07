@@ -32,10 +32,12 @@ export default class LoadingStore extends Store {
    */
   @observable _uriParams: ?UriParams = null;
 
-  _originRoute: {
-    route: string, // internal route
-    location: string, // full URL
-  } = { route: '', location: '' };
+  _originRoute: {|
+    // internal route
+    route: string,
+    // full URL
+    location: string,
+  |} = { route: '', location: '' };
 
   @observable loadRustRequest: Request<void => Promise<void>>
     = new Request<void => Promise<void>>(RustModule.load.bind(RustModule));

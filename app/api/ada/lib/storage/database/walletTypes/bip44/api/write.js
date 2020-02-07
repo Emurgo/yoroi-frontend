@@ -71,10 +71,10 @@ export class ModifyDisplayCutoff {
   static async pop(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
+    request: {|
       pubDeriverKeyDerivationId: number,
       pathToLevel: Array<number>,
-    },
+    |},
     derivationTables: Map<number, string>,
   ): Promise<void | {|
     index: number,
@@ -163,10 +163,10 @@ export class ModifyDisplayCutoff {
   static async set(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
+    request: {|
       derivationId: number,
       newIndex: number,
-    },
+    |},
   ): Promise<void> {
     const chainTable = db.getSchema().table(
       ModifyDisplayCutoff.ownTables[Bip44ChainSchema.name].name

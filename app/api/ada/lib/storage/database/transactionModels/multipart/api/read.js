@@ -28,10 +28,10 @@ export class AssociateTxWithIOs {
   static async getTxIdsForAddresses(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
+    request: {|
       utxoAddressIds: Array<number>,
       accountingAddressIds: Array<number>,
-    },
+    |},
   ): Promise<Array<number>> {
     return Array.from(new Set([
       ...(await AssociateTxWithIOs.depTables.AssociateTxWithAccountingIOs.getTxIdsForAddresses(
@@ -46,9 +46,7 @@ export class AssociateTxWithIOs {
   static async getIOsForTx(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
-      txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>,
-    },
+    request: {| txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>, |},
   ): Promise<Array<DbTxIO>> {
     const accounting = await AssociateTxWithIOs.depTables.AssociateTxWithAccountingIOs.getIOsForTx(
       db, tx, request

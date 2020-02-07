@@ -33,14 +33,14 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   +onSubmit: void => void,
   +onBack: void => void,
   +onCancel: void => void,
   +uriParams: UriParams,
   +classicTheme: boolean,
   +selectedExplorer: ExplorerType,
-};
+|};
 
 @observer
 export default class URIVerifyDialog extends Component<Props> {

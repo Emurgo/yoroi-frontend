@@ -33,13 +33,13 @@ export default class TransactionsStore extends Store {
   SEARCH_SKIP: number = 0;
 
   /** Track transactions for a set of wallets */
-  @observable transactionsRequests: Array<{
+  @observable transactionsRequests: Array<{|
     publicDeriver: PublicDeriver<>,
     pendingRequest: CachedRequest<RefreshPendingTransactionsFunc>,
     recentRequest: CachedRequest<GetTransactionsFunc>,
     allRequest: CachedRequest<GetTransactionsFunc>,
-    getBalanceRequest: CachedRequest<GetBalanceFunc>
-  }> = [];
+    getBalanceRequest: CachedRequest<GetBalanceFunc>,
+  |}> = [];
 
   @observable _searchOptionsForWallets: Map<
     PublicDeriver<>,
@@ -184,7 +184,6 @@ export default class TransactionsStore extends Store {
         // Note: cache based on last slot synced  (not used in balanceRequest)
         const req = this._getBalanceRequest(basePubDeriver.self);
         req.execute({
-          slot: lastUpdateDate.SlotNum,
           getBalance: canGetBalance.getBalance,
         });
         if (!req.promise) throw new Error('should never happen');

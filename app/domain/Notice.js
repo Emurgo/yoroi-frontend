@@ -25,7 +25,7 @@ export default class Notice {
   epochNumber: ?number = 199; // for REWARD_RECEIVED (in ADA)
 
   // TODO: remove all defaults and accept all parameters
-  constructor(data: {
+  constructor(data: {|
     id: string,
     kind: NoticeKindType,
     date: Date,
@@ -34,7 +34,7 @@ export default class Notice {
     newFee?: number,
     oldCost?: number,
     newCost?: number,
-  }) {
+  |}) {
     Object.assign(this, data);
   }
 }

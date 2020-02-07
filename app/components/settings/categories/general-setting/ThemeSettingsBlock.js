@@ -53,7 +53,7 @@ type Props = {|
   +currentTheme: Theme,
   +selectTheme: {| theme: string |} => PossiblyAsync<void>,
   +exportTheme: void => PossiblyAsync<void>,
-  +getThemeVars: {| theme: string |} => { [key: string]: string },
+  +getThemeVars: {| theme: string |} => { [key: string]: string, ... },
   +hasCustomTheme: void => boolean,
   +onExternalLinkClick: MouseEvent => void,
 |};

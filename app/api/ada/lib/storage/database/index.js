@@ -107,7 +107,7 @@ export async function clear(
  * Note: all connection types reuse this variable unfortunately
  * since there is no way to detect the database type given just the raw back store
  */
-export const dumpByVersion: { [tableName: string]: Array<any> } = {};
+export const dumpByVersion: { [tableName: string]: Array<any>, ... } = {};
 
 async function onUpgrade(
   rawDb: lf$raw$BackStore,

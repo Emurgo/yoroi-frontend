@@ -83,11 +83,7 @@ function getFirefoxBuilder() {
     .setFirefoxOptions(options);
 }
 
-type WorldInput = {
-  parameters: {
-    browser: 'brave' | 'chrome' | 'firefox'
-  }
-};
+type WorldInput = {| parameters: {| browser: 'brave' | 'chrome' | 'firefox', |}, |};
 
 // TODO: We should add methods to `this.driver` object, instead of use `this` directly
 function CustomWorld(cmdInput: WorldInput) {

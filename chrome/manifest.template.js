@@ -1,11 +1,11 @@
 // @flow
 
 /*::
-type Icons = {
+type Icons = {|
   '16': string,
   '48': string,
   '128': string,
-};
+|};
 */
 
 export default ({

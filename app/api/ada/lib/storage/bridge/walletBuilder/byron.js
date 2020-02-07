@@ -120,7 +120,7 @@ export async function getAccountDefaultDerivations(
   ];
 }
 
-export async function createStandardBip44Wallet(request: {
+export async function createStandardBip44Wallet(request: {|
   db: lf$Database,
   settings: RustModule.WalletV2.BlockchainSettings,
   rootPk: RustModule.WalletV2.Bip44RootPrivateKey,
@@ -128,7 +128,7 @@ export async function createStandardBip44Wallet(request: {
   accountIndex: number,
   walletName: string,
   accountName: string,
-}): Promise<HasConceptualWallet & HasBip44Wrapper & HasRoot & HasPublicDeriver<mixed>> {
+|}): Promise<HasConceptualWallet & HasBip44Wrapper & HasRoot & HasPublicDeriver<mixed>> {
   if (request.accountIndex < HARD_DERIVATION_START) {
     throw new Error('createStandardBip44Wallet needs hardened index');
   }
@@ -231,6 +231,7 @@ export async function createHardwareWallet(request: {
   walletName: string,
   accountName: string,
   hwWalletMetaInsert: HWFeatures,
+  ...
 }): Promise<HasConceptualWallet & HasBip44Wrapper & HasPublicDeriver<mixed>> {
   if (request.accountIndex < HARD_DERIVATION_START) {
     throw new Error('createHardwareWallet needs hardened index');
@@ -342,6 +343,7 @@ export async function migrateFromStorageV1(request: {
   displayCutoff: number,
   walletName: string,
   hwWalletMetaInsert: void | HWFeatures,
+  ...
 }): Promise<void> {
   // hardware wallet
   if (request.encryptedPk == null) {
@@ -460,6 +462,7 @@ async function addPublicDeriverToMigratedWallet<
   settings: RustModule.WalletV2.BlockchainSettings,
   displayCutoff: number,
   hwWalletMetaInsert: void | HWFeatures,
+  ...
 }): Promise<WalletBuilder<T & HasPublicDeriver<mixed>>> {
   const accountIndex = HARD_DERIVATION_START + 0;
   const accountName = '';

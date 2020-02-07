@@ -44,13 +44,13 @@ import {
   shelleyTxEqual,
 } from './shelley/utils';
 
-export function getFromUserPerspective(data: {
+export function getFromUserPerspective(data: {|
   utxoInputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionInputRow>>,
   utxoOutputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionOutputRow>>,
   accountingInputs: $ReadOnlyArray<$ReadOnly<AccountingTransactionInputRow>>,
   accountingOutputs: $ReadOnlyArray<$ReadOnly<AccountingTransactionOutputRow>>,
   allOwnedAddressIds: Set<number>,
-}): UserAnnotation {
+|}): UserAnnotation {
   // Note: logic taken from the mobile version of Yoroi
   // https://github.com/Emurgo/yoroi-mobile/blob/a3d72218b1e63f6362152aae2f03c8763c168795/src/crypto/transactionUtils.js#L73-L103
 
@@ -154,7 +154,7 @@ export function formatBigNumberToFloatString(x: BigNumber): string {
   return x.isInteger() ? x.toFixed(1) : x.toString();
 }
 
-export type UtxoLookupMap = { [string]: { [number]: RemoteUnspentOutput }};
+export type UtxoLookupMap = { [string]: { [number]: RemoteUnspentOutput, ... }, ... };
 export function utxosToLookupMap(
   utxos: Array<RemoteUnspentOutput>
 ): UtxoLookupMap {

@@ -25,12 +25,12 @@ import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 /**
  * Generate transaction including all addresses with no change.
 */
-export async function buildYoroiTransferTx(payload: {
+export async function buildYoroiTransferTx(payload: {|
   senderUtxos: Array<AddressedUtxo>,
   outputAddr: string,
   keyLevel: number,
   signingKey: RustModule.WalletV3.Bip32PrivateKey,
-}): Promise<TransferTx> {
+|}): Promise<TransferTx> {
   try {
     const { senderUtxos, outputAddr, } = payload;
 

@@ -214,7 +214,7 @@ function _transformToLedgerInputs(
   inputs: Array<TxoPointerType>,
   addressMap: Map<string, Addressing>,
   utxoMap: UtxoLookupMap,
-  txDataHexMap: {[key: string]:string}
+  txDataHexMap: { [key: string]:string, ... }
 ): Array<InputTypeUTxO> {
   return inputs.map(input => {
     const utxo = utxoMap[input.id][input.index];

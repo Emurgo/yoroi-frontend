@@ -1,11 +1,11 @@
 // @flow
 
-export type ConfigType = {
+export type ConfigType = {|
   network: NetworkConfigType,
   seiza: SeizaConfigType,
   app: AppConfigType,
   genesis: GenesisConfigType,
-};
+|};
 
 export type SeizaConfigType = {|
     simpleTemplate: string,
@@ -55,15 +55,15 @@ export type GenesisConfigType = {|
 |};
 
 export type Network = 'shelley-dev' | 'shelley-testnet' | 'development' | 'mainnet' | 'staging' | 'testnet' | 'test';
-export const NetworkType: {
+export const NetworkType: {|
   SHELLEY_DEV: Network,
   SHELLEY_TESTNET: Network,
   DEVELOPMENT: Network,
   MAINNET: Network,
   STAGING: Network,
   TESTNET: Network,
-  TEST: Network
-} = {
+  TEST: Network,
+|} = {
   SHELLEY_DEV: 'shelley-dev',
   SHELLEY_TESTNET: 'shelley-testnet',
   DEVELOPMENT: 'development',

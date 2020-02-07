@@ -60,10 +60,10 @@ import type {
 } from '../../database/walletTypes/common/utils';
 import type { Bip44ChainInsert } from '../../database/walletTypes/common/tables';
 
-export type WalletAccountNumberPlate = {
+export type WalletAccountNumberPlate = {|
   hash: string,
   id: string,
-}
+|};
 
 export type Address = {|
   +address: string,
@@ -91,8 +91,9 @@ export type UsedStatus = {|
 export type IPublicDeriverConstructor<+Parent: IConceptualWallet> = {
   publicDeriverId: number,
   +parent: Parent,
-  pathToPublic: Array<number>;
+  pathToPublic: Array<number>,
   derivationId: number,
+  ...
 };
 export interface IPublicDeriver<+Parent: ConceptualWallet = ConceptualWallet> {
   constructor(data: IPublicDeriverConstructor<Parent>): IPublicDeriver<Parent>;
@@ -180,11 +181,11 @@ export interface IGetAllUtxos {
 }
 
 export type IDisplayCutoffPopRequest = void;
-export type IDisplayCutoffPopResponse = {
+export type IDisplayCutoffPopResponse = {|
   index: number,
   row: $ReadOnly<CanonicalAddressRow>,
   addrs: $ReadOnlyArray<$ReadOnly<AddressRow>>,
-};
+|};
 export type IDisplayCutoffPopFunc = (
   body: IDisplayCutoffPopRequest
 ) => Promise<IDisplayCutoffPopResponse>;
@@ -195,9 +196,7 @@ export type IDisplayCutoffGetFunc = (
   body: IDisplayCutoffGetRequest
 ) => Promise<IDisplayCutoffGetResponse>;
 
-export type IDisplayCutoffSetRequest = {
-  newIndex: number,
-};
+export type IDisplayCutoffSetRequest = {| newIndex: number, |};
 export type IDisplayCutoffSetResponse = void;
 export type IDisplayCutoffSetFunc = (
   body: IDisplayCutoffSetRequest
@@ -299,21 +298,19 @@ export interface IGetUtxoBalance {
 }
 
 export type IGetSigningKeyRequest = void;
-export type IGetSigningKeyResponse = {
+export type IGetSigningKeyResponse = {|
   level: number,
   path: $ReadOnlyArray<$ReadOnly<KeyDerivationRow>>,
   row: $ReadOnly<KeyRow>,
-};
+|};
 export type IGetSigningKeyFunc = (
   body: IGetSigningKeyRequest
 ) => Promise<IGetSigningKeyResponse>;
-export type INormalizeKeyRequest = IGetSigningKeyResponse & {
-  password: string,
-};
-export type INormalizeKeyResponse = {
+export type INormalizeKeyRequest = {| ...IGetSigningKeyResponse, password: string, |};
+export type INormalizeKeyResponse = {|
   prvKeyHex: string,
   pubKeyHex: string,
-};
+|};
 export type INormalizeKeyFunc = (
   body: INormalizeKeyRequest
 ) => Promise<INormalizeKeyResponse>;
@@ -367,9 +364,7 @@ export interface IGetLastSyncInfo {
 }
 
 
-export type IScanAddressesRequest = {
-  checkAddressesInUse: FilterFunc,
-};
+export type IScanAddressesRequest = {| checkAddressesInUse: FilterFunc, |};
 export type IScanAddressesResponse = void;
 export type IScanAddressesFunc = (
   body: IScanAddressesRequest

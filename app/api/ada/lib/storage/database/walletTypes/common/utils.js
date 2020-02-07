@@ -20,7 +20,7 @@ export type TreeInsertStart = {|
   children: TreeInsert<any>,
 |};
 
-export type TreeInsert<T={ KeyDerivationId: number, }> = Array<{|
+export type TreeInsert<T={ KeyDerivationId: number, ... }> = Array<{|
   index: number,
   insert: InsertRequest => Promise<T>,
   children?: TreeInsert<any>,
@@ -31,13 +31,13 @@ export type TreeResultStart<Row> = {|
   children: TreeResult<Row>,
 |};
 
-export type TreeResult<T={ KeyDerivationId: number, }> = Array<{|
+export type TreeResult<T={ KeyDerivationId: number, ... }> = Array<{|
   index: number,
   result: T,
   children?: TreeResult<any>,
 |}>;
 
-export type InsertPath<T={ KeyDerivationId: number, }> = Array<{|
+export type InsertPath<T={ KeyDerivationId: number, ... }> = Array<{|
   index: number,
   insert: InsertRequest => Promise<T>,
   privateKey: KeyInsert | null,

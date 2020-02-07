@@ -4,28 +4,20 @@ import type { CertificateKindType } from '@emurgo/js-chain-libs/js_chain_libs';
 
 // getUTXOsForAddresses
 
-export type AddressUtxoRequest = {
-  addresses: Array<string>,
-};
+export type AddressUtxoRequest = {| addresses: Array<string>, |};
 export type AddressUtxoResponse = Array<RemoteUnspentOutput>;
 export type AddressUtxoFunc = (body: AddressUtxoRequest) => Promise<AddressUtxoResponse>;
 
 // getTxsBodiesForUTXOs
 
-export type TxBodiesRequest = { txsHashes: Array<string> };
-export type TxBodiesResponse = {
-  [key: string]:string
-};
+export type TxBodiesRequest = {| txsHashes: Array<string>, |};
+export type TxBodiesResponse = { [key: string]:string, ... };
 export type TxBodiesFunc = (body: TxBodiesRequest) => Promise<TxBodiesResponse>;
 
 // getUTXOsSumsForAddresses
 
-export type UtxoSumRequest = {
-  addresses: Array<string>,
-};
-export type UtxoSumResponse = {
-  sum: ?string
-};
+export type UtxoSumRequest = {| addresses: Array<string>, |};
+export type UtxoSumResponse = {| sum: ?string, |};
 export type UtxoSumFunc = (body: UtxoSumRequest) => Promise<UtxoSumResponse>;
 
 // getTransactionsHistoryForAddresses
@@ -50,19 +42,20 @@ export type RewardTuple = [
   number, /* epoch */
   number /* amount in lovelaces */
 ];
-export type RewardHistoryResponse = { [address: string]: Array<RewardTuple> };
+export type RewardHistoryResponse = { [address: string]: Array<RewardTuple>, ... };
 export type RewardHistoryFunc = (body: RewardHistoryRequest) => Promise<RewardHistoryResponse>;
 
 // getBestBlock
 
 export type BestBlockRequest = void;
-export type BestBlockResponse = {
-  height: number, // 0 if no blocks in db
+export type BestBlockResponse = {|
+  // 0 if no blocks in db
+  height: number,
   // null when no blocks in db
   epoch: null | number,
   slot: null | number,
   hash: null | string,
-};
+|};
 export type BestBlockFunc = (body: BestBlockRequest) => Promise<BestBlockResponse>;
 
 // sendTx
@@ -74,16 +67,12 @@ export type SignedRequest = {|
   id: string,
   encodedTx: Uint8Array,
 |};
-export type SignedResponse = {
-  txId: string
-};
+export type SignedResponse = {| txId: string, |};
 export type SendFunc = (body: SignedRequest) => Promise<SignedResponse>;
 
 // checkAddressesInUse
 
-export type FilterUsedRequest = {
-  addresses: Array<string>
-};
+export type FilterUsedRequest = {| addresses: Array<string>, |};
 export type FilterUsedResponse = Array<string>;
 export type FilterFunc = (body: FilterUsedRequest) => Promise<FilterUsedResponse>;
 
@@ -108,7 +97,10 @@ export type AccountStateFailure = {|
   error: string,
   comment: string,
 |};
-export type AccountStateResponse = { [key: string]: (AccountStateSuccess | AccountStateFailure) };
+export type AccountStateResponse = {
+  [key: string]: (AccountStateSuccess | AccountStateFailure),
+  ...
+};
 export type AccountStateFunc = (body: AccountStateRequest) => Promise<AccountStateResponse>;
 
 // getPoolInfo
@@ -133,13 +125,17 @@ export type RemotePoolMetaSuccess = {|
   owners: ?{
     [key: string]: {|
       pledgeAddress: string,
-    |}
+    |},
+    ...
   },
 |};
 export type RemotePoolMetaFailure = {|
   error: string,
 |};
-export type PoolInfoResponse = { [key: string]: (RemotePoolMetaSuccess | RemotePoolMetaFailure) };
+export type PoolInfoResponse = {
+  [key: string]: (RemotePoolMetaSuccess | RemotePoolMetaFailure),
+  ...
+};
 export type PoolInfoFunc = (body: PoolInfoRequest) => Promise<PoolInfoResponse>;
 
 // getReputation
@@ -147,9 +143,10 @@ export type PoolInfoFunc = (body: PoolInfoRequest) => Promise<PoolInfoResponse>;
 export type ReputationObject = {
   node_flags?: number,
   // note: could be more metrics that are not handled
+  ...
 };
 export type ReputationRequest = void;
-export type ReputationResponse = { [poolId: string]: ReputationObject };
+export type ReputationResponse = { [poolId: string]: ReputationObject, ... };
 export type ReputationFunc = (body: ReputationRequest) => Promise<ReputationResponse>;
 
 // checkServer

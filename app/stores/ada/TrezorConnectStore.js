@@ -39,10 +39,10 @@ import type {
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import { HARD_DERIVATION_START } from '../../config/numbersConfig';
 
-type TrezorConnectionResponse = {
+type TrezorConnectionResponse = {|
   trezorResp: CardanoGetPublicKey$,
-  trezorEventDevice: DeviceMessage
-};
+  trezorEventDevice: DeviceMessage,
+|};
 
 export default class TrezorConnectStore
   extends Store

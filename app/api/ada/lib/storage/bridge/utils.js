@@ -124,7 +124,7 @@ export function groupAddrContainsAccountKey(
   return targetAccountKey === accountKeyString;
 }
 
-export function filterAddressesByStakingKey<T: { address: string }>(
+export function filterAddressesByStakingKey<T: { address: string, ... }>(
   stakingKey: RustModule.WalletV3.PublicKey,
   utxos: Array<T>,
   acceptTypeMismatch: boolean,

@@ -9,12 +9,12 @@ import { NetworkType } from '../../../../config/config-types';
 import type { WalletAccountNumberPlate } from '../lib/storage/models/PublicDeriver/interfaces';
 import { createIcon as blockiesIcon } from '@download/blockies';
 
-export type PaperRequest = {
+export type PaperRequest = {|
   words: Array<string>,
   addresses: Array<string>,
   accountPlate: ?WalletAccountNumberPlate,
   network: Network,
-}
+|}
 
 export const PdfGenSteps = Object.freeze({
   initializing: 0,
@@ -226,6 +226,7 @@ type AddImageParams = {
   w?: number,
   h?: number,
   r?: number,
+  ...
 }
 
 function textCenter(

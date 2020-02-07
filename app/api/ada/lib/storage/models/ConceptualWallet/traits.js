@@ -69,7 +69,7 @@ export async function derivePublicDeriver<Row>(
   privateDeriverLevel: number,
   derivationTables: Map<number, string>,
 ): Promise<IDerivePublicFromPrivateResponse<Row>> {
-  return await deps.DerivePublicDeriverFromKey.add<{}, Row>(
+  return await deps.DerivePublicDeriverFromKey.add<{...}, Row>(
     db, tx,
     {
       publicDeriverMeta: body.publicDeriverMeta,
@@ -125,7 +125,7 @@ export async function derivePublicDeriver<Row>(
 type PublicFromPrivateDependencies = IHasPrivateDeriver & IHasLevels & IConceptualWallet;
 const PublicFromPrivateMixin = (
   superclass: Class<PublicFromPrivateDependencies>
-) => class PublicFromPrivate extends superclass implements IDerivePublicFromPrivate {
+) => (class PublicFromPrivate extends superclass implements IDerivePublicFromPrivate {
 
   rawDerivePublicDeriverFromPrivate: <Row>(
     lf$Transaction,
@@ -179,7 +179,7 @@ const PublicFromPrivateMixin = (
       )
     );
   }
-};
+});
 export const PublicFromPrivate = Mixin<
   PublicFromPrivateDependencies,
   IDerivePublicFromPrivate,
@@ -203,7 +203,7 @@ export function asPublicFromPrivate<T: IHasPrivateDeriver>(
 type GetPrivateDeriverKeyDependencies = IHasPrivateDeriver & IConceptualWallet;
 const GetPrivateDeriverKeyMixin = (
   superclass: Class<GetPrivateDeriverKeyDependencies>
-) => class GetPrivateDeriverKey extends superclass implements IGetPrivateDeriverKey {
+) => (class GetPrivateDeriverKey extends superclass implements IGetPrivateDeriverKey {
 
   rawGetPrivateDeriverKey: (
     lf$Transaction,
@@ -285,7 +285,7 @@ const GetPrivateDeriverKeyMixin = (
       async tx => this.rawChangePrivateDeriverPassword(tx, deps, body)
     );
   }
-};
+});
 
 export const GetPrivateDeriverKey = Mixin<
   GetPrivateDeriverKeyDependencies,
@@ -310,7 +310,7 @@ export function asGetPrivateDeriverKey<T: IHasPrivateDeriver>(
 type AdhocPublicDeriverDepenencies = IHasLevels & IConceptualWallet;
 const AdhocPublicDeriverMixin = (
   superclass: Class<AdhocPublicDeriverDepenencies>
-) => class AdhocPublicDeriver extends superclass implements IAdhocPublicDeriver {
+) => (class AdhocPublicDeriver extends superclass implements IAdhocPublicDeriver {
 
   rawAddAdhocPubicDeriver: <Row>(
     lf$Transaction,
@@ -352,7 +352,7 @@ const AdhocPublicDeriverMixin = (
       async tx => this.rawAddAdhocPubicDeriver(tx, deps, body, derivationTables)
     );
   }
-};
+});
 export const AdhocPublicDeriver = Mixin<
   AdhocPublicDeriverDepenencies,
   IAdhocPublicDeriver,

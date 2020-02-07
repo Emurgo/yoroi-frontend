@@ -348,10 +348,10 @@ export class GetDerivationsByPath {
   static async getParentPath(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
+    request: {|
       startingKey: $ReadOnly<KeyDerivationRow>,
       numLevels: number,
-    },
+    |},
   ): Promise<Array<$ReadOnly<KeyDerivationRow>>> {
     const path = [request.startingKey];
     for (let i = 0; i < request.numLevels; i++) {
@@ -476,18 +476,18 @@ const _getTree = async (
   return result;
 };
 
-export type GetPathWithSpecificByTreeRequest = {
+export type GetPathWithSpecificByTreeRequest = {|
   startingDerivation: number,
   derivationLevel: number,
   commonPrefix: Array<number>,
   queryPath: Array<number | null>,
-};
+|};
 
-type GetPathWithSpecificRequest = {
+type GetPathWithSpecificRequest = {|
   pubDeriverKeyDerivationId: number,
   pathToLevel: Array<number>,
   level: number,
-};
+|};
 export class GetPathWithSpecific {
   static ownTables = Object.freeze({});
   static depTables = Object.freeze({
@@ -606,9 +606,7 @@ export class GetTransaction {
   static async fromIds(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
-      ids: Array<number>,
-    },
+    request: {| ids: Array<number>, |},
   ): Promise<$ReadOnlyArray<$ReadOnly<TransactionRow>>> {
     return await getRowIn<TransactionRow>(
       db, tx,
@@ -621,10 +619,10 @@ export class GetTransaction {
   static async withStatus(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
+    request: {|
       txIds: Array<number>,
       status: Array<TxStatusCodesType>,
-    },
+    |},
   ): Promise<$ReadOnlyArray<$ReadOnly<TransactionRow>>> {
     const txTableMeta = GetTransaction.ownTables[Tables.TransactionSchema.name];
     const txTable = db.getSchema().table(
@@ -643,10 +641,10 @@ export class GetTransaction {
   static async byDigest(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
+    request: {|
       txIds: Array<number>,
       digests: Array<number>,
-    },
+    |},
   ): Promise<Map<string, $ReadOnly<TransactionRow>>> {
     const txTableMeta = GetTransaction.ownTables[Tables.TransactionSchema.name];
     const txTable = db.getSchema().table(
@@ -679,10 +677,10 @@ export class GetTxAndBlock {
   static async gteSlot(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
+    request: {|
       txIds: Array<number>,
       slot: number,
-    },
+    |},
   ): Promise<$ReadOnlyArray<{|
     Block: $ReadOnly<BlockRow>,
     Transaction: $ReadOnly<TransactionRow>,
@@ -717,10 +715,10 @@ export class GetTxAndBlock {
   static async firstSuccessTxBefore(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
+    request: {|
       txIds: Array<number>,
       slot: number,
-    },
+    |},
   ): Promise<void | {|
     Block: $ReadOnly<BlockRow>,
     Transaction: $ReadOnly<TransactionRow>,
@@ -762,15 +760,15 @@ export class GetTxAndBlock {
   static async byTime(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
+    request: {|
       txIds: Array<number>,
       skip?: number,
       limit?: number,
-    },
-  ): Promise<$ReadOnlyArray<{
+    |},
+  ): Promise<$ReadOnlyArray<{|
     Transaction: $ReadOnly<TransactionRow>,
-    Block: null | $ReadOnly<BlockRow>
-  }>> {
+    Block: null | $ReadOnly<BlockRow>,
+  |}>> {
     const txTableMeta = GetTxAndBlock.ownTables[Tables.TransactionSchema.name];
     const blockTableMeta = GetTxAndBlock.ownTables[Tables.BlockSchema.name];
     const txTable = db.getSchema().table(txTableMeta.name);
@@ -811,14 +809,14 @@ export class GetTxAndBlock {
   static async withStatus(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
+    request: {|
       txIds: Array<number>,
       status: Array<TxStatusCodesType>,
-    },
-  ): Promise<$ReadOnlyArray<{
+    |},
+  ): Promise<$ReadOnlyArray<{|
     Transaction: $ReadOnly<TransactionRow>,
-    Block: null | $ReadOnly<BlockRow>
-  }>>  {
+    Block: null | $ReadOnly<BlockRow>,
+  |}>>  {
     const txTableMeta = GetTxAndBlock.ownTables[Tables.TransactionSchema.name];
     const blockTableMeta = GetTxAndBlock.ownTables[Tables.BlockSchema.name];
     const txTable = db.getSchema().table(txTableMeta.name);
@@ -870,9 +868,7 @@ export class GetCertificates {
   static async forAddress(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
-      addressIds: Array<number>,
-    },
+    request: {| addressIds: Array<number>, |},
   ): Promise<Array<CertificateForKey>> {
     const certAddrSchema = GetCertificates.ownTables[Tables.CertificateAddressSchema.name];
     const certSchema = GetCertificates.ownTables[Tables.CertificateSchema.name];

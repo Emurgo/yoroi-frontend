@@ -13,10 +13,10 @@ export type ConceptualWalletRow = {|
   ConceptualWalletId: number,
   ...ConceptualWalletInsert,
 |};
-export const ConceptualWalletSchema: {
+export const ConceptualWalletSchema: {|
   +name: 'ConceptualWallet',
-  properties: $ObjMapi<ConceptualWalletRow, ToSchemaProp>
-} = {
+  properties: $ObjMapi<ConceptualWalletRow, ToSchemaProp>,
+|} = {
   name: 'ConceptualWallet',
   properties: {
     ConceptualWalletId: 'ConceptualWalletId',
@@ -31,17 +31,17 @@ export type PublicDeriverInsert = {|
   ConceptualWalletId: number,
   KeyDerivationId: number,
   Name: string,
-  Index: number, // a user may want to re-order the public deriverse in the UI
+  Index: number, // a user may want to re-order the public deriver in the UI
   LastSyncInfoId: number,
 |};
 export type PublicDeriverRow = {|
   PublicDeriverId: number, // serial
   ...PublicDeriverInsert,
 |};
-export const PublicDeriverSchema: {
+export const PublicDeriverSchema: {|
   +name: 'PublicDeriver',
-  properties: $ObjMapi<PublicDeriverRow, ToSchemaProp>
-} = {
+  properties: $ObjMapi<PublicDeriverRow, ToSchemaProp>,
+|} = {
   name: 'PublicDeriver',
   properties: {
     PublicDeriverId: 'PublicDeriverId',
@@ -71,10 +71,10 @@ export type LastSyncInfoRow = {|
   LastSyncInfoId: number,
   ...LastSyncInfoInsert,
 |};
-export const LastSyncInfoSchema: {
+export const LastSyncInfoSchema: {|
   +name: 'LastSyncInfo',
-  properties: $ObjMapi<LastSyncInfoRow, ToSchemaProp>
-} = {
+  properties: $ObjMapi<LastSyncInfoRow, ToSchemaProp>,
+|} = {
   name: 'LastSyncInfo',
   properties: {
     LastSyncInfoId: 'LastSyncInfoId',
@@ -103,10 +103,10 @@ export type HwWalletMetaRow = {|
   HwWalletMetaId: number,
   ...HwWalletMetaInsert,
 |};
-export const HwWalletMetaSchema: {
+export const HwWalletMetaSchema: {|
   +name: 'HwWalletMeta',
-  properties: $ObjMapi<HwWalletMetaRow, ToSchemaProp>
-} = {
+  properties: $ObjMapi<HwWalletMetaRow, ToSchemaProp>,
+|} = {
   name: 'HwWalletMeta',
   properties: {
     HwWalletMetaId: 'HwWalletMetaId',

@@ -158,7 +158,7 @@ export async function getAccountDefaultDerivations(
   ];
 }
 
-export async function createStandardCip1852Wallet(request: {
+export async function createStandardCip1852Wallet(request: {|
   db: lf$Database,
   discrimination: AddressDiscriminationType,
   rootPk: RustModule.WalletV3.Bip32PrivateKey,
@@ -166,7 +166,7 @@ export async function createStandardCip1852Wallet(request: {
   accountIndex: number,
   walletName: string,
   accountName: string,
-}): Promise<HasConceptualWallet & HasCip1852Wrapper & HasRoot & HasPublicDeriver<mixed>> {
+|}): Promise<HasConceptualWallet & HasCip1852Wrapper & HasRoot & HasPublicDeriver<mixed>> {
   if (request.accountIndex < HARD_DERIVATION_START) {
     throw new Error('createStandardCip1852Wallet needs hardened index');
   }

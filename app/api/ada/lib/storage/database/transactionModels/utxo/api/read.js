@@ -35,9 +35,7 @@ export class GetUtxoInputs {
   static async fromAddressIds(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
-      ids: Array<number>,
-    },
+    request: {| ids: Array<number>, |},
   ): Promise<$ReadOnlyArray<$ReadOnly<UtxoTransactionInputRow>>> {
     const table = GetUtxoInputs.ownTables[Tables.UtxoTransactionInputSchema.name];
     return await getRowIn<UtxoTransactionInputRow>(
@@ -51,9 +49,7 @@ export class GetUtxoInputs {
   static async fromTxIds(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
-      ids: Array<number>,
-    },
+    request: {| ids: Array<number>, |},
   ): Promise<$ReadOnlyArray<$ReadOnly<UtxoTransactionInputRow>>> {
     const table = GetUtxoInputs.ownTables[Tables.UtxoTransactionInputSchema.name];
     return await getRowIn<UtxoTransactionInputRow>(
@@ -74,9 +70,7 @@ export class GetUtxoOutputs {
   static async fromAddressIds(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
-      ids: Array<number>,
-    },
+    request: {| ids: Array<number>, |},
   ): Promise<$ReadOnlyArray<$ReadOnly<UtxoTransactionOutputRow>>> {
     const table = GetUtxoOutputs.ownTables[Tables.UtxoTransactionOutputSchema.name];
     return await getRowIn<UtxoTransactionOutputRow>(
@@ -90,9 +84,7 @@ export class GetUtxoOutputs {
   static async fromTxIds(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
-      ids: Array<number>,
-    },
+    request: {| ids: Array<number>, |},
   ): Promise<$ReadOnlyArray<$ReadOnly<UtxoTransactionOutputRow>>> {
     const table = GetUtxoOutputs.ownTables[Tables.UtxoTransactionOutputSchema.name];
     return await getRowIn<UtxoTransactionOutputRow>(
@@ -140,10 +132,10 @@ export class GetUtxoTxOutputsWithTx {
   static async getSingleOutput(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
+    request: {|
       txId: number,
       outputIndex: number,
-    },
+    |},
   ): Promise<void | $ReadOnly<UtxoTxOutput>> {
     const query = GetUtxoTxOutputsWithTx.baseQuery(
       db,
@@ -205,10 +197,10 @@ export class GetUtxoTxOutputsWithTx {
   }
 }
 
-export type UtxoTxInput = {
+export type UtxoTxInput = {|
   Transaction: $ReadOnly<TransactionRow>,
   UtxoTransactionInput: $ReadOnly<UtxoTransactionInputRow>,
-};
+|};
 export class GetUtxoTxInputsWithTx {
   static ownTables = Object.freeze({
     [TransactionSchema.name]: TransactionSchema,
@@ -268,9 +260,7 @@ export class AssociateTxWithUtxoIOs {
   static async getTxIdsForAddresses(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
-      addressIds: Array<number>,
-    },
+    request: {| addressIds: Array<number>, |},
   ): Promise<Array<number>> {
     const ins = await AssociateTxWithUtxoIOs.depTables.GetUtxoInputs.fromAddressIds(
       db, tx,
@@ -289,9 +279,7 @@ export class AssociateTxWithUtxoIOs {
   static async getIOsForTx(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {
-      txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>,
-    },
+    request: {| txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>, |},
   ): Promise<Map<$ReadOnly<TransactionRow>, {| ...DbUtxoInputs, ...DbUtxoOutputs, |}>> {
     const ids = request.txs.map(transaction => transaction.TransactionId);
 

@@ -9,7 +9,7 @@ import NoticeBoard from './notice-board-actions';
 import adaActionsMap from './ada/index';
 import type { AdaActionsMap } from './ada/index';
 
-export type ActionsMap = {
+export type ActionsMap = {|
   router: RouterActions,
   topbar: TopbarActions,
   walletBackup: WalletBackupActions,
@@ -17,8 +17,8 @@ export type ActionsMap = {
   dialogs: DialogsActions,
   notifications: NotificationsActions,
   noticeBoard: NoticeBoard,
-  ada: AdaActionsMap
-};
+  ada: AdaActionsMap,
+|};
 
 const actionsMap: ActionsMap = {
   router: new RouterActions(),

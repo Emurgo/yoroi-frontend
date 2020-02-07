@@ -96,10 +96,10 @@ export interface IDerivePublicFromPrivate {
 }
 
 export type IGetPrivateDeriverKeyRequest = void;
-export type IGetPrivateDeriverKeyResponse = {
+export type IGetPrivateDeriverKeyResponse = {|
   keyRow: $ReadOnly<KeyRow>,
   keyDerivation: $ReadOnly<KeyDerivationRow>,
-};
+|};
 export type IGetPrivateDeriverKeyFunc = (
   body: IGetPrivateDeriverKeyRequest
 ) => Promise<IGetPrivateDeriverKeyResponse>;

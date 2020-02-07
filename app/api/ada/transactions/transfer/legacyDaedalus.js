@@ -32,7 +32,7 @@ export function getAddressesKeys(payload: {|
   try {
     const { checker, fullUtxo } = payload;
 
-    const addrKeyMap: { [addr: string]: RustModule.WalletV2.PrivateKey } = {};
+    const addrKeyMap: { [addr: string]: RustModule.WalletV2.PrivateKey, ... } = {};
     for (const addr of fullUtxo) {
       const rustAddr = RustModule.WalletV2.Address.from_base58(addr);
       const checkedAddr = checker.check_address(rustAddr);

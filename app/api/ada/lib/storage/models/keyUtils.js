@@ -24,14 +24,14 @@ import { RustModule } from '../../cardanoCrypto/rustLoader';
 
 import { WrongPassphraseError } from '../../cardanoCrypto/cryptoErrors';
 
-export function normalizeBip32Ed25519ToPubDeriverLevel(request: {
+export function normalizeBip32Ed25519ToPubDeriverLevel(request: {|
   privateKeyRow: $ReadOnly<KeyRow>,
   password: null | string,
   path: Array<number>,
-}): {
+|}): {|
   prvKeyHex: string,
   pubKeyHex: string,
-} {
+|} {
   const prvKey = decryptKey(
     request.privateKeyRow,
     request.password,
@@ -83,10 +83,8 @@ export function deriveKey(
 export async function rawChangePassword(
   db: lf$Database,
   tx: lf$Transaction,
-  deps: { UpdateGet: Class<UpdateGet> },
-  request: IChangePasswordRequest & {
-    oldKeyRow: $ReadOnly<KeyRow>,
-  },
+  deps: {| UpdateGet: Class<UpdateGet>, |},
+  request: {| ...IChangePasswordRequest, oldKeyRow: $ReadOnly<KeyRow>, |},
 ): Promise<IChangePasswordResponse> {
   const decryptedKey = decryptKey(
     request.oldKeyRow,

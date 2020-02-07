@@ -119,8 +119,8 @@ interface Empty {}
 type HasPrivateDeriverDependencies = IPublicDeriver<ConceptualWallet & IHasPrivateDeriver>;
 const HasPrivateDeriverMixin = (
   superclass: Class<HasPrivateDeriverDependencies>,
-) => class HasPrivateDeriver extends superclass {
-};
+) => (class HasPrivateDeriver extends superclass {
+});
 export const HasPrivateDeriver = Mixin<
   HasPrivateDeriverDependencies,
   Empty,
@@ -137,8 +137,8 @@ export function asHasPrivateDeriver<Wrapper: ConceptualWallet, Rest=Empty>(
 type HasLevelsDependencies = IPublicDeriver<ConceptualWallet & IHasLevels>;
 const HasLevelsMixin = (
   superclass: Class<HasLevelsDependencies>,
-) => class HasLevels extends superclass {
-};
+) => (class HasLevels extends superclass {
+});
 export const HasLevels = Mixin<
   HasLevelsDependencies,
   Empty,
@@ -155,8 +155,8 @@ export function asHasLevels<Wrapper: ConceptualWallet, Rest=Empty>(
 type HasSignDependencies = IPublicDeriver<ConceptualWallet & IHasSign>;
 const HasSignMixin = (
   superclass: Class<HasSignDependencies>,
-) => class HasSign extends superclass {
-};
+) => (class HasSign extends superclass {
+});
 export const HasSign = Mixin<
   HasSignDependencies,
   Empty,
@@ -177,7 +177,7 @@ export function asHasSign<Wrapper: ConceptualWallet, Rest=Empty>(
 type GetAllUtxosDependencies = IPublicDeriver<ConceptualWallet & IHasLevels>;
 const GetAllUtxosMixin = (
   superclass: Class<GetAllUtxosDependencies>,
-) => class GetAllUtxos extends superclass implements IGetAllUtxos {
+) => (class GetAllUtxos extends superclass implements IGetAllUtxos {
 
   rawGetAllUtxos: (
     lf$Transaction,
@@ -340,7 +340,7 @@ const GetAllUtxosMixin = (
       async tx => this.rawGetAllUtxoAddresses(tx, deps, body, derivationTables)
     );
   }
-};
+});
 
 export const GetAllUtxos = Mixin<
   GetAllUtxosDependencies,
@@ -366,7 +366,7 @@ type GetAllAccountingFuncs = IGetAllAccounting & IGetStakingKey;
 type GetAllAccountingDependencies = IPublicDeriver<ConceptualWallet & IHasLevels>;
 const GetAllAccountingMixin = (
   superclass: Class<GetAllAccountingDependencies>,
-) => class GetAllAccounting extends superclass implements GetAllAccountingFuncs {
+) => (class GetAllAccounting extends superclass implements GetAllAccountingFuncs {
 
   rawGetAllAccountingAddresses: (
     lf$Transaction,
@@ -477,7 +477,7 @@ const GetAllAccountingMixin = (
       async tx => this.rawGetStakingKey(tx, deps, body, derivationTables)
     );
   }
-};
+});
 
 const GetAllAccounting = Mixin<
   GetAllAccountingDependencies,
@@ -502,8 +502,8 @@ export function asGetAllAccounting<T: IPublicDeriver<any>>(
 type GetStakingKeyDependencies = IPublicDeriver<> & IGetStakingKey;
 const GetStakingKeyMixin = (
   superclass: Class<GetStakingKeyDependencies>,
-) => class GetStakingKey extends superclass implements IGetStakingKey {
-};
+) => (class GetStakingKey extends superclass implements IGetStakingKey {
+});
 
 export const GetStakingKey = Mixin<
   GetStakingKeyDependencies,
@@ -528,7 +528,7 @@ export function asGetStakingKey<T: IPublicDeriver<any>>(
 type AddBip44FromPublicDependencies = IPublicDeriver<ConceptualWallet & IHasLevels>;
 const AddBip44FromPublicMixin = (
   superclass: Class<AddBip44FromPublicDependencies>,
-) => class AddBip44FromPublic extends superclass implements IAddBip44FromPublic {
+) => (class AddBip44FromPublic extends superclass implements IAddBip44FromPublic {
 
   rawAddBip44FromPublic: (
     lf$Transaction,
@@ -608,7 +608,7 @@ const AddBip44FromPublicMixin = (
       async tx => this.rawAddBip44FromPublic(tx, deps, body, derivationTables)
     );
   }
-};
+});
 export const AddBip44FromPublic = Mixin<
   AddBip44FromPublicDependencies,
   IAddBip44FromPublic,
@@ -632,7 +632,7 @@ export function asAddBip44FromPublic<T: IPublicDeriver<any>>(
 type DisplayCutoffDependencies = IPublicDeriver<ConceptualWallet & IHasLevels>;
 const DisplayCutoffMixin = (
   superclass: Class<DisplayCutoffDependencies>,
-) => class DisplayCutoff extends superclass implements IDisplayCutoff {
+) => (class DisplayCutoff extends superclass implements IDisplayCutoff {
 
   rawPopAddress: (
     tx: lf$Transaction,
@@ -820,7 +820,7 @@ const DisplayCutoffMixin = (
       async tx => this.rawSetCutoff(tx, deps, body)
     );
   }
-};
+});
 
 export const DisplayCutoff = Mixin<
   DisplayCutoffDependencies,
@@ -845,7 +845,7 @@ export function asDisplayCutoff<T: IPublicDeriver<any>>(
 type Bip44PickInternalMixinDependencies = IPublicDeriver<>;
 const Bip44PickInternalMixin = (
   superclass: Class<Bip44PickInternalMixinDependencies>,
-) => class Bip44PickInternal extends superclass implements IPickInternal {
+) => (class Bip44PickInternal extends superclass implements IPickInternal {
   rawPickInternal: (
     lf$Transaction,
     {|
@@ -870,7 +870,7 @@ const Bip44PickInternalMixin = (
       addressing: body.addressing,
     };
   }
-};
+});
 const Bip44PickInternal = Mixin<
   Bip44PickInternalMixinDependencies,
   IPickInternal
@@ -883,7 +883,7 @@ const Bip44PickInternal = Mixin<
 type Cip1852PickInternalMixinDependencies = IPublicDeriver<> & IGetStakingKey;
 const Cip1852PickInternalMixin = (
   superclass: Class<Cip1852PickInternalMixinDependencies>,
-) => class Cip1852PickInternal extends superclass implements IPickInternal {
+) => (class Cip1852PickInternal extends superclass implements IPickInternal {
   rawPickInternal: (
     lf$Transaction,
     {|
@@ -922,7 +922,7 @@ const Cip1852PickInternalMixin = (
       addressing: body.addressing,
     };
   }
-};
+});
 const Cip1852PickInternal = Mixin<
   Cip1852PickInternalMixinDependencies,
   IPickInternal
@@ -936,7 +936,7 @@ type HasUtxoChainsDependencies = IPublicDeriver<ConceptualWallet & IHasLevels> &
   IPickInternal & IDisplayCutoff;
 const HasUtxoChainsMixin = (
   superclass: Class<HasUtxoChainsDependencies>,
-) => class HasUtxoChains extends superclass implements IHasUtxoChains {
+) => (class HasUtxoChains extends superclass implements IHasUtxoChains {
 
   rawGetAddressesForChain: (
     lf$Transaction,
@@ -1061,7 +1061,7 @@ const HasUtxoChainsMixin = (
       async tx => this.rawNextInternal(tx, deps, body, derivationTables)
     );
   }
-};
+});
 
 export const HasUtxoChains = Mixin<
   HasUtxoChainsDependencies,
@@ -1086,7 +1086,7 @@ export function asHasUtxoChains<T: IPublicDeriver<any>>(
 type GetPublicKeyDependencies = IPublicDeriver<>;
 const GetPublicKeyMixin = (
   superclass: Class<GetPublicKeyDependencies>,
-) => class GetPublicKey extends superclass implements IGetPublic {
+) => (class GetPublicKey extends superclass implements IGetPublic {
 
   rawGetPublicKey: (
     lf$Transaction,
@@ -1158,7 +1158,7 @@ const GetPublicKeyMixin = (
       async tx => this.rawChangePubDeriverPassword(tx, deps, body)
     );
   }
-};
+});
 export const GetPublicKey = Mixin<
   GetPublicKeyDependencies,
   IGetPublic
@@ -1182,7 +1182,7 @@ export function asGetPublicKey<T: IPublicDeriver<any>>(
 type GetSigningKeyDependencies = IPublicDeriver<ConceptualWallet & IHasLevels & IHasSign>;
 const GetSigningKeyMixin = (
   superclass: Class<GetSigningKeyDependencies>,
-) => class GetSigningKey extends superclass implements IGetSigningKey {
+) => (class GetSigningKey extends superclass implements IGetSigningKey {
 
   rawGetSigningKey: (
     lf$Transaction,
@@ -1338,7 +1338,7 @@ const GetSigningKeyMixin = (
       path: indexPath,
     });
   }
-};
+});
 
 export const GetSigningKey = Mixin<
   GetSigningKeyDependencies,
@@ -1363,7 +1363,7 @@ export function asGetSigningKey<T: IPublicDeriver<any>>(
 type ScanLegacyCardanoUtxoDependencies = IPublicDeriver<>;
 const ScanLegacyCardanoUtxoMixin = (
   superclass: Class<ScanLegacyCardanoUtxoDependencies>,
-) => class ScanLegacyCardanoUtxo extends superclass implements IScanUtxo {
+) => (class ScanLegacyCardanoUtxo extends superclass implements IScanUtxo {
   rawScanAccount: (
     lf$Transaction,
     {|
@@ -1392,7 +1392,7 @@ const ScanLegacyCardanoUtxoMixin = (
       ),
     });
   }
-};
+});
 
 const ScanLegacyCardanoUtxo = Mixin<
   ScanLegacyCardanoUtxoDependencies,
@@ -1419,7 +1419,7 @@ export function asScanLegacyCardanoUtxoInstance<
 type ScanShelleyUtxoDependencies = IPublicDeriver<> & IGetStakingKey;
 const ScanShelleyUtxoMixin = (
   superclass: Class<ScanShelleyUtxoDependencies>,
-) => class ScanShelleyUtxo extends superclass implements IScanUtxo {
+) => (class ScanShelleyUtxo extends superclass implements IScanUtxo {
   rawScanAccount: (
     lf$Transaction,
     {|
@@ -1463,7 +1463,7 @@ const ScanShelleyUtxoMixin = (
       stakingKey: stakingAddress.get_account_key(),
     });
   }
-};
+});
 
 const ScanShelleyUtxo = Mixin<
   ScanShelleyUtxoDependencies,
@@ -1492,7 +1492,7 @@ type ScanUtxoAccountAddressesDependencies = IPublicDeriver<ConceptualWallet & IH
   IHasUtxoChains & IGetPublic & IScanUtxo & IAddBip44FromPublic;
 const ScanUtxoAccountAddressesMixin = (
   superclass: Class<ScanUtxoAccountAddressesDependencies>,
-) => class ScanUtxoAccountAddresses extends superclass implements IScanAddresses {
+) => (class ScanUtxoAccountAddresses extends superclass implements IScanAddresses {
   rawScanAddresses: (
     lf$Transaction,
     {|
@@ -1626,7 +1626,7 @@ const ScanUtxoAccountAddressesMixin = (
       )
     );
   }
-};
+});
 
 export const ScanUtxoAccountAddresses = Mixin<
   ScanUtxoAccountAddressesDependencies,
@@ -1653,7 +1653,7 @@ export function asScanUtxoAccountAddressesInstance<
 type GetUtxoBalanceDependencies = IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos;
 const GetUtxoBalanceMixin = (
   superclass: Class<GetUtxoBalanceDependencies>,
-) => class GetUtxoBalance extends superclass implements IGetUtxoBalance {
+) => (class GetUtxoBalance extends superclass implements IGetUtxoBalance {
 
   rawGetUtxoBalance: (
     lf$Transaction,
@@ -1700,7 +1700,7 @@ const GetUtxoBalanceMixin = (
       async tx => this.rawGetUtxoBalance(tx, deps, undefined, derivationTables)
     );
   }
-};
+});
 
 export const GetUtxoBalance = Mixin<
   GetUtxoBalanceDependencies,
@@ -1725,8 +1725,8 @@ export function asGetUtxoBalance<T: IPublicDeriver<any>>(
 type ScanAddressesDependencies = IPublicDeriver<> & IScanAddresses;
 const ScanAddressesMixin = (
   superclass: Class<ScanAddressesDependencies>,
-) => class ScanAddresses extends superclass implements IScanAddresses {
-};
+) => (class ScanAddresses extends superclass implements IScanAddresses {
+});
 
 export const ScanAddresses = Mixin<
   ScanAddressesDependencies,
@@ -1751,7 +1751,7 @@ export function asScanAddresses<T: IPublicDeriver<any>>(
 type GetBalanceDependencies = IPublicDeriver<> & IGetUtxoBalance;
 const GetBalanceMixin = (
   superclass: Class<GetBalanceDependencies>,
-) => class GetBalance extends superclass implements IGetBalance {
+) => (class GetBalance extends superclass implements IGetBalance {
   getBalance: IGetBalanceRequest => Promise<IGetBalanceResponse> = async (body) => {
     // TODO: also include chimeric account balance
     // be careful because this could confuse users
@@ -1759,7 +1759,7 @@ const GetBalanceMixin = (
     // but they only have 30 UTXO and 20 chimeric-account
     return await this.getUtxoBalance(body);
   }
-};
+});
 
 export const GetBalance = Mixin<
   GetBalanceDependencies,

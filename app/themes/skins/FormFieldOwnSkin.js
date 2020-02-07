@@ -25,11 +25,10 @@ type Props = {
   +done?: boolean,
   +type: string,
   +focused: boolean,
+  ...
 };
 
-type State = {
-  isPasswordShown: boolean,
-};
+type State = {| isPasswordShown: boolean, |};
 
 export const FormFieldOwnSkin = class extends React.Component<Props, State> {
   static defaultProps = {

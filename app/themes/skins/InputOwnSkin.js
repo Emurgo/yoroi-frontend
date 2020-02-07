@@ -35,11 +35,10 @@ type Props = {
   +value: string,
   +done?: boolean,
   +type: string,
+  ...
 };
 
-type State = {
-  focused: boolean,
-};
+type State = {| focused: boolean, |};
 
 export const InputOwnSkin = class extends React.Component<Props, State> {
   static defaultProps = {

@@ -18,9 +18,7 @@ const nodePlugins = {
 
 /*::
 // https://babeljs.io/docs/en/config-files#config-function-api
-type ApiType = {
-  env: (void | string | Array<string>) => (string | boolean)
-};
+type ApiType = { env: (void | string | Array<string>) => (string | boolean), ... };
 */
 module.exports = function (api /*: ApiType */) {
   return {

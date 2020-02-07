@@ -125,21 +125,23 @@ export class StaleStateError extends ExtendableError {
  * - Deadlock if you lock a table which is already locked
  * - Runtime error if you access a table which is not locked
  */
-export type Schema = {
+export type Schema = {|
   +name: string,
-  properties: any; // don't care about the type since we don't need it to inspect table names
-};
-export type OwnTableType = { [key: string]: Schema };
-export type DepTableType = { [key: string]: TableClassType };
+  // don't care about the type since we don't need it to inspect table names
+  properties: any,
+|};
+export type OwnTableType = { [key: string]: Schema, ... };
+export type DepTableType = { [key: string]: TableClassType, ... };
 export type TableClassType = {
   +ownTables: OwnTableType,
   /**
    * Recursively specify which tables will be required
-   * We need to recursivley store this information
+   * We need to recursively store this information
    * That way each wrapper only needs to care about the tables it specifically will access
    * and not what its dependencies will require
    */
   +depTables: DepTableType,
+  ...
 }
 
 /**

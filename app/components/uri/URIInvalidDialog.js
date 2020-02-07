@@ -26,11 +26,11 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
+type Props = {|
   +onClose: void => void,
   +onSubmit: void => void,
   +classicTheme: boolean,
-};
+|};
 
 @observer
 export default class URIInvalidDialog extends Component<Props> {

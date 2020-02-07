@@ -326,7 +326,7 @@ export default class ProfileStore extends Store {
   }
 
   /* @Returns Merged Pre-Built Theme and Custom Theme */
-  @computed get currentThemeVars(): { [key: string]: string } {
+  @computed get currentThemeVars(): { [key: string]: string, ... } {
     const { result } = this.getCustomThemeRequest.execute();
     const currentThemeVars = this.getThemeVars({ theme: this.currentTheme });
     let customThemeVars = {};
@@ -372,7 +372,7 @@ export default class ProfileStore extends Store {
     }
   };
 
-  getThemeVars: {| theme: string |} => { [key: string]: string } = ({ theme }) => {
+  getThemeVars: {| theme: string |} => { [key: string]: string, ... } = ({ theme }) => {
     if (theme) return require(`../../themes/prebuilt/${theme}.js`).default;
     return require(`../../themes/prebuilt/${ProfileStore.getDefaultTheme()}.js`); // default
   };

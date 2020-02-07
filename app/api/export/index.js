@@ -14,17 +14,17 @@ import type {
   ExportTransactionsResponse,
 } from '../common';
 
-export type TransactionExportRow = {
+export type TransactionExportRow = {|
   type: 'in' | 'out',
   amount: string,
   fee: string,
-  date: Date
-}
+  date: Date,
+|}
 
-export type CsvData = {
+export type CsvData = {|
   headers: Array<string>,
-  rows: Array<Array<string>>
-}
+  rows: Array<Array<string>>,
+|}
 
 const TRANSACTION_EXPORT_FILE_TYPE = Object.freeze({
   csv: 'csv'
@@ -36,10 +36,10 @@ const TRANSACTION_EXPORT_DATA_FORMAT = Object.freeze({
 });
 export type TransactionExportDataFormat = $Values<typeof TRANSACTION_EXPORT_DATA_FORMAT>;
 
-export type ExportFileResponse = {
+export type ExportFileResponse = {|
   data: Blob,
-  fileType: TransactionExportFileType
-}
+  fileType: TransactionExportFileType,
+|}
 
 const DEFAULT_FILE_NAME_PREFIX = 'Yoroi-Transaction-History';
 const FN_SEPARATOR = '_';

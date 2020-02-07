@@ -15,7 +15,7 @@ import WalletRestoreActions from './wallet-restore-actions';
 import DelegationTransactionActions from './delegation-transaction-actions';
 import DelegationActions from './delegation-actions';
 
-export type AdaActionsMap = {
+export type AdaActionsMap = {|
   txBuilderActions: TxBuilderActions,
   wallets: WalletsActions,
   paperWallets: PaperWalletsActions,
@@ -32,7 +32,7 @@ export type AdaActionsMap = {
   walletRestore: WalletRestoreActions,
   delegationTransaction: DelegationTransactionActions,
   delegation: DelegationActions,
-};
+|};
 
 const adaActionsMap: AdaActionsMap = {
   txBuilderActions: new TxBuilderActions(),
