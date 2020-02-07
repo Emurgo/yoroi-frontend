@@ -11,19 +11,16 @@ import type {
   Address, Addressing
 } from '../../lib/storage/models/PublicDeriver/interfaces';
 import { buildYoroiTransferTx as shelleyFormatYoroiTx } from '../shelley/yoroiTransfer';
-import { buildYoroiTransferTx as legacyFormatYoroiTx } from '../byron/yoroiTransfer';
 import { toSenderUtxos } from './utils';
 
-export async function generateLegacyYoroiTransferTx(payload: {|
+export async function generateCip1852TransferTx(payload: {|
   addresses: Array<{| ...Address, ...Addressing |}>,
   outputAddr: string,
   keyLevel: number,
   signingKey: RustModule.WalletV3.Bip32PrivateKey,
   getUTXOsForAddresses: AddressUtxoFunc,
-  legacy: boolean,
 |}): Promise<TransferTx> {
-  const { legacy, ...rest } = payload;
-  const senderUtxos = await toSenderUtxos(rest);
+  const senderUtxos = await toSenderUtxos(payload);
 
   const txRequest = {
     outputAddr: payload.outputAddr,
@@ -31,10 +28,8 @@ export async function generateLegacyYoroiTransferTx(payload: {|
     signingKey: payload.signingKey,
     senderUtxos,
   };
-  return legacy
-    ? legacyFormatYoroiTx(txRequest)
-    : shelleyFormatYoroiTx({
-      ...txRequest,
-      useLegacyWitness: true,
-    });
+  return shelleyFormatYoroiTx({
+    ...txRequest,
+    useLegacyWitness: false,
+  });
 }

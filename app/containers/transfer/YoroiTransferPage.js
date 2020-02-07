@@ -112,7 +112,13 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
     }
     await this._getYoroiTransferActions().transferFunds.trigger({
       next: async () => {
-        await walletsStore.refreshWallet(publicDeriver);
+        const preRefreshTime = new Date().getTime();
+        try {
+          await walletsStore.refreshWallet(publicDeriver);
+        } catch (_e) {
+          // still need to re-route even if refresh failed
+        }
+        const timeToRefresh = (new Date().getTime()) - preRefreshTime;
         await new Promise(resolve => {
           setTimeout(() => {
             if (walletsStore.activeWalletRoute != null) {
@@ -122,7 +128,7 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
               });
             }
             resolve();
-          }, SUCCESS_PAGE_STAY_TIME);
+          }, Math.max(SUCCESS_PAGE_STAY_TIME - timeToRefresh, 0));
         });
       },
       getDestinationAddress: yoroiTransfer.nextInternalAddress(publicDeriver),

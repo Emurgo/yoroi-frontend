@@ -31,6 +31,7 @@ export async function buildYoroiTransferTx(payload: {|
   outputAddr: string,
   keyLevel: number,
   signingKey: RustModule.WalletV3.Bip32PrivateKey,
+  useLegacyWitness: boolean,
 |}): Promise<TransferTx> {
   try {
     const { senderUtxos, outputAddr, } = payload;
@@ -54,7 +55,7 @@ export async function buildYoroiTransferTx(payload: {|
       unsignedTxResponse,
       payload.keyLevel,
       payload.signingKey,
-      true,
+      payload.useLegacyWitness,
     );
 
     const uniqueSenders = Array.from(new Set(senderUtxos.map(utxo => utxo.receiver)));
@@ -72,7 +73,7 @@ export async function buildYoroiTransferTx(payload: {|
       ).to_string(Bech32Prefix.ADDRESS)
     };
   } catch (error) {
-    Logger.error(`transfer::buildTransferTx ${stringifyError(error)}`);
+    Logger.error(`transfer::${nameof(buildYoroiTransferTx)} ${stringifyError(error)}`);
     if (error instanceof LocalizableError) {
       throw error;
     }

@@ -69,15 +69,15 @@ export default class DaedalusTransferStore extends Store {
     this._reset();
   }
 
-  _startTransferFunds = (): void => {
+  _startTransferFunds: void => void = () => {
     this._updateStatus(TransferStatus.GETTING_MNEMONICS);
   }
 
-  _startTransferPaperFunds = (): void => {
+  _startTransferPaperFunds: void => void = () => {
     this._updateStatus(TransferStatus.GETTING_PAPER_MNEMONICS);
   }
 
-  _startTransferMasterKey = (): void => {
+  _startTransferMasterKey: void => void = () => {
     this._updateStatus(TransferStatus.GETTING_MASTER_KEY);
   }
 
@@ -85,7 +85,7 @@ export default class DaedalusTransferStore extends Store {
       You should check wallets state outside of the runInAction,
       because this method run as a reaction.
   */
-  _enableDisableTransferFunds = (): void => {
+  _enableDisableTransferFunds: void => void = () => {
     const { wallets } = this.stores.substores[environment.API];
     // User must first make a Yoroi wallet before being able to transfer a Daedalus wallet
     if (wallets.hasActiveWallet) {
@@ -103,15 +103,18 @@ export default class DaedalusTransferStore extends Store {
    * Call the backend service to fetch all the UTXO then find which belong to the Daedalus wallet.
    * Finally, generate the tx to transfer the wallet to Yoroi
    */
-  _setupTransferWebSocket = async (
-    wallet: RustModule.WalletV2.DaedalusWallet,
-    publicDeriver: PublicDeriverWithCachedMeta,
-  ): Promise<void> => {
+  _setupTransferWebSocket: (
+    RustModule.WalletV2.DaedalusWallet,
+    PublicDeriverWithCachedMeta,
+  ) => Promise<void> = async (
+    wallet,
+    publicDeriver,
+  ) => {
     const withChains = asHasUtxoChains(publicDeriver.self);
-    if (!withChains) throw new Error('_setupTransferWebSocket missing chains functionality');
+    if (!withChains) throw new Error(`${nameof(this._setupTransferWebSocket)} missing chains functionality`);
     const nextInternal = await withChains.nextInternal();
     if (nextInternal.addressInfo == null) {
-      throw new Error('_setupTransferWebSocket no internal addresses left. Should never happen');
+      throw new Error(`${nameof(this._setupTransferWebSocket)} no internal addresses left. Should never happen`);
     }
     const nextInternalAddress = nextInternal.addressInfo.addr.Hash;
 
@@ -160,7 +163,7 @@ export default class DaedalusTransferStore extends Store {
           this._updateStatus(TransferStatus.READY_TO_TRANSFER);
         }
       } catch (error) {
-        Logger.error(`DaedalusTransferStore::_setupTransferWebSocket ${stringifyError(error)}`);
+        Logger.error(`${nameof(DaedalusTransferStore)}::${nameof(this._setupTransferWebSocket)} ${stringifyError(error)}`);
         runInAction(() => {
           this.status = TransferStatus.ERROR;
           this.error = localizedError(error);
@@ -188,10 +191,10 @@ export default class DaedalusTransferStore extends Store {
     });
   };
 
-  _setupTransferFundsWithMnemonic = async (payload: {
+  _setupTransferFundsWithMnemonic: {|
     recoveryPhrase: string,
     publicDeriver: PublicDeriverWithCachedMeta,
-  }): Promise<void> => {
+  |} => Promise<void> = async (payload) => {
     let { recoveryPhrase: secretWords } = payload;
     if (secretWords.split(' ').length === 27) {
       const [newSecretWords, unscrambledLen] =
@@ -211,10 +214,10 @@ export default class DaedalusTransferStore extends Store {
     );
   }
 
-  _setupTransferFundsWithMasterKey = async (payload: {
+  _setupTransferFundsWithMasterKey: {|
     masterKey: string,
     publicDeriver: PublicDeriverWithCachedMeta,
-  }): Promise<void> => {
+  |} => Promise<void> = async (payload) => {
     const { masterKey: key } = payload;
 
     await this._setupTransferWebSocket(
@@ -223,7 +226,7 @@ export default class DaedalusTransferStore extends Store {
     );
   }
 
-  _backToUninitialized = (): void => {
+  _backToUninitialized: void => void = () => {
     this._updateStatus(TransferStatus.UNINITIALIZED);
   }
 
@@ -239,10 +242,10 @@ export default class DaedalusTransferStore extends Store {
   )
 
   /** Broadcast the transfer transaction if one exists and proceed to continuation */
-  _transferFunds = async (payload: {
+  _transferFunds: {|
     next: Function,
     publicDeriver: PublicDeriverWithCachedMeta,
-  }): Promise<void> => {
+  |} => Promise<void> = async (payload) => {
     try {
       const { next } = payload;
       if (!this.transferTx) {
@@ -252,7 +255,6 @@ export default class DaedalusTransferStore extends Store {
         id: this.transferTx.id,
         encodedTx: this.transferTx.encodedTx,
       });
-      // TBD: why do we need a continuation instead of just putting the code here directly?
       next();
       this._reset();
     } catch (error) {

@@ -97,8 +97,8 @@ export class AddressTypeStore<T> {
     return result ? result.length : 0;
   }
 
-  /** Refresh addresses for all wallets */
-  @action refreshAddresses: PublicDeriverWithCachedMeta => Promise<void> = async (
+  /** Refresh addresses from database */
+  @action refreshAddressesFromDb: PublicDeriverWithCachedMeta => Promise<void> = async (
     publicDeriver,
   ) => {
     const allRequest = this.getRequest(publicDeriver.self);
@@ -189,7 +189,7 @@ export default class AddressesStore extends Store {
         popFunc: withDisplayCutoff.popAddress
       }).promise;
       if (address != null) {
-        await this.refreshAddresses(publicDeriver);
+        await this.refreshAddressesFromDb(publicDeriver);
         runInAction('reset error', () => { this.error = null; });
       }
     } catch (error) {
@@ -216,17 +216,17 @@ export default class AddressesStore extends Store {
     }
   }
 
-  refreshAddresses: PublicDeriverWithCachedMeta => Promise<void> = async (
+  refreshAddressesFromDb: PublicDeriverWithCachedMeta => Promise<void> = async (
     publicDeriver
   ) => {
     const withHasUtxoChains = asHasUtxoChains(publicDeriver.self);
     if (withHasUtxoChains == null) {
-      await this.allAddressesForDisplay.refreshAddresses(publicDeriver);
+      await this.allAddressesForDisplay.refreshAddressesFromDb(publicDeriver);
     } else {
-      await this.externalForDisplay.refreshAddresses(publicDeriver);
-      await this.internalForDisplay.refreshAddresses(publicDeriver);
+      await this.externalForDisplay.refreshAddressesFromDb(publicDeriver);
+      await this.internalForDisplay.refreshAddressesFromDb(publicDeriver);
       if (environment.isShelley) {
-        await this.mangledAddressesForDisplay.refreshAddresses(publicDeriver);
+        await this.mangledAddressesForDisplay.refreshAddressesFromDb(publicDeriver);
       }
     }
   }
