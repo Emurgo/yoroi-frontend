@@ -60,22 +60,22 @@ export default class TopbarStore extends Store {
     () => this.activeTopbarCategory && this.activeTopbarCategory === category.route
   ).get();
 
-  @action _onActivateTopbarCategory = (
-    params: { category: string, }
-  ): void => {
+  @action _onActivateTopbarCategory: {| category: string |} => void = (
+    params
+  ) => {
     const { category } = params;
     if (category !== this.activeTopbarCategory) {
       this.actions.router.goToRoute.trigger({ route: category });
     }
   };
 
-  @action _setActivateTopbarCategory = (
-    category: string
-  ): void => {
+  @action _setActivateTopbarCategory: string => void = (
+    category
+  ) => {
     this.activeTopbarCategory = category;
   };
 
-  _syncTopbarRouteWithRouter = (): void => {
+  _syncTopbarRouteWithRouter: void => void = () => {
     const route = this.stores.app.currentRoute;
     this.categories.forEach((category) => {
       // If the current route starts with the route of the category

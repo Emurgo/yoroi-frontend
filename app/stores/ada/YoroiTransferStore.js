@@ -55,6 +55,7 @@ export default class YoroiTransferStore extends Store {
   @observable transferKind: TransferKindType = TransferKind.NORMAL;
   @observable transferSource: TransferSourceType = TransferSource.BYRON;
 
+  // eslint-disable-next-line no-restricted-syntax
   _asyncErrorWrapper = <PT, RT>(func: PT=>Promise<RT>): (PT => Promise<RT>) => (async (payload) => {
     try {
       return await func(payload);
@@ -67,6 +68,7 @@ export default class YoroiTransferStore extends Store {
       throw error;
     }
   });
+  // eslint-disable-next-line no-restricted-syntax
   _errorWrapper = <PT, RT>(func: PT=>RT): (PT => RT) => ((payload) => {
     try {
       return func(payload);
@@ -272,7 +274,7 @@ export default class YoroiTransferStore extends Store {
     this._updateStatus(TransferStatus.READY_TO_TRANSFER);
   }
 
-  _backToUninitialized = (): void => {
+  _backToUninitialized: void => void = () => {
     this._updateStatus(TransferStatus.UNINITIALIZED);
   }
 

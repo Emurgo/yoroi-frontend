@@ -40,7 +40,7 @@ export default class UiDialogsStore extends Store {
     Math.max(countDownTo - this.secondsSinceActiveDialogIsOpen, 0)
   );
 
-  @action _onOpen = ({ dialog, params } : {| dialog : Function, params?: Object |}) => {
+  @action _onOpen: {| dialog : Function, params?: Object |} => void = ({ dialog, params }) => {
     this._reset();
     this.activeDialog = dialog;
     this.paramsForActiveDialog = params || {};
@@ -50,19 +50,19 @@ export default class UiDialogsStore extends Store {
     this._secondsTimerInterval = setInterval(this._updateSeconds, 1000);
   };
 
-  @action _onClose = () => {
+  @action _onClose: void => void = () => {
     this._reset();
   };
 
-  @action _updateSeconds = () => {
+  @action _updateSeconds: void => void = () => {
     this.secondsSinceActiveDialogIsOpen += 1;
   };
 
-  @action _onUpdateDataForActiveDialog = ({ data }: { [key: string]: any }) => {
+  @action _onUpdateDataForActiveDialog: { [key: string]: any } => void = ({ data }) => {
     Object.assign(this.dataForActiveDialog, data);
   };
 
-  @action _reset = () => {
+  @action _reset: void => void = () => {
     this.activeDialog = null;
     this.secondsSinceActiveDialogIsOpen = 0;
     this.dataForActiveDialog = {};

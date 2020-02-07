@@ -49,11 +49,11 @@ class WalletBackupStore extends Store {
     a.removeOneMnemonicWord.listen(this._removeOneWord);
   }
 
-  @action _initiateWalletBackup = (params: {
+  @action _initiateWalletBackup: {|
       recoveryPhrase: Array<string>,
       name: string,
       password: string,
-  }) => {
+  |} => void = (params) => {
     this.recoveryPhrase = params.recoveryPhrase;
     this.name = params.name;
     this.password = params.password;
@@ -83,37 +83,40 @@ class WalletBackupStore extends Store {
     });
   };
 
-  @action _continueToPrivacyWarning = () => {
+  @action _continueToPrivacyWarning: void => void = () => {
     this.currentStep = 'privacyWarning';
   };
 
-  @action _acceptPrivacyNoticeForWalletBackup = () => {
+  @action _acceptPrivacyNoticeForWalletBackup: void => void = () => {
     this.isPrivacyNoticeAccepted = true;
   };
 
-  @action _continueToRecoveryPhraseForWalletBackup = () => {
+  @action _continueToRecoveryPhraseForWalletBackup: void => void = () => {
     this.currentStep = 'recoveryPhraseDisplay';
   };
 
-  @action _startWalletBackup = () => {
+  @action _startWalletBackup: void => void = () => {
     this.currentStep = 'recoveryPhraseEntry';
   };
 
-  @action _addWordToWalletBackupVerification = (params: { word: string, index: number }) => {
+  @action _addWordToWalletBackupVerification: {|
+    word: string,
+    index: number
+  |} => void = (params) => {
     const { word, index } = params;
     this.enteredPhrase.push({ word, index });
     const pickedWord = this.recoveryPhraseSorted[index];
     if (pickedWord && pickedWord.word === word) pickedWord.isActive = false;
   };
 
-  @action _clearEnteredRecoveryPhrase = () => {
+  @action _clearEnteredRecoveryPhrase: void => void = () => {
     this.enteredPhrase = [];
     this.recoveryPhraseSorted = this.recoveryPhraseSorted.map(
       ({ word }) => ({ word, isActive: true })
     );
   };
 
-  @action _removeOneWord = () => {
+  @action _removeOneWord: void => void = () => {
     if (!this.enteredPhrase) {
       return;
     }
@@ -128,20 +131,20 @@ class WalletBackupStore extends Store {
     );
   }
 
-  @action _acceptWalletBackupTermDevice = () => {
+  @action _acceptWalletBackupTermDevice: void => void = () => {
     this.isTermDeviceAccepted = true;
   };
 
-  @action _acceptWalletBackupTermRecovery = () => {
+  @action _acceptWalletBackupTermRecovery: void => void = () => {
     this.isTermRecoveryAccepted = true;
   };
 
-  @action _restartWalletBackup = () => {
+  @action _restartWalletBackup: void => void = () => {
     this._clearEnteredRecoveryPhrase();
     this.currentStep = 'recoveryPhraseDisplay';
   };
 
-  @action _cancelWalletBackup = () => {
+  @action _cancelWalletBackup: void => void = () => {
     this.teardown();
   };
 
@@ -151,7 +154,7 @@ class WalletBackupStore extends Store {
   }
 
   @action
-  _reset = () => {
+  _reset: void => void = () => {
     this.inProgress = false;
     this.name = '';
     this.password = '';

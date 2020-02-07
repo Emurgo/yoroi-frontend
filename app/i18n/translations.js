@@ -1,6 +1,6 @@
 // @flow
 import globalMessages from './global-messages';
-
+import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import EnglishFlag from '../assets/images/flags/english.inline.svg';
 import JapaneseFlag from '../assets/images/flags/japanese.inline.svg';
 import KoreanFlag from '../assets/images/flags/korean.inline.svg';
@@ -23,7 +23,13 @@ req.keys().forEach((file) => {
   translations[locale] = req(file);
 });
 
-export const LANGUAGES = [
+export type LanguageType = {|
+  value: string,
+  label: $npm$ReactIntl$MessageDescriptor,
+  svg: string,
+|};
+
+export const LANGUAGES: Array<LanguageType> = [
   {
     value: 'en-US',
     label: globalMessages.languageEnglish,

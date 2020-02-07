@@ -125,7 +125,7 @@ export default class TimeStore extends Store {
     });
   }
 
-  @action _updateTime = async (): Promise<void> => {
+  @action _updateTime: void => Promise<void> = async () => {
     const currTime = new Date();
     runInAction(() => { this.time = currTime; });
 

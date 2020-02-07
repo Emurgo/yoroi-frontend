@@ -59,17 +59,14 @@ export default class PaperWalletCreateStore extends Store {
     a.cancel.listen(this._cancel);
   }
 
-  @action _submitInit = (
-    {
-      numAddresses,
-      printAccountPlate
-    }: {
-      numAddresses: number,
-      printAccountPlate: boolean
-    }
-  ): void => {
-    this.numAddresses = numAddresses;
-    this.printAccountPlate = printAccountPlate;
+  @action _submitInit: {|
+    numAddresses: number,
+    printAccountPlate: boolean
+  |} => void = (
+    request
+  ) => {
+    this.numAddresses = request.numAddresses;
+    this.printAccountPlate = request.printAccountPlate;
     this.progressInfo = ProgressStep.USER_PASSWORD;
   };
 
@@ -85,19 +82,19 @@ export default class PaperWalletCreateStore extends Store {
     await this.actions.ada.paperWallets.createPdfDocument.trigger();
   };
 
-  @action _backToCreatePaper = () => {
+  @action _backToCreatePaper: void => void = () => {
     this.progressInfo = ProgressStep.CREATE;
   };
 
-  @action _submitCreatePaper = () => {
+  @action _submitCreatePaper: void => void = () => {
     this.progressInfo = ProgressStep.VERIFY;
   };
 
-  @action _submitVerifyPaper = () => {
+  @action _submitVerifyPaper: void => void = () => {
     this.progressInfo = ProgressStep.FINALIZE;
   };
 
-  @action _createPaperWallet = () => {
+  @action _createPaperWallet: void => void = () => {
     if (this.numAddresses != null && this.userPassword != null) {
       this.paper = this.api.ada.createAdaPaper({
         numAddresses: this.numAddresses,
@@ -108,7 +105,7 @@ export default class PaperWalletCreateStore extends Store {
     }
   };
 
-  @action _createPdfDocument = async () => {
+  @action _createPdfDocument: void => Promise<void> = async () => {
     let pdf;
     if (this.paper) {
       pdf = await this.api.ada.createAdaPaperPdf({
@@ -126,19 +123,23 @@ export default class PaperWalletCreateStore extends Store {
     }
   };
 
-  @action _setPdfRenderStatus = ({ status }: {| status: PdfGenStepType |}) => {
+  @action _setPdfRenderStatus: {| status: PdfGenStepType |} => void = (
+    { status }
+  ) => {
     this.pdfRenderStatus = status;
   };
 
-  @action _setPdf = ({ pdf }: {| pdf: Blob |}) => {
+  @action _setPdf: {| pdf: Blob |} => void = (
+    { pdf }
+  ) => {
     this.pdf = pdf;
   };
 
-  @action _downloadPaperWallet = () => {
+  @action _downloadPaperWallet: void => void = () => {
     fileSaver.saveAs(this.pdf, 'Yoroi-Paper-Wallet.pdf');
   };
 
-  @action _cancel = () => {
+  @action _cancel: void => void = () => {
     this.teardown();
   };
 
@@ -148,7 +149,7 @@ export default class PaperWalletCreateStore extends Store {
   }
 
   @action
-  _reset = () => {
+  _reset: void => void = () => {
     this.progressInfo = ProgressStep.INIT;
     this.error = undefined;
     this.numAddresses = undefined;

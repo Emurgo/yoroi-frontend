@@ -9,6 +9,7 @@ import { THEMES } from '../../themes';
 import type { Theme } from '../../themes';
 import { ROUTES } from '../../routes-config';
 import { LANGUAGES } from '../../i18n/translations';
+import type { LanguageType } from '../../i18n/translations';
 import type { ExplorerType } from '../../domain/Explorer';
 import type {
   GetSelectedExplorerFunc, SaveSelectedExplorerFunc,
@@ -19,7 +20,7 @@ import type {
 
 export default class ProfileStore extends Store {
 
-  LANGUAGE_OPTIONS = [
+  LANGUAGE_OPTIONS: Array<LanguageType> = [
     ...LANGUAGES,
     ...(!environment.isProduction()
       ? [
@@ -43,10 +44,10 @@ export default class ProfileStore extends Store {
 
   /** Linear list of steps that need to be completed before app start */
   @observable
-  SETUP_STEPS = [
+  SETUP_STEPS: Array<{| isDone: void => boolean, action: void => Promise<void> |}> = [
     {
       isDone: () => (this.isCurrentLocaleSet),
-      action: () => {
+      action: async () => {
         const route = ROUTES.PROFILE.LANGUAGE_SELECTION;
         if (this.stores.app.currentRoute === route) {
           return;
@@ -56,7 +57,7 @@ export default class ProfileStore extends Store {
     },
     {
       isDone: () => this.areTermsOfUseAccepted,
-      action: () => {
+      action: async () => {
         const route = ROUTES.PROFILE.TERMS_OF_USE;
         if (this.stores.app.currentRoute === route) {
           return;
@@ -70,7 +71,7 @@ export default class ProfileStore extends Store {
         !environment.userAgentInfo.canRegisterProtocol() ||
         this.isUriSchemeAccepted
       ),
-      action: () => {
+      action: async () => {
         const route = ROUTES.PROFILE.URI_PROMPT;
         if (this.stores.app.currentRoute === route) {
           return;
@@ -207,7 +208,7 @@ export default class ProfileStore extends Store {
     super.teardown();
   }
 
-  _setBigNumberFormat = () => {
+  _setBigNumberFormat: void => void = () => {
     BigNumber.config({ FORMAT: this.bigNumberDecimalFormat });
   };
 

@@ -33,6 +33,7 @@ export default class DelegationTransactionStore extends Store {
   /** tracks if wallet balance changed during confirmation screen */
   @observable isStale: boolean = false;
 
+  // eslint-disable-next-line no-restricted-syntax
   _updateTxBuilderReaction = reaction(
     () => [
       this.stores.substores.ada.wallets.selected,

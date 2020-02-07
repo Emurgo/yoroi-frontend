@@ -81,7 +81,7 @@ export default class AdaWalletsStore extends WalletStore {
     this.goToWalletRoute(transactionDetails.publicDeriver.self);
   };
 
-  @action _onRouteChange = (options: { route: string, params: ?Object }): void => {
+  @action _onRouteChange: {| route: string, params: ?Object |} => void = (options) => {
     // Reset the send request anytime we visit the send page (e.g: to remove any previous errors)
     if (matchRoute(ROUTES.WALLETS.SEND, buildRoute(options.route, options.params)) !== false) {
       this.sendMoneyRequest.reset();
@@ -102,11 +102,11 @@ export default class AdaWalletsStore extends WalletStore {
 
   // =================== WALLET RESTORATION ==================== //
 
-  _restoreWallet = async (params: {|
+  _restoreWallet: {|
     recoveryPhrase: string,
     walletName: string,
     walletPassword: string,
-  |}) => {
+  |} => Promise<void> = async (params) => {
     await this.restore(params);
   };
 

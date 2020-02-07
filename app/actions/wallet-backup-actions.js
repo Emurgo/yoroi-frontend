@@ -5,11 +5,11 @@ import { AsyncAction, Action } from './lib/Action';
 
 export default class WalletBackupActions {
   startWalletBackup: Action<void> = new Action();
-  initiateWalletBackup: Action<{
+  initiateWalletBackup: Action<{|
     recoveryPhrase: Array<string>,
     name: string,
     password: string,
-  }> = new Action();
+  |}> = new Action();
   continueToPrivacyWarning: Action<void> = new Action();
   acceptPrivacyNoticeForWalletBackup: Action<void> = new Action();
   continueToRecoveryPhraseForWalletBackup: Action<void> = new Action();

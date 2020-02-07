@@ -92,6 +92,7 @@ export default class AdaTransactionBuilderStore extends Store {
   //   tentative tx
   // ================
 
+  // eslint-disable-next-line no-restricted-syntax
   _mismatchReaction = reaction(
     () => [
       this.plannedTx,
@@ -104,6 +105,7 @@ export default class AdaTransactionBuilderStore extends Store {
   //   planned tx
   // ==============
 
+  // eslint-disable-next-line no-restricted-syntax
   _updatePlannedTxReaction = reaction(
     () => this.createUnsignedTx.result,
     () => this._updatePlannedTx(),
@@ -137,10 +139,11 @@ export default class AdaTransactionBuilderStore extends Store {
   //   tx builder
   // ==============
 
+  // eslint-disable-next-line no-restricted-syntax
   _updateTxBuilderReaction = reaction(
     () => [
       // Need toJS for mobx to react to an array.
-      // Note: will not trigger if re-asigned same value
+      // Note: will not trigger if re-assigned same value
       toJS(this.plannedTxInfo),
       this.shouldSendAll,
       this.stores.substores.ada.wallets.selected,
@@ -275,9 +278,11 @@ export default class AdaTransactionBuilderStore extends Store {
    * We need to clone to tentative tx to avoid the dialog changing
    * when the send page recalculates the utxo
    */
-  _cloneTx = (
-    signRequest: BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>
-  ): BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput> => {
+  _cloneTx: (
+    BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>
+  ) => BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput> = (
+    signRequest
+  ) => {
     // drop mobx observable behavior
     const copy = toJS(signRequest);
 

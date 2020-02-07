@@ -7,7 +7,7 @@ import environment from '../../environment';
 import type { ServerStatusResponse } from '../../api/ada/lib/state-fetch/types';
 
 export default class ServerConnectionStore extends Store {
-  SERVER_STATUS_REFRESH_INTERVAL = environment.serverStatusRefreshInterval;
+  SERVER_STATUS_REFRESH_INTERVAL: number = environment.serverStatusRefreshInterval;
 
   @observable serverStatus: ServerStatusErrorType = 'healthy';
 
@@ -20,7 +20,7 @@ export default class ServerConnectionStore extends Store {
     return this.serverStatus;
   }
 
-  @action _checkServerStatus = async (): Promise<void> => {
+  @action _checkServerStatus: void => Promise<void> = async () => {
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     const checkServerStatusFunc = stateFetcher.checkServerStatus;
     try {

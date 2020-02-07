@@ -50,12 +50,12 @@ export default class NoticeBoardStore extends Store {
     await this._loadNew();
   }
 
-  _loadMore = async () => {
+  _loadMore: void => Promise<void> = async () => {
     this.searchOptions.limit += SEARCH_LIMIT_INCREASE;
     await this._loadNew();
   }
 
-  _loadNew = async (): Promise<void> => {
+  _loadNew: void => Promise<void> = async () => {
     try {
       this.setLoading(true);
 

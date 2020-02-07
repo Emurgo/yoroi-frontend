@@ -91,11 +91,11 @@ export default class LedgerConnectStore
 
   /** setup() is called when stores are being created
     * _init() is called when connect dailog is about to show */
-  _init = (): void => {
+  _init: void => void = () => {
     Logger.debug('LedgerConnectStore::_init called');
   }
 
-  @action _cancel = (): void => {
+  @action _cancel: void => void = () => {
     this.teardown();
     this.ledgerConnect && this.ledgerConnect.dispose();
     this.ledgerConnect = undefined;
@@ -106,7 +106,7 @@ export default class LedgerConnectStore
     super.teardown();
   }
 
-  @action _reset = (): void => {
+  @action _reset: void => void = () => {
     this.progressInfo = {
       currentStep: ProgressStep.CHECK,
       stepState: StepState.LOAD,
@@ -118,7 +118,7 @@ export default class LedgerConnectStore
 
   // =================== CHECK =================== //
   /** CHECK dialog submit(Next button) */
-  @action _submitCheck = (): void => {
+  @action _submitCheck: void => void = () => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStep.CONNECT;
     this.progressInfo.stepState = StepState.LOAD;
@@ -127,21 +127,21 @@ export default class LedgerConnectStore
 
   // =================== CONNECT =================== //
   /** CONNECT dialog goBack button */
-  @action _goBackToCheck = (): void => {
+  @action _goBackToCheck: void => void = () => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStep.CHECK;
     this.progressInfo.stepState = StepState.LOAD;
   };
 
   /** CONNECT dialog submit (Connect button) */
-  @action _submitConnect = async (): Promise<void> => {
+  @action _submitConnect: void => Promise<void> = async () => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStep.CONNECT;
     this.progressInfo.stepState = StepState.PROCESS;
     await this._checkAndStoreHWDeviceInfo();
   };
 
-  _checkAndStoreHWDeviceInfo = async (): Promise<void> => {
+  _checkAndStoreHWDeviceInfo: void => Promise<void> = async () => {
     try {
       this.ledgerConnect = new LedgerConnect({
         locale: this.stores.profile.currentLocale
@@ -174,9 +174,9 @@ export default class LedgerConnectStore
     }
   };
 
-  _normalizeHWResponse = (
-    resp: ExtendedPublicKeyResp,
-  ): HWDeviceInfo => {
+  _normalizeHWResponse: ExtendedPublicKeyResp => HWDeviceInfo = (
+    resp,
+  ) => {
     this._validateHWResponse(resp);
 
     const { ePublicKey, deviceVersion } = resp;
@@ -196,9 +196,9 @@ export default class LedgerConnectStore
     };
   }
 
-  _validateHWResponse = (
-    resp: ExtendedPublicKeyResp,
-  ): boolean => {
+  _validateHWResponse: ExtendedPublicKeyResp => boolean = (
+    resp,
+  ) => {
     const { ePublicKey, deviceVersion } = resp;
 
     if (deviceVersion == null) {
@@ -212,30 +212,30 @@ export default class LedgerConnectStore
     return true;
   };
 
-  _handleConnectError = (error: Error): void => {
+  _handleConnectError: Error => void = (error) => {
     this.hwDeviceInfo = undefined;
     this.error = convertToLocalizableError(error);
 
     this._goToConnectError();
   };
 
-  @action _goToConnectError = (): void => {
+  @action _goToConnectError: void => void = () => {
     this.progressInfo.currentStep = ProgressStep.CONNECT;
     this.progressInfo.stepState = StepState.ERROR;
   };
   // =================== CONNECT =================== //
 
   // =================== SAVE =================== //
-  @action _goToSaveLoad = (): void => {
+  @action _goToSaveLoad: void => void = () => {
     this.error = null;
     this.progressInfo.currentStep = ProgressStep.SAVE;
     this.progressInfo.stepState = StepState.LOAD;
   };
 
   /** SAVE dialog submit (Save button) */
-  @action _submitSave = async (
-    walletName: string,
-  ): Promise<void> => {
+  @action _submitSave: (string) => Promise<void> = async (
+    walletName,
+  ) => {
     this.error = null;
     this.progressInfo.currentStep = ProgressStep.SAVE;
     this.progressInfo.stepState = StepState.PROCESS;
@@ -245,11 +245,11 @@ export default class LedgerConnectStore
   };
 
   /** creates new wallet and loads it */
-  _saveHW = async (
-    walletName: string,
-  ): Promise<void>  => {
+  _saveHW: (string) => Promise<void> = async (
+    walletName,
+  )  => {
     try {
-      Logger.debug('LedgerConnectStore::_saveHW:: called');
+      Logger.debug(`${nameof(LedgerConnectStore)}::${nameof(this._saveHW)}:: called`);
       this._setIsCreateHWActive(true);
       this.createHWRequest.reset();
 
@@ -263,7 +263,7 @@ export default class LedgerConnectStore
 
       await this._onSaveSucess(newWallet.publicDeriver);
     } catch (error) {
-      Logger.error(`LedgerConnectStore::_saveHW::error ${stringifyError(error)}`);
+      Logger.error(`${nameof(LedgerConnectStore)}::${nameof(this._saveHW)}::error ${stringifyError(error)}`);
 
       // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1055
       if (error instanceof CheckAdressesInUseApiError) {
@@ -289,10 +289,10 @@ export default class LedgerConnectStore
     }
   };
 
-  _prepareCreateHWReqParams = (
-    walletName: string,
-    derivationIndex: number,
-  ): CreateHardwareWalletRequest => {
+  _prepareCreateHWReqParams: (string, number) => CreateHardwareWalletRequest = (
+    walletName,
+    derivationIndex,
+  ) => {
     if (this.hwDeviceInfo == null
       || this.hwDeviceInfo.publicMasterKey == null
       || this.hwDeviceInfo.hwFeatures == null) {
@@ -301,7 +301,7 @@ export default class LedgerConnectStore
 
     const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
     if (persistentDb == null) {
-      throw new Error('_prepareCreateHWReqParams db not loaded. Should never happen');
+      throw new Error(`${nameof(this._prepareCreateHWReqParams)} db not loaded. Should never happen`);
     }
 
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
@@ -330,14 +330,14 @@ export default class LedgerConnectStore
     Logger.info('SUCCESS: Ledger Connected Wallet created and loaded');
   }
 
-  @action _goToSaveError = (): void => {
+  @action _goToSaveError: void => void = () => {
     this.progressInfo.currentStep = ProgressStep.SAVE;
     this.progressInfo.stepState = StepState.ERROR;
   };
   // =================== SAVE =================== //
 
   // =================== API =================== //
-  @action _setIsCreateHWActive = (active: boolean): void => {
+  @action _setIsCreateHWActive: boolean => void = (active) => {
     this.isCreateHWActive = active;
   };
 

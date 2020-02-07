@@ -50,9 +50,9 @@ export default class AddressesStore extends Store {
     actions.closeAddressDetailDialog.listen(this._closeAddressDetailDialog);
   }
 
-  @action _verifyAddress = async (
-    publicDeriver: PublicDeriver<>,
-  ): Promise<void> => {
+  @action _verifyAddress: (PublicDeriver<>) => Promise<void> = async (
+    publicDeriver,
+  ) => {
     Logger.info('AddressStore::_verifyAddress called');
 
     if (!this.selectedAddress) {
@@ -120,23 +120,23 @@ export default class AddressesStore extends Store {
     }
   }
 
-  @action _selectAddress = async (params: {|
+  @action _selectAddress: {|
     address: string,
     path: BIP32Path,
-  |}): Promise<void> => {
+  |} => Promise<void> = async (params) => {
     Logger.info('AddressStore::_selectAddress::called: ' + params.address);
     this.selectedAddress = { address: params.address, path: params.path };
   }
 
-  @action _setActionProcessing = (processing: boolean): void => {
+  @action _setActionProcessing: boolean => void = (processing) => {
     this.isActionProcessing = processing;
   }
 
-  @action _setError = (error: ?LocalizableError): void => {
+  @action _setError: ?LocalizableError => void = (error) => {
     this.error = error;
   }
 
-  @action _closeAddressDetailDialog = (): void => {
+  @action _closeAddressDetailDialog: void => void = () => {
     this.ledgerConnect && this.ledgerConnect.dispose();
     this.ledgerConnect = undefined;
     this.selectedAddress = null;

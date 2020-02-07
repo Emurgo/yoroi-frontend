@@ -50,7 +50,7 @@ export type StandardAddress = {|
   ...Address, ...Value, ...Addressing, ...UsedStatus
 |};
 
-type SubRequestType<T> = { publicDeriver: PublicDeriver<> } => Promise<Array<T>>;
+type SubRequestType<T> = {| publicDeriver: PublicDeriver<> |} => Promise<Array<T>>;
 export class AddressTypeStore<T> {
 
   @observable addressesRequests: Array<{
@@ -231,13 +231,13 @@ export default class AddressesStore extends Store {
     }
   }
 
-  _wrapForAllAddresses = async (request: {
+  _wrapForAllAddresses: {|
     publicDeriver: PublicDeriver<>,
     invertFilter: boolean,
-  }): Promise<Array<StandardAddress>> => {
+  |} => Promise<Array<StandardAddress>> = async (request) => {
     const withUtxos = asGetAllUtxos(request.publicDeriver);
     if (withUtxos == null) {
-      Logger.error(`_wrapForAllAddresses incorrect public deriver`);
+      Logger.error(`${nameof(this._wrapForAllAddresses)} incorrect public deriver`);
       return Promise.resolve([]);
     }
 
@@ -255,15 +255,15 @@ export default class AddressesStore extends Store {
     });
   }
 
-  _wrapForChainAddresses = async (request: {
+  _wrapForChainAddresses: {|
     publicDeriver: PublicDeriver<>,
     chainsRequest: IHasUtxoChainsRequest,
-  }): Promise<Array<StandardAddress>> => {
+  |}=> Promise<Array<StandardAddress>> = async (request) => {
     const withHasUtxoChains = asHasUtxoChains(
       request.publicDeriver
     );
     if (withHasUtxoChains == null) {
-      Logger.error(`_wrapForChainAddresses incorrect public deriver`);
+      Logger.error(`${nameof(this._wrapForChainAddresses)} incorrect public deriver`);
       return Promise.resolve([]);
     }
     const addresses = await this.api[environment.API].getChainAddressesForDisplay({
