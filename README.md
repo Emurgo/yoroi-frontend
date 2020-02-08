@@ -64,9 +64,30 @@ _Note_: `dev` should hot reload on code change
 
 ## Run Yoroi Firefox extension
 
-Debug builds are not maintained for Firefox as firefox rejects manifest files with non-https `localhost` in them.
-You can bypass this by manually adding the extension into your Firefox folder but this is kind of tedious.
-I suggest instead installing the `mainnet` build as it does not use `localhost`. (through `about:debugging` or `about:addons`). See [SETUP.md](docs/SETUP.md) for how to makes the unittests pass.
+Debug builds for Firefox require the [Debugger for Firefox](https://marketplace.visualstudio.com/items?itemName=firefox-devtools.vscode-firefox-debug) addon.
+
+You can use the following config in `vscode/.launch.json` to launch the debugger.
+
+```json
+{
+  "type": "firefox",
+  "request": "launch",
+  "reAttach": true,
+  "name": "Launch add-on",
+  "addonPath": "${workspaceFolder}/dev/",
+  "preferences": {
+    "security.csp.enable": false
+  },
+  "pathMappings": [
+    {
+      "url": "webpack:///app/",
+      "path": "${workspaceFolder}/app/"
+    }
+  ]
+},
+```
+
+See [SETUP.md](docs/SETUP.md) for how to makes the unittests pass.
 
 ## Build release candidate
 

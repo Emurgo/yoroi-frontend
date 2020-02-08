@@ -10,8 +10,6 @@ process.env.NODE_CONFIG_ENV = argv.env;
 export function buildProd(env: string) {
   const shell = require('shelljs');
 
-  tasks.replaceWebpack();
-
   console.log('[Build manifest]');
   console.log('-'.repeat(80));
   tasks.buildManifests(false);
@@ -31,8 +29,6 @@ export function buildDev(env: string) {
   const createWebpackServer = require('webpack-httpolyglot-server');
 
   const config = require(`../webpack/devConfig`);
-
-  tasks.replaceWebpack();
 
   console.log('[Build manifest]');
   console.log('-'.repeat(80));
