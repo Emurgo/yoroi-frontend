@@ -10,8 +10,6 @@ const ENV = 'test';
 const config = require(`../webpack/devConfig`);
 process.env.NODE_CONFIG_ENV = ENV;
 
-tasks.replaceWebpack();
-
 console.log('[Build manifest]');
 console.log('-'.repeat(80));
 tasks.buildManifests(true);

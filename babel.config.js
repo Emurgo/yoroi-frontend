@@ -70,20 +70,13 @@ module.exports = function (api /*: ApiType */) {
       ],
       '@babel/plugin-proposal-export-default-from',
       '@babel/plugin-proposal-export-namespace-from',
+      ...(api.env('development')
+        ? [
+          'react-hot-loader/babel',
+        ]
+        : []),
     ],
     env: {
-      development: {
-        plugins: [
-          'react-hot-loader/babel',
-          '@babel/plugin-transform-runtime'
-        ]
-      },
-      'shelley-dev': {
-        plugins: [
-          'react-hot-loader/babel',
-          '@babel/plugin-transform-runtime'
-        ]
-      },
       cucumber: nodePlugins,
       test: nodePlugins,
       jest: nodePlugins,

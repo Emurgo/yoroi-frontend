@@ -6,18 +6,6 @@ import { values } from 'lodash';
 import fs from 'fs';
 import path from 'path';
 
-exports.replaceWebpack = () => {
-  const replaceTasks = [{
-    from: 'webpack/replace/JsonpMainTemplate.runtime.js',
-    to: 'node_modules/webpack/lib/JsonpMainTemplate.runtime.js'
-  }, {
-    from: 'webpack/replace/process-update.js',
-    to: 'node_modules/webpack-hot-middleware/process-update.js'
-  }];
-
-  replaceTasks.forEach(task => cp(task.from, task.to));
-};
-
 exports.copyAssets = (type: string, env: string) => {
   rm('-rf', type);
   mkdir(type);
