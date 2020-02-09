@@ -46,7 +46,7 @@
     @extend .section;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: center; // flex-end;
     flex: 1;
     padding-left: 24px;
     padding-right: 24px;

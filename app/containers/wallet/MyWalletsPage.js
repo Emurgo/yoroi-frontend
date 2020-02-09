@@ -25,6 +25,8 @@ import moment from 'moment';
 import NavBarAddButton from '../../components/topbar/NavBarAddButton';
 import NavWalletDetails from '../../components/topbar/NavWalletDetails';
 import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
+import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 
 const messages = defineMessages({
   title: {
@@ -62,13 +64,13 @@ export default class MyWalletsPage extends Component<Props> {
     this.props.actions.wallets.unselectWallet.trigger();
   }
 
-  handleWalletNavItemClick = (page: string): void => {
-    const { wallets } = this.props.stores.substores.ada;
-    const selected = wallets.selected;
-    if (selected == null) return;
+  handleWalletNavItemClick: (string, PublicDeriverWithCachedMeta) => void = (
+    page,
+    publicDeriver
+  ) => {
     this.props.actions.router.goToRoute.trigger({
       route: ROUTES.WALLETS.PAGE,
-      params: { id: selected.self.getPublicDeriverId(), page },
+      params: { id: publicDeriver.self.getPublicDeriverId(), page },
     });
   };
 
@@ -78,12 +80,6 @@ export default class MyWalletsPage extends Component<Props> {
     const { profile } = stores;
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
     const sidebarContainer = (<SidebarContainer actions={actions} stores={stores} />);
-
-    const walletsStore = stores.substores[environment.API].wallets;
-    const publicDeriver = walletsStore.selected;
-    const walletName = publicDeriver ? publicDeriver.conceptualWalletName : '';
-
-    const walletAmount = new BigNumber(12);
 
     const wallets = this.props.stores.substores.ada.wallets.publicDerivers;
 
@@ -120,68 +116,9 @@ export default class MyWalletsPage extends Component<Props> {
       />
     );
 
-    /*
-     * TODO: this should operator on conceptual wallets
-     * with publicDerivers acting as sub-rows
-     * but since we don't support multi-currency or multi-account yet we simplify the UI for now
-     */
-
-    // TODO: should be sum of public derivers
-    const walletSumCurrencies = (
-      <>
-        <WalletCurrency
-          currency="ADA"
-          tooltipText="1.320"
-        />
-        <WalletCurrency
-          currency="BTC"
-          tooltipText="0.060"
-        />
-        <WalletCurrency
-          currency="ETH"
-          tooltipText="3.132"
-        />
-      </>
-    );
-
     const walletsList = (
       <WalletsList>
-        {
-          wallets.map((wallet) => {
-            return (
-              <WalletRow
-                isExpandable={false /* TODO: should be expandable if > 1 public deriver */}
-                key={wallet.self.getPublicDeriverId()}
-                onRowClicked={this.handleWalletNavItemClick}
-                walletSumDetails={<WalletDetails
-                  walletAmount={walletAmount}
-                  rewards={new BigNumber('565.000000') /* TODO */}
-                  // TODO: This should be probably bound to an individual wallet
-                  onUpdateHideBalance={this.updateHideBalance}
-                  shouldHideBalance={profile.shouldHideBalance}
-                />}
-                walletSumCurrencies={walletSumCurrencies}
-                walletSubRow={() => this.createSubrow(wallet)}
-                walletPlate={
-                  <NavPlate
-                    publicDeriver={walletsStore.selected}
-                    walletName={walletName}
-                    walletType="standard"
-                  />
-                }
-                walletSync={
-                  <WalletSync
-                    time={
-                      wallet.lastSyncInfo.Time
-                        ? moment(wallet.lastSyncInfo.Time).fromNow()
-                        : null
-                    }
-                  />
-                }
-              />
-            );
-          })
-        }
+        {wallets.map(wallet => this.generateRow(wallet))}
       </WalletsList>
     );
 
@@ -198,6 +135,57 @@ export default class MyWalletsPage extends Component<Props> {
           {walletsList}
         </MyWallets>
       </MainLayout>
+    );
+  }
+
+  /*
+  * TODO: this should operator on conceptual wallets
+  * with publicDerivers acting as sub-rows
+  * but since we don't support multi-currency or multi-account yet we simplify the UI for now
+  */
+  generateRow: PublicDeriverWithCachedMeta => Node = (publicDeriver) => {
+    const walletName = publicDeriver ? publicDeriver.conceptualWalletName : '';
+
+    // TODO: should be sum of public derivers
+    const walletSumCurrencies = (
+      <>
+        <WalletCurrency
+          currency="ADA"
+          tooltipText="1.320"
+        />
+      </>
+    );
+    return (
+      <WalletRow
+        isExpandable={false /* TODO: should be expandable if > 1 public deriver */}
+        key={publicDeriver.self.getPublicDeriverId()}
+        onRowClicked={page => this.handleWalletNavItemClick(page, publicDeriver)}
+        walletSumDetails={<WalletDetails
+          walletAmount={publicDeriver.amount}
+          rewards={this.getRewardBalance(publicDeriver)}
+          // TODO: This should be probably bound to an individual wallet
+          onUpdateHideBalance={this.updateHideBalance}
+          shouldHideBalance={this.props.stores.profile.shouldHideBalance}
+        />}
+        walletSumCurrencies={walletSumCurrencies}
+        walletSubRow={() => this.createSubrow(publicDeriver)}
+        walletPlate={
+          <NavPlate
+            publicDeriver={publicDeriver}
+            walletName={walletName}
+            walletType={getWalletType(publicDeriver)}
+          />
+        }
+        walletSync={
+          <WalletSync
+            time={
+              publicDeriver.lastSyncInfo.Time
+                ? moment(publicDeriver.lastSyncInfo.Time).fromNow()
+                : null
+            }
+          />
+        }
+      />
     );
   }
 
@@ -239,4 +227,35 @@ export default class MyWalletsPage extends Component<Props> {
 
     return walletSubRow;
   }
+
+  /**
+   * undefined => wallet is not a reward wallet
+   * null => still calculating
+   * value => done calculating
+   */
+  getRewardBalance: PublicDeriverWithCachedMeta => null | void | BigNumber = (
+    publicDeriver
+  ) => {
+    const delegationRequest = this.props.stores.substores.ada.delegation.getRequests(
+      publicDeriver.self
+    );
+    if (delegationRequest == null) return undefined;
+
+    const balanceResult = delegationRequest.getDelegatedBalance.result;
+    if (balanceResult == null) {
+      return null;
+    }
+    return balanceResult.accountPart.dividedBy(LOVELACES_PER_ADA);
+  }
+}
+
+function getWalletType(publicDeriver: PublicDeriverWithCachedMeta) {
+  const conceptualWallet = publicDeriver.self.getParent();
+  if (isLedgerNanoWallet(conceptualWallet)) {
+    return 'ledger';
+  }
+  if (isTrezorTWallet(conceptualWallet)) {
+    return 'trezor';
+  }
+  return 'standard';
 }

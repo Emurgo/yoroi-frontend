@@ -3,46 +3,25 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import BigNumber from 'bignumber.js';
 import classnames from 'classnames';
-import { intlShape, defineMessages } from 'react-intl';
-import { DECIMAL_PLACES_IN_ADA } from '../../../config/numbersConfig';
-import { formattedWalletAmount } from '../../../utils/formatters';
-
+import { intlShape } from 'react-intl';
+import globalMessages from '../../../i18n/global-messages';
+import { splitAmount } from '../../../utils/formatters';
 import styles from './WalletDetails.scss';
 import IconEyeOpen from '../../../assets/images/my-wallets/icon_eye_open.inline.svg';
 import IconEyeClosed from '../../../assets/images/my-wallets/icon_eye_closed.inline.svg';
 
-const messages = defineMessages({
-  totalLabel: {
-    id: 'wallet.details.sumLabel.total',
-    defaultMessage: '!!!Total',
-  },
-  walletLabel: {
-    id: 'wallet.details.sumLabel.wallet',
-    defaultMessage: '!!!Wallet',
-  },
-  rewardsLabel: {
-    id: 'wallet.details.sumLabel.rewards',
-    defaultMessage: '!!!Rewards',
-  },
-});
-
 type Props = {|
     +onUpdateHideBalance: void => void,
     +shouldHideBalance: boolean,
-    +rewards: null | BigNumber,
+    /**
+      * undefined => wallet doesn't is not a reward wallet
+      * null => still calculating
+      * value => done calculating
+    */
+    +rewards: null | void | BigNumber,
     +walletAmount: null | BigNumber,
     +infoText?: string,
 |};
-
-type SplitDecimalProps = [string, string];
-
-function splitAmount(
-  value: string,
-  index: number,
-): SplitDecimalProps {
-  const startIndex = value.length - index;
-  return [value.substring(0, startIndex), value.substring(startIndex)];
-}
 
 export default class WalletDetails extends Component<Props> {
 
@@ -73,15 +52,21 @@ export default class WalletDetails extends Component<Props> {
                 ? walletAmount.plus(rewards)
                 : null
             })}
-            <span className={styles.amountLabel}>{intl.formatMessage(messages.totalLabel)}</span>
+            <span className={styles.amountLabel}>
+              {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
+            </span>
           </div>
           <div className={styles.amount}>
             {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
-            <span className={styles.amountLabel}>{intl.formatMessage(messages.walletLabel)}</span>
+            <span className={styles.amountLabel}>
+              {intl.formatMessage(globalMessages.walletLabel)}
+            </span>
           </div>
           <div className={styles.amount}>
             {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
-            <span className={styles.amountLabel}>{intl.formatMessage(messages.rewardsLabel)}</span>
+            <span className={styles.amountLabel}>
+              {intl.formatMessage(globalMessages.rewardsLabel)}
+            </span>
           </div>
         </div>
         <button
@@ -97,7 +82,7 @@ export default class WalletDetails extends Component<Props> {
 
   renderAmountDisplay: {|
     shouldHideBalance: boolean,
-    amount: BigNumber | null
+    amount: ?BigNumber
   |} => Node = (request) => {
     if (request.amount == null) {
       return <div className={styles.isLoading} />;
@@ -107,10 +92,7 @@ export default class WalletDetails extends Component<Props> {
     if (request.shouldHideBalance) {
       balanceDisplay = (<span>******</span>);
     } else {
-      const [beforeDecimalRewards, afterDecimalRewards]: SplitDecimalProps = splitAmount(
-        formattedWalletAmount(request.amount),
-        DECIMAL_PLACES_IN_ADA
-      );
+      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(request.amount);
 
       balanceDisplay = (
         <>
@@ -124,5 +106,4 @@ export default class WalletDetails extends Component<Props> {
 
     return (<>{balanceDisplay} {currency}</>);
   }
-
 }
