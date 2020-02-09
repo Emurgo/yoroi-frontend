@@ -9,7 +9,7 @@ import { matchRoute } from '../../utils/routing';
 import { getURIParameters } from '../../utils/URIHandling';
 import type { UriParams } from '../../utils/URIHandling';
 import LocalizableError from '../../i18n/LocalizableError';
-import { UnableToLoadError } from '../../i18n/errors';
+import { UnableToLoadError, StorageLoadError } from '../../i18n/errors';
 import Request from '../lib/LocalizedRequest';
 import type { MigrationRequest } from '../../api';
 import { migrate } from '../../api';
@@ -74,10 +74,15 @@ export default class LoadingStore extends Store {
         return undefined;
       }).catch((error) => {
         Logger.error(`${nameof(LoadingStore)}::${nameof(this.load)} Unable to load libraries ` + stringifyError(error));
-        runInAction(() => {
-          this.error = new UnableToLoadError();
-          this._loading = false;
-        });
+        if (this.loadPersitentDbRequest.error != null) {
+          runInAction(() => {
+            this.error = new StorageLoadError();
+          });
+        } else {
+          runInAction(() => {
+            this.error = new UnableToLoadError();
+          });
+        }
       });
   }
 
