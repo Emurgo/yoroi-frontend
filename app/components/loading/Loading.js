@@ -64,6 +64,26 @@ export default class Loading extends Component<Props> {
       styles[`${api}-apiLogo`],
     ]);
 
+    const renderError = error == null
+      ? null
+      : (
+        <div className={styles.loading}>
+          <h1 className={styles.error}>
+            {intl.formatMessage(error)}<br /><br />
+            {this._getErrorMessageComponent()}
+          </h1>
+        </div>
+      );
+    const renderContent = (error != null || !isLoadingDataForNextScreen)
+      ? null
+      : (
+        <div className={styles.loading}>
+          <h1 className={styles.headline}>
+            {intl.formatMessage(messages.loading)}
+          </h1>
+          <LoadingSpinner />
+        </div>
+      );
     return (
       <div className={componentStyles}>
         <div className={styles.logos}>
@@ -72,24 +92,10 @@ export default class Loading extends Component<Props> {
           <span className={apiLogoStyles}><CardanoLogo /></span>
         </div>
         {hasLoadedCurrentLocale && (
-          <div>
-            {isLoadingDataForNextScreen && (
-              <div className={styles.loading}>
-                <h1 className={styles.headline}>
-                  {intl.formatMessage(messages.loading)}
-                </h1>
-                <LoadingSpinner />
-              </div>
-            )}
-            {error && (
-              <div className={styles.loading}>
-                <h1 className={styles.error}>
-                  {intl.formatMessage(error)}<br />
-                  {this._getErrorMessageComponent()}
-                </h1>
-              </div>
-            )}
-          </div>
+          <>
+            {renderContent}
+            {renderError}
+          </>
         )}
       </div>
     );
