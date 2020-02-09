@@ -36,6 +36,7 @@
   "api.errors.unusedAddressesError": "Es ist nicht möglich, mehr als 20 Adressen hintereinander zu generieren, ohne sie zu verwenden.",
   "api.errors.updateAdaTxsHistoryError": "Fehler beim Aktualisieren des ADA-Transaktionsverlaufs.",
   "api.errors.updateAdaWalletError": "Fehler beim Aktualisieren der ADA-Wallet.",
+  "app.errors.storageLoadError": "Failed to access storage. Yoroi needs to access to storage (\"IndexedDB\") to properly manage wallets. Your browser may either not support IndexedDB or it may be disabled due to your privacy settings (such as private browsing)",
   "app.errors.unableToLoad": "Laden nicht möglich!",
   "app.errors.unexpectedError": "Etwas Unerwartetes ist passiert. Bitte versuche es erneut.",
   "app.errors.unknowError": "Unbekannter Fehler.",
