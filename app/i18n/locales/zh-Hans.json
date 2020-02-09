@@ -36,6 +36,7 @@
   "api.errors.unusedAddressesError": "您不能产生超过20个连续的未使用地址。",
   "api.errors.updateAdaTxsHistoryError": "更新 ada 交易历史时发生错误。",
   "api.errors.updateAdaWalletError": "更新 ada 钱包时发生错误。",
+  "app.errors.storageLoadError": "Failed to access storage. Yoroi needs to access to storage (\"IndexedDB\") to properly manage wallets. Your browser may either not support IndexedDB or it may be disabled due to your privacy settings (such as private browsing)",
   "app.errors.unableToLoad": "无法加载！",
   "app.errors.unexpectedError": "发生意外错误。请重试。",
   "app.errors.unknowError": "未知错误。",
