@@ -36,6 +36,7 @@
   "api.errors.unusedAddressesError": "Você não pode gerar mais de 20 endereços não utilizados de forma consecutiva.",
   "api.errors.updateAdaTxsHistoryError": "Erro ao atualizar o histórico de transações do Ada.",
   "api.errors.updateAdaWalletError": "Erro ao atualizar a carteira Ada.",
+  "app.errors.storageLoadError": "Failed to access storage. Yoroi needs to access to storage (\"IndexedDB\") to properly manage wallets. Your browser may either not support IndexedDB or it may be disabled due to your privacy settings (such as private browsing)",
   "app.errors.unableToLoad": "Não foi possível carregar!",
   "app.errors.unexpectedError": "Algo inesperado aconteceu. Por favor tente novamente.",
   "app.errors.unknowError": "Erro desconhecido.",
