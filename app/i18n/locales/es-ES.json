@@ -36,7 +36,7 @@
   "api.errors.unusedAddressesError": "No puedes generar más de 20 direcciones sin usar, de forma consecutiva.",
   "api.errors.updateAdaTxsHistoryError": "Error al actualizar el historial de transacciones.",
   "api.errors.updateAdaWalletError": "Error al actualizar la billetera.",
-  "app.errors.storageLoadError": "Failed to access storage. Yoroi needs to access to storage (\"IndexedDB\") to properly manage wallets. Your browser may either not support IndexedDB or it may be disabled due to your privacy settings (such as private browsing)",
+  "app.errors.storageLoadError": "Error al acceder al almacenamiento. Yoroi necesita acceder al almacenamiento (\"IndexedDB\") para manejar adecuadamente las billeteras. Es posible que tu navegador no sea compatible con IndexedDB, o que esta característica esté desactivada debido a la configuración de privacidad (como la navegación privada)",
   "app.errors.unableToLoad": "No es posible cargar el contenido",
   "app.errors.unexpectedError": "Sucedió algo inesperado. Por favor, reinténtalo.",
   "app.errors.unknowError": "Error desconocido.",
