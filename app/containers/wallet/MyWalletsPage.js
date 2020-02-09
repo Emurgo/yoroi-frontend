@@ -58,6 +58,10 @@ export default class MyWalletsPage extends Component<Props> {
     this.props.actions.profile.updateHideBalance.trigger();
   }
 
+  componentDidMount() {
+    this.props.actions.wallets.unselectWallet.trigger();
+  }
+
   handleWalletNavItemClick = (page: string): void => {
     const { wallets } = this.props.stores.substores.ada;
     const selected = wallets.selected;

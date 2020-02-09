@@ -6,6 +6,7 @@ import ProfileActions from './profile-actions';
 import DialogsActions from './dialogs-actions';
 import NotificationsActions from './notifications-actions';
 import NoticeBoard from './notice-board-actions';
+import WalletActions from './wallet-actions';
 import adaActionsMap from './ada/index';
 import type { AdaActionsMap } from './ada/index';
 
@@ -17,6 +18,7 @@ export type ActionsMap = {|
   dialogs: DialogsActions,
   notifications: NotificationsActions,
   noticeBoard: NoticeBoard,
+  wallets: WalletActions,
   ada: AdaActionsMap,
 |};
 
@@ -28,6 +30,7 @@ const actionsMap: ActionsMap = {
   dialogs: new DialogsActions(),
   notifications: new NotificationsActions(),
   noticeBoard: new NoticeBoard(),
+  wallets: new WalletActions(),
   ada: adaActionsMap
 };
 

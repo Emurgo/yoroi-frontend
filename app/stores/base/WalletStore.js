@@ -70,6 +70,8 @@ export default class WalletStore extends Store {
   setup(): void {
     super.setup();
     this.publicDerivers = [];
+    const { wallets } = this.actions;
+    wallets.unselectWallet.listen(this._unsetActiveWallet);
     setInterval(this._pollRefresh, this.WALLET_REFRESH_INTERVAL);
     // $FlowFixMe built-in types can't handle visibilitychange
     document.addEventListener('visibilitychange', debounce(this._pollRefresh, this.ON_VISIBLE_DEBOUNCE_WAIT));

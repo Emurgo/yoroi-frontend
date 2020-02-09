@@ -10,7 +10,7 @@ import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMet
 
 // ======= WALLET ACTIONS =======
 
-export default class WalletsActions {
+export default class AdaWalletsActions {
   createWallet: AsyncAction<{| name: string, password: string |}> = new AsyncAction();
   restoreWallet: AsyncAction<{|
     recoveryPhrase: string,
