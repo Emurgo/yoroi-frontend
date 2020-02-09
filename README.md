@@ -80,8 +80,8 @@ You can use the following config in `vscode/.launch.json` to launch the debugger
   },
   "pathMappings": [
     {
-      "url": "webpack:///app/",
-      "path": "${workspaceFolder}/app/"
+      "url": "webpack:///",
+      "path": "${workspaceFolder}/"
     }
   ]
 },

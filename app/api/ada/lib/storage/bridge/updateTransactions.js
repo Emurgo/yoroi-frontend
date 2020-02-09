@@ -578,7 +578,7 @@ async function rollback(
 ): Promise<void> {
   const { TransactionSeed, } = await deps.GetEncryptionMeta.get(db, dbTx);
 
-  // if we've never succcessfully sync'd from the server, no need to rollback
+  // if we've never successfully synced from the server, no need to rollback
   const lastSyncSlotNum = request.lastSyncInfo.SlotNum;
   if (lastSyncSlotNum === null) {
     return;
