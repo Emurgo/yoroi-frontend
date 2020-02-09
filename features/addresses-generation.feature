@@ -7,17 +7,19 @@ Feature: Generate Addresses
 
   @it-106
   Scenario: Latest address should be displayed at the top (IT-106)
-    Then I should see my latest address "Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc" at the top
+    Then I should see my latest address "Ae2tdPwUPEZAbDBFpgzALfryWbvDtx6H6BMynDxWFuThQthW7HX93yJ3wRS" at the top
     And I should see the addresses exactly list them
     | address                                                     |
+    | Ae2tdPwUPEZAbDBFpgzALfryWbvDtx6H6BMynDxWFuThQthW7HX93yJ3wRS |
     | Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc |
 
   @it-17
   Scenario: Generate a new receive address (IT-17)
     When I click on the Generate new address button
-    Then I should see my latest address "Ae2tdPwUPEZAbDBFpgzALfryWbvDtx6H6BMynDxWFuThQthW7HX93yJ3wRS" at the top
+    Then I should see my latest address "Ae2tdPwUPEZHGGpp6RV9N9qPsAjHFWfbQzoD9unBmPDoJpMQW129GWPVU1X" at the top
     And I should see the addresses exactly list them
     | address                                                     |
+    | Ae2tdPwUPEZHGGpp6RV9N9qPsAjHFWfbQzoD9unBmPDoJpMQW129GWPVU1X |
     | Ae2tdPwUPEZAbDBFpgzALfryWbvDtx6H6BMynDxWFuThQthW7HX93yJ3wRS |
     | Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc |
 
@@ -34,7 +36,6 @@ Feature: Generate Addresses
 
   @it-22
   Scenario: Ensure user can hide used Addresses under "Receive tab" (IT-22)
-    When I click on the Generate new address button
     And I click on the Hide used addresses button
     Then I should see the addresses exactly list them
     | address                                                     |

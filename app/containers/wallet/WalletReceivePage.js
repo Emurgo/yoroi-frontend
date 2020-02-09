@@ -49,7 +49,7 @@ export default class WalletReceivePage extends Component<Props, State> {
     const { wallets } = this.props.stores.substores.ada;
     const publicDeriver = wallets.selected;
     if (publicDeriver != null) {
-      await this.props.actions.ada.addresses.createAddress.trigger(publicDeriver);
+      await this.props.actions.ada.addresses.createAddress.trigger(publicDeriver.self);
     }
   };
 
@@ -79,11 +79,11 @@ export default class WalletReceivePage extends Component<Props, State> {
     const { validateAmount } = transactions;
 
     // Guard against potential null values
-    if (!publicDeriver) throw new Error('Active wallet required for WalletReceivePage.');
+    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(WalletReceivePage)}.`);
 
     // assume account-level wallet for now
     const withChains = asHasUtxoChains(publicDeriver.self);
-    if (!withChains) throw new Error('WalletReceivePage only available for account-level wallets');
+    if (!withChains) throw new Error(`${nameof(WalletReceivePage)} only available for account-level wallets`);
     const addressTypeStore = this.getTypeStore(publicDeriver);
 
     if (!addressTypeStore.getRequest(publicDeriver.self).wasExecuted || !addressTypeStore.hasAny) {
@@ -94,7 +94,7 @@ export default class WalletReceivePage extends Component<Props, State> {
       );
     }
 
-    // get info about the lattest address generated for special rendering
+    // get info about the latest address generated for special rendering
     const lastAddress = addressTypeStore.last;
     const walletAddress = lastAddress != null ? lastAddress.address : '';
     const isWalletAddressUsed = lastAddress != null ? lastAddress.isUsed : false;

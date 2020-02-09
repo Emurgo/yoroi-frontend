@@ -22,6 +22,7 @@ Feature: Restore Wallet
     And I go to the receive screen
     And I should see the addresses exactly list them
     | address                                                     |
+    | Ae2tdPwUPEZAbDBFpgzALfryWbvDtx6H6BMynDxWFuThQthW7HX93yJ3wRS |
     | Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc |
 
   @it-13
@@ -161,6 +162,7 @@ Feature: Restore Wallet
       And I go to the receive screen
       And I should see the addresses exactly list them
       | address                                                     |
+      | Ae2tdPwUPEZF4q7tzeXnofsXLF3yCW7mwbFVxucwoXBrfUCGXJ9yHWzwVm8 |
       | Ae2tdPwUPEZ7TQpzbJZCbA5BjW4zWYFn47jKo43ouvfe4EABoCfvEjwYvJr |
 
     @it-73

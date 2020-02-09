@@ -8,6 +8,7 @@ import Request from '../lib/LocalizedRequest';
 import LocalizableError, { localizedError } from '../../i18n/LocalizableError';
 import type {
   CreateAddressFunc,
+  CreateAddressResponse,
 } from '../../api/ada';
 import environment from '../../environment';
 import {
@@ -98,12 +99,12 @@ export class AddressTypeStore<T> {
   }
 
   /** Refresh addresses from database */
-  @action refreshAddressesFromDb: PublicDeriverWithCachedMeta => Promise<void> = async (
+  @action refreshAddressesFromDb: PublicDeriver<> => Promise<void> = async (
     publicDeriver,
   ) => {
-    const allRequest = this.getRequest(publicDeriver.self);
+    const allRequest = this.getRequest(publicDeriver);
     allRequest.invalidate({ immediately: false });
-    await allRequest.execute({ publicDeriver: publicDeriver.self }).promise;
+    await allRequest.execute({ publicDeriver }).promise;
   };
 
   _flowCoerceResult: CachedRequest<SubRequestType<T>> => ?Array<T> = (request) => {
@@ -162,9 +163,12 @@ export default class AddressesStore extends Store {
     );
     this.externalForDisplay = new AddressTypeStore(
       this.stores,
-      (request) => this._wrapForChainAddresses({
-        ...request,
-        chainsRequest: { chainId: ChainDerivations.EXTERNAL },
+      async (request) => this._createAddressIfNeeded({
+        publicDeriver: request.publicDeriver,
+        genAddresses: () => this._wrapForChainAddresses({
+          ...request,
+          chainsRequest: { chainId: ChainDerivations.EXTERNAL },
+        }),
       })
     );
     this.internalForDisplay = new AddressTypeStore(
@@ -176,25 +180,31 @@ export default class AddressesStore extends Store {
     );
   }
 
-  _createAddress: PublicDeriverWithCachedMeta => Promise<void> = async (
+  _createAddress: PublicDeriver<> => Promise<void> = async (
     publicDeriver
   ) => {
     try {
-      const withDisplayCutoff = asDisplayCutoff(publicDeriver.self);
-      if (withDisplayCutoff == null) {
-        Logger.error(`${nameof(this._createAddress)} incorrect public deriver`);
-        return;
-      }
-      const address = await this.createAddressRequest.execute({
-        popFunc: withDisplayCutoff.popAddress
-      }).promise;
-      if (address != null) {
+      const result = await this._baseCreateAddress(publicDeriver);
+      if (result != null) {
         await this.refreshAddressesFromDb(publicDeriver);
         runInAction('reset error', () => { this.error = null; });
       }
     } catch (error) {
       runInAction('set error', () => { this.error = localizedError(error); });
     }
+  };
+  _baseCreateAddress: PublicDeriver<> => Promise<?CreateAddressResponse> = async (
+    publicDeriver
+  ) => {
+    const withDisplayCutoff = asDisplayCutoff(publicDeriver);
+    if (withDisplayCutoff == null) {
+      Logger.error(`${nameof(this._createAddress)} incorrect public deriver`);
+      return;
+    }
+    const address = await this.createAddressRequest.execute({
+      popFunc: withDisplayCutoff.popAddress
+    }).promise;
+    return address;
   };
 
   @action _resetErrors: void => void = () => {
@@ -216,10 +226,10 @@ export default class AddressesStore extends Store {
     }
   }
 
-  refreshAddressesFromDb: PublicDeriverWithCachedMeta => Promise<void> = async (
+  refreshAddressesFromDb: PublicDeriver<> => Promise<void> = async (
     publicDeriver
   ) => {
-    const withHasUtxoChains = asHasUtxoChains(publicDeriver.self);
+    const withHasUtxoChains = asHasUtxoChains(publicDeriver);
     if (withHasUtxoChains == null) {
       await this.allAddressesForDisplay.refreshAddressesFromDb(publicDeriver);
     } else {
@@ -279,6 +289,21 @@ export default class AddressesStore extends Store {
       baseAddresses: addresses,
       invertFilter: false,
     });
+  }
+
+  _createAddressIfNeeded: {|
+    publicDeriver: PublicDeriver<>,
+    genAddresses: () => Promise<Array<StandardAddress>>,
+  |} => Promise<Array<StandardAddress>> = async (request) => {
+    const addresses = await request.genAddresses();
+    const last = addresses[addresses.length - 1];
+    if (last == null) return addresses;
+
+    if (last.isUsed) {
+      await this._baseCreateAddress(request.publicDeriver);
+      return request.genAddresses(); // refresh after creating new address
+    }
+    return addresses;
   }
 
   isActiveTab: ($Keys<typeof RECEIVE_ROUTES>, PublicDeriverWithCachedMeta) => boolean = (
