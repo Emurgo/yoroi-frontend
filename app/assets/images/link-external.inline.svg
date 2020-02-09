@@ -9,11 +9,8 @@
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="1-Intro" transform="translate(-819.000000, -612.000000)">
             <g id="link" transform="translate(817.000000, 610.000000)">
-                <mask id="mask-link-external" fill="white">
-                    <use xlink:href="#path-1"></use>
-                </mask>
                 <g id="Rectangle" opacity="0"></g>
-                <g id="redirect-copy" opacity="0.5" mask="url(#mask-2)" fill="#4A4A4A">
+                <g id="redirect-copy" opacity="0.5" fill="#4A4A4A">
                     <g transform="translate(3.000000, 2.000000)" id="Path">
                         <polygon stroke="#4A4A4A" stroke-width="0.5" points="11.7 13 11.7 6.05731901 10.8642857 6.89303329 10.8642857 12.1642857 0.835714286 12.1642857 0.835714286 2.13571429 5.9263404 2.13571429 6.76205469 1.3 0 1.3 0 13"></polygon>
                         <polygon stroke="none" points="13 0 9.1 0 10.504 1.404 5.2 6.708 6.292 7.8 11.596 2.496 13 3.9"></polygon>
