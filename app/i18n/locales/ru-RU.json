@@ -509,7 +509,7 @@
   "wallet.settings.name.label": "Имя кошелька",
   "wallet.settings.passwordLastUpdated": "Последнее обновление {lastUpdated}",
   "wallet.settings.resync.buttonLabel": "Синхронизировать кошелек",
-  "wallet.settings.resync.explanation": "If you are experiencing issues with your wallet, or think you have an incorrect balance or transaction history, you can delete the local data stored by Yoroi and resync with the blockchain.",
+  "wallet.settings.resync.explanation": "Если у вас возникли проблемы с кошельком или вы считаете, что у вас неверный баланс или история транзакций, вы можете удалить локальные данные хранящиеся в Yoroi и повторно синхронизировать их с блокчейном.",
   "wallet.settings.resync.label": "Синхронизировать кошелек c блокчейном",
   "wallet.settings.unchangedPassword": "Пароль не менялся с момента создания кошелька",
   "wallet.staking.pool.unknownLabel": "Неизвестный пул",
