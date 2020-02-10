@@ -36,7 +36,7 @@
   "api.errors.unusedAddressesError": "Вы не можете генерировать более 20 последовательных неиспользованных адресов.",
   "api.errors.updateAdaTxsHistoryError": "Ошибка при обновлении истории транзакций Ada.",
   "api.errors.updateAdaWalletError": "Ошибка при обновлении Ada кошелька.",
-  "app.errors.storageLoadError": "Failed to access storage. Yoroi needs to access to storage (\"IndexedDB\") to properly manage wallets. Your browser may either not support IndexedDB or it may be disabled due to your privacy settings (such as private browsing)",
+  "app.errors.storageLoadError": "Не удалось получить доступ к хранилищу. Для управления кошельками Yoroi необходим доступ к хранилищу (\"IndexedDB\"). Ваш браузер либо не поддерживает IndexedDB, либо доступ был отключен из-за настроек конфиденциальности (например, приватный просмотр)",
   "app.errors.unableToLoad": "Не удалось загрузить!",
   "app.errors.unexpectedError": "Случилось что-то непредвиденное. Пожалуйста, повторите попытку.",
   "app.errors.unknowError": "Неизвестная ошибка.",
