@@ -219,7 +219,7 @@
   "settings.support.reportProblem.link": "Richiesta di supporto",
   "settings.support.reportProblem.title": "Segnala un problema",
   "sidebar.settings": "Impostazioni",
-  "sidebar.transfer": "Portafogli di trasferimento",
+  "sidebar.transfer": "Trasferisci portafogli",
   "sidebar.wallets": "I miei portafogli",
   "testnet.label.message": "ATTENZIONE: questa è una rete {network}. ADA qui non ha alcun valore monetario. Per ulteriori informazioni, consulta le domande frequenti su {faqLink}",
   "testnet.shelley.label.message": "SEI SULLA RETE TESTNET ({network}).",
