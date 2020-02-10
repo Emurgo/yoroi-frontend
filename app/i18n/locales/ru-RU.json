@@ -387,7 +387,7 @@
   "wallet.dashboard.summary.rewardsTitle": "Всего Наград",
   "wallet.dashboard.summary.title": "Ваш итог",
   "wallet.dashboard.upcomingRewards.at": "в",
-  "wallet.dashboard.upcomingRewards.noRewards": "no rewards will be earned on this epoch",
+  "wallet.dashboard.upcomingRewards.noRewards": "в эту эпоху награды не будут заработаны",
   "wallet.dashboard.upcomingRewards.title": "Предстоящие Награды",
   "wallet.dashboard.warning.pendingTx": "Информационная панель делегирования будет обновлена как только ваша транзакция будет подтверждена",
   "wallet.delegation.transaction.approximationLabel": "Текущая приблизительная сумма награды, которую вы получите за эпоху:",
