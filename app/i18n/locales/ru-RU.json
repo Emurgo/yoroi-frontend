@@ -218,7 +218,7 @@
   "settings.support.reportProblem.content": "Если FAQ не решил возникший у Вас вопрос, пожалуйста, воспользуйтесь нашей опцией {supportRequestLink}.",
   "settings.support.reportProblem.link": "Запрос в службу поддержки",
   "settings.support.reportProblem.title": "Сообщить о проблеме",
-  "sidebar.settings": "Settings",
+  "sidebar.settings": "Настройки",
   "sidebar.transfer": "Transfer wallets",
   "sidebar.wallets": "My wallets",
   "testnet.label.message": "ПРЕДУПРЕЖДЕНИЕ: Это {network}. ADA не имеет денежной стоимости в {network}. Для получения дополнительной информации, ознакомьтесь с разделом часто задаваемых вопросов {faqLink}",
