@@ -386,7 +386,7 @@
   "wallet.dashboard.summary.note": "Less than you expected?",
   "wallet.dashboard.summary.rewardsTitle": "Всего Наград",
   "wallet.dashboard.summary.title": "Ваш итог",
-  "wallet.dashboard.upcomingRewards.at": "at",
+  "wallet.dashboard.upcomingRewards.at": "в",
   "wallet.dashboard.upcomingRewards.noRewards": "no rewards will be earned on this epoch",
   "wallet.dashboard.upcomingRewards.title": "Upcoming Rewards",
   "wallet.dashboard.warning.pendingTx": "Информационная панель делегирования будет обновлена как только ваша транзакция будет подтверждена",
