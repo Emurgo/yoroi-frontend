@@ -12,7 +12,7 @@
 
 12.6 **Ferramentas.** A empresa fornecerá aos usuários e operadores dos stake pools certas ferramentas projetadas para estimar a quantidade de recompensas que um usuário pode receber na rede de teste incentivada. O usuário entende que essas ferramentas são fornecidas apenas para fins ilustrativos e podem não ser precisas. A empresa não promete que a recompensa recebida corresponderá à quantia indicada pelas ferramentas ou pelos stake pools.
 
-12.7 **Prohibited Use.** User will not, and will not permit any other third party to use any device, software or routine to interfere with the proper function of the Incentivised Testnet. If there is a complaint or notice of violation, a User’s participation may be suspended without notice until resolved, and terminated if not resolved promptly.
+12.7 **Uso proibido.** O Usuário não deve e não permitirá que terceiros usem nenhum dispositivo, software ou rotina para interferir no bom funcionamento do Incentivized Testnet. Se houver uma reclamação ou aviso de violação, a participação de um Usuário poderá ser suspensa sem aviso prévio até que seja resolvida e encerrada se não for resolvida imediatamente.
 
 12.8 **Warranty.** The Service are provided to User on an "as is" and "as available" basis and all warranties, express, implied, statutory or otherwise, with respect to the Service are hereby excluded. User acknowledges that the Incentivized Testnet may not operate properly and that it may contain errors, design flaws or other issues. User’s use of the Incentivized Testnet remains at User’s risk and discretion. EMURGO reserves the right to restart the Incentivised Testnet and reverse all or some Rewards in the case of errors and/or malicious behaviour in the system.
 
