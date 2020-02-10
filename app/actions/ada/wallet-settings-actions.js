@@ -1,25 +1,25 @@
 // @flow
 import { AsyncAction, Action } from '../lib/Action';
-import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import type { WalletWithCachedMeta } from '../../stores/toplevel/WalletStore';
 
 export default class WalletSettingsActions {
   cancelEditingWalletField: Action<void> = new Action();
   startEditingWalletField: Action<{| field: string |}> = new Action();
   stopEditingWalletField: Action<void> = new Action();
   renamePublicDeriver: AsyncAction<{|
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
     newName: string,
   |}> = new AsyncAction();
   renameConceptualWallet: AsyncAction<{|
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
     newName: string,
   |}> = new AsyncAction();
   updateSigningPassword: AsyncAction<{|
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
     oldPassword: string,
     newPassword: string
   |}> = new AsyncAction();
   resyncHistory: AsyncAction<{|
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
   |}> = new AsyncAction();
 }

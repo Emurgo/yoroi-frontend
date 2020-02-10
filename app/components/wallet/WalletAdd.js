@@ -5,6 +5,7 @@ import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import classnames from 'classnames';
 
 import CustomTooltip from '../widgets/CustomTooltip';
+import MainCards from './add/MainCards';
 import LogoYoroiIcon from '../../assets/images/yoroi-logo-white.inline.svg';
 import LogoYoroiShelleyTestnetIcon from '../../assets/images/yoroi-logo-shelley-testnet-white.inline.svg';
 import SettingsIcon from '../../assets/images/top-bar/setting-active.inline.svg';
@@ -12,7 +13,7 @@ import DaedalusIcon from '../../assets/images/top-bar/daedalus-migration.inline.
 
 import styles from './WalletAdd.scss';
 
-import environmnent from '../../environment';
+import environment from '../../environment';
 
 const messages = defineMessages({
   title: {
@@ -22,30 +23,6 @@ const messages = defineMessages({
   subTitle: {
     id: 'wallet.add.page.subtitle.label',
     defaultMessage: '!!!Yoroi light wallet for Cardano',
-  },
-  connectToHWTitle: {
-    id: 'wallet.add.page.hw.title',
-    defaultMessage: '!!!Connect to hardware wallet',
-  },
-  connectToHWTooltip: {
-    id: 'wallet.add.page.hw.tooltip',
-    defaultMessage: '!!!Create or restore a Yoroi wallet<br/>using a Ledger or Trezor hardware wallet.',
-  },
-  createTitle: {
-    id: 'wallet.add.page.create.title',
-    defaultMessage: '!!!Create wallet',
-  },
-  createTooltip: {
-    id: 'wallet.add.page.create.tooltip',
-    defaultMessage: '!!!Generate a new 15-word recovery phrase<br/>and create a Yoroi wallet.',
-  },
-  restoreTitle: {
-    id: 'wallet.add.page.restore.title',
-    defaultMessage: '!!!Restore wallet',
-  },
-  restoreTooltip: {
-    id: 'wallet.add.page.restore.tooltip',
-    defaultMessage: '!!!Enter a 15-word recovery phrase<br/>to restore an already-existing Yoroi wallet,<br/>or import an existing Yoroi paper wallet.',
   },
   transferFundsTitle: {
     id: 'wallet.add.page.daedalusTransfer.title',
@@ -63,7 +40,6 @@ type Props = {|
   +onHardwareConnect: void => void,
   +onSettings: void => void,
   +onDaedalusTransfer: void => void,
-  +classicTheme: boolean,
 |};
 
 @observer
@@ -75,19 +51,16 @@ export default class WalletAdd extends Component<Props> {
   render() {
     const { intl } = this.context;
     const {
-      onCreate,
-      onRestore,
-      onHardwareConnect,
       onSettings,
       onDaedalusTransfer,
     } = this.props;
 
     const componentStyle = classnames([
       styles.component,
-      environmnent.isShelley() ? styles.shelleyTestnet : null
+      environment.isShelley() ? styles.shelleyTestnet : null
     ]);
 
-    const LogoIcon = environmnent.isShelley() ? LogoYoroiShelleyTestnetIcon : LogoYoroiIcon;
+    const LogoIcon = environment.isShelley() ? LogoYoroiShelleyTestnetIcon : LogoYoroiIcon;
 
     return (
       <div className={componentStyle}>
@@ -110,72 +83,11 @@ export default class WalletAdd extends Component<Props> {
             </div>
             {/* Right block  */}
             <div className={styles.heroRight}>
-              <div className={styles.heroCardsList}>
-                {/* Connect to hardware wallet */}
-                {!environmnent.isShelley() &&
-                  <button
-                    type="button"
-                    className="WalletAdd_btnConnectHW"
-                    onClick={onHardwareConnect}
-                  >
-                    <div className={styles.heroCardsItem}>
-                      <div className={classnames([styles.heroCardsItemBg, styles.bgConnectHW])} />
-                      <div className={styles.heroCardsItemTitle}>
-                        {intl.formatMessage(messages.connectToHWTitle)}
-                        <div className={styles.tooltip}>
-                          <CustomTooltip
-                            toolTip={
-                              <div><FormattedHTMLMessage {...messages.connectToHWTooltip} /></div>
-                            }
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </button>
-                }
-                {/* Create wallet */}
-                <button
-                  type="button"
-                  className="WalletAdd_btnCreateWallet"
-                  onClick={onCreate}
-                >
-                  <div className={styles.heroCardsItem}>
-                    <div className={classnames([styles.heroCardsItemBg, styles.bgCreateWallet])} />
-                    <div className={styles.heroCardsItemTitle}>
-                      {intl.formatMessage(messages.createTitle)}
-                      <div className={styles.tooltip}>
-                        <CustomTooltip
-                          toolTip={
-                            <div><FormattedHTMLMessage {...messages.createTooltip} /></div>
-                          }
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </button>
-                {/* Restore wallet */}
-                <button
-                  type="button"
-                  className="WalletAdd_btnRestoreWallet"
-                  onClick={onRestore}
-                >
-                  <div className={styles.heroCardsItem}>
-                    <div
-                      className={classnames([styles.heroCardsItemBg, styles.bgRestoreWallet])}
-                    />
-                    <div className={styles.heroCardsItemTitle}>
-                      {intl.formatMessage(messages.restoreTitle)}
-                      <div className={styles.tooltip}>
-                        <CustomTooltip
-                          toolTip={
-                            <div><FormattedHTMLMessage {...messages.restoreTooltip} /></div>
-                          }
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </button>
-              </div>
+              <MainCards
+                onCreate={this.props.onCreate}
+                onRestore={this.props.onRestore}
+                onHardwareConnect={this.props.onHardwareConnect}
+              />
               {/* Transfer funds from a Daedalus wallet to Yoroi */}
               <button
                 type="button"
@@ -202,5 +114,4 @@ export default class WalletAdd extends Component<Props> {
       </div>
     );
   }
-
 }

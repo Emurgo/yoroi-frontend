@@ -8,7 +8,7 @@ import ReceiveWithNavigation from '../../components/wallet/layouts/ReceiveWithNa
 export default class Receive extends Component<InjectedContainerProps> {
 
   render() {
-    const publicDeriver = this.props.stores.substores.ada.wallets.selected;
+    const publicDeriver = this.props.stores.wallets.selected;
     if (publicDeriver == null) throw new Error(`${nameof(Receive)} no public deriver`);
 
     return (

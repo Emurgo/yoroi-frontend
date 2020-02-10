@@ -12,8 +12,8 @@ import DaedalusTransferFormPage from './DaedalusTransferFormPage';
 import DaedalusTransferMasterKeyFormPage from './DaedalusTransferMasterKeyFormPage';
 import DaedalusTransferWaitingPage from './DaedalusTransferWaitingPage';
 import DaedalusTransferErrorPage from './DaedalusTransferErrorPage';
+import type { WalletWithCachedMeta } from '../../stores/toplevel/WalletStore';
 import environment from '../../environment';
-import { ROUTES } from '../../routes-config';
 import config from '../../config';
 import { TransferStatus } from '../../types/TransferTypes';
 
@@ -26,10 +26,13 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     intl: intlShape.isRequired,
   };
 
-  goToCreateWallet = () => {
-    this._getRouter().goToRoute.trigger({
-      route: ROUTES.WALLETS.ADD
-    });
+  componentWillUnmount() {
+    this.cancelTransferFunds();
+  }
+
+  goToCreateWallet: WalletWithCachedMeta => void = (publicDeriver) => {
+    const wallets = this._getWalletsStore();
+    wallets.goToWalletRoute(publicDeriver.self);
   }
 
   startTransferFunds = () => {
@@ -64,7 +67,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     const walletsStore = this._getWalletsStore();
     const publicDeriver = walletsStore.selected;
     if (publicDeriver == null) {
-      throw new Error('transferFunds no wallet selected');
+      throw new Error(`${nameof(this.setupTransferFundsWithMasterKey)} no wallet selected`);
     }
     await this._getDaedalusTransferActions().setupTransferFundsWithMasterKey.trigger({
       ...payload,
@@ -77,7 +80,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     const walletsStore = this._getWalletsStore();
     const publicDeriver = walletsStore.selected;
     if (publicDeriver == null) {
-      throw new Error('transferFunds no wallet selected');
+      throw new Error(`${nameof(this.transferFunds)} no wallet selected`);
     }
     // broadcast transfer transaction then call continuation
     await this._getDaedalusTransferActions().transferFunds.trigger({
@@ -110,6 +113,11 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     const { stores } = this.props;
     const { profile } = stores;
     const wallets = this._getWalletsStore();
+    const adaWallets = this._getAdaWalletsStore();
+    const selected = wallets.selected;
+    if (selected == null) {
+      throw new Error(`${nameof(DaedalusTransferPage)} no wallet selected`);
+    }
     const daedalusTransfer = this._getDaedalusTransferStore();
 
     switch (daedalusTransfer.status) {
@@ -117,7 +125,9 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
         return (
           <TransferLayout>
             <TransferInstructionsPage
-              onFollowInstructionsPrerequisites={this.goToCreateWallet}
+              onFollowInstructionsPrerequisites={
+                () => this.goToCreateWallet(selected)
+              }
               onConfirm={this.startTransferFunds}
               onPaperConfirm={this.startTransferPaperFunds}
               onMasterKeyConfirm={this.startTransferMasterKey}
@@ -131,7 +141,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             <DaedalusTransferFormPage
               onSubmit={this.setupTransferFundsWithMnemonic}
               onBack={this.backToUninitialized}
-              mnemonicValidator={mnemonic => wallets.isValidMnemonic({
+              mnemonicValidator={mnemonic => adaWallets.isValidMnemonic({
                 mnemonic,
                 numberOfWords: config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT
               })}
@@ -147,7 +157,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
             <DaedalusTransferFormPage
               onSubmit={this.setupTransferFundsWithMnemonic}
               onBack={this.backToUninitialized}
-              mnemonicValidator={mnemonic => wallets.isValidPaperMnemonic({
+              mnemonicValidator={mnemonic => adaWallets.isValidPaperMnemonic({
                 mnemonic,
                 numberOfWords: config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT
               })}
@@ -177,7 +187,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
         );
       case TransferStatus.READY_TO_TRANSFER:
         if (daedalusTransfer.transferTx == null) {
-          return null; // TODO: throw error? Shoudln't happen
+          return null; // TODO: throw error? Shouldn't happen
         }
         return (
           <TransferLayout>
@@ -216,6 +226,10 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
   }
 
   _getWalletsStore() {
+    return this.props.stores.wallets;
+  }
+
+  _getAdaWalletsStore() {
     return this.props.stores.substores[environment.API].wallets;
   }
 

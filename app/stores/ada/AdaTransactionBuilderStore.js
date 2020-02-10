@@ -146,7 +146,7 @@ export default class AdaTransactionBuilderStore extends Store {
       // Note: will not trigger if re-assigned same value
       toJS(this.plannedTxInfo),
       this.shouldSendAll,
-      this.stores.substores.ada.wallets.selected,
+      this.stores.wallets.selected,
       // num tx sync changed => valid inputs may have changed
       this.stores.substores.ada.transactions.totalAvailable,
       // need to recalculate when there are no more pending transactions
@@ -177,7 +177,7 @@ export default class AdaTransactionBuilderStore extends Store {
       this.createUnsignedTx.reset();
       this.plannedTx = null;
     });
-    const publicDeriver = this.stores.substores.ada.wallets.selected;
+    const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver || !this._canCompute()) {
       return;
     }

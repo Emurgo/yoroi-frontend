@@ -118,7 +118,7 @@ export const Routes = (
         path={ROUTES.NOTICE_BOARD.ROOT}
         component={(props) => <NoticeBoardPage {...props} stores={stores} actions={actions} />}
       />
-      <Redirect to={ROUTES.WALLETS.ADD} />
+      <Redirect to={ROUTES.MY_WALLETS} />
     </Switch>
   </div>
 );

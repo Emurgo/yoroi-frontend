@@ -2,11 +2,14 @@
 import { observable, action, computed, runInAction } from 'mobx';
 import BigNumber from 'bignumber.js';
 import { debounce, } from 'lodash';
-import Store from './Store';
+import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import { buildRoute, matchRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import environment from '../../environment';
+import config from '../../config';
+import globalMessages from '../../i18n/global-messages';
+import type { Notification } from '../../types/notificationType';
 import type {
   CreateWalletFunc,
   GetWalletsFunc, RestoreWalletFunc,
@@ -16,21 +19,39 @@ import type {
 import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import {
+  asGetSigningKey,
+  asGetPublicKey
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   IGetLastSyncInfoResponse,
+  WalletAccountNumberPlate,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
-import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
 import { Logger, stringifyError } from '../../utils/logging';
+import type { AssuranceMode, } from '../../types/transactionAssuranceTypes';
+import { createAccountPlate } from '../../api/ada/lib/cardanoCrypto/plate';
+import { assuranceModes, } from '../../config/transactionAssuranceConfig';
+
+export type WalletWithCachedMeta = {|
+  self: PublicDeriver<>,
+  plate: null | WalletAccountNumberPlate,
+  publicDeriverName: string,
+  conceptualWalletName: string,
+  amount: null | BigNumber, // TODO: remove this
+  assuranceMode: AssuranceMode,
+  signingKeyUpdateDate: null | Date,
+  lastSyncInfo: IGetLastSyncInfoResponse,
+|};
 
 type GroupedWallets = {|
-  publicDerivers: Array<PublicDeriverWithCachedMeta>;
+  publicDerivers: Array<WalletWithCachedMeta>;
   conceptualWallet: ConceptualWallet;
 |};
 
 function groupWallets(
-  publicDerivers: Array<PublicDeriverWithCachedMeta>,
+  publicDerivers: Array<WalletWithCachedMeta>,
 ): Array<GroupedWallets> {
   const pairingMap = new Map();
   for (const publicDeriver of publicDerivers) {
@@ -59,8 +80,8 @@ export default class WalletStore extends Store {
   WALLET_REFRESH_INTERVAL: number = environment.walletRefreshInterval;
   ON_VISIBLE_DEBOUNCE_WAIT: number = 1000;
 
-  @observable publicDerivers: Array<PublicDeriverWithCachedMeta>;
-  @observable selected: null | PublicDeriverWithCachedMeta;
+  @observable publicDerivers: Array<WalletWithCachedMeta>;
+  @observable selected: null | WalletWithCachedMeta;
   @observable getInitialWallets: Request<GetWalletsFunc>;
   @observable createWalletRequest: Request<CreateWalletFunc>;
   @observable generateWalletRecoveryPhraseRequest: Request<GenerateWalletRecoveryPhraseFunc>;
@@ -70,8 +91,11 @@ export default class WalletStore extends Store {
   setup(): void {
     super.setup();
     this.publicDerivers = [];
-    const { wallets } = this.actions;
+    const { wallets, walletBackup } = this.actions;
     wallets.unselectWallet.listen(this._unsetActiveWallet);
+    walletBackup.finishWalletBackup.listen(this._finishCreation);
+    wallets.updateBalance.listen(this._updateBalance);
+    wallets.updateLastSync.listen(this._updateLastSync);
     setInterval(this._pollRefresh, this.WALLET_REFRESH_INTERVAL);
     // $FlowFixMe built-in types can't handle visibilitychange
     document.addEventListener('visibilitychange', debounce(this._pollRefresh, this.ON_VISIBLE_DEBOUNCE_WAIT));
@@ -81,7 +105,7 @@ export default class WalletStore extends Store {
     ]);
   }
 
-  _create: {|
+  create: {|
     name: string,
     password: string,
   |} => Promise<void> = async (params) => {
@@ -102,16 +126,15 @@ export default class WalletStore extends Store {
     newWallet,
   ) => {
     // set the first created as the result
-    const newWithCachedData: Array<PublicDeriverWithCachedMeta> = [];
+    const newWithCachedData: Array<WalletWithCachedMeta> = [];
     for (const newPublicDeriver of newWallet.publicDerivers) {
-      const withCache = await PublicDeriverWithCachedMeta.fromPublicDeriver(newPublicDeriver);
+      const withCache = await fromPublicDeriver(newPublicDeriver);
       newWithCachedData.push(withCache);
     }
     this.actions.dialogs.closeActiveDialog.trigger();
     this.goToWalletRoute(newWithCachedData[0].self);
 
-    const { wallets } = this.stores.substores[environment.API];
-    wallets.showWalletCreatedNotification();
+    this.showWalletCreatedNotification();
 
     for (const pubDeriver of newWithCachedData) {
       this.registerObserversForNewWallet(pubDeriver);
@@ -127,7 +150,7 @@ export default class WalletStore extends Store {
   _finishCreation: void => Promise<void> = async () => {
     const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
     if (persistentDb == null) {
-      throw new Error('_finishCreation db not loaded. Should never happen');
+      throw new Error(`${nameof(this._finishCreation)} db not loaded. Should never happen`);
     }
     const createdWallet = await this.createWalletRequest.execute({
       db: persistentDb,
@@ -135,7 +158,7 @@ export default class WalletStore extends Store {
       walletPassword: this.stores.walletBackup.password,
       recoveryPhrase: this.stores.walletBackup.recoveryPhrase.join(' '),
     }).promise;
-    if (!createdWallet) throw new Error('_finishCreation should never happen');
+    if (!createdWallet) throw new Error(`${nameof(this._finishCreation)} should never happen`);
 
     await this._baseAddNewWallet(createdWallet);
 
@@ -152,7 +175,7 @@ export default class WalletStore extends Store {
 
     const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
     if (persistentDb == null) {
-      throw new Error('_finishCreation db not loaded. Should never happen');
+      throw new Error(`${nameof(this.restore)} db not loaded. Should never happen`);
     }
     const createdWallet = await this.restoreRequest.execute({
       db: persistentDb,
@@ -189,7 +212,7 @@ export default class WalletStore extends Store {
     );
   }
 
-  @computed get first(): null | PublicDeriverWithCachedMeta {
+  @computed get first(): null | WalletWithCachedMeta {
     return this.publicDerivers.length === 0
       ? null
       : this.publicDerivers[0];
@@ -227,7 +250,7 @@ export default class WalletStore extends Store {
   }
 
   async refreshWallet(
-    publicDeriver: PublicDeriverWithCachedMeta
+    publicDeriver: WalletWithCachedMeta,
   ): Promise<void> {
     try {
       const substore = this.stores.substores[environment.API];
@@ -243,7 +266,7 @@ export default class WalletStore extends Store {
   addHwWallet: PublicDeriver<> => Promise<void> = async (
     publicDeriver: PublicDeriver<>,
   ): Promise<void> => {
-    const withCache = await PublicDeriverWithCachedMeta.fromPublicDeriver(publicDeriver);
+    const withCache = await fromPublicDeriver(publicDeriver);
     // set the first created as the result
     runInAction(() => {
       this.publicDerivers.push(withCache);
@@ -258,7 +281,7 @@ export default class WalletStore extends Store {
 
   @action.bound _updateBalance(request: {|
     balance: BigNumber,
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
   |}): void {
     request.publicDeriver.amount = request.balance.dividedBy(
       LOVELACES_PER_ADA
@@ -268,7 +291,7 @@ export default class WalletStore extends Store {
   @action.bound
   _updateLastSync(request: {|
     lastSync: IGetLastSyncInfoResponse,
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
   |}): void {
     request.publicDeriver.lastSyncInfo = request.lastSync;
   }
@@ -277,16 +300,16 @@ export default class WalletStore extends Store {
   @action restoreWalletsFromStorage: void => Promise<void> = async () => {
     const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
     if (persistentDb == null) {
-      throw new Error('restoreWalletsFromStorage db not loaded. Should never happen');
+      throw new Error(`${nameof(this.restoreWalletsFromStorage)} db not loaded. Should never happen`);
     }
     const result = await this.getInitialWallets.execute({
       db: persistentDb,
     }).promise;
     if (result == null || result.length === 0) return;
 
-    const newWithCachedData: Array<PublicDeriverWithCachedMeta> = [];
+    const newWithCachedData: Array<WalletWithCachedMeta> = [];
     for (const newPublicDeriver of result) {
-      const withCache = await PublicDeriverWithCachedMeta.fromPublicDeriver(newPublicDeriver);
+      const withCache = await fromPublicDeriver(newPublicDeriver);
       newWithCachedData.push(withCache);
     }
     for (const publicDeriver of newWithCachedData) {
@@ -302,7 +325,7 @@ export default class WalletStore extends Store {
     });
   };
 
-  @action registerObserversForNewWallet: PublicDeriverWithCachedMeta => void = (
+  @action registerObserversForNewWallet: WalletWithCachedMeta => void = (
     publicDeriver
   ) => {
     const stores = this.stores.substores[environment.API];
@@ -322,7 +345,7 @@ export default class WalletStore extends Store {
 
   // =================== ACTIVE WALLET ==================== //
 
-  @action _setActiveWallet: {| wallet: PublicDeriverWithCachedMeta |} => void = (
+  @action _setActiveWallet: {| wallet: WalletWithCachedMeta |} => void = (
     { wallet }
   ) => {
     this.selected = wallet;
@@ -386,8 +409,6 @@ export default class WalletStore extends Store {
           // The wallet exists, we are done
           this._setActiveWallet({ wallet: publicDeriverForRoute });
         } else if (hasAnyPublicDeriver) {
-          // There is no wallet with given id -> pick first wallet
-          this._setActiveWallet({ wallet: this.publicDerivers[0] });
           if (this.selected != null) {
             this.goToWalletRoute(this.selected.self);
           }
@@ -404,4 +425,81 @@ export default class WalletStore extends Store {
     });
   };
 
+  // =================== NOTIFICATION ==================== //
+  showLedgerNanoWalletIntegratedNotification: void => void = (): void => {
+    const notification: Notification = {
+      id: globalMessages.ledgerNanoSWalletIntegratedNotificationMessage.id,
+      message: globalMessages.ledgerNanoSWalletIntegratedNotificationMessage,
+      duration: config.wallets.WALLET_CREATED_NOTIFICATION_DURATION,
+    };
+    this.actions.notifications.open.trigger(notification);
+  }
+
+  showTrezorTWalletIntegratedNotification: void => void = (): void => {
+    const notification: Notification = {
+      id: globalMessages.trezorTWalletIntegratedNotificationMessage.id,
+      message: globalMessages.trezorTWalletIntegratedNotificationMessage,
+      duration: config.wallets.WALLET_CREATED_NOTIFICATION_DURATION,
+    };
+    this.actions.notifications.open.trigger(notification);
+  }
+
+  showWalletCreatedNotification: void => void = (): void => {
+    const notification: Notification = {
+      id: globalMessages.walletCreatedNotificationMessage.id,
+      message: globalMessages.walletCreatedNotificationMessage,
+      duration: config.wallets.WALLET_CREATED_NOTIFICATION_DURATION,
+    };
+    this.actions.notifications.open.trigger(notification);
+  }
+
+  showWalletRestoredNotification: void => void = (): void => {
+    const notification: Notification = {
+      id: globalMessages.walletRestoredNotificationMessage.id,
+      message: globalMessages.walletRestoredNotificationMessage,
+      duration: config.wallets.WALLET_RESTORED_NOTIFICATION_DURATION,
+    };
+    this.actions.notifications.open.trigger(notification);
+  }
+}
+
+async function fromPublicDeriver(
+  publicDeriver: PublicDeriver<>,
+): Promise<WalletWithCachedMeta> {
+  const withPubKey = asGetPublicKey(publicDeriver);
+
+  let plate = null;
+  if (withPubKey != null) {
+    const publicKey = await withPubKey.getPublicKey();
+    if (publicKey.IsEncrypted) {
+      throw new Error('fromPublicDeriver unexpected encrypted public key');
+    }
+    plate = createAccountPlate(publicKey.Hash);
+  }
+
+  const publicDeriverInfo = await publicDeriver.getFullPublicDeriverInfo();
+  const conceptualWalletInfo = await publicDeriver
+    .getParent()
+    .getFullConceptualWalletInfo();
+
+  let signingKeyUpdateDate = null;
+  {
+    const withSigningKey = asGetSigningKey(publicDeriver);
+    if (withSigningKey) {
+      const key = await withSigningKey.getSigningKey();
+      signingKeyUpdateDate = key.row.PasswordLastUpdate;
+    }
+  }
+
+  const lastSyncInfo = await publicDeriver.getLastSyncInfo();
+  return {
+    self: publicDeriver,
+    plate,
+    publicDeriverName: publicDeriverInfo.Name,
+    conceptualWalletName: conceptualWalletInfo.Name,
+    amount: null,
+    assuranceMode: assuranceModes.NORMAL,
+    signingKeyUpdateDate,
+    lastSyncInfo,
+  };
 }

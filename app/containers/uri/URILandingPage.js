@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { ROUTES } from '../../routes-config';
-import environment from '../../environment';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import URILandingDialogContainer from './URILandingDialogContainer';
 
@@ -18,7 +17,7 @@ export default class URILandingPage extends Component<Props> {
   };
 
   onConfirm = () => {
-    const { wallets } = this.props.stores.substores[environment.API];
+    const { wallets } = this.props.stores;
     let params = {};
     if (wallets.hasAnyWallets && wallets.first) {
       const firstWallet = wallets.first;

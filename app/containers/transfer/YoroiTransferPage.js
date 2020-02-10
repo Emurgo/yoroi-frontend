@@ -20,9 +20,9 @@ import YoroiTransferErrorPage from './YoroiTransferErrorPage';
 import YoroiTransferSuccessPage from './YoroiTransferSuccessPage';
 import YoroiTransferStartPage from '../../components/transfer/YoroiTransferStartPage';
 import environment from '../../environment';
-import { ROUTES } from '../../routes-config';
 import config from '../../config';
 import { formattedWalletAmount } from '../../utils/formatters';
+import type { WalletWithCachedMeta } from '../../stores/toplevel/WalletStore';
 import { TransferKind, TransferStatus, TransferSource, } from '../../types/TransferTypes';
 
 // Stay this long on the success page, then jump to the wallet transactions page
@@ -40,10 +40,9 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
     yoroiTransfer.reset();
   }
 
-  goToCreateWallet = () => {
-    this._getRouter().goToRoute.trigger({
-      route: ROUTES.WALLETS.ADD
-    });
+  goToCreateWallet: WalletWithCachedMeta => void = (publicDeriver) => {
+    const wallets = this._getWalletsStore();
+    wallets.goToWalletRoute(publicDeriver.self);
   }
 
   startLegacyTransferFunds: void => void = () => {
@@ -149,6 +148,11 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
     const { stores } = this.props;
     const { profile } = stores;
     const wallets = this._getWalletsStore();
+    const adaWallets = this._getAdaWalletsStore();
+    const selected = wallets.selected;
+    if (selected == null) {
+      throw new Error(`${nameof(YoroiTransferPage)} no wallet selected`);
+    }
     const yoroiTransfer = this._getYoroiTransferStore();
 
     switch (yoroiTransfer.status) {
@@ -162,7 +166,9 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
               onLegacyLedger={this.startTransferLegacyLedgerFunds}
               onLegacyTrezor={this.startTransferLegacyTrezorFunds}
               classicTheme={profile.isClassicTheme}
-              onFollowInstructionsPrerequisites={this.goToCreateWallet}
+              onFollowInstructionsPrerequisites={
+                () => this.goToCreateWallet(selected)
+              }
               disableTransferFunds={yoroiTransfer.disableTransferFunds}
             />
           </TransferLayout>
@@ -173,7 +179,7 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
             <YoroiTransferFormPage
               onSubmit={this.setupTransferFundsWithMnemonic}
               onBack={this.backToUninitialized}
-              mnemonicValidator={mnemonic => wallets.isValidMnemonic({
+              mnemonicValidator={mnemonic => adaWallets.isValidMnemonic({
                 mnemonic,
                 numberOfWords: config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT
               })}
@@ -189,7 +195,7 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
             <YoroiPaperWalletFormPage
               onSubmit={this.setupTransferFundsWithPaperMnemonic}
               onBack={this.backToUninitialized}
-              mnemonicValidator={mnemonic => wallets.isValidPaperMnemonic({
+              mnemonicValidator={mnemonic => adaWallets.isValidPaperMnemonic({
                 mnemonic,
                 numberOfWords: config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT
               })}
@@ -216,10 +222,10 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
         return (
           <TransferLayout>
             <HardwareTransferFormPage
-              onSubmit={this.setupTransferFundsWithMnemonic} // TODO: hw-specific
+              onSubmit={this.setupTransferFundsWithMnemonic}
               onBack={this.backToUninitialized}
               // different hardware wallet support different lengths
-              // so we just allow any lenght as long as the mnemonic is valid
+              // so we just allow any length as long as the mnemonic is valid
               mnemonicValidator={mnemonic => validateMnemonic(mnemonic)}
               validWords={validWords}
               classicTheme={profile.isClassicTheme}
@@ -250,7 +256,7 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
         );
       case TransferStatus.READY_TO_TRANSFER:
         if (yoroiTransfer.transferTx == null) {
-          return null; // TODO: throw error? Shoudln't happen
+          return null; // TODO: throw error? Shouldn't happen
         }
         return (
           <TransferLayout>
@@ -288,7 +294,7 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
           </TransferLayout>
         );
       default:
-        throw new Error('YoroiTransferPage Unexpected state ' + yoroiTransfer.status);
+        throw new Error(`${nameof(YoroiTransferPage)} Unexpected state ${yoroiTransfer.status}`);
     }
   }
 
@@ -297,6 +303,10 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
   }
 
   _getWalletsStore() {
+    return this.props.stores.wallets;
+  }
+
+  _getAdaWalletsStore() {
     return this.props.stores.substores[environment.API].wallets;
   }
 

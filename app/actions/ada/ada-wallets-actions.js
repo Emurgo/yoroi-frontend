@@ -1,12 +1,9 @@
 // @flow
-import BigNumber from 'bignumber.js';
-import { AsyncAction, Action } from '../lib/Action';
+import { AsyncAction, } from '../lib/Action';
 import type { BaseSignRequest } from '../../api/ada/transactions/types';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import type {
-  IGetLastSyncInfoResponse,
-} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+
+import type { WalletWithCachedMeta } from '../../stores/toplevel/WalletStore';
 
 // ======= WALLET ACTIONS =======
 
@@ -20,14 +17,6 @@ export default class AdaWalletsActions {
   sendMoney: AsyncAction<{|
     signRequest: BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>,
     password: string,
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
   |}> = new AsyncAction();
-  updateBalance: Action<{|
-    balance: BigNumber,
-    publicDeriver: PublicDeriverWithCachedMeta,
-  |}> = new Action();
-  updateLastSync: Action<{|
-    lastSync: IGetLastSyncInfoResponse,
-    publicDeriver: PublicDeriverWithCachedMeta,
-  |}> = new Action();
 }

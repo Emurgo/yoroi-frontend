@@ -31,7 +31,7 @@ export default class TopbarStore extends Store {
   }
 
   @computed get categories(): Array<Category> {
-    const { wallets } = this.stores.substores[environment.API];
+    const { wallets } = this.stores;
 
     let isTrezorT = false;
     let isNano = false;

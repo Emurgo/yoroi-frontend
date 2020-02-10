@@ -1,15 +1,15 @@
 // @flow
 import { AsyncAction, Action } from '../lib/Action';
-import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import type { WalletWithCachedMeta } from '../../stores/toplevel/WalletStore';
 
 // ======= TRANSACTIONS ACTIONS =======
 
 export type TransactionRowsToExportRequest = void;
 
 export default class TransactionsActions {
-  loadMoreTransactions: AsyncAction<PublicDeriverWithCachedMeta> = new AsyncAction();
+  loadMoreTransactions: AsyncAction<WalletWithCachedMeta> = new AsyncAction();
   exportTransactionsToFile: AsyncAction<{|
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
     exportRequest: TransactionRowsToExportRequest,
   |}> = new AsyncAction();
   closeExportTransactionDialog: Action<void> = new Action();

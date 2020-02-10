@@ -16,7 +16,7 @@ import {
 import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import type { WalletWithCachedMeta } from '../toplevel/WalletStore';
 import type { PoolRequest } from '../../api/ada/lib/storage/bridge/delegationUtils';
 
 export default class DelegationTransactionStore extends Store {
@@ -36,7 +36,7 @@ export default class DelegationTransactionStore extends Store {
   // eslint-disable-next-line no-restricted-syntax
   _updateTxBuilderReaction = reaction(
     () => [
-      this.stores.substores.ada.wallets.selected,
+      this.stores.wallets.selected,
       // num tx sync changed => valid inputs may have changed
       this.stores.substores.ada.transactions.totalAvailable,
       // need to recalculate when there are no more pending transactions
@@ -66,7 +66,7 @@ export default class DelegationTransactionStore extends Store {
 
   @action
   _createTransaction: {|
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
     poolRequest: PoolRequest,
   |} => Promise<void> = async (request) => {
     const withUtxos = asGetAllUtxos(request.publicDeriver.self);
@@ -105,7 +105,7 @@ export default class DelegationTransactionStore extends Store {
   @action
   _signTransaction: {|
     password: string,
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
   |} => Promise<void> = async (request) => {
     const withSigning = (asGetSigningKey(request.publicDeriver.self));
     if (withSigning == null) {
@@ -133,13 +133,13 @@ export default class DelegationTransactionStore extends Store {
         password: request.password,
         sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
       },
-      refreshWallet: () => this.stores.substores[environment.API].wallets.refreshWallet(
+      refreshWallet: () => this.stores.wallets.refreshWallet(
         request.publicDeriver
       ),
     }).promise;
   }
 
-  _complete: PublicDeriverWithCachedMeta => void = (publicDeriver) => {
+  _complete: WalletWithCachedMeta => void = (publicDeriver) => {
     this.actions.dialogs.closeActiveDialog.trigger();
     this.goToDashboardRoute(publicDeriver.self);
   }

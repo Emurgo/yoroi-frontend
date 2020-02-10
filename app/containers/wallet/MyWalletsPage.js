@@ -24,26 +24,15 @@ import BigNumber from 'bignumber.js';
 import moment from 'moment';
 import NavBarAddButton from '../../components/topbar/NavBarAddButton';
 import NavWalletDetails from '../../components/topbar/NavWalletDetails';
-import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import type { WalletWithCachedMeta } from '../../stores/toplevel/WalletStore';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
+import globalMessages from '../../i18n/global-messages';
 import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 
 const messages = defineMessages({
-  title: {
-    id: 'myWallets.general.title',
-    defaultMessage: '!!!My wallets',
-  },
-  addressSingular: {
-    id: 'myWallets.wallets.addressSingular',
-    defaultMessage: '!!!address',
-  },
-  addressPlural: {
-    id: 'myWallets.wallets.addressPlural',
-    defaultMessage: '!!!addresses',
-  },
   walletSumInfo: {
     id: 'myWallets.wallets.sumInfoText',
-    defaultMessage: '!!!All wallets total balance considering rewards',
+    defaultMessage: '!!!Total wallet balance',
   }
 });
 
@@ -64,7 +53,7 @@ export default class MyWalletsPage extends Component<Props> {
     this.props.actions.wallets.unselectWallet.trigger();
   }
 
-  handleWalletNavItemClick: (string, PublicDeriverWithCachedMeta) => void = (
+  handleWalletNavItemClick: (string, WalletWithCachedMeta) => void = (
     page,
     publicDeriver
   ) => {
@@ -81,7 +70,7 @@ export default class MyWalletsPage extends Component<Props> {
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
     const sidebarContainer = (<SidebarContainer actions={actions} stores={stores} />);
 
-    const wallets = this.props.stores.substores.ada.wallets.publicDerivers;
+    const wallets = this.props.stores.wallets.publicDerivers;
 
     let utxoTotal = new BigNumber(0);
     for (const walletUtxoAmount of wallets.map(wallet => wallet.amount)) {
@@ -94,14 +83,16 @@ export default class MyWalletsPage extends Component<Props> {
 
 
     const navbarTitle = (
-      <NavBarTitle title={this.context.intl.formatMessage(messages.title)} />
+      <NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarWallets)} />
     );
 
     const navbarElement = (
       <NavBar
         title={navbarTitle}
-        // TODO: Add action onClick
-        walletPlate={<NavBarAddButton onClick={() => {} /* TODO */} />}
+        walletPlate={<NavBarAddButton onClick={
+          () => this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
+        }
+        />}
         walletDetails={
           <NavWalletDetails
             showDetails={false}
@@ -143,7 +134,7 @@ export default class MyWalletsPage extends Component<Props> {
   * with publicDerivers acting as sub-rows
   * but since we don't support multi-currency or multi-account yet we simplify the UI for now
   */
-  generateRow: PublicDeriverWithCachedMeta => Node = (publicDeriver) => {
+  generateRow: WalletWithCachedMeta => Node = (publicDeriver) => {
     const walletName = publicDeriver ? publicDeriver.conceptualWalletName : '';
 
     // TODO: should be sum of public derivers
@@ -189,7 +180,7 @@ export default class MyWalletsPage extends Component<Props> {
     );
   }
 
-  createSubrow: PublicDeriverWithCachedMeta => Node = (publicDeriver) => {
+  createSubrow: WalletWithCachedMeta => Node = (publicDeriver) => {
     const { intl } = this.context;
 
     // TODO: replace with wallet addresses
@@ -208,7 +199,7 @@ export default class MyWalletsPage extends Component<Props> {
           infoText={
             `${addressesLength} ${
               intl.formatMessage(addressesLength > 1 ?
-                messages.addressPlural : messages.addressSingular)}`
+                globalMessages.addressesLabel : globalMessages.addressLabel)}`
           }
           // TODO: This should be probably bound to an individual wallet
           onUpdateHideBalance={this.updateHideBalance}
@@ -233,7 +224,7 @@ export default class MyWalletsPage extends Component<Props> {
    * null => still calculating
    * value => done calculating
    */
-  getRewardBalance: PublicDeriverWithCachedMeta => null | void | BigNumber = (
+  getRewardBalance: WalletWithCachedMeta => null | void | BigNumber = (
     publicDeriver
   ) => {
     const delegationRequest = this.props.stores.substores.ada.delegation.getRequests(
@@ -249,7 +240,7 @@ export default class MyWalletsPage extends Component<Props> {
   }
 }
 
-function getWalletType(publicDeriver: PublicDeriverWithCachedMeta) {
+function getWalletType(publicDeriver: WalletWithCachedMeta) {
   const conceptualWallet = publicDeriver.self.getParent();
   if (isLedgerNanoWallet(conceptualWallet)) {
     return 'ledger';

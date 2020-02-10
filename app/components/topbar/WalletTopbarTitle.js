@@ -12,7 +12,7 @@ import WalletAccountIcon from './WalletAccountIcon';
 import { defineMessages, intlShape } from 'react-intl';
 import HideBalanceIcon from '../../assets/images/top-bar/password.hide.inline.svg';
 import ShowBalanceIcon from '../../assets/images/top-bar/password.show.inline.svg';
-import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import type { WalletWithCachedMeta } from '../../stores/toplevel/WalletStore';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import type { WalletAccountNumberPlate } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
@@ -24,7 +24,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +publicDeriver: null | PublicDeriverWithCachedMeta,
+  +publicDeriver: null | WalletWithCachedMeta,
   +currentRoute: string,
   +formattedWalletAmount?: BigNumber => string,
   +themeProperties?: {|

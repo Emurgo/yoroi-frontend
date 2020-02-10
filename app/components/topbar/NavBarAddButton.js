@@ -1,15 +1,9 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages } from 'react-intl';
+import { intlShape, } from 'react-intl';
 import styles from './NavBarAddButton.scss';
-
-const messages = defineMessages({
-  addButtonText: {
-    id: 'wallet.nav.addButton',
-    defaultMessage: '!!!Add new wallet',
-  }
-});
+import globalMessages from '../../i18n/global-messages';
 
 type Props = {|
   +onClick: void => void,
@@ -35,7 +29,7 @@ export default class NavBarAddButton extends Component<Props> {
         className={styles.button}
         onClick={() => onClick()}
       >
-        {intl.formatMessage(messages.addButtonText)}
+        {intl.formatMessage(globalMessages.addWalletLabel)}
       </button>
     );
   }

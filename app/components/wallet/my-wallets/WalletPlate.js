@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import PublicDeriverWithCachedMeta from '../../../domain/PublicDeriverWithCachedMeta';
+import type { WalletWithCachedMeta } from '../../../stores/toplevel/WalletStore';
 import type { WalletAccountNumberPlate } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 import styles from './WalletPlate.scss';
@@ -8,7 +8,7 @@ import WalletAccountIcon from '../../topbar/WalletAccountIcon';
 
 type Props = {|
   +walletName: string,
-  +publicDeriver: null | PublicDeriverWithCachedMeta,
+  +publicDeriver: null | WalletWithCachedMeta,
 |};
 
 function constructPlate(

@@ -37,7 +37,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     } = this.props;
     const { wallets } = this.props.stores.substores[environment.API];
     const { sendMoneyRequest } = wallets;
-    const publicDeriver = wallets.selected;
+    const publicDeriver = this.props.stores.wallets.selected;
     const { profile } = stores;
     const { sendMoney } = this.props.actions[environment.API].wallets;
 

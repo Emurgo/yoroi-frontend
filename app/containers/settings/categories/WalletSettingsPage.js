@@ -15,9 +15,9 @@ export default class WalletSettingsPage extends Component<Props> {
 
   render() {
     const { uiDialogs, profile } = this.props.stores;
-    const { wallets, walletSettings } = this.props.stores.substores.ada;
+    const { walletSettings } = this.props.stores.substores.ada;
     const { actions, stores } = this.props;
-    const publicDeriver = wallets.selected;
+    const publicDeriver = this.props.stores.wallets.selected;
     const {
       renameModelRequest,
       lastUpdatedWalletField,
@@ -43,7 +43,7 @@ export default class WalletSettingsPage extends Component<Props> {
       />
     );
 
-    const walletsStore = this.props.stores.substores.ada.wallets;
+    const walletsStore = this.props.stores.wallets;
     if (walletsStore.selected == null) {
       throw new Error('Should never happen');
     }

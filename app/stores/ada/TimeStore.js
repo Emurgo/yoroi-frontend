@@ -5,7 +5,7 @@ import { find } from 'lodash';
 import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import type { WalletWithCachedMeta } from '../toplevel/WalletStore';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import Store from '../base/Store';
 import {
@@ -88,7 +88,7 @@ export default class TimeStore extends Store {
     throw new Error(`${nameof(TimeStore)}::${nameof(this.getCurrentTimeRequests)} missing for public deriver`);
   }
 
-  @action addObservedTime: PublicDeriverWithCachedMeta => void = (
+  @action addObservedTime: WalletWithCachedMeta => void = (
     publicDeriver
   ) => {
     this.timeCalcRequests.push({
@@ -129,7 +129,7 @@ export default class TimeStore extends Store {
     const currTime = new Date();
     runInAction(() => { this.time = currTime; });
 
-    const selected = this.stores.substores.ada.wallets.selected;
+    const selected = this.stores.wallets.selected;
     if (selected == null) return;
 
     const timeCalcRequests = this.getTimeCalcRequests(selected.self);
@@ -155,7 +155,7 @@ export default class TimeStore extends Store {
 
   @computed get currentTime(): ?CurrentTimeRequests {
     // Get current public deriver
-    const publicDeriver = this.stores.substores.ada.wallets.selected;
+    const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return undefined;
 
     return this.getCurrentTimeRequests(publicDeriver.self);

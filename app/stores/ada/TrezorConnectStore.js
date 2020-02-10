@@ -371,7 +371,7 @@ export default class TrezorConnectStore
 
       const newWallet = await this.createHWRequest.promise;
 
-      await this._onSaveSucess(newWallet.publicDeriver);
+      await this._onSaveSuccess(newWallet.publicDeriver);
     } catch (error) {
       Logger.error(`${nameof(TrezorConnectStore)}::${nameof(this._saveHW)}::error ${stringifyError(error)}`);
 
@@ -430,12 +430,12 @@ export default class TrezorConnectStore
     this.progressInfo.stepState = StepState.ERROR;
   };
 
-  _onSaveSucess: (PublicDeriver<>) => Promise<void> = async (publicDeriver) => {
+  _onSaveSuccess: (PublicDeriver<>) => Promise<void> = async (publicDeriver) => {
     // close the active dialog
-    Logger.debug(`${nameof(TrezorConnectStore)}::${nameof(this._onSaveSucess)} success, closing dialog`);
+    Logger.debug(`${nameof(TrezorConnectStore)}::${nameof(this._onSaveSuccess)} success, closing dialog`);
     this.actions.dialogs.closeActiveDialog.trigger();
 
-    const { wallets } = this.stores.substores[environment.API];
+    const { wallets } = this.stores;
     await wallets.addHwWallet(publicDeriver);
 
     // show success notification

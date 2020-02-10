@@ -41,7 +41,7 @@ import {
 } from '../../utils/hwConnectHandler';
 
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import type { WalletWithCachedMeta } from '../toplevel/WalletStore';
 
 /** Note: Handles Ledger Signing */
 export default class LedgerSendStore extends Store {
@@ -69,7 +69,7 @@ export default class LedgerSendStore extends Store {
   }
 
   /** setup() is called when stores are being created
-    * _init() is called when Confirmation dailog is about to show */
+    * _init() is called when Confirmation dialog is about to show */
   _init: void => void = () => {
     Logger.debug(`${nameof(LedgerSendStore)}::${nameof(this._init)} called`);
   }
@@ -89,7 +89,7 @@ export default class LedgerSendStore extends Store {
   /** Generates a payload with Ledger format and tries Send ADA using Ledger signing */
   _send: {|
     params: SendUsingLedgerParams,
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
   |} => Promise<void> = async (request) => {
     let ledgerConnect: LedgerConnect;
     try {
@@ -146,13 +146,13 @@ export default class LedgerSendStore extends Store {
   _prepareAndBroadcastSignedTx: (
     LedgerSignTxResponse,
     RustModule.WalletV2.Transaction,
-    PublicDeriverWithCachedMeta,
+    WalletWithCachedMeta,
   ) => Promise<void> = async (
     ledgerSignTxResp,
     unsignedTx,
     publicDeriver,
   ) => {
-    const { wallets } = this.stores.substores[environment.API];
+    const { wallets } = this.stores;
     const withPublicKey = asGetPublicKey(publicDeriver.self);
     if (withPublicKey == null) {
       throw new Error(`${nameof(this._prepareAndBroadcastSignedTx)} public deriver has no public key.`);

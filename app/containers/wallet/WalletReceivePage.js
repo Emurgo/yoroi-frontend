@@ -23,7 +23,7 @@ import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWal
 import { asHasUtxoChains } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type { StandardAddress, AddressTypeStore } from '../../stores/base/AddressesStore';
 import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
-import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import type { WalletWithCachedMeta } from '../../stores/toplevel/WalletStore';
 
 type Props = {|
   ...InjectedProps,
@@ -46,8 +46,7 @@ export default class WalletReceivePage extends Component<Props, State> {
   }
 
   handleGenerateAddress: void => Promise<void> = async () => {
-    const { wallets } = this.props.stores.substores.ada;
-    const publicDeriver = wallets.selected;
+    const publicDeriver = this.props.stores.wallets.selected;
     if (publicDeriver != null) {
       await this.props.actions.ada.addresses.createAddress.trigger(publicDeriver.self);
     }
@@ -58,8 +57,7 @@ export default class WalletReceivePage extends Component<Props, State> {
   };
 
   closeNotification = () => {
-    const { wallets } = this.props.stores.substores.ada;
-    const publicDeriver = wallets.selected;
+    const publicDeriver = this.props.stores.wallets.selected;
     if (publicDeriver) {
       const notificationId = `${publicDeriver.self.getPublicDeriverId()}-copyNotification`;
       this.props.actions.notifications.closeActiveNotification.trigger({ id: notificationId });
@@ -70,12 +68,11 @@ export default class WalletReceivePage extends Component<Props, State> {
     const actions = this.props.actions;
     const { uiNotifications, uiDialogs, profile } = this.props.stores;
     const {
-      wallets,
       addresses,
       hwVerifyAddress,
       transactions
     } = this.props.stores.substores.ada;
-    const publicDeriver = wallets.selected;
+    const publicDeriver = this.props.stores.wallets.selected;
     const { validateAmount } = transactions;
 
     // Guard against potential null values
@@ -239,7 +236,7 @@ export default class WalletReceivePage extends Component<Props, State> {
     );
   }
 
-  getTypeStore: PublicDeriverWithCachedMeta => AddressTypeStore<StandardAddress> = (
+  getTypeStore: WalletWithCachedMeta => AddressTypeStore<StandardAddress> = (
     publicDeriver
   ) => {
     const { addresses } = this.props.stores.substores.ada;

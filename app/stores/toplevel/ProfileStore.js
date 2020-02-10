@@ -82,7 +82,7 @@ export default class ProfileStore extends Store {
     {
       isDone: () => this.hasRedirected,
       action: async () => {
-        const { wallets } = this.stores.substores[environment.API];
+        const { wallets } = this.stores;
         await wallets.restoreWalletsFromStorage();
         if (wallets.first) {
           const firstWallet = wallets.first;

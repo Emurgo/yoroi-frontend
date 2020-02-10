@@ -46,7 +46,7 @@ export default class SeizaFetcher extends Component<Props> {
     if (event.origin !== process.env.SEIZA_FOR_YOROI_URL) return;
     const pools: Array<SelectedPool> = JSON.parse(decodeURI(event.data));
 
-    const selectedWallet = this.props.stores.substores[environment.API].wallets.selected;
+    const selectedWallet = this.props.stores.wallets.selected;
     if (selectedWallet == null) {
       return;
     }
@@ -101,7 +101,7 @@ export default class SeizaFetcher extends Component<Props> {
       throw new Error('Staking undefined SEIZA_FOR_YOROI_URL should never happen');
     }
 
-    const selectedWallet = this.props.stores.substores[environment.API].wallets.selected;
+    const selectedWallet = this.props.stores.wallets.selected;
     if (selectedWallet == null) {
       return null;
     }

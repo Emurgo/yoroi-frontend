@@ -2,14 +2,13 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
-import PublicDeriverWithCachedMeta from '../../../domain/PublicDeriverWithCachedMeta';
+import type { WalletWithCachedMeta } from '../../../stores/toplevel/WalletStore';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import EpochProgress from '../../../components/wallet/staking/dashboard/EpochProgress';
-import environment from '../../../environment';
 
 type Props = {|
   ...InjectedProps,
-  +publicDeriver: PublicDeriverWithCachedMeta,
+  +publicDeriver: WalletWithCachedMeta,
   +showTooltip: boolean,
 |};
 
@@ -21,7 +20,7 @@ export default class EpochProgressContainer extends Component<Props> {
 
   async componentDidMount() {
     const timeStore = this.props.stores.substores.ada.time;
-    const publicDeriver = this.props.stores.substores[environment.API].wallets.selected;
+    const publicDeriver = this.props.stores.wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(EpochProgressContainer)} no public deriver. Should never happen`);
     }

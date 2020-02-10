@@ -2,14 +2,14 @@
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import PublicDeriverWithCachedMeta from '../../../domain/PublicDeriverWithCachedMeta';
+import type { WalletWithCachedMeta } from '../../../stores/toplevel/WalletStore';
 
 import styles from './WalletSubRow.scss';
 
 import WalletPlate from './WalletPlate';
 
 type Props = {|
-  +publicDeriver: null | PublicDeriverWithCachedMeta,
+  +publicDeriver: null | WalletWithCachedMeta,
   +walletDetails: Node,
   +walletNumber: number,
   +walletAddresses:  Node,

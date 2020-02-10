@@ -2,10 +2,7 @@
 // import { BigNumber } from 'bignumber.js';
 import { observable, action } from 'mobx';
 
-import config from '../../config';
-import globalMessages from '../../i18n/global-messages';
-import type { Notification } from '../../types/notificationType';
-import WalletStore from '../base/WalletStore';
+import Store from '../base/Store';
 import { matchRoute, buildRoute } from '../../utils/routing';
 import Request from '../lib/LocalizedRequest';
 import { ROUTES } from '../../routes-config';
@@ -20,9 +17,9 @@ import {
   asGetSigningKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import type { WalletWithCachedMeta } from '../toplevel/WalletStore';
 
-export default class AdaWalletsStore extends WalletStore {
+export default class AdaWalletsStore extends Store {
 
   // REQUESTS
   @observable getInitialWallets: Request<GetWalletsFunc>
@@ -42,15 +39,12 @@ export default class AdaWalletsStore extends WalletStore {
 
   setup(): void {
     super.setup();
-    const { router, walletBackup, ada } = this.actions;
+    const { router, ada } = this.actions;
     const { wallets } = ada;
-    wallets.createWallet.listen(this._create);
+    wallets.createWallet.listen(this._createWallet);
     wallets.sendMoney.listen(this._sendMoney);
     wallets.restoreWallet.listen(this._restoreWallet);
-    wallets.updateBalance.listen(this._updateBalance);
-    wallets.updateLastSync.listen(this._updateLastSync);
     router.goToRoute.listen(this._onRouteChange);
-    walletBackup.finishWalletBackup.listen(this._finishCreation);
   }
 
   // =================== SEND MONEY ==================== //
@@ -59,7 +53,7 @@ export default class AdaWalletsStore extends WalletStore {
   _sendMoney:  {|
     signRequest: BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>,
     password: string,
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
   |} => Promise<void> = async (transactionDetails) => {
     const withSigning = (asGetSigningKey(transactionDetails.publicDeriver.self));
     if (withSigning == null) {
@@ -72,13 +66,13 @@ export default class AdaWalletsStore extends WalletStore {
         signRequest: transactionDetails.signRequest,
         sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
       },
-      refreshWallet: () => this.refreshWallet(transactionDetails.publicDeriver),
+      refreshWallet: () => this.stores.wallets.refreshWallet(transactionDetails.publicDeriver),
     }).promise;
 
     this.actions.dialogs.closeActiveDialog.trigger();
     this.sendMoneyRequest.reset();
     // go to transaction screen
-    this.goToWalletRoute(transactionDetails.publicDeriver.self);
+    this.stores.wallets.goToWalletRoute(transactionDetails.publicDeriver.self);
   };
 
   @action _onRouteChange: {| route: string, params: ?Object |} => void = (options) => {
@@ -102,50 +96,19 @@ export default class AdaWalletsStore extends WalletStore {
 
   // =================== WALLET RESTORATION ==================== //
 
+  _createWallet: {|
+    name: string,
+    password: string,
+  |} => Promise<void> = async (params) => {
+    await this.stores.wallets.create(params);
+  };
   _restoreWallet: {|
     recoveryPhrase: string,
     walletName: string,
     walletPassword: string,
   |} => Promise<void> = async (params) => {
-    await this.restore(params);
+    await this.stores.wallets.restore(params);
   };
-
-  // =================== NOTIFICATION ==================== //
-  showLedgerNanoWalletIntegratedNotification: void => void = (): void => {
-    const notification: Notification = {
-      id: globalMessages.ledgerNanoSWalletIntegratedNotificationMessage.id,
-      message: globalMessages.ledgerNanoSWalletIntegratedNotificationMessage,
-      duration: config.wallets.WALLET_CREATED_NOTIFICATION_DURATION,
-    };
-    this.actions.notifications.open.trigger(notification);
-  }
-
-  showTrezorTWalletIntegratedNotification: void => void = (): void => {
-    const notification: Notification = {
-      id: globalMessages.trezorTWalletIntegratedNotificationMessage.id,
-      message: globalMessages.trezorTWalletIntegratedNotificationMessage,
-      duration: config.wallets.WALLET_CREATED_NOTIFICATION_DURATION,
-    };
-    this.actions.notifications.open.trigger(notification);
-  }
-
-  showWalletCreatedNotification: void => void = (): void => {
-    const notification: Notification = {
-      id: globalMessages.walletCreatedNotificationMessage.id,
-      message: globalMessages.walletCreatedNotificationMessage,
-      duration: config.wallets.WALLET_CREATED_NOTIFICATION_DURATION,
-    };
-    this.actions.notifications.open.trigger(notification);
-  }
-
-  showWalletRestoredNotification: void => void = (): void => {
-    const notification: Notification = {
-      id: globalMessages.walletRestoredNotificationMessage.id,
-      message: globalMessages.walletRestoredNotificationMessage,
-      duration: config.wallets.WALLET_RESTORED_NOTIFICATION_DURATION,
-    };
-    this.actions.notifications.open.trigger(notification);
-  }
 
   sendAndRefresh: {|
     broadcastRequest: SignAndBroadcastRequest,

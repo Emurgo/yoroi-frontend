@@ -33,7 +33,8 @@ export default class WalletSummaryPage extends Component<Props> {
   render() {
     const { intl } = this.context;
     const actions = this.props.actions;
-    const { wallets, transactions } = this.props.stores.substores.ada;
+    const { transactions } = this.props.stores.substores.ada;
+    const { wallets } = this.props.stores;
     const {
       hasAny,
       totalAvailable,

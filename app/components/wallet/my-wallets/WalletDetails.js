@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import BigNumber from 'bignumber.js';
-import classnames from 'classnames';
+// import classnames from 'classnames';
 import { intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { splitAmount } from '../../../utils/formatters';
@@ -39,13 +39,13 @@ export default class WalletDetails extends Component<Props> {
       shouldHideBalance,
       onUpdateHideBalance,
       walletAmount,
-      rewards
+      // rewards
     } = this.props;
 
     return (
       <div className={styles.wrapper}>
         <div className={styles.content}>
-          <div className={classnames([styles.amount, styles.amountBold])}>
+          {/* <div className={classnames([styles.amount, styles.amountBold])}>
             {this.renderAmountDisplay({
               shouldHideBalance,
               amount: walletAmount != null && rewards != null
@@ -55,19 +55,19 @@ export default class WalletDetails extends Component<Props> {
             <span className={styles.amountLabel}>
               {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
             </span>
-          </div>
+          </div> */}
           <div className={styles.amount}>
             {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
             <span className={styles.amountLabel}>
               {intl.formatMessage(globalMessages.walletLabel)}
             </span>
           </div>
-          <div className={styles.amount}>
+          {/* <div className={styles.amount}>
             {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
             <span className={styles.amountLabel}>
               {intl.formatMessage(globalMessages.rewardsLabel)}
             </span>
-          </div>
+          </div> */}
         </div>
         <button
           type="button"
