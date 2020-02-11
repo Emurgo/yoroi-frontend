@@ -122,7 +122,7 @@ export default class TrezorSendStore extends Store {
         },
         sendTx: this.stores.substores[environment.API].stateFetchStore.fetcher.sendTx,
       },
-      refreshWallet: () => wallets.refreshWallet(publicDeriver),
+      refreshWallet: () => wallets.refreshWalletFromRemote(publicDeriver),
     }).promise;
 
     this.actions.dialogs.closeActiveDialog.trigger();

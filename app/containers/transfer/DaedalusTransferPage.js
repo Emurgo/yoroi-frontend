@@ -85,7 +85,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     await this._getDaedalusTransferActions().transferFunds.trigger({
       next: async () => {
         try {
-          await walletsStore.refreshWallet(publicDeriver);
+          await walletsStore.refreshWalletFromRemote(publicDeriver);
         } catch (_e) {
           // still need to re-route even if refresh failed
         }

@@ -115,7 +115,7 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
     }
     await this.clearHistory.execute({
       publicDeriver: withLevels,
-      refreshWallet: () => this.stores.wallets.refreshWallet(request.publicDeriver),
+      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
     }).promise;
     request.publicDeriver.amount = null; // TODO: properly clear cache
     this.clearHistory.reset();

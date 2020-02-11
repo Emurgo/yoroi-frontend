@@ -1,7 +1,7 @@
 // @flow
 import { observable, action, computed, runInAction } from 'mobx';
 import BigNumber from 'bignumber.js';
-import { debounce, } from 'lodash';
+import { debounce, find, } from 'lodash';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import { buildRoute, matchRoute } from '../../utils/routing';
@@ -212,15 +212,47 @@ export default class WalletStore extends Store {
     this.actions.router.goToRoute.trigger({ route });
   }
 
-  async refreshWallet(
+  async refreshWalletFromRemote(
     publicDeriver: WalletWithCachedMeta,
   ): Promise<void> {
     try {
       const substore = this.stores.substores[environment.API];
-      await substore.transactions.refreshTransactionData(publicDeriver);
+      await substore.transactions.refreshTransactionData({
+        publicDeriver,
+        localRequest: false,
+      });
       await substore.addresses.refreshAddressesFromDb(publicDeriver.self);
     } catch (error) {
-      Logger.error(`${nameof(WalletStore)}::${nameof(this.refreshWallet)} ` + stringifyError(error));
+      Logger.error(`${nameof(WalletStore)}::${nameof(this.refreshWalletFromRemote)} ` + stringifyError(error));
+      throw error;
+    }
+  }
+
+  async refreshWalletFromLocalOnLaunch(
+    publicDeriver: WalletWithCachedMeta,
+  ): Promise<void> {
+    try {
+      const substore = this.stores.substores[environment.API];
+      await substore.transactions.refreshTransactionData({
+        publicDeriver,
+        localRequest: true,
+      });
+      // if after querying local history we find nothing, we just reset the DB entirely
+      const txRequests = find(
+        substore.transactions.transactionsRequests,
+        { publicDeriver: publicDeriver.self }
+      );
+      if (txRequests == null) throw new Error(`${nameof(this.refreshWalletFromLocalOnLaunch)} should never happen`);
+      const { result } = txRequests.requests.allRequest;
+      if (result == null) throw new Error(`${nameof(this.refreshWalletFromLocalOnLaunch)} should never happen`);
+      if (result.transactions.length === 0) {
+        for (const txRequest of Object.keys(txRequests.requests)) {
+          txRequests.requests[txRequest].reset();
+        }
+      }
+      await substore.addresses.refreshAddressesFromDb(publicDeriver.self);
+    } catch (error) {
+      Logger.error(`${nameof(WalletStore)}::${nameof(this.refreshWalletFromLocalOnLaunch)} ` + stringifyError(error));
       throw error;
     }
   }
@@ -278,6 +310,9 @@ export default class WalletStore extends Store {
     for (const publicDeriver of newWithCachedData) {
       this.registerObserversForNewWallet(publicDeriver);
     }
+    for (const publicDeriver of newWithCachedData) {
+      await this.refreshWalletFromLocalOnLaunch(publicDeriver);
+    }
     runInAction('refresh active wallet', () => {
       if (this.selected == null) {
         this._setActiveWallet({
@@ -313,7 +348,7 @@ export default class WalletStore extends Store {
   ) => {
     this.selected = wallet;
     // do not await on purpose since the UI will handle adding loaders while refresh is happening
-    this.refreshWallet(wallet);
+    this.refreshWalletFromRemote(wallet);
   };
 
   @action _unsetActiveWallet: void => void = () => {
@@ -335,7 +370,7 @@ export default class WalletStore extends Store {
     if (!document.hidden) {
       const selected = this.selected;
       if (selected) {
-        this.refreshWallet(selected);
+        this.refreshWalletFromRemote(selected);
       }
     }
   };

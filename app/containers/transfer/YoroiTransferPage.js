@@ -112,7 +112,7 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
       next: async () => {
         const preRefreshTime = new Date().getTime();
         try {
-          await walletsStore.refreshWallet(publicDeriver);
+          await walletsStore.refreshWalletFromRemote(publicDeriver);
         } catch (_e) {
           // still need to re-route even if refresh failed
         }

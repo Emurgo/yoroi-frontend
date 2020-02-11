@@ -45,7 +45,7 @@ export default class MyWalletsPage extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  updateHideBalance = () => {
+  updateHideBalance: void => void = () => {
     this.props.actions.profile.updateHideBalance.trigger();
   }
 
@@ -137,12 +137,11 @@ export default class MyWalletsPage extends Component<Props> {
   generateRow: WalletWithCachedMeta => Node = (publicDeriver) => {
     const walletName = publicDeriver ? publicDeriver.conceptualWalletName : '';
 
-    // TODO: should be sum of public derivers
     const walletSumCurrencies = (
       <>
         <WalletCurrency
           currency="ADA"
-          tooltipText="1.320"
+          tooltipText={undefined /* TODO */}
         />
       </>
     );

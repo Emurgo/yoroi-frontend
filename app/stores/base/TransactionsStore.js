@@ -26,7 +26,7 @@ export default class TransactionsStore extends Store {
   /** How many transactions to display */
   INITIAL_SEARCH_LIMIT: number = 5;
 
-  /** How many additonal transactions to display when user wants to show more */
+  /** How many additional transactions to display when user wants to show more */
   SEARCH_LIMIT_INCREASE: number = 5;
 
   /** Skip first n transactions from api */
@@ -35,18 +35,18 @@ export default class TransactionsStore extends Store {
   /** Track transactions for a set of wallets */
   @observable transactionsRequests: Array<{|
     publicDeriver: PublicDeriver<>,
-    pendingRequest: CachedRequest<RefreshPendingTransactionsFunc>,
-    recentRequest: CachedRequest<GetTransactionsFunc>,
-    allRequest: CachedRequest<GetTransactionsFunc>,
-    getBalanceRequest: CachedRequest<GetBalanceFunc>,
+    requests: {|
+      pendingRequest: CachedRequest<RefreshPendingTransactionsFunc>,
+      recentRequest: CachedRequest<GetTransactionsFunc>,
+      allRequest: CachedRequest<GetTransactionsFunc>,
+      getBalanceRequest: CachedRequest<GetBalanceFunc>,
+    |}
   |}> = [];
 
   @observable _searchOptionsForWallets: Array<{|
     publicDeriver: PublicDeriver<>,
     options: GetTransactionsRequestOptions,
   |}> = [];
-
-  _hasAnyPending: boolean = false;
 
   setup(): void {
     super.setup();
@@ -65,11 +65,8 @@ export default class TransactionsStore extends Store {
 
   @computed get recentTransactionsRequest(): CachedRequest<GetTransactionsFunc> {
     const publicDeriver = this.stores.wallets.selected;
-    // TODO: Do not return new request here
     if (!publicDeriver) {
-      return new CachedRequest<GetTransactionsFunc>(
-        this.api[environment.API].refreshTransactions
-      );
+      throw new Error(`${nameof(TransactionsStore)}::${nameof(this.recentTransactionsRequest)} no wallet selected`);
     }
     return this._getTransactionsRecentRequest(publicDeriver.self);
   }
@@ -106,10 +103,7 @@ export default class TransactionsStore extends Store {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return false;
     const result = this._getTransactionsPendingRequest(publicDeriver.self).result;
-    if (result) {
-      this._hasAnyPending = result.length > 0;
-    }
-    return this._hasAnyPending;
+    return result ? result.length > 0 : false;
   }
 
   @computed get totalAvailable(): number {
@@ -120,15 +114,16 @@ export default class TransactionsStore extends Store {
   }
 
   /** Refresh transaction data for all wallets and update wallet balance */
-  @action refreshTransactionData: WalletWithCachedMeta => Promise<void> = async (
-    basePubDeriver
-  ) => {
+  @action refreshTransactionData: {|
+    publicDeriver: WalletWithCachedMeta,
+    localRequest: boolean,
+  |} => Promise<void> = async (request) => {
     const walletsActions = this.actions.wallets;
 
     const publicDeriver = asHasLevels<
       ConceptualWallet,
       IGetLastSyncInfo
-    >(basePubDeriver.self);
+    >(request.publicDeriver.self);
     if (publicDeriver == null) {
       return;
     }
@@ -140,11 +135,11 @@ export default class TransactionsStore extends Store {
       checkAddressesInUse,
       getBestBlock
     } = stateFetcher;
-    const allRequest = this.getTransactionsAllRequest(basePubDeriver.self);
+    const allRequest = this.getTransactionsAllRequest(request.publicDeriver.self);
     allRequest.invalidate({ immediately: false });
     allRequest.execute({
       publicDeriver,
-      isLocalRequest: false,
+      isLocalRequest: request.localRequest,
       getTransactionsHistoryForAddresses,
       checkAddressesInUse,
       getBestBlock,
@@ -155,7 +150,7 @@ export default class TransactionsStore extends Store {
     await allRequest.promise
       .then(async () => {
         // calculate pending transactions just to cache the result
-        const pendingRequest = this._getTransactionsPendingRequest(basePubDeriver.self);
+        const pendingRequest = this._getTransactionsPendingRequest(request.publicDeriver.self);
         pendingRequest.invalidate({ immediately: false });
         pendingRequest.execute(
           { publicDeriver }
@@ -163,7 +158,7 @@ export default class TransactionsStore extends Store {
         if (!pendingRequest.promise) throw new Error('should never happen');
         await pendingRequest.promise;
 
-        const canGetBalance = asGetBalance(basePubDeriver.self);
+        const canGetBalance = asGetBalance(request.publicDeriver.self);
         if (canGetBalance == null) {
           return new BigNumber(0);
         }
@@ -172,10 +167,10 @@ export default class TransactionsStore extends Store {
         });
         walletsActions.updateLastSync.trigger({
           lastSync: lastUpdateDate,
-          publicDeriver: basePubDeriver,
+          publicDeriver: request.publicDeriver,
         });
-        // Note: cache based on last slot synced  (not used in balanceRequest)
-        const req = this._getBalanceRequest(basePubDeriver.self);
+        // Note: cache based on last slot synced (not used in balanceRequest)
+        const req = this._getBalanceRequest(request.publicDeriver.self);
         req.execute({
           getBalance: canGetBalance.getBalance,
         });
@@ -185,14 +180,14 @@ export default class TransactionsStore extends Store {
       .then((updatedBalance) => {
         walletsActions.updateBalance.trigger({
           balance: updatedBalance,
-          publicDeriver: basePubDeriver,
+          publicDeriver: request.publicDeriver,
         });
         return undefined;
       })
       .then(() => {
         // Recent Request
         // Here we are sure that allRequest was resolved and the local database was updated
-        return this.refreshLocal(basePubDeriver.self);
+        return this.refreshLocal(request.publicDeriver.self);
       });
   };
 
@@ -239,10 +234,12 @@ export default class TransactionsStore extends Store {
   ) => {
     this.transactionsRequests.push({
       publicDeriver: publicDeriver.self,
-      recentRequest: this._getTransactionsRecentRequest(publicDeriver.self),
-      allRequest: this.getTransactionsAllRequest(publicDeriver.self),
-      getBalanceRequest: this._getBalanceRequest(publicDeriver.self),
-      pendingRequest: this._getTransactionsPendingRequest(publicDeriver.self),
+      requests: {
+        recentRequest: this._getTransactionsRecentRequest(publicDeriver.self),
+        allRequest: this.getTransactionsAllRequest(publicDeriver.self),
+        getBalanceRequest: this._getBalanceRequest(publicDeriver.self),
+        pendingRequest: this._getTransactionsPendingRequest(publicDeriver.self),
+      },
     });
     this._searchOptionsForWallets.push({
       publicDeriver: publicDeriver.self,
@@ -259,7 +256,9 @@ export default class TransactionsStore extends Store {
     publicDeriver
   ) => {
     const foundRequest = find(this.transactionsRequests, { publicDeriver });
-    if (foundRequest && foundRequest.pendingRequest) return foundRequest.pendingRequest;
+    if (foundRequest && foundRequest.requests.pendingRequest) {
+      return foundRequest.requests.pendingRequest;
+    }
     return new CachedRequest<RefreshPendingTransactionsFunc>(
       this.api[environment.API].refreshPendingTransactions
     );
@@ -271,7 +270,9 @@ export default class TransactionsStore extends Store {
     publicDeriver
   ) => {
     const foundRequest = find(this.transactionsRequests, { publicDeriver });
-    if (foundRequest && foundRequest.recentRequest) return foundRequest.recentRequest;
+    if (foundRequest && foundRequest.requests.recentRequest) {
+      return foundRequest.requests.recentRequest;
+    }
     return new CachedRequest<GetTransactionsFunc>(this.api[environment.API].refreshTransactions);
   };
 
@@ -281,7 +282,9 @@ export default class TransactionsStore extends Store {
     publicDeriver
   ) => {
     const foundRequest = find(this.transactionsRequests, { publicDeriver });
-    if (foundRequest && foundRequest.allRequest) return foundRequest.allRequest;
+    if (foundRequest && foundRequest.requests.allRequest) {
+      return foundRequest.requests.allRequest;
+    }
     return new CachedRequest<GetTransactionsFunc>(this.api[environment.API].refreshTransactions);
   };
 
@@ -289,7 +292,9 @@ export default class TransactionsStore extends Store {
     publicDeriver
   ) => {
     const foundRequest = find(this.transactionsRequests, { publicDeriver });
-    if (foundRequest && foundRequest.getBalanceRequest) return foundRequest.getBalanceRequest;
+    if (foundRequest && foundRequest.requests.getBalanceRequest) {
+      return foundRequest.requests.getBalanceRequest;
+    }
     return new CachedRequest<GetBalanceFunc>(this.api[environment.API].getBalance);
   };
 

@@ -55,7 +55,7 @@ export default class AdaWalletsStore extends Store {
         signRequest: transactionDetails.signRequest,
         sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
       },
-      refreshWallet: () => this.stores.wallets.refreshWallet(transactionDetails.publicDeriver),
+      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(transactionDetails.publicDeriver),
     }).promise;
 
     this.actions.dialogs.closeActiveDialog.trigger();

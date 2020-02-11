@@ -84,19 +84,22 @@ export default class ProfileStore extends Store {
       action: async () => {
         const { wallets } = this.stores;
         await wallets.restoreWalletsFromStorage();
-        if (wallets.first) {
-          const firstWallet = wallets.first;
-
-          if (this.stores.loading.fromUriScheme) {
-            this.actions.router.goToRoute.trigger({ route: ROUTES.SEND_FROM_URI.ROOT });
-          } else {
-            this.actions.router.goToRoute.trigger({
-              route: ROUTES.WALLETS.TRANSACTIONS,
-              params: { id: firstWallet }
-            });
-          }
-        } else {
+        if (wallets.hasAnyPublicDeriver && this.stores.loading.fromUriScheme) {
+          this.actions.router.goToRoute.trigger({ route: ROUTES.SEND_FROM_URI.ROOT });
+        }
+        const firstWallet = wallets.first;
+        if (firstWallet == null) {
           this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
+        } else if (wallets.publicDerivers.length === 1) {
+          // if user only has 1 wallet, just go to it directly as a shortcut
+          this.actions.router.goToRoute.trigger({
+            route: ROUTES.WALLETS.TRANSACTIONS,
+            params: { id: firstWallet.self.getPublicDeriverId() }
+          });
+        } else {
+          this.actions.router.goToRoute.trigger({
+            route: ROUTES.MY_WALLETS,
+          });
         }
         runInAction(() => {
           this.hasRedirected = true;

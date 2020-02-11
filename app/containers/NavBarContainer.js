@@ -138,6 +138,9 @@ export default class NavBarContainer extends Component<Props> {
       <NavDropdown
         headerComponent={dropdownHead}
         contentComponents={dropdownContent}
+        onAddWallet={
+          () => this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
+        }
       />
     );
 

@@ -50,6 +50,10 @@ export default class WalletAddPage extends Component<Props> {
     this.props.actions.dialogs.closeActiveDialog.trigger();
   };
 
+  componentDidMount() {
+    this.props.actions.wallets.unselectWallet.trigger();
+  }
+
   render() {
     const { profile } = this.props.stores;
     const { actions, stores } = this.props;

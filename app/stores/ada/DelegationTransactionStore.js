@@ -132,7 +132,7 @@ export default class DelegationTransactionStore extends Store {
         password: request.password,
         sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
       },
-      refreshWallet: () => this.stores.wallets.refreshWallet(
+      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(
         request.publicDeriver
       ),
     }).promise;

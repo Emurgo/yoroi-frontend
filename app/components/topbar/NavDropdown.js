@@ -10,6 +10,7 @@ import NavBarAddButton from './NavBarAddButton';
 type Props = {|
   +headerComponent?: ?Node,
   +contentComponents?: ?Node,
+  +onAddWallet: void => void,
 |};
 
 type State = {|
@@ -60,7 +61,7 @@ export default class NavDropdown extends Component<Props, State> {
           <div className={styles.content}>
             {contentComponents}
             <div className={styles.buttonWrapper}>
-              <NavBarAddButton onClick={() => {} /* TODO */} />
+              <NavBarAddButton onClick={this.props.onAddWallet} />
             </div>
           </div>
         )}
