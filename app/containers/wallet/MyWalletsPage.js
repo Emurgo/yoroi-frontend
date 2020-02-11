@@ -99,7 +99,7 @@ export default class MyWalletsPage extends Component<Props> {
             highlightTitle
             onUpdateHideBalance={this.updateHideBalance}
             shouldHideBalance={profile.shouldHideBalance}
-            rewards={new BigNumber('565.000000') /* TODO */}
+            rewards={new BigNumber('0.000000') /* TODO */}
             walletAmount={utxoTotal}
             infoText={intl.formatMessage(messages.walletSumInfo)}
           />
