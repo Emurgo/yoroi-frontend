@@ -239,7 +239,7 @@ function CustomWorld(cmdInput: WorldInput) {
 
   this.saveLastReceiveAddressIndex = index => {
     this.driver.executeScript(i => {
-      const selected = window.yoroi.stores.substores.ada.wallets.selected;
+      const selected = window.yoroi.stores.wallets.selected;
       if (selected == null) throw new Error('executeScript no public deriver selected');
       window.yoroi.api.ada.saveLastReceiveAddressIndex({
         publicDeriver: selected.self,

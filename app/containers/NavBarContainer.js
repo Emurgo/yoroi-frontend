@@ -4,7 +4,6 @@ import React, { Component } from 'react';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import type { InjectedProps } from '../types/injectedPropsType';
-import environment from '../environment';
 import { intlShape, defineMessages } from 'react-intl';
 import NavBar from '../components/topbar/NavBar';
 import NavPlate from '../components/topbar/NavPlate';

@@ -12,12 +12,12 @@ import DaedalusTransferFormPage from './DaedalusTransferFormPage';
 import DaedalusTransferMasterKeyFormPage from './DaedalusTransferMasterKeyFormPage';
 import DaedalusTransferWaitingPage from './DaedalusTransferWaitingPage';
 import DaedalusTransferErrorPage from './DaedalusTransferErrorPage';
-import type { WalletWithCachedMeta } from '../../stores/toplevel/WalletStore';
 import environment from '../../environment';
 import config from '../../config';
 import { TransferStatus } from '../../types/TransferTypes';
 
 import { formattedWalletAmount } from '../../utils/formatters';
+import { ROUTES } from '../../routes-config';
 
 @observer
 export default class DaedalusTransferPage extends Component<InjectedProps> {
@@ -30,9 +30,8 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
     this.cancelTransferFunds();
   }
 
-  goToCreateWallet: WalletWithCachedMeta => void = (publicDeriver) => {
-    const wallets = this._getWalletsStore();
-    wallets.goToWalletRoute(publicDeriver.self);
+  goToCreateWallet: void => void = () => {
+    this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
   }
 
   startTransferFunds = () => {
@@ -112,12 +111,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
   render() {
     const { stores } = this.props;
     const { profile } = stores;
-    const wallets = this._getWalletsStore();
     const adaWallets = this._getAdaWalletsStore();
-    const selected = wallets.selected;
-    if (selected == null) {
-      throw new Error(`${nameof(DaedalusTransferPage)} no wallet selected`);
-    }
     const daedalusTransfer = this._getDaedalusTransferStore();
 
     switch (daedalusTransfer.status) {
@@ -125,9 +119,7 @@ export default class DaedalusTransferPage extends Component<InjectedProps> {
         return (
           <TransferLayout>
             <TransferInstructionsPage
-              onFollowInstructionsPrerequisites={
-                () => this.goToCreateWallet(selected)
-              }
+              onFollowInstructionsPrerequisites={this.goToCreateWallet}
               onConfirm={this.startTransferFunds}
               onPaperConfirm={this.startTransferPaperFunds}
               onMasterKeyConfirm={this.startTransferMasterKey}

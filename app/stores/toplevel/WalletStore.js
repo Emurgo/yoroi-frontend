@@ -11,11 +11,15 @@ import config from '../../config';
 import globalMessages from '../../i18n/global-messages';
 import type { Notification } from '../../types/notificationType';
 import type {
-  CreateWalletFunc,
-  GetWalletsFunc, RestoreWalletFunc,
-  GenerateWalletRecoveryPhraseFunc,
+  CreateWalletResponse,
   RestoreWalletResponse,
 } from '../../api/ada';
+import type {
+  GetWalletsFunc
+} from '../../api/common/index';
+import {
+  getWallets
+} from '../../api/common/index';
 import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -71,6 +75,8 @@ function groupWallets(
   return Array.from(pairingMap.values());
 }
 
+type DeferredCall<T> = (() => Promise<T>) => Promise<T>;
+
 /**
  * The base wallet store that contains the shared logic
  * dealing with wallets / accounts.
@@ -82,18 +88,33 @@ export default class WalletStore extends Store {
 
   @observable publicDerivers: Array<WalletWithCachedMeta>;
   @observable selected: null | WalletWithCachedMeta;
-  @observable getInitialWallets: Request<GetWalletsFunc>;
-  @observable createWalletRequest: Request<CreateWalletFunc>;
-  @observable generateWalletRecoveryPhraseRequest: Request<GenerateWalletRecoveryPhraseFunc>;
-  @observable restoreRequest: Request<RestoreWalletFunc>;
+  @observable getInitialWallets: Request<GetWalletsFunc>
+    = new Request<GetWalletsFunc>(getWallets);
+  @observable createWalletRequest: Request<DeferredCall<CreateWalletResponse>>
+    = new Request<DeferredCall<CreateWalletResponse>>(async (create) => {
+      const createdWallet = await create();
+      if (!createdWallet) throw new Error(`${nameof(this.createWalletRequest)} failed to create wallet`);
+
+      await this._baseAddNewWallet(createdWallet);
+      this.stores.walletBackup.teardown();
+      return createdWallet;
+    });
+  @observable restoreRequest: Request<DeferredCall<RestoreWalletResponse>>
+    = new Request<DeferredCall<RestoreWalletResponse>>(async (restore) => {
+      const restoredWallet = await restore();
+      if (!restoredWallet) throw new Error(`${nameof(this.createWalletRequest)} failed to restore wallet`);
+
+      await this._baseAddNewWallet(restoredWallet);
+      this.restoreRequest.reset();
+      return restoredWallet;
+    });
   @observable isImportActive: boolean = false;
 
   setup(): void {
     super.setup();
     this.publicDerivers = [];
-    const { wallets, walletBackup } = this.actions;
+    const { wallets, } = this.actions;
     wallets.unselectWallet.listen(this._unsetActiveWallet);
-    walletBackup.finishWalletBackup.listen(this._finishCreation);
     wallets.updateBalance.listen(this._updateBalance);
     wallets.updateLastSync.listen(this._updateLastSync);
     setInterval(this._pollRefresh, this.WALLET_REFRESH_INTERVAL);
@@ -104,22 +125,6 @@ export default class WalletStore extends Store {
       this._showAddWalletPageWhenNoWallets,
     ]);
   }
-
-  create: {|
-    name: string,
-    password: string,
-  |} => Promise<void> = async (params) => {
-    const recoveryPhrase = await (
-      this.generateWalletRecoveryPhraseRequest.execute({}).promise
-    );
-    if (recoveryPhrase != null) {
-      this.actions.walletBackup.initiateWalletBackup.trigger({
-        recoveryPhrase,
-        name: params.name,
-        password: params.password,
-      });
-    }
-  };
 
   @action
   _baseAddNewWallet: RestoreWalletResponse => Promise<void> = async (
@@ -145,48 +150,6 @@ export default class WalletStore extends Store {
       this.selected = newWithCachedData[0];
     });
   }
-
-  /** Create the wallet and go to wallet summary screen */
-  _finishCreation: void => Promise<void> = async () => {
-    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
-    if (persistentDb == null) {
-      throw new Error(`${nameof(this._finishCreation)} db not loaded. Should never happen`);
-    }
-    const createdWallet = await this.createWalletRequest.execute({
-      db: persistentDb,
-      walletName: this.stores.walletBackup.name,
-      walletPassword: this.stores.walletBackup.password,
-      recoveryPhrase: this.stores.walletBackup.recoveryPhrase.join(' '),
-    }).promise;
-    if (!createdWallet) throw new Error(`${nameof(this._finishCreation)} should never happen`);
-
-    await this._baseAddNewWallet(createdWallet);
-
-    this.stores.walletBackup.teardown();
-  };
-
-  /** Restore wallet and move to wallet summary screen */
-  restore: {|
-    recoveryPhrase: string,
-    walletName: string,
-    walletPassword: string,
-  |} => Promise<void> = async (params) => {
-    this.restoreRequest.reset();
-
-    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
-    if (persistentDb == null) {
-      throw new Error(`${nameof(this.restore)} db not loaded. Should never happen`);
-    }
-    const createdWallet = await this.restoreRequest.execute({
-      db: persistentDb,
-      ...params,
-    }).promise;
-    if (!createdWallet) throw new Error('Restored wallet was not received correctly');
-
-    await this._baseAddNewWallet(createdWallet);
-
-    this.restoreRequest.reset();
-  };
 
   // =================== PUBLIC API ==================== //
 

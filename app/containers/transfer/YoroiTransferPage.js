@@ -22,8 +22,8 @@ import YoroiTransferStartPage from '../../components/transfer/YoroiTransferStart
 import environment from '../../environment';
 import config from '../../config';
 import { formattedWalletAmount } from '../../utils/formatters';
-import type { WalletWithCachedMeta } from '../../stores/toplevel/WalletStore';
 import { TransferKind, TransferStatus, TransferSource, } from '../../types/TransferTypes';
+import { ROUTES } from '../../routes-config';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
@@ -40,9 +40,8 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
     yoroiTransfer.reset();
   }
 
-  goToCreateWallet: WalletWithCachedMeta => void = (publicDeriver) => {
-    const wallets = this._getWalletsStore();
-    wallets.goToWalletRoute(publicDeriver.self);
+  goToCreateWallet: void => void = () => {
+    this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
   }
 
   startLegacyTransferFunds: void => void = () => {
@@ -147,12 +146,7 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
   render() {
     const { stores } = this.props;
     const { profile } = stores;
-    const wallets = this._getWalletsStore();
     const adaWallets = this._getAdaWalletsStore();
-    const selected = wallets.selected;
-    if (selected == null) {
-      throw new Error(`${nameof(YoroiTransferPage)} no wallet selected`);
-    }
     const yoroiTransfer = this._getYoroiTransferStore();
 
     switch (yoroiTransfer.status) {
@@ -166,9 +160,7 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
               onLegacyLedger={this.startTransferLegacyLedgerFunds}
               onLegacyTrezor={this.startTransferLegacyTrezorFunds}
               classicTheme={profile.isClassicTheme}
-              onFollowInstructionsPrerequisites={
-                () => this.goToCreateWallet(selected)
-              }
+              onFollowInstructionsPrerequisites={this.goToCreateWallet}
               disableTransferFunds={yoroiTransfer.disableTransferFunds}
             />
           </TransferLayout>

@@ -7,7 +7,7 @@ import classnames from 'classnames';
 import styles from './WalletRow.scss';
 
 import ToggleIcon from '../../../assets/images/my-wallets/arrow_down.inline.svg';
-import PlusIcon from '../../../assets/images/my-wallets/icon_plus.inline.svg';
+// import PlusIcon from '../../../assets/images/my-wallets/icon_plus.inline.svg';
 
 type Props = {|
     +walletSumDetails: Node,

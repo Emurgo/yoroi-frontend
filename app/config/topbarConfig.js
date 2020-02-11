@@ -21,14 +21,14 @@ export type Category = {|
   label?: MessageDescriptor,
 |};
 
-export const WALLETS: Category = {
+export const WALLETS: string => Category = route => ({
   name: 'WALLETS',
   className: 'wallets',
-  route: ROUTES.MY_WALLETS,
+  route,
   icon: walletsIcon,
   iconStyle: styles.walletsIcon,
   label: globalMessages.sidebarWallets
-};
+});
 
 export const WITH_TREZOR_T: Category = {
   name: 'WITH_TREZOR_T',

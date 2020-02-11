@@ -151,7 +151,7 @@ export function getMockServer(
       res.send(response);
     });
 
-    server.post('/api/v2/pool/reputation', async (
+    server.get('/api/v2/pool/reputation', async (
       req: { body: ReputationRequest, ... },
       res: { send(arg: ReputationResponse): any, ... }
     ): Promise<void> => {

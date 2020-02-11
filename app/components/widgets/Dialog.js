@@ -14,6 +14,7 @@ type ActionType = {|
   +label: string,
   +onClick: void => PossiblyAsync<void>,
   +primary?: boolean,
+  +isSubmitting?: boolean,
   +disabled?: boolean,
   +className?: ?string,
 |};
@@ -59,6 +60,10 @@ export default class Dialog extends Component<Props> {
     } = this.props;
     const secondaryButton = classicTheme ? 'flat' : 'outlined';
 
+    const hasSubmitting = actions != null && actions.filter(
+      action => action.isSubmitting === true
+    ).length > 0;
+
     return (
       <Modal
         isOpen
@@ -93,6 +98,12 @@ export default class Dialog extends Component<Props> {
                 const buttonClasses = classnames([
                   action.className != null ? action.className : null,
                   action.primary === true ? 'primary' : secondaryButton,
+                  action.isSubmitting === true && action.primary === true
+                    ? styles.isSubmittingPrimary
+                    : null,
+                  action.isSubmitting === true && action.primary !== true
+                    ? styles.isSubmittingSecondary
+                    : null,
                 ]);
                 return (
                   <Button
@@ -100,7 +111,7 @@ export default class Dialog extends Component<Props> {
                     className={buttonClasses}
                     label={action.label}
                     onClick={action.onClick}
-                    disabled={action.disabled}
+                    disabled={action.disabled === true || action.isSubmitting === true}
                     skin={ButtonSkin}
                   />
                 );
@@ -108,8 +119,8 @@ export default class Dialog extends Component<Props> {
             </div>)
           }
 
-          {closeButton ? React.cloneElement(closeButton, { onClose }) : null}
-          {backButton}
+          {!hasSubmitting && closeButton ? React.cloneElement(closeButton, { onClose }) : null}
+          {!hasSubmitting && backButton}
 
         </div>
       </Modal>

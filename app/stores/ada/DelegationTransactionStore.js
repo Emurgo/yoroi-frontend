@@ -3,7 +3,6 @@
 import { observable, action, reaction } from 'mobx';
 import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';
-import environment from '../../environment';
 import type {
   CreateDelegationTxFunc,
   SignAndBroadcastDelegationTxRequest, SignAndBroadcastDelegationTxResponse,

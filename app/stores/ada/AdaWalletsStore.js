@@ -1,5 +1,4 @@
 // @flow
-// import { BigNumber } from 'bignumber.js';
 import { observable, action } from 'mobx';
 
 import Store from '../base/Store';
@@ -8,8 +7,6 @@ import Request from '../lib/LocalizedRequest';
 import { ROUTES } from '../../routes-config';
 import type {
   SignAndBroadcastRequest, SignAndBroadcastResponse,
-  CreateWalletFunc,
-  GetWalletsFunc, RestoreWalletFunc,
   GenerateWalletRecoveryPhraseFunc
 } from '../../api/ada/index';
 import type { BaseSignRequest } from '../../api/ada/transactions/types';
@@ -22,28 +19,20 @@ import type { WalletWithCachedMeta } from '../toplevel/WalletStore';
 export default class AdaWalletsStore extends Store {
 
   // REQUESTS
-  @observable getInitialWallets: Request<GetWalletsFunc>
-    = new Request<GetWalletsFunc>(this.api.ada.getWallets);
-
-  @observable createWalletRequest: Request<CreateWalletFunc>
-    = new Request<CreateWalletFunc>(this.api.ada.createWallet.bind(this.api.ada));
-
   @observable sendMoneyRequest: Request<typeof AdaWalletsStore.prototype.sendAndRefresh>
     = new Request<typeof AdaWalletsStore.prototype.sendAndRefresh>(this.sendAndRefresh);
 
   @observable generateWalletRecoveryPhraseRequest: Request<GenerateWalletRecoveryPhraseFunc>
     = new Request<GenerateWalletRecoveryPhraseFunc>(this.api.ada.generateWalletRecoveryPhrase);
 
-  @observable restoreRequest: Request<RestoreWalletFunc>
-    = new Request<RestoreWalletFunc>(this.api.ada.restoreWallet);
-
   setup(): void {
     super.setup();
-    const { router, ada } = this.actions;
+    const { router, ada, walletBackup } = this.actions;
     const { wallets } = ada;
-    wallets.createWallet.listen(this._createWallet);
+    walletBackup.finishWalletBackup.listen(this._createInDb);
+    wallets.createWallet.listen(this._startWalletCreation);
     wallets.sendMoney.listen(this._sendMoney);
-    wallets.restoreWallet.listen(this._restoreWallet);
+    wallets.restoreWallet.listen(this._restoreToDb);
     router.goToRoute.listen(this._onRouteChange);
   }
 
@@ -96,18 +85,56 @@ export default class AdaWalletsStore extends Store {
 
   // =================== WALLET RESTORATION ==================== //
 
-  _createWallet: {|
+  _startWalletCreation: {|
     name: string,
     password: string,
   |} => Promise<void> = async (params) => {
-    await this.stores.wallets.create(params);
+    const recoveryPhrase = await (
+      this.generateWalletRecoveryPhraseRequest.execute({}).promise
+    );
+    if (recoveryPhrase == null) {
+      throw new Error(`${nameof(this._startWalletCreation)} failed to generate recovery phrase`);
+    }
+    this.actions.walletBackup.initiateWalletBackup.trigger({
+      recoveryPhrase,
+      name: params.name,
+      password: params.password,
+    });
   };
-  _restoreWallet: {|
+
+  /** Create the wallet and go to wallet summary screen */
+  _createInDb: void => Promise<void> = async () => {
+    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
+    if (persistentDb == null) {
+      throw new Error(`${nameof(this._createInDb)} db not loaded. Should never happen`);
+    }
+    await this.stores.wallets.createWalletRequest.execute(async () => {
+      const wallet = await this.api.ada.createWallet.bind(this.api.ada)({
+        db: persistentDb,
+        walletName: this.stores.walletBackup.name,
+        walletPassword: this.stores.walletBackup.password,
+        recoveryPhrase: this.stores.walletBackup.recoveryPhrase.join(' '),
+      });
+      return wallet;
+    }).promise;
+  };
+
+  _restoreToDb: {|
     recoveryPhrase: string,
     walletName: string,
     walletPassword: string,
   |} => Promise<void> = async (params) => {
-    await this.stores.wallets.restore(params);
+    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
+    if (persistentDb == null) {
+      throw new Error(`${nameof(this._restoreToDb)} db not loaded. Should never happen`);
+    }
+    await this.stores.wallets.restoreRequest.execute(async () => {
+      const wallet = await this.api.ada.createWallet.bind(this.api.ada)({
+        db: persistentDb,
+        ...params,
+      });
+      return wallet;
+    }).promise;
   };
 
   sendAndRefresh: {|

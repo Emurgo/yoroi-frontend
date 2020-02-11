@@ -51,10 +51,6 @@
   text-align: center;
 }
 
-.isSubmitting {
-  @include loading-spinner("../../assets/images/spinner-light.svg");
-}
-
 :global(.YoroiModern) .dialog {
   // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1052
   min-width: 680px;
