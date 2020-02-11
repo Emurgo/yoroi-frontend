@@ -359,7 +359,7 @@
   "wallet.dashboard.lessthan.reason5": "Вы делегируете в пул который или был, или остаётся перенасыщен",
   "wallet.dashboard.lessthan.title": "Объяснение упущенной награды",
   "wallet.dashboard.poolWarnings.censoringTxs": "Специально исключает транзакции из блоков (цензурирование сети)",
-  "wallet.dashboard.poolWarnings.explanation": "Unlike Proof of Work (PoW) where users cannot do anything about adversarial behavior, Proof of Stake (PoS) blockchains like Cardano empower users to punish bad actors",
+  "wallet.dashboard.poolWarnings.explanation": "В отличие от Proof of Work (PoW), где пользователи не могут ничего сделать с агрессной конкуренцией, Proof of Stake (PoS) блокчейны, такие как Cardano, дают пользователям возможность наказывать плохих участников",
   "wallet.dashboard.poolWarnings.header": "Судя сетевой активности, похоже, что этот пул:",
   "wallet.dashboard.poolWarnings.multiBlock": "Creates multiple blocks in the same slot (purposely causing forks)",
   "wallet.dashboard.poolWarnings.suggested": "Мы рекомендуем связаться с оператором пула через сайт пула, чтобы узнать его состояние. Помните, что Вы можете сменить пул для делегирования в любое время без каких-либо перерывов в получении наград.",
