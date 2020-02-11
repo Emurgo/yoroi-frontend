@@ -362,7 +362,7 @@
   "wallet.dashboard.poolWarnings.explanation": "Unlike Proof of Work (PoW) where users cannot do anything about adversarial behavior, Proof of Stake (PoS) blockchains like Cardano empower users to punish bad actors",
   "wallet.dashboard.poolWarnings.header": "Судя сетевой активности, похоже, что этот пул:",
   "wallet.dashboard.poolWarnings.multiBlock": "Creates multiple blocks in the same slot (purposely causing forks)",
-  "wallet.dashboard.poolWarnings.suggested": "We suggest contacting the pool owner through the stake pool's webpage to ask about their behavior. Remember, you can change your delegation at any time without any interruptions in rewards.",
+  "wallet.dashboard.poolWarnings.suggested": "Мы рекомендуем связаться с оператором пула через сайт пула, чтобы узнать его состояние. Помните, что Вы можете сменить пул для делегирования в любое время без каких-либо перерывов в получении наград.",
   "wallet.dashboard.poolWarnings.unknown": "Causes some unknown issue (look online for more info)",
   "wallet.dashboard.rewards.note": "До получения первого вознаграждения пройдет больше времени.",
   "wallet.dashboard.stakePool.age": "Возраст",
