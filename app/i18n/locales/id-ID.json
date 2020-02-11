@@ -36,6 +36,7 @@
   "api.errors.unusedAddressesError": "Anda tidak dapat membuat lebih dari 20 address yang tidak digunakan secara berturut-turut.",
   "api.errors.updateAdaTxsHistoryError": "Terjadi kesalahan saat memperbarui riwayat transaksi Ada.",
   "api.errors.updateAdaWalletError": "Terjadi kesalahan saat memperbarui wallet Ada.",
+  "app.errors.storageLoadError": "Failed to access storage. Yoroi needs to access to storage (\"IndexedDB\") to properly manage wallets. Your browser may either not support IndexedDB or it may be disabled due to your privacy settings (such as private browsing)",
   "app.errors.unableToLoad": "Tidak bisa memuat!",
   "app.errors.unexpectedError": "Sesuatu yang tak terduga terjadi. Coba lagi.",
   "app.errors.unknowError": "Terjadi kesalahan yang tidak diketahui.",
