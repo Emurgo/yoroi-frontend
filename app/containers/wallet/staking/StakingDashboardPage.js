@@ -676,6 +676,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
           delegationRequests: request.delegationRequests,
           currentEpoch: currTimeRequests.currentEpoch,
         }),
+        hideYAxis: this.props.stores.profile.shouldHideBalance
       }
     };
   }

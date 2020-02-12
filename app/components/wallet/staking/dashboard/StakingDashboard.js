@@ -51,6 +51,7 @@ export type RewardsGraphData = {|
     totalRewards: Array<GraphItems>,
     perEpochRewards: Array<GraphItems>,
   |},
+  +hideYAxis: boolean,
   +error: ?LocalizableError,
 |};
 export type GraphData = {|
@@ -180,12 +181,14 @@ export default class StakingDashboard extends Component<Props> {
             data: items.perEpochRewards,
             primaryBarLabel: intl.formatMessage(globalMessages.rewardsLabel),
             yAxisLabel: intl.formatMessage(globalMessages.rewardsLabel),
+            hideYAxis: graphData.hideYAxis,
           },
           {
             tabName: intl.formatMessage(globalMessages.totalRewardsLabel),
             data: items.totalRewards,
             primaryBarLabel: intl.formatMessage(globalMessages.totalRewardsLabel),
             yAxisLabel: intl.formatMessage(globalMessages.rewardsLabel),
+            hideYAxis: graphData.hideYAxis,
           },
           // intl.formatMessage(globalMessages.marginsLabel),
         ]}
