@@ -358,7 +358,7 @@
   "wallet.dashboard.lessthan.reason2": "С момента делегирования прошло недостаточно времени",
   "wallet.dashboard.lessthan.reason3": "Заработанная сумма была округлена до 0 (если вы делегировали очень маленькую сумму)",
   "wallet.dashboard.lessthan.reason4": "Пул, в который вы делегируете, взимает фиксированную плату, превышающую общую сумму вознаграждения пула",
-  "wallet.dashboard.lessthan.reason5": "Вы делегируете в пул который или был, или остаётся перенасыщен",
+  "wallet.dashboard.lessthan.reason5": "Вы делегируете в пул который был, или остаётся перенасыщен",
   "wallet.dashboard.lessthan.title": "Объяснение упущенной награды",
   "wallet.dashboard.poolWarnings.censoringTxs": "Специально исключает транзакции из блоков (цензурирование сети)",
   "wallet.dashboard.poolWarnings.explanation": "В отличие от Proof of Work (PoW), где пользователи не могут ничего сделать с агрессной конкуренцией, Proof of Stake (PoS) блокчейны, такие как Cardano, дают пользователям возможность наказывать плохих участников",
