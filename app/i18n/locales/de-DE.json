@@ -112,7 +112,7 @@
   "inline.editing.input.changesSaved": "Die Änderungen wurden gespeichert",
   "loading.screen.error": "Für weitere Hilfe, kannst Du {supportRequestLink}",
   "loading.screen.loading": "Lade Komponenten",
-  "myWallets.wallets.lastSyncText": "Last sync",
+  "myWallets.wallets.lastSyncText": "Letzte Synchronisierung",
   "myWallets.wallets.sumInfoText": "Total wallet balance",
   "networkError.label.message": "WARNUNG: Verbindung zum Server fehlgeschlagen.<br>Bitte überprüfe Deine Internetverbindung oder <a target='blank' href='https://twitter.com/YoroiWallet'>unser Twitter Konto</a>.<br>Das angezeigte Guthaben und der Transaktions-Verlauf könnte unvollständig erscheinen, bis unsere Server wieder in Normalbetrieb sind. Dein effektives Guthaben ist davon aber nicht betroffen.",
   "noticeBoard.noNoticeText.chooseAPool": "Um hier Benachrichtigungen zu sehen, <strong>wähle zuerst einen Stake pool</strong> und delegiere Deine ADA.",
