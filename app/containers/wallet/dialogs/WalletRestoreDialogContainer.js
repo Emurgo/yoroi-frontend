@@ -101,12 +101,12 @@ export default class WalletRestoreDialogContainer
         return (<WalletRestoreDialog
           mnemonicValidator={mnemonic => {
             if (isPaper) {
-              return wallets.isValidPaperMnemonic({
+              return this._getAdaWalletsStore().isValidPaperMnemonic({
                 mnemonic,
                 numberOfWords: wordsCount
               });
             }
-            return wallets.isValidMnemonic({
+            return this._getAdaWalletsStore().isValidMnemonic({
               mnemonic,
               numberOfWords: wordsCount
             });
@@ -143,8 +143,8 @@ export default class WalletRestoreDialogContainer
             byronPlate={walletRestore.recoveryResult ?.byronPlate}
             shelleyPlate={walletRestore.recoveryResult ?.shelleyPlate}
             selectedExplorer={profile.selectedExplorer}
-            onNext={() => actions[environment.API].walletRestore.verifyMnemonic.trigger()}
-            onCancel={() => walletRestoreActions.back.trigger()}
+            onNext={actions[environment.API].walletRestore.verifyMnemonic.trigger}
+            onCancel={walletRestoreActions.back.trigger}
             onCopyAddressTooltip={(address, elementId) => {
               if (!uiNotifications.isOpen(elementId)) {
                 this.setState({ notificationElementId: elementId });
@@ -167,11 +167,12 @@ export default class WalletRestoreDialogContainer
       case RestoreSteps.LEGACY_EXPLANATION: {
         return (
           <LegacyExplanation
-            onBack={() => walletRestoreActions.back.trigger()}
+            onBack={walletRestoreActions.back.trigger}
             onClose={this.onCancel}
             onSkip={walletRestoreActions.startRestore.trigger}
             onCheck={walletRestoreActions.startCheck.trigger}
             classicTheme={this.props.classicTheme}
+            isSubmitting={restoreRequest.isExecuting}
           />
         );
       }
@@ -189,8 +190,9 @@ export default class WalletRestoreDialogContainer
           }
           return [{
             label: intl.formatMessage(globalMessages.continue),
-            onClick: () => walletRestoreActions.startRestore.trigger(),
+            onClick: walletRestoreActions.startRestore.trigger,
             primary: true,
+            isSubmitting: restoreRequest.isExecuting,
           }];
         };
         return (
@@ -212,8 +214,11 @@ export default class WalletRestoreDialogContainer
     }
   }
 
-  _getWalletsStore() {
+  _getAdaWalletsStore() {
     return this.props.stores.substores[environment.API].wallets;
+  }
+  _getWalletsStore() {
+    return this.props.stores.wallets;
   }
 
   _transferDialogContent() {
@@ -240,7 +245,7 @@ export default class WalletRestoreDialogContainer
           formattedWalletAmount={formattedWalletAmount}
           selectedExplorer={this.props.stores.profile.selectedExplorer}
           transferTx={yoroiTransfer.transferTx}
-          onSubmit={() => walletRestoreActions.transferFromLegacy.trigger()}
+          onSubmit={walletRestoreActions.transferFromLegacy.trigger}
           isSubmitting={yoroiTransfer.transferFundsRequest.isExecuting}
           onCancel={this.onCancel}
           error={yoroiTransfer.error}

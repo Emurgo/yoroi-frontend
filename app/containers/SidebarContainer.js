@@ -9,7 +9,7 @@ type Props = InjectedProps;
 @observer
 export default class SidebarContainer extends Component<Props> {
 
-  toggleSidebar = () => {
+  toggleSidebar: void => void = () => {
     this.props.actions.profile.toggleSidebar.trigger();
   }
 

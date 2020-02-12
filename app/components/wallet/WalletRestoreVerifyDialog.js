@@ -18,6 +18,7 @@ import type { ExplorerType } from '../../domain/Explorer';
 import type { Notification } from '../../types/notificationType';
 import type { PlateResponse } from '../../api/ada/lib/cardanoCrypto/plate';
 import CenteredLayout from '../layout/CenteredLayout';
+import environment from '../../environment';
 
 const messages = defineMessages({
   dialogTitleVerifyWalletRestoration: {
@@ -168,14 +169,15 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
     const actions = [
       {
         label: intl.formatMessage(globalMessages.backButtonLabel),
-        onClick: onCancel
+        onClick: onCancel,
+        disabled: !environment.isShelley() && isSubmitting,
       },
       {
         label: intl.formatMessage(globalMessages.confirm),
         onClick: onNext,
         primary: true,
-        className: classnames(['confirmButton', isSubmitting ? styles.isSubmitting : null]),
-        disabled: isSubmitting,
+        className: classnames(['confirmButton']),
+        isSubmitting: !environment.isShelley() && isSubmitting,
       },
     ];
 

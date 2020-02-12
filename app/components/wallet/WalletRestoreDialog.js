@@ -303,7 +303,7 @@ export default class WalletRestoreDialog extends Component<Props> {
 
       // Although we require 10 characters for creation
       // We allow any password to be used for restoration
-      // This is to ensure compatiblity with any other apps that use our paper wallet construction
+      // This is to ensure compatibility with any other apps that use our paper wallet construction
 
       return !condition;
     };

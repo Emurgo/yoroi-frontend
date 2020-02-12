@@ -162,9 +162,6 @@ import {
 import {
   getAllAddressesForDisplay,
 } from './lib/storage/bridge/traitUtils';
-import {
-  loadWalletsFromStorage,
-} from './lib/storage/models/load';
 import { convertAdaTransactionsToExportRows } from './transactions/utils';
 import { migrateToLatest } from './lib/storage/adaMigration';
 import { generateAdaPaperPdf } from './paperWallet/paperWalletPdf';
@@ -210,14 +207,6 @@ export type CreateAdaPaperPdfResponse = ?Blob;
 export type CreateAdaPaperPdfFunc = (
   request: CreateAdaPaperPdfRequest
 ) => Promise<CreateAdaPaperPdfResponse>;
-
-// getWallets
-
-export type GetWalletsRequest = {| db: lf$Database, |};
-export type GetWalletsResponse = Array<PublicDeriver<>>;
-export type GetWalletsFunc = (
-  request: GetWalletsRequest
-) => Promise<GetWalletsResponse>;
 
 // getAllAddressesForDisplay
 
@@ -636,20 +625,6 @@ export default class AdaApi {
       }
     });
     return res;
-  }
-
-  async getWallets(
-    request: GetWalletsRequest,
-  ): Promise<GetWalletsResponse> {
-    Logger.debug('AdaApi::getWallets called');
-    try {
-      const wallets = await loadWalletsFromStorage(request.db);
-      Logger.debug('AdaApi::getWallets success: ' + stringifyData(wallets));
-      return wallets;
-    } catch (error) {
-      Logger.error('AdaApi::getWallets error: ' + stringifyError(error));
-      throw new GenericApiError();
-    }
   }
 
   /**

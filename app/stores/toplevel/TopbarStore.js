@@ -3,6 +3,7 @@ import { observable, computed, action } from 'mobx';
 import Store from '../base/Store';
 import environment from '../../environment';
 import type { Category } from '../../config/topbarConfig';
+import { ROUTES } from '../../routes-config';
 import {
   WITH_LEDGER_NANO,
   WITH_TREZOR_T,
@@ -19,7 +20,7 @@ import {
 
 export default class TopbarStore extends Store {
 
-  @observable activeTopbarCategory: string = WALLETS.route;
+  @observable activeTopbarCategory: string = ROUTES.MY_WALLETS;
 
   setup(): void {
     super.setup();
@@ -31,7 +32,7 @@ export default class TopbarStore extends Store {
   }
 
   @computed get categories(): Array<Category> {
-    const { wallets } = this.stores.substores[environment.API];
+    const { wallets } = this.stores;
 
     let isTrezorT = false;
     let isNano = false;
@@ -41,9 +42,12 @@ export default class TopbarStore extends Store {
       isTrezorT = isTrezorTWallet(conceptualWallet);
       isNano = isLedgerNanoWallet(conceptualWallet);
     }
+    const walletsRoute = selected == null
+      ? WALLETS(ROUTES.MY_WALLETS)
+      : WALLETS(this.stores.wallets.getWalletRoute(selected.self));
 
     return [
-      (wallets && !wallets.hasAnyPublicDeriver) ? GO_BACK : WALLETS,
+      (wallets && !wallets.hasAnyPublicDeriver) ? GO_BACK : walletsRoute,
       ...(isTrezorT ? [WITH_TREZOR_T] : []),
       ...(isNano ? [WITH_LEDGER_NANO] : []),
       SETTINGS,

@@ -25,6 +25,7 @@ import SupportSettingsPage from './containers/settings/categories/SupportSetting
 // Dynamic container loading - resolver loads file relative to '/app/' directory
 import LoadingPage from './containers/LoadingPage';
 import Wallet from './containers/wallet/Wallet';
+import MyWalletsPage from './containers/wallet/MyWalletsPage';
 import WalletSummaryPage from './containers/wallet/WalletSummaryPage';
 import WalletSendPage from './containers/wallet/WalletSendPage';
 import WalletReceivePage from './containers/wallet/WalletReceivePage';
@@ -75,6 +76,11 @@ export const Routes = (
       />
       <Route
         exact
+        path={ROUTES.MY_WALLETS}
+        component={(props) => <MyWalletsPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
         path={ROUTES.WALLETS.ADD}
         component={(props) => <WalletAddPage {...props} stores={stores} actions={actions} />}
       />
@@ -112,7 +118,7 @@ export const Routes = (
         path={ROUTES.NOTICE_BOARD.ROOT}
         component={(props) => <NoticeBoardPage {...props} stores={stores} actions={actions} />}
       />
-      <Redirect to={ROUTES.WALLETS.ADD} />
+      <Redirect to={ROUTES.MY_WALLETS} />
     </Switch>
   </div>
 );

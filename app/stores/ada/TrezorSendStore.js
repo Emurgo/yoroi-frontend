@@ -22,7 +22,7 @@ import {
   convertToLocalizableError
 } from '../../domain/TrezorLocalizedError';
 import LocalizableError from '../../i18n/LocalizableError';
-import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import type { WalletWithCachedMeta } from '../toplevel/WalletStore';
 
 /** Note: Handles Trezor Signing */
 export default class TrezorSendStore extends Store {
@@ -56,7 +56,7 @@ export default class TrezorSendStore extends Store {
   /** Generates a payload with Trezor format and tries Send ADA using Trezor signing */
   _sendUsingTrezor: {|
     params: SendUsingTrezorParams,
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
   |} => Promise<void> = async (request) => {
     try {
       this.createTrezorSignTxDataRequest.reset();
@@ -105,7 +105,7 @@ export default class TrezorSendStore extends Store {
 
   _brodcastSignedTx: (
     CardanoSignTransaction$,
-    PublicDeriverWithCachedMeta,
+    WalletWithCachedMeta,
   ) => Promise<void> = async (
     trezorSignTxResp,
     publicDeriver,
@@ -113,7 +113,7 @@ export default class TrezorSendStore extends Store {
     if (!trezorSignTxResp.success) {
       throw new Error(`${nameof(TrezorSendStore)}::${nameof(this._brodcastSignedTx)} should never happen`);
     }
-    const { wallets } = this.stores.substores[environment.API];
+    const { wallets } = this.stores;
     await this.broadcastTrezorSignedTxRequest.execute({
       broadcastRequest: {
         signedTxRequest: {
@@ -122,7 +122,7 @@ export default class TrezorSendStore extends Store {
         },
         sendTx: this.stores.substores[environment.API].stateFetchStore.fetcher.sendTx,
       },
-      refreshWallet: () => wallets.refreshWallet(publicDeriver),
+      refreshWallet: () => wallets.refreshWalletFromRemote(publicDeriver),
     }).promise;
 
     this.actions.dialogs.closeActiveDialog.trigger();

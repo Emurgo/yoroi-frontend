@@ -19,8 +19,7 @@ export default class Wallet extends Component<Props> {
 
   isActiveScreen = (page: string, subpage: ?boolean): boolean => {
     const { app } = this.props.stores;
-    const { wallets } = this.props.stores.substores.ada;
-    const selected = wallets.selected;
+    const { selected } = this.props.stores.wallets;
     if (selected == null) return false;
     const screenRoute = buildRoute(
       ROUTES.WALLETS.PAGE,
@@ -35,8 +34,8 @@ export default class Wallet extends Component<Props> {
     return app.currentRoute === screenRoute;
   };
 
-  handleWalletNavItemClick = (page: string): void => {
-    const { wallets } = this.props.stores.substores.ada;
+  handleWalletNavItemClick: (string) => void = (page) => {
+    const { wallets } = this.props.stores;
     const selected = wallets.selected;
     if (selected == null) return;
     this.props.actions.router.goToRoute.trigger({
@@ -46,7 +45,7 @@ export default class Wallet extends Component<Props> {
   };
 
   render() {
-    const { wallets, } = this.props.stores.substores.ada;
+    const { wallets, } = this.props.stores;
     const { actions, stores } = this.props;
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
     const sidebarContainer = (<SidebarContainer actions={actions} stores={stores} />);
@@ -60,6 +59,7 @@ export default class Wallet extends Component<Props> {
           stores={stores}
           connectionErrorType={checkAdaServerStatus}
           showInContainer
+          showAsCard
         >
           <VerticallyCenteredLayout>
             <LoadingSpinner />
@@ -76,6 +76,7 @@ export default class Wallet extends Component<Props> {
         stores={stores}
         connectionErrorType={checkAdaServerStatus}
         showInContainer
+        showAsCard
       >
         <WalletWithNavigation
           isActiveScreen={this.isActiveScreen}

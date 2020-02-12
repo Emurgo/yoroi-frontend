@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import WalletBackupDialog from '../../../components/wallet/WalletBackupDialog';
 import type { InjectedDialogContainerProps } from '../../../types/injectedPropsType';
-import environment from '../../../environment';
 
 type Props = InjectedDialogContainerProps;
 
@@ -41,7 +40,7 @@ export default class WalletBackupDialogContainer extends Component<Props> {
       acceptPrivacyNoticeForWalletBackup,
       continueToRecoveryPhraseForWalletBackup
     } = actions.walletBackup;
-    const { createWalletRequest } = stores.substores[environment.API].wallets;
+    const { createWalletRequest } = stores.wallets;
     const { classicTheme } = this.props;
     const hasWord = (enteredPhrase.length > 0);
     return (

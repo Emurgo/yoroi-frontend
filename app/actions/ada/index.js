@@ -1,5 +1,5 @@
 // @flow
-import WalletsActions from './wallets-actions';
+import AdaWalletsActions from './ada-wallets-actions';
 import PaperWalletsActions from './paper-wallets-actions';
 import TransactionsActions from './transactions-actions';
 import WalletSettingsActions from './wallet-settings-actions';
@@ -17,7 +17,7 @@ import DelegationActions from './delegation-actions';
 
 export type AdaActionsMap = {|
   txBuilderActions: TxBuilderActions,
-  wallets: WalletsActions,
+  wallets: AdaWalletsActions,
   paperWallets: PaperWalletsActions,
   transactions: TransactionsActions,
   walletSettings: WalletSettingsActions,
@@ -36,7 +36,7 @@ export type AdaActionsMap = {|
 
 const adaActionsMap: AdaActionsMap = {
   txBuilderActions: new TxBuilderActions(),
-  wallets: new WalletsActions(),
+  wallets: new AdaWalletsActions(),
   paperWallets: new PaperWalletsActions(),
   transactions: new TransactionsActions(),
   walletSettings: new WalletSettingsActions(),

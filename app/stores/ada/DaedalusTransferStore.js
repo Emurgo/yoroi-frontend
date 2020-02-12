@@ -30,7 +30,7 @@ import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import {
   asHasUtxoChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import type { WalletWithCachedMeta } from '../toplevel/WalletStore';
 
 declare var CONFIG: ConfigType;
 const websocketUrl = CONFIG.network.websocketUrl;
@@ -86,7 +86,7 @@ export default class DaedalusTransferStore extends Store {
       because this method run as a reaction.
   */
   _enableDisableTransferFunds: void => void = () => {
-    const { wallets } = this.stores.substores[environment.API];
+    const { wallets } = this.stores;
     // User must first make a Yoroi wallet before being able to transfer a Daedalus wallet
     if (wallets.hasActiveWallet) {
       runInAction(() => {
@@ -105,7 +105,7 @@ export default class DaedalusTransferStore extends Store {
    */
   _setupTransferWebSocket: (
     RustModule.WalletV2.DaedalusWallet,
-    PublicDeriverWithCachedMeta,
+    WalletWithCachedMeta,
   ) => Promise<void> = async (
     wallet,
     publicDeriver,
@@ -193,7 +193,7 @@ export default class DaedalusTransferStore extends Store {
 
   _setupTransferFundsWithMnemonic: {|
     recoveryPhrase: string,
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
   |} => Promise<void> = async (payload) => {
     let { recoveryPhrase: secretWords } = payload;
     if (secretWords.split(' ').length === 27) {
@@ -216,7 +216,7 @@ export default class DaedalusTransferStore extends Store {
 
   _setupTransferFundsWithMasterKey: {|
     masterKey: string,
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
   |} => Promise<void> = async (payload) => {
     const { masterKey: key } = payload;
 
@@ -244,7 +244,7 @@ export default class DaedalusTransferStore extends Store {
   /** Broadcast the transfer transaction if one exists and proceed to continuation */
   _transferFunds: {|
     next: Function,
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
   |} => Promise<void> = async (payload) => {
     try {
       const { next } = payload;

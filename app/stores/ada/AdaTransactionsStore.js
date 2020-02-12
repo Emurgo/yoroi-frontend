@@ -19,7 +19,7 @@ import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
 import { isValidAmountInLovelaces } from '../../utils/validations';
 import TransactionsStore from '../base/TransactionsStore';
 import { assuranceLevels, } from '../../config/transactionAssuranceConfig';
-import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import type { WalletWithCachedMeta } from '../toplevel/WalletStore';
 import type {
   GetTransactionRowsToExportFunc,
 } from '../../api/ada';
@@ -53,7 +53,7 @@ export default class AdaTransactionsStore extends TransactionsStore {
 
   @observable exportError: ?LocalizableError;
 
-  /** Calculate information about transactions that are still realistically reversable */
+  /** Calculate information about transactions that are still realistically reversible */
   @computed get unconfirmedAmount(): UnconfirmedAmount {
     const unconfirmedAmount = {
       total: new BigNumber(0),
@@ -62,7 +62,7 @@ export default class AdaTransactionsStore extends TransactionsStore {
     };
 
     // Get current public deriver
-    const publicDeriver = this.stores.substores.ada.wallets.selected;
+    const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return unconfirmedAmount;
 
     // Get current transactions for public deriver
@@ -101,7 +101,7 @@ export default class AdaTransactionsStore extends TransactionsStore {
   );
 
   @action _exportTransactionsToFile: {|
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
     exportRequest: TransactionRowsToExportRequest,
   |} => Promise<void> = async (request) => {
     try {
@@ -122,7 +122,7 @@ export default class AdaTransactionsStore extends TransactionsStore {
         throw new LocalizableError(globalMessages.noTransactionsFound);
       }
 
-      /** Intentially added delay to feel smooth flow */
+      /** Intentionally added delay to feel smooth flow */
       setTimeout(async () => {
         const req: ExportTransactionsRequest = {
           rows: respTxRows

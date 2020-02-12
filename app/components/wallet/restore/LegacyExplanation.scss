@@ -1,3 +1,5 @@
+@import '../../../themes/mixins/loading-spinner';
+
 .component {
   text-align: left;
 
@@ -19,4 +21,9 @@
       width: 212px;
     }
   }
+}
+
+.isSubmitting {
+  @include loading-spinner("../../../assets/images/spinner-dark.svg");
+  opacity: 0.5;
 }

@@ -8,6 +8,7 @@ import UiDialogsStore from './toplevel/UiDialogsStore';
 import UiNotificationsStore from './toplevel/UiNotificationsStore';
 import NoticeBoardStore from './toplevel/NoticeBoardStore';
 import LoadingStore from './toplevel/LoadingStore';
+import WalletStore from './toplevel/WalletStore';
 import setupAdaStores from './ada/index';
 import type { AdaStoresMap } from './ada/index';
 import environment from '../environment';
@@ -25,6 +26,7 @@ const storeClasses = {
   uiNotifications: UiNotificationsStore,
   noticeBoard: NoticeBoardStore,
   loading: LoadingStore,
+  wallets: WalletStore,
 };
 
 export type StoresMap = {|
@@ -36,7 +38,7 @@ export type StoresMap = {|
   uiNotifications: UiNotificationsStore,
   noticeBoard: NoticeBoardStore,
   loading: LoadingStore,
-
+  wallets: WalletStore,
   substores: {| ada: AdaStoresMap, |},
   router: RouterStore,
 |};
@@ -52,7 +54,7 @@ const stores = observable({
   uiNotifications: null,
   noticeBoard: null,
   loading: null,
-
+  wallets: null,
   substores: {},
   router: null,
 });
@@ -99,7 +101,7 @@ export default action(
     }
 
     // Perform load after all setup is done to ensure migration can modify store state
-    if (stores.loading) { // if condition to please flow (avoid thinkin "loading" is null)
+    if (stores.loading) { // if condition to please flow (avoid thinking "loading" is null)
       stores.loading.load();
     }
 

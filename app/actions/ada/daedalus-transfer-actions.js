@@ -1,6 +1,6 @@
 // @flow
 import { AsyncAction, Action } from '../lib/Action';
-import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import type { WalletWithCachedMeta } from '../../stores/toplevel/WalletStore';
 
 export default class DaedalusTransferActions {
   startTransferFunds: Action<void> = new Action();
@@ -8,16 +8,16 @@ export default class DaedalusTransferActions {
   startTransferMasterKey: Action<void> = new Action();
   setupTransferFundsWithMnemonic: AsyncAction<{|
     recoveryPhrase: string,
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
   |}> = new AsyncAction();
   setupTransferFundsWithMasterKey: AsyncAction<{|
     masterKey: string,
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
   |}> = new AsyncAction();
   backToUninitialized: Action<void> = new Action();
   transferFunds: AsyncAction<{|
     next: () => Promise<void>,
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
   |}> = new AsyncAction();
   cancelTransferFunds: Action<void> = new Action();
 }

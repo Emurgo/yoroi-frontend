@@ -4,7 +4,6 @@ import { observer } from 'mobx-react';
 import TopBar from '../components/topbar/TopBar';
 import WalletTopbarTitle from '../components/topbar/WalletTopbarTitle';
 import type { InjectedProps } from '../types/injectedPropsType';
-import environment from '../environment';
 
 import { formattedWalletAmount } from '../utils/formatters';
 
@@ -21,7 +20,7 @@ export default class TopBarContainer extends Component<Props> {
     const { actions, stores } = this.props;
     const { app, topbar, profile } = stores;
 
-    const walletsStore = stores.substores[environment.API].wallets;
+    const walletsStore = stores.wallets;
     const title = (<WalletTopbarTitle
       publicDeriver={walletsStore.selected}
       currentRoute={app.currentRoute}

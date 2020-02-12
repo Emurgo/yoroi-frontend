@@ -6,7 +6,7 @@ import moment from 'moment';
 import { observer } from 'mobx-react';
 import BigNumber from 'bignumber.js';
 
-import PublicDeriverWithCachedMeta from '../../../domain/PublicDeriverWithCachedMeta';
+import type { WalletWithCachedMeta } from '../../../stores/toplevel/WalletStore';
 import { getOrDefault } from '../../../domain/Explorer';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import StakingDashboard from '../../../components/wallet/staking/dashboard/StakingDashboard';
@@ -65,7 +65,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
     });
 
     const timeStore = this.props.stores.substores.ada.time;
-    const publicDeriver = this.props.stores.substores[environment.API].wallets.selected;
+    const publicDeriver = this.props.stores.wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
     }
@@ -87,7 +87,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
   };
 
   render() {
-    const publicDeriver = this.props.stores.substores[environment.API].wallets.selected;
+    const publicDeriver = this.props.stores.wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
     }
@@ -156,7 +156,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
       </>);
   }
 
-  getEpochLengthInDays: PublicDeriverWithCachedMeta => ?number = (publicDeriver) => {
+  getEpochLengthInDays: WalletWithCachedMeta => ?number = (publicDeriver) => {
     const timeStore = this.props.stores.substores.ada.time;
     const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver.self);
     const getEpochLength = timeCalcRequests.currentEpochLength.result;
@@ -170,7 +170,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
     return epochLengthInDays;
   }
 
-  generatePopupDialog: PublicDeriverWithCachedMeta => (null | Node) = (publicDeriver) => {
+  generatePopupDialog: WalletWithCachedMeta => (null | Node) = (publicDeriver) => {
     const { uiDialogs } = this.props.stores;
     const delegationTxStore = this.props.stores.substores[environment.API].delegationTransaction;
 
@@ -229,7 +229,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
     />);
   }
 
-  getRewardInfo: PublicDeriverWithCachedMeta => (void | {|
+  getRewardInfo: WalletWithCachedMeta => (void | {|
     rewardPopup: Node,
     showWarning: boolean,
   |}) = (publicDeriver) => {
@@ -372,7 +372,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
     };
   }
 
-  getErrorInFetch: PublicDeriverWithCachedMeta => void | {| error: LocalizableError, |} = (
+  getErrorInFetch: WalletWithCachedMeta => void | {| error: LocalizableError, |} = (
     publicDeriver
   ) => {
     const delegationStore = this.props.stores.substores[environment.API].delegation;
@@ -401,7 +401,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
     return undefined;
   }
 
-  getStakePools: PublicDeriverWithCachedMeta => {| pools: null | Array<Node> |} = (
+  getStakePools: WalletWithCachedMeta => {| pools: null | Array<Node> |} = (
     publicDeriver
   ) => {
     const delegationStore = this.props.stores.substores[environment.API].delegation;
@@ -549,7 +549,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
 
   _generateUserSummary: {|
     delegationRequests: DelegationRequests,
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
     errorIfPresent: void | {| error: LocalizableError |}
   |} => Node = (request) => {
     const showRewardAmount = request.delegationRequests.getCurrentDelegation.wasExecuted &&
@@ -664,7 +664,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
 
   _generateGraphData: {|
     delegationRequests: DelegationRequests,
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
   |} => GraphData = (request) => {
     const timeStore = this.props.stores.substores.ada.time;
     const currTimeRequests = timeStore.getCurrentTimeRequests(request.publicDeriver.self);

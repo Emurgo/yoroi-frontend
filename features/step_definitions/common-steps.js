@@ -222,7 +222,7 @@ Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
 
 async function refreshWallet(client) {
   await client.driver.executeAsyncScript((done) => {
-    window.yoroi.stores.substores.ada.wallets.refreshImportedWalletData()
+    window.yoroi.stores.wallets.refreshImportedWalletData()
       .then(done)
       .catch(err => done(err));
   });

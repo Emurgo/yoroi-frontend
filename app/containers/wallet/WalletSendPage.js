@@ -75,8 +75,8 @@ export default class WalletSendPage extends Component<Props> {
   };
 
   render() {
-    const { wallets, transactions, transactionBuilderStore } = this.props.stores.substores.ada;
-    const publicDeriver = wallets.selected;
+    const { transactions, transactionBuilderStore } = this.props.stores.substores.ada;
+    const publicDeriver = this.props.stores.wallets.selected;
     // Guard against potential null values
     if (!publicDeriver) throw new Error('Active wallet required for WalletSendPage.');
 
@@ -180,7 +180,7 @@ export default class WalletSendPage extends Component<Props> {
     * separate container is not needed, this container acts as container for Confirmation dialog */
   hardwareWalletDoConfirmation = (): Node => {
     const { intl } = this.context;
-    const publicDeriver = this.props.stores.substores[environment.API].wallets.selected;
+    const publicDeriver = this.props.stores.wallets.selected;
     const { transactionBuilderStore } = this.props.stores.substores.ada;
     // Guard against potential null values
     if (!publicDeriver) throw new Error('Active wallet required for hardwareWalletDoConfirmation.');

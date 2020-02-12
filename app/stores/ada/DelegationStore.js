@@ -33,7 +33,7 @@ import type {
   RewardTuple,
 } from '../../api/ada/lib/state-fetch/types';
 import LocalizableError from '../../i18n/LocalizableError';
-import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import type { WalletWithCachedMeta } from '../toplevel/WalletStore';
 import {
   genToRelativeSlotNumber,
   genTimeToSlot,
@@ -87,7 +87,7 @@ export default class DelegationStore extends Store {
     return undefined; // can happen if the wallet is not a Shelley wallet
   }
 
-  @action addObservedWallet: PublicDeriverWithCachedMeta => void = (
+  @action addObservedWallet: WalletWithCachedMeta => void = (
     publicDeriver
   ) => {
     const newObserved = {
@@ -116,7 +116,7 @@ export default class DelegationStore extends Store {
     ]);
   }
 
-  refreshDelegation: PublicDeriverWithCachedMeta => Promise<void> = async (
+  refreshDelegation: WalletWithCachedMeta => Promise<void> = async (
     publicDeriver
   ) => {
     const delegationRequest = this.getRequests(publicDeriver.self);
@@ -242,7 +242,7 @@ export default class DelegationStore extends Store {
   _startWatch: void => void = () => {
     this._recalculateDelegationInfoDisposer = reaction(
       () => [
-        this.stores.substores.ada.wallets.selected,
+        this.stores.wallets.selected,
         // num tx sync changed => valid inputs may have changed
         this.stores.substores.ada.transactions.totalAvailable,
         // need to recalculate when there are no more pending transactions
@@ -257,7 +257,7 @@ export default class DelegationStore extends Store {
           // don't re-query when server goes offline -- only when it comes back online
           return;
         }
-        const selected = this.stores.substores.ada.wallets.selected;
+        const selected = this.stores.wallets.selected;
         if (selected == null) return;
         await this.refreshDelegation(selected);
       },

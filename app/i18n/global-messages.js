@@ -140,6 +140,18 @@ const globalMessages = defineMessages({
     id: 'global.language.italian',
     defaultMessage: '!!!Italiano',
   },
+  addressLabel: {
+    id: 'wallet.receive.confirmationDialog.addressLabel',
+    defaultMessage: '!!!Address',
+  },
+  addressesLabel: {
+    id: 'wallet.receive.confirmationDialog.addressesLabel',
+    defaultMessage: '!!!Addresses',
+  },
+  addWalletLabel: {
+    id: 'wallet.nav.addButton',
+    defaultMessage: '!!!Add new wallet',
+  },
   unitAda: {
     id: 'global.unit.ada',
     defaultMessage: '!!!Ada',

@@ -75,7 +75,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
   componentWillUnmount() {
     const builderActions = this._getTxBuilderActions();
     builderActions.reset.trigger();
-    this._getWalletsStore().sendMoneyRequest.reset();
+    this._getAdaWalletsStore().sendMoneyRequest.reset();
   }
 
   submit: void => Promise<void> = async () => {
@@ -168,9 +168,9 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
         selectedExplorer={this.props.stores.profile.selectedExplorer}
         transferTx={transferTx}
         onSubmit={this.submit}
-        isSubmitting={this._getWalletsStore().sendMoneyRequest.isExecuting}
+        isSubmitting={this._getAdaWalletsStore().sendMoneyRequest.isExecuting}
         onCancel={this.props.onClose}
-        error={this._getWalletsStore().sendMoneyRequest.error}
+        error={this._getAdaWalletsStore().sendMoneyRequest.error}
         classicTheme={profile.isClassicTheme}
       />
     );
@@ -181,6 +181,10 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
   }
 
   _getWalletsStore() {
+    return this.props.stores.wallets;
+  }
+
+  _getAdaWalletsStore() {
     return this.props.stores.substores[environment.API].wallets;
   }
 

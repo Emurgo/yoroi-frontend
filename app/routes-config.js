@@ -2,6 +2,7 @@
 export const ROUTES = {
   ROOT: '/',
   NO_WALLETS: '/no-wallets',
+  MY_WALLETS: '/my-wallets',
   PROFILE: {
     LANGUAGE_SELECTION: '/profile/language-selection',
     TERMS_OF_USE: '/profile/terms-of-use',

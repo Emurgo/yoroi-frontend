@@ -65,7 +65,7 @@ export default class StakingPage extends Component<Props> {
       );
 
     // Add userAda
-    const publicDeriver = this.props.stores.substores.ada.wallets.selected;
+    const publicDeriver = this.props.stores.wallets.selected;
     if (!publicDeriver) {
       return null;
     }

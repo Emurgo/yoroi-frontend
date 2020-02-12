@@ -5,10 +5,12 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import styles from './NavDropdown.scss';
 import CaretIcon from '../../assets/images/wallet-nav/caret-down.inline.svg';
+import NavBarAddButton from './NavBarAddButton';
 
 type Props = {|
   +headerComponent?: ?Node,
   +contentComponents?: ?Node,
+  +onAddWallet: void => void,
 |};
 
 type State = {|
@@ -58,15 +60,9 @@ export default class NavDropdown extends Component<Props, State> {
         {isExpanded !== null && isExpanded && (
           <div className={styles.content}>
             {contentComponents}
-            {/* Re-enable once multi-wallet is fully supported */}
-            {/* <div className={styles.buttonWrapper}>
-              <button
-                type="button"
-                className={styles.button}
-              >
-                Add new wallet
-              </button>
-            </div> */}
+            <div className={styles.buttonWrapper}>
+              <NavBarAddButton onClick={this.props.onAddWallet} />
+            </div>
           </div>
         )}
       </div>

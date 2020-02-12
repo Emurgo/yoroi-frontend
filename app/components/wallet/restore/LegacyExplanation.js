@@ -28,7 +28,8 @@ type Props = {|
   +onClose: void => void,
   +onSkip: void => PossiblyAsync<void>,
   +onCheck: void => PossiblyAsync<void>,
-  +classicTheme: boolean
+  +classicTheme: boolean,
+  +isSubmitting: boolean,
 |};
 
 @observer
@@ -51,13 +52,16 @@ export default class LegacyExplanation extends Component<Props> {
     const actions = [
       {
         label: intl.formatMessage(globalMessages.skipLabel),
+        className: classnames([this.props.isSubmitting ? styles.isSubmitting : null]),
         onClick: this.props.onSkip,
-        primary: false
+        primary: false,
+        isSubmitting: this.props.isSubmitting,
       },
       {
         label: intl.formatMessage(globalMessages.checkLabel),
         onClick: this.props.onCheck,
-        primary: true
+        primary: true,
+        disabled: this.props.isSubmitting,
       }
     ];
 

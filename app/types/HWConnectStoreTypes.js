@@ -112,7 +112,7 @@ export interface HWConnectStoreTypes<ConnectionResponse> {
     derivationIndex: number,
   ): CreateHardwareWalletRequest;
 
-  _onSaveSucess(publicDeriver: PublicDeriver<>): Promise<void>;
+  _onSaveSuccess(publicDeriver: PublicDeriver<>): Promise<void>;
   // =================== SAVE =================== //
 
   // =================== API =================== //

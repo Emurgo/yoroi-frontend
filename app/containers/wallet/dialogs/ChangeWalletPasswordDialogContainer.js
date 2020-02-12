@@ -11,10 +11,10 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Injec
   render() {
     const { actions } = this.props;
     const { uiDialogs, profile } = this.props.stores;
-    const { wallets, walletSettings } = this.props.stores.substores[environment.API];
+    const { walletSettings } = this.props.stores.substores[environment.API];
     const dialogData = uiDialogs.dataForActiveDialog;
     const { updateDataForActiveDialog } = actions.dialogs;
-    const publicDeriver = wallets.selected;
+    const publicDeriver = this.props.stores.wallets.selected;
     const { changeSigningKeyRequest } = walletSettings;
 
     if (!publicDeriver) throw new Error('Active wallet required for ChangeWalletPasswordDialogContainer.');

@@ -22,12 +22,16 @@ type Props = {|
     */
     +rewards: null | void | BigNumber,
     +walletAmount: null | BigNumber,
+    +infoText?: string,
+    +showDetails?: boolean,
 |};
 
 export default class NavWalletDetails extends Component<Props> {
 
   static defaultProps = {
     highlightTitle: false,
+    infoText: undefined,
+    showDetails: true,
   };
 
   static contextTypes = {
@@ -41,6 +45,8 @@ export default class NavWalletDetails extends Component<Props> {
       highlightTitle,
       rewards,
       walletAmount,
+      infoText,
+      showDetails
     } = this.props;
 
     const { intl } = this.context;
@@ -48,42 +54,51 @@ export default class NavWalletDetails extends Component<Props> {
     const totalAmount = this.getTotalAmount();
     return (
       <div className={styles.wrapper}>
-        <div className={styles.content}>
-          <div
-            className={classnames([
-              styles.amount,
-              highlightTitle !== null && highlightTitle === true && styles.highlightAmount
-            ])}
-          >
-            {this.renderAmountDisplay({
-              shouldHideBalance,
-              amount: totalAmount
-            })}
-          </div>
-          {this.props.rewards !== undefined &&
-          <div className={styles.details}>
-            <div>
-              <p className={styles.label}>{intl.formatMessage(globalMessages.walletLabel)}&nbsp;</p>
-              {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
+        <div className={styles.outerWrapper}>
+          <div className={styles.content}>
+            <div
+              className={classnames([
+                styles.amount,
+                highlightTitle !== null && highlightTitle === true && styles.highlightAmount
+              ])}
+            >
+              {this.renderAmountDisplay({
+                shouldHideBalance,
+                amount: totalAmount
+              })}
             </div>
-            <div>
-              <p className={styles.label}>
-                {intl.formatMessage(globalMessages.rewardsLabel)}&nbsp;
-              </p>
-              {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
+            {this.props.rewards !== undefined && showDetails !== null && showDetails === true &&
+            <div className={styles.details}>
+              <div>
+                <p className={styles.label}>
+                  {intl.formatMessage(globalMessages.walletLabel)}&nbsp;
+                </p>
+                {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
+              </div>
+              <div>
+                <p className={styles.label}>
+                  {intl.formatMessage(globalMessages.rewardsLabel)}&nbsp;
+                </p>
+                {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
+              </div>
             </div>
+          }
           </div>
-        }
+          {totalAmount != null &&
+            <button
+              type="button"
+              className={styles.toggleButton}
+              onClick={onUpdateHideBalance}
+            >
+              {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
+            </button>
+          }
         </div>
-        {totalAmount != null &&
-          <button
-            type="button"
-            className={styles.toggleButton}
-            onClick={onUpdateHideBalance}
-          >
-            {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
-          </button>
-        }
+        {infoText != null && (
+          <div className={styles.info}>
+            {infoText}
+          </div>
+        )}
       </div>
     );
   }

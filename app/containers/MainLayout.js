@@ -15,15 +15,17 @@ export type MainLayoutProps = {|
   navbar?: Node,
   connectionErrorType: ServerStatusErrorType,
   showInContainer?: boolean,
+  showAsCard?: boolean,
 |};
 
 @observer
 export default class MainLayout extends Component<MainLayoutProps> {
   static defaultProps = {
     topbar: null,
+    showInContainer: false,
+    showAsCard: false,
     sidebar: null,
     navbar: null,
-    showInContainer: false,
   };
 
 
@@ -40,6 +42,7 @@ export default class MainLayout extends Component<MainLayoutProps> {
         navbar={this.props.navbar}
         notification={<div />}
         showInContainer={this.props.showInContainer}
+        showAsCard={this.props.showAsCard}
       >
         {this.props.children}
       </TopBarLayout>

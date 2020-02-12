@@ -4,17 +4,16 @@ import React, { Component } from 'react';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import type { InjectedProps } from '../types/injectedPropsType';
-import environment from '../environment';
 import { intlShape, defineMessages } from 'react-intl';
 import NavBar from '../components/topbar/NavBar';
 import NavPlate from '../components/topbar/NavPlate';
 import NavWalletDetails from '../components/topbar/NavWalletDetails';
 import NavDropdown from '../components/topbar/NavDropdown';
 import NavDropdownRow from '../components/topbar/NavDropdownRow';
-// import NavBarBack from '../components/topbar/NavBarBack';
-// import { ROUTES } from '../routes-config';
+import NavBarBack from '../components/topbar/NavBarBack';
+import { ROUTES } from '../routes-config';
 import { LOVELACES_PER_ADA } from '../config/numbersConfig';
-import PublicDeriverWithCachedMeta from '../domain/PublicDeriverWithCachedMeta';
+import type { WalletWithCachedMeta } from '../stores/toplevel/WalletStore';
 import { isLedgerNanoWallet, isTrezorTWallet } from '../api/ada/lib/storage/models/ConceptualWallet/index';
 
 const messages = defineMessages({
@@ -51,20 +50,19 @@ export default class NavBarContainer extends Component<Props> {
     const { stores } = this.props;
     const { profile } = stores;
 
-    const walletsStore = stores.substores[environment.API].wallets;
+    const walletsStore = stores.wallets;
     const publicDeriver = walletsStore.selected;
     if (publicDeriver == null) return null;
 
-    // TODO: Replace route with ROUTES.WALLETS.ROOT after merging MyWallets screen
-    const title = (<></>);
-    //   <NavBarBack
-    //     route={ROUTES.SETTINGS.ROOT}
-    //     onBackClick={this.navigateToWallets}
-    //     title={intl.formatMessage(messages.backButton)}
-    //   />
-    // );
+    const title = (
+      <NavBarBack
+        route={ROUTES.MY_WALLETS}
+        onBackClick={this.navigateToWallets}
+        title={intl.formatMessage(messages.backButton)}
+      />
+    );
 
-    const wallets = this.props.stores.substores.ada.wallets.publicDerivers;
+    const wallets = this.props.stores.wallets.publicDerivers;
 
     let utxoTotal = new BigNumber(0);
     for (const walletUtxoAmount of wallets.map(wallet => wallet.amount)) {
@@ -103,7 +101,7 @@ export default class NavBarContainer extends Component<Props> {
           walletName={wallet.conceptualWalletName}
           walletType={getWalletType(wallet)}
         />}
-        isCurrentWallet={wallet === this.props.stores.substores.ada.wallets.selected}
+        isCurrentWallet={wallet === this.props.stores.wallets.selected}
         syncTime={wallet.lastSyncInfo.Time
           ? moment(wallet.lastSyncInfo.Time).fromNow()
           : null
@@ -140,6 +138,9 @@ export default class NavBarContainer extends Component<Props> {
       <NavDropdown
         headerComponent={dropdownHead}
         contentComponents={dropdownContent}
+        onAddWallet={
+          () => this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
+        }
       />
     );
 
@@ -159,11 +160,11 @@ export default class NavBarContainer extends Component<Props> {
   }
 
   /**
-   * undefined => wallet doesn't is not a reward wallet
+   * undefined => wallet is not a reward wallet
    * null => still calculating
    * value => done calculating
    */
-  getRewardBalance: PublicDeriverWithCachedMeta => null | void | BigNumber = (
+  getRewardBalance: WalletWithCachedMeta => null | void | BigNumber = (
     publicDeriver
   ) => {
     const delegationRequest = this.props.stores.substores.ada.delegation.getRequests(
@@ -179,7 +180,7 @@ export default class NavBarContainer extends Component<Props> {
   }
 }
 
-function getWalletType(publicDeriver: PublicDeriverWithCachedMeta) {
+function getWalletType(publicDeriver: WalletWithCachedMeta) {
   const conceptualWallet = publicDeriver.self.getParent();
   if (isLedgerNanoWallet(conceptualWallet)) {
     return 'ledger';

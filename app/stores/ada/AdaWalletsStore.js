@@ -1,18 +1,12 @@
 // @flow
-// import { BigNumber } from 'bignumber.js';
 import { observable, action } from 'mobx';
 
-import config from '../../config';
-import globalMessages from '../../i18n/global-messages';
-import type { Notification } from '../../types/notificationType';
-import WalletStore from '../base/WalletStore';
+import Store from '../base/Store';
 import { matchRoute, buildRoute } from '../../utils/routing';
 import Request from '../lib/LocalizedRequest';
 import { ROUTES } from '../../routes-config';
 import type {
   SignAndBroadcastRequest, SignAndBroadcastResponse,
-  CreateWalletFunc,
-  GetWalletsFunc, RestoreWalletFunc,
   GenerateWalletRecoveryPhraseFunc
 } from '../../api/ada/index';
 import type { BaseSignRequest } from '../../api/ada/transactions/types';
@@ -20,37 +14,26 @@ import {
   asGetSigningKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import type { WalletWithCachedMeta } from '../toplevel/WalletStore';
 
-export default class AdaWalletsStore extends WalletStore {
+export default class AdaWalletsStore extends Store {
 
   // REQUESTS
-  @observable getInitialWallets: Request<GetWalletsFunc>
-    = new Request<GetWalletsFunc>(this.api.ada.getWallets);
-
-  @observable createWalletRequest: Request<CreateWalletFunc>
-    = new Request<CreateWalletFunc>(this.api.ada.createWallet.bind(this.api.ada));
-
   @observable sendMoneyRequest: Request<typeof AdaWalletsStore.prototype.sendAndRefresh>
     = new Request<typeof AdaWalletsStore.prototype.sendAndRefresh>(this.sendAndRefresh);
 
   @observable generateWalletRecoveryPhraseRequest: Request<GenerateWalletRecoveryPhraseFunc>
     = new Request<GenerateWalletRecoveryPhraseFunc>(this.api.ada.generateWalletRecoveryPhrase);
 
-  @observable restoreRequest: Request<RestoreWalletFunc>
-    = new Request<RestoreWalletFunc>(this.api.ada.restoreWallet);
-
   setup(): void {
     super.setup();
-    const { router, walletBackup, ada } = this.actions;
+    const { router, ada, walletBackup } = this.actions;
     const { wallets } = ada;
-    wallets.createWallet.listen(this._create);
+    walletBackup.finishWalletBackup.listen(this._createInDb);
+    wallets.createWallet.listen(this._startWalletCreation);
     wallets.sendMoney.listen(this._sendMoney);
-    wallets.restoreWallet.listen(this._restoreWallet);
-    wallets.updateBalance.listen(this._updateBalance);
-    wallets.updateLastSync.listen(this._updateLastSync);
+    wallets.restoreWallet.listen(this._restoreToDb);
     router.goToRoute.listen(this._onRouteChange);
-    walletBackup.finishWalletBackup.listen(this._finishCreation);
   }
 
   // =================== SEND MONEY ==================== //
@@ -59,7 +42,7 @@ export default class AdaWalletsStore extends WalletStore {
   _sendMoney:  {|
     signRequest: BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>,
     password: string,
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
   |} => Promise<void> = async (transactionDetails) => {
     const withSigning = (asGetSigningKey(transactionDetails.publicDeriver.self));
     if (withSigning == null) {
@@ -72,13 +55,15 @@ export default class AdaWalletsStore extends WalletStore {
         signRequest: transactionDetails.signRequest,
         sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
       },
-      refreshWallet: () => this.refreshWallet(transactionDetails.publicDeriver),
+      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(
+        transactionDetails.publicDeriver
+      ),
     }).promise;
 
     this.actions.dialogs.closeActiveDialog.trigger();
     this.sendMoneyRequest.reset();
     // go to transaction screen
-    this.goToWalletRoute(transactionDetails.publicDeriver.self);
+    this.stores.wallets.goToWalletRoute(transactionDetails.publicDeriver.self);
   };
 
   @action _onRouteChange: {| route: string, params: ?Object |} => void = (options) => {
@@ -102,50 +87,57 @@ export default class AdaWalletsStore extends WalletStore {
 
   // =================== WALLET RESTORATION ==================== //
 
-  _restoreWallet: {|
+  _startWalletCreation: {|
+    name: string,
+    password: string,
+  |} => Promise<void> = async (params) => {
+    const recoveryPhrase = await (
+      this.generateWalletRecoveryPhraseRequest.execute({}).promise
+    );
+    if (recoveryPhrase == null) {
+      throw new Error(`${nameof(this._startWalletCreation)} failed to generate recovery phrase`);
+    }
+    this.actions.walletBackup.initiateWalletBackup.trigger({
+      recoveryPhrase,
+      name: params.name,
+      password: params.password,
+    });
+  };
+
+  /** Create the wallet and go to wallet summary screen */
+  _createInDb: void => Promise<void> = async () => {
+    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
+    if (persistentDb == null) {
+      throw new Error(`${nameof(this._createInDb)} db not loaded. Should never happen`);
+    }
+    await this.stores.wallets.createWalletRequest.execute(async () => {
+      const wallet = await this.api.ada.createWallet.bind(this.api.ada)({
+        db: persistentDb,
+        walletName: this.stores.walletBackup.name,
+        walletPassword: this.stores.walletBackup.password,
+        recoveryPhrase: this.stores.walletBackup.recoveryPhrase.join(' '),
+      });
+      return wallet;
+    }).promise;
+  };
+
+  _restoreToDb: {|
     recoveryPhrase: string,
     walletName: string,
     walletPassword: string,
   |} => Promise<void> = async (params) => {
-    await this.restore(params);
+    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
+    if (persistentDb == null) {
+      throw new Error(`${nameof(this._restoreToDb)} db not loaded. Should never happen`);
+    }
+    await this.stores.wallets.restoreRequest.execute(async () => {
+      const wallet = await this.api.ada.createWallet.bind(this.api.ada)({
+        db: persistentDb,
+        ...params,
+      });
+      return wallet;
+    }).promise;
   };
-
-  // =================== NOTIFICATION ==================== //
-  showLedgerNanoWalletIntegratedNotification: void => void = (): void => {
-    const notification: Notification = {
-      id: globalMessages.ledgerNanoSWalletIntegratedNotificationMessage.id,
-      message: globalMessages.ledgerNanoSWalletIntegratedNotificationMessage,
-      duration: config.wallets.WALLET_CREATED_NOTIFICATION_DURATION,
-    };
-    this.actions.notifications.open.trigger(notification);
-  }
-
-  showTrezorTWalletIntegratedNotification: void => void = (): void => {
-    const notification: Notification = {
-      id: globalMessages.trezorTWalletIntegratedNotificationMessage.id,
-      message: globalMessages.trezorTWalletIntegratedNotificationMessage,
-      duration: config.wallets.WALLET_CREATED_NOTIFICATION_DURATION,
-    };
-    this.actions.notifications.open.trigger(notification);
-  }
-
-  showWalletCreatedNotification: void => void = (): void => {
-    const notification: Notification = {
-      id: globalMessages.walletCreatedNotificationMessage.id,
-      message: globalMessages.walletCreatedNotificationMessage,
-      duration: config.wallets.WALLET_CREATED_NOTIFICATION_DURATION,
-    };
-    this.actions.notifications.open.trigger(notification);
-  }
-
-  showWalletRestoredNotification: void => void = (): void => {
-    const notification: Notification = {
-      id: globalMessages.walletRestoredNotificationMessage.id,
-      message: globalMessages.walletRestoredNotificationMessage,
-      duration: config.wallets.WALLET_RESTORED_NOTIFICATION_DURATION,
-    };
-    this.actions.notifications.open.trigger(notification);
-  }
 
   sendAndRefresh: {|
     broadcastRequest: SignAndBroadcastRequest,

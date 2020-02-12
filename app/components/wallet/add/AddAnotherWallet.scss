@@ -1,0 +1,41 @@
+@import './card-mixin.scss';
+
+.component {
+  height: 100%;
+  overflow: auto;
+
+  .hero {
+    min-height: 100%;
+    max-width: 1366px;
+    margin: 0 auto;
+    padding: 20px 15px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .heroInner {
+    display: flex;
+    position: relative;
+    z-index: 1;
+    justify-content: space-between;
+    width: 100%;
+  
+    @media screen and (max-width: 1300px) {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+  
+  .heroLogo {
+    display: block;
+    position: relative;
+    top: 50%;
+    margin: auto auto;
+    path {
+      fill: var(--cmn-color-black);
+    }
+    @media screen and (max-width: 1300px) {
+      margin-bottom: 24px;
+    }
+  }
+}

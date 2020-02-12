@@ -22,6 +22,7 @@ import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashC
 import type { ExplorerType } from '../../../domain/Explorer';
 
 import LocalizableError from '../../../i18n/LocalizableError';
+import globalMessages from '../../../i18n/global-messages';
 import styles from './VerifyAddressDialog.scss';
 
 const messages = defineMessages({
@@ -32,10 +33,6 @@ const messages = defineMessages({
   verifyAddressButtonLabel: {
     id: 'wallet.receive.confirmationDialog.verifyAddressButtonLabel',
     defaultMessage: '!!!Verify on hardware wallet',
-  },
-  addressLabel: {
-    id: 'wallet.receive.confirmationDialog.addressLabel',
-    defaultMessage: '!!!Address',
   },
   derivationPathLabel: {
     id: 'wallet.receive.confirmationDialog.derivationPathLabel',
@@ -121,7 +118,7 @@ export default class VerifyAddressDialog extends Component<Props> {
             <br />
             <br />
             <span className={labelStyle}>
-              {intl.formatMessage(messages.addressLabel)}
+              {intl.formatMessage(globalMessages.addressLabel)}
             </span>
             <div className={styles.infoBlock}>
               <div className={styles.data}>

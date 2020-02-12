@@ -35,7 +35,7 @@ import {
 import {
   asHasUtxoChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import type { WalletWithCachedMeta } from '../toplevel/WalletStore';
 import {
   unscramblePaperAdaMnemonic,
 } from '../../api/ada/lib/cardanoCrypto/paperWallet';
@@ -146,7 +146,7 @@ export default class YoroiTransferStore extends Store {
       because this method run as a reaction.
   */
   _enableDisableTransferFunds: void => void = (): void => {
-    const { wallets } = this.stores.substores[environment.API];
+    const { wallets } = this.stores;
     // User must first make a Yoroi wallet before being able to transfer a Daedalus wallet
     if (wallets.hasActiveWallet) {
       runInAction(() => {
@@ -159,7 +159,7 @@ export default class YoroiTransferStore extends Store {
     }
   }
 
-  nextInternalAddress: PublicDeriverWithCachedMeta => (void => Promise<string>) = (
+  nextInternalAddress: WalletWithCachedMeta => (void => Promise<string>) = (
     publicDeriver
   ) => {
     return async () => {

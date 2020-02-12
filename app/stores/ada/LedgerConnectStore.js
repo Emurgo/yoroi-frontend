@@ -261,7 +261,7 @@ export default class LedgerConnectStore
       if (!this.createHWRequest.promise) throw new Error('should never happen');
       const newWallet = await this.createHWRequest.promise;
 
-      await this._onSaveSucess(newWallet.publicDeriver);
+      await this._onSaveSuccess(newWallet.publicDeriver);
     } catch (error) {
       Logger.error(`${nameof(LedgerConnectStore)}::${nameof(this._saveHW)}::error ${stringifyError(error)}`);
 
@@ -315,12 +315,12 @@ export default class LedgerConnectStore
     };
   };
 
-  async _onSaveSucess(publicDeriver: PublicDeriver<>): Promise<void> {
+  async _onSaveSuccess(publicDeriver: PublicDeriver<>): Promise<void> {
     // close the active dialog
-    Logger.debug('LedgerConnectStore::_onSaveSucess success, closing dialog');
+    Logger.debug('LedgerConnectStore::_onSaveSuccess success, closing dialog');
     this.actions.dialogs.closeActiveDialog.trigger();
 
-    const { wallets } = this.stores.substores[environment.API];
+    const { wallets } = this.stores;
     await wallets.addHwWallet(publicDeriver);
 
     // show success notification

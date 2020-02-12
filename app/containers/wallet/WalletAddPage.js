@@ -7,9 +7,11 @@ import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
 import RouterActions from '../../actions/router-actions';
 import type { InjectedProps } from '../../types/injectedPropsType';
+import globalMessages from '../../i18n/global-messages';
 
 import MainLayout from '../MainLayout';
 import WalletAdd from '../../components/wallet/WalletAdd';
+import AddAnotherWallet from '../../components/wallet/add/AddAnotherWallet';
 
 import WalletCreateDialogContainer from './dialogs/WalletCreateDialogContainer';
 import WalletCreateDialog from '../../components/wallet/WalletCreateDialog';
@@ -26,6 +28,10 @@ import WalletConnectHWOptionDialog from '../../components/wallet/add/option-dial
 import WalletTrezorConnectDialogContainer from './dialogs/WalletTrezorConnectDialogContainer';
 import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDialogContainer';
 
+import SidebarContainer from '../SidebarContainer';
+import NavBar from '../../components/topbar/NavBar';
+import NavBarTitle from '../../components/topbar/NavBarTitle';
+
 import type { RestoreModeType } from '../../actions/ada/wallet-restore-actions';
 import { RestoreMode } from '../../actions/ada/wallet-restore-actions';
 
@@ -38,11 +44,15 @@ export default class WalletAddPage extends Component<Props> {
   };
 
   onClose = () => {
-    if (!this.props.stores.substores[environment.API].wallets.hasAnyWallets) {
+    if (!this.props.stores.wallets.hasAnyWallets) {
       this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
     }
     this.props.actions.dialogs.closeActiveDialog.trigger();
   };
+
+  componentDidMount() {
+    this.props.actions.wallets.unselectWallet.trigger();
+  }
 
   render() {
     const { profile } = this.props.stores;
@@ -133,26 +143,52 @@ export default class WalletAddPage extends Component<Props> {
       );
     }
 
-    const content = (
-      <WalletAdd
-        onHardwareConnect={
-          () => actions.dialogs.open.trigger({ dialog: WalletConnectHWOptionDialog })
+    const { hasAnyWallets } = this.props.stores.wallets;
+    if (!hasAnyWallets) {
+      return (
+        <MainLayout
+          actions={actions}
+          stores={stores}
+          connectionErrorType={checkAdaServerStatus}
+        >
+          <WalletAdd
+            onHardwareConnect={
+              () => actions.dialogs.open.trigger({ dialog: WalletConnectHWOptionDialog })
+            }
+            onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
+            onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreOptionDialog })}
+            onSettings={this._goToSettingsRoot}
+            onDaedalusTransfer={this._goToDaedalusTransferRoot}
+          />
+          {activeDialog}
+        </MainLayout>
+      );
+    }
+    const navbarElement = (
+      <NavBar
+        title={
+          <NavBarTitle
+            title={this.context.intl.formatMessage(globalMessages.addWalletLabel)}
+          />
         }
-        onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
-        onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreOptionDialog })}
-        onSettings={this._goToSettingsRoot}
-        onDaedalusTransfer={this._goToDaedalusTransferRoot}
-        classicTheme={profile.isClassicTheme}
       />
     );
-
     return (
       <MainLayout
         actions={actions}
         stores={stores}
         connectionErrorType={checkAdaServerStatus}
+        sidebar={<SidebarContainer actions={actions} stores={stores} />}
+        navbar={navbarElement}
+        showInContainer
       >
-        {content}
+        <AddAnotherWallet
+          onHardwareConnect={
+            () => actions.dialogs.open.trigger({ dialog: WalletConnectHWOptionDialog })
+          }
+          onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
+          onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreOptionDialog })}
+        />
         {activeDialog}
       </MainLayout>
     );

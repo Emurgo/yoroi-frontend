@@ -16,7 +16,7 @@ import {
 import {
   IPublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import type { WalletWithCachedMeta } from '../toplevel/WalletStore';
 import { removeAllTransactions } from '../../api/ada/lib/storage/bridge/updateTransactions';
 import {
   Logger,
@@ -46,7 +46,7 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
   }
 
   @action _changeSigningPassword: {|
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
     oldPassword: string,
     newPassword: string
   |} => Promise<void> = async (request) => {
@@ -72,7 +72,7 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
   };
 
   @action _renamePublicDeriver: {|
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
     newName: string
   |} => Promise<void> = async (request) => {
     // update the meta-parameters in the internal wallet representation
@@ -89,7 +89,7 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
   };
 
   @action _renameConceptualWallet: {|
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
     newName: string
   |} => Promise<void> = async (request) => {
     const conceptualWallet = request.publicDeriver.self.getParent();
@@ -107,7 +107,7 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
   };
 
   @action _resyncHistory: {|
-    publicDeriver: PublicDeriverWithCachedMeta,
+    publicDeriver: WalletWithCachedMeta,
   |} => Promise<void> = async (request) => {
     const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver.self);
     if (withLevels == null) {
@@ -115,9 +115,9 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
     }
     await this.clearHistory.execute({
       publicDeriver: withLevels,
-      refreshWallet: () => this.stores.substores.ada.wallets.refreshWallet(request.publicDeriver),
+      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
     }).promise;
-    request.publicDeriver.clearCache();
+    request.publicDeriver.amount = null; // TODO: properly clear cache
     this.clearHistory.reset();
   };
 }

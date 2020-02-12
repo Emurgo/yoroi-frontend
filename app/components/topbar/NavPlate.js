@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import PublicDeriverWithCachedMeta from '../../domain/PublicDeriverWithCachedMeta';
+import type { WalletWithCachedMeta } from '../../stores/toplevel/WalletStore';
 import type { WalletAccountNumberPlate } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { intlShape, defineMessages } from 'react-intl';
 import styles from './NavPlate.scss';
@@ -35,7 +35,7 @@ const messages = defineMessages({
 
 type Props = {|
   +walletName: string,
-  +publicDeriver: null | PublicDeriverWithCachedMeta,
+  +publicDeriver: null | WalletWithCachedMeta,
   +walletType: 'standard' | 'paper' | 'trezor' | 'ledger',
 |};
 
