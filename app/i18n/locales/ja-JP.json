@@ -36,7 +36,7 @@
   "api.errors.unusedAddressesError": "未使用アドレスは20件まで作成が可能です。",
   "api.errors.updateAdaTxsHistoryError": "ADAトランザクション履歴の更新中にエラーが発生しました。",
   "api.errors.updateAdaWalletError": "ADAウォレットの更新中にエラーが発生しました。",
-  "app.errors.storageLoadError": "Failed to access storage. Yoroi needs to access to storage (\"IndexedDB\") to properly manage wallets. Your browser may either not support IndexedDB or it may be disabled due to your privacy settings (such as private browsing)",
+  "app.errors.storageLoadError": "ストレージへのアクセスに失敗しました。ヨロイは、ウォレットの適正な管理のためにストレージ（IndexedDB）にアクセスする必要があります。お使いのブラウザがIndexedDBに対応していない、またはプライバシー設定に基づき無効化されている可能性があります（プライベートブラウジングなど）。",
   "app.errors.unableToLoad": "ロードできませんでした。",
   "app.errors.unexpectedError": "予期せぬエラーが発生しました。再試行してください。",
   "app.errors.unknowError": "不明なエラー。",
