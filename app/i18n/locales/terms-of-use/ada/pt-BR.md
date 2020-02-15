@@ -14,7 +14,7 @@ Este contrato de Termos de Serviço ("Acordo") é realizado entre EMURGO Co., Lt
 
 **e. Privacy.** When reasonably practicable, the Company will attempt to respect User's privacy. The Company will not monitor, edit, or disclose any personal information about User or User's account, including its contents or User's use of the Software, without User's prior consent unless the Company believes in good faith that such action is necessary to: (i) comply with legal process or other legal requirements of any governmental authority; (ii) protect and defend the rights or property of the Company; (iii) enforce this Agreement; (iv) protect the interests of users of the Software other than User or any other person; or (v) operate or conduct maintenance and repair of the Company's services or equipment, including the Software as authorized by law. User has no expectation of privacy with respect to the Internet generally. User's IP address is transmitted and recorded with each message or other information User sends from the Software.
 
-## 2. Taxes and Fees
+## 2. Impostos e Taxas
 
 All currency conversion charges, third party fees, sales, use, value-added, personal property or other tax, duty or levy of any kind, including interest and penalties thereon, whether imposed now or hereinafter by any governmental entity, and fees incurred by User by reason of User's access, use or installation of the Software shall be the sole responsibility of User.
 
