@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  # todo: more sensible trigger
+  schedule:
+  - cron: "0 2 * * 1-5"
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          # todo: nvm use ?
+          node-version: '12.x'
+      - run: npm install
+      - run: npm run shelley-prod -- --nightly
+        # todo: way to fetch the pem
+      - run: npm run compress -- --env 'shelley-testnet' --app-id 'yoroi-nightly' --zip-only --codebase 'https://yoroiwallet.com/dw/yoroi-extension-nightly.crx' --key ./nightly-key.pem
+      - name: publish nightly
+        uses: trmcnvn/chrome-addon@v2
+        with:
+          # ID of the extension that you are updating
+          extension: # optional
+          # Path to a .zip of your addon
+          zip: # optional
+          # Google OAuth2 client id
+          client-id: # optional
+          # Google OAuth2 client secret
+          client-secret: # optional
+          # Google OAuth2 refresh token
+          refresh-token: # optional

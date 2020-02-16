@@ -33,7 +33,7 @@ do
 
     # since we cannot control if circleci triggered jobs by type (PR), we control here if we need
     # to upload artifacts or not if this was triggered by a normal branch
-    if [[ ! -z $(echo ${BRANCH} | grep "^develop$\|^staging$\|^master$\|^shelley$") ]] || [[ ! -z "${PR_NUMBER}" ]]
+    if [[ ! -z $(echo ${BRANCH} | grep "^develop$\|^master$\|^shelley$") ]] || [[ ! -z "${PR_NUMBER}" ]]
     then
       aws s3 sync --only-show-errors screenshots/${browser} "s3://${S3_BUCKET}/${OBJECT_KEY_BASEPATH}"
       

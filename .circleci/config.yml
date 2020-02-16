@@ -38,12 +38,11 @@ aliases:
       CHROME_CODEBASE_URL: https://www.sample.com/dw/yoroi-extension.crx
       CHROME_WEBSTORE_API_ENDPOINT: https://www.googleapis.com/upload/chromewebstore/v1.1
       CHROME_DEV_APP_ID: febkioblpijdgicianpklkmolpbagnbo
-      CHROME_STG_APP_ID: bbaanljemfingpglehbbpdlhhahliihe
       CHROME_PRO_APP_ID: fkkmcnnpaaimcaikbjgklcibgncdgejc
       SCREENSHOT_DIFF_THRESHOLD: 0
       SCREENSHOT_DIFF_COLOR: yellow
       BROWSERS: brave chrome firefox
-      GITHUB_BUILD_BRANCHES: develop staging master shelley
+      GITHUB_BUILD_BRANCHES: develop master shelley
 
       # Encrypted env vars from ui:
       # AWS_ACCESS_KEY_ID: "${ARTIFACTS_KEY}"
@@ -76,7 +75,7 @@ jobs:
           # This is not working on circle's checkout/post hook for some reason, so we moved it here
           name: Checkout merge-commit if this is a PR build
           command: |
-            # Get PR number if there is some open PR for develop|staging|master,
+            # Get PR number if there is some open PR for develop|shelley|master,
             # even if circle doesn't provide it (triggers are for the branches).
             # NOTE: we could have multiple PRs from the same branch and this
             # snippet would only pick the last one
@@ -192,7 +191,6 @@ jobs:
       - *setenv
       - run: bash .circleci/deploy_depends_install.sh
       - run: bash .circleci/s3_screenshots_upload.sh
-      - run: bash .circleci/chrome_webstore_deploy.sh
       # TODO: GH releases deploy, this is a dummy script right now.
       # We prolly could use dpl CLI tool from Travis: https://github.com/travis-ci/dpl#github-releases
       - run: bash .circleci/s3_artifacts_upload.sh
