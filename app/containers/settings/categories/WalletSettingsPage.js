@@ -1,8 +1,11 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import WalletSettings from '../../../components/wallet/settings/WalletSettings';
 import ResyncBlock from '../../../components/wallet/settings/ResyncBlock';
+import RemoveWallet from '../../../components/wallet/settings/RemoveWallet';
+import RemoveWalletDialog from '../../../components/wallet/settings/RemoveWalletDialog';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import { isValidWalletName } from '../../../utils/validations';
 import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
@@ -16,7 +19,7 @@ export default class WalletSettingsPage extends Component<Props> {
   render() {
     const { uiDialogs, profile } = this.props.stores;
     const { walletSettings } = this.props.stores.substores.ada;
-    const { actions, stores } = this.props;
+    const { actions, } = this.props;
     const publicDeriver = this.props.stores.wallets.selected;
     const {
       renameModelRequest,
@@ -36,13 +39,6 @@ export default class WalletSettingsPage extends Component<Props> {
     const walletType = publicDeriver.self.getParent().getWalletType();
     const isWebWallet = walletType === WalletTypeOption.WEB_WALLET;
 
-    const changeDialog = (
-      <ChangeWalletPasswordDialogContainer
-        actions={actions}
-        stores={stores}
-      />
-    );
-
     const walletsStore = this.props.stores.wallets;
     if (walletsStore.selected == null) {
       throw new Error('Should never happen');
@@ -50,12 +46,14 @@ export default class WalletSettingsPage extends Component<Props> {
     const selectedWallet = walletsStore.selected;
     return (
       <>
+        {this.getDialog()}
         <WalletSettings
           error={renameModelRequest.error}
-          openDialogAction={actions.dialogs.open.trigger}
+          openDialog={() => actions.dialogs.open.trigger({
+            dialog: ChangeWalletPasswordDialogContainer,
+          })}
           walletPasswordUpdateDate={publicDeriver.signingKeyUpdateDate}
           isDialogOpen={uiDialogs.isOpen}
-          dialog={changeDialog}
           walletName={publicDeriver.conceptualWalletName}
           isSubmitting={renameModelRequest.isExecuting}
           isInvalid={
@@ -85,8 +83,36 @@ export default class WalletSettingsPage extends Component<Props> {
             });
           }}
         />
+        <RemoveWallet
+          walletName={selectedWallet.conceptualWalletName}
+          openDialog={() => actions.dialogs.open.trigger({
+            dialog: RemoveWalletDialog,
+          })}
+        />
       </>
     );
   }
 
+  getDialog: void => Node = () => {
+    if (this.props.stores.uiDialogs.isOpen(ChangeWalletPasswordDialogContainer)) {
+      return (
+        <ChangeWalletPasswordDialogContainer
+          actions={this.props.actions}
+          stores={this.props.stores}
+        />
+      );
+    }
+    if (this.props.stores.uiDialogs.isOpen(RemoveWalletDialog)) {
+      return (
+        <RemoveWalletDialog
+          onSubmit={() => {}}
+          isSubmitting={false}
+          onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
+          error={null}
+          classicTheme={this.props.stores.profile.isClassicTheme}
+        />
+      );
+    }
+    return null;
+  }
 }

@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
+import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 
@@ -10,6 +11,7 @@ type Props = {|
   +children: ?Node
 |};
 
+@observer
 export default class WarningBox extends Component<Props> {
   static contextTypes = {
     intl: intlShape.isRequired,

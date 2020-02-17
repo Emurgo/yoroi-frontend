@@ -17,7 +17,7 @@ type Props = {|
 |};
 
 @observer
-export default class PaperPasswordInput extends Component<Props> {
+export default class SpendingPasswordInput extends Component<Props> {
 
   static defaultProps = {
     initValues: undefined,

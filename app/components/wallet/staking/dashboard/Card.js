@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import { observer } from 'mobx-react';
 import type { Node } from 'react';
 
 import styles from './Card.scss';
@@ -9,6 +10,7 @@ type Props = {|
   title?: string,
 |};
 
+@observer
 export default class Card extends Component<Props> {
 
   static defaultProps = {

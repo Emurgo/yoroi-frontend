@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import styles from './LoadingSpinner.scss';
 
@@ -8,6 +9,7 @@ type Props = {|
   light?: boolean,
 |};
 
+@observer
 export default class LoadingSpinner extends Component<Props> {
   static defaultProps = {
     small: undefined,

@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import BigNumber from 'bignumber.js';
+import { observer } from 'mobx-react';
 import type { Node } from 'react';
 import classnames from 'classnames';
 import { intlShape, } from 'react-intl';
@@ -26,6 +27,7 @@ type Props = {|
     +showDetails?: boolean,
 |};
 
+@observer
 export default class NavWalletDetails extends Component<Props> {
 
   static defaultProps = {

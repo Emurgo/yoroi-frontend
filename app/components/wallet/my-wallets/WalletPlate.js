@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import { observer } from 'mobx-react';
 import type { WalletWithCachedMeta } from '../../../stores/toplevel/WalletStore';
 import type { WalletAccountNumberPlate } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
@@ -26,6 +27,7 @@ function constructPlate(
   )];
 }
 
+@observer
 export default class WalletPlate extends Component<Props> {
 
   render() {

@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import { observer } from 'mobx-react';
 import classnames from 'classnames';
 
 import styles from './ProgressCircle.scss';
@@ -10,6 +11,7 @@ type Props = {|
   variant: string,
 |};
 
+@observer
 export default class ProgressCircle extends Component<Props> {
   static defaultProps = {
     text: null,

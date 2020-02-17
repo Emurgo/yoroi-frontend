@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
+import { observer } from 'mobx-react';
 import moment from 'moment';
 
 import Notice, { NoticeKind } from '../../domain/Notice';
@@ -87,6 +88,7 @@ type Props = {|
   +isToday: boolean
 |};
 
+@observer
 export default class NoticeBlock extends Component<Props> {
   static contextTypes = { intl: intlShape.isRequired };
 

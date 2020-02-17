@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import { observer } from 'mobx-react';
 import styles from './StaticTopbarTitle.scss';
 
 type Props = {|
@@ -7,6 +8,7 @@ type Props = {|
 |};
 
 /** Static text styled for the center-text of a topbar */
+@observer
 export default class StaticTopbarTitle extends Component<Props> {
   render() {
     const { title } = this.props;

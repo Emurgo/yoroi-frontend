@@ -1,5 +1,7 @@
 // @flow
 import React, { Component } from 'react';
+import { observer } from 'mobx-react';
+
 import CloseCross from '../../assets/images/close-cross.inline.svg';
 import styles from './DialogCloseButton.scss';
 
@@ -8,6 +10,7 @@ type Props = {|
   +icon?: ?string,
 |};
 
+@observer
 export default class DialogCloseButton extends Component<Props> {
   static defaultProps = {
     onClose: undefined,

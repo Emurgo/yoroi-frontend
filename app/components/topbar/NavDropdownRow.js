@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import { observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
 import type { Node } from 'react';
 import classnames from 'classnames';
@@ -20,6 +21,7 @@ type Props = {|
   +isCurrentWallet?: boolean,
 |};
 
+@observer
 export default class NavDropdownRow extends Component<Props> {
 
   static contextTypes = {

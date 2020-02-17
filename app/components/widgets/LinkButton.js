@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import { observer } from 'mobx-react';
 import type { MessageDescriptor } from 'react-intl';
 import { intlShape } from 'react-intl';
 import styles from './LinkButton.scss';
@@ -13,6 +14,7 @@ type Props = {|
   +onExternalLinkClick: MouseEvent => void,
 |};
 
+@observer
 export default class LinkButton extends Component<Props> {
   static defaultProps = {
     svgClass: undefined

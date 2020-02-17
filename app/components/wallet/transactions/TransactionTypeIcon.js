@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import ExpendIcon from '../../../assets/images/transaction/send-ic.inline.svg';
 import IncomeIcon from '../../../assets/images/transaction/receive-ic.inline.svg';
@@ -11,6 +12,7 @@ type Props = {|
   +iconType: string,
 |};
 
+@observer
 export default class TransactionTypeIcon extends Component<Props> {
 
   render() {

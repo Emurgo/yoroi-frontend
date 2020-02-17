@@ -6,10 +6,8 @@ import moment from 'moment';
 import LocalizableError from '../../../i18n/LocalizableError';
 import InlineEditingInput from '../../widgets/forms/InlineEditingInput';
 import ReadOnlyInput from '../../widgets/forms/ReadOnlyInput';
-import ChangeWalletPasswordDialog from './ChangeWalletPasswordDialog';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletSettings.scss';
-import type { Node } from 'react';
 
 const messages = defineMessages({
   name: {
@@ -30,9 +28,8 @@ type Props = {|
   +walletName: string,
   +walletPasswordUpdateDate: ?Date,
   +error?: ?LocalizableError,
-  +openDialogAction: {| dialog: any, params?: any |} => void,
+  +openDialog: void => void,
   +isDialogOpen: any => boolean,
-  +dialog: Node,
   +onFieldValueChange: (string, string) => PossiblyAsync<void>,
   +onStartEditing: string => void,
   +onStopEditing: void => void,
@@ -65,12 +62,11 @@ export default class WalletSettings extends Component<Props> {
     const {
       walletName,
       walletPasswordUpdateDate, error,
-      openDialogAction, isDialogOpen,
       onFieldValueChange, onStartEditing,
       onStopEditing, onCancelEditing,
       nameValidator, activeField,
       isSubmitting, isInvalid,
-      lastUpdatedField, dialog,
+      lastUpdatedField,
       showPasswordBlock, classicTheme,
     } = this.props;
     const passwordMessage = walletPasswordUpdateDate == null
@@ -82,7 +78,7 @@ export default class WalletSettings extends Component<Props> {
       );
 
     return (
-      <div>
+      <>
         <InlineEditingInput
           className="walletName"
           inputFieldLabel={intl.formatMessage(messages.name)}
@@ -103,19 +99,12 @@ export default class WalletSettings extends Component<Props> {
             label={intl.formatMessage(globalMessages.walletPasswordLabel)}
             value={passwordMessage}
             isSet
-            onClick={() => openDialogAction({
-              dialog: ChangeWalletPasswordDialog,
-            })}
+            onClick={this.props.openDialog}
             classicTheme={classicTheme}
           />}
 
         {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
-
-        {isDialogOpen(ChangeWalletPasswordDialog) ? (
-          <div>{dialog}</div>
-        ) : null}
-
-      </div>
+      </>
     );
   }
 
