@@ -43,6 +43,7 @@
 
   .status {
     width: $status-width;
+    min-width: $status-width;
     text-align: $status-align;
 
     display: inline-block;

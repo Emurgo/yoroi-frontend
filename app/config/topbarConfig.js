@@ -46,10 +46,19 @@ export const WITH_LEDGER_NANO: Category = {
   iconStyle: styles.withLedgerNanoIcon,
 };
 
-export const GO_BACK: Category = {
-  name: 'GO_BACK',
+export const BACK_TO_ADD: Category = {
+  name: 'BACK_TO_ADD',
   className: 'go-back',
   route: ROUTES.WALLETS.ADD,
+  icon: goBackIcon,
+  iconStyle: styles.goBackIcon,
+  inlineText: globalMessages.goBack
+};
+
+export const BACK_TO_MY_WALLETS: Category = {
+  name: 'BACK_TO_ADD',
+  className: 'go-back',
+  route: ROUTES.MY_WALLETS,
   icon: goBackIcon,
   iconStyle: styles.goBackIcon,
   inlineText: globalMessages.goBack

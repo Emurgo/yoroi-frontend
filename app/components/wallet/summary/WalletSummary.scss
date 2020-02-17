@@ -4,6 +4,7 @@ $rightBlockWidth: $leftBlockWidth;
 @import "../transactions/categoryData";
 
 .component {
+  min-width: fit-content;
   box-shadow: 0 2px 4px 0 rgba(56,57,61,0.2);
 
   .content {

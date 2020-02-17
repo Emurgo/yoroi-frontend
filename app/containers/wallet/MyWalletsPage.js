@@ -110,6 +110,10 @@ export default class MyWalletsPage extends Component<Props> {
     const walletsList = (
       <WalletsList>
         {wallets.map(wallet => this.generateRow(wallet))}
+        {wallets.map(wallet => this.generateRow(wallet))}
+        {wallets.map(wallet => this.generateRow(wallet))}
+        {wallets.map(wallet => this.generateRow(wallet))}
+        {wallets.map(wallet => this.generateRow(wallet))}
       </WalletsList>
     );
 
