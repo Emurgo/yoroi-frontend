@@ -83,8 +83,6 @@ export default class TopbarStore extends Store {
     params
   ) => {
     const { category } = params;
-    console.log(category);
-    console.log(this.activeTopbarCategory);
     if (category !== this.activeTopbarCategory) {
       this.actions.router.goToRoute.trigger({ route: category });
     }
@@ -102,7 +100,6 @@ export default class TopbarStore extends Store {
       this._setActivateTopbarCategory(undefined);
     }
     this.categories.forEach((category) => {
-      console.log(`category ${JSON.stringify(category)}`);
       // If the current route starts with the route of the category
       // E.g. category could be settings, and route could be settings/general
       if (route.indexOf(category.route) === 0) this._setActivateTopbarCategory(category.route);
