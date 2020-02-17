@@ -3,7 +3,7 @@
 import {
   ConceptualWalletSchema,
 } from '../core/tables';
-import { Type } from 'lovefield';
+import { Type, ConstraintAction, } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 import { KeyDerivationSchema } from '../../primitives/tables';
 
@@ -48,11 +48,13 @@ export const populateCip1852Db = (schemaBuilder: lf$schema$Builder) => {
     )
     .addForeignKey('Cip1852Wrapper_ConceptualWallet', {
       local: Cip1852WrapperSchema.properties.ConceptualWalletId,
-      ref: `${ConceptualWalletSchema.name}.${ConceptualWalletSchema.properties.ConceptualWalletId}`
+      ref: `${ConceptualWalletSchema.name}.${ConceptualWalletSchema.properties.ConceptualWalletId}`,
+      action: ConstraintAction.CASCADE,
     })
     .addForeignKey('Cip1852Wrapper_KeyDerivation', {
       local: Cip1852WrapperSchema.properties.PrivateDeriverKeyDerivationId,
-      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`
+      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
+      action: ConstraintAction.CASCADE,
     })
     .addNullable([
       Cip1852WrapperSchema.properties.SignerLevel,

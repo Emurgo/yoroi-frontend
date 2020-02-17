@@ -1,6 +1,6 @@
 // @flow
 
-import { Type } from 'lovefield';
+import { Type, ConstraintAction, } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 import { KeyDerivationSchema } from '../../primitives/tables';
 
@@ -151,14 +151,15 @@ export const populateWalletDb = (schemaBuilder: lf$schema$Builder) => {
     })
     .addForeignKey('PublicDeriver_KeyDerivation', {
       local: PublicDeriverSchema.properties.KeyDerivationId,
-      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`
+      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
+      action: ConstraintAction.CASCADE,
     })
     .addForeignKey('PublicDeriver_LastSyncInfo', {
       local: PublicDeriverSchema.properties.LastSyncInfoId,
       ref: `${LastSyncInfoSchema.name}.${LastSyncInfoSchema.properties.LastSyncInfoId}`
     })
     .addIndex(
-      'Bip44ToPublicDeriver_ConceptualWalletr_Index',
+      'Bip44ToPublicDeriver_ConceptualWallet_Index',
       ([PublicDeriverSchema.properties.ConceptualWalletId]: Array<string>),
       false
     );
@@ -198,7 +199,8 @@ export const populateWalletDb = (schemaBuilder: lf$schema$Builder) => {
     )
     .addForeignKey('HwWalletMetaSchema_ConceptualWallet', {
       local: HwWalletMetaSchema.properties.ConceptualWalletId,
-      ref: `${ConceptualWalletSchema.name}.${ConceptualWalletSchema.properties.ConceptualWalletId}`
+      ref: `${ConceptualWalletSchema.name}.${ConceptualWalletSchema.properties.ConceptualWalletId}`,
+      action: ConstraintAction.CASCADE,
     })
     .addUnique('HwWalletMetaSchema_ConceptualWallet_Unique', [
       HwWalletMetaSchema.properties.ConceptualWalletId,

@@ -42,6 +42,7 @@ export default class RemoveWalletDialog extends Component<Props> {
 
   @action
   toggleCheck: void => void = () => {
+    if (this.props.isSubmitting) return;
     this.isChecked = !this.isChecked;
   }
 
@@ -67,6 +68,7 @@ export default class RemoveWalletDialog extends Component<Props> {
         onClick: this.props.onSubmit,
         primary: true,
         className: confirmButtonClasses,
+        disabled: !this.isChecked ? true : undefined,
         isSubmitting: this.props.isSubmitting
       },
     ];

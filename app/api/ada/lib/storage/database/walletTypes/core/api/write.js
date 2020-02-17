@@ -18,10 +18,11 @@ import type {
 
 import {
   addOrReplaceRow, addNewRowToTable, removeFromTableBatch,
+  StaleStateError,
 } from '../../../utils';
-import { GetLastSyncForPublicDeriver } from './read';
+import { GetLastSyncForPublicDeriver, GetPublicDeriver, } from './read';
 import type { KeyDerivationRow } from '../../../primitives/tables';
-import { TransactionSchema } from '../../../primitives/tables';
+import { KeyDerivationSchema, TransactionSchema } from '../../../primitives/tables';
 import type { AddDerivationRequest } from '../../../primitives/api/write';
 import { AddDerivation } from '../../../primitives/api/write';
 
@@ -254,5 +255,47 @@ export class ModifyConceptualWallet {
       ));
 
     await tx.attach(updateQuery);
+  }
+}
+
+export class DeletePublicDeriver {
+  static ownTables = Object.freeze({
+    [Tables.PublicDeriverSchema.name]: Tables.PublicDeriverSchema,
+    [KeyDerivationSchema.name]: KeyDerivationSchema,
+  });
+  static depTables = Object.freeze({
+    GetPublicDeriver
+  });
+
+  static async delete(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {|
+      publicDeriverId: number,
+    |},
+  ): Promise<void> {
+    console.log(request.publicDeriverId);
+    const publicDeriverRow = await DeletePublicDeriver.depTables.GetPublicDeriver.get(
+      db, tx, request.publicDeriverId
+    );
+    if (publicDeriverRow == null) {
+      throw new StaleStateError(`${nameof(DeletePublicDeriver)}::${nameof(DeletePublicDeriver.delete)}`);
+    }
+
+    // 1) delete public deriver row
+    await removeFromTableBatch(
+      db, tx,
+      DeletePublicDeriver.ownTables[Tables.PublicDeriverSchema.name].name,
+      DeletePublicDeriver.ownTables[Tables.PublicDeriverSchema.name].properties.PublicDeriverId,
+      ([request.publicDeriverId]: Array<number>),
+    );
+
+    // 2) delete primary key derivation
+    await removeFromTableBatch(
+      db, tx,
+      DeletePublicDeriver.ownTables[KeyDerivationSchema.name].name,
+      DeletePublicDeriver.ownTables[KeyDerivationSchema.name].properties.KeyDerivationId,
+      ([publicDeriverRow.KeyDerivationId]: Array<number>),
+    );
   }
 }

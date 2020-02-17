@@ -18,6 +18,7 @@ import {
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { WalletWithCachedMeta } from '../toplevel/WalletStore';
 import { removeAllTransactions } from '../../api/ada/lib/storage/bridge/updateTransactions';
+import { removePublicDeriver } from '../../api/ada/lib/storage/bridge/walletBuilder/remove';
 import {
   Logger,
 } from '../../utils/logging';
@@ -33,6 +34,9 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
   @observable clearHistory: Request<typeof _clearHistory>
     = new Request<typeof _clearHistory>(_clearHistory);
 
+  @observable removeWalletRequest: Request<typeof _removeWalletFromDb>
+    = new Request<typeof _removeWalletFromDb>(_removeWalletFromDb);
+
   setup(): void {
     super.setup();
     const a = this.actions.ada.walletSettings;
@@ -43,6 +47,7 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
     a.renameConceptualWallet.listen(this._renameConceptualWallet);
     a.updateSigningPassword.listen(this._changeSigningPassword);
     a.resyncHistory.listen(this._resyncHistory);
+    a.removeWallet.listen(this._removeWallet);
   }
 
   @action _changeSigningPassword: {|
@@ -109,6 +114,7 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
   @action _resyncHistory: {|
     publicDeriver: WalletWithCachedMeta,
   |} => Promise<void> = async (request) => {
+    this.clearHistory.reset();
     const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver.self);
     if (withLevels == null) {
       throw new Error(`${nameof(this._resyncHistory)} missing levels`);
@@ -117,9 +123,27 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
       publicDeriver: withLevels,
       refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
     }).promise;
-    request.publicDeriver.amount = null; // TODO: properly clear cache
-    this.clearHistory.reset();
+    runInAction(() => {
+      request.publicDeriver.amount = null; // TODO: properly clear cache
+    });
   };
+
+  @action _removeWallet: {|
+    publicDeriver: WalletWithCachedMeta,
+  |} => Promise<void> = async (request) => {
+    this.removeWalletRequest.reset();
+    this.stores.wallets.selected = null; // deselect before deleting
+    await this.removeWalletRequest.execute({
+      publicDeriver: request.publicDeriver.self,
+    }).promise;
+    // TODO: go to root and refresh
+  };
+}
+
+async function _removeWalletFromDb(request: {|
+  publicDeriver: IPublicDeriver<>,
+|}): Promise<void> {
+  await removePublicDeriver({ publicDeriver: request.publicDeriver });
 }
 
 async function _clearHistory(request: {|

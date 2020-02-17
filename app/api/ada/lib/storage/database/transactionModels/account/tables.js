@@ -93,7 +93,8 @@ export const populateAccountingTransactionsDb = (schemaBuilder: lf$schema$Builde
     })
     .addForeignKey('AccountingTransactionInput_Address', {
       local: AccountingTransactionInputSchema.properties.AddressId,
-      ref: `${AddressSchema.name}.${AddressSchema.properties.AddressId}`
+      ref: `${AddressSchema.name}.${AddressSchema.properties.AddressId}`,
+      action: ConstraintAction.CASCADE,
     });
 
   // AccountingTransactionOutput Table
@@ -117,6 +118,7 @@ export const populateAccountingTransactionsDb = (schemaBuilder: lf$schema$Builde
     })
     .addForeignKey('AccountingTransactionOutput_Address', {
       local: AccountingTransactionOutputSchema.properties.AddressId,
-      ref: `${AddressSchema.name}.${AddressSchema.properties.AddressId}`
+      ref: `${AddressSchema.name}.${AddressSchema.properties.AddressId}`,
+      action: ConstraintAction.CASCADE,
     });
 };
