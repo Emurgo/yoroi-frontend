@@ -97,7 +97,7 @@ import {
 } from '../../database/primitives/api/read';
 import { CoreAddressTypes } from '../../database/primitives/enums';
 import type { KeyRow, KeyDerivationRow, } from '../../database/primitives/tables';
-import { UpdateGet, AddAddress, } from '../../database/primitives/api/write';
+import { ModifyKey, AddAddress, } from '../../database/primitives/api/write';
 
 import { scanBip44Account, } from '../../../../restoration/byron/scan';
 import { scanCip1852Account } from '../../../../restoration/shelley/scan';
@@ -1122,7 +1122,7 @@ const GetPublicKeyMixin = (
   rawChangePubDeriverPassword: (
     lf$Transaction,
     {|
-      UpdateGet: Class<UpdateGet>,
+      ModifyKey: Class<ModifyKey>,
       GetKeyForPublicDeriver: Class<GetKeyForPublicDeriver>
     |},
     IChangePasswordRequest,
@@ -1134,7 +1134,7 @@ const GetPublicKeyMixin = (
     );
     return rawChangePassword(
       super.getDb(), tx,
-      { UpdateGet: deps.UpdateGet, },
+      { ModifyKey: deps.ModifyKey, },
       {
         ...body,
         oldKeyRow: currentRow
@@ -1145,7 +1145,7 @@ const GetPublicKeyMixin = (
     IChangePasswordRequest
   ) => Promise<IChangePasswordResponse> = async (body) => {
     const deps = Object.freeze({
-      UpdateGet,
+      ModifyKey,
       GetKeyForPublicDeriver,
     });
     const depTables = Object
@@ -1274,7 +1274,7 @@ const GetSigningKeyMixin = (
       GetPublicDeriver: Class<GetPublicDeriver>,
       GetKeyDerivation: Class<GetKeyDerivation>,
       GetKey: Class<GetKey>,
-      UpdateGet: Class<UpdateGet>,
+      ModifyKey: Class<ModifyKey>,
     |},
     IChangePasswordRequest,
   ) => Promise<IChangePasswordResponse> = async (
@@ -1294,7 +1294,7 @@ const GetSigningKeyMixin = (
     );
     return rawChangePassword(
       super.getDb(), tx,
-      { UpdateGet: deps.UpdateGet, },
+      { ModifyKey: deps.ModifyKey, },
       {
         ...body,
         oldKeyRow: currentRow.row
@@ -1309,7 +1309,7 @@ const GetSigningKeyMixin = (
       GetPublicDeriver,
       GetKeyDerivation,
       GetKey,
-      UpdateGet,
+      ModifyKey,
     });
     const depTables = Object
       .keys(deps)

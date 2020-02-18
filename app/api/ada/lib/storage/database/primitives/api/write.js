@@ -28,6 +28,7 @@ import {
 } from './utils';
 import {
   addNewRowToTable,
+  removeFromTableBatch,
   addBatchToTable,
   addOrReplaceRow,
   getRowIn,
@@ -38,10 +39,11 @@ import {
   GetChildIfExists,
   GetBlock,
   GetEncryptionMeta,
+  GetDerivationsByPath,
 } from './read';
 import type { InsertRequest } from '../../walletTypes/common/utils';
 
-export class AddKey {
+export class ModifyKey {
   static ownTables = Object.freeze({
     [Tables.KeySchema.name]: Tables.KeySchema,
   });
@@ -55,16 +57,22 @@ export class AddKey {
     return await addNewRowToTable<KeyInsert, KeyRow>(
       db, tx,
       request,
-      AddKey.ownTables[Tables.KeySchema.name].name,
+      ModifyKey.ownTables[Tables.KeySchema.name].name,
     );
   }
-}
 
-export class UpdateGet {
-  static ownTables = Object.freeze({
-    [Tables.KeySchema.name]: Tables.KeySchema,
-  });
-  static depTables = Object.freeze({});
+  static async remove(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: $ReadOnlyArray<number>,
+  ): Promise<void> {
+    return await removeFromTableBatch(
+      db, tx,
+      ModifyKey.ownTables[Tables.KeySchema.name].name,
+      ModifyKey.ownTables[Tables.KeySchema.name].properties.KeyId,
+      request
+    );
+  }
 
   static async update(
     db: lf$Database,
@@ -74,7 +82,7 @@ export class UpdateGet {
     return await addOrReplaceRow<KeyRow, KeyRow>(
       db, tx,
       request,
-      UpdateGet.ownTables[Tables.KeySchema.name].name
+      ModifyKey.ownTables[Tables.KeySchema.name].name
     );
   }
 }
@@ -209,7 +217,7 @@ export class AddDerivation {
     [Tables.KeyDerivationSchema.name]: Tables.KeyDerivationSchema,
   });
   static depTables = Object.freeze({
-    AddKey,
+    ModifyKey,
   });
 
   static async add<Insert, Row>(
@@ -221,13 +229,13 @@ export class AddDerivation {
   ): Promise<DerivationQueryResult<Row>> {
     const privateKey = request.privateKeyInfo === null
       ? null
-      : await AddDerivation.depTables.AddKey.add(
+      : await AddDerivation.depTables.ModifyKey.add(
         db, tx,
         request.privateKeyInfo,
       );
     const publicKey = request.publicKeyInfo === null
       ? null
-      : await AddDerivation.depTables.AddKey.add(
+      : await AddDerivation.depTables.ModifyKey.add(
         db, tx,
         request.publicKeyInfo,
       );
@@ -444,5 +452,51 @@ export class ModifyCertificate {
       certificate,
       relatedAddresses,
     };
+  }
+}
+
+export class RemoveKeyDerivationTree {
+  static ownTables = Object.freeze({
+    [Tables.KeyDerivationSchema.name]: Tables.KeyDerivationSchema,
+  });
+  static depTables = Object.freeze({
+    GetDerivationsByPath,
+    ModifyKey,
+  });
+
+  static async remove(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {|
+      rootKeyId: number,
+    |},
+  ): Promise<void> {
+    // 2) delete primary key derivation
+    // cascade doesn't work for many-to-many so we instead use deferrable and delete manually
+    const allDerivations = await RemoveKeyDerivationTree.depTables.GetDerivationsByPath.allFromRoot(
+      db, tx,
+      request.rootKeyId,
+    );
+    console.log(allDerivations);
+    await removeFromTableBatch(
+      db, tx,
+      RemoveKeyDerivationTree.ownTables[Tables.KeyDerivationSchema.name].name,
+      RemoveKeyDerivationTree.ownTables[Tables.KeyDerivationSchema.name].properties.KeyDerivationId,
+      allDerivations.map(row => row.KeyDerivationId),
+    );
+
+    const relatedKeys: Array<number> = allDerivations.reduce(
+      (keys, deriver) => {
+        if (deriver.PrivateKeyId != null) keys.push(deriver.PrivateKeyId);
+        if (deriver.PublicKeyId != null) keys.push(deriver.PublicKeyId);
+        return keys;
+      },
+      []
+    );
+
+    await RemoveKeyDerivationTree.depTables.ModifyKey.remove(
+      db, tx,
+      relatedKeys
+    );
   }
 }

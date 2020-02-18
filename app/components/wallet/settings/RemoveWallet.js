@@ -55,6 +55,4 @@ export default class RemoveWallet extends Component<Props> {
       </div>
     );
   }
-
-
 }

@@ -1,6 +1,6 @@
 // @flow
 
-import { Type, ConstraintAction } from 'lovefield';
+import { Type, ConstraintAction, ConstraintTiming } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 import type {
   TxStatusCodesType,
@@ -347,7 +347,8 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
     .addForeignKey('KeyDerivation_Parent', {
       local: KeyDerivationSchema.properties.Parent,
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
-      action: ConstraintAction.CASCADE,
+      // cascade doesn't work for many-to-many so we instead use deferrable and delete manually
+      timing: ConstraintTiming.DEFERRABLE,
     })
     .addForeignKey('KeyDerivation_PrivateKeyId', {
       local: KeyDerivationSchema.properties.PrivateKeyId,

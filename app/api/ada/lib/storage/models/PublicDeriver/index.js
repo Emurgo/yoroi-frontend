@@ -30,7 +30,7 @@ import {
   GetPublicDeriver,
   GetLastSyncForPublicDeriver,
 } from '../../database/walletTypes/core/api/read';
-import { ModifyPublicDeriver } from '../../database/walletTypes/core/api/write';
+import { ModifyPublicDeriver, } from '../../database/walletTypes/core/api/write';
 
 import type {
   KeyDerivationRow,

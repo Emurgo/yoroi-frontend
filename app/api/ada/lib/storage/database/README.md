@@ -50,7 +50,7 @@ export class MyTopLevelQuery {
     return await addNewRowToTable(
       db, tx,
       request,
-      AddKey.ownTables[Tables.KeySchema.name].name,
+      ModifyKey.ownTables[Tables.KeySchema.name].name,
     );
 
     return {};

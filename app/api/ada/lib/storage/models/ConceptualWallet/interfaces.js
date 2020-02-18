@@ -15,7 +15,7 @@ import type {
   TreeInsert,
 } from '../../database/walletTypes/common/utils';
 import type { AddPublicDeriverResponse } from '../../database/walletTypes/core/api/write';
-import { UpdateGet, } from '../../database/primitives/api/write';
+import { ModifyKey, } from '../../database/primitives/api/write';
 import {
   GetKeyForDerivation,
 } from '../../database/primitives/api/read';
@@ -117,7 +117,7 @@ export interface IGetPrivateDeriverKey {
     IChangePasswordRequestFunc,
     {|
       GetKeyForDerivation: Class<GetKeyForDerivation>,
-      UpdateGet: Class<UpdateGet>,
+      ModifyKey: Class<ModifyKey>,
     |},
     IChangePasswordRequest
   >;

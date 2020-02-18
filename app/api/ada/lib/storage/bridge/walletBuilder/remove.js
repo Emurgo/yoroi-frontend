@@ -8,14 +8,19 @@ import type {
   IPublicDeriver,
 } from '../../models/PublicDeriver/interfaces';
 import {
-  DeletePublicDeriver,
+  RemovePublicDeriver,
 } from '../../database/walletTypes/core/api/write';
+import {
+  GetKeyForPublicDeriver,
+} from '../../database/walletTypes/core/api/read';
+import {
+  ModifyKey
+} from '../../database/primitives/api/write';
 
-export async function removePublicDeriver(
-  request: {| publicDeriver: IPublicDeriver<>, |},
+export async function removePublicDeriver(request: {| publicDeriver: IPublicDeriver<>, |},
 ): Promise<number> {
   const deps = Object.freeze({
-    DeletePublicDeriver
+    RemovePublicDeriver,
   });
   const db = request.publicDeriver.getDb();
   const depTables = Object
@@ -31,7 +36,7 @@ export async function removePublicDeriver(
       ...depTables,
     ],
     async dbTx => {
-      await DeletePublicDeriver.delete(
+      await deps.RemovePublicDeriver.remove(
         db, dbTx,
         { publicDeriverId: request.publicDeriver.getPublicDeriverId() }
       );
@@ -39,7 +44,6 @@ export async function removePublicDeriver(
       // TODO: delete keys separately -- not cascaded (AKA any key not referenced)
       // TODO: delete any blocks separately?
       // TODO: wrapper deleted from key derivation cascade but not Conceptual Wallet
-      // TODO: LastSyncInfoSchema
     }
   );
 }

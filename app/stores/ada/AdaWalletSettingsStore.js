@@ -133,6 +133,10 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
   |} => Promise<void> = async (request) => {
     this.removeWalletRequest.reset();
     this.stores.wallets.selected = null; // deselect before deleting
+    await this.clearHistory.execute({
+      publicDeriver: (request.publicDeriver.self: any),
+      refreshWallet: async () => {},
+    }).promise;
     await this.removeWalletRequest.execute({
       publicDeriver: request.publicDeriver.self,
     }).promise;
