@@ -477,7 +477,6 @@ export class RemoveKeyDerivationTree {
       db, tx,
       request.rootKeyId,
     );
-    console.log(allDerivations);
     await removeFromTableBatch(
       db, tx,
       RemoveKeyDerivationTree.ownTables[Tables.KeyDerivationSchema.name].name,
@@ -494,7 +493,15 @@ export class RemoveKeyDerivationTree {
       []
     );
 
-    // TODO: iterate up through parent key derivations to see if this was their only child
+    /**
+     * Note: we don't iterate up through the parent to delete up to ROOT level
+     * this may cause unused key derivations to pile up in your storage
+     * but we can't reliable delete them
+     * because there isn't a way to guarantee these keys aren't used by some other table
+     *
+     * it's not a big deal since parent key derivations not used anywhere
+     * means they probably are just helpful metadata and don't represent sensitive information
+     */
 
     await RemoveKeyDerivationTree.depTables.ModifyKey.remove(
       db, tx,

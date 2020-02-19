@@ -11,12 +11,6 @@ import {
   RemovePublicDeriver,
   ModifyConceptualWallet,
 } from '../../database/walletTypes/core/api/write';
-import {
-  GetKeyForPublicDeriver,
-} from '../../database/walletTypes/core/api/read';
-import {
-  ModifyKey
-} from '../../database/primitives/api/write';
 import type { IConceptualWallet } from '../../models/ConceptualWallet/interfaces';
 
 export async function removePublicDeriver(request: {|
