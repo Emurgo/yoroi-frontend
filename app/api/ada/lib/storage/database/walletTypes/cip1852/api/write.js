@@ -58,11 +58,9 @@ export class ModifyCip1852Wrapper {
     );
 
     // 2) delete related key derivations
-    if (fullRow.PrivateDeriverKeyDerivationId != null) {
-      await ModifyCip1852Wrapper.depTables.RemoveKeyDerivationTree.remove(
-        db, tx,
-        { rootKeyId: fullRow.PrivateDeriverKeyDerivationId },
-      );
-    }
+    await ModifyCip1852Wrapper.depTables.RemoveKeyDerivationTree.remove(
+      db, tx,
+      { rootKeyId: fullRow.RootKeyDerivationId },
+    );
   }
 }

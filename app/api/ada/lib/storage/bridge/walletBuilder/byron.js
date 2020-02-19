@@ -194,6 +194,7 @@ export async function createStandardBip44Wallet(request: {|
           PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
           PrivateDeriverKeyDerivationId: finalState.root.root.KeyDerivation.KeyDerivationId,
           PrivateDeriverLevel: pathToPrivate.length,
+          RootKeyDerivationId: finalState.root.root.KeyDerivation.KeyDerivationId,
         })
       )
       .derivePublicDeriver(
@@ -283,6 +284,7 @@ export async function createHardwareWallet(request: {
           PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
           PrivateDeriverKeyDerivationId: null,
           PrivateDeriverLevel: null,
+          RootKeyDerivationId: finalState.root.root.KeyDerivation.KeyDerivationId,
         })
       )
       .addAdhocPublicDeriver(
@@ -386,6 +388,7 @@ export async function migrateFromStorageV1(request: {
           PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
           PrivateDeriverKeyDerivationId: null,
           PrivateDeriverLevel: null,
+          RootKeyDerivationId: finalState.root.root.KeyDerivation.KeyDerivationId,
         })
       );
     builder = await addPublicDeriverToMigratedWallet({
@@ -438,7 +441,8 @@ export async function migrateFromStorageV1(request: {
           SignerLevel: Bip44DerivationLevels.ROOT.level,
           PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
           PrivateDeriverKeyDerivationId: finalState.root.root.KeyDerivation.KeyDerivationId,
-          PrivateDeriverLevel: pathToPrivate.length
+          PrivateDeriverLevel: pathToPrivate.length,
+          RootKeyDerivationId: finalState.root.root.KeyDerivation.KeyDerivationId,
         })
       );
     builder = await addPublicDeriverToMigratedWallet({

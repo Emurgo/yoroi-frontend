@@ -82,12 +82,10 @@ export class ModifyBip44Wrapper {
     );
 
     // 2) delete related key derivations
-    if (fullRow.PrivateDeriverKeyDerivationId != null) {
-      await ModifyBip44Wrapper.depTables.RemoveKeyDerivationTree.remove(
-        db, tx,
-        { rootKeyId: fullRow.PrivateDeriverKeyDerivationId },
-      );
-    }
+    await ModifyBip44Wrapper.depTables.RemoveKeyDerivationTree.remove(
+      db, tx,
+      { rootKeyId: fullRow.RootKeyDerivationId },
+    );
   }
 }
 

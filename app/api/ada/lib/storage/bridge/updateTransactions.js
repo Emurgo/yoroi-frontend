@@ -27,7 +27,7 @@ import {
   GetTxAndBlock,
 } from '../database/primitives/api/read';
 import {
-  AddAddress,
+  ModifyAddress,
   ModifyTransaction,
 } from '../database/primitives/api/write';
 import type { AddCertificateRequest } from '../database/primitives/api/write';
@@ -125,9 +125,11 @@ async function rawGetAllTxIds(
   request: {| publicDeriver: IPublicDeriver<ConceptualWallet>, |},
   derivationTables: Map<number, string>,
 ): Promise<{|
-  utxoAddressIds: Array<number>,
-  accountingAddressIds: Array<number>,
   txIds: Array<number>,
+  addressIds: {|
+    utxoAddressIds: Array<number>,
+    accountingAddressIds: Array<number>,
+  |}
 |}> {
   const utxoAddressIds = [];
   const withUtxos = asGetAllUtxos(request.publicDeriver);
@@ -170,8 +172,10 @@ async function rawGetAllTxIds(
   );
   return {
     txIds,
-    utxoAddressIds,
-    accountingAddressIds,
+    addressIds: {
+      utxoAddressIds,
+      accountingAddressIds,
+    },
   };
 }
 
@@ -200,8 +204,7 @@ export async function rawGetTransactions(
   txs: Array<AnnotatedTransaction>,
 |}> {
   const {
-    utxoAddressIds,
-    accountingAddressIds,
+    addressIds,
     txIds,
   } = await rawGetAllTxIds(
     db, dbTx,
@@ -253,10 +256,9 @@ export async function rawGetTransactions(
       utxoOutputs: tx.utxoOutputs,
       accountingInputs: tx.accountingInputs,
       accountingOutputs: tx.accountingOutputs,
-      allOwnedAddressIds: new Set([
-        ...utxoAddressIds,
-        ...accountingAddressIds,
-      ]),
+      allOwnedAddressIds: new Set(
+        Object.keys(addressIds).flatMap(key => addressIds[key])
+      ),
     })
   }));
 
@@ -373,9 +375,47 @@ export async function getPendingTransactions(
   );
 }
 
+export async function rawRemoveAllTransactions(
+  db: lf$Database,
+  dbTx: lf$Transaction,
+  deps: {|
+    GetPathWithSpecific: Class<GetPathWithSpecific>,
+    GetAddress: Class<GetAddress>,
+    AssociateTxWithIOs: Class<AssociateTxWithIOs>,
+    GetDerivationSpecific: Class<GetDerivationSpecific>,
+    DeleteAllTransactions: Class<DeleteAllTransactions>,
+  |},
+  derivationTables: Map<number, string>,
+  request: {|
+    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
+  |},
+): ReturnType<typeof rawGetAllTxIds> {
+  const relatedIds = await rawGetAllTxIds(
+    db, dbTx,
+    {
+      GetPathWithSpecific: deps.GetPathWithSpecific,
+      GetAddress: deps.GetAddress,
+      AssociateTxWithIOs: deps.AssociateTxWithIOs,
+      GetDerivationSpecific: deps.GetDerivationSpecific,
+    },
+    { publicDeriver: request.publicDeriver },
+    derivationTables,
+  );
+
+  await deps.DeleteAllTransactions.delete(
+    db, dbTx,
+    {
+      publicDeriverId: request.publicDeriver.getPublicDeriverId(),
+      txIds: relatedIds.txIds,
+    }
+  );
+
+  return relatedIds;
+}
+
 export async function removeAllTransactions(
   request: {| publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>, |},
-): Promise<number> {
+): ReturnType<typeof rawGetAllTxIds> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
     GetPathWithSpecific,
@@ -399,29 +439,18 @@ export async function removeAllTransactions(
       ...depTables,
       ...mapToTables(db, derivationTables),
     ],
-    async dbTx => {
-      const { txIds, } = await rawGetAllTxIds(
-        db, dbTx,
-        {
-          GetPathWithSpecific: deps.GetPathWithSpecific,
-          GetAddress: deps.GetAddress,
-          AssociateTxWithIOs: deps.AssociateTxWithIOs,
-          GetDerivationSpecific: deps.GetDerivationSpecific,
-        },
-        { publicDeriver: request.publicDeriver },
-        derivationTables,
-      );
-
-      await deps.DeleteAllTransactions.delete(
-        db, dbTx,
-        {
-          publicDeriverId: request.publicDeriver.getPublicDeriverId(),
-          txIds,
-        }
-      );
-
-      return txIds.length;
-    }
+    async dbTx => rawRemoveAllTransactions(
+      db, dbTx,
+      {
+        GetPathWithSpecific: deps.GetPathWithSpecific,
+        GetAddress: deps.GetAddress,
+        AssociateTxWithIOs: deps.AssociateTxWithIOs,
+        GetDerivationSpecific: deps.GetDerivationSpecific,
+        DeleteAllTransactions: deps.DeleteAllTransactions,
+      },
+      request.publicDeriver.getParent().getDerivationTables(),
+      { publicDeriver: request.publicDeriver },
+    )
   );
 }
 
@@ -445,7 +474,7 @@ export async function updateTransactions(
       GetAddress,
       GetPathWithSpecific,
       GetUtxoTxOutputsWithTx,
-      AddAddress,
+      ModifyAddress,
       GetPublicDeriver,
       AddDerivationTree,
       MarkUtxo,
@@ -708,7 +737,7 @@ async function rawUpdateTransactions(
     GetAddress: Class<GetAddress>,
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
-    AddAddress: Class<AddAddress>,
+    ModifyAddress: Class<ModifyAddress>,
     GetPublicDeriver: Class<GetPublicDeriver>,
     AddDerivationTree: Class<AddDerivationTree>,
     MarkUtxo: Class<MarkUtxo>,
@@ -763,7 +792,7 @@ async function rawUpdateTransactions(
           GetAddress: deps.GetAddress,
           GetPathWithSpecific: deps.GetPathWithSpecific,
           GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx,
-          AddAddress: deps.AddAddress,
+          ModifyAddress: deps.ModifyAddress,
           GetPublicDeriver: deps.GetPublicDeriver,
           AddDerivationTree: deps.AddDerivationTree,
           ModifyDisplayCutoff: deps.ModifyDisplayCutoff,

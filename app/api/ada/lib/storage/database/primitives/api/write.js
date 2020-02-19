@@ -118,7 +118,7 @@ export class GetOrAddBlock {
   }
 }
 
-export class AddAddress {
+export class ModifyAddress {
   static ownTables = Object.freeze({
     [Tables.AddressSchema.name]: Tables.AddressSchema,
     [Tables.AddressMappingSchema.name]: Tables.AddressMappingSchema,
@@ -135,7 +135,7 @@ export class AddAddress {
       type: CoreAddressT,
     |}>,
   ): Promise<Array<$ReadOnly<AddressRow>>> {
-    const { AddressSeed } = await AddAddress.depTables.GetEncryptionMeta.get(db, tx);
+    const { AddressSeed } = await ModifyAddress.depTables.GetEncryptionMeta.get(db, tx);
     const digests = address.map<number>(meta => digetForHash(meta.data, AddressSeed));
 
     const result = await addBatchToTable<AddressInsert, AddressRow>(
@@ -145,7 +145,7 @@ export class AddAddress {
         Hash: meta.data,
         Type: meta.type,
       })),
-      AddAddress.ownTables[Tables.AddressSchema.name].name,
+      ModifyAddress.ownTables[Tables.AddressSchema.name].name,
     );
 
     return result;
@@ -160,7 +160,7 @@ export class AddAddress {
       type: CoreAddressT,
     |}>,
   ): Promise<Array<$ReadOnly<AddressRow>>> {
-    const addressEntries = await AddAddress.addForeignByHash(
+    const addressEntries = await ModifyAddress.addForeignByHash(
       db, tx,
       address.map(meta => ({ data: meta.data, type: meta.type }))
     );
@@ -171,10 +171,23 @@ export class AddAddress {
         KeyDerivationId: meta.keyDerivationId,
         AddressId: addressEntries[i].AddressId,
       })),
-      AddAddress.ownTables[Tables.AddressMappingSchema.name].name,
+      ModifyAddress.ownTables[Tables.AddressMappingSchema.name].name,
     );
 
     return addressEntries;
+  }
+
+  static async remove(
+    db: lf$Database,
+    tx: lf$Transaction,
+    addressIds: $ReadOnlyArray<number>,
+  ): Promise<void> {
+    return await removeFromTableBatch(
+      db, tx,
+      ModifyAddress.ownTables[Tables.AddressSchema.name].name,
+      ModifyAddress.ownTables[Tables.AddressSchema.name].properties.AddressId,
+      addressIds
+    );
   }
 }
 
@@ -495,12 +508,9 @@ export class RemoveKeyDerivationTree {
 
     /**
      * Note: we don't iterate up through the parent to delete up to ROOT level
-     * this may cause unused key derivations to pile up in your storage
-     * but we can't reliable delete them
+     * we can't delete them here
      * because there isn't a way to guarantee these keys aren't used by some other table
-     *
-     * it's not a big deal since parent key derivations not used anywhere
-     * means they probably are just helpful metadata and don't represent sensitive information
+     * so the entity managing the keys has to ensure things are cleaned up
      */
 
     await RemoveKeyDerivationTree.depTables.ModifyKey.remove(

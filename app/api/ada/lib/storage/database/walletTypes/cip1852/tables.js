@@ -13,6 +13,8 @@ export type Cip1852WrapperInsert = {|
   PublicDeriverLevel: number,
   PrivateDeriverLevel: number | null,
   PrivateDeriverKeyDerivationId: number | null,
+  /** Need to keep track of root ID to cleanup when wallet is removed */
+  RootKeyDerivationId: number,
 |};
 export type Cip1852WrapperRow = {|
   Cip1852WrapperId: number, // serial
@@ -30,6 +32,7 @@ export const Cip1852WrapperSchema: {|
     PublicDeriverLevel: 'PublicDeriverLevel',
     PrivateDeriverLevel: 'PrivateDeriverLevel',
     PrivateDeriverKeyDerivationId: 'PrivateDeriverKeyDerivationId',
+    RootKeyDerivationId: 'RootKeyDerivationId',
   }
 };
 
@@ -42,6 +45,7 @@ export const populateCip1852Db = (schemaBuilder: lf$schema$Builder) => {
     .addColumn(Cip1852WrapperSchema.properties.PublicDeriverLevel, Type.INTEGER)
     .addColumn(Cip1852WrapperSchema.properties.PrivateDeriverLevel, Type.INTEGER)
     .addColumn(Cip1852WrapperSchema.properties.PrivateDeriverKeyDerivationId, Type.INTEGER)
+    .addColumn(Cip1852WrapperSchema.properties.RootKeyDerivationId, Type.INTEGER)
     .addPrimaryKey(
       ([Cip1852WrapperSchema.properties.Cip1852WrapperId]: Array<string>),
       true

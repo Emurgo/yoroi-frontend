@@ -97,7 +97,7 @@ import {
 } from '../../database/primitives/api/read';
 import { CoreAddressTypes } from '../../database/primitives/enums';
 import type { KeyRow, KeyDerivationRow, } from '../../database/primitives/tables';
-import { ModifyKey, AddAddress, } from '../../database/primitives/api/write';
+import { ModifyKey, ModifyAddress, } from '../../database/primitives/api/write';
 
 import { scanBip44Account, } from '../../../../restoration/byron/scan';
 import { scanCip1852Account } from '../../../../restoration/shelley/scan';
@@ -1500,7 +1500,7 @@ const ScanUtxoAccountAddressesMixin = (
       GetAddress: Class<GetAddress>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
-      AddAddress: Class<AddAddress>,
+      ModifyAddress: Class<ModifyAddress>,
       GetPublicDeriver: Class<GetPublicDeriver>,
       AddDerivationTree: Class<AddDerivationTree>,
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
@@ -1601,7 +1601,7 @@ const ScanUtxoAccountAddressesMixin = (
       GetAddress,
       GetPathWithSpecific,
       GetUtxoTxOutputsWithTx,
-      AddAddress,
+      ModifyAddress,
       GetPublicDeriver,
       AddDerivationTree,
       GetDerivationsByPath,

@@ -13,6 +13,8 @@ export type Bip44WrapperInsert = {|
   PublicDeriverLevel: number,
   PrivateDeriverLevel: number | null,
   PrivateDeriverKeyDerivationId: number | null,
+  /** Need to keep track of root ID to cleanup when wallet is removed */
+  RootKeyDerivationId: number,
 |};
 export type Bip44WrapperRow = {|
   Bip44WrapperId: number, // serial
@@ -30,6 +32,7 @@ export const Bip44WrapperSchema: {|
     PublicDeriverLevel: 'PublicDeriverLevel',
     PrivateDeriverLevel: 'PrivateDeriverLevel',
     PrivateDeriverKeyDerivationId: 'PrivateDeriverKeyDerivationId',
+    RootKeyDerivationId: 'RootKeyDerivationId',
   }
 };
 
@@ -42,6 +45,7 @@ export const populateBip44Db = (schemaBuilder: lf$schema$Builder) => {
     .addColumn(Bip44WrapperSchema.properties.PublicDeriverLevel, Type.INTEGER)
     .addColumn(Bip44WrapperSchema.properties.PrivateDeriverLevel, Type.INTEGER)
     .addColumn(Bip44WrapperSchema.properties.PrivateDeriverKeyDerivationId, Type.INTEGER)
+    .addColumn(Bip44WrapperSchema.properties.RootKeyDerivationId, Type.INTEGER)
     .addPrimaryKey(
       ([Bip44WrapperSchema.properties.Bip44WrapperId]: Array<string>),
       true

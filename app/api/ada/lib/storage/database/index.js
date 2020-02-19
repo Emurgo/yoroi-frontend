@@ -73,7 +73,7 @@ export const loadLovefieldDB = async (
 const populateAndCreate = async (
   storeType: $Values<typeof schema.DataStoreType>
 ): Promise<lf$Database> => {
-  const schemaBuilder = schema.create('yoroi-schema', 4);
+  const schemaBuilder = schema.create('yoroi-schema', 5);
 
   populatePrimitivesDb(schemaBuilder);
   populateWalletDb(schemaBuilder);
@@ -145,6 +145,16 @@ async function onUpgrade(
       await deleteDb();
       window.location.reload();
     }
+  } if (version === 4) {
+    // we know that before this version, Yoroi only supported 1 wallet
+    // therefore the single wallet always has its root key as derivation id 1
+    // and we only launched the new DB for the Shelley testnet
+    // so there are only Cip1852 wallets
+    await rawDb.addTableColumn(
+      'Cip1852Wrapper',
+      'RootKeyDerivationId',
+      1
+    );
   } else {
     throw new Error('unexpected version number');
   }

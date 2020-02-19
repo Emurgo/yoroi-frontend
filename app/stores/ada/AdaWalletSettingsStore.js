@@ -145,11 +145,6 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
     if (group == null) {
       throw new Error(`${nameof(this._removeWallet)} wallet doesn't belong to group`);
     }
-    console.log(group);
-    await this.clearHistory.execute({
-      publicDeriver: (request.publicDeriver.self: any),
-      refreshWallet: async () => {},
-    }).promise;
     await this.removeWalletRequest.execute({
       publicDeriver: request.publicDeriver.self,
       conceptualWallet: group.publicDerivers.length === 1
