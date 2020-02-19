@@ -1,11 +1,11 @@
 // @flow
 
 import type {
-  lf$Database,
+  lf$Database, lf$Transaction,
 } from 'lovefield';
 
 import {
-  ConceptualWallet,
+  ConceptualWallet, rawRemoveConceptualWallet,
 } from '../ConceptualWallet/index';
 import type {
   IConceptualWalletConstructor,
@@ -22,6 +22,7 @@ import type {
 import type {
   Bip44WrapperRow,
 } from '../../database/walletTypes/bip44/tables';
+import { ModifyBip44Wrapper } from '../../database/walletTypes/bip44/api/write';
 import {
   Bip44TableMap,
 } from '../../database/walletTypes/bip44/api/utils';
@@ -95,5 +96,13 @@ export class Bip44Wallet
       Bip44Wallet,
       protocolMagic
     );
+  }
+
+  rawRemove: (lf$Database, lf$Transaction) => Promise<void> = async (db, tx) => {
+    await ModifyBip44Wrapper.remove(
+      db, tx,
+      this.getConceptualWalletId()
+    );
+    await rawRemoveConceptualWallet(db, tx, this.getConceptualWalletId());
   }
 }

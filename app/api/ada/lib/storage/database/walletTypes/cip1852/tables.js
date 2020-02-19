@@ -54,7 +54,6 @@ export const populateCip1852Db = (schemaBuilder: lf$schema$Builder) => {
     .addForeignKey('Cip1852Wrapper_KeyDerivation', {
       local: Cip1852WrapperSchema.properties.PrivateDeriverKeyDerivationId,
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
-      action: ConstraintAction.CASCADE,
     })
     .addNullable([
       Cip1852WrapperSchema.properties.SignerLevel,

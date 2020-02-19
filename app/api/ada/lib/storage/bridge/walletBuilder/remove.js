@@ -9,6 +9,7 @@ import type {
 } from '../../models/PublicDeriver/interfaces';
 import {
   RemovePublicDeriver,
+  ModifyConceptualWallet,
 } from '../../database/walletTypes/core/api/write';
 import {
   GetKeyForPublicDeriver,
@@ -16,11 +17,16 @@ import {
 import {
   ModifyKey
 } from '../../database/primitives/api/write';
+import type { IConceptualWallet } from '../../models/ConceptualWallet/interfaces';
 
-export async function removePublicDeriver(request: {| publicDeriver: IPublicDeriver<>, |},
-): Promise<number> {
+export async function removePublicDeriver(request: {|
+  publicDeriver: IPublicDeriver<>,
+  /** removes parent if specified */
+  conceptualWallet: void | IConceptualWallet,
+|}): Promise<number> {
   const deps = Object.freeze({
     RemovePublicDeriver,
+    ModifyConceptualWallet,
   });
   const db = request.publicDeriver.getDb();
   const depTables = Object
@@ -40,10 +46,10 @@ export async function removePublicDeriver(request: {| publicDeriver: IPublicDeri
         db, dbTx,
         { publicDeriverId: request.publicDeriver.getPublicDeriverId() }
       );
-      // TODO delete public deriver
-      // TODO: delete keys separately -- not cascaded (AKA any key not referenced)
+      if (request.conceptualWallet != null) {
+        await request.conceptualWallet.rawRemove(db, dbTx);
+      }
       // TODO: delete any blocks separately?
-      // TODO: wrapper deleted from key derivation cascade but not Conceptual Wallet
     }
   );
 }

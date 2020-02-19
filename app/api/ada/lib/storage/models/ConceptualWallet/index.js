@@ -1,7 +1,7 @@
 // @flow
 
 import type {
-  lf$Database,
+  lf$Database, lf$Transaction,
 } from 'lovefield';
 
 import type {
@@ -113,8 +113,25 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
       }
     );
   }
+
+  rawRemove: (lf$Database, lf$Transaction) => Promise<void> = async (db, tx) => {
+    await rawRemoveConceptualWallet(
+      db, tx,
+      this.getConceptualWalletId()
+    );
+  }
 }
 
+export async function rawRemoveConceptualWallet(
+  db: lf$Database,
+  tx: lf$Transaction,
+  conceptualWalletId: number,
+): Promise<void> {
+  await ModifyConceptualWallet.remove(
+    db, tx,
+    [conceptualWalletId]
+  );
+}
 function isHwKind(
   conceptualWallet: IConceptualWallet,
   matchKind: ($ReadOnly<HwWalletMetaRow>) => boolean,

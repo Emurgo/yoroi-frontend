@@ -75,6 +75,20 @@ function groupWallets(
   return Array.from(pairingMap.values());
 }
 
+export function groupForWallet(
+  grouped: Array<GroupedWallets>,
+  publicDeriver: PublicDeriver<>,
+): void | GroupedWallets {
+  for (const conceptualGroup of grouped) {
+    for (const pubDeriver of conceptualGroup.publicDerivers) {
+      if (pubDeriver.self === publicDeriver) {
+        return conceptualGroup;
+      }
+    }
+  }
+  return undefined;
+}
+
 type DeferredCall<T> = (() => Promise<T>) => Promise<T>;
 
 /**

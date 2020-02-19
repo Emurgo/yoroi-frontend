@@ -9,11 +9,12 @@ import {
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   IHasLevels,
+  IConceptualWallet,
 } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import {
   ConceptualWallet
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import {
+import type {
   IPublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { WalletWithCachedMeta } from '../toplevel/WalletStore';
@@ -22,6 +23,9 @@ import { removePublicDeriver } from '../../api/ada/lib/storage/bridge/walletBuil
 import {
   Logger,
 } from '../../utils/logging';
+import {
+  groupForWallet,
+} from '../toplevel/WalletStore';
 
 export default class AdaWalletSettingsStore extends WalletSettingsStore {
 
@@ -133,12 +137,24 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
   |} => Promise<void> = async (request) => {
     this.removeWalletRequest.reset();
     this.stores.wallets.selected = null; // deselect before deleting
+
+    const group = groupForWallet(
+      this.stores.wallets.grouped,
+      request.publicDeriver.self
+    );
+    if (group == null) {
+      throw new Error(`${nameof(this._removeWallet)} wallet doesn't belong to group`);
+    }
+    console.log(group);
     await this.clearHistory.execute({
       publicDeriver: (request.publicDeriver.self: any),
       refreshWallet: async () => {},
     }).promise;
     await this.removeWalletRequest.execute({
       publicDeriver: request.publicDeriver.self,
+      conceptualWallet: group.publicDerivers.length === 1
+        ? group.conceptualWallet
+        : undefined
     }).promise;
     // TODO: go to root and refresh
   };
@@ -146,8 +162,12 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
 
 async function _removeWalletFromDb(request: {|
   publicDeriver: IPublicDeriver<>,
+  conceptualWallet: void | IConceptualWallet,
 |}): Promise<void> {
-  await removePublicDeriver({ publicDeriver: request.publicDeriver });
+  await removePublicDeriver({
+    publicDeriver: request.publicDeriver,
+    conceptualWallet: request.conceptualWallet,
+  });
 }
 
 async function _clearHistory(request: {|

@@ -8,6 +8,7 @@ import {
   op,
 } from 'lovefield';
 
+import { GetBip44Wrapper } from './read';
 import type {
   Bip44WrapperInsert, Bip44WrapperRow,
 } from '../tables';
@@ -31,17 +32,21 @@ import {
 import {
   GetChildWithSpecific, GetPathWithSpecific,
 } from '../../../primitives/api/read';
+import { RemoveKeyDerivationTree } from '../../../primitives/api/write';
 
 import {
   Bip44DerivationLevels,
 } from './utils';
-import { addNewRowToTable, } from '../../../utils';
+import { addNewRowToTable, removeFromTableBatch, } from '../../../utils';
 
-export class AddBip44Wrapper {
+export class ModifyBip44Wrapper {
   static ownTables = Object.freeze({
     [Bip44Tables.Bip44WrapperSchema.name]: Bip44Tables.Bip44WrapperSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables = Object.freeze({
+    GetBip44Wrapper,
+    RemoveKeyDerivationTree,
+  });
 
   static async add(
     db: lf$Database,
@@ -51,8 +56,38 @@ export class AddBip44Wrapper {
     return await addNewRowToTable<Bip44WrapperInsert, Bip44WrapperRow>(
       db, tx,
       request,
-      AddBip44Wrapper.ownTables[Bip44Tables.Bip44WrapperSchema.name].name,
+      ModifyBip44Wrapper.ownTables[Bip44Tables.Bip44WrapperSchema.name].name,
     );
+  }
+
+  static async remove(
+    db: lf$Database,
+    tx: lf$Transaction,
+    id: number,
+  ): Promise<void> {
+    const fullRow = await ModifyBip44Wrapper.depTables.GetBip44Wrapper.get(
+      db, tx,
+      id
+    );
+    if (fullRow == null) {
+      throw new Error(`${nameof(ModifyBip44Wrapper)}::${nameof(ModifyBip44Wrapper.remove)} Should never happen`);
+    }
+    // 1) delete wrapper
+    const table = ModifyBip44Wrapper.ownTables[Bip44Tables.Bip44WrapperSchema.name];
+    await removeFromTableBatch(
+      db, tx,
+      table.name,
+      table.properties.Bip44WrapperId,
+      ([id]: Array<number>),
+    );
+
+    // 2) delete related key derivations
+    if (fullRow.PrivateDeriverKeyDerivationId != null) {
+      await ModifyBip44Wrapper.depTables.RemoveKeyDerivationTree.remove(
+        db, tx,
+        { rootKeyId: fullRow.PrivateDeriverKeyDerivationId },
+      );
+    }
   }
 }
 

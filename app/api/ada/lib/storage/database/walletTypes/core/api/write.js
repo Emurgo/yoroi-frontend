@@ -244,6 +244,20 @@ export class ModifyConceptualWallet {
     );
   }
 
+  static async remove(
+    db: lf$Database,
+    tx: lf$Transaction,
+    ids: $ReadOnlyArray<number>,
+  ): Promise<void> {
+    const table = ModifyConceptualWallet.ownTables[Tables.ConceptualWalletSchema.name];
+    await removeFromTableBatch(
+      db, tx,
+      table.name,
+      table.properties.ConceptualWalletId,
+      ids,
+    );
+  }
+
   static async rename(
     db: lf$Database,
     tx: lf$Transaction,

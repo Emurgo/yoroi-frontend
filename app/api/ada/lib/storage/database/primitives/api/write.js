@@ -494,6 +494,8 @@ export class RemoveKeyDerivationTree {
       []
     );
 
+    // TODO: iterate up through parent key derivations to see if this was their only child
+
     await RemoveKeyDerivationTree.depTables.ModifyKey.remove(
       db, tx,
       relatedKeys

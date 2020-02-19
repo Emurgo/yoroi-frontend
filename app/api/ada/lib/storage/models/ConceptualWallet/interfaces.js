@@ -1,7 +1,7 @@
 // @flow
 
 import type {
-  lf$Database
+  lf$Database, lf$Transaction,
 } from 'lovefield';
 import type { HwWalletMetaRow } from '../../database/walletTypes/core/tables';
 
@@ -50,6 +50,7 @@ export interface IConceptualWallet {
   getDb(): lf$Database;
   getConceptualWalletId(): number;
   getProtocolMagic(): string;
+  rawRemove(db: lf$Database, tx: lf$Transaction): Promise<void>
 }
 
 export interface IHasPrivateDeriver {
