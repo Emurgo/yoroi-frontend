@@ -354,7 +354,7 @@
   "wallet.dashboard.graphType.costs": "花费",
   "wallet.dashboard.graphType.positions": "位置",
   "wallet.dashboard.lessthan.header": "有很多因素导致您获得的奖励少于您的预期。我们在这里列出一些常见的",
-  "wallet.dashboard.lessthan.reason1": "A stake pool you are delegating to either was or is offline so it did not make any blocks",
+  "wallet.dashboard.lessthan.reason1": "您所授权的权益池曾经是或目前正处于脱机状态，因此没有生成块",
   "wallet.dashboard.lessthan.reason2": "Not enough time has passed since you delegated",
   "wallet.dashboard.lessthan.reason3": "The amount earned was rounded down to 0 (if you delegated a very small amount)",
   "wallet.dashboard.lessthan.reason4": "A stake pool you are delegating to charges a flat fee greater than the pool's total reward",
