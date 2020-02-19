@@ -18,7 +18,7 @@
   "api.errors.getBestBlockApiError": "获取最佳区块时从服务器收到错误。",
   "api.errors.getPoolInfoApiError": "从服务器获取权益池信息时收到错误。",
   "api.errors.getReputationError": "从服务器获取声誉时收到错误。",
-  "api.errors.getRewardHistoryApiError": "Error received from server while getting reward history.",
+  "api.errors.getRewardHistoryApiError": "获取奖励历史记录时从服务器收到错误。",
   "api.errors.getTxHistoryForAddressesApiError": "获取 txs 时从服务器收到错误。",
   "api.errors.getTxsBodiesForUTXOsApiError": "获取 TxBodies 时从服务器收到错误。",
   "api.errors.getTxsBodiesForUTXOsError": "获取 TxBodies 时从api method call收到错误。",
