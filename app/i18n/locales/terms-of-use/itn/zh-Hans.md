@@ -16,6 +16,6 @@
 
 12.8 **保证** 本服务是按"原样"和"可用"的基础提供给用户的。因此，不包含与本服务有关的所有明示，暗示，法定或其他担保。用户确认，激励测试网可能无法正常运行，并且可能包含错误，设计缺陷或其他问题。用户自行承担使用激励测试网的风险。 EMURGO保留重新启动激励测试网并在系统中出现错误和/或恶意行为时撤销所有或部分奖励的权利。
 
-12.9 **Termination of the Incentivised Testnet.** User understands and agrees that Company may change, withdraw, terminate access to and/or discontinue the Incentivized Testnet (or any portion thereof) at any time and in its sole discretion. User may end participation in the Incentivized Testnet at any time and any Rewards gained up to that time will still be transferred to User’s Daedalus or Yoroi mainet wallet once the Incentivized Testnet is discontinued.
+12.9 **激励测试网的终止** 用户理解并同意，公司可以随时自行决定更改，撤回，终止访问和/或中止激励测试网 (或其任何部分)。用户可以随时停止参与激励测试网，并且在激励测试网中止后，用户在此之前获得的任何奖励仍将转移到用户的Daedalus或Yoroi主钱包中。
 
 12.10 **反馈** 用户可以通过任何官方反馈渠道随时提供建议，评论或想法，并报告与使用激励测试网有关的问题。
