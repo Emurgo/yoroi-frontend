@@ -429,7 +429,7 @@
   "wallet.receive.confirmationDialog.verifyAddressButtonLabel": "在硬件钱包上验证",
   "wallet.receive.nav.external": "外部",
   "wallet.receive.nav.internal": "内部",
-  "wallet.receive.nav.mangled": "损毁的",
+  "wallet.receive.nav.mangled": "错乱的",
   "wallet.receive.page.copyAddressLabel": "复制地址",
   "wallet.receive.page.generateNewAddressButtonLabel": "生成新地址",
   "wallet.receive.page.generatePaymentURLLabel": "生成付款链接",
