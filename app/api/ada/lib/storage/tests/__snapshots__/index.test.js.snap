@@ -487,6 +487,7 @@ Object {
       "PrivateDeriverKeyDerivationId": 1,
       "PrivateDeriverLevel": 0,
       "PublicDeriverLevel": 3,
+      "RootKeyDerivationId": 1,
       "SignerLevel": 0,
     },
   ],
