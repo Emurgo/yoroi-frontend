@@ -2,7 +2,7 @@
 
 12.1 **激励测试网** 公司正在测试并向用户提供测试奖励和激励机制，该机制旨在模仿即将发布的Shelley版本中的奖励和激励机制 ("**激励测试网**")。用户可以通过将其ada权益授权给自己的权益池或第三方权益池来参与激励测试网，以换取权益池产生收益中与用户权益百分比相等的奖励 ("**奖励**")。
 
-12.2 **Rewards.** The amount of Rewards a User may earn from delegation depends on various factors including, but not limited to, user participation, stakepool profit margins and the volume of ada being delegated. It is possible that delegation generates no Reward for a User due to the above-mentioned factors. Rewards are earned as of the start of the 3rd epoch on the Cardano blockchain. When the Incentivized Testnet is discontinued, any Rewards earned can be transferred back to the User’s Daedalus or Yoroi wallet.
+12.2 **奖励** 用户可以从授权中获得的奖励金额取决于多种因素，包括但不限于用户参与度，权益池利润率和被授权的ada数量。基于上述因素，授权可能不会为用户产生任何奖励。奖励是从在Cardano区块链授权后第三个纪元开始时开始计算。激励测试网结束后，获得的所有奖励都可以转回到用户的Daedalus或Yoroi钱包中。
 
 12.3 **Delegation.** Users may delegate their stake to one of the various stake pools of the Company or to a third party stake pool. User will have the sole right to determine the volume to be delegated to a stake pool and may increase or decrease its level of participation at any time. Any information Company shares regarding stakepools, including performance metrics and Rewards, will be for indicative purposes only and may not be accurate. Users may only delegate their stake to a stake pool if their ada is in an updated Daedalus or an updated Yoroi wallet at the time of the setup process. User does not acquire any automatic right to Rewards as a result of delegating its stake.
 
