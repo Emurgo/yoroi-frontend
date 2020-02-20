@@ -4,7 +4,7 @@
 
 12.2 **奖励** 用户可以从授权中获得的奖励金额取决于多种因素，包括但不限于用户参与度，权益池利润率和被授权的ada数量。基于上述因素，授权可能不会为用户产生任何奖励。奖励是从在Cardano区块链授权后第三个纪元开始时开始计算。激励测试网结束后，获得的所有奖励都可以转回到用户的Daedalus或Yoroi钱包中。
 
-12.3 **Delegation.** Users may delegate their stake to one of the various stake pools of the Company or to a third party stake pool. User will have the sole right to determine the volume to be delegated to a stake pool and may increase or decrease its level of participation at any time. Any information Company shares regarding stakepools, including performance metrics and Rewards, will be for indicative purposes only and may not be accurate. Users may only delegate their stake to a stake pool if their ada is in an updated Daedalus or an updated Yoroi wallet at the time of the setup process. User does not acquire any automatic right to Rewards as a result of delegating its stake.
+12.3 **授权** 用户可以将其权益授权给公司的各种权益池之一或第三方权益池。用户将拥有唯一的权力来确定要授权给权益池的数量，并且可以随时增加或减少其参与程度。公司分享的有关权益池的任何信息，包括绩效指标和奖励，仅用于指导目的，可能不准确。在设置过程中，如果其ada存在于更新的Daedalus或更新的Yoroi钱包中，则用户只能将其权益授权给一个权益池。用户由于授权其权益而没有奖励的任何自动权利。
 
 12.4 **Company Stake-Pools.** The Company will operate various stake pools which will be visible in Yoroi or Seiza. The cost and network and server requirements to reliably operate such stake pools shall be determined by the Company in its sole discretion. Company will communicate the percentage amount of Reward to be shared with Users through the User’s Testnet Yoroi wallet. Rewards will accrue at the end of each epoch and will automatically appear in the User’s Testnet Yoroi wallet. Company will provide a dashboard detailing the Company’s staking performance to User.
 
