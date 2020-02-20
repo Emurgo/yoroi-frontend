@@ -6,7 +6,7 @@
 
 12.3 **授权** 用户可以将其权益授权给公司的各种权益池之一或第三方权益池。用户将拥有唯一的权力来确定要授权给权益池的数量，并且可以随时增加或减少其参与程度。公司分享的有关权益池的任何信息，包括绩效指标和奖励，仅用于指导目的，可能不准确。在设置过程中，如果其ada存在于更新的Daedalus或更新的Yoroi钱包中，则用户只能将其权益授权给一个权益池。用户由于授权其权益而没有奖励的任何自动权利。
 
-12.4 **Company Stake-Pools.** The Company will operate various stake pools which will be visible in Yoroi or Seiza. The cost and network and server requirements to reliably operate such stake pools shall be determined by the Company in its sole discretion. Company will communicate the percentage amount of Reward to be shared with Users through the User’s Testnet Yoroi wallet. Rewards will accrue at the end of each epoch and will automatically appear in the User’s Testnet Yoroi wallet. Company will provide a dashboard detailing the Company’s staking performance to User.
+12.4 **公司的权益池** 公司将运营各种权益池，这些权益池将在Yoroi或Seiza中显示。可靠地运营此类权益池的成本以及对网络和服务器要求，应由公司自行决定。公司将通过用户的测试网Yoroi钱包传达与用户共享的奖励百分比金额。奖励将在每个纪元结束时产生，并自动出现在用户的测试网Yoroi钱包中。公司将提供一个仪表板，向用户详细说明公司的委托绩效。
 
 12.5 **Redeeming Rewards.** User acknowledges and agrees that by redeeming Rewards in the Incentivised Testnet, User redeems TEST-ADA only, and that in order to redeem actual ada, User must repeat the procedure in the mainnet, once released. User shall be responsible for payment of all applicable taxes, if any, to which the Rewards might be subject and any and all other taxes which may apply to User once Rewards are redeemed.
 
