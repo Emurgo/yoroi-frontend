@@ -14,7 +14,7 @@
 
 12.7 **禁止使用** 用户不会也不会允许任何其他第三方使用任何设备，软件或例程来干扰激励测试网的正常功能。如果有投诉或违规通知，则用户的参与可能会被暂停，恕不另行通知，直到解决为止；如果未能及时解决，则会被终止。
 
-12.8 **Warranty.** The Service are provided to User on an "as is" and "as available" basis and all warranties, express, implied, statutory or otherwise, with respect to the Service are hereby excluded. User acknowledges that the Incentivized Testnet may not operate properly and that it may contain errors, design flaws or other issues. User’s use of the Incentivized Testnet remains at User’s risk and discretion. EMURGO reserves the right to restart the Incentivised Testnet and reverse all or some Rewards in the case of errors and/or malicious behaviour in the system.
+12.8 **保证** 本服务是按"原样"和"可用"的基础提供给用户的。因此，不包含与本服务有关的所有明示，暗示，法定或其他担保。用户确认，激励测试网可能无法正常运行，并且可能包含错误，设计缺陷或其他问题。用户自行承担使用激励测试网的风险。 EMURGO保留重新启动激励测试网并在系统中出现错误和/或恶意行为时撤销所有或部分奖励的权利。
 
 12.9 **Termination of the Incentivised Testnet.** User understands and agrees that Company may change, withdraw, terminate access to and/or discontinue the Incentivized Testnet (or any portion thereof) at any time and in its sole discretion. User may end participation in the Incentivized Testnet at any time and any Rewards gained up to that time will still be transferred to User’s Daedalus or Yoroi mainet wallet once the Incentivized Testnet is discontinued.
 
