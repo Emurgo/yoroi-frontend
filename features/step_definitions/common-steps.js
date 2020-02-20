@@ -11,6 +11,7 @@ import {
   satisfies,
 } from 'semver';
 import { truncateLongName, } from '../../app/utils/formatters';
+import stableStringify from 'json-stable-stringify';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -81,7 +82,7 @@ After({ tags: '@invalidWitnessTest' }, () => {
 });
 
 After(async function () {
-  await this.driver.quit();
+  // await this.driver.quit();
 });
 
 const writeFile = promisify(fs.writeFile);
@@ -198,7 +199,7 @@ Given(/^I restart the browser$/, async function () {
 });
 
 Given(/^There is no wallet stored$/, async function () {
-  await refreshWallet(this);
+  await restoreWalletsFromStorage(this);
   await this.waitForElement('.WalletAdd_component');
 });
 
@@ -220,9 +221,9 @@ Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
   await this.waitForElement('.YoroiClassic');
 });
 
-async function refreshWallet(client) {
+async function restoreWalletsFromStorage(client) {
   await client.driver.executeAsyncScript((done) => {
-    window.yoroi.stores.wallets.refreshImportedWalletData()
+    window.yoroi.stores.wallets.restoreWalletsFromStorage()
       .then(done)
       .catch(err => done(err));
   });
@@ -312,3 +313,42 @@ async function importIndexedDB(client, importDir: string) {
     }, JSON.parse(indexedDBData));
   } catch (e) {} // eslint-disable-line no-empty
 }
+
+let capturedDbState = undefined;
+async function captureDbStae(client) {
+  const rawDb = await client.driver.executeAsyncScript((done) => {
+    window.yoroi.api.ada.exportLocalDatabase(
+      window.yoroi.stores.loading.loadPersitentDbRequest.result,
+    )
+      .then(done)
+      .catch(err => done(err));
+  });
+  capturedDbState = JSON.parse(rawDb.toString());
+}
+async function compareToCapturedDbState(client, excludeSyncTime) {
+  if (capturedDbState == null) throw new Error('Db state was never captured');
+  const rawDb = await client.driver.executeAsyncScript((done) => {
+    window.yoroi.api.ada.exportLocalDatabase(
+      window.yoroi.stores.loading.loadPersitentDbRequest.result,
+    )
+      .then(done)
+      .catch(err => done(err));
+  });
+  const newState = JSON.parse(rawDb.toString());
+  if (excludeSyncTime) {
+    delete capturedDbState.tables.LastSyncInfo;
+    delete newState.tables.LastSyncInfo;
+  }
+  expect(stableStringify(capturedDbState.tables)).to.equal(stableStringify(newState.tables));
+}
+
+Given(/^I capture DB state snapshot$/, async function () {
+  await captureDbStae(this);
+});
+
+Then(/^I compare to DB state snapshot$/, async function () {
+  await compareToCapturedDbState(this, false);
+});
+Then(/^I compare to DB state snapshot excluding sync time$/, async function () {
+  await compareToCapturedDbState(this, true);
+});

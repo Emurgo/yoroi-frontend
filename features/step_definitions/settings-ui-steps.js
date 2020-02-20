@@ -113,3 +113,16 @@ Then(/^I should see support screen$/, async function () {
   await this.waitForElement("//h1[contains(text(), 'Reporting a problem')]", By.xpath);
   await this.waitForElement("//h1[contains(text(), 'Logs')]", By.xpath);
 });
+
+When(/^I click on remove wallet$/, async function () {
+  await this.click('.removeWallet');
+});
+
+Then(/^I click on the checkbox$/, async function () {
+  await this.click('.RemoveWalletDialog_checkbox .SimpleCheckbox_root');
+});
+
+
+Then(/^I sleep for ([^"]*)$/, async function (ms) {
+  await this.driver.sleep(Number.parseInt(ms, 10));
+});

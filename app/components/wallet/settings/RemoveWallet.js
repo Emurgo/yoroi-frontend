@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import classNames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
-import styles from './ResyncBlock.scss';
+import styles from './RemoveWallet.scss';
 import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
@@ -36,7 +36,7 @@ export default class RemoveWallet extends Component<Props> {
     const buttonClassNames = classNames([
       'primary',
       styles.submitButton,
-      'delete' // classname for UI tests
+      'removeWallet' // classname for UI tests
     ]);
     return (
       <div className={styles.component}>
