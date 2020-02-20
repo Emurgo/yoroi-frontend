@@ -32,7 +32,6 @@ type Props = {
   ...
 };
 
-@observer
 export default class AmountInputSkin extends Component<Props> {
   static defaultProps = {
     error: undefined,
