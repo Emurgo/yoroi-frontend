@@ -10,9 +10,9 @@
 
 12.5 **Redeeming Rewards.** User acknowledges and agrees that by redeeming Rewards in the Incentivised Testnet, User redeems TEST-ADA only, and that in order to redeem actual ada, User must repeat the procedure in the mainnet, once released. User shall be responsible for payment of all applicable taxes, if any, to which the Rewards might be subject and any and all other taxes which may apply to User once Rewards are redeemed.
 
-12.6 **Tools.** Company will provide Users and stake pool operators certain tools designed to estimate the amount of Rewards a User may earn on the Incentivized Testnet. User understands that these tools are provided for illustrative purposes only and may not be accurate. Company does not promise that the Reward received will correspond to the amount indicated by the tools or by the stake pools.
+12.6 **工具** 公司将向用户和权益池运营商提供某些工具，这些工具旨在估算用户在激励测试网上可获得的奖励金额。用户明确，这些工具仅用于说明目的，可能不准确。公司不保证所收到的奖励将与工具或权益池所指示的金额相对应。
 
-12.7 **Prohibited Use.** User will not, and will not permit any other third party to use any device, software or routine to interfere with the proper function of the Incentivised Testnet. If there is a complaint or notice of violation, a User’s participation may be suspended without notice until resolved, and terminated if not resolved promptly.
+12.7 **禁止使用** 用户不会也不会允许任何其他第三方使用任何设备，软件或例程来干扰激励测试网的正常功能。如果有投诉或违规通知，则用户的参与可能会被暂停，恕不另行通知，直到解决为止；如果未能及时解决，则会被终止。
 
 12.8 **Warranty.** The Service are provided to User on an "as is" and "as available" basis and all warranties, express, implied, statutory or otherwise, with respect to the Service are hereby excluded. User acknowledges that the Incentivized Testnet may not operate properly and that it may contain errors, design flaws or other issues. User’s use of the Incentivized Testnet remains at User’s risk and discretion. EMURGO reserves the right to restart the Incentivised Testnet and reverse all or some Rewards in the case of errors and/or malicious behaviour in the system.
 
