@@ -8,7 +8,7 @@
 
 12.4 **公司的权益池** 公司将运营各种权益池，这些权益池将在Yoroi或Seiza中显示。可靠地运营此类权益池的成本以及对网络和服务器要求，应由公司自行决定。公司将通过用户的测试网Yoroi钱包传达与用户共享的奖励百分比金额。奖励将在每个纪元结束时产生，并自动出现在用户的测试网Yoroi钱包中。公司将提供一个仪表板，向用户详细说明公司的委托绩效。
 
-12.5 **Redeeming Rewards.** User acknowledges and agrees that by redeeming Rewards in the Incentivised Testnet, User redeems TEST-ADA only, and that in order to redeem actual ada, User must repeat the procedure in the mainnet, once released. User shall be responsible for payment of all applicable taxes, if any, to which the Rewards might be subject and any and all other taxes which may apply to User once Rewards are redeemed.
+12.6 **兑换奖励** 用户确认并同意，通过在奖励测试网中兑换奖励，用户只能兑换TEST-ADA，并且为了兑换实际的ada，用户必须在发布后在主网中重复该过程。奖励兑现后，用户应负责支付所有可能适用的税费。
 
 12.6 **工具** 公司将向用户和权益池运营商提供某些工具，这些工具旨在估算用户在激励测试网上可获得的奖励金额。用户明确，这些工具仅用于说明目的，可能不准确。公司不保证所收到的奖励将与工具或权益池所指示的金额相对应。
 
