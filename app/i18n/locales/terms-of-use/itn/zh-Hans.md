@@ -18,4 +18,4 @@
 
 12.9 **Termination of the Incentivised Testnet.** User understands and agrees that Company may change, withdraw, terminate access to and/or discontinue the Incentivized Testnet (or any portion thereof) at any time and in its sole discretion. User may end participation in the Incentivized Testnet at any time and any Rewards gained up to that time will still be transferred to User’s Daedalus or Yoroi mainet wallet once the Incentivized Testnet is discontinued.
 
-12.10 **Feedback.** Users may provide suggestions, comments or ideas and report issues or problems related to their use of the Incentivized Testnet at any time by using any of the official feedback channels.
+12.10 **反馈** 用户可以通过任何官方反馈渠道随时提供建议，评论或想法，并报告与使用激励测试网有关的问题。
