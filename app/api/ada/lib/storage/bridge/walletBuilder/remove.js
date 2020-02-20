@@ -23,8 +23,9 @@ import { rawRemoveAllTransactions } from '../updateTransactions';
 import {
   GetAddress,
   GetPathWithSpecific,
+  GetTransaction,
 } from '../../database/primitives/api/read';
-import { ModifyAddress } from '../../database/primitives/api/write';
+import { ModifyAddress, FreeBlocks, } from '../../database/primitives/api/write';
 import {
   AssociateTxWithIOs
 } from '../../database/transactionModels/multipart/api/read';
@@ -45,6 +46,8 @@ export async function removePublicDeriver(request: {|
     GetDerivationSpecific,
     DeleteAllTransactions,
     ModifyAddress,
+    GetTransaction,
+    FreeBlocks,
   });
   const db = request.publicDeriver.getDb();
   const depTables = Object
@@ -63,14 +66,17 @@ export async function removePublicDeriver(request: {|
       const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
       if (withLevels != null) {
         // 1) remove transactions
-        const relatedIds = await rawRemoveAllTransactions(
+        await rawRemoveAllTransactions(
           db, dbTx,
           {
-            GetPathWithSpecific,
-            GetAddress,
-            AssociateTxWithIOs,
-            GetDerivationSpecific,
-            DeleteAllTransactions,
+            GetPathWithSpecific: deps.GetPathWithSpecific,
+            GetAddress: deps.GetAddress,
+            AssociateTxWithIOs: deps.AssociateTxWithIOs,
+            GetDerivationSpecific: deps.GetDerivationSpecific,
+            DeleteAllTransactions: deps.DeleteAllTransactions,
+            ModifyAddress: deps.ModifyAddress,
+            GetTransaction: deps.GetTransaction,
+            FreeBlocks: deps.FreeBlocks,
           },
           withLevels.getParent().getDerivationTables(),
           {
@@ -81,12 +87,14 @@ export async function removePublicDeriver(request: {|
         // 2) remove addresses
         // note: this won't actually delete all addresses
         // only wallets associated with this wallet
+        // we depend on other things (like transaction deletion)
+        // to delete addresses only kept as metadata
         const addresses = await rawGetAddressRowsForWallet(
           dbTx,
           {
-            GetPathWithSpecific,
-            GetAddress,
-            GetDerivationSpecific,
+            GetPathWithSpecific: deps.GetPathWithSpecific,
+            GetAddress: deps.GetAddress,
+            GetDerivationSpecific: deps.GetDerivationSpecific,
           },
           { publicDeriver: request.publicDeriver },
           withLevels.getParent().getDerivationTables(),
@@ -95,16 +103,9 @@ export async function removePublicDeriver(request: {|
           .flatMap(key => addresses[key])
           .map(row => row.AddressId);
 
-        const addressIdsInTxs = Object.keys(relatedIds.addressIds)
-          .flatMap(key => relatedIds.addressIds[key]);
         await deps.ModifyAddress.remove(
           db, dbTx,
-          [
-            // a) include all address for this wallet
-            ...walletAddressIds,
-            // b) include addresses that are in txs for this wallet but don't belong to you
-            ...addressIdsInTxs,
-          ]
+          walletAddressIds
         );
       }
       await deps.RemovePublicDeriver.remove(
@@ -114,7 +115,6 @@ export async function removePublicDeriver(request: {|
       if (request.conceptualWallet != null) {
         await request.conceptualWallet.rawRemove(db, dbTx);
       }
-      // TODO: delete any blocks separately?
     }
   );
 }

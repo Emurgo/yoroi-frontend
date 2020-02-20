@@ -519,3 +519,54 @@ export class RemoveKeyDerivationTree {
     );
   }
 }
+
+export class FreeBlocks {
+  static ownTables = Object.freeze({
+    [Tables.TransactionSchema.name]: Tables.TransactionSchema,
+    [Tables.BlockSchema.name]: Tables.BlockSchema,
+  });
+  static depTables = Object.freeze({
+  });
+
+  /**
+   * Warning: unfortunately this logic has to be updated
+   * whenever a new table is added to the DB that changes when a block can be freed
+   */
+  static async free(
+    db: lf$Database,
+    tx: lf$Transaction,
+  ): Promise<void> {
+    const txTableMeta = FreeBlocks.ownTables[Tables.TransactionSchema.name];
+    const blockTableMeta = FreeBlocks.ownTables[Tables.BlockSchema.name];
+    const txTable = db.getSchema().table(txTableMeta.name);
+    const blockTable = db.getSchema().table(blockTableMeta.name);
+    const query = db
+      .select()
+      .from(blockTable)
+      .leftOuterJoin(
+        txTable,
+        txTable[txTableMeta.properties.BlockId].eq(
+          blockTable[blockTableMeta.properties.BlockId]
+        )
+      );
+    const result: $ReadOnlyArray<{|
+      Transaction: WithNullableFields<$ReadOnly<TransactionRow>>,
+      Block: $ReadOnly<BlockRow>,
+    |}> = await tx.attach(query);
+    const freeableBlocks = result.reduce(
+      (acc, pair) => {
+        if (pair.Transaction.TransactionId == null) {
+          acc.push(pair.Block);
+        }
+        return acc;
+      },
+      []
+    );
+    await removeFromTableBatch(
+      db, tx,
+      blockTableMeta.name,
+      blockTableMeta.properties.BlockId,
+      freeableBlocks.map(row => row.BlockId)
+    );
+  }
+}

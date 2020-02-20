@@ -20,6 +20,7 @@ import type {
 import type { WalletWithCachedMeta } from '../toplevel/WalletStore';
 import { removeAllTransactions } from '../../api/ada/lib/storage/bridge/updateTransactions';
 import { removePublicDeriver } from '../../api/ada/lib/storage/bridge/walletBuilder/remove';
+import { ROUTES } from '../../routes-config';
 import {
   Logger,
 } from '../../utils/logging';
@@ -151,7 +152,11 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
         ? group.conceptualWallet
         : undefined
     }).promise;
-    // TODO: go to root and refresh
+    // note: it's possible some other function was waiting for a DB lock
+    // and so it may fail if it runs now since underlying data was deleted
+    // to avoid this causing an issue, we just refresh the page
+    // note: redirect logic will handle going to the right page after reloading
+    window.location.reload();
   };
 }
 
