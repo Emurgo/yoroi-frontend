@@ -11,6 +11,7 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
 import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
 import styles from './RemoveWalletDialog.scss';
+import dangerousButtonStyles from '../../../themes/overrides/DangerousButton.scss';
 import { messages } from './RemoveWallet';
 
 const dialogMessages = defineMessages({
@@ -76,6 +77,7 @@ export default class RemoveWalletDialog extends Component<Props> {
         primary: true,
         className: confirmButtonClasses,
         disabled: !this.isChecked ? true : undefined,
+        themeOverrides: dangerousButtonStyles,
         isSubmitting: this.props.isSubmitting
       },
     ];

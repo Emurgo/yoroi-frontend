@@ -17,6 +17,7 @@ type ActionType = {|
   +isSubmitting?: boolean,
   +disabled?: boolean,
   +className?: ?string,
+  +themeOverrides?: {...},
 |};
 
 type Props = {|
@@ -107,6 +108,7 @@ export default class Dialog extends Component<Props> {
                 ]);
                 return (
                   <Button
+                    themeOverrides={action.themeOverrides}
                     key={i}
                     className={buttonClasses}
                     label={action.label}
