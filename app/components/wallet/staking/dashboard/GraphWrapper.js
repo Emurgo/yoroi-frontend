@@ -104,6 +104,7 @@ const Graph: {|
   xAxisLabel: string,
   yAxisLabel: string,
   primaryBarLabel: string,
+  hideYAxis: boolean,
 |} => Node = ({
   themeVars,
   data,
@@ -111,6 +112,7 @@ const Graph: {|
   xAxisLabel,
   yAxisLabel,
   primaryBarLabel,
+  hideYAxis,
 }) => {
 
   const graphVars = {
@@ -129,6 +131,10 @@ const Graph: {|
     <span style={{ fontSize: graphVars.fontSize, color: graphVars.legendTextColor }}>
       {value}
     </span>
+  );
+
+  const formatYAxis = (value) => (
+    !hideYAxis ? value : '∗∗∗ '
   );
 
   const GraphTooltip = (
@@ -180,6 +186,7 @@ const Graph: {|
           }}
         />
         <YAxis
+          tickFormatter={formatYAxis}
           tick={{
             fill: graphVars.axisTickColor,
             fontSize: graphVars.fontSize,
@@ -230,6 +237,7 @@ type Props = {|
     data: Array<GraphItems>,
     primaryBarLabel: string,
     yAxisLabel: string,
+    hideYAxis: boolean,
   |}>,
 |};
 
@@ -286,6 +294,7 @@ export default class GraphWrapper extends Component<Props, State> {
               primaryBarLabel={tabs[this.state.selectedTab].primaryBarLabel}
               themeVars={themeVars}
               data={tabs[this.state.selectedTab].data}
+              hideYAxis={tabs[this.state.selectedTab].hideYAxis}
             />
           </div>
         </Card>
