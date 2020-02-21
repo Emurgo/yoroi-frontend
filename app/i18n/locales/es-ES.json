@@ -510,7 +510,7 @@
   "wallet.settings.changePassword.dialog.repeatPasswordFieldPlaceholder": "Ingresa tu nueva contraseña de gastos",
   "wallet.settings.changePassword.dialog.repeatPasswordLabel": "Repetir nueva contraseña de gastos",
   "wallet.settings.changePassword.dialog.title.changePassword": "Cambiar contraseña de gastos",
-  "wallet.settings.delete.accept": "Todavía tengo los medios para restaurar esta billetera",
+  "wallet.settings.delete.accept": "Aún conozco la forma y tengo los medios para restaurar esta billetera",
   "wallet.settings.delete.warning2": "Por favor, comprueba que todavía tienes los medios para restaurar el acceso a esta billetera. Si no puedes, eliminar la billetera puede resultar en una pérdida irreversible de los fondos.",
   "wallet.settings.name.label": "Nombre de la billetera",
   "wallet.settings.passwordLastUpdated": "Última actualización {lastUpdated}",
