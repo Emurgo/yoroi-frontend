@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import { observer } from 'mobx-react';
 import styles from './NavBarBack.scss';
 import BackIcon from '../../assets/images/wallet-nav/back-arrow.inline.svg';
 
@@ -9,6 +10,7 @@ type Props = {|
   +route: string,
 |};
 
+@observer
 export default class NavBarBack extends Component<Props> {
 
   render() {

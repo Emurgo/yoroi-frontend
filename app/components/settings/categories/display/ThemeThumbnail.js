@@ -1,5 +1,6 @@
 // @flow
 
+import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 
 type Props = {|
@@ -7,6 +8,7 @@ type Props = {|
   +themeKey: string,
 |};
 
+@observer
 export default class ThemeThumbnail extends Component<Props> {
   render() {
     const { themeVars, themeKey } = this.props;

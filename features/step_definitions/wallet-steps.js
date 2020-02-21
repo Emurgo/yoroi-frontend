@@ -20,3 +20,11 @@ When(/^I navigate to wallet transactions screen$/, async function () {
 Then(/^I should see the opened wallet with name "([^"]*)"$/, async function (walletName) {
   await this.waitUntilText('.NavPlate_name', truncateLongName(walletName));
 });
+
+Then(/^I unselect the wallet$/, async function () {
+  await this.click(`//div[@class='TopBarLayout_navbar']//button[@class='NavBarBack_backButton']`, By.xpath);
+});
+
+When(/^I am on the my wallets screen$/, async function () {
+  await this.waitForElement('.MyWallets_page');
+});

@@ -18,12 +18,13 @@ import type {
 
 import {
   addOrReplaceRow, addNewRowToTable, removeFromTableBatch,
+  StaleStateError,
 } from '../../../utils';
-import { GetLastSyncForPublicDeriver } from './read';
+import { GetLastSyncForPublicDeriver, GetPublicDeriver, } from './read';
 import type { KeyDerivationRow } from '../../../primitives/tables';
 import { TransactionSchema } from '../../../primitives/tables';
 import type { AddDerivationRequest } from '../../../primitives/api/write';
-import { AddDerivation } from '../../../primitives/api/write';
+import { AddDerivation, RemoveKeyDerivationTree } from '../../../primitives/api/write';
 
 
 export class ModifyLastSyncInfo {
@@ -57,6 +58,19 @@ export class ModifyLastSyncInfo {
         Time: null,
       },
       ModifyLastSyncInfo.ownTables[Tables.LastSyncInfoSchema.name].name,
+    );
+  }
+
+  static async remove(
+    db: lf$Database,
+    tx: lf$Transaction,
+    ids: $ReadOnlyArray<number>,
+  ): Promise<void> {
+    await removeFromTableBatch(
+      db, tx,
+      ModifyLastSyncInfo.ownTables[Tables.LastSyncInfoSchema.name].name,
+      ModifyLastSyncInfo.ownTables[Tables.LastSyncInfoSchema.name].properties.LastSyncInfoId,
+      ids,
     );
   }
 }
@@ -230,6 +244,20 @@ export class ModifyConceptualWallet {
     );
   }
 
+  static async remove(
+    db: lf$Database,
+    tx: lf$Transaction,
+    ids: $ReadOnlyArray<number>,
+  ): Promise<void> {
+    const table = ModifyConceptualWallet.ownTables[Tables.ConceptualWalletSchema.name];
+    await removeFromTableBatch(
+      db, tx,
+      table.name,
+      table.properties.ConceptualWalletId,
+      ids,
+    );
+  }
+
   static async rename(
     db: lf$Database,
     tx: lf$Transaction,
@@ -254,5 +282,50 @@ export class ModifyConceptualWallet {
       ));
 
     await tx.attach(updateQuery);
+  }
+}
+
+export class RemovePublicDeriver {
+  static ownTables = Object.freeze({
+    [Tables.PublicDeriverSchema.name]: Tables.PublicDeriverSchema,
+  });
+  static depTables = Object.freeze({
+    GetPublicDeriver,
+    RemoveKeyDerivationTree,
+    ModifyLastSyncInfo,
+  });
+
+  static async remove(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {|
+      publicDeriverId: number,
+    |},
+  ): Promise<void> {
+    const publicDeriverRow = await RemovePublicDeriver.depTables.GetPublicDeriver.get(
+      db, tx, request.publicDeriverId
+    );
+    if (publicDeriverRow == null) {
+      throw new StaleStateError(`${nameof(RemovePublicDeriver)}::${nameof(RemovePublicDeriver.remove)}`);
+    }
+
+    // 1) delete public deriver row
+    await removeFromTableBatch(
+      db, tx,
+      RemovePublicDeriver.ownTables[Tables.PublicDeriverSchema.name].name,
+      RemovePublicDeriver.ownTables[Tables.PublicDeriverSchema.name].properties.PublicDeriverId,
+      ([request.publicDeriverId]: Array<number>),
+    );
+
+    await RemovePublicDeriver.depTables.RemoveKeyDerivationTree.remove(
+      db, tx,
+      { rootKeyId: publicDeriverRow.KeyDerivationId, }
+    );
+
+    // 3) remove last sync info
+    await RemovePublicDeriver.depTables.ModifyLastSyncInfo.remove(
+      db, tx,
+      [publicDeriverRow.LastSyncInfoId]
+    );
   }
 }

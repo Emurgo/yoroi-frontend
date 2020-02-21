@@ -3,7 +3,7 @@
 import {
   ConceptualWalletSchema,
 } from '../core/tables';
-import { Type } from 'lovefield';
+import { Type, ConstraintAction, } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 import { KeyDerivationSchema } from '../../primitives/tables';
 
@@ -13,6 +13,8 @@ export type Cip1852WrapperInsert = {|
   PublicDeriverLevel: number,
   PrivateDeriverLevel: number | null,
   PrivateDeriverKeyDerivationId: number | null,
+  /** Need to keep track of root ID to cleanup when wallet is removed */
+  RootKeyDerivationId: number,
 |};
 export type Cip1852WrapperRow = {|
   Cip1852WrapperId: number, // serial
@@ -30,6 +32,7 @@ export const Cip1852WrapperSchema: {|
     PublicDeriverLevel: 'PublicDeriverLevel',
     PrivateDeriverLevel: 'PrivateDeriverLevel',
     PrivateDeriverKeyDerivationId: 'PrivateDeriverKeyDerivationId',
+    RootKeyDerivationId: 'RootKeyDerivationId',
   }
 };
 
@@ -42,17 +45,23 @@ export const populateCip1852Db = (schemaBuilder: lf$schema$Builder) => {
     .addColumn(Cip1852WrapperSchema.properties.PublicDeriverLevel, Type.INTEGER)
     .addColumn(Cip1852WrapperSchema.properties.PrivateDeriverLevel, Type.INTEGER)
     .addColumn(Cip1852WrapperSchema.properties.PrivateDeriverKeyDerivationId, Type.INTEGER)
+    .addColumn(Cip1852WrapperSchema.properties.RootKeyDerivationId, Type.INTEGER)
     .addPrimaryKey(
       ([Cip1852WrapperSchema.properties.Cip1852WrapperId]: Array<string>),
       true
     )
     .addForeignKey('Cip1852Wrapper_ConceptualWallet', {
       local: Cip1852WrapperSchema.properties.ConceptualWalletId,
-      ref: `${ConceptualWalletSchema.name}.${ConceptualWalletSchema.properties.ConceptualWalletId}`
+      ref: `${ConceptualWalletSchema.name}.${ConceptualWalletSchema.properties.ConceptualWalletId}`,
     })
-    .addForeignKey('Cip1852Wrapper_KeyDerivation', {
+    .addForeignKey('Cip1852Wrapper_PrivateDeriverKeyDerivation', {
       local: Cip1852WrapperSchema.properties.PrivateDeriverKeyDerivationId,
-      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`
+      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
+    })
+    .addForeignKey('Cip1852Wrapper_RootKeyDerivation', {
+      local: Cip1852WrapperSchema.properties.RootKeyDerivationId,
+      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
+      action: ConstraintAction.CASCADE,
     })
     .addNullable([
       Cip1852WrapperSchema.properties.SignerLevel,

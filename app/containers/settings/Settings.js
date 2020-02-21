@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import environment from '../../environment';
 import SettingsLayout from '../../components/settings/SettingsLayout';
+import NavBarContainer from '../NavBarContainer';
 import SettingsMenu from '../../components/settings/menu/SettingsMenu';
 import { buildRoute } from '../../utils/routing';
 import type { InjectedContainerProps } from '../../types/injectedPropsType';
@@ -51,14 +52,18 @@ export default class Settings extends Component<InjectedContainerProps> {
       />
     );
 
-    const navbarTitle = (
-      <NavBarTitle title={this.context.intl.formatMessage(messages.title)} />
-    );
+    const navbarTitle = stores.wallets.selected
+      ? <NavBarContainer
+        actions={actions}
+        stores={stores}
+        title={<NavBarTitle title={this.context.intl.formatMessage(messages.title)} />}
+      />
+      : <NavBar title={<NavBarTitle title={this.context.intl.formatMessage(messages.title)} />} />;
 
     return (
       <MainLayout
-        navbar={<NavBar title={navbarTitle} />}
         sidebar={sidebarContainer}
+        navbar={navbarTitle}
         connectionErrorType={checkAdaServerStatus}
         actions={actions}
         stores={stores}

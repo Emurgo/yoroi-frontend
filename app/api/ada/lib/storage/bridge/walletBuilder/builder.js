@@ -18,10 +18,10 @@ import type {
   Cip1852WrapperInsert,
 } from '../../database/walletTypes/cip1852/tables';
 import {
-  AddBip44Wrapper,
+  ModifyBip44Wrapper,
 } from '../../database/walletTypes/bip44/api/write';
 import {
-  AddCip1852Wrapper,
+  ModifyCip1852Wrapper,
 } from '../../database/walletTypes/cip1852/api/write';
 import type {
   AddAdhocPublicDeriverRequest,
@@ -196,9 +196,9 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
   ) => {
     return this.updateData<HasConceptualWallet, HasBip44Wrapper>(
       AsNotNull<HasBip44Wrapper>({ bip44WrapperRow: null }),
-      Array.from(getAllTables(AddBip44Wrapper)),
+      Array.from(getAllTables(ModifyBip44Wrapper)),
       async (finalData) => {
-        finalData.bip44WrapperRow = await AddBip44Wrapper.add(
+        finalData.bip44WrapperRow = await ModifyBip44Wrapper.add(
           this.db,
           this.txHolder.tx,
           insert(finalData),
@@ -217,9 +217,9 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
   ) => {
     return this.updateData<HasConceptualWallet, HasCip1852Wrapper>(
       AsNotNull<HasCip1852Wrapper>({ cip1852WrapperRow: null }),
-      Array.from(getAllTables(AddCip1852Wrapper)),
+      Array.from(getAllTables(ModifyCip1852Wrapper)),
       async (finalData) => {
-        finalData.cip1852WrapperRow = await AddCip1852Wrapper.add(
+        finalData.cip1852WrapperRow = await ModifyCip1852Wrapper.add(
           this.db,
           this.txHolder.tx,
           insert(finalData),
@@ -350,10 +350,10 @@ export type HasConceptualWallet = {|
   conceptualWalletRow: PromisslessReturnType<typeof ModifyConceptualWallet.add>
 |};
 export type HasBip44Wrapper = {|
-  bip44WrapperRow: PromisslessReturnType<typeof AddBip44Wrapper.add>
+  bip44WrapperRow: PromisslessReturnType<typeof ModifyBip44Wrapper.add>
 |};
 export type HasCip1852Wrapper = {|
-  cip1852WrapperRow: PromisslessReturnType<typeof AddCip1852Wrapper.add>
+  cip1852WrapperRow: PromisslessReturnType<typeof ModifyCip1852Wrapper.add>
 |};
 export type HasRoot = {|
   root: PromisslessReturnType<typeof AddDerivationTree.includingParent>

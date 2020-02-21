@@ -8,7 +8,7 @@ import type {
   KeyRow,
 } from '../database/primitives/tables';
 import {
-  UpdateGet,
+  ModifyKey,
 } from '../database/primitives/api/write';
 
 import type {
@@ -83,7 +83,7 @@ export function deriveKey(
 export async function rawChangePassword(
   db: lf$Database,
   tx: lf$Transaction,
-  deps: {| UpdateGet: Class<UpdateGet>, |},
+  deps: {| ModifyKey: Class<ModifyKey>, |},
   request: {| ...IChangePasswordRequest, oldKeyRow: $ReadOnly<KeyRow>, |},
 ): Promise<IChangePasswordResponse> {
   const decryptedKey = decryptKey(
@@ -106,7 +106,7 @@ export async function rawChangePassword(
     PasswordLastUpdate: request.currentTime,
   };
 
-  return await deps.UpdateGet.update(
+  return await deps.ModifyKey.update(
     db, tx,
     newRow,
   );

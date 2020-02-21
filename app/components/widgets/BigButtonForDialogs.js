@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import styles from './BigButtonForDialogs.scss';
 
@@ -11,6 +12,7 @@ type Props = {|
   +className: string,
 |};
 
+@observer
 export default class BigButtonForDialogs extends Component<Props> {
 
   render() {

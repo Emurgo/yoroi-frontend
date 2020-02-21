@@ -28,6 +28,7 @@ import {
 } from './utils';
 import {
   addNewRowToTable,
+  removeFromTableBatch,
   addBatchToTable,
   addOrReplaceRow,
   getRowIn,
@@ -38,10 +39,11 @@ import {
   GetChildIfExists,
   GetBlock,
   GetEncryptionMeta,
+  GetDerivationsByPath,
 } from './read';
 import type { InsertRequest } from '../../walletTypes/common/utils';
 
-export class AddKey {
+export class ModifyKey {
   static ownTables = Object.freeze({
     [Tables.KeySchema.name]: Tables.KeySchema,
   });
@@ -55,16 +57,22 @@ export class AddKey {
     return await addNewRowToTable<KeyInsert, KeyRow>(
       db, tx,
       request,
-      AddKey.ownTables[Tables.KeySchema.name].name,
+      ModifyKey.ownTables[Tables.KeySchema.name].name,
     );
   }
-}
 
-export class UpdateGet {
-  static ownTables = Object.freeze({
-    [Tables.KeySchema.name]: Tables.KeySchema,
-  });
-  static depTables = Object.freeze({});
+  static async remove(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: $ReadOnlyArray<number>,
+  ): Promise<void> {
+    return await removeFromTableBatch(
+      db, tx,
+      ModifyKey.ownTables[Tables.KeySchema.name].name,
+      ModifyKey.ownTables[Tables.KeySchema.name].properties.KeyId,
+      request
+    );
+  }
 
   static async update(
     db: lf$Database,
@@ -74,7 +82,7 @@ export class UpdateGet {
     return await addOrReplaceRow<KeyRow, KeyRow>(
       db, tx,
       request,
-      UpdateGet.ownTables[Tables.KeySchema.name].name
+      ModifyKey.ownTables[Tables.KeySchema.name].name
     );
   }
 }
@@ -110,7 +118,7 @@ export class GetOrAddBlock {
   }
 }
 
-export class AddAddress {
+export class ModifyAddress {
   static ownTables = Object.freeze({
     [Tables.AddressSchema.name]: Tables.AddressSchema,
     [Tables.AddressMappingSchema.name]: Tables.AddressMappingSchema,
@@ -127,7 +135,7 @@ export class AddAddress {
       type: CoreAddressT,
     |}>,
   ): Promise<Array<$ReadOnly<AddressRow>>> {
-    const { AddressSeed } = await AddAddress.depTables.GetEncryptionMeta.get(db, tx);
+    const { AddressSeed } = await ModifyAddress.depTables.GetEncryptionMeta.get(db, tx);
     const digests = address.map<number>(meta => digetForHash(meta.data, AddressSeed));
 
     const result = await addBatchToTable<AddressInsert, AddressRow>(
@@ -137,7 +145,7 @@ export class AddAddress {
         Hash: meta.data,
         Type: meta.type,
       })),
-      AddAddress.ownTables[Tables.AddressSchema.name].name,
+      ModifyAddress.ownTables[Tables.AddressSchema.name].name,
     );
 
     return result;
@@ -152,7 +160,7 @@ export class AddAddress {
       type: CoreAddressT,
     |}>,
   ): Promise<Array<$ReadOnly<AddressRow>>> {
-    const addressEntries = await AddAddress.addForeignByHash(
+    const addressEntries = await ModifyAddress.addForeignByHash(
       db, tx,
       address.map(meta => ({ data: meta.data, type: meta.type }))
     );
@@ -163,10 +171,23 @@ export class AddAddress {
         KeyDerivationId: meta.keyDerivationId,
         AddressId: addressEntries[i].AddressId,
       })),
-      AddAddress.ownTables[Tables.AddressMappingSchema.name].name,
+      ModifyAddress.ownTables[Tables.AddressMappingSchema.name].name,
     );
 
     return addressEntries;
+  }
+
+  static async remove(
+    db: lf$Database,
+    tx: lf$Transaction,
+    addressIds: $ReadOnlyArray<number>,
+  ): Promise<void> {
+    return await removeFromTableBatch(
+      db, tx,
+      ModifyAddress.ownTables[Tables.AddressSchema.name].name,
+      ModifyAddress.ownTables[Tables.AddressSchema.name].properties.AddressId,
+      addressIds
+    );
   }
 }
 
@@ -209,7 +230,7 @@ export class AddDerivation {
     [Tables.KeyDerivationSchema.name]: Tables.KeyDerivationSchema,
   });
   static depTables = Object.freeze({
-    AddKey,
+    ModifyKey,
   });
 
   static async add<Insert, Row>(
@@ -221,13 +242,13 @@ export class AddDerivation {
   ): Promise<DerivationQueryResult<Row>> {
     const privateKey = request.privateKeyInfo === null
       ? null
-      : await AddDerivation.depTables.AddKey.add(
+      : await AddDerivation.depTables.ModifyKey.add(
         db, tx,
         request.privateKeyInfo,
       );
     const publicKey = request.publicKeyInfo === null
       ? null
-      : await AddDerivation.depTables.AddKey.add(
+      : await AddDerivation.depTables.ModifyKey.add(
         db, tx,
         request.publicKeyInfo,
       );
@@ -444,5 +465,107 @@ export class ModifyCertificate {
       certificate,
       relatedAddresses,
     };
+  }
+}
+
+export class RemoveKeyDerivationTree {
+  static ownTables = Object.freeze({
+    [Tables.KeyDerivationSchema.name]: Tables.KeyDerivationSchema,
+  });
+  static depTables = Object.freeze({
+    GetDerivationsByPath,
+    ModifyKey,
+  });
+
+  static async remove(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {|
+      rootKeyId: number,
+    |},
+  ): Promise<void> {
+    // cascade doesn't work for many-to-many so we instead use deferrable and delete manually
+    const allDerivations = await RemoveKeyDerivationTree.depTables.GetDerivationsByPath.allFromRoot(
+      db, tx,
+      request.rootKeyId,
+    );
+    await removeFromTableBatch(
+      db, tx,
+      RemoveKeyDerivationTree.ownTables[Tables.KeyDerivationSchema.name].name,
+      RemoveKeyDerivationTree.ownTables[Tables.KeyDerivationSchema.name].properties.KeyDerivationId,
+      allDerivations.map(row => row.KeyDerivationId),
+    );
+
+    const relatedKeys: Array<number> = allDerivations.reduce(
+      (keys, deriver) => {
+        if (deriver.PrivateKeyId != null) keys.push(deriver.PrivateKeyId);
+        if (deriver.PublicKeyId != null) keys.push(deriver.PublicKeyId);
+        return keys;
+      },
+      []
+    );
+
+    /**
+     * Note: we don't iterate up through the parent to delete up to ROOT level
+     * we can't delete them here
+     * because there isn't a way to guarantee these keys aren't used by some other table
+     * so the entity managing the keys has to ensure things are cleaned up
+     */
+
+    await RemoveKeyDerivationTree.depTables.ModifyKey.remove(
+      db, tx,
+      relatedKeys
+    );
+  }
+}
+
+export class FreeBlocks {
+  static ownTables = Object.freeze({
+    [Tables.TransactionSchema.name]: Tables.TransactionSchema,
+    [Tables.BlockSchema.name]: Tables.BlockSchema,
+  });
+  static depTables = Object.freeze({
+  });
+
+  /**
+   * Warning: unfortunately this logic has to be updated
+   * whenever a new table is added to the DB that changes when a block can be freed
+   */
+  static async free(
+    db: lf$Database,
+    tx: lf$Transaction,
+  ): Promise<void> {
+    const txTableMeta = FreeBlocks.ownTables[Tables.TransactionSchema.name];
+    const blockTableMeta = FreeBlocks.ownTables[Tables.BlockSchema.name];
+    const txTable = db.getSchema().table(txTableMeta.name);
+    const blockTable = db.getSchema().table(blockTableMeta.name);
+    const query = db
+      .select()
+      .from(blockTable)
+      .leftOuterJoin(
+        txTable,
+        txTable[txTableMeta.properties.BlockId].eq(
+          blockTable[blockTableMeta.properties.BlockId]
+        )
+      );
+    const result: $ReadOnlyArray<{|
+      Transaction: WithNullableFields<$ReadOnly<TransactionRow>>,
+      Block: $ReadOnly<BlockRow>,
+    |}> = await tx.attach(query);
+    const freeableBlocks = result.reduce(
+      (acc, pair) => {
+        if (pair.Transaction.TransactionId == null) {
+          acc.push(pair.Block);
+        }
+        return acc;
+      },
+      []
+    );
+    await removeFromTableBatch(
+      db, tx,
+      blockTableMeta.name,
+      blockTableMeta.properties.BlockId,
+      freeableBlocks.map(row => row.BlockId)
+    );
   }
 }

@@ -2,7 +2,7 @@
 
 import type { lf$Database, lf$Transaction, } from 'lovefield';
 import {
-  AddAddress,
+  ModifyAddress,
 } from '../database/primitives/api/write';
 import {
   GetAddress,
@@ -36,7 +36,7 @@ export function rawGenAddByHash(
     request: AddByHashRequest
   ): Promise<void> => {
     const deps = Object.freeze({
-      GetAddress, AddAddress
+      GetAddress, ModifyAddress
     });
     const depsTables = Array.from(
       getAllTables(...Object.keys(deps).map(key => deps[key]))
@@ -56,7 +56,7 @@ export function rawGenAddByHash(
         return;
       }
     }
-    const newHashes = await deps.AddAddress.addFromCanonicalByHash(
+    const newHashes = await deps.ModifyAddress.addFromCanonicalByHash(
       request.db, request.tx,
       [{
         ...request.address,
@@ -84,7 +84,7 @@ export function rawGenHashToIdsFunc(
     request: HashToIdsRequest
   ): Promise<Map<string, number>> => {
     const deps = Object.freeze({
-      GetAddress, AddAddress
+      GetAddress, ModifyAddress
     });
     const depsTables = Array.from(
       getAllTables(...Object.keys(deps).map(key => deps[key]))
@@ -164,7 +164,7 @@ export function rawGenHashToIdsFunc(
             addressRows[0].AddressId
           );
           if (keyDerivationId == null) throw new Error('rawGenHashToIdsFunc Should never happen no mapping');
-          const newAddr = await deps.AddAddress.addFromCanonicalByHash(request.db, request.tx, [{
+          const newAddr = await deps.ModifyAddress.addFromCanonicalByHash(request.db, request.tx, [{
             keyDerivationId,
             data: address.data,
             type: CoreAddressTypes.SHELLEY_GROUP,
@@ -176,7 +176,7 @@ export function rawGenHashToIdsFunc(
     }
     // note: must be foreign
     // because we should have synced address history before ever calling this
-    const newEntries = await deps.AddAddress.addForeignByHash(
+    const newEntries = await deps.ModifyAddress.addForeignByHash(
       request.db, request.tx,
       notFoundWithoutCanonical
     );

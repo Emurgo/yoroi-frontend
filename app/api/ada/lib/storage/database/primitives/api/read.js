@@ -405,16 +405,49 @@ export class GetDerivationsByPath {
     tx: lf$Transaction,
     derivationId: number,
     commonPrefix: Array<number>,
-    queryPath: BIP32QueryPath,
+    queryPath: void | BIP32QueryPath,
   ): Promise<PathMapType> {
     const pathMap = new Map([[derivationId, commonPrefix]]);
     const result = await _getTree(
       db,
       tx,
       pathMap,
-      commonPrefix.concat(queryPath),
+      queryPath ? commonPrefix.concat(queryPath) : undefined,
       commonPrefix.length,
     );
+    return result;
+  }
+
+  static async allFromRoot(
+    db: lf$Database,
+    tx: lf$Transaction,
+    rootId: number,
+  ): Promise<$ReadOnlyArray<$ReadOnly<KeyDerivationRow>>> {
+    const root = await GetDerivationsByPath.depTables.GetKeyDerivation.get(
+      db, tx,
+      rootId
+    );
+    if (root === undefined) {
+      throw new Error(`${nameof(GetDerivationsByPath)}::${nameof(GetDerivationsByPath.getParentPath)} root not found`);
+    }
+    const result: Array<$ReadOnly<KeyDerivationRow>> = [];
+    let keysForLevel: $ReadOnlyArray<$ReadOnly<KeyDerivationRow>> = [root];
+    const derivationSchema = GetDerivationsByPath.ownTables[Tables.KeyDerivationSchema.name];
+    const derivationTable = db.getSchema().table(derivationSchema.name);
+
+    while (keysForLevel.length !== 0) {
+      result.push(...keysForLevel);
+      const query = db
+        .select()
+        .from(derivationTable)
+        .where(derivationTable[derivationSchema.properties.Parent].in(
+          keysForLevel.map(row => row.KeyDerivationId)
+        ));
+
+      const queryResult: $ReadOnlyArray<$ReadOnly<KeyDerivationRow>> = await tx.attach(query);
+      keysForLevel = queryResult;
+    }
+
     return result;
   }
 }
@@ -422,11 +455,11 @@ const _getTree = async (
   db: lf$Database,
   tx: lf$Transaction,
   pathMap: PathMapType,
-  queryPath: BIP32QueryPath,
+  queryPath: void | BIP32QueryPath,
   currPathIndex: number,
 ): Promise<PathMapType> => {
   // base case
-  if (currPathIndex === queryPath.length) {
+  if (queryPath && currPathIndex === queryPath.length) {
     return pathMap;
   }
   const derivationSchema = GetDerivationsByPath.ownTables[Tables.KeyDerivationSchema.name];
@@ -438,7 +471,7 @@ const _getTree = async (
     ),
   ];
   // if the query is for a specific index, we need to add the condition to the SQL query
-  if (queryPath[currPathIndex] !== null) {
+  if (queryPath && queryPath[currPathIndex] !== null) {
     conditions.push(
       derivationTable[derivationSchema.properties.Index].eq(
         queryPath[currPathIndex]
@@ -463,6 +496,7 @@ const _getTree = async (
     ];
   }));
   if (nextPathMap.size === 0) {
+    if (queryPath == null) return pathMap;
     throw new Error('bip44::_getDerivationsByPath no result');
   }
 

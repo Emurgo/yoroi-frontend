@@ -3,7 +3,7 @@
 import {
   KeyDerivationSchema,
 } from '../../primitives/tables';
-import { Type } from 'lovefield';
+import { Type, ConstraintAction } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 
 export type RootDerivationInsert = {|
@@ -121,9 +121,10 @@ export const populateCommonDb = (schemaBuilder: lf$schema$Builder) => {
       ([RootDerivationSchema.properties.RootDerivationId]: Array<string>),
       true
     )
-    .addForeignKey('RootDerivation_Bip44Derivation', {
+    .addForeignKey('RootDerivation_KeyDerivation', {
       local: RootDerivationSchema.properties.KeyDerivationId,
-      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`
+      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
+      action: ConstraintAction.CASCADE,
     });
   // PurposeDerivation
   schemaBuilder.createTable(PurposeDerivationSchema.name)
@@ -133,9 +134,10 @@ export const populateCommonDb = (schemaBuilder: lf$schema$Builder) => {
       ([PurposeDerivationSchema.properties.PurposeDerivationId]: Array<string>),
       true
     )
-    .addForeignKey('PurposeDerivation_Bip44Derivation', {
+    .addForeignKey('PurposeDerivation_KeyDerivation', {
       local: PurposeDerivationSchema.properties.KeyDerivationId,
-      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`
+      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
+      action: ConstraintAction.CASCADE,
     });
   // CoinTypeDerivation
   schemaBuilder.createTable(CoinTypeDerivationSchema.name)
@@ -145,9 +147,10 @@ export const populateCommonDb = (schemaBuilder: lf$schema$Builder) => {
       ([CoinTypeDerivationSchema.properties.CoinTypeDerivationId]: Array<string>),
       true
     )
-    .addForeignKey('CoinTypeDerivation_Bip44Derivation', {
+    .addForeignKey('CoinTypeDerivation_KeyDerivation', {
       local: CoinTypeDerivationSchema.properties.KeyDerivationId,
-      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`
+      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
+      action: ConstraintAction.CASCADE,
     });
   // Bip44Account
   schemaBuilder.createTable(Bip44AccountSchema.name)
@@ -157,9 +160,10 @@ export const populateCommonDb = (schemaBuilder: lf$schema$Builder) => {
       ([Bip44AccountSchema.properties.Bip44AccountId]: Array<string>),
       true
     )
-    .addForeignKey('Bip44Account_Bip44Derivation', {
+    .addForeignKey('Bip44Account_KeyDerivation', {
       local: Bip44AccountSchema.properties.KeyDerivationId,
-      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`
+      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
+      action: ConstraintAction.CASCADE,
     });
   // Bip44Chain
   schemaBuilder.createTable(Bip44ChainSchema.name)
@@ -170,9 +174,10 @@ export const populateCommonDb = (schemaBuilder: lf$schema$Builder) => {
       ([Bip44ChainSchema.properties.Bip44ChainId]: Array<string>),
       true
     )
-    .addForeignKey('Bip44Chain_Bip44Derivation', {
+    .addForeignKey('Bip44Chain_KeyDerivation', {
       local: Bip44ChainSchema.properties.KeyDerivationId,
-      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`
+      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
+      action: ConstraintAction.CASCADE,
     })
     .addNullable([
       Bip44ChainSchema.properties.DisplayCutoff,

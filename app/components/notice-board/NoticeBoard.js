@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { intlShape } from 'react-intl';
 import moment from 'moment';
+import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
@@ -28,6 +29,7 @@ type NoticesByDate = {|
   isYesterday: boolean,
 |};
 
+@observer
 export default class NoticeBoard extends Component<Props> {
   static contextTypes = { intl: intlShape.isRequired };
   localizedDateFormat: string = 'MM/DD/YYYY';

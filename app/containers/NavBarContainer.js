@@ -1,6 +1,7 @@
 // @flow
 import moment from 'moment';
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import type { InjectedProps } from '../types/injectedPropsType';
@@ -10,24 +11,22 @@ import NavPlate from '../components/topbar/NavPlate';
 import NavWalletDetails from '../components/topbar/NavWalletDetails';
 import NavDropdown from '../components/topbar/NavDropdown';
 import NavDropdownRow from '../components/topbar/NavDropdownRow';
-import NavBarBack from '../components/topbar/NavBarBack';
 import { ROUTES } from '../routes-config';
 import { LOVELACES_PER_ADA } from '../config/numbersConfig';
 import type { WalletWithCachedMeta } from '../stores/toplevel/WalletStore';
 import { isLedgerNanoWallet, isTrezorTWallet } from '../api/ada/lib/storage/models/ConceptualWallet/index';
 
 const messages = defineMessages({
-  backButton: {
-    id: 'wallet.nav.backButton',
-    defaultMessage: '!!!Back to my wallets',
-  },
   allWalletsLabel: {
     id: 'wallet.nav.allWalletsLabel',
     defaultMessage: '!!!All wallets',
   },
 });
 
-type Props = InjectedProps;
+type Props = {|
+  ...InjectedProps,
+  title: Node,
+|};
 
 @observer
 export default class NavBarContainer extends Component<Props> {
@@ -36,13 +35,8 @@ export default class NavBarContainer extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-
   updateHideBalance = () => {
     this.props.actions.profile.updateHideBalance.trigger();
-  }
-
-  navigateToWallets = (destination: string) => {
-    this.props.actions.router.goToRoute.trigger({ route: destination });
   }
 
   render() {
@@ -53,14 +47,6 @@ export default class NavBarContainer extends Component<Props> {
     const walletsStore = stores.wallets;
     const publicDeriver = walletsStore.selected;
     if (publicDeriver == null) return null;
-
-    const title = (
-      <NavBarBack
-        route={ROUTES.MY_WALLETS}
-        onBackClick={this.navigateToWallets}
-        title={intl.formatMessage(messages.backButton)}
-      />
-    );
 
     const wallets = this.props.stores.wallets.publicDerivers;
 
@@ -146,7 +132,7 @@ export default class NavBarContainer extends Component<Props> {
 
     return (
       <NavBar
-        title={title}
+        title={this.props.title}
         walletPlate={
           <NavPlate
             publicDeriver={walletsStore.selected}

@@ -75,6 +75,20 @@ function groupWallets(
   return Array.from(pairingMap.values());
 }
 
+export function groupForWallet(
+  grouped: Array<GroupedWallets>,
+  publicDeriver: PublicDeriver<>,
+): void | GroupedWallets {
+  for (const conceptualGroup of grouped) {
+    for (const pubDeriver of conceptualGroup.publicDerivers) {
+      if (pubDeriver.self === publicDeriver) {
+        return conceptualGroup;
+      }
+    }
+  }
+  return undefined;
+}
+
 type DeferredCall<T> = (() => Promise<T>) => Promise<T>;
 
 /**
@@ -314,12 +328,12 @@ export default class WalletStore extends Store {
       await this.refreshWalletFromLocalOnLaunch(publicDeriver);
     }
     runInAction('refresh active wallet', () => {
-      if (this.selected == null) {
+      if (this.selected == null && newWithCachedData.length === 1) {
         this._setActiveWallet({
           wallet: newWithCachedData[0]
         });
-        this.publicDerivers.push(...newWithCachedData);
       }
+      this.publicDerivers.push(...newWithCachedData);
     });
   };
 
@@ -333,12 +347,6 @@ export default class WalletStore extends Store {
     if (environment.isShelley()) {
       stores.delegation.addObservedWallet(publicDeriver);
     }
-  };
-
-  /** Make all API calls required to setup imported wallet */
-  @action refreshImportedWalletData: void => Promise<void> = async () => {
-    if (this.hasAnyPublicDeriver) this._setActiveWallet({ wallet: this.publicDerivers[0] });
-    return await this.restoreWalletsFromStorage();
   };
 
   // =================== ACTIVE WALLET ==================== //

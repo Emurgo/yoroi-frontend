@@ -1,7 +1,7 @@
 // @flow
 
 import type {
-  lf$Database
+  lf$Database, lf$Transaction,
 } from 'lovefield';
 import type { HwWalletMetaRow } from '../../database/walletTypes/core/tables';
 
@@ -15,7 +15,7 @@ import type {
   TreeInsert,
 } from '../../database/walletTypes/common/utils';
 import type { AddPublicDeriverResponse } from '../../database/walletTypes/core/api/write';
-import { UpdateGet, } from '../../database/primitives/api/write';
+import { ModifyKey, } from '../../database/primitives/api/write';
 import {
   GetKeyForDerivation,
 } from '../../database/primitives/api/read';
@@ -50,6 +50,7 @@ export interface IConceptualWallet {
   getDb(): lf$Database;
   getConceptualWalletId(): number;
   getProtocolMagic(): string;
+  rawRemove(db: lf$Database, tx: lf$Transaction): Promise<void>
 }
 
 export interface IHasPrivateDeriver {
@@ -117,7 +118,7 @@ export interface IGetPrivateDeriverKey {
     IChangePasswordRequestFunc,
     {|
       GetKeyForDerivation: Class<GetKeyForDerivation>,
-      UpdateGet: Class<UpdateGet>,
+      ModifyKey: Class<ModifyKey>,
     |},
     IChangePasswordRequest
   >;

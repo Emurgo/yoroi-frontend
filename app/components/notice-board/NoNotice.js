@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import { observer } from 'mobx-react';
 import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
 
 import environmnent from '../../environment';
@@ -24,6 +25,7 @@ type Props = {|
   +classicTheme: boolean,
 |};
 
+@observer
 export default class NoNotice extends Component<Props> {
   static contextTypes = { intl: intlShape.isRequired };
 

@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
+import { observer } from 'mobx-react';
 import BigNumber from 'bignumber.js';
 // import classnames from 'classnames';
 import { intlShape } from 'react-intl';
@@ -23,6 +24,7 @@ type Props = {|
     +infoText?: string,
 |};
 
+@observer
 export default class WalletDetails extends Component<Props> {
 
   static defaultProps = {

@@ -48,7 +48,7 @@ import {
   AddDerivationTree,
 } from '../../database/walletTypes/common/api/write';
 import { GetDerivationSpecific } from '../../database/walletTypes/common/api/read';
-import { UpdateGet, AddAddress, } from '../../database/primitives/api/write';
+import { ModifyKey, ModifyAddress, } from '../../database/primitives/api/write';
 import type {
   FilterFunc,
 } from '../../../state-fetch/types';
@@ -135,7 +135,7 @@ export interface IGetPublic {
 
   +rawChangePubDeriverPassword: RawVariation<
     IChangePasswordRequestFunc,
-    {| UpdateGet: Class<UpdateGet>, GetKeyForPublicDeriver: Class<GetKeyForPublicDeriver> |},
+    {| ModifyKey: Class<ModifyKey>, GetKeyForPublicDeriver: Class<GetKeyForPublicDeriver> |},
     IChangePasswordRequest
   >;
   +changePubDeriverPassword: IChangePasswordRequestFunc,
@@ -340,7 +340,7 @@ export interface IGetSigningKey {
       GetPublicDeriver: Class<GetPublicDeriver>,
       GetKeyDerivation: Class<GetKeyDerivation>,
       GetKey: Class<GetKey>,
-      UpdateGet: Class<UpdateGet>,
+      ModifyKey: Class<ModifyKey>,
     |},
     IChangePasswordRequest
   >;
@@ -377,7 +377,7 @@ export interface IScanAddresses {
       GetAddress: Class<GetAddress>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
-      AddAddress: Class<AddAddress>,
+      ModifyAddress: Class<ModifyAddress>,
       GetPublicDeriver: Class<GetPublicDeriver>,
       AddDerivationTree: Class<AddDerivationTree>,
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,

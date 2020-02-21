@@ -43,7 +43,7 @@ import { encryptWithPassword } from '../../../../../../utils/passwordCipher';
 import {
   DerivePublicDeriverFromKey, AddAdhocPublicDeriver,
 } from '../../database/walletTypes/common/api/write';
-import { UpdateGet, } from '../../database/primitives/api/write';
+import { ModifyKey, } from '../../database/primitives/api/write';
 import { GetKeyForDerivation, } from '../../database/primitives/api/read';
 
 import {
@@ -250,7 +250,7 @@ const GetPrivateDeriverKeyMixin = (
     lf$Transaction,
     {|
       GetKeyForDerivation: Class<GetKeyForDerivation>,
-      UpdateGet: Class<UpdateGet>,
+      ModifyKey: Class<ModifyKey>,
     |},
     IChangePasswordRequest,
   ) => Promise<IChangePasswordResponse> = async (tx, deps, body) => {
@@ -261,7 +261,7 @@ const GetPrivateDeriverKeyMixin = (
     );
     return rawChangePassword(
       super.getDb(), tx,
-      { UpdateGet: deps.UpdateGet, },
+      { ModifyKey: deps.ModifyKey, },
       {
         ...body,
         oldKeyRow: currentRow.keyRow
@@ -273,7 +273,7 @@ const GetPrivateDeriverKeyMixin = (
   ) => {
     const deps = Object.freeze({
       GetKeyForDerivation,
-      UpdateGet
+      ModifyKey
     });
     const depTables = Object
       .keys(deps)

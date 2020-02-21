@@ -1,6 +1,6 @@
 // @flow
 
-import { Type, ConstraintAction } from 'lovefield';
+import { Type, ConstraintAction, ConstraintTiming } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 import type {
   TxStatusCodesType,
@@ -346,11 +346,13 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
     )
     .addForeignKey('KeyDerivation_Parent', {
       local: KeyDerivationSchema.properties.Parent,
-      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`
+      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
+      // cascade doesn't work for many-to-many so we instead use deferrable and delete manually
+      timing: ConstraintTiming.DEFERRABLE,
     })
     .addForeignKey('KeyDerivation_PrivateKeyId', {
       local: KeyDerivationSchema.properties.PrivateKeyId,
-      ref: `${KeySchema.name}.${KeySchema.properties.KeyId}`
+      ref: `${KeySchema.name}.${KeySchema.properties.KeyId}`,
     })
     .addForeignKey('KeyDerivation_PublicKeyId', {
       local: KeyDerivationSchema.properties.PublicKeyId,
@@ -416,9 +418,10 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
       ([CanonicalAddressSchema.properties.CanonicalAddressId]: Array<string>),
       true
     )
-    .addForeignKey('CanonicalAddress_Bip44Derivation', {
+    .addForeignKey('CanonicalAddress_KeyDerivation', {
       local: CanonicalAddressSchema.properties.KeyDerivationId,
-      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`
+      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
+      action: ConstraintAction.CASCADE,
     })
     .addIndex(
       'CanonicalAddress_KeyDerivation_Index',
@@ -436,11 +439,13 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
     )
     .addForeignKey('AddressMapping_KeyDerivation', {
       local: AddressMappingSchema.properties.KeyDerivationId,
-      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`
+      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
+      action: ConstraintAction.CASCADE,
     })
     .addForeignKey('AddressMapping_Address', {
       local: AddressMappingSchema.properties.AddressId,
-      ref: `${AddressSchema.name}.${AddressSchema.properties.AddressId}`
+      ref: `${AddressSchema.name}.${AddressSchema.properties.AddressId}`,
+      action: ConstraintAction.CASCADE,
     })
     .addIndex(
       'AddressMapping_KeyDerivation_Index',
@@ -486,7 +491,7 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
     })
     .addForeignKey('CertificateAddress_Address', {
       local: CertificateAddressSchema.properties.AddressId,
-      ref: `${AddressSchema.name}.${AddressSchema.properties.AddressId}`
+      ref: `${AddressSchema.name}.${AddressSchema.properties.AddressId}`,
     })
     .addIndex(
       'CertificateAddress_Certificate_Index',

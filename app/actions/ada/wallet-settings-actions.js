@@ -22,4 +22,7 @@ export default class WalletSettingsActions {
   resyncHistory: AsyncAction<{|
     publicDeriver: WalletWithCachedMeta,
   |}> = new AsyncAction();
+  removeWallet: AsyncAction<{|
+    publicDeriver: WalletWithCachedMeta,
+  |}> = new AsyncAction();
 }

@@ -9,18 +9,23 @@ import {
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   IHasLevels,
+  IConceptualWallet,
 } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import {
   ConceptualWallet
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import {
+import type {
   IPublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { WalletWithCachedMeta } from '../toplevel/WalletStore';
 import { removeAllTransactions } from '../../api/ada/lib/storage/bridge/updateTransactions';
+import { removePublicDeriver } from '../../api/ada/lib/storage/bridge/walletBuilder/remove';
 import {
   Logger,
 } from '../../utils/logging';
+import {
+  groupForWallet,
+} from '../toplevel/WalletStore';
 
 export default class AdaWalletSettingsStore extends WalletSettingsStore {
 
@@ -33,6 +38,9 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
   @observable clearHistory: Request<typeof _clearHistory>
     = new Request<typeof _clearHistory>(_clearHistory);
 
+  @observable removeWalletRequest: Request<typeof _removeWalletFromDb>
+    = new Request<typeof _removeWalletFromDb>(_removeWalletFromDb);
+
   setup(): void {
     super.setup();
     const a = this.actions.ada.walletSettings;
@@ -43,6 +51,7 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
     a.renameConceptualWallet.listen(this._renameConceptualWallet);
     a.updateSigningPassword.listen(this._changeSigningPassword);
     a.resyncHistory.listen(this._resyncHistory);
+    a.removeWallet.listen(this._removeWallet);
   }
 
   @action _changeSigningPassword: {|
@@ -109,6 +118,7 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
   @action _resyncHistory: {|
     publicDeriver: WalletWithCachedMeta,
   |} => Promise<void> = async (request) => {
+    this.clearHistory.reset();
     const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver.self);
     if (withLevels == null) {
       throw new Error(`${nameof(this._resyncHistory)} missing levels`);
@@ -117,9 +127,46 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
       publicDeriver: withLevels,
       refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
     }).promise;
-    request.publicDeriver.amount = null; // TODO: properly clear cache
-    this.clearHistory.reset();
+    runInAction(() => {
+      request.publicDeriver.amount = null; // TODO: properly clear cache
+    });
   };
+
+  @action _removeWallet: {|
+    publicDeriver: WalletWithCachedMeta,
+  |} => Promise<void> = async (request) => {
+    this.removeWalletRequest.reset();
+    this.stores.wallets.selected = null; // deselect before deleting
+
+    const group = groupForWallet(
+      this.stores.wallets.grouped,
+      request.publicDeriver.self
+    );
+    if (group == null) {
+      throw new Error(`${nameof(this._removeWallet)} wallet doesn't belong to group`);
+    }
+    await this.removeWalletRequest.execute({
+      publicDeriver: request.publicDeriver.self,
+      conceptualWallet: group.publicDerivers.length === 1
+        ? group.conceptualWallet
+        : undefined
+    }).promise;
+    // note: it's possible some other function was waiting for a DB lock
+    // and so it may fail if it runs now since underlying data was deleted
+    // to avoid this causing an issue, we just refresh the page
+    // note: redirect logic will handle going to the right page after reloading
+    window.location.reload();
+  };
+}
+
+async function _removeWalletFromDb(request: {|
+  publicDeriver: IPublicDeriver<>,
+  conceptualWallet: void | IConceptualWallet,
+|}): Promise<void> {
+  await removePublicDeriver({
+    publicDeriver: request.publicDeriver,
+    conceptualWallet: request.conceptualWallet,
+  });
 }
 
 async function _clearHistory(request: {|

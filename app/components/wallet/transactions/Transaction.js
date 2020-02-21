@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
+import { observer } from 'mobx-react';
 import BigNumber from 'bignumber.js';
 import { defineMessages, intlShape } from 'react-intl';
 import type {
@@ -153,6 +154,7 @@ type State = {|
   isExpanded: boolean,
 |};
 
+@observer
 export default class Transaction extends Component<Props, State> {
 
   static contextTypes = {

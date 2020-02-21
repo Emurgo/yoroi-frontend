@@ -1,7 +1,7 @@
 // @flow
 
 import type {
-  lf$Database,
+  lf$Database, lf$Transaction
 } from 'lovefield';
 
 import type {
@@ -9,11 +9,12 @@ import type {
   IHasPrivateDeriver, IHasLevels, IHasSign,
 } from '../ConceptualWallet/interfaces';
 import {
-  ConceptualWallet,
+  ConceptualWallet, rawRemoveConceptualWallet,
 } from '../ConceptualWallet/index';
 import { refreshCip1852WalletFunctionality } from '../ConceptualWallet/traits';
 import type { ICip1852Wallet } from './interfaces';
 import type { Cip1852WrapperRow } from '../../database/walletTypes/cip1852/tables';
+import { ModifyCip1852Wrapper } from '../../database/walletTypes/cip1852/api/write';
 import {
   Bip44TableMap,
 } from '../../database/walletTypes/bip44/api/utils';
@@ -90,5 +91,13 @@ export class Cip1852Wallet
       Cip1852Wallet,
       protocolMagic
     );
+  }
+
+  rawRemove: (lf$Database, lf$Transaction) => Promise<void> = async (db, tx) => {
+    await ModifyCip1852Wrapper.remove(
+      db, tx,
+      this.getConceptualWalletId()
+    );
+    await rawRemoveConceptualWallet(db, tx, this.getConceptualWalletId());
   }
 }

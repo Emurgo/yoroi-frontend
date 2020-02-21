@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import { observer } from 'mobx-react';
 import styles from './Timer.scss';
 
 type Props = {|
@@ -10,6 +11,7 @@ type Props = {|
   |},
 |};
 
+@observer
 export default class Timer extends Component<Props> {
 
   render() {

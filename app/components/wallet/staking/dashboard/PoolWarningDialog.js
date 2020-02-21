@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
+import { observer } from 'mobx-react';
 import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import type { ReputationObject } from '../../../../api/ada/lib/state-fetch/types';
@@ -41,6 +42,7 @@ type Props = {|
   +reputationInfo: ReputationObject,
 |};
 
+@observer
 export default class PoolWarningDialog extends Component<Props> {
   static contextTypes = {
     intl: intlShape.isRequired,

@@ -234,6 +234,7 @@ export async function createStandardCip1852Wallet(request: {|
           PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
           PrivateDeriverKeyDerivationId: finalState.root.root.KeyDerivation.KeyDerivationId,
           PrivateDeriverLevel: pathToPrivate.length,
+          RootKeyDerivationId: finalState.root.root.KeyDerivation.KeyDerivationId,
         })
       )
       .derivePublicDeriver(
