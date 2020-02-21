@@ -72,16 +72,9 @@ export class ModifyBip44Wrapper {
     if (fullRow == null) {
       throw new Error(`${nameof(ModifyBip44Wrapper)}::${nameof(ModifyBip44Wrapper.remove)} Should never happen`);
     }
-    // 1) delete wrapper
-    const table = ModifyBip44Wrapper.ownTables[Bip44Tables.Bip44WrapperSchema.name];
-    await removeFromTableBatch(
-      db, tx,
-      table.name,
-      table.properties.Bip44WrapperId,
-      ([id]: Array<number>),
-    );
 
-    // 2) delete related key derivations
+    // delete related key derivations
+    // should cascade-delete the wrapper itself at the same time
     await ModifyBip44Wrapper.depTables.RemoveKeyDerivationTree.remove(
       db, tx,
       { rootKeyId: fullRow.RootKeyDerivationId },

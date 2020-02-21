@@ -121,7 +121,7 @@ export const populateCommonDb = (schemaBuilder: lf$schema$Builder) => {
       ([RootDerivationSchema.properties.RootDerivationId]: Array<string>),
       true
     )
-    .addForeignKey('RootDerivation_Bip44Derivation', {
+    .addForeignKey('RootDerivation_KeyDerivation', {
       local: RootDerivationSchema.properties.KeyDerivationId,
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
       action: ConstraintAction.CASCADE,
@@ -134,7 +134,7 @@ export const populateCommonDb = (schemaBuilder: lf$schema$Builder) => {
       ([PurposeDerivationSchema.properties.PurposeDerivationId]: Array<string>),
       true
     )
-    .addForeignKey('PurposeDerivation_Bip44Derivation', {
+    .addForeignKey('PurposeDerivation_KeyDerivation', {
       local: PurposeDerivationSchema.properties.KeyDerivationId,
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
       action: ConstraintAction.CASCADE,
@@ -147,7 +147,7 @@ export const populateCommonDb = (schemaBuilder: lf$schema$Builder) => {
       ([CoinTypeDerivationSchema.properties.CoinTypeDerivationId]: Array<string>),
       true
     )
-    .addForeignKey('CoinTypeDerivation_Bip44Derivation', {
+    .addForeignKey('CoinTypeDerivation_KeyDerivation', {
       local: CoinTypeDerivationSchema.properties.KeyDerivationId,
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
       action: ConstraintAction.CASCADE,
@@ -160,7 +160,7 @@ export const populateCommonDb = (schemaBuilder: lf$schema$Builder) => {
       ([Bip44AccountSchema.properties.Bip44AccountId]: Array<string>),
       true
     )
-    .addForeignKey('Bip44Account_Bip44Derivation', {
+    .addForeignKey('Bip44Account_KeyDerivation', {
       local: Bip44AccountSchema.properties.KeyDerivationId,
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
       action: ConstraintAction.CASCADE,
@@ -174,7 +174,7 @@ export const populateCommonDb = (schemaBuilder: lf$schema$Builder) => {
       ([Bip44ChainSchema.properties.Bip44ChainId]: Array<string>),
       true
     )
-    .addForeignKey('Bip44Chain_Bip44Derivation', {
+    .addForeignKey('Bip44Chain_KeyDerivation', {
       local: Bip44ChainSchema.properties.KeyDerivationId,
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
       action: ConstraintAction.CASCADE,

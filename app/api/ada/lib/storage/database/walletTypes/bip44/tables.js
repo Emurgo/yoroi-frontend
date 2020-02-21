@@ -53,10 +53,13 @@ export const populateBip44Db = (schemaBuilder: lf$schema$Builder) => {
     .addForeignKey('Bip44Wrapper_ConceptualWallet', {
       local: Bip44WrapperSchema.properties.ConceptualWalletId,
       ref: `${ConceptualWalletSchema.name}.${ConceptualWalletSchema.properties.ConceptualWalletId}`,
-      action: ConstraintAction.CASCADE,
     })
-    .addForeignKey('Bip44Wrapper_KeyDerivation', {
+    .addForeignKey('Bip44Wrapper_PrivateDeriverKeyDerivation', {
       local: Bip44WrapperSchema.properties.PrivateDeriverKeyDerivationId,
+      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
+    })
+    .addForeignKey('Bip44Wrapper_RootKeyDerivation', {
+      local: Bip44WrapperSchema.properties.RootKeyDerivationId,
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
       action: ConstraintAction.CASCADE,
     })

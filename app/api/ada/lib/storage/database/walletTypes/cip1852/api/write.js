@@ -48,16 +48,8 @@ export class ModifyCip1852Wrapper {
       throw new Error(`${nameof(ModifyCip1852Wrapper)}::${nameof(ModifyCip1852Wrapper.remove)} Should never happen`);
     }
 
-    // 1) delete wrapper
-    const table = ModifyCip1852Wrapper.ownTables[Cip1852Tables.Cip1852WrapperSchema.name];
-    await removeFromTableBatch(
-      db, tx,
-      table.name,
-      table.properties.Cip1852WrapperId,
-      ([id]: Array<number>),
-    );
-
-    // 2) delete related key derivations
+    // delete related key derivations
+    // should cascade-delete the wrapper itself at the same time
     await ModifyCip1852Wrapper.depTables.RemoveKeyDerivationTree.remove(
       db, tx,
       { rootKeyId: fullRow.RootKeyDerivationId },

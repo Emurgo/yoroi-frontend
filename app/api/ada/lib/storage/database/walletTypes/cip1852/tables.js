@@ -53,11 +53,15 @@ export const populateCip1852Db = (schemaBuilder: lf$schema$Builder) => {
     .addForeignKey('Cip1852Wrapper_ConceptualWallet', {
       local: Cip1852WrapperSchema.properties.ConceptualWalletId,
       ref: `${ConceptualWalletSchema.name}.${ConceptualWalletSchema.properties.ConceptualWalletId}`,
-      action: ConstraintAction.CASCADE,
     })
-    .addForeignKey('Cip1852Wrapper_KeyDerivation', {
+    .addForeignKey('Cip1852Wrapper_PrivateDeriverKeyDerivation', {
       local: Cip1852WrapperSchema.properties.PrivateDeriverKeyDerivationId,
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
+    })
+    .addForeignKey('Cip1852Wrapper_RootKeyDerivation', {
+      local: Cip1852WrapperSchema.properties.RootKeyDerivationId,
+      ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
+      action: ConstraintAction.CASCADE,
     })
     .addNullable([
       Cip1852WrapperSchema.properties.SignerLevel,

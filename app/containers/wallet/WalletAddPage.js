@@ -144,7 +144,6 @@ export default class WalletAddPage extends Component<Props> {
     }
 
     const { hasAnyWallets } = this.props.stores.wallets;
-    console.log(hasAnyWallets);
     if (!hasAnyWallets) {
       return (
         <MainLayout
