@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react';
 import type { Ref } from 'react';
-import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
 import BigNumber from 'bignumber.js';
