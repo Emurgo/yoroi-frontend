@@ -12,7 +12,7 @@ import type {
 import * as Cip1852Tables from '../tables';
 import { RemoveKeyDerivationTree } from '../../../primitives/api/write';
 
-import { addNewRowToTable, removeFromTableBatch, } from '../../../utils';
+import { addNewRowToTable, } from '../../../utils';
 
 export class ModifyCip1852Wrapper {
   static ownTables = Object.freeze({

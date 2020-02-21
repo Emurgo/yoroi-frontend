@@ -37,7 +37,7 @@ import { RemoveKeyDerivationTree } from '../../../primitives/api/write';
 import {
   Bip44DerivationLevels,
 } from './utils';
-import { addNewRowToTable, removeFromTableBatch, } from '../../../utils';
+import { addNewRowToTable, } from '../../../utils';
 
 export class ModifyBip44Wrapper {
   static ownTables = Object.freeze({
