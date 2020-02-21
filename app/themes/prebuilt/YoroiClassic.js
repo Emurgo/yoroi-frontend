@@ -399,6 +399,10 @@ export default {
   '--theme-warning-box-bg-color': 'rgba(233, 72, 61, 0.06)', // #E9483D
 
   '--theme-warning-color': `#E9483D`,
+  '--theme-warning-button-color': `#CC3F35`,
+  '--theme-warning-button-color-active': `#CC3F35`,
+  '--theme-warning-button-color-hover': `#FF4F42`,
+  '--theme-warning-button-color-disabled': `rgba(204, 63, 53, 0.35)`, // CC3F35
 
   '--theme-tooltipbox-border-color': 'rgba(77,32,192,0.08)', // 4d20c0
 

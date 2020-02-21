@@ -4,6 +4,18 @@
 .dialog {
   font-family: var(--font-light);
 
+  .removeButton[disabled] {
+    background: var(--theme-warning-button-color-disabled) !important;
+  }
+  .removeButton:not([disabled]) {
+    background: var(--theme-warning-button-color) !important;
+    &:hover {
+      background-color: var(--theme-warning-button-color-hover) !important;
+    }
+    &:active {
+      background-color: var(--theme-warning-button-color-active) !important;
+    }
+  }
   p {
     color: var(--theme-support-settings-text-color);
     font-family: var(--font-regular);

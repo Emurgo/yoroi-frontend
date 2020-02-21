@@ -427,6 +427,10 @@ const YoroiModern = {
   '--theme-warning-box-bg-color': 'rgba(255, 19, 81, 0.06)', // #FF1351
 
   '--theme-warning-color': `#FF1351`,
+  '--theme-warning-button-color': `#CC0E41`,
+  '--theme-warning-button-color-active': `#CC0E41`,
+  '--theme-warning-button-color-hover': `#FF1351`,
+  '--theme-warning-button-color-disabled': `rgba(204, 14, 65, 0.35)`, // CC0E41
 
   '--theme-tooltipbox-border-color': 'rgba(77,32,192,0.08)', // 4d20c0
 

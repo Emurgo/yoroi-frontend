@@ -59,10 +59,17 @@ export default class RemoveWalletDialog extends Component<Props> {
 
     const confirmButtonClasses = classnames([
       'confirmButton',
+      styles.removeButton,
       isSubmitting ? styles.isSubmitting : null,
     ]);
 
     const actions = [
+      {
+        label: intl.formatMessage(globalMessages.cancel),
+        onClick: this.props.onCancel,
+        primary: false,
+        disabled: this.props.isSubmitting,
+      },
       {
         label: intl.formatMessage(globalMessages.remove),
         onClick: this.props.onSubmit,
