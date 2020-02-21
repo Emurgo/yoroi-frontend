@@ -82,7 +82,7 @@ After({ tags: '@invalidWitnessTest' }, () => {
 });
 
 After(async function () {
-  // await this.driver.quit();
+  await this.driver.quit();
 });
 
 const writeFile = promisify(fs.writeFile);
