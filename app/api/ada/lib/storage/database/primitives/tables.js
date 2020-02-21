@@ -418,7 +418,7 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
       ([CanonicalAddressSchema.properties.CanonicalAddressId]: Array<string>),
       true
     )
-    .addForeignKey('CanonicalAddress_Bip44Derivation', {
+    .addForeignKey('CanonicalAddress_KeyDerivation', {
       local: CanonicalAddressSchema.properties.KeyDerivationId,
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
       action: ConstraintAction.CASCADE,
@@ -492,7 +492,6 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
     .addForeignKey('CertificateAddress_Address', {
       local: CertificateAddressSchema.properties.AddressId,
       ref: `${AddressSchema.name}.${AddressSchema.properties.AddressId}`,
-      action: ConstraintAction.CASCADE,
     })
     .addIndex(
       'CertificateAddress_Certificate_Index',

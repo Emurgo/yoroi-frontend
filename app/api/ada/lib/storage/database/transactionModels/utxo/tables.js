@@ -100,7 +100,6 @@ export const populateUtxoTransactionsDb = (schemaBuilder: lf$schema$Builder) => 
     .addForeignKey('UtxoTransactionInput_Address', {
       local: UtxoTransactionInputSchema.properties.AddressId,
       ref: `${AddressSchema.name}.${AddressSchema.properties.AddressId}`,
-      action: ConstraintAction.CASCADE,
     });
 
   // UtxoTransactionOutput Table
@@ -123,6 +122,5 @@ export const populateUtxoTransactionsDb = (schemaBuilder: lf$schema$Builder) => 
     .addForeignKey('UtxoTransactionOutput_Address', {
       local: UtxoTransactionOutputSchema.properties.AddressId,
       ref: `${AddressSchema.name}.${AddressSchema.properties.AddressId}`,
-      action: ConstraintAction.CASCADE,
     });
 };

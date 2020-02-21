@@ -484,7 +484,6 @@ export class RemoveKeyDerivationTree {
       rootKeyId: number,
     |},
   ): Promise<void> {
-    // 2) delete primary key derivation
     // cascade doesn't work for many-to-many so we instead use deferrable and delete manually
     const allDerivations = await RemoveKeyDerivationTree.depTables.GetDerivationsByPath.allFromRoot(
       db, tx,
