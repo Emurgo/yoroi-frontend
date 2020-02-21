@@ -510,7 +510,7 @@
   "wallet.settings.changePassword.dialog.repeatPasswordFieldPlaceholder": "Digite a nova senha de pagamentos",
   "wallet.settings.changePassword.dialog.repeatPasswordLabel": "Repita a nova senha de pagamentos",
   "wallet.settings.changePassword.dialog.title.changePassword": "Alterar senha de pagamentos",
-  "wallet.settings.delete.accept": "I still have the means to restore this wallet",
+  "wallet.settings.delete.accept": "Eu ainda tenho os meios para restaurar esta carteira",
   "wallet.settings.delete.warning2": "Please double-check you still have the means to restore access to this wallet. If you cannot, removing the wallet may result in irreversible loss of funds.",
   "wallet.settings.name.label": "Nome da Wallet",
   "wallet.settings.passwordLastUpdated": "Última atualização {lastUpdated}",
