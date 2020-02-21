@@ -178,9 +178,7 @@ export default class WalletStore extends Store {
   }
 
   @computed get hasAnyWallets(): boolean {
-    console.log(`hasLoadedWallets ${this.hasLoadedWallets}`);
     if (!this.hasLoadedWallets) return false;
-    console.log(`hasLoadedWallets ${this.publicDerivers.length}`);
     if (this.publicDerivers.length === 0) return false;
     return this.publicDerivers.length > 0;
   }
