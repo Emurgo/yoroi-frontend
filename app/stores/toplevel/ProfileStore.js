@@ -377,8 +377,13 @@ export default class ProfileStore extends Store {
   };
 
   getThemeVars: {| theme: string |} => { [key: string]: string, ... } = ({ theme }) => {
-    if (theme) return require(`../../themes/prebuilt/${theme}.js`).default;
-    return require(`../../themes/prebuilt/${ProfileStore.getDefaultTheme()}.js`); // default
+    const { getThemeVars } = theme
+      ? require(`../../themes/prebuilt/${theme}.js`)
+      : require(`../../themes/prebuilt/${ProfileStore.getDefaultTheme()}.js`);
+    if (environment.isShelley()) {
+      return getThemeVars('shelley');
+    }
+    return getThemeVars(undefined);
   };
 
   hasCustomTheme: void => boolean = (): boolean => {

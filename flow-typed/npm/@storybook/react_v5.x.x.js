@@ -51,7 +51,7 @@ declare module '@storybook/react' {
   declare function addDecorator(decorator: StoryDecorator): void;
   declare function addParameters(parameters: DecoratorParameters): void;
   declare function clearDecorators(): void;
-  declare function configure(fn: () => void, module: NodeModule): void;
+  declare function configure(fn: (() => void) | Array<void => void>, module: NodeModule): void;
   declare function setAddon(addon: Object): void;
   declare function storiesOf(name: string, module: NodeModule): Story;
   declare function storiesOf<T>(name: string, module: NodeModule): Story & T;

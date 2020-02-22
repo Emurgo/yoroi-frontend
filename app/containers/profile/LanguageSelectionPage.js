@@ -1,17 +1,22 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { runInAction } from 'mobx';
 import { defineMessages, intlShape } from 'react-intl';
 import environment from '../../environment';
 import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import TopBar from '../../components/topbar/TopBar';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import LanguageSelectionForm from '../../components/profile/language-selection/LanguageSelectionForm';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
 import IntroBanner from '../../components/profile/language-selection/IntroBanner';
+import type { LanguageType } from '../../i18n/translations';
+import LocalizableError from '../../i18n/LocalizableError';
+import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
+import ProfleActions from '../../actions/profile-actions';
+import ProfileStore from '../../stores/toplevel/ProfileStore';
+import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 
 const messages = defineMessages({
   title: {
@@ -20,54 +25,118 @@ const messages = defineMessages({
   },
 });
 
+type GeneratedData = {|
+  +stores: {|
+    +profile: {|
+      +LANGUAGE_OPTIONS: Array<LanguageType>,
+      +isCurrentLocaleSet: boolean,
+      +currentLocale: string,
+      +setProfileLocaleRequest: {|
+        +error: ?LocalizableError,
+        +isExecuting: boolean,
+      |},
+      +unsetProfileLocaleRequest: typeof ProfileStore.prototype.unsetProfileLocaleRequest,
+      +getProfileLocaleRequest: typeof ProfileStore.prototype.getProfileLocaleRequest,
+      +isClassicTheme: boolean,
+    |},
+    +serverConnectionStore: {|
+      +checkAdaServerStatus: ServerStatusErrorType,
+    |},
+  |},
+  +actions: {|
+    +profile: {|
+      +updateTentativeLocale: {|
+        +trigger: typeof ProfleActions.prototype.updateTentativeLocale.trigger
+      |},
+      +commitLocaleToStorage: {|
+        +trigger: typeof ProfleActions.prototype.commitLocaleToStorage.trigger
+      |},
+    |},
+  |},
+|};
+
 @observer
-export default class LanguageSelectionPage extends Component<InjectedProps> {
+export default class LanguageSelectionPage extends Component<InjectedOrGenerated<GeneratedData>> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
   };
 
-  async componentDidMount() {
-    const profileStore = this.props.stores.profile;
+  generateData: void => GeneratedData = () => {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(LanguageSelectionPage)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    const profileStore = stores.profile;
+    return {
+      stores: {
+        profile: {
+          LANGUAGE_OPTIONS: profileStore.LANGUAGE_OPTIONS,
+          isCurrentLocaleSet: profileStore.isCurrentLocaleSet,
+          currentLocale: profileStore.currentLocale,
+          isClassicTheme: profileStore.isClassicTheme,
+          setProfileLocaleRequest: {
+            error: profileStore.setProfileLocaleRequest.error,
+            isExecuting: profileStore.setProfileLocaleRequest.isExecuting,
+          },
+          unsetProfileLocaleRequest: stores.profile.unsetProfileLocaleRequest,
+          getProfileLocaleRequest: stores.profile.getProfileLocaleRequest,
+        },
+        serverConnectionStore: {
+          checkAdaServerStatus: stores.substores[environment.API]
+            .serverConnectionStore.checkAdaServerStatus,
+        },
+      },
+      actions: {
+        profile: {
+          updateTentativeLocale: { trigger: actions.profile.updateTentativeLocale.trigger },
+          commitLocaleToStorage: { trigger: actions.profile.commitLocaleToStorage.trigger },
+        },
+      },
+    };
+  }
+  generated: GeneratedData = this.generateData();
 
+  async componentDidMount() {
+    const profileStore = this.generated.stores.profile;
     // if user uses back button to get back to this page
     // we need to undo saving the language to storage so they can pick a new language
     if (profileStore.isCurrentLocaleSet) {
       const prevLang = profileStore.currentLocale;
-      runInAction(() => {
-        // tentatively set language to their previous selection
-        profileStore.inMemoryLanguage = prevLang;
-      });
+      // tentatively set language to their previous selection
+      this.generated.actions.profile.updateTentativeLocale.trigger({ locale: prevLang });
     }
 
-    await this.props.stores.profile.unsetProfileLocaleRequest.execute();
-    await this.props.stores.profile.getProfileLocaleRequest.execute();
+    await profileStore.unsetProfileLocaleRequest.execute();
+    await profileStore.getProfileLocaleRequest.execute();
   }
 
   onSelectLanguage = (values: {| locale: string |}) => {
-    this.props.actions.profile.updateTentativeLocale.trigger(values);
+    this.generated.actions.profile.updateTentativeLocale.trigger(values);
   };
 
   onSubmit = async (_values: {| locale: string |}): Promise<void> => {
-    await this.props.actions.profile.commitLocaleToStorage.trigger();
+    await this.generated.actions.profile.commitLocaleToStorage.trigger();
   };
 
-  renderByron() {
-    const { setProfileLocaleRequest, currentLocale, LANGUAGE_OPTIONS } = this.props.stores.profile;
-    const isSubmitting = setProfileLocaleRequest.isExecuting;
-    const { stores } = this.props;
-    const { profile } = stores;
-    const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
+  renderByron(generated: GeneratedData) {
     const topBartitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
-    const topBar = profile.isClassicTheme ? (
+    const topBar = generated.stores.profile.isClassicTheme ? (
       <TopBar
         title={topBartitle}
       />) : undefined;
-    const displayedBanner = checkAdaServerStatus === 'healthy'
+    const displayedBanner = generated.stores
+      .serverConnectionStore.checkAdaServerStatus === ServerStatusErrors.Healthy
       ? <TestnetWarningBanner />
-      : <ServerErrorBanner errorType={checkAdaServerStatus} />;
+      : <ServerErrorBanner errorType={
+        generated.stores.serverConnectionStore.checkAdaServerStatus
+      }
+      />;
     return (
       <TopBarLayout
         topbar={topBar}
@@ -77,31 +146,30 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
         <LanguageSelectionForm
           onSelectLanguage={this.onSelectLanguage}
           onSubmit={this.onSubmit}
-          isSubmitting={isSubmitting}
-          currentLocale={currentLocale}
-          languages={LANGUAGE_OPTIONS}
-          error={setProfileLocaleRequest.error}
+          isSubmitting={generated.stores.profile.setProfileLocaleRequest.isExecuting}
+          currentLocale={generated.stores.profile.currentLocale}
+          languages={generated.stores.profile.LANGUAGE_OPTIONS}
+          error={generated.stores.profile.setProfileLocaleRequest.error}
         />
       </TopBarLayout>
     );
   }
 
-  renderShelley() {
-    const { setProfileLocaleRequest, currentLocale, LANGUAGE_OPTIONS } = this.props.stores.profile;
-    const isSubmitting = setProfileLocaleRequest.isExecuting;
-    const { stores } = this.props;
-    const { profile } = stores;
-    const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
+  renderShelley(generated: GeneratedData) {
     const topBartitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
-    const topBar = profile.isClassicTheme ? (
+    const topBar = generated.stores.profile.isClassicTheme ? (
       <TopBar
         title={topBartitle}
       />) : undefined;
-    const displayedBanner = checkAdaServerStatus === 'healthy'
+    const displayedBanner = generated.stores
+      .serverConnectionStore.checkAdaServerStatus === ServerStatusErrors.Healthy
       ? undefined
-      : <ServerErrorBanner errorType={checkAdaServerStatus} />;
+      : <ServerErrorBanner errorType={
+        generated.stores.serverConnectionStore.checkAdaServerStatus
+      }
+      />;
     return (
       <TopBarLayout
         topbar={topBar}
@@ -112,19 +180,20 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
         <LanguageSelectionForm
           onSelectLanguage={this.onSelectLanguage}
           onSubmit={this.onSubmit}
-          isSubmitting={isSubmitting}
-          currentLocale={currentLocale}
-          languages={LANGUAGE_OPTIONS}
-          error={setProfileLocaleRequest.error}
+          isSubmitting={generated.stores.profile.setProfileLocaleRequest.isExecuting}
+          currentLocale={generated.stores.profile.currentLocale}
+          languages={generated.stores.profile.LANGUAGE_OPTIONS}
+          error={generated.stores.profile.setProfileLocaleRequest.error}
         />
       </TopBarLayout>
     );
   }
 
   render() {
+    if (this.generated == null) return null;
     if (environment.isShelley()) {
-      return this.renderShelley();
+      return this.renderShelley(this.generated);
     }
-    return this.renderByron();
+    return this.renderByron(this.generated);
   }
 }

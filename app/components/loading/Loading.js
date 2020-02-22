@@ -52,10 +52,10 @@ export default class Loading extends Component<Props> {
 
     const componentStyles = classNames([
       styles.component,
-      hasLoadedCurrentTheme ? null : styles['is-loading-theme']
     ]);
     const yoroiLogoStyles = classNames([
-      styles.yoroiLogo
+      styles.yoroiLogo,
+      hasLoadedCurrentTheme ? null : styles.hide,
     ]);
     const currencyLogoStyles = classNames([
       styles[`${api}-logo`],
@@ -64,7 +64,7 @@ export default class Loading extends Component<Props> {
       styles[`${api}-apiLogo`],
     ]);
 
-    const renderError = error == null
+    const renderError = error == null || !hasLoadedCurrentLocale
       ? null
       : (
         <div className={styles.loading}>
@@ -78,9 +78,11 @@ export default class Loading extends Component<Props> {
       ? null
       : (
         <div className={styles.loading}>
-          <h1 className={styles.headline}>
-            {intl.formatMessage(messages.loading)}
-          </h1>
+          {hasLoadedCurrentLocale && (
+            <h1 className={styles.headline}>
+              {intl.formatMessage(messages.loading)}
+            </h1>
+          )}
           <LoadingSpinner />
         </div>
       );
@@ -91,12 +93,8 @@ export default class Loading extends Component<Props> {
           <span className={yoroiLogoStyles}><YoroiLogo /></span>
           <span className={apiLogoStyles}><CardanoLogo /></span>
         </div>
-        {hasLoadedCurrentLocale && (
-          <>
-            {renderContent}
-            {renderError}
-          </>
-        )}
+        {renderContent}
+        {renderError}
       </div>
     );
   }

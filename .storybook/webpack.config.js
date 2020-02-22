@@ -12,17 +12,24 @@ module.exports = async ({ config, mode }) => {
   const customConfig = custom.baseDevConfig(ENV);
   const finalConfig = {
     ...config,
+    node: {
+      ...config.node,
+      fs: 'empty',
+    },
     plugins: [
       ...config.plugins,
       new ConfigWebpackPlugin(),
       new webpack.DefinePlugin(commonConfig.definePlugin(ENV, false))
     ],
-    module: { ...config.module, rules: customConfig.module.rules }
+    module: {
+      ...config.module,
+      rules: customConfig.module.rules
+    }
   };
 
   finalConfig.module.rules.push({
     test: /\.stories\.jsx?$/,
-    loaders: [require.resolve('@storybook/addon-storysource/loader')],
+    loaders: [require.resolve('@storybook/source-loader')],
     enforce: 'pre',
   });
 

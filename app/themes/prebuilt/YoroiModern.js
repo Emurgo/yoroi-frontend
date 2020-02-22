@@ -1,6 +1,5 @@
 // @flow
 //  ==== Theme: Yoroi Modern === //
-import environment from '../../environment';
 import common from './Common';
 
 // FONTS
@@ -541,36 +540,42 @@ const YoroiModern = {
 // e.g for new theme we need to override :global(.NewTheme)
 // is needed in UI style files or :global(.OldTheme, .NewTheme)
 // *************************************************************
-let ShelleyTestnetOverrides = {};
-if (environment.isShelley()) {
-  ShelleyTestnetOverrides = {
-    // React Polymorph buttons
-    '--rp-button-bg-color': '#3154CB',
-    '--rp-button-bg-color-active': '#3154CB',
-    '--rp-button-bg-color-disabled': 'rgba(49, 84, 203, 0.3)', // #3154CB
-    '--rp-button-bg-color-hover': '#4760FF',
-    // Toolbar
-    '--theme-topbar-background-color': 'linear-gradient(225deg, #F14D78 0%, #1A44B7 100%)',
-    '--theme-topbar-active-item-bottom-border': '5px solid #ffffff',
-    // Button Primary
-    '--theme-button-primary-background-color': '#3154CB',
-    '--theme-button-primary-background-color-hover': '#4760FF',
-    '--theme-button-primary-background-color-active': '#3154CB',
-    '--theme-button-primary-background-color-disabled': 'rgba(49,84,203,0.35)',
-    // Button Outline
-    '--theme-button-outlined-text-color': '#3154CB',
-    '--theme-button-outlined-border-color-hover': '#3154CB',
-    '--theme-button-outlined-background-color': '#FFFFFF',
-    '--theme-button-outlined-background-color-hover': 'rgba(49, 84, 203, 0.15)',
-    '--theme-button-outlined-background-color-active': '#3154CB',
-    '--theme-button-outlined-active-text-color': '#ffffff',
-    '--theme-button-outlined-text-color-disabled': 'rgba(49, 84, 203, 0.35)',
-    '--theme-button-outlined-background-color-disabled': 'rgba(49, 84, 203, 0.35)',
-    // Language Selection
-    '--theme-select-language-color': '#3154CB',
-    // Top banner
-    '--theme-banner-warning-background-color': 'linear-gradient(41deg, #1A44B7 0%, #4760FF 100%)'
-  };
-}
+const ShelleyTestnetOverrides = {
+  // React Polymorph buttons
+  '--rp-button-bg-color': '#3154CB',
+  '--rp-button-bg-color-active': '#3154CB',
+  '--rp-button-bg-color-disabled': 'rgba(49, 84, 203, 0.3)', // #3154CB
+  '--rp-button-bg-color-hover': '#4760FF',
+  // Toolbar
+  '--theme-topbar-background-color': 'linear-gradient(225deg, #F14D78 0%, #1A44B7 100%)',
+  '--theme-topbar-active-item-bottom-border': '5px solid #ffffff',
+  // Button Primary
+  '--theme-button-primary-background-color': '#3154CB',
+  '--theme-button-primary-background-color-hover': '#4760FF',
+  '--theme-button-primary-background-color-active': '#3154CB',
+  '--theme-button-primary-background-color-disabled': 'rgba(49,84,203,0.35)',
+  // Button Outline
+  '--theme-button-outlined-text-color': '#3154CB',
+  '--theme-button-outlined-border-color-hover': '#3154CB',
+  '--theme-button-outlined-background-color': '#FFFFFF',
+  '--theme-button-outlined-background-color-hover': 'rgba(49, 84, 203, 0.15)',
+  '--theme-button-outlined-background-color-active': '#3154CB',
+  '--theme-button-outlined-active-text-color': '#ffffff',
+  '--theme-button-outlined-text-color-disabled': 'rgba(49, 84, 203, 0.35)',
+  '--theme-button-outlined-background-color-disabled': 'rgba(49, 84, 203, 0.35)',
+  // Language Selection
+  '--theme-select-language-color': '#3154CB',
+  // Top banner
+  '--theme-banner-warning-background-color': 'linear-gradient(41deg, #1A44B7 0%, #4760FF 100%)'
+};
 
-export default Object.assign(YoroiModern, ShelleyTestnetOverrides);
+export const getThemeVars: ('shelley' | void) => {...} = (env) => {
+  if (env === 'shelley') {
+    const mergedTheme = {
+      ...YoroiModern,
+      ...ShelleyTestnetOverrides
+    };
+    return mergedTheme;
+  }
+  return YoroiModern;
+};

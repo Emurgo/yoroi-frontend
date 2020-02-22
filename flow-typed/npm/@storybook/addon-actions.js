@@ -1,4 +1,4 @@
 // @flow
 declare module '@storybook/addon-actions' {
-  declare module.exports: any;
+  declare function action(string): ((...args: any[]) => void);
 }

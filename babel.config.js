@@ -77,6 +77,7 @@ module.exports = function (api /*: ApiType */) {
         : []),
     ],
     env: {
+      storybook: nodePlugins,
       cucumber: nodePlugins,
       test: nodePlugins,
       jest: nodePlugins,

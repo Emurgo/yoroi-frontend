@@ -5,6 +5,7 @@ import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
 import styles from './ServerErrorBanner.scss';
 import WarningSvg from '../../../assets/images/warning.inline.svg';
 import type { ServerStatusErrorType } from '../../../types/serverStatusErrorType';
+import { ServerStatusErrors } from '../../../types/serverStatusErrorType';
 
 const messages = defineMessages({
   serverErrorLabel: {
@@ -34,9 +35,9 @@ export default class ServerErrorBanner extends Component<Props> {
 
     const displayMessage = (() => {
       switch (errorType) {
-        case 'server':
+        case ServerStatusErrors.Server:
           return messages.serverErrorLabel;
-        case 'network':
+        case ServerStatusErrors.Network:
           return messages.networkErrorLabel;
         default:
           return null;

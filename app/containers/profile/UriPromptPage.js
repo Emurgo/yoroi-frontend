@@ -15,6 +15,7 @@ import UriSkip from '../../components/profile/uri-prompt/UriSkip';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
+import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import registerProtocols from '../../uri-protocols';
 import globalMessages from '../../i18n/global-messages';
 
@@ -82,7 +83,7 @@ export default class UriPromptPage extends Component<InjectedProps> {
   render() {
     const { stores } = this.props;
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
-    const displayedBanner = checkAdaServerStatus === 'healthy' ?
+    const displayedBanner = checkAdaServerStatus === ServerStatusErrors.Healthy ?
       <TestnetWarningBanner /> :
       <ServerErrorBanner errorType={checkAdaServerStatus} />;
     const topbarTitle = (

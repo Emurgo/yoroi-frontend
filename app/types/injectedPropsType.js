@@ -8,6 +8,12 @@ export type InjectedProps = {|
   +actions: ActionsMap,
 |};
 
+export type GeneratedProps<T> = {|
+  +generated: T,
+|};
+
+export type InjectedOrGenerated<T> = InjectedProps | GeneratedProps<T>;
+
 export type InjectedContainerProps = {|
   ...InjectedProps,
   +children?: Node,

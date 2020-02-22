@@ -6,6 +6,7 @@ export default {
   '--cmn-topbar-icon-default-width': '64px',
   '--cmn-color-white': '#fff',
   '--cmn-color-black': '#000',
+  '--cmn-invisible': 'rgba(0, 0, 0, 0)',
 
   '--cmn-default-color-grey': '#38393D',
   '--cmn-default-color-grey-1': '#464749',
