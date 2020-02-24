@@ -1,2 +1,8 @@
 // @flow
-export type ServerStatusErrorType = 'server' | 'network' | 'healthy';
+
+export const ServerStatusErrors = {
+  Server: 0,
+  Network: 1,
+  Healthy: 2,
+};
+export type ServerStatusErrorType = $Values<typeof ServerStatusErrors>;

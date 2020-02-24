@@ -53,11 +53,18 @@ $adaLogoWidth: 43px;
 
 .yoroiLogo {
   & > svg {
-    display: block;
     width: 100px;
     margin: 0 114px;
     & > path {
       fill: var(--theme-button-primary-background-color);
+    }
+  }
+}
+
+.hide {
+  & > svg {
+    & > path {
+      fill: var(--cmn-color-black);
     }
   }
 }

@@ -53,7 +53,7 @@ class App extends Component<Props> {
       stores.profile.currentThemeVars,
       {
         // show wingdings on dev builds when no font is set to easily find
-        // missing font bugshowever, on production, we use Times New Roman
+        // missing font bugs. However, on production, we use Times New Roman
         // which looks ugly but at least it's readable.
         '--default-font': environment.isDev() ? 'wingdings' : 'Times New Roman',
       }
@@ -66,7 +66,7 @@ class App extends Component<Props> {
       <div style={{ height: '100%' }}>
         <ThemeManager variables={themeVars} />
 
-        {/* Automatically pass a theme prop to all componenets in this subtree. */}
+        {/* Automatically pass a theme prop to all components in this subtree. */}
         <ThemeProvider
           key={currentTheme}
           theme={yoroiPolymorphTheme}

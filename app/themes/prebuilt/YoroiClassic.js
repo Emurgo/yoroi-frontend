@@ -188,7 +188,7 @@ const topbarGradient = {
   end: '#373f52',
 };
 
-export default {
+const YoroiClassic = {
   // COMMON-THEME-INDEPENDENT
   ...common,
 
@@ -449,4 +449,8 @@ export default {
   '--theme-navbar-height': '60px',
   '--theme-navbar-background-color': '#F0F3F5',
   '--theme-navbar-color': '#6B7384',
+};
+
+export const getThemeVars: ('shelley' | void) => {...} = (_env) => {
+  return YoroiClassic;
 };

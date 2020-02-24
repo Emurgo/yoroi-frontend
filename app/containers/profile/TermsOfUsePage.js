@@ -10,6 +10,7 @@ import TermsOfUseForm from '../../components/profile/terms-of-use/TermsOfUseForm
 import type { InjectedProps } from '../../types/injectedPropsType';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
+import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 
 const messages = defineMessages({
   title: {
@@ -30,7 +31,7 @@ export default class TermsOfUsePage extends Component<InjectedProps> {
     const isSubmitting = setTermsOfUseAcceptanceRequest.isExecuting;
     const { stores } = this.props;
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
-    const displayedBanner = checkAdaServerStatus === 'healthy' ?
+    const displayedBanner = checkAdaServerStatus === ServerStatusErrors.Healthy ?
       <TestnetWarningBanner /> :
       <ServerErrorBanner errorType={checkAdaServerStatus} />;
     const topbarTitle = (

@@ -7,6 +7,7 @@ import TestnetWarningBanner from '../components/topbar/banners/TestnetWarningBan
 import ServerErrorBanner from '../components/topbar/banners/ServerErrorBanner';
 import type { InjectedContainerProps } from '../types/injectedPropsType';
 import type { ServerStatusErrorType } from '../types/serverStatusErrorType';
+import { ServerStatusErrors } from '../types/serverStatusErrorType';
 
 export type MainLayoutProps = {|
   ...InjectedContainerProps,
@@ -30,7 +31,7 @@ export default class MainLayout extends Component<MainLayoutProps> {
 
 
   render() {
-    const displayedBanner = this.props.connectionErrorType === 'healthy' ?
+    const displayedBanner = this.props.connectionErrorType === ServerStatusErrors.Healthy ?
       <TestnetWarningBanner /> :
       <ServerErrorBanner errorType={this.props.connectionErrorType} />;
 
