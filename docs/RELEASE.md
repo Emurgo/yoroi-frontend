@@ -9,7 +9,7 @@ Zip files can be shared
 ```bash
 # compress build folder to {manifest.name}.zip
 # if CARDANO_NETWORK is not provided, it defaults to "testnet"
-$ CARDANO_NETWORK=staging npm run build-compress
+$ CARDANO_NETWORK=mainnet npm run prod:unsigned
 ```
 
 ## (Chrome) Signed build
@@ -18,8 +18,7 @@ Crx are compressed and signed chrome extension bundles
 
 ```bash
 # compress build folder to {manifest.name}.zip and crx
-$ npm run build -- --env "${network}"
-$ npm run compress -- --env "${network}"  --zip-only --app-id "APP_ID" --codebase "https://www.sample.com/dw/yoroi-extension.crx" --key ./production-key.pem
+$ npm run prod:byron
 ```
 
 Note: Chrome extensions [update automatically](https://developer.chrome.com/extensions/autoupdate)

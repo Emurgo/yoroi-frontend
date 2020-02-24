@@ -10,11 +10,11 @@ Note: The JSON file is just miscellaneous faked data. It is
 - Not a blockchain
 - Not a valid state in Cardano
 
-Each scenario is tagged with `@it-<number>` so that we can use run specific scenarios by their tags, such as `npm run test-by-tag-chrome @it-99`. To add new scenarios, pick unique numbers as tags. This command may suggest from which number to start: `grep -oh '@it-[0-9]*' features/*.feature | sort -Vr | head`.
+Each scenario is tagged with `@it-<number>` so that we can use run specific scenarios by their tags, such as `npm run test:run:tag:chrome @it-99`. To add new scenarios, pick unique numbers as tags. This command may suggest from which number to start: `grep -oh '@it-[0-9]*' features/*.feature | sort -Vr | head`.
 
 ## Exporting a Yoroi snapshot
 
-Yoroi snapshots are created by adding the step `I export a snapshot named SNAPSHOT_NAME` and running locally the escenario once. This creates the files `localStorage.json` and `indexedDB.json` in the folder `features/yoroi_snapshots/SNAPSHOT_NAME`. Then you can import the snapshot with the  step `I import a snapshot named SNAPSHOT_NAME`.
+Yoroi snapshots are created by adding the step `I export a snapshot named SNAPSHOT_NAME` and running locally the scenario once. This creates the files `localStorage.json` and `indexedDB.json` in the folder `features/yoroi_snapshots/SNAPSHOT_NAME`. Then you can import the snapshot with the  step `I import a snapshot named SNAPSHOT_NAME`.
 
 ## Local CI
 
@@ -36,10 +36,10 @@ You sometimes need to update your docker image (for example get the latest versi
 
 #### Using LocalCI
 
-1) (ONLY FIRST TIME) `npm run localci-setup` to create the docker image.
-1) `npm run localci-newbuild` whenever you make a code change
+1) (ONLY FIRST TIME) `npm run localci:setup` to create the docker image.
+1) `npm run localci:newbuild` whenever you make a code change
 1) (MAC ONLY) `npm install` isn't compatible across operating systems you you have to delete `node_modules` inside the docker image and re-run `npm install`.
-1) `npm run localci-test` to run the test (ex: `npm run localci-test test-e2e`)
+1) `npm run localci:test` to run the test (ex: `npm run localci:test test:run:e2e:chrome`)
 
 ### See LocalCI browser behavior using a virtual monitor
 
