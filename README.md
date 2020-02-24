@@ -26,7 +26,7 @@ Extension can be built for both Byron mainnet and Jormungandr testnet:
 #### Debug build with byron mainnet
 ```bash
 # build files to './dev'
-$ npm run byron-dev
+$ npm run dev:byron
 ```
 
 This command will run extension as locally-hosted, create a `./dev` directory in the project, and then you can "load unpacked" extension from there. When you stop the running process - extension will stop working, but it also means you can create code-changes while process is running and extension will be hot-reloaded with these changes.
@@ -36,7 +36,7 @@ This will connect to the Cardano mainnet with ADA coins having real monetary val
 #### Production build with byron mainnet
 ```bash
 # build files to './build'
-$ npm run byron-prod
+$ npm run prod:byron
 ```
 
 This command will create a full build of the extension in the `./build` directory, which you can also "load unpacked" into your browser, and it will not require you to keep a running process to continue working (standalone build).
@@ -46,9 +46,9 @@ This will connect to the Cardano mainnet with ADA coins having real monetary val
 #### Jormungandr testnet
 ```bash
 # build files to './dev'
-$ npm run shelley-dev
+$ npm run dev:shelley
 # build files to './build'
-$ npm run shelley-prod
+$ npm run prod:shelley
 ```
 
 Same as previous but connects to the [Jormungandr testnet]https://staking.cardano.org/).
@@ -96,11 +96,11 @@ See [SETUP.md](docs/SETUP.md) for how to makes the unittests pass.
 ## Test
 
 ### Selenium + Cucumber
-You **must** run `npm run test-prepare` **before** running the tests!
+You **must** run `npm run test:build` **before** running the tests!
 
-`test-prepare` will *BUILD* the extension and then the tests will *LOAD* the extension.
+`test:build` will *BUILD* the extension and then the tests will *LOAD* the extension.
 
-Rerun `test-prepare` anytime you make changes to the application itself. If you only change test files, you do not need to rerun it.
+Rerun `test:build` anytime you make changes to the application itself. If you only change test files, you do not need to rerun it.
 
 ```bash
 # flow
@@ -108,11 +108,11 @@ $ npm run flow
 # lint
 $ npm run eslint
 # features (command to run all existing tests)
-$ npm run test-e2e-chrome
+$ npm run test:run:e2e:chrome
 # How to run one .feature file
-$ npm run test-by-feature-chrome features/wallet-creation.feature
+$ npm run test:run:feature:chrome features/wallet-creation.feature
 # How to run one test.
-$ npm run test-by-tag-chrome @it-10
+$ npm run test:run:tag:chrome @it-10
 ```
 
 ### Jest

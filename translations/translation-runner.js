@@ -7,7 +7,7 @@ const fs = require('fs');
 
 const messagesDirectory = 'translations/messages';
 if (!fs.existsSync(messagesDirectory)) {
-  console.log('Run `npm run build` once to build your translation cache');
+  console.log('Run `npm run prod:build` once to build your translation cache');
   throw new Error();
 }
 

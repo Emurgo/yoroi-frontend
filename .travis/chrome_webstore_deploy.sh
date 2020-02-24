@@ -4,11 +4,11 @@ set -xeo pipefail
 
 function yoroi-build(){
 
-  npm run build -- --env "$TEMPLATE"
+  npm run prod:build -- --env "$TEMPLATE"
   sed -i "s|\"name\": \".*|\"name\":\"Yoroi ${RELEASE_TAG}\",|" build/manifest.json
   find build -type f -exec sha256sum {} \; | sed 's| build/||' > sha256sum.list
   mv sha256sum.list build/
-  npm run compress -- --env "${TEMPLATE}" --zip-only --app-id ${APP_ID} --codebase "${CHROME_CODEBASE_URL}"
+  npm run prod:compress -- --env "${TEMPLATE}" --zip-only --app-id ${APP_ID} --codebase "${CHROME_CODEBASE_URL}"
   ls -hl . build;
   mv Yoroi*zip artifacts/${ZIP_NAME}
   mv Yoroi*xpi artifacts/${XPI_NAME}

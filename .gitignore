@@ -2,6 +2,7 @@ node_modules
 npm-debug.log
 .DS_Store
 staging-key.pem
+nightly-key.pem
 production-key.pem
 
 build/
