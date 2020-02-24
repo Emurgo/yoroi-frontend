@@ -11,7 +11,7 @@ import {
   BACK_TO_ADD,
   BACK_TO_MY_WALLETS,
   WALLETS,
-  CURRENCY_SPECIFIC_CATEGORIES,
+  TRANSFER_PAGE,
   SETTINGS,
   NOTICE_BOARD,
 } from '../../config/topbarConfig';
@@ -19,6 +19,7 @@ import {
   isTrezorTWallet,
   isLedgerNanoWallet,
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 
 export default class TopbarStore extends Store {
 
@@ -60,13 +61,17 @@ export default class TopbarStore extends Store {
       isTrezorT = isTrezorTWallet(conceptualWallet);
       isNano = isLedgerNanoWallet(conceptualWallet);
     }
+    const canTransfer = selected != null &&
+      // recall: legacy bip44 wallets can't receive in Shelley era
+      (!environment.isShelley() || !(selected.self.getParent() instanceof Bip44Wallet));
+
 
     return [
       this._genTopCategory(),
       ...(isTrezorT ? [WITH_TREZOR_T] : []),
       ...(isNano ? [WITH_LEDGER_NANO] : []),
       SETTINGS,
-      ...CURRENCY_SPECIFIC_CATEGORIES[environment.API],
+      ...(canTransfer ? [TRANSFER_PAGE] : []),
       ...(environment.isTest() ? [NOTICE_BOARD] : []), // Temporarily Hide
     ];
   }

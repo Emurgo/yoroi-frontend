@@ -1358,10 +1358,10 @@ export default class AdaApi {
       const reverseAddressLookup = new Map<number, Array<string>>();
       const foundAddresses = new Set<string>();
 
-      const isShelley = request.transferSource === TransferSource.SHELLEY_UTXO ||
+      const sourceIsShelleyWallet = request.transferSource === TransferSource.SHELLEY_UTXO ||
         request.transferSource === TransferSource.SHELLEY_CHIMERIC_ACCOUNT;
       const accountKey = rootPk
-        .derive(isShelley
+        .derive(sourceIsShelleyWallet
           ? WalletTypePurpose.CIP1852
           : WalletTypePurpose.BIP44)
         .derive(CoinTypes.CARDANO)
@@ -1389,7 +1389,7 @@ export default class AdaApi {
           checkAddressesInUse,
           addByHash,
         });
-      } else if (isShelley) {
+      } else if (sourceIsShelleyWallet) {
         const stakingKey = accountKey
           .derive(ChainDerivations.CHIMERIC_ACCOUNT)
           .derive(STAKING_KEY_INDEX)

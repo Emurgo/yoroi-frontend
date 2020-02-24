@@ -38,6 +38,7 @@ import {
 import type {
   ConfigType,
 } from '../../../config/config-types';
+import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 
 declare var CONFIG : ConfigType;
 
@@ -157,9 +158,7 @@ export default class AddressesStore extends Store {
     );
     this.mangledAddressesForDisplay = new AddressTypeStore(
       this.stores,
-      (request) => (environment.isShelley()
-        ? this._wrapForAllAddresses({ ...request, invertFilter: true })
-        : Promise.resolve([]))
+      (request) => this._wrapForAllAddresses({ ...request, invertFilter: true })
     );
     this.externalForDisplay = new AddressTypeStore(
       this.stores,
@@ -220,7 +219,7 @@ export default class AddressesStore extends Store {
     } else {
       this.externalForDisplay.addObservedWallet(publicDeriver.self);
       this.internalForDisplay.addObservedWallet(publicDeriver.self);
-      if (environment.isShelley) {
+      if (asGetStakingKey(publicDeriver.self) != null) {
         this.mangledAddressesForDisplay.addObservedWallet(publicDeriver.self);
       }
     }
@@ -235,7 +234,7 @@ export default class AddressesStore extends Store {
     } else {
       await this.externalForDisplay.refreshAddressesFromDb(publicDeriver);
       await this.internalForDisplay.refreshAddressesFromDb(publicDeriver);
-      if (environment.isShelley) {
+      if (asGetStakingKey(publicDeriver) != null) {
         await this.mangledAddressesForDisplay.refreshAddressesFromDb(publicDeriver);
       }
     }
@@ -253,9 +252,9 @@ export default class AddressesStore extends Store {
 
     const allAddresses = await this.api[environment.API].getAllAddressesForDisplay({
       publicDeriver: withUtxos,
-      type: environment.isShelley()
-        ? CoreAddressTypes.SHELLEY_GROUP
-        : CoreAddressTypes.CARDANO_LEGACY,
+      type: request.publicDeriver.getParent() instanceof Bip44Wallet
+        ? CoreAddressTypes.CARDANO_LEGACY
+        : CoreAddressTypes.SHELLEY_GROUP,
     });
 
     return filterMangledAddresses({
@@ -279,9 +278,9 @@ export default class AddressesStore extends Store {
     const addresses = await this.api[environment.API].getChainAddressesForDisplay({
       publicDeriver: withHasUtxoChains,
       chainsRequest: request.chainsRequest,
-      type: environment.isShelley()
-        ? CoreAddressTypes.SHELLEY_GROUP
-        : CoreAddressTypes.CARDANO_LEGACY,
+      type: request.publicDeriver.getParent() instanceof Bip44Wallet
+        ? CoreAddressTypes.CARDANO_LEGACY
+        : CoreAddressTypes.SHELLEY_GROUP,
     });
 
     return filterMangledAddresses({
@@ -373,6 +372,7 @@ async function filterMangledAddresses(request: {|
 |}): Promise<Array<StandardAddress>> {
   const withStakingKey = asGetStakingKey(request.publicDeriver);
   if (withStakingKey == null) {
+    if (request.invertFilter) return [];
     return request.baseAddresses.map(info => ({
       ...info,
       address: addressToDisplayString(info.address),

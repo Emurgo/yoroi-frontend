@@ -84,12 +84,15 @@ export default class WalletReceivePage extends Component<Props, State> {
     const addressTypeStore = this.getTypeStore(publicDeriver);
 
     if (!addressTypeStore.getRequest(publicDeriver.self).wasExecuted || !addressTypeStore.hasAny) {
+      console.log(addressTypeStore);
+      console.log(addressTypeStore.getRequest(publicDeriver.self));
       return (
         <VerticallyCenteredLayout>
           <LoadingSpinner />
         </VerticallyCenteredLayout>
       );
     }
+    console.log('2');
 
     // get info about the latest address generated for special rendering
     const lastAddress = addressTypeStore.last;

@@ -109,6 +109,7 @@ export default class Wallet extends Component<Props> {
         showAsCard
       >
         <WalletWithNavigation
+          wallet={wallets.selected.self}
           isActiveScreen={this.isActiveScreen}
           onWalletNavItemClick={this.handleWalletNavItemClick}
         >

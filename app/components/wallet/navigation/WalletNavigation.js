@@ -5,6 +5,9 @@ import { defineMessages, intlShape } from 'react-intl';
 import styles from './WalletNavigation.scss';
 import WalletNavButton from './WalletNavButton';
 import environment from '../../../environment';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
+import { asGetStakingKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { Bip44Wallet } from '../../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 
 import transactionsIcon from '../../../assets/images/wallet-nav/tab-transactions.inline.svg';
 import sendIcon from '../../../assets/images/wallet-nav/tab-send.inline.svg';
@@ -38,6 +41,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
+  +wallet: PublicDeriver<>,
   +isActiveNavItem: (string, ?boolean) => boolean,
   +onNavItemClick: string => void,
 |};
@@ -53,6 +57,14 @@ export default class WalletNavigation extends Component<Props> {
     const { isActiveNavItem, onNavItemClick } = this.props;
     const { intl } = this.context;
 
+    const canStake = asGetStakingKey(this.props.wallet) != null;
+
+    // sending from a balance wallet in Shelley doesn't really work
+    // since you can't generate change addresses
+    // it's easier to have people use the "upgrade wallet" UX
+    // then to make a special "send" page that only allows sendAll
+    const canSend = !environment.isShelley() ||
+      !(this.props.wallet.getParent() instanceof Bip44Wallet);
     return (
       <div className={styles.component}>
 
@@ -66,15 +78,17 @@ export default class WalletNavigation extends Component<Props> {
           />
         </div>
 
-        <div className={styles.navItem}>
-          <WalletNavButton
-            className="send"
-            label={intl.formatMessage(messages.send)}
-            icon={sendIcon}
-            isActive={isActiveNavItem('send')}
-            onClick={() => onNavItemClick('send')}
-          />
-        </div>
+        {canSend && (
+          <div className={styles.navItem}>
+            <WalletNavButton
+              className="send"
+              label={intl.formatMessage(messages.send)}
+              icon={sendIcon}
+              isActive={isActiveNavItem('send')}
+              onClick={() => onNavItemClick('send')}
+            />
+          </div>
+        )}
 
         <div className={styles.navItem}>
           <WalletNavButton
@@ -86,7 +100,7 @@ export default class WalletNavigation extends Component<Props> {
           />
         </div>
 
-        {environment.isShelley() && (
+        {environment.isShelley() && canStake && (
           <>
             <div className={styles.navItem}>
               <WalletNavButton
