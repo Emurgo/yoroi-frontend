@@ -7,7 +7,13 @@ const webpack = require('webpack');
 
 const customPath = path.join(__dirname, './customPublicPath');
 
-const baseProdConfig = (networkName /*: string */) => ({
+/*::
+type EnvParams = {|
+  networkName: string,
+  nightly: "true" | "false",
+|};
+*/
+const baseProdConfig = (env /*: EnvParams */) => ({
   mode: 'production',
   optimization: commonConfig.optimization,
   node: commonConfig.node,
@@ -29,8 +35,12 @@ const baseProdConfig = (networkName /*: string */) => ({
     publicPath: '/js/',
   },
   plugins: [
-    ...commonConfig.plugins('build', networkName),
-    new webpack.DefinePlugin(commonConfig.definePlugin(networkName, true)),
+    ...commonConfig.plugins('build', env.networkName),
+    new webpack.DefinePlugin(commonConfig.definePlugin(
+      env.networkName,
+      true,
+      JSON.parse(env.nightly)
+    )),
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),
   ],

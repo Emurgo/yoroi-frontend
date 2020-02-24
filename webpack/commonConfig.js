@@ -173,11 +173,16 @@ const resolve = {
   extensions: ['*', '.js', '.wasm']
 };
 
-const definePlugin = (networkName /*: string */, isProd /*: boolean */) => ({
+const definePlugin = (
+  networkName /*: string */,
+  isProd /*: boolean */,
+  isNightly /*: boolean */
+) => ({
   'process.env': {
     NODE_ENV: JSON.stringify(isProd ? 'production' : 'development'),
     COMMIT: JSON.stringify(shell.exec('git rev-parse HEAD', { silent: true }).trim()),
     BRANCH: JSON.stringify(shell.exec('git rev-parse --abbrev-ref HEAD', { silent: true }).trim()),
+    NIGHTLY: isNightly,
     SEIZA_FOR_YOROI_URL: JSON.stringify(manifestEnvs.SEIZA_FOR_YOROI_URL),
   }
 });

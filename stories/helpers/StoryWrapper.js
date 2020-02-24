@@ -40,6 +40,7 @@ const langCode = LANGUAGES.map(item => item.value);
 type Props = { +children: any, ... };
 
 environment.isShelley = () => boolean('IsJormungandr', true);
+environment.isNightly = () => boolean('IsNightly', false);
 
 export const globalKnobs = {
   // needs to use functions for storybook to work properly

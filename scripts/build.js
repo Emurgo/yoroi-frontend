@@ -21,7 +21,7 @@ export function buildProd(env: string) {
   console.log('[Webpack Build]');
   console.log('-'.repeat(80));
 
-  process.exit(shell.exec(`./node_modules/.bin/webpack --config webpack/prodConfig.js --progress --profile --colors --env=${argv.env}`).code);
+  process.exit(shell.exec(`./node_modules/.bin/webpack --config webpack/prodConfig.js --progress --profile --colors --env.networkName=${argv.env} --env.nightly=${(argv.nightly != null).toString()}`).code);
 }
 
 export function buildDev(env: string) {
@@ -43,7 +43,7 @@ export function buildDev(env: string) {
   console.log('If you\'re developing Inject page,');
   console.log(`please allow 'https://localhost:${connections.Ports.WebpackDev}' connections in Google Chrome,`);
   console.log('and load unpacked extensions with `./dev` folder. (see https://developer.chrome.com/extensions/getstarted#unpacked)\n');
-  createWebpackServer(config.baseDevConfig(argv.env), {
+  createWebpackServer(config.baseDevConfig(argv.env, argv.nightly != null), {
     host: 'localhost',
     port: connections.Ports.WebpackDev
   });
