@@ -104,6 +104,7 @@ export default class LoadingStore extends Store {
       const uriParams = await getURIParameters(
         decodeURIComponent(this._originRoute.location),
         address => {
+          // TODO: validation should be done based on wallet type
           const addressKind = tryAddressToKind(address, 'bech32');
           const valid = environment.isShelley()
             ? addressKind != null && addressKind !== CoreAddressTypes.CARDANO_LEGACY

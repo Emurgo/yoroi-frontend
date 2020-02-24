@@ -9,7 +9,7 @@ import styles from './SideBarCategory.scss';
 type Props = {|
   +icon: string,
   +active: boolean,
-  +onClick: Function,
+  +onClick: void => void,
   +showLabel?: boolean,
   +label: ?MessageDescriptor,
 |};

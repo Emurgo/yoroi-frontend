@@ -64,16 +64,12 @@ export const BACK_TO_MY_WALLETS: Category = {
   inlineText: globalMessages.goBack
 };
 
-export const CURRENCY_SPECIFIC_CATEGORIES = {
-  ada: [
-    {
-      name: 'DAEDALUS_TRANSFER',
-      className: 'daedalus-transfer',
-      route: ROUTES.TRANSFER.ROOT,
-      icon: transferIcon,
-      label: globalMessages.sidebarTransfer
-    }
-  ]
+export const TRANSFER_PAGE: Category = {
+  name: 'WALLET_TRANSFER',
+  className: 'wallet-transfer',
+  route: ROUTES.TRANSFER.ROOT,
+  icon: transferIcon,
+  label: globalMessages.sidebarTransfer
 };
 
 export const SETTINGS: Category = {

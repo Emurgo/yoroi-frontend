@@ -17,7 +17,7 @@ type Props = {|
     +shouldHideBalance: boolean,
     +highlightTitle?: boolean,
     /**
-      * undefined => wallet doesn't is not a reward wallet
+      * undefined => wallet is not a reward wallet
       * null => still calculating
       * value => done calculating
     */

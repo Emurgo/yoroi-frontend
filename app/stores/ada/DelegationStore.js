@@ -259,7 +259,9 @@ export default class DelegationStore extends Store {
         }
         const selected = this.stores.wallets.selected;
         if (selected == null) return;
-        await this.refreshDelegation(selected);
+        if (asGetStakingKey(selected.self) != null) {
+          await this.refreshDelegation(selected);
+        }
       },
     );
   }

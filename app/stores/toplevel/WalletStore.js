@@ -25,7 +25,8 @@ import {
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
   asGetSigningKey,
-  asGetPublicKey
+  asGetPublicKey,
+  asGetStakingKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   IGetLastSyncInfoResponse,
@@ -344,7 +345,7 @@ export default class WalletStore extends Store {
     stores.addresses.addObservedWallet(publicDeriver);
     stores.transactions.addObservedWallet(publicDeriver);
     stores.time.addObservedTime(publicDeriver);
-    if (environment.isShelley()) {
+    if (asGetStakingKey(publicDeriver.self) != null) {
       stores.delegation.addObservedWallet(publicDeriver);
     }
   };
