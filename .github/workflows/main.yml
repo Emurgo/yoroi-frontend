@@ -18,9 +18,8 @@ jobs:
           # todo: nvm use ?
           node-version: '12.x'
       - run: npm install
-      - run: npm run shelley-prod -- --nightly
-        # todo: way to fetch the pem
-      - run: npm run compress -- --env 'shelley-testnet' --app-id 'yoroi-nightly' --zip-only --codebase 'https://yoroiwallet.com/dw/yoroi-extension-nightly.crx' --key ./nightly-key.pem
+      # todo: way to fetch the pem
+      - run: npm run prod:nightly
       - name: publish nightly
         uses: trmcnvn/chrome-addon@v2
         with:
