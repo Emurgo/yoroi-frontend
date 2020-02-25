@@ -24,6 +24,7 @@ import SupportSettingsPage from './containers/settings/categories/SupportSetting
 
 // Dynamic container loading - resolver loads file relative to '/app/' directory
 import LoadingPage from './containers/LoadingPage';
+import NightlyPage from './containers/profile/NightlyPage';
 import Wallet from './containers/wallet/Wallet';
 import MyWalletsPage from './containers/wallet/MyWalletsPage';
 import WalletSummaryPage from './containers/wallet/WalletSummaryPage';
@@ -53,6 +54,11 @@ export const Routes = (
         exact
         path={ROUTES.ROOT}
         component={(props) => <LoadingPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.NIGHTLY_INFO}
+        component={(props) => <NightlyPage {...props} stores={stores} actions={actions} />}
       />
       <Route
         exact

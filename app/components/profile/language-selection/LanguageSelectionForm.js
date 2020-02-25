@@ -6,7 +6,7 @@ import { Select } from 'react-polymorph/lib/components/Select';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { LanguageType } from '../../../i18n/translations';
@@ -14,13 +14,6 @@ import styles from './LanguageSelectionForm.scss';
 import FlagLabel from '../../widgets/FlagLabel';
 import { tier1Languages } from '../../../config/languagesConfig';
 import globalMessages, { listOfTranslators } from '../../../i18n/global-messages';
-
-const messages = defineMessages({
-  submitLabel: {
-    id: 'profile.languageSelect.form.submitLabel',
-    defaultMessage: '!!!Continue',
-  },
-});
 
 type Props = {|
   +onSelectLanguage: {| locale: string |} => void,
@@ -99,7 +92,7 @@ export default class LanguageSelectionForm extends Component<Props> {
 
           <Button
             className={buttonClasses}
-            label={intl.formatMessage(messages.submitLabel)}
+            label={intl.formatMessage(globalMessages.continue)}
             onMouseUp={this.submit}
             skin={ButtonSkin}
           />

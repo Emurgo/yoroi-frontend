@@ -10,6 +10,7 @@ import LogoYoroiIcon from '../../assets/images/yoroi-logo-white.inline.svg';
 import LogoYoroiShelleyTestnetIcon from '../../assets/images/yoroi-logo-shelley-testnet-white.inline.svg';
 import SettingsIcon from '../../assets/images/top-bar/setting-active.inline.svg';
 import DaedalusIcon from '../../assets/images/top-bar/daedalus-migration.inline.svg';
+import NightlyLogo from '../../assets/images/yoroi-logo-nightly-white.inline.svg';
 
 import styles from './WalletAdd.scss';
 
@@ -48,6 +49,16 @@ export default class WalletAdd extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  getLogo: void => string = () => {
+    if (environment.isNightly()) {
+      return NightlyLogo;
+    }
+    if (environment.isShelley()) {
+      return LogoYoroiShelleyTestnetIcon;
+    }
+    return LogoYoroiIcon;
+  }
+
   render() {
     const { intl } = this.context;
     const {
@@ -60,7 +71,7 @@ export default class WalletAdd extends Component<Props> {
       environment.isShelley() ? styles.shelleyTestnet : null
     ]);
 
-    const LogoIcon = environment.isShelley() ? LogoYoroiShelleyTestnetIcon : LogoYoroiIcon;
+    const LogoIcon = this.getLogo();
 
     return (
       <div className={componentStyle}>

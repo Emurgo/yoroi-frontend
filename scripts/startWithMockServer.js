@@ -41,7 +41,7 @@ const { resetChain } = require('../features/mock-chain/mockImporter');
 getMockServer({ outputLog: true });
 resetChain();
 
-createWebpackServer(config.baseDevConfig(ENV), {
+createWebpackServer(config.baseDevConfig(ENV, false), {
   host: 'localhost',
   port: connections.Ports.WebpackDev,
 });

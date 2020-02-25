@@ -4,8 +4,11 @@ import { observer } from 'mobx-react';
 import styles from './IntroBanner.scss';
 import { defineMessages, intlShape, } from 'react-intl';
 import TestnetLogo from '../../../assets/images/yoroi-logotestnet-gradient.inline.svg';
+import NightlyLogo from '../../../assets/images/yoroi-logo-nightly.inline.svg';
 
-type Props = {||};
+type Props = {|
+  +isNightly: boolean,
+|};
 
 const messages = defineMessages({
   title: {
@@ -23,9 +26,12 @@ export default class IntroBanner extends Component<Props> {
 
   render() {
     const { intl } = this.context;
+    const logo = this.props.isNightly
+      ? <NightlyLogo />
+      : <TestnetLogo />;
     return (
       <div className={styles.component}>
-        <span className={styles.banner}><TestnetLogo /></span>
+        <span className={styles.banner}>{logo}</span>
         <div className={styles.mainTitle}>
           {intl.formatMessage(messages.title)}
         </div>
