@@ -8,7 +8,7 @@ import {
 import { SEIZA_URL, SEIZA_FOR_YOROI_URL } from './manifestEnvs';
 
 export const Version = {
-  Shelley: '2.5.3',
+  Shelley: '2.6.0',
   Byron: '1.10.0',
 };
 
