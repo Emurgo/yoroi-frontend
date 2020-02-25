@@ -61,10 +61,10 @@ export default class TopbarStore extends Store {
       isTrezorT = isTrezorTWallet(conceptualWallet);
       isNano = isLedgerNanoWallet(conceptualWallet);
     }
-    const canTransfer = selected != null &&
-      // recall: legacy bip44 wallets can't receive in Shelley era
-      (!environment.isShelley() || !(selected.self.getParent() instanceof Bip44Wallet));
 
+    // recall: legacy bip44 wallets can't receive in Shelley era
+    const canTransfer = !environment.isShelley() ||
+      !(selected != null && selected.self.getParent() instanceof Bip44Wallet);
 
     return [
       this._genTopCategory(),
