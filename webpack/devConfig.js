@@ -11,7 +11,10 @@ const customPath = path.join(__dirname, './customPublicPath');
 const hotScript =
   'webpack-hot-middleware/client?path=__webpack_hmr&dynamicPublicPath=true';
 
-const baseDevConfig = (networkName /*: string */) => ({
+const baseDevConfig = (
+  networkName /*: string */,
+  isNightly /*: boolean */,
+) => ({
   mode: 'development',
   optimization: commonConfig.optimization,
   node: commonConfig.node,
@@ -48,7 +51,7 @@ const baseDevConfig = (networkName /*: string */) => ({
   },
   plugins: [
     ...commonConfig.plugins('dev', networkName),
-    new webpack.DefinePlugin(commonConfig.definePlugin(networkName, false)),
+    new webpack.DefinePlugin(commonConfig.definePlugin(networkName, false, isNightly)),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.prod$/),

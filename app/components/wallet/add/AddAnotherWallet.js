@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import MainCards from './MainCards';
 import LogoYoroiIcon from '../../../assets/images/yoroi-logo-white.inline.svg';
 import LogoYoroiShelleyTestnetIcon from '../../../assets/images/yoroi-logo-shelley-testnet-white.inline.svg';
+import NightlyLogo from '../../../assets/images/yoroi-logo-nightly-white.inline.svg';
 
 import styles from './AddAnotherWallet.scss';
 
@@ -18,8 +19,19 @@ type Props = {|
 
 @observer
 export default class AddAnotherWallet extends Component<Props> {
+
+  getLogo: void => string = () => {
+    if (environment.isNightly()) {
+      return NightlyLogo;
+    }
+    if (environment.isShelley()) {
+      return LogoYoroiShelleyTestnetIcon;
+    }
+    return LogoYoroiIcon;
+  }
+
   render() {
-    const LogoIcon = environment.isShelley() ? LogoYoroiShelleyTestnetIcon : LogoYoroiIcon;
+    const LogoIcon = this.getLogo();
 
     return (
       <div className={styles.component}>

@@ -36,6 +36,9 @@ export default class ProfileStore extends Store {
   @observable
   inMemoryLanguage: null | string = null;
 
+  @observable
+  acceptedNightly: boolean = false;
+
   /**
    * We only want to redirect users once when the app launches
    */
@@ -59,6 +62,16 @@ export default class ProfileStore extends Store {
       isDone: () => this.areTermsOfUseAccepted,
       action: async () => {
         const route = ROUTES.PROFILE.TERMS_OF_USE;
+        if (this.stores.app.currentRoute === route) {
+          return;
+        }
+        this.actions.router.goToRoute.trigger({ route });
+      },
+    },
+    {
+      isDone: () => !environment.isNightly() || this.acceptedNightly,
+      action: async () => {
+        const route = ROUTES.NIGHTLY_INFO;
         if (this.stores.app.currentRoute === route) {
           return;
         }
@@ -199,6 +212,7 @@ export default class ProfileStore extends Store {
     this.actions.profile.commitLocaleToStorage.listen(this._acceptLocale);
     this.actions.profile.updateHideBalance.listen(this._updateHideBalance);
     this.actions.profile.toggleSidebar.listen(this._toggleSidebar);
+    this.actions.profile.acceptNightly.listen(this._acceptNightly);
     this.registerReactions([
       this._setBigNumberFormat,
       this._updateMomentJsLocaleAfterLocaleChange,
@@ -523,6 +537,10 @@ export default class ProfileStore extends Store {
     await this.getToggleSidebarRequest.execute();
   };
 
+  @action
+  _acceptNightly: void => void = () => {
+    this.acceptedNightly = true;
+  }
 
   // ========== Redirect Logic ========== //
 

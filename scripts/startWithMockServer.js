@@ -12,7 +12,7 @@ process.env.NODE_CONFIG_ENV = ENV;
 
 console.log('[Build manifest]');
 console.log('-'.repeat(80));
-tasks.buildManifests(true);
+tasks.buildManifests(true, false);
 
 console.log('[Copy assets]');
 console.log('-'.repeat(80));
@@ -41,7 +41,7 @@ const { resetChain } = require('../features/mock-chain/mockImporter');
 getMockServer({ outputLog: true });
 resetChain();
 
-createWebpackServer(config.baseDevConfig(ENV), {
+createWebpackServer(config.baseDevConfig(ENV, false), {
   host: 'localhost',
   port: connections.Ports.WebpackDev,
 });

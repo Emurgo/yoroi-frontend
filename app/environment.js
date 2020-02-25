@@ -19,6 +19,7 @@ function getVersion(): string {
     : genManifest();
   return content.version;
 }
+
 export const environment = ((
   {
     ...process.env,
@@ -41,6 +42,7 @@ export const environment = ((
       return CONFIG.network.name === NetworkType.SHELLEY_DEV ||
         CONFIG.network.name === NetworkType.SHELLEY_TESTNET;
     },
+    isNightly: () => (process.env.NIGHTLY == null ? false : JSON.parse(process.env.NIGHTLY)),
     isTest: () => CONFIG.network.name === NetworkType.TEST,
     isMainnet: () => environment.NETWORK === NetworkType.MAINNET,
     isProduction: () => environment.NETWORK === NetworkType.MAINNET ||
@@ -67,6 +69,7 @@ export const environment = ((
     isJest: void => boolean,
     isDev: void => boolean,
     isShelley: void => boolean,
+    isNightly: void => boolean,
     isTest: void => boolean,
     isMainnet: void => boolean,
     isProduction: void => boolean,

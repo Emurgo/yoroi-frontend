@@ -1,6 +1,7 @@
 // @flow
 export const ROUTES = {
   ROOT: '/',
+  NIGHTLY_INFO: '/nightly',
   NO_WALLETS: '/no-wallets',
   MY_WALLETS: '/my-wallets',
   PROFILE: {

@@ -5,6 +5,7 @@ import type { Network } from '../config/config-types';
 import { values } from 'lodash';
 import fs from 'fs';
 import path from 'path';
+import { overrideForNightly } from '../chrome/manifest.template';
 
 exports.copyAssets = (type: string, env: string) => {
   rm('-rf', type);
@@ -17,9 +18,12 @@ exports.copyAssets = (type: string, env: string) => {
   cp('chrome/content-scripts/ledger/*.js', `${type}/js/`);
 };
 
-const buildManifest = (type: Network, isDebug: boolean) => {
+const buildManifest = (type: Network, isDebug: boolean, isNightly: boolean) => {
   const genManifestContent = require(`../chrome/manifest.${type}`);
-  const manifestContentJSON = JSON.stringify(genManifestContent(isDebug), null, 4);
+  const manifestContent = isNightly
+    ? overrideForNightly(genManifestContent(isDebug))
+    : genManifestContent(isDebug);
+  const manifestContentJSON = JSON.stringify(manifestContent, null, 4);
 
   const OUTPUT_FILE_NAME = `manifest.${type}.json`;
   const manifestDestPath = path.resolve(`${__dirname}/../chrome`, OUTPUT_FILE_NAME);
@@ -33,6 +37,6 @@ const buildManifest = (type: Network, isDebug: boolean) => {
 };
 
 const manifestTypes = values(NetworkType);
-exports.buildManifests = (isDebug: boolean) => {
-  manifestTypes.map((type) => buildManifest(type, isDebug));
+exports.buildManifests = (isDebug: boolean, isNightly: boolean) => {
+  manifestTypes.map((type) => buildManifest(type, isDebug, isNightly));
 };

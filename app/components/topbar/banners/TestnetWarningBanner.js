@@ -18,6 +18,10 @@ const messages = defineMessages({
     id: 'testnet.shelley.label.message',
     defaultMessage: 'YOU ARE ON TESTNET NETWORK ({network}).',
   },
+  nightlyLabel: {
+    id: 'nightly.banner.label.message',
+    defaultMessage: 'YOU ARE ON YOROI NIGHTLY ({network}).',
+  },
 });
 
 type Props = {|
@@ -31,9 +35,9 @@ export default class TestnetWarningBanner extends Component<Props> {
   };
 
   render() {
-    if (environment.isProduction() && !environment.isShelley()) {
-      // banner will not shown in Mainnet
-      return (null);
+    if (environment.isProduction() && !environment.isShelley() && !environment.isNightly()) {
+      // banner will not shown in Mainnet non-nightly builds
+      return null;
     }
 
     const { intl } = this.context;
@@ -47,9 +51,22 @@ export default class TestnetWarningBanner extends Component<Props> {
       </a>
     );
 
-    let children = null;
+    if (environment.isNightly()) {
+      return (
+        <div className={styles.shelleyTestnetWarning}>
+          <span key="0" className={styles.shelleyTestnetWarningIcon}><ShelleyTestnetWarningSvg /></span>
+          <div className={styles.text}>
+            <FormattedMessage
+              {...messages.nightlyLabel}
+              values={{ network: environment.NETWORK }}
+              key="1"
+            />
+          </div>
+        </div>
+      );
+    }
     if (environment.isShelley()) {
-      children = (
+      return (
         <div className={styles.shelleyTestnetWarning}>
           <span key="0" className={styles.shelleyTestnetWarningIcon}><ShelleyTestnetWarningSvg /></span>
           <div className={styles.text}>
@@ -61,22 +78,15 @@ export default class TestnetWarningBanner extends Component<Props> {
           </div>
         </div>
       );
-    } else {
-      children = (
-        <div className={styles.testnetWarning}>
-          <span key="0" className={styles.warningIcon}><WarningSvg /></span>
-          <FormattedMessage
-            {...messages.testnetLabel}
-            values={{ faqLink, network: environment.NETWORK }}
-            key="1"
-          />
-        </div>
-      );
     }
-
     return (
-      <div>
-        {children}
+      <div className={styles.testnetWarning}>
+        <span key="0" className={styles.warningIcon}><WarningSvg /></span>
+        <FormattedMessage
+          {...messages.testnetLabel}
+          values={{ faqLink, network: environment.NETWORK }}
+          key="1"
+        />
       </div>
     );
   }

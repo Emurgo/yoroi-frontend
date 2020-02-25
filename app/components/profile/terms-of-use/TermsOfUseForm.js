@@ -87,5 +87,4 @@ export default class TermsOfUseForm extends Component<Props, State> {
       </div>
     );
   }
-
 }
