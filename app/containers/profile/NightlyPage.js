@@ -17,11 +17,6 @@ const messages = defineMessages({
 });
 
 type GeneratedData = {|
-  +stores: {|
-    +profile: {|
-      +isClassicTheme: boolean,
-    |},
-  |},
   +actions: {|
     +profile: {|
       +acceptNightly: {|
@@ -45,14 +40,8 @@ export default class NightlyPage extends Component<InjectedOrGenerated<Generated
     if (this.props.stores == null || this.props.actions == null) {
       throw new Error(`${nameof(NightlyPage)} no way to generated props`);
     }
-    const { stores, actions } = this.props;
-    const profileStore = stores.profile;
+    const { actions } = this.props;
     return {
-      stores: {
-        profile: {
-          isClassicTheme: profileStore.isClassicTheme,
-        },
-      },
       actions: {
         profile: {
           acceptNightly: { trigger: actions.profile.acceptNightly.trigger },
@@ -66,7 +55,7 @@ export default class NightlyPage extends Component<InjectedOrGenerated<Generated
     this.generated.actions.profile.acceptNightly.trigger();
   };
 
-  renderPage(generated: GeneratedData) {
+  renderPage(_generated: GeneratedData) {
     const topBartitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );

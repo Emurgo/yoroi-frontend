@@ -3,9 +3,7 @@
 import React from 'react';
 
 import { action } from '@storybook/addon-actions';
-import { THEMES } from '../../themes';
 import NightlyPage from './NightlyPage';
-import { globalKnobs } from '../../../stories/helpers/StoryWrapper';
 import { withScreenshot } from 'storycap';
 
 export default {
@@ -17,11 +15,6 @@ export default {
 export const Generic = () => (
   <NightlyPage
     generated={{
-      stores: {
-        profile: {
-          isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-        },
-      },
       actions: {
         profile: {
           acceptNightly: { trigger: action('acceptNightly') },
