@@ -18,6 +18,7 @@ export default ({
   geckoKey,
   iconOverride,
   version,
+  enableProtocolHandlers,
 } /*: {|
   description: string,
   defaultTitle: string,
@@ -28,6 +29,7 @@ export default ({
   geckoKey: string,
   iconOverride?: Icons,
   version: string,
+  enableProtocolHandlers: boolean,
 |} */
 ) => { // eslint-disable-line function-paren-newline
   const icons = iconOverride == null
@@ -75,13 +77,15 @@ export default ({
       }
     ],
     content_security_policy: contentSecurityPolicy,
-    protocol_handlers: [
-      {
-        protocol: 'web+cardano',
-        name: 'Yoroi',
-        uriTemplate: 'main_window.html#/send-from-uri?q=%s',
-      },
-    ],
+    protocol_handlers: !enableProtocolHandlers
+      ? []
+      : [
+        {
+          protocol: 'web+cardano',
+          name: 'Yoroi',
+          uriTemplate: 'main_window.html#/send-from-uri?q=%s',
+        },
+      ],
   };
 
   const verName /*: {| version_name?: string |} */ = versionName != null
@@ -96,3 +100,24 @@ export default ({
     ...extKey,
   };
 };
+
+export function overrideForNightly(manifest: any): any {
+  const nightlyTitle = 'Yoroi Nightly';
+  const nightlyIcons = {
+    /* eslint-disable quote-props */
+    '16': 'img/nightly-16.png',
+    '48': 'img/nightly-48.png',
+    '128': 'img/nightly-128.png',
+    /* eslint-enable quote-props */
+  };
+
+  manifest.browser_specific_settings.gecko.id = '6abdeba8-579b-11ea-8e2d-0242ac130003';
+
+  manifest.name = nightlyTitle;
+  manifest.browser_action.default_title = nightlyTitle;
+
+  manifest.icons = nightlyIcons;
+  manifest.browser_action.default_icon = nightlyIcons;
+
+  return manifest;
+}

@@ -12,7 +12,7 @@ process.env.NODE_CONFIG_ENV = ENV;
 
 console.log('[Build manifest]');
 console.log('-'.repeat(80));
-tasks.buildManifests(true);
+tasks.buildManifests(true, false);
 
 console.log('[Copy assets]');
 console.log('-'.repeat(80));
