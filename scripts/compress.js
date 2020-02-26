@@ -9,13 +9,27 @@ const argv = require('minimist')(process.argv.slice(2));
 // $FlowFixMe this file is generated at build time so Flow fails to find it
 const name = require('../build/manifest.json').name;
 
-const keyPath = argv.key;
-const existsKey = fs.existsSync(keyPath);
+function readKeyFromFile(keyPath) {
+  if (!fs.existsSync(keyPath)) {
+    throw new Error(`Key not found at ${keyPath}`);
+  }
+  return fs.readFileSync(keyPath);
+}
+
+function getPrivateKey() {
+  if (argv.key == null) return null;
+  if (argv.key.startsWith('./')) {
+    return readKeyFromFile(argv.key);
+  }
+  return Buffer.from(argv.key, 'utf-8');
+}
+
+const privateKey = getPrivateKey();
 const zipOnly = argv['zip-only'];
 const isCrx = !zipOnly;
 
-if (!argv.codebase || (isCrx && !existsKey)) {
-  console.error('Missing input data.');
+if (!argv.codebase) {
+  console.error('Missing codebase param.');
   process.exit();
 }
 
@@ -23,9 +37,7 @@ const crx = new ChromeExtension({
   appId: argv['app-id'],
   codebase: argv.codebase,
   version: 3,
-  privateKey: existsKey
-    ? fs.readFileSync(keyPath)
-    : null
+  privateKey,
 });
 
 async function compress(isCrxBuild) {

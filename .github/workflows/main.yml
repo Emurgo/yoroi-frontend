@@ -3,6 +3,7 @@ name: CI
 on:
   # todo: more sensible trigger
   schedule:
+    # Monday-Friday at 2AM UTC
   - cron: "0 2 * * 1-5"
 
 jobs:
@@ -12,24 +13,26 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js
+      - name: Read .nvmrc
+        run: echo ::set-output name=NVMRC::$(cat .nvmrc)
+        id: nvm
+      - name: Setup node
         uses: actions/setup-node@v1
         with:
-          # todo: nvm use ?
-          node-version: '12.x'
+          node-version: '${{ steps.nvm.outputs.NVMRC }}'
       - run: npm install
       # todo: way to fetch the pem
       - run: npm run prod:nightly
       - name: publish nightly
         uses: trmcnvn/chrome-addon@v2
         with:
+          env:
+            YOROI_NIGHTLY_PEM: ${{ secrets.YOROI_NIGHTLY_PEM }}
           # ID of the extension that you are updating
-          extension: # optional
+          extension: poonlenmfdfbjfeeballhiibknlknepo
           # Path to a .zip of your addon
-          zip: # optional
-          # Google OAuth2 client id
-          client-id: # optional
-          # Google OAuth2 client secret
-          client-secret: # optional
-          # Google OAuth2 refresh token
-          refresh-token: # optional
+          zip: "Yoroi Nightly.zip"
+          # Google OAuth2
+          client-id: ${{ secrets.CHROME_CLIENT_ID }}
+          client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}
+          refresh-token: ${{ secrets.CHROME_REFRESH_TOKEN }}
