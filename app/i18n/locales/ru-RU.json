@@ -138,7 +138,7 @@
   "profile.languageSelect.intro": "Вы в тестнете Yoroi Shelley",
   "profile.languageSelect.title": "Выбор языка",
   "profile.nightly.acknowledgedRisks": "Я понимаю риск",
-  "profile.nightly.header": "<strong>Yoroi Nightly automatically updates nightly</strong> with the latest in-progress features. Although we will never intentionally push bugs or broken code, features may still be in-progress or contain errors.",
+  "profile.nightly.header": "<strong>Yoroi Nightly автоматически обновляется каждую ночь</strong> с последними новейшими функциями, находящимися в процессе разработки. Несмотря на то, что мы никогда намеренно не будем добавлять ошибки или нерабочий код, некоторые функции могут находиться в процессе разработки или содержать ошибки.",
   "profile.nightly.recommendation1": "Для минимизации риска используете кошельки только с небольшим количеством ADA.",
   "profile.nightly.recommendation2": "Сообщайте в EMURGO о любых проблемах посредством канала Yoroi Nightly.",
   "profile.nightly.recommendationHeader": "Мы рекомендуем:",
