@@ -35,9 +35,9 @@ addDecorator(story => {
 
 configure(
   [
-    // $FlowFixMe error in library types?
+    // $FlowFixMe comes from Webpack and not nodejs so Flow doesn't find the function
     require.context('../app/components', true, /\.stories\.js$/),
-    // $FlowFixMe error in library types?
+    // $FlowFixMe comes from Webpack and not nodejs so Flow doesn't find the function
     require.context('../app/containers', true, /\.stories\.js$/),
   ],
   module

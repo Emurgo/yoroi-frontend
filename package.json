@@ -11,7 +11,7 @@
     "prod:build": "rimraf build/ && babel-node scripts/build --type=prod",
     "prod:compress": "babel-node scripts/compress",
     "prod:unsigned": "npm run prod:build -- --env ${CARDANO_NETWORK:-testnet} && npm run prod:compress -- --env ${CARDANO_NETWORK:-testnet} --app-id yoroi-${CARDANO_NETWORK:-testnet} --zip-only --codebase https://yoroiwallet.com/dw/yoroi-${CARDANO_NETWORK:-testnet}-extension.crx",
-    "prod:nightly": "npm run prod:build -- --env 'shelley-testnet' --nightly && npm run prod:compress -- --env 'shelley-testnet' --app-id 'yoroi' --zip-only --codebase 'https://yoroiwallet.com/dw/yoroi-extension.crx' --key ./nightly-key.pem",
+    "prod:nightly": "npm run prod:build -- --env 'shelley-testnet' --nightly && npm run -s prod:compress -- --env 'shelley-testnet' --app-id 'yoroi-nightly' --zip-only --codebase 'https://yoroiwallet.com/dw/yoroi-nightly-extension.crx' --key \"'${YOROI_NIGHTLY_PEM:-./nightly-key.pem}'\"",
     "prod:shelley": "npm run prod:build -- --env 'shelley-testnet' && npm run prod:compress -- --env 'shelley-testnet' --app-id 'yoroi' --zip-only --codebase 'https://yoroiwallet.com/dw/yoroi-extension.crx' --key ./shelley-production.pem",
     "prod:byron": "npm run prod:build -- --env 'mainnet' && npm run prod:compress -- --env 'mainnet' --app-id 'yoroi' --zip-only --codebase 'https://yoroiwallet.com/dw/yoroi-extension.crx' --key ./production-key.pem",
     "keygen": "crx keygen",

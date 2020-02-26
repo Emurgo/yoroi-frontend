@@ -21,7 +21,6 @@ const Servers = {
   ByronTestnet: 'testnet-yoroi-backend.yoroiwallet.com',
   ShelleyDev: 'shelley-emurgo-yoroi-backend.yoroiwallet.com',
   ShelleyITN: 'shelley-itn-yoroi-backend.yoroiwallet.com',
-  ByronStaging: 'stg-yoroi-backend.yoroiwallet.com',
 };
 
 module.exports = {
