@@ -141,7 +141,7 @@
   "profile.nightly.header": "<strong>Yoroi Nightly automatically updates nightly</strong> with the latest in-progress features. Although we will never intentionally push bugs or broken code, features may still be in-progress or contain errors.",
   "profile.nightly.recommendation1": "您应该只使用具有少量ADA的钱包来最大程度地降低风险。",
   "profile.nightly.recommendation2": "You report any issues to EMURGO through the Yoroi Nightly channel.",
-  "profile.nightly.recommendationHeader": "We recommend that:",
+  "profile.nightly.recommendationHeader": "我们建议：",
   "profile.nightly.title": "Yoroi Nightly",
   "profile.nightly.warning1": "Yoroi Nightly does NOT operate on a mock blockchain or test server.",
   "profile.nightly.warning2": "Any transactions you send will be visible on-chain and in production servers.",
