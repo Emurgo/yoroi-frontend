@@ -1,5 +1,5 @@
 // @flow
-import moment from 'moment'; // TODO remove
+import moment from 'moment';
 import BigNumber from 'bignumber.js';
 import type { lf$Database } from 'lovefield';
 import {

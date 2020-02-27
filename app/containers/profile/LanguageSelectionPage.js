@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import environment from '../../environment';
@@ -62,7 +63,7 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
     intl: intlShape.isRequired,
   };
 
-  generateData: void => GeneratedData = () => {
+  @computed get generated(): GeneratedData {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -71,7 +72,7 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
     }
     const { stores, actions } = this.props;
     const profileStore = stores.profile;
-    return {
+    return Object.freeze({
       stores: {
         profile: {
           LANGUAGE_OPTIONS: profileStore.LANGUAGE_OPTIONS,
@@ -96,9 +97,8 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
           commitLocaleToStorage: { trigger: actions.profile.commitLocaleToStorage.trigger },
         },
       },
-    };
+    });
   }
-  generated: GeneratedData = this.generateData();
 
   async componentDidMount() {
     const profileStore = this.generated.stores.profile;

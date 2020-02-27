@@ -100,7 +100,7 @@ export default class RemoveWalletDialog extends Component<Props> {
           <Checkbox
             label={intl.formatMessage(dialogMessages.accept)}
             onChange={this.toggleCheck}
-            checked={this.isChecked}
+            checked={this.props.isSubmitting || this.isChecked}
             skin={CheckboxSkin}
           />
         </div>

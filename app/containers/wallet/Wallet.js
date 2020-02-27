@@ -85,8 +85,6 @@ export default class Wallet extends Component<Props> {
       return (
         <MainLayout
           navbar={navbarContainer}
-          actions={actions}
-          stores={stores}
           connectionErrorType={checkAdaServerStatus}
           showInContainer
           showAsCard
@@ -102,8 +100,6 @@ export default class Wallet extends Component<Props> {
       <MainLayout
         sidebar={sidebarContainer}
         navbar={navbarContainer}
-        actions={actions}
-        stores={stores}
         connectionErrorType={checkAdaServerStatus}
         showInContainer
         showAsCard

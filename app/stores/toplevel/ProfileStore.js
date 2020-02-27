@@ -220,6 +220,7 @@ export default class ProfileStore extends Store {
     ]);
     this._getTermsOfUseAcceptance(); // eagerly cache
     this._getUriSchemeAcceptance(); // eagerly cache
+    this.currentTheme; // eagerly cache
   }
 
   teardown(): void {
@@ -408,23 +409,16 @@ export default class ProfileStore extends Store {
   // ========== Paper Wallets ========== //
 
   @computed get paperWalletsIntro(): string {
-    try {
-      return require(`../../i18n/locales/paper-wallets/intro/${this.currentLocale}.md`);
-    } catch {
-      return require(`../../i18n/locales/paper-wallets/intro/${ProfileStore.getDefaultLocale()}.md`);
-    }
+    return getPaperWalletIntro(
+      this.currentLocale,
+      ProfileStore.getDefaultLocale()
+    );
   }
 
   // ========== Terms of Use ========== //
 
   @computed get termsOfUse(): string {
-    const API = environment.API;
-    const tos = require(`../../i18n/locales/terms-of-use/${API}/${this.currentLocale}.md`);
-    if (environment.isShelley()) {
-      const testnetAddition = require(`../../i18n/locales/terms-of-use/itn/${this.currentLocale}.md`);
-      return tos + '\n\n' + testnetAddition;
-    }
-    return tos;
+    return getTermsOfUse(this.currentLocale);
   }
 
   @computed get hasLoadedTermsOfUseAcceptance(): boolean {
@@ -556,4 +550,27 @@ export default class ProfileStore extends Store {
       }
     }
   }
+}
+
+export function getPaperWalletIntro(
+  currentLocale: string,
+  defaultLocale: string,
+): string {
+  try {
+    return require(`../../i18n/locales/paper-wallets/intro/${currentLocale}.md`);
+  } catch {
+    return require(`../../i18n/locales/paper-wallets/intro/${defaultLocale}.md`);
+  }
+}
+
+export function getTermsOfUse(
+  currentLocale: string,
+): string {
+  const API = environment.API;
+  const tos = require(`../../i18n/locales/terms-of-use/${API}/${currentLocale}.md`);
+  if (environment.isShelley()) {
+    const testnetAddition = require(`../../i18n/locales/terms-of-use/itn/${currentLocale}.md`);
+    return tos + '\n\n' + testnetAddition;
+  }
+  return tos;
 }

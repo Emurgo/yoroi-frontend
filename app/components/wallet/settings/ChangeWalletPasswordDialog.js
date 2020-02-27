@@ -31,9 +31,11 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +currentPasswordValue: string,
-  +newPasswordValue: string,
-  +repeatedPasswordValue: string,
+  +dialogData: {|
+    +currentPasswordValue: void | string,
+    +newPasswordValue: void | string,
+    +repeatedPasswordValue: void | string,
+  |},
   +onSave: {| oldPassword: string, newPassword: string |} => PossiblyAsync<void>,
   +onCancel: void => void,
   +onDataChange: { [key: string]: any, ... } => void,
@@ -56,14 +58,14 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
         label: this.context.intl.formatMessage(messages.currentPasswordLabel),
         placeholder: this.props.classicTheme ?
           this.context.intl.formatMessage(messages.currentPasswordFieldPlaceholder) : '',
-        value: '',
+        value: this.props.dialogData.currentPasswordValue,
       },
       walletPassword: {
         type: 'password',
         label: this.context.intl.formatMessage(globalMessages.newPasswordLabel),
         placeholder: this.props.classicTheme ?
           this.context.intl.formatMessage(globalMessages.newPasswordFieldPlaceholder) : '',
-        value: '',
+        value: this.props.dialogData.newPasswordValue,
         validators: [({ field, form }) => {
           const repeatPasswordField = form.$('repeatPassword');
           if (repeatPasswordField.value.length > 0) {
@@ -80,7 +82,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
         label: this.context.intl.formatMessage(globalMessages.repeatPasswordLabel),
         placeholder: this.props.classicTheme ?
           this.context.intl.formatMessage(globalMessages.repeatPasswordFieldPlaceholder) : '',
-        value: '',
+        value: this.props.dialogData.repeatedPasswordValue,
         validators: [({ field, form }) => {
           const walletPassword = form.$('walletPassword').value;
           if (walletPassword.length === 0) return [true];
@@ -93,6 +95,11 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
     }
   }, {
     options: {
+      showErrorsOnInit: Object.keys(this.props.dialogData)
+        .map(key => this.props.dialogData[key])
+        .map(val => { console.log(val); return val; })
+        .filter(val => val !== '' && val != null)
+        .length > 0,
       validateOnChange: true,
       validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
     },
@@ -124,10 +131,8 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
     const { intl } = this.context;
     const {
       onCancel,
-      currentPasswordValue,
-      newPasswordValue,
-      repeatedPasswordValue,
       isSubmitting,
+      dialogData,
       error,
       classicTheme,
     } = this.props;
@@ -185,7 +190,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
           <Input
             type="password"
             className="currentPassword"
-            value={currentPasswordValue}
+            value={dialogData.currentPasswordValue}
             onChange={(value) => this.handleDataChange('currentPasswordValue', value)}
             {...currentPasswordField.bind()}
             error={currentPasswordField.error}
@@ -197,7 +202,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
           <Input
             type="password"
             className={newPasswordClasses}
-            value={newPasswordValue}
+            value={dialogData.newPasswordValue}
             onChange={(value) => this.handleDataChange('newPasswordValue', value)}
             {...newPasswordField.bind()}
             done={isValidWalletPassword(newPassword)}
@@ -208,7 +213,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
           <Input
             type="password"
             className="repeatedPassword"
-            value={repeatedPasswordValue}
+            value={dialogData.repeatedPasswordValue}
             onChange={(value) => this.handleDataChange('repeatedPasswordValue', value)}
             {...repeatedPasswordField.bind()}
             done={repeatedPassword && isValidRepeatPassword(newPassword, repeatedPassword)}

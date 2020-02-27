@@ -114,10 +114,9 @@ export default class CachedRequest<
   }
 
   /** Reset request properties including cache */
-  reset(): CachedRequest<Func, Error> {
+  reset(): void {
     super.reset();
     this._isInvalidated = true;
-    return this;
   }
 
 }

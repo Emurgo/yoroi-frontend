@@ -45,8 +45,6 @@ export default class Transfer extends Component<InjectedContainerProps> {
       <MainLayout
         navbar={<NavBar title={navbarTitle} />}
         sidebar={sidebarContainer}
-        actions={actions}
-        stores={stores}
         connectionErrorType={checkAdaServerStatus}
         showInContainer
         showAsCard

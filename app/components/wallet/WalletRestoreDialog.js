@@ -72,7 +72,7 @@ type Props = {|
   +onCancel: void => PossiblyAsync<void>,
   +onBack?: void => PossiblyAsync<void>,
   +mnemonicValidator: string => boolean,
-  +passwordValidator?: string => boolean,
+  +paperPasswordValidator?: string => boolean,
   +numberOfMnemonics: number,
   +error?: ?LocalizableError,
   +validWords: Array<string>,
@@ -80,7 +80,7 @@ type Props = {|
   +isVerificationMode?: boolean,
   +showPaperPassword?: boolean,
   +classicTheme: boolean,
-  +initValues?: WalletRestoreDialogValues,
+  +initValues?: ?WalletRestoreDialogValues,
   +introMessage?: string,
 |};
 
@@ -89,7 +89,7 @@ export default class WalletRestoreDialog extends Component<Props> {
   static defaultProps = {
     error: undefined,
     onBack: undefined,
-    passwordValidator: undefined,
+    paperPasswordValidator: undefined,
     isPaper: undefined,
     isVerificationMode: undefined,
     showPaperPassword: undefined,
@@ -155,7 +155,7 @@ export default class WalletRestoreDialog extends Component<Props> {
         value: (this.props.initValues && this.props.initValues.paperPassword) || '',
         validators: [({ field }) => {
           const validatePassword = p => (
-            !this.props.passwordValidator || this.props.passwordValidator(p)
+            !this.props.paperPasswordValidator || this.props.paperPasswordValidator(p)
           );
           return [
             validatePassword(field.value),
@@ -206,6 +206,7 @@ export default class WalletRestoreDialog extends Component<Props> {
     },
   }, {
     options: {
+      showErrorsOnInit: this.props.initValues != null,
       validateOnChange: true,
       validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
     },
@@ -258,7 +259,7 @@ export default class WalletRestoreDialog extends Component<Props> {
       showPaperPassword,
       classicTheme,
       mnemonicValidator,
-      passwordValidator,
+      paperPasswordValidator,
       introMessage
     } = this.props;
     const {
@@ -286,8 +287,8 @@ export default class WalletRestoreDialog extends Component<Props> {
 
     const validatePaperPassword = () => {
       let condition = isValidWalletPassword(paperPassword);
-      if (passwordValidator) {
-        condition = condition && passwordValidator(paperPassword);
+      if (paperPasswordValidator) {
+        condition = condition && paperPasswordValidator(paperPassword);
       }
       return condition;
     };
@@ -299,6 +300,9 @@ export default class WalletRestoreDialog extends Component<Props> {
           isValidWalletName(walletName) &&
           isValidWalletPassword(walletPassword) &&
           isValidRepeatPassword(walletPassword, repeatPassword);
+      }
+      if (this.props.paperPasswordValidator != null) {
+        condition = condition && validatePaperPassword();
       }
 
       // Although we require 10 characters for creation

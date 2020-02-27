@@ -64,7 +64,7 @@ $adaLogoWidth: 43px;
 .hide {
   & > svg {
     & > path {
-      fill: var(--cmn-color-black);
+      fill: var(--cmn-invisible);
     }
   }
 }

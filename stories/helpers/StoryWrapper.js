@@ -24,6 +24,11 @@ import environment from '../../app/environment';
 import { withKnobs, select, boolean } from '@storybook/addon-knobs';
 import { addDecorator } from '@storybook/react';
 
+import type { WalletWithCachedMeta } from '../../app/stores/toplevel/WalletStore';
+import { assuranceModes } from '../../app/config/transactionAssuranceConfig';
+import { PublicDeriver } from '../../app/api/ada/lib/storage/models/PublicDeriver';
+import { ConceptualWallet } from '../../app/api/ada/lib/storage/models/ConceptualWallet';
+import { WalletTypeOption } from '../../app/api/ada/lib/storage/models/ConceptualWallet/interfaces';
 /**
  * This whole file is meant to mirror code in App.js
  */
@@ -70,7 +75,7 @@ export default class StoryWrapper extends Component<Props> {
     changeToplevelTheme(currentTheme);
 
     return (
-      <div style={{ height: 'calc(100vh - 20px)' }}>
+      <div style={{ height: 'calc(100vh)' }}>
         <ThemeManager variables={themeVars} />
 
         {/* Automatically pass a theme prop to all components in this subtree. */}
@@ -91,4 +96,78 @@ export default class StoryWrapper extends Component<Props> {
       </div>
     );
   }
+}
+
+export function getMnemonicCases(length: number): {|
+  Empty: string,
+  Partial: string,
+  Incorrect: string,
+  Invalid: string,
+  Correct: string,
+|} {
+  if (length === 21) {
+    return {
+      Empty: '',
+      Partial: 'lamp',
+      Incorrect: 'clown worth average equal giggle obtain lamp minimum brother replace define glimpse gaze tone mystery people crack wreck grow blanket current',
+      Invalid: 'lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp',
+      Correct: 'slab spend fabric danger truly between delay like before sword prefer camera reject offer minor caught pitch shoe jewel wine lawn',
+    };
+  }
+  throw new Error(`${nameof(getMnemonicCases)} Unexpected length ${length}`);
+}
+
+export function getPasswordValidationCases(correct: string): {|
+  Empty: string,
+  Correct: string,
+|} {
+  return {
+    Empty: '',
+    Correct: correct,
+  };
+}
+
+export function getPasswordCreationCases(long?: string): {|
+  Empty: string,
+  Short: string,
+  Long: string,
+|} {
+  return {
+    Empty: '',
+    Short: 'a',
+    Long: long == null ? 'asdfasdfasdf' : long,
+  };
+}
+
+export function getDummyWallet(data?: {|
+  signingKeyUpdateDate?: Date,
+|}): WalletWithCachedMeta {
+  const parent = (((new ConceptualWallet({
+    db: (null: any),
+    conceptualWalletId: 0,
+    walletType: WalletTypeOption.WEB_WALLET,
+    hardwareInfo: null,
+  })): any): ConceptualWallet);
+  const self = new PublicDeriver<>({
+    publicDeriverId: 0,
+    parent,
+    pathToPublic: [],
+    derivationId: 0,
+  });
+  return {
+    self,
+    plate: null,
+    publicDeriverName: 'publicDeriverName',
+    conceptualWalletName: 'conceptualWalletName',
+    amount: null,
+    assuranceMode: assuranceModes.NORMAL,
+    signingKeyUpdateDate: data?.signingKeyUpdateDate || null,
+    lastSyncInfo: {
+      LastSyncInfoId: 0,
+      Time: null,
+      SlotNum: null,
+      BlockHash: null,
+      Height: 0,
+    },
+  };
 }
