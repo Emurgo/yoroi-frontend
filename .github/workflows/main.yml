@@ -1,10 +1,10 @@
-name: CI
+name: Publish to Nightly
 
 on:
   # todo: more sensible trigger
   schedule:
     # Monday-Friday at 2AM UTC
-  - cron: "0 2 * * 1-5"
+    - cron: "0 2 * * 1-5"
 
 jobs:
   build:
@@ -21,17 +21,19 @@ jobs:
         with:
           node-version: '${{ steps.nvm.outputs.NVMRC }}'
       - run: npm install
-      # todo: way to fetch the pem
-      - run: npm run prod:nightly
+      - name: Build
+        run: npm run prod:nightly
+        env:
+          YOROI_NIGHTLY_PEM: ${{ secrets.YOROI_NIGHTLY_PEM }}
       - name: publish nightly
-        uses: trmcnvn/chrome-addon@v2
+        uses: SebastienGllmt/chrome-addon@v3
         with:
-          env:
-            YOROI_NIGHTLY_PEM: ${{ secrets.YOROI_NIGHTLY_PEM }}
           # ID of the extension that you are updating
           extension: poonlenmfdfbjfeeballhiibknlknepo
           # Path to a .zip of your addon
           zip: "Yoroi Nightly.zip"
+          # TODO: only share with trusted testers for now
+          publishTarget: trustedTesters
           # Google OAuth2
           client-id: ${{ secrets.CHROME_CLIENT_ID }}
           client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}
