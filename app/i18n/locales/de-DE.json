@@ -145,7 +145,7 @@
   "profile.nightly.title": "Yoroi Nightly",
   "profile.nightly.warning1": "Yoroi Nightly arbeitet nicht mit auf einer Schein-Blockchain oder einem Test-server.",
   "profile.nightly.warning2": "Alle getätigten Transaktionen werden on-chain und auf den Produktions-Servern sichtbar sein.",
-  "profile.nightly.warningHeader": "In order to simulate a production environment:",
+  "profile.nightly.warningHeader": "Um eine Produktionsumgebung zu simulieren:",
   "profile.termsOfUse.checkboxLabel": "Ich stimme den Nutzungsbedingungen zu",
   "profile.termsOfUse.title": "Nutzungsbestimmungen",
   "profile.uriAccept.seePrompt": "Einfach <strong><em>Erlauben</em> klicken</strong> um die Zahlungs-URLs zu aktivieren",
