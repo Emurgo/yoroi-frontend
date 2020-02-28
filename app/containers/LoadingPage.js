@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import { computed } from 'mobx';
 import environment from '../environment';
 import CenteredLayout from '../components/layout/CenteredLayout';
 import Loading from '../components/loading/Loading';
@@ -27,7 +28,7 @@ type GeneratedData = {|
 @observer
 export default class LoadingPage extends Component<InjectedOrGenerated<GeneratedData>> {
 
-  generateData: void => GeneratedData = () => {
+  @computed get generated(): GeneratedData {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -36,7 +37,7 @@ export default class LoadingPage extends Component<InjectedOrGenerated<Generated
     }
     const { stores, } = this.props;
     const { profile, loading } = stores;
-    return {
+    return Object.freeze({
       stores: {
         profile: {
           hasLoadedCurrentLocale: profile.hasLoadedCurrentLocale,
@@ -49,9 +50,8 @@ export default class LoadingPage extends Component<InjectedOrGenerated<Generated
       },
       downloadLogs,
       handleExternalLinkClick,
-    };
+    });
   }
-  generated: GeneratedData = this.generateData();
 
   render() {
     return (

@@ -157,7 +157,7 @@ export default class Request<Func: (...args: any) => Promise<any>, Err> {
     this._currentApiCall = null;
     return this;
   }
-  @action reset(): Request<Func, Err> {
+  @action reset(): void {
     this.result = null;
     this.error = null;
     this.isError = false;
@@ -165,7 +165,6 @@ export default class Request<Func: (...args: any) => Promise<any>, Err> {
     this.wasExecuted = false;
     this._isWaitingForResponse = false;
     this._currentApiCall = null;
-    return this;
   }
 }
 

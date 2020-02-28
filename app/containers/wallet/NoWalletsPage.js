@@ -9,14 +9,12 @@ import MainLayout from '../MainLayout';
 export default class NoWalletsPage extends Component<any> {
 
   render() {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
 
     return (
       <MainLayout
         connectionErrorType={checkAdaServerStatus}
-        actions={actions}
-        stores={stores}
       >
         <div />
       </MainLayout>

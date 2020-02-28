@@ -117,8 +117,6 @@ export default class MyWalletsPage extends Component<Props> {
       <MainLayout
         sidebar={sidebarContainer}
         navbar={navbarElement}
-        actions={actions}
-        stores={stores}
         connectionErrorType={checkAdaServerStatus}
         showInContainer
       >

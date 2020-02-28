@@ -2,6 +2,9 @@
 
 import React from 'react';
 import { configure, addDecorator, addParameters } from '@storybook/react';
+import {
+  MINIMAL_VIEWPORTS,
+} from '@storybook/addon-viewport';
 
 import StoryWrapper from '../stories/helpers/StoryWrapper';
 
@@ -25,7 +28,28 @@ addParameters({
         height: 768,
       },
     }
-  }
+  },
+  viewport: {
+    viewports: {
+      ...MINIMAL_VIEWPORTS,
+      desktopBig: {
+        name: 'Big desktop',
+        styles: {
+          width: '1920px',
+          height: '1080px',
+        },
+        type: 'desktop',
+      },
+      desktopSmall: {
+        name: 'Small desktop',
+        styles: {
+          width: '1366px',
+          height: '768px',
+        },
+        type: 'desktop',
+      },
+    },
+  },
 });
 
 // Global Decorator

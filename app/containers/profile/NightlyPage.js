@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
@@ -33,7 +34,7 @@ export default class NightlyPage extends Component<InjectedOrGenerated<Generated
     intl: intlShape.isRequired,
   };
 
-  generateData: void => GeneratedData = () => {
+  @computed get generated(): GeneratedData {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -41,15 +42,14 @@ export default class NightlyPage extends Component<InjectedOrGenerated<Generated
       throw new Error(`${nameof(NightlyPage)} no way to generated props`);
     }
     const { actions } = this.props;
-    return {
+    return Object.freeze({
       actions: {
         profile: {
           acceptNightly: { trigger: actions.profile.acceptNightly.trigger },
         },
       },
-    };
+    });
   }
-  generated: GeneratedData = this.generateData();
 
   acceptNightly: void => void = () => {
     this.generated.actions.profile.acceptNightly.trigger();

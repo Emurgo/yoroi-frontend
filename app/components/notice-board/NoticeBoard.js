@@ -15,7 +15,7 @@ import styles from './NoticeBoard.scss';
 
 type Props = {|
   +loadedNotices: Array<Notice>,
-  +onLoadMore: Function,
+  +onLoadMore: void => Promise<void>,
   +isLoading: boolean,
   +hasMoreToLoad: boolean
 |};

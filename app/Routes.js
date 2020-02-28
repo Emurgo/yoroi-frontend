@@ -6,6 +6,7 @@ import environment from './environment';
 import { ROUTES } from './routes-config';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';
+import type { InjectedOrGenerated } from './types/injectedPropsType';
 
 // PAGES
 import NoWalletsPage from './containers/wallet/NoWalletsPage';
@@ -16,6 +17,7 @@ import UriPromptPage from './containers/profile/UriPromptPage';
 
 // SETTINGS
 import Settings from './containers/settings/Settings';
+import type { GeneratedData as SettingsData } from './containers/settings/Settings';
 import GeneralSettingsPage from './containers/settings/categories/GeneralSettingsPage';
 import PaperWalletPage from './containers/settings/categories/PaperWalletPage';
 import WalletSettingsPage from './containers/settings/categories/WalletSettingsPage';
@@ -101,9 +103,10 @@ export const Routes = (
       <Route
         path={ROUTES.SETTINGS.ROOT}
         component={(props) => (
-          <Settings {...props} stores={stores} actions={actions}>
-            {SettingsSubpages(stores, actions)}
-          </Settings>
+          wrapSettings(
+            { ...props, stores, actions },
+            SettingsSubpages(stores, actions)
+          )
         )}
       />
       <Route
@@ -241,3 +244,16 @@ const ReceiveSubpages = (stores, actions) => (
 );
 
 /* eslint-enable max-len */
+
+export function wrapSettings(
+  settingsProps: InjectedOrGenerated<SettingsData>,
+  children: Node,
+): Node {
+  return (
+    <Settings
+      {...settingsProps}
+    >
+      {children}
+    </Settings>
+  );
+}

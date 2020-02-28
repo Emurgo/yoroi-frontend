@@ -147,8 +147,6 @@ export default class WalletAddPage extends Component<Props> {
     if (!hasAnyWallets) {
       return (
         <MainLayout
-          actions={actions}
-          stores={stores}
           connectionErrorType={checkAdaServerStatus}
         >
           <WalletAdd
@@ -175,8 +173,6 @@ export default class WalletAddPage extends Component<Props> {
     );
     return (
       <MainLayout
-        actions={actions}
-        stores={stores}
         connectionErrorType={checkAdaServerStatus}
         sidebar={<SidebarContainer actions={actions} stores={stores} />}
         navbar={navbarElement}

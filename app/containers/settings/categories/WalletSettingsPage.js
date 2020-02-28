@@ -2,30 +2,160 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
+import { computed } from 'mobx';
 import WalletSettings from '../../../components/wallet/settings/WalletSettings';
 import ResyncBlock from '../../../components/wallet/settings/ResyncBlock';
 import RemoveWallet from '../../../components/wallet/settings/RemoveWallet';
 import RemoveWalletDialog from '../../../components/wallet/settings/RemoveWalletDialog';
-import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import { isValidWalletName } from '../../../utils/validations';
 import type { WalletWithCachedMeta } from '../../../stores/toplevel/WalletStore';
+import LocalizableError from '../../../i18n/LocalizableError';
 import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
 import { WalletTypeOption } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import WalletSettingsActions from '../../../actions/ada/wallet-settings-actions';
+import DialogsActions from '../../../actions/dialogs-actions';
+import type { RenameModelResponse } from '../../../api/ada/index';
+import type { GeneratedData as ChangeWalletPasswordDialogContainerData } from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
 
-type Props = InjectedProps
+type GeneratedData = {|
+  +stores: {|
+    +profile: {|
+      +isClassicTheme: boolean,
+    |},
+    +walletSettings: {|
+      +removeWalletRequest: {|
+        +reset: void => void,
+        +isExecuting: boolean,
+        +error?: ?LocalizableError,
+      |},
+      +clearHistory: {|
+        +reset: void => void,
+        +isExecuting: boolean,
+      |},
+      +renameModelRequest: {|
+        +error?: ?LocalizableError,
+        +isExecuting: boolean,
+        +wasExecuted: boolean,
+        +result: ?RenameModelResponse,
+      |},
+      +lastUpdatedWalletField: string | null,
+      +walletFieldBeingEdited: string | null,
+    |},
+    +uiDialogs: {|
+      +isOpen: any => boolean,
+    |},
+    +wallets: {|
+      +selected: null | WalletWithCachedMeta,
+    |},
+  |},
+  +actions: {|
+    +walletSettings: {|
+      +startEditingWalletField: {|
+        +trigger: typeof WalletSettingsActions.prototype.startEditingWalletField.trigger
+      |},
+      +stopEditingWalletField: {|
+        +trigger: typeof WalletSettingsActions.prototype.stopEditingWalletField.trigger
+      |},
+      +cancelEditingWalletField: {|
+        +trigger: typeof WalletSettingsActions.prototype.cancelEditingWalletField.trigger
+      |},
+      +renameConceptualWallet: {|
+        +trigger: typeof WalletSettingsActions.prototype.renameConceptualWallet.trigger
+      |},
+      +resyncHistory: {|
+        +trigger: typeof WalletSettingsActions.prototype.resyncHistory.trigger
+      |},
+      +removeWallet: {|
+        +trigger: typeof WalletSettingsActions.prototype.removeWallet.trigger
+      |},
+    |},
+    +dialogs: {|
+      +open: {|
+        +trigger: typeof DialogsActions.prototype.open.trigger
+      |},
+      +closeActiveDialog: {|
+        +trigger: typeof DialogsActions.prototype.closeActiveDialog.trigger
+      |},
+    |},
+  |},
+  +ChangeWalletPasswordDialogContainerProps:
+    InjectedOrGenerated<ChangeWalletPasswordDialogContainerData>,
+|};
 
 @observer
-export default class WalletSettingsPage extends Component<Props> {
+export default class WalletSettingsPage extends Component<InjectedOrGenerated<GeneratedData>> {
 
   componentWillUnmount() {
-    this.props.stores.substores.ada.walletSettings.removeWalletRequest.reset();
-    this.props.stores.substores.ada.walletSettings.clearHistory.reset();
+    this.generated.stores.walletSettings.removeWalletRequest.reset();
+    this.generated.stores.walletSettings.clearHistory.reset();
+  }
+
+  @computed get generated(): GeneratedData {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(WalletSettingsPage)} no way to generated props`);
+    }
+    const { actions, stores, } = this.props;
+    const settingActions = actions.ada.walletSettings;
+    const settingStores = this.props.stores.substores.ada.walletSettings;
+    return Object.freeze({
+      stores: {
+        profile: {
+          isClassicTheme: stores.profile.isClassicTheme,
+        },
+        walletSettings: {
+          removeWalletRequest: {
+            reset: settingStores.removeWalletRequest.reset,
+            isExecuting: settingStores.removeWalletRequest.isExecuting,
+            error: settingStores.removeWalletRequest.error,
+          },
+          clearHistory: {
+            reset: settingStores.clearHistory.reset,
+            isExecuting: settingStores.clearHistory.isExecuting,
+          },
+          renameModelRequest: {
+            error: settingStores.renameModelRequest.error,
+            isExecuting: settingStores.renameModelRequest.isExecuting,
+            wasExecuted: settingStores.renameModelRequest.wasExecuted,
+            result: settingStores.renameModelRequest.result,
+          },
+          lastUpdatedWalletField: settingStores.lastUpdatedWalletField,
+          walletFieldBeingEdited: settingStores.walletFieldBeingEdited,
+        },
+        uiDialogs: {
+          isOpen: stores.uiDialogs.isOpen,
+        },
+        wallets: {
+          selected: stores.wallets.selected,
+        },
+      },
+      actions: {
+        walletSettings: {
+          startEditingWalletField: { trigger: settingActions.startEditingWalletField.trigger },
+          stopEditingWalletField: { trigger: settingActions.stopEditingWalletField.trigger },
+          cancelEditingWalletField: { trigger: settingActions.cancelEditingWalletField.trigger },
+          renameConceptualWallet: { trigger: settingActions.renameConceptualWallet.trigger },
+          resyncHistory: { trigger: settingActions.resyncHistory.trigger },
+          removeWallet: { trigger: settingActions.removeWallet.trigger },
+        },
+        dialogs: {
+          open: { trigger: actions.dialogs.open.trigger },
+          closeActiveDialog: { trigger: actions.dialogs.closeActiveDialog.trigger },
+        },
+      },
+      ChangeWalletPasswordDialogContainerProps: {
+        actions,
+        stores,
+      },
+    });
   }
 
   render() {
-    const { uiDialogs, profile } = this.props.stores;
-    const { walletSettings } = this.props.stores.substores.ada;
-    const { actions, } = this.props;
+    const { uiDialogs, profile, walletSettings } = this.generated.stores;
+    const { actions, } = this.generated;
     const {
       renameModelRequest,
       lastUpdatedWalletField,
@@ -36,9 +166,9 @@ export default class WalletSettingsPage extends Component<Props> {
       stopEditingWalletField,
       cancelEditingWalletField,
       renameConceptualWallet,
-    } = actions.ada.walletSettings;
+    } = actions.walletSettings;
 
-    const walletsStore = this.props.stores.wallets;
+    const walletsStore = this.generated.stores.wallets;
     if (walletsStore.selected == null) {
       return this.getDialog(undefined);
     }
@@ -81,9 +211,9 @@ export default class WalletSettingsPage extends Component<Props> {
           classicTheme={profile.isClassicTheme}
         />
         <ResyncBlock
-          isSubmitting={this.props.stores.substores.ada.walletSettings.clearHistory.isExecuting}
+          isSubmitting={this.generated.stores.walletSettings.clearHistory.isExecuting}
           onResync={async () => {
-            await this.props.actions.ada.walletSettings.resyncHistory.trigger({
+            await this.generated.actions.walletSettings.resyncHistory.trigger({
               publicDeriver: selectedWallet
             });
           }}
@@ -101,27 +231,26 @@ export default class WalletSettingsPage extends Component<Props> {
   getDialog: (void | WalletWithCachedMeta) => Node = (
     publicDeriver
   ) => {
-    const settingsStore = this.props.stores.substores.ada.walletSettings;
-    const settingsActions = this.props.actions.ada.walletSettings;
+    const settingsStore = this.generated.stores.walletSettings;
+    const settingsActions = this.generated.actions.walletSettings;
 
-    if (this.props.stores.uiDialogs.isOpen(ChangeWalletPasswordDialogContainer)) {
+    if (this.generated.stores.uiDialogs.isOpen(ChangeWalletPasswordDialogContainer)) {
       return (
         <ChangeWalletPasswordDialogContainer
-          actions={this.props.actions}
-          stores={this.props.stores}
+          {...this.generated.ChangeWalletPasswordDialogContainerProps}
         />
       );
     }
-    if (this.props.stores.uiDialogs.isOpen(RemoveWalletDialog)) {
+    if (this.generated.stores.uiDialogs.isOpen(RemoveWalletDialog)) {
       return (
         <RemoveWalletDialog
           onSubmit={() => publicDeriver && settingsActions.removeWallet.trigger({
             publicDeriver,
           })}
           isSubmitting={settingsStore.removeWalletRequest.isExecuting}
-          onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
+          onCancel={this.generated.actions.dialogs.closeActiveDialog.trigger}
           error={settingsStore.removeWalletRequest.error}
-          classicTheme={this.props.stores.profile.isClassicTheme}
+          classicTheme={this.generated.stores.profile.isClassicTheme}
         />
       );
     }

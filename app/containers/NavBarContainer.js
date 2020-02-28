@@ -1,10 +1,11 @@
 // @flow
 import moment from 'moment';
+import { computed } from 'mobx';
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
-import type { InjectedProps } from '../types/injectedPropsType';
+import type { InjectedOrGenerated } from '../types/injectedPropsType';
 import { intlShape, defineMessages } from 'react-intl';
 import NavBar from '../components/topbar/NavBar';
 import NavPlate from '../components/topbar/NavPlate';
@@ -15,6 +16,10 @@ import { ROUTES } from '../routes-config';
 import { LOVELACES_PER_ADA } from '../config/numbersConfig';
 import type { WalletWithCachedMeta } from '../stores/toplevel/WalletStore';
 import { isLedgerNanoWallet, isTrezorTWallet } from '../api/ada/lib/storage/models/ConceptualWallet/index';
+import ProfileActions from '../actions/profile-actions';
+import RouterActions from '../actions/router-actions';
+import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
+import type { DelegationRequests } from '../stores/ada/DelegationStore';
 
 const messages = defineMessages({
   allWalletsLabel: {
@@ -23,8 +28,35 @@ const messages = defineMessages({
   },
 });
 
+export type GeneratedData = {|
+  +stores: {|
+    +wallets: {|
+      +selected: null | WalletWithCachedMeta,
+      +publicDerivers: Array<WalletWithCachedMeta>,
+    |},
+    +profile: {|
+      +shouldHideBalance: boolean,
+    |},
+    +delegation: {|
+      +getRequests: PublicDeriver<> => (void | DelegationRequests),
+    |},
+  |},
+  +actions: {|
+    +profile: {|
+      +updateHideBalance: {|
+        +trigger: typeof ProfileActions.prototype.updateHideBalance.trigger
+      |},
+    |},
+    +router: {|
+      +goToRoute: {|
+        +trigger: typeof RouterActions.prototype.goToRoute.trigger
+      |},
+    |},
+  |},
+|};
+
 type Props = {|
-  ...InjectedProps,
+  ...InjectedOrGenerated<GeneratedData>,
   title: Node,
 |};
 
@@ -35,20 +67,52 @@ export default class NavBarContainer extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  @computed get generated(): GeneratedData {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(NavBarContainer)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    return Object.freeze({
+      stores: {
+        wallets: {
+          selected: stores.wallets.selected,
+          publicDerivers: stores.wallets.publicDerivers,
+        },
+        profile: {
+          shouldHideBalance: stores.profile.shouldHideBalance,
+        },
+        delegation: {
+          getRequests: stores.substores.ada.delegation.getRequests,
+        },
+      },
+      actions: {
+        profile: {
+          updateHideBalance: { trigger: actions.profile.updateHideBalance.trigger },
+        },
+        router: {
+          goToRoute: { trigger: actions.router.goToRoute.trigger },
+        },
+      },
+    });
+  }
+
   updateHideBalance = () => {
-    this.props.actions.profile.updateHideBalance.trigger();
+    this.generated.actions.profile.updateHideBalance.trigger();
   }
 
   render() {
     const { intl } = this.context;
-    const { stores } = this.props;
+    const { stores } = this.generated;
     const { profile } = stores;
 
     const walletsStore = stores.wallets;
     const publicDeriver = walletsStore.selected;
     if (publicDeriver == null) return null;
 
-    const wallets = this.props.stores.wallets.publicDerivers;
+    const wallets = this.generated.stores.wallets.publicDerivers;
 
     let utxoTotal = new BigNumber(0);
     for (const walletUtxoAmount of wallets.map(wallet => wallet.amount)) {
@@ -87,7 +151,7 @@ export default class NavBarContainer extends Component<Props> {
           walletName={wallet.conceptualWalletName}
           walletType={getWalletType(wallet)}
         />}
-        isCurrentWallet={wallet === this.props.stores.wallets.selected}
+        isCurrentWallet={wallet === this.generated.stores.wallets.selected}
         syncTime={wallet.lastSyncInfo.Time
           ? moment(wallet.lastSyncInfo.Time).fromNow()
           : null
@@ -125,7 +189,7 @@ export default class NavBarContainer extends Component<Props> {
         headerComponent={dropdownHead}
         contentComponents={dropdownContent}
         onAddWallet={
-          () => this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
+          () => this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
         }
       />
     );
@@ -153,7 +217,7 @@ export default class NavBarContainer extends Component<Props> {
   getRewardBalance: WalletWithCachedMeta => null | void | BigNumber = (
     publicDeriver
   ) => {
-    const delegationRequest = this.props.stores.substores.ada.delegation.getRequests(
+    const delegationRequest = this.generated.stores.delegation.getRequests(
       publicDeriver.self
     );
     if (delegationRequest == null) return undefined;
