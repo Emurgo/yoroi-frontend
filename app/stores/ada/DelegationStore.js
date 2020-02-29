@@ -33,7 +33,6 @@ import type {
   RewardTuple,
 } from '../../api/ada/lib/state-fetch/types';
 import LocalizableError from '../../i18n/LocalizableError';
-import type { WalletWithCachedMeta } from '../toplevel/WalletStore';
 import {
   genToRelativeSlotNumber,
   genTimeToSlot,
@@ -87,11 +86,11 @@ export default class DelegationStore extends Store {
     return undefined; // can happen if the wallet is not a Shelley wallet
   }
 
-  @action addObservedWallet: WalletWithCachedMeta => void = (
+  @action addObservedWallet: PublicDeriver<> => void = (
     publicDeriver
   ) => {
     const newObserved = {
-      publicDeriver: publicDeriver.self,
+      publicDeriver,
       getDelegatedBalance: new CachedRequest<GetDelegatedBalanceFunc>(getDelegatedBalance),
       getCurrentDelegation: new CachedRequest<GetCurrentDelegationFunc>(getCurrentDelegation),
       rewardHistory: new CachedRequest<RewardHistoryForWallet>(async (address) => {
@@ -116,10 +115,10 @@ export default class DelegationStore extends Store {
     ]);
   }
 
-  refreshDelegation: WalletWithCachedMeta => Promise<void> = async (
+  refreshDelegation: PublicDeriver<> => Promise<void> = async (
     publicDeriver
   ) => {
-    const delegationRequest = this.getRequests(publicDeriver.self);
+    const delegationRequest = this.getRequests(publicDeriver);
     if (delegationRequest == null) return;
 
     try {
@@ -130,7 +129,7 @@ export default class DelegationStore extends Store {
         delegationRequest.stakingKeyState = undefined;
       });
 
-      const withStakingKey = asGetStakingKey(publicDeriver.self);
+      const withStakingKey = asGetStakingKey(publicDeriver);
       if (withStakingKey == null) {
         throw new Error(`${nameof(this.refreshDelegation)} missing staking key functionality`);
       }
@@ -259,7 +258,7 @@ export default class DelegationStore extends Store {
         }
         const selected = this.stores.wallets.selected;
         if (selected == null) return;
-        if (asGetStakingKey(selected.self) != null) {
+        if (asGetStakingKey(selected) != null) {
           await this.refreshDelegation(selected);
         }
       },

@@ -16,11 +16,11 @@ const messages = defineMessages({
   },
   shelleyTestnetLabel: {
     id: 'testnet.shelley.label.message',
-    defaultMessage: 'YOU ARE ON TESTNET NETWORK ({network}).',
+    defaultMessage: '!!!YOU ARE ON TESTNET NETWORK ({network}).',
   },
   nightlyLabel: {
     id: 'nightly.banner.label.message',
-    defaultMessage: 'YOU ARE ON YOROI NIGHTLY ({network}).',
+    defaultMessage: '!!!YOU ARE ON YOROI NIGHTLY ({network}).',
   },
 });
 

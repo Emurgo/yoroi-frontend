@@ -28,7 +28,6 @@ import {
 import { ROUTES } from '../../routes-config';
 import { buildRoute } from '../../utils/routing';
 import { ChainDerivations } from '../../config/numbersConfig';
-import type { WalletWithCachedMeta }  from '../toplevel/WalletStore';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import {
   filterAddressesByStakingKey,
@@ -73,7 +72,7 @@ export class AddressTypeStore<T> {
   @computed get all(): Array<T> {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return [];
-    const result = this._flowCoerceResult(this.getRequest(publicDeriver.self));
+    const result = this._flowCoerceResult(this.getRequest(publicDeriver));
     if (result == null) return [];
     return result;
   }
@@ -81,21 +80,21 @@ export class AddressTypeStore<T> {
   @computed get hasAny(): boolean {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return false;
-    const result = this._flowCoerceResult(this.getRequest(publicDeriver.self));
+    const result = this._flowCoerceResult(this.getRequest(publicDeriver));
     return result ? result.length > 0 : false;
   }
 
   @computed get last(): ?T {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return;
-    const result = this._flowCoerceResult(this.getRequest(publicDeriver.self));
+    const result = this._flowCoerceResult(this.getRequest(publicDeriver));
     return result ? result[result.length - 1] : null;
   }
 
   @computed get totalAvailable(): number {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return 0;
-    const result = this._flowCoerceResult(this.getRequest(publicDeriver.self));
+    const result = this._flowCoerceResult(this.getRequest(publicDeriver));
     return result ? result.length : 0;
   }
 
@@ -210,17 +209,17 @@ export default class AddressesStore extends Store {
     this.error = null;
   };
 
-  addObservedWallet: WalletWithCachedMeta => void = (
+  addObservedWallet: PublicDeriver<> => void = (
     publicDeriver
   ) => {
-    const withHasUtxoChains = asHasUtxoChains(publicDeriver.self);
+    const withHasUtxoChains = asHasUtxoChains(publicDeriver);
     if (withHasUtxoChains == null) {
-      this.allAddressesForDisplay.addObservedWallet(publicDeriver.self);
+      this.allAddressesForDisplay.addObservedWallet(publicDeriver);
     } else {
-      this.externalForDisplay.addObservedWallet(publicDeriver.self);
-      this.internalForDisplay.addObservedWallet(publicDeriver.self);
-      if (asGetStakingKey(publicDeriver.self) != null) {
-        this.mangledAddressesForDisplay.addObservedWallet(publicDeriver.self);
+      this.externalForDisplay.addObservedWallet(publicDeriver);
+      this.internalForDisplay.addObservedWallet(publicDeriver);
+      if (asGetStakingKey(publicDeriver) != null) {
+        this.mangledAddressesForDisplay.addObservedWallet(publicDeriver);
       }
     }
   }
@@ -305,24 +304,24 @@ export default class AddressesStore extends Store {
     return addresses;
   }
 
-  isActiveTab: ($Keys<typeof RECEIVE_ROUTES>, WalletWithCachedMeta) => boolean = (
+  isActiveTab: ($Keys<typeof RECEIVE_ROUTES>, PublicDeriver<>) => boolean = (
     tab, publicDeriver,
   ) => {
     const { app } = this.stores;
     const screenRoute = buildRoute(
       RECEIVE_ROUTES[tab],
       {
-        id: publicDeriver.self.getPublicDeriverId(),
+        id: publicDeriver.getPublicDeriverId(),
         tab
       }
     );
     return app.currentRoute === screenRoute;
   };
 
-  handleTabClick: (string, WalletWithCachedMeta) => void = (page, publicDeriver) => {
+  handleTabClick: (string, PublicDeriver<>) => void = (page, publicDeriver) => {
     this.actions.router.goToRoute.trigger({
       route: RECEIVE_ROUTES[page],
-      params: { id: publicDeriver.self.getPublicDeriverId(), page },
+      params: { id: publicDeriver.getPublicDeriverId(), page },
     });
   };
 

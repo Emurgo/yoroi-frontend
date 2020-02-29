@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { WalletWithCachedMeta } from '../../../stores/toplevel/WalletStore';
 import type { WalletAccountNumberPlate } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 import styles from './WalletPlate.scss';
@@ -9,7 +8,7 @@ import WalletAccountIcon from '../../topbar/WalletAccountIcon';
 
 type Props = {|
   +walletName: string,
-  +publicDeriver: null | WalletWithCachedMeta,
+  +plate: null | WalletAccountNumberPlate,
 |};
 
 function constructPlate(
@@ -31,10 +30,10 @@ function constructPlate(
 export default class WalletPlate extends Component<Props> {
 
   render() {
-    const { publicDeriver, walletName } = this.props;
+    const { plate, walletName } = this.props;
 
-    const [accountPlateId, iconComponent] = (publicDeriver && publicDeriver.plate) ?
-      constructPlate(publicDeriver.plate, 0, styles.icon)
+    const [accountPlateId, iconComponent] = (plate) ?
+      constructPlate(plate, 0, styles.icon)
       : [];
 
     return (

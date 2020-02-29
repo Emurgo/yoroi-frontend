@@ -30,7 +30,7 @@ import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import {
   asHasUtxoChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import type { WalletWithCachedMeta } from '../toplevel/WalletStore';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 declare var CONFIG: ConfigType;
 const websocketUrl = CONFIG.network.websocketUrl;
@@ -105,12 +105,12 @@ export default class DaedalusTransferStore extends Store {
    */
   _setupTransferWebSocket: (
     RustModule.WalletV2.DaedalusWallet,
-    WalletWithCachedMeta,
+    PublicDeriver<>,
   ) => Promise<void> = async (
     wallet,
     publicDeriver,
   ) => {
-    const withChains = asHasUtxoChains(publicDeriver.self);
+    const withChains = asHasUtxoChains(publicDeriver);
     if (!withChains) throw new Error(`${nameof(this._setupTransferWebSocket)} missing chains functionality`);
     const nextInternal = await withChains.nextInternal();
     if (nextInternal.addressInfo == null) {
@@ -193,7 +193,7 @@ export default class DaedalusTransferStore extends Store {
 
   _setupTransferFundsWithMnemonic: {|
     recoveryPhrase: string,
-    publicDeriver: WalletWithCachedMeta,
+    publicDeriver: PublicDeriver<>,
   |} => Promise<void> = async (payload) => {
     let { recoveryPhrase: secretWords } = payload;
     if (secretWords.split(' ').length === 27) {
@@ -216,7 +216,7 @@ export default class DaedalusTransferStore extends Store {
 
   _setupTransferFundsWithMasterKey: {|
     masterKey: string,
-    publicDeriver: WalletWithCachedMeta,
+    publicDeriver: PublicDeriver<>,
   |} => Promise<void> = async (payload) => {
     const { masterKey: key } = payload;
 
@@ -244,7 +244,7 @@ export default class DaedalusTransferStore extends Store {
   /** Broadcast the transfer transaction if one exists and proceed to continuation */
   _transferFunds: {|
     next: Function,
-    publicDeriver: WalletWithCachedMeta,
+    publicDeriver: PublicDeriver<>,
   |} => Promise<void> = async (payload) => {
     try {
       const { next } = payload;

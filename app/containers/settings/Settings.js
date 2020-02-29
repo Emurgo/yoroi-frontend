@@ -10,8 +10,8 @@ import SettingsMenu from '../../components/settings/menu/SettingsMenu';
 import { buildRoute } from '../../utils/routing';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { Theme } from '../../themes';
-import type { WalletWithCachedMeta } from '../../stores/toplevel/WalletStore';
 import RouterActions from '../../actions/router-actions';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import type { GeneratedData as NavBarContainerData } from '../NavBarContainer';
@@ -41,7 +41,7 @@ export type GeneratedData = {|
     |},
     +wallets: {|
       +hasActiveWallet: boolean,
-      +selected: null | WalletWithCachedMeta,
+      +selected: null | PublicDeriver<>,
     |},
     +serverConnectionStore: {|
       +checkAdaServerStatus: ServerStatusErrorType,

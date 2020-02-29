@@ -24,10 +24,13 @@ import BigNumber from 'bignumber.js';
 import moment from 'moment';
 import NavBarAddButton from '../../components/topbar/NavBarAddButton';
 import NavWalletDetails from '../../components/topbar/NavWalletDetails';
-import type { WalletWithCachedMeta } from '../../stores/toplevel/WalletStore';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
 import globalMessages from '../../i18n/global-messages';
 import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import {
+  asGetPublicKey,
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 const messages = defineMessages({
   walletSumInfo: {
@@ -53,13 +56,13 @@ export default class MyWalletsPage extends Component<Props> {
     this.props.actions.wallets.unselectWallet.trigger();
   }
 
-  handleWalletNavItemClick: (string, WalletWithCachedMeta) => void = (
+  handleWalletNavItemClick: (string, PublicDeriver<>) => void = (
     page,
     publicDeriver
   ) => {
     this.props.actions.router.goToRoute.trigger({
       route: ROUTES.WALLETS.PAGE,
-      params: { id: publicDeriver.self.getPublicDeriverId(), page },
+      params: { id: publicDeriver.getPublicDeriverId(), page },
     });
   };
 
@@ -73,7 +76,12 @@ export default class MyWalletsPage extends Component<Props> {
     const wallets = this.props.stores.wallets.publicDerivers;
 
     let utxoTotal = new BigNumber(0);
-    for (const walletUtxoAmount of wallets.map(wallet => wallet.amount)) {
+    const walletBalances = wallets.map(wallet => stores.substores.ada.transactions
+      .getTxRequests(wallet).requests.getBalanceRequest.result
+      ?.dividedBy(
+        LOVELACES_PER_ADA
+      ));
+    for (const walletUtxoAmount of walletBalances) {
       if (walletUtxoAmount == null) {
         utxoTotal = null;
         break;
@@ -132,8 +140,10 @@ export default class MyWalletsPage extends Component<Props> {
   * with publicDerivers acting as sub-rows
   * but since we don't support multi-currency or multi-account yet we simplify the UI for now
   */
-  generateRow: WalletWithCachedMeta => Node = (publicDeriver) => {
-    const walletName = publicDeriver ? publicDeriver.conceptualWalletName : '';
+  generateRow: PublicDeriver<> => Node = (publicDeriver) => {
+    const parent = publicDeriver.getParent();
+    const settingsCache = this.props.stores.substores.ada.walletSettings
+      .getConceptualWalletSettingsCache(parent);
 
     const walletSumCurrencies = (
       <>
@@ -143,13 +153,23 @@ export default class MyWalletsPage extends Component<Props> {
         />
       </>
     );
+    const txRequests = this.props.stores.substores.ada.transactions
+      .getTxRequests(publicDeriver);
+    const balance = txRequests.requests.getBalanceRequest.result
+      ?.dividedBy(LOVELACES_PER_ADA) || null;
+
+    const withPubKey = asGetPublicKey(publicDeriver);
+    const plate = withPubKey == null
+      ? null
+      : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
+
     return (
       <WalletRow
         isExpandable={false /* TODO: should be expandable if > 1 public deriver */}
-        key={publicDeriver.self.getPublicDeriverId()}
+        key={publicDeriver.getPublicDeriverId()}
         onRowClicked={page => this.handleWalletNavItemClick(page, publicDeriver)}
         walletSumDetails={<WalletDetails
-          walletAmount={publicDeriver.amount}
+          walletAmount={balance}
           rewards={this.getRewardBalance(publicDeriver)}
           // TODO: This should be probably bound to an individual wallet
           onUpdateHideBalance={this.updateHideBalance}
@@ -159,16 +179,16 @@ export default class MyWalletsPage extends Component<Props> {
         walletSubRow={() => this.createSubrow(publicDeriver)}
         walletPlate={
           <NavPlate
-            publicDeriver={publicDeriver}
-            walletName={walletName}
+            plate={plate}
+            walletName={settingsCache.conceptualWalletName}
             walletType={getWalletType(publicDeriver)}
           />
         }
         walletSync={
           <WalletSync
             time={
-              publicDeriver.lastSyncInfo.Time
-                ? moment(publicDeriver.lastSyncInfo.Time).fromNow()
+              txRequests.lastSyncInfo.Time
+                ? moment(txRequests.lastSyncInfo.Time).fromNow()
                 : null
             }
           />
@@ -177,7 +197,7 @@ export default class MyWalletsPage extends Component<Props> {
     );
   }
 
-  createSubrow: WalletWithCachedMeta => Node = (publicDeriver) => {
+  createSubrow: PublicDeriver<> => Node = (publicDeriver) => {
     const { intl } = this.context;
 
     // TODO: replace with wallet addresses
@@ -188,9 +208,21 @@ export default class MyWalletsPage extends Component<Props> {
 
     const addressesLength = walletAddresses.length;
 
+    const parent = publicDeriver.getParent();
+    const settingsCache = this.props.stores.substores.ada.walletSettings
+      .getConceptualWalletSettingsCache(parent);
+
+    const withPubKey = asGetPublicKey(publicDeriver);
+    const plate = withPubKey == null
+      ? null
+      : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
+
     const walletSubRow = (
       <WalletSubRow
-        publicDeriver={publicDeriver}
+        walletInfo={{
+          conceptualWalletName: settingsCache.conceptualWalletName,
+          plate,
+        }}
         // TODO: do we delete WalletDetails? Lots of duplication with Nav alternative
         walletDetails={<WalletDetails
           infoText={
@@ -221,11 +253,11 @@ export default class MyWalletsPage extends Component<Props> {
    * null => still calculating
    * value => done calculating
    */
-  getRewardBalance: WalletWithCachedMeta => null | void | BigNumber = (
+  getRewardBalance: PublicDeriver<> => null | void | BigNumber = (
     publicDeriver
   ) => {
     const delegationRequest = this.props.stores.substores.ada.delegation.getRequests(
-      publicDeriver.self
+      publicDeriver
     );
     if (delegationRequest == null) return undefined;
 
@@ -237,8 +269,8 @@ export default class MyWalletsPage extends Component<Props> {
   }
 }
 
-function getWalletType(publicDeriver: WalletWithCachedMeta) {
-  const conceptualWallet = publicDeriver.self.getParent();
+function getWalletType(publicDeriver: PublicDeriver<>) {
+  const conceptualWallet = publicDeriver.getParent();
   if (isLedgerNanoWallet(conceptualWallet)) {
     return 'ledger';
   }

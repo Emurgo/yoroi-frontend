@@ -19,6 +19,7 @@ export function getDefaultExplorer(): ExplorerType {
     : 'seiza';
 }
 export function getExplorers(): Array<{| value: ExplorerType, label: string |}> {
+  const explorerInfo = getExplorerInfo();
   if (environment.isShelley()) {
     return Object.keys(ShelleyExplorers)
       .filter(explorer => ShelleyExplorers[explorer] === ShelleyExplorers.JORMUNGANDR)
@@ -79,7 +80,7 @@ function getIohkExplorer(): ExplorerInfo {
   };
 }
 
-export const explorerInfo: {
+const getExplorerInfo: void => {
   [key: ExplorerType]: ExplorerInfo,
   // assert that Seiza always has a URL for every type
   seiza: {|
@@ -87,7 +88,7 @@ export const explorerInfo: {
     name: string,
   |},
   ...
-} = Object.freeze({
+} = () => Object.freeze({
   seiza,
   ...(!environment.isShelley()
     ? {
@@ -116,6 +117,7 @@ export function getOrDefault(selectedExplorer: ExplorerType, linkType: LinkType)
   name: string,
   baseUrl: string,
 |} {
+  const explorerInfo = getExplorerInfo();
   const explorer = explorerInfo[selectedExplorer];
 
   // since not every explorer supports every feature

@@ -4,6 +4,10 @@ import { observer } from 'mobx-react';
 import TopBar from '../components/topbar/TopBar';
 import WalletTopbarTitle from '../components/topbar/WalletTopbarTitle';
 import type { InjectedProps } from '../types/injectedPropsType';
+import { LOVELACES_PER_ADA } from '../config/numbersConfig';
+import {
+  asGetPublicKey,
+} from '../api/ada/lib/storage/models/PublicDeriver/traits';
 
 import { formattedWalletAmount } from '../utils/formatters';
 
@@ -21,7 +25,29 @@ export default class TopBarContainer extends Component<Props> {
     const { app, topbar, profile } = stores;
 
     const walletsStore = stores.wallets;
+    const walletInfo = (() => {
+      if (walletsStore.selected == null) {
+        return null;
+      }
+      const selected = walletsStore.selected;
+      const amount = stores.substores.ada.transactions
+        .getTxRequests(selected).requests.getBalanceRequest.result
+        ?.dividedBy(LOVELACES_PER_ADA);
+
+      const withPubKey = asGetPublicKey(selected);
+      const plate = withPubKey == null
+        ? null
+        : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
+
+      return {
+        type: selected.getParent().getWalletType(),
+        plate,
+        amount,
+        conceptualWalletName: self.conceptualWalletName,
+      };
+    })();
     const title = (<WalletTopbarTitle
+      walletInfo={walletInfo}
       publicDeriver={walletsStore.selected}
       currentRoute={app.currentRoute}
       formattedWalletAmount={formattedWalletAmount}

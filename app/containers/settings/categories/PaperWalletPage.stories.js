@@ -12,12 +12,12 @@ import {
   getPasswordValidationCases,
 } from '../../../../stories/helpers/StoryWrapper';
 import { getPaperWalletIntro } from '../../../stores/toplevel/ProfileStore';
-import { getDefaultExplorer } from '../../../domain/Explorer';
 import { ProgressStep } from '../../../stores/ada/PaperWalletCreateStore';
 import { THEMES } from '../../../themes';
 import { PdfGenSteps } from '../../../api/ada/paperWallet/paperWalletPdf';
 import { wrapSettings } from '../../../Routes';
 import { mockSettingsProps } from '../Settings.mock';
+import { getDefaultExplorer } from '../../../domain/Explorer';
 
 export default {
   title: `Container/${nameof(PaperWalletPage)}`,
@@ -134,19 +134,19 @@ export const CreateDialog = () => wrapSettings(
       ...PdfGenSteps,
       hasPdf: 'hasPdf',
     };
-    const extendedSteps = select(
+    const extendedSteps = () => select(
       'currentStep',
       modifiedSteps,
       modifiedSteps.initializing,
     );
     const getRealStep = () => {
-      if (extendedSteps === modifiedSteps.undefined) {
+      if (extendedSteps() === modifiedSteps.undefined) {
         return undefined;
       }
-      if (extendedSteps === modifiedSteps.hasPdf) {
+      if (extendedSteps() === modifiedSteps.hasPdf) {
         return modifiedSteps.done;
       }
-      return extendedSteps;
+      return extendedSteps();
     };
     return (
       <PaperWalletPage
@@ -177,7 +177,7 @@ export const CreateDialog = () => wrapSettings(
                   progressInfo: ProgressStep.CREATE,
                   userPassword: '',
                   pdfRenderStatus: getRealStep(),
-                  pdf: extendedSteps === modifiedSteps.hasPdf
+                  pdf: extendedSteps() === modifiedSteps.hasPdf
                     ? new Blob(['this is just fake data'])
                     : null,
                 },
@@ -211,14 +211,14 @@ export const VerifyDialog = () => wrapSettings(
   mockSettingsProps,
   (() => {
     const mnemonicCases = getMnemonicCases(21);
-    const mneonicsValue = select(
+    const mneonicsValue = () => select(
       'mnemonicCases',
       mnemonicCases,
       mnemonicCases.Empty,
     );
     const correctPassword = 'asdfasdfasdf';
     const passwordCases = getPasswordValidationCases(correctPassword);
-    const passwordValue = select(
+    const passwordValue = () => select(
       'passwordCases',
       passwordCases,
       passwordCases.Empty,
@@ -256,12 +256,12 @@ export const VerifyDialog = () => wrapSettings(
                 },
               },
               actions: mockActions,
-              verifyDefaultValues: passwordValue === passwordCases.Empty &&
-                mneonicsValue === mnemonicCases.Empty
+              verifyDefaultValues: passwordValue() === passwordCases.Empty &&
+                mneonicsValue() === mnemonicCases.Empty
                 ? undefined
                 : {
-                  paperPassword: passwordValue,
-                  recoveryPhrase: mneonicsValue,
+                  paperPassword: passwordValue(),
+                  recoveryPhrase: mneonicsValue(),
                   walletName: '',
                   walletPassword: '',
                 }

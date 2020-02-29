@@ -12,9 +12,10 @@ import WalletAccountIcon from './WalletAccountIcon';
 import { defineMessages, intlShape } from 'react-intl';
 import HideBalanceIcon from '../../assets/images/top-bar/password.hide.inline.svg';
 import ShowBalanceIcon from '../../assets/images/top-bar/password.show.inline.svg';
-import type { WalletWithCachedMeta } from '../../stores/toplevel/WalletStore';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import type { WalletType } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import type { WalletAccountNumberPlate } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 const messages = defineMessages({
   totalBalance: {
@@ -24,7 +25,13 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +publicDeriver: null | WalletWithCachedMeta,
+  +publicDeriver: null | PublicDeriver<>,
+  +walletInfo: null | {|
+    +type: WalletType,
+    +plate: null | WalletAccountNumberPlate,
+    +conceptualWalletName: string,
+    +amount: ?BigNumber,
+  |},
   +currentRoute: string,
   +formattedWalletAmount?: BigNumber => string,
   +themeProperties?: {|
@@ -65,7 +72,7 @@ export default class WalletTopbarTitle extends Component<Props> {
 
   render() {
     const {
-      publicDeriver, currentRoute, formattedWalletAmount, themeProperties,
+      publicDeriver, walletInfo, currentRoute, formattedWalletAmount, themeProperties,
       shouldHideBalance, onUpdateHideBalance
     } = this.props;
     const { identiconSaturationFactor } = themeProperties || {};
@@ -73,14 +80,14 @@ export default class WalletTopbarTitle extends Component<Props> {
 
     // If we are looking at a wallet, show its name and balance
     const walletRoutesMatch = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
-    const showWalletInfo = (walletRoutesMatch !== false) && (publicDeriver != null);
+    const showWalletInfo = (walletRoutesMatch !== false) && (walletInfo != null);
 
-    const isHardwareWallet = publicDeriver != null &&
-      publicDeriver.self.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET;
+    const isHardwareWallet = walletInfo != null &&
+      walletInfo.type === WalletTypeOption.HARDWARE_WALLET;
     const currency = ' ADA';
     const iconDivClass = isHardwareWallet ? styles.divIconHardware : styles.divIcon;
-    const [accountPlateId, iconComponent] = (publicDeriver && publicDeriver.plate) ?
-      constructPlate(publicDeriver.plate, identiconSaturationFactor, iconDivClass)
+    const [accountPlateId, iconComponent] = (walletInfo && walletInfo.plate) ?
+      constructPlate(walletInfo.plate, identiconSaturationFactor, iconDivClass)
       : [];
 
     const topbarTitle = showWalletInfo && formattedWalletAmount ? (
@@ -88,17 +95,17 @@ export default class WalletTopbarTitle extends Component<Props> {
         {iconComponent}
         <div className={styles.divWalletInfo}>
           <div className={styles.walletName}>
-            { publicDeriver && publicDeriver.conceptualWalletName }
+            { walletInfo && walletInfo.conceptualWalletName }
           </div>
           <div className={styles.walletPlate}>{accountPlateId || ''}</div>
         </div>
         <div className={styles.divAmount}>
-          {publicDeriver?.amount != null
+          {walletInfo?.amount != null
             ? (
               <div className={styles.walletAmount}>
                 { publicDeriver && shouldHideBalance ?
                   <span className={styles.hiddenWalletAmount}>******</span> :
-                  publicDeriver && formattedWalletAmount(publicDeriver.amount)
+                  publicDeriver && formattedWalletAmount(walletInfo.amount)
                 }
                 { currency }
               </div>

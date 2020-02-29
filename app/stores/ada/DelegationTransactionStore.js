@@ -15,7 +15,6 @@ import {
 import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { WalletWithCachedMeta } from '../toplevel/WalletStore';
 import type { PoolRequest } from '../../api/ada/lib/storage/bridge/delegationUtils';
 
 export default class DelegationTransactionStore extends Store {
@@ -65,10 +64,10 @@ export default class DelegationTransactionStore extends Store {
 
   @action
   _createTransaction: {|
-    publicDeriver: WalletWithCachedMeta,
+    publicDeriver: PublicDeriver<>,
     poolRequest: PoolRequest,
   |} => Promise<void> = async (request) => {
-    const withUtxos = asGetAllUtxos(request.publicDeriver.self);
+    const withUtxos = asGetAllUtxos(request.publicDeriver);
     if (withUtxos == null) {
       throw new Error(`${nameof(this._createTransaction)} missing utxo functionality`);
     }
@@ -83,7 +82,7 @@ export default class DelegationTransactionStore extends Store {
     const basePubDeriver = withStakingKey;
 
     const delegationRequests = this.stores.substores.ada.delegation.getRequests(
-      request.publicDeriver.self
+      request.publicDeriver
     );
     if (delegationRequests == null) {
       throw new Error(`${nameof(DelegationTransactionStore)}::${nameof(this._createTransaction)} called for non-reward wallet`);
@@ -104,9 +103,9 @@ export default class DelegationTransactionStore extends Store {
   @action
   _signTransaction: {|
     password: string,
-    publicDeriver: WalletWithCachedMeta,
+    publicDeriver: PublicDeriver<>,
   |} => Promise<void> = async (request) => {
-    const withSigning = (asGetSigningKey(request.publicDeriver.self));
+    const withSigning = (asGetSigningKey(request.publicDeriver));
     if (withSigning == null) {
       throw new Error(`${nameof(this._signTransaction)} public deriver missing signing functionality.`);
     }
@@ -138,9 +137,9 @@ export default class DelegationTransactionStore extends Store {
     }).promise;
   }
 
-  _complete: WalletWithCachedMeta => void = (publicDeriver) => {
+  _complete: PublicDeriver<> => void = (publicDeriver) => {
     this.actions.dialogs.closeActiveDialog.trigger();
-    this.goToDashboardRoute(publicDeriver.self);
+    this.goToDashboardRoute(publicDeriver);
   }
 
   goToDashboardRoute(publicDeriver: PublicDeriver<>): void {

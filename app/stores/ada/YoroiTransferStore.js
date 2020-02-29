@@ -32,10 +32,10 @@ import type { RestoreWalletForTransferResponse, RestoreWalletForTransferFunc } f
 import {
   Bip44DerivationLevels,
 } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
   asHasUtxoChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import type { WalletWithCachedMeta } from '../toplevel/WalletStore';
 import {
   unscramblePaperAdaMnemonic,
 } from '../../api/ada/lib/cardanoCrypto/paperWallet';
@@ -159,11 +159,11 @@ export default class YoroiTransferStore extends Store {
     }
   }
 
-  nextInternalAddress: WalletWithCachedMeta => (void => Promise<string>) = (
+  nextInternalAddress: PublicDeriver<> => (void => Promise<string>) = (
     publicDeriver
   ) => {
     return async () => {
-      const withChains = asHasUtxoChains(publicDeriver.self);
+      const withChains = asHasUtxoChains(publicDeriver);
       if (!withChains) throw new Error(`${nameof(this.nextInternalAddress)} missing chains functionality`);
       const nextInternal = await withChains.nextInternal();
       if (nextInternal.addressInfo == null) {

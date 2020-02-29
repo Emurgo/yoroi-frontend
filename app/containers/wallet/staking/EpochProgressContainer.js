@@ -2,13 +2,13 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
-import type { WalletWithCachedMeta } from '../../../stores/toplevel/WalletStore';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import EpochProgress from '../../../components/wallet/staking/dashboard/EpochProgress';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 
 type Props = {|
   ...InjectedProps,
-  +publicDeriver: WalletWithCachedMeta,
+  +publicDeriver: PublicDeriver<>,
   +showTooltip: boolean,
 |};
 
@@ -24,7 +24,7 @@ export default class EpochProgressContainer extends Component<Props> {
     if (publicDeriver == null) {
       throw new Error(`${nameof(EpochProgressContainer)} no public deriver. Should never happen`);
     }
-    const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver.self);
+    const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
     // calculate these so the cached result is available in the render function
     await timeCalcRequests.currentEpochLength.execute().promise;
     await timeCalcRequests.currentSlotLength.execute().promise;
@@ -37,8 +37,8 @@ export default class EpochProgressContainer extends Component<Props> {
 
   render() {
     const timeStore = this.props.stores.substores.ada.time;
-    const timeCalcRequests = timeStore.getTimeCalcRequests(this.props.publicDeriver.self);
-    const currTimeRequests = timeStore.getCurrentTimeRequests(this.props.publicDeriver.self);
+    const timeCalcRequests = timeStore.getTimeCalcRequests(this.props.publicDeriver);
+    const currTimeRequests = timeStore.getCurrentTimeRequests(this.props.publicDeriver);
 
     const getEpochLength = timeCalcRequests.currentEpochLength.result;
     if (getEpochLength == null) return (<EpochProgress loading />);

@@ -5,9 +5,9 @@ import { computed } from 'mobx';
 import ChangeWalletPasswordDialog from '../../../components/wallet/settings/ChangeWalletPasswordDialog';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import LocalizableError from '../../../i18n/LocalizableError';
-import type { WalletWithCachedMeta } from '../../../stores/toplevel/WalletStore';
 import WalletSettingsActions from '../../../actions/ada/wallet-settings-actions';
 import DialogsActions from '../../../actions/dialogs-actions';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 
 export type GeneratedData = {|
   +stores: {|
@@ -22,7 +22,7 @@ export type GeneratedData = {|
       +isClassicTheme: boolean,
     |},
     +wallets: {|
-      +selected: null | WalletWithCachedMeta,
+      +selected: null | PublicDeriver<>,
     |},
     +uiDialogs: {|
       +dataForActiveDialog: {|

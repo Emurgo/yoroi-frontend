@@ -41,7 +41,7 @@ export default class Wallet extends Component<Props> {
     const screenRoute = buildRoute(
       ROUTES.WALLETS.PAGE,
       {
-        id: selected.self.getPublicDeriverId(),
+        id: selected.getPublicDeriverId(),
         page
       }
     );
@@ -57,7 +57,7 @@ export default class Wallet extends Component<Props> {
     if (selected == null) return;
     this.props.actions.router.goToRoute.trigger({
       route: ROUTES.WALLETS.PAGE,
-      params: { id: selected.self.getPublicDeriverId(), page },
+      params: { id: selected.getPublicDeriverId(), page },
     });
   };
 
@@ -105,7 +105,7 @@ export default class Wallet extends Component<Props> {
         showAsCard
       >
         <WalletWithNavigation
-          wallet={wallets.selected.self}
+          wallet={wallets.selected}
           isActiveScreen={this.isActiveScreen}
           onWalletNavItemClick={this.handleWalletNavItemClick}
         >

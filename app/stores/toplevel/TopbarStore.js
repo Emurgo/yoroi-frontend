@@ -47,7 +47,7 @@ export default class TopbarStore extends Store {
       }
       return WALLETS(ROUTES.MY_WALLETS);
     }
-    return WALLETS(this.stores.wallets.getWalletRoute(selected.self));
+    return WALLETS(this.stores.wallets.getWalletRoute(selected));
   }
 
   @computed get categories(): Array<Category> {
@@ -57,14 +57,14 @@ export default class TopbarStore extends Store {
     let isNano = false;
     const selected = wallets.selected;
     if (selected != null) {
-      const conceptualWallet = selected.self.getParent();
+      const conceptualWallet = selected.getParent();
       isTrezorT = isTrezorTWallet(conceptualWallet);
       isNano = isLedgerNanoWallet(conceptualWallet);
     }
 
     // recall: legacy bip44 wallets can't receive in Shelley era
     const canTransfer = !environment.isShelley() ||
-      !(selected != null && selected.self.getParent() instanceof Bip44Wallet);
+      !(selected != null && selected.getParent() instanceof Bip44Wallet);
 
     return [
       this._genTopCategory(),

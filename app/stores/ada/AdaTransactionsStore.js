@@ -19,11 +19,11 @@ import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
 import { isValidAmountInLovelaces } from '../../utils/validations';
 import TransactionsStore from '../base/TransactionsStore';
 import { assuranceLevels, } from '../../config/transactionAssuranceConfig';
-import type { WalletWithCachedMeta } from '../toplevel/WalletStore';
 import type {
   GetTransactionRowsToExportFunc,
 } from '../../api/ada';
 import { asHasLevels, } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 import type {
   ExportTransactionsRequest,
@@ -66,11 +66,13 @@ export default class AdaTransactionsStore extends TransactionsStore {
     if (!publicDeriver) return unconfirmedAmount;
 
     // Get current transactions for public deriver
-    const result = this.getTransactionsAllRequest(publicDeriver.self).result;
+    const result = this.getTransactionsAllRequest(publicDeriver).result;
     if (!result || !result.transactions) return unconfirmedAmount;
 
     for (const transaction of result.transactions) {
-      const assuranceForTx = transaction.getAssuranceLevelForMode(publicDeriver.assuranceMode);
+      const { assuranceMode } = this.stores.substores.ada.walletSettings
+        .getPublicDeriverSettingsCache(publicDeriver);
+      const assuranceForTx = transaction.getAssuranceLevelForMode(assuranceMode);
       if (assuranceForTx !== assuranceLevels.HIGH) {
         // total
         unconfirmedAmount.total = unconfirmedAmount.total.plus(transaction.amount.absoluteValue());
@@ -101,7 +103,7 @@ export default class AdaTransactionsStore extends TransactionsStore {
   );
 
   @action _exportTransactionsToFile: {|
-    publicDeriver: WalletWithCachedMeta,
+    publicDeriver: PublicDeriver<>,
     exportRequest: TransactionRowsToExportRequest,
   |} => Promise<void> = async (request) => {
     try {
@@ -110,7 +112,7 @@ export default class AdaTransactionsStore extends TransactionsStore {
       this.getTransactionRowsToExportRequest.reset();
       this.exportTransactions.reset();
 
-      const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver.self);
+      const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
       if (!withLevels) return;
 
       const respTxRows = await this.getTransactionRowsToExportRequest.execute({

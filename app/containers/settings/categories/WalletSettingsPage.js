@@ -3,20 +3,24 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
-import WalletSettings from '../../../components/wallet/settings/WalletSettings';
+import WalletNameSetting from '../../../components/wallet/settings/WalletNameSetting';
+import SpendingPasswordSetting from '../../../components/wallet/settings/SpendingPasswordSetting';
 import ResyncBlock from '../../../components/wallet/settings/ResyncBlock';
 import RemoveWallet from '../../../components/wallet/settings/RemoveWallet';
 import RemoveWalletDialog from '../../../components/wallet/settings/RemoveWalletDialog';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import { isValidWalletName } from '../../../utils/validations';
-import type { WalletWithCachedMeta } from '../../../stores/toplevel/WalletStore';
+import type { SigningKeyCache } from '../../../stores/toplevel/WalletStore';
 import LocalizableError from '../../../i18n/LocalizableError';
 import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
-import { WalletTypeOption } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import { asGetSigningKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
+import type { IGetSigningKey } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import WalletSettingsActions from '../../../actions/ada/wallet-settings-actions';
 import DialogsActions from '../../../actions/dialogs-actions';
 import type { RenameModelResponse } from '../../../api/ada/index';
 import type { GeneratedData as ChangeWalletPasswordDialogContainerData } from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
+import WalletSettingsStore from '../../../stores/base/WalletSettingsStore';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 
 type GeneratedData = {|
   +stores: {|
@@ -24,6 +28,8 @@ type GeneratedData = {|
       +isClassicTheme: boolean,
     |},
     +walletSettings: {|
+      +getConceptualWalletSettingsCache:
+        typeof WalletSettingsStore.prototype.getConceptualWalletSettingsCache,
       +removeWalletRequest: {|
         +reset: void => void,
         +isExecuting: boolean,
@@ -46,7 +52,8 @@ type GeneratedData = {|
       +isOpen: any => boolean,
     |},
     +wallets: {|
-      +selected: null | WalletWithCachedMeta,
+      +getSigningKeyCache: IGetSigningKey => SigningKeyCache,
+      +selected: null | PublicDeriver<>,
     |},
   |},
   +actions: {|
@@ -100,36 +107,38 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
     }
     const { actions, stores, } = this.props;
     const settingActions = actions.ada.walletSettings;
-    const settingStores = this.props.stores.substores.ada.walletSettings;
+    const settingStore = this.props.stores.substores.ada.walletSettings;
     return Object.freeze({
       stores: {
         profile: {
           isClassicTheme: stores.profile.isClassicTheme,
         },
         walletSettings: {
+          getConceptualWalletSettingsCache: settingStore.getConceptualWalletSettingsCache,
           removeWalletRequest: {
-            reset: settingStores.removeWalletRequest.reset,
-            isExecuting: settingStores.removeWalletRequest.isExecuting,
-            error: settingStores.removeWalletRequest.error,
+            reset: settingStore.removeWalletRequest.reset,
+            isExecuting: settingStore.removeWalletRequest.isExecuting,
+            error: settingStore.removeWalletRequest.error,
           },
           clearHistory: {
-            reset: settingStores.clearHistory.reset,
-            isExecuting: settingStores.clearHistory.isExecuting,
+            reset: settingStore.clearHistory.reset,
+            isExecuting: settingStore.clearHistory.isExecuting,
           },
           renameModelRequest: {
-            error: settingStores.renameModelRequest.error,
-            isExecuting: settingStores.renameModelRequest.isExecuting,
-            wasExecuted: settingStores.renameModelRequest.wasExecuted,
-            result: settingStores.renameModelRequest.result,
+            error: settingStore.renameModelRequest.error,
+            isExecuting: settingStore.renameModelRequest.isExecuting,
+            wasExecuted: settingStore.renameModelRequest.wasExecuted,
+            result: settingStore.renameModelRequest.result,
           },
-          lastUpdatedWalletField: settingStores.lastUpdatedWalletField,
-          walletFieldBeingEdited: settingStores.walletFieldBeingEdited,
+          lastUpdatedWalletField: settingStore.lastUpdatedWalletField,
+          walletFieldBeingEdited: settingStore.walletFieldBeingEdited,
         },
         uiDialogs: {
           isOpen: stores.uiDialogs.isOpen,
         },
         wallets: {
           selected: stores.wallets.selected,
+          getSigningKeyCache: stores.wallets.getSigningKeyCache,
         },
       },
       actions: {
@@ -154,7 +163,7 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
   }
 
   render() {
-    const { uiDialogs, profile, walletSettings } = this.generated.stores;
+    const { profile, walletSettings } = this.generated.stores;
     const { actions, } = this.generated;
     const {
       renameModelRequest,
@@ -173,20 +182,17 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
       return this.getDialog(undefined);
     }
     const selectedWallet = walletsStore.selected;
+    const withSigning = asGetSigningKey(selectedWallet);
+    const parent = selectedWallet.getParent();
+    const settingsCache = this.generated.stores.walletSettings
+      .getConceptualWalletSettingsCache(parent);
 
-    const walletType = selectedWallet.self.getParent().getWalletType();
-    const isWebWallet = walletType === WalletTypeOption.WEB_WALLET;
     return (
       <>
         {this.getDialog(selectedWallet)}
-        <WalletSettings
+        <WalletNameSetting
           error={renameModelRequest.error}
-          openDialog={() => actions.dialogs.open.trigger({
-            dialog: ChangeWalletPasswordDialogContainer,
-          })}
-          walletPasswordUpdateDate={selectedWallet.signingKeyUpdateDate}
-          isDialogOpen={uiDialogs.isOpen}
-          walletName={selectedWallet.conceptualWalletName}
+          walletName={settingsCache.conceptualWalletName}
           isSubmitting={renameModelRequest.isExecuting}
           isInvalid={
             renameModelRequest.wasExecuted
@@ -207,9 +213,19 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
           onCancelEditing={() => cancelEditingWalletField.trigger()}
           activeField={walletFieldBeingEdited}
           nameValidator={name => isValidWalletName(name)}
-          showPasswordBlock={isWebWallet}
           classicTheme={profile.isClassicTheme}
         />
+        {withSigning != null && (
+          <SpendingPasswordSetting
+            openDialog={() => actions.dialogs.open.trigger({
+              dialog: ChangeWalletPasswordDialogContainer,
+            })}
+            walletPasswordUpdateDate={
+              this.generated.stores.wallets.getSigningKeyCache(withSigning).signingKeyUpdateDate
+            }
+            classicTheme={profile.isClassicTheme}
+          />
+        )}
         <ResyncBlock
           isSubmitting={this.generated.stores.walletSettings.clearHistory.isExecuting}
           onResync={async () => {
@@ -219,7 +235,7 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
           }}
         />
         <RemoveWallet
-          walletName={selectedWallet.conceptualWalletName}
+          walletName={settingsCache.conceptualWalletName}
           openDialog={() => actions.dialogs.open.trigger({
             dialog: RemoveWalletDialog,
           })}
@@ -228,7 +244,7 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
     );
   }
 
-  getDialog: (void | WalletWithCachedMeta) => Node = (
+  getDialog: (void | PublicDeriver<>) => Node = (
     publicDeriver
   ) => {
     const settingsStore = this.generated.stores.walletSettings;

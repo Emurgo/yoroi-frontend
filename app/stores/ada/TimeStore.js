@@ -5,7 +5,6 @@ import { find } from 'lodash';
 import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { WalletWithCachedMeta } from '../toplevel/WalletStore';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import Store from '../base/Store';
 import {
@@ -88,11 +87,11 @@ export default class TimeStore extends Store {
     throw new Error(`${nameof(TimeStore)}::${nameof(this.getCurrentTimeRequests)} missing for public deriver`);
   }
 
-  @action addObservedTime: WalletWithCachedMeta => void = (
+  @action addObservedTime: PublicDeriver<> => void = (
     publicDeriver
   ) => {
     this.timeCalcRequests.push({
-      publicDeriver: publicDeriver.self,
+      publicDeriver,
       toAbsoluteSlot: new CachedRequest<void => Promise<ToAbsoluteSlotNumberFunc>>(
         genToAbsoluteSlotNumber
       ),
@@ -117,7 +116,7 @@ export default class TimeStore extends Store {
     });
 
     this.currentTimeRequests.push({
-      publicDeriver: publicDeriver.self,
+      publicDeriver,
       // initial values that can be updated later
       currentEpoch: 0,
       currentSlot: 0,
@@ -132,8 +131,8 @@ export default class TimeStore extends Store {
     const selected = this.stores.wallets.selected;
     if (selected == null) return;
 
-    const timeCalcRequests = this.getTimeCalcRequests(selected.self);
-    const currTimeRequests = this.getCurrentTimeRequests(selected.self);
+    const timeCalcRequests = this.getTimeCalcRequests(selected);
+    const currTimeRequests = this.getCurrentTimeRequests(selected);
 
     const timeToSlot = await timeCalcRequests.timeToSlot.execute().promise;
     if (!timeToSlot) throw new Error(`${nameof(this._updateTime)} should never happen`);
@@ -158,7 +157,7 @@ export default class TimeStore extends Store {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return undefined;
 
-    return this.getCurrentTimeRequests(publicDeriver.self);
+    return this.getCurrentTimeRequests(publicDeriver);
   }
 
 

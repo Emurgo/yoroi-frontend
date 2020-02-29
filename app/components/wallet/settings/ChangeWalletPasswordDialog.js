@@ -97,7 +97,6 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
     options: {
       showErrorsOnInit: Object.keys(this.props.dialogData)
         .map(key => this.props.dialogData[key])
-        .map(val => { console.log(val); return val; })
         .filter(val => val !== '' && val != null)
         .length > 0,
       validateOnChange: true,

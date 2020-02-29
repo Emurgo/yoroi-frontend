@@ -6,7 +6,7 @@ import { action } from '@storybook/addon-actions';
 import WalletSettingsPage from './WalletSettingsPage';
 import { withScreenshot } from 'storycap';
 import { THEMES } from '../../../themes';
-import { globalKnobs, getDummyWallet } from '../../../../stories/helpers/StoryWrapper';
+import { globalKnobs, getDummyWallet, getSigningWallet } from '../../../../stories/helpers/StoryWrapper';
 import { IncorrectWalletPasswordError } from '../../../api/common';
 import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
 import RemoveWalletDialog from '../../../components/wallet/settings/RemoveWalletDialog';
@@ -27,6 +27,10 @@ const defaultSettingsPageProps = {
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
     },
     walletSettings: {
+      getConceptualWalletSettingsCache: (conceptualWallet) => ({
+        conceptualWallet,
+        conceptualWalletName: 'Test wallet', // TODO: global var?
+      }),
       removeWalletRequest: {
         reset: action('removeWalletRequest reset'),
         isExecuting: false,
@@ -49,6 +53,10 @@ const defaultSettingsPageProps = {
       isOpen: () => false,
     },
     wallets: {
+      getSigningKeyCache: (publicDeriver) => ({
+        publicDeriver,
+        signingKeyUpdateDate: null,
+      }),
       selected: getDummyWallet(),
     },
   },
@@ -75,7 +83,7 @@ export const EditName = () => wrapSettings(
       Editing: 1,
       Done: 2,
     };
-    const nameValue = select(
+    const nameValue = () => select(
       'nameCases',
       nameCases,
       nameCases.Untouched,
@@ -88,8 +96,8 @@ export const EditName = () => wrapSettings(
             ...defaultSettingsPageProps.stores,
             walletSettings: {
               ...defaultSettingsPageProps.stores.walletSettings,
-              lastUpdatedWalletField: nameValue === nameCases.Done ? 'name' : null,
-              walletFieldBeingEdited: nameValue === nameCases.Editing ? 'name' : null,
+              lastUpdatedWalletField: nameValue() === nameCases.Done ? 'name' : null,
+              walletFieldBeingEdited: nameValue() === nameCases.Editing ? 'name' : null,
             },
           },
           ChangeWalletPasswordDialogContainerProps: (null: any),
@@ -102,6 +110,15 @@ export const EditName = () => wrapSettings(
 export const PasswordUpdateTime = wrapSettings(
   mockSettingsProps,
   (() => {
+    const lastUpdateCases = {
+      Never: 0,
+      Previously: 1,
+    };
+    const lastUpdateValue = () => select(
+      'lastUpdateCases',
+      lastUpdateCases,
+      lastUpdateCases.Never,
+    );
     return (
       <WalletSettingsPage
         generated={{
@@ -110,9 +127,13 @@ export const PasswordUpdateTime = wrapSettings(
             ...defaultSettingsPageProps.stores,
             wallets: {
               ...defaultSettingsPageProps.stores.wallets,
-              selected: getDummyWallet({
-                signingKeyUpdateDate: new Date(0),
+              getSigningKeyCache: (publicDeriver) => ({
+                publicDeriver,
+                signingKeyUpdateDate: lastUpdateValue() === lastUpdateCases.Never
+                  ? null
+                  : new Date(0),
               }),
+              selected: getSigningWallet(),
             },
           },
           ChangeWalletPasswordDialogContainerProps: (null: any),
@@ -187,7 +208,7 @@ export const EditPassword = () => wrapSettings(
       None: undefined,
       WrongPassword: new IncorrectWalletPasswordError(),
     };
-    const errorValue = select(
+    const errorValue = () => select(
       'errorCases',
       errorCases,
       errorCases.None,
@@ -199,25 +220,29 @@ export const EditPassword = () => wrapSettings(
       Correct: 3,
       All: 4,
     };
-    const passwordValue = select(
+    const passwordValue = () => select(
       'passwordCases',
       passwordCases,
       passwordCases.Untouched,
     );
     const getCurrentPassword = () => {
-      return passwordValue === passwordCases.All ? 'asdfasdfasdf' : '';
+      const val = passwordValue();
+      return val === passwordCases.All ? 'asdfasdfasdf' : '';
     };
     const getNewPassword = () => {
-      if (passwordValue === passwordCases.All) return 'asdfasdfasdf';
-      if (passwordValue === passwordCases.Correct) return 'asdfasdfasdf';
-      if (passwordValue === passwordCases.MisMatch) return 'asdfasdfasdf';
-      if (passwordValue === passwordCases.TooShort) return 'a';
+      const val = passwordValue();
+      if (val === passwordCases.All) return 'asdfasdfasdf';
+      if (val === passwordCases.Correct) return 'asdfasdfasdf';
+      if (val === passwordCases.MisMatch) return 'asdfasdfasdf';
+      if (val === passwordCases.TooShort) return 'a';
       return '';
     };
     const getRepeatPassword = () => {
-      if (passwordValue === passwordCases.All) return 'asdfasdfasdf';
-      if (passwordValue === passwordCases.Correct) return 'asdfasdfasdf';
-      if (passwordValue === passwordCases.MisMatch) return 'zxcvzxcvzxcv';
+      const val = passwordValue();
+      if (val === passwordCases.All) return 'asdfasdfasdf';
+      if (val === passwordCases.Correct) return 'asdfasdfasdf';
+      if (val === passwordCases.MisMatch) return 'zxcvzxcvzxcv';
+      if (val === passwordCases.TooShort) return 'a';
       return '';
     };
 
@@ -232,6 +257,14 @@ export const EditPassword = () => wrapSettings(
               ...defaultSettingsPageProps.stores.uiDialogs,
               isOpen: (clazz) => clazz === ChangeWalletPasswordDialogContainer,
             },
+            wallets: {
+              ...defaultSettingsPageProps.stores.wallets,
+              getSigningKeyCache: (publicDeriver) => ({
+                publicDeriver,
+                signingKeyUpdateDate: null,
+              }),
+              selected: getSigningWallet(),
+            },
           },
           ChangeWalletPasswordDialogContainerProps: {
             generated: {
@@ -243,7 +276,7 @@ export const EditPassword = () => wrapSettings(
                   changeSigningKeyRequest: {
                     ...defaultProps.stores.walletSettings.changeSigningKeyRequest,
                     isExecuting: boolean('changeSigningKeyRequest isExecuting'),
-                    error: errorValue === errorCases.None ? undefined : errorValue,
+                    error: errorValue() === errorCases.None ? undefined : errorValue(),
                   },
                 },
                 uiDialogs: {

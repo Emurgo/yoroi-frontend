@@ -21,7 +21,7 @@ export default class URILandingPage extends Component<Props> {
     let params = {};
     if (wallets.hasAnyWallets && wallets.first) {
       const firstWallet = wallets.first;
-      params = { id: firstWallet.self.getPublicDeriverId() };
+      params = { id: firstWallet.getPublicDeriverId() };
     }
     // this will automatically reroute to the right page if no wallet exists
     this.props.actions.router.goToRoute.trigger({

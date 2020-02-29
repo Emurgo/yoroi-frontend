@@ -91,7 +91,7 @@ export default class WalletSendPage extends Component<Props> {
       actions.dialogs.closeActiveDialog.trigger();
     }
 
-    const walletType = publicDeriver.self.getParent().getWalletType();
+    const walletType = publicDeriver.getParent().getWalletType();
     const targetDialog = walletType === WalletTypeOption.HARDWARE_WALLET ?
       HWSendConfirmationDialog :
       WalletSendConfirmationDialog;
@@ -194,7 +194,7 @@ export default class WalletSendPage extends Component<Props> {
     const fee = IGetFee(signRequest, true);
     const receivers = IReceivers(signRequest, false);
 
-    const conceptualWallet = publicDeriver.self.getParent();
+    const conceptualWallet = publicDeriver.getParent();
     let hwSendConfirmationDialog: Node = null;
 
     const unsignedTx = signRequest.unsignedTx;
