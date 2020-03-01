@@ -115,7 +115,7 @@
   "myWallets.wallets.lastSyncText": "Dernière synchronisation",
   "myWallets.wallets.sumInfoText": "Solde total",
   "networkError.label.message": "Avertissement : La connexion au serveur a échoué.<br>Veuillez vérifier votre connexion internet ou <a target='blank' href='https://twitter.com/YoroiWallet'>notre compte Twitter</a>.<br>Le solde affiché ainsi que l'historique des transactions peuvent apparaître erronés jusqu'à ce que la situation sur nos serveurs revienne à la normale, mais votre solde réel n'est pas affecté.",
-  "nightly.banner.label.message": "YOU ARE ON YOROI NIGHTLY ({network}).",
+  "nightly.banner.label.message": "VOUS ÊTES SUR YOROI NIGHTLY ({network}).",
   "noticeBoard.noNoticeText.chooseAPool": "Pour voir les notifications ici, commencez par <strong>choisir un groupe d'enjeu (pool)</strong> et déléguez vos ADA.",
   "noticeBoard.noNoticeText.notDelegatedYet": "Vous n'avez pas encore délégué d'enjeu.",
   "noticeBoard.notice.costChanged.subMessage": "L'ancien coût était de {oldCost} {currency} et le nouveau coût est de {newCost} {currency}",
