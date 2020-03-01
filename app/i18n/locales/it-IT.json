@@ -115,6 +115,7 @@
   "myWallets.wallets.lastSyncText": "Ultima sincronizzazione",
   "myWallets.wallets.sumInfoText": "Saldo totale del portafoglio",
   "networkError.label.message": "Connessione al server fallita. <br>Per favore controlla la tua connessione oppure<a target='blank' href='https://twitter.com/YoroiWallet'> il nostro account Twitter</a>.<br>. Il bilancio mostrato e lo storico delle transazioni potrebbe essere incorretto fino a quando la connessione ai server venga normalizzata, ma il tuo bilancio effettivo non verrà modificato.",
+  "nightly.banner.label.message": "YOU ARE ON YOROI NIGHTLY ({network}).",
   "noticeBoard.noNoticeText.chooseAPool": "Per visualizzare le notifiche qui, prima <strong> scegli una staking pool</strong>e delega i tuoi ADA.",
   "noticeBoard.noNoticeText.notDelegatedYet": "Non hai ancora delegato uno stake.",
   "noticeBoard.notice.costChanged.subMessage": "Il vecchio costo era {oldCost} {currency} e il nuovo costo è {newCost} {currency}",
