@@ -115,6 +115,7 @@
   "myWallets.wallets.lastSyncText": "前回の同期：",
   "myWallets.wallets.sumInfoText": "合計ウォレット残高",
   "networkError.label.message": "警告：サーバーへの接続に失敗しました。<br>インターネット接続を確認するか、<a target='blank' href='https://twitter.com/YoroiWallet'>EMURGOのTwitterアカウントをチェックしてください</a>。<br>サーバーが正常に戻るまで、表示されている残高やトランザクション履歴は正確ではない場合がありますが、実際の残高に影響はありません。",
+  "nightly.banner.label.message": "YOU ARE ON YOROI NIGHTLY ({network}).",
   "noticeBoard.noNoticeText.chooseAPool": "ここに通知を表示するには、まず<strong>ステークプールを選択</strong>して、ADAを委任します。",
   "noticeBoard.noNoticeText.notDelegatedYet": "まだステークを委任していません。",
   "noticeBoard.notice.costChanged.subMessage": "以前の金額は {oldCost}{currency} で、現在の金額は {newCost}{currency} です",
