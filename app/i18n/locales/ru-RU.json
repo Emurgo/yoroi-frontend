@@ -115,6 +115,7 @@
   "myWallets.wallets.lastSyncText": "Последняя синхронизация",
   "myWallets.wallets.sumInfoText": "Итоговый баланс",
   "networkError.label.message": "ПРЕДУПРЕЖДЕНИЕ: Не удалось подключиться к серверу.<br>Пожалуйста, проверьте подключение к Интернету или <a target='blank' href='https://twitter.com/YoroiWallet'>наш Twitter-аккаунт</a>.<br>Отображаемый баланс и история транзакций могут отображаться неккоректно, пока наши серверы не вернутся в нормальное состояние, но на Ваш фактический баланс это никоим образом не влияет.",
+  "nightly.banner.label.message": "YOU ARE ON YOROI NIGHTLY ({network}).",
   "noticeBoard.noNoticeText.chooseAPool": "Для просмотра уведомлений, сначала <strong>выберите стейк-пул</strong> и затем делегируйте вашу ADA.",
   "noticeBoard.noNoticeText.notDelegatedYet": "Вы еще не делегировали.",
   "noticeBoard.notice.costChanged.subMessage": "Старая стоимость была {oldCost} {currency} и новая стоимость составляет {newCost} {currency}",
