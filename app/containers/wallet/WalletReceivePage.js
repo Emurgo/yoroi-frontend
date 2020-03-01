@@ -13,6 +13,7 @@ import URIDisplayDialog from '../../components/uri/URIDisplayDialog';
 import type { InjectedProps } from '../../types/injectedPropsType';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 import {
   DECIMAL_PLACES_IN_ADA,
@@ -23,7 +24,6 @@ import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWal
 import { asHasUtxoChains } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type { StandardAddress, AddressTypeStore } from '../../stores/base/AddressesStore';
 import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
-import type { WalletWithCachedMeta } from '../../stores/toplevel/WalletStore';
 
 type Props = {|
   ...InjectedProps,
@@ -48,7 +48,7 @@ export default class WalletReceivePage extends Component<Props, State> {
   handleGenerateAddress: void => Promise<void> = async () => {
     const publicDeriver = this.props.stores.wallets.selected;
     if (publicDeriver != null) {
-      await this.props.actions.ada.addresses.createAddress.trigger(publicDeriver.self);
+      await this.props.actions.ada.addresses.createAddress.trigger(publicDeriver);
     }
   };
 
@@ -59,7 +59,7 @@ export default class WalletReceivePage extends Component<Props, State> {
   closeNotification = () => {
     const publicDeriver = this.props.stores.wallets.selected;
     if (publicDeriver) {
-      const notificationId = `${publicDeriver.self.getPublicDeriverId()}-copyNotification`;
+      const notificationId = `${publicDeriver.getPublicDeriverId()}-copyNotification`;
       this.props.actions.notifications.closeActiveNotification.trigger({ id: notificationId });
     }
   };
@@ -79,20 +79,17 @@ export default class WalletReceivePage extends Component<Props, State> {
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(WalletReceivePage)}.`);
 
     // assume account-level wallet for now
-    const withChains = asHasUtxoChains(publicDeriver.self);
+    const withChains = asHasUtxoChains(publicDeriver);
     if (!withChains) throw new Error(`${nameof(WalletReceivePage)} only available for account-level wallets`);
     const addressTypeStore = this.getTypeStore(publicDeriver);
 
-    if (!addressTypeStore.getRequest(publicDeriver.self).wasExecuted || !addressTypeStore.hasAny) {
-      console.log(addressTypeStore);
-      console.log(addressTypeStore.getRequest(publicDeriver.self));
+    if (!addressTypeStore.getRequest(publicDeriver).wasExecuted || !addressTypeStore.hasAny) {
       return (
         <VerticallyCenteredLayout>
           <LoadingSpinner />
         </VerticallyCenteredLayout>
       );
     }
-    console.log('2');
 
     // get info about the latest address generated for special rendering
     const lastAddress = addressTypeStore.last;
@@ -106,7 +103,7 @@ export default class WalletReceivePage extends Component<Props, State> {
       message: globalMessages.copyTooltipMessage,
     };
 
-    const walletType = publicDeriver.self.getParent().getWalletType();
+    const walletType = publicDeriver.getParent().getWalletType();
     const isHwWallet = walletType === WalletTypeOption.HARDWARE_WALLET;
 
     const onCopyAddressTooltip = (address, elementId) => {
@@ -229,7 +226,7 @@ export default class WalletReceivePage extends Component<Props, State> {
             walletAddress={hwVerifyAddress.selectedAddress.address}
             walletPath={hwVerifyAddress.selectedAddress.path}
             isHardware={isHwWallet}
-            verify={() => actions.ada.hwVerifyAddress.verifyAddress.trigger(publicDeriver.self)}
+            verify={() => actions.ada.hwVerifyAddress.verifyAddress.trigger(publicDeriver)}
             cancel={actions.ada.hwVerifyAddress.closeAddressDetailDialog.trigger}
             classicTheme={profile.isClassicTheme}
           />
@@ -239,7 +236,7 @@ export default class WalletReceivePage extends Component<Props, State> {
     );
   }
 
-  getTypeStore: WalletWithCachedMeta => AddressTypeStore<StandardAddress> = (
+  getTypeStore: PublicDeriver<> => AddressTypeStore<StandardAddress> = (
     publicDeriver
   ) => {
     const { addresses } = this.props.stores.substores.ada;

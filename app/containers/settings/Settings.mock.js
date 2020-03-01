@@ -54,15 +54,29 @@ export const mockSettingsProps: {| generated: GeneratedData |} = {
     NavBarContainerProps: {
       generated: {
         stores: {
+          walletSettings: {
+            getConceptualWalletSettingsCache: (conceptualWallet) => ({
+              conceptualWallet,
+              conceptualWalletName: 'Test wallet', // TODO: global var?
+            }),
+          },
           wallets: {
+            // TODO: maybe should come from a global knob?
             selected: null,
             publicDerivers: [],
+            getPublicKeyCache: (publicDeriver) => ({
+              publicDeriver,
+              plate: (undefined: any), // TODO
+            }),
           },
           profile: {
             shouldHideBalance: false,
           },
           delegation: {
             getRequests: (_publicDeriver) => undefined,
+          },
+          transactions: {
+            getTxRequests: (_publicDeriver) => (undefined: any),
           },
         },
         actions: {

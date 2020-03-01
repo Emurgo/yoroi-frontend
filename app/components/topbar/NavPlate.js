@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import type { WalletWithCachedMeta } from '../../stores/toplevel/WalletStore';
 import type { WalletAccountNumberPlate } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { intlShape, defineMessages } from 'react-intl';
 import styles from './NavPlate.scss';
@@ -36,7 +35,7 @@ const messages = defineMessages({
 
 type Props = {|
   +walletName: string,
-  +publicDeriver: null | WalletWithCachedMeta,
+  +plate: null | WalletAccountNumberPlate,
   +walletType: 'standard' | 'paper' | 'trezor' | 'ledger',
 |};
 
@@ -64,11 +63,11 @@ export default class NavPlate extends Component<Props> {
   };
 
   render() {
-    const { publicDeriver, walletName, walletType } = this.props;
+    const { plate, walletName, walletType } = this.props;
     const { intl } = this.context;
 
-    const [accountPlateId, iconComponent] = (publicDeriver && publicDeriver.plate) ?
-      constructPlate(publicDeriver.plate, 0, styles.icon)
+    const [accountPlateId, iconComponent] = (plate) ?
+      constructPlate(plate, 0, styles.icon)
       : [];
 
     let typeText;

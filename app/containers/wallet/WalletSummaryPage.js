@@ -67,6 +67,8 @@ export default class WalletSummaryPage extends Component<Props> {
       const { limit } = searchOptions;
       const noTransactionsFoundLabel = intl.formatMessage(globalMessages.noTransactionsFound);
       if (!recentTransactionsRequest.wasExecuted || hasAny) {
+        const { assuranceMode } = this.props.stores.substores.ada.walletSettings
+          .getPublicDeriverSettingsCache(publicDeriver);
         walletTransactions = (
           <WalletTransactionsList
             transactions={recent}
@@ -74,8 +76,8 @@ export default class WalletSummaryPage extends Component<Props> {
             isLoadingTransactions={isLoadingTx}
             hasMoreToLoad={totalAvailable > limit}
             onLoadMore={() => actions.ada.transactions.loadMoreTransactions.trigger(publicDeriver)}
-            assuranceMode={publicDeriver.assuranceMode}
-            walletId={publicDeriver.self.getPublicDeriverId().toString()}
+            assuranceMode={assuranceMode}
+            walletId={publicDeriver.getPublicDeriverId().toString()}
             shouldHideBalance={profile.shouldHideBalance}
           />
         );

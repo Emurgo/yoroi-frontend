@@ -6,7 +6,6 @@ import moment from 'moment';
 import { observer } from 'mobx-react';
 import BigNumber from 'bignumber.js';
 
-import type { WalletWithCachedMeta } from '../../../stores/toplevel/WalletStore';
 import { getOrDefault } from '../../../domain/Explorer';
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import StakingDashboard from '../../../components/wallet/staking/dashboard/StakingDashboard';
@@ -36,6 +35,7 @@ import { formattedWalletAmount } from '../../../utils/formatters';
 import type { PoolTuples, ReputationObject, } from '../../../api/ada/lib/state-fetch/types';
 import type { DelegationRequests } from '../../../stores/ada/DelegationStore';
 import EpochProgressContainer from './EpochProgressContainer';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 
 import type {
   ToRealTimeFunc,
@@ -69,7 +69,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
     }
-    const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver.self);
+    const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
     await timeCalcRequests.toAbsoluteSlot.execute().promise;
     await timeCalcRequests.toRealTime.execute().promise;
     await timeCalcRequests.currentEpochLength.execute().promise;
@@ -93,7 +93,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
     }
 
     const delegationStore = this.props.stores.substores[environment.API].delegation;
-    const delegationRequests = delegationStore.getRequests(publicDeriver.self);
+    const delegationRequests = delegationStore.getRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
@@ -156,9 +156,9 @@ export default class StakingDashboardPage extends Component<Props, State> {
       </>);
   }
 
-  getEpochLengthInDays: WalletWithCachedMeta => ?number = (publicDeriver) => {
+  getEpochLengthInDays: PublicDeriver<> => ?number = (publicDeriver) => {
     const timeStore = this.props.stores.substores.ada.time;
-    const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver.self);
+    const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
     const getEpochLength = timeCalcRequests.currentEpochLength.result;
     if (getEpochLength == null) return null;
 
@@ -170,7 +170,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
     return epochLengthInDays;
   }
 
-  generatePopupDialog: WalletWithCachedMeta => (null | Node) = (publicDeriver) => {
+  generatePopupDialog: PublicDeriver<> => (null | Node) = (publicDeriver) => {
     const { uiDialogs } = this.props.stores;
     const delegationTxStore = this.props.stores.substores[environment.API].delegationTransaction;
 
@@ -229,20 +229,20 @@ export default class StakingDashboardPage extends Component<Props, State> {
     />);
   }
 
-  getRewardInfo: WalletWithCachedMeta => (void | {|
+  getRewardInfo: PublicDeriver<> => (void | {|
     rewardPopup: Node,
     showWarning: boolean,
   |}) = (publicDeriver) => {
     const timeStore = this.props.stores.substores.ada.time;
-    const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver.self);
-    const currTimeRequests = timeStore.getCurrentTimeRequests(publicDeriver.self);
+    const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
+    const currTimeRequests = timeStore.getCurrentTimeRequests(publicDeriver);
     const toAbsoluteSlot = timeCalcRequests.toAbsoluteSlot.result;
     if (toAbsoluteSlot == null) return undefined;
     const toRealTime = timeCalcRequests.toRealTime.result;
     if (toRealTime == null) return undefined;
 
     const delegationStore = this.props.stores.substores[environment.API].delegation;
-    const delegationRequests = delegationStore.getRequests(publicDeriver.self);
+    const delegationRequests = delegationStore.getRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
@@ -372,11 +372,11 @@ export default class StakingDashboardPage extends Component<Props, State> {
     };
   }
 
-  getErrorInFetch: WalletWithCachedMeta => void | {| error: LocalizableError, |} = (
+  getErrorInFetch: PublicDeriver<> => void | {| error: LocalizableError, |} = (
     publicDeriver
   ) => {
     const delegationStore = this.props.stores.substores[environment.API].delegation;
-    const delegationRequests = delegationStore.getRequests(publicDeriver.self);
+    const delegationRequests = delegationStore.getRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
@@ -401,11 +401,11 @@ export default class StakingDashboardPage extends Component<Props, State> {
     return undefined;
   }
 
-  getStakePools: WalletWithCachedMeta => {| pools: null | Array<Node> |} = (
+  getStakePools: PublicDeriver<> => {| pools: null | Array<Node> |} = (
     publicDeriver
   ) => {
     const delegationStore = this.props.stores.substores[environment.API].delegation;
-    const delegationRequests = delegationStore.getRequests(publicDeriver.self);
+    const delegationRequests = delegationStore.getRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
@@ -549,7 +549,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
 
   _generateUserSummary: {|
     delegationRequests: DelegationRequests,
-    publicDeriver: WalletWithCachedMeta,
+    publicDeriver: PublicDeriver<>,
     errorIfPresent: void | {| error: LocalizableError |}
   |} => Node = (request) => {
     const showRewardAmount = request.delegationRequests.getCurrentDelegation.wasExecuted &&
@@ -570,6 +570,9 @@ export default class StakingDashboardPage extends Component<Props, State> {
       new BigNumber(0)
     );
 
+    const txRequests = this.props.stores.substores.ada.transactions
+      .getTxRequests(request.publicDeriver);
+    const balance = txRequests.requests.getBalanceRequest.result;
     return (
       <UserSummary
         canUnmangleSum={canUnmangleSum}
@@ -577,9 +580,11 @@ export default class StakingDashboardPage extends Component<Props, State> {
         onUnmangle={() => this.props.actions.dialogs.open.trigger({
           dialog: UnmangleTxDialogContainer,
         })}
-        totalAdaSum={request.publicDeriver.amount == null
+        totalAdaSum={balance == null
           ? undefined
-          : this.hideOrFormat(request.publicDeriver.amount)
+          : this.hideOrFormat(balance.dividedBy(
+            LOVELACES_PER_ADA
+          ))
         }
         totalRewards={
           !showRewardAmount || request.delegationRequests.getDelegatedBalance.result == null
@@ -664,10 +669,10 @@ export default class StakingDashboardPage extends Component<Props, State> {
 
   _generateGraphData: {|
     delegationRequests: DelegationRequests,
-    publicDeriver: WalletWithCachedMeta,
+    publicDeriver: PublicDeriver<>,
   |} => GraphData = (request) => {
     const timeStore = this.props.stores.substores.ada.time;
-    const currTimeRequests = timeStore.getCurrentTimeRequests(request.publicDeriver.self);
+    const currTimeRequests = timeStore.getCurrentTimeRequests(request.publicDeriver);
 
     return {
       rewardsGraphData: {

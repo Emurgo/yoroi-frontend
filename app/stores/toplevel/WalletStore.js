@@ -1,6 +1,5 @@
 // @flow
 import { observable, action, computed, runInAction } from 'mobx';
-import BigNumber from 'bignumber.js';
 import { debounce, find, } from 'lodash';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
@@ -31,37 +30,26 @@ import {
 import type {
   IGetLastSyncInfoResponse,
   WalletAccountNumberPlate,
+  IGetSigningKey,
+  IGetPublic,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
 import { Logger, stringifyError } from '../../utils/logging';
-import type { AssuranceMode, } from '../../types/transactionAssuranceTypes';
 import { createAccountPlate } from '../../api/ada/lib/cardanoCrypto/plate';
 import { assuranceModes, } from '../../config/transactionAssuranceConfig';
 
-export type WalletWithCachedMeta = {|
-  self: PublicDeriver<>,
-  plate: null | WalletAccountNumberPlate,
-  publicDeriverName: string,
-  conceptualWalletName: string,
-  amount: null | BigNumber, // TODO: remove this
-  assuranceMode: AssuranceMode,
-  signingKeyUpdateDate: null | Date,
-  lastSyncInfo: IGetLastSyncInfoResponse,
-|};
-
 type GroupedWallets = {|
-  publicDerivers: Array<WalletWithCachedMeta>;
+  publicDerivers: Array<PublicDeriver<>>;
   conceptualWallet: ConceptualWallet;
 |};
 
 function groupWallets(
-  publicDerivers: Array<WalletWithCachedMeta>,
+  publicDerivers: Array<PublicDeriver<>>,
 ): Array<GroupedWallets> {
   const pairingMap = new Map();
   for (const publicDeriver of publicDerivers) {
     // note: this may override previous entries but the result is the same
-    const parent = publicDeriver.self.getParent();
+    const parent = publicDeriver.getParent();
     pairingMap.set(parent, {
       conceptualWallet: parent,
       publicDerivers: [],
@@ -69,7 +57,7 @@ function groupWallets(
   }
   // now fill them with public derivers
   for (const publicDeriver of publicDerivers) {
-    const parentEntry = pairingMap.get(publicDeriver.self.getParent());
+    const parentEntry = pairingMap.get(publicDeriver.getParent());
     if (parentEntry == null) throw new Error('getPairing public deriver without parent');
     parentEntry.publicDerivers.push(publicDeriver);
   }
@@ -82,13 +70,24 @@ export function groupForWallet(
 ): void | GroupedWallets {
   for (const conceptualGroup of grouped) {
     for (const pubDeriver of conceptualGroup.publicDerivers) {
-      if (pubDeriver.self === publicDeriver) {
+      if (pubDeriver === publicDeriver) {
         return conceptualGroup;
       }
     }
   }
   return undefined;
 }
+
+export type SigningKeyCache = {|
+  publicDeriver: IGetSigningKey,
+  // todo: maybe should be a Request instead of just the result data
+  signingKeyUpdateDate: null | Date,
+|};
+
+export type PublicKeyCache = {|
+  publicDeriver: IGetPublic,
+  plate: WalletAccountNumberPlate,
+|};
 
 type DeferredCall<T> = (() => Promise<T>) => Promise<T>;
 
@@ -101,8 +100,8 @@ export default class WalletStore extends Store {
   WALLET_REFRESH_INTERVAL: number = environment.walletRefreshInterval;
   ON_VISIBLE_DEBOUNCE_WAIT: number = 1000;
 
-  @observable publicDerivers: Array<WalletWithCachedMeta>;
-  @observable selected: null | WalletWithCachedMeta;
+  @observable publicDerivers: Array<PublicDeriver<>>;
+  @observable selected: null | PublicDeriver<>;
   @observable getInitialWallets: Request<GetWalletsFunc>
     = new Request<GetWalletsFunc>(getWallets);
   @observable createWalletRequest: Request<DeferredCall<CreateWalletResponse>>
@@ -125,13 +124,31 @@ export default class WalletStore extends Store {
     });
   @observable isImportActive: boolean = false;
 
+  @observable signingKeyCache: Array<SigningKeyCache> = [];
+  getSigningKeyCache: IGetSigningKey => SigningKeyCache = (
+    publicDeriver
+  ) => {
+    const foundRequest = find(this.signingKeyCache, { publicDeriver });
+    if (foundRequest) return foundRequest;
+
+    throw new Error(`${nameof(WalletStore)}::${nameof(this.getSigningKeyCache)} no signing key in cache`);
+  }
+
+  @observable publicKeyCache: Array<PublicKeyCache> = [];
+  getPublicKeyCache: IGetPublic => PublicKeyCache = (
+    publicDeriver
+  ) => {
+    const foundRequest = find(this.publicKeyCache, { publicDeriver });
+    if (foundRequest) return foundRequest;
+
+    throw new Error(`${nameof(WalletStore)}::${nameof(this.getPublicKeyCache)} no public key in cache`);
+  }
+
   setup(): void {
     super.setup();
     this.publicDerivers = [];
     const { wallets, } = this.actions;
     wallets.unselectWallet.listen(this._unsetActiveWallet);
-    wallets.updateBalance.listen(this._updateBalance);
-    wallets.updateLastSync.listen(this._updateLastSync);
     setInterval(this._pollRefresh, this.WALLET_REFRESH_INTERVAL);
     // $FlowFixMe built-in types can't handle visibilitychange
     document.addEventListener('visibilitychange', debounce(this._pollRefresh, this.ON_VISIBLE_DEBOUNCE_WAIT));
@@ -146,18 +163,22 @@ export default class WalletStore extends Store {
     newWallet,
   ) => {
     // set the first created as the result
-    const newWithCachedData: Array<WalletWithCachedMeta> = [];
+    const newWithCachedData: Array<PublicDeriver<>> = [];
     for (const newPublicDeriver of newWallet.publicDerivers) {
-      const withCache = await fromPublicDeriver(newPublicDeriver);
+      const withCache = await this.populateCacheForWallet(newPublicDeriver);
       newWithCachedData.push(withCache);
     }
     this.actions.dialogs.closeActiveDialog.trigger();
-    this.goToWalletRoute(newWithCachedData[0].self);
+    this.goToWalletRoute(newWithCachedData[0]);
 
     this.showWalletCreatedNotification();
 
     for (const pubDeriver of newWithCachedData) {
-      this.registerObserversForNewWallet(pubDeriver);
+      const lastSyncInfo = await pubDeriver.getLastSyncInfo();
+      this.registerObserversForNewWallet({
+        publicDeriver: pubDeriver,
+        lastSyncInfo
+      });
     }
     runInAction(() => {
       this.publicDerivers.push(...newWithCachedData);
@@ -190,7 +211,7 @@ export default class WalletStore extends Store {
     );
   }
 
-  @computed get first(): null | WalletWithCachedMeta {
+  @computed get first(): null | PublicDeriver<> {
     return this.publicDerivers.length === 0
       ? null
       : this.publicDerivers[0];
@@ -202,7 +223,7 @@ export default class WalletStore extends Store {
 
   @computed get activeWalletRoute(): ?string {
     if (this.selected == null) return null;
-    return this.getWalletRoute(this.selected.self);
+    return this.getWalletRoute(this.selected);
   }
 
   @computed get isWalletRoute(): boolean {
@@ -228,7 +249,7 @@ export default class WalletStore extends Store {
   }
 
   async refreshWalletFromRemote(
-    publicDeriver: WalletWithCachedMeta,
+    publicDeriver: PublicDeriver<>,
   ): Promise<void> {
     try {
       const substore = this.stores.substores[environment.API];
@@ -236,7 +257,7 @@ export default class WalletStore extends Store {
         publicDeriver,
         localRequest: false,
       });
-      await substore.addresses.refreshAddressesFromDb(publicDeriver.self);
+      await substore.addresses.refreshAddressesFromDb(publicDeriver);
     } catch (error) {
       Logger.error(`${nameof(WalletStore)}::${nameof(this.refreshWalletFromRemote)} ` + stringifyError(error));
       throw error;
@@ -244,7 +265,7 @@ export default class WalletStore extends Store {
   }
 
   async refreshWalletFromLocalOnLaunch(
-    publicDeriver: WalletWithCachedMeta,
+    publicDeriver: PublicDeriver<>,
   ): Promise<void> {
     try {
       const substore = this.stores.substores[environment.API];
@@ -255,7 +276,7 @@ export default class WalletStore extends Store {
       // if after querying local history we find nothing, we just reset the DB entirely
       const txRequests = find(
         substore.transactions.transactionsRequests,
-        { publicDeriver: publicDeriver.self }
+        { publicDeriver }
       );
       if (txRequests == null) throw new Error(`${nameof(this.refreshWalletFromLocalOnLaunch)} should never happen`);
       const { result } = txRequests.requests.allRequest;
@@ -265,7 +286,7 @@ export default class WalletStore extends Store {
           txRequests.requests[txRequest].reset();
         }
       }
-      await substore.addresses.refreshAddressesFromDb(publicDeriver.self);
+      await substore.addresses.refreshAddressesFromDb(publicDeriver);
     } catch (error) {
       Logger.error(`${nameof(WalletStore)}::${nameof(this.refreshWalletFromLocalOnLaunch)} ` + stringifyError(error));
       throw error;
@@ -276,34 +297,19 @@ export default class WalletStore extends Store {
   addHwWallet: PublicDeriver<> => Promise<void> = async (
     publicDeriver: PublicDeriver<>,
   ): Promise<void> => {
-    const withCache = await fromPublicDeriver(publicDeriver);
+    const lastSyncInfo = await publicDeriver.getLastSyncInfo();
+    const withCache = await this.populateCacheForWallet(publicDeriver);
     // set the first created as the result
     runInAction(() => {
       this.publicDerivers.push(withCache);
       this.selected = withCache;
     });
-    this.goToWalletRoute(withCache.self);
+    this.goToWalletRoute(withCache);
 
-    await this.registerObserversForNewWallet(withCache);
-  }
-
-  // ACTIONS
-
-  @action.bound _updateBalance(request: {|
-    balance: BigNumber,
-    publicDeriver: WalletWithCachedMeta,
-  |}): void {
-    request.publicDeriver.amount = request.balance.dividedBy(
-      LOVELACES_PER_ADA
-    );
-  }
-
-  @action.bound
-  _updateLastSync(request: {|
-    lastSync: IGetLastSyncInfoResponse,
-    publicDeriver: WalletWithCachedMeta,
-  |}): void {
-    request.publicDeriver.lastSyncInfo = request.lastSync;
+    await this.registerObserversForNewWallet({
+      publicDeriver: withCache,
+      lastSyncInfo,
+    });
   }
 
   /** Make all API calls required to setup/update wallet */
@@ -317,13 +323,17 @@ export default class WalletStore extends Store {
     }).promise;
     if (result == null || result.length === 0) return;
 
-    const newWithCachedData: Array<WalletWithCachedMeta> = [];
+    const newWithCachedData: Array<PublicDeriver<>> = [];
     for (const newPublicDeriver of result) {
-      const withCache = await fromPublicDeriver(newPublicDeriver);
+      const withCache = await this.populateCacheForWallet(newPublicDeriver);
       newWithCachedData.push(withCache);
     }
     for (const publicDeriver of newWithCachedData) {
-      this.registerObserversForNewWallet(publicDeriver);
+      const lastSyncInfo = await publicDeriver.getLastSyncInfo();
+      this.registerObserversForNewWallet({
+        publicDeriver,
+        lastSyncInfo
+      });
     }
     for (const publicDeriver of newWithCachedData) {
       await this.refreshWalletFromLocalOnLaunch(publicDeriver);
@@ -338,21 +348,24 @@ export default class WalletStore extends Store {
     });
   };
 
-  @action registerObserversForNewWallet: WalletWithCachedMeta => void = (
-    publicDeriver
+  @action registerObserversForNewWallet: {|
+    publicDeriver: PublicDeriver<>,
+    lastSyncInfo: IGetLastSyncInfoResponse,
+  |} => void = (
+    request
   ) => {
     const stores = this.stores.substores[environment.API];
-    stores.addresses.addObservedWallet(publicDeriver);
-    stores.transactions.addObservedWallet(publicDeriver);
-    stores.time.addObservedTime(publicDeriver);
-    if (asGetStakingKey(publicDeriver.self) != null) {
-      stores.delegation.addObservedWallet(publicDeriver);
+    stores.addresses.addObservedWallet(request.publicDeriver);
+    stores.transactions.addObservedWallet(request);
+    stores.time.addObservedTime(request.publicDeriver);
+    if (asGetStakingKey(request.publicDeriver) != null) {
+      stores.delegation.addObservedWallet(request.publicDeriver);
     }
   };
 
   // =================== ACTIVE WALLET ==================== //
 
-  @action _setActiveWallet: {| wallet: WalletWithCachedMeta |} => void = (
+  @action _setActiveWallet: {| wallet: PublicDeriver<> |} => void = (
     { wallet }
   ) => {
     this.selected = wallet;
@@ -408,7 +421,7 @@ export default class WalletStore extends Store {
         // We have a route for a specific wallet -> lets try to find it
         let publicDeriverForRoute = undefined;
         for (const publicDeriver of this.publicDerivers) {
-          if (publicDeriver.self.getPublicDeriverId().toString() === matchWalletRoute.id) {
+          if (publicDeriver.getPublicDeriverId().toString() === matchWalletRoute.id) {
             publicDeriverForRoute = publicDeriver;
           }
         }
@@ -417,7 +430,7 @@ export default class WalletStore extends Store {
           this._setActiveWallet({ wallet: publicDeriverForRoute });
         } else if (hasAnyPublicDeriver) {
           if (this.selected != null) {
-            this.goToWalletRoute(this.selected.self);
+            this.goToWalletRoute(this.selected);
           }
         }
       } else if (this._canRedirectToWallet) {
@@ -426,7 +439,7 @@ export default class WalletStore extends Store {
           this._setActiveWallet({ wallet: this.publicDerivers[0] });
         }
         if (this.selected != null) {
-          this.goToWalletRoute(this.selected.self);
+          this.goToWalletRoute(this.selected);
         }
       }
     });
@@ -468,45 +481,55 @@ export default class WalletStore extends Store {
     };
     this.actions.notifications.open.trigger(notification);
   }
-}
 
-async function fromPublicDeriver(
-  publicDeriver: PublicDeriver<>,
-): Promise<WalletWithCachedMeta> {
-  const withPubKey = asGetPublicKey(publicDeriver);
+  // TODO: maybe delete this function and turn it into another "addObservedWallet"
+  populateCacheForWallet: PublicDeriver<> => Promise<PublicDeriver<>> = async (
+    publicDeriver,
+  ) => {
+    const withPubKey = asGetPublicKey(publicDeriver);
 
-  let plate = null;
-  if (withPubKey != null) {
-    const publicKey = await withPubKey.getPublicKey();
-    if (publicKey.IsEncrypted) {
-      throw new Error('fromPublicDeriver unexpected encrypted public key');
+    if (withPubKey != null) {
+      const publicKey = await withPubKey.getPublicKey();
+      if (publicKey.IsEncrypted) {
+        throw new Error('fromPublicDeriver unexpected encrypted public key');
+      }
+      runInAction(() => {
+        this.publicKeyCache.push({
+          publicDeriver: withPubKey,
+          plate: createAccountPlate(publicKey.Hash),
+        });
+      });
     }
-    plate = createAccountPlate(publicKey.Hash);
-  }
 
-  const publicDeriverInfo = await publicDeriver.getFullPublicDeriverInfo();
-  const conceptualWalletInfo = await publicDeriver
-    .getParent()
-    .getFullConceptualWalletInfo();
+    const publicDeriverInfo = await publicDeriver.getFullPublicDeriverInfo();
+    const conceptualWalletInfo = await publicDeriver
+      .getParent()
+      .getFullConceptualWalletInfo();
 
-  let signingKeyUpdateDate = null;
-  {
-    const withSigningKey = asGetSigningKey(publicDeriver);
-    if (withSigningKey) {
-      const key = await withSigningKey.getSigningKey();
-      signingKeyUpdateDate = key.row.PasswordLastUpdate;
+    {
+      const withSigningKey = asGetSigningKey(publicDeriver);
+      if (withSigningKey) {
+        const key = await withSigningKey.getSigningKey();
+        runInAction(() => {
+          this.signingKeyCache.push({
+            publicDeriver: withSigningKey,
+            signingKeyUpdateDate: key.row.PasswordLastUpdate
+          });
+        });
+      }
     }
-  }
+    runInAction(() => {
+      this.stores.substores.ada.walletSettings.publicDeriverSettingsCache.push({
+        publicDeriver,
+        assuranceMode: assuranceModes.NORMAL,
+        publicDeriverName: publicDeriverInfo.Name,
+      });
+      this.stores.substores.ada.walletSettings.conceptualWalletSettingsCache.push({
+        conceptualWallet: publicDeriver.getParent(),
+        conceptualWalletName: conceptualWalletInfo.Name,
+      });
+    });
 
-  const lastSyncInfo = await publicDeriver.getLastSyncInfo();
-  return {
-    self: publicDeriver,
-    plate,
-    publicDeriverName: publicDeriverInfo.Name,
-    conceptualWalletName: conceptualWalletInfo.Name,
-    amount: null,
-    assuranceMode: assuranceModes.NORMAL,
-    signingKeyUpdateDate,
-    lastSyncInfo,
-  };
+    return publicDeriver;
+  }
 }

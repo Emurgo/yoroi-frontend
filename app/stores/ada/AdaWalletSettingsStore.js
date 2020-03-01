@@ -17,9 +17,9 @@ import {
 import type {
   IPublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import type { WalletWithCachedMeta } from '../toplevel/WalletStore';
 import { removeAllTransactions } from '../../api/ada/lib/storage/bridge/updateTransactions';
 import { removePublicDeriver } from '../../api/ada/lib/storage/bridge/walletBuilder/remove';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
   Logger,
 } from '../../utils/logging';
@@ -55,11 +55,11 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
   }
 
   @action _changeSigningPassword: {|
-    publicDeriver: WalletWithCachedMeta,
+    publicDeriver: PublicDeriver<>,
     oldPassword: string,
     newPassword: string
   |} => Promise<void> = async (request) => {
-    const withSigningKey = asGetSigningKey(request.publicDeriver.self);
+    const withSigningKey = asGetSigningKey(request.publicDeriver);
     if (withSigningKey == null) {
       throw new Error(`${nameof(this._changeSigningPassword)} missing signing functionality`);
     }
@@ -72,36 +72,36 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
         newPassword: request.newPassword,
       },
     });
+    runInAction(() => {
+      this.stores.wallets.getSigningKeyCache(withSigningKey).signingKeyUpdateDate = newUpdateDate;
+    });
     this.actions.dialogs.closeActiveDialog.trigger();
     this.changeSigningKeyRequest.reset();
-
-    runInAction(() => {
-      request.publicDeriver.signingKeyUpdateDate = newUpdateDate;
-    });
   };
 
   @action _renamePublicDeriver: {|
-    publicDeriver: WalletWithCachedMeta,
+    publicDeriver: PublicDeriver<>,
     newName: string
   |} => Promise<void> = async (request) => {
     // update the meta-parameters in the internal wallet representation
     await this.renameModelRequest.execute({
-      func: request.publicDeriver.self.rename,
+      func: request.publicDeriver.rename,
       request: {
         newName: request.newName,
       },
     }).promise;
 
+    const settingsCache = this.getPublicDeriverSettingsCache(request.publicDeriver);
     runInAction(() => {
-      request.publicDeriver.publicDeriverName = request.newName;
+      settingsCache.publicDeriverName = request.newName;
     });
   };
 
   @action _renameConceptualWallet: {|
-    publicDeriver: WalletWithCachedMeta,
+    publicDeriver: PublicDeriver<>,
     newName: string
   |} => Promise<void> = async (request) => {
-    const conceptualWallet = request.publicDeriver.self.getParent();
+    const conceptualWallet = request.publicDeriver.getParent();
     // update the meta-parameters in the internal wallet representation
     await this.renameModelRequest.execute({
       func: conceptualWallet.rename,
@@ -110,43 +110,51 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
       },
     }).promise;
 
+    const parent = request.publicDeriver.getParent();
+    const settingsCache = this.getConceptualWalletSettingsCache(parent);
     runInAction(() => {
-      request.publicDeriver.conceptualWalletName = request.newName;
+      settingsCache.conceptualWalletName = request.newName;
     });
   };
 
   @action _resyncHistory: {|
-    publicDeriver: WalletWithCachedMeta,
+    publicDeriver: PublicDeriver<>,
   |} => Promise<void> = async (request) => {
     this.clearHistory.reset();
-    const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver.self);
+    const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
     if (withLevels == null) {
       throw new Error(`${nameof(this._resyncHistory)} missing levels`);
     }
     await this.clearHistory.execute({
       publicDeriver: withLevels,
-      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
+      refreshWallet: () => {
+        // clear cache
+        const txRequests = this.stores.substores.ada.transactions
+          .getTxRequests(request.publicDeriver);
+        for (const txRequest of Object.keys(txRequests.requests)) {
+          txRequests.requests[txRequest].reset();
+        }
+        // refresh
+        return this.stores.wallets.refreshWalletFromRemote(request.publicDeriver);
+      }
     }).promise;
-    runInAction(() => {
-      request.publicDeriver.amount = null; // TODO: properly clear cache
-    });
   };
 
   @action _removeWallet: {|
-    publicDeriver: WalletWithCachedMeta,
+    publicDeriver: PublicDeriver<>,
   |} => Promise<void> = async (request) => {
     this.removeWalletRequest.reset();
     this.stores.wallets.selected = null; // deselect before deleting
 
     const group = groupForWallet(
       this.stores.wallets.grouped,
-      request.publicDeriver.self
+      request.publicDeriver
     );
     if (group == null) {
       throw new Error(`${nameof(this._removeWallet)} wallet doesn't belong to group`);
     }
     await this.removeWalletRequest.execute({
-      publicDeriver: request.publicDeriver.self,
+      publicDeriver: request.publicDeriver,
       conceptualWallet: group.publicDerivers.length === 1
         ? group.conceptualWallet
         : undefined

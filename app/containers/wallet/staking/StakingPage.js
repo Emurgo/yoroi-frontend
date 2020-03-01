@@ -7,6 +7,7 @@ import InformativeError from '../../../components/widgets/InformativeError';
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
 import { formattedAmountWithoutLovelace } from '../../../utils/formatters';
 import environment from '../../../environment';
+import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
 
 import type { InjectedProps } from '../../../types/injectedPropsType';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
@@ -69,14 +70,19 @@ export default class StakingPage extends Component<Props> {
     if (!publicDeriver) {
       return null;
     }
-    if (publicDeriver.amount) {
+    const txRequests = this.props.stores.substores.ada.transactions
+      .getTxRequests(publicDeriver);
+    const balance = txRequests.requests.getBalanceRequest.result;
+    if (balance != null) {
       // Seiza does not understand decimal places, so removing all Lovelaces
-      finalURL += `&userAda=${formattedAmountWithoutLovelace(publicDeriver.amount)}`;
+      finalURL += `&userAda=${formattedAmountWithoutLovelace(balance.dividedBy(
+        LOVELACES_PER_ADA
+      ))}`;
     }
 
     finalURL += `&locale=${this.props.stores.profile.currentLocale}`;
     const delegationStore = this.props.stores.substores.ada.delegation;
-    const delegationRequests = delegationStore.getRequests(publicDeriver.self);
+    const delegationRequests = delegationStore.getRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingPage)} opened for non-reward wallet`);
     }

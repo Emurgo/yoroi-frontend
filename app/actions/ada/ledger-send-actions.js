@@ -2,7 +2,7 @@
 import { AsyncAction, Action } from '../lib/Action';
 import type { BaseSignRequest } from '../../api/ada/transactions/types';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import type { WalletWithCachedMeta } from '../../stores/toplevel/WalletStore';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 export type SendUsingLedgerParams = {|
   signRequest: BaseSignRequest<RustModule.WalletV2.Transaction>,
@@ -15,6 +15,6 @@ export default class LedgerSendActions {
   cancel: Action<void> = new Action();
   sendUsingLedger: AsyncAction<{|
     params: SendUsingLedgerParams,
-    publicDeriver: WalletWithCachedMeta,
+    publicDeriver: PublicDeriver<>,
   |}> = new AsyncAction();
 }

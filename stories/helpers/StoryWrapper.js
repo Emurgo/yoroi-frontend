@@ -1,6 +1,7 @@
 // @flow
 
 import React, { Component } from 'react';
+import { observer } from 'mobx-react';
 import { ThemeProvider } from 'react-polymorph/lib/components/ThemeProvider';
 import { addLocaleData, IntlProvider } from 'react-intl';
 import en from 'react-intl/locale-data/en';
@@ -19,16 +20,20 @@ import { themeOverrides } from '../../app/themes/overrides';
 import { translations, LANGUAGES } from '../../app/i18n/translations';
 import ThemeManager from '../../app/ThemeManager';
 import { THEMES, changeToplevelTheme } from '../../app/themes';
+import type { Theme } from '../../app/themes';
 import environment from '../../app/environment';
+import { getVarsForTheme } from '../../app/stores/toplevel/ProfileStore';
 
 import { withKnobs, select, boolean } from '@storybook/addon-knobs';
 import { addDecorator } from '@storybook/react';
 
-import type { WalletWithCachedMeta } from '../../app/stores/toplevel/WalletStore';
-import { assuranceModes } from '../../app/config/transactionAssuranceConfig';
 import { PublicDeriver } from '../../app/api/ada/lib/storage/models/PublicDeriver';
 import { ConceptualWallet } from '../../app/api/ada/lib/storage/models/ConceptualWallet';
+import { Cip1852Wallet } from '../../app/api/ada/lib/storage/models/Cip1852Wallet/wrapper';
 import { WalletTypeOption } from '../../app/api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import { HasSign, HasLevels, GetSigningKey,  } from '../../app/api/ada/lib/storage/models/PublicDeriver/traits';
+
+
 /**
  * This whole file is meant to mirror code in App.js
  */
@@ -47,12 +52,16 @@ type Props = { +children: any, ... };
 environment.isShelley = () => boolean('IsJormungandr', true);
 environment.isNightly = () => boolean('IsNightly', false);
 
-export const globalKnobs = {
+export const globalKnobs: {|
+  locale: void => string,
+  currentTheme: void => Theme,
+|} = {
   // needs to use functions for storybook to work properly
   locale: () => select('Language', langCode, langCode[0]),
   currentTheme: () => select('Theme', themeNames, THEMES.YOROI_MODERN),
 };
 
+@observer
 export default class StoryWrapper extends Component<Props> {
 
   render() {
@@ -67,10 +76,7 @@ export default class StoryWrapper extends Component<Props> {
     const mergedMessages = Object.assign({}, translations['en-US'], translations[locale]);
 
     // eslint-disable-next-line prefer-object-spread
-    const { getThemeVars } = require(`../../app/themes/prebuilt/${currentTheme}.js`);
-    const themeVars = environment.isShelley()
-      ? getThemeVars('shelley')
-      : getThemeVars(undefined);
+    const themeVars = getVarsForTheme({ theme: currentTheme });
 
     changeToplevelTheme(currentTheme);
 
@@ -139,9 +145,7 @@ export function getPasswordCreationCases(long?: string): {|
   };
 }
 
-export function getDummyWallet(data?: {|
-  signingKeyUpdateDate?: Date,
-|}): WalletWithCachedMeta {
+export function getDummyWallet(): PublicDeriver<> {
   const parent = (((new ConceptualWallet({
     db: (null: any),
     conceptualWalletId: 0,
@@ -154,20 +158,37 @@ export function getDummyWallet(data?: {|
     pathToPublic: [],
     derivationId: 0,
   });
-  return {
-    self,
-    plate: null,
-    publicDeriverName: 'publicDeriverName',
-    conceptualWalletName: 'conceptualWalletName',
-    amount: null,
-    assuranceMode: assuranceModes.NORMAL,
-    signingKeyUpdateDate: data?.signingKeyUpdateDate || null,
-    lastSyncInfo: {
-      LastSyncInfoId: 0,
-      Time: null,
-      SlotNum: null,
-      BlockHash: null,
-      Height: 0,
+  return self;
+}
+
+export function getSigningWallet(): PublicDeriver<> {
+  const parent = new Cip1852Wallet(
+    (null: any),
+    {
+      db: (null: any),
+      conceptualWalletId: 0,
+      walletType: WalletTypeOption.WEB_WALLET,
+      hardwareInfo: null,
     },
-  };
+    {
+      Cip1852WrapperId: 0,
+      ConceptualWalletId: 0,
+      SignerLevel: null,
+      PublicDeriverLevel: 0,
+      PrivateDeriverLevel: null,
+      PrivateDeriverKeyDerivationId: null,
+      RootKeyDerivationId: 0,
+    },
+    null,
+    null,
+    0,
+  );
+  const clazz = GetSigningKey(HasLevels(HasSign(PublicDeriver)));
+  const self = new clazz({
+    publicDeriverId: 0,
+    parent,
+    pathToPublic: [],
+    derivationId: 0,
+  });
+  return self;
 }

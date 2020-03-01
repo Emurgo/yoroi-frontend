@@ -55,7 +55,7 @@ const ButtonCases = Object.freeze({
   HasMoreLoading: 2,
 });
 export const Generic = () => {
-  const buttonState = select(
+  const buttonState = () => select(
     'loadButton',
     ButtonCases,
     ButtonCases.NoMore,
@@ -88,9 +88,9 @@ export const Generic = () => {
               skip: 0,
               limit: 0,
             },
-            isLoading: buttonState === ButtonCases.HasMoreLoading,
-            hasMoreToLoad: buttonState === ButtonCases.HasMore ||
-              buttonState === ButtonCases.HasMoreLoading,
+            isLoading: buttonState() === ButtonCases.HasMoreLoading,
+            hasMoreToLoad: buttonState() === ButtonCases.HasMore ||
+              buttonState() === ButtonCases.HasMoreLoading,
           },
         },
         actions: {

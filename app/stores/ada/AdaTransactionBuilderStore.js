@@ -196,7 +196,7 @@ export default class AdaTransactionBuilderStore extends Store {
       this.createUnsignedTx.cancel();
     }
 
-    const withUtxos = asGetAllUtxos(publicDeriver.self);
+    const withUtxos = asGetAllUtxos(publicDeriver);
     if (withUtxos == null) {
       throw new Error('_updateTxBuilder missing utxo functionality');
     }

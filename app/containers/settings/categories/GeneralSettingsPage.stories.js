@@ -8,10 +8,10 @@ import { LANGUAGES } from '../../../i18n/translations';
 import GeneralSettingsPage from './GeneralSettingsPage';
 import { withScreenshot } from 'storycap';
 import { globalKnobs } from '../../../../stories/helpers/StoryWrapper';
-import ProfileStore from '../../../stores/toplevel/ProfileStore';
-import { getDefaultExplorer } from '../../../domain/Explorer';
+import { getVarsForTheme } from '../../../stores/toplevel/ProfileStore';
 import { wrapSettings } from '../../../Routes';
 import { mockSettingsProps } from '../Settings.mock';
+import { getDefaultExplorer } from '../../../domain/Explorer';
 
 export default {
   title: `Container/${nameof(GeneralSettingsPage)}`,
@@ -38,8 +38,8 @@ export const Generic = () => wrapSettings(
           currentLocale: globalKnobs.locale(),
           selectedExplorer: getDefaultExplorer(),
           currentTheme: globalKnobs.currentTheme(),
-          getThemeVars: ProfileStore.prototype.getThemeVars,
-          hasCustomTheme: boolean('hasCustomTheme', false),
+          getThemeVars: getVarsForTheme,
+          hasCustomTheme: () => boolean('hasCustomTheme', false),
         },
       },
       actions: {

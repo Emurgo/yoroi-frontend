@@ -50,7 +50,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
     if (selected == null) {
       throw new Error(`${nameof(UnmangleTxDialogContainer)} no wallet selected`);
     }
-    const withChains = asHasUtxoChains(selected.self);
+    const withChains = asHasUtxoChains(selected);
     if (withChains == null) {
       throw new Error(`${nameof(UnmangleTxDialogContainer)} no chains`);
     }

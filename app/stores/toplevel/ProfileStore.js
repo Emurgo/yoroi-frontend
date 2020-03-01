@@ -107,7 +107,7 @@ export default class ProfileStore extends Store {
             // if user only has 1 wallet, just go to it directly as a shortcut
             this.actions.router.goToRoute.trigger({
               route: ROUTES.WALLETS.TRANSACTIONS,
-              params: { id: firstWallet.self.getPublicDeriverId() }
+              params: { id: firstWallet.getPublicDeriverId() }
             });
           } else {
             this.actions.router.goToRoute.trigger({
@@ -234,9 +234,6 @@ export default class ProfileStore extends Store {
 
   static getDefaultLocale(): string {
     return 'en-US';
-  }
-  static getDefaultTheme(): Theme {
-    return THEMES.YOROI_CLASSIC;
   }
 
   // ========== Locale ========== //
@@ -391,14 +388,8 @@ export default class ProfileStore extends Store {
     }
   };
 
-  getThemeVars: {| theme: string |} => { [key: string]: string, ... } = ({ theme }) => {
-    const { getThemeVars } = theme
-      ? require(`../../themes/prebuilt/${theme}.js`)
-      : require(`../../themes/prebuilt/${ProfileStore.getDefaultTheme()}.js`);
-    if (environment.isShelley()) {
-      return getThemeVars('shelley');
-    }
-    return getThemeVars(undefined);
+  getThemeVars: {| theme: string |} => { [key: string]: string, ... } = (request) => {
+    return getVarsForTheme(request);
   };
 
   hasCustomTheme: void => boolean = (): boolean => {
@@ -551,6 +542,16 @@ export default class ProfileStore extends Store {
     }
   }
 }
+
+export const getVarsForTheme: {|
+  theme: string
+|} => { [key: string]: string, ... } = ({ theme }) => {
+  const { getThemeVars } = require(`../../themes/prebuilt/${theme}.js`);
+  if (environment.isShelley()) {
+    return getThemeVars('shelley');
+  }
+  return getThemeVars(undefined);
+};
 
 export function getPaperWalletIntro(
   currentLocale: string,

@@ -14,7 +14,7 @@ import {
   asGetSigningKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import type { WalletWithCachedMeta } from '../toplevel/WalletStore';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 export default class AdaWalletsStore extends Store {
 
@@ -42,9 +42,9 @@ export default class AdaWalletsStore extends Store {
   _sendMoney:  {|
     signRequest: BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>,
     password: string,
-    publicDeriver: WalletWithCachedMeta,
+    publicDeriver: PublicDeriver<>,
   |} => Promise<void> = async (transactionDetails) => {
-    const withSigning = (asGetSigningKey(transactionDetails.publicDeriver.self));
+    const withSigning = (asGetSigningKey(transactionDetails.publicDeriver));
     if (withSigning == null) {
       throw new Error(`${nameof(this._sendMoney)} public deriver missing signing functionality.`);
     }
@@ -63,7 +63,7 @@ export default class AdaWalletsStore extends Store {
     this.actions.dialogs.closeActiveDialog.trigger();
     this.sendMoneyRequest.reset();
     // go to transaction screen
-    this.stores.wallets.goToWalletRoute(transactionDetails.publicDeriver.self);
+    this.stores.wallets.goToWalletRoute(transactionDetails.publicDeriver);
   };
 
   @action _onRouteChange: {| route: string, params: ?Object |} => void = (options) => {

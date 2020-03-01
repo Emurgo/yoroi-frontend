@@ -115,6 +115,7 @@
   "myWallets.wallets.lastSyncText": "Last sync",
   "myWallets.wallets.sumInfoText": "Total wallet balance",
   "networkError.label.message": "WARNING: Connection to the server failed.<br>Please check your internet connection or <a target='blank' href='https://twitter.com/YoroiWallet'>our Twitter account</a>.<br>The displayed balance and transaction history may appear incorrect until our servers are back to normal, but your actual balance is not affected.",
+  "nightly.banner.label.message": "YOU ARE ON YOROI NIGHTLY ({network}).",
   "noticeBoard.noNoticeText.chooseAPool": "To view notifications here, first <strong>choose a stake pool</strong> and delegate your ADA.",
   "noticeBoard.noNoticeText.notDelegatedYet": "You have not delegated a stake yet.",
   "noticeBoard.notice.costChanged.subMessage": "Old cost was {oldCost} {currency} and new cost is {newCost} {currency}",

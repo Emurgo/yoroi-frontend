@@ -14,12 +14,17 @@ import NavDropdown from '../components/topbar/NavDropdown';
 import NavDropdownRow from '../components/topbar/NavDropdownRow';
 import { ROUTES } from '../routes-config';
 import { LOVELACES_PER_ADA } from '../config/numbersConfig';
-import type { WalletWithCachedMeta } from '../stores/toplevel/WalletStore';
 import { isLedgerNanoWallet, isTrezorTWallet } from '../api/ada/lib/storage/models/ConceptualWallet/index';
+import {
+  asGetPublicKey,
+} from '../api/ada/lib/storage/models/PublicDeriver/traits';
 import ProfileActions from '../actions/profile-actions';
 import RouterActions from '../actions/router-actions';
 import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
 import type { DelegationRequests } from '../stores/ada/DelegationStore';
+import type { TxRequests } from '../stores/base/TransactionsStore';
+import WalletSettingsStore from '../stores/base/WalletSettingsStore';
+import WalletStore from '../stores/toplevel/WalletStore';
 
 const messages = defineMessages({
   allWalletsLabel: {
@@ -30,15 +35,23 @@ const messages = defineMessages({
 
 export type GeneratedData = {|
   +stores: {|
+    +walletSettings: {|
+      +getConceptualWalletSettingsCache:
+        typeof WalletSettingsStore.prototype.getConceptualWalletSettingsCache,
+    |},
     +wallets: {|
-      +selected: null | WalletWithCachedMeta,
-      +publicDerivers: Array<WalletWithCachedMeta>,
+      +selected: null | PublicDeriver<>,
+      +publicDerivers: Array<PublicDeriver<>>,
+      +getPublicKeyCache: typeof WalletStore.prototype.getPublicKeyCache,
     |},
     +profile: {|
       +shouldHideBalance: boolean,
     |},
     +delegation: {|
       +getRequests: PublicDeriver<> => (void | DelegationRequests),
+    |},
+    +transactions: {|
+      +getTxRequests: PublicDeriver<> => TxRequests,
     |},
   |},
   +actions: {|
@@ -77,15 +90,23 @@ export default class NavBarContainer extends Component<Props> {
     const { stores, actions } = this.props;
     return Object.freeze({
       stores: {
+        walletSettings: {
+          getConceptualWalletSettingsCache: stores.substores.ada.walletSettings
+            .getConceptualWalletSettingsCache,
+        },
         wallets: {
           selected: stores.wallets.selected,
           publicDerivers: stores.wallets.publicDerivers,
+          getPublicKeyCache: stores.wallets.getPublicKeyCache,
         },
         profile: {
           shouldHideBalance: stores.profile.shouldHideBalance,
         },
         delegation: {
           getRequests: stores.substores.ada.delegation.getRequests,
+        },
+        transactions: {
+          getTxRequests: stores.substores.ada.transactions.getTxRequests,
         },
       },
       actions: {
@@ -109,13 +130,16 @@ export default class NavBarContainer extends Component<Props> {
     const { profile } = stores;
 
     const walletsStore = stores.wallets;
-    const publicDeriver = walletsStore.selected;
-    if (publicDeriver == null) return null;
 
     const wallets = this.generated.stores.wallets.publicDerivers;
 
     let utxoTotal = new BigNumber(0);
-    for (const walletUtxoAmount of wallets.map(wallet => wallet.amount)) {
+    const walletBalances = wallets.map(wallet => stores.transactions
+      .getTxRequests(wallet).requests.getBalanceRequest.result
+      ?.dividedBy(
+        LOVELACES_PER_ADA
+      ));
+    for (const walletUtxoAmount of walletBalances) {
       if (walletUtxoAmount == null) {
         utxoTotal = null;
         break;
@@ -134,38 +158,44 @@ export default class NavBarContainer extends Component<Props> {
       rewardTotal = rewardTotal?.plus(amount);
     }
 
-    const dropdownHead = (
-      <NavWalletDetails
-        onUpdateHideBalance={this.updateHideBalance}
-        shouldHideBalance={profile.shouldHideBalance}
-        rewards={this.getRewardBalance(publicDeriver)}
-        walletAmount={publicDeriver.amount}
-      />
-    );
+    const walletComponents = wallets.map(wallet => {
+      const txRequests = this.generated.stores.transactions.getTxRequests(wallet);
+      const balance = txRequests.requests.getBalanceRequest.result
+        ?.dividedBy(LOVELACES_PER_ADA) || null;
 
-    const walletComponents = wallets.map(wallet => (
-      <NavDropdownRow
-        key={wallet.self.getPublicDeriverId()}
-        plateComponent={<NavPlate
-          publicDeriver={wallet}
-          walletName={wallet.conceptualWalletName}
-          walletType={getWalletType(wallet)}
-        />}
-        isCurrentWallet={wallet === this.generated.stores.wallets.selected}
-        syncTime={wallet.lastSyncInfo.Time
-          ? moment(wallet.lastSyncInfo.Time).fromNow()
-          : null
-        }
-        detailComponent={
-          <NavWalletDetails
-            walletAmount={wallet.amount}
-            onUpdateHideBalance={this.updateHideBalance}
-            shouldHideBalance={profile.shouldHideBalance}
-            rewards={this.getRewardBalance(wallet)}
-          />
-        }
-      />
-    ));
+      const parent = wallet.getParent();
+      const settingsCache = this.generated.stores.walletSettings
+        .getConceptualWalletSettingsCache(parent);
+
+      const withPubKey = asGetPublicKey(wallet);
+      const plate = withPubKey == null
+        ? null
+        : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
+
+      return (
+        <NavDropdownRow
+          key={wallet.getPublicDeriverId()}
+          plateComponent={<NavPlate
+            plate={plate}
+            walletName={settingsCache.conceptualWalletName}
+            walletType={getWalletType(wallet)}
+          />}
+          isCurrentWallet={wallet === this.generated.stores.wallets.selected}
+          syncTime={txRequests.lastSyncInfo.Time
+            ? moment(txRequests.lastSyncInfo.Time).fromNow()
+            : null
+          }
+          detailComponent={
+            <NavWalletDetails
+              walletAmount={balance}
+              onUpdateHideBalance={this.updateHideBalance}
+              shouldHideBalance={profile.shouldHideBalance}
+              rewards={this.getRewardBalance(wallet)}
+            />
+          }
+        />
+      );
+    });
     const dropdownContent = (
       <>
         <NavDropdownRow
@@ -184,23 +214,47 @@ export default class NavBarContainer extends Component<Props> {
       </>
     );
 
-    const dropdownComponent = (
-      <NavDropdown
-        headerComponent={dropdownHead}
-        contentComponents={dropdownContent}
-        onAddWallet={
-          () => this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
-        }
-      />
-    );
+    const publicDeriver = walletsStore.selected;
+    if (publicDeriver == null) return null;
+    const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
+    const parent = publicDeriver.getParent();
+    const settingsCache = this.generated.stores.walletSettings
+      .getConceptualWalletSettingsCache(parent);
+
+    const withPubKey = asGetPublicKey(publicDeriver);
+    const plate = withPubKey == null
+      ? null
+      : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
+
+    const dropdownComponent = (() => {
+      const balance = txRequests.requests.getBalanceRequest.result
+        ?.dividedBy(LOVELACES_PER_ADA) || null;
+      const dropdownHead = (
+        <NavWalletDetails
+          onUpdateHideBalance={this.updateHideBalance}
+          shouldHideBalance={profile.shouldHideBalance}
+          rewards={this.getRewardBalance(publicDeriver)}
+          walletAmount={balance}
+        />
+      );
+      return (
+        <NavDropdown
+          headerComponent={dropdownHead}
+          contentComponents={dropdownContent}
+          onAddWallet={
+            () => this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
+          }
+        />
+      );
+    })();
 
     return (
       <NavBar
         title={this.props.title}
         walletPlate={
           <NavPlate
-            publicDeriver={walletsStore.selected}
-            walletName={publicDeriver.conceptualWalletName}
+            plate={plate}
+            walletName={settingsCache.conceptualWalletName}
             walletType={getWalletType(publicDeriver)}
           />
         }
@@ -214,11 +268,11 @@ export default class NavBarContainer extends Component<Props> {
    * null => still calculating
    * value => done calculating
    */
-  getRewardBalance: WalletWithCachedMeta => null | void | BigNumber = (
+  getRewardBalance: PublicDeriver<> => null | void | BigNumber = (
     publicDeriver
   ) => {
     const delegationRequest = this.generated.stores.delegation.getRequests(
-      publicDeriver.self
+      publicDeriver
     );
     if (delegationRequest == null) return undefined;
 
@@ -230,8 +284,8 @@ export default class NavBarContainer extends Component<Props> {
   }
 }
 
-function getWalletType(publicDeriver: WalletWithCachedMeta) {
-  const conceptualWallet = publicDeriver.self.getParent();
+function getWalletType(publicDeriver: PublicDeriver<>) {
+  const conceptualWallet = publicDeriver.getParent();
   if (isLedgerNanoWallet(conceptualWallet)) {
     return 'ledger';
   }

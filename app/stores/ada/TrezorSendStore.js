@@ -22,7 +22,7 @@ import {
   convertToLocalizableError
 } from '../../domain/TrezorLocalizedError';
 import LocalizableError from '../../i18n/LocalizableError';
-import type { WalletWithCachedMeta } from '../toplevel/WalletStore';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 /** Note: Handles Trezor Signing */
 export default class TrezorSendStore extends Store {
@@ -56,7 +56,7 @@ export default class TrezorSendStore extends Store {
   /** Generates a payload with Trezor format and tries Send ADA using Trezor signing */
   _sendUsingTrezor: {|
     params: SendUsingTrezorParams,
-    publicDeriver: WalletWithCachedMeta,
+    publicDeriver: PublicDeriver<>,
   |} => Promise<void> = async (request) => {
     try {
       this.createTrezorSignTxDataRequest.reset();
@@ -105,7 +105,7 @@ export default class TrezorSendStore extends Store {
 
   _brodcastSignedTx: (
     CardanoSignTransaction$,
-    WalletWithCachedMeta,
+    PublicDeriver<>,
   ) => Promise<void> = async (
     trezorSignTxResp,
     publicDeriver,
@@ -128,7 +128,7 @@ export default class TrezorSendStore extends Store {
     this.actions.dialogs.closeActiveDialog.trigger();
 
     // go to transaction screen
-    wallets.goToWalletRoute(publicDeriver.self);
+    wallets.goToWalletRoute(publicDeriver);
 
     Logger.info('SUCCESS: ADA sent using Trezor SignTx');
   }

@@ -242,7 +242,7 @@ function CustomWorld(cmdInput: WorldInput) {
       const selected = window.yoroi.stores.wallets.selected;
       if (selected == null) throw new Error('executeScript no public deriver selected');
       window.yoroi.api.ada.saveLastReceiveAddressIndex({
-        publicDeriver: selected.self,
+        publicDeriver: selected,
         index: i,
       });
     }, index);
