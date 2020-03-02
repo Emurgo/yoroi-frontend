@@ -13,12 +13,15 @@ export default {
   decorators: [withScreenshot],
 };
 
-export const Generic = () => wrapSettings(
-  mockSettingsProps,
-  (<SupportSettingsPage
-    generated={{
-    }}
-  />)
-);
+export const Generic = () => {
+  const GenericSymbol = Symbol('Generic');
+  return wrapSettings(
+    mockSettingsProps(GenericSymbol),
+    (<SupportSettingsPage
+      generated={{
+      }}
+    />)
+  );
+};
 
 /* ===== Notable variations ===== */

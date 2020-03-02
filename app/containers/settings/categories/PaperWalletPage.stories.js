@@ -6,11 +6,6 @@ import { select, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import PaperWalletPage from './PaperWalletPage';
 import { withScreenshot } from 'storycap';
-import {
-  globalKnobs,
-  getMnemonicCases,
-  getPasswordValidationCases,
-} from '../../../../stories/helpers/StoryWrapper';
 import { getPaperWalletIntro } from '../../../stores/toplevel/ProfileStore';
 import { ProgressStep } from '../../../stores/ada/PaperWalletCreateStore';
 import { THEMES } from '../../../themes';
@@ -18,6 +13,12 @@ import { PdfGenSteps } from '../../../api/ada/paperWallet/paperWalletPdf';
 import { wrapSettings } from '../../../Routes';
 import { mockSettingsProps } from '../Settings.mock';
 import { getDefaultExplorer } from '../../../domain/Explorer';
+import {
+  getMnemonicCases,
+  getPasswordValidationCases,
+  globalKnobs, getDummyWallet,
+  registerLookup,
+} from '../../../../stories/helpers/StoryWrapper';
 
 export default {
   title: `Container/${nameof(PaperWalletPage)}`,
@@ -27,28 +28,31 @@ export default {
 
 /* ===== Notable variations ===== */
 
-export const NoDialog = () => wrapSettings(
-  mockSettingsProps,
-  (<PaperWalletPage
-    generated={{
-      stores: {
-        profile: {
-          paperWalletsIntro: getPaperWalletIntro(globalKnobs.locale(), ''),
+export const NoDialog = () => {
+  const NoDialogSymbol = Symbol('NoDialog');
+  return wrapSettings(
+    mockSettingsProps(NoDialogSymbol),
+    (<PaperWalletPage
+      generated={{
+        stores: {
+          profile: {
+            paperWalletsIntro: getPaperWalletIntro(globalKnobs.locale(), ''),
+          },
+          uiDialogs: {
+            isOpen: () => false,
+          },
         },
-        uiDialogs: {
-          isOpen: () => false,
+        actions: {
+          dialogs: {
+            open: { trigger: action('open') },
+            updateDataForActiveDialog: { trigger: action('updateDataForActiveDialog') },
+          },
         },
-      },
-      actions: {
-        dialogs: {
-          open: { trigger: action('open') },
-          updateDataForActiveDialog: { trigger: action('updateDataForActiveDialog') },
-        },
-      },
-      CreatePaperWalletDialogContainerProps: (null: any),
-    }}
-  />)
-);
+        CreatePaperWalletDialogContainerProps: (null: any),
+      }}
+    />)
+  );
+};
 
 const mockActions = {
   dialogs: {
@@ -86,111 +90,116 @@ const OpenDialogBase = {
   },
 };
 
-export const UserPasswordDialog = () => wrapSettings(
-  mockSettingsProps,
-  (<PaperWalletPage
-    generated={{
-      ...OpenDialogBase,
-      CreatePaperWalletDialogContainerProps: {
-        generated: {
-          stores: {
-            profile: {
-              paperWalletsIntro: getPaperWalletIntro(globalKnobs.locale(), ''),
-              isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-              selectedExplorer: getDefaultExplorer(),
-            },
-            uiDialogs: {
-              dataForActiveDialog: {
-                numAddresses: 5,
-                printAccountPlate: true,
-                repeatedPasswordValue: '',
-                passwordValue: '',
-              }
-            },
-            uiNotifications: {
-              isOpen: () => false,
-              getTooltipActiveNotification: () => null,
-            },
-            paperWallets: {
-              paper: null,
-              progressInfo: ProgressStep.USER_PASSWORD,
-              userPassword: '',
-              pdfRenderStatus: null,
-              pdf: null,
-            },
-          },
-          actions: mockActions,
-        },
-      },
-    }}
-  />)
-);
-
-export const CreateDialog = () => wrapSettings(
-  mockSettingsProps,
-  (() => {
-    const modifiedSteps = {
-      undefined: 'undefined',
-      ...PdfGenSteps,
-      hasPdf: 'hasPdf',
-    };
-    const extendedSteps = () => select(
-      'currentStep',
-      modifiedSteps,
-      modifiedSteps.initializing,
-    );
-    const getRealStep = () => {
-      if (extendedSteps() === modifiedSteps.undefined) {
-        return undefined;
-      }
-      if (extendedSteps() === modifiedSteps.hasPdf) {
-        return modifiedSteps.done;
-      }
-      return extendedSteps();
-    };
-    return (
-      <PaperWalletPage
-        generated={{
-          ...OpenDialogBase,
-          CreatePaperWalletDialogContainerProps: {
-            generated: {
-              stores: {
-                profile: {
-                  paperWalletsIntro: getPaperWalletIntro(globalKnobs.locale(), ''),
-                  isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-                  selectedExplorer: getDefaultExplorer(),
-                },
-                uiDialogs: {
-                  dataForActiveDialog: {
-                    numAddresses: 5,
-                    printAccountPlate: true,
-                    repeatedPasswordValue: '',
-                    passwordValue: '',
-                  }
-                },
-                uiNotifications: {
-                  isOpen: () => false,
-                  getTooltipActiveNotification: () => null,
-                },
-                paperWallets: {
-                  paper: null,
-                  progressInfo: ProgressStep.CREATE,
-                  userPassword: '',
-                  pdfRenderStatus: getRealStep(),
-                  pdf: extendedSteps() === modifiedSteps.hasPdf
-                    ? new Blob(['this is just fake data'])
-                    : null,
-                },
+export const UserPasswordDialog = () => {
+  const UserPasswordDialogSymbol = Symbol('UserPasswordDialog');
+  return wrapSettings(
+    mockSettingsProps(UserPasswordDialogSymbol),
+    (<PaperWalletPage
+      generated={{
+        ...OpenDialogBase,
+        CreatePaperWalletDialogContainerProps: {
+          generated: {
+            stores: {
+              profile: {
+                paperWalletsIntro: getPaperWalletIntro(globalKnobs.locale(), ''),
+                isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+                selectedExplorer: getDefaultExplorer(),
               },
-              actions: mockActions,
+              uiDialogs: {
+                dataForActiveDialog: {
+                  numAddresses: 5,
+                  printAccountPlate: true,
+                  repeatedPasswordValue: '',
+                  passwordValue: '',
+                }
+              },
+              uiNotifications: {
+                isOpen: () => false,
+                getTooltipActiveNotification: () => null,
+              },
+              paperWallets: {
+                paper: null,
+                progressInfo: ProgressStep.USER_PASSWORD,
+                userPassword: '',
+                pdfRenderStatus: null,
+                pdf: null,
+              },
             },
+            actions: mockActions,
           },
-        }}
-      />
-    );
-  })()
-);
+        },
+      }}
+    />)
+  );
+};
 
+export const CreateDialog = () => {
+  const CreateDialogSymbol = Symbol('CreateDialog');
+  return wrapSettings(
+    mockSettingsProps(CreateDialogSymbol),
+    (() => {
+      const modifiedSteps = {
+        undefined: 'undefined',
+        ...PdfGenSteps,
+        hasPdf: 'hasPdf',
+      };
+      const extendedSteps = () => select(
+        'currentStep',
+        modifiedSteps,
+        modifiedSteps.initializing,
+      );
+      const getRealStep = () => {
+        if (extendedSteps() === modifiedSteps.undefined) {
+          return undefined;
+        }
+        if (extendedSteps() === modifiedSteps.hasPdf) {
+          return modifiedSteps.done;
+        }
+        return extendedSteps();
+      };
+      return (
+        <PaperWalletPage
+          generated={{
+            ...OpenDialogBase,
+            CreatePaperWalletDialogContainerProps: {
+              generated: {
+                stores: {
+                  profile: {
+                    paperWalletsIntro: getPaperWalletIntro(globalKnobs.locale(), ''),
+                    isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+                    selectedExplorer: getDefaultExplorer(),
+                  },
+                  uiDialogs: {
+                    dataForActiveDialog: {
+                      numAddresses: 5,
+                      printAccountPlate: true,
+                      repeatedPasswordValue: '',
+                      passwordValue: '',
+                    }
+                  },
+                  uiNotifications: {
+                    isOpen: () => false,
+                    getTooltipActiveNotification: () => null,
+                  },
+                  paperWallets: {
+                    paper: null,
+                    progressInfo: ProgressStep.CREATE,
+                    userPassword: '',
+                    pdfRenderStatus: getRealStep(),
+                    pdf: extendedSteps() === modifiedSteps.hasPdf
+                      ? new Blob(['this is just fake data'])
+                      : null,
+                  },
+                },
+                actions: mockActions,
+              },
+            },
+          }}
+        />
+      );
+    })()
+  );
+};
 
 const constructedPaperWallet = {
   addresses: [
@@ -207,109 +216,114 @@ const constructedPaperWallet = {
   },
 };
 
-export const VerifyDialog = () => wrapSettings(
-  mockSettingsProps,
-  (() => {
-    const mnemonicCases = getMnemonicCases(21);
-    const mneonicsValue = () => select(
-      'mnemonicCases',
-      mnemonicCases,
-      mnemonicCases.Empty,
-    );
-    const correctPassword = 'asdfasdfasdf';
-    const passwordCases = getPasswordValidationCases(correctPassword);
-    const passwordValue = () => select(
-      'passwordCases',
-      passwordCases,
-      passwordCases.Empty,
-    );
-    return (
-      <PaperWalletPage
-        generated={{
-          ...OpenDialogBase,
-          CreatePaperWalletDialogContainerProps: {
-            generated: {
-              stores: {
-                profile: {
-                  paperWalletsIntro: getPaperWalletIntro(globalKnobs.locale(), ''),
-                  isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-                  selectedExplorer: getDefaultExplorer(),
+export const VerifyDialog = () => {
+  const VerifyDialogSymbol = Symbol('VerifyDialog');
+  return wrapSettings(
+    mockSettingsProps(VerifyDialogSymbol),
+    (() => {
+      const mnemonicCases = getMnemonicCases(21);
+      const mneonicsValue = () => select(
+        'mnemonicCases',
+        mnemonicCases,
+        mnemonicCases.Empty,
+      );
+      const correctPassword = 'asdfasdfasdf';
+      const passwordCases = getPasswordValidationCases(correctPassword);
+      const passwordValue = () => select(
+        'passwordCases',
+        passwordCases,
+        passwordCases.Empty,
+      );
+      return (
+        <PaperWalletPage
+          generated={{
+            ...OpenDialogBase,
+            CreatePaperWalletDialogContainerProps: {
+              generated: {
+                stores: {
+                  profile: {
+                    paperWalletsIntro: getPaperWalletIntro(globalKnobs.locale(), ''),
+                    isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+                    selectedExplorer: getDefaultExplorer(),
+                  },
+                  uiDialogs: {
+                    dataForActiveDialog: {
+                      numAddresses: 5,
+                      printAccountPlate: true,
+                      repeatedPasswordValue: '',
+                      passwordValue: '',
+                    }
+                  },
+                  uiNotifications: {
+                    isOpen: () => false,
+                    getTooltipActiveNotification: () => null,
+                  },
+                  paperWallets: {
+                    paper: constructedPaperWallet,
+                    progressInfo: ProgressStep.VERIFY,
+                    userPassword: correctPassword,
+                    pdfRenderStatus: null,
+                    pdf: null,
+                  },
                 },
-                uiDialogs: {
-                  dataForActiveDialog: {
-                    numAddresses: 5,
-                    printAccountPlate: true,
-                    repeatedPasswordValue: '',
-                    passwordValue: '',
+                actions: mockActions,
+                verifyDefaultValues: passwordValue() === passwordCases.Empty &&
+                  mneonicsValue() === mnemonicCases.Empty
+                  ? undefined
+                  : {
+                    paperPassword: passwordValue(),
+                    recoveryPhrase: mneonicsValue(),
+                    walletName: '',
+                    walletPassword: '',
                   }
-                },
-                uiNotifications: {
-                  isOpen: () => false,
-                  getTooltipActiveNotification: () => null,
-                },
-                paperWallets: {
-                  paper: constructedPaperWallet,
-                  progressInfo: ProgressStep.VERIFY,
-                  userPassword: correctPassword,
-                  pdfRenderStatus: null,
-                  pdf: null,
-                },
               },
-              actions: mockActions,
-              verifyDefaultValues: passwordValue() === passwordCases.Empty &&
-                mneonicsValue() === mnemonicCases.Empty
-                ? undefined
-                : {
-                  paperPassword: passwordValue(),
-                  recoveryPhrase: mneonicsValue(),
-                  walletName: '',
-                  walletPassword: '',
+            },
+          }}
+        />
+      );
+    })()
+  );
+};
+
+export const FinalizeDialog = () => {
+  const FinalizeDialogSymbol = Symbol('FinalizeDialog');
+  return wrapSettings(
+    mockSettingsProps(FinalizeDialogSymbol),
+    (<PaperWalletPage
+      generated={{
+        ...OpenDialogBase,
+        CreatePaperWalletDialogContainerProps: {
+          generated: {
+            stores: {
+              profile: {
+                paperWalletsIntro: getPaperWalletIntro(globalKnobs.locale(), ''),
+                isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+                selectedExplorer: getDefaultExplorer(),
+              },
+              uiDialogs: {
+                dataForActiveDialog: {
+                  numAddresses: 5,
+                  printAccountPlate: true,
+                  repeatedPasswordValue: '',
+                  passwordValue: '',
                 }
+              },
+              uiNotifications: {
+                isOpen: () => false,
+                getTooltipActiveNotification: () => null,
+              },
+              paperWallets: {
+                paper: constructedPaperWallet,
+                progressInfo: ProgressStep.FINALIZE,
+                userPassword: '',
+                pdfRenderStatus: null,
+                pdf: null,
+              },
             },
+            actions: mockActions,
           },
-        }}
-      />
-    );
-  })()
-);
-
-
-export const FinalizeDialog = () => wrapSettings(
-  mockSettingsProps,
-  (<PaperWalletPage
-    generated={{
-      ...OpenDialogBase,
-      CreatePaperWalletDialogContainerProps: {
-        generated: {
-          stores: {
-            profile: {
-              paperWalletsIntro: getPaperWalletIntro(globalKnobs.locale(), ''),
-              isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-              selectedExplorer: getDefaultExplorer(),
-            },
-            uiDialogs: {
-              dataForActiveDialog: {
-                numAddresses: 5,
-                printAccountPlate: true,
-                repeatedPasswordValue: '',
-                passwordValue: '',
-              }
-            },
-            uiNotifications: {
-              isOpen: () => false,
-              getTooltipActiveNotification: () => null,
-            },
-            paperWallets: {
-              paper: constructedPaperWallet,
-              progressInfo: ProgressStep.FINALIZE,
-              userPassword: '',
-              pdfRenderStatus: null,
-              pdf: null,
-            },
-          },
-          actions: mockActions,
         },
-      },
-    }}
-  />)
-);
+      }}
+    />)
+  );
+};

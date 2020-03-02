@@ -6,7 +6,10 @@ import { action } from '@storybook/addon-actions';
 import WalletSettingsPage from './WalletSettingsPage';
 import { withScreenshot } from 'storycap';
 import { THEMES } from '../../../themes';
-import { globalKnobs, getDummyWallet, getSigningWallet } from '../../../../stories/helpers/StoryWrapper';
+import {
+  globalKnobs, getDummyWallet, getSigningWallet,
+  registerLookup, walletLookup,
+} from '../../../../stories/helpers/StoryWrapper';
 import { IncorrectWalletPasswordError } from '../../../api/common';
 import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
 import RemoveWalletDialog from '../../../components/wallet/settings/RemoveWalletDialog';
@@ -21,16 +24,14 @@ export default {
 
 /* ===== Notable variations ===== */
 
-const defaultSettingsPageProps = {
+const defaultSettingsPageProps = (cacheKey: symbol) => ({
   stores: {
     profile: {
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
     },
     walletSettings: {
-      getConceptualWalletSettingsCache: (conceptualWallet) => ({
-        conceptualWallet,
-        conceptualWalletName: 'Test wallet', // TODO: global var?
-      }),
+      getConceptualWalletSettingsCache:
+        walletLookup(cacheKey)().getConceptualWalletSettingsCache,
       removeWalletRequest: {
         reset: action('removeWalletRequest reset'),
         isExecuting: false,
@@ -57,7 +58,8 @@ const defaultSettingsPageProps = {
         publicDeriver,
         signingKeyUpdateDate: null,
       }),
-      selected: getDummyWallet(),
+      selected: walletLookup(cacheKey)().selected,
+      // TODO getSigningKeyCache
     },
   },
   actions: {
@@ -74,100 +76,142 @@ const defaultSettingsPageProps = {
       closeActiveDialog: { trigger: action('closeActiveDialog') },
     },
   },
-};
-export const EditName = () => wrapSettings(
-  mockSettingsProps,
-  (() => {
-    const nameCases = {
-      Untouched: 0,
-      Editing: 1,
-      Done: 2,
-    };
-    const nameValue = () => select(
-      'nameCases',
-      nameCases,
-      nameCases.Untouched,
-    );
-    return (
-      <WalletSettingsPage
-        generated={{
-          ...defaultSettingsPageProps,
-          stores: {
-            ...defaultSettingsPageProps.stores,
-            walletSettings: {
-              ...defaultSettingsPageProps.stores.walletSettings,
-              lastUpdatedWalletField: nameValue() === nameCases.Done ? 'name' : null,
-              walletFieldBeingEdited: nameValue() === nameCases.Editing ? 'name' : null,
-            },
-          },
-          ChangeWalletPasswordDialogContainerProps: (null: any),
-        }}
-      />
-    );
-  })()
-);
+});
 
-export const PasswordUpdateTime = wrapSettings(
-  mockSettingsProps,
+export const EditName = () => {
+  const EditNameSymbol = Symbol('EditName');
   (() => {
-    const lastUpdateCases = {
-      Never: 0,
-      Previously: 1,
-    };
-    const lastUpdateValue = () => select(
-      'lastUpdateCases',
-      lastUpdateCases,
-      lastUpdateCases.Never,
-    );
-    return (
-      <WalletSettingsPage
-        generated={{
-          ...defaultSettingsPageProps,
-          stores: {
-            ...defaultSettingsPageProps.stores,
-            wallets: {
-              ...defaultSettingsPageProps.stores.wallets,
-              getSigningKeyCache: (publicDeriver) => ({
-                publicDeriver,
-                signingKeyUpdateDate: lastUpdateValue() === lastUpdateCases.Never
-                  ? null
-                  : new Date(0),
-              }),
-              selected: getSigningWallet(),
-            },
-          },
-          ChangeWalletPasswordDialogContainerProps: (null: any),
-        }}
-      />
-    );
-  })()
-);
-
-export const ResyncWallet = () => wrapSettings(
-  mockSettingsProps,
-  (() => {
-    return (
-      <WalletSettingsPage
-        generated={{
-          ...defaultSettingsPageProps,
-          stores: {
-            ...defaultSettingsPageProps.stores,
-            walletSettings: {
-              ...defaultSettingsPageProps.stores.walletSettings,
-              clearHistory: {
-                ...defaultSettingsPageProps.stores.walletSettings.clearHistory,
-                isExecuting: true,
+    const dummyWallet = getDummyWallet();
+    registerLookup(EditNameSymbol, [{
+      publicDeriver: dummyWallet,
+      conceptualWalletCache: {
+        conceptualWallet: dummyWallet.getParent(),
+        conceptualWalletName: 'Test wallet',
+      },
+    }]);
+  })();
+  return wrapSettings(
+    mockSettingsProps(EditNameSymbol),
+    (() => {
+      const nameCases = {
+        Untouched: 0,
+        Editing: 1,
+        Done: 2,
+      };
+      const nameValue = () => select(
+        'nameCases',
+        nameCases,
+        nameCases.Untouched,
+      );
+      const settingPageProps = defaultSettingsPageProps(EditNameSymbol);
+      return (
+        <WalletSettingsPage
+          generated={{
+            ...defaultSettingsPageProps(EditNameSymbol),
+            stores: {
+              ...settingPageProps.stores,
+              walletSettings: {
+                ...settingPageProps.stores.walletSettings,
+                lastUpdatedWalletField: nameValue() === nameCases.Done ? 'name' : null,
+                walletFieldBeingEdited: nameValue() === nameCases.Editing ? 'name' : null,
               },
             },
-          },
-          ChangeWalletPasswordDialogContainerProps: (null: any),
-        }}
-      />
-    );
-  })()
-);
+            ChangeWalletPasswordDialogContainerProps: (null: any),
+          }}
+        />
+      );
+    })()
+  );
+};
 
-const defaultChangeWalletPasswordDialogContainerProps = {
+export const PasswordUpdateTime = () => {
+  const PasswordUpdateSymbol = Symbol('PasswordUpdateTime');
+  (() => {
+    const signingWallet = getSigningWallet();
+    registerLookup(PasswordUpdateSymbol, [{
+      publicDeriver: signingWallet,
+      conceptualWalletCache: {
+        conceptualWallet: signingWallet.getParent(),
+        conceptualWalletName: 'Signing Wallet',
+      },
+    }]);
+  })();
+  return wrapSettings(
+    mockSettingsProps(PasswordUpdateSymbol),
+    (() => {
+      const lastUpdateCases = {
+        Never: 0,
+        Previously: 1,
+      };
+      const lastUpdateValue = () => select(
+        'lastUpdateCases',
+        lastUpdateCases,
+        lastUpdateCases.Never,
+      );
+      const settingPageProps = defaultSettingsPageProps(PasswordUpdateSymbol);
+      return (
+        <WalletSettingsPage
+          generated={{
+            ...defaultSettingsPageProps(PasswordUpdateSymbol),
+            stores: {
+              ...settingPageProps.stores,
+              wallets: {
+                ...settingPageProps.stores.wallets,
+                getSigningKeyCache: (publicDeriver) => ({
+                  publicDeriver,
+                  signingKeyUpdateDate: lastUpdateValue() === lastUpdateCases.Never
+                    ? null
+                    : new Date(0),
+                }),
+              },
+            },
+            ChangeWalletPasswordDialogContainerProps: (null: any),
+          }}
+        />
+      );
+    })()
+  );
+};
+
+export const ResyncWallet = () => {
+  const ResyncWalletSymbol = Symbol('ResyncWallet');
+  (() => {
+    const dummyWallet = getDummyWallet();
+    registerLookup(ResyncWalletSymbol, [{
+      publicDeriver: dummyWallet,
+      conceptualWalletCache: {
+        conceptualWallet: dummyWallet.getParent(),
+        conceptualWalletName: 'Test wallet',
+      },
+    }]);
+  })();
+  return wrapSettings(
+    mockSettingsProps(ResyncWalletSymbol),
+    (() => {
+      const settingPageProps = defaultSettingsPageProps(ResyncWalletSymbol);
+      return (
+        <WalletSettingsPage
+          generated={{
+            ...defaultSettingsPageProps(ResyncWalletSymbol),
+            stores: {
+              ...settingPageProps.stores,
+              walletSettings: {
+                ...settingPageProps.stores.walletSettings,
+                clearHistory: {
+                  ...settingPageProps.stores.walletSettings.clearHistory,
+                  isExecuting: true,
+                },
+              },
+            },
+            ChangeWalletPasswordDialogContainerProps: (null: any),
+          }}
+        />
+      );
+    })()
+  );
+};
+
+const defaultChangeWalletPasswordDialogContainerProps = (cacheKey: symbol) => ({
   stores: {
     walletSettings: {
       changeSigningKeyRequest: {
@@ -180,7 +224,7 @@ const defaultChangeWalletPasswordDialogContainerProps = {
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
     },
     wallets: {
-      selected: getDummyWallet(),
+      selected: walletLookup(cacheKey)().selected,
     },
     uiDialogs: {
       dataForActiveDialog: {
@@ -199,133 +243,160 @@ const defaultChangeWalletPasswordDialogContainerProps = {
       closeActiveDialog: { trigger: action('closeActiveDialog') },
     },
   },
+});
+
+export const EditPassword = () => {
+  const EditPasswordSymbol = Symbol('EditPassword');
+  (() => {
+    const signingWallet = getSigningWallet();
+    registerLookup(EditPasswordSymbol, [{
+      publicDeriver: signingWallet,
+      conceptualWalletCache: {
+        conceptualWallet: signingWallet.getParent(),
+        conceptualWalletName: 'Signing Wallet',
+      },
+    }]);
+  })();
+  return wrapSettings(
+    mockSettingsProps(EditPasswordSymbol),
+    (() => {
+      const errorCases = {
+        None: undefined,
+        WrongPassword: new IncorrectWalletPasswordError(),
+      };
+      const errorValue = () => select(
+        'errorCases',
+        errorCases,
+        errorCases.None,
+      );
+      const passwordCases = {
+        Untouched: 0,
+        TooShort: 1,
+        MisMatch: 2,
+        Correct: 3,
+        All: 4,
+      };
+      const passwordValue = () => select(
+        'passwordCases',
+        passwordCases,
+        passwordCases.Untouched,
+      );
+      const getCurrentPassword = () => {
+        const val = passwordValue();
+        return val === passwordCases.All ? 'asdfasdfasdf' : '';
+      };
+      const getNewPassword = () => {
+        const val = passwordValue();
+        if (val === passwordCases.All) return 'asdfasdfasdf';
+        if (val === passwordCases.Correct) return 'asdfasdfasdf';
+        if (val === passwordCases.MisMatch) return 'asdfasdfasdf';
+        if (val === passwordCases.TooShort) return 'a';
+        return '';
+      };
+      const getRepeatPassword = () => {
+        const val = passwordValue();
+        if (val === passwordCases.All) return 'asdfasdfasdf';
+        if (val === passwordCases.Correct) return 'asdfasdfasdf';
+        if (val === passwordCases.MisMatch) return 'zxcvzxcvzxcv';
+        if (val === passwordCases.TooShort) return 'a';
+        return '';
+      };
+
+      const defaultProps = defaultChangeWalletPasswordDialogContainerProps(EditPasswordSymbol);
+      const settingPageProps = defaultSettingsPageProps(EditPasswordSymbol);
+      return (
+        <WalletSettingsPage
+          generated={{
+            ...defaultSettingsPageProps(EditPasswordSymbol),
+            stores: {
+              ...settingPageProps.stores,
+              uiDialogs: {
+                ...settingPageProps.stores.uiDialogs,
+                isOpen: (clazz) => clazz === ChangeWalletPasswordDialogContainer,
+              },
+              wallets: {
+                ...settingPageProps.stores.wallets,
+                getSigningKeyCache: (publicDeriver) => ({
+                  publicDeriver,
+                  signingKeyUpdateDate: null,
+                }),
+              },
+            },
+            ChangeWalletPasswordDialogContainerProps: {
+              generated: {
+                ...defaultProps,
+                stores: {
+                  ...defaultProps.stores,
+                  walletSettings: {
+                    ...defaultProps.stores.walletSettings,
+                    changeSigningKeyRequest: {
+                      ...defaultProps.stores.walletSettings.changeSigningKeyRequest,
+                      isExecuting: boolean('changeSigningKeyRequest isExecuting'),
+                      error: errorValue() === errorCases.None ? undefined : errorValue(),
+                    },
+                  },
+                  uiDialogs: {
+                    ...defaultProps.stores.uiDialogs,
+                    dataForActiveDialog: {
+                      ...defaultProps.stores.uiDialogs.dataForActiveDialog,
+                      currentPasswordValue: getCurrentPassword(),
+                      newPasswordValue: getNewPassword(),
+                      repeatedPasswordValue: getRepeatPassword(),
+                    },
+                  },
+                },
+              },
+            },
+          }}
+        />
+      );
+    })()
+  );
 };
 
-export const EditPassword = () => wrapSettings(
-  mockSettingsProps,
+export const RemoveWallet = () => {
+  const RemoveWalletSymbol = Symbol('RemoveWallet');
   (() => {
-    const errorCases = {
-      None: undefined,
-      WrongPassword: new IncorrectWalletPasswordError(),
-    };
-    const errorValue = () => select(
-      'errorCases',
-      errorCases,
-      errorCases.None,
-    );
-    const passwordCases = {
-      Untouched: 0,
-      TooShort: 1,
-      MisMatch: 2,
-      Correct: 3,
-      All: 4,
-    };
-    const passwordValue = () => select(
-      'passwordCases',
-      passwordCases,
-      passwordCases.Untouched,
-    );
-    const getCurrentPassword = () => {
-      const val = passwordValue();
-      return val === passwordCases.All ? 'asdfasdfasdf' : '';
-    };
-    const getNewPassword = () => {
-      const val = passwordValue();
-      if (val === passwordCases.All) return 'asdfasdfasdf';
-      if (val === passwordCases.Correct) return 'asdfasdfasdf';
-      if (val === passwordCases.MisMatch) return 'asdfasdfasdf';
-      if (val === passwordCases.TooShort) return 'a';
-      return '';
-    };
-    const getRepeatPassword = () => {
-      const val = passwordValue();
-      if (val === passwordCases.All) return 'asdfasdfasdf';
-      if (val === passwordCases.Correct) return 'asdfasdfasdf';
-      if (val === passwordCases.MisMatch) return 'zxcvzxcvzxcv';
-      if (val === passwordCases.TooShort) return 'a';
-      return '';
-    };
-
-    const defaultProps = defaultChangeWalletPasswordDialogContainerProps;
-    return (
-      <WalletSettingsPage
-        generated={{
-          ...defaultSettingsPageProps,
-          stores: {
-            ...defaultSettingsPageProps.stores,
-            uiDialogs: {
-              ...defaultSettingsPageProps.stores.uiDialogs,
-              isOpen: (clazz) => clazz === ChangeWalletPasswordDialogContainer,
-            },
-            wallets: {
-              ...defaultSettingsPageProps.stores.wallets,
-              getSigningKeyCache: (publicDeriver) => ({
-                publicDeriver,
-                signingKeyUpdateDate: null,
-              }),
-              selected: getSigningWallet(),
-            },
-          },
-          ChangeWalletPasswordDialogContainerProps: {
-            generated: {
-              ...defaultProps,
-              stores: {
-                ...defaultProps.stores,
-                walletSettings: {
-                  ...defaultProps.stores.walletSettings,
-                  changeSigningKeyRequest: {
-                    ...defaultProps.stores.walletSettings.changeSigningKeyRequest,
-                    isExecuting: boolean('changeSigningKeyRequest isExecuting'),
-                    error: errorValue() === errorCases.None ? undefined : errorValue(),
-                  },
-                },
-                uiDialogs: {
-                  ...defaultProps.stores.uiDialogs,
-                  dataForActiveDialog: {
-                    ...defaultProps.stores.uiDialogs.dataForActiveDialog,
-                    currentPasswordValue: getCurrentPassword(),
-                    newPasswordValue: getNewPassword(),
-                    repeatedPasswordValue: getRepeatPassword(),
-                  },
+    const dummyWallet = getDummyWallet();
+    registerLookup(RemoveWalletSymbol, [{
+      publicDeriver: dummyWallet,
+      conceptualWalletCache: {
+        conceptualWallet: dummyWallet.getParent(),
+        conceptualWalletName: 'Test wallet',
+      },
+    }]);
+  })();
+  return wrapSettings(
+    mockSettingsProps(RemoveWalletSymbol),
+    (() => {
+      const defaultProps = defaultChangeWalletPasswordDialogContainerProps(RemoveWalletSymbol);
+      const settingPageProps = defaultSettingsPageProps(RemoveWalletSymbol);
+      return (
+        <WalletSettingsPage
+          generated={{
+            ...defaultSettingsPageProps(RemoveWalletSymbol),
+            stores: {
+              ...settingPageProps.stores,
+              uiDialogs: {
+                ...settingPageProps.stores.uiDialogs,
+                isOpen: (clazz) => clazz === RemoveWalletDialog,
+              },
+              walletSettings: {
+                ...settingPageProps.stores.walletSettings,
+                removeWalletRequest: {
+                  ...settingPageProps.stores.walletSettings.removeWalletRequest,
+                  isExecuting: boolean('isExecuting', false),
                 },
               },
             },
-          },
-        }}
-      />
-    );
-  })()
-);
-
-export const RemoveWallet = () => wrapSettings(
-  mockSettingsProps,
-  (() => {
-    const defaultProps = defaultChangeWalletPasswordDialogContainerProps;
-    return (
-      <WalletSettingsPage
-        generated={{
-          ...defaultSettingsPageProps,
-          stores: {
-            ...defaultSettingsPageProps.stores,
-            uiDialogs: {
-              ...defaultSettingsPageProps.stores.uiDialogs,
-              isOpen: (clazz) => clazz === RemoveWalletDialog,
-            },
-            walletSettings: {
-              ...defaultSettingsPageProps.stores.walletSettings,
-              removeWalletRequest: {
-                ...defaultSettingsPageProps.stores.walletSettings.removeWalletRequest,
-                isExecuting: boolean('isExecuting', false),
+            ChangeWalletPasswordDialogContainerProps: {
+              generated: {
+                ...defaultProps,
               },
             },
-          },
-          ChangeWalletPasswordDialogContainerProps: {
-            generated: {
-              ...defaultProps,
-            },
-          },
-        }}
-      />
-    );
-  })()
-);
+          }}
+        />
+      );
+    })()
+  );
+};

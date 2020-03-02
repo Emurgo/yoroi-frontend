@@ -32,7 +32,8 @@ import { ConceptualWallet } from '../../app/api/ada/lib/storage/models/Conceptua
 import { Cip1852Wallet } from '../../app/api/ada/lib/storage/models/Cip1852Wallet/wrapper';
 import { WalletTypeOption } from '../../app/api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { HasSign, HasLevels, GetSigningKey,  } from '../../app/api/ada/lib/storage/models/PublicDeriver/traits';
-
+import type { ConceptualWalletSettingsCache } from '../../app/stores/base/WalletSettingsStore';
+import WalletSettingsStore from '../../app/stores/base/WalletSettingsStore';
 
 /**
  * This whole file is meant to mirror code in App.js
@@ -191,4 +192,57 @@ export function getSigningWallet(): PublicDeriver<> {
     derivationId: 0,
   });
   return self;
+}
+
+type CacheValue = {|
+  publicDeriver: PublicDeriver<>,
+  conceptualWalletCache: ConceptualWalletSettingsCache,
+|};
+
+const _walletLookup: Map<symbol, Array<CacheValue>> = new Map();
+
+// TODO: take in cache values
+export function registerLookup(key: symbol, wallets: Array<CacheValue>): void {
+  _walletLookup.set(key, wallets);
+}
+
+// TODO: also return caches
+export function walletLookup(key: symbol): void => {|
+  selected: null | PublicDeriver<>,
+  publicDerivers: Array<PublicDeriver<>>,
+  getConceptualWalletSettingsCache:
+    typeof WalletSettingsStore.prototype.getConceptualWalletSettingsCache,
+|} {
+  const wallets = _walletLookup.get(key);
+  if (wallets == null || wallets.length === 0) {
+    return () => ({
+      selected: null,
+      publicDerivers: [],
+      getConceptualWalletSettingsCache: (_conceptualWallet) => (null: any),
+    });
+  }
+
+  const asOption: { [key: string]: PublicDeriver<>, ... } = {};
+  for (const wallet of wallets) {
+    asOption[wallet.conceptualWalletCache.conceptualWalletName] = wallet.publicDeriver;
+  }
+  const selectedWallet = () => select(
+    'selectedWallet',
+    asOption,
+    // TODO: support no wallet selected
+    asOption[wallets[0].conceptualWalletCache.conceptualWalletName],
+  );
+
+  return () => ({
+    selected: selectedWallet(),
+    publicDerivers: wallets.map(wallet => wallet.publicDeriver),
+    getConceptualWalletSettingsCache: (conceptualWallet) => {
+      for (const wallet of wallets) {
+        if (wallet.publicDeriver.getParent() === conceptualWallet) {
+          return wallet.conceptualWalletCache;
+        }
+      }
+      throw new Error(`Missing cache entry for getConceptualWalletSettingsCache`);
+    }
+  });
 }

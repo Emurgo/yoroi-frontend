@@ -1,11 +1,11 @@
 // @flow
 
-import { globalKnobs } from '../../../stories/helpers/StoryWrapper';
+import { globalKnobs, walletLookup } from '../../../stories/helpers/StoryWrapper';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { action } from '@storybook/addon-actions';
 import type { GeneratedData } from './Settings';
 
-export const mockSettingsProps: {| generated: GeneratedData |} = {
+export const mockSettingsProps: symbol => {| generated: GeneratedData |} = (cacheKey) => ({
   generated: {
     stores: {
       profile: {
@@ -18,8 +18,8 @@ export const mockSettingsProps: {| generated: GeneratedData |} = {
         },
       },
       wallets: {
-        hasActiveWallet: false,
-        selected: null,
+        hasActiveWallet: walletLookup(cacheKey)().selected != null,
+        selected: walletLookup(cacheKey)().selected,
       },
       serverConnectionStore: {
         checkAdaServerStatus: ServerStatusErrors.Healthy, // TODO: make this a global knob?
@@ -55,10 +55,8 @@ export const mockSettingsProps: {| generated: GeneratedData |} = {
       generated: {
         stores: {
           walletSettings: {
-            getConceptualWalletSettingsCache: (conceptualWallet) => ({
-              conceptualWallet,
-              conceptualWalletName: 'Test wallet', // TODO: global var?
-            }),
+            getConceptualWalletSettingsCache:
+              walletLookup(cacheKey)().getConceptualWalletSettingsCache,
           },
           wallets: {
             // TODO: maybe should come from a global knob?
@@ -90,4 +88,4 @@ export const mockSettingsProps: {| generated: GeneratedData |} = {
       }
     },
   },
-};
+});
