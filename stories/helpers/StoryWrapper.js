@@ -332,10 +332,7 @@ export function walletLookup(key: symbol): void => {|
     publicDerivers: wallets.map(wallet => wallet.publicDeriver),
     getConceptualWalletSettingsCache: (conceptualWallet) => {
       for (const wallet of wallets) {
-        if (
-          wallet.publicDeriver.getParent().getConceptualWalletId() ===
-            conceptualWallet.getConceptualWalletId()
-        ) {
+        if (wallet.publicDeriver.getParent() === conceptualWallet) {
           return wallet.conceptualWalletCache;
         }
       }
