@@ -12,6 +12,7 @@ import { getVarsForTheme } from '../../../stores/toplevel/ProfileStore';
 import { wrapSettings } from '../../../Routes';
 import { mockSettingsProps } from '../Settings.mock';
 import { getDefaultExplorer } from '../../../domain/Explorer';
+import { ROUTES } from '../../../routes-config';
 
 export default {
   title: `Container/${nameof(GeneralSettingsPage)}`,
@@ -23,7 +24,7 @@ export default {
 export const Generic = () => {
   const GenericSymbol = Symbol('Generic');
   return wrapSettings(
-    mockSettingsProps(GenericSymbol),
+    mockSettingsProps({ cacheKey: GenericSymbol, location: ROUTES.SETTINGS.GENERAL }),
     (<GeneralSettingsPage
       generated={{
         stores: {

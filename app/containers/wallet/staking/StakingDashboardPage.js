@@ -93,7 +93,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
     }
 
     const delegationStore = this.props.stores.substores[environment.API].delegation;
-    const delegationRequests = delegationStore.getRequests(publicDeriver);
+    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
@@ -242,7 +242,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
     if (toRealTime == null) return undefined;
 
     const delegationStore = this.props.stores.substores[environment.API].delegation;
-    const delegationRequests = delegationStore.getRequests(publicDeriver);
+    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
@@ -376,7 +376,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
     publicDeriver
   ) => {
     const delegationStore = this.props.stores.substores[environment.API].delegation;
-    const delegationRequests = delegationStore.getRequests(publicDeriver);
+    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
@@ -405,7 +405,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
     publicDeriver
   ) => {
     const delegationStore = this.props.stores.substores[environment.API].delegation;
-    const delegationRequests = delegationStore.getRequests(publicDeriver);
+    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }

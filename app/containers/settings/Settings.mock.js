@@ -5,7 +5,10 @@ import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { action } from '@storybook/addon-actions';
 import type { GeneratedData } from './Settings';
 
-export const mockSettingsProps: symbol => {| generated: GeneratedData |} = (cacheKey) => ({
+export const mockSettingsProps: {|
+  cacheKey: symbol,
+  location: string,
+|} => {| generated: GeneratedData |} = (request) => ({
   generated: {
     stores: {
       profile: {
@@ -14,12 +17,12 @@ export const mockSettingsProps: symbol => {| generated: GeneratedData |} = (cach
       },
       router: {
         location: {
-          pathname: '',
+          pathname: request.location,
         },
       },
       wallets: {
-        hasActiveWallet: walletLookup(cacheKey)().selected != null,
-        selected: walletLookup(cacheKey)().selected,
+        hasActiveWallet: walletLookup(request.cacheKey)().selected != null,
+        selected: walletLookup(request.cacheKey)().selected,
       },
       serverConnectionStore: {
         checkAdaServerStatus: ServerStatusErrors.Healthy, // TODO: make this a global knob?
@@ -56,25 +59,21 @@ export const mockSettingsProps: symbol => {| generated: GeneratedData |} = (cach
         stores: {
           walletSettings: {
             getConceptualWalletSettingsCache:
-              walletLookup(cacheKey)().getConceptualWalletSettingsCache,
+              walletLookup(request.cacheKey)().getConceptualWalletSettingsCache,
           },
           wallets: {
-            // TODO: maybe should come from a global knob?
-            selected: null,
-            publicDerivers: [],
-            getPublicKeyCache: (publicDeriver) => ({
-              publicDeriver,
-              plate: (undefined: any), // TODO
-            }),
+            selected: walletLookup(request.cacheKey)().selected,
+            publicDerivers: walletLookup(request.cacheKey)().publicDerivers,
+            getPublicKeyCache: walletLookup(request.cacheKey)().getPublicKeyCache,
           },
           profile: {
             shouldHideBalance: false,
           },
           delegation: {
-            getRequests: (_publicDeriver) => undefined,
+            getDelegationRequests: walletLookup(request.cacheKey)().getDelegation,
           },
           transactions: {
-            getTxRequests: (_publicDeriver) => (undefined: any),
+            getTxRequests: walletLookup(request.cacheKey)().getTransactions,
           },
         },
         actions: {

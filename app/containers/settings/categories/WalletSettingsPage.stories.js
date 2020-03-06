@@ -7,7 +7,7 @@ import WalletSettingsPage from './WalletSettingsPage';
 import { withScreenshot } from 'storycap';
 import { THEMES } from '../../../themes';
 import {
-  globalKnobs, getDummyWallet, getSigningWallet,
+  globalKnobs, genDummyWithCache, genSigningWalletWithCache,
   registerLookup, walletLookup,
 } from '../../../../stories/helpers/StoryWrapper';
 import { IncorrectWalletPasswordError } from '../../../api/common';
@@ -15,6 +15,7 @@ import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWall
 import RemoveWalletDialog from '../../../components/wallet/settings/RemoveWalletDialog';
 import { wrapSettings } from '../../../Routes';
 import { mockSettingsProps } from '../Settings.mock';
+import { ROUTES } from '../../../routes-config';
 
 export default {
   title: `Container/${nameof(WalletSettingsPage)}`,
@@ -81,17 +82,11 @@ const defaultSettingsPageProps = (cacheKey: symbol) => ({
 export const EditName = () => {
   const EditNameSymbol = Symbol('EditName');
   (() => {
-    const dummyWallet = getDummyWallet();
-    registerLookup(EditNameSymbol, [{
-      publicDeriver: dummyWallet,
-      conceptualWalletCache: {
-        conceptualWallet: dummyWallet.getParent(),
-        conceptualWalletName: 'Test wallet',
-      },
-    }]);
+    const dummyWallet = genDummyWithCache();
+    registerLookup(EditNameSymbol, [dummyWallet]);
   })();
   return wrapSettings(
-    mockSettingsProps(EditNameSymbol),
+    mockSettingsProps({ cacheKey: EditNameSymbol, location: ROUTES.SETTINGS.WALLET }),
     (() => {
       const nameCases = {
         Untouched: 0,
@@ -127,17 +122,11 @@ export const EditName = () => {
 export const PasswordUpdateTime = () => {
   const PasswordUpdateSymbol = Symbol('PasswordUpdateTime');
   (() => {
-    const signingWallet = getSigningWallet();
-    registerLookup(PasswordUpdateSymbol, [{
-      publicDeriver: signingWallet,
-      conceptualWalletCache: {
-        conceptualWallet: signingWallet.getParent(),
-        conceptualWalletName: 'Signing Wallet',
-      },
-    }]);
+    const dummyWallet = genSigningWalletWithCache();
+    registerLookup(PasswordUpdateSymbol, [dummyWallet]);
   })();
   return wrapSettings(
-    mockSettingsProps(PasswordUpdateSymbol),
+    mockSettingsProps({ cacheKey: PasswordUpdateSymbol, location: ROUTES.SETTINGS.WALLET }),
     (() => {
       const lastUpdateCases = {
         Never: 0,
@@ -176,17 +165,11 @@ export const PasswordUpdateTime = () => {
 export const ResyncWallet = () => {
   const ResyncWalletSymbol = Symbol('ResyncWallet');
   (() => {
-    const dummyWallet = getDummyWallet();
-    registerLookup(ResyncWalletSymbol, [{
-      publicDeriver: dummyWallet,
-      conceptualWalletCache: {
-        conceptualWallet: dummyWallet.getParent(),
-        conceptualWalletName: 'Test wallet',
-      },
-    }]);
+    const dummyWallet = genDummyWithCache();
+    registerLookup(ResyncWalletSymbol, [dummyWallet]);
   })();
   return wrapSettings(
-    mockSettingsProps(ResyncWalletSymbol),
+    mockSettingsProps({ cacheKey: ResyncWalletSymbol, location: ROUTES.SETTINGS.WALLET }),
     (() => {
       const settingPageProps = defaultSettingsPageProps(ResyncWalletSymbol);
       return (
@@ -248,17 +231,11 @@ const defaultChangeWalletPasswordDialogContainerProps = (cacheKey: symbol) => ({
 export const EditPassword = () => {
   const EditPasswordSymbol = Symbol('EditPassword');
   (() => {
-    const signingWallet = getSigningWallet();
-    registerLookup(EditPasswordSymbol, [{
-      publicDeriver: signingWallet,
-      conceptualWalletCache: {
-        conceptualWallet: signingWallet.getParent(),
-        conceptualWalletName: 'Signing Wallet',
-      },
-    }]);
+    const dummyWallet = genSigningWalletWithCache();
+    registerLookup(EditPasswordSymbol, [dummyWallet]);
   })();
   return wrapSettings(
-    mockSettingsProps(EditPasswordSymbol),
+    mockSettingsProps({ cacheKey: EditPasswordSymbol, location: ROUTES.SETTINGS.WALLET }),
     (() => {
       const errorCases = {
         None: undefined,
@@ -357,17 +334,11 @@ export const EditPassword = () => {
 export const RemoveWallet = () => {
   const RemoveWalletSymbol = Symbol('RemoveWallet');
   (() => {
-    const dummyWallet = getDummyWallet();
-    registerLookup(RemoveWalletSymbol, [{
-      publicDeriver: dummyWallet,
-      conceptualWalletCache: {
-        conceptualWallet: dummyWallet.getParent(),
-        conceptualWalletName: 'Test wallet',
-      },
-    }]);
+    const dummyWallet = genDummyWithCache();
+    registerLookup(RemoveWalletSymbol, [dummyWallet]);
   })();
   return wrapSettings(
-    mockSettingsProps(RemoveWalletSymbol),
+    mockSettingsProps({ cacheKey: RemoveWalletSymbol, location: ROUTES.SETTINGS.WALLET }),
     (() => {
       const defaultProps = defaultChangeWalletPasswordDialogContainerProps(RemoveWalletSymbol);
       const settingPageProps = defaultSettingsPageProps(RemoveWalletSymbol);

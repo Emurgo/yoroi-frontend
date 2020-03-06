@@ -16,9 +16,9 @@ import { getDefaultExplorer } from '../../../domain/Explorer';
 import {
   getMnemonicCases,
   getPasswordValidationCases,
-  globalKnobs, getDummyWallet,
-  registerLookup,
+  globalKnobs,
 } from '../../../../stories/helpers/StoryWrapper';
+import { ROUTES } from '../../../routes-config';
 
 export default {
   title: `Container/${nameof(PaperWalletPage)}`,
@@ -31,7 +31,7 @@ export default {
 export const NoDialog = () => {
   const NoDialogSymbol = Symbol('NoDialog');
   return wrapSettings(
-    mockSettingsProps(NoDialogSymbol),
+    mockSettingsProps({ cacheKey: NoDialogSymbol, location: ROUTES.SETTINGS.PAPER_WALLET }),
     (<PaperWalletPage
       generated={{
         stores: {
@@ -93,7 +93,10 @@ const OpenDialogBase = {
 export const UserPasswordDialog = () => {
   const UserPasswordDialogSymbol = Symbol('UserPasswordDialog');
   return wrapSettings(
-    mockSettingsProps(UserPasswordDialogSymbol),
+    mockSettingsProps({
+      cacheKey: UserPasswordDialogSymbol,
+      location: ROUTES.SETTINGS.PAPER_WALLET
+    }),
     (<PaperWalletPage
       generated={{
         ...OpenDialogBase,
@@ -136,7 +139,7 @@ export const UserPasswordDialog = () => {
 export const CreateDialog = () => {
   const CreateDialogSymbol = Symbol('CreateDialog');
   return wrapSettings(
-    mockSettingsProps(CreateDialogSymbol),
+    mockSettingsProps({ cacheKey: CreateDialogSymbol, location: ROUTES.SETTINGS.PAPER_WALLET }),
     (() => {
       const modifiedSteps = {
         undefined: 'undefined',
@@ -219,7 +222,7 @@ const constructedPaperWallet = {
 export const VerifyDialog = () => {
   const VerifyDialogSymbol = Symbol('VerifyDialog');
   return wrapSettings(
-    mockSettingsProps(VerifyDialogSymbol),
+    mockSettingsProps({ cacheKey: VerifyDialogSymbol, location: ROUTES.SETTINGS.PAPER_WALLET }),
     (() => {
       const mnemonicCases = getMnemonicCases(21);
       const mneonicsValue = () => select(
@@ -288,7 +291,7 @@ export const VerifyDialog = () => {
 export const FinalizeDialog = () => {
   const FinalizeDialogSymbol = Symbol('FinalizeDialog');
   return wrapSettings(
-    mockSettingsProps(FinalizeDialogSymbol),
+    mockSettingsProps({ cacheKey: FinalizeDialogSymbol, location: ROUTES.SETTINGS.PAPER_WALLET }),
     (<PaperWalletPage
       generated={{
         ...OpenDialogBase,

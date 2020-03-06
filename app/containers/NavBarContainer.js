@@ -48,7 +48,7 @@ export type GeneratedData = {|
       +shouldHideBalance: boolean,
     |},
     +delegation: {|
-      +getRequests: PublicDeriver<> => (void | DelegationRequests),
+      +getDelegationRequests: PublicDeriver<> => (void | DelegationRequests),
     |},
     +transactions: {|
       +getTxRequests: PublicDeriver<> => TxRequests,
@@ -103,7 +103,7 @@ export default class NavBarContainer extends Component<Props> {
           shouldHideBalance: stores.profile.shouldHideBalance,
         },
         delegation: {
-          getRequests: stores.substores.ada.delegation.getRequests,
+          getDelegationRequests: stores.substores.ada.delegation.getDelegationRequests,
         },
         transactions: {
           getTxRequests: stores.substores.ada.transactions.getTxRequests,
@@ -271,7 +271,7 @@ export default class NavBarContainer extends Component<Props> {
   getRewardBalance: PublicDeriver<> => null | void | BigNumber = (
     publicDeriver
   ) => {
-    const delegationRequest = this.generated.stores.delegation.getRequests(
+    const delegationRequest = this.generated.stores.delegation.getDelegationRequests(
       publicDeriver
     );
     if (delegationRequest == null) return undefined;
