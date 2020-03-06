@@ -10,7 +10,7 @@ import DelegationStore from '../../stores/ada/DelegationStore';
 import WalletStore from '../../stores/toplevel/WalletStore';
 import type { GeneratedData } from './Settings';
 
-export const mockSettingsProps: {|
+export const mockSettingsProps: {
   selected: null | PublicDeriver<>,
   publicDerivers: Array<PublicDeriver<>>,
   getConceptualWalletSettingsCache:
@@ -22,7 +22,8 @@ export const mockSettingsProps: {|
   getDelegation:
     typeof DelegationStore.prototype.getDelegationRequests,
   location: string,
-|} => {| generated: GeneratedData |} = (request) => ({
+  ...
+} => {| generated: GeneratedData |} = (request) => ({
   generated: {
     stores: {
       profile: {

@@ -224,6 +224,10 @@ function genMockCache(dummyWallet: PublicDeriver<>) {
         getBalanceRequest,
       },
     }),
+    getSigningKeyCache: (publicDeriver) => ({
+      publicDeriver,
+      signingKeyUpdateDate: null,
+    }),
   };
 }
 
@@ -284,13 +288,9 @@ type CacheValue = {|
     typeof TransactionsStore.prototype.getTxRequests,
   getDelegation:
     typeof DelegationStore.prototype.getDelegationRequests,
+  getSigningKeyCache:
+    typeof WalletStore.prototype.getSigningKeyCache,
 |};
-
-const _walletLookup: Map<symbol, Array<CacheValue>> = new Map();
-
-export function registerLookup(key: symbol, wallets: Array<CacheValue>): void {
-  _walletLookup.set(key, wallets);
-}
 
 export function walletLookup(wallets: Array<CacheValue>): {|
   publicDerivers: Array<PublicDeriver<>>,
@@ -302,6 +302,8 @@ export function walletLookup(wallets: Array<CacheValue>): {|
     typeof TransactionsStore.prototype.getTxRequests,
   getDelegation:
     typeof DelegationStore.prototype.getDelegationRequests,
+  getSigningKeyCache:
+    typeof WalletStore.prototype.getSigningKeyCache,
 |} {
   if (wallets.length === 0) {
     return ({
@@ -310,6 +312,7 @@ export function walletLookup(wallets: Array<CacheValue>): {|
       getTransactions: (_publicDeriver) => (null: any),
       getDelegation: (_publicDeriver) => (null: any),
       getPublicKeyCache: (_publicDeriver) => (null: any),
+      getSigningKeyCache: (_publicDeriver) => (null: any),
     });
   }
 
@@ -357,6 +360,14 @@ export function walletLookup(wallets: Array<CacheValue>): {|
         }
       }
       throw new Error(`Missing cache entry for publicKeyCache`);
+    },
+    getSigningKeyCache: (publicDeriver) => {
+      for (const wallet of wallets) {
+        if (wallet.publicDeriver === publicDeriver) {
+          return wallet.getSigningKeyCache(publicDeriver);
+        }
+      }
+      throw new Error(`Missing cache entry for getSigningKeyCache`);
     },
   });
 }

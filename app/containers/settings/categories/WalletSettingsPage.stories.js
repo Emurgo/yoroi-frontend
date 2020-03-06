@@ -8,7 +8,7 @@ import { withScreenshot } from 'storycap';
 import { THEMES } from '../../../themes';
 import {
   globalKnobs, genDummyWithCache, genSigningWalletWithCache,
-  registerLookup, walletLookup,
+  walletLookup,
 } from '../../../../stories/helpers/StoryWrapper';
 import { IncorrectWalletPasswordError } from '../../../api/common';
 import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
@@ -18,6 +18,7 @@ import { mockSettingsProps } from '../Settings.mock';
 import { ROUTES } from '../../../routes-config';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 import WalletSettingsStore from '../../../stores/base/WalletSettingsStore';
+import WalletStore from '../../../stores/toplevel/WalletStore';
 
 export default {
   title: `Container/${nameof(WalletSettingsPage)}`,
@@ -31,6 +32,8 @@ const defaultSettingsPageProps: {|
   selected: null | PublicDeriver<>,
   getConceptualWalletSettingsCache:
     typeof WalletSettingsStore.prototype.getConceptualWalletSettingsCache,
+  getSigningKeyCache:
+    typeof WalletStore.prototype.getSigningKeyCache,
 |} => * = (request) => ({
   stores: {
     profile: {
@@ -60,10 +63,7 @@ const defaultSettingsPageProps: {|
       isOpen: () => false,
     },
     wallets: {
-      getSigningKeyCache: (publicDeriver) => ({
-        publicDeriver,
-        signingKeyUpdateDate: null,
-      }),
+      getSigningKeyCache: request.getSigningKeyCache,
       selected: request.selected,
     },
   },
@@ -96,6 +96,7 @@ export const EditName = () => {
       const settingPageProps = defaultSettingsPageProps({
         selected: wallet.publicDeriver,
         getConceptualWalletSettingsCache: lookup.getConceptualWalletSettingsCache,
+        getSigningKeyCache: lookup.getSigningKeyCache,
       });
       const nameCases = {
         Untouched: 0,
@@ -128,50 +129,54 @@ export const EditName = () => {
 };
 
 export const PasswordUpdateTime = () => {
-  const wallet = genSigningWalletWithCache();
-  const lookup = walletLookup([wallet]);
-  return wrapSettings(
-    mockSettingsProps({
-      location: ROUTES.SETTINGS.WALLET,
-      selected: wallet.publicDeriver,
-      ...lookup,
-    }),
-    (() => {
-      const settingPageProps = defaultSettingsPageProps({
+  return (() => {
+    const lastUpdateCases = {
+      Never: 0,
+      Previously: 1,
+    };
+    const lastUpdateValue = () => select(
+      'lastUpdateCases',
+      lastUpdateCases,
+      lastUpdateCases.Never,
+    );
+    const wallet = genSigningWalletWithCache();
+    wallet.getSigningKeyCache = (publicDeriver) => ({
+      publicDeriver,
+      signingKeyUpdateDate: lastUpdateValue() === lastUpdateCases.Never
+        ? null
+        : new Date(0),
+    });
+    const lookup = walletLookup([wallet]);
+    return wrapSettings(
+      mockSettingsProps({
+        location: ROUTES.SETTINGS.WALLET,
         selected: wallet.publicDeriver,
-        getConceptualWalletSettingsCache: lookup.getConceptualWalletSettingsCache,
-      });
-      const lastUpdateCases = {
-        Never: 0,
-        Previously: 1,
-      };
-      const lastUpdateValue = () => select(
-        'lastUpdateCases',
-        lastUpdateCases,
-        lastUpdateCases.Never,
-      );
-      return (
-        <WalletSettingsPage
-          generated={{
-            ...settingPageProps,
-            stores: {
-              ...settingPageProps.stores,
-              wallets: {
-                ...settingPageProps.stores.wallets,
-                getSigningKeyCache: (publicDeriver) => ({
-                  publicDeriver,
-                  signingKeyUpdateDate: lastUpdateValue() === lastUpdateCases.Never
-                    ? null
-                    : new Date(0),
-                }),
+        ...lookup,
+      }),
+      (() => {
+        const settingPageProps = defaultSettingsPageProps({
+          selected: wallet.publicDeriver,
+          getConceptualWalletSettingsCache: lookup.getConceptualWalletSettingsCache,
+          getSigningKeyCache: lookup.getSigningKeyCache,
+        });
+        return (
+          <WalletSettingsPage
+            generated={{
+              ...settingPageProps,
+              stores: {
+                ...settingPageProps.stores,
+                wallets: {
+                  ...settingPageProps.stores.wallets,
+                  getSigningKeyCache: lookup.getSigningKeyCache,
+                },
               },
-            },
-            ChangeWalletPasswordDialogContainerProps: (null: any),
-          }}
-        />
-      );
-    })()
-  );
+              ChangeWalletPasswordDialogContainerProps: (null: any),
+            }}
+          />
+        );
+      })()
+    );
+  })();
 };
 
 export const ResyncWallet = () => {
@@ -187,6 +192,7 @@ export const ResyncWallet = () => {
       const settingPageProps = defaultSettingsPageProps({
         selected: wallet.publicDeriver,
         getConceptualWalletSettingsCache: lookup.getConceptualWalletSettingsCache,
+        getSigningKeyCache: lookup.getSigningKeyCache,
       });
       return (
         <WalletSettingsPage
@@ -259,6 +265,7 @@ export const EditPassword = () => {
       const settingPageProps = defaultSettingsPageProps({
         selected: wallet.publicDeriver,
         getConceptualWalletSettingsCache: lookup.getConceptualWalletSettingsCache,
+        getSigningKeyCache: lookup.getSigningKeyCache,
       });
       const defaultProps = defaultChangeWalletPasswordDialogContainerProps({
         selected: wallet.publicDeriver,
@@ -317,11 +324,7 @@ export const EditPassword = () => {
               },
               wallets: {
                 ...settingPageProps.stores.wallets,
-                // TODO: proper cache?
-                getSigningKeyCache: (publicDeriver) => ({
-                  publicDeriver,
-                  signingKeyUpdateDate: null,
-                }),
+                getSigningKeyCache: lookup.getSigningKeyCache,
               },
             },
             ChangeWalletPasswordDialogContainerProps: {
@@ -369,6 +372,7 @@ export const RemoveWallet = () => {
       const settingPageProps = defaultSettingsPageProps({
         selected: wallet.publicDeriver,
         getConceptualWalletSettingsCache: lookup.getConceptualWalletSettingsCache,
+        getSigningKeyCache: lookup.getSigningKeyCache,
       });
       const defaultProps = defaultChangeWalletPasswordDialogContainerProps({
         selected: wallet.publicDeriver,
