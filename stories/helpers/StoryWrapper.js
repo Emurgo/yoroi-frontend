@@ -292,8 +292,7 @@ export function registerLookup(key: symbol, wallets: Array<CacheValue>): void {
   _walletLookup.set(key, wallets);
 }
 
-export function walletLookup(key: symbol): void => {|
-  selected: null | PublicDeriver<>,
+export function walletLookup(wallets: Array<CacheValue>): {|
   publicDerivers: Array<PublicDeriver<>>,
   getConceptualWalletSettingsCache:
     typeof WalletSettingsStore.prototype.getConceptualWalletSettingsCache,
@@ -304,10 +303,8 @@ export function walletLookup(key: symbol): void => {|
   getDelegation:
     typeof DelegationStore.prototype.getDelegationRequests,
 |} {
-  const wallets = _walletLookup.get(key);
-  if (wallets == null || wallets.length === 0) {
-    return () => ({
-      selected: null,
+  if (wallets.length === 0) {
+    return ({
       publicDerivers: [],
       getConceptualWalletSettingsCache: (_conceptualWallet) => (null: any),
       getTransactions: (_publicDeriver) => (null: any),
@@ -320,15 +317,14 @@ export function walletLookup(key: symbol): void => {|
   for (const wallet of wallets) {
     asOption[wallet.conceptualWalletCache.conceptualWalletName] = wallet.publicDeriver;
   }
-  const selectedWallet = () => select(
-    'selectedWallet',
-    asOption,
-    // TODO: support no wallet selected
-    asOption[wallets[0].conceptualWalletCache.conceptualWalletName],
-  );
+  // const selectedWallet = () => select(
+  //   'selectedWallet',
+  //   asOption,
+  //   // TODO: support no wallet selected
+  //   asOption[wallets[0].conceptualWalletCache.conceptualWalletName],
+  // );
 
-  return () => ({
-    selected: selectedWallet(),
+  return ({
     publicDerivers: wallets.map(wallet => wallet.publicDeriver),
     getConceptualWalletSettingsCache: (conceptualWallet) => {
       for (const wallet of wallets) {

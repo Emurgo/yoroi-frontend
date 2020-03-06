@@ -16,6 +16,8 @@ import RemoveWalletDialog from '../../../components/wallet/settings/RemoveWallet
 import { wrapSettings } from '../../../Routes';
 import { mockSettingsProps } from '../Settings.mock';
 import { ROUTES } from '../../../routes-config';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
+import WalletSettingsStore from '../../../stores/base/WalletSettingsStore';
 
 export default {
   title: `Container/${nameof(WalletSettingsPage)}`,
@@ -25,14 +27,17 @@ export default {
 
 /* ===== Notable variations ===== */
 
-const defaultSettingsPageProps = (cacheKey: symbol) => ({
+const defaultSettingsPageProps: {|
+  selected: null | PublicDeriver<>,
+  getConceptualWalletSettingsCache:
+    typeof WalletSettingsStore.prototype.getConceptualWalletSettingsCache,
+|} => * = (request) => ({
   stores: {
     profile: {
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
     },
     walletSettings: {
-      getConceptualWalletSettingsCache:
-        walletLookup(cacheKey)().getConceptualWalletSettingsCache,
+      getConceptualWalletSettingsCache: request.getConceptualWalletSettingsCache,
       removeWalletRequest: {
         reset: action('removeWalletRequest reset'),
         isExecuting: false,
@@ -59,8 +64,7 @@ const defaultSettingsPageProps = (cacheKey: symbol) => ({
         publicDeriver,
         signingKeyUpdateDate: null,
       }),
-      selected: walletLookup(cacheKey)().selected,
-      // TODO getSigningKeyCache
+      selected: request.selected,
     },
   },
   actions: {
@@ -80,14 +84,19 @@ const defaultSettingsPageProps = (cacheKey: symbol) => ({
 });
 
 export const EditName = () => {
-  const EditNameSymbol = Symbol('EditName');
-  (() => {
-    const dummyWallet = genDummyWithCache();
-    registerLookup(EditNameSymbol, [dummyWallet]);
-  })();
+  const wallet = genDummyWithCache();
+  const lookup = walletLookup([wallet]);
   return wrapSettings(
-    mockSettingsProps({ cacheKey: EditNameSymbol, location: ROUTES.SETTINGS.WALLET }),
+    mockSettingsProps({
+      location: ROUTES.SETTINGS.WALLET,
+      selected: wallet.publicDeriver,
+      ...lookup,
+    }),
     (() => {
+      const settingPageProps = defaultSettingsPageProps({
+        selected: wallet.publicDeriver,
+        getConceptualWalletSettingsCache: lookup.getConceptualWalletSettingsCache,
+      });
       const nameCases = {
         Untouched: 0,
         Editing: 1,
@@ -98,11 +107,10 @@ export const EditName = () => {
         nameCases,
         nameCases.Untouched,
       );
-      const settingPageProps = defaultSettingsPageProps(EditNameSymbol);
       return (
         <WalletSettingsPage
           generated={{
-            ...defaultSettingsPageProps(EditNameSymbol),
+            ...settingPageProps,
             stores: {
               ...settingPageProps.stores,
               walletSettings: {
@@ -120,14 +128,19 @@ export const EditName = () => {
 };
 
 export const PasswordUpdateTime = () => {
-  const PasswordUpdateSymbol = Symbol('PasswordUpdateTime');
-  (() => {
-    const dummyWallet = genSigningWalletWithCache();
-    registerLookup(PasswordUpdateSymbol, [dummyWallet]);
-  })();
+  const wallet = genSigningWalletWithCache();
+  const lookup = walletLookup([wallet]);
   return wrapSettings(
-    mockSettingsProps({ cacheKey: PasswordUpdateSymbol, location: ROUTES.SETTINGS.WALLET }),
+    mockSettingsProps({
+      location: ROUTES.SETTINGS.WALLET,
+      selected: wallet.publicDeriver,
+      ...lookup,
+    }),
     (() => {
+      const settingPageProps = defaultSettingsPageProps({
+        selected: wallet.publicDeriver,
+        getConceptualWalletSettingsCache: lookup.getConceptualWalletSettingsCache,
+      });
       const lastUpdateCases = {
         Never: 0,
         Previously: 1,
@@ -137,11 +150,10 @@ export const PasswordUpdateTime = () => {
         lastUpdateCases,
         lastUpdateCases.Never,
       );
-      const settingPageProps = defaultSettingsPageProps(PasswordUpdateSymbol);
       return (
         <WalletSettingsPage
           generated={{
-            ...defaultSettingsPageProps(PasswordUpdateSymbol),
+            ...settingPageProps,
             stores: {
               ...settingPageProps.stores,
               wallets: {
@@ -163,19 +175,23 @@ export const PasswordUpdateTime = () => {
 };
 
 export const ResyncWallet = () => {
-  const ResyncWalletSymbol = Symbol('ResyncWallet');
-  (() => {
-    const dummyWallet = genDummyWithCache();
-    registerLookup(ResyncWalletSymbol, [dummyWallet]);
-  })();
+  const wallet = genDummyWithCache();
+  const lookup = walletLookup([wallet]);
   return wrapSettings(
-    mockSettingsProps({ cacheKey: ResyncWalletSymbol, location: ROUTES.SETTINGS.WALLET }),
+    mockSettingsProps({
+      location: ROUTES.SETTINGS.WALLET,
+      selected: wallet.publicDeriver,
+      ...lookup,
+    }),
     (() => {
-      const settingPageProps = defaultSettingsPageProps(ResyncWalletSymbol);
+      const settingPageProps = defaultSettingsPageProps({
+        selected: wallet.publicDeriver,
+        getConceptualWalletSettingsCache: lookup.getConceptualWalletSettingsCache,
+      });
       return (
         <WalletSettingsPage
           generated={{
-            ...defaultSettingsPageProps(ResyncWalletSymbol),
+            ...settingPageProps,
             stores: {
               ...settingPageProps.stores,
               walletSettings: {
@@ -194,7 +210,9 @@ export const ResyncWallet = () => {
   );
 };
 
-const defaultChangeWalletPasswordDialogContainerProps = (cacheKey: symbol) => ({
+const defaultChangeWalletPasswordDialogContainerProps: {|
+  selected: null | PublicDeriver<>,
+|} => * = (request) => ({
   stores: {
     walletSettings: {
       changeSigningKeyRequest: {
@@ -207,7 +225,7 @@ const defaultChangeWalletPasswordDialogContainerProps = (cacheKey: symbol) => ({
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
     },
     wallets: {
-      selected: walletLookup(cacheKey)().selected,
+      selected: request.selected,
     },
     uiDialogs: {
       dataForActiveDialog: {
@@ -229,14 +247,22 @@ const defaultChangeWalletPasswordDialogContainerProps = (cacheKey: symbol) => ({
 });
 
 export const EditPassword = () => {
-  const EditPasswordSymbol = Symbol('EditPassword');
-  (() => {
-    const dummyWallet = genSigningWalletWithCache();
-    registerLookup(EditPasswordSymbol, [dummyWallet]);
-  })();
+  const wallet = genSigningWalletWithCache();
+  const lookup = walletLookup([wallet]);
   return wrapSettings(
-    mockSettingsProps({ cacheKey: EditPasswordSymbol, location: ROUTES.SETTINGS.WALLET }),
+    mockSettingsProps({
+      location: ROUTES.SETTINGS.WALLET,
+      selected: wallet.publicDeriver,
+      ...lookup,
+    }),
     (() => {
+      const settingPageProps = defaultSettingsPageProps({
+        selected: wallet.publicDeriver,
+        getConceptualWalletSettingsCache: lookup.getConceptualWalletSettingsCache,
+      });
+      const defaultProps = defaultChangeWalletPasswordDialogContainerProps({
+        selected: wallet.publicDeriver,
+      });
       const errorCases = {
         None: undefined,
         WrongPassword: new IncorrectWalletPasswordError(),
@@ -279,12 +305,10 @@ export const EditPassword = () => {
         return '';
       };
 
-      const defaultProps = defaultChangeWalletPasswordDialogContainerProps(EditPasswordSymbol);
-      const settingPageProps = defaultSettingsPageProps(EditPasswordSymbol);
       return (
         <WalletSettingsPage
           generated={{
-            ...defaultSettingsPageProps(EditPasswordSymbol),
+            ...settingPageProps,
             stores: {
               ...settingPageProps.stores,
               uiDialogs: {
@@ -293,6 +317,7 @@ export const EditPassword = () => {
               },
               wallets: {
                 ...settingPageProps.stores.wallets,
+                // TODO: proper cache?
                 getSigningKeyCache: (publicDeriver) => ({
                   publicDeriver,
                   signingKeyUpdateDate: null,
@@ -332,20 +357,26 @@ export const EditPassword = () => {
 };
 
 export const RemoveWallet = () => {
-  const RemoveWalletSymbol = Symbol('RemoveWallet');
-  (() => {
-    const dummyWallet = genDummyWithCache();
-    registerLookup(RemoveWalletSymbol, [dummyWallet]);
-  })();
+  const wallet = genDummyWithCache();
+  const lookup = walletLookup([wallet]);
   return wrapSettings(
-    mockSettingsProps({ cacheKey: RemoveWalletSymbol, location: ROUTES.SETTINGS.WALLET }),
+    mockSettingsProps({
+      location: ROUTES.SETTINGS.WALLET,
+      selected: wallet.publicDeriver,
+      ...lookup,
+    }),
     (() => {
-      const defaultProps = defaultChangeWalletPasswordDialogContainerProps(RemoveWalletSymbol);
-      const settingPageProps = defaultSettingsPageProps(RemoveWalletSymbol);
+      const settingPageProps = defaultSettingsPageProps({
+        selected: wallet.publicDeriver,
+        getConceptualWalletSettingsCache: lookup.getConceptualWalletSettingsCache,
+      });
+      const defaultProps = defaultChangeWalletPasswordDialogContainerProps({
+        selected: wallet.publicDeriver,
+      });
       return (
         <WalletSettingsPage
           generated={{
-            ...defaultSettingsPageProps(RemoveWalletSymbol),
+            ...settingPageProps,
             stores: {
               ...settingPageProps.stores,
               uiDialogs: {

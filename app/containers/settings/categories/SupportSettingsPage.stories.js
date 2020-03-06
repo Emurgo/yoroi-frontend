@@ -7,6 +7,9 @@ import { withScreenshot } from 'storycap';
 import { wrapSettings } from '../../../Routes';
 import { mockSettingsProps } from '../Settings.mock';
 import { ROUTES } from '../../../routes-config';
+import {
+  walletLookup,
+} from '../../../../stories/helpers/StoryWrapper';
 
 export default {
   title: `Container/${nameof(SupportSettingsPage)}`,
@@ -15,9 +18,13 @@ export default {
 };
 
 export const Generic = () => {
-  const GenericSymbol = Symbol('Generic');
+  const lookup = walletLookup([]);
   return wrapSettings(
-    mockSettingsProps({ cacheKey: GenericSymbol, location: ROUTES.SETTINGS.SUPPORT }),
+    mockSettingsProps({
+      location: ROUTES.SETTINGS.SUPPORT,
+      selected: null,
+      ...lookup,
+    }),
     (<SupportSettingsPage
       generated={{
       }}

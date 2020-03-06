@@ -1,12 +1,26 @@
 // @flow
 
-import { globalKnobs, walletLookup } from '../../../stories/helpers/StoryWrapper';
+import { globalKnobs, } from '../../../stories/helpers/StoryWrapper';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { action } from '@storybook/addon-actions';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
+import WalletSettingsStore from '../../stores/base/WalletSettingsStore';
+import TransactionsStore from '../../stores/base/TransactionsStore';
+import DelegationStore from '../../stores/ada/DelegationStore';
+import WalletStore from '../../stores/toplevel/WalletStore';
 import type { GeneratedData } from './Settings';
 
 export const mockSettingsProps: {|
-  cacheKey: symbol,
+  selected: null | PublicDeriver<>,
+  publicDerivers: Array<PublicDeriver<>>,
+  getConceptualWalletSettingsCache:
+    typeof WalletSettingsStore.prototype.getConceptualWalletSettingsCache,
+  getPublicKeyCache:
+    typeof WalletStore.prototype.getPublicKeyCache,
+  getTransactions:
+    typeof TransactionsStore.prototype.getTxRequests,
+  getDelegation:
+    typeof DelegationStore.prototype.getDelegationRequests,
   location: string,
 |} => {| generated: GeneratedData |} = (request) => ({
   generated: {
@@ -21,8 +35,8 @@ export const mockSettingsProps: {|
         },
       },
       wallets: {
-        hasActiveWallet: walletLookup(request.cacheKey)().selected != null,
-        selected: walletLookup(request.cacheKey)().selected,
+        hasActiveWallet: request.selected != null,
+        selected: request.selected,
       },
       serverConnectionStore: {
         checkAdaServerStatus: ServerStatusErrors.Healthy, // TODO: make this a global knob?
@@ -59,21 +73,21 @@ export const mockSettingsProps: {|
         stores: {
           walletSettings: {
             getConceptualWalletSettingsCache:
-              walletLookup(request.cacheKey)().getConceptualWalletSettingsCache,
+              request.getConceptualWalletSettingsCache,
           },
           wallets: {
-            selected: walletLookup(request.cacheKey)().selected,
-            publicDerivers: walletLookup(request.cacheKey)().publicDerivers,
-            getPublicKeyCache: walletLookup(request.cacheKey)().getPublicKeyCache,
+            selected: request.selected,
+            publicDerivers: request.publicDerivers,
+            getPublicKeyCache: request.getPublicKeyCache,
           },
           profile: {
             shouldHideBalance: false,
           },
           delegation: {
-            getDelegationRequests: walletLookup(request.cacheKey)().getDelegation,
+            getDelegationRequests: request.getDelegation,
           },
           transactions: {
-            getTxRequests: walletLookup(request.cacheKey)().getTransactions,
+            getTxRequests: request.getTransactions,
           },
         },
         actions: {

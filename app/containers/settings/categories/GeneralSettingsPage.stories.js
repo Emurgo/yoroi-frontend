@@ -7,7 +7,7 @@ import { action } from '@storybook/addon-actions';
 import { LANGUAGES } from '../../../i18n/translations';
 import GeneralSettingsPage from './GeneralSettingsPage';
 import { withScreenshot } from 'storycap';
-import { globalKnobs } from '../../../../stories/helpers/StoryWrapper';
+import { globalKnobs, walletLookup } from '../../../../stories/helpers/StoryWrapper';
 import { getVarsForTheme } from '../../../stores/toplevel/ProfileStore';
 import { wrapSettings } from '../../../Routes';
 import { mockSettingsProps } from '../Settings.mock';
@@ -22,9 +22,13 @@ export default {
 
 // TODO: dynamic change isFirefox/isChrome/isExtension
 export const Generic = () => {
-  const GenericSymbol = Symbol('Generic');
+  const lookup = walletLookup([]);
   return wrapSettings(
-    mockSettingsProps({ cacheKey: GenericSymbol, location: ROUTES.SETTINGS.GENERAL }),
+    mockSettingsProps({
+      location: ROUTES.SETTINGS.GENERAL,
+      selected: null,
+      ...lookup,
+    }),
     (<GeneralSettingsPage
       generated={{
         stores: {

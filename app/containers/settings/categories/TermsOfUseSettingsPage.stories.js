@@ -9,6 +9,7 @@ import { wrapSettings } from '../../../Routes';
 import { mockSettingsProps } from '../Settings.mock';
 import {
   globalKnobs,
+  walletLookup,
 } from '../../../../stories/helpers/StoryWrapper';
 import { ROUTES } from '../../../routes-config';
 
@@ -19,9 +20,13 @@ export default {
 };
 
 export const Generic = () => {
-  const GenericSymbol = Symbol('Generic');
+  const lookup = walletLookup([]);
   return wrapSettings(
-    mockSettingsProps({ cacheKey: GenericSymbol, location: ROUTES.SETTINGS.TERMS_OF_USE }),
+    mockSettingsProps({
+      location: ROUTES.SETTINGS.TERMS_OF_USE,
+      selected: null,
+      ...lookup,
+    }),
     (<TermsOfUseSettingsPage
       generated={{
         stores: {

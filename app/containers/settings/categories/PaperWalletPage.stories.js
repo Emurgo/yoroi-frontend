@@ -17,6 +17,7 @@ import {
   getMnemonicCases,
   getPasswordValidationCases,
   globalKnobs,
+  walletLookup,
 } from '../../../../stories/helpers/StoryWrapper';
 import { ROUTES } from '../../../routes-config';
 
@@ -29,9 +30,13 @@ export default {
 /* ===== Notable variations ===== */
 
 export const NoDialog = () => {
-  const NoDialogSymbol = Symbol('NoDialog');
+  const lookup = walletLookup([]);
   return wrapSettings(
-    mockSettingsProps({ cacheKey: NoDialogSymbol, location: ROUTES.SETTINGS.PAPER_WALLET }),
+    mockSettingsProps({
+      location: ROUTES.SETTINGS.PAPER_WALLET,
+      selected: null,
+      ...lookup,
+    }),
     (<PaperWalletPage
       generated={{
         stores: {
@@ -91,11 +96,12 @@ const OpenDialogBase = {
 };
 
 export const UserPasswordDialog = () => {
-  const UserPasswordDialogSymbol = Symbol('UserPasswordDialog');
+  const lookup = walletLookup([]);
   return wrapSettings(
     mockSettingsProps({
-      cacheKey: UserPasswordDialogSymbol,
-      location: ROUTES.SETTINGS.PAPER_WALLET
+      location: ROUTES.SETTINGS.PAPER_WALLET,
+      selected: null,
+      ...lookup,
     }),
     (<PaperWalletPage
       generated={{
@@ -137,9 +143,13 @@ export const UserPasswordDialog = () => {
 };
 
 export const CreateDialog = () => {
-  const CreateDialogSymbol = Symbol('CreateDialog');
+  const lookup = walletLookup([]);
   return wrapSettings(
-    mockSettingsProps({ cacheKey: CreateDialogSymbol, location: ROUTES.SETTINGS.PAPER_WALLET }),
+    mockSettingsProps({
+      location: ROUTES.SETTINGS.PAPER_WALLET,
+      selected: null,
+      ...lookup,
+    }),
     (() => {
       const modifiedSteps = {
         undefined: 'undefined',
@@ -220,9 +230,13 @@ const constructedPaperWallet = {
 };
 
 export const VerifyDialog = () => {
-  const VerifyDialogSymbol = Symbol('VerifyDialog');
+  const lookup = walletLookup([]);
   return wrapSettings(
-    mockSettingsProps({ cacheKey: VerifyDialogSymbol, location: ROUTES.SETTINGS.PAPER_WALLET }),
+    mockSettingsProps({
+      location: ROUTES.SETTINGS.PAPER_WALLET,
+      selected: null,
+      ...lookup,
+    }),
     (() => {
       const mnemonicCases = getMnemonicCases(21);
       const mneonicsValue = () => select(
@@ -289,9 +303,13 @@ export const VerifyDialog = () => {
 };
 
 export const FinalizeDialog = () => {
-  const FinalizeDialogSymbol = Symbol('FinalizeDialog');
+  const lookup = walletLookup([]);
   return wrapSettings(
-    mockSettingsProps({ cacheKey: FinalizeDialogSymbol, location: ROUTES.SETTINGS.PAPER_WALLET }),
+    mockSettingsProps({
+      location: ROUTES.SETTINGS.PAPER_WALLET,
+      selected: null,
+      ...lookup,
+    }),
     (<PaperWalletPage
       generated={{
         ...OpenDialogBase,
