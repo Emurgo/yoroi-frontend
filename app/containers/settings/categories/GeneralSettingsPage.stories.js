@@ -15,7 +15,7 @@ import { getDefaultExplorer } from '../../../domain/Explorer';
 import { ROUTES } from '../../../routes-config';
 
 export default {
-  title: `Container/${nameof(GeneralSettingsPage)}`,
+  title: `${module.id.split('.')[1]}`,
   component: GeneralSettingsPage,
   decorators: [withScreenshot],
 };

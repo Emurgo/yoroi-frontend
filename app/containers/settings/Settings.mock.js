@@ -1,5 +1,6 @@
 // @flow
 
+import { select, } from '@storybook/addon-knobs';
 import { globalKnobs, } from '../../../stories/helpers/StoryWrapper';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { action } from '@storybook/addon-actions';
@@ -40,7 +41,11 @@ export const mockSettingsProps: {
         selected: request.selected,
       },
       serverConnectionStore: {
-        checkAdaServerStatus: ServerStatusErrors.Healthy, // TODO: make this a global knob?
+        checkAdaServerStatus: select(
+          'checkAdaServerStatus',
+          ServerStatusErrors,
+          ServerStatusErrors.Healthy,
+        ),
       }
     },
     actions: {

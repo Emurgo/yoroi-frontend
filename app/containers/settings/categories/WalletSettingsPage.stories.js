@@ -21,7 +21,7 @@ import WalletSettingsStore from '../../../stores/base/WalletSettingsStore';
 import WalletStore from '../../../stores/toplevel/WalletStore';
 
 export default {
-  title: `Container/${nameof(WalletSettingsPage)}`,
+  title: `${module.id.split('.')[1]}`,
   component: WalletSettingsPage,
   decorators: [withScreenshot],
 };

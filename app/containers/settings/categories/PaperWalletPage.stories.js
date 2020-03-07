@@ -22,7 +22,7 @@ import {
 import { ROUTES } from '../../../routes-config';
 
 export default {
-  title: `Container/${nameof(PaperWalletPage)}`,
+  title: `${module.id.split('.')[1]}`,
   component: PaperWalletPage,
   decorators: [withScreenshot],
 };

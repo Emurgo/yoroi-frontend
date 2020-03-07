@@ -14,7 +14,7 @@ import {
 import { ROUTES } from '../../../routes-config';
 
 export default {
-  title: `Container/${nameof(TermsOfUseSettingsPage)}`,
+  title: `${module.id.split('.')[1]}`,
   component: TermsOfUseSettingsPage,
   decorators: [withScreenshot],
 };
