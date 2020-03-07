@@ -103,42 +103,71 @@ export const UserPasswordDialog = () => {
       selected: null,
       ...lookup,
     }),
-    (<PaperWalletPage
-      generated={{
-        ...OpenDialogBase,
-        CreatePaperWalletDialogContainerProps: {
-          generated: {
-            stores: {
-              profile: {
-                paperWalletsIntro: getPaperWalletIntro(globalKnobs.locale(), ''),
-                isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-                selectedExplorer: getDefaultExplorer(),
-              },
-              uiDialogs: {
-                dataForActiveDialog: {
-                  numAddresses: 5,
-                  printAccountPlate: true,
-                  repeatedPasswordValue: '',
-                  passwordValue: '',
-                }
-              },
-              uiNotifications: {
-                isOpen: () => false,
-                getTooltipActiveNotification: () => null,
-              },
-              paperWallets: {
-                paper: null,
-                progressInfo: ProgressStep.USER_PASSWORD,
-                userPassword: '',
-                pdfRenderStatus: null,
-                pdf: null,
+    (() => {
+      const passwordCases = {
+        Untouched: 0,
+        TooShort: 1,
+        MisMatch: 2,
+        Correct: 3,
+      };
+      const passwordValue = () => select(
+        'passwordCases',
+        passwordCases,
+        passwordCases.Untouched,
+      );
+      const getNewPassword = () => {
+        const val = passwordValue();
+        if (val === passwordCases.Correct) return 'asdfasdfasdf';
+        if (val === passwordCases.MisMatch) return 'asdfasdfasdf';
+        if (val === passwordCases.TooShort) return 'a';
+        return '';
+      };
+      const getRepeatPassword = () => {
+        const val = passwordValue();
+        if (val === passwordCases.Correct) return 'asdfasdfasdf';
+        if (val === passwordCases.MisMatch) return 'zxcvzxcvzxcv';
+        if (val === passwordCases.TooShort) return 'a';
+        return '';
+      };
+      return (
+        <PaperWalletPage
+          generated={{
+            ...OpenDialogBase,
+            CreatePaperWalletDialogContainerProps: {
+              generated: {
+                stores: {
+                  profile: {
+                    paperWalletsIntro: getPaperWalletIntro(globalKnobs.locale(), ''),
+                    isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+                    selectedExplorer: getDefaultExplorer(),
+                  },
+                  uiDialogs: {
+                    dataForActiveDialog: {
+                      numAddresses: 5,
+                      printAccountPlate: true,
+                      repeatedPasswordValue: getRepeatPassword(),
+                      passwordValue: getNewPassword(),
+                    }
+                  },
+                  uiNotifications: {
+                    isOpen: () => false,
+                    getTooltipActiveNotification: () => null,
+                  },
+                  paperWallets: {
+                    paper: null,
+                    progressInfo: ProgressStep.USER_PASSWORD,
+                    userPassword: '',
+                    pdfRenderStatus: null,
+                    pdf: null,
+                  },
+                },
+                actions: mockActions,
               },
             },
-            actions: mockActions,
-          },
-        },
-      }}
-    />)
+          }}
+        />
+      );
+    })()
   );
 };
 

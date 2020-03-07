@@ -120,6 +120,7 @@ export const EditName = () => {
                 walletFieldBeingEdited: nameValue() === nameCases.Editing ? 'name' : null,
               },
             },
+            // dialog is close so no need to give props
             ChangeWalletPasswordDialogContainerProps: (null: any),
           }}
         />
@@ -170,6 +171,7 @@ export const PasswordUpdateTime = () => {
                   getSigningKeyCache: lookup.getSigningKeyCache,
                 },
               },
+              // dialog is close so no need to give props
               ChangeWalletPasswordDialogContainerProps: (null: any),
             }}
           />
@@ -208,6 +210,7 @@ export const ResyncWallet = () => {
                 },
               },
             },
+            // dialog is close so no need to give props
             ChangeWalletPasswordDialogContainerProps: (null: any),
           }}
         />

@@ -206,8 +206,10 @@ export default class CreatePaperWalletDialogContainer
       case ProgressStep.USER_PASSWORD:
         return (
           <UserPasswordDialog
-            passwordValue={dialogData.passwordValue}
-            repeatedPasswordValue={dialogData.repeatedPasswordValue}
+            dialogData={{
+              passwordValue: dialogData.passwordValue,
+              repeatedPasswordValue: dialogData.repeatedPasswordValue,
+            }}
             onNext={this.generated.actions.paperWallets.submitUserPassword.trigger}
             onCancel={onCancel}
             onDataChange={data => {
