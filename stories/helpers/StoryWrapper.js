@@ -66,6 +66,12 @@ export const globalKnobs: {|
   currentTheme: () => select('Theme', themeNames, THEMES.YOROI_MODERN),
 };
 
+export const isFirefoxKnob: void => boolean = () => {
+  const firefox = boolean('isFirefox', false);
+  environment.userAgentInfo.isFirefox = firefox;
+  return firefox;
+};
+
 @observer
 export default class StoryWrapper extends Component<Props> {
 

@@ -53,6 +53,7 @@ type GeneratedData = {|
       |},
     |},
   |},
+  +canRegisterProtocol: void => boolean,
 |};
 
 @observer
@@ -94,6 +95,7 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           updateSelectedExplorer: { trigger: actions.profile.updateSelectedExplorer.trigger },
         },
       },
+      canRegisterProtocol: environment.userAgentInfo.canRegisterProtocol,
     });
   }
 
@@ -105,7 +107,7 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
     const { currentTheme } = profileStore;
 
     // disable for Shelley to avoid overriding mainnet Yoroi URI
-    const uriSettings = environment.userAgentInfo.canRegisterProtocol() && !environment.isShelley()
+    const uriSettings = !environment.isShelley() && this.generated.canRegisterProtocol()
       ? (
         <UriSettingsBlock
           registerUriScheme={() => registerProtocols()}

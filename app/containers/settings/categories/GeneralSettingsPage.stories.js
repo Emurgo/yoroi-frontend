@@ -20,7 +20,6 @@ export default {
   decorators: [withScreenshot],
 };
 
-// TODO: dynamic change isFirefox/isChrome/isExtension
 export const Generic = () => {
   const lookup = walletLookup([]);
   return wrapSettings(
@@ -57,6 +56,7 @@ export const Generic = () => {
             updateSelectedExplorer: { trigger: async () => action('updateSelectedExplorer')() },
           },
         },
+        canRegisterProtocol: () => boolean('canRegisterProtocol', true),
       }}
     />)
   );
