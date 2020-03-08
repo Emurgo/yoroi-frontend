@@ -161,7 +161,7 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
               onLegacyTrezor={this.startTransferLegacyTrezorFunds}
               classicTheme={profile.isClassicTheme}
               onFollowInstructionsPrerequisites={this.goToCreateWallet}
-              disableTransferFunds={yoroiTransfer.disableTransferFunds}
+              disableTransferFunds={stores.wallets.selected == null}
             />
           </TransferLayout>
         );

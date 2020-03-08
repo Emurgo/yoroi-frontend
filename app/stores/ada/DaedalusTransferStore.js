@@ -40,7 +40,6 @@ const WS_CODE_NORMAL_CLOSURE = 1000;
 export default class DaedalusTransferStore extends Store {
 
   @observable status: TransferStatusT = TransferStatus.UNINITIALIZED;
-  @observable disableTransferFunds: boolean = true;
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
   @observable transferFundsRequest: Request<SendFunc>
@@ -50,9 +49,6 @@ export default class DaedalusTransferStore extends Store {
 
   setup(): void {
     super.setup();
-    this.registerReactions([
-      this._enableDisableTransferFunds
-    ]);
     const actions = this.actions.ada.daedalusTransfer;
     actions.startTransferFunds.listen(this._startTransferFunds);
     actions.startTransferPaperFunds.listen(this._startTransferPaperFunds);
@@ -79,24 +75,6 @@ export default class DaedalusTransferStore extends Store {
 
   _startTransferMasterKey: void => void = () => {
     this._updateStatus(TransferStatus.GETTING_MASTER_KEY);
-  }
-
-  /** @Attention:
-      You should check wallets state outside of the runInAction,
-      because this method run as a reaction.
-  */
-  _enableDisableTransferFunds: void => void = () => {
-    const { wallets } = this.stores;
-    // User must first make a Yoroi wallet before being able to transfer a Daedalus wallet
-    if (wallets.hasActiveWallet) {
-      runInAction(() => {
-        this.disableTransferFunds = false;
-      });
-    } else {
-      runInAction(() => {
-        this.disableTransferFunds = true;
-      });
-    }
   }
 
   /**
@@ -259,9 +237,15 @@ export default class DaedalusTransferStore extends Store {
       this._reset();
     } catch (error) {
       Logger.error(`DaedalusTransferStore::transferFunds ${stringifyError(error)}`);
-      runInAction(() => {
-        this.error = new TransferFundsError();
-      });
+      if (error instanceof NoTransferTxError) {
+        runInAction(() => {
+          this.error = error;
+        });
+      } else {
+        runInAction(() => {
+          this.error = new TransferFundsError();
+        });
+      }
     }
   }
 

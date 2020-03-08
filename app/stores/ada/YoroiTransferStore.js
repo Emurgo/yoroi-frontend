@@ -44,7 +44,6 @@ import config from '../../config';
 export default class YoroiTransferStore extends Store {
 
   @observable status: TransferStatusT = TransferStatus.UNINITIALIZED;
-  @observable disableTransferFunds: boolean = true;
   @observable transferFundsRequest: Request<typeof YoroiTransferStore.prototype._checkAndTransfer>
     = new Request<typeof YoroiTransferStore.prototype._checkAndTransfer>(this._checkAndTransfer);
   @observable restoreForTransferRequest: Request<RestoreWalletForTransferFunc>
@@ -84,9 +83,6 @@ export default class YoroiTransferStore extends Store {
 
   setup(): void {
     super.setup();
-    this.registerReactions([
-      this._enableDisableTransferFunds
-    ]);
     const actions = this.actions.ada.yoroiTransfer;
     actions.startTransferFunds.listen(this._startTransferFunds);
     actions.startTransferLegacyHardwareFunds.listen(this._startTransferLegacyHardwareFunds);
@@ -139,24 +135,6 @@ export default class YoroiTransferStore extends Store {
 
   _startHardwareMnemnoic: void => void = () => {
     this._updateStatus(TransferStatus.GETTING_HARDWARE_MNEMONIC);
-  }
-
-  /** @Attention:
-      You should check wallets state outside of the runInAction,
-      because this method run as a reaction.
-  */
-  _enableDisableTransferFunds: void => void = (): void => {
-    const { wallets } = this.stores;
-    // User must first make a Yoroi wallet before being able to transfer a Daedalus wallet
-    if (wallets.hasActiveWallet) {
-      runInAction(() => {
-        this.disableTransferFunds = false;
-      });
-    } else {
-      runInAction(() => {
-        this.disableTransferFunds = true;
-      });
-    }
   }
 
   nextInternalAddress: PublicDeriver<> => (void => Promise<string>) = (
