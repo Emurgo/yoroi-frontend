@@ -2,11 +2,9 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { action, observable } from 'mobx';
-import type { InjectedProps } from '../../types/injectedPropsType';
 import HardwareDisclaimer from '../../components/transfer/HardwareDisclaimer';
 
 type Props = {|
-  ...InjectedProps,
   +onBack: void => void,
   +onNext: void => void,
 |};

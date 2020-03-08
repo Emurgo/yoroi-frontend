@@ -35,74 +35,6 @@ type State = {|
   notificationElementId: string,
 |};
 
-export type GeneratedData = {|
-  +stores: {|
-    +profile: {|
-      +paperWalletsIntro: string,
-      +isClassicTheme: boolean,
-      +selectedExplorer: ExplorerType,
-    |},
-    +uiDialogs: {|
-      +dataForActiveDialog: {|
-        +numAddresses: number,
-        +printAccountPlate: boolean,
-        +repeatedPasswordValue: string,
-        +passwordValue: string,
-      |},
-    |},
-    +uiNotifications: {|
-      +isOpen: any => boolean,
-      +getTooltipActiveNotification: string => ?Notification,
-    |},
-    +paperWallets: {|
-      +paper: ?AdaPaper,
-      +progressInfo: ?ProgressStepEnum,
-      +userPassword: ?string,
-      +pdfRenderStatus: ?PdfGenStepType,
-      +pdf: ?Blob,
-    |},
-  |},
-  +actions: {|
-    +dialogs: {|
-      +updateDataForActiveDialog: {|
-        +trigger: typeof DialogsActions.prototype.updateDataForActiveDialog.trigger
-      |},
-      +closeActiveDialog: {|
-        +trigger: typeof DialogsActions.prototype.closeActiveDialog.trigger
-      |},
-    |},
-    +notifications: {|
-      +open: {|
-        +trigger: typeof NotificationActions.prototype.open.trigger
-      |},
-    |},
-    +paperWallets: {|
-      +cancel: {|
-        +trigger: typeof PaperWalletsActions.prototype.cancel.trigger
-      |},
-      +submitInit: {|
-        +trigger: typeof PaperWalletsActions.prototype.submitInit.trigger
-      |},
-      +submitUserPassword: {|
-        +trigger: typeof PaperWalletsActions.prototype.submitUserPassword.trigger
-      |},
-      +backToCreate: {|
-        +trigger: typeof PaperWalletsActions.prototype.backToCreate.trigger
-      |},
-      +submitVerify: {|
-        +trigger: typeof PaperWalletsActions.prototype.submitVerify.trigger
-      |},
-      +submitCreate: {|
-        +trigger: typeof PaperWalletsActions.prototype.submitCreate.trigger
-      |},
-      +downloadPaperWallet: {|
-        +trigger: typeof PaperWalletsActions.prototype.downloadPaperWallet.trigger
-      |},
-    |},
-  |},
-  verifyDefaultValues?: ?WalletRestoreDialogValues,
-|};
-
 @observer
 export default class CreatePaperWalletDialogContainer
   extends Component<InjectedOrGenerated<GeneratedData>, State> {
@@ -114,62 +46,6 @@ export default class CreatePaperWalletDialogContainer
   state = {
     notificationElementId: ''
   };
-
-  @computed get generated(): GeneratedData {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(CreatePaperWalletDialogContainer)} no way to generated props`);
-    }
-    const { stores, actions } = this.props;
-    return Object.freeze({
-      stores: {
-        profile: {
-          paperWalletsIntro: stores.profile.paperWalletsIntro,
-          isClassicTheme: stores.profile.isClassicTheme,
-          selectedExplorer: stores.profile.selectedExplorer,
-        },
-        uiDialogs: {
-          dataForActiveDialog: {
-            numAddresses: stores.uiDialogs.dataForActiveDialog.numAddresses,
-            printAccountPlate: stores.uiDialogs.dataForActiveDialog.printAccountPlate,
-            repeatedPasswordValue: stores.uiDialogs.dataForActiveDialog.repeatedPasswordValue,
-            passwordValue: stores.uiDialogs.dataForActiveDialog.passwordValue,
-          }
-        },
-        uiNotifications: {
-          isOpen: stores.uiNotifications.isOpen,
-          getTooltipActiveNotification: stores.uiNotifications.getTooltipActiveNotification,
-        },
-        paperWallets: {
-          paper: stores.substores.ada.paperWallets.paper,
-          progressInfo: stores.substores.ada.paperWallets.progressInfo,
-          userPassword: stores.substores.ada.paperWallets.userPassword,
-          pdfRenderStatus: stores.substores.ada.paperWallets.pdfRenderStatus,
-          pdf: stores.substores.ada.paperWallets.pdf,
-        },
-      },
-      actions: {
-        dialogs: {
-          updateDataForActiveDialog: { trigger: actions.dialogs.updateDataForActiveDialog.trigger },
-          closeActiveDialog: { trigger: actions.dialogs.closeActiveDialog.trigger },
-        },
-        notifications: {
-          open: { trigger: actions.notifications.open.trigger },
-        },
-        paperWallets: {
-          cancel: { trigger: actions.ada.paperWallets.cancel.trigger },
-          submitInit: { trigger: actions.ada.paperWallets.submitInit.trigger },
-          submitUserPassword: { trigger: actions.ada.paperWallets.submitUserPassword.trigger },
-          backToCreate: { trigger: actions.ada.paperWallets.backToCreate.trigger },
-          submitVerify: { trigger: actions.ada.paperWallets.submitVerify.trigger },
-          submitCreate: { trigger: actions.ada.paperWallets.submitCreate.trigger },
-          downloadPaperWallet: { trigger: actions.ada.paperWallets.downloadPaperWallet.trigger },
-        },
-      },
-    });
-  }
 
   render() {
     const { intl } = this.context;
@@ -285,4 +161,128 @@ export default class CreatePaperWalletDialogContainer
         return null;
     }
   }
+
+  @computed get generated(): GeneratedData {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(CreatePaperWalletDialogContainer)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    return Object.freeze({
+      stores: {
+        profile: {
+          paperWalletsIntro: stores.profile.paperWalletsIntro,
+          isClassicTheme: stores.profile.isClassicTheme,
+          selectedExplorer: stores.profile.selectedExplorer,
+        },
+        uiDialogs: {
+          dataForActiveDialog: {
+            numAddresses: stores.uiDialogs.dataForActiveDialog.numAddresses,
+            printAccountPlate: stores.uiDialogs.dataForActiveDialog.printAccountPlate,
+            repeatedPasswordValue: stores.uiDialogs.dataForActiveDialog.repeatedPasswordValue,
+            passwordValue: stores.uiDialogs.dataForActiveDialog.passwordValue,
+          }
+        },
+        uiNotifications: {
+          isOpen: stores.uiNotifications.isOpen,
+          getTooltipActiveNotification: stores.uiNotifications.getTooltipActiveNotification,
+        },
+        paperWallets: {
+          paper: stores.substores.ada.paperWallets.paper,
+          progressInfo: stores.substores.ada.paperWallets.progressInfo,
+          userPassword: stores.substores.ada.paperWallets.userPassword,
+          pdfRenderStatus: stores.substores.ada.paperWallets.pdfRenderStatus,
+          pdf: stores.substores.ada.paperWallets.pdf,
+        },
+      },
+      actions: {
+        dialogs: {
+          updateDataForActiveDialog: { trigger: actions.dialogs.updateDataForActiveDialog.trigger },
+          closeActiveDialog: { trigger: actions.dialogs.closeActiveDialog.trigger },
+        },
+        notifications: {
+          open: { trigger: actions.notifications.open.trigger },
+        },
+        paperWallets: {
+          cancel: { trigger: actions.ada.paperWallets.cancel.trigger },
+          submitInit: { trigger: actions.ada.paperWallets.submitInit.trigger },
+          submitUserPassword: { trigger: actions.ada.paperWallets.submitUserPassword.trigger },
+          backToCreate: { trigger: actions.ada.paperWallets.backToCreate.trigger },
+          submitVerify: { trigger: actions.ada.paperWallets.submitVerify.trigger },
+          submitCreate: { trigger: actions.ada.paperWallets.submitCreate.trigger },
+          downloadPaperWallet: { trigger: actions.ada.paperWallets.downloadPaperWallet.trigger },
+        },
+      },
+    });
+  }
 }
+
+export type GeneratedData = {|
+  +stores: {|
+    +profile: {|
+      +paperWalletsIntro: string,
+      +isClassicTheme: boolean,
+      +selectedExplorer: ExplorerType,
+    |},
+    +uiDialogs: {|
+      +dataForActiveDialog: {|
+        +numAddresses: number,
+        +printAccountPlate: boolean,
+        +repeatedPasswordValue: string,
+        +passwordValue: string,
+      |},
+    |},
+    +uiNotifications: {|
+      +isOpen: any => boolean,
+      +getTooltipActiveNotification: string => ?Notification,
+    |},
+    +paperWallets: {|
+      +paper: ?AdaPaper,
+      +progressInfo: ?ProgressStepEnum,
+      +userPassword: ?string,
+      +pdfRenderStatus: ?PdfGenStepType,
+      +pdf: ?Blob,
+    |},
+  |},
+  +actions: {|
+    +dialogs: {|
+      +updateDataForActiveDialog: {|
+        +trigger: typeof DialogsActions.prototype.updateDataForActiveDialog.trigger
+      |},
+      +closeActiveDialog: {|
+        +trigger: typeof DialogsActions.prototype.closeActiveDialog.trigger
+      |},
+    |},
+    +notifications: {|
+      +open: {|
+        +trigger: typeof NotificationActions.prototype.open.trigger
+      |},
+    |},
+    +paperWallets: {|
+      +cancel: {|
+        +trigger: typeof PaperWalletsActions.prototype.cancel.trigger
+      |},
+      +submitInit: {|
+        +trigger: typeof PaperWalletsActions.prototype.submitInit.trigger
+      |},
+      +submitUserPassword: {|
+        +trigger: typeof PaperWalletsActions.prototype.submitUserPassword.trigger
+      |},
+      +backToCreate: {|
+        +trigger: typeof PaperWalletsActions.prototype.backToCreate.trigger
+      |},
+      +submitVerify: {|
+        +trigger: typeof PaperWalletsActions.prototype.submitVerify.trigger
+      |},
+      +submitCreate: {|
+        +trigger: typeof PaperWalletsActions.prototype.submitCreate.trigger
+      |},
+      +downloadPaperWallet: {|
+        +trigger: typeof PaperWalletsActions.prototype.downloadPaperWallet.trigger
+      |},
+    |},
+  |},
+  verifyDefaultValues?: ?WalletRestoreDialogValues,
+|};

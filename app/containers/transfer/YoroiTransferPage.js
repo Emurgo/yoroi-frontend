@@ -32,6 +32,7 @@ import YoroiTransferActions from '../../actions/ada/yoroi-transfer-actions';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { ExplorerType } from '../../domain/Explorer';
 import AdaWalletsStore from '../../stores/ada/AdaWalletsStore';
+import type { GeneratedData as YoroiPlateData } from './YoroiPlatePage';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
@@ -48,146 +49,12 @@ export type MockYoroiTransferStore = {|
   +reset: void => void,
 |};
 
-export type GeneratedData = {|
-  +stores: {|
-    +profile: {|
-      +isClassicTheme: boolean,
-      +selectedExplorer: ExplorerType,
-    |},
-    +wallets: {|
-      +selected: null | PublicDeriver<>,
-      +activeWalletRoute: ?string,
-      +refreshWalletFromRemote: PublicDeriver<> => Promise<void>,
-    |},
-    +substores: {|
-      +ada: {|
-        +wallets: {|
-          +isValidMnemonic: typeof AdaWalletsStore.prototype.isValidMnemonic,
-          +isValidPaperMnemonic: typeof AdaWalletsStore.prototype.isValidPaperMnemonic,
-        |},
-        +yoroiTransfer: MockYoroiTransferStore,
-      |},
-    |},
-  |},
-  +actions: {|
-    +router: {|
-      +goToRoute: {|
-        +trigger: typeof RouterActions.prototype.goToRoute.trigger
-      |},
-    |},
-     +ada: {|
-      +yoroiTransfer: {|
-        +backToUninitialized: {|
-          +trigger: typeof YoroiTransferActions.prototype.backToUninitialized.trigger
-        |},
-        +cancelTransferFunds: {|
-          +trigger: typeof YoroiTransferActions.prototype.cancelTransferFunds.trigger
-        |},
-        +startHardwareMnemnoic: {|
-          +trigger: typeof YoroiTransferActions.prototype.startHardwareMnemnoic.trigger
-        |},
-        +transferFunds: {|
-          +trigger: typeof YoroiTransferActions.prototype.transferFunds.trigger
-        |},
-        +checkAddresses: {|
-          +trigger: typeof YoroiTransferActions.prototype.checkAddresses.trigger
-        |},
-        +setupTransferFundsWithPaperMnemonic: {|
-          +trigger: typeof YoroiTransferActions.prototype
-            .setupTransferFundsWithPaperMnemonic.trigger
-        |},
-        +setupTransferFundsWithMnemonic: {|
-          +trigger: typeof YoroiTransferActions.prototype.setupTransferFundsWithMnemonic.trigger
-        |},
-        +startTransferLegacyHardwareFunds: {|
-          +trigger: typeof YoroiTransferActions.prototype.startTransferLegacyHardwareFunds.trigger
-        |},
-        +startTransferPaperFunds: {|
-          +trigger: typeof YoroiTransferActions.prototype.startTransferPaperFunds.trigger
-        |},
-        +startTransferFunds: {|
-          +trigger: typeof YoroiTransferActions.prototype.startTransferFunds.trigger
-        |},
-      |},
-    |},
-  |},
-|};
-
 @observer
 export default class YoroiTransferPage extends Component<InjectedOrGenerated<GeneratedData>> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
   };
-
-  @computed get generated(): GeneratedData {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(YoroiTransferPage)} no way to generated props`);
-    }
-    const { stores, actions } = this.props;
-    const adaStores = stores.substores.ada;
-    const { yoroiTransfer } = actions.ada;
-    return Object.freeze({
-      stores: {
-        profile: {
-          isClassicTheme: stores.profile.isClassicTheme,
-          selectedExplorer: stores.profile.selectedExplorer,
-        },
-        wallets: {
-          selected: stores.wallets.selected,
-          activeWalletRoute: stores.wallets.activeWalletRoute,
-          refreshWalletFromRemote: stores.wallets.refreshWalletFromRemote,
-        },
-        substores: {
-          ada: {
-            wallets: {
-              isValidMnemonic: adaStores.wallets.isValidMnemonic,
-              isValidPaperMnemonic: adaStores.wallets.isValidPaperMnemonic,
-            },
-            yoroiTransfer: {
-              status: adaStores.yoroiTransfer.status,
-              error: adaStores.yoroiTransfer.error,
-              transferTx: adaStores.yoroiTransfer.transferTx,
-              transferFundsRequest: {
-                isExecuting: adaStores.yoroiTransfer.transferFundsRequest.isExecuting,
-              },
-              nextInternalAddress: adaStores.yoroiTransfer.nextInternalAddress,
-              recoveryPhrase: adaStores.yoroiTransfer.recoveryPhrase,
-              reset: adaStores.yoroiTransfer.reset,
-            },
-          },
-        },
-      },
-      actions: {
-        router: {
-          goToRoute: { trigger: actions.router.goToRoute.trigger },
-        },
-        ada: {
-          yoroiTransfer: {
-            backToUninitialized: { trigger: yoroiTransfer.backToUninitialized.trigger },
-            cancelTransferFunds: { trigger: yoroiTransfer.cancelTransferFunds.trigger },
-            startHardwareMnemnoic: { trigger: yoroiTransfer.startHardwareMnemnoic.trigger },
-            transferFunds: { trigger: yoroiTransfer.transferFunds.trigger },
-            checkAddresses: { trigger: yoroiTransfer.checkAddresses.trigger },
-            setupTransferFundsWithPaperMnemonic: {
-              trigger: yoroiTransfer.setupTransferFundsWithPaperMnemonic.trigger
-            },
-            setupTransferFundsWithMnemonic: {
-              trigger: yoroiTransfer.setupTransferFundsWithMnemonic.trigger
-            },
-            startTransferLegacyHardwareFunds: {
-              trigger: yoroiTransfer.startTransferLegacyHardwareFunds.trigger
-            },
-            startTransferPaperFunds: { trigger: yoroiTransfer.startTransferPaperFunds.trigger },
-            startTransferFunds: { trigger: yoroiTransfer.startTransferFunds.trigger },
-          },
-        },
-      },
-    });
-  }
 
   componentWillUnmount() {
     const yoroiTransfer = this._getYoroiTransferStore();
@@ -357,8 +224,6 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         return (
           <TransferLayout>
             <HardwareDisclaimerPage
-              actions={this.props.actions}
-              stores={this.props.stores}
               onBack={() => this._getYoroiTransferActions().cancelTransferFunds.trigger()}
               onNext={() => this._getYoroiTransferActions().startHardwareMnemnoic.trigger()}
             />
@@ -382,13 +247,9 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         return (
           <TransferLayout>
             <YoroiPlatePage
-              stores={this.props.stores}
-              actions={this.props.actions}
+              {...this.generated.YoroiPlateProps}
               onNext={this.checkAddresses}
               onCancel={this.backToUninitialized}
-              recoveryPhrase={yoroiTransfer.recoveryPhrase}
-              selectedExplorer={this.generated.stores.profile.selectedExplorer}
-              classicTheme={profile.isClassicTheme}
             />
           </TransferLayout>
         );
@@ -463,4 +324,139 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
     return this.generated.actions.ada.yoroiTransfer;
   }
 
+  @computed get generated(): GeneratedData {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(YoroiTransferPage)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    const adaStores = stores.substores.ada;
+    const { yoroiTransfer } = actions.ada;
+    return Object.freeze({
+      stores: {
+        profile: {
+          isClassicTheme: stores.profile.isClassicTheme,
+          selectedExplorer: stores.profile.selectedExplorer,
+        },
+        wallets: {
+          selected: stores.wallets.selected,
+          activeWalletRoute: stores.wallets.activeWalletRoute,
+          refreshWalletFromRemote: stores.wallets.refreshWalletFromRemote,
+        },
+        substores: {
+          ada: {
+            wallets: {
+              isValidMnemonic: adaStores.wallets.isValidMnemonic,
+              isValidPaperMnemonic: adaStores.wallets.isValidPaperMnemonic,
+            },
+            yoroiTransfer: {
+              status: adaStores.yoroiTransfer.status,
+              error: adaStores.yoroiTransfer.error,
+              transferTx: adaStores.yoroiTransfer.transferTx,
+              transferFundsRequest: {
+                isExecuting: adaStores.yoroiTransfer.transferFundsRequest.isExecuting,
+              },
+              nextInternalAddress: adaStores.yoroiTransfer.nextInternalAddress,
+              recoveryPhrase: adaStores.yoroiTransfer.recoveryPhrase,
+              reset: adaStores.yoroiTransfer.reset,
+            },
+          },
+        },
+      },
+      actions: {
+        router: {
+          goToRoute: { trigger: actions.router.goToRoute.trigger },
+        },
+        ada: {
+          yoroiTransfer: {
+            backToUninitialized: { trigger: yoroiTransfer.backToUninitialized.trigger },
+            cancelTransferFunds: { trigger: yoroiTransfer.cancelTransferFunds.trigger },
+            startHardwareMnemnoic: { trigger: yoroiTransfer.startHardwareMnemnoic.trigger },
+            transferFunds: { trigger: yoroiTransfer.transferFunds.trigger },
+            checkAddresses: { trigger: yoroiTransfer.checkAddresses.trigger },
+            setupTransferFundsWithPaperMnemonic: {
+              trigger: yoroiTransfer.setupTransferFundsWithPaperMnemonic.trigger
+            },
+            setupTransferFundsWithMnemonic: {
+              trigger: yoroiTransfer.setupTransferFundsWithMnemonic.trigger
+            },
+            startTransferLegacyHardwareFunds: {
+              trigger: yoroiTransfer.startTransferLegacyHardwareFunds.trigger
+            },
+            startTransferPaperFunds: { trigger: yoroiTransfer.startTransferPaperFunds.trigger },
+            startTransferFunds: { trigger: yoroiTransfer.startTransferFunds.trigger },
+          },
+        },
+      },
+      YoroiPlateProps: ({ actions, stores, }: InjectedOrGenerated<YoroiPlateData>),
+    });
+  }
 }
+
+export type GeneratedData = {|
+  +stores: {|
+    +profile: {|
+      +isClassicTheme: boolean,
+      +selectedExplorer: ExplorerType,
+    |},
+    +wallets: {|
+      +selected: null | PublicDeriver<>,
+      +activeWalletRoute: ?string,
+      +refreshWalletFromRemote: PublicDeriver<> => Promise<void>,
+    |},
+    +substores: {|
+      +ada: {|
+        +wallets: {|
+          +isValidMnemonic: typeof AdaWalletsStore.prototype.isValidMnemonic,
+          +isValidPaperMnemonic: typeof AdaWalletsStore.prototype.isValidPaperMnemonic,
+        |},
+        +yoroiTransfer: MockYoroiTransferStore,
+      |},
+    |},
+  |},
+  +actions: {|
+    +router: {|
+      +goToRoute: {|
+        +trigger: typeof RouterActions.prototype.goToRoute.trigger
+      |},
+    |},
+     +ada: {|
+      +yoroiTransfer: {|
+        +backToUninitialized: {|
+          +trigger: typeof YoroiTransferActions.prototype.backToUninitialized.trigger
+        |},
+        +cancelTransferFunds: {|
+          +trigger: typeof YoroiTransferActions.prototype.cancelTransferFunds.trigger
+        |},
+        +startHardwareMnemnoic: {|
+          +trigger: typeof YoroiTransferActions.prototype.startHardwareMnemnoic.trigger
+        |},
+        +transferFunds: {|
+          +trigger: typeof YoroiTransferActions.prototype.transferFunds.trigger
+        |},
+        +checkAddresses: {|
+          +trigger: typeof YoroiTransferActions.prototype.checkAddresses.trigger
+        |},
+        +setupTransferFundsWithPaperMnemonic: {|
+          +trigger: typeof YoroiTransferActions.prototype
+            .setupTransferFundsWithPaperMnemonic.trigger
+        |},
+        +setupTransferFundsWithMnemonic: {|
+          +trigger: typeof YoroiTransferActions.prototype.setupTransferFundsWithMnemonic.trigger
+        |},
+        +startTransferLegacyHardwareFunds: {|
+          +trigger: typeof YoroiTransferActions.prototype.startTransferLegacyHardwareFunds.trigger
+        |},
+        +startTransferPaperFunds: {|
+          +trigger: typeof YoroiTransferActions.prototype.startTransferPaperFunds.trigger
+        |},
+        +startTransferFunds: {|
+          +trigger: typeof YoroiTransferActions.prototype.startTransferFunds.trigger
+        |},
+      |},
+    |},
+  |},
+  +YoroiPlateProps: InjectedOrGenerated<YoroiPlateData>,
+|};
