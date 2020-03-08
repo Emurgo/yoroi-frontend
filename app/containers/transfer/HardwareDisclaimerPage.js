@@ -28,7 +28,6 @@ export default class HardwareDisclaimerPage extends Component<Props> {
         onNext={this.props.onNext}
         isChecked={this.checkboxMarked}
         toggleCheck={this.toggleCheck}
-        classicTheme={this.props.stores.profile.isClassicTheme}
       />
     );
   }

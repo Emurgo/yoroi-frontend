@@ -330,7 +330,6 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
                 isSubmitting={daedalusTransfer.transferFundsRequest.isExecuting}
                 onCancel={this.cancelTransferFunds}
                 error={daedalusTransfer.error}
-                classicTheme={profile.isClassicTheme}
               />
             </BorderedBox>
           </TransferLayout>

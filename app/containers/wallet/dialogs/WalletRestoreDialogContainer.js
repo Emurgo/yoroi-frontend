@@ -249,7 +249,6 @@ export default class WalletRestoreDialogContainer
           isSubmitting={yoroiTransfer.transferFundsRequest.isExecuting}
           onCancel={this.onCancel}
           error={yoroiTransfer.error}
-          classicTheme={profile.isClassicTheme}
         />);
       }
       case TransferStatus.ERROR: {

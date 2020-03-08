@@ -416,7 +416,6 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
                 isSubmitting={yoroiTransfer.transferFundsRequest.isExecuting}
                 onCancel={this.cancelTransferFunds}
                 error={yoroiTransfer.error}
-                classicTheme={profile.isClassicTheme}
               />
             </BorderedBox>
           </TransferLayout>

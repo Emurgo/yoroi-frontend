@@ -24,7 +24,6 @@ const messages = defineMessages({
 type Props = {|
   +onBack: void => void,
   +onNext: void => void,
-  +classicTheme: boolean,
   +isChecked: boolean,
   +toggleCheck: void => void,
 |};
@@ -38,9 +37,8 @@ export default class HardwareDisclaimer extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { classicTheme } = this.props;
     const buttonClasses = (primary: boolean) => classnames([
-      classicTheme ? 'flat' : 'outlined',
+      'secondary',
       primary ? 'primary' : null,
       styles.button,
     ]);

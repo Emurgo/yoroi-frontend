@@ -171,7 +171,6 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
         isSubmitting={this._getAdaWalletsStore().sendMoneyRequest.isExecuting}
         onCancel={this.props.onClose}
         error={this._getAdaWalletsStore().sendMoneyRequest.error}
-        classicTheme={profile.isClassicTheme}
       />
     );
   }
