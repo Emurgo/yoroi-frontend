@@ -18,13 +18,7 @@ import { isLedgerNanoWallet, isTrezorTWallet } from '../api/ada/lib/storage/mode
 import {
   asGetPublicKey,
 } from '../api/ada/lib/storage/models/PublicDeriver/traits';
-import ProfileActions from '../actions/profile-actions';
-import RouterActions from '../actions/router-actions';
 import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
-import type { DelegationRequests } from '../stores/ada/DelegationStore';
-import type { TxRequests } from '../stores/base/TransactionsStore';
-import WalletSettingsStore from '../stores/base/WalletSettingsStore';
-import WalletStore from '../stores/toplevel/WalletStore';
 
 const messages = defineMessages({
   allWalletsLabel: {
@@ -33,40 +27,7 @@ const messages = defineMessages({
   },
 });
 
-export type GeneratedData = {|
-  +stores: {|
-    +walletSettings: {|
-      +getConceptualWalletSettingsCache:
-        typeof WalletSettingsStore.prototype.getConceptualWalletSettingsCache,
-    |},
-    +wallets: {|
-      +selected: null | PublicDeriver<>,
-      +publicDerivers: Array<PublicDeriver<>>,
-      +getPublicKeyCache: typeof WalletStore.prototype.getPublicKeyCache,
-    |},
-    +profile: {|
-      +shouldHideBalance: boolean,
-    |},
-    +delegation: {|
-      +getRequests: PublicDeriver<> => (void | DelegationRequests),
-    |},
-    +transactions: {|
-      +getTxRequests: PublicDeriver<> => TxRequests,
-    |},
-  |},
-  +actions: {|
-    +profile: {|
-      +updateHideBalance: {|
-        +trigger: typeof ProfileActions.prototype.updateHideBalance.trigger
-      |},
-    |},
-    +router: {|
-      +goToRoute: {|
-        +trigger: typeof RouterActions.prototype.goToRoute.trigger
-      |},
-    |},
-  |},
-|};
+export type GeneratedData = typeof NavBarContainer.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
@@ -79,46 +40,6 @@ export default class NavBarContainer extends Component<Props> {
   static contextTypes = {
     intl: intlShape.isRequired,
   };
-
-  @computed get generated(): GeneratedData {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(NavBarContainer)} no way to generated props`);
-    }
-    const { stores, actions } = this.props;
-    return Object.freeze({
-      stores: {
-        walletSettings: {
-          getConceptualWalletSettingsCache: stores.substores.ada.walletSettings
-            .getConceptualWalletSettingsCache,
-        },
-        wallets: {
-          selected: stores.wallets.selected,
-          publicDerivers: stores.wallets.publicDerivers,
-          getPublicKeyCache: stores.wallets.getPublicKeyCache,
-        },
-        profile: {
-          shouldHideBalance: stores.profile.shouldHideBalance,
-        },
-        delegation: {
-          getRequests: stores.substores.ada.delegation.getRequests,
-        },
-        transactions: {
-          getTxRequests: stores.substores.ada.transactions.getTxRequests,
-        },
-      },
-      actions: {
-        profile: {
-          updateHideBalance: { trigger: actions.profile.updateHideBalance.trigger },
-        },
-        router: {
-          goToRoute: { trigger: actions.router.goToRoute.trigger },
-        },
-      },
-    });
-  }
 
   updateHideBalance = () => {
     this.generated.actions.profile.updateHideBalance.trigger();
@@ -271,7 +192,7 @@ export default class NavBarContainer extends Component<Props> {
   getRewardBalance: PublicDeriver<> => null | void | BigNumber = (
     publicDeriver
   ) => {
-    const delegationRequest = this.generated.stores.delegation.getRequests(
+    const delegationRequest = this.generated.stores.delegation.getDelegationRequests(
       publicDeriver
     );
     if (delegationRequest == null) return undefined;
@@ -281,6 +202,46 @@ export default class NavBarContainer extends Component<Props> {
       return null;
     }
     return balanceResult.accountPart.dividedBy(LOVELACES_PER_ADA);
+  }
+
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(NavBarContainer)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    return Object.freeze({
+      stores: {
+        walletSettings: {
+          getConceptualWalletSettingsCache: stores.substores.ada.walletSettings
+            .getConceptualWalletSettingsCache,
+        },
+        wallets: {
+          selected: stores.wallets.selected,
+          publicDerivers: stores.wallets.publicDerivers,
+          getPublicKeyCache: stores.wallets.getPublicKeyCache,
+        },
+        profile: {
+          shouldHideBalance: stores.profile.shouldHideBalance,
+        },
+        delegation: {
+          getDelegationRequests: stores.substores.ada.delegation.getDelegationRequests,
+        },
+        transactions: {
+          getTxRequests: stores.substores.ada.transactions.getTxRequests,
+        },
+      },
+      actions: {
+        profile: {
+          updateHideBalance: { trigger: actions.profile.updateHideBalance.trigger },
+        },
+        router: {
+          goToRoute: { trigger: actions.router.goToRoute.trigger },
+        },
+      },
+    });
   }
 }
 

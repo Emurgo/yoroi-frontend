@@ -37,7 +37,6 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +classicTheme: boolean,
   +close: void => void,
   +reputationInfo: ReputationObject,
 |};
@@ -50,9 +49,6 @@ export default class PoolWarningDialog extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const {
-      classicTheme,
-    } = this.props;
 
     return (
       <Dialog
@@ -60,7 +56,6 @@ export default class PoolWarningDialog extends Component<Props> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={this.props.close}
-        classicTheme={classicTheme}
       >
         <div className={styles.component}>
           <div className={styles.header}>

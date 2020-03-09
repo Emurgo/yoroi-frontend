@@ -38,7 +38,6 @@ type Props = {|
   +error: ?LocalizableError,
   +onSubmit: void => PossiblyAsync<void>,
   +onCancel: void => void,
-  +classicTheme: boolean,
 |};
 
 @observer
@@ -60,7 +59,6 @@ export default class HWSendConfirmationDialog extends Component<Props> {
       messages,
       error,
       onCancel,
-      classicTheme,
     } = this.props;
 
     const staleTxWarning = (
@@ -161,7 +159,6 @@ export default class HWSendConfirmationDialog extends Component<Props> {
         onClose={!isSubmitting ? onCancel : null}
         className={styles.dialog}
         closeButton={<DialogCloseButton />}
-        classicTheme={classicTheme}
       >
         {this.props.staleTx && staleTxWarning}
         {infoBlock}

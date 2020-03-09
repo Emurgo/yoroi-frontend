@@ -226,10 +226,10 @@ export default class StakePool extends Component<Props> {
     const { intl } = this.context;
 
     const moreInfoButtonClasses = classnames([
-      this.props.classicTheme ? 'flat' : 'outlined',
+      'secondary',
     ]);
     const undelegateButtonClasses = classnames([
-      this.props.classicTheme ? 'flat' : 'outlined',
+      'secondary',
       this.props.isUndelegating ? styles.submitButtonSpinning : null,
     ]);
     return (

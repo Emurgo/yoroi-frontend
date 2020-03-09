@@ -9,7 +9,7 @@ import { StorageLoadError, UnableToLoadError } from '../i18n/errors';
 import { withScreenshot } from 'storycap';
 
 export default {
-  title: `Container/${nameof(LoadingPage)}`,
+  title: `${module.id.split('.')[1]}`,
   component: LoadingPage,
   decorators: [withScreenshot],
 };

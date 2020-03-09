@@ -36,7 +36,6 @@ type Props = {|
   +onCancel: void => void,
   +onRestore: void => void,
   +onPaperRestore: void => void,
-  +classicTheme: boolean
 |};
 
 @observer
@@ -47,7 +46,7 @@ export default class WalletRestoreOptionDialog extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onCancel, onRestore, onPaperRestore, classicTheme } = this.props;
+    const { onCancel, onRestore, onPaperRestore, } = this.props;
 
     return (
       <Dialog
@@ -55,7 +54,6 @@ export default class WalletRestoreOptionDialog extends Component<Props> {
         closeOnOverlayClick={false}
         onClose={onCancel}
         closeButton={<DialogCloseButton />}
-        classicTheme={classicTheme}
         className="WalletRestoreOptionDialog"
       >
         <div className={styles.component}>

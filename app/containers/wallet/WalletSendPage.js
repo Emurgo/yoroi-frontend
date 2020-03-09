@@ -228,7 +228,6 @@ export default class WalletSendPage extends Component<Props> {
             })
           }
           onCancel={ledgerSendAction.cancel.trigger}
-          classicTheme={this.props.stores.profile.isClassicTheme}
         />);
     } else if (isTrezorTWallet(conceptualWallet)) {
       const trezorSendAction = this.props.actions[environment.API].trezorSend;
@@ -252,7 +251,6 @@ export default class WalletSendPage extends Component<Props> {
             })
           }
           onCancel={trezorSendAction.cancel.trigger}
-          classicTheme={this.props.stores.profile.isClassicTheme}
         />);
     } else {
       throw new Error('Unsupported hardware wallet found at hardwareWalletDoConfirmation.');

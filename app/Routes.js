@@ -32,6 +32,7 @@ import MyWalletsPage from './containers/wallet/MyWalletsPage';
 import WalletSummaryPage from './containers/wallet/WalletSummaryPage';
 import WalletSendPage from './containers/wallet/WalletSendPage';
 import WalletReceivePage from './containers/wallet/WalletReceivePage';
+import type { GeneratedData as TransferData } from './containers/transfer/Transfer';
 import DaedalusTransferPage from './containers/transfer/DaedalusTransferPage';
 import YoroiTransferPage from './containers/transfer/YoroiTransferPage';
 import URILandingPage from './containers/uri/URILandingPage';
@@ -112,9 +113,10 @@ export const Routes = (
       <Route
         path={ROUTES.TRANSFER.ROOT}
         component={(props) => (
-          <Transfer {...props} stores={stores} actions={actions}>
-            {TransferSubpages(stores, actions)}
-          </Transfer>
+          wrapTransfer(
+            { ...props, stores, actions },
+            TransferSubpages(stores, actions)
+          )
         )}
       />
       <Route
@@ -255,5 +257,18 @@ export function wrapSettings(
     >
       {children}
     </Settings>
+  );
+}
+
+export function wrapTransfer(
+  transferProps: InjectedOrGenerated<TransferData>,
+  children: Node,
+): Node {
+  return (
+    <Transfer
+      {...transferProps}
+    >
+      {children}
+    </Transfer>
   );
 }

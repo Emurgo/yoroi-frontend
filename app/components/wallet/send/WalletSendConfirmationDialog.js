@@ -98,7 +98,6 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
       isSubmitting,
       error,
       currencyUnit,
-      classicTheme
     } = this.props;
 
     const staleTxWarning = (
@@ -139,7 +138,6 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
         onClose={!isSubmitting ? onCancel : null}
         className={styles.dialog}
         closeButton={<DialogCloseButton />}
-        classicTheme={classicTheme}
       >
         {this.props.staleTx && staleTxWarning}
 

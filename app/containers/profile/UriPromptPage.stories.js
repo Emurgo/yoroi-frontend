@@ -11,7 +11,7 @@ import { THEMES } from '../../themes';
 import { withScreenshot } from 'storycap';
 
 export default {
-  title: `Container/${nameof(UriPromptPage)}`,
+  title: `${module.id.split('.')[1]}`,
   component: UriPromptPage,
   decorators: [withScreenshot],
 };

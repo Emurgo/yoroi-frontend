@@ -11,7 +11,7 @@ import { getTermsOfUse } from '../../stores/toplevel/ProfileStore';
 import { globalKnobs } from '../../../stories/helpers/StoryWrapper';
 
 export default {
-  title: `Container/${nameof(TermsOfUsePage)}`,
+  title: `${module.id.split('.')[1]}`,
   component: TermsOfUsePage,
   decorators: [withScreenshot],
 };

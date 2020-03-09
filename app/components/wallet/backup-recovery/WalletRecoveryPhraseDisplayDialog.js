@@ -65,7 +65,6 @@ export default class WalletRecoveryPhraseDisplayDialog extends Component<Props> 
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton onClose={onCancelBackup} />}
         backButton={<DialogBackButton onBack={onBack} />}
-        classicTheme={classicTheme}
       >
         {!classicTheme && <span className={styles.recoveryImage}><RecoveryPhraseSvg /></span>}
 

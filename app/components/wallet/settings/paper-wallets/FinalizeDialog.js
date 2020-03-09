@@ -51,7 +51,6 @@ type Props = {|
   +onNext: void => PossiblyAsync<void>,
   +onCancel: void => PossiblyAsync<void>,
   +onBack?: void => PossiblyAsync<void>,
-  +classicTheme: boolean,
 |};
 
 @observer
@@ -71,7 +70,6 @@ export default class FinalizeDialog extends Component<Props> {
       onCancel,
       onNext,
       onBack,
-      classicTheme,
       onCopyAddressTooltip,
       notification,
     } = this.props;
@@ -97,7 +95,6 @@ export default class FinalizeDialog extends Component<Props> {
         className={dialogClasses}
         backButton={onBack && <DialogBackButton onBack={onBack} />}
         closeButton={<DialogCloseButton onClose={onCancel} />}
-        classicTheme={classicTheme}
       >
 
         <span>{intl.formatMessage(messages.paperFinalizeIntroLine1)}</span><br />

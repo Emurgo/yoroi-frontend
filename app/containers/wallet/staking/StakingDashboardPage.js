@@ -93,7 +93,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
     }
 
     const delegationStore = this.props.stores.substores[environment.API].delegation;
-    const delegationRequests = delegationStore.getRequests(publicDeriver);
+    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
@@ -185,7 +185,6 @@ export default class StakingDashboardPage extends Component<Props, State> {
         <Dialog
           title={intl.formatMessage(globalMessages.errorLabel)}
           closeOnOverlayClick={false}
-          classicTheme={this.props.stores.profile.isClassicTheme}
           onClose={cancel}
           closeButton={<DialogCloseButton onClose={cancel} />}
           actions={[{
@@ -242,7 +241,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
     if (toRealTime == null) return undefined;
 
     const delegationStore = this.props.stores.substores[environment.API].delegation;
-    const delegationRequests = delegationStore.getRequests(publicDeriver);
+    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
@@ -376,7 +375,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
     publicDeriver
   ) => {
     const delegationStore = this.props.stores.substores[environment.API].delegation;
-    const delegationRequests = delegationStore.getRequests(publicDeriver);
+    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
@@ -405,7 +404,7 @@ export default class StakingDashboardPage extends Component<Props, State> {
     publicDeriver
   ) => {
     const delegationStore = this.props.stores.substores[environment.API].delegation;
-    const delegationRequests = delegationStore.getRequests(publicDeriver);
+    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
@@ -519,7 +518,6 @@ export default class StakingDashboardPage extends Component<Props, State> {
       return (
         <LessThanExpectedDialog
           close={() => this.props.actions.dialogs.closeActiveDialog.trigger()}
-          classicTheme={this.props.stores.profile.isClassicTheme}
         />
       );
     }
@@ -528,7 +526,6 @@ export default class StakingDashboardPage extends Component<Props, State> {
       return (
         <PoolWarningDialog
           close={() => this.props.actions.dialogs.closeActiveDialog.trigger()}
-          classicTheme={this.props.stores.profile.isClassicTheme}
           reputationInfo={uiDialogs.getParam<ReputationObject>('reputation')}
         />
       );

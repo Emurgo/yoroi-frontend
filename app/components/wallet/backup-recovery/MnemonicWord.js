@@ -21,7 +21,7 @@ export default class MnemonicWord extends Component<Props> {
     const handleClick = onClick.bind(null, { word, index });
 
     const componentClasses = classnames([
-      classicTheme ? 'flat' : null,
+      classicTheme ? 'secondary' : null,
       styles.component
     ]);
 

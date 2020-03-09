@@ -256,7 +256,7 @@ export default class MyWalletsPage extends Component<Props> {
   getRewardBalance: PublicDeriver<> => null | void | BigNumber = (
     publicDeriver
   ) => {
-    const delegationRequest = this.props.stores.substores.ada.delegation.getRequests(
+    const delegationRequest = this.props.stores.substores.ada.delegation.getDelegationRequests(
       publicDeriver
     );
     if (delegationRequest == null) return undefined;

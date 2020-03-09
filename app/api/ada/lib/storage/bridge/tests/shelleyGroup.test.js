@@ -97,7 +97,7 @@ const firstTx: void => Array<RemoteTransaction> = () => [{
       address: getSingleAddressString(
         ABANDON_SHARE,
         [
-          WalletTypePurpose.BIP44, // purposely use leagcy address
+          WalletTypePurpose.BIP44, // purposely use legacy address
           CoinTypes.CARDANO,
           0 + HARD_DERIVATION_START,
           ChainDerivations.INTERNAL,
@@ -214,7 +214,7 @@ const txWithGroupSwapped: void => Array<RemoteTransaction> = () => [{
       address: getSingleAddressString(
         ABANDON_SHARE,
         [
-          WalletTypePurpose.BIP44, // purposely use leagcy address
+          WalletTypePurpose.BIP44, // purposely use legacy address
           CoinTypes.CARDANO,
           0 + HARD_DERIVATION_START,
           ChainDerivations.INTERNAL,

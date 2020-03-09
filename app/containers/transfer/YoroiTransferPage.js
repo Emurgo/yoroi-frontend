@@ -2,11 +2,12 @@
 import {
   validateMnemonic,
 } from 'bip39';
+import { computed } from 'mobx';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, } from 'react-intl';
 import validWords from 'bip39/src/wordlists/english.json';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import TransferLayout from '../../components/transfer/TransferLayout';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import HardwareDisclaimerPage from './HardwareDisclaimerPage';
@@ -23,13 +24,31 @@ import environment from '../../environment';
 import config from '../../config';
 import { formattedWalletAmount } from '../../utils/formatters';
 import { TransferKind, TransferStatus, TransferSource, } from '../../types/TransferTypes';
+import type { TransferStatusT, TransferTx } from '../../types/TransferTypes';
+import LocalizableError from '../../i18n/LocalizableError';
 import { ROUTES } from '../../routes-config';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import type { GeneratedData as YoroiPlateData } from './YoroiPlatePage';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
 
+export type GeneratedData = typeof YoroiTransferPage.prototype.generated;
+
+export type MockYoroiTransferStore = {|
+  +status: TransferStatusT,
+  +error: ?LocalizableError,
+  +transferTx: ?TransferTx,
+  +transferFundsRequest: {|
+    isExecuting: boolean,
+  |},
+  +nextInternalAddress: PublicDeriver<> => (void => Promise<string>),
+  +recoveryPhrase: string,
+  +reset: void => void,
+|};
+
 @observer
-export default class YoroiTransferPage extends Component<InjectedProps> {
+export default class YoroiTransferPage extends Component<InjectedOrGenerated<GeneratedData>> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -41,7 +60,7 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
   }
 
   goToCreateWallet: void => void = () => {
-    this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
+    this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
   }
 
   startLegacyTransferFunds: void => void = () => {
@@ -144,7 +163,7 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
 
 
   render() {
-    const { stores } = this.props;
+    const { stores } = this.generated;
     const { profile } = stores;
     const adaWallets = this._getAdaWalletsStore();
     const yoroiTransfer = this._getYoroiTransferStore();
@@ -161,7 +180,7 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
               onLegacyTrezor={this.startTransferLegacyTrezorFunds}
               classicTheme={profile.isClassicTheme}
               onFollowInstructionsPrerequisites={this.goToCreateWallet}
-              disableTransferFunds={yoroiTransfer.disableTransferFunds}
+              disableTransferFunds={stores.wallets.selected == null}
             />
           </TransferLayout>
         );
@@ -203,8 +222,6 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
         return (
           <TransferLayout>
             <HardwareDisclaimerPage
-              actions={this.props.actions}
-              stores={this.props.stores}
               onBack={() => this._getYoroiTransferActions().cancelTransferFunds.trigger()}
               onNext={() => this._getYoroiTransferActions().startHardwareMnemnoic.trigger()}
             />
@@ -228,13 +245,9 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
         return (
           <TransferLayout>
             <YoroiPlatePage
-              stores={this.props.stores}
-              actions={this.props.actions}
+              {...this.generated.YoroiPlateProps}
               onNext={this.checkAddresses}
               onCancel={this.backToUninitialized}
-              recoveryPhrase={yoroiTransfer.recoveryPhrase}
-              selectedExplorer={this.props.stores.profile.selectedExplorer}
-              classicTheme={profile.isClassicTheme}
             />
           </TransferLayout>
         );
@@ -256,13 +269,12 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
               <TransferSummaryPage
                 form={null}
                 formattedWalletAmount={formattedWalletAmount}
-                selectedExplorer={this.props.stores.profile.selectedExplorer}
+                selectedExplorer={this.generated.stores.profile.selectedExplorer}
                 transferTx={yoroiTransfer.transferTx}
                 onSubmit={this.transferFunds}
                 isSubmitting={yoroiTransfer.transferFundsRequest.isExecuting}
                 onCancel={this.cancelTransferFunds}
                 error={yoroiTransfer.error}
-                classicTheme={profile.isClassicTheme}
               />
             </BorderedBox>
           </TransferLayout>
@@ -291,23 +303,92 @@ export default class YoroiTransferPage extends Component<InjectedProps> {
   }
 
   _getRouter() {
-    return this.props.actions.router;
+    return this.generated.actions.router;
   }
 
   _getWalletsStore() {
-    return this.props.stores.wallets;
+    return this.generated.stores.wallets;
   }
 
   _getAdaWalletsStore() {
-    return this.props.stores.substores[environment.API].wallets;
+    return this.generated.stores.substores[environment.API].wallets;
   }
 
   _getYoroiTransferStore() {
-    return this.props.stores.substores.ada.yoroiTransfer;
+    return this.generated.stores.substores.ada.yoroiTransfer;
   }
 
   _getYoroiTransferActions() {
-    return this.props.actions.ada.yoroiTransfer;
+    return this.generated.actions.ada.yoroiTransfer;
   }
 
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(YoroiTransferPage)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    const adaStores = stores.substores.ada;
+    const { yoroiTransfer } = actions.ada;
+    return Object.freeze({
+      stores: {
+        profile: {
+          isClassicTheme: stores.profile.isClassicTheme,
+          selectedExplorer: stores.profile.selectedExplorer,
+        },
+        wallets: {
+          selected: stores.wallets.selected,
+          activeWalletRoute: stores.wallets.activeWalletRoute,
+          refreshWalletFromRemote: stores.wallets.refreshWalletFromRemote,
+        },
+        substores: {
+          ada: {
+            wallets: {
+              isValidMnemonic: adaStores.wallets.isValidMnemonic,
+              isValidPaperMnemonic: adaStores.wallets.isValidPaperMnemonic,
+            },
+            yoroiTransfer: {
+              status: adaStores.yoroiTransfer.status,
+              error: adaStores.yoroiTransfer.error,
+              transferTx: adaStores.yoroiTransfer.transferTx,
+              transferFundsRequest: {
+                isExecuting: adaStores.yoroiTransfer.transferFundsRequest.isExecuting,
+              },
+              nextInternalAddress: adaStores.yoroiTransfer.nextInternalAddress,
+              recoveryPhrase: adaStores.yoroiTransfer.recoveryPhrase,
+              reset: adaStores.yoroiTransfer.reset,
+            },
+          },
+        },
+      },
+      actions: {
+        router: {
+          goToRoute: { trigger: actions.router.goToRoute.trigger },
+        },
+        ada: {
+          yoroiTransfer: {
+            backToUninitialized: { trigger: yoroiTransfer.backToUninitialized.trigger },
+            cancelTransferFunds: { trigger: yoroiTransfer.cancelTransferFunds.trigger },
+            startHardwareMnemnoic: { trigger: yoroiTransfer.startHardwareMnemnoic.trigger },
+            transferFunds: { trigger: yoroiTransfer.transferFunds.trigger },
+            checkAddresses: { trigger: yoroiTransfer.checkAddresses.trigger },
+            setupTransferFundsWithPaperMnemonic: {
+              trigger: yoroiTransfer.setupTransferFundsWithPaperMnemonic.trigger
+            },
+            setupTransferFundsWithMnemonic: {
+              trigger: yoroiTransfer.setupTransferFundsWithMnemonic.trigger
+            },
+            startTransferLegacyHardwareFunds: {
+              trigger: yoroiTransfer.startTransferLegacyHardwareFunds.trigger
+            },
+            startTransferPaperFunds: { trigger: yoroiTransfer.startTransferPaperFunds.trigger },
+            startTransferFunds: { trigger: yoroiTransfer.startTransferFunds.trigger },
+          },
+        },
+      },
+      YoroiPlateProps: ({ actions, stores, }: InjectedOrGenerated<YoroiPlateData>),
+    });
+  }
 }

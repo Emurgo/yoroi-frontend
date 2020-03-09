@@ -8,27 +8,29 @@ import Loading from '../components/loading/Loading';
 import type { InjectedOrGenerated } from '../types/injectedPropsType';
 import { handleExternalLinkClick } from '../utils/routing';
 import { downloadLogs } from '../utils/logging';
-import LocalizableError from '../i18n/LocalizableError';
 
-type GeneratedData = {|
-  +stores: {|
-    +profile: {|
-      +hasLoadedCurrentLocale: boolean,
-      +hasLoadedCurrentTheme: boolean,
-    |},
-    +loading: {|
-      +isLoading: boolean,
-      +error: ?LocalizableError,
-    |},
-  |},
-  +handleExternalLinkClick: MouseEvent => void,
-  +downloadLogs: void => void,
-|};
+type GeneratedData = typeof LoadingPage.prototype.generated;
 
 @observer
 export default class LoadingPage extends Component<InjectedOrGenerated<GeneratedData>> {
 
-  @computed get generated(): GeneratedData {
+  render() {
+    return (
+      <CenteredLayout>
+        <Loading
+          api={environment.API}
+          hasLoadedCurrentLocale={this.generated.stores.profile.hasLoadedCurrentLocale}
+          hasLoadedCurrentTheme={this.generated.stores.profile.hasLoadedCurrentTheme}
+          isLoadingDataForNextScreen={this.generated.stores.loading.isLoading}
+          error={this.generated.stores.loading.error}
+          onExternalLinkClick={this.generated.handleExternalLinkClick}
+          downloadLogs={this.generated.downloadLogs}
+        />
+      </CenteredLayout>
+    );
+  }
+
+  @computed get generated() {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -51,21 +53,5 @@ export default class LoadingPage extends Component<InjectedOrGenerated<Generated
       downloadLogs,
       handleExternalLinkClick,
     });
-  }
-
-  render() {
-    return (
-      <CenteredLayout>
-        <Loading
-          api={environment.API}
-          hasLoadedCurrentLocale={this.generated.stores.profile.hasLoadedCurrentLocale}
-          hasLoadedCurrentTheme={this.generated.stores.profile.hasLoadedCurrentTheme}
-          isLoadingDataForNextScreen={this.generated.stores.loading.isLoading}
-          error={this.generated.stores.loading.error}
-          onExternalLinkClick={this.generated.handleExternalLinkClick}
-          downloadLogs={this.generated.downloadLogs}
-        />
-      </CenteredLayout>
-    );
   }
 }

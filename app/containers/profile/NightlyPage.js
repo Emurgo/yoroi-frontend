@@ -7,7 +7,6 @@ import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import TopBar from '../../components/topbar/TopBar';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
-import ProfleActions from '../../actions/profile-actions';
 import NightlyForm from '../../components/profile/nightly/NightlyForm';
 
 const messages = defineMessages({
@@ -17,15 +16,7 @@ const messages = defineMessages({
   },
 });
 
-type GeneratedData = {|
-  +actions: {|
-    +profile: {|
-      +acceptNightly: {|
-        +trigger: typeof ProfleActions.prototype.acceptNightly.trigger
-      |},
-    |},
-  |},
-|};
+type GeneratedData = typeof NightlyPage.prototype.generated;
 
 @observer
 export default class NightlyPage extends Component<InjectedOrGenerated<GeneratedData>> {
@@ -33,23 +24,6 @@ export default class NightlyPage extends Component<InjectedOrGenerated<Generated
   static contextTypes = {
     intl: intlShape.isRequired,
   };
-
-  @computed get generated(): GeneratedData {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(NightlyPage)} no way to generated props`);
-    }
-    const { actions } = this.props;
-    return Object.freeze({
-      actions: {
-        profile: {
-          acceptNightly: { trigger: actions.profile.acceptNightly.trigger },
-        },
-      },
-    });
-  }
 
   acceptNightly: void => void = () => {
     this.generated.actions.profile.acceptNightly.trigger();
@@ -77,7 +51,23 @@ export default class NightlyPage extends Component<InjectedOrGenerated<Generated
   }
 
   render() {
-    if (this.generated == null) return null;
     return this.renderPage(this.generated);
+  }
+
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(NightlyPage)} no way to generated props`);
+    }
+    const { actions } = this.props;
+    return Object.freeze({
+      actions: {
+        profile: {
+          acceptNightly: { trigger: actions.profile.acceptNightly.trigger },
+        },
+      },
+    });
   }
 }

@@ -23,19 +23,19 @@ export default class URILandingDialogContainer extends Component<Props> {
   @observable showDisclaimer = true;
 
   @action
-  toggleShowDisclaimer = () => {
+  toggleShowDisclaimer: void => void = () => {
     this.showDisclaimer = !this.showDisclaimer;
   }
 
-  onSubmit = () => {
+  onSubmit: void => void = () => {
     this.toggleShowDisclaimer();
   };
 
-  onVerifiedSubmit = () => {
+  onVerifiedSubmit: void => void = () => {
     this.props.onConfirm();
   };
 
-  onCancel = () => {
+  onCancel: void => void = () => {
     this.props.onClose();
   }
 
@@ -45,7 +45,6 @@ export default class URILandingDialogContainer extends Component<Props> {
         <URIInvalidDialog
           onClose={this.onCancel}
           onSubmit={this.onCancel}
-          classicTheme={this.props.classicTheme}
         />
       );
     }
@@ -59,7 +58,6 @@ export default class URILandingDialogContainer extends Component<Props> {
           onBack={() => this.toggleShowDisclaimer()}
           onCancel={this.onCancel}
           uriParams={uriParams}
-          classicTheme={this.props.classicTheme}
           selectedExplorer={this.props.stores.profile.selectedExplorer}
         />
       );

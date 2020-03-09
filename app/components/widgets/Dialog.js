@@ -30,7 +30,6 @@ type Props = {|
   +styleOveride?: {...},
   +onClose?: ?(void => PossiblyAsync<void>),
   +closeOnOverlayClick?: boolean,
-  +classicTheme: boolean
 |};
 
 @observer
@@ -57,9 +56,7 @@ export default class Dialog extends Component<Props> {
       className,
       closeButton,
       backButton,
-      classicTheme
     } = this.props;
-    const secondaryButton = classicTheme ? 'flat' : 'outlined';
 
     const hasSubmitting = actions != null && actions.filter(
       action => action.isSubmitting === true
@@ -98,7 +95,7 @@ export default class Dialog extends Component<Props> {
               {map(actions, (action, i: number) => {
                 const buttonClasses = classnames([
                   action.className != null ? action.className : null,
-                  action.primary === true ? 'primary' : secondaryButton,
+                  action.primary === true ? 'primary' : 'secondary',
                   action.isSubmitting === true && action.primary === true
                     ? styles.isSubmittingPrimary
                     : null,

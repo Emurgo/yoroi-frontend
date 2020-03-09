@@ -1,10 +1,10 @@
 // @flow
 import React, { Component } from 'react';
+import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import globalMessages from '../../i18n/global-messages';
 import WalletRestoreVerifyDialog from '../../components/wallet/WalletRestoreVerifyDialog';
-import type { InjectedProps } from '../../types/injectedPropsType';
-import type { ExplorerType } from '../../domain/Explorer';
+import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import config from '../../config';
 import {
   generateStandardPlate,
@@ -16,14 +16,14 @@ import {
 import environment from '../../environment';
 import type { PlateResponse } from '../../api/ada/lib/cardanoCrypto/plate';
 import { TransferKind } from '../../types/TransferTypes';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+
+export type GeneratedData = typeof YoroiPlatePage.prototype.generated;
 
 type Props = {|
-  ...InjectedProps,
+  ...InjectedOrGenerated<GeneratedData>,
   +onNext: void => PossiblyAsync<void>,
-  +selectedExplorer: ExplorerType,
   +onCancel: void => void,
-  +recoveryPhrase: string,
-  +classicTheme: boolean,
 |};
 type WalletRestoreDialogContainerState = {|
   byronPlate: void | PlateResponse,
@@ -37,8 +37,9 @@ const NUMBER_OF_VERIFIED_ADDRESSES_PAPER = 5;
 @observer
 export default class YoroiPlatePage extends Component<Props, WalletRestoreDialogContainerState> {
 
-  initializeState = () => {
-    const { yoroiTransfer } = this.props.stores.substores.ada;
+  async componentDidMount() {
+    await RustModule.load();
+    const { yoroiTransfer } = this.generated.stores.substores.ada;
 
     const numAddresses = yoroiTransfer.transferKind === TransferKind.PAPER
       ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER
@@ -54,7 +55,8 @@ export default class YoroiPlatePage extends Component<Props, WalletRestoreDialog
       environment.getDiscriminant(),
       true,
     );
-    const shelleyPlate = yoroiTransfer.transferKind === TransferKind.PAPER
+    const shelleyPlate = !environment.isShelley() ||
+      yoroiTransfer.transferKind === TransferKind.PAPER
       ? undefined
       : generateStandardPlate(
         rootPk,
@@ -63,18 +65,19 @@ export default class YoroiPlatePage extends Component<Props, WalletRestoreDialog
         environment.getDiscriminant(),
         false,
       );
-    return {
+    this.setState({
       byronPlate,
       shelleyPlate,
       notificationElementId: '',
-    };
+    });
   }
 
-  state = this.initializeState();
+  state: WalletRestoreDialogContainerState;
 
   render() {
-    const actions = this.props.actions;
-    const { uiNotifications } = this.props.stores;
+    if (this.state == null) return null;
+    const actions = this.generated.actions;
+    const { uiNotifications } = this.generated.stores;
 
     const tooltipNotification = {
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
@@ -85,7 +88,7 @@ export default class YoroiPlatePage extends Component<Props, WalletRestoreDialog
       <WalletRestoreVerifyDialog
         byronPlate={byronPlate}
         shelleyPlate={shelleyPlate}
-        selectedExplorer={this.props.selectedExplorer}
+        selectedExplorer={this.generated.stores.profile.selectedExplorer}
         onCopyAddressTooltip={(address, elementId) => {
           if (!uiNotifications.isOpen(elementId)) {
             this.setState({ notificationElementId: elementId });
@@ -102,9 +105,43 @@ export default class YoroiPlatePage extends Component<Props, WalletRestoreDialog
         onNext={this.props.onNext}
         onCancel={this.props.onCancel}
         isSubmitting={false}
-        classicTheme={this.props.classicTheme}
         error={undefined}
       />
     );
+  }
+
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(YoroiPlatePage)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    const adaStores = stores.substores.ada;
+    return Object.freeze({
+      stores: {
+        profile: {
+          selectedExplorer: stores.profile.selectedExplorer,
+        },
+        uiNotifications: {
+          isOpen: stores.uiNotifications.isOpen,
+          getTooltipActiveNotification: stores.uiNotifications.getTooltipActiveNotification,
+        },
+        substores: {
+          ada: {
+            yoroiTransfer: {
+              transferKind: adaStores.yoroiTransfer.transferKind,
+              recoveryPhrase: adaStores.yoroiTransfer.recoveryPhrase,
+            },
+          },
+        },
+      },
+      actions: {
+        notifications: {
+          open: { trigger: actions.notifications.open.trigger },
+        },
+      },
+    });
   }
 }

@@ -29,7 +29,6 @@ type Props = {|
   +onCancel: void => void,
   +onTrezor: void => void,
   +onLedger: void => void,
-  +classicTheme: boolean
 |};
 
 @observer
@@ -40,7 +39,7 @@ export default class WalletConnectHWOptionDialog extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onCancel, onTrezor, onLedger, classicTheme } = this.props;
+    const { onCancel, onTrezor, onLedger, } = this.props;
 
     return (
       <Dialog
@@ -48,7 +47,6 @@ export default class WalletConnectHWOptionDialog extends Component<Props> {
         closeOnOverlayClick={false}
         onClose={onCancel}
         closeButton={<DialogCloseButton />}
-        classicTheme={classicTheme}
         className="WalletConnectHWOptionDialog"
       >
         <div className={styles.component}>

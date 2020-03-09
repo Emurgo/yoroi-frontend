@@ -42,7 +42,7 @@ export default class UriSkip extends Component<Props> {
       styles.submitButton,
     ]);
     const skipButtonClasses = classnames([
-      this.props.classicTheme ? 'flat' : 'outlined',
+      'secondary',
       styles.submitButton,
     ]);
 

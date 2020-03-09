@@ -141,7 +141,6 @@ export default class ConnectDialog extends Component<Props> {
         onClose={cancel}
         backButton={backButton}
         closeButton={<DialogCloseButton />}
-        classicTheme={classicTheme}
       >
         <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         {introBlock}

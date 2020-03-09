@@ -7,7 +7,7 @@ import NightlyPage from './NightlyPage';
 import { withScreenshot } from 'storycap';
 
 export default {
-  title: `Container/${nameof(NightlyPage)}`,
+  title: `${module.id.split('.')[1]}`,
   component: NightlyPage,
   decorators: [withScreenshot],
 };

@@ -28,9 +28,9 @@ export default class ErrorPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { error, onCancel, title, backButtonLabel, classicTheme } = this.props;
+    const { error, onCancel, title, backButtonLabel, } = this.props;
     const backButtonClasses = classnames([
-      classicTheme ? 'flat' : 'outlined',
+      'secondary',
       styles.button,
     ]);
 

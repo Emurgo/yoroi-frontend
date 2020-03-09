@@ -76,7 +76,6 @@ export default class DaedalusTransferFormPage extends Component<Props> {
         onSubmit={this.submit}
         onBack={this.props.onBack}
         step0={intl.formatMessage(message)}
-        classicTheme={this.props.classicTheme}
         isDisabled={this.mnemonicForm == null || this.mnemonicForm.hasError}
       >
         <MnemonicInput

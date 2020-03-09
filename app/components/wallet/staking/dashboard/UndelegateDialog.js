@@ -134,7 +134,6 @@ export default class UndelegateDialog extends Component<Props> {
         onClose={!this.props.isSubmitting ? this.props.onCancel : null}
         className={styles.dialog}
         closeButton={<DialogCloseButton />}
-        classicTheme={this.props.classicTheme}
       >
         {this.props.staleTx && staleTxWarning}
         <ul className={styles.explanation}>

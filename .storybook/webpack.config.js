@@ -6,7 +6,7 @@ const ConfigWebpackPlugin = require('config-webpack');
 const custom = require('../webpack/devConfig');
 const commonConfig = require('../webpack/commonConfig');
 
-const ENV = 'test';
+const ENV = 'storybook';
 
 module.exports = async ({ config, mode }) => {
   const customConfig = custom.baseDevConfig(ENV);
@@ -24,7 +24,14 @@ module.exports = async ({ config, mode }) => {
     module: {
       ...config.module,
       rules: customConfig.module.rules
-    }
+    },
+    resolve: {
+      ...config.resolve,
+      extensions: [
+        ...config.resolve.extensions,
+        '.wasm',
+      ],
+    },
   };
 
   finalConfig.module.rules.push({

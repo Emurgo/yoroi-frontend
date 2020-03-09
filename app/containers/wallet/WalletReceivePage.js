@@ -206,7 +206,6 @@ export default class WalletReceivePage extends Component<Props, State> {
             notification={uiNotifications.getTooltipActiveNotification(
               this.state.notificationElementId
             )}
-            classicTheme={profile.isClassicTheme}
           />
         ) : null}
 

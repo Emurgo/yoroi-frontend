@@ -51,8 +51,10 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +passwordValue: string,
-  +repeatedPasswordValue: string,
+  +dialogData: {|
+    +passwordValue: string,
+    +repeatedPasswordValue: string,
+  |},
   +onNext: {| userPassword: string |} => PossiblyAsync<void>,
   +onCancel: void => PossiblyAsync<void>,
   +onDataChange: { [key: string]: any, ... } => void,
@@ -72,7 +74,7 @@ export default class UserPasswordDialog extends Component<Props> {
         label: this.context.intl.formatMessage(messages.paperPasswordLabel),
         placeholder: this.props.classicTheme ?
           this.context.intl.formatMessage(messages.paperPasswordPlaceholder) : '',
-        value: '',
+        value: this.props.dialogData.passwordValue,
         validators: [({ field, form }) => {
           const repeatPasswordField = form.$('repeatPassword');
           if (repeatPasswordField.value.length > 0) {
@@ -89,7 +91,7 @@ export default class UserPasswordDialog extends Component<Props> {
         label: this.context.intl.formatMessage(messages.repeatPasswordLabel),
         placeholder: this.props.classicTheme ?
           this.context.intl.formatMessage(messages.repeatPasswordPlaceholder) : '',
-        value: '',
+        value: this.props.dialogData.repeatedPasswordValue,
         validators: [({ field, form }) => {
           const paperPassword = form.$('paperPassword').value;
           if (paperPassword.length === 0) return [true];
@@ -102,6 +104,10 @@ export default class UserPasswordDialog extends Component<Props> {
     }
   }, {
     options: {
+      showErrorsOnInit: Object.keys(this.props.dialogData)
+        .map(key => this.props.dialogData[key])
+        .filter(val => val !== '' && val != null)
+        .length > 0,
       validateOnChange: true,
       validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
     },
@@ -130,8 +136,7 @@ export default class UserPasswordDialog extends Component<Props> {
     const { intl } = this.context;
     const {
       onCancel,
-      passwordValue,
-      repeatedPasswordValue,
+      dialogData,
       classicTheme,
     } = this.props;
 
@@ -164,7 +169,6 @@ export default class UserPasswordDialog extends Component<Props> {
         onClose={onCancel}
         className={dialogClasses}
         closeButton={<DialogCloseButton onClose={onCancel} />}
-        classicTheme={classicTheme}
       >
 
         <div className={classicTheme ? headerMixin.headerBlockClassic : headerMixin.headerBlock}>
@@ -177,7 +181,7 @@ export default class UserPasswordDialog extends Component<Props> {
           <Input
             type="password"
             className={styles.paperPassword}
-            value={passwordValue}
+            value={dialogData.passwordValue}
             onChange={(value) => this.handleDataChange('passwordValue', value)}
             {...paperPasswordField.bind()}
             done={isValidPaperPassword(paperPassword)}
@@ -189,7 +193,7 @@ export default class UserPasswordDialog extends Component<Props> {
           <Input
             type="password"
             className={styles.repeatedPassword}
-            value={repeatedPasswordValue}
+            value={dialogData.repeatedPasswordValue}
             onChange={(value) => this.handleDataChange('repeatedPasswordValue', value)}
             done={repeatPassword && isValidRepeatPassword(paperPassword, repeatPassword)}
             {...repeatedPasswordField.bind()}

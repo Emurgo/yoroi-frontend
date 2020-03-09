@@ -92,7 +92,6 @@ export default class WalletAddPage extends Component<Props> {
       activeDialog = (
         <WalletRestoreOptionDialogContainer
           onClose={this.onClose}
-          classicTheme={profile.isClassicTheme}
           onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
           onPaperRestore={() => actions.dialogs.open.trigger({
             dialog: WalletRestoreDialog,
@@ -116,7 +115,6 @@ export default class WalletAddPage extends Component<Props> {
       activeDialog = (
         <WalletConnectHWOptionDialogContainer
           onClose={this.onClose}
-          classicTheme={profile.isClassicTheme}
           onTrezor={openTrezorConnectDialog}
           onLedger={openLedgerConnectDialog}
         />

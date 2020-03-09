@@ -1,11 +1,30 @@
 // @flow
 
-import { globalKnobs } from '../../../stories/helpers/StoryWrapper';
+import { select, } from '@storybook/addon-knobs';
+import { globalKnobs, } from '../../../stories/helpers/StoryWrapper';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { action } from '@storybook/addon-actions';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
+import WalletSettingsStore from '../../stores/base/WalletSettingsStore';
+import TransactionsStore from '../../stores/base/TransactionsStore';
+import DelegationStore from '../../stores/ada/DelegationStore';
+import WalletStore from '../../stores/toplevel/WalletStore';
 import type { GeneratedData } from './Settings';
 
-export const mockSettingsProps: {| generated: GeneratedData |} = {
+export const mockSettingsProps: {
+  selected: null | PublicDeriver<>,
+  publicDerivers: Array<PublicDeriver<>>,
+  getConceptualWalletSettingsCache:
+    typeof WalletSettingsStore.prototype.getConceptualWalletSettingsCache,
+  getPublicKeyCache:
+    typeof WalletStore.prototype.getPublicKeyCache,
+  getTransactions:
+    typeof TransactionsStore.prototype.getTxRequests,
+  getDelegation:
+    typeof DelegationStore.prototype.getDelegationRequests,
+  location: string,
+  ...
+} => {| generated: GeneratedData |} = (request) => ({
   generated: {
     stores: {
       profile: {
@@ -14,15 +33,19 @@ export const mockSettingsProps: {| generated: GeneratedData |} = {
       },
       router: {
         location: {
-          pathname: '',
+          pathname: request.location,
         },
       },
       wallets: {
-        hasActiveWallet: false,
-        selected: null,
+        hasActiveWallet: request.selected != null,
+        selected: request.selected,
       },
       serverConnectionStore: {
-        checkAdaServerStatus: ServerStatusErrors.Healthy, // TODO: make this a global knob?
+        checkAdaServerStatus: select(
+          'checkAdaServerStatus',
+          ServerStatusErrors,
+          ServerStatusErrors.Healthy,
+        ),
       }
     },
     actions: {
@@ -55,28 +78,22 @@ export const mockSettingsProps: {| generated: GeneratedData |} = {
       generated: {
         stores: {
           walletSettings: {
-            getConceptualWalletSettingsCache: (conceptualWallet) => ({
-              conceptualWallet,
-              conceptualWalletName: 'Test wallet', // TODO: global var?
-            }),
+            getConceptualWalletSettingsCache:
+              request.getConceptualWalletSettingsCache,
           },
           wallets: {
-            // TODO: maybe should come from a global knob?
-            selected: null,
-            publicDerivers: [],
-            getPublicKeyCache: (publicDeriver) => ({
-              publicDeriver,
-              plate: (undefined: any), // TODO
-            }),
+            selected: request.selected,
+            publicDerivers: request.publicDerivers,
+            getPublicKeyCache: request.getPublicKeyCache,
           },
           profile: {
             shouldHideBalance: false,
           },
           delegation: {
-            getRequests: (_publicDeriver) => undefined,
+            getDelegationRequests: request.getDelegation,
           },
           transactions: {
-            getTxRequests: (_publicDeriver) => (undefined: any),
+            getTxRequests: request.getTransactions,
           },
         },
         actions: {
@@ -90,4 +107,4 @@ export const mockSettingsProps: {| generated: GeneratedData |} = {
       }
     },
   },
-};
+});

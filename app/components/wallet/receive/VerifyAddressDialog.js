@@ -103,7 +103,6 @@ export default class VerifyAddressDialog extends Component<Props> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={cancel}
-        classicTheme={classicTheme}
       >
         {walletAddress ? (
           <div>

@@ -16,10 +16,8 @@ import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
-import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 import registerProtocols from '../../uri-protocols';
 import globalMessages from '../../i18n/global-messages';
-import ProfleActions from '../../actions/profile-actions';
 
 const Choices = {
   ACCEPT: 'accept',
@@ -27,23 +25,7 @@ const Choices = {
 };
 type CHOICES = $Values<typeof Choices>;
 
-type GeneratedData = {|
-  +stores: {|
-    +profile: {|
-      +isClassicTheme: boolean,
-    |},
-    +serverConnectionStore: {|
-      +checkAdaServerStatus: ServerStatusErrorType,
-    |},
-  |},
-  +actions: {|
-    +profile: {|
-      +acceptUriScheme: {|
-        +trigger: typeof ProfleActions.prototype.acceptUriScheme.trigger
-      |},
-    |},
-  |},
-|};
+type GeneratedData = typeof UriPromptPage.prototype.generated;
 
 @observer
 export default class UriPromptPage extends Component<InjectedOrGenerated<GeneratedData>> {
@@ -55,47 +37,20 @@ export default class UriPromptPage extends Component<InjectedOrGenerated<Generat
     intl: intlShape.isRequired,
   };
 
-  @computed get generated(): GeneratedData {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(UriPromptPage)} no way to generated props`);
-    }
-    const { stores, actions } = this.props;
-    const profileStore = stores.profile;
-    return Object.freeze({
-      stores: {
-        profile: {
-          isClassicTheme: profileStore.isClassicTheme,
-        },
-        serverConnectionStore: {
-          checkAdaServerStatus: stores.substores[environment.API]
-            .serverConnectionStore.checkAdaServerStatus,
-        },
-      },
-      actions: {
-        profile: {
-          acceptUriScheme: { trigger: actions.profile.acceptUriScheme.trigger },
-        },
-      },
-    });
-  }
-
-  onAccept = () => {
+  onAccept: void => void = () => {
     registerProtocols();
     runInAction(() => {
       this.selectedChoice = Choices.ACCEPT;
     });
   };
 
-  onSkip = () => {
+  onSkip: void => void = () => {
     runInAction(() => {
       this.selectedChoice = Choices.SKIP;
     });
   };
 
-  onBack = () => {
+  onBack: void => void = () => {
     runInAction(() => {
       this.selectedChoice = null;
     });
@@ -146,5 +101,32 @@ export default class UriPromptPage extends Component<InjectedOrGenerated<Generat
         {this._getContent()}
       </TopBarLayout>
     );
+  }
+
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(UriPromptPage)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    const profileStore = stores.profile;
+    return Object.freeze({
+      stores: {
+        profile: {
+          isClassicTheme: profileStore.isClassicTheme,
+        },
+        serverConnectionStore: {
+          checkAdaServerStatus: stores.substores[environment.API]
+            .serverConnectionStore.checkAdaServerStatus,
+        },
+      },
+      actions: {
+        profile: {
+          acceptUriScheme: { trigger: actions.profile.acceptUriScheme.trigger },
+        },
+      },
+    });
   }
 }

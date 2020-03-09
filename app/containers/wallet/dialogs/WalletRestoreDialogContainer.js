@@ -159,7 +159,6 @@ export default class WalletRestoreDialogContainer
               this.state.notificationElementId
             )}
             isSubmitting={isSubmitting}
-            classicTheme={this.props.classicTheme}
             error={error}
           />
         );
@@ -200,7 +199,6 @@ export default class WalletRestoreDialogContainer
             styleOveride={{ '--theme-modal-min-max-width-cmn': '680px' }}
             title={intl.formatMessage(globalMessages.walletUpgrade)}
             closeOnOverlayClick={false}
-            classicTheme={profile.isClassicTheme}
             actions={yoroiTransfer.status === TransferStatus.ERROR
               ? getDoneButton()
               : undefined
@@ -249,7 +247,6 @@ export default class WalletRestoreDialogContainer
           isSubmitting={yoroiTransfer.transferFundsRequest.isExecuting}
           onCancel={this.onCancel}
           error={yoroiTransfer.error}
-          classicTheme={profile.isClassicTheme}
         />);
       }
       case TransferStatus.ERROR: {

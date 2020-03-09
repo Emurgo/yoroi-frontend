@@ -15,7 +15,6 @@ type Props = {|
   +onSubmit: void => Promise<void>,
   +onBack: void => void,
   +step0: string,
-  +classicTheme: boolean,
   +isDisabled: boolean
 |};
 
@@ -31,7 +30,6 @@ export default class BaseTransferPage extends Component<Props> {
     const {
       onBack,
       step0,
-      classicTheme
     } = this.props;
 
     const nextButtonClasses = classnames([
@@ -41,7 +39,7 @@ export default class BaseTransferPage extends Component<Props> {
     ]);
     const backButtonClasses = classnames([
       'backTransferButtonClasses',
-      classicTheme ? 'flat' : 'outlined',
+      'secondary',
       styles.button,
     ]);
 

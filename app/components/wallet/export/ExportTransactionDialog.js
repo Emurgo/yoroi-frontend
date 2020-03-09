@@ -32,7 +32,6 @@ type Props = {|
   +error: ?LocalizableError,
   +submit: void => PossiblyAsync<void>,
   +cancel: void => void,
-  +classicTheme: boolean,
 |};
 
 @observer
@@ -72,7 +71,6 @@ export default class ExportTransactionDialog extends Component<Props> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={cancel}
-        classicTheme={this.props.classicTheme}
       >
         {infoBlock}
         {error && <ErrorBlock error={error} />}

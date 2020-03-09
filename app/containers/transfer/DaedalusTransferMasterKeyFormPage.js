@@ -53,7 +53,6 @@ export default class DaedalusTransferMasterKeyFormPage extends Component<Props> 
         onSubmit={this.submit}
         onBack={this.props.onBack}
         step0={intl.formatMessage(messages.step0)}
-        classicTheme={this.props.classicTheme}
         isDisabled={this.masterKeyForm == null || this.masterKeyForm.hasError}
       >
         <DaedalusMasterKeyInput

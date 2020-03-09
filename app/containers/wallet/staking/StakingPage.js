@@ -82,7 +82,7 @@ export default class StakingPage extends Component<Props> {
 
     finalURL += `&locale=${this.props.stores.profile.currentLocale}`;
     const delegationStore = this.props.stores.substores.ada.delegation;
-    const delegationRequests = delegationStore.getRequests(publicDeriver);
+    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingPage)} opened for non-reward wallet`);
     }

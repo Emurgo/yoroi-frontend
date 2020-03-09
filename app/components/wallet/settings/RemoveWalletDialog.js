@@ -30,7 +30,6 @@ type Props = {|
   +isSubmitting: boolean,
   +onCancel: void => void,
   +error: ?LocalizableError,
-  +classicTheme: boolean,
 |};
 
 @observer
@@ -53,7 +52,6 @@ export default class RemoveWalletDialog extends Component<Props> {
       onCancel,
       isSubmitting,
       error,
-      classicTheme,
     } = this.props;
 
     const dialogClasses = classnames(['removeWalletDialog', styles.dialog]);
@@ -90,7 +88,6 @@ export default class RemoveWalletDialog extends Component<Props> {
         onClose={onCancel}
         className={dialogClasses}
         closeButton={<DialogCloseButton onClose={onCancel} />}
-        classicTheme={classicTheme}
       >
 
         <p>{intl.formatMessage(messages.removeExplanation)}</p>

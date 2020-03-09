@@ -77,7 +77,8 @@ export default class DelegationStore extends Store {
 
   _recalculateDelegationInfoDisposer: void => void = () => {};
 
-  getRequests: PublicDeriver<> => void | DelegationRequests = (
+  // TODO: refine input typ to staking key wallets only
+  getDelegationRequests: PublicDeriver<> => void | DelegationRequests = (
     publicDeriver
   ) => {
     const foundRequest = find(this.delegationRequests, { publicDeriver });
@@ -118,7 +119,7 @@ export default class DelegationStore extends Store {
   refreshDelegation: PublicDeriver<> => Promise<void> = async (
     publicDeriver
   ) => {
-    const delegationRequest = this.getRequests(publicDeriver);
+    const delegationRequest = this.getDelegationRequests(publicDeriver);
     if (delegationRequest == null) return;
 
     try {

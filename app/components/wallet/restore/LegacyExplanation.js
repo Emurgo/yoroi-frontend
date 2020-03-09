@@ -74,7 +74,6 @@ export default class LegacyExplanation extends Component<Props> {
         onClose={this.props.onClose}
         closeButton={<DialogCloseButton onClose={this.props.onClose} />}
         backButton={<DialogBackButton onBack={this.props.onBack} />}
-        classicTheme={classicTheme}
       >
         {!classicTheme && <span className={styles.recoveryImage}><RecoveryWatchingSvg /></span>}
         <WalletRecoveryInstructions
