@@ -9,10 +9,6 @@ import NavBarContainer from '../NavBarContainer';
 import SettingsMenu from '../../components/settings/menu/SettingsMenu';
 import { buildRoute } from '../../utils/routing';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
-import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { Theme } from '../../themes';
-import RouterActions from '../../actions/router-actions';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import type { GeneratedData as NavBarContainerData } from '../NavBarContainer';
 
@@ -28,36 +24,7 @@ const messages = defineMessages({
   },
 });
 
-export type GeneratedData = {|
-  +stores: {|
-    +profile: {|
-      +currentLocale: string,
-      +currentTheme: Theme,
-    |},
-    +router: {|
-      +location: {|
-        +pathname: string,
-      |},
-    |},
-    +wallets: {|
-      +hasActiveWallet: boolean,
-      +selected: null | PublicDeriver<>,
-    |},
-    +serverConnectionStore: {|
-      +checkAdaServerStatus: ServerStatusErrorType,
-    |},
-  |},
-  +actions: {|
-    +router: {|
-      +goToRoute: {|
-        +trigger: typeof RouterActions.prototype.goToRoute.trigger
-      |},
-    |},
-  |},
-  +SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
-  +NavBarContainerProps: InjectedOrGenerated<NavBarContainerData>,
-|};
-
+export type GeneratedData = typeof Settings.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
@@ -75,7 +42,7 @@ export default class Settings extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  @computed get generated(): GeneratedData {
+  @computed get generated() {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -105,8 +72,8 @@ export default class Settings extends Component<Props> {
           goToRoute: { trigger: actions.router.goToRoute.trigger },
         },
       },
-      SidebarContainerProps: { actions, stores, },
-      NavBarContainerProps: { actions, stores, },
+      SidebarContainerProps: ({ actions, stores, }: InjectedOrGenerated<SidebarContainerData>),
+      NavBarContainerProps: ({ actions, stores, }: InjectedOrGenerated<NavBarContainerData>),
     });
   }
 

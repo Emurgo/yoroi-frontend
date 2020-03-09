@@ -12,9 +12,6 @@ import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
-import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
-import LocalizableError from '../../i18n/LocalizableError';
-import ProfleActions from '../../actions/profile-actions';
 
 const messages = defineMessages({
   title: {
@@ -23,27 +20,7 @@ const messages = defineMessages({
   },
 });
 
-type GeneratedData = {|
-  +stores: {|
-    +profile: {|
-      +setTermsOfUseAcceptanceRequest: {|
-        +isExecuting: boolean,
-        +error: ?LocalizableError,
-      |},
-      +termsOfUse: string,
-    |},
-    +serverConnectionStore: {|
-      +checkAdaServerStatus: ServerStatusErrorType,
-    |},
-  |},
-  +actions: {|
-    +profile: {|
-      +acceptTermsOfUse: {|
-        +trigger: typeof ProfleActions.prototype.acceptTermsOfUse.trigger
-      |},
-    |},
-  |},
-|};
+type GeneratedData = typeof TermsOfUsePage.prototype.generated;
 
 @observer
 export default class TermsOfUsePage extends Component<InjectedOrGenerated<GeneratedData>> {
@@ -52,7 +29,34 @@ export default class TermsOfUsePage extends Component<InjectedOrGenerated<Genera
     intl: intlShape.isRequired,
   };
 
-  @computed get generated(): GeneratedData {
+  render() {
+    const { checkAdaServerStatus } = this.generated.stores.serverConnectionStore;
+    const displayedBanner = checkAdaServerStatus === ServerStatusErrors.Healthy ?
+      <TestnetWarningBanner /> :
+      <ServerErrorBanner errorType={checkAdaServerStatus} />;
+    const topbarTitle = (
+      <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
+    );
+    const topbarElement = (
+      <TopBar
+        title={topbarTitle}
+      />);
+    return (
+      <TopBarLayout
+        topbar={topbarElement}
+        banner={displayedBanner}
+      >
+        <TermsOfUseForm
+          localizedTermsOfUse={this.generated.stores.profile.termsOfUse}
+          onSubmit={this.generated.actions.profile.acceptTermsOfUse.trigger}
+          isSubmitting={this.generated.stores.profile.setTermsOfUseAcceptanceRequest.isExecuting}
+          error={this.generated.stores.profile.setTermsOfUseAcceptanceRequest.error}
+        />
+      </TopBarLayout>
+    );
+  }
+
+  @computed get generated() {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -81,32 +85,5 @@ export default class TermsOfUsePage extends Component<InjectedOrGenerated<Genera
         },
       },
     });
-  }
-
-  render() {
-    const { checkAdaServerStatus } = this.generated.stores.serverConnectionStore;
-    const displayedBanner = checkAdaServerStatus === ServerStatusErrors.Healthy ?
-      <TestnetWarningBanner /> :
-      <ServerErrorBanner errorType={checkAdaServerStatus} />;
-    const topbarTitle = (
-      <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
-    );
-    const topbarElement = (
-      <TopBar
-        title={topbarTitle}
-      />);
-    return (
-      <TopBarLayout
-        topbar={topbarElement}
-        banner={displayedBanner}
-      >
-        <TermsOfUseForm
-          localizedTermsOfUse={this.generated.stores.profile.termsOfUse}
-          onSubmit={this.generated.actions.profile.acceptTermsOfUse.trigger}
-          isSubmitting={this.generated.stores.profile.setTermsOfUseAcceptanceRequest.isExecuting}
-          error={this.generated.stores.profile.setTermsOfUseAcceptanceRequest.error}
-        />
-      </TopBarLayout>
-    );
   }
 }

@@ -5,18 +5,12 @@ import { observer } from 'mobx-react';
 import TermsOfUseSettings from '../../../components/settings/categories/TermsOfUseSettings';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 
-type GeneratedData = {|
-  +stores: {|
-    +profile: {|
-      +termsOfUse: string,
-    |},
-  |},
-|};
+type GeneratedData = typeof TermsOfUseSettingsPage.prototype.generated;
 
 @observer
 export default class TermsOfUseSettingsPage extends Component<InjectedOrGenerated<GeneratedData>> {
 
-  @computed get generated(): GeneratedData {
+  @computed get generated() {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -40,5 +34,4 @@ export default class TermsOfUseSettingsPage extends Component<InjectedOrGenerate
       />
     );
   }
-
 }

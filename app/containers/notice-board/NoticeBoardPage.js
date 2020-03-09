@@ -11,14 +11,6 @@ import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import TopBar from '../../components/topbar/TopBar';
 import NoticeBoard from '../../components/notice-board/NoticeBoard';
 import NoNotice from '../../components/notice-board/NoNotice';
-import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
-import type { Category } from '../../config/topbarConfig';
-import TopbarActions from '../../actions/topbar-actions';
-import NoticeActions from '../../actions/notice-board-actions';
-import Notice from '../../domain/Notice';
-import type {
-  GetNoticesRequestOptions
-} from '../../api/ada';
 
 const messages = defineMessages({
   title: {
@@ -28,84 +20,13 @@ const messages = defineMessages({
 });
 
 
-type GeneratedData = {|
-  +stores: {|
-    +profile: {|
-      +isClassicTheme: boolean,
-    |},
-    +serverConnectionStore: {|
-      +checkAdaServerStatus: ServerStatusErrorType,
-    |},
-    topbar: {|
-      +isActiveCategory: Category => boolean,
-      +categories: Array<Category>,
-    |},
-    +noticeBoard: {|
-      +loadedNotices: Array<Notice>,
-      +searchOptions: GetNoticesRequestOptions,
-      +isLoading: boolean,
-      +hasMoreToLoad: boolean,
-    |},
-  |},
-  +actions: {|
-    +topbar: {|
-      +activateTopbarCategory: {|
-        +trigger: typeof TopbarActions.prototype.activateTopbarCategory.trigger,
-      |},
-    |},
-    +noticeBoard: {|
-      +loadMore: {|
-        +trigger: typeof NoticeActions.prototype.loadMore.trigger,
-      |},
-    |},
-  |},
-|};
+type GeneratedData = typeof NoticeBoardPage.prototype.generated;
 
 @observer
 export default class NoticeBoardPage extends Component<InjectedOrGenerated<GeneratedData>> {
   static contextTypes = {
     intl: intlShape.isRequired,
   };
-
-  @computed get generated(): GeneratedData {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(NoticeBoardPage)} no way to generated props`);
-    }
-    const { stores, actions } = this.props;
-    const profileStore = stores.profile;
-    return Object.freeze({
-      stores: {
-        profile: {
-          isClassicTheme: profileStore.isClassicTheme,
-        },
-        serverConnectionStore: {
-          checkAdaServerStatus: stores.substores[environment.API]
-            .serverConnectionStore.checkAdaServerStatus,
-        },
-        topbar: {
-          isActiveCategory: stores.topbar.isActiveCategory,
-          categories: stores.topbar.categories,
-        },
-        noticeBoard: {
-          loadedNotices: stores.noticeBoard.loadedNotices,
-          searchOptions: stores.noticeBoard.searchOptions,
-          isLoading: stores.noticeBoard.isLoading,
-          hasMoreToLoad: stores.noticeBoard.hasMoreToLoad,
-        },
-      },
-      actions: {
-        topbar: {
-          activateTopbarCategory: { trigger: actions.topbar.activateTopbarCategory.trigger },
-        },
-        noticeBoard: {
-          loadMore: { trigger: actions.noticeBoard.loadMore.trigger },
-        },
-      },
-    });
-  }
 
   render() {
     const {
@@ -154,5 +75,45 @@ export default class NoticeBoardPage extends Component<InjectedOrGenerated<Gener
         {noticeComp}
       </MainLayout>
     );
+  }
+
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(NoticeBoardPage)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    const profileStore = stores.profile;
+    return Object.freeze({
+      stores: {
+        profile: {
+          isClassicTheme: profileStore.isClassicTheme,
+        },
+        serverConnectionStore: {
+          checkAdaServerStatus: stores.substores[environment.API]
+            .serverConnectionStore.checkAdaServerStatus,
+        },
+        topbar: {
+          isActiveCategory: stores.topbar.isActiveCategory,
+          categories: stores.topbar.categories,
+        },
+        noticeBoard: {
+          loadedNotices: stores.noticeBoard.loadedNotices,
+          searchOptions: stores.noticeBoard.searchOptions,
+          isLoading: stores.noticeBoard.isLoading,
+          hasMoreToLoad: stores.noticeBoard.hasMoreToLoad,
+        },
+      },
+      actions: {
+        topbar: {
+          activateTopbarCategory: { trigger: actions.topbar.activateTopbarCategory.trigger },
+        },
+        noticeBoard: {
+          loadMore: { trigger: actions.noticeBoard.loadMore.trigger },
+        },
+      },
+    });
   }
 }

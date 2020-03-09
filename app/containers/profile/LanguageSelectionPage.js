@@ -12,11 +12,6 @@ import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
 import IntroBanner from '../../components/profile/language-selection/IntroBanner';
-import type { LanguageType } from '../../i18n/translations';
-import LocalizableError from '../../i18n/LocalizableError';
-import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
-import ProfleActions from '../../actions/profile-actions';
-import ProfileStore from '../../stores/toplevel/ProfileStore';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 
 const messages = defineMessages({
@@ -26,35 +21,7 @@ const messages = defineMessages({
   },
 });
 
-type GeneratedData = {|
-  +stores: {|
-    +profile: {|
-      +LANGUAGE_OPTIONS: Array<LanguageType>,
-      +isCurrentLocaleSet: boolean,
-      +currentLocale: string,
-      +setProfileLocaleRequest: {|
-        +error: ?LocalizableError,
-        +isExecuting: boolean,
-      |},
-      +unsetProfileLocaleRequest: typeof ProfileStore.prototype.unsetProfileLocaleRequest,
-      +getProfileLocaleRequest: typeof ProfileStore.prototype.getProfileLocaleRequest,
-      +isClassicTheme: boolean,
-    |},
-    +serverConnectionStore: {|
-      +checkAdaServerStatus: ServerStatusErrorType,
-    |},
-  |},
-  +actions: {|
-    +profile: {|
-      +updateTentativeLocale: {|
-        +trigger: typeof ProfleActions.prototype.updateTentativeLocale.trigger
-      |},
-      +commitLocaleToStorage: {|
-        +trigger: typeof ProfleActions.prototype.commitLocaleToStorage.trigger
-      |},
-    |},
-  |},
-|};
+type GeneratedData = typeof LanguageSelectionPage.prototype.generated;
 
 @observer
 export default class LanguageSelectionPage extends Component<InjectedOrGenerated<GeneratedData>> {
@@ -62,43 +29,6 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
   static contextTypes = {
     intl: intlShape.isRequired,
   };
-
-  @computed get generated(): GeneratedData {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(LanguageSelectionPage)} no way to generated props`);
-    }
-    const { stores, actions } = this.props;
-    const profileStore = stores.profile;
-    return Object.freeze({
-      stores: {
-        profile: {
-          LANGUAGE_OPTIONS: profileStore.LANGUAGE_OPTIONS,
-          isCurrentLocaleSet: profileStore.isCurrentLocaleSet,
-          currentLocale: profileStore.currentLocale,
-          isClassicTheme: profileStore.isClassicTheme,
-          setProfileLocaleRequest: {
-            error: profileStore.setProfileLocaleRequest.error,
-            isExecuting: profileStore.setProfileLocaleRequest.isExecuting,
-          },
-          unsetProfileLocaleRequest: stores.profile.unsetProfileLocaleRequest,
-          getProfileLocaleRequest: stores.profile.getProfileLocaleRequest,
-        },
-        serverConnectionStore: {
-          checkAdaServerStatus: stores.substores[environment.API]
-            .serverConnectionStore.checkAdaServerStatus,
-        },
-      },
-      actions: {
-        profile: {
-          updateTentativeLocale: { trigger: actions.profile.updateTentativeLocale.trigger },
-          commitLocaleToStorage: { trigger: actions.profile.commitLocaleToStorage.trigger },
-        },
-      },
-    });
-  }
 
   async componentDidMount() {
     const profileStore = this.generated.stores.profile;
@@ -114,11 +44,11 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
     await profileStore.getProfileLocaleRequest.execute();
   }
 
-  onSelectLanguage = (values: {| locale: string |}) => {
+  onSelectLanguage: {| locale: string |} => void = (values) => {
     this.generated.actions.profile.updateTentativeLocale.trigger(values);
   };
 
-  onSubmit = async (_values: {| locale: string |}): Promise<void> => {
+  onSubmit: {| locale: string |} => Promise<void> = async (_values) => {
     await this.generated.actions.profile.commitLocaleToStorage.trigger();
   };
 
@@ -190,10 +120,46 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
   }
 
   render() {
-    if (this.generated == null) return null;
     if (environment.isShelley()) {
       return this.renderShelley(this.generated);
     }
     return this.renderByron(this.generated);
+  }
+
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(LanguageSelectionPage)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    const profileStore = stores.profile;
+    return Object.freeze({
+      stores: {
+        profile: {
+          LANGUAGE_OPTIONS: profileStore.LANGUAGE_OPTIONS,
+          isCurrentLocaleSet: profileStore.isCurrentLocaleSet,
+          currentLocale: profileStore.currentLocale,
+          isClassicTheme: profileStore.isClassicTheme,
+          setProfileLocaleRequest: {
+            error: profileStore.setProfileLocaleRequest.error,
+            isExecuting: profileStore.setProfileLocaleRequest.isExecuting,
+          },
+          unsetProfileLocaleRequest: stores.profile.unsetProfileLocaleRequest,
+          getProfileLocaleRequest: stores.profile.getProfileLocaleRequest,
+        },
+        serverConnectionStore: {
+          checkAdaServerStatus: stores.substores[environment.API]
+            .serverConnectionStore.checkAdaServerStatus,
+        },
+      },
+      actions: {
+        profile: {
+          updateTentativeLocale: { trigger: actions.profile.updateTentativeLocale.trigger },
+          commitLocaleToStorage: { trigger: actions.profile.commitLocaleToStorage.trigger },
+        },
+      },
+    });
   }
 }

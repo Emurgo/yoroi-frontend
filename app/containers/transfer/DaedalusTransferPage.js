@@ -16,13 +16,8 @@ import DaedalusTransferErrorPage from './DaedalusTransferErrorPage';
 import environment from '../../environment';
 import config from '../../config';
 import { TransferStatus, } from '../../types/TransferTypes';
-import RouterActions from '../../actions/router-actions';
-import DaedalusTransferActions from '../../actions/ada/daedalus-transfer-actions';
-import type { ExplorerType } from '../../domain/Explorer';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { TransferStatusT, TransferTx } from '../../types/TransferTypes';
 import LocalizableError from '../../i18n/LocalizableError';
-import AdaWalletsStore from '../../stores/ada/AdaWalletsStore';
 
 import { formattedWalletAmount } from '../../utils/formatters';
 import { ROUTES } from '../../routes-config';
@@ -32,67 +27,11 @@ export type MockDaedalusTransferStore = {|
   +error: ?LocalizableError,
   +transferTx: ?TransferTx,
   +transferFundsRequest: {|
-    +isExecuting: boolean,
+    isExecuting: boolean,
   |},
 |};
 
-export type GeneratedData = {|
-  +stores: {|
-    +profile: {|
-      +isClassicTheme: boolean,
-      +selectedExplorer: ExplorerType,
-    |},
-    +wallets: {|
-      +selected: null | PublicDeriver<>,
-      +activeWalletRoute: ?string,
-      +refreshWalletFromRemote: PublicDeriver<> => Promise<void>,
-    |},
-    +substores: {|
-      +ada: {|
-        +wallets: {|
-          +isValidMnemonic: typeof AdaWalletsStore.prototype.isValidMnemonic,
-          +isValidPaperMnemonic: typeof AdaWalletsStore.prototype.isValidPaperMnemonic,
-        |},
-        +daedalusTransfer: MockDaedalusTransferStore,
-      |},
-    |},
-  |},
-  +actions: {|
-    +router: {|
-      +goToRoute: {|
-        +trigger: typeof RouterActions.prototype.goToRoute.trigger
-      |},
-    |},
-    +ada: {|
-      +daedalusTransfer: {|
-        +backToUninitialized: {|
-          +trigger: typeof DaedalusTransferActions.prototype.backToUninitialized.trigger
-        |},
-        +cancelTransferFunds: {|
-          +trigger: typeof DaedalusTransferActions.prototype.cancelTransferFunds.trigger
-        |},
-        +transferFunds: {|
-          +trigger: typeof DaedalusTransferActions.prototype.transferFunds.trigger
-        |},
-        +setupTransferFundsWithMasterKey: {|
-          +trigger: typeof DaedalusTransferActions.prototype.setupTransferFundsWithMasterKey.trigger
-        |},
-        +setupTransferFundsWithMnemonic: {|
-          +trigger: typeof DaedalusTransferActions.prototype.setupTransferFundsWithMnemonic.trigger
-        |},
-        +startTransferFunds: {|
-          +trigger: typeof DaedalusTransferActions.prototype.startTransferFunds.trigger
-        |},
-        +startTransferPaperFunds: {|
-          +trigger: typeof DaedalusTransferActions.prototype.startTransferPaperFunds.trigger
-        |},
-        +startTransferMasterKey: {|
-          +trigger: typeof DaedalusTransferActions.prototype.startTransferMasterKey.trigger
-        |},
-      |},
-    |},
-  |},
-|};
+export type GeneratedData = typeof DaedalusTransferPage.prototype.generated;
 
 @observer
 export default class DaedalusTransferPage extends Component<InjectedOrGenerated<GeneratedData>> {
@@ -100,69 +39,6 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
   static contextTypes = {
     intl: intlShape.isRequired,
   };
-
-
-  @computed get generated(): GeneratedData {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(DaedalusTransferPage)} no way to generated props`);
-    }
-    const { stores, actions } = this.props;
-    const adaStores = stores.substores.ada;
-    const { daedalusTransfer } = actions.ada;
-    return Object.freeze({
-      stores: {
-        profile: {
-          isClassicTheme: stores.profile.isClassicTheme,
-          selectedExplorer: stores.profile.selectedExplorer,
-        },
-        wallets: {
-          selected: stores.wallets.selected,
-          activeWalletRoute: stores.wallets.activeWalletRoute,
-          refreshWalletFromRemote: stores.wallets.refreshWalletFromRemote,
-        },
-        substores: {
-          ada: {
-            wallets: {
-              isValidMnemonic: adaStores.wallets.isValidMnemonic,
-              isValidPaperMnemonic: adaStores.wallets.isValidPaperMnemonic,
-            },
-            daedalusTransfer: {
-              status: adaStores.daedalusTransfer.status,
-              error: adaStores.daedalusTransfer.error,
-              transferTx: adaStores.daedalusTransfer.transferTx,
-              transferFundsRequest: {
-                isExecuting: adaStores.daedalusTransfer.transferFundsRequest.isExecuting,
-              },
-            },
-          },
-        },
-      },
-      actions: {
-        router: {
-          goToRoute: { trigger: actions.router.goToRoute.trigger },
-        },
-        ada: {
-          daedalusTransfer: {
-            backToUninitialized: { trigger: daedalusTransfer.backToUninitialized.trigger },
-            cancelTransferFunds: { trigger: daedalusTransfer.cancelTransferFunds.trigger },
-            transferFunds: { trigger: daedalusTransfer.transferFunds.trigger },
-            setupTransferFundsWithMasterKey: {
-              trigger: daedalusTransfer.setupTransferFundsWithMasterKey.trigger
-            },
-            setupTransferFundsWithMnemonic: {
-              trigger: daedalusTransfer.setupTransferFundsWithMnemonic.trigger
-            },
-            startTransferFunds: { trigger: daedalusTransfer.startTransferFunds.trigger },
-            startTransferPaperFunds: { trigger: daedalusTransfer.startTransferPaperFunds.trigger },
-            startTransferMasterKey: { trigger: daedalusTransfer.startTransferMasterKey.trigger },
-          },
-        },
-      },
-    });
-  }
 
   componentWillUnmount() {
     this.cancelTransferFunds();
@@ -367,5 +243,67 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
 
   _getDaedalusTransferActions() {
     return this.generated.actions.ada.daedalusTransfer;
+  }
+
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(DaedalusTransferPage)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    const adaStores = stores.substores.ada;
+    const { daedalusTransfer } = actions.ada;
+    return Object.freeze({
+      stores: {
+        profile: {
+          isClassicTheme: stores.profile.isClassicTheme,
+          selectedExplorer: stores.profile.selectedExplorer,
+        },
+        wallets: {
+          selected: stores.wallets.selected,
+          activeWalletRoute: stores.wallets.activeWalletRoute,
+          refreshWalletFromRemote: stores.wallets.refreshWalletFromRemote,
+        },
+        substores: {
+          ada: {
+            wallets: {
+              isValidMnemonic: adaStores.wallets.isValidMnemonic,
+              isValidPaperMnemonic: adaStores.wallets.isValidPaperMnemonic,
+            },
+            daedalusTransfer: {
+              status: adaStores.daedalusTransfer.status,
+              error: adaStores.daedalusTransfer.error,
+              transferTx: adaStores.daedalusTransfer.transferTx,
+              transferFundsRequest: {
+                isExecuting: adaStores.daedalusTransfer.transferFundsRequest.isExecuting,
+              },
+            },
+          },
+        },
+      },
+      actions: {
+        router: {
+          goToRoute: { trigger: actions.router.goToRoute.trigger },
+        },
+        ada: {
+          daedalusTransfer: {
+            backToUninitialized: { trigger: daedalusTransfer.backToUninitialized.trigger },
+            cancelTransferFunds: { trigger: daedalusTransfer.cancelTransferFunds.trigger },
+            transferFunds: { trigger: daedalusTransfer.transferFunds.trigger },
+            setupTransferFundsWithMasterKey: {
+              trigger: daedalusTransfer.setupTransferFundsWithMasterKey.trigger
+            },
+            setupTransferFundsWithMnemonic: {
+              trigger: daedalusTransfer.setupTransferFundsWithMnemonic.trigger
+            },
+            startTransferFunds: { trigger: daedalusTransfer.startTransferFunds.trigger },
+            startTransferPaperFunds: { trigger: daedalusTransfer.startTransferPaperFunds.trigger },
+            startTransferMasterKey: { trigger: daedalusTransfer.startTransferMasterKey.trigger },
+          },
+        },
+      },
+    });
   }
 }

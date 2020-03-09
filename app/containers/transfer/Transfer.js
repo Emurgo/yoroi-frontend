@@ -9,32 +9,13 @@ import MainLayout from '../MainLayout';
 import SidebarContainer from '../SidebarContainer';
 import TransferWithNavigation from '../../components/transfer/layouts/TransferWithNavigation';
 import type { TransferNavigationProps } from '../../components/transfer/layouts/TransferWithNavigation';
-import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 import { ROUTES } from '../../routes-config';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import NavBar from '../../components/topbar/NavBar';
 import globalMessages from '../../i18n/global-messages';
-import RouterActions from '../../actions/router-actions';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 
-export type GeneratedData = {|
-  +stores: {|
-    +app: {|
-      +currentRoute: string,
-    |},
-    +serverConnectionStore: {|
-      +checkAdaServerStatus: ServerStatusErrorType,
-    |},
-  |},
-  +actions: {|
-    +router: {|
-      +goToRoute: {|
-        +trigger: typeof RouterActions.prototype.goToRoute.trigger
-      |},
-    |},
-  |},
-  +SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
-|};
+export type GeneratedData = typeof Transfer.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
@@ -74,7 +55,9 @@ export default class Transfer extends Component<Props> {
           goToRoute: { trigger: actions.router.goToRoute.trigger },
         },
       },
-      SidebarContainerProps: { actions, stores, },
+      SidebarContainerProps: (
+        { actions, stores, }: InjectedOrGenerated<SidebarContainerData>
+      ),
     });
   }
 

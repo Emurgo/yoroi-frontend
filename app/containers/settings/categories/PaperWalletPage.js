@@ -9,34 +9,13 @@ import CreatePaperWalletDialogContainer from '../../wallet/dialogs/CreatePaperWa
 import type {
   GeneratedData as CreatePaperWalletDialogContainerData
 } from '../../wallet/dialogs/CreatePaperWalletDialogContainer';
-import DialogsActions from '../../../actions/dialogs-actions';
 
-type GeneratedData = {|
-  +stores: {|
-    +profile: {|
-      +paperWalletsIntro: string,
-    |},
-    +uiDialogs: {|
-      +isOpen: any => boolean,
-    |},
-  |},
-  +actions: {|
-    +dialogs: {|
-      +open: {|
-        +trigger: typeof DialogsActions.prototype.open.trigger
-      |},
-      +updateDataForActiveDialog: {|
-        +trigger: typeof DialogsActions.prototype.updateDataForActiveDialog.trigger
-      |},
-    |},
-  |},
-  +CreatePaperWalletDialogContainerProps: InjectedOrGenerated<CreatePaperWalletDialogContainerData>,
-|};
+type GeneratedData = typeof PaperWalletPage.prototype.generated;
 
 @observer
 export default class PaperWalletPage extends Component<InjectedOrGenerated<GeneratedData>> {
 
-  @computed get generated(): GeneratedData {
+  @computed get generated() {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -59,7 +38,9 @@ export default class PaperWalletPage extends Component<InjectedOrGenerated<Gener
           updateDataForActiveDialog: { trigger: actions.dialogs.updateDataForActiveDialog.trigger },
         },
       },
-      CreatePaperWalletDialogContainerProps: { stores, actions },
+      CreatePaperWalletDialogContainerProps: (
+        { stores, actions }: InjectedOrGenerated<CreatePaperWalletDialogContainerData>
+      ),
     });
   }
 

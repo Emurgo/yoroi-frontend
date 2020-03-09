@@ -5,7 +5,6 @@ import { computed } from 'mobx';
 import UserPasswordDialog from '../../../components/wallet/settings/paper-wallets/UserPasswordDialog';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import config from '../../../config';
-import PaperWalletsActions from '../../../actions/ada/paper-wallets-actions';
 import { ProgressStep } from '../../../stores/ada/PaperWalletCreateStore';
 import { Logger } from '../../../utils/logging';
 import CreatePaperDialog from '../../../components/wallet/settings/paper-wallets/CreatePaperDialog';
@@ -16,12 +15,6 @@ import FinalizeDialog from '../../../components/wallet/settings/paper-wallets/Fi
 import type { AdaPaper } from '../../../api/ada';
 import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
-import DialogsActions from '../../../actions/dialogs-actions';
-import NotificationActions from '../../../actions/notifications-actions';
-import type { ProgressStepEnum } from '../../../stores/ada/PaperWalletCreateStore';
-import type { ExplorerType } from '../../../domain/Explorer';
-import type { Notification } from '../../../types/notificationType';
-import type { PdfGenStepType } from '../../../api/ada/paperWallet/paperWalletPdf';
 import type { WalletRestoreDialogValues } from '../../../components/wallet/WalletRestoreDialog';
 
 const messages = defineMessages({
@@ -30,6 +23,8 @@ const messages = defineMessages({
     defaultMessage: '!!!Verify your paper wallet',
   },
 });
+
+export type GeneratedData = typeof CreatePaperWalletDialogContainer.prototype.generated;
 
 type State = {|
   notificationElementId: string,
@@ -160,7 +155,7 @@ export default class CreatePaperWalletDialogContainer
     }
   }
 
-  @computed get generated(): GeneratedData {
+  @computed get generated() {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -213,74 +208,7 @@ export default class CreatePaperWalletDialogContainer
           downloadPaperWallet: { trigger: actions.ada.paperWallets.downloadPaperWallet.trigger },
         },
       },
+      verifyDefaultValues: (undefined: ?WalletRestoreDialogValues),
     });
   }
 }
-
-export type GeneratedData = {|
-  +stores: {|
-    +profile: {|
-      +paperWalletsIntro: string,
-      +isClassicTheme: boolean,
-      +selectedExplorer: ExplorerType,
-    |},
-    +uiDialogs: {|
-      +dataForActiveDialog: {|
-        +numAddresses: number,
-        +printAccountPlate: boolean,
-        +repeatedPasswordValue: string,
-        +passwordValue: string,
-      |},
-    |},
-    +uiNotifications: {|
-      +isOpen: any => boolean,
-      +getTooltipActiveNotification: string => ?Notification,
-    |},
-    +paperWallets: {|
-      +paper: ?AdaPaper,
-      +progressInfo: ?ProgressStepEnum,
-      +userPassword: ?string,
-      +pdfRenderStatus: ?PdfGenStepType,
-      +pdf: ?Blob,
-    |},
-  |},
-  +actions: {|
-    +dialogs: {|
-      +updateDataForActiveDialog: {|
-        +trigger: typeof DialogsActions.prototype.updateDataForActiveDialog.trigger
-      |},
-      +closeActiveDialog: {|
-        +trigger: typeof DialogsActions.prototype.closeActiveDialog.trigger
-      |},
-    |},
-    +notifications: {|
-      +open: {|
-        +trigger: typeof NotificationActions.prototype.open.trigger
-      |},
-    |},
-    +paperWallets: {|
-      +cancel: {|
-        +trigger: typeof PaperWalletsActions.prototype.cancel.trigger
-      |},
-      +submitInit: {|
-        +trigger: typeof PaperWalletsActions.prototype.submitInit.trigger
-      |},
-      +submitUserPassword: {|
-        +trigger: typeof PaperWalletsActions.prototype.submitUserPassword.trigger
-      |},
-      +backToCreate: {|
-        +trigger: typeof PaperWalletsActions.prototype.backToCreate.trigger
-      |},
-      +submitVerify: {|
-        +trigger: typeof PaperWalletsActions.prototype.submitVerify.trigger
-      |},
-      +submitCreate: {|
-        +trigger: typeof PaperWalletsActions.prototype.submitCreate.trigger
-      |},
-      +downloadPaperWallet: {|
-        +trigger: typeof PaperWalletsActions.prototype.downloadPaperWallet.trigger
-      |},
-    |},
-  |},
-  verifyDefaultValues?: ?WalletRestoreDialogValues,
-|};

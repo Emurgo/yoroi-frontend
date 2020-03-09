@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import globalMessages from '../../i18n/global-messages';
 import WalletRestoreVerifyDialog from '../../components/wallet/WalletRestoreVerifyDialog';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
-import type { ExplorerType } from '../../domain/Explorer';
 import config from '../../config';
 import {
   generateStandardPlate,
@@ -17,10 +16,9 @@ import {
 import environment from '../../environment';
 import type { PlateResponse } from '../../api/ada/lib/cardanoCrypto/plate';
 import { TransferKind } from '../../types/TransferTypes';
-import NotificationActions from '../../actions/notifications-actions';
-import type { Notification } from '../../types/notificationType';
-import type { TransferKindType, } from '../../types/TransferTypes';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+
+export type GeneratedData = typeof YoroiPlatePage.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
@@ -112,7 +110,7 @@ export default class YoroiPlatePage extends Component<Props, WalletRestoreDialog
     );
   }
 
-  @computed get generated(): GeneratedData {
+  @computed get generated() {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -147,30 +145,3 @@ export default class YoroiPlatePage extends Component<Props, WalletRestoreDialog
     });
   }
 }
-
-export type GeneratedData = {|
-  +stores: {|
-    +profile: {|
-      +selectedExplorer: ExplorerType,
-    |},
-    +uiNotifications: {|
-      +isOpen: any => boolean,
-      +getTooltipActiveNotification: string => ?Notification,
-    |},
-    +substores: {|
-      +ada: {|
-        +yoroiTransfer: {|
-          +transferKind: TransferKindType,
-          +recoveryPhrase: string,
-        |},
-      |},
-    |},
-  |},
-  +actions: {|
-    +notifications: {|
-      +open: {|
-        +trigger: typeof NotificationActions.prototype.open.trigger
-      |},
-    |},
-  |},
-|};

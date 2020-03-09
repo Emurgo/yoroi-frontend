@@ -4,38 +4,34 @@ import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import Sidebar from '../components/topbar/Sidebar';
 import type { InjectedOrGenerated } from '../types/injectedPropsType';
-import ProfileActions from '../actions/profile-actions';
-import TopbarActions from '../actions/topbar-actions';
-import type { Category } from '../config/topbarConfig';
 
-export type GeneratedData = {|
-  +stores: {|
-    +topbar: {|
-      +isActiveCategory: Category => boolean,
-      +categories: Array<Category>,
-    |},
-    +profile: {|
-      +isSidebarExpanded: boolean,
-    |},
-  |},
-  +actions: {|
-    +profile: {|
-      +toggleSidebar: {|
-        +trigger: typeof ProfileActions.prototype.toggleSidebar.trigger
-      |},
-    |},
-    +topbar: {|
-      +activateTopbarCategory: {|
-        +trigger: typeof TopbarActions.prototype.activateTopbarCategory.trigger
-      |},
-    |},
-  |},
-|};
+export type GeneratedData = typeof SidebarContainer.prototype.generated;
 
 @observer
 export default class SidebarContainer extends Component<InjectedOrGenerated<GeneratedData>> {
 
-  @computed get generated(): GeneratedData {
+  toggleSidebar: void => void = () => {
+    this.generated.actions.profile.toggleSidebar.trigger();
+  }
+
+  render() {
+    const { actions, stores } = this.generated;
+    const { topbar, profile } = stores;
+
+    return (
+      <Sidebar
+        onCategoryClicked={category => {
+          actions.topbar.activateTopbarCategory.trigger({ category });
+        }}
+        isActiveCategory={topbar.isActiveCategory}
+        categories={topbar.categories}
+        onToggleSidebar={this.toggleSidebar}
+        isSidebarExpanded={profile.isSidebarExpanded}
+      />
+    );
+  }
+
+  @computed get generated() {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -62,26 +58,5 @@ export default class SidebarContainer extends Component<InjectedOrGenerated<Gene
         },
       },
     });
-  }
-
-  toggleSidebar: void => void = () => {
-    this.generated.actions.profile.toggleSidebar.trigger();
-  }
-
-  render() {
-    const { actions, stores } = this.generated;
-    const { topbar, profile } = stores;
-
-    return (
-      <Sidebar
-        onCategoryClicked={category => {
-          actions.topbar.activateTopbarCategory.trigger({ category });
-        }}
-        isActiveCategory={topbar.isActiveCategory}
-        categories={topbar.categories}
-        onToggleSidebar={this.toggleSidebar}
-        isSidebarExpanded={profile.isSidebarExpanded}
-      />
-    );
   }
 }

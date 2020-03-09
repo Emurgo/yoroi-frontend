@@ -23,26 +23,24 @@ import YoroiTransferStartPage from '../../components/transfer/YoroiTransferStart
 import environment from '../../environment';
 import config from '../../config';
 import { formattedWalletAmount } from '../../utils/formatters';
-import RouterActions from '../../actions/router-actions';
 import { TransferKind, TransferStatus, TransferSource, } from '../../types/TransferTypes';
 import type { TransferStatusT, TransferTx } from '../../types/TransferTypes';
 import LocalizableError from '../../i18n/LocalizableError';
 import { ROUTES } from '../../routes-config';
-import YoroiTransferActions from '../../actions/ada/yoroi-transfer-actions';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { ExplorerType } from '../../domain/Explorer';
-import AdaWalletsStore from '../../stores/ada/AdaWalletsStore';
 import type { GeneratedData as YoroiPlateData } from './YoroiPlatePage';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
+
+export type GeneratedData = typeof YoroiTransferPage.prototype.generated;
 
 export type MockYoroiTransferStore = {|
   +status: TransferStatusT,
   +error: ?LocalizableError,
   +transferTx: ?TransferTx,
   +transferFundsRequest: {|
-    +isExecuting: boolean,
+    isExecuting: boolean,
   |},
   +nextInternalAddress: PublicDeriver<> => (void => Promise<string>),
   +recoveryPhrase: string,
@@ -324,7 +322,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
     return this.generated.actions.ada.yoroiTransfer;
   }
 
-  @computed get generated(): GeneratedData {
+  @computed get generated() {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -394,69 +392,3 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
     });
   }
 }
-
-export type GeneratedData = {|
-  +stores: {|
-    +profile: {|
-      +isClassicTheme: boolean,
-      +selectedExplorer: ExplorerType,
-    |},
-    +wallets: {|
-      +selected: null | PublicDeriver<>,
-      +activeWalletRoute: ?string,
-      +refreshWalletFromRemote: PublicDeriver<> => Promise<void>,
-    |},
-    +substores: {|
-      +ada: {|
-        +wallets: {|
-          +isValidMnemonic: typeof AdaWalletsStore.prototype.isValidMnemonic,
-          +isValidPaperMnemonic: typeof AdaWalletsStore.prototype.isValidPaperMnemonic,
-        |},
-        +yoroiTransfer: MockYoroiTransferStore,
-      |},
-    |},
-  |},
-  +actions: {|
-    +router: {|
-      +goToRoute: {|
-        +trigger: typeof RouterActions.prototype.goToRoute.trigger
-      |},
-    |},
-     +ada: {|
-      +yoroiTransfer: {|
-        +backToUninitialized: {|
-          +trigger: typeof YoroiTransferActions.prototype.backToUninitialized.trigger
-        |},
-        +cancelTransferFunds: {|
-          +trigger: typeof YoroiTransferActions.prototype.cancelTransferFunds.trigger
-        |},
-        +startHardwareMnemnoic: {|
-          +trigger: typeof YoroiTransferActions.prototype.startHardwareMnemnoic.trigger
-        |},
-        +transferFunds: {|
-          +trigger: typeof YoroiTransferActions.prototype.transferFunds.trigger
-        |},
-        +checkAddresses: {|
-          +trigger: typeof YoroiTransferActions.prototype.checkAddresses.trigger
-        |},
-        +setupTransferFundsWithPaperMnemonic: {|
-          +trigger: typeof YoroiTransferActions.prototype
-            .setupTransferFundsWithPaperMnemonic.trigger
-        |},
-        +setupTransferFundsWithMnemonic: {|
-          +trigger: typeof YoroiTransferActions.prototype.setupTransferFundsWithMnemonic.trigger
-        |},
-        +startTransferLegacyHardwareFunds: {|
-          +trigger: typeof YoroiTransferActions.prototype.startTransferLegacyHardwareFunds.trigger
-        |},
-        +startTransferPaperFunds: {|
-          +trigger: typeof YoroiTransferActions.prototype.startTransferPaperFunds.trigger
-        |},
-        +startTransferFunds: {|
-          +trigger: typeof YoroiTransferActions.prototype.startTransferFunds.trigger
-        |},
-      |},
-    |},
-  |},
-  +YoroiPlateProps: InjectedOrGenerated<YoroiPlateData>,
-|};

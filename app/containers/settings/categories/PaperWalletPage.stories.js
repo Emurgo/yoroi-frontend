@@ -162,6 +162,7 @@ export const UserPasswordDialog = () => {
                   },
                 },
                 actions: mockActions,
+                verifyDefaultValues: undefined,
               },
             },
           }}
@@ -234,6 +235,7 @@ export const CreateDialog = () => {
                   },
                 },
                 actions: mockActions,
+                verifyDefaultValues: undefined,
               },
             },
           }}
@@ -371,6 +373,7 @@ export const FinalizeDialog = () => {
               },
             },
             actions: mockActions,
+            verifyDefaultValues: undefined,
           },
         },
       }}

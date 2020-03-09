@@ -7,13 +7,12 @@ import SupportSettings from '../../../components/settings/categories/SupportSett
 import { downloadLogs } from '../../../utils/logging';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 
-type GeneratedData = {|
-|};
+type GeneratedData = typeof SupportSettingsPage.prototype.generated;
 
 @observer
 export default class SupportSettingsPage extends Component<InjectedOrGenerated<GeneratedData>> {
 
-  @computed get generated(): GeneratedData {
+  @computed get generated() {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
