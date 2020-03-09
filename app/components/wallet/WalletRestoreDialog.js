@@ -353,7 +353,6 @@ export default class WalletRestoreDialog extends Component<Props> {
         onClose={onCancel}
         backButton={onBack && <DialogBackButton onBack={onBack} />}
         closeButton={<DialogCloseButton onClose={onCancel} />}
-        classicTheme={classicTheme}
       >
 
         {isVerificationMode === true

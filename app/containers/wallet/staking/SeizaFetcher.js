@@ -140,7 +140,6 @@ export default class SeizaFetcher extends Component<Props> {
           <Dialog
             title={intl.formatMessage(globalMessages.processingLabel)}
             closeOnOverlayClick={false}
-            classicTheme={this.props.stores.profile.isClassicTheme}
             onClose={this.cancel}
             closeButton={<DialogCloseButton onClose={this.cancel} />}
           >
@@ -154,7 +153,6 @@ export default class SeizaFetcher extends Component<Props> {
           <Dialog
             title={intl.formatMessage(globalMessages.errorLabel)}
             closeOnOverlayClick={false}
-            classicTheme={this.props.stores.profile.isClassicTheme}
             onClose={this.cancel}
             closeButton={<DialogCloseButton onClose={this.cancel} />}
             actions={dialogBackButton}

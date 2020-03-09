@@ -192,7 +192,6 @@ export default class SaveDialog extends Component<Props> {
         closeOnOverlayClick={false}
         onClose={cancel}
         closeButton={<DialogCloseButton />}
-        classicTheme={classicTheme}
       >
         <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         {walletNameBlock}

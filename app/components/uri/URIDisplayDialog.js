@@ -31,7 +31,6 @@ const messages = defineMessages({
 
 type Props = {|
   +onClose: void => void,
-  +classicTheme: boolean,
   +notification: ?Notification,
   +onCopyAddressTooltip: string => void,
   +onBack: void => void,
@@ -50,7 +49,6 @@ export default class URIDisplayDialog extends Component<Props> {
     const {
       onClose,
       onBack,
-      classicTheme,
       notification,
       onCopyAddressTooltip,
       address,
@@ -80,7 +78,6 @@ export default class URIDisplayDialog extends Component<Props> {
         className={classnames([styles.component, 'URIDisplayDialog'])}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
-        classicTheme={classicTheme}
         onClose={onClose}
         backButton={<DialogBackButton onBack={onBack} />}
       >

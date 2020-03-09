@@ -110,7 +110,6 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
         title={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
-        classicTheme={this.props.stores.profile.isClassicTheme}
         onClose={this.props.onClose}
       >
         {this.getContent()}

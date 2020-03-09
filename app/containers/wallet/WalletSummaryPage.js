@@ -121,7 +121,6 @@ export default class WalletSummaryPage extends Component<Props> {
               publicDeriver
             })}
             cancel={closeExportTransactionDialog.trigger}
-            classicTheme={profile.isClassicTheme}
           />
         ) : null}
 

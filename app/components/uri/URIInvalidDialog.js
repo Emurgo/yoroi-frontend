@@ -29,7 +29,6 @@ const messages = defineMessages({
 type Props = {|
   +onClose: void => void,
   +onSubmit: void => void,
-  +classicTheme: boolean,
 |};
 
 @observer
@@ -40,7 +39,7 @@ export default class URIInvalidDialog extends Component<Props> {
   };
 
   render() {
-    const { onClose, onSubmit, classicTheme } = this.props;
+    const { onClose, onSubmit, } = this.props;
 
     const dialogClasses = classnames([
       styles.component,
@@ -64,7 +63,6 @@ export default class URIInvalidDialog extends Component<Props> {
         title={intl.formatMessage(messages.uriInvalidTitle)}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
-        classicTheme={classicTheme}
         onClose={onClose}
       >
         <div>

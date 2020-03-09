@@ -150,7 +150,6 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
         onClose={onCancelBackup}
         closeButton={<DialogCloseButton onClose={onCancelBackup} />}
         backButton={!isValid ? <DialogBackButton onBack={onRestartBackup} /> : null}
-        classicTheme={classicTheme}
       >
         {!isValid && classicTheme ? (
           <WalletRecoveryInstructions

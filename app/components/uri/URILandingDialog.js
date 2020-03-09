@@ -64,7 +64,6 @@ export default class URILandingDialog extends Component<Props> {
         title={intl.formatMessage(messages.uriLandingDialogTitle)}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
-        classicTheme={classicTheme}
         onClose={onClose}
       >
         <div>

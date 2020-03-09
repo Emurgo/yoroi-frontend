@@ -147,7 +147,6 @@ export default class URIGenerateDialog extends Component<Props> {
         className={dialogClasses}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
-        classicTheme={classicTheme}
         onClose={onClose}
       >
         <div>

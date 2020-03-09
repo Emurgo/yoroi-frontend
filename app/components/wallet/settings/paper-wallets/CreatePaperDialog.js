@@ -62,7 +62,6 @@ type Props = {|
   +onDownload: void => PossiblyAsync<void>,
   +onDataChange: { [key: string]: any, ... } => void,
   +loadingGif: Node,
-  +classicTheme: boolean,
 |};
 
 @observer
@@ -111,7 +110,6 @@ export default class CreatePaperDialog extends Component<Props> {
       paperFile,
       onDownload,
       renderStatus,
-      classicTheme,
     } = this.props;
 
     const dialogClasses = classnames(['createPaperDialog', styles.component]);
@@ -136,7 +134,6 @@ export default class CreatePaperDialog extends Component<Props> {
           onClose={onCancel}
           className={dialogClasses}
           closeButton={<DialogCloseButton onClose={onCancel} />}
-          classicTheme={classicTheme}
         >
           <div
             aria-label="download button"
@@ -164,7 +161,6 @@ export default class CreatePaperDialog extends Component<Props> {
         className={dialogClasses}
         onClose={onCancel}
         closeButton={<DialogCloseButton onClose={onCancel} />}
-        classicTheme={classicTheme}
       >
         <div className={styles.walletLoaderWrapper}>
           {this.props.loadingGif}

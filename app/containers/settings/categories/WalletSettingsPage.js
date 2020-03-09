@@ -266,7 +266,6 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
           isSubmitting={settingsStore.removeWalletRequest.isExecuting}
           onCancel={this.generated.actions.dialogs.closeActiveDialog.trigger}
           error={settingsStore.removeWalletRequest.error}
-          classicTheme={this.generated.stores.profile.isClassicTheme}
         />
       );
     }

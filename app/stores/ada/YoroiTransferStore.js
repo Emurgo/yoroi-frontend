@@ -420,7 +420,7 @@ export class NoTransferTxError extends LocalizableError {
   }
 }
 
-class WalletChangedError extends LocalizableError {
+export class WalletChangedError extends LocalizableError {
   constructor() {
     super({
       id: messages.walletChangedError.id,

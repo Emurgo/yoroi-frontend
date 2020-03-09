@@ -57,7 +57,8 @@ export default class YoroiPlatePage extends Component<Props, WalletRestoreDialog
       environment.getDiscriminant(),
       true,
     );
-    const shelleyPlate = yoroiTransfer.transferKind === TransferKind.PAPER
+    const shelleyPlate = !environment.isShelley() ||
+      yoroiTransfer.transferKind === TransferKind.PAPER
       ? undefined
       : generateStandardPlate(
         rootPk,
@@ -66,11 +67,11 @@ export default class YoroiPlatePage extends Component<Props, WalletRestoreDialog
         environment.getDiscriminant(),
         false,
       );
-    this.state = {
+    this.setState({
       byronPlate,
       shelleyPlate,
       notificationElementId: '',
-    };
+    });
   }
 
   state: WalletRestoreDialogContainerState;
@@ -106,7 +107,6 @@ export default class YoroiPlatePage extends Component<Props, WalletRestoreDialog
         onNext={this.props.onNext}
         onCancel={this.props.onCancel}
         isSubmitting={false}
-        classicTheme={this.generated.stores.profile.isClassicTheme}
         error={undefined}
       />
     );
@@ -124,7 +124,6 @@ export default class YoroiPlatePage extends Component<Props, WalletRestoreDialog
     return Object.freeze({
       stores: {
         profile: {
-          isClassicTheme: stores.profile.isClassicTheme,
           selectedExplorer: stores.profile.selectedExplorer,
         },
         uiNotifications: {
@@ -152,7 +151,6 @@ export default class YoroiPlatePage extends Component<Props, WalletRestoreDialog
 export type GeneratedData = {|
   +stores: {|
     +profile: {|
-      +isClassicTheme: boolean,
       +selectedExplorer: ExplorerType,
     |},
     +uiNotifications: {|

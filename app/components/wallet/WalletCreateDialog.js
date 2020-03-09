@@ -151,7 +151,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
     const { form } = this;
     const { walletName, walletPassword, repeatPassword } = form.values();
     const { intl } = this.context;
-    const { onCancel, classicTheme } = this.props;
+    const { onCancel, } = this.props;
     const { isSubmitting } = this.state;
     const dialogClasses = classnames([
       styles.component,
@@ -190,7 +190,6 @@ export default class WalletCreateDialog extends Component<Props, State> {
         closeOnOverlayClick={false}
         onClose={!isSubmitting ? onCancel : null}
         closeButton={<DialogCloseButton />}
-        classicTheme={classicTheme}
       >
         <Input
           className="walletName"

@@ -54,7 +54,6 @@ export default class DelegationSuccessDialog extends Component<Props> {
         onClose={this.props.onClose}
         className={styles.dialog}
         closeButton={<DialogCloseButton />}
-        classicTheme={this.props.classicTheme}
       >
         <SuccessPage
           title={intl.formatMessage(messages.title)}

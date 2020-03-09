@@ -76,7 +76,6 @@ export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
         closeOnOverlayClick={false}
         onClose={onCancelBackup}
         closeButton={<DialogCloseButton onClose={onCancelBackup} />}
-        classicTheme={classicTheme}
       >
         {!classicTheme && <span className={styles.recoveryImage}><RecoveryWatchingSvg /></span>}
         <WalletRecoveryInstructions

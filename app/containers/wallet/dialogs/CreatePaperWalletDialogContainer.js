@@ -106,7 +106,6 @@ export default class CreatePaperWalletDialogContainer
             onDataChange={data => {
               updateDataForActiveDialog.trigger({ data });
             }}
-            classicTheme={profile.isClassicTheme}
           />
         );
       case ProgressStep.VERIFY:
@@ -140,7 +139,6 @@ export default class CreatePaperWalletDialogContainer
             onNext={onCancel}
             onCancel={onCancel}
             onBack={this.generated.actions.paperWallets.backToCreate.trigger}
-            classicTheme={profile.isClassicTheme}
             onCopyAddressTooltip={(address, elementId) => {
               if (!uiNotifications.isOpen(elementId)) {
                 this.setState({ notificationElementId: elementId });

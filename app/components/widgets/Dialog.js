@@ -30,7 +30,6 @@ type Props = {|
   +styleOveride?: {...},
   +onClose?: ?(void => PossiblyAsync<void>),
   +closeOnOverlayClick?: boolean,
-  +classicTheme: boolean
 |};
 
 @observer

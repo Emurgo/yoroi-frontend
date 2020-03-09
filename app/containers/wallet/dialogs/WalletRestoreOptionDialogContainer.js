@@ -5,17 +5,16 @@ import WalletRestoreOptionDialog from '../../../components/wallet/add/option-dia
 
 type Props = {|
   +onClose: void => void,
-  +classicTheme: boolean,
   +onRestore: void => void,
   +onPaperRestore: void => void,
 |};
+
 @observer
 export default class WalletRestoreOptionDialogContainer extends Component<Props> {
 
   render() {
     return (
       <WalletRestoreOptionDialog
-        classicTheme={this.props.classicTheme}
         onCancel={this.props.onClose}
         onRestore={this.props.onRestore}
         onPaperRestore={this.props.onPaperRestore}

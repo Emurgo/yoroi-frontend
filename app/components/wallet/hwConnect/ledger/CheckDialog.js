@@ -148,7 +148,6 @@ export default class CheckDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         backButton={<DialogBackButton onBack={this.props.onBack} />}
         onClose={cancel}
-        classicTheme={classicTheme}
       >
         <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         {middleBlock}

@@ -77,7 +77,6 @@ type Props = {|
   +onNext: void => PossiblyAsync<void>,
   +onCancel: void => void,
   +isSubmitting: boolean,
-  +classicTheme: boolean,
   +error?: ?LocalizableError,
 |};
 
@@ -159,7 +158,6 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
       isSubmitting,
       onCancel,
       onNext,
-      classicTheme,
       onCopyAddressTooltip,
       notification,
     } = this.props;
@@ -246,7 +244,6 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
         onClose={onCancel}
         className={dialogClasses}
         backButton={<DialogBackButton onBack={onCancel} />}
-        classicTheme={classicTheme}
       >
         <DialogTextBlock>
           {introMessage}

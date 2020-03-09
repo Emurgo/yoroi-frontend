@@ -182,7 +182,6 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
         onClose={!isSubmitting ? onCancel : null}
         className={dialogClasses}
         closeButton={<DialogCloseButton onClose={onCancel} />}
-        classicTheme={classicTheme}
       >
 
         <div className={styles.walletPassword}>
