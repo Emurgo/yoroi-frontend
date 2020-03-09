@@ -70,14 +70,13 @@ module.exports = function (api /*: ApiType */) {
       ],
       '@babel/plugin-proposal-export-default-from',
       '@babel/plugin-proposal-export-namespace-from',
-      ...(api.env('development')
+      ...(api.env('development') || api.env('storybook')
         ? [
           'react-hot-loader/babel',
         ]
         : []),
     ],
     env: {
-      storybook: nodePlugins,
       cucumber: nodePlugins,
       test: nodePlugins,
       jest: nodePlugins,

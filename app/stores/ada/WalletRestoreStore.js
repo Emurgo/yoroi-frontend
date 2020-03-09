@@ -30,8 +30,8 @@ import {
   generateWalletRootKey,
 } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 
-const NUMBER_OF_VERIFIED_ADDRESSES = 1;
-const NUMBER_OF_VERIFIED_ADDRESSES_PAPER = 5;
+export const NUMBER_OF_VERIFIED_ADDRESSES = 1;
+export const NUMBER_OF_VERIFIED_ADDRESSES_PAPER = 5;
 
 export const RestoreSteps = Object.freeze({
   START: 0,

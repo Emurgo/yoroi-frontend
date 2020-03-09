@@ -38,8 +38,7 @@ export default class HardwareDisclaimer extends Component<Props> {
   render() {
     const { intl } = this.context;
     const buttonClasses = (primary: boolean) => classnames([
-      'secondary',
-      primary ? 'primary' : null,
+      primary ? 'primary' : 'secondary',
       styles.button,
     ]);
 

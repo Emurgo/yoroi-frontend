@@ -20,6 +20,7 @@ import { TransferKind } from '../../types/TransferTypes';
 import NotificationActions from '../../actions/notifications-actions';
 import type { Notification } from '../../types/notificationType';
 import type { TransferKindType, } from '../../types/TransferTypes';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
@@ -38,7 +39,8 @@ const NUMBER_OF_VERIFIED_ADDRESSES_PAPER = 5;
 @observer
 export default class YoroiPlatePage extends Component<Props, WalletRestoreDialogContainerState> {
 
-  initializeState = () => {
+  async componentDidMount() {
+    await RustModule.load();
     const { yoroiTransfer } = this.generated.stores.substores.ada;
 
     const numAddresses = yoroiTransfer.transferKind === TransferKind.PAPER
@@ -64,16 +66,17 @@ export default class YoroiPlatePage extends Component<Props, WalletRestoreDialog
         environment.getDiscriminant(),
         false,
       );
-    return {
+    this.state = {
       byronPlate,
       shelleyPlate,
       notificationElementId: '',
     };
   }
 
-  state = this.initializeState();
+  state: WalletRestoreDialogContainerState;
 
   render() {
+    if (this.state == null) return null;
     const actions = this.generated.actions;
     const { uiNotifications } = this.generated.stores;
 

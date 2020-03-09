@@ -14,16 +14,12 @@ import { mockTransferProps } from './Transfer.mock';
 import { THEMES } from '../../themes';
 import { getDefaultExplorer } from '../../domain/Explorer';
 import { ROUTES } from '../../routes-config';
-import DaedalusTransferPage from './DaedalusTransferPage';
-import type { MockDaedalusTransferStore } from './DaedalusTransferPage';
-import { TransferStatus } from '../../types/TransferTypes';
+import YoroiTransferPage from './YoroiTransferPage';
+import type { MockYoroiTransferStore } from './YoroiTransferPage';
+import { TransferKind, TransferStatus, } from '../../types/TransferTypes';
+import type { TransferKindType } from '../../types/TransferTypes';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import AdaApi from '../../api/ada/index';
-import {
-  TransferFundsError,
-  NoTransferTxError,
-  WebSocketRestoreError,
-} from '../../stores/ada/DaedalusTransferStore';
 import {
   GenerateTransferTxError,
   NotEnoughMoneyToSendError,
@@ -31,13 +27,16 @@ import {
 
 export default {
   title: `${module.id.split('.')[1]}`,
-  component: DaedalusTransferPage,
+  component: YoroiTransferPage,
   decorators: [withScreenshot],
 };
 
 const genBaseProps: {|
   wallet: null | PublicDeriver<>,
-  daedalusTransfer: InexactSubset<MockDaedalusTransferStore>,
+  yoroiTransfer: {|
+    ...InexactSubset<MockYoroiTransferStore>,
+  |},
+  transferKind?: TransferKindType,
 |} => * = (request) => ({
   stores: {
     profile: {
@@ -55,14 +54,17 @@ const genBaseProps: {|
           isValidMnemonic: AdaApi.prototype.isValidMnemonic,
           isValidPaperMnemonic: AdaApi.prototype.isValidPaperMnemonic,
         },
-        daedalusTransfer: {
+        yoroiTransfer: {
           status: TransferStatus.UNINITIALIZED,
           error: undefined,
           transferTx: undefined,
           transferFundsRequest: {
             isExecuting: false,
           },
-          ...request.daedalusTransfer,
+          nextInternalAddress: (_publicDeriver) => (async () => 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'),
+          recoveryPhrase: '',
+          reset: action('reset'),
+          ...request.yoroiTransfer,
         },
       },
     },
@@ -72,15 +74,52 @@ const genBaseProps: {|
       goToRoute: { trigger: action('goToRoute') },
     },
     ada: {
-      daedalusTransfer: {
+      yoroiTransfer: {
         backToUninitialized: { trigger: action('backToUninitialized') },
         cancelTransferFunds: { trigger: action('cancelTransferFunds') },
+        startHardwareMnemnoic: { trigger: action('startHardwareMnemnoic') },
         transferFunds: { trigger: async () => action('transferFunds')() },
-        setupTransferFundsWithMasterKey: { trigger: async () => action('setupTransferFundsWithMasterKey')() },
-        setupTransferFundsWithMnemonic: { trigger: async () => action('setupTransferFundsWithMnemonic')() },
+        checkAddresses: { trigger: async () => action('checkAddresses')() },
+        setupTransferFundsWithPaperMnemonic: { trigger: action('setupTransferFundsWithPaperMnemonic') },
+        setupTransferFundsWithMnemonic: { trigger: action('setupTransferFundsWithMnemonic') },
+        startTransferLegacyHardwareFunds: { trigger: action('startTransferLegacyHardwareFunds') },
         startTransferFunds: { trigger: action('startTransferFunds') },
         startTransferPaperFunds: { trigger: action('startTransferPaperFunds') },
-        startTransferMasterKey: { trigger: action('startTransferMasterKey') },
+      },
+    },
+  },
+  YoroiPlateProps: {
+    generated: {
+      stores: {
+        profile: {
+          isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+          selectedExplorer: getDefaultExplorer(),
+        },
+        uiNotifications: {
+          isOpen: (_request) => false,
+          getTooltipActiveNotification: () => null,
+        },
+        substores: {
+          ada: {
+            yoroiTransfer: {
+              transferKind: request.transferKind == null
+                ? TransferKind.NORMAL
+                : request.transferKind,
+              recoveryPhrase: request.yoroiTransfer.recoveryPhrase == null
+                ? ''
+                : request.yoroiTransfer.recoveryPhrase,
+              generatePlates: () => ({
+                byronPlate: undefined,
+                shelleyPlate: undefined,
+              }),
+            },
+          },
+        },
+      },
+      actions: {
+        notifications: {
+          open: { trigger: action('open') },
+        },
       },
     },
   },
@@ -100,21 +139,21 @@ export const Uninitialized = () => {
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.DAEDALUS
+        currentRoute: ROUTES.TRANSFER.YOROI
       }),
       (() => {
         const walletVal = walletValue();
         const baseProps = walletVal === walletCases.NoWallet
           ? genBaseProps({
             wallet: null,
-            daedalusTransfer: Object.freeze({}),
+            yoroiTransfer: Object.freeze({}),
           })
           : genBaseProps({
             wallet: wallet.publicDeriver,
-            daedalusTransfer: Object.freeze({}),
+            yoroiTransfer: Object.freeze({}),
           });
         return (
-          <DaedalusTransferPage
+          <YoroiTransferPage
             generated={{
               ...baseProps,
             }}
@@ -125,23 +164,22 @@ export const Uninitialized = () => {
   })();
 };
 
-
 export const GettingMnemonics = () => {
   const wallet = genDummyWithCache();
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.DAEDALUS
+        currentRoute: ROUTES.TRANSFER.YOROI
       }),
       (() => {
         const baseProps = genBaseProps({
           wallet: wallet.publicDeriver,
-          daedalusTransfer: {
+          yoroiTransfer: {
             status: TransferStatus.GETTING_MNEMONICS,
           },
         });
         return (
-          <DaedalusTransferPage
+          <YoroiTransferPage
             generated={{
               ...baseProps,
             }}
@@ -157,17 +195,17 @@ export const GettingPaperMnemonics = () => {
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.DAEDALUS
+        currentRoute: ROUTES.TRANSFER.YOROI
       }),
       (() => {
         const baseProps = genBaseProps({
           wallet: wallet.publicDeriver,
-          daedalusTransfer: {
+          yoroiTransfer: {
             status: TransferStatus.GETTING_PAPER_MNEMONICS,
           },
         });
         return (
-          <DaedalusTransferPage
+          <YoroiTransferPage
             generated={{
               ...baseProps,
             }}
@@ -178,22 +216,22 @@ export const GettingPaperMnemonics = () => {
   })();
 };
 
-export const GettingMasterKey = () => {
+export const HardwareDisclaimer = () => {
   const wallet = genDummyWithCache();
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.DAEDALUS
+        currentRoute: ROUTES.TRANSFER.YOROI
       }),
       (() => {
         const baseProps = genBaseProps({
           wallet: wallet.publicDeriver,
-          daedalusTransfer: {
-            status: TransferStatus.GETTING_MASTER_KEY,
+          yoroiTransfer: {
+            status: TransferStatus.HARDWARE_DISCLAIMER,
           },
         });
         return (
-          <DaedalusTransferPage
+          <YoroiTransferPage
             generated={{
               ...baseProps,
             }}
@@ -204,22 +242,22 @@ export const GettingMasterKey = () => {
   })();
 };
 
-export const RestoringAddresses = () => {
+export const HardwareMnemonic = () => {
   const wallet = genDummyWithCache();
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.DAEDALUS
+        currentRoute: ROUTES.TRANSFER.YOROI
       }),
       (() => {
         const baseProps = genBaseProps({
           wallet: wallet.publicDeriver,
-          daedalusTransfer: {
-            status: TransferStatus.RESTORING_ADDRESSES,
+          yoroiTransfer: {
+            status: TransferStatus.GETTING_HARDWARE_MNEMONIC,
           },
         });
         return (
-          <DaedalusTransferPage
+          <YoroiTransferPage
             generated={{
               ...baseProps,
             }}
@@ -230,127 +268,26 @@ export const RestoringAddresses = () => {
   })();
 };
 
-export const CheckingAddresses = () => {
+export const Checksum = () => {
   const wallet = genDummyWithCache();
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.DAEDALUS
+        currentRoute: ROUTES.TRANSFER.YOROI
       }),
       (() => {
         const baseProps = genBaseProps({
           wallet: wallet.publicDeriver,
-          daedalusTransfer: {
-            status: TransferStatus.CHECKING_ADDRESSES,
+          yoroiTransfer: {
+            status: TransferStatus.DISPLAY_CHECKSUM,
+            recoveryPhrase: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon share',
           },
         });
         return (
-          <DaedalusTransferPage
+          <YoroiTransferPage
             generated={{
               ...baseProps,
-            }}
-          />
-        );
-      })()
-    );
-  })();
-};
-
-export const GeneratingTx = () => {
-  const wallet = genDummyWithCache();
-  return (() => {
-    return wrapTransfer(
-      mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.DAEDALUS
-      }),
-      (() => {
-        const baseProps = genBaseProps({
-          wallet: wallet.publicDeriver,
-          daedalusTransfer: {
-            status: TransferStatus.GENERATING_TX,
-          },
-        });
-        return (
-          <DaedalusTransferPage
-            generated={{
-              ...baseProps,
-            }}
-          />
-        );
-      })()
-    );
-  })();
-};
-
-export const ReadyToTransfer = () => {
-  const wallet = genDummyWithCache();
-  return (() => {
-    return wrapTransfer(
-      mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.DAEDALUS
-      }),
-      (() => {
-        const baseProps = genBaseProps({
-          wallet: wallet.publicDeriver,
-          daedalusTransfer: {
-            status: TransferStatus.READY_TO_TRANSFER,
-            error: undefined,
-            transferTx: {
-              recoveredBalance: new BigNumber(1),
-              fee: new BigNumber(0.1),
-              id: 'b65ae37bcc560e323ea8922de6573004299b6646e69ab9fac305f62f0c94c3ab',
-              encodedTx: new Uint8Array([]),
-              senders: ['DdzFFzCqrhsmcx7z25PRkdbeUNqNNW4brhznpVxbm1EknAahjaCFEjYXg9KJRqkixjgGyz8D9GSX3CFDRoNrZyfJsi61N2FxCnq9yWBy'],
-              receiver: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
-            },
-            transferFundsRequest: {
-              isExecuting: boolean('isExecuting', false),
-            },
-          },
-        });
-        return (
-          <DaedalusTransferPage
-            generated={{
-              ...baseProps,
-            }}
-          />
-        );
-      })()
-    );
-  })();
-};
-
-export const Error = () => {
-  const wallet = genDummyWithCache();
-  return (() => {
-    return wrapTransfer(
-      mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.DAEDALUS
-      }),
-      (() => {
-        const errorCases = {
-          NotEnoughMoneyToSendError: new NotEnoughMoneyToSendError(),
-          TransferFundsError: new TransferFundsError(),
-          NoTransferTxError: new NoTransferTxError(),
-          WebSocketRestoreError: new WebSocketRestoreError(),
-          GenerateTransferTxError: new GenerateTransferTxError(),
-        };
-        const errorValue = () => select(
-          'errorCases',
-          errorCases,
-          errorCases.NotEnoughMoneyToSendError,
-        );
-        const baseProps = genBaseProps({
-          wallet: wallet.publicDeriver,
-          daedalusTransfer: {
-            status: TransferStatus.ERROR,
-            error: errorValue(),
-          },
-        });
-        return (
-          <DaedalusTransferPage
-            generated={{
-              ...baseProps,
+              // transferKind: 
             }}
           />
         );
