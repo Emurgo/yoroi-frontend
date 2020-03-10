@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import config from '../../../config';
 import validWords from 'bip39/src/wordlists/english.json';
@@ -7,7 +8,7 @@ import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog'
 import WalletRestoreVerifyDialog from '../../../components/wallet/WalletRestoreVerifyDialog';
 import TransferSummaryPage from '../../../components/transfer/TransferSummaryPage';
 import LegacyExplanation from '../../../components/wallet/restore/LegacyExplanation';
-import type { InjectedDialogContainerProps } from '../../../types/injectedPropsType';
+import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import environment from '../../../environment';
 import globalMessages from '../../../i18n/global-messages';
 import {
@@ -33,8 +34,11 @@ const messages = defineMessages({
   },
 });
 
+export type GeneratedData = typeof WalletRestoreDialogContainer.prototype.generated;
+
 type Props = {|
-  ...InjectedDialogContainerProps,
+  ...InjectedOrGenerated<GeneratedData>,
+  +onClose: void => void,
   +mode: RestoreModeType,
     +introMessage ?: string,
     +onBack: void => void,
@@ -62,13 +66,15 @@ export default class WalletRestoreDialogContainer
 
   constructor(props: Props) {
     super(props);
-    const { walletRestore } = props.actions[environment.API];
+    const { walletRestore } = props.generated
+      ? props.generated.actions[environment.API]
+      : props.actions[environment.API];
     walletRestore.reset.trigger();
     walletRestore.setMode.trigger(props.mode);
   }
 
   componentWillUnmount() {
-    const { walletRestore } = this.props.actions[environment.API];
+    const { walletRestore } = this.generated.actions[environment.API];
     walletRestore.reset.trigger();
   }
 
@@ -81,10 +87,10 @@ export default class WalletRestoreDialogContainer
 
   render() {
     const { intl } = this.context;
-    const walletRestoreActions = this.props.actions[environment.API].walletRestore;
-    const actions = this.props.actions;
-    const { uiNotifications, profile, } = this.props.stores;
-    const { walletRestore, } = this.props.stores.substores[environment.API];
+    const walletRestoreActions = this.generated.actions[environment.API].walletRestore;
+    const actions = this.generated.actions;
+    const { uiNotifications, profile, } = this.generated.stores;
+    const { walletRestore, } = this.generated.stores.substores[environment.API];
     const wallets = this._getWalletsStore();
     const { restoreRequest } = wallets;
 
@@ -119,7 +125,7 @@ export default class WalletRestoreDialogContainer
           error={restoreRequest.error}
           isPaper={isPaper}
           showPaperPassword={isPaper}
-          classicTheme={this.props.classicTheme}
+          classicTheme={this.generated.stores.profile.isClassicTheme}
           initValues={walletRestore.walletRestoreMeta}
           introMessage={this.props.introMessage || ''}
         />);
@@ -170,13 +176,13 @@ export default class WalletRestoreDialogContainer
             onClose={this.onCancel}
             onSkip={walletRestoreActions.startRestore.trigger}
             onCheck={walletRestoreActions.startCheck.trigger}
-            classicTheme={this.props.classicTheme}
+            classicTheme={this.generated.stores.profile.isClassicTheme}
             isSubmitting={restoreRequest.isExecuting}
           />
         );
       }
       case RestoreSteps.TRANSFER_TX_GEN: {
-        const { yoroiTransfer } = this.props.stores.substores[environment.API];
+        const { yoroiTransfer } = this.generated.stores.substores[environment.API];
         const content = this._transferDialogContent();
 
         const getDoneButton = () => {
@@ -213,16 +219,16 @@ export default class WalletRestoreDialogContainer
   }
 
   _getAdaWalletsStore() {
-    return this.props.stores.substores[environment.API].wallets;
+    return this.generated.stores.substores[environment.API].wallets;
   }
   _getWalletsStore() {
-    return this.props.stores.wallets;
+    return this.generated.stores.wallets;
   }
 
   _transferDialogContent() {
-    const { yoroiTransfer } = this.props.stores.substores[environment.API];
-    const walletRestoreActions = this.props.actions[environment.API].walletRestore;
-    const { profile, } = this.props.stores;
+    const { yoroiTransfer } = this.generated.stores.substores[environment.API];
+    const walletRestoreActions = this.generated.actions[environment.API].walletRestore;
+    const { profile, } = this.generated.stores;
     const { intl } = this.context;
     switch (yoroiTransfer.status) {
       // we have to verify briefly go through this step
@@ -241,7 +247,7 @@ export default class WalletRestoreDialogContainer
         return (<TransferSummaryPage
           form={null}
           formattedWalletAmount={formattedWalletAmount}
-          selectedExplorer={this.props.stores.profile.selectedExplorer}
+          selectedExplorer={this.generated.stores.profile.selectedExplorer}
           transferTx={yoroiTransfer.transferTx}
           onSubmit={walletRestoreActions.transferFromLegacy.trigger}
           isSubmitting={yoroiTransfer.transferFundsRequest.isExecuting}
@@ -276,6 +282,90 @@ export default class WalletRestoreDialogContainer
       }
       default: throw new Error(`${nameof(WalletRestoreDialogContainer)} tx status ${yoroiTransfer.status}`);
     }
+  }
+
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(WalletRestoreDialogContainer)} no way to generated props`);
+    }
+    const { stores, actions, } = this.props;
+    return Object.freeze({
+      stores: {
+        profile: {
+          isClassicTheme: stores.profile.isClassicTheme,
+          selectedExplorer: stores.profile.selectedExplorer,
+        },
+        uiNotifications: {
+          isOpen: stores.uiNotifications.isOpen,
+          getTooltipActiveNotification: stores.uiNotifications.getTooltipActiveNotification,
+        },
+        wallets: {
+          restoreRequest: {
+            isExecuting: stores.wallets.restoreRequest.isExecuting,
+            error: stores.wallets.restoreRequest.error,
+          },
+        },
+        substores: {
+          ada: {
+            yoroiTransfer: {
+              status: stores.substores.ada.yoroiTransfer.status,
+              error: stores.substores.ada.yoroiTransfer.error,
+              transferTx: stores.substores.ada.yoroiTransfer.transferTx,
+              transferFundsRequest: {
+                isExecuting: stores.substores.ada.yoroiTransfer.transferFundsRequest.isExecuting,
+              },
+            },
+            walletRestore: {
+              step: stores.substores.ada.walletRestore.step,
+              recoveryResult: stores.substores.ada.walletRestore.recoveryResult,
+              walletRestoreMeta: stores.substores.ada.walletRestore.walletRestoreMeta,
+            },
+            wallets: {
+              isValidPaperMnemonic: stores.substores.ada.wallets.isValidPaperMnemonic,
+              isValidMnemonic: stores.substores.ada.wallets.isValidMnemonic,
+            },
+          },
+        },
+      },
+      actions: {
+        notifications: {
+          open: {
+            trigger: actions.notifications.open.trigger,
+          },
+        },
+        ada: {
+          walletRestore: {
+            reset: {
+              trigger: actions.ada.walletRestore.reset.trigger,
+            },
+            setMode: {
+              trigger: actions.ada.walletRestore.setMode.trigger,
+            },
+            back: {
+              trigger: actions.ada.walletRestore.back.trigger,
+            },
+            verifyMnemonic: {
+              trigger: actions.ada.walletRestore.verifyMnemonic.trigger,
+            },
+            startRestore: {
+              trigger: actions.ada.walletRestore.startRestore.trigger,
+            },
+            startCheck: {
+              trigger: actions.ada.walletRestore.startCheck.trigger,
+            },
+            transferFromLegacy: {
+              trigger: actions.ada.walletRestore.transferFromLegacy.trigger,
+            },
+            submitFields: {
+              trigger: actions.ada.walletRestore.submitFields.trigger,
+            },
+          },
+        },
+      },
+    });
   }
 }
 

@@ -1,10 +1,10 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
+import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
-import environment from '../../environment';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 
 import MyWallets from '../../components/wallet/my-wallets/MyWallets';
 import MainLayout from '../MainLayout';
@@ -16,6 +16,7 @@ import WalletCurrency from '../../components/wallet/my-wallets/WalletCurrency';
 import WalletSubRow from '../../components/wallet/my-wallets/WalletSubRow';
 import NavPlate from '../../components/topbar/NavPlate';
 import SidebarContainer from '../SidebarContainer';
+import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import { ROUTES } from '../../routes-config';
 import NavBar from '../../components/topbar/NavBar';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
@@ -39,7 +40,9 @@ const messages = defineMessages({
   }
 });
 
-type Props = InjectedProps
+export type GeneratedData = typeof MyWalletsPage.prototype.generated;
+
+type Props = InjectedOrGenerated<GeneratedData>
 
 @observer
 export default class MyWalletsPage extends Component<Props> {
@@ -49,18 +52,18 @@ export default class MyWalletsPage extends Component<Props> {
   };
 
   updateHideBalance: void => void = () => {
-    this.props.actions.profile.updateHideBalance.trigger();
+    this.generated.actions.profile.updateHideBalance.trigger();
   }
 
   componentDidMount() {
-    this.props.actions.wallets.unselectWallet.trigger();
+    this.generated.actions.wallets.unselectWallet.trigger();
   }
 
   handleWalletNavItemClick: (string, PublicDeriver<>) => void = (
     page,
     publicDeriver
   ) => {
-    this.props.actions.router.goToRoute.trigger({
+    this.generated.actions.router.goToRoute.trigger({
       route: ROUTES.WALLETS.PAGE,
       params: { id: publicDeriver.getPublicDeriverId(), page },
     });
@@ -68,12 +71,12 @@ export default class MyWalletsPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { actions, stores } = this.props;
+    const { stores } = this.generated;
     const { profile } = stores;
-    const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
-    const sidebarContainer = (<SidebarContainer actions={actions} stores={stores} />);
+    const { checkAdaServerStatus } = stores.serverConnectionStore;
+    const sidebarContainer = (<SidebarContainer {...this.generated.SidebarContainerProps} />);
 
-    const wallets = this.props.stores.wallets.publicDerivers;
+    const wallets = this.generated.stores.wallets.publicDerivers;
 
     let utxoTotal = new BigNumber(0);
     const walletBalances = wallets.map(wallet => stores.substores.ada.transactions
@@ -98,7 +101,7 @@ export default class MyWalletsPage extends Component<Props> {
       <NavBar
         title={navbarTitle}
         walletPlate={<NavBarAddButton onClick={
-          () => this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
+          () => this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
         }
         />}
         walletDetails={
@@ -142,7 +145,7 @@ export default class MyWalletsPage extends Component<Props> {
   */
   generateRow: PublicDeriver<> => Node = (publicDeriver) => {
     const parent = publicDeriver.getParent();
-    const settingsCache = this.props.stores.substores.ada.walletSettings
+    const settingsCache = this.generated.stores.substores.ada.walletSettings
       .getConceptualWalletSettingsCache(parent);
 
     const walletSumCurrencies = (
@@ -153,7 +156,7 @@ export default class MyWalletsPage extends Component<Props> {
         />
       </>
     );
-    const txRequests = this.props.stores.substores.ada.transactions
+    const txRequests = this.generated.stores.substores.ada.transactions
       .getTxRequests(publicDeriver);
     const balance = txRequests.requests.getBalanceRequest.result
       ?.dividedBy(LOVELACES_PER_ADA) || null;
@@ -161,7 +164,7 @@ export default class MyWalletsPage extends Component<Props> {
     const withPubKey = asGetPublicKey(publicDeriver);
     const plate = withPubKey == null
       ? null
-      : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
+      : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
 
     return (
       <WalletRow
@@ -173,7 +176,7 @@ export default class MyWalletsPage extends Component<Props> {
           rewards={this.getRewardBalance(publicDeriver)}
           // TODO: This should be probably bound to an individual wallet
           onUpdateHideBalance={this.updateHideBalance}
-          shouldHideBalance={this.props.stores.profile.shouldHideBalance}
+          shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
         />}
         walletSumCurrencies={walletSumCurrencies}
         walletSubRow={() => this.createSubrow(publicDeriver)}
@@ -209,13 +212,13 @@ export default class MyWalletsPage extends Component<Props> {
     const addressesLength = walletAddresses.length;
 
     const parent = publicDeriver.getParent();
-    const settingsCache = this.props.stores.substores.ada.walletSettings
+    const settingsCache = this.generated.stores.substores.ada.walletSettings
       .getConceptualWalletSettingsCache(parent);
 
     const withPubKey = asGetPublicKey(publicDeriver);
     const plate = withPubKey == null
       ? null
-      : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
+      : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
 
     const walletSubRow = (
       <WalletSubRow
@@ -232,7 +235,7 @@ export default class MyWalletsPage extends Component<Props> {
           }
           // TODO: This should be probably bound to an individual wallet
           onUpdateHideBalance={this.updateHideBalance}
-          shouldHideBalance={this.props.stores.profile.shouldHideBalance}
+          shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
           rewards={null /* TODO */}
           walletAmount={null /* TODO */}
         />}
@@ -256,7 +259,7 @@ export default class MyWalletsPage extends Component<Props> {
   getRewardBalance: PublicDeriver<> => null | void | BigNumber = (
     publicDeriver
   ) => {
-    const delegationRequest = this.props.stores.substores.ada.delegation.getDelegationRequests(
+    const delegationRequest = this.generated.stores.substores.ada.delegation.getDelegationRequests(
       publicDeriver
     );
     if (delegationRequest == null) return undefined;
@@ -266,6 +269,58 @@ export default class MyWalletsPage extends Component<Props> {
       return null;
     }
     return balanceResult.accountPart.dividedBy(LOVELACES_PER_ADA);
+  }
+
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(MyWalletsPage)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    return Object.freeze({
+      stores: {
+        profile: {
+          shouldHideBalance: stores.profile.shouldHideBalance,
+        },
+        wallets: {
+          publicDerivers: stores.wallets.publicDerivers,
+          getPublicKeyCache: stores.wallets.getPublicKeyCache,
+        },
+        serverConnectionStore: {
+          checkAdaServerStatus: stores.substores.ada.serverConnectionStore.checkAdaServerStatus,
+        },
+        substores: {
+          ada: {
+            transactions: {
+              getTxRequests: stores.substores.ada.transactions.getTxRequests,
+            },
+            walletSettings: {
+              getConceptualWalletSettingsCache:
+                stores.substores.ada.walletSettings.getConceptualWalletSettingsCache,
+            },
+            delegation: {
+              getDelegationRequests: stores.substores.ada.delegation.getDelegationRequests,
+            },
+          },
+        },
+      },
+      actions: {
+        profile: {
+          updateHideBalance: { trigger: actions.profile.updateHideBalance.trigger },
+        },
+        router: {
+          goToRoute: { trigger: actions.router.goToRoute.trigger },
+        },
+        wallets: {
+          unselectWallet: { trigger: actions.wallets.unselectWallet.trigger },
+        },
+      },
+      SidebarContainerProps: (
+        { actions, stores }: InjectedOrGenerated<SidebarContainerData>
+      ),
+    });
   }
 }
 

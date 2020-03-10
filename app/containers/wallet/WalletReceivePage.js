@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import { computed } from 'mobx';
 import config from '../../config';
 import WalletReceive from '../../components/wallet/WalletReceive';
 import StandardHeader from '../../components/wallet/receive/StandardHeader';
@@ -10,7 +11,7 @@ import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer
 import VerifyAddressDialog from '../../components/wallet/receive/VerifyAddressDialog';
 import URIGenerateDialog from '../../components/uri/URIGenerateDialog';
 import URIDisplayDialog from '../../components/uri/URIDisplayDialog';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -24,9 +25,12 @@ import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWal
 import { asHasUtxoChains } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type { StandardAddress, AddressTypeStore } from '../../stores/base/AddressesStore';
 import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
+import type { GeneratedData as UnmangleTxDialogContainerData } from '../transfer/UnmangleTxDialogContainer';
+
+export type GeneratedData = typeof WalletReceivePage.prototype.generated;
 
 type Props = {|
-  ...InjectedProps,
+  ...InjectedOrGenerated<GeneratedData>,
 |};
 
 type State = {|
@@ -46,33 +50,33 @@ export default class WalletReceivePage extends Component<Props, State> {
   }
 
   handleGenerateAddress: void => Promise<void> = async () => {
-    const publicDeriver = this.props.stores.wallets.selected;
+    const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver != null) {
-      await this.props.actions.ada.addresses.createAddress.trigger(publicDeriver);
+      await this.generated.actions.ada.addresses.createAddress.trigger(publicDeriver);
     }
   };
 
   resetErrors = () => {
-    this.props.actions.ada.addresses.resetErrors.trigger();
+    this.generated.actions.ada.addresses.resetErrors.trigger();
   };
 
   closeNotification = () => {
-    const publicDeriver = this.props.stores.wallets.selected;
+    const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver) {
       const notificationId = `${publicDeriver.getPublicDeriverId()}-copyNotification`;
-      this.props.actions.notifications.closeActiveNotification.trigger({ id: notificationId });
+      this.generated.actions.notifications.closeActiveNotification.trigger({ id: notificationId });
     }
   };
 
   render() {
-    const actions = this.props.actions;
-    const { uiNotifications, uiDialogs, profile } = this.props.stores;
+    const actions = this.generated.actions;
+    const { uiNotifications, uiDialogs, profile } = this.generated.stores;
     const {
       addresses,
       hwVerifyAddress,
       transactions
-    } = this.props.stores.substores.ada;
-    const publicDeriver = this.props.stores.wallets.selected;
+    } = this.generated.stores.substores.ada;
+    const publicDeriver = this.generated.stores.wallets.selected;
     const { validateAmount } = transactions;
 
     // Guard against potential null values
@@ -121,12 +125,12 @@ export default class WalletReceivePage extends Component<Props, State> {
       this.state.notificationElementId
     );
 
-    const { canUnmangle } = this.props.stores.substores.ada.addresses.getUnmangleAmounts();
+    const { canUnmangle } = this.generated.stores.substores.ada.addresses.getUnmangleAmounts();
     const header = (() => {
       if (addresses.isActiveTab('external', publicDeriver)) {
         return (<StandardHeader
           walletAddress={walletAddress}
-          selectedExplorer={this.props.stores.profile.selectedExplorer}
+          selectedExplorer={this.generated.stores.profile.selectedExplorer}
           isWalletAddressUsed={isWalletAddressUsed}
           onGenerateAddress={this.handleGenerateAddress}
           onCopyAddressTooltip={onCopyAddressTooltip}
@@ -142,7 +146,7 @@ export default class WalletReceivePage extends Component<Props, State> {
         return (
           <MangledHeader
             hasMangledUtxo={canUnmangle.length > 0}
-            onClick={() => this.props.actions.dialogs.open.trigger({
+            onClick={() => this.generated.actions.dialogs.open.trigger({
               dialog: UnmangleTxDialogContainer,
             })}
           />
@@ -155,7 +159,7 @@ export default class WalletReceivePage extends Component<Props, State> {
       <VerticalFlexContainer>
         <WalletReceive
           header={header}
-          selectedExplorer={this.props.stores.profile.selectedExplorer}
+          selectedExplorer={this.generated.stores.profile.selectedExplorer}
           walletAddresses={walletAddresses}
           onCopyAddressTooltip={onCopyAddressTooltip}
           notification={notification}
@@ -211,16 +215,15 @@ export default class WalletReceivePage extends Component<Props, State> {
 
         {uiDialogs.isOpen(UnmangleTxDialogContainer) && (
           <UnmangleTxDialogContainer
-            actions={this.props.actions}
-            stores={this.props.stores}
-            onClose={() => this.props.actions.dialogs.closeActiveDialog.trigger()}
+            {...this.generated.UnmangleTxDialogContainerProps}
+            onClose={() => this.generated.actions.dialogs.closeActiveDialog.trigger()}
           />
         )}
 
         {uiDialogs.isOpen(VerifyAddressDialog) && hwVerifyAddress.selectedAddress ? (
           <VerifyAddressDialog
             isActionProcessing={hwVerifyAddress.isActionProcessing}
-            selectedExplorer={this.props.stores.profile.selectedExplorer}
+            selectedExplorer={this.generated.stores.profile.selectedExplorer}
             error={hwVerifyAddress.error}
             walletAddress={hwVerifyAddress.selectedAddress.address}
             walletPath={hwVerifyAddress.selectedAddress.path}
@@ -238,7 +241,7 @@ export default class WalletReceivePage extends Component<Props, State> {
   getTypeStore: PublicDeriver<> => AddressTypeStore<StandardAddress> = (
     publicDeriver
   ) => {
-    const { addresses } = this.props.stores.substores.ada;
+    const { addresses } = this.generated.stores.substores.ada;
     if (addresses.isActiveTab('external', publicDeriver)) {
       return addresses.externalForDisplay;
     }
@@ -252,12 +255,12 @@ export default class WalletReceivePage extends Component<Props, State> {
   }
 
   openVerifyAddressDialog: void => void = (): void => {
-    const { actions } = this.props;
+    const { actions } = this.generated;
     actions.dialogs.open.trigger({ dialog: VerifyAddressDialog });
   }
 
   openURIGenerateDialog = (address: string, amount?: number): void => {
-    const { actions } = this.props;
+    const { actions } = this.generated;
     actions.dialogs.open.trigger({
       dialog: URIGenerateDialog,
       params: { address, amount }
@@ -265,10 +268,94 @@ export default class WalletReceivePage extends Component<Props, State> {
   }
 
   generateURI: (string, number) => void = (address, amount) => {
-    const { actions } = this.props;
+    const { actions } = this.generated;
     actions.dialogs.open.trigger({
       dialog: URIDisplayDialog,
       params: { address, amount }
+    });
+  }
+
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(WalletReceivePage)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    return Object.freeze({
+      stores: {
+        uiNotifications: {
+          isOpen: stores.uiNotifications.isOpen,
+          getTooltipActiveNotification: stores.uiNotifications.getTooltipActiveNotification,
+        },
+        uiDialogs: {
+          isOpen: stores.uiDialogs.isOpen,
+          getParam: stores.uiDialogs.getParam,
+        },
+        profile: {
+          selectedExplorer: stores.profile.selectedExplorer,
+          isClassicTheme: stores.profile.isClassicTheme,
+        },
+        wallets: {
+          selected: stores.wallets.selected,
+        },
+        substores: {
+          ada: {
+            addresses: {
+              getUnmangleAmounts: stores.substores.ada.addresses.getUnmangleAmounts,
+              isActiveTab: stores.substores.ada.addresses.isActiveTab,
+              createAddressRequest: stores.substores.ada.addresses.createAddressRequest,
+              error: stores.substores.ada.addresses.error,
+              externalForDisplay: stores.substores.ada.addresses.externalForDisplay,
+              internalForDisplay: stores.substores.ada.addresses.internalForDisplay,
+              mangledAddressesForDisplay: stores.substores.ada.addresses.mangledAddressesForDisplay,
+            },
+            hwVerifyAddress: {
+              selectedAddress: stores.substores.ada.hwVerifyAddress.selectedAddress,
+              isActionProcessing: stores.substores.ada.hwVerifyAddress.isActionProcessing,
+              error: stores.substores.ada.hwVerifyAddress.error,
+            },
+            transactions: {
+              validateAmount: stores.substores.ada.transactions.validateAmount,
+            },
+          },
+        },
+      },
+      actions: {
+        dialogs: {
+          open: { trigger: actions.dialogs.open.trigger, },
+          closeActiveDialog: { trigger: actions.dialogs.closeActiveDialog.trigger, },
+        },
+        notifications: {
+          closeActiveNotification: {
+            trigger: actions.notifications.closeActiveNotification.trigger,
+          },
+          open: {
+            trigger: actions.notifications.open.trigger,
+          },
+        },
+        ada: {
+          hwVerifyAddress: {
+            selectAddress: { trigger: actions.ada.hwVerifyAddress.selectAddress.trigger, },
+            verifyAddress: { trigger: actions.ada.hwVerifyAddress.verifyAddress.trigger, },
+            closeAddressDetailDialog: {
+              trigger: actions.ada.hwVerifyAddress.closeAddressDetailDialog.trigger,
+            },
+          },
+          addresses: {
+            resetErrors: {
+              trigger: actions.ada.addresses.resetErrors.trigger,
+            },
+            createAddress: {
+              trigger: actions.ada.addresses.createAddress.trigger,
+            },
+          },
+        },
+      },
+      UnmangleTxDialogContainerProps: (
+        { stores, actions }: InjectedOrGenerated<UnmangleTxDialogContainerData>
+      ),
     });
   }
 }

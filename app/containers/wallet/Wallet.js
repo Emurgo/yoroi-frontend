@@ -1,20 +1,28 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
+import { computed } from 'mobx';
 import { intlShape, defineMessages } from 'react-intl';
 import MainLayout from '../MainLayout';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import SidebarContainer from '../SidebarContainer';
 import NavBarContainer from '../NavBarContainer';
+import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
+import type { GeneratedData as NavBarContainerData } from '../NavBarContainer';
 import WalletWithNavigation from '../../components/wallet/layouts/WalletWithNavigation';
 import NavBarBack from '../../components/topbar/NavBarBack';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
-import type { InjectedContainerProps } from '../../types/injectedPropsType';
-import environment from '../../environment';
+import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 
-type Props = InjectedContainerProps;
+export type GeneratedData = typeof Wallet.prototype.generated;
+
+type Props = {|
+  ...InjectedOrGenerated<GeneratedData>,
+  +children?: Node,
+|};
 
 const messages = defineMessages({
   backButton: {
@@ -26,17 +34,21 @@ const messages = defineMessages({
 @observer
 export default class Wallet extends Component<Props> {
 
+  static defaultProps = {
+    children: undefined
+  };
+
   static contextTypes = {
     intl: intlShape.isRequired,
   };
 
   navigateToWallets: string => void = (destination) => {
-    this.props.actions.router.goToRoute.trigger({ route: destination });
+    this.generated.actions.router.goToRoute.trigger({ route: destination });
   }
 
   isActiveScreen = (page: string, subpage: ?boolean): boolean => {
-    const { app } = this.props.stores;
-    const { selected } = this.props.stores.wallets;
+    const { app } = this.generated.stores;
+    const { selected } = this.generated.stores.wallets;
     if (selected == null) return false;
     const screenRoute = buildRoute(
       ROUTES.WALLETS.PAGE,
@@ -52,10 +64,10 @@ export default class Wallet extends Component<Props> {
   };
 
   handleWalletNavItemClick: (string) => void = (page) => {
-    const { wallets } = this.props.stores;
+    const { wallets } = this.generated.stores;
     const selected = wallets.selected;
     if (selected == null) return;
-    this.props.actions.router.goToRoute.trigger({
+    this.generated.actions.router.goToRoute.trigger({
       route: ROUTES.WALLETS.PAGE,
       params: { id: selected.getPublicDeriverId(), page },
     });
@@ -63,14 +75,13 @@ export default class Wallet extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { wallets, } = this.props.stores;
-    const { actions, stores } = this.props;
-    const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
-    const sidebarContainer = (<SidebarContainer actions={actions} stores={stores} />);
+    const { wallets, } = this.generated.stores;
+    const { stores } = this.generated;
+    const { checkAdaServerStatus } = stores.serverConnectionStore;
+    const sidebarContainer = (<SidebarContainer {...this.generated.SidebarContainerProps} />);
     const navbarContainer = (
       <NavBarContainer
-        actions={actions}
-        stores={stores}
+        {...this.generated.NavBarContainerProps}
         title={
           <NavBarBack
             route={ROUTES.MY_WALLETS}
@@ -113,5 +124,35 @@ export default class Wallet extends Component<Props> {
         </WalletWithNavigation>
       </MainLayout>
     );
+  }
+
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(Wallet)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    return Object.freeze({
+      stores: {
+        app: {
+          currentRoute: stores.app.currentRoute,
+        },
+        wallets: {
+          selected: stores.wallets.selected,
+        },
+        serverConnectionStore: {
+          checkAdaServerStatus: stores.substores.ada.serverConnectionStore.checkAdaServerStatus,
+        },
+      },
+      actions: {
+        router: {
+          goToRoute: { trigger: actions.router.goToRoute.trigger },
+        },
+      },
+      SidebarContainerProps: ({ actions, stores, }: InjectedOrGenerated<SidebarContainerData>),
+      NavBarContainerProps: ({ actions, stores, }: InjectedOrGenerated<NavBarContainerData>),
+    });
   }
 }

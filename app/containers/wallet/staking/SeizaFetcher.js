@@ -1,10 +1,10 @@
 // @flow
 
 import React, { Component } from 'react';
-import { runInAction, action, observable } from 'mobx';
+import { computed, runInAction, action, observable } from 'mobx';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
-import type { InjectedContainerProps } from '../../../types/injectedPropsType';
+import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import { intlShape, } from 'react-intl';
 import DelegationTxDialog from '../../../components/wallet/staking/DelegationTxDialog';
 import environment from '../../../environment';
@@ -24,18 +24,24 @@ import type { ConfigType } from '../../../../config/config-types';
 
 declare var CONFIG: ConfigType;
 
+export type GeneratedData = typeof SeizaFetcher.prototype.generated;
+
 type SelectedPool = {|
   +name: null | string,
   +poolHash: string
 |};
 
 type Props = {|
-  ...InjectedContainerProps,
-  stakingUrl: string,
+  ...InjectedOrGenerated<GeneratedData>,
+  +children?: Node,
+  +stakingUrl: string,
 |};
 
 @observer
 export default class SeizaFetcher extends Component<Props> {
+  static defaultProps = {
+    children: undefined
+  };
 
   @observable selectedPools = [];
   @observable iframe: ?HTMLIFrameElement;
@@ -46,11 +52,11 @@ export default class SeizaFetcher extends Component<Props> {
     if (event.origin !== process.env.SEIZA_FOR_YOROI_URL) return;
     const pools: Array<SelectedPool> = JSON.parse(decodeURI(event.data));
 
-    const selectedWallet = this.props.stores.wallets.selected;
+    const selectedWallet = this.generated.stores.wallets.selected;
     if (selectedWallet == null) {
       return;
     }
-    const delegationTxActions = this.props.actions[environment.API].delegationTransaction;
+    const delegationTxActions = this.generated.actions[environment.API].delegationTransaction;
     await delegationTxActions.createTransaction.trigger({
       poolRequest: { id: pools[0].poolHash },
       publicDeriver: selectedWallet,
@@ -73,7 +79,7 @@ export default class SeizaFetcher extends Component<Props> {
   }
 
   componentWillUnmount() {
-    this.props.actions.ada.delegationTransaction.reset.trigger();
+    this.generated.actions.ada.delegationTransaction.reset.trigger();
     window.removeEventListener('resize', this.resize);
     window.removeEventListener('message', this.messageHandler);
   }
@@ -85,11 +91,12 @@ export default class SeizaFetcher extends Component<Props> {
   @action
   cancel: void => void = () => {
     this.selectedPools = [];
-    this.props.actions[environment.API].delegationTransaction.reset.trigger();
+    this.generated.actions[environment.API].delegationTransaction.reset.trigger();
   }
 
   render() {
-    const { actions, stores, stakingUrl } = this.props;
+    const { stakingUrl } = this.props;
+    const { actions, stores } = this.generated;
     const { intl } = this.context;
     const { profile } = stores;
     const delegationTxStore = stores.substores[environment.API].delegationTransaction;
@@ -101,7 +108,7 @@ export default class SeizaFetcher extends Component<Props> {
       throw new Error('Staking undefined SEIZA_FOR_YOROI_URL should never happen');
     }
 
-    const selectedWallet = this.props.stores.wallets.selected;
+    const selectedWallet = this.generated.stores.wallets.selected;
     if (selectedWallet == null) {
       return null;
     }
@@ -214,5 +221,62 @@ export default class SeizaFetcher extends Component<Props> {
       window.innerHeight - this.iframe.getBoundingClientRect().top - 30,
       0
     );
+  }
+
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(SeizaFetcher)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    const delegationTxStore = stores.substores.ada.delegationTransaction;
+    return Object.freeze({
+      stores: {
+        profile: {
+          isClassicTheme: stores.profile.isClassicTheme,
+          selectedExplorer: stores.profile.selectedExplorer,
+        },
+        wallets: {
+          selected: stores.wallets.selected,
+        },
+        substores: {
+          ada: {
+            delegationTransaction: {
+              isStale: delegationTxStore.isStale,
+              createDelegationTx: {
+                result: delegationTxStore.createDelegationTx.result,
+                error: delegationTxStore.createDelegationTx.error,
+                isExecuting: delegationTxStore.createDelegationTx.isExecuting,
+              },
+              signAndBroadcastDelegationTx: {
+                error: delegationTxStore.signAndBroadcastDelegationTx.error,
+                isExecuting: delegationTxStore.createDelegationTx.isExecuting,
+                wasExecuted: delegationTxStore.createDelegationTx.wasExecuted,
+              },
+            },
+          },
+        },
+      },
+      actions: {
+        ada: {
+          delegationTransaction: {
+            createTransaction: {
+              trigger: actions.ada.delegationTransaction.createTransaction.trigger,
+            },
+            signTransaction: {
+              trigger: actions.ada.delegationTransaction.signTransaction.trigger,
+            },
+            complete: {
+              trigger: actions.ada.delegationTransaction.complete.trigger,
+            },
+            reset: {
+              trigger: actions.ada.delegationTransaction.reset.trigger,
+            },
+          },
+        },
+      },
+    });
   }
 }
