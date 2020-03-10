@@ -42,41 +42,6 @@ export default class Settings extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  @computed get generated() {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(Settings)} no way to generated props`);
-    }
-    const { stores, actions } = this.props;
-    return Object.freeze({
-      stores: {
-        profile: {
-          currentLocale: stores.profile.currentLocale,
-          currentTheme: stores.profile.currentTheme,
-        },
-        router: {
-          location: stores.router.location,
-        },
-        wallets: {
-          hasActiveWallet: stores.wallets.hasActiveWallet,
-          selected: stores.wallets.selected,
-        },
-        serverConnectionStore: {
-          checkAdaServerStatus: stores.substores.ada.serverConnectionStore.checkAdaServerStatus,
-        },
-      },
-      actions: {
-        router: {
-          goToRoute: { trigger: actions.router.goToRoute.trigger },
-        },
-      },
-      SidebarContainerProps: ({ actions, stores, }: InjectedOrGenerated<SidebarContainerData>),
-      NavBarContainerProps: ({ actions, stores, }: InjectedOrGenerated<NavBarContainerData>),
-    });
-  }
-
   isActivePage: string => boolean = (route) => {
     const { location } = this.generated.stores.router;
     if (location) {
@@ -122,5 +87,40 @@ export default class Settings extends Component<Props> {
         </SettingsLayout>
       </MainLayout>
     );
+  }
+
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(Settings)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    return Object.freeze({
+      stores: {
+        profile: {
+          currentLocale: stores.profile.currentLocale,
+          currentTheme: stores.profile.currentTheme,
+        },
+        router: {
+          location: stores.router.location,
+        },
+        wallets: {
+          hasActiveWallet: stores.wallets.hasActiveWallet,
+          selected: stores.wallets.selected,
+        },
+        serverConnectionStore: {
+          checkAdaServerStatus: stores.substores.ada.serverConnectionStore.checkAdaServerStatus,
+        },
+      },
+      actions: {
+        router: {
+          goToRoute: { trigger: actions.router.goToRoute.trigger },
+        },
+      },
+      SidebarContainerProps: ({ actions, stores, }: InjectedOrGenerated<SidebarContainerData>),
+      NavBarContainerProps: ({ actions, stores, }: InjectedOrGenerated<NavBarContainerData>),
+    });
   }
 }

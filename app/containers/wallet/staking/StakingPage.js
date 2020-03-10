@@ -1,19 +1,23 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import { computed } from 'mobx';
 import { defineMessages, intlShape } from 'react-intl';
 import SeizaFetcher from './SeizaFetcher';
+import type { GeneratedData as SeizaFetcherData } from './SeizaFetcher';
 import InformativeError from '../../../components/widgets/InformativeError';
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
 import { formattedAmountWithoutLovelace } from '../../../utils/formatters';
 import environment from '../../../environment';
 import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
 
-import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 
+export type GeneratedData = typeof StakingPage.prototype.generated;
+
 type Props = {|
-  ...InjectedProps,
+  ...InjectedOrGenerated<GeneratedData>,
   urlTemplate: string,
 |};
 
@@ -66,11 +70,11 @@ export default class StakingPage extends Component<Props> {
       );
 
     // Add userAda
-    const publicDeriver = this.props.stores.wallets.selected;
+    const publicDeriver = this.generated.stores.wallets.selected;
     if (!publicDeriver) {
       return null;
     }
-    const txRequests = this.props.stores.substores.ada.transactions
+    const txRequests = this.generated.stores.substores.ada.transactions
       .getTxRequests(publicDeriver);
     const balance = txRequests.requests.getBalanceRequest.result;
     if (balance != null) {
@@ -80,8 +84,8 @@ export default class StakingPage extends Component<Props> {
       ))}`;
     }
 
-    finalURL += `&locale=${this.props.stores.profile.currentLocale}`;
-    const delegationStore = this.props.stores.substores.ada.delegation;
+    finalURL += `&locale=${this.generated.stores.profile.currentLocale}`;
+    const delegationStore = this.generated.stores.substores.ada.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingPage)} opened for non-reward wallet`);
@@ -98,7 +102,7 @@ export default class StakingPage extends Component<Props> {
   }
 
   render() {
-    const { actions, stores } = this.props;
+    const { stores } = this.generated;
     const { intl } = this.context;
 
     const delegationTxStore = stores.substores[environment.API].delegationTransaction;
@@ -106,7 +110,7 @@ export default class StakingPage extends Component<Props> {
     if (
       !delegationTxStore.signAndBroadcastDelegationTx.isExecuting &&
       !delegationTxStore.signAndBroadcastDelegationTx.wasExecuted &&
-      this.props.stores.substores.ada.transactions.hasAnyPending
+      this.generated.stores.substores.ada.transactions.hasAnyPending
     ) {
       return (
         <InformativeError
@@ -126,10 +130,52 @@ export default class StakingPage extends Component<Props> {
     }
     return (
       <SeizaFetcher
-        actions={actions}
-        stores={stores}
+        {...this.generated.SeizaFetcherProps}
         stakingUrl={url}
       />
     );
+  }
+
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(StakingPage)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    const adaStores = stores.substores.ada;
+    return Object.freeze({
+      stores: {
+        profile: {
+          currentLocale: stores.profile.currentLocale,
+        },
+        wallets: {
+          selected: stores.wallets.selected,
+        },
+        substores: {
+          ada: {
+            transactions: {
+              getTxRequests: adaStores.transactions.getTxRequests,
+              hasAnyPending: adaStores.transactions.hasAnyPending,
+            },
+            delegation: {
+              getDelegationRequests: adaStores.delegation.getDelegationRequests,
+            },
+            delegationTransaction: {
+              signAndBroadcastDelegationTx: {
+                isExecuting:
+                  adaStores.delegationTransaction.signAndBroadcastDelegationTx.isExecuting,
+                wasExecuted:
+                  adaStores.delegationTransaction.signAndBroadcastDelegationTx.wasExecuted,
+              },
+            },
+          },
+        },
+      },
+      SeizaFetcherProps: (
+        { actions, stores, }: InjectedOrGenerated<SeizaFetcherData>
+      ),
+    });
   }
 }

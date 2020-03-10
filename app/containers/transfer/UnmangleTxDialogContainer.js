@@ -2,10 +2,10 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { action, observable } from 'mobx';
+import { action, computed, observable } from 'mobx';
 import { intlShape, } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import TransferLayout from '../../components/transfer/TransferLayout';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import YoroiTransferErrorPage from './YoroiTransferErrorPage';
@@ -26,8 +26,10 @@ import type { ConfigType } from '../../../config/config-types';
 
 declare var CONFIG: ConfigType;
 
+export type GeneratedData = typeof UnmangleTxDialogContainer.prototype.generated;
+
 type Props = {|
-  ...InjectedProps,
+  ...InjectedOrGenerated<GeneratedData>,
   +onClose: void => void,
 |};
 
@@ -56,13 +58,13 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
     }
 
     const filterTo = new Set(
-      this.props.stores.substores.ada.addresses.mangledAddressesForDisplay.all
+      this.generated.stores.substores.ada.addresses.mangledAddressesForDisplay.all
         // we don't want to include any UTXO that would do nothing but increase the tx fee
         .filter(info => info.value != null && info.value.gt(CONFIG.genesis.linearFee.coefficient))
         .map(info => getAddressPayload(info.address))
     );
 
-    this.props.stores.substores.ada.transactionBuilderStore.setupSelfTx.execute({
+    this.generated.stores.substores.ada.transactionBuilderStore.setupSelfTx.execute({
       publicDeriver: withChains,
       /**
        * We filter to only UTXOs of mangled addresses
@@ -92,7 +94,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
 
         const txBuilderStore = this._getTxBuilderStore();
         if (txBuilderStore.tentativeTx == null) return;
-        this.props.actions.ada.wallets.sendMoney.trigger({
+        this.generated.actions.ada.wallets.sendMoney.trigger({
           signRequest: txBuilderStore.tentativeTx,
           password: walletPassword,
           publicDeriver: selected,
@@ -118,7 +120,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
   }
 
   getContent: (void) => Node = () => {
-    const { profile } = this.props.stores;
+    const { profile } = this.generated.stores;
 
     const txBuilder = this._getTxBuilderStore();
 
@@ -156,7 +158,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
 
     const spendingPasswordForm = (<SpendingPasswordInput
       setForm={(form) => this.setSpendingPasswordForm(form)}
-      classicTheme={this.props.stores.profile.isClassicTheme}
+      classicTheme={this.generated.stores.profile.isClassicTheme}
       isSubmitting={isSubmitting}
     />);
 
@@ -164,7 +166,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
       <TransferSummaryPage
         form={spendingPasswordForm}
         formattedWalletAmount={formattedWalletAmount}
-        selectedExplorer={this.props.stores.profile.selectedExplorer}
+        selectedExplorer={this.generated.stores.profile.selectedExplorer}
         transferTx={transferTx}
         onSubmit={this.submit}
         isSubmitting={this._getAdaWalletsStore().sendMoneyRequest.isExecuting}
@@ -174,23 +176,77 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
     );
   }
 
-  _getRouter() {
-    return this.props.actions.router;
-  }
-
   _getWalletsStore() {
-    return this.props.stores.wallets;
+    return this.generated.stores.wallets;
   }
 
   _getAdaWalletsStore() {
-    return this.props.stores.substores[environment.API].wallets;
+    return this.generated.stores.substores[environment.API].wallets;
   }
 
   _getTxBuilderStore() {
-    return this.props.stores.substores.ada.transactionBuilderStore;
+    return this.generated.stores.substores.ada.transactionBuilderStore;
   }
 
   _getTxBuilderActions() {
-    return this.props.actions.ada.txBuilderActions;
+    return this.generated.actions.ada.txBuilderActions;
+  }
+
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(UnmangleTxDialogContainer)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    return Object.freeze({
+      stores: {
+        profile: {
+          isClassicTheme: stores.profile.isClassicTheme,
+          selectedExplorer: stores.profile.selectedExplorer,
+        },
+        wallets: {
+          selected: stores.wallets.selected,
+        },
+        substores: {
+          ada: {
+            wallets: {
+              sendMoneyRequest: {
+                reset: stores.substores.ada.wallets.sendMoneyRequest.reset,
+                error: stores.substores.ada.wallets.sendMoneyRequest.error,
+                isExecuting: stores.substores.ada.wallets.sendMoneyRequest.isExecuting,
+              },
+            },
+            addresses: {
+              mangledAddressesForDisplay: {
+                all: stores.substores.ada.addresses.mangledAddressesForDisplay.all,
+              },
+            },
+            transactionBuilderStore: {
+              tentativeTx: stores.substores.ada.transactionBuilderStore.tentativeTx,
+              setupSelfTx: {
+                execute: stores.substores.ada.transactionBuilderStore.setupSelfTx.execute,
+                error: stores.substores.ada.transactionBuilderStore.setupSelfTx.error,
+              },
+            },
+          },
+        },
+      },
+      actions: {
+        ada: {
+          txBuilderActions: {
+            reset: {
+              trigger: actions.ada.txBuilderActions.reset.trigger
+            },
+          },
+          wallets: {
+            sendMoney: {
+              trigger: actions.ada.wallets.sendMoney.trigger
+            },
+          },
+        },
+      },
+    });
   }
 }
