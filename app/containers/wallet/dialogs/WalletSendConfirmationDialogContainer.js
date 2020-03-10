@@ -1,8 +1,9 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import { computed } from 'mobx';
 import environment from '../../../environment';
-import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import type { BaseSignRequest } from '../../../api/ada/transactions/types';
 import {
   copySignRequest,
@@ -17,13 +18,15 @@ import {
 } from '../../../utils/formatters';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 
+export type GeneratedData = typeof WalletSendConfirmationDialogContainer.prototype.generated;
+
 type DialogProps = {|
   +signRequest: BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>,
   +currencyUnit: string,
   +staleTx: boolean,
 |};
 type Props = {|
-  ...InjectedProps,
+  ...InjectedOrGenerated<GeneratedData>,
   ...DialogProps,
 |};
 
@@ -32,14 +35,15 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
 
   render() {
     const {
-      actions, currencyUnit,
-      signRequest, stores,
+      currencyUnit,
+      signRequest,
     } = this.props;
-    const { wallets } = this.props.stores.substores[environment.API];
+    const { stores, actions } = this.generated;
+    const { wallets } = stores.substores[environment.API];
     const { sendMoneyRequest } = wallets;
-    const publicDeriver = this.props.stores.wallets.selected;
+    const publicDeriver = stores.wallets.selected;
     const { profile } = stores;
-    const { sendMoney } = this.props.actions[environment.API].wallets;
+    const { sendMoney } = actions[environment.API].wallets;
 
     if (publicDeriver == null) throw new Error('Active wallet required for WalletSendPage.');
 
@@ -49,7 +53,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     return (
       <WalletSendConfirmationDialog
         staleTx={this.props.staleTx}
-        selectedExplorer={this.props.stores.profile.selectedExplorer}
+        selectedExplorer={stores.profile.selectedExplorer}
         amount={formattedWalletAmount(totalInput.minus(fee))}
         receivers={receivers}
         totalAmount={formattedWalletAmount(totalInput)}
@@ -73,5 +77,51 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         classicTheme={profile.isClassicTheme}
       />
     );
+  }
+
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(WalletSendConfirmationDialogContainer)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    return Object.freeze({
+      stores: {
+        profile: {
+          isClassicTheme: stores.profile.isClassicTheme,
+          selectedExplorer: stores.profile.selectedExplorer,
+        },
+        wallets: {
+          selected: stores.wallets.selected,
+        },
+        substores: {
+          ada: {
+            wallets: {
+              sendMoneyRequest: {
+                isExecuting: stores.substores.ada.wallets.sendMoneyRequest.isExecuting,
+                reset: stores.substores.ada.wallets.sendMoneyRequest.reset,
+                error: stores.substores.ada.wallets.sendMoneyRequest.error,
+              },
+            },
+          },
+        },
+      },
+      actions: {
+        dialogs: {
+          closeActiveDialog: {
+            trigger: actions.dialogs.closeActiveDialog.trigger,
+          },
+        },
+        ada: {
+          wallets: {
+            sendMoney: {
+              trigger: actions.ada.wallets.sendMoney.trigger,
+            },
+          },
+        },
+      },
+    });
   }
 }
