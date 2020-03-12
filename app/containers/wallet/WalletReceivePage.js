@@ -23,7 +23,7 @@ import {
 import globalMessages from '../../i18n/global-messages';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { asHasUtxoChains } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import type { StandardAddress, AddressTypeStore } from '../../stores/base/AddressesStore';
+import type { StandardAddress, } from '../../stores/base/AddressesStore';
 import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
 import type { GeneratedData as UnmangleTxDialogContainerData } from '../transfer/UnmangleTxDialogContainer';
 
@@ -87,7 +87,7 @@ export default class WalletReceivePage extends Component<Props, State> {
     if (!withChains) throw new Error(`${nameof(WalletReceivePage)} only available for account-level wallets`);
     const addressTypeStore = this.getTypeStore(publicDeriver);
 
-    if (!addressTypeStore.getRequest(publicDeriver).wasExecuted || !addressTypeStore.hasAny) {
+    if (!addressTypeStore.wasExecuted || !addressTypeStore.hasAny) {
       return (
         <VerticallyCenteredLayout>
           <LoadingSpinner />
@@ -238,18 +238,24 @@ export default class WalletReceivePage extends Component<Props, State> {
     );
   }
 
-  getTypeStore: PublicDeriver<> => AddressTypeStore<StandardAddress> = (
+  getTypeStore: PublicDeriver<> => {|
+    all: Array<StandardAddress>,
+    hasAny: boolean,
+    last: ?StandardAddress,
+    totalAvailable: number,
+    wasExecuted: boolean,
+  |} = (
     publicDeriver
   ) => {
     const { addresses } = this.generated.stores.substores.ada;
     if (addresses.isActiveTab('external', publicDeriver)) {
-      return addresses.externalForDisplay;
+      return addresses.externalForDisplay();
     }
     if (addresses.isActiveTab('internal', publicDeriver)) {
-      return addresses.internalForDisplay;
+      return addresses.internalForDisplay();
     }
     if (addresses.isActiveTab('mangled', publicDeriver)) {
-      return addresses.mangledAddressesForDisplay;
+      return addresses.mangledAddressesForDisplay();
     }
     throw new Error(`${nameof(WalletReceivePage)} unexpected address tab`);
   }
@@ -283,6 +289,7 @@ export default class WalletReceivePage extends Component<Props, State> {
       throw new Error(`${nameof(WalletReceivePage)} no way to generated props`);
     }
     const { stores, actions } = this.props;
+    const adaStore = stores.substores.ada;
     return Object.freeze({
       stores: {
         uiNotifications: {
@@ -303,21 +310,41 @@ export default class WalletReceivePage extends Component<Props, State> {
         substores: {
           ada: {
             addresses: {
-              getUnmangleAmounts: stores.substores.ada.addresses.getUnmangleAmounts,
-              isActiveTab: stores.substores.ada.addresses.isActiveTab,
-              createAddressRequest: stores.substores.ada.addresses.createAddressRequest,
-              error: stores.substores.ada.addresses.error,
-              externalForDisplay: stores.substores.ada.addresses.externalForDisplay,
-              internalForDisplay: stores.substores.ada.addresses.internalForDisplay,
-              mangledAddressesForDisplay: stores.substores.ada.addresses.mangledAddressesForDisplay,
+              getUnmangleAmounts: adaStore.addresses.getUnmangleAmounts,
+              isActiveTab: adaStore.addresses.isActiveTab,
+              createAddressRequest: {
+                isExecuting: adaStore.addresses.createAddressRequest.isExecuting,
+              },
+              error: adaStore.addresses.error,
+              externalForDisplay: () => ({
+                all: adaStore.addresses.externalForDisplay.all,
+                hasAny: adaStore.addresses.externalForDisplay.hasAny,
+                last: adaStore.addresses.externalForDisplay.last,
+                totalAvailable: adaStore.addresses.externalForDisplay.totalAvailable,
+                wasExecuted: adaStore.addresses.externalForDisplay.wasExecuted,
+              }),
+              internalForDisplay: () => ({
+                all: adaStore.addresses.internalForDisplay.all,
+                hasAny: adaStore.addresses.internalForDisplay.hasAny,
+                last: adaStore.addresses.internalForDisplay.last,
+                totalAvailable: adaStore.addresses.internalForDisplay.totalAvailable,
+                wasExecuted: adaStore.addresses.internalForDisplay.wasExecuted,
+              }),
+              mangledAddressesForDisplay: () => ({
+                all: adaStore.addresses.mangledAddressesForDisplay.all,
+                hasAny: adaStore.addresses.mangledAddressesForDisplay.hasAny,
+                last: adaStore.addresses.mangledAddressesForDisplay.last,
+                totalAvailable: adaStore.addresses.mangledAddressesForDisplay.totalAvailable,
+                wasExecuted: adaStore.addresses.mangledAddressesForDisplay.wasExecuted,
+              }),
             },
             hwVerifyAddress: {
-              selectedAddress: stores.substores.ada.hwVerifyAddress.selectedAddress,
-              isActionProcessing: stores.substores.ada.hwVerifyAddress.isActionProcessing,
-              error: stores.substores.ada.hwVerifyAddress.error,
+              selectedAddress: adaStore.hwVerifyAddress.selectedAddress,
+              isActionProcessing: adaStore.hwVerifyAddress.isActionProcessing,
+              error: adaStore.hwVerifyAddress.error,
             },
             transactions: {
-              validateAmount: stores.substores.ada.transactions.validateAmount,
+              validateAmount: adaStore.transactions.validateAmount,
             },
           },
         },

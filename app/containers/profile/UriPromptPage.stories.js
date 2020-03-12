@@ -33,7 +33,7 @@ export const Generic = () => (
       },
       actions: {
         profile: {
-          acceptUriScheme: { trigger: async () => action('acceptUriScheme')() },
+          acceptUriScheme: { trigger: async (req) => action('acceptUriScheme')(req) },
         }
       }
     }}

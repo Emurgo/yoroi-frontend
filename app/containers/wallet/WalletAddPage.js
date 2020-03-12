@@ -220,12 +220,6 @@ export default class WalletAddPage extends Component<Props> {
         },
         substores: {
           ada: {
-            trezorConnect: {
-              progressInfo: stores.substores.ada.trezorConnect.progressInfo,
-              isActionProcessing: stores.substores.ada.trezorConnect.isActionProcessing,
-              error: stores.substores.ada.trezorConnect.error,
-              defaultWalletName: stores.substores.ada.trezorConnect.defaultWalletName,
-            },
             serverConnectionStore: {
               checkAdaServerStatus: stores.substores.ada.serverConnectionStore.checkAdaServerStatus,
             },

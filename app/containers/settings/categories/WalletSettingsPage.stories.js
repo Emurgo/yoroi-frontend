@@ -72,9 +72,9 @@ const defaultSettingsPageProps: {|
       startEditingWalletField: { trigger: action('startEditingWalletField') },
       stopEditingWalletField: { trigger: action('stopEditingWalletField') },
       cancelEditingWalletField: { trigger: action('cancelEditingWalletField') },
-      renameConceptualWallet: { trigger: async () => action('renameConceptualWallet')() },
-      resyncHistory: { trigger: async () => action('resyncHistory')() },
-      removeWallet: { trigger: async () => action('removeWallet')() },
+      renameConceptualWallet: { trigger: async (req) => action('renameConceptualWallet')(req) },
+      resyncHistory: { trigger: async (req) => action('resyncHistory')(req) },
+      removeWallet: { trigger: async (req) => action('removeWallet')(req) },
     },
     dialogs: {
       open: { trigger: action('open') },
@@ -246,7 +246,7 @@ const defaultChangeWalletPasswordDialogContainerProps: {|
   },
   actions: {
     walletSettings: {
-      updateSigningPassword: { trigger: async () => action('updateSigningPassword')() },
+      updateSigningPassword: { trigger: async (req) => action('updateSigningPassword')(req) },
     },
     dialogs: {
       updateDataForActiveDialog: { trigger: action('updateDataForActiveDialog') },

@@ -5,6 +5,7 @@ import { configure, addDecorator, addParameters } from '@storybook/react';
 import {
   MINIMAL_VIEWPORTS,
 } from '@storybook/addon-viewport';
+import { RustModule } from '../app/api/ada/lib/cardanoCrypto/rustLoader';
 
 import StoryWrapper from '../stories/helpers/StoryWrapper';
 
@@ -52,17 +53,19 @@ addParameters({
   },
 });
 
-// Global Decorator
-addDecorator(story => {
-  return <StoryWrapper>{story}</StoryWrapper>;
-});
+RustModule.load().then(() => {
+  // Global Decorator
+  addDecorator(story => {
+    return <StoryWrapper>{story}</StoryWrapper>;
+  });
 
-configure(
-  [
-    // $FlowFixMe comes from Webpack and not nodejs so Flow doesn't find the function
-    require.context('../app/components', true, /\.stories\.js$/),
-    // $FlowFixMe comes from Webpack and not nodejs so Flow doesn't find the function
-    require.context('../app/containers', true, /\.stories\.js$/),
-  ],
-  module
-);
+  configure(
+    [
+      // $FlowFixMe comes from Webpack and not nodejs so Flow doesn't find the function
+      require.context('../app/components', true, /\.stories\.js$/),
+      // $FlowFixMe comes from Webpack and not nodejs so Flow doesn't find the function
+      require.context('../app/containers', true, /\.stories\.js$/),
+    ],
+    module
+  );
+});

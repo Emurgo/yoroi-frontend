@@ -70,6 +70,7 @@ export default class MyWalletsPage extends Component<Props> {
   };
 
   render() {
+    console.log('asdfzxcv');
     const { intl } = this.context;
     const { stores } = this.generated;
     const { profile } = stores;

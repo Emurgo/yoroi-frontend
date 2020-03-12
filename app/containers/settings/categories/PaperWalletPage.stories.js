@@ -14,7 +14,7 @@ import { wrapSettings } from '../../../Routes';
 import { mockSettingsProps } from '../Settings.mock';
 import { getDefaultExplorer } from '../../../domain/Explorer';
 import {
-  getMnemonicCases,
+  getValidationMnemonicCases,
   getPasswordValidationCases,
   globalKnobs,
   walletLookup,
@@ -70,7 +70,7 @@ const mockActions = {
   paperWallets: {
     cancel: { trigger: action('cancel') },
     submitInit: { trigger: action('submitInit') },
-    submitUserPassword: { trigger: async () => action('submitUserPassword')() },
+    submitUserPassword: { trigger: async (req) => action('submitUserPassword')(req) },
     backToCreate: { trigger: action('backToCreate') },
     submitVerify: { trigger: action('submitVerify') },
     submitCreate: { trigger: action('submitCreate') },
@@ -253,7 +253,7 @@ const constructedPaperWallet = {
     'Ae2tdPwUPEZ588oVb86pCyANsrPGJZVHU2mqhYqPzLWU1uo6jS2qM1vgn1P',
     'Ae2tdPwUPEZAPUqpvUgoBB7QjrfAbu1RXbFRoLcdYYV8r4FaSJrq4oowAhv',
   ],
-  scrambledWords: getMnemonicCases(21).Correct.split(' '),
+  scrambledWords: getValidationMnemonicCases(21).Correct.split(' '),
   accountPlate: {
     hash: '7b9bf637f341bed7933c8673f9fb7e405097746115f24ec7d192f80fb6efb219da8bc1902dab99fc070f156b7877f29dd8e581da616ff7fdad28493d084a0db9',
     id: 'XLBS-6706',
@@ -269,8 +269,8 @@ export const VerifyDialog = () => {
       ...lookup,
     }),
     (() => {
-      const mnemonicCases = getMnemonicCases(21);
-      const mneonicsValue = () => select(
+      const mnemonicCases = getValidationMnemonicCases(21);
+      const mnemonicsValue = () => select(
         'mnemonicCases',
         mnemonicCases,
         mnemonicCases.Empty,
@@ -316,11 +316,11 @@ export const VerifyDialog = () => {
                 },
                 actions: mockActions,
                 verifyDefaultValues: passwordValue() === passwordCases.Empty &&
-                  mneonicsValue() === mnemonicCases.Empty
+                  mnemonicsValue() === mnemonicCases.Empty
                   ? undefined
                   : {
                     paperPassword: passwordValue(),
-                    recoveryPhrase: mneonicsValue(),
+                    recoveryPhrase: mnemonicsValue(),
                     walletName: '',
                     walletPassword: '',
                   }

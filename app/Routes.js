@@ -9,7 +9,6 @@ import type { ActionsMap } from './actions/index';
 import type { InjectedOrGenerated } from './types/injectedPropsType';
 
 // PAGES
-import NoWalletsPage from './containers/wallet/NoWalletsPage';
 import WalletAddPage from './containers/wallet/WalletAddPage';
 import LanguageSelectionPage from './containers/profile/LanguageSelectionPage';
 import TermsOfUsePage from './containers/profile/TermsOfUsePage';
@@ -28,6 +27,7 @@ import SupportSettingsPage from './containers/settings/categories/SupportSetting
 import LoadingPage from './containers/LoadingPage';
 import NightlyPage from './containers/profile/NightlyPage';
 import Wallet from './containers/wallet/Wallet';
+import type { GeneratedData as WalletData } from './containers/wallet/Wallet';
 import MyWalletsPage from './containers/wallet/MyWalletsPage';
 import WalletSummaryPage from './containers/wallet/WalletSummaryPage';
 import WalletSendPage from './containers/wallet/WalletSendPage';
@@ -38,6 +38,7 @@ import YoroiTransferPage from './containers/transfer/YoroiTransferPage';
 import URILandingPage from './containers/uri/URILandingPage';
 import Transfer from './containers/transfer/Transfer';
 import Receive from './containers/wallet/Receive';
+import type { GeneratedData as ReceiveData } from './containers/wallet/Receive';
 import StakingDashboardPage from './containers/wallet/staking/StakingDashboardPage';
 import StakingPage from './containers/wallet/staking/StakingPage';
 import NoticeBoardPage from './containers/notice-board/NoticeBoardPage';
@@ -80,11 +81,6 @@ export const Routes = (
       />
       <Route
         exact
-        path={ROUTES.NO_WALLETS}
-        component={(props) => <NoWalletsPage {...props} stores={stores} actions={actions} />}
-      />
-      <Route
-        exact
         path={ROUTES.MY_WALLETS}
         component={(props) => <MyWalletsPage {...props} stores={stores} actions={actions} />}
       />
@@ -96,9 +92,10 @@ export const Routes = (
       <Route
         path={ROUTES.WALLETS.ROOT}
         component={(props) => (
-          <Wallet {...props} stores={stores} actions={actions}>
-            {WalletsSubpages(stores, actions)}
-          </Wallet>
+          wrapWallet(
+            { ...props, stores, actions },
+            WalletsSubpages(stores, actions)
+          )
         )}
       />
       <Route
@@ -149,9 +146,10 @@ const WalletsSubpages = (stores, actions) => (
     <Route
       path={ROUTES.WALLETS.RECEIVE.ROOT}
       component={(props) => (
-        <Receive {...props} stores={stores} actions={actions}>
-          {ReceiveSubpages(stores, actions)}
-        </Receive>
+        wrapReceive(
+          { ...props, stores, actions },
+          ReceiveSubpages(stores, actions)
+        )
       )}
     />
     {environment.isShelley() && (
@@ -270,5 +268,31 @@ export function wrapTransfer(
     >
       {children}
     </Transfer>
+  );
+}
+
+export function wrapWallet(
+  walletProps: InjectedOrGenerated<WalletData>,
+  children: Node,
+): Node {
+  return (
+    <Wallet
+      {...walletProps}
+    >
+      {children}
+    </Wallet>
+  );
+}
+
+export function wrapReceive(
+  receiveProps: InjectedOrGenerated<ReceiveData>,
+  children: Node,
+): Node {
+  return (
+    <Receive
+      {...receiveProps}
+    >
+      {children}
+    </Receive>
   );
 }

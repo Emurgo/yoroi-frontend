@@ -98,7 +98,7 @@ export const Generic = () => {
             activateTopbarCategory: { trigger: action('activateTopbarCategory') },
           },
           noticeBoard: {
-            loadMore: { trigger: async () => action('loadMore')() },
+            loadMore: { trigger: async (request) => action('loadMore')(request) },
           },
         }
       }}

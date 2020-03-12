@@ -39,7 +39,7 @@ export const mockTransferProps: {|
         },
         actions: {
           profile: {
-            toggleSidebar: { trigger: async () => action('toggleSidebar')() },
+            toggleSidebar: { trigger: async (req) => action('toggleSidebar')(req) },
           },
           topbar: {
             activateTopbarCategory: { trigger: action('activateTopbarCategory') },

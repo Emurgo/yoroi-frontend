@@ -75,9 +75,9 @@ const genBaseProps: {|
       daedalusTransfer: {
         backToUninitialized: { trigger: action('backToUninitialized') },
         cancelTransferFunds: { trigger: action('cancelTransferFunds') },
-        transferFunds: { trigger: async () => action('transferFunds')() },
-        setupTransferFundsWithMasterKey: { trigger: async () => action('setupTransferFundsWithMasterKey')() },
-        setupTransferFundsWithMnemonic: { trigger: async () => action('setupTransferFundsWithMnemonic')() },
+        transferFunds: { trigger: async (req) => action('transferFunds')(req) },
+        setupTransferFundsWithMasterKey: { trigger: async (req) => action('setupTransferFundsWithMasterKey')(req) },
+        setupTransferFundsWithMnemonic: { trigger: async (req) => action('setupTransferFundsWithMnemonic')(req) },
         startTransferFunds: { trigger: action('startTransferFunds') },
         startTransferPaperFunds: { trigger: action('startTransferPaperFunds') },
         startTransferMasterKey: { trigger: action('startTransferMasterKey') },

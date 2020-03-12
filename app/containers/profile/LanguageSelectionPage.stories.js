@@ -45,7 +45,7 @@ export const Generic = () => (
       actions: {
         profile: {
           updateTentativeLocale: { trigger: action('updateTentativeLocale') },
-          commitLocaleToStorage: { trigger: async () => action('commitLocaleToStorage')() },
+          commitLocaleToStorage: { trigger: async (req) => action('commitLocaleToStorage')(req) },
         }
       }
     }}
@@ -82,7 +82,7 @@ export const NonTier1 = () => (
       actions: {
         profile: {
           updateTentativeLocale: { trigger: action('updateTentativeLocale') },
-          commitLocaleToStorage: { trigger: async () => action('commitLocaleToStorage')() },
+          commitLocaleToStorage: { trigger: async (req) => action('commitLocaleToStorage')(req) },
         }
       }
     }}
@@ -116,7 +116,7 @@ export const IsExecuting = () => (
       actions: {
         profile: {
           updateTentativeLocale: { trigger: action('updateTentativeLocale') },
-          commitLocaleToStorage: { trigger: async () => action('commitLocaleToStorage')() },
+          commitLocaleToStorage: { trigger: async (req) => action('commitLocaleToStorage')(req) },
         }
       }
     }}
@@ -146,7 +146,7 @@ export const ServerError = () => (
       actions: {
         profile: {
           updateTentativeLocale: { trigger: action('updateTentativeLocale') },
-          commitLocaleToStorage: { trigger: async () => action('commitLocaleToStorage')() },
+          commitLocaleToStorage: { trigger: async (req) => action('commitLocaleToStorage')(req) },
         }
       }
     }}

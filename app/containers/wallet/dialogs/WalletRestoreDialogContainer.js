@@ -40,8 +40,8 @@ type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
   +onClose: void => void,
   +mode: RestoreModeType,
-    +introMessage ?: string,
-    +onBack: void => void,
+  +introMessage ?: string,
+  +onBack: void => void,
 |};
 
 type WalletRestoreDialogContainerState = {|
