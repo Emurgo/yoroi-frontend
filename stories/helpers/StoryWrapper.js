@@ -255,18 +255,22 @@ export const mockTrezorMeta = {
   Vendor: 'trezor.io',
 };
 
+let conceptualWalletCounter = 0;
+let publicDeriverCounter = 0;
+
 function genDummyWallet(): PublicDeriver<> {
+  const conceptualWalletId = conceptualWalletCounter++;
   const parent = new Cip1852Wallet(
     (null: any),
     {
       db: (null: any),
-      conceptualWalletId: 0,
+      conceptualWalletId,
       walletType: WalletTypeOption.WEB_WALLET,
       hardwareInfo: null,
     },
     {
       Cip1852WrapperId: 0,
-      ConceptualWalletId: 0,
+      ConceptualWalletId: conceptualWalletId,
       SignerLevel: null,
       PublicDeriverLevel: 0,
       PrivateDeriverLevel: null,
@@ -279,7 +283,7 @@ function genDummyWallet(): PublicDeriver<> {
   );
   const clazz = GetSigningKey(GetPublicKey(HasLevels(HasSign(PublicDeriver))));
   const self = new clazz({
-    publicDeriverId: 0,
+    publicDeriverId: publicDeriverCounter++,
     parent,
     pathToPublic: [],
     derivationId: 0,
@@ -347,7 +351,7 @@ export function genDummyWithCache(): CacheValue {
 function genSigningWallet(
   genHardwareInfo?: number => HwWalletMetaRow,
 ): PublicDeriver<> {
-  const conceptualWalletId = 0;
+  const conceptualWalletId = conceptualWalletCounter++;
   const hardwareInfo = genHardwareInfo == null
     ? null
     : genHardwareInfo(conceptualWalletId);
@@ -366,7 +370,7 @@ function genSigningWallet(
     },
     {
       Cip1852WrapperId: 0,
-      ConceptualWalletId: 0,
+      ConceptualWalletId: conceptualWalletId,
       SignerLevel: null,
       PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
       PrivateDeriverLevel: null,
@@ -383,7 +387,7 @@ function genSigningWallet(
     )))
   ))));
   const self = new clazz({
-    publicDeriverId: 0,
+    publicDeriverId: publicDeriverCounter++,
     parent,
     pathToPublic: [],
     derivationId: 0,

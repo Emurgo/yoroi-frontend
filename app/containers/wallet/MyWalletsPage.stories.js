@@ -1,6 +1,7 @@
 // @flow
 
 import React from 'react';
+import BigNumber from 'bignumber.js';
 import { select, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import { withScreenshot } from 'storycap';
@@ -8,6 +9,8 @@ import {
   walletLookup,
   genSigningWalletWithCache,
 } from '../../../stories/helpers/StoryWrapper';
+import CachedRequest from '../../stores/lib/LocalizedCachedRequest';
+import type { GetBalanceFunc } from '../../api/ada/index';
 import MyWalletsPage from './MyWalletsPage';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 
@@ -18,9 +21,49 @@ export default {
 };
 
 export const Wallets = () => {
-  const wallet = genSigningWalletWithCache();
-  const lookup = walletLookup([wallet]);
-  const publicDerivers = [wallet.publicDeriver];
+
+  const genWallet = () => {
+    const wallet = genSigningWalletWithCache();
+
+    const pending: CachedRequest<GetBalanceFunc> = new CachedRequest(_request => Promise.resolve(
+      new BigNumber(3),
+    ));
+    const executed: CachedRequest<GetBalanceFunc> = new CachedRequest(_request => Promise.resolve(
+      new BigNumber(4),
+    ));
+    executed.execute((null: any));
+    executed.execute((null: any));
+    const balanceCases = {
+      Pending: 0,
+      Calculated: 1,
+    };
+    const getBalanceCase = () => select(
+      'balanceCases',
+      balanceCases,
+      balanceCases.Calculated
+    );
+    const oldResults = wallet.getTransactions(wallet.publicDeriver);
+    wallet.getTransactions = (_req) => ({
+      ...oldResults,
+      requests: {
+        ...oldResults.requests,
+        getBalanceRequest: getBalanceCase() === balanceCases.Pending
+          ? pending
+          : executed,
+      },
+    });
+    return wallet;
+  };
+  const wallets = [
+    genWallet(),
+    genWallet(),
+    genWallet(),
+    genWallet(),
+  ];
+  const lookup = walletLookup(wallets);
+  const publicDerivers = [
+    ...wallets.map(cache => cache.publicDeriver),
+  ];
   return (<MyWalletsPage
     generated={{
       stores: {
