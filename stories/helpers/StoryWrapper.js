@@ -24,6 +24,7 @@ import type { Theme } from '../../app/themes';
 import environment from '../../app/environment';
 import { getVarsForTheme } from '../../app/stores/toplevel/ProfileStore';
 import type { HwWalletMetaRow, } from '../../app/api/ada/lib/storage/database/walletTypes/core/tables';
+import { assuranceModes } from '../../app/config/transactionAssuranceConfig';
 
 import { withKnobs, select, boolean } from '@storybook/addon-knobs';
 import { addDecorator } from '@storybook/react';
@@ -333,6 +334,11 @@ function genMockCache(dummyWallet: PublicDeriver<>) {
         getBalanceRequest,
       },
     }),
+    getPublicDeriverSettingsCache: (publicDeriver) => ({
+      publicDeriver,
+      assuranceMode: assuranceModes.NORMAL,
+      publicDeriverName: '',
+    }),
     getSigningKeyCache: (publicDeriver) => ({
       publicDeriver,
       signingKeyUpdateDate: null,
@@ -416,6 +422,8 @@ export type CacheValue = {|
     typeof DelegationStore.prototype.getDelegationRequests,
   getSigningKeyCache:
     typeof WalletStore.prototype.getSigningKeyCache,
+  getPublicDeriverSettingsCache:
+    typeof WalletSettingsStore.prototype.getPublicDeriverSettingsCache,
 |};
 
 export function walletLookup(wallets: Array<CacheValue>): {|
@@ -430,6 +438,8 @@ export function walletLookup(wallets: Array<CacheValue>): {|
     typeof DelegationStore.prototype.getDelegationRequests,
   getSigningKeyCache:
     typeof WalletStore.prototype.getSigningKeyCache,
+  getPublicDeriverSettingsCache:
+    typeof WalletSettingsStore.prototype.getPublicDeriverSettingsCache,
 |} {
   if (wallets.length === 0) {
     return ({
@@ -439,6 +449,7 @@ export function walletLookup(wallets: Array<CacheValue>): {|
       getDelegation: (_publicDeriver) => (null: any),
       getPublicKeyCache: (_publicDeriver) => (null: any),
       getSigningKeyCache: (_publicDeriver) => (null: any),
+      getPublicDeriverSettingsCache: (_publicDeriver) => (null: any),
     });
   }
 
@@ -494,6 +505,14 @@ export function walletLookup(wallets: Array<CacheValue>): {|
         }
       }
       throw new Error(`Missing cache entry for getSigningKeyCache`);
+    },
+    getPublicDeriverSettingsCache: (publicDeriver) => {
+      for (const wallet of wallets) {
+        if (wallet.publicDeriver === publicDeriver) {
+          return wallet.getPublicDeriverSettingsCache(publicDeriver);
+        }
+      }
+      throw new Error(`Missing cache entry for getPublicDeriverSettingsCache`);
     },
   });
 }

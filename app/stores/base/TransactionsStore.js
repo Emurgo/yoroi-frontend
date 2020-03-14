@@ -41,16 +41,16 @@ export type TxRequests = {|
   |},
 |};
 
-export default class TransactionsStore extends Store {
+/** How many transactions to display */
+export const INITIAL_SEARCH_LIMIT: number = 5;
 
-  /** How many transactions to display */
-  INITIAL_SEARCH_LIMIT: number = 5;
+/** Skip first n transactions from api */
+export const SEARCH_SKIP: number = 0;
+
+export default class TransactionsStore extends Store {
 
   /** How many additional transactions to display when user wants to show more */
   SEARCH_LIMIT_INCREASE: number = 5;
-
-  /** Skip first n transactions from api */
-  SEARCH_SKIP: number = 0;
 
   /** Track transactions for a set of wallets */
   @observable transactionsRequests: Array<TxRequests> = [];
@@ -203,10 +203,10 @@ export default class TransactionsStore extends Store {
 
     const limit = this.searchOptions
       ? this.searchOptions.limit
-      : this.INITIAL_SEARCH_LIMIT;
+      : INITIAL_SEARCH_LIMIT;
     const skip = this.searchOptions
       ? this.searchOptions.skip
-      : this.SEARCH_SKIP;
+      : SEARCH_SKIP;
 
     const withLevels = asHasLevels<
       ConceptualWallet,
@@ -251,8 +251,8 @@ export default class TransactionsStore extends Store {
     this._searchOptionsForWallets.push({
       publicDeriver: request.publicDeriver,
       options: {
-        limit: this.INITIAL_SEARCH_LIMIT,
-        skip: this.SEARCH_SKIP
+        limit: INITIAL_SEARCH_LIMIT,
+        skip: SEARCH_SKIP
       }
     });
   }

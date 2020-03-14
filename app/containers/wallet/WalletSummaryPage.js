@@ -183,7 +183,10 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
               totalAvailable: adaStores.transactions.totalAvailable,
               recent: adaStores.transactions.recent,
               searchOptions: adaStores.transactions.searchOptions,
-              recentTransactionsRequest: adaStores.transactions.recentTransactionsRequest,
+              recentTransactionsRequest: {
+                isExecuting: adaStores.transactions.recentTransactionsRequest.isExecuting,
+                wasExecuted: adaStores.transactions.recentTransactionsRequest.wasExecuted,
+              },
               unconfirmedAmount: adaStores.transactions.unconfirmedAmount,
               isExporting: adaStores.transactions.isExporting,
               exportError: adaStores.transactions.exportError,
