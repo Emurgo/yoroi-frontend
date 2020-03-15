@@ -25,31 +25,27 @@ export const Wallets = () => {
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();
 
-    const pending: CachedRequest<GetBalanceFunc> = new CachedRequest(_request => Promise.resolve(
+    const balance: CachedRequest<GetBalanceFunc> = new CachedRequest(_request => Promise.resolve(
       new BigNumber(3),
     ));
-    const executed: CachedRequest<GetBalanceFunc> = new CachedRequest(_request => Promise.resolve(
-      new BigNumber(4),
-    ));
-    executed.execute((null: any));
-    executed.execute((null: any));
-    const balanceCases = {
+    const calculationCases = {
       Pending: 0,
       Calculated: 1,
     };
     const getBalanceCase = () => select(
       'balanceCases',
-      balanceCases,
-      balanceCases.Calculated
+      calculationCases,
+      calculationCases.Calculated
     );
+    if (getBalanceCase() === calculationCases.Calculated) {
+      balance.execute((null: any));
+    }
     const oldResults = wallet.getTransactions(wallet.publicDeriver);
     wallet.getTransactions = (_req) => ({
       ...oldResults,
       requests: {
         ...oldResults.requests,
-        getBalanceRequest: getBalanceCase() === balanceCases.Pending
-          ? pending
-          : executed,
+        getBalanceRequest: balance,
       },
     });
     return wallet;

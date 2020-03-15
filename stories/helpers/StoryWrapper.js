@@ -15,6 +15,15 @@ import id from 'react-intl/locale-data/id';
 import es from 'react-intl/locale-data/es';
 import it from 'react-intl/locale-data/it';
 import '../../app/themes/index.global.scss';
+import {
+  genToAbsoluteSlotNumber,
+  genToRelativeSlotNumber,
+  genTimeToSlot,
+  genCurrentEpochLength,
+  genCurrentSlotLength,
+  genTimeSinceGenesis,
+  genToRealTime,
+} from '../../app/api/ada/lib/storage/bridge/timeUtils';
 import { yoroiPolymorphTheme } from '../../app/themes/PolymorphThemes';
 import { themeOverrides } from '../../app/themes/overrides';
 import { translations, LANGUAGES } from '../../app/i18n/translations';
@@ -53,6 +62,7 @@ import WalletSettingsStore from '../../app/stores/base/WalletSettingsStore';
 import TransactionsStore from '../../app/stores/base/TransactionsStore';
 import DelegationStore from '../../app/stores/ada/DelegationStore';
 import WalletStore from '../../app/stores/toplevel/WalletStore';
+import TimeStore from '../../app/stores/ada/TimeStore';
 import CachedRequest from '../../app/stores/lib/LocalizedCachedRequest';
 import LocalizableError from '../../app/i18n/LocalizableError';
 import globalMessages from '../../app/i18n/global-messages';
@@ -343,6 +353,24 @@ function genMockCache(dummyWallet: PublicDeriver<>) {
       publicDeriver,
       signingKeyUpdateDate: null,
     }),
+    getTimeCalcRequests: (publicDeriver) => ({
+      publicDeriver,
+      requests: {
+        toAbsoluteSlot: new CachedRequest(genToAbsoluteSlotNumber),
+        toRelativeSlotNumber: new CachedRequest(genToRelativeSlotNumber),
+        timeToSlot: new CachedRequest(genTimeToSlot),
+        currentEpochLength: new CachedRequest(genCurrentEpochLength),
+        currentSlotLength: new CachedRequest(genCurrentSlotLength),
+        timeSinceGenesis: new CachedRequest(genTimeSinceGenesis),
+        toRealTime: new CachedRequest(genToRealTime),
+      },
+    }),
+    getCurrentTimeRequests: (publicDeriver) => ({
+      publicDeriver,
+      currentEpoch: 0,
+      currentSlot: 0,
+      msIntoSlot: 0,
+    }),
   };
 }
 
@@ -424,6 +452,10 @@ export type CacheValue = {|
     typeof WalletStore.prototype.getSigningKeyCache,
   getPublicDeriverSettingsCache:
     typeof WalletSettingsStore.prototype.getPublicDeriverSettingsCache,
+  getTimeCalcRequests:
+    typeof TimeStore.prototype.getTimeCalcRequests,
+  getCurrentTimeRequests:
+    typeof TimeStore.prototype.getCurrentTimeRequests,
 |};
 
 export function walletLookup(wallets: Array<CacheValue>): {|
@@ -440,6 +472,10 @@ export function walletLookup(wallets: Array<CacheValue>): {|
     typeof WalletStore.prototype.getSigningKeyCache,
   getPublicDeriverSettingsCache:
     typeof WalletSettingsStore.prototype.getPublicDeriverSettingsCache,
+  getTimeCalcRequests:
+    typeof TimeStore.prototype.getTimeCalcRequests,
+  getCurrentTimeRequests:
+    typeof TimeStore.prototype.getCurrentTimeRequests,
 |} {
   if (wallets.length === 0) {
     return ({
@@ -450,6 +486,8 @@ export function walletLookup(wallets: Array<CacheValue>): {|
       getPublicKeyCache: (_publicDeriver) => (null: any),
       getSigningKeyCache: (_publicDeriver) => (null: any),
       getPublicDeriverSettingsCache: (_publicDeriver) => (null: any),
+      getTimeCalcRequests: (_publicDeriver) => (null: any),
+      getCurrentTimeRequests: (_publicDeriver) => (null: any),
     });
   }
 
@@ -457,12 +495,6 @@ export function walletLookup(wallets: Array<CacheValue>): {|
   for (const wallet of wallets) {
     asOption[wallet.conceptualWalletCache.conceptualWalletName] = wallet.publicDeriver;
   }
-  // const selectedWallet = () => select(
-  //   'selectedWallet',
-  //   asOption,
-  //   // TODO: support no wallet selected
-  //   asOption[wallets[0].conceptualWalletCache.conceptualWalletName],
-  // );
 
   return ({
     publicDerivers: wallets.map(wallet => wallet.publicDeriver),
@@ -513,6 +545,22 @@ export function walletLookup(wallets: Array<CacheValue>): {|
         }
       }
       throw new Error(`Missing cache entry for getPublicDeriverSettingsCache`);
+    },
+    getTimeCalcRequests: (publicDeriver) => {
+      for (const wallet of wallets) {
+        if (wallet.publicDeriver === publicDeriver) {
+          return wallet.getTimeCalcRequests(publicDeriver);
+        }
+      }
+      throw new Error(`Missing cache entry for getTimeCalcRequests`);
+    },
+    getCurrentTimeRequests: (publicDeriver) => {
+      for (const wallet of wallets) {
+        if (wallet.publicDeriver === publicDeriver) {
+          return wallet.getCurrentTimeRequests(publicDeriver);
+        }
+      }
+      throw new Error(`Missing cache entry for getCurrentTimeRequests`);
     },
   });
 }

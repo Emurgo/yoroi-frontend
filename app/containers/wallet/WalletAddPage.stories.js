@@ -386,6 +386,7 @@ const restoreWalletProps: {|
       restoreRequest: request.restoreRequest || {
         isExecuting: false,
         error: undefined,
+        reset: action('reset'),
       },
     },
     substores: {
@@ -536,6 +537,7 @@ export const RestoreVerify = () => {
             restoreRequest: {
               isExecuting: !environment.isShelley() && boolean('isExecuting', false),
               error: undefined,
+              reset: action('reset'),
             },
             recoveryResult: {
               phrase: recoveryPhrase,
@@ -560,6 +562,7 @@ export const RestoreLegacyExplanation = () => {
             restoreRequest: {
               isExecuting: boolean('isExecuting', false),
               error: undefined,
+              reset: action('reset'),
             },
           })
         },

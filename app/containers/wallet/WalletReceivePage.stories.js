@@ -98,7 +98,7 @@ const genBaseProps: {|
   wallet: CacheValue,
   dialog?: any,
   tab: 'mangled' | 'external' | 'internal',
-  getParams?: string => any,
+  getParam?: (number | string) => any,
   transactionBuilderStore?: *,
   addresses: Array<StandardAddress>,
   verifyError?: *,
@@ -138,7 +138,7 @@ const genBaseProps: {|
       },
       uiDialogs: {
         isOpen: (dialog) => request.dialog === dialog,
-        getParam: request.getParams || (() => (undefined: any)),
+        getParam: request.getParam || (() => (undefined: any)),
       },
       profile: {
         isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
@@ -154,7 +154,7 @@ const genBaseProps: {|
               canUnmangle: request.tab === 'mangled' && request.dialog == null
                 ? getMangledValue()
                 : [],
-              cannotUnmanble: [],
+              cannotUnmangle: [],
             }),
             isActiveTab: (tab) => tab === request.tab,
             createAddressRequest: {
@@ -478,7 +478,7 @@ export const UriGenerateDialog = () => {
         generated={genBaseProps({
           wallet,
           dialog: URIGenerateDialog,
-          getParams: (param) => {
+          getParam: (param) => {
             if (param === 'address') {
               return genAddresses()[0].address;
             }
@@ -510,7 +510,7 @@ export const UriDisplayDialog = () => {
         generated={genBaseProps({
           wallet,
           dialog: URIDisplayDialog,
-          getParams: (param) => {
+          getParam: (param) => {
             if (param === 'address') {
               return genAddresses()[0].address;
             }

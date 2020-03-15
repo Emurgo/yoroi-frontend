@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { computed } from 'mobx';
+import { computed, observable, runInAction } from 'mobx';
 import config from '../../config';
 import WalletReceive from '../../components/wallet/WalletReceive';
 import StandardHeader from '../../components/wallet/receive/StandardHeader';
@@ -33,16 +33,10 @@ type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
 |};
 
-type State = {|
-  notificationElementId: string,
-|};
-
 @observer
-export default class WalletReceivePage extends Component<Props, State> {
+export default class WalletReceivePage extends Component<Props> {
 
-  state = {
-    notificationElementId: ''
-  };
+  @observable notificationElementId: string = '';
 
   componentWillUnmount() {
     this.closeNotification();
@@ -112,7 +106,9 @@ export default class WalletReceivePage extends Component<Props, State> {
 
     const onCopyAddressTooltip = (address, elementId) => {
       if (!uiNotifications.isOpen(elementId)) {
-        this.setState({ notificationElementId: elementId });
+        runInAction(() => {
+          this.notificationElementId = elementId;
+        });
         actions.notifications.open.trigger({
           id: elementId,
           duration: tooltipNotification.duration,
@@ -122,7 +118,7 @@ export default class WalletReceivePage extends Component<Props, State> {
     };
 
     const notification = uiNotifications.getTooltipActiveNotification(
-      this.state.notificationElementId
+      this.notificationElementId
     );
 
     const { canUnmangle } = this.generated.stores.substores.ada.addresses.getUnmangleAmounts();
@@ -199,7 +195,9 @@ export default class WalletReceivePage extends Component<Props, State> {
             )}
             onCopyAddressTooltip={(elementId) => {
               if (!uiNotifications.isOpen(elementId)) {
-                this.setState({ notificationElementId: elementId });
+                runInAction(() => {
+                  this.notificationElementId = elementId;
+                });
                 actions.notifications.open.trigger({
                   id: elementId,
                   duration: tooltipNotification.duration,
@@ -208,7 +206,7 @@ export default class WalletReceivePage extends Component<Props, State> {
               }
             }}
             notification={uiNotifications.getTooltipActiveNotification(
-              this.state.notificationElementId
+              this.notificationElementId
             )}
           />
         ) : null}

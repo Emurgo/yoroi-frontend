@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { computed } from 'mobx';
+import { computed, observable, runInAction } from 'mobx';
 import { observer } from 'mobx-react';
 import globalMessages from '../../i18n/global-messages';
 import WalletRestoreVerifyDialog from '../../components/wallet/WalletRestoreVerifyDialog';
@@ -25,11 +25,10 @@ type Props = {|
 type WalletRestoreDialogContainerState = {|
   byronPlate: void | PlateResponse,
   shelleyPlate: void | PlateResponse,
-  notificationElementId: string,
 |}
 
 @observer
-export default class YoroiPlatePage extends Component<Props, WalletRestoreDialogContainerState> {
+export default class YoroiPlatePage extends Component<Props> {
 
   async componentDidMount() {
     const { yoroiTransfer } = this.generated.stores.substores.ada;
@@ -43,14 +42,17 @@ export default class YoroiPlatePage extends Component<Props, WalletRestoreDialog
         ? RestoreMode.PAPER
         : RestoreMode.PAPER
     );
-    this.setState({
-      byronPlate,
-      shelleyPlate,
-      notificationElementId: '',
+    runInAction(() => {
+      this.plates = {
+        byronPlate,
+        shelleyPlate,
+      };
     });
   }
 
-  state: WalletRestoreDialogContainerState;
+  @observable notificationElementId: string = '';
+
+  @observable plates: WalletRestoreDialogContainerState;
 
   render() {
     if (this.state == null) return null;
@@ -69,7 +71,9 @@ export default class YoroiPlatePage extends Component<Props, WalletRestoreDialog
         selectedExplorer={this.generated.stores.profile.selectedExplorer}
         onCopyAddressTooltip={(address, elementId) => {
           if (!uiNotifications.isOpen(elementId)) {
-            this.setState({ notificationElementId: elementId });
+            runInAction(() => {
+              this.notificationElementId = elementId;
+            });
             actions.notifications.open.trigger({
               id: elementId,
               duration: tooltipNotification.duration,
@@ -78,7 +82,7 @@ export default class YoroiPlatePage extends Component<Props, WalletRestoreDialog
           }
         }}
         notification={uiNotifications.getTooltipActiveNotification(
-          this.state.notificationElementId
+          this.notificationElementId
         )}
         onNext={this.props.onNext}
         onCancel={this.props.onCancel}

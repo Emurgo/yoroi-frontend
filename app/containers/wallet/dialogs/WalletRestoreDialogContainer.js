@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { computed } from 'mobx';
+import { computed, observable, runInAction } from 'mobx';
 import { observer } from 'mobx-react';
 import config from '../../../config';
 import validWords from 'bip39/src/wordlists/english.json';
@@ -44,13 +44,8 @@ type Props = {|
   +onBack: void => void,
 |};
 
-type WalletRestoreDialogContainerState = {|
-  notificationElementId: string,
-|}
-
 @observer
-export default class WalletRestoreDialogContainer
-  extends Component<Props, WalletRestoreDialogContainerState> {
+export default class WalletRestoreDialogContainer extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired
@@ -60,17 +55,14 @@ export default class WalletRestoreDialogContainer
     introMessage: undefined
   };
 
-  state = {
-    notificationElementId: '',
-  };
+  @observable notificationElementId: string = '';
 
-  constructor(props: Props) {
-    super(props);
-    const { walletRestore } = props.generated
-      ? props.generated.actions[environment.API]
-      : props.actions[environment.API];
+  componentDidMount() {
+    const { walletRestore } = this.props.generated
+      ? this.props.generated.actions[environment.API]
+      : this.props.actions[environment.API];
     walletRestore.reset.trigger();
-    walletRestore.setMode.trigger(props.mode);
+    walletRestore.setMode.trigger(this.props.mode);
   }
 
   componentWillUnmount() {
@@ -78,7 +70,7 @@ export default class WalletRestoreDialogContainer
     walletRestore.reset.trigger();
   }
 
-  onCancel = () => {
+  onCancel: void => void = () => {
     this.props.onClose();
     // Restore request should be reset only in case restore is finished/errored
     const { restoreRequest } = this._getWalletsStore();
@@ -153,7 +145,9 @@ export default class WalletRestoreDialogContainer
             onCancel={walletRestoreActions.back.trigger}
             onCopyAddressTooltip={(address, elementId) => {
               if (!uiNotifications.isOpen(elementId)) {
-                this.setState({ notificationElementId: elementId });
+                runInAction(() => {
+                  this.notificationElementId = elementId;
+                });
                 actions.notifications.open.trigger({
                   id: elementId,
                   duration: tooltipNotification.duration,
@@ -162,7 +156,7 @@ export default class WalletRestoreDialogContainer
               }
             }}
             notification={uiNotifications.getTooltipActiveNotification(
-              this.state.notificationElementId
+              this.notificationElementId
             )}
             isSubmitting={isSubmitting}
             error={error}
@@ -306,6 +300,7 @@ export default class WalletRestoreDialogContainer
           restoreRequest: {
             isExecuting: stores.wallets.restoreRequest.isExecuting,
             error: stores.wallets.restoreRequest.error,
+            reset: stores.wallets.restoreRequest.reset,
           },
         },
         substores: {

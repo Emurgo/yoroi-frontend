@@ -23,14 +23,13 @@ export default class EpochProgressContainer extends Component<Props> {
 
   async componentDidMount() {
     const timeStore = this.generated.stores.substores.ada.time;
-    const publicDeriver = this.generated.stores.wallets.selected;
-    if (publicDeriver == null) {
+    if (this.props.publicDeriver == null) {
       throw new Error(`${nameof(EpochProgressContainer)} no public deriver. Should never happen`);
     }
-    const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
+    const timeCalcRequests = timeStore.getTimeCalcRequests(this.props.publicDeriver);
     // calculate these so the cached result is available in the render function
-    await timeCalcRequests.currentEpochLength.execute().promise;
-    await timeCalcRequests.currentSlotLength.execute().promise;
+    await timeCalcRequests.requests.currentEpochLength.execute().promise;
+    await timeCalcRequests.requests.currentSlotLength.execute().promise;
   }
 
   _leftPadDate: number => string = (num) => {
@@ -43,10 +42,10 @@ export default class EpochProgressContainer extends Component<Props> {
     const timeCalcRequests = timeStore.getTimeCalcRequests(this.props.publicDeriver);
     const currTimeRequests = timeStore.getCurrentTimeRequests(this.props.publicDeriver);
 
-    const getEpochLength = timeCalcRequests.currentEpochLength.result;
+    const getEpochLength = timeCalcRequests.requests.currentEpochLength.result;
     if (getEpochLength == null) return (<EpochProgress loading />);
 
-    const getSlotLength = timeCalcRequests.currentSlotLength.result;
+    const getSlotLength = timeCalcRequests.requests.currentSlotLength.result;
     if (getSlotLength == null) return (<EpochProgress loading />);
 
     const epochLength = getEpochLength();
@@ -79,9 +78,6 @@ export default class EpochProgressContainer extends Component<Props> {
     const { stores, } = this.props;
     return Object.freeze({
       stores: {
-        wallets: {
-          selected: stores.wallets.selected,
-        },
         substores: {
           ada: {
             time: {
