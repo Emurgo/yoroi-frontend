@@ -367,9 +367,9 @@ function genMockCache(dummyWallet: PublicDeriver<>) {
     }),
     getCurrentTimeRequests: (publicDeriver) => ({
       publicDeriver,
-      currentEpoch: 0,
-      currentSlot: 0,
-      msIntoSlot: 0,
+      currentEpoch: 100,
+      currentSlot: 5000,
+      msIntoSlot: 10,
     }),
   };
 }
@@ -638,4 +638,37 @@ export const genTentativeTx = () => {
       fee,
     };
   }
+};
+
+export const genUndelegateTx = () => {
+  const inputAmount = '1000001';
+  const ouputAmount = '400';
+  const fee = new BigNumber(inputAmount).minus(new BigNumber(ouputAmount));
+
+  if (!environment.isShelley()) {
+    throw new Error('Delegation not supported for Byron');
+  }
+  const remoteUnspentUtxo = {
+    amount: inputAmount,
+    receiver: 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
+    tx_hash: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe',
+    tx_index: 0,
+    utxo_id: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0',
+  };
+  const input = utxoToTxInput(remoteUnspentUtxo);
+  const builder = RustModule.WalletV3.InputOutputBuilder.empty();
+  builder.add_input(input);
+  const IOs = builder.build();
+  return {
+    senderUtxos: [{
+      ...remoteUnspentUtxo,
+      addressing: {
+        path: [],
+        startLevel: 0,
+      },
+    }],
+    IOs,
+    changeAddr: [],
+    certificate: undefined, // TODO
+  };
 };

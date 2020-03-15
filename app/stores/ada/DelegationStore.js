@@ -39,7 +39,7 @@ import {
 } from '../../api/ada/lib/storage/bridge/timeUtils';
 
 
-type StakingKeyState = {|
+export type StakingKeyState = {|
   state: AccountStateSuccess,
   /**
     * Pool selected in the UI
