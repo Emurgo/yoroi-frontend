@@ -9,7 +9,7 @@ import {
   stringifyError
 } from '../utils/logging';
 
-const messages = defineMessages({
+export const ledgerErrors = defineMessages({
   cancelOnDeviceError101: {
     id: 'wallet.hw.ledger.common.error.101',
     defaultMessage: '!!!Operation cancelled on Ledger device.',
@@ -40,7 +40,7 @@ export function convertToLocalizableError(error: Error): LocalizableError {
     // It means some API Error has been thrown
     localizableError = error;
   } else if (error && error.message) {
-    // Ledger device related error happend, convert then to LocalizableError
+    // Ledger device related error happened, convert then to LocalizableError
     switch (error.message) {
       case 'TransportError: Failed to sign with Ledger device: U2F TIMEOUT':
         // Showing - Failed to connect. Please check your ledger device and retry.
@@ -48,25 +48,25 @@ export function convertToLocalizableError(error: Error): LocalizableError {
         break;
       case 'TransportStatusError: Ledger device: Action rejected by user':
         // Showing - Operation cancelled on Ledger device.
-        localizableError = new LocalizableError(messages.cancelOnDeviceError101);
+        localizableError = new LocalizableError(ledgerErrors.cancelOnDeviceError101);
         break;
       case 'NotAllowedError: The operation either timed out or was not allowed. See: https://w3c.github.io/webauthn/#sec-assertion-privacy.':
       case 'AbortError: The operation was aborted. ':
       case 'Forcefully cancelled by user':
         // Showing - Operation cancelled by user.
-        localizableError = new LocalizableError(messages.cancelOnLedgerConnectError102);
+        localizableError = new LocalizableError(ledgerErrors.cancelOnLedgerConnectError102);
         break;
       case 'TransportStatusError: Ledger device: Device is locked':
         // Showing - Ledger device is locked, please unlock it and retry.
-        localizableError = new LocalizableError(messages.deviceLockedError103);
+        localizableError = new LocalizableError(ledgerErrors.deviceLockedError103);
         break;
       case 'NotAllowedError: The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.':
         // Showing - Ledger device timeout, please retry.
-        localizableError = new LocalizableError(messages.deviceLockedError104);
+        localizableError = new LocalizableError(ledgerErrors.deviceLockedError104);
         break;
       case "LedgerConnect Error: Timeout happened, Couldn't connect to connect handler":
         // Showing - Network error. Please check your internet connection.
-        localizableError = new LocalizableError(messages.networkError105);
+        localizableError = new LocalizableError(ledgerErrors.networkError105);
         break;
       default:
         /** we are not able to figure out why Error is thrown

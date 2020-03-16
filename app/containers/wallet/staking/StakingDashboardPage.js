@@ -45,39 +45,31 @@ import type {
 } from '../../../api/ada/lib/storage/bridge/timeUtils';
 
 import globalMessages from '../../../i18n/global-messages';
-import { computed, runInAction } from 'mobx';
+import { computed, observable, runInAction } from 'mobx';
 
 export type GeneratedData = typeof StakingDashboardPage.prototype.generated;
 
-type Props = {|
-  ...InjectedOrGenerated<GeneratedData>,
-|};
-
-type State = {|
-  +notificationElementId: string,
-|};
+type Props = InjectedOrGenerated<GeneratedData>;
 
 @observer
-export default class StakingDashboardPage extends Component<Props, State> {
+export default class StakingDashboardPage extends Component<Props> {
   static contextTypes = {
     intl: intlShape.isRequired,
   };
 
-  async componentDidMount() {
-    this.setState({
-      notificationElementId: '',
-    });
+  @observable notificationElementId: string = '';
 
+  async componentDidMount() {
     const timeStore = this.generated.stores.substores.ada.time;
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
     }
     const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
-    await timeCalcRequests.toAbsoluteSlot.execute().promise;
-    await timeCalcRequests.toRealTime.execute().promise;
-    await timeCalcRequests.currentEpochLength.execute().promise;
-    await timeCalcRequests.currentSlotLength.execute().promise;
+    await timeCalcRequests.requests.toAbsoluteSlot.execute().promise;
+    await timeCalcRequests.requests.toRealTime.execute().promise;
+    await timeCalcRequests.requests.currentEpochLength.execute().promise;
+    await timeCalcRequests.requests.currentSlotLength.execute().promise;
   }
 
   componentWillUnmount() {
@@ -162,10 +154,10 @@ export default class StakingDashboardPage extends Component<Props, State> {
   getEpochLengthInDays: PublicDeriver<> => ?number = (publicDeriver) => {
     const timeStore = this.generated.stores.substores.ada.time;
     const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
-    const getEpochLength = timeCalcRequests.currentEpochLength.result;
+    const getEpochLength = timeCalcRequests.requests.currentEpochLength.result;
     if (getEpochLength == null) return null;
 
-    const getSlotLength = timeCalcRequests.currentSlotLength.result;
+    const getSlotLength = timeCalcRequests.requests.currentSlotLength.result;
     if (getSlotLength == null) return null;
 
     const epochLengthInSeconds = getEpochLength() * getSlotLength();
@@ -239,9 +231,9 @@ export default class StakingDashboardPage extends Component<Props, State> {
     const timeStore = this.generated.stores.substores.ada.time;
     const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
     const currTimeRequests = timeStore.getCurrentTimeRequests(publicDeriver);
-    const toAbsoluteSlot = timeCalcRequests.toAbsoluteSlot.result;
+    const toAbsoluteSlot = timeCalcRequests.requests.toAbsoluteSlot.result;
     if (toAbsoluteSlot == null) return undefined;
-    const toRealTime = timeCalcRequests.toRealTime.result;
+    const toRealTime = timeCalcRequests.requests.toRealTime.result;
     if (toRealTime == null) return undefined;
 
     const delegationStore = this.generated.stores.substores[environment.API].delegation;
@@ -469,7 +461,9 @@ export default class StakingDashboardPage extends Component<Props, State> {
             classicTheme={this.generated.stores.profile.isClassicTheme}
             onCopyAddressTooltip={(address, elementId) => {
               if (!uiNotifications.isOpen(elementId)) {
-                this.setState({ notificationElementId: elementId });
+                runInAction(() => {
+                  this.notificationElementId = elementId;
+                });
                 this.generated.actions.notifications.open.trigger({
                   id: elementId,
                   duration: tooltipNotification.duration,
@@ -477,10 +471,10 @@ export default class StakingDashboardPage extends Component<Props, State> {
                 });
               }
             }}
-            notification={this.state == null
+            notification={this.notificationElementId == null
               ? null
               : uiNotifications.getTooltipActiveNotification(
-                this.state.notificationElementId
+                this.notificationElementId
               )
             }
             undelegate={

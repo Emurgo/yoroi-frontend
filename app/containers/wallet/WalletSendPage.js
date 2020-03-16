@@ -108,7 +108,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     };
 
     return (
-      <div>
+      <>
         <WalletSendForm
           currencyUnit={intl.formatMessage(globalMessages.unitAda)}
           currencyMaxIntegerDigits={MAX_INTEGER_PLACES_IN_ADA}
@@ -142,7 +142,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           resetUriParams={this.generated.stores.loading.resetUriParams}
         />
         {this.renderDialog()}
-      </div>
+      </>
     );
   }
 

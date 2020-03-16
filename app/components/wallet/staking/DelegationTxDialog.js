@@ -140,6 +140,7 @@ export default class DelegationTxDialog extends Component<Props> {
     const actions = [
       {
         label: intl.formatMessage(globalMessages.backButtonLabel),
+        disabled: this.props.isSubmitting,
         onClick: this.props.isSubmitting
           ? () => {} // noop
           : this.props.onCancel
@@ -149,6 +150,7 @@ export default class DelegationTxDialog extends Component<Props> {
         onClick: this.submit.bind(this),
         primary: true,
         className: confirmButtonClasses,
+        isSubmitting: this.props.isSubmitting,
         disabled: !walletPasswordField.isValid || this.props.isSubmitting,
       },
     ];

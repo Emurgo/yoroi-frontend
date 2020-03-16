@@ -382,8 +382,7 @@ export default class WalletStore extends Store {
   @computed get _canRedirectToWallet(): boolean {
     const currentRoute = this.stores.app.currentRoute;
     const isRootRoute = matchRoute(ROUTES.WALLETS.ROOT, currentRoute) !== false;
-    const isNoWalletsRoute = matchRoute(ROUTES.NO_WALLETS, currentRoute) !== false;
-    return isRootRoute || isNoWalletsRoute;
+    return isRootRoute;
   }
 
   _pollRefresh: void => Promise<void> = async () => {

@@ -15,6 +15,15 @@ import id from 'react-intl/locale-data/id';
 import es from 'react-intl/locale-data/es';
 import it from 'react-intl/locale-data/it';
 import '../../app/themes/index.global.scss';
+import {
+  genToAbsoluteSlotNumber,
+  genToRelativeSlotNumber,
+  genTimeToSlot,
+  genCurrentEpochLength,
+  genCurrentSlotLength,
+  genTimeSinceGenesis,
+  genToRealTime,
+} from '../../app/api/ada/lib/storage/bridge/timeUtils';
 import { yoroiPolymorphTheme } from '../../app/themes/PolymorphThemes';
 import { themeOverrides } from '../../app/themes/overrides';
 import { translations, LANGUAGES } from '../../app/i18n/translations';
@@ -23,6 +32,8 @@ import { THEMES, changeToplevelTheme } from '../../app/themes';
 import type { Theme } from '../../app/themes';
 import environment from '../../app/environment';
 import { getVarsForTheme } from '../../app/stores/toplevel/ProfileStore';
+import type { HwWalletMetaRow, } from '../../app/api/ada/lib/storage/database/walletTypes/core/tables';
+import { assuranceModes } from '../../app/config/transactionAssuranceConfig';
 
 import { withKnobs, select, boolean } from '@storybook/addon-knobs';
 import { addDecorator } from '@storybook/react';
@@ -30,14 +41,35 @@ import { addDecorator } from '@storybook/react';
 import { PublicDeriver } from '../../app/api/ada/lib/storage/models/PublicDeriver';
 import { Cip1852Wallet } from '../../app/api/ada/lib/storage/models/Cip1852Wallet/wrapper';
 import { WalletTypeOption } from '../../app/api/ada/lib/storage/models/ConceptualWallet/interfaces';
-import { HasSign, HasLevels, GetSigningKey, GetPublicKey } from '../../app/api/ada/lib/storage/models/PublicDeriver/traits';
+import {
+  HasPrivateDeriver,
+  HasSign,
+  HasLevels,
+  GetAllUtxos,
+  GetSigningKey,
+  GetPublicKey,
+  DisplayCutoff,
+  Cip1852PickInternal,
+  GetAllAccounting,
+  GetStakingKey,
+  HasUtxoChains,
+} from '../../app/api/ada/lib/storage/models/PublicDeriver/traits';
+import {
+  Bip44DerivationLevels,
+} from '../../app/api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import type { ConceptualWalletSettingsCache } from '../../app/stores/base/WalletSettingsStore';
 import WalletSettingsStore from '../../app/stores/base/WalletSettingsStore';
 import TransactionsStore from '../../app/stores/base/TransactionsStore';
 import DelegationStore from '../../app/stores/ada/DelegationStore';
 import WalletStore from '../../app/stores/toplevel/WalletStore';
+import TimeStore from '../../app/stores/ada/TimeStore';
 import CachedRequest from '../../app/stores/lib/LocalizedCachedRequest';
+import LocalizableError from '../../app/i18n/LocalizableError';
+import globalMessages from '../../app/i18n/global-messages';
+import { ledgerErrors } from '../../app/domain/LedgerLocalizedError';
 import BigNumber from 'bignumber.js';
+import { utxoToTxInput } from '../../app/api/ada/transactions/shelley/inputSelection';
+import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 
 /**
  * This whole file is meant to mirror code in App.js
@@ -118,7 +150,6 @@ export default class StoryWrapper extends Component<Props> {
 export function getMnemonicCases(length: number): {|
   Empty: string,
   Partial: string,
-  Incorrect: string,
   Invalid: string,
   Correct: string,
 |} {
@@ -126,13 +157,42 @@ export function getMnemonicCases(length: number): {|
     return {
       Empty: '',
       Partial: 'lamp',
-      Incorrect: 'clown worth average equal giggle obtain lamp minimum brother replace define glimpse gaze tone mystery people crack wreck grow blanket current',
       Invalid: 'lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp',
       Correct: 'slab spend fabric danger truly between delay like before sword prefer camera reject offer minor caught pitch shoe jewel wine lawn',
     };
   }
+  if (length === 15) {
+    return {
+      Empty: '',
+      Partial: 'lamp',
+      Invalid: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon',
+      Correct: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon share',
+    };
+  }
   throw new Error(`${nameof(getMnemonicCases)} Unexpected length ${length}`);
 }
+export function getValidationMnemonicCases(length: number): {|
+  Empty: string,
+  Partial: string,
+  Incorrect: string,
+  Invalid: string,
+  Correct: string,
+|} {
+  if (length === 21) {
+    return {
+      ...getMnemonicCases(21),
+      Incorrect: 'clown worth average equal giggle obtain lamp minimum brother replace define glimpse gaze tone mystery people crack wreck grow blanket current',
+    };
+  }
+  if (length === 15) {
+    return {
+      ...getMnemonicCases(15),
+      Incorrect: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon address',
+    };
+  }
+  throw new Error(`${nameof(getMnemonicCases)} Unexpected length ${length}`);
+}
+
 
 export function getPasswordValidationCases(correct: string): {|
   Empty: string,
@@ -141,6 +201,16 @@ export function getPasswordValidationCases(correct: string): {|
   return {
     Empty: '',
     Correct: correct,
+  };
+}
+
+export function getWalletNameCases(): {|
+  None: string,
+  Valid: string,
+  |} {
+  return {
+    None: '',
+    Valid: 'Test wallet',
   };
 }
 
@@ -156,18 +226,62 @@ export function getPasswordCreationCases(long?: string): {|
   };
 }
 
+export const trezorErrorCases = Object.freeze({
+  None: undefined,
+  IFrameTimeout: new LocalizableError(globalMessages.trezorError101),
+  PermissionError: new LocalizableError(globalMessages.hwError101),
+  Cancelled: new LocalizableError(globalMessages.trezorError103),
+});
+
+export const ledgerErrorCases = Object.freeze({
+  None: undefined,
+  U2fTimeout: new LocalizableError(globalMessages.ledgerError101),
+  OtherTimeout: new LocalizableError(ledgerErrors.networkError105),
+  DeviceRejected: new LocalizableError(ledgerErrors.cancelOnDeviceError101),
+  UserRejected: new LocalizableError(ledgerErrors.cancelOnLedgerConnectError102),
+  Locked: new LocalizableError(ledgerErrors.deviceLockedError103),
+  NotAllowed: new LocalizableError(ledgerErrors.deviceLockedError104),
+});
+
+export const mockLedgerMeta = {
+  DeviceId: '',
+  HwWalletMetaId: 1,
+  Label: '',
+  Language: '',
+  MajorVersion: 1,
+  MinorVersion: 0,
+  Model: 'NanoS',
+  PatchVersion: 0,
+  Vendor: 'ledger.com',
+};
+export const mockTrezorMeta = {
+  DeviceId: 'Trezorro',
+  HwWalletMetaId: 1,
+  Label: 'C875BA9D0C571FF4B8718FAA',
+  Language: 'english',
+  MajorVersion: 2,
+  MinorVersion: 1,
+  Model: 'T',
+  PatchVersion: 1,
+  Vendor: 'trezor.io',
+};
+
+let conceptualWalletCounter = 0;
+let publicDeriverCounter = 0;
+
 function genDummyWallet(): PublicDeriver<> {
+  const conceptualWalletId = conceptualWalletCounter++;
   const parent = new Cip1852Wallet(
     (null: any),
     {
       db: (null: any),
-      conceptualWalletId: 0,
+      conceptualWalletId,
       walletType: WalletTypeOption.WEB_WALLET,
       hardwareInfo: null,
     },
     {
       Cip1852WrapperId: 0,
-      ConceptualWalletId: 0,
+      ConceptualWalletId: conceptualWalletId,
       SignerLevel: null,
       PublicDeriverLevel: 0,
       PrivateDeriverLevel: null,
@@ -180,7 +294,7 @@ function genDummyWallet(): PublicDeriver<> {
   );
   const clazz = GetSigningKey(GetPublicKey(HasLevels(HasSign(PublicDeriver))));
   const self = new clazz({
-    publicDeriverId: 0,
+    publicDeriverId: publicDeriverCounter++,
     parent,
     pathToPublic: [],
     derivationId: 0,
@@ -230,9 +344,32 @@ function genMockCache(dummyWallet: PublicDeriver<>) {
         getBalanceRequest,
       },
     }),
+    getPublicDeriverSettingsCache: (publicDeriver) => ({
+      publicDeriver,
+      assuranceMode: assuranceModes.NORMAL,
+      publicDeriverName: '',
+    }),
     getSigningKeyCache: (publicDeriver) => ({
       publicDeriver,
       signingKeyUpdateDate: null,
+    }),
+    getTimeCalcRequests: (publicDeriver) => ({
+      publicDeriver,
+      requests: {
+        toAbsoluteSlot: new CachedRequest(genToAbsoluteSlotNumber),
+        toRelativeSlotNumber: new CachedRequest(genToRelativeSlotNumber),
+        timeToSlot: new CachedRequest(genTimeToSlot),
+        currentEpochLength: new CachedRequest(genCurrentEpochLength),
+        currentSlotLength: new CachedRequest(genCurrentSlotLength),
+        timeSinceGenesis: new CachedRequest(genTimeSinceGenesis),
+        toRealTime: new CachedRequest(genToRealTime),
+      },
+    }),
+    getCurrentTimeRequests: (publicDeriver) => ({
+      publicDeriver,
+      currentEpoch: 100,
+      currentSlot: 5000,
+      msIntoSlot: 10,
     }),
   };
 }
@@ -245,20 +382,31 @@ export function genDummyWithCache(): CacheValue {
   };
 }
 
-function genSigningWallet(): PublicDeriver<> {
+function genSigningWallet(
+  genHardwareInfo?: number => HwWalletMetaRow,
+): PublicDeriver<> {
+  const conceptualWalletId = conceptualWalletCounter++;
+  const hardwareInfo = genHardwareInfo == null
+    ? null
+    : genHardwareInfo(conceptualWalletId);
   const parent = new Cip1852Wallet(
     (null: any),
     {
       db: (null: any),
-      conceptualWalletId: 0,
-      walletType: WalletTypeOption.WEB_WALLET,
-      hardwareInfo: null,
+      conceptualWalletId,
+      walletType: (() => {
+        if (hardwareInfo != null) {
+          return WalletTypeOption.HARDWARE_WALLET;
+        }
+        return WalletTypeOption.WEB_WALLET;
+      })(),
+      hardwareInfo,
     },
     {
       Cip1852WrapperId: 0,
-      ConceptualWalletId: 0,
+      ConceptualWalletId: conceptualWalletId,
       SignerLevel: null,
-      PublicDeriverLevel: 0,
+      PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
       PrivateDeriverLevel: null,
       PrivateDeriverKeyDerivationId: null,
       RootKeyDerivationId: 0,
@@ -267,9 +415,13 @@ function genSigningWallet(): PublicDeriver<> {
     null,
     0,
   );
-  const clazz = GetSigningKey(GetPublicKey(HasLevels(HasSign(PublicDeriver))));
+  const clazz = HasUtxoChains(Cip1852PickInternal(GetStakingKey(GetAllAccounting(
+    DisplayCutoff(GetSigningKey(GetPublicKey(
+      GetAllUtxos(HasLevels(HasSign(HasPrivateDeriver((PublicDeriver: any)))))
+    )))
+  ))));
   const self = new clazz({
-    publicDeriverId: 0,
+    publicDeriverId: publicDeriverCounter++,
     parent,
     pathToPublic: [],
     derivationId: 0,
@@ -277,15 +429,17 @@ function genSigningWallet(): PublicDeriver<> {
   return self;
 }
 
-export function genSigningWalletWithCache(): CacheValue {
-  const dummyWallet = genSigningWallet();
+export function genSigningWalletWithCache(
+  genHardwareInfo?: number => HwWalletMetaRow,
+): CacheValue {
+  const dummyWallet = genSigningWallet(genHardwareInfo);
   return {
     publicDeriver: dummyWallet,
     ...genMockCache(dummyWallet),
   };
 }
 
-type CacheValue = {|
+export type CacheValue = {|
   publicDeriver: PublicDeriver<>,
   conceptualWalletCache: ConceptualWalletSettingsCache,
   getPublicKeyCache:
@@ -296,6 +450,12 @@ type CacheValue = {|
     typeof DelegationStore.prototype.getDelegationRequests,
   getSigningKeyCache:
     typeof WalletStore.prototype.getSigningKeyCache,
+  getPublicDeriverSettingsCache:
+    typeof WalletSettingsStore.prototype.getPublicDeriverSettingsCache,
+  getTimeCalcRequests:
+    typeof TimeStore.prototype.getTimeCalcRequests,
+  getCurrentTimeRequests:
+    typeof TimeStore.prototype.getCurrentTimeRequests,
 |};
 
 export function walletLookup(wallets: Array<CacheValue>): {|
@@ -310,6 +470,12 @@ export function walletLookup(wallets: Array<CacheValue>): {|
     typeof DelegationStore.prototype.getDelegationRequests,
   getSigningKeyCache:
     typeof WalletStore.prototype.getSigningKeyCache,
+  getPublicDeriverSettingsCache:
+    typeof WalletSettingsStore.prototype.getPublicDeriverSettingsCache,
+  getTimeCalcRequests:
+    typeof TimeStore.prototype.getTimeCalcRequests,
+  getCurrentTimeRequests:
+    typeof TimeStore.prototype.getCurrentTimeRequests,
 |} {
   if (wallets.length === 0) {
     return ({
@@ -319,6 +485,9 @@ export function walletLookup(wallets: Array<CacheValue>): {|
       getDelegation: (_publicDeriver) => (null: any),
       getPublicKeyCache: (_publicDeriver) => (null: any),
       getSigningKeyCache: (_publicDeriver) => (null: any),
+      getPublicDeriverSettingsCache: (_publicDeriver) => (null: any),
+      getTimeCalcRequests: (_publicDeriver) => (null: any),
+      getCurrentTimeRequests: (_publicDeriver) => (null: any),
     });
   }
 
@@ -326,12 +495,6 @@ export function walletLookup(wallets: Array<CacheValue>): {|
   for (const wallet of wallets) {
     asOption[wallet.conceptualWalletCache.conceptualWalletName] = wallet.publicDeriver;
   }
-  // const selectedWallet = () => select(
-  //   'selectedWallet',
-  //   asOption,
-  //   // TODO: support no wallet selected
-  //   asOption[wallets[0].conceptualWalletCache.conceptualWalletName],
-  // );
 
   return ({
     publicDerivers: wallets.map(wallet => wallet.publicDeriver),
@@ -375,5 +538,137 @@ export function walletLookup(wallets: Array<CacheValue>): {|
       }
       throw new Error(`Missing cache entry for getSigningKeyCache`);
     },
+    getPublicDeriverSettingsCache: (publicDeriver) => {
+      for (const wallet of wallets) {
+        if (wallet.publicDeriver === publicDeriver) {
+          return wallet.getPublicDeriverSettingsCache(publicDeriver);
+        }
+      }
+      throw new Error(`Missing cache entry for getPublicDeriverSettingsCache`);
+    },
+    getTimeCalcRequests: (publicDeriver) => {
+      for (const wallet of wallets) {
+        if (wallet.publicDeriver === publicDeriver) {
+          return wallet.getTimeCalcRequests(publicDeriver);
+        }
+      }
+      throw new Error(`Missing cache entry for getTimeCalcRequests`);
+    },
+    getCurrentTimeRequests: (publicDeriver) => {
+      for (const wallet of wallets) {
+        if (wallet.publicDeriver === publicDeriver) {
+          return wallet.getCurrentTimeRequests(publicDeriver);
+        }
+      }
+      throw new Error(`Missing cache entry for getCurrentTimeRequests`);
+    },
   });
 }
+
+export const genTentativeTx = () => {
+  const inputAmount = '1000001';
+  const ouputAmount = '400';
+  const fee = new BigNumber(inputAmount).minus(new BigNumber(ouputAmount));
+
+  if (environment.isShelley()) {
+    const remoteUnspentUtxo = {
+      amount: inputAmount,
+      receiver: 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
+      tx_hash: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe',
+      tx_index: 0,
+      utxo_id: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0',
+    };
+    const input = utxoToTxInput(remoteUnspentUtxo);
+    const builder = RustModule.WalletV3.InputOutputBuilder.empty();
+    builder.add_input(input);
+    builder.add_output(
+      RustModule.WalletV3.Address.from_string('addr1s33chdhaexquujgnwm458swlt4tl2t5qyyk7d04gtdy5utp4y6c9sf4nrtlu7glkdwww3leg94jr6rkt9prwfgfp7symp5nj08zuln4lmxjv7k'),
+      RustModule.WalletV3.Value.from_str(ouputAmount)
+    );
+    const unsignedTx = builder.build();
+    return {
+      tentativeTx: {
+        senderUtxos: [{
+          ...remoteUnspentUtxo,
+          addressing: {
+            path: [],
+            startLevel: 0,
+          },
+        }],
+        unsignedTx,
+        changeAddr: [],
+        certificate: undefined,
+      },
+      inputAmount,
+      fee,
+    };
+  }
+  {
+    const remoteUnspentUtxo = {
+      amount: inputAmount,
+      receiver: 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
+      tx_hash: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe',
+      tx_index: 0,
+      utxo_id: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0',
+    };
+    const unsignedTx = RustModule.WalletV2.Transaction.from_json({
+      inputs: [{
+        id: remoteUnspentUtxo.tx_hash,
+        index: remoteUnspentUtxo.tx_index
+      }],
+      outputs: [{
+        address: 'Ae2tdPwUPEZ4xAL3nxLq4Py7BfS1D2tJ3u2rxZGnrAXC8TNkWhTaz41J3FN',
+        value: Number(ouputAmount)
+      }]
+    });
+    return {
+      tentativeTx: {
+        senderUtxos: [{
+          ...remoteUnspentUtxo,
+          addressing: {
+            path: [],
+            startLevel: 0,
+          },
+        }],
+        unsignedTx,
+        changeAddr: [],
+        certificate: undefined,
+      },
+      inputAmount,
+      fee,
+    };
+  }
+};
+
+export const genUndelegateTx = () => {
+  const inputAmount = '1000001';
+  const ouputAmount = '400';
+  const fee = new BigNumber(inputAmount).minus(new BigNumber(ouputAmount));
+
+  if (!environment.isShelley()) {
+    throw new Error('Delegation not supported for Byron');
+  }
+  const remoteUnspentUtxo = {
+    amount: inputAmount,
+    receiver: 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
+    tx_hash: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe',
+    tx_index: 0,
+    utxo_id: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0',
+  };
+  const input = utxoToTxInput(remoteUnspentUtxo);
+  const builder = RustModule.WalletV3.InputOutputBuilder.empty();
+  builder.add_input(input);
+  const IOs = builder.build();
+  return {
+    senderUtxos: [{
+      ...remoteUnspentUtxo,
+      addressing: {
+        path: [],
+        startLevel: 0,
+      },
+    }],
+    IOs,
+    changeAddr: [],
+    certificate: undefined, // TODO
+  };
+};

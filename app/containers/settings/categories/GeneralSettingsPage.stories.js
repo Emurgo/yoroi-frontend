@@ -50,10 +50,10 @@ export const Generic = () => {
         },
         actions: {
           profile: {
-            updateLocale: { trigger: async () => action('updateLocale')() },
-            updateTheme: { trigger: async () => action('updateTheme')() },
-            exportTheme: { trigger: async () => action('exportTheme')() },
-            updateSelectedExplorer: { trigger: async () => action('updateSelectedExplorer')() },
+            updateLocale: { trigger: async (req) => action('updateLocale')(req) },
+            updateTheme: { trigger: async (req) => action('updateTheme')(req) },
+            exportTheme: { trigger: async (req) => action('exportTheme')(req) },
+            updateSelectedExplorer: { trigger: async (req) => action('updateSelectedExplorer')(req) },
           },
         },
         canRegisterProtocol: () => boolean('canRegisterProtocol', true),

@@ -39,7 +39,7 @@ import {
 } from '../../api/ada/lib/storage/bridge/timeUtils';
 
 
-type StakingKeyState = {|
+export type StakingKeyState = {|
   state: AccountStateSuccess,
   /**
     * Pool selected in the UI
@@ -52,7 +52,7 @@ type StakingKeyState = {|
   poolInfo: Map<string, RemotePoolMetaSuccess>
 |};
 
-type RewardHistoryForWallet = string => Promise<Array<RewardTuple>>;
+export type RewardHistoryForWallet = string => Promise<Array<RewardTuple>>;
 
 export type DelegationRequests = {|
   publicDeriver: PublicDeriver<>,

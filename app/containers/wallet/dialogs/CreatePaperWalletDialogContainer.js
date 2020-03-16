@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { computed } from 'mobx';
+import { computed, observable, runInAction, } from 'mobx';
 import UserPasswordDialog from '../../../components/wallet/settings/paper-wallets/UserPasswordDialog';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import config from '../../../config';
@@ -26,21 +26,15 @@ const messages = defineMessages({
 
 export type GeneratedData = typeof CreatePaperWalletDialogContainer.prototype.generated;
 
-type State = {|
-  notificationElementId: string,
-|};
-
 @observer
 export default class CreatePaperWalletDialogContainer
-  extends Component<InjectedOrGenerated<GeneratedData>, State> {
+  extends Component<InjectedOrGenerated<GeneratedData>> {
 
   static contextTypes = {
     intl: intlShape.isRequired
   };
 
-  state = {
-    notificationElementId: ''
-  };
+  @observable notificationElementId: string = '';
 
   render() {
     const { intl } = this.context;
@@ -136,7 +130,9 @@ export default class CreatePaperWalletDialogContainer
             onBack={this.generated.actions.paperWallets.backToCreate.trigger}
             onCopyAddressTooltip={(address, elementId) => {
               if (!uiNotifications.isOpen(elementId)) {
-                this.setState({ notificationElementId: elementId });
+                runInAction(() => {
+                  this.notificationElementId = elementId;
+                });
                 this.generated.actions.notifications.open.trigger({
                   id: elementId,
                   duration: tooltipNotification.duration,
@@ -145,7 +141,7 @@ export default class CreatePaperWalletDialogContainer
               }
             }}
             notification={uiNotifications.getTooltipActiveNotification(
-              this.state.notificationElementId
+              this.notificationElementId
             )}
           />
         );

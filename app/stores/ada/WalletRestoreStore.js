@@ -170,29 +170,7 @@ export default class WalletRestoreStore extends Store {
       resolvedRecoveryPhrase = newPhrase;
     }
     const rootPk = generateWalletRootKey(resolvedRecoveryPhrase);
-    const byronPlate = generateStandardPlate(
-      rootPk,
-      0, // show addresses for account #0
-      this.mode === RestoreMode.PAPER
-        ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER
-        : NUMBER_OF_VERIFIED_ADDRESSES,
-      environment.getDiscriminant(),
-      true,
-    );
-    // TODO: we disable shelley restoration information for paper wallet restoration
-    // this is because we've temporarily disabled paper wallet creation for Shelley
-    // so no point in showing the Shelley checksum
-    const shelleyPlate = !environment.isShelley() || this.mode === RestoreMode.PAPER
-      ? undefined
-      : generateStandardPlate(
-        rootPk,
-        0, // show addresses for account #0
-        this.mode === RestoreMode.PAPER
-          ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER
-          : NUMBER_OF_VERIFIED_ADDRESSES,
-        environment.getDiscriminant(),
-        false,
-      );
+    const { byronPlate, shelleyPlate } = generatePlates(rootPk, this.mode);
 
     runInAction(() => {
       this.recoveryResult = {
@@ -242,4 +220,41 @@ export default class WalletRestoreStore extends Store {
     this.recoveryResult = undefined;
     this.stores.substores.ada.yoroiTransfer.reset();
   }
+}
+
+export function generatePlates(
+  rootPk: RustModule.WalletV3.Bip32PrivateKey,
+  mode: RestoreModeType,
+): {|
+  byronPlate: PlateResponse,
+  shelleyPlate: void | PlateResponse,
+|} {
+  const byronPlate = generateStandardPlate(
+    rootPk,
+    0, // show addresses for account #0
+    mode === RestoreMode.PAPER
+      ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER
+      : NUMBER_OF_VERIFIED_ADDRESSES,
+    environment.getDiscriminant(),
+    true,
+  );
+  // TODO: we disable shelley restoration information for paper wallet restoration
+  // this is because we've temporarily disabled paper wallet creation for Shelley
+  // so no point in showing the Shelley checksum
+  const shelleyPlate = !environment.isShelley() || mode === RestoreMode.PAPER
+    ? undefined
+    : generateStandardPlate(
+      rootPk,
+      0, // show addresses for account #0
+      mode === RestoreMode.PAPER
+        ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER
+        : NUMBER_OF_VERIFIED_ADDRESSES,
+      environment.getDiscriminant(),
+      false,
+    );
+
+  return {
+    byronPlate,
+    shelleyPlate,
+  };
 }

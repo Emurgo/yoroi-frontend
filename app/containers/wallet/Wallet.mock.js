@@ -1,7 +1,7 @@
 // @flow
 
+
 import { select, } from '@storybook/addon-knobs';
-import { globalKnobs, } from '../../../stories/helpers/StoryWrapper';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { action } from '@storybook/addon-actions';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
@@ -9,9 +9,9 @@ import WalletSettingsStore from '../../stores/base/WalletSettingsStore';
 import TransactionsStore from '../../stores/base/TransactionsStore';
 import DelegationStore from '../../stores/ada/DelegationStore';
 import WalletStore from '../../stores/toplevel/WalletStore';
-import type { GeneratedData } from './Settings';
+import type { GeneratedData } from './Wallet';
 
-export const mockSettingsProps: {
+export const mockWalletProps: {
   selected: null | PublicDeriver<>,
   publicDerivers: Array<PublicDeriver<>>,
   getConceptualWalletSettingsCache:
@@ -27,17 +27,10 @@ export const mockSettingsProps: {
 } => {| generated: GeneratedData |} = (request) => ({
   generated: {
     stores: {
-      profile: {
-        currentLocale: globalKnobs.locale(),
-        currentTheme: globalKnobs.currentTheme(),
-      },
-      router: {
-        location: {
-          pathname: request.location,
-        },
+      app: {
+        currentRoute: request.location,
       },
       wallets: {
-        hasActiveWallet: request.selected != null,
         selected: request.selected,
       },
       serverConnectionStore: {

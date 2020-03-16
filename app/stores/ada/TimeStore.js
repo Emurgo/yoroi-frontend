@@ -27,19 +27,25 @@ import type {
 } from '../../api/ada/lib/storage/bridge/timeUtils';
 
 export type TimeCalcRequests = {|
-  // TODO: key should be on network and not on public deriver
+  // although time is network-specific
+  // time settings can change over duration of blockchain
+  // so it depends how much the blockchain has synced for a given wallet
   publicDeriver: PublicDeriver<>,
-  toAbsoluteSlot: CachedRequest<void => Promise<ToAbsoluteSlotNumberFunc>>;
-  toRelativeSlotNumber: CachedRequest<void => Promise<ToRelativeSlotNumberFunc>>;
-  timeToSlot: CachedRequest<void => Promise<TimeToAbsoluteSlotFunc>>;
-  currentEpochLength: CachedRequest<void => Promise<CurrentEpochLengthFunc>>;
-  currentSlotLength: CachedRequest<void => Promise<CurrentSlotLengthFunc>>;
-  timeSinceGenesis: CachedRequest<void => Promise<TimeSinceGenesisRequestFunc>>,
-  toRealTime: CachedRequest<void => Promise<ToRealTimeFunc>>;
+  requests: {|
+    toAbsoluteSlot: CachedRequest<void => Promise<ToAbsoluteSlotNumberFunc>>;
+    toRelativeSlotNumber: CachedRequest<void => Promise<ToRelativeSlotNumberFunc>>;
+    timeToSlot: CachedRequest<void => Promise<TimeToAbsoluteSlotFunc>>;
+    currentEpochLength: CachedRequest<void => Promise<CurrentEpochLengthFunc>>;
+    currentSlotLength: CachedRequest<void => Promise<CurrentSlotLengthFunc>>;
+    timeSinceGenesis: CachedRequest<void => Promise<TimeSinceGenesisRequestFunc>>,
+    toRealTime: CachedRequest<void => Promise<ToRealTimeFunc>>;
+  |},
 |};
 
 export type CurrentTimeRequests = {|
-  // TODO: key should be on network and not on public deriver
+  // although time is network-specific
+  // time settings can change over duration of blockchain
+  // so it depends how much the blockchain has synced for a given wallet
   publicDeriver: PublicDeriver<>,
   currentEpoch: number,
   currentSlot: number,
@@ -92,27 +98,29 @@ export default class TimeStore extends Store {
   ) => {
     this.timeCalcRequests.push({
       publicDeriver,
-      toAbsoluteSlot: new CachedRequest<void => Promise<ToAbsoluteSlotNumberFunc>>(
-        genToAbsoluteSlotNumber
-      ),
-      toRelativeSlotNumber: new CachedRequest<void => Promise<ToRelativeSlotNumberFunc>>(
-        genToRelativeSlotNumber
-      ),
-      timeToSlot: new CachedRequest<void => Promise<TimeToAbsoluteSlotFunc>>(
-        genTimeToSlot
-      ),
-      currentEpochLength: new CachedRequest<void => Promise<CurrentEpochLengthFunc>>(
-        genCurrentEpochLength
-      ),
-      currentSlotLength: new CachedRequest<void => Promise<CurrentSlotLengthFunc>>(
-        genCurrentSlotLength
-      ),
-      timeSinceGenesis: new CachedRequest<void => Promise<TimeSinceGenesisRequestFunc>>(
-        genTimeSinceGenesis
-      ),
-      toRealTime: new CachedRequest<void => Promise<ToRealTimeFunc>>(
-        genToRealTime
-      ),
+      requests: {
+        toAbsoluteSlot: new CachedRequest<void => Promise<ToAbsoluteSlotNumberFunc>>(
+          genToAbsoluteSlotNumber
+        ),
+        toRelativeSlotNumber: new CachedRequest<void => Promise<ToRelativeSlotNumberFunc>>(
+          genToRelativeSlotNumber
+        ),
+        timeToSlot: new CachedRequest<void => Promise<TimeToAbsoluteSlotFunc>>(
+          genTimeToSlot
+        ),
+        currentEpochLength: new CachedRequest<void => Promise<CurrentEpochLengthFunc>>(
+          genCurrentEpochLength
+        ),
+        currentSlotLength: new CachedRequest<void => Promise<CurrentSlotLengthFunc>>(
+          genCurrentSlotLength
+        ),
+        timeSinceGenesis: new CachedRequest<void => Promise<TimeSinceGenesisRequestFunc>>(
+          genTimeSinceGenesis
+        ),
+        toRealTime: new CachedRequest<void => Promise<ToRealTimeFunc>>(
+          genToRealTime
+        ),
+      },
     });
 
     this.currentTimeRequests.push({
@@ -134,14 +142,15 @@ export default class TimeStore extends Store {
     const timeCalcRequests = this.getTimeCalcRequests(selected);
     const currTimeRequests = this.getCurrentTimeRequests(selected);
 
-    const timeToSlot = await timeCalcRequests.timeToSlot.execute().promise;
+    const timeToSlot = await timeCalcRequests.requests.timeToSlot.execute().promise;
     if (!timeToSlot) throw new Error(`${nameof(this._updateTime)} should never happen`);
 
     const currentAbsoluteSlot = timeToSlot({
       time: currTime
     });
 
-    const toRelativeSlotNumber = await timeCalcRequests.toRelativeSlotNumber.execute().promise;
+    const toRelativeSlotNumber = await timeCalcRequests.requests
+      .toRelativeSlotNumber.execute().promise;
     if (!toRelativeSlotNumber) throw new Error(`${nameof(this._updateTime)} should never happen`);
     const currentRelativeTime = toRelativeSlotNumber(currentAbsoluteSlot.slot);
 

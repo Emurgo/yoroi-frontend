@@ -479,7 +479,7 @@ const GetAllAccountingMixin = (
   }
 });
 
-const GetAllAccounting = Mixin<
+export const GetAllAccounting = Mixin<
   GetAllAccountingDependencies,
   GetAllAccountingFuncs,
 >(GetAllAccountingMixin);
@@ -923,7 +923,7 @@ const Cip1852PickInternalMixin = (
     };
   }
 });
-const Cip1852PickInternal = Mixin<
+export const Cip1852PickInternal = Mixin<
   Cip1852PickInternalMixinDependencies,
   IPickInternal
 >(Cip1852PickInternalMixin);

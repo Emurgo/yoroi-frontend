@@ -216,13 +216,13 @@ export default class StakePool extends Component<Props> {
               );
             })}
           </ul> */}
-          {this.props.moreInfo && this.getMoreInfoButton(this.props.moreInfo)}
+          {this.getMoreInfoButton(this.props.moreInfo)}
         </div>
       </Card>
     );
   }
 
-  getMoreInfoButton: MoreInfoProp => Node = (info) => {
+  getMoreInfoButton: ?MoreInfoProp => Node = (info) => {
     const { intl } = this.context;
 
     const moreInfoButtonClasses = classnames([
@@ -234,17 +234,19 @@ export default class StakePool extends Component<Props> {
     ]);
     return (
       <>
-        <a
-          href={info.url}
-          onClick={info.openPoolPage}
-        >
-          <Button
-            type="button"
-            label={intl.formatMessage(messages.button)}
-            className={moreInfoButtonClasses}
-            skin={ButtonSkin}
-          />
-        </a>
+        {info != null &&
+          <a
+            href={info.url}
+            onClick={info.openPoolPage}
+          >
+            <Button
+              type="button"
+              label={intl.formatMessage(messages.button)}
+              className={moreInfoButtonClasses}
+              skin={ButtonSkin}
+            />
+          </a>
+        }
         {this.props.undelegate != null &&
           <>
             <div className={styles.data} />

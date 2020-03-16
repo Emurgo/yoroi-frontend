@@ -1,7 +1,7 @@
 // @flow
 
 import React, { Component } from 'react';
-import { computed, runInAction, action, observable } from 'mobx';
+import { computed, action, observable } from 'mobx';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
@@ -21,15 +21,11 @@ import {
   EPOCH_REWARD_DENOMINATOR,
 } from '../../../config/numbersConfig';
 import type { ConfigType } from '../../../../config/config-types';
+import type { SelectedPool } from '../../../actions/ada/delegation-transaction-actions';
 
 declare var CONFIG: ConfigType;
 
 export type GeneratedData = typeof SeizaFetcher.prototype.generated;
-
-type SelectedPool = {|
-  +name: null | string,
-  +poolHash: string
-|};
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
@@ -43,7 +39,6 @@ export default class SeizaFetcher extends Component<Props> {
     children: undefined
   };
 
-  @observable selectedPools = [];
   @observable iframe: ?HTMLIFrameElement;
   @observable frameHeight = 0;
 
@@ -61,7 +56,7 @@ export default class SeizaFetcher extends Component<Props> {
       poolRequest: { id: pools[0].poolHash },
       publicDeriver: selectedWallet,
     });
-    runInAction(() => { this.selectedPools = pools; });
+    delegationTxActions.setPools.trigger(pools);
   }
 
   @action setFrame: (null | HTMLIFrameElement) => void = (frame) => {
@@ -88,9 +83,8 @@ export default class SeizaFetcher extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  @action
   cancel: void => void = () => {
-    this.selectedPools = [];
+    this.generated.actions[environment.API].delegationTransaction.setPools.trigger([]);
     this.generated.actions[environment.API].delegationTransaction.reset.trigger();
   }
 
@@ -142,7 +136,7 @@ export default class SeizaFetcher extends Component<Props> {
       <>
         {(
           delegationTxStore.createDelegationTx.isExecuting ||
-          (delegationTx == null && this.selectedPools.length >= 1)
+          (delegationTx == null && delegationTxStore.selectedPools.length >= 1)
         ) &&
           <Dialog
             title={intl.formatMessage(globalMessages.processingLabel)}
@@ -172,11 +166,11 @@ export default class SeizaFetcher extends Component<Props> {
             </>
           </Dialog>
         }
-        {delegationTx != null && this.selectedPools.length >= 1 && showSignDialog &&
+        {delegationTx != null && delegationTxStore.selectedPools.length >= 1 && showSignDialog &&
           <DelegationTxDialog
             staleTx={delegationTxStore.isStale}
-            poolName={this.selectedPools[0].name}
-            poolHash={this.selectedPools[0].poolHash}
+            poolName={delegationTxStore.selectedPools[0].name}
+            poolHash={delegationTxStore.selectedPools[0].poolHash}
             transactionFee={getShelleyTxFee(delegationTx.unsignedTx.IOs, true)}
             amountToDelegate={delegationTx.totalAmountToDelegate}
             approximateReward={approximateReward(delegationTx.totalAmountToDelegate)}
@@ -244,6 +238,7 @@ export default class SeizaFetcher extends Component<Props> {
         substores: {
           ada: {
             delegationTransaction: {
+              selectedPools: delegationTxStore.selectedPools,
               isStale: delegationTxStore.isStale,
               createDelegationTx: {
                 result: delegationTxStore.createDelegationTx.result,
@@ -273,6 +268,9 @@ export default class SeizaFetcher extends Component<Props> {
             },
             reset: {
               trigger: actions.ada.delegationTransaction.reset.trigger,
+            },
+            setPools: {
+              trigger: actions.ada.delegationTransaction.setPools.trigger,
             },
           },
         },

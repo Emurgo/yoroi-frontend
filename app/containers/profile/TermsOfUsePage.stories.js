@@ -37,7 +37,7 @@ export const Generic = () => (
       },
       actions: {
         profile: {
-          acceptTermsOfUse: { trigger: async () => action('acceptTermsOfUse')() },
+          acceptTermsOfUse: { trigger: async (req) => action('acceptTermsOfUse')(req) },
         }
       }
     }}

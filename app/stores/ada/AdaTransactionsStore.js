@@ -24,7 +24,8 @@ import type {
 } from '../../api/ada';
 import { asHasLevels, } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-
+import WalletTransaction from '../../domain/WalletTransaction';
+import type { AssuranceMode } from '../../types/transactionAssuranceTypes';
 import type {
   ExportTransactionsRequest,
   ExportTransactionsFunc,
@@ -69,30 +70,9 @@ export default class AdaTransactionsStore extends TransactionsStore {
     const result = this.getTransactionsAllRequest(publicDeriver).result;
     if (!result || !result.transactions) return unconfirmedAmount;
 
-    for (const transaction of result.transactions) {
-      const { assuranceMode } = this.stores.substores.ada.walletSettings
-        .getPublicDeriverSettingsCache(publicDeriver);
-      const assuranceForTx = transaction.getAssuranceLevelForMode(assuranceMode);
-      if (assuranceForTx !== assuranceLevels.HIGH) {
-        // total
-        unconfirmedAmount.total = unconfirmedAmount.total.plus(transaction.amount.absoluteValue());
-
-        // outgoing
-        if (transaction.type === transactionTypes.EXPEND) {
-          unconfirmedAmount.outgoing = unconfirmedAmount.outgoing.plus(
-            transaction.amount.absoluteValue()
-          );
-        }
-
-        // incoming
-        if (transaction.type === transactionTypes.INCOME) {
-          unconfirmedAmount.incoming = unconfirmedAmount.incoming.plus(
-            transaction.amount.absoluteValue()
-          );
-        }
-      }
-    }
-    return unconfirmedAmount;
+    const { assuranceMode } = this.stores.substores.ada.walletSettings
+      .getPublicDeriverSettingsCache(publicDeriver);
+    return calculateUnconfirmedAmount(result.transactions, assuranceMode);
   }
 
   /** Wrap utility function to expose to components/containers */
@@ -164,4 +144,39 @@ export default class AdaTransactionsStore extends TransactionsStore {
       this._setExportError(null);
     }
   }
+}
+
+export function calculateUnconfirmedAmount(
+  transactions: Array<WalletTransaction>,
+  assuranceMode: AssuranceMode,
+): UnconfirmedAmount {
+  const unconfirmedAmount = {
+    total: new BigNumber(0),
+    incoming: new BigNumber(0),
+    outgoing: new BigNumber(0),
+  };
+
+  for (const transaction of transactions) {
+    const assuranceForTx = transaction.getAssuranceLevelForMode(assuranceMode);
+    if (assuranceForTx !== assuranceLevels.HIGH) {
+      // total
+      unconfirmedAmount.total = unconfirmedAmount.total.plus(transaction.amount.absoluteValue());
+
+      // outgoing
+      if (transaction.type === transactionTypes.EXPEND) {
+        unconfirmedAmount.outgoing = unconfirmedAmount.outgoing.plus(
+          transaction.amount.absoluteValue()
+        );
+      }
+
+      // incoming
+      if (transaction.type === transactionTypes.INCOME) {
+        unconfirmedAmount.incoming = unconfirmedAmount.incoming.plus(
+          transaction.amount.absoluteValue()
+        );
+      }
+    }
+  }
+
+  return unconfirmedAmount;
 }

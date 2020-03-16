@@ -16,8 +16,11 @@ import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { PoolRequest } from '../../api/ada/lib/storage/bridge/delegationUtils';
+import type { SelectedPool } from '../../actions/ada/delegation-transaction-actions';
 
 export default class DelegationTransactionStore extends Store {
+
+  @observable selectedPools: Array<SelectedPool>;
 
   @observable createDelegationTx: LocalizedRequest<CreateDelegationTxFunc>
     = new LocalizedRequest<CreateDelegationTxFunc>(this.api.ada.createDelegationTx);
@@ -47,6 +50,11 @@ export default class DelegationTransactionStore extends Store {
     }
   )
 
+  @action
+  _setPools: Array<SelectedPool> => void = (pools) => {
+    this.selectedPools = pools;
+  }
+
   @action.bound
   markStale: boolean => void = (status) => {
     this.isStale = status;
@@ -59,6 +67,7 @@ export default class DelegationTransactionStore extends Store {
     a.createTransaction.listen(this._createTransaction);
     a.signTransaction.listen(this._signTransaction);
     a.complete.listen(this._complete);
+    a.setPools.listen(this._setPools);
     a.reset.listen(this.reset);
   }
 
@@ -169,5 +178,6 @@ export default class DelegationTransactionStore extends Store {
     this.signAndBroadcastDelegationTx.reset();
     this.createDelegationTx.reset();
     this.isStale = false;
+    this.selectedPools = [];
   }
 }

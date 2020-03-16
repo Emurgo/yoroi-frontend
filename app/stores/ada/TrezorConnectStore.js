@@ -389,7 +389,7 @@ export default class TrezorConnectStore
       if (error instanceof LocalizableError) {
         this.error = error;
       } else {
-        // some unknow error
+        // some unknown error
         this.error = new UnexpectedError();
       }
       this._goToSaveError();

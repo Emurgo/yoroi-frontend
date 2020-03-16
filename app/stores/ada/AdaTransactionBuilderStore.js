@@ -18,7 +18,7 @@ import type {
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
-type SetupSelfTxFunc = {|
+export type SetupSelfTxFunc = {|
   publicDeriver: IHasUtxoChains,
   filter: ElementOf<IGetAllUtxosResponse> => boolean,
 |} => Promise<void>;
@@ -308,7 +308,7 @@ export default class AdaTransactionBuilderStore extends Store {
     return !ITxEqual(this.tentativeTx, this.plannedTx);
   }
 
-  _setupSelfTx: SetupSelfTxFunc = async (request) => {
+  _setupSelfTx: SetupSelfTxFunc = async (request): Promise<void> => {
     this._setFilter(request.filter);
     const nextUnusedInternal = await request.publicDeriver.nextInternal();
     const addressInfo = nextUnusedInternal.addressInfo;
