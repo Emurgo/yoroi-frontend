@@ -1,7 +1,7 @@
 // @flow
 
 import React, { Component } from 'react';
-import { computed, runInAction, action, observable } from 'mobx';
+import { computed, action, observable } from 'mobx';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';

@@ -10,16 +10,13 @@ import {
   walletLookup,
   genSigningWalletWithCache,
   genUndelegateTx,
-  genTentativeTx,
 } from '../../../../stories/helpers/StoryWrapper';
 import type {
   CacheValue
 } from '../../../../stories/helpers/StoryWrapper';
 import CachedRequest from '../../../stores/lib/LocalizedCachedRequest';
-import type { GetBalanceFunc } from '../../../api/ada/index';
 import StakingPage from './StakingPage';
 import { mockWalletProps } from '../Wallet.mock';
-import { getVarsForTheme } from '../../../stores/toplevel/ProfileStore';
 import { getDefaultExplorer } from '../../../domain/Explorer';
 import { buildRoute } from '../../../utils/routing';
 import { ROUTES } from '../../../routes-config';
@@ -28,20 +25,12 @@ import { GenericApiError, } from '../../../api/common';
 import { wrapWallet } from '../../../Routes';
 import type {
   GetDelegatedBalanceFunc,
-  CertificateForEpoch,
   GetCurrentDelegationFunc,
 } from '../../../api/ada/lib/storage/bridge/delegationUtils';
 import type {
   RewardHistoryForWallet,
   DelegationRequests,
 } from '../../../stores/ada/DelegationStore';
-import { GetAccountStateApiError, GetPoolInfoApiError } from '../../../api/ada/errors';
-import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard/LessThanExpectedDialog';
-import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
-import PoolWarningDialog from '../../../components/wallet/staking/dashboard/PoolWarningDialog';
-import UndelegateDialog from '../../../components/wallet/staking/dashboard/UndelegateDialog';
-import LocalizedRequest from '../../../stores/lib/LocalizedRequest';
-import type { SetupSelfTxFunc } from '../../../stores/ada/AdaTransactionBuilderStore';
 
 export default {
   title: `${module.id.split('.')[1]}`,
