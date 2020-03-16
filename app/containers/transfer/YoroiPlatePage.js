@@ -52,10 +52,10 @@ export default class YoroiPlatePage extends Component<Props> {
 
   @observable notificationElementId: string = '';
 
-  @observable plates: WalletRestoreDialogContainerState;
+  @observable plates: void | WalletRestoreDialogContainerState;
 
   render() {
-    if (this.state == null) return null;
+    if (this.plates == null) return null;
     const actions = this.generated.actions;
     const { uiNotifications } = this.generated.stores;
 
@@ -63,7 +63,7 @@ export default class YoroiPlatePage extends Component<Props> {
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
       message: globalMessages.copyTooltipMessage,
     };
-    const { byronPlate, shelleyPlate } = this.state;
+    const { byronPlate, shelleyPlate } = this.plates;
     return (
       <WalletRestoreVerifyDialog
         byronPlate={byronPlate}

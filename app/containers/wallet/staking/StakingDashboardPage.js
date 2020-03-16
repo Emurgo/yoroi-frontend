@@ -471,10 +471,10 @@ export default class StakingDashboardPage extends Component<Props> {
                 });
               }
             }}
-            notification={this.state == null
+            notification={this.notificationElementId == null
               ? null
               : uiNotifications.getTooltipActiveNotification(
-                this.state.notificationElementId
+                this.notificationElementId
               )
             }
             undelegate={
