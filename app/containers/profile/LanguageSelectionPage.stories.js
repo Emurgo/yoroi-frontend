@@ -13,7 +13,7 @@ import { globalKnobs } from '../../../stories/helpers/StoryWrapper';
 import { withScreenshot } from 'storycap';
 
 export default {
-  title: `${module.id.split('.')[1]}`,
+  title: `${__filename.split('.')[0]}`,
   component: LanguageSelectionPage,
   decorators: [withScreenshot],
 };

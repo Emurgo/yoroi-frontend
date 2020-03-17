@@ -44,7 +44,7 @@ import LocalizedRequest from '../../../stores/lib/LocalizedRequest';
 import type { SetupSelfTxFunc } from '../../../stores/ada/AdaTransactionBuilderStore';
 
 export default {
-  title: `${module.id.split('.')[1]}`,
+  title: `${__filename.split('.')[0]}`,
   component: StakingDashboardPage,
   decorators: [withScreenshot],
 };

@@ -12,7 +12,7 @@ import {
 } from '../../../../stories/helpers/StoryWrapper';
 
 export default {
-  title: `${module.id.split('.')[1]}`,
+  title: `${__filename.split('.')[0]}`,
   component: SupportSettingsPage,
   decorators: [withScreenshot],
 };

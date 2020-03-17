@@ -31,7 +31,7 @@ import {
 } from '../../stores/ada/YoroiTransferStore';
 
 export default {
-  title: `${module.id.split('.')[1]}`,
+  title: `${__filename.split('.')[0]}`,
   component: YoroiTransferPage,
   decorators: [withScreenshot],
 };

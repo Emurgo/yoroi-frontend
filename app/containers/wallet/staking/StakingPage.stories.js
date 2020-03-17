@@ -33,7 +33,7 @@ import type {
 } from '../../../stores/ada/DelegationStore';
 
 export default {
-  title: `${module.id.split('.')[1]}`,
+  title: `${__filename.split('.')[0]}`,
   component: StakingPage,
   decorators: [withScreenshot],
 };

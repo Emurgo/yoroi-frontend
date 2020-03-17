@@ -31,7 +31,7 @@ import WalletSendConfirmationDialog from '../../components/wallet/send/WalletSen
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
 
 export default {
-  title: `${module.id.split('.')[1]}`,
+  title: `${__filename.split('.')[0]}`,
   component: WalletSendPage,
   decorators: [withScreenshot],
 };

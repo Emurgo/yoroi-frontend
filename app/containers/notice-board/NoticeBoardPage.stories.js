@@ -13,7 +13,7 @@ import { withScreenshot } from 'storycap';
 import Notice from '../../domain/Notice';
 
 export default {
-  title: `${module.id.split('.')[1]}`,
+  title: `${__filename.split('.')[0]}`,
   component: NoticeBoardPage,
   decorators: [withScreenshot],
 };
