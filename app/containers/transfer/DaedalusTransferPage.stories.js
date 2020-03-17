@@ -30,7 +30,7 @@ import {
 } from '../../api/ada/errors';
 
 export default {
-  title: `${module.id.split('.')[1]}`,
+  title: `${__filename.split('.')[0]}`,
   component: DaedalusTransferPage,
   decorators: [withScreenshot],
 };

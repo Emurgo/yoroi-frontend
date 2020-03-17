@@ -15,7 +15,7 @@ import MyWalletsPage from './MyWalletsPage';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 
 export default {
-  title: `${module.id.split('.')[1]}`,
+  title: `${__filename.split('.')[0]}`,
   component: MyWalletsPage,
   decorators: [withScreenshot],
 };

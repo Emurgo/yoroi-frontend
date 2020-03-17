@@ -37,3 +37,6 @@ chrome/manifest.*.json
 # history plugin for vscode
 .history
 Yoroi Shelley Testnet
+
+# Local Netlify folder
+.netlify

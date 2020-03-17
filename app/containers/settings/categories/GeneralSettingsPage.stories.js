@@ -15,7 +15,7 @@ import { getDefaultExplorer } from '../../../domain/Explorer';
 import { ROUTES } from '../../../routes-config';
 
 export default {
-  title: `${module.id.split('.')[1]}`,
+  title: `${__filename.split('.')[0]}`,
   component: GeneralSettingsPage,
   decorators: [withScreenshot],
 };

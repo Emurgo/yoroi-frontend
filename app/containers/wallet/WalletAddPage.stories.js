@@ -40,7 +40,7 @@ import WalletTrezorConnectDialogContainer from './dialogs/WalletTrezorConnectDia
 import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDialogContainer';
 
 export default {
-  title: `${module.id.split('.')[1]}`,
+  title: `${__filename.split('.')[0]}`,
   component: WalletAddPage,
   decorators: [withScreenshot],
 };

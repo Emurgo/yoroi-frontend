@@ -22,7 +22,7 @@ import {
 import { ROUTES } from '../../../routes-config';
 
 export default {
-  title: `${module.id.split('.')[1]}`,
+  title: `${__filename.split('.')[0]}`,
   component: PaperWalletPage,
   decorators: [withScreenshot],
 };

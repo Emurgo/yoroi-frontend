@@ -37,7 +37,7 @@ import WalletSettingsStore from '../../stores/base/WalletSettingsStore';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 export default {
-  title: `${module.id.split('.')[1]}`,
+  title: `${__filename.split('.')[0]}`,
   component: WalletSummaryPage,
   decorators: [withScreenshot],
 };
