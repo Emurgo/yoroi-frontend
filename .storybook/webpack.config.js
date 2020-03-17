@@ -20,7 +20,8 @@ module.exports = async ({ config, mode } /*: {|
   const customConfig = isProduction
     ? baseProdConfig({
       networkName: ENV,
-      nightly: isNightly
+      nightly: isNightly,
+      publicPath: './',
     })
     : devConfig.baseDevConfig(ENV, isNightly === 'true');
   const finalConfig = {

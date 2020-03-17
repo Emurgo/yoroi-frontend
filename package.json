@@ -37,8 +37,8 @@
     "translations:manage": "node ./translations/translation-runner.js",
     "translations:purge": "rimraf ./translations/messages",
     "storybook:watch": "NODE_ENV=storybook start-storybook -p 6006",
-    "storybook:build": "NODE_ENV=storybook build-storybook",
-    "storybook:screenshots": "rimraf ./__screenshots__/ && storycap http://localhost:6006"
+    "storybook:screenshots": "rimraf ./__screenshots__/ && storycap http://localhost:6006",
+    "storybook:publish": "npm run storybook:build && netlify deploy --dir=storybook-static --prod"
   },
   "repository": {
     "type": "git",

@@ -7,10 +7,13 @@ const webpack = require('webpack');
 
 const customPath = path.join(__dirname, './customPublicPath');
 
+const defaultPublicPath = '/js/';
+
 /*::
 type EnvParams = {|
   networkName: string,
   nightly: "true" | "false",
+  publicPath?: string,
 |};
 */
 const baseProdConfig = (env /*: EnvParams */) => ({
@@ -32,7 +35,7 @@ const baseProdConfig = (env /*: EnvParams */) => ({
     path: path.join(__dirname, '../build/js'),
     filename: '[name].bundle.js',
     chunkFilename: '[name].chunk.js',
-    publicPath: '/js/',
+    publicPath: env.publicPath == null ? defaultPublicPath : env.publicPath,
   },
   plugins: [
     ...commonConfig.plugins('build', env.networkName),
@@ -65,7 +68,7 @@ const baseProdConfig = (env /*: EnvParams */) => ({
         loader: 'file-loader',
         options: {
           // Need to specify public path so assets can be loaded from static resources like CSS
-          publicPath: '/js/'
+          publicPath: env.publicPath == null ? defaultPublicPath : env.publicPath,
         },
       },
     ]
