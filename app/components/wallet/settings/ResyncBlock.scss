@@ -24,12 +24,7 @@
     margin-bottom: 10px;
   }  
 
-  .submitButton,
-  .submitButtonSpinning {
+  .submitButton {
     margin-top: 20px;
-  }
-
-  .submitButtonSpinning {
-    @include loading-spinner("../../../assets/images/spinner-light.svg");
   }
 }

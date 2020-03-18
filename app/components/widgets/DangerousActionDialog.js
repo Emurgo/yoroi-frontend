@@ -1,50 +1,36 @@
 // @flow
 import React, { Component } from 'react';
-import { action, observable } from 'mobx';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { defineMessages, intlShape } from 'react-intl';
-import DialogCloseButton from '../../widgets/DialogCloseButton';
-import Dialog from '../../widgets/Dialog';
-import globalMessages from '../../../i18n/global-messages';
-import LocalizableError from '../../../i18n/LocalizableError';
+import { intlShape } from 'react-intl';
+import DialogCloseButton from './DialogCloseButton';
+import Dialog from './Dialog';
+import globalMessages from '../../i18n/global-messages';
+import LocalizableError from '../../i18n/LocalizableError';
 import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
 import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
-import styles from './RemoveWalletDialog.scss';
-import dangerousButtonStyles from '../../../themes/overrides/DangerousButton.scss';
-import { messages } from './RemoveWallet';
-
-const dialogMessages = defineMessages({
-  warning2: {
-    id: 'wallet.settings.delete.warning2',
-    defaultMessage: '!!!Please double-check you still have the means to restore access to this wallet. If you cannot, removing the wallet may result in irreversible loss of funds.',
-  },
-  accept: {
-    id: 'wallet.settings.delete.accept',
-    defaultMessage: '!!!I still have the means to restore this wallet',
-  },
-});
+import styles from './DangerousActionDialog.scss';
+import dangerousButtonStyles from '../../themes/overrides/DangerousButton.scss';
 
 type Props = {|
+  +title: string,
+  +checkboxAcknowledge: string,
+  +buttonLabel: string,
   +onSubmit: void => PossiblyAsync<void>,
   +isSubmitting: boolean,
   +onCancel: void => void,
+  +isChecked: boolean,
+  +toggleCheck: void => void,
   +error: ?LocalizableError,
+  +children: Node,
 |};
 
 @observer
-export default class RemoveWalletDialog extends Component<Props> {
+export default class DangerousActionDialog extends Component<Props> {
   static contextTypes = {
     intl: intlShape.isRequired,
   };
-
-  @observable isChecked: boolean = false;
-
-  @action
-  toggleCheck: void => void = () => {
-    if (this.props.isSubmitting) return;
-    this.isChecked = !this.isChecked;
-  }
 
   render() {
     const { intl } = this.context;
@@ -70,11 +56,11 @@ export default class RemoveWalletDialog extends Component<Props> {
         disabled: this.props.isSubmitting,
       },
       {
-        label: intl.formatMessage(globalMessages.remove),
+        label: this.props.buttonLabel,
         onClick: this.props.onSubmit,
         primary: true,
         className: confirmButtonClasses,
-        disabled: !this.isChecked ? true : undefined,
+        disabled: !this.props.isChecked ? true : undefined,
         themeOverrides: dangerousButtonStyles,
         isSubmitting: this.props.isSubmitting
       },
@@ -82,7 +68,7 @@ export default class RemoveWalletDialog extends Component<Props> {
 
     return (
       <Dialog
-        title={intl.formatMessage(messages.titleLabel)}
+        title={this.props.title}
         actions={actions}
         closeOnOverlayClick={false}
         onClose={onCancel}
@@ -90,14 +76,13 @@ export default class RemoveWalletDialog extends Component<Props> {
         closeButton={<DialogCloseButton onClose={onCancel} />}
       >
 
-        <p>{intl.formatMessage(messages.removeExplanation)}</p>
-        <p>{intl.formatMessage(dialogMessages.warning2)}</p>
+        {this.props.children}
 
         <div className={styles.checkbox}>
           <Checkbox
-            label={intl.formatMessage(dialogMessages.accept)}
-            onChange={this.toggleCheck}
-            checked={this.props.isSubmitting || this.isChecked}
+            label={this.props.checkboxAcknowledge}
+            onChange={this.props.toggleCheck}
+            checked={this.props.isSubmitting || this.props.isChecked}
             skin={CheckboxSkin}
           />
         </div>

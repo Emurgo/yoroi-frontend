@@ -69,7 +69,7 @@ export default class TermsOfUseForm extends Component<Props, State> {
             <Checkbox
               label={intl.formatMessage(messages[checkboxLabel])}
               onChange={this.toggleAcceptance.bind(this)}
-              checked={areTermsOfUseAccepted}
+              checked={areTermsOfUseAccepted || this.props.isSubmitting}
               skin={CheckboxSkin}
             />
 
@@ -77,7 +77,7 @@ export default class TermsOfUseForm extends Component<Props, State> {
               className={buttonClasses}
               label={intl.formatMessage(globalMessages.continue)}
               onMouseUp={this.props.onSubmit}
-              disabled={!areTermsOfUseAccepted}
+              disabled={!areTermsOfUseAccepted || this.props.isSubmitting}
               skin={ButtonSkin}
             />
           </div>

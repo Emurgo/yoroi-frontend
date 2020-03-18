@@ -292,7 +292,7 @@ function genDummyWallet(): PublicDeriver<> {
     null,
     0,
   );
-  const clazz = GetSigningKey(GetPublicKey(HasLevels(HasSign(PublicDeriver))));
+  const clazz = GetPublicKey(HasLevels(HasSign(PublicDeriver)));
   const self = new clazz({
     publicDeriverId: publicDeriverCounter++,
     parent,
