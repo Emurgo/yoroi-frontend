@@ -16,6 +16,7 @@ import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import globalMessages from '../../../../i18n/global-messages';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './UndelegateDialog.scss';
+import AnnotatedLoader from '../../../transfer/AnnotatedLoader';
 import config from '../../../../config';
 
 import {
@@ -43,6 +44,7 @@ type Props = {|
   +onSubmit: ({| password: string |}) => PossiblyAsync<void>,
   +classicTheme: boolean,
   +error: ?LocalizableError,
+  +generatingTx: boolean,
 |};
 
 @observer
@@ -94,6 +96,22 @@ export default class UndelegateDialog extends Component<Props> {
   render() {
     const { form } = this;
     const { intl } = this.context;
+
+    if (this.props.generatingTx) {
+      return (
+        <Dialog
+          title={intl.formatMessage(globalMessages.processingLabel)}
+          closeOnOverlayClick={false}
+          className={styles.dialog}
+        >
+          <AnnotatedLoader
+            title={intl.formatMessage(globalMessages.processingLabel)}
+            details={intl.formatMessage(globalMessages.txGeneration)}
+          />
+        </Dialog>
+      );
+    }
+
     const walletPasswordField = form.$('walletPassword');
 
     const staleTxWarning = (

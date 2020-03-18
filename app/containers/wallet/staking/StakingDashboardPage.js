@@ -218,6 +218,12 @@ export default class StakingDashboardPage extends Component<Props> {
           .trigger({ password: request.password, publicDeriver, });
         cancel();
       }}
+      generatingTx={
+        this.generated.stores.substores[environment.API]
+          .delegationTransaction
+          .createDelegationTx
+          .isExecuting
+      }
       isSubmitting={delegationTxStore.signAndBroadcastDelegationTx.isExecuting}
       transactionFee={getShelleyTxFee(delegationTx.unsignedTx.IOs, true)}
       staleTx={delegationTxStore.isStale}
@@ -491,12 +497,6 @@ export default class StakingDashboardPage extends Component<Props> {
                   this.generated.actions.dialogs.open.trigger({ dialog: UndelegateDialog });
                 }
                 : undefined
-            }
-            isUndelegating={
-              this.generated.stores.substores[environment.API]
-                .delegationTransaction
-                .createDelegationTx
-                .isExecuting
             }
             reputationInfo={poolReputation[pool[0]] ?? {}}
             openReputationDialog={() => this.generated.actions.dialogs.open.trigger({

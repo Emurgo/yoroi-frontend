@@ -793,7 +793,7 @@ export const UndelegateExecuting = () => {
       generated={genBaseProps({
         wallet,
         lookup,
-        openDialog: undefined,
+        openDialog: UndelegateDialog,
         delegationTransaction: {
           isStale: false,
           createDelegationTx: {
@@ -827,7 +827,7 @@ export const UndelegateError = () => {
       generated={genBaseProps({
         wallet,
         lookup,
-        openDialog: undefined,
+        openDialog: UndelegateDialog,
         delegationTransaction: {
           isStale: false,
           createDelegationTx: {

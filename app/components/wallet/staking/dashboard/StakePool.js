@@ -93,7 +93,6 @@ type Props = {|
    * since the UX in this case is not obvious (undelegate from one pool or all pools)
   */
   +undelegate: void | (void => Promise<void>),
-  +isUndelegating: boolean,
   +reputationInfo: ReputationObject,
   +openReputationDialog: void => void,
 |};
@@ -230,7 +229,6 @@ export default class StakePool extends Component<Props> {
     ]);
     const undelegateButtonClasses = classnames([
       'secondary',
-      this.props.isUndelegating ? styles.submitButtonSpinning : null,
     ]);
     return (
       <>
@@ -256,7 +254,6 @@ export default class StakePool extends Component<Props> {
               className={undelegateButtonClasses}
               skin={ButtonSkin}
               onClick={this.props.undelegate}
-              disabled={this.props.isUndelegating}
             />
           </>
         }
