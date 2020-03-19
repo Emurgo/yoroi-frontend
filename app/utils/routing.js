@@ -1,5 +1,7 @@
 // @flow
+
 import RouteParser from 'route-parser';
+import { ROUTES } from '../routes-config';
 
 export const matchRoute = (
   pattern: string, path: string
@@ -17,9 +19,9 @@ export const matchRoute = (
  * @param pattern
  * @param params
  */
-type ParamsT = ?{ [key: string]: Array<number|string>|number|string, ... };
+type ParamsT = ?{ [key: string]: $ReadOnlyArray<number|string> | number | string, ... };
 export const buildRoute = (pattern: string, params: ParamsT) => {
-  function toArray(val): Array<number | string> {
+  function toArray(val): $ReadOnlyArray<number | string> {
     return Array.isArray(val) ? val : [val];
   }
   const reRepeatingSlashes = /\/+/g; // '/some//path'
@@ -61,7 +63,7 @@ export const buildRoute = (pattern: string, params: ParamsT) => {
           return `<${tokenName}>`;
         });
       } else {
-        // Rougly resolve all named placeholders.
+        // Roughly resolve all named placeholders.
         // Cases:
         // - '/path/:param'
         // - '/path/(:param)'
@@ -108,3 +110,22 @@ export const handleExternalLinkClick = (event: MouseEvent) => {
     window.open(target.href, '_blank');
   }
 };
+
+type RecursiveTree = string | { [key: string]: RecursiveTree, ... };
+export function visitPaths(value: RecursiveTree): Array<string> {
+  if (typeof value !== 'object') return [value];
+  return Object.keys(value).map(key => value[key]).flatMap(nextValue => visitPaths(nextValue));
+}
+
+export function switchRouteWallet(currentRoute: string, newWalletId: number): string {
+  for (const route of visitPaths(ROUTES)) {
+    const matchWalletRoute = matchRoute(route, currentRoute);
+    if (matchWalletRoute === false) continue;
+
+    if (matchWalletRoute.id != null) {
+      matchWalletRoute.id = newWalletId.toString();
+    }
+    return buildRoute(route, (matchWalletRoute: any));
+  }
+  throw new Error(`${nameof(switchRouteWallet)} No path matched`);
+}

@@ -7,8 +7,9 @@ import styles from './NavBar.scss';
 type Props = {|
   +children?: ?Node,
   +title: ?Node,
-  +walletPlate?: ?Node,
   +walletDetails?: ?Node,
+  +button?: ?Node,
+  +walletPlate?: ?Node,
 |};
 
 @observer
@@ -16,6 +17,7 @@ export default class NavBar extends Component<Props> {
   static defaultProps = {
     children: undefined,
     walletPlate: undefined,
+    button: undefined,
     walletDetails: undefined,
   };
 
@@ -23,7 +25,6 @@ export default class NavBar extends Component<Props> {
     const {
       title,
       children,
-      walletPlate,
       walletDetails,
     } = this.props;
 
@@ -34,9 +35,16 @@ export default class NavBar extends Component<Props> {
         </div>
         <div className={styles.content}>
           {children}
-          <div className={styles.plate}>
-            {walletPlate}
-          </div>
+          {this.props.walletPlate != null && (
+            <div className={styles.plate}>
+              {this.props.walletPlate}
+            </div>
+          )}
+          {this.props.button != null && (
+            <div className={styles.button}>
+              {this.props.button}
+            </div>
+          )}
           <div className={styles.details}>
             {walletDetails}
           </div>

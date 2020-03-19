@@ -16,12 +16,25 @@ export default class AppStore extends Store {
     return this.stores.router.location.pathname;
   }
 
-  _updateRouteLocation: {| route: string, params: ?Object |} => void = (
+  _updateRouteLocation: {| route: string, params: ?Object, forceRefresh?: boolean |} => void = (
     options
   ) => {
     const routePath = buildRoute(options.route, options.params);
     const currentRoute = this.stores.router.location.pathname;
-    if (currentRoute !== routePath) this.stores.router.push(routePath);
+    if (currentRoute !== routePath || options.forceRefresh === true) {
+      if (options.forceRefresh === true) {
+        // react-router doesn't support forcing reload if the path is the same
+        // so we instead push a unique path (to guarantee a refresh) then replace with the real path
+        this.stores.router.push({ pathname: ROUTES.WALLETS.SWITCH });
+        // note: we replace instead of pushing a new path to avoid breaking the back button
+        // we need the timeout otherwise mobx will optimize out the fake path
+        setTimeout(() => {
+          this.stores.router.replace({ pathname: routePath });
+        });
+      } else {
+        this.stores.router.push(routePath);
+      }
+    }
   };
 
   _setRouteLocationToTransactionsList: {| params: ?Object |} => void = (

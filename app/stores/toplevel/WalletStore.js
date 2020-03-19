@@ -149,6 +149,7 @@ export default class WalletStore extends Store {
     this.publicDerivers = [];
     const { wallets, } = this.actions;
     wallets.unselectWallet.listen(this._unsetActiveWallet);
+    wallets.setActiveWallet.listen(this._setActiveWallet);
     setInterval(this._pollRefresh, this.WALLET_REFRESH_INTERVAL);
     // $FlowFixMe built-in types can't handle visibilitychange
     document.addEventListener('visibilitychange', debounce(this._pollRefresh, this.ON_VISIBLE_DEBOUNCE_WAIT));
@@ -231,15 +232,11 @@ export default class WalletStore extends Store {
     return matchRoute(ROUTES.WALLETS.ROOT + '(/*rest)', currentRoute) !== false;
   }
 
-  getWalletRoute: (PublicDeriver<>, ?string) => string = (
+  getWalletRoute: PublicDeriver<> => string = (
     publicDeriver,
-    page,
   ): string => (
-    buildRoute(ROUTES.WALLETS.PAGE, {
+    buildRoute(ROUTES.WALLETS.TRANSACTIONS, {
       id: publicDeriver.getPublicDeriverId(),
-      page: page == null
-        ? 'transactions'
-        : page
     })
   );
 

@@ -77,6 +77,9 @@ export const mockSettingsProps: {
     NavBarContainerProps: {
       generated: {
         stores: {
+          app: {
+            currentRoute: request.location,
+          },
           walletSettings: {
             getConceptualWalletSettingsCache:
               request.getConceptualWalletSettingsCache,
@@ -97,6 +100,9 @@ export const mockSettingsProps: {
           },
         },
         actions: {
+          wallets: {
+            setActiveWallet: { trigger: action('setActiveWallet') },
+          },
           profile: {
             updateHideBalance: { trigger: async (req) => action('updateHideBalance')(req) },
           },

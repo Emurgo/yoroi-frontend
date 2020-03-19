@@ -8,6 +8,7 @@ import environment from '../../../environment';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 import { asGetStakingKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { Bip44Wallet } from '../../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
+import { ROUTES } from '../../../routes-config';
 
 import transactionsIcon from '../../../assets/images/wallet-nav/tab-transactions.inline.svg';
 import sendIcon from '../../../assets/images/wallet-nav/tab-send.inline.svg';
@@ -73,8 +74,8 @@ export default class WalletNavigation extends Component<Props> {
             className="summary"
             label={intl.formatMessage(messages.transactions)}
             icon={transactionsIcon}
-            isActive={isActiveNavItem('transactions')}
-            onClick={() => onNavItemClick('transactions')}
+            isActive={isActiveNavItem(ROUTES.WALLETS.TRANSACTIONS)}
+            onClick={() => onNavItemClick(ROUTES.WALLETS.TRANSACTIONS)}
           />
         </div>
 
@@ -84,8 +85,8 @@ export default class WalletNavigation extends Component<Props> {
               className="send"
               label={intl.formatMessage(messages.send)}
               icon={sendIcon}
-              isActive={isActiveNavItem('send')}
-              onClick={() => onNavItemClick('send')}
+              isActive={isActiveNavItem(ROUTES.WALLETS.SEND)}
+              onClick={() => onNavItemClick(ROUTES.WALLETS.SEND)}
             />
           </div>
         )}
@@ -95,8 +96,8 @@ export default class WalletNavigation extends Component<Props> {
             className="receive"
             label={intl.formatMessage(messages.receive)}
             icon={receiveIcon}
-            isActive={isActiveNavItem('receive', true)}
-            onClick={() => onNavItemClick('receive')}
+            isActive={isActiveNavItem(ROUTES.WALLETS.RECEIVE.ROOT, true)}
+            onClick={() => onNavItemClick(ROUTES.WALLETS.RECEIVE.ROOT)}
           />
         </div>
 
@@ -106,8 +107,8 @@ export default class WalletNavigation extends Component<Props> {
               <WalletNavButton
                 className="stakeDashboard"
                 label={intl.formatMessage(messages.delegationDashboard)}
-                isActive={isActiveNavItem('delegation-dashboard')}
-                onClick={() => onNavItemClick('delegation-dashboard')}
+                isActive={isActiveNavItem(ROUTES.WALLETS.DELEGATION_DASHBOARD)}
+                onClick={() => onNavItemClick(ROUTES.WALLETS.DELEGATION_DASHBOARD)}
               />
             </div>
 
@@ -115,8 +116,8 @@ export default class WalletNavigation extends Component<Props> {
               <WalletNavButton
                 className="stakeSimulator"
                 label={intl.formatMessage(messages.delegationSimple)}
-                isActive={isActiveNavItem('delegation-simple')}
-                onClick={() => onNavItemClick('delegation-simple')}
+                isActive={isActiveNavItem(ROUTES.WALLETS.DELEGATION_SIMPLE)}
+                onClick={() => onNavItemClick(ROUTES.WALLETS.DELEGATION_SIMPLE)}
               />
             </div>
 
@@ -125,8 +126,8 @@ export default class WalletNavigation extends Component<Props> {
                 <WalletNavButton
                   className="stakeAdvancedSimulator"
                   label={intl.formatMessage(messages.delegationAdvance)}
-                  isActive={isActiveNavItem('delegation-advance')}
-                  onClick={() => onNavItemClick('delegation-advance')}
+                  isActive={isActiveNavItem(ROUTES.WALLETS.DELEGATION_ADVANCE)}
+                  onClick={() => onNavItemClick(ROUTES.WALLETS.DELEGATION_ADVANCE)}
                 />
               </div>)
             }

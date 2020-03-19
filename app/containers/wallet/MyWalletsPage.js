@@ -59,13 +59,12 @@ export default class MyWalletsPage extends Component<Props> {
     this.generated.actions.wallets.unselectWallet.trigger();
   }
 
-  handleWalletNavItemClick: (string, PublicDeriver<>) => void = (
-    page,
+  handleWalletNavItemClick: PublicDeriver<> => void = (
     publicDeriver
   ) => {
     this.generated.actions.router.goToRoute.trigger({
-      route: ROUTES.WALLETS.PAGE,
-      params: { id: publicDeriver.getPublicDeriverId(), page },
+      route: ROUTES.WALLETS.TRANSACTIONS,
+      params: { id: publicDeriver.getPublicDeriverId() },
     });
   };
 
@@ -100,7 +99,7 @@ export default class MyWalletsPage extends Component<Props> {
     const navbarElement = (
       <NavBar
         title={navbarTitle}
-        walletPlate={<NavBarAddButton onClick={
+        button={<NavBarAddButton onClick={
           () => this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
         }
         />}
@@ -170,7 +169,7 @@ export default class MyWalletsPage extends Component<Props> {
       <WalletRow
         isExpandable={false /* TODO: should be expandable if > 1 public deriver */}
         key={publicDeriver.getPublicDeriverId()}
-        onRowClicked={page => this.handleWalletNavItemClick(page, publicDeriver)}
+        onRowClicked={() => this.handleWalletNavItemClick(publicDeriver)}
         walletSumDetails={<WalletDetails
           walletAmount={balance}
           rewards={this.getRewardBalance(publicDeriver)}

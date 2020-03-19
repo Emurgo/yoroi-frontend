@@ -15,7 +15,6 @@
   font-size: 18px;
   line-height: 22px;
   text-align: left;
-  margin-left: 54px;
 }
 
 .currentWrapper {
@@ -24,6 +23,8 @@
 
 .head {
   min-width: 300px;
+}
+button {
   &:hover {
     cursor: pointer;
   }
