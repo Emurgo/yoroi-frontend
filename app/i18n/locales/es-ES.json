@@ -528,6 +528,7 @@
   "wallet.settings.resync.buttonLabel": "Resincronizar la billetera",
   "wallet.settings.resync.explanation": "Si tienes problemas con tu billetera, o crees que tienes un saldo o historial de transacciones incorrecto, puedes eliminar los datos locales almacenados por Yoroi y volver a sincronizar con la blockchain.",
   "wallet.settings.resync.label": "Resincronizar la billetera con la blockchain",
+  "wallet.settings.resync.warning": "This will also cause failed transactions to disappear as they are not stored on the blockchain.",
   "wallet.settings.unchangedPassword": "Contraseña sin cambios desde la creación de la billetera",
   "wallet.staking.pool.unknownLabel": "Pool desconocido",
   "wallet.staking.warning.pendingTx": "No puedes cambiar tu preferencia de delegación mientras una transacción se encuentra pendiente",
