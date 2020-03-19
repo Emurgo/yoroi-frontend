@@ -528,6 +528,7 @@
   "wallet.settings.resync.buttonLabel": "重新同步钱包",
   "wallet.settings.resync.explanation": "如果您的钱包有问题，或者认为余额或交易历史记录有误，则可以删除Yoroi存储的本地数据，然后与区块链重新同步。",
   "wallet.settings.resync.label": "从区块链重新同步钱包",
+  "wallet.settings.resync.warning": "This will also cause failed transactions to disappear as they are not stored on the blockchain.",
   "wallet.settings.unchangedPassword": "自钱包创建起密码未改变",
   "wallet.staking.pool.unknownLabel": "未知权益池",
   "wallet.staking.warning.pendingTx": "有交易暂挂时您无法更改委托偏好",
