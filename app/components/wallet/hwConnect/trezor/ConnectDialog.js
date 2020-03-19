@@ -125,10 +125,9 @@ export default class ConnectDialog extends Component<Props> {
     }
 
     const dailogActions = [{
-      className: isActionProcessing ? styles.processing : null,
       label: intl.formatMessage(globalMessages.hwConnectDialogConnectButtonLabel),
       primary: true,
-      disabled: isActionProcessing,
+      isSubmitting: isActionProcessing,
       onClick: submit
     }];
 

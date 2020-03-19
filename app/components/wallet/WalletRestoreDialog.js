@@ -101,14 +101,14 @@ export default class WalletRestoreDialog extends Component<Props> {
     intl: intlShape.isRequired
   };
 
-  getInitRecoveryPhrase = () => {
+  getInitRecoveryPhrase: void => Array<string> = () => {
     if (this.props.initValues) {
       const str: string = (this.props.initValues.recoveryPhrase || '').trim();
       if (str) {
         return str.split(' ');
       }
     }
-    return '';
+    return [];
   };
 
   form = new ReactToolboxMobxForm({
@@ -206,7 +206,16 @@ export default class WalletRestoreDialog extends Component<Props> {
     },
   }, {
     options: {
-      showErrorsOnInit: this.props.initValues != null,
+      showErrorsOnInit: (() => {
+        if (this.props.initValues == null) {
+          return false;
+        }
+        const { initValues } = this.props;
+        return Object.keys(initValues)
+          .map(key => initValues[key])
+          .filter(val => val !== '' && val != null)
+          .length > 0;
+      })(),
       validateOnChange: true,
       validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
     },

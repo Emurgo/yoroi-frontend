@@ -118,11 +118,10 @@ export default class CheckDialog extends Component<Props> {
       </div>);
 
     const dailogActions = [{
-      className: isActionProcessing ? styles.processing : null,
       label: intl.formatMessage(globalMessages.nextButtonLabel),
       primary: true,
-      disabled: false,
       onClick: submit,
+      isSubmitting: isActionProcessing,
     }];
 
     return (

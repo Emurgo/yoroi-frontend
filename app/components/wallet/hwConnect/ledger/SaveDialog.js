@@ -177,10 +177,10 @@ export default class SaveDialog extends Component<Props> {
     );
 
     const dialogActions = [{
-      className: isActionProcessing ? styles.processing : null,
       label: intl.formatMessage(globalMessages.hwConnectDialogSaveButtonLabel),
       primary: true,
       disabled: disabledCondition,
+      isSubmitting: isActionProcessing,
       onClick: this.save
     }];
 

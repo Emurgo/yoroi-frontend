@@ -96,7 +96,11 @@ const genBaseProps: {|
             ada: {
               delegationTransaction: {
                 selectedPools: request.selectedPools != null ? request.selectedPools : [],
-                isStale: request.createDelegationTx == null ? false : boolean('isStale', false),
+                isStale: request.createDelegationTx == null
+                  || request.createDelegationTx.result == null
+                  || request.signAndBroadcastDelegationTx?.wasExecuted === true
+                  ? false
+                  : boolean('isStale', false),
                 createDelegationTx: request.createDelegationTx == null
                   ? {
                     result: undefined,

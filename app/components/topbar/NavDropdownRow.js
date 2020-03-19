@@ -19,6 +19,7 @@ type Props = {|
   +detailComponent: Node,
   +syncTime?: ?string,
   +isCurrentWallet?: boolean,
+  +onSelect: void => void,
 |};
 
 @observer
@@ -48,12 +49,16 @@ export default class NavDropdownRow extends Component<Props> {
 
     return (
       <div className={wrapperClassname}>
-        <div className={styles.head}>
+        <button
+          className={styles.head}
+          type="button"
+          onClick={this.props.onSelect}
+        >
           {plateComponent !== undefined ?
             plateComponent :
             <p className={styles.title}>{title}</p>
           }
-        </div>
+        </button>
         <div className={styles.details}>
           {detailComponent}
         </div>

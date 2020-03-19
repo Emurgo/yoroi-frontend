@@ -111,7 +111,9 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
       <Dialog
         title={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
         closeOnOverlayClick={false}
-        closeButton={<DialogCloseButton />}
+        closeButton={this._getAdaWalletsStore().sendMoneyRequest.isExecuting
+          ? undefined
+          : (<DialogCloseButton />)}
         onClose={this.props.onClose}
       >
         {this.getContent()}
@@ -154,12 +156,10 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
         .map(addr => addressToDisplayString(addr))[0],
     };
 
-    const isSubmitting = false;
-
     const spendingPasswordForm = (<SpendingPasswordInput
       setForm={(form) => this.setSpendingPasswordForm(form)}
       classicTheme={this.generated.stores.profile.isClassicTheme}
-      isSubmitting={isSubmitting}
+      isSubmitting={this._getAdaWalletsStore().sendMoneyRequest.isExecuting}
     />);
 
     return (

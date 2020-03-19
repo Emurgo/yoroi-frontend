@@ -117,16 +117,16 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
     const actions = [
       {
         label: intl.formatMessage(globalMessages.backButtonLabel),
-        onClick: isSubmitting
-          ? () => {} // noop
-          : onCancel
+        disabled: isSubmitting,
+        onClick: onCancel,
       },
       {
         label: intl.formatMessage(globalMessages.sendButtonLabel),
         onClick: this.submit.bind(this),
         primary: true,
         className: confirmButtonClasses,
-        disabled: !walletPasswordField.isValid || isSubmitting,
+        isSubmitting,
+        disabled: !walletPasswordField.isValid,
       },
     ];
 

@@ -344,7 +344,7 @@ export const EditPassword = () => {
                     ...defaultProps.stores.walletSettings,
                     changeSigningKeyRequest: {
                       ...defaultProps.stores.walletSettings.changeSigningKeyRequest,
-                      isExecuting: boolean('changeSigningKeyRequest isExecuting'),
+                      isExecuting: boolean('changeSigningKeyRequest isExecuting', false),
                       error: errorValue() === errorCases.None ? undefined : errorValue(),
                     },
                   },

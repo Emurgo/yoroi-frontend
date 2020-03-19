@@ -138,16 +138,15 @@ export default class HWSendConfirmationDialog extends Component<Props> {
     const actions = [
       {
         label: intl.formatMessage(globalMessages.backButtonLabel),
-        onClick: isSubmitting
-          ? () => {} // noop
-          : onCancel
+        disabled: isSubmitting,
+        onClick: onCancel,
       },
       {
         label: intl.formatMessage(messages.sendUsingHWButtonLabel),
         onClick: this.props.onSubmit,
         primary: true,
         className: confirmButtonClasses,
-        disabled: isSubmitting,
+        isSubmitting,
       },
     ];
 

@@ -25,7 +25,7 @@ export default class TransferNavButton extends Component<Props> {
       isActive ? styles.active : styles.normal
     ]);
     return (
-      <button type="button" className={componentClasses} onClick={onClick}>
+      <button type="button" className={componentClasses} onClick={isActive ? () => {} : onClick}>
         <div className={styles.container}>
           <span className={styles.label}>{label}</span>
         </div>
