@@ -528,6 +528,7 @@
   "wallet.settings.resync.buttonLabel": "ウォレット同期をやり直す",
   "wallet.settings.resync.explanation": "正しい残高やトランザクション履歴が表示されないなどの問題が発生した場合、ヨロイのローカルデータを一旦削除し再度ブロックチェーンと同期することができます。",
   "wallet.settings.resync.label": "ウォレットをブロックチェーンに再同期する",
+  "wallet.settings.resync.warning": "This will also cause failed transactions to disappear as they are not stored on the blockchain.",
   "wallet.settings.unchangedPassword": "ウォレット作成時からパスワードは変更されていません",
   "wallet.staking.pool.unknownLabel": "不明なプール",
   "wallet.staking.warning.pendingTx": "保留中のトランザクションがある時に委任の設定を変更できません",
