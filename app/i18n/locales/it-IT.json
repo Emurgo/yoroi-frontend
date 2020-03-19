@@ -528,6 +528,7 @@
   "wallet.settings.resync.buttonLabel": "Risincronizza portafoglio",
   "wallet.settings.resync.explanation": "Se si verificano problemi con il portafoglio, o si pensi di avere un saldo o una cronologia delle transazioni errata, è possibile cancellare i dati memorizzati localmente di Yoroi e risincronizzarli con la blockchain.",
   "wallet.settings.resync.label": "Risincronizza il portafoglio con la blockchain",
+  "wallet.settings.resync.warning": "This will also cause failed transactions to disappear as they are not stored on the blockchain.",
   "wallet.settings.unchangedPassword": "Password invariata dalla creazione del portafoglio",
   "wallet.staking.pool.unknownLabel": "Pool sconosciuta",
   "wallet.staking.warning.pendingTx": "Non è possibile modificare le preferenze di delega mentre è in corso una transazione",
