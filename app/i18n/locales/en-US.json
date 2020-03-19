@@ -528,6 +528,7 @@
   "wallet.settings.resync.buttonLabel": "Resync wallet",
   "wallet.settings.resync.explanation": "If you are experiencing issues with your wallet, or think you have an incorrect balance or transaction history, you can delete the local data stored by Yoroi and resync with the blockchain.",
   "wallet.settings.resync.label": "Resync wallet with the blockchain",
+  "wallet.settings.resync.warning": "This will also cause failed transactions to disappear as they are not stored on the blockchain.",
   "wallet.settings.unchangedPassword": "Password unchanged since wallet creation",
   "wallet.staking.pool.unknownLabel": "Unknown pool",
   "wallet.staking.warning.pendingTx": "You cannot change your delegation preference while a transaction is pending",

@@ -12,7 +12,8 @@ import {
 } from '../../../../stories/helpers/StoryWrapper';
 import { IncorrectWalletPasswordError } from '../../../api/common';
 import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
-import RemoveWalletDialog from '../../../components/wallet/settings/RemoveWalletDialog';
+import RemoveWalletDialogContainer from './RemoveWalletDialogContainer';
+import ResyncWalletDialogContainer from './ResyncWalletDialogContainer';
 import { wrapSettings } from '../../../Routes';
 import { mockSettingsProps } from '../Settings.mock';
 import { ROUTES } from '../../../routes-config';
@@ -41,15 +42,6 @@ const defaultSettingsPageProps: {|
     },
     walletSettings: {
       getConceptualWalletSettingsCache: request.getConceptualWalletSettingsCache,
-      removeWalletRequest: {
-        reset: action('removeWalletRequest reset'),
-        isExecuting: false,
-        error: undefined,
-      },
-      clearHistory: {
-        reset: action('clearHistory reset'),
-        isExecuting: false,
-      },
       renameModelRequest: {
         error: undefined,
         isExecuting: false,
@@ -73,12 +65,9 @@ const defaultSettingsPageProps: {|
       stopEditingWalletField: { trigger: action('stopEditingWalletField') },
       cancelEditingWalletField: { trigger: action('cancelEditingWalletField') },
       renameConceptualWallet: { trigger: async (req) => action('renameConceptualWallet')(req) },
-      resyncHistory: { trigger: async (req) => action('resyncHistory')(req) },
-      removeWallet: { trigger: async (req) => action('removeWallet')(req) },
     },
     dialogs: {
       open: { trigger: action('open') },
-      closeActiveDialog: { trigger: action('closeActiveDialog') },
     },
   },
 });
@@ -122,6 +111,8 @@ export const EditName = () => {
             },
             // dialog is close so no need to give props
             ChangeWalletPasswordDialogContainerProps: (null: any),
+            RemoveWalletDialogContainerProps: (null: any),
+            ResyncWalletDialogContainerProps: (null: any),
           }}
         />
       );
@@ -173,6 +164,8 @@ export const PasswordUpdateTime = () => {
               },
               // dialog is close so no need to give props
               ChangeWalletPasswordDialogContainerProps: (null: any),
+              RemoveWalletDialogContainerProps: (null: any),
+              ResyncWalletDialogContainerProps: (null: any),
             }}
           />
         );
@@ -202,16 +195,35 @@ export const ResyncWallet = () => {
             ...settingPageProps,
             stores: {
               ...settingPageProps.stores,
-              walletSettings: {
-                ...settingPageProps.stores.walletSettings,
-                clearHistory: {
-                  ...settingPageProps.stores.walletSettings.clearHistory,
-                  isExecuting: true,
-                },
+              uiDialogs: {
+                ...settingPageProps.stores.uiDialogs,
+                isOpen: (clazz) => clazz === ResyncWalletDialogContainer,
               },
             },
             // dialog is close so no need to give props
             ChangeWalletPasswordDialogContainerProps: (null: any),
+            RemoveWalletDialogContainerProps: (null: any),
+            ResyncWalletDialogContainerProps: {
+              generated: {
+                stores: {
+                  walletSettings: {
+                    clearHistory: {
+                      reset: action('clearHistory reset'),
+                      isExecuting: boolean('isExecuting', false),
+                      error: undefined,
+                    },
+                  }
+                },
+                actions: {
+                  walletSettings: {
+                    resyncHistory: { trigger: async (req) => action('resyncHistory')(req) },
+                  },
+                  dialogs: {
+                    closeActiveDialog: { trigger: action('closeActiveDialog') },
+                  },
+                },
+              },
+            },
           }}
         />
       );
@@ -219,9 +231,7 @@ export const ResyncWallet = () => {
   );
 };
 
-const defaultChangeWalletPasswordDialogContainerProps: {|
-  selected: null | PublicDeriver<>,
-|} => * = (request) => ({
+const defaultChangeWalletPasswordDialogContainerProps: void => * = (_request) => ({
   stores: {
     walletSettings: {
       changeSigningKeyRequest: {
@@ -232,9 +242,6 @@ const defaultChangeWalletPasswordDialogContainerProps: {|
     },
     profile: {
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-    },
-    wallets: {
-      selected: request.selected,
     },
     uiDialogs: {
       dataForActiveDialog: {
@@ -270,9 +277,7 @@ export const EditPassword = () => {
         getConceptualWalletSettingsCache: lookup.getConceptualWalletSettingsCache,
         getSigningKeyCache: lookup.getSigningKeyCache,
       });
-      const defaultProps = defaultChangeWalletPasswordDialogContainerProps({
-        selected: wallet.publicDeriver,
-      });
+      const defaultProps = defaultChangeWalletPasswordDialogContainerProps();
       const errorCases = {
         None: undefined,
         WrongPassword: new IncorrectWalletPasswordError(),
@@ -355,6 +360,8 @@ export const EditPassword = () => {
                 },
               },
             },
+            RemoveWalletDialogContainerProps: (null: any),
+            ResyncWalletDialogContainerProps: (null: any),
           }}
         />
       );
@@ -377,9 +384,6 @@ export const RemoveWallet = () => {
         getConceptualWalletSettingsCache: lookup.getConceptualWalletSettingsCache,
         getSigningKeyCache: lookup.getSigningKeyCache,
       });
-      const defaultProps = defaultChangeWalletPasswordDialogContainerProps({
-        selected: wallet.publicDeriver,
-      });
       return (
         <WalletSettingsPage
           generated={{
@@ -388,21 +392,32 @@ export const RemoveWallet = () => {
               ...settingPageProps.stores,
               uiDialogs: {
                 ...settingPageProps.stores.uiDialogs,
-                isOpen: (clazz) => clazz === RemoveWalletDialog,
+                isOpen: (clazz) => clazz === RemoveWalletDialogContainer,
               },
-              walletSettings: {
-                ...settingPageProps.stores.walletSettings,
-                removeWalletRequest: {
-                  ...settingPageProps.stores.walletSettings.removeWalletRequest,
-                  isExecuting: boolean('isExecuting', false),
+            },
+            ChangeWalletPasswordDialogContainerProps: (null: any),
+            RemoveWalletDialogContainerProps: {
+              generated: {
+                stores: {
+                  walletSettings: {
+                    removeWalletRequest: {
+                      reset: action('removeWalletRequest reset'),
+                      error: undefined,
+                      isExecuting: boolean('isExecuting', false),
+                    },
+                  },
+                },
+                actions: {
+                  walletSettings: {
+                    removeWallet: { trigger: async (req) => action('removeWallet')(req) },
+                  },
+                  dialogs: {
+                    closeActiveDialog: { trigger: action('closeActiveDialog') },
+                  },
                 },
               },
             },
-            ChangeWalletPasswordDialogContainerProps: {
-              generated: {
-                ...defaultProps,
-              },
-            },
+            ResyncWalletDialogContainerProps: (null: any),
           }}
         />
       );

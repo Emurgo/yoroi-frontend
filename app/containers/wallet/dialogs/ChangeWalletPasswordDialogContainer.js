@@ -4,12 +4,17 @@ import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import ChangeWalletPasswordDialog from '../../../components/wallet/settings/ChangeWalletPasswordDialog';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 
 export type GeneratedData = typeof ChangeWalletPasswordDialogContainer.prototype.generated;
 
+type Props = {|
+  ...InjectedOrGenerated<GeneratedData>,
+  publicDeriver: PublicDeriver<>,
+|};
+
 @observer
-export default class ChangeWalletPasswordDialogContainer
-  extends Component<InjectedOrGenerated<GeneratedData>> {
+export default class ChangeWalletPasswordDialogContainer extends Component<Props> {
 
   render() {
     const { actions } = this.generated;
@@ -17,10 +22,7 @@ export default class ChangeWalletPasswordDialogContainer
     const { walletSettings } = this.generated.stores;
     const dialogData = uiDialogs.dataForActiveDialog;
     const { updateDataForActiveDialog } = actions.dialogs;
-    const publicDeriver = this.generated.stores.wallets.selected;
     const { changeSigningKeyRequest } = walletSettings;
-
-    if (!publicDeriver) throw new Error('Active wallet required for ChangeWalletPasswordDialogContainer.');
 
     return (
       <ChangeWalletPasswordDialog
@@ -28,7 +30,7 @@ export default class ChangeWalletPasswordDialogContainer
         onSave={async (values) => {
           const { oldPassword, newPassword } = values;
           await actions.walletSettings.updateSigningPassword.trigger({
-            publicDeriver,
+            publicDeriver: this.props.publicDeriver,
             oldPassword,
             newPassword
           });
@@ -71,9 +73,6 @@ export default class ChangeWalletPasswordDialogContainer
         },
         profile: {
           isClassicTheme: stores.profile.isClassicTheme,
-        },
-        wallets: {
-          selected: stores.wallets.selected,
         },
         uiDialogs: {
           dataForActiveDialog: {

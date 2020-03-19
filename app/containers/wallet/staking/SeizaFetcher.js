@@ -141,8 +141,6 @@ export default class SeizaFetcher extends Component<Props> {
           <Dialog
             title={intl.formatMessage(globalMessages.processingLabel)}
             closeOnOverlayClick={false}
-            onClose={this.cancel}
-            closeButton={<DialogCloseButton onClose={this.cancel} />}
           >
             <AnnotatedLoader
               title={intl.formatMessage(globalMessages.processingLabel)}

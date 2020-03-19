@@ -7,7 +7,7 @@ import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 
-const messages = defineMessages({
+export const messages = defineMessages({
   titleLabel: {
     id: 'wallet.settings.resync.label',
     defaultMessage: '!!!Resync wallet with the blockchain',
@@ -23,8 +23,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  isSubmitting: boolean,
-  onResync: void => PossiblyAsync<void>,
+  openDialog: void => void,
 |};
 
 @observer
@@ -38,7 +37,7 @@ export default class ResyncBlock extends Component<Props> {
 
     const buttonClassNames = classNames([
       'primary',
-      this.props.isSubmitting ? styles.submitButtonSpinning : styles.submitButton,
+      styles.submitButton,
       'resyncButton' // classname for UI tests
     ]);
     return (
@@ -53,8 +52,7 @@ export default class ResyncBlock extends Component<Props> {
           className={buttonClassNames}
           label={this.context.intl.formatMessage(messages.resyncButtonlabel)}
           skin={ButtonSkin}
-          onClick={this.props.onResync}
-          disabled={this.props.isSubmitting}
+          onClick={this.props.openDialog}
         />
       </div>
     );

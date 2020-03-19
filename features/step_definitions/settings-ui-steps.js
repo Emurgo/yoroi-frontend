@@ -119,7 +119,7 @@ When(/^I click on remove wallet$/, async function () {
 });
 
 Then(/^I click on the checkbox$/, async function () {
-  await this.click('.RemoveWalletDialog_checkbox .SimpleCheckbox_root');
+  await this.click('.DangerousActionDialog_checkbox > .SimpleCheckbox_root');
 });
 
 

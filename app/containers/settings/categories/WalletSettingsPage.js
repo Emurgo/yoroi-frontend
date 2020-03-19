@@ -7,7 +7,10 @@ import WalletNameSetting from '../../../components/wallet/settings/WalletNameSet
 import SpendingPasswordSetting from '../../../components/wallet/settings/SpendingPasswordSetting';
 import ResyncBlock from '../../../components/wallet/settings/ResyncBlock';
 import RemoveWallet from '../../../components/wallet/settings/RemoveWallet';
-import RemoveWalletDialog from '../../../components/wallet/settings/RemoveWalletDialog';
+import type { GeneratedData as RemoveWalletDialogContainerData } from './RemoveWalletDialogContainer';
+import RemoveWalletDialogContainer from './RemoveWalletDialogContainer';
+import type { GeneratedData as ResyncWalletDialogContainerData } from './ResyncWalletDialogContainer';
+import ResyncWalletDialogContainer from './ResyncWalletDialogContainer';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import { isValidWalletName } from '../../../utils/validations';
 import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
@@ -19,11 +22,6 @@ type GeneratedData = typeof WalletSettingsPage.prototype.generated;
 
 @observer
 export default class WalletSettingsPage extends Component<InjectedOrGenerated<GeneratedData>> {
-
-  componentWillUnmount() {
-    this.generated.stores.walletSettings.removeWalletRequest.reset();
-    this.generated.stores.walletSettings.clearHistory.reset();
-  }
 
   render() {
     const { profile, walletSettings } = this.generated.stores;
@@ -90,17 +88,14 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
           />
         )}
         <ResyncBlock
-          isSubmitting={this.generated.stores.walletSettings.clearHistory.isExecuting}
-          onResync={async () => {
-            await this.generated.actions.walletSettings.resyncHistory.trigger({
-              publicDeriver: selectedWallet
-            });
-          }}
+          openDialog={() => actions.dialogs.open.trigger({
+            dialog: ResyncWalletDialogContainer,
+          })}
         />
         <RemoveWallet
           walletName={settingsCache.conceptualWalletName}
           openDialog={() => actions.dialogs.open.trigger({
-            dialog: RemoveWalletDialog,
+            dialog: RemoveWalletDialogContainer,
           })}
         />
       </>
@@ -110,25 +105,29 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
   getDialog: (void | PublicDeriver<>) => Node = (
     publicDeriver
   ) => {
-    const settingsStore = this.generated.stores.walletSettings;
-    const settingsActions = this.generated.actions.walletSettings;
-
-    if (this.generated.stores.uiDialogs.isOpen(ChangeWalletPasswordDialogContainer)) {
+    const { isOpen } = this.generated.stores.uiDialogs;
+    if (publicDeriver != null && isOpen(ChangeWalletPasswordDialogContainer)) {
       return (
         <ChangeWalletPasswordDialogContainer
           {...this.generated.ChangeWalletPasswordDialogContainerProps}
+          publicDeriver={publicDeriver}
         />
       );
     }
-    if (this.generated.stores.uiDialogs.isOpen(RemoveWalletDialog)) {
+    // selected wallet becomes null as we delete it
+    if (isOpen(RemoveWalletDialogContainer)) {
       return (
-        <RemoveWalletDialog
-          onSubmit={() => publicDeriver && settingsActions.removeWallet.trigger({
-            publicDeriver,
-          })}
-          isSubmitting={settingsStore.removeWalletRequest.isExecuting}
-          onCancel={this.generated.actions.dialogs.closeActiveDialog.trigger}
-          error={settingsStore.removeWalletRequest.error}
+        <RemoveWalletDialogContainer
+          {...this.generated.RemoveWalletDialogContainerProps}
+          publicDeriver={publicDeriver}
+        />
+      );
+    }
+    if (publicDeriver != null && isOpen(ResyncWalletDialogContainer)) {
+      return (
+        <ResyncWalletDialogContainer
+          {...this.generated.ResyncWalletDialogContainerProps}
+          publicDeriver={publicDeriver}
         />
       );
     }
@@ -152,15 +151,6 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
         },
         walletSettings: {
           getConceptualWalletSettingsCache: settingStore.getConceptualWalletSettingsCache,
-          removeWalletRequest: {
-            reset: settingStore.removeWalletRequest.reset,
-            isExecuting: settingStore.removeWalletRequest.isExecuting,
-            error: settingStore.removeWalletRequest.error,
-          },
-          clearHistory: {
-            reset: settingStore.clearHistory.reset,
-            isExecuting: settingStore.clearHistory.isExecuting,
-          },
           renameModelRequest: {
             error: settingStore.renameModelRequest.error,
             isExecuting: settingStore.renameModelRequest.isExecuting,
@@ -184,17 +174,20 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
           stopEditingWalletField: { trigger: settingActions.stopEditingWalletField.trigger },
           cancelEditingWalletField: { trigger: settingActions.cancelEditingWalletField.trigger },
           renameConceptualWallet: { trigger: settingActions.renameConceptualWallet.trigger },
-          resyncHistory: { trigger: settingActions.resyncHistory.trigger },
-          removeWallet: { trigger: settingActions.removeWallet.trigger },
         },
         dialogs: {
           open: { trigger: actions.dialogs.open.trigger },
-          closeActiveDialog: { trigger: actions.dialogs.closeActiveDialog.trigger },
         },
       },
       ChangeWalletPasswordDialogContainerProps: (
         { actions, stores, }: InjectedOrGenerated<ChangeWalletPasswordDialogContainerData>
-      )
+      ),
+      RemoveWalletDialogContainerProps: (
+        { actions, stores, }: InjectedOrGenerated<RemoveWalletDialogContainerData>
+      ),
+      ResyncWalletDialogContainerProps: (
+        { actions, stores, }: InjectedOrGenerated<ResyncWalletDialogContainerData>
+      ),
     });
   }
 }
