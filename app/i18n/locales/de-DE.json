@@ -528,7 +528,7 @@
   "wallet.settings.resync.buttonLabel": "Neu synchronisieren",
   "wallet.settings.resync.explanation": "Wenn Du Probleme mit Deiner Wallet hast oder glaubst, dass Du einen falschen Kontostand oder eine falsche Transaktionshistorie hast, kannst Du die von Yoroi gespeicherten lokalen Daten löschen und mit der Blockchain neu synchronisieren.",
   "wallet.settings.resync.label": "Synchronisiere neu mit der Blockchain",
-  "wallet.settings.resync.warning": "This will also cause failed transactions to disappear as they are not stored on the blockchain.",
+  "wallet.settings.resync.warning": "Dies wird auch dazu führen, dass fehlgeschlagene Transaktionen verschwinden, da sie nicht in der Blockchain gespeichert sind.",
   "wallet.settings.unchangedPassword": "Das Kennwort wurde seit der Wallet-Erstellung noch nie geändert",
   "wallet.staking.pool.unknownLabel": "Unbekannter pool",
   "wallet.staking.warning.pendingTx": "Du kannst Deine Delegationspräferenz nicht ändern, während eine Transaktion ausstehend ist",
