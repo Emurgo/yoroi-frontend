@@ -67,7 +67,6 @@ export default class Transfer extends Component<Props> {
   };
 
   handleTransferNavItemClick : $PropertyType<TransferNavigationProps, 'onNavItemClick'> = page => {
-
     this.generated.actions.router.goToRoute.trigger({
       route: { daedalus: ROUTES.TRANSFER.DAEDALUS, yoroi: ROUTES.TRANSFER.YOROI }[page],
     });

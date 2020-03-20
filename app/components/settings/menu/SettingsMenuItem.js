@@ -32,8 +32,9 @@ export default class SettingsMenuItem extends Component<Props> {
       className
     ]);
 
+    const disableClick = active || (disabled === true);
     return (
-      <button type="button" className={componentClasses} onClick={onClick}>{label}</button>
+      <button type="button" className={componentClasses} onClick={disableClick ? () => {} : onClick}>{label}</button>
     );
   }
 

@@ -152,9 +152,8 @@ export default class DelegationTransactionStore extends Store {
   }
 
   goToDashboardRoute(publicDeriver: PublicDeriver<>): void {
-    const route = buildRoute(ROUTES.WALLETS.PAGE, {
+    const route = buildRoute(ROUTES.WALLETS.DELEGATION_DASHBOARD, {
       id: publicDeriver.getPublicDeriverId(),
-      page: 'delegation-dashboard'
     });
     this.actions.router.goToRoute.trigger({ route });
   }

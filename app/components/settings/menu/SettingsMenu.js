@@ -68,11 +68,7 @@ export default class SettingsMenu extends Component<Props> {
 
           <SettingsMenuItem
             label={intl.formatMessage(globalMessages.walletLabel)}
-            onClick={() => {
-              if (hasActiveWallet) {
-                onItemClick(ROUTES.SETTINGS.WALLET);
-              }
-            }}
+            onClick={() => onItemClick(ROUTES.SETTINGS.WALLET)}
             active={isActiveItem(ROUTES.SETTINGS.WALLET)}
             className="wallet"
             disabled={!hasActiveWallet}

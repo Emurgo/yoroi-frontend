@@ -66,7 +66,12 @@ export default class AdaWalletsStore extends Store {
     this.stores.wallets.goToWalletRoute(transactionDetails.publicDeriver);
   };
 
-  @action _onRouteChange: {| route: string, params: ?Object |} => void = (options) => {
+  // TODO: delete this and put this logic inside componentWillUnmount
+  @action _onRouteChange: {|
+    route: string,
+    params: ?Object,
+    forceRefresh?: boolean,
+  |} => void = (options) => {
     // Reset the send request anytime we visit the send page (e.g: to remove any previous errors)
     if (matchRoute(ROUTES.WALLETS.SEND, buildRoute(options.route, options.params)) !== false) {
       this.sendMoneyRequest.reset();

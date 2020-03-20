@@ -46,30 +46,30 @@ export default class Wallet extends Component<Props> {
     this.generated.actions.router.goToRoute.trigger({ route: destination });
   }
 
-  isActiveScreen = (page: string, subpage: ?boolean): boolean => {
+  isActiveScreen = (route: string, matchesPrefix: ?boolean): boolean => {
     const { app } = this.generated.stores;
     const { selected } = this.generated.stores.wallets;
     if (selected == null) return false;
     const screenRoute = buildRoute(
-      ROUTES.WALLETS.PAGE,
+      route,
       {
         id: selected.getPublicDeriverId(),
-        page
       }
     );
-    if (subpage === true) {
+    // only check that the page is a prefix of the current route (to handle subpages)
+    if (matchesPrefix === true) {
       return app.currentRoute.indexOf(screenRoute) !== -1;
     }
     return app.currentRoute === screenRoute;
   };
 
-  handleWalletNavItemClick: (string) => void = (page) => {
+  handleWalletNavItemClick: (string) => void = (route) => {
     const { wallets } = this.generated.stores;
     const selected = wallets.selected;
     if (selected == null) return;
     this.generated.actions.router.goToRoute.trigger({
-      route: ROUTES.WALLETS.PAGE,
-      params: { id: selected.getPublicDeriverId(), page },
+      route,
+      params: { id: selected.getPublicDeriverId() },
     });
   };
 

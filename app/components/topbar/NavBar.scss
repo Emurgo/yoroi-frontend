@@ -21,10 +21,12 @@
 
 .plate {
   flex: 0 0 auto;
-  padding-right: 62px;
-  min-width: 240px;
   display: flex;
   align-items: center;
+}
+
+.button {
+  margin-right: 32px;
 }
 
 .details {

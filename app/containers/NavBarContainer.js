@@ -13,6 +13,7 @@ import NavWalletDetails from '../components/topbar/NavWalletDetails';
 import NavDropdown from '../components/topbar/NavDropdown';
 import NavDropdownRow from '../components/topbar/NavDropdownRow';
 import { ROUTES } from '../routes-config';
+import { switchRouteWallet } from '../utils/routing';
 import { LOVELACES_PER_ADA } from '../config/numbersConfig';
 import { isLedgerNanoWallet, isTrezorTWallet } from '../api/ada/lib/storage/models/ConceptualWallet/index';
 import {
@@ -41,8 +42,31 @@ export default class NavBarContainer extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  updateHideBalance = () => {
+  updateHideBalance: void => void = () => {
     this.generated.actions.profile.updateHideBalance.trigger();
+  }
+
+  switchToNewWallet: PublicDeriver<> => void = (newWallet) => {
+    const newRoute = switchRouteWallet(
+      this.generated.stores.app.currentRoute,
+      newWallet.getPublicDeriverId()
+    );
+    if (newRoute === this.generated.stores.app.currentRoute) {
+      // the route specified in the URL would usually switch the selected wallet for us
+      // but if the route is the same even after switching wallets, this won't trigger
+      // so we manually switch the wallets in this case
+      this.generated.actions.wallets.setActiveWallet.trigger({
+        wallet: newWallet,
+      });
+    }
+    this.generated.actions.router.goToRoute.trigger({
+      route: newRoute,
+      /**
+       * need to force a refresh
+       * since some onMount and willMount hooks depend on the selected wallet
+      */
+      forceRefresh: true,
+    });
   }
 
   render() {
@@ -101,6 +125,7 @@ export default class NavBarContainer extends Component<Props> {
             walletName={settingsCache.conceptualWalletName}
             walletType={getWalletType(wallet)}
           />}
+          onSelect={() => this.switchToNewWallet(wallet)}
           isCurrentWallet={wallet === this.generated.stores.wallets.selected}
           syncTime={txRequests.lastSyncInfo.Time
             ? moment(txRequests.lastSyncInfo.Time).fromNow()
@@ -214,6 +239,9 @@ export default class NavBarContainer extends Component<Props> {
     const { stores, actions } = this.props;
     return Object.freeze({
       stores: {
+        app: {
+          currentRoute: stores.app.currentRoute,
+        },
         walletSettings: {
           getConceptualWalletSettingsCache: stores.substores.ada.walletSettings
             .getConceptualWalletSettingsCache,
@@ -234,6 +262,9 @@ export default class NavBarContainer extends Component<Props> {
         },
       },
       actions: {
+        wallets: {
+          setActiveWallet: { trigger: actions.wallets.setActiveWallet.trigger },
+        },
         profile: {
           updateHideBalance: { trigger: actions.profile.updateHideBalance.trigger },
         },

@@ -144,7 +144,6 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
 
     const confirmButtonClasses = classnames([
       'confirmButton',
-      isSubmitting ? styles.isSubmitting : null,
     ]);
 
     const newPasswordClasses = classnames([
@@ -170,7 +169,8 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
         onClick: this.submit,
         primary: true,
         className: confirmButtonClasses,
-        disabled: disabledCondition
+        disabled: disabledCondition,
+        isSubmitting: this.props.isSubmitting,
       },
     ];
 
@@ -179,7 +179,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
         title={intl.formatMessage(messages.dialogTitleChangePassword)}
         actions={actions}
         closeOnOverlayClick={false}
-        onClose={!isSubmitting ? onCancel : null}
+        onClose={onCancel}
         className={dialogClasses}
         closeButton={<DialogCloseButton onClose={onCancel} />}
       >

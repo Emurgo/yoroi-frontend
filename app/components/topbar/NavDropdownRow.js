@@ -1,8 +1,8 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
-import type { Node } from 'react';
 import classnames from 'classnames';
 import styles from './NavDropdownRow.scss';
 
@@ -19,6 +19,7 @@ type Props = {|
   +detailComponent: Node,
   +syncTime?: ?string,
   +isCurrentWallet?: boolean,
+  +onSelect?: void => void,
 |};
 
 @observer
@@ -32,6 +33,7 @@ export default class NavDropdownRow extends Component<Props> {
     title: undefined,
     plateComponent: undefined,
     syncTime: undefined,
+    onSelect: undefined,
     isCurrentWallet: false,
   }
 
@@ -46,14 +48,10 @@ export default class NavDropdownRow extends Component<Props> {
       plateComponent === undefined && title !== undefined && styles.titleWrapper,
     );
 
+    const titleSection = this.getHead();
     return (
       <div className={wrapperClassname}>
-        <div className={styles.head}>
-          {plateComponent !== undefined ?
-            plateComponent :
-            <p className={styles.title}>{title}</p>
-          }
-        </div>
+        {titleSection}
         <div className={styles.details}>
           {detailComponent}
         </div>
@@ -64,6 +62,34 @@ export default class NavDropdownRow extends Component<Props> {
             </span> {syncTime}
           </div>
         }
+      </div>
+    );
+  }
+
+  getHead: void => Node = () => {
+    if (this.props.plateComponent != null && this.props.onSelect != null) {
+      if (this.props.isCurrentWallet !== true) {
+        return (
+          <button
+            className={styles.head}
+            type="button"
+            onClick={this.props.onSelect}
+          >
+            {this.props.plateComponent}
+          </button>
+        );
+      }
+      return (
+        <div
+          className={styles.head}
+        >
+          {this.props.plateComponent}
+        </div>
+      );
+    }
+    return (
+      <div className={styles.head}>
+        <p className={styles.title}>{this.props.title}</p>
       </div>
     );
   }

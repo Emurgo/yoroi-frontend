@@ -435,7 +435,7 @@ const YoroiClassic = {
   '--theme-wallet-dropdown-selected-background-color': '#F0F3F5',
   '--theme-wallet-dropdown-row-border-color': '#E0E3EB',
   '--theme-wallet-dropdown-border-radius': '8px',
-  '--theme-wallet-dropdown-min-width': '608px',
+  '--theme-wallet-dropdown-min-width': '700px',
   '--theme-wallet-plate-main-text-color': '#242838',
   '--theme-wallet-plate-secondary-text-color': '#6B7384',
   '--theme-wallet-receive-submit-button-background-color': '#DAA49A',

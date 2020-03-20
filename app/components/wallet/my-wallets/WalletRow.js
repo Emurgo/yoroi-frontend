@@ -10,13 +10,13 @@ import ToggleIcon from '../../../assets/images/my-wallets/arrow_down.inline.svg'
 // import PlusIcon from '../../../assets/images/my-wallets/icon_plus.inline.svg';
 
 type Props = {|
-    +walletSumDetails: Node,
-    +walletSumCurrencies:  Node,
-    +walletSubRow: () => Node,
-    +walletPlate:  Node,
-    +walletSync:  Node,
-    +onRowClicked: string => void,
-    +isExpandable: boolean,
+  +walletSumDetails: Node,
+  +walletSumCurrencies:  Node,
+  +walletSubRow: () => Node,
+  +walletPlate:  Node,
+  +walletSync:  Node,
+  +onRowClicked: void => void,
+  +isExpandable: boolean,
 |};
 
 type State = {|
@@ -54,7 +54,7 @@ export default class WalletRow extends Component<Props, State> {
         <div className={styles.content}>
           <button
             className={styles.nameSection}
-            onClick={() => onRowClicked('transactions')}
+            onClick={onRowClicked}
             type="button"
           >
             {walletPlate}

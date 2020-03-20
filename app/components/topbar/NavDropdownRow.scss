@@ -14,6 +14,7 @@
   font-family: var(--font-medium);
   font-size: 18px;
   line-height: 22px;
+  text-align: left;
 }
 
 .currentWrapper {
@@ -21,7 +22,12 @@
 }
 
 .head {
-  min-width: 240px;
+  min-width: 300px;
+}
+button {
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 .details {
