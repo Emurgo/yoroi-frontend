@@ -130,7 +130,7 @@ export default class SeizaFetcher extends Component<Props> {
 
     const showSignDialog = delegationTxStore.signAndBroadcastDelegationTx.isExecuting ||
       !delegationTxStore.signAndBroadcastDelegationTx.wasExecuted ||
-      delegationTxStore.signAndBroadcastDelegationTx.error;
+      delegationTxStore.signAndBroadcastDelegationTx.error != null;
 
     return (
       <>
@@ -245,8 +245,8 @@ export default class SeizaFetcher extends Component<Props> {
               },
               signAndBroadcastDelegationTx: {
                 error: delegationTxStore.signAndBroadcastDelegationTx.error,
-                isExecuting: delegationTxStore.createDelegationTx.isExecuting,
-                wasExecuted: delegationTxStore.createDelegationTx.wasExecuted,
+                isExecuting: delegationTxStore.signAndBroadcastDelegationTx.isExecuting,
+                wasExecuted: delegationTxStore.signAndBroadcastDelegationTx.wasExecuted,
               },
             },
           },

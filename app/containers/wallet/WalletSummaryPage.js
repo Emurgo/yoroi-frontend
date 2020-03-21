@@ -78,7 +78,6 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
             hasMoreToLoad={totalAvailable > limit}
             onLoadMore={() => actions.ada.transactions.loadMoreTransactions.trigger(publicDeriver)}
             assuranceMode={assuranceMode}
-            walletId={publicDeriver.getPublicDeriverId().toString()}
             shouldHideBalance={profile.shouldHideBalance}
           />
         );
@@ -107,7 +106,13 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
         <WalletSummary
           numberOfTransactions={totalAvailable}
           pendingAmount={unconfirmedAmount}
-          isLoadingTransactions={isLoadingTx}
+          isLoadingTransactions={
+            /**
+             * only use first load
+             * to avoid wallet summary disappearing when wallet tx list is updating
+            */
+            !recentTransactionsRequest.wasExecuted
+          }
           openExportTxToFileDialog={this.openExportTransactionDialog}
         />
 

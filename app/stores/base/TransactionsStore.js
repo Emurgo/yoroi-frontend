@@ -20,6 +20,7 @@ import type {
   IGetLastSyncInfoResponse,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
+import { digetForHash } from '../../api/ada/lib/storage/database/primitives/api/utils';
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -95,6 +96,25 @@ export default class TransactionsStore extends Store {
       throw new Error(`${nameof(this.searchOptions)} no option found`);
     }
     return foundSearchOptions.options;
+  }
+
+  /**
+   * generate a hash of the transaction history
+   * we can use this to trigger mobx updates
+   */
+  @computed get hash(): number {
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) return 0;
+    const result = this.getTransactionsAllRequest(publicDeriver).result;
+    if (result == null) return 0;
+
+    let hash = 0;
+    const seed = 858499202; // random seed
+    for (const tx of result.transactions) {
+      hash = digetForHash(hash.toString(16) + tx.uniqueKey, seed);
+    }
+    console.log(hash);
+    return hash;
   }
 
   @computed get recent(): Array<WalletTransaction> {

@@ -147,10 +147,8 @@ export default class AdaTransactionBuilderStore extends Store {
       toJS(this.plannedTxInfo),
       this.shouldSendAll,
       this.stores.wallets.selected,
-      // num tx sync changed => valid inputs may have changed
-      this.stores.substores.ada.transactions.totalAvailable,
-      // need to recalculate when there are no more pending transactions
-      this.stores.substores.ada.transactions.hasAnyPending,
+      // update if tx history changes
+      this.stores.substores.ada.transactions.hash,
     ],
     async () => this._updateTxBuilder(),
   )

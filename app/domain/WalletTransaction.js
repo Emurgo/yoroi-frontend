@@ -1,5 +1,5 @@
 // @flow
-import { action, observable } from 'mobx';
+import { action, computed, observable } from 'mobx';
 import BigNumber from 'bignumber.js';
 import { LOVELACES_PER_ADA } from '../config/numbersConfig';
 import type { AssuranceMode, AssuranceLevel } from '../types/transactionAssuranceTypes';
@@ -18,34 +18,52 @@ import type {
   TxStatusCodesType,
 } from '../api/ada/lib/storage/database/primitives/enums';
 
-export type TrasactionAddresses = {| from: Array<string>, to: Array<string> |};
+export type TransactionAddresses = {| from: Array<string>, to: Array<string> |};
 
 export default class WalletTransaction {
 
-  @observable id: string = '';
+  @observable txid: string;
+
+  // TODO: remove and make as a map
+  @observable blockHash: void | string;
   @observable type: TransactionDirectionType;
   @observable amount: BigNumber; // fee included
   @observable fee: BigNumber;
   @observable date: Date;
+  /** todo: remove and instead infer from Block member variable */
   @observable numberOfConfirmations: number = 0;
-  @observable addresses: TrasactionAddresses = { from: [], to: [] };
+  @observable addresses: TransactionAddresses = { from: [], to: [] };
   @observable certificate: void | CertificatePart;
+
+  // TODO: remove and make as a map
   @observable state: TxStatusCodesType;
   @observable errorMsg: null | string;
 
   constructor(data: {|
-    id: string,
+    txid: string,
+    blockHash: void | string,
     type: TransactionDirectionType,
     amount: BigNumber,
     fee: BigNumber,
     date: Date,
     numberOfConfirmations: number,
-    addresses: TrasactionAddresses,
+    addresses: TransactionAddresses,
     certificate: void | CertificatePart,
     state: TxStatusCodesType,
     errorMsg: null | string,
   |}) {
     Object.assign(this, data);
+  }
+
+  /**
+   * get a unique key for the transaction state
+   * can be used as a key for a React element or to trigger a mobx reaction
+   */
+  @computed get uniqueKey(): string {
+    const hash = this.blockHash == null
+      ? 'undefined'
+      : this.blockHash;
+    return `${this.txid}-${this.state}-${hash}`;
   }
 
   getAssuranceLevelForMode(mode: AssuranceMode): AssuranceLevel {
@@ -83,7 +101,8 @@ export default class WalletTransaction {
     };
 
     return new WalletTransaction({
-      id: tx.transaction.Hash,
+      txid: tx.transaction.Hash,
+      blockHash: tx.block?.Hash,
       type: tx.type,
       amount: tx.amount.dividedBy(LOVELACES_PER_ADA).plus(tx.fee.dividedBy(LOVELACES_PER_ADA)),
       fee: tx.fee.dividedBy(LOVELACES_PER_ADA),
