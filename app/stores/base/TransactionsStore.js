@@ -113,7 +113,6 @@ export default class TransactionsStore extends Store {
     for (const tx of result.transactions) {
       hash = digetForHash(hash.toString(16) + tx.uniqueKey, seed);
     }
-    console.log(hash);
     return hash;
   }
 

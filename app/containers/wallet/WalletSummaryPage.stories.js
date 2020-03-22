@@ -226,6 +226,7 @@ export const Transaction = () => {
     };
   const walletTransaction = new WalletTransaction({
     txid: '915f2e6865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
+    blockHash: '111111865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
     type: select(
       'txDirection',
       transactionTypes,
@@ -309,6 +310,7 @@ export const ManyTransactions = () => {
   for (let i = 0; i < INITIAL_SEARCH_LIMIT + 1; i++) {
     transactions.push(new WalletTransaction({
       txid: '915f2e6865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
+      blockHash: '111111865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
       type: transactionTypes.EXPEND,
       amount: new BigNumber(1000),
       fee: new BigNumber(5),
@@ -354,6 +356,7 @@ export const TxHistoryExport = () => {
 
   const transactions = [new WalletTransaction({
     txid: '915f2e6865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
+    blockHash: '111111865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
     type: transactionTypes.EXPEND,
     amount: new BigNumber(1000),
     fee: new BigNumber(5),
