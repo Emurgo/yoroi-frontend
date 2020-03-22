@@ -26,7 +26,6 @@ export default class Request<Func: (...args: any) => Promise<any>, Err> {
   @observable result: ?PromisslessReturnType<Func> = null;
   @observable error: ?Err = null;
   @observable isExecuting: boolean = false;
-  @observable isError: boolean = false;
   @observable wasExecuted: boolean = false;
 
   currentlyExecuting: Set<number> = new Set();
@@ -75,7 +74,6 @@ export default class Request<Func: (...args: any) => Promise<any>, Err> {
             this.isExecuting = false;
             this.wasExecuted = true;
             this.error = null;
-            this.isError = false;
             this._isWaitingForResponse = false;
             resolve(result);
           }), 1);
@@ -92,7 +90,6 @@ export default class Request<Func: (...args: any) => Promise<any>, Err> {
             this.error = error;
             this.result = null;
             this.isExecuting = false;
-            this.isError = true;
             this.wasExecuted = true;
             this._isWaitingForResponse = false;
             reject(error);
@@ -160,7 +157,6 @@ export default class Request<Func: (...args: any) => Promise<any>, Err> {
   @action reset(): void {
     this.result = null;
     this.error = null;
-    this.isError = false;
     this.isExecuting = false;
     this.wasExecuted = false;
     this._isWaitingForResponse = false;

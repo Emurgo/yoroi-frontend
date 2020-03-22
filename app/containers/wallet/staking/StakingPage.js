@@ -42,6 +42,10 @@ export default class StakingPage extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  componentWillUnmount() {
+    this.generated.actions.ada.delegationTransaction.reset.trigger();
+  }
+
   getBrowserReplacement(): string {
     // 1) handle Yoroi running as an extension
 
@@ -169,6 +173,15 @@ export default class StakingPage extends Component<Props> {
                 wasExecuted:
                   adaStores.delegationTransaction.signAndBroadcastDelegationTx.wasExecuted,
               },
+            },
+          },
+        },
+      },
+      actions: {
+        ada: {
+          delegationTransaction: {
+            reset: {
+              trigger: actions.ada.delegationTransaction.reset.trigger,
             },
           },
         },

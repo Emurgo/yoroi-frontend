@@ -1,6 +1,7 @@
 // @flow
 
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { computed, action, observable } from 'mobx';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
@@ -74,7 +75,6 @@ export default class SeizaFetcher extends Component<Props> {
   }
 
   componentWillUnmount() {
-    this.generated.actions.ada.delegationTransaction.reset.trigger();
     window.removeEventListener('resize', this.resize);
     window.removeEventListener('message', this.messageHandler);
   }
@@ -90,6 +90,27 @@ export default class SeizaFetcher extends Component<Props> {
 
   render() {
     const { stakingUrl } = this.props;
+
+    if (stakingUrl == null) {
+      throw new Error('Staking undefined SEIZA_FOR_YOROI_URL should never happen');
+    }
+
+    return (
+      <>
+        {this.getDialog()}
+        <iframe
+          ref={this.setFrame}
+          title="Staking"
+          src={`${stakingUrl}`}
+          frameBorder="0"
+          width="100%"
+          height={this.iframe != null && this.frameHeight != null ? this.frameHeight + 'px' : null}
+        />
+      </>
+    );
+  }
+
+  getDialog: void => ?Node = () => {
     const { actions, stores } = this.generated;
     const { intl } = this.context;
     const { profile } = stores;
@@ -97,15 +118,6 @@ export default class SeizaFetcher extends Component<Props> {
     const delegationTxActions = actions[environment.API].delegationTransaction;
 
     const delegationTx = delegationTxStore.createDelegationTx.result;
-
-    if (stakingUrl == null) {
-      throw new Error('Staking undefined SEIZA_FOR_YOROI_URL should never happen');
-    }
-
-    const selectedWallet = this.generated.stores.wallets.selected;
-    if (selectedWallet == null) {
-      return null;
-    }
 
     const dialogBackButton = [
       {
@@ -132,75 +144,77 @@ export default class SeizaFetcher extends Component<Props> {
       !delegationTxStore.signAndBroadcastDelegationTx.wasExecuted ||
       delegationTxStore.signAndBroadcastDelegationTx.error != null;
 
-    return (
-      <>
-        {(
-          delegationTxStore.createDelegationTx.isExecuting ||
-          (delegationTx == null && delegationTxStore.selectedPools.length >= 1)
-        ) &&
-          <Dialog
+    const selectedWallet = this.generated.stores.wallets.selected;
+    if (selectedWallet == null) {
+      return null;
+    }
+
+    if (
+      delegationTxStore.createDelegationTx.isExecuting ||
+      (delegationTx == null && delegationTxStore.selectedPools.length >= 1)
+    ) {
+      return (
+        <Dialog
+          title={intl.formatMessage(globalMessages.processingLabel)}
+          closeOnOverlayClick={false}
+        >
+          <AnnotatedLoader
             title={intl.formatMessage(globalMessages.processingLabel)}
-            closeOnOverlayClick={false}
-          >
-            <AnnotatedLoader
-              title={intl.formatMessage(globalMessages.processingLabel)}
-              details={intl.formatMessage(globalMessages.txGeneration)}
+            details={intl.formatMessage(globalMessages.txGeneration)}
+          />
+        </Dialog>
+      );
+    }
+    if (delegationTxStore.createDelegationTx.error != null) {
+      return (
+        <Dialog
+          title={intl.formatMessage(globalMessages.errorLabel)}
+          closeOnOverlayClick={false}
+          onClose={this.cancel}
+          closeButton={<DialogCloseButton onClose={this.cancel} />}
+          actions={dialogBackButton}
+        >
+          <>
+            <center><InvalidURIImg /></center>
+            <ErrorBlock
+              error={delegationTxStore.createDelegationTx.error}
             />
-          </Dialog>
-        }
-        {delegationTxStore.createDelegationTx.error != null &&
-          <Dialog
-            title={intl.formatMessage(globalMessages.errorLabel)}
-            closeOnOverlayClick={false}
-            onClose={this.cancel}
-            closeButton={<DialogCloseButton onClose={this.cancel} />}
-            actions={dialogBackButton}
-          >
-            <>
-              <center><InvalidURIImg /></center>
-              <ErrorBlock
-                error={delegationTxStore.createDelegationTx.error}
-              />
-            </>
-          </Dialog>
-        }
-        {delegationTx != null && delegationTxStore.selectedPools.length >= 1 && showSignDialog &&
-          <DelegationTxDialog
-            staleTx={delegationTxStore.isStale}
-            poolName={delegationTxStore.selectedPools[0].name}
-            poolHash={delegationTxStore.selectedPools[0].poolHash}
-            transactionFee={getShelleyTxFee(delegationTx.unsignedTx.IOs, true)}
-            amountToDelegate={delegationTx.totalAmountToDelegate}
-            approximateReward={approximateReward(delegationTx.totalAmountToDelegate)}
-            isSubmitting={
-              delegationTxStore.signAndBroadcastDelegationTx.isExecuting
-            }
-            onCancel={this.cancel}
-            onSubmit={({ password }) => delegationTxActions.signTransaction.trigger({
-              password,
-              publicDeriver: selectedWallet,
-            })}
-            classicTheme={profile.isClassicTheme}
-            error={delegationTxStore.signAndBroadcastDelegationTx.error}
-            selectedExplorer={stores.profile.selectedExplorer}
-          />
-        }
-        {delegationTx != null && !showSignDialog &&
-          <DelegationSuccessDialog
-            onClose={() => delegationTxActions.complete.trigger(selectedWallet)}
-            classicTheme={profile.isClassicTheme}
-          />
-        }
-        <iframe
-          ref={this.setFrame}
-          title="Staking"
-          src={`${stakingUrl}`}
-          frameBorder="0"
-          width="100%"
-          height={this.iframe != null && this.frameHeight != null ? this.frameHeight + 'px' : null}
+          </>
+        </Dialog>
+      );
+    }
+    if (delegationTx != null && delegationTxStore.selectedPools.length >= 1 && showSignDialog) {
+      return (
+        <DelegationTxDialog
+          staleTx={delegationTxStore.isStale}
+          poolName={delegationTxStore.selectedPools[0].name}
+          poolHash={delegationTxStore.selectedPools[0].poolHash}
+          transactionFee={getShelleyTxFee(delegationTx.unsignedTx.IOs, true)}
+          amountToDelegate={delegationTx.totalAmountToDelegate}
+          approximateReward={approximateReward(delegationTx.totalAmountToDelegate)}
+          isSubmitting={
+            delegationTxStore.signAndBroadcastDelegationTx.isExecuting
+          }
+          onCancel={this.cancel}
+          onSubmit={({ password }) => delegationTxActions.signTransaction.trigger({
+            password,
+            publicDeriver: selectedWallet,
+          })}
+          classicTheme={profile.isClassicTheme}
+          error={delegationTxStore.signAndBroadcastDelegationTx.error}
+          selectedExplorer={stores.profile.selectedExplorer}
         />
-      </>
-    );
+      );
+    }
+    if (delegationTx != null && !showSignDialog) {
+      return (
+        <DelegationSuccessDialog
+          onClose={() => delegationTxActions.complete.trigger(selectedWallet)}
+          classicTheme={profile.isClassicTheme}
+        />
+      );
+    }
+    return undefined;
   }
 
   @action
@@ -261,11 +275,11 @@ export default class SeizaFetcher extends Component<Props> {
             signTransaction: {
               trigger: actions.ada.delegationTransaction.signTransaction.trigger,
             },
-            complete: {
-              trigger: actions.ada.delegationTransaction.complete.trigger,
-            },
             reset: {
               trigger: actions.ada.delegationTransaction.reset.trigger,
+            },
+            complete: {
+              trigger: actions.ada.delegationTransaction.complete.trigger,
             },
             setPools: {
               trigger: actions.ada.delegationTransaction.setPools.trigger,
