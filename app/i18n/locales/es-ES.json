@@ -386,7 +386,7 @@
   "wallet.dashboard.stakePool.performance": "Rendimiento",
   "wallet.dashboard.stakePool.pledge": "Compromiso",
   "wallet.dashboard.stakePool.stake": "Participación",
-  "wallet.dashboard.stakePool.title": "Stake Pool elegido",
+  "wallet.dashboard.stakePool.title": "Stake pool elegido",
   "wallet.dashboard.summary.adaTitle": "Total ADA",
   "wallet.dashboard.summary.delegatedTitle": "Total delegado",
   "wallet.dashboard.summary.mangled.can": "{adaAmount} ADA pueden corregirse",
