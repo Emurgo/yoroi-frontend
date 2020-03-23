@@ -35,13 +35,8 @@ export default class TopBarLayout extends Component<Props> {
   render() {
     const {
       banner,
-      topbar,
-      navbar,
       sidebar,
-      children,
-      notification,
       showInContainer,
-      showAsCard
     } = this.props;
 
     const componentClasses = classnames([
@@ -57,19 +52,6 @@ export default class TopBarLayout extends Component<Props> {
       </div>
     );
 
-    const topbarComponent = (
-      <div className={styles.topbar}>
-        {topbar}
-      </div>
-    );
-
-    const navbarComponent = (
-      <div className={styles.navbar}>
-        {navbar}
-      </div>
-    );
-
-
     return (
       <div className={componentClasses}>
         <div className={styles.windowWrapper}>
@@ -83,34 +65,75 @@ export default class TopBarLayout extends Component<Props> {
             }
           >
             {banner}
-            <div
-              className={
-                classnames([
-                  styles.content,
-                  showInContainer !== null && showInContainer === true && styles.containerContent
-                ])
-              }
-            >
-              {topbar != null ? topbarComponent : null}
-              {navbar != null ? navbarComponent : null}
-              {notification}
-              <div
-                className={
-                  classnames([
-                    styles.inner,
-                    showInContainer !== null && showInContainer === true && styles.containerInner,
-                    showAsCard !== null && showAsCard === true && styles.containerCard
-                  ])
-                }
-              >
-                <div className={styles.content}>
-                  {children}
-                </div>
-              </div>
-            </div>
+            {this.getContentUnderBanner()}
           </div>
         </div>
       </div>
     );
+  }
+
+  optionallyWrapInContainer: Node => Node = (content) => {
+    const { showInContainer } = this.props;
+    if (showInContainer === true) {
+      return (
+        <div
+          className={
+            classnames([
+              styles.content,
+              showInContainer !== null && showInContainer === true && styles.containerContent
+            ])
+          }
+        >
+          {content}
+        </div>
+      );
+    }
+    return content;
+  }
+
+  getContentUnderBanner: void => Node = () => {
+    const {
+      topbar,
+      navbar,
+      children,
+      notification,
+      showInContainer,
+      showAsCard
+    } = this.props;
+
+    const topbarComponent = (
+      <div className={styles.topbar}>
+        {topbar}
+      </div>
+    );
+
+    const navbarComponent = (
+      <div className={styles.navbar}>
+        {navbar}
+      </div>
+    );
+
+    const content = (
+      <>
+        {topbar != null ? topbarComponent : null}
+        {navbar != null ? navbarComponent : null}
+        {notification}
+        <div
+          className={
+            classnames([
+              styles.inner,
+              showInContainer !== null && showInContainer === true && styles.containerInner,
+              showAsCard !== null && showAsCard === true && styles.containerCard
+            ])
+          }
+        >
+          <div className={styles.content}>
+            {children}
+          </div>
+        </div>
+      </>
+    );
+
+    return this.optionallyWrapInContainer(content);
   }
 }
