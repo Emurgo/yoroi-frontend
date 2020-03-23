@@ -40,6 +40,7 @@
 .inner {
   height: 100%;
   position: relative;
+  overflow: auto;
   &::-webkit-scrollbar-button {
     height: 7px;
     display: block;

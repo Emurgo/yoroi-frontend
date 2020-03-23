@@ -40,7 +40,7 @@ export default class MainLayout extends Component<MainLayoutProps> {
         topbar={this.props.topbar}
         sidebar={this.props.sidebar}
         navbar={this.props.navbar}
-        notification={<div />}
+        notification={undefined}
         showInContainer={this.props.showInContainer}
         showAsCard={this.props.showAsCard}
       >
