@@ -1,11 +1,12 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import classnames from 'classnames';
 
 import MainCards from './MainCards';
 import LogoYoroiIcon from '../../../assets/images/yoroi-logo-white.inline.svg';
-import LogoYoroiShelleyTestnetIcon from '../../../assets/images/yoroi-logo-shelley-testnet-white.inline.svg';
-import NightlyLogo from '../../../assets/images/yoroi-logo-nightly-white.inline.svg';
+import LogoYoroiShelleyTestnetIcon from '../../../assets/images/yoroi-logotestnet-gradient.inline.svg';
+import NightlyLogo from '../../../assets/images/yoroi-logo-nightly.inline.svg';
 
 import styles from './AddAnotherWallet.scss';
 
@@ -33,12 +34,16 @@ export default class AddAnotherWallet extends Component<Props> {
   render() {
     const LogoIcon = this.getLogo();
 
+    const iconClass = classnames(
+      styles.heroLogo,
+      LogoIcon === LogoYoroiIcon ? styles.makeBlue : null,
+    );
     return (
       <div className={styles.component}>
         <div className={styles.hero}>
           <div className={styles.heroInner}>
             {/* Left block  */}
-            <div className={styles.heroLogo}>
+            <div className={iconClass}>
               <LogoIcon width="400" height="128" />
             </div>
             {/* Right block  */}

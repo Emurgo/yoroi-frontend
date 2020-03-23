@@ -195,7 +195,10 @@ const genBaseProps: {|
           substores: {
             ada: {
               wallets: {
-                sendMoneyRequest: request.transactionBuilderStore == null || (request.transactionBuilderStore.tentativeTx == null)
+                sendMoneyRequest: (
+                  request.transactionBuilderStore == null
+                  || request.transactionBuilderStore.tentativeTx == null
+                )
                   ? {
                     reset: action('reset'),
                     error: undefined,
