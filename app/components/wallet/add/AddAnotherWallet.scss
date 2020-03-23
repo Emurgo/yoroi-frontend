@@ -20,10 +20,8 @@
     justify-content: space-between;
     width: 100%;
   
-    @media screen and (max-width: 1300px) {
-      flex-direction: column;
-      align-items: center;
-    }
+    flex-direction: column;
+    align-items: center;
   }
   
   .heroLogo {
@@ -31,11 +29,12 @@
     position: relative;
     top: 50%;
     margin: auto auto;
+    margin-bottom: 24px;
+  }
+
+  .makeBlue {
     path {
       fill: var(--cmn-color-black);
-    }
-    @media screen and (max-width: 1300px) {
-      margin-bottom: 24px;
     }
   }
 }
