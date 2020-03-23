@@ -165,7 +165,7 @@ export default class Transaction extends Component<Props, State> {
     isExpanded: false
   };
 
-  toggleDetails() {
+  toggleDetails: void => void = () => {
     this.setState(prevState => ({ isExpanded: !prevState.isExpanded }));
   }
 
@@ -355,7 +355,7 @@ export default class Transaction extends Component<Props, State> {
               </h2>
               {uniq(data.addresses.from).map(address => (
                 <ExplorableHashContainer
-                  key={`${data.id}-from-${address}`}
+                  key={`${data.txid}-from-${address}`}
                   selectedExplorer={this.props.selectedExplorer}
                   hash={addressToDisplayString(address)}
                   light
@@ -372,7 +372,7 @@ export default class Transaction extends Component<Props, State> {
               {data.addresses.to.map((address, addressIndex) => (
                 <ExplorableHashContainer
                   // eslint-disable-next-line react/no-array-index-key
-                  key={`${data.id}-to-${address}-${addressIndex}`}
+                  key={`${data.txid}-to-${address}-${addressIndex}`}
                   selectedExplorer={this.props.selectedExplorer}
                   hash={addressToDisplayString(address)}
                   light
@@ -398,12 +398,12 @@ export default class Transaction extends Component<Props, State> {
               <h2>{intl.formatMessage(globalMessages.transactionId)}</h2>
               <ExplorableHashContainer
                 selectedExplorer={this.props.selectedExplorer}
-                hash={data.id}
+                hash={data.txid}
                 light
                 linkType="transaction"
               >
                 <span className={classnames([styles.rowData, styles.hash])}>
-                  {data.id}
+                  {data.txid}
                 </span>
               </ExplorableHashContainer>
             </div>

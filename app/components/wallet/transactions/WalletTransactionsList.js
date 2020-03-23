@@ -31,7 +31,6 @@ type Props = {|
   +hasMoreToLoad: boolean,
   +selectedExplorer: ExplorerType,
   +assuranceMode: AssuranceMode,
-  +walletId: string,
   +onLoadMore: void => PossiblyAsync<void>,
   +shouldHideBalance: boolean,
 |};
@@ -92,7 +91,7 @@ export default class WalletTransactionsList extends Component<Props> {
   getTransactionKey(transactions: Array<WalletTransaction>): string {
     if (transactions.length) {
       const firstTransaction = transactions[0];
-      return firstTransaction.id + '-' + firstTransaction.type;
+      return firstTransaction.uniqueKey;
     }
     // this branch should not happen
     Logger.error(
@@ -108,7 +107,6 @@ export default class WalletTransactionsList extends Component<Props> {
       isLoadingTransactions,
       hasMoreToLoad,
       assuranceMode,
-      walletId,
       onLoadMore,
     } = this.props;
 
@@ -128,7 +126,7 @@ export default class WalletTransactionsList extends Component<Props> {
     return (
       <div className={styles.component}>
         {transactionsGroups.map(group => (
-          <div className={styles.group} key={walletId + '-' + this.getTransactionKey(group.transactions)}>
+          <div className={styles.group} key={`${this.getTransactionKey(group.transactions)}`}>
             <div className={styles.bar}>
               <OneSideBarDecoration>
                 <div className={styles.groupDate}>{this.localizedDate(group.date)}</div>
@@ -137,7 +135,7 @@ export default class WalletTransactionsList extends Component<Props> {
             <div className={styles.list}>
               {group.transactions.map((transaction, transactionIndex) => (
                 <Transaction
-                  key={`${walletId}-${transaction.id}-${transaction.type}`}
+                  key={`${transaction.uniqueKey}-${transaction.numberOfConfirmations}`}
                   selectedExplorer={this.props.selectedExplorer}
                   data={transaction}
                   isLastInList={transactionIndex === group.transactions.length - 1}

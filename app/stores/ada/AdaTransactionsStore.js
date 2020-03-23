@@ -157,6 +157,9 @@ export function calculateUnconfirmedAmount(
   };
 
   for (const transaction of transactions) {
+    // skip any failed transactions
+    if (transaction.state < 0) continue;
+
     const assuranceForTx = transaction.getAssuranceLevelForMode(assuranceMode);
     if (assuranceForTx !== assuranceLevels.HIGH) {
       // total

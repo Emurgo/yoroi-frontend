@@ -243,10 +243,8 @@ export default class DelegationStore extends Store {
     this._recalculateDelegationInfoDisposer = reaction(
       () => [
         this.stores.wallets.selected,
-        // num tx sync changed => valid inputs may have changed
-        this.stores.substores.ada.transactions.totalAvailable,
-        // need to recalculate when there are no more pending transactions
-        this.stores.substores.ada.transactions.hasAnyPending,
+        // update if tx history changes
+        this.stores.substores.ada.transactions.hash,
         // if query failed due to server issue, need to re-query when it comes back online
         this.stores.substores.ada.serverConnectionStore.checkAdaServerStatus,
         // reward grows every epoch so we have to refresh

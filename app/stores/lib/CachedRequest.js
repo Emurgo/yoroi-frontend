@@ -74,7 +74,6 @@ export default class CachedRequest<
           setTimeout(action(() => {
             this.error = error;
             this.isExecuting = false;
-            this.isError = true;
             this.wasExecuted = true;
             this._isWaitingForResponse = false;
             reject(error);

@@ -82,6 +82,13 @@ const genBaseProps: {|
         },
       },
     },
+    actions: {
+      ada: {
+        delegationTransaction: {
+          reset: { trigger: action('reset'), },
+        },
+      },
+    },
     SeizaFetcherProps: {
       generated: {
         stores: {
