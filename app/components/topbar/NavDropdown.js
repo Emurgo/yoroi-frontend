@@ -5,7 +5,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import styles from './NavDropdown.scss';
 import CaretIcon from '../../assets/images/wallet-nav/caret-down.inline.svg';
-import NavBarAddButton from './NavBarAddButton';
+import NavDropdownContent from './NavDropdownContent';
 
 type Props = {|
   +headerComponent?: ?Node,
@@ -57,13 +57,12 @@ export default class NavDropdown extends Component<Props, State> {
             <CaretIcon />
           </button>
         </div>
-        {isExpanded !== null && isExpanded && (
-          <div className={styles.content}>
-            {contentComponents}
-            <div className={styles.buttonWrapper}>
-              <NavBarAddButton onClick={this.props.onAddWallet} />
-            </div>
-          </div>
+        {isExpanded === true && (
+          <NavDropdownContent
+            contentComponents={contentComponents}
+            onAddWallet={this.props.onAddWallet}
+            onClickOutside={this.toggleExpansion}
+          />
         )}
       </div>
     );
