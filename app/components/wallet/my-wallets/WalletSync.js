@@ -1,16 +1,10 @@
 // @flow
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
-import { intlShape, defineMessages } from 'react-intl';
+import { intlShape, } from 'react-intl';
+import globalMessages from '../../../i18n/global-messages';
 
 import styles from './WalletSync.scss';
-
-const messages = defineMessages({
-  lastSyncMessage: {
-    id: 'myWallets.wallets.lastSyncText',
-    defaultMessage: '!!!Last sync',
-  },
-});
 
 type Props = {|
   +time: ?string,
@@ -32,10 +26,16 @@ export default class WalletSync extends Component<Props> {
         <div className={styles.wrapper}>
           {time}
           <span className={styles.text}>
-            {intl.formatMessage(messages.lastSyncMessage)}
+            {intl.formatMessage(globalMessages.lastSyncMessage)}
           </span>
         </div>
       )
-      : null;
+      : (
+        <div className={styles.wrapper}>
+          <span className={styles.text}>
+            {intl.formatMessage(globalMessages.neverSyncedMessage)}
+          </span>
+        </div>
+      );
   }
 }

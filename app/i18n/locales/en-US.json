@@ -113,6 +113,7 @@
   "loading.screen.error": "For more help, you can {supportRequestLink}",
   "loading.screen.loading": "Loading components",
   "myWallets.wallets.lastSyncText": "Last sync",
+  "myWallets.wallets.neverSync": "Never synced",
   "myWallets.wallets.sumInfoText": "Total wallet balance",
   "networkError.label.message": "WARNING: Connection to the server failed.<br>Please check your internet connection or <a target='blank' href='https://twitter.com/YoroiWallet'>our Twitter account</a>.<br>The displayed balance and transaction history may appear incorrect until our servers are back to normal, but your actual balance is not affected.",
   "nightly.banner.label.message": "YOU ARE ON YOROI NIGHTLY ({network}).",

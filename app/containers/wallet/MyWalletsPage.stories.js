@@ -37,12 +37,28 @@ export const Wallets = () => {
       calculationCases,
       calculationCases.Calculated
     );
+    const syncCases = {
+      Never: 0,
+      Recent: 1,
+    };
+    const getSyncCases = () => select(
+      'syncCases',
+      syncCases,
+      syncCases.Recent
+    );
     if (getBalanceCase() === calculationCases.Calculated) {
       balance.execute((null: any));
     }
     const oldResults = wallet.getTransactions(wallet.publicDeriver);
     wallet.getTransactions = (_req) => ({
       ...oldResults,
+      lastSyncInfo: {
+        LastSyncInfoId: 0,
+        Time: getSyncCases() === syncCases.Never ? null : new Date(),
+        SlotNum: getSyncCases() === syncCases.Never ? null : 0,
+        BlockHash: getSyncCases() === syncCases.Never ? null : 'b4a244a86e95308f988d20a77e9576b0b84807d43e733d6fa13475f52b46825c',
+        Height: 0
+      },
       requests: {
         ...oldResults.requests,
         getBalanceRequest: balance,

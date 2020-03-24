@@ -529,6 +529,14 @@ const globalMessages = defineMessages({
     id: 'wallet.receive.page.internalWarning2',
     defaultMessage: '!!!addresses are shown here for personal auditing purposes and should <strong>never</strong> be used.'
   },
+  lastSyncMessage: {
+    id: 'myWallets.wallets.lastSyncText',
+    defaultMessage: '!!!Last sync',
+  },
+  neverSyncedMessage: {
+    id: 'myWallets.wallets.neverSync',
+    defaultMessage: '!!!Never synced',
+  },
 });
 export default globalMessages;
 
