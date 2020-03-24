@@ -37,5 +37,6 @@ export const STAKING_KEY_INDEX = 0;
 /**
  * Constant K as defined in Ouroboros Classic
  * which says no reorg should be longer than 2160 slots
+ * TODO: value for Ouroboros Genesis
  */
 export const STABLE_SIZE = 2160;

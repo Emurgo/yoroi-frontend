@@ -38,6 +38,7 @@ import {
   GetAccountStateApiError,
   GetPoolInfoApiError,
   GetReputationError,
+  RollbackApiError,
 } from '../../errors';
 
 import type { ConfigType } from '../../../../../config/config-types';
@@ -159,6 +160,13 @@ export class RemoteFetcher implements IFetcher {
     })
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getTransactionsHistoryForAddresses)} error: ` + stringifyError(error));
+        if (
+          error?.response === 'REFERENCE_BLOCK_MISMATCH' ||
+          error?.response === 'REFERENCE_TX_NOT_FOUND' ||
+          error?.response === 'REFERENCE_BEST_BLOCK_MISMATCH'
+        ) {
+          throw new RollbackApiError();
+        }
         throw new GetTxHistoryForAddressesApiError();
       })
   )
