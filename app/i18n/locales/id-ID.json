@@ -113,6 +113,7 @@
   "loading.screen.error": "Untuk bantuan lebih lanjut, Anda bisa {supportRequestLink}",
   "loading.screen.loading": "Memuat komponen",
   "myWallets.wallets.lastSyncText": "Last sync",
+  "myWallets.wallets.neverSync": "Never synced",
   "myWallets.wallets.sumInfoText": "Total wallet balance",
   "networkError.label.message": "PERINGATAN: Koneksi ke server gagal.<br>Harap periksa koneksi internet Anda atau <a target='blank' href='https://twitter.com/YoroiWallet'>akun Twitter kami</a>.<br>Saldo yang ditampilkan dan riwayat transaksi mungkin akan terlihat salah sampai server kami kembali normal, tetapi sebenarnya tidak mempengaruhi saldo Anda.",
   "nightly.banner.label.message": "YOU ARE ON YOROI NIGHTLY ({network}).",
