@@ -113,6 +113,7 @@
   "loading.screen.error": "Para mais informações, você pode {supportRequestLink}",
   "loading.screen.loading": "Carregando componentes",
   "myWallets.wallets.lastSyncText": "Última sincronização",
+  "myWallets.wallets.neverSync": "Never synced",
   "myWallets.wallets.sumInfoText": "Saldo total da carteira",
   "networkError.label.message": "AVISO: Falha na conexão com o servidor. <br> Por favor, verifique sua conexão com a internet ou <a target='blank' href='https://twitter.com/YoroiWallet'> nossa conta no Twitter </a>. <br> O saldo exibido e o histórico de transações podem parecer incorretos até que nossos servidores voltem ao normal, mas seu saldo real não é afetado.",
   "nightly.banner.label.message": "VOCÊ ESTÁ EM YOROI NIGHTLY ({network}).",
