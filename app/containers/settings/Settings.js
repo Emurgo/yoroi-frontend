@@ -62,7 +62,9 @@ export default class Settings extends Component<Props> {
     const navbarTitle = (
       <NavBarContainer
         {...this.generated.NavBarContainerProps}
-        title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSettings)} />}
+        title={<NavBarTitle
+          title={this.context.intl.formatMessage(globalMessages.sidebarSettings)}
+        />}
       />
     );
 

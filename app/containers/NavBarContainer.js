@@ -166,9 +166,7 @@ export default class NavBarContainer extends Component<Props> {
         const publicDeriver = walletsStore.selected;
         if (publicDeriver == null) {
           return (
-            <NoWalletsDropdown
-
-            />
+            <NoWalletsDropdown />
           );
         }
 
