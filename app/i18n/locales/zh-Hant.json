@@ -113,6 +113,7 @@
   "loading.screen.error": "獲取更多幫助，您可以 {supportRequestLink}",
   "loading.screen.loading": "正在載入元件",
   "myWallets.wallets.lastSyncText": "Last sync",
+  "myWallets.wallets.neverSync": "Never synced",
   "myWallets.wallets.sumInfoText": "Total wallet balance",
   "networkError.label.message": "警告：與服務器的連接失敗。<br>請檢查您的互聯網連接或<a target='blank' href='https://twitter.com/YoroiWallet'>我們的Twitter帳戶</a>。<br>在我們的服務器恢復正常之前，顯示的餘額和交易記錄可能不正確，但您的實際餘額不受影響。",
   "nightly.banner.label.message": "YOU ARE ON YOROI NIGHTLY ({network}).",
