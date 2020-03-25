@@ -1,0 +1,14 @@
+.content {
+  overflow: auto;
+  border-radius: 0 0 var(--theme-wallet-dropdown-border-radius) var(--theme-wallet-dropdown-border-radius);
+  background-color: var(--theme-wallet-dropdown-background-color);
+  box-shadow: var(--theme-wallet-dropdown-box-shadow);
+  min-width: var(--theme-wallet-dropdown-min-width);
+  position: absolute;
+  top: calc(var(--theme-navbar-height) + 5px);
+  right: calc(-1 * var(--theme-page-container-side-padding));
+}
+
+.buttonWrapper {
+  padding: 32px 74px;
+}
