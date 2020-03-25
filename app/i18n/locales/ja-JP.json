@@ -113,7 +113,7 @@
   "loading.screen.error": "ヘルプは{supportRequestLink}",
   "loading.screen.loading": "コンポーネントをロードしています",
   "myWallets.wallets.lastSyncText": "前回の同期：",
-  "myWallets.wallets.neverSync": "Never synced",
+  "myWallets.wallets.neverSync": "同期された事がありません",
   "myWallets.wallets.sumInfoText": "合計ウォレット残高",
   "networkError.label.message": "警告：サーバーへの接続に失敗しました。<br>インターネット接続を確認するか、<a target='blank' href='https://twitter.com/YoroiWallet'>EMURGOのTwitterアカウントをチェックしてください</a>。<br>サーバーが正常に戻るまで、表示されている残高やトランザクション履歴は正確ではない場合がありますが、実際の残高に影響はありません。",
   "nightly.banner.label.message": "YOU ARE ON YOROI NIGHTLY ({network}).",
