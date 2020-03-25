@@ -9,6 +9,7 @@ type Props = {|
   +contentComponents?: ?Node,
   +onAddWallet: void => void,
   +onClickOutside: void => void,
+  +buttonRef: ?ElementRef<*>;
 |};
 
 type State = {|
@@ -33,19 +34,25 @@ export default class NavDropdownContent extends Component<Props, State> {
 
   componentDidMount() {
     window.addEventListener('resize', this.resize);
-    window.addEventListener('mousedown', this.handleClickOutside);
+    window.addEventListener('mouseup', this.handleClickOutside);
     this.resize();
   }
   componentWillUnmount() {
     window.removeEventListener('resize', this.resize);
-    window.removeEventListener('mousedown', this.handleClickOutside);
+    window.removeEventListener('mouseup', this.handleClickOutside);
   }
 
   handleClickOutside: MouseEvent => void = (event) => {
     if (!this.contentRef || !this.contentRef.current) {
       return;
     }
-    if (!this.contentRef.current.contains(event.target)) {
+    if (
+      // don't close if the user clicks on the dropdown itself
+      !this.contentRef.current.contains(event.target) &&
+      // also don't close if the user clicks on the toggle button to open/close the dialog
+      // otherwise it will close the dialog and re-open it right away
+      !this.props.buttonRef?.current.contains(event.target)
+    ) {
       this.props.onClickOutside();
     }
   }

@@ -3,7 +3,8 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
+import globalMessages from '../../i18n/global-messages';
 import SettingsLayout from '../../components/settings/SettingsLayout';
 import NavBarContainer from '../NavBarContainer';
 import SettingsMenu from '../../components/settings/menu/SettingsMenu';
@@ -14,15 +15,7 @@ import type { GeneratedData as NavBarContainerData } from '../NavBarContainer';
 
 import MainLayout from '../MainLayout';
 import SidebarContainer from '../SidebarContainer';
-import NavBar from '../../components/topbar/NavBar';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
-
-const messages = defineMessages({
-  title: {
-    id: 'settings.general.title',
-    defaultMessage: '!!!General Settings',
-  },
-});
 
 export type GeneratedData = typeof Settings.prototype.generated;
 
@@ -61,18 +54,17 @@ export default class Settings extends Component<Props> {
       <SettingsMenu
         onItemClick={(route) => actions.router.goToRoute.trigger({ route })}
         isActiveItem={this.isActivePage}
-        hasActiveWallet={stores.wallets.hasActiveWallet}
         currentLocale={profile.currentLocale}
         currentTheme={profile.currentTheme}
       />
     );
 
-    const navbarTitle = stores.wallets.selected
-      ? <NavBarContainer
+    const navbarTitle = (
+      <NavBarContainer
         {...this.generated.NavBarContainerProps}
-        title={<NavBarTitle title={this.context.intl.formatMessage(messages.title)} />}
+        title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSettings)} />}
       />
-      : <NavBar title={<NavBarTitle title={this.context.intl.formatMessage(messages.title)} />} />;
+    );
 
     return (
       <MainLayout
@@ -107,7 +99,6 @@ export default class Settings extends Component<Props> {
           location: stores.router.location,
         },
         wallets: {
-          hasActiveWallet: stores.wallets.hasActiveWallet,
           selected: stores.wallets.selected,
         },
         serverConnectionStore: {

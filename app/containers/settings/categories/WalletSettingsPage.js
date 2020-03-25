@@ -4,6 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import WalletNameSetting from '../../../components/wallet/settings/WalletNameSetting';
+import NoWalletMessage from '../../../components/wallet/settings/NoWalletMessage';
 import SpendingPasswordSetting from '../../../components/wallet/settings/SpendingPasswordSetting';
 import ResyncBlock from '../../../components/wallet/settings/ResyncBlock';
 import RemoveWallet from '../../../components/wallet/settings/RemoveWallet';
@@ -40,7 +41,12 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
 
     const walletsStore = this.generated.stores.wallets;
     if (walletsStore.selected == null) {
-      return this.getDialog(undefined);
+      return (
+        <>
+          {this.getDialog(undefined)}
+          <NoWalletMessage />
+        </>
+      );
     }
     const selectedWallet = walletsStore.selected;
     const withSigning = asGetSigningKey(selectedWallet);
