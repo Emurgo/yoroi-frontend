@@ -122,6 +122,10 @@ Then(/^I click on the checkbox$/, async function () {
   await this.click('.DangerousActionDialog_checkbox > .SimpleCheckbox_root');
 });
 
+Then(/^I should see a no wallet message$/, async function () {
+  await this.waitForElement('.NoWalletMessage_component');
+});
+
 
 Then(/^I sleep for ([^"]*)$/, async function (ms) {
   await this.driver.sleep(Number.parseInt(ms, 10));
