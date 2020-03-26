@@ -431,7 +431,7 @@
   "wallet.navigation.receive": "Recibir",
   "wallet.navigation.send": "Enviar",
   "wallet.navigation.transactions": "Transacciones",
-  "wallet.nowallet.subtitle": "Por favor, elija una billetera del menú desplegable de arriba a la derecha",
+  "wallet.nowallet.subtitle": "Por favor, elige una billetera del menú desplegable ubicado arriba a la derecha",
   "wallet.nowallet.title": "No se ha seleccionado ninguna billetera",
   "wallet.receive.confirmationDialog.addressDetailsTitleLabel": "Verifica la dirección",
   "wallet.receive.confirmationDialog.addressLabel": "Dirección",
