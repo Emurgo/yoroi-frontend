@@ -7,33 +7,18 @@
   justify-content: center;
 }
 
-.button {
-  width: 350px !important;
-  margin-top: 30px;
+.headerIcon {
+  width: 16px;
+  height: 16px;
+  margin-right: 3px;
+  vertical-align: top;
 }
 
 .body {
-  width: 800px;
   color: var(--theme-bordered-box-text-color);
   font-family: var(--font-regular);
   font-size: 14px;
   line-height: 19px;
-
-  .title {
-    font-size: 19px;
-    font-family: var(--font-medium);
-    line-height: 23px;
-    margin-bottom: 20px;
-    word-break: break-all;
-    text-align: center;
-
-    .headerIcon {
-      width: 19px;
-      height: 19px;
-      margin-right: 3px;
-      vertical-align: top;
-    }
-  }
 
   .message {
     font-size: 16px;
@@ -42,30 +27,16 @@
     word-break: break-word;
     text-align: center;
   }
-
-  .buttonsWrapper {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-  }
 }
 
 :global(.YoroiClassic) {
-  .body {
-    .title {
-      .headerIcon {
-        content:url(../../assets/images/attention-classic.inline.svg);
-      }
-    }
+  .headerIcon {
+    content:url(../../assets/images/attention-classic.inline.svg);
   }
 }
 
 :global(.YoroiModern) {
-  .body {
-    .title {
-      .headerIcon {
-        content:url(../../assets/images/attention-modern.inline.svg);
-      }
-    }
+  .headerIcon {
+    content:url(../../assets/images/attention-modern.inline.svg);
   }
 }

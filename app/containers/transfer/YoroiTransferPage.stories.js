@@ -7,6 +7,7 @@ import { boolean, select, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import {
   globalKnobs,
+  walletLookup,
   genDummyWithCache,
 } from '../../../stories/helpers/StoryWrapper';
 import { wrapTransfer } from '../../Routes';
@@ -137,13 +138,18 @@ export const Uninitialized = () => {
     walletCases,
     walletCases.NoWallet,
   );
+  const walletVal = walletValue();
+  const lookup = walletLookup(walletVal === walletCases.NoWallet
+    ? []
+    : [wallet]);
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.YOROI
+        currentRoute: ROUTES.TRANSFER.YOROI,
+        selected: walletVal === walletCases.NoWallet ? null : wallet.publicDeriver,
+        ...lookup,
       }),
       (() => {
-        const walletVal = walletValue();
         const baseProps = walletVal === walletCases.NoWallet
           ? genBaseProps({
             wallet: null,
@@ -167,10 +173,13 @@ export const Uninitialized = () => {
 
 export const GettingMnemonics = () => {
   const wallet = genDummyWithCache();
+  const lookup = walletLookup([wallet]);
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.YOROI
+        currentRoute: ROUTES.TRANSFER.YOROI,
+        selected: wallet.publicDeriver,
+        ...lookup,
       }),
       (() => {
         const baseProps = genBaseProps({
@@ -193,10 +202,13 @@ export const GettingMnemonics = () => {
 
 export const GettingPaperMnemonics = () => {
   const wallet = genDummyWithCache();
+  const lookup = walletLookup([wallet]);
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.YOROI
+        currentRoute: ROUTES.TRANSFER.YOROI,
+        selected: wallet.publicDeriver,
+        ...lookup,
       }),
       (() => {
         const baseProps = genBaseProps({
@@ -219,10 +231,13 @@ export const GettingPaperMnemonics = () => {
 
 export const HardwareDisclaimer = () => {
   const wallet = genDummyWithCache();
+  const lookup = walletLookup([wallet]);
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.YOROI
+        currentRoute: ROUTES.TRANSFER.YOROI,
+        selected: wallet.publicDeriver,
+        ...lookup,
       }),
       (() => {
         const baseProps = genBaseProps({
@@ -245,10 +260,13 @@ export const HardwareDisclaimer = () => {
 
 export const HardwareMnemonic = () => {
   const wallet = genDummyWithCache();
+  const lookup = walletLookup([wallet]);
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.YOROI
+        currentRoute: ROUTES.TRANSFER.YOROI,
+        selected: wallet.publicDeriver,
+        ...lookup,
       }),
       (() => {
         const baseProps = genBaseProps({
@@ -271,10 +289,13 @@ export const HardwareMnemonic = () => {
 
 export const Checksum = () => {
   const wallet = genDummyWithCache();
+  const lookup = walletLookup([wallet]);
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.YOROI
+        currentRoute: ROUTES.TRANSFER.YOROI,
+        selected: wallet.publicDeriver,
+        ...lookup,
       }),
       (() => {
         const transferKindSelect = () => select(
@@ -306,10 +327,13 @@ export const Checksum = () => {
 
 export const RestoringAddresses = () => {
   const wallet = genDummyWithCache();
+  const lookup = walletLookup([wallet]);
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.YOROI
+        currentRoute: ROUTES.TRANSFER.YOROI,
+        selected: wallet.publicDeriver,
+        ...lookup,
       }),
       (() => {
         const baseProps = genBaseProps({
@@ -332,10 +356,13 @@ export const RestoringAddresses = () => {
 
 export const CheckingAddresses = () => {
   const wallet = genDummyWithCache();
+  const lookup = walletLookup([wallet]);
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.YOROI
+        currentRoute: ROUTES.TRANSFER.YOROI,
+        selected: wallet.publicDeriver,
+        ...lookup,
       }),
       (() => {
         const baseProps = genBaseProps({
@@ -358,10 +385,13 @@ export const CheckingAddresses = () => {
 
 export const GeneratingTx = () => {
   const wallet = genDummyWithCache();
+  const lookup = walletLookup([wallet]);
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.YOROI
+        currentRoute: ROUTES.TRANSFER.YOROI,
+        selected: wallet.publicDeriver,
+        ...lookup,
       }),
       (() => {
         const baseProps = genBaseProps({
@@ -384,10 +414,13 @@ export const GeneratingTx = () => {
 
 export const TransferTx = () => {
   const wallet = genDummyWithCache();
+  const lookup = walletLookup([wallet]);
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.YOROI
+        currentRoute: ROUTES.TRANSFER.YOROI,
+        selected: wallet.publicDeriver,
+        ...lookup,
       }),
       (() => {
         const errorCases = {
@@ -434,10 +467,13 @@ export const TransferTx = () => {
 
 export const Error = () => {
   const wallet = genDummyWithCache();
+  const lookup = walletLookup([wallet]);
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.YOROI
+        currentRoute: ROUTES.TRANSFER.YOROI,
+        selected: wallet.publicDeriver,
+        ...lookup,
       }),
       (() => {
         const errorCases = {
@@ -472,10 +508,13 @@ export const Error = () => {
 
 export const Success = () => {
   const wallet = genDummyWithCache();
+  const lookup = walletLookup([wallet]);
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.YOROI
+        currentRoute: ROUTES.TRANSFER.YOROI,
+        selected: wallet.publicDeriver,
+        ...lookup,
       }),
       (() => {
         const baseProps = genBaseProps({

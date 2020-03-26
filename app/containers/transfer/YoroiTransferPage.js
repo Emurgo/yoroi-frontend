@@ -265,7 +265,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         }
         return (
           <TransferLayout>
-            <BorderedBox>
+            <Dialog>
               <TransferSummaryPage
                 form={null}
                 formattedWalletAmount={formattedWalletAmount}
@@ -276,7 +276,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
                 onCancel={this.cancelTransferFunds}
                 error={yoroiTransfer.error}
               />
-            </BorderedBox>
+            </Dialog>
           </TransferLayout>
         );
       case TransferStatus.ERROR:

@@ -7,6 +7,8 @@ import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import DialogBackButton from '../widgets/DialogBackButton';
+import Dialog from '../widgets/Dialog';
 import styles from './HardwareDisclaimer.scss';
 import globalMessages from '../../i18n/global-messages';
 
@@ -37,56 +39,54 @@ export default class HardwareDisclaimer extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const buttonClasses = (primary: boolean) => classnames([
-      primary ? 'primary' : 'secondary',
-      styles.button,
-    ]);
 
+    const actions = [
+      {
+        label: intl.formatMessage(globalMessages.backButtonLabel),
+        onClick: this.props.onBack,
+      },
+      {
+        label: intl.formatMessage(globalMessages.uriLandingDialogConfirmLabel),
+        onClick: this.props.onNext,
+        primary: true,
+        disabled: !this.props.isChecked,
+      },
+    ];
+
+    const title = (
+      <>
+        <span className={styles.headerIcon} />
+        {intl.formatMessage(globalMessages.attentionTitle)}
+      </>
+    );
     return (
-      <div className={styles.component}>
+      <Dialog
+        title={title}
+        actions={actions}
+        closeOnOverlayClick={false}
+        onClose={this.props.onBack}
+        backButton={<DialogBackButton onBack={this.props.onBack} />}
+      >
+        <div className={styles.component}>
+          <div>
+            <div className={styles.body}>
+              <p className={styles.message}>
+                {intl.formatMessage(globalMessages.hardwareTransferInstructions)}<br /><br />
+                {intl.formatMessage(messages.instructions2)}
+              </p>
 
-        <div>
-          <div className={styles.body}>
-
-            <div className={styles.title}>
-              <span className={styles.headerIcon} />
-              {intl.formatMessage(globalMessages.attentionTitle)}
+              <div className={styles.checkbox}>
+                <Checkbox
+                  label={intl.formatMessage(messages.hardwareDisclaimer)}
+                  onChange={this.props.toggleCheck}
+                  checked={this.props.isChecked}
+                  skin={CheckboxSkin}
+                />
+              </div>
             </div>
-
-            <p className={styles.message}>
-              {intl.formatMessage(globalMessages.hardwareTransferInstructions)}<br /><br />
-              {intl.formatMessage(messages.instructions2)}
-            </p>
-
-            <div className={styles.checkbox}>
-              <Checkbox
-                label={intl.formatMessage(messages.hardwareDisclaimer)}
-                onChange={this.props.toggleCheck}
-                checked={this.props.isChecked}
-                skin={CheckboxSkin}
-              />
-            </div>
-
-            <div className={styles.buttonsWrapper}>
-              <Button
-                className={buttonClasses(false)}
-                label={intl.formatMessage(globalMessages.backButtonLabel)}
-                onClick={this.props.onBack}
-                skin={ButtonSkin}
-              />
-              <Button
-                disabled={!this.props.isChecked}
-                className={buttonClasses(true)}
-                label={intl.formatMessage(globalMessages.uriLandingDialogConfirmLabel)}
-                onClick={this.props.onNext}
-                skin={ButtonSkin}
-              />
-            </div>
-
           </div>
         </div>
-
-      </div>
+      </Dialog>
     );
   }
 }

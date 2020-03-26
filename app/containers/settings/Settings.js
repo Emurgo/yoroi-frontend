@@ -59,7 +59,7 @@ export default class Settings extends Component<Props> {
       />
     );
 
-    const navbarTitle = (
+    const navbar = (
       <NavBarContainer
         {...this.generated.NavBarContainerProps}
         title={<NavBarTitle
@@ -71,7 +71,7 @@ export default class Settings extends Component<Props> {
     return (
       <MainLayout
         sidebar={sidebarContainer}
-        navbar={navbarTitle}
+        navbar={navbar}
         connectionErrorType={checkAdaServerStatus}
         showInContainer
         showAsCard

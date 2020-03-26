@@ -7,6 +7,7 @@ import { boolean, select, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import {
   globalKnobs,
+  walletLookup,
   genDummyWithCache,
 } from '../../../stories/helpers/StoryWrapper';
 import { wrapTransfer } from '../../Routes';
@@ -97,13 +98,18 @@ export const Uninitialized = () => {
     walletCases,
     walletCases.NoWallet,
   );
+  const walletVal = walletValue();
+  const lookup = walletLookup(walletVal === walletCases.NoWallet
+    ? []
+    : [wallet]);
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.DAEDALUS
+        currentRoute: ROUTES.TRANSFER.DAEDALUS,
+        selected: walletVal === walletCases.NoWallet ? null : wallet.publicDeriver,
+        ...lookup,
       }),
       (() => {
-        const walletVal = walletValue();
         const baseProps = walletVal === walletCases.NoWallet
           ? genBaseProps({
             wallet: null,
@@ -128,10 +134,13 @@ export const Uninitialized = () => {
 
 export const GettingMnemonics = () => {
   const wallet = genDummyWithCache();
+  const lookup = walletLookup([wallet]);
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.DAEDALUS
+        currentRoute: ROUTES.TRANSFER.DAEDALUS,
+        selected: wallet.publicDeriver,
+        ...lookup,
       }),
       (() => {
         const baseProps = genBaseProps({
@@ -154,10 +163,13 @@ export const GettingMnemonics = () => {
 
 export const GettingPaperMnemonics = () => {
   const wallet = genDummyWithCache();
+  const lookup = walletLookup([wallet]);
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.DAEDALUS
+        currentRoute: ROUTES.TRANSFER.DAEDALUS,
+        selected: wallet.publicDeriver,
+        ...lookup,
       }),
       (() => {
         const baseProps = genBaseProps({
@@ -180,10 +192,13 @@ export const GettingPaperMnemonics = () => {
 
 export const GettingMasterKey = () => {
   const wallet = genDummyWithCache();
+  const lookup = walletLookup([wallet]);
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.DAEDALUS
+        currentRoute: ROUTES.TRANSFER.DAEDALUS,
+        selected: wallet.publicDeriver,
+        ...lookup,
       }),
       (() => {
         const baseProps = genBaseProps({
@@ -206,10 +221,13 @@ export const GettingMasterKey = () => {
 
 export const RestoringAddresses = () => {
   const wallet = genDummyWithCache();
+  const lookup = walletLookup([wallet]);
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.DAEDALUS
+        currentRoute: ROUTES.TRANSFER.DAEDALUS,
+        selected: wallet.publicDeriver,
+        ...lookup,
       }),
       (() => {
         const baseProps = genBaseProps({
@@ -232,10 +250,13 @@ export const RestoringAddresses = () => {
 
 export const CheckingAddresses = () => {
   const wallet = genDummyWithCache();
+  const lookup = walletLookup([wallet]);
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.DAEDALUS
+        currentRoute: ROUTES.TRANSFER.DAEDALUS,
+        selected: wallet.publicDeriver,
+        ...lookup,
       }),
       (() => {
         const baseProps = genBaseProps({
@@ -258,10 +279,13 @@ export const CheckingAddresses = () => {
 
 export const GeneratingTx = () => {
   const wallet = genDummyWithCache();
+  const lookup = walletLookup([wallet]);
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.DAEDALUS
+        currentRoute: ROUTES.TRANSFER.DAEDALUS,
+        selected: wallet.publicDeriver,
+        ...lookup,
       }),
       (() => {
         const baseProps = genBaseProps({
@@ -284,10 +308,13 @@ export const GeneratingTx = () => {
 
 export const ReadyToTransfer = () => {
   const wallet = genDummyWithCache();
+  const lookup = walletLookup([wallet]);
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.DAEDALUS
+        currentRoute: ROUTES.TRANSFER.DAEDALUS,
+        selected: wallet.publicDeriver,
+        ...lookup,
       }),
       (() => {
         const baseProps = genBaseProps({
@@ -322,10 +349,13 @@ export const ReadyToTransfer = () => {
 
 export const Error = () => {
   const wallet = genDummyWithCache();
+  const lookup = walletLookup([wallet]);
   return (() => {
     return wrapTransfer(
       mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.DAEDALUS
+        currentRoute: ROUTES.TRANSFER.DAEDALUS,
+        selected: wallet.publicDeriver,
+        ...lookup,
       }),
       (() => {
         const errorCases = {
