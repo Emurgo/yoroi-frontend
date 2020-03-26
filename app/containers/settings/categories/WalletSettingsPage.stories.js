@@ -72,6 +72,36 @@ const defaultSettingsPageProps: {|
   },
 });
 
+export const NoWallet = () => {
+  const wallet = null;
+  const lookup = walletLookup([]);
+  return wrapSettings(
+    mockSettingsProps({
+      location: ROUTES.SETTINGS.WALLET,
+      selected: wallet,
+      ...lookup,
+    }),
+    (() => {
+      const settingPageProps = defaultSettingsPageProps({
+        selected: wallet,
+        getConceptualWalletSettingsCache: lookup.getConceptualWalletSettingsCache,
+        getSigningKeyCache: lookup.getSigningKeyCache,
+      });
+      return (
+        <WalletSettingsPage
+          generated={{
+            ...settingPageProps,
+            // dialog is close so no need to give props
+            ChangeWalletPasswordDialogContainerProps: (null: any),
+            RemoveWalletDialogContainerProps: (null: any),
+            ResyncWalletDialogContainerProps: (null: any),
+          }}
+        />
+      );
+    })()
+  );
+};
+
 export const EditName = () => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);

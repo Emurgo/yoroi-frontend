@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import classnames from 'classnames';
-import type { Node } from 'react';
+import type { Node, ElementRef } from 'react';
 import { observer } from 'mobx-react';
 import styles from './NavDropdown.scss';
 import CaretIcon from '../../assets/images/wallet-nav/caret-down.inline.svg';
@@ -28,7 +28,14 @@ export default class NavDropdown extends Component<Props, State> {
     isExpanded: false,
   };
 
-  toggleExpansion = () => {
+  buttonRef: ?ElementRef<*>;
+
+  constructor(props: Props) {
+    super(props);
+    this.buttonRef = React.createRef();
+  }
+
+  toggleExpansion: void => void = () => {
     this.setState(prevState => ({ isExpanded: !prevState.isExpanded }));
   }
 
@@ -52,6 +59,7 @@ export default class NavDropdown extends Component<Props, State> {
               isExpanded && styles.toggleRotate
             ])}
             type="button"
+            ref={this.buttonRef}
             onClick={this.toggleExpansion}
           >
             <CaretIcon />
@@ -62,6 +70,7 @@ export default class NavDropdown extends Component<Props, State> {
             contentComponents={contentComponents}
             onAddWallet={this.props.onAddWallet}
             onClickOutside={this.toggleExpansion}
+            buttonRef={this.buttonRef}
           />
         )}
       </div>

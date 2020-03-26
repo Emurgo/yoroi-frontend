@@ -163,7 +163,8 @@ Feature: Wallet UI Settings
   Scenario: Wallet settings tab isn't active if wallet is not created (IT-23)
     When There is no wallet stored
     And I navigate to the general settings screen
-    Then I should see secondary menu "wallet" item disabled
+    Then I click on secondary menu "wallet" item
+    Then I should see a no wallet message
 
   @it-4
   Scenario: Yoroi Settings Screen / Support (IT-4)

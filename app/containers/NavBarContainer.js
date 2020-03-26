@@ -10,6 +10,7 @@ import { intlShape, defineMessages } from 'react-intl';
 import NavBar from '../components/topbar/NavBar';
 import NavPlate from '../components/topbar/NavPlate';
 import NavWalletDetails from '../components/topbar/NavWalletDetails';
+import NoWalletsDropdown from '../components/topbar/NoWalletsDropdown';
 import NavDropdown from '../components/topbar/NavDropdown';
 import NavDropdownRow from '../components/topbar/NavDropdownRow';
 import { ROUTES } from '../routes-config';
@@ -160,32 +161,32 @@ export default class NavBarContainer extends Component<Props> {
       </>
     );
 
-    const publicDeriver = walletsStore.selected;
-    if (publicDeriver == null) return null;
-    const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
-    const parent = publicDeriver.getParent();
-    const settingsCache = this.generated.stores.walletSettings
-      .getConceptualWalletSettingsCache(parent);
-
-    const withPubKey = asGetPublicKey(publicDeriver);
-    const plate = withPubKey == null
-      ? null
-      : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
-
     const dropdownComponent = (() => {
-      const balance = txRequests.requests.getBalanceRequest.result
-        ?.dividedBy(LOVELACES_PER_ADA) || null;
-      const dropdownHead = (
-        <NavWalletDetails
-          onUpdateHideBalance={this.updateHideBalance}
-          shouldHideBalance={profile.shouldHideBalance}
-          rewards={this.getRewardBalance(publicDeriver)}
-          walletAmount={balance}
-        />
-      );
+      const getDropdownHead = (() => {
+        const publicDeriver = walletsStore.selected;
+        if (publicDeriver == null) {
+          return (
+            <NoWalletsDropdown />
+          );
+        }
+
+        const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
+        const balance = txRequests.requests.getBalanceRequest.result
+          ?.dividedBy(LOVELACES_PER_ADA) || null;
+
+        return (
+          <NavWalletDetails
+            onUpdateHideBalance={this.updateHideBalance}
+            shouldHideBalance={profile.shouldHideBalance}
+            rewards={this.getRewardBalance(publicDeriver)}
+            walletAmount={balance}
+          />
+        );
+      });
+
       return (
         <NavDropdown
-          headerComponent={dropdownHead}
+          headerComponent={getDropdownHead()}
           contentComponents={dropdownContent}
           onAddWallet={
             () => this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
@@ -194,16 +195,33 @@ export default class NavBarContainer extends Component<Props> {
       );
     })();
 
+    const getPlate = (() => {
+      const publicDeriver = walletsStore.selected;
+      if (publicDeriver == null) return null;
+
+      const parent = publicDeriver.getParent();
+
+      const settingsCache = this.generated.stores.walletSettings
+        .getConceptualWalletSettingsCache(parent);
+
+      const withPubKey = asGetPublicKey(publicDeriver);
+      const plate = withPubKey == null
+        ? null
+        : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
+
+      return (
+        <NavPlate
+          plate={plate}
+          walletName={settingsCache.conceptualWalletName}
+          walletType={getWalletType(publicDeriver)}
+        />
+      );
+    });
+
     return (
       <NavBar
         title={this.props.title}
-        walletPlate={
-          <NavPlate
-            plate={plate}
-            walletName={settingsCache.conceptualWalletName}
-            walletType={getWalletType(publicDeriver)}
-          />
-        }
+        walletPlate={getPlate()}
         walletDetails={dropdownComponent}
       />
     );

@@ -414,6 +414,7 @@ const YoroiModern = {
   '--theme-default-color-red-light': 'rgba(255, 19, 81, 0.6)',
 
   // OTHERS
+  '--theme-wallet-nowallet-text-color': '#2B2C32',
   '--theme-modal-margin-cmn': `${modalMargin.top}px ${modalMargin.right}px ${modalMargin.bottom}px ${modalMargin.left}px`,
   '--theme-modal-min-max-width-cmn': `${560 - (modalMargin.left + modalMargin.right)}px`,
   '--theme-modal-min-max-width-sm': `${465 - (modalMargin.left + modalMargin.right)}px`,

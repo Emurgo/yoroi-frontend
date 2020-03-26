@@ -1,0 +1,19 @@
+@import '../../themes/mixins/loading-spinner';
+
+.wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    min-height: var(--theme-navbar-height);
+}
+
+.info {
+    margin-right: -48px;
+    text-align: right;
+    font-size: 18px;
+    font-family: var(--font-medium);
+    line-height: 22px;
+    color: var(--theme-navbar-color);
+}

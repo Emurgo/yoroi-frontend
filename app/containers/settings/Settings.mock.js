@@ -37,7 +37,6 @@ export const mockSettingsProps: {
         },
       },
       wallets: {
-        hasActiveWallet: request.selected != null,
         selected: request.selected,
       },
       serverConnectionStore: {

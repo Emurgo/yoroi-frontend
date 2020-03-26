@@ -31,7 +31,6 @@ const messages = defineMessages({
 type Props = {|
   +isActiveItem: string => boolean,
   +onItemClick: string => void,
-  +hasActiveWallet: boolean,
   +currentLocale: string,
   +currentTheme: Theme,
 |};
@@ -45,7 +44,7 @@ export default class SettingsMenu extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onItemClick, isActiveItem, hasActiveWallet, } = this.props;
+    const { onItemClick, isActiveItem, } = this.props;
 
     return (
       <div className={styles.componentWrapper}>
@@ -71,7 +70,6 @@ export default class SettingsMenu extends Component<Props> {
             onClick={() => onItemClick(ROUTES.SETTINGS.WALLET)}
             active={isActiveItem(ROUTES.SETTINGS.WALLET)}
             className="wallet"
-            disabled={!hasActiveWallet}
           />
 
           <SettingsMenuItem
