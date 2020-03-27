@@ -234,8 +234,10 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
             title={intl.formatMessage(globalMessages.pdfGenDone)}
             text={intl.formatMessage(messages.walletUpgradeNoop)}
             classicTheme={profile.isClassicTheme}
-            closeLabel={intl.formatMessage(globalMessages.continue)}
-            onClose={walletRestoreActions.startRestore.trigger}
+            closeInfo={{
+              closeLabel: intl.formatMessage(globalMessages.continue),
+              onClose: walletRestoreActions.startRestore.trigger,
+            }}
           />
         );
       }

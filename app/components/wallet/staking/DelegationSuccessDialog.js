@@ -40,8 +40,10 @@ export default class DelegationSuccessDialog extends Component<Props> {
         title={intl.formatMessage(messages.title)}
         text={intl.formatMessage(messages.explanation)}
         classicTheme={this.props.classicTheme}
-        onClose={this.props.onClose}
-        closeLabel={intl.formatMessage(messages.buttonLabel)}
+        closeInfo={{
+          onClose: this.props.onClose,
+          closeLabel: intl.formatMessage(messages.buttonLabel),
+        }}
       />
     );
   }

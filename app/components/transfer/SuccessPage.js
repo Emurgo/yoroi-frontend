@@ -5,13 +5,16 @@ import { intlShape } from 'react-intl';
 import styles from './SuccessPage.scss';
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
+import LoadingSpinner from '../widgets/LoadingSpinner';
 
 type Props = {|
   +title: string,
   +text: string,
   +classicTheme: boolean,
-  +onClose: void => PossiblyAsync<void>,
-  +closeLabel: string,
+  +closeInfo?: {|
+    +onClose: void => PossiblyAsync<void>,
+    +closeLabel: string,
+  |},
 |};
 
 @observer
@@ -21,25 +24,29 @@ export default class SuccessPage extends Component<Props> {
     intl: intlShape.isRequired
   };
 
+  static defaultProps = {
+    closeInfo: undefined
+  };
+
   render() {
     const { title, text } = this.props;
 
-    const actions = [
-      {
-        label: this.props.closeLabel,
-        onClick: this.props.onClose,
+    const actions = this.props.closeInfo == null
+      ? undefined
+      : [{
+        label: this.props.closeInfo.closeLabel,
+        onClick: this.props.closeInfo.onClose,
         primary: true
-      }
-    ];
+      }];
 
     return (
       <Dialog
         title=""
         actions={actions}
         closeOnOverlayClick={false}
-        onClose={this.props.onClose}
+        onClose={this.props.closeInfo ? this.props.closeInfo.onClose : undefined}
         className={styles.dialog}
-        closeButton={<DialogCloseButton />}
+        closeButton={this.props.closeInfo ? (<DialogCloseButton />) : undefined}
       >
         <div className={styles.component}>
           <div>
@@ -50,6 +57,11 @@ export default class SuccessPage extends Component<Props> {
             <div className={styles.text}>
               {text}
             </div>
+            {this.props.closeInfo == null && (
+              <div className={styles.spinnerSection}>
+                <LoadingSpinner />
+              </div>
+            )}
           </div>
         </div>
       </Dialog>

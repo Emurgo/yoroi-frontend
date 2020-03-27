@@ -35,8 +35,6 @@ export default class YoroiTransferSuccessPage extends Component<Props> {
       title={intl.formatMessage(messages.title)}
       text={intl.formatMessage(messages.text)}
       classicTheme={classicTheme}
-      closeLabel={intl.formatMessage(globalMessages.continue)}
-      onClose={() => {} /* TODO: replace timeout logic with this button */}
     />);
   }
 }
