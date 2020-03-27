@@ -15,17 +15,15 @@ import {
   CheckAdressesInUseApiError,
   NoInputsError,
 } from '../../../api/ada/errors';
-import ErrorBlock from '../../../components/widgets/ErrorBlock';
 import type { RestoreModeType } from '../../../actions/ada/wallet-restore-actions';
 import { RestoreMode } from '../../../actions/ada/wallet-restore-actions';
 import { RestoreSteps } from '../../../stores/ada/WalletRestoreStore';
 import { defineMessages, intlShape } from 'react-intl';
-import Dialog from '../../../components/widgets/Dialog';
 import YoroiTransferWaitingPage from '../../transfer/YoroiTransferWaitingPage';
 import SuccessPage from '../../../components/transfer/SuccessPage';
 import { TransferStatus, } from '../../../types/TransferTypes';
 import { formattedWalletAmount } from '../../../utils/formatters';
-import InvalidURIImg from '../../../assets/images/uri/invalid-uri.inline.svg';
+import ErrorPage from '../../../components/transfer/ErrorPage';
 
 const messages = defineMessages({
   walletUpgradeNoop: {
@@ -78,7 +76,6 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
   };
 
   render() {
-    const { intl } = this.context;
     const walletRestoreActions = this.generated.actions[environment.API].walletRestore;
     const actions = this.generated.actions;
     const { uiNotifications, profile, } = this.generated.stores;
@@ -176,37 +173,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         );
       }
       case RestoreSteps.TRANSFER_TX_GEN: {
-        const { yoroiTransfer } = this.generated.stores.substores[environment.API];
-        const content = this._transferDialogContent();
-
-        const getDoneButton = () => {
-          if (!(yoroiTransfer.error instanceof NoInputsError)) {
-            return [{
-              label: intl.formatMessage(globalMessages.cancel),
-              onClick: this.onCancel,
-              primary: true,
-            }];
-          }
-          return [{
-            label: intl.formatMessage(globalMessages.continue),
-            onClick: walletRestoreActions.startRestore.trigger,
-            primary: true,
-            isSubmitting: restoreRequest.isExecuting,
-          }];
-        };
-        return (
-          <Dialog
-            styleOveride={{ '--theme-modal-min-max-width-cmn': '680px' }}
-            title={intl.formatMessage(globalMessages.walletUpgrade)}
-            closeOnOverlayClick={false}
-            actions={yoroiTransfer.status === TransferStatus.ERROR
-              ? getDoneButton()
-              : undefined
-            }
-          >
-            {content}
-          </Dialog>
-        );
+        return this._transferDialogContent();
       }
       default: return null;
     }
@@ -247,17 +214,19 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           isSubmitting={yoroiTransfer.transferFundsRequest.isExecuting}
           onCancel={this.onCancel}
           error={yoroiTransfer.error}
+          dialogTitle={intl.formatMessage(globalMessages.walletUpgrade)}
         />);
       }
       case TransferStatus.ERROR: {
         if (!(yoroiTransfer.error instanceof NoInputsError)) {
           return (
-            <>
-              <center><InvalidURIImg /></center>
-              <ErrorBlock
-                error={yoroiTransfer.error}
-              />
-            </>
+            <ErrorPage
+              error={yoroiTransfer.error}
+              onCancel={this.onCancel}
+              title=""
+              backButtonLabel={intl.formatMessage(globalMessages.cancel)}
+              classicTheme={profile.isClassicTheme}
+            />
           );
         }
         return (
@@ -265,6 +234,8 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
             title={intl.formatMessage(globalMessages.pdfGenDone)}
             text={intl.formatMessage(messages.walletUpgradeNoop)}
             classicTheme={profile.isClassicTheme}
+            closeLabel={intl.formatMessage(globalMessages.continue)}
+            onClose={walletRestoreActions.startRestore.trigger}
           />
         );
       }

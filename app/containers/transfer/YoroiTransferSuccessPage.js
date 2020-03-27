@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import SuccessPage from '../../components/transfer/SuccessPage';
+import globalMessages from '../../i18n/global-messages';
 
 const messages = defineMessages({
   title: {
@@ -34,6 +35,8 @@ export default class YoroiTransferSuccessPage extends Component<Props> {
       title={intl.formatMessage(messages.title)}
       text={intl.formatMessage(messages.text)}
       classicTheme={classicTheme}
+      closeLabel={intl.formatMessage(globalMessages.continue)}
+      onClose={() => {} /* TODO: replace timeout logic with this button */}
     />);
   }
 }

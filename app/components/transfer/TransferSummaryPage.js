@@ -4,12 +4,12 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import BigNumber from 'bignumber.js';
 import classnames from 'classnames';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './TransferSummaryPage.scss';
 import LocalizableError from '../../i18n/LocalizableError';
 import RawHash from '../widgets/hashWrappers/RawHash';
+import DialogCloseButton from '../widgets/DialogCloseButton';
+import Dialog from '../widgets/Dialog';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../domain/Explorer';
 import globalMessages from '../../i18n/global-messages';
@@ -50,6 +50,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
+  +dialogTitle: string,
   +formattedWalletAmount: BigNumber => string,
   +selectedExplorer: ExplorerType,
   +transferTx: {|
@@ -75,6 +76,37 @@ export default class TransferSummaryPage extends Component<Props> {
     intl: intlShape.isRequired
   };
 
+  wrapInDialog: Node => Node = (content) => {
+    const { intl } = this.context;
+    const actions = [
+      {
+        label: intl.formatMessage(globalMessages.backButtonLabel),
+        onClick: this.props.onCancel,
+        className: classnames(['cancelTransferButton']),
+        disabled: this.props.isSubmitting,
+      },
+      {
+        label: intl.formatMessage(globalMessages.nextButtonLabel),
+        onClick: this.props.onSubmit,
+        primary: true,
+        className: classnames(['transferButton']),
+        isSubmitting: this.props.isSubmitting,
+      },
+    ];
+    return (
+      <Dialog
+        styleOveride={{ '--theme-modal-min-max-width-cmn': '680px' }}
+        title={this.props.dialogTitle}
+        actions={actions}
+        closeButton={<DialogCloseButton />}
+        onClose={this.props.onCancel}
+        closeOnOverlayClick={false}
+      >
+        {content}
+      </Dialog>
+    );
+  }
+
   render() {
     const { intl } = this.context;
     const { transferTx, isSubmitting, error, } = this.props;
@@ -86,19 +118,7 @@ export default class TransferSummaryPage extends Component<Props> {
       transferTx.recoveredBalance.minus(transferTx.fee)
     );
 
-    const nextButtonClasses = classnames([
-      'transferButton',
-      isSubmitting ? styles.isSubmitting : 'primary',
-      styles.button,
-    ]);
-
-    const cancelButtonClasses = classnames([
-      'cancelTransferButton',
-      'secondary',
-      styles.button,
-    ]);
-
-    return (
+    return this.wrapInDialog(
       <div className={styles.body}>
 
         <div className={styles.addressLabelWrapper}>
@@ -195,25 +215,6 @@ export default class TransferSummaryPage extends Component<Props> {
               <p className={styles.error}>{intl.formatMessage(error)}</p>
           }
         </div>
-
-        <div className={styles.buttonsWrapper}>
-          <Button
-            className={cancelButtonClasses}
-            label={intl.formatMessage(messages.cancelTransferButtonLabel)}
-            onClick={this.props.onCancel}
-            disabled={isSubmitting}
-            skin={ButtonSkin}
-          />
-
-          <Button
-            className={nextButtonClasses}
-            label={intl.formatMessage(messages.transferButtonLabel)}
-            onClick={this.props.onSubmit}
-            disabled={isSubmitting}
-            skin={ButtonSkin}
-          />
-        </div>
-
       </div>
     );
   }

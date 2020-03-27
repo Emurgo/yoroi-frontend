@@ -44,7 +44,9 @@ export default class YoroiTransferWaitingPage extends Component<Props> {
     const { status } = this.props;
 
     return (
-      <Dialog>
+      <Dialog
+        closeOnOverlayClick={false}
+      >
         <AnnotatedLoader
           title={intl.formatMessage(messages.title)}
           details={this.getMessage(intl, status)}

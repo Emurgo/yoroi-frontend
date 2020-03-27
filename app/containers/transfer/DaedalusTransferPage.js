@@ -7,7 +7,6 @@ import validWords from 'bip39/src/wordlists/english.json';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import TransferLayout from '../../components/transfer/TransferLayout';
 import TransferInstructionsPage from '../../components/transfer/TransferInstructionsPage';
-import BorderedBox from '../../components/widgets/BorderedBox';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import DaedalusTransferFormPage from './DaedalusTransferFormPage';
 import DaedalusTransferMasterKeyFormPage from './DaedalusTransferMasterKeyFormPage';
@@ -18,6 +17,7 @@ import config from '../../config';
 import { TransferStatus, } from '../../types/TransferTypes';
 import type { TransferStatusT, TransferTx } from '../../types/TransferTypes';
 import LocalizableError from '../../i18n/LocalizableError';
+import globalMessages from '../../i18n/global-messages';
 
 import { formattedWalletAmount } from '../../utils/formatters';
 import { ROUTES } from '../../routes-config';
@@ -190,26 +190,27 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
             <DaedalusTransferWaitingPage status={daedalusTransfer.status} />
           </TransferLayout>
         );
-      case TransferStatus.READY_TO_TRANSFER:
+      case TransferStatus.READY_TO_TRANSFER: {
         if (daedalusTransfer.transferTx == null) {
           return null; // TODO: throw error? Shouldn't happen
         }
+        const { intl } = this.context;
         return (
           <TransferLayout>
-            <BorderedBox>
-              <TransferSummaryPage
-                form={null}
-                formattedWalletAmount={formattedWalletAmount}
-                selectedExplorer={this.generated.stores.profile.selectedExplorer}
-                transferTx={daedalusTransfer.transferTx}
-                onSubmit={this.transferFunds}
-                isSubmitting={daedalusTransfer.transferFundsRequest.isExecuting}
-                onCancel={this.cancelTransferFunds}
-                error={daedalusTransfer.error}
-              />
-            </BorderedBox>
+            <TransferSummaryPage
+              form={null}
+              formattedWalletAmount={formattedWalletAmount}
+              selectedExplorer={this.generated.stores.profile.selectedExplorer}
+              transferTx={daedalusTransfer.transferTx}
+              onSubmit={this.transferFunds}
+              isSubmitting={daedalusTransfer.transferFundsRequest.isExecuting}
+              onCancel={this.cancelTransferFunds}
+              error={daedalusTransfer.error}
+              dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
+            />
           </TransferLayout>
         );
+      }
       case TransferStatus.ERROR:
         return (
           <TransferLayout>
