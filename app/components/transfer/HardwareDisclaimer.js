@@ -1,12 +1,9 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import classnames from 'classnames';
 import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
 import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
 import { defineMessages, intlShape } from 'react-intl';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import DialogBackButton from '../widgets/DialogBackButton';
 import Dialog from '../widgets/Dialog';
 import styles from './HardwareDisclaimer.scss';

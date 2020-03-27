@@ -11,7 +11,6 @@ import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import YoroiTransferErrorPage from './YoroiTransferErrorPage';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import Dialog from '../../components/widgets/Dialog';
-import DialogCloseButton from '../../components/widgets/DialogCloseButton';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import environment from '../../environment';
 import { formattedWalletAmount } from '../../utils/formatters';
