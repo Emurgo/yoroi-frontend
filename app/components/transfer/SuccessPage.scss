@@ -22,6 +22,11 @@
     line-height: 22px;
     text-align: center;
   }
+
+  .spinnerSection {
+    margin-top: 12px;
+    margin-bottom: 5px;
+  }
 }
 
 :global(.YoroiModern):not(:global(.YoroiShelley)) .component {

@@ -92,11 +92,11 @@ Feature: Transfer Yoroi Wallet funds
     Then I should see on the Yoroi transfer summary screen:
     | fromAddress                                                 | amount           |
     | Ae2tdPwUPEYx2dK1AMzRN1GqNd2eY7GCd7Z6aikMPJL3EkqqugoFQComQnV | 1234567898765    |
-    Then I navigate to wallet transactions screen
-    Then I am on the Yoroi Transfer start screen
+    When I confirm Yoroi transfer funds
+    Then I should see the Yoroi transfer success screen
 
   @it-82
-  Scenario: User can transfer funds from another Yoroi paper wallet (IT-82)
+  Scenario: User can tryeah ansfer funds from another Yoroi paper wallet (IT-82)
     # The recovery phrase and its balance(s) are defined in 
     # /features/mock-chain/TestWallets.js and
     # /features/mock-chain/mockImporter.js

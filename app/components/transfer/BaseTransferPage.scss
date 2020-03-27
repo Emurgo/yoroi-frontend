@@ -1,24 +1,10 @@
-@import '../../themes/mixins/loading-spinner';
-
 .component {
-
-  .button {
-    display: block !important;
-    margin: 20px auto 0;
-  }
   
   .body {
     color: var(--theme-bordered-box-text-color);
     font-family: var(--font-regular);
     font-size: 14px;
     line-height: 19px;
-  
-    .title {
-      line-height: 1.38;
-      margin-bottom: 4px;
-      font-size: 18px;
-      font-family: var(--font-semibold);
-    }
   
     .text {
       font-size: 15px;
@@ -29,31 +15,19 @@
     .instructionsList {
       list-style-type: disc;
       list-style-position: inside;
-      margin-bottom: 20px;
-    }
-  
-    .buttonsWrapper {
-      display: flex;
-      flex-direction: row-reverse;
-      justify-content: center;
-    }
-  
-    .submitWithPasswordButton {
-      &.spinning {
-        @include loading-spinner("../../assets/images/spinner-light.svg");
-      }
+      margin-bottom: 10px;
     }
   }
 }
 
-:global(.YoroiClassic) .component {
-  .button {
-    margin: 0 auto 0;
-  }
-}
-
-:global(.YoroiModern) .component {
+:global(.YoroiModern) {
   .inputWrapper span[class*='selectedWordBox'] {
     background-color: var(--rp-autocomplete-selected-word-box-bg-color-secondary);
+  }
+
+  .dialog {
+    :global(.Dialog_actions) {
+      margin-top: 0px;
+    }
   }
 }

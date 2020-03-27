@@ -35,7 +35,7 @@ export default class YoroiTransferErrorPage extends Component<Props> {
 
     return (<ErrorPage
       title={intl.formatMessage(messages.title)}
-      backButtonLabel={intl.formatMessage(globalMessages.backButtonLabel)}
+      backButtonLabel={intl.formatMessage(globalMessages.cancel)}
       onCancel={onCancel}
       error={error}
       classicTheme={classicTheme}

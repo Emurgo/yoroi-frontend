@@ -1,18 +1,6 @@
 @import '../../themes/mixins/error-message';
 @import '../../themes/mixins/loading-spinner';
 
-.isSubmitting {
-  @include loading-spinner("../../assets/images/spinner-light.svg");
-}
-
-.button {
-  margin: 0;
-
-  & + button {
-    margin-left: 20px;
-  }
-}
-
 .body {
   color: var(--theme-bordered-box-text-color);
   font-family: var(--font-regular);
@@ -97,12 +85,6 @@
     line-height: 1.38;
     margin-top: 6px;
     word-break: break-word;
-  }
-
-  .buttonsWrapper {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
   }
 
   .form {

@@ -11,11 +11,12 @@ import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import YoroiTransferErrorPage from './YoroiTransferErrorPage';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import Dialog from '../../components/widgets/Dialog';
-import DialogCloseButton from '../../components/widgets/DialogCloseButton';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import environment from '../../environment';
 import { formattedWalletAmount } from '../../utils/formatters';
 import { IGetFee, IReceivers, ITotalInput } from '../../api/ada/transactions/utils';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import type { BaseSignRequest } from '../../api/ada/transactions/types';
 import {
   asHasUtxoChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
@@ -105,25 +106,6 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
   };
 
   render() {
-    const { intl } = this.context;
-
-    return (
-      <Dialog
-        title={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
-        closeOnOverlayClick={false}
-        closeButton={this._getAdaWalletsStore().sendMoneyRequest.isExecuting
-          ? undefined
-          : (<DialogCloseButton />)}
-        onClose={this.props.onClose}
-      >
-        {this.getContent()}
-      </Dialog>
-    );
-  }
-
-  getContent: (void) => Node = () => {
-    const { profile } = this.generated.stores;
-
     const txBuilder = this._getTxBuilderStore();
 
     if (txBuilder.setupSelfTx.error != null) {
@@ -131,22 +113,39 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
         <YoroiTransferErrorPage
           error={txBuilder.setupSelfTx.error}
           onCancel={this.props.onClose}
-          classicTheme={profile.isClassicTheme}
+          classicTheme={this.generated.stores.profile.isClassicTheme}
         />
       );
     }
 
     if (txBuilder.tentativeTx == null) {
-      return (
+      return this.getSpinner();
+    }
+    const tentativeTx = txBuilder.tentativeTx;
+    return this.getContent(tentativeTx);
+  }
+
+  getSpinner: void => Node = () => {
+    const { intl } = this.context;
+    return (
+      <Dialog
+        title={intl.formatMessage(globalMessages.processingLabel)}
+        closeOnOverlayClick={false}
+      >
         <TransferLayout>
           <VerticallyCenteredLayout>
             <LoadingSpinner />
           </VerticallyCenteredLayout>
         </TransferLayout>
-      );
-    }
-    const tentativeTx = txBuilder.tentativeTx;
+      </Dialog>
+    );
+  }
 
+  getContent: BaseSignRequest<
+    RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput
+  > => Node = (
+    tentativeTx
+  ) => {
     const transferTx = {
       recoveredBalance: ITotalInput(tentativeTx, true),
       fee: IGetFee(tentativeTx, true),
@@ -162,6 +161,8 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
       isSubmitting={this._getAdaWalletsStore().sendMoneyRequest.isExecuting}
     />);
 
+    const { intl } = this.context;
+
     return (
       <TransferSummaryPage
         form={spendingPasswordForm}
@@ -172,6 +173,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
         isSubmitting={this._getAdaWalletsStore().sendMoneyRequest.isExecuting}
         onCancel={this.props.onClose}
         error={this._getAdaWalletsStore().sendMoneyRequest.error}
+        dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
       />
     );
   }

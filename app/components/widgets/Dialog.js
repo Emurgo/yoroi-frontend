@@ -21,7 +21,7 @@ type ActionType = {|
 |};
 
 type Props = {|
-  +title?: string,
+  +title?: string | Node,
   +children?: Node,
   +actions?: Array<ActionType>,
   +closeButton?: Element<any>,

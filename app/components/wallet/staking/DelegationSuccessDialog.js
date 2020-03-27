@@ -3,9 +3,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import Dialog from '../../widgets/Dialog';
-import DialogCloseButton from '../../widgets/DialogCloseButton';
-import styles from './DelegationTxDialog.scss';
 import SuccessPage from '../../transfer/SuccessPage';
 
 const messages = defineMessages({
@@ -38,29 +35,16 @@ export default class DelegationSuccessDialog extends Component<Props> {
   render() {
     const { intl } = this.context;
 
-    const actions = [
-      {
-        label: intl.formatMessage(messages.buttonLabel),
-        onClick: this.props.onClose,
-        primary: true
-      }
-    ];
-
     return (
-      <Dialog
-        title=""
-        actions={actions}
-        closeOnOverlayClick={false}
-        onClose={this.props.onClose}
-        className={styles.dialog}
-        closeButton={<DialogCloseButton />}
-      >
-        <SuccessPage
-          title={intl.formatMessage(messages.title)}
-          text={intl.formatMessage(messages.explanation)}
-          classicTheme={this.props.classicTheme}
-        />
-      </Dialog>
+      <SuccessPage
+        title={intl.formatMessage(messages.title)}
+        text={intl.formatMessage(messages.explanation)}
+        classicTheme={this.props.classicTheme}
+        closeInfo={{
+          onClose: this.props.onClose,
+          closeLabel: intl.formatMessage(messages.buttonLabel),
+        }}
+      />
     );
   }
 }

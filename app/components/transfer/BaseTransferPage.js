@@ -3,11 +3,10 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { intlShape } from 'react-intl';
-import BorderedBox from '../widgets/BorderedBox';
 import globalMessages from '../../i18n/global-messages';
+import DialogBackButton from '../widgets/DialogBackButton';
+import Dialog from '../widgets/Dialog';
 import styles from './BaseTransferPage.scss';
 
 type Props = {|
@@ -32,62 +31,45 @@ export default class BaseTransferPage extends Component<Props> {
       step0,
     } = this.props;
 
-    const nextButtonClasses = classnames([
-      'proceedTransferButtonClasses',
-      'primary',
-      styles.button,
-    ]);
-    const backButtonClasses = classnames([
-      'backTransferButtonClasses',
-      'secondary',
-      styles.button,
-    ]);
+    const actions = [
+      {
+        label: intl.formatMessage(globalMessages.backButtonLabel),
+        onClick: onBack,
+        className: classnames(['backTransferButtonClasses']),
+      },
+      {
+        label: intl.formatMessage(globalMessages.nextButtonLabel),
+        onClick: this.props.onSubmit,
+        primary: true,
+        className: classnames(['proceedTransferButtonClasses']),
+        disabled: this.props.isDisabled,
+      },
+    ];
 
     return (
-      <div className={styles.component}>
-        <BorderedBox>
-
+      <Dialog
+        title={intl.formatMessage(globalMessages.instructionTitle)}
+        actions={actions}
+        closeOnOverlayClick={false}
+        onClose={onBack}
+        className={styles.dialog}
+        backButton={<DialogBackButton onBack={onBack} />}
+      >
+        <div className={styles.component}>
           <div className={styles.body}>
-
-            { /* Instructions for how to transfer */ }
             <div>
-              <div className={styles.title}>
-                {intl.formatMessage(globalMessages.instructionTitle)}
-              </div>
-
               <ul className={styles.instructionsList}>
                 <div className={styles.text}>
                   {step0}
-                  &nbsp;
+                  <br /><br />
                   {intl.formatMessage(globalMessages.step1)}
                 </div>
               </ul>
             </div>
-
             {this.props.children}
-
-            <div className={styles.buttonsWrapper}>
-              <Button
-                className={nextButtonClasses}
-                label={intl.formatMessage(globalMessages.nextButtonLabel)}
-                onClick={this.props.onSubmit}
-                skin={ButtonSkin}
-                disabled={this.props.isDisabled}
-              />
-
-              <Button
-                className={backButtonClasses}
-                label={intl.formatMessage(globalMessages.backButtonLabel)}
-                onClick={onBack}
-                skin={ButtonSkin}
-              />
-            </div>
-
           </div>
-
-        </BorderedBox>
-
-      </div>
+        </div>
+      </Dialog>
     );
   }
 }

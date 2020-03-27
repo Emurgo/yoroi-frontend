@@ -11,7 +11,6 @@ import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import TransferLayout from '../../components/transfer/TransferLayout';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import HardwareDisclaimerPage from './HardwareDisclaimerPage';
-import BorderedBox from '../../components/widgets/BorderedBox';
 import YoroiTransferFormPage from './YoroiTransferFormPage';
 import YoroiPaperWalletFormPage from './YoroiPaperWalletFormPage';
 import HardwareTransferFormPage from './HardwareTransferFormPage';
@@ -28,6 +27,7 @@ import type { TransferStatusT, TransferTx } from '../../types/TransferTypes';
 import LocalizableError from '../../i18n/LocalizableError';
 import { ROUTES } from '../../routes-config';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import globalMessages from '../../i18n/global-messages';
 import type { GeneratedData as YoroiPlateData } from './YoroiPlatePage';
 
 // Stay this long on the success page, then jump to the wallet transactions page
@@ -259,26 +259,27 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
             <YoroiTransferWaitingPage status={yoroiTransfer.status} />
           </TransferLayout>
         );
-      case TransferStatus.READY_TO_TRANSFER:
+      case TransferStatus.READY_TO_TRANSFER: {
         if (yoroiTransfer.transferTx == null) {
           return null; // TODO: throw error? Shouldn't happen
         }
+        const { intl } = this.context;
         return (
           <TransferLayout>
-            <BorderedBox>
-              <TransferSummaryPage
-                form={null}
-                formattedWalletAmount={formattedWalletAmount}
-                selectedExplorer={this.generated.stores.profile.selectedExplorer}
-                transferTx={yoroiTransfer.transferTx}
-                onSubmit={this.transferFunds}
-                isSubmitting={yoroiTransfer.transferFundsRequest.isExecuting}
-                onCancel={this.cancelTransferFunds}
-                error={yoroiTransfer.error}
-              />
-            </BorderedBox>
+            <TransferSummaryPage
+              form={null}
+              formattedWalletAmount={formattedWalletAmount}
+              selectedExplorer={this.generated.stores.profile.selectedExplorer}
+              transferTx={yoroiTransfer.transferTx}
+              onSubmit={this.transferFunds}
+              isSubmitting={yoroiTransfer.transferFundsRequest.isExecuting}
+              onCancel={this.cancelTransferFunds}
+              error={yoroiTransfer.error}
+              dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
+            />
           </TransferLayout>
         );
+      }
       case TransferStatus.ERROR:
         return (
           <TransferLayout>

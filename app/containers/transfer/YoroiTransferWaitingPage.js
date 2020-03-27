@@ -5,6 +5,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import type { TransferStatusT } from '../../types/TransferTypes';
 import { TransferStatus } from '../../types/TransferTypes';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import Dialog from '../../components/widgets/Dialog';
 
 import AnnotatedLoader from '../../components/transfer/AnnotatedLoader';
 
@@ -43,10 +44,14 @@ export default class YoroiTransferWaitingPage extends Component<Props> {
     const { status } = this.props;
 
     return (
-      <AnnotatedLoader
-        title={intl.formatMessage(messages.title)}
-        details={this.getMessage(intl, status)}
-      />
+      <Dialog
+        closeOnOverlayClick={false}
+      >
+        <AnnotatedLoader
+          title={intl.formatMessage(messages.title)}
+          details={this.getMessage(intl, status)}
+        />
+      </Dialog>
     );
   }
 
