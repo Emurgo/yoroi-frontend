@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import SuccessPage from '../../components/transfer/SuccessPage';
-import globalMessages from '../../i18n/global-messages';
 
 const messages = defineMessages({
   title: {
