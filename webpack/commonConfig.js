@@ -51,7 +51,7 @@ const plugins = (folder /*: string */, networkName /*: string */) => {
   ];
 };
 
-const rules = [
+const rules /*: boolean => Array<*> */ = (isDev) => [
   // Pdfjs Worker webpack config, reference to issue: https://github.com/mozilla/pdf.js/issues/7612#issuecomment-315179422
   {
     test: /pdf\.worker(\.min)?\.js$/,
@@ -67,7 +67,7 @@ const rules = [
         loader: 'css-loader',
         options: {
           importLoaders: 1,
-          sourceMap: true,
+          sourceMap: isDev,
           modules: {
             mode: 'local',
             localIdentName: '[name]__[local]___[hash:base64:5]',
@@ -91,7 +91,7 @@ const rules = [
       {
         loader: 'css-loader',
         options: {
-          sourceMap: true,
+          sourceMap: isDev,
           modules: {
             mode: 'global',
           },
@@ -110,7 +110,7 @@ const rules = [
         loader: 'css-loader',
         options: {
           importLoaders: 1,
-          sourceMap: true,
+          sourceMap: isDev,
           modules: {
             mode: 'local',
             localIdentName: '[name]_[local]',

@@ -49,7 +49,7 @@ const baseProdConfig = (env /*: EnvParams */) => ({
   ],
   module: {
     rules: [
-      ...commonConfig.rules,
+      ...commonConfig.rules(false),
       {
         test: /\.js$/,
         loader: 'babel-loader',

@@ -62,7 +62,7 @@ const baseDevConfig = (
   ],
   module: {
     rules: [
-      ...commonConfig.rules,
+      ...commonConfig.rules(true),
       {
         test: /\.js$/,
         loader: 'babel-loader?cacheDirectory',
