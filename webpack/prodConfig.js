@@ -44,7 +44,6 @@ const baseProdConfig = (env /*: EnvParams */) => ({
       true,
       JSON.parse(env.nightly)
     )),
-    new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),
   ],
   module: {
