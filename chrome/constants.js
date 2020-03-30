@@ -51,13 +51,20 @@ export function genCSP(request: {|
   frameSrc.push(SEIZA_URL);
   frameSrc.push('https://connect.trezor.io/');
   frameSrc.push('https://emurgo.github.io/yoroi-extension-ledger-bridge');
+
+  // unsafe-eval is unfortunately needed to compile WebAssembly in the browser
+  // it may be removed if wasm-eval is ever standardized https://github.com/w3c/webappsec-csp/pull/293
+  const evalSrc = "'unsafe-eval'";
+
+  // unsafe-inline is unfortunately required by style-loader (even in production builds)
+  const evalStyle = "'unsafe-inline'";
   return [
     `default-src 'self' ${defaultSrc.join(' ')};`,
     `frame-src ${frameSrc.join(' ')};`,
-    `script-src 'self' 'unsafe-eval' ${scriptSrc.join(' ')} blob:;`,
+    `script-src 'self' ${evalSrc} ${scriptSrc.join(' ')} blob:;`,
     `object-src 'self' ${objectSrc.join(' ')};`,
     `connect-src ${connectSrc.join(' ')};`,
-    `style-src * 'unsafe-inline' 'self' ${styleSrc.join(' ')} blob:;`,
+    `style-src * ${evalStyle} 'self' ${styleSrc.join(' ')} blob:;`,
     `img-src 'self' ${imgSrc.join(' ')} data:;`,
   ].join(' ');
 }

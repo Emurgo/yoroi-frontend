@@ -53,7 +53,6 @@ const baseDevConfig = (
     ...commonConfig.plugins('dev', networkName),
     new webpack.DefinePlugin(commonConfig.definePlugin(networkName, false, isNightly)),
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoEmitOnErrorsPlugin(),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.prod$/),
     new webpack.DefinePlugin({
       __HOST__: `'${host}'`,
@@ -62,7 +61,7 @@ const baseDevConfig = (
   ],
   module: {
     rules: [
-      ...commonConfig.rules,
+      ...commonConfig.rules(true),
       {
         test: /\.js$/,
         loader: 'babel-loader?cacheDirectory',

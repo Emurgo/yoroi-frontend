@@ -209,7 +209,7 @@ export const Frame = () => {
       ...lookup,
     }),
     (<StakingPage
-      urlTemplate="no-frame-when-testing"
+      urlTemplate="localhost://no-frame-when-testing"
       generated={genBaseProps({
         wallet,
         lookup,
@@ -236,7 +236,7 @@ export const PendingTransaction = () => {
       ...lookup,
     }),
     (<StakingPage
-      urlTemplate="no-frame-when-testing"
+      urlTemplate="localhost://no-frame-when-testing"
       generated={genBaseProps({
         wallet,
         lookup,
@@ -264,7 +264,7 @@ export const TransactionIsExecuting = () => {
       ...lookup,
     }),
     (<StakingPage
-      urlTemplate="no-frame-when-testing"
+      urlTemplate="localhost://no-frame-when-testing"
       generated={genBaseProps({
         wallet,
         lookup,
@@ -296,7 +296,7 @@ export const TransactionError = () => {
       ...lookup,
     }),
     (<StakingPage
-      urlTemplate="no-frame-when-testing"
+      urlTemplate="localhost://no-frame-when-testing"
       generated={genBaseProps({
         wallet,
         lookup,
@@ -347,7 +347,7 @@ export const Transaction = () => {
       ...lookup,
     }),
     (<StakingPage
-      urlTemplate="no-frame-when-testing"
+      urlTemplate="localhost://no-frame-when-testing"
       generated={genBaseProps({
         wallet,
         lookup,
@@ -395,7 +395,7 @@ export const DelegationSuccess = () => {
       ...lookup,
     }),
     (<StakingPage
-      urlTemplate="no-frame-when-testing"
+      urlTemplate="localhost://no-frame-when-testing"
       generated={genBaseProps({
         wallet,
         lookup,
