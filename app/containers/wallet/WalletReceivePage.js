@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed, observable, runInAction } from 'mobx';
+import { intlShape } from 'react-intl';
 import config from '../../config';
 import WalletReceive from '../../components/wallet/WalletReceive';
 import StandardHeader from '../../components/wallet/receive/StandardHeader';
@@ -15,7 +16,7 @@ import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-
+import Dialog from '../../components/widgets/Dialog';
 import {
   DECIMAL_PLACES_IN_ADA,
   MAX_INTEGER_PLACES_IN_ADA
@@ -36,6 +37,8 @@ type Props = {|
 @observer
 export default class WalletReceivePage extends Component<Props> {
 
+  static contextTypes = { intl: intlShape.isRequired };
+
   @observable notificationElementId: string = '';
 
   componentWillUnmount() {
@@ -46,15 +49,19 @@ export default class WalletReceivePage extends Component<Props> {
   handleGenerateAddress: void => Promise<void> = async () => {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver != null) {
+      this.generated.actions.dialogs.open.trigger({
+        dialog: LoadingSpinner,
+      });
       await this.generated.actions.ada.addresses.createAddress.trigger(publicDeriver);
+      this.generated.actions.dialogs.closeActiveDialog.trigger();
     }
   };
 
-  resetErrors = () => {
+  resetErrors: void => void = () => {
     this.generated.actions.ada.addresses.resetErrors.trigger();
   };
 
-  closeNotification = () => {
+  closeNotification: void => void = () => {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver) {
       const notificationId = `${publicDeriver.getPublicDeriverId()}-copyNotification`;
@@ -63,6 +70,7 @@ export default class WalletReceivePage extends Component<Props> {
   };
 
   render() {
+    const { intl } = this.context;
     const actions = this.generated.actions;
     const { uiNotifications, uiDialogs, profile } = this.generated.stores;
     const {
@@ -171,6 +179,17 @@ export default class WalletReceivePage extends Component<Props> {
           }
         />
 
+
+        {uiDialogs.isOpen(LoadingSpinner) ? (
+          <Dialog
+            title={intl.formatMessage(globalMessages.processingLabel)}
+            closeOnOverlayClick={false}
+          >
+            <VerticalFlexContainer>
+              <LoadingSpinner />
+            </VerticalFlexContainer>
+          </Dialog>
+        ) : null}
         {uiDialogs.isOpen(URIGenerateDialog) ? (
           <URIGenerateDialog
             walletAddress={uiDialogs.getParam<string>('address')}

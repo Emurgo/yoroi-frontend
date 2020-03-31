@@ -234,20 +234,20 @@ export default class WalletStore extends Store {
 
   getWalletRoute: PublicDeriver<> => string = (
     publicDeriver,
-  ): string => (
+  ) => (
     buildRoute(ROUTES.WALLETS.TRANSACTIONS, {
       id: publicDeriver.getPublicDeriverId(),
     })
   );
 
-  goToWalletRoute(publicDeriver: PublicDeriver<>): void {
+  goToWalletRoute: PublicDeriver<> => void = (publicDeriver) => {
     const route = this.getWalletRoute(publicDeriver);
     this.actions.router.goToRoute.trigger({ route });
   }
 
-  async refreshWalletFromRemote(
-    publicDeriver: PublicDeriver<>,
-  ): Promise<void> {
+  refreshWalletFromRemote: PublicDeriver<> => Promise<void> = async (
+    publicDeriver
+  ) => {
     try {
       const substore = this.stores.substores[environment.API];
       await substore.transactions.refreshTransactionData({
@@ -259,11 +259,11 @@ export default class WalletStore extends Store {
       Logger.error(`${nameof(WalletStore)}::${nameof(this.refreshWalletFromRemote)} ` + stringifyError(error));
       throw error;
     }
-  }
+  };
 
-  async refreshWalletFromLocalOnLaunch(
-    publicDeriver: PublicDeriver<>,
-  ): Promise<void> {
+  refreshWalletFromLocalOnLaunch: PublicDeriver<> => Promise<void> = async (
+    publicDeriver
+  ) => {
     try {
       const substore = this.stores.substores[environment.API];
       await substore.transactions.refreshTransactionData({

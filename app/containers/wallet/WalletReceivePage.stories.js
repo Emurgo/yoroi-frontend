@@ -30,6 +30,7 @@ import { isValidAmountInLovelaces } from '../../utils/validations';
 import type { StandardAddress } from '../../stores/base/AddressesStore';
 import type { SetupSelfTxFunc } from '../../stores/ada/AdaTransactionBuilderStore';
 import URIGenerateDialog from '../../components/uri/URIGenerateDialog';
+import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import URIDisplayDialog from '../../components/uri/URIDisplayDialog';
 import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
 import VerifyAddressDialog from '../../components/wallet/receive/VerifyAddressDialog';
@@ -277,6 +278,15 @@ export const ExternalTab = () => {
   const selectedTab = 'external';
   const wallet = genSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
+  const addressCases = {
+    No: 0,
+    Yes: 1,
+  };
+  const getAddressGenerationValue = () => select(
+    'generatingAddress',
+    addressCases,
+    addressCases.No,
+  );
   return wrapWallet(
     mockWalletProps({
       location: getExternalRoute(wallet.publicDeriver.getPublicDeriverId()),
@@ -291,6 +301,9 @@ export const ExternalTab = () => {
       (<WalletReceivePage
         generated={genBaseProps({
           wallet,
+          dialog: getAddressGenerationValue() === addressCases.Yes
+            ? LoadingSpinner
+            : undefined,
           tab: selectedTab,
           addresses: genAddresses(),
         })}
