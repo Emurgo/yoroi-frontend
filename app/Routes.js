@@ -32,10 +32,12 @@ import MyWalletsPage from './containers/wallet/MyWalletsPage';
 import WalletSummaryPage from './containers/wallet/WalletSummaryPage';
 import WalletSendPage from './containers/wallet/WalletSendPage';
 import WalletReceivePage from './containers/wallet/WalletReceivePage';
-import type { GeneratedData as TransferData } from './containers/transfer/Transfer';
 import DaedalusTransferPage from './containers/transfer/DaedalusTransferPage';
 import YoroiTransferPage from './containers/transfer/YoroiTransferPage';
 import URILandingPage from './containers/uri/URILandingPage';
+import type { GeneratedData as LegacyTransferData } from './containers/transfer/LegacyTransfer';
+import LegacyTransfer from './containers/transfer/LegacyTransfer';
+import type { GeneratedData as TransferData } from './containers/transfer/Transfer';
 import Transfer from './containers/transfer/Transfer';
 import Receive from './containers/wallet/Receive';
 import type { GeneratedData as ReceiveData } from './containers/wallet/Receive';
@@ -259,17 +261,30 @@ export function wrapSettings(
 }
 
 export function wrapTransfer(
-  transferProps: InjectedOrGenerated<TransferData>,
+  transferProps: InjectedOrGenerated<LegacyTransferData>,
   children: Node,
 ): Node {
   return (
-    <Transfer
+    <LegacyTransfer
       {...transferProps}
     >
       {children}
-    </Transfer>
+    </LegacyTransfer>
   );
 }
+// export function wrapTransfer(
+//   transferProps: InjectedOrGenerated<TransferData>,
+//   children: Node,
+// ): Node {
+//   return (
+//     <Transfer
+//       {...transferProps}
+//     >
+//       {children}
+//     </Transfer>
+//   );
+// }
+
 
 export function wrapWallet(
   walletProps: InjectedOrGenerated<WalletData>,

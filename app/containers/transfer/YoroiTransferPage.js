@@ -125,7 +125,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
     const yoroiTransfer = this._getYoroiTransferStore();
     const publicDeriver = walletsStore.selected;
     if (publicDeriver == null) {
-      throw new Error(`${nameof(this.transferFunds)} no wallet elected`);
+      throw new Error(`${nameof(this.transferFunds)} no wallet selected`);
     }
     await this._getYoroiTransferActions().transferFunds.trigger({
       next: async () => {

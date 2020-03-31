@@ -11,7 +11,7 @@ import {
   genDummyWithCache,
 } from '../../../stories/helpers/StoryWrapper';
 import { wrapTransfer } from '../../Routes';
-import { mockTransferProps } from './Transfer.mock';
+import { mockTransferProps } from './LegacyTransfer.mock';
 import { THEMES } from '../../themes';
 import { getDefaultExplorer } from '../../domain/Explorer';
 import { ROUTES } from '../../routes-config';

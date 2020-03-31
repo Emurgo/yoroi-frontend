@@ -7,17 +7,16 @@ import { intlShape } from 'react-intl';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import MainLayout from '../MainLayout';
 import SidebarContainer from '../SidebarContainer';
+import TransferWithNavigation from '../../components/transfer/layouts/TransferWithNavigation';
 import type { TransferNavigationProps } from '../../components/transfer/layouts/TransferWithNavigation';
 import { ROUTES } from '../../routes-config';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import NavBarContainer from '../NavBarContainer';
 import globalMessages from '../../i18n/global-messages';
-import WalletTransferPage from './WalletTransferPage';
-import type { GeneratedData as WalletTransferPageData } from './WalletTransferPage';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import type { GeneratedData as NavBarContainerData } from '../NavBarContainer';
 
-export type GeneratedData = typeof Transfer.prototype.generated;
+export type GeneratedData = typeof LegacyTransfer.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
@@ -25,7 +24,7 @@ type Props = {|
 |};
 
 @observer
-export default class Transfer extends Component<Props> {
+export default class LegacyTransfer extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -33,6 +32,11 @@ export default class Transfer extends Component<Props> {
 
   static defaultProps = {
     children: undefined,
+  };
+
+  isActiveScreen : $PropertyType<TransferNavigationProps, 'isActiveNavItem'> = page => {
+    const { app } = this.generated.stores;
+    return app.currentRoute.endsWith(page);
   };
 
   handleTransferNavItemClick : $PropertyType<TransferNavigationProps, 'onNavItemClick'> = page => {
@@ -60,9 +64,15 @@ export default class Transfer extends Component<Props> {
         navbar={navbar}
         sidebar={sidebarContainer}
         connectionErrorType={checkAdaServerStatus}
-        showInContainer={false}
+        showInContainer
+        showAsCard
       >
-        <WalletTransferPage {...this.generated.WalletTransferPageProps} />
+        <TransferWithNavigation
+          isActiveScreen={this.isActiveScreen}
+          onTransferNavItemClick={this.handleTransferNavItemClick}
+        >
+          {this.props.children}
+        </TransferWithNavigation>
       </MainLayout>
     );
   }
@@ -72,7 +82,7 @@ export default class Transfer extends Component<Props> {
       return this.props.generated;
     }
     if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(Transfer)} no way to generated props`);
+      throw new Error(`${nameof(LegacyTransfer)} no way to generated props`);
     }
     const { stores, actions } = this.props;
     return Object.freeze({
@@ -94,9 +104,6 @@ export default class Transfer extends Component<Props> {
       ),
       NavBarContainerProps: (
         { actions, stores, }: InjectedOrGenerated<NavBarContainerData>
-      ),
-      WalletTransferPageProps: (
-        { actions, stores, }: InjectedOrGenerated<WalletTransferPageData>
       ),
     });
   }

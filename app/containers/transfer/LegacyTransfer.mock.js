@@ -8,7 +8,7 @@ import WalletSettingsStore from '../../stores/base/WalletSettingsStore';
 import TransactionsStore from '../../stores/base/TransactionsStore';
 import DelegationStore from '../../stores/ada/DelegationStore';
 import WalletStore from '../../stores/toplevel/WalletStore';
-import type { GeneratedData } from './Transfer';
+import type { GeneratedData } from './LegacyTransfer';
 
 export const mockTransferProps: {
   selected: null | PublicDeriver<>,
@@ -100,30 +100,6 @@ export const mockTransferProps: {
           },
         },
       }
-    },
-    WalletTransferPageProps: {
-      generated: {
-        stores: {
-          uiDialogs: {
-            isOpen: () => false,
-            getParam: () => (null: any),
-          },
-          wallets: {
-            hasActiveWallet: request.selected != null,
-          }
-        },
-        actions: {
-          router: {
-            goToRoute: { trigger: action('goToRoute'), },
-          },
-          dialogs: {
-            closeActiveDialog: {
-              trigger: action('closeActiveDialog'),
-            },
-            open: { trigger: action('open'), },
-          },
-        },
-      },
     },
   },
 });
