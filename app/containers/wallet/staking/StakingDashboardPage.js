@@ -487,6 +487,7 @@ export default class StakingDashboardPage extends Component<Props> {
               // don't support undelegation for ratio stake since it's a less intuitive UX
               keyState.state.delegation.pools.length === 1
                 ? async () => {
+                  this.generated.actions.dialogs.open.trigger({ dialog: UndelegateDialog });
                   await this.generated.actions[environment.API]
                     .delegationTransaction
                     .createTransaction
@@ -494,7 +495,6 @@ export default class StakingDashboardPage extends Component<Props> {
                       publicDeriver,
                       poolRequest: undefined,
                     });
-                  this.generated.actions.dialogs.open.trigger({ dialog: UndelegateDialog });
                 }
                 : undefined
             }
