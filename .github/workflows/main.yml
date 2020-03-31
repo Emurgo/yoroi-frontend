@@ -1,10 +1,9 @@
 name: Publish to Nightly
 
 on:
-  # todo: more sensible trigger
-  schedule:
-    # Monday-Friday at 2AM UTC
-    - cron: "0 2 * * 1-5"
+  push:
+    branches:
+      - shelley
 
 jobs:
   build:
