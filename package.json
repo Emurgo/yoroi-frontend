@@ -86,7 +86,7 @@
     "@storybook/addon-notes": "5.3.17",
     "@storybook/addon-viewport": "5.3.17",
     "@storybook/addons": "5.3.17",
-    "@storybook/react": "5.3.17",
+    "@storybook/react": "5.3.18",
     "@storybook/source-loader": "5.3.17",
     "autoprefixer": "9.7.5",
     "babel-jest": "25.2.4",
