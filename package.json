@@ -85,7 +85,7 @@
     "@storybook/addon-links": "5.3.17",
     "@storybook/addon-notes": "5.3.17",
     "@storybook/addon-viewport": "5.3.17",
-    "@storybook/addons": "5.3.17",
+    "@storybook/addons": "5.3.18",
     "@storybook/react": "5.3.17",
     "@storybook/source-loader": "5.3.17",
     "autoprefixer": "9.7.5",
