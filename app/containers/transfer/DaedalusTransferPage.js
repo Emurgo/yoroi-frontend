@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import validWords from 'bip39/src/wordlists/english.json';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
-import TransferLayout from '../../components/transfer/TransferLayout';
+import LegacyTransferLayout from '../../components/transfer/LegacyTransferLayout';
 import TransferInstructionsPage from '../../components/transfer/TransferInstructionsPage';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import DaedalusTransferFormPage from './DaedalusTransferFormPage';
@@ -130,7 +130,7 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
     switch (daedalusTransfer.status) {
       case TransferStatus.UNINITIALIZED:
         return (
-          <TransferLayout>
+          <LegacyTransferLayout>
             <TransferInstructionsPage
               onFollowInstructionsPrerequisites={this.goToCreateWallet}
               onConfirm={this.startTransferFunds}
@@ -138,11 +138,11 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
               onMasterKeyConfirm={this.startTransferMasterKey}
               disableTransferFunds={wallets.selected == null}
             />
-          </TransferLayout>
+          </LegacyTransferLayout>
         );
       case TransferStatus.GETTING_MNEMONICS:
         return (
-          <TransferLayout>
+          <LegacyTransferLayout>
             <DaedalusTransferFormPage
               onSubmit={this.setupTransferFundsWithMnemonic}
               onBack={this.backToUninitialized}
@@ -154,11 +154,11 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
               mnemonicLength={config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT}
               classicTheme={profile.isClassicTheme}
             />
-          </TransferLayout>
+          </LegacyTransferLayout>
         );
       case TransferStatus.GETTING_PAPER_MNEMONICS:
         return (
-          <TransferLayout>
+          <LegacyTransferLayout>
             <DaedalusTransferFormPage
               onSubmit={this.setupTransferFundsWithMnemonic}
               onBack={this.backToUninitialized}
@@ -170,25 +170,25 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
               mnemonicLength={config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT}
               classicTheme={profile.isClassicTheme}
             />
-          </TransferLayout>
+          </LegacyTransferLayout>
         );
       case TransferStatus.GETTING_MASTER_KEY:
         return (
-          <TransferLayout>
+          <LegacyTransferLayout>
             <DaedalusTransferMasterKeyFormPage
               onSubmit={this.setupTransferFundsWithMasterKey}
               onBack={this.backToUninitialized}
               classicTheme={profile.isClassicTheme}
             />
-          </TransferLayout>
+          </LegacyTransferLayout>
         );
       case TransferStatus.RESTORING_ADDRESSES:
       case TransferStatus.CHECKING_ADDRESSES:
       case TransferStatus.GENERATING_TX:
         return (
-          <TransferLayout>
+          <LegacyTransferLayout>
             <DaedalusTransferWaitingPage status={daedalusTransfer.status} />
-          </TransferLayout>
+          </LegacyTransferLayout>
         );
       case TransferStatus.READY_TO_TRANSFER: {
         if (daedalusTransfer.transferTx == null) {
@@ -196,7 +196,7 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
         }
         const { intl } = this.context;
         return (
-          <TransferLayout>
+          <LegacyTransferLayout>
             <TransferSummaryPage
               form={null}
               formattedWalletAmount={formattedWalletAmount}
@@ -208,18 +208,18 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
               error={daedalusTransfer.error}
               dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
             />
-          </TransferLayout>
+          </LegacyTransferLayout>
         );
       }
       case TransferStatus.ERROR:
         return (
-          <TransferLayout>
+          <LegacyTransferLayout>
             <DaedalusTransferErrorPage
               error={daedalusTransfer.error}
               onCancel={this.cancelTransferFunds}
               classicTheme={profile.isClassicTheme}
             />
-          </TransferLayout>
+          </LegacyTransferLayout>
         );
       default:
         throw new Error('DaedalusTransferPage Unexpected state ' + daedalusTransfer.status);

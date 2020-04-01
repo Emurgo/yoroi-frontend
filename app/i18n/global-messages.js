@@ -511,7 +511,7 @@ const globalMessages = defineMessages({
   },
   sidebarTransfer: {
     id: 'sidebar.transfer',
-    defaultMessage: '!!!Transfer wallets',
+    defaultMessage: '!!!Claim or transfer wallet',
   },
   ledgerTitle: {
     id: 'wallet.add.optionDialog.connect.hw.ledger.title',

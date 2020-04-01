@@ -8,7 +8,7 @@ import { observer } from 'mobx-react';
 import { intlShape, } from 'react-intl';
 import validWords from 'bip39/src/wordlists/english.json';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
-import TransferLayout from '../../components/transfer/TransferLayout';
+import LegacyTransferLayout from '../../components/transfer/LegacyTransferLayout';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import HardwareDisclaimerPage from './HardwareDisclaimerPage';
 import YoroiTransferFormPage from './YoroiTransferFormPage';
@@ -171,7 +171,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
     switch (yoroiTransfer.status) {
       case TransferStatus.UNINITIALIZED:
         return (
-          <TransferLayout>
+          <LegacyTransferLayout>
             <YoroiTransferStartPage
               onLegacy15Words={this.startLegacyTransferFunds}
               onShelley15Words={this.startShelleyTransferFunds}
@@ -182,11 +182,11 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
               onFollowInstructionsPrerequisites={this.goToCreateWallet}
               disableTransferFunds={stores.wallets.selected == null}
             />
-          </TransferLayout>
+          </LegacyTransferLayout>
         );
       case TransferStatus.GETTING_MNEMONICS:
         return (
-          <TransferLayout>
+          <LegacyTransferLayout>
             <YoroiTransferFormPage
               onSubmit={this.setupTransferFundsWithMnemonic}
               onBack={this.backToUninitialized}
@@ -198,11 +198,11 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
               mnemonicLength={config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT}
               classicTheme={profile.isClassicTheme}
             />
-          </TransferLayout>
+          </LegacyTransferLayout>
         );
       case TransferStatus.GETTING_PAPER_MNEMONICS:
         return (
-          <TransferLayout>
+          <LegacyTransferLayout>
             <YoroiPaperWalletFormPage
               onSubmit={this.setupTransferFundsWithPaperMnemonic}
               onBack={this.backToUninitialized}
@@ -216,20 +216,20 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
               includeLengthCheck={false}
               classicTheme={profile.isClassicTheme}
             />
-          </TransferLayout>
+          </LegacyTransferLayout>
         );
       case TransferStatus.HARDWARE_DISCLAIMER:
         return (
-          <TransferLayout>
+          <LegacyTransferLayout>
             <HardwareDisclaimerPage
               onBack={() => this._getYoroiTransferActions().cancelTransferFunds.trigger()}
               onNext={() => this._getYoroiTransferActions().startHardwareMnemnoic.trigger()}
             />
-          </TransferLayout>
+          </LegacyTransferLayout>
         );
       case TransferStatus.GETTING_HARDWARE_MNEMONIC:
         return (
-          <TransferLayout>
+          <LegacyTransferLayout>
             <HardwareTransferFormPage
               onSubmit={this.setupTransferFundsWithMnemonic}
               onBack={this.backToUninitialized}
@@ -239,25 +239,25 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
               validWords={validWords}
               classicTheme={profile.isClassicTheme}
             />
-          </TransferLayout>
+          </LegacyTransferLayout>
         );
       case TransferStatus.DISPLAY_CHECKSUM:
         return (
-          <TransferLayout>
+          <LegacyTransferLayout>
             <YoroiPlatePage
               {...this.generated.YoroiPlateProps}
               onNext={this.checkAddresses}
               onCancel={this.backToUninitialized}
             />
-          </TransferLayout>
+          </LegacyTransferLayout>
         );
       case TransferStatus.RESTORING_ADDRESSES:
       case TransferStatus.CHECKING_ADDRESSES:
       case TransferStatus.GENERATING_TX:
         return (
-          <TransferLayout>
+          <LegacyTransferLayout>
             <YoroiTransferWaitingPage status={yoroiTransfer.status} />
-          </TransferLayout>
+          </LegacyTransferLayout>
         );
       case TransferStatus.READY_TO_TRANSFER: {
         if (yoroiTransfer.transferTx == null) {
@@ -265,7 +265,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         }
         const { intl } = this.context;
         return (
-          <TransferLayout>
+          <LegacyTransferLayout>
             <TransferSummaryPage
               form={null}
               formattedWalletAmount={formattedWalletAmount}
@@ -277,26 +277,26 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
               error={yoroiTransfer.error}
               dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
             />
-          </TransferLayout>
+          </LegacyTransferLayout>
         );
       }
       case TransferStatus.ERROR:
         return (
-          <TransferLayout>
+          <LegacyTransferLayout>
             <YoroiTransferErrorPage
               error={yoroiTransfer.error}
               onCancel={this.cancelTransferFunds}
               classicTheme={profile.isClassicTheme}
             />
-          </TransferLayout>
+          </LegacyTransferLayout>
         );
       case TransferStatus.SUCCESS:
         return (
-          <TransferLayout>
+          <LegacyTransferLayout>
             <YoroiTransferSuccessPage
               classicTheme={profile.isClassicTheme}
             />
-          </TransferLayout>
+          </LegacyTransferLayout>
         );
       default:
         throw new Error(`${nameof(YoroiTransferPage)} Unexpected state ${yoroiTransfer.status}`);

@@ -1,4 +1,4 @@
-@import '../mixins/card-mixin.scss';
+@import '../../mixins/card-mixin.scss';
 
 .heroCardsList {
   display: flex;
@@ -15,34 +15,8 @@
   }
 }
 
-:global(.YoroiClassic) {
-  .heroCardsItemBg {
-    &.bgConnectHW {
-      background-image: url(../../../assets/images/add-wallet/connect-hw-classic.inline.svg);
-    }
-
-    &.bgCreateWallet {
-      background-image: url(../../../assets/images/add-wallet/create-wallet-classic.inline.svg);
-    }
-
-    &.bgRestoreWallet {
-      background-image: url(../../../assets/images/add-wallet/restore-wallet-classic.inline.svg);
-    }
-  }
-}
-
-:global(.YoroiModern) {
-  .heroCardsItemBg {
-    &.bgConnectHW {
-      background-image: url(../../../assets/images/add-wallet/connect-hw-modern.inline.svg);
-    }
-
-    &.bgCreateWallet {
-      background-image: url(../../../assets/images/add-wallet/create-wallet-modern.inline.svg);
-    }
-
-    &.bgRestoreWallet {
-      background-image: url(../../../assets/images/add-wallet/restore-wallet-modern.inline.svg);
-    }
+.heroCardsItemBg {
+  &.bgCreateWallet {
+    background-image: url(../../../assets/images/add-wallet/create-wallet-modern.inline.svg);
   }
 }

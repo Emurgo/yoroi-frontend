@@ -3,12 +3,12 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
-import globalMessages from '../../../../i18n/global-messages';
-import Dialog from '../../../widgets/Dialog';
-import DialogCloseButton from '../../../widgets/DialogCloseButton';
-import OptionBlock from '../../../widgets/options/OptionBlock';
+import globalMessages from '../../../i18n/global-messages';
+import Dialog from '../../widgets/Dialog';
+import DialogCloseButton from '../../widgets/DialogCloseButton';
+import OptionBlock from '../../widgets/options/OptionBlock';
 
-import styles from '../../../widgets/options/OptionListWrapperStyle.scss';
+import styles from '../../widgets/options/OptionListWrapperStyle.scss';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -32,7 +32,7 @@ type Props = {|
 |};
 
 @observer
-export default class WalletConnectHWOptionDialog extends Component<Props> {
+export default class ByronOptionDialog extends Component<Props> {
   static contextTypes = {
     intl: intlShape.isRequired,
   };
@@ -47,19 +47,19 @@ export default class WalletConnectHWOptionDialog extends Component<Props> {
         closeOnOverlayClick={false}
         onClose={onCancel}
         closeButton={<DialogCloseButton />}
-        className="WalletConnectHWOptionDialog"
+        className="ByronOptionDialog"
       >
         <div className={styles.component}>
           <ul className={styles.optionBlockList}>
             <OptionBlock
-              parentName="WalletConnectHWOptionDialog"
+              parentName="ByronOptionDialog"
               type="connectLedger"
               title={intl.formatMessage(globalMessages.ledgerTitle)}
               learnMoreText={intl.formatMessage(messages.ledgerDescription)}
               onSubmit={onLedger}
             />
             <OptionBlock
-              parentName="WalletConnectHWOptionDialog"
+              parentName="ByronOptionDialog"
               type="connectTrezor"
               onSubmit={onTrezor}
               title={intl.formatMessage(globalMessages.trezorTitle)}

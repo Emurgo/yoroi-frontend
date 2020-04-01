@@ -1,16 +1,31 @@
 // @flow
 
-import { select, } from '@storybook/addon-knobs';
+import React from 'react';
+import { boolean, select, } from '@storybook/addon-knobs';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { action } from '@storybook/addon-actions';
+import { withScreenshot } from 'storycap';
+import {
+  globalKnobs,
+  walletLookup,
+  genDummyWithCache,
+} from '../../../stories/helpers/StoryWrapper';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import WalletSettingsStore from '../../stores/base/WalletSettingsStore';
 import TransactionsStore from '../../stores/base/TransactionsStore';
 import DelegationStore from '../../stores/ada/DelegationStore';
 import WalletStore from '../../stores/toplevel/WalletStore';
+import { ROUTES } from '../../routes-config';
 import type { GeneratedData } from './Transfer';
+import Transfer from './Transfer';
 
-export const mockTransferProps: {
+export default {
+  title: `${__filename.split('.')[0]}`,
+  component: Transfer,
+  decorators: [withScreenshot],
+};
+
+const mockTransferProps: {
   selected: null | PublicDeriver<>,
   publicDerivers: Array<PublicDeriver<>>,
   getConceptualWalletSettingsCache:
@@ -35,7 +50,10 @@ export const mockTransferProps: {
           ServerStatusErrors,
           ServerStatusErrors.Healthy,
         ),
-      }
+      },
+      wallets: {
+        selected: request.selected,
+      },
     },
     actions: {
       router: {
@@ -108,9 +126,6 @@ export const mockTransferProps: {
             isOpen: () => false,
             getParam: () => (null: any),
           },
-          wallets: {
-            hasActiveWallet: request.selected != null,
-          }
         },
         actions: {
           router: {
@@ -127,3 +142,27 @@ export const mockTransferProps: {
     },
   },
 });
+
+export const Foo = () => {
+  const wallet = genDummyWithCache();
+  const walletCases = {
+    NoWallet: 0,
+    HasWallet: 1
+  };
+  const walletValue = () => select(
+    'walletCases',
+    walletCases,
+    walletCases.HasWallet,
+  );
+  const walletVal = walletValue();
+  const lookup = walletLookup(walletVal === walletCases.NoWallet
+    ? []
+    : [wallet]);
+  return (<Transfer
+    {...mockTransferProps({
+      currentRoute: ROUTES.TRANSFER.YOROI,
+      selected: walletVal === walletCases.NoWallet ? null : wallet.publicDeriver,
+      ...lookup,
+    })}
+  />);
+};

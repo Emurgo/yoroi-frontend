@@ -231,7 +231,7 @@
   "settings.support.reportProblem.link": "Support request",
   "settings.support.reportProblem.title": "Reporting a problem",
   "sidebar.settings": "Settings",
-  "sidebar.transfer": "Transfer wallets",
+  "sidebar.transfer": "Claim / Transfer",
   "sidebar.wallets": "My wallets",
   "testnet.label.message": "WARNING: This is a {network} network. ADA has no monetary value here. For more information, check out the FAQ at {faqLink}",
   "testnet.shelley.label.message": "YOU ARE ON TESTNET NETWORK ({network}).",

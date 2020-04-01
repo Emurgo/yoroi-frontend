@@ -109,7 +109,7 @@ export const Routes = (
           )
         )}
       />
-      <Route
+      {/* <Route
         path={ROUTES.TRANSFER.ROOT}
         component={(props) => (
           wrapTransfer(
@@ -117,6 +117,10 @@ export const Routes = (
             TransferSubpages(stores, actions)
           )
         )}
+      /> */}
+      <Route
+        path={ROUTES.TRANSFER.ROOT}
+        component={(props) => <Transfer {...props} stores={stores} actions={actions} />}
       />
       <Route
         exact
@@ -272,19 +276,6 @@ export function wrapTransfer(
     </LegacyTransfer>
   );
 }
-// export function wrapTransfer(
-//   transferProps: InjectedOrGenerated<TransferData>,
-//   children: Node,
-// ): Node {
-//   return (
-//     <Transfer
-//       {...transferProps}
-//     >
-//       {children}
-//     </Transfer>
-//   );
-// }
-
 
 export function wrapWallet(
   walletProps: InjectedOrGenerated<WalletData>,

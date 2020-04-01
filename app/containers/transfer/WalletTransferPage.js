@@ -8,16 +8,18 @@ import environment from '../../environment';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import globalMessages from '../../i18n/global-messages';
 
-import MainLayout from '../MainLayout';
-import WalletAdd from '../../components/wallet/WalletAdd';
-import AddAnotherWallet from '../../components/wallet/add/AddAnotherWallet';
+import TransferTypeSelect from '../../components/transfer/cards/TransferTypeSelect';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 
 import WalletConnectHWOptionDialogContainer from '../wallet/dialogs/WalletConnectHWOptionDialogContainer';
 import WalletConnectHWOptionDialog from '../../components/wallet/add/option-dialog/WalletConnectHWOptionDialog';
 
 export type GeneratedData = typeof WalletTransferPage.prototype.generated;
 
-type Props = InjectedOrGenerated<GeneratedData>;
+type Props = {|
+  ...InjectedOrGenerated<GeneratedData>,
+  publicDeriver: PublicDeriver<>,
+|};
 
 @observer
 export default class WalletTransferPage extends Component<Props> {
@@ -44,29 +46,10 @@ export default class WalletTransferPage extends Component<Props> {
       );
     }
 
-    const { hasActiveWallet } = this.generated.stores.wallets;
-    if (!hasActiveWallet) {
-      return (
-        <>
-          {/* <WalletAdd
-            onHardwareConnect={
-              () => actions.dialogs.open.trigger({ dialog: WalletConnectHWOptionDialog })
-            }
-            onCreate={() => actions.dialogs.open.trigger({ dialog: null })}
-            onRestore={() => actions.dialogs.open.trigger({ dialog: null })}
-          /> */}
-          {activeDialog}
-        </>
-      );
-    }
     return (
       <>
-        <AddAnotherWallet
-          onHardwareConnect={
-            () => actions.dialogs.open.trigger({ dialog: WalletConnectHWOptionDialog })
-          }
-          onCreate={() => actions.dialogs.open.trigger({ dialog: null })}
-          onRestore={() => actions.dialogs.open.trigger({ dialog: null })}
+        <TransferTypeSelect
+          onByron={() => actions.dialogs.open.trigger({ dialog: WalletConnectHWOptionDialog })}
         />
         {activeDialog}
       </>
@@ -91,9 +74,6 @@ export default class WalletTransferPage extends Component<Props> {
           isOpen: stores.uiDialogs.isOpen,
           getParam: stores.uiDialogs.getParam,
         },
-        wallets: {
-          hasActiveWallet: stores.wallets.hasActiveWallet,
-        }
       },
       actions: {
         router: {

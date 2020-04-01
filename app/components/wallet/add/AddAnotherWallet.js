@@ -42,11 +42,9 @@ export default class AddAnotherWallet extends Component<Props> {
       <div className={styles.component}>
         <div className={styles.hero}>
           <div className={styles.heroInner}>
-            {/* Left block  */}
             <div className={iconClass}>
               <LogoIcon width="400" height="128" />
             </div>
-            {/* Right block  */}
             <div className={styles.heroRight}>
               <MainCards
                 onCreate={this.props.onCreate}
