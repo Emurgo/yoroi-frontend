@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
@@ -10,64 +11,116 @@ import OptionBlock from '../../widgets/options/OptionBlock';
 
 import styles from '../../widgets/options/OptionListWrapperStyle.scss';
 
-const messages = defineMessages({
-  dialogTitle: {
-    id: 'wallet.add.optionDialog.connect.hw.dialogTitle',
-    defaultMessage: '!!!Connect to hardware wallet',
+const daedalusMessages = defineMessages({
+  daedalusTabTitle: {
+    id: 'transfer.legacy.daedalus.tab.title',
+    defaultMessage: '!!!Legacy Daedalus',
   },
-  ledgerDescription: {
-    id: 'wallet.add.optionDialog.connect.hw.ledger.learnMoreText',
-    defaultMessage: '!!!A Ledger hardware wallet is a small USB device that adds an extra level of security to your wallet. It is more secure because your private key never leaves the hardware wallet. This protects your funds even if your computer is compromised due to malware, phishing attempts, etc.',
+  fromLegacyDaedalus: {
+    id: 'transfer.legacy.daedalus.title',
+    defaultMessage: '!!!Legacy Daedalus wallet',
   },
-  trezorDescription: {
-    id: 'wallet.add.optionDialog.connect.hw.trezor.learnMoreText',
-    defaultMessage: '!!!A Trezor hardware wallet is a small USB device that adds an extra level of security to your wallet. It is more secure because your private key never leaves the hardware wallet. This protects your funds even if your computer is compromised due to malware, phishing attempts, etc.',
+  fromLegacyDaedalusPaper: {
+    id: 'transfer.legacy.daedalusPaper.title',
+    defaultMessage: '!!!Legacy Daedalus paper wallet',
+  },
+  fromLegacyDaedalusKey: {
+    id: 'transfer.legacy.daedalusKey.title',
+    defaultMessage: '!!!Legacy Daedalus master key',
   },
 });
 
 type Props = {|
+  +daedalus: {|
+    +onStandard: void => void,
+    +onPaper: void => void,
+    +onMaster: void => void,
+  |},
+  +yoroi: {|
+    +onStandard: void => void,
+    +onPaper: void => void,
+  |},
+  +hardware: {|
+    +onTrezor: void => void,
+    +onLedger: void => void,
+  |},
   +onCancel: void => void,
-  +onTrezor: void => void,
-  +onLedger: void => void,
+|};
+
+const tabOptions = Object.freeze({
+  Daedalus: 0,
+  Yoroi: 1,
+  Hardware: 2,
+});
+
+type State = {|
+  +selectedTab: $Values<typeof tabOptions>,
 |};
 
 @observer
-export default class ByronOptionDialog extends Component<Props> {
+export default class ByronOptionDialog extends Component<Props, State> {
   static contextTypes = {
     intl: intlShape.isRequired,
   };
 
   render() {
     const { intl } = this.context;
-    const { onCancel, onTrezor, onLedger, } = this.props;
 
     return (
       <Dialog
-        title={intl.formatMessage(messages.dialogTitle)}
+        title={intl.formatMessage(globalMessages.sidebarTransfer)}
         closeOnOverlayClick={false}
-        onClose={onCancel}
+        onClose={this.props.onCancel}
         closeButton={<DialogCloseButton />}
         className="ByronOptionDialog"
       >
         <div className={styles.component}>
+          <div className={styles.tabsHeader}>
+            <button
+              type="button"
+              className={`${styles.tabsLink} ${styles.active}`}>
+              {'asdf'}
+            </button>
+            <button
+              type="button"
+              className={styles.tabsLink}>
+              {'asdf'}
+            </button>
+          </div>
           <ul className={styles.optionBlockList}>
-            <OptionBlock
-              parentName="ByronOptionDialog"
-              type="legacyDaedalus"
-              title={intl.formatMessage(globalMessages.ledgerTitle)}
-              learnMoreText={intl.formatMessage(messages.ledgerDescription)}
-              onSubmit={onLedger}
-            />
-            <OptionBlock
-              parentName="ByronOptionDialog"
-              type="restoreNormalWallet"
-              onSubmit={onTrezor}
-              title={intl.formatMessage(globalMessages.trezorTitle)}
-              learnMoreText={intl.formatMessage(messages.trezorDescription)}
-            />
+            {this.getDaedalusTabContent()}
           </ul>
         </div>
       </Dialog>
+    );
+  }
+
+  getDaedalusTabContent: void => Node = () => {
+    const { intl } = this.context;
+    return (
+      <>
+        <OptionBlock
+          parentName="ByronOptionDialog"
+          type="legacyDaedalus"
+          title={intl.formatMessage(daedalusMessages.fromLegacyDaedalus)}
+          learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
+          onSubmit={this.props.daedalus.onStandard}
+        />
+        <OptionBlock
+          parentName="ByronOptionDialog"
+          type="legacyDaedalus"
+          onSubmit={this.props.daedalus.onPaper}
+          title={intl.formatMessage(daedalusMessages.fromLegacyDaedalusPaper)}
+          learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
+        />
+        <OptionBlock
+          parentName="ByronOptionDialog"
+          type="legacyDaedalus"
+          onSubmit={this.props.daedalus.onMaster}
+          title={intl.formatMessage(daedalusMessages.fromLegacyDaedalusKey)}
+          learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
+        />
+      </>
     );
   }
 }

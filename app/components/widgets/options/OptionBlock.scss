@@ -124,7 +124,10 @@
         
         .optionImage {
           &.legacyDaedalus {
-            background-image: url(../../../assets/images/top-bar/daedalus-migration.inline.svg);
+            background-image: url(../../../assets/images/add-wallet/option-dialog/daedalus-modern.inline.svg);
+          }
+          &.masterKey {
+            background-image: url(../../../assets/images/add-wallet/option-dialog/Master_key.inline.svg);
           }
           // CONNECT HARDWARE WALLET
           &.connectLedger {
@@ -164,6 +167,9 @@
         .optionImage {
           &.legacyDaedalus {
             background-image: url(../../../assets/images/add-wallet/option-dialog/daedalus-modern.inline.svg);
+          }
+          &.masterKey {
+            background-image: url(../../../assets/images/add-wallet/option-dialog/Master_key.inline.svg);
           }
           // CONNECT HARDWARE WALLET
           &.connectLedger {
