@@ -438,7 +438,7 @@
   "wallet.receive.confirmationDialog.addressesLabel": "Direcciones",
   "wallet.receive.confirmationDialog.derivationPathLabel": "Ruta de derivación",
   "wallet.receive.confirmationDialog.verifyAddressButtonLabel": "Verificar en la billetera de hardware",
-  "wallet.receive.nav.external": "Dirección externa",
+  "wallet.receive.nav.external": "Direcciones públicas",
   "wallet.receive.nav.internal": "Direcciones internas",
   "wallet.receive.nav.mangled": "Manipulada",
   "wallet.receive.page.copyAddressLabel": "Copiar dirección",
