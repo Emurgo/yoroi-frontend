@@ -123,6 +123,9 @@
         }
         
         .optionImage {
+          &.legacyDaedalus {
+            background-image: url(../../../assets/images/top-bar/daedalus-migration.inline.svg);
+          }
           // CONNECT HARDWARE WALLET
           &.connectLedger {
             background-image: url(../../../assets/images/add-wallet/option-dialog/connect-ledger-classic.inline.svg);
@@ -159,6 +162,9 @@
         }
 
         .optionImage {
+          &.legacyDaedalus {
+            background-image: url(../../../assets/images/add-wallet/option-dialog/daedalus-modern.inline.svg);
+          }
           // CONNECT HARDWARE WALLET
           &.connectLedger {
             background-image: url(../../../assets/images/add-wallet/option-dialog/connect-ledger-modern.inline.svg);

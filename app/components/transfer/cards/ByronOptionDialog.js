@@ -53,14 +53,14 @@ export default class ByronOptionDialog extends Component<Props> {
           <ul className={styles.optionBlockList}>
             <OptionBlock
               parentName="ByronOptionDialog"
-              type="connectLedger"
+              type="legacyDaedalus"
               title={intl.formatMessage(globalMessages.ledgerTitle)}
               learnMoreText={intl.formatMessage(messages.ledgerDescription)}
               onSubmit={onLedger}
             />
             <OptionBlock
               parentName="ByronOptionDialog"
-              type="connectTrezor"
+              type="restoreNormalWallet"
               onSubmit={onTrezor}
               title={intl.formatMessage(globalMessages.trezorTitle)}
               learnMoreText={intl.formatMessage(messages.trezorDescription)}

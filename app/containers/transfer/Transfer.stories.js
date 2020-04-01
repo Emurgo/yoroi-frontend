@@ -10,6 +10,7 @@ import {
   walletLookup,
   genDummyWithCache,
 } from '../../../stories/helpers/StoryWrapper';
+import ByronEraOptionDialogContainer from './ByronEraOptionDialogContainer';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import WalletSettingsStore from '../../stores/base/WalletSettingsStore';
 import TransactionsStore from '../../stores/base/TransactionsStore';
@@ -27,6 +28,7 @@ export default {
 
 const mockTransferProps: {
   selected: null | PublicDeriver<>,
+  dialog?: any,
   publicDerivers: Array<PublicDeriver<>>,
   getConceptualWalletSettingsCache:
     typeof WalletSettingsStore.prototype.getConceptualWalletSettingsCache,
@@ -123,7 +125,7 @@ const mockTransferProps: {
       generated: {
         stores: {
           uiDialogs: {
-            isOpen: () => false,
+            isOpen: (dialog) => dialog === request.dialog,
             getParam: () => (null: any),
           },
         },
@@ -143,7 +145,7 @@ const mockTransferProps: {
   },
 });
 
-export const Foo = () => {
+export const MainPage = () => {
   const wallet = genDummyWithCache();
   const walletCases = {
     NoWallet: 0,
@@ -162,6 +164,20 @@ export const Foo = () => {
     {...mockTransferProps({
       currentRoute: ROUTES.TRANSFER.YOROI,
       selected: walletVal === walletCases.NoWallet ? null : wallet.publicDeriver,
+      ...lookup,
+    })}
+  />);
+};
+
+
+export const ByronDialog = () => {
+  const wallet = genDummyWithCache();
+  const lookup = walletLookup([wallet]);
+  return (<Transfer
+    {...mockTransferProps({
+      currentRoute: ROUTES.TRANSFER.YOROI,
+      dialog: ByronEraOptionDialogContainer,
+      selected: wallet.publicDeriver,
       ...lookup,
     })}
   />);

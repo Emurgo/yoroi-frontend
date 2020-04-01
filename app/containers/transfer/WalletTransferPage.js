@@ -11,8 +11,7 @@ import globalMessages from '../../i18n/global-messages';
 import TransferTypeSelect from '../../components/transfer/cards/TransferTypeSelect';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 
-import WalletConnectHWOptionDialogContainer from '../wallet/dialogs/WalletConnectHWOptionDialogContainer';
-import WalletConnectHWOptionDialog from '../../components/wallet/add/option-dialog/WalletConnectHWOptionDialog';
+import ByronEraOptionDialogContainer from './ByronEraOptionDialogContainer';
 
 export type GeneratedData = typeof WalletTransferPage.prototype.generated;
 
@@ -36,9 +35,9 @@ export default class WalletTransferPage extends Component<Props> {
     const { uiDialogs } = stores;
 
     let activeDialog = null;
-    if (uiDialogs.isOpen(WalletConnectHWOptionDialog)) {
+    if (uiDialogs.isOpen(ByronEraOptionDialogContainer)) {
       activeDialog = (
-        <WalletConnectHWOptionDialogContainer
+        <ByronEraOptionDialogContainer
           onClose={this.onClose}
           onTrezor={() => {}}
           onLedger={() => {}}
@@ -49,7 +48,7 @@ export default class WalletTransferPage extends Component<Props> {
     return (
       <>
         <TransferTypeSelect
-          onByron={() => actions.dialogs.open.trigger({ dialog: WalletConnectHWOptionDialog })}
+          onByron={() => actions.dialogs.open.trigger({ dialog: ByronEraOptionDialogContainer })}
         />
         {activeDialog}
       </>
