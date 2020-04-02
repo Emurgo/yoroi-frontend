@@ -6,7 +6,6 @@ import { intlShape } from 'react-intl';
 import validWords from 'bip39/src/wordlists/english.json';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import LegacyTransferLayout from '../../components/transfer/LegacyTransferLayout';
-import TransferInstructionsPage from '../../components/transfer/TransferInstructionsPage';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import DaedalusTransferFormPage from './DaedalusTransferFormPage';
 import DaedalusTransferMasterKeyFormPage from './DaedalusTransferMasterKeyFormPage';
@@ -40,24 +39,8 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
     intl: intlShape.isRequired,
   };
 
-  componentWillUnmount() {
-    this.cancelTransferFunds();
-  }
-
   goToCreateWallet: void => void = () => {
     this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
-  }
-
-  startTransferFunds: void => void = () => {
-    this._getDaedalusTransferActions().startTransferFunds.trigger();
-  }
-
-  startTransferPaperFunds: void => void = () => {
-    this._getDaedalusTransferActions().startTransferPaperFunds.trigger();
-  }
-
-  startTransferMasterKey: void => void = () => {
-    this._getDaedalusTransferActions().startTransferMasterKey.trigger();
   }
 
   setupTransferFundsWithMnemonic: {|
@@ -123,23 +106,11 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
   }
 
   render() {
-    const { wallets, profile } = this.generated.stores;
+    const { profile } = this.generated.stores;
     const adaWallets = this._getAdaWalletsStore();
     const daedalusTransfer = this._getDaedalusTransferStore();
 
     switch (daedalusTransfer.status) {
-      case TransferStatus.UNINITIALIZED:
-        return (
-          <LegacyTransferLayout>
-            <TransferInstructionsPage
-              onFollowInstructionsPrerequisites={this.goToCreateWallet}
-              onConfirm={this.startTransferFunds}
-              onPaperConfirm={this.startTransferPaperFunds}
-              onMasterKeyConfirm={this.startTransferMasterKey}
-              disableTransferFunds={wallets.selected == null}
-            />
-          </LegacyTransferLayout>
-        );
       case TransferStatus.GETTING_MNEMONICS:
         return (
           <LegacyTransferLayout>
@@ -299,9 +270,6 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
             setupTransferFundsWithMnemonic: {
               trigger: daedalusTransfer.setupTransferFundsWithMnemonic.trigger
             },
-            startTransferFunds: { trigger: daedalusTransfer.startTransferFunds.trigger },
-            startTransferPaperFunds: { trigger: daedalusTransfer.startTransferPaperFunds.trigger },
-            startTransferMasterKey: { trigger: daedalusTransfer.startTransferMasterKey.trigger },
           },
         },
       },

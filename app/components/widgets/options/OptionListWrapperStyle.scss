@@ -9,7 +9,7 @@
   padding: 5px 0;
   position: relative;
   cursor: pointer;
-  margin: 0 50px;
+  margin: 0 20px;
   font-size: var(--tab-link-text-size);
   font-family: var(--font-regular);
   line-height: var(--tab-link-line-height);
@@ -47,4 +47,8 @@
   padding: 10px 0 0 0;
   max-width: 480px;
   min-width: 100%;
+  // the size of 3 options
+  // use this to make sure the size of the options dialog doesn't change
+  // even if more options are present in a different tab
+  max-height: 514px;
 }

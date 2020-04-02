@@ -10,7 +10,7 @@ import {
   walletLookup,
   genDummyWithCache,
 } from '../../../stories/helpers/StoryWrapper';
-import ByronEraOptionDialogContainer from './ByronEraOptionDialogContainer';
+import ByronEraOptionDialogContainer from './options/ByronEraOptionDialogContainer';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import WalletSettingsStore from '../../stores/base/WalletSettingsStore';
 import TransactionsStore from '../../stores/base/TransactionsStore';
@@ -138,6 +138,26 @@ const mockTransferProps: {
               trigger: action('closeActiveDialog'),
             },
             open: { trigger: action('open'), },
+          },
+        },
+        ByronEraOptionDialogContainerProps: {
+          generated: {
+            actions: {
+              ada: {
+                daedalusTransfer: {
+                  startTransferFunds: { trigger: action('startTransferFunds') },
+                  startTransferPaperFunds: { trigger: action('startTransferPaperFunds') },
+                  startTransferMasterKey: { trigger: action('startTransferMasterKey') },
+                },
+                yoroiTransfer: {
+                  startTransferLegacyHardwareFunds: {
+                    trigger: action('startTransferLegacyHardwareFunds')
+                  },
+                  startTransferPaperFunds: { trigger: action('startTransferPaperFunds') },
+                  startTransferFunds: { trigger: action('startTransferFunds') },
+                },
+              },
+            },
           },
         },
       },

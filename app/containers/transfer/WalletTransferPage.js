@@ -10,8 +10,10 @@ import globalMessages from '../../i18n/global-messages';
 
 import TransferTypeSelect from '../../components/transfer/cards/TransferTypeSelect';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
+import { TransferSource, } from '../../types/TransferTypes';
 
-import ByronEraOptionDialogContainer from './ByronEraOptionDialogContainer';
+import ByronEraOptionDialogContainer from './options/ByronEraOptionDialogContainer';
+import type { GeneratedData as ByronEraOptionDialogContainerData } from './options/ByronEraOptionDialogContainer';
 
 export type GeneratedData = typeof WalletTransferPage.prototype.generated;
 
@@ -38,9 +40,8 @@ export default class WalletTransferPage extends Component<Props> {
     if (uiDialogs.isOpen(ByronEraOptionDialogContainer)) {
       activeDialog = (
         <ByronEraOptionDialogContainer
-          onClose={this.onClose}
-          onTrezor={() => {}}
-          onLedger={() => {}}
+          onCancel={this.onClose}
+          {...this.generated.ByronEraOptionDialogContainerProps}
         />
       );
     }
@@ -49,6 +50,11 @@ export default class WalletTransferPage extends Component<Props> {
       <>
         <TransferTypeSelect
           onByron={() => actions.dialogs.open.trigger({ dialog: ByronEraOptionDialogContainer })}
+          onShelleyItn={() => this.generated.actions.ada.yoroiTransfer
+            .startTransferFunds.trigger({
+              source: TransferSource.SHELLEY_UTXO
+            })
+          }
         />
         {activeDialog}
       </>
@@ -67,6 +73,7 @@ export default class WalletTransferPage extends Component<Props> {
       throw new Error(`${nameof(WalletTransferPage)} no way to generated props`);
     }
     const { stores, actions } = this.props;
+    const { yoroiTransfer } = actions.ada;
     return Object.freeze({
       stores: {
         uiDialogs: {
@@ -75,6 +82,11 @@ export default class WalletTransferPage extends Component<Props> {
         },
       },
       actions: {
+        ada: {
+          yoroiTransfer: {
+            startTransferFunds: { trigger: yoroiTransfer.startTransferFunds.trigger },
+          },
+        },
         router: {
           goToRoute: {
             trigger: actions.router.goToRoute.trigger,
@@ -89,6 +101,9 @@ export default class WalletTransferPage extends Component<Props> {
           },
         },
       },
+      ByronEraOptionDialogContainerProps: (
+        { actions, stores }: InjectedOrGenerated<ByronEraOptionDialogContainerData>
+      )
     });
   }
 }

@@ -14,10 +14,15 @@ const messages = defineMessages({
     id: 'wallet.transfer.cards.byron',
     defaultMessage: '!!!Byron-era wallet',
   },
+  shelleyItnWallet: {
+    id: 'wallet.transfer.cards.shelleyItn',
+    defaultMessage: '!!!Shelley testnet',
+  },
 });
 
 type Props = {|
   +onByron: void => void,
+  +onShelleyItn: void => void,
 |};
 
 @observer
@@ -44,7 +49,31 @@ export default class TransferCards extends Component<Props> {
               <div className={styles.tooltip}>
                 <CustomTooltip
                   toolTip={
-                    <div><FormattedHTMLMessage {...globalMessages.legacyAttentionText} /></div>
+                    <div className={styles.tooltipSize}>
+                      {intl.formatMessage(globalMessages.legacyAttentionText)}
+                    </div>
+                  }
+                />
+              </div>
+            </div>
+          </div>
+        </button>
+        {/* byron-era wallet */}
+        <button
+          type="button"
+          className="TransferCards_shelleyItn"
+          onClick={this.props.onShelleyItn}
+        >
+          <div className={styles.heroCardsItem}>
+            <div className={classnames([styles.heroCardsItemBg, styles.bgCreateWallet])} />
+            <div className={styles.heroCardsItemTitle}>
+              {intl.formatMessage(messages.shelleyItnWallet)}
+              <div className={styles.tooltip}>
+                <CustomTooltip
+                  toolTip={
+                    <div className={styles.tooltipSize}>
+                      {intl.formatMessage(globalMessages.legacyAttentionText)}
+                    </div>
                   }
                 />
               </div>

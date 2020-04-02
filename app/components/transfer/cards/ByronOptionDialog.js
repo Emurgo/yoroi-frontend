@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
+import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
@@ -12,21 +13,44 @@ import OptionBlock from '../../widgets/options/OptionBlock';
 import styles from '../../widgets/options/OptionListWrapperStyle.scss';
 
 const daedalusMessages = defineMessages({
-  daedalusTabTitle: {
-    id: 'transfer.legacy.daedalus.tab.title',
-    defaultMessage: '!!!Legacy Daedalus',
+  transferText: {
+    id: 'transfer.legacy.daedalus.title',
+    defaultMessage: '!!!Legacy Daedalus Wallet',
+  },
+  transferPaperText: {
+    id: 'daedalusTransfer.instructions.attention.paper.button.label',
+    defaultMessage: '!!!Daedalus Paper Wallet',
+  },
+  transferMasterKeyText: {
+    id: 'daedalusTransfer.instructions.attention.masterKey.button.label',
+    defaultMessage: '!!!Daedalus Master Key',
   },
   fromLegacyDaedalus: {
-    id: 'transfer.legacy.daedalus.title',
-    defaultMessage: '!!!Legacy Daedalus wallet',
+    id: 'transfer.legacy.daedalus.12word',
+    defaultMessage: '!!!12-word Daedalus wallet',
   },
-  fromLegacyDaedalusPaper: {
-    id: 'transfer.legacy.daedalusPaper.title',
-    defaultMessage: '!!!Legacy Daedalus paper wallet',
+});
+
+const icarusMessages = defineMessages({
+  transferText: {
+    id: 'transfer.legacy.icarus.title',
+    defaultMessage: '!!!Icarus/Yoroi Wallet',
   },
-  fromLegacyDaedalusKey: {
-    id: 'transfer.legacy.daedalusKey.title',
-    defaultMessage: '!!!Legacy Daedalus master key',
+  mnemonicLabel15: {
+    id: 'yoroiTransfer.start.instructions.mnemonic-15',
+    defaultMessage: '!!!15-word recovery phrase',
+  },
+  yoroiPaperLabel: {
+    id: 'yoroiTransfer.start.instructions.legacy-yoroiPaper',
+    defaultMessage: '!!!Legacy Yoroi paper wallet',
+  },
+  legacyLedgerTitle: {
+    id: 'yoroiTransfer.start.instructions.legacy-ledger',
+    defaultMessage: '!!!Legacy Ledger Hardware Wallet',
+  },
+  legacyTrezorTitle: {
+    id: 'yoroiTransfer.start.instructions.legacy-trezor',
+    defaultMessage: '!!!Legacy Trezor Hardware Wallet',
   },
 });
 
@@ -36,31 +60,32 @@ type Props = {|
     +onPaper: void => void,
     +onMaster: void => void,
   |},
-  +yoroi: {|
+  +icarus: {|
     +onStandard: void => void,
     +onPaper: void => void,
-  |},
-  +hardware: {|
     +onTrezor: void => void,
     +onLedger: void => void,
   |},
   +onCancel: void => void,
 |};
 
-const tabOptions = Object.freeze({
+const TabOptions = Object.freeze({
   Daedalus: 0,
-  Yoroi: 1,
-  Hardware: 2,
+  Icarus: 1,
 });
 
 type State = {|
-  +selectedTab: $Values<typeof tabOptions>,
+  +selectedTab: $Values<typeof TabOptions>,
 |};
 
 @observer
 export default class ByronOptionDialog extends Component<Props, State> {
   static contextTypes = {
     intl: intlShape.isRequired,
+  };
+
+  state = {
+    selectedTab: TabOptions.Daedalus,
   };
 
   render() {
@@ -78,17 +103,28 @@ export default class ByronOptionDialog extends Component<Props, State> {
           <div className={styles.tabsHeader}>
             <button
               type="button"
-              className={`${styles.tabsLink} ${styles.active}`}>
-              {'asdf'}
+              onClick={() => this.setState({ selectedTab: TabOptions.Daedalus })}
+              className={classnames(
+                styles.tabsLink,
+                this.state.selectedTab === TabOptions.Daedalus ? styles.active : null
+              )}
+            >
+              {intl.formatMessage(daedalusMessages.transferText)}
             </button>
             <button
               type="button"
-              className={styles.tabsLink}>
-              {'asdf'}
+              onClick={() => this.setState({ selectedTab: TabOptions.Icarus })}
+              className={classnames(
+                styles.tabsLink,
+                this.state.selectedTab === TabOptions.Icarus ? styles.active : null
+              )}
+            >
+              {intl.formatMessage(icarusMessages.transferText)}
             </button>
           </div>
           <ul className={styles.optionBlockList}>
-            {this.getDaedalusTabContent()}
+            {this.state.selectedTab === TabOptions.Daedalus ? this.getDaedalusTabContent() : null}
+            {this.state.selectedTab === TabOptions.Icarus ? this.getIcarusTabContent() : null}
           </ul>
         </div>
       </Dialog>
@@ -100,24 +136,60 @@ export default class ByronOptionDialog extends Component<Props, State> {
     return (
       <>
         <OptionBlock
-          parentName="ByronOptionDialog"
+          parentName="fromDaedalusWallet12Word"
           type="legacyDaedalus"
           title={intl.formatMessage(daedalusMessages.fromLegacyDaedalus)}
           learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
           onSubmit={this.props.daedalus.onStandard}
         />
         <OptionBlock
-          parentName="ByronOptionDialog"
+          parentName="fromDaedalusPaperWallet"
           type="legacyDaedalus"
           onSubmit={this.props.daedalus.onPaper}
-          title={intl.formatMessage(daedalusMessages.fromLegacyDaedalusPaper)}
+          title={intl.formatMessage(daedalusMessages.transferPaperText)}
           learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
         />
         <OptionBlock
-          parentName="ByronOptionDialog"
+          parentName="fromDaedalusMasterKey"
           type="legacyDaedalus"
           onSubmit={this.props.daedalus.onMaster}
-          title={intl.formatMessage(daedalusMessages.fromLegacyDaedalusKey)}
+          title={intl.formatMessage(daedalusMessages.transferMasterKeyText)}
+          learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
+        />
+      </>
+    );
+  }
+
+  getIcarusTabContent: void => Node = () => {
+    const { intl } = this.context;
+    return (
+      <>
+        <OptionBlock
+          parentName="fromIcarusWallet15Word"
+          type="restoreNormalWallet"
+          title={intl.formatMessage(icarusMessages.mnemonicLabel15)}
+          learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
+          onSubmit={this.props.daedalus.onStandard}
+        />
+        <OptionBlock
+          parentName="fromIcarusPaperWallet"
+          type="restorePaperWallet"
+          onSubmit={this.props.daedalus.onPaper}
+          title={intl.formatMessage(icarusMessages.yoroiPaperLabel)}
+          learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
+        />
+        <OptionBlock
+          parentName="fromLedger"
+          type="connectLedger"
+          onSubmit={this.props.daedalus.onMaster}
+          title={intl.formatMessage(icarusMessages.legacyLedgerTitle)}
+          learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
+        />
+        <OptionBlock
+          parentName="fromTrezor"
+          type="connectTrezor"
+          onSubmit={this.props.daedalus.onMaster}
+          title={intl.formatMessage(icarusMessages.legacyTrezorTitle)}
           learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
         />
       </>

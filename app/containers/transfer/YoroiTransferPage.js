@@ -18,11 +18,10 @@ import YoroiPlatePage from './YoroiPlatePage';
 import YoroiTransferWaitingPage from './YoroiTransferWaitingPage';
 import YoroiTransferErrorPage from './YoroiTransferErrorPage';
 import YoroiTransferSuccessPage from './YoroiTransferSuccessPage';
-import YoroiTransferStartPage from '../../components/transfer/YoroiTransferStartPage';
 import environment from '../../environment';
 import config from '../../config';
 import { formattedWalletAmount } from '../../utils/formatters';
-import { TransferKind, TransferStatus, TransferSource, } from '../../types/TransferTypes';
+import { TransferStatus, } from '../../types/TransferTypes';
 import type { TransferStatusT, TransferTx } from '../../types/TransferTypes';
 import LocalizableError from '../../i18n/LocalizableError';
 import { ROUTES } from '../../routes-config';
@@ -54,39 +53,8 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
     intl: intlShape.isRequired,
   };
 
-  componentWillUnmount() {
-    const yoroiTransfer = this._getYoroiTransferStore();
-    yoroiTransfer.reset();
-  }
-
   goToCreateWallet: void => void = () => {
     this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
-  }
-
-  startLegacyTransferFunds: void => void = () => {
-    this._getYoroiTransferActions().startTransferFunds.trigger({
-      source: TransferSource.BYRON
-    });
-  }
-
-  startShelleyTransferFunds: void => void = () => {
-    this._getYoroiTransferActions().startTransferFunds.trigger({
-      source: TransferSource.SHELLEY_UTXO
-    });
-  }
-
-  startTransferPaperFunds: void => void = () => {
-    this._getYoroiTransferActions().startTransferPaperFunds.trigger({
-      source: TransferSource.BYRON
-    });
-  }
-
-  startTransferLegacyTrezorFunds: void => void = () => {
-    this._getYoroiTransferActions().startTransferLegacyHardwareFunds.trigger(TransferKind.TREZOR);
-  }
-
-  startTransferLegacyLedgerFunds: void => void = () => {
-    this._getYoroiTransferActions().startTransferLegacyHardwareFunds.trigger(TransferKind.LEDGER);
   }
 
   setupTransferFundsWithMnemonic: {|
@@ -169,21 +137,6 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
     const yoroiTransfer = this._getYoroiTransferStore();
 
     switch (yoroiTransfer.status) {
-      case TransferStatus.UNINITIALIZED:
-        return (
-          <LegacyTransferLayout>
-            <YoroiTransferStartPage
-              onLegacy15Words={this.startLegacyTransferFunds}
-              onShelley15Words={this.startShelleyTransferFunds}
-              onLegacyPaper={this.startTransferPaperFunds}
-              onLegacyLedger={this.startTransferLegacyLedgerFunds}
-              onLegacyTrezor={this.startTransferLegacyTrezorFunds}
-              classicTheme={profile.isClassicTheme}
-              onFollowInstructionsPrerequisites={this.goToCreateWallet}
-              disableTransferFunds={stores.wallets.selected == null}
-            />
-          </LegacyTransferLayout>
-        );
       case TransferStatus.GETTING_MNEMONICS:
         return (
           <LegacyTransferLayout>
@@ -299,7 +252,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
           </LegacyTransferLayout>
         );
       default:
-        throw new Error(`${nameof(YoroiTransferPage)} Unexpected state ${yoroiTransfer.status}`);
+        return null;
     }
   }
 
@@ -358,8 +311,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
                 isExecuting: adaStores.yoroiTransfer.transferFundsRequest.isExecuting,
               },
               nextInternalAddress: adaStores.yoroiTransfer.nextInternalAddress,
-              recoveryPhrase: adaStores.yoroiTransfer.recoveryPhrase,
-              reset: adaStores.yoroiTransfer.reset,
+              recoveryPhrase: adaStores.yoroiTransfer.recoveryPhrase,  
             },
           },
         },
@@ -381,11 +333,6 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
             setupTransferFundsWithMnemonic: {
               trigger: yoroiTransfer.setupTransferFundsWithMnemonic.trigger
             },
-            startTransferLegacyHardwareFunds: {
-              trigger: yoroiTransfer.startTransferLegacyHardwareFunds.trigger
-            },
-            startTransferPaperFunds: { trigger: yoroiTransfer.startTransferPaperFunds.trigger },
-            startTransferFunds: { trigger: yoroiTransfer.startTransferFunds.trigger },
           },
         },
       },

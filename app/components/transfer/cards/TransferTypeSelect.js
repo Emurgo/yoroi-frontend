@@ -7,6 +7,7 @@ import styles from './TransferTypeSelect.scss';
 
 type Props = {|
   +onByron: void => void,
+  +onShelleyItn: void => void,
 |};
 
 @observer
@@ -20,6 +21,7 @@ export default class TransferTypeSelect extends Component<Props> {
             <div className={styles.heroRight}>
               <TransferCards
                 onByron={this.props.onByron}
+                onShelleyItn={this.props.onShelleyItn}
               />
             </div>
           </div>
