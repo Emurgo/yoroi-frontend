@@ -10,8 +10,7 @@ import {
   walletLookup,
   genDummyWithCache,
 } from '../../../stories/helpers/StoryWrapper';
-import { wrapTransfer } from '../../Routes';
-import { mockTransferProps } from './LegacyTransfer.mock';
+import { mockTransferProps, wrapTransfer } from './Transfer.mock';
 import { THEMES } from '../../themes';
 import { getDefaultExplorer } from '../../domain/Explorer';
 import { ROUTES } from '../../routes-config';
@@ -87,76 +86,23 @@ const genBaseProps: {|
   },
 });
 
-export const Uninitialized = () => {
-  const wallet = genDummyWithCache();
-  const walletCases = {
-    NoWallet: 0,
-    HasWallet: 1
-  };
-  const walletValue = () => select(
-    'walletCases',
-    walletCases,
-    walletCases.NoWallet,
-  );
-  const walletVal = walletValue();
-  const lookup = walletLookup(walletVal === walletCases.NoWallet
-    ? []
-    : [wallet]);
-  return (() => {
-    return wrapTransfer(
-      mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.DAEDALUS,
-        selected: walletVal === walletCases.NoWallet ? null : wallet.publicDeriver,
-        ...lookup,
-      }),
-      (() => {
-        const baseProps = walletVal === walletCases.NoWallet
-          ? genBaseProps({
-            wallet: null,
-            daedalusTransfer: Object.freeze({}),
-          })
-          : genBaseProps({
-            wallet: wallet.publicDeriver,
-            daedalusTransfer: Object.freeze({}),
-          });
-        return (
-          <DaedalusTransferPage
-            generated={{
-              ...baseProps,
-            }}
-          />
-        );
-      })()
-    );
-  })();
-};
-
-
 export const GettingMnemonics = () => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
+    const baseProps = genBaseProps({
+      wallet: wallet.publicDeriver,
+      daedalusTransfer: {
+        status: TransferStatus.GETTING_MNEMONICS,
+      },
+    });
     return wrapTransfer(
       mockTransferProps({
         currentRoute: ROUTES.TRANSFER.DAEDALUS,
         selected: wallet.publicDeriver,
         ...lookup,
+        DaedalusTransferPageProps: baseProps,
       }),
-      (() => {
-        const baseProps = genBaseProps({
-          wallet: wallet.publicDeriver,
-          daedalusTransfer: {
-            status: TransferStatus.GETTING_MNEMONICS,
-          },
-        });
-        return (
-          <DaedalusTransferPage
-            generated={{
-              ...baseProps,
-            }}
-          />
-        );
-      })()
     );
   })();
 };
@@ -165,27 +111,19 @@ export const GettingPaperMnemonics = () => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
+    const baseProps = genBaseProps({
+      wallet: wallet.publicDeriver,
+      daedalusTransfer: {
+        status: TransferStatus.GETTING_PAPER_MNEMONICS,
+      },
+    });
     return wrapTransfer(
       mockTransferProps({
         currentRoute: ROUTES.TRANSFER.DAEDALUS,
         selected: wallet.publicDeriver,
         ...lookup,
+        DaedalusTransferPageProps: baseProps,
       }),
-      (() => {
-        const baseProps = genBaseProps({
-          wallet: wallet.publicDeriver,
-          daedalusTransfer: {
-            status: TransferStatus.GETTING_PAPER_MNEMONICS,
-          },
-        });
-        return (
-          <DaedalusTransferPage
-            generated={{
-              ...baseProps,
-            }}
-          />
-        );
-      })()
     );
   })();
 };
@@ -194,27 +132,19 @@ export const GettingMasterKey = () => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
+    const baseProps = genBaseProps({
+      wallet: wallet.publicDeriver,
+      daedalusTransfer: {
+        status: TransferStatus.GETTING_MASTER_KEY,
+      },
+    });
     return wrapTransfer(
       mockTransferProps({
         currentRoute: ROUTES.TRANSFER.DAEDALUS,
         selected: wallet.publicDeriver,
         ...lookup,
+        DaedalusTransferPageProps: baseProps,
       }),
-      (() => {
-        const baseProps = genBaseProps({
-          wallet: wallet.publicDeriver,
-          daedalusTransfer: {
-            status: TransferStatus.GETTING_MASTER_KEY,
-          },
-        });
-        return (
-          <DaedalusTransferPage
-            generated={{
-              ...baseProps,
-            }}
-          />
-        );
-      })()
     );
   })();
 };
@@ -223,27 +153,19 @@ export const RestoringAddresses = () => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
+    const baseProps = genBaseProps({
+      wallet: wallet.publicDeriver,
+      daedalusTransfer: {
+        status: TransferStatus.RESTORING_ADDRESSES,
+      },
+    });
     return wrapTransfer(
       mockTransferProps({
         currentRoute: ROUTES.TRANSFER.DAEDALUS,
         selected: wallet.publicDeriver,
         ...lookup,
+        DaedalusTransferPageProps: baseProps,
       }),
-      (() => {
-        const baseProps = genBaseProps({
-          wallet: wallet.publicDeriver,
-          daedalusTransfer: {
-            status: TransferStatus.RESTORING_ADDRESSES,
-          },
-        });
-        return (
-          <DaedalusTransferPage
-            generated={{
-              ...baseProps,
-            }}
-          />
-        );
-      })()
     );
   })();
 };
@@ -252,27 +174,19 @@ export const CheckingAddresses = () => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
+    const baseProps = genBaseProps({
+      wallet: wallet.publicDeriver,
+      daedalusTransfer: {
+        status: TransferStatus.CHECKING_ADDRESSES,
+      },
+    });
     return wrapTransfer(
       mockTransferProps({
         currentRoute: ROUTES.TRANSFER.DAEDALUS,
         selected: wallet.publicDeriver,
         ...lookup,
+        DaedalusTransferPageProps: baseProps,
       }),
-      (() => {
-        const baseProps = genBaseProps({
-          wallet: wallet.publicDeriver,
-          daedalusTransfer: {
-            status: TransferStatus.CHECKING_ADDRESSES,
-          },
-        });
-        return (
-          <DaedalusTransferPage
-            generated={{
-              ...baseProps,
-            }}
-          />
-        );
-      })()
     );
   })();
 };
@@ -281,27 +195,19 @@ export const GeneratingTx = () => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
+    const baseProps = genBaseProps({
+      wallet: wallet.publicDeriver,
+      daedalusTransfer: {
+        status: TransferStatus.GENERATING_TX,
+      },
+    });
     return wrapTransfer(
       mockTransferProps({
         currentRoute: ROUTES.TRANSFER.DAEDALUS,
         selected: wallet.publicDeriver,
         ...lookup,
+        DaedalusTransferPageProps: baseProps,
       }),
-      (() => {
-        const baseProps = genBaseProps({
-          wallet: wallet.publicDeriver,
-          daedalusTransfer: {
-            status: TransferStatus.GENERATING_TX,
-          },
-        });
-        return (
-          <DaedalusTransferPage
-            generated={{
-              ...baseProps,
-            }}
-          />
-        );
-      })()
     );
   })();
 };
@@ -310,39 +216,31 @@ export const ReadyToTransfer = () => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
+    const baseProps = genBaseProps({
+      wallet: wallet.publicDeriver,
+      daedalusTransfer: {
+        status: TransferStatus.READY_TO_TRANSFER,
+        error: undefined,
+        transferTx: {
+          recoveredBalance: new BigNumber(1),
+          fee: new BigNumber(0.1),
+          id: 'b65ae37bcc560e323ea8922de6573004299b6646e69ab9fac305f62f0c94c3ab',
+          encodedTx: new Uint8Array([]),
+          senders: ['DdzFFzCqrhsmcx7z25PRkdbeUNqNNW4brhznpVxbm1EknAahjaCFEjYXg9KJRqkixjgGyz8D9GSX3CFDRoNrZyfJsi61N2FxCnq9yWBy'],
+          receiver: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
+        },
+        transferFundsRequest: {
+          isExecuting: boolean('isExecuting', false),
+        },
+      },
+    });
     return wrapTransfer(
       mockTransferProps({
         currentRoute: ROUTES.TRANSFER.DAEDALUS,
         selected: wallet.publicDeriver,
         ...lookup,
+        DaedalusTransferPageProps: baseProps,
       }),
-      (() => {
-        const baseProps = genBaseProps({
-          wallet: wallet.publicDeriver,
-          daedalusTransfer: {
-            status: TransferStatus.READY_TO_TRANSFER,
-            error: undefined,
-            transferTx: {
-              recoveredBalance: new BigNumber(1),
-              fee: new BigNumber(0.1),
-              id: 'b65ae37bcc560e323ea8922de6573004299b6646e69ab9fac305f62f0c94c3ab',
-              encodedTx: new Uint8Array([]),
-              senders: ['DdzFFzCqrhsmcx7z25PRkdbeUNqNNW4brhznpVxbm1EknAahjaCFEjYXg9KJRqkixjgGyz8D9GSX3CFDRoNrZyfJsi61N2FxCnq9yWBy'],
-              receiver: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
-            },
-            transferFundsRequest: {
-              isExecuting: boolean('isExecuting', false),
-            },
-          },
-        });
-        return (
-          <DaedalusTransferPage
-            generated={{
-              ...baseProps,
-            }}
-          />
-        );
-      })()
     );
   })();
 };
@@ -351,40 +249,32 @@ export const Error = () => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
+    const errorCases = {
+      NotEnoughMoneyToSendError: new NotEnoughMoneyToSendError(),
+      TransferFundsError: new TransferFundsError(),
+      NoTransferTxError: new NoTransferTxError(),
+      WebSocketRestoreError: new WebSocketRestoreError(),
+      GenerateTransferTxError: new GenerateTransferTxError(),
+    };
+    const errorValue = () => select(
+      'errorCases',
+      errorCases,
+      errorCases.NotEnoughMoneyToSendError,
+    );
+    const baseProps = genBaseProps({
+      wallet: wallet.publicDeriver,
+      daedalusTransfer: {
+        status: TransferStatus.ERROR,
+        error: errorValue(),
+      },
+    });
     return wrapTransfer(
       mockTransferProps({
         currentRoute: ROUTES.TRANSFER.DAEDALUS,
         selected: wallet.publicDeriver,
         ...lookup,
+        DaedalusTransferPageProps: baseProps,
       }),
-      (() => {
-        const errorCases = {
-          NotEnoughMoneyToSendError: new NotEnoughMoneyToSendError(),
-          TransferFundsError: new TransferFundsError(),
-          NoTransferTxError: new NoTransferTxError(),
-          WebSocketRestoreError: new WebSocketRestoreError(),
-          GenerateTransferTxError: new GenerateTransferTxError(),
-        };
-        const errorValue = () => select(
-          'errorCases',
-          errorCases,
-          errorCases.NotEnoughMoneyToSendError,
-        );
-        const baseProps = genBaseProps({
-          wallet: wallet.publicDeriver,
-          daedalusTransfer: {
-            status: TransferStatus.ERROR,
-            error: errorValue(),
-          },
-        });
-        return (
-          <DaedalusTransferPage
-            generated={{
-              ...baseProps,
-            }}
-          />
-        );
-      })()
     );
   })();
 };

@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import validWords from 'bip39/src/wordlists/english.json';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
-import LegacyTransferLayout from '../../components/transfer/LegacyTransferLayout';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import DaedalusTransferFormPage from './DaedalusTransferFormPage';
 import DaedalusTransferMasterKeyFormPage from './DaedalusTransferMasterKeyFormPage';
@@ -107,59 +106,50 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
 
   render() {
     const { profile } = this.generated.stores;
-    const adaWallets = this._getAdaWalletsStore();
     const daedalusTransfer = this._getDaedalusTransferStore();
 
     switch (daedalusTransfer.status) {
       case TransferStatus.GETTING_MNEMONICS:
         return (
-          <LegacyTransferLayout>
-            <DaedalusTransferFormPage
-              onSubmit={this.setupTransferFundsWithMnemonic}
-              onBack={this.backToUninitialized}
-              mnemonicValidator={mnemonic => adaWallets.isValidMnemonic({
-                mnemonic,
-                numberOfWords: config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT
-              })}
-              validWords={validWords}
-              mnemonicLength={config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT}
-              classicTheme={profile.isClassicTheme}
-            />
-          </LegacyTransferLayout>
+          <DaedalusTransferFormPage
+            onSubmit={this.setupTransferFundsWithMnemonic}
+            onBack={this.backToUninitialized}
+            mnemonicValidator={mnemonic => this._getAdaWalletsStore().isValidMnemonic({
+              mnemonic,
+              numberOfWords: config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT
+            })}
+            validWords={validWords}
+            mnemonicLength={config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT}
+            classicTheme={profile.isClassicTheme}
+          />
         );
       case TransferStatus.GETTING_PAPER_MNEMONICS:
         return (
-          <LegacyTransferLayout>
-            <DaedalusTransferFormPage
-              onSubmit={this.setupTransferFundsWithMnemonic}
-              onBack={this.backToUninitialized}
-              mnemonicValidator={mnemonic => adaWallets.isValidPaperMnemonic({
-                mnemonic,
-                numberOfWords: config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT
-              })}
-              validWords={validWords}
-              mnemonicLength={config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT}
-              classicTheme={profile.isClassicTheme}
-            />
-          </LegacyTransferLayout>
+          <DaedalusTransferFormPage
+            onSubmit={this.setupTransferFundsWithMnemonic}
+            onBack={this.backToUninitialized}
+            mnemonicValidator={mnemonic => this._getAdaWalletsStore().isValidPaperMnemonic({
+              mnemonic,
+              numberOfWords: config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT
+            })}
+            validWords={validWords}
+            mnemonicLength={config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT}
+            classicTheme={profile.isClassicTheme}
+          />
         );
       case TransferStatus.GETTING_MASTER_KEY:
         return (
-          <LegacyTransferLayout>
-            <DaedalusTransferMasterKeyFormPage
-              onSubmit={this.setupTransferFundsWithMasterKey}
-              onBack={this.backToUninitialized}
-              classicTheme={profile.isClassicTheme}
-            />
-          </LegacyTransferLayout>
+          <DaedalusTransferMasterKeyFormPage
+            onSubmit={this.setupTransferFundsWithMasterKey}
+            onBack={this.backToUninitialized}
+            classicTheme={profile.isClassicTheme}
+          />
         );
       case TransferStatus.RESTORING_ADDRESSES:
       case TransferStatus.CHECKING_ADDRESSES:
       case TransferStatus.GENERATING_TX:
         return (
-          <LegacyTransferLayout>
-            <DaedalusTransferWaitingPage status={daedalusTransfer.status} />
-          </LegacyTransferLayout>
+          <DaedalusTransferWaitingPage status={daedalusTransfer.status} />
         );
       case TransferStatus.READY_TO_TRANSFER: {
         if (daedalusTransfer.transferTx == null) {
@@ -167,33 +157,29 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
         }
         const { intl } = this.context;
         return (
-          <LegacyTransferLayout>
-            <TransferSummaryPage
-              form={null}
-              formattedWalletAmount={formattedWalletAmount}
-              selectedExplorer={this.generated.stores.profile.selectedExplorer}
-              transferTx={daedalusTransfer.transferTx}
-              onSubmit={this.transferFunds}
-              isSubmitting={daedalusTransfer.transferFundsRequest.isExecuting}
-              onCancel={this.cancelTransferFunds}
-              error={daedalusTransfer.error}
-              dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
-            />
-          </LegacyTransferLayout>
+          <TransferSummaryPage
+            form={null}
+            formattedWalletAmount={formattedWalletAmount}
+            selectedExplorer={this.generated.stores.profile.selectedExplorer}
+            transferTx={daedalusTransfer.transferTx}
+            onSubmit={this.transferFunds}
+            isSubmitting={daedalusTransfer.transferFundsRequest.isExecuting}
+            onCancel={this.cancelTransferFunds}
+            error={daedalusTransfer.error}
+            dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
+          />
         );
       }
       case TransferStatus.ERROR:
         return (
-          <LegacyTransferLayout>
-            <DaedalusTransferErrorPage
-              error={daedalusTransfer.error}
-              onCancel={this.cancelTransferFunds}
-              classicTheme={profile.isClassicTheme}
-            />
-          </LegacyTransferLayout>
+          <DaedalusTransferErrorPage
+            error={daedalusTransfer.error}
+            onCancel={this.cancelTransferFunds}
+            classicTheme={profile.isClassicTheme}
+          />
         );
       default:
-        throw new Error('DaedalusTransferPage Unexpected state ' + daedalusTransfer.status);
+        return null;
     }
   }
 

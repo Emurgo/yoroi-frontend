@@ -58,7 +58,7 @@ export default class TransferCards extends Component<Props> {
             </div>
           </div>
         </button>
-        {/* byron-era wallet */}
+        {/* shelley-itn wallet */}
         <button
           type="button"
           className="TransferCards_shelleyItn"

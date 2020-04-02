@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import { intlShape } from 'react-intl';
@@ -11,6 +12,10 @@ import globalMessages from '../../i18n/global-messages';
 import TransferTypeSelect from '../../components/transfer/cards/TransferTypeSelect';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import { TransferSource, } from '../../types/TransferTypes';
+import YoroiTransferPage from './YoroiTransferPage';
+import type { GeneratedData as YoroiTransferPageData } from './YoroiTransferPage';
+import DaedalusTransferPage from './DaedalusTransferPage';
+import type { GeneratedData as DaedalusTransferPageData } from './DaedalusTransferPage';
 
 import ByronEraOptionDialogContainer from './options/ByronEraOptionDialogContainer';
 import type { GeneratedData as ByronEraOptionDialogContainerData } from './options/ByronEraOptionDialogContainer';
@@ -32,6 +37,14 @@ export default class WalletTransferPage extends Component<Props> {
     this.generated.actions.dialogs.closeActiveDialog.trigger();
   };
 
+  getIcarusTransferDialog: InjectedOrGenerated<YoroiTransferPageData> => Node = (props) => {
+    return (<YoroiTransferPage {...props} />);
+  }
+
+  getDaedalusTransferDialog: InjectedOrGenerated<DaedalusTransferPageData> => Node = (props) => {
+    return (<DaedalusTransferPage {...props} />);
+  }
+
   render() {
     const { actions, stores } = this.generated;
     const { uiDialogs } = stores;
@@ -46,6 +59,14 @@ export default class WalletTransferPage extends Component<Props> {
       );
     }
 
+    const icarusTransfer = this.generated.YoroiTransferPageProps != null
+      ? this.getIcarusTransferDialog(this.generated.YoroiTransferPageProps)
+      : null;
+
+    const daedalusTransfer = this.generated.DaedalusTransferPageProps != null
+      ? this.getDaedalusTransferDialog(this.generated.DaedalusTransferPageProps)
+      : null;
+
     return (
       <>
         <TransferTypeSelect
@@ -57,6 +78,8 @@ export default class WalletTransferPage extends Component<Props> {
           }
         />
         {activeDialog}
+        {icarusTransfer}
+        {daedalusTransfer}
       </>
     );
   }
@@ -103,7 +126,13 @@ export default class WalletTransferPage extends Component<Props> {
       },
       ByronEraOptionDialogContainerProps: (
         { actions, stores }: InjectedOrGenerated<ByronEraOptionDialogContainerData>
-      )
+      ),
+      YoroiTransferPageProps: (
+        { actions, stores }: (?InjectedOrGenerated<YoroiTransferPageData>)
+      ),
+      DaedalusTransferPageProps: (
+        { actions, stores }: (?InjectedOrGenerated<DaedalusTransferPageData>)
+      ),
     });
   }
 }

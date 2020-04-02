@@ -169,26 +169,26 @@ export default class ByronOptionDialog extends Component<Props, State> {
           type="restoreNormalWallet"
           title={intl.formatMessage(icarusMessages.mnemonicLabel15)}
           learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
-          onSubmit={this.props.daedalus.onStandard}
+          onSubmit={this.props.icarus.onStandard}
         />
         <OptionBlock
           parentName="fromIcarusPaperWallet"
           type="restorePaperWallet"
-          onSubmit={this.props.daedalus.onPaper}
+          onSubmit={this.props.icarus.onPaper}
           title={intl.formatMessage(icarusMessages.yoroiPaperLabel)}
           learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
         />
         <OptionBlock
           parentName="fromLedger"
           type="connectLedger"
-          onSubmit={this.props.daedalus.onMaster}
+          onSubmit={this.props.icarus.onLedger}
           title={intl.formatMessage(icarusMessages.legacyLedgerTitle)}
           learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
         />
         <OptionBlock
           parentName="fromTrezor"
           type="connectTrezor"
-          onSubmit={this.props.daedalus.onMaster}
+          onSubmit={this.props.icarus.onTrezor}
           title={intl.formatMessage(icarusMessages.legacyTrezorTitle)}
           learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
         />

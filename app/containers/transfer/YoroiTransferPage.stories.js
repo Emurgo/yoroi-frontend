@@ -10,8 +10,7 @@ import {
   walletLookup,
   genDummyWithCache,
 } from '../../../stories/helpers/StoryWrapper';
-import { wrapTransfer } from '../../Routes';
-import { mockTransferProps } from './LegacyTransfer.mock';
+import { mockTransferProps, wrapTransfer, } from './Transfer.mock';
 import { THEMES } from '../../themes';
 import { getDefaultExplorer } from '../../domain/Explorer';
 import { ROUTES } from '../../routes-config';
@@ -127,75 +126,23 @@ const genBaseProps: {|
   },
 });
 
-export const Uninitialized = () => {
-  const wallet = genDummyWithCache();
-  const walletCases = {
-    NoWallet: 0,
-    HasWallet: 1
-  };
-  const walletValue = () => select(
-    'walletCases',
-    walletCases,
-    walletCases.NoWallet,
-  );
-  const walletVal = walletValue();
-  const lookup = walletLookup(walletVal === walletCases.NoWallet
-    ? []
-    : [wallet]);
-  return (() => {
-    return wrapTransfer(
-      mockTransferProps({
-        currentRoute: ROUTES.TRANSFER.YOROI,
-        selected: walletVal === walletCases.NoWallet ? null : wallet.publicDeriver,
-        ...lookup,
-      }),
-      (() => {
-        const baseProps = walletVal === walletCases.NoWallet
-          ? genBaseProps({
-            wallet: null,
-            yoroiTransfer: Object.freeze({}),
-          })
-          : genBaseProps({
-            wallet: wallet.publicDeriver,
-            yoroiTransfer: Object.freeze({}),
-          });
-        return (
-          <YoroiTransferPage
-            generated={{
-              ...baseProps,
-            }}
-          />
-        );
-      })()
-    );
-  })();
-};
-
 export const GettingMnemonics = () => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
+    const baseProps = genBaseProps({
+      wallet: wallet.publicDeriver,
+      yoroiTransfer: {
+        status: TransferStatus.GETTING_MNEMONICS,
+      },
+    });
     return wrapTransfer(
       mockTransferProps({
         currentRoute: ROUTES.TRANSFER.YOROI,
         selected: wallet.publicDeriver,
         ...lookup,
+        YoroiTransferPageProps: baseProps,
       }),
-      (() => {
-        const baseProps = genBaseProps({
-          wallet: wallet.publicDeriver,
-          yoroiTransfer: {
-            status: TransferStatus.GETTING_MNEMONICS,
-          },
-        });
-        return (
-          <YoroiTransferPage
-            generated={{
-              ...baseProps,
-            }}
-          />
-        );
-      })()
     );
   })();
 };
@@ -204,27 +151,19 @@ export const GettingPaperMnemonics = () => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
+    const baseProps = genBaseProps({
+      wallet: wallet.publicDeriver,
+      yoroiTransfer: {
+        status: TransferStatus.GETTING_PAPER_MNEMONICS,
+      },
+    });
     return wrapTransfer(
       mockTransferProps({
         currentRoute: ROUTES.TRANSFER.YOROI,
         selected: wallet.publicDeriver,
         ...lookup,
+        YoroiTransferPageProps: baseProps,
       }),
-      (() => {
-        const baseProps = genBaseProps({
-          wallet: wallet.publicDeriver,
-          yoroiTransfer: {
-            status: TransferStatus.GETTING_PAPER_MNEMONICS,
-          },
-        });
-        return (
-          <YoroiTransferPage
-            generated={{
-              ...baseProps,
-            }}
-          />
-        );
-      })()
     );
   })();
 };
@@ -233,27 +172,19 @@ export const HardwareDisclaimer = () => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
+    const baseProps = genBaseProps({
+      wallet: wallet.publicDeriver,
+      yoroiTransfer: {
+        status: TransferStatus.HARDWARE_DISCLAIMER,
+      },
+    });
     return wrapTransfer(
       mockTransferProps({
         currentRoute: ROUTES.TRANSFER.YOROI,
         selected: wallet.publicDeriver,
         ...lookup,
+        YoroiTransferPageProps: baseProps,
       }),
-      (() => {
-        const baseProps = genBaseProps({
-          wallet: wallet.publicDeriver,
-          yoroiTransfer: {
-            status: TransferStatus.HARDWARE_DISCLAIMER,
-          },
-        });
-        return (
-          <YoroiTransferPage
-            generated={{
-              ...baseProps,
-            }}
-          />
-        );
-      })()
     );
   })();
 };
@@ -262,27 +193,19 @@ export const HardwareMnemonic = () => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
+    const baseProps = genBaseProps({
+      wallet: wallet.publicDeriver,
+      yoroiTransfer: {
+        status: TransferStatus.GETTING_HARDWARE_MNEMONIC,
+      },
+    });
     return wrapTransfer(
       mockTransferProps({
         currentRoute: ROUTES.TRANSFER.YOROI,
         selected: wallet.publicDeriver,
         ...lookup,
+        YoroiTransferPageProps: baseProps,
       }),
-      (() => {
-        const baseProps = genBaseProps({
-          wallet: wallet.publicDeriver,
-          yoroiTransfer: {
-            status: TransferStatus.GETTING_HARDWARE_MNEMONIC,
-          },
-        });
-        return (
-          <YoroiTransferPage
-            generated={{
-              ...baseProps,
-            }}
-          />
-        );
-      })()
     );
   })();
 };
@@ -291,36 +214,28 @@ export const Checksum = () => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
+    const transferKindSelect = () => select(
+      'transferKind',
+      TransferKind,
+      TransferKind.NORMAL,
+    );
+    const transferKind = transferKindSelect();
+    const baseProps = genBaseProps({
+      wallet: wallet.publicDeriver,
+      openDialog: true,
+      transferKind,
+      yoroiTransfer: {
+        status: TransferStatus.DISPLAY_CHECKSUM,
+        recoveryPhrase: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon share',
+      },
+    });
     return wrapTransfer(
       mockTransferProps({
         currentRoute: ROUTES.TRANSFER.YOROI,
         selected: wallet.publicDeriver,
         ...lookup,
+        YoroiTransferPageProps: baseProps,
       }),
-      (() => {
-        const transferKindSelect = () => select(
-          'transferKind',
-          TransferKind,
-          TransferKind.NORMAL,
-        );
-        const transferKind = transferKindSelect();
-        const baseProps = genBaseProps({
-          wallet: wallet.publicDeriver,
-          openDialog: true,
-          transferKind,
-          yoroiTransfer: {
-            status: TransferStatus.DISPLAY_CHECKSUM,
-            recoveryPhrase: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon share',
-          },
-        });
-        return (
-          <YoroiTransferPage
-            generated={{
-              ...baseProps,
-            }}
-          />
-        );
-      })()
     );
   })();
 };
@@ -329,27 +244,19 @@ export const RestoringAddresses = () => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
+    const baseProps = genBaseProps({
+      wallet: wallet.publicDeriver,
+      yoroiTransfer: {
+        status: TransferStatus.RESTORING_ADDRESSES,
+      },
+    });
     return wrapTransfer(
       mockTransferProps({
         currentRoute: ROUTES.TRANSFER.YOROI,
         selected: wallet.publicDeriver,
         ...lookup,
+        YoroiTransferPageProps: baseProps,
       }),
-      (() => {
-        const baseProps = genBaseProps({
-          wallet: wallet.publicDeriver,
-          yoroiTransfer: {
-            status: TransferStatus.RESTORING_ADDRESSES,
-          },
-        });
-        return (
-          <YoroiTransferPage
-            generated={{
-              ...baseProps,
-            }}
-          />
-        );
-      })()
     );
   })();
 };
@@ -358,27 +265,19 @@ export const CheckingAddresses = () => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
+    const baseProps = genBaseProps({
+      wallet: wallet.publicDeriver,
+      yoroiTransfer: {
+        status: TransferStatus.CHECKING_ADDRESSES,
+      },
+    });
     return wrapTransfer(
       mockTransferProps({
         currentRoute: ROUTES.TRANSFER.YOROI,
         selected: wallet.publicDeriver,
         ...lookup,
+        YoroiTransferPageProps: baseProps,
       }),
-      (() => {
-        const baseProps = genBaseProps({
-          wallet: wallet.publicDeriver,
-          yoroiTransfer: {
-            status: TransferStatus.CHECKING_ADDRESSES,
-          },
-        });
-        return (
-          <YoroiTransferPage
-            generated={{
-              ...baseProps,
-            }}
-          />
-        );
-      })()
     );
   })();
 };
@@ -387,27 +286,19 @@ export const GeneratingTx = () => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
+    const baseProps = genBaseProps({
+      wallet: wallet.publicDeriver,
+      yoroiTransfer: {
+        status: TransferStatus.GENERATING_TX,
+      },
+    });
     return wrapTransfer(
       mockTransferProps({
         currentRoute: ROUTES.TRANSFER.YOROI,
         selected: wallet.publicDeriver,
         ...lookup,
+        YoroiTransferPageProps: baseProps,
       }),
-      (() => {
-        const baseProps = genBaseProps({
-          wallet: wallet.publicDeriver,
-          yoroiTransfer: {
-            status: TransferStatus.GENERATING_TX,
-          },
-        });
-        return (
-          <YoroiTransferPage
-            generated={{
-              ...baseProps,
-            }}
-          />
-        );
-      })()
     );
   })();
 };
@@ -416,51 +307,43 @@ export const TransferTx = () => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
+    const errorCases = {
+      NoError: 0,
+      WalletChangedError: 1,
+    };
+    const errorValue = () => select(
+      'errorCases',
+      errorCases,
+      errorCases.NoError,
+    );
+    const error = errorValue();
+    const baseProps = genBaseProps({
+      wallet: wallet.publicDeriver,
+      yoroiTransfer: {
+        status: TransferStatus.READY_TO_TRANSFER,
+        error: error === errorCases.NoError
+          ? undefined
+          : new WalletChangedError(),
+        transferTx: {
+          recoveredBalance: new BigNumber(1),
+          fee: new BigNumber(0.1),
+          id: 'b65ae37bcc560e323ea8922de6573004299b6646e69ab9fac305f62f0c94c3ab',
+          encodedTx: new Uint8Array([]),
+          senders: ['Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'],
+          receiver: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
+        },
+        transferFundsRequest: {
+          isExecuting: boolean('isExecuting', false),
+        },
+      },
+    });
     return wrapTransfer(
       mockTransferProps({
         currentRoute: ROUTES.TRANSFER.YOROI,
         selected: wallet.publicDeriver,
         ...lookup,
+        YoroiTransferPageProps: baseProps,
       }),
-      (() => {
-        const errorCases = {
-          NoError: 0,
-          WalletChangedError: 1,
-        };
-        const errorValue = () => select(
-          'errorCases',
-          errorCases,
-          errorCases.NoError,
-        );
-        const error = errorValue();
-        const baseProps = genBaseProps({
-          wallet: wallet.publicDeriver,
-          yoroiTransfer: {
-            status: TransferStatus.READY_TO_TRANSFER,
-            error: error === errorCases.NoError
-              ? undefined
-              : new WalletChangedError(),
-            transferTx: {
-              recoveredBalance: new BigNumber(1),
-              fee: new BigNumber(0.1),
-              id: 'b65ae37bcc560e323ea8922de6573004299b6646e69ab9fac305f62f0c94c3ab',
-              encodedTx: new Uint8Array([]),
-              senders: ['Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'],
-              receiver: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
-            },
-            transferFundsRequest: {
-              isExecuting: boolean('isExecuting', false),
-            },
-          },
-        });
-        return (
-          <YoroiTransferPage
-            generated={{
-              ...baseProps,
-            }}
-          />
-        );
-      })()
     );
   })();
 };
@@ -469,39 +352,31 @@ export const Error = () => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
+    const errorCases = {
+      NotEnoughMoneyToSendError: new NotEnoughMoneyToSendError(),
+      TransferFundsError: new TransferFundsError(),
+      NoTransferTxError: new NoTransferTxError(),
+      GenerateTransferTxError: new GenerateTransferTxError(),
+    };
+    const errorValue = () => select(
+      'errorCases',
+      errorCases,
+      errorCases.NotEnoughMoneyToSendError,
+    );
+    const baseProps = genBaseProps({
+      wallet: wallet.publicDeriver,
+      yoroiTransfer: {
+        status: TransferStatus.ERROR,
+        error: errorValue(),
+      },
+    });
     return wrapTransfer(
       mockTransferProps({
         currentRoute: ROUTES.TRANSFER.YOROI,
         selected: wallet.publicDeriver,
         ...lookup,
+        YoroiTransferPageProps: baseProps,
       }),
-      (() => {
-        const errorCases = {
-          NotEnoughMoneyToSendError: new NotEnoughMoneyToSendError(),
-          TransferFundsError: new TransferFundsError(),
-          NoTransferTxError: new NoTransferTxError(),
-          GenerateTransferTxError: new GenerateTransferTxError(),
-        };
-        const errorValue = () => select(
-          'errorCases',
-          errorCases,
-          errorCases.NotEnoughMoneyToSendError,
-        );
-        const baseProps = genBaseProps({
-          wallet: wallet.publicDeriver,
-          yoroiTransfer: {
-            status: TransferStatus.ERROR,
-            error: errorValue(),
-          },
-        });
-        return (
-          <YoroiTransferPage
-            generated={{
-              ...baseProps,
-            }}
-          />
-        );
-      })()
     );
   })();
 };
@@ -510,27 +385,19 @@ export const Success = () => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
+    const baseProps = genBaseProps({
+      wallet: wallet.publicDeriver,
+      yoroiTransfer: {
+        status: TransferStatus.SUCCESS,
+      },
+    });
     return wrapTransfer(
       mockTransferProps({
         currentRoute: ROUTES.TRANSFER.YOROI,
         selected: wallet.publicDeriver,
         ...lookup,
+        YoroiTransferPageProps: baseProps,
       }),
-      (() => {
-        const baseProps = genBaseProps({
-          wallet: wallet.publicDeriver,
-          yoroiTransfer: {
-            status: TransferStatus.SUCCESS,
-          },
-        });
-        return (
-          <YoroiTransferPage
-            generated={{
-              ...baseProps,
-            }}
-          />
-        );
-      })()
     );
   })();
 };

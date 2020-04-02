@@ -8,7 +8,6 @@ import { observer } from 'mobx-react';
 import { intlShape, } from 'react-intl';
 import validWords from 'bip39/src/wordlists/english.json';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
-import LegacyTransferLayout from '../../components/transfer/LegacyTransferLayout';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import HardwareDisclaimerPage from './HardwareDisclaimerPage';
 import YoroiTransferFormPage from './YoroiTransferFormPage';
@@ -133,84 +132,71 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
   render() {
     const { stores } = this.generated;
     const { profile } = stores;
-    const adaWallets = this._getAdaWalletsStore();
     const yoroiTransfer = this._getYoroiTransferStore();
 
     switch (yoroiTransfer.status) {
       case TransferStatus.GETTING_MNEMONICS:
         return (
-          <LegacyTransferLayout>
-            <YoroiTransferFormPage
-              onSubmit={this.setupTransferFundsWithMnemonic}
-              onBack={this.backToUninitialized}
-              mnemonicValidator={mnemonic => adaWallets.isValidMnemonic({
-                mnemonic,
-                numberOfWords: config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT
-              })}
-              validWords={validWords}
-              mnemonicLength={config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT}
-              classicTheme={profile.isClassicTheme}
-            />
-          </LegacyTransferLayout>
+          <YoroiTransferFormPage
+            onSubmit={this.setupTransferFundsWithMnemonic}
+            onBack={this.backToUninitialized}
+            mnemonicValidator={mnemonic => this._getAdaWalletsStore().isValidMnemonic({
+              mnemonic,
+              numberOfWords: config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT
+            })}
+            validWords={validWords}
+            mnemonicLength={config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT}
+            classicTheme={profile.isClassicTheme}
+          />
         );
       case TransferStatus.GETTING_PAPER_MNEMONICS:
         return (
-          <LegacyTransferLayout>
-            <YoroiPaperWalletFormPage
-              onSubmit={this.setupTransferFundsWithPaperMnemonic}
-              onBack={this.backToUninitialized}
-              mnemonicValidator={mnemonic => adaWallets.isValidPaperMnemonic({
-                mnemonic,
-                numberOfWords: config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT
-              })}
-              validWords={validWords}
-              mnemonicLength={config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT}
-              passwordMatches={_password => true}
-              includeLengthCheck={false}
-              classicTheme={profile.isClassicTheme}
-            />
-          </LegacyTransferLayout>
+          <YoroiPaperWalletFormPage
+            onSubmit={this.setupTransferFundsWithPaperMnemonic}
+            onBack={this.backToUninitialized}
+            mnemonicValidator={mnemonic => this._getAdaWalletsStore().isValidPaperMnemonic({
+              mnemonic,
+              numberOfWords: config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT
+            })}
+            validWords={validWords}
+            mnemonicLength={config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT}
+            passwordMatches={_password => true}
+            includeLengthCheck={false}
+            classicTheme={profile.isClassicTheme}
+          />
         );
       case TransferStatus.HARDWARE_DISCLAIMER:
         return (
-          <LegacyTransferLayout>
-            <HardwareDisclaimerPage
-              onBack={() => this._getYoroiTransferActions().cancelTransferFunds.trigger()}
-              onNext={() => this._getYoroiTransferActions().startHardwareMnemnoic.trigger()}
-            />
-          </LegacyTransferLayout>
+          <HardwareDisclaimerPage
+            onBack={() => this._getYoroiTransferActions().cancelTransferFunds.trigger()}
+            onNext={() => this._getYoroiTransferActions().startHardwareMnemnoic.trigger()}
+          />
         );
       case TransferStatus.GETTING_HARDWARE_MNEMONIC:
         return (
-          <LegacyTransferLayout>
-            <HardwareTransferFormPage
-              onSubmit={this.setupTransferFundsWithMnemonic}
-              onBack={this.backToUninitialized}
-              // different hardware wallet support different lengths
-              // so we just allow any length as long as the mnemonic is valid
-              mnemonicValidator={mnemonic => validateMnemonic(mnemonic)}
-              validWords={validWords}
-              classicTheme={profile.isClassicTheme}
-            />
-          </LegacyTransferLayout>
+          <HardwareTransferFormPage
+            onSubmit={this.setupTransferFundsWithMnemonic}
+            onBack={this.backToUninitialized}
+            // different hardware wallet support different lengths
+            // so we just allow any length as long as the mnemonic is valid
+            mnemonicValidator={mnemonic => validateMnemonic(mnemonic)}
+            validWords={validWords}
+            classicTheme={profile.isClassicTheme}
+          />
         );
       case TransferStatus.DISPLAY_CHECKSUM:
         return (
-          <LegacyTransferLayout>
-            <YoroiPlatePage
-              {...this.generated.YoroiPlateProps}
-              onNext={this.checkAddresses}
-              onCancel={this.backToUninitialized}
-            />
-          </LegacyTransferLayout>
+          <YoroiPlatePage
+            {...this.generated.YoroiPlateProps}
+            onNext={this.checkAddresses}
+            onCancel={this.backToUninitialized}
+          />
         );
       case TransferStatus.RESTORING_ADDRESSES:
       case TransferStatus.CHECKING_ADDRESSES:
       case TransferStatus.GENERATING_TX:
         return (
-          <LegacyTransferLayout>
-            <YoroiTransferWaitingPage status={yoroiTransfer.status} />
-          </LegacyTransferLayout>
+          <YoroiTransferWaitingPage status={yoroiTransfer.status} />
         );
       case TransferStatus.READY_TO_TRANSFER: {
         if (yoroiTransfer.transferTx == null) {
@@ -218,38 +204,32 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         }
         const { intl } = this.context;
         return (
-          <LegacyTransferLayout>
-            <TransferSummaryPage
-              form={null}
-              formattedWalletAmount={formattedWalletAmount}
-              selectedExplorer={this.generated.stores.profile.selectedExplorer}
-              transferTx={yoroiTransfer.transferTx}
-              onSubmit={this.transferFunds}
-              isSubmitting={yoroiTransfer.transferFundsRequest.isExecuting}
-              onCancel={this.cancelTransferFunds}
-              error={yoroiTransfer.error}
-              dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
-            />
-          </LegacyTransferLayout>
+          <TransferSummaryPage
+            form={null}
+            formattedWalletAmount={formattedWalletAmount}
+            selectedExplorer={this.generated.stores.profile.selectedExplorer}
+            transferTx={yoroiTransfer.transferTx}
+            onSubmit={this.transferFunds}
+            isSubmitting={yoroiTransfer.transferFundsRequest.isExecuting}
+            onCancel={this.cancelTransferFunds}
+            error={yoroiTransfer.error}
+            dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
+          />
         );
       }
       case TransferStatus.ERROR:
         return (
-          <LegacyTransferLayout>
-            <YoroiTransferErrorPage
-              error={yoroiTransfer.error}
-              onCancel={this.cancelTransferFunds}
-              classicTheme={profile.isClassicTheme}
-            />
-          </LegacyTransferLayout>
+          <YoroiTransferErrorPage
+            error={yoroiTransfer.error}
+            onCancel={this.cancelTransferFunds}
+            classicTheme={profile.isClassicTheme}
+          />
         );
       case TransferStatus.SUCCESS:
         return (
-          <LegacyTransferLayout>
-            <YoroiTransferSuccessPage
-              classicTheme={profile.isClassicTheme}
-            />
-          </LegacyTransferLayout>
+          <YoroiTransferSuccessPage
+            classicTheme={profile.isClassicTheme}
+          />
         );
       default:
         return null;
@@ -311,7 +291,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
                 isExecuting: adaStores.yoroiTransfer.transferFundsRequest.isExecuting,
               },
               nextInternalAddress: adaStores.yoroiTransfer.nextInternalAddress,
-              recoveryPhrase: adaStores.yoroiTransfer.recoveryPhrase,  
+              recoveryPhrase: adaStores.yoroiTransfer.recoveryPhrase,
             },
           },
         },
