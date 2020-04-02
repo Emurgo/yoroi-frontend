@@ -537,6 +537,18 @@ const globalMessages = defineMessages({
     id: 'myWallets.wallets.neverSync',
     defaultMessage: '!!!Never synced',
   },
+  hardwareWalletLabel: {
+    id: 'yoroiTransfer.start.instructions.hardware',
+    defaultMessage: '!!!Hardware wallet',
+  },
+  daedalusWalletLabel: {
+    id: 'daedalusTransfer.instructions.attention.button.label',
+    defaultMessage: '!!!Daedalus Wallet',
+  },
+  yoroiPaperLabel: {
+    id: 'yoroiTransfer.start.instructions.yoroiPaper',
+    defaultMessage: '!!!Yoroi paper wallet',
+  },
 });
 export default globalMessages;
 
