@@ -22,7 +22,7 @@ Feature: Main UI
   @it-21
   Scenario: Yoroi Wallet "Home Button" Test (IT-21)
     When There is a wallet stored named empty-wallet
-    And I am on the Daedalus Transfer instructions screen
+    And I am on the transfer start screen
     And I go to the main screen
     Then I should see the transactions screen
     When I navigate to the general settings screen
@@ -42,7 +42,7 @@ Feature: Main UI
   @it-30
   Scenario: User can't restore Daedalus wallet in Yoroi if Yoroi wallet is not created (IT-30)
     When There is no wallet stored
-    And I am on the Daedalus Transfer instructions screen
+    And I am on the transfer start screen
     Then I see transactions buttons are disabled
 
   @serverDown @it-31

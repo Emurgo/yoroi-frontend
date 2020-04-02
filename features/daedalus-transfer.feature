@@ -7,8 +7,9 @@ Feature: Transfer Daedalus Wallet funds
 
   @it-99
   Scenario: Daedalus transfer fails when user type invalid mnemonic phrase (IT-99)
-    And I am on the Daedalus Transfer instructions screen
-    When I click on the transfer funds from Daedalus button
+    And I am on the transfer start screen
+    When I click on the byron button on the transfer screen
+    When I select the 12-word option
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                           |
     | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow monster |
@@ -16,8 +17,9 @@ Feature: Transfer Daedalus Wallet funds
   
   @it-84
   Scenario: Daedalus transfer should fail to recover wallet if connection was lost (IT-84)
-    And I am on the Daedalus Transfer instructions screen
-    When I click on the transfer funds from Daedalus button
+    And I am on the transfer start screen
+    When I click on the byron button on the transfer screen
+    When I select the 12-word option
     And I enter the recovery phrase:
     | recoveryPhrase                                                          |
     | leaf immune metal phrase river cool domain snow year below result three |
@@ -27,8 +29,9 @@ Feature: Transfer Daedalus Wallet funds
 
   @it-35
   Scenario: Ensure user can not add more than 12 words to the Daedalus recovery phrase (IT-35)
-    And I am on the Daedalus Transfer instructions screen
-    When I click on the transfer funds from Daedalus button
+    And I am on the transfer start screen
+    When I click on the byron button on the transfer screen
+    When I select the 12-word option
     And I enter the recovery phrase:
     | recoveryPhrase                                                          |
     | leaf immune metal phrase river cool domain snow year below result three |
@@ -39,8 +42,9 @@ Feature: Transfer Daedalus Wallet funds
   @withWebSocketConnection @it-45
   Scenario: User can transfer Daedalus funds to Yoroi using 12-word mnemonic phrase (IT-45)
     And My Daedalus wallet has funds
-    And I am on the Daedalus Transfer instructions screen
-    When I click on the transfer funds from Daedalus button
+    And I am on the transfer start screen
+    When I click on the byron button on the transfer screen
+    When I select the 12-word option
     And I enter the recovery phrase:
     | recoveryPhrase                                                          |
     | leaf immune metal phrase river cool domain snow year below result three |
@@ -54,9 +58,10 @@ Feature: Transfer Daedalus Wallet funds
     
   @withWebSocketConnection @it-80
   Scenario: Daedalus transfer should fail if the 12-words mnemonics corresponds to an empty Daedalus wallet (IT-80)
-    And My Daedalus wallet hasn't funds
-    And I am on the Daedalus Transfer instructions screen
-    When I click on the transfer funds from Daedalus button
+    And My Daedalus wallet has no funds
+    And I am on the transfer start screen
+    When I click on the byron button on the transfer screen
+    When I select the 12-word option
     And I enter the recovery phrase:
     | recoveryPhrase                                                          |
     | leaf immune metal phrase river cool domain snow year below result three |
@@ -64,25 +69,11 @@ Feature: Transfer Daedalus Wallet funds
     Then I should see an Error screen
     And I should see 'Daedalus wallet without funds' error message
 
-  @it-29 @withWebSocketConnection
-  Scenario: Yoroi "TRANSFER FUNDS FROM DAEDALUS" screen validation (IT-29)
-    And My Daedalus wallet hasn't funds
-    And I am on the Daedalus Transfer instructions screen
-    Then I see all necessary elements on "TRANSFER FUNDS FROM DAEDALUS" screen:
-
-  @it-37 @withWebSocketConnection
-  Scenario: "Daedalus-transfer" page buttons test (IT-37)
-    And My Daedalus wallet hasn't funds
-    And I am on the Daedalus Transfer instructions screen
-    And I click on the transfer funds from Daedalus button
-    Then I should not be able to submit
-    When I click the back button
-    Then I see all necessary elements on "TRANSFER FUNDS FROM DAEDALUS" screen:
-
   @withWebSocketConnection @it-19
   Scenario: User can transfer Daedalus funds to Yoroi using master key (IT-19)
     And My Daedalus wallet has funds
-    And I am on the Daedalus Transfer instructions screen
+    And I am on the transfer start screen
+    When I click on the byron button on the transfer screen
     When I click on the transfer funds from Daedalus master key button
     # enter private key for following mnemonic
     # leaf immune metal phrase river cool domain snow year below result three

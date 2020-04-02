@@ -105,6 +105,7 @@ export default class ByronOptionDialog extends Component<Props, State> {
               type="button"
               onClick={() => this.setState({ selectedTab: TabOptions.Daedalus })}
               className={classnames(
+                'DaedalusTab',
                 styles.tabsLink,
                 this.state.selectedTab === TabOptions.Daedalus ? styles.active : null
               )}
@@ -115,6 +116,7 @@ export default class ByronOptionDialog extends Component<Props, State> {
               type="button"
               onClick={() => this.setState({ selectedTab: TabOptions.Icarus })}
               className={classnames(
+                'IcarusTab',
                 styles.tabsLink,
                 this.state.selectedTab === TabOptions.Icarus ? styles.active : null
               )}

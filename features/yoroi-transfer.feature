@@ -8,9 +8,10 @@ Feature: Transfer Yoroi Wallet funds
   @it-114
   Scenario: Yoroi transfer fails when user transfers from an empty wallet (IT-114)
     Given There is a wallet stored named empty-wallet
-    And I am on the Yoroi Transfer start screen
-    And I should see the "CREATE YOROI WALLET" button disabled
-    When I click on the standardMnemonic button on the Yoroi Transfer start screen
+    And I am on the transfer start screen
+    When I click on the byron button on the transfer screen
+    When I click on the icarus tab
+    Then I select the 15-word option
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                           |
     | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow monster |
@@ -25,8 +26,10 @@ Feature: Transfer Yoroi Wallet funds
     # /features/mock-chain/TestWallets.js and
     # /features/mock-chain/mockImporter.js
     Given There is a wallet stored named empty-wallet
-    And I am on the Yoroi Transfer start screen
-    When I click on the standardMnemonic button on the Yoroi Transfer start screen
+    And I am on the transfer start screen
+    When I click on the byron button on the transfer screen
+    When I click on the icarus tab
+    Then I select the 15-word option
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                           |
     | dragon mango general very inmate idea rabbit pencil element bleak term cart critic kite pill |
@@ -41,16 +44,16 @@ Feature: Transfer Yoroi Wallet funds
     
   @it-112
   Scenario: Yoroi transfer should be disabled when user hasn't created a wallet (IT-112)
-    And I am on the Yoroi Transfer start screen
-    Then I should see the next button on the Yoroi transfer start screen disabled
-    When I click on the create Yoroi wallet button
-    Then I should see the Create wallet screen
+    And I am on the transfer start screen
+    Then I should see the transfer screen disabled
 
   @it-113
   Scenario: Wallet changes after transaction is generated (IT-113)
     Given There is a wallet stored named empty-wallet
-    And I am on the Yoroi Transfer start screen
-    When I click on the standardMnemonic button on the Yoroi Transfer start screen
+    And I am on the transfer start screen
+    When I click on the byron button on the transfer screen
+    When I click on the icarus tab
+    Then I select the 15-word option
     And I enter the recovery phrase:
     | recoveryPhrase                                                                            |
     | final autumn bacon fold horse scissors act pole country focus task blush basket move view |
@@ -79,10 +82,12 @@ Feature: Transfer Yoroi Wallet funds
     Then I should see the Yoroi transfer success screen
 
   @it-115
-  Scenario: Transfer UI should be reset when user leaves the transfer page (IT-115)
+  Scenario: User can transfer funds from a trezor wallet (IT-115)
     Given There is a wallet stored named empty-wallet
-    And I am on the Yoroi Transfer start screen
-    When I click on the standardMnemonic button on the Yoroi Transfer start screen
+    And I am on the transfer start screen
+    When I click on the byron button on the transfer screen
+    When I click on the icarus tab
+    Then I select the trezor option
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                           |
     | dragon mango general very inmate idea rabbit pencil element bleak term cart critic kite pill |
@@ -96,13 +101,15 @@ Feature: Transfer Yoroi Wallet funds
     Then I should see the Yoroi transfer success screen
 
   @it-82
-  Scenario: User can tryeah ansfer funds from another Yoroi paper wallet (IT-82)
+  Scenario: User can transfer funds from another Yoroi paper wallet (IT-82)
     # The recovery phrase and its balance(s) are defined in 
     # /features/mock-chain/TestWallets.js and
     # /features/mock-chain/mockImporter.js
     Given There is a wallet stored named empty-wallet
-    And I am on the Yoroi Transfer start screen
-    When I click on the yoroiPaper button on the Yoroi Transfer start screen
+    And I am on the transfer start screen
+    When I click on the byron button on the transfer screen
+    When I click on the icarus tab
+    Then I select the yoroi paper wallet option
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                           |
     | mushroom expose slogan wagon uphold train absurd fix snake unable rescue curious escape member resource garbage enemy champion airport matrix year |
