@@ -1,6 +1,5 @@
 // @flow
 
-import React from 'react';
 import BigNumber from 'bignumber.js';
 import { withScreenshot } from 'storycap';
 import { boolean, select, } from '@storybook/addon-knobs';

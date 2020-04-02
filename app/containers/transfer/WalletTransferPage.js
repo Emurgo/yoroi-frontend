@@ -5,9 +5,7 @@ import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import { intlShape } from 'react-intl';
 
-import environment from '../../environment';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
-import globalMessages from '../../i18n/global-messages';
 
 import TransferTypeSelect from '../../components/transfer/cards/TransferTypeSelect';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';

@@ -11,10 +11,6 @@ import {
   closeMockWebSocketServer,
   mockRestoredDaedalusAddresses
 } from '../mock-chain/mockWebSocketServer';
-import {
-  navigateTo,
-  waitUntilUrlEquals
-} from '../support/helpers/route-helpers';
 import i18n from '../support/helpers/i18n-helpers';
 import {
   checkAddressesRecoveredAreCorrect,

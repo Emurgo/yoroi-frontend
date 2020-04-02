@@ -1,9 +1,10 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, } from 'react-intl';
 import classnames from 'classnames';
 import globalMessages from '../../../i18n/global-messages';
+import environment from '../../../environment';
 
 import CustomTooltip from '../../widgets/CustomTooltip';
 
@@ -59,27 +60,29 @@ export default class TransferCards extends Component<Props> {
           </div>
         </button>
         {/* shelley-itn wallet */}
-        <button
-          type="button"
-          className="TransferCards_shelleyItn"
-          onClick={this.props.onShelleyItn}
-        >
-          <div className={styles.heroCardsItem}>
-            <div className={classnames([styles.heroCardsItemBg, styles.bgCreateWallet])} />
-            <div className={styles.heroCardsItemTitle}>
-              {intl.formatMessage(messages.shelleyItnWallet)}
-              <div className={styles.tooltip}>
-                <CustomTooltip
-                  toolTip={
-                    <div className={styles.tooltipSize}>
-                      {intl.formatMessage(globalMessages.legacyAttentionText)}
-                    </div>
-                  }
-                />
+        {!environment.isProduction() &&
+          <button
+            type="button"
+            className="TransferCards_shelleyItn"
+            onClick={this.props.onShelleyItn}
+          >
+            <div className={styles.heroCardsItem}>
+              <div className={classnames([styles.heroCardsItemBg, styles.bgCreateWallet])} />
+              <div className={styles.heroCardsItemTitle}>
+                {intl.formatMessage(messages.shelleyItnWallet)}
+                <div className={styles.tooltip}>
+                  <CustomTooltip
+                    toolTip={
+                      <div className={styles.tooltipSize}>
+                        {intl.formatMessage(globalMessages.legacyAttentionText)}
+                      </div>
+                    }
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        </button>
+          </button>
+        }
       </div>
     );
   }
