@@ -270,6 +270,7 @@ export default class WalletStore extends Store {
         publicDeriver,
         localRequest: true,
       });
+      await substore.transactions.reactToTxHistoryUpdate({ publicDeriver });
       // if after querying local history we find nothing, we just reset the DB entirely
       const txRequests = find(
         substore.transactions.transactionsRequests,
