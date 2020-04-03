@@ -1,24 +1,18 @@
 .component {
   height: 100%;
-  overflow: auto;
 
   .hero {
     min-height: 100%;
-    max-width: 1366px;
-    margin: 0 auto;
-    padding: 20px 15px;
     display: flex;
-    align-items: center;
-  }
-  
-  .heroInner {
-    display: flex;
-    position: relative;
-    z-index: 1;
-    justify-content: space-between;
-    width: 100%;
-  
     flex-direction: column;
     align-items: center;
+  }
+
+  .instructions {
+    margin-top: 143px;
+    font-family: var(--font-regular);
+    font-size: 16px;
+    line-height: 19px;
+    color: var(--cmn-default-color-grey);
   }
 }

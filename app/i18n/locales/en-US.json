@@ -580,6 +580,7 @@
   "wallet.transaction.type.multiparty": "{currency} multiparty transaction",
   "wallet.transfer.cards.byron": "Byron-era wallet",
   "wallet.transfer.cards.shelleyItn": "Shelley testnet",
+  "wallet.transfer.instruction": "Any ADA claimed will be transfered to your currently selected wallet",
   "wallet.undelegation.transaction.explanationLine1": "You do NOT need to undelegate before switching stake pools",
   "wallet.undelegation.transaction.explanationLine2": "It will take 2 epochs after the end of the current epoch for undelegation to take effect",
   "widgets.copyableaddress.addressCopyTooltipMessage": "Copy to clipboard",

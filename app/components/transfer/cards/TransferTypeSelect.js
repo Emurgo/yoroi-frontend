@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import { defineMessages, intlShape, } from 'react-intl';
 import { observer } from 'mobx-react';
 
 import TransferCards from './TransferCards';
@@ -10,20 +11,30 @@ type Props = {|
   +onShelleyItn: void => void,
 |};
 
+const messages = defineMessages({
+  instruction: {
+    id: 'wallet.transfer.instruction',
+    defaultMessage: '!!!Any ADA claimed will be transfered to your currently selected wallet',
+  },
+});
+
 @observer
 export default class TransferTypeSelect extends Component<Props> {
-  render() {
+  static contextTypes = {
+    intl: intlShape.isRequired,
+  };
 
+  render() {
+    const { intl } = this.context;
     return (
       <div className={styles.component}>
         <div className={styles.hero}>
-          <div className={styles.heroInner}>
-            <div className={styles.heroRight}>
-              <TransferCards
-                onByron={this.props.onByron}
-                onShelleyItn={this.props.onShelleyItn}
-              />
-            </div>
+          <TransferCards
+            onByron={this.props.onByron}
+            onShelleyItn={this.props.onShelleyItn}
+          />
+          <div className={styles.instructions}>
+            {intl.formatMessage(messages.instruction)}
           </div>
         </div>
       </div>
