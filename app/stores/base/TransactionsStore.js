@@ -174,8 +174,13 @@ export default class TransactionsStore extends Store {
     if (!allRequest.promise) throw new Error('should never happen');
 
     const result = await allRequest.promise;
+
+    const recentRequest = this.getTxRequests(request.publicDeriver).requests.recentRequest;
     const newHash = hashTransactions(result.transactions);
-    if (oldHash !== newHash) {
+    // only recalcualte cache if
+    // 1) the tx history changed
+    // 2) if it's the first time computing for this wallet
+    if (oldHash !== newHash || !recentRequest.wasExecuted) {
       this.reactToTxHistoryUpdate({ publicDeriver: request.publicDeriver });
     }
   };
