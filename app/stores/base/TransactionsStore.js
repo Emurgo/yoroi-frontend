@@ -1,6 +1,5 @@
 // @flow
-import BigNumber from 'bignumber.js';
-import { runInAction, reaction, observable, computed, action, } from 'mobx';
+import { runInAction, observable, computed, action, } from 'mobx';
 import { find } from 'lodash';
 import Store from './Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
