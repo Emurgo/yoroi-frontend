@@ -39,12 +39,6 @@ Feature: Main UI
     | message                                            |
     | global.copyTooltipMessage |
 
-  @it-30
-  Scenario: User can't restore Daedalus wallet in Yoroi if Yoroi wallet is not created (IT-30)
-    When There is no wallet stored
-    And I am on the transfer start screen
-    Then I see transactions buttons are disabled
-
   @serverDown @it-31
   Scenario: The networkError banner must be displayed if the server is not reachable (IT-31)
   Then I should see the networkError banner
