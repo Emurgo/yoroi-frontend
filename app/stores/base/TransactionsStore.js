@@ -1,5 +1,4 @@
 // @flow
-import BigNumber from 'bignumber.js';
 import { runInAction, observable, computed, action, } from 'mobx';
 import { find } from 'lodash';
 import Store from './Store';
@@ -81,7 +80,7 @@ export default class TransactionsStore extends Store {
     if (!publicDeriver) {
       throw new Error(`${nameof(TransactionsStore)}::${nameof(this.recentTransactionsRequest)} no wallet selected`);
     }
-    return this._getTransactionsRecentRequest(publicDeriver);
+    return this.getTxRequests(publicDeriver).requests.recentRequest;
   }
 
   /** Get (or create) the search options for the active wallet (if any)  */
@@ -98,6 +97,7 @@ export default class TransactionsStore extends Store {
     return foundSearchOptions.options;
   }
 
+
   /**
    * generate a hash of the transaction history
    * we can use this to trigger mobx updates
@@ -105,42 +105,37 @@ export default class TransactionsStore extends Store {
   @computed get hash(): number {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return 0;
-    const result = this.getTransactionsAllRequest(publicDeriver).result;
+    const result = this.getTxRequests(publicDeriver).requests.allRequest.result;
     if (result == null) return 0;
 
-    let hash = 0;
-    const seed = 858499202; // random seed
-    for (const tx of result.transactions) {
-      hash = digetForHash(hash.toString(16) + tx.uniqueKey, seed);
-    }
-    return hash;
+    return hashTransactions(result.transactions);
   }
 
   @computed get recent(): Array<WalletTransaction> {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return [];
-    const result = this._getTransactionsRecentRequest(publicDeriver).result;
+    const result = this.getTxRequests(publicDeriver).requests.recentRequest.result;
     return result ? result.transactions : [];
   }
 
   @computed get hasAny(): boolean {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return false;
-    const result = this._getTransactionsRecentRequest(publicDeriver).result;
+    const result = this.getTxRequests(publicDeriver).requests.recentRequest.result;
     return result ? result.transactions.length > 0 : false;
   }
 
   @computed get hasAnyPending(): boolean {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return false;
-    const result = this._getTransactionsPendingRequest(publicDeriver).result;
+    const result = this.getTxRequests(publicDeriver).requests.pendingRequest.result;
     return result ? result.length > 0 : false;
   }
 
   @computed get totalAvailable(): number {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return 0;
-    const result = this.getTransactionsAllRequest(publicDeriver).result;
+    const result = this.getTxRequests(publicDeriver).requests.allRequest.result;
     return result ? result.transactions.length : 0;
   }
 
@@ -164,7 +159,9 @@ export default class TransactionsStore extends Store {
       checkAddressesInUse,
       getBestBlock
     } = stateFetcher;
-    const allRequest = this.getTransactionsAllRequest(request.publicDeriver);
+    const allRequest = this.getTxRequests(request.publicDeriver).requests.allRequest;
+
+    const oldHash = hashTransactions(allRequest.result?.transactions);
     allRequest.invalidate({ immediately: false });
     allRequest.execute({
       publicDeriver,
@@ -176,42 +173,67 @@ export default class TransactionsStore extends Store {
 
     if (!allRequest.promise) throw new Error('should never happen');
 
-    await allRequest.promise
-      .then(async () => {
-        // calculate pending transactions just to cache the result
-        const pendingRequest = this._getTransactionsPendingRequest(request.publicDeriver);
-        pendingRequest.invalidate({ immediately: false });
-        pendingRequest.execute(
-          { publicDeriver }
-        );
-        if (!pendingRequest.promise) throw new Error('should never happen');
-        await pendingRequest.promise;
+    const result = await allRequest.promise;
 
-        const canGetBalance = asGetBalance(request.publicDeriver);
-        if (canGetBalance == null) {
-          return new BigNumber(0);
-        }
-        {
-          const lastUpdateDate = await this.api[environment.API].getTxLastUpdatedDate({
-            getLastSyncInfo: publicDeriver.getLastSyncInfo
-          });
-          runInAction(() => {
-            this.getTxRequests(request.publicDeriver).lastSyncInfo = lastUpdateDate;
-          });
-        }
-        // Note: cache based on last slot synced (not used in balanceRequest)
-        const req = this._getBalanceRequest(request.publicDeriver);
-        req.execute({
-          getBalance: canGetBalance.getBalance,
-        });
-        if (!req.promise) throw new Error('should never happen');
-        return req.promise;
-      })
-      .then(() => {
-        // Here we are sure that allRequest was resolved and the local database was updated
-        return this.refreshLocal(request.publicDeriver);
-      });
+    const recentRequest = this.getTxRequests(request.publicDeriver).requests.recentRequest;
+    const newHash = hashTransactions(result.transactions);
+    // only recalcualte cache if
+    // 1) the tx history changed
+    // 2) if it's the first time computing for this wallet
+    if (oldHash !== newHash || !recentRequest.wasExecuted) {
+      this.reactToTxHistoryUpdate({ publicDeriver: request.publicDeriver });
+    }
   };
+
+  @action reactToTxHistoryUpdate: {|
+    publicDeriver: PublicDeriver<>,
+  |} => Promise<void> = async (request) => {
+    const publicDeriver = asHasLevels<
+      ConceptualWallet,
+      IGetLastSyncInfo
+    >(request.publicDeriver);
+    if (publicDeriver == null) {
+      return;
+    }
+    // calculate pending transactions just to cache the result
+    {
+      const pendingRequest = this.getTxRequests(request.publicDeriver).requests.pendingRequest;
+      pendingRequest.invalidate({ immediately: false });
+      pendingRequest.execute(
+        { publicDeriver }
+      );
+      if (!pendingRequest.promise) throw new Error('should never happen');
+      await pendingRequest.promise;
+    }
+
+    // update last sync
+    {
+      const lastUpdateDate = await this.api[environment.API].getTxLastUpdatedDate({
+        getLastSyncInfo: publicDeriver.getLastSyncInfo
+      });
+      runInAction(() => {
+        this.getTxRequests(request.publicDeriver).lastSyncInfo = lastUpdateDate;
+      });
+    }
+
+    // update balance
+    await (async () => {
+      const canGetBalance = asGetBalance(publicDeriver);
+      if (canGetBalance == null) {
+        return;
+      }
+      const balanceReq = this.getTxRequests(request.publicDeriver).requests.getBalanceRequest;
+      balanceReq.invalidate({ immediately: false });
+      balanceReq.execute({
+        getBalance: canGetBalance.getBalance,
+      });
+      if (!balanceReq.promise) throw new Error('should never happen');
+      await balanceReq.promise;
+    })();
+
+    // refresh local history
+    await this.refreshLocal(request.publicDeriver);
+  }
 
   @action refreshLocal: (
     PublicDeriver<> & IGetLastSyncInfo
@@ -243,7 +265,7 @@ export default class TransactionsStore extends Store {
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
       getBestBlock: stateFetcher.getBestBlock,
     };
-    const recentRequest = this._getTransactionsRecentRequest(publicDeriver);
+    const recentRequest = this.getTxRequests(publicDeriver).requests.recentRequest;
     recentRequest.invalidate({ immediately: false });
     recentRequest.execute(requestParams); // note: different params/cache than allRequests
     if (!recentRequest.promise) throw new Error('should never happen');
@@ -257,14 +279,21 @@ export default class TransactionsStore extends Store {
   |} => void = (
     request
   ) => {
+    const foundRequest = find(this.transactionsRequests, { publicDeriver: request.publicDeriver });
+    if (foundRequest != null) {
+      return;
+    }
+    const api = this.api[environment.API];
     this.transactionsRequests.push({
       publicDeriver: request.publicDeriver,
       lastSyncInfo: request.lastSyncInfo,
       requests: {
-        recentRequest: this._getTransactionsRecentRequest(request.publicDeriver),
-        allRequest: this.getTransactionsAllRequest(request.publicDeriver),
-        getBalanceRequest: this._getBalanceRequest(request.publicDeriver),
-        pendingRequest: this._getTransactionsPendingRequest(request.publicDeriver),
+        recentRequest: new CachedRequest<GetTransactionsFunc>(api.refreshTransactions),
+        allRequest: new CachedRequest<GetTransactionsFunc>(api.refreshTransactions),
+        getBalanceRequest: new CachedRequest<GetBalanceFunc>(api.getBalance),
+        pendingRequest: new CachedRequest<RefreshPendingTransactionsFunc>(
+          api.refreshPendingTransactions
+        ),
       },
     });
     this._searchOptionsForWallets.push({
@@ -287,52 +316,15 @@ export default class TransactionsStore extends Store {
     }
     return foundRequest;
   };
+}
 
-  // TODO: delete function and use getTxRequests
-  _getTransactionsPendingRequest: (
-    PublicDeriver<>
-  ) => CachedRequest<RefreshPendingTransactionsFunc> = (
-    publicDeriver
-  ) => {
-    const foundRequest = find(this.transactionsRequests, { publicDeriver });
-    if (foundRequest && foundRequest.requests.pendingRequest) {
-      return foundRequest.requests.pendingRequest;
-    }
-    return new CachedRequest<RefreshPendingTransactionsFunc>(
-      this.api[environment.API].refreshPendingTransactions
-    );
-  };
+function hashTransactions(transactions: ?Array<WalletTransaction>): number {
+  let hash = 0;
+  if (transactions == null) return hash;
 
-  // TODO: delete function and use getTxRequests
-  _getTransactionsRecentRequest: PublicDeriver<> => CachedRequest<GetTransactionsFunc> = (
-    publicDeriver
-  ) => {
-    const foundRequest = find(this.transactionsRequests, { publicDeriver });
-    if (foundRequest && foundRequest.requests.recentRequest) {
-      return foundRequest.requests.recentRequest;
-    }
-    return new CachedRequest<GetTransactionsFunc>(this.api[environment.API].refreshTransactions);
-  };
-
-  // TODO: delete function and use getTxRequests
-  getTransactionsAllRequest: PublicDeriver<> => CachedRequest<GetTransactionsFunc> = (
-    publicDeriver
-  ) => {
-    const foundRequest = find(this.transactionsRequests, { publicDeriver });
-    if (foundRequest && foundRequest.requests.allRequest) {
-      return foundRequest.requests.allRequest;
-    }
-    return new CachedRequest<GetTransactionsFunc>(this.api[environment.API].refreshTransactions);
-  };
-
-  // TODO: delete function and use getTxRequests
-  _getBalanceRequest: (PublicDeriver<>) => CachedRequest<GetBalanceFunc> = (
-    publicDeriver
-  ) => {
-    const foundRequest = find(this.transactionsRequests, { publicDeriver });
-    if (foundRequest && foundRequest.requests.getBalanceRequest) {
-      return foundRequest.requests.getBalanceRequest;
-    }
-    return new CachedRequest<GetBalanceFunc>(this.api[environment.API].getBalance);
-  };
+  const seed = 858499202; // random seed
+  for (const tx of transactions) {
+    hash = digetForHash(hash.toString(16) + tx.uniqueKey, seed);
+  }
+  return hash;
 }

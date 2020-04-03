@@ -58,3 +58,12 @@ Feature: Txs History
     And I refresh the page
     Then I see the transactions summary
     And I should see that the number of transactions is 3
+
+  @it-96
+  Scenario: Tx from other client updates tx history (IT-96)
+    Given There is a wallet stored named many-tx-wallet
+    Given I see the transactions summary
+    Then A successful tx gets sent from my wallet from another client
+    Then I see the transactions summary
+    And I should see that the number of transactions is 7
+    Then I should see the balance number "2.290005 ADA"

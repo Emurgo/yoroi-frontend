@@ -67,7 +67,7 @@ export default class AdaTransactionsStore extends TransactionsStore {
     if (!publicDeriver) return unconfirmedAmount;
 
     // Get current transactions for public deriver
-    const result = this.getTransactionsAllRequest(publicDeriver).result;
+    const result = this.getTxRequests(publicDeriver).requests.allRequest.result;
     if (!result || !result.transactions) return unconfirmedAmount;
 
     const { assuranceMode } = this.stores.substores.ada.walletSettings
