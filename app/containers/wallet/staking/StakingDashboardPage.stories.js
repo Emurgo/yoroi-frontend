@@ -757,11 +757,12 @@ export const UnknownPool = () => {
     privatePoolInfo
   );
   const oldResult = wallet.getDelegation(wallet.publicDeriver);
-  if (oldResult == null) throw new Error('Should never happen');
+  if (oldResult == null || oldResult.stakingKeyState == null) throw new Error('Should never happen');
+  const oldStakingKeyState = oldResult.stakingKeyState;
   wallet.getDelegation = (_publicDeriver) => ({
     ...oldResult,
     stakingKeyState: {
-      ...oldResult.stakingKeyState,
+      ...oldStakingKeyState,
       poolInfo: mockPoolInfo,
     },
   });
