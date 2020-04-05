@@ -243,7 +243,7 @@
   "transfer.instructions.instructions.button.label": "Crear billetera de Yoroi",
   "transfer.instructions.instructions.text": "Antes de poder transferir fondos, debes crear una billetera de Yoroi, y hacer una copia de seguridad.<br> Al terminar, recibirás una frase de recuperación de 15 palabras que servirá para restaurar tu billetera de Yoroi en cualquier momento.",
   "transfer.instructions.instructions.title.label": "Instrucciones",
-  "transfer.legacy.daedalus.12word": "12-palabras de la billetera Daedalus",
+  "transfer.legacy.daedalus.12word": "12 palabras de la billetera Daedalus",
   "transfer.legacy.daedalus.title": "Billetera Daedalus Antigua",
   "transfer.legacy.icarus.title": "Billetera Icarus/Yoroi",
   "transfer.summary.addressFrom.label": "Desde",
