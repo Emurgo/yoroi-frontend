@@ -4,8 +4,8 @@ import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import classnames from 'classnames';
 
-import globalMessages from '../../../../i18n/global-messages';
-import ArrowDownSVG from '../../../../assets/images/expand-arrow-grey.inline.svg';
+import globalMessages from '../../../i18n/global-messages';
+import ArrowDownSVG from '../../../assets/images/expand-arrow-grey.inline.svg';
 import styles from './OptionBlock.scss';
 
 type Props = {|

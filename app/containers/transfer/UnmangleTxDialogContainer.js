@@ -6,7 +6,7 @@ import { action, computed, observable } from 'mobx';
 import { intlShape, } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
-import TransferLayout from '../../components/transfer/TransferLayout';
+import LegacyTransferLayout from '../../components/transfer/LegacyTransferLayout';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import YoroiTransferErrorPage from './YoroiTransferErrorPage';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
@@ -132,11 +132,11 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
         title={intl.formatMessage(globalMessages.processingLabel)}
         closeOnOverlayClick={false}
       >
-        <TransferLayout>
+        <LegacyTransferLayout>
           <VerticallyCenteredLayout>
             <LoadingSpinner />
           </VerticallyCenteredLayout>
-        </TransferLayout>
+        </LegacyTransferLayout>
       </Dialog>
     );
   }

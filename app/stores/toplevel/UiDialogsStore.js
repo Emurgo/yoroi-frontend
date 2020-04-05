@@ -7,7 +7,7 @@ import Store from '../base/Store';
  */
 export default class UiDialogsStore extends Store {
 
-  @observable activeDialog: ?Function = null;
+  @observable activeDialog: ?any = null;
   @observable secondsSinceActiveDialogIsOpen: number = 0;
 
   /** Arbitrary data that may be used to render the dialog */
@@ -24,10 +24,10 @@ export default class UiDialogsStore extends Store {
     this.actions.dialogs.updateDataForActiveDialog.listen(this._onUpdateDataForActiveDialog);
   }
 
-  isOpen: Function => boolean = (
-    dialog: Function
+  isOpen: any => boolean = (
+    dialog: any
   ): boolean => (this.activeDialog
-    ? this.activeDialog.name === dialog.name
+    ? this.activeDialog === dialog
     : false);
 
   getParam: <T>(number | string) => T = <T>(
@@ -40,7 +40,7 @@ export default class UiDialogsStore extends Store {
     Math.max(countDownTo - this.secondsSinceActiveDialogIsOpen, 0)
   );
 
-  @action _onOpen: {| dialog : Function, params?: Object |} => void = ({ dialog, params }) => {
+  @action _onOpen: {| dialog : any, params?: Object |} => void = ({ dialog, params }) => {
     this._reset();
     this.activeDialog = dialog;
     this.paramsForActiveDialog = params || {};

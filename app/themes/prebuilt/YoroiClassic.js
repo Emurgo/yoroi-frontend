@@ -397,6 +397,9 @@ const YoroiClassic = {
   '--theme-wallet-navigation-tab-height': '40px',
   '--theme-wallet-navigation-tab-text-color': '#6B7384',
   '--theme-wallet-navigation-tab-text-color-active': '#DAA49A',
+  '--theme-wallet-navigation-tab-text-color-hover': '#17D1AA',
+  '--theme-wallet-navigation-tab-text-color-disabled': '#C4CAD7',
+
 
   '--theme-warning-box-bg-color': 'rgba(233, 72, 61, 0.06)', // #E9483D
 

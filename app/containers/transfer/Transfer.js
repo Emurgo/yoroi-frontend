@@ -7,12 +7,13 @@ import { intlShape } from 'react-intl';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import MainLayout from '../MainLayout';
 import SidebarContainer from '../SidebarContainer';
-import TransferWithNavigation from '../../components/transfer/layouts/TransferWithNavigation';
-import type { TransferNavigationProps } from '../../components/transfer/layouts/TransferWithNavigation';
-import { ROUTES } from '../../routes-config';
+import BackgroundColoredLayout from '../../components/layout/BackgroundColoredLayout';
+import NoWalletMessage from '../../components/wallet/settings/NoWalletMessage';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import NavBarContainer from '../NavBarContainer';
 import globalMessages from '../../i18n/global-messages';
+import WalletTransferPage from './WalletTransferPage';
+import type { GeneratedData as WalletTransferPageData } from './WalletTransferPage';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import type { GeneratedData as NavBarContainerData } from '../NavBarContainer';
 
@@ -34,17 +35,6 @@ export default class Transfer extends Component<Props> {
     children: undefined,
   };
 
-  isActiveScreen : $PropertyType<TransferNavigationProps, 'isActiveNavItem'> = page => {
-    const { app } = this.generated.stores;
-    return app.currentRoute.endsWith(page);
-  };
-
-  handleTransferNavItemClick : $PropertyType<TransferNavigationProps, 'onNavItemClick'> = page => {
-    this.generated.actions.router.goToRoute.trigger({
-      route: { daedalus: ROUTES.TRANSFER.DAEDALUS, yoroi: ROUTES.TRANSFER.YOROI }[page],
-    });
-  }
-
   render() {
     const { stores } = this.generated;
     const sidebarContainer = (<SidebarContainer {...this.generated.SidebarContainerProps} />);
@@ -65,15 +55,24 @@ export default class Transfer extends Component<Props> {
         sidebar={sidebarContainer}
         connectionErrorType={checkAdaServerStatus}
         showInContainer
-        showAsCard
       >
-        <TransferWithNavigation
-          isActiveScreen={this.isActiveScreen}
-          onTransferNavItemClick={this.handleTransferNavItemClick}
-        >
-          {this.props.children}
-        </TransferWithNavigation>
+        {this.getContent()}
       </MainLayout>
+    );
+  }
+
+  getContent: void => Node = () => {
+    const wallet = this.generated.stores.wallets.selected;
+    if (wallet == null) {
+      return (<NoWalletMessage />);
+    }
+    return (
+      <BackgroundColoredLayout>
+        <WalletTransferPage
+          {...this.generated.WalletTransferPageProps}
+          publicDeriver={wallet}
+        />
+      </BackgroundColoredLayout>
     );
   }
 
@@ -93,6 +92,9 @@ export default class Transfer extends Component<Props> {
         serverConnectionStore: {
           checkAdaServerStatus: stores.substores.ada.serverConnectionStore.checkAdaServerStatus,
         },
+        wallets: {
+          selected: stores.wallets.selected,
+        }
       },
       actions: {
         router: {
@@ -104,6 +106,9 @@ export default class Transfer extends Component<Props> {
       ),
       NavBarContainerProps: (
         { actions, stores, }: InjectedOrGenerated<NavBarContainerData>
+      ),
+      WalletTransferPageProps: (
+        { actions, stores, }: InjectedOrGenerated<WalletTransferPageData>
       ),
     });
   }

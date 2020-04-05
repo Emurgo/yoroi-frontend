@@ -6,9 +6,9 @@ import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
-import OptionBlock from './OptionBlock';
+import OptionBlock from '../../../widgets/options/OptionBlock';
 
-import styles from './OptionListWrapperStyle.scss';
+import styles from '../../../widgets/options/OptionListWrapperStyle.scss';
 
 const messages = defineMessages({
   dialogTitle: {

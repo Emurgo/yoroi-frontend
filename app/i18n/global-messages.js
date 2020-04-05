@@ -511,7 +511,7 @@ const globalMessages = defineMessages({
   },
   sidebarTransfer: {
     id: 'sidebar.transfer',
-    defaultMessage: '!!!Transfer wallets',
+    defaultMessage: '!!!Claim or transfer wallet',
   },
   ledgerTitle: {
     id: 'wallet.add.optionDialog.connect.hw.ledger.title',
@@ -536,6 +536,18 @@ const globalMessages = defineMessages({
   neverSyncedMessage: {
     id: 'myWallets.wallets.neverSync',
     defaultMessage: '!!!Never synced',
+  },
+  hardwareWalletLabel: {
+    id: 'yoroiTransfer.start.instructions.hardware',
+    defaultMessage: '!!!Hardware wallet',
+  },
+  daedalusWalletLabel: {
+    id: 'daedalusTransfer.instructions.attention.button.label',
+    defaultMessage: '!!!Daedalus Wallet',
+  },
+  yoroiPaperLabel: {
+    id: 'yoroiTransfer.start.instructions.yoroiPaper',
+    defaultMessage: '!!!Yoroi paper wallet',
   },
 });
 export default globalMessages;

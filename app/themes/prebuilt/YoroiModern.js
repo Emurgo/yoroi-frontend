@@ -423,6 +423,8 @@ const YoroiModern = {
   '--theme-wallet-navigation-tab-height': '62px',
   '--theme-wallet-navigation-tab-text-color': '#6B7384',
   '--theme-wallet-navigation-tab-text-color-active': '#17D1AA',
+  '--theme-wallet-navigation-tab-text-color-hover': '#17D1AA',
+  '--theme-wallet-navigation-tab-text-color-disabled': '#C4CAD7',
 
   '--theme-warning-box-bg-color': 'rgba(255, 19, 81, 0.06)', // #FF1351
 

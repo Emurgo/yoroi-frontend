@@ -5,8 +5,6 @@ import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import validWords from 'bip39/src/wordlists/english.json';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
-import TransferLayout from '../../components/transfer/TransferLayout';
-import TransferInstructionsPage from '../../components/transfer/TransferInstructionsPage';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import DaedalusTransferFormPage from './DaedalusTransferFormPage';
 import DaedalusTransferMasterKeyFormPage from './DaedalusTransferMasterKeyFormPage';
@@ -40,24 +38,8 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
     intl: intlShape.isRequired,
   };
 
-  componentWillUnmount() {
-    this.cancelTransferFunds();
-  }
-
   goToCreateWallet: void => void = () => {
     this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
-  }
-
-  startTransferFunds: void => void = () => {
-    this._getDaedalusTransferActions().startTransferFunds.trigger();
-  }
-
-  startTransferPaperFunds: void => void = () => {
-    this._getDaedalusTransferActions().startTransferPaperFunds.trigger();
-  }
-
-  startTransferMasterKey: void => void = () => {
-    this._getDaedalusTransferActions().startTransferMasterKey.trigger();
   }
 
   setupTransferFundsWithMnemonic: {|
@@ -123,72 +105,51 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
   }
 
   render() {
-    const { wallets, profile } = this.generated.stores;
-    const adaWallets = this._getAdaWalletsStore();
+    const { profile } = this.generated.stores;
     const daedalusTransfer = this._getDaedalusTransferStore();
 
     switch (daedalusTransfer.status) {
-      case TransferStatus.UNINITIALIZED:
-        return (
-          <TransferLayout>
-            <TransferInstructionsPage
-              onFollowInstructionsPrerequisites={this.goToCreateWallet}
-              onConfirm={this.startTransferFunds}
-              onPaperConfirm={this.startTransferPaperFunds}
-              onMasterKeyConfirm={this.startTransferMasterKey}
-              disableTransferFunds={wallets.selected == null}
-            />
-          </TransferLayout>
-        );
       case TransferStatus.GETTING_MNEMONICS:
         return (
-          <TransferLayout>
-            <DaedalusTransferFormPage
-              onSubmit={this.setupTransferFundsWithMnemonic}
-              onBack={this.backToUninitialized}
-              mnemonicValidator={mnemonic => adaWallets.isValidMnemonic({
-                mnemonic,
-                numberOfWords: config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT
-              })}
-              validWords={validWords}
-              mnemonicLength={config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT}
-              classicTheme={profile.isClassicTheme}
-            />
-          </TransferLayout>
+          <DaedalusTransferFormPage
+            onSubmit={this.setupTransferFundsWithMnemonic}
+            onBack={this.backToUninitialized}
+            mnemonicValidator={mnemonic => this._getAdaWalletsStore().isValidMnemonic({
+              mnemonic,
+              numberOfWords: config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT
+            })}
+            validWords={validWords}
+            mnemonicLength={config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT}
+            classicTheme={profile.isClassicTheme}
+          />
         );
       case TransferStatus.GETTING_PAPER_MNEMONICS:
         return (
-          <TransferLayout>
-            <DaedalusTransferFormPage
-              onSubmit={this.setupTransferFundsWithMnemonic}
-              onBack={this.backToUninitialized}
-              mnemonicValidator={mnemonic => adaWallets.isValidPaperMnemonic({
-                mnemonic,
-                numberOfWords: config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT
-              })}
-              validWords={validWords}
-              mnemonicLength={config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT}
-              classicTheme={profile.isClassicTheme}
-            />
-          </TransferLayout>
+          <DaedalusTransferFormPage
+            onSubmit={this.setupTransferFundsWithMnemonic}
+            onBack={this.backToUninitialized}
+            mnemonicValidator={mnemonic => this._getAdaWalletsStore().isValidPaperMnemonic({
+              mnemonic,
+              numberOfWords: config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT
+            })}
+            validWords={validWords}
+            mnemonicLength={config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT}
+            classicTheme={profile.isClassicTheme}
+          />
         );
       case TransferStatus.GETTING_MASTER_KEY:
         return (
-          <TransferLayout>
-            <DaedalusTransferMasterKeyFormPage
-              onSubmit={this.setupTransferFundsWithMasterKey}
-              onBack={this.backToUninitialized}
-              classicTheme={profile.isClassicTheme}
-            />
-          </TransferLayout>
+          <DaedalusTransferMasterKeyFormPage
+            onSubmit={this.setupTransferFundsWithMasterKey}
+            onBack={this.backToUninitialized}
+            classicTheme={profile.isClassicTheme}
+          />
         );
       case TransferStatus.RESTORING_ADDRESSES:
       case TransferStatus.CHECKING_ADDRESSES:
       case TransferStatus.GENERATING_TX:
         return (
-          <TransferLayout>
-            <DaedalusTransferWaitingPage status={daedalusTransfer.status} />
-          </TransferLayout>
+          <DaedalusTransferWaitingPage status={daedalusTransfer.status} />
         );
       case TransferStatus.READY_TO_TRANSFER: {
         if (daedalusTransfer.transferTx == null) {
@@ -196,33 +157,29 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
         }
         const { intl } = this.context;
         return (
-          <TransferLayout>
-            <TransferSummaryPage
-              form={null}
-              formattedWalletAmount={formattedWalletAmount}
-              selectedExplorer={this.generated.stores.profile.selectedExplorer}
-              transferTx={daedalusTransfer.transferTx}
-              onSubmit={this.transferFunds}
-              isSubmitting={daedalusTransfer.transferFundsRequest.isExecuting}
-              onCancel={this.cancelTransferFunds}
-              error={daedalusTransfer.error}
-              dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
-            />
-          </TransferLayout>
+          <TransferSummaryPage
+            form={null}
+            formattedWalletAmount={formattedWalletAmount}
+            selectedExplorer={this.generated.stores.profile.selectedExplorer}
+            transferTx={daedalusTransfer.transferTx}
+            onSubmit={this.transferFunds}
+            isSubmitting={daedalusTransfer.transferFundsRequest.isExecuting}
+            onCancel={this.cancelTransferFunds}
+            error={daedalusTransfer.error}
+            dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
+          />
         );
       }
       case TransferStatus.ERROR:
         return (
-          <TransferLayout>
-            <DaedalusTransferErrorPage
-              error={daedalusTransfer.error}
-              onCancel={this.cancelTransferFunds}
-              classicTheme={profile.isClassicTheme}
-            />
-          </TransferLayout>
+          <DaedalusTransferErrorPage
+            error={daedalusTransfer.error}
+            onCancel={this.cancelTransferFunds}
+            classicTheme={profile.isClassicTheme}
+          />
         );
       default:
-        throw new Error('DaedalusTransferPage Unexpected state ' + daedalusTransfer.status);
+        return null;
     }
   }
 
@@ -299,9 +256,6 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
             setupTransferFundsWithMnemonic: {
               trigger: daedalusTransfer.setupTransferFundsWithMnemonic.trigger
             },
-            startTransferFunds: { trigger: daedalusTransfer.startTransferFunds.trigger },
-            startTransferPaperFunds: { trigger: daedalusTransfer.startTransferPaperFunds.trigger },
-            startTransferMasterKey: { trigger: daedalusTransfer.startTransferMasterKey.trigger },
           },
         },
       },

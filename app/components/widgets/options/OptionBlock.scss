@@ -123,24 +123,31 @@
         }
         
         .optionImage {
+          &.legacyDaedalus {
+            background-image: url(../../../assets/images/add-wallet/option-dialog/daedalus-modern.inline.svg);
+            background-position-y: 20px;
+          }
+          &.masterKey {
+            background-image: url(../../../assets/images/add-wallet/option-dialog/Master_key.inline.svg);
+          }
           // CONNECT HARDWARE WALLET
           &.connectLedger {
-            background-image: url(../../../../assets/images/add-wallet/option-dialog/connect-ledger-classic.inline.svg);
+            background-image: url(../../../assets/images/add-wallet/option-dialog/connect-ledger-classic.inline.svg);
           }
 
           &.connectTrezor {
-            background-image: url(../../../../assets/images/add-wallet/option-dialog/connect-trezor-classic.inline.svg);
+            background-image: url(../../../assets/images/add-wallet/option-dialog/connect-trezor-classic.inline.svg);
           }
 
           // CREATE WALLET [NOT YET]
 
           // RESTORE WALLET
           &.restoreNormalWallet {
-            background-image: url(../../../../assets/images/add-wallet/option-dialog/restore-normal-wallet-classic.inline.svg);
+            background-image: url(../../../assets/images/add-wallet/option-dialog/restore-normal-wallet-classic.inline.svg);
           }
         
           &.restorePaperWallet {
-            background-image: url(../../../../assets/images/add-wallet/option-dialog/restore-paper-wallet-classic.inline.svg);
+            background-image: url(../../../assets/images/add-wallet/option-dialog/restore-paper-wallet-classic.inline.svg);
           }
         }
       }
@@ -159,24 +166,31 @@
         }
 
         .optionImage {
+          &.legacyDaedalus {
+            background-image: url(../../../assets/images/add-wallet/option-dialog/daedalus-modern.inline.svg);
+            background-position-y: 20px;
+          }
+          &.masterKey {
+            background-image: url(../../../assets/images/add-wallet/option-dialog/Master_key.inline.svg);
+          }
           // CONNECT HARDWARE WALLET
           &.connectLedger {
-            background-image: url(../../../../assets/images/add-wallet/option-dialog/connect-ledger-modern.inline.svg);
+            background-image: url(../../../assets/images/add-wallet/option-dialog/connect-ledger-modern.inline.svg);
           }
       
           &.connectTrezor {
-            background-image: url(../../../../assets/images/add-wallet/option-dialog/connect-trezor-modern.inline.svg);
+            background-image: url(../../../assets/images/add-wallet/option-dialog/connect-trezor-modern.inline.svg);
           }
 
           // CREATE WALLET [NOT ANY YET]
 
           // RESTORE WALLET
           &.restoreNormalWallet {
-            background-image: url(../../../../assets/images/add-wallet/option-dialog/restore-normal-wallet-modern.inline.svg);
+            background-image: url(../../../assets/images/add-wallet/option-dialog/restore-normal-wallet-modern.inline.svg);
           }
         
           &.restorePaperWallet {
-            background-image: url(../../../../assets/images/add-wallet/option-dialog/restore-paper-wallet-modern.inline.svg);
+            background-image: url(../../../assets/images/add-wallet/option-dialog/restore-paper-wallet-modern.inline.svg);
           }
         }
       }

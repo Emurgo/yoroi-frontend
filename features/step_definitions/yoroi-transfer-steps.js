@@ -11,14 +11,27 @@ import {
   checkTotalAmountIsCorrect
 } from '../support/helpers/transfer-helpers';
 
-Given(/^I am on the Yoroi Transfer start screen$/, async function () {
-  await navigateTo.call(this, '/transfer/yoroi');
-  await waitUntilUrlEquals.call(this, '/transfer/yoroi');
-  await this.waitForElement('.yoroiTransferStartPageComponent');
+Given(/^I am on the transfer start screen$/, async function () {
+  await navigateTo.call(this, '/transfer');
+  await waitUntilUrlEquals.call(this, '/transfer');
 });
 
-When(/^I click on the standardMnemonic button on the Yoroi Transfer start screen$/, async function () {
-  await this.click('.standardMnemonic');
+When(/^I click on the byron button on the transfer screen$/, async function () {
+  await this.click('.TransferCards_byronEra');
+});
+Then(/^I click on the icarus tab$/, async function () {
+  await this.click('.IcarusTab');
+});
+Then(/^I select the 15-word option$/, async function () {
+  await this.click('.fromIcarusWallet15Word_restoreNormalWallet');
+});
+Then(/^I select the yoroi paper wallet option$/, async function () {
+  await this.click('.fromIcarusPaperWallet_restorePaperWallet');
+});
+Then(/^I select the trezor option$/, async function () {
+  await this.click('.fromTrezor_connectTrezor');
+  await this.click('.SimpleCheckbox_check');
+  await this.click('.primary');
 });
 When(/^I click on the yoroiPaper button on the Yoroi Transfer start screen$/, async function () {
   await this.click('.yoroiPaper');
@@ -46,8 +59,8 @@ Then(/^I should see the Yoroi transfer success screen$/, async function () {
   await this.waitUntilText('.SuccessPage_title', successPageTitle.toUpperCase());
 });
 
-Then(/^I should see the next button on the Yoroi transfer start screen disabled$/, async function () {
-  await this.waitDisable('.YoroiTransferStartPage_button.next');
+Then(/^I should see the transfer screen disabled$/, async function () {
+  await this.waitForElement('.NoWalletMessage_component');
 });
 
 Then(/^I should see the "CREATE YOROI WALLET" button disabled$/, async function () {

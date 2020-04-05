@@ -1,17 +1,33 @@
 // @flow
 
 import { select, } from '@storybook/addon-knobs';
+import type { Node } from 'react';
+import React from 'react';
+import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { action } from '@storybook/addon-actions';
+import { withScreenshot } from 'storycap';
+import type { GeneratedData as YoroiTransferPageData } from './YoroiTransferPage';
+import type { GeneratedData as DaedalusTransferPageData } from './DaedalusTransferPage';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import WalletSettingsStore from '../../stores/base/WalletSettingsStore';
 import TransactionsStore from '../../stores/base/TransactionsStore';
 import DelegationStore from '../../stores/ada/DelegationStore';
 import WalletStore from '../../stores/toplevel/WalletStore';
 import type { GeneratedData } from './Transfer';
+import Transfer from './Transfer';
+
+export default {
+  title: `${__filename.split('.')[0]}`,
+  component: Transfer,
+  decorators: [withScreenshot],
+};
 
 export const mockTransferProps: {
   selected: null | PublicDeriver<>,
+  dialog?: any,
+  YoroiTransferPageProps?: YoroiTransferPageData,
+  DaedalusTransferPageProps?: DaedalusTransferPageData,
   publicDerivers: Array<PublicDeriver<>>,
   getConceptualWalletSettingsCache:
     typeof WalletSettingsStore.prototype.getConceptualWalletSettingsCache,
@@ -35,7 +51,10 @@ export const mockTransferProps: {
           ServerStatusErrors,
           ServerStatusErrors.Healthy,
         ),
-      }
+      },
+      wallets: {
+        selected: request.selected,
+      },
     },
     actions: {
       router: {
@@ -101,5 +120,63 @@ export const mockTransferProps: {
         },
       }
     },
+    WalletTransferPageProps: {
+      generated: {
+        stores: {
+          uiDialogs: {
+            isOpen: (dialog) => dialog === request.dialog,
+            getParam: () => (null: any),
+          },
+        },
+        actions: {
+          router: {
+            goToRoute: { trigger: action('goToRoute'), },
+          },
+          dialogs: {
+            closeActiveDialog: {
+              trigger: action('closeActiveDialog'),
+            },
+            open: { trigger: action('open'), },
+          },
+          ada: {
+            yoroiTransfer: {
+              startTransferFunds: { trigger: action('startTransferFunds') },
+            },
+          },
+        },
+        ByronEraOptionDialogContainerProps: {
+          generated: {
+            actions: {
+              ada: {
+                daedalusTransfer: {
+                  startTransferFunds: { trigger: action('startTransferFunds') },
+                  startTransferPaperFunds: { trigger: action('startTransferPaperFunds') },
+                  startTransferMasterKey: { trigger: action('startTransferMasterKey') },
+                },
+                yoroiTransfer: {
+                  startTransferLegacyHardwareFunds: {
+                    trigger: action('startTransferLegacyHardwareFunds')
+                  },
+                  startTransferPaperFunds: { trigger: action('startTransferPaperFunds') },
+                  startTransferFunds: { trigger: action('startTransferFunds') },
+                },
+              },
+            },
+          },
+        },
+        YoroiTransferPageProps: request.YoroiTransferPageProps
+          ? { generated: request.YoroiTransferPageProps }
+          : null,
+        DaedalusTransferPageProps: request.DaedalusTransferPageProps
+          ? { generated: request.DaedalusTransferPageProps }
+          : null,
+      },
+    },
   },
 });
+
+export function wrapTransfer(
+  transferProps: InjectedOrGenerated<GeneratedData>,
+): Node {
+  return (<Transfer {...transferProps} />);
+}

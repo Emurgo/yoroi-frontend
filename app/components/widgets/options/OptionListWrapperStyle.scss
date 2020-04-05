@@ -1,25 +1,30 @@
-// [NOT USED YET] TABS HEADER
 .tabsHeader {
   font-family: var(--font-regular);
   display: flex;
   justify-content: center;
-  margin-bottom: 35px;
-  margin-top: 10px;
+  margin-bottom: 5px;
 }
 
-// [NOT USED YET] TABS LINK
 .tabsLink {
   padding: 5px 0;
   position: relative;
   cursor: pointer;
-  margin: 0 50px;
-  opacity: .5;
-  color: var(--tab-link-text-color);
+  margin: 0 20px;
   font-size: var(--tab-link-text-size);
+  font-family: var(--font-regular);
   line-height: var(--tab-link-line-height);
   
   &.active {
-    opacity: 1;
+    color: var(--theme-wallet-navigation-tab-text-color-active);
+    font-family: var(--font-medium);
+  }
+
+  &:hover {
+    color: var(--theme-wallet-navigation-tab-text-color-hover);
+  }
+
+  &:disabled {
+    color: var(--theme-wallet-navigation-tab-text-color-disabled);
   }
 
   &.active::after {
@@ -42,4 +47,8 @@
   padding: 10px 0 0 0;
   max-width: 480px;
   min-width: 100%;
+  // the size of 3 options
+  // use this to make sure the size of the options dialog doesn't change
+  // even if more options are present in a different tab
+  max-height: 514px;
 }
