@@ -227,7 +227,7 @@
   "settings.support.reportProblem.link": "Support-Anfrage",
   "settings.support.reportProblem.title": "Ein Problem melden",
   "sidebar.settings": "Einstellungen",
-  "sidebar.transfer": "Claim / Transfer",
+  "sidebar.transfer": "Einfordern / Übertragen",
   "sidebar.wallets": "Meine Wallets",
   "testnet.label.message": "WARNUNG: Dies ist ein {network}-Netzwerk. ADA hat hier keinen echten Geldwert. Weitere Informationen hierzu findest Du in den FAQ unter {faqLink}",
   "testnet.shelley.label.message": "DU BIST IM TESTNETZ NETZWERK ({network}).",
