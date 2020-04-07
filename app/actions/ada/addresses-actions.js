@@ -1,9 +1,12 @@
 // @flow
-import Action from '../lib/Action';
+import { AsyncAction, Action } from '../lib/Action';
+import {
+  PublicDeriver,
+} from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 // ======= ADDRESSES ACTIONS =======
 
 export default class AddressesActions {
-  createAddress: Action<void> = new Action();
+  createAddress: AsyncAction<PublicDeriver<>> = new AsyncAction();
   resetErrors: Action<void> = new Action();
 }

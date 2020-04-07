@@ -14,6 +14,7 @@ import type { AdaPaper } from '../../../../api/ada';
 import WalletAccountIcon from '../../../topbar/WalletAccountIcon';
 import ExplorableHashContainer from '../../../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../../../domain/Explorer';
+import type { Notification } from '../../../../types/notificationType';
 
 const messages = defineMessages({
   dialogTitleFinalizePaper: {
@@ -43,14 +44,13 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onCopyAddressTooltip: Function,
-  getNotification: Function,
-  selectedExplorer: ExplorerType,
-  paper: AdaPaper,
-  onNext: Function,
-  onCancel: Function,
-  onBack?: Function,
-  classicTheme: boolean,
+  +onCopyAddressTooltip: (string, string) => void,
+  +notification: ?Notification,
+  +selectedExplorer: ExplorerType,
+  +paper: AdaPaper,
+  +onNext: void => PossiblyAsync<void>,
+  +onCancel: void => PossiblyAsync<void>,
+  +onBack?: void => PossiblyAsync<void>,
 |};
 
 @observer
@@ -70,9 +70,8 @@ export default class FinalizeDialog extends Component<Props> {
       onCancel,
       onNext,
       onBack,
-      classicTheme,
       onCopyAddressTooltip,
-      getNotification,
+      notification,
     } = this.props;
 
     const dialogClasses = classnames(['finalizeDialog', styles.dialog]);
@@ -96,7 +95,6 @@ export default class FinalizeDialog extends Component<Props> {
         className={dialogClasses}
         backButton={onBack && <DialogBackButton onBack={onBack} />}
         closeButton={<DialogCloseButton onClose={onCancel} />}
-        classicTheme={classicTheme}
       >
 
         <span>{intl.formatMessage(messages.paperFinalizeIntroLine1)}</span><br />
@@ -133,8 +131,8 @@ export default class FinalizeDialog extends Component<Props> {
               <CopyableAddress
                 hash={address}
                 elementId={notificationElementId}
-                onCopyAddress={onCopyAddressTooltip.bind(this, address, notificationElementId)}
-                getNotification={getNotification}
+                onCopyAddress={() => onCopyAddressTooltip(address, notificationElementId)}
+                notification={notification}
                 tooltipOpensUpward
                 key={address}
               >

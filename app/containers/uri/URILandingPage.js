@@ -1,52 +1,85 @@
 // @flow
 import React, { Component } from 'react';
+import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import { ROUTES } from '../../routes-config';
-import environment from '../../environment';
-import type { InjectedProps } from '../../types/injectedPropsType';
-import Wallet from '../../domain/Wallet';
+import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import URILandingDialogContainer from './URILandingDialogContainer';
+import type { GeneratedData as URILandingDialogContainerData } from './URILandingDialogContainer';
 
-type Props = InjectedProps;
+export type GeneratedData = typeof URILandingPage.prototype.generated;
 
 @observer
-export default class URILandingPage extends Component<Props> {
+export default class URILandingPage extends Component<InjectedOrGenerated<GeneratedData>> {
 
-  onClose = () => {
-    this.props.actions.dialogs.closeActiveDialog.trigger();
-    this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS });
-    this.props.stores.loading.resetUriParams();
+  onClose: void => void = () => {
+    this.generated.actions.dialogs.closeActiveDialog.trigger();
+    this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS });
+    this.generated.stores.loading.resetUriParams();
   };
 
-  onConfirm = () => {
-    const { wallets } = this.props.stores.substores[environment.API];
+  onConfirm: void => void = () => {
+    const { wallets } = this.generated.stores;
     let params = {};
     if (wallets.hasAnyWallets && wallets.first) {
-      const firstWallet: Wallet = wallets.first;
-      params = { id: firstWallet.id };
+      const firstWallet = wallets.first;
+      params = { id: firstWallet.getPublicDeriverId() };
     }
     // this will automatically reroute to the right page if no wallet exists
-    this.props.actions.router.goToRoute.trigger({
+    this.generated.actions.router.goToRoute.trigger({
       route: ROUTES.WALLETS.SEND,
       params,
     });
   }
 
   render() {
-
-    const { actions, stores } = this.props;
-    const { profile, loading } = this.props.stores;
-
     return (
       <URILandingDialogContainer
-        actions={actions}
-        stores={stores}
+        {...this.generated.URILandingDialogContainerProps}
         onConfirm={this.onConfirm}
         onClose={this.onClose}
-        uriParams={loading.uriParams}
-        classicTheme={profile.isClassicTheme}
       />
     );
+  }
+
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(URILandingDialogContainer)} no way to generated props`);
+    }
+    const { actions, stores, } = this.props;
+    return Object.freeze({
+      stores: {
+        profile: {
+          isClassicTheme: stores.profile.isClassicTheme,
+        },
+        loading: {
+          uriParams: stores.loading.uriParams,
+          resetUriParams: stores.loading.resetUriParams,
+        },
+        wallets: {
+          hasAnyWallets: stores.wallets.hasAnyWallets,
+          first: stores.wallets.first,
+        },
+      },
+      actions: {
+        dialogs: {
+          closeActiveDialog: {
+            trigger: actions.dialogs.closeActiveDialog.trigger,
+          },
+        },
+        router: {
+          goToRoute: {
+            trigger: actions.router.goToRoute.trigger,
+          },
+        },
+      },
+      URILandingDialogContainerProps: (
+        { stores, actions }: InjectedOrGenerated<URILandingDialogContainerData>
+      )
+    });
   }
 
 }

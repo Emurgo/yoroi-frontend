@@ -5,13 +5,28 @@
     "websocketUrl": "ws://localhost:8080",
     "name": "test"
   },
+  "seiza": {
+    "simpleTemplate": "",
+    "advanceTemplate": ""
+  },
   "app": {
     "walletRefreshInterval": 2000,
     "serverStatusRefreshInterval": 2000,
     "logsBufferSize": 500,
     "logsFileSuffix": "-yoroi.log",
-    "addressScanSize": 20,
     "addressRequestSize": 50,
     "txsBodiesRequestSize": 150
+  },
+  "genesis": {
+    "block0_date": 0,
+    "slots_per_epoch": 21600,
+    "slot_duration": 20,
+    "epoch_reward": 21414,
+    "linearFee": {
+      "constant": "2",
+      "coefficient": "1",
+      "certificate": "4"
+    },
+    "genesisHash": "c511043dda377d7764d9f01d721ddea323f2a01b1e89f62c8ee587a65d7a1487"
   }
 }

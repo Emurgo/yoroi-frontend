@@ -33,14 +33,13 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
-  onSubmit: void => void,
-  onBack: void => void,
-  onCancel: void => void,
-  uriParams: UriParams,
-  classicTheme: boolean,
-  selectedExplorer: ExplorerType,
-};
+type Props = {|
+  +onSubmit: void => void,
+  +onBack: void => void,
+  +onCancel: void => void,
+  +uriParams: UriParams,
+  +selectedExplorer: ExplorerType,
+|};
 
 @observer
 export default class URIVerifyDialog extends Component<Props> {
@@ -50,7 +49,7 @@ export default class URIVerifyDialog extends Component<Props> {
   };
 
   render() {
-    const { onCancel, onSubmit, classicTheme } = this.props;
+    const { onCancel, onSubmit, } = this.props;
     const { intl } = this.context;
 
     const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
@@ -80,7 +79,6 @@ export default class URIVerifyDialog extends Component<Props> {
         title={intl.formatMessage(messages.uriVerifyTitle)}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
-        classicTheme={classicTheme}
         onClose={onCancel}
         backButton={<DialogBackButton onBack={this.props.onBack} />}
       >
@@ -101,7 +99,7 @@ export default class URIVerifyDialog extends Component<Props> {
         </div>
         <div>
           <h2 className={styles.label}>
-            {intl.formatMessage(globalMessages.walletSendConfirmationAmountLabel)}:
+            {intl.formatMessage(globalMessages.amountLabel)}:
           </h2>
           <span className={styles.amount}>
             {formattedWalletAmount(this.props.uriParams.amount)} {currency}

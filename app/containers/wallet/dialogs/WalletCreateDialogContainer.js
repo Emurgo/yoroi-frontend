@@ -1,26 +1,54 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import { computed } from 'mobx';
 import WalletCreateDialog from '../../../components/wallet/WalletCreateDialog';
-import type { InjectedDialogContainerProps } from '../../../types/injectedPropsType';
+import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import environment from '../../../environment';
 
-type Props = InjectedDialogContainerProps;
+export type GeneratedData = typeof WalletCreateDialogContainer.prototype.generated;
+
+type Props = {|
+  ...InjectedOrGenerated<GeneratedData>,
+  +onClose: void => void,
+|};
 
 @observer
 export default class WalletCreateDialogContainer extends Component<Props> {
 
-  onSubmit = (values: { name: string, password: string }) => {
-    this.props.actions[environment.API].wallets.createWallet.trigger(values);
-  };
-
   render() {
     return (
       <WalletCreateDialog
-        classicTheme={this.props.classicTheme}
-        onSubmit={this.onSubmit}
+        classicTheme={this.generated.stores.profile.isClassicTheme}
+        onSubmit={this.generated.actions[environment.API].wallets.createWallet.trigger}
         onCancel={this.props.onClose}
       />
     );
+  }
+
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(WalletCreateDialogContainer)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    return Object.freeze({
+      stores: {
+        profile: {
+          isClassicTheme: stores.profile.isClassicTheme,
+        },
+      },
+      actions: {
+        ada: {
+          wallets: {
+            createWallet: {
+              trigger: actions.ada.wallets.createWallet.trigger,
+            },
+          },
+        },
+      },
+    });
   }
 }

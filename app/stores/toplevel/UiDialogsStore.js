@@ -7,7 +7,7 @@ import Store from '../base/Store';
  */
 export default class UiDialogsStore extends Store {
 
-  @observable activeDialog: ?Function = null;
+  @observable activeDialog: ?any = null;
   @observable secondsSinceActiveDialogIsOpen: number = 0;
 
   /** Arbitrary data that may be used to render the dialog */
@@ -16,24 +16,31 @@ export default class UiDialogsStore extends Store {
 
   _secondsTimerInterval: ?IntervalID = null;
 
-  setup() {
+  setup(): void {
+    super.setup();
     this.actions.dialogs.open.listen(this._onOpen);
     this.actions.dialogs.closeActiveDialog.listen(this._onClose);
     this.actions.dialogs.resetActiveDialog.listen(this._reset);
     this.actions.dialogs.updateDataForActiveDialog.listen(this._onUpdateDataForActiveDialog);
   }
 
-  isOpen = (dialog: Function): boolean => (this.activeDialog
-    ? this.activeDialog.name === dialog.name
+  isOpen: any => boolean = (
+    dialog: any
+  ): boolean => (this.activeDialog
+    ? this.activeDialog === dialog
     : false);
 
-  getParam = (key: string): string => this.paramsForActiveDialog[key];
+  getParam: <T>(number | string) => T = <T>(
+    key: (number | string)
+  ): T => this.paramsForActiveDialog[key];
 
-  countdownSinceDialogOpened = (countDownTo: number) => (
+  countdownSinceDialogOpened: number => number = (
+    countDownTo: number
+  ): number => (
     Math.max(countDownTo - this.secondsSinceActiveDialogIsOpen, 0)
   );
 
-  @action _onOpen = ({ dialog, params } : { dialog : Function, params?: Object }) => {
+  @action _onOpen: {| dialog : any, params?: Object |} => void = ({ dialog, params }) => {
     this._reset();
     this.activeDialog = dialog;
     this.paramsForActiveDialog = params || {};
@@ -43,19 +50,19 @@ export default class UiDialogsStore extends Store {
     this._secondsTimerInterval = setInterval(this._updateSeconds, 1000);
   };
 
-  @action _onClose = () => {
+  @action _onClose: void => void = () => {
     this._reset();
   };
 
-  @action _updateSeconds = () => {
+  @action _updateSeconds: void => void = () => {
     this.secondsSinceActiveDialogIsOpen += 1;
   };
 
-  @action _onUpdateDataForActiveDialog = ({ data } : { data: Object }) => {
+  @action _onUpdateDataForActiveDialog: { [key: string]: any, ... } => void = ({ data }) => {
     Object.assign(this.dataForActiveDialog, data);
   };
 
-  @action _reset = () => {
+  @action _reset: void => void = () => {
     this.activeDialog = null;
     this.secondsSinceActiveDialogIsOpen = 0;
     this.dataForActiveDialog = {};

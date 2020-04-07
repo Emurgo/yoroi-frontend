@@ -2,6 +2,11 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
+import type { TransferStatusT } from '../../types/TransferTypes';
+import { TransferStatus } from '../../types/TransferTypes';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import Dialog from '../../components/widgets/Dialog';
+
 import AnnotatedLoader from '../../components/transfer/AnnotatedLoader';
 
 const messages = defineMessages({
@@ -24,7 +29,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  status: string
+  +status: TransferStatusT
 |};
 
 @observer
@@ -39,10 +44,29 @@ export default class YoroiTransferWaitingPage extends Component<Props> {
     const { status } = this.props;
 
     return (
-      <AnnotatedLoader
-        title={intl.formatMessage(messages.title)}
-        details={intl.formatMessage(messages[status])}
-      />
+      <Dialog
+        closeOnOverlayClick={false}
+      >
+        <AnnotatedLoader
+          title={intl.formatMessage(messages.title)}
+          details={this.getMessage(intl, status)}
+        />
+      </Dialog>
     );
+  }
+
+  getMessage(
+    intl: $npm$ReactIntl$IntlFormat,
+    status: TransferStatusT,
+  ): string {
+    switch (status) {
+      case TransferStatus.RESTORING_ADDRESSES:
+        return intl.formatMessage(messages.restoringAddresses);
+      case TransferStatus.CHECKING_ADDRESSES:
+        return intl.formatMessage(messages.checkingAddresses);
+      case TransferStatus.GENERATING_TX:
+        return intl.formatMessage(messages.generatingTx);
+      default: throw new Error('TransferWaitingPage::getMessage unexpected status');
+    }
   }
 }

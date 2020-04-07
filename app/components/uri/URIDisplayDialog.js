@@ -10,6 +10,7 @@ import DialogBackButton from '../widgets/DialogBackButton';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import WarningBox from '../widgets/WarningBox';
 import CopyableAddress from '../widgets/CopyableAddress';
+import type { Notification } from '../../types/notificationType';
 
 import styles from './URIDisplayDialog.scss';
 
@@ -28,15 +29,14 @@ const messages = defineMessages({
   }
 });
 
-type Props = {
-  onClose: void => void,
-  classicTheme: boolean,
-  getNotification: Function,
-  onCopyAddressTooltip: Function,
-  onBack: void => void,
-  address: string,
-  amount: number,
-};
+type Props = {|
+  +onClose: void => void,
+  +notification: ?Notification,
+  +onCopyAddressTooltip: string => void,
+  +onBack: void => void,
+  +address: string,
+  +amount: number,
+|};
 
 @observer
 export default class URIDisplayDialog extends Component<Props> {
@@ -49,8 +49,7 @@ export default class URIDisplayDialog extends Component<Props> {
     const {
       onClose,
       onBack,
-      classicTheme,
-      getNotification,
+      notification,
       onCopyAddressTooltip,
       address,
       amount,
@@ -79,7 +78,6 @@ export default class URIDisplayDialog extends Component<Props> {
         className={classnames([styles.component, 'URIDisplayDialog'])}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
-        classicTheme={classicTheme}
         onClose={onClose}
         backButton={<DialogBackButton onBack={onBack} />}
       >
@@ -96,8 +94,8 @@ export default class URIDisplayDialog extends Component<Props> {
           <CopyableAddress
             hash={uri}
             elementId={uriNotificationId}
-            onCopyAddress={onCopyAddressTooltip.bind(this, uriNotificationId)}
-            getNotification={getNotification}
+            onCopyAddress={() => onCopyAddressTooltip(uriNotificationId)}
+            notification={notification}
             tooltipOpensUpward
           >
             <span className={styles.uri}>{uri}</span>

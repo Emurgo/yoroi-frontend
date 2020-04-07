@@ -5,9 +5,9 @@ import { defineMessages, intlShape } from 'react-intl';
 
 import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
-import OptionBlock from './OptionBlock';
+import OptionBlock from '../../../widgets/options/OptionBlock';
 
-import styles from './OptionListWrapperStyle.scss';
+import styles from '../../../widgets/options/OptionListWrapperStyle.scss';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -33,10 +33,9 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onCancel: Function,
-  onRestore: Function,
-  onPaperRestore: Function,
-  classicTheme: boolean
+  +onCancel: void => void,
+  +onRestore: void => void,
+  +onPaperRestore: void => void,
 |};
 
 @observer
@@ -47,7 +46,7 @@ export default class WalletRestoreOptionDialog extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onCancel, onRestore, onPaperRestore, classicTheme } = this.props;
+    const { onCancel, onRestore, onPaperRestore, } = this.props;
 
     return (
       <Dialog
@@ -55,7 +54,6 @@ export default class WalletRestoreOptionDialog extends Component<Props> {
         closeOnOverlayClick={false}
         onClose={onCancel}
         closeButton={<DialogCloseButton />}
-        classicTheme={classicTheme}
         className="WalletRestoreOptionDialog"
       >
         <div className={styles.component}>

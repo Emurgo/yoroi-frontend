@@ -80,6 +80,18 @@ const messages = defineMessages({
     id: 'api.errors.getTxHistoryForAddressesApiError',
     defaultMessage: '!!!Error received from server while getting txs.',
   },
+  getRewardHistoryApiError: {
+    id: 'api.errors.getRewardHistoryApiError',
+    defaultMessage: '!!!Error received from server while getting reward history.',
+  },
+  rollbackApiError: {
+    id: 'api.errors.rollbackApiError',
+    defaultMessage: '!!!Rollback was detected.',
+  },
+  getBestBlockApiError: {
+    id: 'api.errors.getBestBlockApiError',
+    defaultMessage: '!!!Error received from server while getting best block.',
+  },
   sendTransactionApiError: {
     id: 'api.errors.sendTransactionApiError',
     defaultMessage: '!!!Error received from server while sending tx.',
@@ -87,6 +99,18 @@ const messages = defineMessages({
   checkAdressesInUseApiError: {
     id: 'api.errors.checkAdressesInUseApiError',
     defaultMessage: '!!!Error received from server while checking used addresses.',
+  },
+  getAccountStateApiError: {
+    id: 'api.errors.getAccountStateApiError',
+    defaultMessage: '!!!Error received from server while getting account state.',
+  },
+  getPoolInfoApiError: {
+    id: 'api.errors.getPoolInfoApiError',
+    defaultMessage: '!!!Error received from server while getting pool info.',
+  },
+  getReputationError: {
+    id: 'api.errors.getReputationError',
+    defaultMessage: '!!!Error received from server while getting reputation.',
   },
   invalidWitnessError: {
     id: 'api.errors.invalidWitnessError',
@@ -273,6 +297,33 @@ export class GetTxHistoryForAddressesApiError extends LocalizableError {
   }
 }
 
+export class GetRewardHistoryApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getRewardHistoryApiError.id,
+      defaultMessage: messages.getRewardHistoryApiError.defaultMessage || '',
+    });
+  }
+}
+
+export class RollbackApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.rollbackApiError.id,
+      defaultMessage: messages.rollbackApiError.defaultMessage || '',
+    });
+  }
+}
+
+export class GetBestBlockError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getBestBlockApiError.id,
+      defaultMessage: messages.getBestBlockApiError.defaultMessage || '',
+    });
+  }
+}
+
 export class SendTransactionApiError extends LocalizableError {
   constructor() {
     super({
@@ -287,6 +338,33 @@ export class CheckAdressesInUseApiError extends LocalizableError {
     super({
       id: messages.checkAdressesInUseApiError.id,
       defaultMessage: messages.checkAdressesInUseApiError.defaultMessage || '',
+    });
+  }
+}
+
+export class GetAccountStateApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getAccountStateApiError.id,
+      defaultMessage: messages.getAccountStateApiError.defaultMessage || '',
+    });
+  }
+}
+
+export class GetPoolInfoApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getPoolInfoApiError.id,
+      defaultMessage: messages.getPoolInfoApiError.defaultMessage || '',
+    });
+  }
+}
+
+export class GetReputationError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getReputationError.id,
+      defaultMessage: messages.getReputationError.defaultMessage || '',
     });
   }
 }

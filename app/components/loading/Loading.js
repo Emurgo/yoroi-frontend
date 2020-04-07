@@ -1,14 +1,13 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import SvgInline from 'react-svg-inline';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 import LoadingSpinner from '../widgets/LoadingSpinner';
-import adaLogo from '../../assets/images/ada-logo.inline.svg';
-import cardanoLogo from '../../assets/images/cardano-logo.inline.svg';
-import yoroiLogo from '../../assets/images/yoroi-logo-shape-white.inline.svg';
+import AdaLogo from '../../assets/images/ada-logo.inline.svg';
+import CardanoLogo from '../../assets/images/cardano-logo.inline.svg';
+import YoroiLogo from '../../assets/images/yoroi-logo-shape-white.inline.svg';
 import styles from './Loading.scss';
 import LocalizableError from '../../i18n/LocalizableError';
 import globalMessages from '../../i18n/global-messages';
@@ -25,13 +24,13 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  api: string,
-  isLoadingDataForNextScreen: boolean,
-  hasLoadedCurrentLocale: boolean,
-  hasLoadedCurrentTheme: boolean,
-  error: ?LocalizableError,
-  onExternalLinkClick: Function,
-  downloadLogs: Function
+  +api: string,
+  +isLoadingDataForNextScreen: boolean,
+  +hasLoadedCurrentLocale: boolean,
+  +hasLoadedCurrentTheme: boolean,
+  +error: ?LocalizableError,
+  +onExternalLinkClick: MouseEvent => void,
+  +downloadLogs: void => void
 |};
 
 @observer
@@ -53,10 +52,10 @@ export default class Loading extends Component<Props> {
 
     const componentStyles = classNames([
       styles.component,
-      hasLoadedCurrentTheme ? null : styles['is-loading-theme']
     ]);
     const yoroiLogoStyles = classNames([
-      styles.yoroiLogo
+      styles.yoroiLogo,
+      hasLoadedCurrentTheme ? null : styles.hide,
     ]);
     const currencyLogoStyles = classNames([
       styles[`${api}-logo`],
@@ -65,37 +64,37 @@ export default class Loading extends Component<Props> {
       styles[`${api}-apiLogo`],
     ]);
 
-    const yoroiLoadingLogo = yoroiLogo;
-    const currencyLoadingLogo = adaLogo;
-    const apiLoadingLogo = cardanoLogo;
-
+    const renderError = error == null || !hasLoadedCurrentLocale
+      ? null
+      : (
+        <div className={styles.loading}>
+          <h1 className={styles.error}>
+            {intl.formatMessage(error)}<br /><br />
+            {this._getErrorMessageComponent()}
+          </h1>
+        </div>
+      );
+    const renderContent = (error != null || !isLoadingDataForNextScreen)
+      ? null
+      : (
+        <div className={styles.loading}>
+          {hasLoadedCurrentLocale && (
+            <h1 className={styles.headline}>
+              {intl.formatMessage(messages.loading)}
+            </h1>
+          )}
+          <LoadingSpinner />
+        </div>
+      );
     return (
       <div className={componentStyles}>
         <div className={styles.logos}>
-          <SvgInline svg={currencyLoadingLogo} className={currencyLogoStyles} />
-          <SvgInline svg={yoroiLoadingLogo} className={yoroiLogoStyles} />
-          <SvgInline svg={apiLoadingLogo} className={apiLogoStyles} />
+          <span className={currencyLogoStyles}><AdaLogo /></span>
+          <span className={yoroiLogoStyles}><YoroiLogo /></span>
+          <span className={apiLogoStyles}><CardanoLogo /></span>
         </div>
-        {hasLoadedCurrentLocale && (
-          <div>
-            {isLoadingDataForNextScreen && (
-              <div className={styles.loading}>
-                <h1 className={styles.headline}>
-                  {intl.formatMessage(messages.loading)}
-                </h1>
-                <LoadingSpinner />
-              </div>
-            )}
-            {error && (
-              <div className={styles.loading}>
-                <h1 className={styles.error}>
-                  {intl.formatMessage(error)}<br />
-                  {this._getErrorMessageComponent()}
-                </h1>
-              </div>
-            )}
-          </div>
-        )}
+        {renderContent}
+        {renderError}
       </div>
     );
   }

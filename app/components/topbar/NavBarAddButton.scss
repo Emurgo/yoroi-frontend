@@ -1,0 +1,17 @@
+.button {
+  background-color: var(--theme-wallet-dropdown-accent-text-color);
+  border-radius: var(--theme-wallet-dropdown-border-radius);
+  padding: 16px 40px;
+  min-width: 230px;
+  color: var(--theme-wallet-dropdown-background-color);
+  font-family: var(--font-medium);
+  font-size: 16px;
+  line-height: 21px;
+  text-align: center;
+  display: block;
+  margin-left: auto;
+
+  &:hover {
+    cursor: pointer;
+  }
+}

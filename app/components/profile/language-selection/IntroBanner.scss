@@ -1,0 +1,25 @@
+.component {
+  margin-top: 64px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+  text-align: center;
+
+  font-family: var(--font-regular);
+  line-height: 1.38;
+
+  .banner {
+    & > svg {
+      display: block;
+      margin: auto;
+      width: 220px;
+      height: 60px;
+    }
+  }
+
+  .mainTitle {
+    color: var(--cmn-default-color-grey);
+    font-size: 26px;
+    margin-top: 156px - (64px + 60px);
+  }
+}

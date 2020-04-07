@@ -1,0 +1,92 @@
+@import '../../themes/mixins/loading-spinner';
+
+.wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    min-height: var(--theme-navbar-height);
+    color: var(--theme-wallet-dropdown-main-text-color);
+    font-family: var(--font-regular);
+}
+
+.outerWrapper {
+    display: flex;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex: 1;
+    width: max-content;
+    max-width: max-content;
+}
+
+.isLoading {
+    position: relative;
+    display: inline-block;
+    margin-left: 15px;
+    margin-bottom: 4px;
+}
+
+.amount {
+    .isLoading {
+        margin-left: 9px;
+        margin-bottom: 6px;
+        @include loading-spinner("../../assets/images/spinner-dark.svg", 16);
+    }
+    font-family: var(--font-medium);
+    font-size: 16px;
+    line-height: 24px;
+
+    .afterDecimal {
+        font-family: var(--font-regular);
+        font-size: 12px;
+    }
+}
+
+.highlightAmount {
+    color: var(--theme-wallet-dropdown-accent-text-color);
+}
+
+.toggleButton {
+    align-self: flex-start;
+    margin-left: 12px;
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.text {
+    font-size: 14px;
+    line-height: 22px;
+    margin-top: 2px;
+}
+
+.details {
+    .isLoading {
+        @include loading-spinner("../../assets/images/spinner-dark.svg", 8);
+    }
+    font-size: 10px;
+    line-height: 16px;
+    margin-top: 2px;
+
+    .afterDecimal {
+        font-size: 10px;
+        font-family: var(--font-light);
+    }
+}
+
+.label {
+    display: inline-block;
+    color: var(--theme-wallet-dropdown-secondary-text-color);
+}
+
+.info {
+    font-size: 12px;
+    line-height: 20px;
+    color: var(--theme-wallet-dropdown-secondary-text-color);
+}

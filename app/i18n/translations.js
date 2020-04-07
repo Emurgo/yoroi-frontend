@@ -1,71 +1,88 @@
 // @flow
 import globalMessages from './global-messages';
+import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
+import EnglishFlag from '../assets/images/flags/english.inline.svg';
+import JapaneseFlag from '../assets/images/flags/japanese.inline.svg';
+import KoreanFlag from '../assets/images/flags/korean.inline.svg';
+import Chinese from '../assets/images/flags/chinese.inline.svg';
+import RussianFlag from '../assets/images/flags/russian.inline.svg';
+import GermanFlag from '../assets/images/flags/german.inline.svg';
+import FrenchFlag from '../assets/images/flags/french.inline.svg';
+import SpanishFlag from '../assets/images/flags/spanish.inline.svg';
+import ItalianFlag from '../assets/images/flags/italian.inline.svg';
+import IdonesianFlag from '../assets/images/flags/indonesian.inline.svg';
 
 // This is essentially bulk require
 
 // $FlowFixMe require.context comes from webpack
 const req = require.context('./locales', true, /\.json.*$/);
-export const translations: { [locale: string]: { [key: string]: string } } = {};
+export const translations: { [locale: string]: { [key: string]: string, ... }, ... } = {};
 
 req.keys().forEach((file) => {
   const locale = file.replace('./', '').replace('.json', '');
   translations[locale] = req(file);
 });
 
-export const LANGUAGES = [
+export type LanguageType = {|
+  value: string,
+  label: $npm$ReactIntl$MessageDescriptor,
+  svg: string,
+|};
+
+export const LANGUAGES: Array<LanguageType> = [
   {
     value: 'en-US',
     label: globalMessages.languageEnglish,
-    svg: require('../assets/images/flags/english.inline.svg')
+    svg: EnglishFlag
   },
   {
     value: 'ja-JP',
     label: globalMessages.languageJapanese,
-    svg: require('../assets/images/flags/japanese.inline.svg')
+    svg: JapaneseFlag
   },
   {
     value: 'ko-KR',
     label: globalMessages.languageKorean,
-    svg: require('../assets/images/flags/korean.inline.svg')
+    svg: KoreanFlag
   },
   {
     value: 'zh-Hans',
     label: globalMessages.languageChineseSimplified,
-    svg: require('../assets/images/flags/chinese.inline.svg')
+    svg: Chinese
   },
   {
     value: 'zh-Hant',
     label: globalMessages.languageChineseTraditional,
-    svg: require('../assets/images/flags/chinese.inline.svg')
+    svg: Chinese
   },
   {
     value: 'ru-RU',
     label: globalMessages.languageRussian,
-    svg: require('../assets/images/flags/russian.inline.svg')
+    svg: RussianFlag
   },
   {
     value: 'de-DE',
     label: globalMessages.languageGerman,
-    svg: require('../assets/images/flags/german.inline.svg')
+    svg: GermanFlag
   },
   {
     value: 'fr-FR',
     label: globalMessages.languageFrench,
-    svg: require('../assets/images/flags/french.inline.svg')
+    svg: FrenchFlag
   },
   {
     value: 'es-ES',
     label: globalMessages.languageSpanish,
-    svg: require('../assets/images/flags/spanish.inline.svg')
+    svg: SpanishFlag
   },
   {
     value: 'it-IT',
     label: globalMessages.languageItalian,
-    svg: require('../assets/images/flags/italian.inline.svg')
+    svg: ItalianFlag
   },
   {
     value: 'id-ID',
     label: globalMessages.languageIndonesian,
-    svg: require('../assets/images/flags/indonesian.inline.svg')
+    svg: IdonesianFlag
   },
 ];

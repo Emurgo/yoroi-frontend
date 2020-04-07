@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import _ from 'lodash';
+import { map } from 'lodash';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import type { Node, Element } from 'react';
@@ -10,24 +10,26 @@ import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { ModalSkin } from 'react-polymorph/lib/skins/simple/ModalSkin';
 import styles from './Dialog.scss';
 
-type ActionType = {
-  label: string,
-  onClick: Function,
-  primary?: boolean,
-  disabled?: boolean,
-  className?: ?string
-};
+type ActionType = {|
+  +label: string,
+  +onClick: void => PossiblyAsync<void>,
+  +primary?: boolean,
+  +isSubmitting?: boolean,
+  +disabled?: boolean,
+  +className?: ?string,
+  +themeOverrides?: {...},
+|};
 
 type Props = {|
-  title?: string,
-  children?: Node,
-  actions?: Array<ActionType>,
-  closeButton?: Element<any>,
-  backButton?: Node,
-  className?: string,
-  onClose?: ?Function,
-  closeOnOverlayClick?: boolean,
-  classicTheme: boolean
+  +title?: string | Node,
+  +children?: Node,
+  +actions?: Array<ActionType>,
+  +closeButton?: Element<any>,
+  +backButton?: Node,
+  +className?: string,
+  +styleOveride?: {...},
+  +onClose?: ?(void => PossiblyAsync<void>),
+  +closeOnOverlayClick?: boolean,
 |};
 
 @observer
@@ -39,6 +41,7 @@ export default class Dialog extends Component<Props> {
     closeButton: undefined,
     backButton: undefined,
     className: undefined,
+    styleOveride: undefined,
     onClose: undefined,
     closeOnOverlayClick: undefined,
   };
@@ -53,9 +56,11 @@ export default class Dialog extends Component<Props> {
       className,
       closeButton,
       backButton,
-      classicTheme
     } = this.props;
-    const secondaryButton = classicTheme ? 'flat' : 'outlined';
+
+    const hasSubmitting = actions != null && actions.filter(
+      action => action.isSubmitting === true
+    ).length > 0;
 
     return (
       <Modal
@@ -65,7 +70,10 @@ export default class Dialog extends Component<Props> {
         skin={ModalSkin}
       >
 
-        <div className={classnames([styles.component, className])}>
+        <div
+          className={classnames([styles.component, className])}
+          style={this.props.styleOveride}
+        >
           {(title != null && title !== '')
             ? (
               <div className={styles.title}>
@@ -84,18 +92,25 @@ export default class Dialog extends Component<Props> {
 
           {actions && actions.length > 0 && (
             <div className={styles.actions}>
-              {_.map(actions, (action, i: number) => {
+              {map(actions, (action, i: number) => {
                 const buttonClasses = classnames([
                   action.className != null ? action.className : null,
-                  action.primary === true ? 'primary' : secondaryButton,
+                  action.primary === true ? 'primary' : 'secondary',
+                  action.isSubmitting === true && action.primary === true
+                    ? styles.isSubmittingPrimary
+                    : null,
+                  action.isSubmitting === true && action.primary !== true
+                    ? styles.isSubmittingSecondary
+                    : null,
                 ]);
                 return (
                   <Button
+                    themeOverrides={action.themeOverrides}
                     key={i}
                     className={buttonClasses}
                     label={action.label}
                     onClick={action.onClick}
-                    disabled={action.disabled}
+                    disabled={action.disabled === true || action.isSubmitting === true}
                     skin={ButtonSkin}
                   />
                 );
@@ -103,8 +118,8 @@ export default class Dialog extends Component<Props> {
             </div>)
           }
 
-          {closeButton ? React.cloneElement(closeButton, { onClose }) : null}
-          {backButton}
+          {!hasSubmitting && closeButton ? React.cloneElement(closeButton, { onClose }) : null}
+          {!hasSubmitting && backButton}
 
         </div>
       </Modal>

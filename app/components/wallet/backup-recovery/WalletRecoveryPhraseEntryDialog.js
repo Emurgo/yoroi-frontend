@@ -43,22 +43,28 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  recoveryPhraseSorted: Array<{ word: string, isActive: boolean }>,
-  enteredPhrase: Array<{ word: string, index: number }>,
-  isValid: boolean,
-  isTermDeviceAccepted: boolean,
-  isTermRecoveryAccepted: boolean,
-  isSubmitting: boolean,
-  onAddWord: Function,
-  onClear: Function,
-  onAcceptTermDevice: Function,
-  onAcceptTermRecovery: Function,
-  onRestartBackup: Function,
-  onCancelBackup: Function,
-  onFinishBackup: Function,
-  removeWord: Function,
-  hasWord: Function,
-  classicTheme: boolean,
+  +recoveryPhraseSorted: Array<{|
+    word: string,
+    isActive: boolean,
+  |}>,
+  +enteredPhrase: Array<{|
+    word: string,
+    index: number,
+  |}>,
+  +isValid: boolean,
+  +isTermDeviceAccepted: boolean,
+  +isTermRecoveryAccepted: boolean,
+  +isSubmitting: boolean,
+  +onAddWord: {| index: number, word: string |} => void,
+  +onClear: void => void,
+  +onAcceptTermDevice: void => void,
+  +onAcceptTermRecovery: void => void,
+  +onRestartBackup: void => void,
+  +onCancelBackup: void => void,
+  +onFinishBackup: void => PossiblyAsync<void>,
+  +removeWord: void => void,
+  +hasWord: boolean,
+  +classicTheme: boolean,
 |};
 
 @observer
@@ -144,12 +150,10 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
         onClose={onCancelBackup}
         closeButton={<DialogCloseButton onClose={onCancelBackup} />}
         backButton={!isValid ? <DialogBackButton onBack={onRestartBackup} /> : null}
-        classicTheme={classicTheme}
       >
         {!isValid && classicTheme ? (
           <WalletRecoveryInstructions
             instructionsText={intl.formatMessage(messages.verificationInstructions)}
-            classicTheme={classicTheme}
           />
         ) : null}
 
@@ -167,7 +171,11 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
                 word={word}
                 index={index}
                 isActive={isActive}
-                onClick={(value) => isActive && onAddWord(value)}
+                onClick={(value) => {
+                  if (isActive) {
+                    onAddWord(value);
+                  }
+                }}
                 classicTheme={classicTheme}
               />
             ))}

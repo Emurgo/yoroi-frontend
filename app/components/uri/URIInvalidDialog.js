@@ -3,12 +3,11 @@ import React, { Component } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import SVGInline from 'react-svg-inline';
 
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import globalMessages from '../../i18n/global-messages';
-import invalidURIImg from '../../assets/images/uri/invalid-uri.inline.svg';
+import InvalidURIImg from '../../assets/images/uri/invalid-uri.inline.svg';
 
 import styles from './URIInvalidDialog.scss';
 
@@ -27,11 +26,10 @@ const messages = defineMessages({
   },
 });
 
-type Props = {
-  onClose: void => void,
-  onSubmit: void => void,
-  classicTheme: boolean,
-};
+type Props = {|
+  +onClose: void => void,
+  +onSubmit: void => void,
+|};
 
 @observer
 export default class URIInvalidDialog extends Component<Props> {
@@ -41,7 +39,7 @@ export default class URIInvalidDialog extends Component<Props> {
   };
 
   render() {
-    const { onClose, onSubmit, classicTheme } = this.props;
+    const { onClose, onSubmit, } = this.props;
 
     const dialogClasses = classnames([
       styles.component,
@@ -65,12 +63,11 @@ export default class URIInvalidDialog extends Component<Props> {
         title={intl.formatMessage(messages.uriInvalidTitle)}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
-        classicTheme={classicTheme}
         onClose={onClose}
       >
         <div>
           <center>
-            <SVGInline svg={invalidURIImg} className={styles.invalidURIImg} />
+            <span className={styles.invalidURIImg}><InvalidURIImg /></span>
           </center>
           <div className={styles.warningText}>
             {intl.formatMessage(messages.uriInvalidDialogWarningText1)}

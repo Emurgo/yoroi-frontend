@@ -1,16 +1,33 @@
-module.exports = function (api) {
-  // when running jest we need to use nodejs and not browser configurations
-  const nodePlugins = api.env('jest')
-    ? ['dynamic-import-node']
-    : [];
+// @flow
 
+/**
+ * when running jest we need to use nodejs and not browser configurations
+*/
+const nodePlugins = {
+  plugins: [
+    'dynamic-import-node',
+    '@babel/plugin-transform-runtime',
+    ['module-resolver', {
+      alias: {
+        'cardano-wallet-browser': 'cardano-wallet',
+        '@emurgo/js-chain-libs': '@emurgo/js-chain-libs-node',
+      }
+    }]
+  ]
+};
+
+/*::
+// https://babeljs.io/docs/en/config-files#config-function-api
+type ApiType = { env: (void | string | Array<string>) => (string | boolean), ... };
+*/
+module.exports = function (api /*: ApiType */) {
   return {
     presets: [
       [
         '@babel/preset-env',
         {
-          corejs: 2,
-          modules: api.env('jest') ? 'commonjs' : 'auto',
+          corejs: 3,
+          modules: (api.env('test') || api.env('jest')) ? 'commonjs' : 'auto',
           useBuiltIns: 'entry'
         }
       ],
@@ -18,6 +35,9 @@ module.exports = function (api) {
       '@babel/preset-react'
     ],
     plugins: [
+      '@babel/plugin-proposal-nullish-coalescing-operator',
+      '@babel/plugin-proposal-optional-chaining',
+      'nameof-js',
       [
         '@babel/plugin-proposal-decorators',
         {
@@ -27,7 +47,8 @@ module.exports = function (api) {
       [
         '@babel/plugin-transform-runtime',
         {
-          corejs: 2,
+          // CoreJS breaks Jest mocks for some reason
+          corejs: (api.env('test') || api.env('jest')) ? false : 3,
           helpers: true,
           regenerator: true
         }
@@ -36,8 +57,7 @@ module.exports = function (api) {
         'react-intl',
         {
           messagesDir: './translations/messages/',
-          enforceDescriptions: false,
-          extractSourceLocationß: true
+          extractSourceLocation: true
         }
       ],
       '@babel/plugin-syntax-dynamic-import',
@@ -50,15 +70,16 @@ module.exports = function (api) {
       ],
       '@babel/plugin-proposal-export-default-from',
       '@babel/plugin-proposal-export-namespace-from',
-      ...nodePlugins,
+      ...(api.env('development') || api.env('storybook')
+        ? [
+          'react-hot-loader/babel',
+        ]
+        : []),
     ],
     env: {
-      development: {
-        plugins: [
-          'react-hot-loader/babel',
-          '@babel/plugin-transform-runtime'
-        ]
-      }
+      cucumber: nodePlugins,
+      test: nodePlugins,
+      jest: nodePlugins,
     }
-  }
+  };
 };

@@ -79,21 +79,13 @@ export class UnusedAddressesError extends LocalizableError {
   }
 }
 
-export type ExportTransactionsRequest = {
+export type ExportTransactionsRequest = {|
   rows: Array<TransactionExportRow>,
   format?: TransactionExportDataFormat,
   fileType?: TransactionExportFileType,
-  fileName?: string
-};
+  fileName?: string,
+|};
 export type ExportTransactionsResponse = void;  // TODO: Implement in the Next iteration
 export type ExportTransactionsFunc = (
   request: ExportTransactionsRequest
 ) => Promise<ExportTransactionsResponse>;
-
-export type DeleteWalletRequest = {
-  walletId: string,
-};
-export type DeleteWalletResponse = boolean;
-export type DeleteWalletFunc = (
-  request: DeleteWalletRequest
-) => Promise<DeleteWalletResponse>;

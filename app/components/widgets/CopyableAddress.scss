@@ -28,3 +28,17 @@
     margin-left: 20px; // offset = horizontal padding of icon and tooltip
   }
 }
+
+.componentDark {
+  background-color: var(--theme-page-background-color);
+  display: flex;
+  align-items: center;
+  padding: 8px 20px;
+  border-radius: 8px;
+
+  .copyIconBig {
+    & > svg {
+      margin-top: 0;
+    }
+  }
+}

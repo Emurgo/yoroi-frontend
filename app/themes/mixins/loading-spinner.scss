@@ -1,14 +1,14 @@
-@mixin loading-spinner($iconPath) {
+@mixin loading-spinner($iconPath, $size:30) {
   text-indent: -9999px;
   &:after {
     content: '';
-    width: 30px;
-    height: 30px;
+    width: $size + px;
+    height: $size + px;
     position: absolute;
-    top: calc(50% - 15px);
-    left: calc(50% - 15px);
+    top: calc(50% - #{$size / 2}px);
+    left: calc(50% - #{$size / 2}px);
     background: url($iconPath) no-repeat center;
-    background-size: 30px;
+    background-size: $size + px;
     :global {
       animation: loading-spin 1.5s linear;
       animation-iteration-count: infinite;

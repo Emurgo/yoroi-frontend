@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
@@ -51,20 +52,16 @@ const messages = defineMessages({
     id: 'settings.paperWallet.dialog.createPaper.addresses',
     defaultMessage: '!!!Drawing the address',
   },
-  pdfGenDone: {
-    id: 'settings.paperWallet.dialog.createPaper.done',
-    defaultMessage: '!!!All done!',
-  },
 });
 
 type Props = {|
-  renderStatus: ?PdfGenStepType,
-  paperFile: ?Blob,
-  onNext: Function,
-  onCancel: Function,
-  onDownload: Function,
-  onDataChange: Function,
-  classicTheme: boolean,
+  +renderStatus: ?PdfGenStepType,
+  +paperFile: ?Blob,
+  +onNext: void => PossiblyAsync<void>,
+  +onCancel: void => PossiblyAsync<void>,
+  +onDownload: void => PossiblyAsync<void>,
+  +onDataChange: { [key: string]: any, ... } => void,
+  +loadingGif: Node,
 |};
 
 @observer
@@ -99,7 +96,7 @@ export default class CreatePaperDialog extends Component<Props> {
       case PdfGenSteps.addresses:
         return this.context.intl.formatMessage(messages.pdfGenAddresses);
       case PdfGenSteps.done:
-        return this.context.intl.formatMessage(messages.pdfGenDone);
+        return this.context.intl.formatMessage(globalMessages.pdfGenDone);
       default:
         return defaultMessage;
     }
@@ -113,7 +110,6 @@ export default class CreatePaperDialog extends Component<Props> {
       paperFile,
       onDownload,
       renderStatus,
-      classicTheme,
     } = this.props;
 
     const dialogClasses = classnames(['createPaperDialog', styles.component]);
@@ -138,7 +134,6 @@ export default class CreatePaperDialog extends Component<Props> {
           onClose={onCancel}
           className={dialogClasses}
           closeButton={<DialogCloseButton onClose={onCancel} />}
-          classicTheme={classicTheme}
         >
           <div
             aria-label="download button"
@@ -166,10 +161,9 @@ export default class CreatePaperDialog extends Component<Props> {
         className={dialogClasses}
         onClose={onCancel}
         closeButton={<DialogCloseButton onClose={onCancel} />}
-        classicTheme={classicTheme}
       >
         <div className={styles.walletLoaderWrapper}>
-          <div className={styles.walletLoader} />
+          {this.props.loadingGif}
           <div className={styles.walletLoaderTitle}>
             {this.context.intl.formatMessage(messages.progressTitleCreatePaperWallet)}
           </div>

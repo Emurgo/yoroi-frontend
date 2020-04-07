@@ -1,6 +1,6 @@
 // @flow
-import { observable, computed, action, runInAction } from 'mobx';
-import _ from 'lodash';
+import { runInAction, observable, computed, action, } from 'mobx';
+import { find } from 'lodash';
 import Store from './Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import WalletTransaction from '../../domain/WalletTransaction';
@@ -8,233 +8,323 @@ import type { GetTransactionsFunc, GetBalanceFunc,
   GetTransactionsRequest, GetTransactionsRequestOptions,
   RefreshPendingTransactionsFunc } from '../../api/ada';
 import environment from '../../environment';
+import {
+  PublicDeriver,
+} from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import {
+  asGetBalance, asHasLevels,
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import type {
+  IGetLastSyncInfo,
+  IGetLastSyncInfoResponse,
+} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
+import { digetForHash } from '../../api/ada/lib/storage/database/primitives/api/utils';
+
+export type TxRequests = {|
+  publicDeriver: PublicDeriver<>,
+  lastSyncInfo: IGetLastSyncInfoResponse,
+  requests: {|
+    pendingRequest: CachedRequest<RefreshPendingTransactionsFunc>,
+    /**
+    * Should ONLY be executed to cache query WITH search options
+    */
+    recentRequest: CachedRequest<GetTransactionsFunc>,
+    /**
+    * Should ONLY be executed to cache query WITHOUT search options
+    */
+    allRequest: CachedRequest<GetTransactionsFunc>,
+    /**
+     * in lovelaces
+     */
+    getBalanceRequest: CachedRequest<GetBalanceFunc>,
+  |},
+|};
+
+/** How many transactions to display */
+export const INITIAL_SEARCH_LIMIT: number = 5;
+
+/** Skip first n transactions from api */
+export const SEARCH_SKIP: number = 0;
 
 export default class TransactionsStore extends Store {
 
-  /** How many transactions to display */
-  INITIAL_SEARCH_LIMIT = 5;
-
-  /** How many additonall transactions to display when user wants to show more */
-  SEARCH_LIMIT_INCREASE = 5;
-
-  /** Skip first n transactions from api */
-  SEARCH_SKIP = 0;
+  /** How many additional transactions to display when user wants to show more */
+  SEARCH_LIMIT_INCREASE: number = 5;
 
   /** Track transactions for a set of wallets */
-  @observable transactionsRequests: Array<{
-    walletId: string,
-    pendingRequest: CachedRequest<RefreshPendingTransactionsFunc>,
-    recentRequest: CachedRequest<GetTransactionsFunc>,
-    allRequest: CachedRequest<GetTransactionsFunc>,
-    getBalanceRequest: CachedRequest<GetBalanceFunc>
-  }> = [];
+  @observable transactionsRequests: Array<TxRequests> = [];
 
-  @observable _searchOptionsForWallets = observable.map();
+  @observable _searchOptionsForWallets: Array<{|
+    publicDeriver: PublicDeriver<>,
+    options: GetTransactionsRequestOptions,
+  |}> = [];
 
-  _hasAnyPending: boolean = false;
-
-  setup() {
+  setup(): void {
+    super.setup();
     const actions = this.actions[environment.API].transactions;
     actions.loadMoreTransactions.listen(this._increaseSearchLimit);
   }
 
-  @action _increaseSearchLimit = () => {
+  @action _increaseSearchLimit: PublicDeriver<> => Promise<void> = async (
+    publicDeriver
+  ) => {
     if (this.searchOptions != null) {
       this.searchOptions.limit += this.SEARCH_LIMIT_INCREASE;
-      const wallet = this.stores.substores[environment.API].wallets.active;
-      if (!wallet) return;
-      this.refreshLocal(wallet.id);
+      await this.refreshLocal(publicDeriver);
     }
   };
 
   @computed get recentTransactionsRequest(): CachedRequest<GetTransactionsFunc> {
-    const wallet = this.stores.substores[environment.API].wallets.active;
-    // TODO: Do not return new request here
-    if (!wallet) {
-      return new CachedRequest<GetTransactionsFunc>(
-        this.api[environment.API].refreshTransactions
-      );
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) {
+      throw new Error(`${nameof(TransactionsStore)}::${nameof(this.recentTransactionsRequest)} no wallet selected`);
     }
-    return this._getTransactionsRecentRequest(wallet.id);
+    return this.getTxRequests(publicDeriver).requests.recentRequest;
   }
 
   /** Get (or create) the search options for the active wallet (if any)  */
   @computed get searchOptions(): ?GetTransactionsRequestOptions {
-    const wallet = this.stores.substores[environment.API].wallets.active;
-    if (!wallet) return null;
-    let options = this._searchOptionsForWallets.get(wallet.id);
-    if (!options) {
-      // Setup options for each requested wallet
-      runInAction(() => {
-        this._searchOptionsForWallets.set(
-          wallet.id,
-          {
-            limit: this.INITIAL_SEARCH_LIMIT,
-            skip: this.SEARCH_SKIP
-          }
-        );
-      });
-      options = this._searchOptionsForWallets.get(wallet.id);
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) return null;
+    const foundSearchOptions = find(
+      this._searchOptionsForWallets,
+      { publicDeriver }
+    );
+    if (!foundSearchOptions) {
+      throw new Error(`${nameof(this.searchOptions)} no option found`);
     }
-    return options;
+    return foundSearchOptions.options;
+  }
+
+
+  /**
+   * generate a hash of the transaction history
+   * we can use this to trigger mobx updates
+   */
+  @computed get hash(): number {
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) return 0;
+    const result = this.getTxRequests(publicDeriver).requests.allRequest.result;
+    if (result == null) return 0;
+
+    return hashTransactions(result.transactions);
   }
 
   @computed get recent(): Array<WalletTransaction> {
-    const wallet = this.stores.substores[environment.API].wallets.active;
-    if (!wallet) return [];
-    const result = this._getTransactionsRecentRequest(wallet.id).result;
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) return [];
+    const result = this.getTxRequests(publicDeriver).requests.recentRequest.result;
     return result ? result.transactions : [];
   }
 
   @computed get hasAny(): boolean {
-    const wallet = this.stores.substores[environment.API].wallets.active;
-    if (!wallet) return false;
-    const result = this._getTransactionsRecentRequest(wallet.id).result;
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) return false;
+    const result = this.getTxRequests(publicDeriver).requests.recentRequest.result;
     return result ? result.transactions.length > 0 : false;
   }
 
   @computed get hasAnyPending(): boolean {
-    const wallet = this.stores.substores[environment.API].wallets.active;
-    if (!wallet) return false;
-    const result = this._getTransactionsPendingRequest(wallet.id).result;
-    if (result) {
-      this._hasAnyPending = result.length > 0;
-    }
-    return this._hasAnyPending;
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) return false;
+    const result = this.getTxRequests(publicDeriver).requests.pendingRequest.result;
+    return result ? result.length > 0 : false;
   }
 
   @computed get totalAvailable(): number {
-    const wallet = this.stores.substores[environment.API].wallets.active;
-    if (!wallet) return 0;
-    const result = this._getTransactionsAllRequest(wallet.id).result;
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) return 0;
+    const result = this.getTxRequests(publicDeriver).requests.allRequest.result;
     return result ? result.transactions.length : 0;
   }
 
   /** Refresh transaction data for all wallets and update wallet balance */
-  @action _refreshTransactionData = () => {
-    const walletsStore = this.stores.substores[environment.API].wallets;
-    const walletsActions = this.actions[environment.API].wallets;
-    const allWallets = walletsStore.all;
-    for (const wallet of allWallets) {
-      // All Request
-      const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+  @action refreshTransactionData: {|
+    publicDeriver: PublicDeriver<>,
+    localRequest: boolean,
+  |} => Promise<void> = async (request) => {
+    const publicDeriver = asHasLevels<
+      ConceptualWallet,
+      IGetLastSyncInfo
+    >(request.publicDeriver);
+    if (publicDeriver == null) {
+      return;
+    }
 
-      const allRequest = this._getTransactionsAllRequest(wallet.id);
-      allRequest.invalidate({ immediately: false });
-      allRequest.execute({
-        walletId: wallet.id,
-        isLocalRequest: false,
-        getTransactionsHistoryForAddresses: stateFetcher.getTransactionsHistoryForAddresses,
-        checkAddressesInUse: stateFetcher.checkAddressesInUse,
-      });
+    // All Request
+    const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+    const {
+      getTransactionsHistoryForAddresses,
+      checkAddressesInUse,
+      getBestBlock
+    } = stateFetcher;
+    const allRequest = this.getTxRequests(request.publicDeriver).requests.allRequest;
 
-      if (!allRequest.promise) throw new Error('should never happen');
+    const oldHash = hashTransactions(allRequest.result?.transactions);
+    allRequest.invalidate({ immediately: false });
+    allRequest.execute({
+      publicDeriver,
+      isLocalRequest: request.localRequest,
+      getTransactionsHistoryForAddresses,
+      checkAddressesInUse,
+      getBestBlock,
+    });
 
-      allRequest.promise
-        .then(async () => {
-          // calculate pending tranactions just to cache the result
-          const pendingRequest = this._getTransactionsPendingRequest(wallet.id);
-          pendingRequest.invalidate({ immediately: false });
-          pendingRequest.execute(
-            { walletId: wallet.id } // add walletId just for cache
-          );
+    if (!allRequest.promise) throw new Error('should never happen');
 
-          const lastUpdateDate = await this.api[environment.API].getTxLastUpdatedDate();
-          // Note: cache based on lastUpdateDate even though it's not used in balanceRequest
-          const req = this._getBalanceRequest(wallet.id);
-          req.execute({
-            date: lastUpdateDate,
-            getUTXOsSumsForAddresses: stateFetcher.getUTXOsSumsForAddresses,
-          });
-          if (!req.promise) throw new Error('should never happen');
-          return req.promise;
-        })
-        .then((updatedBalance) => {
-          if (walletsStore.active && walletsStore.active.id === wallet.id) {
-            walletsActions.updateBalance.trigger(updatedBalance);
-          }
-          return undefined;
-        })
-        .then(() => {
-          // Recent Request
-          // Here we are sure that allRequest was resolved and the local database was updated
-          this.refreshLocal(wallet.id);
-          return undefined;
-        })
-        .catch(() => {}); // Do nothing. It's logged in the api call
+    const result = await allRequest.promise;
+
+    const recentRequest = this.getTxRequests(request.publicDeriver).requests.recentRequest;
+    const newHash = hashTransactions(result.transactions);
+    // only recalcualte cache if
+    // 1) the tx history changed
+    // 2) if it's the first time computing for this wallet
+    if (oldHash !== newHash || !recentRequest.wasExecuted) {
+      this.reactToTxHistoryUpdate({ publicDeriver: request.publicDeriver });
     }
   };
 
-  @action refreshLocal = (
-    walletId: string,
-  ): void => {
+  @action reactToTxHistoryUpdate: {|
+    publicDeriver: PublicDeriver<>,
+  |} => Promise<void> = async (request) => {
+    const publicDeriver = asHasLevels<
+      ConceptualWallet,
+      IGetLastSyncInfo
+    >(request.publicDeriver);
+    if (publicDeriver == null) {
+      return;
+    }
+    // calculate pending transactions just to cache the result
+    {
+      const pendingRequest = this.getTxRequests(request.publicDeriver).requests.pendingRequest;
+      pendingRequest.invalidate({ immediately: false });
+      pendingRequest.execute(
+        { publicDeriver }
+      );
+      if (!pendingRequest.promise) throw new Error('should never happen');
+      await pendingRequest.promise;
+    }
+
+    // update last sync
+    {
+      const lastUpdateDate = await this.api[environment.API].getTxLastUpdatedDate({
+        getLastSyncInfo: publicDeriver.getLastSyncInfo
+      });
+      runInAction(() => {
+        this.getTxRequests(request.publicDeriver).lastSyncInfo = lastUpdateDate;
+      });
+    }
+
+    // update balance
+    await (async () => {
+      const canGetBalance = asGetBalance(publicDeriver);
+      if (canGetBalance == null) {
+        return;
+      }
+      const balanceReq = this.getTxRequests(request.publicDeriver).requests.getBalanceRequest;
+      balanceReq.invalidate({ immediately: false });
+      balanceReq.execute({
+        getBalance: canGetBalance.getBalance,
+      });
+      if (!balanceReq.promise) throw new Error('should never happen');
+      await balanceReq.promise;
+    })();
+
+    // refresh local history
+    await this.refreshLocal(request.publicDeriver);
+  }
+
+  @action refreshLocal: (
+    PublicDeriver<> & IGetLastSyncInfo
+  ) => Promise<PromisslessReturnType<GetTransactionsFunc>> = (
+    publicDeriver: PublicDeriver<> & IGetLastSyncInfo,
+  ) => {
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
 
     const limit = this.searchOptions
       ? this.searchOptions.limit
-      : this.INITIAL_SEARCH_LIMIT;
+      : INITIAL_SEARCH_LIMIT;
     const skip = this.searchOptions
       ? this.searchOptions.skip
-      : this.SEARCH_SKIP;
+      : SEARCH_SKIP;
 
+    const withLevels = asHasLevels<
+      ConceptualWallet,
+      IGetLastSyncInfo
+    >(publicDeriver);
+    if (withLevels == null) {
+      throw new Error(`${nameof(this.refreshLocal)} no levels`);
+    }
     const requestParams: GetTransactionsRequest = {
-      walletId,
+      publicDeriver: withLevels,
       isLocalRequest: true,
       limit,
       skip,
       getTransactionsHistoryForAddresses: stateFetcher.getTransactionsHistoryForAddresses,
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
+      getBestBlock: stateFetcher.getBestBlock,
     };
-    const recentRequest = this._getTransactionsRecentRequest(walletId);
+    const recentRequest = this.getTxRequests(publicDeriver).requests.recentRequest;
     recentRequest.invalidate({ immediately: false });
     recentRequest.execute(requestParams); // note: different params/cache than allRequests
-    return undefined;
+    if (!recentRequest.promise) throw new Error('should never happen');
+    return recentRequest.promise;
   }
 
-  /** Update which walletIds to track and refresh the data */
-  @action updateObservedWallets = (
-    walletIds: Array<string>
-  ): void => {
-    this.transactionsRequests = walletIds.map(walletId => ({
-      walletId,
-      recentRequest: this._getTransactionsRecentRequest(walletId),
-      allRequest: this._getTransactionsAllRequest(walletId),
-      getBalanceRequest: this._getBalanceRequest(walletId),
-      pendingRequest: this._getTransactionsPendingRequest(walletId),
-    }));
-    this._refreshTransactionData();
+  /** Add a new public deriver to track and refresh the data */
+  @action addObservedWallet: {|
+    publicDeriver: PublicDeriver<>,
+    lastSyncInfo: IGetLastSyncInfoResponse,
+  |} => void = (
+    request
+  ) => {
+    const foundRequest = find(this.transactionsRequests, { publicDeriver: request.publicDeriver });
+    if (foundRequest != null) {
+      return;
+    }
+    const api = this.api[environment.API];
+    this.transactionsRequests.push({
+      publicDeriver: request.publicDeriver,
+      lastSyncInfo: request.lastSyncInfo,
+      requests: {
+        recentRequest: new CachedRequest<GetTransactionsFunc>(api.refreshTransactions),
+        allRequest: new CachedRequest<GetTransactionsFunc>(api.refreshTransactions),
+        getBalanceRequest: new CachedRequest<GetBalanceFunc>(api.getBalance),
+        pendingRequest: new CachedRequest<RefreshPendingTransactionsFunc>(
+          api.refreshPendingTransactions
+        ),
+      },
+    });
+    this._searchOptionsForWallets.push({
+      publicDeriver: request.publicDeriver,
+      options: {
+        limit: INITIAL_SEARCH_LIMIT,
+        skip: SEARCH_SKIP
+      }
+    });
   }
 
-  _getTransactionsPendingRequest = (
-    walletId: string
-  ): CachedRequest<RefreshPendingTransactionsFunc> => {
-    const foundRequest = _.find(this.transactionsRequests, { walletId });
-    if (foundRequest && foundRequest.pendingRequest) return foundRequest.pendingRequest;
-    return new CachedRequest<RefreshPendingTransactionsFunc>(
-      this.api[environment.API].refreshPendingTransactions
-    );
+  getTxRequests: (
+    PublicDeriver<>
+  ) => TxRequests = (
+    publicDeriver
+  ) => {
+    const foundRequest = find(this.transactionsRequests, { publicDeriver });
+    if (foundRequest == null) {
+      throw new Error(`${nameof(TransactionsStore)}::${nameof(this.getTxRequests)} no requests found`);
+    }
+    return foundRequest;
   };
+}
 
-  /** Get request for fetching transaction data.
-   * Should ONLY be executed to cache query WITH search options */
-  _getTransactionsRecentRequest = (walletId: string): CachedRequest<GetTransactionsFunc> => {
-    const foundRequest = _.find(this.transactionsRequests, { walletId });
-    if (foundRequest && foundRequest.recentRequest) return foundRequest.recentRequest;
-    return new CachedRequest<GetTransactionsFunc>(this.api[environment.API].refreshTransactions);
-  };
+function hashTransactions(transactions: ?Array<WalletTransaction>): number {
+  let hash = 0;
+  if (transactions == null) return hash;
 
-  /** Get request for fetching transaction data.
-   * Should ONLY be executed to cache query WITHOUT search options */
-  _getTransactionsAllRequest = (walletId: string): CachedRequest<GetTransactionsFunc> => {
-    const foundRequest = _.find(this.transactionsRequests, { walletId });
-    if (foundRequest && foundRequest.allRequest) return foundRequest.allRequest;
-    return new CachedRequest<GetTransactionsFunc>(this.api[environment.API].refreshTransactions);
-  };
-
-  _getBalanceRequest = (walletId: string): CachedRequest<GetBalanceFunc> => {
-    const foundRequest = _.find(this.transactionsRequests, { walletId });
-    if (foundRequest && foundRequest.getBalanceRequest) return foundRequest.getBalanceRequest;
-    return new CachedRequest<GetBalanceFunc>(this.api[environment.API].getBalance);
-  };
-
+  const seed = 858499202; // random seed
+  for (const tx of transactions) {
+    hash = digetForHash(hash.toString(16) + tx.uniqueKey, seed);
+  }
+  return hash;
 }

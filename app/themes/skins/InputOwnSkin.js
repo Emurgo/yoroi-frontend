@@ -19,27 +19,26 @@ import styles from './InputOwnSkin.scss';
 // This type should be kept open (not "exact") because it is a react-polymorph skin
 // and should be able to pass any extra properties from react-polymorph down.
 type Props = {
-  className?: ?string,
-  disabled?: boolean,
-  error?: string,
-  label?: string | Element<any>,
-  inputRef: Ref<'input'>,
-  onBlur?: FocusEvent=>void,
-  onChange?: Event=>void,
-  onFocus?: FocusEvent=>void,
-  onKeyPress?: KeyboardEvent=>void,
-  placeholder?: string,
-  readOnly?: boolean,
-  theme: Object,
-  themeId: string,
-  value: string,
-  done?: boolean,
-  type: string,
+  +className?: ?string,
+  +disabled?: boolean,
+  +error?: string,
+  +label?: string | Element<any>,
+  +inputRef: Ref<'input'>,
+  +onBlur?: FocusEvent=>void,
+  +onChange?: Event=>void,
+  +onFocus?: FocusEvent=>void,
+  +onKeyPress?: KeyboardEvent=>void,
+  +placeholder?: string,
+  +readOnly?: boolean,
+  +theme: Object,
+  +themeId: string,
+  +value: string,
+  +done?: boolean,
+  +type: string,
+  ...
 };
 
-type State = {
-  focused: boolean,
-};
+type State = {| focused: boolean, |};
 
 export const InputOwnSkin = class extends React.Component<Props, State> {
   static defaultProps = {

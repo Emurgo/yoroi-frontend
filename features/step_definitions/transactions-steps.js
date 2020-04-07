@@ -4,7 +4,7 @@ import { Given, When, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 import i18n from '../support/helpers/i18n-helpers';
-import { addTransaction, postLaunchSuccessfulTx, postLaunchPendingTx } from '../mock-chain/mockImporter';
+import { addTransaction, generateTransction, } from '../mock-chain/mockImporter';
 
 Given(/^I have a wallet with funds$/, async function () {
   const amountWithCurrency = await this.driver.findElements(By.xpath("//div[@class='WalletTopbarTitle_walletAmount']"));
@@ -119,11 +119,13 @@ Then(/^I should see an incorrect wallet password error message$/, async function
 });
 
 Then(/^A successful tx gets sent from my wallet from another client$/, () => {
-  addTransaction(postLaunchSuccessfulTx);
+  const txs = generateTransction();
+  addTransaction(txs.postLaunchSuccessfulTx);
 });
 
 Then(/^A pending tx gets sent from my wallet from another client$/, () => {
-  addTransaction(postLaunchPendingTx);
+  const txs = generateTransction();
+  addTransaction(txs.postLaunchPendingTx);
 });
 
 Then(/^I should see a warning block$/, async function () {

@@ -19,7 +19,8 @@
   input[disabled] {pointer-events:none}
 
   .button {
-    bottom: 20px;
+    // top: 50%;
+    transform: translateY(-4px);
     color: var(--theme-label-button-color);
     cursor: pointer;
     font-family: var(--font-light);
@@ -56,9 +57,10 @@
     font-size: 14px;
     opacity: 0;
     position: absolute;
-    right: 0;
+    right: 10px;
     text-align: right;
-    top: 0;
+    top: 50%;
+    transform: translateY(-100%);
   }
 }
 

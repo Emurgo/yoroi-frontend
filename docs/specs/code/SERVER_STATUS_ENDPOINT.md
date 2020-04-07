@@ -52,7 +52,7 @@ The `'healthy'` is then used to let the frontend know that the banner must stop 
 
 ### GUI
 
-The GUI component consists of an irremovable red banner that will be displayed on the top part of all the screens. This banner is rendered while the endpoint reports a problem or the connection is not possible and is similar in appearance to the one displayed in the staging network.
+The GUI component consists of an irremovable red banner that will be displayed on the top part of all the screens. This banner is rendered while the endpoint reports a problem or the connection is not possible and is similar in appearance to the one displayed in the nightly network.
 When the endpoint report `false`, the message is:
 
 ```
@@ -75,4 +75,4 @@ YOUR FUNDS ARE SAFE, YOU CAN CHECK THEM IN ANY BLOCK EXPLORER.
 
 ![Network error](../images/banner_example_2.png "Network error")
 
-The behavior is that this new banner will overlap the staging banner if both are present and it will be shown in all the screens of Yoroi.
+The behavior is that this new banner will overlap the nightly banner if both are present and it will be shown in all the screens of Yoroi.

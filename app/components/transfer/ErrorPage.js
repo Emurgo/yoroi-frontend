@@ -1,19 +1,19 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import classnames from 'classnames';
 import { intlShape } from 'react-intl';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import LocalizableError from '../../i18n/LocalizableError';
+import Dialog from '../widgets/Dialog';
+import DialogCloseButton from '../widgets/DialogCloseButton';
+import globalMessages from '../../i18n/global-messages';
 import styles from './ErrorPage.scss';
 
 type Props = {|
-  error?: ?LocalizableError,
-  onCancel: Function,
-  title: string,
-  backButtonLabel: string,
-  classicTheme: boolean,
+  +error?: ?LocalizableError,
+  +onCancel: void => void,
+  +title: string,
+  +backButtonLabel: string,
+  +classicTheme: boolean,
 |};
 
 @observer
@@ -28,37 +28,36 @@ export default class ErrorPage extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { error, onCancel, title, backButtonLabel, classicTheme } = this.props;
-    const backButtonClasses = classnames([
-      classicTheme ? 'flat' : 'outlined',
-      styles.button,
-    ]);
+    const { error, onCancel, title, backButtonLabel, } = this.props;
+
+    const actions = [
+      {
+        label: backButtonLabel,
+        onClick: onCancel,
+      },
+    ];
 
     return (
-      <div className={styles.component}>
+      <Dialog
+        title={intl.formatMessage(globalMessages.errorLabel)}
+        actions={actions}
+        closeOnOverlayClick={false}
+        closeButton={<DialogCloseButton />}
+        onClose={onCancel}
+        className={styles.dialog}
+      >
+        <div className={styles.component}>
+          <div>
+            <div className={styles.body}>
+              <div className={styles.title}>
+                {title}
+              </div>
 
-        <div>
-          <div className={styles.body}>
-
-            <div className={styles.title}>
-              {title}
+              {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
             </div>
-
-            {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
-
-            <div className={styles.buttonsWrapper}>
-              <Button
-                className={backButtonClasses}
-                label={backButtonLabel}
-                onClick={onCancel}
-                skin={ButtonSkin}
-              />
-            </div>
-
           </div>
         </div>
-
-      </div>
+      </Dialog>
     );
   }
 }

@@ -1,8 +1,10 @@
 // @flow
 
+import environment from '../environment';
+
 export const THEMES = Object.freeze({
   YOROI_CLASSIC: 'YoroiClassic',
-  YOROI_MODERN: 'YoroiModern'
+  YOROI_MODERN: 'YoroiModern',
 });
 
 export type Theme = $Values<typeof THEMES>;
@@ -17,6 +19,10 @@ export function changeToplevelTheme(currentTheme: Theme) {
     // therefore we only remove & add those related to the theme
     const allThemes: Array<string> = Object.keys(THEMES).map(key => THEMES[key]);
     bodyClassList.remove(...allThemes);
+    bodyClassList.remove('YoroiShelley');
     bodyClassList.add(currentTheme);
+    if (environment.isShelley()) {
+      bodyClassList.add('YoroiShelley');
+    }
   }
 }

@@ -20,7 +20,11 @@
   bottom: 10%;	
   position: absolute;	
   text-align: center;	
-  width: 100%;	
+  width: 100%;
+
+  .spinner {
+    margin-top: 20px;
+  }
 }
 
 .ada-logo,
@@ -49,7 +53,6 @@ $adaLogoWidth: 43px;
 
 .yoroiLogo {
   & > svg {
-    display: block;
     width: 100px;
     margin: 0 114px;
     & > path {
@@ -58,9 +61,18 @@ $adaLogoWidth: 43px;
   }
 }
 
+.hide {
+  & > svg {
+    & > path {
+      fill: var(--cmn-invisible);
+    }
+  }
+}
+
 .headline {
   font-family: var(--font-light);
   font-size: 16px;
+  margin-bottom: 24px;
 }
 
 .component, .headline, .logo, .error {
@@ -80,4 +92,6 @@ $adaLogoWidth: 43px;
   line-height: 22px;
   word-break: break-word;
   text-align: center;
+  margin-left: 24px;
+  margin-right: 24px;
 }

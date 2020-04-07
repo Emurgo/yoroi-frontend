@@ -7,10 +7,6 @@
   justify-content: center;
 }
 
-.button {
-  margin: 20px auto 0;
-}
-
 .body {
   color: var(--theme-bordered-box-text-color);
   font-family: var(--font-regular);
@@ -33,11 +29,5 @@
     margin-bottom: 12px;
     word-break: break-word;
     text-align: center;
-  }
-
-  .buttonsWrapper {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
   }
 }

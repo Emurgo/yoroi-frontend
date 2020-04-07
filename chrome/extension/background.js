@@ -1,4 +1,9 @@
+// @flow
 import debounce from 'lodash/debounce';
+
+/*::
+declare var chrome;
+*/
 
 const onYoroiIconClicked = () => {
   chrome.tabs.create({ url: 'main_window.html' });

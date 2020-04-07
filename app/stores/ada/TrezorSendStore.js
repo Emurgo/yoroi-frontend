@@ -9,7 +9,7 @@ import LocalizedRequest from '../lib/LocalizedRequest';
 
 import type {
   CreateTrezorSignTxDataFunc,
-  BroadcastTrezorSignedTxFunc
+  BroadcastTrezorSignedTxRequest, BroadcastTrezorSignedTxResponse,
 } from '../../api/ada';
 import type {
   SendUsingTrezorParams
@@ -22,6 +22,7 @@ import {
   convertToLocalizableError
 } from '../../domain/TrezorLocalizedError';
 import LocalizableError from '../../i18n/LocalizableError';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 /** Note: Handles Trezor Signing */
 export default class TrezorSendStore extends Store {
@@ -34,23 +35,29 @@ export default class TrezorSendStore extends Store {
   createTrezorSignTxDataRequest: LocalizedRequest<CreateTrezorSignTxDataFunc>
     = new LocalizedRequest<CreateTrezorSignTxDataFunc>(this.api.ada.createTrezorSignTxData);
 
-  broadcastTrezorSignedTxRequest: LocalizedRequest<BroadcastTrezorSignedTxFunc>
-    = new LocalizedRequest<BroadcastTrezorSignedTxFunc>(this.api.ada.broadcastTrezorSignedTx);
+  broadcastTrezorSignedTxRequest: LocalizedRequest<typeof TrezorSendStore.prototype.sendAndRefresh>
+    = new LocalizedRequest<typeof TrezorSendStore.prototype.sendAndRefresh>(
+      this.sendAndRefresh
+    );
   // =================== API RELATED =================== //
 
-  setup() {
+  setup(): void {
+    super.setup();
     const trezorSendAction = this.actions.ada.trezorSend;
     trezorSendAction.sendUsingTrezor.listen(this._sendUsingTrezor);
     trezorSendAction.cancel.listen(this._cancel);
   }
 
-  _reset() {
+  _reset(): void {
     this._setActionProcessing(false);
     this._setError(null);
   }
 
   /** Generates a payload with Trezor format and tries Send ADA using Trezor signing */
-  _sendUsingTrezor = async (params: SendUsingTrezorParams): Promise<void> => {
+  _sendUsingTrezor: {|
+    params: SendUsingTrezorParams,
+    publicDeriver: PublicDeriver<>,
+  |} => Promise<void> = async (request) => {
     try {
       this.createTrezorSignTxDataRequest.reset();
       this.broadcastTrezorSignedTxRequest.reset();
@@ -63,23 +70,9 @@ export default class TrezorSendStore extends Store {
       this._setError(null);
       this._setActionProcessing(true);
 
-      const { wallets, addresses } = this.stores.substores[environment.API];
-      const activeWallet = wallets.active;
-      if (!activeWallet) {
-        // this Error will be converted to LocalizableError()
-        throw new Error('Active wallet required before sending.');
-      }
-
-      const accountId = addresses._getAccountIdByWalletId(activeWallet.id);
-      if (accountId == null) {
-        // this Error will be converted to LocalizableError()
-        throw new Error('Active account required before sending.');
-      }
-
       const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
       this.createTrezorSignTxDataRequest.execute({
-        ...params,
-        getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
+        ...request.params,
         getTxsBodiesForUTXOs: stateFetcher.getTxsBodiesForUTXOs,
       });
       if (!this.createTrezorSignTxDataRequest.promise) throw new Error('should never happen');
@@ -95,10 +88,13 @@ export default class TrezorSendStore extends Store {
         throw new Error(trezorSignTxResp.payload.error);
       }
 
-      await this._brodcastSignedTx(trezorSignTxResp);
+      await this._brodcastSignedTx(
+        trezorSignTxResp,
+        request.publicDeriver
+      );
 
     } catch (error) {
-      Logger.error('TrezorSendStore::_sendUsingTrezor error: ' + stringifyError(error));
+      Logger.error(`${nameof(TrezorSendStore)}::${nameof(this._sendUsingTrezor)} error: ` + stringifyError(error));
       this._setError(convertToLocalizableError(error));
     } finally {
       this.createTrezorSignTxDataRequest.reset();
@@ -107,42 +103,62 @@ export default class TrezorSendStore extends Store {
     }
   };
 
-  _brodcastSignedTx = async (
-    trezorSignTxResp: CardanoSignTransaction$,
+  _brodcastSignedTx: (
+    CardanoSignTransaction$,
+    PublicDeriver<>,
+  ) => Promise<void> = async (
+    trezorSignTxResp,
+    publicDeriver,
   ): Promise<void> => {
     if (!trezorSignTxResp.success) {
-      throw new Error('TrezorSendStore::_brodcastSignedTx should never happen');
+      throw new Error(`${nameof(TrezorSendStore)}::${nameof(this._brodcastSignedTx)} should never happen`);
     }
+    const { wallets } = this.stores;
     await this.broadcastTrezorSignedTxRequest.execute({
-      signedTxHex: trezorSignTxResp.payload.body,
-      sendTx: this.stores.substores[environment.API].stateFetchStore.fetcher.sendTx,
+      broadcastRequest: {
+        signedTxRequest: {
+          id: trezorSignTxResp.payload.hash,
+          encodedTx: Buffer.from(trezorSignTxResp.payload.body, 'hex'),
+        },
+        sendTx: this.stores.substores[environment.API].stateFetchStore.fetcher.sendTx,
+      },
+      refreshWallet: () => wallets.refreshWalletFromRemote(publicDeriver),
     }).promise;
 
     this.actions.dialogs.closeActiveDialog.trigger();
-    const { wallets } = this.stores.substores[environment.API];
-    await wallets.refreshWalletsData();
 
-    const activeWallet = wallets.active;
-    if (activeWallet) {
-      // go to transaction screen
-      wallets.goToWalletRoute(activeWallet.id);
-    }
+    // go to transaction screen
+    wallets.goToWalletRoute(publicDeriver);
 
     Logger.info('SUCCESS: ADA sent using Trezor SignTx');
   }
 
-  _cancel = (): void => {
+  sendAndRefresh: {|
+    broadcastRequest: BroadcastTrezorSignedTxRequest,
+    refreshWallet: () => Promise<void>,
+  |} => Promise<BroadcastTrezorSignedTxResponse> = async (request) => {
+    const result = await this.api.ada.broadcastTrezorSignedTx(request.broadcastRequest);
+    try {
+      await request.refreshWallet();
+    } catch (_e) {
+      // even if refreshing the wallet fails, we don't want to fail the tx
+      // otherwise user may try and re-send the tx
+    }
+    return result;
+  }
+
+  _cancel: void => void = () => {
     if (!this.isActionProcessing) {
       this.actions.dialogs.closeActiveDialog.trigger();
       this._reset();
     }
   }
 
-  @action _setActionProcessing = (processing: boolean): void => {
+  @action _setActionProcessing: boolean => void = (processing) => {
     this.isActionProcessing = processing;
   }
 
-  @action _setError = (error: ?LocalizableError): void => {
+  @action _setError: (?LocalizableError) => void = (error) => {
     this.error = error;
   }
 }

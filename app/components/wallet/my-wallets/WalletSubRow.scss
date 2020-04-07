@@ -1,0 +1,48 @@
+.content {
+    padding: 24px;
+}
+
+.section {
+    display: flex;
+    align-items: center;
+    border-right: 1px solid var(--theme-mywallets-separator-dark-color);
+}
+
+.contentHead {
+    display: flex;
+}
+
+.walletNumber {
+    margin-right: 44px;
+    color: var(--theme-mywallets-secondary-text-color);
+    font-size: 14px;
+    line-height: 22px;
+}
+
+.contentBody {
+    margin-top: 30px;
+    padding-left: 6px;
+}
+
+.detailsSection {
+    @extend .section;
+    padding-left: 24px;
+    padding-right: 74px;
+    min-width: 250px;
+}
+
+.plateSection {
+    @extend .section;
+    padding-top: 13px;
+    padding-bottom: 13px;
+    padding-right: 70px;
+    min-width: 320px;
+}
+
+.currencySection {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    padding-left: 24px;
+    padding-right: 24px;
+}

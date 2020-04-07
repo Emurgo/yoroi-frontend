@@ -7,18 +7,19 @@ import type {
   AssuranceMode, AssuranceLevel, AssuranceModeOption,
 } from '../types/transactionAssuranceTypes';
 
-export const assuranceModeOptions: {
-  NORMAL: AssuranceModeOption, STRICT: AssuranceModeOption,
-} = {
+export const assuranceModeOptions: {|
+  NORMAL: AssuranceModeOption,
+  STRICT: AssuranceModeOption,
+|} = {
   NORMAL: 'CWANormal', STRICT: 'CWAStrict',
 };
 
-export const assuranceModes: {
+export const assuranceModes: {|
   /** Safe against covert adversaries */
   NORMAL: AssuranceMode,
   /** Safe against all adversaries */
-  STRICT: AssuranceMode
-} = {
+  STRICT: AssuranceMode,
+|} = {
   NORMAL: {
     low: 3,
     medium: 9,
@@ -29,8 +30,10 @@ export const assuranceModes: {
   }
 };
 
-export const assuranceLevels: {
-  LOW: AssuranceLevel, MEDIUM: AssuranceLevel, HIGH: AssuranceLevel,
-} = {
+export const assuranceLevels: {|
+  LOW: AssuranceLevel,
+  MEDIUM: AssuranceLevel,
+  HIGH: AssuranceLevel,
+|} = {
   LOW: 'low', MEDIUM: 'medium', HIGH: 'high',
 };

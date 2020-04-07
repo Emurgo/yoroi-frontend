@@ -13,16 +13,10 @@ import LoadingSpinner from '../../widgets/LoadingSpinner';
 import type { AssuranceMode } from '../../../types/transactionAssuranceTypes';
 import { Logger } from '../../../utils/logging';
 import type { ExplorerType } from '../../../domain/Explorer';
+import OneSideBarDecoration from '../../widgets/OneSideBarDecoration';
+import globalMessages from '../../../i18n/global-messages';
 
 const messages = defineMessages({
-  today: {
-    id: 'wallet.summary.page.todayLabel',
-    defaultMessage: '!!!Today',
-  },
-  yesterday: {
-    id: 'wallet.summary.page.yesterdayLabel',
-    defaultMessage: '!!!Yesterday',
-  },
   showMoreTransactionsButtonLabel: {
     id: 'wallet.summary.page.showMoreTransactionsButtonLabel',
     defaultMessage: '!!!Show more transactions',
@@ -32,14 +26,13 @@ const messages = defineMessages({
 const dateFormat = 'YYYY-MM-DD';
 
 type Props = {|
-  transactions: Array<WalletTransaction>,
-  isLoadingTransactions: boolean,
-  hasMoreToLoad: boolean,
-  selectedExplorer: ExplorerType,
-  assuranceMode: AssuranceMode,
-  walletId: string,
-  formattedWalletAmount: Function,
-  onLoadMore: Function,
+  +transactions: Array<WalletTransaction>,
+  +isLoadingTransactions: boolean,
+  +hasMoreToLoad: boolean,
+  +selectedExplorer: ExplorerType,
+  +assuranceMode: AssuranceMode,
+  +onLoadMore: void => PossiblyAsync<void>,
+  +shouldHideBalance: boolean,
 |};
 
 @observer
@@ -62,13 +55,19 @@ export default class WalletTransactionsList extends Component<Props> {
   localizedDateFormat: 'MM/DD/YYYY';
 
   groupTransactionsByDay(transactions: Array<WalletTransaction>)
-      : Array<{date: string, transactions: Array<WalletTransaction>}> {
-    const groups = [];
+      : Array<{|
+        date: string,
+        transactions: Array<WalletTransaction>,
+      |}> {
+    const groups: Array<{|
+      date: string,
+      transactions: Array<WalletTransaction>,
+    |}> = [];
     for (const transaction of transactions) {
-      const date = moment(transaction.date).format(dateFormat);
+      const date: string = moment(transaction.date).format(dateFormat);
       // find the group this transaction belongs in
       let group = groups.find((g) => g.date === date);
-      // if first transaltion in this group, create the group
+      // if first transaction in this group, create the group
       if (!group) {
         group = { date, transactions: [] };
         groups.push(group);
@@ -83,16 +82,16 @@ export default class WalletTransactionsList extends Component<Props> {
   localizedDate(date: string) {
     const { intl } = this.context;
     const today = moment().format(dateFormat);
-    if (date === today) return intl.formatMessage(messages.today);
+    if (date === today) return intl.formatMessage(globalMessages.dateToday);
     const yesterday = moment().subtract(1, 'days').format(dateFormat);
-    if (date === yesterday) return intl.formatMessage(messages.yesterday);
+    if (date === yesterday) return intl.formatMessage(globalMessages.dateYesterday);
     return moment(date).format(this.localizedDateFormat);
   }
 
   getTransactionKey(transactions: Array<WalletTransaction>): string {
     if (transactions.length) {
       const firstTransaction = transactions[0];
-      return firstTransaction.id + '-' + firstTransaction.type;
+      return firstTransaction.uniqueKey;
     }
     // this branch should not happen
     Logger.error(
@@ -108,8 +107,6 @@ export default class WalletTransactionsList extends Component<Props> {
       isLoadingTransactions,
       hasMoreToLoad,
       assuranceMode,
-      walletId,
-      formattedWalletAmount,
       onLoadMore,
     } = this.props;
 
@@ -121,31 +118,37 @@ export default class WalletTransactionsList extends Component<Props> {
     const transactionsGroups = this.groupTransactionsByDay(transactions);
 
     const loadingSpinner = isLoadingTransactions ? (
-      <LoadingSpinner ref={(component) => { this.loadingSpinner = component; }} />
+      <div className={styles.loading}>
+        <LoadingSpinner ref={(component) => { this.loadingSpinner = component; }} />
+      </div>
     ) : null;
 
     return (
       <div className={styles.component}>
         {transactionsGroups.map(group => (
-          <div className={styles.group} key={walletId + '-' + this.getTransactionKey(group.transactions)}>
-            <div className={styles.groupDate}>{this.localizedDate(group.date)}</div>
+          <div className={styles.group} key={`${this.getTransactionKey(group.transactions)}`}>
+            <div className={styles.bar}>
+              <OneSideBarDecoration>
+                <div className={styles.groupDate}>{this.localizedDate(group.date)}</div>
+              </OneSideBarDecoration>
+            </div>
             <div className={styles.list}>
               {group.transactions.map((transaction, transactionIndex) => (
                 <Transaction
-                  key={`${walletId}-${transaction.id}-${transaction.type}`}
+                  key={`${transaction.uniqueKey}-${transaction.numberOfConfirmations}`}
                   selectedExplorer={this.props.selectedExplorer}
                   data={transaction}
                   isLastInList={transactionIndex === group.transactions.length - 1}
                   state={transaction.state}
                   assuranceLevel={transaction.getAssuranceLevelForMode(assuranceMode)}
-                  formattedWalletAmount={formattedWalletAmount}
+                  shouldHideBalance={this.props.shouldHideBalance}
                 />
               ))}
             </div>
           </div>
         ))}
         {loadingSpinner}
-        {hasMoreToLoad &&
+        {!isLoadingTransactions && hasMoreToLoad &&
           <Button
             disabled={isLoadingTransactions}
             className={buttonClasses}

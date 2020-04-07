@@ -1,3 +1,7 @@
+@import '../mixins/card-mixin.scss';
+
+$linebreakWidth: 1540px;
+
 .component {
   height: 100%;
   overflow: auto;
@@ -10,7 +14,7 @@
     display: flex;
     align-items: center;
   
-    @media screen and (max-width: 1300px) {
+    @media screen and (max-width: $linebreakWidth) {
       max-width: 992px;
     }
   }
@@ -22,7 +26,7 @@
     justify-content: space-between;
     width: 100%;
   
-    @media screen and (max-width: 1300px) {
+    @media screen and (max-width: $linebreakWidth) {
       flex-direction: column;
       padding: 0 15px;
     }
@@ -50,53 +54,14 @@
     font-size: 22px;
     line-height: 27px;
   
-    @media screen and (max-width: 1300px) {
+    @media screen and (max-width: 1530px) {
       margin-bottom: 30px;
     }
   }
   
-  .heroCardsList {
-    display: flex;
-  }
-  
   .heroCardsItem {
-    width: var(--card-width);
-    height: var(--card-height);
-    border-radius: var(--card-border-radius);
-    background-color: var(--card-bg-color);
-    color: var(--card-text-color);
-    font-size: var(--card-text-size);
-    font-family: var(--font-regular);
-    padding: 32px 20px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    margin: 0 8px;
-    box-shadow: 0 5px 20px 0px rgba(24,26,30, .08);
-    margin-bottom: 15px;
-    cursor: pointer;
-  
-    &:hover {
-      box-shadow: 0 5px 30px 0px rgba(24,26,30, .12);
+    @include card-mixin;
 
-      .heroCardsItemTitle {
-        color: var(--card-text-color-hover);
-      }
-    }
-  
-    .heroCardsItemTitle {
-      display: flex;
-      justify-content: center;
-      letter-spacing: -0.03em;
-    }
-  
-    .heroCardsItemBg {
-      flex: 1 0 auto;
-      background-repeat: no-repeat;
-      background-position: center center;
-      background-size: contain;
-    }
-  
     &.heroCardsItemLink {
       flex: auto;
       flex-direction: row;
@@ -108,16 +73,6 @@
         margin-right: 30px;
       }
     }
-  }
-
-  .notification {
-    color: var(--theme-transactions-list-group-date-color);
-    font-family: var(--font-regular);
-    font-size: 16px;
-    line-height: 1.38;
-    margin-top: 10px;
-    opacity: 0.6;
-    text-align: center;
   }
 
   .settingsBar {
@@ -163,20 +118,6 @@
     .heroSubTitle {
       color: var(--theme-wallet-add-sub-title-color);      
     }
-  
-    .heroCardsItemBg {
-      &.bgConnectHW {
-        background-image: url(../../assets/images/add-wallet/connect-hw-classic.inline.svg);
-      }
-
-      &.bgCreateWallet {
-        background-image: url(../../assets/images/add-wallet/create-wallet-classic.inline.svg);
-      }
-
-      &.bgRestoreWallet {
-        background-image: url(../../assets/images/add-wallet/restore-wallet-classic.inline.svg);
-      }
-    }
   }
 }
 
@@ -187,7 +128,7 @@
     background-repeat: no-repeat;
     background-position: center -13vw;
 
-    @media screen and (max-width: 1400px) {
+    @media screen and (max-width: $linebreakWidth) {
       background-position: 0 0;
     }
 
@@ -216,19 +157,9 @@
         fill: var(--theme-default-color-blue);
       }
     }
+  }
 
-    .heroCardsItemBg {
-      &.bgConnectHW {
-        background-image: url(../../assets/images/add-wallet/connect-hw-modern.inline.svg);
-      }
-
-      &.bgCreateWallet {
-        background-image: url(../../assets/images/add-wallet/create-wallet-modern.inline.svg);
-      }
-
-      &.bgRestoreWallet {
-        background-image: url(../../assets/images/add-wallet/restore-wallet-modern.inline.svg);
-      }
-    }
+  .shelleyTestnet {
+    background-image: url(../../assets/images/add-wallet/add-wallet-bg-testnet.inline.svg);
   }
 }

@@ -1,13 +1,14 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import { computed } from 'mobx';
 import { intlShape, FormattedHTMLMessage } from 'react-intl';
 import environment from '../../environment';
 import type { Notification } from '../../types/notificationType';
 import NotificationMessage from '../../components/widgets/NotificationMessage';
 import globalMessages from '../../i18n/global-messages';
 import successIcon from '../../assets/images/success-small.inline.svg';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import WalletTransactionsList from '../../components/wallet/transactions/WalletTransactionsList';
 import WalletSummary from '../../components/wallet/summary/WalletSummary';
 import WalletNoTransactions from '../../components/wallet/transactions/WalletNoTransactions';
@@ -15,9 +16,7 @@ import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer
 import ExportTransactionDialog from '../../components/wallet/export/ExportTransactionDialog';
 import { Logger } from '../../utils/logging';
 
-import { formattedWalletAmount } from '../../utils/formatters';
-
-type Props = InjectedProps
+export type GeneratedData = typeof WalletSummaryPage.prototype.generated;
 
 const targetNotificationIds = [
   globalMessages.walletCreatedNotificationMessage.id,
@@ -27,15 +26,16 @@ const targetNotificationIds = [
 ];
 
 @observer
-export default class WalletSummaryPage extends Component<Props> {
+export default class WalletSummaryPage extends Component<InjectedOrGenerated<GeneratedData>> {
   static contextTypes = {
     intl: intlShape.isRequired
   };
 
   render() {
     const { intl } = this.context;
-    const actions = this.props.actions;
-    const { wallets, transactions } = this.props.stores.substores.ada;
+    const actions = this.generated.actions;
+    const { transactions } = this.generated.stores.substores.ada;
+    const { wallets } = this.generated.stores;
     const {
       hasAny,
       totalAvailable,
@@ -46,10 +46,10 @@ export default class WalletSummaryPage extends Component<Props> {
       isExporting,
       exportError,
     } = transactions;
-    const wallet = wallets.active;
+    const publicDeriver = wallets.selected;
     let walletTransactions = null;
     // Guard against potential null values
-    if (!wallet) {
+    if (publicDeriver == null) {
       Logger.error('[WalletSummaryPage::render] Active wallet required');
       return null;
     }
@@ -59,25 +59,26 @@ export default class WalletSummaryPage extends Component<Props> {
       closeExportTransactionDialog,
     } = actions[environment.API].transactions;
 
-    const { uiDialogs, profile } = this.props.stores;
+    const isLoadingTx = (
+      !recentTransactionsRequest.wasExecuted || recentTransactionsRequest.isExecuting
+    );
+
+    const { uiDialogs, profile } = this.generated.stores;
     if (searchOptions) {
       const { limit } = searchOptions;
       const noTransactionsFoundLabel = intl.formatMessage(globalMessages.noTransactionsFound);
       if (!recentTransactionsRequest.wasExecuted || hasAny) {
-
-        const isLoadingTx = (!recentTransactionsRequest.wasExecuted ||
-          recentTransactionsRequest.isExecuting);
-
+        const { assuranceMode } = this.generated.stores.substores.ada.walletSettings
+          .getPublicDeriverSettingsCache(publicDeriver);
         walletTransactions = (
           <WalletTransactionsList
             transactions={recent}
-            selectedExplorer={this.props.stores.profile.selectedExplorer}
+            selectedExplorer={this.generated.stores.profile.selectedExplorer}
             isLoadingTransactions={isLoadingTx}
             hasMoreToLoad={totalAvailable > limit}
-            onLoadMore={() => actions.ada.transactions.loadMoreTransactions.trigger()}
-            assuranceMode={wallet.assuranceMode}
-            walletId={wallet.id}
-            formattedWalletAmount={formattedWalletAmount}
+            onLoadMore={() => actions.ada.transactions.loadMoreTransactions.trigger(publicDeriver)}
+            assuranceMode={assuranceMode}
+            shouldHideBalance={profile.shouldHideBalance}
           />
         );
       } else if (!hasAny) {
@@ -105,7 +106,13 @@ export default class WalletSummaryPage extends Component<Props> {
         <WalletSummary
           numberOfTransactions={totalAvailable}
           pendingAmount={unconfirmedAmount}
-          isLoadingTransactions={recentTransactionsRequest.isExecutingFirstTime}
+          isLoadingTransactions={
+            /**
+             * only use first load
+             * to avoid wallet summary disappearing when wallet tx list is updating
+            */
+            !recentTransactionsRequest.wasExecuted
+          }
           openExportTxToFileDialog={this.openExportTransactionDialog}
         />
 
@@ -115,9 +122,11 @@ export default class WalletSummaryPage extends Component<Props> {
           <ExportTransactionDialog
             isActionProcessing={isExporting}
             error={exportError}
-            submit={exportTransactionsToFile.trigger}
+            submit={exportRequest => exportTransactionsToFile.trigger({
+              exportRequest,
+              publicDeriver
+            })}
             cancel={closeExportTransactionDialog.trigger}
-            classicTheme={profile.isClassicTheme}
           />
         ) : null}
 
@@ -128,7 +137,7 @@ export default class WalletSummaryPage extends Component<Props> {
   _getThisPageActiveNotification = (): ?Notification => {
     let notification = null;
 
-    const { mostRecentActiveNotification } = this.props.stores.uiNotifications;
+    const { mostRecentActiveNotification } = this.generated.stores.uiNotifications;
     const activeNotificationId = mostRecentActiveNotification ?
       mostRecentActiveNotification.id :
       '';
@@ -140,7 +149,74 @@ export default class WalletSummaryPage extends Component<Props> {
   }
 
   openExportTransactionDialog = (): void => {
-    const { actions } = this.props;
+    const { actions } = this.generated;
     actions.dialogs.open.trigger({ dialog: ExportTransactionDialog });
+  }
+
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(WalletSummaryPage)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    const adaStores = stores.substores.ada;
+    return Object.freeze({
+      stores: {
+        profile: {
+          selectedExplorer: stores.profile.selectedExplorer,
+          shouldHideBalance: stores.profile.shouldHideBalance,
+          isClassicTheme: stores.profile.isClassicTheme,
+        },
+        uiDialogs: {
+          isOpen: stores.uiDialogs.isOpen,
+        },
+        uiNotifications: {
+          mostRecentActiveNotification: stores.uiNotifications.mostRecentActiveNotification,
+        },
+        wallets: {
+          selected: stores.wallets.selected,
+        },
+        substores: {
+          ada: {
+            walletSettings: {
+              getPublicDeriverSettingsCache: adaStores.walletSettings.getPublicDeriverSettingsCache,
+            },
+            transactions: {
+              hasAny: adaStores.transactions.hasAny,
+              totalAvailable: adaStores.transactions.totalAvailable,
+              recent: adaStores.transactions.recent,
+              searchOptions: adaStores.transactions.searchOptions,
+              recentTransactionsRequest: {
+                isExecuting: adaStores.transactions.recentTransactionsRequest.isExecuting,
+                wasExecuted: adaStores.transactions.recentTransactionsRequest.wasExecuted,
+              },
+              unconfirmedAmount: adaStores.transactions.unconfirmedAmount,
+              isExporting: adaStores.transactions.isExporting,
+              exportError: adaStores.transactions.exportError,
+            },
+          },
+        },
+      },
+      actions: {
+        dialogs: {
+          open: { trigger: actions.dialogs.open.trigger },
+        },
+        ada: {
+          transactions: {
+            exportTransactionsToFile: {
+              trigger: actions.ada.transactions.exportTransactionsToFile.trigger
+            },
+            closeExportTransactionDialog: {
+              trigger: actions.ada.transactions.closeExportTransactionDialog.trigger
+            },
+            loadMoreTransactions: {
+              trigger: actions.ada.transactions.loadMoreTransactions.trigger
+            },
+          },
+        },
+      },
+    });
   }
 }

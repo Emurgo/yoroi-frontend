@@ -1,0 +1,15 @@
+.component {
+  text-align: center;
+  line-height: 22px;
+  color: var(--theme-wallet-nowallet-text-color);
+
+  .title {
+    font-family: var(--font-medium);
+    font-size: 18px;
+  }
+
+  .subtitle {
+    font-family: var(--font-regular);
+    font-size: 14px;
+  }
+}

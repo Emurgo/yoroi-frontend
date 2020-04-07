@@ -5,8 +5,7 @@ import { observer } from 'mobx-react';
 import styles from './WalletRecoveryInstructions.scss';
 
 type Props = {|
-  instructionsText: string | Element<any>,
-  classicTheme: boolean
+  +instructionsText: string | Element<any>,
 |};
 
 @observer
