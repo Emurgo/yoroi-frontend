@@ -429,7 +429,7 @@
   "wallet.navigation.receive": "Получить",
   "wallet.navigation.send": "Отправить",
   "wallet.navigation.transactions": "Транзакции",
-  "wallet.nowallet.subtitle": "Please choose a wallet from the top-right dropdown",
+  "wallet.nowallet.subtitle": "Пожалуйста, выберите кошелек из выпадающего списка в правом верхнем углу",
   "wallet.nowallet.title": "Кошелек не выбран",
   "wallet.receive.confirmationDialog.addressDetailsTitleLabel": "Проверить адрес",
   "wallet.receive.confirmationDialog.addressLabel": "Адрес",
