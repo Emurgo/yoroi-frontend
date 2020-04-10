@@ -227,7 +227,7 @@
   "settings.support.reportProblem.link": "サポート依頼",
   "settings.support.reportProblem.title": "問題を報告する",
   "sidebar.settings": "設定",
-  "sidebar.transfer": "Claim / Transfer",
+  "sidebar.transfer": "復元/送金",
   "sidebar.wallets": "マイ・ウォレット",
   "testnet.label.message": "注意：{network}上のADAには貨幣価値がありません。詳細は、FAQ({faqLink})をご参照ください。",
   "testnet.shelley.label.message": "テストネットのネットワークを使用しています ({network})",
