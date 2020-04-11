@@ -6,8 +6,11 @@ import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
 
 export type walletBackupSteps = 'privacyWarning' | 'recoveryPhraseDisplay' | 'recoveryPhraseEntry' | null;
 
-type RecoveryPhraseWordArray = Array<{ word: string }>;
-type recoveryPhraseSortedArray = Array<{ word: string, isActive: boolean }>;
+type RecoveryPhraseWordArray = Array<{| word: string, |}>;
+type recoveryPhraseSortedArray = Array<{|
+  word: string,
+  isActive: boolean,
+|}>;
 
 /** Pipeline for users to create their wallet and backing up their mnemonic somewhere safe */
 export default
@@ -22,7 +25,10 @@ class WalletBackupStore extends Store {
   /** Sorted recovery phrase the user clicks on to make sure they remember their mnemonic */
   @observable recoveryPhraseSorted: recoveryPhraseSortedArray;
   @observable completed: boolean;
-  @observable enteredPhrase: Array<{ word: string, index: number }>;
+  @observable enteredPhrase: Array<{|
+    word: string,
+    index: number,
+  |}>;
   @observable isPrivacyNoticeAccepted: boolean;
   @observable isEntering: boolean;
   @observable isTermDeviceAccepted: boolean;
@@ -31,7 +37,8 @@ class WalletBackupStore extends Store {
 
   countdownTimerInterval: ?IntervalID;
 
-  setup() {
+  setup(): void {
+    super.setup();
     this._reset();
     const a = this.actions.walletBackup;
     a.initiateWalletBackup.listen(this._initiateWalletBackup);
@@ -48,11 +55,11 @@ class WalletBackupStore extends Store {
     a.removeOneMnemonicWord.listen(this._removeOneWord);
   }
 
-  @action _initiateWalletBackup = (params: {
+  @action _initiateWalletBackup: {|
       recoveryPhrase: Array<string>,
       name: string,
       password: string,
-  }) => {
+  |} => void = (params) => {
     this.recoveryPhrase = params.recoveryPhrase;
     this.name = params.name;
     this.password = params.password;
@@ -68,8 +75,8 @@ class WalletBackupStore extends Store {
     this.isEntering = false;
     this.isTermDeviceAccepted = false;
     this.isTermRecoveryAccepted = false;
-    this.countdownRemaining = !environment.isMainnet() ? 0 : 10;
-    if (this.countdownTimerInterval) clearInterval(this.countdownTimerInterval);
+    this.countdownRemaining = !environment.isProduction() ? 0 : 10;
+    clearInterval(this.countdownTimerInterval);
     this.countdownTimerInterval = setInterval(() => {
       if (this.countdownRemaining > 0) {
         action(() => this.countdownRemaining--)();
@@ -82,37 +89,40 @@ class WalletBackupStore extends Store {
     });
   };
 
-  @action _continueToPrivacyWarning = () => {
+  @action _continueToPrivacyWarning: void => void = () => {
     this.currentStep = 'privacyWarning';
   };
 
-  @action _acceptPrivacyNoticeForWalletBackup = () => {
+  @action _acceptPrivacyNoticeForWalletBackup: void => void = () => {
     this.isPrivacyNoticeAccepted = true;
   };
 
-  @action _continueToRecoveryPhraseForWalletBackup = () => {
+  @action _continueToRecoveryPhraseForWalletBackup: void => void = () => {
     this.currentStep = 'recoveryPhraseDisplay';
   };
 
-  @action _startWalletBackup = () => {
+  @action _startWalletBackup: void => void = () => {
     this.currentStep = 'recoveryPhraseEntry';
   };
 
-  @action _addWordToWalletBackupVerification = (params: { word: string, index: number }) => {
+  @action _addWordToWalletBackupVerification: {|
+    word: string,
+    index: number
+  |} => void = (params) => {
     const { word, index } = params;
     this.enteredPhrase.push({ word, index });
     const pickedWord = this.recoveryPhraseSorted[index];
     if (pickedWord && pickedWord.word === word) pickedWord.isActive = false;
   };
 
-  @action _clearEnteredRecoveryPhrase = () => {
+  @action _clearEnteredRecoveryPhrase: void => void = () => {
     this.enteredPhrase = [];
     this.recoveryPhraseSorted = this.recoveryPhraseSorted.map(
       ({ word }) => ({ word, isActive: true })
     );
   };
 
-  @action _removeOneWord = () => {
+  @action _removeOneWord: void => void = () => {
     if (!this.enteredPhrase) {
       return;
     }
@@ -127,20 +137,20 @@ class WalletBackupStore extends Store {
     );
   }
 
-  @action _acceptWalletBackupTermDevice = () => {
+  @action _acceptWalletBackupTermDevice: void => void = () => {
     this.isTermDeviceAccepted = true;
   };
 
-  @action _acceptWalletBackupTermRecovery = () => {
+  @action _acceptWalletBackupTermRecovery: void => void = () => {
     this.isTermRecoveryAccepted = true;
   };
 
-  @action _restartWalletBackup = () => {
+  @action _restartWalletBackup: void => void = () => {
     this._clearEnteredRecoveryPhrase();
     this.currentStep = 'recoveryPhraseDisplay';
   };
 
-  @action _cancelWalletBackup = () => {
+  @action _cancelWalletBackup: void => void = () => {
     this.teardown();
   };
 
@@ -150,7 +160,7 @@ class WalletBackupStore extends Store {
   }
 
   @action
-  _reset = () => {
+  _reset: void => void = () => {
     this.inProgress = false;
     this.name = '';
     this.password = '';
@@ -164,8 +174,9 @@ class WalletBackupStore extends Store {
     this.isEntering = false;
     this.isTermDeviceAccepted = false;
     this.isTermRecoveryAccepted = false;
-    this.countdownRemaining = 0;
 
+    this.countdownRemaining = 0;
+    clearInterval(this.countdownTimerInterval);
     this.countdownTimerInterval = null;
   };
 

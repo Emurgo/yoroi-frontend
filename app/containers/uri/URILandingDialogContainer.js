@@ -1,78 +1,95 @@
 // @flow
 import React, { Component } from 'react';
-import { action, observable } from 'mobx';
+import { computed, action, observable } from 'mobx';
 import { observer } from 'mobx-react';
 
-import type { InjectedDialogContainerProps } from '../../types/injectedPropsType';
+import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 
 import URILandingDialog from '../../components/uri/URILandingDialog';
 import URIVerifyDialog from '../../components/uri/URIVerifyDialog';
 import URIInvalidDialog from '../../components/uri/URIInvalidDialog';
 
-import type { UriParams } from '../../utils/URIHandling';
+export type GeneratedData = typeof URILandingDialogContainer.prototype.generated;
 
-type Props = InjectedDialogContainerProps & {
-  onConfirm: void => void,
-  uriParams: ?UriParams,
-};
-
+type Props = {|
+  ...InjectedOrGenerated<GeneratedData>,
+  +onClose: void => void,
+  +onConfirm: void => void,
+|};
 
 @observer
 export default class URILandingDialogContainer extends Component<Props> {
 
-  @observable showDisclaimer = true;
+  @observable showDisclaimer: boolean = true;
 
   @action
-  toggleShowDisclaimer = () => {
+  toggleShowDisclaimer: void => void = () => {
     this.showDisclaimer = !this.showDisclaimer;
   }
 
-  onSubmit = () => {
+  onSubmit: void => void = () => {
     this.toggleShowDisclaimer();
   };
 
-  onVerifiedSubmit = () => {
+  onVerifiedSubmit: void => void = () => {
     this.props.onConfirm();
   };
 
-  onCancel = () => {
+  onCancel: void => void = () => {
     this.props.onClose();
   }
 
   render() {
-    if (!this.props.uriParams) {
+    if (!this.generated.stores.loading.uriParams) {
       return (
         <URIInvalidDialog
           onClose={this.onCancel}
           onSubmit={this.onCancel}
-          classicTheme={this.props.classicTheme}
         />
       );
     }
     // assert not null
-    const uriParams = this.props.uriParams;
+    const uriParams = this.generated.stores.loading.uriParams;
 
     if (!this.showDisclaimer) {
       return (
         <URIVerifyDialog
           onSubmit={this.onVerifiedSubmit}
+          onBack={this.toggleShowDisclaimer}
           onCancel={this.onCancel}
           uriParams={uriParams}
-          classicTheme={this.props.classicTheme}
-          selectedExplorer={this.props.stores.profile.selectedExplorer}
+          selectedExplorer={this.generated.stores.profile.selectedExplorer}
         />
       );
     }
 
     return (
       <URILandingDialog
-        onSubmit={() => this.toggleShowDisclaimer()}
+        onSubmit={this.toggleShowDisclaimer}
         onClose={this.onCancel}
-        classicTheme={this.props.classicTheme}
+        classicTheme={this.generated.stores.profile.isClassicTheme}
       />
     );
-
-
   }
 
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(URILandingDialogContainer)} no way to generated props`);
+    }
+    const { stores, } = this.props;
+    return Object.freeze({
+      stores: {
+        profile: {
+          selectedExplorer: stores.profile.selectedExplorer,
+          isClassicTheme: stores.profile.isClassicTheme,
+        },
+        loading: {
+          uriParams: stores.loading.uriParams,
+        },
+      },
+    });
+  }
 }

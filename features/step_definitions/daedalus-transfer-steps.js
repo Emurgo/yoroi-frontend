@@ -11,10 +11,6 @@ import {
   closeMockWebSocketServer,
   mockRestoredDaedalusAddresses
 } from '../mock-chain/mockWebSocketServer';
-import {
-  navigateTo,
-  waitUntilUrlEquals
-} from '../support/helpers/route-helpers';
 import i18n from '../support/helpers/i18n-helpers';
 import {
   checkAddressesRecoveredAreCorrect,
@@ -46,27 +42,17 @@ Given(/^My Daedalus wallet has funds/, () => {
   mockRestoredDaedalusAddresses(daedalusAddresses);
 });
 
-Given(/^My Daedalus wallet hasn't funds/, () => {
+Given(/^My Daedalus wallet has no funds/, () => {
   const daedalusAddresses = [];
   mockRestoredDaedalusAddresses(daedalusAddresses);
 });
 
-Given(/^I am on the Daedalus Transfer instructions screen$/, async function () {
-  await navigateTo.call(this, '/transfer/daedalus');
-  await waitUntilUrlEquals.call(this, '/transfer/daedalus');
-  await this.waitForElement('.transferInstructionsPageComponent');
-});
-
-When(/^I click on the create Yoroi wallet button$/, async function () {
-  await this.click('.createYoroiWallet');
-});
-
-When(/^I click on the transfer funds from Daedalus button$/, async function () {
-  await this.click('.fromDaedalusWallet');
+Then(/^I select the 12-word option$/, async function () {
+  await this.click('.fromDaedalusWallet12Word_legacyDaedalus');
 });
 
 When(/^I click on the transfer funds from Daedalus master key button$/, async function () {
-  await this.click('.fromDaedalusMasterKey');
+  await this.click('.fromDaedalusMasterKey_legacyDaedalus');
 });
 
 When(/^I proceed with the recovery$/, async function () {
@@ -98,7 +84,7 @@ Then(/^I should see the Create wallet screen$/, async function () {
 Then(/^I should see the Receive screen$/, async function () {
   const receiveTitle = await i18n.formatMessage(this.driver,
     { id: 'wallet.navigation.receive' });
-  await this.waitUntilText('.WalletNavButton_active', receiveTitle.toUpperCase());
+  await this.waitUntilText('.WalletNavButton_active', receiveTitle);
 });
 
 Then(/^I should see an Error screen$/, async function () {
@@ -123,16 +109,4 @@ Then(/^I should wait until funds are recovered:$/, async function (table) {
   const rows = table.hashes();
   await checkAddressesRecoveredAreCorrect(rows, this);
   await checkTotalAmountIsCorrect(rows, this);
-});
-
-Then(/^I see all necessary elements on "TRANSFER FUNDS FROM DAEDALUS" screen:$/, async function () {
-  const textCreateYoroiWallet = await this.intl('transfer.instructions.instructions.button.label');
-  const textDaedalusWallet = await this.intl('daedalusTransfer.instructions.attention.button.label');
-  const textDaedalusPaperWallet = await this.intl('daedalusTransfer.instructions.attention.paper.button.label');
-  const textDaedalusMasterKey = await this.intl('daedalusTransfer.instructions.attention.masterKey.button.label');
-
-  await this.waitForElement(`//button[contains(@class, 'createYoroiWallet') and contains(text(), '${textCreateYoroiWallet}')]`, By.xpath);
-  await this.waitForElement(`//button[contains(@class, 'fromDaedalusWallet') and contains(text(), '${textDaedalusWallet}')]`, By.xpath);
-  await this.waitForElement(`//button[contains(@class, 'fromDaedalusPaperWallet') and contains(text(), '${textDaedalusPaperWallet}')]`, By.xpath);
-  await this.waitForElement(`//button[contains(@class, 'fromDaedalusMasterKey') and contains(text(), '${textDaedalusMasterKey}')]`, By.xpath);
 });

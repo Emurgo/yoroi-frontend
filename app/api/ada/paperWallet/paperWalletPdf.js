@@ -6,15 +6,15 @@ import paperWalletPage2Path from '../../../assets/images/paper-wallet/paper-wall
 import { Logger, stringifyError } from '../../../utils/logging';
 import type { Network } from '../../../../config/config-types';
 import { NetworkType } from '../../../../config/config-types';
-import type { WalletAccountNumberPlate } from '../../../domain/Wallet';
+import type { WalletAccountNumberPlate } from '../lib/storage/models/PublicDeriver/interfaces';
 import { createIcon as blockiesIcon } from '@download/blockies';
 
-export type PaperRequest = {
+export type PaperRequest = {|
   words: Array<string>,
   addresses: Array<string>,
   accountPlate: ?WalletAccountNumberPlate,
   network: Network,
-}
+|}
 
 export const PdfGenSteps = Object.freeze({
   initializing: 0,
@@ -126,7 +126,7 @@ export const generateAdaPaperPdf = async (
 
 function printPasswordMessage(
   doc: Pdf,
-) {
+): void {
   doc.setFontSize(11);
   const text = 'password or a hint';
   textCenter(doc, 56, text, null, 180, true);
@@ -139,7 +139,7 @@ function printTestnetLabel(
   y: number,
   r?: number,
   xShift?: number
-) {
+): void {
   doc.setFontSize(50);
   doc.setFontType('bold');
   doc.setTextColor(255, 180, 164);
@@ -205,7 +205,7 @@ function printAddresses(
   return true;
 }
 
-function printMnemonics(doc: Pdf, words: Array<string>) {
+function printMnemonics(doc: Pdf, words: Array<string>): void {
   doc.setFont('courier');
   doc.setFontSize(7);
   const [pA, pB] = [{ x: 56, y: 82 }, { x: 153, y: 105 }];
@@ -226,23 +226,26 @@ type AddImageParams = {
   w?: number,
   h?: number,
   r?: number,
+  ...
 }
 
 function textCenter(
   doc: Pdf,
   y: number,
   text: string,
-  m,
-  r,
+  m: null,
+  r: ?number,
   isReverseCentering?: boolean,
   xShift?: number
-) {
+): void {
   const unit = doc.getStringUnitWidth(text);
   const fontSize = doc.internal.getFontSize();
   const scaleFactor = doc.internal.scaleFactor;
   const textWidth = unit * fontSize / scaleFactor;
   const pageWidth = doc.internal.pageSize.width;
-  const textOffset = ((pageWidth / 2) - ((textWidth / 2) * (isReverseCentering === true ? -1 : +1)));
+  const textOffset = (
+    (pageWidth / 2) - ((textWidth / 2) * (isReverseCentering === true ? -1 : +1))
+  );
   doc.text(textOffset + (xShift || 0), y, text, m, r);
 }
 
@@ -250,7 +253,7 @@ async function addImage(doc: Pdf, url: string, params?: AddImageParams): Promise
   return addImageBase64(doc, await loadImage(url), params);
 }
 
-function addImageBase64(doc: Pdf, img: string, params?: AddImageParams) {
+function addImageBase64(doc: Pdf, img: string, params?: AddImageParams): void {
   const { x, y, w, h, r } = params || {};
   doc.addImage(img, 'png', x || 0, y || 0, w, h, '', 'FAST', r);
 }

@@ -1,12 +1,15 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import { action, computed, observable } from 'mobx';
 import type { Node } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import environment from '../../environment';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import globalMessages from '../../i18n/global-messages';
+import { tryAddressToKind } from '../../api/ada/lib/storage/bridge/utils';
+import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 
 import {
   DECIMAL_PLACES_IN_ADA,
@@ -16,18 +19,23 @@ import {
 import WalletSendForm from '../../components/wallet/send/WalletSendForm';
 // Web Wallet Confirmation
 import WalletSendConfirmationDialogContainer from './dialogs/WalletSendConfirmationDialogContainer';
+import type {
+  GeneratedData as WalletSendConfirmationDialogContainerData
+} from './dialogs/WalletSendConfirmationDialogContainer';
 import WalletSendConfirmationDialog from '../../components/wallet/send/WalletSendConfirmationDialog';
 import ConnectExternalStorageDialog from '../../components/wallet/memos/ConnectExternalStorageDialog';
 import {
   formattedWalletAmount,
-  formattedAmountToNaturalUnits,
 } from '../../utils/formatters';
 import {
   copySignRequest,
-  signRequestFee,
-  signRequestReceivers,
-  signRequestTotalInput,
-} from '../../api/ada/lib/utils';
+  IGetFee,
+  IReceivers,
+  ITotalInput,
+} from '../../api/ada/transactions/utils';
+import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 // Hardware Wallet Confirmation
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
@@ -62,47 +70,41 @@ const messagesTrezor = defineMessages({
   },
 });
 
-
-type Props = InjectedProps;
-
-type State = {
-  showMemo: boolean,
-};
+export type GeneratedData = typeof WalletSendPage.prototype.generated;
 
 @observer
-export default class WalletSendPage extends Component<Props, State> {
+export default class WalletSendPage extends Component<InjectedOrGenerated<GeneratedData>> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
   };
 
-  state = {
-    showMemo: false,
-  };
+  @observable showMemo: boolean = false;
 
+  @action
   toggleShowMemo = () => {
-    this.setState(prevState => ({ showMemo: !prevState.showMemo }));
+    this.showMemo = !this.showMemo;
   };
 
   render() {
-    const { wallets, transactions, transactionBuilderStore } = this.props.stores.substores.ada;
-    const activeWallet = wallets.active;
+    const { transactions, transactionBuilderStore } = this.generated.stores.substores.ada;
+    const publicDeriver = this.generated.stores.wallets.selected;
     // Guard against potential null values
-    if (!activeWallet) throw new Error('Active wallet required for WalletSendPage.');
+    if (!publicDeriver) throw new Error('Active wallet required for WalletSendPage.');
 
     const { intl } = this.context;
-    const { uiDialogs, profile, memos } = this.props.stores;
-    const { actions } = this.props;
-    const { isValidAddress } = wallets;
+    const { uiDialogs, profile, memos } = this.generated.stores;
+    const { actions } = this.generated;
     const { validateAmount, hasAnyPending } = transactions;
-    const { txBuilderActions } = this.props.actions.ada;
+    const { txBuilderActions } = this.generated.actions.ada;
 
     // disallow sending when pending tx exists
     if (uiDialogs.isOpen && hasAnyPending) {
       actions.dialogs.closeActiveDialog.trigger();
     }
 
-    const targetDialog =  activeWallet.isHardwareWallet ?
+    const walletType = publicDeriver.getParent().getWalletType();
+    const targetDialog = walletType === WalletTypeOption.HARDWARE_WALLET ?
       HWSendConfirmationDialog :
       WalletSendConfirmationDialog;
 
@@ -114,14 +116,25 @@ export default class WalletSendPage extends Component<Props, State> {
     };
 
     return (
-      <div>
+      <>
         <WalletSendForm
           currencyUnit={intl.formatMessage(globalMessages.unitAda)}
           currencyMaxIntegerDigits={MAX_INTEGER_PLACES_IN_ADA}
           currencyMaxFractionalDigits={DECIMAL_PLACES_IN_ADA}
           validateAmount={validateAmount}
           onSubmit={onSubmit}
-          addressValidator={isValidAddress}
+          isValidShelleyAddress={address => {
+            const kind = tryAddressToKind(address, 'bech32');
+            if (kind == null) return false;
+            if (kind === CoreAddressTypes.CARDANO_LEGACY) return false;
+            return true;
+          }}
+          isValidLegacyAddress={address => {
+            const kind = tryAddressToKind(address, 'bech32');
+            if (kind == null) return false;
+            if (kind === CoreAddressTypes.CARDANO_LEGACY) return true;
+            return false;
+          }}
           totalInput={transactionBuilderStore.totalInput}
           hasAnyPending={hasAnyPending}
           classicTheme={profile.isClassicTheme}
@@ -129,14 +142,14 @@ export default class WalletSendPage extends Component<Props, State> {
           updateAmount={(value: void | number) => txBuilderActions.updateAmount.trigger(value)}
           updateMemo={(content: void | string) => txBuilderActions.updateMemo.trigger(content)}
           shouldSendAll={transactionBuilderStore.shouldSendAll}
-          toggleSendAll={() => txBuilderActions.toggleSendAll.trigger()}
+          toggleSendAll={txBuilderActions.toggleSendAll.trigger}
           fee={transactionBuilderStore.fee}
           isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
-          reset={() => txBuilderActions.reset.trigger()}
+          reset={txBuilderActions.reset.trigger}
           error={transactionBuilderStore.createUnsignedTx.error}
-          uriParams={this.props.stores.loading.uriParams}
-          resetUriParams={this.props.stores.loading.resetUriParams}
-          showMemo={this.state.showMemo}
+          uriParams={this.generated.stores.loading.uriParams}
+          resetUriParams={this.generated.stores.loading.resetUriParams}
+          showMemo={this.showMemo}
           onAddMemo={() => {
             if (memos.hasSetSelectedExternalStorageProvider) {
               this.toggleShowMemo();
@@ -146,12 +159,12 @@ export default class WalletSendPage extends Component<Props, State> {
           }}
         />
         {this.renderDialog()}
-      </div>
+      </>
     );
   }
 
   renderDialog = (): Node => {
-    const { uiDialogs } = this.props.stores;
+    const { uiDialogs } = this.generated.stores;
 
     if (uiDialogs.isOpen(WalletSendConfirmationDialog)) {
       return this.webWalletDoConfirmation();
@@ -169,17 +182,15 @@ export default class WalletSendPage extends Component<Props, State> {
     * Callback that creates a container to avoid the component knowing about actions/stores */
   webWalletDoConfirmation = (): Node => {
     const { intl } = this.context;
-    const { actions, stores } = this.props;
 
-    const { transactionBuilderStore } = this.props.stores.substores.ada;
+    const { transactionBuilderStore } = this.generated.stores.substores.ada;
     if (!transactionBuilderStore.tentativeTx) {
       throw new Error('webWalletDoConfirmation::should never happen');
     }
     const signRequest = transactionBuilderStore.tentativeTx;
 
     return (<WalletSendConfirmationDialogContainer
-      actions={actions}
-      stores={stores}
+      {...this.generated.WalletSendConfirmationDialogContainerProps}
       signRequest={signRequest}
       staleTx={transactionBuilderStore.txMismatch}
       currencyUnit={intl.formatMessage(globalMessages.unitAda)}
@@ -191,69 +202,77 @@ export default class WalletSendPage extends Component<Props, State> {
     * separate container is not needed, this container acts as container for Confirmation dialog */
   hardwareWalletDoConfirmation = (): Node => {
     const { intl } = this.context;
-    const { active } = this.props.stores.substores[environment.API].wallets;
-    const { transactionBuilderStore } = this.props.stores.substores.ada;
+    const publicDeriver = this.generated.stores.wallets.selected;
+    const { transactionBuilderStore } = this.generated.stores.substores.ada;
     // Guard against potential null values
-    if (!active) throw new Error('Active wallet required for hardwareWalletDoConfirmation.');
+    if (!publicDeriver) throw new Error('Active wallet required for hardwareWalletDoConfirmation.');
 
     if (!transactionBuilderStore.tentativeTx) {
       throw new Error('hardwareWalletDoConfirmation::should never happen');
     }
     const signRequest = transactionBuilderStore.tentativeTx;
 
-    const totalInput = signRequestTotalInput(signRequest, true);
-    const fee = signRequestFee(signRequest, true);
-    const receivers = signRequestReceivers(signRequest, false);
+    const totalInput = ITotalInput(signRequest, true);
+    const fee = IGetFee(signRequest, true);
+    const receivers = IReceivers(signRequest, false);
 
+    const conceptualWallet = publicDeriver.getParent();
     let hwSendConfirmationDialog: Node = null;
-    if (active.isLedgerNanoSWallet) {
-      const ledgerSendAction = this.props.actions[environment.API].ledgerSend;
+
+    const unsignedTx = signRequest.unsignedTx;
+    if (!(unsignedTx instanceof RustModule.WalletV2.Transaction)) {
+      throw new Error('hardwareWalletDoConfirmation hw wallets unsupported for Shelley');
+    }
+    const v2Request = {
+      ...signRequest,
+      unsignedTx,
+    };
+    if (isLedgerNanoWallet(conceptualWallet)) {
+      const ledgerSendAction = this.generated.actions[environment.API].ledgerSend;
       ledgerSendAction.init.trigger();
-      const ledgerSendStore = this.props.stores.substores[environment.API].ledgerSend;
+      const ledgerSendStore = this.generated.stores.substores[environment.API].ledgerSend;
       hwSendConfirmationDialog = (
         <HWSendConfirmationDialog
           staleTx={transactionBuilderStore.txMismatch}
-          selectedExplorer={this.props.stores.profile.selectedExplorer}
+          selectedExplorer={this.generated.stores.profile.selectedExplorer}
           amount={formattedWalletAmount(totalInput.minus(fee))}
           receivers={receivers}
           totalAmount={formattedWalletAmount(totalInput)}
           transactionFee={formattedWalletAmount(fee)}
-          amountToNaturalUnits={formattedAmountToNaturalUnits}
           currencyUnit={intl.formatMessage(globalMessages.unitAda)}
           messages={messagesLedger}
           isSubmitting={ledgerSendStore.isActionProcessing}
           error={ledgerSendStore.error}
           onSubmit={
             () => ledgerSendAction.sendUsingLedger.trigger({
-              signRequest: copySignRequest(signRequest)
+              params: { signRequest: copySignRequest(v2Request) },
+              publicDeriver,
             })
           }
           onCancel={ledgerSendAction.cancel.trigger}
-          classicTheme={this.props.stores.profile.isClassicTheme}
         />);
-    } else if (active.isTrezorTWallet) {
-      const trezorSendAction = this.props.actions[environment.API].trezorSend;
-      const trezorSendStore = this.props.stores.substores[environment.API].trezorSend;
+    } else if (isTrezorTWallet(conceptualWallet)) {
+      const trezorSendAction = this.generated.actions[environment.API].trezorSend;
+      const trezorSendStore = this.generated.stores.substores[environment.API].trezorSend;
       hwSendConfirmationDialog = (
         <HWSendConfirmationDialog
           staleTx={transactionBuilderStore.txMismatch}
-          selectedExplorer={this.props.stores.profile.selectedExplorer}
+          selectedExplorer={this.generated.stores.profile.selectedExplorer}
           amount={formattedWalletAmount(totalInput.minus(fee))}
           receivers={receivers}
           totalAmount={formattedWalletAmount(totalInput)}
           transactionFee={formattedWalletAmount(fee)}
-          amountToNaturalUnits={formattedAmountToNaturalUnits}
           currencyUnit={intl.formatMessage(globalMessages.unitAda)}
           messages={messagesTrezor}
           isSubmitting={trezorSendStore.isActionProcessing}
           error={trezorSendStore.error}
           onSubmit={
             () => trezorSendAction.sendUsingTrezor.trigger({
-              signRequest: copySignRequest(signRequest)
+              params: { signRequest: copySignRequest(v2Request) },
+              publicDeriver,
             })
           }
           onCancel={trezorSendAction.cancel.trigger}
-          classicTheme={this.props.stores.profile.isClassicTheme}
         />);
     } else {
       throw new Error('Unsupported hardware wallet found at hardwareWalletDoConfirmation.');
@@ -263,19 +282,113 @@ export default class WalletSendPage extends Component<Props, State> {
   };
 
   connectExternalStorageDialog = (): Node => {
-    const { actions, stores } = this.props;
+    const { actions, } = this.generated;
     return (<ConnectExternalStorageDialog
       onCancel={actions.memos.closeConnectExternalStorageDialog.trigger}
       onConnect={() => {
         actions.memos.closeConnectExternalStorageDialog.trigger();
         actions.router.goToRoute.trigger({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
       }}
-      classicTheme={stores.profile.isClassicTheme}
     />);
   }
 
   openConnectExternalStorageDialog = (): void => {
-    const { actions } = this.props;
+    const { actions } = this.generated;
     actions.dialogs.open.trigger({ dialog: ConnectExternalStorageDialog });
+  }
+
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(WalletSendPage)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    const adaStore = stores.substores.ada;
+    return Object.freeze({
+      stores: {
+        profile: {
+          isClassicTheme: stores.profile.isClassicTheme,
+          selectedExplorer: stores.profile.selectedExplorer,
+        },
+        wallets: {
+          selected: stores.wallets.selected,
+        },
+        memos: {
+          hasSetSelectedExternalStorageProvider: stores.memos.hasSetSelectedExternalStorageProvider,
+        },
+        loading: {
+          uriParams: stores.loading.uriParams,
+          resetUriParams: stores.loading.resetUriParams,
+        },
+        uiDialogs: {
+          isOpen: stores.uiDialogs.isOpen,
+        },
+        substores: {
+          ada: {
+            transactions: {
+              validateAmount: adaStore.transactions.validateAmount,
+              hasAnyPending: adaStore.transactions.hasAnyPending,
+            },
+            ledgerSend: {
+              isActionProcessing: adaStore.ledgerSend.isActionProcessing,
+              error: adaStore.ledgerSend.error,
+            },
+            trezorSend: {
+              isActionProcessing: adaStore.trezorSend.isActionProcessing,
+              error: adaStore.trezorSend.error,
+            },
+            transactionBuilderStore: {
+              totalInput: adaStore.transactionBuilderStore.totalInput,
+              fee: adaStore.transactionBuilderStore.fee,
+              shouldSendAll: adaStore.transactionBuilderStore.shouldSendAll,
+              tentativeTx: adaStore.transactionBuilderStore.tentativeTx,
+              txMismatch: adaStore.transactionBuilderStore.txMismatch,
+              createUnsignedTx: {
+                isExecuting: adaStore.transactionBuilderStore.createUnsignedTx.isExecuting,
+                error: adaStore.transactionBuilderStore.createUnsignedTx.error,
+              },
+            },
+          },
+        },
+      },
+      actions: {
+        dialogs: {
+          open: { trigger: actions.dialogs.open.trigger },
+          closeActiveDialog: { trigger: actions.dialogs.closeActiveDialog.trigger },
+        },
+        router: {
+          goToRoute: { trigger: actions.router.goToRoute.trigger },
+        },
+        memos: {
+          closeConnectExternalStorageDialog: {
+            trigger: actions.memos.closeConnectExternalStorageDialog.trigger
+          },
+        },
+        ada: {
+          ledgerSend: {
+            init: { trigger: actions.ada.ledgerSend.init.trigger },
+            cancel: { trigger: actions.ada.ledgerSend.cancel.trigger },
+            sendUsingLedger: { trigger: actions.ada.ledgerSend.sendUsingLedger.trigger },
+          },
+          trezorSend: {
+            cancel: { trigger: actions.ada.trezorSend.cancel.trigger },
+            sendUsingTrezor: { trigger: actions.ada.trezorSend.sendUsingTrezor.trigger },
+          },
+          txBuilderActions: {
+            updateTentativeTx: { trigger: actions.ada.txBuilderActions.updateTentativeTx.trigger },
+            updateReceiver: { trigger: actions.ada.txBuilderActions.updateReceiver.trigger },
+            updateAmount: { trigger: actions.ada.txBuilderActions.updateAmount.trigger },
+            toggleSendAll: { trigger: actions.ada.txBuilderActions.toggleSendAll.trigger },
+            reset: { trigger: actions.ada.txBuilderActions.reset.trigger },
+            updateMemo: { trigger: actions.ada.txBuilderActions.updateMemo.trigger },
+          },
+        },
+      },
+      WalletSendConfirmationDialogContainerProps: (
+        { actions, stores, }: InjectedOrGenerated<WalletSendConfirmationDialogContainerData>
+      ),
+    });
   }
 }

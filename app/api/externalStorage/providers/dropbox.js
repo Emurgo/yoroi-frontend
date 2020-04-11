@@ -1,6 +1,5 @@
 // @flow
-import { observable } from 'mobx';
-import { sprintf } from 'sprintf-js';
+import { observable, runInAction } from 'mobx';
 import { Dropbox } from 'dropbox';
 import moment from 'moment';
 import {
@@ -11,68 +10,46 @@ import {
   Logger,
   stringifyError
 } from '../../../utils/logging';
+import { ROUTES } from '../../../routes-config';
 import environment from '../../../environment';
 import type {
+  IProvider,
   UploadExternalTxMemoRequest, DeleteExternalTxMemoRequest,
   DownloadExternalTxMemoRequest, GetMetadataExternalTxMemoRequest,
   FetchFolderExternalTxMemoRequest, CreateFolderExternalTxMemoRequest,
   UploadExternalTxMemoResponse, DeleteExternalTxMemoResponse,
-  DownloadExternalTxMemoResponse, FetchFilenameExternalTxMemoResponse,
+  DownloadExternalTxMemoResponse,
+  FetchFilenameExternalTxMemoRequest, FetchFilenameExternalTxMemoResponse,
   GetMetadataExternalTxMemoResponse, FetchFolderExternalTxMemoResponse,
   CreateFolderExternalTxMemoResponse
-} from '../types';
-import {
-  ExternalStorageList,
-  ExternalStorageProviders
-} from '../../../domain/ExternalStorage';
+} from './IProvider';
 
-
-export default class DropboxApi {
-  // eslint-disable-next-line max-len
-  @observable authorizeUrl: string = ExternalStorageProviders[ExternalStorageList.DROPBOX].authorize_url;
-  @observable folderPath: string = '/cardano/%s/transaction-memos';
-  name: string = ExternalStorageProviders[ExternalStorageList.DROPBOX].name;
+export default class DropboxApi implements IProvider {
+  authorizeUrl: string = `https://www.dropbox.com/oauth2/authorize?client_id=${DROPBOX_CLIENT_ID}&response_type=token&redirect_uri=${ROUTES.ROOT}#/`;
+  baseFolderPath: string = `/cardano/${environment.NETWORK}/transaction-memos`;
   memoExt: string = '.txt';
-  errorMessage: string = '';
-  errorCode: string = '';
+  @observable errorMessage: string = '';
+  @observable errorCode: string = '';
   api: Dropbox;
-  /* setup: Function;
-  auth: Function;
-  uploadFile: Function;
-  uploadAndOverwriteFile: Function;
-  deleteFile: Function; */
 
   constructor() {
-    // $FlowFixMe
     this.setup = this.setup.bind(this);
-    // $FlowFixMe
     this.auth = this.auth.bind(this);
-    // $FlowFixMe
-    this.setWallet = this.setWallet.bind(this);
-    // $FlowFixMe
+    this.getDisplayName = this.getDisplayName.bind(this);
+    this.revokeToken = this.revokeToken.bind(this);
+    this.getError = this.getError.bind(this);
     this.getMetadata = this.getMetadata.bind(this);
-    // $FlowFixMe
     this.fetchFolder = this.fetchFolder.bind(this);
-    // $FlowFixMe
     this.createFolder = this.createFolder.bind(this);
-    // $FlowFixMe
     this.fetchFilenames = this.fetchFilenames.bind(this);
-    // $FlowFixMe
     this.uploadFile = this.uploadFile.bind(this);
-    // $FlowFixMe
     this.uploadAndOverwriteFile = this.uploadAndOverwriteFile.bind(this);
-    // $FlowFixMe
     this.deleteFile = this.deleteFile.bind(this);
-    // $FlowFixMe
     this.downloadFile = this.downloadFile.bind(this);
   }
 
-  setup() {
-    this.authorizeUrl = sprintf(this.authorizeUrl, environment.baseUrl);
-    this.folderPath = sprintf(this.folderPath, environment.NETWORK);
-  }
-
-  auth(token: string) {
+  /*:: auth: string => void; */
+  auth(token: string): void {
     this.api = new Dropbox({
       clientId: DROPBOX_CLIENT_ID,
       accessToken: token,
@@ -80,82 +57,105 @@ export default class DropboxApi {
     });
   }
 
-  // Update folder path with wallet account plate id
-  setWallet(numberPlateId: string) {
-    if (numberPlateId !== '' && numberPlateId !== undefined) {
-      this.folderPath = this.folderPath.concat('/').concat(numberPlateId);
-    }
+  /*:: setup: void => void; */
+  setup(): void {
   }
 
+  /*:: getDisplayName: void => string; */
+  getDisplayName(): string {
+    return 'Dropbox';
+  }
+
+  /*:: revokeToken: void => Promise<void>; */
   async revokeToken(): Promise<void> {
     return this.api.authTokenRevoke()
-      .then(() => {
+      .then((result) => {
         Logger.debug('DropboxApi::revokeToken success');
-        return true;
+        return result;
       })
       .catch((e) => {
-        self.errorCode = e.status;
-        self.errorMessage = 'An error ocurred while revoking the token';
+        runInAction(() => {
+          self.errorCode = e.status;
+          self.errorMessage = 'An error ocurred while revoking the token';
+        });
         Logger.error('DropboxApi::revokeToken error: ' + stringifyError(e.error));
-        return false;
+        throw e;
       });
   }
 
-  getError() {
-    return sprintf('[%s] %s', this.errorCode, this.errorMessage);
+  /*:: getError: void => string; */
+  getError(): string {
+    return `[${this.errorCode}] ${this.errorMessage}`;
   }
 
+  // TODO: do we need this function?
+  /*:: getMetadata:
+    GetMetadataExternalTxMemoRequest => Promise<GetMetadataExternalTxMemoResponse>; */
   async getMetadata(
     path: GetMetadataExternalTxMemoRequest
   ): Promise<GetMetadataExternalTxMemoResponse> {
     const self = this;
-    const defaultResponse = { tag: '', lastUpdated: '' };
     return await this.api.filesGetMetadata({
       path,
     })
       .then((response) => {
         if (
-          Object.prototype.hasOwnProperty.call(response, '.tag')
-          && Object.prototype.hasOwnProperty.call(response, 'name')
+          !Object.prototype.hasOwnProperty.call(response, '.tag')
+          || !Object.prototype.hasOwnProperty.call(response, 'name')
         ) {
-          return {
-            tag: response['.tag'],
-            lastUpdated: Object.prototype.hasOwnProperty.call(response, 'server_modified')
-              ? moment(response.server_modified, 'YYYY-MM-DDTHH:mm:ssZ').toDate() : ''
-          };
+          throw new Error('Should never happen');
         }
-        return defaultResponse;
+        return {
+          tag: response['.tag'],
+          lastUpdated: Object.prototype.hasOwnProperty.call(response, 'server_modified')
+            // $FlowFixMe
+            && response.server_modified != null
+            ? moment(response.server_modified, 'YYYY-MM-DDTHH:mm:ssZ').toDate()
+            : new Date(0)
+        };
       })
       .catch((e) => {
-        self.errorCode = e.status;
-        self.errorMessage = 'An error ocurred while fetching metadata';
+        runInAction(() => {
+          self.errorCode = e.status;
+          self.errorMessage = 'An error ocurred while fetching metadata';
+        });
         Logger.error('DropboxApi::getMetadata error: ' + stringifyError(e.error));
-        return defaultResponse;
+        throw e;
       });
   }
 
+  /*:: fetchFolder:
+    FetchFolderExternalTxMemoRequest => Promise<FetchFolderExternalTxMemoResponse>; */
   async fetchFolder(
-    folder: FetchFolderExternalTxMemoRequest
+    request: FetchFolderExternalTxMemoRequest
   ): Promise<FetchFolderExternalTxMemoResponse> {
-    const fullPath = (folder !== '' && folder !== undefined)
-      ? this.folderPath.concat('/').concat(folder) : this.folderPath;
+    const { walletId } = request;
+    const fullPath = walletId != null
+      ? this.baseFolderPath.concat('/').concat(walletId)
+      : this.baseFolderPath;
     return await this.getMetadata(fullPath)
       .then(response => {
         return response.tag === 'folder';
       })
       .catch((e) => {
-        self.errorCode = e.status;
-        self.errorMessage = 'An error ocurred while fetching folder';
+        runInAction(() => {
+          self.errorCode = e.status;
+          self.errorMessage = 'An error ocurred while fetching folder';
+        });
         Logger.error('DropboxApi::fetchFolder error: ' + stringifyError(e.error));
-        return false;
+        throw e;
       });
   }
 
+  /*:: createFolder:
+    CreateFolderExternalTxMemoRequest => Promise<CreateFolderExternalTxMemoResponse>; */
   async createFolder(
-    folder: CreateFolderExternalTxMemoRequest
+    request: CreateFolderExternalTxMemoRequest
   ): Promise<CreateFolderExternalTxMemoResponse> {
-    const fullPath = (folder !== '' && folder !== undefined)
-      ? this.folderPath.concat('/').concat(folder) : this.folderPath;
+    const { walletId } = request;
+    const fullPath = walletId != null
+      ? this.baseFolderPath.concat('/').concat(walletId)
+      : this.baseFolderPath;
     return this.api.filesCreateFolderV2({
       path: fullPath,
     })
@@ -164,122 +164,151 @@ export default class DropboxApi {
         return true;
       })
       .catch((e) => {
-        self.errorCode = e.status;
-        self.errorMessage = 'An error ocurred while creating the folder';
+        runInAction(() => {
+          self.errorCode = e.status;
+          self.errorMessage = 'An error ocurred while creating the folder';
+        });
         Logger.error('DropboxApi::createFolder error: ' + stringifyError(e.error));
-        return false;
+        throw e;
       });
   }
 
-  async fetchFilenames(): Promise<FetchFilenameExternalTxMemoResponse> {
+  /*:: fetchFilenames:
+    FetchFilenameExternalTxMemoRequest => Promise<FetchFilenameExternalTxMemoResponse>; */
+  async fetchFilenames(
+    request: FetchFilenameExternalTxMemoRequest
+  ): Promise<FetchFilenameExternalTxMemoResponse> {
     const self = this;
+
+    // TODO: call list_folder/continue with the returned ListFolderResult.cursor
+    // to retrieve more entries
     return await this.api.filesListFolder({
-      path: this.folderPath,
+      path: `${this.baseFolderPath}/${request.walletId}`,
       include_deleted: true,
     })
       .then((response) => {
-        return response.entries.map(entry => {
-          if (
+        return response.entries
+          .filter(entry => (
             Object.prototype.hasOwnProperty.call(entry, '.tag')
             && Object.prototype.hasOwnProperty.call(entry, 'name')
-          ) {
+          ))
+          .map(entry => {
             return {
               tx: entry.name.substr(0, entry.name.length - this.memoExt.length),
               deleted: entry['.tag'] === 'deleted',
               lastUpdated: Object.prototype.hasOwnProperty.call(entry, 'server_modified')
-                ? moment(entry.server_modified, 'YYYY-MM-DDTHH:mm:ssZ').toDate() : ''
+                // $FlowFixMe
+                && entry.server_modified != null
+                ? moment(entry.server_modified, 'YYYY-MM-DDTHH:mm:ssZ').toDate()
+                : new Date(0),
             };
-          }
-          return '';
-        });
+          });
       })
       .catch((e) => {
-        self.errorCode = e.status;
-        self.errorMessage = 'An error ocurred while fetching filenames';
+        runInAction(() => {
+          self.errorCode = e.status;
+          self.errorMessage = 'An error ocurred while fetching filenames';
+        });
         Logger.error('DropboxApi::fetchFilenames error: ' + stringifyError(e.error));
+        throw e;
       });
   }
 
+  /*:: uploadFile:
+    UploadExternalTxMemoRequest => Promise<UploadExternalTxMemoResponse>; */
   async uploadFile(
     request: UploadExternalTxMemoRequest
   ): Promise<UploadExternalTxMemoResponse> {
     const self = this;
-    const txHash = request.memo.tx;
-    const fullPath = this.folderPath.concat('/').concat(txHash).concat(this.memoExt);
+    const txHash = request.memo.TransactionHash;
+    const fullPath = `${this.baseFolderPath}/${request.memo.WalletId}/${request.memo.TransactionHash}${this.memoExt}`;
     return this.api.filesUpload({
       path: fullPath,
-      contents: request.memo.memo,
+      contents: request.memo.Content,
     })
       .then(() => {
         Logger.debug('DropboxApi::uploadFile success: ' + txHash + ' file uploaded');
         return true;
       })
       .catch((e) => {
-        // Memo already exists for this trx, don't overwrite.
+        // Memo already exists for this tx, don't overwrite.
         // Wallet auto-sync should update with the correct version
         if (e.status === 409) {
           return false;
         }
-        self.errorCode = e.status;
-        self.errorMessage = 'An error ocurred while uploading the file';
+        runInAction(() => {
+          self.errorCode = e.status;
+          self.errorMessage = 'An error ocurred while uploading the file';
+        });
         Logger.error('DropboxApi::uploadFile error: ' + stringifyError(e.error));
-        return false;
+        throw e;
       });
   }
 
+  /*:: uploadAndOverwriteFile:
+    UploadExternalTxMemoRequest => Promise<UploadExternalTxMemoResponse>; */
   async uploadAndOverwriteFile(
     request: UploadExternalTxMemoRequest
   ): Promise<UploadExternalTxMemoResponse> {
     const self = this;
-    const txHash = request.memo.tx;
-    const fullPath = this.folderPath.concat('/').concat(txHash).concat(this.memoExt);
+    const txHash = request.memo.TransactionHash;
+    const fullPath = `${this.baseFolderPath}/${request.memo.WalletId}/${request.memo.TransactionHash}${this.memoExt}`;
     return this.api.filesUpload({
       path: fullPath,
-      contents: request.memo.memo,
-      mode: 'overwrite'
+      contents: request.memo.Content,
+      mode: ('overwrite': any) // type definition is wrong
     })
       .then(() => {
         Logger.debug('DropboxApi::uploadAndOverwriteFile success: ' + txHash + ' file uploaded');
         return true;
       })
       .catch((e) => {
-        self.errorCode = e.status;
-        self.errorMessage = 'An error ocurred while uploading the file';
+        runInAction(() => {
+          self.errorCode = e.status;
+          self.errorMessage = 'An error ocurred while uploading the file';
+        });
         Logger.error('DropboxApi::uploadAndOverwrite error: ' + stringifyError(e.error));
-        return false;
+        throw e;
       });
   }
 
+  /*:: deleteFile: DeleteExternalTxMemoRequest => Promise<DeleteExternalTxMemoResponse>; */
   async deleteFile(
-    txHash: DeleteExternalTxMemoRequest
+    request: DeleteExternalTxMemoRequest
   ): Promise<DeleteExternalTxMemoResponse> {
-    const fullPath = this.folderPath.concat('/').concat(txHash).concat(this.memoExt);
+    const fullPath = `${this.baseFolderPath}/${request.walletId}/${request.txHash}${this.memoExt}`;
+    // TODO: deprecated
     return this.api.filesDelete({
       path: fullPath
     })
       .then(() => {
-        Logger.debug('DropboxApi::deleteFile success: ' + txHash + ' file deleted');
+        Logger.debug('DropboxApi::deleteFile success: ' + request.txHash + ' file deleted');
         return true;
       })
       .catch((e) => {
-        self.errorCode = e.status;
-        self.errorMessage = 'An error ocurred while deleting the file';
+        runInAction(() => {
+          self.errorCode = e.status;
+          self.errorMessage = 'An error ocurred while deleting the file';
+        });
         Logger.error('DropboxApi::deleteFile error: ' + stringifyError(e.error));
-        return false;
+        throw e;
       });
   }
 
+  /*:: downloadFile: DownloadExternalTxMemoRequest => Promise<DownloadExternalTxMemoResponse>; */
   async downloadFile(
-    txHash: DownloadExternalTxMemoRequest
+    request: DownloadExternalTxMemoRequest
   ): Promise<DownloadExternalTxMemoResponse> {
     const self = this;
-    const defaultResponse = { content: '', lastUpdated: '' };
-    const fullPath = this.folderPath.concat('/').concat(txHash).concat(this.memoExt);
+    const fullPath = `${this.baseFolderPath}/${request.walletId}/${request.txHash}${this.memoExt}`;
     return this.api.filesDownload({
       path: fullPath
     })
       .then((response) => {
-        Logger.debug('DropboxApi::downloadFile success: ' + txHash + ' file downloaded');
+        Logger.debug('DropboxApi::downloadFile success: ' + request.txHash + ' file downloaded');
+        if (!response.fileBlob) {
+          throw new Error('No fileBlob');
+        }
         return response.fileBlob.text()
           .then(content => {
             return {
@@ -289,14 +318,16 @@ export default class DropboxApi {
           })
           .catch((error) => {
             Logger.error('DropboxApi::downloadFile error while parsing the file: ' + stringifyError(error));
-            return defaultResponse;
+            throw new Error('Unknown dropbox content error');
           });
       })
       .catch((e) => {
-        self.errorCode = e.status;
-        self.errorMessage = 'An error ocurred while downloading the file';
+        runInAction(() => {
+          self.errorCode = e.status || '';
+          self.errorMessage = 'An error ocurred while downloading the file';
+        });
         Logger.error('DropboxApi::downloadFile error: ' + stringifyError(e.error));
-        return defaultResponse;
+        throw e;
       });
   }
 }

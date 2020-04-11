@@ -33,15 +33,14 @@ const messages = defineMessages({
 type Props = {|
   selectedTransaction: WalletTransaction,
   error: ?LocalizableError,
-  onCancel: Function,
-  onClose: Function,
-  onDelete: Function,
-  classicTheme: boolean,
+  onCancel: void => void,
+  onClose: void => void,
+  onDelete: string => Promise<void>,
 |};
 
-type State = {
+type State = {|
   isSubmitting: boolean,
-};
+|};
 
 @observer
 export default class DeleteMemoDialog extends Component<Props, State> {
@@ -63,7 +62,6 @@ export default class DeleteMemoDialog extends Component<Props, State> {
       onCancel,
       onClose,
       onDelete,
-      classicTheme
     } = this.props;
 
     const actions = [
@@ -77,7 +75,7 @@ export default class DeleteMemoDialog extends Component<Props, State> {
         className: isSubmitting ? styles.isSubmitting : null,
         label: this.context.intl.formatMessage(messages.deleteMemoActionsDelete),
         primary: true,
-        onClick: () => onDelete(selectedTransaction.id),
+        onClick: () => onDelete(selectedTransaction.txid),
         disabled: isSubmitting
       },
     ];
@@ -90,7 +88,6 @@ export default class DeleteMemoDialog extends Component<Props, State> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={onClose}
-        classicTheme={classicTheme}
       >
         <div className={styles.content}>
           { error ? (<ErrorBlock error={error} />) : null }

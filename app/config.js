@@ -1,4 +1,5 @@
 // @flow
+
 export default {
   wallets: {
     ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION: 2,
@@ -7,7 +8,10 @@ export default {
     MAX_ALLOWED_UNUSED_ADDRESSES: 20,
     TRANSACTION_REQUEST_SIZE: 20,
     DAEDALUS_RECOVERY_PHRASE_WORD_COUNT: 12,
+    DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT: 27,
+    MAX_RECOVERY_PHRASE_WORD_COUNT: 24,
     WALLET_RECOVERY_PHRASE_WORD_COUNT: 15,
+    YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT: 21,
     hardwareWallet: {
       trezorT: {
         VENDOR: 'trezor.io',
@@ -20,15 +24,14 @@ export default {
           }
         }
       },
-      ledgerNanoS: {
-        // Ledger doesn’t provide any device name so using hard-coded name
+      ledgerNano: {
+        // Ledger does not provide device model info up till now
         DEFAULT_WALLET_NAME: 'Yoroi-Ledger',
         VENDOR: 'ledger.com',
-        MODEL: 'NanoS'
       }
     }
   },
   forms: {
-    FORM_VALIDATION_DEBOUNCE_WAIT: 250
+    FORM_VALIDATION_DEBOUNCE_WAIT: 500
   },
 };

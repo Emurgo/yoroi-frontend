@@ -35,11 +35,11 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onCreatePaper: Function,
-  dialog: Node,
-  paperWalletsIntroText: string,
-  isDialogOpen: boolean,
-  error?: ?LocalizableError,
+  +onCreatePaper: {| numAddresses: number, printAccountPlate: boolean |} => void,
+  +dialog: Node,
+  +paperWalletsIntroText: string,
+  +isDialogOpen: boolean,
+  +error?: ?LocalizableError,
 |};
 
 @observer

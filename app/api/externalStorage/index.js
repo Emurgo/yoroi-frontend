@@ -8,14 +8,16 @@ import {
 } from '../common';
 import DropboxApi from './providers/dropbox';
 import type {
+  IProvider,
   UploadExternalTxMemoRequest, DeleteExternalTxMemoRequest,
   DownloadExternalTxMemoRequest, FetchFolderExternalTxMemoRequest,
   CreateFolderExternalTxMemoRequest,
   UploadExternalTxMemoResponse, DeleteExternalTxMemoResponse,
-  DownloadExternalTxMemoResponse, FetchFilenameExternalTxMemoResponse,
+  DownloadExternalTxMemoResponse,
+  FetchFilenameExternalTxMemoRequest, FetchFilenameExternalTxMemoResponse,
   FetchFolderExternalTxMemoResponse, CreateFolderExternalTxMemoResponse
-} from './types';
-import { ExternalStorageList, ExternalStorageProviders } from '../../domain/ExternalStorage';
+} from './providers/IProvider';
+import { ExternalStorageList } from '../../domain/ExternalStorage';
 import type { SelectedExternalStorageProvider } from '../../domain/ExternalStorage';
 
 
@@ -28,86 +30,68 @@ const providers = {
 };
 export type ProvidersType = $Values<typeof providers>;
 
-// Main class
-export default class ExternalStorageApi {
+// Composite pattern for forwarding calls to selected provider
+export default class ExternalStorageApi implements IProvider {
 
-  getProviders = (): { [key: string]: ProvidersType } => providers;
+  getProviders: void => { [key: string]: ProvidersType, ... } = () => providers;
   selectedProvider: ProvidersType;
   wallet: string;
 
   constructor() {
-    // $FlowFixMe
     this.setSelectedProvider = this.setSelectedProvider.bind(this);
-    // $FlowFixMe
-    this.setWalletAccountNumberPlate = this.setWalletAccountNumberPlate.bind(this);
-    // $FlowFixMe
     this.setup = this.setup.bind(this);
-    // $FlowFixMe
     this.fetchFolder = this.fetchFolder.bind(this);
-    // $FlowFixMe
     this.fetchFilenames = this.fetchFilenames.bind(this);
-    // $FlowFixMe
     this.createFolder = this.createFolder.bind(this);
-    // $FlowFixMe
     this.uploadFile = this.uploadFile.bind(this);
-    // $FlowFixMe
     this.uploadAndOverwriteFile = this.uploadAndOverwriteFile.bind(this);
-    // $FlowFixMe
     this.deleteFile = this.deleteFile.bind(this);
-    // $FlowFixMe
     this.downloadFile = this.downloadFile.bind(this);
-    // $FlowFixMe
     this.revokeToken = this.revokeToken.bind(this);
   }
 
   // Setup all available providers. Usually a setup should involve
   // configuring/parsing so the provider is ready to be selected
   // as external storage
-  setup() {
-    // eslint-disable-next-line
-    for (const key in ExternalStorageProviders) {
+  /*:: setup: void => void; */
+  setup(): void {
+    for (const key of Object.keys(providers)) {
       providers[key].setup();
     }
   }
 
   // Set the selected provider (saved in local storage) so from now on
   // all methods of this main class call the provider subclass directly
+  /*:: setSelectedProvider: SelectedExternalStorageProvider => Promise<void>; */
   async setSelectedProvider(
     selected: SelectedExternalStorageProvider
   ): Promise<void> {
     this.selectedProvider = providers[selected.provider];
     try {
-      this.selectedProvider.auth(selected.token);
+      return this.selectedProvider.auth(selected.token);
     } catch (error) {
       Logger.error('ExternalStorageApi::setSelectedProvider error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }
 
-  // Set the current account number plate. It's used by all methods to save/delete/fetch memos
-  // from a specific wallet
-  async setWalletAccountNumberPlate(
-    numberPlateId: string
-  ): Promise<void> {
-    try {
-      this.selectedProvider.setWallet(numberPlateId);
-    } catch (error) {
-      Logger.error('ExternalStorageApi::setWallet error: ' + stringifyError(error));
-      throw new GenericApiError();
-    }
+  /*:: getDisplayName: void => string; */
+  getDisplayName(): string {
+    return this.getDisplayName();
   }
 
-  // Revoke current token
+  /*:: revokeToken: void => Promise<void>; */
   async revokeToken(): Promise<void> {
     try {
-      this.selectedProvider.revokeToken();
+      return this.selectedProvider.revokeToken();
     } catch (error) {
       Logger.error('ExternalStorageApi::revokeToken error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }
 
-  // Fetch folder to check if exists
+  /*:: fetchFolder:
+    FetchFolderExternalTxMemoRequest => Promise<FetchFolderExternalTxMemoResponse>; */
   async fetchFolder(
     request: FetchFolderExternalTxMemoRequest
   ): Promise<FetchFolderExternalTxMemoResponse> {
@@ -119,7 +103,8 @@ export default class ExternalStorageApi {
     }
   }
 
-  // Create a folder
+  /*:: createFolder:
+    CreateFolderExternalTxMemoRequest => Promise<CreateFolderExternalTxMemoResponse>; */
   async createFolder(
     request: CreateFolderExternalTxMemoRequest
   ): Promise<CreateFolderExternalTxMemoResponse> {
@@ -131,17 +116,20 @@ export default class ExternalStorageApi {
     }
   }
 
-  // Sync with external storage folder to catch up with changes (updated/deleted files)
-  async fetchFilenames(): Promise<FetchFilenameExternalTxMemoResponse> {
+  /*:: fetchFilenames:
+    FetchFilenameExternalTxMemoRequest => Promise<FetchFilenameExternalTxMemoResponse>; */
+  async fetchFilenames(
+    request: FetchFilenameExternalTxMemoRequest
+  ): Promise<FetchFilenameExternalTxMemoResponse> {
     try {
-      return this.selectedProvider.fetchFilenames();
+      return this.selectedProvider.fetchFilenames(request);
     } catch (error) {
       Logger.error('ExternalStorageApi::fetchFilenames error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }
 
-  // Upload file without overwriting. Adding a new memo should not overwrite in case of conflict
+  /*:: uploadFile: UploadExternalTxMemoRequest => Promise<UploadExternalTxMemoResponse>; */
   async uploadFile(
     request: UploadExternalTxMemoRequest
   ): Promise<UploadExternalTxMemoResponse> {
@@ -153,7 +141,8 @@ export default class ExternalStorageApi {
     }
   }
 
-  // Upload file and overwrite. This is for updating an existing memo.
+  /*:: uploadAndOverwriteFile:
+    UploadExternalTxMemoRequest => Promise<UploadExternalTxMemoResponse>; */
   async uploadAndOverwriteFile(
     request: UploadExternalTxMemoRequest
   ): Promise<UploadExternalTxMemoResponse> {
@@ -165,7 +154,7 @@ export default class ExternalStorageApi {
     }
   }
 
-  // Delete file
+  /*:: deleteFile: DeleteExternalTxMemoRequest => Promise<DeleteExternalTxMemoResponse>; */
   async deleteFile(
     request: DeleteExternalTxMemoRequest
   ): Promise<DeleteExternalTxMemoResponse> {
@@ -177,7 +166,7 @@ export default class ExternalStorageApi {
     }
   }
 
-  // Download file
+  /*:: downloadFile: DownloadExternalTxMemoRequest => Promise<DownloadExternalTxMemoResponse>; */
   async downloadFile(
     request: DownloadExternalTxMemoRequest
   ): Promise<DownloadExternalTxMemoResponse> {

@@ -29,11 +29,11 @@ function verifyAllTxsFields(txType, txAmount, txTime, txStatus, txFee, txFromLis
 
 function mapConditionalFields(txExpectedStatus, conditionalFields) {
   if (txExpectedStatus === 'pending') {
-    const [, txId] = conditionalFields;
+    const [txId] = conditionalFields;
     return [txId, undefined];
   }
   if (txExpectedStatus === 'failed') {
-    const [, , txId] = conditionalFields;
+    const [, txId] = conditionalFields;
     return [txId, undefined];
   }
   const [, txConfirmations, , txId] = conditionalFields;
@@ -45,6 +45,9 @@ Given(/^There are ([0-9]+) generated addresses$/, async function (lastReceiveInd
 });
 
 When(/^I see the transactions summary$/, async function () {
+  // sometimes this UI twitches on load when it starts fetching data from the server
+  // sleep to avoid the twitch breaking the test
+  await this.driver.sleep(500);
   await this.waitForElement('.WalletSummary_numberOfTransactions');
 });
 
@@ -120,9 +123,8 @@ Then(
     await topTx.click();
     const txData = await topTx.getText();
     const txDataFields = txData.split('\n');
-    const [txType, txTime, txStatus, txAmount] = txDataFields;
+    const [txTime, txType, txStatus, txFee, txAmount] = txDataFields;
 
-    let txFee;
     let txFrom;
     let txTo;
     let conditionalFields;
@@ -133,7 +135,7 @@ Then(
         = txDataFields;
 
     } else {
-      [, , , , , txFee, , txFrom, , txTo, , ...conditionalFields]
+      [, , , , , , txFrom, , txTo, , ...conditionalFields]
         = txDataFields;
     }
 
@@ -147,8 +149,8 @@ Then(
 
 const displayInfo = {
   'many-tx-wallet': {
-    txType: 'ADA sent',
-    txAmount: '-0.170000',
+    txType: 'ADA intrawallet transaction',
+    txAmount: '-0.169999',
     txTime: '2019-04-21T15:13:33.000Z',
     txStatus: 'LOW',
     txFrom: ['Ae2tdPwUPEZ77uBBu8cMVxswVy1xfaMZR9wsUSwDNiB48MWqsVWfitHfUM9'],
@@ -163,7 +165,7 @@ const displayInfo = {
   'simple-pending-wallet': {
     txType: 'ADA intrawallet transaction',
     txAmount: '-0.999999',
-    txTime: '2019-04-20T15:13:34.000Z',
+    txTime: '2019-04-20T23:14:52.000Z',
     txStatus: 'PENDING',
     txFrom: ['Ae2tdPwUPEZ9ySSM18e2QGFnCgL8ViDqp8K3wU4i5DYTSf5w6e1cT2aGdSJ'],
     txTo: [
@@ -175,11 +177,11 @@ const displayInfo = {
   'failed-single-tx': {
     txType: 'ADA sent',
     txAmount: '-0.180000',
-    txTime: '2019-04-21T15:13:33.000Z',
+    txTime: '2019-04-20T23:14:51.000Z',
     txStatus: 'FAILED',
     txFrom: ['Ae2tdPwUPEYw8ScZrAvKbxai1TzG7BGC4n8PoF9JzE1abgHc3gBfkkDNBNv'],
     txTo: [
-      'Ae2tdPwUPEZCvDkc6R9oNE7Qh1yFLDyu4mpVbGhqUHkNsoVjd2UPiWGoVes',
+      'Ae2tdPwUPEZCdSLM7bHhoC6xptW9SRW155PFFf4WYCKnpX4JrxJPmFzi6G2',
       'Ae2tdPwUPEZCqWsJkibw8BK2SgbmJ1rRG142Ru1CjSnRvKwDWbL4UYPN3eU',
     ],
     txId: 'fc6a5f086c0810de3048651ddd9075e6e5543bf59cdfe5e0c73bf1ed9dcec1ab',

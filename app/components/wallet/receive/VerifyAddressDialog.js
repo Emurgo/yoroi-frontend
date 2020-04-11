@@ -12,7 +12,7 @@ import type {
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import {
   toDerivationPathString,
-} from 'yoroi-extension-ledger-bridge';
+} from 'yoroi-extension-ledger-connect-handler';
 
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
@@ -22,6 +22,7 @@ import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashC
 import type { ExplorerType } from '../../../domain/Explorer';
 
 import LocalizableError from '../../../i18n/LocalizableError';
+import globalMessages from '../../../i18n/global-messages';
 import styles from './VerifyAddressDialog.scss';
 
 const messages = defineMessages({
@@ -33,10 +34,6 @@ const messages = defineMessages({
     id: 'wallet.receive.confirmationDialog.verifyAddressButtonLabel',
     defaultMessage: '!!!Verify on hardware wallet',
   },
-  addressLabel: {
-    id: 'wallet.receive.confirmationDialog.addressLabel',
-    defaultMessage: '!!!Address',
-  },
   derivationPathLabel: {
     id: 'wallet.receive.confirmationDialog.derivationPathLabel',
     defaultMessage: '!!!Derivation Path',
@@ -44,15 +41,15 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  isActionProcessing: boolean,
-  error: ?LocalizableError,
-  verify: Function,
-  cancel: Function,
-  selectedExplorer: ExplorerType,
-  isHardware: boolean,
-  walletAddress: string,
-  walletPath: BIP32Path,
-  classicTheme: boolean,
+  +isActionProcessing: boolean,
+  +error: ?LocalizableError,
+  +verify: void => PossiblyAsync<void>,
+  +cancel: void => void,
+  +selectedExplorer: ExplorerType,
+  +isHardware: boolean,
+  +walletAddress: string,
+  +walletPath: BIP32Path,
+  +classicTheme: boolean,
 |};
 
 @observer
@@ -78,10 +75,9 @@ export default class VerifyAddressDialog extends Component<Props> {
     const dialogActions = !isHardware
       ? []
       : [{
-        className: isActionProcessing ? styles.processing : null,
         label: intl.formatMessage(messages.verifyAddressButtonLabel),
         primary: true,
-        disabled: isActionProcessing,
+        isSubmitting: isActionProcessing,
         onClick: verify,
       }];
 
@@ -93,8 +89,8 @@ export default class VerifyAddressDialog extends Component<Props> {
       document.documentElement.style.getPropertyValue('--theme-receive-qr-code-foreground-color') : '#000';
 
     const labelStyle = classicTheme ?
-      'SimpleFormField_label FormFieldOverridesClassic_label VerifyAddressDialog_header' :
-      'SimpleFormField_label FormFieldOverrides_label VerifyAddressDialog_header';
+      'SimpleFormField_label FormFieldOverridesClassic_label' :
+      styles.label;
 
     const derivationClasses = classnames([styles.infoBlock, styles.derivation]);
 
@@ -106,7 +102,6 @@ export default class VerifyAddressDialog extends Component<Props> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={cancel}
-        classicTheme={classicTheme}
       >
         {walletAddress ? (
           <div>
@@ -121,7 +116,7 @@ export default class VerifyAddressDialog extends Component<Props> {
             <br />
             <br />
             <span className={labelStyle}>
-              {intl.formatMessage(messages.addressLabel)}
+              {intl.formatMessage(globalMessages.addressLabel)}
             </span>
             <div className={styles.infoBlock}>
               <div className={styles.data}>
@@ -131,7 +126,7 @@ export default class VerifyAddressDialog extends Component<Props> {
                   hash={walletAddress}
                   linkType="address"
                 >
-                  <RawHash light>
+                  <RawHash light={false} className={styles.hash}>
                     {walletAddress}
                   </RawHash>
                 </ExplorableHashContainer>
@@ -142,7 +137,7 @@ export default class VerifyAddressDialog extends Component<Props> {
               {intl.formatMessage(messages.derivationPathLabel)}
             </span>
             <div className={derivationClasses}>
-              <div className={styles.data}>
+              <div className={styles.hash}>
                 {toDerivationPathString(walletPath)}
               </div>
             </div>

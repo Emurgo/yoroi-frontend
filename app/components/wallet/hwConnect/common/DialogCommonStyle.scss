@@ -1,12 +1,6 @@
-@import '../../../../themes/mixins/loading-spinner.scss';
-
 $opacityCommon: 0.7;
 
 .component {
-
-  .processing {
-    @include loading-spinner("../../../../assets/images/spinner-light.svg");
-  }
 
   .actions {
     display: flex;

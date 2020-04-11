@@ -1,0 +1,36 @@
+@import '../../themes/mixins/loading-spinner';
+@import '../../themes/mixins/error-message';
+
+.dialog {
+  font-family: var(--font-light);
+
+  p {
+    color: var(--theme-support-settings-text-color);
+    font-family: var(--font-regular);
+    font-size: 14px;
+    line-height: 19px;
+    margin-bottom: 20px;
+  }
+
+  .checkbox {
+    padding-bottom: 16px;
+  }
+
+  .error {
+    @include error-message;
+    text-align: center;
+    margin-bottom: 24px !important;
+  }
+}
+
+:global(.YoroiModern) {
+  .dialog {
+    :global(.Dialog_actions) {
+      margin-top: var(--theme-dialog-password-input-actions-margin-top);
+    }
+  }
+}
+
+.isSubmitting {
+  @include loading-spinner("../../assets/images/spinner-light.svg");
+}

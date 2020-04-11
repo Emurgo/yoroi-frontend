@@ -9,6 +9,7 @@ import { THEMES } from '../../themes';
 import type { Theme } from '../../themes';
 import { ROUTES } from '../../routes-config';
 import { LANGUAGES } from '../../i18n/translations';
+import type { LanguageType } from '../../i18n/translations';
 import type { ExplorerType } from '../../domain/Explorer';
 import type {
   GetSelectedExplorerFunc, SaveSelectedExplorerFunc,
@@ -19,9 +20,9 @@ import type {
 
 export default class ProfileStore extends Store {
 
-  LANGUAGE_OPTIONS = [
+  LANGUAGE_OPTIONS: Array<LanguageType> = [
     ...LANGUAGES,
-    ...(!environment.isMainnet()
+    ...(!environment.isProduction()
       ? [
         // add any language that's mid-translation here
       ]
@@ -35,6 +36,9 @@ export default class ProfileStore extends Store {
   @observable
   inMemoryLanguage: null | string = null;
 
+  @observable
+  acceptedNightly: boolean = false;
+
   /**
    * We only want to redirect users once when the app launches
    */
@@ -43,10 +47,10 @@ export default class ProfileStore extends Store {
 
   /** Linear list of steps that need to be completed before app start */
   @observable
-  SETUP_STEPS = [
+  SETUP_STEPS: Array<{| isDone: void => boolean, action: void => Promise<void> |}> = [
     {
       isDone: () => (this.isCurrentLocaleSet),
-      action: () => {
+      action: async () => {
         const route = ROUTES.PROFILE.LANGUAGE_SELECTION;
         if (this.stores.app.currentRoute === route) {
           return;
@@ -56,7 +60,7 @@ export default class ProfileStore extends Store {
     },
     {
       isDone: () => this.areTermsOfUseAccepted,
-      action: () => {
+      action: async () => {
         const route = ROUTES.PROFILE.TERMS_OF_USE;
         if (this.stores.app.currentRoute === route) {
           return;
@@ -65,8 +69,22 @@ export default class ProfileStore extends Store {
       },
     },
     {
-      isDone: () => !environment.userAgentInfo.canRegisterProtocol() || this.isUriSchemeAccepted,
-      action: () => {
+      isDone: () => !environment.isNightly() || this.acceptedNightly,
+      action: async () => {
+        const route = ROUTES.NIGHTLY_INFO;
+        if (this.stores.app.currentRoute === route) {
+          return;
+        }
+        this.actions.router.goToRoute.trigger({ route });
+      },
+    },
+    {
+      isDone: () => (
+        environment.isShelley() || // disable for Shelley to avoid overriding mainnet Yoroi URI
+        !environment.userAgentInfo.canRegisterProtocol() ||
+        this.isUriSchemeAccepted
+      ),
+      action: async () => {
         const route = ROUTES.PROFILE.URI_PROMPT;
         if (this.stores.app.currentRoute === route) {
           return;
@@ -77,21 +95,30 @@ export default class ProfileStore extends Store {
     {
       isDone: () => this.hasRedirected,
       action: async () => {
-        const { wallets } = this.stores.substores[environment.API];
-        await wallets.refreshWalletsData();
-        if (wallets.first) {
-          const firstWallet = wallets.first;
+        const { wallets } = this.stores;
 
-          if (this.stores.loading.fromUriScheme) {
-            this.actions.router.goToRoute.trigger({ route: ROUTES.SEND_FROM_URI.ROOT });
-          } else {
+        // note: we want to load memos BEFORE we start syncing wallets
+        // this is because syncing wallets will also try and sync memos with external storage
+        await this.stores.memos.loadFromStorage();
+
+        await wallets.restoreWalletsFromStorage();
+        if (wallets.hasAnyPublicDeriver && this.stores.loading.fromUriScheme) {
+          this.actions.router.goToRoute.trigger({ route: ROUTES.SEND_FROM_URI.ROOT });
+        } else {
+          const firstWallet = wallets.first;
+          if (firstWallet == null) {
+            this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
+          } else if (wallets.publicDerivers.length === 1) {
+            // if user only has 1 wallet, just go to it directly as a shortcut
             this.actions.router.goToRoute.trigger({
               route: ROUTES.WALLETS.TRANSACTIONS,
-              params: { id: firstWallet.id }
+              params: { id: firstWallet.getPublicDeriverId() }
+            });
+          } else {
+            this.actions.router.goToRoute.trigger({
+              route: ROUTES.MY_WALLETS,
             });
           }
-        } else {
-          this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
         }
         if (this.stores.loading.shouldRedirect) {
           this.actions.loading.redirect.trigger();
@@ -103,7 +130,14 @@ export default class ProfileStore extends Store {
     },
   ];
 
-  @observable bigNumberDecimalFormat = {
+  @observable bigNumberDecimalFormat: {|
+    decimalSeparator: string,
+    groupSeparator: string,
+    groupSize: number,
+    secondaryGroupSize: number,
+    fractionGroupSeparator: string,
+    fractionGroupSize: number,
+  |} = {
     decimalSeparator: '.',
     groupSeparator: ',',
     groupSize: 3,
@@ -168,7 +202,14 @@ export default class ProfileStore extends Store {
   @observable setHideBalanceRequest: Request<boolean => Promise<void>>
     = new Request<boolean => Promise<void>>(this.api.localStorage.setHideBalance);
 
-  setup() {
+  @observable getToggleSidebarRequest: Request<void => Promise<boolean>>
+    = new Request<void => Promise<boolean>>(this.api.localStorage.getToggleSidebar);
+
+  @observable setToggleSidebarRequest: Request<boolean => Promise<void>>
+    = new Request<boolean => Promise<void>>(this.api.localStorage.setToggleSidebar);
+
+  setup(): void {
+    super.setup();
     this.actions.profile.updateLocale.listen(this._updateLocale);
     this.actions.profile.updateTentativeLocale.listen(this._updateTentativeLocale);
     this.actions.profile.updateSelectedExplorer.listen(this.setSelectedExplorer);
@@ -178,6 +219,8 @@ export default class ProfileStore extends Store {
     this.actions.profile.exportTheme.listen(this._exportTheme);
     this.actions.profile.commitLocaleToStorage.listen(this._acceptLocale);
     this.actions.profile.updateHideBalance.listen(this._updateHideBalance);
+    this.actions.profile.toggleSidebar.listen(this._toggleSidebar);
+    this.actions.profile.acceptNightly.listen(this._acceptNightly);
     this.registerReactions([
       this._setBigNumberFormat,
       this._updateMomentJsLocaleAfterLocaleChange,
@@ -185,22 +228,20 @@ export default class ProfileStore extends Store {
     ]);
     this._getTermsOfUseAcceptance(); // eagerly cache
     this._getUriSchemeAcceptance(); // eagerly cache
+    this.currentTheme; // eagerly cache
   }
 
-  teardown() {
+  teardown(): void {
     super.teardown();
   }
 
-  _setBigNumberFormat = () => {
+  _setBigNumberFormat: void => void = () => {
     BigNumber.config({ FORMAT: this.bigNumberDecimalFormat });
   };
 
 
   static getDefaultLocale(): string {
     return 'en-US';
-  }
-  static getDefaultTheme(): Theme {
-    return THEMES.YOROI_CLASSIC;
   }
 
   // ========== Locale ========== //
@@ -211,7 +252,7 @@ export default class ProfileStore extends Store {
       return this.inMemoryLanguage;
     }
     const { result } = this.getProfileLocaleRequest.execute();
-    if (this.isCurrentLocaleSet && result != null) return result;
+    if (this.isCurrentLocaleSet && result != null && result !== '') return result;
 
     return ProfileStore.getDefaultLocale();
   }
@@ -231,16 +272,16 @@ export default class ProfileStore extends Store {
   }
 
   @action
-  _updateTentativeLocale = ({ locale }: { locale: string }) => {
-    this.inMemoryLanguage = locale;
+  _updateTentativeLocale: {| locale: string |} => void = (request) => {
+    this.inMemoryLanguage = request.locale;
   };
 
-  _updateLocale = async ({ locale }: { locale: string }) => {
+  _updateLocale: {| locale: string |} => Promise<void> = async ({ locale }) => {
     await this.setProfileLocaleRequest.execute(locale);
     await this.getProfileLocaleRequest.execute(); // eagerly cache
   };
 
-  _acceptLocale = async () => {
+  _acceptLocale: void => Promise<void> = async () => {
     // commit in-memory language to storage
     await this.setProfileLocaleRequest.execute(
       this.inMemoryLanguage != null
@@ -253,11 +294,12 @@ export default class ProfileStore extends Store {
     });
   }
 
-  _updateMomentJsLocaleAfterLocaleChange = () => {
+  _updateMomentJsLocaleAfterLocaleChange: void => void = () => {
     moment.locale(this._convertLocaleKeyToMomentJSLocalKey(this.currentLocale));
+    // moment.relativeTimeThreshold('ss', -1);
   };
 
-  _convertLocaleKeyToMomentJSLocalKey = (localeKey: string): string => {
+  _convertLocaleKeyToMomentJSLocalKey: string => string = (localeKey) => {
     // REF -> https://github.com/moment/moment/tree/develop/locale
     let momentJSLocalKey = localeKey;
     switch (localeKey) {
@@ -303,8 +345,12 @@ export default class ProfileStore extends Store {
     return this.currentTheme === THEMES.YOROI_CLASSIC;
   }
 
+  @computed get isShelleyTestnetTheme(): boolean {
+    return environment.isShelley();
+  }
+
   /* @Returns Merged Pre-Built Theme and Custom Theme */
-  @computed get currentThemeVars() {
+  @computed get currentThemeVars(): { [key: string]: string, ... } {
     const { result } = this.getCustomThemeRequest.execute();
     const currentThemeVars = this.getThemeVars({ theme: this.currentTheme });
     let customThemeVars = {};
@@ -327,7 +373,7 @@ export default class ProfileStore extends Store {
     );
   }
 
-  _updateTheme = async ({ theme }: { theme: string }) => {
+  _updateTheme: {| theme: string |} => Promise<void> = async ({ theme }) => {
     // Unset / Clear the Customized Theme from LocalStorage
     await this.unsetCustomThemeRequest.execute();
     await this.getCustomThemeRequest.execute(); // eagerly cache
@@ -335,7 +381,7 @@ export default class ProfileStore extends Store {
     await this.getThemeRequest.execute(); // eagerly cache
   };
 
-  _exportTheme = async () => {
+  _exportTheme: void => Promise<void> = async () => {
     // TODO: It should be ok to access DOM Style from here
     // but not sure about project conventions about accessing the DOM (Clark)
     const html = document.querySelector('html');
@@ -350,12 +396,11 @@ export default class ProfileStore extends Store {
     }
   };
 
-  getThemeVars = ({ theme }: { theme: string }) => {
-    if (theme) return require(`../../themes/prebuilt/${theme}.js`).default;
-    return require(`../../themes/prebuilt/${ProfileStore.getDefaultTheme()}.js`); // default
+  getThemeVars: {| theme: string |} => { [key: string]: string, ... } = (request) => {
+    return getVarsForTheme(request);
   };
 
-  hasCustomTheme = (): boolean => {
+  hasCustomTheme: void => boolean = (): boolean => {
     const { result } = this.getCustomThemeRequest.execute();
     return result !== undefined;
   };
@@ -363,18 +408,16 @@ export default class ProfileStore extends Store {
   // ========== Paper Wallets ========== //
 
   @computed get paperWalletsIntro(): string {
-    try {
-      return require(`../../i18n/locales/paper-wallets/intro/${this.currentLocale}.md`);
-    } catch {
-      return require(`../../i18n/locales/paper-wallets/intro/${ProfileStore.getDefaultLocale()}.md`);
-    }
+    return getPaperWalletIntro(
+      this.currentLocale,
+      ProfileStore.getDefaultLocale()
+    );
   }
 
   // ========== Terms of Use ========== //
 
   @computed get termsOfUse(): string {
-    const API = environment.API;
-    return require(`../../i18n/locales/terms-of-use/${API}/${this.currentLocale}.md`);
+    return getTermsOfUse(this.currentLocale);
   }
 
   @computed get hasLoadedTermsOfUseAcceptance(): boolean {
@@ -388,12 +431,12 @@ export default class ProfileStore extends Store {
     return this.getTermsOfUseAcceptanceRequest.result === true;
   }
 
-  _acceptTermsOfUse = async () => {
+  _acceptTermsOfUse: void => Promise<void> = async () => {
     await this.setTermsOfUseAcceptanceRequest.execute();
     await this.getTermsOfUseAcceptanceRequest.execute(); // eagerly cache
   };
 
-  _getTermsOfUseAcceptance = () => {
+  _getTermsOfUseAcceptance: void => void = () => {
     this.getTermsOfUseAcceptanceRequest.execute();
   };
 
@@ -410,12 +453,12 @@ export default class ProfileStore extends Store {
     return this.getUriSchemeAcceptanceRequest.result === true;
   }
 
-  _acceptUriScheme = async () => {
+  _acceptUriScheme: void => Promise<void> = async () => {
     await this.setUriSchemeAcceptanceRequest.execute();
     await this.getUriSchemeAcceptanceRequest.execute(); // eagerly cache
   };
 
-  _getUriSchemeAcceptance = () => {
+  _getUriSchemeAcceptance: void => void = () => {
     this.getUriSchemeAcceptanceRequest.execute();
   };
 
@@ -426,7 +469,9 @@ export default class ProfileStore extends Store {
     return result != null ? result : '0.0.0';
   }
 
-  setLastLaunchVersion = async (version: string) => {
+  setLastLaunchVersion: string => Promise<void> = async (
+    version: string
+  ): Promise<void> => {
     await this.setLastLaunchVersionRequest.execute(version);
     await this.getLastLaunchVersionRequest.execute(); // eagerly cache
   };
@@ -445,7 +490,9 @@ export default class ProfileStore extends Store {
     return result || 'seiza';
   }
 
-  setSelectedExplorer = async ({ explorer }: { explorer: ExplorerType }) => {
+  setSelectedExplorer: {| explorer: ExplorerType |} => Promise<void> = async (
+    { explorer }
+  ): Promise<void> => {
     await this.setSelectedExplorerRequest.execute({ explorer });
     await this.getSelectedExplorerRequest.execute(); // eagerly cache
   };
@@ -464,16 +511,33 @@ export default class ProfileStore extends Store {
     return result === true;
   }
 
-  _updateHideBalance = async () => {
+  _updateHideBalance: void => Promise<void> = async () => {
     const shouldHideBalance = this.shouldHideBalance;
     await this.setHideBalanceRequest.execute(shouldHideBalance);
     await this.getHideBalanceRequest.execute();
   };
 
+  // ========== Expand / Retract Sidebar ========== //
 
-  // ========== Redirec Logic ========== //
+  @computed get isSidebarExpanded(): boolean {
+    const { result } = this.getToggleSidebarRequest.execute();
+    return result === true;
+  }
 
-  _checkSetupSteps = async () => {
+  _toggleSidebar: void => Promise<void> = async () => {
+    const isSidebarExpanded = this.isSidebarExpanded;
+    await this.setToggleSidebarRequest.execute(isSidebarExpanded);
+    await this.getToggleSidebarRequest.execute();
+  };
+
+  @action
+  _acceptNightly: void => void = () => {
+    this.acceptedNightly = true;
+  }
+
+  // ========== Redirect Logic ========== //
+
+  _checkSetupSteps: void => Promise<void> = async () => {
     const { isLoading } = this.stores.loading;
     if (isLoading) {
       return;
@@ -485,4 +549,37 @@ export default class ProfileStore extends Store {
       }
     }
   }
+}
+
+export const getVarsForTheme: {|
+  theme: string
+|} => { [key: string]: string, ... } = ({ theme }) => {
+  const { getThemeVars } = require(`../../themes/prebuilt/${theme}.js`);
+  if (environment.isShelley()) {
+    return getThemeVars('shelley');
+  }
+  return getThemeVars(undefined);
+};
+
+export function getPaperWalletIntro(
+  currentLocale: string,
+  defaultLocale: string,
+): string {
+  try {
+    return require(`../../i18n/locales/paper-wallets/intro/${currentLocale}.md`);
+  } catch {
+    return require(`../../i18n/locales/paper-wallets/intro/${defaultLocale}.md`);
+  }
+}
+
+export function getTermsOfUse(
+  currentLocale: string,
+): string {
+  const API = environment.API;
+  const tos = require(`../../i18n/locales/terms-of-use/${API}/${currentLocale}.md`);
+  if (environment.isShelley()) {
+    const testnetAddition = require(`../../i18n/locales/terms-of-use/itn/${currentLocale}.md`);
+    return tos + '\n\n' + testnetAddition;
+  }
+  return tos;
 }

@@ -5,7 +5,7 @@ import TermsOfUseText from '../../profile/terms-of-use/TermsOfUseText';
 import styles from './TermsOfUseSettings.scss';
 
 type Props = {|
-  localizedTermsOfUse: string,
+  +localizedTermsOfUse: string,
 |};
 
 @observer

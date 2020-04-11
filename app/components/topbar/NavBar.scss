@@ -1,0 +1,35 @@
+.navbar {
+  display: flex;
+  position: relative;
+  z-index: 100;
+  margin-top: 12px;
+  margin-bottom: 4px;
+  height: var(--theme-navbar-height);
+  background-color: var(--theme-navbar-background-color);
+  color: var(--theme-navbar-color);
+}
+
+.title {
+  flex: 0 0 auto;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.plate {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+.button {
+  margin-right: 32px;
+}
+
+.details {
+  flex: 0 0 auto;
+  min-width: 280px;
+}

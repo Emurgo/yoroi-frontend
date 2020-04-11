@@ -104,7 +104,7 @@ const socialMediaLinks = [{
 const baseGithubUrl = 'https://github.com/Emurgo/yoroi-frontend/';
 
 @observer
-export default class AboutYoroiSettingsBlock extends Component<{}> {
+export default class AboutYoroiSettingsBlock extends Component<{||}> {
   static contextTypes = {
     intl: intlShape.isRequired,
   };
@@ -147,7 +147,7 @@ export default class AboutYoroiSettingsBlock extends Component<{}> {
             </RawHash>
           </ExplorableHash>
         </div>
-        {!environment.isMainnet() &&
+        {!environment.isProduction() &&
           <div className={styles.aboutLine}>
             <strong>{intl.formatMessage(messages.branchLabel)}</strong>&nbsp;
             <ExplorableHash
@@ -163,7 +163,7 @@ export default class AboutYoroiSettingsBlock extends Component<{}> {
             </ExplorableHash>
           </div>
         }
-        <div className={styles.aboutScoial}>
+        <div className={styles.aboutSocial}>
           <GridFlexContainer rowSize={socialMediaLinks.length}>
             {socialMediaLinks.map(link => (
               <LinkButton

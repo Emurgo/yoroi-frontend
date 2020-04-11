@@ -3,19 +3,18 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { intlShape } from 'react-intl';
-import SvgInline from 'react-svg-inline';
 import { Input } from 'react-polymorph/lib/components/Input';
 import globalMessages from '../../../i18n/global-messages';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
-import editSvg from '../../../assets/images/edit.inline.svg';
+import EditSvg from '../../../assets/images/edit.inline.svg';
 import styles from './ReadOnlyInput.scss';
 
 type Props = {|
-  label: string,
-  value: string,
-  isSet: boolean,
-  onClick: Function,
-  classicTheme: boolean,
+  +label: string,
+  +value: string,
+  +isSet: boolean,
+  +onClick: void => void,
+  +classicTheme: boolean,
 |};
 
 @observer
@@ -58,7 +57,7 @@ export default class ReadOnlyInput extends Component<Props> {
           className={styles.button}
           onClick={onClick}
         >
-          {classicTheme ? buttonLabel : <SvgInline svg={editSvg} className={styles.icon} />}
+          {classicTheme ? buttonLabel : <span className={styles.icon}><EditSvg /></span>}
         </button>
 
       </div>

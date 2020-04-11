@@ -5,8 +5,9 @@ import {
   addListener,
 } from '../api/localStorage/primitives';
 
-declare var chrome; // TODO: no type for chrome
-
+/*::
+declare var chrome;
+*/
 /**
  * We may run into bugs if the user has two copies of Yoroi running on the same localstorage
  * Since Yoroi data process is not transactional.

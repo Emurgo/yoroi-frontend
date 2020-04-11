@@ -18,6 +18,13 @@ import HWVerifyAddressStore from './HWVerifyAddressStore';
 import PaperWalletCreateStore from './PaperWalletCreateStore';
 import StateFetchStore from './StateFetchStore';
 import ServerConnectionStore from './ServerConnectionStore';
+import WalletRestoreStore from './WalletRestoreStore';
+import DelegationTransactionStore from './DelegationTransactionStore';
+import DelegationStore from './DelegationStore';
+import TimeStore from './TimeStore';
+import type { ActionsMap } from '../../actions/index';
+import type { Api } from '../../api/index';
+import type { StoresMap } from '../index';
 
 export const adaStoreClasses = {
   wallets: AdaWalletsStore,
@@ -35,9 +42,13 @@ export const adaStoreClasses = {
   stateFetchStore: StateFetchStore,
   transactionBuilderStore: AdaTransactionBuilderStore,
   serverConnectionStore: ServerConnectionStore,
+  walletRestore: WalletRestoreStore,
+  delegationTransaction: DelegationTransactionStore,
+  delegation: DelegationStore,
+  time: TimeStore,
 };
 
-export type AdaStoresMap = {
+export type AdaStoresMap = {|
   wallets: AdaWalletsStore,
   paperWallets: PaperWalletCreateStore,
   transactions: TransactionsStore,
@@ -53,7 +64,11 @@ export type AdaStoresMap = {
   stateFetchStore: StateFetchStore,
   transactionBuilderStore: AdaTransactionBuilderStore,
   serverConnectionStore: ServerConnectionStore,
-};
+  walletRestore: WalletRestoreStore,
+  delegationTransaction: DelegationTransactionStore,
+  delegation: DelegationStore,
+  time: TimeStore,
+|};
 
 const adaStores = observable({
   wallets: null,
@@ -71,16 +86,26 @@ const adaStores = observable({
   stateFetchStore: null,
   transactionBuilderStore: null,
   serverConnectionStore: null,
+  walletRestore: null,
+  delegationTransaction: null,
+  delegation: null,
+  time: null,
 });
 
 /** See `stores` index for description of this weird behavior
  * Note: stores created here are NOT initialized
  */
-export default action((stores, api, actions): AdaStoresMap => {
-  const storeNames = Object.keys(adaStoreClasses);
-  storeNames.forEach(name => { if (adaStores[name]) adaStores[name].teardown(); });
-  storeNames.forEach(name => {
-    adaStores[name] = ((new adaStoreClasses[name](stores, api, actions)): any);
-  });
-  return (adaStores: any);
-});
+export default action(
+  (
+    stores: StoresMap,
+    api: Api,
+    actions: ActionsMap,
+  ): AdaStoresMap => {
+    const storeNames: Array<$Keys<typeof adaStoreClasses>> = Object.keys(adaStoreClasses);
+    storeNames.forEach(name => { if (adaStores[name]) adaStores[name].teardown(); });
+    storeNames.forEach(name => {
+      adaStores[name] = ((new adaStoreClasses[name](stores, api, actions)): any);
+    });
+    return (adaStores: any);
+  }
+);

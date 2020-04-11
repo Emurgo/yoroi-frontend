@@ -29,9 +29,9 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onConnect: Function,
-  onDisconnect: Function,
-  externalStorageProviders: { [key: string] : ProvidersType },
+  onConnect: string => void,
+  onDisconnect: void => void,
+  externalStorageProviders: { [key: string] : ProvidersType, ... },
   selectedExternalStorage: ?SelectedExternalStorageProvider,
 |};
 
@@ -72,10 +72,10 @@ export default class ExternalStorageSettings extends Component<Props> {
         <Button
           key={provider}
           className={buttonClasses}
-          label={showDisconnect === true ?
-            intl.formatMessage(messages.buttonDisconnect) :
+          label={showDisconnect === true
+            ? intl.formatMessage(messages.buttonDisconnect)
             // externalStorageProviders[provider].name
-            intl.formatMessage(messages.buttonConnect)
+            : intl.formatMessage(messages.buttonConnect)
           }
           skin={ButtonSkin}
           onClick={() => (showDisconnect === true ? onDisconnect() : onConnect(authorizeUrl))}

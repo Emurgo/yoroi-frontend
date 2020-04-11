@@ -1,15 +1,20 @@
+// @flow
+
 const commonConfig = require('./commonConfig');
+const connections = require('../scripts/connections');
 
 const path = require('path');
 const webpack = require('webpack');
 
 const host = 'localhost';
-const port = 3000;
 const customPath = path.join(__dirname, './customPublicPath');
 const hotScript =
   'webpack-hot-middleware/client?path=__webpack_hmr&dynamicPublicPath=true';
 
-const baseDevConfig = (networkName) => ({
+const baseDevConfig = (
+  networkName /*: string */,
+  isNightly /*: boolean */,
+) => ({
   mode: 'development',
   optimization: commonConfig.optimization,
   node: commonConfig.node,
@@ -28,7 +33,7 @@ const baseDevConfig = (networkName) => ({
     ]
   },
   devMiddleware: {
-    publicPath: `http://${host}:${port}/js`,
+    publicPath: `http://${host}:${connections.Ports.WebpackDev}/js`,
     stats: {
       colors: true
     },
@@ -42,22 +47,21 @@ const baseDevConfig = (networkName) => ({
     path: path.join(__dirname, '../dev/js'),
     filename: '[name].bundle.js',
     // Need to so `HtmlWebpackPlugin` knows where to find the js bundles
-    publicPath: 'http://localhost:3000/js/'
+    publicPath: `http://localhost:${connections.Ports.WebpackDev}/js/`
   },
   plugins: [
-    ...commonConfig.plugins('dev'),
-    new webpack.DefinePlugin(commonConfig.definePlugin(networkName, false)),
+    ...commonConfig.plugins('dev', networkName),
+    new webpack.DefinePlugin(commonConfig.definePlugin(networkName, false, isNightly)),
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoEmitOnErrorsPlugin(),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.prod$/),
     new webpack.DefinePlugin({
       __HOST__: `'${host}'`,
-      __PORT__: port,
+      __PORT__: connections.Ports.WebpackDev,
     })
   ],
   module: {
     rules: [
-      ...commonConfig.rules,
+      ...commonConfig.rules(true),
       {
         test: /\.js$/,
         loader: 'babel-loader?cacheDirectory',

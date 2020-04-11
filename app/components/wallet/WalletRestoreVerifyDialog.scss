@@ -51,11 +51,8 @@
   text-align: center;
 }
 
-.isSubmitting {
-  @include loading-spinner("../../assets/images/spinner-light.svg");
-}
-
 :global(.YoroiModern) .dialog {
-  min-width: var(--theme-modal-min-max-width-lg);
-  max-width: var(--theme-modal-min-max-width-lg); 
+  // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1052
+  min-width: 680px;
+  max-width: 680px; 
 }

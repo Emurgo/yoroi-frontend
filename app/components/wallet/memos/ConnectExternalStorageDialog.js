@@ -4,10 +4,9 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
-import SvgInline from 'react-svg-inline';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
-import linkExternalStorageSvg from '../../../assets/images/link-external-storage.inline.svg';
+import LinkExternalStorageSvg from '../../../assets/images/link-external-storage.inline.svg';
 import styles from './MemoDialogCommon.scss';
 
 
@@ -31,9 +30,8 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onCancel: Function,
-  onConnect: Function,
-  classicTheme: boolean,
+  onCancel: void => void,
+  onConnect: void => void,
 |};
 
 @observer
@@ -45,7 +43,7 @@ export default class ConnectExternalStorageDialog extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onCancel, onConnect, classicTheme } = this.props;
+    const { onCancel, onConnect, } = this.props;
 
     const actions = [
       {
@@ -67,10 +65,9 @@ export default class ConnectExternalStorageDialog extends Component<Props> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={onCancel}
-        classicTheme={classicTheme}
       >
         <div className={styles.content}>
-          <SvgInline svg={linkExternalStorageSvg} className={styles.icon} />
+          <span className={styles.icon}><LinkExternalStorageSvg /></span>
           <p>{intl.formatMessage(messages.connectContent)}</p>
         </div>
       </Dialog>);

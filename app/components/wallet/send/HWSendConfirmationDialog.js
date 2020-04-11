@@ -19,27 +19,25 @@ import type { ExplorerType } from '../../../domain/Explorer';
 
 import styles from './HWSendConfirmationDialog.scss';
 
-type ExpectedMessages = {
+type ExpectedMessages = {|
   infoLine1: MessageDescriptor,
   infoLine2: MessageDescriptor,
   sendUsingHWButtonLabel: MessageDescriptor,
-};
+|};
 
 type Props = {|
-  staleTx: boolean,
-  selectedExplorer: ExplorerType,
-  amount: string,
-  receivers: Array<string>,
-  totalAmount: string,
-  transactionFee: string,
-  currencyUnit: string,
-  amountToNaturalUnits: Function,
-  messages: ExpectedMessages,
-  isSubmitting: boolean,
-  error: ?LocalizableError,
-  onSubmit: void => void,
-  onCancel: Function,
-  classicTheme: boolean,
+  +staleTx: boolean,
+  +selectedExplorer: ExplorerType,
+  +amount: string,
+  +receivers: Array<string>,
+  +totalAmount: string,
+  +transactionFee: string,
+  +currencyUnit: string,
+  +messages: ExpectedMessages,
+  +isSubmitting: boolean,
+  +error: ?LocalizableError,
+  +onSubmit: void => PossiblyAsync<void>,
+  +onCancel: void => void,
 |};
 
 @observer
@@ -61,7 +59,6 @@ export default class HWSendConfirmationDialog extends Component<Props> {
       messages,
       error,
       onCancel,
-      classicTheme,
     } = this.props;
 
     const staleTxWarning = (
@@ -107,7 +104,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
       <div className={styles.amountFeesWrapper}>
         <div className={styles.amountWrapper}>
           <div className={styles.amountLabel}>
-            {intl.formatMessage(globalMessages.walletSendConfirmationAmountLabel)}
+            {intl.formatMessage(globalMessages.amountLabel)}
           </div>
           <div className={styles.amount}>{amount}
             <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
@@ -141,16 +138,15 @@ export default class HWSendConfirmationDialog extends Component<Props> {
     const actions = [
       {
         label: intl.formatMessage(globalMessages.backButtonLabel),
-        onClick: isSubmitting
-          ? () => {} // noop
-          : onCancel
+        disabled: isSubmitting,
+        onClick: onCancel,
       },
       {
         label: intl.formatMessage(messages.sendUsingHWButtonLabel),
         onClick: this.props.onSubmit,
         primary: true,
         className: confirmButtonClasses,
-        disabled: isSubmitting,
+        isSubmitting,
       },
     ];
 
@@ -162,7 +158,6 @@ export default class HWSendConfirmationDialog extends Component<Props> {
         onClose={!isSubmitting ? onCancel : null}
         className={styles.dialog}
         closeButton={<DialogCloseButton />}
-        classicTheme={classicTheme}
       >
         {this.props.staleTx && staleTxWarning}
         {infoBlock}

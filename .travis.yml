@@ -33,7 +33,6 @@ env:
     - CHROME_CODEBASE_URL=https://www.sample.com/dw/yoroi-extension.crx
     - CHROME_WEBSTORE_API_ENDPOINT=https://www.googleapis.com/upload/chromewebstore/v1.1
     - CHROME_DEV_APP_ID=febkioblpijdgicianpklkmolpbagnbo
-    - CHROME_STG_APP_ID=bbaanljemfingpglehbbpdlhhahliihe
     - CHROME_PRO_APP_ID=fkkmcnnpaaimcaikbjgklcibgncdgejc
     - SCREENSHOT_DIFF_THRESHOLD=0
     - SCREENSHOT_DIFF_COLOR=yellow
@@ -71,22 +70,22 @@ matrix:
 
     # stage: code-qa
     - stage: code-qa
-      if: branch =~ ^develop|staging|master OR type = pull_request
+      if: branch =~ ^develop|master OR type = pull_request
       name: "flow checks"
       script: npm run flow
     - stage: code-qa
-      if: branch =~ ^develop|staging|master OR type = pull_request
+      if: branch =~ ^develop|master OR type = pull_request
       name: "eslint checks"
       script: npm run eslint
     - stage: code-qa
-      if: branch =~ ^develop|staging|master OR type = pull_request
+      if: branch =~ ^develop|master OR type = pull_request
       name: "jest checks"
       script: npm run jest
 
     # stage: build-yoroi
     # 3x env in order to satisfy (build|artifacts) cache for e2e-tests
     - stage: build-yoroi
-      if: branch =~ ^develop|staging|master OR type = pull_request
+      if: branch =~ ^develop|master OR type = pull_request
       name: "build Yoroi extension"
       env:
         - BROWSER=chrome
@@ -108,7 +107,7 @@ matrix:
         - bash .travis/e2e_tests.sh
         - bash .travis/s3_screenshots_upload.sh
     - stage: e2e-tests
-      if: ( ( branch =~ ^develop|staging|master AND env(TRAVIS_PULL_REQUEST_BRANCH) != l10n_develop ) OR ( type = pull_request AND env(TRAVIS_PULL_REQUEST_BRANCH) != l10n_develop ) )
+      if: ( ( branch =~ ^develop|master AND env(TRAVIS_PULL_REQUEST_BRANCH) != l10n_develop ) OR ( type = pull_request AND env(TRAVIS_PULL_REQUEST_BRANCH) != l10n_develop ) )
       name: "Chrome End-to-End tests"
       env:
         - BROWSER=firefox
@@ -119,7 +118,7 @@ matrix:
         - bash .travis/e2e_tests.sh
         - bash .travis/s3_screenshots_upload.sh
     - stage: e2e-tests
-      if: ( ( branch =~ ^develop|staging|master AND env(TRAVIS_PULL_REQUEST_BRANCH) != l10n_develop ) OR ( type = pull_request AND env(TRAVIS_PULL_REQUEST_BRANCH) != l10n_develop ) )
+      if: ( ( branch =~ ^develop|master AND env(TRAVIS_PULL_REQUEST_BRANCH) != l10n_develop ) OR ( type = pull_request AND env(TRAVIS_PULL_REQUEST_BRANCH) != l10n_develop ) )
       name: "Firefox End-to-End tests"
       env:
         - BROWSER=brave
@@ -133,9 +132,8 @@ matrix:
     # stage: artifacts-deploy
     - stage: artifacts-deploy
       name: "Upload artifacts to GH releases, extension stores..."
-      if: branch =~ ^develop|staging|master OR type = pull_request
+      if: branch =~ ^develop|master OR type = pull_request
       script:
-        - bash .travis/chrome_webstore_deploy.sh
         - bash .travis/pull_request_comment.sh
       # env provides cache
       env:
@@ -175,7 +173,7 @@ deploy:
     draft: true
     on:
       all_branches: true
-      condition: ( $TRAVIS_BRANCH =~ staging|master ) && ( $TRAVIS_BUILD_STAGE_NAME = Artifacts-deploy )
+      condition: ( $TRAVIS_BRANCH =~ master ) && ( $TRAVIS_BUILD_STAGE_NAME = Artifacts-deploy )
 
 notifications:
   slack:

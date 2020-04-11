@@ -17,17 +17,18 @@ const messages = defineMessages({
 // This type should be kept open (not "exact") because it is a react-polymorph skin
 // and should be able to pass any extra properties from react-polymorph down.
 type Props = {
-  currency: string,
-  fees: BigNumber,
-  total: BigNumber,
-  error?: string,
-  classicTheme: boolean,
+  +currency: string,
+  +fees: BigNumber,
+  +total: BigNumber,
+  +error?: string,
+  +classicTheme: boolean,
   // inherited from InputOwnSkin
-  inputRef: Ref<'input'>,
-  theme: Object,
-  themeId: string,
-  value: string,
-  type: string,
+  +inputRef: Ref<'input'>,
+  +theme: Object,
+  +themeId: string,
+  +value: string,
+  +type: string,
+  ...
 };
 
 export default class AmountInputSkin extends Component<Props> {
@@ -46,7 +47,8 @@ export default class AmountInputSkin extends Component<Props> {
     return (
       <div className={styles.component}>
         <InputOwnSkin {...this.props} />
-        {error != null
+        {/* Do not show fee in case of some error is showing */}
+        {(error == null || error === '')
           ? (
             <span className={styles.fees}>
               {intl.formatMessage(messages.feesLabel, { amount: fees })}
@@ -55,8 +57,8 @@ export default class AmountInputSkin extends Component<Props> {
           : null
         }
 
-        <span className={classnames([styles.total, error != null ? styles.error : ''])}>
-          {error != null ? `= ${total.toString()} ` : null}{currency}
+        <span className={classnames([styles.total, (error != null && error !== '') ? styles.error : ''])}>
+          {(error === null || error === '') ? `= ${total.toString()} ` : null}{currency}
         </span>
       </div>
     );

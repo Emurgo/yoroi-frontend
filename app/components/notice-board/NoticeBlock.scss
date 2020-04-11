@@ -1,0 +1,46 @@
+.component {
+  font-family: var(--font-regular);
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  .wrap {
+    width: 100%;
+    margin-bottom: 24px;
+    display: flex;
+    .iconBlock {
+      width: 48px;
+      margin-right: 16px;
+    }
+    .infoBlock {
+      width: 100%;
+      .firstRow {
+        display: flex;
+        line-height: 22px;
+        .title {
+          flex-grow: 1;
+          font-size: 18px;
+          font-weight: 600;
+          color: var(--cmn-default-color-grey);
+        }
+        .time {
+          min-width: 160px;
+          display: flex;
+          justify-content: flex-end;
+          font-size: 12px;
+          color: var(--cmn-default-color-grey-3);
+        }
+      }
+      .secondRow {
+        margin-top: 5px;
+        font-size: 14px;
+        line-height: 18px;
+        color: var(--cmn-default-color-grey);
+      }
+    }
+  }
+  .line {
+    height: 1px;
+    opacity: 0.3;
+    background-color: var(--cmn-default-color-grey-3);
+  }
+}

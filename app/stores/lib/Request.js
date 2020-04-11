@@ -15,10 +15,10 @@ const messages = defineMessages({
   }
 });
 
-export type ApiCallType<Func: Function> = {
+export type ApiCallType<Func: Function> = {|
   args: Arguments<Func>,
   result: ?PromisslessReturnType<Func>,
-};
+|};
 
 // Note: Do not use this class directly. Only use LocalizedRequest or CachedLocalizedRequest
 export default class Request<Func: (...args: any) => Promise<any>, Err> {
@@ -26,9 +26,9 @@ export default class Request<Func: (...args: any) => Promise<any>, Err> {
   @observable result: ?PromisslessReturnType<Func> = null;
   @observable error: ?Err = null;
   @observable isExecuting: boolean = false;
-  @observable isError: boolean = false;
   @observable wasExecuted: boolean = false;
 
+  currentlyExecuting: Set<number> = new Set();
   promise: ?Promise<PromisslessReturnType<Func>> = null;
 
   _method: Func;
@@ -49,6 +49,8 @@ export default class Request<Func: (...args: any) => Promise<any>, Err> {
       this.isExecuting = true;
     }), 0);
 
+    const executionId = Math.random();
+    this.currentlyExecuting.add(executionId);
     // Issue api call & save it as promise that is handled to update the results of the operation
     this.promise = new Promise((resolve, reject) => {
       if (!this._method) {
@@ -56,6 +58,12 @@ export default class Request<Func: (...args: any) => Promise<any>, Err> {
       }
       this._method(...callArgs)
         .then((result) => {
+          if (this.currentlyExecuting.has(executionId)) {
+            this.currentlyExecuting.delete(executionId);
+          } else {
+            resolve(result);
+            return;
+          }
           setTimeout(action('Request::execute/then', () => {
             if (this.result != null && isObservableArray(this.result) && Array.isArray(result)) {
               this.result.replace(result);
@@ -66,18 +74,22 @@ export default class Request<Func: (...args: any) => Promise<any>, Err> {
             this.isExecuting = false;
             this.wasExecuted = true;
             this.error = null;
-            this.isError = false;
             this._isWaitingForResponse = false;
             resolve(result);
           }), 1);
           return result;
         })
         .catch(action('Request::execute/catch', (error) => {
+          if (this.currentlyExecuting.has(executionId)) {
+            this.currentlyExecuting.delete(executionId);
+          } else {
+            reject(error);
+            return;
+          }
           setTimeout(action(() => {
             this.error = error;
             this.result = null;
             this.isExecuting = false;
-            this.isError = true;
             this.wasExecuted = true;
             this._isWaitingForResponse = false;
             reject(error);
@@ -116,7 +128,7 @@ export default class Request<Func: (...args: any) => Promise<any>, Err> {
    * Asynchronously patch the result of the request.
    * This can be used for optimistic UI updates before the server has confirmed the change.
    *
-   * @param modify {Function} - Custom function to path the result (which gets passed in as
+   * @param modify {Function} - Custom function to patch the result (which gets passed in as
    * only param) You can either change the result directly (e.g: `result.push(something)` or
    * if you need to replace the whole result of the request you need to return it from this
    * function.
@@ -136,15 +148,19 @@ export default class Request<Func: (...args: any) => Promise<any>, Err> {
     });
   }
 
-  @action reset(): Request<Func, Err> {
+  @action cancel(): Request<Func, Err> {
+    this.isExecuting = false;
+    this._isWaitingForResponse = false;
+    this._currentApiCall = null;
+    return this;
+  }
+  @action reset(): void {
     this.result = null;
     this.error = null;
-    this.isError = false;
     this.isExecuting = false;
     this.wasExecuted = false;
     this._isWaitingForResponse = false;
     this._currentApiCall = null;
-    return this;
   }
 }
 

@@ -7,10 +7,12 @@ import DialogsActions from './dialogs-actions';
 import NotificationsActions from './notifications-actions';
 import LoadingActions from './loading-actions';
 import MemosActions from './memos-actions';
+import NoticeBoard from './notice-board-actions';
+import WalletActions from './wallet-actions';
 import adaActionsMap from './ada/index';
 import type { AdaActionsMap } from './ada/index';
 
-export type ActionsMap = {
+export type ActionsMap = {|
   router: RouterActions,
   topbar: TopbarActions,
   walletBackup: WalletBackupActions,
@@ -19,8 +21,10 @@ export type ActionsMap = {
   notifications: NotificationsActions,
   memos: MemosActions,
   loading: LoadingActions,
-  ada: AdaActionsMap
-};
+  noticeBoard: NoticeBoard,
+  wallets: WalletActions,
+  ada: AdaActionsMap,
+|};
 
 const actionsMap: ActionsMap = {
   router: new RouterActions(),
@@ -31,6 +35,8 @@ const actionsMap: ActionsMap = {
   notifications: new NotificationsActions(),
   memos: new MemosActions(),
   loading: new LoadingActions(),
+  noticeBoard: new NoticeBoard(),
+  wallets: new WalletActions(),
   ada: adaActionsMap
 };
 

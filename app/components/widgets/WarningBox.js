@@ -1,21 +1,17 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import { defineMessages, intlShape } from 'react-intl';
+import { observer } from 'mobx-react';
+import { intlShape } from 'react-intl';
+import globalMessages from '../../i18n/global-messages';
 
 import styles from './WarningBox.scss';
 
-const messages = defineMessages({
-  headerText: {
-    id: 'widgets.warningBox.headerText',
-    defaultMessage: '!!!ATTENTION:',
-  },
-});
-
 type Props = {|
-  children: ?Node
+  +children: ?Node
 |};
 
+@observer
 export default class WarningBox extends Component<Props> {
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -30,7 +26,7 @@ export default class WarningBox extends Component<Props> {
         <div className={styles.header}>
           <div className={styles.headerIcon} />
           <span className={styles.headerText}>
-            {intl.formatMessage(messages.headerText)}
+            {intl.formatMessage(globalMessages.attentionHeaderText)}
           </span>
         </div>
         {/* Warning content  */}

@@ -5,7 +5,7 @@ import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 
 Then(/^I should see the balance number "([^"]*)"$/, async function (number) {
-  await this.waitUntilText('.WalletTopbarTitle_walletAmount', number);
+  await this.waitUntilText('.NavWalletDetails_amount', number);
 });
 
 Then(/^I should see send transaction screen$/, async function () {
@@ -18,11 +18,11 @@ Then(/^I go to the transaction history screen$/, async function () {
 });
 
 When(/^I go to the main screen$/, async function () {
-  await this.click(`//header//button[1]`, By.xpath);
+  await this.click(`//div[@class='Sidebar_categories']//button[1]`, By.xpath);
 });
 
 Then(/^I should see the transactions screen$/, async function () {
-  await this.waitForElement("//div[@class='WalletSummary_numberOfTransactions']", By.xpath);
+  await this.waitForElement("//div[@class='WalletSummary_component']", By.xpath);
 });
 
 Then(/^I click on "copy to clipboard" button$/, async function () {
@@ -51,10 +51,10 @@ Then(/^I should see the serverError banner$/, async function () {
 });
 
 Then(/^I click on hide balance button$/, async function () {
-  await this.click('.hideBalanceButton');
+  await this.click('.NavWalletDetails_toggleButton');
 });
 
 Then(/^I should see my balance hidden$/, async function () {
-  await this.waitForElement('.WalletTopbarTitle_hiddenWalletAmount');
-  await this.waitUntilContainsText('.WalletTopbarTitle_hiddenWalletAmount', '***');
+  await this.waitForElement('.NavWalletDetails_amount');
+  await this.waitUntilContainsText('.NavWalletDetails_amount', '***');
 });

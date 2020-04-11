@@ -32,6 +32,14 @@ const globalMessages = defineMessages({
     id: 'global.errors.invalidRepeatPassword',
     defaultMessage: '!!!Doesn\'t match.',
   },
+  errorLabel: {
+    id: 'global.labels.error',
+    defaultMessage: '!!!Error',
+  },
+  processingLabel: {
+    id: 'global.labels.processing',
+    defaultMessage: '!!!Processing...',
+  },
   nextButtonLabel: {
     id: 'global.labels.next',
     defaultMessage: '!!!Next',
@@ -64,6 +72,10 @@ const globalMessages = defineMessages({
     id: 'global.labels.change',
     defaultMessage: '!!!Change',
   },
+  delegateLabel: {
+    id: 'global.labels.delegate',
+    defaultMessage: '!!!Delegate',
+  },
   create: {
     id: 'global.labels.create',
     defaultMessage: '!!!Create',
@@ -79,6 +91,10 @@ const globalMessages = defineMessages({
   learnMore: {
     id: 'global.labels.LearnMore',
     defaultMessage: '!!!Learn more',
+  },
+  walletLabel: {
+    id: 'settings.menu.wallet.link.label',
+    defaultMessage: '!!!Wallet',
   },
   languageEnglish: {
     id: 'global.language.english',
@@ -124,9 +140,25 @@ const globalMessages = defineMessages({
     id: 'global.language.italian',
     defaultMessage: '!!!Italiano',
   },
+  addressLabel: {
+    id: 'wallet.receive.confirmationDialog.addressLabel',
+    defaultMessage: '!!!Address',
+  },
+  addressesLabel: {
+    id: 'wallet.receive.confirmationDialog.addressesLabel',
+    defaultMessage: '!!!Addresses',
+  },
+  addWalletLabel: {
+    id: 'wallet.nav.addButton',
+    defaultMessage: '!!!Add new wallet',
+  },
   unitAda: {
     id: 'global.unit.ada',
     defaultMessage: '!!!Ada',
+  },
+  attentionHeaderText: {
+    id: 'widgets.warningBox.headerText',
+    defaultMessage: '!!!ATTENTION:',
   },
   recoveryPhraseDialogTitle: {
     id: 'wallet.backup.recovery.phrase.dialog.title',
@@ -144,7 +176,7 @@ const globalMessages = defineMessages({
     id: 'wallet.send.confirmationDialog.addressToLabel',
     defaultMessage: '!!!To',
   },
-  walletSendConfirmationAmountLabel: {
+  amountLabel: {
     id: 'wallet.send.confirmationDialog.amountLabel',
     defaultMessage: '!!!Amount',
   },
@@ -236,6 +268,10 @@ const globalMessages = defineMessages({
     id: 'transfer.form.instructions.step1.text',
     defaultMessage: '!!!It will take about 1 minute to restore your balance. In the next step, you will be presented with a transaction that will move all of your funds. Please review the details of the transaction carefully. You will need to pay a standard transaction fee on the Cardano network to make the transaction.',
   },
+  feeLabel: {
+    id: 'wallet.transaction.fee',
+    defaultMessage: '!!!Fee',
+  },
   languageSelectLabel: {
     id: 'profile.languageSelect.form.languageSelectLabel',
     defaultMessage: '!!!Select your language',
@@ -259,7 +295,11 @@ const globalMessages = defineMessages({
   },
   passwordInstructionsPaperWallet: {
     id: 'global.passwordInstructionsPaperWallet',
-    defaultMessage: '!!!Note: Paper Wallet password needs to be at least 12 characters long.',
+    defaultMessage: '!!!Note: Paper Wallet password needs to be at least 10 characters long.',
+  },
+  paperPasswordLabel: {
+    id: 'wallet.restore.dialog.paperPasswordLabel',
+    defaultMessage: '!!!Paper wallet password',
   },
   shortRecoveryPhrase: {
     id: 'wallet.restore.dialog.form.errors.shortRecoveryPhrase',
@@ -352,6 +392,166 @@ const globalMessages = defineMessages({
   invalidMemo: {
     id: 'wallet.transaction.memo.invalid',
     defaultMessage: '!!!Wallet name requires at least 1 and at most 40 letters.',
+  },
+  passwordDisclaimer: {
+    id: 'wallet.restore.dialog.passwordDisclaimer',
+    defaultMessage: '!!!Typing the wrong wallet password will give you a different wallet. This allows for plausible deniability.',
+  },
+  recoveryPhraseInputLabel: {
+    id: 'wallet.restore.dialog.recovery.phrase.input.label',
+    defaultMessage: '!!!Recovery phrase',
+  },
+  recoveryPhraseInputHint: {
+    id: 'wallet.restore.dialog.recovery.phrase.input.hint',
+    defaultMessage: '!!!Enter recovery phrase',
+  },
+  recoveryPhraseNoResults: {
+    id: 'wallet.restore.dialog.recovery.phrase.input.noResults',
+    defaultMessage: '!!!No results',
+  },
+  invalidRecoveryPhrase: {
+    id: 'wallet.restore.dialog.form.errors.invalidRecoveryPhrase',
+    defaultMessage: '!!!Invalid recovery phrase',
+  },
+  totalRewardsLabel: {
+    id: 'wallet.dashboard.summary.rewardsTitle',
+    defaultMessage: '!!!Total Rewards',
+  },
+  skipLabel: {
+    id: 'profile.uriPrompt.form.skipLabel',
+    defaultMessage: '!!!Skip',
+  },
+  checkLabel: {
+    id: 'wallet.connect.hw.dialog.step.about.label',
+    defaultMessage: '!!!CHECK',
+  },
+  walletUpgrade: {
+    id: 'wallet.backup.dialog.legacy.upgrade',
+    defaultMessage: `!!!Wallet Upgrade`
+  },
+  pdfGenDone: {
+    id: 'settings.paperWallet.dialog.createPaper.done',
+    defaultMessage: '!!!All done!',
+  },
+  dateToday: {
+    id: 'wallet.summary.page.todayLabel',
+    defaultMessage: '!!!Today',
+  },
+  dateYesterday: {
+    id: 'wallet.summary.page.yesterdayLabel',
+    defaultMessage: '!!!Yesterday',
+  },
+  legacyAttentionText: {
+    id: 'transfer.instructions.attention.legacy',
+    defaultMessage: '!!!Legacy wallets created during the Byron-era (before November 29th, 2019) can no longer be used. However, you can transfer your legacy funds to your current wallet to access your funds.',
+  },
+  uriLandingDialogConfirmLabel: {
+    id: 'uri.landing.dialog.confirm.label',
+    defaultMessage: '!!!I understand',
+  },
+  hardwareTransferInstructions: {
+    id: 'transfer.instructions.hardware.disclaimer.instructions1',
+    defaultMessage: '!!!When you originally setup your hardware wallet, you were asked to write down a recovery phrase on a piece of paper. Entering this phrase will allow you to transfer your funds out of your hardware wallet and into the current wallet.',
+  },
+  sendButtonLabel: {
+    id: 'wallet.send.confirmationDialog.submit',
+    defaultMessage: '!!!Send',
+  },
+  walletPasswordLabel: {
+    id: 'wallet.send.confirmationDialog.walletPasswordLabel',
+    defaultMessage: '!!!Spending password',
+  },
+  walletPasswordFieldPlaceholder: {
+    id: 'wallet.send.confirmationDialog.walletPasswordFieldPlaceholder',
+    defaultMessage: '!!!Type your spending password',
+  },
+  txGeneration: {
+    id: 'wallet.delegation.transaction.generation',
+    defaultMessage: '!!!Generating transaction',
+  },
+  transactionId: {
+    id: 'wallet.transaction.transactionId',
+    defaultMessage: '!!!Transaction ID',
+  },
+  epochLabel: {
+    id: 'global.labels.epoch',
+    defaultMessage: '!!!Epoch',
+  },
+  rewardsLabel: {
+    id: 'global.labels.rewardsLabel',
+    defaultMessage: '!!!Rewards',
+  },
+  totalAdaLabel: {
+    id: 'wallet.dashboard.summary.adaTitle',
+    defaultMessage: '!!!Total ADA',
+  },
+  marginsLabel: {
+    id: 'wallet.dashboard.stakePool.margins',
+    defaultMessage: '!!!Margins',
+  },
+  loadMoreButtonLabel: {
+    id: 'global.labels.loadMore',
+    defaultMessage: '!!!Load more',
+  },
+  unknownPoolLabel: {
+    id: 'wallet.staking.pool.unknownLabel',
+    defaultMessage: '!!!Unknown pool',
+  },
+  internalLabel: {
+    id: 'wallet.receive.nav.internal',
+    defaultMessage: '!!!Internal',
+  },
+  mangledLabel: {
+    id: 'wallet.receive.nav.mangled',
+    defaultMessage: '!!!Mangled',
+  },
+  sidebarWallets: {
+    id: 'sidebar.wallets',
+    defaultMessage: '!!!My wallets',
+  },
+  sidebarSettings: {
+    id: 'sidebar.settings',
+    defaultMessage: '!!!Settings',
+  },
+  sidebarTransfer: {
+    id: 'sidebar.transfer',
+    defaultMessage: '!!!Claim or transfer wallet',
+  },
+  ledgerTitle: {
+    id: 'wallet.add.optionDialog.connect.hw.ledger.title',
+    defaultMessage: '!!!Ledger Hardware Wallet',
+  },
+  trezorTitle: {
+    id: 'wallet.add.optionDialog.connect.hw.trezor.title',
+    defaultMessage: '!!!Trezor Hardware Wallet',
+  },
+  undelegateLabel: {
+    id: 'global.labael.undelegate',
+    defaultMessage: '!!!Undelegate',
+  },
+  auditAddressWarning: {
+    id: 'wallet.receive.page.internalWarning2',
+    defaultMessage: '!!!addresses are shown here for personal auditing purposes and should <strong>never</strong> be used.'
+  },
+  lastSyncMessage: {
+    id: 'myWallets.wallets.lastSyncText',
+    defaultMessage: '!!!Last sync',
+  },
+  neverSyncedMessage: {
+    id: 'myWallets.wallets.neverSync',
+    defaultMessage: '!!!Never synced',
+  },
+  hardwareWalletLabel: {
+    id: 'yoroiTransfer.start.instructions.hardware',
+    defaultMessage: '!!!Hardware wallet',
+  },
+  daedalusWalletLabel: {
+    id: 'daedalusTransfer.instructions.attention.button.label',
+    defaultMessage: '!!!Daedalus Wallet',
+  },
+  yoroiPaperLabel: {
+    id: 'yoroiTransfer.start.instructions.yoroiPaper',
+    defaultMessage: '!!!Yoroi paper wallet',
   },
 });
 export default globalMessages;

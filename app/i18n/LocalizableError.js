@@ -24,7 +24,10 @@ class LocalizableError extends ExtendableError {
 
   constructor(
     { id, defaultMessage, values }:
-    { ...$Exact<MessageDescriptor>, values?: Object}
+    {|
+      ...$Exact<MessageDescriptor>,
+      values?: Object,
+    |}
   ) {
     if (!id) throw new Error('id:string is required.');
     if (defaultMessage == null) throw new Error('defaultMessage:string is required.');

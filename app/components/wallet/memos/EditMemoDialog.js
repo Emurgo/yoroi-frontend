@@ -11,10 +11,12 @@ import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import { Input } from 'react-polymorph/lib/components/Input';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
+import type { TxMemoTablePreInsert } from '../../../api/ada/lib/storage/bridge/memos';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import { isValidMemo } from '../../../utils/validations';
 import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
-import WalletTransaction from '../../../domain/WalletTransaction';
+import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
 import config from '../../../config';
 import styles from './MemoDialogCommon.scss';
 
@@ -34,17 +36,18 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  selectedTransaction: WalletTransaction,
+  selectedWallet: PublicDeriver<>,
+  existingMemo: $ReadOnly<TxMemoTableRow>,
   error: ?LocalizableError,
-  onCancel: Function,
-  onSubmit: Function,
-  onClickDelete: Function,
+  onCancel: void => void,
+  onSubmit: TxMemoTablePreInsert => Promise<void>,
+  onClickDelete: void => void,
   classicTheme: boolean,
 |};
 
-type State = {
+type State = {|
   isSubmitting: boolean,
-};
+|};
 
 @observer
 export default class EditMemoDialog extends Component<Props, State> {
@@ -64,9 +67,10 @@ export default class EditMemoDialog extends Component<Props, State> {
       memoContent: {
         type: 'memo',
         label: this.context.intl.formatMessage(messages.editMemoInputLabel),
-        placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(messages.editMemoInputLabel) : '',
-        value: this.props.selectedTransaction.memo,
+        placeholder: this.props.classicTheme
+          ? this.context.intl.formatMessage(messages.editMemoInputLabel)
+          : '',
+        value: this.props.existingMemo,
         validators: [({ field }) => (
           [
             isValidMemo(field.value),
@@ -85,17 +89,20 @@ export default class EditMemoDialog extends Component<Props, State> {
     },
   });
 
-  submit = () => {
+  submit: void => void = () => {
     this.form.submit({
       onSuccess: (form) => {
         this.setState({ isSubmitting: true });
         const { memoContent } = form.values();
-        const memoData = {
-          memo: memoContent.replace(/ +/g, ' '),
-          tx: this.props.selectedTransaction.id,
-          lastUpdated: new Date()
+        const memoRequest = {
+          publicDeriver: this.props.selectedWallet,
+          memo: {
+            Content: memoContent.replace(/ +/g, ' '),
+            TransactionHash: this.props.existingMemo.TransactionHash,
+            LastUpdated: new Date(),
+          },
         };
-        this.props.onSubmit(memoData);
+        this.props.onSubmit(memoRequest);
       },
       onError: () => {
         this.setState({ isSubmitting: false });
@@ -112,7 +119,6 @@ export default class EditMemoDialog extends Component<Props, State> {
       error,
       onCancel,
       onClickDelete,
-      classicTheme
     } = this.props;
 
     const disabledCondition = !(
@@ -125,7 +131,8 @@ export default class EditMemoDialog extends Component<Props, State> {
         label: this.context.intl.formatMessage(messages.editMemoActionsSubmit),
         primary: true,
         onClick: this.submit,
-        disabled: isSubmitting || disabledCondition
+        isSubmitting,
+        disabled: disabledCondition
       },
     ];
 
@@ -139,7 +146,6 @@ export default class EditMemoDialog extends Component<Props, State> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={onCancel}
-        classicTheme={classicTheme}
       >
         <Input
           className={styles.memoContent}

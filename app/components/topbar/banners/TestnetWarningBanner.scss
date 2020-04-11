@@ -23,3 +23,24 @@
     @include underline(var(--cmn-color-white));
   }
 }
+
+.shelleyTestnetWarning {
+  height: 46px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--theme-banner-warning-background-color);
+  .shelleyTestnetWarningIcon {
+    margin-right: 9px;
+  }
+  .text {
+    text-transform: uppercase;
+    height: 20px;
+    color: var(--cmn-color-white);
+    font-size: 13px;
+    font-weight: bold;
+    font-family: var(--font-regular);
+    letter-spacing: 1px;
+    line-height: 20px;
+  }
+}

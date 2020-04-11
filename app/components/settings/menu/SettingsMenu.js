@@ -4,8 +4,10 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import SettingsMenuItem from './SettingsMenuItem';
 import styles from './SettingsMenu.scss';
+import environmnent from '../../../environment';
 import { ROUTES } from '../../../routes-config';
 import type { Theme } from '../../../themes';
+import globalMessages from '../../../i18n/global-messages';
 
 const messages = defineMessages({
   general: {
@@ -15,10 +17,6 @@ const messages = defineMessages({
   paperWallet: {
     id: 'settings.menu.paperWallet.link.label',
     defaultMessage: '!!!Paper Wallet',
-  },
-  wallet: {
-    id: 'settings.menu.wallet.link.label',
-    defaultMessage: '!!!Wallet',
   },
   support: {
     id: 'settings.menu.support.link.label',
@@ -35,11 +33,10 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  isActiveItem: Function,
-  onItemClick: Function,
-  hasActiveWallet: boolean,
-  currentLocale: string,
-  currentTheme: Theme,
+  +isActiveItem: string => boolean,
+  +onItemClick: string => void,
+  +currentLocale: string,
+  +currentTheme: Theme,
 |};
 
 @observer
@@ -51,7 +48,7 @@ export default class SettingsMenu extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onItemClick, isActiveItem, hasActiveWallet, } = this.props;
+    const { onItemClick, isActiveItem, } = this.props;
 
     return (
       <div className={styles.componentWrapper}>
@@ -63,35 +60,27 @@ export default class SettingsMenu extends Component<Props> {
             className="general"
           />
 
-          <SettingsMenuItem
-            label={intl.formatMessage(messages.paperWallet)}
-            onClick={() => onItemClick(ROUTES.SETTINGS.PAPER_WALLET)}
-            active={isActiveItem(ROUTES.SETTINGS.PAPER_WALLET)}
-            className="paperWallet"
-          />
+          {!environmnent.isShelley() &&
+            <SettingsMenuItem
+              label={intl.formatMessage(messages.paperWallet)}
+              onClick={() => onItemClick(ROUTES.SETTINGS.PAPER_WALLET)}
+              active={isActiveItem(ROUTES.SETTINGS.PAPER_WALLET)}
+              className="paperWallet"
+            />
+          }
 
           <SettingsMenuItem
-            label={intl.formatMessage(messages.wallet)}
-            onClick={() => {
-              if (hasActiveWallet) {
-                onItemClick(ROUTES.SETTINGS.WALLET);
-              }
-            }}
+            label={intl.formatMessage(globalMessages.walletLabel)}
+            onClick={() => onItemClick(ROUTES.SETTINGS.WALLET)}
             active={isActiveItem(ROUTES.SETTINGS.WALLET)}
             className="wallet"
-            disabled={!hasActiveWallet}
           />
 
           <SettingsMenuItem
             label={intl.formatMessage(messages.externalStorage)}
-            onClick={() => {
-              if (hasActiveWallet) {
-                onItemClick(ROUTES.SETTINGS.EXTERNAL_STORAGE);
-              }
-            }}
+            onClick={() => onItemClick(ROUTES.SETTINGS.EXTERNAL_STORAGE)}
             active={isActiveItem(ROUTES.SETTINGS.EXTERNAL_STORAGE)}
             className="externalStorage"
-            disabled={!hasActiveWallet}
           />
 
           <SettingsMenuItem

@@ -1,27 +1,31 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import { computed } from 'mobx';
 import { handleExternalClick } from '../../../utils/routing';
 import ExternalStorageSettings from '../../../components/settings/categories/ExternalStorageSettings';
-import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
+
+type GeneratedData = typeof ExternalStorageSettingsPage.prototype.generated;
 
 @observer
-export default class ExternalStorageSettingsPage extends Component<InjectedProps> {
+export default class ExternalStorageSettingsPage
+  extends Component<InjectedOrGenerated<GeneratedData>> {
 
-  onConnect = (authorizeUrl: string) => {
+  onConnect: string => void = (authorizeUrl) => {
     // Open authorize url
     handleExternalClick(authorizeUrl);
   };
 
-  onDisconnect = () => {
-    this.props.actions.memos.unsetExternalStorageProvider.trigger();
+  onDisconnect: void => void = () => {
+    this.generated.actions.memos.unsetExternalStorageProvider.trigger();
   };
 
   render() {
     const {
       providers,
       selectedProvider
-    } = this.props.stores.memos;
+    } = this.generated.stores.memos;
 
     return (
       <ExternalStorageSettings
@@ -31,5 +35,30 @@ export default class ExternalStorageSettingsPage extends Component<InjectedProps
         selectedExternalStorage={selectedProvider}
       />
     );
+  }
+
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(ExternalStorageSettingsPage)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    return Object.freeze({
+      stores: {
+        memos: {
+          providers: stores.memos.providers,
+          selectedProvider: stores.memos.selectedProvider,
+        },
+      },
+      actions: {
+        memos: {
+          unsetExternalStorageProvider: {
+            trigger: actions.memos.unsetExternalStorageProvider.trigger
+          },
+        },
+      },
+    });
   }
 }

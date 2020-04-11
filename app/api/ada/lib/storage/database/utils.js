@@ -5,20 +5,62 @@ import type {
   lf$Row,
   lf$Transaction,
   lf$schema$Table,
+  lf$ValueLiteralArray,
 } from 'lovefield';
 import { size } from 'lodash';
 import ExtendableError from 'es6-error';
 
-export async function addToTable<Insert, Row>(
+export async function getAll<Row>(
+  db: lf$Database,
+  tx: lf$Transaction,
+  tableName: string,
+): Promise<$ReadOnlyArray<$ReadOnly<Row>>> {
+  const table = db.getSchema().table(tableName);
+  const query = db
+    .select()
+    .from(table);
+  return await tx.attach(query);
+}
+export async function addBatchToTable<Insert, Row>(
+  db: lf$Database,
+  tx: lf$Transaction,
+  request: $ReadOnlyArray<Insert>,
+  tableName: string,
+): Promise<$ReadOnlyArray<$ReadOnly<Row>>> {
+  const table = db.getSchema().table(tableName);
+  const newRows = request.map(insert => table.createRow(insert));
+
+  const results: $ReadOnlyArray<$ReadOnly<Row>> = (await tx.attach(
+    db
+      .insert()
+      .into(table)
+      .values((newRows: Array<lf$Row>))
+  ));
+
+  return results;
+}
+export async function addNewRowToTable<Insert, Row>(
   db: lf$Database,
   tx: lf$Transaction,
   request: Insert,
   tableName: string,
-): Promise<Row> {
+): Promise<$ReadOnly<Row>> {
+  const results = await addBatchToTable<Insert, Row>(
+    db, tx, [request], tableName
+  );
+  return results[0];
+}
+
+export async function addOrReplaceRow<Insert, Row>(
+  db: lf$Database,
+  tx: lf$Transaction,
+  request: Insert,
+  tableName: string,
+): Promise<$ReadOnly<Row>> {
   const table = db.getSchema().table(tableName);
   const newRow = table.createRow(request);
 
-  const result: Row = (await tx.attach(
+  const result: $ReadOnly<Row> = (await tx.attach(
     db
       .insertOrReplace()
       .into(table)
@@ -31,10 +73,10 @@ export async function addToTable<Insert, Row>(
 export const getRowFromKey = async <T>(
   db: lf$Database,
   tx: lf$Transaction,
-  key: number,
+  key: any,
   tableName: string,
   keyRowName: string,
-): Promise<T | void> => {
+): Promise<$ReadOnly<T> | void> => {
   const table = db.getSchema().table(tableName);
   const query = db
     .select()
@@ -52,14 +94,31 @@ export async function getRowIn<Row>(
   tx: lf$Transaction,
   tableName: string,
   keyRowName: string,
-  list: Array<any>,
-): Promise<Array<Row>> {
+  list: lf$ValueLiteralArray,
+): Promise<$ReadOnlyArray<$ReadOnly<Row>>> {
   const table = db.getSchema().table(tableName);
   const query = db
     .select()
     .from(table)
     .where(table[keyRowName].in(list));
   return await tx.attach(query);
+}
+
+export async function removeFromTableBatch(
+  db: lf$Database,
+  tx: lf$Transaction,
+  tableName: string,
+  rowName: string,
+  keys: lf$ValueLiteralArray,
+): Promise<void> {
+  const table = db.getSchema().table(tableName);
+
+  await tx.attach(
+    db
+      .delete()
+      .from(table)
+      .where(table[rowName].in(keys))
+  );
 }
 
 export class StaleStateError extends ExtendableError {
@@ -77,21 +136,23 @@ export class StaleStateError extends ExtendableError {
  * - Deadlock if you lock a table which is already locked
  * - Runtime error if you access a table which is not locked
  */
-export type Schema = {
+export type Schema = {|
   +name: string,
-  properties: any; // don't care about the type since we don't need it to inspect table names
-};
-export type OwnTableType = { [key: string]: Schema };
-export type DepTableType = { [key: string]: TableClassType };
+  // don't care about the type since we don't need it to inspect table names
+  properties: any,
+|};
+export type OwnTableType = { [key: string]: Schema, ... };
+export type DepTableType = { [key: string]: TableClassType, ... };
 export type TableClassType = {
   +ownTables: OwnTableType,
   /**
    * Recursively specify which tables will be required
-   * We need to recursivley store this information
+   * We need to recursively store this information
    * That way each wrapper only needs to care about the tables it specifically will access
    * and not what its dependencies will require
    */
   +depTables: DepTableType,
+  ...
 }
 
 /**
@@ -102,7 +163,7 @@ export async function raii<T>(
   db: lf$Database,
   tables: Array<lf$schema$Table>,
   scope: lf$Transaction => Promise<T>,
-): Promise<T | void> {
+): Promise<T> {
   const tx = db.createTransaction();
   await tx.begin(tables);
   try {
@@ -110,9 +171,19 @@ export async function raii<T>(
     await tx.commit();
     return result;
   } catch (e) {
-    console.error(JSON.stringify(e));
+    const tableNames = tables.map(table => table.getName()).join('\n');
+    console.error('rolling back Lovefield query for\n' + tableNames + ' with error ' + JSON.stringify(e));
     await tx.rollback();
+    throw e;
   }
+}
+
+export function mapToTables(
+  db: lf$Database,
+  map: Map<number, string>
+): Array<lf$schema$Table> {
+  return Array.from(map.values())
+    .map(table => db.getSchema().table(table));
 }
 
 export function getAllSchemaTables(
@@ -124,11 +195,18 @@ export function getAllSchemaTables(
 }
 
 /** recursively get all tables required for a database query */
-export function getAllTables(tableClass: TableClassType): Set<string> {
-  return new Set(_getAllTables(tableClass));
+export function getAllTables(...tableClass: Array<TableClassType>): Set<string> {
+  const tables = [];
+  for (const clazz of tableClass) {
+    tables.push(..._getAllTables(clazz));
+  }
+  return new Set(tables);
 }
 
 function _getAllTables(tableClass: TableClassType): Array<string> {
+  if (tableClass === undefined) {
+    throw new Error('Found undefined table. Probably a static initialization order issue');
+  }
   const ownTables = Object.keys(tableClass.ownTables)
     .map(key => tableClass.ownTables[key])
     .map(schema => schema.name);

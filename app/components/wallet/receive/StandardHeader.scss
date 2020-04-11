@@ -1,0 +1,74 @@
+@import '../../../themes/mixins/loading-spinner';
+@import '../../../themes/mixins/error-message';
+
+.qrCodeAndInstructions {
+  border-bottom: 1px solid var(--theme-separation-border-color);
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 30px;
+  padding-bottom: 30px;
+  position: relative;
+
+  .qrCode {
+    align-items: flex-start;
+    display: flex;
+    margin-left: 80px;
+
+    canvas {
+      border: 4px solid var(--theme-receive-qr-code-background-color);
+      box-sizing: content-box;
+    }
+  }
+
+  .instructions {
+    color: var(--theme-bordered-box-text-color);
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-regular);
+    font-size: 14px;
+    justify-content: space-between;
+    line-height: 19px;
+    letter-spacing: 0;
+
+    .postCopyMargin {
+      margin-bottom: 16px;
+    }
+
+    .copyableHash {
+      letter-spacing: 0px;
+      font-size: 14px;
+      line-height: 22px;
+      font-family: var(--font-mono-medium);
+      color: var(--theme-wallet-receive-wallet-hash-text-color);
+    }
+
+    .hashLabel {
+      font-size: 18px;
+      font-family: var(--font-medium);
+      line-height: 22px;
+      margin-bottom: 16px;
+    }
+
+    .instructionsText {
+      font-size: 14px;
+      letter-spacing: 0;
+      line-height: 1.57;
+      margin-bottom: 12px;
+      word-break: break-word;
+    }
+
+    .submitWithPasswordButton {
+      max-width: 310px;
+      width: calc(50% - 10px);
+      &.spinning {
+        @include loading-spinner("../../../assets/images/spinner-light.svg");
+      }
+    }
+
+    .error {
+      @include error-message;
+      text-align: left;
+      margin-top: 5px;
+    }
+  }
+}

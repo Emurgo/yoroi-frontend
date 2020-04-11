@@ -1,0 +1,28 @@
+.wrapper {
+  position: relative;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+
+  .component {
+    flex: 1;
+    min-width: 250px;
+  }
+}
+
+.toggle {
+  margin-left: 58px;
+  width: 12px;
+  height: 12px;
+  display: block;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.toggleRotate {
+  transform: rotate(180deg);
+}

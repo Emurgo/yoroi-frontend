@@ -5,31 +5,39 @@ import classnames from 'classnames';
 import styles from './WalletNavButton.scss';
 
 type Props = {|
-  label: string,
-  icon: string,
-  isActive: boolean,
-  onClick: Function,
-  className?: string,
+  +label: string,
+  +icon?: string,
+  +isActive: boolean,
+  +onClick: void => void,
+  +className?: string,
 |};
 
 @observer
 export default class WalletNavButton extends Component<Props> {
   static defaultProps = {
-    className: undefined
+    className: undefined,
+    icon: undefined
   };
 
   render() {
-    const { isActive, onClick, className } = this.props;
+    const { isActive, onClick, className, label, icon } = this.props;
+
+    const IconComponent = icon;
+
     const componentClasses = classnames([
       className,
-      styles.component,
-      isActive ? styles.active : styles.normal
+      styles.button,
+      isActive && styles.active
     ]);
+
     return (
       <button type="button" className={componentClasses} onClick={onClick}>
-        <div className={styles.container}>
-          <span className={styles.label}>{this.props.label}</span>
-        </div>
+        {IconComponent != null &&
+          <div className={styles.icon}>
+            <IconComponent />
+          </div>
+        }
+        <span className={styles.label}>{label}</span>
       </button>
     );
   }

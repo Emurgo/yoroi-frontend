@@ -3,28 +3,21 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
+import globalMessages from '../../../../i18n/global-messages';
 import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
-import OptionBlock from './OptionBlock';
+import OptionBlock from '../../../widgets/options/OptionBlock';
 
-import styles from './OptionListWrapperStyle.scss';
+import styles from '../../../widgets/options/OptionListWrapperStyle.scss';
 
 const messages = defineMessages({
   dialogTitle: {
     id: 'wallet.add.optionDialog.connect.hw.dialogTitle',
     defaultMessage: '!!!Connect to hardware wallet',
   },
-  ledgerTitle: {
-    id: 'wallet.add.optionDialog.connect.hw.ledger.title',
-    defaultMessage: '!!!Ledger Hardware Wallet',
-  },
   ledgerDescription: {
     id: 'wallet.add.optionDialog.connect.hw.ledger.learnMoreText',
     defaultMessage: '!!!A Ledger hardware wallet is a small USB device that adds an extra level of security to your wallet. It is more secure because your private key never leaves the hardware wallet. This protects your funds even if your computer is compromised due to malware, phishing attempts, etc.',
-  },
-  trezorTitle: {
-    id: 'wallet.add.optionDialog.connect.hw.trezor.title',
-    defaultMessage: '!!!Trezor Hardware Wallet',
   },
   trezorDescription: {
     id: 'wallet.add.optionDialog.connect.hw.trezor.learnMoreText',
@@ -33,10 +26,9 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onCancel: Function,
-  onTrezor: Function,
-  onLedger: Function,
-  classicTheme: boolean
+  +onCancel: void => void,
+  +onTrezor: void => void,
+  +onLedger: void => void,
 |};
 
 @observer
@@ -47,7 +39,7 @@ export default class WalletConnectHWOptionDialog extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onCancel, onTrezor, onLedger, classicTheme } = this.props;
+    const { onCancel, onTrezor, onLedger, } = this.props;
 
     return (
       <Dialog
@@ -55,7 +47,6 @@ export default class WalletConnectHWOptionDialog extends Component<Props> {
         closeOnOverlayClick={false}
         onClose={onCancel}
         closeButton={<DialogCloseButton />}
-        classicTheme={classicTheme}
         className="WalletConnectHWOptionDialog"
       >
         <div className={styles.component}>
@@ -63,7 +54,7 @@ export default class WalletConnectHWOptionDialog extends Component<Props> {
             <OptionBlock
               parentName="WalletConnectHWOptionDialog"
               type="connectLedger"
-              title={intl.formatMessage(messages.ledgerTitle)}
+              title={intl.formatMessage(globalMessages.ledgerTitle)}
               learnMoreText={intl.formatMessage(messages.ledgerDescription)}
               onSubmit={onLedger}
             />
@@ -71,7 +62,7 @@ export default class WalletConnectHWOptionDialog extends Component<Props> {
               parentName="WalletConnectHWOptionDialog"
               type="connectTrezor"
               onSubmit={onTrezor}
-              title={intl.formatMessage(messages.trezorTitle)}
+              title={intl.formatMessage(globalMessages.trezorTitle)}
               learnMoreText={intl.formatMessage(messages.trezorDescription)}
             />
           </ul>

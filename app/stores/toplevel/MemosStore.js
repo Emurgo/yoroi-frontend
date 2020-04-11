@@ -4,23 +4,32 @@ import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import WalletTransaction from '../../domain/WalletTransaction';
 import LocalizableError from '../../i18n/LocalizableError';
-import environment from '../../environment';
 import type {
-  SaveTxMemoFunc, DeleteTxMemoFunc, GetTxMemoLastUpdateDateFunc
-} from '../../api/ada';
-import type { TransactionMemo } from '../../api/ada/adaTypes';
+  TxMemoTablePreInsert, TxMemoPreLookupKey,
+  UpsertTxMemoFunc, DeleteTxMemoFunc, GetAllTxMemoFunc
+} from '../../api/ada/lib/storage/bridge/memos';
+import {
+  upsertTxMemo, deleteTxMemo, getAllTxMemo
+} from '../../api/ada/lib/storage/bridge/memos';
+import type { TxMemoTableRow } from '../../api/ada/lib/storage/database/memos/tables';
+import {
+  asGetPublicKey,
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type { ProvidersType } from '../../api/externalStorage/index';
 import type {
   UploadExternalTxMemoFunc, DeleteExternalTxMemoFunc,
   DownloadExternalTxMemoFunc, FetchFilenameExternalTxMemoFunc,
   FetchFilenameExternalTxMemoResponse, FetchFolderExternalTxMemoFunc,
   CreateFolderExternalTxMemoFunc
-} from '../../api/externalStorage/types';
+} from '../../api/externalStorage/providers/IProvider';
 import type { SelectedExternalStorageProvider } from '../../domain/ExternalStorage';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+
+type MemosForWallet = Map<string, $ReadOnly<TxMemoTableRow>>;
 
 export default class MemosStore extends Store {
 
-  @computed get providers(): { [key: string]: ProvidersType } {
+  @computed get providers(): { [key: string]: ProvidersType, ... } {
     return this.api.externalStorage.getProviders();
   }
 
@@ -46,10 +55,6 @@ export default class MemosStore extends Store {
     // eslint-disable-next-line max-len
     = new Request<SelectedExternalStorageProvider => Promise<void>>(this.api.externalStorage.setSelectedProvider);
 
-  @observable
-  setWalletAccountNumberPlateRequest: Request<string => Promise<void>>
-    = new Request<string => Promise<void>>(this.api.externalStorage.setWalletAccountNumberPlate);
-
   @observable uploadExternalTxMemoRequest: Request<UploadExternalTxMemoFunc>
     = new Request<UploadExternalTxMemoFunc>(this.api.externalStorage.uploadFile);
 
@@ -71,25 +76,25 @@ export default class MemosStore extends Store {
   @observable createFolderExternalTxMemoRequest: Request<CreateFolderExternalTxMemoFunc>
     = new Request<CreateFolderExternalTxMemoFunc>(this.api.externalStorage.createFolder);
 
-  @observable saveTxMemoRequest: Request<SaveTxMemoFunc>
-    = new Request<SaveTxMemoFunc>(this.api.ada.saveTxMemo);
+  @observable saveTxMemoRequest: Request<UpsertTxMemoFunc>
+    = new Request<UpsertTxMemoFunc>(upsertTxMemo);
 
   @observable deleteTxMemoRequest: Request<DeleteTxMemoFunc>
-    = new Request<DeleteTxMemoFunc>(this.api.ada.deleteTxMemo);
+    = new Request<DeleteTxMemoFunc>(deleteTxMemo);
 
-  @observable getTxMemoLastUpdateDateRequest: Request<GetTxMemoLastUpdateDateFunc>
-    = new Request<GetTxMemoLastUpdateDateFunc>(this.api.ada.getTxMemoLastUpdateDate);
+  @observable getAllTxMemos: Request<GetAllTxMemoFunc>
+    = new Request<GetAllTxMemoFunc>(getAllTxMemo);
 
-   @observable
+  @observable
   revokeTokenStorageProvideRequest: Request<void => Promise<void>>
     = new Request<void => Promise<void>>(this.api.externalStorage.revokeToken);
 
-  _hasAnyPending: boolean = false;
+  @observable
+  txMemoMap: Map<string, MemosForWallet> = new Map();
 
-  setup() {
+  setup(): void {
     this._getSelectedProvider(); // eagerly cache
     this.actions.memos.updateExternalStorageProvider.listen(this._setExternalStorageProvider);
-    this.actions.memos.updateAccountNumberPlate.listen(this._updateAccountNumberPlate);
     this.actions.memos.unsetExternalStorageProvider.listen(this._unsetExternalStorageProvider);
     this.actions.memos.closeAddMemoDialog.listen(this._closeAddMemoDialog);
     this.actions.memos.closeEditMemoDialog.listen(this._closeEditMemoDialog);
@@ -102,31 +107,62 @@ export default class MemosStore extends Store {
     this.actions.memos.updateTxMemo.listen(this._updateTxMemo);
     this.actions.memos.deleteTxMemo.listen(this._deleteTxMemo);
     this.actions.memos.syncTxMemos.listen(this._syncTxMemos);
-    this.actions.memos.downloadTxMemo.listen(this._downloadTxMemo);
+    this.actions.memos.downloadTxMemo.listen(this._downloadAndSaveTxMemo);
     this.api.externalStorage.setup();
     this.registerReactions([
       this._setSelectedProvider,
     ]);
   }
 
-  teardown() {
+  teardown(): void {
     super.teardown();
+  }
+
+  @action
+  loadFromStorage: void => Promise<void> = async () => {
+    // note: only need to care about persistent storage
+    // since this is called only once when the app launches
+    // so there should be no transient storage when the app loads anyway
+    const db = this.stores.loading.loadPersitentDbRequest.result;
+    if (db == null) throw new Error(`${nameof(MemosStore)}::${nameof(this.loadFromStorage)} called before storage was initialized`);
+    const allTxMemos = await this.getAllTxMemos.execute({
+      db,
+    }).promise;
+    if (allTxMemos == null) throw new Error('Should never happen');
+    for (const txMemo of allTxMemos) {
+      let walletTxMemos = this.txMemoMap.get(txMemo.WalletId);
+      if (walletTxMemos == null) {
+        walletTxMemos = observable.map();
+        this.txMemoMap.set(txMemo.WalletId, walletTxMemos);
+      }
+      walletTxMemos.set(txMemo.TransactionHash, txMemo);
+    }
+  }
+
+  @computed
+  get getTxMemosForWallet(): void | MemosForWallet {
+    const { selected } = this.stores.wallets;
+    if (selected == null) return undefined;
+    const walletId = this.getIdForWallet(selected);
+    const memos = this.txMemoMap.get(walletId);
+    if (memos != null) return memos;
+
+    // not found -> new wallet
+    const result = observable.map();
+    this.txMemoMap.set(walletId, result);
+    return result;
   }
 
   // ========== Selected External Storage ========== //
 
-  @action _setExternalStorageProvider = async (provider : SelectedExternalStorageProvider) => {
+  @action _setExternalStorageProvider: SelectedExternalStorageProvider => Promise<void> = async (
+    provider
+  ) => {
     await this.setExternalStorageProviderRequest.execute(provider);
     await this.getExternalStorageProviderRequest.execute(); // eagerly cache
   };
 
-  @action _updateAccountNumberPlate = async (numberPlateId : string) => {
-    if (this.hasSetSelectedExternalStorageProvider && !this.hasSetAccountNumberPlate) {
-      await this.setWalletAccountNumberPlateRequest.execute(numberPlateId);
-    }
-  }
-
-  @action _unsetExternalStorageProvider = async () => {
+  @action _unsetExternalStorageProvider: void => Promise<void> = async () => {
     await this.unsetExternalStorageProviderRequest.execute();
     await this.getExternalStorageProviderRequest.execute(); // eagerly cache
     // Revoke current token
@@ -149,122 +185,188 @@ export default class MemosStore extends Store {
     );
   }
 
-  @computed get hasSetAccountNumberPlate(): boolean {
-    return (
-      this.setWalletAccountNumberPlateRequest.wasExecuted &&
-      this.setWalletAccountNumberPlateRequest.result !== null
-    );
-  }
-
-  @action _closeAddMemoDialog = (): void => {
+  @action _closeAddMemoDialog: void => void = () => {
     this._setError(null);
     this.actions.dialogs.closeActiveDialog.trigger();
   }
 
-  @action _closeEditMemoDialog = (): void => {
+  @action _closeEditMemoDialog: void => void = () => {
     this._setError(null);
     this.actions.dialogs.closeActiveDialog.trigger();
   }
 
-  @action _goBackDeleteMemoDialog = (): void => {
+  @action _goBackDeleteMemoDialog: void => void = () => {
     this._setError(null);
     this.actions.dialogs.closeActiveDialog.trigger();
   }
 
-  @action _closeDeleteMemoDialog = (): void => {
+  @action _closeDeleteMemoDialog: void => void = () => {
     this._setError(null);
     this.actions.dialogs.closeActiveDialog.trigger();
   }
 
-  @action _closeConnectExternalStorageDialog = (): void => {
+  @action _closeConnectExternalStorageDialog: void => void = () => {
     this._setError(null);
     this.actions.dialogs.closeActiveDialog.trigger();
   }
 
-  @action _selectTransaction = async (params: { tx: WalletTransaction }): Promise<void> => {
+  @action _selectTransaction: {| tx: WalletTransaction |} => void = (params) => {
     this.selectedTransaction = params.tx;
   }
 
-  @action _setError = (error: ?LocalizableError): void => {
+  @action _setError: ?LocalizableError => void = (error) => {
     this.error = error;
   }
 
-  @action _saveTxMemo = async (memo: TransactionMemo) => {
-    const { wallets } = this.stores.substores[environment.API];
+  @action _saveTxMemo: TxMemoTablePreInsert => Promise<void> = async (request) => {
+    const walletId = this.getIdForWallet(request.publicDeriver);
+    const memo = {
+      ...request.memo,
+      WalletId: walletId,
+    };
     if (this.hasSetSelectedExternalStorageProvider) {
-      await this.saveTxMemoRequest.execute({ memo });
-      wallets.refreshWalletsData();
       await this.uploadExternalTxMemoRequest.execute({ memo });
-      this._closeAddMemoDialog();
     }
+    const savedMemo = await this.saveTxMemoRequest.execute({
+      db: request.publicDeriver.getDb(),
+      memo,
+    }).promise;
+    if (savedMemo == null) throw new Error('Should never happen');
+    this.txMemoMap.get(walletId)?.set(request.memo.TransactionHash, savedMemo);
+    this._closeAddMemoDialog();
   };
 
-  @action _updateTxMemo = async (memo: TransactionMemo) => {
-    const { wallets } = this.stores.substores[environment.API];
+  @action _updateTxMemo: TxMemoTablePreInsert => Promise<void> = async (request) => {
+    const walletId = this.getIdForWallet(request.publicDeriver);
+    const memo = {
+      ...request.memo,
+      WalletId: walletId,
+    };
     if (this.hasSetSelectedExternalStorageProvider) {
-      await this.saveTxMemoRequest.execute({ memo });
-      wallets.refreshWalletsData();
       await this.uploadAndOverwriteExternalTxMemoRequest.execute({ memo });
-      this._closeEditMemoDialog();
+    }
+    const savedMemo = await this.saveTxMemoRequest.execute({
+      db: request.publicDeriver.getDb(),
+      memo,
+    }).promise;
+    if (savedMemo == null) throw new Error('Should never happen');
+    this.txMemoMap.get(walletId)?.set(request.memo.TransactionHash, savedMemo);
+    this._closeEditMemoDialog();
+  };
+
+  @action _deleteTxMemo: TxMemoPreLookupKey => Promise<void> = async (request) => {
+    const walletId = this.getIdForWallet(request.publicDeriver);
+    const memoToDelete = {
+      walletId,
+      txHash: request.txHash,
+    };
+    if (this.hasSetSelectedExternalStorageProvider) {
+      await this.deleteExternalTxMemoRequest.execute(memoToDelete);
+    }
+    await this.deleteTxMemoRequest.execute({
+      db: request.publicDeriver.getDb(),
+      key: memoToDelete,
+    });
+    this.txMemoMap.get(walletId)?.delete(request.txHash);
+    this._closeDeleteMemoDialog();
+  };
+
+  @action _downloadAndSaveTxMemo: TxMemoPreLookupKey => Promise<void> = async (
+    request
+  ) => {
+    if (this.hasSetSelectedExternalStorageProvider) {
+      const walletId = this.getIdForWallet(request.publicDeriver);
+      const memo = await this.downloadExternalTxMemoRequest.execute({
+        walletId,
+        txHash: request.txHash,
+      }).promise;
+      if (memo == null) throw new Error('Should never happen');
+      const memoRow = await this.saveTxMemoRequest.execute({
+        db: request.publicDeriver.getDb(),
+        memo: {
+          WalletId: walletId,
+          Content: memo.content,
+          TransactionHash: request.txHash,
+          LastUpdated: memo.lastUpdated
+        }
+      }).promise;
+      if (memoRow == null) throw new Error('Should never happen');
+      this.txMemoMap.get(walletId)?.set(request.txHash, memoRow);
     }
   };
 
-  @action _deleteTxMemo = async (memoTxHash: string) => {
-    const { wallets } = this.stores.substores[environment.API];
+  @action _syncTxMemos: PublicDeriver<> => Promise<void> = async (publicDeriver) => {
     if (this.hasSetSelectedExternalStorageProvider) {
-      await this.deleteTxMemoRequest.execute(memoTxHash);
-      wallets.refreshWalletsData();
-      await this.deleteExternalTxMemoRequest.execute(memoTxHash);
-      this._closeDeleteMemoDialog();
-    }
-  };
+      // 1st check if root folder exists. If not, we create it
+      {
+        const rootFolderStatus = await this.fetchFolderExternalTxMemoRequest.execute({
+          walletId: undefined
+        }).promise;
+        if (rootFolderStatus == null) return undefined;
+        if (rootFolderStatus === false) {
+          await this.createFolderExternalTxMemoRequest.execute({ walletId: undefined });
+        }
+      }
 
-  @action _downloadTxMemo = async (memoTxHash: string) => {
-    if (this.hasSetSelectedExternalStorageProvider) {
-      await this.downloadExternalTxMemoRequest.execute(memoTxHash)
-        .then(async memo => {
-          return await this.saveTxMemoRequest.execute({
-            memo: {
-              memo: memo.content,
-              tx: memoTxHash,
-              lastUpdated: memo.lastUpdated
-            }
-          });
-        });
-    }
-  };
+      // 2nd check if wallet folder exists. If not, we create it
+      const walletId = this.getIdForWallet(publicDeriver);
+      {
+        // Check if wallet folder exists
+        const walletFolderStatus = await this.fetchFolderExternalTxMemoRequest.execute({
+          walletId
+        }).promise;
+        if (walletFolderStatus == null) return undefined;
+        if (walletFolderStatus === false) {
+          await this.createFolderExternalTxMemoRequest.execute({ walletId });
+        }
+      }
 
-  @action _syncTxMemos = async () => {
-    if (this.hasSetSelectedExternalStorageProvider) {
-      // Check if wallet folder exists
-      await this.fetchFolderExternalTxMemoRequest.execute('')
-        .then(async response => {
-          // If folder exists, fetch files. Otherwise, create it.
-          if (response === true) {
-            return await this.fetchFilenamesExternalTxMemoRequest.execute()
-              .then(async memos => {
-                return await this._queryAndUpdateMemos(memos);
-              });
-          }
-          return await this.createFolderExternalTxMemoRequest.execute('');
-        });
+      // sync memos with remote
+      const memos = await this.fetchFilenamesExternalTxMemoRequest.execute({ walletId }).promise;
+      if (memos == null) return undefined;
+      await this._updateLocaleFromRemote({
+        remoteResponse: memos,
+        publicDeriver,
+      });
     }
   }
 
-  _queryAndUpdateMemos = async (memos: FetchFilenameExternalTxMemoResponse) => {
-    for (const memo of memos) {
-      // First, check if memo already exists
-      await this.getTxMemoLastUpdateDateRequest.execute(memo.tx)
-        .then(async lastUpdated => {
-          if (memo.deleted === true) {
-            // delete local copy if file was deleted on external storage
-            await this.deleteTxMemoRequest.execute(memo.tx);
+  _updateLocaleFromRemote: {|
+    remoteResponse: FetchFilenameExternalTxMemoResponse,
+    publicDeriver: PublicDeriver<>,
+  |} => Promise<void> = async (request) => {
+    const walletId = this.getIdForWallet(request.publicDeriver);
+    const txMemosForWallet = this.txMemoMap.get(walletId);
+    if (txMemosForWallet == null) return; // shouldn't happen
+
+    for (const memo of request.remoteResponse) {
+      // check if memo already exists
+      const localMemo = txMemosForWallet.get(memo.tx);
+      if (localMemo != null) {
+        // delete local copy if file was deleted on external storage
+        if (memo.deleted === true) {
+          await this.deleteTxMemoRequest.execute({
+            db: request.publicDeriver.getDb(),
+            key: {
+              walletId,
+              txHash: memo.tx,
+            }
+          });
+        } else if (localMemo.LastUpdated < memo.lastUpdated) {
           // only update if the file is newer
-          } else if (lastUpdated < memo.lastUpdated) {
-            await this._downloadTxMemo(memo.tx);
-          }
-          return lastUpdated;
+          await this._downloadAndSaveTxMemo({
+            publicDeriver: request.publicDeriver,
+            txHash: memo.tx
+          });
+        }
+        // our local version is more recent, so don't do anything
+      } else {
+        // save memo locally
+        await this._downloadAndSaveTxMemo({
+          publicDeriver: request.publicDeriver,
+          txHash: memo.tx
         });
+      }
     }
   }
 
@@ -273,11 +375,11 @@ export default class MemosStore extends Store {
     return result;
   }
 
-  _getSelectedProvider = () => {
+  _getSelectedProvider: void => void = () => {
     this.getExternalStorageProviderRequest.execute();
   };
 
-  _setSelectedProvider = async () => {
+  _setSelectedProvider: void => Promise<void> = async () => {
     const { isLoading } = this.stores.loading;
     if (isLoading) {
       return;
@@ -290,4 +392,12 @@ export default class MemosStore extends Store {
     }
   }
 
+  getIdForWallet: PublicDeriver<> => string = (wallet) => {
+    const withPubKey = asGetPublicKey(wallet);
+    // probably if there isn't a public key,
+    // we should combine a unique install ID + the publicDeriver's auto-increment key number
+    if (withPubKey == null) throw new Error('Not implemented yet');
+    const { plate } = this.stores.wallets.getPublicKeyCache(withPubKey);
+    return plate.id;
+  }
 }

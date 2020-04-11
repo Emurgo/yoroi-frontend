@@ -22,7 +22,6 @@ export class MyTopLevelQuery {
 
   /** other high level queries you use inside this query **/
   static depTables = Object.freeze({
-    
     OtherHighLevelQuery,
   });
 
@@ -48,10 +47,10 @@ export class MyTopLevelQuery {
      * Similarly, instead of referring to the table directly, we access it through
      * our `ownTables` variable
      */
-    return await addToTable(
+    return await addNewRowToTable(
       db, tx,
       request,
-      AddKey.ownTables[Tables.KeySchema.name].name,
+      ModifyKey.ownTables[Tables.KeySchema.name].name,
     );
 
     return {};
@@ -70,7 +69,7 @@ await myTransactionalQuery.begin([
 ]);
 
 // execute query
-const addressesForAccount = await GetDerivationsByPath.exec(
+const addressesForAccount = await MyTopLevelQuery.exec(
   db,
   myTransactionalQuery,
 );
@@ -87,7 +86,7 @@ await raii(
   getAllSchemaTables(db, MyTopLevelQuery),
   async tx => {
     // execute query
-    const addressesForAccount = await GetDerivationsByPath.exec(
+    const addressesForAccount = await MyTopLevelQuery.exec(
       db,
       tx,
     );

@@ -8,8 +8,20 @@ import type {
   CreateUnsignedTxFunc,
 } from '../../api/ada';
 
-import type { BaseSignRequest } from '../../api/ada/adaTypes';
-import { signRequestFee, signRequestTotalInput } from '../../api/ada/lib/utils';
+import type { BaseSignRequest } from '../../api/ada/transactions/types';
+import { IGetFee, ITotalInput, ITxEqual, copySignRequest } from '../../api/ada/transactions/utils';
+import {
+  asGetAllUtxos, asHasUtxoChains,
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import type {
+  IGetAllUtxosResponse, IHasUtxoChains,
+} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+
+export type SetupSelfTxFunc = {|
+  publicDeriver: IHasUtxoChains,
+  filter: ElementOf<IGetAllUtxosResponse> => boolean,
+|} => Promise<void>;
 
 /**
  * TODO: we make the following assumptions
@@ -22,11 +34,17 @@ export default class AdaTransactionBuilderStore extends Store {
 
   @observable shouldSendAll: boolean;
   /** Stores the tx information as the user is building it */
-  @observable plannedTxInfo: Array<{ ...Inexact<TxOutType> }>;
+  @observable plannedTxInfo: Array<{| ...InexactSubset<TxOutType<number>>, |}>;
   /** Stores the tx used to generate the information on the send form */
-  @observable plannedTx: null | BaseSignRequest;
+  @observable plannedTx: null | BaseSignRequest<
+    RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput
+  >;
   /** Stores the tx that will be sent if the user confirms sending */
-  @observable tentativeTx: null | BaseSignRequest;
+  @observable tentativeTx: null | BaseSignRequest<
+    RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput
+  >;
+
+  @observable filter: ElementOf<IGetAllUtxosResponse> => boolean;
 
   /** tracks mismatch between `plannedTx` and `tentativeTx` */
   @observable txMismatch: boolean = false;
@@ -37,11 +55,15 @@ export default class AdaTransactionBuilderStore extends Store {
 
   @observable memo: void | string;
 
-  setup() {
+  @observable setupSelfTx: LocalizedRequest<SetupSelfTxFunc>
+    = new LocalizedRequest<SetupSelfTxFunc>(this._setupSelfTx);
+
+  setup(): void {
     super.setup();
     this._reset();
     const actions = this.actions.ada.txBuilderActions;
     actions.updateReceiver.listen(this._updateReceiver);
+    actions.setFilter.listen(this._setFilter);
     actions.updateAmount.listen(this._updateAmount);
     actions.updateMemo.listen(this._updateMemo);
     actions.updateTentativeTx.listen(this._updateTentativeTx);
@@ -58,7 +80,7 @@ export default class AdaTransactionBuilderStore extends Store {
     if (!this.plannedTx) {
       return undefined;
     }
-    return signRequestFee(this.plannedTx, true);
+    return IGetFee(this.plannedTx, true);
   }
 
   @computed get
@@ -66,13 +88,14 @@ export default class AdaTransactionBuilderStore extends Store {
     if (!this.plannedTx) {
       return undefined;
     }
-    return signRequestTotalInput(this.plannedTx, true);
+    return ITotalInput(this.plannedTx, true);
   }
 
   // ================
   //   tentative tx
   // ================
 
+  // eslint-disable-next-line no-restricted-syntax
   _mismatchReaction = reaction(
     () => [
       this.plannedTx,
@@ -85,12 +108,13 @@ export default class AdaTransactionBuilderStore extends Store {
   //   planned tx
   // ==============
 
+  // eslint-disable-next-line no-restricted-syntax
   _updatePlannedTxReaction = reaction(
     () => this.createUnsignedTx.result,
     () => this._updatePlannedTx(),
   )
 
-  _updatePlannedTx = () => {
+  _updatePlannedTx: void => void = () => {
     if (!this.createUnsignedTx.result) {
       runInAction(() => {
         this.plannedTx = null;
@@ -99,12 +123,17 @@ export default class AdaTransactionBuilderStore extends Store {
     }
     const result = this.createUnsignedTx.result;
 
+    const certificate = result.certificate == null
+      ? undefined
+      : result.certificate;
     runInAction(() => {
       this.plannedTx = {
-        addressesMap: result.addressesMap,
         senderUtxos: result.senderUtxos,
-        unsignedTx: result.txBuilder.make_transaction(),
+        unsignedTx: result.txBuilder
+          ? result.txBuilder.make_transaction()
+          : result.IOs,
         changeAddr: result.changeAddr,
+        certificate,
       };
     });
   }
@@ -113,19 +142,18 @@ export default class AdaTransactionBuilderStore extends Store {
   //   tx builder
   // ==============
 
+  // eslint-disable-next-line no-restricted-syntax
   _updateTxBuilderReaction = reaction(
     () => [
       // Need toJS for mobx to react to an array.
-      // Note: will not trigger if re-asigned same value
+      // Note: will not trigger if re-assigned same value
       toJS(this.plannedTxInfo),
       this.shouldSendAll,
-      // whenever the user wallet updates, we probably have to refresh the utxo set
-      this.stores.substores.ada.wallets.active,
-      // need to recalculate when there are no more pending transactions
-      this.stores.substores.ada.transactions.hasAnyPending,
+      this.stores.wallets.selected,
+      // update if tx history changes
+      this.stores.substores.ada.transactions.hash,
     ],
-    // $FlowFixMe error in mobx types
-    async () => await this._updateTxBuilder(),
+    async () => this._updateTxBuilder(),
   )
 
   _canCompute(): boolean {
@@ -145,38 +173,53 @@ export default class AdaTransactionBuilderStore extends Store {
    * Note: need to check state outside of runInAction
    * Otherwise reaction won't trigger
    */
-  _updateTxBuilder = async (): Promise<void> => {
+  _updateTxBuilder: void => Promise<void> = async () => {
     runInAction(() => {
       this.createUnsignedTx.reset();
       this.plannedTx = null;
     });
-    const account = this.stores.substores.ada.wallets.activeAccount;
-    if (!account || !this._canCompute()) {
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver || !this._canCompute()) {
       return;
     }
 
     // type-cast to assert non-null
-    const plannedTxInfo: Array<TxOutType> = (this.plannedTxInfo: any);
+    const plannedTxInfo = (this.plannedTxInfo);
 
     const receiver = plannedTxInfo[0].address;
-    const amount = plannedTxInfo[0].value
+    if (receiver == null) return;
+    const amount = plannedTxInfo[0].value != null
       ? plannedTxInfo[0].value.toString()
-      : '0'; // value is not relevant in sendall case
+      : null;
     const shouldSendAll = this.shouldSendAll;
 
-    const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
-    if (this.createUnsignedTx.promise) {
-      // eslint-disable-next-line no-unused-vars
-      await this.createUnsignedTx.promise.catch(err => { /* do nothing */ });
+    if (this.createUnsignedTx.isExecuting) {
+      this.createUnsignedTx.cancel();
     }
-    this.createUnsignedTx.execute({
-      accountId: account.account,
-      receiver,
-      amount,
-      getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
-      shouldSendAll,
-    });
 
+    const withUtxos = asGetAllUtxos(publicDeriver);
+    if (withUtxos == null) {
+      throw new Error('_updateTxBuilder missing utxo functionality');
+    }
+    const withHasUtxoChains = asHasUtxoChains(withUtxos);
+    if (withHasUtxoChains == null) {
+      throw new Error('_updateTxBuilder missing chains functionality');
+    }
+    if (amount == null && shouldSendAll === true) {
+      await this.createUnsignedTx.execute({
+        publicDeriver: withHasUtxoChains,
+        receiver,
+        shouldSendAll,
+        filter: this.filter,
+      });
+    } else if (amount != null) {
+      await this.createUnsignedTx.execute({
+        publicDeriver: withHasUtxoChains,
+        receiver,
+        amount,
+        filter: this.filter,
+      });
+    }
   }
 
   // ===========
@@ -184,30 +227,35 @@ export default class AdaTransactionBuilderStore extends Store {
   // ===========
 
   @action
-  _toggleSendAll = () => {
+  _toggleSendAll: void => void = () => {
     this._updateAmount();
     this.shouldSendAll = !this.shouldSendAll;
   }
 
   /** Should only set to valid address or undefined */
   @action
-  _updateReceiver = (receiver: void | string) => {
+  _updateReceiver: (void | string) => void = (receiver) => {
     this.plannedTxInfo[0].address = receiver;
+  }
+
+  @action
+  _setFilter: (ElementOf<IGetAllUtxosResponse> => boolean) => void = (filter) => {
+    this.filter = filter;
   }
 
   /** Should only set to valid amount or undefined */
   @action
-  _updateAmount = (value: void | number) => {
+  _updateAmount: (void | number) => void = (value) => {
     this.plannedTxInfo[0].value = value;
   }
 
   @action
-  _updateMemo = (content: void | string) => {
+  _updateMemo: (void | string) => void = (content) => {
     this.memo = content;
   }
 
   @action
-  _updateTentativeTx = () => {
+  _updateTentativeTx: void => void = () => {
     if (!this.plannedTx) {
       this.tentativeTx = null;
       return;
@@ -216,23 +264,17 @@ export default class AdaTransactionBuilderStore extends Store {
   }
 
   @action
-  _reset = async () => {
+  _reset: void => void = () => {
     this.plannedTxInfo = [{ address: undefined, value: undefined }];
     this.shouldSendAll = false;
-    this.memo = '';
-
-    // creation of unsigned tx may still be running when we try and reset
-    // we need to wait for it to finish then clear the result since we can't cancel the promise
-    try {
-      await this.createUnsignedTx.promise;
-    } catch (err) {
-      // ignore
-    }
+    this.memo = undefined;
+    this.filter = () => true;
+    this.createUnsignedTx.cancel();
     this.createUnsignedTx.reset();
-    runInAction(() => {
-      this.plannedTx = null;
-      this.tentativeTx = null;
-    });
+    this.plannedTx = null;
+    this.tentativeTx = null;
+    this.setupSelfTx.cancel();
+    this.setupSelfTx.reset();
   }
 
   // =======================================
@@ -243,7 +285,11 @@ export default class AdaTransactionBuilderStore extends Store {
    * We need to clone to tentative tx to avoid the dialog changing
    * when the send page recalculates the utxo
    */
-  _cloneTx = (signRequest: BaseSignRequest): BaseSignRequest => {
+  _cloneTx: (
+    BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>
+  ) => BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput> = (
+    signRequest
+  ) => {
     // drop mobx observable behavior
     const copy = toJS(signRequest);
 
@@ -252,32 +298,37 @@ export default class AdaTransactionBuilderStore extends Store {
      *
      * To avoid the back button breaking the send page form, we clone the tx
      */
-    copy.unsignedTx = copy.unsignedTx.clone();
-    return copy;
+    return copySignRequest(copy);
   }
 
   /**
    * Check if tx in the confirm dialog matches what the tx would be
    * if they tries to send again (since it may change if UTXO changes)
    */
-  _txMismatch = (): boolean => {
+  _txMismatch: void => boolean = () => {
     if (!this.plannedTx || !this.tentativeTx) {
       // don't change the value when a tx is being recalculated
       // this avoids the UI flickering as the tx gets recalculated
       return this.txMismatch;
     }
 
-    // cast to non-null
-    const plannedUnsignedTx = this.plannedTx.unsignedTx;
+    return !ITxEqual(this.tentativeTx, this.plannedTx);
+  }
 
-    // to_json returns objects and not strings
-    // so we need to get rid of the object part with stringify
-    const tentativeTxJson = JSON.stringify((this.tentativeTx.unsignedTx.to_json()));
-    const plannedTxJson = JSON.stringify(plannedUnsignedTx.to_json());
-
-    if (tentativeTxJson !== plannedTxJson) {
-      return true;
+  _setupSelfTx: SetupSelfTxFunc = async (request): Promise<void> => {
+    this._setFilter(request.filter);
+    const nextUnusedInternal = await request.publicDeriver.nextInternal();
+    const addressInfo = nextUnusedInternal.addressInfo;
+    if (addressInfo == null) {
+      throw new Error(`${nameof(this._setupSelfTx)} ${nameof(addressInfo)} == null`);
     }
-    return false;
+    this._updateReceiver(addressInfo.addr.Hash);
+    if (this.shouldSendAll === false) {
+      this._toggleSendAll();
+    }
+
+    await this._updateTxBuilder();
+    this._updatePlannedTx();
+    this._updateTentativeTx();
   }
 }

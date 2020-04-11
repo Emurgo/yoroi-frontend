@@ -28,12 +28,13 @@ import environment from './environment';
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr, ...id, ...es, ...it]);
 
+type Props = {|
+  +stores: StoresMap,
+  +actions: ActionsMap,
+  +history: Object,
+|};
 @observer
-class App extends Component<{
-  stores: StoresMap,
-  actions: ActionsMap,
-  history: Object,
-}> {
+class App extends Component<Props> {
   render() {
     const { stores, actions, history } = this.props;
     const locale = stores.profile.currentLocale;
@@ -41,16 +42,18 @@ class App extends Component<{
     // Merged english messages with selected by user locale messages
     // In this case all english data would be overridden to user selected locale, but untranslated
     // (missed in object keys) just stay in english
-    const mergedMessages = {
-      ...translations['en-US'],
-      ...translations[locale]
-    };
+    // eslint-disable-next-line prefer-object-spread
+    const mergedMessages: { [key: string]: string, ... } = Object.assign(
+      {},
+      translations['en-US'],
+      translations[locale]
+    );
 
     const themeVars = Object.assign(
       stores.profile.currentThemeVars,
       {
         // show wingdings on dev builds when no font is set to easily find
-        // missing font bugshowever, on production, we use Times New Roman
+        // missing font bugs. However, on production, we use Times New Roman
         // which looks ugly but at least it's readable.
         '--default-font': environment.isDev() ? 'wingdings' : 'Times New Roman',
       }
@@ -63,7 +66,7 @@ class App extends Component<{
       <div style={{ height: '100%' }}>
         <ThemeManager variables={themeVars} />
 
-        {/* Automatically pass a theme prop to all componenets in this subtree. */}
+        {/* Automatically pass a theme prop to all components in this subtree. */}
         <ThemeProvider
           key={currentTheme}
           theme={yoroiPolymorphTheme}

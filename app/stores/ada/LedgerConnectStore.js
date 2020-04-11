@@ -3,26 +3,22 @@
 
 import { observable, action } from 'mobx';
 
-import {
-  LedgerBridge,
+import type { ExtendedPublicKeyResp } from 'yoroi-extension-ledger-connect-handler';
+import LedgerConnect, {
   makeCardanoAccountBIP44Path,
-} from 'yoroi-extension-ledger-bridge';
-import type {
-  GetVersionResponse,
-  GetExtendedPublicKeyResponse,
-} from '@cardano-foundation/ledgerjs-hw-app-cardano';
+} from 'yoroi-extension-ledger-connect-handler';
 
 import Config from '../../config';
 import environment from '../../environment';
 
 import Store from '../base/Store';
-import Wallet from '../../domain/Wallet';
 import LocalizedRequest from '../lib/LocalizedRequest';
 
 import type {
   CreateHardwareWalletRequest,
   CreateHardwareWalletFunc,
 } from '../../api/ada';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 
 import {
   convertToLocalizableError
@@ -38,11 +34,9 @@ import {
 import { StepState } from '../../components/widgets/ProgressSteps';
 
 import {
-  prepareLedgerBridger,
-  disposeLedgerBridgeIFrame
-} from '../../utils/iframeHandler';
+  prepareLedgerConnect,
+} from '../../utils/hwConnectHandler';
 
-import globalMessages from '../../i18n/global-messages';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import { CheckAdressesInUseApiError } from '../../api/ada/errors';
 
@@ -51,25 +45,22 @@ import {
   stringifyData,
   stringifyError
 } from '../../utils/logging';
-
-type LedgerConnectionResponse = {
-  versionResp: GetVersionResponse,
-  extendedPublicKeyResp: GetExtendedPublicKeyResponse,
-};
+import { HARD_DERIVATION_START } from '../../config/numbersConfig';
 
 export default class LedgerConnectStore
   extends Store
-  implements HWConnectStoreTypes<LedgerConnectionResponse> {
+  implements HWConnectStoreTypes<ExtendedPublicKeyResp> {
 
   // =================== VIEW RELATED =================== //
   @observable progressInfo: ProgressInfo;
+  @observable derivationIndex: number = 0; // assume single account
   error: ?LocalizableError;
   hwDeviceInfo: ?HWDeviceInfo;
-  ledgerBridge: ?LedgerBridge;
+  ledgerConnect: ?LedgerConnect;
 
   get defaultWalletName(): string {
     // Ledger doesn’t provide any device name so using hard-coded name
-    return Config.wallets.hardwareWallet.ledgerNanoS.DEFAULT_WALLET_NAME;
+    return Config.wallets.hardwareWallet.ledgerNano.DEFAULT_WALLET_NAME;
   }
 
   get isActionProcessing(): boolean {
@@ -86,7 +77,8 @@ export default class LedgerConnectStore
   @observable isCreateHWActive: boolean = false;
   // =================== API RELATED =================== //
 
-  setup() {
+  setup(): void {
+    super.setup();
     this._reset();
     const ledgerConnectAction = this.actions.ada.ledgerConnect;
     ledgerConnectAction.init.listen(this._init);
@@ -99,16 +91,14 @@ export default class LedgerConnectStore
 
   /** setup() is called when stores are being created
     * _init() is called when connect dailog is about to show */
-  _init = (): void => {
+  _init: void => void = () => {
     Logger.debug('LedgerConnectStore::_init called');
-    if (this.ledgerBridge == null) {
-      Logger.debug('LedgerConnectStore::_init new LedgerBridge created');
-      this.ledgerBridge = new LedgerBridge();
-    }
   }
 
-  @action _cancel = (): void => {
+  @action _cancel: void => void = () => {
     this.teardown();
+    this.ledgerConnect && this.ledgerConnect.dispose();
+    this.ledgerConnect = undefined;
   };
 
   teardown(): void {
@@ -116,10 +106,7 @@ export default class LedgerConnectStore
     super.teardown();
   }
 
-  @action _reset = (): void => {
-    disposeLedgerBridgeIFrame();
-    this.ledgerBridge = undefined;
-
+  @action _reset: void => void = () => {
     this.progressInfo = {
       currentStep: ProgressStep.CHECK,
       stepState: StepState.LOAD,
@@ -131,7 +118,7 @@ export default class LedgerConnectStore
 
   // =================== CHECK =================== //
   /** CHECK dialog submit(Next button) */
-  @action _submitCheck = (): void => {
+  @action _submitCheck: void => void = () => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStep.CONNECT;
     this.progressInfo.stepState = StepState.LOAD;
@@ -140,142 +127,156 @@ export default class LedgerConnectStore
 
   // =================== CONNECT =================== //
   /** CONNECT dialog goBack button */
-  @action _goBackToCheck = (): void => {
+  @action _goBackToCheck: void => void = () => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStep.CHECK;
     this.progressInfo.stepState = StepState.LOAD;
   };
 
   /** CONNECT dialog submit (Connect button) */
-  @action _submitConnect = (): void => {
+  @action _submitConnect: void => Promise<void> = async () => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStep.CONNECT;
     this.progressInfo.stepState = StepState.PROCESS;
-    this._checkAndStoreHWDeviceInfo();
+    await this._checkAndStoreHWDeviceInfo();
   };
 
-  _checkAndStoreHWDeviceInfo = async (): Promise<void> => {
+  _checkAndStoreHWDeviceInfo: void => Promise<void> = async () => {
     try {
-      if (this.ledgerBridge) {
-        // Since this.ledgerBridge is undefinable flow need to know that it's a LedgerBridge
-        const ledgerBridge: LedgerBridge = this.ledgerBridge;
-        await prepareLedgerBridger(ledgerBridge);
+      this.ledgerConnect = new LedgerConnect({
+        locale: this.stores.profile.currentLocale
+      });
+      await prepareLedgerConnect(this.ledgerConnect);
 
-        const versionResp: GetVersionResponse = await ledgerBridge.getVersion();
+      const accountPath = makeCardanoAccountBIP44Path(this.derivationIndex);
+      // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#examples
+      Logger.debug(stringifyData(accountPath));
 
-        Logger.debug(stringifyData(versionResp));
+      // get Cardano's first account's
+      // i.e hdPath = [2147483692, 2147485463, 2147483648]
+      let extendedPublicKeyResp: ExtendedPublicKeyResp;
+      if (this.ledgerConnect) {
+        extendedPublicKeyResp = await this.ledgerConnect.getExtendedPublicKey(accountPath);
 
-        // TODO: assume single account in Yoroi
-        const accountPath = makeCardanoAccountBIP44Path(0);
-        // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#examples
-        Logger.debug(stringifyData(accountPath));
-
-        // get Cardano's first account's
-        // i.e hdPath = [2147483692, 2147485463, 2147483648]
-        const extendedPublicKeyResp: GetExtendedPublicKeyResponse
-          = await ledgerBridge.getExtendedPublicKey(accountPath);
-
-        this.hwDeviceInfo = this._normalizeHWResponse({ versionResp, extendedPublicKeyResp });
-
-        this._goToSaveLoad();
-        Logger.info('Ledger device OK');
-      } else {
-        throw new Error(`LedgerBridge Error: LedgerBridge is undefined`);
+        this.hwDeviceInfo = this._normalizeHWResponse({
+          ePublicKey: extendedPublicKeyResp.ePublicKey,
+          deviceVersion: extendedPublicKeyResp.deviceVersion
+        });
       }
+
+      this._goToSaveLoad();
+      Logger.info('Ledger device OK');
     } catch (error) {
       this._handleConnectError(error);
+    } finally {
+      this.ledgerConnect && this.ledgerConnect.dispose();
+      this.ledgerConnect = undefined;
     }
   };
 
-  _normalizeHWResponse = (
-    resp: LedgerConnectionResponse,
-  ): HWDeviceInfo => {
+  _normalizeHWResponse: ExtendedPublicKeyResp => HWDeviceInfo = (
+    resp,
+  ) => {
     this._validateHWResponse(resp);
 
-    const { extendedPublicKeyResp, versionResp } = resp;
+    const { ePublicKey, deviceVersion } = resp;
 
     return {
-      publicMasterKey: extendedPublicKeyResp.publicKeyHex + extendedPublicKeyResp.chainCodeHex,
+      publicMasterKey: ePublicKey.publicKeyHex + ePublicKey.chainCodeHex,
       hwFeatures: {
-        vendor: Config.wallets.hardwareWallet.ledgerNanoS.VENDOR,
-        model: Config.wallets.hardwareWallet.ledgerNanoS.MODEL,
-        label: '',
-        deviceId: '',
-        language: '',
-        majorVersion: parseInt(versionResp.major, 10),
-        minorVersion: parseInt(versionResp.minor, 10),
-        patchVersion: parseInt(versionResp.patch, 10),
+        Vendor: Config.wallets.hardwareWallet.ledgerNano.VENDOR,
+        Model: '', // Ledger does not provide device model info up till now
+        Label: '',
+        DeviceId: '',
+        Language: '',
+        MajorVersion: parseInt(deviceVersion.major, 10),
+        MinorVersion: parseInt(deviceVersion.minor, 10),
+        PatchVersion: parseInt(deviceVersion.patch, 10),
       }
     };
   }
 
-  _validateHWResponse = (
-    resp: LedgerConnectionResponse,
-  ): boolean => {
-    const { extendedPublicKeyResp, versionResp } = resp;
+  _validateHWResponse: ExtendedPublicKeyResp => boolean = (
+    resp,
+  ) => {
+    const { ePublicKey, deviceVersion } = resp;
 
-    if (versionResp == null) {
+    if (deviceVersion == null) {
       throw new Error('Ledger device version response is undefined');
     }
 
-    if (extendedPublicKeyResp == null) {
+    if (ePublicKey == null) {
       throw new Error('Ledger device extended public key response is undefined');
     }
 
     return true;
   };
 
-  _handleConnectError = (error: Error): void => {
-    Logger.error(`LedgerConnectStore::_checkAndStoreHWDeviceInfo ${stringifyError(error)}`);
-
+  _handleConnectError: Error => void = (error) => {
     this.hwDeviceInfo = undefined;
     this.error = convertToLocalizableError(error);
 
     this._goToConnectError();
   };
 
-  @action _goToConnectError = (): void => {
+  @action _goToConnectError: void => void = () => {
     this.progressInfo.currentStep = ProgressStep.CONNECT;
     this.progressInfo.stepState = StepState.ERROR;
   };
   // =================== CONNECT =================== //
 
   // =================== SAVE =================== //
-  @action _goToSaveLoad = (): void => {
+  @action _goToSaveLoad: void => void = () => {
     this.error = null;
     this.progressInfo.currentStep = ProgressStep.SAVE;
     this.progressInfo.stepState = StepState.LOAD;
   };
 
   /** SAVE dialog submit (Save button) */
-  @action _submitSave = (walletName: string): void => {
+  @action _submitSave: (string) => Promise<void> = async (
+    walletName,
+  ) => {
     this.error = null;
     this.progressInfo.currentStep = ProgressStep.SAVE;
     this.progressInfo.stepState = StepState.PROCESS;
-    this._saveHW(walletName);
+    await this._saveHW(
+      walletName,
+    );
   };
 
   /** creates new wallet and loads it */
-  _saveHW = async (walletName: string): Promise<void>  => {
+  _saveHW: (string) => Promise<void> = async (
+    walletName,
+  )  => {
     try {
-      Logger.debug('LedgerConnectStore::_saveHW:: called');
+      Logger.debug(`${nameof(LedgerConnectStore)}::${nameof(this._saveHW)}:: called`);
       this._setIsCreateHWActive(true);
       this.createHWRequest.reset();
 
-      const reqParams = this._prepareCreateHWReqParams(walletName);
+      const reqParams = this._prepareCreateHWReqParams(
+        walletName,
+        this.derivationIndex + HARD_DERIVATION_START,
+      );
       this.createHWRequest.execute(reqParams);
       if (!this.createHWRequest.promise) throw new Error('should never happen');
-      const ledgerWallet = await this.createHWRequest.promise;
+      const newWallet = await this.createHWRequest.promise;
 
-      await this._onSaveSucess(ledgerWallet);
+      await this._onSaveSuccess(newWallet.publicDeriver);
     } catch (error) {
-      Logger.error(`LedgerConnectStore::_saveHW::error ${stringifyError(error)}`);
+      Logger.error(`${nameof(LedgerConnectStore)}::${nameof(this._saveHW)}::error ${stringifyError(error)}`);
 
+      // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1055
       if (error instanceof CheckAdressesInUseApiError) {
-        // redirecting CheckAdressesInUseApiError -> hwConnectDialogSaveError101
-        // because for user hwConnectDialogSaveError101 is more meaningful in this context
-        this.error = new LocalizableError(globalMessages.hwConnectDialogSaveError101);
-      } else if (error instanceof LocalizableError) {
+        /**
+         * This error happens when yoroi could not fetch Used Address.
+         * Mostly because internet not connected or yoroi backend is down.
+         * At this point wallet is already created in the storage.
+         * When internet connection is back, everything will be loaded correctly.
+         */
+        return;
+      }
+
+      if (error instanceof LocalizableError) {
         this.error = error;
       } else {
         // some unknow error
@@ -288,53 +289,55 @@ export default class LedgerConnectStore
     }
   };
 
-  _prepareCreateHWReqParams = (walletName: string): CreateHardwareWalletRequest => {
+  _prepareCreateHWReqParams: (string, number) => CreateHardwareWalletRequest = (
+    walletName,
+    derivationIndex,
+  ) => {
     if (this.hwDeviceInfo == null
       || this.hwDeviceInfo.publicMasterKey == null
       || this.hwDeviceInfo.hwFeatures == null) {
       throw new Error('Ledger device hardware info not valid');
     }
 
+    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
+    if (persistentDb == null) {
+      throw new Error(`${nameof(this._prepareCreateHWReqParams)} db not loaded. Should never happen`);
+    }
+
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     return {
+      db: persistentDb,
+      derivationIndex,
       walletName,
-      publicMasterKey: this.hwDeviceInfo.publicMasterKey,
+      publicKey: this.hwDeviceInfo.publicMasterKey,
       hwFeatures: this.hwDeviceInfo.hwFeatures,
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
     };
   };
 
-  async _onSaveSucess(ledgerWallet: Wallet): Promise<void> {
+  async _onSaveSuccess(publicDeriver: PublicDeriver<>): Promise<void> {
     // close the active dialog
-    Logger.debug('LedgerConnectStore::_onSaveSucess success, closing dialog');
+    Logger.debug('LedgerConnectStore::_onSaveSuccess success, closing dialog');
     this.actions.dialogs.closeActiveDialog.trigger();
 
-    const { wallets } = this.stores.substores[environment.API];
-    await wallets._patchWalletRequestWithNewWallet(ledgerWallet);
-
-    // goto the wallet transactions page
-    Logger.debug('LedgerConnectStore::_onSaveSucess setting new walles as active wallet');
-    wallets.goToWalletRoute(ledgerWallet.id);
-
-    // fetch its data
-    Logger.debug('LedgerConnectStore::_onSaveSucess loading wallet data');
-    wallets.refreshWalletsData();
+    const { wallets } = this.stores;
+    await wallets.addHwWallet(publicDeriver);
 
     // show success notification
-    wallets.showLedgerNanoSWalletIntegratedNotification();
+    wallets.showLedgerNanoWalletIntegratedNotification();
 
     this.teardown();
     Logger.info('SUCCESS: Ledger Connected Wallet created and loaded');
   }
 
-  @action _goToSaveError = (): void => {
+  @action _goToSaveError: void => void = () => {
     this.progressInfo.currentStep = ProgressStep.SAVE;
     this.progressInfo.stepState = StepState.ERROR;
   };
   // =================== SAVE =================== //
 
   // =================== API =================== //
-  @action _setIsCreateHWActive = (active: boolean): void => {
+  @action _setIsCreateHWActive: boolean => void = (active) => {
     this.isCreateHWActive = active;
   };
 

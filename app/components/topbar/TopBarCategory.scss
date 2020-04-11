@@ -41,15 +41,12 @@
   margin-right: 6px;
 }
 
+.noticeBoardIcon,
 .walletsIcon {
   flex-shrink: 0;
-  & > svg {
-    width: 36px;
-    height: 42.5px;
-  }
 }
 
-.withLedgerNanoSIcon {
+.withLedgerNanoIcon {
   flex-shrink: 0;
   & > svg {
     width: var(--cmn-topbar-icon-default-width);
@@ -100,7 +97,7 @@
       margin-left: 14px;
     }
 
-    &.with-ledger-nano-s {
+    &.with-ledger-nano {
       left: 56px;
       width: 72px;
       margin-left: 14px;
@@ -113,13 +110,18 @@
       margin-left: 14px;
     }
 
-    &.daedalus-transfer {
+    &.wallet-transfer {
       right: 86px;
       width: 72px;
     }
 
     &.settings {
       right: 14px;
+      width: 72px;
+    }
+
+    &.notice-board {
+      right: 158px;
       width: 72px;
     }
   }
