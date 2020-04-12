@@ -23,7 +23,7 @@ import type {
   GeneratedData as WalletSendConfirmationDialogContainerData
 } from './dialogs/WalletSendConfirmationDialogContainer';
 import WalletSendConfirmationDialog from '../../components/wallet/send/WalletSendConfirmationDialog';
-import ConnectExternalStorageDialog from '../../components/wallet/memos/ConnectExternalStorageDialog';
+import MemoNoExternalStorageDialog from '../../components/wallet/memos/MemoNoExternalStorageDialog';
 import {
   formattedWalletAmount,
 } from '../../utils/formatters';
@@ -93,7 +93,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     if (!publicDeriver) throw new Error('Active wallet required for WalletSendPage.');
 
     const { intl } = this.context;
-    const { uiDialogs, profile, memos } = this.generated.stores;
+    const { uiDialogs, profile, } = this.generated.stores;
     const { actions } = this.generated;
     const { validateAmount, hasAnyPending } = transactions;
     const { txBuilderActions } = this.generated.actions.ada;
@@ -150,13 +150,10 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           uriParams={this.generated.stores.loading.uriParams}
           resetUriParams={this.generated.stores.loading.resetUriParams}
           showMemo={this.showMemo}
-          onAddMemo={() => {
-            if (memos.hasSetSelectedExternalStorageProvider) {
-              this.toggleShowMemo();
-            } else {
-              this.openConnectExternalStorageDialog();
-            }
-          }}
+          onAddMemo={() => this.showMemoDialog({
+            dialog: MemoNoExternalStorageDialog,
+            continuation: this.toggleShowMemo,
+          })}
         />
         {this.renderDialog()}
       </>
@@ -172,8 +169,8 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     if (uiDialogs.isOpen(HWSendConfirmationDialog)) {
       return this.hardwareWalletDoConfirmation();
     }
-    if (uiDialogs.isOpen(ConnectExternalStorageDialog)) {
-      return this.connectExternalStorageDialog();
+    if (uiDialogs.isOpen(MemoNoExternalStorageDialog)) {
+      return this.noCloudWarningDialog();
     }
     return '';
   }
@@ -281,20 +278,35 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     return hwSendConfirmationDialog;
   };
 
-  connectExternalStorageDialog = (): Node => {
-    const { actions, } = this.generated;
-    return (<ConnectExternalStorageDialog
-      onCancel={actions.memos.closeConnectExternalStorageDialog.trigger}
-      onConnect={() => {
-        actions.memos.closeConnectExternalStorageDialog.trigger();
-        actions.router.goToRoute.trigger({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
-      }}
-    />);
+  showMemoDialog: {|
+    continuation: void => void,
+    dialog: any,
+  |} => void = (request) => {
+    if (this.generated.stores.memos.hasSetSelectedExternalStorageProvider) {
+      return request.continuation();
+    }
+
+    this.generated.actions.dialogs.open.trigger({
+      dialog: request.dialog,
+      params: {
+        continuation: request.continuation,
+      },
+    });
   }
 
-  openConnectExternalStorageDialog = (): void => {
-    const { actions } = this.generated;
-    actions.dialogs.open.trigger({ dialog: ConnectExternalStorageDialog });
+  noCloudWarningDialog: void => Node = () => {
+    const { actions, } = this.generated;
+    return (<MemoNoExternalStorageDialog
+      onCancel={actions.memos.closeMemoDialog.trigger}
+      addExternal={() => {
+        actions.memos.closeMemoDialog.trigger();
+        actions.router.goToRoute.trigger({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
+      }}
+      onAcknowledge={() => {
+        actions.memos.closeMemoDialog.trigger();
+        this.generated.stores.uiDialogs.getParam<void => void>('continuation')();
+      }}
+    />);
   }
 
   @computed get generated() {
@@ -324,6 +336,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
         },
         uiDialogs: {
           isOpen: stores.uiDialogs.isOpen,
+          getParam: stores.uiDialogs.getParam,
         },
         substores: {
           ada: {
@@ -362,8 +375,8 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           goToRoute: { trigger: actions.router.goToRoute.trigger },
         },
         memos: {
-          closeConnectExternalStorageDialog: {
-            trigger: actions.memos.closeConnectExternalStorageDialog.trigger
+          closeMemoDialog: {
+            trigger: actions.memos.closeMemoDialog.trigger
           },
         },
         ada: {

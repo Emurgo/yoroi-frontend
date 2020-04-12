@@ -3,7 +3,7 @@ import { defineMessages } from 'react-intl';
 
 /*
  * Some messages need to be used in multiple components
- * In order to avoid componenets depending on each other just to resuse translation messages
+ * In order to avoid components depending on each other just to reuse translation messages
  * We instead store the shared messages in this file
 */
 
@@ -391,7 +391,7 @@ const globalMessages = defineMessages({
   },
   invalidMemo: {
     id: 'wallet.transaction.memo.invalid',
-    defaultMessage: '!!!Wallet name requires at least 1 and at most 40 letters.',
+    defaultMessage: '!!!Memo must be at least 1 and at most {maxMemo} characters.',
   },
   passwordDisclaimer: {
     id: 'wallet.restore.dialog.passwordDisclaimer',

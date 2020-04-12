@@ -76,12 +76,14 @@ export default class SettingsMenu extends Component<Props> {
             className="wallet"
           />
 
-          <SettingsMenuItem
-            label={intl.formatMessage(messages.externalStorage)}
-            onClick={() => onItemClick(ROUTES.SETTINGS.EXTERNAL_STORAGE)}
-            active={isActiveItem(ROUTES.SETTINGS.EXTERNAL_STORAGE)}
-            className="externalStorage"
-          />
+          {!environmnent.isProduction() &&
+            <SettingsMenuItem
+              label={intl.formatMessage(messages.externalStorage)}
+              onClick={() => onItemClick(ROUTES.SETTINGS.EXTERNAL_STORAGE)}
+              active={isActiveItem(ROUTES.SETTINGS.EXTERNAL_STORAGE)}
+              className="externalStorage"
+            />
+          }
 
           <SettingsMenuItem
             label={intl.formatMessage(messages.termsOfUse)}

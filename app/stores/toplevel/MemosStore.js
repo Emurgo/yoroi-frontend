@@ -1,11 +1,11 @@
 // @flow
-import { observable, computed, action } from 'mobx';
+import { observable, computed, action, runInAction } from 'mobx';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import WalletTransaction from '../../domain/WalletTransaction';
 import LocalizableError from '../../i18n/LocalizableError';
 import type {
-  TxMemoTablePreInsert, TxMemoPreLookupKey,
+  TxMemoTableUpsert, TxMemoTablePreInsert, TxMemoPreLookupKey,
   UpsertTxMemoFunc, DeleteTxMemoFunc, GetAllTxMemoFunc
 } from '../../api/ada/lib/storage/bridge/memos';
 import {
@@ -96,12 +96,7 @@ export default class MemosStore extends Store {
     this._getSelectedProvider(); // eagerly cache
     this.actions.memos.updateExternalStorageProvider.listen(this._setExternalStorageProvider);
     this.actions.memos.unsetExternalStorageProvider.listen(this._unsetExternalStorageProvider);
-    this.actions.memos.closeAddMemoDialog.listen(this._closeAddMemoDialog);
-    this.actions.memos.closeEditMemoDialog.listen(this._closeEditMemoDialog);
-    this.actions.memos.goBackDeleteMemoDialog.listen(this._goBackDeleteMemoDialog);
-    this.actions.memos.closeDeleteMemoDialog.listen(this._closeDeleteMemoDialog);
-    // eslint-disable-next-line max-len
-    this.actions.memos.closeConnectExternalStorageDialog.listen(this._closeConnectExternalStorageDialog);
+    this.actions.memos.closeMemoDialog.listen(this._closeMemoDialog);
     this.actions.memos.selectTransaction.listen(this._selectTransaction);
     this.actions.memos.saveTxMemo.listen(this._saveTxMemo);
     this.actions.memos.updateTxMemo.listen(this._updateTxMemo);
@@ -111,11 +106,28 @@ export default class MemosStore extends Store {
     this.api.externalStorage.setup();
     this.registerReactions([
       this._setSelectedProvider,
+      this._initMemosForWallet,
     ]);
   }
 
   teardown(): void {
     super.teardown();
+  }
+
+  _initMemosForWallet: void => void = () => {
+    const { selected } = this.stores.wallets;
+    if (selected == null) return undefined;
+    const walletId = this.getIdForWallet(selected);
+    console.log(walletId);
+    const memos = this.txMemoMap.get(walletId);
+    if (memos != null) return;
+
+    // not found -> new wallet
+    const result = observable.map();
+    runInAction(() => {
+      this.txMemoMap.set(walletId, result);
+    });
+    return result;
   }
 
   @action
@@ -131,26 +143,14 @@ export default class MemosStore extends Store {
     if (allTxMemos == null) throw new Error('Should never happen');
     for (const txMemo of allTxMemos) {
       let walletTxMemos = this.txMemoMap.get(txMemo.WalletId);
-      if (walletTxMemos == null) {
-        walletTxMemos = observable.map();
-        this.txMemoMap.set(txMemo.WalletId, walletTxMemos);
-      }
-      walletTxMemos.set(txMemo.TransactionHash, txMemo);
+      runInAction(() => {
+        if (walletTxMemos == null) {
+          walletTxMemos = observable.map();
+          this.txMemoMap.set(txMemo.WalletId, walletTxMemos);
+        }
+        walletTxMemos.set(txMemo.TransactionHash, txMemo);
+      });
     }
-  }
-
-  @computed
-  get getTxMemosForWallet(): void | MemosForWallet {
-    const { selected } = this.stores.wallets;
-    if (selected == null) return undefined;
-    const walletId = this.getIdForWallet(selected);
-    const memos = this.txMemoMap.get(walletId);
-    if (memos != null) return memos;
-
-    // not found -> new wallet
-    const result = observable.map();
-    this.txMemoMap.set(walletId, result);
-    return result;
   }
 
   // ========== Selected External Storage ========== //
@@ -185,27 +185,7 @@ export default class MemosStore extends Store {
     );
   }
 
-  @action _closeAddMemoDialog: void => void = () => {
-    this._setError(null);
-    this.actions.dialogs.closeActiveDialog.trigger();
-  }
-
-  @action _closeEditMemoDialog: void => void = () => {
-    this._setError(null);
-    this.actions.dialogs.closeActiveDialog.trigger();
-  }
-
-  @action _goBackDeleteMemoDialog: void => void = () => {
-    this._setError(null);
-    this.actions.dialogs.closeActiveDialog.trigger();
-  }
-
-  @action _closeDeleteMemoDialog: void => void = () => {
-    this._setError(null);
-    this.actions.dialogs.closeActiveDialog.trigger();
-  }
-
-  @action _closeConnectExternalStorageDialog: void => void = () => {
+  @action _closeMemoDialog: void => void = () => {
     this._setError(null);
     this.actions.dialogs.closeActiveDialog.trigger();
   }
@@ -232,14 +212,17 @@ export default class MemosStore extends Store {
       memo,
     }).promise;
     if (savedMemo == null) throw new Error('Should never happen');
-    this.txMemoMap.get(walletId)?.set(request.memo.TransactionHash, savedMemo);
-    this._closeAddMemoDialog();
+    runInAction(() => {
+      this.txMemoMap.get(walletId)?.set(request.memo.TransactionHash, savedMemo);
+    });
+    this._closeMemoDialog();
   };
 
-  @action _updateTxMemo: TxMemoTablePreInsert => Promise<void> = async (request) => {
+  @action _updateTxMemo: TxMemoTableUpsert => Promise<void> = async (request) => {
     const walletId = this.getIdForWallet(request.publicDeriver);
+    const { TxMemoId, ...memoBase } = request.memo;
     const memo = {
-      ...request.memo,
+      ...memoBase,
       WalletId: walletId,
     };
     if (this.hasSetSelectedExternalStorageProvider) {
@@ -247,11 +230,16 @@ export default class MemosStore extends Store {
     }
     const savedMemo = await this.saveTxMemoRequest.execute({
       db: request.publicDeriver.getDb(),
-      memo,
+      memo: {
+        ...memo,
+        TxMemoId,
+      },
     }).promise;
     if (savedMemo == null) throw new Error('Should never happen');
-    this.txMemoMap.get(walletId)?.set(request.memo.TransactionHash, savedMemo);
-    this._closeEditMemoDialog();
+    runInAction(() => {
+      this.txMemoMap.get(walletId)?.set(request.memo.TransactionHash, savedMemo);
+    });
+    this._closeMemoDialog();
   };
 
   @action _deleteTxMemo: TxMemoPreLookupKey => Promise<void> = async (request) => {
@@ -267,8 +255,10 @@ export default class MemosStore extends Store {
       db: request.publicDeriver.getDb(),
       key: memoToDelete,
     });
-    this.txMemoMap.get(walletId)?.delete(request.txHash);
-    this._closeDeleteMemoDialog();
+    runInAction(() => {
+      this.txMemoMap.get(walletId)?.delete(request.txHash);
+    });
+    this._closeMemoDialog();
   };
 
   @action _downloadAndSaveTxMemo: TxMemoPreLookupKey => Promise<void> = async (
@@ -291,7 +281,9 @@ export default class MemosStore extends Store {
         }
       }).promise;
       if (memoRow == null) throw new Error('Should never happen');
-      this.txMemoMap.get(walletId)?.set(request.txHash, memoRow);
+      runInAction(() => {
+        this.txMemoMap.get(walletId)?.set(request.txHash, memoRow);
+      });
     }
   };
 

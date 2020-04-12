@@ -7,13 +7,16 @@ import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import type { SelectedExternalStorageProvider } from '../../../domain/ExternalStorage';
 import type { ProvidersType } from '../../../api/externalStorage/index';
-import globalMessages from '../../../i18n/global-messages';
 import styles from './ExternalStorageSettings.scss';
 
 const messages = defineMessages({
   sectionTitle: {
     id: 'settings.externalStorage.title',
-    defaultMessage: '!!!Connect your account',
+    defaultMessage: '!!!Connect an account',
+  },
+  provider: {
+    id: 'settings.externalStorage.provider',
+    defaultMessage: '!!!Connect to {provider}',
   },
   sectionIntro: {
     id: 'settings.externalStorage.intro',
@@ -71,8 +74,10 @@ export default class ExternalStorageSettings extends Component<Props> {
           className={buttonClasses}
           label={showDisconnect === true
             ? intl.formatMessage(messages.buttonDisconnect)
-            // externalStorageProviders[provider].name
-            : intl.formatMessage(globalMessages.hwConnectDialogConnectButtonLabel)
+            : intl.formatMessage(
+              messages.provider,
+              { provider: externalStorageProviders[provider].getDisplayName() }
+            )
           }
           skin={ButtonSkin}
           onClick={() => (showDisconnect === true ? onDisconnect() : onConnect(authorizeUrl))}

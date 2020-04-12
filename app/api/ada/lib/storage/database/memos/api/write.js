@@ -20,9 +20,9 @@ export class ModifyTxMemo {
   static async upsertMemo(
     db: lf$Database,
     dbTx: lf$Transaction,
-    memo: TxMemoTableInsert,
+    memo: TxMemoTableInsert | TxMemoTableRow,
   ): Promise<$ReadOnly<TxMemoTableRow>> {
-    return await addOrReplaceRow<TxMemoTableInsert, TxMemoTableRow>(
+    return await addOrReplaceRow<{ ...TxMemoTableInsert, ... }, TxMemoTableRow>(
       db, dbTx,
       memo,
       ModifyTxMemo.ownTables[Tables.TxMemoSchema.name].name,

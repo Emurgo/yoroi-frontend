@@ -32,11 +32,24 @@ export type TxMemoTablePreInsert = {|
   memo: TxMemoTableInsertCommon,
 |}
 
+
+export type TxMemoTableUpsert = {|
+  /*
+   * Should be checksum of public deriver
+   * But for wallets without a public key, it can be something else
+   */
+  publicDeriver: PublicDeriver<>,
+  memo: {|
+    ...TxMemoTableInsertCommon,
+    TxMemoId: number,
+  |},
+|}
+
 // upsertTxMemo
 
 export type UpsertTxMemoRequest = {|
   db: lf$Database,
-  memo: TxMemoTableInsert,
+  memo: TxMemoTableInsert | TxMemoTableRow,
 |};
 export type UpsertTxMemoResponse = $ReadOnly<TxMemoTableRow>;
 export type UpsertTxMemoFunc = (

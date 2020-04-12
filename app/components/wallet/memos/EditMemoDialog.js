@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
@@ -11,12 +11,13 @@ import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import { Input } from 'react-polymorph/lib/components/Input';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
-import type { TxMemoTablePreInsert } from '../../../api/ada/lib/storage/bridge/memos';
+import type { TxMemoTableUpsert } from '../../../api/ada/lib/storage/bridge/memos';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import { isValidMemo } from '../../../utils/validations';
 import globalMessages, { memoMessages, } from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
+import { MAX_MEMO_SIZE } from '../../../config/externalStorageConfig';
 import config from '../../../config';
 import styles from './MemoDialogCommon.scss';
 
@@ -25,7 +26,7 @@ type Props = {|
   existingMemo: $ReadOnly<TxMemoTableRow>,
   error: ?LocalizableError,
   onCancel: void => void,
-  onSubmit: TxMemoTablePreInsert => Promise<void>,
+  onSubmit: TxMemoTableUpsert => Promise<void>,
   onClickDelete: void => void,
   classicTheme: boolean,
 |};
@@ -55,11 +56,11 @@ export default class EditMemoDialog extends Component<Props, State> {
         placeholder: this.props.classicTheme
           ? this.context.intl.formatMessage(memoMessages.memoLabel)
           : '',
-        value: this.props.existingMemo,
+        value: this.props.existingMemo.Content,
         validators: [({ field }) => (
           [
             isValidMemo(field.value),
-            this.context.intl.formatMessage(globalMessages.invalidMemo)
+            this.context.intl.formatMessage(globalMessages.invalidMemo, { maxMemo: MAX_MEMO_SIZE, })
           ]
         )],
       },
@@ -82,6 +83,7 @@ export default class EditMemoDialog extends Component<Props, State> {
         const memoRequest = {
           publicDeriver: this.props.selectedWallet,
           memo: {
+            TxMemoId: this.props.existingMemo.TxMemoId,
             Content: memoContent.replace(/ +/g, ' '),
             TransactionHash: this.props.existingMemo.TransactionHash,
             LastUpdated: new Date(),

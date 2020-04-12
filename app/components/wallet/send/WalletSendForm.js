@@ -23,6 +23,7 @@ import globalMessages, { memoMessages, environmentSpecificMessages } from '../..
 import environment from '../../../environment';
 import type { UriParams } from '../../../utils/URIHandling';
 import { getAddressPayload } from '../../../api/ada/lib/storage/bridge/utils';
+import { MAX_MEMO_SIZE } from '../../../config/externalStorageConfig';
 
 import {
   formattedWalletAmount,
@@ -94,7 +95,7 @@ const messages = defineMessages({
   },
   memoInvalidOptional: {
     id: 'wallet.transaction.memo.optional.invalid',
-    defaultMessage: '!!!Memo requires at most 128 characters',
+    defaultMessage: '!!!Memo cannot be more than {maxMemo} characters.',
   },
   cannotSendtoLegacy: {
     id: 'wallet.send.form.cannotSendToLegacy',
@@ -255,7 +256,10 @@ export default class WalletSendForm extends Component<Props> {
           }
           return [
             isValid,
-            this.context.intl.formatMessage(messages.memoInvalidOptional)
+            this.context.intl.formatMessage(
+              messages.memoInvalidOptional,
+              { maxMemo: MAX_MEMO_SIZE, }
+            )
           ];
         }],
       },

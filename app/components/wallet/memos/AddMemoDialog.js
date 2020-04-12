@@ -17,6 +17,7 @@ import { isValidMemo } from '../../../utils/validations';
 import globalMessages, { memoMessages, } from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 import WalletTransaction from '../../../domain/WalletTransaction';
+import { MAX_MEMO_SIZE } from '../../../config/externalStorageConfig';
 import config from '../../../config';
 import styles from './MemoDialogCommon.scss';
 
@@ -63,7 +64,7 @@ export default class AddMemoDialog extends Component<Props, State> {
         validators: [({ field }) => (
           [
             isValidMemo(field.value),
-            this.context.intl.formatMessage(globalMessages.invalidMemo)
+            this.context.intl.formatMessage(globalMessages.invalidMemo, { maxMemo: MAX_MEMO_SIZE, })
           ]
         )],
       },

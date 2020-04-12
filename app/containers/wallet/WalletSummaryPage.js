@@ -18,7 +18,7 @@ import ExportTransactionDialog from '../../components/wallet/export/ExportTransa
 import AddMemoDialog from '../../components/wallet/memos/AddMemoDialog';
 import EditMemoDialog from '../../components/wallet/memos/EditMemoDialog';
 import DeleteMemoDialog from '../../components/wallet/memos/DeleteMemoDialog';
-import ConnectExternalStorageDialog from '../../components/wallet/memos/ConnectExternalStorageDialog';
+import MemoNoExternalStorageDialog from '../../components/wallet/memos/MemoNoExternalStorageDialog';
 import { Logger } from '../../utils/logging';
 
 export type GeneratedData = typeof WalletSummaryPage.prototype.generated;
@@ -73,6 +73,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
     const { uiDialogs, profile, memos } = this.generated.stores;
     if (searchOptions) {
       const { limit } = searchOptions;
+      console.log(this.generated.stores.memos.txMemoMap.get(walletId));
       const noTransactionsFoundLabel = intl.formatMessage(globalMessages.noTransactionsFound);
       if (!recentTransactionsRequest.wasExecuted || hasAny) {
         const { assuranceMode } = this.generated.stores.substores.ada.walletSettings
@@ -87,22 +88,20 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
             onLoadMore={() => actions.ada.transactions.loadMoreTransactions.trigger(publicDeriver)}
             assuranceMode={assuranceMode}
             shouldHideBalance={profile.shouldHideBalance}
-            onAddMemo={(transaction) => {
-              if (memos.hasSetSelectedExternalStorageProvider) {
+            onAddMemo={(transaction) => this.showMemoDialog({
+              dialog: MemoNoExternalStorageDialog,
+              continuation: () => {
                 actions.memos.selectTransaction.trigger({ tx: transaction });
-                this.openAddMemoDialog();
-              } else {
-                this.openConnectExternalStorageDialog();
+                actions.dialogs.open.trigger({ dialog: AddMemoDialog });
               }
-            }}
-            onEditMemo={(transaction) => {
-              if (memos.hasSetSelectedExternalStorageProvider) {
+            })}
+            onEditMemo={(transaction) => this.showMemoDialog({
+              dialog: MemoNoExternalStorageDialog,
+              continuation: () => {
                 actions.memos.selectTransaction.trigger({ tx: transaction });
-                this.openEditMemoDialog();
-              } else {
-                this.openConnectExternalStorageDialog();
+                actions.dialogs.open.trigger({ dialog: EditMemoDialog });
               }
-            }}
+            })}
           />
         );
       } else if (!hasAny) {
@@ -159,7 +158,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
             selectedWallet={publicDeriver}
             selectedTransaction={memos.selectedTransaction}
             error={memos.error}
-            onCancel={actions.memos.closeAddMemoDialog.trigger}
+            onCancel={actions.memos.closeMemoDialog.trigger}
             onSubmit={(values) => {
               return actions.memos.saveTxMemo.trigger(values);
             }}
@@ -167,12 +166,16 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
           />
         ) : null}
 
-        {uiDialogs.isOpen(ConnectExternalStorageDialog) ? (
-          <ConnectExternalStorageDialog
-            onCancel={actions.memos.closeConnectExternalStorageDialog.trigger}
-            onConnect={() => {
-              actions.memos.closeConnectExternalStorageDialog.trigger();
+        {uiDialogs.isOpen(MemoNoExternalStorageDialog) ? (
+          <MemoNoExternalStorageDialog
+            onCancel={actions.memos.closeMemoDialog.trigger}
+            addExternal={() => {
+              actions.memos.closeMemoDialog.trigger();
               actions.router.goToRoute.trigger({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
+            }}
+            onAcknowledge={() => {
+              actions.memos.closeMemoDialog.trigger();
+              this.generated.stores.uiDialogs.getParam<void => void>('continuation')();
             }}
           />
         ) : null}
@@ -188,7 +191,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
               return memo;
             })()}
             error={memos.error}
-            onCancel={actions.memos.closeEditMemoDialog.trigger}
+            onCancel={actions.memos.closeMemoDialog.trigger}
             onClickDelete={this.openDeleteMemoDialog}
             onSubmit={(values) => {
               return actions.memos.updateTxMemo.trigger(values);
@@ -202,10 +205,10 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
             selectedTransaction={memos.selectedTransaction}
             error={memos.error}
             onCancel={() => {
-              actions.memos.goBackDeleteMemoDialog.trigger();
-              this.openEditMemoDialog();
+              actions.memos.closeMemoDialog.trigger();
+              actions.dialogs.open.trigger({ dialog: EditMemoDialog });
             }}
-            onClose={actions.memos.closeDeleteMemoDialog.trigger}
+            onClose={actions.memos.closeMemoDialog.trigger}
             onDelete={txHash => {
               return actions.memos.deleteTxMemo.trigger({
                 publicDeriver,
@@ -238,24 +241,25 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
     actions.dialogs.open.trigger({ dialog: ExportTransactionDialog });
   }
 
-  openAddMemoDialog: void => void = () => {
-    const { actions } = this.generated;
-    actions.dialogs.open.trigger({ dialog: AddMemoDialog });
-  }
+  showMemoDialog: {|
+    continuation: void => void,
+    dialog: any,
+  |} => void = (request) => {
+    if (this.generated.stores.memos.hasSetSelectedExternalStorageProvider) {
+      return request.continuation();
+    }
 
-  openEditMemoDialog: void => void = () => {
-    const { actions } = this.generated;
-    actions.dialogs.open.trigger({ dialog: EditMemoDialog });
+    this.generated.actions.dialogs.open.trigger({
+      dialog: request.dialog,
+      params: {
+        continuation: request.continuation,
+      },
+    });
   }
 
   openDeleteMemoDialog: void => void = () => {
     const { actions } = this.generated;
     actions.dialogs.open.trigger({ dialog: DeleteMemoDialog });
-  }
-
-  openConnectExternalStorageDialog: void => void = () => {
-    const { actions } = this.generated;
-    actions.dialogs.open.trigger({ dialog: ConnectExternalStorageDialog });
   }
 
   @computed get generated() {
@@ -276,6 +280,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
         },
         uiDialogs: {
           isOpen: stores.uiDialogs.isOpen,
+          getParam: stores.uiDialogs.getParam,
         },
         uiNotifications: {
           mostRecentActiveNotification: stores.uiNotifications.mostRecentActiveNotification,
@@ -319,13 +324,9 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
           goToRoute: { trigger: actions.router.goToRoute.trigger },
         },
         memos: {
-          closeAddMemoDialog: { trigger: actions.memos.closeAddMemoDialog.trigger },
-          closeEditMemoDialog: { trigger: actions.memos.closeEditMemoDialog.trigger },
-          closeDeleteMemoDialog: { trigger: actions.memos.closeDeleteMemoDialog.trigger },
-          closeConnectExternalStorageDialog: {
-            trigger: actions.memos.closeConnectExternalStorageDialog.trigger
+          closeMemoDialog: {
+            trigger: actions.memos.closeMemoDialog.trigger
           },
-          goBackDeleteMemoDialog: { trigger: actions.memos.goBackDeleteMemoDialog.trigger },
           saveTxMemo: { trigger: actions.memos.saveTxMemo.trigger },
           updateTxMemo: { trigger: actions.memos.updateTxMemo.trigger },
           deleteTxMemo: { trigger: actions.memos.deleteTxMemo.trigger },

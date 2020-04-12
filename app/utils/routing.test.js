@@ -12,7 +12,6 @@ test('Daedalus transfer from single small UTXO', async () => {
       account_id: 'a',
       id: 0,
     });
-    console.log(builtRoute);
     if (builtRoute.includes(':')) {
       throw new Error(`Unhandled param for route ${builtRoute}`);
     }

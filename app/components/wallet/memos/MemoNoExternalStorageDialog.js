@@ -12,22 +12,23 @@ import styles from './MemoDialogCommon.scss';
 
 const messages = defineMessages({
   connectTitle: {
-    id: 'settings.externalStorage.dialog.title',
-    defaultMessage: '!!!Connect to external storage',
+    id: 'settings.noexternal.dialog.title',
+    defaultMessage: '!!!No external storage',
   },
   connectContent: {
-    id: 'settings.externalStorage.dialog.content',
-    defaultMessage: '!!!Memos will be encrypted so that your sensitive information is not leaked even if your external storage account is compromised',
+    id: 'settings.noexternal.dialog.content',
+    defaultMessage: '!!!Your memos are stored locally. They will not automatically sync with other Yoroi instances and will be lost if you delete Yoroi',
   },
 });
 
 type Props = {|
-  onCancel: void => void,
-  onConnect: void => void,
+  +onCancel: void => void,
+  +onAcknowledge: void => void,
+  +addExternal: void => void,
 |};
 
 @observer
-export default class ConnectExternalStorageDialog extends Component<Props> {
+export default class MemoNoExternalStorageDialog extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -35,18 +36,20 @@ export default class ConnectExternalStorageDialog extends Component<Props> {
 
   render() {
     const { intl } = this.context;
-    const { onCancel, onConnect, } = this.props;
+    const { onCancel, onAcknowledge, } = this.props;
 
+    const acknowledgeAction = {
+      label: this.context.intl.formatMessage(globalMessages.uriLandingDialogConfirmLabel),
+      primary: true,
+      onClick: onAcknowledge,
+    };
     const actions = [
+      // TODO: replace cancel with addExternal once we add external memo storage
       {
         label: intl.formatMessage(globalMessages.cancel),
         onClick: onCancel
       },
-      {
-        label: this.context.intl.formatMessage(globalMessages.hwConnectDialogConnectButtonLabel),
-        primary: true,
-        onClick: onConnect,
-      },
+      acknowledgeAction,
     ];
 
     return (
@@ -59,7 +62,6 @@ export default class ConnectExternalStorageDialog extends Component<Props> {
         onClose={onCancel}
       >
         <div className={styles.content}>
-          <span className={styles.icon}><LinkExternalStorageSvg /></span>
           <p>{intl.formatMessage(messages.connectContent)}</p>
         </div>
       </Dialog>);
