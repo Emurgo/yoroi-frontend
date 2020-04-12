@@ -46,7 +46,8 @@ export const ROUTES = {
     ROOT: '/staking'
   },
   OAUTH_FROM_EXTERNAL: {
-    DROPBOX: '/access_token=:token&token_type=:token_type&uid=:uid&account_id=:account_id',
+    DROPBOX: '/foo', // TODO: think about this
+    // DROPBOX: '/access_token=:token&token_type=:token_type&uid=:uid&account_id=:account_id',
   },
   NOTICE_BOARD: {
     ROOT: '/notice-board',

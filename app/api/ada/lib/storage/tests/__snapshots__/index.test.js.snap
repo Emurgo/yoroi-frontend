@@ -1091,6 +1091,7 @@ Object {
     },
   ],
   "Transaction": Array [],
+  "TxMemo": Array [],
   "UtxoTransactionInput": Array [],
   "UtxoTransactionOutput": Array [],
 }
