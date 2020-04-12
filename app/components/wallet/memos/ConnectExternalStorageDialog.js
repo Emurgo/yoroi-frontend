@@ -7,6 +7,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import LinkExternalStorageSvg from '../../../assets/images/link-external-storage.inline.svg';
+import globalMessages from '../../../i18n/global-messages';
 import styles from './MemoDialogCommon.scss';
 
 
@@ -18,14 +19,6 @@ const messages = defineMessages({
   connectContent: {
     id: 'settings.externalStorage.dialog.content',
     defaultMessage: '!!!To add private memos to the transactions you need to connect Yoroi to your Dropbox account',
-  },
-  connectActionsCancel: {
-    id: 'settings.externalStorage.dialog.actions.cancel',
-    defaultMessage: '!!!Cancel',
-  },
-  connectActionsConnect: {
-    id: 'settings.externalStorage.dialog.actions.connect',
-    defaultMessage: '!!!Connect',
   },
 });
 
@@ -47,11 +40,11 @@ export default class ConnectExternalStorageDialog extends Component<Props> {
 
     const actions = [
       {
-        label: intl.formatMessage(messages.connectActionsCancel),
+        label: intl.formatMessage(globalMessages.cancel),
         onClick: onCancel
       },
       {
-        label: this.context.intl.formatMessage(messages.connectActionsConnect),
+        label: this.context.intl.formatMessage(globalMessages.hwConnectDialogConnectButtonLabel),
         primary: true,
         onClick: onConnect,
       },

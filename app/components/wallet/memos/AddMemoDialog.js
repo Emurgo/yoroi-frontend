@@ -14,25 +14,13 @@ import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import type { TxMemoTablePreInsert } from '../../../api/ada/lib/storage/bridge/memos';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import { isValidMemo } from '../../../utils/validations';
-import globalMessages from '../../../i18n/global-messages';
+import globalMessages, { memoMessages, } from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 import WalletTransaction from '../../../domain/WalletTransaction';
 import config from '../../../config';
 import styles from './MemoDialogCommon.scss';
 
 const messages = defineMessages({
-  addMemoTitle: {
-    id: 'wallet.transaction.memo.add.dialog.title',
-    defaultMessage: '!!!Add memo',
-  },
-  addMemoInputLabel: {
-    id: 'wallet.transaction.memo.add.dialog.input.label',
-    defaultMessage: '!!!Memo',
-  },
-  addMemoInputHint: {
-    id: 'wallet.transaction.memo.add.dialog.input.hint',
-    defaultMessage: '!!!Memo (optional)',
-  },
   addMemoActionsSubmit: {
     id: 'wallet.transaction.memo.add.dialog.actions.submit',
     defaultMessage: '!!!Add',
@@ -68,9 +56,9 @@ export default class AddMemoDialog extends Component<Props, State> {
   form = new ReactToolboxMobxForm({
     fields: {
       memoContent: {
-        label: this.context.intl.formatMessage(messages.addMemoInputLabel),
+        label: this.context.intl.formatMessage(memoMessages.memoLabel),
         placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(messages.addMemoInputHint) : '',
+          this.context.intl.formatMessage(memoMessages.optionalMemo) : '',
         value: '',
         validators: [({ field }) => (
           [
@@ -138,7 +126,7 @@ export default class AddMemoDialog extends Component<Props, State> {
     return (
       <Dialog
         className={classnames([styles.component])}
-        title={intl.formatMessage(messages.addMemoTitle)}
+        title={intl.formatMessage(memoMessages.addMemo)}
         actions={actions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}

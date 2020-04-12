@@ -14,26 +14,11 @@ import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import type { TxMemoTablePreInsert } from '../../../api/ada/lib/storage/bridge/memos';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import { isValidMemo } from '../../../utils/validations';
-import globalMessages from '../../../i18n/global-messages';
+import globalMessages, { memoMessages, } from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
 import config from '../../../config';
 import styles from './MemoDialogCommon.scss';
-
-const messages = defineMessages({
-  editMemoTitle: {
-    id: 'wallet.transaction.memo.edit.dialog.title',
-    defaultMessage: '!!!Edit memo',
-  },
-  editMemoInputLabel: {
-    id: 'wallet.transaction.memo.edit.dialog.input.label',
-    defaultMessage: '!!!Memo',
-  },
-  editMemoActionsSubmit: {
-    id: 'wallet.transaction.memo.edit.dialog.actions.submit',
-    defaultMessage: '!!!Save',
-  },
-});
 
 type Props = {|
   selectedWallet: PublicDeriver<>,
@@ -66,9 +51,9 @@ export default class EditMemoDialog extends Component<Props, State> {
     fields: {
       memoContent: {
         type: 'memo',
-        label: this.context.intl.formatMessage(messages.editMemoInputLabel),
+        label: this.context.intl.formatMessage(memoMessages.memoLabel),
         placeholder: this.props.classicTheme
-          ? this.context.intl.formatMessage(messages.editMemoInputLabel)
+          ? this.context.intl.formatMessage(memoMessages.memoLabel)
           : '',
         value: this.props.existingMemo,
         validators: [({ field }) => (
@@ -128,7 +113,7 @@ export default class EditMemoDialog extends Component<Props, State> {
     const actions = [
       {
         className: isSubmitting ? styles.isSubmitting : null,
-        label: this.context.intl.formatMessage(messages.editMemoActionsSubmit),
+        label: this.context.intl.formatMessage(globalMessages.save),
         primary: true,
         onClick: this.submit,
         isSubmitting,
@@ -141,7 +126,7 @@ export default class EditMemoDialog extends Component<Props, State> {
     return (
       <Dialog
         className={classnames([styles.component])}
-        title={intl.formatMessage(messages.editMemoTitle)}
+        title={intl.formatMessage(memoMessages.editMemo)}
         actions={actions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}

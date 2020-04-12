@@ -19,7 +19,7 @@ import AmountInputSkin from '../skins/AmountInputSkin';
 import AddMemoSvg from '../../../assets/images/add-memo.inline.svg';
 import BorderedBox from '../../widgets/BorderedBox';
 import styles from './WalletSendForm.scss';
-import globalMessages, { environmentSpecificMessages } from '../../../i18n/global-messages';
+import globalMessages, { memoMessages, environmentSpecificMessages } from '../../../i18n/global-messages';
 import environment from '../../../environment';
 import type { UriParams } from '../../../utils/URIHandling';
 import { getAddressPayload } from '../../../api/ada/lib/storage/bridge/utils';
@@ -92,21 +92,9 @@ const messages = defineMessages({
     id: 'wallet.send.form.sendingIsDisabled',
     defaultMessage: '!!!Cannot send a transaction while there is a pending one',
   },
-  addMemoActionLinkLabel: {
-    id: 'wallet.transaction.memo.add.label',
-    defaultMessage: '!!!Add memo',
-  },
   memoInvalidOptional: {
     id: 'wallet.transaction.memo.optional.invalid',
     defaultMessage: '!!!Memo requires at most 128 characters',
-  },
-  memoInputLabel: {
-    id: 'wallet.send.form.memo.input.label',
-    defaultMessage: '!!!Memo',
-  },
-  memoInputHint: {
-    id: 'wallet.send.form.memo.input.hint',
-    defaultMessage: '!!!Memo (optional)',
   },
   cannotSendtoLegacy: {
     id: 'wallet.send.form.cannotSendToLegacy',
@@ -256,8 +244,8 @@ export default class WalletSendForm extends Component<Props> {
         }],
       },
       memo: {
-        label: this.context.intl.formatMessage(messages.memoInputLabel),
-        placeholder: this.context.intl.formatMessage(messages.memoInputHint),
+        label: this.context.intl.formatMessage(memoMessages.memoLabel),
+        placeholder: this.context.intl.formatMessage(memoMessages.optionalMemo),
         value: '',
         validators: [({ field }) => {
           const memoContent = field.value;
@@ -397,7 +385,7 @@ export default class WalletSendForm extends Component<Props> {
                     <AddMemoSvg />
                   </span>
                   <span className={styles.actionLabel}>
-                    {intl.formatMessage(messages.addMemoActionLinkLabel)}
+                    {intl.formatMessage(memoMessages.addMemo)}
                   </span>
                 </div>
               </button>

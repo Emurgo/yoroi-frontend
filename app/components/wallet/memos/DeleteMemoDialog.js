@@ -9,20 +9,13 @@ import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
 import LocalizableError from '../../../i18n/LocalizableError';
 import WalletTransaction from '../../../domain/WalletTransaction';
+import globalMessages, { memoMessages, } from '../../../i18n/global-messages';
 import styles from './MemoDialogCommon.scss';
 
 const messages = defineMessages({
-  deleteMemoTitle: {
-    id: 'wallet.transaction.memo.delete.dialog.title',
-    defaultMessage: '!!!Delete memo',
-  },
   deleteMemoContent: {
     id: 'wallet.transaction.memo.delete.dialog.content',
     defaultMessage: '!!!Are you sure you want to remove the memo for this transaction?',
-  },
-  deleteMemoActionsCancel: {
-    id: 'wallet.transaction.memo.delete.dialog.actions.cancel',
-    defaultMessage: '!!!Cancel',
   },
   deleteMemoActionsDelete: {
     id: 'wallet.transaction.memo.delete.dialog.actions.delete',
@@ -67,7 +60,7 @@ export default class DeleteMemoDialog extends Component<Props, State> {
     const actions = [
       {
         className: isSubmitting ? styles.isSubmitting : null,
-        label: this.context.intl.formatMessage(messages.deleteMemoActionsCancel),
+        label: this.context.intl.formatMessage(globalMessages.cancel),
         onClick: onCancel,
         disabled: isSubmitting
       },
@@ -83,7 +76,7 @@ export default class DeleteMemoDialog extends Component<Props, State> {
     return (
       <Dialog
         className={classnames([styles.component])}
-        title={intl.formatMessage(messages.deleteMemoTitle)}
+        title={intl.formatMessage(memoMessages.deleteMemo)}
         actions={actions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}

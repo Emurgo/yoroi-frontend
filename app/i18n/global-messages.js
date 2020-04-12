@@ -556,6 +556,29 @@ const globalMessages = defineMessages({
 });
 export default globalMessages;
 
+export const memoMessages = defineMessages({
+  memoLabel: {
+    id: 'global.labels.memo',
+    defaultMessage: '!!!Memo',
+  },
+  addMemo: {
+    id: 'global.labels.addMemo',
+    defaultMessage: '!!!Add memo',
+  },
+  editMemo: {
+    id: 'global.labels.editMemo',
+    defaultMessage: '!!!Edit memo',
+  },
+  deleteMemo: {
+    id: 'global.labels.deleteMemo',
+    defaultMessage: '!!!Delete memo',
+  },
+  optionalMemo: {
+    id: 'global.labels.optionalMemo',
+    defaultMessage: '!!!Memo (optional)',
+  },
+});
+
 export const environmentSpecificMessages = {
   ada: defineMessages({
     currency: {

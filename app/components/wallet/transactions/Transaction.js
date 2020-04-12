@@ -15,7 +15,7 @@ import AdaSymbol from '../../../assets/images/ada-symbol.inline.svg';
 import AddMemoSvg from '../../../assets/images/add-memo.inline.svg';
 import EditSvg from '../../../assets/images/edit.inline.svg';
 import WalletTransaction from '../../../domain/WalletTransaction';
-import globalMessages, { environmentSpecificMessages } from '../../../i18n/global-messages';
+import globalMessages, { memoMessages, environmentSpecificMessages } from '../../../i18n/global-messages';
 import type { TransactionDirectionType, } from '../../../api/ada/transactions/types';
 import { transactionTypes } from '../../../api/ada/transactions/types';
 import type { AssuranceLevel } from '../../../types/transactionAssuranceTypes';
@@ -92,14 +92,6 @@ const messages = defineMessages({
   transactionAmount: {
     id: 'wallet.transaction.transactionAmount',
     defaultMessage: '!!!Transaction amount',
-  },
-  memoTitle: {
-    id: 'wallet.transaction.memo.title',
-    defaultMessage: '!!!Memo',
-  },
-  addMemoLabel: {
-    id: 'wallet.transaction.memo.add.label',
-    defaultMessage: '!!!Add memo',
   },
 });
 
@@ -430,7 +422,7 @@ export default class Transaction extends Component<Props, State> {
               {this.props.memo != null ? (
                 <div className={styles.row}>
                   <h2>
-                    {intl.formatMessage(messages.memoTitle)}
+                    {intl.formatMessage(memoMessages.memoLabel)}
 
                     <button
                       type="button"
@@ -457,7 +449,7 @@ export default class Transaction extends Component<Props, State> {
                         <span className={styles.addMemoIcon}>
                           <AddMemoSvg />
                         </span>
-                        <span>{intl.formatMessage(messages.addMemoLabel)}</span>
+                        <span>{intl.formatMessage(memoMessages.addMemo)}</span>
                       </div>
                     </button>
                   </div>
