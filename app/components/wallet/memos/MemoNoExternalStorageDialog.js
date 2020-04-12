@@ -6,7 +6,6 @@ import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
-import LinkExternalStorageSvg from '../../../assets/images/link-external-storage.inline.svg';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './MemoDialogCommon.scss';
 
