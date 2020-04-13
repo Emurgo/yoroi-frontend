@@ -1,22 +1,23 @@
-// // @flow
+// @flow
 
-// /* eslint-disable camelcase */
+/* eslint-disable camelcase */
+/* eslint-disable indent */
 
-// // flowgen from https://github.com/dropbox/dropbox-sdk-js/blob/master/generator/typescript
+// flowgen from https://github.com/dropbox/dropbox-sdk-js/blob/master/generator/typescript
 
-// declare module 'dropbox' {
+declare module 'dropbox' {
 //   declare var DropboxTypes: typeof npm$namespace$DropboxTypes;
 
 //   declare var npm$namespace$DropboxTypes: {|
 //     DropboxBase: typeof DropboxTypes$DropboxBase
 //   |};
-//   declare interface DropboxTypes$DropboxOptions {
-//     accessToken?: string;
-//     clientId?: string;
-//     selectUser?: string;
-//     pathRoot?: string;
-//     fetch?: Function;
-//   }
+  declare interface DropboxTypes$DropboxOptions {
+    accessToken?: string;
+    clientId?: string;
+    selectUser?: string;
+    pathRoot?: string;
+    fetch?: Function;
+  }
 
 //   declare class DropboxTypes$DropboxBase {
 //     /**
@@ -96,7 +97,7 @@
 //     locale: string;
 //   }
 
-//   declare type DropboxTypes$Timestamp = string;
+  declare type DropboxTypes$Timestamp = string;
 
 //   /**
 //   * The job finished synchronously and successfully.
@@ -575,7 +576,7 @@
 
 //   declare type DropboxTypes$common$DisplayNameLegacy = string;
 
-//   declare type DropboxTypes$common$DropboxTimestamp = DropboxTypes$Timestamp;
+  declare type DropboxTypes$common$DropboxTimestamp = DropboxTypes$Timestamp;
 
 //   declare type DropboxTypes$common$EmailAddress = string;
 
@@ -583,13 +584,13 @@
 
 //   declare type DropboxTypes$common$NamePart = string;
 
-//   declare type DropboxTypes$common$NamespaceId = string;
+  declare type DropboxTypes$common$NamespaceId = string;
 
 //   declare type DropboxTypes$common$OptionalNamePart = string;
 
 //   declare type DropboxTypes$common$SessionId = string;
 
-//   declare type DropboxTypes$common$SharedFolderId = DropboxTypes$common$NamespaceId;
+  declare type DropboxTypes$common$SharedFolderId = DropboxTypes$common$NamespaceId;
 
 //   declare interface DropboxTypes$contacts$DeleteManualContactsArg {
 //     /**
@@ -962,19 +963,19 @@
 //   * Raw key/value data to be associated with a Dropbox file. Property fields
 //   * are added to Dropbox files as a file_properties.PropertyGroup.
 //   */
-//   declare interface DropboxTypes$file_properties$PropertyField {
-//     /**
-//     * Key of the property field associated with a file and template. Keys can
-//     * be up to 256 bytes.
-//     */
-//     name: string;
+  declare interface DropboxTypes$file_properties$PropertyField {
+    /**
+    * Key of the property field associated with a file and template. Keys can
+    * be up to 256 bytes.
+    */
+    name: string;
 
-//     /**
-//     * Value of the property field associated with a file and template. Values
-//     * can be up to 1024 bytes.
-//     */
-//     value: string;
-//   }
+    /**
+    * Value of the property field associated with a file and template. Values
+    * can be up to 1024 bytes.
+    */
+    value: string;
+  }
 
 //   /**
 //   * Defines how a single property field may be structured. Used exclusively
@@ -1007,18 +1008,18 @@
 //   * and value types in this group are defined by the corresponding
 //   * file_properties.PropertyGroupTemplate.
 //   */
-//   declare interface DropboxTypes$file_properties$PropertyGroup {
-//     /**
-//     * A unique identifier for the associated template.
-//     */
-//     template_id: DropboxTypes$file_properties$TemplateId;
+  declare interface DropboxTypes$file_properties$PropertyGroup {
+    /**
+    * A unique identifier for the associated template.
+    */
+    template_id: DropboxTypes$file_properties$TemplateId;
 
-//     /**
-//     * The actual properties associated with the template. There can be up to
-//     * 32 property types per template.
-//     */
-//     fields: Array<DropboxTypes$file_properties$PropertyField>;
-//   }
+    /**
+    * The actual properties associated with the template. There can be up to
+    * 32 property types per template.
+    */
+    fields: Array<DropboxTypes$file_properties$PropertyField>;
+  }
 
 //   /**
 //   * Defines how a property group may be structured.
@@ -1150,18 +1151,20 @@
 //   * Only templates with an ID in the supplied list will be returned (a subset
 //   * of templates will be returned).
 //   */
-//   declare interface DropboxTypes$file_properties$TemplateFilterBaseFilterSome {
-//     ".tag": "filter_some";
-//     filter_some: Array<DropboxTypes$file_properties$TemplateId>;
-//   }
+  declare interface DropboxTypes$file_properties$TemplateFilterBaseFilterSome {
+    // $FlowFixMe
+    ".tag": "filter_some";
+    filter_some: Array<DropboxTypes$file_properties$TemplateId>;
+  }
 
-//   declare interface DropboxTypes$file_properties$TemplateFilterBaseOther {
-//     ".tag": "other";
-//   }
+  declare interface DropboxTypes$file_properties$TemplateFilterBaseOther {
+    // $FlowFixMe
+    ".tag": "other";
+  }
 
-//   declare type DropboxTypes$file_properties$TemplateFilterBase =
-//     | DropboxTypes$file_properties$TemplateFilterBaseFilterSome
-//     | DropboxTypes$file_properties$TemplateFilterBaseOther;
+  declare type DropboxTypes$file_properties$TemplateFilterBase =
+    | DropboxTypes$file_properties$TemplateFilterBaseFilterSome
+    | DropboxTypes$file_properties$TemplateFilterBaseOther;
 
 //   /**
 //   * Template will be associated with a user.
@@ -1246,7 +1249,7 @@
 
 //   declare type DropboxTypes$file_properties$PropertiesSearchCursor = string;
 
-//   declare type DropboxTypes$file_properties$TemplateId = string;
+  declare type DropboxTypes$file_properties$TemplateId = string;
 
 //   /**
 //   * There was an error counting the file requests.
@@ -1706,53 +1709,53 @@
 //     | DropboxTypes$files$GetMetadataError
 //     | DropboxTypes$files$AlphaGetMetadataErrorPropertiesError;
 
-//   declare interface DropboxTypes$files$CommitInfo {
-//     /**
-//     * The file contents to be uploaded.
-//     */
-//     contents: Object;
+  declare interface DropboxTypes$files$CommitInfo {
+    /**
+    * The file contents to be uploaded.
+    */
+    contents: Object;
 
-//     /**
-//     * Path in the user's Dropbox to save the file.
-//     */
-//     path: DropboxTypes$files$WritePathOrId;
+    /**
+    * Path in the user's Dropbox to save the file.
+    */
+    path: DropboxTypes$files$WritePathOrId;
 
-//     /**
-//     * Defaults to TagRef(Union(u'WriteMode', [UnionField(u'add', Void, False,
-//     * None), UnionField(u'overwrite', Void, False, None),
-//     * UnionField(u'update', Alias(u'Rev', String), False, None)]), u'add').
-//     */
-//     mode?: DropboxTypes$files$WriteMode;
+    /**
+    * Defaults to TagRef(Union(u'WriteMode', [UnionField(u'add', Void, False,
+    * None), UnionField(u'overwrite', Void, False, None),
+    * UnionField(u'update', Alias(u'Rev', String), False, None)]), u'add').
+    */
+    mode?: DropboxTypes$files$WriteMode;
 
-//     /**
-//     * Defaults to False.
-//     */
-//     autorename?: boolean;
+    /**
+    * Defaults to False.
+    */
+    autorename?: boolean;
 
-//     /**
-//     * The value to store as the client_modified timestamp. Dropbox
-//     * automatically records the time at which the file was written to the
-//     * Dropbox servers. It can also record an additional timestamp, provided
-//     * by Dropbox desktop clients, mobile clients, and API apps of when the
-//     * file was actually created or modified.
-//     */
-//     client_modified?: DropboxTypes$common$DropboxTimestamp;
+    /**
+    * The value to store as the client_modified timestamp. Dropbox
+    * automatically records the time at which the file was written to the
+    * Dropbox servers. It can also record an additional timestamp, provided
+    * by Dropbox desktop clients, mobile clients, and API apps of when the
+    * file was actually created or modified.
+    */
+    client_modified?: DropboxTypes$common$DropboxTimestamp;
 
-//     /**
-//     * Defaults to False.
-//     */
-//     mute?: boolean;
+    /**
+    * Defaults to False.
+    */
+    mute?: boolean;
 
-//     /**
-//     * List of custom properties to add to file.
-//     */
-//     property_groups?: Array<DropboxTypes$file_properties$PropertyGroup>;
+    /**
+    * List of custom properties to add to file.
+    */
+    property_groups?: Array<DropboxTypes$file_properties$PropertyGroup>;
 
-//     /**
-//     * Defaults to False.
-//     */
-//     strict_conflict?: boolean;
-//   }
+    /**
+    * Defaults to False.
+    */
+    strict_conflict?: boolean;
+  }
 
 //   declare type DropboxTypes$files$CommitInfoWithProperties = {
 //     /**
@@ -1786,17 +1789,17 @@
 //     sync_setting: DropboxTypes$files$SyncSettingArg;
 //   }
 
-//   declare interface DropboxTypes$files$CreateFolderArg {
-//     /**
-//     * Path in the user's Dropbox to create.
-//     */
-//     path: DropboxTypes$files$WritePath;
+  declare interface DropboxTypes$files$CreateFolderArg {
+    /**
+    * Path in the user's Dropbox to create.
+    */
+    path: DropboxTypes$files$WritePath;
 
-//     /**
-//     * Defaults to False.
-//     */
-//     autorename?: boolean;
-//   }
+    /**
+    * Defaults to False.
+    */
+    autorename?: boolean;
+  }
 
 //   declare interface DropboxTypes$files$CreateFolderBatchArg {
 //     /**
@@ -1925,26 +1928,26 @@
 
 //   declare type DropboxTypes$files$CreateFolderError = DropboxTypes$files$CreateFolderErrorPath;
 
-//   declare type DropboxTypes$files$CreateFolderResult = {
-//     /**
-//     * Metadata of the created folder.
-//     */
-//     metadata: DropboxTypes$files$FolderMetadata,
-//     ...
-//   } & DropboxTypes$files$FileOpsResult;
+  declare type DropboxTypes$files$CreateFolderResult = {
+    /**
+    * Metadata of the created folder.
+    */
+    metadata: DropboxTypes$files$FolderMetadata,
+    ...
+  } & DropboxTypes$files$FileOpsResult;
 
-//   declare interface DropboxTypes$files$DeleteArg {
-//     /**
-//     * Path in the user's Dropbox to delete.
-//     */
-//     path: DropboxTypes$files$WritePathOrId;
+  declare interface DropboxTypes$files$DeleteArg {
+    /**
+    * Path in the user's Dropbox to delete.
+    */
+    path: DropboxTypes$files$WritePathOrId;
 
-//     /**
-//     * Perform delete if given "rev" matches the existing file's latest "rev".
-//     * This field does not support deleting a folder.
-//     */
-//     parent_rev?: DropboxTypes$files$Rev;
-//   }
+    /**
+    * Perform delete if given "rev" matches the existing file's latest "rev".
+    * This field does not support deleting a folder.
+    */
+    parent_rev?: DropboxTypes$files$Rev;
+  }
 
 //   declare interface DropboxTypes$files$DeleteBatchArg {
 //     entries: Array<DropboxTypes$files$DeleteArg>;
@@ -2094,49 +2097,49 @@
 //   * Indicates that there used to be a file or folder at this path, but it no
 //   * longer exists.
 //   */
-//   declare type DropboxTypes$files$DeletedMetadata = {
-//     ...
-//   } & DropboxTypes$files$Metadata;
+  declare type DropboxTypes$files$DeletedMetadata = {
+    ...
+  } & DropboxTypes$files$Metadata;
 
 //   /**
 //   * Reference to the DeletedMetadata type, identified by the value of the
 //   * .tag property.
 //   */
-//   declare type DropboxTypes$files$DeletedMetadataReference = {
-//     /**
-//     * Tag identifying this subtype variant. This field is only present when
-//     * needed to discriminate between multiple possible subtypes.
-//     */
-//     ".tag": "deleted",
-//     ...
-//   } & DropboxTypes$files$DeletedMetadata;
+  declare type DropboxTypes$files$DeletedMetadataReference = {
+    /**
+    * Tag identifying this subtype variant. This field is only present when
+    * needed to discriminate between multiple possible subtypes.
+    */
+    ".tag": "deleted",
+    ...
+  } & DropboxTypes$files$DeletedMetadata;
 
 //   /**
 //   * Dimensions for a photo or video.
 //   */
-//   declare interface DropboxTypes$files$Dimensions {
-//     /**
-//     * Height of the photo/video.
-//     */
-//     height: number;
+  declare interface DropboxTypes$files$Dimensions {
+    /**
+    * Height of the photo/video.
+    */
+    height: number;
 
-//     /**
-//     * Width of the photo/video.
-//     */
-//     width: number;
-//   }
+    /**
+    * Width of the photo/video.
+    */
+    width: number;
+  }
 
-//   declare interface DropboxTypes$files$DownloadArg {
-//     /**
-//     * The path of the file to download.
-//     */
-//     path: DropboxTypes$files$ReadPath;
+  declare interface DropboxTypes$files$DownloadArg {
+    /**
+    * The path of the file to download.
+    */
+    path: DropboxTypes$files$ReadPath;
 
-//     /**
-//     * Please specify revision in path instead.
-//     */
-//     rev?: DropboxTypes$files$Rev;
-//   }
+    /**
+    * Please specify revision in path instead.
+    */
+    rev?: DropboxTypes$files$Rev;
+  }
 
 //   declare interface DropboxTypes$files$DownloadErrorPath {
 //     ".tag": "path";
@@ -2230,12 +2233,12 @@
 //   /**
 //   * Export information for a file.
 //   */
-//   declare interface DropboxTypes$files$ExportInfo {
-//     /**
-//     * Format to which the file can be exported to.
-//     */
-//     export_as?: string;
-//   }
+  declare interface DropboxTypes$files$ExportInfo {
+    /**
+    * Format to which the file can be exported to.
+    */
+    export_as?: string;
+  }
 
 //   declare interface DropboxTypes$files$ExportMetadata {
 //     /**
@@ -2270,190 +2273,190 @@
 //     file_metadata: DropboxTypes$files$FileMetadata;
 //   }
 
-//   declare type DropboxTypes$files$FileMetadata = {
-//     /**
-//     * A unique identifier for the file.
-//     */
-//     id: DropboxTypes$files$Id,
+  declare type DropboxTypes$files$FileMetadata = {
+    /**
+    * A unique identifier for the file.
+    */
+    id: DropboxTypes$files$Id,
 
-//     /**
-//     * For files, this is the modification time set by the desktop client when
-//     * the file was added to Dropbox. Since this time is not verified (the
-//     * Dropbox server stores whatever the desktop client sends up), this
-//     * should only be used for display purposes (such as sorting) and not, for
-//     * example, to determine if a file has changed or not.
-//     */
-//     client_modified: DropboxTypes$common$DropboxTimestamp,
+    /**
+    * For files, this is the modification time set by the desktop client when
+    * the file was added to Dropbox. Since this time is not verified (the
+    * Dropbox server stores whatever the desktop client sends up), this
+    * should only be used for display purposes (such as sorting) and not, for
+    * example, to determine if a file has changed or not.
+    */
+    client_modified: DropboxTypes$common$DropboxTimestamp,
 
-//     /**
-//     * The last time the file was modified on Dropbox.
-//     */
-//     server_modified: DropboxTypes$common$DropboxTimestamp,
+    /**
+    * The last time the file was modified on Dropbox.
+    */
+    server_modified: DropboxTypes$common$DropboxTimestamp,
 
-//     /**
-//     * A unique identifier for the current revision of a file. This field is
-//     * the same rev as elsewhere in the API and can be used to detect changes
-//     * and avoid conflicts.
-//     */
-//     rev: DropboxTypes$files$Rev,
+    /**
+    * A unique identifier for the current revision of a file. This field is
+    * the same rev as elsewhere in the API and can be used to detect changes
+    * and avoid conflicts.
+    */
+    rev: DropboxTypes$files$Rev,
 
-//     /**
-//     * The file size in bytes.
-//     */
-//     size: number,
+    /**
+    * The file size in bytes.
+    */
+    size: number,
 
-//     /**
-//     * Additional information if the file is a photo or video. This field will
-//     * not be set on entries returned by listFolder(), listFolderContinue(),
-//     * or getThumbnailBatch(), starting December 2, 2019.
-//     */
-//     media_info?: DropboxTypes$files$MediaInfo,
+    /**
+    * Additional information if the file is a photo or video. This field will
+    * not be set on entries returned by listFolder(), listFolderContinue(),
+    * or getThumbnailBatch(), starting December 2, 2019.
+    */
+    media_info?: DropboxTypes$files$MediaInfo,
 
-//     /**
-//     * Set if this file is a symlink.
-//     */
-//     symlink_info?: DropboxTypes$files$SymlinkInfo,
+    /**
+    * Set if this file is a symlink.
+    */
+    symlink_info?: DropboxTypes$files$SymlinkInfo,
 
-//     /**
-//     * Set if this file is contained in a shared folder.
-//     */
-//     sharing_info?: DropboxTypes$files$FileSharingInfo,
+    /**
+    * Set if this file is contained in a shared folder.
+    */
+    sharing_info?: DropboxTypes$files$FileSharingInfo,
 
-//     /**
-//     * Defaults to True.
-//     */
-//     is_downloadable?: boolean,
+    /**
+    * Defaults to True.
+    */
+    is_downloadable?: boolean,
 
-//     /**
-//     * Information about format this file can be exported to. This filed must
-//     * be set if is_downloadable is set to false.
-//     */
-//     export_info?: DropboxTypes$files$ExportInfo,
+    /**
+    * Information about format this file can be exported to. This filed must
+    * be set if is_downloadable is set to false.
+    */
+    export_info?: DropboxTypes$files$ExportInfo,
 
-//     /**
-//     * Additional information if the file has custom properties with the
-//     * property template specified.
-//     */
-//     property_groups?: Array<DropboxTypes$file_properties$PropertyGroup>,
+    /**
+    * Additional information if the file has custom properties with the
+    * property template specified.
+    */
+    property_groups?: Array<DropboxTypes$file_properties$PropertyGroup>,
 
-//     /**
-//     * This flag will only be present if include_has_explicit_shared_members
-//     * is true in listFolder() or getMetadata(). If this  flag is present, it
-//     * will be true if this file has any explicit shared  members. This is
-//     * different from sharing_info in that this could be true  in the case
-//     * where a file has explicit members but is not contained within  a shared
-//     * folder.
-//     */
-//     has_explicit_shared_members?: boolean,
+    /**
+    * This flag will only be present if include_has_explicit_shared_members
+    * is true in listFolder() or getMetadata(). If this  flag is present, it
+    * will be true if this file has any explicit shared  members. This is
+    * different from sharing_info in that this could be true  in the case
+    * where a file has explicit members but is not contained within  a shared
+    * folder.
+    */
+    has_explicit_shared_members?: boolean,
 
-//     /**
-//     * A hash of the file content. This field can be used to verify data
-//     * integrity. For more information see our [Content hash]{@link
-//     * https://www.dropbox.com/developers/reference/content-hash} page.
-//     */
-//     content_hash?: DropboxTypes$files$Sha256HexHash,
-//     ...
-//   } & DropboxTypes$files$Metadata;
+    /**
+    * A hash of the file content. This field can be used to verify data
+    * integrity. For more information see our [Content hash]{@link
+    * https://www.dropbox.com/developers/reference/content-hash} page.
+    */
+    content_hash?: DropboxTypes$files$Sha256HexHash,
+    ...
+  } & DropboxTypes$files$Metadata;
 
 //   /**
 //   * Reference to the FileMetadata type, identified by the value of the .tag
 //   * property.
 //   */
-//   declare type DropboxTypes$files$FileMetadataReference = {
-//     /**
-//     * Tag identifying this subtype variant. This field is only present when
-//     * needed to discriminate between multiple possible subtypes.
-//     */
-//     ".tag": "file",
-//     ...
-//   } & DropboxTypes$files$FileMetadata;
+  declare type DropboxTypes$files$FileMetadataReference = {
+    /**
+    * Tag identifying this subtype variant. This field is only present when
+    * needed to discriminate between multiple possible subtypes.
+    */
+    ".tag": "file",
+    ...
+  } & DropboxTypes$files$FileMetadata;
 
-//   declare interface DropboxTypes$files$FileOpsResult {}
+  declare interface DropboxTypes$files$FileOpsResult {}
 
 //   /**
 //   * Sharing info for a file which is contained by a shared folder.
 //   */
-//   declare type DropboxTypes$files$FileSharingInfo = {
-//     /**
-//     * ID of shared folder that holds this file.
-//     */
-//     parent_shared_folder_id: DropboxTypes$common$SharedFolderId,
+  declare type DropboxTypes$files$FileSharingInfo = {
+    /**
+    * ID of shared folder that holds this file.
+    */
+    parent_shared_folder_id: DropboxTypes$common$SharedFolderId,
 
-//     /**
-//     * The last user who modified the file. This field will be null if the
-//     * user's account has been deleted.
-//     */
-//     modified_by?: DropboxTypes$users_common$AccountId,
-//     ...
-//   } & DropboxTypes$files$SharingInfo;
+    /**
+    * The last user who modified the file. This field will be null if the
+    * user's account has been deleted.
+    */
+    modified_by?: DropboxTypes$users_common$AccountId,
+    ...
+  } & DropboxTypes$files$SharingInfo;
 
-//   declare type DropboxTypes$files$FolderMetadata = {
-//     /**
-//     * A unique identifier for the folder.
-//     */
-//     id: DropboxTypes$files$Id,
+  declare type DropboxTypes$files$FolderMetadata = {
+    /**
+    * A unique identifier for the folder.
+    */
+    id: DropboxTypes$files$Id,
 
-//     /**
-//     * Please use sharing_info instead.
-//     */
-//     shared_folder_id?: DropboxTypes$common$SharedFolderId,
+    /**
+    * Please use sharing_info instead.
+    */
+    shared_folder_id?: DropboxTypes$common$SharedFolderId,
 
-//     /**
-//     * Set if the folder is contained in a shared folder or is a shared folder
-//     * mount point.
-//     */
-//     sharing_info?: DropboxTypes$files$FolderSharingInfo,
+    /**
+    * Set if the folder is contained in a shared folder or is a shared folder
+    * mount point.
+    */
+    sharing_info?: DropboxTypes$files$FolderSharingInfo,
 
-//     /**
-//     * Additional information if the file has custom properties with the
-//     * property template specified. Note that only properties associated with
-//     * user-owned templates, not team-owned templates, can be attached to
-//     * folders.
-//     */
-//     property_groups?: Array<DropboxTypes$file_properties$PropertyGroup>,
-//     ...
-//   } & DropboxTypes$files$Metadata;
+    /**
+    * Additional information if the file has custom properties with the
+    * property template specified. Note that only properties associated with
+    * user-owned templates, not team-owned templates, can be attached to
+    * folders.
+    */
+    property_groups?: Array<DropboxTypes$file_properties$PropertyGroup>,
+    ...
+  } & DropboxTypes$files$Metadata;
 
 //   /**
 //   * Reference to the FolderMetadata type, identified by the value of the .tag
 //   * property.
 //   */
-//   declare type DropboxTypes$files$FolderMetadataReference = {
-//     /**
-//     * Tag identifying this subtype variant. This field is only present when
-//     * needed to discriminate between multiple possible subtypes.
-//     */
-//     ".tag": "folder",
-//     ...
-//   } & DropboxTypes$files$FolderMetadata;
+  declare type DropboxTypes$files$FolderMetadataReference = {
+    /**
+    * Tag identifying this subtype variant. This field is only present when
+    * needed to discriminate between multiple possible subtypes.
+    */
+    ".tag": "folder",
+    ...
+  } & DropboxTypes$files$FolderMetadata;
 
 //   /**
 //   * Sharing info for a folder which is contained in a shared folder or is a
 //   * shared folder mount point.
 //   */
-//   declare type DropboxTypes$files$FolderSharingInfo = {
-//     /**
-//     * Set if the folder is contained by a shared folder.
-//     */
-//     parent_shared_folder_id?: DropboxTypes$common$SharedFolderId,
+  declare type DropboxTypes$files$FolderSharingInfo = {
+    /**
+    * Set if the folder is contained by a shared folder.
+    */
+    parent_shared_folder_id?: DropboxTypes$common$SharedFolderId,
 
-//     /**
-//     * If this folder is a shared folder mount point, the ID of the shared
-//     * folder mounted at this location.
-//     */
-//     shared_folder_id?: DropboxTypes$common$SharedFolderId,
+    /**
+    * If this folder is a shared folder mount point, the ID of the shared
+    * folder mounted at this location.
+    */
+    shared_folder_id?: DropboxTypes$common$SharedFolderId,
 
-//     /**
-//     * Defaults to False.
-//     */
-//     traverse_only?: boolean,
+    /**
+    * Defaults to False.
+    */
+    traverse_only?: boolean,
 
-//     /**
-//     * Defaults to False.
-//     */
-//     no_access?: boolean,
-//     ...
-//   } & DropboxTypes$files$SharingInfo;
+    /**
+    * Defaults to False.
+    */
+    no_access?: boolean,
+    ...
+  } & DropboxTypes$files$SharingInfo;
 
 //   declare interface DropboxTypes$files$GetCopyReferenceArg {
 //     /**
@@ -2497,34 +2500,34 @@
 //     expires: DropboxTypes$common$DropboxTimestamp;
 //   }
 
-//   declare interface DropboxTypes$files$GetMetadataArg {
-//     /**
-//     * The path of a file or folder on Dropbox.
-//     */
-//     path: DropboxTypes$files$ReadPath;
+  declare interface DropboxTypes$files$GetMetadataArg {
+    /**
+    * The path of a file or folder on Dropbox.
+    */
+    path: DropboxTypes$files$ReadPath;
 
-//     /**
-//     * Defaults to False.
-//     */
-//     include_media_info?: boolean;
+    /**
+    * Defaults to False.
+    */
+    include_media_info?: boolean;
 
-//     /**
-//     * Defaults to False.
-//     */
-//     include_deleted?: boolean;
+    /**
+    * Defaults to False.
+    */
+    include_deleted?: boolean;
 
-//     /**
-//     * Defaults to False.
-//     */
-//     include_has_explicit_shared_members?: boolean;
+    /**
+    * Defaults to False.
+    */
+    include_has_explicit_shared_members?: boolean;
 
-//     /**
-//     * If set to a valid list of template IDs, FileMetadata.property_groups is
-//     * set if there exists property data associated with the file and each of
-//     * the listed templates.
-//     */
-//     include_property_groups?: DropboxTypes$file_properties$TemplateFilterBase;
-//   }
+    /**
+    * If set to a valid list of template IDs, FileMetadata.property_groups is
+    * set if there exists property data associated with the file and each of
+    * the listed templates.
+    */
+    include_property_groups?: DropboxTypes$file_properties$TemplateFilterBase;
+  }
 
 //   declare interface DropboxTypes$files$GetMetadataErrorPath {
 //     ".tag": "path";
@@ -2668,76 +2671,76 @@
 //   /**
 //   * GPS coordinates for a photo or video.
 //   */
-//   declare interface DropboxTypes$files$GpsCoordinates {
-//     /**
-//     * Latitude of the GPS coordinates.
-//     */
-//     latitude: number;
+  declare interface DropboxTypes$files$GpsCoordinates {
+    /**
+    * Latitude of the GPS coordinates.
+    */
+    latitude: number;
 
-//     /**
-//     * Longitude of the GPS coordinates.
-//     */
-//     longitude: number;
-//   }
+    /**
+    * Longitude of the GPS coordinates.
+    */
+    longitude: number;
+  }
 
-//   declare interface DropboxTypes$files$ListFolderArg {
-//     /**
-//     * A unique identifier for the file.
-//     */
-//     path: DropboxTypes$files$PathROrId;
+  declare interface DropboxTypes$files$ListFolderArg {
+    /**
+    * A unique identifier for the file.
+    */
+    path: DropboxTypes$files$PathROrId;
 
-//     /**
-//     * Defaults to False.
-//     */
-//     recursive?: boolean;
+    /**
+    * Defaults to False.
+    */
+    recursive?: boolean;
 
-//     /**
-//     * Defaults to False.
-//     */
-//     include_media_info?: boolean;
+    /**
+    * Defaults to False.
+    */
+    include_media_info?: boolean;
 
-//     /**
-//     * Defaults to False.
-//     */
-//     include_deleted?: boolean;
+    /**
+    * Defaults to False.
+    */
+    include_deleted?: boolean;
 
-//     /**
-//     * Defaults to False.
-//     */
-//     include_has_explicit_shared_members?: boolean;
+    /**
+    * Defaults to False.
+    */
+    include_has_explicit_shared_members?: boolean;
 
-//     /**
-//     * Defaults to True.
-//     */
-//     include_mounted_folders?: boolean;
+    /**
+    * Defaults to True.
+    */
+    include_mounted_folders?: boolean;
 
-//     /**
-//     * The maximum number of results to return per request. Note: This is an
-//     * approximate number and there can be slightly more entries returned in
-//     * some cases.
-//     */
-//     limit?: number;
+    /**
+    * The maximum number of results to return per request. Note: This is an
+    * approximate number and there can be slightly more entries returned in
+    * some cases.
+    */
+    limit?: number;
 
-//     /**
-//     * A shared link to list the contents of. If the link is
-//     * password-protected, the password must be provided. If this field is
-//     * present, ListFolderArg.path will be relative to root of the shared
-//     * link. Only non-recursive mode is supported for shared link.
-//     */
-//     shared_link?: DropboxTypes$files$SharedLink;
+    /**
+    * A shared link to list the contents of. If the link is
+    * password-protected, the password must be provided. If this field is
+    * present, ListFolderArg.path will be relative to root of the shared
+    * link. Only non-recursive mode is supported for shared link.
+    */
+    shared_link?: DropboxTypes$files$SharedLink;
 
-//     /**
-//     * If set to a valid list of template IDs, FileMetadata.property_groups is
-//     * set if there exists property data associated with the file and each of
-//     * the listed templates.
-//     */
-//     include_property_groups?: DropboxTypes$file_properties$TemplateFilterBase;
+    /**
+    * If set to a valid list of template IDs, FileMetadata.property_groups is
+    * set if there exists property data associated with the file and each of
+    * the listed templates.
+    */
+    include_property_groups?: DropboxTypes$file_properties$TemplateFilterBase;
 
-//     /**
-//     * Defaults to True.
-//     */
-//     include_non_downloadable_files?: boolean;
-//   }
+    /**
+    * Defaults to True.
+    */
+    include_non_downloadable_files?: boolean;
+  }
 
 //   declare interface DropboxTypes$files$ListFolderContinueArg {
 //     /**
@@ -2834,28 +2837,28 @@
 //     backoff?: number;
 //   }
 
-//   declare interface DropboxTypes$files$ListFolderResult {
-//     /**
-//     * The files and (direct) subfolders in the folder.
-//     */
-//     entries: Array<
-//       | DropboxTypes$files$FileMetadataReference
-//       | DropboxTypes$files$FolderMetadataReference
-//       | DropboxTypes$files$DeletedMetadataReference
-//     >;
+  declare interface DropboxTypes$files$ListFolderResult {
+    /**
+    * The files and (direct) subfolders in the folder.
+    */
+    entries: Array<
+      | DropboxTypes$files$FileMetadataReference
+      | DropboxTypes$files$FolderMetadataReference
+      | DropboxTypes$files$DeletedMetadataReference
+    >;
 
-//     /**
-//     * Pass the cursor into listFolderContinue() to see what's changed in the
-//     * folder since your previous query.
-//     */
-//     cursor: DropboxTypes$files$ListFolderCursor;
+    /**
+    * Pass the cursor into listFolderContinue() to see what's changed in the
+    * folder since your previous query.
+    */
+    cursor: DropboxTypes$files$ListFolderCursor;
 
-//     /**
-//     * If true, then there are more entries available. Pass the cursor to
-//     * listFolderContinue() to retrieve the rest.
-//     */
-//     has_more: boolean;
-//   }
+    /**
+    * If true, then there are more entries available. Pass the cursor to
+    * listFolderContinue() to retrieve the rest.
+    */
+    has_more: boolean;
+  }
 
 //   declare interface DropboxTypes$files$ListRevisionsArg {
 //     /**
@@ -2999,43 +3002,45 @@
 //   * Indicate the photo/video is still under processing and metadata is not
 //   * available yet.
 //   */
-//   declare interface DropboxTypes$files$MediaInfoPending {
-//     ".tag": "pending";
-//   }
+  declare interface DropboxTypes$files$MediaInfoPending {
+    // $FlowFixMe
+    ".tag": "pending";
+  }
 
 //   /**
 //   * The metadata for the photo/video.
 //   */
-//   declare interface DropboxTypes$files$MediaInfoMetadata {
-//     ".tag": "metadata";
-//     metadata:
-//       | DropboxTypes$files$PhotoMetadataReference
-//       | DropboxTypes$files$VideoMetadataReference;
-//   }
+  declare interface DropboxTypes$files$MediaInfoMetadata {
+    // $FlowFixMe
+    ".tag": "metadata";
+    metadata:
+      | DropboxTypes$files$PhotoMetadataReference
+      | DropboxTypes$files$VideoMetadataReference;
+  }
 
-//   declare type DropboxTypes$files$MediaInfo =
-//     | DropboxTypes$files$MediaInfoPending
-//     | DropboxTypes$files$MediaInfoMetadata;
+  declare type DropboxTypes$files$MediaInfo =
+    | DropboxTypes$files$MediaInfoPending
+    | DropboxTypes$files$MediaInfoMetadata;
 
 //   /**
 //   * Metadata for a photo or video.
 //   */
-//   declare interface DropboxTypes$files$MediaMetadata {
-//     /**
-//     * Dimension of the photo/video.
-//     */
-//     dimensions?: DropboxTypes$files$Dimensions;
+  declare interface DropboxTypes$files$MediaMetadata {
+    /**
+    * Dimension of the photo/video.
+    */
+    dimensions?: DropboxTypes$files$Dimensions;
 
-//     /**
-//     * The GPS coordinate of the photo/video.
-//     */
-//     location?: DropboxTypes$files$GpsCoordinates;
+    /**
+    * The GPS coordinate of the photo/video.
+    */
+    location?: DropboxTypes$files$GpsCoordinates;
 
-//     /**
-//     * The timestamp when the photo/video is taken.
-//     */
-//     time_taken?: DropboxTypes$common$DropboxTimestamp;
-//   }
+    /**
+    * The timestamp when the photo/video is taken.
+    */
+    time_taken?: DropboxTypes$common$DropboxTimestamp;
+  }
 
 //   /**
 //   * Reference to the MediaMetadata polymorphic type. Contains a .tag property
@@ -3052,35 +3057,35 @@
 //   /**
 //   * Metadata for a file or folder.
 //   */
-//   declare interface DropboxTypes$files$Metadata {
-//     /**
-//     * The last component of the path (including extension). This never
-//     * contains a slash.
-//     */
-//     name: string;
+  declare interface DropboxTypes$files$Metadata {
+    /**
+    * The last component of the path (including extension). This never
+    * contains a slash.
+    */
+    name: string;
 
-//     /**
-//     * The lowercased full path in the user's Dropbox. This always starts with
-//     * a slash. This field will be null if the file or folder is not mounted.
-//     */
-//     path_lower?: string;
+    /**
+    * The lowercased full path in the user's Dropbox. This always starts with
+    * a slash. This field will be null if the file or folder is not mounted.
+    */
+    path_lower?: string;
 
-//     /**
-//     * The cased path to be used for display purposes only. In rare instances
-//     * the casing will not correctly match the user's filesystem, but this
-//     * behavior will match the path provided in the Core API v1, and at least
-//     * the last path component will have the correct casing. Changes to only
-//     * the casing of paths won't be returned by listFolderContinue(). This
-//     * field will be null if the file or folder is not mounted.
-//     */
-//     path_display?: string;
+    /**
+    * The cased path to be used for display purposes only. In rare instances
+    * the casing will not correctly match the user's filesystem, but this
+    * behavior will match the path provided in the Core API v1, and at least
+    * the last path component will have the correct casing. Changes to only
+    * the casing of paths won't be returned by listFolderContinue(). This
+    * field will be null if the file or folder is not mounted.
+    */
+    path_display?: string;
 
-//     /**
-//     * Please use FileSharingInfo.parent_shared_folder_id or
-//     * FolderSharingInfo.parent_shared_folder_id instead.
-//     */
-//     parent_shared_folder_id?: DropboxTypes$common$SharedFolderId;
-//   }
+    /**
+    * Please use FileSharingInfo.parent_shared_folder_id or
+    * FolderSharingInfo.parent_shared_folder_id instead.
+    */
+    parent_shared_folder_id?: DropboxTypes$common$SharedFolderId;
+  }
 
 //   /**
 //   * Reference to the Metadata polymorphic type. Contains a .tag property to
@@ -3105,22 +3110,22 @@
 //   /**
 //   * Metadata for a photo.
 //   */
-//   declare type DropboxTypes$files$PhotoMetadata = {
-//     ...
-//   } & DropboxTypes$files$MediaMetadata;
+  declare type DropboxTypes$files$PhotoMetadata = {
+    ...
+  } & DropboxTypes$files$MediaMetadata;
 
 //   /**
 //   * Reference to the PhotoMetadata type, identified by the value of the .tag
 //   * property.
 //   */
-//   declare type DropboxTypes$files$PhotoMetadataReference = {
-//     /**
-//     * Tag identifying this subtype variant. This field is only present when
-//     * needed to discriminate between multiple possible subtypes.
-//     */
-//     ".tag": "photo",
-//     ...
-//   } & DropboxTypes$files$PhotoMetadata;
+  declare type DropboxTypes$files$PhotoMetadataReference = {
+    /**
+    * Tag identifying this subtype variant. This field is only present when
+    * needed to discriminate between multiple possible subtypes.
+    */
+    ".tag": "photo",
+    ...
+  } & DropboxTypes$files$PhotoMetadata;
 
 //   declare interface DropboxTypes$files$PreviewArg {
 //     /**
@@ -3828,34 +3833,34 @@
 //     start: number;
 //   }
 
-//   declare interface DropboxTypes$files$SharedLink {
-//     /**
-//     * Shared link url.
-//     */
-//     url: DropboxTypes$files$SharedLinkUrl;
+  declare interface DropboxTypes$files$SharedLink {
+    /**
+    * Shared link url.
+    */
+    url: DropboxTypes$files$SharedLinkUrl;
 
-//     /**
-//     * Password for the shared link.
-//     */
-//     password?: string;
-//   }
+    /**
+    * Password for the shared link.
+    */
+    password?: string;
+  }
 
 //   /**
 //   * Sharing info for a file or folder.
 //   */
-//   declare interface DropboxTypes$files$SharingInfo {
-//     /**
-//     * True if the file or folder is inside a read-only shared folder.
-//     */
-//     read_only: boolean;
-//   }
+  declare interface DropboxTypes$files$SharingInfo {
+    /**
+    * True if the file or folder is inside a read-only shared folder.
+    */
+    read_only: boolean;
+  }
 
-//   declare interface DropboxTypes$files$SymlinkInfo {
-//     /**
-//     * The target this symlink points to.
-//     */
-//     target: string;
-//   }
+  declare interface DropboxTypes$files$SymlinkInfo {
+    /**
+    * The target this symlink points to.
+    */
+    target: string;
+  }
 
 //   /**
 //   * On first sync to members' computers, the specified folder will follow its
@@ -4419,26 +4424,26 @@
 //   /**
 //   * Metadata for a video.
 //   */
-//   declare type DropboxTypes$files$VideoMetadata = {
-//     /**
-//     * The duration of the video in milliseconds.
-//     */
-//     duration?: number,
-//     ...
-//   } & DropboxTypes$files$MediaMetadata;
+  declare type DropboxTypes$files$VideoMetadata = {
+    /**
+    * The duration of the video in milliseconds.
+    */
+    duration?: number,
+    ...
+  } & DropboxTypes$files$MediaMetadata;
 
 //   /**
 //   * Reference to the VideoMetadata type, identified by the value of the .tag
 //   * property.
 //   */
-//   declare type DropboxTypes$files$VideoMetadataReference = {
-//     /**
-//     * Tag identifying this subtype variant. This field is only present when
-//     * needed to discriminate between multiple possible subtypes.
-//     */
-//     ".tag": "video",
-//     ...
-//   } & DropboxTypes$files$VideoMetadata;
+  declare type DropboxTypes$files$VideoMetadataReference = {
+    /**
+    * Tag identifying this subtype variant. This field is only present when
+    * needed to discriminate between multiple possible subtypes.
+    */
+    ".tag": "video",
+    ...
+  } & DropboxTypes$files$VideoMetadata;
 
 //   /**
 //   * There's a file in the way.
@@ -4546,17 +4551,19 @@
 //   * strategy is to append a number to the file name. For example,
 //   * "document.txt" might become "document (2).txt".
 //   */
-//   declare interface DropboxTypes$files$WriteModeAdd {
-//     ".tag": "add";
-//   }
+  declare interface DropboxTypes$files$WriteModeAdd {
+    // $FlowFixMe
+    ".tag": "add";
+  }
 
 //   /**
 //   * Always overwrite the existing file. The autorename strategy is the same
 //   * as it is for add.
 //   */
-//   declare interface DropboxTypes$files$WriteModeOverwrite {
-//     ".tag": "overwrite";
-//   }
+  declare interface DropboxTypes$files$WriteModeOverwrite {
+    // $FlowFixMe
+    ".tag": "overwrite";
+  }
 
 //   /**
 //   * Overwrite if the given "rev" matches the existing file's "rev". The
@@ -4564,10 +4571,11 @@
 //   * name. For example, "document.txt" might become "document (conflicted
 //   * copy).txt" or "document (Panda's conflicted copy).txt".
 //   */
-//   declare interface DropboxTypes$files$WriteModeUpdate {
-//     ".tag": "update";
-//     update: DropboxTypes$files$Rev;
-//   }
+  declare interface DropboxTypes$files$WriteModeUpdate {
+    // $FlowFixMe
+    ".tag": "update";
+    update: DropboxTypes$files$Rev;
+  }
 
 //   /**
 //   * Your intent when writing a file to some path. This is used to determine
@@ -4580,18 +4588,18 @@
 //   * there's a file at the target path with contents different from the
 //   * contents you're trying to write.
 //   */
-//   declare type DropboxTypes$files$WriteMode =
-//     | DropboxTypes$files$WriteModeAdd
-//     | DropboxTypes$files$WriteModeOverwrite
-//     | DropboxTypes$files$WriteModeUpdate;
+  declare type DropboxTypes$files$WriteMode =
+    | DropboxTypes$files$WriteModeAdd
+    | DropboxTypes$files$WriteModeOverwrite
+    | DropboxTypes$files$WriteModeUpdate;
 
 //   declare type DropboxTypes$files$CopyBatchArg = DropboxTypes$files$RelocationBatchArgBase;
 
 //   declare type DropboxTypes$files$FileId = string;
 
-//   declare type DropboxTypes$files$Id = string;
+  declare type DropboxTypes$files$Id = string;
 
-//   declare type DropboxTypes$files$ListFolderCursor = string;
+  declare type DropboxTypes$files$ListFolderCursor = string;
 
 //   declare type DropboxTypes$files$MalformedPathError = Object;
 
@@ -4601,19 +4609,19 @@
 
 //   declare type DropboxTypes$files$PathR = string;
 
-//   declare type DropboxTypes$files$PathROrId = string;
+  declare type DropboxTypes$files$PathROrId = string;
 
-//   declare type DropboxTypes$files$ReadPath = string;
+  declare type DropboxTypes$files$ReadPath = string;
 
-//   declare type DropboxTypes$files$Rev = string;
+  declare type DropboxTypes$files$Rev = string;
 
-//   declare type DropboxTypes$files$Sha256HexHash = string;
+  declare type DropboxTypes$files$Sha256HexHash = string;
 
-//   declare type DropboxTypes$files$SharedLinkUrl = string;
+  declare type DropboxTypes$files$SharedLinkUrl = string;
 
-//   declare type DropboxTypes$files$WritePath = string;
+  declare type DropboxTypes$files$WritePath = string;
 
-//   declare type DropboxTypes$files$WritePathOrId = string;
+  declare type DropboxTypes$files$WritePathOrId = string;
 
 //   declare interface DropboxTypes$paper$AddMember {
 //     /**
@@ -29148,26 +29156,26 @@
 //     | DropboxTypes$users_common$AccountTypePro
 //     | DropboxTypes$users_common$AccountTypeBusiness;
 
-//   declare type DropboxTypes$users_common$AccountId = string;
+  declare type DropboxTypes$users_common$AccountId = string;
 
 
-//   declare class Dropbox {
-//     constructor(options: DropboxOptions): void;
+  declare class Dropbox {
+    constructor(options: DropboxOptions): void;
 
-//     authTokenRevoke(arg: void): Promise<void>;
+    authTokenRevoke(arg: void): Promise<void>;
 
-//     filesGetMetadata(arg: DropboxTypes$files$GetMetadataArg):
-//       Promise<DropboxTypes$files$FileMetadataReference|DropboxTypes$files$FolderMetadataReference|DropboxTypes$files$DeletedMetadataReference>;
+    filesGetMetadata(arg: DropboxTypes$files$GetMetadataArg):
+      Promise<DropboxTypes$files$FileMetadataReference|DropboxTypes$files$FolderMetadataReference|DropboxTypes$files$DeletedMetadataReference>;
 
-//     filesCreateFolderV2(arg: DropboxTypes$files$CreateFolderArg): Promise<DropboxTypes$files$CreateFolderResult>;
+    filesCreateFolderV2(arg: DropboxTypes$files$CreateFolderArg): Promise<DropboxTypes$files$CreateFolderResult>;
 
-//     filesListFolder(arg: DropboxTypes$files$ListFolderArg): Promise<DropboxTypes$files$ListFolderResult>;
+    filesListFolder(arg: DropboxTypes$files$ListFolderArg): Promise<DropboxTypes$files$ListFolderResult>;
 
-//     filesUpload(arg: DropboxTypes$files$CommitInfo): Promise<DropboxTypes$files$FileMetadata>;
+    filesUpload(arg: DropboxTypes$files$CommitInfo): Promise<DropboxTypes$files$FileMetadata>;
 
-//     filesDelete(arg: DropboxTypes$files$DeleteArg):
-//       Promise<DropboxTypes$files$FileMetadataReference|DropboxTypes$files$FolderMetadataReference|DropboxTypes$files$DeletedMetadataReference>;
+    filesDelete(arg: DropboxTypes$files$DeleteArg):
+      Promise<DropboxTypes$files$FileMetadataReference|DropboxTypes$files$FolderMetadataReference|DropboxTypes$files$DeletedMetadataReference>;
 
-//     filesDownload(arg: DropboxTypes$files$DownloadArg): Promise<DropboxTypes$files$FileMetadata & {fileBlob?: Blob}>;
-//   }
-// }
+    filesDownload(arg: DropboxTypes$files$DownloadArg): Promise<DropboxTypes$files$FileMetadata & {| fileBlob?: Blob |}>;
+  }
+}

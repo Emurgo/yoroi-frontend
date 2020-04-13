@@ -975,15 +975,12 @@ const utxoForAddresses = genUtxoForAddresses(
 );
 const utxoSumForAddresses = genUtxoSumForAddresses(utxoForAddresses);
 const sendTx = (request: SignedRequestInternal): SignedResponse => {
-  if (isShelley) {
-    const remoteTx = toRemoteJormungandrTx(transactions, request);
-    addTransaction(remoteTx);
-    return { txId: remoteTx.hash };
-  } else {
-    const remoteTx = toRemoteByronTx(transactions, request);
-    addTransaction(remoteTx);
-    return { txId: remoteTx.hash };
-  }
+  const remoteTx = isShelley
+    ? toRemoteJormungandrTx(transactions, request)
+    : toRemoteByronTx(transactions, request);
+
+  addTransaction(remoteTx);
+  return { txId: remoteTx.hash };
 };
 const getAccountState = genGetAccountState(transactions);
 const getPoolInfo = genGetPoolInfo(transactions);

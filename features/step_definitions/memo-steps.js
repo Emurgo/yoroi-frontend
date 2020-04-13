@@ -1,10 +1,7 @@
 // @flow
 
-import { Then, When, Given } from 'cucumber';
-import { By } from 'selenium-webdriver';
+import { Then, } from 'cucumber';
 import chai from 'chai';
-import moment from 'moment';
-import i18n from '../support/helpers/i18n-helpers';
 import { MAX_MEMO_SIZE } from '../../app/config/externalStorageConfig';
 
 Then(

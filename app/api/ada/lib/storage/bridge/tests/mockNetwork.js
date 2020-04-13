@@ -576,7 +576,7 @@ export function toRemoteByronTx(
   };
 }
 
-export function toRemoteShelleyTx(
+export function toRemoteJormungandrTx(
   blockchain: Array<RemoteTransaction>,
   request: SignedRequestInternal,
 ): RemoteTransaction {
