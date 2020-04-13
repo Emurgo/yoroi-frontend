@@ -102,6 +102,17 @@ Then(
   }
 );
 
+When(
+  /^I expand the top transaction$/,
+  async function () {
+    await this.waitForElement('.Transaction_component');
+    const actualTxsList = await this.getElementsBy('.Transaction_component');
+    const topTx = actualTxsList[0];
+
+    await topTx.click();
+  }
+);
+
 Then(
   /^I verify top transaction content ([^"]*)$/,
   async function (walletName) {

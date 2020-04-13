@@ -427,14 +427,21 @@ export default class Transaction extends Component<Props, State> {
                     <button
                       type="button"
                       onClick={onEditMemo.bind(this, data)}
-                      className={styles.editButton}
+                      className={classnames(
+                        styles.editButton,
+                        'editMemoButton' // for tests
+                      )}
                     >
                       <div className={styles.editMemoIcon}>
                         <EditSvg />
                       </div>
                     </button>
                   </h2>
-                  <span className={styles.rowData}>
+                  <span className={classnames(
+                    styles.rowData,
+                    'memoContent', // for tests
+                  )}
+                  >
                     {this.props.memo?.Content}
                   </span>
                 </div>
@@ -444,6 +451,7 @@ export default class Transaction extends Component<Props, State> {
                     <button
                       type="button"
                       onClick={onAddMemo.bind(this, data)}
+                      className="addMemoButton" // for tests
                     >
                       <div>
                         <span className={styles.addMemoIcon}>

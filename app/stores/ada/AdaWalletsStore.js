@@ -63,23 +63,24 @@ export default class AdaWalletsStore extends Store {
         transactionDetails.publicDeriver
       ),
     })
-      .then((response) => {
+      .then(async (response) => {
         const memo = this.stores.substores.ada.transactionBuilderStore.memo;
         if (memo !== '' && memo !== undefined) {
-          this.actions.memos.saveTxMemo.trigger({
-            publicDeriver: transactionDetails.publicDeriver,
-            memo: {
-              Content: memo,
-              TransactionHash: response.txId,
-              LastUpdated: new Date(),
-            },
-          });
+          try {
+            await this.actions.memos.saveTxMemo.trigger({
+              publicDeriver: transactionDetails.publicDeriver,
+              memo: {
+                Content: memo,
+                TransactionHash: response.txId,
+                LastUpdated: new Date(),
+              },
+            });
+          } catch (error) {
+            Logger.error('AdaWalletsStore::_sendMoney error: ' + stringifyError(error));
+            throw new Error('An error has ocurred when saving the transaction memo.');
+          }
         }
         return response;
-      })
-      .catch(error => {
-        Logger.error('AdaWalletsStore::_sendMoney error: ' + stringifyError(error));
-        throw new Error('An error has ocurred when saving the transaction memo.');
       });
 
     this.actions.dialogs.closeActiveDialog.trigger();

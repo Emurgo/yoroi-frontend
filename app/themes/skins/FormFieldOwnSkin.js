@@ -81,7 +81,7 @@ export const FormFieldOwnSkin = class extends React.Component<Props, State> {
               </button>
             ) : null}
             {this.props.type === 'memo' && !this.props.error ? (
-              <button tabIndex="-1" type="button" onClick={this.props.onDelete}>
+              <button tabIndex="-1" type="button" onClick={this.props.onDelete} className="deleteContent">
                 <DeleteMemoSvg />
               </button>
             ) : null}

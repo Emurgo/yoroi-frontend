@@ -381,6 +381,7 @@ export default class WalletSendForm extends Component<Props> {
           ) : (
             <div className={styles.memoActionItemBlock}>
               <button
+                className="addMemoButton"
                 type="button"
                 onClick={onAddMemo}
               >

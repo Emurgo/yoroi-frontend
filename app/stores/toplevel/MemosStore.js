@@ -118,7 +118,6 @@ export default class MemosStore extends Store {
     const { selected } = this.stores.wallets;
     if (selected == null) return undefined;
     const walletId = this.getIdForWallet(selected);
-    console.log(walletId);
     const memos = this.txMemoMap.get(walletId);
     if (memos != null) return;
 

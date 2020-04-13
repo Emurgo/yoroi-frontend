@@ -439,7 +439,7 @@ function getAccountBalance(
   }
   return value;
 }
-function getInputs(
+function getJormungandrInputs(
   blockchain: Array<RemoteTransaction>,
   inputs: RustModule.WalletV3.Inputs
 ): Array<RemoteTransactionInput> {
@@ -454,7 +454,7 @@ function getInputs(
 
       const pointedTx = blockchain.find(tx => tx.hash === hash);
       if (pointedTx == null) {
-        throw new Error(`${nameof(getInputs)} no tx found ${hash}`);
+        throw new Error(`${nameof(getJormungandrInputs)} no tx found ${hash}`);
       }
       const pointedOutput = pointedTx.outputs[index];
       const addressKind = addressToKind(pointedOutput.address, 'bytes');
@@ -499,7 +499,7 @@ function getInputs(
       });
       continue;
     }
-    throw new Error(`${nameof(getInputs)} unexpected input type ${input.get_type()}`);
+    throw new Error(`${nameof(getJormungandrInputs)} unexpected input type ${input.get_type()}`);
   }
   return result;
 }
@@ -518,7 +518,65 @@ function getOutputs(
   return result;
 }
 
-export function toRemoteTx(
+function getByronInputs(
+  blockchain: Array<RemoteTransaction>,
+  inputs: Array<TxoPointerType>
+): Array<RemoteTransactionInput> {
+  const result: Array<RemoteTransactionInput> = [];
+  for (const input of inputs) {
+    const pointedTx = blockchain.find(tx => tx.hash === input.id);
+    if (pointedTx == null) {
+      throw new Error(`${nameof(getJormungandrInputs)} no tx found ${input.id}`);
+    }
+    const pointedOutput = pointedTx.outputs[input.index];
+    const addressKind = addressToKind(pointedOutput.address, 'bytes');
+    if (addressKind === CoreAddressTypes.CARDANO_LEGACY) {
+      result.push({
+        address: pointedOutput.address,
+        amount: pointedOutput.amount,
+        id: input.id + input.index,
+        index: input.index,
+        txHash: input.id,
+      });
+    } else {
+      throw new Error(`${nameof(getByronInputs)} unexpected type ${addressKind}`);
+    }
+  }
+  return result;
+}
+
+export function toRemoteByronTx(
+  blockchain: Array<RemoteTransaction>,
+  request: SignedRequestInternal,
+): RemoteTransaction {
+  const signedTx = RustModule.WalletV2.SignedTransaction
+    .from_bytes(Buffer.from(request.signedTx, 'base64'));
+  const hash = signedTx.id();
+  const transaction = signedTx.to_json().tx;
+
+  const base = {
+    hash,
+    last_update: new Date().toString(),
+    tx_state: 'Pending',
+    inputs: getByronInputs(blockchain, transaction.inputs),
+    outputs: transaction.outputs.map(output => ({
+      address: output.address,
+      amount: output.value.toString(),
+    })),
+  };
+
+  return {
+    ...base,
+    height: null,
+    block_hash: null,
+    tx_ordinal: null,
+    time: null,
+    epoch: null,
+    slot: null,
+  };
+}
+
+export function toRemoteShelleyTx(
   blockchain: Array<RemoteTransaction>,
   request: SignedRequestInternal,
 ): RemoteTransaction {
@@ -531,7 +589,7 @@ export function toRemoteTx(
     hash,
     last_update: new Date().toString(),
     tx_state: 'Pending',
-    inputs: getInputs(blockchain, transaction.inputs()),
+    inputs: getJormungandrInputs(blockchain, transaction.inputs()),
     outputs: getOutputs(blockchain, transaction.outputs()),
     certificate: getCertificate(transaction.certificate()),
   };

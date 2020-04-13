@@ -174,10 +174,7 @@ const genPropsForTransactions: {|
     isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
   },
   uiDialogs: {
-    isOpen: (dialog) => {
-      console.log(request.dialog);
-      return dialog === request.dialog;
-    },
+    isOpen: (dialog) => dialog === request.dialog,
     getParam: () => (undefined: any)
   },
   uiNotifications: {
