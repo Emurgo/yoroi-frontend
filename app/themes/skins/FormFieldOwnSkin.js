@@ -80,12 +80,12 @@ export const FormFieldOwnSkin = class extends React.Component<Props, State> {
                   : <PasswordHiddenSvg />}
               </button>
             ) : null}
+            {this.props.type === 'memo' && !this.props.error ? (
+              <button tabIndex="-1" type="button" onClick={this.props.onDelete}>
+                <DeleteMemoSvg />
+              </button>
+            ) : null}
           </div>
-          {this.props.type === 'memo' && !this.props.error ? (
-            <button tabIndex="-1" type="button" onClick={this.props.onDelete}>
-              <DeleteMemoSvg />
-            </button>
-          ) : null}
           {this.props.render(omit(renderProps, ['themeId']))}
           {this.props.label && (
             // eslint-disable-next-line

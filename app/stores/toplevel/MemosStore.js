@@ -34,7 +34,7 @@ export default class MemosStore extends Store {
   }
 
   @observable error: ?LocalizableError = null;
-  @observable selectedTransaction: WalletTransaction;
+  @observable selectedTransaction: void | WalletTransaction;
 
   @observable getExternalStorageProviderRequest:
     Request<void => Promise<?SelectedExternalStorageProvider>>

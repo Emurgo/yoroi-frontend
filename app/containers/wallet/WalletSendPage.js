@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { action, computed, observable } from 'mobx';
+import { action, computed, observable, runInAction } from 'mobx';
 import type { Node } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
@@ -80,6 +80,12 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
   };
 
   @observable showMemo: boolean = false;
+
+  componentDidMount() {
+    runInAction(() => {
+      this.showMemo = this.generated.initialShowMemoState;
+    });
+  }
 
   @action
   toggleShowMemo = () => {
@@ -399,6 +405,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           },
         },
       },
+      initialShowMemoState: (false: boolean),
       WalletSendConfirmationDialogContainerProps: (
         { actions, stores, }: InjectedOrGenerated<WalletSendConfirmationDialogContainerData>
       ),

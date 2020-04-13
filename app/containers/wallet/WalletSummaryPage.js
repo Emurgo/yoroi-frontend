@@ -73,7 +73,6 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
     const { uiDialogs, profile, memos } = this.generated.stores;
     if (searchOptions) {
       const { limit } = searchOptions;
-      console.log(this.generated.stores.memos.txMemoMap.get(walletId));
       const noTransactionsFoundLabel = intl.formatMessage(globalMessages.noTransactionsFound);
       if (!recentTransactionsRequest.wasExecuted || hasAny) {
         const { assuranceMode } = this.generated.stores.substores.ada.walletSettings
@@ -156,7 +155,10 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
         {uiDialogs.isOpen(AddMemoDialog) ? (
           <AddMemoDialog
             selectedWallet={publicDeriver}
-            selectedTransaction={memos.selectedTransaction}
+            selectedTransaction={(() => {
+              if (memos.selectedTransaction == null) throw new Error('no selected transaction. Should never happen');
+              return memos.selectedTransaction;
+            })()}
             error={memos.error}
             onCancel={actions.memos.closeMemoDialog.trigger}
             onSubmit={(values) => {
@@ -184,9 +186,11 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
           <EditMemoDialog
             selectedWallet={publicDeriver}
             existingMemo={(() => {
+              if (memos.selectedTransaction == null) throw new Error('no selected transaction. Should never happen');
+              const txid = memos.selectedTransaction.txid;
               const memo = this.generated.stores.memos.txMemoMap
                 .get(walletId)
-                ?.get(memos.selectedTransaction.txid);
+                ?.get(txid);
               if (memo == null) throw new Error('Should never happen');
               return memo;
             })()}
@@ -202,7 +206,10 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
 
         {uiDialogs.isOpen(DeleteMemoDialog) ? (
           <DeleteMemoDialog
-            selectedTransaction={memos.selectedTransaction}
+            selectedTransaction={(() => {
+              if (memos.selectedTransaction == null) throw new Error('no selected transaction. Should never happen');
+              return memos.selectedTransaction;
+            })()}
             error={memos.error}
             onCancel={() => {
               actions.memos.closeMemoDialog.trigger();

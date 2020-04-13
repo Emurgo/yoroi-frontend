@@ -227,6 +227,17 @@
     .editButton {
       cursor: pointer;
       margin-left: 6px;
+
+      .editMemoIcon {
+        cursor: pointer;
+        display: inline-flex;
+        object-fit: contain;
+        vertical-align: bottom;
+        & > svg {
+          height: 15px;
+          width: 15px;
+        }
+      }
     }
 
     .memoActionItemBlock {
@@ -259,16 +270,6 @@
         & > svg {
           height: 20px;
           width: 20px;
-        }
-      }
-
-      .editMemoIcon {
-        cursor: pointer;
-        display: inline-flex;
-        object-fit: contain;
-        & > svg {
-          height: 15px;
-          width: 15px;
         }
       }
     }
