@@ -26,6 +26,10 @@ const messages = defineMessages({
     id: 'settings.menu.termsOfUse.link.label',
     defaultMessage: '!!!Terms of use',
   },
+  externalStorage: {
+    id: 'settings.menu.externalStorage.link.label',
+    defaultMessage: '!!!External Storage',
+  },
 });
 
 type Props = {|
@@ -71,6 +75,15 @@ export default class SettingsMenu extends Component<Props> {
             active={isActiveItem(ROUTES.SETTINGS.WALLET)}
             className="wallet"
           />
+
+          {!environmnent.isProduction() &&
+            <SettingsMenuItem
+              label={intl.formatMessage(messages.externalStorage)}
+              onClick={() => onItemClick(ROUTES.SETTINGS.EXTERNAL_STORAGE)}
+              active={isActiveItem(ROUTES.SETTINGS.EXTERNAL_STORAGE)}
+              className="externalStorage"
+            />
+          }
 
           <SettingsMenuItem
             label={intl.formatMessage(messages.termsOfUse)}

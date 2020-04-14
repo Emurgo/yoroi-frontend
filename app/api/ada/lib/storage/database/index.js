@@ -23,6 +23,7 @@ import { populateUtxoTransactionsDb } from './transactionModels/utxo/tables';
 import { populateAccountingTransactionsDb } from './transactionModels/account/tables';
 import { populateMultipartTransactionsDb } from './transactionModels/multipart/tables';
 import { populateWalletDb } from './walletTypes/core/tables';
+import { populateMemoTransactionsDb } from './memos/tables';
 
 declare var indexedDB;
 
@@ -73,7 +74,7 @@ export const loadLovefieldDB = async (
 const populateAndCreate = async (
   storeType: $Values<typeof schema.DataStoreType>
 ): Promise<lf$Database> => {
-  const schemaBuilder = schema.create('yoroi-schema', 5);
+  const schemaBuilder = schema.create('yoroi-schema', 6);
 
   populatePrimitivesDb(schemaBuilder);
   populateWalletDb(schemaBuilder);
@@ -83,6 +84,7 @@ const populateAndCreate = async (
   populateUtxoTransactionsDb(schemaBuilder);
   populateAccountingTransactionsDb(schemaBuilder);
   populateMultipartTransactionsDb(schemaBuilder);
+  populateMemoTransactionsDb(schemaBuilder);
 
   return await schemaBuilder.connect({
     storeType,
@@ -155,6 +157,8 @@ async function onUpgrade(
       'RootKeyDerivationId',
       1
     );
+  } if (version === 5) {
+    // nothing to do. Just adds a new table
   } else {
     throw new Error('unexpected version number');
   }

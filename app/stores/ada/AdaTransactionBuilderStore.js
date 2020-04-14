@@ -53,6 +53,8 @@ export default class AdaTransactionBuilderStore extends Store {
   @observable createUnsignedTx: LocalizedRequest<CreateUnsignedTxFunc>
     = new LocalizedRequest<CreateUnsignedTxFunc>(this.api.ada.createUnsignedTx);
 
+  @observable memo: void | string;
+
   @observable setupSelfTx: LocalizedRequest<SetupSelfTxFunc>
     = new LocalizedRequest<SetupSelfTxFunc>(this._setupSelfTx);
 
@@ -63,6 +65,7 @@ export default class AdaTransactionBuilderStore extends Store {
     actions.updateReceiver.listen(this._updateReceiver);
     actions.setFilter.listen(this._setFilter);
     actions.updateAmount.listen(this._updateAmount);
+    actions.updateMemo.listen(this._updateMemo);
     actions.updateTentativeTx.listen(this._updateTentativeTx);
     actions.toggleSendAll.listen(this._toggleSendAll);
     actions.reset.listen(this._reset);
@@ -247,6 +250,11 @@ export default class AdaTransactionBuilderStore extends Store {
   }
 
   @action
+  _updateMemo: (void | string) => void = (content) => {
+    this.memo = content;
+  }
+
+  @action
   _updateTentativeTx: void => void = () => {
     if (!this.plannedTx) {
       this.tentativeTx = null;
@@ -259,6 +267,7 @@ export default class AdaTransactionBuilderStore extends Store {
   _reset: void => void = () => {
     this.plannedTxInfo = [{ address: undefined, value: undefined }];
     this.shouldSendAll = false;
+    this.memo = undefined;
     this.filter = () => true;
     this.createUnsignedTx.cancel();
     this.createUnsignedTx.reset();

@@ -2,17 +2,20 @@
 import type { lf$Database, } from 'lovefield';
 import AdaApi from './ada/index';
 import LocalStorageApi from './localStorage/index';
+import ExternalStorageApi from './externalStorage/index';
 import ExportApi from './export/index';
 
 export type Api = {|
   ada: AdaApi,
   localStorage: LocalStorageApi,
+  externalStorage: ExternalStorageApi,
   export: ExportApi,
 |};
 
 export const setupApi = async (): Promise<Api> => ({
   ada: new AdaApi(),
   localStorage: new LocalStorageApi(),
+  externalStorage: new ExternalStorageApi(),
   export: new ExportApi(),
 });
 

@@ -29,7 +29,7 @@ export default class WalletTransaction {
   @observable type: TransactionDirectionType;
   @observable amount: BigNumber; // fee included
   @observable fee: BigNumber;
-  @observable date: Date;
+  @observable date: Date; // TODO: remove?
   /** todo: remove and instead infer from Block member variable */
   @observable numberOfConfirmations: number = 0;
   @observable addresses: TransactionAddresses = { from: [], to: [] };

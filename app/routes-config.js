@@ -30,6 +30,7 @@ export const ROUTES = {
     GENERAL: '/settings/general',
     PAPER_WALLET: '/settings/paper-wallet',
     WALLET: '/settings/wallet',
+    EXTERNAL_STORAGE: '/settings/external-storage',
     TERMS_OF_USE: '/settings/terms-of-use',
     SUPPORT: '/settings/support',
   },
@@ -40,6 +41,13 @@ export const ROUTES = {
   },
   SEND_FROM_URI: {
     ROOT: '/send-from-uri',
+  },
+  STAKING: {
+    ROOT: '/staking'
+  },
+  OAUTH_FROM_EXTERNAL: {
+    DROPBOX: '/foo', // TODO: think about this. GET params don't work well with react-router I think
+    // DROPBOX: '/access_token=:token&token_type=:token_type&uid=:uid&account_id=:account_id',
   },
   NOTICE_BOARD: {
     ROOT: '/notice-board',

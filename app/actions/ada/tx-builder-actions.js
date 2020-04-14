@@ -7,6 +7,7 @@ import type {
 export default class TxBuilderActions {
   updateReceiver: Action<void | string> = new Action();
   updateAmount: Action<void | number> = new Action();
+  updateMemo: Action<void | string> = new Action();
   updateTentativeTx: Action<void> = new Action();
   setFilter: Action<(ElementOf<IGetAllUtxosResponse> => boolean)> = new Action();
   toggleSendAll: Action<void> = new Action();

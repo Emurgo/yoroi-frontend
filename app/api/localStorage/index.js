@@ -1,5 +1,5 @@
 // @flow
-
+import type { SelectedExternalStorageProvider } from '../../domain/ExternalStorage';
 import environment from '../../environment';
 
 import {
@@ -21,6 +21,7 @@ const storageKeys = {
   CUSTOM_THEME: networkForLocalStorage + '-CUSTOM-THEME',
   VERSION: networkForLocalStorage + '-LAST-LAUNCH-VER',
   HIDE_BALANCE: networkForLocalStorage + '-HIDE-BALANCE',
+  EXTERNAL_STORAGE: networkForLocalStorage + '-EXTERNAL-STORAGE',
   TOGGLE_SIDEBAR: networkForLocalStorage + '-TOGGLE-SIDEBAR',
 };
 
@@ -170,12 +171,31 @@ export default class LocalStorageApi {
 
   unsetToggleSidebar: void => Promise<void> = () => removeLocalItem(storageKeys.TOGGLE_SIDEBAR);
 
+  // ============ External storage provider ============ //
+
+  getExternalStorage: void => Promise<?SelectedExternalStorageProvider> = () => getLocalItem(
+    storageKeys.EXTERNAL_STORAGE
+  ).then((result) => {
+    if (result === undefined || result === null) return null;
+    return JSON.parse(result);
+  });
+
+  setExternalStorage: SelectedExternalStorageProvider => Promise<void> = (provider) => setLocalItem(
+    storageKeys.EXTERNAL_STORAGE, JSON.stringify(provider)
+  );
+
+  unsetExternalStorage: void => Promise<void> = () => removeLocalItem(storageKeys.EXTERNAL_STORAGE);
+
+
+  // =========== Common =============== //
+
   async reset(): Promise<void> {
     await this.unsetUserLocale();
     await this.unsetTermsOfUseAcceptance();
     await this.unsetUserTheme();
     await this.unsetLastLaunchVersion();
     await this.unsetHideBalance();
+    await this.unsetExternalStorage();
     await this.unsetToggleSidebar();
   }
 

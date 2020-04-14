@@ -20,6 +20,8 @@ import type { GeneratedData as SettingsData } from './containers/settings/Settin
 import GeneralSettingsPage from './containers/settings/categories/GeneralSettingsPage';
 import PaperWalletPage from './containers/settings/categories/PaperWalletPage';
 import WalletSettingsPage from './containers/settings/categories/WalletSettingsPage';
+import ExternalStorageSettingsPage from './containers/settings/categories/ExternalStorageSettingsPage';
+import OAuthDropboxPage from './containers/settings/categories/OAuthDropboxPage';
 import TermsOfUseSettingsPage from './containers/settings/categories/TermsOfUseSettingsPage';
 import SupportSettingsPage from './containers/settings/categories/SupportSettingsPage';
 
@@ -115,6 +117,11 @@ export const Routes = (
       />
       <Route
         exact
+        path={ROUTES.OAUTH_FROM_EXTERNAL.DROPBOX}
+        component={(props) => <OAuthDropboxPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
         path={ROUTES.NOTICE_BOARD.ROOT}
         component={(props) => <NoticeBoardPage {...props} stores={stores} actions={actions} />}
       />
@@ -188,6 +195,11 @@ const SettingsSubpages = (stores, actions) => (
       exact
       path={ROUTES.SETTINGS.WALLET}
       component={(props) => <WalletSettingsPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.SETTINGS.EXTERNAL_STORAGE}
+      component={(props) => <ExternalStorageSettingsPage {...props} stores={stores} actions={actions} />}
     />
     <Route
       exact

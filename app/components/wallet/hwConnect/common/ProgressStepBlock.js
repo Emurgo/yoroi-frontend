@@ -8,10 +8,6 @@ import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 import globalMessages from '../../../../i18n/global-messages';
 
 const messages = defineMessages({
-  stepConnectLabel: {
-    id: 'wallet.connect.hw.dialog.step.connect.label',
-    defaultMessage: '!!!CONNECT',
-  },
   stepSaveLabel: {
     id: 'wallet.connect.hw.dialog.step.save.label',
     defaultMessage: '!!!SAVE',
@@ -38,7 +34,7 @@ export default class ProgressStepBlock extends Component<Props> {
       <ProgressSteps
         stepsList={[
           intl.formatMessage(globalMessages.checkLabel),
-          intl.formatMessage(messages.stepConnectLabel),
+          intl.formatMessage(globalMessages.hwConnectDialogConnectButtonLabel),
           intl.formatMessage(messages.stepSaveLabel)
         ]}
         currentStep={progressInfo.currentStep}

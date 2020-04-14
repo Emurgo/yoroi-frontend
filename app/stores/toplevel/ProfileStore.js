@@ -96,6 +96,11 @@ export default class ProfileStore extends Store {
       isDone: () => this.hasRedirected,
       action: async () => {
         const { wallets } = this.stores;
+
+        // note: we want to load memos BEFORE we start syncing wallets
+        // this is because syncing wallets will also try and sync memos with external storage
+        await this.stores.memos.loadFromStorage();
+
         await wallets.restoreWalletsFromStorage();
         if (wallets.hasAnyPublicDeriver && this.stores.loading.fromUriScheme) {
           this.actions.router.goToRoute.trigger({ route: ROUTES.SEND_FROM_URI.ROOT });
@@ -114,6 +119,9 @@ export default class ProfileStore extends Store {
               route: ROUTES.MY_WALLETS,
             });
           }
+        }
+        if (this.stores.loading.shouldRedirect) {
+          this.actions.loading.redirect.trigger();
         }
         runInAction(() => {
           this.hasRedirected = true;

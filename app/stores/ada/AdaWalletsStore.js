@@ -3,6 +3,10 @@ import { observable, action } from 'mobx';
 
 import Store from '../base/Store';
 import { matchRoute, buildRoute } from '../../utils/routing';
+import {
+  Logger,
+  stringifyError
+} from '../../utils/logging';
 import Request from '../lib/LocalizedRequest';
 import { ROUTES } from '../../routes-config';
 import type {
@@ -58,7 +62,26 @@ export default class AdaWalletsStore extends Store {
       refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(
         transactionDetails.publicDeriver
       ),
-    }).promise;
+    })
+      .then(async (response) => {
+        const memo = this.stores.substores.ada.transactionBuilderStore.memo;
+        if (memo !== '' && memo !== undefined) {
+          try {
+            await this.actions.memos.saveTxMemo.trigger({
+              publicDeriver: transactionDetails.publicDeriver,
+              memo: {
+                Content: memo,
+                TransactionHash: response.txId,
+                LastUpdated: new Date(),
+              },
+            });
+          } catch (error) {
+            Logger.error('AdaWalletsStore::_sendMoney error: ' + stringifyError(error));
+            throw new Error('An error has ocurred when saving the transaction memo.');
+          }
+        }
+        return response;
+      });
 
     this.actions.dialogs.closeActiveDialog.trigger();
     this.sendMoneyRequest.reset();

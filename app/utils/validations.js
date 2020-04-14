@@ -2,19 +2,20 @@
 import BigNumber from 'bignumber.js';
 import isInt from 'validator/lib/isInt';
 import { TOTAL_SUPPLY } from '../config/numbersConfig';
+import { MAX_MEMO_SIZE } from '../config/externalStorageConfig';
 
-export const isValidWalletName = (walletName: string) => {
+export const isValidWalletName: string => boolean = (walletName) => {
   const nameLength = walletName.length;
   return nameLength >= 1 && nameLength <= 40;
 };
 
-export const isValidPaperPassword = (paperPassword: string) => (
+export const isValidPaperPassword: string => boolean = (paperPassword) => (
   isValidWalletPassword(paperPassword)
 );
 
-export const isValidWalletPassword = (walletPassword: string) => (
+export const isValidWalletPassword: string => boolean = (walletPassword) => (
   /**
-   * No special chracter requirement: https://xkcd.com/936/
+   * No special character requirement: https://xkcd.com/936/
    *
    * We pick 10 letters as the requirement because Daedalus password requirements are:
    * - 10 characters long
@@ -30,14 +31,23 @@ export const isValidWalletPassword = (walletPassword: string) => (
 );
 
 // eslint-disable-next-line max-len
-export const isValidRepeatPassword = (
-  walletPassword: string,
-  repeatPassword: string
+export const isValidRepeatPassword: (string, string) => boolean = (
+  walletPassword,
+  repeatPassword
 ) => walletPassword === repeatPassword;
 
-export const isNotEmptyString = (value: string) => value !== '';
+export const isNotEmptyString: string => boolean = (value) => value !== '';
 
-export const isValidAmountInLovelaces = (value: string) => {
+export const isValidMemo: string => boolean = (memo) => (
+  memo !== ''
+  && memo.length <= MAX_MEMO_SIZE
+);
+
+export const isValidMemoOptional: string => boolean = (memo) => (
+  memo.length <= MAX_MEMO_SIZE
+);
+
+export const isValidAmountInLovelaces: string => boolean = (value) => {
   const isNumeric = isInt(value, { allow_leading_zeroes: false });
   if (!isNumeric) return false;
   const numericValue = new BigNumber(value);

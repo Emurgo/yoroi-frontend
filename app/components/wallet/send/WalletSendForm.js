@@ -11,16 +11,19 @@ import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
 import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
 import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
 import { defineMessages, intlShape } from 'react-intl';
+import { isValidMemoOptional, isValidMemo } from '../../../utils/validations';
 import BigNumber from 'bignumber.js';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import AmountInputSkin from '../skins/AmountInputSkin';
+import AddMemoSvg from '../../../assets/images/add-memo.inline.svg';
 import BorderedBox from '../../widgets/BorderedBox';
 import styles from './WalletSendForm.scss';
-import globalMessages, { environmentSpecificMessages } from '../../../i18n/global-messages';
+import globalMessages, { memoMessages, environmentSpecificMessages } from '../../../i18n/global-messages';
 import environment from '../../../environment';
 import type { UriParams } from '../../../utils/URIHandling';
 import { getAddressPayload } from '../../../api/ada/lib/storage/bridge/utils';
+import { MAX_MEMO_SIZE } from '../../../config/externalStorageConfig';
 
 import {
   formattedWalletAmount,
@@ -90,6 +93,10 @@ const messages = defineMessages({
     id: 'wallet.send.form.sendingIsDisabled',
     defaultMessage: '!!!Cannot send a transaction while there is a pending one',
   },
+  memoInvalidOptional: {
+    id: 'wallet.transaction.memo.optional.invalid',
+    defaultMessage: '!!!Memo cannot be more than {maxMemo} characters.',
+  },
   cannotSendtoLegacy: {
     id: 'wallet.send.form.cannotSendToLegacy',
     defaultMessage: '!!!You cannot send to legacy addresses (any address created before November 29th, 2019)',
@@ -109,6 +116,7 @@ type Props = {|
   +classicTheme: boolean,
   +updateReceiver: (void | string) => void,
   +updateAmount: (void | number) => void,
+  +updateMemo: (void | string) => void,
   +shouldSendAll: boolean,
   +toggleSendAll: void => void,
   +fee: ?BigNumber,
@@ -117,6 +125,8 @@ type Props = {|
   +error: ?LocalizableError,
   +uriParams: ?UriParams,
   +resetUriParams: void => void,
+  +showMemo: boolean,
+  +onAddMemo: void => void,
 |};
 
 @observer
@@ -234,6 +244,25 @@ export default class WalletSendForm extends Component<Props> {
           return [isValidAmount, this.context.intl.formatMessage(messages.invalidAmount)];
         }],
       },
+      memo: {
+        label: this.context.intl.formatMessage(memoMessages.memoLabel),
+        placeholder: this.context.intl.formatMessage(memoMessages.optionalMemo),
+        value: '',
+        validators: [({ field }) => {
+          const memoContent = field.value;
+          const isValid = isValidMemoOptional(memoContent);
+          if (isValid) {
+            this.props.updateMemo(memoContent);
+          }
+          return [
+            isValid,
+            this.context.intl.formatMessage(
+              messages.memoInvalidOptional,
+              { maxMemo: MAX_MEMO_SIZE, }
+            )
+          ];
+        }],
+      },
     },
   }, {
     options: {
@@ -251,17 +280,20 @@ export default class WalletSendForm extends Component<Props> {
   render() {
     const { form } = this;
     const { intl } = this.context;
-
+    const { memo } = this.form.values();
     const {
       currencyUnit,
       currencyMaxIntegerDigits,
       currencyMaxFractionalDigits,
       hasAnyPending,
       classicTheme,
+      showMemo,
+      onAddMemo
     } = this.props;
 
     const amountField = form.$('amount');
     const receiverField = form.$('receiver');
+    const memoField = form.$('memo');
     const amountFieldProps = amountField.bind();
 
     const transactionFee = this.props.fee || new BigNumber(0);
@@ -285,7 +317,6 @@ export default class WalletSendForm extends Component<Props> {
     if (this.props.error) {
       transactionFeeError = this.context.intl.formatMessage(this.props.error);
     }
-
 
     return (
       <div className={styles.component}>
@@ -337,6 +368,35 @@ export default class WalletSendForm extends Component<Props> {
             />
           </div>
 
+          {showMemo ? (
+            <div className={styles.memoInput}>
+              <Input
+                className="memo"
+                {...memoField.bind()}
+                error={memoField.error}
+                skin={InputOwnSkin}
+                done={isValidMemo(memo)}
+              />
+            </div>
+          ) : (
+            <div className={styles.memoActionItemBlock}>
+              <button
+                className="addMemoButton"
+                type="button"
+                onClick={onAddMemo}
+              >
+                <div>
+                  <span className={styles.addMemoIcon}>
+                    <AddMemoSvg />
+                  </span>
+                  <span className={styles.actionLabel}>
+                    {intl.formatMessage(memoMessages.addMemo)}
+                  </span>
+                </div>
+              </button>
+            </div>
+          )}
+
           {this._makeInvokeConfirmationButton()}
 
         </BorderedBox>
@@ -347,6 +407,7 @@ export default class WalletSendForm extends Component<Props> {
 
   _makeInvokeConfirmationButton(): Node {
     const { intl } = this.context;
+    const { memo } = this.form.values();
 
     const buttonClasses = classnames([
       'primary',
@@ -357,6 +418,12 @@ export default class WalletSendForm extends Component<Props> {
       hasAnyPending,
     } = this.props;
 
+    const disabledCondition = (
+      !this.props.fee
+      || hasAnyPending
+      || !isValidMemoOptional(memo)
+    );
+
     return (
       <Button
         className={buttonClasses}
@@ -364,7 +431,7 @@ export default class WalletSendForm extends Component<Props> {
         onMouseUp={this.props.onSubmit}
         /** Next Action can't be performed in case transaction fees are not calculated
           * or there's a transaction waiting to be confirmed (pending) */
-        disabled={!this.props.fee || hasAnyPending}
+        disabled={disabledCondition}
         skin={ButtonSkin}
       />);
   }

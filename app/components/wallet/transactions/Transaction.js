@@ -12,8 +12,10 @@ import classnames from 'classnames';
 import { uniq } from 'lodash';
 import styles from './Transaction.scss';
 import AdaSymbol from '../../../assets/images/ada-symbol.inline.svg';
+import AddMemoSvg from '../../../assets/images/add-memo.inline.svg';
+import EditSvg from '../../../assets/images/edit.inline.svg';
 import WalletTransaction from '../../../domain/WalletTransaction';
-import globalMessages, { environmentSpecificMessages } from '../../../i18n/global-messages';
+import globalMessages, { memoMessages, environmentSpecificMessages } from '../../../i18n/global-messages';
 import type { TransactionDirectionType, } from '../../../api/ada/transactions/types';
 import { transactionTypes } from '../../../api/ada/transactions/types';
 import type { AssuranceLevel } from '../../../types/transactionAssuranceTypes';
@@ -28,6 +30,7 @@ import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/util
 import type { CertificateRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { splitAmount } from '../../../utils/formatters';
+import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
 
 const messages = defineMessages({
   type: {
@@ -143,11 +146,14 @@ const stateTranslations = defineMessages({
 
 type Props = {|
   +data: WalletTransaction,
+  +memo: void | $ReadOnly<TxMemoTableRow>,
   +state: TxStatusCodesType,
   +selectedExplorer: ExplorerType,
   +assuranceLevel: AssuranceLevel,
   +isLastInList: boolean,
   +shouldHideBalance: boolean,
+  +onAddMemo: WalletTransaction => void,
+  +onEditMemo: WalletTransaction => void,
 |};
 
 type State = {|
@@ -256,7 +262,13 @@ export default class Transaction extends Component<Props, State> {
 
   render() {
     const data = this.props.data;
-    const { isLastInList, state, assuranceLevel } = this.props;
+    const {
+      isLastInList,
+      state,
+      assuranceLevel,
+      onAddMemo,
+      onEditMemo,
+    } = this.props;
     const { isExpanded } = this.state;
     const { intl } = this.context;
     const isFailedTransaction = state < 0;
@@ -406,6 +418,51 @@ export default class Transaction extends Component<Props, State> {
                   {data.txid}
                 </span>
               </ExplorableHashContainer>
+
+              {this.props.memo != null ? (
+                <div className={styles.row}>
+                  <h2>
+                    {intl.formatMessage(memoMessages.memoLabel)}
+
+                    <button
+                      type="button"
+                      onClick={onEditMemo.bind(this, data)}
+                      className={classnames(
+                        styles.editButton,
+                        'editMemoButton' // for tests
+                      )}
+                    >
+                      <div className={styles.editMemoIcon}>
+                        <EditSvg />
+                      </div>
+                    </button>
+                  </h2>
+                  <span className={classnames(
+                    styles.rowData,
+                    'memoContent', // for tests
+                  )}
+                  >
+                    {this.props.memo?.Content}
+                  </span>
+                </div>
+              ) : (
+                <div className={styles.row}>
+                  <div className={styles.memoActionItemBlock}>
+                    <button
+                      type="button"
+                      onClick={onAddMemo.bind(this, data)}
+                      className="addMemoButton" // for tests
+                    >
+                      <div>
+                        <span className={styles.addMemoIcon}>
+                          <AddMemoSvg />
+                        </span>
+                        <span>{intl.formatMessage(memoMessages.addMemo)}</span>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

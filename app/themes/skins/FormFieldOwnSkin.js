@@ -7,6 +7,7 @@ import ErrorSvg from '../../assets/images/input/exclamationmark.inline.svg';
 import PasswordSvg from '../../assets/images/input/password.watch.inline.svg';
 import PasswordHiddenSvg from '../../assets/images/input/password.hiden.inline.svg';
 import SuccessSvg from '../../assets/images/widget/tick-green.inline.svg';
+import DeleteMemoSvg from '../../assets/images/cross.inline.svg';
 import styles from './FormFieldOwnSkin.scss';
 
 // This type should be kept open (not "exact") because it is a react-polymorph skin
@@ -25,6 +26,7 @@ type Props = {
   +done?: boolean,
   +type: string,
   +focused: boolean,
+  +onDelete: void => void,
   ...
 };
 
@@ -76,6 +78,11 @@ export const FormFieldOwnSkin = class extends React.Component<Props, State> {
                 {isPasswordShown
                   ? <PasswordSvg />
                   : <PasswordHiddenSvg />}
+              </button>
+            ) : null}
+            {this.props.type === 'memo' && !this.props.error ? (
+              <button tabIndex="-1" type="button" onClick={this.props.onDelete} className="deleteContent">
+                <DeleteMemoSvg />
               </button>
             ) : null}
           </div>

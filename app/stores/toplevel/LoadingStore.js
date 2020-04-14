@@ -2,6 +2,7 @@
 import type { lf$Database, } from 'lovefield';
 import { schema, } from 'lovefield';
 import { action, observable, computed, when, runInAction } from 'mobx';
+import { pathToRegexp } from 'path-to-regexp';
 import Store from '../base/Store';
 import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
@@ -31,6 +32,8 @@ export default class LoadingStore extends Store {
    * null if app not opened from URI Scheme OR URI scheme was invalid
    */
   @observable _uriParams: ?UriParams = null;
+  @observable _shouldRedirect: boolean = false;
+  @observable _redirectUri: string = '';
 
   _originRoute: {|
     // internal route
@@ -49,6 +52,10 @@ export default class LoadingStore extends Store {
     = new Request<void => Promise<lf$Database>>(
       async () => await loadLovefieldDB(schema.DataStoreType.INDEXED_DB)
     );
+
+  setup(): void {
+    this.actions.loading.redirect.listen(this._redirect);
+  }
 
   load(): void {
     when(this._isRefresh, this._redirectToLoading);
@@ -98,6 +105,14 @@ export default class LoadingStore extends Store {
     return this._uriParams;
   }
 
+  @computed get shouldRedirect(): boolean {
+    return this._shouldRedirect;
+  }
+
+  @computed get redirectUri() : string {
+    return this._redirectUri;
+  }
+
   @action
   validateUriPath: void => Promise<void> = async (): Promise<void> => {
     if (this.fromUriScheme) {
@@ -127,9 +142,23 @@ export default class LoadingStore extends Store {
     this._originRoute = { route: '', location: '' };
   }
 
+  @action
+  _redirect: void => void = () => {
+    this._shouldRedirect = false;
+    this.actions.router.goToRoute.trigger({
+      route: this._redirectUri
+    });
+  }
+
+  _redirectRegex: RegExp = pathToRegexp(ROUTES.OAUTH_FROM_EXTERNAL.DROPBOX);
+
   _isRefresh: void => boolean = () => this.isLoading;
 
   _redirectToLoading: void => void = () => {
+    if (this._redirectRegex.test(this.stores.app.currentRoute)) {
+      this._shouldRedirect = true;
+      this._redirectUri = this.stores.app.currentRoute;
+    }
     // before redirecting, save origin route in case we need to come back to
     // it later (this is the case when user comes from a URI link)
     runInAction(() => {

@@ -8,7 +8,7 @@ import {
 import { SEIZA_URL, SEIZA_FOR_YOROI_URL } from './manifestEnvs';
 
 export const Version = {
-  Shelley: '2.6.5',
+  Shelley: '2.7.0',
   Byron: '1.10.0',
 };
 
@@ -46,6 +46,9 @@ export function genCSP(request: {|
 
     imgSrc.push(portToPermission(Ports.WebpackDev));
   }
+
+  connectSrc.push('https://api.dropboxapi.com');
+  connectSrc.push('https://content.dropboxapi.com');
 
   frameSrc.push(SEIZA_FOR_YOROI_URL);
   frameSrc.push(SEIZA_URL);

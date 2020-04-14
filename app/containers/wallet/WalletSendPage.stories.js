@@ -20,6 +20,7 @@ import {
   genTentativeTx,
 } from '../../../stories/helpers/StoryWrapper';
 import type { CacheValue } from '../../../stories/helpers/StoryWrapper';
+import MemoNoExternalStorageDialog from '../../components/wallet/memos/MemoNoExternalStorageDialog';
 import { wrapWallet } from '../../Routes';
 import { mockWalletProps } from './Wallet.mock';
 import { getDefaultExplorer } from '../../domain/Explorer';
@@ -47,8 +48,11 @@ const genBaseProps: {|
     sendMoneyRequest: *,
     transactionBuilderStore: *,
   |},
+  noExternalStorage?: boolean,
+  initialShowMemoState?: boolean,
   hwSend?: *,
 |} => * = (request) => ({
+  initialShowMemoState: request.initialShowMemoState || false,
   stores: {
     profile: {
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
@@ -57,17 +61,24 @@ const genBaseProps: {|
     wallets: {
       selected: request.wallet.publicDeriver,
     },
+    memos: {
+      hasSetSelectedExternalStorageProvider: false,
+    },
     loading: {
       uriParams: undefined,
       resetUriParams: action('resetUriParams'),
     },
     uiDialogs: {
+      getParam: () => (undefined: any),
       isOpen: (clazz) => {
         if (clazz === WalletSendConfirmationDialog) {
           return request.dialogInfo != null && request.hwSend == null;
         }
         if (clazz === HWSendConfirmationDialog) {
           return request.dialogInfo != null && request.hwSend != null;
+        }
+        if (clazz === MemoNoExternalStorageDialog) {
+          return request.noExternalStorage === true;
         }
         return false;
       },
@@ -109,6 +120,12 @@ const genBaseProps: {|
       open: { trigger: action('open') },
       closeActiveDialog: { trigger: action('closeActiveDialog') },
     },
+    router: {
+      goToRoute: { trigger: action('goToRoute') },
+    },
+    memos: {
+      closeMemoDialog: { trigger: action('closeMemoDialog') },
+    },
     ada: {
       ledgerSend: {
         init: { trigger: action('init') },
@@ -125,6 +142,7 @@ const genBaseProps: {|
         updateAmount: { trigger: action('updateAmount') },
         toggleSendAll: { trigger: action('toggleSendAll') },
         reset: { trigger: action('reset') },
+        updateMemo: { trigger: action('updateMemo') },
       },
     },
   },
@@ -178,6 +196,42 @@ export const UserInput = () => {
     (<WalletSendPage
       generated={genBaseProps({
         wallet,
+      })}
+    />)
+  );
+};
+
+export const MemoDialog = () => {
+  const wallet = genSigningWalletWithCache();
+  const lookup = walletLookup([wallet]);
+  return wrapWallet(
+    mockWalletProps({
+      location: getRoute(wallet.publicDeriver.getPublicDeriverId()),
+      selected: wallet.publicDeriver,
+      ...lookup,
+    }),
+    (<WalletSendPage
+      generated={genBaseProps({
+        wallet,
+        noExternalStorage: true,
+      })}
+    />)
+  );
+};
+
+export const MemoExpanded = () => {
+  const wallet = genSigningWalletWithCache();
+  const lookup = walletLookup([wallet]);
+  return wrapWallet(
+    mockWalletProps({
+      location: getRoute(wallet.publicDeriver.getPublicDeriverId()),
+      selected: wallet.publicDeriver,
+      ...lookup,
+    }),
+    (<WalletSendPage
+      generated={genBaseProps({
+        wallet,
+        initialShowMemoState: true,
       })}
     />)
   );

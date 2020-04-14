@@ -177,12 +177,16 @@ export default class TransactionsStore extends Store {
 
     const recentRequest = this.getTxRequests(request.publicDeriver).requests.recentRequest;
     const newHash = hashTransactions(result.transactions);
-    // only recalcualte cache if
+    // only recalculate cache if
     // 1) the tx history changed
     // 2) if it's the first time computing for this wallet
     if (oldHash !== newHash || !recentRequest.wasExecuted) {
       this.reactToTxHistoryUpdate({ publicDeriver: request.publicDeriver });
     }
+
+    // sync memos regardless of whether or not new txs are found
+    // since it's possible existing memos were modified on a difference instance, etc.
+    this.actions.memos.syncTxMemos.trigger(request.publicDeriver);
   };
 
   @action reactToTxHistoryUpdate: {|

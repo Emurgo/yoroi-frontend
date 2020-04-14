@@ -35,6 +35,7 @@ type Props = {
   +value: string,
   +done?: boolean,
   +type: string,
+  +onDelete?: void => void,
   ...
 };
 
@@ -53,6 +54,7 @@ export const InputOwnSkin = class extends React.Component<Props, State> {
     placeholder: undefined,
     readOnly: undefined,
     done: undefined,
+    onDelete: undefined,
   };
 
   state = {
@@ -76,6 +78,7 @@ export const InputOwnSkin = class extends React.Component<Props, State> {
         done={this.props.done}
         type={this.props.type}
         focused={this.state.focused}
+        onDelete={this.props.onDelete}
         render={({ inputType }) => (
           <input
             ref={this.props.inputRef}

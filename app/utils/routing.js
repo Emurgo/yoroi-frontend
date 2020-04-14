@@ -111,6 +111,11 @@ export const handleExternalLinkClick = (event: MouseEvent) => {
   }
 };
 
+/** open a link from an element other than an anchor */
+export const handleExternalClick: string => void = (link) => {
+  window.open(link);
+};
+
 type RecursiveTree = string | { [key: string]: RecursiveTree, ... };
 export function visitPaths(value: RecursiveTree): Array<string> {
   if (typeof value !== 'object') return [value];

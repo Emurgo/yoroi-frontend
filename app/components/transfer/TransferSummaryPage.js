@@ -35,10 +35,6 @@ const messages = defineMessages({
     id: 'transfer.summary.finalBalance.label',
     defaultMessage: '!!!Final balance',
   },
-  cancelTransferButtonLabel: {
-    id: 'transfer.summary.cancelTransferButton.label',
-    defaultMessage: '!!!Cancel',
-  },
   transferButtonLabel: {
     id: 'transfer.summary.transferButton.label',
     defaultMessage: '!!!Transfer Funds',

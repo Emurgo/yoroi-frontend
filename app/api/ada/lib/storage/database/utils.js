@@ -10,6 +10,17 @@ import type {
 import { size } from 'lodash';
 import ExtendableError from 'es6-error';
 
+export async function getAll<Row>(
+  db: lf$Database,
+  tx: lf$Transaction,
+  tableName: string,
+): Promise<$ReadOnlyArray<$ReadOnly<Row>>> {
+  const table = db.getSchema().table(tableName);
+  const query = db
+    .select()
+    .from(table);
+  return await tx.attach(query);
+}
 export async function addBatchToTable<Insert, Row>(
   db: lf$Database,
   tx: lf$Transaction,

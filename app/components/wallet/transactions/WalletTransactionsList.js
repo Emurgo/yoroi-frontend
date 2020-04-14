@@ -15,6 +15,7 @@ import { Logger } from '../../../utils/logging';
 import type { ExplorerType } from '../../../domain/Explorer';
 import OneSideBarDecoration from '../../widgets/OneSideBarDecoration';
 import globalMessages from '../../../i18n/global-messages';
+import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
 
 const messages = defineMessages({
   showMoreTransactionsButtonLabel: {
@@ -27,12 +28,15 @@ const dateFormat = 'YYYY-MM-DD';
 
 type Props = {|
   +transactions: Array<WalletTransaction>,
+  +memoMap: Map<string, $ReadOnly<TxMemoTableRow>>,
   +isLoadingTransactions: boolean,
   +hasMoreToLoad: boolean,
   +selectedExplorer: ExplorerType,
   +assuranceMode: AssuranceMode,
   +onLoadMore: void => PossiblyAsync<void>,
   +shouldHideBalance: boolean,
+  +onAddMemo: WalletTransaction => void,
+  +onEditMemo: WalletTransaction => void,
 |};
 
 @observer
@@ -108,6 +112,8 @@ export default class WalletTransactionsList extends Component<Props> {
       hasMoreToLoad,
       assuranceMode,
       onLoadMore,
+      onAddMemo,
+      onEditMemo,
     } = this.props;
 
     const buttonClasses = classnames([
@@ -136,11 +142,14 @@ export default class WalletTransactionsList extends Component<Props> {
               {group.transactions.map((transaction, transactionIndex) => (
                 <Transaction
                   key={`${transaction.uniqueKey}-${transaction.numberOfConfirmations}`}
+                  memo={this.props.memoMap.get(transaction.txid)}
                   selectedExplorer={this.props.selectedExplorer}
                   data={transaction}
                   isLastInList={transactionIndex === group.transactions.length - 1}
                   state={transaction.state}
                   assuranceLevel={transaction.getAssuranceLevelForMode(assuranceMode)}
+                  onAddMemo={onAddMemo}
+                  onEditMemo={onEditMemo}
                   shouldHideBalance={this.props.shouldHideBalance}
                 />
               ))}

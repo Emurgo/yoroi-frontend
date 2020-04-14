@@ -1,10 +1,10 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { computed } from 'mobx';
+import { action, computed, observable, runInAction } from 'mobx';
 import type { Node } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
-
+import { ROUTES } from '../../routes-config';
 import environment from '../../environment';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import globalMessages from '../../i18n/global-messages';
@@ -23,6 +23,7 @@ import type {
   GeneratedData as WalletSendConfirmationDialogContainerData
 } from './dialogs/WalletSendConfirmationDialogContainer';
 import WalletSendConfirmationDialog from '../../components/wallet/send/WalletSendConfirmationDialog';
+import MemoNoExternalStorageDialog from '../../components/wallet/memos/MemoNoExternalStorageDialog';
 import {
   formattedWalletAmount,
 } from '../../utils/formatters';
@@ -78,6 +79,19 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     intl: intlShape.isRequired,
   };
 
+  @observable showMemo: boolean = false;
+
+  componentDidMount() {
+    runInAction(() => {
+      this.showMemo = this.generated.initialShowMemoState;
+    });
+  }
+
+  @action
+  toggleShowMemo = () => {
+    this.showMemo = !this.showMemo;
+  };
+
   render() {
     const { transactions, transactionBuilderStore } = this.generated.stores.substores.ada;
     const publicDeriver = this.generated.stores.wallets.selected;
@@ -85,7 +99,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     if (!publicDeriver) throw new Error('Active wallet required for WalletSendPage.');
 
     const { intl } = this.context;
-    const { uiDialogs, profile } = this.generated.stores;
+    const { uiDialogs, profile, } = this.generated.stores;
     const { actions } = this.generated;
     const { validateAmount, hasAnyPending } = transactions;
     const { txBuilderActions } = this.generated.actions.ada;
@@ -132,6 +146,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           classicTheme={profile.isClassicTheme}
           updateReceiver={(addr: void | string) => txBuilderActions.updateReceiver.trigger(addr)}
           updateAmount={(value: void | number) => txBuilderActions.updateAmount.trigger(value)}
+          updateMemo={(content: void | string) => txBuilderActions.updateMemo.trigger(content)}
           shouldSendAll={transactionBuilderStore.shouldSendAll}
           toggleSendAll={txBuilderActions.toggleSendAll.trigger}
           fee={transactionBuilderStore.fee}
@@ -140,6 +155,11 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           error={transactionBuilderStore.createUnsignedTx.error}
           uriParams={this.generated.stores.loading.uriParams}
           resetUriParams={this.generated.stores.loading.resetUriParams}
+          showMemo={this.showMemo}
+          onAddMemo={() => this.showMemoDialog({
+            dialog: MemoNoExternalStorageDialog,
+            continuation: this.toggleShowMemo,
+          })}
         />
         {this.renderDialog()}
       </>
@@ -154,6 +174,9 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     }
     if (uiDialogs.isOpen(HWSendConfirmationDialog)) {
       return this.hardwareWalletDoConfirmation();
+    }
+    if (uiDialogs.isOpen(MemoNoExternalStorageDialog)) {
+      return this.noCloudWarningDialog();
     }
     return '';
   }
@@ -261,6 +284,37 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     return hwSendConfirmationDialog;
   };
 
+  showMemoDialog: {|
+    continuation: void => void,
+    dialog: any,
+  |} => void = (request) => {
+    if (this.generated.stores.memos.hasSetSelectedExternalStorageProvider) {
+      return request.continuation();
+    }
+
+    this.generated.actions.dialogs.open.trigger({
+      dialog: request.dialog,
+      params: {
+        continuation: request.continuation,
+      },
+    });
+  }
+
+  noCloudWarningDialog: void => Node = () => {
+    const { actions, } = this.generated;
+    return (<MemoNoExternalStorageDialog
+      onCancel={actions.memos.closeMemoDialog.trigger}
+      addExternal={() => {
+        actions.memos.closeMemoDialog.trigger();
+        actions.router.goToRoute.trigger({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
+      }}
+      onAcknowledge={() => {
+        actions.memos.closeMemoDialog.trigger();
+        this.generated.stores.uiDialogs.getParam<void => void>('continuation')();
+      }}
+    />);
+  }
+
   @computed get generated() {
     if (this.props.generated !== undefined) {
       return this.props.generated;
@@ -279,12 +333,16 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
         wallets: {
           selected: stores.wallets.selected,
         },
+        memos: {
+          hasSetSelectedExternalStorageProvider: stores.memos.hasSetSelectedExternalStorageProvider,
+        },
         loading: {
           uriParams: stores.loading.uriParams,
           resetUriParams: stores.loading.resetUriParams,
         },
         uiDialogs: {
           isOpen: stores.uiDialogs.isOpen,
+          getParam: stores.uiDialogs.getParam,
         },
         substores: {
           ada: {
@@ -319,6 +377,14 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           open: { trigger: actions.dialogs.open.trigger },
           closeActiveDialog: { trigger: actions.dialogs.closeActiveDialog.trigger },
         },
+        router: {
+          goToRoute: { trigger: actions.router.goToRoute.trigger },
+        },
+        memos: {
+          closeMemoDialog: {
+            trigger: actions.memos.closeMemoDialog.trigger
+          },
+        },
         ada: {
           ledgerSend: {
             init: { trigger: actions.ada.ledgerSend.init.trigger },
@@ -335,9 +401,11 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
             updateAmount: { trigger: actions.ada.txBuilderActions.updateAmount.trigger },
             toggleSendAll: { trigger: actions.ada.txBuilderActions.toggleSendAll.trigger },
             reset: { trigger: actions.ada.txBuilderActions.reset.trigger },
+            updateMemo: { trigger: actions.ada.txBuilderActions.updateMemo.trigger },
           },
         },
       },
+      initialShowMemoState: (false: boolean),
       WalletSendConfirmationDialogContainerProps: (
         { actions, stores, }: InjectedOrGenerated<WalletSendConfirmationDialogContainerData>
       ),
