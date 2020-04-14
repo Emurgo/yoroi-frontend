@@ -57,7 +57,7 @@ export default class ExternalStorageSettings extends Component<Props> {
     ]);
 
     const providersButtons = [];
-    for (const provider of externalStorageProviders) {
+    for (const provider of Object.keys(externalStorageProviders)) {
       const authorizeUrl = externalStorageProviders[provider].authorizeUrl;
       const showDisconnect = (
         selectedExternalStorage
