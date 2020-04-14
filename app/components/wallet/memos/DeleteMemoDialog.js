@@ -62,14 +62,14 @@ export default class DeleteMemoDialog extends Component<Props, State> {
         className: isSubmitting ? styles.isSubmitting : null,
         label: this.context.intl.formatMessage(globalMessages.cancel),
         onClick: onCancel,
-        disabled: isSubmitting
+        disabled: isSubmitting,
       },
       {
         className: isSubmitting ? styles.isSubmitting : null,
         label: this.context.intl.formatMessage(messages.deleteMemoActionsDelete),
         primary: true,
         onClick: () => onDelete(selectedTransaction.txid),
-        disabled: isSubmitting
+        isSubmitting,
       },
     ];
 

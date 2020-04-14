@@ -194,8 +194,6 @@
   "settings.menu.support.link.label": "Support / Logs",
   "settings.menu.termsOfUse.link.label": "Terms of use",
   "settings.menu.wallet.link.label": "Wallet",
-  "settings.nocloud.dialog.content": "Memos will be encrypted so that your sensitive information is not leaked even if your external storage account is compromised",
-  "settings.nocloud.dialog.title": "Connect to external storage",
   "settings.noexternal.dialog.content": "Your memos are stored locally. They will not automatically sync with other Yoroi instances and will be lost if you delete Yoroi",
   "settings.noexternal.dialog.title": "No external storage",
   "settings.paperWallet.createPaper.label": "Create Paper Wallet",

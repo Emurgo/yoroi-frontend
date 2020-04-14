@@ -57,8 +57,7 @@ export default class ExternalStorageSettings extends Component<Props> {
     ]);
 
     const providersButtons = [];
-    // eslint-disable-next-line
-    for (const provider in externalStorageProviders) {
+    for (const provider of externalStorageProviders) {
       const authorizeUrl = externalStorageProviders[provider].authorizeUrl;
       const showDisconnect = (
         selectedExternalStorage
