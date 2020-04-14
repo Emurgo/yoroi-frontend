@@ -166,8 +166,6 @@
   "settings.display.themeNote": "<strong>Note:</strong> Changing theme will remove customization.",
   "settings.display.themeWarning": "CHANGING THEME WILL REMOVE CUSTOMIZATION",
   "settings.externalStorage.button.disconnect": "Disconnect",
-  "settings.externalStorage.dialog.content": "Memos will be encrypted so that your sensitive information is not leaked even if your external storage account is compromised",
-  "settings.externalStorage.dialog.title": "Connect to external storage",
   "settings.externalStorage.intro": "Select an external storage service to connect your account and save your memo notes.",
   "settings.externalStorage.provider": "Connect to {provider}",
   "settings.externalStorage.title": "Connect an account",
