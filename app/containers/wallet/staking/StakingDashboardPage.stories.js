@@ -11,6 +11,7 @@ import {
   genSigningWalletWithCache,
   genUndelegateTx,
   genTentativeTx,
+  genUnitOfAccount,
 } from '../../../../stories/helpers/StoryWrapper';
 import type {
   CacheValue
@@ -86,9 +87,13 @@ const genBaseProps: {|
           ? boolean('hideBalance', false)
           : false,
         getThemeVars: getVarsForTheme,
+        unitOfAccount: genUnitOfAccount(),
       },
       wallets: {
         selected: request.wallet.publicDeriver,
+      },
+      coinPriceStore: {
+        getCurrentPrice: (_from, _to) => 5,
       },
       uiDialogs: {
         isOpen: (dialog) => dialog === request.openDialog,
@@ -188,9 +193,13 @@ const genBaseProps: {|
           profile: {
             isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
             selectedExplorer: getDefaultExplorer(),
+            unitOfAccount: genUnitOfAccount(),
           },
           wallets: {
             selected: request.wallet.publicDeriver,
+          },
+          coinPriceStore: {
+            getCurrentPrice: (_from, _to) => 5,
           },
           substores: {
             ada: {

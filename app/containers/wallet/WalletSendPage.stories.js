@@ -18,6 +18,7 @@ import {
   mockTrezorMeta,
   mockLedgerMeta,
   genTentativeTx,
+  genUnitOfAccount,
 } from '../../../stories/helpers/StoryWrapper';
 import type { CacheValue } from '../../../stories/helpers/StoryWrapper';
 import MemoNoExternalStorageDialog from '../../components/wallet/memos/MemoNoExternalStorageDialog';
@@ -57,9 +58,13 @@ const genBaseProps: {|
     profile: {
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
       selectedExplorer: getDefaultExplorer(),
+      unitOfAccount: genUnitOfAccount(),
     },
     wallets: {
       selected: request.wallet.publicDeriver,
+    },
+    coinPriceStore: {
+      getCurrentPrice: (_from, _to) => 5,
     },
     memos: {
       hasSetSelectedExternalStorageProvider: false,

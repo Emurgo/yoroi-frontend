@@ -2,7 +2,10 @@
 import { BigNumber } from 'bignumber.js';
 import { Logger } from './logging';
 
-export function calculateAndFormatValue(coinAmount: BigNumber, price: number): string {
+export function calculateAndFormatValue(
+  coinAmount: BigNumber, // in ADA, not lovelaces
+  price: number
+): string {
   try {
     /*
       Have to convert the number to string first because when BigNumber.DEBUG is

@@ -219,9 +219,8 @@ export default class MemosStore extends Store {
 
   @action _updateTxMemo: TxMemoTableUpsert => Promise<void> = async (request) => {
     const walletId = this.getIdForWallet(request.publicDeriver);
-    const { TxMemoId, ...memoBase } = request.memo;
     const memo = {
-      ...memoBase,
+      ...request.memo,
       WalletId: walletId,
     };
     if (this.hasSetSelectedExternalStorageProvider) {
@@ -229,10 +228,7 @@ export default class MemosStore extends Store {
     }
     const savedMemo = await this.saveTxMemoRequest.execute({
       db: request.publicDeriver.getDb(),
-      memo: {
-        ...memo,
-        TxMemoId,
-      },
+      memo,
     }).promise;
     if (savedMemo == null) throw new Error('Should never happen');
     runInAction(() => {

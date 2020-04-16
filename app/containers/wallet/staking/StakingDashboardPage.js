@@ -38,6 +38,7 @@ import type { DelegationRequests } from '../../../stores/ada/DelegationStore';
 import EpochProgressContainer from './EpochProgressContainer';
 import type { GeneratedData as EpochProgressContainerData } from './EpochProgressContainer';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
+import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 
 import type {
   ToRealTimeFunc,
@@ -76,10 +77,39 @@ export default class StakingDashboardPage extends Component<Props> {
     this.generated.actions[environment.API].delegationTransaction.reset.trigger();
   }
 
-  hideOrFormat: BigNumber => string = (amount) => {
-    return this.generated.stores.profile.shouldHideBalance
-      ? '******'
-      : formattedWalletAmount(amount);
+  hideOrFormat: BigNumber => {|
+    +ADA: string,
+    +unitOfAccount: void | {| currency: string, amount: string |},
+  |} = (amount) => {
+    if (this.generated.stores.profile.shouldHideBalance) {
+      return {
+        ADA: '******',
+        unitOfAccount: undefined,
+      };
+    }
+
+    const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
+      ? (
+        this.generated.stores.coinPriceStore
+          .getCurrentPrice('ADA', this.generated.stores.profile.unitOfAccount.currency)
+      )
+      : null;
+
+    const unitOfAccount =
+      coinPrice == null
+      || this.generated.stores.profile.unitOfAccount.currency == null
+        ? undefined
+        : {
+          currency: this.generated.stores.profile.unitOfAccount.currency,
+          amount: calculateAndFormatValue(
+            new BigNumber(amount),
+            coinPrice
+          )
+        };
+    return {
+      ADA: formattedWalletAmount(amount),
+      unitOfAccount,
+    };
   };
 
   render() {
@@ -567,6 +597,7 @@ export default class StakingDashboardPage extends Component<Props> {
     const txRequests = this.generated.stores.substores.ada.transactions
       .getTxRequests(request.publicDeriver);
     const balance = txRequests.requests.getBalanceRequest.result;
+
     return (
       <UserSummary
         canUnmangleSum={canUnmangleSum}
@@ -696,9 +727,13 @@ export default class StakingDashboardPage extends Component<Props> {
           selectedExplorer: stores.profile.selectedExplorer,
           shouldHideBalance: stores.profile.shouldHideBalance,
           getThemeVars: stores.profile.getThemeVars,
+          unitOfAccount: stores.profile.unitOfAccount,
         },
         wallets: {
           selected: stores.wallets.selected,
+        },
+        coinPriceStore: {
+          getCurrentPrice: stores.substores.ada.coinPriceStore.getCurrentPrice,
         },
         uiDialogs: {
           isOpen: stores.uiDialogs.isOpen,

@@ -9,6 +9,7 @@ import {
   walletLookup,
   globalKnobs,
   genSigningWalletWithCache,
+  genUnitOfAccount,
 } from '../../../stories/helpers/StoryWrapper';
 import type {
   CacheValue,
@@ -103,6 +104,7 @@ export const Loading = () => {
             selectedExplorer: getDefaultExplorer(),
             shouldHideBalance: false,
             isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+            unitOfAccount: genUnitOfAccount(),
           },
           uiDialogs: {
             isOpen: () => false,
@@ -142,6 +144,8 @@ export const Loading = () => {
                   total: new BigNumber(0),
                   incoming: new BigNumber(0),
                   outgoing: new BigNumber(0),
+                  incomingInSelectedCurrency: new BigNumber(0),
+                  outgoingInSelectedCurrency: new BigNumber(0),
                 },
                 isExporting: false,
                 exportError: undefined,
@@ -172,6 +176,7 @@ const genPropsForTransactions: {|
     selectedExplorer: getDefaultExplorer(),
     shouldHideBalance: request.txExport == null ? boolean('shouldHideBalance', false) : false,
     isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+    unitOfAccount: genUnitOfAccount(),
   },
   uiDialogs: {
     isOpen: (dialog) => dialog === request.dialog,
@@ -209,7 +214,8 @@ const genPropsForTransactions: {|
         },
         unconfirmedAmount: calculateUnconfirmedAmount(
           request.transactions,
-          assuranceModes.NORMAL
+          assuranceModes.NORMAL,
+          genUnitOfAccount(),
         ),
         isExporting: request.txExport != null ? request.txExport.isExporting : false,
         exportError: request.txExport?.exportError,
@@ -281,6 +287,11 @@ export const Transaction = () => {
     certificate,
     state,
     errorMsg: null,
+    tickers: [{
+      From: 'ADA',
+      To: 'USD',
+      Price: 5,
+    }],
   });
   const transactions = [walletTransaction];
   return wrapWallet(
@@ -329,6 +340,11 @@ export const TransactionWithMemo = () => {
     certificate: undefined,
     state: TxStatusCodes.IN_BLOCK,
     errorMsg: null,
+    tickers: [{
+      From: 'ADA',
+      To: 'USD',
+      Price: 5,
+    }],
   });
   const transactions = [walletTransaction];
   return wrapWallet(
@@ -349,7 +365,6 @@ export const TransactionWithMemo = () => {
             error: undefined,
             getIdForWallet: () => 'DNKO-8098',
             txMemoMap: new Map([['DNKO-8098', new Map([[walletTransaction.txid, {
-              TxMemoId: 0,
               WalletId: 'DNKO-8098',
               Content: 'foo',
               TransactionHash: walletTransaction.txid,
@@ -390,6 +405,11 @@ export const MemoDialog = () => {
     certificate: undefined,
     state: TxStatusCodes.IN_BLOCK,
     errorMsg: null,
+    tickers: [{
+      From: 'ADA',
+      To: 'USD',
+      Price: 5,
+    }],
   });
   const transactions = [walletTransaction];
 
@@ -424,7 +444,6 @@ export const MemoDialog = () => {
             error: undefined,
             getIdForWallet: () => 'DNKO-8098',
             txMemoMap: new Map([['DNKO-8098', new Map([[walletTransaction.txid, {
-              TxMemoId: 0,
               WalletId: 'DNKO-8098',
               Content: 'foo',
               TransactionHash: walletTransaction.txid,
@@ -492,6 +511,11 @@ export const ManyTransactions = () => {
       certificate: undefined,
       state: TxStatusCodes.IN_BLOCK,
       errorMsg: null,
+      tickers: [{
+        From: 'ADA',
+        To: 'USD',
+        Price: 5,
+      }],
     }));
   }
   return wrapWallet(
@@ -537,6 +561,11 @@ export const TxHistoryExport = () => {
     certificate: undefined,
     state: TxStatusCodes.IN_BLOCK,
     errorMsg: null,
+    tickers: [{
+      From: 'ADA',
+      To: 'USD',
+      Price: 5,
+    }],
   })];
   const errorCases = {
     None: undefined,

@@ -55,6 +55,7 @@ export default class WalletTransaction {
     certificate: void | CertificatePart,
     state: TxStatusCodesType,
     errorMsg: null | string,
+    tickers?: Array<Ticker>,
   |}) {
     Object.assign(this, data);
   }

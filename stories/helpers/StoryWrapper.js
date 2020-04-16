@@ -15,6 +15,7 @@ import id from 'react-intl/locale-data/id';
 import es from 'react-intl/locale-data/es';
 import it from 'react-intl/locale-data/it';
 import '../../app/themes/index.global.scss';
+import type { UnitOfAccountSettingType } from '../../app/types/unitOfAccountType';
 import {
   genToAbsoluteSlotNumber,
   genToRelativeSlotNumber,
@@ -642,8 +643,6 @@ export const genTentativeTx = () => {
 
 export const genUndelegateTx = () => {
   const inputAmount = '1000001';
-  const ouputAmount = '400';
-  const fee = new BigNumber(inputAmount).minus(new BigNumber(ouputAmount));
 
   if (!environment.isShelley()) {
     throw new Error('Delegation not supported for Byron');
@@ -671,4 +670,20 @@ export const genUndelegateTx = () => {
     changeAddr: [],
     certificate: undefined, // TODO
   };
+};
+
+export const genUnitOfAccount: void => UnitOfAccountSettingType = () => {
+  const unitOfAccountCases = {
+    ADA: 0,
+    USD: 1,
+  };
+  const unitOfAccount = select(
+    'unitOfAccount',
+    unitOfAccountCases,
+    unitOfAccountCases.ADA
+  );
+  if (unitOfAccount === unitOfAccountCases.ADA) {
+    return { enabled: false, currency: null };
+  }
+  return { enabled: true, currency: 'USD' };
 };

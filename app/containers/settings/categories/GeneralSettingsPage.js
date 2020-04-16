@@ -123,14 +123,16 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           error={profileStore.setSelectedExplorerRequest.error}
         />
         {uriSettings}
-        <UnitOfAccountSettings
-          onSelect={this.onSelectUnitOfAccount}
-          isSubmitting={isSubmittingUnitOfAccount}
-          currencies={currencies}
-          currentValue={unitOfAccountValue}
-          error={profileStore.setUnitOfAccountRequest.error}
-          lastUpdatedTimestamp={coinPriceStore.lastUpdateTimestamp}
-        />
+        {!environment.isProduction() &&
+          <UnitOfAccountSettings
+            onSelect={this.onSelectUnitOfAccount}
+            isSubmitting={isSubmittingUnitOfAccount}
+            currencies={currencies}
+            currentValue={unitOfAccountValue}
+            error={profileStore.setUnitOfAccountRequest.error}
+            lastUpdatedTimestamp={coinPriceStore.lastUpdateTimestamp}
+          />
+        }
         {!environment.isShelley() &&
           <ThemeSettingsBlock
             currentTheme={currentTheme}
@@ -174,7 +176,10 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           hasCustomTheme: profileStore.hasCustomTheme,
           UNIT_OF_ACCOUNT_OPTIONS: profileStore.UNIT_OF_ACCOUNT_OPTIONS,
           unitOfAccount: profileStore.unitOfAccount,
-          setUnitOfAccountRequest: profileStore.setUnitOfAccountRequest,
+          setUnitOfAccountRequest: {
+            error: profileStore.setUnitOfAccountRequest.error,
+            isExecuting: profileStore.setUnitOfAccountRequest.isExecuting,
+          },
         },
         coinPriceStore: {
           getCurrentPrice: stores.substores.ada.coinPriceStore.getCurrentPrice,

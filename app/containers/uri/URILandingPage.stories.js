@@ -9,6 +9,7 @@ import URILandingPage from './URILandingPage';
 import { THEMES } from '../../themes';
 import {
   globalKnobs,
+  genUnitOfAccount,
 } from '../../../stories/helpers/StoryWrapper';
 import { getDefaultExplorer } from '../../domain/Explorer';
 
@@ -53,6 +54,9 @@ export const GettingMnemonics = () => {
             hasAnyWallets: false,
             first: null,
           },
+          coinPriceStore: {
+            getCurrentPrice: (_from, _to) => 5,
+          },
         },
         actions: {
           dialogs: {
@@ -68,6 +72,10 @@ export const GettingMnemonics = () => {
               profile: {
                 isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
                 selectedExplorer: getDefaultExplorer(),
+                unitOfAccount: genUnitOfAccount(),
+              },
+              coinPriceStore: {
+                getCurrentPrice: (_from, _to) => 5,
               },
               loading: {
                 uriParams,

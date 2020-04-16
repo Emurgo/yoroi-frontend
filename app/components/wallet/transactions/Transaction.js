@@ -230,6 +230,7 @@ export default class Transaction extends Component<Props, State> {
     if (this.props.shouldHideBalance) {
       return (<span>******</span>);
     }
+
     const currency = this.props.unitOfAccountSetting.currency;
     if (request.price != null && currency != null) {
       const price = request.price;
@@ -375,7 +376,7 @@ export default class Transaction extends Component<Props, State> {
                   amount: data.amount,
                   price,
                 })}
-                <span className={styles.currencySymbol}><AdaSymbol /></span>
+                {price == null && <span className={styles.currencySymbol}><AdaSymbol /></span>}
               </div>
             </div>
             <div className={styles.expandArrowBox}>

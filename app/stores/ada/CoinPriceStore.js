@@ -89,7 +89,8 @@ export default class CoinPriceStore extends Store {
       Logger.error('CoinPriceStore::_refreshCoinPrice: ' + stringifyError(error));
       this.nextRefreshTimeout = CONFIG.app.coinPriceRequestRetryDelay;
     }
-    setTimeout(this._refreshCoinPrice, this.nextRefreshTimeout);
+    // TODO: remove these timeouts
+    // setTimeout(this._refreshCoinPrice, this.nextRefreshTimeout);
   }
 
   @action _expirePriceData: void => void = () => {

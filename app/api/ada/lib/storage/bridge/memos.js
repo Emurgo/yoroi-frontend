@@ -39,10 +39,7 @@ export type TxMemoTableUpsert = {|
    * But for wallets without a public key, it can be something else
    */
   publicDeriver: PublicDeriver<>,
-  memo: {|
-    ...TxMemoTableInsertCommon,
-    TxMemoId: number,
-  |},
+  memo: TxMemoTableInsertCommon,
 |}
 
 // upsertTxMemo
