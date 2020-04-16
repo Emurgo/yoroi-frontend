@@ -1,13 +1,20 @@
 // @flow
-// TODO: replace with WalletV3 WASM
-import { PrivateKey } from 'cardano-wallet';
+
+import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import type {
   ResponseTicker,
   CurrentCoinPriceResponse,
 } from '../../app/api/ada/lib/state-fetch/types';
 
 const CURRENCIES = ['BTC', 'ETH', 'USD', 'KRW', 'JPY', 'EUR', 'CNY'];
-let privKey = PrivateKey.from_hex('c8fc9467abae3c3396854ed25c59cc1d9a8ef3db9772f4cb0f074181ba4cad57eaa923bc58cbf6aff0aa34541e015d6cb6cf74b48d35f05f0ec4a907df64bad2');
+
+function genPrivKeyFunc(key: string) {
+  return () => RustModule.WalletV3.PrivateKey.from_extended_bytes(Buffer.from(
+    key,
+    'hex',
+  ));
+}
+let getPrivKey = genPrivKeyFunc('c8fc9467abae3c3396854ed25c59cc1d9a8ef3db9772f4cb0f074181ba4cad57eaa923bc58cbf6aff0aa34541e015d6cb6cf74b48d35f05f0ec4a907df64bad2');
 
 let pubKeyDataReplacement;
 let pubKeyDataSignature;
@@ -44,7 +51,7 @@ export function installCoinPriceRequestHandlers(server: Object) {
       timestamp: Date.now(),
       prices
     };
-    ticker.signature = privKey.sign(serializeTicker(ticker)).to_hex();
+    ticker.signature = getPrivKey().sign(serializeTicker(ticker)).to_hex();
     const response : CurrentCoinPriceResponse = { error: null, ticker };
     if (pubKeyDataReplacement) {
       response.pubKeyData = pubKeyDataReplacement;
@@ -74,7 +81,7 @@ export function installCoinPriceRequestHandlers(server: Object) {
           timestamp,
           prices
         };
-        ticker.signature = privKey.sign(serializeTicker(ticker)).to_hex();
+        ticker.signature = getPrivKey().sign(serializeTicker(ticker)).to_hex();
         return ticker;
       })
     });
@@ -91,9 +98,9 @@ export function replaceKey(privKeyMaster: string, pubKeyData: string, privKeyDat
   if (!privKeyData) {
     privKeyData = 'b02d80756fdb275f6e467f1b0eead5f1b4875d6db8855017a0a2f7addc888d4d1c0bcbb302230a8e9e3c3c44b90cd74f93e42e0deed7cba02f67d2d6e8e93868';
   }
-  privKey = PrivateKey.from_hex(privKeyData);
+  getPrivKey = genPrivKeyFunc(privKeyData);
   pubKeyDataReplacement = pubKeyData;
-  pubKeyDataSignature = PrivateKey.from_hex(privKeyMaster)
+  pubKeyDataSignature = genPrivKeyFunc(privKeyMaster)()
     .sign(Buffer.from(pubKeyData))
     .to_hex();
 }

@@ -17,6 +17,7 @@ Then(
 Then(
   /^The memo content says "([^"]*)"$/,
   async function (memo) {
+    await this.waitForElement('.memoContent');
     const memoElem = await this.getElementsBy('.memoContent');
     const memoContent = await memoElem[0].getText();
     chai.expect(memoContent).to.equal(memo);
