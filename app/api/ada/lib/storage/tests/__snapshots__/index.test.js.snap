@@ -1060,6 +1060,7 @@ Object {
       "Time": null,
     },
   ],
+  "PriceData": Array [],
   "PublicDeriver": Array [
     Object {
       "ConceptualWalletId": 1,
