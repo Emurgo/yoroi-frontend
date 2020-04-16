@@ -14,7 +14,6 @@ import { wrapSettings } from '../../../Routes';
 import { mockSettingsProps } from '../Settings.mock';
 import { getDefaultExplorer } from '../../../domain/Explorer';
 import { ROUTES } from '../../../routes-config';
-import { IncorrectWalletPasswordError } from '../../../api/common';
 
 export default {
   title: `${__filename.split('.')[0]}`,

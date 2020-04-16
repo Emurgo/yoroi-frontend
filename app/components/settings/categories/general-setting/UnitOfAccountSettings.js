@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import classNames from 'classnames';
 import { Select } from 'react-polymorph/lib/components/Select';
 import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
