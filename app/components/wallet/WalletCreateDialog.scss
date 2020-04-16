@@ -38,6 +38,13 @@
       & > div {
         margin-top: 0;
       }
+
+      // Seems like this is the same class name as parent, but it's different.
+      // This class will apply to the child Input tag.
+      // Unfortunately for fixing this problem we also need to carefully fix basic E2E cases, as its used there.
+      :global .walletPassword {
+        margin-right: 25px;
+      }
   
       @include place-form-field-error-below-input;
     }
@@ -54,10 +61,10 @@
       & > div {
         width: 100%;
       }
-
-      & > div:last-child {
-        padding-bottom: 0;
-      }
     }
+  }
+
+  :global(.Dialog_actions) {
+    margin-top: var(--theme-dialog-password-input-actions-margin-top);
   }
 }

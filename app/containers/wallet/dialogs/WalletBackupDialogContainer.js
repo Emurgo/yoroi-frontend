@@ -1,22 +1,27 @@
 // @flow
 import React, { Component } from 'react';
+import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import WalletBackupDialog from '../../../components/wallet/WalletBackupDialog';
-import type { InjectedDialogContainerProps } from '../../../types/injectedPropsType';
-import environment from '../../../environment';
+import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 
-type Props = InjectedDialogContainerProps;
+export type GeneratedData = typeof WalletBackupDialogContainer.prototype.generated;
+
+type Props = {|
+  ...InjectedOrGenerated<GeneratedData>,
+  +onClose: void => void,
+|};
 
 @observer
 export default class WalletBackupDialogContainer extends Component<Props> {
 
   onCancelBackup = () => {
     this.props.onClose();
-    this.props.actions.walletBackup.cancelWalletBackup.trigger();
+    this.generated.actions.walletBackup.cancelWalletBackup.trigger();
   }
 
   render() {
-    const { actions, stores } = this.props;
+    const { actions, stores } = this.generated;
     const {
       recoveryPhraseWords,
       enteredPhrase,
@@ -41,8 +46,7 @@ export default class WalletBackupDialogContainer extends Component<Props> {
       acceptPrivacyNoticeForWalletBackup,
       continueToRecoveryPhraseForWalletBackup
     } = actions.walletBackup;
-    const { createWalletRequest } = stores.substores[environment.API].wallets;
-    const { classicTheme } = this.props;
+    const { createWalletRequest } = stores.wallets;
     const hasWord = (enteredPhrase.length > 0);
     return (
       <WalletBackupDialog
@@ -70,16 +74,87 @@ export default class WalletBackupDialogContainer extends Component<Props> {
         onAcceptTermRecovery={acceptWalletBackupTermRecovery.trigger}
         onAddWord={addWordToWalletBackupVerification.trigger}
         onClear={clearEnteredRecoveryPhrase.trigger}
-        onFinishBackup={() => {
-          finishWalletBackup.trigger();
-        }}
+        onFinishBackup={finishWalletBackup.trigger}
         removeWord={() => {
           removeOneMnemonicWord.trigger();
         }}
         onRestartBackup={restartWalletBackup.trigger}
         recoveryPhraseSorted={recoveryPhraseSorted}
-        classicTheme={classicTheme}
+        classicTheme={stores.profile.isClassicTheme}
       />
     );
+  }
+
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(WalletBackupDialogContainer)} no way to generated props`);
+    }
+    const { stores, actions, } = this.props;
+    return Object.freeze({
+      stores: {
+        profile: {
+          isClassicTheme: stores.profile.isClassicTheme,
+        },
+        walletBackup: {
+          recoveryPhraseWords: stores.walletBackup.recoveryPhraseWords,
+          enteredPhrase: stores.walletBackup.enteredPhrase,
+          isRecoveryPhraseValid: stores.walletBackup.isRecoveryPhraseValid,
+          countdownRemaining: stores.walletBackup.countdownRemaining,
+          recoveryPhraseSorted: stores.walletBackup.recoveryPhraseSorted,
+          isTermDeviceAccepted: stores.walletBackup.isTermDeviceAccepted,
+          isTermRecoveryAccepted: stores.walletBackup.isTermRecoveryAccepted,
+          isPrivacyNoticeAccepted: stores.walletBackup.isPrivacyNoticeAccepted,
+          currentStep: stores.walletBackup.currentStep,
+        },
+        wallets: {
+          createWalletRequest: {
+            isExecuting: stores.wallets.createWalletRequest.isExecuting,
+          },
+        },
+      },
+      actions: {
+        walletBackup: {
+          cancelWalletBackup: {
+            trigger: actions.walletBackup.cancelWalletBackup.trigger,
+          },
+          startWalletBackup: {
+            trigger: actions.walletBackup.startWalletBackup.trigger,
+          },
+          addWordToWalletBackupVerification: {
+            trigger: actions.walletBackup.addWordToWalletBackupVerification.trigger,
+          },
+          clearEnteredRecoveryPhrase: {
+            trigger: actions.walletBackup.clearEnteredRecoveryPhrase.trigger,
+          },
+          acceptWalletBackupTermDevice: {
+            trigger: actions.walletBackup.acceptWalletBackupTermDevice.trigger,
+          },
+          acceptWalletBackupTermRecovery: {
+            trigger: actions.walletBackup.acceptWalletBackupTermRecovery.trigger,
+          },
+          restartWalletBackup: {
+            trigger: actions.walletBackup.restartWalletBackup.trigger,
+          },
+          finishWalletBackup: {
+            trigger: actions.walletBackup.finishWalletBackup.trigger,
+          },
+          removeOneMnemonicWord: {
+            trigger: actions.walletBackup.removeOneMnemonicWord.trigger,
+          },
+          continueToPrivacyWarning: {
+            trigger: actions.walletBackup.continueToPrivacyWarning.trigger,
+          },
+          acceptPrivacyNoticeForWalletBackup: {
+            trigger: actions.walletBackup.acceptPrivacyNoticeForWalletBackup.trigger,
+          },
+          continueToRecoveryPhraseForWalletBackup: {
+            trigger: actions.walletBackup.continueToRecoveryPhraseForWalletBackup.trigger,
+          },
+        },
+      },
+    });
   }
 }

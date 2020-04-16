@@ -7,10 +7,10 @@ import classNames from 'classnames';
 import styles from './DialogTextBlock.scss';
 
 type Props = {|
-  title?: string,
-  message?: string,
-  subclass?: string,
-  children?: Node
+  +title?: string,
+  +message?: string,
+  +subclass?: string,
+  +children?: Node
 |};
 
 @observer
@@ -26,7 +26,7 @@ export default class DialogTextBlock extends Component<Props> {
     const { title, message, subclass, children } = this.props;
 
     const messageStyle = classNames([
-      subclass ? styles[subclass] : styles.component
+      (subclass != null && subclass !== '') ? styles[subclass] : styles.component
     ]);
 
     if (children !== null) {
@@ -38,8 +38,8 @@ export default class DialogTextBlock extends Component<Props> {
     }
     return (
       <div className={messageStyle}>
-        {title && <h1>{title}</h1>}
-        {message && <ReactMarkdown source={message} escapeHtml={false} />}
+        {(title != null && title !== '') ? (<h1>{title}</h1>) : null}
+        {(message != null && message !== '') ? (<ReactMarkdown source={message} escapeHtml={false} />) : null}
       </div>
     );
   }

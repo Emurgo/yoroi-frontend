@@ -1,0 +1,57 @@
+@import '../../../themes/mixins/error-message';
+@import '../../../themes/mixins/underline';
+
+.component {
+  padding-bottom: 10px;
+
+  h1 {
+    color: var(--theme-support-settings-text-color);
+    font-family: var(--font-semibold);
+    line-height: 1.38;
+    margin-bottom: 10px;
+  }
+
+  h1:not(:first-child) {
+    padding-top: 10px;
+  }
+
+  a,
+  p {
+    color: var(--theme-support-settings-text-color);
+    font-family: var(--font-regular);
+    font-size: 14px;
+    line-height: 19px;
+  }
+
+  a {
+    color: var(--theme-support-settings-link-color);
+  }
+  
+  p {
+    margin-bottom: 10px;
+  }
+  
+  .link {
+    @include underline(var(--theme-underline-dark-color));
+  }
+
+  .link:focus {
+    outline: none;
+  }
+
+  .button {
+    margin-top: 20px;
+  }
+}
+
+:global(.YoroiClassic) .component {
+  h1 {
+    font-size: 16px;
+  }
+}
+
+:global(.YoroiModern) .component {
+  h1 {
+    font-size: 18px;
+  }
+}

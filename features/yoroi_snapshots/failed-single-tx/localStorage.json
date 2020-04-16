@@ -1,9 +1,0 @@
-{
-  "test-USER-LOCALE":"en-US",
-  "WALLET":"{\"adaWallet\":{\"cwAmount\":{\"getCCoin\":\"0\"},\"cwId\":\"1\",\"cwMeta\":{\"cwAssurance\":\"CWANormal\",\"cwName\":\"failed-single-tx\",\"cwUnit\":0},\"cwType\":\"CWTWeb\",\"cwPassphraseLU\":\"2019-07-09T19:51:37-04:00\"},\"masterKey\":\"d8e8cb7576df03418ef6b32bb8d0c483895f9a40c19dc24fed7f5c0924c9e1a36914e3eb38bfa334cdbc33b370c533a941929251bd92c35ffa9636937cadf9084ac17841ac92ddf8c7abe12dd7222493bfe69f076d2f583dd4c123b3cf8215a3811c7d771c20d4cae93f9e3c2e76233abe5d8d3d92333462eb8019007f91ce85686aa0becddd3227ba4ca449552ef56de0e798014fcb41138d379ca8\",\"lastReceiveAddressIndex\":0}",
-  "test-URI-SCHEME-ACCEPTANCE":"true",
-  "openTabId":"1562716292559",
-  "ACCOUNT":"{\"account\":0,\"root_cached_key\":\"84fd37565a1ba6482963478493de2057e40e740e69fc7d6abb0d0e30c5246626d186e94f31dc5d51e558aa732134689c11259668a1315afceeb0d5751eb2b0b8\",\"derivation_scheme\":\"V2\"}",
-  "test-LAST-LAUNCH-VER":"1.9.0",
-  "test-TERMS-OF-USE-ACCEPTANCE":"true"
-}

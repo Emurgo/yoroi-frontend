@@ -1,0 +1,20 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.title {
+    font-family: var(--font-medium);
+    font-size: 18px;
+    line-height: 22px;
+    margin-bottom: 16px;
+}
+
+.inner {
+    background-color: var(--theme-main-body-background-color);
+    flex: 1;
+    border-radius: 6px;
+    box-shadow: 0 10px 20px 0 var(--theme-dashboard-card-shadow-color);
+    border: 1px solid var(--theme-dashboard-card-border-color);
+}

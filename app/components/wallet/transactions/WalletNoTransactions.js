@@ -1,14 +1,13 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import SvgInline from 'react-svg-inline';
 import styles from './WalletNoTransactions.scss';
-import noTransactionClassicSvg from '../../../assets/images/transaction/no-transactions-yet.classic.inline.svg';
-import noTransactionModernSvg from '../../../assets/images/transaction/no-transactions-yet.modern.inline.svg';
+import NoTransactionClassicSvg from '../../../assets/images/transaction/no-transactions-yet.classic.inline.svg';
+import NoTransactionModernSvg from '../../../assets/images/transaction/no-transactions-yet.modern.inline.svg';
 
 type Props = {|
-  label: string,
-  classicTheme: boolean,
+  +label: string,
+  +classicTheme: boolean,
 |};
 
 @observer
@@ -16,10 +15,10 @@ export default class WalletNoTransactions extends Component<Props> {
 
   render() {
     const { classicTheme } = this.props;
-    const noTransactionSvg = classicTheme ? noTransactionClassicSvg : noTransactionModernSvg;
+    const NoTransactionSvg = classicTheme ? NoTransactionClassicSvg : NoTransactionModernSvg;
     return (
       <div className={styles.component}>
-        <SvgInline className={styles.imageWrappper} svg={noTransactionSvg} />
+        <span className={styles.imageWrappper}><NoTransactionSvg /></span>
         <div className={styles.label}>{this.props.label}</div>
       </div>
     );

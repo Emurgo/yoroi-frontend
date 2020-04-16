@@ -11,15 +11,19 @@ import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
 import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
 import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
 import { defineMessages, intlShape } from 'react-intl';
+import { isValidMemoOptional, isValidMemo } from '../../../utils/validations';
 import BigNumber from 'bignumber.js';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import AmountInputSkin from '../skins/AmountInputSkin';
+import AddMemoSvg from '../../../assets/images/add-memo.inline.svg';
 import BorderedBox from '../../widgets/BorderedBox';
 import styles from './WalletSendForm.scss';
-import globalMessages, { environmentSpecificMessages } from '../../../i18n/global-messages';
+import globalMessages, { memoMessages, environmentSpecificMessages } from '../../../i18n/global-messages';
 import environment from '../../../environment';
 import type { UriParams } from '../../../utils/URIHandling';
+import { getAddressPayload } from '../../../api/ada/lib/storage/bridge/utils';
+import { MAX_MEMO_SIZE } from '../../../config/externalStorageConfig';
 
 import {
   formattedWalletAmount,
@@ -48,10 +52,6 @@ const messages = defineMessages({
   receiverHint: {
     id: 'wallet.send.form.receiver.hint',
     defaultMessage: '!!!Wallet Address',
-  },
-  amountLabel: {
-    id: 'wallet.send.form.amount.label',
-    defaultMessage: '!!!Amount',
   },
   equalsAdaHint: {
     id: 'wallet.send.form.amount.equalsAda',
@@ -93,28 +93,40 @@ const messages = defineMessages({
     id: 'wallet.send.form.sendingIsDisabled',
     defaultMessage: '!!!Cannot send a transaction while there is a pending one',
   },
+  memoInvalidOptional: {
+    id: 'wallet.transaction.memo.optional.invalid',
+    defaultMessage: '!!!Memo cannot be more than {maxMemo} characters.',
+  },
+  cannotSendtoLegacy: {
+    id: 'wallet.send.form.cannotSendToLegacy',
+    defaultMessage: '!!!You cannot send to legacy addresses (any address created before November 29th, 2019)',
+  },
 });
 
 type Props = {|
-  currencyUnit: string,
-  currencyMaxIntegerDigits: number,
-  currencyMaxFractionalDigits: number,
-  hasAnyPending: boolean,
-  validateAmount: (amountInNaturalUnits: string) => Promise<boolean>,
-  onSubmit: void => void,
-  addressValidator: Function,
-  totalInput: ?BigNumber,
-  classicTheme: boolean,
-  updateReceiver: (void | string) => void,
-  updateAmount: (void | number) => void,
-  shouldSendAll: boolean,
-  toggleSendAll: void => void,
-  fee: ?BigNumber,
-  isCalculatingFee: boolean,
-  reset: void => void,
-  error: ?LocalizableError,
-  uriParams: ?UriParams,
-  resetUriParams: void => void,
+  +currencyUnit: string,
+  +currencyMaxIntegerDigits: number,
+  +currencyMaxFractionalDigits: number,
+  +hasAnyPending: boolean,
+  +validateAmount: (amountInNaturalUnits: string) => Promise<boolean>,
+  +onSubmit: void => void,
+  +isValidShelleyAddress: string => boolean,
+  +isValidLegacyAddress: string => boolean,
+  +totalInput: ?BigNumber,
+  +classicTheme: boolean,
+  +updateReceiver: (void | string) => void,
+  +updateAmount: (void | number) => void,
+  +updateMemo: (void | string) => void,
+  +shouldSendAll: boolean,
+  +toggleSendAll: void => void,
+  +fee: ?BigNumber,
+  +isCalculatingFee: boolean,
+  +reset: void => void,
+  +error: ?LocalizableError,
+  +uriParams: ?UriParams,
+  +resetUriParams: void => void,
+  +showMemo: boolean,
+  +onAddMemo: void => void,
 |};
 
 @observer
@@ -134,7 +146,7 @@ export default class WalletSendForm extends Component<Props> {
       const adjustedAmount = formattedAmountToNaturalUnits(uriParams.amount.toString());
       // note: assume these are validated externally
       this.props.updateAmount(Number(adjustedAmount));
-      this.props.updateReceiver(uriParams.address);
+      this.props.updateReceiver(getAddressPayload(uriParams.address));
       this.props.resetUriParams();
     }
 
@@ -174,7 +186,8 @@ export default class WalletSendForm extends Component<Props> {
     fields: {
       receiver: {
         label: this.context.intl.formatMessage(messages.receiverLabel),
-        placeholder: this.context.intl.formatMessage(messages.receiverHint),
+        placeholder: this.props.classicTheme ?
+          this.context.intl.formatMessage(messages.receiverHint) : '',
         value: this.props.uriParams
           ? this.props.uriParams.address
           : '',
@@ -184,20 +197,30 @@ export default class WalletSendForm extends Component<Props> {
             this.props.updateReceiver();
             return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
-          return this.props.addressValidator(receiverValue)
-            .then(isValidReceiver => {
-              if (isValidReceiver) {
-                this.props.updateReceiver(receiverValue);
-              } else {
-                this.props.updateReceiver();
-              }
-              return [isValidReceiver, this.context.intl.formatMessage(messages.invalidAddress)];
-            });
+          const updateReceiver = (isValid) => {
+            if (isValid) {
+              this.props.updateReceiver(getAddressPayload(receiverValue));
+            } else {
+              this.props.updateReceiver();
+            }
+          };
+          const isValidLegacy = this.props.isValidLegacyAddress(receiverValue);
+          if (!environment.isShelley()) {
+            updateReceiver(isValidLegacy);
+            return [isValidLegacy, this.context.intl.formatMessage(messages.invalidAddress)];
+          }
+          if (isValidLegacy) {
+            return [false, this.context.intl.formatMessage(messages.cannotSendtoLegacy)];
+          }
+          const isValidShelley = this.props.isValidShelleyAddress(receiverValue);
+          updateReceiver(isValidShelley);
+          return [isValidShelley, this.context.intl.formatMessage(messages.invalidAddress)];
         }],
       },
       amount: {
-        label: this.context.intl.formatMessage(messages.amountLabel),
-        placeholder: `0.${'0'.repeat(this.props.currencyMaxFractionalDigits)}`,
+        label: this.context.intl.formatMessage(globalMessages.amountLabel),
+        placeholder: this.props.classicTheme ?
+          `0.${'0'.repeat(this.props.currencyMaxFractionalDigits)}` : '',
         value: this.props.uriParams
           ? formattedWalletAmount(this.props.uriParams.amount)
           : '',
@@ -221,6 +244,25 @@ export default class WalletSendForm extends Component<Props> {
           return [isValidAmount, this.context.intl.formatMessage(messages.invalidAmount)];
         }],
       },
+      memo: {
+        label: this.context.intl.formatMessage(memoMessages.memoLabel),
+        placeholder: this.context.intl.formatMessage(memoMessages.optionalMemo),
+        value: '',
+        validators: [({ field }) => {
+          const memoContent = field.value;
+          const isValid = isValidMemoOptional(memoContent);
+          if (isValid) {
+            this.props.updateMemo(memoContent);
+          }
+          return [
+            isValid,
+            this.context.intl.formatMessage(
+              messages.memoInvalidOptional,
+              { maxMemo: MAX_MEMO_SIZE, }
+            )
+          ];
+        }],
+      },
     },
   }, {
     options: {
@@ -238,17 +280,20 @@ export default class WalletSendForm extends Component<Props> {
   render() {
     const { form } = this;
     const { intl } = this.context;
-
+    const { memo } = this.form.values();
     const {
       currencyUnit,
       currencyMaxIntegerDigits,
       currencyMaxFractionalDigits,
       hasAnyPending,
       classicTheme,
+      showMemo,
+      onAddMemo
     } = this.props;
 
     const amountField = form.$('amount');
     const receiverField = form.$('receiver');
+    const memoField = form.$('memo');
     const amountFieldProps = amountField.bind();
 
     const transactionFee = this.props.fee || new BigNumber(0);
@@ -273,7 +318,6 @@ export default class WalletSendForm extends Component<Props> {
       transactionFeeError = this.context.intl.formatMessage(this.props.error);
     }
 
-
     return (
       <div className={styles.component}>
 
@@ -295,7 +339,7 @@ export default class WalletSendForm extends Component<Props> {
             <NumericInput
               {...amountFieldProps}
               className="amount"
-              label={intl.formatMessage(messages.amountLabel)}
+              label={intl.formatMessage(globalMessages.amountLabel)}
               maxBeforeDot={currencyMaxIntegerDigits}
               maxAfterDot={currencyMaxFractionalDigits}
               disabled={this.props.shouldSendAll}
@@ -324,6 +368,35 @@ export default class WalletSendForm extends Component<Props> {
             />
           </div>
 
+          {showMemo ? (
+            <div className={styles.memoInput}>
+              <Input
+                className="memo"
+                {...memoField.bind()}
+                error={memoField.error}
+                skin={InputOwnSkin}
+                done={isValidMemo(memo)}
+              />
+            </div>
+          ) : (
+            <div className={styles.memoActionItemBlock}>
+              <button
+                className="addMemoButton"
+                type="button"
+                onClick={onAddMemo}
+              >
+                <div>
+                  <span className={styles.addMemoIcon}>
+                    <AddMemoSvg />
+                  </span>
+                  <span className={styles.actionLabel}>
+                    {intl.formatMessage(memoMessages.addMemo)}
+                  </span>
+                </div>
+              </button>
+            </div>
+          )}
+
           {this._makeInvokeConfirmationButton()}
 
         </BorderedBox>
@@ -334,6 +407,7 @@ export default class WalletSendForm extends Component<Props> {
 
   _makeInvokeConfirmationButton(): Node {
     const { intl } = this.context;
+    const { memo } = this.form.values();
 
     const buttonClasses = classnames([
       'primary',
@@ -344,6 +418,12 @@ export default class WalletSendForm extends Component<Props> {
       hasAnyPending,
     } = this.props;
 
+    const disabledCondition = (
+      !this.props.fee
+      || hasAnyPending
+      || !isValidMemoOptional(memo)
+    );
+
     return (
       <Button
         className={buttonClasses}
@@ -351,7 +431,7 @@ export default class WalletSendForm extends Component<Props> {
         onMouseUp={this.props.onSubmit}
         /** Next Action can't be performed in case transaction fees are not calculated
           * or there's a transaction waiting to be confirmed (pending) */
-        disabled={!this.props.fee || hasAnyPending}
+        disabled={disabledCondition}
         skin={ButtonSkin}
       />);
   }

@@ -1,0 +1,11 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    font-size: 12px;
+    line-height: 22px;
+    color: var(--theme-mywallets-sync-time-text-color);
+}
+
+.text {
+    color: var(--theme-mywallets-sync-time-label-color);
+}

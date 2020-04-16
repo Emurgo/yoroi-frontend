@@ -14,14 +14,19 @@ export default class UiNotificationsStore extends Store {
       null;
   }
 
-  setup() {
+  setup(): void {
+    super.setup();
     this.actions.notifications.open.listen(this._onOpen);
     this.actions.notifications.closeActiveNotification.listen(this._onClose);
   }
 
-  isOpen = (id: string): boolean => !!this._findNotificationById(id);
+  isOpen: string => boolean = (
+    id: string
+  ): boolean => !!this._findNotificationById(id);
 
-  getTooltipActiveNotification = (tooltipNotificationId : string): ?Notification => {
+  getTooltipActiveNotification: string => ?Notification = (
+    tooltipNotificationId : string
+  ): ?Notification => {
     let notification = null;
     const activeNotificationId = this.mostRecentActiveNotification ?
       this.mostRecentActiveNotification.id :
@@ -32,16 +37,16 @@ export default class UiNotificationsStore extends Store {
     return notification;
   }
 
-  _findNotificationById = (id: string): ?Notification => (
+  _findNotificationById: string => ?Notification = (id) => (
     this.activeNotifications.find(notification => notification.id === id)
   );
 
-  @action _onOpen = ({ id, message, duration }: Notification) => {
+  @action _onOpen: Notification => void = ({ id, message, duration }) => {
     const notification: Notification = {
       id,
       message,
-      duration: duration || null,
-      secondsTimerInterval: duration ? setInterval(this._updateSeconds, 1000, id) : null,
+      duration: duration != null ? duration : null,
+      secondsTimerInterval: duration != null ? setInterval(this._updateSeconds, 1000, id) : null,
     };
 
     if (this.isOpen(id)) {
@@ -53,11 +58,11 @@ export default class UiNotificationsStore extends Store {
     }
   };
 
-  @action _set = (notification: Notification) => {
+  @action _set: Notification => void = (notification) => {
     this.activeNotifications.push(notification);
   };
 
-  @action _onClose = ({ id } : { id: string }) => {
+  @action _onClose: {| id: string |} => void = ({ id }) => {
     const notification = this._findNotificationById(id);
     if (notification) {
       if (notification.secondsTimerInterval) clearInterval(notification.secondsTimerInterval);
@@ -66,9 +71,9 @@ export default class UiNotificationsStore extends Store {
     }
   };
 
-  @action _updateSeconds = (id: string) => {
+  @action _updateSeconds: string => void = (id) => {
     const notification = this._findNotificationById(id);
-    if (notification && notification.duration) {
+    if (notification && notification.duration != null) {
       notification.duration -= 1;
       if (notification.duration === 0) this._onClose({ id });
     }

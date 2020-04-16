@@ -1,19 +1,20 @@
 // @flow
 import React, { Component } from 'react';
+import { observer } from 'mobx-react';
 import type { MessageDescriptor } from 'react-intl';
-import SvgInline from 'react-svg-inline';
 import { intlShape } from 'react-intl';
 import styles from './LinkButton.scss';
 
 type Props = {|
-  url: string,
-  svg: string,
-  message: MessageDescriptor,
-  svgClass?: string,
-  textClassName: string,
-  onExternalLinkClick: Function,
+  +url: string,
+  +svg: string,
+  +message: MessageDescriptor,
+  +svgClass?: string,
+  +textClassName: string,
+  +onExternalLinkClick: MouseEvent => void,
 |};
 
+@observer
 export default class LinkButton extends Component<Props> {
   static defaultProps = {
     svgClass: undefined
@@ -34,25 +35,24 @@ export default class LinkButton extends Component<Props> {
       onExternalLinkClick
     } = this.props;
 
+    const SvgElem = svg;
     return (
       <div className={styles.component}>
-        {
-          <a
-            href={url}
-            onClick={event => onExternalLinkClick(event)}
-            className={styles.block}
-            title={intl.formatMessage(message)}
-          >
-            <div className={styles.icon}>
-              <SvgInline svg={svg} className={svgClass} />
-            </div>
-            <div className={styles.text}>
-              <span className={textClassName}>
-                {intl.formatMessage(message)}
-              </span>
-            </div>
-          </a>
-        }
+        <a
+          href={url}
+          onClick={event => onExternalLinkClick(event)}
+          className={styles.block}
+          title={intl.formatMessage(message)}
+        >
+          <div className={styles.icon}>
+            <span className={svgClass}><SvgElem /></span>
+          </div>
+          <div className={styles.text}>
+            <span className={textClassName}>
+              {intl.formatMessage(message)}
+            </span>
+          </div>
+        </a>
       </div>
     );
   }

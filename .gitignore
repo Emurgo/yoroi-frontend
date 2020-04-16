@@ -2,11 +2,15 @@ node_modules
 npm-debug.log
 .DS_Store
 staging-key.pem
+nightly-key.pem
 production-key.pem
 
 build/
 dev/
 screenshots/
+storybook-static/
+__screenshots__/
+coverage/
 
 *.zip
 *.xpi
@@ -26,3 +30,13 @@ Yoroi
 # IntelliJ IDEA config
 .idea
 **/*.iml
+
+# manifests are built dynamically
+chrome/manifest.*.json
+
+# history plugin for vscode
+.history
+Yoroi Shelley Testnet
+
+# Local Netlify folder
+.netlify

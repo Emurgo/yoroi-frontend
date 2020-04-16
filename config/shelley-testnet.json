@@ -1,0 +1,36 @@
+{
+  "network": {
+    "protocolMagic": 764824073,
+    "backendUrl": "https://shelley-itn-yoroi-backend.yoroiwallet.com",
+    "websocketUrl": "wss://shelley-itn-yoroi-backend.yoroiwallet.com:443",
+    "name": "shelley-testnet"
+  },
+  "seiza": {
+    "simpleTemplate": "https://testnet.seiza-website.emurgo.io/staking-simple/list?sortBy=RANDOM&searchText=&performance[]=0&performance[]=100&source=$$BROWSER$$",
+    "advanceTemplate": "https://testnet.seiza-website.emurgo.io/staking/list?sortBy=RANDOM&searchText=&performance[]=0&performance[]=100&source=$$BROWSER$$"
+  },
+  "app": {
+    "walletRefreshInterval": 20000,
+    "serverStatusRefreshInterval": 20000,
+    "logsBufferSize": 500,
+    "logsFileSuffix": "-yoroi-shelley-testnet.log",
+    "addressRequestSize": 50,
+    "txsBodiesRequestSize": 150
+  },
+  "genesis": {
+    "block0_date": 1576264417000,
+    "slots_per_epoch": 43200,
+    "slot_duration": 2,
+    "epoch_reward": 19666,
+    "linearFee": {
+      "constant": "200000",
+      "coefficient": "100000",
+      "certificate": "400000",
+      "per_certificate_fees": {
+        "certificate_pool_registration": "500000000",
+        "certificate_stake_delegation": "400000"
+      }
+    },
+    "genesisHash": "8e4d2a343f3dcf9330ad9035b3e8d168e6728904262f2c434a4f8f934ec7b676"
+  }
+}

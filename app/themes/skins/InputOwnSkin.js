@@ -19,27 +19,27 @@ import styles from './InputOwnSkin.scss';
 // This type should be kept open (not "exact") because it is a react-polymorph skin
 // and should be able to pass any extra properties from react-polymorph down.
 type Props = {
-  className?: ?string,
-  disabled?: boolean,
-  error?: string,
-  label?: string | Element<any>,
-  inputRef: Ref<'input'>,
-  onBlur?: FocusEvent=>void,
-  onChange?: Event=>void,
-  onFocus?: FocusEvent=>void,
-  onKeyPress?: KeyboardEvent=>void,
-  placeholder?: string,
-  readOnly?: boolean,
-  theme: Object,
-  themeId: string,
-  value: string,
-  done?: boolean,
-  type: string,
+  +className?: ?string,
+  +disabled?: boolean,
+  +error?: string,
+  +label?: string | Element<any>,
+  +inputRef: Ref<'input'>,
+  +onBlur?: FocusEvent=>void,
+  +onChange?: Event=>void,
+  +onFocus?: FocusEvent=>void,
+  +onKeyPress?: KeyboardEvent=>void,
+  +placeholder?: string,
+  +readOnly?: boolean,
+  +theme: Object,
+  +themeId: string,
+  +value: string,
+  +done?: boolean,
+  +type: string,
+  +onDelete?: void => void,
+  ...
 };
 
-type State = {
-  focused: boolean,
-};
+type State = {| focused: boolean, |};
 
 export const InputOwnSkin = class extends React.Component<Props, State> {
   static defaultProps = {
@@ -54,6 +54,7 @@ export const InputOwnSkin = class extends React.Component<Props, State> {
     placeholder: undefined,
     readOnly: undefined,
     done: undefined,
+    onDelete: undefined,
   };
 
   state = {
@@ -77,6 +78,7 @@ export const InputOwnSkin = class extends React.Component<Props, State> {
         done={this.props.done}
         type={this.props.type}
         focused={this.state.focused}
+        onDelete={this.props.onDelete}
         render={({ inputType }) => (
           <input
             ref={this.props.inputRef}
@@ -84,10 +86,10 @@ export const InputOwnSkin = class extends React.Component<Props, State> {
             type={inputType}
             className={classnames([
               this.props.theme[this.props.themeId].input,
-              this.props.disabled ? this.props.theme[this.props.themeId].disabled : null,
-              this.props.error ? this.props.theme[this.props.themeId].errored : null,
-              (this.props.error || this.props.type === 'password' || this.props.done) ? styles.icon : null,
-              ((this.props.error || this.props.type === 'password') && this.props.done) ? styles.doubleIcon : null
+              this.props.disabled === true ? this.props.theme[this.props.themeId].disabled : null,
+              (this.props.error != null && this.props.error !== '') ? this.props.theme[this.props.themeId].errored : null,
+              (this.props.error != null || this.props.type === 'password' || this.props.done === true) ? styles.icon : null,
+              ((this.props.error != null || this.props.type === 'password') && this.props.done === true) ? styles.doubleIcon : null
             ])}
             readOnly={this.props.readOnly}
             onFocus={this.handleFocus}

@@ -113,7 +113,6 @@
   .error {
     @include error-message;
     text-align: center;
-    margin-top: 17px;
   }
 }
 
@@ -164,7 +163,6 @@
 
   .walletPassword {
     margin-top: 0;
-    padding-bottom: 0;
   }
 
   .amountFeesWrapper {

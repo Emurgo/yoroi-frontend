@@ -14,21 +14,36 @@
 
 [untyped]
 .*/node_modules/trezor-connect/lib/utils/networkUtils.js
+.*/node_modules/trezor-connect/lib/index.js
+.*/node_modules/react-polymorph/source/components/HOC/withTheme.js
+.*/node_modules/react-polymorph/source/components/layout/Flex.js
 
 [libs]
 flow/declarations/
 
+[lints]
+sketchy-null=warn
+sketchy-number=warn
+unnecessary-optional-chain=warn
+ambiguous-object-type=error
+# re-enable this if it's ever shipped as part of Flow
+# no-floating-promises=warn
+
 [options]
+include_warnings=true
 server.max_workers=1
 esproposal.class_static_fields=enable
 esproposal.class_instance_fields=enable
 esproposal.export_star_as=enable
 esproposal.decorators=ignore
 module.ignore_non_literal_requires=true
+esproposal.optional_chaining=enable
+esproposal.nullish_coalescing=enable
 module.name_mapper.extension='scss' -> '<PROJECT_ROOT>/flow/mappers/CSSModule.js.flow'
 module.name_mapper.extension='png' -> '<PROJECT_ROOT>/flow/mappers/WebpackAsset.js.flow'
 module.name_mapper.extension='jpg' -> '<PROJECT_ROOT>/flow/mappers/WebpackAsset.js.flow'
 module.name_mapper.extension='svg' -> '<PROJECT_ROOT>/flow/mappers/WebpackAsset.js.flow'
-module.name_mapper='\(react-dropzone\)' -> '<PROJECT_ROOT>/flow/mappers/GeneralStub.js.flow'
+module.name_mapper.extension='md' -> '<PROJECT_ROOT>/flow/mappers/Markdown.js.flow'
 suppress_comment=\\(.\\|\n\\)*\\$FlowFixMe
 suppress_comment=\\(.\\|\n\\)*\\$FlowIssue
+suppress_comment=\\(.\\|\n\\)*\\$FlowDisable

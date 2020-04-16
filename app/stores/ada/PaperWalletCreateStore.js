@@ -42,7 +42,8 @@ export default class PaperWalletCreateStore extends Store {
   userPassword: ?string;
   paper: ?AdaPaper;
 
-  setup() {
+  setup(): void {
+    super.setup();
     this._reset();
     const a = this.actions.ada.paperWallets;
     a.submitInit.listen(this._submitInit);
@@ -58,57 +59,53 @@ export default class PaperWalletCreateStore extends Store {
     a.cancel.listen(this._cancel);
   }
 
-  @action _submitInit = async (
-    {
-      numAddresses,
-      printAccountPlate
-    }: {
-      numAddresses: number,
-      printAccountPlate: boolean
-    }
-  ): Promise<void> => {
-    this.numAddresses = numAddresses;
-    this.printAccountPlate = printAccountPlate;
+  @action _submitInit: {|
+    numAddresses: number,
+    printAccountPlate: boolean
+  |} => void = (
+    request
+  ) => {
+    this.numAddresses = request.numAddresses;
+    this.printAccountPlate = request.printAccountPlate;
     this.progressInfo = ProgressStep.USER_PASSWORD;
   };
 
-  @action _submitUserPassword = async ({ userPassword }: { userPassword: string }) => {
-    if (this.userPassword) {
+  @action _submitUserPassword: {|
+    userPassword: string
+  |} => Promise<void> = async ({ userPassword }) => {
+    if (this.userPassword != null) {
       throw new Error('User password is already initialized');
     }
     this.userPassword = userPassword;
     this.progressInfo = ProgressStep.CREATE;
-    this.actions.ada.paperWallets.createPaperWallet.trigger({});
-    // setTimeout is needed to fix:
-    // https://github.com/Emurgo/yoroi-frontend/pull/584#pullrequestreview-249311058
-    // createPdfDocument is heavyweight and blocking
-    setTimeout(() => {
-      this.actions.ada.paperWallets.createPdfDocument.trigger({});
-    }, 0);
+    this.actions.ada.paperWallets.createPaperWallet.trigger();
+    await this.actions.ada.paperWallets.createPdfDocument.trigger();
   };
 
-  @action _backToCreatePaper = async () => {
+  @action _backToCreatePaper: void => void = () => {
     this.progressInfo = ProgressStep.CREATE;
   };
 
-  @action _submitCreatePaper = async () => {
+  @action _submitCreatePaper: void => void = () => {
     this.progressInfo = ProgressStep.VERIFY;
   };
 
-  @action _submitVerifyPaper = async () => {
+  @action _submitVerifyPaper: void => void = () => {
     this.progressInfo = ProgressStep.FINALIZE;
   };
 
-  @action _createPaperWallet = async () => {
-    if (this.numAddresses && this.userPassword) {
+  @action _createPaperWallet: void => void = () => {
+    if (this.numAddresses != null && this.userPassword != null) {
       this.paper = this.api.ada.createAdaPaper({
         numAddresses: this.numAddresses,
         password: this.userPassword,
+        // TODO: fix paper wallets for Shelley
+        legacy: true,
       });
     }
   };
 
-  @action _createPdfDocument = async () => {
+  @action _createPdfDocument: void => Promise<void> = async () => {
     let pdf;
     if (this.paper) {
       pdf = await this.api.ada.createAdaPaperPdf({
@@ -126,19 +123,23 @@ export default class PaperWalletCreateStore extends Store {
     }
   };
 
-  @action _setPdfRenderStatus = async ({ status }: { status: PdfGenStepType }) => {
+  @action _setPdfRenderStatus: {| status: PdfGenStepType |} => void = (
+    { status }
+  ) => {
     this.pdfRenderStatus = status;
   };
 
-  @action _setPdf = async ({ pdf }: { pdf: Blob }) => {
+  @action _setPdf: {| pdf: Blob |} => void = (
+    { pdf }
+  ) => {
     this.pdf = pdf;
   };
 
-  @action _downloadPaperWallet = async () => {
+  @action _downloadPaperWallet: void => void = () => {
     fileSaver.saveAs(this.pdf, 'Yoroi-Paper-Wallet.pdf');
   };
 
-  @action _cancel = async () => {
+  @action _cancel: void => void = () => {
     this.teardown();
   };
 
@@ -148,7 +149,7 @@ export default class PaperWalletCreateStore extends Store {
   }
 
   @action
-  _reset = () => {
+  _reset: void => void = () => {
     this.progressInfo = ProgressStep.INIT;
     this.error = undefined;
     this.numAddresses = undefined;

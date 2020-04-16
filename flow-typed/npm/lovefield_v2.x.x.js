@@ -11,16 +11,15 @@ declare module 'lovefield' {
 
   declare var npm$namespace$lf: {
     bind: typeof lf$bind,
-
     Order: typeof lf$Order,
     Type: typeof lf$Type,
     ConstraintAction: typeof lf$ConstraintAction,
     ConstraintTiming: typeof lf$ConstraintTiming,
     TransactionType: typeof lf$TransactionType,
-
     schema: typeof npm$namespace$lf$schema,
     op: typeof npm$namespace$lf$op,
-    fn: typeof npm$namespace$lf$fn
+    fn: typeof npm$namespace$lf$fn,
+    ...
   };
 
   declare var lf$Order: {|
@@ -57,6 +56,11 @@ declare module 'lovefield' {
   declare interface lf$Row {}
 
   declare type lf$ValueLiteral = string | number | boolean | Date;
+  declare type lf$ValueLiteralArray =
+    $ReadOnlyArray<string> |
+    $ReadOnlyArray<number> |
+    $ReadOnlyArray<boolean> |
+    $ReadOnlyArray<Date>;
 
   declare interface lf$PredicateProvider {
     eq(operand: lf$ValueLiteral | lf$schema$Column | lf$Binder): lf$Predicate;
@@ -70,7 +74,7 @@ declare module 'lovefield' {
       from: lf$ValueLiteral | lf$Binder,
       to: lf$ValueLiteral | lf$Binder
     ): lf$Predicate;
-    in(values: lf$Binder | Array<lf$ValueLiteral>): lf$Predicate;
+    in(values: lf$Binder | lf$ValueLiteralArray): lf$Predicate;
     isNull(): lf$Predicate;
     isNotNull(): lf$Predicate;
   }
@@ -86,10 +90,12 @@ declare module 'lovefield' {
   }
 
   declare interface lf$Transaction {
-    attach(query: lf$query$Builder): Promise<Array<Object>>;
-    begin(scope: Array<lf$schema$Table>): Promise<void>;
+    attach(query: lf$query$Builder): Promise<$ReadOnlyArray<$ReadOnly<Object>>>;
+    begin(scope: $ReadOnlyArray<lf$schema$Table>): Promise<void>;
     commit(): Promise<void>;
-    exec(queries: Array<lf$query$Builder>): Promise<Array<Array<Object>>>;
+    exec(queries: $ReadOnlyArray<lf$query$Builder>): Promise<
+      $ReadOnlyArray<$ReadOnlyArray<$ReadOnly<Object>>>
+    >;
     rollback(): Promise<void>;
     stats(): lf$TransactionStats;
   }
@@ -117,19 +123,21 @@ declare module 'lovefield' {
 
   declare interface lf$query$Builder {
     bind(...values: any[]): lf$query$Builder;
-    exec(): Promise<Array<Object>>;
+    exec(): Promise<$ReadOnlyArray<$ReadOnly<Object>>>;
     explain(): string;
     toSql(): string;
   }
 
   declare type lf$query$Delete = {
     from(table: lf$schema$Table): lf$query$Delete,
-    where(predicate: lf$Predicate): lf$query$Delete
+    where(predicate: lf$Predicate): lf$query$Delete,
+    ...
   } & lf$query$Builder;
 
   declare type lf$query$Insert = {
     into(table: lf$schema$Table): lf$query$Insert,
-    values(rows: Array<lf$Row> | lf$Binder | Array<lf$Binder>): lf$query$Insert
+    values(rows: $ReadOnlyArray<lf$Row> | lf$Binder | $ReadOnlyArray<lf$Binder>): lf$query$Insert,
+    ...
   } & lf$query$Builder;
 
   declare type lf$query$Select = {
@@ -146,12 +154,14 @@ declare module 'lovefield' {
       order?: $Values<typeof lf$Order>
     ): lf$query$Select,
     skip(numberOfRows: lf$Binder | number): lf$query$Select,
-    where(predicate: lf$Predicate): lf$query$Select
+    where(predicate: lf$Predicate): lf$query$Select,
+    ...
   } & lf$query$Builder;
 
   declare type lf$query$Update = {
     set(column: lf$schema$Column, value: any): lf$query$Update,
-    where(predicate: lf$Predicate): lf$query$Update
+    where(predicate: lf$Predicate): lf$query$Update,
+    ...
   } & lf$query$Builder;
 
   declare interface lf$raw$BackStore {
@@ -171,13 +181,13 @@ declare module 'lovefield' {
     ): Promise<void>;
     createRow(payload: Object): lf$Row;
     getVersion(): number;
-    dump(): Array<Object>;
+    dump(): Promise<{ [tableName: string]: Array<any>, ... }>;
   }
 
   declare var npm$namespace$lf$schema: {
     create: typeof lf$schema$create,
-
-    DataStoreType: typeof lf$schema$DataStoreType
+    DataStoreType: typeof lf$schema$DataStoreType,
+    ...
   };
 
   declare var lf$schema$DataStoreType: {|
@@ -195,7 +205,7 @@ declare module 'lovefield' {
   declare interface lf$schema$Database {
     name(): string;
     pragma(): lf$schema$DatabasePragma;
-    tables(): Array<lf$schema$Table>;
+    tables(): $ReadOnlyArray<lf$schema$Table>;
     table(tableName: string): lf$schema$Table;
     version(): number;
   }
@@ -203,7 +213,8 @@ declare module 'lovefield' {
   declare type lf$schema$Column = {
     as(name: string): lf$schema$Column,
     getName(): string,
-    getNormalizedName(): string
+    getNormalizedName(): string,
+    ...
   } & lf$PredicateProvider;
 
   declare interface lf$schema$Table {
@@ -236,7 +247,8 @@ declare module 'lovefield' {
     local: string,
     ref: string,
     action?: $Values<typeof lf$ConstraintAction>,
-    timing?: $Values<typeof lf$ConstraintTiming>
+    timing?: $Values<typeof lf$ConstraintTiming>,
+    ...
   };
 
   declare interface lf$schema$TableBuilder {
@@ -250,16 +262,16 @@ declare module 'lovefield' {
     ): lf$schema$TableBuilder;
     addIndex(
       name: string,
-      columns: Array<string> | Array<lf$schema$IndexedColumn>,
+      columns: $ReadOnlyArray<string> | $ReadOnlyArray<lf$schema$IndexedColumn>,
       unique?: boolean,
       order?: $Values<typeof lf$Order>
     ): lf$schema$TableBuilder;
-    addNullable(columns: Array<string>): lf$schema$TableBuilder;
+    addNullable(columns: $ReadOnlyArray<string>): lf$schema$TableBuilder;
     addPrimaryKey(
-      columns: Array<string> | Array<lf$schema$IndexedColumn>,
+      columns: $ReadOnlyArray<string> | $ReadOnlyArray<lf$schema$IndexedColumn>,
       autoInc?: boolean
     ): lf$schema$TableBuilder;
-    addUnique(name: string, columns: Array<string>): lf$schema$TableBuilder;
+    addUnique(name: string, columns: $ReadOnlyArray<string>): lf$schema$TableBuilder;
   }
 
   declare function lf$schema$create(
@@ -270,7 +282,8 @@ declare module 'lovefield' {
   declare var npm$namespace$lf$op: {
     and: typeof lf$op$and,
     not: typeof lf$op$not,
-    or: typeof lf$op$or
+    or: typeof lf$op$or,
+    ...
   };
   declare function lf$op$and(...args: lf$Predicate[]): lf$Predicate;
 
@@ -286,7 +299,8 @@ declare module 'lovefield' {
     max: typeof lf$fn$max,
     min: typeof lf$fn$min,
     stddev: typeof lf$fn$stddev,
-    sum: typeof lf$fn$sum
+    sum: typeof lf$fn$sum,
+    ...
   };
   declare function lf$fn$avg(column: lf$schema$Column): lf$schema$Column;
 

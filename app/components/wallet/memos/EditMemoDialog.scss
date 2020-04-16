@@ -1,0 +1,8 @@
+.memoContent {
+  padding-bottom: 0!important;
+}
+
+:global(.YoroiModern) .component {
+  min-width: var(--theme-modal-min-max-width-cmn);
+  max-width: var(--theme-modal-min-max-width-cmn); 
+}

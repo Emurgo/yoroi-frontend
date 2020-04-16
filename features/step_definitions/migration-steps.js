@@ -1,13 +1,14 @@
 // @flow
 
 import { Then } from 'cucumber';
-
-const lastestVersion = require('../../chrome/manifest.test.json').version;
+import {
+  Version,
+} from '../../chrome/constants';
 
 Then(/^Last launch version is updated$/, async function () {
   await this.driver.wait(async () => {
     const lastLaunchVersion = await getLastLaunchVersion(this.driver);
-    return lastLaunchVersion === lastestVersion;
+    return lastLaunchVersion === Version.Byron;
   });
 });
 

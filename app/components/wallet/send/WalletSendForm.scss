@@ -45,6 +45,43 @@
     font-family: var(--font-mono-light);
     width: fit-content;
   }
+
+  .memoActionItemBlock {
+    letter-spacing: 0.5px;
+    margin: 15px 0;
+    line-height: 20px;
+    vertical-align: top;
+    white-space: nowrap;
+
+    * {
+      vertical-align: middle;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .addMemoIcon {
+      cursor: pointer;
+      display: inline-flex;
+      object-fit: contain;
+      & > svg {
+        height: 30px;
+        width: 30px;
+      }
+    }
+  }
+
+  .memoInput {
+    margin-top: 24px;
+  }
+
+  .actionLabel {
+    color: var(--theme-label-button-color);
+    font-family: var(--rp-checkbox-label-font-family, var(--rp-theme-font-light, "NotoSans-Light, NotoSansCJKjp-Light"), sans-serif);
+    font-size: var(--rp-checkbox-label-font-size, 16px);
+    padding-left: 17px;
+  }
 }
 
 :global(.YoroiClassic) .component {

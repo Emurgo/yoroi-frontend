@@ -6,9 +6,9 @@ import classnames from 'classnames';
 import styles from './WalletRecoveryPhraseMnemonic.scss';
 
 type Props = {|
-  phrase: string | Element<any>,
-  classicTheme: boolean,
-  filled?: boolean
+  +phrase: string | Element<any>,
+  +classicTheme: boolean,
+  +filled?: boolean
 |};
 
 @observer
@@ -21,7 +21,7 @@ export default class WalletRecoveryPhraseMnemonic extends Component<Props> {
     const { phrase, filled } = this.props;
     const componentClasses = classnames([
       styles.component,
-      filled ? styles.filled : ''
+      filled === true ? styles.filled : ''
     ]);
     return (
       <div className={componentClasses}>{phrase}</div>

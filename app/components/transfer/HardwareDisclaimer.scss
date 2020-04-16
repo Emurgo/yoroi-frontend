@@ -1,0 +1,42 @@
+@import '../../themes/mixins/error-message';
+
+.component {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.headerIcon {
+  width: 16px;
+  height: 16px;
+  margin-right: 3px;
+  vertical-align: top;
+}
+
+.body {
+  color: var(--theme-bordered-box-text-color);
+  font-family: var(--font-regular);
+  font-size: 14px;
+  line-height: 19px;
+
+  .message {
+    font-size: 16px;
+    line-height: 22px;
+    margin-bottom: 50px;
+    word-break: break-word;
+    text-align: center;
+  }
+}
+
+:global(.YoroiClassic) {
+  .headerIcon {
+    content:url(../../assets/images/attention-classic.inline.svg);
+  }
+}
+
+:global(.YoroiModern) {
+  .headerIcon {
+    content:url(../../assets/images/attention-modern.inline.svg);
+  }
+}

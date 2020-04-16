@@ -39,6 +39,7 @@ Feature: Migration
     And I go to the receive screen
     And I should see the addresses exactly list them
     | address                                                     |
+    | Ae2tdPwUPEYwqhm4h1XJ1YkKhYY4tgymXmGLA1UoRySc8zTG2wAfbBijXz3 |
     | Ae2tdPwUPEYx2dK1AMzRN1GqNd2eY7GCd7Z6aikMPJL3EkqqugoFQComQnV |
     # make sure can still send transactions
     When I go to the send transaction screen

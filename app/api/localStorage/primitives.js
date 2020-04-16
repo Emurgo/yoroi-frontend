@@ -8,7 +8,9 @@ import environment from '../../environment';
  * so the WebPage will use the `localStorage`.
  */
 
+/*::
 declare var chrome;
+*/
 
 // =====
 //  get
@@ -17,7 +19,7 @@ declare var chrome;
 const getStorageItemInExtension = async (
   key: string | void
 ): Promise<?string> => new Promise((resolve, reject) => {
-  chrome.storage.local.get(key, (data: {}) => {
+  chrome.storage.local.get(key, (data: {...}) => {
     if (chrome.runtime.lastError) reject(chrome.runtime.lastError);
     if (key === undefined) {
       resolve(JSON.stringify(data));
@@ -36,7 +38,7 @@ const getStorageItemInExtension = async (
 const getStorageItemInWeb = async (
   key: string | void
 ): Promise<?string> => {
-  if (!key) return Promise.resolve(JSON.stringify(localStorage));
+  if (key === undefined) return Promise.resolve(JSON.stringify(localStorage));
   // careful: getItem returns null on missing key. Indexer returns undefined
   return Promise.resolve(localStorage[key]);
 };
@@ -113,12 +115,10 @@ export async function clear(): Promise<void> {
 //  listener
 // ==========
 
-type StorageChange = {
-  [key: string]: {
-    +oldValue?: any,
-    +newValue?: any,
-  }
-}
+type StorageChange = { [key: string]: {|
+  +oldValue?: any,
+  +newValue?: any,
+|}, ... }
 /**
  * Warning!
  * There are a lof of differences between localStorage and storage.local listeners
@@ -141,16 +141,16 @@ export function addListener(
     });
   } else {
     window.addEventListener('storage', (e: StorageEvent) => {
-      // can't map behavior when key is null  (happens when .clear() is called)
+      // can't map behavior when key is null (happens when .clear() is called)
       if (e.key == null) {
         return;
       }
-      const oldValue = e.oldValue
+      const oldValue: {| oldValue?: any |} = e.oldValue != null
         ? { oldValue: JSON.parse(e.oldValue) }
-        : {};
-      const newValue = e.newValue
+        : Object.freeze({});
+      const newValue: {| newValue?: any |}  = e.newValue != null
         ? { newValue: JSON.parse(e.newValue) }
-        : {};
+        : Object.freeze({});
       listener({
         [e.key]: {
           ...oldValue,

@@ -11,7 +11,6 @@ import DaedalusTransferStore from './DaedalusTransferStore';
 import YoroiTransferStore from './YoroiTransferStore';
 import TrezorConnectStore from './TrezorConnectStore';
 import TrezorSendStore from './TrezorSendStore';
-import AdaRedemptionStore from './AdaRedemptionStore';
 import AdaTransactionBuilderStore from './AdaTransactionBuilderStore';
 import LedgerConnectStore from './LedgerConnectStore';
 import LedgerSendStore from './LedgerSendStore';
@@ -20,9 +19,15 @@ import PaperWalletCreateStore from './PaperWalletCreateStore';
 import StateFetchStore from './StateFetchStore';
 import ServerConnectionStore from './ServerConnectionStore';
 import CoinPriceStore from './CoinPriceStore';
+import WalletRestoreStore from './WalletRestoreStore';
+import DelegationTransactionStore from './DelegationTransactionStore';
+import DelegationStore from './DelegationStore';
+import TimeStore from './TimeStore';
+import type { ActionsMap } from '../../actions/index';
+import type { Api } from '../../api/index';
+import type { StoresMap } from '../index';
 
 export const adaStoreClasses = {
-  adaRedemption: AdaRedemptionStore,
   wallets: AdaWalletsStore,
   paperWallets: PaperWalletCreateStore,
   transactions: TransactionsStore,
@@ -39,10 +44,13 @@ export const adaStoreClasses = {
   transactionBuilderStore: AdaTransactionBuilderStore,
   serverConnectionStore: ServerConnectionStore,
   coinPriceStore: CoinPriceStore,
+  walletRestore: WalletRestoreStore,
+  delegationTransaction: DelegationTransactionStore,
+  delegation: DelegationStore,
+  time: TimeStore,
 };
 
-export type AdaStoresMap = {
-  adaRedemption: AdaRedemptionStore,
+export type AdaStoresMap = {|
   wallets: AdaWalletsStore,
   paperWallets: PaperWalletCreateStore,
   transactions: TransactionsStore,
@@ -59,10 +67,13 @@ export type AdaStoresMap = {
   transactionBuilderStore: AdaTransactionBuilderStore,
   serverConnectionStore: ServerConnectionStore,
   coinPriceStore: CoinPriceStore,
-};
+  walletRestore: WalletRestoreStore,
+  delegationTransaction: DelegationTransactionStore,
+  delegation: DelegationStore,
+  time: TimeStore,
+|};
 
 const adaStores = observable({
-  adaRedemption: null,
   wallets: null,
   paperWallets: null,
   transactions: null,
@@ -79,16 +90,26 @@ const adaStores = observable({
   transactionBuilderStore: null,
   serverConnectionStore: null,
   coinPriceStore: null,
+  walletRestore: null,
+  delegationTransaction: null,
+  delegation: null,
+  time: null,
 });
 
 /** See `stores` index for description of this weird behavior
  * Note: stores created here are NOT initialized
  */
-export default action((stores, api, actions): AdaStoresMap => {
-  const storeNames = Object.keys(adaStoreClasses);
-  storeNames.forEach(name => { if (adaStores[name]) adaStores[name].teardown(); });
-  storeNames.forEach(name => {
-    adaStores[name] = ((new adaStoreClasses[name](stores, api, actions)): any);
-  });
-  return (adaStores: any);
-});
+export default action(
+  (
+    stores: StoresMap,
+    api: Api,
+    actions: ActionsMap,
+  ): AdaStoresMap => {
+    const storeNames: Array<$Keys<typeof adaStoreClasses>> = Object.keys(adaStoreClasses);
+    storeNames.forEach(name => { if (adaStores[name]) adaStores[name].teardown(); });
+    storeNames.forEach(name => {
+      adaStores[name] = ((new adaStoreClasses[name](stores, api, actions)): any);
+    });
+    return (adaStores: any);
+  }
+);

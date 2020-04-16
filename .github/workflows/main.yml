@@ -1,0 +1,39 @@
+name: Publish to Nightly
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Read .nvmrc
+        run: echo ::set-output name=NVMRC::$(cat .nvmrc)
+        id: nvm
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '${{ steps.nvm.outputs.NVMRC }}'
+      - run: npm install
+      - name: Build
+        run: npm run prod:nightly
+        env:
+          YOROI_NIGHTLY_PEM: ${{ secrets.YOROI_NIGHTLY_PEM }}
+      - name: publish nightly
+        uses: SebastienGllmt/chrome-addon@v3
+        with:
+          # ID of the extension that you are updating
+          extension: poonlenmfdfbjfeeballhiibknlknepo
+          # Path to a .zip of your addon
+          zip: "Yoroi Nightly.zip"
+          # TODO: only share with trusted testers for now
+          publishTarget: trustedTesters
+          # Google OAuth2
+          client-id: ${{ secrets.CHROME_CLIENT_ID }}
+          client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}
+          refresh-token: ${{ secrets.CHROME_REFRESH_TOKEN }}

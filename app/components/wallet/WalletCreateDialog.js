@@ -31,14 +31,6 @@ const messages = defineMessages({
     id: 'wallet.create.dialog.create.personal.wallet.button.label',
     defaultMessage: '!!!Create personal wallet',
   },
-  walletPasswordLabel: {
-    id: 'wallet.create.dialog.walletPasswordLabel',
-    defaultMessage: '!!!Spending password',
-  },
-  passwordFieldPlaceholder: {
-    id: 'wallet.create.dialog.passwordFieldPlaceholder',
-    defaultMessage: '!!!Spending password',
-  },
   repeatPasswordLabel: {
     id: 'wallet.create.dialog.repeatPasswordLabel',
     defaultMessage: '!!!Repeat spending password',
@@ -50,14 +42,14 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onSubmit: Function,
-  onCancel: Function,
-  classicTheme: boolean
+  +onSubmit: {| name: string, password: string |} => PossiblyAsync<void>,
+  +onCancel: void => void,
+  +classicTheme: boolean
 |};
 
-type State = {
+type State = {|
   isSubmitting: boolean,
-};
+|};
 
 @observer
 export default class WalletCreateDialog extends Component<Props, State> {
@@ -91,9 +83,9 @@ export default class WalletCreateDialog extends Component<Props, State> {
       },
       walletPassword: {
         type: 'password',
-        label: this.context.intl.formatMessage(messages.walletPasswordLabel),
+        label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
         placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(messages.passwordFieldPlaceholder) : '',
+          this.context.intl.formatMessage(globalMessages.walletPasswordLabel) : '',
         value: '',
         validators: [({ field, form }) => {
           const repeatPasswordField = form.$('repeatPassword');
@@ -134,14 +126,14 @@ export default class WalletCreateDialog extends Component<Props, State> {
 
   submit = () => {
     this.form.submit({
-      onSuccess: (form) => {
+      onSuccess: async (form) => {
         this.setState({ isSubmitting: true });
         const { walletName, walletPassword } = form.values();
         const walletData = {
           name: walletName,
           password: walletPassword,
         };
-        this.props.onSubmit(walletData);
+        await this.props.onSubmit(walletData);
       },
       onError: () => {
         this.setState({ isSubmitting: false });
@@ -159,7 +151,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
     const { form } = this;
     const { walletName, walletPassword, repeatPassword } = form.values();
     const { intl } = this.context;
-    const { onCancel, classicTheme } = this.props;
+    const { onCancel, } = this.props;
     const { isSubmitting } = this.state;
     const dialogClasses = classnames([
       styles.component,
@@ -198,7 +190,6 @@ export default class WalletCreateDialog extends Component<Props, State> {
         closeOnOverlayClick={false}
         onClose={!isSubmitting ? onCancel : null}
         closeButton={<DialogCloseButton />}
-        classicTheme={classicTheme}
       >
         <Input
           className="walletName"
@@ -226,7 +217,6 @@ export default class WalletCreateDialog extends Component<Props, State> {
               error={repeatedPasswordField.error}
               skin={InputOwnSkin}
             />
-            <div />
           </div>
         </div>
 

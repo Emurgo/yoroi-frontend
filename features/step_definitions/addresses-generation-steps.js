@@ -16,6 +16,10 @@ When(/^I click on the Generate new address button$/, async function () {
   await this.click('.generateAddressButton');
 });
 
+When(/^I click on the internal tab$/, async function () {
+  await this.click('button.internal.ReceiveNavButton_button');
+});
+
 When(/^I click on the Hide used addresses button$/, async function () {
   const hideUsedText =
   await i18n.formatMessage(this.driver, { id: 'wallet.receive.page.hideUsedLabel' });
@@ -30,7 +34,7 @@ When(/^I click on the Generate new address button ([0-9]+) times$/, async functi
 });
 
 Then(/^I should see my latest address "([^"]*)" at the top$/, async function (address) {
-  await this.waitUntilText('.WalletReceive_copyableHash', address);
+  await this.waitUntilText('.StandardHeader_copyableHash', address);
 });
 
 Then(/^I see every generated address is unique$/, async function () {
@@ -74,5 +78,5 @@ Then(/^I shouldn't see the address "([^"]*)"$/, async function (address) {
 
 Then(/I should see an error about max unused addresses/, async function () {
   const errorMessage = await i18n.formatMessage(this.driver, { id: 'api.errors.unusedAddressesError' });
-  await this.waitUntilText('.WalletReceive_error', errorMessage);
+  await this.waitUntilText('.StandardHeader_error', errorMessage);
 });

@@ -46,9 +46,9 @@ To build production versions of Yoroi that run on `testnet` (or any other networ
 Although the real `pem` is not uploaded to Github for security reasons, you can generate your own `pem` for testing purposes using the following steps:
 
 ```
-npm run compress-keygen
+npm run keygen
 mv key.pem testnet.pem
-npm run compress-keygen
+npm run keygen
 mv key.pem mainnet.pem
 ```
 
@@ -62,11 +62,3 @@ To avoid this, we recommend the following:
 1) [Setting up Firefox-dev](https://askubuntu.com/questions/548003/how-do-i-install-the-firefox-developer-edition) (note that the Aurora PPA has been deprecated, so you might want to try another installation method).
 2) Setting `xpinstall.signatures.required` to `false` in `about:config`.
 3) Make sure typing `firefox` in your terminal opens firefox-dev or set the path of the binary using `setBinary(path)` in `firefox.Options()` in webdriver.js (otherwise the unittests will not pass).
-
-### Git hooks
-
-To register the githooks locally you must run this command
-
-```bash
-$ git config core.hooksPath .githooks
-```

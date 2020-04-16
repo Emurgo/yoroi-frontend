@@ -1,14 +1,18 @@
+// @flow
+
 module.exports = {
   moduleNameMapper: {
     // mock out the browser version of WASM bindings with the nodejs bindings
     'cardano-wallet-browser': 'cardano-wallet',
+    '@emurgo/js-chain-libs': '@emurgo/js-chain-libs-node',
     '\\.png$': 'lodash/noop.js',
-    pdfParser$: 'lodash/noop.js',
   },
   transformIgnorePatterns: [
-    '<rootDir>/node_modules/(?!yoroi-extension-ledger-bridge)'
+    '<rootDir>/node_modules/(?!yoroi-extension-ledger-connect-handler)'
   ],
   setupFiles: [
     'jest-canvas-mock'
-  ]
+  ],
+  // ignore manifest.test.js file, because it isn't a test
+  testPathIgnorePatterns: ['manifest.test.js']
 };

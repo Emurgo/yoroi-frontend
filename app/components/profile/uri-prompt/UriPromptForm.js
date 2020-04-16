@@ -1,21 +1,16 @@
 // @flow
 import React, { Component } from 'react';
 import classnames from 'classnames';
-import SvgInline from 'react-svg-inline';
 import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './UriPromptForm.scss';
-import aboutUri from '../../../assets/images/uri/about-url.inline.svg';
-import aboutUriClassic from '../../../assets/images/uri/about-url-classic.inline.svg';
+import AboutUri from '../../../assets/images/uri/about-url.inline.svg';
+import AboutUriClassic from '../../../assets/images/uri/about-url-classic.inline.svg';
 import globalMessages from '../../../i18n/global-messages';
 
 const messages = defineMessages({
-  skipLabel: {
-    id: 'profile.uriPrompt.form.skipLabel',
-    defaultMessage: '!!!Skip',
-  },
   explanationLine1: {
     id: 'profile.uriPrompt.form.explanation',
     defaultMessage: '!!!Do you want to enable Cardano payment URLs?',
@@ -23,9 +18,9 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onAccept: void => void,
-  onSkip: void => void,
-  classicTheme: boolean
+  +onAccept: void => void,
+  +onSkip: void => void,
+  +classicTheme: boolean
 |};
 
 @observer
@@ -42,7 +37,7 @@ export default class UriPromptForm extends Component<Props> {
       styles.submitButton,
     ]);
     const skipButtonClasses = classnames([
-      this.props.classicTheme ? 'flat' : 'outlined',
+      'secondary',
       styles.submitButton,
     ]);
 
@@ -50,13 +45,12 @@ export default class UriPromptForm extends Component<Props> {
       <div className={styles.component}>
         <div className={styles.centeredBox}>
 
-          <SvgInline
-            svg={this.props.classicTheme
-              ? aboutUriClassic
-              : aboutUri
+          <span className={styles.aboutSvg}>
+            {this.props.classicTheme
+              ? <AboutUriClassic />
+              : <AboutUri />
             }
-            className={styles.aboutSvg}
-          />
+          </span>
 
           <div className={styles.explanation}>
             {intl.formatMessage(messages.explanationLine1)}&nbsp;
@@ -66,7 +60,7 @@ export default class UriPromptForm extends Component<Props> {
           <div className={styles.buttonsWrapper}>
             <Button
               className={skipButtonClasses}
-              label={intl.formatMessage(messages.skipLabel)}
+              label={intl.formatMessage(globalMessages.skipLabel)}
               onMouseUp={this.props.onSkip}
               skin={ButtonSkin}
             />

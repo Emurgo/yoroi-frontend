@@ -3,16 +3,14 @@ import { observable, action, toJS } from 'mobx';
 import Store from '../base/Store';
 
 import {
-  prepareLedgerBridger,
-  disposeLedgerBridgeIFrame
-} from '../../utils/iframeHandler';
+  prepareLedgerConnect,
+} from '../../utils/hwConnectHandler';
 
-import {
-  LedgerBridge,
-} from 'yoroi-extension-ledger-bridge';
+import LedgerConnect from 'yoroi-extension-ledger-connect-handler';
 import TrezorConnect from 'trezor-connect';
 
 import LocalizableError from '../../i18n/LocalizableError';
+
 import environment from '../../environment';
 
 import type {
@@ -30,24 +28,34 @@ import {
 import {
   convertToLocalizableError as trezorErrorToLocalized
 } from '../../domain/TrezorLocalizedError';
-
-import Wallet from '../../domain/Wallet';
+import {
+  isTrezorTWallet,
+  isLedgerNanoWallet,
+} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import {
+  PublicDeriver,
+} from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 export default class AddressesStore extends Store {
   @observable isActionProcessing: boolean = false;
   @observable error: ?LocalizableError = null;
-  @observable selectedAddress: ?{ address: string, path: BIP32Path } = null;
+  @observable selectedAddress: ?{|
+    address: string,
+    path: BIP32Path,
+  |} = null;
+  ledgerConnect: ?LedgerConnect;
 
-  ledgerBridge: ?LedgerBridge;
-
-  setup() {
+  setup(): void {
+    super.setup();
     const actions = this.actions[environment.API].hwVerifyAddress;
     actions.selectAddress.listen(this._selectAddress);
     actions.verifyAddress.listen(this._verifyAddress);
     actions.closeAddressDetailDialog.listen(this._closeAddressDetailDialog);
   }
 
-  @action _verifyAddress = async (params: { wallet: Wallet }): Promise<void> => {
+  @action _verifyAddress: (PublicDeriver<>) => Promise<void> = async (
+    publicDeriver,
+  ) => {
     Logger.info('AddressStore::_verifyAddress called');
 
     if (!this.selectedAddress) {
@@ -59,16 +67,14 @@ export default class AddressesStore extends Store {
     const path = toJS(selectedAddress.path);
     const address = toJS(selectedAddress.address);
 
-    if (!params.wallet.hardwareInfo) {
-      throw new Error('AddressStore::_verifyAddress called with no hardware wallet active');
-    }
+    const conceptualWallet = publicDeriver.getParent();
 
     this._setError(null);
     this._setActionProcessing(true);
 
-    if (params.wallet.isLedgerNanoSWallet) {
-      await this.ledgerVerifyAddress(path);
-    } else if (params.wallet.isTrezorTWallet) {
+    if (isLedgerNanoWallet(conceptualWallet)) {
+      await this.ledgerVerifyAddress(path, address);
+    } else if (isTrezorTWallet(conceptualWallet)) {
       await this.trezorVerifyAddress(path, address);
     } else {
       throw new Error('AddressStore::_verifyAddress called with unrecognized hardware wallet');
@@ -77,7 +83,7 @@ export default class AddressesStore extends Store {
     this._setActionProcessing(false);
   }
 
-  trezorVerifyAddress = async (
+  trezorVerifyAddress: (BIP32Path, string) => Promise<void> = async (
     path: BIP32Path,
     address: string
   ): Promise<void> => {
@@ -94,55 +100,51 @@ export default class AddressesStore extends Store {
     }
   }
 
-  ledgerVerifyAddress = async (
+  ledgerVerifyAddress: (BIP32Path, string) => Promise<void> = async (
     path: BIP32Path,
+    address: string,
   ): Promise<void> => {
-    if (this.ledgerBridge == null) {
-      Logger.info('AddressStore::_verifyAddress new LedgerBridge created');
-      this.ledgerBridge = new LedgerBridge();
-    }
-
     try {
-      if (this.ledgerBridge) {
-        // trick to fix flow
-        const ledgerBridge: LedgerBridge = this.ledgerBridge;
+      this.ledgerConnect = new LedgerConnect({
+        locale: this.stores.profile.currentLocale
+      });
+      await prepareLedgerConnect(this.ledgerConnect);
 
-        await prepareLedgerBridger(ledgerBridge);
-        Logger.info('AddressStore::_verifyAddress show path ' + JSON.stringify(path));
-        // the next line is used to get an error when
-        // Ledger is not connected or has issues.
-        await ledgerBridge.getVersion();
-        await ledgerBridge.showAddress(path);
-      } else {
-        throw new Error(`LedgerBridge Error: LedgerBridge is undefined`);
+      Logger.info('AddressStore::_verifyAddress show path ' + JSON.stringify(path));
+      if (this.ledgerConnect) {
+        await this.ledgerConnect.showAddress(path, address);
       }
     } catch (error) {
-      Logger.error('AddressStore::ledgerVerifyAddress::error: ' + stringifyError(error));
       this._setError(ledgerErrorToLocalized(error));
     } finally {
+      this.ledgerConnect && this.ledgerConnect.dispose();
+      this.ledgerConnect = undefined;
       Logger.info('HWVerifyStore::ledgerVerifyAddress finalized ');
     }
   }
 
-  @action _selectAddress = async (params: { address: string, path: BIP32Path }): Promise<void> => {
+  @action _selectAddress: {|
+    address: string,
+    path: BIP32Path,
+  |} => Promise<void> = async (params) => {
     Logger.info('AddressStore::_selectAddress::called: ' + params.address);
     this.selectedAddress = { address: params.address, path: params.path };
   }
 
-  @action _setActionProcessing = (processing: boolean): void => {
+  @action _setActionProcessing: boolean => void = (processing) => {
     this.isActionProcessing = processing;
   }
 
-  @action _setError = (error: ?LocalizableError): void => {
+  @action _setError: ?LocalizableError => void = (error) => {
     this.error = error;
   }
 
-  @action _closeAddressDetailDialog = (): void => {
+  @action _closeAddressDetailDialog: void => void = () => {
+    this.ledgerConnect && this.ledgerConnect.dispose();
+    this.ledgerConnect = undefined;
     this.selectedAddress = null;
     this._setError(null);
     this._setActionProcessing(false);
-    disposeLedgerBridgeIFrame();
-    this.ledgerBridge = null;
     this.actions.dialogs.closeActiveDialog.trigger();
   }
 }

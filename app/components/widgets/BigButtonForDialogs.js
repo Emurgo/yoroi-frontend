@@ -1,16 +1,18 @@
 // @flow
 import React, { Component } from 'react';
+import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import styles from './BigButtonForDialogs.scss';
 
 type Props = {|
-  label: string,
-  description: string,
-  onClick: Function,
-  isDisabled: boolean,
-  className: string,
+  +label: string,
+  +description: string,
+  +onClick: void => void,
+  +isDisabled: boolean,
+  +className: string,
 |};
 
+@observer
 export default class BigButtonForDialogs extends Component<Props> {
 
   render() {

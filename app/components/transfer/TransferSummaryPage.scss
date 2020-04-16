@@ -1,18 +1,6 @@
 @import '../../themes/mixins/error-message';
 @import '../../themes/mixins/loading-spinner';
 
-.isSubmitting {
-  @include loading-spinner("../../assets/images/spinner-light.svg");
-}
-
-.component {
-  padding: 20px;
-}
-
-.button {
-  margin: 0;
-}
-
 .body {
   color: var(--theme-bordered-box-text-color);
   font-family: var(--font-regular);
@@ -114,10 +102,8 @@
     font-size: 12px;
   }
 
-  .buttonsWrapper {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+  .form {
+    margin-top: 20px;
   }
 
   .errorWrapper {
@@ -137,32 +123,28 @@
   }
 }
 
-:global(.YoroiClassic) .component {
-  .body {
-    .addressLabel {
-      text-transform: uppercase;
-    }
+:global(.YoroiClassic) .body {
+  .addressLabel {
+    text-transform: uppercase;
   }
 }
 
-:global(.YoroiModern) .component {
-  .body {
-    .addressLabel {
+:global(.YoroiModern) .body {
+  .addressLabel {
+    font-size: 16px;
+    text-transform: capitalize;
+  }
+
+  .amountFeesWrapper {
+    .amountLabel,
+    .feesLabel {
       font-size: 16px;
       text-transform: capitalize;
     }
+  }
 
-    .amountFeesWrapper {
-      .amountLabel,
-      .feesLabel {
-        font-size: 16px;
-        text-transform: capitalize;
-      }
-    }
-
-    .totalAmountLabel {
-      font-size: 16px;
-      text-transform: capitalize;
-    }
+  .totalAmountLabel {
+    font-size: 16px;
+    text-transform: capitalize;
   }
 }

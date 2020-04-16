@@ -7,24 +7,31 @@ import {
   Logger,
   stringifyError
 } from '../../utils/logging';
+import { transactionTypes } from '../../api/ada/transactions/types';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import globalMessages from '../../i18n/global-messages';
+import {
+  ConceptualWallet
+} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 
 import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
 import { isValidAmountInLovelaces } from '../../utils/validations';
 import TransactionsStore from '../base/TransactionsStore';
-import { transactionTypes } from '../../domain/WalletTransaction';
-import { assuranceLevels } from '../../config/transactionAssuranceConfig';
-import { getPrice } from '../../types/unitOfAccountType';
+import { assuranceLevels, } from '../../config/transactionAssuranceConfig';
+import { getPrice } from '../../api/ada/lib/storage/bridge/prices';
 import type {
   GetTransactionRowsToExportFunc,
 } from '../../api/ada';
-
+import { asHasLevels, } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import WalletTransaction from '../../domain/WalletTransaction';
+import type { AssuranceMode } from '../../types/transactionAssuranceTypes';
 import type {
   ExportTransactionsRequest,
   ExportTransactionsFunc,
 } from '../../api/common';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 
 import type { TransactionRowsToExportRequest } from '../../actions/ada/transactions-actions';
 
@@ -32,7 +39,7 @@ const EXPORT_START_DELAY = 800; // in milliseconds [1000 = 1sec]
 
 export default class AdaTransactionsStore extends TransactionsStore {
 
-  setup() {
+  setup(): void {
     super.setup();
     const actions = this.actions[environment.API].transactions;
     actions.exportTransactionsToFile.listen(this._exportTransactionsToFile);
@@ -49,104 +56,61 @@ export default class AdaTransactionsStore extends TransactionsStore {
 
   @observable exportError: ?LocalizableError;
 
-  /** Calculate information about transactions that are still realistically reversable */
+  /** Calculate information about transactions that are still realistically reversible */
   @computed get unconfirmedAmount(): UnconfirmedAmount {
-    const unconfirmedAmount = {
+    const defaultUnconfirmedAmount = {
       total: new BigNumber(0),
       incoming: new BigNumber(0),
       outgoing: new BigNumber(0),
-      // If any of the below values becomes null, it means price data are
-      // unavailable for at least one of the transaction in the category
-      // and we just give up calculating the value.
       incomingInSelectedCurrency: new BigNumber(0),
       outgoingInSelectedCurrency: new BigNumber(0),
     };
 
-    // Get current wallet
-    const wallet = this.stores.substores.ada.wallets.active;
-    if (!wallet) return unconfirmedAmount;
+    // Get current public deriver
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) return defaultUnconfirmedAmount;
 
-    // Get current transactions for wallet
-    const result = this._getTransactionsAllRequest(wallet.id).result;
-    if (!result || !result.transactions) return unconfirmedAmount;
+    // Get current transactions for public deriver
+    const result = this.getTxRequests(publicDeriver).requests.allRequest.result;
+    if (!result || !result.transactions) return defaultUnconfirmedAmount;
 
     const unitOfAccount = this.stores.profile.unitOfAccount;
 
-    for (const transaction of result.transactions) {
-      if (transaction.getAssuranceLevelForMode(wallet.assuranceMode) !== assuranceLevels.HIGH) {
-        // total
-        unconfirmedAmount.total = unconfirmedAmount.total.plus(transaction.amount.absoluteValue());
-
-        // outgoing
-        if (transaction.type === transactionTypes.EXPEND) {
-          unconfirmedAmount.outgoing = unconfirmedAmount.outgoing.plus(
-            transaction.amount.absoluteValue()
-          );
-
-          if (unitOfAccount.enabled) {
-            const price = getPrice('ADA', unitOfAccount.currency, transaction.tickers);
-            if (price !== null && unconfirmedAmount.outgoingInSelectedCurrency) {
-              unconfirmedAmount.outgoingInSelectedCurrency =
-                unconfirmedAmount.outgoingInSelectedCurrency.plus(
-                  transaction.amount.absoluteValue().multipliedBy(String(price))
-                );
-            } else {
-              unconfirmedAmount.outgoingInSelectedCurrency = null;
-            }
-          }
-        }
-
-        // incoming
-        if (transaction.type === transactionTypes.INCOME) {
-          unconfirmedAmount.incoming = unconfirmedAmount.incoming.plus(
-            transaction.amount.absoluteValue()
-          );
-          if (unitOfAccount.enabled) {
-            const price = getPrice('ADA', unitOfAccount.currency, transaction.tickers);
-            if (price !== null && unconfirmedAmount.incomingInSelectedCurrency) {
-              unconfirmedAmount.incomingInSelectedCurrency =
-                unconfirmedAmount.incomingInSelectedCurrency.plus(
-                  transaction.amount.absoluteValue().multipliedBy(String(price))
-                );
-            } else {
-              unconfirmedAmount.incomingInSelectedCurrency = null;
-            }
-          }
-        }
-      }
-    }
-    return unconfirmedAmount;
+    const { assuranceMode } = this.stores.substores.ada.walletSettings
+      .getPublicDeriverSettingsCache(publicDeriver);
+    return calculateUnconfirmedAmount(result.transactions, assuranceMode, unitOfAccount);
   }
 
   /** Wrap utility function to expose to components/containers */
-  validateAmount = (amountInLovelaces: string): Promise<boolean> => (
+  validateAmount: string => Promise<boolean> = (
+    amountInLovelaces: string
+  ): Promise<boolean> => (
     Promise.resolve(isValidAmountInLovelaces(amountInLovelaces))
   );
 
-  @action _exportTransactionsToFile = async (
-    params: TransactionRowsToExportRequest
-  ): Promise<void> => {
+  @action _exportTransactionsToFile: {|
+    publicDeriver: PublicDeriver<>,
+    exportRequest: TransactionRowsToExportRequest,
+  |} => Promise<void> = async (request) => {
     try {
       this._setExporting(true);
 
       this.getTransactionRowsToExportRequest.reset();
       this.exportTransactions.reset();
 
-      const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
-      this.getTransactionRowsToExportRequest.execute({
-        ...params,
-        getTransactionsHistoryForAddresses: stateFetcher.getTransactionsHistoryForAddresses,
-        checkAddressesInUse: stateFetcher.checkAddressesInUse,
-      });
-      if (!this.getTransactionRowsToExportRequest.promise) throw new Error('should never happen');
+      const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
+      if (!withLevels) return;
 
-      const respTxRows = await this.getTransactionRowsToExportRequest.promise;
+      const respTxRows = await this.getTransactionRowsToExportRequest.execute({
+        publicDeriver: withLevels,
+        ...request.exportRequest,
+      }).promise;
 
       if (respTxRows == null || respTxRows.length < 1) {
         throw new LocalizableError(globalMessages.noTransactionsFound);
       }
 
-      /** Intentially added delay to feel smooth flow */
+      /** Intentionally added delay to feel smooth flow */
       setTimeout(async () => {
         const req: ExportTransactionsRequest = {
           rows: respTxRows
@@ -164,26 +128,92 @@ export default class AdaTransactionsStore extends TransactionsStore {
 
       this._setExportError(localizableError);
       this._setExporting(false);
-      Logger.error(`AdaTransactionsStore::_exportTransactionsToFile ${stringifyError(error)}`);
+      Logger.error(`${nameof(AdaTransactionsStore)}::${nameof(this._exportTransactionsToFile)} ${stringifyError(error)}`);
     } finally {
       this.getTransactionRowsToExportRequest.reset();
       this.exportTransactions.reset();
     }
   }
 
-  @action _setExporting = (isExporting: boolean): void  => {
+  @action _setExporting: boolean => void = (isExporting)  => {
     this.isExporting = isExporting;
   }
 
-  @action _setExportError = (error: ?LocalizableError): void => {
+  @action _setExportError: ?LocalizableError => void = (error) => {
     this.exportError = error;
   }
 
-  @action _closeExportTransactionDialog = (): void => {
+  @action _closeExportTransactionDialog: void => void = () => {
     if (!this.isExporting) {
       this.actions.dialogs.closeActiveDialog.trigger();
       this._setExporting(false);
       this._setExportError(null);
     }
   }
+}
+
+export function calculateUnconfirmedAmount(
+  transactions: Array<WalletTransaction>,
+  assuranceMode: AssuranceMode,
+  unitOfAccount: UnitOfAccountSettingType,
+): UnconfirmedAmount {
+  const unconfirmedAmount = {
+    total: new BigNumber(0),
+    incoming: new BigNumber(0),
+    outgoing: new BigNumber(0),
+    // If any of the below values becomes null, it means price data are
+    // unavailable for at least one of the transaction in the category
+    // and we just give up calculating the value.
+    incomingInSelectedCurrency: new BigNumber(0),
+    outgoingInSelectedCurrency: new BigNumber(0),
+  };
+
+  for (const transaction of transactions) {
+    // skip any failed transactions
+    if (transaction.state < 0) continue;
+
+    const assuranceForTx = transaction.getAssuranceLevelForMode(assuranceMode);
+    if (assuranceForTx !== assuranceLevels.HIGH) {
+      // total
+      unconfirmedAmount.total = unconfirmedAmount.total.plus(transaction.amount.absoluteValue());
+
+      // outgoing
+      if (transaction.type === transactionTypes.EXPEND) {
+        unconfirmedAmount.outgoing = unconfirmedAmount.outgoing.plus(
+          transaction.amount.absoluteValue()
+        );
+        if (unitOfAccount.enabled) {
+          const price = getPrice('ADA', unitOfAccount.currency, transaction.tickers);
+          if (price !== null && unconfirmedAmount.outgoingInSelectedCurrency) {
+            unconfirmedAmount.outgoingInSelectedCurrency =
+              unconfirmedAmount.outgoingInSelectedCurrency.plus(
+                transaction.amount.absoluteValue().multipliedBy(String(price))
+              );
+          } else {
+            unconfirmedAmount.outgoingInSelectedCurrency = null;
+          }
+        }
+      }
+
+      // incoming
+      if (transaction.type === transactionTypes.INCOME) {
+        unconfirmedAmount.incoming = unconfirmedAmount.incoming.plus(
+          transaction.amount.absoluteValue()
+        );
+        if (unitOfAccount.enabled) {
+          const price = getPrice('ADA', unitOfAccount.currency, transaction.tickers);
+          if (price !== null && unconfirmedAmount.incomingInSelectedCurrency) {
+            unconfirmedAmount.incomingInSelectedCurrency =
+              unconfirmedAmount.incomingInSelectedCurrency.plus(
+                transaction.amount.absoluteValue().multipliedBy(String(price))
+              );
+          } else {
+            unconfirmedAmount.incomingInSelectedCurrency = null;
+          }
+        }
+      }
+    }
+  }
+
+  return unconfirmedAmount;
 }

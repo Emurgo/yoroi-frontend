@@ -14,17 +14,17 @@ import type {
   ExportTransactionsResponse,
 } from '../common';
 
-export type TransactionExportRow = {
+export type TransactionExportRow = {|
   type: 'in' | 'out',
   amount: string,
   fee: string,
-  date: Date
-}
+  date: Date,
+|}
 
-export type CsvData = {
+export type CsvData = {|
   headers: Array<string>,
-  rows: Array<Array<string>>
-}
+  rows: Array<Array<string>>,
+|}
 
 const TRANSACTION_EXPORT_FILE_TYPE = Object.freeze({
   csv: 'csv'
@@ -36,10 +36,10 @@ const TRANSACTION_EXPORT_DATA_FORMAT = Object.freeze({
 });
 export type TransactionExportDataFormat = $Values<typeof TRANSACTION_EXPORT_DATA_FORMAT>;
 
-export type ExportFileResponse = {
+export type ExportFileResponse = {|
   data: Blob,
-  fileType: TransactionExportFileType
-}
+  fileType: TransactionExportFileType,
+|}
 
 const DEFAULT_FILE_NAME_PREFIX = 'Yoroi-Transaction-History';
 const FN_SEPARATOR = '_';
@@ -59,14 +59,14 @@ export default class ExportApi {
    *
    * No result will be returned. File is sent to user as side-effect.
    */
-  exportTransactions = async (
-    request : ExportTransactionsRequest
-  ): Promise<ExportTransactionsResponse> => {
+  exportTransactions: ExportTransactionsRequest => Promise<ExportTransactionsResponse> = async (
+    request
+  ) => {
     try {
       Logger.debug('ExportApi::exportTransactions: called');
 
       const { rows, format, fileType, fileName } = request;
-      const dlFileName = fileName || ExportApi.createDefaultFileName();
+      const dlFileName = fileName != null ? fileName : ExportApi.createDefaultFileName();
       const data = ExportApi.convertExportRowsToCsv(rows, format);
       const fileResponse = ExportApi.convertCsvDataToFile(data, fileType);
 
@@ -119,7 +119,7 @@ export default class ExportApi {
   /** Creates a default export file name
     * SYNTAX: Yoroi-Transaction-History_YYYY-MM-DD
     * TODO: https://github.com/Emurgo/yoroi-frontend/issues/250 */
-  static createDefaultFileName = (): string => (
+  static createDefaultFileName: void => string = () => (
     DEFAULT_FILE_NAME_PREFIX
     + FN_SEPARATOR
     + moment().format(FN_TIME_FORMAT));

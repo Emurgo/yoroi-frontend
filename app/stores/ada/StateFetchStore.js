@@ -10,7 +10,8 @@ export default class StateFetchStore extends Store {
 
   @observable fetcher: IFetcher;
 
-  setup() {
+  setup(): void {
+    super.setup();
     this.fetcher = new BatchedFetcher(new RemoteFetcher(
       () => this.stores.profile.lastLaunchVersion,
       () => this.stores.profile.currentLocale

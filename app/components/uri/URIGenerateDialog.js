@@ -44,16 +44,16 @@ const messages = defineMessages({
   }
 });
 
-type Props = {
-  onClose: void => void,
-  onGenerate: (address: string, amount: number) => void,
-  classicTheme: boolean,
-  walletAddress: string,
-  amount?: number,
-  currencyMaxIntegerDigits: number,
-  currencyMaxFractionalDigits: number,
-  validateAmount: (amountInNaturalUnits: string) => Promise<boolean>,
-};
+type Props = {|
+  +onClose: void => void,
+  +onGenerate: (address: string, amount: number) => void,
+  +classicTheme: boolean,
+  +walletAddress: string,
+  +amount?: number,
+  +currencyMaxIntegerDigits: number,
+  +currencyMaxFractionalDigits: number,
+  +validateAmount: (amountInNaturalUnits: string) => Promise<boolean>,
+|};
 
 @observer
 export default class URIGenerateDialog extends Component<Props> {
@@ -117,7 +117,7 @@ export default class URIGenerateDialog extends Component<Props> {
     const amountField = this.form.$('amount');
     amountField.set(
       'value',
-      this.props.amount ? this.props.amount.toString() : ''
+      this.props.amount != null ? this.props.amount.toString() : ''
     );
   }
 
@@ -147,7 +147,6 @@ export default class URIGenerateDialog extends Component<Props> {
         className={dialogClasses}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
-        classicTheme={classicTheme}
         onClose={onClose}
       >
         <div>

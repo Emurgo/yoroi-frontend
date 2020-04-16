@@ -2,8 +2,32 @@
 import BigNumber from 'bignumber.js';
 import { DECIMAL_PLACES_IN_ADA } from '../config/numbersConfig';
 
+export function splitAmount(
+  amount: BigNumber,
+): [string, string] {
+  const valString = formattedWalletAmount(amount);
+  const startIndex = valString.length - DECIMAL_PLACES_IN_ADA;
+  return [valString.substring(0, startIndex), valString.substring(startIndex)];
+}
+
 export const formattedWalletAmount = (amount: BigNumber): string => (
   amount.toFormat(DECIMAL_PLACES_IN_ADA)
+);
+
+export const maxNameLengthBeforeTruncation = 15;
+export const truncateLongName: string => string = (walletName) => {
+  return walletName.length > maxNameLengthBeforeTruncation
+    ? walletName.substring(0, maxNameLengthBeforeTruncation - 3) + '...'
+    : walletName;
+};
+
+/**
+ * Just removes all Lovelaces, without decimal place (does not round off)
+ * e.g 3657.9345 => 3657
+ * @param {*} amount
+ */
+export const formattedAmountWithoutLovelace = (amount: BigNumber): string => (
+  amount.decimalPlaces(0, 3).toString() // 3 = ROUND_FLOOR
 );
 
 /** removes commas */

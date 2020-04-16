@@ -20,15 +20,15 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  localizedTermsOfUse: string,
-  onSubmit: Function,
-  isSubmitting: boolean,
-  error?: ?LocalizableError,
+  +localizedTermsOfUse: string,
+  +onSubmit: void => PossiblyAsync<void>,
+  +isSubmitting: boolean,
+  +error?: ?LocalizableError,
 |};
 
-type State = {
+type State = {|
   areTermsOfUseAccepted: boolean,
-};
+|};
 
 @observer
 export default class TermsOfUseForm extends Component<Props, State> {
@@ -47,10 +47,6 @@ export default class TermsOfUseForm extends Component<Props, State> {
   toggleAcceptance() {
     this.setState(prevState => ({ areTermsOfUseAccepted: !prevState.areTermsOfUseAccepted }));
   }
-
-  submit = () => {
-    this.props.onSubmit();
-  };
 
   render() {
     const { intl } = this.context;
@@ -73,15 +69,15 @@ export default class TermsOfUseForm extends Component<Props, State> {
             <Checkbox
               label={intl.formatMessage(messages[checkboxLabel])}
               onChange={this.toggleAcceptance.bind(this)}
-              checked={areTermsOfUseAccepted}
+              checked={areTermsOfUseAccepted || this.props.isSubmitting}
               skin={CheckboxSkin}
             />
 
             <Button
               className={buttonClasses}
               label={intl.formatMessage(globalMessages.continue)}
-              onMouseUp={this.submit}
-              disabled={!areTermsOfUseAccepted}
+              onMouseUp={this.props.onSubmit}
+              disabled={!areTermsOfUseAccepted || this.props.isSubmitting}
               skin={ButtonSkin}
             />
           </div>
@@ -91,5 +87,4 @@ export default class TermsOfUseForm extends Component<Props, State> {
       </div>
     );
   }
-
 }

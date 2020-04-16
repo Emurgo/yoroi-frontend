@@ -12,46 +12,69 @@ import LocalizableError, {
   localizedError
 } from '../../i18n/LocalizableError';
 import type {
-  TransferStatus,
-  TransferTx
+  TransferStatusT,
+  TransferTx,
+  TransferSourceType,
+  TransferKindType,
 } from '../../types/TransferTypes';
-import { generateTransferTx } from '../../api/ada/daedalusTransfer';
+import { TransferStatus, TransferSource, TransferKind, } from '../../types/TransferTypes';
+import { generateLegacyYoroiTransferTx } from '../../api/ada/transactions/transfer/legacyYoroi';
+import { generateCip1852TransferTx } from '../../api/ada/transactions/transfer/cip1852Transfer';
 import environment from '../../environment';
-import type { SignedResponse } from '../../api/ada/lib/state-fetch/types';
-import { getReceiverAddress } from '../../api/ada/lib/storage/adaAddress';
-import { getCryptoWalletFromEncryptedMasterKey } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import { HARD_DERIVATION_START } from '../../config/numbersConfig';
+import { generateWalletRootKey, generateLedgerWalletRootKey, } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
+import {
+  HARD_DERIVATION_START,
+  WalletTypePurpose,
+  CoinTypes,
+} from '../../config/numbersConfig';
 import type { RestoreWalletForTransferResponse, RestoreWalletForTransferFunc } from '../../api/ada/index';
-
-type TransferFundsRequest = {
-  signedTx: RustModule.Wallet.SignedTransaction,
-};
-type TransferFundsResponse = SignedResponse;
-type TransferFundsFunc = (
-  request: TransferFundsRequest
-) => Promise<TransferFundsResponse>;
-
+import {
+  Bip44DerivationLevels,
+} from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import {
+  asHasUtxoChains,
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import {
+  unscramblePaperAdaMnemonic,
+} from '../../api/ada/lib/cardanoCrypto/paperWallet';
+import config from '../../config';
 
 export default class YoroiTransferStore extends Store {
 
-  @observable status: TransferStatus = 'uninitialized';
-  @observable disableTransferFunds: boolean = true;
-  @observable transferFundsRequest: Request<TransferFundsFunc>
-    = new Request<TransferFundsFunc>(this._transferFundsRequest);
+  @observable status: TransferStatusT = TransferStatus.UNINITIALIZED;
+  @observable transferFundsRequest: Request<typeof YoroiTransferStore.prototype._checkAndTransfer>
+    = new Request<typeof YoroiTransferStore.prototype._checkAndTransfer>(this._checkAndTransfer);
   @observable restoreForTransferRequest: Request<RestoreWalletForTransferFunc>
     = new Request(this.api.ada.restoreWalletForTransfer);
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
-  recoveryPhrase: string = '';
+  @observable recoveryPhrase: string = '';
+  @observable transferKind: TransferKindType = TransferKind.NORMAL;
+  @observable transferSource: TransferSourceType = TransferSource.BYRON;
 
-  _errorWrapper = <PT, RT>(func: PT=>Promise<RT>): (PT => Promise<RT>) => (async (payload) => {
+  // eslint-disable-next-line no-restricted-syntax
+  _asyncErrorWrapper = <PT, RT>(func: PT=>Promise<RT>): (PT => Promise<RT>) => (async (payload) => {
     try {
       return await func(payload);
     } catch (error) {
       Logger.error(`YoroiTransferStore ${stringifyError(error)}`);
       runInAction(() => {
-        this.status = 'error';
+        this.status = TransferStatus.ERROR;
+        this.error = localizedError(error);
+      });
+      throw error;
+    }
+  });
+  // eslint-disable-next-line no-restricted-syntax
+  _errorWrapper = <PT, RT>(func: PT=>RT): (PT => RT) => ((payload) => {
+    try {
+      return func(payload);
+    } catch (error) {
+      Logger.error(`YoroiTransferStore ${stringifyError(error)}`);
+      runInAction(() => {
+        this.status = TransferStatus.ERROR;
         this.error = localizedError(error);
       });
       throw error;
@@ -59,16 +82,21 @@ export default class YoroiTransferStore extends Store {
   });
 
   setup(): void {
-    this.registerReactions([
-      this._enableDisableTransferFunds
-    ]);
+    super.setup();
     const actions = this.actions.ada.yoroiTransfer;
     actions.startTransferFunds.listen(this._startTransferFunds);
-    actions.setupTransferFundsWithMnemonic.listen(
-      this._errorWrapper(this._setupTransferFundsWithMnemonic)
+    actions.startTransferLegacyHardwareFunds.listen(this._startTransferLegacyHardwareFunds);
+    actions.startTransferPaperFunds.listen(this._startTransferPaperFunds);
+    actions.startHardwareMnemnoic.listen(this._startHardwareMnemnoic);
+    actions.setupTransferFundsWithMnemonic.listen(this.setupTransferFundsWithMnemonic);
+    actions.setupTransferFundsWithPaperMnemonic.listen(
+      this._errorWrapper(this._setupTransferFundsWithPaperMnemonic)
+    );
+    actions.checkAddresses.listen(
+      this._asyncErrorWrapper(this.checkAddresses)
     );
     actions.backToUninitialized.listen(this._backToUninitialized);
-    actions.transferFunds.listen(this._errorWrapper(this._transferFunds));
+    actions.transferFunds.listen(this._asyncErrorWrapper(this._transferFunds));
     actions.cancelTransferFunds.listen(this.reset);
   }
 
@@ -77,124 +105,209 @@ export default class YoroiTransferStore extends Store {
     this.reset();
   }
 
-  _startTransferFunds = () => {
-    this._updateStatus('gettingMnemonics');
+  _startTransferFunds: {|
+    source: TransferSourceType,
+  |} => void = (payload) => {
+    runInAction(() => {
+      this.transferKind = TransferKind.NORMAL;
+      this.transferSource = payload.source;
+    });
+    this._updateStatus(TransferStatus.GETTING_MNEMONICS);
   }
 
-  /** @Attention:
-      You should check wallets state outside of the runInAction,
-      because this method run as a reaction.
-  */
-  _enableDisableTransferFunds = (): void => {
-    const { wallets } = this.stores.substores[environment.API];
-    // User must first make a Yoroi wallet before being able to transfer a Daedalus wallet
-    if (wallets.hasActiveWallet) {
-      runInAction(() => {
-        this.disableTransferFunds = false;
-      });
-    } else {
-      runInAction(() => {
-        this.disableTransferFunds = true;
-      });
-    }
+  _startTransferPaperFunds: {|
+    source: TransferSourceType,
+  |} => void = (payload) => {
+    runInAction(() => {
+      this.transferKind = TransferKind.PAPER;
+      this.transferSource = payload.source;
+    });
+    this._updateStatus(TransferStatus.GETTING_PAPER_MNEMONICS);
   }
 
-  _generateTransferTxFromMnemonic = async (recoveryPhrase: string,
-    updateStatusCallback: void=>void) => {
-    const { masterKey, addresses } = await this._restoreWalletForTransfer(recoveryPhrase);
+  _startTransferLegacyHardwareFunds: TransferKindType => void = (kind) => {
+    runInAction(() => {
+      this.transferKind = kind;
+      this.transferSource = TransferSource.BYRON;
+    });
+    this._updateStatus(TransferStatus.HARDWARE_DISCLAIMER);
+  }
+
+  _startHardwareMnemnoic: void => void = () => {
+    this._updateStatus(TransferStatus.GETTING_HARDWARE_MNEMONIC);
+  }
+
+  nextInternalAddress: PublicDeriver<> => (void => Promise<string>) = (
+    publicDeriver
+  ) => {
+    return async () => {
+      const withChains = asHasUtxoChains(publicDeriver);
+      if (!withChains) throw new Error(`${nameof(this.nextInternalAddress)} missing chains functionality`);
+      const nextInternal = await withChains.nextInternal();
+      if (nextInternal.addressInfo == null) {
+        throw new Error(`${nameof(this.nextInternalAddress)} no internal addresses left. Should never happen`);
+      }
+      const nextInternalAddress = nextInternal.addressInfo.addr.Hash;
+      return nextInternalAddress;
+    };
+  }
+
+  _generateTransferTxFromMnemonic: (
+    string,
+    void => void,
+    void => Promise<string>
+  ) => Promise<TransferTx> = async (
+    recoveryPhrase,
+    updateStatusCallback,
+    getDestinationAddress,
+  ) => {
+    // 1) get receive address
+    const destinationAddress = await getDestinationAddress();
+
+    // 2) Perform restoration
+    const accountIndex = 0 + HARD_DERIVATION_START;
+    const { masterKey, addresses } = await this._restoreWalletForTransfer(
+      recoveryPhrase,
+      accountIndex,
+    );
 
     updateStatusCallback();
 
-    const cryptoWallet = getCryptoWalletFromEncryptedMasterKey(masterKey, '');
-    const addressKeys = {};
-    addresses.forEach(({ address, accountIndex, addressType, index }) => {
-      const account = cryptoWallet.bip44_account(
-        RustModule.Wallet.AccountIndex.new(accountIndex | HARD_DERIVATION_START)
-      );
-      const chainPrv = account.bip44_chain(addressType === 'Internal');
-      const keyPrv = chainPrv.address_key(RustModule.Wallet.AddressKeyIndex.new(index));
-      addressKeys[address] = keyPrv;
-    });
+    const sourceIsShelleyWallet = this.transferSource === TransferSource.SHELLEY_UTXO ||
+      this.transferSource === TransferSource.SHELLEY_CHIMERIC_ACCOUNT;
 
-    const outputAddr = await getReceiverAddress();
-    // Possible exception: NotEnoughMoneyToSendError
-    return generateTransferTx({
-      outputAddr,
-      addressKeys,
+    // 3) Calculate private keys for restored wallet utxo
+    const accountKey = RustModule.WalletV3.Bip32PrivateKey
+      .from_bytes(Buffer.from(masterKey, 'hex'))
+      .derive(sourceIsShelleyWallet
+        ? WalletTypePurpose.CIP1852
+        : WalletTypePurpose.BIP44)
+      .derive(CoinTypes.CARDANO)
+      .derive(accountIndex);
+
+    // 4) generate transaction
+    const baseRequest = {
+      addresses,
+      outputAddr: destinationAddress,
+      keyLevel: Bip44DerivationLevels.ACCOUNT.level,
+      signingKey: accountKey,
       getUTXOsForAddresses:
         this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
-      filterSenders: true
+    };
+
+    const transferTx = sourceIsShelleyWallet
+      ? await generateCip1852TransferTx(baseRequest)
+      : await generateLegacyYoroiTransferTx({
+        ...baseRequest,
+        legacy: !environment.isShelley(),
+      });
+    // Possible exception: NotEnoughMoneyToSendError
+    return transferTx;
+  }
+
+  _setupTransferFundsWithPaperMnemonic: {|
+    recoveryPhrase: string,
+    paperPassword: string,
+  |} => void = (payload) => {
+    const result = unscramblePaperAdaMnemonic(
+      payload.recoveryPhrase,
+      config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT,
+      payload.paperPassword
+    );
+    const recoveryPhrase = result[0];
+    if (recoveryPhrase == null) {
+      throw new Error(`${nameof(this._setupTransferFundsWithPaperMnemonic)} paper wallet failed`);
+    }
+    this.setupTransferFundsWithMnemonic({
+      recoveryPhrase,
     });
   }
 
-  _setupTransferFundsWithMnemonic = async (payload: { recoveryPhrase: string }): Promise<void> => {
-    this._updateStatus('checkingAddresses');
-    this.recoveryPhrase = payload.recoveryPhrase;
+  setupTransferFundsWithMnemonic: {|
+    recoveryPhrase: string,
+  |} => void = (
+    payload
+  ) => {
+    runInAction(() => {
+      this.recoveryPhrase = payload.recoveryPhrase;
+    });
+    this._updateStatus(TransferStatus.DISPLAY_CHECKSUM);
+  }
+
+  checkAddresses: {|
+    getDestinationAddress: void => Promise<string>,
+  |} => Promise<void> = async (
+    payload
+  ): Promise<void> => {
+    this._updateStatus(TransferStatus.CHECKING_ADDRESSES);
     const transferTx = await this._generateTransferTxFromMnemonic(
-      payload.recoveryPhrase,
-      () => this._updateStatus('generatingTx')
+      this.recoveryPhrase,
+      () => this._updateStatus(TransferStatus.GENERATING_TX),
+      payload.getDestinationAddress,
     );
     runInAction(() => {
       this.transferTx = transferTx;
     });
 
-    this._updateStatus('readyToTransfer');
+    this._updateStatus(TransferStatus.READY_TO_TRANSFER);
   }
 
-  _backToUninitialized = (): void => {
-    this._updateStatus('uninitialized');
+  _backToUninitialized: void => void = () => {
+    this._updateStatus(TransferStatus.UNINITIALIZED);
   }
 
   /** Updates the status that we show to the user as transfer progresses */
   @action.bound
-  _updateStatus(s: TransferStatus): void {
+  _updateStatus(s: TransferStatusT): void {
     this.status = s;
   }
 
   /** Broadcast the transfer transaction if one exists and proceed to continuation */
-  _transferFunds = async (payload: {
-    next: void => void
-  }): Promise<void> => {
+  _transferFunds: {|
+    next: void => Promise<void>,
+    getDestinationAddress: void => Promise<string>,
     /*
-     Always re-recover from the mnemonics to reduce the chance that the wallet
+     re-recover from the mnemonics to reduce the chance that the wallet
      changes before the tx is submit (we can't really eliminate it).
      */
-    const transferTx = await this._generateTransferTxFromMnemonic(
-      this.recoveryPhrase, () => {}
-    );
-    if (!this.transferTx) {
-      throw new NoTransferTxError();
-    }
-    if (this._isWalletChanged(transferTx, this.transferTx)) {
-      return this._handleWalletChanged(transferTx);
-    }
+    rebuildTx: boolean,
+  |} => Promise<void> = async (payload) => {
+    runInAction(() => {
+      this.error = null;
+    });
+    const oldTx = (() => {
+      const tx = this.transferTx;
+      if (tx == null) {
+        throw new NoTransferTxError();
+      }
+      return tx;
+    })();
 
-    try {
-      const { next } = payload;
+    const getTransferTx = async () => {
+      if (!payload.rebuildTx) {
+        return oldTx;
+      }
+      const newTx = await this._generateTransferTxFromMnemonic(
+        this.recoveryPhrase,
+        () => {},
+        payload.getDestinationAddress,
+      );
+      if (this._isWalletChanged(oldTx, newTx)) {
+        this._handleWalletChanged(newTx);
+        return null;
+      }
+      return newTx;
+    };
 
-      await this.transferFundsRequest.execute({
-        signedTx: transferTx.signedTx
-      });
-      this._updateStatus('success');
+    const { next } = payload;
+
+    await this.transferFundsRequest.execute({
+      getTransferTx,
+    });
+    if (this.error == null) {
+      this._updateStatus(TransferStatus.SUCCESS);
       await next();
       this.reset();
-    } catch (error) {
-      if (error.id === 'api.errors.sendTransactionApiError') {
-        /* See if the error is due to wallet change since last recovery.
-           This should be very rare because the window is short.
-        */
-        const newTransferTx = await this._generateTransferTxFromMnemonic(
-          this.recoveryPhrase, () => {}
-        );
-        if (this._isWalletChanged(newTransferTx, transferTx)) {
-          return this._handleWalletChanged(newTransferTx);
-        }
-      }
-
-      Logger.error(`YoroiTransferStore::transferFunds ${stringifyError(error)}`);
-      runInAction(() => {
-        this.error = new TransferFundsError();
-      });
     }
   }
 
@@ -212,34 +325,64 @@ export default class YoroiTransferStore extends Store {
 
   @action.bound
   reset(): void {
-    this.status = 'uninitialized';
+    this.status = TransferStatus.UNINITIALIZED;
     this.error = null;
     this.transferTx = null;
     this.transferFundsRequest.reset();
     this.restoreForTransferRequest.reset();
     this.recoveryPhrase = '';
+    this.transferKind = TransferKind.NORMAL;
+    this.transferSource = TransferSource.BYRON;
   }
 
-  _restoreWalletForTransfer = async (recoveryPhrase: string) :
-    Promise<RestoreWalletForTransferResponse> => {
+  _restoreWalletForTransfer: (string, number) => Promise<RestoreWalletForTransferResponse> = async (
+    recoveryPhrase,
+    accountIndex,
+  ) => {
     this.restoreForTransferRequest.reset();
 
+    const rootPk = this.transferKind === TransferKind.LEDGER
+      ? generateLedgerWalletRootKey(recoveryPhrase)
+      : generateWalletRootKey(recoveryPhrase);
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     const restoreResult = await this.restoreForTransferRequest.execute({
-      recoveryPhrase,
+      rootPk,
+      accountIndex,
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
+      transferSource: this.transferSource,
     }).promise;
     if (!restoreResult) throw new Error('Restored wallet was not received correctly');
     return restoreResult;
   };
 
-  /** Send a transaction to the backend-service to be broadcast into the network */
-  _transferFundsRequest = async (request: {
-    signedTx: RustModule.Wallet.SignedTransaction,
-  }): Promise<SignedResponse> => (
-    this.stores.substores.ada.stateFetchStore.fetcher.sendTx({ signedTx: request.signedTx })
-  )
+  _checkAndTransfer: {|
+    getTransferTx: void => Promise<?TransferTx>,
+  |} => Promise<void> = async (request) => {
+    const transferTx = await request.getTransferTx();
+    if (transferTx == null) return;
 
+    try {
+      await this.stores.substores.ada.stateFetchStore.fetcher.sendTx({
+        id: transferTx.id,
+        encodedTx: transferTx.encodedTx,
+      });
+    } catch (error) {
+      if (error.id === 'api.errors.sendTransactionApiError') {
+        /* See if the error is due to wallet change since last recovery.
+           This should be very rare because the window is short.
+        */
+        const newTx = await request.getTransferTx(); // will update the tx if something changed
+        if (newTx == null) {
+          return;
+        }
+      }
+
+      Logger.error(`${nameof(YoroiTransferStore)}::${nameof(this._checkAndTransfer)} ${stringifyError(error)}`);
+      runInAction(() => {
+        this.error = new TransferFundsError();
+      });
+    }
+  }
 }
 
 const messages = defineMessages({
@@ -277,7 +420,7 @@ export class NoTransferTxError extends LocalizableError {
   }
 }
 
-class WalletChangedError extends LocalizableError {
+export class WalletChangedError extends LocalizableError {
   constructor() {
     super({
       id: messages.walletChangedError.id,

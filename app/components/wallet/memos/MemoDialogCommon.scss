@@ -1,0 +1,25 @@
+.component {
+  .content {
+    font-family: var(--font-regular);
+    font-size: 14px;
+    line-height: 1.38;
+    text-align: center;
+    padding-bottom: 24px;
+
+    p {
+      width: 80%;
+      margin: 0 auto;
+    }
+  }
+}
+
+:global {
+  .Dialog_actions {
+    margin-top: 14px!important;
+  }
+}
+
+:global(.YoroiModern) .component {
+  min-width: var(--theme-modal-min-max-width-cmn);
+  max-width: var(--theme-modal-min-max-width-cmn); 
+}

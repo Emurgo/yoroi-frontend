@@ -5,13 +5,13 @@ import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
-import SVGInline from 'react-svg-inline';
 
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
-import performTxImg from '../../assets/images/uri/perform-tx-uri.inline.svg';
+import PerformTxImg from '../../assets/images/uri/perform-tx-uri.inline.svg';
 
 import styles from './URILandingDialog.scss';
+import globalMessages from '../../i18n/global-messages';
 
 const messages = defineMessages({
   uriLandingDialogTitle: {
@@ -30,17 +30,13 @@ const messages = defineMessages({
     id: 'uri.landing.dialog.warning.line3',
     defaultMessage: '!!!You are not being victim of a phishing or man-in-the-middle attack.',
   },
-  uriLandingDialogConfirmLabel: {
-    id: 'uri.landing.dialog.confirm.label',
-    defaultMessage: '!!!I understand',
-  },
 });
 
-type Props = {
-  onSubmit: void => void,
-  onClose: void => void,
-  classicTheme: boolean,
-};
+type Props = {|
+  +onSubmit: void => void,
+  +onClose: void => void,
+  +classicTheme: boolean,
+|};
 
 @observer
 export default class URILandingDialog extends Component<Props> {
@@ -68,11 +64,10 @@ export default class URILandingDialog extends Component<Props> {
         title={intl.formatMessage(messages.uriLandingDialogTitle)}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
-        classicTheme={classicTheme}
         onClose={onClose}
       >
         <div>
-          {!classicTheme && <SVGInline svg={performTxImg} className={styles.urlImage} />}
+          {!classicTheme && <span className={styles.urlImage}><PerformTxImg /></span>}
           <div className={styles.warningText}>
             {intl.formatMessage(messages.uriLandingDialogWarningLine1)}
             <ul>
@@ -85,7 +80,7 @@ export default class URILandingDialog extends Component<Props> {
             </ul>
           </div>
           <Button
-            label={intl.formatMessage(messages.uriLandingDialogConfirmLabel)}
+            label={intl.formatMessage(globalMessages.uriLandingDialogConfirmLabel)}
             onMouseUp={this.submit}
             disabled={false}
             skin={ButtonSkin}

@@ -6,9 +6,9 @@ import Blockies from 'react-blockies';
 import tinycolor from 'tinycolor2';
 
 type Props = {|
-  iconSeed: string,
-  scalePx?: number,
-  saturationFactor?: number,
+  +iconSeed: string,
+  +scalePx?: number,
+  +saturationFactor?: number,
 |};
 
 const mkcolor = (primary, secondary, spots) => ({ primary, secondary, spots });
@@ -48,7 +48,7 @@ export default class WalletAccountIcon extends Component<Props> {
     return (<Blockies
       seed={iconSeed}
       size={7}
-      scale={scalePx || 5}
+      scale={scalePx != null ? scalePx : 5}
       bgColor={saturation(color.primary, saturationFactor)}
       color={saturation(color.secondary, saturationFactor)}
       spotColor={saturation(color.spots, saturationFactor)}
