@@ -4,7 +4,6 @@ import BigNumber from 'bignumber.js';
 import { LOVELACES_PER_ADA } from '../config/numbersConfig';
 import type { AssuranceMode, AssuranceLevel } from '../types/transactionAssuranceTypes';
 import { assuranceLevels } from '../config/transactionAssuranceConfig';
-import type { Ticker } from '../api/ada/lib/storage/database/prices/tables';
 import type {
   TransactionDirectionType,
   UserAnnotation,
@@ -39,9 +38,6 @@ export default class WalletTransaction {
   // TODO: remove and turn it into a map
   @observable state: TxStatusCodesType;
   @observable errorMsg: null | string;
-  // Price data at the moment of the transaction. Used to show amount and fee in other currencies.
-  // TODO: remove this turn it into a map
-  @observable tickers: ?Array<Ticker>;
 
   constructor(data: {|
     txid: string,
@@ -55,7 +51,6 @@ export default class WalletTransaction {
     certificate: void | CertificatePart,
     state: TxStatusCodesType,
     errorMsg: null | string,
-    tickers?: Array<Ticker>,
   |}) {
     Object.assign(this, data);
   }

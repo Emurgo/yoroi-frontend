@@ -81,6 +81,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
           <WalletTransactionsList
             transactions={recent}
             memoMap={this.generated.stores.memos.txMemoMap.get(walletId) || new Map()}
+            priceMap={this.generated.stores.coinPriceStore.priceMap}
             selectedExplorer={this.generated.stores.profile.selectedExplorer}
             isLoadingTransactions={isLoadingTx}
             hasMoreToLoad={totalAvailable > limit}
@@ -297,6 +298,9 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
         },
         wallets: {
           selected: stores.wallets.selected,
+        },
+        coinPriceStore: {
+          priceMap: stores.substores.ada.coinPriceStore.priceMap,
         },
         memos: {
           hasSetSelectedExternalStorageProvider: stores.memos.hasSetSelectedExternalStorageProvider,

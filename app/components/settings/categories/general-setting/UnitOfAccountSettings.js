@@ -8,6 +8,10 @@ import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './UnitOfAccountSettings.scss';
+import Dialog from '../../../widgets/Dialog';
+import VerticalFlexContainer from '../../../layout/VerticalFlexContainer';
+import LoadingSpinner from '../../../widgets/LoadingSpinner';
+import globalMessages from '../../../../i18n/global-messages';
 
 const messages = defineMessages({
   unitOfAccountTitle: {
@@ -16,7 +20,7 @@ const messages = defineMessages({
   },
   note: {
     id: 'settings.unitOfAccount.note',
-    defaultMessage: '!!!<strong>Note:</strong> If you change the currency it might change the fee and the total amount received. The rate we use is based on <a href="https://www.cryptocompare.com/" target="_blank" rel="noopener noreferrer">CryptoCompare.com</a>, <a href="https://coinlayer.com/" target="_blank" rel="noopener noreferrer">coinlayer</a> and <a href="https://coinmarketcap.com/" target="_blank" rel="noopener noreferrer">CoinMarketCap</a>.',
+    defaultMessage: '!!!<strong>Note:</strong> coin price is approximate and may not match the price of any given trading platform. Any transactions based on these price approximates are done at your own risk.',
   },
   lastUpdated: {
     id: 'settings.unitOfAccount.lastUpdated',
@@ -61,14 +65,13 @@ export default class CoinPriceCurrencySettings extends Component<Props> {
   });
 
   render() {
-    const { currencies, isSubmitting, error, currentValue, lastUpdatedTimestamp } = this.props;
+    const { currencies, error, currentValue, lastUpdatedTimestamp } = this.props;
     const { intl } = this.context;
     const { form } = this;
     const coinPriceCurrencyId = form.$('coinPriceCurrencyId');
     const componentClassNames = classNames([styles.component, 'currency']);
     const coinPriceCurrencySelectClassNames = classNames([
       styles.currency,
-      isSubmitting ? styles.submitCoinPriceCurrencySpinner : null,
     ]);
 
     const optionRenderer = option => {
@@ -96,8 +99,22 @@ export default class CoinPriceCurrencySettings extends Component<Props> {
       ? new Date(lastUpdatedTimestamp).toLocaleString()
       : '-';
 
+    const dialog = this.props.isSubmitting
+      ? (
+        <Dialog
+          title={intl.formatMessage(globalMessages.processingLabel)}
+          closeOnOverlayClick={false}
+        >
+          <VerticalFlexContainer>
+            <LoadingSpinner />
+          </VerticalFlexContainer>
+        </Dialog>
+      )
+      : null;
+
     return (
       <div className={componentClassNames}>
+        {dialog}
         <h2 className={styles.title}>
           {intl.formatMessage(messages.unitOfAccountTitle)}
         </h2>

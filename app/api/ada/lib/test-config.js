@@ -22,7 +22,6 @@ const CONFIG: ConfigType = {
     txsBodiesRequestSize: 20,
     coinPriceRefreshInterval: 60000,
     coinPriceFreshnessThreshold: 120000,
-    coinPriceRequestRetryDelay: 10000,
     pubKeyData: '',
     pubKeyMaster: '',
   },

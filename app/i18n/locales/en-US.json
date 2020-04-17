@@ -249,7 +249,7 @@
   "settings.unitOfAccount.currency.krw": "South Korean won",
   "settings.unitOfAccount.currency.usd": "US dollar",
   "settings.unitOfAccount.lastUpdated": "<strong>Last updated:</strong> {lastUpdated}",
-  "settings.unitOfAccount.note": "<strong>Note:</strong> If you change the currency it might change the fee and the total amount received. The rate we use is based on <a href=\"https://www.cryptocompare.com/\" target=\"_blank\" rel=\"noopener noreferrer\">CryptoCompare.com</a>, <a href=\"https://coinlayer.com/\" target=\"_blank\" rel=\"noopener noreferrer\">coinlayer</a> and <a href=\"https://coinmarketcap.com/\" target=\"_blank\" rel=\"noopener noreferrer\">CoinMarketCap</a>.",
+  "settings.unitOfAccount.note": "<strong>Note:</strong> coin price is approximate and may not match the price of any given trading platform. Any transactions based on these price approximates are done at your own risk.",
   "settings.unitOfAccount.title": "Currency Conversion",
   "sidebar.settings": "Settings",
   "sidebar.transfer": "Claim / Transfer",

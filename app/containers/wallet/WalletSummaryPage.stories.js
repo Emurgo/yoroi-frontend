@@ -40,6 +40,7 @@ import { TxStatusCodes } from '../../api/ada/lib/storage/database/primitives/enu
 import { assuranceModes, } from '../../config/transactionAssuranceConfig';
 import WalletSettingsStore from '../../stores/base/WalletSettingsStore';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { getPriceKey } from '../../api/ada/lib/storage/bridge/prices';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -123,6 +124,9 @@ export const Loading = () => {
           wallets: {
             selected: wallet.publicDeriver,
           },
+          coinPriceStore: {
+            priceMap: new Map(),
+          },
           substores: {
             ada: {
               walletSettings: {
@@ -188,6 +192,22 @@ const genPropsForTransactions: {|
   wallets: {
     selected: request.wallet.publicDeriver,
   },
+  coinPriceStore: {
+    priceMap: (() => {
+      const priceMap = new Map();
+      // populate the map to match the mock txs we create
+      for (let i = 0; i < 20; i++) {
+        const time = (24 * 60 * 60 * 1000) * i;
+        priceMap.set(getPriceKey('ADA', 'USD', new Date(time)), {
+          From: 'ADA',
+          To: 'USD',
+          Time: new Date(time),
+          Price: 5,
+        });
+      }
+      return priceMap;
+    })(),
+  },
   memos: request.memo || {
     hasSetSelectedExternalStorageProvider: false,
     selectedTransaction: undefined,
@@ -215,7 +235,12 @@ const genPropsForTransactions: {|
         unconfirmedAmount: calculateUnconfirmedAmount(
           request.transactions,
           assuranceModes.NORMAL,
-          genUnitOfAccount(),
+          (timestamp) => ({
+            From: 'ADA',
+            To: 'USD',
+            Price: 5,
+            Time: timestamp,
+          }),
         ),
         isExporting: request.txExport != null ? request.txExport.isExporting : false,
         exportError: request.txExport?.exportError,
@@ -287,11 +312,6 @@ export const Transaction = () => {
     certificate,
     state,
     errorMsg: null,
-    tickers: [{
-      From: 'ADA',
-      To: 'USD',
-      Price: 5,
-    }],
   });
   const transactions = [walletTransaction];
   return wrapWallet(
@@ -340,11 +360,6 @@ export const TransactionWithMemo = () => {
     certificate: undefined,
     state: TxStatusCodes.IN_BLOCK,
     errorMsg: null,
-    tickers: [{
-      From: 'ADA',
-      To: 'USD',
-      Price: 5,
-    }],
   });
   const transactions = [walletTransaction];
   return wrapWallet(
@@ -405,11 +420,6 @@ export const MemoDialog = () => {
     certificate: undefined,
     state: TxStatusCodes.IN_BLOCK,
     errorMsg: null,
-    tickers: [{
-      From: 'ADA',
-      To: 'USD',
-      Price: 5,
-    }],
   });
   const transactions = [walletTransaction];
 
@@ -511,11 +521,6 @@ export const ManyTransactions = () => {
       certificate: undefined,
       state: TxStatusCodes.IN_BLOCK,
       errorMsg: null,
-      tickers: [{
-        From: 'ADA',
-        To: 'USD',
-        Price: 5,
-      }],
     }));
   }
   return wrapWallet(
@@ -561,11 +566,6 @@ export const TxHistoryExport = () => {
     certificate: undefined,
     state: TxStatusCodes.IN_BLOCK,
     errorMsg: null,
-    tickers: [{
-      From: 'ADA',
-      To: 'USD',
-      Price: 5,
-    }],
   })];
   const errorCases = {
     None: undefined,

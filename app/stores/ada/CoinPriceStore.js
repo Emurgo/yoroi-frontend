@@ -1,5 +1,7 @@
 // @flow
 
+import type { lf$Database } from 'lovefield';
+import { debounce, } from 'lodash';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { action, observable, runInAction } from 'mobx';
 import Store from '../base/Store';
@@ -8,32 +10,85 @@ import {
   Logger,
   stringifyError
 } from '../../utils/logging';
+import Request from '../lib/LocalizedRequest';
 import type {
   CurrentCoinPriceResponse,
   HistoricalCoinPriceResponse,
 } from '../../api/ada/lib/state-fetch/types';
 import WalletTransaction from '../../domain/WalletTransaction';
-import type { Ticker } from '../../api/ada/lib/storage/database/prices/tables';
-import { getPrice, upsertPrices, getAllPrices } from '../../api/ada/lib/storage/bridge/prices';
+import type { Ticker, PriceDataRow } from '../../api/ada/lib/storage/database/prices/tables';
+import { getPrice, upsertPrices, getAllPrices, getPriceKey } from '../../api/ada/lib/storage/bridge/prices';
+import type { GetAllPricesFunc } from '../../api/ada/lib/storage/bridge/prices';
 import { verifyTicker, verifyPubKeyDataReplacement } from '../../api/verify';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { ConfigType } from '../../../config/config-types';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
 export default class CoinPriceStore extends Store {
-  @observable tickers: Array<{| From: string, To: string, Price: number |}> = [];
+  @observable currentPriceTickers: Array<{| From: string, To: string, Price: number |}> = [];
   @observable lastUpdateTimestamp: number|null = null;
 
-  nextRefreshTimeout: number = 0;
   expirePriceDataTimeoutId: ?TimeoutID = null;
   // Cached public key to verify the price data.
-  pubKeyData: ?RustModule.WalletV3.PublicKey = null;
+  @observable pubKeyData: ?RustModule.WalletV3.PublicKey = null;
+
+  @observable getAllPrices: Request<GetAllPricesFunc>
+    = new Request<GetAllPricesFunc>(getAllPrices);
+
+  @observable refreshCurrentUnit: Request<void => Promise<void>>
+    = new Request<void => Promise<void>>(async () => {
+      this.stores.substores.ada.coinPriceStore.refreshCurrentCoinPrice();
+      const { selected } = this.stores.wallets;
+      if (selected) {
+        const { allRequest } = this.stores.substores.ada.transactions
+          .getTxRequests(selected).requests;
+        const transactions = allRequest.result?.transactions;
+        if (allRequest.wasExecuted && transactions != null) {
+          this.stores.substores.ada.coinPriceStore.updateTransactionPriceData({
+            db: selected.getDb(),
+            transactions,
+          });
+        }
+      }
+    });
+
+
+  @observable // mobx can only use string keys for observable maps
+  priceMap: Map<string, $ReadOnly<PriceDataRow>> = new Map();
 
   setup(): void {
-    this.nextRefreshTimeout = CONFIG.app.coinPriceRefreshInterval;
-    this._refreshCoinPrice();
+    setInterval(this._pollRefresh, CONFIG.app.coinPriceRefreshInterval);
+    // $FlowFixMe built-in types can't handle visibilitychange
+    document.addEventListener('visibilitychange', debounce(this._pollRefresh, this.ON_VISIBLE_DEBOUNCE_WAIT));
+  }
+
+  @action
+  loadFromStorage: void => Promise<void> = async () => {
+    // note: only need to care about persistent storage
+    // since this is called only once when the app launches
+    // so there should be no transient storage when the app loads anyway
+    const db = this.stores.loading.loadPersitentDbRequest.result;
+    if (db == null) throw new Error(`${nameof(CoinPriceStore)}::${nameof(this.loadFromStorage)} called before storage was initialized`);
+    const allPrices = await this.getAllPrices.execute({
+      db,
+    }).promise;
+    if (allPrices == null) throw new Error('Should never happen');
+    runInAction(() => {
+      for (const price of allPrices) {
+        const key = getPriceKey(price.From, price.To, price.Time);
+        this.priceMap.set(key, price);
+      }
+    });
+
+    const storedKey: ?string = await this.api.localStorage.getCoinPricePubKeyData();
+    Logger.debug(`${nameof(CoinPriceStore)}: stored pubKeyData ${storedKey == null ? 'null' : storedKey}`);
+    runInAction(() => {
+      this.pubKeyData = RustModule.WalletV3.PublicKey.from_bytes(Buffer.from(
+        storedKey != null ? storedKey : CONFIG.app.pubKeyData,
+        'hex'
+      ));
+    });
   }
 
   getCurrentPrice(from: string, to: string): ?number {
@@ -44,14 +99,24 @@ export default class CoinPriceStore extends Store {
     if (Date.now() - lastUpdateTimestamp > CONFIG.app.coinPriceFreshnessThreshold) {
       return null;
     }
-    return getPrice(from, to, this.tickers);
+    return getPrice(from, to, this.currentPriceTickers);
   }
 
-  _waitForRustModule: void => Promise<void> = async () => {
-    await this.stores.loading.loadRustRequest.promise;
-  }
+  _pollRefresh: void => Promise<void> = async () => {
+    // Do not update if screen not active
+    // TODO: use visibilityState instead
+    if (!document.hidden) {
+      const { hasAnyWallets } = this.stores.wallets;
+      if (hasAnyWallets) {
+        this.refreshCurrentCoinPrice();
+      }
+    }
+  };
 
-  @action _refreshCoinPrice: void => Promise<void> = async () => {
+  @action refreshCurrentCoinPrice: void => Promise<void> = async () => {
+    const { unitOfAccount } = this.stores.profile;
+    if (!unitOfAccount.enabled) return;
+
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     try {
       const response: CurrentCoinPriceResponse = await stateFetcher.getCurrentCoinPrice({
@@ -62,7 +127,6 @@ export default class CoinPriceStore extends Store {
         throw new Error('coin price backend error: ' + response.error);
       }
 
-      await this._loadPubKeyData();
       if (response.pubKeyData != null && response.pubKeyDataSignature != null) {
         await this._replacePubKeyData(
           response.pubKeyData,
@@ -76,61 +140,65 @@ export default class CoinPriceStore extends Store {
         throw new Error('Invalid ticker signature: ' + JSON.stringify(response.ticker));
       }
 
-      this.nextRefreshTimeout = CONFIG.app.coinPriceRefreshInterval;
+      // if we got here before the timeout expired, clear the timeout
       if (this.expirePriceDataTimeoutId) {
         clearTimeout(this.expirePriceDataTimeoutId);
       }
+      // then recreate the timeout (similar to resetting it to 0)
       this.expirePriceDataTimeoutId = setTimeout(
         this._expirePriceData, CONFIG.app.coinPriceFreshnessThreshold
       );
 
-      this._updatePriceData(response);
+      this._updatePriceData(response, unitOfAccount.currency);
     } catch (error) {
-      Logger.error('CoinPriceStore::_refreshCoinPrice: ' + stringifyError(error));
-      this.nextRefreshTimeout = CONFIG.app.coinPriceRequestRetryDelay;
+      Logger.error(`${nameof(CoinPriceStore)}::${nameof(this.refreshCurrentCoinPrice)} ` + stringifyError(error));
     }
-    // TODO: remove these timeouts
-    // setTimeout(this._refreshCoinPrice, this.nextRefreshTimeout);
   }
 
   @action _expirePriceData: void => void = () => {
-    this.tickers.splice(0);
+    this.currentPriceTickers.splice(0);
   }
 
-  @action _updatePriceData: CurrentCoinPriceResponse => void = (response) => {
+  @action _updatePriceData: (CurrentCoinPriceResponse, string) => void = (response, currency) => {
     const tickers: Array<Ticker> = Object.entries(response.ticker.prices).map(
       ([To, Price]) => (
         { From: response.ticker.from, To, Price: ((Price: any) : number) }
       )
-    );
+    ).filter(ticker => ticker.To === currency);
 
-    this.tickers.splice(0, this.tickers.length, ...tickers);
+    this.currentPriceTickers.splice(0, this.currentPriceTickers.length, ...tickers);
     this.lastUpdateTimestamp = response.ticker.timestamp;
   }
 
   updateTransactionPriceData: {|
-    publicDeriver: PublicDeriver<>,
-    transactions: Array<WalletTransaction> // TODO: don't want this
+    db: lf$Database,
+    transactions: Array<WalletTransaction>
   |} => Promise<void> = async (request) => {
-    const filteredTxs = request.transactions.filter(tx => tx.tickers === null);
-    if (!filteredTxs.length) {
+    const { unitOfAccount } = this.stores.profile;
+    if (!unitOfAccount.enabled) return;
+
+    const timestamps = Array.from(new Set(request.transactions.map(tx => tx.date.valueOf())));
+    const missingPrices = timestamps.filter(
+      timestamp => this.priceMap.get(
+        getPriceKey('ADA', unitOfAccount.currency, new Date(timestamp))
+      ) == null
+    );
+    if (!missingPrices.length) {
       return;
     }
 
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
-    const timestamps = filteredTxs.map(tx => tx.date.valueOf());
     try {
       const response: HistoricalCoinPriceResponse =
         await stateFetcher.getHistoricalCoinPrice({ from: 'ADA', timestamps });
       if (response.error != null) {
         throw new Error('historical coin price query error: ' + response.error);
       }
-      if (response.tickers.length !== filteredTxs.length) {
+      if (response.tickers.length !== missingPrices.length) {
         throw new Error('historical coin price query error: data length mismatch');
       }
 
-      await this._loadPubKeyData();
-      filteredTxs.forEach((tx, i) => {
+      for (let i = 0; i < missingPrices.length; i++) {
         const ticker = response.tickers[i];
         if (!this.pubKeyData) {
           throw new Error('missing pubKeyData - should never happen');
@@ -140,35 +208,28 @@ export default class CoinPriceStore extends Store {
         }
 
         const tickers: Array<Ticker> =
-          Object.entries(ticker.prices).map(([To, Price]) => (
-            { From: response.tickers[i].from, To, Price: ((Price: any): number) }));
-        runInAction(() => {
-          tx.tickers = tickers;
-        });
-        upsertPrices({
-          db: request.publicDeriver.getDb(),
+          Object.entries(ticker.prices)
+            .map(([To, Price]) => (
+              { From: response.tickers[i].from, To, Price: ((Price: any): number) }
+            ))
+            .filter(entry => entry.To === unitOfAccount.currency);
+        const rowsInDb = await upsertPrices({
+          db: request.db,
           prices: tickers.map(singleTicker => ({
             ...singleTicker,
-            Time: tx.date,
+            Time: new Date(missingPrices[i]),
           })),
         });
-      });
+        runInAction(() => {
+          rowsInDb.map(row => this.priceMap.set(
+            getPriceKey(row.From, row.To, row.Time),
+            row
+          ));
+        });
+      }
     } catch (error) {
-      Logger.error('CoinPriceStore::updateTransactionPriceData: ' + stringifyError(error));
+      Logger.error(`${nameof(CoinPriceStore)}::${nameof(this.updateTransactionPriceData)}: ` + stringifyError(error));
     }
-  }
-
-  _loadPubKeyData: void => Promise<void> = async () => {
-    if (this.pubKeyData) {
-      return;
-    }
-    await this._waitForRustModule();
-    const storedKey: ?string = await this.api.localStorage.getCoinPricePubKeyData();
-    Logger.debug(`CoinPriceStore: stored pubKeyData ${storedKey == null ? 'null' : storedKey}`);
-    this.pubKeyData = RustModule.WalletV3.PublicKey.from_bytes(Buffer.from(
-      storedKey != null ? storedKey : CONFIG.app.pubKeyData,
-      'hex'
-    ));
   }
 
   _replacePubKeyData: (string, string) => Promise<void> = async (
@@ -181,16 +242,18 @@ export default class CoinPriceStore extends Store {
     if (Buffer.from(this.pubKeyData.as_bytes()).toString('hex') === pubKeyData) {
       return;
     }
-    Logger.debug(`CoinPriceStore: replace with pubKeyData ${pubKeyData} signature ${pubKeyDataSignature}.`);
+    Logger.debug(`${nameof(CoinPriceStore)}: replace with pubKeyData ${pubKeyData} signature ${pubKeyDataSignature}.`);
     if (!verifyPubKeyDataReplacement(
       pubKeyData,
       pubKeyDataSignature,
       CONFIG.app.pubKeyMaster
     )) {
-      Logger.debug('CoinPriceStore: new pubKeyData signature is invalid.;');
+      Logger.debug(`${nameof(CoinPriceStore)}: new pubKeyData signature is invalid.;`);
       return;
     }
-    this.pubKeyData = RustModule.WalletV3.PublicKey.from_bytes(Buffer.from(pubKeyData, 'hex'));
+    runInAction(() => {
+      this.pubKeyData = RustModule.WalletV3.PublicKey.from_bytes(Buffer.from(pubKeyData, 'hex'));
+    });
     await this.api.localStorage.setCoinPricePubKeyData(pubKeyData);
   }
 }

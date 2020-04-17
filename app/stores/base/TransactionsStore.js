@@ -117,16 +117,6 @@ export default class TransactionsStore extends Store {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return [];
     const result = this.getTxRequests(publicDeriver).requests.recentRequest.result;
-
-    // TODO: not the best place to put this
-    if (result) {
-      const coinPriceStore = this.stores.substores[environment.API].coinPriceStore;
-      coinPriceStore.updateTransactionPriceData({
-        publicDeriver,
-        transactions: result.transactions,
-      });
-
-    }
     return result ? result.transactions : [];
   }
 
@@ -196,9 +186,16 @@ export default class TransactionsStore extends Store {
       this.reactToTxHistoryUpdate({ publicDeriver: request.publicDeriver });
     }
 
-    // sync memos regardless of whether or not new txs are found
-    // since it's possible existing memos were modified on a difference instance, etc.
+    // sync these regardless of whether or not new txs are found
+
+    // note: possible existing memos were modified on a difference instance, etc.
     this.actions.memos.syncTxMemos.trigger(request.publicDeriver);
+    // note: possible we failed to get the historical price for something in the past
+    const coinPriceStore = this.stores.substores[environment.API].coinPriceStore;
+    coinPriceStore.updateTransactionPriceData({
+      db: publicDeriver.getDb(),
+      transactions: result.transactions,
+    });
   };
 
   @action reactToTxHistoryUpdate: {|

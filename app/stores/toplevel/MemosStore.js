@@ -93,7 +93,6 @@ export default class MemosStore extends Store {
   txMemoMap: Map<string, MemosForWallet> = new Map();
 
   setup(): void {
-    this._getSelectedProvider(); // eagerly cache
     this.actions.memos.updateExternalStorageProvider.listen(this._setExternalStorageProvider);
     this.actions.memos.unsetExternalStorageProvider.listen(this._unsetExternalStorageProvider);
     this.actions.memos.closeMemoDialog.listen(this._closeMemoDialog);
@@ -362,15 +361,12 @@ export default class MemosStore extends Store {
     return result;
   }
 
-  _getSelectedProvider: void => void = () => {
-    this.getExternalStorageProviderRequest.execute();
-  };
-
   _setSelectedProvider: void => Promise<void> = async () => {
     const { isLoading } = this.stores.loading;
     if (isLoading) {
       return;
     }
+    // TODO: handle refreshing (and possibly merging) memos when a provider is selected
     if (!this.hasSetSelectedExternalStorageProvider) {
       const selected = this.selectedProvider;
       if (selected) {

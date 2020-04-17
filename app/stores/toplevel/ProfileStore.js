@@ -105,6 +105,8 @@ export default class ProfileStore extends Store {
         // note: we want to load memos BEFORE we start syncing wallets
         // this is because syncing wallets will also try and sync memos with external storage
         await this.stores.memos.loadFromStorage();
+        await this.stores.substores.ada.coinPriceStore.loadFromStorage();
+        await this.stores.substores.ada.coinPriceStore.refreshCurrentCoinPrice();
 
         await wallets.restoreWalletsFromStorage();
         if (wallets.hasAnyPublicDeriver && this.stores.loading.fromUriScheme) {
@@ -572,6 +574,8 @@ export default class ProfileStore extends Store {
   _updateUnitOfAccount: UnitOfAccountSettingType => Promise<void> = async (currency) => {
     await this.setUnitOfAccountRequest.execute(currency);
     await this.getUnitOfAccountRequest.execute(); // eagerly cache
+
+    await this.stores.substores.ada.coinPriceStore.refreshCurrentUnit.execute().promise;
   };
 
   @computed get hasLoadedUnitOfAccount(): boolean {

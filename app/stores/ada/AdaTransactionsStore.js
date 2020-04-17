@@ -19,7 +19,8 @@ import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
 import { isValidAmountInLovelaces } from '../../utils/validations';
 import TransactionsStore from '../base/TransactionsStore';
 import { assuranceLevels, } from '../../config/transactionAssuranceConfig';
-import { getPrice } from '../../api/ada/lib/storage/bridge/prices';
+import { getPriceKey } from '../../api/ada/lib/storage/bridge/prices';
+import type { PriceDataRow } from '../../api/ada/lib/storage/database/prices/tables';
 import type {
   GetTransactionRowsToExportFunc,
 } from '../../api/ada';
@@ -31,7 +32,6 @@ import type {
   ExportTransactionsRequest,
   ExportTransactionsFunc,
 } from '../../api/common';
-import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 
 import type { TransactionRowsToExportRequest } from '../../actions/ada/transactions-actions';
 
@@ -78,7 +78,15 @@ export default class AdaTransactionsStore extends TransactionsStore {
 
     const { assuranceMode } = this.stores.substores.ada.walletSettings
       .getPublicDeriverSettingsCache(publicDeriver);
-    return calculateUnconfirmedAmount(result.transactions, assuranceMode, unitOfAccount);
+
+    const getUnitOfAccount = (timestamp: Date) => (!unitOfAccount.enabled
+      ? undefined
+      : this.stores.substores.ada.coinPriceStore.priceMap.get(getPriceKey(
+        'ADA',
+        unitOfAccount.currency,
+        timestamp
+      )));
+    return calculateUnconfirmedAmount(result.transactions, assuranceMode, getUnitOfAccount);
   }
 
   /** Wrap utility function to expose to components/containers */
@@ -155,7 +163,7 @@ export default class AdaTransactionsStore extends TransactionsStore {
 export function calculateUnconfirmedAmount(
   transactions: Array<WalletTransaction>,
   assuranceMode: AssuranceMode,
-  unitOfAccount: UnitOfAccountSettingType,
+  getUnitOfAccount: Date => (void | $ReadOnly<PriceDataRow>),
 ): UnconfirmedAmount {
   const unconfirmedAmount = {
     total: new BigNumber(0),
@@ -182,12 +190,12 @@ export function calculateUnconfirmedAmount(
         unconfirmedAmount.outgoing = unconfirmedAmount.outgoing.plus(
           transaction.amount.absoluteValue()
         );
-        if (unitOfAccount.enabled) {
-          const price = getPrice('ADA', unitOfAccount.currency, transaction.tickers);
-          if (price !== null && unconfirmedAmount.outgoingInSelectedCurrency) {
+        const unitOfAccount = getUnitOfAccount(transaction.date);
+        if (unitOfAccount != null) {
+          if (unconfirmedAmount.outgoingInSelectedCurrency) {
             unconfirmedAmount.outgoingInSelectedCurrency =
               unconfirmedAmount.outgoingInSelectedCurrency.plus(
-                transaction.amount.absoluteValue().multipliedBy(String(price))
+                transaction.amount.absoluteValue().multipliedBy(String(unitOfAccount.Price))
               );
           } else {
             unconfirmedAmount.outgoingInSelectedCurrency = null;
@@ -200,12 +208,12 @@ export function calculateUnconfirmedAmount(
         unconfirmedAmount.incoming = unconfirmedAmount.incoming.plus(
           transaction.amount.absoluteValue()
         );
-        if (unitOfAccount.enabled) {
-          const price = getPrice('ADA', unitOfAccount.currency, transaction.tickers);
-          if (price !== null && unconfirmedAmount.incomingInSelectedCurrency) {
+        const unitOfAccount = getUnitOfAccount(transaction.date);
+        if (unitOfAccount != null) {
+          if (unconfirmedAmount.incomingInSelectedCurrency) {
             unconfirmedAmount.incomingInSelectedCurrency =
               unconfirmedAmount.incomingInSelectedCurrency.plus(
-                transaction.amount.absoluteValue().multipliedBy(String(price))
+                transaction.amount.absoluteValue().multipliedBy(String(unitOfAccount.Price))
               );
           } else {
             unconfirmedAmount.incomingInSelectedCurrency = null;

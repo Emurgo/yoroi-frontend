@@ -72,6 +72,9 @@ export const Generic = () => {
             lastUpdateTimestamp: lastUpdatedTimestamp === lastUpdateCases.Never
               ? null
               : new Date().getTime(),
+            refreshCurrentUnit: {
+              isExecuting: false,
+            },
           },
         },
         actions: {

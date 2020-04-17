@@ -24,8 +24,7 @@ import { Logger } from '../../../utils/logging';
 import ExpandArrow from '../../../assets/images/expand-arrow-grey.inline.svg';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../../domain/Explorer';
-import { getPrice } from '../../../api/ada/lib/storage/bridge/prices';
-import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import type { PriceDataRow } from '../../../api/ada/lib/storage/database/prices/tables';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import { TxStatusCodes, } from '../../../api/ada/lib/storage/database/primitives/enums';
 import type { TxStatusCodesType, } from '../../../api/ada/lib/storage/database/primitives/enums';
@@ -157,7 +156,7 @@ type Props = {|
   +shouldHideBalance: boolean,
   +onAddMemo: WalletTransaction => void,
   +onEditMemo: WalletTransaction => void,
-  +unitOfAccountSetting: UnitOfAccountSettingType,
+  +unitOfAccount: void | $ReadOnly<PriceDataRow>,
 |};
 
 type State = {|
@@ -225,18 +224,16 @@ export default class Transaction extends Component<Props, State> {
 
   renderAmountDisplay: {|
     amount: BigNumber,
-    price: ?number,
   |} => Node = (request) => {
     if (this.props.shouldHideBalance) {
       return (<span>******</span>);
     }
 
-    const currency = this.props.unitOfAccountSetting.currency;
-    if (request.price != null && currency != null) {
-      const price = request.price;
+    const { unitOfAccount } = this.props;
+    if (unitOfAccount != null) {
       return (
         <>
-          { calculateAndFormatValue(request.amount, price) + ' ' + currency }
+          { calculateAndFormatValue(request.amount, unitOfAccount.Price) + ' ' + unitOfAccount.To }
           <div className={styles.amountSmall}>
             {request.amount.toString()} ADA
           </div>
@@ -261,17 +258,15 @@ export default class Transaction extends Component<Props, State> {
   renderFeeDisplay: {|
     amount: BigNumber,
     type: TransactionDirectionType,
-    price: ?number,
   |} => Node = (request) => {
     if (this.props.shouldHideBalance) {
       return (<span>******</span>);
     }
-    const currency = this.props.unitOfAccountSetting.currency;
-    if (request.price != null && currency != null) {
-      const price = request.price;
+    const { unitOfAccount } = this.props;
+    if (unitOfAccount != null) {
       return (
         <>
-          { calculateAndFormatValue(request.amount.abs(), price) + ' ' + currency }
+          { calculateAndFormatValue(request.amount.abs(), unitOfAccount.Price) + ' ' + unitOfAccount.To }
           <div className={styles.amountSmall}>
             {request.amount.abs().toString()} ADA
           </div>
@@ -297,7 +292,6 @@ export default class Transaction extends Component<Props, State> {
       isLastInList,
       state,
       assuranceLevel,
-      unitOfAccountSetting,
       onAddMemo,
       onEditMemo,
     } = this.props;
@@ -340,10 +334,6 @@ export default class Transaction extends Component<Props, State> {
 
     const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
 
-    const price: ?number = unitOfAccountSetting.enabled
-      ? getPrice('ADA', unitOfAccountSetting.currency, data.tickers)
-      : null;
-
     return (
       <div className={componentStyles}>
 
@@ -368,15 +358,15 @@ export default class Transaction extends Component<Props, State> {
                 {this.renderFeeDisplay({
                   amount: data.fee,
                   type: data.type,
-                  price,
                 })}
               </div>
               <div className={classnames([styles.currency, styles.amount])}>
                 {this.renderAmountDisplay({
                   amount: data.amount,
-                  price,
                 })}
-                {price == null && <span className={styles.currencySymbol}><AdaSymbol /></span>}
+                {this.props.unitOfAccount == null && (
+                  <span className={styles.currencySymbol}><AdaSymbol /></span>
+                )}
               </div>
             </div>
             <div className={styles.expandArrowBox}>

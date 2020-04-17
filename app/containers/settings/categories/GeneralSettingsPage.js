@@ -66,9 +66,12 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
 
   render() {
     const profileStore = this.generated.stores.profile;
+    const coinPriceStore = this.generated.stores.coinPriceStore;
+
     const isSubmittingLocale = profileStore.setProfileLocaleRequest.isExecuting;
     const isSubmittingExplorer = profileStore.setSelectedExplorerRequest.isExecuting;
-    const isSubmittingUnitOfAccount = profileStore.setUnitOfAccountRequest.isExecuting;
+    const isSubmittingUnitOfAccount = profileStore.setUnitOfAccountRequest.isExecuting
+      || coinPriceStore.refreshCurrentUnit.isExecuting;
     const explorerOptions = getExplorers();
     const { currentTheme } = profileStore;
 
@@ -81,8 +84,6 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
         />
       )
       : null;
-
-    const coinPriceStore = this.generated.stores.coinPriceStore;
 
     const currencies = profileStore.UNIT_OF_ACCOUNT_OPTIONS.map(c => {
       const name = this.context.intl.formatMessage(currencyLabels[c.symbol]);
@@ -184,6 +185,9 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
         coinPriceStore: {
           getCurrentPrice: stores.substores.ada.coinPriceStore.getCurrentPrice,
           lastUpdateTimestamp: stores.substores.ada.coinPriceStore.lastUpdateTimestamp,
+          refreshCurrentUnit: {
+            isExecuting: stores.substores.ada.coinPriceStore.refreshCurrentUnit.isExecuting,
+          },
         },
       },
       actions: {

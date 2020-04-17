@@ -9,6 +9,19 @@ import {
 import { GetPriceData } from '../database/prices/api/read';
 import { ModifyPriceData } from '../database/prices/api/write';
 
+
+export function getPriceKey(
+  fromCurrency: string,
+  toCurrency: string,
+  time: Date
+): string {
+  return JSON.stringify({
+    From: fromCurrency,
+    To: toCurrency,
+    Time: time
+  });
+}
+
 export function getPrice(
   fromCurrency: string,
   toCurrency: string,
