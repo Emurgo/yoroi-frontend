@@ -24,6 +24,7 @@ import { populateAccountingTransactionsDb } from './transactionModels/account/ta
 import { populateMultipartTransactionsDb } from './transactionModels/multipart/tables';
 import { populateWalletDb } from './walletTypes/core/tables';
 import { populateMemoTransactionsDb } from './memos/tables';
+import { populatePricesDb } from './prices/tables';
 
 declare var indexedDB;
 
@@ -74,7 +75,7 @@ export const loadLovefieldDB = async (
 const populateAndCreate = async (
   storeType: $Values<typeof schema.DataStoreType>
 ): Promise<lf$Database> => {
-  const schemaBuilder = schema.create('yoroi-schema', 6);
+  const schemaBuilder = schema.create('yoroi-schema', 7);
 
   populatePrimitivesDb(schemaBuilder);
   populateWalletDb(schemaBuilder);
@@ -85,6 +86,7 @@ const populateAndCreate = async (
   populateAccountingTransactionsDb(schemaBuilder);
   populateMultipartTransactionsDb(schemaBuilder);
   populateMemoTransactionsDb(schemaBuilder);
+  populatePricesDb(schemaBuilder);
 
   return await schemaBuilder.connect({
     storeType,
@@ -159,6 +161,9 @@ async function onUpgrade(
     );
   } if (version === 5) {
     // nothing to do. Just adds a new table
+  } if (version === 6) {
+    // turns out we didn't need this
+    await rawDb.dropTableColumn('TxMemo', 'TxMemoId');
   } else {
     throw new Error('unexpected version number');
   }

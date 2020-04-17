@@ -16,7 +16,10 @@ export default (isDebug: boolean) => buildManifest({
   contentSecurityPolicy: genCSP({
     isDev: isDebug,
     additional: {
-      'connect-src': [serverToPermission(Servers.ByronTestnet)],
+      'connect-src': [
+        serverToPermission(Servers.ByronTestnet),
+        'https://testnet-yoroi-coin-price-feed.yoroiwallet.com',
+      ],
     },
   }),
   version: Version.Byron,

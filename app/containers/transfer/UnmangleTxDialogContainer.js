@@ -146,6 +146,13 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
   > => Node = (
     tentativeTx
   ) => {
+    const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
+      ? (
+        this.generated.stores.coinPriceStore
+          .getCurrentPrice('ADA', this.generated.stores.profile.unitOfAccount.currency)
+      )
+      : null;
+
     const transferTx = {
       recoveredBalance: ITotalInput(tentativeTx, true),
       fee: IGetFee(tentativeTx, true),
@@ -174,6 +181,8 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
         onCancel={this.props.onClose}
         error={this._getAdaWalletsStore().sendMoneyRequest.error}
         dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
+        coinPrice={coinPrice}
+        unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
       />
     );
   }
@@ -207,9 +216,13 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
         profile: {
           isClassicTheme: stores.profile.isClassicTheme,
           selectedExplorer: stores.profile.selectedExplorer,
+          unitOfAccount: stores.profile.unitOfAccount,
         },
         wallets: {
           selected: stores.wallets.selected,
+        },
+        coinPriceStore: {
+          getCurrentPrice: stores.substores.ada.coinPriceStore.getCurrentPrice,
         },
         substores: {
           ada: {

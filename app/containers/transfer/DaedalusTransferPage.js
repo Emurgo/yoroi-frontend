@@ -108,6 +108,13 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
     const { profile } = this.generated.stores;
     const daedalusTransfer = this._getDaedalusTransferStore();
 
+    const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
+      ? (
+        this.generated.stores.coinPriceStore
+          .getCurrentPrice('ADA', this.generated.stores.profile.unitOfAccount.currency)
+      )
+      : null;
+
     switch (daedalusTransfer.status) {
       case TransferStatus.GETTING_MNEMONICS:
         return (
@@ -167,6 +174,8 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
             onCancel={this.cancelTransferFunds}
             error={daedalusTransfer.error}
             dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
+            coinPrice={coinPrice}
+            unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
           />
         );
       }
@@ -218,11 +227,15 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
         profile: {
           isClassicTheme: stores.profile.isClassicTheme,
           selectedExplorer: stores.profile.selectedExplorer,
+          unitOfAccount: stores.profile.unitOfAccount,
         },
         wallets: {
           selected: stores.wallets.selected,
           activeWalletRoute: stores.wallets.activeWalletRoute,
           refreshWalletFromRemote: stores.wallets.refreshWalletFromRemote,
+        },
+        coinPriceStore: {
+          getCurrentPrice: stores.substores.ada.coinPriceStore.getCurrentPrice,
         },
         substores: {
           ada: {

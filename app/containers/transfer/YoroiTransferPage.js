@@ -134,6 +134,13 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
     const { profile } = stores;
     const yoroiTransfer = this._getYoroiTransferStore();
 
+    const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
+      ? (
+        this.generated.stores.coinPriceStore
+          .getCurrentPrice('ADA', this.generated.stores.profile.unitOfAccount.currency)
+      )
+      : null;
+
     switch (yoroiTransfer.status) {
       case TransferStatus.GETTING_MNEMONICS:
         return (
@@ -214,6 +221,8 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
             onCancel={this.cancelTransferFunds}
             error={yoroiTransfer.error}
             dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
+            coinPrice={coinPrice}
+            unitOfAccountSetting={stores.profile.unitOfAccount}
           />
         );
       }
@@ -271,11 +280,15 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         profile: {
           isClassicTheme: stores.profile.isClassicTheme,
           selectedExplorer: stores.profile.selectedExplorer,
+          unitOfAccount: stores.profile.unitOfAccount,
         },
         wallets: {
           selected: stores.wallets.selected,
           activeWalletRoute: stores.wallets.activeWalletRoute,
           refreshWalletFromRemote: stores.wallets.refreshWalletFromRemote,
+        },
+        coinPriceStore: {
+          getCurrentPrice: stores.substores.ada.coinPriceStore.getCurrentPrice,
         },
         substores: {
           ada: {

@@ -24,6 +24,8 @@ import { Logger } from '../../../utils/logging';
 import ExpandArrow from '../../../assets/images/expand-arrow-grey.inline.svg';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../../domain/Explorer';
+import type { PriceDataRow } from '../../../api/ada/lib/storage/database/prices/tables';
+import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import { TxStatusCodes, } from '../../../api/ada/lib/storage/database/primitives/enums';
 import type { TxStatusCodesType, } from '../../../api/ada/lib/storage/database/primitives/enums';
 import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
@@ -154,6 +156,7 @@ type Props = {|
   +shouldHideBalance: boolean,
   +onAddMemo: WalletTransaction => void,
   +onEditMemo: WalletTransaction => void,
+  +unitOfAccount: void | $ReadOnly<PriceDataRow>,
 |};
 
 type State = {|
@@ -225,6 +228,18 @@ export default class Transaction extends Component<Props, State> {
     if (this.props.shouldHideBalance) {
       return (<span>******</span>);
     }
+
+    const { unitOfAccount } = this.props;
+    if (unitOfAccount != null) {
+      return (
+        <>
+          { calculateAndFormatValue(request.amount, unitOfAccount.Price) + ' ' + unitOfAccount.To }
+          <div className={styles.amountSmall}>
+            {request.amount.toString()} ADA
+          </div>
+        </>
+      );
+    }
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(request.amount);
 
     // we may need to explicitly add + for positive values
@@ -246,6 +261,17 @@ export default class Transaction extends Component<Props, State> {
   |} => Node = (request) => {
     if (this.props.shouldHideBalance) {
       return (<span>******</span>);
+    }
+    const { unitOfAccount } = this.props;
+    if (unitOfAccount != null) {
+      return (
+        <>
+          { calculateAndFormatValue(request.amount.abs(), unitOfAccount.Price) + ' ' + unitOfAccount.To }
+          <div className={styles.amountSmall}>
+            {request.amount.abs().toString()} ADA
+          </div>
+        </>
+      );
     }
     if (request.type === transactionTypes.INCOME) {
       return (<span>-</span>);
@@ -338,7 +364,9 @@ export default class Transaction extends Component<Props, State> {
                 {this.renderAmountDisplay({
                   amount: data.amount,
                 })}
-                <span className={styles.currencySymbol}><AdaSymbol /></span>
+                {this.props.unitOfAccount == null && (
+                  <span className={styles.currencySymbol}><AdaSymbol /></span>
+                )}
               </div>
             </div>
             <div className={styles.expandArrowBox}>

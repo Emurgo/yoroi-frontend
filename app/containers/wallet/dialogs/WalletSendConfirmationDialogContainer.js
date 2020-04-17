@@ -13,9 +13,9 @@ import {
 } from '../../../api/ada/transactions/utils';
 import WalletSendConfirmationDialog from '../../../components/wallet/send/WalletSendConfirmationDialog';
 import {
-  formattedWalletAmount,
   formattedAmountToNaturalUnits,
 } from '../../../utils/formatters';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 
 export type GeneratedData = typeof WalletSendConfirmationDialogContainer.prototype.generated;
@@ -24,6 +24,8 @@ type DialogProps = {|
   +signRequest: BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>,
   +currencyUnit: string,
   +staleTx: boolean,
+  +unitOfAccountSetting: UnitOfAccountSettingType,
+  +coinPrice: ?number,
 |};
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
@@ -37,6 +39,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     const {
       currencyUnit,
       signRequest,
+      unitOfAccountSetting, coinPrice,
     } = this.props;
     const { stores, actions } = this.generated;
     const { wallets } = stores.substores[environment.API];
@@ -54,10 +57,10 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
       <WalletSendConfirmationDialog
         staleTx={this.props.staleTx}
         selectedExplorer={stores.profile.selectedExplorer}
-        amount={formattedWalletAmount(totalInput.minus(fee))}
+        amount={totalInput.minus(fee)}
         receivers={receivers}
-        totalAmount={formattedWalletAmount(totalInput)}
-        transactionFee={formattedWalletAmount(fee)}
+        totalAmount={totalInput}
+        transactionFee={fee}
         amountToNaturalUnits={formattedAmountToNaturalUnits}
         onSubmit={async ({ password }) => {
           const copyRequest = copySignRequest(signRequest);
@@ -75,6 +78,8 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         error={sendMoneyRequest.error}
         currencyUnit={currencyUnit}
         classicTheme={profile.isClassicTheme}
+        unitOfAccountSetting={unitOfAccountSetting}
+        coinPrice={coinPrice}
       />
     );
   }

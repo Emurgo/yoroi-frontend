@@ -17,7 +17,10 @@ export default (isDebug: boolean) => buildManifest({
   contentSecurityPolicy: genCSP({
     isDev: isDebug,
     additional: {
-      'connect-src': [serverToPermission(Servers.ShelleyDev)],
+      'connect-src': [
+        serverToPermission(Servers.ShelleyDev),
+        'https://testnet-yoroi-coin-price-feed.yoroiwallet.com',
+      ],
     },
   }),
   extensionKey: 'pojejnpjgcacmnpkdiklhlnlbkjechfh',

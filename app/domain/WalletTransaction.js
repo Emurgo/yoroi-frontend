@@ -35,7 +35,7 @@ export default class WalletTransaction {
   @observable addresses: TransactionAddresses = { from: [], to: [] };
   @observable certificate: void | CertificatePart;
 
-  // TODO: remove and make as a map
+  // TODO: remove and turn it into a map
   @observable state: TxStatusCodesType;
   @observable errorMsg: null | string;
 

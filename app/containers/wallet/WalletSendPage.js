@@ -25,9 +25,6 @@ import type {
 import WalletSendConfirmationDialog from '../../components/wallet/send/WalletSendConfirmationDialog';
 import MemoNoExternalStorageDialog from '../../components/wallet/memos/MemoNoExternalStorageDialog';
 import {
-  formattedWalletAmount,
-} from '../../utils/formatters';
-import {
   copySignRequest,
   IGetFee,
   IReceivers,
@@ -81,14 +78,14 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
 
   @observable showMemo: boolean = false;
 
-  componentDidMount() {
+  componentDidMount(): void {
     runInAction(() => {
       this.showMemo = this.generated.initialShowMemoState;
     });
   }
 
   @action
-  toggleShowMemo = () => {
+  toggleShowMemo: void => void = () => {
     this.showMemo = !this.showMemo;
   };
 
@@ -192,11 +189,20 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     }
     const signRequest = transactionBuilderStore.tentativeTx;
 
+    const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
+      ? (
+        this.generated.stores.coinPriceStore
+          .getCurrentPrice('ADA', this.generated.stores.profile.unitOfAccount.currency)
+      )
+      : null;
+
     return (<WalletSendConfirmationDialogContainer
       {...this.generated.WalletSendConfirmationDialogContainerProps}
       signRequest={signRequest}
       staleTx={transactionBuilderStore.txMismatch}
       currencyUnit={intl.formatMessage(globalMessages.unitAda)}
+      unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
+      coinPrice={coinPrice}
     />);
   };
 
@@ -219,6 +225,13 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     const fee = IGetFee(signRequest, true);
     const receivers = IReceivers(signRequest, false);
 
+    const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
+      ? (
+        this.generated.stores.coinPriceStore
+          .getCurrentPrice('ADA', this.generated.stores.profile.unitOfAccount.currency)
+      )
+      : null;
+
     const conceptualWallet = publicDeriver.getParent();
     let hwSendConfirmationDialog: Node = null;
 
@@ -238,10 +251,10 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
         <HWSendConfirmationDialog
           staleTx={transactionBuilderStore.txMismatch}
           selectedExplorer={this.generated.stores.profile.selectedExplorer}
-          amount={formattedWalletAmount(totalInput.minus(fee))}
+          amount={totalInput.minus(fee)}
           receivers={receivers}
-          totalAmount={formattedWalletAmount(totalInput)}
-          transactionFee={formattedWalletAmount(fee)}
+          totalAmount={totalInput}
+          transactionFee={fee}
           currencyUnit={intl.formatMessage(globalMessages.unitAda)}
           messages={messagesLedger}
           isSubmitting={ledgerSendStore.isActionProcessing}
@@ -253,6 +266,8 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
             })
           }
           onCancel={ledgerSendAction.cancel.trigger}
+          unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
+          coinPrice={coinPrice}
         />);
     } else if (isTrezorTWallet(conceptualWallet)) {
       const trezorSendAction = this.generated.actions[environment.API].trezorSend;
@@ -261,10 +276,10 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
         <HWSendConfirmationDialog
           staleTx={transactionBuilderStore.txMismatch}
           selectedExplorer={this.generated.stores.profile.selectedExplorer}
-          amount={formattedWalletAmount(totalInput.minus(fee))}
+          amount={totalInput.minus(fee)}
           receivers={receivers}
-          totalAmount={formattedWalletAmount(totalInput)}
-          transactionFee={formattedWalletAmount(fee)}
+          totalAmount={totalInput}
+          transactionFee={fee}
           currencyUnit={intl.formatMessage(globalMessages.unitAda)}
           messages={messagesTrezor}
           isSubmitting={trezorSendStore.isActionProcessing}
@@ -276,6 +291,8 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
             })
           }
           onCancel={trezorSendAction.cancel.trigger}
+          unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
+          coinPrice={coinPrice}
         />);
     } else {
       throw new Error('Unsupported hardware wallet found at hardwareWalletDoConfirmation.');
@@ -329,6 +346,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
         profile: {
           isClassicTheme: stores.profile.isClassicTheme,
           selectedExplorer: stores.profile.selectedExplorer,
+          unitOfAccount: stores.profile.unitOfAccount,
         },
         wallets: {
           selected: stores.wallets.selected,
@@ -339,6 +357,9 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
         loading: {
           uriParams: stores.loading.uriParams,
           resetUriParams: stores.loading.resetUriParams,
+        },
+        coinPriceStore: {
+          getCurrentPrice: stores.substores.ada.coinPriceStore.getCurrentPrice,
         },
         uiDialogs: {
           isOpen: stores.uiDialogs.isOpen,

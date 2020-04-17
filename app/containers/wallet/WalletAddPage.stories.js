@@ -16,6 +16,7 @@ import {
   getPasswordValidationCases,
   trezorErrorCases,
   ledgerErrorCases,
+  genUnitOfAccount,
 } from '../../../stories/helpers/StoryWrapper';
 import environment from '../../environment';
 import { THEMES } from '../../themes';
@@ -377,6 +378,7 @@ const restoreWalletProps: {|
     profile: {
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
       selectedExplorer: getDefaultExplorer(),
+      unitOfAccount: genUnitOfAccount(),
     },
     uiNotifications: {
       isOpen: () => false,
@@ -388,6 +390,9 @@ const restoreWalletProps: {|
         error: undefined,
         reset: action('reset'),
       },
+    },
+    coinPriceStore: {
+      getCurrentPrice: (_from, _to) => 5,
     },
     substores: {
       ada: {

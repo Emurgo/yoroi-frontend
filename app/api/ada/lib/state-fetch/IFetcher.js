@@ -13,6 +13,8 @@ import type {
   AccountStateRequest, AccountStateResponse,
   PoolInfoRequest, PoolInfoResponse,
   ReputationRequest, ReputationResponse,
+  CurrentCoinPriceRequest, CurrentCoinPriceResponse,
+  HistoricalCoinPriceRequest, HistoricalCoinPriceResponse,
 } from './types';
 
 export interface IFetcher {
@@ -28,4 +30,6 @@ export interface IFetcher {
   getAccountState(body: AccountStateRequest): Promise<AccountStateResponse>;
   getPoolInfo(body: PoolInfoRequest): Promise<PoolInfoResponse>;
   getReputation(body: ReputationRequest): Promise<ReputationResponse>;
+  getCurrentCoinPrice(body: CurrentCoinPriceRequest): Promise<CurrentCoinPriceResponse>;
+  getHistoricalCoinPrice(body: HistoricalCoinPriceRequest): Promise<HistoricalCoinPriceResponse>;
 }

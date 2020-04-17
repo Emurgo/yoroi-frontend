@@ -54,9 +54,18 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +totalAdaSum: void | string,
-  +totalRewards: void | string,
-  +totalDelegated: void | string,
+  +totalAdaSum: void | {|
+    +ADA: string,
+    +unitOfAccount: void | {| currency: string, amount: string |},
+  |},
+  +totalRewards: void | {|
+    +ADA: string,
+    +unitOfAccount: void | {| currency: string, amount: string |},
+  |},
+  +totalDelegated: void | {|
+    +ADA: string,
+    +unitOfAccount: void | {| currency: string, amount: string |},
+  |},
   +openLearnMore: void => void,
   +canUnmangleSum: BigNumber,
   +cannotUnmangleSum: BigNumber,
@@ -92,6 +101,7 @@ export default class UserSummary extends Component<Props, State> {
 
   getTotalAda: void => Node = () => {
     const { intl } = this.context;
+    const { totalAdaSum } = this.props;
     return (
       <div className={styles.column}>
         <div className={styles.header}>
@@ -102,8 +112,19 @@ export default class UserSummary extends Component<Props, State> {
         <h3 className={styles.label}>
           {intl.formatMessage(globalMessages.totalAdaLabel)}:
         </h3>
-        {this.props.totalAdaSum != null
-          ? (<p className={styles.value}>{this.props.totalAdaSum} ADA</p>)
+        {totalAdaSum != null
+          ? (
+            <>
+              {totalAdaSum.unitOfAccount && (
+                <p className={styles.value}>
+                  {totalAdaSum.unitOfAccount.amount} {totalAdaSum.unitOfAccount.currency}
+                </p>
+              )}
+              <p className={styles.value}>
+                {totalAdaSum.ADA} ADA
+              </p>
+            </>
+          )
           : (<LoadingSpinner small />)
         }
       </div>
@@ -112,6 +133,7 @@ export default class UserSummary extends Component<Props, State> {
 
   getTotalRewards: void => Node = () => {
     const { intl } = this.context;
+    const { totalRewards } = this.props;
     return (
       <div className={styles.column}>
         <div className={styles.header}>
@@ -122,11 +144,16 @@ export default class UserSummary extends Component<Props, State> {
         <h3 className={styles.label}>
           {intl.formatMessage(globalMessages.totalRewardsLabel)}:
         </h3>
-        {this.props.totalRewards != null
+        {totalRewards != null
           ? (
             <>
+              {totalRewards.unitOfAccount && (
+                <p className={styles.value}>
+                  {totalRewards.unitOfAccount.amount} {totalRewards.unitOfAccount.currency}
+                </p>
+              )}
               <p className={styles.value}>
-                {this.props.totalRewards} ADA
+                {totalRewards.ADA} ADA
               </p>
               <span
                 className={styles.note}
@@ -147,6 +174,7 @@ export default class UserSummary extends Component<Props, State> {
 
   getTotalDelegated: void => Node = () => {
     const { intl } = this.context;
+    const { totalDelegated } = this.props;
 
     const mangledWarningIcon = this.props.canUnmangleSum.gt(0) || this.props.cannotUnmangleSum.gt(0)
       ? (
@@ -223,8 +251,19 @@ export default class UserSummary extends Component<Props, State> {
         <h3 className={styles.label}>
           {intl.formatMessage(messages.delegatedLabel)}:
         </h3>
-        {this.props.totalDelegated != null
-          ? (<p className={styles.value}>{this.props.totalDelegated} ADA</p>)
+        {totalDelegated != null
+          ? (
+            <>
+              {totalDelegated.unitOfAccount && (
+                <p className={styles.value}>
+                  {totalDelegated.unitOfAccount.amount} {totalDelegated.unitOfAccount.currency}
+                </p>
+              )}
+              <p className={styles.value}>
+                {totalDelegated.ADA} ADA
+              </p>
+            </>
+          )
           : (<div><LoadingSpinner small /></div>)
         }
       </div>

@@ -191,6 +191,14 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     const walletRestoreActions = this.generated.actions[environment.API].walletRestore;
     const { profile, } = this.generated.stores;
     const { intl } = this.context;
+
+    const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
+      ? (
+        this.generated.stores.coinPriceStore
+          .getCurrentPrice('ADA', this.generated.stores.profile.unitOfAccount.currency)
+      )
+      : null;
+
     switch (yoroiTransfer.status) {
       // we have to verify briefly go through this step
       // and we don't want to throw an error for it
@@ -215,6 +223,8 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           onCancel={this.onCancel}
           error={yoroiTransfer.error}
           dialogTitle={intl.formatMessage(globalMessages.walletUpgrade)}
+          coinPrice={coinPrice}
+          unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
         />);
       }
       case TransferStatus.ERROR: {
@@ -264,6 +274,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         profile: {
           isClassicTheme: stores.profile.isClassicTheme,
           selectedExplorer: stores.profile.selectedExplorer,
+          unitOfAccount: stores.profile.unitOfAccount,
         },
         uiNotifications: {
           isOpen: stores.uiNotifications.isOpen,
@@ -275,6 +286,9 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
             error: stores.wallets.restoreRequest.error,
             reset: stores.wallets.restoreRequest.reset,
           },
+        },
+        coinPriceStore: {
+          getCurrentPrice: stores.substores.ada.coinPriceStore.getCurrentPrice,
         },
         substores: {
           ada: {

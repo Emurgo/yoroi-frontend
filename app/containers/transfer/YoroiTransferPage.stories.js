@@ -8,6 +8,7 @@ import {
   globalKnobs,
   walletLookup,
   genDummyWithCache,
+  genUnitOfAccount,
 } from '../../../stories/helpers/StoryWrapper';
 import { mockTransferProps, wrapTransfer, } from './Transfer.mock';
 import { THEMES } from '../../themes';
@@ -47,11 +48,15 @@ const genBaseProps: {|
     profile: {
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
       selectedExplorer: getDefaultExplorer(),
+      unitOfAccount: genUnitOfAccount(),
     },
     wallets: {
       selected: request.wallet,
       activeWalletRoute: request.wallet == null ? null : '',
       refreshWalletFromRemote: async () => action('refreshWalletFromRemote')(),
+    },
+    coinPriceStore: {
+      getCurrentPrice: (_from, _to) => 5,
     },
     substores: {
       ada: {

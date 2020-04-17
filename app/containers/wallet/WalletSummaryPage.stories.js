@@ -9,6 +9,7 @@ import {
   walletLookup,
   globalKnobs,
   genSigningWalletWithCache,
+  genUnitOfAccount,
 } from '../../../stories/helpers/StoryWrapper';
 import type {
   CacheValue,
@@ -39,6 +40,7 @@ import { TxStatusCodes } from '../../api/ada/lib/storage/database/primitives/enu
 import { assuranceModes, } from '../../config/transactionAssuranceConfig';
 import WalletSettingsStore from '../../stores/base/WalletSettingsStore';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { getPriceKey } from '../../api/ada/lib/storage/bridge/prices';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -103,6 +105,7 @@ export const Loading = () => {
             selectedExplorer: getDefaultExplorer(),
             shouldHideBalance: false,
             isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+            unitOfAccount: genUnitOfAccount(),
           },
           uiDialogs: {
             isOpen: () => false,
@@ -120,6 +123,9 @@ export const Loading = () => {
           },
           wallets: {
             selected: wallet.publicDeriver,
+          },
+          coinPriceStore: {
+            priceMap: new Map(),
           },
           substores: {
             ada: {
@@ -142,6 +148,8 @@ export const Loading = () => {
                   total: new BigNumber(0),
                   incoming: new BigNumber(0),
                   outgoing: new BigNumber(0),
+                  incomingInSelectedCurrency: new BigNumber(0),
+                  outgoingInSelectedCurrency: new BigNumber(0),
                 },
                 isExporting: false,
                 exportError: undefined,
@@ -172,6 +180,7 @@ const genPropsForTransactions: {|
     selectedExplorer: getDefaultExplorer(),
     shouldHideBalance: request.txExport == null ? boolean('shouldHideBalance', false) : false,
     isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+    unitOfAccount: genUnitOfAccount(),
   },
   uiDialogs: {
     isOpen: (dialog) => dialog === request.dialog,
@@ -182,6 +191,22 @@ const genPropsForTransactions: {|
   },
   wallets: {
     selected: request.wallet.publicDeriver,
+  },
+  coinPriceStore: {
+    priceMap: (() => {
+      const priceMap = new Map();
+      // populate the map to match the mock txs we create
+      for (let i = 0; i < 20; i++) {
+        const time = (24 * 60 * 60 * 1000) * i;
+        priceMap.set(getPriceKey('ADA', 'USD', new Date(time)), {
+          From: 'ADA',
+          To: 'USD',
+          Time: new Date(time),
+          Price: 5,
+        });
+      }
+      return priceMap;
+    })(),
   },
   memos: request.memo || {
     hasSetSelectedExternalStorageProvider: false,
@@ -209,7 +234,13 @@ const genPropsForTransactions: {|
         },
         unconfirmedAmount: calculateUnconfirmedAmount(
           request.transactions,
-          assuranceModes.NORMAL
+          assuranceModes.NORMAL,
+          (timestamp) => ({
+            From: 'ADA',
+            To: 'USD',
+            Price: 5,
+            Time: timestamp,
+          }),
         ),
         isExporting: request.txExport != null ? request.txExport.isExporting : false,
         exportError: request.txExport?.exportError,
@@ -349,7 +380,6 @@ export const TransactionWithMemo = () => {
             error: undefined,
             getIdForWallet: () => 'DNKO-8098',
             txMemoMap: new Map([['DNKO-8098', new Map([[walletTransaction.txid, {
-              TxMemoId: 0,
               WalletId: 'DNKO-8098',
               Content: 'foo',
               TransactionHash: walletTransaction.txid,
@@ -424,7 +454,6 @@ export const MemoDialog = () => {
             error: undefined,
             getIdForWallet: () => 'DNKO-8098',
             txMemoMap: new Map([['DNKO-8098', new Map([[walletTransaction.txid, {
-              TxMemoId: 0,
               WalletId: 'DNKO-8098',
               Content: 'foo',
               TransactionHash: walletTransaction.txid,

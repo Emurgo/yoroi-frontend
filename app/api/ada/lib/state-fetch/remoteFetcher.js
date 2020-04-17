@@ -15,6 +15,8 @@ import type {
   PoolInfoRequest, PoolInfoResponse,
   SignedRequestInternal,
   RemoteTransaction,
+  CurrentCoinPriceRequest, CurrentCoinPriceResponse,
+  HistoricalCoinPriceRequest, HistoricalCoinPriceResponse,
 } from './types';
 
 import type { IFetcher } from './IFetcher';
@@ -39,12 +41,15 @@ import {
   GetPoolInfoApiError,
   GetReputationError,
   RollbackApiError,
+  CurrentCoinPriceError,
+  HistoricalCoinPriceError,
 } from '../../errors';
 
 import type { ConfigType } from '../../../../../config/config-types';
 
 declare var CONFIG: ConfigType;
 const backendUrl = CONFIG.network.backendUrl;
+const priceBackendUrl = CONFIG.network.priceBackendUrl;
 
 /**
  * Makes calls to Yoroi backend service
@@ -341,4 +346,29 @@ export class RemoteFetcher implements IFetcher {
         throw new ServerStatusError();
       })
   )
+
+  getCurrentCoinPrice: CurrentCoinPriceRequest => Promise<CurrentCoinPriceResponse> = (body) => (
+    axios(`${priceBackendUrl}/price/${body.from}/current`,
+      {
+        method: 'get'
+      }).then(response => response.data)
+      .catch(error => {
+        Logger.error('RemoteFetcher::getCurrentCoinPrice error: ' + stringifyError(error));
+        throw new CurrentCoinPriceError();
+      })
+  )
+
+  getHistoricalCoinPrice: HistoricalCoinPriceRequest => Promise<HistoricalCoinPriceResponse> = (
+    body
+  ) => (
+    axios(`${priceBackendUrl}/price/${body.from}/${body.timestamps.join(',')}`,
+      {
+        method: 'get'
+      }).then(response => response.data)
+      .catch(error => {
+        Logger.error('RemoteFetcher::getHistoricalCoinPrice error: ' + stringifyError(error));
+        throw new HistoricalCoinPriceError();
+      })
+  )
+
 }

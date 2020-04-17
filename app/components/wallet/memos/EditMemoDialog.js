@@ -83,7 +83,6 @@ export default class EditMemoDialog extends Component<Props, State> {
         const memoRequest = {
           publicDeriver: this.props.selectedWallet,
           memo: {
-            TxMemoId: this.props.existingMemo.TxMemoId,
             Content: memoContent.replace(/ +/g, ' '),
             TransactionHash: this.props.existingMemo.TransactionHash,
             LastUpdated: new Date(),

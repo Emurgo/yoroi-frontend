@@ -111,6 +111,11 @@
     }
   }
 
+  .amountSmall {
+    color: var(--theme-widgets-hash-light-color);
+    font-size: 14px;
+  }
+
   .failedLabel {
     color: var(--theme-transactions-state-failed-text-color);
     background-color: var(--theme-transactions-state-failed-background-color);

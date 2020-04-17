@@ -2,9 +2,10 @@
 
 import React from 'react';
 
-import { boolean, } from '@storybook/addon-knobs';
+import { boolean, select, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import { LANGUAGES } from '../../../i18n/translations';
+import { SUPPORTED_CURRENCIES } from '../../../config/unitOfAccount';
 import GeneralSettingsPage from './GeneralSettingsPage';
 import { withScreenshot } from 'storycap';
 import { globalKnobs, walletLookup } from '../../../../stories/helpers/StoryWrapper';
@@ -22,6 +23,16 @@ export default {
 
 export const Generic = () => {
   const lookup = walletLookup([]);
+
+  const lastUpdateCases = {
+    Never: 0,
+    Recent: 1,
+  };
+  const lastUpdatedTimestamp = select(
+    'currency_lastUpdate',
+    lastUpdateCases,
+    lastUpdateCases.Never
+  );
   return wrapSettings(
     mockSettingsProps({
       location: ROUTES.SETTINGS.GENERAL,
@@ -46,6 +57,24 @@ export const Generic = () => {
             currentTheme: globalKnobs.currentTheme(),
             getThemeVars: getVarsForTheme,
             hasCustomTheme: () => boolean('hasCustomTheme', false),
+            UNIT_OF_ACCOUNT_OPTIONS: SUPPORTED_CURRENCIES,
+            unitOfAccount: {
+              enabled: false,
+              currency: undefined,
+            },
+            setUnitOfAccountRequest: {
+              error: null,
+              isExecuting: boolean('setUnitOfAccountRequest_isExecuting'),
+            },
+          },
+          coinPriceStore: {
+            getCurrentPrice: (_from, _to) => 5,
+            lastUpdateTimestamp: lastUpdatedTimestamp === lastUpdateCases.Never
+              ? null
+              : new Date().getTime(),
+            refreshCurrentUnit: {
+              isExecuting: false,
+            },
           },
         },
         actions: {
@@ -54,6 +83,7 @@ export const Generic = () => {
             updateTheme: { trigger: async (req) => action('updateTheme')(req) },
             exportTheme: { trigger: async (req) => action('exportTheme')(req) },
             updateSelectedExplorer: { trigger: async (req) => action('updateSelectedExplorer')(req) },
+            updateUnitOfAccount: { trigger: async (req) => action('updateUnitOfAccount')(req) },
           },
         },
         canRegisterProtocol: () => boolean('canRegisterProtocol', true),

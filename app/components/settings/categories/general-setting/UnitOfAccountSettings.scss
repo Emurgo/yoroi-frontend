@@ -1,0 +1,64 @@
+@import '../../../../themes/mixins/error-message';
+
+.component {
+  border-top: 1px solid rgba(173, 174, 182, 0.3);
+  padding-top: 30px;
+  margin-bottom: 20px;
+
+  .title {
+    color: var(--theme-support-settings-text-color);
+    font-family: var(--font-semibold);
+    font-size: 18px;
+    line-height: 22px;
+    margin-bottom: 12px;
+  }
+  a,
+  p {
+    color: var(--theme-support-settings-text-color);
+    font-family: var(--font-regular);
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  a {
+    color: var(--theme-support-settings-link-color);
+  }
+
+  p {
+    margin-bottom: 2px;
+  }
+
+  .optionSmall {
+    font-size: 14px;
+    color: var(--theme-widgets-hash-light-color);
+  }
+
+  :global(.SelectOverrides_selectInput) input {
+    // don't uppercase selected currency
+    text-transform: none;
+  }
+
+  .optionRow {
+    display: flex;
+    .optionLabel {
+      margin-left: 8px;
+    }
+  }
+}
+
+.error {
+  @include error-message;
+  text-align: center;
+}
+
+.currency {
+  margin-top: 20px;
+  label {
+    background-color: var(--theme-settings-pane-background-color);
+  }
+}
+
+:global(.YoroiModern) .optionSmallNative {
+  font-size: 14px;
+  color: var(--theme-select-language-color);
+}

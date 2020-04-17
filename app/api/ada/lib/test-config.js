@@ -6,7 +6,8 @@ const CONFIG: ConfigType = {
     protocolMagic: 764824073,
     backendUrl: '',
     websocketUrl: '',
-    name: 'mainnet'
+    name: 'mainnet',
+    priceBackendUrl: '',
   },
   seiza: {
     simpleTemplate: '',
@@ -19,6 +20,10 @@ const CONFIG: ConfigType = {
     logsFileSuffix: 'log',
     addressRequestSize: 20,
     txsBodiesRequestSize: 20,
+    coinPriceRefreshInterval: 60000,
+    coinPriceFreshnessThreshold: 120000,
+    pubKeyData: '',
+    pubKeyMaster: '',
   },
   genesis: {
     block0_date: 0,

@@ -1,6 +1,8 @@
 // @flow
 import type { SelectedExternalStorageProvider } from '../../domain/ExternalStorage';
 import environment from '../../environment';
+import { unitOfAccountDisabledValue } from '../../types/unitOfAccountType';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 
 import {
   getLocalItem,
@@ -21,6 +23,8 @@ const storageKeys = {
   CUSTOM_THEME: networkForLocalStorage + '-CUSTOM-THEME',
   VERSION: networkForLocalStorage + '-LAST-LAUNCH-VER',
   HIDE_BALANCE: networkForLocalStorage + '-HIDE-BALANCE',
+  UNIT_OF_ACCOUNT: networkForLocalStorage + '-UNIT-OF-ACCOUNT',
+  COIN_PRICE_PUB_KEY_DATA: networkForLocalStorage + '-COIN-PRICE-PUB-KEY-DATA',
   EXTERNAL_STORAGE: networkForLocalStorage + '-EXTERNAL-STORAGE',
   TOGGLE_SIDEBAR: networkForLocalStorage + '-TOGGLE-SIDEBAR',
 };
@@ -189,12 +193,65 @@ export default class LocalStorageApi {
 
   // =========== Common =============== //
 
+  // ========== Unit of account ========== //
+
+  getUnitOfAccount: void => Promise<UnitOfAccountSettingType> = (
+  ) => new Promise((resolve, reject) => {
+    try {
+      const unitOfAccount = localStorage.getItem(storageKeys.UNIT_OF_ACCOUNT);
+      if (unitOfAccount == null) resolve(unitOfAccountDisabledValue);
+      else resolve(JSON.parse(unitOfAccount));
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+  setUnitOfAccount: UnitOfAccountSettingType => Promise<void> = (
+    currency
+  ) => new Promise((resolve, reject) => {
+    try {
+      localStorage.setItem(storageKeys.UNIT_OF_ACCOUNT, JSON.stringify(currency));
+      resolve();
+    } catch (error) {
+      return reject(error);
+    }
+  });
+
+  unsetUnitOfAccount: void => Promise<void> = () => new Promise((resolve) => {
+    try {
+      localStorage.removeItem(storageKeys.UNIT_OF_ACCOUNT);
+    } catch (_error) {
+      // ignore the error
+    }
+    resolve();
+  });
+
+  // ========== Coin price data public key  ========== //
+
+  getCoinPricePubKeyData: void => Promise<?string> = async () => {
+    return localStorage.getItem(storageKeys.COIN_PRICE_PUB_KEY_DATA);
+  }
+
+  setCoinPricePubKeyData: string => Promise<void> = async (pubKeyData) => {
+    localStorage.setItem(storageKeys.COIN_PRICE_PUB_KEY_DATA, pubKeyData);
+  }
+
+  unsetCoinPricePubKeyData: void => Promise<void> = async () => {
+    try {
+      localStorage.removeItem(storageKeys.COIN_PRICE_PUB_KEY_DATA);
+    } catch (_) {
+      // ignore the error
+    }
+  }
+
   async reset(): Promise<void> {
     await this.unsetUserLocale();
     await this.unsetTermsOfUseAcceptance();
     await this.unsetUserTheme();
     await this.unsetLastLaunchVersion();
     await this.unsetHideBalance();
+    await this.unsetUnitOfAccount();
+    await this.unsetCoinPricePubKeyData();
     await this.unsetExternalStorage();
     await this.unsetToggleSidebar();
   }

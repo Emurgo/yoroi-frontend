@@ -51,23 +51,35 @@ export async function addNewRowToTable<Insert, Row>(
   return results[0];
 }
 
-export async function addOrReplaceRow<Insert, Row>(
+export async function addOrReplaceRows<Insert, Row>(
   db: lf$Database,
   tx: lf$Transaction,
-  request: Insert,
+  request: $ReadOnlyArray<Insert>,
   tableName: string,
-): Promise<$ReadOnly<Row>> {
+): Promise<$ReadOnlyArray<Row>> {
   const table = db.getSchema().table(tableName);
-  const newRow = table.createRow(request);
+  const newRows = request.map(row => table.createRow(row));
 
-  const result: $ReadOnly<Row> = (await tx.attach(
+  const result: $ReadOnlyArray<Row> = (await tx.attach(
     db
       .insertOrReplace()
       .into(table)
-      .values(([newRow]: Array<lf$Row>))
-  ))[0];
+      .values(newRows)
+  ));
 
   return result;
+}
+export async function addOrReplaceRow<Insert, Row>(
+  db: lf$Database,
+  tx: lf$Transaction,
+  request: $ReadOnly<Insert>,
+  tableName: string,
+): Promise<$ReadOnly<Row>> {
+  return (await addOrReplaceRows(
+    db, tx,
+    [request],
+    tableName
+  ))[0];
 }
 
 export const getRowFromKey = async <T>(

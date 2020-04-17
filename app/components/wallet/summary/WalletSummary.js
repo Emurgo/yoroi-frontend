@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import React, { Component, } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
@@ -10,6 +10,8 @@ import { DECIMAL_PLACES_IN_ADA } from '../../../config/numbersConfig';
 import type { UnconfirmedAmount } from '../../../types/unconfirmedAmountType';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletSummary.scss';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import { formatValue } from '../../../utils/unit-of-account';
 
 const messages = defineMessages({
   pendingOutgoingConfirmationLabel: {
@@ -47,6 +49,7 @@ type Props = {|
   +pendingAmount: UnconfirmedAmount,
   +isLoadingTransactions: boolean,
   +openExportTxToFileDialog: void => void,
+  +unitOfAccountSetting: UnitOfAccountSettingType,
 |};
 
 @observer
@@ -62,6 +65,7 @@ export default class WalletSummary extends Component<Props> {
       numberOfTransactions,
       isLoadingTransactions,
       openExportTxToFileDialog,
+      unitOfAccountSetting,
     } = this.props;
     const { intl } = this.context;
 
@@ -80,19 +84,43 @@ export default class WalletSummary extends Component<Props> {
                     {pendingAmount.incoming.isGreaterThan(0) &&
                       <div className={styles.pendingConfirmation}>
                         {`${intl.formatMessage(messages.pendingIncomingConfirmationLabel)}`}
-                        : <span>{pendingAmount.incoming.toFormat(DECIMAL_PLACES_IN_ADA)}</span>
-                        <span className={styles.currencySymbolSmallest}>
-                          <AdaSymbolSmallest />
-                        </span>
+                        :&nbsp;
+                        {pendingAmount.incomingInSelectedCurrency &&
+                        unitOfAccountSetting.enabled
+                          ? (
+                            <span>
+                              {formatValue(pendingAmount.incomingInSelectedCurrency)}
+                              {' ' + unitOfAccountSetting.currency}
+                            </span>
+                          ) : (
+                            <>
+                              <span>{pendingAmount.incoming.toFormat(DECIMAL_PLACES_IN_ADA)}</span>
+                              <span className={styles.currencySymbolSmallest}>
+                                <AdaSymbolSmallest />
+                              </span>
+                            </>
+                          )}
                       </div>
                     }
                     {pendingAmount.outgoing.isGreaterThan(0) &&
                       <div className={styles.pendingConfirmation}>
                         {`${intl.formatMessage(messages.pendingOutgoingConfirmationLabel)}`}
-                        : <span>{pendingAmount.outgoing.toFormat(DECIMAL_PLACES_IN_ADA)}</span>
-                        <span className={styles.currencySymbolSmallest}>
-                          <AdaSymbolSmallest />
-                        </span>
+                        :&nbsp;
+                        {pendingAmount.outgoingInSelectedCurrency &&
+                          unitOfAccountSetting.enabled
+                          ? (
+                            <span>
+                              {formatValue(pendingAmount.outgoingInSelectedCurrency)}
+                              {' ' + unitOfAccountSetting.currency}
+                            </span>
+                          ) : (
+                            <>
+                              <span>{pendingAmount.outgoing.toFormat(DECIMAL_PLACES_IN_ADA)}</span>
+                              <span className={styles.currencySymbolSmallest}>
+                                <AdaSymbolSmallest />
+                              </span>
+                            </>
+                          )}
                       </div>
                     }
                   </div>

@@ -14,6 +14,8 @@ import type {
   AccountStateRequest, AccountStateResponse,
   PoolInfoRequest, PoolInfoResponse,
   ReputationRequest, ReputationResponse,
+  CurrentCoinPriceRequest, CurrentCoinPriceResponse,
+  HistoricalCoinPriceRequest, HistoricalCoinPriceResponse,
   AddressUtxoFunc,
   FilterFunc,
   HistoryFunc,
@@ -115,6 +117,16 @@ export class BatchedFetcher implements IFetcher {
 
   checkServerStatus: ServerStatusRequest => Promise<ServerStatusResponse> = (body) => (
     this.baseFetcher.checkServerStatus(body)
+  )
+
+  getCurrentCoinPrice: CurrentCoinPriceRequest => Promise<CurrentCoinPriceResponse> = (body) => (
+    this.baseFetcher.getCurrentCoinPrice(body)
+  )
+
+  getHistoricalCoinPrice: HistoricalCoinPriceRequest => Promise<HistoricalCoinPriceResponse> = (
+    body
+  )  => (
+    this.baseFetcher.getHistoricalCoinPrice(body)
   )
 }
 

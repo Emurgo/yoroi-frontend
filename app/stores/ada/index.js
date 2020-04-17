@@ -18,6 +18,7 @@ import HWVerifyAddressStore from './HWVerifyAddressStore';
 import PaperWalletCreateStore from './PaperWalletCreateStore';
 import StateFetchStore from './StateFetchStore';
 import ServerConnectionStore from './ServerConnectionStore';
+import CoinPriceStore from './CoinPriceStore';
 import WalletRestoreStore from './WalletRestoreStore';
 import DelegationTransactionStore from './DelegationTransactionStore';
 import DelegationStore from './DelegationStore';
@@ -42,6 +43,7 @@ export const adaStoreClasses = {
   stateFetchStore: StateFetchStore,
   transactionBuilderStore: AdaTransactionBuilderStore,
   serverConnectionStore: ServerConnectionStore,
+  coinPriceStore: CoinPriceStore,
   walletRestore: WalletRestoreStore,
   delegationTransaction: DelegationTransactionStore,
   delegation: DelegationStore,
@@ -64,6 +66,7 @@ export type AdaStoresMap = {|
   stateFetchStore: StateFetchStore,
   transactionBuilderStore: AdaTransactionBuilderStore,
   serverConnectionStore: ServerConnectionStore,
+  coinPriceStore: CoinPriceStore,
   walletRestore: WalletRestoreStore,
   delegationTransaction: DelegationTransactionStore,
   delegation: DelegationStore,
@@ -86,6 +89,7 @@ const adaStores = observable({
   stateFetchStore: null,
   transactionBuilderStore: null,
   serverConnectionStore: null,
+  coinPriceStore: null,
   walletRestore: null,
   delegationTransaction: null,
   delegation: null,

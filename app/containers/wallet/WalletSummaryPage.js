@@ -81,6 +81,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
           <WalletTransactionsList
             transactions={recent}
             memoMap={this.generated.stores.memos.txMemoMap.get(walletId) || new Map()}
+            priceMap={this.generated.stores.coinPriceStore.priceMap}
             selectedExplorer={this.generated.stores.profile.selectedExplorer}
             isLoadingTransactions={isLoadingTx}
             hasMoreToLoad={totalAvailable > limit}
@@ -101,6 +102,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
                 actions.dialogs.open.trigger({ dialog: EditMemoDialog });
               }
             })}
+            unitOfAccountSetting={profile.unitOfAccount}
           />
         );
       } else if (!hasAny) {
@@ -136,6 +138,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
             !recentTransactionsRequest.wasExecuted
           }
           openExportTxToFileDialog={this.openExportTransactionDialog}
+          unitOfAccountSetting={profile.unitOfAccount}
         />
 
         {walletTransactions}
@@ -284,6 +287,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
           selectedExplorer: stores.profile.selectedExplorer,
           shouldHideBalance: stores.profile.shouldHideBalance,
           isClassicTheme: stores.profile.isClassicTheme,
+          unitOfAccount: stores.profile.unitOfAccount,
         },
         uiDialogs: {
           isOpen: stores.uiDialogs.isOpen,
@@ -294,6 +298,9 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
         },
         wallets: {
           selected: stores.wallets.selected,
+        },
+        coinPriceStore: {
+          priceMap: stores.substores.ada.coinPriceStore.priceMap,
         },
         memos: {
           hasSetSelectedExternalStorageProvider: stores.memos.hasSetSelectedExternalStorageProvider,

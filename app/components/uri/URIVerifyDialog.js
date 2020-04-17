@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import React, { Component, } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
@@ -14,7 +14,8 @@ import { formattedWalletAmount } from '../../utils/formatters';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../widgets/hashWrappers/RawHash';
 import type { ExplorerType } from '../../domain/Explorer';
-
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import { calculateAndFormatValue } from '../../utils/unit-of-account';
 
 import styles from './URIVerifyDialog.scss';
 
@@ -39,6 +40,8 @@ type Props = {|
   +onCancel: void => void,
   +uriParams: UriParams,
   +selectedExplorer: ExplorerType,
+  +unitOfAccountSetting: UnitOfAccountSettingType,
+  +coinPrice: ?number,
 |};
 
 @observer
@@ -49,7 +52,7 @@ export default class URIVerifyDialog extends Component<Props> {
   };
 
   render() {
-    const { onCancel, onSubmit, } = this.props;
+    const { onCancel, onSubmit, unitOfAccountSetting, coinPrice } = this.props;
     const { intl } = this.context;
 
     const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
@@ -71,6 +74,7 @@ export default class URIVerifyDialog extends Component<Props> {
       },
     ];
 
+    const amount = this.props.uriParams.amount;
     // TODO: in the future, we will need to confirm which wallet/account to use for this transaction
     return (
       <Dialog
@@ -101,9 +105,21 @@ export default class URIVerifyDialog extends Component<Props> {
           <h2 className={styles.label}>
             {intl.formatMessage(globalMessages.amountLabel)}:
           </h2>
-          <span className={styles.amount}>
-            {formattedWalletAmount(this.props.uriParams.amount)} {currency}
-          </span>
+          {unitOfAccountSetting.enabled ? (
+            <>
+              <div className={styles.amount}>
+                {coinPrice != null ? calculateAndFormatValue(amount, coinPrice) : '-'}&nbsp;
+                {unitOfAccountSetting.currency}
+              </div>
+              <div className={styles.amountSmall}>
+                {formattedWalletAmount(amount)} {currency}
+              </div>
+            </>
+          ) : (
+            <div className={styles.amount}>
+              {formattedWalletAmount(amount)} {currency}
+            </div>
+          )}
         </div>
         <p className={styles.textBlock}>
           {intl.formatMessage(messages.uriVerifyDialogText)}

@@ -2,9 +2,11 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
+import { defineMessages, intlShape } from 'react-intl';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import GeneralSettings from '../../../components/settings/categories/general-setting/GeneralSettings';
 import ExplorerSettings from '../../../components/settings/categories/general-setting/ExplorerSettings';
+import UnitOfAccountSettings from '../../../components/settings/categories/general-setting/UnitOfAccountSettings';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import ThemeSettingsBlock from '../../../components/settings/categories/general-setting/ThemeSettingsBlock';
 import UriSettingsBlock from '../../../components/settings/categories/general-setting/UriSettingsBlock';
@@ -12,16 +14,64 @@ import registerProtocols from '../../../uri-protocols';
 import environment from '../../../environment';
 import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
 import { getExplorers } from '../../../domain/Explorer';
+import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
+import AdaCurrency from '../../../assets/images/currencies/ADA.inline.svg';
+
+const currencyLabels = defineMessages({
+  USD: {
+    id: 'settings.unitOfAccount.currency.usd',
+    defaultMessage: '!!!US dollar',
+  },
+  JPY: {
+    id: 'settings.unitOfAccount.currency.jpy',
+    defaultMessage: '!!!Japanese yen',
+  },
+  EUR: {
+    id: 'settings.unitOfAccount.currency.eur',
+    defaultMessage: '!!!Euro',
+  },
+  CNY: {
+    id: 'settings.unitOfAccount.currency.cny',
+    defaultMessage: '!!!Chinese Renminbi yuan',
+  },
+  KRW: {
+    id: 'settings.unitOfAccount.currency.krw',
+    defaultMessage: '!!!South Korean won',
+  },
+  BTC: {
+    id: 'settings.unitOfAccount.currency.btc',
+    defaultMessage: '!!!Bitcoin',
+  },
+  ETH: {
+    id: 'settings.unitOfAccount.currency.eth',
+    defaultMessage: '!!!Ethereum',
+  },
+});
 
 type GeneratedData = typeof GeneralSettingsPage.prototype.generated;
 
 @observer
 export default class GeneralSettingsPage extends Component<InjectedOrGenerated<GeneratedData>> {
 
+  static contextTypes = {
+    intl: intlShape.isRequired,
+  };
+
+  onSelectUnitOfAccount: string => void = (value) => {
+    const unitOfAccount = (value === 'ADA')
+      ? unitOfAccountDisabledValue
+      : { enabled: true, currency: value };
+    this.generated.actions.profile.updateUnitOfAccount.trigger(unitOfAccount);
+  };
+
   render() {
     const profileStore = this.generated.stores.profile;
+    const coinPriceStore = this.generated.stores.coinPriceStore;
+
     const isSubmittingLocale = profileStore.setProfileLocaleRequest.isExecuting;
     const isSubmittingExplorer = profileStore.setSelectedExplorerRequest.isExecuting;
+    const isSubmittingUnitOfAccount = profileStore.setUnitOfAccountRequest.isExecuting
+      || coinPriceStore.refreshCurrentUnit.isExecuting;
     const explorerOptions = getExplorers();
     const { currentTheme } = profileStore;
 
@@ -34,6 +84,28 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
         />
       )
       : null;
+
+    const currencies = profileStore.UNIT_OF_ACCOUNT_OPTIONS.map(c => {
+      const name = this.context.intl.formatMessage(currencyLabels[c.symbol]);
+      return {
+        value: c.symbol,
+        label: `${c.symbol} - ${name}`,
+        name,
+        price: coinPriceStore.getCurrentPrice('ADA', c.symbol),
+        svg: c.svg
+      };
+    });
+    currencies.unshift({
+      value: 'ADA',
+      label: 'ADA - Cardano',
+      name: 'Cardano',
+      native: true,
+      svg: AdaCurrency,
+    });
+
+    const unitOfAccountValue = profileStore.unitOfAccount.enabled
+      ? profileStore.unitOfAccount.currency
+      : 'ADA';
 
     return (
       <>
@@ -52,6 +124,16 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           error={profileStore.setSelectedExplorerRequest.error}
         />
         {uriSettings}
+        {!environment.isProduction() &&
+          <UnitOfAccountSettings
+            onSelect={this.onSelectUnitOfAccount}
+            isSubmitting={isSubmittingUnitOfAccount}
+            currencies={currencies}
+            currentValue={unitOfAccountValue}
+            error={profileStore.setUnitOfAccountRequest.error}
+            lastUpdatedTimestamp={coinPriceStore.lastUpdateTimestamp}
+          />
+        }
         {!environment.isShelley() &&
           <ThemeSettingsBlock
             currentTheme={currentTheme}
@@ -93,6 +175,19 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           currentTheme: profileStore.currentTheme,
           getThemeVars: profileStore.getThemeVars,
           hasCustomTheme: profileStore.hasCustomTheme,
+          UNIT_OF_ACCOUNT_OPTIONS: profileStore.UNIT_OF_ACCOUNT_OPTIONS,
+          unitOfAccount: profileStore.unitOfAccount,
+          setUnitOfAccountRequest: {
+            error: profileStore.setUnitOfAccountRequest.error,
+            isExecuting: profileStore.setUnitOfAccountRequest.isExecuting,
+          },
+        },
+        coinPriceStore: {
+          getCurrentPrice: stores.substores.ada.coinPriceStore.getCurrentPrice,
+          lastUpdateTimestamp: stores.substores.ada.coinPriceStore.lastUpdateTimestamp,
+          refreshCurrentUnit: {
+            isExecuting: stores.substores.ada.coinPriceStore.refreshCurrentUnit.isExecuting,
+          },
         },
       },
       actions: {
@@ -101,6 +196,7 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           updateTheme: { trigger: actions.profile.updateTheme.trigger },
           exportTheme: { trigger: actions.profile.exportTheme.trigger },
           updateSelectedExplorer: { trigger: actions.profile.updateSelectedExplorer.trigger },
+          updateUnitOfAccount: { trigger: actions.profile.updateUnitOfAccount.trigger },
         },
       },
       canRegisterProtocol: environment.userAgentInfo.canRegisterProtocol,

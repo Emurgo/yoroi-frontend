@@ -17,6 +17,8 @@ import type {
 } from '../../app/api/ada/lib/state-fetch/types';
 import chai from 'chai';
 import mockImporter from './mockImporter';
+import { installCoinPriceRequestHandlers } from './coinPriceRequestHandler';
+
 import { Ports } from '../../scripts/connections';
 
 // MockData should always be consistent with the following values
@@ -166,6 +168,8 @@ export function getMockServer(
       const isServerOk = mockImporter.getApiStatus();
       res.send({ isServerOk });
     });
+
+    installCoinPriceRequestHandlers(server);
 
     MockServer = server.listen(Ports.DevBackendServe, () => {
       console.log(`JSON Server is running at ${Ports.DevBackendServe}`);

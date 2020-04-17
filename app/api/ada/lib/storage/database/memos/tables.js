@@ -19,7 +19,6 @@ export type TxMemoTableInsert = {|
   ...TxMemoTableInsertCommon,
 |};
 export type TxMemoTableRow = {|
-  TxMemoId: number,
   ...TxMemoTableInsert,
 |};
 export const TxMemoSchema: {|
@@ -28,7 +27,6 @@ export const TxMemoSchema: {|
 |} = {
   name: 'TxMemo',
   properties: {
-    TxMemoId: 'TxMemoId',
     WalletId: 'WalletId',
     Content: 'Content',
     TransactionHash: 'TransactionHash',
@@ -38,22 +36,19 @@ export const TxMemoSchema: {|
 
 export const populateMemoTransactionsDb: lf$schema$Builder => void = (schemaBuilder) => {
   schemaBuilder.createTable(TxMemoSchema.name)
-    .addColumn(TxMemoSchema.properties.TxMemoId, Type.INTEGER)
     .addColumn(TxMemoSchema.properties.WalletId, Type.STRING)
     .addColumn(TxMemoSchema.properties.Content, Type.STRING)
     .addColumn(TxMemoSchema.properties.TransactionHash, Type.INTEGER)
     .addColumn(TxMemoSchema.properties.LastUpdated, Type.DATE_TIME)
-    .addPrimaryKey(
-      ([TxMemoSchema.properties.TxMemoId]: Array<string>),
-      true,
-    )
     // Note: no foreign key in the Transaction table
     // since txhash aren't unique in the Transactions table
     // and some memos may be for transactions we haven't synced yet
-    .addUnique('TxMemo_TransactionHash_Unique', [
-      // different wallets can have the same transaction in them
-      // but different memos respectively
-      TxMemoSchema.properties.WalletId,
-      TxMemoSchema.properties.TransactionHash,
-    ]);
+    .addPrimaryKey(
+      ([
+        // different wallets can have the same transaction in them
+        // but different memos respectively
+        TxMemoSchema.properties.WalletId,
+        TxMemoSchema.properties.TransactionHash,
+      ]: Array<string>)
+    );
 };

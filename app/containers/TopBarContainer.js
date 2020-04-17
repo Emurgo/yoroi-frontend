@@ -25,7 +25,10 @@ export default class TopBarContainer extends Component<Props> {
 
   render() {
     const { actions, stores } = this.generated;
-    const { app, topbar, profile } = stores;
+    const { app, topbar, profile, coinPriceStore } = stores;
+
+    const coinPrice = profile.unitOfAccount.enabled ?
+      coinPriceStore.getCurrentPrice('ADA', profile.unitOfAccount.currency) : null;
 
     const walletsStore = stores.wallets;
     const walletInfo = (() => {
@@ -59,6 +62,8 @@ export default class TopBarContainer extends Component<Props> {
       }}
       onUpdateHideBalance={this.updateHideBalance}
       shouldHideBalance={profile.shouldHideBalance}
+      coinPrice={coinPrice}
+      unitOfAccountSetting={profile.unitOfAccount}
     />);
     return (
       <TopBar
@@ -80,11 +85,16 @@ export default class TopBarContainer extends Component<Props> {
       throw new Error(`${nameof(TopBarContainer)} no way to generated props`);
     }
     const { stores, actions } = this.props;
+    const { coinPriceStore } = stores.substores.ada;
     return Object.freeze({
       stores: {
+        coinPriceStore: {
+          getCurrentPrice: coinPriceStore.getCurrentPrice,
+        },
         profile: {
           isClassicTheme: stores.profile.isClassicTheme,
           shouldHideBalance: stores.profile.shouldHideBalance,
+          unitOfAccount: stores.profile.unitOfAccount,
         },
         wallets: {
           getPublicKeyCache: stores.wallets.getPublicKeyCache,

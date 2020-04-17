@@ -1,6 +1,7 @@
 // @flow
 import { AsyncAction, Action } from './lib/Action';
 import type { ExplorerType } from '../domain/Explorer';
+import type { UnitOfAccountSettingType } from '../types/unitOfAccountType';
 
 // ======= PROFILE ACTIONS =======
 
@@ -16,4 +17,5 @@ export default class ProfileActions {
   updateHideBalance: AsyncAction<void> = new AsyncAction();
   toggleSidebar: AsyncAction<void> = new AsyncAction();
   acceptNightly: Action<void> = new Action();
+  updateUnitOfAccount: AsyncAction<UnitOfAccountSettingType> = new AsyncAction();
 }

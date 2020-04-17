@@ -17,6 +17,9 @@ import type {
 import type {
   SetCustomUserThemeRequest
 } from '../../api/localStorage/index';
+import { unitOfAccountDisabledValue } from '../../types/unitOfAccountType';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import { SUPPORTED_CURRENCIES } from '../../config/unitOfAccount';
 
 export default class ProfileStore extends Store {
 
@@ -28,6 +31,8 @@ export default class ProfileStore extends Store {
       ]
       : [])
   ];
+
+  UNIT_OF_ACCOUNT_OPTIONS: typeof SUPPORTED_CURRENCIES = SUPPORTED_CURRENCIES;
 
   /**
    * Need to store the selected language in-memory for when the user
@@ -100,6 +105,8 @@ export default class ProfileStore extends Store {
         // note: we want to load memos BEFORE we start syncing wallets
         // this is because syncing wallets will also try and sync memos with external storage
         await this.stores.memos.loadFromStorage();
+        await this.stores.substores.ada.coinPriceStore.loadFromStorage();
+        await this.stores.substores.ada.coinPriceStore.refreshCurrentCoinPrice();
 
         await wallets.restoreWalletsFromStorage();
         if (wallets.hasAnyPublicDeriver && this.stores.loading.fromUriScheme) {
@@ -202,6 +209,12 @@ export default class ProfileStore extends Store {
   @observable setHideBalanceRequest: Request<boolean => Promise<void>>
     = new Request<boolean => Promise<void>>(this.api.localStorage.setHideBalance);
 
+  @observable setUnitOfAccountRequest: Request<UnitOfAccountSettingType => Promise<void>>
+    = new Request(this.api.localStorage.setUnitOfAccount);
+
+  @observable getUnitOfAccountRequest: Request<void => Promise<UnitOfAccountSettingType>>
+    = new Request(this.api.localStorage.getUnitOfAccount);
+
   @observable getToggleSidebarRequest: Request<void => Promise<boolean>>
     = new Request<void => Promise<boolean>>(this.api.localStorage.getToggleSidebar);
 
@@ -219,6 +232,7 @@ export default class ProfileStore extends Store {
     this.actions.profile.exportTheme.listen(this._exportTheme);
     this.actions.profile.commitLocaleToStorage.listen(this._acceptLocale);
     this.actions.profile.updateHideBalance.listen(this._updateHideBalance);
+    this.actions.profile.updateUnitOfAccount.listen(this._updateUnitOfAccount);
     this.actions.profile.toggleSidebar.listen(this._toggleSidebar);
     this.actions.profile.acceptNightly.listen(this._acceptNightly);
     this.registerReactions([
@@ -549,6 +563,28 @@ export default class ProfileStore extends Store {
       }
     }
   }
+
+  // ========== Coin Price Currency ========== //
+
+  @computed.struct get unitOfAccount(): UnitOfAccountSettingType {
+    const { result } = this.getUnitOfAccountRequest.execute();
+    return result || unitOfAccountDisabledValue;
+  }
+
+  _updateUnitOfAccount: UnitOfAccountSettingType => Promise<void> = async (currency) => {
+    await this.setUnitOfAccountRequest.execute(currency);
+    await this.getUnitOfAccountRequest.execute(); // eagerly cache
+
+    await this.stores.substores.ada.coinPriceStore.refreshCurrentUnit.execute().promise;
+  };
+
+  @computed get hasLoadedUnitOfAccount(): boolean {
+    return (
+      this.getUnitOfAccountRequest.wasExecuted &&
+      this.getUnitOfAccountRequest.result !== null
+    );
+  }
+
 }
 
 export const getVarsForTheme: {|

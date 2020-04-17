@@ -51,6 +51,13 @@ export default class URILandingDialogContainer extends Component<Props> {
     // assert not null
     const uriParams = this.generated.stores.loading.uriParams;
 
+    const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
+      ? (
+        this.generated.stores.coinPriceStore
+          .getCurrentPrice('ADA', this.generated.stores.profile.unitOfAccount.currency)
+      )
+      : null;
+
     if (!this.showDisclaimer) {
       return (
         <URIVerifyDialog
@@ -59,6 +66,8 @@ export default class URILandingDialogContainer extends Component<Props> {
           onCancel={this.onCancel}
           uriParams={uriParams}
           selectedExplorer={this.generated.stores.profile.selectedExplorer}
+          unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
+          coinPrice={coinPrice}
         />
       );
     }
@@ -85,6 +94,10 @@ export default class URILandingDialogContainer extends Component<Props> {
         profile: {
           selectedExplorer: stores.profile.selectedExplorer,
           isClassicTheme: stores.profile.isClassicTheme,
+          unitOfAccount: stores.profile.unitOfAccount,
+        },
+        coinPriceStore: {
+          getCurrentPrice: stores.substores.ada.coinPriceStore.getCurrentPrice,
         },
         loading: {
           uriParams: stores.loading.uriParams,
