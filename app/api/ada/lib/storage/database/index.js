@@ -76,7 +76,7 @@ export const loadLovefieldDB = async (
 const populateAndCreate = async (
   storeType: $Values<typeof schema.DataStoreType>
 ): Promise<lf$Database> => {
-  const schemaBuilder = schema.create('yoroi-schema', 9);
+  const schemaBuilder = schema.create('yoroi-schema', 8);
 
   populatePrimitivesDb(schemaBuilder);
   populateWalletDb(schemaBuilder);
@@ -162,7 +162,7 @@ async function onUpgrade(
     );
   } if (version === 5) {
     // nothing to do. Just adds a new table
-  } if (version === 6 || version === 7 || version === 8) {
+  } if (version === 6 || version === 7) {
     // fix mistake of assuming tx hash was always unencrypted
     const tx = rawDb.getRawTransaction();
     const txMemoStore = tx.objectStore('TxMemo');
