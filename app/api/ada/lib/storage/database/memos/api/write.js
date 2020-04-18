@@ -10,21 +10,31 @@ import {
 import * as Tables from '../tables';
 import type { TxMemoTableRow, TxMemoTableInsert } from '../tables';
 import { addOrReplaceRow, } from '../../utils';
+import { GetEncryptionMeta } from '../../primitives/api/read';
+import { digetForHash } from '../../primitives/api/utils';
 
 export class ModifyTxMemo {
   static ownTables = Object.freeze({
     [Tables.TxMemoSchema.name]: Tables.TxMemoSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables = Object.freeze({
+    GetEncryptionMeta
+  });
 
   static async upsertMemo(
     db: lf$Database,
     dbTx: lf$Transaction,
     memo: TxMemoTableInsert | TxMemoTableRow,
   ): Promise<$ReadOnly<TxMemoTableRow>> {
+    const { TransactionSeed } = await ModifyTxMemo.depTables.GetEncryptionMeta.get(db, dbTx);
+    const digest = digetForHash(memo.TransactionHash, TransactionSeed);
+    const memoWithDigest = {
+      ...memo,
+      Digest: digest,
+    };
     return await addOrReplaceRow<{ ...TxMemoTableInsert, ... }, TxMemoTableRow>(
       db, dbTx,
-      memo,
+      memoWithDigest,
       ModifyTxMemo.ownTables[Tables.TxMemoSchema.name].name,
     );
   }
@@ -37,6 +47,9 @@ export class ModifyTxMemo {
       txHash: string,
     |},
   ): Promise<void> {
+    const { TransactionSeed } = await ModifyTxMemo.depTables.GetEncryptionMeta.get(db, dbTx);
+    const digest = digetForHash(request.txHash, TransactionSeed);
+
     const table = db.getSchema().table(ModifyTxMemo.ownTables[Tables.TxMemoSchema.name].name);
 
     const { properties } = ModifyTxMemo.ownTables[Tables.TxMemoSchema.name];
@@ -45,7 +58,7 @@ export class ModifyTxMemo {
         .delete()
         .from(table)
         .where(op.and(
-          table[properties.TransactionHash].eq(request.txHash),
+          table[properties.Digest].eq(digest),
           table[properties.WalletId].eq(request.walletId),
         ))
     );

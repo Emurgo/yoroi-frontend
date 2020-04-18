@@ -380,6 +380,7 @@ export const TransactionWithMemo = () => {
             error: undefined,
             getIdForWallet: () => 'DNKO-8098',
             txMemoMap: new Map([['DNKO-8098', new Map([[walletTransaction.txid, {
+              Digest: 1,
               WalletId: 'DNKO-8098',
               Content: 'foo',
               TransactionHash: walletTransaction.txid,
@@ -454,6 +455,7 @@ export const MemoDialog = () => {
             error: undefined,
             getIdForWallet: () => 'DNKO-8098',
             txMemoMap: new Map([['DNKO-8098', new Map([[walletTransaction.txid, {
+              Digest: 1,
               WalletId: 'DNKO-8098',
               Content: 'foo',
               TransactionHash: walletTransaction.txid,
