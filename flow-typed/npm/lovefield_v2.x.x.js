@@ -165,8 +165,8 @@ declare module 'lovefield' {
   } & lf$query$Builder;
 
   declare interface lf$raw$BackStore {
-    getRawDBInstance(): any;
-    getRawTransaction(): any;
+    getRawDBInstance(): IDBDatabase;
+    getRawTransaction(): IDBTransaction;
     dropTable(tableName: string): Promise<void>;
     addTableColumn(
       tableName: string,

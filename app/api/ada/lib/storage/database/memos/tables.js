@@ -5,7 +5,7 @@ import type { lf$schema$Builder } from 'lovefield';
 
 export type TxMemoTableInsertCommon = {|
   Content: string,
-  /* can't use TransactionId here because that would cause memos to break on resync? */
+  /* can't use TransactionId auto-inc key here because that would cause memos to break on resync */
   TransactionHash: string,
   LastUpdated: Date,
 |};
@@ -19,6 +19,7 @@ export type TxMemoTableInsert = {|
   ...TxMemoTableInsertCommon,
 |};
 export type TxMemoTableRow = {|
+  Digest: number, // Note: don't want to upload this since it changes per instance
   ...TxMemoTableInsert,
 |};
 export const TxMemoSchema: {|
@@ -29,6 +30,7 @@ export const TxMemoSchema: {|
   properties: {
     WalletId: 'WalletId',
     Content: 'Content',
+    Digest: 'Digest',
     TransactionHash: 'TransactionHash',
     LastUpdated: 'LastUpdated'
   }
@@ -38,7 +40,8 @@ export const populateMemoTransactionsDb: lf$schema$Builder => void = (schemaBuil
   schemaBuilder.createTable(TxMemoSchema.name)
     .addColumn(TxMemoSchema.properties.WalletId, Type.STRING)
     .addColumn(TxMemoSchema.properties.Content, Type.STRING)
-    .addColumn(TxMemoSchema.properties.TransactionHash, Type.INTEGER)
+    .addColumn(TxMemoSchema.properties.TransactionHash, Type.STRING)
+    .addColumn(TxMemoSchema.properties.Digest, Type.NUMBER)
     .addColumn(TxMemoSchema.properties.LastUpdated, Type.DATE_TIME)
     // Note: no foreign key in the Transaction table
     // since txhash aren't unique in the Transactions table
@@ -48,7 +51,7 @@ export const populateMemoTransactionsDb: lf$schema$Builder => void = (schemaBuil
         // different wallets can have the same transaction in them
         // but different memos respectively
         TxMemoSchema.properties.WalletId,
-        TxMemoSchema.properties.TransactionHash,
+        TxMemoSchema.properties.Digest,
       ]: Array<string>)
     );
 };
