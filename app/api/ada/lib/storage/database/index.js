@@ -128,14 +128,16 @@ async function onUpgrade(
     await rawDb.dropTable('TxAddresses');
     await rawDb.dropTable('Txs');
     await rawDb.dropTable('Addresses');
+    return;
   }
-  if (version <= 2) {
+  if (version === 2) {
     // if user was in the balance-check version of Yoroi
     // they have an incompatible DB and we don't care about it
     // so we just delete it entirely
     await deleteDb();
     // need to refresh for page to re-create new DB
     window.location.reload();
+    return;
   }
   if (version === 3) {
     // In https://github.com/Emurgo/yoroi-frontend/pull/1229
@@ -151,6 +153,7 @@ async function onUpgrade(
     if (numKeys === 0) {
       await deleteDb();
       window.location.reload();
+      return;
     }
   }
   if (version >= 3 && version <= 4) {

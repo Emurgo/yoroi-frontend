@@ -1,27 +1,29 @@
 // @flow
 
-/* eslint-disable camelcase */
-
 import '../test-config';
 import { schema } from 'lovefield';
 import { validateMnemonic } from 'bip39';
 import {
   getCryptoDaedalusWalletFromMnemonics,
+  generateWalletRootKey,
 } from './cryptoWallet';
 import {
   isValidEnglishAdaPaperMnemonic,
   unscramblePaperAdaMnemonic,
+  scramblePaperAdaMnemonic,
 } from './paperWallet';
 import {
   getAddressesKeys,
 } from '../../transactions/transfer/legacyDaedalus';
 import { RustModule } from './rustLoader';
+import { generateStandardPlate } from './plate';
 import {
   silenceLogsForTesting,
 } from '../../../../utils/logging';
 import {
   loadLovefieldDB,
 } from '../storage/database/index';
+import environment from '../../../../environment';
 import config from '../../../../config';
 
 const VALID_DD_PAPER = {
@@ -42,13 +44,17 @@ beforeAll(async () => {
   silenceLogsForTesting();
 });
 
-test('Is valid Daedalus paper mnemonic', async () => {
+test('Is valid Daedalus paper mnemonic', () => {
+  // Note: expect these to print error to console
+
   expect(isValidEnglishAdaPaperMnemonic(
     VALID_DD_PAPER.words,
     config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT
   )).toEqual(true);
+  // fails if length parameter is incorrect
   expect(isValidEnglishAdaPaperMnemonic(VALID_DD_PAPER.words, 30)).toEqual(false);
-  // Note: expect these to print error to console
+
+  // TODO: why did we need two tests for this?
   expect(isValidEnglishAdaPaperMnemonic(
     INVALID_DD_PAPER_1,
     config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT
@@ -85,5 +91,60 @@ test('Unscramble Daedalus paper matches expected address', async () => {
     expect(VALID_DD_PAPER.address in addressMap).toEqual(true);
     expect(UNEXPECTED_DD_ADDRESS in addressMap).toEqual(false);
     expect(addressMap[VALID_DD_PAPER.address].to_hex()).toEqual(VALID_DD_PAPER.privateKey);
+  }
+});
+
+const VALID_YOROI_PAPER = {
+  originalWords: 'business sight another write gadget near where hollow insane dynamic grain hurt slim clip require',
+  password: 'testpasswordtest',
+  scrambledWords: 'air comic label visual scale twist sell build ankle copy expect rocket crystal allow tissue eager jaguar crouch million cushion beach',
+  byronAddress: 'Ae2tdPwUPEZ5WTs87mbEwJjbW7pmkigLfBnLp3eKfGehapUMKiewwMn5yxh',
+  privateKey: '104e6fe092dff467502839395b9415672f35af08ae094a9b9bb7823caa5e835845b60600c66c654bf1a27b5d202a76b2169d0dfbf67b1cb9db89459892d319be16c6824f38cbc9377d14de83f8619fa5a7368ae74cffa939e42d91b877e2c1be',
+};
+const INVALID_YOROI_PAPER_1 =
+  'air comic label visual scale twist sell build ankle copy expect rocket crystal allow tissue eager jaguar crouch million cushion cushion';
+
+test('Is valid Yoroi paper mnemonic', () => {
+  // Note: expect these to print error to console
+
+  expect(isValidEnglishAdaPaperMnemonic(
+    VALID_YOROI_PAPER.scrambledWords,
+    config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT
+  )).toEqual(true);
+  // fails if length parameter is incorrect
+  expect(isValidEnglishAdaPaperMnemonic(VALID_YOROI_PAPER.scrambledWords, 30)).toEqual(false);
+  // fails if mnemonic itself is incorrect
+  expect(isValidEnglishAdaPaperMnemonic(
+    INVALID_YOROI_PAPER_1,
+    config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT
+  )).toEqual(false);
+});
+
+test('Scramble then unscramble Yoroi paper wallet is no-op', () => {
+  const password = 'testpasswordtest';
+  const scrambled = scramblePaperAdaMnemonic(
+    VALID_YOROI_PAPER.originalWords,
+    password,
+  );
+  const [words] = unscramblePaperAdaMnemonic(
+    scrambled,
+    config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT,
+    password
+  );
+  expect(words).toEqual(VALID_YOROI_PAPER.originalWords);
+});
+
+test('Unscramble Yoroi paper matches expected address', async () => {
+  const [words] = unscramblePaperAdaMnemonic(
+    VALID_YOROI_PAPER.scrambledWords,
+    config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT,
+    VALID_YOROI_PAPER.password
+  );
+  expect(words).toBeTruthy();
+  if (words != null) {
+    const rootPk = generateWalletRootKey(words);
+    expect(Buffer.from(rootPk.as_bytes()).toString('hex')).toEqual(VALID_YOROI_PAPER.privateKey);
+    const plate = generateStandardPlate(rootPk, 0, 1, environment.getDiscriminant(), true);
+    expect(plate.addresses[0]).toEqual(VALID_YOROI_PAPER.byronAddress);
   }
 });

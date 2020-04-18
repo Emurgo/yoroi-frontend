@@ -49,7 +49,7 @@ export const isValidEnglishAdaPaperMnemonic = (
 };
 
 
-/** Check validty of paper mnemonic (including checksum) */
+/** Check validity of paper mnemonic (including checksum) */
 export const unscramblePaperAdaMnemonic = (
   phrase: string,
   numberOfWords: number,
