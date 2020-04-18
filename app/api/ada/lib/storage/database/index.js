@@ -128,14 +128,16 @@ async function onUpgrade(
     await rawDb.dropTable('TxAddresses');
     await rawDb.dropTable('Txs');
     await rawDb.dropTable('Addresses');
-  } if (version === 2) {
+  }
+  if (version <= 2) {
     // if user was in the balance-check version of Yoroi
     // they have an incompatible DB and we don't care about it
     // so we just delete it entirely
     await deleteDb();
     // need to refresh for page to re-create new DB
     window.location.reload();
-  } if (version === 3) {
+  }
+  if (version === 3) {
     // In https://github.com/Emurgo/yoroi-frontend/pull/1229
     // I tried to delete balance-check databases but it didn't work
 
@@ -150,7 +152,8 @@ async function onUpgrade(
       await deleteDb();
       window.location.reload();
     }
-  } if (version === 4) {
+  }
+  if (version >= 3 && version <= 4) {
     // we know that before this version, Yoroi only supported 1 wallet
     // therefore the single wallet always has its root key as derivation id 1
     // and we only launched the new DB for the Shelley testnet
@@ -160,9 +163,8 @@ async function onUpgrade(
       'RootKeyDerivationId',
       1
     );
-  } if (version === 5) {
-    // nothing to do. Just adds a new table
-  } if (version === 6 || version === 7) {
+  }
+  if (version === 6 || version === 7) {
     // fix mistake of assuming tx hash was always unencrypted
     const tx = rawDb.getRawTransaction();
     const txMemoStore = tx.objectStore('TxMemo');
@@ -171,7 +173,5 @@ async function onUpgrade(
       clearRequest.onsuccess = () => resolve();
       clearRequest.onerror = () => resolve();
     });
-  } else {
-    throw new Error('unexpected version number');
   }
 }
