@@ -58,3 +58,18 @@ Then(/^I should see my balance hidden$/, async function () {
   await this.waitForElement('.NavWalletDetails_amount');
   await this.waitUntilContainsText('.NavWalletDetails_amount', '***');
 });
+
+Then(/^I switch to "([^"]*)" from the dropdown$/, async function (walletName) {
+  await this.click('.NavDropdown_toggle');
+  const wallets = await this.driver.findElements(By.xpath("//button[contains(@class, 'NavDropdownRow_head')]"));
+  for (const wallet of wallets) {
+    const nameElem = await wallet.findElement(By.css('.NavPlate_name'));
+    const foundName = await nameElem.getText();
+    console.log(foundName);
+    if (walletName === foundName) {
+      await wallet.click();
+      return;
+    }
+  }
+  throw new Error(`No wallet found with name ${walletName}`);
+});
