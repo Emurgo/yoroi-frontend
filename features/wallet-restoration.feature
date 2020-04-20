@@ -317,3 +317,16 @@ Feature: Restore Wallet
     # check removing didn't affect other wallets
     Then I compare to DB state snapshot
     And I should see the Create wallet screen
+
+  @it-117
+  Scenario: Switch wallets (IT-117)
+    # wallet 1
+    Given There is a wallet stored named many-tx-wallet
+    # prep adding 2nd wallet
+    Then I unselect the wallet
+    And I click to add an additional wallet
+    # wallet 2 (same as wallet 1)
+    Given There is a wallet stored named small-single-tx
+    # switch to wallet #1
+    Then I switch to "many-tx-wallet" from the dropdown
+    Then I should see the opened wallet with name "many-tx-wallet"
