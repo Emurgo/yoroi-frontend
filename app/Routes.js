@@ -170,6 +170,10 @@ const WalletsSubpages = (stores, actions) => (
         />
       </>)
     }
+    <Route
+      path={ROUTES.WALLETS.SWITCH}
+      component={(_props) => <></> /* this is a temporary state as the wallet is switching wallets. Faster than user can really notice or skipped entirely */}
+    />
     <Redirect to={ROUTES.WALLETS.TRANSACTIONS} />
   </Switch>
 );
