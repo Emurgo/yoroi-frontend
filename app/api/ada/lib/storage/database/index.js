@@ -179,6 +179,7 @@ async function onUpgrade(
   rawDb: lf$raw$BackStore,
 ): Promise<void> {
   const version = rawDb.getVersion();
+  console.log(`Starting IndexedDB migration for version ${version}`);
   if (version === 0) {
     // defaults to 0 when first time launching ever
     return;

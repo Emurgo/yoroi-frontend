@@ -23,7 +23,7 @@ Feature: Migration
     And Last launch version is updated
 
   @it-85
-  Scenario Outline: Version set on first launch (IT-85)
+  Scenario Outline: Upgrade from first version ever (IT-85)
     Then I am on the language selection screen
     # make sure all major functionality work
     # even if user hasn't launched Yoroi since the very first version
@@ -60,3 +60,25 @@ Feature: Migration
     Examples:
       | amount              | fee       |
       | 1.000000            | 0.168801  |
+
+  @it-116
+  Scenario: Upgrade from version that adds bip44 support (IT-116)
+    Then I am on the language selection screen
+    # make sure all major functionality work
+    # even if user hasn't launched Yoroi since the very first version
+    Given I import a snapshot named historical-versions/1_4_0/software
+    Then I accept uri registration
+    Then I should see the summary screen
+    Then I should see a plate EDAO-9229
+    # make sure tx screen is right
+    When I see the transactions summary
+    Then I should see that the number of transactions is 1
+    And I should see 1 successful transactions
+    # make sure receive screen is right
+    And I go to the receive screen
+    And I should see the addresses exactly list them
+    | address                                                     |
+    | Ae2tdPwUPEZB9632b4TZwNoVAhCAFaHD5DZhbanUJyYPoP6kJxJpNcaAaQU |
+    | Ae2tdPwUPEZ8jH9Me4vbUFwpjUmNxmW34MfEi3HsiNuQPYn5sDU9V53rJFc |
+    | Ae2tdPwUPEYwqhm4h1XJ1YkKhYY4tgymXmGLA1UoRySc8zTG2wAfbBijXz3 |
+    | Ae2tdPwUPEYx2dK1AMzRN1GqNd2eY7GCd7Z6aikMPJL3EkqqugoFQComQnV |
