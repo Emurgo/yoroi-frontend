@@ -1,5 +1,7 @@
 name: Run tests
 
+# todo: stop workflow here if '#skip-e2e' was provided in $GIT_COMMIT_MESSAGE
+
 on:
   push:
     branches:
@@ -12,11 +14,16 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
-
     strategy:
+      fail-fast: false # don't fail Chrome if Firefox fails, etc.
       matrix:
-        platform: [chrome, firefox]
+        include:
+          - platform: chrome
+            container: circleci/node:12-browsers
+          - platform: firefox
+            container: emurgornd/circleci-node-12-browsers:firefox-dev
+
+    runs-on: ${{ matrix.container }}
 
     steps:
       - uses: actions/checkout@v2
