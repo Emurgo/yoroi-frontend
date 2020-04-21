@@ -1,0 +1,34 @@
+name: Run tests
+
+on:
+  push:
+    branches:
+      - '*'
+      - '*/*/*'
+      - '!master'
+      - '!master-shelley'
+      - '!develop'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        platform: [chrome, firefox]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Read .nvmrc
+        run: echo ::set-output name=NVMRC::$(cat .nvmrc)
+        id: nvm
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '${{ steps.nvm.outputs.NVMRC }}'
+      - run: npm install
+      - name: Build
+        run: npm run test:build
+      - name: run test
+        run: npm run test:run:e2e:${{ matrix.platform }}
