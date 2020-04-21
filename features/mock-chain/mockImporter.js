@@ -1,7 +1,11 @@
 // @flow
 
 import cryptoRandomString from 'crypto-random-string';
-import type { SignedRequestInternal, SignedResponse, RemoteTransaction } from '../../app/api/ada/lib/state-fetch/types';
+import type {
+  SignedRequestInternal, SignedResponse,
+  RemoteTransaction,
+  ServerStatusResponse,
+} from '../../app/api/ada/lib/state-fetch/types';
 import {
   genGetTransactionsHistoryForAddresses,
   genGetRewardHistory,
@@ -933,36 +937,47 @@ export function resetChain() {
 // =========================
 //   server-status
 // =========================
-const apiStatuses: Array<ServerStatus> = [];
+const apiStatuses: Array<ServerStatusResponse> = [];
 
-const addServerStatus  = (serverStatus: ServerStatus) => apiStatuses.push(serverStatus);
-
-const initialServerOk: ServerStatus = {
-  id: 1,
-  status: true,
-  time: '2019-01-01T15:13:33.000Z'
+const setServerStatus = (serverStatus: ServerStatusResponse) => {
+  apiStatuses[0] = serverStatus;
 };
 
-addServerStatus(initialServerOk);
+const initialServerOk: ServerStatusResponse = {
+  isServerOk: true,
+  shouldShutdown: false,
+};
+
+setServerStatus(initialServerOk);
 
 export function serverIssue() {
-  addServerStatus({
-    id: 2,
-    status: false,
-    time: '2019-01-02T15:13:33.000Z'
+  setServerStatus({
+    isServerOk: false,
+    shouldShutdown: false,
   });
 }
-
 export function serverFixed() {
-  addServerStatus({
-    id: 3,
-    status: true,
-    time: '2019-01-03T15:13:33.000Z'
+  setServerStatus({
+    isServerOk: true,
+    shouldShutdown: false,
   });
 }
 
-function getApiStatus(): boolean {
-  return apiStatuses.slice(-1)[0].status;
+export function appShutdown() {
+  setServerStatus({
+    isServerOk: true,
+    shouldShutdown: true,
+  });
+}
+export function appRestore() {
+  setServerStatus({
+    isServerOk: true,
+    shouldShutdown: false,
+  });
+}
+
+function getApiStatus(): ServerStatusResponse {
+  return apiStatuses[0];
 }
 
 

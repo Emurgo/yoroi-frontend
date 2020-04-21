@@ -1,6 +1,7 @@
 // @flow
 import { hot } from 'react-hot-loader/root';
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { ThemeProvider } from 'react-polymorph/lib/components/ThemeProvider';
 import { Router } from 'react-router-dom';
@@ -24,6 +25,7 @@ import type { ActionsMap } from './actions';
 import { changeToplevelTheme } from './themes';
 import ThemeManager from './ThemeManager';
 import environment from './environment';
+import ShutdownPage from './containers/ShutdownPage';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr, ...id, ...es, ...it]);
@@ -36,7 +38,7 @@ type Props = {|
 @observer
 class App extends Component<Props> {
   render() {
-    const { stores, actions, history } = this.props;
+    const { stores, } = this.props;
     const locale = stores.profile.currentLocale;
 
     // Merged english messages with selected by user locale messages
@@ -73,12 +75,22 @@ class App extends Component<Props> {
           themeOverrides={themeOverrides(currentTheme)}
         >
           <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
-            <Router history={history}>
-              {Routes(stores, actions)}
-            </Router>
+            {this.getContent()}
           </IntlProvider>
         </ThemeProvider>
       </div>
+    );
+  }
+
+  getContent: void => ?Node = () => {
+    const { stores, actions, history } = this.props;
+    if (stores.substores.ada.serverConnectionStore.shouldShutdown) {
+      return (<ShutdownPage stores={stores} actions={actions} />);
+    }
+    return (
+      <Router history={history}>
+        {Routes(stores, actions)}
+      </Router>
     );
   }
 }

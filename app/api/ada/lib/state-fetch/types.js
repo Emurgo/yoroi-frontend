@@ -153,7 +153,8 @@ export type ReputationFunc = (body: ReputationRequest) => Promise<ReputationResp
 
 export type ServerStatusRequest = void;
 export type ServerStatusResponse = {|
-  isServerOk: boolean
+  isServerOk: boolean,
+  shouldShutdown: boolean,
 |};
 export type ServerStatusFunc = (body: ServerStatusRequest) => Promise<ServerStatusResponse>;
 

@@ -5,7 +5,11 @@ import { getMockServer, closeMockServer } from '../mock-chain/mockServer';
 import { By } from 'selenium-webdriver';
 import { enterRecoveryPhrase, assertPlate } from './wallet-restoration-steps';
 import { testWallets } from '../mock-chain/TestWallets';
-import { resetChain, serverIssue, serverFixed } from '../mock-chain/mockImporter';
+import {
+  resetChain,
+  serverIssue, serverFixed,
+  appShutdown, appRestore,
+} from '../mock-chain/mockImporter';
 import { expect } from 'chai';
 import {
   satisfies,
@@ -52,7 +56,6 @@ Before((scenario) => {
 Before({ tags: '@serverDown' }, () => {
   closeMockServer();
 });
-
 After({ tags: '@serverDown' }, () => {
   getMockServer({});
 });
@@ -60,9 +63,15 @@ After({ tags: '@serverDown' }, () => {
 Before({ tags: '@serverMaintenance' }, () => {
   serverIssue();
 });
-
 After({ tags: '@serverMaintenance' }, () => {
   serverFixed();
+});
+
+Before({ tags: '@appMaintenance' }, () => {
+  appShutdown();
+});
+After({ tags: '@appMaintenance' }, () => {
+  appRestore();
 });
 
 Before({ tags: '@invalidWitnessTest' }, () => {

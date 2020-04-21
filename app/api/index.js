@@ -12,7 +12,7 @@ export type Api = {|
   export: ExportApi,
 |};
 
-export const setupApi = async (): Promise<Api> => ({
+export const setupApi: void => Promise<Api> = async () => ({
   ada: new AdaApi(),
   localStorage: new LocalStorageApi(),
   externalStorage: new ExternalStorageApi(),
@@ -25,7 +25,7 @@ export type MigrationRequest = {|
   currVersion: string,
 |}
 
-export const migrate = async (migrationRequest: MigrationRequest): Promise<void> => {
+export const migrate: MigrationRequest => Promise<void> = async (migrationRequest) => {
   const lastLaunchVersion = await migrationRequest.api.localStorage.getLastLaunchVersion();
   if (lastLaunchVersion === migrationRequest.currVersion) {
     return;
@@ -49,6 +49,6 @@ export const migrate = async (migrationRequest: MigrationRequest): Promise<void>
     // if we don't block forever here,
     // then Yoroi would start and may get in a bad state with migrations partially applied
     // since reload is not a blocking call we just await on a timeout
-    await (new Promise(resolve => setTimeout(resolve, 5000 /* aribtrary high number */)));
+    await (new Promise(resolve => setTimeout(resolve, 5000 /* arbitrary high number */)));
   }
 };
