@@ -16,7 +16,7 @@ import { RustModule } from './rustLoader';
 /** Generate a random mnemonic based on 160-bits of entropy (15 words) */
 export const generateAdaMnemonic: void => Array<string> = () => generateMnemonic(160).split(' ');
 
-/** Check validty of mnemonic (including checksum) */
+/** Check validity of mnemonic (including checksum) */
 export const isValidEnglishAdaMnemonic = (
   phrase: string,
   numberOfWords: number

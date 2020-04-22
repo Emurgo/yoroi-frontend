@@ -92,6 +92,7 @@ export default class AddressesStore extends Store {
         path,
         address,
       });
+
     } catch (error) {
       Logger.error('AddressStore::trezorVerifyAddress::error: ' + stringifyError(error));
       this._setError(trezorErrorToLocalized(error));

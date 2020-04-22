@@ -76,7 +76,7 @@ export default class AdaWalletsStore extends Store {
               },
             });
           } catch (error) {
-            Logger.error('AdaWalletsStore::_sendMoney error: ' + stringifyError(error));
+            Logger.error(`${nameof(AdaWalletsStore)}::${nameof(this._sendMoney)} error: ` + stringifyError(error));
             throw new Error('An error has ocurred when saving the transaction memo.');
           }
         }

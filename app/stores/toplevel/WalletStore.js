@@ -297,16 +297,16 @@ export default class WalletStore extends Store {
   ): Promise<void> => {
     const lastSyncInfo = await publicDeriver.getLastSyncInfo();
     const withCache = await this.populateCacheForWallet(publicDeriver);
-    // set the first created as the result
-    runInAction(() => {
-      this.publicDerivers.push(withCache);
-      this.selected = withCache;
-    });
     this.goToWalletRoute(withCache);
 
-    await this.registerObserversForNewWallet({
+    this.registerObserversForNewWallet({
       publicDeriver: withCache,
       lastSyncInfo,
+    });
+    runInAction(() => {
+      this.publicDerivers.push(withCache);
+
+      this.selected = withCache;
     });
   }
 

@@ -13,6 +13,7 @@ import type {
   PoolInfoRequest, PoolInfoResponse,
   ReputationRequest, ReputationResponse,
   ServerStatusResponse,
+  TxBodiesRequest, TxBodiesResponse,
   SignedRequestInternal,
 } from '../../app/api/ada/lib/state-fetch/types';
 import chai from 'chai';
@@ -168,6 +169,15 @@ export function getMockServer(
       const status = mockImporter.getApiStatus();
       res.send(status);
     });
+
+    server.post('/api/txs/txBodies', async (
+      req: { body: TxBodiesRequest, ... },
+      res: { send(arg: TxBodiesResponse): any, ... }
+    ): Promise<void> => {
+      const response = await mockImporter.getTxsBodiesForUTXOs(req.body);
+      res.send(response);
+    });
+
 
     installCoinPriceRequestHandlers(server);
 

@@ -8,7 +8,7 @@ import type {
   BaseSignRequest,
 } from '../types';
 import type { UtxoLookupMap }  from '../utils';
-import { utxosToLookupMap, derivePathAsString, verifyAccountLevel }  from '../utils';
+import { utxosToLookupMap, verifyFromBip44Root }  from '../utils';
 import type {
   SendFunc,
   TxBodiesFunc,
@@ -32,7 +32,7 @@ import type {
   SignTransactionResponse as LedgerSignTxResponse,
   Witness
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { makeCardanoBIP44Path } from 'yoroi-extension-ledger-connect-handler';
+import { toDerivationPathString } from 'yoroi-extension-ledger-connect-handler';
 import type {
   $CardanoSignTransaction,
   CardanoInput,
@@ -124,15 +124,10 @@ function _transformToTrezorInputs(
   return inputs.map((input: TxoPointerType) => {
     const utxo = utxoMap[input.id][input.index];
     const addressingInfo = addressMap.get(utxo.receiver);
-    if (addressingInfo == null) throw new Error('_transformToTrezorInputs should never happen');
-    verifyAccountLevel(addressingInfo);
-    const { addressing } = addressingInfo;
+    if (addressingInfo == null) throw new Error(`${nameof(_transformToTrezorInputs)} should never happen`);
+    verifyFromBip44Root(addressingInfo);
     return {
-      path: derivePathAsString(
-        addressing.path[0],
-        addressing.path[1],
-        addressing.path[2]
-      ),
+      path: toDerivationPathString(addressingInfo.addressing.path),
       prev_hash: input.id,
       prev_index: input.index,
       type: 0
@@ -147,14 +142,10 @@ function _generateTrezorOutputs(
   return txOutputs.map(txOutput => {
     const change = changeAddr.find(addr => addr.address === txOutput.address);
     if (change != null) {
-      verifyAccountLevel({ addressing: change.addressing });
+      verifyFromBip44Root({ addressing: change.addressing });
       return {
         amount: txOutput.value.toString(),
-        path: derivePathAsString(
-          change.addressing.path[0],
-          change.addressing.path[1],
-          change.addressing.path[2],
-        )
+        path: toDerivationPathString(change.addressing.path),
       };
     }
     return {
@@ -219,17 +210,12 @@ function _transformToLedgerInputs(
   return inputs.map(input => {
     const utxo = utxoMap[input.id][input.index];
     const addressingInfo = addressMap.get(utxo.receiver);
-    if (addressingInfo == null) throw new Error('_transformToTrezorInputs should never happen');
-    verifyAccountLevel(addressingInfo);
-    const { addressing } = addressingInfo;
+    if (addressingInfo == null) throw new Error(`${nameof(_transformToLedgerInputs)} should never happen`);
+    verifyFromBip44Root(addressingInfo);
     return {
       txDataHex: txDataHexMap[input.id],
       outputIndex: input.index,
-      path: makeCardanoBIP44Path(
-        addressing.path[0],
-        addressing.path[1],
-        addressing.path[2]
-      ),
+      path: addressingInfo.addressing.path,
     };
   });
 }
@@ -242,13 +228,9 @@ function _transformToLedgerOutputs(
     const amountStr = txOutput.value.toString();
     const change = changeAddr.find(addr => addr.address === txOutput.address);
     if (change != null) {
-      verifyAccountLevel({ addressing: change.addressing });
+      verifyFromBip44Root({ addressing: change.addressing });
       return {
-        path: makeCardanoBIP44Path(
-          change.addressing.path[0],
-          change.addressing.path[1],
-          change.addressing.path[2],
-        ),
+        path: change.addressing.path,
         amountStr,
       };
     }
@@ -310,7 +292,7 @@ function prepareWitness(
   for (let i = keyLevel; i < ledgerWitness.path.length; i++) {
     finalKey = finalKey.derive(
       RustModule.WalletV2.DerivationScheme.v2(),
-      ledgerWitness.path[3]
+      ledgerWitness.path[i]
     );
   }
 

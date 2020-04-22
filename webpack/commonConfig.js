@@ -169,9 +169,15 @@ const node = {
   fs: 'empty'
 };
 
-const resolve = {
-  extensions: ['*', '.js', '.wasm']
-};
+const resolve = (networkName /*: string */) => ({
+  extensions: ['*', '.js', '.wasm'],
+  alias: (networkName === 'test')
+    ? {
+      // todo: make conditional
+      'trezor-connect': path.resolve(__dirname, '../features/mock-trezor-connect/'),
+    }
+    : {},
+});
 
 const definePlugin = (
   networkName /*: string */,

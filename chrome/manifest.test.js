@@ -17,10 +17,14 @@ export default (isDebug: boolean) => buildManifest({
   contentSecurityPolicy: genCSP({
     isDev: isDebug,
     additional: {
-      'connect-src': [portToPermission(Ports.DevBackendServe), portToSocketPermission(Ports.DevBackendServe)],
+      'connect-src': [
+        portToPermission(Ports.DevBackendServe),
+        portToSocketPermission(Ports.DevBackendServe),
+      ],
     },
   }),
   version: Version.Byron,
   geckoKey: '{530f7c6c-6077-4703-8f71-cb368c663e35}',
   enableProtocolHandlers: false,
+  ledgerScript: 'js/ledger-test-script.js',
 });

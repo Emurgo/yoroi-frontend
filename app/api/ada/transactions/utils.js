@@ -172,42 +172,26 @@ export function utxosToLookupMap(
   return lookupMap;
 }
 
-export function derivePathAsString(
-  accountIndex: number,
-  chain: number,
-  addressIndex: number
-): string {
-  if (accountIndex < HARD_DERIVATION_START) {
-    throw new Error('derivePathAsString accountIndex < 0x80000000');
-  }
-  if (chain >= HARD_DERIVATION_START) {
-    throw new Error('derivePathAsString chain >= 0x80000000');
-  }
-  if (addressIndex >= HARD_DERIVATION_START) {
-    throw new Error('derivePathAsString addressIndex >= 0x80000000');
-  }
-  // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
-  return `m/44'/1815'/${accountIndex - HARD_DERIVATION_START}'/${chain}/${addressIndex}`;
-}
-
 export function derivePathPrefix(accountIndex: number): string {
   if (accountIndex < HARD_DERIVATION_START) {
-    throw new Error('derivePathAsString accountIndex < 0x80000000');
+    throw new Error(`${nameof(derivePathPrefix)} accountIndex < 0x80000000`);
   }
   // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
   return `m/44'/1815'/${accountIndex}'`;
 }
 
-export function verifyAccountLevel(
+export function verifyFromBip44Root(
   addressingInfo: Addressing,
 ): void {
   const { addressing } = addressingInfo;
-  if (addressing.startLevel !== Bip44DerivationLevels.ACCOUNT.level) {
-    throw new Error('_transformToTrezorInputs only accounts are supported');
+
+  const accountPosition = addressing.startLevel;
+  if (accountPosition !== 1) {
+    throw new Error(`${nameof(verifyFromBip44Root)} addressing does not start from root`);
   }
   const lastLevelSpecified = addressing.startLevel + addressing.path.length - 1;
   if (lastLevelSpecified !== Bip44DerivationLevels.ADDRESS.level) {
-    throw new Error('_transformToTrezorInputs incorrect addressing size');
+    throw new Error(`${nameof(verifyFromBip44Root)} incorrect addressing size`);
   }
 }
 

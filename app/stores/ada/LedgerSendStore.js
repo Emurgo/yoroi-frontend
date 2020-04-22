@@ -14,7 +14,6 @@ import LocalizableError from '../../i18n/LocalizableError';
 
 import type {
   CreateLedgerSignTxDataFunc,
-  PrepareAndBroadcastLedgerSignedTxRequest,
   PrepareAndBroadcastLedgerSignedTxResponse,
 } from '../../api/ada';
 import {
@@ -35,6 +34,7 @@ import {
 import {
   Logger,
   stringifyData,
+  stringifyError,
 } from '../../utils/logging';
 
 import {
@@ -54,9 +54,9 @@ export default class LedgerSendStore extends Store {
   createLedgerSignTxDataRequest: LocalizedRequest<CreateLedgerSignTxDataFunc>
     = new LocalizedRequest<CreateLedgerSignTxDataFunc>(this.api.ada.createLedgerSignTxData);
 
-  broadcastLedgerSignedTxRequest: LocalizedRequest<typeof LedgerSendStore.prototype.sendAndRefresh>
-    = new LocalizedRequest<typeof LedgerSendStore.prototype.sendAndRefresh>(
-      this.sendAndRefresh
+  broadcastLedgerSignedTxRequest: LocalizedRequest<typeof sendAndRefresh>
+    = new LocalizedRequest<typeof sendAndRefresh>(
+      sendAndRefresh
     );
   // =================== API RELATED =================== //
 
@@ -162,16 +162,33 @@ export default class LedgerSendStore extends Store {
       throw new Error(`${nameof(this._prepareAndBroadcastSignedTx)} public deriver has no levels`);
     }
 
-    await this.broadcastLedgerSignedTxRequest.execute({
-      broadcastRequest: {
+    const signedTxResponse = await this.broadcastLedgerSignedTxRequest.execute({
+      broadcast: () => this.api.ada.prepareAndBroadcastLedgerSignedTx({
         getPublicKey: withPublicKey.getPublicKey,
         keyLevel: withLevels.getParent().getPublicDeriverLevel(),
         ledgerSignTxResp,
         unsignedTx,
         sendTx: this.stores.substores[environment.API].stateFetchStore.fetcher.sendTx,
-      },
+      }),
       refreshWallet: () => wallets.refreshWalletFromRemote(publicDeriver),
     }).promise;
+    if (signedTxResponse == null) throw new Error('Should never happen');
+
+    const memo = this.stores.substores.ada.transactionBuilderStore.memo;
+    if (memo !== '' && memo !== undefined) {
+      try {
+        await this.actions.memos.saveTxMemo.trigger({
+          publicDeriver,
+          memo: {
+            Content: memo,
+            TransactionHash: signedTxResponse.txId,
+            LastUpdated: new Date(),
+          },
+        });
+      } catch (error) {
+        Logger.error(`${nameof(LedgerSendStore)}::${nameof(this._prepareAndBroadcastSignedTx)} error: ` + stringifyError(error));
+      }
+    }
 
     this.actions.dialogs.closeActiveDialog.trigger();
 
@@ -180,20 +197,6 @@ export default class LedgerSendStore extends Store {
 
     this._reset();
     Logger.info('SUCCESS: ADA sent using Ledger SignTx');
-  }
-
-  sendAndRefresh: {|
-    broadcastRequest: PrepareAndBroadcastLedgerSignedTxRequest,
-    refreshWallet: () => Promise<void>,
-  |} => Promise<PrepareAndBroadcastLedgerSignedTxResponse> = async (request) => {
-    const result = await this.api.ada.prepareAndBroadcastLedgerSignedTx(request.broadcastRequest);
-    try {
-      await request.refreshWallet();
-    } catch (_e) {
-      // even if refreshing the wallet fails, we don't want to fail the tx
-      // otherwise user may try and re-send the tx
-    }
-    return result;
   }
 
   _cancel: void => void = () => {
@@ -211,3 +214,17 @@ export default class LedgerSendStore extends Store {
     this.error = error;
   }
 }
+
+const sendAndRefresh: {|
+  broadcast: () => Promise<PrepareAndBroadcastLedgerSignedTxResponse>,
+  refreshWallet: () => Promise<void>,
+|} => Promise<PrepareAndBroadcastLedgerSignedTxResponse> = async (request) => {
+  const result = await request.broadcast();
+  try {
+    await request.refreshWallet();
+  } catch (_e) {
+    // even if refreshing the wallet fails, we don't want to fail the tx
+    // otherwise user may try and re-send the tx
+  }
+  return result;
+};

@@ -19,6 +19,7 @@ export default ({
   iconOverride,
   version,
   enableProtocolHandlers,
+  ledgerScript,
 } /*: {|
   description: string,
   defaultTitle: string,
@@ -30,6 +31,7 @@ export default ({
   iconOverride?: Icons,
   version: string,
   enableProtocolHandlers: boolean,
+  ledgerScript?: string,
 |} */
 ) => { // eslint-disable-line function-paren-newline
   const icons = iconOverride == null
@@ -73,7 +75,7 @@ export default ({
       },
       {
         matches: ['https://emurgo.github.io/yoroi-extension-ledger-connect/*'],
-        js: ['js/ledger-content-script.js']
+        js: [ledgerScript != null ? ledgerScript : 'js/ledger-content-script.js']
       }
     ],
     content_security_policy: contentSecurityPolicy,
