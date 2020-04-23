@@ -4,17 +4,17 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape, } from 'react-intl';
 import ExternalLinkSVG from '../../assets/images/link-external.inline.svg';
 import ErrorInfo from '../../assets/images/error-info.inline.svg';
-import styles from './Shutdown.scss';
+import styles from './Maintenance.scss';
 import globalMessages from '../../i18n/global-messages';
 import VerticallyCenteredLayout from '../layout/VerticallyCenteredLayout';
 
 const messages = defineMessages({
   title: {
-    id: 'shutdown.screen.title',
+    id: 'maintenance.screen.title',
     defaultMessage: '!!!Temporary maintenance',
   },
   explanation: {
-    id: 'shutdown.screen.explanation',
+    id: 'maintenance.screen.explanation',
     defaultMessage: '!!!Yoroi is in maintenance mode. You can still access your funds through any other wallet software.',
   },
 });
@@ -24,7 +24,7 @@ type Props = {|
 |};
 
 @observer
-export default class Shutdown extends Component<Props> {
+export default class Maintenance extends Component<Props> {
 
   static contextTypes = {
     intl: intlShape.isRequired,
@@ -66,41 +66,4 @@ export default class Shutdown extends Component<Props> {
       </div>
     );
   }
-
-  // _getErrorMessageComponent = (): Node => {
-  //   const { intl } = this.context;
-  //   const {
-  //     onExternalLinkClick,
-  //     downloadLogs
-  //   } = this.props;
-
-  //   const downloadLogsLink = (
-  //     // eslint-disable-next-line jsx-a11y/anchor-is-valid
-  //     <a
-  //       className={styles.link}
-  //       href="#"
-  //       onClick={_event => downloadLogs()}
-  //     >
-  //       {intl.formatMessage(globalMessages.downloadLogsLink)}
-  //     </a>
-  //   );
-
-  //   const supportRequestLink = (
-  //     <a
-  //       className={styles.link}
-  //       href={intl.formatMessage(globalMessages.supportRequestLinkUrl)}
-  //       onClick={event => onExternalLinkClick(event)}
-  //     >
-  //       {intl.formatMessage(globalMessages.contactSupport)}
-  //     </a>
-  //   );
-
-  //   return (
-  //     <p>
-  //       <FormattedMessage {...globalMessages.logsContent} values={{ downloadLogsLink }} /><br />
-  //       <FormattedMessage {...messages.error} values={{ supportRequestLink }} />
-  //     </p>
-  //   );
-  // };
-
 }

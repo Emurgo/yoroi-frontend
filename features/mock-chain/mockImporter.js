@@ -945,7 +945,7 @@ const setServerStatus = (serverStatus: ServerStatusResponse) => {
 
 const initialServerOk: ServerStatusResponse = {
   isServerOk: true,
-  shouldShutdown: false,
+  isMaintenance: false,
 };
 
 setServerStatus(initialServerOk);
@@ -953,26 +953,26 @@ setServerStatus(initialServerOk);
 export function serverIssue() {
   setServerStatus({
     isServerOk: false,
-    shouldShutdown: false,
+    isMaintenance: false,
   });
 }
 export function serverFixed() {
   setServerStatus({
     isServerOk: true,
-    shouldShutdown: false,
+    isMaintenance: false,
   });
 }
 
-export function appShutdown() {
+export function appMaintenance() {
   setServerStatus({
     isServerOk: true,
-    shouldShutdown: true,
+    isMaintenance: true,
   });
 }
-export function appRestore() {
+export function appMaintenanceFinish() {
   setServerStatus({
     isServerOk: true,
-    shouldShutdown: false,
+    isMaintenance: false,
   });
 }
 

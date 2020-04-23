@@ -8,7 +8,7 @@ import { testWallets } from '../mock-chain/TestWallets';
 import {
   resetChain,
   serverIssue, serverFixed,
-  appShutdown, appRestore,
+  appMaintenance, appMaintenanceFinish,
 } from '../mock-chain/mockImporter';
 import { expect } from 'chai';
 import {
@@ -68,10 +68,10 @@ After({ tags: '@serverMaintenance' }, () => {
 });
 
 Before({ tags: '@appMaintenance' }, () => {
-  appShutdown();
+  appMaintenance();
 });
 After({ tags: '@appMaintenance' }, () => {
-  appRestore();
+  appMaintenanceFinish();
 });
 
 Before({ tags: '@invalidWitnessTest' }, () => {

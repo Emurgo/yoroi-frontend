@@ -370,8 +370,8 @@ const YoroiModern = {
   '--theme-instructions-recovery-text-color': '#2b2c32',
   '--theme-password-condition-text-color': '#17d1aa',
 
-  '--theme-shutdown-background-color': '#050D23',
-  '--theme-shutdown-border-color': '#D9DDE0',
+  '--theme-maintenance-background-color': '#050D23',
+  '--theme-maintenance-border-color': '#D9DDE0',
 
   '--theme-label-button-color': '#353535',
 

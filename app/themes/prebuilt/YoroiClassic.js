@@ -358,8 +358,8 @@ const YoroiClassic = {
 
   '--theme-instructions-text-color': '#121327',
 
-  '--theme-shutdown-background-color': '#050D23',
-  '--theme-shutdown-border-color': '#D9DDE0',
+  '--theme-maintenance-background-color': '#050D23',
+  '--theme-maintenance-border-color': '#D9DDE0',
 
   '--theme-label-button-color': '#121327',
 

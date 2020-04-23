@@ -25,7 +25,7 @@ import type { ActionsMap } from './actions';
 import { changeToplevelTheme } from './themes';
 import ThemeManager from './ThemeManager';
 import environment from './environment';
-import ShutdownPage from './containers/ShutdownPage';
+import MaintenancePage from './containers/MaintenancePage';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr, ...id, ...es, ...it]);
@@ -84,8 +84,8 @@ class App extends Component<Props> {
 
   getContent: void => ?Node = () => {
     const { stores, actions, history } = this.props;
-    if (stores.substores.ada.serverConnectionStore.shouldShutdown) {
-      return (<ShutdownPage stores={stores} actions={actions} />);
+    if (stores.substores.ada.serverConnectionStore.isMaintenance) {
+      return (<MaintenancePage stores={stores} actions={actions} />);
     }
     return (
       <Router history={history}>

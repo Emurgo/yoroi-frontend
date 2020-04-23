@@ -11,7 +11,7 @@ export default class ServerConnectionStore extends Store {
   SERVER_STATUS_REFRESH_INTERVAL: number = environment.serverStatusRefreshInterval;
 
   @observable serverStatus: ServerStatusErrorType = ServerStatusErrors.Healthy;
-  @observable shouldShutdown: boolean;
+  @observable isMaintenance: boolean;
 
   setup(): void {
     super.setup();
@@ -33,7 +33,7 @@ export default class ServerConnectionStore extends Store {
         this.serverStatus = response.isServerOk === true
           ? ServerStatusErrors.Healthy
           : ServerStatusErrors.Server;
-        this.shouldShutdown = response.shouldShutdown || false;
+        this.isMaintenance = response.isMaintenance || false;
       });
     } catch (err) {
       runInAction('refresh server status', () => {

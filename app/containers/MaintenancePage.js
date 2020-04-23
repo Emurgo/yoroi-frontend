@@ -2,18 +2,18 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
-import Shutdown from '../components/loading/Shutdown';
+import Maintenance from '../components/loading/Maintenance';
 import type { InjectedOrGenerated } from '../types/injectedPropsType';
 import { handleExternalLinkClick } from '../utils/routing';
 
-type GeneratedData = typeof ShutdownPage.prototype.generated;
+type GeneratedData = typeof MaintenancePage.prototype.generated;
 
 @observer
-export default class ShutdownPage extends Component<InjectedOrGenerated<GeneratedData>> {
+export default class MaintenancePage extends Component<InjectedOrGenerated<GeneratedData>> {
 
   render() {
     return (
-      <Shutdown
+      <Maintenance
         onExternalLinkClick={this.generated.handleExternalLinkClick}
       />
     );
@@ -24,7 +24,7 @@ export default class ShutdownPage extends Component<InjectedOrGenerated<Generate
       return this.props.generated;
     }
     if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(ShutdownPage)} no way to generated props`);
+      throw new Error(`${nameof(MaintenancePage)} no way to generated props`);
     }
     return Object.freeze({
       handleExternalLinkClick,
