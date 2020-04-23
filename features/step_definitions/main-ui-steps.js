@@ -50,6 +50,10 @@ Then(/^I should see the serverError banner$/, async function () {
   await this.waitForElement('.ServerErrorBanner_serverError');
 });
 
+Then(/^I should see the app maintenance page$/, async function () {
+  await this.waitForElement('.Maintenance_component');
+});
+
 Then(/^I click on hide balance button$/, async function () {
   await this.click('.NavWalletDetails_toggleButton');
 });
@@ -65,7 +69,6 @@ Then(/^I switch to "([^"]*)" from the dropdown$/, async function (walletName) {
   for (const wallet of wallets) {
     const nameElem = await wallet.findElement(By.css('.NavPlate_name'));
     const foundName = await nameElem.getText();
-    console.log(foundName);
     if (walletName === foundName) {
       await wallet.click();
       return;

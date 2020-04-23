@@ -358,6 +358,9 @@ const YoroiClassic = {
 
   '--theme-instructions-text-color': '#121327',
 
+  '--theme-maintenance-background-color': '#050D23',
+  '--theme-maintenance-border-color': '#D9DDE0',
+
   '--theme-label-button-color': '#121327',
 
   '--theme-loading-background-color': '#fafbfc',
@@ -391,6 +394,10 @@ const YoroiClassic = {
 
   '--theme-default-main-color': '#DAA49A',
   '--theme-default-main-bg': '#F3F3F5',
+
+  '--theme-default-color-red': '#FF1351',
+  '--theme-default-color-red-medium': 'rgba(255, 19, 81, 0.3)',
+  '--theme-default-color-red-light': 'rgba(255, 19, 81, 0.6)',
 
   '--theme-wallet-nowallet-text-color': '#2B2C32',
 

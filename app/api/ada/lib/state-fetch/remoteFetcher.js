@@ -57,12 +57,18 @@ const priceBackendUrl = CONFIG.network.priceBackendUrl;
  */
 export class RemoteFetcher implements IFetcher {
 
-  lastLaunchVersion: () => string;
-  currentLocale: () => string;
+  getLastLaunchVersion: () => string;
+  getCurrentLocale: () => string;
+  getPlatform: () => string;
 
-  constructor(lastLaunchVersion: () => string, currentLocale: () => string) {
-    this.lastLaunchVersion = lastLaunchVersion;
-    this.currentLocale = currentLocale;
+  constructor(
+    getLastLaunchVersion: () => string,
+    getCurrentLocale: () => string,
+    getPlatform: () => string,
+  ) {
+    this.getLastLaunchVersion = getLastLaunchVersion;
+    this.getCurrentLocale = getCurrentLocale;
+    this.getPlatform = getPlatform;
   }
 
   getUTXOsForAddresses: AddressUtxoRequest => Promise<AddressUtxoResponse> = (body) => (
@@ -74,8 +80,8 @@ export class RemoteFetcher implements IFetcher {
           addresses: body.addresses
         },
         headers: {
-          'yoroi-version': this.lastLaunchVersion(),
-          'yoroi-locale': this.currentLocale()
+          'yoroi-version': this.getLastLaunchVersion(),
+          'yoroi-locale': this.getCurrentLocale()
         }
       }
     ).then(response => response.data)
@@ -94,8 +100,8 @@ export class RemoteFetcher implements IFetcher {
           txsHashes: body.txsHashes
         },
         headers: {
-          'yoroi-version': this.lastLaunchVersion(),
-          'yoroi-locale': this.currentLocale()
+          'yoroi-version': this.getLastLaunchVersion(),
+          'yoroi-locale': this.getCurrentLocale()
         }
       }
     ).then(response => response.data)
@@ -114,8 +120,8 @@ export class RemoteFetcher implements IFetcher {
           addresses: body.addresses
         },
         headers: {
-          'yoroi-version': this.lastLaunchVersion(),
-          'yoroi-locale': this.currentLocale()
+          'yoroi-version': this.getLastLaunchVersion(),
+          'yoroi-locale': this.getCurrentLocale()
         }
       }
     ).then(response => response.data)
@@ -132,8 +138,8 @@ export class RemoteFetcher implements IFetcher {
         method: 'post',
         data: body,
         headers: {
-          'yoroi-version': this.lastLaunchVersion(),
-          'yoroi-locale': this.currentLocale()
+          'yoroi-version': this.getLastLaunchVersion(),
+          'yoroi-locale': this.getCurrentLocale()
         }
       }
     ).then(response => {
@@ -183,8 +189,8 @@ export class RemoteFetcher implements IFetcher {
         method: 'post',
         data: body,
         headers: {
-          'yoroi-version': this.lastLaunchVersion(),
-          'yoroi-locale': this.currentLocale()
+          'yoroi-version': this.getLastLaunchVersion(),
+          'yoroi-locale': this.getCurrentLocale()
         }
       }
     ).then(response => response.data)
@@ -200,8 +206,8 @@ export class RemoteFetcher implements IFetcher {
       {
         method: 'get',
         headers: {
-          'yoroi-version': this.lastLaunchVersion(),
-          'yoroi-locale': this.currentLocale()
+          'yoroi-version': this.getLastLaunchVersion(),
+          'yoroi-locale': this.getCurrentLocale()
         }
       }
     ).then(response => response.data)
@@ -221,8 +227,8 @@ export class RemoteFetcher implements IFetcher {
           signedTx: signedTx64
         }: SignedRequestInternal),
         headers: {
-          'yoroi-version': this.lastLaunchVersion(),
-          'yoroi-locale': this.currentLocale()
+          'yoroi-version': this.getLastLaunchVersion(),
+          'yoroi-locale': this.getCurrentLocale()
         }
       }
     ).then(() => ({
@@ -246,8 +252,8 @@ export class RemoteFetcher implements IFetcher {
           addresses: body.addresses
         },
         headers: {
-          'yoroi-version': this.lastLaunchVersion(),
-          'yoroi-locale': this.currentLocale()
+          'yoroi-version': this.getLastLaunchVersion(),
+          'yoroi-locale': this.getCurrentLocale()
         }
       }
     ).then(response => response.data)
@@ -266,8 +272,8 @@ export class RemoteFetcher implements IFetcher {
           addresses: body.addresses
         },
         headers: {
-          'yoroi-version': this.lastLaunchVersion(),
-          'yoroi-locale': this.currentLocale()
+          'yoroi-version': this.getLastLaunchVersion(),
+          'yoroi-locale': this.getCurrentLocale()
         }
       }
     ).then(response => {
@@ -302,8 +308,8 @@ export class RemoteFetcher implements IFetcher {
           ids: body.ids
         },
         headers: {
-          'yoroi-version': this.lastLaunchVersion(),
-          'yoroi-locale': this.currentLocale()
+          'yoroi-version': this.getLastLaunchVersion(),
+          'yoroi-locale': this.getCurrentLocale()
         }
       }
     ).then(response => response.data)
@@ -319,8 +325,8 @@ export class RemoteFetcher implements IFetcher {
       {
         method: 'get',
         headers: {
-          'yoroi-version': this.lastLaunchVersion(),
-          'yoroi-locale': this.currentLocale()
+          'yoroi-version': this.getLastLaunchVersion(),
+          'yoroi-locale': this.getCurrentLocale()
         }
       }
     ).then(response => response.data)
@@ -336,8 +342,8 @@ export class RemoteFetcher implements IFetcher {
       {
         method: 'get',
         headers: {
-          'yoroi-version': this.lastLaunchVersion(),
-          'yoroi-locale': this.currentLocale()
+          'yoroi-version': `${this.getPlatform()} / ${this.getLastLaunchVersion()}`,
+          'yoroi-locale': this.getCurrentLocale(),
         }
       }
     ).then(response => response.data)

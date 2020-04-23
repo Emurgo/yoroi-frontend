@@ -165,8 +165,8 @@ export function getMockServer(
       req,
       res: { send(arg: ServerStatusResponse): any, ... }
     ): void => {
-      const isServerOk = mockImporter.getApiStatus();
-      res.send({ isServerOk });
+      const status = mockImporter.getApiStatus();
+      res.send(status);
     });
 
     installCoinPriceRequestHandlers(server);
