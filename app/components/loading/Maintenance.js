@@ -11,7 +11,7 @@ import VerticallyCenteredLayout from '../layout/VerticallyCenteredLayout';
 const messages = defineMessages({
   title: {
     id: 'maintenance.screen.title',
-    defaultMessage: '!!!Temporary maintenance',
+    defaultMessage: '!!!Temporary Maintenance',
   },
   explanation: {
     id: 'maintenance.screen.explanation',
