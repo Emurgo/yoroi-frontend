@@ -5,6 +5,7 @@ import environment from '../environment';
 const ShelleyExplorers = Object.freeze({
   SEIZA: 'seiza',
   JORMUNGANDR: 'jormungandr',
+  ADASTAT: 'adastat',
 });
 const ByronExplorers = Object.freeze({
   SEIZA: 'seiza',
@@ -109,6 +110,12 @@ const getExplorerInfo: void => {
     }
     : {
       jormungandr: getIohkExplorer(),
+      adastat: {
+        name: 'AdaStat',
+        address: 'https://adastat.net/address/',
+        transaction: 'https://adastat.net/transaction/',
+        pool: 'https://adastat.net/pool/',
+      },
     }
   )
 });
