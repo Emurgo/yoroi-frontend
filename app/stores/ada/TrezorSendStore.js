@@ -72,7 +72,6 @@ export default class TrezorSendStore extends Store {
 
       const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
 
-      // request.params.signRequest.senderUtxos[0]
       this.createTrezorSignTxDataRequest.execute({
         ...request.params,
         getTxsBodiesForUTXOs: stateFetcher.getTxsBodiesForUTXOs,
