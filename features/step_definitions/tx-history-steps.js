@@ -163,14 +163,14 @@ const displayInfo = {
     txType: 'ADA intrawallet transaction',
     txAmount: '-0.169999',
     txTime: '2019-04-21T15:13:33.000Z',
-    txStatus: 'LOW',
+    txStatus: 'HIGH',
     txFrom: ['Ae2tdPwUPEZ77uBBu8cMVxswVy1xfaMZR9wsUSwDNiB48MWqsVWfitHfUM9'],
     txTo: [
       'Ae2tdPwUPEYzkKjrqPw1GHUty25Cj5fWrBVsWxiQYCxfoe2d9iLjTnt34Aj',
       'Ae2tdPwUPEZ7VKG9jy6jJTxQCWNXoMeL2Airvzjv3dc3WCLhSBA7XbSMhKd',
     ],
     txId: '0a073669845fea4ae83cd4418a0b4fd56610097a89601a816b5891f667e3496c',
-    txConfirmations: 'Low. 0 confirmations.',
+    txConfirmations: 'High. 103 confirmations.',
     txFee: '0.169999',
   },
   'simple-pending-wallet': {
