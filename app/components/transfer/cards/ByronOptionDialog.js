@@ -9,6 +9,7 @@ import globalMessages from '../../../i18n/global-messages';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import OptionBlock from '../../widgets/options/OptionBlock';
+import environment from '../../../environment';
 
 import styles from '../../widgets/options/OptionListWrapperStyle.scss';
 
@@ -180,20 +181,24 @@ export default class ByronOptionDialog extends Component<Props, State> {
           title={intl.formatMessage(icarusMessages.yoroiPaperLabel)}
           learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
         />
-        <OptionBlock
-          parentName="fromLedger"
-          type="connectLedger"
-          onSubmit={this.props.icarus.onLedger}
-          title={intl.formatMessage(icarusMessages.legacyLedgerTitle)}
-          learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
-        />
-        <OptionBlock
-          parentName="fromTrezor"
-          type="connectTrezor"
-          onSubmit={this.props.icarus.onTrezor}
-          title={intl.formatMessage(icarusMessages.legacyTrezorTitle)}
-          learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
-        />
+        {(environment.isShelley() || environment.isTest()) && (
+          <>
+            <OptionBlock
+              parentName="fromLedger"
+              type="connectLedger"
+              onSubmit={this.props.icarus.onLedger}
+              title={intl.formatMessage(icarusMessages.legacyLedgerTitle)}
+              learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
+            />
+            <OptionBlock
+              parentName="fromTrezor"
+              type="connectTrezor"
+              onSubmit={this.props.icarus.onTrezor}
+              title={intl.formatMessage(icarusMessages.legacyTrezorTitle)}
+              learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
+            />
+          </>
+        )}
       </>
     );
   }

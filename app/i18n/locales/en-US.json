@@ -3,7 +3,7 @@
   "api.errors.GenericApiError": "An error occurred, please try again later.",
   "api.errors.IncorrectPasswordError": "Incorrect wallet password.",
   "api.errors.NotEnoughMoneyToSendError": "Not enough ADA to make this transaction.",
-  "api.errors.PromiseNotCalledYetError": "You have to call Request::execute before you can access it as promise.",
+  "api.errors.PromiseNotCalledYetError": "Result accessed before execution finished.",
   "api.errors.ReportRequestError": "There was a problem sending the support request.",
   "api.errors.WalletAlreadyImportedError": "The wallet you are trying to import already exists.",
   "api.errors.WalletAlreadyRestoredError": "The wallet you are trying to restore already exists.",

@@ -30,6 +30,8 @@ import {
 
 import { RustModule } from '../../../cardanoCrypto/rustLoader';
 
+import { generateLedgerWalletRootKey } from '../../../cardanoCrypto/cryptoWallet';
+
 const protocolMagic = 764824073; // mainnet
 
 export function genCheckAddressesInUse(
@@ -279,13 +281,16 @@ export function genUtxoSumForAddresses(
 export function getSingleAddressString(
   mnemonic: string,
   path: Array<number>,
+  isLedger?: boolean = false,
 ): string {
   const bip39entropy = mnemonicToEntropy(mnemonic);
   const EMPTY_PASSWORD = Buffer.from('');
-  const rootKey = RustModule.WalletV3.Bip32PrivateKey.from_bip39_entropy(
-    Buffer.from(bip39entropy, 'hex'),
-    EMPTY_PASSWORD
-  );
+  const rootKey = isLedger
+    ? generateLedgerWalletRootKey(mnemonic)
+    : RustModule.WalletV3.Bip32PrivateKey.from_bip39_entropy(
+      Buffer.from(bip39entropy, 'hex'),
+      EMPTY_PASSWORD
+    );
   const derivedKey = derivePath(rootKey, path);
 
   if (path[0] === WalletTypePurpose.BIP44) {

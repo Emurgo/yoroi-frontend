@@ -53,7 +53,7 @@ export default class LedgerConnectStore
 
   // =================== VIEW RELATED =================== //
   @observable progressInfo: ProgressInfo;
-  @observable derivationIndex: number = 0; // assume single account
+  @observable derivationIndex: number = HARD_DERIVATION_START + 0; // assume single account
   error: ?LocalizableError;
   hwDeviceInfo: ?HWDeviceInfo;
   ledgerConnect: ?LedgerConnect;
@@ -73,7 +73,7 @@ export default class LedgerConnectStore
     = new LocalizedRequest<CreateHardwareWalletFunc>(this.api.ada.createHardwareWallet);
 
   /** While ledger wallet creation is taking place, we need to block users from starting a
-    * ledger wallet creation on a seperate wallet and explain to them why the action is blocked */
+    * ledger wallet creation on a separate wallet and explain to them why the action is blocked */
   @observable isCreateHWActive: boolean = false;
   // =================== API RELATED =================== //
 
@@ -90,7 +90,7 @@ export default class LedgerConnectStore
   }
 
   /** setup() is called when stores are being created
-    * _init() is called when connect dailog is about to show */
+    * _init() is called when connect dialog is about to show */
   _init: void => void = () => {
     Logger.debug('LedgerConnectStore::_init called');
   }
@@ -148,7 +148,7 @@ export default class LedgerConnectStore
       });
       await prepareLedgerConnect(this.ledgerConnect);
 
-      const accountPath = makeCardanoAccountBIP44Path(this.derivationIndex);
+      const accountPath = makeCardanoAccountBIP44Path(this.derivationIndex - HARD_DERIVATION_START);
       // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#examples
       Logger.debug(stringifyData(accountPath));
 
@@ -255,7 +255,7 @@ export default class LedgerConnectStore
 
       const reqParams = this._prepareCreateHWReqParams(
         walletName,
-        this.derivationIndex + HARD_DERIVATION_START,
+        this.derivationIndex,
       );
       this.createHWRequest.execute(reqParams);
       if (!this.createHWRequest.promise) throw new Error('should never happen');
@@ -279,7 +279,7 @@ export default class LedgerConnectStore
       if (error instanceof LocalizableError) {
         this.error = error;
       } else {
-        // some unknow error
+        // some unknown error
         this.error = new UnexpectedError();
       }
       this._goToSaveError();

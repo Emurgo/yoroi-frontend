@@ -9,7 +9,7 @@ import LocalizedRequest from '../lib/LocalizedRequest';
 
 import type {
   CreateTrezorSignTxDataFunc,
-  BroadcastTrezorSignedTxRequest, BroadcastTrezorSignedTxResponse,
+  BroadcastTrezorSignedTxResponse,
 } from '../../api/ada';
 import type {
   SendUsingTrezorParams
@@ -35,9 +35,9 @@ export default class TrezorSendStore extends Store {
   createTrezorSignTxDataRequest: LocalizedRequest<CreateTrezorSignTxDataFunc>
     = new LocalizedRequest<CreateTrezorSignTxDataFunc>(this.api.ada.createTrezorSignTxData);
 
-  broadcastTrezorSignedTxRequest: LocalizedRequest<typeof TrezorSendStore.prototype.sendAndRefresh>
-    = new LocalizedRequest<typeof TrezorSendStore.prototype.sendAndRefresh>(
-      this.sendAndRefresh
+  broadcastTrezorSignedTxRequest: LocalizedRequest<typeof sendAndRefresh>
+    = new LocalizedRequest<typeof sendAndRefresh>(
+      sendAndRefresh
     );
   // =================== API RELATED =================== //
 
@@ -71,6 +71,7 @@ export default class TrezorSendStore extends Store {
       this._setActionProcessing(true);
 
       const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+
       this.createTrezorSignTxDataRequest.execute({
         ...request.params,
         getTxsBodiesForUTXOs: stateFetcher.getTxsBodiesForUTXOs,
@@ -79,7 +80,7 @@ export default class TrezorSendStore extends Store {
 
       const trezorSignTxDataResp = await this.createTrezorSignTxDataRequest.promise;
 
-      const trezorSignTxResp = await await TrezorConnect.cardanoSignTransaction(
+      const trezorSignTxResp = await TrezorConnect.cardanoSignTransaction(
         { ...trezorSignTxDataResp.trezorSignTxPayload }
       );
 
@@ -114,16 +115,33 @@ export default class TrezorSendStore extends Store {
       throw new Error(`${nameof(TrezorSendStore)}::${nameof(this._brodcastSignedTx)} should never happen`);
     }
     const { wallets } = this.stores;
-    await this.broadcastTrezorSignedTxRequest.execute({
-      broadcastRequest: {
+    const signedTxResponse = await this.broadcastTrezorSignedTxRequest.execute({
+      broadcast: () => this.api.ada.broadcastTrezorSignedTx({
         signedTxRequest: {
           id: trezorSignTxResp.payload.hash,
           encodedTx: Buffer.from(trezorSignTxResp.payload.body, 'hex'),
         },
         sendTx: this.stores.substores[environment.API].stateFetchStore.fetcher.sendTx,
-      },
+      }),
       refreshWallet: () => wallets.refreshWalletFromRemote(publicDeriver),
     }).promise;
+    if (signedTxResponse == null) throw new Error('Should never happen');
+
+    const memo = this.stores.substores.ada.transactionBuilderStore.memo;
+    if (memo !== '' && memo !== undefined) {
+      try {
+        await this.actions.memos.saveTxMemo.trigger({
+          publicDeriver,
+          memo: {
+            Content: memo,
+            TransactionHash: signedTxResponse.txId,
+            LastUpdated: new Date(),
+          },
+        });
+      } catch (error) {
+        Logger.error(`${nameof(TrezorSendStore)}::${nameof(this._brodcastSignedTx)} error: ` + stringifyError(error));
+      }
+    }
 
     this.actions.dialogs.closeActiveDialog.trigger();
 
@@ -131,20 +149,6 @@ export default class TrezorSendStore extends Store {
     wallets.goToWalletRoute(publicDeriver);
 
     Logger.info('SUCCESS: ADA sent using Trezor SignTx');
-  }
-
-  sendAndRefresh: {|
-    broadcastRequest: BroadcastTrezorSignedTxRequest,
-    refreshWallet: () => Promise<void>,
-  |} => Promise<BroadcastTrezorSignedTxResponse> = async (request) => {
-    const result = await this.api.ada.broadcastTrezorSignedTx(request.broadcastRequest);
-    try {
-      await request.refreshWallet();
-    } catch (_e) {
-      // even if refreshing the wallet fails, we don't want to fail the tx
-      // otherwise user may try and re-send the tx
-    }
-    return result;
   }
 
   _cancel: void => void = () => {
@@ -162,3 +166,17 @@ export default class TrezorSendStore extends Store {
     this.error = error;
   }
 }
+
+const sendAndRefresh: {|
+  broadcast: () => Promise<BroadcastTrezorSignedTxResponse>,
+  refreshWallet: () => Promise<void>,
+|} => Promise<BroadcastTrezorSignedTxResponse> = async (request) => {
+  const result = await request.broadcast();
+  try {
+    await request.refreshWallet();
+  } catch (_e) {
+    // even if refreshing the wallet fails, we don't want to fail the tx
+    // otherwise user may try and re-send the tx
+  }
+  return result;
+};

@@ -51,7 +51,7 @@ export default class TrezorConnectStore
   // =================== VIEW RELATED =================== //
   /** the only observable which manages state change */
   @observable progressInfo: ProgressInfo;
-  @observable derivationIndex: number = 0; // assume single account
+  @observable derivationIndex: number = HARD_DERIVATION_START + 0; // assume single account
 
   /** only in ERROR state it will hold LocalizableError object */
   error: ?LocalizableError;
@@ -225,7 +225,7 @@ export default class TrezorConnectStore
 
     const { trezorResp, trezorEventDevice } = resp;
 
-    /** This check aready done in _validateHWResponse but flow needs this */
+    /** This check already done in _validateHWResponse but flow needs this */
     if (trezorEventDevice == null
       || trezorEventDevice.payload == null
       || trezorEventDevice.payload.features == null) {
@@ -239,7 +239,7 @@ export default class TrezorConnectStore
         Vendor: deviceFeatures.vendor,
         Model: deviceFeatures.model,
         DeviceId: deviceFeatures.device_id,
-        Label: deviceFeatures.label,
+        Label: deviceFeatures.label || '',
         MajorVersion: deviceFeatures.major_version,
         MinorVersion: deviceFeatures.minor_version,
         PatchVersion: deviceFeatures.patch_version,
@@ -364,7 +364,7 @@ export default class TrezorConnectStore
 
       const reqParams = this._prepareCreateHWReqParams(
         walletName,
-        this.derivationIndex + HARD_DERIVATION_START,
+        this.derivationIndex,
       );
       this.createHWRequest.execute(reqParams);
       if (!this.createHWRequest.promise) throw new Error('should never happen');

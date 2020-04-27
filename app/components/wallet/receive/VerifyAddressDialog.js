@@ -118,19 +118,17 @@ export default class VerifyAddressDialog extends Component<Props> {
             <span className={labelStyle}>
               {intl.formatMessage(globalMessages.addressLabel)}
             </span>
-            <div className={styles.infoBlock}>
-              <div className={styles.data}>
-                <ExplorableHashContainer
-                  light={false}
-                  selectedExplorer={this.props.selectedExplorer}
-                  hash={walletAddress}
-                  linkType="address"
-                >
-                  <RawHash light={false} className={styles.hash}>
-                    {walletAddress}
-                  </RawHash>
-                </ExplorableHashContainer>
-              </div>
+            <div className="verificationAddress">
+              <ExplorableHashContainer
+                light={false}
+                selectedExplorer={this.props.selectedExplorer}
+                hash={walletAddress}
+                linkType="address"
+              >
+                <RawHash light={false} className={styles.hash}>
+                  {walletAddress}
+                </RawHash>
+              </ExplorableHashContainer>
             </div>
             <br />
             <span className={labelStyle}>

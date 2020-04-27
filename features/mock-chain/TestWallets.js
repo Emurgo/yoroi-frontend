@@ -32,7 +32,9 @@ type WalletNames =
   'simple-pending-wallet' |
   'tx-big-input-wallet' |
   'dump-wallet' |
-  'shelley-test';
+  'shelley-test' |
+  'ledger-wallet' |
+  'trezor-wallet';
 
 // eslint-disable-next-line prefer-object-spread
 export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object.assign(
@@ -78,5 +80,15 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
     name: ('shelley-test': WalletNames),
     mnemonic: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon address',
     plate: 'XXXX-1111',
+  }),
+  createWallet({
+    name: ('ledger-wallet': WalletNames),
+    mnemonic: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art',
+    plate: 'JSKA-2258',
+  }),
+  createWallet({
+    name: ('trezor-wallet': WalletNames),
+    mnemonic: 'lyrics tray aunt muffin brisk ensure wedding cereal capital path replace weasel',
+    plate: 'CXHB-0220',
   }),
 );

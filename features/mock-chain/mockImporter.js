@@ -5,6 +5,7 @@ import type {
   SignedRequestInternal, SignedResponse,
   RemoteTransaction,
   ServerStatusResponse,
+  TxBodiesFunc,
 } from '../../app/api/ada/lib/state-fetch/types';
 import {
   genGetTransactionsHistoryForAddresses,
@@ -42,13 +43,6 @@ const genesisTxValue = 2000000000000000; // 2 billion ada
 const genesisTxReceiver = 'Ae2tdPwUPEZ4YjgvykNpoFeYUxoyhNj2kg8KfKWN2FizsSpLUPv68MpTVDo';
 
 type MockTx = RemoteTransaction;
-
-type ServerStatus = {|
-  id: number,
-  status: boolean,
-  // timestamp with timezone
-  time: string,
-|}
 
 /**
  * To simplify, our genesis is a single address which gives all its ada to a "distributor"
@@ -244,6 +238,63 @@ export const generateTransction = () => {
           CoreAddressTypes.SHELLEY_GROUP
         ),
         amount: '2100000'
+      },
+      // dump-wallet
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ],
+        ),
+        amount: '2000000'
+      },
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ],
+        ),
+        amount: '3000000'
+      },
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ],
+        ),
+        amount: '2000000'
+      },
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ],
+        ),
+        amount: '2000000'
       },
     ],
     height: 1,
@@ -877,6 +928,229 @@ export const generateTransction = () => {
     tx_state: 'Successful'
   };
 
+  // =================
+  //   ledger-wallet
+  // =================
+
+  const ledgerTx1 = {
+    hash: '166dfde5b183b7e09483afbbfce7b41e7d6fed34b405cc1041b45f27e8b05d47',
+    inputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ]
+        ),
+        txHash: distributorTx.hash,
+        id: distributorTx.hash + '13',
+        index: 13,
+        amount: '2000000'
+      }
+    ],
+    outputs: [
+      {
+        // Ae2tdPwUPEYyHfxoQYGPhyHuAfLHKfLubzo4kxyw2XDnLsLmACtjufaBs33
+        address: getSingleAddressString(
+          testWallets['ledger-wallet'].mnemonic,
+          [
+            isShelley ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            0
+          ],
+          true
+        ),
+        amount: '638497'
+      },
+    ],
+    height: 300,
+    block_hash: '300',
+    tx_ordinal: 0,
+    time: '2019-04-20T15:15:33.000Z',
+    epoch: 0,
+    slot: 300,
+    last_update: '2019-05-20T23:16:51.899Z',
+    tx_state: 'Successful'
+  };
+
+  // =================
+  //   trezor-wallet
+  // =================
+
+  const trezorTx1 = {
+    hash: '3677e75c7ba699bfdc6cd57d42f246f86f69aefd76025006ac78313fad2bba20',
+    inputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ]
+        ),
+        txHash: distributorTx.hash,
+        id: distributorTx.hash + '14',
+        index: 14,
+        amount: '3000000'
+      }
+    ],
+    outputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ]
+        ),
+        amount: '1'
+      },
+      {
+        // Ae2tdPwUPEZ9qgUrkrTqqTa5iKkaURYNFqM1gSbPXicn21LYyF184ZXnQ5R
+        address: getSingleAddressString(
+          testWallets['trezor-wallet'].mnemonic,
+          [
+            isShelley ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.INTERNAL,
+            2
+          ],
+        ),
+        amount: '2832006'
+      },
+    ],
+    height: 301,
+    block_hash: '301',
+    tx_ordinal: 1,
+    time: '2019-04-20T15:15:53.000Z',
+    epoch: 0,
+    slot: 301,
+    last_update: '2019-05-20T23:17:11.899Z',
+    tx_state: 'Successful'
+  };
+  const trezorTx2 = {
+    hash: '058405892f66075d83abd1b7fe341d2d5bfd2f6122b2f874700039e5078e0dd5',
+    inputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ]
+        ),
+        txHash: distributorTx.hash,
+        id: distributorTx.hash + '15',
+        index: 15,
+        amount: '2000000'
+      }
+    ],
+    outputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ]
+        ),
+        amount: '1'
+      },
+      {
+        // Ae2tdPwUPEZLmqiKtMQ4kKL38emRfkyPqBsHqL64pf8uRz6uzsQCd7GAu9R
+        address: getSingleAddressString(
+          testWallets['trezor-wallet'].mnemonic,
+          [
+            isShelley ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.INTERNAL,
+            1
+          ],
+        ),
+        amount: '1494128'
+      },
+    ],
+    height: 302,
+    block_hash: '302',
+    tx_ordinal: 1,
+    time: '2019-04-20T15:16:13.000Z',
+    epoch: 0,
+    slot: 302,
+    last_update: '2019-05-20T23:17:31.899Z',
+    tx_state: 'Successful'
+  };
+  const trezorTx3 = {
+    hash: '1029eef5bb0f06979ab0b9530a62bac11e180797d08cab980fe39389d42b3657',
+    inputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ]
+        ),
+        txHash: distributorTx.hash,
+        id: distributorTx.hash + '16',
+        index: 16,
+        amount: '2000000'
+      }
+    ],
+    outputs: [
+      {
+        // Ae2tdPwUPEYw66yGJJfbzNxTerpKV3zQRcd746cUtNSFgAGSYx1YLHnQW6c
+        address: getSingleAddressString(
+          testWallets['trezor-wallet'].mnemonic,
+          [
+            isShelley ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            7
+          ],
+        ),
+        amount: '1000000'
+      },
+    ],
+    height: 303,
+    block_hash: '303',
+    tx_ordinal: 0,
+    time: '2019-04-20T15:16:33.000Z',
+    epoch: 0,
+    slot: 303,
+    last_update: '2019-05-20T23:17:51.899Z',
+    tx_state: 'Successful'
+  };
+
   return {
     genesisTx,
     distributorTx,
@@ -891,6 +1165,10 @@ export const generateTransction = () => {
     postLaunchPendingTx,
     failedTx,
     certificateTx,
+    ledgerTx1,
+    trezorTx1,
+    trezorTx2,
+    trezorTx3,
   };
 };
 
@@ -932,6 +1210,12 @@ export function resetChain() {
   if (isShelley) {
     addTransaction(txs.certificateTx);
   }
+  // ledger-wallet
+  addTransaction(txs.ledgerTx1);
+  // trezor-wallet
+  addTransaction(txs.trezorTx1);
+  addTransaction(txs.trezorTx2);
+  addTransaction(txs.trezorTx3);
 }
 
 // =========================
@@ -1001,6 +1285,23 @@ const getAccountState = genGetAccountState(transactions);
 const getPoolInfo = genGetPoolInfo(transactions);
 const getReputation = genGetReputation();
 const getRewardHistory = genGetRewardHistory();
+const getTxsBodiesForUTXOs: TxBodiesFunc = async req => {
+  const result = {};
+  for (const hash of req.txsHashes) {
+    if (hash === '166dfde5b183b7e09483afbbfce7b41e7d6fed34b405cc1041b45f27e8b05d47') {
+      result[hash] = '839f8200d818582482582000665adfef649eb8e7ccb104c14d4c33ccba708aeb0ec85e6a34555bb76b119f008200d818582482582000665adfef649eb8e7ccb104c14d4c33ccba708aeb0ec85e6a34555bb76b119f01ff9f8282d818582183581c18ddda3e6ad67cfa6e91357e75f565835b86379e8f3f22f60fa8a312a0001a9c55fede1a0009be21ffa0';
+    } else if (hash === '3677e75c7ba699bfdc6cd57d42f246f86f69aefd76025006ac78313fad2bba20') {
+      result[hash] = '839f8200d8185824825820591267207e36e03789c74b282cce9d0637325d46d6bd5b9a27fe6e75abf1b08700ff9f8282d818582183581ce999ddf0e7b22ffdc8a6ea041ba4b1382c4834fd553f308c407d9e1aa0001a8132b4e41a001e84808282d818582183581c829e3e4cecea3cd73fae255123bef7be317ed0ac3be40c1616ade9fea0001ab3ff94641a002b3686ffa0';
+    } else if (hash === '058405892f66075d83abd1b7fe341d2d5bfd2f6122b2f874700039e5078e0dd5') {
+      result[hash] = '839f8200d8185824825820c54e97f5d6fa9b1170a986d081dc860f9721e253b40c0c6b79edbab922f235f201ff9f8282d818582183581c429bfc0da2711bf754edc60f6ec0349c4fb02eabfd5b66597d25a9e3a0001a1d25653f1a000f42408282d818582183581cf03274dad3c7a1b7aa3951a4cdecc167d5c17d82f3cbfb291f71d2c2a0001a98ca71d01a0016cc70ffa0';
+    } else if (hash === '1029eef5bb0f06979ab0b9530a62bac11e180797d08cab980fe39389d42b3657') {
+      result[hash] = '839f8200d81858248258202bddf3710ee44383a5a9f53aee9f3e27d1d8382537b8b21b30e6314c2897664b00ff9f8282d818582183581c02d2cf0eca7f55fdce2f4c51a307583f50eae31c052c934ae59bf704a0001a0a0584011a000f42408282d818582183581ca3f6cfcb530b5c1d148a07707baef7fea7d61217117903c4109694d2a0001a3dca8fd51a000a0a5cffa0';
+    } else {
+      throw new Error(`Txhash found with no body ${hash}`);
+    }
+  }
+  return result;
+};
 
 export default {
   utxoForAddresses,
@@ -1009,6 +1310,7 @@ export default {
   getApiStatus,
   history,
   getRewardHistory,
+  getTxsBodiesForUTXOs,
   getBestBlock,
   getAccountState,
   getPoolInfo,

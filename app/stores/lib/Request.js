@@ -11,7 +11,7 @@ const messages = defineMessages({
   },
   promiseNotCalledYetError: {
     id: 'api.errors.PromiseNotCalledYetError',
-    defaultMessage: '!!!You have to call Request::execute before you can access it as promise.',
+    defaultMessage: '!!!Result accessed before execution finished.',
   }
 });
 

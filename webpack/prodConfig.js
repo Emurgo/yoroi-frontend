@@ -20,7 +20,7 @@ const baseProdConfig = (env /*: EnvParams */) => ({
   mode: 'production',
   optimization: commonConfig.optimization,
   node: commonConfig.node,
-  resolve: commonConfig.resolve,
+  resolve: commonConfig.resolve(env.networkName),
   entry: {
     yoroi: [
       customPath,
