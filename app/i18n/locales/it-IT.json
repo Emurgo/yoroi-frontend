@@ -3,7 +3,7 @@
   "api.errors.GenericApiError": "Si è verificato un errore, riprova più tardi.",
   "api.errors.IncorrectPasswordError": "Password del portafoglio errata.",
   "api.errors.NotEnoughMoneyToSendError": "Non hai abbastanza ADA per effettuare questa transazione.",
-  "api.errors.PromiseNotCalledYetError": "È necessario chiamare Request::execute prima di potervi accedere come promise.",
+  "api.errors.PromiseNotCalledYetError": "Result accessed before execution finished.",
   "api.errors.ReportRequestError": "Si è verificato un problema durante l'invio della richiesta di supporto.",
   "api.errors.WalletAlreadyImportedError": "Il portafoglio che stai cercando di importare è già esistente.",
   "api.errors.WalletAlreadyRestoredError": "Il portafoglio che si sta cercando di ripristinare è già esistente.",
