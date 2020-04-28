@@ -5,6 +5,7 @@ import environment from '../environment';
 const ShelleyExplorers = Object.freeze({
   SEIZA: 'seiza',
   JORMUNGANDR: 'jormungandr',
+  ADASTAT: 'adastat',
 });
 const ByronExplorers = Object.freeze({
   SEIZA: 'seiza',
@@ -22,7 +23,7 @@ export function getExplorers(): Array<{| value: ExplorerType, label: string |}> 
   const explorerInfo = getExplorerInfo();
   if (environment.isShelley()) {
     return Object.keys(ShelleyExplorers)
-      .filter(explorer => ShelleyExplorers[explorer] === ShelleyExplorers.JORMUNGANDR)
+      .filter(explorer => ShelleyExplorers[explorer] !== ShelleyExplorers.SEIZA)
       .map(key => ({
         value: ShelleyExplorers[key],
         label: explorerInfo[ShelleyExplorers[key]].name,
@@ -109,6 +110,12 @@ const getExplorerInfo: void => {
     }
     : {
       jormungandr: getIohkExplorer(),
+      adastat: {
+        name: 'AdaStat',
+        address: 'https://adastat.net/address/',
+        transaction: 'https://adastat.net/transaction/',
+        pool: 'https://adastat.net/pool/',
+      },
     }
   )
 });
