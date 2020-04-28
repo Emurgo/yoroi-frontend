@@ -3,7 +3,7 @@
   "api.errors.GenericApiError": "Ocorreu um erro. Por favor tente novamente mais tarde.",
   "api.errors.IncorrectPasswordError": "Senha incorreta da wallet.",
   "api.errors.NotEnoughMoneyToSendError": "Saldo insuficiente para realizar essa transação.",
-  "api.errors.PromiseNotCalledYetError": "Você tem que chamar Request::execute antes de poder acessá-lo como promessa.",
+  "api.errors.PromiseNotCalledYetError": "Result accessed before execution finished.",
   "api.errors.ReportRequestError": "Houve um problema ao enviar a solicitação para o suporte.",
   "api.errors.WalletAlreadyImportedError": "A carteira que você está tentando importar já existe.",
   "api.errors.WalletAlreadyRestoredError": "A carteira que você está tentando restaurar já existe.",
