@@ -23,7 +23,7 @@ export function getExplorers(): Array<{| value: ExplorerType, label: string |}> 
   const explorerInfo = getExplorerInfo();
   if (environment.isShelley()) {
     return Object.keys(ShelleyExplorers)
-      .filter(explorer => ShelleyExplorers[explorer] === ShelleyExplorers.JORMUNGANDR)
+      .filter(explorer => ShelleyExplorers[explorer] !== ShelleyExplorers.SEIZA)
       .map(key => ({
         value: ShelleyExplorers[key],
         label: explorerInfo[ShelleyExplorers[key]].name,
