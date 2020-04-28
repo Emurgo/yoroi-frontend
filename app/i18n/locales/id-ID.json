@@ -3,7 +3,7 @@
   "api.errors.GenericApiError": "Terjadi kesalahan, mohon coba beberapa saat lagi.",
   "api.errors.IncorrectPasswordError": "Kata sandi wallet yang Anda gunakan salah.",
   "api.errors.NotEnoughMoneyToSendError": "ADA tidak mencukupi untuk melakukan transaksi ini.",
-  "api.errors.PromiseNotCalledYetError": "Anda harus memanggil Request::execute sebelum bisa mengaksesnya sebagai promise.",
+  "api.errors.PromiseNotCalledYetError": "Result accessed before execution finished.",
   "api.errors.ReportRequestError": "Terjadi masalah saat pengiriman support request.",
   "api.errors.WalletAlreadyImportedError": "Wallet yang Anda coba import sudah tersedia.",
   "api.errors.WalletAlreadyRestoredError": "Wallet yang Anda coba pulihkan sudah tersedia.",
