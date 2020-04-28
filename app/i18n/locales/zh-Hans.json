@@ -3,7 +3,7 @@
   "api.errors.GenericApiError": "发生错误，请稍后重试。",
   "api.errors.IncorrectPasswordError": "钱包密码不正确。",
   "api.errors.NotEnoughMoneyToSendError": "没有足够的 ADA 进行此交易。",
-  "api.errors.PromiseNotCalledYetError": "您必须调用Request::execute才能存取。",
+  "api.errors.PromiseNotCalledYetError": "Result accessed before execution finished.",
   "api.errors.ReportRequestError": "发送支援请求时出现问题。",
   "api.errors.WalletAlreadyImportedError": "您要导入的钱包已存在。",
   "api.errors.WalletAlreadyRestoredError": "您要恢复的钱包已存在。",
