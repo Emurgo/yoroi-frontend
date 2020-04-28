@@ -17,6 +17,7 @@
 .*/node_modules/trezor-connect/lib/index.js
 .*/node_modules/react-polymorph/source/components/HOC/withTheme.js
 .*/node_modules/react-polymorph/source/components/layout/Flex.js
+.*/node_modules/@ledgerhq/hw-transport/lib/Transport.js.flow
 
 [libs]
 flow/declarations/
