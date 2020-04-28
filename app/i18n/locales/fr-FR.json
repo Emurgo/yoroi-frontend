@@ -3,7 +3,7 @@
   "api.errors.GenericApiError": "Une erreur s’est produite, veuillez réessayer ultérieurement.",
   "api.errors.IncorrectPasswordError": "Mot de passe incorrect.",
   "api.errors.NotEnoughMoneyToSendError": "Fonds insuffisants pour effectuer cette transaction.",
-  "api.errors.PromiseNotCalledYetError": "Result accessed before execution finished.",
+  "api.errors.PromiseNotCalledYetError": "Résultat accédé avant la fin de l'exécution.",
   "api.errors.ReportRequestError": "Il y a eu un problème avec l'envoi de la demande.",
   "api.errors.WalletAlreadyImportedError": "Le wallet que vous essayez d'importer existe déjà.",
   "api.errors.WalletAlreadyRestoredError": "Le wallet que vous essayez de restaurer existe déjà.",
