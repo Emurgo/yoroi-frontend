@@ -3,7 +3,7 @@
   "api.errors.GenericApiError": "Произошла ошибка, пожалуйста, повторите попытку позже.",
   "api.errors.IncorrectPasswordError": "Неверный пароль кошелька.",
   "api.errors.NotEnoughMoneyToSendError": "Недостаточно ADA для проведения данной транзакции.",
-  "api.errors.PromiseNotCalledYetError": "Вам нужно вызвать Request::execute, прежде, чем Вы сможете получить доступ к нему как promise.",
+  "api.errors.PromiseNotCalledYetError": "Result accessed before execution finished.",
   "api.errors.ReportRequestError": "Возникла проблема при отправки запроса в службу поддержки.",
   "api.errors.WalletAlreadyImportedError": "Кошелек, который Вы пытаетесь импортировать, уже существует.",
   "api.errors.WalletAlreadyRestoredError": "Кошелек, который Вы пытаетесь восстановить, уже существует.",
