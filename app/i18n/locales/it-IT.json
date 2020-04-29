@@ -142,6 +142,7 @@
   "noticeBoard.notice.stakeUndelegated.subMessage": "Le ricompense per le prossime due epoche devono ancora essere ricevute",
   "noticeBoard.notice.stakeUndelegated.title": "Hai rimosso la delega alla pool [{poolTicker}]",
   "noticeBoard.topbar.title": "Notifica",
+  "notprod.label.message": "WARNING: non-production build. If unexpected, double-check Yoroi installation.",
   "profile.languageSelect.form.languageSelectLabel": "Seleziona la tua lingua",
   "profile.languageSelect.intro": "Sei sulla Yoroi Shelley Testnet",
   "profile.languageSelect.title": "Seleziona lingua",
