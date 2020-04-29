@@ -45,13 +45,6 @@ export const mockTransferProps: {
       app: {
         currentRoute: request.currentRoute,
       },
-      serverConnectionStore: {
-        checkAdaServerStatus: select(
-          'checkAdaServerStatus',
-          ServerStatusErrors,
-          ServerStatusErrors.Healthy,
-        ),
-      },
       wallets: {
         selected: request.selected,
       },
@@ -170,6 +163,20 @@ export const mockTransferProps: {
         DaedalusTransferPageProps: request.DaedalusTransferPageProps
           ? { generated: request.DaedalusTransferPageProps }
           : null,
+      },
+    },
+    BannerContainerProps: {
+      generated: {
+        stores: {
+          serverConnectionStore: {
+            checkAdaServerStatus: select(
+              'checkAdaServerStatus',
+              ServerStatusErrors,
+              ServerStatusErrors.Healthy,
+            ),
+          },
+        },
+        actions: Object.freeze({}),
       },
     },
   },

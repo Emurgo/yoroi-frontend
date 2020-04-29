@@ -39,13 +39,6 @@ export const mockSettingsProps: {
       wallets: {
         selected: request.selected,
       },
-      serverConnectionStore: {
-        checkAdaServerStatus: select(
-          'checkAdaServerStatus',
-          ServerStatusErrors,
-          ServerStatusErrors.Healthy,
-        ),
-      }
     },
     actions: {
       router: {
@@ -110,6 +103,20 @@ export const mockSettingsProps: {
           },
         },
       }
+    },
+    BannerContainerProps: {
+      generated: {
+        stores: {
+          serverConnectionStore: {
+            checkAdaServerStatus: select(
+              'checkAdaServerStatus',
+              ServerStatusErrors,
+              ServerStatusErrors.Healthy,
+            ),
+          },
+        },
+        actions: Object.freeze({}),
+      },
     },
   },
 });

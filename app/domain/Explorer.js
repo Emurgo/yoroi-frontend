@@ -68,9 +68,7 @@ const seiza = environment.isShelley()
 
 
 function getIohkExplorer(): ExplorerInfo {
-  const domain = environment.isDev()
-    ? 'https://shelley-testnet-explorer-nightly.netlify.com'
-    : 'https://shelleyexplorer.cardano.org';
+  const domain = 'https://shelleyexplorer.cardano.org';
 
   // TODO: send to different page based on locale
   return {

@@ -8,12 +8,14 @@ import globalMessages from '../../i18n/global-messages';
 import SettingsLayout from '../../components/settings/SettingsLayout';
 import NavBarContainer from '../NavBarContainer';
 import SettingsMenu from '../../components/settings/menu/SettingsMenu';
+import BannerContainer from '../BannerContainer';
+import type { GeneratedData as BannerContainerData } from '../BannerContainer';
 import { buildRoute } from '../../utils/routing';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import type { GeneratedData as NavBarContainerData } from '../NavBarContainer';
 
-import MainLayout from '../MainLayout';
+import TopBarLayout from '../../components/layout/TopBarLayout';
 import SidebarContainer from '../SidebarContainer';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 
@@ -47,7 +49,6 @@ export default class Settings extends Component<Props> {
     const { children } = this.props;
     const { actions, stores } = this.generated;
     const { profile } = stores;
-    const { checkAdaServerStatus } = stores.serverConnectionStore;
     const sidebarContainer = (<SidebarContainer {...this.generated.SidebarContainerProps} />);
 
     const menu = (
@@ -69,17 +70,17 @@ export default class Settings extends Component<Props> {
     );
 
     return (
-      <MainLayout
+      <TopBarLayout
+        banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
         sidebar={sidebarContainer}
         navbar={navbar}
-        connectionErrorType={checkAdaServerStatus}
         showInContainer
         showAsCard
       >
         <SettingsLayout menu={menu}>
           {children != null ? children : null}
         </SettingsLayout>
-      </MainLayout>
+      </TopBarLayout>
     );
   }
 
@@ -103,9 +104,6 @@ export default class Settings extends Component<Props> {
         wallets: {
           selected: stores.wallets.selected,
         },
-        serverConnectionStore: {
-          checkAdaServerStatus: stores.substores.ada.serverConnectionStore.checkAdaServerStatus,
-        },
       },
       actions: {
         router: {
@@ -114,6 +112,7 @@ export default class Settings extends Component<Props> {
       },
       SidebarContainerProps: ({ actions, stores, }: InjectedOrGenerated<SidebarContainerData>),
       NavBarContainerProps: ({ actions, stores, }: InjectedOrGenerated<NavBarContainerData>),
+      BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
     });
   }
 }

@@ -121,7 +121,7 @@ export default class WalletNavigation extends Component<Props> {
               />
             </div>
 
-            {environment.isDev() && ( // Hide temporarily
+            {!environment.isProduction() && ( // Hide temporarily
               <div className={styles.navItem}>
                 <WalletNavButton
                   className="stakeAdvancedSimulator"

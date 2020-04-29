@@ -4,12 +4,14 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import { intlShape, defineMessages } from 'react-intl';
-import MainLayout from '../MainLayout';
+import TopBarLayout from '../../components/layout/TopBarLayout';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import SidebarContainer from '../SidebarContainer';
 import NavBarContainer from '../NavBarContainer';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import type { GeneratedData as NavBarContainerData } from '../NavBarContainer';
+import BannerContainer from '../BannerContainer';
+import type { GeneratedData as BannerContainerData } from '../BannerContainer';
 import WalletWithNavigation from '../../components/wallet/layouts/WalletWithNavigation';
 import NavBarBack from '../../components/topbar/NavBarBack';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
@@ -76,8 +78,6 @@ export default class Wallet extends Component<Props> {
   render() {
     const { intl } = this.context;
     const { wallets, } = this.generated.stores;
-    const { stores } = this.generated;
-    const { checkAdaServerStatus } = stores.serverConnectionStore;
     const sidebarContainer = (<SidebarContainer {...this.generated.SidebarContainerProps} />);
     const navbarContainer = (
       <NavBarContainer
@@ -94,24 +94,24 @@ export default class Wallet extends Component<Props> {
 
     if (!wallets.selected) {
       return (
-        <MainLayout
+        <TopBarLayout
+          banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
           navbar={navbarContainer}
-          connectionErrorType={checkAdaServerStatus}
           showInContainer
           showAsCard
         >
           <VerticallyCenteredLayout>
             <LoadingSpinner />
           </VerticallyCenteredLayout>
-        </MainLayout>
+        </TopBarLayout>
       );
     }
 
     return (
-      <MainLayout
+      <TopBarLayout
+        banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
         sidebar={sidebarContainer}
         navbar={navbarContainer}
-        connectionErrorType={checkAdaServerStatus}
         showInContainer
         showAsCard
       >
@@ -122,7 +122,7 @@ export default class Wallet extends Component<Props> {
         >
           {this.props.children}
         </WalletWithNavigation>
-      </MainLayout>
+      </TopBarLayout>
     );
   }
 
@@ -142,9 +142,6 @@ export default class Wallet extends Component<Props> {
         wallets: {
           selected: stores.wallets.selected,
         },
-        serverConnectionStore: {
-          checkAdaServerStatus: stores.substores.ada.serverConnectionStore.checkAdaServerStatus,
-        },
       },
       actions: {
         router: {
@@ -153,6 +150,7 @@ export default class Wallet extends Component<Props> {
       },
       SidebarContainerProps: ({ actions, stores, }: InjectedOrGenerated<SidebarContainerData>),
       NavBarContainerProps: ({ actions, stores, }: InjectedOrGenerated<NavBarContainerData>),
+      BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
     });
   }
 }

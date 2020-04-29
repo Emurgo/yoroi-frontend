@@ -86,13 +86,6 @@ export const Wallets = () => {
           publicDerivers,
           getPublicKeyCache: lookup.getPublicKeyCache
         },
-        serverConnectionStore: {
-          checkAdaServerStatus: select(
-            'checkAdaServerStatus',
-            ServerStatusErrors,
-            ServerStatusErrors.Healthy,
-          ),
-        },
         substores: {
           ada: {
             transactions: {
@@ -137,6 +130,20 @@ export const Wallets = () => {
               activateTopbarCategory: { trigger: action('activateTopbarCategory') },
             },
           },
+        },
+      },
+      BannerContainerProps: {
+        generated: {
+          stores: {
+            serverConnectionStore: {
+              checkAdaServerStatus: select(
+                'checkAdaServerStatus',
+                ServerStatusErrors,
+                ServerStatusErrors.Healthy,
+              ),
+            },
+          },
+          actions: Object.freeze({}),
         },
       },
     }}

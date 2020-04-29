@@ -26,18 +26,11 @@ export const environment = ((
     /** Network used to connect */
     NETWORK: CONFIG.network.name,
     version: getVersion(),
-    /** Environment used during webpack build */
-    env_type: process.env.NODE_ENV,
-
     API: ('ada': Currency), // Note: can't change at runtime
     MOBX_DEV_TOOLS: process.env.MOBX_DEV_TOOLS,
     commit: process.env.COMMIT || '',
     isJest: () => process.env.NODE_ENV === 'jest' || process.env.NODE_ENV === 'test',
     branch: process.env.BRANCH || '',
-    isDev: () => {
-      return CONFIG.network.name === NetworkType.DEVELOPMENT ||
-        CONFIG.network.name === NetworkType.SHELLEY_DEV;
-    },
     isShelley: () => {
       return CONFIG.network.name === NetworkType.SHELLEY_DEV ||
         CONFIG.network.name === NetworkType.SHELLEY_TESTNET;
@@ -45,8 +38,8 @@ export const environment = ((
     isNightly: () => (process.env.NIGHTLY == null ? false : JSON.parse(process.env.NIGHTLY)),
     isTest: () => CONFIG.network.name === NetworkType.TEST,
     isMainnet: () => environment.NETWORK === NetworkType.MAINNET,
-    isProduction: () => environment.NETWORK === NetworkType.MAINNET ||
-      CONFIG.network.name === NetworkType.SHELLEY_TESTNET,
+    /** Environment used during webpack build */
+    isProduction: () => process.env.NODE_ENV === 'production',
     getDiscriminant: () => {
       if (CONFIG.network.name === NetworkType.TEST || process.env.NODE_ENV === 'jest' || process.env.NODE_ENV === 'test') {
         return RustModule.WalletV3.AddressDiscrimination.Production;
@@ -61,13 +54,11 @@ export const environment = ((
 ): {
     NETWORK: Network,
     version: string,
-    env_type: ?string,
     API: Currency,
     MOBX_DEV_TOOLS: ?string,
     commit: string,
     branch: string,
     isJest: void => boolean,
-    isDev: void => boolean,
     isShelley: void => boolean,
     isNightly: void => boolean,
     isTest: void => boolean,

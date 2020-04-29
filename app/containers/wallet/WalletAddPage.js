@@ -9,7 +9,9 @@ import { ROUTES } from '../../routes-config';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import globalMessages from '../../i18n/global-messages';
 
-import MainLayout from '../MainLayout';
+import TopBarLayout from '../../components/layout/TopBarLayout';
+import BannerContainer from '../BannerContainer';
+import type { GeneratedData as BannerContainerData } from '../BannerContainer';
 import WalletAdd from '../../components/wallet/WalletAdd';
 import AddAnotherWallet from '../../components/wallet/add/AddAnotherWallet';
 
@@ -65,7 +67,6 @@ export default class WalletAddPage extends Component<Props> {
   render() {
     const { actions, stores } = this.generated;
     const { uiDialogs } = stores;
-    const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
 
     const openTrezorConnectDialog = () => {
       actions.dialogs.open.trigger({ dialog: WalletTrezorConnectDialogContainer });
@@ -141,8 +142,8 @@ export default class WalletAddPage extends Component<Props> {
     const { hasAnyWallets } = this.generated.stores.wallets;
     if (!hasAnyWallets) {
       return (
-        <MainLayout
-          connectionErrorType={checkAdaServerStatus}
+        <TopBarLayout
+          banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
         >
           <WalletAdd
             onHardwareConnect={
@@ -154,7 +155,7 @@ export default class WalletAddPage extends Component<Props> {
             onDaedalusTransfer={this._goToDaedalusTransferRoot}
           />
           {activeDialog}
-        </MainLayout>
+        </TopBarLayout>
       );
     }
     const navbarElement = (
@@ -167,8 +168,8 @@ export default class WalletAddPage extends Component<Props> {
       />
     );
     return (
-      <MainLayout
-        connectionErrorType={checkAdaServerStatus}
+      <TopBarLayout
+        banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
         sidebar={<SidebarContainer {...this.generated.SidebarContainerProps} />}
         navbar={navbarElement}
         showInContainer
@@ -181,7 +182,7 @@ export default class WalletAddPage extends Component<Props> {
           onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreOptionDialog })}
         />
         {activeDialog}
-      </MainLayout>
+      </TopBarLayout>
     );
   }
 
@@ -217,13 +218,6 @@ export default class WalletAddPage extends Component<Props> {
         },
         wallets: {
           hasAnyWallets: stores.wallets.hasAnyWallets,
-        },
-        substores: {
-          ada: {
-            serverConnectionStore: {
-              checkAdaServerStatus: stores.substores.ada.serverConnectionStore.checkAdaServerStatus,
-            },
-          },
         },
       },
       actions: {
@@ -276,6 +270,7 @@ export default class WalletAddPage extends Component<Props> {
       WalletLedgerConnectDialogContainerProps: (
         { actions, stores, }: InjectedOrGenerated<WalletLedgerConnectDialogContainerData>
       ),
+      BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
     });
   }
 }

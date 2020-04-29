@@ -63,17 +63,6 @@ const defaultProps: {|
     wallets: {
       hasAnyWallets: boolean('hasAnyWallets', false),
     },
-    substores: {
-      ada: {
-        serverConnectionStore: {
-          checkAdaServerStatus: select(
-            'checkAdaServerStatus',
-            ServerStatusErrors,
-            ServerStatusErrors.Healthy,
-          ),
-        },
-      },
-    },
   },
   actions: {
     router: {
@@ -135,6 +124,20 @@ const defaultProps: {|
     request.WalletTrezorConnectDialogContainerProps || (null: any),
   WalletLedgerConnectDialogContainerProps:
     request.WalletLedgerConnectDialogContainerProps || (null: any),
+  BannerContainerProps: {
+    generated: {
+      stores: {
+        serverConnectionStore: {
+          checkAdaServerStatus: select(
+            'checkAdaServerStatus',
+            ServerStatusErrors,
+            ServerStatusErrors.Healthy,
+          ),
+        },
+      },
+      actions: Object.freeze({}),
+    },
+  },
 });
 
 export const MainPage = () => (

@@ -35,8 +35,8 @@ export default class TestnetWarningBanner extends Component<Props> {
   };
 
   render() {
-    if (environment.isProduction() && !environment.isShelley() && !environment.isNightly()) {
-      // banner will not shown in Mainnet non-nightly builds
+    if (environment.isProduction() && environment.isMainnet() && !environment.isNightly()) {
+      // banner will not shown in Mainnet non-nightly production builds
       return null;
     }
 
