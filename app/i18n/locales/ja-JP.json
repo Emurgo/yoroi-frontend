@@ -142,6 +142,7 @@
   "noticeBoard.notice.stakeUndelegated.subMessage": "次の2エポックの報酬はまだ受け取られる予定です",
   "noticeBoard.notice.stakeUndelegated.title": "プール [{poolTicker}] からの委任を行っていません",
   "noticeBoard.topbar.title": "通知",
+  "notprod.label.message": "WARNING: non-production build. If unexpected, double-check Yoroi installation.",
   "profile.languageSelect.form.languageSelectLabel": "使用する言語を選んでください",
   "profile.languageSelect.intro": "ヨロイShelleyテストネットを使用しています",
   "profile.languageSelect.title": "言語の選択",
