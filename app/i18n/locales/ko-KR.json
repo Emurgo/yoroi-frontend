@@ -142,6 +142,7 @@
   "noticeBoard.notice.stakeUndelegated.subMessage": "이후 두 에포크 동안의 보상은 계속 수령될 것입니다.",
   "noticeBoard.notice.stakeUndelegated.title": "[{poolTicker}]으로의 위임을 해제하였습니다.",
   "noticeBoard.topbar.title": "알림",
+  "notprod.label.message": "WARNING: non-production build. If unexpected, double-check Yoroi installation.",
   "profile.languageSelect.form.languageSelectLabel": "언어 선택",
   "profile.languageSelect.intro": "현재 요로이 테스트넷을 사용 중입니다.",
   "profile.languageSelect.title": "언어 선택",
