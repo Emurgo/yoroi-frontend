@@ -142,6 +142,7 @@
   "noticeBoard.notice.stakeUndelegated.subMessage": "Rewards for next two epochs will still be received",
   "noticeBoard.notice.stakeUndelegated.title": "You have undelegated from the pool [{poolTicker}]",
   "noticeBoard.topbar.title": "Notification",
+  "notprod.label.message": "WARNING: non-production build. If unexpected, double-check Yoroi installation.",
   "profile.languageSelect.form.languageSelectLabel": "Pilih Bahasa Anda",
   "profile.languageSelect.intro": "You are on the Yoroi Shelley Testnet",
   "profile.languageSelect.title": "Pilih Bahasa",
