@@ -142,6 +142,7 @@
   "noticeBoard.notice.stakeUndelegated.subMessage": "下两个纪元的奖励还会收到",
   "noticeBoard.notice.stakeUndelegated.title": "你已从权益池撤销委托{poolTicker}",
   "noticeBoard.topbar.title": "通知",
+  "notprod.label.message": "WARNING: non-production build. If unexpected, double-check Yoroi installation.",
   "profile.languageSelect.form.languageSelectLabel": "请选择您的语言",
   "profile.languageSelect.intro": "您正在Yoroi Shelley测试网上",
   "profile.languageSelect.title": "语言选择",
