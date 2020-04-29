@@ -20,7 +20,6 @@ function getVersion(): string {
   return content.version;
 }
 
-console.log(process.env);
 export const environment = ((
   {
     ...process.env,
