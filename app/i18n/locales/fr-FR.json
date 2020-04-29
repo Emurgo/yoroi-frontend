@@ -142,6 +142,7 @@
   "noticeBoard.notice.stakeUndelegated.subMessage": "Les récompenses pour les deux prochaines époques seront toujours reçues",
   "noticeBoard.notice.stakeUndelegated.title": "Vous avez arrêté la délégation au groupe d'enjeu [{poolTicker}]",
   "noticeBoard.topbar.title": "Notification",
+  "notprod.label.message": "WARNING: non-production build. If unexpected, double-check Yoroi installation.",
   "profile.languageSelect.form.languageSelectLabel": "Choisissez votre langue",
   "profile.languageSelect.intro": "Vous êtes sur Yoroi Shelley Testnet",
   "profile.languageSelect.title": "Sélection de la langue",
