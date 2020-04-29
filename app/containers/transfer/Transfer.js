@@ -5,7 +5,9 @@ import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
-import MainLayout from '../MainLayout';
+import TopBarLayout from '../../components/layout/TopBarLayout';
+import BannerContainer from '../BannerContainer';
+import type { GeneratedData as BannerContainerData } from '../BannerContainer';
 import SidebarContainer from '../SidebarContainer';
 import BackgroundColoredLayout from '../../components/layout/BackgroundColoredLayout';
 import NoWalletMessage from '../../components/wallet/settings/NoWalletMessage';
@@ -36,9 +38,7 @@ export default class Transfer extends Component<Props> {
   };
 
   render() {
-    const { stores } = this.generated;
     const sidebarContainer = (<SidebarContainer {...this.generated.SidebarContainerProps} />);
-    const { checkAdaServerStatus } = stores.serverConnectionStore;
 
     const navbar = (
       <NavBarContainer
@@ -50,14 +50,14 @@ export default class Transfer extends Component<Props> {
     );
 
     return (
-      <MainLayout
+      <TopBarLayout
+        banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
         navbar={navbar}
         sidebar={sidebarContainer}
-        connectionErrorType={checkAdaServerStatus}
         showInContainer
       >
         {this.getContent()}
-      </MainLayout>
+      </TopBarLayout>
     );
   }
 
@@ -89,9 +89,6 @@ export default class Transfer extends Component<Props> {
         app: {
           currentRoute: stores.app.currentRoute,
         },
-        serverConnectionStore: {
-          checkAdaServerStatus: stores.substores.ada.serverConnectionStore.checkAdaServerStatus,
-        },
         wallets: {
           selected: stores.wallets.selected,
         }
@@ -110,6 +107,7 @@ export default class Transfer extends Component<Props> {
       WalletTransferPageProps: (
         { actions, stores, }: InjectedOrGenerated<WalletTransferPageData>
       ),
+      BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
     });
   }
 }

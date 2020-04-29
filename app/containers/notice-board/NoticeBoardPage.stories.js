@@ -67,13 +67,6 @@ export const Generic = () => {
           profile: {
             isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
           },
-          serverConnectionStore: {
-            checkAdaServerStatus: select(
-              'checkAdaServerStatus',
-              ServerStatusErrors,
-              ServerStatusErrors.Healthy,
-            ),
-          },
           topbar: {
             isActiveCategory: () => false,
             categories: [],
@@ -100,7 +93,21 @@ export const Generic = () => {
           noticeBoard: {
             loadMore: { trigger: async (request) => action('loadMore')(request) },
           },
-        }
+        },
+        BannerContainerProps: {
+          generated: {
+            stores: {
+              serverConnectionStore: {
+                checkAdaServerStatus: select(
+                  'checkAdaServerStatus',
+                  ServerStatusErrors,
+                  ServerStatusErrors.Healthy,
+                ),
+              },
+            },
+            actions: Object.freeze({}),
+          },
+        },
       }}
     />
   );

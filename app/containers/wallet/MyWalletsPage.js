@@ -7,7 +7,7 @@ import { intlShape, defineMessages } from 'react-intl';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 
 import MyWallets from '../../components/wallet/my-wallets/MyWallets';
-import MainLayout from '../MainLayout';
+import TopBarLayout from '../../components/layout/TopBarLayout';
 
 import WalletsList from '../../components/wallet/my-wallets/WalletsList';
 import WalletRow from '../../components/wallet/my-wallets/WalletRow';
@@ -16,6 +16,8 @@ import WalletCurrency from '../../components/wallet/my-wallets/WalletCurrency';
 import WalletSubRow from '../../components/wallet/my-wallets/WalletSubRow';
 import NavPlate from '../../components/topbar/NavPlate';
 import SidebarContainer from '../SidebarContainer';
+import BannerContainer from '../BannerContainer';
+import type { GeneratedData as BannerContainerData } from '../BannerContainer';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import { ROUTES } from '../../routes-config';
 import NavBar from '../../components/topbar/NavBar';
@@ -72,7 +74,6 @@ export default class MyWalletsPage extends Component<Props> {
     const { intl } = this.context;
     const { stores } = this.generated;
     const { profile } = stores;
-    const { checkAdaServerStatus } = stores.serverConnectionStore;
     const sidebarContainer = (<SidebarContainer {...this.generated.SidebarContainerProps} />);
 
     const wallets = this.generated.stores.wallets.publicDerivers;
@@ -124,16 +125,16 @@ export default class MyWalletsPage extends Component<Props> {
     );
 
     return (
-      <MainLayout
+      <TopBarLayout
+        banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
         sidebar={sidebarContainer}
         navbar={navbarElement}
-        connectionErrorType={checkAdaServerStatus}
         showInContainer
       >
         <MyWallets>
           {walletsList}
         </MyWallets>
-      </MainLayout>
+      </TopBarLayout>
     );
   }
 
@@ -287,9 +288,6 @@ export default class MyWalletsPage extends Component<Props> {
           publicDerivers: stores.wallets.publicDerivers,
           getPublicKeyCache: stores.wallets.getPublicKeyCache,
         },
-        serverConnectionStore: {
-          checkAdaServerStatus: stores.substores.ada.serverConnectionStore.checkAdaServerStatus,
-        },
         substores: {
           ada: {
             transactions: {
@@ -319,6 +317,7 @@ export default class MyWalletsPage extends Component<Props> {
       SidebarContainerProps: (
         { actions, stores }: InjectedOrGenerated<SidebarContainerData>
       ),
+      BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
     });
   }
 }

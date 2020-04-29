@@ -4,9 +4,10 @@ import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import { intlShape, defineMessages } from 'react-intl';
 
-import environment from '../../environment';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
-import MainLayout from '../MainLayout';
+import TopBarLayout from '../../components/layout/TopBarLayout';
+import BannerContainer from '../BannerContainer';
+import type { GeneratedData as BannerContainerData } from '../BannerContainer';
 import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import TopBar from '../../components/topbar/TopBar';
 import NoticeBoard from '../../components/notice-board/NoticeBoard';
@@ -68,12 +69,12 @@ export default class NoticeBoardPage extends Component<InjectedOrGenerated<Gener
     }
 
     return (
-      <MainLayout
+      <TopBarLayout
+        banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
         topbar={topbarComp}
-        connectionErrorType={this.generated.stores.serverConnectionStore.checkAdaServerStatus}
       >
         {noticeComp}
-      </MainLayout>
+      </TopBarLayout>
     );
   }
 
@@ -90,10 +91,6 @@ export default class NoticeBoardPage extends Component<InjectedOrGenerated<Gener
       stores: {
         profile: {
           isClassicTheme: profileStore.isClassicTheme,
-        },
-        serverConnectionStore: {
-          checkAdaServerStatus: stores.substores[environment.API]
-            .serverConnectionStore.checkAdaServerStatus,
         },
         topbar: {
           isActiveCategory: stores.topbar.isActiveCategory,
@@ -114,6 +111,7 @@ export default class NoticeBoardPage extends Component<InjectedOrGenerated<Gener
           loadMore: { trigger: actions.noticeBoard.loadMore.trigger },
         },
       },
+      BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
     });
   }
 }
