@@ -1,7 +1,7 @@
-# Paper Wallets
+# "Papier" Portemonnees
 
-A **"Paper Wallet"** is a special document, containing secret mnemonics words and a small set of addresses. When a paper wallet is created **it is NOT stored by Yoroi**. The generated PDF document is the only copy of this wallet in existence.
+Een **"Papier" Portemonnee"** is a speciaal document dat een geheime reeks van woorden (herstelzin) bevat en een kleine set van adressen. Een "Papier" Portemonnee wordt **niet opgeslagen bij Yoroi.** De aangemaakte PDF is de enige kopie van de Portemonnee die bestaat.
 
-You can use a paper wallet to receive coins using the pre-generated addresses. You can restore your paper wallet at any time into Yoroi to access the funds. However, you should stop using a paper wallet after you restore its funds as it will no longer be a "cold" wallet.
+U kunt een "Papier" Portemonnee gebruiken om munten te ontvangen met behulp van de vooraf gegenereerde adressen. U kunt uw "Papier" Portemonnee op elk moment in Yoroi herstellen om toegang te krijgen tot het geld. U moet echter stoppen met het gebruik van deze "Papier" Portemonnee nadat u het geld heeft teruggeplaatst, omdat het niet langer een "koude" portemonnee zal zijn.
 
-Yoroi Paper Wallets are protected with a **custom user password** and contain 21 secret words. Even if someone gets access to this paper-wallet, they will also need to know your password to gain access to the funds. **But if you lose or forget your password, your funds will be lost forever and no one will be able to restore them**. Typing the wrong wallet password will give you a different wallet. This allows for plausible deniability.
+Yoroi "Papier" Portemonnees zijn beveiligd met een **<u>uniek</u> gebruikers wachtwoord** en bevat 21 geheime woorden. Zelfs als iemand toegang krijgt tot de "Papier" Portemonnee zullen ze uw wachtwoord moeten kennen om bij het kapitaal te komen. **Maar als u uw wachtwoord verliest of vergeet, dan is uw kapitaal op deze Portemonnee voor ALTIJD verdwenen en zal NIEMAND in staat zijn dit te herstellen.** Het invoeren van een verkeerd wachtwoord kan een andere Portemonnee herstellen en is aannemelijke ontkenning van de Portemonnee mogelijk.
