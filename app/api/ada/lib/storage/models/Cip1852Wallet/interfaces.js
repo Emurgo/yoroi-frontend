@@ -19,5 +19,4 @@ export interface ICip1852Wallet {
     privateDeriverKeyDerivationId: number | null,
     protocolMagic: number,
   ): ICip1852Wallet;
-  getWrapperId(): number;
 }

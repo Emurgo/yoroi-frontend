@@ -27,7 +27,6 @@ Array [
   Object {
     "Bip44Wrapper": Array [
       Object {
-        "Bip44WrapperId": 1,
         "ConceptualWalletId": 1,
         "PrivateDeriverKeyDerivationId": null,
         "PrivateDeriverLevel": null,
@@ -59,13 +58,7 @@ Array [
       Object {
         "ConceptualWalletId": 1,
         "DeviceId": "",
-        "HwWalletMetaId": 1,
-        "Label": "",
-        "Language": "",
-        "MajorVersion": 1,
-        "MinorVersion": 0,
         "Model": "NanoS",
-        "PatchVersion": 0,
         "Vendor": "ledger.com",
       },
     ],
@@ -452,7 +445,6 @@ Array [
   Object {
     "Bip44Wrapper": Array [
       Object {
-        "Bip44WrapperId": 1,
         "ConceptualWalletId": 1,
         "PrivateDeriverKeyDerivationId": 1,
         "PrivateDeriverLevel": 0,
@@ -870,7 +862,6 @@ Array [
   Object {
     "Bip44Wrapper": Array [
       Object {
-        "Bip44WrapperId": 1,
         "ConceptualWalletId": 1,
         "PrivateDeriverKeyDerivationId": null,
         "PrivateDeriverLevel": null,
@@ -901,14 +892,8 @@ Array [
     "HwWalletMeta": Array [
       Object {
         "ConceptualWalletId": 1,
-        "DeviceId": "Trezorro",
-        "HwWalletMetaId": 1,
-        "Label": "C875BA9D0C571FF4B8718FAA",
-        "Language": "english",
-        "MajorVersion": 2,
-        "MinorVersion": 1,
+        "DeviceId": "C875BA9D0C571FF4B8718FAA",
         "Model": "T",
-        "PatchVersion": 1,
         "Vendor": "trezor.io",
       },
     ],

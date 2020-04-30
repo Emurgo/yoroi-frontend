@@ -27,7 +27,6 @@ export class Cip1852Wallet
    * Should only cache information we know will never change
    */
 
-  #bip44WrapperId: number;
   #publicDeriverLevel: number;
   #signingLevel: number | null;
   #privateDeriverLevel: number | null;
@@ -46,17 +45,12 @@ export class Cip1852Wallet
     protocolMagic: number,
   ): Cip1852Wallet {
     super(conceptualWalletCtorData);
-    this.#bip44WrapperId = row.Cip1852WrapperId;
     this.#publicDeriverLevel = row.PublicDeriverLevel;
     this.#signingLevel = row.SignerLevel;
     this.#privateDeriverLevel = privateDeriverLevel;
     this.#privateDeriverKeyDerivationId = privateDeriverKeyDerivationId;
     this.#protocolMagic = protocolMagic;
     return this;
-  }
-
-  getWrapperId(): number {
-    return this.#bip44WrapperId;
   }
 
   getDerivationTables: void => Map<number, string> = () => {

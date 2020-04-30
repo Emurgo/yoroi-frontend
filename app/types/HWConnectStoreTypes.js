@@ -24,7 +24,8 @@ export interface ProgressInfo {
 
 export interface HWDeviceInfo {
   publicMasterKey: string,
-  hwFeatures: HWFeatures
+  hwFeatures: HWFeatures,
+  defaultName: string,
 }
 
 export interface HWConnectStoreTypes<ConnectionResponse> {

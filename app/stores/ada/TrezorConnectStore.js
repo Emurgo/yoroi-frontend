@@ -64,7 +64,7 @@ export default class TrezorConnectStore
   get defaultWalletName(): string {
     let defaultWalletName = '';
     if (this.hwDeviceInfo && this.hwDeviceInfo.hwFeatures) {
-      defaultWalletName = this.hwDeviceInfo.hwFeatures.Label;
+      defaultWalletName = this.hwDeviceInfo.defaultName;
     }
     return defaultWalletName;
   }
@@ -239,12 +239,8 @@ export default class TrezorConnectStore
         Vendor: deviceFeatures.vendor,
         Model: deviceFeatures.model,
         DeviceId: deviceFeatures.device_id,
-        Label: deviceFeatures.label || '',
-        MajorVersion: deviceFeatures.major_version,
-        MinorVersion: deviceFeatures.minor_version,
-        PatchVersion: deviceFeatures.patch_version,
-        Language: deviceFeatures.language,
-      }
+      },
+      defaultName: deviceFeatures.label || '',
     };
   }
 

@@ -209,12 +209,7 @@ export async function storagev2Migation(
         : {
           Vendor: wallet.adaWallet.cwHardwareInfo.vendor,
           Model: wallet.adaWallet.cwHardwareInfo.model,
-          Label: wallet.adaWallet.cwHardwareInfo.deviceId,
-          DeviceId: wallet.adaWallet.cwHardwareInfo.label,
-          Language: wallet.adaWallet.cwHardwareInfo.language,
-          MajorVersion: wallet.adaWallet.cwHardwareInfo.majorVersion,
-          MinorVersion: wallet.adaWallet.cwHardwareInfo.minorVersion,
-          PatchVersion: wallet.adaWallet.cwHardwareInfo.patchVersion,
+          DeviceId: wallet.adaWallet.cwHardwareInfo.deviceId,
         },
       settings,
       walletName: wallet.adaWallet.cwMeta.cwName,

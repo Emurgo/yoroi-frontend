@@ -88,19 +88,13 @@ export const LastSyncInfoSchema: {|
 export type HWFeatures = {|
   Vendor: string,
   Model: string,
-  Label: string,
   DeviceId: string,
-  Language: string,
-  MajorVersion: number,
-  MinorVersion: number,
-  PatchVersion: number,
 |};
 export type HwWalletMetaInsert = {|
   ConceptualWalletId: number,
   ...HWFeatures,
 |};
 export type HwWalletMetaRow = {|
-  HwWalletMetaId: number,
   ...HwWalletMetaInsert,
 |};
 export const HwWalletMetaSchema: {|
@@ -109,16 +103,10 @@ export const HwWalletMetaSchema: {|
 |} = {
   name: 'HwWalletMeta',
   properties: {
-    HwWalletMetaId: 'HwWalletMetaId',
     ConceptualWalletId: 'ConceptualWalletId',
     Vendor: 'Vendor',
     Model: 'Model',
-    Label: 'Label',
     DeviceId: 'DeviceId',
-    Language: 'Language',
-    MajorVersion: 'MajorVersion',
-    MinorVersion: 'MinorVersion',
-    PatchVersion: 'PatchVersion',
   }
 };
 
@@ -183,20 +171,10 @@ export const populateWalletDb = (schemaBuilder: lf$schema$Builder) => {
 
   // HwWalletMeta Table
   schemaBuilder.createTable(HwWalletMetaSchema.name)
-    .addColumn(HwWalletMetaSchema.properties.HwWalletMetaId, Type.INTEGER)
     .addColumn(HwWalletMetaSchema.properties.ConceptualWalletId, Type.INTEGER)
     .addColumn(HwWalletMetaSchema.properties.Vendor, Type.STRING)
     .addColumn(HwWalletMetaSchema.properties.Model, Type.STRING)
-    .addColumn(HwWalletMetaSchema.properties.Label, Type.STRING)
     .addColumn(HwWalletMetaSchema.properties.DeviceId, Type.STRING)
-    .addColumn(HwWalletMetaSchema.properties.Language, Type.STRING)
-    .addColumn(HwWalletMetaSchema.properties.MajorVersion, Type.INTEGER)
-    .addColumn(HwWalletMetaSchema.properties.MinorVersion, Type.INTEGER)
-    .addColumn(HwWalletMetaSchema.properties.PatchVersion, Type.INTEGER)
-    .addPrimaryKey(
-      ([HwWalletMetaSchema.properties.HwWalletMetaId]: Array<string>),
-      true,
-    )
     .addForeignKey('HwWalletMetaSchema_ConceptualWallet', {
       local: HwWalletMetaSchema.properties.ConceptualWalletId,
       ref: `${ConceptualWalletSchema.name}.${ConceptualWalletSchema.properties.ConceptualWalletId}`,

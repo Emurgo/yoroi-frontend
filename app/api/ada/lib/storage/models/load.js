@@ -45,14 +45,14 @@ export async function loadWalletsFromStorage(
   {
     const bip44Map = new Map<number, Bip44Wallet>();
     for (const entry of walletsInStorage.bip44) {
-      let bip44Wallet = bip44Map.get(entry.Bip44Wrapper.Bip44WrapperId);
+      let bip44Wallet = bip44Map.get(entry.Bip44Wrapper.ConceptualWalletId);
       if (bip44Wallet == null) {
         bip44Wallet = await Bip44Wallet.createBip44Wallet(
           db,
           entry.Bip44Wrapper,
           protocolMagic,
         );
-        bip44Map.set(entry.Bip44Wrapper.Bip44WrapperId, bip44Wallet);
+        bip44Map.set(entry.Bip44Wrapper.ConceptualWalletId, bip44Wallet);
       }
       const publicDeriver = await PublicDeriver.createPublicDeriver(
         entry.PublicDeriver,
@@ -65,14 +65,14 @@ export async function loadWalletsFromStorage(
   {
     const cip1852Map = new Map<number, Cip1852Wallet>();
     for (const entry of walletsInStorage.cip1852) {
-      let cip1852Wallet = cip1852Map.get(entry.Cip1852Wrapper.Cip1852WrapperId);
+      let cip1852Wallet = cip1852Map.get(entry.Cip1852Wrapper.ConceptualWalletId);
       if (cip1852Wallet == null) {
         cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(
           db,
           entry.Cip1852Wrapper,
           protocolMagic,
         );
-        cip1852Map.set(entry.Cip1852Wrapper.Cip1852WrapperId, cip1852Wallet);
+        cip1852Map.set(entry.Cip1852Wrapper.ConceptualWalletId, cip1852Wallet);
       }
       const publicDeriver = await PublicDeriver.createPublicDeriver(
         entry.PublicDeriver,

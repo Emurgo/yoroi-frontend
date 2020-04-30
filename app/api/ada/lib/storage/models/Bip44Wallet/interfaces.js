@@ -18,5 +18,4 @@ export interface IBip44Wallet {
     privateDeriverLevel: number | null,
     privateDeriverKeyDerivationId: number | null,
   ): IBip44Wallet;
-  getWrapperId(): number;
 }
