@@ -142,7 +142,7 @@
   "noticeBoard.notice.stakeUndelegated.subMessage": "Erträge für die nächsten zwei Epochen werden noch ankommen",
   "noticeBoard.notice.stakeUndelegated.title": "Du hast die Delegierung vom Pool [{poolTicker}] entfernt",
   "noticeBoard.topbar.title": "Benachrichtigung",
-  "notprod.label.message": "WARNING: non-production build. If unexpected, double-check Yoroi installation.",
+  "notprod.label.message": "WARNUNG: Nicht-produktions-build. Falls unerwartet, überprüfen Sie die Yoroi Installation noch einmal.",
   "profile.languageSelect.form.languageSelectLabel": "Wähle deine Sprache",
   "profile.languageSelect.intro": "Du bist im Yoroi Shelle Testnet",
   "profile.languageSelect.title": "Sprachauswahl",
