@@ -128,6 +128,14 @@ const globalMessages = defineMessages({
     id: 'global.language.french',
     defaultMessage: '!!!Français',
   },
+  languagePortuguese: {
+    id: 'global.language.portuguese',
+    defaultMessage: '!!!Português',
+  },
+  languageDutch: {
+    id: 'global.language.dutch',
+    defaultMessage: '!!!Nederlands',
+  },
   languageIndonesian: {
     id: 'global.language.indonesian',
     defaultMessage: '!!!Bahasa Indonesia',
@@ -278,11 +286,11 @@ const globalMessages = defineMessages({
   },
   languageSelectLabelInfo: {
     id: 'settings.general.languageSelect.labelInfo',
-    defaultMessage: '!!!Language Label Info',
+    defaultMessage: '!!!The selected language translation is fully provided by the community',
   },
   languageSelectInfo: {
     id: 'settings.general.languageSelect.info',
-    defaultMessage: '!!!Language Info',
+    defaultMessage: '!!!For EMURGO, friendliness in Yoroi is an important topic. We believe understanding blockchain concepts is easier in your native language. We try supporting as many languages as possible, but for a broader selection of languages we need to accept the help from community translators. The selected language translation is fully provided by the community.',
   },
   translationAcknowledgment: {
     id: 'settings.general.translation.acknowledgment',

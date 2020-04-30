@@ -8,9 +8,11 @@ import Chinese from '../assets/images/flags/chinese.inline.svg';
 import RussianFlag from '../assets/images/flags/russian.inline.svg';
 import GermanFlag from '../assets/images/flags/german.inline.svg';
 import FrenchFlag from '../assets/images/flags/french.inline.svg';
+import DutchFlag from '../assets/images/flags/dutch.inline.svg';
+import BrazilFlag from '../assets/images/flags/brazil.inline.svg';
 import SpanishFlag from '../assets/images/flags/spanish.inline.svg';
 import ItalianFlag from '../assets/images/flags/italian.inline.svg';
-import IdonesianFlag from '../assets/images/flags/indonesian.inline.svg';
+import IndonesianFlag from '../assets/images/flags/indonesian.inline.svg';
 
 // This is essentially bulk require
 
@@ -71,6 +73,16 @@ export const LANGUAGES: Array<LanguageType> = [
     svg: FrenchFlag
   },
   {
+    value: 'nl-NL',
+    label: globalMessages.languageDutch,
+    svg: DutchFlag
+  },
+  {
+    value: 'pt-BR',
+    label: globalMessages.languagePortuguese,
+    svg: BrazilFlag
+  },
+  {
     value: 'es-ES',
     label: globalMessages.languageSpanish,
     svg: SpanishFlag
@@ -83,6 +95,6 @@ export const LANGUAGES: Array<LanguageType> = [
   {
     value: 'id-ID',
     label: globalMessages.languageIndonesian,
-    svg: IdonesianFlag
+    svg: IndonesianFlag
   },
 ];

@@ -13,6 +13,8 @@ import zh from 'react-intl/locale-data/zh';
 import ru from 'react-intl/locale-data/ru';
 import de from 'react-intl/locale-data/de';
 import fr from 'react-intl/locale-data/fr';
+import nl from 'react-intl/locale-data/nl';
+import pt from 'react-intl/locale-data/pt';
 import id from 'react-intl/locale-data/id';
 import es from 'react-intl/locale-data/es';
 import it from 'react-intl/locale-data/it';
@@ -28,7 +30,7 @@ import environment from './environment';
 import MaintenancePage from './containers/MaintenancePage';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
-addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr, ...id, ...es, ...it]);
+addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr, ...nl, ...pt, ...id, ...es, ...it]);
 
 type Props = {|
   +stores: StoresMap,
