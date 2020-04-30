@@ -142,7 +142,7 @@
   "noticeBoard.notice.stakeUndelegated.subMessage": "Las recompensas para los próximos dos epochs se seguirán recibiendo",
   "noticeBoard.notice.stakeUndelegated.title": "Has dejado de delegar en el pool [{poolTicker}]",
   "noticeBoard.topbar.title": "Notificación",
-  "notprod.label.message": "WARNING: non-production build. If unexpected, double-check Yoroi installation.",
+  "notprod.label.message": "ADVERTENCIA: Esta versión no es de producción. Si no lo sabías, vuelve a comprobar la instalación de Yoroi.",
   "profile.languageSelect.form.languageSelectLabel": "Elige tu idioma",
   "profile.languageSelect.intro": "Estás en Yoroi Testnet de Shelley",
   "profile.languageSelect.title": "Selección de idioma",
