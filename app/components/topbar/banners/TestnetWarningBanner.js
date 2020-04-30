@@ -79,15 +79,18 @@ export default class TestnetWarningBanner extends Component<Props> {
         </div>
       );
     }
-    return (
-      <div className={styles.testnetWarning}>
-        <span key="0" className={styles.warningIcon}><WarningSvg /></span>
-        <FormattedMessage
-          {...messages.testnetLabel}
-          values={{ faqLink, network: environment.NETWORK }}
-          key="1"
-        />
-      </div>
-    );
+    if (!environment.isMainnet()) {
+      return (
+        <div className={styles.testnetWarning}>
+          <span key="0" className={styles.warningIcon}><WarningSvg /></span>
+          <FormattedMessage
+            {...messages.testnetLabel}
+            values={{ faqLink, network: environment.NETWORK }}
+            key="1"
+          />
+        </div>
+      );
+    }
+    return null;
   }
 }

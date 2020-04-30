@@ -248,24 +248,12 @@ export const ledgerErrorCases = Object.freeze({
 
 export const mockLedgerMeta = {
   DeviceId: '',
-  HwWalletMetaId: 1,
-  Label: '',
-  Language: '',
-  MajorVersion: 1,
-  MinorVersion: 0,
   Model: 'NanoS',
-  PatchVersion: 0,
   Vendor: 'ledger.com',
 };
 export const mockTrezorMeta = {
-  DeviceId: 'Trezorro',
-  HwWalletMetaId: 1,
-  Label: 'C875BA9D0C571FF4B8718FAA',
-  Language: 'english',
-  MajorVersion: 2,
-  MinorVersion: 1,
+  DeviceId: 'C875BA9D0C571FF4B8718FAA',
   Model: 'T',
-  PatchVersion: 1,
   Vendor: 'trezor.io',
 };
 
@@ -283,7 +271,6 @@ function genDummyWallet(): PublicDeriver<> {
       hardwareInfo: null,
     },
     {
-      Cip1852WrapperId: 0,
       ConceptualWalletId: conceptualWalletId,
       SignerLevel: null,
       PublicDeriverLevel: 0,
@@ -406,7 +393,6 @@ function genSigningWallet(
       hardwareInfo,
     },
     {
-      Cip1852WrapperId: 0,
       ConceptualWalletId: conceptualWalletId,
       SignerLevel: null,
       PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,

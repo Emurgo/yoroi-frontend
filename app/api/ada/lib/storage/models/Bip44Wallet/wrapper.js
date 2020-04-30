@@ -35,7 +35,6 @@ export class Bip44Wallet
    * Should only cache information we know will never change
    */
 
-  #bip44WrapperId: number;
   #publicDeriverLevel: number;
   #signingLevel: number | null;
   #privateDeriverLevel: number | null;
@@ -53,7 +52,6 @@ export class Bip44Wallet
     privateDeriverKeyDerivationId: number | null,
   ): Bip44Wallet {
     super(conceptualWalletCtorData);
-    this.#bip44WrapperId = row.Bip44WrapperId;
     this.#publicDeriverLevel = row.PublicDeriverLevel;
     this.#signingLevel = row.SignerLevel;
     this.#privateDeriverLevel = privateDeriverLevel;
@@ -63,10 +61,6 @@ export class Bip44Wallet
 
   getDerivationTables: void => Map<number, string> = () => {
     return Bip44TableMap;
-  }
-
-  getWrapperId(): number {
-    return this.#bip44WrapperId;
   }
 
   getPublicDeriverLevel(): number {

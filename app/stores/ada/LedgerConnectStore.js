@@ -179,20 +179,16 @@ export default class LedgerConnectStore
   ) => {
     this._validateHWResponse(resp);
 
-    const { ePublicKey, deviceVersion } = resp;
+    const { ePublicKey, } = resp;
 
     return {
       publicMasterKey: ePublicKey.publicKeyHex + ePublicKey.chainCodeHex,
       hwFeatures: {
         Vendor: Config.wallets.hardwareWallet.ledgerNano.VENDOR,
         Model: '', // Ledger does not provide device model info up till now
-        Label: '',
         DeviceId: '',
-        Language: '',
-        MajorVersion: parseInt(deviceVersion.major, 10),
-        MinorVersion: parseInt(deviceVersion.minor, 10),
-        PatchVersion: parseInt(deviceVersion.patch, 10),
-      }
+      },
+      defaultName: '',
     };
   }
 

@@ -482,7 +482,6 @@ Object {
   ],
   "Bip44Wrapper": Array [
     Object {
-      "Bip44WrapperId": 1,
       "ConceptualWalletId": 1,
       "PrivateDeriverKeyDerivationId": 1,
       "PrivateDeriverLevel": 0,

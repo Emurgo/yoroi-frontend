@@ -31,7 +31,7 @@ export class GetCip1852Wrapper {
       db, tx,
       key,
       GetCip1852Wrapper.ownTables[Tables.Cip1852WrapperSchema.name].name,
-      GetCip1852Wrapper.ownTables[Tables.Cip1852WrapperSchema.name].properties.Cip1852WrapperId,
+      GetCip1852Wrapper.ownTables[Tables.Cip1852WrapperSchema.name].properties.ConceptualWalletId,
     );
   }
 }
@@ -59,37 +59,6 @@ export class GetAllCip1852Wallets {
     const query = db
       .select()
       .from(Cip1852WrapperTable)
-      .innerJoin(
-        publicDeriverTable,
-        publicDeriverTable[PublicDeriverSchema.properties.ConceptualWalletId].eq(
-          Cip1852WrapperTable[PublicDeriverSchema.properties.ConceptualWalletId]
-        )
-      );
-
-    return await tx.attach(query);
-  }
-
-  static async forCip1852Wallet(
-    db: lf$Database,
-    tx: lf$Transaction,
-    Cip1852WrapperId: number,
-  ): Promise<$ReadOnlyArray<{|
-    PublicDeriver: $ReadOnly<PublicDeriverRow>,
-  |}>> {
-    const publicDeriverTable = db.getSchema().table(
-      GetAllCip1852Wallets.ownTables[PublicDeriverSchema.name].name
-    );
-    const Cip1852WrapperTable = db.getSchema().table(
-      GetAllCip1852Wallets.ownTables[Tables.Cip1852WrapperSchema.name].name
-    );
-    const query = db
-      .select()
-      .from(Cip1852WrapperTable)
-      .where(
-        Cip1852WrapperTable[Tables.Cip1852WrapperSchema.properties.Cip1852WrapperId].eq(
-          Cip1852WrapperId
-        )
-      )
       .innerJoin(
         publicDeriverTable,
         publicDeriverTable[PublicDeriverSchema.properties.ConceptualWalletId].eq(

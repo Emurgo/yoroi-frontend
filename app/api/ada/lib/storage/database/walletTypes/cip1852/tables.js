@@ -17,7 +17,6 @@ export type Cip1852WrapperInsert = {|
   RootKeyDerivationId: number,
 |};
 export type Cip1852WrapperRow = {|
-  Cip1852WrapperId: number, // serial
   ...Cip1852WrapperInsert,
 |};
 export const Cip1852WrapperSchema: {|
@@ -26,7 +25,6 @@ export const Cip1852WrapperSchema: {|
 |} = {
   name: 'Cip1852Wrapper',
   properties: {
-    Cip1852WrapperId: 'Cip1852WrapperId',
     ConceptualWalletId: 'ConceptualWalletId',
     SignerLevel: 'SignerLevel',
     PublicDeriverLevel: 'PublicDeriverLevel',
@@ -39,17 +37,12 @@ export const Cip1852WrapperSchema: {|
 export const populateCip1852Db = (schemaBuilder: lf$schema$Builder) => {
   // Cip1852Wrapper Table
   schemaBuilder.createTable(Cip1852WrapperSchema.name)
-    .addColumn(Cip1852WrapperSchema.properties.Cip1852WrapperId, Type.INTEGER)
     .addColumn(Cip1852WrapperSchema.properties.ConceptualWalletId, Type.INTEGER)
     .addColumn(Cip1852WrapperSchema.properties.SignerLevel, Type.INTEGER)
     .addColumn(Cip1852WrapperSchema.properties.PublicDeriverLevel, Type.INTEGER)
     .addColumn(Cip1852WrapperSchema.properties.PrivateDeriverLevel, Type.INTEGER)
     .addColumn(Cip1852WrapperSchema.properties.PrivateDeriverKeyDerivationId, Type.INTEGER)
     .addColumn(Cip1852WrapperSchema.properties.RootKeyDerivationId, Type.INTEGER)
-    .addPrimaryKey(
-      ([Cip1852WrapperSchema.properties.Cip1852WrapperId]: Array<string>),
-      true
-    )
     .addForeignKey('Cip1852Wrapper_ConceptualWallet', {
       local: Cip1852WrapperSchema.properties.ConceptualWalletId,
       ref: `${ConceptualWalletSchema.name}.${ConceptualWalletSchema.properties.ConceptualWalletId}`,
@@ -63,6 +56,9 @@ export const populateCip1852Db = (schemaBuilder: lf$schema$Builder) => {
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
       action: ConstraintAction.CASCADE,
     })
+    .addUnique('Cip1852Wrapper_ConceptualWallet_Unique', [
+      Cip1852WrapperSchema.properties.ConceptualWalletId,
+    ])
     .addNullable([
       Cip1852WrapperSchema.properties.SignerLevel,
       Cip1852WrapperSchema.properties.PrivateDeriverLevel,
