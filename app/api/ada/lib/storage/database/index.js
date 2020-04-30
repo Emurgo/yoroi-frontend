@@ -76,7 +76,7 @@ export const loadLovefieldDB = async (
 const populateAndCreate = async (
   storeType: $Values<typeof schema.DataStoreType>
 ): Promise<lf$Database> => {
-  const schemaBuilder = schema.create('yoroi-schema', 8);
+  const schemaBuilder = schema.create('yoroi-schema', 9);
 
   populatePrimitivesDb(schemaBuilder);
   populateWalletDb(schemaBuilder);
@@ -176,5 +176,16 @@ async function onUpgrade(
       clearRequest.onsuccess = () => resolve();
       clearRequest.onerror = () => resolve();
     });
+  }
+
+  if (version >= 3 && version <= 9) {
+    await rawDb.dropTableColumn(
+      'Bip44Wrapper',
+      'Bip44WrapperId',
+    );
+    await rawDb.dropTableColumn(
+      'Cip1852Wrapper',
+      'Cip1852WrapperId',
+    );
   }
 }
