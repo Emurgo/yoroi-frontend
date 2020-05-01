@@ -1,171 +1,183 @@
 // @flow
-// import { BigNumber } from 'bignumber.js';
 import { observable, action } from 'mobx';
 
-import config from '../../config';
-import globalMessages from '../../i18n/global-messages';
-import type { Notification } from '../../types/notificationType';
-import WalletStore from '../base/WalletStore';
+import Store from '../base/Store';
 import { matchRoute, buildRoute } from '../../utils/routing';
+import {
+  Logger,
+  stringifyError
+} from '../../utils/logging';
 import Request from '../lib/LocalizedRequest';
 import { ROUTES } from '../../routes-config';
-import type { WalletImportFromFileParams } from '../../actions/ada/wallets-actions';
 import type {
-  SignAndBroadcastFunc, CreateWalletFunc,
-  GetWalletsFunc, RestoreWalletFunc,
+  SignAndBroadcastRequest, SignAndBroadcastResponse,
   GenerateWalletRecoveryPhraseFunc
 } from '../../api/ada/index';
-import type { DeleteWalletFunc } from '../../api/common';
-import type { BaseSignRequest } from '../../api/ada/adaTypes';
+import type { BaseSignRequest } from '../../api/ada/transactions/types';
+import {
+  asGetSigningKey,
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
-export default class AdaWalletsStore extends WalletStore {
+export default class AdaWalletsStore extends Store {
 
   // REQUESTS
-  @observable walletsRequest: Request<GetWalletsFunc>
-    = new Request<GetWalletsFunc>(this.api.ada.getWallets);
-
-  @observable importFromFileRequest: Request<{} => Promise<{}>>
-    = new Request<{} => Promise<{}>>(() => Promise.resolve({}));
-
-  @observable createWalletRequest: Request<CreateWalletFunc>
-    = new Request<CreateWalletFunc>(this.api.ada.createWallet.bind(this.api.ada));
-
-  @observable deleteWalletRequestt: Request<DeleteWalletFunc>
-    = new Request<DeleteWalletFunc>(() => Promise.resolve(true));
-
-  @observable sendMoneyRequest: Request<SignAndBroadcastFunc>
-    = new Request<SignAndBroadcastFunc>(this.api.ada.signAndBroadcast);
+  @observable sendMoneyRequest: Request<typeof AdaWalletsStore.prototype.sendAndRefresh>
+    = new Request<typeof AdaWalletsStore.prototype.sendAndRefresh>(this.sendAndRefresh);
 
   @observable generateWalletRecoveryPhraseRequest: Request<GenerateWalletRecoveryPhraseFunc>
     = new Request<GenerateWalletRecoveryPhraseFunc>(this.api.ada.generateWalletRecoveryPhrase);
 
-  @observable restoreRequest: Request<RestoreWalletFunc>
-    = new Request<RestoreWalletFunc>(this.api.ada.restoreWallet);
-
-  setup() {
+  setup(): void {
     super.setup();
-    const { router, walletBackup, ada } = this.actions;
+    const { router, ada, walletBackup } = this.actions;
     const { wallets } = ada;
-    wallets.createWallet.listen(this._create);
-    wallets.deleteWallet.listen(this._delete);
+    walletBackup.finishWalletBackup.listen(this._createInDb);
+    wallets.createWallet.listen(this._startWalletCreation);
     wallets.sendMoney.listen(this._sendMoney);
-    wallets.restoreWallet.listen(this._restoreWallet);
-    wallets.importWalletFromFile.listen(this._importWalletFromFile);
-    wallets.updateBalance.listen(this._updateBalance);
+    wallets.restoreWallet.listen(this._restoreToDb);
     router.goToRoute.listen(this._onRouteChange);
-    walletBackup.finishWalletBackup.listen(this._finishCreation);
   }
 
   // =================== SEND MONEY ==================== //
 
   /** Send money and then return to transaction screen */
-  _sendMoney = async (transactionDetails: {
-    signRequest: BaseSignRequest,
+  _sendMoney:  {|
+    signRequest: BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>,
     password: string,
-  }): Promise<void> => {
-    const wallet = this.active;
-    if (!wallet) throw new Error('Active wallet required before sending.');
-    const accountId = this.stores.substores.ada.addresses._getAccountIdByWalletId(wallet.id);
-    if (accountId == null) throw new Error('Active account required before sending.');
-
+    publicDeriver: PublicDeriver<>,
+  |} => Promise<void> = async (transactionDetails) => {
+    const withSigning = (asGetSigningKey(transactionDetails.publicDeriver));
+    if (withSigning == null) {
+      throw new Error(`${nameof(this._sendMoney)} public deriver missing signing functionality.`);
+    }
     await this.sendMoneyRequest.execute({
-      ...transactionDetails,
-      sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
-    });
+      broadcastRequest: {
+        publicDeriver: withSigning,
+        password: transactionDetails.password,
+        signRequest: transactionDetails.signRequest,
+        sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
+      },
+      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(
+        transactionDetails.publicDeriver
+      ),
+    })
+      .then(async (response) => {
+        const memo = this.stores.substores.ada.transactionBuilderStore.memo;
+        if (memo !== '' && memo !== undefined) {
+          try {
+            await this.actions.memos.saveTxMemo.trigger({
+              publicDeriver: transactionDetails.publicDeriver,
+              memo: {
+                Content: memo,
+                TransactionHash: response.txId,
+                LastUpdated: new Date(),
+              },
+            });
+          } catch (error) {
+            Logger.error(`${nameof(AdaWalletsStore)}::${nameof(this._sendMoney)} error: ` + stringifyError(error));
+            throw new Error('An error has ocurred when saving the transaction memo.');
+          }
+        }
+        return response;
+      });
 
-    await this.refreshWalletsData();
     this.actions.dialogs.closeActiveDialog.trigger();
     this.sendMoneyRequest.reset();
     // go to transaction screen
-    this.goToWalletRoute(wallet.id);
+    this.stores.wallets.goToWalletRoute(transactionDetails.publicDeriver);
   };
 
-  @action _onRouteChange = (options: { route: string, params: ?Object }): void => {
+  // TODO: delete this and put this logic inside componentWillUnmount
+  @action _onRouteChange: {|
+    route: string,
+    params: ?Object,
+    forceRefresh?: boolean,
+  |} => void = (options) => {
     // Reset the send request anytime we visit the send page (e.g: to remove any previous errors)
-    if (matchRoute(ROUTES.WALLETS.SEND, buildRoute(options.route, options.params))) {
+    if (matchRoute(ROUTES.WALLETS.SEND, buildRoute(options.route, options.params)) !== false) {
       this.sendMoneyRequest.reset();
     }
   };
 
   // =================== VALIDITY CHECK ==================== //
 
-  isValidAddress = (address: string): Promise<boolean> => this.api.ada.isValidAddress({ address });
-
-  isValidMnemonic = (
+  isValidMnemonic: {|
     mnemonic: string,
-    numberOfWords: ?number
-  ): boolean => this.api.ada.isValidMnemonic({ mnemonic, numberOfWords });
+    numberOfWords: number,
+  |} => boolean = request => this.api.ada.isValidMnemonic(request);
 
-  isValidPaperMnemonic = (
+  isValidPaperMnemonic: {|
     mnemonic: string,
-    numberOfWords: ?number
-  ): boolean => this.api.ada.isValidPaperMnemonic({ mnemonic, numberOfWords });
+    numberOfWords: number,
+  |} => boolean = request => this.api.ada.isValidPaperMnemonic(request);
 
   // =================== WALLET RESTORATION ==================== //
 
-  _restoreWallet = async (params: {
+  _startWalletCreation: {|
+    name: string,
+    password: string,
+  |} => Promise<void> = async (params) => {
+    const recoveryPhrase = await (
+      this.generateWalletRecoveryPhraseRequest.execute({}).promise
+    );
+    if (recoveryPhrase == null) {
+      throw new Error(`${nameof(this._startWalletCreation)} failed to generate recovery phrase`);
+    }
+    this.actions.walletBackup.initiateWalletBackup.trigger({
+      recoveryPhrase,
+      name: params.name,
+      password: params.password,
+    });
+  };
+
+  /** Create the wallet and go to wallet summary screen */
+  _createInDb: void => Promise<void> = async () => {
+    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
+    if (persistentDb == null) {
+      throw new Error(`${nameof(this._createInDb)} db not loaded. Should never happen`);
+    }
+    await this.stores.wallets.createWalletRequest.execute(async () => {
+      const wallet = await this.api.ada.createWallet.bind(this.api.ada)({
+        db: persistentDb,
+        walletName: this.stores.walletBackup.name,
+        walletPassword: this.stores.walletBackup.password,
+        recoveryPhrase: this.stores.walletBackup.recoveryPhrase.join(' '),
+      });
+      return wallet;
+    }).promise;
+  };
+
+  _restoreToDb: {|
     recoveryPhrase: string,
     walletName: string,
     walletPassword: string,
-  }) => {
-    await this._restore(params);
-
-    this.showWalletRestoredNotification();
+  |} => Promise<void> = async (params) => {
+    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
+    if (persistentDb == null) {
+      throw new Error(`${nameof(this._restoreToDb)} db not loaded. Should never happen`);
+    }
+    await this.stores.wallets.restoreRequest.execute(async () => {
+      const wallet = await this.api.ada.createWallet.bind(this.api.ada)({
+        db: persistentDb,
+        ...params,
+      });
+      return wallet;
+    }).promise;
   };
 
-  // =================== WALLET IMPORTING ==================== //
-
-  // Similar to wallet restoration
-  @action _importWalletFromFile = async (params: WalletImportFromFileParams) => {
-    this.importFromFileRequest.reset();
-
-    const { filePath, walletName, walletPassword } = params;
-    this.importFromFileRequest.execute({
-      filePath, walletName, walletPassword,
-    });
-    // $FlowFixMe fix if we ever implement this
-    const importedWallet = await this.importFromFileRequest.promise;
-
-    if (!importedWallet) throw new Error('Imported wallet was not received correctly');
-    this.importFromFileRequest.reset();
-    await this._patchWalletRequestWithNewWallet(importedWallet);
-    await this.refreshWalletsData();
-  };
-
-  // =================== NOTIFICATION ==================== //
-  showLedgerNanoWalletIntegratedNotification = (): void => {
-    const notification: Notification = {
-      id: globalMessages.ledgerNanoSWalletIntegratedNotificationMessage.id,
-      message: globalMessages.ledgerNanoSWalletIntegratedNotificationMessage,
-      duration: config.wallets.WALLET_CREATED_NOTIFICATION_DURATION,
-    };
-    this.actions.notifications.open.trigger(notification);
-  }
-
-  showTrezorTWalletIntegratedNotification = (): void => {
-    const notification: Notification = {
-      id: globalMessages.trezorTWalletIntegratedNotificationMessage.id,
-      message: globalMessages.trezorTWalletIntegratedNotificationMessage,
-      duration: config.wallets.WALLET_CREATED_NOTIFICATION_DURATION,
-    };
-    this.actions.notifications.open.trigger(notification);
-  }
-
-  showWalletCreatedNotification = (): void => {
-    const notification: Notification = {
-      id: globalMessages.walletCreatedNotificationMessage.id,
-      message: globalMessages.walletCreatedNotificationMessage,
-      duration: config.wallets.WALLET_CREATED_NOTIFICATION_DURATION,
-    };
-    this.actions.notifications.open.trigger(notification);
-  }
-
-  showWalletRestoredNotification = (): void => {
-    const notification: Notification = {
-      id: globalMessages.walletRestoredNotificationMessage.id,
-      message: globalMessages.walletRestoredNotificationMessage,
-      duration: config.wallets.WALLET_RESTORED_NOTIFICATION_DURATION,
-    };
-    this.actions.notifications.open.trigger(notification);
+  sendAndRefresh: {|
+    broadcastRequest: SignAndBroadcastRequest,
+    refreshWallet: () => Promise<void>,
+  |} => Promise<SignAndBroadcastResponse> = async (request) => {
+    const result = await this.api.ada.signAndBroadcast(request.broadcastRequest);
+    try {
+      await request.refreshWallet();
+    } catch (_e) {
+      // even if refreshing the wallet fails, we don't want to fail the tx
+      // otherwise user may try and re-send the tx
+    }
+    return result;
   }
 }

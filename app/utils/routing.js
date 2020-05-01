@@ -1,7 +1,11 @@
 // @flow
-import RouteParser from 'route-parser';
 
-export const matchRoute = (pattern: string, path: string) => new RouteParser(pattern).match(path);
+import RouteParser from 'route-parser';
+import { ROUTES } from '../routes-config';
+
+export const matchRoute = (
+  pattern: string, path: string
+): false | { [param: string]: string, ... } => new RouteParser(pattern).match(path);
 
 /**
  * Build a route from a pattern like `/wallets/:id` to `/wallets/123`
@@ -15,9 +19,9 @@ export const matchRoute = (pattern: string, path: string) => new RouteParser(pat
  * @param pattern
  * @param params
  */
-type ParamsT = ?{ [key: string]: Array<number|string>|number|string };
+type ParamsT = ?{ [key: string]: $ReadOnlyArray<number|string> | number | string, ... };
 export const buildRoute = (pattern: string, params: ParamsT) => {
-  function toArray(val) {
+  function toArray(val): $ReadOnlyArray<number | string> {
     return Array.isArray(val) ? val : [val];
   }
   const reRepeatingSlashes = /\/+/g; // '/some//path'
@@ -59,7 +63,7 @@ export const buildRoute = (pattern: string, params: ParamsT) => {
           return `<${tokenName}>`;
         });
       } else {
-        // Rougly resolve all named placeholders.
+        // Roughly resolve all named placeholders.
         // Cases:
         // - '/path/:param'
         // - '/path/(:param)'
@@ -92,26 +96,6 @@ export const buildRoute = (pattern: string, params: ParamsT) => {
     .replace(/^$/, '/');
 };
 
-/**
- * Get a named url query parameter from given or current url.
- *
- * Taken from here:
- * https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
- *
- * @param name
- * @param url
- * @returns {string}
- */
-export const getUrlParameterByName = (name: string, url?: string) => {
-  if (url == null || url === '') url = window.location.href;
-  name = name.replace(/[[\]]/g, '\\$&');
-  const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
-  const results = regex.exec(url);
-  if (!results) return null;
-  if (!results[2]) return '';
-  return decodeURIComponent(results[2].replace(/\+/g, ' '));
-};
-
 /** pre-req: either the target is an anchor or is the child of an anchor */
 export const handleExternalLinkClick = (event: MouseEvent) => {
   event.preventDefault();
@@ -126,3 +110,27 @@ export const handleExternalLinkClick = (event: MouseEvent) => {
     window.open(target.href, '_blank');
   }
 };
+
+/** open a link from an element other than an anchor */
+export const handleExternalClick: string => void = (link) => {
+  window.open(link);
+};
+
+type RecursiveTree = string | { [key: string]: RecursiveTree, ... };
+export function visitPaths(value: RecursiveTree): Array<string> {
+  if (typeof value !== 'object') return [value];
+  return Object.keys(value).map(key => value[key]).flatMap(nextValue => visitPaths(nextValue));
+}
+
+export function switchRouteWallet(currentRoute: string, newWalletId: number): string {
+  for (const route of visitPaths(ROUTES)) {
+    const matchWalletRoute = matchRoute(route, currentRoute);
+    if (matchWalletRoute === false) continue;
+
+    if (matchWalletRoute.id != null) {
+      matchWalletRoute.id = newWalletId.toString();
+    }
+    return buildRoute(route, (matchWalletRoute: any));
+  }
+  throw new Error(`${nameof(switchRouteWallet)} No path matched`);
+}

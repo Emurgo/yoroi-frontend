@@ -9,7 +9,7 @@ import { Logger, stringifyError } from '../../utils/logging';
 import styles from './ErrorBlock.scss';
 
 type Props = {|
-  error: ?LocalizableError,
+  +error: ?LocalizableError,
 |};
 
 @observer

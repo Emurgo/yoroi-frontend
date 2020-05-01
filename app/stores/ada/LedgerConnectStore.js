@@ -12,13 +12,13 @@ import Config from '../../config';
 import environment from '../../environment';
 
 import Store from '../base/Store';
-import Wallet from '../../domain/Wallet';
 import LocalizedRequest from '../lib/LocalizedRequest';
 
 import type {
   CreateHardwareWalletRequest,
   CreateHardwareWalletFunc,
 } from '../../api/ada';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 
 import {
   convertToLocalizableError
@@ -45,6 +45,7 @@ import {
   stringifyData,
   stringifyError
 } from '../../utils/logging';
+import { HARD_DERIVATION_START } from '../../config/numbersConfig';
 
 export default class LedgerConnectStore
   extends Store
@@ -52,6 +53,7 @@ export default class LedgerConnectStore
 
   // =================== VIEW RELATED =================== //
   @observable progressInfo: ProgressInfo;
+  @observable derivationIndex: number = HARD_DERIVATION_START + 0; // assume single account
   error: ?LocalizableError;
   hwDeviceInfo: ?HWDeviceInfo;
   ledgerConnect: ?LedgerConnect;
@@ -71,11 +73,12 @@ export default class LedgerConnectStore
     = new LocalizedRequest<CreateHardwareWalletFunc>(this.api.ada.createHardwareWallet);
 
   /** While ledger wallet creation is taking place, we need to block users from starting a
-    * ledger wallet creation on a seperate wallet and explain to them why the action is blocked */
+    * ledger wallet creation on a separate wallet and explain to them why the action is blocked */
   @observable isCreateHWActive: boolean = false;
   // =================== API RELATED =================== //
 
-  setup() {
+  setup(): void {
+    super.setup();
     this._reset();
     const ledgerConnectAction = this.actions.ada.ledgerConnect;
     ledgerConnectAction.init.listen(this._init);
@@ -87,12 +90,12 @@ export default class LedgerConnectStore
   }
 
   /** setup() is called when stores are being created
-    * _init() is called when connect dailog is about to show */
-  _init = (): void => {
+    * _init() is called when connect dialog is about to show */
+  _init: void => void = () => {
     Logger.debug('LedgerConnectStore::_init called');
   }
 
-  @action _cancel = (): void => {
+  @action _cancel: void => void = () => {
     this.teardown();
     this.ledgerConnect && this.ledgerConnect.dispose();
     this.ledgerConnect = undefined;
@@ -103,7 +106,7 @@ export default class LedgerConnectStore
     super.teardown();
   }
 
-  @action _reset = (): void => {
+  @action _reset: void => void = () => {
     this.progressInfo = {
       currentStep: ProgressStep.CHECK,
       stepState: StepState.LOAD,
@@ -115,7 +118,7 @@ export default class LedgerConnectStore
 
   // =================== CHECK =================== //
   /** CHECK dialog submit(Next button) */
-  @action _submitCheck = (): void => {
+  @action _submitCheck: void => void = () => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStep.CONNECT;
     this.progressInfo.stepState = StepState.LOAD;
@@ -124,29 +127,28 @@ export default class LedgerConnectStore
 
   // =================== CONNECT =================== //
   /** CONNECT dialog goBack button */
-  @action _goBackToCheck = (): void => {
+  @action _goBackToCheck: void => void = () => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStep.CHECK;
     this.progressInfo.stepState = StepState.LOAD;
   };
 
   /** CONNECT dialog submit (Connect button) */
-  @action _submitConnect = async (): Promise<void> => {
+  @action _submitConnect: void => Promise<void> = async () => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStep.CONNECT;
     this.progressInfo.stepState = StepState.PROCESS;
     await this._checkAndStoreHWDeviceInfo();
   };
 
-  _checkAndStoreHWDeviceInfo = async (): Promise<void> => {
+  _checkAndStoreHWDeviceInfo: void => Promise<void> = async () => {
     try {
       this.ledgerConnect = new LedgerConnect({
         locale: this.stores.profile.currentLocale
       });
       await prepareLedgerConnect(this.ledgerConnect);
 
-      // TODO: assume single account in Yoroi
-      const accountPath = makeCardanoAccountBIP44Path(0);
+      const accountPath = makeCardanoAccountBIP44Path(this.derivationIndex - HARD_DERIVATION_START);
       // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#examples
       Logger.debug(stringifyData(accountPath));
 
@@ -172,31 +174,27 @@ export default class LedgerConnectStore
     }
   };
 
-  _normalizeHWResponse = (
-    resp: ExtendedPublicKeyResp,
-  ): HWDeviceInfo => {
+  _normalizeHWResponse: ExtendedPublicKeyResp => HWDeviceInfo = (
+    resp,
+  ) => {
     this._validateHWResponse(resp);
 
-    const { ePublicKey, deviceVersion } = resp;
+    const { ePublicKey, } = resp;
 
     return {
       publicMasterKey: ePublicKey.publicKeyHex + ePublicKey.chainCodeHex,
       hwFeatures: {
-        vendor: Config.wallets.hardwareWallet.ledgerNano.VENDOR,
-        model: '', // Ledger does not provide device model info up till now
-        label: '',
-        deviceId: '',
-        language: '',
-        majorVersion: parseInt(deviceVersion.major, 10),
-        minorVersion: parseInt(deviceVersion.minor, 10),
-        patchVersion: parseInt(deviceVersion.patch, 10),
-      }
+        Vendor: Config.wallets.hardwareWallet.ledgerNano.VENDOR,
+        Model: '', // Ledger does not provide device model info up till now
+        DeviceId: '',
+      },
+      defaultName: '',
     };
   }
 
-  _validateHWResponse = (
-    resp: ExtendedPublicKeyResp,
-  ): boolean => {
+  _validateHWResponse: ExtendedPublicKeyResp => boolean = (
+    resp,
+  ) => {
     const { ePublicKey, deviceVersion } = resp;
 
     if (deviceVersion == null) {
@@ -210,49 +208,58 @@ export default class LedgerConnectStore
     return true;
   };
 
-  _handleConnectError = (error: Error): void => {
+  _handleConnectError: Error => void = (error) => {
     this.hwDeviceInfo = undefined;
     this.error = convertToLocalizableError(error);
 
     this._goToConnectError();
   };
 
-  @action _goToConnectError = (): void => {
+  @action _goToConnectError: void => void = () => {
     this.progressInfo.currentStep = ProgressStep.CONNECT;
     this.progressInfo.stepState = StepState.ERROR;
   };
   // =================== CONNECT =================== //
 
   // =================== SAVE =================== //
-  @action _goToSaveLoad = (): void => {
+  @action _goToSaveLoad: void => void = () => {
     this.error = null;
     this.progressInfo.currentStep = ProgressStep.SAVE;
     this.progressInfo.stepState = StepState.LOAD;
   };
 
   /** SAVE dialog submit (Save button) */
-  @action _submitSave = async (walletName: string): Promise<void> => {
+  @action _submitSave: (string) => Promise<void> = async (
+    walletName,
+  ) => {
     this.error = null;
     this.progressInfo.currentStep = ProgressStep.SAVE;
     this.progressInfo.stepState = StepState.PROCESS;
-    await this._saveHW(walletName);
+    await this._saveHW(
+      walletName,
+    );
   };
 
   /** creates new wallet and loads it */
-  _saveHW = async (walletName: string): Promise<void>  => {
+  _saveHW: (string) => Promise<void> = async (
+    walletName,
+  )  => {
     try {
-      Logger.debug('LedgerConnectStore::_saveHW:: called');
+      Logger.debug(`${nameof(LedgerConnectStore)}::${nameof(this._saveHW)}:: called`);
       this._setIsCreateHWActive(true);
       this.createHWRequest.reset();
 
-      const reqParams = this._prepareCreateHWReqParams(walletName);
+      const reqParams = this._prepareCreateHWReqParams(
+        walletName,
+        this.derivationIndex,
+      );
       this.createHWRequest.execute(reqParams);
       if (!this.createHWRequest.promise) throw new Error('should never happen');
-      const ledgerWallet = await this.createHWRequest.promise;
+      const newWallet = await this.createHWRequest.promise;
 
-      await this._onSaveSucess(ledgerWallet);
+      await this._onSaveSuccess(newWallet.publicDeriver);
     } catch (error) {
-      Logger.error(`LedgerConnectStore::_saveHW::error ${stringifyError(error)}`);
+      Logger.error(`${nameof(LedgerConnectStore)}::${nameof(this._saveHW)}::error ${stringifyError(error)}`);
 
       // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1055
       if (error instanceof CheckAdressesInUseApiError) {
@@ -268,7 +275,7 @@ export default class LedgerConnectStore
       if (error instanceof LocalizableError) {
         this.error = error;
       } else {
-        // some unknow error
+        // some unknown error
         this.error = new UnexpectedError();
       }
       this._goToSaveError();
@@ -278,37 +285,39 @@ export default class LedgerConnectStore
     }
   };
 
-  _prepareCreateHWReqParams = (walletName: string): CreateHardwareWalletRequest => {
+  _prepareCreateHWReqParams: (string, number) => CreateHardwareWalletRequest = (
+    walletName,
+    derivationIndex,
+  ) => {
     if (this.hwDeviceInfo == null
       || this.hwDeviceInfo.publicMasterKey == null
       || this.hwDeviceInfo.hwFeatures == null) {
       throw new Error('Ledger device hardware info not valid');
     }
 
+    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
+    if (persistentDb == null) {
+      throw new Error(`${nameof(this._prepareCreateHWReqParams)} db not loaded. Should never happen`);
+    }
+
     const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
     return {
+      db: persistentDb,
+      derivationIndex,
       walletName,
-      publicMasterKey: this.hwDeviceInfo.publicMasterKey,
+      publicKey: this.hwDeviceInfo.publicMasterKey,
       hwFeatures: this.hwDeviceInfo.hwFeatures,
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
     };
   };
 
-  async _onSaveSucess(ledgerWallet: Wallet): Promise<void> {
+  async _onSaveSuccess(publicDeriver: PublicDeriver<>): Promise<void> {
     // close the active dialog
-    Logger.debug('LedgerConnectStore::_onSaveSucess success, closing dialog');
+    Logger.debug('LedgerConnectStore::_onSaveSuccess success, closing dialog');
     this.actions.dialogs.closeActiveDialog.trigger();
 
-    const { wallets } = this.stores.substores[environment.API];
-    await wallets._patchWalletRequestWithNewWallet(ledgerWallet);
-
-    // goto the wallet transactions page
-    Logger.debug('LedgerConnectStore::_onSaveSucess setting new walles as active wallet');
-    wallets.goToWalletRoute(ledgerWallet.id);
-
-    // fetch its data
-    Logger.debug('LedgerConnectStore::_onSaveSucess loading wallet data');
-    await wallets.refreshWalletsData();
+    const { wallets } = this.stores;
+    await wallets.addHwWallet(publicDeriver);
 
     // show success notification
     wallets.showLedgerNanoWalletIntegratedNotification();
@@ -317,14 +326,14 @@ export default class LedgerConnectStore
     Logger.info('SUCCESS: Ledger Connected Wallet created and loaded');
   }
 
-  @action _goToSaveError = (): void => {
+  @action _goToSaveError: void => void = () => {
     this.progressInfo.currentStep = ProgressStep.SAVE;
     this.progressInfo.stepState = StepState.ERROR;
   };
   // =================== SAVE =================== //
 
   // =================== API =================== //
-  @action _setIsCreateHWActive = (active: boolean): void => {
+  @action _setIsCreateHWActive: boolean => void = (active) => {
     this.isCreateHWActive = active;
   };
 

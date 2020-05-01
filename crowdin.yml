@@ -11,10 +11,10 @@ files:
         ru: ru-RU
         de: de-DE
         fr: fr-FR
+        nl: nl-NL
         id: id-ID
         es: es-ES
         it: it-IT
-
   - source: /app/i18n/locales/**/en-US.md
     translation: /app/i18n/locales/**/%locale%.md
     languages_mapping:
@@ -26,8 +26,8 @@ files:
         ru: ru-RU
         de: de-DE
         fr: fr-FR
+        nl: nl-NL
         id: id-ID
         es: es-ES
         it: it-IT
     content_segmentation: 0
-

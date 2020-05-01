@@ -12,8 +12,8 @@ type TransferSourceType = Array<{|
 |}>;
 
 export async function checkAddressesRecoveredAreCorrect(
-  rows:TransferSourceType,
-  world:Object
+  rows: TransferSourceType,
+  world: Object
 ):Promise<void> {
   const waitUntilAddressesRecoveredAppeared = rows.map((row, index) => (
     world.waitUntilText(
@@ -25,8 +25,8 @@ export async function checkAddressesRecoveredAreCorrect(
 }
 
 export async function checkTotalAmountIsCorrect(
-  rows:TransferSourceType,
-  world:Object
+  rows: TransferSourceType,
+  world: Object
 ):Promise<void> {
   const totalAmount = rows.reduce(
     (acc, row) => acc.plus(new BigNumber(row.amount)), new BigNumber(0)

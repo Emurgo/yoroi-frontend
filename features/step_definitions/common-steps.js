@@ -5,11 +5,17 @@ import { getMockServer, closeMockServer } from '../mock-chain/mockServer';
 import { By } from 'selenium-webdriver';
 import { enterRecoveryPhrase, assertPlate } from './wallet-restoration-steps';
 import { testWallets } from '../mock-chain/TestWallets';
-import { resetChain, serverIssue, serverFixed } from '../mock-chain/mockImporter';
+import {
+  resetChain, MockChain,
+  serverIssue, serverFixed,
+  appMaintenance, appMaintenanceFinish,
+} from '../mock-chain/mockImporter';
 import { expect } from 'chai';
 import {
   satisfies,
 } from 'semver';
+import { truncateLongName, } from '../../app/utils/formatters';
+import stableStringify from 'json-stable-stringify';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -42,15 +48,18 @@ Before((scenario) => {
   testProgress.scenarioName = scenario.pickle.name.replace(/[^0-9a-z_ ]/gi, '');
   testProgress.lineNum = scenario.sourceLocation.line;
   testProgress.step = 0;
+});
 
-  // reset our mock chain to avoid modifications bleeding into other tests
-  resetChain();
+Before({ tags: 'not @TestAssuranceChain' }, () => {
+  resetChain(MockChain.Standard);
+});
+Before({ tags: '@TestAssuranceChain' }, () => {
+  resetChain(MockChain.TestAssurance);
 });
 
 Before({ tags: '@serverDown' }, () => {
   closeMockServer();
 });
-
 After({ tags: '@serverDown' }, () => {
   getMockServer({});
 });
@@ -58,9 +67,15 @@ After({ tags: '@serverDown' }, () => {
 Before({ tags: '@serverMaintenance' }, () => {
   serverIssue();
 });
-
 After({ tags: '@serverMaintenance' }, () => {
   serverFixed();
+});
+
+Before({ tags: '@appMaintenance' }, () => {
+  appMaintenance();
+});
+After({ tags: '@appMaintenance' }, () => {
+  appMaintenanceFinish();
 });
 
 Before({ tags: '@invalidWitnessTest' }, () => {
@@ -145,11 +160,11 @@ Given(/^There is a wallet stored named ([^"]*)$/, async function (walletName) {
   await this.click('.WalletRestoreDialog .primary');
   await assertPlate(this, restoreInfo.plate);
   await this.click('.confirmButton');
-  await this.waitUntilText('.WalletTopbarTitle_walletName', walletName.toUpperCase());
+  await this.waitUntilText('.NavPlate_name', truncateLongName(walletName));
 });
 
 Given(/^I have completed the basic setup$/, async function () {
-  // langauge select page
+  // language select page
   await this.waitForElement('.LanguageSelectionForm_component');
   await this.click('.LanguageSelectionForm_submitButton');
 
@@ -160,6 +175,8 @@ Given(/^I have completed the basic setup$/, async function () {
 
   // uri prompt page
   await acceptUriPrompt(this);
+
+  await this.waitForElement('.WalletAdd_component');
 });
 
 Then(/^I accept uri registration$/, async function () {
@@ -195,7 +212,7 @@ Given(/^I restart the browser$/, async function () {
 });
 
 Given(/^There is no wallet stored$/, async function () {
-  await refreshWallet(this);
+  await restoreWalletsFromStorage(this);
   await this.waitForElement('.WalletAdd_component');
 });
 
@@ -217,9 +234,9 @@ Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
   await this.waitForElement('.YoroiClassic');
 });
 
-async function refreshWallet(client) {
+async function restoreWalletsFromStorage(client) {
   await client.driver.executeAsyncScript((done) => {
-    window.yoroi.stores.substores.ada.wallets.refreshImportedWalletData()
+    window.yoroi.stores.wallets.restoreWalletsFromStorage()
       .then(done)
       .catch(err => done(err));
   });
@@ -246,7 +263,9 @@ async function exportLocalStorage(client, exportDir: string) {
 async function exportIndexedDB(client, exportDir: string) {
   const indexedDBPath = `${exportDir}/indexedDB.json`;
   const indexedDB = await client.driver.executeAsyncScript((done) => {
-    window.yoroi.api.ada.exportLocalDatabase()
+    window.yoroi.api.ada.exportLocalDatabase(
+      window.yoroi.stores.loading.loadPersitentDbRequest.result,
+    )
       .then(done)
       .catch(err => done(err));
   });
@@ -298,9 +317,51 @@ async function importIndexedDB(client, importDir: string) {
   try {
     const indexedDBData = fs.readFileSync(indexedDBPath).toString();
     await client.driver.executeAsyncScript((data, done) => {
-      window.yoroi.api.ada.importLocalDatabase(data)
+      window.yoroi.api.ada.importLocalDatabase(
+        window.yoroi.stores.loading.loadPersitentDbRequest.result,
+        data
+      )
         .then(done)
         .catch(err => done(err));
     }, JSON.parse(indexedDBData));
   } catch (e) {} // eslint-disable-line no-empty
 }
+
+let capturedDbState = undefined;
+async function captureDbStae(client) {
+  const rawDb = await client.driver.executeAsyncScript((done) => {
+    window.yoroi.api.ada.exportLocalDatabase(
+      window.yoroi.stores.loading.loadPersitentDbRequest.result,
+    )
+      .then(done)
+      .catch(err => done(err));
+  });
+  capturedDbState = JSON.parse(rawDb.toString());
+}
+async function compareToCapturedDbState(client, excludeSyncTime) {
+  if (capturedDbState == null) throw new Error('Db state was never captured');
+  const rawDb = await client.driver.executeAsyncScript((done) => {
+    window.yoroi.api.ada.exportLocalDatabase(
+      window.yoroi.stores.loading.loadPersitentDbRequest.result,
+    )
+      .then(done)
+      .catch(err => done(err));
+  });
+  const newState = JSON.parse(rawDb.toString());
+  if (excludeSyncTime) {
+    delete capturedDbState.tables.LastSyncInfo;
+    delete newState.tables.LastSyncInfo;
+  }
+  expect(stableStringify(capturedDbState.tables)).to.equal(stableStringify(newState.tables));
+}
+
+Given(/^I capture DB state snapshot$/, async function () {
+  await captureDbStae(this);
+});
+
+Then(/^I compare to DB state snapshot$/, async function () {
+  await compareToCapturedDbState(this, false);
+});
+Then(/^I compare to DB state snapshot excluding sync time$/, async function () {
+  await compareToCapturedDbState(this, true);
+});

@@ -1,0 +1,40 @@
+{
+  "network": {
+    "protocolMagic": 764824073,
+    "backendUrl": "should_mock_backend_url",
+    "websocketUrl": "should_mock_websocket_url",
+    "name": "storybook"
+  },
+  "seiza": {
+    "simpleTemplate": "https://testnet.seiza-website.emurgo.io/staking-simple/list?sortBy=RANDOM&searchText=&performance[]=0&performance[]=100&source=$$BROWSER$$",
+    "advanceTemplate": "https://testnet.seiza-website.emurgo.io/staking/list?sortBy=RANDOM&searchText=&performance[]=0&performance[]=100&source=$$BROWSER$$"
+  },
+  "app": {
+    "walletRefreshInterval": 20000,
+    "serverStatusRefreshInterval": 20000,
+    "logsBufferSize": 500,
+    "logsFileSuffix": "-storybook.log",
+    "addressRequestSize": 50,
+    "txsBodiesRequestSize": 150,
+    "coinPriceRefreshInterval": 60000,
+    "coinPriceFreshnessThreshold": 120000,
+    "pubKeyData": "43d0c0e05acfd2608dd392ad7add6b8a41a3d182387f3ee17f1e9b165c243168",
+    "pubKeyMaster": "ab9e4f1c4d996a0e9cdda8546bf5ee1dd8397fd7ab287c331ff171c7e4e0e9e2"
+  },
+  "genesis": {
+    "block0_date": 1576264417000,
+    "slots_per_epoch": 43200,
+    "slot_duration": 2,
+    "epoch_reward": 19666,
+    "linearFee": {
+      "constant": "200000",
+      "coefficient": "100000",
+      "certificate": "400000",
+      "per_certificate_fees": {
+        "certificate_pool_registration": "500000000",
+        "certificate_stake_delegation": "400000"
+      }
+    },
+    "genesisHash": "8e4d2a343f3dcf9330ad9035b3e8d168e6728904262f2c434a4f8f934ec7b676"
+  }
+}

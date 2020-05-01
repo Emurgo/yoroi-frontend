@@ -6,7 +6,10 @@ import WalletBackupStore from './toplevel/WalletBackupStore';
 import TopbarStore from './toplevel/TopbarStore';
 import UiDialogsStore from './toplevel/UiDialogsStore';
 import UiNotificationsStore from './toplevel/UiNotificationsStore';
+import NoticeBoardStore from './toplevel/NoticeBoardStore';
 import LoadingStore from './toplevel/LoadingStore';
+import MemosStore from './toplevel/MemosStore';
+import WalletStore from './toplevel/WalletStore';
 import setupAdaStores from './ada/index';
 import type { AdaStoresMap } from './ada/index';
 import environment from '../environment';
@@ -14,29 +17,34 @@ import { RouterStore } from 'mobx-react-router';
 import type { ActionsMap } from '../actions/index';
 import type { Api } from '../api/index';
 
-/** Map of var name to class. Allows dyanmic lookup of class so we can init all stores one loop */
+/** Map of var name to class. Allows dynamic lookup of class so we can init all stores one loop */
 const storeClasses = {
   profile: ProfileStore,
   app: AppStore,
   topbar: TopbarStore,
+  memos: MemosStore,
   walletBackup: WalletBackupStore,
   uiDialogs: UiDialogsStore,
   uiNotifications: UiNotificationsStore,
+  noticeBoard: NoticeBoardStore,
   loading: LoadingStore,
+  wallets: WalletStore,
 };
 
-export type StoresMap = {
+export type StoresMap = {|
   profile: ProfileStore,
   app: AppStore,
   topbar: TopbarStore,
+  memos: MemosStore,
   walletBackup: WalletBackupStore,
   uiDialogs: UiDialogsStore,
   uiNotifications: UiNotificationsStore,
+  noticeBoard: NoticeBoardStore,
   loading: LoadingStore,
-
-  substores: { ada: AdaStoresMap },
+  wallets: WalletStore,
+  substores: {| ada: AdaStoresMap, |},
   router: RouterStore,
-};
+|};
 
 /** Constant that represents the stores across the lifetime of the application */
 const stores = observable({
@@ -44,11 +52,13 @@ const stores = observable({
   theme: null,
   app: null,
   topbar: null,
+  memos: null,
   walletBackup: null,
   uiDialogs: null,
   uiNotifications: null,
+  noticeBoard: null,
   loading: null,
-
+  wallets: null,
   substores: {},
   router: null,
 });
@@ -95,7 +105,7 @@ export default action(
     }
 
     // Perform load after all setup is done to ensure migration can modify store state
-    if (stores.loading) { // if condition to please flow (avoid thinkin "loading" is null)
+    if (stores.loading) { // if condition to please flow (avoid thinking "loading" is null)
       stores.loading.load();
     }
 

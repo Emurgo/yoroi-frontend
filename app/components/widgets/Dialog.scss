@@ -1,3 +1,5 @@
+ @import '../../themes/mixins/loading-spinner';
+
 .component {
   color: var(--theme-dialog-title-color);
   display: flex;
@@ -66,4 +68,12 @@
       }
     }
   }
+}
+
+.isSubmittingPrimary {
+  @include loading-spinner("../../assets/images/spinner-light.svg");
+}
+.isSubmittingSecondary {
+  @include loading-spinner("../../assets/images/spinner-dark.svg");
+  opacity: 0.5;
 }

@@ -5,13 +5,32 @@
     "websocketUrl": "wss://iohk-mainnet.yoroiwallet.com:443",
     "name": "mainnet"
   },
+  "seiza": {
+    "simpleTemplate": "",
+    "advanceTemplate": ""
+  },
   "app": {
     "walletRefreshInterval": 20000,
     "serverStatusRefreshInterval": 20000,
     "logsBufferSize": 500,
     "logsFileSuffix": "-yoroi.log",
-    "addressScanSize": 20,
     "addressRequestSize": 50,
-    "txsBodiesRequestSize": 150
+    "txsBodiesRequestSize": 150,
+    "coinPriceRefreshInterval": 60000,
+    "coinPriceFreshnessThreshold": 120000,
+    "pubKeyData": "43d0c0e05acfd2608dd392ad7add6b8a41a3d182387f3ee17f1e9b165c243168",
+    "pubKeyMaster": "ab9e4f1c4d996a0e9cdda8546bf5ee1dd8397fd7ab287c331ff171c7e4e0e9e2"
+  },
+  "genesis": {
+    "block0_date": 0,
+    "slots_per_epoch": 21600,
+    "slot_duration": 20,
+    "epoch_reward": 21414,
+    "linearFee": {
+      "constant": "2",
+      "coefficient": "1",
+      "certificate": "4"
+    },
+    "genesisHash": "c511043dda377d7764d9f01d721ddea323f2a01b1e89f62c8ee587a65d7a1487"
   }
 }

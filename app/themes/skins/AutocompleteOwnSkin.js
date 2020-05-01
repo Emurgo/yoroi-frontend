@@ -3,7 +3,7 @@ import React from 'react';
 import type { ElementRef, Element } from 'react';
 
 // external libraries
-import _ from 'lodash';
+import { slice } from 'lodash';
 import classnames from 'classnames';
 
 // components
@@ -47,13 +47,14 @@ type Props = {
   themeId: string,
   toggleMouseLocation: Function,
   toggleOpen: Function,
-  done: Boolean
+  done: boolean,
+  ...
 };
 
 export const AutocompleteOwnSkin = (props: Props) => {
   const theme = props.theme[props.themeId];
 
-  const filteredAndLimitedOptions = _.slice(
+  const filteredAndLimitedOptions = slice(
     props.filteredOptions,
     0,
     props.maxVisibleOptions

@@ -18,13 +18,13 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  children: ?Node,
-  websiteName: string,
-  url: string,
-  light: boolean,
-  tooltipOpensUpward?: boolean,
-  onExternalLinkClick: Function,
-  arrowRelativeToTip?: boolean,
+  +children: ?Node,
+  +websiteName: string,
+  +url: string,
+  +light: boolean,
+  +tooltipOpensUpward?: boolean,
+  +onExternalLinkClick: MouseEvent => void,
+  +arrowRelativeToTip?: boolean,
 |};
 
 @observer

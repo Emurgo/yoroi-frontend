@@ -1,8 +1,17 @@
+// @flow
+
 /* global __webpack_public_path__ __HOST__ __PORT__ */
 /* eslint no-global-assign: 0 camelcase: 0 */
 /* eslint no-unused-vars: 0 */
 
-if (process.env.NODE_ENV !== 'development') {
+/*::
+declare var chrome;
+declare var __webpack_public_path__: string;
+declare var __HOST__: string;
+declare var __PORT__: number;
+*/
+
+if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'shelley-dev') {
   __webpack_public_path__ = chrome.extension.getURL('/js/');
 } else {
   // In development mode,

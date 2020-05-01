@@ -5,18 +5,13 @@
 }
 
 .label {
-  color:  var(--rp-formfield-label-text-color);
+  color:  var(--theme-wallet-receive-label-text-color);
+  font-size: 14px;
+  line-height: 22px;
   display: block;
-  font-family: var(--rp-formfield-label-font-family);
-  font-size: var(--rp-formfield-label-font-size);
-  line-height: 1.38;
-  margin: var(--rp-formfield-label-margin);
+  font-family: var(--font-regular);
+  margin-bottom: 4px;
   text-align: left;
-}
-
-.header {
-  padding-left: 0px !important;
-  padding-right: 0px;
 }
 
 .derivation {
@@ -24,19 +19,10 @@
   letter-spacing: 0;
 }
 
-.infoBlock {
-  font-size: 15px;
-  text-align: center;
-
-  .data {
-    color: var(--theme-default-color-grey-3);
-    line-height: 30px;
-    height: 30px;
-    padding-left: 5px;
-    padding-right: 5px;
-    background-color: var(--theme-bordered-box-background-color);
-    border: var(--theme-bordered-box-border);
-  }
+.hash {
+  color: var(--theme-wallet-receive-hash-used-text-color);
+  font-size: 16px;
+  line-height: 22px;
 }
 
 :global(.YoroiModern) .component {

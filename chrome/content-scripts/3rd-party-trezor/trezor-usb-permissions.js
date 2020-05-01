@@ -3,7 +3,9 @@
 Handling messages from usb permissions iframe
 */
 
-declare var chrome; // TODO: no type for chrome
+/*::
+declare var chrome;
+*/
 
 const switchToPopupTab = (event) => {
     window.removeEventListener('beforeunload', switchToPopupTab);

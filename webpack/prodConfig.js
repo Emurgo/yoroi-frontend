@@ -1,3 +1,5 @@
+// @flow
+
 const commonConfig = require('./commonConfig');
 
 const path = require('path');
@@ -5,11 +7,20 @@ const webpack = require('webpack');
 
 const customPath = path.join(__dirname, './customPublicPath');
 
-const baseProdConfig = (networkName) => ({
+const defaultPublicPath = '/js/';
+
+/*::
+type EnvParams = {|
+  networkName: string,
+  nightly: "true" | "false",
+  publicPath?: string,
+|};
+*/
+const baseProdConfig = (env /*: EnvParams */) => ({
   mode: 'production',
   optimization: commonConfig.optimization,
   node: commonConfig.node,
-  resolve: commonConfig.resolve,
+  resolve: commonConfig.resolve(env.networkName),
   entry: {
     yoroi: [
       customPath,
@@ -24,17 +35,20 @@ const baseProdConfig = (networkName) => ({
     path: path.join(__dirname, '../build/js'),
     filename: '[name].bundle.js',
     chunkFilename: '[name].chunk.js',
-    publicPath: '/js/',
+    publicPath: env.publicPath == null ? defaultPublicPath : env.publicPath,
   },
   plugins: [
-    ...commonConfig.plugins('build'),
-    new webpack.DefinePlugin(commonConfig.definePlugin(networkName, true)),
-    new webpack.optimize.OccurrenceOrderPlugin(),
+    ...commonConfig.plugins('build', env.networkName),
+    new webpack.DefinePlugin(commonConfig.definePlugin(
+      env.networkName,
+      true,
+      JSON.parse(env.nightly)
+    )),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),
   ],
   module: {
     rules: [
-      ...commonConfig.rules,
+      ...commonConfig.rules(false),
       {
         test: /\.js$/,
         loader: 'babel-loader',
@@ -53,7 +67,7 @@ const baseProdConfig = (networkName) => ({
         loader: 'file-loader',
         options: {
           // Need to specify public path so assets can be loaded from static resources like CSS
-          publicPath: '/js/'
+          publicPath: env.publicPath == null ? defaultPublicPath : env.publicPath,
         },
       },
     ]

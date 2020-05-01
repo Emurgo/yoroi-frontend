@@ -36,6 +36,11 @@
     margin-bottom: 20px;
   }
 
+  .amountSmall {
+    @extend .amount;
+    font-size: 14px;
+    color: var(--theme-widgets-hash-light-color);
+  }
 }
 
 :global(.YoroiModern) .component {

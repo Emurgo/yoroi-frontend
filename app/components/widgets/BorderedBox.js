@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import styles from './BorderedBox.scss';
 
 type Props = {|
-  children?: Node,
+  +children?: Node,
 |};
 
 @observer

@@ -1,0 +1,23 @@
+.component {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 36px;
+  .notices {
+    max-width: 675px;
+    .group {
+      margin-bottom: 30px;
+      .groupDate {
+        font-family: var(--font-regular);
+        font-size: 16px;
+        line-height: 21px;
+        color: var(--theme-main-body-messages-color);
+      }
+    }
+  }
+  .loadMoreNoticesButton {
+    display: block !important;
+    width: 287px;
+  }
+}

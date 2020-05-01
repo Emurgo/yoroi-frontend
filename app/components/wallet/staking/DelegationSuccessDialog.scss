@@ -1,0 +1,19 @@
+.dialog {
+  font-family: var(--font-medium);
+
+  :global {
+    .Dialog_title {
+      margin-bottom: 24px;
+    }
+  }
+}
+
+:global(.YoroiModern) .dialog {
+  min-width: var(--theme-modal-min-max-width-lg);
+  max-width: var(--theme-modal-min-max-width-lg);  
+  font-family: var(--font-regular);
+
+  .walletPassword {
+    margin-top: 0;
+  }
+}

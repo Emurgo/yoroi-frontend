@@ -1,26 +1,31 @@
 // @flow
+import type { lf$Database, } from 'lovefield';
 import AdaApi from './ada/index';
 import LocalStorageApi from './localStorage/index';
+import ExternalStorageApi from './externalStorage/index';
 import ExportApi from './export/index';
 
-export type Api = {
+export type Api = {|
   ada: AdaApi,
   localStorage: LocalStorageApi,
+  externalStorage: ExternalStorageApi,
   export: ExportApi,
-};
+|};
 
-export const setupApi = (): Api => ({
+export const setupApi: void => Promise<Api> = async () => ({
   ada: new AdaApi(),
   localStorage: new LocalStorageApi(),
+  externalStorage: new ExternalStorageApi(),
   export: new ExportApi(),
 });
 
-export type MigrationRequest = {
+export type MigrationRequest = {|
   api: Api,
+  persistentDb: lf$Database,
   currVersion: string,
-}
+|}
 
-export const migrate = async (migrationRequest: MigrationRequest): Promise<void> => {
+export const migrate: MigrationRequest => Promise<void> = async (migrationRequest) => {
   const lastLaunchVersion = await migrationRequest.api.localStorage.getLastLaunchVersion();
   if (lastLaunchVersion === migrationRequest.currVersion) {
     return;
@@ -28,6 +33,7 @@ export const migrate = async (migrationRequest: MigrationRequest): Promise<void>
 
   const appliedMigration = await migrationRequest.api.ada.migrate(
     migrationRequest.api.localStorage,
+    migrationRequest.persistentDb,
   );
 
   // update launch version in localstorage to avoid calling migration twice
@@ -43,6 +49,6 @@ export const migrate = async (migrationRequest: MigrationRequest): Promise<void>
     // if we don't block forever here,
     // then Yoroi would start and may get in a bad state with migrations partially applied
     // since reload is not a blocking call we just await on a timeout
-    await (new Promise(resolve => setTimeout(resolve, 5000 /* aribtrary high number */)));
+    await (new Promise(resolve => setTimeout(resolve, 5000 /* arbitrary high number */)));
   }
 };

@@ -4,10 +4,9 @@ import { observer } from 'mobx-react';
 import WalletConnectHWOptionDialog from '../../../components/wallet/add/option-dialog/WalletConnectHWOptionDialog';
 
 type Props = {|
-  onClose: Function,
-  classicTheme: boolean,
-  onTrezor: Function,
-  onLedger: Function,
+  +onClose: void => void,
+  +onTrezor: void => void,
+  +onLedger: void => void,
 |};
 
 @observer
@@ -16,7 +15,6 @@ export default class WalletConnectHWOptionDialogContainer extends Component<Prop
   render() {
     return (
       <WalletConnectHWOptionDialog
-        classicTheme={this.props.classicTheme}
         onCancel={this.props.onClose}
         onTrezor={this.props.onTrezor}
         onLedger={this.props.onLedger}

@@ -2,21 +2,10 @@
 import { rm, mkdir, cp } from 'shelljs';
 import { NetworkType } from '../config/config-types';
 import type { Network } from '../config/config-types';
-import _ from 'lodash';
+import { values } from 'lodash';
 import fs from 'fs';
 import path from 'path';
-
-exports.replaceWebpack = () => {
-  const replaceTasks = [{
-    from: 'webpack/replace/JsonpMainTemplate.runtime.js',
-    to: 'node_modules/webpack/lib/JsonpMainTemplate.runtime.js'
-  }, {
-    from: 'webpack/replace/process-update.js',
-    to: 'node_modules/webpack-hot-middleware/process-update.js'
-  }];
-
-  replaceTasks.forEach(task => cp(task.from, task.to));
-};
+import { overrideForNightly } from '../chrome/manifest.template';
 
 exports.copyAssets = (type: string, env: string) => {
   rm('-rf', type);
@@ -29,8 +18,11 @@ exports.copyAssets = (type: string, env: string) => {
   cp('chrome/content-scripts/ledger/*.js', `${type}/js/`);
 };
 
-const buildManifest = (type: Network) => {
-  const manifestContent = require(`../chrome/manifest.${type}`);
+const buildManifest = (type: Network, isDebug: boolean, isNightly: boolean) => {
+  const genManifestContent = require(`../chrome/manifest.${type}`);
+  const manifestContent = isNightly
+    ? overrideForNightly(genManifestContent(isDebug))
+    : genManifestContent(isDebug);
   const manifestContentJSON = JSON.stringify(manifestContent, null, 4);
 
   const OUTPUT_FILE_NAME = `manifest.${type}.json`;
@@ -44,7 +36,7 @@ const buildManifest = (type: Network) => {
   }
 };
 
-const manifestTypes = _.values(NetworkType);
-exports.buildManifests = () => {
-  manifestTypes.map((type) => buildManifest(type));
+const manifestTypes = values(NetworkType);
+exports.buildManifests = (isDebug: boolean, isNightly: boolean) => {
+  manifestTypes.map((type) => buildManifest(type, isDebug, isNightly));
 };

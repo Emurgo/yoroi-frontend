@@ -2,12 +2,13 @@
 
 /* eslint react/jsx-one-expression-per-line: 0 */  // the &nbsp; in the html breaks this
 
-import React, { Component } from 'react';
+import React, { Component, } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
+import BigNumber from 'bignumber.js';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import Dialog from '../../widgets/Dialog';
@@ -19,40 +20,28 @@ import config from '../../../config';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../../widgets/hashWrappers/RawHash';
 import type { ExplorerType } from '../../../domain/Explorer';
-
+import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
+import { formattedWalletAmount } from '../../../utils/formatters';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import WarningBox from '../../widgets/WarningBox';
-import type { BaseSignRequest } from '../../../api/ada/adaTypes';
-
-const messages = defineMessages({
-  walletPasswordLabel: {
-    id: 'wallet.send.confirmationDialog.walletPasswordLabel',
-    defaultMessage: '!!!Spending password',
-  },
-  walletPasswordFieldPlaceholder: {
-    id: 'wallet.send.confirmationDialog.walletPasswordFieldPlaceholder',
-    defaultMessage: '!!!Type your spending password',
-  },
-  sendButtonLabel: {
-    id: 'wallet.send.confirmationDialog.submit',
-    defaultMessage: '!!!Send',
-  },
-});
 
 type Props = {|
-  staleTx: boolean,
-  selectedExplorer: ExplorerType,
-  amount: string,
-  receivers: Array<string>,
-  totalAmount: string,
-  transactionFee: string,
-  onSubmit: ({ password: string }) => void,
-  amountToNaturalUnits: (amountWithFractions: string) => string,
-  signRequest: BaseSignRequest,
-  onCancel: Function,
-  isSubmitting: boolean,
-  error: ?LocalizableError,
-  currencyUnit: string,
-  classicTheme: boolean,
+  +staleTx: boolean,
+  +selectedExplorer: ExplorerType,
+  +amount: BigNumber,
+  +receivers: Array<string>,
+  +totalAmount: BigNumber,
+  +transactionFee: BigNumber,
+  +onSubmit: ({| password: string |}) => PossiblyAsync<void>,
+  +amountToNaturalUnits: (amountWithFractions: string) => string,
+  +onCancel: void => void,
+  +isSubmitting: boolean,
+  +error: ?LocalizableError,
+  +currencyUnit: string,
+  +classicTheme: boolean,
+  +unitOfAccountSetting: UnitOfAccountSettingType,
+  +coinPrice: ?number
 |};
 
 @observer
@@ -66,9 +55,9 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
     fields: {
       walletPassword: {
         type: 'password',
-        label: this.context.intl.formatMessage(messages.walletPasswordLabel),
+        label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
         placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(messages.walletPasswordFieldPlaceholder) : '',
+          this.context.intl.formatMessage(globalMessages.walletPasswordFieldPlaceholder) : '',
         value: '',
         validators: [({ field }) => {
           if (field.value === '') {
@@ -90,12 +79,12 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
 
   submit() {
     this.form.submit({
-      onSuccess: (form) => {
+      onSuccess: async (form) => {
         const { walletPassword } = form.values();
         const transactionData = {
           password: walletPassword,
         };
-        this.props.onSubmit(transactionData);
+        await this.props.onSubmit(transactionData);
       },
       onError: () => {}
     });
@@ -114,7 +103,8 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
       isSubmitting,
       error,
       currencyUnit,
-      classicTheme
+      unitOfAccountSetting,
+      coinPrice,
     } = this.props;
 
     const staleTxWarning = (
@@ -134,16 +124,16 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
     const actions = [
       {
         label: intl.formatMessage(globalMessages.backButtonLabel),
-        onClick: isSubmitting
-          ? () => {} // noop
-          : onCancel
+        disabled: isSubmitting,
+        onClick: onCancel,
       },
       {
-        label: intl.formatMessage(messages.sendButtonLabel),
+        label: intl.formatMessage(globalMessages.sendButtonLabel),
         onClick: this.submit.bind(this),
         primary: true,
         className: confirmButtonClasses,
-        disabled: !walletPasswordField.isValid || isSubmitting,
+        isSubmitting,
+        disabled: !walletPasswordField.isValid,
       },
     ];
 
@@ -155,7 +145,6 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
         onClose={!isSubmitting ? onCancel : null}
         className={styles.dialog}
         closeButton={<DialogCloseButton />}
-        classicTheme={classicTheme}
       >
         {this.props.staleTx && staleTxWarning}
 
@@ -168,13 +157,13 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
               <ExplorableHashContainer
                 key={receiver + i} // eslint-disable-line react/no-array-index-key
                 selectedExplorer={this.props.selectedExplorer}
-                hash={receiver}
+                hash={addressToDisplayString(receiver)}
                 light
                 linkType="address"
               >
                 <RawHash light>
                   <span className={styles.addressTo}>
-                    {receiver}
+                    {addressToDisplayString(receiver)}
                   </span>
                 </RawHash>
               </ExplorableHashContainer>
@@ -184,20 +173,55 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
           <div className={styles.amountFeesWrapper}>
             <div className={styles.amountWrapper}>
               <div className={styles.amountLabel}>
-                {intl.formatMessage(globalMessages.walletSendConfirmationAmountLabel)}
+                {intl.formatMessage(globalMessages.amountLabel)}
               </div>
-              <div className={styles.amount}>{amount}
-                <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
-              </div>
+              {unitOfAccountSetting.enabled ? (
+                <>
+                  <div className={styles.amount}>
+                    {coinPrice != null ?
+                      calculateAndFormatValue(amount, coinPrice) :
+                      '-'
+                    }
+                    <span className={styles.currencySymbol}>
+                      &nbsp;{unitOfAccountSetting.currency}
+                    </span>
+                  </div>
+                  <div className={styles.amountSmall}>{formattedWalletAmount(amount)}
+                    <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+                  </div>
+                </>
+              ) : (
+                <div className={styles.amount}>{formattedWalletAmount(amount)}
+                  <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+                </div>
+              )}
             </div>
 
             <div className={styles.feesWrapper}>
               <div className={styles.feesLabel}>
                 {intl.formatMessage(globalMessages.walletSendConfirmationFeesLabel)}
               </div>
-              <div className={styles.fees}>+{transactionFee}
-                <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
-              </div>
+              {unitOfAccountSetting.enabled ? (
+                <>
+                  <div className={styles.fees}>+
+                    {coinPrice != null ?
+                      calculateAndFormatValue(transactionFee, coinPrice) :
+                      '-'
+                    }
+                    <span className={styles.currencySymbol}>
+                      &nbsp;{unitOfAccountSetting.currency}
+                    </span>
+                  </div>
+                  <div className={styles.feesSmall}>+{formattedWalletAmount(transactionFee)}
+                    <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+                  </div>
+                </>
+              ) : (
+                <div className={styles.fees}>
+                  +{formattedWalletAmount(transactionFee)}
+                  <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -205,9 +229,27 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
             <div className={styles.totalAmountLabel}>
               {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
             </div>
-            <div className={styles.totalAmount}>{totalAmount}
-              <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
-            </div>
+            {unitOfAccountSetting.enabled ? (
+              <>
+                <div className={styles.totalAmount}>
+                  {coinPrice != null ?
+                    calculateAndFormatValue(totalAmount, coinPrice) :
+                    '-'
+                  }
+                  <span className={styles.currencySymbol}>
+                    &nbsp;{unitOfAccountSetting.currency}
+                  </span>
+                </div>
+                <div className={styles.totalAmountSmall}>
+                  {formattedWalletAmount(totalAmount)}
+                  <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+                </div>
+              </>
+            ) : (
+              <div className={styles.totalAmount}>{formattedWalletAmount(totalAmount)}
+                <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+              </div>
+            )}
           </div>
 
           <Input

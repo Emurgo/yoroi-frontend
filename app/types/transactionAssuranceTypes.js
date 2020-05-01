@@ -1,9 +1,9 @@
 // @flow
 export type AssuranceModeOption = 'CWANormal' | 'CWAStrict';
-export type AssuranceMode = {
+export type AssuranceMode = {|
     /** <95% assurance */
     low: number,
     /** <99.9% assurance */
-    medium: number
-};
+    medium: number,
+|};
 export type AssuranceLevel = 'low' | 'medium' | 'high';

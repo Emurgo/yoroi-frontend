@@ -1,62 +1,73 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import { computed } from 'mobx';
 import environment from '../../../environment';
-import type { InjectedProps } from '../../../types/injectedPropsType';
-import type { BaseSignRequest } from '../../../api/ada/adaTypes';
+import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
+import type { BaseSignRequest } from '../../../api/ada/transactions/types';
 import {
   copySignRequest,
-  signRequestFee,
-  signRequestReceivers,
-  signRequestTotalInput,
-} from '../../../api/ada/lib/utils';
+  IGetFee,
+  IReceivers,
+  ITotalInput,
+} from '../../../api/ada/transactions/utils';
 import WalletSendConfirmationDialog from '../../../components/wallet/send/WalletSendConfirmationDialog';
 import {
-  formattedWalletAmount,
   formattedAmountToNaturalUnits,
 } from '../../../utils/formatters';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 
-type DialogProps = {
-  signRequest: BaseSignRequest,
-  currencyUnit: string,
-  staleTx: boolean,
-};
-type Props = InjectedProps & DialogProps;
+export type GeneratedData = typeof WalletSendConfirmationDialogContainer.prototype.generated;
+
+type DialogProps = {|
+  +signRequest: BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>,
+  +currencyUnit: string,
+  +staleTx: boolean,
+  +unitOfAccountSetting: UnitOfAccountSettingType,
+  +coinPrice: ?number,
+|};
+type Props = {|
+  ...InjectedOrGenerated<GeneratedData>,
+  ...DialogProps,
+|};
 
 @observer
 export default class WalletSendConfirmationDialogContainer extends Component<Props> {
 
   render() {
     const {
-      actions, currencyUnit,
-      signRequest, stores,
+      currencyUnit,
+      signRequest,
+      unitOfAccountSetting, coinPrice,
     } = this.props;
-    const { wallets } = this.props.stores.substores[environment.API];
+    const { stores, actions } = this.generated;
+    const { wallets } = stores.substores[environment.API];
     const { sendMoneyRequest } = wallets;
-    const activeWallet = wallets.active;
+    const publicDeriver = stores.wallets.selected;
     const { profile } = stores;
-    const { sendMoney } = this.props.actions[environment.API].wallets;
+    const { sendMoney } = actions[environment.API].wallets;
 
-    if (!activeWallet) throw new Error('Active wallet required for WalletSendPage.');
+    if (publicDeriver == null) throw new Error('Active wallet required for WalletSendPage.');
 
-    const totalInput = signRequestTotalInput(signRequest, true);
-    const fee = signRequestFee(signRequest, true);
-    const receivers = signRequestReceivers(signRequest, false);
+    const totalInput = ITotalInput(signRequest, true);
+    const fee = IGetFee(signRequest, true);
+    const receivers = IReceivers(signRequest, false);
     return (
       <WalletSendConfirmationDialog
         staleTx={this.props.staleTx}
-        selectedExplorer={this.props.stores.profile.selectedExplorer}
-        amount={formattedWalletAmount(totalInput.minus(fee))}
+        selectedExplorer={stores.profile.selectedExplorer}
+        amount={totalInput.minus(fee)}
         receivers={receivers}
-        totalAmount={formattedWalletAmount(totalInput)}
-        transactionFee={formattedWalletAmount(fee)}
+        totalAmount={totalInput}
+        transactionFee={fee}
         amountToNaturalUnits={formattedAmountToNaturalUnits}
-        signRequest={signRequest}
-        onSubmit={({ password }) => {
+        onSubmit={async ({ password }) => {
           const copyRequest = copySignRequest(signRequest);
-          sendMoney.trigger({
+          await sendMoney.trigger({
             signRequest: copyRequest,
             password,
+            publicDeriver,
           });
         }}
         isSubmitting={sendMoneyRequest.isExecuting}
@@ -67,7 +78,55 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         error={sendMoneyRequest.error}
         currencyUnit={currencyUnit}
         classicTheme={profile.isClassicTheme}
+        unitOfAccountSetting={unitOfAccountSetting}
+        coinPrice={coinPrice}
       />
     );
+  }
+
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(WalletSendConfirmationDialogContainer)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    return Object.freeze({
+      stores: {
+        profile: {
+          isClassicTheme: stores.profile.isClassicTheme,
+          selectedExplorer: stores.profile.selectedExplorer,
+        },
+        wallets: {
+          selected: stores.wallets.selected,
+        },
+        substores: {
+          ada: {
+            wallets: {
+              sendMoneyRequest: {
+                isExecuting: stores.substores.ada.wallets.sendMoneyRequest.isExecuting,
+                reset: stores.substores.ada.wallets.sendMoneyRequest.reset,
+                error: stores.substores.ada.wallets.sendMoneyRequest.error,
+              },
+            },
+          },
+        },
+      },
+      actions: {
+        dialogs: {
+          closeActiveDialog: {
+            trigger: actions.dialogs.closeActiveDialog.trigger,
+          },
+        },
+        ada: {
+          wallets: {
+            sendMoney: {
+              trigger: actions.ada.wallets.sendMoney.trigger,
+            },
+          },
+        },
+      },
+    });
   }
 }

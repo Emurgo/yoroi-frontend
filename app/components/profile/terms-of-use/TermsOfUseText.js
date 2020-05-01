@@ -6,8 +6,8 @@ import styles from './TermsOfUseText.scss';
 import classNames from 'classnames';
 
 type Props = {|
-  localizedTermsOfUse: string,
-  fixedHeight?: boolean,
+  +localizedTermsOfUse: string,
+  +fixedHeight?: boolean,
 |};
 
 @observer

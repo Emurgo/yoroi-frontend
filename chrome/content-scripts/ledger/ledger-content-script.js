@@ -1,3 +1,9 @@
+// @flow
+
+/*::
+declare var chrome;
+*/
+
 console.debug('[CS-LEDGER] Loading');
 (function init () {
   console.debug('[CS-LEDGER] Execution begins');
@@ -31,7 +37,7 @@ console.debug('[CS-LEDGER] Loading');
     if(event.origin === ORIGIN && event.data) {
       const { data } = event;
       // As this listener, listens to events that needs to be passed to WebPage as well,
-      // but here we are only intersted in passing result to the Extension
+      // but here we are only interested in passing result to the Extension
       if (data.action && data.action.endsWith('-reply') && browserPort) {
         browserPort.postMessage(event.data)
       }

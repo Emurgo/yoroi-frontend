@@ -1,8 +1,9 @@
 // @flow
-import React, { Component } from 'react';
+import React, { Component, } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { intlShape } from 'react-intl';
+import BigNumber from 'bignumber.js';
 import type { MessageDescriptor } from 'react-intl';
 
 import Dialog from '../../widgets/Dialog';
@@ -15,31 +16,35 @@ import LocalizableError from '../../../i18n/LocalizableError';
 
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../../widgets/hashWrappers/RawHash';
+import { formattedWalletAmount } from '../../../utils/formatters';
+import { calculateAndFormatValue } from '../../../utils/unit-of-account';
+
 import type { ExplorerType } from '../../../domain/Explorer';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 
 import styles from './HWSendConfirmationDialog.scss';
 
-type ExpectedMessages = {
+type ExpectedMessages = {|
   infoLine1: MessageDescriptor,
   infoLine2: MessageDescriptor,
   sendUsingHWButtonLabel: MessageDescriptor,
-};
+|};
 
 type Props = {|
-  staleTx: boolean,
-  selectedExplorer: ExplorerType,
-  amount: string,
-  receivers: Array<string>,
-  totalAmount: string,
-  transactionFee: string,
-  currencyUnit: string,
-  amountToNaturalUnits: Function,
-  messages: ExpectedMessages,
-  isSubmitting: boolean,
-  error: ?LocalizableError,
-  onSubmit: void => void,
-  onCancel: Function,
-  classicTheme: boolean,
+  +staleTx: boolean,
+  +selectedExplorer: ExplorerType,
+  +amount: BigNumber,
+  +receivers: Array<string>,
+  +totalAmount: BigNumber,
+  +transactionFee: BigNumber,
+  +currencyUnit: string,
+  +messages: ExpectedMessages,
+  +isSubmitting: boolean,
+  +error: ?LocalizableError,
+  +onSubmit: void => PossiblyAsync<void>,
+  +onCancel: void => void,
+  +unitOfAccountSetting: UnitOfAccountSettingType,
+  +coinPrice: ?number
 |};
 
 @observer
@@ -61,7 +66,8 @@ export default class HWSendConfirmationDialog extends Component<Props> {
       messages,
       error,
       onCancel,
-      classicTheme,
+      unitOfAccountSetting,
+      coinPrice,
     } = this.props;
 
     const staleTxWarning = (
@@ -107,20 +113,44 @@ export default class HWSendConfirmationDialog extends Component<Props> {
       <div className={styles.amountFeesWrapper}>
         <div className={styles.amountWrapper}>
           <div className={styles.amountLabel}>
-            {intl.formatMessage(globalMessages.walletSendConfirmationAmountLabel)}
+            {intl.formatMessage(globalMessages.amountLabel)}
           </div>
-          <div className={styles.amount}>{amount}
-            <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
-          </div>
+          {unitOfAccountSetting.enabled ? (
+            <>
+              <div className={styles.amount}>
+                {coinPrice != null ? calculateAndFormatValue(amount, coinPrice) : '-'}
+                &nbsp;{unitOfAccountSetting.currency}
+              </div>
+              <div className={styles.amountSmall}>{formattedWalletAmount(amount)}
+                <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+              </div>
+            </>
+          ) : (
+            <div className={styles.amount}>{formattedWalletAmount(amount)}
+              <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+            </div>
+          )}
         </div>
 
         <div className={styles.feesWrapper}>
           <div className={styles.feesLabel}>
             {intl.formatMessage(globalMessages.walletSendConfirmationFeesLabel)}
           </div>
-          <div className={styles.fees}>+{transactionFee}
-            <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
-          </div>
+          {unitOfAccountSetting.enabled ? (
+            <>
+              <div className={styles.fees}>+
+                {coinPrice != null ? calculateAndFormatValue(transactionFee, coinPrice) : '-'}
+                &nbsp;{unitOfAccountSetting.currency}
+              </div>
+              <div className={styles.feesSmall}>+{formattedWalletAmount(transactionFee)}
+                <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+              </div>
+            </>
+          ) : (
+            <div className={styles.fees}>+{formattedWalletAmount(transactionFee)}
+              <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+            </div>
+          )}
         </div>
       </div>);
 
@@ -129,9 +159,21 @@ export default class HWSendConfirmationDialog extends Component<Props> {
         <div className={styles.totalAmountLabel}>
           {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
         </div>
-        <div className={styles.totalAmount}>{totalAmount}
-          <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
-        </div>
+        {unitOfAccountSetting.enabled ? (
+          <>
+            <div className={styles.totalAmount}>
+              {coinPrice != null ? calculateAndFormatValue(totalAmount, coinPrice) : '-'}
+              &nbsp;{unitOfAccountSetting.currency}
+            </div>
+            <div className={styles.totalAmountSmall}>{formattedWalletAmount(totalAmount)}
+              <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+            </div>
+          </>
+        ) : (
+          <div className={styles.totalAmount}>{formattedWalletAmount(totalAmount)}
+            <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+          </div>
+        )}
       </div>);
 
     const confirmButtonClasses = classnames([
@@ -141,16 +183,15 @@ export default class HWSendConfirmationDialog extends Component<Props> {
     const actions = [
       {
         label: intl.formatMessage(globalMessages.backButtonLabel),
-        onClick: isSubmitting
-          ? () => {} // noop
-          : onCancel
+        disabled: isSubmitting,
+        onClick: onCancel,
       },
       {
         label: intl.formatMessage(messages.sendUsingHWButtonLabel),
         onClick: this.props.onSubmit,
         primary: true,
         className: confirmButtonClasses,
-        disabled: isSubmitting,
+        isSubmitting,
       },
     ];
 
@@ -162,7 +203,6 @@ export default class HWSendConfirmationDialog extends Component<Props> {
         onClose={!isSubmitting ? onCancel : null}
         className={styles.dialog}
         closeButton={<DialogCloseButton />}
-        classicTheme={classicTheme}
       >
         {this.props.staleTx && staleTxWarning}
         {infoBlock}

@@ -1,7 +1,10 @@
+// @flow
+
 module.exports = {
   moduleNameMapper: {
     // mock out the browser version of WASM bindings with the nodejs bindings
     'cardano-wallet-browser': 'cardano-wallet',
+    '@emurgo/js-chain-libs': '@emurgo/js-chain-libs-node',
     '\\.png$': 'lodash/noop.js',
   },
   transformIgnorePatterns: [

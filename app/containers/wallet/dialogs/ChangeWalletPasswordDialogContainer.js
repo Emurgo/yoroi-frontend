@@ -1,51 +1,96 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import { computed } from 'mobx';
 import ChangeWalletPasswordDialog from '../../../components/wallet/settings/ChangeWalletPasswordDialog';
-import type { InjectedProps } from '../../../types/injectedPropsType';
-import environment from '../../../environment';
+import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
+
+export type GeneratedData = typeof ChangeWalletPasswordDialogContainer.prototype.generated;
+
+type Props = {|
+  ...InjectedOrGenerated<GeneratedData>,
+  publicDeriver: PublicDeriver<>,
+|};
 
 @observer
-export default class ChangeWalletPasswordDialogContainer extends Component<InjectedProps> {
+export default class ChangeWalletPasswordDialogContainer extends Component<Props> {
 
   render() {
-    const { actions } = this.props;
-    const { uiDialogs, profile } = this.props.stores;
-    const { wallets, walletSettings } = this.props.stores.substores[environment.API];
+    const { actions } = this.generated;
+    const { uiDialogs, profile } = this.generated.stores;
+    const { walletSettings } = this.generated.stores;
     const dialogData = uiDialogs.dataForActiveDialog;
     const { updateDataForActiveDialog } = actions.dialogs;
-    const activeWallet = wallets.active;
-    const { updateWalletPasswordRequest } = walletSettings;
-
-    if (!activeWallet) throw new Error('Active wallet required for ChangeWalletPasswordDialogContainer.');
+    const { changeSigningKeyRequest } = walletSettings;
 
     return (
       <ChangeWalletPasswordDialog
-        currentPasswordValue={dialogData.currentPasswordValue}
-        newPasswordValue={dialogData.newPasswordValue}
-        repeatedPasswordValue={dialogData.repeatedPasswordValue}
-        onSave={(values: { oldPassword: string, newPassword: string }) => {
-          const walletId = activeWallet.id;
+        dialogData={dialogData}
+        onSave={async (values) => {
           const { oldPassword, newPassword } = values;
-          actions[environment.API].walletSettings.updateWalletPassword.trigger({
-            walletId, oldPassword, newPassword
+          await actions.walletSettings.updateSigningPassword.trigger({
+            publicDeriver: this.props.publicDeriver,
+            oldPassword,
+            newPassword
           });
         }}
         onCancel={() => {
           actions.dialogs.closeActiveDialog.trigger();
-          updateWalletPasswordRequest.reset();
+          changeSigningKeyRequest.reset();
         }}
         onPasswordSwitchToggle={() => {
-          updateWalletPasswordRequest.reset();
+          changeSigningKeyRequest.reset();
         }}
         onDataChange={data => {
           updateDataForActiveDialog.trigger({ data });
         }}
-        isSubmitting={updateWalletPasswordRequest.isExecuting}
-        error={updateWalletPasswordRequest.error}
+        isSubmitting={changeSigningKeyRequest.isExecuting}
+        error={changeSigningKeyRequest.error}
         classicTheme={profile.isClassicTheme}
       />
     );
   }
 
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(ChangeWalletPasswordDialogContainer)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    const settingActions = actions.ada.walletSettings;
+    const settingStores = this.props.stores.substores.ada.walletSettings;
+    return Object.freeze({
+      stores: {
+        walletSettings: {
+          changeSigningKeyRequest: {
+            reset: settingStores.changeSigningKeyRequest.reset,
+            isExecuting: settingStores.changeSigningKeyRequest.isExecuting,
+            error: settingStores.changeSigningKeyRequest.error,
+          },
+        },
+        profile: {
+          isClassicTheme: stores.profile.isClassicTheme,
+        },
+        uiDialogs: {
+          dataForActiveDialog: {
+            currentPasswordValue: stores.uiDialogs.dataForActiveDialog.currentPasswordValue,
+            newPasswordValue: stores.uiDialogs.dataForActiveDialog.newPasswordValue,
+            repeatedPasswordValue: stores.uiDialogs.dataForActiveDialog.repeatedPasswordValue,
+          },
+        },
+      },
+      actions: {
+        walletSettings: {
+          updateSigningPassword: { trigger: settingActions.updateSigningPassword.trigger },
+        },
+        dialogs: {
+          updateDataForActiveDialog: { trigger: actions.dialogs.updateDataForActiveDialog.trigger },
+          closeActiveDialog: { trigger: actions.dialogs.closeActiveDialog.trigger },
+        },
+      },
+    });
+  }
 }

@@ -1,0 +1,29 @@
+@import '../../mixins/card-mixin.scss';
+
+.heroCardsList {
+  display: flex;
+}
+
+.heroCardsItem {
+  @include card-mixin;
+
+  .heroCardsItemBg {
+    flex: 1 0 auto;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: contain;
+  }
+}
+
+.heroCardsItemBg {
+  &.bgCreateWallet {
+    background-image: url(../../../assets/images/add-wallet/create-wallet-modern.inline.svg);
+  }
+}
+
+.tooltipSize {
+  width: 500px;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+

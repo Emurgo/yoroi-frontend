@@ -1,0 +1,107 @@
+.wrapper {
+    display: block;
+    & + & {
+        margin-top: 32px;
+    }
+}
+
+.graphContainer {
+    padding: 20px 52px 8px 0px;
+    display: flex;
+    flex-direction: column;
+}
+
+.tabsWrapper {
+    margin-bottom: 16px;
+    display: flex;
+    flex-wrap: wrap;
+
+    li {
+        margin-right: 20px;
+        width: max-content;
+    }
+}
+
+.tab {
+    font-family: var(--font-medium);
+    display: inline-block;
+    color: var(--theme-dashboard-graph-tab-color);
+    font-size: 16px;
+    line-height: 20px;
+    text-transform: uppercase;
+    & + & {
+        margin-left: 40px;
+    }
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.radiosWrapper {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    line-height: 20px;
+    &:hover {
+        cursor: pointer;
+    }
+    & + & {
+        margin-left: 22px;
+    }
+}
+
+.checkbox {
+    position: relative;
+    -webkit-appearance: none;
+    border-radius: 50%;
+    margin: 0 10px 0 0;
+	height: 16px;
+	width: 16px;
+    border: 2px solid var(--theme-dashboard-graph-radio-color);
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+        height: 8px;
+        width: 8px;
+        background-color: var(--theme-dashboard-graph-active-radio-color);
+        visibility: hidden;
+        border-radius: 50%;
+    }
+    &:checked {
+        border-color: var(--theme-dashboard-graph-active-radio-color);
+    }
+    &:checked::before {
+        visibility: visible;
+    }
+    &:focus {
+        outline: none;
+    }
+}
+
+.tabActive {
+    color: var(--theme-dashboard-graph-active-tab-color);
+}
+
+.tooltip {
+    padding: 8px 12px 8px 8px;
+    background-color: var(--theme-dashboard-graph-tooltip-background);
+    color: var(--theme-dashboard-graph-tooltip-text-color);
+    font-size: var(--theme-dashboard-graph-tooltip-font-size);
+    line-height: var(--theme-dashboard-graph-tooltip-line-height);
+    border-radius: 4px;
+}
+
+.tooltipValue {
+    font-family: var(--font-medium);
+}

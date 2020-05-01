@@ -1,33 +1,44 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
+import { computed } from 'mobx';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
-import environment from '../../environment';
+import { intlShape } from 'react-intl';
+import globalMessages from '../../i18n/global-messages';
 import SettingsLayout from '../../components/settings/SettingsLayout';
+import NavBarContainer from '../NavBarContainer';
 import SettingsMenu from '../../components/settings/menu/SettingsMenu';
-import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
-import TopBar from '../../components/topbar/TopBar';
+import BannerContainer from '../BannerContainer';
+import type { GeneratedData as BannerContainerData } from '../BannerContainer';
 import { buildRoute } from '../../utils/routing';
-import type { InjectedContainerProps } from '../../types/injectedPropsType';
+import type { InjectedOrGenerated } from '../../types/injectedPropsType';
+import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
+import type { GeneratedData as NavBarContainerData } from '../NavBarContainer';
 
-import MainLayout from '../MainLayout';
+import TopBarLayout from '../../components/layout/TopBarLayout';
+import SidebarContainer from '../SidebarContainer';
+import NavBarTitle from '../../components/topbar/NavBarTitle';
 
-const messages = defineMessages({
-  title: {
-    id: 'settings.general.title',
-    defaultMessage: '!!!General Settings',
-  },
-});
+export type GeneratedData = typeof Settings.prototype.generated;
+
+type Props = {|
+  ...InjectedOrGenerated<GeneratedData>,
+  +children?: Node,
+|};
 
 @observer
-export default class Settings extends Component<InjectedContainerProps> {
+export default class Settings extends Component<Props> {
+
+  static defaultProps = {
+    children: undefined,
+  };
 
   static contextTypes = {
     intl: intlShape.isRequired,
   };
 
-  isActivePage = (route: string) => {
-    const { location } = this.props.stores.router;
+  isActivePage: string => boolean = (route) => {
+    const { location } = this.generated.stores.router;
     if (location) {
       return location.pathname === buildRoute(route);
     }
@@ -35,43 +46,73 @@ export default class Settings extends Component<InjectedContainerProps> {
   };
 
   render() {
-    const { actions, stores, children } = this.props;
-    const { profile, topbar } = stores;
-    const { checkAdaServerStatus } = stores.substores[environment.API].serverConnectionStore;
+    const { children } = this.props;
+    const { actions, stores } = this.generated;
+    const { profile } = stores;
+    const sidebarContainer = (<SidebarContainer {...this.generated.SidebarContainerProps} />);
 
     const menu = (
       <SettingsMenu
         onItemClick={(route) => actions.router.goToRoute.trigger({ route })}
         isActiveItem={this.isActivePage}
-        hasActiveWallet={stores.substores.ada.wallets.hasActiveWallet}
         currentLocale={profile.currentLocale}
         currentTheme={profile.currentTheme}
       />
     );
-    const topbarTitle = (
-      <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
+
+    const navbar = (
+      <NavBarContainer
+        {...this.generated.NavBarContainerProps}
+        title={<NavBarTitle
+          title={this.context.intl.formatMessage(globalMessages.sidebarSettings)}
+        />}
+      />
     );
+
     return (
-      <MainLayout
-        topbar={(
-          <TopBar
-            title={topbarTitle}
-            onCategoryClicked={category => {
-              actions.topbar.activateTopbarCategory.trigger({ category });
-            }}
-            isActiveCategory={topbar.isActiveCategory}
-            categories={topbar.categories}
-          />
-        )}
-        connectionErrorType={checkAdaServerStatus}
-        classicTheme={profile.isClassicTheme}
-        actions={actions}
-        stores={stores}
+      <TopBarLayout
+        banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
+        sidebar={sidebarContainer}
+        navbar={navbar}
+        showInContainer
+        showAsCard
       >
         <SettingsLayout menu={menu}>
           {children != null ? children : null}
         </SettingsLayout>
-      </MainLayout>
+      </TopBarLayout>
     );
+  }
+
+  @computed get generated() {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(Settings)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    return Object.freeze({
+      stores: {
+        profile: {
+          currentLocale: stores.profile.currentLocale,
+          currentTheme: stores.profile.currentTheme,
+        },
+        router: {
+          location: stores.router.location,
+        },
+        wallets: {
+          selected: stores.wallets.selected,
+        },
+      },
+      actions: {
+        router: {
+          goToRoute: { trigger: actions.router.goToRoute.trigger },
+        },
+      },
+      SidebarContainerProps: ({ actions, stores, }: InjectedOrGenerated<SidebarContainerData>),
+      NavBarContainerProps: ({ actions, stores, }: InjectedOrGenerated<NavBarContainerData>),
+      BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
+    });
   }
 }

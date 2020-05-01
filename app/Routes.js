@@ -1,13 +1,14 @@
 // @flow
 import React from 'react';
+import type { Node } from 'react';
 import { Route, Redirect, Switch } from 'react-router-dom';
+import environment from './environment';
 import { ROUTES } from './routes-config';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';
-import type { Node } from 'react';
+import type { InjectedOrGenerated } from './types/injectedPropsType';
 
 // PAGES
-import NoWalletsPage from './containers/wallet/NoWalletsPage';
 import WalletAddPage from './containers/wallet/WalletAddPage';
 import LanguageSelectionPage from './containers/profile/LanguageSelectionPage';
 import TermsOfUsePage from './containers/profile/TermsOfUsePage';
@@ -15,23 +16,35 @@ import UriPromptPage from './containers/profile/UriPromptPage';
 
 // SETTINGS
 import Settings from './containers/settings/Settings';
+import type { GeneratedData as SettingsData } from './containers/settings/Settings';
 import GeneralSettingsPage from './containers/settings/categories/GeneralSettingsPage';
 import PaperWalletPage from './containers/settings/categories/PaperWalletPage';
 import WalletSettingsPage from './containers/settings/categories/WalletSettingsPage';
+import ExternalStorageSettingsPage from './containers/settings/categories/ExternalStorageSettingsPage';
+import OAuthDropboxPage from './containers/settings/categories/OAuthDropboxPage';
 import TermsOfUseSettingsPage from './containers/settings/categories/TermsOfUseSettingsPage';
 import SupportSettingsPage from './containers/settings/categories/SupportSettingsPage';
 
 // Dynamic container loading - resolver loads file relative to '/app/' directory
 import LoadingPage from './containers/LoadingPage';
+import NightlyPage from './containers/profile/NightlyPage';
 import Wallet from './containers/wallet/Wallet';
+import type { GeneratedData as WalletData } from './containers/wallet/Wallet';
+import MyWalletsPage from './containers/wallet/MyWalletsPage';
 import WalletSummaryPage from './containers/wallet/WalletSummaryPage';
 import WalletSendPage from './containers/wallet/WalletSendPage';
 import WalletReceivePage from './containers/wallet/WalletReceivePage';
-import DaedalusTransferPage from './containers/transfer/DaedalusTransferPage';
-import YoroiTransferPage from './containers/transfer/YoroiTransferPage';
 import URILandingPage from './containers/uri/URILandingPage';
 import Transfer from './containers/transfer/Transfer';
-import Staking from './containers/staking/Staking';
+import Receive from './containers/wallet/Receive';
+import type { GeneratedData as ReceiveData } from './containers/wallet/Receive';
+import StakingDashboardPage from './containers/wallet/staking/StakingDashboardPage';
+import StakingPage from './containers/wallet/staking/StakingPage';
+import NoticeBoardPage from './containers/notice-board/NoticeBoardPage';
+
+import type { ConfigType } from '../config/config-types';
+
+declare var CONFIG: ConfigType;
 
 /* eslint-disable max-len */
 export const Routes = (
@@ -44,6 +57,11 @@ export const Routes = (
         exact
         path={ROUTES.ROOT}
         component={(props) => <LoadingPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.NIGHTLY_INFO}
+        component={(props) => <NightlyPage {...props} stores={stores} actions={actions} />}
       />
       <Route
         exact
@@ -62,8 +80,8 @@ export const Routes = (
       />
       <Route
         exact
-        path={ROUTES.NO_WALLETS}
-        component={(props) => <NoWalletsPage {...props} stores={stores} actions={actions} />}
+        path={ROUTES.MY_WALLETS}
+        component={(props) => <MyWalletsPage {...props} stores={stores} actions={actions} />}
       />
       <Route
         exact
@@ -73,40 +91,41 @@ export const Routes = (
       <Route
         path={ROUTES.WALLETS.ROOT}
         component={(props) => (
-          <Wallet {...props} stores={stores} actions={actions}>
-            {WalletsSubpages(stores, actions)}
-          </Wallet>
+          wrapWallet(
+            { ...props, stores, actions },
+            WalletsSubpages(stores, actions)
+          )
         )}
       />
       <Route
         path={ROUTES.SETTINGS.ROOT}
         component={(props) => (
-          <Settings {...props} stores={stores} actions={actions}>
-            {SettingsSubpages(stores, actions)}
-          </Settings>
-        )}
-      />
-      <Route
-        exact
-        path={ROUTES.STAKING.ROOT}
-        component={(props) => (
-          <Staking {...props} stores={stores} actions={actions} />
+          wrapSettings(
+            { ...props, stores, actions },
+            SettingsSubpages(stores, actions)
+          )
         )}
       />
       <Route
         path={ROUTES.TRANSFER.ROOT}
-        component={(props) => (
-          <Transfer {...props} stores={stores} actions={actions}>
-            {TransferSubpages(stores, actions)}
-          </Transfer>
-        )}
+        component={(props) => <Transfer {...props} stores={stores} actions={actions} />}
       />
       <Route
         exact
         path={ROUTES.SEND_FROM_URI.ROOT}
         component={(props) => <URILandingPage {...props} stores={stores} actions={actions} />}
       />
-      <Redirect to={ROUTES.WALLETS.ADD} />
+      <Route
+        exact
+        path={ROUTES.OAUTH_FROM_EXTERNAL.DROPBOX}
+        component={(props) => <OAuthDropboxPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.NOTICE_BOARD.ROOT}
+        component={(props) => <NoticeBoardPage {...props} stores={stores} actions={actions} />}
+      />
+      <Redirect to={ROUTES.MY_WALLETS} />
     </Switch>
   </div>
 );
@@ -124,9 +143,36 @@ const WalletsSubpages = (stores, actions) => (
       component={(props) => <WalletSendPage {...props} stores={stores} actions={actions} />}
     />
     <Route
-      exact
-      path={ROUTES.WALLETS.RECEIVE}
-      component={(props) => <WalletReceivePage {...props} stores={stores} actions={actions} />}
+      path={ROUTES.WALLETS.RECEIVE.ROOT}
+      component={(props) => (
+        wrapReceive(
+          { ...props, stores, actions },
+          ReceiveSubpages(stores, actions)
+        )
+      )}
+    />
+    {environment.isShelley() && (
+      <>
+        <Route
+          exact
+          path={ROUTES.WALLETS.DELEGATION_DASHBOARD}
+          component={(props) => <StakingDashboardPage {...props} stores={stores} actions={actions} />}
+        />
+        <Route
+          exact
+          path={ROUTES.WALLETS.DELEGATION_SIMPLE}
+          component={(props) => <StakingPage {...props} stores={stores} actions={actions} urlTemplate={CONFIG.seiza.simpleTemplate} />}
+        />
+        <Route
+          exact
+          path={ROUTES.WALLETS.DELEGATION_ADVANCE}
+          component={(props) => <StakingPage {...props} stores={stores} actions={actions} urlTemplate={CONFIG.seiza.advanceTemplate} />}
+        />
+      </>)
+    }
+    <Route
+      path={ROUTES.WALLETS.SWITCH}
+      component={(_props) => <></> /* this is a temporary state as the wallet is switching wallets. Faster than user can really notice or skipped entirely */}
     />
     <Redirect to={ROUTES.WALLETS.TRANSACTIONS} />
   </Switch>
@@ -156,6 +202,11 @@ const SettingsSubpages = (stores, actions) => (
     />
     <Route
       exact
+      path={ROUTES.SETTINGS.EXTERNAL_STORAGE}
+      component={(props) => <ExternalStorageSettingsPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
       path={ROUTES.SETTINGS.SUPPORT}
       component={(props) => <SupportSettingsPage {...props} stores={stores} actions={actions} />}
     />
@@ -163,20 +214,64 @@ const SettingsSubpages = (stores, actions) => (
   </Switch>
 );
 
-const TransferSubpages = (stores, actions) => (
+const ReceiveSubpages = (stores, actions) => (
   <Switch>
     <Route
       exact
-      path={ROUTES.TRANSFER.YOROI}
-      component={(props) => <YoroiTransferPage {...props} stores={stores} actions={actions} />}
+      path={ROUTES.WALLETS.RECEIVE.EXTERNAL}
+      component={(props) => <WalletReceivePage {...props} stores={stores} actions={actions} />}
     />
     <Route
       exact
-      path={ROUTES.TRANSFER.DAEDALUS}
-      component={(props) => <DaedalusTransferPage {...props} stores={stores} actions={actions} />}
+      path={ROUTES.WALLETS.RECEIVE.INTERNAL}
+      component={(props) => <WalletReceivePage {...props} stores={stores} actions={actions} />}
     />
-    <Redirect to={ROUTES.TRANSFER.DAEDALUS} />
+    <Route
+      exact
+      path={ROUTES.WALLETS.RECEIVE.MANGLED}
+      component={(props) => <WalletReceivePage {...props} stores={stores} actions={actions} />}
+    />
+    <Redirect to={ROUTES.WALLETS.RECEIVE.EXTERNAL} />
   </Switch>
 );
 
 /* eslint-enable max-len */
+
+export function wrapSettings(
+  settingsProps: InjectedOrGenerated<SettingsData>,
+  children: Node,
+): Node {
+  return (
+    <Settings
+      {...settingsProps}
+    >
+      {children}
+    </Settings>
+  );
+}
+
+export function wrapWallet(
+  walletProps: InjectedOrGenerated<WalletData>,
+  children: Node,
+): Node {
+  return (
+    <Wallet
+      {...walletProps}
+    >
+      {children}
+    </Wallet>
+  );
+}
+
+export function wrapReceive(
+  receiveProps: InjectedOrGenerated<ReceiveData>,
+  children: Node,
+): Node {
+  return (
+    <Receive
+      {...receiveProps}
+    >
+      {children}
+    </Receive>
+  );
+}

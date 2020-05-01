@@ -10,7 +10,8 @@
 }
 
 .page {
-  height: calc(100% - var(--theme-wallet-navigation-tab-height));
+  height: 100%;
+  min-height: 200px;
   overflow: auto;
 }
 
@@ -18,8 +19,4 @@
   .navigation {
     height: var(--theme-wallet-navigation-tab-height);
   }
-
-  .page {
-    height: calc(100% - var(--theme-wallet-navigation-tab-height));
-  }  
 }

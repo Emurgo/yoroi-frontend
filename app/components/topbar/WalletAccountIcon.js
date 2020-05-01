@@ -6,9 +6,9 @@ import Blockies from 'react-blockies';
 import tinycolor from 'tinycolor2';
 
 type Props = {|
-  iconSeed: string,
-  scalePx?: number,
-  saturationFactor?: number,
+  +iconSeed: string,
+  +scalePx?: number,
+  +saturationFactor?: number,
 |};
 
 const mkcolor = (primary, secondary, spots) => ({ primary, secondary, spots });

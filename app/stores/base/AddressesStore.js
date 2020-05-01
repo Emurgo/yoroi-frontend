@@ -1,106 +1,406 @@
 // @flow
 import { observable, computed, action, runInAction } from 'mobx';
-import _ from 'lodash';
+import { find } from 'lodash';
+import BigNumber from 'bignumber.js';
 import Store from './Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import Request from '../lib/LocalizedRequest';
-import WalletAddress from '../../domain/WalletAddress';
 import LocalizableError, { localizedError } from '../../i18n/LocalizableError';
-import type { GetAddressesFunc, CreateAddressFunc } from '../../api/ada';
+import type {
+  CreateAddressFunc,
+  CreateAddressResponse,
+} from '../../api/ada';
 import environment from '../../environment';
+import {
+  PublicDeriver,
+} from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import {
+  asGetAllUtxos, asHasUtxoChains, asDisplayCutoff, asGetStakingKey,
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import type {
+  IHasUtxoChainsRequest,
+  Address, Addressing, UsedStatus, Value,
+} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { StoresMap } from '../index';
+import {
+  Logger,
+} from '../../utils/logging';
+import { ROUTES } from '../../routes-config';
+import { buildRoute } from '../../utils/routing';
+import { ChainDerivations } from '../../config/numbersConfig';
+import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
+import {
+  filterAddressesByStakingKey,
+  unwrapStakingKey,
+  addressToDisplayString,
+} from '../../api/ada/lib/storage/bridge/utils';
+import type {
+  ConfigType,
+} from '../../../config/config-types';
+import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
+
+declare var CONFIG : ConfigType;
+
+const RECEIVE_ROUTES = {
+  internal: ROUTES.WALLETS.RECEIVE.INTERNAL,
+  external: ROUTES.WALLETS.RECEIVE.EXTERNAL,
+  mangled: ROUTES.WALLETS.RECEIVE.MANGLED
+};
+
+export type StandardAddress = {|
+  ...Address, ...Value, ...Addressing, ...UsedStatus
+|};
+
+type SubRequestType<T> = {| publicDeriver: PublicDeriver<> |} => Promise<Array<T>>;
+export class AddressTypeStore<T> {
+
+  @observable addressesRequests: Array<{|
+    publicDeriver: PublicDeriver<>,
+    cachedRequest: CachedRequest<SubRequestType<T>>,
+  |}> = [];
+
+  stores: StoresMap;
+  request: SubRequestType<T>;
+  constructor(
+    stores: StoresMap,
+    request: SubRequestType<T>,
+  ) {
+    this.stores = stores;
+    this.request = request;
+  }
+
+  @computed get all(): Array<T> {
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) return [];
+    const result = this._flowCoerceResult(this._getRequest(publicDeriver));
+    if (result == null) return [];
+    return result;
+  }
+
+  @computed get hasAny(): boolean {
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) return false;
+    const result = this._flowCoerceResult(this._getRequest(publicDeriver));
+    return result ? result.length > 0 : false;
+  }
+
+  @computed get last(): ?T {
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) return;
+    const result = this._flowCoerceResult(this._getRequest(publicDeriver));
+    return result ? result[result.length - 1] : null;
+  }
+
+  @computed get totalAvailable(): number {
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) return 0;
+    const result = this._flowCoerceResult(this._getRequest(publicDeriver));
+    return result ? result.length : 0;
+  }
+
+  @computed get wasExecuted(): boolean {
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) return false;
+    return this._getRequest(publicDeriver).wasExecuted;
+  }
+
+  /** Refresh addresses from database */
+  @action refreshAddressesFromDb: PublicDeriver<> => Promise<void> = async (
+    publicDeriver,
+  ) => {
+    const allRequest = this._getRequest(publicDeriver);
+    allRequest.invalidate({ immediately: false });
+    await allRequest.execute({ publicDeriver }).promise;
+  };
+
+  _flowCoerceResult: CachedRequest<SubRequestType<T>> => ?Array<T> = (request) => {
+    // Flow fails when resolving types so this is the best we can check
+    (request.result: ?Array<any>);
+    return (request.result: any);
+  }
+
+  _getRequest: (PublicDeriver<>) => CachedRequest<SubRequestType<T>> = (publicDeriver) => {
+    const foundRequest = find(this.addressesRequests, { publicDeriver });
+    if (foundRequest && foundRequest.cachedRequest) {
+      return foundRequest.cachedRequest;
+    }
+    return new CachedRequest<SubRequestType<T>>(this.request);
+  };
+
+  @action addObservedWallet: PublicDeriver<> => void = (
+    publicDeriver
+  ) => {
+    this.addressesRequests.push({
+      publicDeriver,
+      cachedRequest: this._getRequest(publicDeriver),
+    });
+  }
+}
 
 export default class AddressesStore extends Store {
 
-  /** Track addresses for a set of wallets */
-  @observable addressesRequests: Array<{
-    walletId: string,
-    allRequest: CachedRequest<GetAddressesFunc>
-  }> = [];
+  /** warning: do NOT use this if public deriver level < Account */
+  allAddressesForDisplay: AddressTypeStore<StandardAddress>;
+
+  mangledAddressesForDisplay: AddressTypeStore<StandardAddress>;
+  externalForDisplay: AddressTypeStore<StandardAddress>;
+  internalForDisplay: AddressTypeStore<StandardAddress>;
+
   @observable error: ?LocalizableError = null;
 
   // REQUESTS
   @observable createAddressRequest: Request<CreateAddressFunc>;
 
-  setup() {
+  setup(): void {
+    super.setup();
     const actions = this.actions[environment.API].addresses;
     actions.createAddress.listen(this._createAddress);
     actions.resetErrors.listen(this._resetErrors);
+
+    this.allAddressesForDisplay = new AddressTypeStore(
+      this.stores,
+      (request) => this._wrapForAllAddresses({ ...request, invertFilter: false })
+    );
+    this.mangledAddressesForDisplay = new AddressTypeStore(
+      this.stores,
+      (request) => this._wrapForAllAddresses({ ...request, invertFilter: true })
+    );
+    this.externalForDisplay = new AddressTypeStore(
+      this.stores,
+      async (request) => this._createAddressIfNeeded({
+        publicDeriver: request.publicDeriver,
+        genAddresses: () => this._wrapForChainAddresses({
+          ...request,
+          chainsRequest: { chainId: ChainDerivations.EXTERNAL },
+        }),
+      })
+    );
+    this.internalForDisplay = new AddressTypeStore(
+      this.stores,
+      (request) => this._wrapForChainAddresses({
+        ...request,
+        chainsRequest: { chainId: ChainDerivations.INTERNAL },
+      })
+    );
   }
 
-  _createAddress = async () => {
+  _createAddress: PublicDeriver<> => Promise<void> = async (
+    publicDeriver
+  ) => {
     try {
-      const address: ?WalletAddress = await this.createAddressRequest.execute({}).promise;
-      if (address != null) {
-        this._refreshAddresses();
+      const result = await this._baseCreateAddress(publicDeriver);
+      if (result != null) {
+        await this.refreshAddressesFromDb(publicDeriver);
         runInAction('reset error', () => { this.error = null; });
       }
     } catch (error) {
       runInAction('set error', () => { this.error = localizedError(error); });
     }
   };
-
-  @computed get all(): Array<WalletAddress> {
-    const wallet = this.stores.substores[environment.API].wallets.active;
-    if (!wallet) return [];
-    const result = this._getAddressesAllRequest(wallet.id).result;
-    return result ? result.addresses : [];
-  }
-
-  @computed get hasAny(): boolean {
-    const wallet = this.stores.substores[environment.API].wallets.active;
-    if (!wallet) return false;
-    const result = this._getAddressesAllRequest(wallet.id).result;
-    return result ? result.addresses.length > 0 : false;
-  }
-
-  @computed get active(): ?WalletAddress {
-    const wallet = this.stores.substores[environment.API].wallets.active;
-    if (!wallet) return;
-    const result = this._getAddressesAllRequest(wallet.id).result;
-    return result ? result.addresses[result.addresses.length - 1] : null;
-  }
-
-  @computed get totalAvailable(): number {
-    const wallet = this.stores.substores[environment.API].wallets.active;
-    if (!wallet) return 0;
-    const result = this._getAddressesAllRequest(wallet.id).result;
-    return result ? result.addresses.length : 0;
-  }
-
-  /** Refresh addresses for all wallets */
-  @action _refreshAddresses = () => {
-    const allWallets = this.stores.substores[environment.API].wallets.all;
-    for (const wallet of allWallets) {
-      const allRequest = this._getAddressesAllRequest(wallet.id);
-      allRequest.invalidate({ immediately: false });
-      allRequest.execute({ walletId: wallet.id });
+  _baseCreateAddress: PublicDeriver<> => Promise<?CreateAddressResponse> = async (
+    publicDeriver
+  ) => {
+    const withDisplayCutoff = asDisplayCutoff(publicDeriver);
+    if (withDisplayCutoff == null) {
+      Logger.error(`${nameof(this._createAddress)} incorrect public deriver`);
+      return;
     }
+    const address = await this.createAddressRequest.execute({
+      popFunc: withDisplayCutoff.popAddress
+    }).promise;
+    return address;
   };
 
-  /** Update which walletIds to track and refresh the data */
-  @action updateObservedWallets = (
-    walletIds: Array<string>
-  ): void => {
-    this.addressesRequests = walletIds.map(walletId => ({
-      walletId,
-      allRequest: this.stores.substores.ada.addresses._getAddressesAllRequest(walletId),
-    }));
-    this._refreshAddresses();
-  }
-
-  @action _resetErrors = () => {
+  @action _resetErrors: void => void = () => {
     this.error = null;
   };
 
-  _getAccountIdByWalletId = (walletId: string): (?string) => {
-    // Note: assume single account in Yoroi
-    const result = this._getAddressesAllRequest(walletId).result;
-    return result ? result.accountId : null;
+  addObservedWallet: PublicDeriver<> => void = (
+    publicDeriver
+  ) => {
+    const withHasUtxoChains = asHasUtxoChains(publicDeriver);
+    if (withHasUtxoChains == null) {
+      this.allAddressesForDisplay.addObservedWallet(publicDeriver);
+    } else {
+      this.externalForDisplay.addObservedWallet(publicDeriver);
+      this.internalForDisplay.addObservedWallet(publicDeriver);
+      if (asGetStakingKey(publicDeriver) != null) {
+        this.mangledAddressesForDisplay.addObservedWallet(publicDeriver);
+      }
+    }
+  }
+
+  refreshAddressesFromDb: PublicDeriver<> => Promise<void> = async (
+    publicDeriver
+  ) => {
+    const withHasUtxoChains = asHasUtxoChains(publicDeriver);
+    if (withHasUtxoChains == null) {
+      await this.allAddressesForDisplay.refreshAddressesFromDb(publicDeriver);
+    } else {
+      await this.externalForDisplay.refreshAddressesFromDb(publicDeriver);
+      await this.internalForDisplay.refreshAddressesFromDb(publicDeriver);
+      if (asGetStakingKey(publicDeriver) != null) {
+        await this.mangledAddressesForDisplay.refreshAddressesFromDb(publicDeriver);
+      }
+    }
+  }
+
+  _wrapForAllAddresses: {|
+    publicDeriver: PublicDeriver<>,
+    invertFilter: boolean,
+  |} => Promise<Array<StandardAddress>> = async (request) => {
+    const withUtxos = asGetAllUtxos(request.publicDeriver);
+    if (withUtxos == null) {
+      Logger.error(`${nameof(this._wrapForAllAddresses)} incorrect public deriver`);
+      return Promise.resolve([]);
+    }
+
+    const allAddresses = await this.api[environment.API].getAllAddressesForDisplay({
+      publicDeriver: withUtxos,
+      type: request.publicDeriver.getParent() instanceof Bip44Wallet
+        ? CoreAddressTypes.CARDANO_LEGACY
+        : CoreAddressTypes.SHELLEY_GROUP,
+    });
+
+    return filterMangledAddresses({
+      publicDeriver: request.publicDeriver,
+      baseAddresses: allAddresses,
+      invertFilter: request.invertFilter,
+    });
+  }
+
+  _wrapForChainAddresses: {|
+    publicDeriver: PublicDeriver<>,
+    chainsRequest: IHasUtxoChainsRequest,
+  |}=> Promise<Array<StandardAddress>> = async (request) => {
+    const withHasUtxoChains = asHasUtxoChains(
+      request.publicDeriver
+    );
+    if (withHasUtxoChains == null) {
+      Logger.error(`${nameof(this._wrapForChainAddresses)} incorrect public deriver`);
+      return Promise.resolve([]);
+    }
+    const addresses = await this.api[environment.API].getChainAddressesForDisplay({
+      publicDeriver: withHasUtxoChains,
+      chainsRequest: request.chainsRequest,
+      type: request.publicDeriver.getParent() instanceof Bip44Wallet
+        ? CoreAddressTypes.CARDANO_LEGACY
+        : CoreAddressTypes.SHELLEY_GROUP,
+    });
+
+    return filterMangledAddresses({
+      publicDeriver: request.publicDeriver,
+      baseAddresses: addresses,
+      invertFilter: false,
+    });
+  }
+
+  _createAddressIfNeeded: {|
+    publicDeriver: PublicDeriver<>,
+    genAddresses: () => Promise<Array<StandardAddress>>,
+  |} => Promise<Array<StandardAddress>> = async (request) => {
+    const addresses = await request.genAddresses();
+    const last = addresses[addresses.length - 1];
+    if (last == null) return addresses;
+
+    if (last.isUsed) {
+      await this._baseCreateAddress(request.publicDeriver);
+      return request.genAddresses(); // refresh after creating new address
+    }
+    return addresses;
+  }
+
+  isActiveTab: ($Keys<typeof RECEIVE_ROUTES>, PublicDeriver<>) => boolean = (
+    tab, publicDeriver,
+  ) => {
+    const { app } = this.stores;
+    const screenRoute = buildRoute(
+      RECEIVE_ROUTES[tab],
+      {
+        id: publicDeriver.getPublicDeriverId(),
+        tab
+      }
+    );
+    return app.currentRoute === screenRoute;
   };
 
-  _getAddressesAllRequest = (walletId: string): CachedRequest<GetAddressesFunc> => {
-    const foundRequest = _.find(this.addressesRequests, { walletId });
-    if (foundRequest && foundRequest.allRequest) return foundRequest.allRequest;
-    return new CachedRequest<GetAddressesFunc>(this.api[environment.API].getExternalAddresses);
+  handleTabClick: (string, PublicDeriver<>) => void = (page, publicDeriver) => {
+    this.actions.router.goToRoute.trigger({
+      route: RECEIVE_ROUTES[page],
+      params: { id: publicDeriver.getPublicDeriverId(), page },
+    });
   };
+
+  getUnmangleAmounts: void => {|
+    canUnmangle: Array<BigNumber>,
+    cannotUnmangle: Array<BigNumber>,
+  |} = () => {
+    const canUnmangle = [];
+    const cannotUnmangle = [];
+    for (const addrInfo of this.mangledAddressesForDisplay.all
+    ) {
+      if (addrInfo.value != null) {
+        const value = addrInfo.value;
+        if (addrInfo.value.gt(CONFIG.genesis.linearFee.coefficient)) {
+          canUnmangle.push(value);
+        } else {
+          cannotUnmangle.push(value);
+        }
+      }
+    }
+    const canUnmangleSum = canUnmangle.reduce(
+      (sum, val) => sum.plus(val),
+      new BigNumber(0)
+    );
+    const expectedFee = new BigNumber(canUnmangle.length + 1)
+      .times(CONFIG.genesis.linearFee.coefficient)
+      .plus(CONFIG.genesis.linearFee.constant);
+
+    // if user would strictly lose ADA by making the transaction, don't prompt them to make it
+    if (canUnmangleSum.lt(expectedFee)) {
+      while (canUnmangle.length > 0) {
+        cannotUnmangle.push(canUnmangle.pop());
+      }
+    }
+
+    return {
+      canUnmangle,
+      cannotUnmangle
+    };
+  }
+}
+
+async function filterMangledAddresses(request: {|
+  publicDeriver: PublicDeriver<>,
+  baseAddresses: Array<StandardAddress>,
+  invertFilter: boolean,
+|}): Promise<Array<StandardAddress>> {
+  const withStakingKey = asGetStakingKey(request.publicDeriver);
+  if (withStakingKey == null) {
+    if (request.invertFilter) return [];
+    return request.baseAddresses.map(info => ({
+      ...info,
+      address: addressToDisplayString(info.address),
+    }));
+  }
+
+  const stakingKeyResp = await withStakingKey.getStakingKey();
+  const stakingKey = unwrapStakingKey(stakingKeyResp.addr.Hash);
+
+  const filterResult = filterAddressesByStakingKey(
+    stakingKey,
+    request.baseAddresses,
+    !request.invertFilter,
+  );
+
+  let result = filterResult;
+  if (request.invertFilter) {
+    const nonMangledSet = new Set(filterResult);
+    result = request.baseAddresses.filter(info => !nonMangledSet.has(info));
+  }
+
+  return result.map(info => ({
+    ...info,
+    address: addressToDisplayString(info.address),
+  }));
 }

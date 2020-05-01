@@ -10,8 +10,8 @@ import globalMessages from '../../../../i18n/global-messages';
 import { observable, runInAction } from 'mobx';
 
 type Props = {|
-  registerUriScheme: void => void,
-  isFirefox: boolean,
+  +registerUriScheme: void => void,
+  +isFirefox: boolean,
 |};
 
 @observer

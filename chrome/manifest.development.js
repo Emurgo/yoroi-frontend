@@ -1,9 +1,29 @@
-import buildManifest from './manifest.template';
-import { SEIZA_URL, SEIZA_FOR_YOROI_URL } from './manifestEnvs';
+// @flow
 
-export default buildManifest({
+import buildManifest from './manifest.template';
+import {
+  Servers,
+  serverToPermission,
+} from '../scripts/connections';
+import {
+  Version,
+  genCSP,
+} from './constants';
+
+export default (isDebug: boolean) => buildManifest({
   description: '[dev] Cardano ADA wallet',
   defaultTitle: '[dev] Yoroi',
-  contentSecurityPolicy: `default-src 'self' http://localhost:3000 https://localhost:3000 http://localhost:8097; frame-src ${SEIZA_FOR_YOROI_URL} ${SEIZA_URL} https://connect.trezor.io/ https://emurgo.github.io/yoroi-extension-ledger-bridge; script-src 'self' 'unsafe-eval' http://localhost:3000 https://localhost:3000 http://localhost:8097 blob:; object-src 'self'; connect-src https://iohk-mainnet.yoroiwallet.com wss://iohk-mainnet.yoroiwallet.com:443 http://localhost:3000 https://localhost:3000 http://localhost:8080 https://localhost:8080 http://localhost:8097 ws://localhost:8080 ws://localhost:8097 wss://localhost:8080 wss://testnet-yoroi-backend.yoroiwallet.com:443 https://testnet-yoroi-backend.yoroiwallet.com; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' http://localhost:3000 data:;`,
+  contentSecurityPolicy: genCSP({
+    isDev: isDebug,
+    additional: {
+      'connect-src': [
+        serverToPermission(Servers.ByronTestnet),
+        'https://testnet-yoroi-coin-price-feed.yoroiwallet.com',
+      ],
+    },
+  }),
+  version: Version.Byron,
   extensionKey: 'pojejnpjgcacmnpkdiklhlnlbkjechfh',
+  geckoKey: '{530f7c6c-6077-4703-8f71-cb368c663e35}',
+  enableProtocolHandlers: true,
 });

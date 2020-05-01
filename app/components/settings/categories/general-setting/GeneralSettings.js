@@ -8,17 +8,17 @@ import { intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './GeneralSettings.scss';
-import type { MessageDescriptor } from 'react-intl';
+import type { LanguageType } from '../../../../i18n/translations';
 import FlagLabel from '../../../widgets/FlagLabel';
 import { tier1Languages } from '../../../../config/languagesConfig';
 import globalMessages, { listOfTranslators } from '../../../../i18n/global-messages';
 
 type Props = {|
-  languages: Array<{ value: string, label: MessageDescriptor, svg: string }>,
-  currentLocale: string,
-  onSelectLanguage: Function,
-  isSubmitting: boolean,
-  error?: ?LocalizableError,
+  +languages: Array<LanguageType>,
+  +currentLocale: string,
+  +onSelectLanguage: {| locale: string |} => PossiblyAsync<void>,
+  +isSubmitting: boolean,
+  +error?: ?LocalizableError,
 |};
 
 @observer
@@ -31,8 +31,8 @@ export default class GeneralSettings extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  selectLanguage = (values: { locale: string }) => {
-    this.props.onSelectLanguage({ locale: values });
+  selectLanguage: string => Promise<void> = async (locale) => {
+    await this.props.onSelectLanguage({ locale });
   };
 
   form = new ReactToolboxMobxForm({

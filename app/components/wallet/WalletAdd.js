@@ -4,47 +4,43 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import classnames from 'classnames';
 
-import SvgInline from 'react-svg-inline';
-import logoIcon from '../../assets/images/yoroi-logo-white.inline.svg';
-import settingsIcon from '../../assets/images/top-bar/setting-active.inline.svg';
-import daedalusIcon from '../../assets/images/top-bar/daedalus-migration.inline.svg';
+import CustomTooltip from '../widgets/CustomTooltip';
+import MainCards from './add/MainCards';
+import LogoYoroiIcon from '../../assets/images/yoroi-logo-white.inline.svg';
+import LogoYoroiShelleyTestnetIcon from '../../assets/images/yoroi-logo-shelley-testnet-white.inline.svg';
+import SettingsIcon from '../../assets/images/top-bar/setting-active.inline.svg';
+import DaedalusIcon from '../../assets/images/top-bar/daedalus-migration.inline.svg';
+import NightlyLogo from '../../assets/images/yoroi-logo-nightly-white.inline.svg';
 
 import styles from './WalletAdd.scss';
+
+import environment from '../../environment';
 
 const messages = defineMessages({
   title: {
     id: 'wallet.add.page.title',
-    defaultMessage: '!!!Gateway to the financial world',
+    defaultMessage: '!!!Your gateway to the financial world',
   },
   subTitle: {
     id: 'wallet.add.page.subtitle.label',
     defaultMessage: '!!!Yoroi light wallet for Cardano',
   },
-  connectToHWTitle: {
-    id: 'wallet.add.page.hw.title',
-    defaultMessage: '!!!Connect to hardware wallet',
-  },
-  createTitle: {
-    id: 'wallet.add.page.create.title',
-    defaultMessage: '!!!Create wallet',
-  },
-  restoreTitle: {
-    id: 'wallet.add.page.restore.title',
-    defaultMessage: '!!!Restore wallet',
-  },
   transferFundsTitle: {
     id: 'wallet.add.page.daedalusTransfer.title',
     defaultMessage: '!!!Transfer funds from a Daedalus wallet to Yoroi',
   },
+  transferFundsTooltip: {
+    id: 'wallet.add.page.daedalusTransfer.tooltip',
+    defaultMessage: '!!!You can transfer funds from a Daedalus wallet<br/>to Yoroi, but first you will need to create<br/>a Yoroi wallet to store those funds.',
+  },
 });
 
 type Props = {|
-  onCreate: Function,
-  onRestore: Function,
-  onHardwareConnect: Function,
-  onSettings: Function,
-  onDaedalusTransfer: Function,
-  classicTheme: boolean,
+  +onCreate: void => void,
+  +onRestore: void => void,
+  +onHardwareConnect: void => void,
+  +onSettings: void => void,
+  +onDaedalusTransfer: void => void,
 |};
 
 @observer
@@ -53,30 +49,44 @@ export default class WalletAdd extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  getLogo: void => string = () => {
+    if (environment.isNightly()) {
+      return NightlyLogo;
+    }
+    if (environment.isShelley()) {
+      return LogoYoroiShelleyTestnetIcon;
+    }
+    return LogoYoroiIcon;
+  }
+
   render() {
     const { intl } = this.context;
     const {
-      onCreate,
-      onRestore,
-      onHardwareConnect,
       onSettings,
       onDaedalusTransfer,
     } = this.props;
 
+    const componentStyle = classnames([
+      styles.component,
+      environment.isShelley() ? styles.shelleyTestnet : null
+    ]);
+
+    const LogoIcon = this.getLogo();
+
     return (
-      <div className={styles.component}>
+      <div className={componentStyle}>
         {/* Setting button */}
         <div className={styles.hero}>
           <div className={styles.settingsBar}>
             <button type="button" onClick={onSettings} className={styles.settingsBarLink}>
-              <SvgInline svg={settingsIcon} width="30" height="30" />
+              <SettingsIcon width="30" height="30" />
             </button>
           </div>
 
           <div className={styles.heroInner}>
             {/* Left block  */}
             <div className={styles.heroLeft}>
-              <SvgInline svg={logoIcon} className={styles.heroLogo} />
+              <span className={styles.heroLogo}><LogoIcon width="156" height="50" /></span>
               <h2 className={styles.heroTitle}>
                 <FormattedHTMLMessage {...(messages.title)} />
               </h2>
@@ -84,63 +94,29 @@ export default class WalletAdd extends Component<Props> {
             </div>
             {/* Right block  */}
             <div className={styles.heroRight}>
-              <div className={styles.heroCardsList}>
-                {/* Connect to hardware wallet */}
-                <button
-                  type="button"
-                  className="WalletAdd_btnConnectHW"
-                  onClick={onHardwareConnect}
-                >
-                  <div className={styles.heroCardsItem}>
-                    <div className={classnames([styles.heroCardsItemBg, styles.bgConnectHW])} />
-                    <div className={styles.heroCardsItemTitle}>
-                      {intl.formatMessage(messages.connectToHWTitle)}
-                    </div>
-                  </div>
-                </button>
-                {/* Create wallet */}
-                <button
-                  type="button"
-                  className="WalletAdd_btnCreateWallet"
-                  onClick={onCreate}
-                >
-                  <div className={styles.heroCardsItem}>
-                    <div className={classnames([styles.heroCardsItemBg, styles.bgCreateWallet])} />
-                    <div className={styles.heroCardsItemTitle}>
-                      {intl.formatMessage(messages.createTitle)}
-                    </div>
-                  </div>
-                </button>
-                {/* Restore wallet */}
-                <button
-                  type="button"
-                  className="WalletAdd_btnRestoreWallet"
-                  onClick={onRestore}
-                >
-                  <div className={styles.heroCardsItem}>
-                    <div
-                      className={classnames([styles.heroCardsItemBg, styles.bgRestoreWallet])}
-                    />
-                    <div className={styles.heroCardsItemTitle}>
-                      {intl.formatMessage(messages.restoreTitle)}
-                    </div>
-                  </div>
-                </button>
-              </div>
+              <MainCards
+                onCreate={this.props.onCreate}
+                onRestore={this.props.onRestore}
+                onHardwareConnect={this.props.onHardwareConnect}
+              />
               {/* Transfer funds from a Daedalus wallet to Yoroi */}
               <button
                 type="button"
                 onClick={onDaedalusTransfer}
                 className={classnames([styles.heroCardsItem, styles.heroCardsItemLink])}
               >
-                <SvgInline
-                  svg={daedalusIcon}
-                  width="45"
-                  height="40"
-                  className={styles.heroCardsItemLinkIcon}
-                />
+                <span className={styles.heroCardsItemLinkIcon}>
+                  <DaedalusIcon width="45" height="40" />
+                </span>
                 <div className={styles.heroCardsItemTitle}>
                   {intl.formatMessage(messages.transferFundsTitle)}
+                  <div className={styles.tooltip}>
+                    <CustomTooltip
+                      toolTip={
+                        <div><FormattedHTMLMessage {...messages.transferFundsTooltip} /></div>
+                      }
+                    />
+                  </div>
                 </div>
               </button>
             </div>
@@ -149,5 +125,4 @@ export default class WalletAdd extends Component<Props> {
       </div>
     );
   }
-
 }

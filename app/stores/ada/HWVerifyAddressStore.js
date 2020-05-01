@@ -28,23 +28,34 @@ import {
 import {
   convertToLocalizableError as trezorErrorToLocalized
 } from '../../domain/TrezorLocalizedError';
-
-import Wallet from '../../domain/Wallet';
+import {
+  isTrezorTWallet,
+  isLedgerNanoWallet,
+} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import {
+  PublicDeriver,
+} from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 export default class AddressesStore extends Store {
   @observable isActionProcessing: boolean = false;
   @observable error: ?LocalizableError = null;
-  @observable selectedAddress: ?{ address: string, path: BIP32Path } = null;
+  @observable selectedAddress: ?{|
+    address: string,
+    path: BIP32Path,
+  |} = null;
   ledgerConnect: ?LedgerConnect;
 
-  setup() {
+  setup(): void {
+    super.setup();
     const actions = this.actions[environment.API].hwVerifyAddress;
     actions.selectAddress.listen(this._selectAddress);
     actions.verifyAddress.listen(this._verifyAddress);
     actions.closeAddressDetailDialog.listen(this._closeAddressDetailDialog);
   }
 
-  @action _verifyAddress = async (params: { wallet: Wallet }): Promise<void> => {
+  @action _verifyAddress: (PublicDeriver<>) => Promise<void> = async (
+    publicDeriver,
+  ) => {
     Logger.info('AddressStore::_verifyAddress called');
 
     if (!this.selectedAddress) {
@@ -56,16 +67,14 @@ export default class AddressesStore extends Store {
     const path = toJS(selectedAddress.path);
     const address = toJS(selectedAddress.address);
 
-    if (!params.wallet.hardwareInfo) {
-      throw new Error('AddressStore::_verifyAddress called with no hardware wallet active');
-    }
+    const conceptualWallet = publicDeriver.getParent();
 
     this._setError(null);
     this._setActionProcessing(true);
 
-    if (params.wallet.isLedgerNanoWallet) {
+    if (isLedgerNanoWallet(conceptualWallet)) {
       await this.ledgerVerifyAddress(path, address);
-    } else if (params.wallet.isTrezorTWallet) {
+    } else if (isTrezorTWallet(conceptualWallet)) {
       await this.trezorVerifyAddress(path, address);
     } else {
       throw new Error('AddressStore::_verifyAddress called with unrecognized hardware wallet');
@@ -74,7 +83,7 @@ export default class AddressesStore extends Store {
     this._setActionProcessing(false);
   }
 
-  trezorVerifyAddress = async (
+  trezorVerifyAddress: (BIP32Path, string) => Promise<void> = async (
     path: BIP32Path,
     address: string
   ): Promise<void> => {
@@ -91,12 +100,11 @@ export default class AddressesStore extends Store {
     }
   }
 
-  ledgerVerifyAddress = async (
+  ledgerVerifyAddress: (BIP32Path, string) => Promise<void> = async (
     path: BIP32Path,
     address: string,
   ): Promise<void> => {
     try {
-      // trick to fix flow
       this.ledgerConnect = new LedgerConnect({
         locale: this.stores.profile.currentLocale
       });
@@ -115,20 +123,23 @@ export default class AddressesStore extends Store {
     }
   }
 
-  @action _selectAddress = async (params: { address: string, path: BIP32Path }): Promise<void> => {
+  @action _selectAddress: {|
+    address: string,
+    path: BIP32Path,
+  |} => Promise<void> = async (params) => {
     Logger.info('AddressStore::_selectAddress::called: ' + params.address);
     this.selectedAddress = { address: params.address, path: params.path };
   }
 
-  @action _setActionProcessing = (processing: boolean): void => {
+  @action _setActionProcessing: boolean => void = (processing) => {
     this.isActionProcessing = processing;
   }
 
-  @action _setError = (error: ?LocalizableError): void => {
+  @action _setError: ?LocalizableError => void = (error) => {
     this.error = error;
   }
 
-  @action _closeAddressDetailDialog = (): void => {
+  @action _closeAddressDetailDialog: void => void = () => {
     this.ledgerConnect && this.ledgerConnect.dispose();
     this.ledgerConnect = undefined;
     this.selectedAddress = null;
