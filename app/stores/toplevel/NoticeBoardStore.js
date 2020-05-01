@@ -38,6 +38,7 @@ export default class NoticeBoardStore extends Store {
   setup(): void {
     super.setup();
     this.actions.noticeBoard.loadMore.listen(this._loadMore);
+    // do not await on purpose since it's fine if initialization is asynchronous
     this.init();
   }
 

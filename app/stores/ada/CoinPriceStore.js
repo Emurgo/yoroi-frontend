@@ -38,14 +38,14 @@ export default class CoinPriceStore extends Store {
 
   @observable refreshCurrentUnit: Request<void => Promise<void>>
     = new Request<void => Promise<void>>(async () => {
-      this.stores.substores.ada.coinPriceStore.refreshCurrentCoinPrice();
+      await this.stores.substores.ada.coinPriceStore.refreshCurrentCoinPrice();
       const { selected } = this.stores.wallets;
       if (selected) {
         const { allRequest } = this.stores.substores.ada.transactions
           .getTxRequests(selected).requests;
         const transactions = allRequest.result?.transactions;
         if (allRequest.wasExecuted && transactions != null) {
-          this.stores.substores.ada.coinPriceStore.updateTransactionPriceData({
+          await this.stores.substores.ada.coinPriceStore.updateTransactionPriceData({
             db: selected.getDb(),
             transactions,
           });
@@ -108,6 +108,7 @@ export default class CoinPriceStore extends Store {
     if (!document.hidden) {
       const { hasAnyWallets } = this.stores.wallets;
       if (hasAnyWallets) {
+        // note: don't need to await since UI will handle this
         this.refreshCurrentCoinPrice();
       }
     }

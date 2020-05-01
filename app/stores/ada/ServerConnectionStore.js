@@ -16,6 +16,7 @@ export default class ServerConnectionStore extends Store {
   setup(): void {
     super.setup();
 
+    // do not await on purpose -- it's okay if this is async
     this._checkServerStatus();
     setInterval(this._checkServerStatus, this.SERVER_STATUS_REFRESH_INTERVAL);
   }

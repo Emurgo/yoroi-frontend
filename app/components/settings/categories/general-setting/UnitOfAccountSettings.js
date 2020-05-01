@@ -33,7 +33,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +onSelect: string=>void,
+  +onSelect: string => Promise<void>,
   +isSubmitting: boolean,
   +currencies: Array<{
     value: string,

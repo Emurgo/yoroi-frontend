@@ -30,7 +30,7 @@ const messages = defineMessages({
 
 type Props = {|
   onConnect: string => void,
-  onDisconnect: void => void,
+  onDisconnect: void => Promise<void>,
   externalStorageProviders: { [key: string] : ProvidersType, ... },
   selectedExternalStorage: ?SelectedExternalStorageProvider,
 |};

@@ -57,11 +57,11 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
     intl: intlShape.isRequired,
   };
 
-  onSelectUnitOfAccount: string => void = (value) => {
+  onSelectUnitOfAccount: string => Promise<void> = async (value) => {
     const unitOfAccount = (value === 'ADA')
       ? unitOfAccountDisabledValue
       : { enabled: true, currency: value };
-    this.generated.actions.profile.updateUnitOfAccount.trigger(unitOfAccount);
+    await this.generated.actions.profile.updateUnitOfAccount.trigger(unitOfAccount);
   };
 
   render() {

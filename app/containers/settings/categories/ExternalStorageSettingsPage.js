@@ -17,8 +17,8 @@ export default class ExternalStorageSettingsPage
     handleExternalClick(authorizeUrl);
   };
 
-  onDisconnect: void => void = () => {
-    this.generated.actions.memos.unsetExternalStorageProvider.trigger();
+  onDisconnect: void => Promise<void> = async () => {
+    await this.generated.actions.memos.unsetExternalStorageProvider.trigger();
   };
 
   render() {

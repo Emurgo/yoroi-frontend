@@ -203,16 +203,16 @@ export default class TransactionsStore extends Store {
     // 1) the tx history changed
     // 2) if it's the first time computing for this wallet
     if (oldHash !== newHash || !recentRequest.wasExecuted) {
-      this.reactToTxHistoryUpdate({ publicDeriver: request.publicDeriver });
+      await this.reactToTxHistoryUpdate({ publicDeriver: request.publicDeriver });
     }
 
     // sync these regardless of whether or not new txs are found
 
     // note: possible existing memos were modified on a difference instance, etc.
-    this.actions.memos.syncTxMemos.trigger(request.publicDeriver);
+    await this.actions.memos.syncTxMemos.trigger(request.publicDeriver);
     // note: possible we failed to get the historical price for something in the past
     const coinPriceStore = this.stores.substores[environment.API].coinPriceStore;
-    coinPriceStore.updateTransactionPriceData({
+    await coinPriceStore.updateTransactionPriceData({
       db: publicDeriver.getDb(),
       transactions: result.transactions,
     });

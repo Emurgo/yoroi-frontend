@@ -95,7 +95,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
 
         const txBuilderStore = this._getTxBuilderStore();
         if (txBuilderStore.tentativeTx == null) return;
-        this.generated.actions.ada.wallets.sendMoney.trigger({
+        await this.generated.actions.ada.wallets.sendMoney.trigger({
           signRequest: txBuilderStore.tentativeTx,
           password: walletPassword,
           publicDeriver: selected,
