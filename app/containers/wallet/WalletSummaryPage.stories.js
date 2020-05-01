@@ -36,6 +36,7 @@ import {
 import ExportTransactionDialog from '../../components/wallet/export/ExportTransactionDialog';
 import WalletTransaction from '../../domain/WalletTransaction';
 import { transactionTypes } from '../../api/ada/transactions/types';
+import type { LastSyncInfoRow, } from '../../api/ada/lib/storage/database/walletTypes/core/tables';
 import { TxStatusCodes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { assuranceModes, } from '../../config/transactionAssuranceConfig';
 import WalletSettingsStore from '../../stores/base/WalletSettingsStore';
@@ -144,6 +145,13 @@ export const Loading = () => {
                   isExecuting: false,
                   wasExecuted: false,
                 },
+                lastSyncInfo: {
+                  LastSyncInfoId: 1,
+                  Time: null,
+                  SlotNum: null,
+                  BlockHash: null,
+                  Height: 0,
+                },
                 unconfirmedAmount: {
                   total: new BigNumber(0),
                   incoming: new BigNumber(0),
@@ -175,6 +183,7 @@ const genPropsForTransactions: {|
     isExporting: boolean,
     exportError: ?LocalizableError
   |},
+  lastSyncInfo: LastSyncInfoRow,
 |} => * = (request) => ({
   profile: {
     selectedExplorer: getDefaultExplorer(),
@@ -232,8 +241,10 @@ const genPropsForTransactions: {|
           isExecuting: request.isLoadingTxs || false,
           wasExecuted: true,
         },
+        lastSyncInfo: request.lastSyncInfo,
         unconfirmedAmount: calculateUnconfirmedAmount(
           request.transactions,
+          request.lastSyncInfo.Height,
           assuranceModes.NORMAL,
           (timestamp) => ({
             From: 'ADA',
@@ -289,7 +300,14 @@ export const Transaction = () => {
     };
   const walletTransaction = new WalletTransaction({
     txid: '915f2e6865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
-    blockHash: '111111865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
+    block: {
+      BlockId: 1,
+      SlotNum: 0,
+      Height: 0,
+      Digest: 0.0,
+      Hash: '111111865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
+      BlockTime: new Date(0),
+    },
     type: select(
       'txDirection',
       transactionTypes,
@@ -298,13 +316,6 @@ export const Transaction = () => {
     amount: new BigNumber(1000),
     fee: new BigNumber(5),
     date: new Date(0),
-    numberOfConfirmations: state === TxStatusCodes.IN_BLOCK
-      ? select(
-        'confirmations',
-        confirmationCases,
-        confirmationCases.Low
-      )
-      : confirmationCases.Low,
     addresses: {
       from: ['Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf'],
       to: ['Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM'],
@@ -314,6 +325,14 @@ export const Transaction = () => {
     errorMsg: null,
   });
   const transactions = [walletTransaction];
+
+  const numConfirmations = state === TxStatusCodes.IN_BLOCK
+    ? select(
+      'confirmations',
+      confirmationCases,
+      confirmationCases.Low
+    )
+    : confirmationCases.Low;
   return wrapWallet(
     mockWalletProps({
       location: getRoute(wallet.publicDeriver.getPublicDeriverId()),
@@ -325,7 +344,14 @@ export const Transaction = () => {
         stores: genPropsForTransactions({
           wallet,
           getPublicDeriverSettingsCache: lookup.getPublicDeriverSettingsCache,
-          transactions
+          transactions,
+          lastSyncInfo: {
+            LastSyncInfoId: 1,
+            Time: new Date(1),
+            SlotNum: numConfirmations,
+            BlockHash: walletTransaction.block?.Hash || '',
+            Height: numConfirmations,
+          },
         }),
         actions,
       }}
@@ -343,7 +369,14 @@ export const TransactionWithMemo = () => {
 
   const walletTransaction = new WalletTransaction({
     txid: '915f2e6865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
-    blockHash: '111111865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
+    block: {
+      BlockId: 1,
+      SlotNum: 0,
+      Height: 0,
+      Digest: 0.0,
+      Hash: '111111865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
+      BlockTime: new Date(0),
+    },
     type: select(
       'txDirection',
       transactionTypes,
@@ -352,7 +385,6 @@ export const TransactionWithMemo = () => {
     amount: new BigNumber(1000),
     fee: new BigNumber(5),
     date: new Date(0),
-    numberOfConfirmations: 0,
     addresses: {
       from: ['Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf'],
       to: ['Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM'],
@@ -374,6 +406,13 @@ export const TransactionWithMemo = () => {
           wallet,
           getPublicDeriverSettingsCache: lookup.getPublicDeriverSettingsCache,
           transactions,
+          lastSyncInfo: {
+            LastSyncInfoId: 1,
+            Time: new Date(1),
+            SlotNum: 1,
+            BlockHash: walletTransaction.block?.Hash || '',
+            Height: 1,
+          },
           memo: {
             hasSetSelectedExternalStorageProvider: false,
             selectedTransaction: walletTransaction,
@@ -404,7 +443,14 @@ export const MemoDialog = () => {
 
   const walletTransaction = new WalletTransaction({
     txid: '915f2e6865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
-    blockHash: '111111865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
+    block: {
+      BlockId: 1,
+      SlotNum: 0,
+      Height: 0,
+      Digest: 0.0,
+      Hash: '111111865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
+      BlockTime: new Date(0),
+    },
     type: select(
       'txDirection',
       transactionTypes,
@@ -413,7 +459,6 @@ export const MemoDialog = () => {
     amount: new BigNumber(1000),
     fee: new BigNumber(5),
     date: new Date(0),
-    numberOfConfirmations: 0,
     addresses: {
       from: ['Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf'],
       to: ['Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM'],
@@ -448,6 +493,13 @@ export const MemoDialog = () => {
           wallet,
           getPublicDeriverSettingsCache: lookup.getPublicDeriverSettingsCache,
           transactions,
+          lastSyncInfo: {
+            LastSyncInfoId: 1,
+            Time: new Date(1),
+            SlotNum: 1,
+            BlockHash: walletTransaction.block?.Hash || '',
+            Height: 1,
+          },
           dialog,
           memo: {
             hasSetSelectedExternalStorageProvider: false,
@@ -490,6 +542,13 @@ export const NoTransactions = () => {
           wallet,
           getPublicDeriverSettingsCache: lookup.getPublicDeriverSettingsCache,
           transactions,
+          lastSyncInfo: {
+            LastSyncInfoId: 1,
+            Time: null,
+            SlotNum: null,
+            BlockHash: null,
+            Height: 0,
+          },
         }),
         actions,
       }}
@@ -506,16 +565,22 @@ export const ManyTransactions = () => {
   const lookup = walletLookup([wallet]);
 
   const transactions = [];
-  for (let i = 0; i < INITIAL_SEARCH_LIMIT + 1; i++) {
+  for (let i = INITIAL_SEARCH_LIMIT; i >= 0; i--) {
     transactions.push(new WalletTransaction({
-      txid: '915f2e6865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
-      blockHash: '111111865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
+      txid: `915f2e6865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7${i}`,
+      block: {
+        BlockId: i + 1,
+        SlotNum: i,
+        Height: i,
+        Digest: i,
+        Hash: `111111865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7${i}`,
+        BlockTime: new Date(Math.floor(i / 2) * (24 * 60 * 60 * 1000)),
+      },
       type: transactionTypes.EXPEND,
       amount: new BigNumber(1000),
       fee: new BigNumber(5),
       // make groups of 2 transactions each
       date: new Date(Math.floor(i / 2) * (24 * 60 * 60 * 1000)),
-      numberOfConfirmations: 0,
       addresses: {
         from: ['Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf'],
         to: ['Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM'],
@@ -525,6 +590,7 @@ export const ManyTransactions = () => {
       errorMsg: null,
     }));
   }
+
   return wrapWallet(
     mockWalletProps({
       location: getRoute(wallet.publicDeriver.getPublicDeriverId()),
@@ -537,6 +603,13 @@ export const ManyTransactions = () => {
           wallet,
           getPublicDeriverSettingsCache: lookup.getPublicDeriverSettingsCache,
           transactions,
+          lastSyncInfo: {
+            LastSyncInfoId: 1,
+            Time: transactions[0].block?.BlockTime || new Date(0),
+            SlotNum: transactions[0].block?.Height || 0,
+            BlockHash: transactions[0].block?.Hash || '',
+            Height: transactions[0].block?.Height || 0,
+          },
           isLoadingTxs: boolean('isLoadingMoreTransactions', false)
         }),
         actions,
@@ -555,12 +628,18 @@ export const TxHistoryExport = () => {
 
   const transactions = [new WalletTransaction({
     txid: '915f2e6865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
-    blockHash: '111111865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
+    block: {
+      BlockId: 1,
+      SlotNum: 0,
+      Height: 0,
+      Digest: 0.0,
+      Hash: '111111865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
+      BlockTime: new Date(0),
+    },
     type: transactionTypes.EXPEND,
     amount: new BigNumber(1000),
     fee: new BigNumber(5),
     date: new Date(0),
-    numberOfConfirmations: 0,
     addresses: {
       from: ['Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf'],
       to: ['Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM'],
@@ -586,6 +665,13 @@ export const TxHistoryExport = () => {
           wallet,
           getPublicDeriverSettingsCache: lookup.getPublicDeriverSettingsCache,
           transactions,
+          lastSyncInfo: {
+            LastSyncInfoId: 1,
+            Time: new Date(1),
+            SlotNum: 1,
+            BlockHash: transactions[0].block?.Hash || '',
+            Height: 1,
+          },
           dialog: ExportTransactionDialog,
           txExport: {
             isExporting: boolean('isExporting', false),

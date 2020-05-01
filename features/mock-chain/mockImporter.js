@@ -51,7 +51,7 @@ type MockTx = RemoteTransaction;
  * You can generate more data for these tests using the Cardano-Wallet WASM library
  */
 
-export const generateTransction = () => {
+export const generateTransaction = () => {
   const genesisTx = {
     hash: cryptoRandomString({ length: 64 }),
     inputs: [
@@ -1178,44 +1178,61 @@ export const generateTransction = () => {
 
 const transactions: Array<MockTx> = [];
 
-export function addTransaction(tx: MockTx) {
+export function addTransaction(tx: MockTx): void {
   transactions.push(tx);
 }
 
-export function resetChain() {
+export const MockChain = Object.freeze({
+  Standard: 0,
+  TestAssurance: 1,
+});
+export function resetChain(
+  chainToUse: $Values<typeof MockChain>,
+): void {
   // want to keep reference the same
   while (transactions.length > 0) {
     transactions.pop();
   }
 
-  const txs = generateTransction();
-  // test setup
-  addTransaction(txs.genesisTx);
-  addTransaction(txs.distributorTx);
-  // test setup
-  addTransaction(txs.genesisTx);
-  addTransaction(txs.distributorTx);
-  // simple-pending-wallet
-  addTransaction(txs.pendingTx1);
-  addTransaction(txs.pendingTx2);
-  // many-tx-wallet
-  addTransaction(txs.manyTx1);
-  addTransaction(txs.manyTx2);
-  addTransaction(txs.manyTx3);
-  addTransaction(txs.manyTx4);
-  addTransaction(txs.useChange);
-  // failed-single-tx
-  addTransaction(txs.failedTx);
-  // shelley-test
-  if (isShelley) {
-    addTransaction(txs.certificateTx);
+  const txs = generateTransaction();
+
+  if (chainToUse === MockChain.Standard) {
+    // test setup
+    addTransaction(txs.genesisTx);
+    addTransaction(txs.distributorTx);
+    // simple-pending-wallet
+    addTransaction(txs.pendingTx1);
+    addTransaction(txs.pendingTx2);
+    // many-tx-wallet
+    addTransaction(txs.manyTx1);
+    addTransaction(txs.manyTx2);
+    addTransaction(txs.manyTx3);
+    addTransaction(txs.manyTx4);
+    addTransaction(txs.useChange);
+    // failed-single-tx
+    addTransaction(txs.failedTx);
+    // shelley-test
+    if (isShelley) {
+      addTransaction(txs.certificateTx);
+    }
+    // ledger-wallet
+    addTransaction(txs.ledgerTx1);
+    // trezor-wallet
+    addTransaction(txs.trezorTx1);
+    addTransaction(txs.trezorTx2);
+    addTransaction(txs.trezorTx3);
+  } else if (chainToUse === MockChain.TestAssurance) {
+    // test setup
+    addTransaction(txs.genesisTx);
+    addTransaction(txs.distributorTx);
+
+    // setup wallet that will send the tx to move the best block
+    addTransaction(txs.manyTx1);
+    addTransaction(txs.manyTx2);
+    addTransaction(txs.manyTx3);
+    addTransaction(txs.manyTx4);
+    addTransaction(txs.useChange);
   }
-  // ledger-wallet
-  addTransaction(txs.ledgerTx1);
-  // trezor-wallet
-  addTransaction(txs.trezorTx1);
-  addTransaction(txs.trezorTx2);
-  addTransaction(txs.trezorTx3);
 }
 
 // =========================

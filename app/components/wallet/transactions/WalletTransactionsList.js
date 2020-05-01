@@ -31,6 +31,7 @@ const dateFormat = 'YYYY-MM-DD';
 
 type Props = {|
   +transactions: Array<WalletTransaction>,
+  +lastSyncBlock: number,
   +memoMap: Map<string, $ReadOnly<TxMemoTableRow>>,
   +priceMap: Map<string, $ReadOnly<PriceDataRow>>,
   +isLoadingTransactions: boolean,
@@ -146,7 +147,7 @@ export default class WalletTransactionsList extends Component<Props> {
             <div className={styles.list}>
               {group.transactions.map((transaction, transactionIndex) => (
                 <Transaction
-                  key={`${transaction.uniqueKey}-${transaction.numberOfConfirmations}`}
+                  key={`${transaction.uniqueKey}`}
                   memo={this.props.memoMap.get(transaction.txid)}
                   unitOfAccount={(() => {
                     if (!this.props.unitOfAccountSetting.enabled) {
@@ -162,7 +163,14 @@ export default class WalletTransactionsList extends Component<Props> {
                   data={transaction}
                   isLastInList={transactionIndex === group.transactions.length - 1}
                   state={transaction.state}
-                  assuranceLevel={transaction.getAssuranceLevelForMode(assuranceMode)}
+                  numberOfConfirmations={transaction.block == null
+                    ? null
+                    : this.props.lastSyncBlock - transaction.block.Height
+                  }
+                  assuranceLevel={transaction.getAssuranceLevelForMode(
+                    assuranceMode,
+                    this.props.lastSyncBlock
+                  )}
                   onAddMemo={onAddMemo}
                   onEditMemo={onEditMemo}
                   shouldHideBalance={this.props.shouldHideBalance}

@@ -81,7 +81,7 @@ export default class AddMemoDialog extends Component<Props, State> {
 
   submit: void => void = () => {
     this.form.submit({
-      onSuccess: (form) => {
+      onSuccess: async (form) => {
         this.setState({ isSubmitting: true });
         const { memoContent } = form.values();
         const memoRequest = {
@@ -92,7 +92,7 @@ export default class AddMemoDialog extends Component<Props, State> {
             LastUpdated: new Date()
           },
         };
-        this.props.onSubmit(memoRequest);
+        await this.props.onSubmit(memoRequest);
       },
       onError: () => {
         this.setState({ isSubmitting: false });

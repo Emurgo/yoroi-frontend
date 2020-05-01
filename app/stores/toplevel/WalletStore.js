@@ -389,6 +389,7 @@ export default class WalletStore extends Store {
     if (!document.hidden) {
       const selected = this.selected;
       if (selected) {
+        // note: don't need to await since UI will handle this
         this.refreshWalletFromRemote(selected);
       }
     }

@@ -13,7 +13,7 @@ import IconEyeOpen from '../../assets/images/my-wallets/icon_eye_open.inline.svg
 import IconEyeClosed from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
 
 type Props = {|
-    +onUpdateHideBalance: void => void,
+    +onUpdateHideBalance: void => Promise<void>,
     +shouldHideBalance: boolean,
     +highlightTitle?: boolean,
     /**

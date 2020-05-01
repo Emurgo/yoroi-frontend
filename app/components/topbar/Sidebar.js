@@ -16,7 +16,7 @@ type Props = {|
   +categories?: Array<Category>,
   +isActiveCategory?: Category => boolean,
   +onCategoryClicked?: string => void,
-  +onToggleSidebar: void => void,
+  +onToggleSidebar: void => Promise<void>,
   +isSidebarExpanded: boolean
 |};
 

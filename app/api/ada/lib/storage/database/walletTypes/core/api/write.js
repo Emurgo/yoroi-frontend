@@ -107,7 +107,7 @@ export class DeleteAllTransactions {
       db, tx,
       request.publicDeriverId
     );
-    DeleteAllTransactions.depTables.ModifyLastSyncInfo.overrideLastSyncInfo(
+    await DeleteAllTransactions.depTables.ModifyLastSyncInfo.overrideLastSyncInfo(
       db, tx,
       {
         LastSyncInfoId: lastSyncInfo.LastSyncInfoId,

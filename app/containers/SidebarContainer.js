@@ -10,8 +10,8 @@ export type GeneratedData = typeof SidebarContainer.prototype.generated;
 @observer
 export default class SidebarContainer extends Component<InjectedOrGenerated<GeneratedData>> {
 
-  toggleSidebar: void => void = () => {
-    this.generated.actions.profile.toggleSidebar.trigger();
+  toggleSidebar: void => Promise<void> = async () => {
+    await this.generated.actions.profile.toggleSidebar.trigger();
   }
 
   render() {

@@ -53,8 +53,8 @@ export default class MyWalletsPage extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  updateHideBalance: void => void = () => {
-    this.generated.actions.profile.updateHideBalance.trigger();
+  updateHideBalance: void => Promise<void> = async () => {
+    await this.generated.actions.profile.updateHideBalance.trigger();
   }
 
   componentDidMount() {

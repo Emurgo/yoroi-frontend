@@ -27,17 +27,20 @@ type Props = {|
 @observer
 export default class OAuthDropboxPage extends Component<Props> {
 
-  onLoad: string => void = (token) => {
-    this.generated.actions.memos.updateExternalStorageProvider.trigger({
+  onLoad: string => Promise<void> = async (token) => {
+    await this.generated.actions.memos.updateExternalStorageProvider.trigger({
       provider: ExternalStorageList.DROPBOX,
       token,
     });
   };
 
+  async componentDidMount() {
+    const { token } = this.props.match.params;
+    await this.onLoad(token);
+  }
+
   render() {
     // URL params
-    const { token } = this.props.match.params;
-    this.onLoad(token);
     return (
       <Redirect to="/settings/external-storage" />
     );
