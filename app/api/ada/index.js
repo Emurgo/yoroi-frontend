@@ -173,7 +173,7 @@ import { clear } from './lib/storage/database/index';
 import environment from '../../environment';
 import { Cip1852Wallet } from './lib/storage/models/Cip1852Wallet/wrapper';
 
-declare var CONFIG : ConfigType;
+declare var CONFIG: ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;
 
 // ADA specific Request / Response params

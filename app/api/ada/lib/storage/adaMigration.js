@@ -74,7 +74,8 @@ export async function migrateToLatest(
     }],
     ['<1.4.0', async () => await bip44Migration()],
     ['<1.10.0', async () => await storagev2Migation(persistentDb)],
-    ['<2.4.0', async () => await txHistoryReset(persistentDb)]
+    ['=1.10.0', async () => await txHistoryReset(persistentDb)],
+    ['>=2.0.0 <2.4.0', async () => await txHistoryReset(persistentDb)],
   ];
 
   let appliedMigration = false;
