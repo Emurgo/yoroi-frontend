@@ -302,7 +302,7 @@ async function _batchHistoryByTransaction(
   if (history.length === 0) {
     return previousTxs;
   }
-  // map database format for historic transactions to actual AdaTransaction format
+
   const transactions = previousTxs.concat(history);
 
   // If we reached the API limit, call API again to get more results
