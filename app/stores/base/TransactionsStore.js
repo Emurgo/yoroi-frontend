@@ -85,6 +85,15 @@ export default class TransactionsStore extends Store {
     return this.getTxRequests(publicDeriver).requests.recentRequest;
   }
 
+  @computed get lastSyncInfo(): IGetLastSyncInfoResponse {
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) {
+      throw new Error(`${nameof(TransactionsStore)}::${nameof(this.lastSyncInfo)} no wallet selected`);
+    }
+    const result = this.getTxRequests(publicDeriver).lastSyncInfo;
+    return result;
+  }
+
   /** Get (or create) the search options for the active wallet (if any)  */
   @computed get searchOptions(): ?GetTransactionsRequestOptions {
     const publicDeriver = this.stores.wallets.selected;
@@ -179,6 +188,17 @@ export default class TransactionsStore extends Store {
 
     const recentRequest = this.getTxRequests(request.publicDeriver).requests.recentRequest;
     const newHash = hashTransactions(result.transactions);
+
+    // update last sync (note: changes even if no new transaction is found)
+    {
+      const lastUpdateDate = await this.api[environment.API].getTxLastUpdatedDate({
+        getLastSyncInfo: publicDeriver.getLastSyncInfo
+      });
+      runInAction(() => {
+        this.getTxRequests(request.publicDeriver).lastSyncInfo = lastUpdateDate;
+      });
+    }
+
     // only recalculate cache if
     // 1) the tx history changed
     // 2) if it's the first time computing for this wallet
@@ -217,16 +237,6 @@ export default class TransactionsStore extends Store {
       );
       if (!pendingRequest.promise) throw new Error('should never happen');
       await pendingRequest.promise;
-    }
-
-    // update last sync
-    {
-      const lastUpdateDate = await this.api[environment.API].getTxLastUpdatedDate({
-        getLastSyncInfo: publicDeriver.getLastSyncInfo
-      });
-      runInAction(() => {
-        this.getTxRequests(request.publicDeriver).lastSyncInfo = lastUpdateDate;
-      });
     }
 
     // update balance

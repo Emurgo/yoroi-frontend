@@ -148,6 +148,7 @@ const stateTranslations = defineMessages({
 
 type Props = {|
   +data: WalletTransaction,
+  +numberOfConfirmations: ?number,
   +memo: void | $ReadOnly<TxMemoTableRow>,
   +state: TxStatusCodesType,
   +selectedExplorer: ExplorerType,
@@ -425,12 +426,16 @@ export default class Transaction extends Component<Props, State> {
               ))}
               {this.getCerificate(data)}
 
-              {(environment.isAdaApi() && state === TxStatusCodes.IN_BLOCK) && (
+              {(
+                environment.isAdaApi() &&
+                state === TxStatusCodes.IN_BLOCK &&
+                this.props.numberOfConfirmations != null
+              ) && (
                 <div className={styles.row}>
                   <h2>{intl.formatMessage(messages.assuranceLevel)}</h2>
                   <span className={styles.rowData}>
                     <span className={styles.assuranceLevel}>{status}</span>
-                    . {data.numberOfConfirmations} {intl.formatMessage(messages.confirmations)}.
+                    . <span className="confirmationCount">{this.props.numberOfConfirmations}</span> {intl.formatMessage(messages.confirmations)}.
                   </span>
                 </div>
               )}

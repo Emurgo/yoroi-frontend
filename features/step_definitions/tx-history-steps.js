@@ -158,6 +158,18 @@ Then(
   }
 );
 
+Then(
+  /^The number of confirmations of the top tx is ([^"]*)$/,
+  async function (count) {
+    await this.waitForElement('.Transaction_component');
+    const actualTxsList = await this.getElementsBy('.Transaction_component');
+    const topTx = actualTxsList[0];
+    const assuranceElem = await topTx.findElements(By.css('.confirmationCount'));
+    const confirmationCount = await assuranceElem[0].getText();
+    chai.expect(confirmationCount).to.equal(count);
+  }
+);
+
 const displayInfo = {
   'many-tx-wallet': {
     txType: 'ADA intrawallet transaction',

@@ -6,7 +6,7 @@ import { By } from 'selenium-webdriver';
 import { enterRecoveryPhrase, assertPlate } from './wallet-restoration-steps';
 import { testWallets } from '../mock-chain/TestWallets';
 import {
-  resetChain,
+  resetChain, MockChain,
   serverIssue, serverFixed,
   appMaintenance, appMaintenanceFinish,
 } from '../mock-chain/mockImporter';
@@ -48,9 +48,13 @@ Before((scenario) => {
   testProgress.scenarioName = scenario.pickle.name.replace(/[^0-9a-z_ ]/gi, '');
   testProgress.lineNum = scenario.sourceLocation.line;
   testProgress.step = 0;
+});
 
-  // reset our mock chain to avoid modifications bleeding into other tests
-  resetChain();
+Before({ tags: 'not @TestAssuranceChain' }, () => {
+  resetChain(MockChain.Standard);
+});
+Before({ tags: '@TestAssuranceChain' }, () => {
+  resetChain(MockChain.TestAssurance);
 });
 
 Before({ tags: '@serverDown' }, () => {

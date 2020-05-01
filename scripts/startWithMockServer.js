@@ -36,10 +36,10 @@ RustModule._wasmv2 = wasmv2;
 RustModule._wasmv3 = wasmv3;
 
 const { getMockServer } = require('../features/mock-chain/mockServer');
-const { resetChain } = require('../features/mock-chain/mockImporter');
+const { MockChain, resetChain } = require('../features/mock-chain/mockImporter');
 
 getMockServer({ outputLog: true });
-resetChain();
+resetChain(MockChain.Standard);
 
 createWebpackServer(config.baseDevConfig(ENV, false), {
   host: 'localhost',

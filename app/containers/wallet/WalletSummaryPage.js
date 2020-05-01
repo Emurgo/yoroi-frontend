@@ -47,6 +47,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
       recent,
       searchOptions,
       recentTransactionsRequest,
+      lastSyncInfo,
       unconfirmedAmount,
       isExporting,
       exportError,
@@ -80,6 +81,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
         walletTransactions = (
           <WalletTransactionsList
             transactions={recent}
+            lastSyncBlock={lastSyncInfo.Height}
             memoMap={this.generated.stores.memos.txMemoMap.get(walletId) || new Map()}
             priceMap={this.generated.stores.coinPriceStore.priceMap}
             selectedExplorer={this.generated.stores.profile.selectedExplorer}
@@ -323,6 +325,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
                 isExecuting: adaStores.transactions.recentTransactionsRequest.isExecuting,
                 wasExecuted: adaStores.transactions.recentTransactionsRequest.wasExecuted,
               },
+              lastSyncInfo: adaStores.transactions.lastSyncInfo,
               unconfirmedAmount: adaStores.transactions.unconfirmedAmount,
               isExporting: adaStores.transactions.isExporting,
               exportError: adaStores.transactions.exportError,

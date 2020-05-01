@@ -67,3 +67,13 @@ Feature: Txs History
     Then I see the transactions summary
     And I should see that the number of transactions is 7
     Then I should see the balance number "2.290005 ADA"
+
+  @it-121 @TestAssuranceChain
+  Scenario: Number of confirmation increases overt time (IT-121)
+    Given There is a wallet stored named small-single-tx
+    Given I see the transactions summary
+    Then I should see that the number of transactions is 1
+    Then I expand the top transaction
+    And The number of confirmations of the top tx is 199
+    Then A successful tx gets sent from my wallet from another client
+    And The number of confirmations of the top tx is 201

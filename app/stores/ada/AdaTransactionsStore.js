@@ -71,7 +71,8 @@ export default class AdaTransactionsStore extends TransactionsStore {
     if (!publicDeriver) return defaultUnconfirmedAmount;
 
     // Get current transactions for public deriver
-    const result = this.getTxRequests(publicDeriver).requests.allRequest.result;
+    const txRequests = this.getTxRequests(publicDeriver);
+    const result = txRequests.requests.allRequest.result;
     if (!result || !result.transactions) return defaultUnconfirmedAmount;
 
     const unitOfAccount = this.stores.profile.unitOfAccount;
@@ -86,7 +87,12 @@ export default class AdaTransactionsStore extends TransactionsStore {
         unitOfAccount.currency,
         timestamp
       )));
-    return calculateUnconfirmedAmount(result.transactions, assuranceMode, getUnitOfAccount);
+    return calculateUnconfirmedAmount(
+      result.transactions,
+      txRequests.lastSyncInfo.Height,
+      assuranceMode,
+      getUnitOfAccount
+    );
   }
 
   /** Wrap utility function to expose to components/containers */
@@ -162,6 +168,7 @@ export default class AdaTransactionsStore extends TransactionsStore {
 
 export function calculateUnconfirmedAmount(
   transactions: Array<WalletTransaction>,
+  lastSyncBlock: number,
   assuranceMode: AssuranceMode,
   getUnitOfAccount: Date => (void | $ReadOnly<PriceDataRow>),
 ): UnconfirmedAmount {
@@ -180,7 +187,7 @@ export function calculateUnconfirmedAmount(
     // skip any failed transactions
     if (transaction.state < 0) continue;
 
-    const assuranceForTx = transaction.getAssuranceLevelForMode(assuranceMode);
+    const assuranceForTx = transaction.getAssuranceLevelForMode(assuranceMode, lastSyncBlock);
     if (assuranceForTx !== assuranceLevels.HIGH) {
       // total
       unconfirmedAmount.total = unconfirmedAmount.total.plus(transaction.amount.absoluteValue());

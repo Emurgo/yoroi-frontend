@@ -12,7 +12,7 @@ import type {
   DbTxIO,
 } from '../api/ada/lib/storage/database/transactionModels/multipart/tables';
 import type {
-  DbBlock, CertificatePart,
+  DbBlock, CertificatePart, BlockRow,
 } from '../api/ada/lib/storage/database/primitives/tables';
 import type {
   TxStatusCodesType,
@@ -25,13 +25,11 @@ export default class WalletTransaction {
   @observable txid: string;
 
   // TODO: remove and make as a map
-  @observable blockHash: void | string;
+  @observable block: ?$ReadOnly<BlockRow>;
   @observable type: TransactionDirectionType;
   @observable amount: BigNumber; // fee included
   @observable fee: BigNumber;
   @observable date: Date; // TODO: remove?
-  /** todo: remove and instead infer from Block member variable */
-  @observable numberOfConfirmations: number = 0;
   @observable addresses: TransactionAddresses = { from: [], to: [] };
   @observable certificate: void | CertificatePart;
 
@@ -41,12 +39,11 @@ export default class WalletTransaction {
 
   constructor(data: {|
     txid: string,
-    blockHash: void | string,
+    block: ?$ReadOnly<BlockRow>,
     type: TransactionDirectionType,
     amount: BigNumber,
     fee: BigNumber,
     date: Date,
-    numberOfConfirmations: number,
     addresses: TransactionAddresses,
     certificate: void | CertificatePart,
     state: TxStatusCodesType,
@@ -60,17 +57,25 @@ export default class WalletTransaction {
    * can be used as a key for a React element or to trigger a mobx reaction
    */
   @computed get uniqueKey(): string {
-    const hash = this.blockHash == null
+    const hash = this.block == null
       ? 'undefined'
-      : this.blockHash;
+      : this.block.Hash;
     return `${this.txid}-${this.state}-${hash}`;
   }
 
-  getAssuranceLevelForMode(mode: AssuranceMode): AssuranceLevel {
-    if (this.numberOfConfirmations < mode.low) {
+  getAssuranceLevelForMode(
+    mode: AssuranceMode,
+    absoluteBlockNum: number,
+  ): AssuranceLevel {
+    if (this.block == null) {
+      // TODO: this is slightly unexpected behavior in order to return non-null
+      // maybe we shouldn't do this
       return assuranceLevels.LOW;
     }
-    if (this.numberOfConfirmations < mode.medium) {
+    if (absoluteBlockNum - this.block.Height < mode.low) {
+      return assuranceLevels.LOW;
+    }
+    if (absoluteBlockNum - this.block.Height < mode.medium) {
       return assuranceLevels.MEDIUM;
     }
     return assuranceLevels.HIGH;
@@ -102,16 +107,13 @@ export default class WalletTransaction {
 
     return new WalletTransaction({
       txid: tx.transaction.Hash,
-      blockHash: tx.block?.Hash,
+      block: tx.block,
       type: tx.type,
       amount: tx.amount.dividedBy(LOVELACES_PER_ADA).plus(tx.fee.dividedBy(LOVELACES_PER_ADA)),
       fee: tx.fee.dividedBy(LOVELACES_PER_ADA),
       date: tx.block != null
         ? tx.block.BlockTime
         : new Date(tx.transaction.LastUpdateTime),
-      numberOfConfirmations: request.lastBlockNumber != null && tx.block != null
-        ? request.lastBlockNumber - tx.block.Height
-        : 0,
       addresses: {
         from: [
           ...toAddr(tx.utxoInputs),
