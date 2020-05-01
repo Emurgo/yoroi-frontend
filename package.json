@@ -76,7 +76,7 @@
     "@babel/preset-flow": "7.9.0",
     "@babel/preset-react": "7.9.4",
     "@babel/register": "7.9.0",
-    "@babel/runtime": "7.9.2",
+    "@babel/runtime": "7.9.6",
     "@babel/runtime-corejs3": "7.9.2",
     "@emurgo/js-chain-libs-node": "git+https://github.com/SebastienGllmt/js-chain-libs-node-pkg.git",
     "@przemyslawzalewski/babel-eslint": "11.0.0",
