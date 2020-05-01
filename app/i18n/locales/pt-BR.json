@@ -600,7 +600,7 @@
   "wallet.transaction.memo.delete.dialog.actions.delete": "Deletar",
   "wallet.transaction.memo.delete.dialog.content": "Tem certeza de que deseja remover a nota desta transação? <br /> Isso excluirá todas as cópias e você não poderá restaurá-lo no futuro.",
   "wallet.transaction.memo.invalid": "A nota deve ter no mínimo 1 e no máximo {maxMemo} caracteres.",
-  "wallet.transaction.memo.optional.invalid": "Memo cannot be more than {maxMemo} characters.",
+  "wallet.transaction.memo.optional.invalid": "A nota não pode ter mais que {maxMemo} caracteres.",
   "wallet.transaction.received": "{currency} recebida",
   "wallet.transaction.sent": "{currency} enviada",
   "wallet.transaction.state.failed": "falhou",
