@@ -89,7 +89,7 @@
     "@storybook/react": "5.3.18",
     "@storybook/source-loader": "5.3.18",
     "autoprefixer": "9.7.6",
-    "babel-jest": "25.4.0",
+    "babel-jest": "25.5.1",
     "babel-loader": "8.1.0",
     "babel-plugin-add-module-exports": "1.0.2",
     "babel-plugin-dynamic-import-node": "2.3.3",
