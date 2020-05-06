@@ -31,7 +31,7 @@ const mnemonicsToAddresses = (
 };
 
 export function createAccountPlate(accountPubHash: string): WalletAccountNumberPlate {
-  const hash = blakejs.blake2bHex(accountPubHash);
+  const hash: string = blakejs.blake2bHex(accountPubHash);
   const [a, b, c, d] = crc32(hash);
   const alpha = `ABCDEJHKLNOPSTXZ`;
   const letters = x => `${alpha[Math.floor(x / 16)]}${alpha[x % 16]}`;

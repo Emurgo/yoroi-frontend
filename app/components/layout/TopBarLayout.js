@@ -80,7 +80,7 @@ export default class TopBarLayout extends Component<Props> {
           className={
             classnames([
               styles.content,
-              showInContainer !== null && showInContainer === true && styles.containerContent
+              showInContainer === true && styles.containerContent
             ])
           }
         >
