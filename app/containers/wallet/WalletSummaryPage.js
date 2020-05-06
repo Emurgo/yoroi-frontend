@@ -107,7 +107,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
             unitOfAccountSetting={profile.unitOfAccount}
           />
         );
-      } else if (!hasAny) {
+      } else {
         walletTransactions = (
           <WalletNoTransactions
             label={noTransactionsFoundLabel}

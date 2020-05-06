@@ -108,8 +108,6 @@ async function _scanNextBatch(
   requestSize: number,
   checkAddressesInUse: FilterFunc,
 ): Promise<Array<AddressInfo>> {
-  let newFetchedAddressesInfo = fetchedAddressesInfo;
-
   /* Optimization: use `requestSize` to batch calls to crypto backend and to backend-service api
    * Allows us to make more than `scanSize` calls at a time
    *
@@ -137,7 +135,7 @@ async function _scanNextBatch(
   const usedAddresses = await checkAddressesInUse({ addresses: newAddresses });
 
   // Update metadata for new addresses
-  newFetchedAddressesInfo = _addFetchedAddressesInfo(
+  const newFetchedAddressesInfo = _addFetchedAddressesInfo(
     fetchedAddressesInfo,
     newAddresses,
     usedAddresses,

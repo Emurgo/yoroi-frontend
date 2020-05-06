@@ -31,14 +31,19 @@ export default class LoadingGif extends Component<{||}, State> {
 
   componentDidMount() {
     const loadingImg = getBgUrl(document.getElementsByClassName(styles.component)[0]);
-    this.state.image.src = loadingImg;
-    this.state.image.onload = () => {
-      this.setState({ isLoaded: true, });
-    };
+    this.setState(prevState => {
+      prevState.image.src = loadingImg;
+      prevState.image.onload = () => {
+        this.setState({ isLoaded: true, });
+      };
+      return prevState;
+    });
   }
 
   componentWillUnmount() {
-    this.state.image.onload = null;
+    this.setState(prevState => {
+      prevState.image.onload = null;
+    });
   }
 
   render() {
