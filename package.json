@@ -121,7 +121,7 @@
     "geckodriver": "1.19.1",
     "html-loader": "1.1.0",
     "html-webpack-harddisk-plugin": "1.0.1",
-    "html-webpack-plugin": "4.2.0",
+    "html-webpack-plugin": "4.3.0",
     "husky": "4.2.5",
     "jest": "25.5.3",
     "jest-canvas-mock": "2.2.0",
