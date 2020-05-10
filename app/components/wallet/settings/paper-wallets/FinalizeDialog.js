@@ -114,9 +114,9 @@ export default class FinalizeDialog extends Component<Props> {
             </h2>
             <div className={styles.plateRowDiv}>
               <WalletAccountIcon
-                iconSeed={paper.accountPlate.hash}
+                iconSeed={paper.accountPlate.ImagePart}
               />
-              <span className={styles.plateIdSpan}>{paper.accountPlate.id}</span>
+              <span className={styles.plateIdSpan}>{paper.accountPlate.TextPart}</span>
             </div>
           </div>
         ) : ''}

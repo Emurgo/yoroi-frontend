@@ -381,6 +381,6 @@ export default class MemosStore extends Store {
     // we should combine a unique install ID + the publicDeriver's auto-increment key number
     if (withPubKey == null) throw new Error('Not implemented yet');
     const { plate } = this.stores.wallets.getPublicKeyCache(withPubKey);
-    return plate.id;
+    return plate.TextPart;
   }
 }

@@ -21,7 +21,7 @@ function createWallet(payload: {|
   } };
 }
 
-// You can use this website to generate more mnemoncis if you need for testing
+// You can use this website to generate more mnemonics if you need for testing
 // https://iancoleman.io/bip39/
 
 type WalletNames =
