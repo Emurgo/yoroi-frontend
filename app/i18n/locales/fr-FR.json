@@ -613,7 +613,7 @@
   "wallet.transaction.type.multiparty": "Transaction multiparties {currency}",
   "wallet.transfer.cards.byron": "Wallet de l'ère Byron",
   "wallet.transfer.cards.shelleyItn": "Testnet Shelley",
-  "wallet.transfer.instruction": "Tout ADA réclamé sera transféré dans votre portefeuille actuellement sélectionné",
+  "wallet.transfer.instruction": "Any ADA claimed will be transferred to your currently selected wallet",
   "wallet.undelegation.transaction.explanationLine1": "Vous n'avez PAS besoin d'arrêter une délégation avant de changer de groupe d'enjeu (pool)",
   "wallet.undelegation.transaction.explanationLine2": "Cela prendra 2 époques après la fin de l'époque courante pour que votre choix d'arrêter de déléguer soit effectif",
   "widgets.copyableaddress.addressCopyTooltipMessage": "Copier dans le presse-papier",
