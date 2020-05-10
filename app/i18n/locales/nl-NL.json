@@ -613,7 +613,7 @@
   "wallet.transaction.type.multiparty": "{currency} transacties tussen meerdere partijen",
   "wallet.transfer.cards.byron": "Byron-tijdperk Portemonnee",
   "wallet.transfer.cards.shelleyItn": "Shelley Testnet",
-  "wallet.transfer.instruction": "Elke ADA die wordt geclaimd, wordt overgebracht naar de door u gekozen Portemonnee",
+  "wallet.transfer.instruction": "Any ADA claimed will be transferred to your currently selected wallet",
   "wallet.undelegation.transaction.explanationLine1": "U hoeft de delegatie NIET ongedaan te maken om van Stakepool te wisselen",
   "wallet.undelegation.transaction.explanationLine2": "Het duurt 2 tijdperken na het einde van het huidige tijdvak om de delegatie in werking te laten treden",
   "widgets.copyableaddress.addressCopyTooltipMessage": "Kopieer naar klembord",
