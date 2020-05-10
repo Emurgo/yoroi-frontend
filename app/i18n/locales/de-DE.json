@@ -613,7 +613,7 @@
   "wallet.transaction.type.multiparty": "{currency} mehrfach-Teilnehmer Transaktion",
   "wallet.transfer.cards.byron": "Byron-Ära wallet",
   "wallet.transfer.cards.shelleyItn": "Shelley testnet",
-  "wallet.transfer.instruction": "Any ADA claimed will be transferred to your currently selected wallet",
+  "wallet.transfer.instruction": "Alle beantragten ADA werden in die gerade ausgewählte Wallet übertragen",
   "wallet.undelegation.transaction.explanationLine1": "Du musst NICHT undelegieren bevor Du zu einem anderen Stake pool wechselst",
   "wallet.undelegation.transaction.explanationLine2": "Es wird nach dem Ende der aktuellen Epoche 2 weitere Epochen dauern bis die Undelegierung effektiv wird",
   "widgets.copyableaddress.addressCopyTooltipMessage": "In die Zwischenablage kopieren",
