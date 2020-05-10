@@ -613,7 +613,7 @@
   "wallet.transaction.type.multiparty": "{currency} transazione multiparty",
   "wallet.transfer.cards.byron": "Portafoglio era-Byron",
   "wallet.transfer.cards.shelleyItn": "Shelley testnet",
-  "wallet.transfer.instruction": "Qualsiasi richiesta di ADA verrà trasferita sul portafoglio attualmente selezionato",
+  "wallet.transfer.instruction": "Any ADA claimed will be transferred to your currently selected wallet",
   "wallet.undelegation.transaction.explanationLine1": "NON è necessario rimuovere la delega prima di cambiare pool",
   "wallet.undelegation.transaction.explanationLine2": "Ci vorranno 2 epoche dopo la fine dell'epoca attuale perché il ritiro delega abbia effetto",
   "widgets.copyableaddress.addressCopyTooltipMessage": "Copia negli appunti",
