@@ -14,7 +14,7 @@ type Props = {|
 const messages = defineMessages({
   instruction: {
     id: 'wallet.transfer.instruction',
-    defaultMessage: '!!!Any ADA claimed will be transfered to your currently selected wallet',
+    defaultMessage: '!!!Any ADA claimed will be transferred to your currently selected wallet',
   },
 });
 

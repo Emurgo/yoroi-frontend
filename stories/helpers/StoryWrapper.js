@@ -313,8 +313,8 @@ function genMockCache(dummyWallet: PublicDeriver<>) {
     getPublicKeyCache: (wallet) => ({
       publicDeriver: wallet,
       plate: {
-        hash: '8e4e2f11b6ac2a269913286e26339779ab8767579d18d173cdd324929d94e2c43e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
-        id: 'DNKO-8098',
+        ImagePart: '8e4e2f11b6ac2a269913286e26339779ab8767579d18d173cdd324929d94e2c43e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
+        TextPart: 'DNKO-8098',
       },
     }),
     getDelegation: (_wallet) => (undefined),

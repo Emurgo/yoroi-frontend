@@ -2,7 +2,7 @@
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import type { WalletAccountNumberPlate } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { WalletChecksum } from '@emurgo/cip4-js';
 
 import styles from './WalletSubRow.scss';
 
@@ -11,7 +11,7 @@ import WalletPlate from './WalletPlate';
 type Props = {|
   +walletInfo: {|
     +conceptualWalletName: string,
-    +plate: null | WalletAccountNumberPlate,
+    +plate: null | WalletChecksum,
   |},
   +walletDetails: Node,
   +walletNumber: number,

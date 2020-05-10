@@ -15,10 +15,10 @@ import HideBalanceIcon from '../../assets/images/top-bar/password.hide.inline.sv
 import ShowBalanceIcon from '../../assets/images/top-bar/password.show.inline.svg';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import type { WalletType } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
-import type { WalletAccountNumberPlate } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { calculateAndFormatValue } from '../../utils/unit-of-account';
+import type { WalletChecksum } from '@emurgo/cip4-js';
 
 const messages = defineMessages({
   totalBalance: {
@@ -31,7 +31,7 @@ type Props = {|
   +publicDeriver: null | PublicDeriver<>,
   +walletInfo: null | {|
     +type: WalletType,
-    +plate: null | WalletAccountNumberPlate,
+    +plate: null | WalletChecksum,
     +conceptualWalletName: string,
     +amount: ?BigNumber,
   |},
@@ -47,14 +47,14 @@ type Props = {|
 |};
 
 function constructPlate(
-  plate: WalletAccountNumberPlate,
+  plate: WalletChecksum,
   saturationFactor: number,
   divClass: string,
 ): [string, React$Element<'div'>] {
-  return [plate.id, (
+  return [plate.TextPart, (
     <div className={divClass}>
       <WalletAccountIcon
-        iconSeed={plate.hash}
+        iconSeed={plate.ImagePart}
         saturationFactor={saturationFactor}
       />
     </div>

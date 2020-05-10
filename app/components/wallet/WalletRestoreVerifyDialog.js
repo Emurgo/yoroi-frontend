@@ -11,7 +11,6 @@ import RawHash from '../widgets/hashWrappers/RawHash';
 import WalletAccountIcon from '../topbar/WalletAccountIcon';
 import Dialog from '../widgets/Dialog';
 import DialogTextBlock from '../widgets/DialogTextBlock';
-import type { WalletAccountNumberPlate } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import LocalizableError from '../../i18n/LocalizableError';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../domain/Explorer';
@@ -19,6 +18,7 @@ import type { Notification } from '../../types/notificationType';
 import type { PlateResponse } from '../../api/ada/lib/cardanoCrypto/plate';
 import CenteredLayout from '../layout/CenteredLayout';
 import environment from '../../environment';
+import type { WalletChecksum } from '@emurgo/cip4-js';
 
 const messages = defineMessages({
   dialogTitleVerifyWalletRestoration: {
@@ -92,7 +92,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
 
   generatePlate(
     title: string,
-    plate: WalletAccountNumberPlate,
+    plate: WalletChecksum,
   ) {
     return (
       <div>
@@ -101,9 +101,9 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
         </h2>
         <div className={styles.plateRowDiv}>
           <WalletAccountIcon
-            iconSeed={plate.hash}
+            iconSeed={plate.ImagePart}
           />
-          <span className={styles.plateIdSpan}>{plate.id}</span>
+          <span className={styles.plateIdSpan}>{plate.TextPart}</span>
         </div>
       </div>
     );

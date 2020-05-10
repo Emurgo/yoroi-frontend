@@ -1,6 +1,7 @@
 // @flow
 import './lib/test-config';
 import { schema } from 'lovefield';
+import type { lf$Database } from 'lovefield';
 import AdaApi from './index';
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
 import { generateWalletRootKey } from './lib/cardanoCrypto/cryptoWallet';
@@ -18,10 +19,10 @@ import type {
 import {
   loadLovefieldDB,
 } from './lib/storage/database/index';
-import { createAccountPlate, } from './lib/cardanoCrypto/plate';
+import { legacyWalletChecksum } from '@emurgo/cip4-js';
 import { asGetPublicKey } from './lib/storage/models/PublicDeriver/traits';
 
-let db;
+let db: lf$Database;
 
 beforeAll(async () => {
   await RustModule.load();
@@ -44,8 +45,8 @@ test('Restore wallet', async () => {
   expect(asGetPublicKeyInstance != null).toEqual(true);
   if (asGetPublicKeyInstance != null) {
     const pubKey = await asGetPublicKeyInstance.getPublicKey();
-    const plate = createAccountPlate(pubKey.Hash);
-    expect(plate.id).toEqual('DBJL-9530');
+    const plate = legacyWalletChecksum(pubKey.Hash);
+    expect(plate.TextPart).toEqual('DBJL-9530');
   }
 });
 

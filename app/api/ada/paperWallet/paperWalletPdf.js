@@ -6,13 +6,13 @@ import paperWalletPage2Path from '../../../assets/images/paper-wallet/paper-wall
 import { Logger, stringifyError } from '../../../utils/logging';
 import type { Network } from '../../../../config/config-types';
 import { NetworkType } from '../../../../config/config-types';
-import type { WalletAccountNumberPlate } from '../lib/storage/models/PublicDeriver/interfaces';
+import type { WalletChecksum } from '@emurgo/cip4-js';
 import { createIcon as blockiesIcon } from '@download/blockies';
 
 export type PaperRequest = {|
   words: Array<string>,
   addresses: Array<string>,
-  accountPlate: ?WalletAccountNumberPlate,
+  accountPlate: ?WalletChecksum,
   network: Network,
 |}
 
@@ -59,7 +59,7 @@ export const generateAdaPaperPdf = async (
     if (accountPlate) {
       // print account plate ID bottom-left corner of main front section
       doc.setFontSize(12);
-      doc.text(145, 180, accountPlate.id);
+      doc.text(145, 180, accountPlate.TextPart);
     }
 
     updateStatus(PdfGenSteps.frontpage);
@@ -87,7 +87,7 @@ export const generateAdaPaperPdf = async (
 
       // Generate account plate icon
       const icon = blockiesIcon({
-        seed: accountPlate.hash,
+        seed: accountPlate.ImagePart,
         size: 7,
         scale: 5,
         bgcolor: '#fff',
@@ -106,7 +106,7 @@ export const generateAdaPaperPdf = async (
 
       // Print account plate ID under the plate icon on backside
       doc.setFontSize(12);
-      textCenter(doc, 130, accountPlate.id, null, 180, true);
+      textCenter(doc, 130, accountPlate.TextPart, null, 180, true);
     }
 
     await addImage(doc, paperWalletPage2Path, pageSize);
