@@ -1,6 +1,7 @@
 // @flow
 import { action, observable } from 'mobx';
-import type { CardanoSignTransaction$ } from 'trezor-connect/lib/types/cardano';
+import type { CardanoSignedTx } from 'trezor-connect/lib/types/networks/cardano';
+import type { Success, Unsuccessful } from 'trezor-connect/lib/types/params';
 
 import Store from '../base/Store';
 import environment from '../../environment';
@@ -105,7 +106,7 @@ export default class TrezorSendStore extends Store {
   };
 
   _brodcastSignedTx: (
-    CardanoSignTransaction$,
+    Success<CardanoSignedTx> | Unsuccessful,
     PublicDeriver<>,
   ) => Promise<void> = async (
     trezorSignTxResp,
