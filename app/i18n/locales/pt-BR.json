@@ -1,7 +1,7 @@
 {
   "api.errors.ApiMethodNotYetImplementedError": "Este método de API ainda não está implementado.",
   "api.errors.GenericApiError": "Ocorreu um erro. Por favor tente novamente mais tarde.",
-  "api.errors.IncorrectPasswordError": "Senha incorreta da wallet.",
+  "api.errors.IncorrectPasswordError": "Senha incorreta",
   "api.errors.NotEnoughMoneyToSendError": "Saldo insuficiente para realizar essa transação.",
   "api.errors.PromiseNotCalledYetError": "Resultado acessado antes da conclusão da execução.",
   "api.errors.ReportRequestError": "Houve um problema ao enviar a solicitação para o suporte.",
@@ -24,7 +24,7 @@
   "api.errors.getTxsBodiesForUTXOsApiError": "Erro recebido do servidor ao obter os TxBodies.",
   "api.errors.getTxsBodiesForUTXOsError": "Erro recebido na chamada do método da API ao obter TxBodies.",
   "api.errors.getUtxosForAddressesApiError": "Erro recebido do servidor ao obter UTxOs.",
-  "api.errors.getUtxosSumsForAddressesApiError": "Erro recebido do servidor ao obter o balance.",
+  "api.errors.getUtxosSumsForAddressesApiError": "Erro recebido do servidor ao obter o saldo",
   "api.errors.histoicalCoinPriceError": "Dados históricos de preços de moedas não estão disponíveis agora.",
   "api.errors.invalidMnemonicError": "\nFrase inserida é inválida, por favor, verifique.",
   "api.errors.invalidWitnessError": "A assinatura é inválida.",
