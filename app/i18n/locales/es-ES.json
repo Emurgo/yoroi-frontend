@@ -613,7 +613,7 @@
   "wallet.transaction.type.multiparty": "{currency} transacción multipartita",
   "wallet.transfer.cards.byron": "Billetera de la era Byron",
   "wallet.transfer.cards.shelleyItn": "Red de Prueba de Shelley",
-  "wallet.transfer.instruction": "Cualquier ADA reclamado será transferido a tu billetera actualmente seleccionada",
+  "wallet.transfer.instruction": "Toda ADA reclamada será transferida a la billetera actualmente seleccionada",
   "wallet.undelegation.transaction.explanationLine1": "NO es necesario que canceles la delegación antes de cambiar de stake pool",
   "wallet.undelegation.transaction.explanationLine2": "Tomará 2 epochs, a partir del final del epoch actual, para que la des-delegación se haga efectiva",
   "widgets.copyableaddress.addressCopyTooltipMessage": "Copiar al portapapeles",
