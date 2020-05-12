@@ -1,3 +1,5 @@
+// @flow
+
 module.exports = {
   rules: {
     'flowtype/require-return-type': [
@@ -9,18 +11,18 @@ module.exports = {
         excludeMatching: ['constructor'],
       }
     ],
-    "flowtype/require-parameter-type": [
+    'flowtype/require-parameter-type': [
       2,
       {
-        "excludeArrowFunctions": true
+        excludeArrowFunctions: true
       }
     ],
-    "no-restricted-syntax": [
-      "error",
+    'no-restricted-syntax': [
+      'error',
       {
-        "selector": "ClassProperty:not([typeAnnotation])",
-        "message": "Missing type annotation of class property. This has unexpected cross-module behavior."
+        selector: 'ClassProperty:not([typeAnnotation])',
+        message: 'Missing type annotation of class property. This has unexpected cross-module behavior.'
       },
     ],
   },
-}
+};
