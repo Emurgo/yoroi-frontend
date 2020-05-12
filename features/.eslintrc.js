@@ -1,6 +1,8 @@
+// @flow
+
 module.exports = {
   rules: {
-    "no-await-in-loop": "off",
-    "no-unused-expressions": "off"
+    'no-await-in-loop': 'off',
+    'no-unused-expressions': 'off'
   }
-}
+};

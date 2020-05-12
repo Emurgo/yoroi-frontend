@@ -1,6 +1,8 @@
+// @flow
+
 module.exports = {
   root: true,
-  parser: '@przemyslawzalewski/babel-eslint',
+  parser: 'babel-eslint',
   parserOptions: {
     ecmaVersion: 6,
     sourceType: 'module',
@@ -118,4 +120,4 @@ module.exports = {
     yoroi: true,
     nameof: true,
   }
-}
+};
