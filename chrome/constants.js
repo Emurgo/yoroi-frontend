@@ -5,11 +5,10 @@ import {
   portToPermission,
   portToSocketPermission,
 } from '../scripts/connections';
-import { SEIZA_URL, SEIZA_FOR_YOROI_URL } from './manifestEnvs';
 
 export const Version = {
-  Shelley: '2.7.7',
-  Byron: '1.10.1',
+  Shelley: '2.7.8',
+  Byron: '1.10.2',
 };
 
 export function genCSP(request: {|
@@ -50,14 +49,12 @@ export function genCSP(request: {|
   connectSrc.push('https://api.dropboxapi.com');
   connectSrc.push('https://content.dropboxapi.com');
 
-  frameSrc.push(SEIZA_FOR_YOROI_URL);
-  frameSrc.push(SEIZA_URL);
   frameSrc.push('https://connect.trezor.io/');
   frameSrc.push('https://emurgo.github.io/yoroi-extension-ledger-bridge');
 
   // unsafe-eval is unfortunately needed to compile WebAssembly in the browser
   // it may be removed if wasm-eval is ever standardized https://github.com/w3c/webappsec-csp/pull/293
-  const evalSrc = "'unsafe-eval'";
+  const evalSrc = "'wasm-eval'";
 
   // unsafe-inline is unfortunately required by style-loader (even in production builds)
   const evalStyle = "'unsafe-inline'";
