@@ -6,7 +6,7 @@ import {
   prepareLedgerConnect,
 } from '../../utils/hwConnectHandler';
 
-import LedgerConnect from 'yoroi-extension-ledger-connect-handler';
+import LedgerConnect from '@emurgo/ledger-connect-handler';
 import { wrapWithFrame } from '../lib/TrezorWrapper';
 
 import LocalizableError from '../../i18n/LocalizableError';

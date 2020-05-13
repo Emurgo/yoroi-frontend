@@ -7,8 +7,8 @@ import {
 } from '../scripts/connections';
 
 export const Version = {
-  Shelley: '2.7.8',
-  Byron: '1.10.2',
+  Shelley: '2.7.9',
+  Byron: '1.10.3',
 };
 
 export function genCSP(request: {|
@@ -55,6 +55,10 @@ export function genCSP(request: {|
   // wasm-eval is needed to compile WebAssembly in the browser
   // note: wasm-eval is not standardized but empirically works in Firefox & Chrome https://github.com/w3c/webappsec-csp/pull/293
   const evalSrc = "'wasm-eval'";
+
+  if (request.isDev) {
+    scriptSrc.push("'unsafe-eval'");
+  }
 
   // unsafe-inline is unfortunately required by style-loader (even in production builds)
   const evalStyle = "'unsafe-inline'";

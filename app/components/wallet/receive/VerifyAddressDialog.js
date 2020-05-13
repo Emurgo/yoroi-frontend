@@ -12,7 +12,7 @@ import type {
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import {
   toDerivationPathString,
-} from 'yoroi-extension-ledger-connect-handler';
+} from '@emurgo/ledger-connect-handler';
 
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
