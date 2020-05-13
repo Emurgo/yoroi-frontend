@@ -9,6 +9,7 @@ import {
   Version,
   genCSP,
 } from './constants';
+import { SEIZA_URL, SEIZA_FOR_YOROI_URL } from './manifestEnvs';
 
 export default (isDebug: boolean) => buildManifest({
   description: 'A simple, secure and fast Cardano ADA wallet.',
@@ -18,6 +19,10 @@ export default (isDebug: boolean) => buildManifest({
     isDev: isDebug,
     additional: {
       'connect-src': [serverToPermission(Servers.ShelleyITN)],
+      'frame-src': [
+        SEIZA_FOR_YOROI_URL,
+        SEIZA_URL,
+      ],
     },
   }),
   iconOverride: {
