@@ -52,8 +52,8 @@ export function genCSP(request: {|
   frameSrc.push('https://connect.trezor.io/');
   frameSrc.push('https://emurgo.github.io/yoroi-extension-ledger-bridge');
 
-  // unsafe-eval is unfortunately needed to compile WebAssembly in the browser
-  // it may be removed if wasm-eval is ever standardized https://github.com/w3c/webappsec-csp/pull/293
+  // wasm-eval is needed to compile WebAssembly in the browser
+  // note: wasm-eval is not standardized but empirically works in Firefox & Chrome https://github.com/w3c/webappsec-csp/pull/293
   const evalSrc = "'wasm-eval'";
 
   // unsafe-inline is unfortunately required by style-loader (even in production builds)
