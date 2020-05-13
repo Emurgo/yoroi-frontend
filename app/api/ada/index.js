@@ -72,7 +72,6 @@ import type {
   IGetAllUtxosResponse,
   IHasUtxoChains, IHasUtxoChainsRequest,
   IGetLastSyncInfoResponse,
-  WalletAccountNumberPlate,
   IGetPublicResponse,
   Address, Addressing, UsedStatus, Value,
 } from './lib/storage/models/PublicDeriver/interfaces';
@@ -172,6 +171,7 @@ import { RustModule } from './lib/cardanoCrypto/rustLoader';
 import { clear } from './lib/storage/database/index';
 import environment from '../../environment';
 import { Cip1852Wallet } from './lib/storage/models/Cip1852Wallet/wrapper';
+import type { WalletChecksum } from '@emurgo/cip4-js';
 
 declare var CONFIG: ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;
@@ -188,7 +188,7 @@ export type CreateAdaPaperRequest = {|
 export type AdaPaper = {|
   addresses: Array<string>,
   scrambledWords: Array<string>,
-  accountPlate: WalletAccountNumberPlate,
+  accountPlate: WalletChecksum,
 |};
 export type CreateAdaPaperFunc = (
   request: CreateAdaPaperRequest

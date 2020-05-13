@@ -1,25 +1,25 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { WalletAccountNumberPlate } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { WalletChecksum } from '@emurgo/cip4-js';
 
 import styles from './WalletPlate.scss';
 import WalletAccountIcon from '../../topbar/WalletAccountIcon';
 
 type Props = {|
   +walletName: string,
-  +plate: null | WalletAccountNumberPlate,
+  +plate: null | WalletChecksum,
 |};
 
 function constructPlate(
-  plate: WalletAccountNumberPlate,
+  plate: WalletChecksum,
   saturationFactor: number,
   divClass: string,
 ): [string, React$Element<'div'>] {
-  return [plate.id, (
+  return [plate.TextPart, (
     <div className={divClass}>
       <WalletAccountIcon
-        iconSeed={plate.hash}
+        iconSeed={plate.ImagePart}
         saturationFactor={saturationFactor}
       />
     </div>

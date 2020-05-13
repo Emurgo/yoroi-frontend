@@ -7,9 +7,6 @@ import { RustModule } from './rustLoader';
 import type { GenerateAddressFunc } from '../adaAddressProcessing';
 import { v2genAddressBatchFunc } from '../../restoration/byron/scan';
 import { Bech32Prefix } from '../../../../config/stringConfig';
-import blakejs from 'blakejs';
-import crc32 from 'buffer-crc32';
-import type { WalletAccountNumberPlate } from '../storage/models/PublicDeriver/interfaces';
 import {
   HARD_DERIVATION_START,
   CoinTypes,
@@ -18,31 +15,23 @@ import {
   STAKING_KEY_INDEX,
 } from '../../../../config/numbersConfig';
 import type { AddressDiscriminationType } from '@emurgo/js-chain-libs/js_chain_libs';
+import { legacyWalletChecksum } from '@emurgo/cip4-js';
+import type { WalletChecksum } from '@emurgo/cip4-js';
 
 const mnemonicsToAddresses = (
   generateAddressFunc: GenerateAddressFunc,
   pubKey: string,
   count: number,
-): {| addresses: Array<string>, accountPlate: WalletAccountNumberPlate |} => {
-  const accountPlate = createAccountPlate(pubKey);
+): {| addresses: Array<string>, accountPlate: WalletChecksum |} => {
+  const accountPlate = legacyWalletChecksum(pubKey);
 
   const addresses = generateAddressFunc([...Array(count).keys()]);
   return { addresses, accountPlate };
 };
 
-export function createAccountPlate(accountPubHash: string): WalletAccountNumberPlate {
-  const hash = blakejs.blake2bHex(accountPubHash);
-  const [a, b, c, d] = crc32(hash);
-  const alpha = `ABCDEJHKLNOPSTXZ`;
-  const letters = x => `${alpha[Math.floor(x / 16)]}${alpha[x % 16]}`;
-  const numbers = `${((c << 8) + d) % 10000}`.padStart(4, '0');
-  const id = `${letters(a)}${letters(b)}-${numbers}`;
-  return { hash, id };
-}
-
 export type PlateResponse = {|
   addresses: Array<string>,
-  accountPlate: WalletAccountNumberPlate
+  accountPlate: WalletChecksum
 |};
 export const generateStandardPlate = (
   rootPk: RustModule.WalletV3.Bip32PrivateKey,

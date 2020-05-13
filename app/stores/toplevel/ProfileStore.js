@@ -242,7 +242,7 @@ export default class ProfileStore extends Store {
     ]);
     this._getTermsOfUseAcceptance(); // eagerly cache
     this._getUriSchemeAcceptance(); // eagerly cache
-    this.currentTheme; // eagerly cache
+    this.currentTheme; // eagerly cache (note: don't remove -- getter is stateful)
   }
 
   teardown(): void {
@@ -315,7 +315,7 @@ export default class ProfileStore extends Store {
 
   _convertLocaleKeyToMomentJSLocalKey: string => string = (localeKey) => {
     // REF -> https://github.com/moment/moment/tree/develop/locale
-    let momentJSLocalKey = localeKey;
+    let momentJSLocalKey;
     switch (localeKey) {
       case 'zh-Hans':
         momentJSLocalKey = 'zh-cn';

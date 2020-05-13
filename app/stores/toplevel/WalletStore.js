@@ -29,14 +29,14 @@ import {
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   IGetLastSyncInfoResponse,
-  WalletAccountNumberPlate,
   IGetSigningKey,
   IGetPublic,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { Logger, stringifyError } from '../../utils/logging';
-import { createAccountPlate } from '../../api/ada/lib/cardanoCrypto/plate';
 import { assuranceModes, } from '../../config/transactionAssuranceConfig';
+import type { WalletChecksum } from '@emurgo/cip4-js';
+import { legacyWalletChecksum } from '@emurgo/cip4-js';
 
 type GroupedWallets = {|
   publicDerivers: Array<PublicDeriver<>>;
@@ -86,7 +86,7 @@ export type SigningKeyCache = {|
 
 export type PublicKeyCache = {|
   publicDeriver: IGetPublic,
-  plate: WalletAccountNumberPlate,
+  plate: WalletChecksum,
 |};
 
 type DeferredCall<T> = (() => Promise<T>) => Promise<T>;
@@ -494,7 +494,7 @@ export default class WalletStore extends Store {
       runInAction(() => {
         this.publicKeyCache.push({
           publicDeriver: withPubKey,
-          plate: createAccountPlate(publicKey.Hash),
+          plate: legacyWalletChecksum(publicKey.Hash),
         });
       });
     }

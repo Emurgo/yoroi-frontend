@@ -9,6 +9,7 @@ import {
   Version,
   genCSP,
 } from './constants';
+import { SEIZA_URL, SEIZA_FOR_YOROI_URL } from './manifestEnvs';
 
 export default (isDebug: boolean) => buildManifest({
   description: '[shelley-dev] Cardano ADA wallet',
@@ -20,6 +21,10 @@ export default (isDebug: boolean) => buildManifest({
       'connect-src': [
         serverToPermission(Servers.ShelleyDev),
         'https://testnet-yoroi-coin-price-feed.yoroiwallet.com',
+      ],
+      'frame-src': [
+        SEIZA_FOR_YOROI_URL,
+        SEIZA_URL,
       ],
     },
   }),

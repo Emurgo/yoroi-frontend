@@ -60,11 +60,6 @@ import type {
 } from '../../database/walletTypes/common/utils';
 import type { Bip44ChainInsert } from '../../database/walletTypes/common/tables';
 
-export type WalletAccountNumberPlate = {|
-  hash: string,
-  id: string,
-|};
-
 export type Address = {|
   +address: string,
 |};

@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import type { WalletAccountNumberPlate } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { intlShape, defineMessages } from 'react-intl';
 import styles from './NavPlate.scss';
 import WalletAccountIcon from './WalletAccountIcon';
@@ -13,6 +12,7 @@ import LedgerIcon from '../../assets/images/wallet-nav/ledger-wallet.inline.svg'
 import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
 import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
 import { truncateLongName, maxNameLengthBeforeTruncation } from '../../utils/formatters';
+import type { WalletChecksum } from '@emurgo/cip4-js';
 
 const messages = defineMessages({
   standardWallet: {
@@ -35,19 +35,19 @@ const messages = defineMessages({
 
 type Props = {|
   +walletName: string,
-  +plate: null | WalletAccountNumberPlate,
+  +plate: null | WalletChecksum,
   +walletType: 'standard' | 'paper' | 'trezor' | 'ledger',
 |};
 
 function constructPlate(
-  plate: WalletAccountNumberPlate,
+  plate: WalletChecksum,
   saturationFactor: number,
   divClass: string,
 ): [string, React$Element<'div'>] {
-  return [plate.id, (
+  return [plate.TextPart, (
     <div className={divClass}>
       <WalletAccountIcon
-        iconSeed={plate.hash}
+        iconSeed={plate.ImagePart}
         saturationFactor={saturationFactor}
         scalePx={6}
       />

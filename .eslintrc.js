@@ -1,13 +1,15 @@
+// @flow
+
 module.exports = {
   root: true,
-  parser: '@przemyslawzalewski/babel-eslint',
+  parser: 'babel-eslint',
   parserOptions: {
     ecmaVersion: 6,
     sourceType: 'module',
     ecmaFeatures: {
       legacyDecorators: true
     }
-},
+  },
   extends: 'airbnb',
   env: {
     browser: true,
@@ -23,7 +25,7 @@ module.exports = {
     'comma-dangle': 'off',
     'generator-star-spacing': 'off',
     'import/no-unresolved': ['error', {
-      ignore: ['electron', 'js-chain-libs', 'cardano-wallet-browser']
+      ignore: ['js-chain-libs', 'cardano-wallet-browser']
     }],
     'import/no-extraneous-dependencies': 'off',
     'import/no-dynamic-require': 'off',
@@ -118,4 +120,4 @@ module.exports = {
     yoroi: true,
     nameof: true,
   }
-}
+};
