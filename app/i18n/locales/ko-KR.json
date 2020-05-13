@@ -613,7 +613,7 @@
   "wallet.transaction.type.multiparty": "{currency} 다중 거래",
   "wallet.transfer.cards.byron": "Byron-era wallet",
   "wallet.transfer.cards.shelleyItn": "Shelley testnet",
-  "wallet.transfer.instruction": "Any ADA claimed will be transfered to your currently selected wallet",
+  "wallet.transfer.instruction": "Any ADA claimed will be transferred to your currently selected wallet",
   "wallet.undelegation.transaction.explanationLine1": "위임할 풀을 바꾸기 위해서 위임 취소를 할 필요는 없습니다.",
   "wallet.undelegation.transaction.explanationLine2": "위임 취소는 해당 에포크 종료 후 2개 에포크가 지나야 처리됩니다.",
   "widgets.copyableaddress.addressCopyTooltipMessage": "클립보드로 복사",
