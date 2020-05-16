@@ -17,6 +17,7 @@ import globalMessages from '../../i18n/global-messages';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import { CheckAdressesInUseApiError } from '../../api/ada/errors';
 import { derivePathPrefix } from '../../api/ada/transactions/utils';
+import { wrapWithFrame, wrapWithoutFrame } from '../lib/TrezorWrapper';
 
 // This is actually just an interface
 import {
@@ -43,6 +44,7 @@ type TrezorConnectionResponse = {|
   trezorResp: CardanoGetPublicKey$,
   trezorEventDevice: DeviceMessage,
 |};
+
 
 export default class TrezorConnectStore
   extends Store
@@ -114,11 +116,8 @@ export default class TrezorConnectStore
         // In future if other non chrome like browser is supported them we can consider updating
         trezorManifest.appUrl = manifest.appURL.CHROME;
       }
-      TrezorConnect.manifest(trezorManifest);
 
-      /** Preinitialization of TrezorConnect API will result in faster first response */
-      // we purposely don't want to await. Safe in practice.
-      TrezorConnect.init({});
+      wrapWithoutFrame(trezor => trezor.manifest(trezorManifest));
     } catch (error) {
       Logger.error(`TrezorConnectStore::setup:error: ${stringifyError(error)}`);
     }
@@ -193,9 +192,9 @@ export default class TrezorConnectStore
     try {
       this.hwDeviceInfo = undefined;
 
-      const trezorResp = await TrezorConnect.cardanoGetPublicKey({
+      const trezorResp = await wrapWithFrame(trezor => trezor.cardanoGetPublicKey({
         path: derivePathPrefix(this.derivationIndex)
-      });
+      }));
 
       const trezorEventDevice: DeviceMessage = { ...this.trezorEventDevice };
 
@@ -297,8 +296,8 @@ export default class TrezorConnectStore
 
   _addTrezorConnectEventListeners: void => void = () => {
     if (TrezorConnect) {
-      TrezorConnect.on(DEVICE_EVENT, this._onTrezorDeviceEvent);
-      TrezorConnect.on(UI_EVENT, this._onTrezorUIEvent);
+      wrapWithoutFrame(trezor => trezor.on(DEVICE_EVENT, this._onTrezorDeviceEvent));
+      wrapWithoutFrame(trezor => trezor.on(UI_EVENT, this._onTrezorUIEvent));
     } else {
       Logger.error(`${nameof(TrezorConnectStore)}::${nameof(this._addTrezorConnectEventListeners)}:: TrezorConnect not installed`);
     }
@@ -306,8 +305,8 @@ export default class TrezorConnectStore
 
   _removeTrezorConnectEventListeners: void => void = () => {
     if (TrezorConnect) {
-      TrezorConnect.off(DEVICE_EVENT, this._onTrezorDeviceEvent);
-      TrezorConnect.off(UI_EVENT, this._onTrezorUIEvent);
+      wrapWithoutFrame(trezor => trezor.off(DEVICE_EVENT, this._onTrezorDeviceEvent));
+      wrapWithoutFrame(trezor => trezor.off(UI_EVENT, this._onTrezorUIEvent));
     }
   };
 

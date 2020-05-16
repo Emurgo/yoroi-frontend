@@ -1,12 +1,12 @@
 // @flow
 import { action, observable } from 'mobx';
-import TrezorConnect from 'trezor-connect';
 import type { CardanoSignTransaction$ } from 'trezor-connect/lib/types/cardano';
 
 import Store from '../base/Store';
 import environment from '../../environment';
 import LocalizedRequest from '../lib/LocalizedRequest';
 
+import { wrapWithFrame } from '../lib/TrezorWrapper';
 import type {
   CreateTrezorSignTxDataFunc,
   BroadcastTrezorSignedTxResponse,
@@ -80,9 +80,9 @@ export default class TrezorSendStore extends Store {
 
       const trezorSignTxDataResp = await this.createTrezorSignTxDataRequest.promise;
 
-      const trezorSignTxResp = await TrezorConnect.cardanoSignTransaction(
+      const trezorSignTxResp = await wrapWithFrame(trezor => trezor.cardanoSignTransaction(
         { ...trezorSignTxDataResp.trezorSignTxPayload }
-      );
+      ));
 
       if (trezorSignTxResp && trezorSignTxResp.payload && trezorSignTxResp.payload.error != null) {
         // this Error will be converted to LocalizableError()
