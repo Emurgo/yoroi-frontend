@@ -7,10 +7,10 @@ Handling messages from usb permissions iframe
 declare var chrome;
 */
 
-const VERSION = '8.1.3';
+const VERSION = '8.1.4';
 const versionN = VERSION.split('.').map(s => parseInt(s));
 const DIRECTORY = `${ versionN[0] }${ (versionN[1] > 0 ? `.${versionN[1]}` : '') }/`;
-const url = 'https://connect.trezor.io/' + DIRECTORY;
+const url = 'https://connect.trezor.io/' + 8;
 
 /* Handling messages from usb permissions iframe */
 function switchToPopupTab(event) {

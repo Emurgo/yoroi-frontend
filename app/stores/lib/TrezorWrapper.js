@@ -43,7 +43,7 @@ export async function wrapWithFrame<T>(
 ): Promise<T> {
   const trezorManifest = getTrezorManifest();
   await TrezorConnect.init({
-    manifest: trezorManifest
+    manifest: trezorManifest,
   });
   const result = await func(TrezorConnect);
   await TrezorConnect.dispose();
