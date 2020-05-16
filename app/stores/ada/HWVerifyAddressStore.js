@@ -7,7 +7,7 @@ import {
 } from '../../utils/hwConnectHandler';
 
 import LedgerConnect from 'yoroi-extension-ledger-connect-handler';
-import TrezorConnect from 'trezor-connect';
+import { wrapWithFrame } from '../lib/TrezorWrapper';
 
 import LocalizableError from '../../i18n/LocalizableError';
 
@@ -88,10 +88,10 @@ export default class AddressesStore extends Store {
     address: string
   ): Promise<void> => {
     try {
-      await TrezorConnect.cardanoGetAddress({
+      await wrapWithFrame(trezor => trezor.cardanoGetAddress({
         path,
         address,
-      });
+      }));
     } catch (error) {
       Logger.error('AddressStore::trezorVerifyAddress::error: ' + stringifyError(error));
       this._setError(trezorErrorToLocalized(error));

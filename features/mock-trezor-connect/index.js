@@ -17,13 +17,13 @@ import type {
 const UI_EVENT: 'UI_EVENT' = 'UI_EVENT';
 const DEVICE_EVENT: 'DEVICE_EVENT' = 'DEVICE_EVENT';
 
-class TrezorConnect {
+class MockTrezorConnect {
 
   static deviceEventListeners: Array<DeviceMessage => void> = [];
   static uiEventListeners: Array<UiMessage => void> = [];
 
   static cardanoGetAddress: CardanoGetAddress = async (_params) => {
-    TrezorConnect.mockConnectDevice();
+    MockTrezorConnect.mockConnectDevice();
     const result = ({
       success: (true: true),
       payload: {
@@ -36,7 +36,7 @@ class TrezorConnect {
   };
 
   static cardanoGetPublicKey: CardanoGetPublicKey = async (_params) => {
-    TrezorConnect.mockConnectDevice();
+    MockTrezorConnect.mockConnectDevice();
     const result = ({
       success: (true: true),
       payload: {
@@ -57,7 +57,7 @@ class TrezorConnect {
   };
 
   static cardanoSignTransaction: CardanoSignTransaction = async (_params) => {
-    TrezorConnect.mockConnectDevice();
+    MockTrezorConnect.mockConnectDevice();
     const result = ({
       success: (true: true),
       payload: {
@@ -72,6 +72,9 @@ class TrezorConnect {
   }
 
   static init = async (_settings: Settings): Promise<void> => {
+  }
+
+  static dispose = (): void => {
   }
 
   static on: EventListener = (type, fn): void => {
@@ -139,6 +142,6 @@ class TrezorConnect {
   }
 }
 
-export default TrezorConnect;
+export default MockTrezorConnect;
 
 export { UI_EVENT, DEVICE_EVENT, };
