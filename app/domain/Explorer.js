@@ -95,6 +95,9 @@ const getExplorerInfo: void => {
       adaex: {
         name: 'ADAex.org',
         address: 'https://adaex.org/',
+        transaction: 'https://adaex.org/',
+        block: 'https://adaex.org/',            
+        pool: 'https://adaex.org/',
       },
       clio: {
         name: 'Clio.1',
