@@ -9,6 +9,7 @@ const ShelleyExplorers = Object.freeze({
 });
 const ByronExplorers = Object.freeze({
   SEIZA: 'seiza',
+  ADAEX: 'ADAex',
   CLIO: 'clio',
   ADA_SCAN: 'adascan',
   CARDANO_EXPLORER: 'cardano_explorer',
@@ -91,6 +92,10 @@ const getExplorerInfo: void => {
   seiza,
   ...(!environment.isShelley()
     ? {
+      adaex: {
+        name: 'ADAex.org',
+        address: 'https://adaex.org/',
+      },
       clio: {
         name: 'Clio.1',
         address: 'https://clio.one/tracker/address/',
