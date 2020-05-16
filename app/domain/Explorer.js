@@ -9,7 +9,7 @@ const ShelleyExplorers = Object.freeze({
 });
 const ByronExplorers = Object.freeze({
   SEIZA: 'seiza',
-  ADAEX: 'ADAex',
+  ADAEX: 'adaex',
   CLIO: 'clio',
   ADA_SCAN: 'adascan',
   CARDANO_EXPLORER: 'cardano_explorer',
