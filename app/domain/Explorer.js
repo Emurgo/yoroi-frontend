@@ -9,8 +9,10 @@ const ShelleyExplorers = Object.freeze({
 });
 const ByronExplorers = Object.freeze({
   SEIZA: 'seiza',
-  CLIO: 'clio',
+  ADAEX: 'adaex',
   ADA_SCAN: 'adascan',
+  BLOCKCHAIR: 'blockchair',
+  CLIO: 'clio',
   CARDANO_EXPLORER: 'cardano_explorer',
 });
 export function getDefaultExplorer(): ExplorerType {
@@ -91,14 +93,25 @@ const getExplorerInfo: void => {
   seiza,
   ...(!environment.isShelley()
     ? {
-      clio: {
-        name: 'Clio.1',
-        address: 'https://clio.one/tracker/address/',
+      adaex: {
+        name: 'ADAex.org',
+        address: 'https://adaex.org/',
+        transaction: 'https://adaex.org/',
+        pool: 'https://adaex.org/',
       },
       adascan: {
         name: 'AdaScan',
         address: 'https://adascan.net/address/',
         transaction: 'https://adascan.net/transaction/',
+      },
+      blockchair: {
+        name: 'Blockchair',
+        address: 'https://blockchair.com/cardano/address/',
+        transaction: 'https://blockchair.com/cardano/transaction/',
+      },
+      clio: {
+        name: 'Clio.1',
+        address: 'https://clio.one/tracker/address/',
       },
       cardano_explorer: {
         name: 'CardanoExplorer',
