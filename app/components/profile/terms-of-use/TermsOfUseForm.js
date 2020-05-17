@@ -10,7 +10,9 @@ import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
 import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
 import LocalizableError from '../../../i18n/LocalizableError';
 import TermsOfUseText from './TermsOfUseText';
+import PrivacyPolicy from './PrivacyPolicy';
 import styles from './TermsOfUseForm.scss';
+import CenteredBarDecoration from '../../widgets/CenteredBarDecoration';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
@@ -64,7 +66,10 @@ export default class TermsOfUseForm extends Component<Props, State> {
     return (
       <div className={styles.component}>
         <div className={styles.centeredBox}>
-
+          <PrivacyPolicy />
+          <div className={styles.centerBar}>
+            <CenteredBarDecoration />
+          </div>
           <TermsOfUseText localizedTermsOfUse={localizedTermsOfUse} fixedHeight />
 
           <div className={styles.checkbox}>

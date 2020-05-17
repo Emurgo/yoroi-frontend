@@ -16,8 +16,9 @@ export default class CenteredBarDecoration extends Component<Props> {
 
   render(): Node {
     const { children } = this.props;
-    return (
-      <div className={styles.separator}>{children}</div>
+    return (children == null
+      ? (<div className={styles.solidSeparator} />)
+      : (<div className={styles.separator}>{children}</div>)
     );
   }
 }
