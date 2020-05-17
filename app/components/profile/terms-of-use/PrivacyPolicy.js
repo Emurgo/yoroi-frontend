@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import styles from './PrivacyPolicy.scss';
-import classNames from 'classnames';
 
 const messages = defineMessages({
   header: {
