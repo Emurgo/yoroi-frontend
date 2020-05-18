@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { computed } from 'mobx';
+import { computed, } from 'mobx';
 import { intlShape, defineMessages } from 'react-intl';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
@@ -15,10 +15,11 @@ import type { GeneratedData as BannerContainerData } from '../BannerContainer';
 import WalletWithNavigation from '../../components/wallet/layouts/WalletWithNavigation';
 import NavBarBack from '../../components/topbar/NavBarBack';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
-import { buildRoute } from '../../utils/routing';
+import { buildRoute, } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 export type GeneratedData = typeof Wallet.prototype.generated;
 
@@ -110,6 +111,8 @@ export default class Wallet extends Component<Props> {
         </TopBarLayout>
       );
     }
+    const selectedWallet = wallets.selected;
+    const warning = this.getWarning(selectedWallet);
 
     return (
       <TopBarLayout
@@ -119,8 +122,9 @@ export default class Wallet extends Component<Props> {
         showInContainer
         showAsCard
       >
+        {warning}
         <WalletWithNavigation
-          wallet={wallets.selected}
+          wallet={selectedWallet}
           isActiveScreen={this.isActiveScreen}
           onWalletNavItemClick={this.handleWalletNavItemClick}
         >
@@ -128,6 +132,14 @@ export default class Wallet extends Component<Props> {
         </WalletWithNavigation>
       </TopBarLayout>
     );
+  }
+
+  getWarning: PublicDeriver<> => void | Node = (publicDeriver) => {
+    const warnings = this.generated.stores.walletSettings.getWalletWarnings(publicDeriver).dialogs;
+    if (warnings.length === 0) {
+      return undefined;
+    }
+    return warnings[warnings.length - 1]();
   }
 
   @computed get generated() {
@@ -138,6 +150,7 @@ export default class Wallet extends Component<Props> {
       throw new Error(`${nameof(Wallet)} no way to generated props`);
     }
     const { stores, actions } = this.props;
+    const settingStore = this.props.stores.substores.ada.walletSettings;
     return Object.freeze({
       stores: {
         app: {
@@ -145,6 +158,9 @@ export default class Wallet extends Component<Props> {
         },
         wallets: {
           selected: stores.wallets.selected,
+        },
+        walletSettings: {
+          getWalletWarnings: settingStore.getWalletWarnings,
         },
       },
       actions: {

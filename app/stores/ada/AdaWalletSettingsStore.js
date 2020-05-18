@@ -52,7 +52,6 @@ export default class AdaWalletSettingsStore extends WalletSettingsStore {
     a.updateSigningPassword.listen(this._changeSigningPassword);
     a.resyncHistory.listen(this._resyncHistory);
     a.removeWallet.listen(this._removeWallet);
-    a.openNextWarning.listen(this._openNextWarningIfAny);
   }
 
   @action _changeSigningPassword: {|

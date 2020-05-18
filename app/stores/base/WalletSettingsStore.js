@@ -1,5 +1,6 @@
 // @flow
 import { observable, action } from 'mobx';
+import type { Node } from 'react';
 import { find, } from 'lodash';
 import type { AssuranceMode, } from '../../types/transactionAssuranceTypes';
 import {
@@ -23,12 +24,13 @@ export type ConceptualWalletSettingsCache = {|
   conceptualWalletName: string,
 |};
 
-export default class WalletSettingsStore extends Store {
+export type WarningList = {|
+  publicDeriver: PublicDeriver<>,
+  // TODO: type for props
+  dialogs: Array<void => Node>,
+|};
 
-  @observable walletWarnings: Array<{|
-    publicDeriver: PublicDeriver<>,
-    openDialog: void => void,
-  |}> = [];
+export default class WalletSettingsStore extends Store {
 
   @observable walletFieldBeingEdited: string | null = null;
   @observable lastUpdatedWalletField: string | null = null;
@@ -53,6 +55,16 @@ export default class WalletSettingsStore extends Store {
     throw new Error(`${nameof(WalletSettingsStore)}::${nameof(this.conceptualWalletSettingsCache)} no settings in cache`);
   }
 
+  @observable walletWarnings: Array<WarningList> = [];
+  getWalletWarnings: PublicDeriver<> => WarningList = (
+    publicDeriver
+  ) => {
+    const foundRequest = find(this.walletWarnings, { publicDeriver });
+    if (foundRequest) return foundRequest;
+
+    throw new Error(`${nameof(WalletSettingsStore)}::${nameof(this.getWalletWarnings)} no warning list found`);
+  }
+
   @action _startEditingWalletField: {| field: string |} => void = (
     { field }
   ) => {
@@ -70,10 +82,4 @@ export default class WalletSettingsStore extends Store {
     this.lastUpdatedWalletField = null;
     this.walletFieldBeingEdited = null;
   };
-
-  @action _openNextWarningIfAny: PublicDeriver<> => void = (publicDeriver) => {
-    const nextWarning = find(this.walletWarnings, { publicDeriver });
-    if (nextWarning == null) return;
-    nextWarning.openDialog();
-  }
 }

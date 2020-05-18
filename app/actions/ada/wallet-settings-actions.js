@@ -25,5 +25,4 @@ export default class WalletSettingsActions {
   removeWallet: AsyncAction<{|
     publicDeriver: PublicDeriver<>,
   |}> = new AsyncAction();
-  openNextWarning: Action<PublicDeriver<>> = new Action();
 }

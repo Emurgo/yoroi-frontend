@@ -37,7 +37,7 @@ import { Logger, stringifyError } from '../../utils/logging';
 import { assuranceModes, } from '../../config/transactionAssuranceConfig';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { legacyWalletChecksum } from '@emurgo/cip4-js';
-import DebugWalletDialog from '../../components/wallet/DebugWalletDialog';
+import { createDebugWalletDialog } from '../../containers/wallet/dialogs/DebugWalletDialogContainer';
 
 type GroupedWallets = {|
   publicDerivers: Array<PublicDeriver<>>;
@@ -306,6 +306,7 @@ export default class WalletStore extends Store {
       publicDeriver: withCache,
       lastSyncInfo,
     });
+    this._queueWarningIfNeeded(withCache);
     runInAction(() => {
       this.publicDerivers.push(withCache);
 
@@ -338,6 +339,9 @@ export default class WalletStore extends Store {
     }
     for (const publicDeriver of newWithCachedData) {
       await this.refreshWalletFromLocalOnLaunch(publicDeriver);
+    }
+    for (const publicDeriver of newWithCachedData) {
+      this._queueWarningIfNeeded(publicDeriver);
     }
     runInAction('refresh active wallet', () => {
       if (this.selected == null && newWithCachedData.length === 1) {
@@ -529,6 +533,10 @@ export default class WalletStore extends Store {
         conceptualWallet: publicDeriver.getParent(),
         conceptualWalletName: conceptualWalletInfo.Name,
       });
+      this.stores.substores.ada.walletSettings.walletWarnings.push({
+        publicDeriver,
+        dialogs: [],
+      });
     });
 
     return publicDeriver;
@@ -536,6 +544,8 @@ export default class WalletStore extends Store {
 
   @action
   _queueWarningIfNeeded: PublicDeriver<> => void = (publicDeriver) => {
+    if (environment.isTest()) return;
+
     const debugWalletChecksums = [
       'DNKO-8098', 'ATPE-6458', // abandon share
       'ATJK-0805', 'NXTB-2808', // abandon address
@@ -548,10 +558,14 @@ export default class WalletStore extends Store {
     if (withPubKey != null) {
       const { plate } = this.getPublicKeyCache(withPubKey);
       if (debugWalletChecksums.find(elem => elem === plate.TextPart) != null) {
-        this.stores.substores.ada.walletSettings.walletWarnings.push({
-          publicDeriver,
-          openDialog: () => this.actions.dialogs.open.trigger({ dialog: DebugWalletDialog }),
-        });
+        const existingWarnings = this.stores.substores.ada.walletSettings.getWalletWarnings(
+          publicDeriver
+        );
+        existingWarnings.dialogs.push(createDebugWalletDialog(
+          plate.TextPart,
+          action(() => { existingWarnings.dialogs.pop(); }),
+          { stores: this.stores, actions: this.actions },
+        ));
       }
     }
   }

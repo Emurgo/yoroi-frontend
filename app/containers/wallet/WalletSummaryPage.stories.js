@@ -43,6 +43,11 @@ import { assuranceModes, } from '../../config/transactionAssuranceConfig';
 import WalletSettingsStore from '../../stores/base/WalletSettingsStore';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { getPriceKey } from '../../api/ada/lib/storage/bridge/prices';
+import { createDebugWalletDialog } from './dialogs/DebugWalletDialogContainer';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import {
+  asGetPublicKey,
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -679,6 +684,57 @@ export const TxHistoryExport = (): Node => {
             exportError: getErrorValue() === errorCases.None
               ? undefined
               : getErrorValue(),
+          },
+        }),
+        actions,
+      }}
+    />)
+  );
+};
+
+export const DebugWalletWarning = () => {
+  const genWallet = () => {
+    const wallet = genSigningWalletWithCache();
+    return wallet;
+  };
+  const wallet = genWallet();
+  const lookup = walletLookup([wallet]);
+
+  const getPlate: PublicDeriver<> => string = (publicDeriver) => {
+    const withPubKey = asGetPublicKey(publicDeriver);
+    if (withPubKey == null) throw new Error('No checksum found for storybook wallet');
+    return lookup.getPublicKeyCache(withPubKey).plate.TextPart;
+  };
+
+  const transactions = [];
+  return wrapWallet(
+    mockWalletProps({
+      location: getRoute(wallet.publicDeriver.getPublicDeriverId()),
+      selected: wallet.publicDeriver,
+      getWalletWarnings: (publicDeriver) => ({
+        publicDeriver,
+        dialogs: publicDeriver === wallet.publicDeriver
+          ? [createDebugWalletDialog(
+            getPlate(wallet.publicDeriver),
+            action('close DebugWalletDialog'),
+            { generated: Object.freeze({}) },
+          )]
+          : [],
+      }),
+      ...lookup,
+    }),
+    (<WalletSummaryPage
+      generated={{
+        stores: genPropsForTransactions({
+          wallet,
+          getPublicDeriverSettingsCache: lookup.getPublicDeriverSettingsCache,
+          transactions,
+          lastSyncInfo: {
+            LastSyncInfoId: 1,
+            Time: null,
+            SlotNum: null,
+            BlockHash: null,
+            Height: 0,
           },
         }),
         actions,
