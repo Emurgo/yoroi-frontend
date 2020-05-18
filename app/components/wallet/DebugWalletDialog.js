@@ -11,7 +11,7 @@ import styles from './DebugWalletDialog.scss';
 const messages = defineMessages({
   explanation1: {
     id: 'wallet.debugwallet.explanation1',
-    defaultMessage: '!!!The wallet you selected ({checksumTextPart}) is for testing and debugging purposes',
+    defaultMessage: '!!!The wallet you selected ({checksumTextPart}) is for testing and debugging purposes.',
   },
   explanation2: {
     id: 'wallet.debugwallet.explanation2',
