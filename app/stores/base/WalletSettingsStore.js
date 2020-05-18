@@ -25,6 +25,11 @@ export type ConceptualWalletSettingsCache = {|
 
 export default class WalletSettingsStore extends Store {
 
+  @observable walletWarnings: Array<{|
+    publicDeriver: PublicDeriver<>,
+    openDialog: void => void,
+  |}> = [];
+
   @observable walletFieldBeingEdited: string | null = null;
   @observable lastUpdatedWalletField: string | null = null;
 
@@ -66,4 +71,9 @@ export default class WalletSettingsStore extends Store {
     this.walletFieldBeingEdited = null;
   };
 
+  @action _openNextWarningIfAny: PublicDeriver<> => void = (publicDeriver) => {
+    const nextWarning = find(this.walletWarnings, { publicDeriver });
+    if (nextWarning == null) return;
+    nextWarning.openDialog();
+  }
 }

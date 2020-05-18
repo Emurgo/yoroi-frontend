@@ -37,6 +37,7 @@ import { Logger, stringifyError } from '../../utils/logging';
 import { assuranceModes, } from '../../config/transactionAssuranceConfig';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { legacyWalletChecksum } from '@emurgo/cip4-js';
+import DebugWalletDialog from '../../components/wallet/DebugWalletDialog';
 
 type GroupedWallets = {|
   publicDerivers: Array<PublicDeriver<>>;
@@ -181,9 +182,11 @@ export default class WalletStore extends Store {
         lastSyncInfo
       });
     }
+    for (const publicDeriver of newWithCachedData) {
+      this._queueWarningIfNeeded(publicDeriver);
+    }
     runInAction(() => {
       this.publicDerivers.push(...newWithCachedData);
-
       this.selected = newWithCachedData[0];
     });
   }
@@ -529,5 +532,27 @@ export default class WalletStore extends Store {
     });
 
     return publicDeriver;
+  }
+
+  @action
+  _queueWarningIfNeeded: PublicDeriver<> => void = (publicDeriver) => {
+    const debugWalletChecksums = [
+      'DNKO-8098', 'ATPE-6458', // abandon share
+      'ATJK-0805', 'NXTB-2808', // abandon address
+      'JSKA-2258', // ledger
+      'CZSA-2051', // trezor
+      'JEBH-9973', 'ONZO-5595', // mobile debug create
+      'SKBE-5478', 'SHHN-6941', // mobile debug restore
+    ];
+    const withPubKey = asGetPublicKey(publicDeriver);
+    if (withPubKey != null) {
+      const { plate } = this.getPublicKeyCache(withPubKey);
+      if (debugWalletChecksums.find(elem => elem === plate.TextPart) != null) {
+        this.stores.substores.ada.walletSettings.walletWarnings.push({
+          publicDeriver,
+          openDialog: () => this.actions.dialogs.open.trigger({ dialog: DebugWalletDialog }),
+        });
+      }
+    }
   }
 }
