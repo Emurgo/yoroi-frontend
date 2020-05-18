@@ -16,7 +16,7 @@ type EnvParams = {|
   publicPath?: string,
 |};
 */
-const baseProdConfig = (env /*: EnvParams */) => ({
+const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
   mode: 'production',
   optimization: commonConfig.optimization,
   node: commonConfig.node,

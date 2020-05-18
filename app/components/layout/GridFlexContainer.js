@@ -13,7 +13,7 @@ type Props = {|
 
 @observer
 export default class GridFlexContainer extends Component<Props> {
-  render() {
+  render(): Node {
     const { children, rowSize } = this.props;
 
     const childArray = React.Children.toArray(children);

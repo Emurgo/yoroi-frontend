@@ -31,7 +31,10 @@ const {
 } = IDENTIFIERS;
 
 // package all our overrides into one theme
-export const yoroiPolymorphTheme = {
+export const yoroiPolymorphTheme: {
+  [key: string]: { [key: string]: string, ... },
+  ...,
+} = {
   [AUTOCOMPLETE]: SimpleAutocomplete,
   [BUBBLE]: SimpleBubble,
   [BUTTON]: SimpleButton,

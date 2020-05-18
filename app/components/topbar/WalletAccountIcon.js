@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import styles from './WalletAccountIcon.scss';
@@ -36,12 +37,12 @@ const saturation = (color, factor: number = 0) => {
 /** Dynamically generated title for the topbar when a wallet is selected */
 @observer
 export default class WalletAccountIcon extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|saturationFactor: number, scalePx: number|} = {
     scalePx: 5,
     saturationFactor: 0,
   };
 
-  render() {
+  render(): Node {
     const { iconSeed, scalePx, saturationFactor } = this.props;
     const colorIdx = Buffer.from(iconSeed, 'hex')[0] % COLORS.length;
     const color = COLORS[colorIdx];

@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './ReceiveNavigation.scss';
@@ -7,6 +8,7 @@ import globalMessages from '../../../i18n/global-messages';
 
 import AttentionIcon from '../../../assets/images/attention-modern.inline.svg';
 import ReceiveNavButton from './ReceiveNavButton';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   externalTab: {
@@ -24,11 +26,11 @@ type Props = {|
 @observer
 export default class ReceiveNavigation extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { isActiveTab, onTabClick } = this.props;
     const { intl } = this.context;
 

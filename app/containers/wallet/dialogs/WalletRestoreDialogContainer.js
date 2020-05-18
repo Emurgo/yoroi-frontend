@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { computed, observable, runInAction } from 'mobx';
 import { observer } from 'mobx-react';
@@ -24,6 +25,7 @@ import SuccessPage from '../../../components/transfer/SuccessPage';
 import { TransferStatus, } from '../../../types/TransferTypes';
 import { formattedWalletAmount } from '../../../utils/formatters';
 import ErrorPage from '../../../components/transfer/ErrorPage';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   walletUpgradeNoop: {
@@ -45,11 +47,11 @@ type Props = {|
 @observer
 export default class WalletRestoreDialogContainer extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
   };
 
-  static defaultProps = {
+  static defaultProps: {|introMessage: void|} = {
     introMessage: undefined
   };
 
@@ -75,7 +77,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     if (!restoreRequest.isExecuting) restoreRequest.reset();
   };
 
-  render() {
+  render(): null | Node {
     const walletRestoreActions = this.generated.actions[environment.API].walletRestore;
     const actions = this.generated.actions;
     const { uiNotifications, profile, } = this.generated.stores;
@@ -96,12 +98,12 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         return (<WalletRestoreDialog
           mnemonicValidator={mnemonic => {
             if (isPaper) {
-              return this._getAdaWalletsStore().isValidPaperMnemonic({
+              return this.generated.stores.substores[environment.API].wallets.isValidPaperMnemonic({
                 mnemonic,
                 numberOfWords: wordsCount
               });
             }
-            return this._getAdaWalletsStore().isValidMnemonic({
+            return this.generated.stores.substores[environment.API].wallets.isValidMnemonic({
               mnemonic,
               numberOfWords: wordsCount
             });
@@ -179,14 +181,11 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     }
   }
 
-  _getAdaWalletsStore() {
-    return this.generated.stores.substores[environment.API].wallets;
-  }
   _getWalletsStore() {
     return this.generated.stores.wallets;
   }
 
-  _transferDialogContent() {
+  _transferDialogContent(): null | Node {
     const { yoroiTransfer } = this.generated.stores.substores[environment.API];
     const walletRestoreActions = this.generated.actions[environment.API].walletRestore;
     const { profile, } = this.generated.stores;

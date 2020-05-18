@@ -90,7 +90,7 @@ const genBaseProps: {|
   },
 });
 
-export const GettingMnemonics = () => {
+export const GettingMnemonics = (): React$Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
@@ -111,7 +111,7 @@ export const GettingMnemonics = () => {
   })();
 };
 
-export const GettingPaperMnemonics = () => {
+export const GettingPaperMnemonics = (): React$Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
@@ -132,7 +132,7 @@ export const GettingPaperMnemonics = () => {
   })();
 };
 
-export const GettingMasterKey = () => {
+export const GettingMasterKey = (): React$Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
@@ -153,7 +153,7 @@ export const GettingMasterKey = () => {
   })();
 };
 
-export const RestoringAddresses = () => {
+export const RestoringAddresses = (): React$Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
@@ -174,7 +174,7 @@ export const RestoringAddresses = () => {
   })();
 };
 
-export const CheckingAddresses = () => {
+export const CheckingAddresses = (): React$Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
@@ -195,7 +195,7 @@ export const CheckingAddresses = () => {
   })();
 };
 
-export const GeneratingTx = () => {
+export const GeneratingTx = (): React$Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
@@ -216,7 +216,7 @@ export const GeneratingTx = () => {
   })();
 };
 
-export const ReadyToTransfer = () => {
+export const ReadyToTransfer = (): React$Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
@@ -249,7 +249,7 @@ export const ReadyToTransfer = () => {
   })();
 };
 
-export const Error = () => {
+export const Error = (): React$Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {

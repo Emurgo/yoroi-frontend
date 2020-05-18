@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import type { Element } from 'react';
+import type { Element, Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import styles from './WalletRecoveryPhraseMnemonic.scss';
@@ -13,11 +13,11 @@ type Props = {|
 
 @observer
 export default class WalletRecoveryPhraseMnemonic extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|filled: void|} = {
     filled: undefined
   }
 
-  render() {
+  render(): Node {
     const { phrase, filled } = this.props;
     const componentClasses = classnames([
       styles.component,

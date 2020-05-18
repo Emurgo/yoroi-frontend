@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, } from 'react-intl';
 import ExternalLinkSVG from '../../assets/images/link-external.inline.svg';
@@ -7,6 +8,7 @@ import ErrorInfo from '../../assets/images/error-info.inline.svg';
 import styles from './Maintenance.scss';
 import globalMessages from '../../i18n/global-messages';
 import VerticallyCenteredLayout from '../layout/VerticallyCenteredLayout';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   title: {
@@ -26,11 +28,11 @@ type Props = {|
 @observer
 export default class Maintenance extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
 
     return (

@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 
@@ -13,10 +14,10 @@ type Props = {|
 
 @observer
 export default class ProgressCircle extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|text: null|} = {
     text: null,
   };
-  render() {
+  render(): Node {
     const { percentage, text, variant } = this.props;
     return (
       <div className={classnames(styles.wrapper, styles[`${variant}`])}>

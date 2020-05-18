@@ -1,5 +1,6 @@
 // @flow
 
+import type { Node } from 'react';
 import React from 'react';
 
 import { boolean, select, } from '@storybook/addon-knobs';
@@ -21,7 +22,7 @@ export default {
   decorators: [withScreenshot],
 };
 
-export const Generic = () => {
+export const Generic = (): Node => {
   const lookup = walletLookup([]);
 
   const lastUpdateCases = {

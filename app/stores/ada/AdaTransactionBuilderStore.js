@@ -96,7 +96,7 @@ export default class AdaTransactionBuilderStore extends Store {
   // ================
 
   // eslint-disable-next-line no-restricted-syntax
-  _mismatchReaction = reaction(
+  _mismatchReaction: void => mixed = reaction(
     () => [
       this.plannedTx,
       this.tentativeTx,
@@ -109,7 +109,7 @@ export default class AdaTransactionBuilderStore extends Store {
   // ==============
 
   // eslint-disable-next-line no-restricted-syntax
-  _updatePlannedTxReaction = reaction(
+  _updatePlannedTxReaction: void => mixed = reaction(
     () => this.createUnsignedTx.result,
     () => this._updatePlannedTx(),
   )
@@ -143,7 +143,7 @@ export default class AdaTransactionBuilderStore extends Store {
   // ==============
 
   // eslint-disable-next-line no-restricted-syntax
-  _updateTxBuilderReaction = reaction(
+  _updateTxBuilderReaction: void => mixed = reaction(
     () => [
       // Need toJS for mobx to react to an array.
       // Note: will not trigger if re-assigned same value

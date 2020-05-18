@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
@@ -11,7 +12,7 @@ type GeneratedData = typeof MaintenancePage.prototype.generated;
 @observer
 export default class MaintenancePage extends Component<InjectedOrGenerated<GeneratedData>> {
 
-  render() {
+  render(): Node {
     return (
       <Maintenance
         onExternalLinkClick={this.generated.handleExternalLinkClick}

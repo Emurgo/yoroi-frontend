@@ -1,5 +1,6 @@
 // @flow
 
+import type { Node } from 'react';
 import React from 'react';
 
 import SupportSettingsPage from './SupportSettingsPage';
@@ -17,7 +18,7 @@ export default {
   decorators: [withScreenshot],
 };
 
-export const Generic = () => {
+export const Generic = (): Node => {
   const lookup = walletLookup([]);
   return wrapSettings(
     mockSettingsProps({

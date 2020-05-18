@@ -1,13 +1,13 @@
 // @flow
 import BigNumber from 'bignumber.js';
 
-export const LOVELACES_PER_ADA = new BigNumber('1 000 000'.replace(/ /g, ''), 10);
-export const TOTAL_SUPPLY = new BigNumber('45 000 000 000'.replace(/ /g, ''), 10).times(LOVELACES_PER_ADA);
+export const LOVELACES_PER_ADA: BigNumber = new BigNumber('1 000 000'.replace(/ /g, ''), 10);
+export const TOTAL_SUPPLY: BigNumber = new BigNumber('45 000 000 000'.replace(/ /g, ''), 10).times(LOVELACES_PER_ADA);
 export const MAX_INTEGER_PLACES_IN_ADA = 11;
 export const DECIMAL_PLACES_IN_ADA = 6;
 export const MAX_ADA_WALLETS_COUNT = 1;
 
-export const EPOCH_REWARD_DENOMINATOR = new BigNumber(10).pow(6);
+export const EPOCH_REWARD_DENOMINATOR: BigNumber = new BigNumber(10).pow(6);
 
 export const HARD_DERIVATION_START: 2147483648 = 0x80000000;
 

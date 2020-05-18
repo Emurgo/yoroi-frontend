@@ -18,6 +18,7 @@ import WalletTransferPage from './WalletTransferPage';
 import type { GeneratedData as WalletTransferPageData } from './WalletTransferPage';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import type { GeneratedData as NavBarContainerData } from '../NavBarContainer';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 export type GeneratedData = typeof Transfer.prototype.generated;
 
@@ -29,15 +30,15 @@ type Props = {|
 @observer
 export default class Transfer extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  static defaultProps = {
+  static defaultProps: {|children: void|} = {
     children: undefined,
   };
 
-  render() {
+  render(): Node {
     const sidebarContainer = (<SidebarContainer {...this.generated.SidebarContainerProps} />);
 
     const navbar = (

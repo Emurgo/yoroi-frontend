@@ -1,7 +1,7 @@
 // @flow
 // Extended version of Checkbox component from react-polymorph (simple skin)
 import React from 'react';
-import type { Element } from 'react';
+import type { Element, Node } from 'react';
 // external libraries
 import classnames from 'classnames';
 import { pickDOMProps } from 'react-polymorph/lib/utils/props';
@@ -27,11 +27,11 @@ type Props = {
  * This skin provides flexibility of Checkbox icon vertical display position
  * and props.description provides option to display addition info text about the Checkbox.
  * If props.description is provided, by default Checkbox icon is displayed
- * at the top(at same lavel of the label text) and If props.showCheckInCenter is true,
- * Checkbox icon is displayed at the ceter.
+ * at the top(at same level of the label text) and If props.showCheckInCenter is true,
+ * Checkbox icon is displayed at the center.
  * @param {*} props
  */
-export const CheckboxOwnSkin = (props: Props) => {
+export const CheckboxOwnSkin = (props: Props): Node => {
   let checkBlockStyleOverride;
   if (props.description) {
     checkBlockStyleOverride = props.showCheckInCenter ?

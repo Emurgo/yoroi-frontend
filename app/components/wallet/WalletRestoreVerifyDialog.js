@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
@@ -19,6 +20,7 @@ import type { PlateResponse } from '../../api/ada/lib/cardanoCrypto/plate';
 import CenteredLayout from '../layout/CenteredLayout';
 import environment from '../../environment';
 import type { WalletChecksum } from '@emurgo/cip4-js';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   dialogTitleVerifyWalletRestoration: {
@@ -82,18 +84,18 @@ type Props = {|
 
 @observer
 export default class WalletRestoreVerifyDialog extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|error: void|} = {
     error: undefined,
   };
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
   generatePlate(
     title: string,
     plate: WalletChecksum,
-  ) {
+  ): Node {
     return (
       <div>
         <h2 className={styles.addressLabel}>
@@ -114,7 +116,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
     addresses: Array<string>,
     onCopyAddressTooltip: (string, string) => void,
     notification: ?Notification,
-  ) {
+  ): Node {
     return (
       <div>
         <h2 className={styles.addressLabel}>
@@ -149,7 +151,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
     );
   }
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const {
       byronPlate,

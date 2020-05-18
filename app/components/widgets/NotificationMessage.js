@@ -13,11 +13,11 @@ type Props = {|
 
 @observer
 export default class NotificationMessage extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|children: null|} = {
     children: null
   };
 
-  render() {
+  render(): Node {
     const { icon, show, children } = this.props;
 
     const notificationMessageStyles = classNames([

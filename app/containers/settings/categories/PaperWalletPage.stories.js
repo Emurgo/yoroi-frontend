@@ -1,5 +1,6 @@
 // @flow
 
+import type { Node } from 'react';
 import React from 'react';
 
 import { select, } from '@storybook/addon-knobs';
@@ -29,7 +30,7 @@ export default {
 
 /* ===== Notable variations ===== */
 
-export const NoDialog = () => {
+export const NoDialog = (): Node => {
   const lookup = walletLookup([]);
   return wrapSettings(
     mockSettingsProps({
@@ -95,7 +96,7 @@ const OpenDialogBase = {
   },
 };
 
-export const UserPasswordDialog = () => {
+export const UserPasswordDialog = (): Node => {
   const lookup = walletLookup([]);
   return wrapSettings(
     mockSettingsProps({
@@ -172,7 +173,7 @@ export const UserPasswordDialog = () => {
   );
 };
 
-export const CreateDialog = () => {
+export const CreateDialog = (): Node => {
   const lookup = walletLookup([]);
   return wrapSettings(
     mockSettingsProps({
@@ -260,7 +261,7 @@ const constructedPaperWallet = {
   },
 };
 
-export const VerifyDialog = () => {
+export const VerifyDialog = (): Node => {
   const lookup = walletLookup([]);
   return wrapSettings(
     mockSettingsProps({
@@ -333,7 +334,7 @@ export const VerifyDialog = () => {
   );
 };
 
-export const FinalizeDialog = () => {
+export const FinalizeDialog = (): Node => {
   const lookup = walletLookup([]);
   return wrapSettings(
     mockSettingsProps({

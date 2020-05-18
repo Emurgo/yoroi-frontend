@@ -9,6 +9,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import styles from './GraphWrapper.scss';
 import Card from './Card';
 import globalMessages from '../../../../i18n/global-messages';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   // total ADA sent to the pool
@@ -247,11 +248,11 @@ type State = {|
 
 @observer
 export default class GraphWrapper extends Component<Props, State> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  state = {
+  state: State = {
     selectedTab: 0,
   }
 
@@ -267,7 +268,7 @@ export default class GraphWrapper extends Component<Props, State> {
       : intl.formatMessage(messages.epochAxisLabel, { epochLength });
   }
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const { tabs, themeVars } = this.props;
 

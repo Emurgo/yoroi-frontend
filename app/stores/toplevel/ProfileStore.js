@@ -501,7 +501,8 @@ export default class ProfileStore extends Store {
 
   @computed get selectedExplorer(): ExplorerType {
     const { result } = this.getSelectedExplorerRequest.execute();
-    return result || 'seiza';
+    if (result == null || result === '') return 'seiza';
+    return result;
   }
 
   setSelectedExplorer: {| explorer: ExplorerType |} => Promise<void> = async (

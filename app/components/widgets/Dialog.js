@@ -34,7 +34,17 @@ type Props = {|
 
 @observer
 export default class Dialog extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|
+    actions: void,
+    backButton: void,
+    children: void,
+    className: void,
+    closeButton: void,
+    closeOnOverlayClick: void,
+    onClose: void,
+    styleOveride: void,
+    title: void,
+  |} = {
     title: undefined,
     children: undefined,
     actions: undefined,
@@ -46,7 +56,7 @@ export default class Dialog extends Component<Props> {
     closeOnOverlayClick: undefined,
   };
 
-  render() {
+  render(): Node {
     const {
       title,
       children,

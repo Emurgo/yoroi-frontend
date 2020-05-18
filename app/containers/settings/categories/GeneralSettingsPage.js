@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
@@ -16,6 +17,7 @@ import AboutYoroiSettingsBlock from '../../../components/settings/categories/gen
 import { getExplorers } from '../../../domain/Explorer';
 import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
 import AdaCurrency from '../../../assets/images/currencies/ADA.inline.svg';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const currencyLabels = defineMessages({
   USD: {
@@ -53,7 +55,7 @@ type GeneratedData = typeof GeneralSettingsPage.prototype.generated;
 @observer
 export default class GeneralSettingsPage extends Component<InjectedOrGenerated<GeneratedData>> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
@@ -64,7 +66,7 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
     await this.generated.actions.profile.updateUnitOfAccount.trigger(unitOfAccount);
   };
 
-  render() {
+  render(): Node {
     const profileStore = this.generated.stores.profile;
     const coinPriceStore = this.generated.stores.coinPriceStore;
 

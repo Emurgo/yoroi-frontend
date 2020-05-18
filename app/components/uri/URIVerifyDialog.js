@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component, } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
@@ -16,6 +17,7 @@ import RawHash from '../widgets/hashWrappers/RawHash';
 import type { ExplorerType } from '../../domain/Explorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { calculateAndFormatValue } from '../../utils/unit-of-account';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import styles from './URIVerifyDialog.scss';
 
@@ -47,11 +49,11 @@ type Props = {|
 @observer
 export default class URIVerifyDialog extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { onCancel, onSubmit, unitOfAccountSetting, coinPrice } = this.props;
     const { intl } = this.context;
 

@@ -24,7 +24,7 @@ type GeneratedData = typeof WalletSettingsPage.prototype.generated;
 @observer
 export default class WalletSettingsPage extends Component<InjectedOrGenerated<GeneratedData>> {
 
-  render() {
+  render(): Node {
     const { profile, walletSettings } = this.generated.stores;
     const { actions, } = this.generated;
     const {

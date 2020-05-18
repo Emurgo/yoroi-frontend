@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
@@ -8,6 +9,7 @@ import DialogBackButton from '../widgets/DialogBackButton';
 import Dialog from '../widgets/Dialog';
 import styles from './HardwareDisclaimer.scss';
 import globalMessages from '../../i18n/global-messages';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   instructions2: {
@@ -30,11 +32,11 @@ type Props = {|
 @observer
 export default class HardwareDisclaimer extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
 
     const actions = [

@@ -33,7 +33,7 @@ export class UserAgentInfo {
       !this.isFirefox;
   }
 
-  canRegisterProtocol = (): boolean => {
+  canRegisterProtocol: (() => boolean) = () => {
     // Moz-Extension specify the protocol in the manifest not at runtime
     if (this.isExtension && this.isFirefox) {
       return false;
@@ -46,4 +46,4 @@ export class UserAgentInfo {
   }
 }
 
-export default new UserAgentInfo();
+export default (new UserAgentInfo(): UserAgentInfo);

@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { computed, action, observable } from 'mobx';
 import { observer } from 'mobx-react';
@@ -6,6 +7,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { messages } from '../../../components/wallet/settings/RemoveWallet';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 
@@ -31,7 +33,7 @@ const dialogMessages = defineMessages({
 
 @observer
 export default class RemoveWalletDialogContainer extends Component<Props> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
@@ -47,7 +49,7 @@ export default class RemoveWalletDialogContainer extends Component<Props> {
     this.isChecked = !this.isChecked;
   }
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const settingsStore = this.generated.stores.walletSettings;
     const settingsActions = this.generated.actions.walletSettings;

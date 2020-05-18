@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
@@ -11,6 +12,7 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import TermsOfUseText from './TermsOfUseText';
 import styles from './TermsOfUseForm.scss';
 import globalMessages from '../../../i18n/global-messages';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   checkboxLabel: {
@@ -32,15 +34,15 @@ type State = {|
 
 @observer
 export default class TermsOfUseForm extends Component<Props, State> {
-  static defaultProps = {
+  static defaultProps: {|error: void|} = {
     error: undefined
   };
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  state = {
+  state: State = {
     areTermsOfUseAccepted: false,
   };
 
@@ -48,7 +50,7 @@ export default class TermsOfUseForm extends Component<Props, State> {
     this.setState(prevState => ({ areTermsOfUseAccepted: !prevState.areTermsOfUseAccepted }));
   }
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const { isSubmitting, error, localizedTermsOfUse } = this.props;
     const { areTermsOfUseAccepted } = this.state;

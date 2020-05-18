@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
@@ -42,6 +43,7 @@ import NavBarTitle from '../../components/topbar/NavBarTitle';
 
 import type { RestoreModeType } from '../../actions/ada/wallet-restore-actions';
 import { RestoreMode } from '../../actions/ada/wallet-restore-actions';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 export type GeneratedData = typeof WalletAddPage.prototype.generated;
 
@@ -49,7 +51,7 @@ type Props = InjectedOrGenerated<GeneratedData>;
 
 @observer
 export default class WalletAddPage extends Component<Props> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
@@ -64,7 +66,7 @@ export default class WalletAddPage extends Component<Props> {
     this.generated.actions.wallets.unselectWallet.trigger();
   }
 
-  render() {
+  render(): Node {
     const { actions, stores } = this.generated;
     const { uiDialogs } = stores;
 
@@ -186,18 +188,14 @@ export default class WalletAddPage extends Component<Props> {
     );
   }
 
-  _getRouter() {
-    return this.generated.actions.router;
-  }
-
-  _goToSettingsRoot = (): void => {
-    this._getRouter().goToRoute.trigger({
+  _goToSettingsRoot: (() => void) = () => {
+    this.generated.actions.router.goToRoute.trigger({
       route: ROUTES.SETTINGS.ROOT
     });
   }
 
-  _goToDaedalusTransferRoot = (): void => {
-    this._getRouter().goToRoute.trigger({
+  _goToDaedalusTransferRoot: (() => void) = () => {
+    this.generated.actions.router.goToRoute.trigger({
       route: ROUTES.TRANSFER.DAEDALUS
     });
   }

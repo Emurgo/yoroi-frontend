@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import classnames from 'classnames';
@@ -11,7 +12,7 @@ import LogoYoroiShelleyTestnetIcon from '../../assets/images/yoroi-logo-shelley-
 import SettingsIcon from '../../assets/images/top-bar/setting-active.inline.svg';
 import DaedalusIcon from '../../assets/images/top-bar/daedalus-migration.inline.svg';
 import NightlyLogo from '../../assets/images/yoroi-logo-nightly-white.inline.svg';
-
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './WalletAdd.scss';
 
 import environment from '../../environment';
@@ -45,7 +46,7 @@ type Props = {|
 
 @observer
 export default class WalletAdd extends Component<Props> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
@@ -59,7 +60,7 @@ export default class WalletAdd extends Component<Props> {
     return LogoYoroiIcon;
   }
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const {
       onSettings,

@@ -1,5 +1,6 @@
 // @flow
 
+import type { Node } from 'react';
 import React from 'react';
 import BigNumber from 'bignumber.js';
 import { boolean, select, } from '@storybook/addon-knobs';
@@ -475,7 +476,7 @@ function getStakingInfo(
   };
 }
 
-export const Loading = () => {
+export const Loading = (): Node => {
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();
     const getDelegatedBalance: CachedRequest<GetDelegatedBalanceFunc> = new CachedRequest(
@@ -583,7 +584,7 @@ export const Loading = () => {
   );
 };
 
-export const DelegationCases = () => {
+export const DelegationCases = (): Node => {
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();
     const getStakingKeyValue = () => select(
@@ -636,7 +637,7 @@ export const DelegationCases = () => {
   );
 };
 
-export const Errors = () => {
+export const Errors = (): Node => {
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();
     {
@@ -737,7 +738,7 @@ const genBaseWallet = () => {
   return wallet;
 };
 
-export const LessThanExpected = () => {
+export const LessThanExpected = (): Node => {
   const wallet = genBaseWallet();
   const lookup = walletLookup([wallet]);
   return wrapWallet(
@@ -756,7 +757,7 @@ export const LessThanExpected = () => {
   );
 };
 
-export const UnknownPool = () => {
+export const UnknownPool = (): Node => {
   const wallet = genBaseWallet();
 
   // setup a map that doesn't have the metadata for a pool (a private pool)
@@ -793,7 +794,7 @@ export const UnknownPool = () => {
   );
 };
 
-export const UndelegateExecuting = () => {
+export const UndelegateExecuting = (): Node => {
   const wallet = genBaseWallet();
   const lookup = walletLookup([wallet]);
   return wrapWallet(
@@ -827,7 +828,7 @@ export const UndelegateExecuting = () => {
   );
 };
 
-export const UndelegateError = () => {
+export const UndelegateError = (): Node => {
   const wallet = genBaseWallet();
   const lookup = walletLookup([wallet]);
   return wrapWallet(
@@ -861,7 +862,7 @@ export const UndelegateError = () => {
   );
 };
 
-export const UndelegateDialogShown = () => {
+export const UndelegateDialogShown = (): Node => {
   const wallet = genBaseWallet();
   const lookup = walletLookup([wallet]);
   const errorCases = {
@@ -906,7 +907,7 @@ export const UndelegateDialogShown = () => {
   );
 };
 
-export const Reputation = () => {
+export const Reputation = (): Node => {
   const wallet = genBaseWallet();
   const lookup = walletLookup([wallet]);
   const flagCases = {
@@ -956,7 +957,7 @@ export const Reputation = () => {
   );
 };
 
-export const MangledDashboardWarning = () => {
+export const MangledDashboardWarning = (): Node => {
   const mangledCases = {
     CannotUnmangle: 0,
     CanUnmangleSome: 1,
@@ -998,7 +999,7 @@ export const MangledDashboardWarning = () => {
 const setupSelfTxRequest: LocalizedRequest<SetupSelfTxFunc>
   = new LocalizedRequest(async (_foo) => undefined);
 
-export const UnmangleDialogLoading = () => {
+export const UnmangleDialogLoading = (): Node => {
   const wallet = genBaseWallet();
   const lookup = walletLookup([wallet]);
   return wrapWallet(
@@ -1031,7 +1032,7 @@ export const UnmangleDialogLoading = () => {
   );
 };
 
-export const UnmangleDialogError = () => {
+export const UnmangleDialogError = (): Node => {
   const wallet = genBaseWallet();
   const lookup = walletLookup([wallet]);
   return wrapWallet(
@@ -1064,7 +1065,7 @@ export const UnmangleDialogError = () => {
   );
 };
 
-export const UnmangleDialogConfirm = () => {
+export const UnmangleDialogConfirm = (): Node => {
   const wallet = genBaseWallet();
   const lookup = walletLookup([wallet]);
   const { tentativeTx } = genTentativeTx();

@@ -9,7 +9,7 @@ import {
   stringifyError
 } from '../utils/logging';
 
-export const ledgerErrors = defineMessages({
+export const ledgerErrors: * = defineMessages({
   cancelOnDeviceError101: {
     id: 'wallet.hw.ledger.common.error.101',
     defaultMessage: '!!!Operation cancelled on Ledger device.',

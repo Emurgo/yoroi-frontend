@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
@@ -8,6 +9,7 @@ import globalMessages from '../../../i18n/global-messages';
 import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import { Input } from 'react-polymorph/lib/components/Input';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
   +setForm: ReactToolboxMobxForm => void,
@@ -19,15 +21,15 @@ type Props = {|
 @observer
 export default class SpendingPasswordInput extends Component<Props> {
 
-  static defaultProps = {
+  static defaultProps: {|initValues: void|} = {
     initValues: undefined,
   };
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
   };
 
-  form = new ReactToolboxMobxForm({
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       walletPassword: {
         type: 'password',
@@ -57,7 +59,7 @@ export default class SpendingPasswordInput extends Component<Props> {
     this.props.setForm(this.form);
   }
 
-  render() {
+  render(): Node {
     const { form } = this;
 
     const walletPasswordField = form.$('walletPassword');

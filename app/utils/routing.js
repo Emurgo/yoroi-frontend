@@ -20,7 +20,7 @@ export const matchRoute = (
  * @param params
  */
 type ParamsT = ?{ [key: string]: $ReadOnlyArray<number|string> | number | string, ... };
-export const buildRoute = (pattern: string, params: ParamsT) => {
+export const buildRoute = (pattern: string, params: ParamsT): string => {
   function toArray(val): $ReadOnlyArray<number | string> {
     return Array.isArray(val) ? val : [val];
   }

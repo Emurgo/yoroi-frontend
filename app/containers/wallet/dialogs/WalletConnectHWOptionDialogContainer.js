@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import WalletConnectHWOptionDialog from '../../../components/wallet/add/option-dialog/WalletConnectHWOptionDialog';
@@ -12,7 +13,7 @@ type Props = {|
 @observer
 export default class WalletConnectHWOptionDialogContainer extends Component<Props> {
 
-  render() {
+  render(): Node {
     return (
       <WalletConnectHWOptionDialog
         onCancel={this.props.onClose}

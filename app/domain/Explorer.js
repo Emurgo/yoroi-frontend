@@ -37,9 +37,11 @@ export function getExplorers(): Array<{| value: ExplorerType, label: string |}> 
       label: explorerInfo[ByronExplorers[key]].name,
     }));
 }
-export const Explorer = environment.isShelley()
-  ? ShelleyExplorers
-  : ByronExplorers;
+export const Explorer:
+  | typeof ShelleyExplorers
+  | typeof ByronExplorers = environment.isShelley()
+    ? ShelleyExplorers
+    : ByronExplorers;
 export type ExplorerType = $Values<typeof ShelleyExplorers> | $Values<typeof ByronExplorers>;
 
 export const Link = Object.freeze({

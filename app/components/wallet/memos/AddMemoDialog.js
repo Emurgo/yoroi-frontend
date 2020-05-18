@@ -1,5 +1,6 @@
 // @flow
 
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
@@ -20,6 +21,7 @@ import WalletTransaction from '../../../domain/WalletTransaction';
 import { MAX_MEMO_SIZE } from '../../../config/externalStorageConfig';
 import config from '../../../config';
 import styles from './MemoDialogCommon.scss';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   addMemoActionsSubmit: {
@@ -44,17 +46,17 @@ type State = {|
 @observer
 export default class AddMemoDialog extends Component<Props, State> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  state = {
+  state: State = {
     isSubmitting: false,
   };
 
   memoContentInput: Input;
 
-  form = new ReactToolboxMobxForm({
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       memoContent: {
         label: this.context.intl.formatMessage(memoMessages.memoLabel),
@@ -100,7 +102,7 @@ export default class AddMemoDialog extends Component<Props, State> {
     });
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const { form } = this;
     const { memoContent } = form.values();

@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
@@ -36,6 +37,7 @@ import { Logger } from '../../../../utils/logging';
 import styles from '../common/SaveDialog.scss';
 import headerMixin from '../../../mixins/HeaderBlock.scss';
 import config from '../../../../config';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const SaveStartSVG = SaveLoadSVG;
 
@@ -60,11 +62,11 @@ type Props = {|
 @observer
 export default class SaveDialog extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
   };
 
-  form: typeof ReactToolboxMobxForm;
+  form: ReactToolboxMobxForm;
 
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillMount() {
@@ -97,7 +99,7 @@ export default class SaveDialog extends Component<Props> {
     });
   }
 
-  render() {
+  render(): Node {
     const { form } = this;
     const { intl } = this.context;
 

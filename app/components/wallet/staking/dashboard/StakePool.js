@@ -20,6 +20,7 @@ import type { ExplorerType } from '../../../../domain/Explorer';
 import type { ReputationObject } from '../../../../api/ada/lib/state-fetch/types';
 import globalMessages from '../../../../i18n/global-messages';
 import WarningIcon from '../../../../assets/images/attention-modern.inline.svg';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   title: {
@@ -99,11 +100,11 @@ type Props = {|
 
 @observer
 export default class StakePool extends Component<Props> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
 
     const { hash, poolName } = this.props;

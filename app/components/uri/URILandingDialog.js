@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
@@ -12,6 +13,7 @@ import PerformTxImg from '../../assets/images/uri/perform-tx-uri.inline.svg';
 
 import styles from './URILandingDialog.scss';
 import globalMessages from '../../i18n/global-messages';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   uriLandingDialogTitle: {
@@ -41,15 +43,15 @@ type Props = {|
 @observer
 export default class URILandingDialog extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  submit = () => {
+  submit: (() => void) = () => {
     this.props.onSubmit();
   };
 
-  render() {
+  render(): Node {
     const { onClose, classicTheme } = this.props;
     const { intl } = this.context;
 

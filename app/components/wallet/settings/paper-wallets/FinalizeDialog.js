@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
@@ -15,6 +16,7 @@ import WalletAccountIcon from '../../../topbar/WalletAccountIcon';
 import ExplorableHashContainer from '../../../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../../../domain/Explorer';
 import type { Notification } from '../../../../types/notificationType';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   dialogTitleFinalizePaper: {
@@ -55,15 +57,15 @@ type Props = {|
 
 @observer
 export default class FinalizeDialog extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|onBack: void|} = {
     onBack: undefined,
   };
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const {
       paper,

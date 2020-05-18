@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
-import type { MessageDescriptor } from 'react-intl';
+import type { Node } from 'react';
+import type { MessageDescriptor, $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
@@ -16,15 +17,15 @@ type Props = {|
 
 @observer
 export default class SideBarCategory extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|showLabel: boolean|} = {
     showLabel: false,
   };
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
 
     const { intl } = this.context;
 

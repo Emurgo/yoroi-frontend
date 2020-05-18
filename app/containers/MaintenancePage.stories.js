@@ -1,5 +1,6 @@
 // @flow
 
+import type { Node } from 'react';
 import React from 'react';
 
 import { action } from '@storybook/addon-actions';
@@ -12,7 +13,7 @@ export default {
   decorators: [withScreenshot],
 };
 
-export const Generic = () => (
+export const Generic = (): Node => (
   <MaintenancePage
     generated={{
       handleExternalLinkClick: action('External link click'),

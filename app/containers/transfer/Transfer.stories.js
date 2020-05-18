@@ -1,5 +1,6 @@
 // @flow
 
+import type { Node } from 'react';
 import React from 'react';
 import { select, } from '@storybook/addon-knobs';
 import { withScreenshot } from 'storycap';
@@ -18,7 +19,7 @@ export default {
   decorators: [withScreenshot],
 };
 
-export const MainPage = () => {
+export const MainPage = (): Node => {
   const wallet = genDummyWithCache();
   const walletCases = {
     NoWallet: 0,
@@ -43,7 +44,7 @@ export const MainPage = () => {
 };
 
 
-export const ByronDialog = () => {
+export const ByronDialog = (): Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (<Transfer

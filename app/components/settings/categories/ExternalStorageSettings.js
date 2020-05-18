@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
@@ -8,6 +9,7 @@ import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import type { SelectedExternalStorageProvider } from '../../../domain/ExternalStorage';
 import type { ProvidersType } from '../../../api/externalStorage/index';
 import styles from './ExternalStorageSettings.scss';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   sectionTitle: {
@@ -38,11 +40,11 @@ type Props = {|
 @observer
 export default class ExternalStorageSettings extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const {
       onConnect,
       onDisconnect,

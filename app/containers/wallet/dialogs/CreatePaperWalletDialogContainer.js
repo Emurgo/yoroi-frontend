@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed, observable, runInAction, } from 'mobx';
@@ -16,6 +17,7 @@ import type { AdaPaper } from '../../../api/ada';
 import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import type { WalletRestoreDialogValues } from '../../../components/wallet/WalletRestoreDialog';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   verifyPaperWallet: {
@@ -30,13 +32,13 @@ export type GeneratedData = typeof CreatePaperWalletDialogContainer.prototype.ge
 export default class CreatePaperWalletDialogContainer
   extends Component<InjectedOrGenerated<GeneratedData>> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
   };
 
   @observable notificationElementId: string = '';
 
-  render() {
+  render(): null | Node {
     const { intl } = this.context;
     const { uiDialogs, uiNotifications, profile } = this.generated.stores;
     const { updateDataForActiveDialog } = this.generated.actions.dialogs;

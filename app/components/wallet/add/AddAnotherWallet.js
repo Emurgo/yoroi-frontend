@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 
@@ -31,7 +32,7 @@ export default class AddAnotherWallet extends Component<Props> {
     return LogoYoroiIcon;
   }
 
-  render() {
+  render(): Node {
     const LogoIcon = this.getLogo();
 
     const iconClass = classnames(

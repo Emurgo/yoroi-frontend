@@ -2,6 +2,7 @@
 
 /* eslint react/jsx-one-expression-per-line: 0 */  // the &nbsp; in the html breaks this
 
+import type { Node } from 'react';
 import BigNumber from 'bignumber.js';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
@@ -18,6 +19,7 @@ import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './UndelegateDialog.scss';
 import AnnotatedLoader from '../../../transfer/AnnotatedLoader';
 import config from '../../../../config';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import {
   DECIMAL_PLACES_IN_ADA,
@@ -50,11 +52,11 @@ type Props = {|
 @observer
 export default class UndelegateDialog extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  form = new ReactToolboxMobxForm({
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       walletPassword: {
         type: 'password',
@@ -93,7 +95,7 @@ export default class UndelegateDialog extends Component<Props> {
     });
   }
 
-  render() {
+  render(): Node {
     const { form } = this;
     const { intl } = this.context;
 

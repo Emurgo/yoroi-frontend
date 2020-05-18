@@ -1,6 +1,7 @@
 // @flow
 
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { ThemeProvider } from 'react-polymorph/lib/components/ThemeProvider';
 import { addLocaleData, IntlProvider } from 'react-intl';
@@ -18,6 +19,7 @@ import es from 'react-intl/locale-data/es';
 import it from 'react-intl/locale-data/it';
 import '../../app/themes/index.global.scss';
 import type { UnitOfAccountSettingType } from '../../app/types/unitOfAccountType';
+import type { BaseSignRequest, V3UnsignedTxAddressedUtxoResponse } from '../../app/api/ada/transactions/types';
 import {
   genToAbsoluteSlotNumber,
   genToRelativeSlotNumber,
@@ -110,7 +112,7 @@ export const isFirefoxKnob: void => boolean = () => {
 @observer
 export default class StoryWrapper extends Component<Props> {
 
-  render() {
+  render(): Node {
     const { children: Story } = this.props;
     const locale = globalKnobs.locale();
     const currentTheme = globalKnobs.currentTheme();
@@ -229,14 +231,27 @@ export function getPasswordCreationCases(long?: string): {|
   };
 }
 
-export const trezorErrorCases = Object.freeze({
+export const trezorErrorCases: {|
+  None: void,
+  IFrameTimeout: LocalizableError,
+  PermissionError: LocalizableError,
+  Cancelled: LocalizableError,
+|} = Object.freeze({
   None: undefined,
   IFrameTimeout: new LocalizableError(globalMessages.trezorError101),
   PermissionError: new LocalizableError(globalMessages.hwError101),
   Cancelled: new LocalizableError(globalMessages.trezorError103),
 });
 
-export const ledgerErrorCases = Object.freeze({
+export const ledgerErrorCases: {|
+  None: void,
+  U2fTimeout: LocalizableError,
+  OtherTimeout: LocalizableError,
+  DeviceRejected: LocalizableError,
+  UserRejected: LocalizableError,
+  Locked: LocalizableError,
+  NotAllowed: LocalizableError,
+|} = Object.freeze({
   None: undefined,
   U2fTimeout: new LocalizableError(globalMessages.ledgerError101),
   OtherTimeout: new LocalizableError(ledgerErrors.networkError105),
@@ -554,7 +569,13 @@ export function walletLookup(wallets: Array<CacheValue>): {|
   });
 }
 
-export const genTentativeTx = () => {
+export const genTentativeTx = (): {|
+  tentativeTx: null | BaseSignRequest<
+    RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput
+  >,
+  inputAmount: string,
+  fee: BigNumber,
+|} => {
   const inputAmount = '1000001';
   const ouputAmount = '400';
   const fee = new BigNumber(inputAmount).minus(new BigNumber(ouputAmount));
@@ -629,7 +650,7 @@ export const genTentativeTx = () => {
   }
 };
 
-export const genUndelegateTx = () => {
+export const genUndelegateTx = (): V3UnsignedTxAddressedUtxoResponse => {
   const inputAmount = '1000001';
 
   if (!environment.isShelley()) {

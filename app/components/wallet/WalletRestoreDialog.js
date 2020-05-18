@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { join } from 'lodash';
 import { observer } from 'mobx-react';
@@ -24,6 +25,7 @@ import config from '../../config';
 import DialogBackButton from '../widgets/DialogBackButton';
 import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
 import { AutocompleteOwnSkin } from '../../themes/skins/AutocompleteOwnSkin';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   title: {
@@ -86,7 +88,16 @@ type Props = {|
 
 @observer
 export default class WalletRestoreDialog extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|
+    error: void,
+    initValues: void,
+    introMessage: string,
+    isPaper: void,
+    isVerificationMode: void,
+    onBack: void,
+    paperPasswordValidator: void,
+    showPaperPassword: void,
+  |} = {
     error: undefined,
     onBack: undefined,
     paperPasswordValidator: undefined,
@@ -97,7 +108,7 @@ export default class WalletRestoreDialog extends Component<Props> {
     introMessage: '',
   };
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
   };
 
@@ -111,7 +122,7 @@ export default class WalletRestoreDialog extends Component<Props> {
     return [];
   };
 
-  form = new ReactToolboxMobxForm({
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       walletName: this.props.isVerificationMode === true ? undefined : {
         label: this.context.intl.formatMessage(messages.walletNameInputLabel),
@@ -224,7 +235,7 @@ export default class WalletRestoreDialog extends Component<Props> {
     },
   });
 
-  submit = () => {
+  submit: (() => void) = () => {
     this.form.submit({
       onSuccess: async (form) => {
         const { recoveryPhrase, walletName, walletPassword, paperPassword } = form.values();
@@ -240,7 +251,7 @@ export default class WalletRestoreDialog extends Component<Props> {
     });
   };
 
-  componentDidMount() {
+  componentDidMount(): void {
     setTimeout(() => {
       if (this.props.isVerificationMode === true) {
         // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1009
@@ -255,7 +266,7 @@ export default class WalletRestoreDialog extends Component<Props> {
   // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1009
   // recoveryPhraseInput: Autocomplete;
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const { form } = this;
     const {

@@ -18,12 +18,12 @@ type State = {|
 
 @observer
 export default class NavDropdownContent extends Component<Props, State> {
-  static defaultProps = {
+  static defaultProps: {|contentComponents: void|} = {
     contentComponents: undefined,
   };
   contentRef: ?ElementRef<*>;
 
-  state = {
+  state: State = {
     maxHeight: Number.MAX_SAFE_INTEGER
   };
 
@@ -79,7 +79,7 @@ export default class NavDropdownContent extends Component<Props, State> {
     this.setState({ maxHeight });
   }
 
-  render() {
+  render(): Node {
     const {
       contentComponents,
     } = this.props;

@@ -7,7 +7,7 @@ import { defineMessages } from 'react-intl';
  * We instead store the shared messages in this file
 */
 
-const globalMessages = defineMessages({
+const globalMessages: * = defineMessages({
   invalidMasterKey: {
     id: 'global.errors.invalidMasterKey',
     defaultMessage: '!!!Invalid master key entered, please check.',
@@ -564,7 +564,7 @@ const globalMessages = defineMessages({
 });
 export default globalMessages;
 
-export const memoMessages = defineMessages({
+export const memoMessages: * = defineMessages({
   memoLabel: {
     id: 'global.labels.memo',
     defaultMessage: '!!!Memo',
@@ -587,7 +587,7 @@ export const memoMessages = defineMessages({
   },
 });
 
-export const environmentSpecificMessages = {
+export const environmentSpecificMessages: * = {
   ada: defineMessages({
     currency: {
       id: 'environment.currency.ada',

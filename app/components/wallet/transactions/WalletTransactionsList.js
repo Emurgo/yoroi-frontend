@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
@@ -19,6 +20,7 @@ import globalMessages from '../../../i18n/global-messages';
 import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
 import type { PriceDataRow } from '../../../api/ada/lib/storage/database/prices/tables';
 import { getPriceKey } from '../../../api/ada/lib/storage/bridge/prices';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   showMoreTransactionsButtonLabel: {
@@ -48,12 +50,12 @@ type Props = {|
 @observer
 export default class WalletTransactionsList extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
   // eslint-disable-next-line camelcase
-  UNSAFE_componentWillMount() {
+  UNSAFE_componentWillMount(): void {
     this.localizedDateFormat = moment.localeData().longDateFormat('L');
     // Localized dateFormat:
     // English - MM/DD/YYYY
@@ -64,11 +66,10 @@ export default class WalletTransactionsList extends Component<Props> {
   loadingSpinner: ?LoadingSpinner;
   localizedDateFormat: 'MM/DD/YYYY';
 
-  groupTransactionsByDay(transactions: Array<WalletTransaction>)
-      : Array<{|
-        date: string,
-        transactions: Array<WalletTransaction>,
-      |}> {
+  groupTransactionsByDay(transactions: Array<WalletTransaction>): Array<{|
+    date: string,
+    transactions: Array<WalletTransaction>,
+  |}> {
     const groups: Array<{|
       date: string,
       transactions: Array<WalletTransaction>,
@@ -89,7 +90,7 @@ export default class WalletTransactionsList extends Component<Props> {
     );
   }
 
-  localizedDate(date: string) {
+  localizedDate(date: string): string {
     const { intl } = this.context;
     const today = moment().format(dateFormat);
     if (date === today) return intl.formatMessage(globalMessages.dateToday);
@@ -110,7 +111,7 @@ export default class WalletTransactionsList extends Component<Props> {
     return '';
   }
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const {
       transactions,

@@ -19,6 +19,7 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { calculateAndFormatValue } from '../../utils/unit-of-account';
 import type { WalletChecksum } from '@emurgo/cip4-js';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   totalBalance: {
@@ -64,14 +65,17 @@ function constructPlate(
 /** Dynamically generated title for the topbar when a wallet is selected */
 @observer
 export default class WalletTopbarTitle extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|
+    formattedWalletAmount: void,
+    themeProperties: {|identiconSaturationFactor: number|},
+  |} = {
     formattedWalletAmount: undefined,
     themeProperties: {
       identiconSaturationFactor: 0,
     },
   };
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
@@ -98,7 +102,7 @@ export default class WalletTopbarTitle extends Component<Props> {
       : this.props.formattedWalletAmount(walletAmount);
   }
 
-  render() {
+  render(): Node {
     const {
       walletInfo, currentRoute, formattedWalletAmount, themeProperties,
       shouldHideBalance, onUpdateHideBalance, unitOfAccountSetting,

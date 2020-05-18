@@ -130,7 +130,7 @@ const genBaseProps: {|
   },
 });
 
-export const GettingMnemonics = () => {
+export const GettingMnemonics = (): React$Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
@@ -151,7 +151,7 @@ export const GettingMnemonics = () => {
   })();
 };
 
-export const GettingPaperMnemonics = () => {
+export const GettingPaperMnemonics = (): React$Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
@@ -172,7 +172,7 @@ export const GettingPaperMnemonics = () => {
   })();
 };
 
-export const HardwareDisclaimer = () => {
+export const HardwareDisclaimer = (): React$Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
@@ -193,7 +193,7 @@ export const HardwareDisclaimer = () => {
   })();
 };
 
-export const HardwareMnemonic = () => {
+export const HardwareMnemonic = (): React$Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
@@ -214,7 +214,7 @@ export const HardwareMnemonic = () => {
   })();
 };
 
-export const Checksum = () => {
+export const Checksum = (): React$Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
@@ -244,7 +244,7 @@ export const Checksum = () => {
   })();
 };
 
-export const RestoringAddresses = () => {
+export const RestoringAddresses = (): React$Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
@@ -265,7 +265,7 @@ export const RestoringAddresses = () => {
   })();
 };
 
-export const CheckingAddresses = () => {
+export const CheckingAddresses = (): React$Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
@@ -286,7 +286,7 @@ export const CheckingAddresses = () => {
   })();
 };
 
-export const GeneratingTx = () => {
+export const GeneratingTx = (): React$Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
@@ -307,7 +307,7 @@ export const GeneratingTx = () => {
   })();
 };
 
-export const TransferTx = () => {
+export const TransferTx = (): React$Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
@@ -352,7 +352,7 @@ export const TransferTx = () => {
   })();
 };
 
-export const Error = () => {
+export const Error = (): React$Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
@@ -385,7 +385,7 @@ export const Error = () => {
   })();
 };
 
-export const Success = () => {
+export const Success = (): React$Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {

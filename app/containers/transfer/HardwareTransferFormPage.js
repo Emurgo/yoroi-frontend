@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
@@ -8,6 +9,7 @@ import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import MnemonicInput from '../../components/widgets/forms/MnemonicInput';
 import BaseTransferPage from '../../components/transfer/BaseTransferPage';
 import globalMessages from '../../i18n/global-messages';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
   +onSubmit: {| recoveryPhrase: string |} => void,
@@ -20,7 +22,7 @@ type Props = {|
 @observer
 export default class HardwareTransferFormPage extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
   };
 
@@ -31,7 +33,7 @@ export default class HardwareTransferFormPage extends Component<Props> {
     this.mnemonicForm = form;
   }
 
-  submit = async () => {
+  submit: (() => Promise<void>) = async () => {
     if (this.mnemonicForm == null) {
       throw new Error(`${nameof(HardwareTransferFormPage)} form not set`);
     }
@@ -47,7 +49,7 @@ export default class HardwareTransferFormPage extends Component<Props> {
     });
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     return (
       <BaseTransferPage

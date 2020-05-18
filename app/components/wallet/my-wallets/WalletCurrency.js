@@ -1,7 +1,7 @@
 // @flow
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
-
+import type { Node } from 'react';
 import styles from './WalletCurrency.scss';
 
 import SymbolADA from '../../../assets/images/my-wallets/symbol_ada.inline.svg';
@@ -15,11 +15,11 @@ type Props = {|
 
 @observer
 export default class WalletCurrency extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|tooltipText: null|} = {
     tooltipText: null,
   };
 
-  render() {
+  render(): Node {
     const { currency, tooltipText } = this.props;
 
     let Icon;

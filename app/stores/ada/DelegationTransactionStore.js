@@ -35,7 +35,7 @@ export default class DelegationTransactionStore extends Store {
   @observable isStale: boolean = false;
 
   // eslint-disable-next-line no-restricted-syntax
-  _updateTxBuilderReaction = reaction(
+  _updateTxBuilderReaction: (void => mixed) = reaction(
     () => [
       this.stores.wallets.selected,
       // update if tx history changes

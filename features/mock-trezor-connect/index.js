@@ -68,13 +68,13 @@ class MockTrezorConnect {
     return (result: any);
   };
 
-  static manifest = (_data: Object): void => {
+  static manifest: Object => void = (_data) => {
   }
 
-  static init = async (_settings: Settings): Promise<void> => {
+  static init: Settings => Promise<void> = async (_settings) => {
   }
 
-  static dispose = (): void => {
+  static dispose: void => void = () => {
   }
 
   static on: EventListener = (type, fn): void => {

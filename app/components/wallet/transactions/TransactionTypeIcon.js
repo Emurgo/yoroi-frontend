@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import ExpendIcon from '../../../assets/images/transaction/send-ic.inline.svg';
@@ -15,7 +16,7 @@ type Props = {|
 @observer
 export default class TransactionTypeIcon extends Component<Props> {
 
-  render() {
+  render(): Node {
     const { iconType } = this.props;
 
     const transactionTypeIconClasses = classNames([

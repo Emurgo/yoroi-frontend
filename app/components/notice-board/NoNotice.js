@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
 
@@ -7,6 +8,7 @@ import environmnent from '../../environment';
 import NoNoticeTestnetSvg from '../../assets/images/transaction/no-transactions-yet.testnet.inline.svg';
 import NoNoticeClassicSvg from '../../assets/images/transaction/no-transactions-yet.classic.inline.svg';
 import NoNoticeModernSvg from '../../assets/images/transaction/no-transactions-yet.modern.inline.svg';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import styles from './NoNotice.scss';
 
@@ -27,9 +29,9 @@ type Props = {|
 
 @observer
 export default class NoNotice extends Component<Props> {
-  static contextTypes = { intl: intlShape.isRequired };
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = { intl: intlShape.isRequired };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const { classicTheme } = this.props;
 

@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './WalletNavigation.scss';
@@ -13,6 +14,7 @@ import { ROUTES } from '../../../routes-config';
 import transactionsIcon from '../../../assets/images/wallet-nav/tab-transactions.inline.svg';
 import sendIcon from '../../../assets/images/wallet-nav/tab-send.inline.svg';
 import receiveIcon from '../../../assets/images/wallet-nav/tab-receive.inline.svg';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   transactions: {
@@ -50,11 +52,11 @@ type Props = {|
 @observer
 export default class WalletNavigation extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { isActiveNavItem, onNavItemClick } = this.props;
     const { intl } = this.context;
 

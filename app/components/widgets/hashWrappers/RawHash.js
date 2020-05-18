@@ -15,11 +15,11 @@ type Props = {|
 @observer
 export default class RawHash extends Component<Props> {
 
-  static defaultProps = {
+  static defaultProps: {|className: void|} = {
     className: undefined
   }
 
-  render() {
+  render(): Node {
     const addressClasses = classnames([
       styles.hash,
       this.props.light ? styles.lightColor : styles.darkColor,

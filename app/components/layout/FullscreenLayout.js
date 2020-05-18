@@ -15,13 +15,13 @@ type State = {|
 @observer
 export default class FullscreenLayout extends Component<Props, State> {
 
-  static defaultProps = {
+  static defaultProps: {|children: void|} = {
     children: undefined
   };
 
   contentRef: ?ElementRef<*>;
 
-  state = {
+  state: State = {
     height: Number.MAX_SAFE_INTEGER
   };
 
@@ -60,7 +60,7 @@ export default class FullscreenLayout extends Component<Props, State> {
     this.setState({ height });
   }
 
-  render() {
+  render(): Node {
     const { children } = this.props;
     return (
       <div

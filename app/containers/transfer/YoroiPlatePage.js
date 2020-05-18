@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { computed, observable, runInAction } from 'mobx';
 import { observer } from 'mobx-react';
@@ -54,7 +55,7 @@ export default class YoroiPlatePage extends Component<Props> {
 
   @observable plates: void | WalletRestoreDialogContainerState;
 
-  render() {
+  render(): null | Node {
     if (this.plates == null) return null;
     const actions = this.generated.actions;
     const { uiNotifications } = this.generated.stores;

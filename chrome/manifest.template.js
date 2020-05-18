@@ -33,7 +33,7 @@ export default ({
   enableProtocolHandlers: boolean,
   ledgerScript?: string,
 |} */
-) => { // eslint-disable-line function-paren-newline
+)/* : * */ => { // eslint-disable-line function-paren-newline
   const icons = iconOverride == null
     ? {
       /* eslint-disable quote-props */

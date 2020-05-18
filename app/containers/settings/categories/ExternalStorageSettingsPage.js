@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
@@ -21,7 +22,7 @@ export default class ExternalStorageSettingsPage
     await this.generated.actions.memos.unsetExternalStorageProvider.trigger();
   };
 
-  render() {
+  render(): Node {
     const {
       providers,
       selectedProvider

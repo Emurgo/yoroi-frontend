@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
@@ -7,6 +8,7 @@ import { join } from 'lodash';
 import { action, observable } from 'mobx';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import MnemonicInput from '../../components/widgets/forms/MnemonicInput';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import BaseTransferPage from '../../components/transfer/BaseTransferPage';
 
 const messages = defineMessages({
@@ -32,11 +34,7 @@ type Props = {|
 @observer
 export default class DaedalusTransferFormPage extends Component<Props> {
 
-  static contextTypes = {
-    intl: intlShape.isRequired
-  };
-
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
   };
 
@@ -47,7 +45,7 @@ export default class DaedalusTransferFormPage extends Component<Props> {
     this.mnemonicForm = form;
   }
 
-  submit = async () => {
+  submit: (() => Promise<void>) = async () => {
     if (this.mnemonicForm == null) {
       throw new Error('DaedalusTransferFormPage form not set');
     }
@@ -63,7 +61,7 @@ export default class DaedalusTransferFormPage extends Component<Props> {
     });
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const {
       mnemonicLength,

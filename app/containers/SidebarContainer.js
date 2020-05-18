@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
@@ -14,7 +15,7 @@ export default class SidebarContainer extends Component<InjectedOrGenerated<Gene
     await this.generated.actions.profile.toggleSidebar.trigger();
   }
 
-  render() {
+  render(): Node {
     const { actions, stores } = this.generated;
     const { topbar, profile } = stores;
 

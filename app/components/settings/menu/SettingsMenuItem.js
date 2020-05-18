@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import styles from './SettingsMenuItem.scss';
@@ -14,11 +15,11 @@ type Props = {|
 
 @observer
 export default class SettingsMenuItem extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|disabled: boolean|} = {
     disabled: false
   };
 
-  render() {
+  render(): Node {
     const { label, active, disabled, onClick, className } = this.props;
     let state = styles.enabled;
     if (disabled === true) {

@@ -5,7 +5,21 @@ import MobxReactForm from 'mobx-react-form';
  * Based off https://foxhound87.github.io/mobx-react-form/docs/bindings/custom.html */
 export default class ReactToolboxMobxForm extends MobxReactForm {
 
-  bindings() {
+  bindings(): {|
+  ReactToolbox: {|
+    disabled: string,
+    error: string,
+    id: string,
+    label: string,
+    name: string,
+    onBlur: string,
+    onChange: string,
+    onFocus: string,
+    placeholder: string,
+    type: string,
+    value: string,
+  |},
+  |} {
     return {
       ReactToolbox: {
         id: 'id',

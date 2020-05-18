@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import classnames from 'classnames';
@@ -7,6 +8,7 @@ import classnames from 'classnames';
 import globalMessages from '../../../i18n/global-messages';
 import ArrowDownSVG from '../../../assets/images/expand-arrow-grey.inline.svg';
 import styles from './OptionBlock.scss';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
   +parentName: string,
@@ -23,15 +25,15 @@ type State = {|
 
 @observer
 export default class OptionBlock extends Component<Props, State> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  static defaultProps = {
+  static defaultProps: {|learnMoreText: void|} = {
     learnMoreText: undefined
   }
 
-  state = {
+  state: State = {
     showLearnMore: false,
   };
 
@@ -39,7 +41,7 @@ export default class OptionBlock extends Component<Props, State> {
     this.setState(prevState => ({ showLearnMore: !prevState.showLearnMore }));
   }
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const { parentName, type, title, learnMoreText, onSubmit } = this.props;
 

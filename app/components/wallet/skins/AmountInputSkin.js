@@ -1,11 +1,12 @@
 // @flow
 import React, { Component } from 'react';
-import type { Ref } from 'react';
+import type { Node, Ref } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
 import BigNumber from 'bignumber.js';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import styles from './AmountInputSkin.scss';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   feesLabel: {
@@ -32,15 +33,15 @@ type Props = {
 };
 
 export default class AmountInputSkin extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|error: void|} = {
     error: undefined,
   };
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { error, fees, total, currency } = this.props;
     const { intl } = this.context;
 

@@ -1,5 +1,6 @@
 // @flow
 
+import type { Node } from 'react';
 import React from 'react';
 import BigNumber from 'bignumber.js';
 import { withScreenshot } from 'storycap';
@@ -19,7 +20,7 @@ export default {
   decorators: [withScreenshot],
 };
 
-export const GettingMnemonics = () => {
+export const GettingMnemonics = (): Node => {
   const linkCases = {
     Send: 0,
     Invalid: 1,

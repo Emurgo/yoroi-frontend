@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed, observable, runInAction } from 'mobx';
@@ -18,6 +19,7 @@ import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import registerProtocols from '../../uri-protocols';
 import globalMessages from '../../i18n/global-messages';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const Choices = {
   ACCEPT: 'accept',
@@ -33,7 +35,7 @@ export default class UriPromptPage extends Component<InjectedOrGenerated<Generat
   @observable
   selectedChoice: CHOICES | null = null;
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
@@ -56,7 +58,7 @@ export default class UriPromptPage extends Component<InjectedOrGenerated<Generat
     });
   };
 
-  _getContent = () => {
+  _getContent: (() => Node) = () => {
     switch (this.selectedChoice) {
       case null:
         return <UriPromptForm
@@ -81,7 +83,7 @@ export default class UriPromptPage extends Component<InjectedOrGenerated<Generat
     }
   }
 
-  render() {
+  render(): Node {
     const { checkAdaServerStatus } = this.generated.stores.serverConnectionStore;
     const displayedBanner = checkAdaServerStatus === ServerStatusErrors.Healthy ?
       <TestnetWarningBanner /> :

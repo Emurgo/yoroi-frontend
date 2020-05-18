@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
@@ -14,6 +15,7 @@ import globalMessages from '../../../../i18n/global-messages';
 import styles from './UserPasswordDialog.scss';
 import headerMixin from '../../../mixins/HeaderBlock.scss';
 import config from '../../../../config';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   dialogTitleUserPaperPassword: {
@@ -63,11 +65,11 @@ type Props = {|
 
 @observer
 export default class UserPasswordDialog extends Component<Props> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  form = new ReactToolboxMobxForm({
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       paperPassword: {
         type: 'password',
@@ -116,7 +118,7 @@ export default class UserPasswordDialog extends Component<Props> {
     },
   });
 
-  submit = () => {
+  submit: (() => void) = () => {
     this.form.submit({
       onSuccess: async (form) => {
         const { paperPassword } = form.values();
@@ -126,11 +128,11 @@ export default class UserPasswordDialog extends Component<Props> {
     });
   };
 
-  handleDataChange = (key: string, value: string) => {
+  handleDataChange: ((key: string, value: string) => void) = (key, value) => {
     this.props.onDataChange({ [key]: value });
   };
 
-  render() {
+  render(): Node {
     const { form } = this;
     const { paperPassword, repeatPassword } = form.values();
     const { intl } = this.context;

@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
@@ -14,7 +15,7 @@ type GeneratedData = typeof LoadingPage.prototype.generated;
 @observer
 export default class LoadingPage extends Component<InjectedOrGenerated<GeneratedData>> {
 
-  render() {
+  render(): Node {
     return (
       <CenteredLayout>
         <Loading

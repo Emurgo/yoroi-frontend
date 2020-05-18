@@ -24,7 +24,7 @@ import type { SelectedExternalStorageProvider } from '../../domain/ExternalStora
 // Each provider may have a different class. The main class will call
 // all basic methods but the provider could have a specific one that
 // can be invoked by calling directly to the provider
-const providers = {
+const providers: {|dropbox: DropboxApi|} = {
   [ExternalStorageList.DROPBOX]: new DropboxApi(),
   // [ExternalStorageList.GOOGLE_DRIVE]: new GoogleDriveApi(),
 };

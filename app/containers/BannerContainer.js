@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
@@ -14,7 +15,7 @@ export type GeneratedData = typeof BannerContainer.prototype.generated;
 @observer
 export default class BannerContainer extends Component<InjectedOrGenerated<GeneratedData>> {
 
-  render() {
+  render(): Node {
     const serverStatus = this.generated.stores.serverConnectionStore.checkAdaServerStatus;
     return (
       <>

@@ -34,7 +34,7 @@ const mnemonicToSeedHex = (mnemonic: string, password: ?string): string => {
 export const isValidEnglishAdaPaperMnemonic = (
   phrase: string,
   numberOfWords: number
-) => {
+): boolean => {
   // Any password will return some valid unscrambled mnemonic
   // so we just pass a fake password to pass downstream validation
   const fakePassword = numberOfWords === config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT

@@ -1,5 +1,6 @@
 // @flow
 
+import type { Node } from 'react';
 import React from 'react';
 import { select, boolean, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
@@ -72,7 +73,7 @@ const defaultSettingsPageProps: {|
   },
 });
 
-export const NoWallet = () => {
+export const NoWallet = (): Node => {
   const wallet = null;
   const lookup = walletLookup([]);
   return wrapSettings(
@@ -102,7 +103,7 @@ export const NoWallet = () => {
   );
 };
 
-export const EditName = () => {
+export const EditName = (): Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return wrapSettings(
@@ -150,7 +151,7 @@ export const EditName = () => {
   );
 };
 
-export const PasswordUpdateTime = () => {
+export const PasswordUpdateTime = (): Node => {
   return (() => {
     const lastUpdateCases = {
       Never: 0,
@@ -204,7 +205,7 @@ export const PasswordUpdateTime = () => {
   })();
 };
 
-export const ResyncWallet = () => {
+export const ResyncWallet = (): Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return wrapSettings(
@@ -292,7 +293,7 @@ const defaultChangeWalletPasswordDialogContainerProps: void => * = (_request) =>
   },
 });
 
-export const EditPassword = () => {
+export const EditPassword = (): Node => {
   const wallet = genSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
   return wrapSettings(
@@ -399,7 +400,7 @@ export const EditPassword = () => {
   );
 };
 
-export const RemoveWallet = () => {
+export const RemoveWallet = (): Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return wrapSettings(

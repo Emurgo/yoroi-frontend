@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
@@ -13,6 +14,7 @@ import globalMessages from '../../i18n/global-messages';
 import styles from './WalletCreateDialog.scss';
 import config from '../../config';
 import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -53,21 +55,21 @@ type State = {|
 
 @observer
 export default class WalletCreateDialog extends Component<Props, State> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  state = {
+  state: State = {
     isSubmitting: false,
   };
 
-  componentDidMount() {
+  componentDidMount(): void {
     setTimeout(() => { this.walletNameInput.focus(); });
   }
 
   walletNameInput: Input;
 
-  form = new ReactToolboxMobxForm({
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       walletName: {
         label: this.context.intl.formatMessage(messages.walletName),
@@ -124,7 +126,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
     },
   });
 
-  submit = () => {
+  submit: (() => void) = () => {
     this.form.submit({
       onSuccess: async (form) => {
         this.setState({ isSubmitting: true });
@@ -147,7 +149,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
     }
   }
 
-  render() {
+  render(): Node {
     const { form } = this;
     const { walletName, walletPassword, repeatPassword } = form.values();
     const { intl } = this.context;
