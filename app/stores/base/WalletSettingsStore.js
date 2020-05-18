@@ -26,7 +26,6 @@ export type ConceptualWalletSettingsCache = {|
 
 export type WarningList = {|
   publicDeriver: PublicDeriver<>,
-  // TODO: type for props
   dialogs: Array<void => Node>,
 |};
 
