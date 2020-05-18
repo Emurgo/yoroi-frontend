@@ -11,19 +11,19 @@ const messages = defineMessages({
   },
   neverTrack: {
     id: 'profile.privacypolicy.neverTrack',
-    defaultMessage: '!!!<strong>Never</strong> collect keys, addresses, transactions, balances, hashes, or any personal information',
+    defaultMessage: '!!!<strong>Never</strong> track your behavior.',
   },
   neverIP: {
-    id: 'profile.privacypolicy.neverIP',
-    defaultMessage: '!!!<strong>Never</strong> collect your IP address',
+    id: 'profile.privacypolicy.neverProfile',
+    defaultMessage: '!!!<strong>Never</strong> create profiles with your information.',
   },
   neverSell: {
     id: 'profile.privacypolicy.neverSell',
-    defaultMessage: '!!!<strong>Never</strong> sell your data',
+    defaultMessage: '!!!<strong>Never</strong> sell your data.',
   },
   neverAnalytics: {
     id: 'profile.privacypolicy.neverAnalytics',
-    defaultMessage: '!!!<strong>Never</strong> run any analytics software or 3rd party trackers',
+    defaultMessage: '!!!<strong>Never</strong> run any analytics software or 3rd party trackers.',
   },
   serverLogs: {
     id: 'profile.privacypolicy.serverLogs',
