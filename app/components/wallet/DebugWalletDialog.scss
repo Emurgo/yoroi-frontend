@@ -1,3 +1,5 @@
+@import '../../themes/mixins/underline';
+
 :global(.YoroiModern) .component {
   min-width: var(--theme-modal-min-max-width-cmn);
   max-width: var(--theme-modal-min-max-width-cmn);
@@ -10,5 +12,10 @@
 
   .header {
     margin-bottom: 20px;
+  }
+
+  a {
+    color: var(--font-black);
+    @include underline(var(--theme-underline-dark-color));
   }
 }

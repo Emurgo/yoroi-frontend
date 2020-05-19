@@ -692,7 +692,7 @@ export const TxHistoryExport = (): Node => {
   );
 };
 
-export const DebugWalletWarning = () => {
+export const DebugWalletWarning = (): Node => {
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();
     return wallet;

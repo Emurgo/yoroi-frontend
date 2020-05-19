@@ -18,7 +18,7 @@ type Props = {|
 @observer
 export default class DebugWalletDialogContainer extends Component<Props> {
 
-  render() {
+  render(): Node {
     return (
       <DebugWalletDialog
         onClose={this.props.onClose}
