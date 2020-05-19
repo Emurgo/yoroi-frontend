@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { join } from 'lodash';
 import { observer } from 'mobx-react';
@@ -10,6 +11,7 @@ import globalMessages from '../../../i18n/global-messages';
 import styles from './MnemonicInput.scss';
 import config from '../../../config';
 import { AutocompleteOwnSkin } from '../../../themes/skins/AutocompleteOwnSkin';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
   +setForm: ReactToolboxMobxForm => void,
@@ -22,11 +24,11 @@ type Props = {|
 @observer
 export default class MnemonicInput extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
   };
 
-  form = new ReactToolboxMobxForm({
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       recoveryPhrase: {
         label: this.context.intl.formatMessage(globalMessages.recoveryPhraseInputLabel),
@@ -63,11 +65,11 @@ export default class MnemonicInput extends Component<Props> {
     },
   });
 
-  componentDidMount() {
+  componentDidMount(): void {
     this.props.setForm(this.form);
   }
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const { form } = this;
     const {

@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
@@ -27,13 +28,13 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
 
   cancel: void => void = () => {
     this.props.onClose();
-    this._getHWConnectActions().cancel.trigger();
+    this.generated.actions[environment.API].trezorConnect.cancel.trigger();
   };
 
-  render() {
+  render(): null | Node {
     const { profile } = this.generated.stores;
     const trezorConnectStore = this._getTrezorConnectStore();
-    const hwConnectActions = this._getHWConnectActions();
+    const hwConnectActions = this.generated.actions[environment.API].trezorConnect;
 
     let component = null;
 
@@ -88,11 +89,6 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
   /** Returns the store which is responsible for this Container */
   _getTrezorConnectStore() {
     return this.generated.stores.substores[environment.API].trezorConnect;
-  }
-
-  /** Returns the action which is responsible for this Container */
-  _getHWConnectActions() {
-    return this.generated.actions[environment.API].trezorConnect;
   }
 
   @computed get generated() {

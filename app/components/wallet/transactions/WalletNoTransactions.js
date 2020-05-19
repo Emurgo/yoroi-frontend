@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import styles from './WalletNoTransactions.scss';
 import NoTransactionClassicSvg from '../../../assets/images/transaction/no-transactions-yet.classic.inline.svg';
@@ -13,7 +14,7 @@ type Props = {|
 @observer
 export default class WalletNoTransactions extends Component<Props> {
 
-  render() {
+  render(): Node {
     const { classicTheme } = this.props;
     const NoTransactionSvg = classicTheme ? NoTransactionClassicSvg : NoTransactionModernSvg;
     return (

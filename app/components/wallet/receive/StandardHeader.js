@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import classnames from 'classnames';
@@ -13,6 +14,7 @@ import RawHash from '../../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../../domain/Explorer';
 import type { Notification } from '../../../types/notificationType';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   walletAddressLabel: {
@@ -42,11 +44,11 @@ type Props = {|
 
 @observer
 export default class StandardHeader extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|error: void|} = {
     error: undefined
   };
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
@@ -54,7 +56,7 @@ export default class StandardHeader extends Component<Props> {
     await this.props.onGenerateAddress();
   }
 
-  render() {
+  render(): Node {
     const {
       walletAddress,
       isSubmitting, error, isWalletAddressUsed,

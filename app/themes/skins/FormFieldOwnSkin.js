@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import type { Element } from 'react';
+import type { Element, Node } from 'react';
 import { omit } from 'lodash';
 import classnames from 'classnames';
 import ErrorSvg from '../../assets/images/input/exclamationmark.inline.svg';
@@ -33,19 +33,19 @@ type Props = {
 type State = {| isPasswordShown: boolean, |};
 
 export const FormFieldOwnSkin = class extends React.Component<Props, State> {
-  static defaultProps = {
+  static defaultProps: {|done: void|} = {
     done: undefined
   }
 
-  state = {
+  state: State = {
     isPasswordShown: false
   }
 
-  showPassword = () => this.setState(
+  showPassword: (() => void) = () => this.setState(
     prevState => ({ isPasswordShown: !prevState.isPasswordShown })
   )
 
-  render() {
+  render(): Node {
     const { isPasswordShown } = this.state;
     const renderProps = { ...this.props, inputType: isPasswordShown ? 'text' : this.props.type };
 

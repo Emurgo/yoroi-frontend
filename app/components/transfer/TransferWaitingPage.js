@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
@@ -41,11 +42,11 @@ type Props = {|
 @observer
 export default class TransferWaitingPage extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const { status } = this.props;
 

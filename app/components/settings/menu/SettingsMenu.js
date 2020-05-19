@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import SettingsMenuItem from './SettingsMenuItem';
@@ -8,6 +9,7 @@ import environmnent from '../../../environment';
 import { ROUTES } from '../../../routes-config';
 import type { Theme } from '../../../themes';
 import globalMessages from '../../../i18n/global-messages';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   general: {
@@ -42,11 +44,11 @@ type Props = {|
 @observer
 export default class SettingsMenu extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const { onItemClick, isActiveItem, } = this.props;
 

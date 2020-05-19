@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
@@ -8,6 +9,7 @@ import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import globalMessages from '../../i18n/global-messages';
 import InvalidURIImg from '../../assets/images/uri/invalid-uri.inline.svg';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import styles from './URIInvalidDialog.scss';
 
@@ -34,11 +36,11 @@ type Props = {|
 @observer
 export default class URIInvalidDialog extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { onClose, onSubmit, } = this.props;
 
     const dialogClasses = classnames([

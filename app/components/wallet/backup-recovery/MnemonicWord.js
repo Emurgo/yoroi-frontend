@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
@@ -16,7 +17,7 @@ type Props = {|
 
 @observer
 export default class MnemonicWord extends Component<Props> {
-  render() {
+  render(): Node {
     const { word, index, isActive, onClick, classicTheme } = this.props;
     const handleClick = onClick.bind(null, { word, index });
 

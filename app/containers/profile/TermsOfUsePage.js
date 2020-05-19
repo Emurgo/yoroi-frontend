@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
@@ -12,6 +13,7 @@ import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   title: {
@@ -25,11 +27,11 @@ type GeneratedData = typeof TermsOfUsePage.prototype.generated;
 @observer
 export default class TermsOfUsePage extends Component<InjectedOrGenerated<GeneratedData>> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { checkAdaServerStatus } = this.generated.stores.serverConnectionStore;
     const displayedBanner = checkAdaServerStatus === ServerStatusErrors.Healthy ?
       <TestnetWarningBanner /> :

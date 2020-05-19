@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
@@ -23,7 +24,7 @@ export default class TopBarContainer extends Component<Props> {
     await this.generated.actions.profile.updateHideBalance.trigger();
   }
 
-  render() {
+  render(): Node {
     const { actions, stores } = this.generated;
     const { app, topbar, profile, coinPriceStore } = stores;
 

@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage, } from 'react-intl';
-import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
+import type { $npm$ReactIntl$MessageDescriptor, $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import { DECIMAL_PLACES_IN_ADA } from '../../../../config/numbersConfig';
 import Card from './Card';
@@ -15,7 +15,6 @@ import IconDelegated from '../../../../assets/images/dashboard/total-delegated.i
 import globalMessages from '../../../../i18n/global-messages';
 import TooltipBox from '../../../widgets/TooltipBox';
 import WarningIcon from '../../../../assets/images/attention-modern.inline.svg';
-
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 
 const messages = defineMessages({
@@ -78,15 +77,15 @@ type State = {|
 
 @observer
 export default class UserSummary extends Component<Props, State> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  state = {
+  state: State = {
     mangledPopupOpen: false,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     return (
       <Card title={intl.formatMessage(messages.title)}>

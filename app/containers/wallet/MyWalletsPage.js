@@ -33,6 +33,7 @@ import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/m
 import {
   asGetPublicKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 const messages = defineMessages({
@@ -49,7 +50,7 @@ type Props = InjectedOrGenerated<GeneratedData>
 @observer
 export default class MyWalletsPage extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
@@ -70,7 +71,7 @@ export default class MyWalletsPage extends Component<Props> {
     });
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const { stores } = this.generated;
     const { profile } = stores;

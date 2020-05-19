@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
@@ -8,6 +9,7 @@ import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import styles from './UriAccept.scss';
 import UriPrompt from '../../../assets/images/uri/uri-prompt.inline.svg';
 import globalMessages from '../../../i18n/global-messages';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   seePrompt: {
@@ -24,11 +26,11 @@ type Props = {|
 
 @observer
 export default class UriAccept extends Component<Props> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const allowButtonClasses = classnames([
       'finishButton',

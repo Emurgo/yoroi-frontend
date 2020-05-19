@@ -29,6 +29,7 @@ const storeClasses = {
   noticeBoard: NoticeBoardStore,
   loading: LoadingStore,
   wallets: WalletStore,
+  // note: purposely exclude substores and router
 };
 
 export type StoresMap = {|
@@ -47,9 +48,8 @@ export type StoresMap = {|
 |};
 
 /** Constant that represents the stores across the lifetime of the application */
-const stores = observable({
+const stores: WithNullableFields<StoresMap> = observable({
   profile: null,
-  theme: null,
   app: null,
   topbar: null,
   memos: null,
@@ -59,12 +59,12 @@ const stores = observable({
   noticeBoard: null,
   loading: null,
   wallets: null,
-  substores: {},
+  substores: null,
   router: null,
 });
 
 /** Set up and return the stores for this app -> also used to reset all stores to defaults */
-export default action(
+export default (action(
   (
     api: Api,
     actions: ActionsMap,
@@ -72,7 +72,7 @@ export default action(
   ): StoresMap => {
     /** Note: `stores` sets all values to null to start
      * However this is incompatible with the `StoresMap` types
-     * We don't make `StoresMap` fields optional as it would bloat the code with nullchecks
+     * We don't make `StoresMap` fields optional as it would bloat the code with null checks
      * We need to keep `stores` null to
      * - keep the global reference alive
      * - allow resetting the stores
@@ -96,19 +96,21 @@ export default action(
      * Note: we have to split up th setup and the initialization
      * Because to make sure all substores are non-null we have to create the object
      * But we only want to actually initialize it if it is the currency in use */
-    stores.substores.ada = setupAdaStores(stores, api, actions);
+    stores.substores = {
+      ada: setupAdaStores((stores: any), api, actions)
+    };
+
+    const loadedStores: StoresMap = (stores: any);
     if (environment.API === 'ada') {
       Object
-        .keys(stores.substores.ada)
-        .map(key => stores.substores.ada[key])
+        .keys(loadedStores.substores.ada)
+        .map(key => loadedStores.substores.ada[key])
         .forEach(store => store.initialize());
     }
 
     // Perform load after all setup is done to ensure migration can modify store state
-    if (stores.loading) { // if condition to please flow (avoid thinking "loading" is null)
-      stores.loading.load();
-    }
+    loadedStores.loading.load();
 
-    return (stores: any);
+    return loadedStores;
   }
-);
+): (Api, ActionsMap, RouterStore) => StoresMap);

@@ -73,7 +73,7 @@ export type AdaStoresMap = {|
   time: TimeStore,
 |};
 
-const adaStores = observable({
+const adaStores: WithNullableFields<AdaStoresMap> = observable({
   wallets: null,
   paperWallets: null,
   transactions: null,
@@ -99,7 +99,7 @@ const adaStores = observable({
 /** See `stores` index for description of this weird behavior
  * Note: stores created here are NOT initialized
  */
-export default action(
+export default (action(
   (
     stores: StoresMap,
     api: Api,
@@ -112,4 +112,4 @@ export default action(
     });
     return (adaStores: any);
   }
-);
+): (StoresMap, Api, ActionsMap) => AdaStoresMap);

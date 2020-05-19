@@ -7,6 +7,7 @@ import { intlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import type { ExplorerType, LinkType } from '../../domain/Explorer';
 import { Explorer, getOrDefault, } from '../../domain/Explorer';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import ExplorableHash from '../../components/widgets/hashWrappers/ExplorableHash';
 
@@ -21,15 +22,15 @@ type Props = {|
 
 @observer
 export default class ExplorableHashContainer extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|tooltipOpensUpward: boolean|} = {
     tooltipOpensUpward: false,
   };
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
 
     const { name, baseUrl } = getOrDefault(this.props.selectedExplorer, this.props.linkType);

@@ -6,6 +6,15 @@ import type {
   RemoteTransaction,
   ServerStatusResponse,
   TxBodiesFunc,
+  AccountStateFunc,
+  ReputationFunc,
+  RewardHistoryFunc,
+  UtxoSumFunc,
+  PoolInfoFunc,
+  AddressUtxoFunc,
+  HistoryFunc,
+  BestBlockFunc,
+  FilterFunc,
 } from '../../app/api/ada/lib/state-fetch/types';
 import {
   genGetTransactionsHistoryForAddresses,
@@ -51,7 +60,25 @@ type MockTx = RemoteTransaction;
  * You can generate more data for these tests using the Cardano-Wallet WASM library
  */
 
-export const generateTransaction = () => {
+export const generateTransaction = (): {|
+  genesisTx: RemoteTransaction,
+  distributorTx: RemoteTransaction,
+  pendingTx1: RemoteTransaction,
+  pendingTx2: RemoteTransaction,
+  manyTx1: RemoteTransaction,
+  manyTx2: RemoteTransaction,
+  manyTx3: RemoteTransaction,
+  manyTx4: RemoteTransaction,
+  useChange: RemoteTransaction,
+  postLaunchSuccessfulTx: RemoteTransaction,
+  postLaunchPendingTx: RemoteTransaction,
+  failedTx: RemoteTransaction,
+  certificateTx: RemoteTransaction,
+  ledgerTx1: RemoteTransaction,
+  trezorTx1: RemoteTransaction,
+  trezorTx2: RemoteTransaction,
+  trezorTx3: RemoteTransaction,
+|} => {
   const genesisTx = {
     hash: cryptoRandomString({ length: 64 }),
     inputs: [
@@ -1281,15 +1308,14 @@ function getApiStatus(): ServerStatusResponse {
   return apiStatuses[0];
 }
 
-
-const usedAddresses = genCheckAddressesInUse(transactions);
-const history = genGetTransactionsHistoryForAddresses(transactions);
-const getBestBlock = genGetBestBlock(transactions);
-const utxoForAddresses = genUtxoForAddresses(
+const usedAddresses: FilterFunc = genCheckAddressesInUse(transactions);
+const history: HistoryFunc = genGetTransactionsHistoryForAddresses(transactions);
+const getBestBlock: BestBlockFunc = genGetBestBlock(transactions);
+const utxoForAddresses: AddressUtxoFunc = genUtxoForAddresses(
   history,
   getBestBlock,
 );
-const utxoSumForAddresses = genUtxoSumForAddresses(utxoForAddresses);
+const utxoSumForAddresses: UtxoSumFunc = genUtxoSumForAddresses(utxoForAddresses);
 const sendTx = (request: SignedRequestInternal): SignedResponse => {
   const remoteTx = isShelley
     ? toRemoteJormungandrTx(transactions, request)
@@ -1298,10 +1324,10 @@ const sendTx = (request: SignedRequestInternal): SignedResponse => {
   addTransaction(remoteTx);
   return { txId: remoteTx.hash };
 };
-const getAccountState = genGetAccountState(transactions);
-const getPoolInfo = genGetPoolInfo(transactions);
-const getReputation = genGetReputation();
-const getRewardHistory = genGetRewardHistory();
+const getAccountState: AccountStateFunc = genGetAccountState(transactions);
+const getPoolInfo: PoolInfoFunc = genGetPoolInfo(transactions);
+const getReputation: ReputationFunc = genGetReputation();
+const getRewardHistory: RewardHistoryFunc = genGetRewardHistory();
 const getTxsBodiesForUTXOs: TxBodiesFunc = async req => {
   const result = {};
   for (const hash of req.txsHashes) {

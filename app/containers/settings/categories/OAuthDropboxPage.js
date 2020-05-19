@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { computed } from 'mobx';
 import { Redirect } from 'react-router-dom';
@@ -39,7 +40,7 @@ export default class OAuthDropboxPage extends Component<Props> {
     await this.onLoad(token);
   }
 
-  render() {
+  render(): Node {
     // URL params
     return (
       <Redirect to="/settings/external-storage" />

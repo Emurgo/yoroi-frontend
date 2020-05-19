@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
@@ -8,6 +9,7 @@ import { intlShape } from 'react-intl';
 import styles from './UriSettingsBlock.scss';
 import globalMessages from '../../../../i18n/global-messages';
 import { observable, runInAction } from 'mobx';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
   +registerUriScheme: void => void,
@@ -19,11 +21,11 @@ export default class UriSettingsBlock extends Component<Props> {
 
   @observable hasPressed: boolean = false;
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
 
     const allowButtonClasses = classnames([

@@ -8,6 +8,7 @@ import globalMessages from '../../i18n/global-messages';
 import DialogBackButton from '../widgets/DialogBackButton';
 import Dialog from '../widgets/Dialog';
 import styles from './BaseTransferPage.scss';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
   +children: Node,
@@ -20,11 +21,11 @@ type Props = {|
 @observer
 export default class BaseTransferPage extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const {
       onBack,

@@ -1,11 +1,13 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
 import styles from './ServerErrorBanner.scss';
 import WarningSvg from '../../../assets/images/warning.inline.svg';
 import type { ServerStatusErrorType } from '../../../types/serverStatusErrorType';
 import { ServerStatusErrors } from '../../../types/serverStatusErrorType';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   serverErrorLabel: {
@@ -24,11 +26,11 @@ type Props = {| +errorType: ServerStatusErrorType, |};
 @observer
 export default class ServerErrorBanner extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const {
       errorType
     } = this.props;

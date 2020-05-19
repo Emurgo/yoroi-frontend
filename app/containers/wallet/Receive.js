@@ -16,11 +16,11 @@ type Props = {|
 @observer
 export default class Receive extends Component<Props> {
 
-  static defaultProps = {
+  static defaultProps: {|children: void|} = {
     children: undefined,
   };
 
-  render() {
+  render(): Node {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) throw new Error(`${nameof(Receive)} no public deriver`);
     const { addresses } = this.generated.stores.substores.ada;

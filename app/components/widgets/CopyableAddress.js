@@ -11,6 +11,7 @@ import styles from './CopyableAddress.scss';
 import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
 import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
 import type { Notification } from '../../types/notificationType';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   copyTooltipMessage: {
@@ -32,11 +33,17 @@ type Props = {|
 
 @observer
 export default class CopyableAddress extends Component<Props> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  static defaultProps = {
+  static defaultProps: {|
+    arrowRelativeToTip: boolean,
+    darkVariant: boolean,
+    elementId: void,
+    onCopyAddress: void,
+    tooltipOpensUpward: boolean,
+  |} = {
     onCopyAddress: undefined,
     tooltipOpensUpward: false,
     arrowRelativeToTip: true,
@@ -44,7 +51,7 @@ export default class CopyableAddress extends Component<Props> {
     darkVariant: false
   };
 
-  render() {
+  render(): Node {
     const { hash, elementId, onCopyAddress, notification, darkVariant } = this.props;
     const { intl } = this.context;
 

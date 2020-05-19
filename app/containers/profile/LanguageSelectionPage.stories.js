@@ -1,5 +1,6 @@
 // @flow
 
+import type { Node } from 'react';
 import React from 'react';
 
 import { select, boolean, } from '@storybook/addon-knobs';
@@ -18,7 +19,7 @@ export default {
   decorators: [withScreenshot],
 };
 
-export const Generic = () => (
+export const Generic = (): Node => (
   <LanguageSelectionPage
     generated={{
       stores: {
@@ -54,7 +55,7 @@ export const Generic = () => (
 
 /* ===== Notable variations ===== */
 
-export const NonTier1 = () => (
+export const NonTier1 = (): Node => (
   <LanguageSelectionPage
     generated={{
       stores: {
@@ -89,7 +90,7 @@ export const NonTier1 = () => (
   />
 );
 
-export const IsExecuting = () => (
+export const IsExecuting = (): Node => (
   <LanguageSelectionPage
     generated={{
       stores: {
@@ -123,7 +124,7 @@ export const IsExecuting = () => (
   />
 );
 
-export const ServerError = () => (
+export const ServerError = (): Node => (
   <LanguageSelectionPage
     generated={{
       stores: {

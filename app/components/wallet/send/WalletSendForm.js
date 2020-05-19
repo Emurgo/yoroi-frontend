@@ -35,6 +35,7 @@ import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import LocalizableError from '../../../i18n/LocalizableError';
 
 import WarningBox from '../../widgets/WarningBox';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   titleLabel: {
@@ -132,11 +133,11 @@ type Props = {|
 @observer
 export default class WalletSendForm extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  amountFieldReactionDisposer = null;
+  amountFieldReactionDisposer: null | (() => mixed) = null;
 
   componentDidMount() {
     this.props.reset();
@@ -173,16 +174,16 @@ export default class WalletSendForm extends Component<Props> {
     );
   }
 
-  componentWillUnmount() {
+  componentWillUnmount(): void {
     this.props.reset();
     // dispose reaction
-    if (this.amountFieldReactionDisposer) {
+    if (this.amountFieldReactionDisposer != null) {
       this.amountFieldReactionDisposer();
     }
   }
 
   // FORM VALIDATION
-  form = new ReactToolboxMobxForm({
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       receiver: {
         label: this.context.intl.formatMessage(messages.receiverLabel),
@@ -277,7 +278,7 @@ export default class WalletSendForm extends Component<Props> {
     },
   });
 
-  render() {
+  render(): Node {
     const { form } = this;
     const { intl } = this.context;
     const { memo } = this.form.values();

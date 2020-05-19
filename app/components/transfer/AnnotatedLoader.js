@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import styles from './AnnotatedLoader.scss';
@@ -12,7 +13,7 @@ type Props = {|
 @observer
 export default class AnnotatedLoader extends Component<Props> {
 
-  render() {
+  render(): Node {
     const { title, details } = this.props;
 
     return (

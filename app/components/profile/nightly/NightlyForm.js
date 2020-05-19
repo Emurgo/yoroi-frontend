@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
@@ -10,6 +11,7 @@ import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import styles from './NightlyForm.scss';
 import globalMessages from '../../../i18n/global-messages';
 import NightlyIcon from '../../../assets/images/yoroi-nightly-icon.inline.svg';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   header: {
@@ -56,19 +58,19 @@ type State = {|
 
 @observer
 export default class NightlyForm extends Component<Props, State> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  state = {
+  state: State = {
     acknowledgedRisks: false,
   };
 
-  toggleAcceptance() {
+  toggleAcceptance(): void {
     this.setState(prevState => ({ acknowledgedRisks: !prevState.acknowledgedRisks }));
   }
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
 
     return (

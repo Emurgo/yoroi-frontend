@@ -19,6 +19,7 @@ import LocalizableError from '../../../../i18n/LocalizableError';
 import InvalidURIImg from '../../../../assets/images/uri/invalid-uri.inline.svg';
 import ErrorBlock from '../../../widgets/ErrorBlock';
 import type { CertificateForKey } from '../../../../api/ada/lib/storage/database/primitives/api/read';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   positionsLabel: {
@@ -77,11 +78,11 @@ type Props = {|
 
 @observer
 export default class StakingDashboard extends Component<Props> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const {
       graphData,
     } = this.props;

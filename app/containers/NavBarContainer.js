@@ -21,6 +21,7 @@ import {
   asGetPublicKey,
 } from '../api/ada/lib/storage/models/PublicDeriver/traits';
 import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   allWalletsLabel: {
@@ -39,7 +40,7 @@ type Props = {|
 @observer
 export default class NavBarContainer extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
@@ -70,7 +71,7 @@ export default class NavBarContainer extends Component<Props> {
     });
   }
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const { stores } = this.generated;
     const { profile } = stores;

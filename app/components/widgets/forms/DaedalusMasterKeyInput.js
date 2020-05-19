@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
@@ -9,6 +10,7 @@ import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import { Input } from 'react-polymorph/lib/components/Input';
 import isHexadecimal from 'validator/lib/isHexadecimal';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   masterKeyInputLabel: {
@@ -35,18 +37,18 @@ type Props = {|
 @observer
 export default class DaedalusMasterKeyInput extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
   };
 
-  keyValidator = (key: string) => {
+  keyValidator: ((key: string) => boolean) = (key) => {
     if (key.length !== daedalusMasterKeyLength) {
       return false;
     }
     return isHexadecimal(key);
   }
 
-  form = new ReactToolboxMobxForm({
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       masterKey: {
         label: this.context.intl.formatMessage(messages.masterKeyInputLabel),
@@ -78,11 +80,11 @@ export default class DaedalusMasterKeyInput extends Component<Props> {
     },
   });
 
-  componentDidMount() {
+  componentDidMount(): void {
     this.props.setForm(this.form);
   }
 
-  render() {
+  render(): Node {
     const { form } = this;
     const {
       masterKey,

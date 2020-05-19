@@ -10,7 +10,7 @@ export default {
   setActiveLanguage: async (
     client: any,
     { language }: {| language: string,  |} = {}
-  ) => (
+  ): Promise<void> => (
     await client.executeScript(locale => {
       yoroi.actions.profile.updateTentativeLocale.trigger({ locale });
     }, language || DEFAULT_LANGUAGE)
@@ -18,14 +18,14 @@ export default {
 
   getActiveLanguage: async (
     client: any
-  ) => (
+  ): Promise<void> => (
     await client.executeScript(() => yoroi.stores.profile.currentLocale)
   ),
 
   formatMessage: async (
     client: any,
     { id, values }: any
-  ) => {
+  ): Promise<string> => {
     const [locale, messages] = await client.executeScript(() => (
       [yoroi.stores.profile.currentLocale, yoroi.translations]
     ));

@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import ReactMarkdown from 'react-markdown';
 import styles from './TermsOfUseText.scss';
@@ -12,11 +13,11 @@ type Props = {|
 
 @observer
 export default class TermsOfUseText extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|fixedHeight: boolean|} = {
     fixedHeight: false
   }
 
-  render() {
+  render(): Node {
     const termsClassNames = classNames([
       styles.terms,
       this.props.fixedHeight === true ? styles.fixedHeight : null,

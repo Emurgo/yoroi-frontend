@@ -14,7 +14,7 @@ import YoroiTransferPage from './YoroiTransferPage';
 import type { GeneratedData as YoroiTransferPageData } from './YoroiTransferPage';
 import DaedalusTransferPage from './DaedalusTransferPage';
 import type { GeneratedData as DaedalusTransferPageData } from './DaedalusTransferPage';
-
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import ByronEraOptionDialogContainer from './options/ByronEraOptionDialogContainer';
 import type { GeneratedData as ByronEraOptionDialogContainerData } from './options/ByronEraOptionDialogContainer';
 
@@ -27,7 +27,7 @@ type Props = {|
 
 @observer
 export default class WalletTransferPage extends Component<Props> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
@@ -43,7 +43,7 @@ export default class WalletTransferPage extends Component<Props> {
     return (<DaedalusTransferPage {...props} />);
   }
 
-  render() {
+  render(): Node {
     const { actions, stores } = this.generated;
     const { uiDialogs } = stores;
 
@@ -82,9 +82,6 @@ export default class WalletTransferPage extends Component<Props> {
     );
   }
 
-  _getRouter() {
-    return this.generated.actions.router;
-  }
 
   @computed get generated() {
     if (this.props.generated !== undefined) {
@@ -106,11 +103,6 @@ export default class WalletTransferPage extends Component<Props> {
         ada: {
           yoroiTransfer: {
             startTransferFunds: { trigger: yoroiTransfer.startTransferFunds.trigger },
-          },
-        },
-        router: {
-          goToRoute: {
-            trigger: actions.router.goToRoute.trigger,
           },
         },
         dialogs: {

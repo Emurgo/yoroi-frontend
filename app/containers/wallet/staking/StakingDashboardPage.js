@@ -39,6 +39,7 @@ import EpochProgressContainer from './EpochProgressContainer';
 import type { GeneratedData as EpochProgressContainerData } from './EpochProgressContainer';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import type {
   ToRealTimeFunc,
@@ -54,7 +55,7 @@ type Props = InjectedOrGenerated<GeneratedData>;
 
 @observer
 export default class StakingDashboardPage extends Component<Props> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
@@ -112,7 +113,7 @@ export default class StakingDashboardPage extends Component<Props> {
     };
   };
 
-  render() {
+  render(): Node {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);

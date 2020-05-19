@@ -14,11 +14,11 @@ type Props = {|
 
 @observer
 export default class ReceiveWithNavigation extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|children: void|} = {
     children: undefined
   };
 
-  render() {
+  render(): Node {
     const { children, isActiveTab, onTabClick } = this.props;
     return (
       <div className={styles.component}>

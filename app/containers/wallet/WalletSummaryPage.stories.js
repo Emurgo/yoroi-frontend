@@ -1,5 +1,6 @@
 // @flow
 
+import type { Node } from 'react';
 import React from 'react';
 import BigNumber from 'bignumber.js';
 import { boolean, select, } from '@storybook/addon-knobs';
@@ -86,7 +87,7 @@ const actions = {
   },
 };
 
-export const Loading = () => {
+export const Loading = (): Node => {
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();
     return wallet;
@@ -260,7 +261,7 @@ const genPropsForTransactions: {|
   },
 });
 
-export const Transaction = () => {
+export const Transaction = (): Node => {
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();
     return wallet;
@@ -359,7 +360,7 @@ export const Transaction = () => {
   );
 };
 
-export const TransactionWithMemo = () => {
+export const TransactionWithMemo = (): Node => {
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();
     return wallet;
@@ -433,7 +434,7 @@ export const TransactionWithMemo = () => {
   );
 };
 
-export const MemoDialog = () => {
+export const MemoDialog = (): Node => {
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();
     return wallet;
@@ -521,7 +522,7 @@ export const MemoDialog = () => {
   );
 };
 
-export const NoTransactions = () => {
+export const NoTransactions = (): Node => {
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();
     return wallet;
@@ -556,7 +557,7 @@ export const NoTransactions = () => {
   );
 };
 
-export const ManyTransactions = () => {
+export const ManyTransactions = (): Node => {
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();
     return wallet;
@@ -618,7 +619,7 @@ export const ManyTransactions = () => {
   );
 };
 
-export const TxHistoryExport = () => {
+export const TxHistoryExport = (): Node => {
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();
     return wallet;

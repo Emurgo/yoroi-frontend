@@ -10,7 +10,7 @@ type Props = {|
 
 /** Allow to swap the CSS used at runtime to allow user-defined themes */
 export default class ThemeManager extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|children: void|} = {
     children: undefined
   };
 
@@ -31,7 +31,7 @@ export default class ThemeManager extends Component<Props> {
       }
     });
   }
-  render() {
+  render(): Node {
     return (
       <div>
         {this.props.children}

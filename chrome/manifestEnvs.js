@@ -1,7 +1,7 @@
 // @flow
 
 // URL of Seiza for Yoroi
-const SEIZA_FOR_YOROI_URL = process.env.SEIZA_FOR_YOROI_URL != null
+const SEIZA_FOR_YOROI_URL /*: string */ = process.env.SEIZA_FOR_YOROI_URL != null
   ? process.env.SEIZA_FOR_YOROI_URL // suggested: 'http://localhost:3001'
   : 'https://testnet.seiza-website.emurgo.io';
 
@@ -11,7 +11,7 @@ const SEIZA_FOR_YOROI_URL = process.env.SEIZA_FOR_YOROI_URL != null
  * that opens a new tab with original Seiza URL, which is a different URL than Seiza for Yoroi.
  * Therefore we also need to have SEIZA_URL in manifest.json (frame-src)
  */
-const SEIZA_URL = process.env.SEIZA_URL != null
+const SEIZA_URL /*: string */ = process.env.SEIZA_URL != null
   ? process.env.SEIZA_URL // suggested: 'http://localhost:3000'
   : 'https://testnet.seiza-website.emurgo.io';
 

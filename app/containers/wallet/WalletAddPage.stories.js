@@ -1,5 +1,6 @@
 // @flow
 
+import type { Node } from 'react';
 import React from 'react';
 import BigNumber from 'bignumber.js';
 
@@ -140,14 +141,14 @@ const defaultProps: {|
   },
 });
 
-export const MainPage = () => (
+export const MainPage = (): Node => (
   <WalletAddPage
     generated={defaultProps(Object.freeze({
     }))}
   />
 );
 
-export const CreateWalletStart = () => (
+export const CreateWalletStart = (): Node => (
   <WalletAddPage
     generated={defaultProps(Object.freeze({
       openDialog: WalletCreateDialog,
@@ -212,7 +213,7 @@ const walletBackupProps: {|
   },
 });
 
-export const CreateWalletPrivacyDialog = () => {
+export const CreateWalletPrivacyDialog = (): Node => {
   const countdownCases = Object.freeze({
     CountingDown: 10,
     Elapsed: 0,
@@ -245,7 +246,7 @@ export const CreateWalletPrivacyDialog = () => {
   );
 };
 
-export const CreateWalletRecoveryPhraseDisplay = () => {
+export const CreateWalletRecoveryPhraseDisplay = (): Node => {
   const countdownCases = Object.freeze({
     CountingDown: 10,
     Elapsed: 0,
@@ -278,7 +279,7 @@ export const CreateWalletRecoveryPhraseDisplay = () => {
   );
 };
 
-export const CreateWalletRecoveryPhraseEnter = () => {
+export const CreateWalletRecoveryPhraseEnter = (): Node => {
   const entryCases = Object.freeze({
     None: 0,
     Single: 1,
@@ -342,7 +343,7 @@ export const CreateWalletRecoveryPhraseEnter = () => {
   );
 };
 
-export const CreateWalletFinalConfirm = () => {
+export const CreateWalletFinalConfirm = (): Node => {
   const isTermDeviceAccepted = boolean('isTermDeviceAccepted', false);
   const isTermRecoveryAccepted = boolean('isTermRecoveryAccepted', false);
   return (
@@ -465,7 +466,7 @@ const restoreWalletProps: {|
   }
 });
 
-export const RestoreOptions = () => {
+export const RestoreOptions = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -475,7 +476,7 @@ export const RestoreOptions = () => {
   );
 };
 
-export const RestoreWalletStart = () => {
+export const RestoreWalletStart = (): Node => {
   const restoreMode = Object.freeze({
     Regular: 0,
     Paper: 1,
@@ -521,7 +522,7 @@ export const RestoreWalletStart = () => {
   );
 };
 
-export const RestoreVerify = () => {
+export const RestoreVerify = (): Node => {
   const restoreMode = Object.freeze({
     Regular: 0,
     Paper: 1,
@@ -559,7 +560,7 @@ export const RestoreVerify = () => {
   );
 };
 
-export const RestoreLegacyExplanation = () => {
+export const RestoreLegacyExplanation = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -579,7 +580,7 @@ export const RestoreLegacyExplanation = () => {
   );
 };
 
-export const RestoreUpgradeRestoringAddresses = () => {
+export const RestoreUpgradeRestoringAddresses = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -595,7 +596,7 @@ export const RestoreUpgradeRestoringAddresses = () => {
   );
 };
 
-export const RestoreUpgradeCheckingAddresses = () => {
+export const RestoreUpgradeCheckingAddresses = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -611,7 +612,7 @@ export const RestoreUpgradeCheckingAddresses = () => {
   );
 };
 
-export const RestoreUpgradeGeneratingTx = () => {
+export const RestoreUpgradeGeneratingTx = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -627,7 +628,7 @@ export const RestoreUpgradeGeneratingTx = () => {
   );
 };
 
-export const RestoreUpgradeReadyToTransfer = () => {
+export const RestoreUpgradeReadyToTransfer = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -643,7 +644,7 @@ export const RestoreUpgradeReadyToTransfer = () => {
   );
 };
 
-export const RestoreUpgradeError = () => {
+export const RestoreUpgradeError = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -660,7 +661,7 @@ export const RestoreUpgradeError = () => {
   );
 };
 
-export const RestoreUpgradeNoNeed = () => {
+export const RestoreUpgradeNoNeed = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -677,7 +678,7 @@ export const RestoreUpgradeNoNeed = () => {
   );
 };
 
-export const HardwareOptions = () => {
+export const HardwareOptions = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -723,7 +724,7 @@ const trezorPops: {|
   },
 });
 
-export const TrezorCheck = () => {
+export const TrezorCheck = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -747,7 +748,7 @@ export const TrezorCheck = () => {
 };
 
 
-export const TrezorConnect = () => {
+export const TrezorConnect = (): Node => {
   const isActionProcessing = boolean('isActionProcessing', false);
   const getErrorValue = () => select(
     'errorCases',
@@ -787,7 +788,7 @@ export const TrezorConnect = () => {
   );
 };
 
-export const TrezorSave = () => {
+export const TrezorSave = (): Node => {
   const isActionProcessing = boolean('isActionProcessing', false);
   const errorCases = Object.freeze({
     None: undefined,
@@ -868,7 +869,7 @@ const ledgerProps: {|
   },
 });
 
-export const LedgerCheck = () => {
+export const LedgerCheck = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -892,7 +893,7 @@ export const LedgerCheck = () => {
 };
 
 
-export const LedgerConnect = () => {
+export const LedgerConnect = (): Node => {
   const isActionProcessing = boolean('isActionProcessing', false);
   const getErrorValue = () => select(
     'errorCases',
@@ -932,7 +933,7 @@ export const LedgerConnect = () => {
   );
 };
 
-export const LedgerSave = () => {
+export const LedgerSave = (): Node => {
   const isActionProcessing = boolean('isActionProcessing', false);
   const errorCases = Object.freeze({
     None: undefined,

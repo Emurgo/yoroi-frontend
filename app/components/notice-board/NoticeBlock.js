@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import moment from 'moment';
@@ -13,6 +14,7 @@ import CostChangedIcon from '../../assets/images/notice-board/cost-changed.inlin
 import RewardRecievedIcon from '../../assets/images/notice-board/reward-received.inline.svg';
 import PoolToRetireIcon from '../../assets/images/notice-board/retired.inline.svg';
 import NoRewardForUndelegationIcon from '../../assets/images/notice-board/reward-not-received.inline.svg';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import styles from './NoticeBlock.scss';
 
@@ -90,14 +92,14 @@ type Props = {|
 
 @observer
 export default class NoticeBlock extends Component<Props> {
-  static contextTypes = { intl: intlShape.isRequired };
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = { intl: intlShape.isRequired };
 
   formatTime(notice: Notice, isToday: boolean): string {
     if (isToday) return moment(notice.date).fromNow();
     return moment(notice.date).format('HH:mm:ss');
   }
 
-  render() {
+  render(): null | Node {
     const { intl } = this.context;
     const { notice, isToday } = this.props;
 

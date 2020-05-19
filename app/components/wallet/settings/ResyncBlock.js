@@ -1,13 +1,15 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import classNames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './ResyncBlock.scss';
 import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
-export const messages = defineMessages({
+export const messages: * = defineMessages({
   titleLabel: {
     id: 'wallet.settings.resync.label',
     defaultMessage: '!!!Resync wallet with the blockchain',
@@ -28,11 +30,11 @@ type Props = {|
 
 @observer
 export default class ResyncBlock extends Component<Props> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
 
     const buttonClassNames = classNames([

@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { intlShape } from 'react-intl';
 import moment from 'moment';
 import { observer } from 'mobx-react';
@@ -10,6 +11,7 @@ import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import Notice from '../../domain/Notice';
 import NoticeBlock from './NoticeBlock';
 import globalMessages from '../../i18n/global-messages';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import styles from './NoticeBoard.scss';
 
@@ -31,11 +33,11 @@ type NoticesByDate = {|
 
 @observer
 export default class NoticeBoard extends Component<Props> {
-  static contextTypes = { intl: intlShape.isRequired };
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = { intl: intlShape.isRequired };
   localizedDateFormat: string = 'MM/DD/YYYY';
 
   // eslint-disable-next-line camelcase
-  UNSAFE_componentWillMount() {
+  UNSAFE_componentWillMount(): void {
     // https://momentjs.com/docs/#/i18n/
     this.localizedDateFormat = moment.localeData().longDateFormat('LL');
   }
@@ -73,7 +75,7 @@ export default class NoticeBoard extends Component<Props> {
     );
   }
 
-  localizedDate(noticesByDate: NoticesByDate) {
+  localizedDate(noticesByDate: NoticesByDate): string {
     const { intl } = this.context;
     if (noticesByDate.isToday) return intl.formatMessage(globalMessages.dateToday);
 
@@ -82,7 +84,7 @@ export default class NoticeBoard extends Component<Props> {
     return moment(noticesByDate.strDate).format(this.localizedDateFormat);
   }
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const {
       loadedNotices,

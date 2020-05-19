@@ -1,5 +1,6 @@
 // @flow
 
+import type { Node } from 'react';
 import React from 'react';
 
 import { select, boolean, } from '@storybook/addon-knobs';
@@ -16,7 +17,7 @@ export default {
   decorators: [withScreenshot],
 };
 
-export const Generic = () => (
+export const Generic = (): Node => (
   <TermsOfUsePage
     generated={{
       stores: {

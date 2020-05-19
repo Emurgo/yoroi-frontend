@@ -11,6 +11,7 @@ import globalMessages from '../../i18n/global-messages';
 import styles from './NavWalletDetails.scss';
 import IconEyeOpen from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
 import IconEyeClosed from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
     +onUpdateHideBalance: void => Promise<void>,
@@ -30,17 +31,17 @@ type Props = {|
 @observer
 export default class NavWalletDetails extends Component<Props> {
 
-  static defaultProps = {
+  static defaultProps: {|highlightTitle: boolean, infoText: void, showDetails: boolean|} = {
     highlightTitle: false,
     infoText: undefined,
     showDetails: true,
   };
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const {
       shouldHideBalance,
       onUpdateHideBalance,

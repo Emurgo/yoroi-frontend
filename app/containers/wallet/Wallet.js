@@ -17,6 +17,7 @@ import NavBarBack from '../../components/topbar/NavBarBack';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 
 export type GeneratedData = typeof Wallet.prototype.generated;
@@ -36,11 +37,11 @@ const messages = defineMessages({
 @observer
 export default class Wallet extends Component<Props> {
 
-  static defaultProps = {
+  static defaultProps: {|children: void|} = {
     children: undefined
   };
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
@@ -48,7 +49,10 @@ export default class Wallet extends Component<Props> {
     this.generated.actions.router.goToRoute.trigger({ route: destination });
   }
 
-  isActiveScreen = (route: string, matchesPrefix: ?boolean): boolean => {
+  isActiveScreen: (
+    route: string,
+    matchesPrefix: ?boolean
+  ) => boolean = (route, matchesPrefix) => {
     const { app } = this.generated.stores;
     const { selected } = this.generated.stores.wallets;
     if (selected == null) return false;
@@ -75,7 +79,7 @@ export default class Wallet extends Component<Props> {
     });
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const { wallets, } = this.generated.stores;
     const sidebarContainer = (<SidebarContainer {...this.generated.SidebarContainerProps} />);

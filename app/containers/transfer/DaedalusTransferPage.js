@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
@@ -16,6 +17,7 @@ import { TransferStatus, } from '../../types/TransferTypes';
 import type { TransferStatusT, TransferTx } from '../../types/TransferTypes';
 import LocalizableError from '../../i18n/LocalizableError';
 import globalMessages from '../../i18n/global-messages';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import { formattedWalletAmount } from '../../utils/formatters';
 import { ROUTES } from '../../routes-config';
@@ -34,7 +36,7 @@ export type GeneratedData = typeof DaedalusTransferPage.prototype.generated;
 @observer
 export default class DaedalusTransferPage extends Component<InjectedOrGenerated<GeneratedData>> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
@@ -45,12 +47,12 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
   setupTransferFundsWithMnemonic: {|
     recoveryPhrase: string,
   |} => Promise<void> = async (payload) => {
-    const walletsStore = this._getWalletsStore();
+    const walletsStore = this.generated.stores.wallets;
     const publicDeriver = walletsStore.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(this.setupTransferFundsWithMnemonic)} no wallet selected`);
     }
-    await this._getDaedalusTransferActions().setupTransferFundsWithMnemonic.trigger({
+    await this.generated.actions.ada.daedalusTransfer.setupTransferFundsWithMnemonic.trigger({
       ...payload,
       publicDeriver
     });
@@ -59,12 +61,12 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
   setupTransferFundsWithMasterKey: {|
     masterKey: string,
   |} => Promise<void> = async (payload) => {
-    const walletsStore = this._getWalletsStore();
+    const walletsStore = this.generated.stores.wallets;
     const publicDeriver = walletsStore.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(this.setupTransferFundsWithMasterKey)} no wallet selected`);
     }
-    await this._getDaedalusTransferActions().setupTransferFundsWithMasterKey.trigger({
+    await this.generated.actions.ada.daedalusTransfer.setupTransferFundsWithMasterKey.trigger({
       ...payload,
       publicDeriver
     });
@@ -72,13 +74,13 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
 
   /** Broadcast the transfer transaction if one exists and return to wallet page */
   transferFunds: void => Promise<void> = async () => {
-    const walletsStore = this._getWalletsStore();
+    const walletsStore = this.generated.stores.wallets;
     const publicDeriver = walletsStore.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(this.transferFunds)} no wallet selected`);
     }
     // broadcast transfer transaction then call continuation
-    await this._getDaedalusTransferActions().transferFunds.trigger({
+    await this.generated.actions.ada.daedalusTransfer.transferFunds.trigger({
       next: async () => {
         try {
           await walletsStore.refreshWalletFromRemote(publicDeriver);
@@ -87,7 +89,7 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
         }
         if (walletsStore.activeWalletRoute != null) {
           const newRoute = walletsStore.activeWalletRoute;
-          this._getRouter().goToRoute.trigger({
+          this.generated.actions.router.goToRoute.trigger({
             route: newRoute
           });
         }
@@ -96,17 +98,18 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
     });
   }
 
-  backToUninitialized = () => {
-    this._getDaedalusTransferActions().backToUninitialized.trigger();
+  backToUninitialized: (() => void) = () => {
+    this.generated.actions.ada.daedalusTransfer.backToUninitialized.trigger();
   }
 
-  cancelTransferFunds = () => {
-    this._getDaedalusTransferActions().cancelTransferFunds.trigger();
+  cancelTransferFunds: (() => void) = () => {
+    this.generated.actions.ada.daedalusTransfer.cancelTransferFunds.trigger();
   }
 
-  render() {
+  render(): null | Node {
     const { profile } = this.generated.stores;
-    const daedalusTransfer = this._getDaedalusTransferStore();
+    const daedalusTransfer = this.generated.stores.substores.ada.daedalusTransfer;
+    const adaWallets = this.generated.stores.substores[environment.API].wallets;
 
     const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
       ? (
@@ -121,7 +124,7 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
           <DaedalusTransferFormPage
             onSubmit={this.setupTransferFundsWithMnemonic}
             onBack={this.backToUninitialized}
-            mnemonicValidator={mnemonic => this._getAdaWalletsStore().isValidMnemonic({
+            mnemonicValidator={mnemonic => adaWallets.isValidMnemonic({
               mnemonic,
               numberOfWords: config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT
             })}
@@ -135,7 +138,7 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
           <DaedalusTransferFormPage
             onSubmit={this.setupTransferFundsWithMnemonic}
             onBack={this.backToUninitialized}
-            mnemonicValidator={mnemonic => this._getAdaWalletsStore().isValidPaperMnemonic({
+            mnemonicValidator={mnemonic => adaWallets.isValidPaperMnemonic({
               mnemonic,
               numberOfWords: config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT
             })}
@@ -192,25 +195,6 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
     }
   }
 
-  _getRouter() {
-    return this.generated.actions.router;
-  }
-
-  _getWalletsStore() {
-    return this.generated.stores.wallets;
-  }
-
-  _getAdaWalletsStore() {
-    return this.generated.stores.substores[environment.API].wallets;
-  }
-
-  _getDaedalusTransferStore() {
-    return this.generated.stores.substores.ada.daedalusTransfer;
-  }
-
-  _getDaedalusTransferActions() {
-    return this.generated.actions.ada.daedalusTransfer;
-  }
 
   @computed get generated() {
     if (this.props.generated !== undefined) {

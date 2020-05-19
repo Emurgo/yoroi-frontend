@@ -1,11 +1,12 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 
 import LocalizableError from '../../../i18n/LocalizableError';
-
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
@@ -37,11 +38,11 @@ type Props = {|
 @observer
 export default class ExportTransactionDialog extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const {
       isActionProcessing,

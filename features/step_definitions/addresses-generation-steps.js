@@ -21,8 +21,7 @@ When(/^I click on the internal tab$/, async function () {
 });
 
 When(/^I click on the Hide used addresses button$/, async function () {
-  const hideUsedText =
-  await i18n.formatMessage(this.driver, { id: 'wallet.receive.page.hideUsedLabel' });
+  const hideUsedText = await i18n.formatMessage(this.driver, { id: 'wallet.receive.page.hideUsedLabel' });
   await this.click(`//button[contains(text(), "${hideUsedText}")]`, By.xpath);
 });
 

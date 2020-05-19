@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
@@ -23,11 +24,11 @@ export default class SupportSettingsPage extends Component<InjectedOrGenerated<G
     });
   }
 
-  handleDownloadLogs = () => {
+  handleDownloadLogs: (() => void) = () => {
     downloadLogs();
   };
 
-  render() {
+  render(): Node {
     return (
       <SupportSettings
         onExternalLinkClick={handleExternalLinkClick}

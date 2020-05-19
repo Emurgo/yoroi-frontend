@@ -11,7 +11,7 @@ type Props = {|
 
 @observer
 export default class SettingsLayout extends Component<Props> {
-  render() {
+  render(): Node {
     const { menu, children } = this.props;
     return (
       <div className={styles.component}>

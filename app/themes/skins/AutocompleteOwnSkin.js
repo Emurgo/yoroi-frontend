@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import type { ElementRef, Element } from 'react';
+import type { ElementRef, Element, Node } from 'react';
 
 // external libraries
 import { slice } from 'lodash';
@@ -51,7 +51,7 @@ type Props = {
   ...
 };
 
-export const AutocompleteOwnSkin = (props: Props) => {
+export const AutocompleteOwnSkin = (props: Props): Node => {
   const theme = props.theme[props.themeId];
 
   const filteredAndLimitedOptions = slice(

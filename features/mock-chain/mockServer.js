@@ -44,7 +44,8 @@ function _defaultSignedTransaction(
   res.send(response);
 }
 
-let MockServer = null;
+// TODO: no type from json-server
+let MockServer: null | any = null;
 
 export function getMockServer(
   settings: {
@@ -60,7 +61,7 @@ export function getMockServer(
     outputLog?: boolean,
     ...
   }
-) {
+): typeof MockServer {
   if (!MockServer) {
     const middlewares = [...defaults({ logger: !!settings.outputLog }), bodyParser];
 

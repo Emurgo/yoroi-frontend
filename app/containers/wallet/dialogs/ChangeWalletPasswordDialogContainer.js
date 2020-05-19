@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
@@ -16,7 +17,7 @@ type Props = {|
 @observer
 export default class ChangeWalletPasswordDialogContainer extends Component<Props> {
 
-  render() {
+  render(): Node {
     const { actions } = this.generated;
     const { uiDialogs, profile } = this.generated.stores;
     const { walletSettings } = this.generated.stores;

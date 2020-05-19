@@ -11,6 +11,7 @@ import YoroiLogo from '../../assets/images/yoroi-logo-shape-white.inline.svg';
 import styles from './Loading.scss';
 import LocalizableError from '../../i18n/LocalizableError';
 import globalMessages from '../../i18n/global-messages';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   loading: {
@@ -36,11 +37,11 @@ type Props = {|
 @observer
 export default class Loading extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const {
       api,
@@ -99,7 +100,7 @@ export default class Loading extends Component<Props> {
     );
   }
 
-  _getErrorMessageComponent = (): Node => {
+  _getErrorMessageComponent: (void => Node) = () => {
     const { intl } = this.context;
     const {
       onExternalLinkClick,

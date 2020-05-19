@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
@@ -16,24 +17,20 @@ type Props = {|
 @observer
 export default class ByronEraOptionDialogContainer extends Component<Props> {
 
-  _getDaedalusTransferActions() {
-    return this.generated.actions.ada.daedalusTransfer;
-  }
-
   _getYoroiTransferActions() {
     return this.generated.actions.ada.yoroiTransfer;
   }
 
   startTransferDaedalusFunds: void => void = () => {
-    this._getDaedalusTransferActions().startTransferFunds.trigger();
+    this.generated.actions.ada.daedalusTransfer.startTransferFunds.trigger();
   }
 
   startTransferDaedalusPaperFunds: void => void = () => {
-    this._getDaedalusTransferActions().startTransferPaperFunds.trigger();
+    this.generated.actions.ada.daedalusTransfer.startTransferPaperFunds.trigger();
   }
 
   startTransferDaedalusMasterKe: void => void = () => {
-    this._getDaedalusTransferActions().startTransferMasterKey.trigger();
+    this.generated.actions.ada.daedalusTransfer.startTransferMasterKey.trigger();
   }
 
   startTransferIcarusFunds: void => void = () => {
@@ -56,7 +53,7 @@ export default class ByronEraOptionDialogContainer extends Component<Props> {
     this._getYoroiTransferActions().startTransferLegacyHardwareFunds.trigger(TransferKind.LEDGER);
   }
 
-  render() {
+  render(): Node {
     return (
       <ByronOptionDialog
         daedalus={{

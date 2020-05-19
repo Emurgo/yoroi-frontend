@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
@@ -9,6 +10,7 @@ import styles from './ThemeSettingsBlock.scss';
 import { THEMES } from '../../../../themes';
 import type { Theme } from '../../../../themes';
 import ThemeThumbnail from '../display/ThemeThumbnail';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   themeLabel: {
@@ -61,11 +63,11 @@ type Props = {|
 @observer
 export default class ThemeSettingsBlock extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const {
       currentTheme,
       selectTheme,

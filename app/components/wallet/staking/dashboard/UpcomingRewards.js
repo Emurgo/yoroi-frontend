@@ -10,6 +10,7 @@ import type { PoolTuples } from '../../../../api/ada/lib/state-fetch/types';
 import Timer from '../../../widgets/Timer';
 import CustomTooltip from '../../../widgets/CustomTooltip';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import Card from './Card';
 import styles from './UpcomingRewards.scss';
@@ -47,11 +48,11 @@ type Props = {|
 
 @observer
 export default class UpcomingRewards extends Component<Props> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
 
     const firstRewardWarning = this.props.showWarning

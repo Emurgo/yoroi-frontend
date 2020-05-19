@@ -22,14 +22,19 @@ type Props = {|
 
 @observer
 export default class Sidebar extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|
+    categories: void,
+    children: void,
+    isActiveCategory: void,
+    onCategoryClicked: void,
+  |} = {
     children: undefined,
     categories: undefined,
     isActiveCategory: undefined,
     onCategoryClicked: undefined,
   };
 
-  render() {
+  render(): Node {
     const {
       categories,
       isActiveCategory,

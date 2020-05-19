@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
@@ -9,6 +10,7 @@ import styles from './UriSkip.scss';
 import globalMessages from '../../../i18n/global-messages';
 import NoTransactionClassicSvg from '../../../assets/images/transaction/no-transactions-yet.classic.inline.svg';
 import NoTransactionModernSvg from '../../../assets/images/transaction/no-transactions-yet.modern.inline.svg';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 
 const messages = defineMessages({
@@ -30,11 +32,11 @@ type Props = {|
 
 @observer
 export default class UriSkip extends Component<Props> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const allowButtonClasses = classnames([
       'finishButton',

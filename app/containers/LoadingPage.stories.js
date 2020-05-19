@@ -1,5 +1,6 @@
 // @flow
 
+import type { Node } from 'react';
 import React from 'react';
 
 import { select, boolean, } from '@storybook/addon-knobs';
@@ -20,7 +21,7 @@ const PotentialErrors = {
   UnableToLoadError: new UnableToLoadError(),
 };
 
-export const Generic = () => (
+export const Generic = (): Node => (
   <LoadingPage
     generated={{
       stores: {
@@ -45,7 +46,7 @@ export const Generic = () => (
 
 /* ===== Notable variations ===== */
 
-export const NoLocale = () => (
+export const NoLocale = (): Node => (
   <LoadingPage
     generated={{
       stores: {
@@ -68,7 +69,7 @@ export const NoLocale = () => (
   />
 );
 
-export const NoTheme = () => (
+export const NoTheme = (): Node => (
   <LoadingPage
     generated={{
       stores: {
@@ -91,7 +92,7 @@ export const NoTheme = () => (
   />
 );
 
-export const StorageLoadFailed = () => (
+export const StorageLoadFailed = (): Node => (
   <LoadingPage
     generated={{
       stores: {
@@ -110,7 +111,7 @@ export const StorageLoadFailed = () => (
   />
 );
 
-export const UnknownLoadFailed = () => (
+export const UnknownLoadFailed = (): Node => (
   <LoadingPage
     generated={{
       stores: {

@@ -12,6 +12,7 @@ import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
 import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
 import styles from './DangerousActionDialog.scss';
 import dangerousButtonStyles from '../../themes/overrides/DangerousButton.scss';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
   +title: string,
@@ -28,11 +29,11 @@ type Props = {|
 
 @observer
 export default class DangerousActionDialog extends Component<Props> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const {
       onCancel,

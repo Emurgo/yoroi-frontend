@@ -1,7 +1,8 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import type { MessageDescriptor } from 'react-intl';
+import type { MessageDescriptor, $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
 import styles from './LinkButton.scss';
 
@@ -16,15 +17,15 @@ type Props = {|
 
 @observer
 export default class LinkButton extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|svgClass: void|} = {
     svgClass: undefined
   };
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const {
       url,

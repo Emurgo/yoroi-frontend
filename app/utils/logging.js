@@ -56,7 +56,7 @@ export const downloadLogs = () => {
 
 // ========== STRINGIFY =========
 
-export const generateLogHeader = () => (
+export const generateLogHeader = (): string => (
   `[INFO] Yoroi v.${environment.version}\r\n`
   + `[INFO] Commit: ${environment.commit}\r\n`
   + `[INFO] Network: ${environment.NETWORK}\r\n`
@@ -66,6 +66,6 @@ export const generateLogHeader = () => (
 
 export const stringifyData = (data : any): string => inspect(data);
 
-export const stringifyError = (error : any) => (
+export const stringifyError = (error : any): string => (
   JSON.stringify(error, Object.getOwnPropertyNames(error), 2)
 );

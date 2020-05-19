@@ -167,11 +167,11 @@ type State = {|
 @observer
 export default class Transaction extends Component<Props, State> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  state = {
+  state: State = {
     isExpanded: false
   };
 
@@ -210,7 +210,7 @@ export default class Transaction extends Component<Props, State> {
     intl: $npm$ReactIntl$IntlFormat,
     state: number,
     assuranceLevel: AssuranceLevel,
-  ) {
+  ): string {
     if (state === TxStatusCodes.IN_BLOCK) {
       return intl.formatMessage(assuranceLevelTranslations[assuranceLevel]);
     }
@@ -287,7 +287,7 @@ export default class Transaction extends Component<Props, State> {
     );
   }
 
-  render() {
+  render(): Node {
     const data = this.props.data;
     const {
       isLastInList,

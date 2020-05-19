@@ -23,6 +23,7 @@ import {
 } from '../../../config/numbersConfig';
 import type { ConfigType } from '../../../../config/config-types';
 import type { SelectedPool } from '../../../actions/ada/delegation-transaction-actions';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 declare var CONFIG: ConfigType;
 
@@ -36,12 +37,12 @@ type Props = {|
 
 @observer
 export default class SeizaFetcher extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|children: void|} = {
     children: undefined
   };
 
   @observable iframe: ?HTMLIFrameElement;
-  @observable frameHeight = 0;
+  @observable frameHeight: number = 0;
 
   @action
   messageHandler: any => Promise<void> = async (event: any) => {
@@ -79,7 +80,7 @@ export default class SeizaFetcher extends Component<Props> {
     window.removeEventListener('message', this.messageHandler);
   }
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
@@ -88,7 +89,7 @@ export default class SeizaFetcher extends Component<Props> {
     this.generated.actions[environment.API].delegationTransaction.reset.trigger();
   }
 
-  render() {
+  render(): Node {
     const { stakingUrl } = this.props;
 
     if (stakingUrl == null) {

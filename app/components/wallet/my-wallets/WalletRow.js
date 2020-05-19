@@ -26,7 +26,7 @@ type State = {|
 
 @observer
 export default class WalletRow extends Component<Props, State> {
-  state = {
+  state: State = {
     isExpanded: false,
   };
 
@@ -34,7 +34,7 @@ export default class WalletRow extends Component<Props, State> {
     this.setState(prevState => ({ isExpanded: !prevState.isExpanded }));
   }
 
-  render() {
+  render(): Node {
     const { isExpanded } = this.state;
 
     const {

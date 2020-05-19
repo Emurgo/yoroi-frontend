@@ -11,7 +11,7 @@ import {
 } from './constants';
 import { SEIZA_URL, SEIZA_FOR_YOROI_URL } from './manifestEnvs';
 
-export default (isDebug: boolean) => buildManifest({
+export default (isDebug: boolean): * => buildManifest({
   description: 'A simple, secure and fast Cardano ADA wallet.',
   defaultTitle: 'Yoroi Shelley Testnet',
   titleOverride: true,

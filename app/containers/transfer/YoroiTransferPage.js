@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import {
   validateMnemonic,
 } from 'bip39';
@@ -26,6 +27,7 @@ import LocalizableError from '../../i18n/LocalizableError';
 import { ROUTES } from '../../routes-config';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import globalMessages from '../../i18n/global-messages';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { GeneratedData as YoroiPlateData } from './YoroiPlatePage';
 
 // Stay this long on the success page, then jump to the wallet transactions page
@@ -48,7 +50,7 @@ export type MockYoroiTransferStore = {|
 @observer
 export default class YoroiTransferPage extends Component<InjectedOrGenerated<GeneratedData>> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
@@ -59,28 +61,28 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
   setupTransferFundsWithMnemonic: {|
     recoveryPhrase: string,
   |} => void = (payload) => {
-    this._getYoroiTransferActions().setupTransferFundsWithMnemonic.trigger({
+    this.generated.actions.ada.yoroiTransfer.setupTransferFundsWithMnemonic.trigger({
       ...payload,
     });
   };
 
-  setupTransferFundsWithPaperMnemonic = (payload: {|
-    recoveryPhrase: string,
+  setupTransferFundsWithPaperMnemonic: ((payload: {|
     paperPassword: string,
-  |}) => {
-    this._getYoroiTransferActions().setupTransferFundsWithPaperMnemonic.trigger({
+    recoveryPhrase: string,
+  |}) => void) = (payload) => {
+    this.generated.actions.ada.yoroiTransfer.setupTransferFundsWithPaperMnemonic.trigger({
       ...payload,
     });
   };
 
   checkAddresses: void => Promise<void> = async () => {
-    const walletsStore = this._getWalletsStore();
-    const yoroiTransfer = this._getYoroiTransferStore();
+    const walletsStore = this.generated.stores.wallets;
+    const yoroiTransfer = this.generated.stores.substores.ada.yoroiTransfer;
     const publicDeriver = walletsStore.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(this.checkAddresses)} no wallet selected`);
     }
-    await this._getYoroiTransferActions().checkAddresses.trigger({
+    await this.generated.actions.ada.yoroiTransfer.checkAddresses.trigger({
       getDestinationAddress: yoroiTransfer.nextInternalAddress(publicDeriver),
     });
   };
@@ -88,13 +90,13 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
   /** Broadcast the transfer transaction if one exists and return to wallet page */
   transferFunds: void => Promise<void> = async () => {
     // broadcast transfer transaction then call continuation
-    const walletsStore = this._getWalletsStore();
-    const yoroiTransfer = this._getYoroiTransferStore();
+    const walletsStore = this.generated.stores.wallets;
+    const yoroiTransfer = this.generated.stores.substores.ada.yoroiTransfer;
     const publicDeriver = walletsStore.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(this.transferFunds)} no wallet selected`);
     }
-    await this._getYoroiTransferActions().transferFunds.trigger({
+    await this.generated.actions.ada.yoroiTransfer.transferFunds.trigger({
       next: async () => {
         const preRefreshTime = new Date().getTime();
         try {
@@ -107,7 +109,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
           setTimeout(() => {
             if (walletsStore.activeWalletRoute != null) {
               const newRoute = walletsStore.activeWalletRoute;
-              this._getRouter().goToRoute.trigger({
+              this.generated.actions.router.goToRoute.trigger({
                 route: newRoute
               });
             }
@@ -120,19 +122,20 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
     });
   }
 
-  backToUninitialized = () => {
-    this._getYoroiTransferActions().backToUninitialized.trigger();
+  backToUninitialized: (() => void) = () => {
+    this.generated.actions.ada.yoroiTransfer.backToUninitialized.trigger();
   };
 
-  cancelTransferFunds = () => {
-    this._getYoroiTransferActions().cancelTransferFunds.trigger();
+  cancelTransferFunds: (() => void) = () => {
+    this.generated.actions.ada.yoroiTransfer.cancelTransferFunds.trigger();
   };
 
 
-  render() {
+  render(): null | Node {
     const { stores } = this.generated;
     const { profile } = stores;
-    const yoroiTransfer = this._getYoroiTransferStore();
+    const yoroiTransfer = this.generated.stores.substores.ada.yoroiTransfer;
+    const adaWallet = this.generated.stores.substores[environment.API].wallets;
 
     const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
       ? (
@@ -147,7 +150,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
           <YoroiTransferFormPage
             onSubmit={this.setupTransferFundsWithMnemonic}
             onBack={this.backToUninitialized}
-            mnemonicValidator={mnemonic => this._getAdaWalletsStore().isValidMnemonic({
+            mnemonicValidator={mnemonic => adaWallet.isValidMnemonic({
               mnemonic,
               numberOfWords: config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT
             })}
@@ -161,7 +164,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
           <YoroiPaperWalletFormPage
             onSubmit={this.setupTransferFundsWithPaperMnemonic}
             onBack={this.backToUninitialized}
-            mnemonicValidator={mnemonic => this._getAdaWalletsStore().isValidPaperMnemonic({
+            mnemonicValidator={mnemonic => adaWallet.isValidPaperMnemonic({
               mnemonic,
               numberOfWords: config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT
             })}
@@ -175,8 +178,8 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
       case TransferStatus.HARDWARE_DISCLAIMER:
         return (
           <HardwareDisclaimerPage
-            onBack={() => this._getYoroiTransferActions().cancelTransferFunds.trigger()}
-            onNext={() => this._getYoroiTransferActions().startHardwareMnemnoic.trigger()}
+            onBack={() => this.generated.actions.ada.yoroiTransfer.cancelTransferFunds.trigger()}
+            onNext={() => this.generated.actions.ada.yoroiTransfer.startHardwareMnemnoic.trigger()}
           />
         );
       case TransferStatus.GETTING_HARDWARE_MNEMONIC:
@@ -243,26 +246,6 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
       default:
         return null;
     }
-  }
-
-  _getRouter() {
-    return this.generated.actions.router;
-  }
-
-  _getWalletsStore() {
-    return this.generated.stores.wallets;
-  }
-
-  _getAdaWalletsStore() {
-    return this.generated.stores.substores[environment.API].wallets;
-  }
-
-  _getYoroiTransferStore() {
-    return this.generated.stores.substores.ada.yoroiTransfer;
-  }
-
-  _getYoroiTransferActions() {
-    return this.generated.actions.ada.yoroiTransfer;
   }
 
   @computed get generated() {

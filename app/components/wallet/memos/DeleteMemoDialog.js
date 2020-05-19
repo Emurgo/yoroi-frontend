@@ -1,5 +1,6 @@
 // @flow
 
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
@@ -11,6 +12,7 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import WalletTransaction from '../../../domain/WalletTransaction';
 import globalMessages, { memoMessages, } from '../../../i18n/global-messages';
 import styles from './MemoDialogCommon.scss';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   deleteMemoContent: {
@@ -38,15 +40,15 @@ type State = {|
 @observer
 export default class DeleteMemoDialog extends Component<Props, State> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  state = {
+  state: State = {
     isSubmitting: false,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const { isSubmitting } = this.state;
     const {
