@@ -162,7 +162,7 @@
   "profile.privacypolicy.neverProfile": "Ne créera <strong>jamais</strong> de profils avec vos informations.",
   "profile.privacypolicy.neverSell": "Ne vendra <strong>jamais</strong> tes données.",
   "profile.privacypolicy.neverTrack": "Ne tracera <strong>jamais</strong> ton comportement.",
-  "profile.privacypolicy.serverLogs": "Any server log is kept for at most 2 weeks purely for server troubleshooting purposes.",
+  "profile.privacypolicy.serverLogs": "Tout journal de serveur est conservé pendant deux semaines au maximum, purement à fin de dépannage du serveur.",
   "profile.termsOfUse.checkboxLabel": "J'accepte les conditions d'utilisation",
   "profile.termsOfUse.title": "Conditions d'utilisation",
   "profile.uriAccept.seePrompt": "Simplement <strong>cliquer <em>Autoriser </em></strong> pour activer les URL de paiement",
