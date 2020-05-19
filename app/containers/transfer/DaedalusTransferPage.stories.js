@@ -1,6 +1,7 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
+import type { Node } from 'react';
 import { withScreenshot } from 'storycap';
 import { boolean, select, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
@@ -90,7 +91,7 @@ const genBaseProps: {|
   },
 });
 
-export const GettingMnemonics = (): React$Node => {
+export const GettingMnemonics = (): Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
@@ -111,7 +112,7 @@ export const GettingMnemonics = (): React$Node => {
   })();
 };
 
-export const GettingPaperMnemonics = (): React$Node => {
+export const GettingPaperMnemonics = (): Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
@@ -132,7 +133,7 @@ export const GettingPaperMnemonics = (): React$Node => {
   })();
 };
 
-export const GettingMasterKey = (): React$Node => {
+export const GettingMasterKey = (): Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
@@ -153,7 +154,7 @@ export const GettingMasterKey = (): React$Node => {
   })();
 };
 
-export const RestoringAddresses = (): React$Node => {
+export const RestoringAddresses = (): Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
@@ -174,7 +175,7 @@ export const RestoringAddresses = (): React$Node => {
   })();
 };
 
-export const CheckingAddresses = (): React$Node => {
+export const CheckingAddresses = (): Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
@@ -195,7 +196,7 @@ export const CheckingAddresses = (): React$Node => {
   })();
 };
 
-export const GeneratingTx = (): React$Node => {
+export const GeneratingTx = (): Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
@@ -216,7 +217,7 @@ export const GeneratingTx = (): React$Node => {
   })();
 };
 
-export const ReadyToTransfer = (): React$Node => {
+export const ReadyToTransfer = (): Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
@@ -249,7 +250,7 @@ export const ReadyToTransfer = (): React$Node => {
   })();
 };
 
-export const Error = (): React$Node => {
+export const Error = (): Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
