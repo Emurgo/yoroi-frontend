@@ -46,8 +46,8 @@ export function genCSP(request: {|
     imgSrc.push(portToPermission(Ports.WebpackDev));
   }
 
-  connectSrc.push('https://api.dropboxapi.com');
-  connectSrc.push('https://content.dropboxapi.com');
+  // connectSrc.push('https://api.dropboxapi.com');
+  // connectSrc.push('https://content.dropboxapi.com');
 
   frameSrc.push('https://connect.trezor.io/');
   frameSrc.push('https://emurgo.github.io/yoroi-extension-ledger-bridge');
