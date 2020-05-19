@@ -1,8 +1,10 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import styles from './PrivacyPolicy.scss';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   header: {
@@ -27,7 +29,7 @@ const messages = defineMessages({
   },
   serverLogs: {
     id: 'profile.privacypolicy.serverLogs',
-    defaultMessage: '!!!Any server log is kept for at most 2 weeks purely for server troubleshooting purposes',
+    defaultMessage: '!!!Any server log is kept for at most 2 weeks purely for server troubleshooting purposes.',
   },
 });
 
@@ -37,11 +39,11 @@ type Props = {|
 @observer
 export default class PrivacyPolicy extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
 
     return (
