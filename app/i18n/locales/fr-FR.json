@@ -157,7 +157,7 @@
   "profile.nightly.warning1": "Yoroi Nightly ne fonctionne pas sur une blockchain test ou un serveur de test.",
   "profile.nightly.warning2": "Toute transaction que vous effectuerez sera visible sur la blockchain et sur les serveurs en production.",
   "profile.nightly.warningHeader": "Afin de simuler un environnement réel :",
-  "profile.privacypolicy.header": "Yoroi will...",
+  "profile.privacypolicy.header": "Yoroi...",
   "profile.privacypolicy.neverAnalytics": "<strong>Never</strong> run any analytics software or 3rd party trackers.",
   "profile.privacypolicy.neverProfile": "<strong>Never</strong> create profiles with your information.",
   "profile.privacypolicy.neverSell": "<strong>Never</strong> sell your data.",
