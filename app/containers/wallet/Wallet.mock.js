@@ -6,6 +6,7 @@ import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { action } from '@storybook/addon-actions';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import WalletSettingsStore from '../../stores/base/WalletSettingsStore';
+import type { WarningList } from '../../stores/base/WalletSettingsStore';
 import TransactionsStore from '../../stores/base/TransactionsStore';
 import DelegationStore from '../../stores/ada/DelegationStore';
 import WalletStore from '../../stores/toplevel/WalletStore';
@@ -14,6 +15,7 @@ import type { GeneratedData } from './Wallet';
 export const mockWalletProps: {
   selected: null | PublicDeriver<>,
   publicDerivers: Array<PublicDeriver<>>,
+  getWalletWarnings?: PublicDeriver<> => WarningList,
   getConceptualWalletSettingsCache:
     typeof WalletSettingsStore.prototype.getConceptualWalletSettingsCache,
   getPublicKeyCache:
@@ -32,6 +34,12 @@ export const mockWalletProps: {
       },
       wallets: {
         selected: request.selected,
+      },
+      walletSettings: {
+        getWalletWarnings: request.getWalletWarnings ?? ((publicDeriver) => ({
+          publicDeriver,
+          dialogs: [],
+        }))
       },
     },
     actions: {

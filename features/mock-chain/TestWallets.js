@@ -89,6 +89,6 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
   createWallet({
     name: ('trezor-wallet': WalletNames),
     mnemonic: 'lyrics tray aunt muffin brisk ensure wedding cereal capital path replace weasel',
-    plate: 'CXHB-0220',
+    plate: 'CZSA-2051',
   }),
 );
