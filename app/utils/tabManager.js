@@ -47,7 +47,7 @@ export function addCloseListener() {
 
 /**
  * Notify any other Yoroi tabs to close before we initialize
- * Note: for the listner to fire, the key much change values
+ * Note: for the listener to fire, the key much change values
  * To generate a new value every time, we use the current time
  *
  * The precision of the clock may be of concern. Let's look at two scenarios:
@@ -60,7 +60,7 @@ export function addCloseListener() {
  *
  * 2) Manually entering the Yoroi URL into a page multiple times
  * This bypasses above-mentioned restriction of only one copy loading at once
- * Emperically, this doesn't seem to be an issue though.
+ * Empirically, this doesn't seem to be an issue though.
  *
  * WARNING: You should only call this AFTER the wasm bindings have loaded
  * closing a different copy of Yoroi while loading WASM causes the load to hang
