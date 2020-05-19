@@ -4,10 +4,11 @@
 import { observable, action } from 'mobx';
 
 import TrezorConnect, { UI_EVENT, DEVICE_EVENT } from 'trezor-connect';
-import type { DeviceMessage, UiMessage } from 'trezor-connect';
-import type { CardanoGetPublicKey$ } from 'trezor-connect/lib/types/cardano';
+import type { DeviceEvent } from 'trezor-connect/lib/types/trezor/device';
+import type { UiEvent } from 'trezor-connect/lib/types/events';
+import type { CardanoPublicKey } from 'trezor-connect/lib/types/networks/cardano';
+import type { Success, Unsuccessful, } from 'trezor-connect/lib/types/params';
 
-import Config from '../../config';
 import environment from '../../environment';
 
 import Store from '../base/Store';
@@ -17,7 +18,7 @@ import globalMessages from '../../i18n/global-messages';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import { CheckAdressesInUseApiError } from '../../api/ada/errors';
 import { derivePathPrefix } from '../../api/ada/transactions/utils';
-import { wrapWithFrame, wrapWithoutFrame } from '../lib/TrezorWrapper';
+import { getTrezorManifest, wrapWithFrame, wrapWithoutFrame } from '../lib/TrezorWrapper';
 
 // This is actually just an interface
 import {
@@ -41,8 +42,8 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import { HARD_DERIVATION_START } from '../../config/numbersConfig';
 
 type TrezorConnectionResponse = {|
-  trezorResp: CardanoGetPublicKey$,
-  trezorEventDevice: DeviceMessage,
+  trezorResp: Success<CardanoPublicKey> | Unsuccessful,
+  trezorEventDevice: DeviceEvent,
 |};
 
 
@@ -78,7 +79,7 @@ export default class TrezorConnectStore
 
   /** holds Trezor device DeviceMessage event object, device features will be fetched
     * from this object and will be converted to TrezorDeviceInfo object */
-  trezorEventDevice: ?DeviceMessage;
+  trezorEventDevice: ?DeviceEvent;
   // =================== VIEW RELATED =================== //
 
   // =================== API RELATED =================== //
@@ -102,21 +103,7 @@ export default class TrezorConnectStore
     trezorConnectAction.submitSave.listen(this._submitSave);
 
     try {
-      /** Starting from v7 Trezor Connect Manifest has been made mandatory
-        * https://github.com/trezor/connect/blob/develop/docs/index.md#trezor-connect-manifest */
-      const { manifest } = Config.wallets.hardwareWallet.trezorT;
-
-      const trezorManifest = {};
-      trezorManifest.email = manifest.EMAIL;
-      if (environment.userAgentInfo.isFirefox) {
-        // Set appUrl for `moz-extension:` protocol using browser (like Firefox)
-        trezorManifest.appUrl = manifest.appURL.FIREFOX;
-      } else {
-        // For all other browser supported that uses `chrome-extension:` protocol
-        // In future if other non chrome like browser is supported them we can consider updating
-        trezorManifest.appUrl = manifest.appURL.CHROME;
-      }
-
+      const trezorManifest = getTrezorManifest();
       wrapWithoutFrame(trezor => trezor.manifest(trezorManifest));
     } catch (error) {
       Logger.error(`TrezorConnectStore::setup:error: ${stringifyError(error)}`);
@@ -124,7 +111,7 @@ export default class TrezorConnectStore
   }
 
   /** setup() is called when stores are being created
-    * _init() is called when connect dailog is about to show */
+    * _init() is called when connect dialog is about to show */
   _init: void => void = () => {
     Logger.debug(`${nameof(TrezorConnectStore)}::${nameof(this._init)} called`);
   }
@@ -196,7 +183,10 @@ export default class TrezorConnectStore
         path: derivePathPrefix(this.derivationIndex)
       }));
 
-      const trezorEventDevice: DeviceMessage = { ...this.trezorEventDevice };
+      if (this.trezorEventDevice == null) {
+        throw new Error(`${nameof(this._checkAndStoreHWDeviceInfo)} no ${nameof(this.trezorEventDevice)}`);
+      }
+      const trezorEventDevice = this.trezorEventDevice;
 
       /** Converts a valid hardware wallet response to a common storable format
         * later the same format will be used to create wallet */
@@ -225,21 +215,20 @@ export default class TrezorConnectStore
     const { trezorResp, trezorEventDevice } = resp;
 
     /** This check already done in _validateHWResponse but flow needs this */
-    if (trezorEventDevice == null
-      || trezorEventDevice.payload == null
-      || trezorEventDevice.payload.features == null) {
+    const device = trezorEventDevice.payload;
+    const { features } = device;
+    if (features == null) {
       throw new Error('Trezor device hardware info not valid');
     }
 
-    const deviceFeatures = trezorEventDevice.payload.features;
     return {
       publicMasterKey: trezorResp.payload.publicKey,
       hwFeatures: {
-        Vendor: deviceFeatures.vendor,
-        Model: deviceFeatures.model,
-        DeviceId: deviceFeatures.device_id,
+        Vendor: features.vendor,
+        Model: features.model,
+        DeviceId: features.device_id || '',
       },
-      defaultName: deviceFeatures.label || '',
+      defaultName: device.label || '',
     };
   }
 
@@ -310,12 +299,12 @@ export default class TrezorConnectStore
     }
   };
 
-  _onTrezorDeviceEvent: DeviceMessage => void = (event) => {
+  _onTrezorDeviceEvent: DeviceEvent => void = (event) => {
     Logger.debug(`TrezorConnectStore:: DEVICE_EVENT: ${event.type}`);
     this.trezorEventDevice = event;
   };
 
-  _onTrezorUIEvent: UiMessage => void = (event) => {
+  _onTrezorUIEvent: UiEvent => void = (event) => {
     Logger.debug(`TrezorConnectStore:: UI_EVENT: ${event.type}`);
     // TODO: [TREZOR] https://github.com/Emurgo/yoroi-frontend/issues/126
     // if(event.type === CLOSE_UI_WINDOW &&
