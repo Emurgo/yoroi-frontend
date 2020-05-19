@@ -1,6 +1,5 @@
 // @flow
 
-// $FlowFixMe no types for this library
 const manageTranslations = require('react-intl-translations-manager').default;
 
 const fs = require('fs');

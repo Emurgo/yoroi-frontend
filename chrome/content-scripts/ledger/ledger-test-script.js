@@ -3,10 +3,11 @@
 /*::
 import type {
   ExtendedPublicKeyResp,
-} from 'yoroi-extension-ledger-connect-handler';
+} from '@emurgo/ledger-connect-handler';
 import type {
   DeriveAddressResponse,
-  SignTransactionResponse
+  SignTransactionResponse,
+  GetVersionResponse,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 */
 
@@ -101,8 +102,14 @@ console.debug('[CS-LEDGER] Loading');
         };
         browserPort.postMessage(postData)
       } if (data.action === 'ledger-get-version') {
-        const payload /*: ExtendedPublicKeyResp */ = {
-        };
+        const payload /*: GetVersionResponse */ = {
+          major: '1',
+          minor: '0',
+          patch: '0',
+          flags: {
+            isDebug: false,
+          }
+        }
         const postData = {
           action: 'ledger-get-version-reply',
           success: true,

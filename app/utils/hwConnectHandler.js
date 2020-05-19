@@ -1,5 +1,5 @@
 // @flow
-import LedgerConnect from 'yoroi-extension-ledger-connect-handler';
+import LedgerConnect from '@emurgo/ledger-connect-handler';
 
 import { Logger } from './logging';
 

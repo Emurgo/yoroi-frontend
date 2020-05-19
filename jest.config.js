@@ -8,7 +8,7 @@ module.exports = {
     '\\.png$': 'lodash/noop.js',
   },
   transformIgnorePatterns: [
-    '<rootDir>/node_modules/(?!yoroi-extension-ledger-connect-handler)'
+    '<rootDir>/node_modules/(?!@emurgo/ledger-connect-handler)'
   ],
   setupFiles: [
     'jest-canvas-mock'

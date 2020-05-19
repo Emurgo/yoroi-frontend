@@ -1,3 +1,5 @@
+// @flow
+
 /* eslint-disable camelcase */
 
 /**
@@ -85,6 +87,8 @@ declare module 'cardano-wallet-browser' { // need to wrap flowgen output into mo
      * @returns {Address}
      */
     static from_base58(s: string): Address;
+
+    static is_valid(s: string): boolean;
   }
   /**
    */

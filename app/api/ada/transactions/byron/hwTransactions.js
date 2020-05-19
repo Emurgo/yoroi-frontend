@@ -32,7 +32,7 @@ import type {
   SignTransactionResponse as LedgerSignTxResponse,
   Witness
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { toDerivationPathString } from 'yoroi-extension-ledger-connect-handler';
+import { toDerivationPathString } from '@emurgo/ledger-connect-handler';
 import type {
   $CardanoSignTransaction,
   CardanoInput,

@@ -3,10 +3,10 @@
 
 import { observable, action } from 'mobx';
 
-import type { ExtendedPublicKeyResp } from 'yoroi-extension-ledger-connect-handler';
+import type { ExtendedPublicKeyResp } from '@emurgo/ledger-connect-handler';
 import LedgerConnect, {
   makeCardanoAccountBIP44Path,
-} from 'yoroi-extension-ledger-connect-handler';
+} from '@emurgo/ledger-connect-handler';
 
 import Config from '../../config';
 import environment from '../../environment';
