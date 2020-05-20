@@ -41,7 +41,7 @@ export default class AddressesStore extends Store {
   @observable error: ?LocalizableError = null;
   @observable selectedAddress: ?{|
     address: string,
-    path: BIP32Path,
+    path: void | BIP32Path,
   |} = null;
   ledgerConnect: ?LedgerConnect;
 
@@ -125,7 +125,7 @@ export default class AddressesStore extends Store {
 
   @action _selectAddress: {|
     address: string,
-    path: BIP32Path,
+    path: void | BIP32Path,
   |} => Promise<void> = async (params) => {
     Logger.info('AddressStore::_selectAddress::called: ' + params.address);
     this.selectedAddress = { address: params.address, path: params.path };

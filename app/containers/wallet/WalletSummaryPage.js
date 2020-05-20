@@ -21,7 +21,12 @@ import EditMemoDialog from '../../components/wallet/memos/EditMemoDialog';
 import DeleteMemoDialog from '../../components/wallet/memos/DeleteMemoDialog';
 import MemoNoExternalStorageDialog from '../../components/wallet/memos/MemoNoExternalStorageDialog';
 import { Logger } from '../../utils/logging';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { buildRoute } from '../../utils/routing';
+import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import type {
+  Address,
+} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 export type GeneratedData = typeof WalletSummaryPage.prototype.generated;
 
@@ -41,7 +46,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
   render(): null | Node {
     const { intl } = this.context;
     const actions = this.generated.actions;
-    const { transactions } = this.generated.stores.substores.ada;
+    const { transactions, addresses } = this.generated.stores.substores.ada;
     const { wallets } = this.generated.stores;
     const {
       hasAny,
@@ -107,6 +112,21 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
               }
             })}
             unitOfAccountSetting={profile.unitOfAccount}
+            addressLookup={(address) => {
+              const addressStores = addresses.getStoresForWallet(publicDeriver);
+              for (const addressStore of addressStores) {
+                if (addressStore.all.some(addressInStore => addressInStore.address === address)) {
+                  const route = buildRoute(addressStore.route, {
+                    id: publicDeriver.getPublicDeriverId(),
+                  });
+                  return {
+                    goToRoute: () => this.generated.actions.router.goToRoute.trigger({ route }),
+                    displayName: addressStore.displayName,
+                  };
+                }
+              }
+              return undefined;
+            }}
           />
         );
       } else {
@@ -315,6 +335,22 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
         },
         substores: {
           ada: {
+            addresses: {
+              getStoresForWallet: (publicDeriver: PublicDeriver<>) => {
+                const substore = stores.substores.ada;
+                const addressStores = substore.addresses.getStoresForWallet(publicDeriver);
+                const functionalitySubset: Array<{|
+                  +route: string,
+                  +displayName: $Exact<$npm$ReactIntl$MessageDescriptor>,
+                  +all: $ReadOnlyArray<$ReadOnly<{ ...Address, ... }>>,
+                |}> = addressStores.map(addressStore => ({
+                  route: addressStore.route,
+                  displayName: addressStore.name.display,
+                  all: addressStore.all,
+                }));
+                return functionalitySubset;
+              },
+            },
             walletSettings: {
               getPublicDeriverSettingsCache: adaStores.walletSettings.getPublicDeriverSettingsCache,
             },

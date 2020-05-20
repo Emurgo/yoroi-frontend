@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import WarningHeader from './WarningHeader';
-import globalMessages from '../../../i18n/global-messages';
+import globalMessages, { addressTypes } from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
@@ -31,7 +31,7 @@ export default class InternalHeader extends Component<Props> {
           <>
             <p>{intl.formatMessage(messages.warning1)}</p><br />
             <p>
-              {intl.formatMessage(globalMessages.internalLabel)}&nbsp;
+              {intl.formatMessage(addressTypes.internalLabel)}&nbsp;
               <FormattedHTMLMessage {...globalMessages.auditAddressWarning} />
             </p>
           </>

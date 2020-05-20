@@ -1,13 +1,17 @@
 // @flow
 
-import { action } from '@storybook/addon-actions';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import type { GeneratedData } from './Receive';
+import type { AddressTypeName } from '../../stores/base/AddressesStore';
 
 export const mockReceiveProps: {|
   selected: null | PublicDeriver<>,
-  activeTab: 'internal' | 'external' | 'mangled',
-  hasMangled?: boolean,
+  getStoresForWallet: PublicDeriver<> => Array<{|
+    +isActiveStore: boolean,
+    +isHidden: boolean,
+    +setAsActiveStore: void => void,
+    +name: AddressTypeName,
+  |}>,
 |} => {| generated: GeneratedData |} = (request) => ({
   generated: {
     stores: {
@@ -17,11 +21,7 @@ export const mockReceiveProps: {|
       substores: {
         ada: {
           addresses: {
-            isActiveTab: (tab) => tab === request.activeTab,
-            handleTabClick: action('handleTabClick'),
-            mangledAddressesForDisplay: {
-              hasAny: request.hasMangled === true
-            },
+            getStoresForWallet: request.getStoresForWallet,
           },
         },
       },

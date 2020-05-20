@@ -10,6 +10,6 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 
 export default class HWVerifyAddressActions {
   closeAddressDetailDialog: Action<void> = new Action();
-  selectAddress: AsyncAction<{| address: string, path: BIP32Path |}> = new AsyncAction();
+  selectAddress: AsyncAction<{| address: string, path: void | BIP32Path |}> = new AsyncAction();
   verifyAddress: AsyncAction<PublicDeriver<>> = new AsyncAction();
 }

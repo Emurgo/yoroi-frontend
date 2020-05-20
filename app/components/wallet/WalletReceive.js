@@ -49,10 +49,10 @@ const messages = defineMessages({
 type Props = {|
   +header: Node,
   +selectedExplorer: ExplorerType,
-  +walletAddresses: Array<StandardAddress>,
+  +walletAddresses: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
-  +onVerifyAddress: {| address: string, path: BIP32Path |} => Promise<void>,
+  +onVerifyAddress: {| address: string, path: void | BIP32Path |} => Promise<void>,
   +onGeneratePaymentURI: void | (string => void),
 |};
 
@@ -93,12 +93,12 @@ export default class WalletReceive extends Component<Props, State> {
             </button>
           </h2>
           {walletAddresses.map((address, index) => {
-            const isAddressVisible = !address.isUsed || showUsed;
+            const isAddressVisible = address.isUsed === false || showUsed;
             if (!isAddressVisible) return null;
             const addressClasses = classnames([
               'generatedAddress-' + (index + 1),
               styles.walletAddress,
-              address.isUsed ? styles.usedWalletAddress : null,
+              address.isUsed === true ? styles.usedWalletAddress : null,
             ]);
             const notificationElementId = `address-${index}-copyNotification`;
             return (
@@ -115,14 +115,14 @@ export default class WalletReceive extends Component<Props, State> {
                   <ExplorableHashContainer
                     selectedExplorer={this.props.selectedExplorer}
                     hash={address.address}
-                    light={address.isUsed}
+                    light={address.isUsed === true}
                     linkType="address"
                   >
-                    <RawHash light={address.isUsed}>
+                    <RawHash light={address.isUsed === true}>
                       <span
                         className={classnames([
                           styles.addressHash,
-                          address.isUsed && styles.addressHashUsed
+                          address.isUsed === true && styles.addressHashUsed
                         ])}
                       >
                         {truncateAddress(address.address)}
@@ -166,7 +166,7 @@ export default class WalletReceive extends Component<Props, State> {
                       onClick={
                         onVerifyAddress.bind(this, {
                           address: address.address,
-                          path: address.addressing.path
+                          path: address.addressing?.path
                         })
                       }
                     >

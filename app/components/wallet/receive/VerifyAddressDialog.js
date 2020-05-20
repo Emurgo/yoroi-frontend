@@ -50,7 +50,7 @@ type Props = {|
   +selectedExplorer: ExplorerType,
   +isHardware: boolean,
   +walletAddress: string,
-  +walletPath: BIP32Path,
+  +walletPath: void | BIP32Path,
   +classicTheme: boolean,
 |};
 
@@ -136,11 +136,13 @@ export default class VerifyAddressDialog extends Component<Props> {
             <span className={labelStyle}>
               {intl.formatMessage(messages.derivationPathLabel)}
             </span>
-            <div className={derivationClasses}>
-              <div className={styles.hash}>
-                {toDerivationPathString(walletPath)}
+            {walletPath != null && (
+              <div className={derivationClasses}>
+                <div className={styles.hash}>
+                  {toDerivationPathString(walletPath)}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         ) : null}
         { error ? (<ErrorBlock error={error} />) : null }

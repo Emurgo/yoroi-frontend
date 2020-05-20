@@ -545,6 +545,7 @@ export default class WalletStore extends Store {
   @action
   _queueWarningIfNeeded: PublicDeriver<> => void = (publicDeriver) => {
     if (environment.isTest()) return;
+    if (!environment.isProduction()) return;
 
     const debugWalletChecksums = [
       'DNKO-8098', 'ATPE-6458', // abandon share
