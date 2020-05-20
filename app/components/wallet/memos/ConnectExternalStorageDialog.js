@@ -1,5 +1,6 @@
 // @flow
 
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
@@ -9,6 +10,7 @@ import DialogCloseButton from '../../widgets/DialogCloseButton';
 import LinkExternalStorageSvg from '../../../assets/images/link-external-storage.inline.svg';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './MemoDialogCommon.scss';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   connectTitle: {
@@ -29,11 +31,11 @@ type Props = {|
 @observer
 export default class ConnectExternalStorageDialog extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const { onCancel, onConnect, } = this.props;
 

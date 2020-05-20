@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { computed, action, observable } from 'mobx';
 import { observer } from 'mobx-react';
@@ -39,7 +40,7 @@ export default class URILandingDialogContainer extends Component<Props> {
     this.props.onClose();
   }
 
-  render() {
+  render(): Node {
     if (!this.generated.stores.loading.uriParams) {
       return (
         <URIInvalidDialog

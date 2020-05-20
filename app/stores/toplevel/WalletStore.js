@@ -37,6 +37,7 @@ import { Logger, stringifyError } from '../../utils/logging';
 import { assuranceModes, } from '../../config/transactionAssuranceConfig';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { legacyWalletChecksum } from '@emurgo/cip4-js';
+import { createDebugWalletDialog } from '../../containers/wallet/dialogs/DebugWalletDialogContainer';
 
 type GroupedWallets = {|
   publicDerivers: Array<PublicDeriver<>>;
@@ -181,9 +182,11 @@ export default class WalletStore extends Store {
         lastSyncInfo
       });
     }
+    for (const publicDeriver of newWithCachedData) {
+      this._queueWarningIfNeeded(publicDeriver);
+    }
     runInAction(() => {
       this.publicDerivers.push(...newWithCachedData);
-
       this.selected = newWithCachedData[0];
     });
   }
@@ -303,6 +306,7 @@ export default class WalletStore extends Store {
       publicDeriver: withCache,
       lastSyncInfo,
     });
+    this._queueWarningIfNeeded(withCache);
     runInAction(() => {
       this.publicDerivers.push(withCache);
 
@@ -335,6 +339,9 @@ export default class WalletStore extends Store {
     }
     for (const publicDeriver of newWithCachedData) {
       await this.refreshWalletFromLocalOnLaunch(publicDeriver);
+    }
+    for (const publicDeriver of newWithCachedData) {
+      this._queueWarningIfNeeded(publicDeriver);
     }
     runInAction('refresh active wallet', () => {
       if (this.selected == null && newWithCachedData.length === 1) {
@@ -526,8 +533,40 @@ export default class WalletStore extends Store {
         conceptualWallet: publicDeriver.getParent(),
         conceptualWalletName: conceptualWalletInfo.Name,
       });
+      this.stores.substores.ada.walletSettings.walletWarnings.push({
+        publicDeriver,
+        dialogs: [],
+      });
     });
 
     return publicDeriver;
+  }
+
+  @action
+  _queueWarningIfNeeded: PublicDeriver<> => void = (publicDeriver) => {
+    if (environment.isTest()) return;
+
+    const debugWalletChecksums = [
+      'DNKO-8098', 'ATPE-6458', // abandon share
+      'ATJK-0805', 'NXTB-2808', // abandon address
+      'JSKA-2258', // ledger
+      'CZSA-2051', // trezor
+      'JEBH-9973', 'ONZO-5595', // mobile debug create
+      'SKBE-5478', 'SHHN-6941', // mobile debug restore
+    ];
+    const withPubKey = asGetPublicKey(publicDeriver);
+    if (withPubKey != null) {
+      const { plate } = this.getPublicKeyCache(withPubKey);
+      if (debugWalletChecksums.find(elem => elem === plate.TextPart) != null) {
+        const existingWarnings = this.stores.substores.ada.walletSettings.getWalletWarnings(
+          publicDeriver
+        );
+        existingWarnings.dialogs.push(createDebugWalletDialog(
+          plate.TextPart,
+          action(() => { existingWarnings.dialogs.pop(); }),
+          { stores: this.stores, actions: this.actions },
+        ));
+      }
+    }
   }
 }

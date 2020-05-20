@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
@@ -6,6 +7,7 @@ import { intlShape } from 'react-intl';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import EpochProgress from '../../../components/wallet/staking/dashboard/EpochProgress';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 export type GeneratedData = typeof EpochProgressContainer.prototype.generated;
 
@@ -17,7 +19,7 @@ type Props = {|
 
 @observer
 export default class EpochProgressContainer extends Component<Props> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
@@ -37,7 +39,7 @@ export default class EpochProgressContainer extends Component<Props> {
     return num.toString();
   };
 
-  render() {
+  render(): Node {
     const timeStore = this.generated.stores.substores.ada.time;
     const timeCalcRequests = timeStore.getTimeCalcRequests(this.props.publicDeriver);
     const currTimeRequests = timeStore.getCurrentTimeRequests(this.props.publicDeriver);

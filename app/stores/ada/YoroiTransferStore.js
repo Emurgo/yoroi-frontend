@@ -55,20 +55,28 @@ export default class YoroiTransferStore extends Store {
   @observable transferSource: TransferSourceType = TransferSource.BYRON;
 
   // eslint-disable-next-line no-restricted-syntax
-  _asyncErrorWrapper = <PT, RT>(func: PT=>Promise<RT>): (PT => Promise<RT>) => (async (payload) => {
-    try {
-      return await func(payload);
-    } catch (error) {
-      Logger.error(`YoroiTransferStore ${stringifyError(error)}`);
-      runInAction(() => {
-        this.status = TransferStatus.ERROR;
-        this.error = localizedError(error);
-      });
-      throw error;
-    }
-  });
+  _asyncErrorWrapper: (<PT, RT>(
+      func: (PT) => Promise<RT>
+    ) => (PT) => Promise<RT>) = <PT, RT>(
+      func: PT=>Promise<RT>
+    ): (PT => Promise<RT>) => (async (payload) => {
+      try {
+        return await func(payload);
+      } catch (error) {
+        Logger.error(`YoroiTransferStore ${stringifyError(error)}`);
+        runInAction(() => {
+          this.status = TransferStatus.ERROR;
+          this.error = localizedError(error);
+        });
+        throw error;
+      }
+    });
   // eslint-disable-next-line no-restricted-syntax
-  _errorWrapper = <PT, RT>(func: PT=>RT): (PT => RT) => ((payload) => {
+  _errorWrapper: (<PT, RT>(
+    func: (PT) => RT
+  ) => (PT) => RT) = <PT, RT>(
+    func: PT=>RT
+  ): (PT => RT) => ((payload) => {
     try {
       return func(payload);
     } catch (error) {

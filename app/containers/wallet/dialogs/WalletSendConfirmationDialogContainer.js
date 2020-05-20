@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
@@ -35,7 +36,7 @@ type Props = {|
 @observer
 export default class WalletSendConfirmationDialogContainer extends Component<Props> {
 
-  render() {
+  render(): Node {
     const {
       currencyUnit,
       signRequest,

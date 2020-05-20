@@ -1,5 +1,6 @@
 // @flow
 
+import type { Node } from 'react';
 import React from 'react';
 import BigNumber from 'bignumber.js';
 import { boolean, select, } from '@storybook/addon-knobs';
@@ -191,7 +192,7 @@ function getStakingInfo(
   };
 }
 
-export const Frame = () => {
+export const Frame = (): Node => {
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();
     const computedDelegation = getStakingInfo(
@@ -218,7 +219,7 @@ export const Frame = () => {
   );
 };
 
-export const PendingTransaction = () => {
+export const PendingTransaction = (): Node => {
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();
     const computedDelegation = getStakingInfo(
@@ -246,7 +247,7 @@ export const PendingTransaction = () => {
   );
 };
 
-export const TransactionIsExecuting = () => {
+export const TransactionIsExecuting = (): Node => {
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();
     const computedDelegation = getStakingInfo(
@@ -278,7 +279,7 @@ export const TransactionIsExecuting = () => {
   );
 };
 
-export const TransactionError = () => {
+export const TransactionError = (): Node => {
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();
     const computedDelegation = getStakingInfo(
@@ -310,7 +311,7 @@ export const TransactionError = () => {
   );
 };
 
-export const Transaction = () => {
+export const Transaction = (): Node => {
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();
     const computedDelegation = getStakingInfo(
@@ -377,7 +378,7 @@ export const Transaction = () => {
   );
 };
 
-export const DelegationSuccess = () => {
+export const DelegationSuccess = (): Node => {
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();
     const computedDelegation = getStakingInfo(

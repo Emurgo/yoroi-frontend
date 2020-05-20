@@ -2,6 +2,7 @@
 
 /* eslint react/jsx-one-expression-per-line: 0 */  // the &nbsp; in the html breaks this
 
+import type { Node } from 'react';
 import React, { Component, } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
@@ -25,6 +26,7 @@ import { formattedWalletAmount } from '../../../utils/formatters';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import WarningBox from '../../widgets/WarningBox';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
   +staleTx: boolean,
@@ -47,11 +49,11 @@ type Props = {|
 @observer
 export default class WalletSendConfirmationDialog extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  form = new ReactToolboxMobxForm({
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       walletPassword: {
         type: 'password',
@@ -77,7 +79,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
     },
   });
 
-  submit() {
+  submit(): void {
     this.form.submit({
       onSuccess: async (form) => {
         const { walletPassword } = form.values();
@@ -90,7 +92,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
     });
   }
 
-  render() {
+  render(): Node {
     const { form } = this;
     const { intl } = this.context;
     const walletPasswordField = form.$('walletPassword');

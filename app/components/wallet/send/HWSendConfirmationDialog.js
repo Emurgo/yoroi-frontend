@@ -1,10 +1,11 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component, } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { intlShape } from 'react-intl';
 import BigNumber from 'bignumber.js';
-import type { MessageDescriptor } from 'react-intl';
+import type { MessageDescriptor, $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
@@ -21,7 +22,6 @@ import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 
 import type { ExplorerType } from '../../../domain/Explorer';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
-
 import styles from './HWSendConfirmationDialog.scss';
 
 type ExpectedMessages = {|
@@ -50,11 +50,11 @@ type Props = {|
 @observer
 export default class HWSendConfirmationDialog extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const {
       amount,

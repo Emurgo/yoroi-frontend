@@ -10,14 +10,15 @@ type Props = {|
 
 @observer
 export default class CenteredBarDecoration extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|children: void|} = {
     children: undefined
   };
 
-  render() {
+  render(): Node {
     const { children } = this.props;
-    return (
-      <div className={styles.separator}>{children}</div>
+    return (children == null
+      ? (<div className={styles.solidSeparator} />)
+      : (<div className={styles.separator}>{children}</div>)
     );
   }
 }

@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import type { Ref, Element } from 'react';
+import type { Ref, Element, Node } from 'react';
 
 // external libraries
 import classnames from 'classnames';
@@ -42,7 +42,20 @@ type Props = {
 type State = {| focused: boolean, |};
 
 export const InputOwnSkin = class extends React.Component<Props, State> {
-  static defaultProps = {
+  static defaultProps: {|
+    className: string,
+    disabled: void,
+    done: void,
+    error: void,
+    label: void,
+    onBlur: void,
+    onChange: void,
+    onDelete: void,
+    onFocus: void,
+    onKeyPress: void,
+    placeholder: void,
+    readOnly: void,
+  |} = {
     className: '',
     disabled: undefined,
     error: undefined,
@@ -57,15 +70,15 @@ export const InputOwnSkin = class extends React.Component<Props, State> {
     onDelete: undefined,
   };
 
-  state = {
+  state: State = {
     focused: false,
   }
 
-  handleFocus = () => this.setState({ focused: true })
+  handleFocus: (() => void) = () => this.setState({ focused: true })
 
-  handleBlur = () => this.setState({ focused: false })
+  handleBlur: (() => void) = () => this.setState({ focused: false })
 
-  render() {
+  render(): Node {
     return (
       <FormField
         className={this.props.className}

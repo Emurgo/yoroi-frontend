@@ -11,11 +11,11 @@ type Props = {|
 @observer
 export default class CenteredLayout extends Component<Props> {
 
-  static defaultProps = {
+  static defaultProps: {|children: void|} = {
     children: undefined
   };
 
-  render() {
+  render(): Node {
     const { children } = this.props;
     return (
       <div className={styles.component}>

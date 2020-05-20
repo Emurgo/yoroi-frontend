@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
@@ -20,6 +21,7 @@ import EditMemoDialog from '../../components/wallet/memos/EditMemoDialog';
 import DeleteMemoDialog from '../../components/wallet/memos/DeleteMemoDialog';
 import MemoNoExternalStorageDialog from '../../components/wallet/memos/MemoNoExternalStorageDialog';
 import { Logger } from '../../utils/logging';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 export type GeneratedData = typeof WalletSummaryPage.prototype.generated;
 
@@ -32,11 +34,11 @@ const targetNotificationIds = [
 
 @observer
 export default class WalletSummaryPage extends Component<InjectedOrGenerated<GeneratedData>> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
   };
 
-  render() {
+  render(): null | Node {
     const { intl } = this.context;
     const actions = this.generated.actions;
     const { transactions } = this.generated.stores.substores.ada;

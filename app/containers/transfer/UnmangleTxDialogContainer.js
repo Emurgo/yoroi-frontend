@@ -24,6 +24,7 @@ import SpendingPasswordInput from '../../components/widgets/forms/SpendingPasswo
 import { addressToDisplayString, getAddressPayload } from '../../api/ada/lib/storage/bridge/utils';
 import globalMessages from '../../i18n/global-messages';
 import type { ConfigType } from '../../../config/config-types';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 declare var CONFIG: ConfigType;
 
@@ -37,7 +38,7 @@ type Props = {|
 @observer
 export default class UnmangleTxDialogContainer extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
@@ -76,7 +77,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
   }
 
   componentWillUnmount() {
-    const builderActions = this._getTxBuilderActions();
+    const builderActions = this.generated.actions.ada.txBuilderActions;
     builderActions.reset.trigger();
     this._getAdaWalletsStore().sendMoneyRequest.reset();
   }
@@ -105,7 +106,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
     });
   };
 
-  render() {
+  render(): Node {
     const txBuilder = this._getTxBuilderStore();
 
     if (txBuilder.setupSelfTx.error != null) {
@@ -197,10 +198,6 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
 
   _getTxBuilderStore() {
     return this.generated.stores.substores.ada.transactionBuilderStore;
-  }
-
-  _getTxBuilderActions() {
-    return this.generated.actions.ada.txBuilderActions;
   }
 
   @computed get generated() {

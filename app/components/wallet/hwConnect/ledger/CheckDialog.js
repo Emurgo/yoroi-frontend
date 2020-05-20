@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
@@ -19,7 +20,7 @@ import ExternalLinkSVG from '../../../../assets/images/link-external.inline.svg'
 import AboutPrerequisiteIconSVG from '../../../../assets/images/hardware-wallet/check-prerequisite-header-icon.inline.svg';
 import AboutPrerequisiteTrezorSVG from '../../../../assets/images/hardware-wallet/ledger/check.inline.svg';
 import AboutLedgerSVG from '../../../../assets/images/hardware-wallet/ledger/check-modern.inline.svg';
-
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 
 import styles from './CheckDialog.scss';
@@ -73,11 +74,11 @@ type Props = {|
 @observer
 export default class CheckDialog extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const {
       progressInfo,

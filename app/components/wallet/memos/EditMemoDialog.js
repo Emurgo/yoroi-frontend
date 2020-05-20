@@ -1,5 +1,6 @@
 // @flow
 
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
@@ -20,6 +21,7 @@ import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos
 import { MAX_MEMO_SIZE } from '../../../config/externalStorageConfig';
 import config from '../../../config';
 import styles from './MemoDialogCommon.scss';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
   selectedWallet: PublicDeriver<>,
@@ -38,17 +40,17 @@ type State = {|
 @observer
 export default class EditMemoDialog extends Component<Props, State> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  state = {
+  state: State = {
     isSubmitting: false,
   };
 
   memoContentInput: Input;
 
-  form = new ReactToolboxMobxForm({
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       memoContent: {
         type: 'memo',
@@ -96,7 +98,7 @@ export default class EditMemoDialog extends Component<Props, State> {
     });
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const { form } = this;
     const { memoContent } = form.values();

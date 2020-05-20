@@ -1,12 +1,14 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './NoWalletMessage.scss';
 import VerticallyCenteredLayout from '../../layout/VerticallyCenteredLayout';
 import FullscreenLayout from '../../layout/FullscreenLayout';
 import { observer } from 'mobx-react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
-export const messages = defineMessages({
+export const messages: * = defineMessages({
   title: {
     id: 'wallet.nowallet.title',
     defaultMessage: '!!!No wallet selected',
@@ -22,11 +24,11 @@ type Props = {|
 
 @observer
 export default class NoWalletMessage extends Component<Props> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
 
     return (

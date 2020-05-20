@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 
 import styles from './FirstRewardTooltip.scss';
@@ -11,7 +12,7 @@ type Props = {|
 
 @observer
 export default class FirstRewardTooltip extends Component<Props> {
-  render() {
+  render(): Node {
     const { text } = this.props;
     return (
       <div className={styles.wrapper}>

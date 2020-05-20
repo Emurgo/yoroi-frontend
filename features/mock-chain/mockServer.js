@@ -44,7 +44,8 @@ function _defaultSignedTransaction(
   res.send(response);
 }
 
-let MockServer = null;
+// TODO: no type from json-server
+let MockServer: null | any = null;
 
 export function getMockServer(
   settings: {
@@ -60,7 +61,7 @@ export function getMockServer(
     outputLog?: boolean,
     ...
   }
-) {
+): typeof MockServer {
   if (!MockServer) {
     const middlewares = [...defaults({ logger: !!settings.outputLog }), bodyParser];
 
@@ -182,6 +183,7 @@ export function getMockServer(
     installCoinPriceRequestHandlers(server);
 
     MockServer = server.listen(Ports.DevBackendServe, () => {
+      // eslint-disable-next-line no-console
       console.log(`JSON Server is running at ${Ports.DevBackendServe}`);
     });
   }

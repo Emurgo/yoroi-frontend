@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import classnames from 'classnames';
@@ -7,6 +8,7 @@ import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './SupportSettings.scss';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   faqTitle: {
@@ -47,11 +49,11 @@ type Props = {|
 @observer
 export default class SupportSettings extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { onExternalLinkClick, onDownloadLogs } = this.props;
     const { intl } = this.context;
 

@@ -24,27 +24,25 @@ export function addressToKind(
   address: string,
   parseAs: 'bech32' | 'bytes',
 ): CoreAddressT {
-  try {
-    // Need to try parsing as a legacy address first
-    // Since parsing as bech32 directly may give a wrong result if the address contains a 1
-    RustModule.WalletV2.Address.from_base58(address);
+  // Need to try parsing as a legacy address first
+  // Since parsing as bech32 directly may give a wrong result if the address contains a 1
+  if (RustModule.WalletV2.Address.is_valid(address)) {
     return CoreAddressTypes.CARDANO_LEGACY;
-  } catch (e1) {
-    try {
-      const wasmAddr = parseAs === 'bytes'
-        ? RustModule.WalletV3.Address.from_bytes(Buffer.from(address, 'hex'))
-        : RustModule.WalletV3.Address.from_string(address);
+  }
+  try {
+    const wasmAddr = parseAs === 'bytes'
+      ? RustModule.WalletV3.Address.from_bytes(Buffer.from(address, 'hex'))
+      : RustModule.WalletV3.Address.from_string(address);
 
-      switch (wasmAddr.get_kind()) {
-        case RustModule.WalletV3.AddressKind.Single: return CoreAddressTypes.SHELLEY_SINGLE;
-        case RustModule.WalletV3.AddressKind.Group: return CoreAddressTypes.SHELLEY_GROUP;
-        case RustModule.WalletV3.AddressKind.Account: return CoreAddressTypes.SHELLEY_ACCOUNT;
-        case RustModule.WalletV3.AddressKind.Multisig: return CoreAddressTypes.SHELLEY_MULTISIG;
-        default: throw new Error(`${nameof(addressToKind)} unknown address type ` + address);
-      }
-    } catch (e2) {
-      throw new Error(`${nameof(addressToKind)} failed to parse address type ${e1} ${e2} ${address}`);
+    switch (wasmAddr.get_kind()) {
+      case RustModule.WalletV3.AddressKind.Single: return CoreAddressTypes.SHELLEY_SINGLE;
+      case RustModule.WalletV3.AddressKind.Group: return CoreAddressTypes.SHELLEY_GROUP;
+      case RustModule.WalletV3.AddressKind.Account: return CoreAddressTypes.SHELLEY_ACCOUNT;
+      case RustModule.WalletV3.AddressKind.Multisig: return CoreAddressTypes.SHELLEY_MULTISIG;
+      default: throw new Error(`${nameof(addressToKind)} unknown address type ` + address);
     }
+  } catch (e1) {
+    throw new Error(`${nameof(addressToKind)} failed to parse address type ${e1} ${address}`);
   }
 }
 
@@ -70,39 +68,35 @@ export function groupToSingle(
 export function addressToDisplayString(
   address: string
 ): string {
-  try {
-    // Need to try parsing as a legacy address first
-    // Since parsing as bech32 directly may give a wrong result if the address contains a 1
-    RustModule.WalletV2.Address.from_base58(address);
+  // Need to try parsing as a legacy address first
+  // Since parsing as bech32 directly may give a wrong result if the address contains a 1
+  if (RustModule.WalletV2.Address.is_valid(address)) {
     return address;
-  } catch (_e1) {
-    try {
-      const wasmAddr = RustModule.WalletV3.Address.from_bytes(
-        Buffer.from(address, 'hex')
-      );
-      return wasmAddr.to_string(Bech32Prefix.ADDRESS);
-    } catch (_e2) {
-      throw new Error(`${nameof(addressToDisplayString)} failed to parse address type ` + address);
-    }
+  }
+  try {
+    const wasmAddr = RustModule.WalletV3.Address.from_bytes(
+      Buffer.from(address, 'hex')
+    );
+    return wasmAddr.to_string(Bech32Prefix.ADDRESS);
+  } catch (_e2) {
+    throw new Error(`${nameof(addressToDisplayString)} failed to parse address type ` + address);
   }
 }
 
 export function getAddressPayload(
   address: string
 ): string {
-  try {
-    // Need to try parsing as a legacy address first
-    // Since parsing as bech32 directly may give a wrong result if the address contains a 1
-    RustModule.WalletV2.Address.from_base58(address);
+  // Need to try parsing as a legacy address first
+  // Since parsing as bech32 directly may give a wrong result if the address contains a 1
+  if (RustModule.WalletV2.Address.is_valid(address)) {
     return address;
-  } catch (_e1) {
-    try {
-      return Buffer.from(
-        RustModule.WalletV3.Address.from_string(address).as_bytes()
-      ).toString('hex');
-    } catch (_e2) {
-      throw new Error(`${nameof(getAddressPayload)} failed to parse address type ` + address);
-    }
+  }
+  try {
+    return Buffer.from(
+      RustModule.WalletV3.Address.from_string(address).as_bytes()
+    ).toString('hex');
+  } catch (_e2) {
+    throw new Error(`${nameof(getAddressPayload)} failed to parse address type ` + address);
   }
 }
 

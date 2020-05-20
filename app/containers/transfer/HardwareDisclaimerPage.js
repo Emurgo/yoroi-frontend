@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { action, observable } from 'mobx';
@@ -19,7 +20,7 @@ export default class HardwareDisclaimerPage extends Component<Props> {
     this.checkboxMarked = !this.checkboxMarked;
   }
 
-  render() {
+  render(): Node {
     return (
       <HardwareDisclaimer
         onBack={this.props.onBack}

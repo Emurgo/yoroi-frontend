@@ -7,6 +7,7 @@ import styles from './WarningHeader.scss';
 import InvalidURIImg from '../../../assets/images/uri/invalid-uri.inline.svg';
 import VerticallyCenteredLayout from '../../layout/VerticallyCenteredLayout';
 import globalMessages from '../../../i18n/global-messages';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
   +message: Node,
@@ -15,15 +16,15 @@ type Props = {|
 
 @observer
 export default class WarningHeader extends Component<Props> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  static defaultProps = {
+  static defaultProps: {|children: void|} = {
     children: undefined
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     return (
       <div className={styles.component}>

@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
@@ -12,6 +13,7 @@ import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import TopBar from '../../components/topbar/TopBar';
 import NoticeBoard from '../../components/notice-board/NoticeBoard';
 import NoNotice from '../../components/notice-board/NoNotice';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   title: {
@@ -25,11 +27,11 @@ type GeneratedData = typeof NoticeBoardPage.prototype.generated;
 
 @observer
 export default class NoticeBoardPage extends Component<InjectedOrGenerated<GeneratedData>> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const {
       loadedNotices,
       searchOptions,

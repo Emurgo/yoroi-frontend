@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
@@ -13,6 +14,7 @@ import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarning
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
 import IntroBanner from '../../components/profile/language-selection/IntroBanner';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   title: {
@@ -26,7 +28,7 @@ type GeneratedData = typeof LanguageSelectionPage.prototype.generated;
 @observer
 export default class LanguageSelectionPage extends Component<InjectedOrGenerated<GeneratedData>> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
@@ -52,7 +54,7 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
     await this.generated.actions.profile.commitLocaleToStorage.trigger();
   };
 
-  renderByron(generated: GeneratedData) {
+  renderByron(generated: GeneratedData): Node {
     const topBartitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
@@ -85,7 +87,7 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
     );
   }
 
-  renderShelley(generated: GeneratedData) {
+  renderShelley(generated: GeneratedData): Node {
     const topBartitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
@@ -119,7 +121,7 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
     );
   }
 
-  render() {
+  render(): Node {
     if (environment.isShelley()) {
       return this.renderShelley(this.generated);
     }

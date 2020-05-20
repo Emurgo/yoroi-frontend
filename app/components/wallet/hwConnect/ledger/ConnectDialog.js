@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
@@ -28,6 +29,7 @@ import { Logger } from '../../../../utils/logging';
 
 import styles from '../common/ConnectDialog.scss';
 import headerMixin from '../../../mixins/HeaderBlock.scss';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const connectStartGIF = connectLoadGIF;
 
@@ -56,11 +58,11 @@ type Props = {|
 @observer
 export default class ConnectDialog extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const {
       progressInfo,

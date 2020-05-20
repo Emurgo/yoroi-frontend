@@ -1,5 +1,6 @@
 // @flow
 
+import type { Node } from 'react';
 import React from 'react';
 
 import moment from 'moment';
@@ -54,7 +55,7 @@ const ButtonCases = Object.freeze({
   HasMore: 1,
   HasMoreLoading: 2,
 });
-export const Generic = () => {
+export const Generic = (): Node => {
   const buttonState = () => select(
     'loadButton',
     ButtonCases,

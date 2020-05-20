@@ -1,5 +1,6 @@
 // @flow
 
+import type { Node } from 'react';
 import React from 'react';
 import BigNumber from 'bignumber.js';
 
@@ -279,7 +280,7 @@ const genBaseProps: {|
   };
 };
 
-export const ExternalTab = () => {
+export const ExternalTab = (): Node => {
   const selectedTab = 'external';
   const wallet = genSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
@@ -318,7 +319,7 @@ export const ExternalTab = () => {
 };
 
 
-export const InternalTab = () => {
+export const InternalTab = (): Node => {
   const selectedTab = 'internal';
   const wallet = genSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
@@ -344,7 +345,7 @@ export const InternalTab = () => {
   );
 };
 
-export const MangledTab = () => {
+export const MangledTab = (): Node => {
   const selectedTab = 'mangled';
   const wallet = genSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
@@ -371,7 +372,7 @@ export const MangledTab = () => {
   );
 };
 
-export const UnmangleDialogLoading = () => {
+export const UnmangleDialogLoading = (): Node => {
   const selectedTab = 'mangled';
   const wallet = genSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
@@ -406,7 +407,7 @@ export const UnmangleDialogLoading = () => {
   );
 };
 
-export const UnmangleDialogError = () => {
+export const UnmangleDialogError = (): Node => {
   const selectedTab = 'mangled';
   const wallet = genSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
@@ -441,7 +442,7 @@ export const UnmangleDialogError = () => {
   );
 };
 
-export const UnmangleDialogConfirm = () => {
+export const UnmangleDialogConfirm = (): Node => {
   const selectedTab = 'mangled';
   const wallet = genSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
@@ -477,7 +478,7 @@ export const UnmangleDialogConfirm = () => {
   );
 };
 
-export const UriGenerateDialog = () => {
+export const UriGenerateDialog = (): Node => {
   const selectedTab = 'external';
   const wallet = genSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
@@ -509,7 +510,7 @@ export const UriGenerateDialog = () => {
   );
 };
 
-export const UriDisplayDialog = () => {
+export const UriDisplayDialog = (): Node => {
   const selectedTab = 'external';
   const wallet = genSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
@@ -544,7 +545,7 @@ export const UriDisplayDialog = () => {
   );
 };
 
-export const VerifyRegularAddress = () => {
+export const VerifyRegularAddress = (): Node => {
   const selectedTab = 'external';
   const wallet = genSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
@@ -571,7 +572,7 @@ export const VerifyRegularAddress = () => {
   );
 };
 
-export const VerifyLedgerAddress = () => {
+export const VerifyLedgerAddress = (): Node => {
   const selectedTab = 'external';
   const wallet = genSigningWalletWithCache(ConceptualWalletId => ({
     ConceptualWalletId,

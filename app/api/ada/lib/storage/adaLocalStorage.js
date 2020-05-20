@@ -19,7 +19,8 @@ export async function saveSelectedExplorer(explorer: ExplorerType): Promise<void
 
 export async function getSelectedExplorer(): Promise<ExplorerType> {
   const explorer = await _getFromStorage<ExplorerType>(storageKeys.SELECTED_EXPLORER_KEY);
-  return explorer || getDefaultExplorer();
+  if (explorer == null || explorer === '') return getDefaultExplorer();
+  return explorer;
 }
 
 /* Util functions */

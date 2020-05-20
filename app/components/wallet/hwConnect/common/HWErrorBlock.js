@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 
@@ -15,7 +16,7 @@ type Props = {|
 
 @observer
 export default class HWErrorBlock extends Component<Props> {
-  render() {
+  render(): Node {
     return <ErrorBlock error={this.props.error} />;
   }
 }

@@ -13,12 +13,12 @@ type Props = {|
 @observer
 export default class Card extends Component<Props> {
 
-  static defaultProps = {
+  static defaultProps: {|children: void, title: void|} = {
     children: undefined,
     title: undefined,
   };
 
-  render() {
+  render(): Node {
     const { title, children } = this.props;
     return (
       <div className={styles.wrapper}>

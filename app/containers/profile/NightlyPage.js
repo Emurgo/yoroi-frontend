@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
@@ -8,6 +9,7 @@ import TopBar from '../../components/topbar/TopBar';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import NightlyForm from '../../components/profile/nightly/NightlyForm';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   title: {
@@ -21,7 +23,7 @@ type GeneratedData = typeof NightlyPage.prototype.generated;
 @observer
 export default class NightlyPage extends Component<InjectedOrGenerated<GeneratedData>> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
@@ -29,7 +31,7 @@ export default class NightlyPage extends Component<InjectedOrGenerated<Generated
     this.generated.actions.profile.acceptNightly.trigger();
   };
 
-  renderPage(_generated: GeneratedData) {
+  renderPage(_generated: GeneratedData): Node {
     const topBartitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
@@ -50,7 +52,7 @@ export default class NightlyPage extends Component<InjectedOrGenerated<Generated
     );
   }
 
-  render() {
+  render(): Node {
     return this.renderPage(this.generated);
   }
 

@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
@@ -26,7 +27,7 @@ export default class TermsOfUseSettingsPage extends Component<InjectedOrGenerate
     });
   }
 
-  render() {
+  render(): Node {
     const { termsOfUse } = this.generated.stores.profile;
     return (
       <TermsOfUseSettings

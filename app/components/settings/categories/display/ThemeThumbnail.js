@@ -1,6 +1,7 @@
 // @flow
 
 import { observer } from 'mobx-react';
+import type { Node } from 'react';
 import React, { Component } from 'react';
 
 type Props = {|
@@ -10,7 +11,7 @@ type Props = {|
 
 @observer
 export default class ThemeThumbnail extends Component<Props> {
-  render() {
+  render(): Node {
     const { themeVars, themeKey } = this.props;
 
     const gradientKey = `topbar-gradient-${themeKey}`;

@@ -2,6 +2,7 @@
 
 /* eslint react/jsx-one-expression-per-line: 0 */  // the &nbsp; in the html breaks this
 
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
@@ -12,7 +13,7 @@ import type {
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import {
   toDerivationPathString,
-} from 'yoroi-extension-ledger-connect-handler';
+} from '@emurgo/ledger-connect-handler';
 
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
@@ -24,6 +25,7 @@ import type { ExplorerType } from '../../../domain/Explorer';
 import LocalizableError from '../../../i18n/LocalizableError';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './VerifyAddressDialog.scss';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   addressDetailsTitleLabel: {
@@ -55,11 +57,11 @@ type Props = {|
 @observer
 export default class VerifyAddressDialog extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const {
       isActionProcessing,

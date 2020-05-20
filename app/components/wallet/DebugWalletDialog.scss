@@ -1,0 +1,21 @@
+@import '../../themes/mixins/underline';
+
+:global(.YoroiModern) .component {
+  min-width: var(--theme-modal-min-max-width-cmn);
+  max-width: var(--theme-modal-min-max-width-cmn);
+}
+
+.component {
+  font-family: var(--font-regular);
+  font-size: 14px;
+  line-height: 22px;
+
+  .header {
+    margin-bottom: 20px;
+  }
+
+  a {
+    color: var(--font-black);
+    @include underline(var(--theme-underline-dark-color));
+  }
+}

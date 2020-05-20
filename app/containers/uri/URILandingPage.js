@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
@@ -32,7 +33,7 @@ export default class URILandingPage extends Component<InjectedOrGenerated<Genera
     });
   }
 
-  render() {
+  render(): Node {
     return (
       <URILandingDialogContainer
         {...this.generated.URILandingDialogContainerProps}

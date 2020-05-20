@@ -109,7 +109,7 @@ import type {
   LedgerSignTxPayload,
 } from '../../domain/HWSignTx';
 import Notice from '../../domain/Notice';
-import type { $CardanoSignTransaction } from 'trezor-connect/lib/types/cardano';
+import type { CardanoSignTransaction } from 'trezor-connect/lib/types/networks/cardano';
 import {
   createTrezorSignTxPayload,
   broadcastTrezorSignedTx,
@@ -327,7 +327,7 @@ export type CreateTrezorSignTxDataRequest = {|
 |};
 export type CreateTrezorSignTxDataResponse = {|
   // https://github.com/trezor/connect/blob/develop/docs/methods/cardanoSignTransaction.md
-  trezorSignTxPayload: $CardanoSignTransaction,
+  trezorSignTxPayload: $Exact<CardanoSignTransaction>,
 |};
 export type CreateTrezorSignTxDataFunc = (
   request: CreateTrezorSignTxDataRequest

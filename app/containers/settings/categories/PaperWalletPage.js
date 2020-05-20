@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
@@ -44,12 +45,15 @@ export default class PaperWalletPage extends Component<InjectedOrGenerated<Gener
     });
   }
 
-  createPaperWallet = (data: {| numAddresses: number, printAccountPlate: boolean |}) => {
+  createPaperWallet: ((data: {|
+    numAddresses: number,
+    printAccountPlate: boolean,
+  |}) => void) = (data) => {
     this.generated.actions.dialogs.open.trigger({ dialog: UserPasswordDialog });
     this.generated.actions.dialogs.updateDataForActiveDialog.trigger({ data });
   };
 
-  render() {
+  render(): Node {
     return (
       <PaperWalletSettings
         onCreatePaper={this.createPaperWallet}

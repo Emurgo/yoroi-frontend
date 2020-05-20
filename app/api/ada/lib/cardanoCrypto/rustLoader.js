@@ -24,4 +24,4 @@ class Module {
 }
 
 // need this otherwise Wallet's flow type isn't properly exported
-export const RustModule = new Module();
+export const RustModule: Module = new Module();

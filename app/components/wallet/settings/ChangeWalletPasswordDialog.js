@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
@@ -14,6 +15,7 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './ChangeWalletPasswordDialog.scss';
 import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   dialogTitleChangePassword: {
@@ -47,11 +49,11 @@ type Props = {|
 
 @observer
 export default class ChangeWalletPasswordDialog extends Component<Props> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  form = new ReactToolboxMobxForm({
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       currentPassword: {
         type: 'password',
@@ -107,7 +109,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
     },
   });
 
-  submit = () => {
+  submit: (() => void) = () => {
     this.form.submit({
       onSuccess: async (form) => {
         const { currentPassword, walletPassword } = form.values();
@@ -121,11 +123,11 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
     });
   };
 
-  handleDataChange = (key: string, value: string) => {
+  handleDataChange: ((key: string, value: string) => void) = (key, value) => {
     this.props.onDataChange({ [key]: value });
   };
 
-  render() {
+  render(): Node {
     const { form } = this;
     const { intl } = this.context;
     const {

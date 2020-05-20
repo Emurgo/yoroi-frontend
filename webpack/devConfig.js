@@ -14,7 +14,7 @@ const hotScript =
 const baseDevConfig = (
   networkName /*: string */,
   isNightly /*: boolean */,
-) => ({
+) /*: * */ => ({
   mode: 'development',
   optimization: commonConfig.optimization,
   node: commonConfig.node,

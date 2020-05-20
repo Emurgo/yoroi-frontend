@@ -15,14 +15,14 @@ type Props = {|
 
 @observer
 export default class DialogTextBlock extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|children: null, message: string, subclass: string, title: string|} = {
     title: '',
     message: '',
     subclass: '',
     children: null
   };
 
-  render() {
+  render(): Node {
     const { title, message, subclass, children } = this.props;
 
     const messageStyle = classNames([

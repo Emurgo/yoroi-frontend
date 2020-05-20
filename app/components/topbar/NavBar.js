@@ -14,14 +14,14 @@ type Props = {|
 
 @observer
 export default class NavBar extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|button: void, children: void, walletDetails: void, walletPlate: void|} = {
     children: undefined,
     walletPlate: undefined,
     button: undefined,
     walletDetails: undefined,
   };
 
-  render() {
+  render(): Node {
     const {
       title,
       children,

@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import { Select } from 'react-polymorph/lib/components/Select';
@@ -12,6 +13,7 @@ import Dialog from '../../../widgets/Dialog';
 import VerticalFlexContainer from '../../../layout/VerticalFlexContainer';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import globalMessages from '../../../../i18n/global-messages';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   unitOfAccountTitle: {
@@ -48,15 +50,15 @@ type Props = {|
 
 @observer
 export default class CoinPriceCurrencySettings extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|error: void|} = {
     error: undefined
   };
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  form = new ReactToolboxMobxForm({
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       coinPriceCurrencyId: {
         label: this.context.intl.formatMessage(messages.label),
@@ -64,7 +66,7 @@ export default class CoinPriceCurrencySettings extends Component<Props> {
     }
   });
 
-  render() {
+  render(): Node {
     const { currencies, error, currentValue, lastUpdatedTimestamp } = this.props;
     const { intl } = this.context;
     const { form } = this;

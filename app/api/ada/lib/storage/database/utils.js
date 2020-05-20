@@ -184,6 +184,7 @@ export async function raii<T>(
     return result;
   } catch (e) {
     const tableNames = tables.map(table => table.getName()).join('\n');
+    // eslint-disable-next-line no-console
     console.error('rolling back Lovefield query for\n' + tableNames + ' with error ' + JSON.stringify(e));
     await tx.rollback();
     throw e;

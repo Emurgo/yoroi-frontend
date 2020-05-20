@@ -20,7 +20,17 @@ type Props = {|
 /** Adds a top bar above the wrapped node */
 @observer
 export default class TopBarLayout extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|
+    banner: void,
+    children: void,
+    languageSelectionBackground: boolean,
+    navbar: void,
+    notification: void,
+    showAsCard: boolean,
+    showInContainer: boolean,
+    sidebar: void,
+    topbar: void,
+  |} = {
     banner: undefined,
     topbar: undefined,
     navbar: undefined,
@@ -32,7 +42,7 @@ export default class TopBarLayout extends Component<Props> {
     showAsCard: false,
   };
 
-  render() {
+  render(): Node {
     const {
       banner,
       sidebar,

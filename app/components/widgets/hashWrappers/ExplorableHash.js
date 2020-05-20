@@ -29,12 +29,12 @@ type Props = {|
 
 @observer
 export default class ExplorableHash extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|arrowRelativeToTip: boolean, tooltipOpensUpward: boolean|} = {
     tooltipOpensUpward: false,
     arrowRelativeToTip: true,
   };
 
-  render() {
+  render(): Node {
     const { websiteName, onExternalLinkClick } = this.props;
 
     const addressClass = classnames([

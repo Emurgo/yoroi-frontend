@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
@@ -11,6 +12,7 @@ import DialogCloseButton from '../widgets/DialogCloseButton';
 import WarningBox from '../widgets/WarningBox';
 import CopyableAddress from '../widgets/CopyableAddress';
 import type { Notification } from '../../types/notificationType';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import styles from './URIDisplayDialog.scss';
 
@@ -41,11 +43,11 @@ type Props = {|
 @observer
 export default class URIDisplayDialog extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const {
       onClose,
       onBack,

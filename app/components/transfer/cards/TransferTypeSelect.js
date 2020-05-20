@@ -1,8 +1,9 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { defineMessages, intlShape, } from 'react-intl';
 import { observer } from 'mobx-react';
-
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import TransferCards from './TransferCards';
 import styles from './TransferTypeSelect.scss';
 
@@ -20,11 +21,11 @@ const messages = defineMessages({
 
 @observer
 export default class TransferTypeSelect extends Component<Props> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     return (
       <div className={styles.component}>

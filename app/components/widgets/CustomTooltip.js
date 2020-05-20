@@ -16,9 +16,15 @@ type Props = {|
 
 @observer
 export default class CustomTooltip extends Component<Props> {
-  static defaultProps = { children: undefined, isOpeningUpward: true }
+  static defaultProps: {|
+    children: void,
+    isOpeningUpward: boolean
+  |} = {
+    children: undefined,
+    isOpeningUpward: true
+  }
 
-  render() {
+  render(): Node {
     const { toolTip, children } = this.props;
     const child = (children == null) ? this.makeDefaultChild() : children;
 
@@ -36,7 +42,7 @@ export default class CustomTooltip extends Component<Props> {
     );
   }
 
-  makeDefaultChild = (): Node => {
+  makeDefaultChild: (() => Node) = () => {
     return (
       <span className={styles.infoIcon}>
         <InfoIcon width="14" height="14" />

@@ -13,6 +13,7 @@ import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
 import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
 import { truncateLongName, maxNameLengthBeforeTruncation } from '../../utils/formatters';
 import type { WalletChecksum } from '@emurgo/cip4-js';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   standardWallet: {
@@ -58,11 +59,11 @@ function constructPlate(
 @observer
 export default class NavPlate extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { plate, walletName, walletType } = this.props;
     const { intl } = this.context;
 

@@ -10,7 +10,7 @@ type Props = {|
 
 @observer
 export default class LegacyTransferLayout extends Component<Props> {
-  render() {
+  render(): Node {
     const { children } = this.props;
     return (
       <div className={styles.component}>

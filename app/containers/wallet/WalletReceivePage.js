@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed, observable, runInAction } from 'mobx';
@@ -27,6 +28,7 @@ import { asHasUtxoChains } from '../../api/ada/lib/storage/models/PublicDeriver/
 import type { StandardAddress, } from '../../stores/base/AddressesStore';
 import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
 import type { GeneratedData as UnmangleTxDialogContainerData } from '../transfer/UnmangleTxDialogContainer';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 export type GeneratedData = typeof WalletReceivePage.prototype.generated;
 
@@ -37,7 +39,7 @@ type Props = {|
 @observer
 export default class WalletReceivePage extends Component<Props> {
 
-  static contextTypes = { intl: intlShape.isRequired };
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = { intl: intlShape.isRequired };
 
   @observable notificationElementId: string = '';
 
@@ -69,7 +71,7 @@ export default class WalletReceivePage extends Component<Props> {
     }
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const actions = this.generated.actions;
     const { uiNotifications, uiDialogs, profile } = this.generated.stores;
@@ -282,7 +284,7 @@ export default class WalletReceivePage extends Component<Props> {
     actions.dialogs.open.trigger({ dialog: VerifyAddressDialog });
   }
 
-  openURIGenerateDialog = (address: string, amount?: number): void => {
+  openURIGenerateDialog: ((address: string, amount?: number) => void) = (address, amount) => {
     const { actions } = this.generated;
     actions.dialogs.open.trigger({
       dialog: URIGenerateDialog,

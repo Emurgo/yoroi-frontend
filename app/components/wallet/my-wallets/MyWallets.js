@@ -12,7 +12,7 @@ type Props = {|
 @observer
 export default class MyWallets extends Component<Props> {
 
-  render() {
+  render(): Node {
     const { children } = this.props;
 
     return (

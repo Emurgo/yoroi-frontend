@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import styles from './ReceiveNavButton.scss';
@@ -14,12 +15,12 @@ type Props = {|
 
 @observer
 export default class ReceiveNavButton extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|className: void, icon: void|} = {
     className: undefined,
     icon: undefined,
   };
 
-  render() {
+  render(): Node {
     const { isActive, onClick, className, label } = this.props;
 
     const componentClasses = classnames([

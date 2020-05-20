@@ -1,0 +1,23 @@
+@mixin unordered-donot-list() {
+  li::before {
+    content: '               '; // Hair Space (U+200A)
+    margin-right:0.4em;
+    font-size:0.8em;
+    background-image: url(../../../assets/images/transaction/deny-ic.inline.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+
+  li {
+    font-family: var(--font-regular);
+    display: list-item;
+    margin-left: 12px;
+    line-height: 1.38;
+    font-size: 14px;
+    color: var(--cmn-default-color-grey);
+
+    & + li {
+      margin-top: 8px;
+    }
+  }
+}

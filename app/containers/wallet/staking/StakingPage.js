@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
@@ -13,6 +14,7 @@ import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
 
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 export type GeneratedData = typeof StakingPage.prototype.generated;
 
@@ -38,7 +40,7 @@ declare var chrome;
 
 @observer
 export default class StakingPage extends Component<Props> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
@@ -105,7 +107,7 @@ export default class StakingPage extends Component<Props> {
     return finalURL;
   }
 
-  render() {
+  render(): Node {
     const { stores } = this.generated;
     const { intl } = this.context;
 

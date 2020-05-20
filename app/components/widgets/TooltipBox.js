@@ -7,6 +7,7 @@ import styles from './TooltipBox.scss';
 import globalMessages from '../../i18n/global-messages';
 import WarningIcon from '../../assets/images/attention-modern.inline.svg';
 import CloseCross from '../../assets/images/small-cross.inline.svg';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
   +children: ?Node,
@@ -15,11 +16,11 @@ type Props = {|
 
 @observer
 export default class TooltipBox extends Component<Props> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const { children } = this.props;
     return (

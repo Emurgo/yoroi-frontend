@@ -1,6 +1,7 @@
 // @flow
 
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 
 import EmptyIllustration from '../../assets/images/dashboard/empty-dashboard.inline.svg';
@@ -13,7 +14,7 @@ type Props = {|
 
 @observer
 export default class InformativeError extends Component<Props> {
-  render() {
+  render(): Node {
     return (
       <div className={styles.wrapper}>
         <EmptyIllustration />

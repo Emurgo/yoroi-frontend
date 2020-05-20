@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import styles from './PageSelect.scss';
@@ -14,7 +15,7 @@ type Props = {|
 
 @observer
 export default class PageSelect extends Component<Props> {
-  render() {
+  render(): Node {
     const leftIsEnabled = this.props.currentPage <= 0
       ? styles.disabled
       : styles.enabled;

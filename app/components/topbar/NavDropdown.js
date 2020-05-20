@@ -19,12 +19,12 @@ type State = {|
 
 @observer
 export default class NavDropdown extends Component<Props, State> {
-  static defaultProps = {
+  static defaultProps: {|contentComponents: void, headerComponent: void|} = {
     headerComponent: undefined,
     contentComponents: undefined,
   };
 
-  state = {
+  state: State = {
     isExpanded: false,
   };
 
@@ -39,7 +39,7 @@ export default class NavDropdown extends Component<Props, State> {
     this.setState(prevState => ({ isExpanded: !prevState.isExpanded }));
   }
 
-  render() {
+  render(): Node {
     const {
       headerComponent,
       contentComponents,

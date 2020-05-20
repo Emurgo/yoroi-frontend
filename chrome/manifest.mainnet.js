@@ -10,7 +10,7 @@ import {
   genCSP,
 } from './constants';
 
-export default (isDebug: boolean) => buildManifest({
+export default (isDebug: boolean): * => buildManifest({
   description: 'A simple, secure and fast Cardano ADA wallet.',
   defaultTitle: 'Yoroi',
   titleOverride: true,

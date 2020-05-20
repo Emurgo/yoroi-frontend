@@ -1,5 +1,6 @@
 // @flow
 
+import type { Node } from 'react';
 import React from 'react';
 import BigNumber from 'bignumber.js';
 
@@ -189,7 +190,7 @@ const genBaseProps: {|
   }
 });
 
-export const UserInput = () => {
+export const UserInput = (): Node => {
   const wallet = genSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
   return wrapWallet(
@@ -206,7 +207,7 @@ export const UserInput = () => {
   );
 };
 
-export const MemoDialog = () => {
+export const MemoDialog = (): Node => {
   const wallet = genSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
   return wrapWallet(
@@ -224,7 +225,7 @@ export const MemoDialog = () => {
   );
 };
 
-export const MemoExpanded = () => {
+export const MemoExpanded = (): Node => {
   const wallet = genSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
   return wrapWallet(
@@ -242,7 +243,7 @@ export const MemoExpanded = () => {
   );
 };
 
-export const RegularConfirmationDialog = () => {
+export const RegularConfirmationDialog = (): Node => {
   const wallet = genSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
 
@@ -288,7 +289,7 @@ export const RegularConfirmationDialog = () => {
   );
 };
 
-export const LedgerConfirmationDialog = () => {
+export const LedgerConfirmationDialog = (): Node => {
   const wallet = genSigningWalletWithCache(ConceptualWalletId => ({
     ConceptualWalletId,
     ...mockLedgerMeta
@@ -339,7 +340,7 @@ export const LedgerConfirmationDialog = () => {
   );
 };
 
-export const TrezorConfirmationDialog = () => {
+export const TrezorConfirmationDialog = (): Node => {
   const wallet = genSigningWalletWithCache(ConceptualWalletId => ({
     ConceptualWalletId,
     ...mockTrezorMeta

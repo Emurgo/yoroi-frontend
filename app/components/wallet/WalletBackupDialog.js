@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import WalletBackupPrivacyWarningDialog from './backup-recovery/WalletBackupPrivacyWarningDialog';
@@ -42,7 +43,7 @@ type Props = {|
 @observer
 export default class WalletBackupDialog extends Component<Props> {
 
-  render() {
+  render(): Node {
     const {
       currentStep, onCancelBackup,
       canPhraseBeShown, isPrivacyNoticeAccepted,

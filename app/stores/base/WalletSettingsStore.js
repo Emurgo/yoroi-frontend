@@ -1,5 +1,6 @@
 // @flow
 import { observable, action } from 'mobx';
+import type { Node } from 'react';
 import { find, } from 'lodash';
 import type { AssuranceMode, } from '../../types/transactionAssuranceTypes';
 import {
@@ -21,6 +22,11 @@ export type ConceptualWalletSettingsCache = {|
   conceptualWallet: ConceptualWallet,
   // todo: maybe should be a Request instead of just the result data
   conceptualWalletName: string,
+|};
+
+export type WarningList = {|
+  publicDeriver: PublicDeriver<>,
+  dialogs: Array<void => Node>,
 |};
 
 export default class WalletSettingsStore extends Store {
@@ -48,6 +54,16 @@ export default class WalletSettingsStore extends Store {
     throw new Error(`${nameof(WalletSettingsStore)}::${nameof(this.conceptualWalletSettingsCache)} no settings in cache`);
   }
 
+  @observable walletWarnings: Array<WarningList> = [];
+  getWalletWarnings: PublicDeriver<> => WarningList = (
+    publicDeriver
+  ) => {
+    const foundRequest = find(this.walletWarnings, { publicDeriver });
+    if (foundRequest) return foundRequest;
+
+    throw new Error(`${nameof(WalletSettingsStore)}::${nameof(this.getWalletWarnings)} no warning list found`);
+  }
+
   @action _startEditingWalletField: {| field: string |} => void = (
     { field }
   ) => {
@@ -65,5 +81,4 @@ export default class WalletSettingsStore extends Store {
     this.lastUpdatedWalletField = null;
     this.walletFieldBeingEdited = null;
   };
-
 }

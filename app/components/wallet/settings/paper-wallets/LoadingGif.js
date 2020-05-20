@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import styles from './LoadingGif.scss';
 
@@ -24,12 +25,12 @@ type State = {|
 
 @observer
 export default class LoadingGif extends Component<{||}, State> {
-  state = {
+  state: State = {
     isLoaded: false,
     image: document.createElement('img'),
   };
 
-  componentDidMount() {
+  componentDidMount(): void {
     const loadingImg = getBgUrl(document.getElementsByClassName(styles.component)[0]);
     this.setState(prevState => {
       prevState.image.src = loadingImg;
@@ -40,13 +41,13 @@ export default class LoadingGif extends Component<{||}, State> {
     });
   }
 
-  componentWillUnmount() {
+  componentWillUnmount(): void {
     this.setState(prevState => {
       prevState.image.onload = null;
     });
   }
 
-  render() {
+  render(): Node {
     return (
       <div className={styles.component}>
         {!this.state.isLoaded && <div className={styles.spinner} />}

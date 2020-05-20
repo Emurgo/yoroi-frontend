@@ -32,12 +32,12 @@ import type {
   SignTransactionResponse as LedgerSignTxResponse,
   Witness
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { toDerivationPathString } from 'yoroi-extension-ledger-connect-handler';
+import { toDerivationPathString } from '@emurgo/ledger-connect-handler';
 import type {
-  $CardanoSignTransaction,
+  CardanoSignTransaction,
   CardanoInput,
   CardanoOutput,
-} from 'trezor-connect/lib/types/cardano';
+} from 'trezor-connect/lib/types/networks/cardano';
 import type {
   Address, Value, Addressing,
 } from '../../lib/storage/models/PublicDeriver/interfaces';
@@ -53,7 +53,7 @@ declare var CONFIG: ConfigType;
 export async function createTrezorSignTxPayload(
   signRequest: BaseSignRequest<RustModule.WalletV2.Transaction>,
   getTxsBodiesForUTXOs: TxBodiesFunc,
-): Promise<$CardanoSignTransaction> {
+): Promise<$Exact<CardanoSignTransaction>> {
   const txJson = signRequest.unsignedTx.to_json();
 
   const utxoMap = utxosToLookupMap(

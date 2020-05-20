@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import type { Element } from 'react';
+import type { Element, Node } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 
@@ -27,11 +27,15 @@ type Props = {|
 @observer
 export default class ProgressSteps extends Component<Props> {
 
-  createSteps = (
+  createSteps: ((
     stepsList: Array<string>,
-    currentStep : number,
-    stepState: StepStateEnum,
-  ): Array<Element<any>> => {
+    currentStep: number,
+    stepState: StepStateEnum
+  ) => Array<Element<any>>) = (
+    stepsList,
+    currentStep,
+    stepState,
+  ) => {
     const { classicTheme } = this.props;
     const steps = [];
 
@@ -90,7 +94,7 @@ export default class ProgressSteps extends Component<Props> {
     return steps;
   }
 
-  render() {
+  render(): Node {
     const { stepsList, currentStep, stepState } = this.props;
 
     return (

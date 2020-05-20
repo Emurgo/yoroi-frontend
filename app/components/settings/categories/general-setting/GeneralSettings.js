@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import { Select } from 'react-polymorph/lib/components/Select';
@@ -12,6 +13,7 @@ import type { LanguageType } from '../../../../i18n/translations';
 import FlagLabel from '../../../widgets/FlagLabel';
 import { tier1Languages } from '../../../../config/languagesConfig';
 import globalMessages, { listOfTranslators } from '../../../../i18n/global-messages';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
   +languages: Array<LanguageType>,
@@ -23,11 +25,11 @@ type Props = {|
 
 @observer
 export default class GeneralSettings extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|error: void|} = {
     error: undefined
   };
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
@@ -35,7 +37,7 @@ export default class GeneralSettings extends Component<Props> {
     await this.props.onSelectLanguage({ locale });
   };
 
-  form = new ReactToolboxMobxForm({
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       languageId: {
         label: this.context.intl.formatMessage(globalMessages.languageSelectLabel),
@@ -44,7 +46,7 @@ export default class GeneralSettings extends Component<Props> {
     }
   });
 
-  render() {
+  render(): Node {
     const { languages, isSubmitting, error } = this.props;
     const { intl } = this.context;
     const { form } = this;

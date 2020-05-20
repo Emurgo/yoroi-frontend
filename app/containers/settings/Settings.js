@@ -18,6 +18,7 @@ import type { GeneratedData as NavBarContainerData } from '../NavBarContainer';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import SidebarContainer from '../SidebarContainer';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 export type GeneratedData = typeof Settings.prototype.generated;
 
@@ -29,11 +30,11 @@ type Props = {|
 @observer
 export default class Settings extends Component<Props> {
 
-  static defaultProps = {
+  static defaultProps: {|children: void|} = {
     children: undefined,
   };
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
@@ -45,7 +46,7 @@ export default class Settings extends Component<Props> {
     return false;
   };
 
-  render() {
+  render(): Node {
     const { children } = this.props;
     const { actions, stores } = this.generated;
     const { profile } = stores;

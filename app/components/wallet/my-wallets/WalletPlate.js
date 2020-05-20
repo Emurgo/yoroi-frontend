@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 
@@ -29,7 +30,7 @@ function constructPlate(
 @observer
 export default class WalletPlate extends Component<Props> {
 
-  render() {
+  render(): Node {
     const { plate, walletName } = this.props;
 
     const [accountPlateId, iconComponent] = (plate) ?

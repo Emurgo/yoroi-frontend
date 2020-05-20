@@ -1,5 +1,6 @@
 // @flow
 import React, { Component, } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
@@ -9,6 +10,7 @@ import vjf from 'mobx-react-form/lib/validators/VJF';
 import styles from './InlineEditingInput.scss';
 import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   change: {
@@ -46,19 +48,19 @@ type State = {|
 
 @observer
 export default class InlineEditingInput extends Component<Props, State> {
-  static defaultProps = {
+  static defaultProps: {|className: void|} = {
     className: undefined
   };
 
-  state = {
+  state: State = {
     isActive: false,
   };
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  validator = new ReactToolboxMobxForm({
+  validator: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       inputField: {
         value: this.props.inputFieldValue,
@@ -80,7 +82,7 @@ export default class InlineEditingInput extends Component<Props, State> {
     },
   });
 
-  submit = () => {
+  submit: (() => void) = () => {
     this.validator.submit({
       onSuccess: async (form) => {
         const { inputField } = form.values();
@@ -95,7 +97,7 @@ export default class InlineEditingInput extends Component<Props, State> {
     });
   };
 
-  handleInputKeyDown = (event: KeyboardEvent) => {
+  handleInputKeyDown: ((event: KeyboardEvent) => void) = (event: KeyboardEvent) => {
     if (event.which === 13) { // ENTER key
       this.onBlur();
     }
@@ -104,25 +106,25 @@ export default class InlineEditingInput extends Component<Props, State> {
     }
   };
 
-  onFocus = () => {
+  onFocus: (() => void) = () => {
     this.setState({ isActive: true });
     this.props.onStartEditing();
   };
 
-  onBlur = () => {
+  onBlur: (() => void) = () => {
     if (this.state.isActive) {
       this.submit();
     }
   };
 
-  onCancel = () => {
+  onCancel: (() => void) = () => {
     const inputField = this.validator.$('inputField');
     inputField.value = this.props.inputFieldValue;
     this.setState({ isActive: false });
     this.props.onCancelEditing();
   };
 
-  componentDidUpdate() {
+  componentDidUpdate(): void {
     if (this.props.isActive && this.inputField) {
       this.inputField.focus();
     }
@@ -130,7 +132,7 @@ export default class InlineEditingInput extends Component<Props, State> {
 
   inputField: Input;
 
-  render() {
+  render(): Node {
     const { validator } = this;
     const {
       className,

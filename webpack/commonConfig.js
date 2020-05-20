@@ -9,7 +9,7 @@ const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
 const shell = require('shelljs');
 const manifestEnvs = require('../chrome/manifestEnvs');
 
-const plugins = (folder /*: string */, networkName /*: string */) => {
+const plugins = (folder /*: string */, networkName /*: string */) /*: * */ => {
   let pageTitle = '';
   switch (networkName) {
     case 'shelley-dev':
@@ -169,11 +169,10 @@ const node = {
   fs: 'empty'
 };
 
-const resolve = (networkName /*: string */) => ({
+const resolve = (networkName /*: string */) /*: * */ => ({
   extensions: ['*', '.js', '.wasm'],
   alias: (networkName === 'test')
     ? {
-      // todo: make conditional
       'trezor-connect': path.resolve(__dirname, '../features/mock-trezor-connect/'),
     }
     : {},
@@ -183,7 +182,7 @@ const definePlugin = (
   networkName /*: string */,
   isProd /*: boolean */,
   isNightly /*: boolean */
-) => ({
+) /*: * */ => ({
   'process.env': {
     NODE_ENV: JSON.stringify(isProd ? 'production' : 'development'),
     COMMIT: JSON.stringify(shell.exec('git rev-parse HEAD', { silent: true }).trim()),

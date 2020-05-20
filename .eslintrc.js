@@ -70,7 +70,7 @@ module.exports = {
     'no-plusplus': 0,
     'no-bitwise': 0,
     'no-underscore-dangle': 0,
-    'no-console': 0,
+    'no-console': 1,
     'no-mixed-operators': 0,
     'no-multi-assign': 0,
     'no-undef-init': 0, // need this to improve Flow type inference
@@ -101,8 +101,12 @@ module.exports = {
     'no-lone-blocks': 0,
     'max-classes-per-file': 0,
     'no-floating-promise/no-floating-promise': 2,
-    "flowtype/no-primitive-constructor-types": 2,
-    "flowtype/no-dupe-keys": 2,
+    'flowtype/no-primitive-constructor-types': 2,
+    'flowtype/no-dupe-keys': 2,
+    'no-restricted-properties': [
+      2,
+      { object: 'TrezorConnect', message: 'Use TrezorWrapper instead to minimize Trezor iframe lifespan', },
+    ],
   },
   plugins: [
     'import',

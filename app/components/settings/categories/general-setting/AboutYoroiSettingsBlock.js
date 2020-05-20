@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './AboutYoroiSettingsBlock.scss';
 import { observer } from 'mobx-react';
@@ -18,6 +19,7 @@ import LinkButton from '../../../widgets/LinkButton';
 import RawHash from '../../../widgets/hashWrappers/RawHash';
 import ExplorableHash from '../../../widgets/hashWrappers/ExplorableHash';
 import { handleExternalLinkClick } from '../../../../utils/routing';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   aboutYoroiLabel: {
@@ -105,11 +107,11 @@ const baseGithubUrl = 'https://github.com/Emurgo/yoroi-frontend/';
 
 @observer
 export default class AboutYoroiSettingsBlock extends Component<{||}> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
 
     return (

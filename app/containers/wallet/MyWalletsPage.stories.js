@@ -1,5 +1,6 @@
 // @flow
 
+import type { Node } from 'react';
 import React from 'react';
 import BigNumber from 'bignumber.js';
 import { select, } from '@storybook/addon-knobs';
@@ -20,7 +21,7 @@ export default {
   decorators: [withScreenshot],
 };
 
-export const Wallets = () => {
+export const Wallets = (): Node => {
 
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();

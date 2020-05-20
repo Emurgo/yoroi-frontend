@@ -13,6 +13,7 @@ import globalMessages from '../../../../i18n/global-messages';
 
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import Timer from '../../../widgets/Timer';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   title: {
@@ -45,11 +46,11 @@ type Props = {|
 
 @observer
 export default class EpochProgress extends Component<Props> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
 
     return (

@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
@@ -15,12 +16,12 @@ type Props = {|
 @observer
 export default class WalletBackupDialogContainer extends Component<Props> {
 
-  onCancelBackup = () => {
+  onCancelBackup: (() => void) = () => {
     this.props.onClose();
     this.generated.actions.walletBackup.cancelWalletBackup.trigger();
   }
 
-  render() {
+  render(): Node {
     const { actions, stores } = this.generated;
     const {
       recoveryPhraseWords,

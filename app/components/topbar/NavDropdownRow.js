@@ -6,6 +6,7 @@ import { intlShape, } from 'react-intl';
 import classnames from 'classnames';
 import styles from './NavDropdownRow.scss';
 import globalMessages from '../../i18n/global-messages';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
   +title?: string,
@@ -23,11 +24,17 @@ type Props = {|
 @observer
 export default class NavDropdownRow extends Component<Props> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  static defaultProps = {
+  static defaultProps: {|
+    isCurrentWallet: boolean,
+    onSelect: void,
+    plateComponent: void,
+    syncTime: void,
+    title: void,
+  |} = {
     title: undefined,
     plateComponent: undefined,
     syncTime: undefined,
@@ -35,7 +42,7 @@ export default class NavDropdownRow extends Component<Props> {
     isCurrentWallet: false,
   }
 
-  render() {
+  render(): Node {
     const { title, plateComponent, detailComponent, syncTime, isCurrentWallet } = this.props;
 
     const { intl } = this.context;

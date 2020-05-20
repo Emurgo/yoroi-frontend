@@ -17,6 +17,7 @@ import type { Notification } from '../../types/notificationType';
 import type {
   BIP32Path
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   generatedAddressesSectionTitle: {
@@ -61,11 +62,11 @@ type State = {|
 
 @observer
 export default class WalletReceive extends Component<Props, State> {
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  state = {
+  state: State = {
     showUsed: true,
   };
 
@@ -73,7 +74,7 @@ export default class WalletReceive extends Component<Props, State> {
     this.setState(prevState => ({ showUsed: !prevState.showUsed }));
   };
 
-  render() {
+  render(): Node {
     const {
       walletAddresses,
       onVerifyAddress, onGeneratePaymentURI,

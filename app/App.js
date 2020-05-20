@@ -37,9 +37,10 @@ type Props = {|
   +actions: ActionsMap,
   +history: Object,
 |};
+
 @observer
 class App extends Component<Props> {
-  render() {
+  render(): Node {
     const { stores, } = this.props;
     const locale = stores.profile.currentLocale;
 
@@ -97,4 +98,4 @@ class App extends Component<Props> {
   }
 }
 
-export default hot(App);
+export default (hot(App): typeof App);

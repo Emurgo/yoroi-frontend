@@ -22,7 +22,7 @@ type Props = {|
 @observer
 export default class WalletSubRow extends Component<Props> {
 
-  render() {
+  render(): Node {
     const {
       walletInfo,
       walletDetails,

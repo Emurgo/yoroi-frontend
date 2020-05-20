@@ -1,5 +1,6 @@
 // @flow
 
+import type { Node } from 'react';
 import React from 'react';
 import BigNumber from 'bignumber.js';
 import { boolean, select, } from '@storybook/addon-knobs';
@@ -42,6 +43,11 @@ import { assuranceModes, } from '../../config/transactionAssuranceConfig';
 import WalletSettingsStore from '../../stores/base/WalletSettingsStore';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { getPriceKey } from '../../api/ada/lib/storage/bridge/prices';
+import { createDebugWalletDialog } from './dialogs/DebugWalletDialogContainer';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import {
+  asGetPublicKey,
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -86,7 +92,7 @@ const actions = {
   },
 };
 
-export const Loading = () => {
+export const Loading = (): Node => {
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();
     return wallet;
@@ -260,7 +266,7 @@ const genPropsForTransactions: {|
   },
 });
 
-export const Transaction = () => {
+export const Transaction = (): Node => {
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();
     return wallet;
@@ -359,7 +365,7 @@ export const Transaction = () => {
   );
 };
 
-export const TransactionWithMemo = () => {
+export const TransactionWithMemo = (): Node => {
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();
     return wallet;
@@ -433,7 +439,7 @@ export const TransactionWithMemo = () => {
   );
 };
 
-export const MemoDialog = () => {
+export const MemoDialog = (): Node => {
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();
     return wallet;
@@ -521,7 +527,7 @@ export const MemoDialog = () => {
   );
 };
 
-export const NoTransactions = () => {
+export const NoTransactions = (): Node => {
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();
     return wallet;
@@ -556,7 +562,7 @@ export const NoTransactions = () => {
   );
 };
 
-export const ManyTransactions = () => {
+export const ManyTransactions = (): Node => {
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();
     return wallet;
@@ -618,7 +624,7 @@ export const ManyTransactions = () => {
   );
 };
 
-export const TxHistoryExport = () => {
+export const TxHistoryExport = (): Node => {
   const genWallet = () => {
     const wallet = genSigningWalletWithCache();
     return wallet;
@@ -678,6 +684,57 @@ export const TxHistoryExport = () => {
             exportError: getErrorValue() === errorCases.None
               ? undefined
               : getErrorValue(),
+          },
+        }),
+        actions,
+      }}
+    />)
+  );
+};
+
+export const DebugWalletWarning = (): Node => {
+  const genWallet = () => {
+    const wallet = genSigningWalletWithCache();
+    return wallet;
+  };
+  const wallet = genWallet();
+  const lookup = walletLookup([wallet]);
+
+  const getPlate: PublicDeriver<> => string = (publicDeriver) => {
+    const withPubKey = asGetPublicKey(publicDeriver);
+    if (withPubKey == null) throw new Error('No checksum found for storybook wallet');
+    return lookup.getPublicKeyCache(withPubKey).plate.TextPart;
+  };
+
+  const transactions = [];
+  return wrapWallet(
+    mockWalletProps({
+      location: getRoute(wallet.publicDeriver.getPublicDeriverId()),
+      selected: wallet.publicDeriver,
+      getWalletWarnings: (publicDeriver) => ({
+        publicDeriver,
+        dialogs: publicDeriver === wallet.publicDeriver
+          ? [createDebugWalletDialog(
+            getPlate(wallet.publicDeriver),
+            action('close DebugWalletDialog'),
+            { generated: Object.freeze({}) },
+          )]
+          : [],
+      }),
+      ...lookup,
+    }),
+    (<WalletSummaryPage
+      generated={{
+        stores: genPropsForTransactions({
+          wallet,
+          getPublicDeriverSettingsCache: lookup.getPublicDeriverSettingsCache,
+          transactions,
+          lastSyncInfo: {
+            LastSyncInfoId: 1,
+            Time: null,
+            SlotNum: null,
+            BlockHash: null,
+            Height: 0,
           },
         }),
         actions,

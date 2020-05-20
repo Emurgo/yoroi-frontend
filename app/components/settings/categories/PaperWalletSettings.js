@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
@@ -12,8 +13,8 @@ import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './PaperWalletSettings.scss';
 import ReactMarkdown from 'react-markdown';
-import type { Node } from 'react';
 import { CheckboxOwnSkin } from '../../../themes/skins/CheckboxOwnSkin';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   numAddressesSelectLabel: {
@@ -44,15 +45,15 @@ type Props = {|
 
 @observer
 export default class PaperWalletSettings extends Component<Props> {
-  static defaultProps = {
+  static defaultProps: {|error: void|} = {
     error: undefined
   };
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  createPaper = () => {
+  createPaper: (() => void) = () => {
     const { numAddresses, printPaperWalletIdentification } = this.form.values();
     this.props.onCreatePaper({
       numAddresses: parseInt(numAddresses, 10),
@@ -60,7 +61,7 @@ export default class PaperWalletSettings extends Component<Props> {
     });
   };
 
-  form = new ReactToolboxMobxForm({
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       numAddresses: {
         label: this.context.intl.formatMessage(messages.numAddressesSelectLabel),
@@ -73,11 +74,13 @@ export default class PaperWalletSettings extends Component<Props> {
     }
   });
 
-  setPrintPaperIdentification = (printPaperWalletIdentification: boolean) => {
+  setPrintPaperIdentification: ((
+    printPaperWalletIdentification: boolean
+  ) => void) = (printPaperWalletIdentification) => {
     this.form.$('printPaperWalletIdentification').value = printPaperWalletIdentification;
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const { error, isDialogOpen, dialog, paperWalletsIntroText } = this.props;
     const numAddresses = this.form.$('numAddresses');

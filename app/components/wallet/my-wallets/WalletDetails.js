@@ -10,6 +10,7 @@ import { splitAmount } from '../../../utils/formatters';
 import styles from './WalletDetails.scss';
 import IconEyeOpen from '../../../assets/images/my-wallets/icon_eye_open.inline.svg';
 import IconEyeClosed from '../../../assets/images/my-wallets/icon_eye_closed.inline.svg';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
     +onUpdateHideBalance: void => Promise<void>,
@@ -27,15 +28,15 @@ type Props = {|
 @observer
 export default class WalletDetails extends Component<Props> {
 
-  static defaultProps = {
+  static defaultProps: {|infoText: void|} = {
     infoText: undefined,
   };
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const {
       shouldHideBalance,

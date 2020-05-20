@@ -11,7 +11,7 @@ import {
   genCSP,
 } from './constants';
 
-export default (isDebug: boolean) => buildManifest({
+export default (isDebug: boolean): * => buildManifest({
   description: '[localhost] Cardano ADA wallet',
   defaultTitle: '[localhost] Yoroi',
   contentSecurityPolicy: genCSP({

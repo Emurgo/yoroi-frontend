@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
@@ -25,15 +26,15 @@ type Props = {|
 @observer
 export default class WalletLedgerConnectDialogContainer extends Component<Props> {
 
-  cancel = () => {
+  cancel: (() => void) = () => {
     this.props.onClose();
-    this._getHWConnectActions().cancel.trigger();
+    this.generated.actions[environment.API].ledgerConnect.cancel.trigger();
   };
 
-  render() {
+  render(): null | Node {
     const { profile } = this.generated.stores;
     const ledgerConnectStore = this._getLedgerConnectStore();
-    const hwConnectActions = this._getHWConnectActions();
+    const hwConnectActions = this.generated.actions[environment.API].ledgerConnect;
 
     let component = null;
 
@@ -88,11 +89,6 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
   /** Returns the store which is responsible for this Container */
   _getLedgerConnectStore() {
     return this.generated.stores.substores[environment.API].ledgerConnect;
-  }
-
-  /** Returns the action which is responsible for this Container */
-  _getHWConnectActions() {
-    return this.generated.actions[environment.API].ledgerConnect;
   }
 
   @computed get generated() {

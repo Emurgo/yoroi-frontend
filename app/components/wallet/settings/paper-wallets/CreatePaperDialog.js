@@ -10,6 +10,7 @@ import globalMessages from '../../../../i18n/global-messages';
 import styles from './CreatePaperDialog.scss';
 import { PdfGenSteps } from '../../../../api/ada/paperWallet/paperWalletPdf';
 import type { PdfGenStepType } from '../../../../api/ada/paperWallet/paperWalletPdf';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   dialogTitleCreatePaperWallet: {
@@ -67,16 +68,16 @@ type Props = {|
 @observer
 export default class CreatePaperDialog extends Component<Props> {
 
-  static formatBytes = (bytes: number): string => {
+  static formatBytes: ((bytes: number) => string) = (bytes) => {
     const mb = (bytes / 1024) / 1024;
     return mb.toFixed(2);
   };
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  handleDataChange = (key: string, value: string) => {
+  handleDataChange: ((key: string, value: string) => void) = (key, value) => {
     this.props.onDataChange({ [key]: value });
   };
 
@@ -102,7 +103,7 @@ export default class CreatePaperDialog extends Component<Props> {
     }
   }
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const {
       onNext,

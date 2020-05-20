@@ -33,6 +33,7 @@ import {
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 // Hardware Wallet Confirmation
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
@@ -72,7 +73,7 @@ export type GeneratedData = typeof WalletSendPage.prototype.generated;
 @observer
 export default class WalletSendPage extends Component<InjectedOrGenerated<GeneratedData>> {
 
-  static contextTypes = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
@@ -89,7 +90,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     this.showMemo = !this.showMemo;
   };
 
-  render() {
+  render(): Node {
     const { transactions, transactionBuilderStore } = this.generated.stores.substores.ada;
     const publicDeriver = this.generated.stores.wallets.selected;
     // Guard against potential null values
@@ -163,7 +164,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     );
   }
 
-  renderDialog = (): Node => {
+  renderDialog: (() => Node) = () => {
     const { uiDialogs } = this.generated.stores;
 
     if (uiDialogs.isOpen(WalletSendConfirmationDialog)) {
@@ -180,7 +181,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
 
   /** Web Wallet Send Confirmation dialog
     * Callback that creates a container to avoid the component knowing about actions/stores */
-  webWalletDoConfirmation = (): Node => {
+  webWalletDoConfirmation: (() => Node) = () => {
     const { intl } = this.context;
 
     const { transactionBuilderStore } = this.generated.stores.substores.ada;
@@ -209,7 +210,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
   /** Hardware Wallet (Trezor or Ledger) Confirmation dialog
     * Callback that creates a component to avoid the component knowing about actions/stores
     * separate container is not needed, this container acts as container for Confirmation dialog */
-  hardwareWalletDoConfirmation = (): Node => {
+  hardwareWalletDoConfirmation: (() => Node) = () => {
     const { intl } = this.context;
     const publicDeriver = this.generated.stores.wallets.selected;
     const { transactionBuilderStore } = this.generated.stores.substores.ada;

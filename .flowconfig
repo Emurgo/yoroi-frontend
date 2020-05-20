@@ -1,23 +1,22 @@
 [ignore]
 .*/node_modules/fbjs/.*
-.*/node_modules/electron-packager/.*
 .*/node_modules/npm/.*
-.*/node_modules/oboe/.*
-.*/dist/.*
 .*/release/.*
 .*/.git/.*
 .*/.vscode/.*
 .*/.circleci/.*
+<PROJECT_ROOT>/dev/.*
+<PROJECT_ROOT>/build/.*
 
 [include]
 ../node_modules/eslint-plugin-jsx-a11y
 
 [untyped]
 .*/node_modules/trezor-connect/lib/utils/networkUtils.js
-.*/node_modules/trezor-connect/lib/index.js
+.*/node_modules/trezor-connect/lib/env/browser/index.js
+.*/node_modules/trezor-connect/lib/popup/PopupManager.js
 .*/node_modules/react-polymorph/source/components/HOC/withTheme.js
 .*/node_modules/react-polymorph/source/components/layout/Flex.js
-.*/node_modules/@ledgerhq/hw-transport/lib/Transport.js.flow
 
 [libs]
 flow/declarations/
@@ -27,10 +26,14 @@ sketchy-null=warn
 sketchy-number=warn
 unnecessary-optional-chain=warn
 ambiguous-object-type=error
+unnecessary-invariant=warn
+deprecated-utility=error
+unsafe-addition=error
 # re-enable this if it's ever shipped as part of Flow
 # no-floating-promises=warn
 
 [options]
+well_formed_exports=false
 include_warnings=true
 server.max_workers=1
 esproposal.class_static_fields=enable

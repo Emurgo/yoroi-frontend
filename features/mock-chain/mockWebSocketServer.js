@@ -8,7 +8,7 @@ const toMessage = JSON.stringify;
 
 let wss = null;
 
-export function getMockWebSocketServer(server: any) {
+export function getMockWebSocketServer(server: any): WebSocket.Server {
   if (!wss) {
     wss = new WebSocket.Server({ server });
   }
