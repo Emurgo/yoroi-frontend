@@ -70,7 +70,7 @@
   "global.errors.invalidWalletName": "Portemonneenaam moet minimaal 1 en maximaal 40 letters bevatten.",
   "global.errors.invalidWalletPassword": "Het betaalwachtwoord moet uit minstens 10 karakters bestaan.",
   "global.labael.undelegate": "Delegeren ongedaan maken",
-  "global.label.addToAddressbook": "Add to address book",
+  "global.label.addToAddressbook": "Toevoegen aan het adresboek",
   "global.label.allow": "Toestaan",
   "global.labels.LearnMore": "Leer meer",
   "global.labels.addMemo": "Voeg memo toe",
