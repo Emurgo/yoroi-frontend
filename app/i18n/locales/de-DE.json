@@ -70,7 +70,7 @@
   "global.errors.invalidWalletName": "Der Wallet-Name muss aus mindestens 1 und maximal 40 Zeichen bestehen.",
   "global.errors.invalidWalletPassword": "Das Ausgabe-Kennwort muss mindestens 10 Zeichen lang sein.",
   "global.labael.undelegate": "Undelegieren",
-  "global.label.addToAddressbook": "Add to address book",
+  "global.label.addToAddressbook": "Zum Adressbuch hinzufügen",
   "global.label.allow": "Erlauben",
   "global.labels.LearnMore": "Erfahre mehr",
   "global.labels.addMemo": "Notiz hinzufügen",
