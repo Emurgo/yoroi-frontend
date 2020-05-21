@@ -70,7 +70,7 @@
   "global.errors.invalidWalletName": "La longueur du nom d'un wallet doit être comprise entre 1 et 40 caractères.",
   "global.errors.invalidWalletPassword": "Le mot de passe de dépense requiert au moins 10 caractères.",
   "global.labael.undelegate": "Ne plus déléguer",
-  "global.label.addToAddressbook": "Add to address book",
+  "global.label.addToAddressbook": "Ajouter au carnet d'adresses",
   "global.label.allow": "Permettre",
   "global.labels.LearnMore": "En savoir plus",
   "global.labels.addMemo": "Ajouter un mémo",
