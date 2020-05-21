@@ -70,7 +70,7 @@
   "global.errors.invalidWalletName": "El nombre de la billetera requiere un mínimo de 1 letra, y máximo de 40 letras.",
   "global.errors.invalidWalletPassword": "La contraseña de gastos requiere al menos 10 caracteres.",
   "global.labael.undelegate": "Des-delegar",
-  "global.label.addToAddressbook": "Add to address book",
+  "global.label.addToAddressbook": "Añadir a la libreta de direcciones",
   "global.label.allow": "Permitir",
   "global.labels.LearnMore": "Aprende más",
   "global.labels.addMemo": "Añadir memo",
