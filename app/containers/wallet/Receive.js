@@ -5,6 +5,8 @@ import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import ReceiveWithNavigation from '../../components/wallet/layouts/ReceiveWithNavigation';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import type { AddressTypeName } from '../../stores/base/AddressesStore';
 
 export type GeneratedData = typeof Receive.prototype.generated;
 
@@ -26,15 +28,7 @@ export default class Receive extends Component<Props> {
     const { addresses } = this.generated.stores.substores.ada;
     return (
       <ReceiveWithNavigation
-        isActiveTab={(tab) => addresses.isActiveTab(
-          tab,
-          publicDeriver
-        )}
-        onTabClick={(page) => addresses.handleTabClick(
-          page,
-          publicDeriver
-        )}
-        showMangled={addresses.mangledAddressesForDisplay.hasAny}
+        addressTypes={addresses.getStoresForWallet(publicDeriver)}
       >
         {this.props.children}
       </ReceiveWithNavigation>
@@ -57,10 +51,21 @@ export default class Receive extends Component<Props> {
         substores: {
           ada: {
             addresses: {
-              isActiveTab: stores.substores.ada.addresses.isActiveTab,
-              handleTabClick: stores.substores.ada.addresses.handleTabClick,
-              mangledAddressesForDisplay: {
-                hasAny: stores.substores.ada.addresses.mangledAddressesForDisplay.hasAny,
+              getStoresForWallet: (publicDeriver: PublicDeriver<>) => {
+                const substore = stores.substores.ada;
+                const addressStores = substore.addresses.getStoresForWallet(publicDeriver);
+                const functionalitySubset: Array<{|
+                  +isActiveStore: boolean,
+                  +isHidden: boolean,
+                  +setAsActiveStore: void => void,
+                  +name: AddressTypeName,
+                |}> = addressStores.map(addressStore => ({
+                  isHidden: addressStore.isHidden,
+                  isActiveStore: addressStore.isActiveStore,
+                  setAsActiveStore: () => addressStore.setAsActiveStore(publicDeriver),
+                  name: addressStore.name,
+                }));
+                return functionalitySubset;
               },
             },
           },

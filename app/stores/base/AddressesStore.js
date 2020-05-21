@@ -15,13 +15,14 @@ import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
-  asGetAllUtxos, asHasUtxoChains, asDisplayCutoff, asGetStakingKey,
+  asGetAllUtxos, asHasUtxoChains, asDisplayCutoff, asGetStakingKey, asHasLevels,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   IHasUtxoChainsRequest,
   Address, Addressing, UsedStatus, Value,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { StoresMap } from '../index';
+import type { ActionsMap } from '../../actions';
 import {
   Logger,
 } from '../../utils/logging';
@@ -29,6 +30,7 @@ import { ROUTES } from '../../routes-config';
 import { buildRoute } from '../../utils/routing';
 import { ChainDerivations } from '../../config/numbersConfig';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
+import { Bip44DerivationLevels } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import {
   filterAddressesByStakingKey,
   unwrapStakingKey,
@@ -38,21 +40,40 @@ import type {
   ConfigType,
 } from '../../../config/config-types';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
+import { Cip1852Wallet } from '../../api/ada/lib/storage/models/Cip1852Wallet/wrapper';
+import globalMessages, { addressTypes } from '../../i18n/global-messages';
+import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
+import {
+  ConceptualWallet
+} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 
 declare var CONFIG : ConfigType;
 
-const RECEIVE_ROUTES = {
-  internal: ROUTES.WALLETS.RECEIVE.INTERNAL,
-  external: ROUTES.WALLETS.RECEIVE.EXTERNAL,
-  mangled: ROUTES.WALLETS.RECEIVE.MANGLED
-};
+export const AddressStoreTypes = Object.freeze({
+  all: 'all',
+  internal: 'internal',
+  external: 'external',
+  mangled: 'mangled',
+});
+export type AddressStoreKind = $Values<typeof AddressStoreTypes>;
 
 export type StandardAddress = {|
-  ...Address, ...Value, ...Addressing, ...UsedStatus
+  ...Address,
+  ...InexactSubset<Value>,
+  ...InexactSubset<Addressing>,
+  ...InexactSubset<UsedStatus>,
 |};
 
-type SubRequestType<T> = {| publicDeriver: PublicDeriver<> |} => Promise<Array<T>>;
-export class AddressTypeStore<T> {
+type SubRequestType<+T> = {|
+  publicDeriver: PublicDeriver<>,
+|} => Promise<$ReadOnlyArray<$ReadOnly<T>>>;
+
+export type AddressTypeName = {|
+  stable: AddressStoreKind, // constant name that doesn't change with language selected
+  display: $Exact<$npm$ReactIntl$MessageDescriptor>,
+|};
+
+export class AddressTypeStore<T: StandardAddress> {
 
   @observable addressesRequests: Array<{|
     publicDeriver: PublicDeriver<>,
@@ -60,16 +81,54 @@ export class AddressTypeStore<T> {
   |}> = [];
 
   stores: StoresMap;
+  actions: ActionsMap;
   request: SubRequestType<T>;
-  constructor(
+  name: AddressTypeName;
+  route: string;
+  shouldHide: (PublicDeriver<>, AddressTypeStore<T>) => boolean;
+  constructor(data: {|
     stores: StoresMap,
+    actions: ActionsMap,
     request: SubRequestType<T>,
-  ) {
-    this.stores = stores;
-    this.request = request;
+    name: AddressTypeName,
+    route: string,
+    shouldHide: (PublicDeriver<>, AddressTypeStore<T>) => boolean,
+  |}) {
+    this.stores = data.stores;
+    this.actions = data.actions;
+    this.request = data.request;
+    this.name = data.name;
+    this.route = data.route;
+    this.shouldHide = data.shouldHide;
   }
 
-  @computed get all(): Array<T> {
+  @computed get isActiveStore(): boolean {
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) return false;
+    const { app } = this.stores;
+    const screenRoute = buildRoute(
+      this.route,
+      {
+        id: publicDeriver.getPublicDeriverId(),
+      }
+    );
+    return app.currentRoute === screenRoute;
+  }
+
+  setAsActiveStore: (PublicDeriver<>) => void = (publicDeriver) => {
+    this.actions.router.goToRoute.trigger({
+      route: this.route,
+      params: { id: publicDeriver.getPublicDeriverId() },
+    });
+  };
+
+  @computed get isHidden(): boolean {
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) return true;
+    return this.shouldHide(publicDeriver, this);
+  }
+
+  @computed get all(): $ReadOnlyArray<$ReadOnly<T>> {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return [];
     const result = this._flowCoerceResult(this._getRequest(publicDeriver));
@@ -84,7 +143,7 @@ export class AddressTypeStore<T> {
     return result ? result.length > 0 : false;
   }
 
-  @computed get last(): ?T {
+  @computed get last(): ?$ReadOnly<T> {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return;
     const result = this._flowCoerceResult(this._getRequest(publicDeriver));
@@ -113,9 +172,11 @@ export class AddressTypeStore<T> {
     await allRequest.execute({ publicDeriver }).promise;
   };
 
-  _flowCoerceResult: CachedRequest<SubRequestType<T>> => ?Array<T> = (request) => {
+  _flowCoerceResult: (
+    CachedRequest<SubRequestType<T>>
+  ) => ?$ReadOnlyArray<$ReadOnly<T>> = (request) => {
     // Flow fails when resolving types so this is the best we can check
-    (request.result: ?Array<any>);
+    (request.result: ?$ReadOnlyArray<$ReadOnly<any>>);
     return (request.result: any);
   }
 
@@ -138,10 +199,7 @@ export class AddressTypeStore<T> {
 }
 
 export default class AddressesStore extends Store {
-
-  /** warning: do NOT use this if public deriver level < Account */
   allAddressesForDisplay: AddressTypeStore<StandardAddress>;
-
   mangledAddressesForDisplay: AddressTypeStore<StandardAddress>;
   externalForDisplay: AddressTypeStore<StandardAddress>;
   internalForDisplay: AddressTypeStore<StandardAddress>;
@@ -157,31 +215,78 @@ export default class AddressesStore extends Store {
     actions.createAddress.listen(this._createAddress);
     actions.resetErrors.listen(this._resetErrors);
 
-    this.allAddressesForDisplay = new AddressTypeStore(
-      this.stores,
-      (request) => this._wrapForAllAddresses({ ...request, invertFilter: false })
-    );
-    this.mangledAddressesForDisplay = new AddressTypeStore(
-      this.stores,
-      (request) => this._wrapForAllAddresses({ ...request, invertFilter: true })
-    );
-    this.externalForDisplay = new AddressTypeStore(
-      this.stores,
-      async (request) => this._createAddressIfNeeded({
+    this.allAddressesForDisplay = new AddressTypeStore({
+      stores: this.stores,
+      actions: this.actions,
+      request: (request) => this._wrapForAllAddresses({ ...request, invertFilter: false }),
+      name: {
+        stable: AddressStoreTypes.all,
+        display: globalMessages.addressesLabel
+      },
+      route: ROUTES.WALLETS.RECEIVE.ROOT,
+      shouldHide: (publicDeriver, _store) => {
+        const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
+        if (withLevels == null) return true;
+        const parent = withLevels.getParent();
+        if (!(parent instanceof Bip44Wallet || parent instanceof Cip1852Wallet)) {
+          return false;
+        }
+        // don't show this if public deriver level < Account
+        return parent.getPublicDeriverLevel() > Bip44DerivationLevels.ACCOUNT.level;
+      },
+    });
+    this.mangledAddressesForDisplay = new AddressTypeStore({
+      stores: this.stores,
+      actions: this.actions,
+      request: (request) => this._wrapForAllAddresses({ ...request, invertFilter: true }),
+      name: {
+        stable: AddressStoreTypes.mangled,
+        display: addressTypes.mangledLabel,
+      },
+      route: ROUTES.WALLETS.RECEIVE.MANGLED,
+      shouldHide: (_publicDeriver, store) => !store.hasAny,
+    });
+    this.externalForDisplay = new AddressTypeStore({
+      stores: this.stores,
+      actions: this.actions,
+      request: async (request) => this._createAddressIfNeeded({
         publicDeriver: request.publicDeriver,
         genAddresses: () => this._wrapForChainAddresses({
           ...request,
           chainsRequest: { chainId: ChainDerivations.EXTERNAL },
         }),
-      })
-    );
-    this.internalForDisplay = new AddressTypeStore(
-      this.stores,
-      (request) => this._wrapForChainAddresses({
+      }),
+      name: {
+        stable: AddressStoreTypes.external,
+        display: addressTypes.externalTab,
+      },
+      route: ROUTES.WALLETS.RECEIVE.EXTERNAL,
+      shouldHide: (_publicDeriver, store) => !store.hasAny,
+    });
+    this.internalForDisplay = new AddressTypeStore({
+      stores: this.stores,
+      actions: this.actions,
+      request: (request) => this._wrapForChainAddresses({
         ...request,
         chainsRequest: { chainId: ChainDerivations.INTERNAL },
-      })
-    );
+      }),
+      name: {
+        stable: AddressStoreTypes.internal,
+        display: addressTypes.internalLabel,
+      },
+      route: ROUTES.WALLETS.RECEIVE.INTERNAL,
+      shouldHide: (_publicDeriver, store) => !store.hasAny,
+    });
+  }
+
+  getStoresForWallet: (
+    PublicDeriver<>
+  ) => Array<AddressTypeStore<StandardAddress>> = (_publicDeriver) => {
+    return [
+      this.externalForDisplay,
+      this.internalForDisplay,
+      this.mangledAddressesForDisplay,
+    ];
   }
 
   _createAddress: PublicDeriver<> => Promise<void> = async (
@@ -248,7 +353,7 @@ export default class AddressesStore extends Store {
   _wrapForAllAddresses: {|
     publicDeriver: PublicDeriver<>,
     invertFilter: boolean,
-  |} => Promise<Array<StandardAddress>> = async (request) => {
+  |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
     const withUtxos = asGetAllUtxos(request.publicDeriver);
     if (withUtxos == null) {
       Logger.error(`${nameof(this._wrapForAllAddresses)} incorrect public deriver`);
@@ -272,7 +377,7 @@ export default class AddressesStore extends Store {
   _wrapForChainAddresses: {|
     publicDeriver: PublicDeriver<>,
     chainsRequest: IHasUtxoChainsRequest,
-  |}=> Promise<Array<StandardAddress>> = async (request) => {
+  |}=> Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
     const withHasUtxoChains = asHasUtxoChains(
       request.publicDeriver
     );
@@ -297,39 +402,18 @@ export default class AddressesStore extends Store {
 
   _createAddressIfNeeded: {|
     publicDeriver: PublicDeriver<>,
-    genAddresses: () => Promise<Array<StandardAddress>>,
-  |} => Promise<Array<StandardAddress>> = async (request) => {
+    genAddresses: () => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>>,
+  |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
     const addresses = await request.genAddresses();
     const last = addresses[addresses.length - 1];
     if (last == null) return addresses;
 
-    if (last.isUsed) {
+    if (last.isUsed === true) {
       await this._baseCreateAddress(request.publicDeriver);
       return request.genAddresses(); // refresh after creating new address
     }
     return addresses;
   }
-
-  isActiveTab: ($Keys<typeof RECEIVE_ROUTES>, PublicDeriver<>) => boolean = (
-    tab, publicDeriver,
-  ) => {
-    const { app } = this.stores;
-    const screenRoute = buildRoute(
-      RECEIVE_ROUTES[tab],
-      {
-        id: publicDeriver.getPublicDeriverId(),
-        tab
-      }
-    );
-    return app.currentRoute === screenRoute;
-  };
-
-  handleTabClick: (string, PublicDeriver<>) => void = (page, publicDeriver) => {
-    this.actions.router.goToRoute.trigger({
-      route: RECEIVE_ROUTES[page],
-      params: { id: publicDeriver.getPublicDeriverId(), page },
-    });
-  };
 
   getUnmangleAmounts: void => {|
     canUnmangle: Array<BigNumber>,
@@ -372,9 +456,9 @@ export default class AddressesStore extends Store {
 
 async function filterMangledAddresses(request: {|
   publicDeriver: PublicDeriver<>,
-  baseAddresses: Array<StandardAddress>,
+  baseAddresses: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   invertFilter: boolean,
-|}): Promise<Array<StandardAddress>> {
+|}): Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> {
   const withStakingKey = asGetStakingKey(request.publicDeriver);
   if (withStakingKey == null) {
     if (request.invertFilter) return [];
