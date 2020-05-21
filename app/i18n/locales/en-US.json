@@ -238,7 +238,7 @@
   "settings.paperWallet.numAddressesSelect.label": "Number of addresses",
   "settings.paperWallet.printIdentificationCheckbox.description": "Enabling this will help you verify your wallet at the moment of restoration, but it will also **forfeit plausible deniability**.",
   "settings.paperWallet.printIdentificationCheckbox.label": "Print Paper Wallet account checksum",
-  "settings.support.faq.blogLinkUrl": "https://emurgo.io/#/en/blog/yoroi-custom-themes",
+  "settings.support.faq.blogLinkUrl": "https://emurgo.io/en/blog/yoroi-custom-themes",
   "settings.support.faq.blogLinkWrapper": "blog post",
   "settings.support.faq.content": "If you are experiencing issues, please see the {faqLink} for guidance on known issues.",
   "settings.support.faq.faqLink": "FAQ on Yoroi website",

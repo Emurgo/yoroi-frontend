@@ -43,7 +43,7 @@ const messages = defineMessages({
   },
   blogLinkUrl: {
     id: 'settings.support.faq.blogLinkUrl',
-    defaultMessage: '!!!https://emurgo.io/#/en/blog/yoroi-custom-themes',
+    defaultMessage: '!!!https://emurgo.io/en/blog/yoroi-custom-themes',
   },
   blogLinkWrapper: {
     id: 'settings.support.faq.blogLinkWrapper',
