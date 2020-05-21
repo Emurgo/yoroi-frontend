@@ -435,7 +435,7 @@
   "wallet.dashboard.upcomingRewards.title": "獲得予定の報酬",
   "wallet.dashboard.warning.pendingTx": "保留中のトランザクションが完了するとステーキングダッシュボードの情報が更新されます",
   "wallet.debugwallet.explanation1": "選択されたウォレット({checksumTextPart})はテスト・デバッグ用です。",
-  "wallet.debugwallet.explanation2": "このウォレットを使用すると問題が発生する可能性があります。<br />変わりに、新規のウォレットを作成しお使いください。",
+  "wallet.debugwallet.explanation2": "このウォレットを使用すると問題が発生する可能性があります。<br />代わりに、新規のウォレットを作成しお使いください。",
   "wallet.debugwallet.explanation3": "このメッセージを予期していない場合は{contactSupportLink}。",
   "wallet.delegation.transaction.approximationLabel": "エポックごとの獲得報酬額（現時点での見積額とします）:",
   "wallet.delegation.transaction.explanationLine1": "一度に委任できるステークプールは1つだけです",
