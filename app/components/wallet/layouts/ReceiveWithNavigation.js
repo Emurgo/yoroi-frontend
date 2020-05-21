@@ -4,12 +4,16 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import ReceiveNavigation from '../navigation/ReceiveNavigation';
 import styles from './ReceiveWithNavigation.scss';
+import type { AddressTypeName } from '../../../stores/base/AddressesStore';
 
-type Props = {|
+export type Props = {|
   +children?: Node,
-  +isActiveTab: ('internal' | 'external' | 'mangled') => boolean,
-  +onTabClick: string => void,
-  +showMangled: boolean,
+  +addressTypes: Array<{|
+    +isActiveStore: boolean,
+    +isHidden: boolean,
+    +setAsActiveStore: void => void,
+    +name: AddressTypeName,
+  |}>;
 |};
 
 @observer
@@ -19,14 +23,12 @@ export default class ReceiveWithNavigation extends Component<Props> {
   };
 
   render(): Node {
-    const { children, isActiveTab, onTabClick } = this.props;
+    const { children, addressTypes } = this.props;
     return (
       <div className={styles.component}>
         <div className={styles.navigation}>
           <ReceiveNavigation
-            isActiveTab={isActiveTab}
-            onTabClick={onTabClick}
-            showMangled={this.props.showMangled}
+            addressTypes={addressTypes}
           />
         </div>
         <div className={styles.page}>

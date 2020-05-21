@@ -48,6 +48,7 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import {
   asGetPublicKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { addressTypes } from '../../i18n/global-messages';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -136,6 +137,9 @@ export const Loading = (): Node => {
           },
           substores: {
             ada: {
+              addresses: {
+                getStoresForWallet: (_publicDeriver) => [],
+              },
               walletSettings: {
                 getPublicDeriverSettingsCache: lookup.getPublicDeriverSettingsCache,
               },
@@ -232,6 +236,24 @@ const genPropsForTransactions: {|
   },
   substores: {
     ada: {
+      addresses: {
+        getStoresForWallet: (_publicDeriver) => [
+          {
+            route: 'external',
+            displayName: addressTypes.externalTab,
+            all: [{
+              address: 'Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf',
+            }],
+          },
+          {
+            route: 'internal',
+            displayName: addressTypes.internalLabel,
+            all: [{
+              address: 'Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM',
+            }],
+          },
+        ],
+      },
       walletSettings: {
         getPublicDeriverSettingsCache: request.getPublicDeriverSettingsCache,
       },
@@ -324,7 +346,10 @@ export const Transaction = (): Node => {
     date: new Date(0),
     addresses: {
       from: ['Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf'],
-      to: ['Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM'],
+      to: [
+        'Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM',
+        'DdzFFzCqrhseVmPAqenKdENxL5Fp7DW82CF6wk8SnWoCiUDFfVfqD6cHFCFgv1ySmFhpPod3hYqzuRFs48BbT6QR9rk9bYMdgodBXFny',
+      ],
     },
     certificate,
     state,

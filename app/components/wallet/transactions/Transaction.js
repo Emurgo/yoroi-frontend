@@ -6,6 +6,7 @@ import BigNumber from 'bignumber.js';
 import { defineMessages, intlShape } from 'react-intl';
 import type {
   $npm$ReactIntl$IntlFormat,
+  $npm$ReactIntl$MessageDescriptor,
 } from 'react-intl';
 import moment from 'moment';
 import classnames from 'classnames';
@@ -158,6 +159,10 @@ type Props = {|
   +onAddMemo: WalletTransaction => void,
   +onEditMemo: WalletTransaction => void,
   +unitOfAccount: void | $ReadOnly<PriceDataRow>,
+  +addressLookup: string => void | {|
+    goToRoute: void => void,
+    displayName: $Exact<$npm$ReactIntl$MessageDescriptor>,
+  |},
 |};
 
 type State = {|
@@ -395,36 +400,42 @@ export default class Transaction extends Component<Props, State> {
                 {intl.formatMessage(messages.fromAddresses)}
               </h2>
               {uniq(data.addresses.from).map(address => (
-                <ExplorableHashContainer
-                  key={`${data.txid}-from-${address}`}
-                  selectedExplorer={this.props.selectedExplorer}
-                  hash={addressToDisplayString(address)}
-                  light
-                  linkType="address"
-                >
-                  <span className={classnames([styles.rowData, styles.hash])}>
-                    {addressToDisplayString(address)}<br />
-                  </span>
-                </ExplorableHashContainer>
+                <div key={`${data.txid}-from-${address}`}>
+                  <ExplorableHashContainer
+                    key={`${data.txid}-from-${address}`}
+                    selectedExplorer={this.props.selectedExplorer}
+                    hash={addressToDisplayString(address)}
+                    light
+                    linkType="address"
+                  >
+                    <span className={classnames([styles.rowData, styles.hash])}>
+                      {addressToDisplayString(address)}<br />
+                    </span>
+                  </ExplorableHashContainer>
+                  {this.generateAddressButton(address)}
+                </div>
               ))}
               <h2>
                 {intl.formatMessage(messages.toAddresses)}
               </h2>
               {data.addresses.to.map((address, addressIndex) => (
-                <ExplorableHashContainer
-                  // eslint-disable-next-line react/no-array-index-key
+                <div // eslint-disable-next-line react/no-array-index-key
                   key={`${data.txid}-to-${address}-${addressIndex}`}
-                  selectedExplorer={this.props.selectedExplorer}
-                  hash={addressToDisplayString(address)}
-                  light
-                  linkType="address"
                 >
-                  <span className={classnames([styles.rowData, styles.hash])}>
-                    {addressToDisplayString(address)}<br />
-                  </span>
-                </ExplorableHashContainer>
+                  <ExplorableHashContainer
+                    selectedExplorer={this.props.selectedExplorer}
+                    hash={addressToDisplayString(address)}
+                    light
+                    linkType="address"
+                  >
+                    <span className={classnames([styles.rowData, styles.hash])}>
+                      {addressToDisplayString(address)}<br />
+                    </span>
+                  </ExplorableHashContainer>
+                  {this.generateAddressButton(address)}
+                </div>
               ))}
-              {this.getCerificate(data)}
+              {this.getCertificate(data)}
 
               {(
                 environment.isAdaApi() &&
@@ -504,6 +515,27 @@ export default class Transaction extends Component<Props, State> {
     );
   }
 
+  generateAddressButton: string => ?Node = (address) => {
+    if (environment.isProduction()) return undefined;
+
+    const { intl } = this.context;
+    const addressInfo = this.props.addressLookup(
+      addressToDisplayString(address)
+    );
+    if (addressInfo != null) {
+      return (
+        <button type="button" onClick={addressInfo.goToRoute}>
+          {intl.formatMessage(addressInfo.displayName)}
+        </button>
+      );
+    }
+    return (
+      <button type="button" onClick={() => {} /* todo: link to address book */}>
+        {intl.formatMessage(globalMessages.addToAddressbookLabel)}
+      </button>
+    );
+  }
+
   certificateToText: $ReadOnly<CertificateRow> => string = (certificate) => {
     const { intl } = this.context;
     const kind = certificate.Kind;
@@ -524,7 +556,7 @@ export default class Transaction extends Component<Props, State> {
     }
   }
 
-  getCerificate: WalletTransaction => Node = (data) => {
+  getCertificate: WalletTransaction => Node = (data) => {
     const { intl } = this.context;
     if (data.certificate == null) {
       return (null);

@@ -89,7 +89,6 @@ export default class WalletTransaction {
       ...UserAnnotation,
     |},
     addressLookupMap: Map<number, string>,
-    lastBlockNumber: null | number,
   |}): WalletTransaction {
     const { addressLookupMap, tx } = request;
 

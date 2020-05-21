@@ -20,7 +20,7 @@ import globalMessages from '../../../i18n/global-messages';
 import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
 import type { PriceDataRow } from '../../../api/ada/lib/storage/database/prices/tables';
 import { getPriceKey } from '../../../api/ada/lib/storage/bridge/prices';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor, } from 'react-intl';
 
 const messages = defineMessages({
   showMoreTransactionsButtonLabel: {
@@ -45,6 +45,10 @@ type Props = {|
   +onAddMemo: WalletTransaction => void,
   +onEditMemo: WalletTransaction => void,
   +unitOfAccountSetting: UnitOfAccountSettingType,
+  +addressLookup: string => void | {|
+    goToRoute: void => void,
+    displayName: $Exact<$npm$ReactIntl$MessageDescriptor>,
+  |},
 |};
 
 @observer
@@ -175,6 +179,7 @@ export default class WalletTransactionsList extends Component<Props> {
                   onAddMemo={onAddMemo}
                   onEditMemo={onEditMemo}
                   shouldHideBalance={this.props.shouldHideBalance}
+                  addressLookup={this.props.addressLookup}
                 />
               ))}
             </div>

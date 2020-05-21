@@ -505,14 +505,6 @@ const globalMessages: * = defineMessages({
     id: 'wallet.staking.pool.unknownLabel',
     defaultMessage: '!!!Unknown pool',
   },
-  internalLabel: {
-    id: 'wallet.receive.nav.internal',
-    defaultMessage: '!!!Internal',
-  },
-  mangledLabel: {
-    id: 'wallet.receive.nav.mangled',
-    defaultMessage: '!!!Mangled',
-  },
   sidebarWallets: {
     id: 'sidebar.wallets',
     defaultMessage: '!!!My wallets',
@@ -561,6 +553,10 @@ const globalMessages: * = defineMessages({
     id: 'yoroiTransfer.start.instructions.yoroiPaper',
     defaultMessage: '!!!Yoroi paper wallet',
   },
+  addToAddressbookLabel: {
+    id: 'global.label.addToAddressbook',
+    defaultMessage: '!!!Add to address book',
+  },
 });
 export default globalMessages;
 
@@ -584,6 +580,21 @@ export const memoMessages: * = defineMessages({
   optionalMemo: {
     id: 'global.labels.optionalMemo',
     defaultMessage: '!!!Memo (optional)',
+  },
+});
+
+export const addressTypes: * = defineMessages({
+  externalTab: {
+    id: 'wallet.receive.nav.external',
+    defaultMessage: '!!!External',
+  },
+  internalLabel: {
+    id: 'wallet.receive.nav.internal',
+    defaultMessage: '!!!Internal',
+  },
+  mangledLabel: {
+    id: 'wallet.receive.nav.mangled',
+    defaultMessage: '!!!Mangled',
   },
 });
 

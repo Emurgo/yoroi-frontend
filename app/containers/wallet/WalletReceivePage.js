@@ -25,10 +25,13 @@ import {
 import globalMessages from '../../i18n/global-messages';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { asHasUtxoChains } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import type { StandardAddress, } from '../../stores/base/AddressesStore';
+import type { StandardAddress, AddressStoreKind, } from '../../stores/base/AddressesStore';
 import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
 import type { GeneratedData as UnmangleTxDialogContainerData } from '../transfer/UnmangleTxDialogContainer';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type {
+  BIP32Path
+} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 export type GeneratedData = typeof WalletReceivePage.prototype.generated;
 
@@ -102,7 +105,7 @@ export default class WalletReceivePage extends Component<Props> {
     // get info about the latest address generated for special rendering
     const lastAddress = addressTypeStore.last;
     const walletAddress = lastAddress != null ? lastAddress.address : '';
-    const isWalletAddressUsed = lastAddress != null ? lastAddress.isUsed : false;
+    const isWalletAddressUsed = lastAddress != null ? lastAddress.isUsed === true : false;
 
     const walletAddresses = addressTypeStore.all.slice().reverse();
 
@@ -131,9 +134,10 @@ export default class WalletReceivePage extends Component<Props> {
       this.notificationElementId
     );
 
+    const addressStores = addresses.getStoresForWallet(publicDeriver);
     const { canUnmangle } = this.generated.stores.substores.ada.addresses.getUnmangleAmounts();
     const header = (() => {
-      if (addresses.isActiveTab('external', publicDeriver)) {
+      if (addressStores.some(store => store.stableName === 'external' && store.isActiveStore)) {
         return (<StandardHeader
           walletAddress={walletAddress}
           selectedExplorer={this.generated.stores.profile.selectedExplorer}
@@ -145,10 +149,10 @@ export default class WalletReceivePage extends Component<Props> {
           error={addresses.error}
         />);
       }
-      if (addresses.isActiveTab('internal', publicDeriver)) {
+      if (addressStores.some(store => store.stableName === 'internal' && store.isActiveStore)) {
         return (<InternalHeader />);
       }
-      if (addresses.isActiveTab('mangled', publicDeriver)) {
+      if (addressStores.some(store => store.stableName === 'mangled' && store.isActiveStore)) {
         return (
           <MangledHeader
             hasMangledUtxo={canUnmangle.length > 0}
@@ -157,6 +161,18 @@ export default class WalletReceivePage extends Component<Props> {
             })}
           />
         );
+      }
+      if (addressStores.some(store => store.stableName === 'all' && store.isActiveStore)) {
+        return (<StandardHeader
+          walletAddress={walletAddress}
+          selectedExplorer={this.generated.stores.profile.selectedExplorer}
+          isWalletAddressUsed={isWalletAddressUsed}
+          onGenerateAddress={this.handleGenerateAddress}
+          onCopyAddressTooltip={onCopyAddressTooltip}
+          notification={notification}
+          isSubmitting={addresses.createAddressRequest.isExecuting}
+          error={addresses.error}
+        />);
       }
       throw new Error(`${nameof(WalletReceivePage)} unexpected address tab`);
     })();
@@ -169,11 +185,13 @@ export default class WalletReceivePage extends Component<Props> {
           walletAddresses={walletAddresses}
           onCopyAddressTooltip={onCopyAddressTooltip}
           notification={notification}
-          onVerifyAddress={async ({ address, path }) => {
-            await actions.ada.hwVerifyAddress.selectAddress.trigger({ address, path });
+          onVerifyAddress={async (request: {| address: string, path: void | BIP32Path, |}) => {
+            await actions.ada.hwVerifyAddress.selectAddress.trigger(request);
             this.openVerifyAddressDialog();
           }}
-          onGeneratePaymentURI={!addresses.isActiveTab('external', publicDeriver)
+          onGeneratePaymentURI={!addressStores.some(store => (
+            (store.stableName === 'external' || store.stableName === 'all') && store.isActiveStore
+          ))
             ? undefined
             : (address) => {
               this.openURIGenerateDialog(address);
@@ -257,24 +275,23 @@ export default class WalletReceivePage extends Component<Props> {
     );
   }
 
-  getTypeStore: PublicDeriver<> => {|
-    all: Array<StandardAddress>,
-    hasAny: boolean,
-    last: ?StandardAddress,
-    totalAvailable: number,
-    wasExecuted: boolean,
-  |} = (
+  getTypeStore: PublicDeriver<> => {
+    +all: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
+    +hasAny: boolean,
+    +last: ?$ReadOnly<StandardAddress>,
+    +totalAvailable: number,
+    +wasExecuted: boolean,
+    ...,
+  } = (
     publicDeriver
   ) => {
     const { addresses } = this.generated.stores.substores.ada;
-    if (addresses.isActiveTab('external', publicDeriver)) {
-      return addresses.externalForDisplay();
-    }
-    if (addresses.isActiveTab('internal', publicDeriver)) {
-      return addresses.internalForDisplay();
-    }
-    if (addresses.isActiveTab('mangled', publicDeriver)) {
-      return addresses.mangledAddressesForDisplay();
+    const addressStores = addresses.getStoresForWallet(publicDeriver);
+
+    for (const addressStore of addressStores) {
+      if (addressStore.isActiveStore) {
+        return addressStore;
+      }
     }
     throw new Error(`${nameof(WalletReceivePage)} unexpected address tab`);
   }
@@ -330,32 +347,32 @@ export default class WalletReceivePage extends Component<Props> {
           ada: {
             addresses: {
               getUnmangleAmounts: adaStore.addresses.getUnmangleAmounts,
-              isActiveTab: adaStore.addresses.isActiveTab,
+              getStoresForWallet: (publicDeriver: PublicDeriver<>) => {
+                const substore = stores.substores.ada;
+                const addressStores = substore.addresses.getStoresForWallet(publicDeriver);
+                const functionalitySubset: Array<{|
+                  +isActiveStore: boolean,
+                  +stableName: AddressStoreKind,
+                  +all: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
+                  +hasAny: boolean,
+                  +last: ?$ReadOnly<StandardAddress>,
+                  +totalAvailable: number,
+                  +wasExecuted: boolean,
+                |}> = addressStores.map(addressStore => ({
+                  isActiveStore: addressStore.isActiveStore,
+                  stableName: addressStore.name.stable,
+                  all: addressStore.all,
+                  hasAny: addressStore.hasAny,
+                  last: addressStore.last,
+                  totalAvailable: addressStore.totalAvailable,
+                  wasExecuted: addressStore.wasExecuted,
+                }));
+                return functionalitySubset;
+              },
               createAddressRequest: {
                 isExecuting: adaStore.addresses.createAddressRequest.isExecuting,
               },
               error: adaStore.addresses.error,
-              externalForDisplay: () => ({
-                all: adaStore.addresses.externalForDisplay.all,
-                hasAny: adaStore.addresses.externalForDisplay.hasAny,
-                last: adaStore.addresses.externalForDisplay.last,
-                totalAvailable: adaStore.addresses.externalForDisplay.totalAvailable,
-                wasExecuted: adaStore.addresses.externalForDisplay.wasExecuted,
-              }),
-              internalForDisplay: () => ({
-                all: adaStore.addresses.internalForDisplay.all,
-                hasAny: adaStore.addresses.internalForDisplay.hasAny,
-                last: adaStore.addresses.internalForDisplay.last,
-                totalAvailable: adaStore.addresses.internalForDisplay.totalAvailable,
-                wasExecuted: adaStore.addresses.internalForDisplay.wasExecuted,
-              }),
-              mangledAddressesForDisplay: () => ({
-                all: adaStore.addresses.mangledAddressesForDisplay.all,
-                hasAny: adaStore.addresses.mangledAddressesForDisplay.hasAny,
-                last: adaStore.addresses.mangledAddressesForDisplay.last,
-                totalAvailable: adaStore.addresses.mangledAddressesForDisplay.totalAvailable,
-                wasExecuted: adaStore.addresses.mangledAddressesForDisplay.wasExecuted,
-              }),
             },
             hwVerifyAddress: {
               selectedAddress: adaStore.hwVerifyAddress.selectedAddress,
