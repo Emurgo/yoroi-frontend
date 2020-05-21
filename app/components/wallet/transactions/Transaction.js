@@ -34,6 +34,7 @@ import type { CertificateRow } from '../../../api/ada/lib/storage/database/primi
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { splitAmount } from '../../../utils/formatters';
 import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
+import CopyableAddress from '../../widgets/CopyableAddress';
 
 const messages = defineMessages({
   type: {
@@ -412,12 +413,15 @@ export default class Transaction extends Component<Props, State> {
                       {intl.formatMessage(messages.fromAddresses)}:
                       <span className={styles.addressCount}>{uniq(data.addresses.from).length}</span>
                     </h2>
-                    <h2>{intl.formatMessage(messages.addressType)}</h2>
-                    <h2>{intl.formatMessage(globalMessages.amountLabel)}</h2>
+                    {/* <h2>{intl.formatMessage(messages.addressType)}</h2> */}
+                    <h2>Address Type</h2>
+                    <h2 className={styles.amount}>
+                      {intl.formatMessage(globalMessages.amountLabel)}
+                    </h2>
                   </div>
                   <div className={styles.addressList}>
                     {uniq(data.addresses.from).map(address => (
-                      <div key={`${data.txid}-from-${address}`}>
+                      <div key={`${data.txid}-from-${address}`} className={styles.addressItem}>
                         <ExplorableHashContainer
                           key={`${data.txid}-from-${address}`}
                           selectedExplorer={this.props.selectedExplorer}
@@ -429,7 +433,12 @@ export default class Transaction extends Component<Props, State> {
                             {this.truncateString(addressToDisplayString(address))}
                           </div>
                         </ExplorableHashContainer>
-                        {this.generateAddressButton(address)}
+                        <div>
+                          {this.generateAddressButton(address)}
+                        </div>
+                        <div className={styles.fee}>
+                          1231203129390120 ADA{/*to do*/}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -440,13 +449,17 @@ export default class Transaction extends Component<Props, State> {
                       {intl.formatMessage(messages.toAddresses)}:
                       <span className={styles.addressCount}>{uniq(data.addresses.to).length}</span>
                     </h2>
-                    <h2>{intl.formatMessage(messages.addressType)}</h2>
-                    <h2>{intl.formatMessage(globalMessages.amountLabel)}</h2>
+                    {/* <h2>{intl.formatMessage(messages.addressType)}</h2> */}
+                    <h2>Address Type</h2>
+                    <h2 className={styles.amount}>
+                      {intl.formatMessage(globalMessages.amountLabel)}
+                    </h2>
                   </div>
                   <div className={styles.addressList}>
                     {data.addresses.to.map((address, addressIndex) => (
                       <div // eslint-disable-next-line react/no-array-index-key
                         key={`${data.txid}-to-${address}-${addressIndex}`}
+                        className={styles.addressItem}
                       >
                         <ExplorableHashContainer
                           selectedExplorer={this.props.selectedExplorer}
@@ -458,7 +471,12 @@ export default class Transaction extends Component<Props, State> {
                             {this.truncateString(addressToDisplayString(address))}
                           </div>
                         </ExplorableHashContainer>
-                        {this.generateAddressButton(address)}
+                        <div>
+                          {this.generateAddressButton(address)}
+                        </div>
+                        <div className={styles.fee}>
+                          1231203129390120 ADA{/*to do*/}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -553,7 +571,7 @@ export default class Transaction extends Component<Props, State> {
     );
     if (addressInfo != null) {
       return (
-        <button type="button" onClick={addressInfo.goToRoute}>
+        <button type="button" className={classnames([styles.status, styles.typeAddress])} onClick={addressInfo.goToRoute}>
           {intl.formatMessage(addressInfo.displayName)}
         </button>
       );
@@ -587,6 +605,7 @@ export default class Transaction extends Component<Props, State> {
 
   getCertificate: WalletTransaction => Node = (data) => {
     const { intl } = this.context;
+    console.log({data});
     if (data.certificate == null) {
       return (null);
     }

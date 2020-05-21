@@ -58,6 +58,11 @@
     height: 25px;
     user-select: none;
   }
+  .typeAddress{
+    background: var(--cmn-default-color-grey-5);
+    font-size: 10px;
+    letter-spacing: 0;
+  }
 
   .currency {
     color: var(--theme-transactions-list-text-color);
@@ -226,7 +231,9 @@
       }
     }
     .addressHeader {
-      display: flex;
+      display: grid;
+      grid-gap: 15px;
+      grid-template-columns: 1fr auto 1fr;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 24px;
@@ -239,16 +246,19 @@
       margin-left: 5px;
     }
     .addressList {
-      &>* {
-        display:block;
+      color: var(--theme-transactions-list-detail-row-text-color);
+      font-size: 14px;
+      & > * {
         padding-bottom: 10px;
         margin-top: 14px;
         border-bottom: 1px solid #DEE2EA;
       }
     }
     .addressItem {
-      margin-top: 10px;
-      padding-bottom: 10px;
+      display: grid;
+      grid-gap: 15px;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
     }
     * + h2,
     * + .row {
