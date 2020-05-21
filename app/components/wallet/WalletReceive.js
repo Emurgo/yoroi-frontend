@@ -134,8 +134,8 @@ export default class WalletReceive extends Component<Props, State> {
                 {/* Address Action block start */}
                 <div className={styles.addressActions}>
                   {/* Generate payment URL for Address action */}
-                  {!environment.isShelley() && // disable URI for Shelley testnet
-                    onGeneratePaymentURI != null &&
+                  {/* disable URI for Shelley testnet */}
+                  {!environment.isShelley() && onGeneratePaymentURI != null && (
                     <div className={classnames([
                       styles.addressActionItemBlock,
                       styles.generateURLActionBlock])}
@@ -155,7 +155,7 @@ export default class WalletReceive extends Component<Props, State> {
                         </div>
                       </button>
                     </div>
-                  }
+                  )}
                   {/* Verify Address action */}
                   <div className={classnames([
                     styles.addressActionItemBlock,

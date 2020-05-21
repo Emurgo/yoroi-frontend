@@ -189,7 +189,7 @@ export default class WalletReceivePage extends Component<Props> {
             await actions.ada.hwVerifyAddress.selectAddress.trigger(request);
             this.openVerifyAddressDialog();
           }}
-          onGeneratePaymentURI={addressStores.some(store => (
+          onGeneratePaymentURI={!addressStores.some(store => (
             (store.stableName === 'external' || store.stableName === 'all') && store.isActiveStore
           ))
             ? undefined
