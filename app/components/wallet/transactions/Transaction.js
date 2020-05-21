@@ -413,8 +413,7 @@ export default class Transaction extends Component<Props, State> {
                       {intl.formatMessage(messages.fromAddresses)}:
                       <span className={styles.addressCount}>{uniq(data.addresses.from).length}</span>
                     </h2>
-                    {/* <h2>{intl.formatMessage(messages.addressType)}</h2> */}
-                    <h2>Address Type</h2>
+                    <h2>{intl.formatMessage(messages.addressType)}</h2>
                     <h2 className={styles.amount}>
                       {intl.formatMessage(globalMessages.amountLabel)}
                     </h2>
@@ -437,7 +436,7 @@ export default class Transaction extends Component<Props, State> {
                           {this.generateAddressButton(address)}
                         </div>
                         <div className={styles.fee}>
-                          1231203129390120 ADA{/*to do*/}
+                          - 999,000.000544 ADA{/*to do*/}
                         </div>
                       </div>
                     ))}
@@ -449,8 +448,7 @@ export default class Transaction extends Component<Props, State> {
                       {intl.formatMessage(messages.toAddresses)}:
                       <span className={styles.addressCount}>{uniq(data.addresses.to).length}</span>
                     </h2>
-                    {/* <h2>{intl.formatMessage(messages.addressType)}</h2> */}
-                    <h2>Address Type</h2>
+                    <h2>{intl.formatMessage(messages.addressType)}</h2>
                     <h2 className={styles.amount}>
                       {intl.formatMessage(globalMessages.amountLabel)}
                     </h2>
@@ -475,7 +473,7 @@ export default class Transaction extends Component<Props, State> {
                           {this.generateAddressButton(address)}
                         </div>
                         <div className={styles.fee}>
-                          1231203129390120 ADA{/*to do*/}
+                          - 999,000.000544 ADA{/*to do*/}
                         </div>
                       </div>
                     ))}
