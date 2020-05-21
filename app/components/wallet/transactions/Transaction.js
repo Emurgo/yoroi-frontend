@@ -87,10 +87,6 @@ const messages = defineMessages({
     id: 'wallet.transaction.address.type',
     defaultMessage: '!!!Address Type',
   },
-  amount: {
-    id: 'wallet.transaction.amount',
-    defaultMessage: '!!!Amount',
-  },
   toAddresses: {
     id: 'wallet.transaction.addresses.to',
     defaultMessage: '!!!To addresses',
@@ -412,7 +408,7 @@ export default class Transaction extends Component<Props, State> {
                       <span className={styles.addressCount}>{uniq(data.addresses.from).length}</span>
                     </h2>
                     <h2>{intl.formatMessage(messages.addressType)}</h2>
-                    <h2>{intl.formatMessage(messages.amount)}</h2>
+                    <h2>{intl.formatMessage(globalMessages.amountLabel)}</h2>
                   </div>
                   <div className={styles.addressList}>
                     {uniq(data.addresses.from).map(address => (
@@ -437,7 +433,7 @@ export default class Transaction extends Component<Props, State> {
                       <span className={styles.addressCount}>{uniq(data.addresses.to).length}</span>
                     </h2>
                     <h2>{intl.formatMessage(messages.addressType)}</h2>
-                    <h2>{intl.formatMessage(messages.amount)}</h2>
+                    <h2>{intl.formatMessage(globalMessages.amountLabel)}</h2>
                   </div>
                   <div className={styles.addressList}>
                     {data.addresses.to.map((address, addressIndex) => (
