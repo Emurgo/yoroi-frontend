@@ -83,6 +83,14 @@ const messages = defineMessages({
     id: 'wallet.transaction.address.to',
     defaultMessage: '!!!To address',
   },
+  addressType: {
+    id: 'wallet.transaction.address.type',
+    defaultMessage: '!!!Address Type',
+  },
+  amount: {
+    id: 'wallet.transaction.amount',
+    defaultMessage: '!!!Amount',
+  },
   toAddresses: {
     id: 'wallet.transaction.addresses.to',
     defaultMessage: '!!!To addresses',
@@ -221,6 +229,11 @@ export default class Transaction extends Component<Props, State> {
       return intl.formatMessage(stateTranslations.failed);
     }
     throw new Error(`${nameof(this.getStatusString)} unexpected state ` + state);
+  }
+
+  truncateString(string: string): string {
+    const { length } = string;
+    return length > 20 ? `${string.substring(0, 10)}...${string.substring(length - 10)}` : string;
   }
 
   renderAmountDisplay: {|
@@ -391,39 +404,59 @@ export default class Transaction extends Component<Props, State> {
               </div>
             )}
             <div>
-              <h2>
-                {intl.formatMessage(messages.fromAddresses)}
-              </h2>
-              {uniq(data.addresses.from).map(address => (
-                <ExplorableHashContainer
-                  key={`${data.txid}-from-${address}`}
-                  selectedExplorer={this.props.selectedExplorer}
-                  hash={addressToDisplayString(address)}
-                  light
-                  linkType="address"
-                >
-                  <span className={classnames([styles.rowData, styles.hash])}>
-                    {addressToDisplayString(address)}<br />
-                  </span>
-                </ExplorableHashContainer>
-              ))}
-              <h2>
-                {intl.formatMessage(messages.toAddresses)}
-              </h2>
-              {data.addresses.to.map((address, addressIndex) => (
-                <ExplorableHashContainer
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={`${data.txid}-to-${address}-${addressIndex}`}
-                  selectedExplorer={this.props.selectedExplorer}
-                  hash={addressToDisplayString(address)}
-                  light
-                  linkType="address"
-                >
-                  <span className={classnames([styles.rowData, styles.hash])}>
-                    {addressToDisplayString(address)}<br />
-                  </span>
-                </ExplorableHashContainer>
-              ))}
+              <div className={styles.addressContent}>
+                <div>
+                  <div className={styles.addressHeader}>
+                    <h2>
+                      {intl.formatMessage(messages.fromAddresses)}:
+                      <span className={styles.addressCount}>{uniq(data.addresses.from).length}</span>
+                    </h2>
+                    <h2>{intl.formatMessage(messages.addressType)}</h2>
+                    <h2>{intl.formatMessage(messages.amount)}</h2>
+                  </div>
+                  <div className={styles.addressList}>
+                    {uniq(data.addresses.from).map(address => (
+                      <ExplorableHashContainer
+                        key={`${data.txid}-from-${address}`}
+                        selectedExplorer={this.props.selectedExplorer}
+                        hash={addressToDisplayString(address)}
+                        light
+                        linkType="address"
+                      >
+                        <div className={classnames([styles.rowData, styles.hash])}>
+                          {this.truncateString(addressToDisplayString(address))}
+                        </div>
+                      </ExplorableHashContainer>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <div className={styles.addressHeader}>
+                    <h2>
+                      {intl.formatMessage(messages.toAddresses)}:
+                      <span className={styles.addressCount}>{uniq(data.addresses.to).length}</span>
+                    </h2>
+                    <h2>{intl.formatMessage(messages.addressType)}</h2>
+                    <h2>{intl.formatMessage(messages.amount)}</h2>
+                  </div>
+                  <div className={styles.addressList}>
+                    {data.addresses.to.map((address, addressIndex) => (
+                      <ExplorableHashContainer
+                        // eslint-disable-next-line react/no-array-index-key
+                        key={`${data.txid}-to-${address}-${addressIndex}`}
+                        selectedExplorer={this.props.selectedExplorer}
+                        hash={addressToDisplayString(address)}
+                        light
+                        linkType="address"
+                      >
+                        <div className={classnames([styles.rowData, styles.hash])}>
+                          {this.truncateString(addressToDisplayString(address))}
+                        </div>
+                      </ExplorableHashContainer>
+                    ))}
+                  </div>
+                </div>
+              </div>
               {this.getCerificate(data)}
 
               {(
