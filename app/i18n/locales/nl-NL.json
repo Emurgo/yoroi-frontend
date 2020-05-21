@@ -116,7 +116,7 @@
   "global.uriSchemeTitleLabel": "Cardano betaal URL's",
   "inline.editing.input.cancel.label": "afbreken",
   "inline.editing.input.change.label": "wijzigen",
-  "inline.editing.input.changesSaved": "Uw wijzigingen zijn bewaard",
+  "inline.editing.input.changesSaved": "Uw wijzigingen zijn opgeborgen",
   "loading.screen.error": "Om meer hulp te krijgen kunt u {supportRequestLink}",
   "loading.screen.loading": "Laden van de componenten",
   "maintenance.screen.explanation": "Yoroi is in onderhoud. U kunt de inhoud van uw portemonnee met andere applicaties benaderen.",
