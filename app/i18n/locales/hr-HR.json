@@ -1,8 +1,8 @@
 {
   "api.errors.ApiMethodNotYetImplementedError": "This API method is not yet implemented.",
   "api.errors.GenericApiError": "An error occurred, please try again later.",
-  "api.errors.IncorrectPasswordError": "Incorrect wallet password.",
-  "api.errors.NotEnoughMoneyToSendError": "Not enough ADA to make this transaction.",
+  "api.errors.IncorrectPasswordError": "Neispravna zaporka novčanika.",
+  "api.errors.NotEnoughMoneyToSendError": "Nedovoljno ADA za provedbu transakcije.",
   "api.errors.PromiseNotCalledYetError": "Result accessed before execution finished.",
   "api.errors.ReportRequestError": "There was a problem sending the support request.",
   "api.errors.WalletAlreadyImportedError": "The wallet you are trying to import already exists.",
