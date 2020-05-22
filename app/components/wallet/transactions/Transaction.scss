@@ -217,7 +217,8 @@
       display: flex;
       border-top: 1px solid rgba(173, 174, 182, 0.3);
       border-bottom: 1px solid rgba(173, 174, 182, 0.3);
-      & > * {
+      & > div {
+        flex: 1 1 50%;
         padding-top: 24px;
         margin-bottom: -1px;
         &:first-child{
@@ -232,7 +233,7 @@
     .addressHeader {
       display: grid;
       grid-gap: 15px;
-      grid-template-columns: 1fr auto 1fr;
+      grid-template-columns: minmax(230px,1fr) 1fr 1fr;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 24px;
@@ -256,7 +257,7 @@
     .addressItem {
       display: grid;
       grid-gap: 15px;
-      grid-template-columns: 1fr auto 1fr;
+      grid-template-columns: minmax(230px,1fr) 1fr 1fr;
       align-items: center;
     }
     * + h2,

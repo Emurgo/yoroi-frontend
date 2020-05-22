@@ -21,6 +21,7 @@ import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos
 import type { PriceDataRow } from '../../../api/ada/lib/storage/database/prices/tables';
 import { getPriceKey } from '../../../api/ada/lib/storage/bridge/prices';
 import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor, } from 'react-intl';
+import type { Notification } from '../../../types/notificationType';
 
 const messages = defineMessages({
   showMoreTransactionsButtonLabel: {
@@ -49,6 +50,8 @@ type Props = {|
     goToRoute: void => void,
     displayName: $Exact<$npm$ReactIntl$MessageDescriptor>,
   |},
+  +onCopyAddressTooltip: (string, string) => void,
+  +notification: ?Notification,
 |};
 
 @observer
@@ -125,6 +128,8 @@ export default class WalletTransactionsList extends Component<Props> {
       onLoadMore,
       onAddMemo,
       onEditMemo,
+      notification,
+      onCopyAddressTooltip
     } = this.props;
 
     const buttonClasses = classnames([
@@ -180,6 +185,8 @@ export default class WalletTransactionsList extends Component<Props> {
                   onEditMemo={onEditMemo}
                   shouldHideBalance={this.props.shouldHideBalance}
                   addressLookup={this.props.addressLookup}
+                  notification={notification}
+                  onCopyAddressTooltip={onCopyAddressTooltip}
                 />
               ))}
             </div>

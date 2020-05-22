@@ -35,6 +35,7 @@ import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { splitAmount } from '../../../utils/formatters';
 import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
 import CopyableAddress from '../../widgets/CopyableAddress';
+import type { Notification } from '../../../types/notificationType';
 
 const messages = defineMessages({
   type: {
@@ -168,6 +169,8 @@ type Props = {|
     goToRoute: void => void,
     displayName: $Exact<$npm$ReactIntl$MessageDescriptor>,
   |},
+  +onCopyAddressTooltip: (string, string) => void,
+  +notification: ?Notification,
 |};
 
 type State = {|
@@ -310,6 +313,8 @@ export default class Transaction extends Component<Props, State> {
       assuranceLevel,
       onAddMemo,
       onEditMemo,
+      notification,
+      onCopyAddressTooltip
     } = this.props;
     const { isExpanded } = this.state;
     const { intl } = this.context;
@@ -414,32 +419,46 @@ export default class Transaction extends Component<Props, State> {
                       <span className={styles.addressCount}>{uniq(data.addresses.from).length}</span>
                     </h2>
                     <h2>{intl.formatMessage(messages.addressType)}</h2>
-                    <h2 className={styles.amount}>
+                    <h2 className={styles.fee}>
                       {intl.formatMessage(globalMessages.amountLabel)}
                     </h2>
                   </div>
                   <div className={styles.addressList}>
-                    {uniq(data.addresses.from).map(address => (
-                      <div key={`${data.txid}-from-${address.address}`} className={styles.addressItem}>
-                        <ExplorableHashContainer
-                          key={`${data.txid}-from-${address.address}`}
-                          selectedExplorer={this.props.selectedExplorer}
-                          hash={addressToDisplayString(address.address)}
-                          light
-                          linkType="address"
-                        >
-                          <div className={classnames([styles.rowData, styles.hash])}>
-                            {this.truncateString(addressToDisplayString(address.address))}
+                    {uniq(data.addresses.from).map((address, addressIndex) => {
+
+                      const notificationElementId = `address-${addressIndex}-copyNotification`;
+                      return (
+                        <div key={`${data.txid}-from-${address.address}`} className={styles.addressItem}>
+                          <CopyableAddress
+                            hash={address.address}
+                            elementId={notificationElementId}
+                            onCopyAddress={
+                              () => onCopyAddressTooltip(address.address, notificationElementId)
+                            }
+                            notification={notification}
+                          >
+                            <ExplorableHashContainer
+                              key={`${data.txid}-from-${address.address}`}
+                              selectedExplorer={this.props.selectedExplorer}
+                              hash={addressToDisplayString(address.address)}
+                              light
+                              linkType="address"
+                            >
+                              <span className={classnames([styles.rowData, styles.hash])}>
+                                {this.truncateString(addressToDisplayString(address.address))}
+                              </span>
+                            </ExplorableHashContainer>
+                          </CopyableAddress>
+                          <div>
+                            {this.generateAddressButton(address.address)}
                           </div>
-                        </ExplorableHashContainer>
-                        <div>
-                          {this.generateAddressButton(address.address)}
+                          <div className={styles.fee}>
+                            {this.renderAmountDisplay({ amount: address.value.negated() })} ADA
+                          </div>
                         </div>
-                        <div className={styles.fee}>
-                          {this.renderAmountDisplay({ amount: address.value.negated() })}
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })
+                    }
                   </div>
                 </div>
                 <div>
@@ -449,34 +468,47 @@ export default class Transaction extends Component<Props, State> {
                       <span className={styles.addressCount}>{uniq(data.addresses.to).length}</span>
                     </h2>
                     <h2>{intl.formatMessage(messages.addressType)}</h2>
-                    <h2 className={styles.amount}>
+                    <h2 className={styles.fee}>
                       {intl.formatMessage(globalMessages.amountLabel)}
                     </h2>
                   </div>
                   <div className={styles.addressList}>
-                    {data.addresses.to.map((address, addressIndex) => (
-                      <div // eslint-disable-next-line react/no-array-index-key
-                        key={`${data.txid}-to-${address.address}-${addressIndex}`}
-                        className={styles.addressItem}
-                      >
-                        <ExplorableHashContainer
-                          selectedExplorer={this.props.selectedExplorer}
-                          hash={addressToDisplayString(address.address)}
-                          light
-                          linkType="address"
+                    {data.addresses.to.map((address, addressIndex) => {
+
+                      const notificationElementId = `address-${addressIndex}-copyNotification`;
+                      return (
+                        <div // eslint-disable-next-line react/no-array-index-key
+                          key={`${data.txid}-to-${address.address}-${addressIndex}`}
+                          className={styles.addressItem}
                         >
-                          <div className={classnames([styles.rowData, styles.hash])}>
-                            {this.truncateString(addressToDisplayString(address.address))}
+                          <CopyableAddress
+                            hash={address.address}
+                            elementId={notificationElementId}
+                            onCopyAddress={
+                              () => onCopyAddressTooltip(address.address, notificationElementId)
+                            }
+                            notification={notification}
+                          >
+                            <ExplorableHashContainer
+                              key={`${data.txid}-from-${address.address}`}
+                              selectedExplorer={this.props.selectedExplorer}
+                              hash={addressToDisplayString(address.address)}
+                              light
+                              linkType="address"
+                            >
+                              <span className={classnames([styles.rowData, styles.hash])}>
+                                {this.truncateString(addressToDisplayString(address.address))}
+                              </span>
+                            </ExplorableHashContainer>
+                          </CopyableAddress>
+                          <div>
+                            {this.generateAddressButton(address.address)}
                           </div>
-                        </ExplorableHashContainer>
-                        <div>
-                          {this.generateAddressButton(address.address)}
-                        </div>
-                        <div className={styles.fee}>
-                          {this.renderAmountDisplay({ amount: address.value })}
-                        </div>
-                      </div>
-                    ))}
+                          <div className={styles.fee}>
+                            {this.renderAmountDisplay({ amount: address.value })} ADA
+                          </div>
+                        </div>);
+                    })}
                   </div>
                 </div>
               </div>
