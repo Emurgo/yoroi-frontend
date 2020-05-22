@@ -603,7 +603,6 @@ export default class Transaction extends Component<Props, State> {
 
   getCertificate: WalletTransaction => Node = (data) => {
     const { intl } = this.context;
-    console.log({data});
     if (data.certificate == null) {
       return (null);
     }

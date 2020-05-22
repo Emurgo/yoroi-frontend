@@ -219,7 +219,7 @@
       border-bottom: 1px solid rgba(173, 174, 182, 0.3);
       & > * {
         padding-top: 24px;
-        padding-bottom: 24px;
+        margin-bottom: -1px;
         &:first-child{
           padding-right: 24px;
         }
