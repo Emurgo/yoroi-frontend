@@ -18,7 +18,16 @@ import type {
   TxStatusCodesType,
 } from '../api/ada/lib/storage/database/primitives/enums';
 
-export type TransactionAddresses = {| from: Array<string>, to: Array<string> |};
+export type TransactionAddresses = {|
+  from: Array<{|
+    address: string,
+    value: BigNumber,
+  |}>,
+  to: Array<{|
+    address: string,
+    value: BigNumber,
+  |}>,
+|};
 
 export default class WalletTransaction {
 
@@ -93,13 +102,19 @@ export default class WalletTransaction {
     const { addressLookupMap, tx } = request;
 
     const toAddr = rows => {
-      const result  = [];
+      const result: Array<{|
+        address: string,
+        value: BigNumber,
+      |}> = [];
       for (const row of rows) {
         const val = addressLookupMap.get(row.AddressId);
         if (val == null) {
           throw new Error(`${nameof(WalletTransaction.fromAnnotatedTx)} address not in map`);
         }
-        result.push(val);
+        result.push({
+          address: val,
+          value: new BigNumber(row.Amount).dividedBy(LOVELACES_PER_ADA),
+        });
       }
       return result;
     };

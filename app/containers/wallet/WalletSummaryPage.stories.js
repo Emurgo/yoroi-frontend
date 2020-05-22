@@ -345,10 +345,19 @@ export const Transaction = (): Node => {
     fee: new BigNumber(5),
     date: new Date(0),
     addresses: {
-      from: ['Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf'],
+      from: [{
+        address: 'Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf',
+        value: new BigNumber(1010),
+      }],
       to: [
-        'Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM',
-        'DdzFFzCqrhseVmPAqenKdENxL5Fp7DW82CF6wk8SnWoCiUDFfVfqD6cHFCFgv1ySmFhpPod3hYqzuRFs48BbT6QR9rk9bYMdgodBXFny',
+        {
+          address: 'Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM',
+          value: new BigNumber(5),
+        },
+        {
+          address: 'DdzFFzCqrhseVmPAqenKdENxL5Fp7DW82CF6wk8SnWoCiUDFfVfqD6cHFCFgv1ySmFhpPod3hYqzuRFs48BbT6QR9rk9bYMdgodBXFny',
+          value: new BigNumber(1000),
+        },
       ],
     },
     certificate,
@@ -417,8 +426,14 @@ export const TransactionWithMemo = (): Node => {
     fee: new BigNumber(5),
     date: new Date(0),
     addresses: {
-      from: ['Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf'],
-      to: ['Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM'],
+      from: [{
+        address: 'Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf',
+        value: new BigNumber(1005),
+      }],
+      to: [{
+        address: 'Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM',
+        value: new BigNumber(1000),
+      }],
     },
     certificate: undefined,
     state: TxStatusCodes.IN_BLOCK,
@@ -491,8 +506,14 @@ export const MemoDialog = (): Node => {
     fee: new BigNumber(5),
     date: new Date(0),
     addresses: {
-      from: ['Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf'],
-      to: ['Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM'],
+      from: [{
+        address: 'Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf',
+        value: new BigNumber(1005),
+      }],
+      to: [{
+        address: 'Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM',
+        value: new BigNumber(1000),
+      }],
     },
     certificate: undefined,
     state: TxStatusCodes.IN_BLOCK,
@@ -613,8 +634,14 @@ export const ManyTransactions = (): Node => {
       // make groups of 2 transactions each
       date: new Date(Math.floor(i / 2) * (24 * 60 * 60 * 1000)),
       addresses: {
-        from: ['Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf'],
-        to: ['Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM'],
+        from: [{
+          address: 'Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf',
+          value: new BigNumber(1005),
+        }],
+        to: [{
+          address: 'Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM',
+          value: new BigNumber(1000),
+        }],
       },
       certificate: undefined,
       state: TxStatusCodes.IN_BLOCK,
@@ -672,8 +699,14 @@ export const TxHistoryExport = (): Node => {
     fee: new BigNumber(5),
     date: new Date(0),
     addresses: {
-      from: ['Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf'],
-      to: ['Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM'],
+      from: [{
+        address: 'Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf',
+        value: new BigNumber(1005),
+      }],
+      to: [{
+        address: 'Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM',
+        value: new BigNumber(1000),
+      }],
     },
     certificate: undefined,
     state: TxStatusCodes.IN_BLOCK,

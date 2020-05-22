@@ -420,23 +420,23 @@ export default class Transaction extends Component<Props, State> {
                   </div>
                   <div className={styles.addressList}>
                     {uniq(data.addresses.from).map(address => (
-                      <div key={`${data.txid}-from-${address}`} className={styles.addressItem}>
+                      <div key={`${data.txid}-from-${address.address}`} className={styles.addressItem}>
                         <ExplorableHashContainer
-                          key={`${data.txid}-from-${address}`}
+                          key={`${data.txid}-from-${address.address}`}
                           selectedExplorer={this.props.selectedExplorer}
-                          hash={addressToDisplayString(address)}
+                          hash={addressToDisplayString(address.address)}
                           light
                           linkType="address"
                         >
                           <div className={classnames([styles.rowData, styles.hash])}>
-                            {this.truncateString(addressToDisplayString(address))}
+                            {this.truncateString(addressToDisplayString(address.address))}
                           </div>
                         </ExplorableHashContainer>
                         <div>
-                          {this.generateAddressButton(address)}
+                          {this.generateAddressButton(address.address)}
                         </div>
                         <div className={styles.fee}>
-                          - 999,000.000544 ADA{/*to do*/}
+                          {this.renderAmountDisplay({ amount: address.value.negated() })}
                         </div>
                       </div>
                     ))}
@@ -456,24 +456,24 @@ export default class Transaction extends Component<Props, State> {
                   <div className={styles.addressList}>
                     {data.addresses.to.map((address, addressIndex) => (
                       <div // eslint-disable-next-line react/no-array-index-key
-                        key={`${data.txid}-to-${address}-${addressIndex}`}
+                        key={`${data.txid}-to-${address.address}-${addressIndex}`}
                         className={styles.addressItem}
                       >
                         <ExplorableHashContainer
                           selectedExplorer={this.props.selectedExplorer}
-                          hash={addressToDisplayString(address)}
+                          hash={addressToDisplayString(address.address)}
                           light
                           linkType="address"
                         >
                           <div className={classnames([styles.rowData, styles.hash])}>
-                            {this.truncateString(addressToDisplayString(address))}
+                            {this.truncateString(addressToDisplayString(address.address))}
                           </div>
                         </ExplorableHashContainer>
                         <div>
-                          {this.generateAddressButton(address)}
+                          {this.generateAddressButton(address.address)}
                         </div>
                         <div className={styles.fee}>
-                          - 999,000.000544 ADA{/*to do*/}
+                          {this.renderAmountDisplay({ amount: address.value })}
                         </div>
                       </div>
                     ))}
