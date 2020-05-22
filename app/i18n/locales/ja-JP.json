@@ -70,7 +70,7 @@
   "global.errors.invalidWalletName": "1文字以上40文字以下のウォレット名を入力してください。",
   "global.errors.invalidWalletPassword": "送金パスワードは10文字以上にする必要があります。",
   "global.labael.undelegate": "委任を解除する",
-  "global.label.addToAddressbook": "Add to address book",
+  "global.label.addToAddressbook": "アドレス帳に追加",
   "global.label.allow": "承諾",
   "global.labels.LearnMore": "もっと詳しく見る",
   "global.labels.addMemo": "メモを追加",
