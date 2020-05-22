@@ -62,6 +62,11 @@ const getRoute = (id) => buildRoute(
 );
 
 const actions = {
+  notifications: {
+    open: {
+      trigger: action('open'),
+    },
+  },
   profile: {
     updateHideBalance: { trigger: async (req) => action('updateHideBalance')(req) },
   },
@@ -127,6 +132,8 @@ export const Loading = (): Node => {
             txMemoMap: new Map(),
           },
           uiNotifications: {
+            isOpen: () => false,
+            getTooltipActiveNotification: () => null,
             mostRecentActiveNotification: undefined,
           },
           wallets: {
