@@ -132,9 +132,9 @@ export const Loading = (): Node => {
             txMemoMap: new Map(),
           },
           uiNotifications: {
+            mostRecentActiveNotification: undefined,
             isOpen: () => false,
             getTooltipActiveNotification: () => null,
-            mostRecentActiveNotification: undefined,
           },
           wallets: {
             selected: wallet.publicDeriver,
@@ -214,6 +214,9 @@ const genPropsForTransactions: {|
   },
   uiNotifications: {
     mostRecentActiveNotification: undefined, // TODO
+    isOpen: () => false,
+    getTooltipActiveNotification: () => null,
+
   },
   wallets: {
     selected: request.wallet.publicDeriver,
