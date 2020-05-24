@@ -587,6 +587,7 @@
   "wallet.summary.page.yesterdayLabel": "Kemarin",
   "wallet.transaction.address.from": "Dari address",
   "wallet.transaction.address.to": "Ke address",
+  "wallet.transaction.address.type": "Address Type",
   "wallet.transaction.addresses.from": "Dari address",
   "wallet.transaction.addresses.to": "Ke address",
   "wallet.transaction.assuranceLevel": "Tingkat jaminan transaksi",
