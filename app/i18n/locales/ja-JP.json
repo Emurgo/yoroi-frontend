@@ -587,6 +587,7 @@
   "wallet.summary.page.yesterdayLabel": "昨日",
   "wallet.transaction.address.from": "送信アドレス",
   "wallet.transaction.address.to": "受信アドレス",
+  "wallet.transaction.address.type": "Address Type",
   "wallet.transaction.addresses.from": "送信アドレス",
   "wallet.transaction.addresses.to": "受信アドレス",
   "wallet.transaction.assuranceLevel": "トランザクション確信度",
