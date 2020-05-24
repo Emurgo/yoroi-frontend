@@ -587,6 +587,7 @@
   "wallet.summary.page.yesterdayLabel": "昨天",
   "wallet.transaction.address.from": "源地址",
   "wallet.transaction.address.to": "目标地址",
+  "wallet.transaction.address.type": "Address Type",
   "wallet.transaction.addresses.from": "源地址",
   "wallet.transaction.addresses.to": "目标地址",
   "wallet.transaction.assuranceLevel": "交易担保级别",
