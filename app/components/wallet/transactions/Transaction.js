@@ -416,7 +416,9 @@ export default class Transaction extends Component<Props, State> {
                   <div className={styles.addressHeader}>
                     <h2>
                       {intl.formatMessage(messages.fromAddresses)}:
-                      <span className={styles.addressCount}>{uniq(data.addresses.from).length}</span>
+                      <span className={styles.addressCount}>
+                        {uniq(data.addresses.from).length}
+                      </span>
                     </h2>
                     <h2>{intl.formatMessage(messages.addressType)}</h2>
                     <h2 className={styles.fee}>
@@ -593,8 +595,6 @@ export default class Transaction extends Component<Props, State> {
   }
 
   generateAddressButton: string => ?Node = (address) => {
-    if (environment.isProduction()) return undefined;
-
     const { intl } = this.context;
     const addressInfo = this.props.addressLookup(
       addressToDisplayString(address)
@@ -607,9 +607,15 @@ export default class Transaction extends Component<Props, State> {
       );
     }
     return (
-      <button type="button" onClick={() => {} /* todo: link to address book */}>
-        {intl.formatMessage(globalMessages.addToAddressbookLabel)}
-      </button>
+      environment.isProduction()
+        ? '   -'
+        : (
+          <button type="button" className={classnames([styles.status, styles.typeAddress])} onClick={() => {} /* todo: link to address book */}>
+            {/* padding using irregular whitespacing in the HTML */}
+            {/* eslint-disable-next-line no-irregular-whitespace */}
+            {` ${intl.formatMessage(globalMessages.addToAddressbookLabel)} `}
+          </button>
+        )
     );
   }
 

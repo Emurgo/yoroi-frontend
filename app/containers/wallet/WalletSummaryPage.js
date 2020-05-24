@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { computed, runInAction, action, observable } from 'mobx';
+import { computed, runInAction, observable } from 'mobx';
 import { intlShape, FormattedHTMLMessage } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import environment from '../../environment';
