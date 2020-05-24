@@ -587,6 +587,7 @@
   "wallet.summary.page.yesterdayLabel": "Ieri",
   "wallet.transaction.address.from": "Dall'indirizzo",
   "wallet.transaction.address.to": "All'indirizzo",
+  "wallet.transaction.address.type": "Address Type",
   "wallet.transaction.addresses.from": "Dagli indirizzi",
   "wallet.transaction.addresses.to": "Agli indirizzi",
   "wallet.transaction.assuranceLevel": "Livello di garanzia della transazione",
