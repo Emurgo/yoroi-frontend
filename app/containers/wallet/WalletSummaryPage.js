@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { computed } from 'mobx';
+import { computed, runInAction, observable } from 'mobx';
 import { intlShape, FormattedHTMLMessage } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import environment from '../../environment';
@@ -27,6 +27,7 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import type {
   Address,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import config from '../../config';
 
 export type GeneratedData = typeof WalletSummaryPage.prototype.generated;
 
@@ -42,6 +43,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
   };
+  @observable notificationElementId: string = '';
 
   render(): null | Node {
     const { intl } = this.context;
@@ -78,7 +80,29 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
 
     const walletId = this.generated.stores.memos.getIdForWallet(publicDeriver);
 
-    const { uiDialogs, profile, memos } = this.generated.stores;
+    const { uiDialogs, profile, memos, uiNotifications } = this.generated.stores;
+
+    const tooltipNotification = {
+      duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
+      message: globalMessages.copyTooltipMessage,
+    };
+
+    const onCopyAddressTooltip = (address, elementId) => {
+      if (!uiNotifications.isOpen(elementId)) {
+        runInAction(() => {
+          this.notificationElementId = elementId;
+        });
+        actions.notifications.open.trigger({
+          id: elementId,
+          duration: tooltipNotification.duration,
+          message: tooltipNotification.message,
+        });
+      }
+    };
+    const notificationToolTip = uiNotifications.getTooltipActiveNotification(
+      this.notificationElementId
+    );
+
     if (searchOptions) {
       const { limit } = searchOptions;
       const noTransactionsFoundLabel = intl.formatMessage(globalMessages.noTransactionsFound);
@@ -127,6 +151,8 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
               }
               return undefined;
             }}
+            onCopyAddressTooltip={onCopyAddressTooltip}
+            notification={notificationToolTip}
           />
         );
       } else {
@@ -319,6 +345,8 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
         },
         uiNotifications: {
           mostRecentActiveNotification: stores.uiNotifications.mostRecentActiveNotification,
+          isOpen: stores.uiNotifications.isOpen,
+          getTooltipActiveNotification: stores.uiNotifications.getTooltipActiveNotification,
         },
         wallets: {
           selected: stores.wallets.selected,
@@ -372,6 +400,11 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
         },
       },
       actions: {
+        notifications: {
+          open: {
+            trigger: actions.notifications.open.trigger,
+          },
+        },
         dialogs: {
           open: { trigger: actions.dialogs.open.trigger },
         },

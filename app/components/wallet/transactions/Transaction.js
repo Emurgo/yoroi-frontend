@@ -34,6 +34,8 @@ import type { CertificateRow } from '../../../api/ada/lib/storage/database/primi
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { splitAmount } from '../../../utils/formatters';
 import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
+import CopyableAddress from '../../widgets/CopyableAddress';
+import type { Notification } from '../../../types/notificationType';
 
 const messages = defineMessages({
   type: {
@@ -83,6 +85,10 @@ const messages = defineMessages({
   toAddress: {
     id: 'wallet.transaction.address.to',
     defaultMessage: '!!!To address',
+  },
+  addressType: {
+    id: 'wallet.transaction.address.type',
+    defaultMessage: '!!!Address Type',
   },
   toAddresses: {
     id: 'wallet.transaction.addresses.to',
@@ -163,6 +169,8 @@ type Props = {|
     goToRoute: void => void,
     displayName: $Exact<$npm$ReactIntl$MessageDescriptor>,
   |},
+  +onCopyAddressTooltip: (string, string) => void,
+  +notification: ?Notification,
 |};
 
 type State = {|
@@ -226,6 +234,11 @@ export default class Transaction extends Component<Props, State> {
       return intl.formatMessage(stateTranslations.failed);
     }
     throw new Error(`${nameof(this.getStatusString)} unexpected state ` + state);
+  }
+
+  truncateString(string: string): string {
+    const { length } = string;
+    return length > 20 ? `${string.substring(0, 10)}...${string.substring(length - 10)}` : string;
   }
 
   renderAmountDisplay: {|
@@ -300,6 +313,8 @@ export default class Transaction extends Component<Props, State> {
       assuranceLevel,
       onAddMemo,
       onEditMemo,
+      notification,
+      onCopyAddressTooltip
     } = this.props;
     const { isExpanded } = this.state;
     const { intl } = this.context;
@@ -396,45 +411,109 @@ export default class Transaction extends Component<Props, State> {
               </div>
             )}
             <div>
-              <h2>
-                {intl.formatMessage(messages.fromAddresses)}
-              </h2>
-              {uniq(data.addresses.from).map(address => (
-                <div key={`${data.txid}-from-${address}`}>
-                  <ExplorableHashContainer
-                    key={`${data.txid}-from-${address}`}
-                    selectedExplorer={this.props.selectedExplorer}
-                    hash={addressToDisplayString(address)}
-                    light
-                    linkType="address"
-                  >
-                    <span className={classnames([styles.rowData, styles.hash])}>
-                      {addressToDisplayString(address)}<br />
-                    </span>
-                  </ExplorableHashContainer>
-                  {this.generateAddressButton(address)}
+              <div className={styles.addressContent}>
+                <div>
+                  <div className={styles.addressHeader}>
+                    <h2>
+                      {intl.formatMessage(messages.fromAddresses)}:
+                      <span className={styles.addressCount}>
+                        {uniq(data.addresses.from).length}
+                      </span>
+                    </h2>
+                    <h2>{intl.formatMessage(messages.addressType)}</h2>
+                    <h2 className={styles.fee}>
+                      {intl.formatMessage(globalMessages.amountLabel)}
+                    </h2>
+                  </div>
+                  <div className={styles.addressList}>
+                    {uniq(data.addresses.from).map((address, addressIndex) => {
+
+                      const notificationElementId = `address-${addressIndex}-copyNotification`;
+                      return (
+                        <div key={`${data.txid}-from-${address.address}`} className={styles.addressItem}>
+                          <CopyableAddress
+                            hash={address.address}
+                            elementId={notificationElementId}
+                            onCopyAddress={
+                              () => onCopyAddressTooltip(address.address, notificationElementId)
+                            }
+                            notification={notification}
+                          >
+                            <ExplorableHashContainer
+                              key={`${data.txid}-from-${address.address}`}
+                              selectedExplorer={this.props.selectedExplorer}
+                              hash={addressToDisplayString(address.address)}
+                              light
+                              linkType="address"
+                            >
+                              <span className={classnames([styles.rowData, styles.hash])}>
+                                {this.truncateString(addressToDisplayString(address.address))}
+                              </span>
+                            </ExplorableHashContainer>
+                          </CopyableAddress>
+                          <div>
+                            {this.generateAddressButton(address.address)}
+                          </div>
+                          <div className={styles.fee}>
+                            {this.renderAmountDisplay({ amount: address.value.negated() })} ADA
+                          </div>
+                        </div>
+                      );
+                    })
+                    }
+                  </div>
                 </div>
-              ))}
-              <h2>
-                {intl.formatMessage(messages.toAddresses)}
-              </h2>
-              {data.addresses.to.map((address, addressIndex) => (
-                <div // eslint-disable-next-line react/no-array-index-key
-                  key={`${data.txid}-to-${address}-${addressIndex}`}
-                >
-                  <ExplorableHashContainer
-                    selectedExplorer={this.props.selectedExplorer}
-                    hash={addressToDisplayString(address)}
-                    light
-                    linkType="address"
-                  >
-                    <span className={classnames([styles.rowData, styles.hash])}>
-                      {addressToDisplayString(address)}<br />
-                    </span>
-                  </ExplorableHashContainer>
-                  {this.generateAddressButton(address)}
+                <div>
+                  <div className={styles.addressHeader}>
+                    <h2>
+                      {intl.formatMessage(messages.toAddresses)}:
+                      <span className={styles.addressCount}>{uniq(data.addresses.to).length}</span>
+                    </h2>
+                    <h2>{intl.formatMessage(messages.addressType)}</h2>
+                    <h2 className={styles.fee}>
+                      {intl.formatMessage(globalMessages.amountLabel)}
+                    </h2>
+                  </div>
+                  <div className={styles.addressList}>
+                    {data.addresses.to.map((address, addressIndex) => {
+
+                      const notificationElementId = `address-${addressIndex}-copyNotification`;
+                      return (
+                        <div // eslint-disable-next-line react/no-array-index-key
+                          key={`${data.txid}-to-${address.address}-${addressIndex}`}
+                          className={styles.addressItem}
+                        >
+                          <CopyableAddress
+                            hash={address.address}
+                            elementId={notificationElementId}
+                            onCopyAddress={
+                              () => onCopyAddressTooltip(address.address, notificationElementId)
+                            }
+                            notification={notification}
+                          >
+                            <ExplorableHashContainer
+                              key={`${data.txid}-from-${address.address}`}
+                              selectedExplorer={this.props.selectedExplorer}
+                              hash={addressToDisplayString(address.address)}
+                              light
+                              linkType="address"
+                            >
+                              <span className={classnames([styles.rowData, styles.hash])}>
+                                {this.truncateString(addressToDisplayString(address.address))}
+                              </span>
+                            </ExplorableHashContainer>
+                          </CopyableAddress>
+                          <div>
+                            {this.generateAddressButton(address.address)}
+                          </div>
+                          <div className={styles.fee}>
+                            {this.renderAmountDisplay({ amount: address.value })} ADA
+                          </div>
+                        </div>);
+                    })}
+                  </div>
                 </div>
-              ))}
+              </div>
               {this.getCertificate(data)}
 
               {(
@@ -516,23 +595,27 @@ export default class Transaction extends Component<Props, State> {
   }
 
   generateAddressButton: string => ?Node = (address) => {
-    if (environment.isProduction()) return undefined;
-
     const { intl } = this.context;
     const addressInfo = this.props.addressLookup(
       addressToDisplayString(address)
     );
     if (addressInfo != null) {
       return (
-        <button type="button" onClick={addressInfo.goToRoute}>
+        <button type="button" className={classnames([styles.status, styles.typeAddress])} onClick={addressInfo.goToRoute}>
           {intl.formatMessage(addressInfo.displayName)}
         </button>
       );
     }
     return (
-      <button type="button" onClick={() => {} /* todo: link to address book */}>
-        {intl.formatMessage(globalMessages.addToAddressbookLabel)}
-      </button>
+      environment.isProduction()
+        ? '   -'
+        : (
+          <button type="button" className={classnames([styles.status, styles.typeAddress])} onClick={() => {} /* todo: link to address book */}>
+            {/* padding using irregular whitespacing in the HTML */}
+            {/* eslint-disable-next-line no-irregular-whitespace */}
+            {` ${intl.formatMessage(globalMessages.addToAddressbookLabel)} `}
+          </button>
+        )
     );
   }
 

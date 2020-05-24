@@ -58,6 +58,12 @@
     height: 25px;
     user-select: none;
   }
+  .typeAddress{
+    min-width: fit-content;
+    background: var(--cmn-default-color-grey-5);
+    font-size: 10px;
+    letter-spacing: 0;
+  }
 
   .currency {
     color: var(--theme-transactions-list-text-color);
@@ -207,7 +213,54 @@
 
   .details {
     height: auto;
-  
+    
+    .addressContent {
+      display: flex;
+      border-top: 1px solid rgba(173, 174, 182, 0.3);
+      border-bottom: 1px solid rgba(173, 174, 182, 0.3);
+      & > div {
+        flex: 1 1 50%;
+        padding-top: 24px;
+        margin-bottom: -1px;
+        &:first-child{
+          padding-right: 24px;
+        }
+        &:last-child{
+          border-left: 1px solid rgba(173, 174, 182, 0.3);
+          padding-left: 24px;
+        }
+      }
+    }
+    .addressHeader {
+      display: grid;
+      grid-gap: 15px;
+      grid-template-columns: minmax(230px,1fr) 1fr 1fr;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      h2 {
+        margin: 0;
+      }
+    }
+    .addressCount {
+      font-weight: bold;
+      margin-left: 5px;
+    }
+    .addressList {
+      color: var(--theme-transactions-list-detail-row-text-color);
+      font-size: 14px;
+      & > * {
+        padding-bottom: 10px;
+        margin-top: 14px;
+        border-bottom: 1px solid #DEE2EA;
+      }
+    }
+    .addressItem {
+      display: grid;
+      grid-gap: 15px;
+      grid-template-columns: minmax(230px,1fr) 1fr 1fr;
+      align-items: center;
+    }
     * + h2,
     * + .row {
       margin-top: 18px;
