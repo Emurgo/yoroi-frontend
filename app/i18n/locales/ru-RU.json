@@ -587,6 +587,7 @@
   "wallet.summary.page.yesterdayLabel": "Вчера",
   "wallet.transaction.address.from": "С адреса",
   "wallet.transaction.address.to": "На адрес",
+  "wallet.transaction.address.type": "Address Type",
   "wallet.transaction.addresses.from": "С адресов",
   "wallet.transaction.addresses.to": "На адреса",
   "wallet.transaction.assuranceLevel": "Уровень гарантии транзакции",
