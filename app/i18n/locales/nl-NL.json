@@ -587,7 +587,7 @@
   "wallet.summary.page.yesterdayLabel": "Gisteren",
   "wallet.transaction.address.from": "Van adres",
   "wallet.transaction.address.to": "Naar adres",
-  "wallet.transaction.address.type": "Address Type",
+  "wallet.transaction.address.type": "Adrestype",
   "wallet.transaction.addresses.from": "Van adressen",
   "wallet.transaction.addresses.to": "Naar adressen",
   "wallet.transaction.assuranceLevel": "Transactie zekerheidsniveau",
