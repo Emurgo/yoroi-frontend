@@ -587,6 +587,7 @@
   "wallet.summary.page.yesterdayLabel": "어제",
   "wallet.transaction.address.from": "보낸 주소",
   "wallet.transaction.address.to": "받는 주소",
+  "wallet.transaction.address.type": "Address Type",
   "wallet.transaction.addresses.from": "보낸 주소",
   "wallet.transaction.addresses.to": "받는 주소",
   "wallet.transaction.assuranceLevel": "거래 보증 수준",
