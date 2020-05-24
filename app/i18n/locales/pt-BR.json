@@ -587,7 +587,7 @@
   "wallet.summary.page.yesterdayLabel": "Ontem",
   "wallet.transaction.address.from": "Do endereço",
   "wallet.transaction.address.to": "Para o endereço",
-  "wallet.transaction.address.type": "Address Type",
+  "wallet.transaction.address.type": "Tipo de endereço",
   "wallet.transaction.addresses.from": "Do endereço",
   "wallet.transaction.addresses.to": "Para o endereço",
   "wallet.transaction.assuranceLevel": "Nível de confiabilidade da transação",
