@@ -6,17 +6,23 @@ import chai from 'chai';
 import moment from 'moment';
 import i18n from '../support/helpers/i18n-helpers';
 
-function verifyAllTxsFields(txType, txAmount, txTime, txStatus, txFee, txFromList, txToList,
-  txId, expectedTx, txConfirmations) {
+function verifyAllTxsFields(
+  txType, txAmount, txTime, txStatus, txFee, txFromList, txToList,
+  txId, expectedTx, txConfirmations
+) {
   chai.expect(txType).to.equal(expectedTx.txType);
   chai.expect(txAmount.split(' ')[0]).to.equal(expectedTx.txAmount);
   chai.expect(txTime).to.equal(moment(expectedTx.txTime).format('hh:mm:ss A'));
   chai.expect(txStatus).to.equal(expectedTx.txStatus);
   for (let i = 0; i < txFromList.length; i++) {
-    chai.expect(txFromList[i]).to.equal(expectedTx.txFrom[i]);
+    for (let j = 0; j < txFromList[i].length; j++) {
+      chai.expect(txFromList[i][j]).to.equal(expectedTx.txFrom[i][j]);
+    }
   }
   for (let i = 0; i < txToList.length; i++) {
-    chai.expect(txToList[i]).to.equal(expectedTx.txTo[i]);
+    for (let j = 0; j < txToList[i].length; j++) {
+      chai.expect(txToList[i][j]).to.equal(expectedTx.txTo[i][j]);
+    }
   }
   chai.expect(txId).to.equal(expectedTx.txId);
   if (txConfirmations) {
@@ -25,19 +31,6 @@ function verifyAllTxsFields(txType, txAmount, txTime, txStatus, txFee, txFromLis
   if (txFee) {
     chai.expect(txFee).to.equal(expectedTx.txFee);
   }
-}
-
-function mapConditionalFields(txExpectedStatus, conditionalFields) {
-  if (txExpectedStatus === 'pending') {
-    const [txId] = conditionalFields;
-    return [txId, undefined];
-  }
-  if (txExpectedStatus === 'failed') {
-    const [, txId] = conditionalFields;
-    return [txId, undefined];
-  }
-  const [, txConfirmations, , txId] = conditionalFields;
-  return [txId, txConfirmations];
 }
 
 Given(/^There are ([0-9]+) generated addresses$/, async function (lastReceiveIndex) {
@@ -113,6 +106,19 @@ When(
   }
 );
 
+async function parseTxInfo(addressList) {
+  const addressInfoRow = await addressList.findElements(By.css('.Transaction_addressItem'));
+
+  const result = [];
+  for (const row of addressInfoRow) {
+    const rowInfo = await row.findElements(By.xpath('*'));
+    const rowInfoText = await Promise.all(rowInfo.map(async column => await column.getText()));
+    result.push(rowInfoText);
+  }
+
+  return result;
+}
+
 Then(
   /^I verify top transaction content ([^"]*)$/,
   async function (walletName) {
@@ -132,29 +138,32 @@ Then(
     }
 
     await topTx.click();
+
+    const txList = await topTx.findElements(By.css('.Transaction_addressList'));
+    const fromTxInfo = await parseTxInfo(txList[0]);
+    const toTxInfo = await parseTxInfo(txList[1]);
+
     const txData = await topTx.getText();
     const txDataFields = txData.split('\n');
     const [txTime, txType, txStatus, txFee, txAmount] = txDataFields;
 
-    let txFrom;
-    let txTo;
-    let conditionalFields;
-
-    if (txType === 'ADA received') {
-      // Exclude fee
-      [, , , , , txFrom, , txTo, , ...conditionalFields]
-        = txDataFields;
-
-    } else {
-      [, , , , , , txFrom, , txTo, , ...conditionalFields]
-        = txDataFields;
-    }
-
     const expectedTx = displayInfo[walletName];
 
-    const [txId, txConfirmations] = mapConditionalFields(status, conditionalFields);
-    verifyAllTxsFields(txType, txAmount, txTime, txStatus, txFee, [txFrom],
-      [txTo], txId, expectedTx, txConfirmations);
+    const txId = await (async () => {
+      const elem = await topTx.findElement(By.css('.txid'));
+      return await elem.getText();
+    })();
+    const txConfirmation =
+      status === 'successful'
+        ? await (async () => {
+          const txConfirmationsCount = await topTx.findElement(By.css('.confirmationCount'));
+          const txConfirmationParentElem = await txConfirmationsCount.findElement(By.xpath('./..'));
+          return await txConfirmationParentElem.getText();
+        })()
+        : undefined;
+
+    verifyAllTxsFields(txType, txAmount, txTime, txStatus, txFee, fromTxInfo,
+      toTxInfo, txId, expectedTx, txConfirmation);
   }
 );
 
@@ -176,10 +185,12 @@ const displayInfo = {
     txAmount: '-0.169999',
     txTime: '2019-04-21T15:13:33.000Z',
     txStatus: 'HIGH',
-    txFrom: ['Ae2tdPwUPEZ77uBBu8cMVxswVy1xfaMZR9wsUSwDNiB48MWqsVWfitHfUM9'],
+    txFrom: [
+      ['Ae2tdPwUPE...VWfitHfUM9', 'INTERNAL', '-0.820000 ADA'],
+    ],
     txTo: [
-      'Ae2tdPwUPEYzkKjrqPw1GHUty25Cj5fWrBVsWxiQYCxfoe2d9iLjTnt34Aj',
-      'Ae2tdPwUPEZ7VKG9jy6jJTxQCWNXoMeL2Airvzjv3dc3WCLhSBA7XbSMhKd',
+      ['Ae2tdPwUPE...iLjTnt34Aj', 'EXTERNAL', '+0.000001 ADA'],
+      ['Ae2tdPwUPE...BA7XbSMhKd', 'INTERNAL', '+0.650000 ADA'],
     ],
     txId: '0a073669845fea4ae83cd4418a0b4fd56610097a89601a816b5891f667e3496c',
     txConfirmations: 'High. 103 confirmations.',
@@ -190,9 +201,11 @@ const displayInfo = {
     txAmount: '-0.999999',
     txTime: '2019-04-20T23:14:52.000Z',
     txStatus: 'PENDING',
-    txFrom: ['Ae2tdPwUPEZ9ySSM18e2QGFnCgL8ViDqp8K3wU4i5DYTSf5w6e1cT2aGdSJ'],
+    txFrom: [
+      ['Ae2tdPwUPE...e1cT2aGdSJ', 'EXTERNAL', '-1.000000 ADA'],
+    ],
     txTo: [
-      'Ae2tdPwUPEYwEnNsuY9uMAphecEWipHKEy9g8yZCJTJm4zxV1sTrQfTxPVX',
+      ['Ae2tdPwUPE...sTrQfTxPVX', '-', '+0.000001 ADA']
     ],
     txId: 'fa6f2c82fb511d0cc9c12a540b5fac6e5a9b0f288f2d140f909f981279e16fbe',
     txFee: '0.999999',
@@ -202,10 +215,12 @@ const displayInfo = {
     txAmount: '-0.180000',
     txTime: '2019-04-20T23:14:51.000Z',
     txStatus: 'FAILED',
-    txFrom: ['Ae2tdPwUPEYw8ScZrAvKbxai1TzG7BGC4n8PoF9JzE1abgHc3gBfkkDNBNv'],
+    txFrom: [
+      ['Ae2tdPwUPE...gBfkkDNBNv', 'EXTERNAL', '-1.000000 ADA'],
+    ],
     txTo: [
-      'Ae2tdPwUPEZCdSLM7bHhoC6xptW9SRW155PFFf4WYCKnpX4JrxJPmFzi6G2',
-      'Ae2tdPwUPEZCqWsJkibw8BK2SgbmJ1rRG142Ru1CjSnRvKwDWbL4UYPN3eU',
+      ['Ae2tdPwUPE...xJPmFzi6G2', '-', '+0.000001 ADA'],
+      ['Ae2tdPwUPE...bL4UYPN3eU', 'INTERNAL', '+0.820000 ADA'],
     ],
     txId: 'fc6a5f086c0810de3048651ddd9075e6e5543bf59cdfe5e0c73bf1ed9dcec1ab',
     txFee: '0.179999',

@@ -537,7 +537,7 @@ export default class Transaction extends Component<Props, State> {
                 light
                 linkType="transaction"
               >
-                <span className={classnames([styles.rowData, styles.hash])}>
+                <span className={classnames([styles.rowData, styles.hash, 'txid'/* for tests */])}>
                   {data.txid}
                 </span>
               </ExplorableHashContainer>

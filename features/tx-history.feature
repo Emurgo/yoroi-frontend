@@ -23,18 +23,24 @@ Feature: Txs History
   Scenario: Check content of successful transaction (IT-56)
     Given There is a wallet stored named many-tx-wallet
     When I see the transactions summary
+    # TODO: need to give time to address stores to update
+    Given I sleep for 1500
     Then I verify top transaction content many-tx-wallet
 
   @it-57
   Scenario: Check content of pending transaction (IT-57)
     Given There is a wallet stored named simple-pending-wallet
     When I see the transactions summary
+    # TODO: need to give time to address stores to update
+    Given I sleep for 1500
     Then I verify top transaction content simple-pending-wallet
 
   @it-58
   Scenario: Check content of failed transaction (IT-58)
     Given There is a wallet stored named failed-single-tx
     When I see the transactions summary
+    # TODO: need to give time to address stores to update
+    Given I sleep for 1500
     Then I verify top transaction content failed-single-tx
 
   @it-103
