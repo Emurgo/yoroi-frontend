@@ -587,7 +587,7 @@
   "wallet.summary.page.yesterdayLabel": "Gestern",
   "wallet.transaction.address.from": "Absender-Adresse",
   "wallet.transaction.address.to": "Empfänger-Adresse",
-  "wallet.transaction.address.type": "Address Type",
+  "wallet.transaction.address.type": "Adress Typ",
   "wallet.transaction.addresses.from": "Absender-Adressen",
   "wallet.transaction.addresses.to": "Empfänger-Adressen",
   "wallet.transaction.assuranceLevel": "Transaktionssicherheitsstufe",
