@@ -185,10 +185,10 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           },
         },
         coinPriceStore: {
-          getCurrentPrice: stores.substores.ada.coinPriceStore.getCurrentPrice,
-          lastUpdateTimestamp: stores.substores.ada.coinPriceStore.lastUpdateTimestamp,
+          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
+          lastUpdateTimestamp: stores.coinPriceStore.lastUpdateTimestamp,
           refreshCurrentUnit: {
-            isExecuting: stores.substores.ada.coinPriceStore.refreshCurrentUnit.isExecuting,
+            isExecuting: stores.coinPriceStore.refreshCurrentUnit.isExecuting,
           },
         },
       },

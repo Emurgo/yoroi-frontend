@@ -4,7 +4,6 @@ import React, { Component } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import environment from '../../environment';
 import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import TopBar from '../../components/topbar/TopBar';
 import TopBarLayout from '../../components/layout/TopBarLayout';
@@ -77,8 +76,7 @@ export default class TermsOfUsePage extends Component<InjectedOrGenerated<Genera
           termsOfUse: profileStore.termsOfUse,
         },
         serverConnectionStore: {
-          checkAdaServerStatus: stores.substores[environment.API]
-            .serverConnectionStore.checkAdaServerStatus,
+          checkAdaServerStatus: stores.serverConnectionStore.checkAdaServerStatus,
         },
       },
       actions: {

@@ -10,7 +10,6 @@ import type {
   CreateAddressFunc,
   CreateAddressResponse,
 } from '../../api/ada';
-import environment from '../../environment';
 import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -211,7 +210,7 @@ export default class AddressesStore extends Store {
 
   setup(): void {
     super.setup();
-    const actions = this.actions[environment.API].addresses;
+    const actions = this.actions[this.stores.profile.selectedAPI.type].addresses;
     actions.createAddress.listen(this._createAddress);
     actions.resetErrors.listen(this._resetErrors);
 
@@ -360,7 +359,9 @@ export default class AddressesStore extends Store {
       return Promise.resolve([]);
     }
 
-    const allAddresses = await this.api[environment.API].getAllAddressesForDisplay({
+    const allAddresses = await this.api[
+      this.stores.profile.selectedAPI.type
+    ].getAllAddressesForDisplay({
       publicDeriver: withUtxos,
       type: request.publicDeriver.getParent() instanceof Bip44Wallet
         ? CoreAddressTypes.CARDANO_LEGACY
@@ -385,7 +386,9 @@ export default class AddressesStore extends Store {
       Logger.error(`${nameof(this._wrapForChainAddresses)} incorrect public deriver`);
       return Promise.resolve([]);
     }
-    const addresses = await this.api[environment.API].getChainAddressesForDisplay({
+    const addresses = await this.api[
+      this.stores.profile.selectedAPI.type
+    ].getChainAddressesForDisplay({
       publicDeriver: withHasUtxoChains,
       chainsRequest: request.chainsRequest,
       type: request.publicDeriver.getParent() instanceof Bip44Wallet

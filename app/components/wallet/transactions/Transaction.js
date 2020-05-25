@@ -16,7 +16,7 @@ import AdaSymbol from '../../../assets/images/ada-symbol.inline.svg';
 import AddMemoSvg from '../../../assets/images/add-memo.inline.svg';
 import EditSvg from '../../../assets/images/edit.inline.svg';
 import WalletTransaction from '../../../domain/WalletTransaction';
-import globalMessages, { memoMessages, environmentSpecificMessages } from '../../../i18n/global-messages';
+import globalMessages, { memoMessages, } from '../../../i18n/global-messages';
 import type { TransactionDirectionType, } from '../../../api/ada/transactions/types';
 import { transactionTypes } from '../../../api/ada/transactions/types';
 import type { AssuranceLevel } from '../../../types/transactionAssuranceTypes';
@@ -164,7 +164,10 @@ type Props = {|
   +shouldHideBalance: boolean,
   +onAddMemo: WalletTransaction => void,
   +onEditMemo: WalletTransaction => void,
-  +unitOfAccount: void | $ReadOnly<PriceDataRow>,
+  +unitOfAccount: {|
+    +primaryTicker: string,
+    +priceInfo: void | $ReadOnly<PriceDataRow>
+  |},
   +addressLookup: string => void | {|
     goToRoute: void => void,
     displayName: $Exact<$npm$ReactIntl$MessageDescriptor>,
@@ -249,12 +252,13 @@ export default class Transaction extends Component<Props, State> {
     }
 
     const { unitOfAccount } = this.props;
-    if (unitOfAccount != null) {
+    if (unitOfAccount.priceInfo != null) {
+      const { priceInfo } = unitOfAccount;
       return (
         <>
-          { calculateAndFormatValue(request.amount, unitOfAccount.Price) + ' ' + unitOfAccount.To }
+          { calculateAndFormatValue(request.amount, priceInfo.Price) + ' ' + priceInfo.To }
           <div className={styles.amountSmall}>
-            {request.amount.toString()} ADA
+            {request.amount.toString()} {priceInfo.From}
           </div>
         </>
       );
@@ -282,12 +286,13 @@ export default class Transaction extends Component<Props, State> {
       return (<span>******</span>);
     }
     const { unitOfAccount } = this.props;
-    if (unitOfAccount != null) {
+    if (unitOfAccount.priceInfo != null) {
+      const { priceInfo } = unitOfAccount;
       return (
         <>
-          { calculateAndFormatValue(request.amount.abs(), unitOfAccount.Price) + ' ' + unitOfAccount.To }
+          { calculateAndFormatValue(request.amount.abs(), priceInfo.Price) + ' ' + priceInfo.To }
           <div className={styles.amountSmall}>
-            {request.amount.abs().toString()} ADA
+            {request.amount.abs().toString()} {priceInfo.From}
           </div>
         </>
       );
@@ -353,8 +358,6 @@ export default class Transaction extends Component<Props, State> {
 
     const status = this.getStatusString(intl, state, assuranceLevel);
 
-    const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
-
     return (
       <div className={componentStyles}>
 
@@ -366,7 +369,7 @@ export default class Transaction extends Component<Props, State> {
                 {moment(data.date).format('hh:mm:ss A')}
               </div>
               <div className={styles.type}>
-                { this.getTxTypeMsg(intl, currency, data.type) }
+                { this.getTxTypeMsg(intl, this.props.unitOfAccount.primaryTicker, data.type) }
               </div>
               {state === TxStatusCodes.IN_BLOCK ? (
                 <div className={labelOkClasses}>{status}</div>
@@ -455,7 +458,9 @@ export default class Transaction extends Component<Props, State> {
                             {this.generateAddressButton(address.address)}
                           </div>
                           <div className={styles.fee}>
-                            {this.renderAmountDisplay({ amount: address.value.negated() })} ADA
+                            {this.renderAmountDisplay({
+                              amount: address.value.negated()
+                            })} {this.props.unitOfAccount.primaryTicker}
                           </div>
                         </div>
                       );
@@ -507,7 +512,9 @@ export default class Transaction extends Component<Props, State> {
                             {this.generateAddressButton(address.address)}
                           </div>
                           <div className={styles.fee}>
-                            {this.renderAmountDisplay({ amount: address.value })} ADA
+                            {this.renderAmountDisplay({
+                              amount: address.value
+                            })} {this.props.unitOfAccount.primaryTicker}
                           </div>
                         </div>);
                     })}
@@ -517,7 +524,6 @@ export default class Transaction extends Component<Props, State> {
               {this.getCertificate(data)}
 
               {(
-                environment.isAdaApi() &&
                 state === TxStatusCodes.IN_BLOCK &&
                 this.props.numberOfConfirmations != null
               ) && (

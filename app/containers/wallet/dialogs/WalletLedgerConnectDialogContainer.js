@@ -4,7 +4,6 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 
-import environment from '../../../environment';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import { Logger } from '../../../utils/logging';
 import { handleExternalLinkClick } from '../../../utils/routing';
@@ -28,13 +27,17 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
 
   cancel: (() => void) = () => {
     this.props.onClose();
-    this.generated.actions[environment.API].ledgerConnect.cancel.trigger();
+    this.generated.actions[
+      this.generated.stores.profile.selectedAPI.type
+    ].ledgerConnect.cancel.trigger();
   };
 
   render(): null | Node {
     const { profile } = this.generated.stores;
     const ledgerConnectStore = this._getLedgerConnectStore();
-    const hwConnectActions = this.generated.actions[environment.API].ledgerConnect;
+    const hwConnectActions = this.generated.actions[
+      this.generated.stores.profile.selectedAPI.type
+    ].ledgerConnect;
 
     let component = null;
 
@@ -88,7 +91,9 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
 
   /** Returns the store which is responsible for this Container */
   _getLedgerConnectStore() {
-    return this.generated.stores.substores[environment.API].ledgerConnect;
+    return this.generated.stores.substores[
+      this.generated.stores.profile.selectedAPI.type
+    ].ledgerConnect;
   }
 
   @computed get generated() {
@@ -102,6 +107,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
     return Object.freeze({
       stores: {
         profile: {
+          selectedAPI: stores.profile.selectedAPI,
           isClassicTheme: stores.profile.isClassicTheme,
         },
         substores: {

@@ -115,6 +115,7 @@ export const Loading = (): Node => {
       generated={{
         stores: {
           profile: {
+            selectedAPI: globalKnobs.selectedAPI(),
             selectedExplorer: getDefaultExplorer(),
             shouldHideBalance: false,
             isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
@@ -203,6 +204,7 @@ const genPropsForTransactions: {|
   lastSyncInfo: LastSyncInfoRow,
 |} => * = (request) => ({
   profile: {
+    selectedAPI: globalKnobs.selectedAPI(),
     selectedExplorer: getDefaultExplorer(),
     shouldHideBalance: request.txExport == null ? boolean('shouldHideBalance', false) : false,
     isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,

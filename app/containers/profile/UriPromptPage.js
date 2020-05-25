@@ -120,8 +120,7 @@ export default class UriPromptPage extends Component<InjectedOrGenerated<Generat
           isClassicTheme: profileStore.isClassicTheme,
         },
         serverConnectionStore: {
-          checkAdaServerStatus: stores.substores[environment.API]
-            .serverConnectionStore.checkAdaServerStatus,
+          checkAdaServerStatus: stores.serverConnectionStore.checkAdaServerStatus,
         },
       },
       actions: {

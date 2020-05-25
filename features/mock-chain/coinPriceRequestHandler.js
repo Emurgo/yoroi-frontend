@@ -4,7 +4,7 @@ import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import type {
   ResponseTicker,
   CurrentCoinPriceResponse,
-} from '../../app/api/ada/lib/state-fetch/types';
+} from '../../app/api/common/lib/state-fetch/types';
 
 const CURRENCIES = ['BTC', 'ETH', 'USD', 'KRW', 'JPY', 'EUR', 'CNY'];
 

@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import WalletCreateDialog from '../../../components/wallet/WalletCreateDialog';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
-import environment from '../../../environment';
 
 export type GeneratedData = typeof WalletCreateDialogContainer.prototype.generated;
 
@@ -21,7 +20,7 @@ export default class WalletCreateDialogContainer extends Component<Props> {
     return (
       <WalletCreateDialog
         classicTheme={this.generated.stores.profile.isClassicTheme}
-        onSubmit={this.generated.actions[environment.API].wallets.createWallet.trigger}
+        onSubmit={this.generated.actions.ada.wallets.createWallet.trigger}
         onCancel={this.props.onClose}
       />
     );

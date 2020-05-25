@@ -62,6 +62,7 @@ export default class URILandingDialogContainer extends Component<Props> {
     if (!this.showDisclaimer) {
       return (
         <URIVerifyDialog
+          primaryTicker={this.generated.stores.profile.selectedAPI.meta.primaryTicker}
           onSubmit={this.onVerifiedSubmit}
           onBack={this.toggleShowDisclaimer}
           onCancel={this.onCancel}
@@ -93,12 +94,13 @@ export default class URILandingDialogContainer extends Component<Props> {
     return Object.freeze({
       stores: {
         profile: {
+          selectedAPI: stores.profile.selectedAPI,
           selectedExplorer: stores.profile.selectedExplorer,
           isClassicTheme: stores.profile.isClassicTheme,
           unitOfAccount: stores.profile.unitOfAccount,
         },
         coinPriceStore: {
-          getCurrentPrice: stores.substores.ada.coinPriceStore.getCurrentPrice,
+          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
         },
         loading: {
           uriParams: stores.loading.uriParams,

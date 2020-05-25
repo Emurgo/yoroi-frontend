@@ -252,7 +252,7 @@ export default class WalletStore extends Store {
     publicDeriver
   ) => {
     try {
-      const substore = this.stores.substores[environment.API];
+      const substore = this.stores.substores[this.stores.profile.selectedAPI.type];
       await substore.transactions.refreshTransactionData({
         publicDeriver,
         localRequest: false,
@@ -268,7 +268,7 @@ export default class WalletStore extends Store {
     publicDeriver
   ) => {
     try {
-      const substore = this.stores.substores[environment.API];
+      const substore = this.stores.substores[this.stores.profile.selectedAPI.type];
       await substore.transactions.refreshTransactionData({
         publicDeriver,
         localRequest: true,
@@ -359,7 +359,7 @@ export default class WalletStore extends Store {
   |} => void = (
     request
   ) => {
-    const stores = this.stores.substores[environment.API];
+    const stores = this.stores.substores[this.stores.profile.selectedAPI.type];
     stores.addresses.addObservedWallet(request.publicDeriver);
     stores.transactions.addObservedWallet(request);
     stores.time.addObservedTime(request.publicDeriver);

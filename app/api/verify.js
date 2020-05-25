@@ -1,6 +1,6 @@
 // @flow
 import { RustModule } from './ada/lib/cardanoCrypto/rustLoader';
-import type { ResponseTicker } from './ada/lib/state-fetch/types';
+import type { ResponseTicker } from './common/lib/state-fetch/types';
 
 function serializeTicker(ticker: ResponseTicker): Buffer {
   return Buffer.from(

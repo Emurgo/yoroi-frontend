@@ -71,7 +71,7 @@ export default class TrezorSendStore extends Store {
       this._setError(null);
       this._setActionProcessing(true);
 
-      const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+      const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
 
       this.createTrezorSignTxDataRequest.execute({
         ...request.params,
@@ -122,7 +122,7 @@ export default class TrezorSendStore extends Store {
           id: trezorSignTxResp.payload.hash,
           encodedTx: Buffer.from(trezorSignTxResp.payload.body, 'hex'),
         },
-        sendTx: this.stores.substores[environment.API].stateFetchStore.fetcher.sendTx,
+        sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
       }),
       refreshWallet: () => wallets.refreshWalletFromRemote(publicDeriver),
     }).promise;

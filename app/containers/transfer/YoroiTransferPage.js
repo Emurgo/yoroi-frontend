@@ -135,7 +135,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
     const { stores } = this.generated;
     const { profile } = stores;
     const yoroiTransfer = this.generated.stores.substores.ada.yoroiTransfer;
-    const adaWallet = this.generated.stores.substores[environment.API].wallets;
+    const adaWallet = this.generated.stores.substores.ada.wallets;
 
     const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
       ? (
@@ -271,7 +271,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
           refreshWalletFromRemote: stores.wallets.refreshWalletFromRemote,
         },
         coinPriceStore: {
-          getCurrentPrice: stores.substores.ada.coinPriceStore.getCurrentPrice,
+          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
         },
         substores: {
           ada: {

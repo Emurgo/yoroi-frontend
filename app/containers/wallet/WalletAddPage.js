@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import { intlShape } from 'react-intl';
 
-import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import globalMessages from '../../i18n/global-messages';
@@ -72,11 +71,15 @@ export default class WalletAddPage extends Component<Props> {
 
     const openTrezorConnectDialog = () => {
       actions.dialogs.open.trigger({ dialog: WalletTrezorConnectDialogContainer });
-      this.generated.actions[environment.API].trezorConnect.init.trigger();
+      this.generated.actions[
+        this.generated.stores.profile.selectedAPI.type
+      ].trezorConnect.init.trigger();
     };
     const openLedgerConnectDialog = () => {
       actions.dialogs.open.trigger({ dialog: WalletLedgerConnectDialogContainer });
-      this.generated.actions[environment.API].ledgerConnect.init.trigger();
+      this.generated.actions[
+        this.generated.stores.profile.selectedAPI.type
+      ].ledgerConnect.init.trigger();
     };
 
     let activeDialog = null;
@@ -210,6 +213,9 @@ export default class WalletAddPage extends Component<Props> {
     const { stores, actions } = this.props;
     return Object.freeze({
       stores: {
+        profile: {
+          selectedAPI: stores.profile.selectedAPI,
+        },
         uiDialogs: {
           isOpen: stores.uiDialogs.isOpen,
           getParam: stores.uiDialogs.getParam,

@@ -106,7 +106,7 @@ export default class LedgerSendStore extends Store {
       this._setError(null);
       this._setActionProcessing(true);
 
-      const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+      const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
       this.createLedgerSignTxDataRequest.execute({
         ...request.params,
         getTxsBodiesForUTXOs: stateFetcher.getTxsBodiesForUTXOs,
@@ -168,7 +168,7 @@ export default class LedgerSendStore extends Store {
         keyLevel: withLevels.getParent().getPublicDeriverLevel(),
         ledgerSignTxResp,
         unsignedTx,
-        sendTx: this.stores.substores[environment.API].stateFetchStore.fetcher.sendTx,
+        sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
       }),
       refreshWallet: () => wallets.refreshWalletFromRemote(publicDeriver),
     }).promise;

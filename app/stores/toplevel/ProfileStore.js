@@ -20,6 +20,12 @@ import type {
 import { unitOfAccountDisabledValue } from '../../types/unitOfAccountType';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { SUPPORTED_CURRENCIES } from '../../config/unitOfAccount';
+import AdaApi from '../../api/ada/index';
+
+export type SelectedApiType = {|
+  type: 'ada',
+  meta: ReturnType<typeof AdaApi.prototype.getCurrencyMeta>,
+|};
 
 export default class ProfileStore extends Store {
 
@@ -105,8 +111,8 @@ export default class ProfileStore extends Store {
         // note: we want to load memos BEFORE we start syncing wallets
         // this is because syncing wallets will also try and sync memos with external storage
         await this.stores.memos.loadFromStorage();
-        await this.stores.substores.ada.coinPriceStore.loadFromStorage();
-        await this.stores.substores.ada.coinPriceStore.refreshCurrentCoinPrice();
+        await this.stores.coinPriceStore.loadFromStorage();
+        await this.stores.coinPriceStore.refreshCurrentCoinPrice();
 
         await wallets.restoreWalletsFromStorage();
         if (wallets.hasAnyPublicDeriver && this.stores.loading.fromUriScheme) {
@@ -419,6 +425,15 @@ export default class ProfileStore extends Store {
     return result !== undefined;
   };
 
+  // ========== Active API ========== //
+
+  @computed get selectedAPI(): SelectedApiType {
+    return {
+      type: 'ada',
+      meta: this.api.ada.getCurrencyMeta(),
+    };
+  }
+
   // ========== Paper Wallets ========== //
 
   @computed get paperWalletsIntro(): string {
@@ -431,7 +446,7 @@ export default class ProfileStore extends Store {
   // ========== Terms of Use ========== //
 
   @computed get termsOfUse(): string {
-    return getTermsOfUse(this.currentLocale);
+    return getTermsOfUse(this.selectedAPI.type, this.currentLocale);
   }
 
   @computed get hasLoadedTermsOfUseAcceptance(): boolean {
@@ -576,7 +591,7 @@ export default class ProfileStore extends Store {
     await this.setUnitOfAccountRequest.execute(currency);
     await this.getUnitOfAccountRequest.execute(); // eagerly cache
 
-    await this.stores.substores.ada.coinPriceStore.refreshCurrentUnit.execute().promise;
+    await this.stores.coinPriceStore.refreshCurrentUnit.execute().promise;
   };
 
   @computed get hasLoadedUnitOfAccount(): boolean {
@@ -610,10 +625,10 @@ export function getPaperWalletIntro(
 }
 
 export function getTermsOfUse(
+  api: 'ada',
   currentLocale: string,
 ): string {
-  const API = environment.API;
-  const tos = require(`../../i18n/locales/terms-of-use/${API}/${currentLocale}.md`);
+  const tos = require(`../../i18n/locales/terms-of-use/${api}/${currentLocale}.md`);
   if (environment.isShelley()) {
     const testnetAddition = require(`../../i18n/locales/terms-of-use/itn/${currentLocale}.md`);
     return tos + '\n\n' + testnetAddition;

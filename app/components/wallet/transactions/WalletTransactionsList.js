@@ -45,7 +45,10 @@ type Props = {|
   +shouldHideBalance: boolean,
   +onAddMemo: WalletTransaction => void,
   +onEditMemo: WalletTransaction => void,
-  +unitOfAccountSetting: UnitOfAccountSettingType,
+  +unitOfAccountSetting: {|
+    +primaryTicker: string,
+    +settings: UnitOfAccountSettingType,
+  |},
   +addressLookup: string => void | {|
     goToRoute: void => void,
     displayName: $Exact<$npm$ReactIntl$MessageDescriptor>,
@@ -160,14 +163,20 @@ export default class WalletTransactionsList extends Component<Props> {
                   key={`${transaction.uniqueKey}`}
                   memo={this.props.memoMap.get(transaction.txid)}
                   unitOfAccount={(() => {
-                    if (!this.props.unitOfAccountSetting.enabled) {
-                      return undefined;
+                    if (!this.props.unitOfAccountSetting.settings.enabled) {
+                      return {
+                        primaryTicker: this.props.unitOfAccountSetting.primaryTicker,
+                        priceInfo: undefined,
+                      };
                     }
-                    return this.props.priceMap.get(getPriceKey(
-                      'ADA',
-                      this.props.unitOfAccountSetting.currency,
-                      transaction.date,
-                    ));
+                    return {
+                      primaryTicker: this.props.unitOfAccountSetting.primaryTicker,
+                      priceInfo: this.props.priceMap.get(getPriceKey(
+                        this.props.unitOfAccountSetting.primaryTicker,
+                        this.props.unitOfAccountSetting.settings.currency,
+                        transaction.date,
+                      ))
+                    };
                   })()}
                   selectedExplorer={this.props.selectedExplorer}
                   data={transaction}

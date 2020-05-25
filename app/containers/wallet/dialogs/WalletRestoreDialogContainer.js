@@ -10,7 +10,6 @@ import WalletRestoreVerifyDialog from '../../../components/wallet/WalletRestoreV
 import TransferSummaryPage from '../../../components/transfer/TransferSummaryPage';
 import LegacyExplanation from '../../../components/wallet/restore/LegacyExplanation';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
-import environment from '../../../environment';
 import globalMessages from '../../../i18n/global-messages';
 import {
   CheckAdressesInUseApiError,
@@ -59,14 +58,16 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
 
   componentDidMount() {
     const { walletRestore } = this.props.generated
-      ? this.props.generated.actions[environment.API]
-      : this.props.actions[environment.API];
+      ? this.props.generated.actions[this.generated.stores.profile.selectedAPI.type]
+      : this.props.actions[this.generated.stores.profile.selectedAPI.type];
     walletRestore.reset.trigger();
     walletRestore.setMode.trigger(this.props.mode);
   }
 
   componentWillUnmount() {
-    const { walletRestore } = this.generated.actions[environment.API];
+    const { walletRestore } = this.generated.actions[
+      this.generated.stores.profile.selectedAPI.type
+    ];
     walletRestore.reset.trigger();
   }
 
@@ -78,10 +79,14 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
   };
 
   render(): null | Node {
-    const walletRestoreActions = this.generated.actions[environment.API].walletRestore;
+    const walletRestoreActions = this.generated.actions[
+      this.generated.stores.profile.selectedAPI.type
+    ].walletRestore;
     const actions = this.generated.actions;
     const { uiNotifications, profile, } = this.generated.stores;
-    const { walletRestore, } = this.generated.stores.substores[environment.API];
+    const { walletRestore, } = this.generated.stores.substores[
+      this.generated.stores.profile.selectedAPI.type
+    ];
     const wallets = this._getWalletsStore();
     const { restoreRequest } = wallets;
 
@@ -98,19 +103,25 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         return (<WalletRestoreDialog
           mnemonicValidator={mnemonic => {
             if (isPaper) {
-              return this.generated.stores.substores[environment.API].wallets.isValidPaperMnemonic({
+              return this.generated.stores.substores[
+                this.generated.stores.profile.selectedAPI.type
+              ].wallets.isValidPaperMnemonic({
                 mnemonic,
                 numberOfWords: wordsCount
               });
             }
-            return this.generated.stores.substores[environment.API].wallets.isValidMnemonic({
+            return this.generated.stores.substores[
+              this.generated.stores.profile.selectedAPI.type
+            ].wallets.isValidMnemonic({
               mnemonic,
               numberOfWords: wordsCount
             });
           }}
           validWords={validWords}
           numberOfMnemonics={wordsCount}
-          onSubmit={meta => actions[environment.API].walletRestore.submitFields.trigger(meta)}
+          onSubmit={meta => actions[
+            this.generated.stores.profile.selectedAPI.type
+          ].walletRestore.submitFields.trigger(meta)}
           onCancel={this.onCancel}
           onBack={this.props.onBack}
           error={restoreRequest.error}
@@ -140,7 +151,9 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
             byronPlate={walletRestore.recoveryResult ?.byronPlate}
             shelleyPlate={walletRestore.recoveryResult ?.shelleyPlate}
             selectedExplorer={profile.selectedExplorer}
-            onNext={actions[environment.API].walletRestore.verifyMnemonic.trigger}
+            onNext={actions[
+              this.generated.stores.profile.selectedAPI.type
+            ].walletRestore.verifyMnemonic.trigger}
             onCancel={walletRestoreActions.back.trigger}
             onCopyAddressTooltip={(address, elementId) => {
               if (!uiNotifications.isOpen(elementId)) {
@@ -186,8 +199,12 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
   }
 
   _transferDialogContent(): null | Node {
-    const { yoroiTransfer } = this.generated.stores.substores[environment.API];
-    const walletRestoreActions = this.generated.actions[environment.API].walletRestore;
+    const { yoroiTransfer } = this.generated.stores.substores[
+      this.generated.stores.profile.selectedAPI.type
+    ];
+    const walletRestoreActions = this.generated.actions[
+      this.generated.stores.profile.selectedAPI.type
+    ].walletRestore;
     const { profile, } = this.generated.stores;
     const { intl } = this.context;
 
@@ -271,6 +288,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     return Object.freeze({
       stores: {
         profile: {
+          selectedAPI: stores.profile.selectedAPI,
           isClassicTheme: stores.profile.isClassicTheme,
           selectedExplorer: stores.profile.selectedExplorer,
           unitOfAccount: stores.profile.unitOfAccount,
@@ -287,7 +305,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           },
         },
         coinPriceStore: {
-          getCurrentPrice: stores.substores.ada.coinPriceStore.getCurrentPrice,
+          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
         },
         substores: {
           ada: {

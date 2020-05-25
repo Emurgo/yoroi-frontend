@@ -25,7 +25,6 @@ import type {
   GetDelegatedBalanceFunc,
   GetCurrentDelegationFunc,
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
-import environment from '../../environment';
 import type {
   AccountStateSuccess,
   RemotePoolMetaSuccess,
@@ -71,7 +70,7 @@ export default class DelegationStore extends Store {
     = new CachedRequest<ReputationFunc>(() => {
       // we need to defer this call because the store may not be initialized yet
       // by the time this constructor is called
-      const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+      const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
       return stateFetcher.getReputation();
     });
 
@@ -97,7 +96,7 @@ export default class DelegationStore extends Store {
       rewardHistory: new CachedRequest<RewardHistoryForWallet>(async (address) => {
         // we need to defer this call because the store may not be initialized yet
         // by the time this constructor is called
-        const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+        const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
         const result = await stateFetcher.getRewardHistory({ addresses: [address] });
         return result[address] ?? [];
       }),
@@ -139,7 +138,7 @@ export default class DelegationStore extends Store {
 
       const accountStateCalcs = (async () => {
         try {
-          const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+          const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
           const accountStateResp = await stateFetcher.getAccountState({
             addresses: [stakingKeyResp.addr.Hash],
           });
@@ -193,7 +192,7 @@ export default class DelegationStore extends Store {
     delegationRequest: DelegationRequests,
     stateForStakingKey: AccountStateSuccess,
   |} => Promise<void> = async (request) => {
-    const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+    const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
     const poolInfoResp = await stateFetcher.getPoolInfo({
       ids: request.stateForStakingKey.delegation.pools.map(delegation => delegation[0]),
     });
@@ -246,12 +245,12 @@ export default class DelegationStore extends Store {
         // update if tx history changes
         this.stores.substores.ada.transactions.hash,
         // if query failed due to server issue, need to re-query when it comes back online
-        this.stores.substores.ada.serverConnectionStore.checkAdaServerStatus,
+        this.stores.serverConnectionStore.checkAdaServerStatus,
         // reward grows every epoch so we have to refresh
         this.stores.substores.ada.time.currentTime?.currentEpoch,
       ],
       async () => {
-        if (!this.stores.substores.ada.serverConnectionStore.checkAdaServerStatus) {
+        if (!this.stores.serverConnectionStore.checkAdaServerStatus) {
           // don't re-query when server goes offline -- only when it comes back online
           return;
         }

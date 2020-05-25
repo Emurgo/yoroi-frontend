@@ -86,11 +86,10 @@ export default class TopBarContainer extends Component<Props> {
       throw new Error(`${nameof(TopBarContainer)} no way to generated props`);
     }
     const { stores, actions } = this.props;
-    const { coinPriceStore } = stores.substores.ada;
     return Object.freeze({
       stores: {
         coinPriceStore: {
-          getCurrentPrice: coinPriceStore.getCurrentPrice,
+          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
         },
         profile: {
           isClassicTheme: stores.profile.isClassicTheme,

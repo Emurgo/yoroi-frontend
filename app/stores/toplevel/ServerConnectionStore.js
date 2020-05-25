@@ -5,7 +5,7 @@ import Store from '../base/Store';
 import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import environment from '../../environment';
-import type { ServerStatusResponse } from '../../api/ada/lib/state-fetch/types';
+import type { ServerStatusResponse } from '../../api/common/lib/state-fetch/types';
 
 export default class ServerConnectionStore extends Store {
   SERVER_STATUS_REFRESH_INTERVAL: number = environment.serverStatusRefreshInterval;
@@ -26,7 +26,7 @@ export default class ServerConnectionStore extends Store {
   }
 
   @action _checkServerStatus: void => Promise<void> = async () => {
-    const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+    const stateFetcher = this.stores.stateFetchStore.fetcher;
     const checkServerStatusFunc = stateFetcher.checkServerStatus;
     try {
       const response: ServerStatusResponse = await checkServerStatusFunc();

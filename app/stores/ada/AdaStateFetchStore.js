@@ -7,7 +7,7 @@ import { RemoteFetcher } from '../../api/ada/lib/state-fetch/remoteFetcher';
 import { BatchedFetcher } from '../../api/ada/lib/state-fetch/batchedFetcher';
 import environment from '../../environment';
 
-export default class StateFetchStore extends Store {
+export default class AdaStateFetchStore extends Store {
 
   @observable fetcher: IFetcher;
 

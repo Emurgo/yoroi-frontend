@@ -188,7 +188,7 @@ export default class WalletRestoreStore extends Store {
         `${nameof(this._startRestore)} Cannot submit wallet restoration! No values are available in context!`
       );
     }
-    await this.actions[environment.API].wallets.restoreWallet.trigger({
+    await this.actions.ada.wallets.restoreWallet.trigger({
       recoveryPhrase: this.recoveryResult.phrase,
       walletName: this.walletRestoreMeta.walletName,
       walletPassword: this.walletRestoreMeta.walletPassword

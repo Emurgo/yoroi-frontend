@@ -87,7 +87,7 @@ class App extends Component<Props> {
 
   getContent: void => ?Node = () => {
     const { stores, actions, history } = this.props;
-    if (stores.substores.ada.serverConnectionStore.isMaintenance) {
+    if (stores.serverConnectionStore.isMaintenance) {
       return (<MaintenancePage stores={stores} actions={actions} />);
     }
     return (

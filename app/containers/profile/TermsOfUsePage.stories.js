@@ -26,7 +26,7 @@ export const Generic = (): Node => (
             isExecuting: boolean('isExecuting', false),
             error: null,
           },
-          termsOfUse: getTermsOfUse(globalKnobs.locale()),
+          termsOfUse: getTermsOfUse(globalKnobs.selectedAPI().type, globalKnobs.locale()),
         },
         serverConnectionStore: {
           checkAdaServerStatus: select(

@@ -12,6 +12,7 @@ import styles from './Loading.scss';
 import LocalizableError from '../../i18n/LocalizableError';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { ApiOptionType } from '../../api/index';
 
 const messages = defineMessages({
   loading: {
@@ -25,7 +26,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +api: string,
+  +api: ApiOptionType,
   +isLoadingDataForNextScreen: boolean,
   +hasLoadedCurrentLocale: boolean,
   +hasLoadedCurrentTheme: boolean,

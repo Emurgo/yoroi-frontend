@@ -212,6 +212,7 @@ export default class WalletReceivePage extends Component<Props> {
         ) : null}
         {uiDialogs.isOpen(URIGenerateDialog) ? (
           <URIGenerateDialog
+            primaryTicker={this.generated.stores.profile.selectedAPI.meta.primaryTicker}
             walletAddress={uiDialogs.getParam<string>('address')}
             amount={uiDialogs.getParam<number>('amount')}
             onClose={() => actions.dialogs.closeActiveDialog.trigger()}
@@ -337,6 +338,7 @@ export default class WalletReceivePage extends Component<Props> {
           getParam: stores.uiDialogs.getParam,
         },
         profile: {
+          selectedAPI: stores.profile.selectedAPI,
           selectedExplorer: stores.profile.selectedExplorer,
           isClassicTheme: stores.profile.isClassicTheme,
         },

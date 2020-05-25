@@ -5,6 +5,11 @@ import LocalStorageApi from './localStorage/index';
 import ExternalStorageApi from './externalStorage/index';
 import ExportApi from './export/index';
 
+export const ApiOptions = Object.freeze({
+  ada: 'ada',
+});
+export type ApiOptionType = $Values<typeof ApiOptions>;
+
 export type Api = {|
   ada: AdaApi,
   localStorage: LocalStorageApi,

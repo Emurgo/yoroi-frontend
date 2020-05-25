@@ -111,7 +111,7 @@ export default class StakingPage extends Component<Props> {
     const { stores } = this.generated;
     const { intl } = this.context;
 
-    const delegationTxStore = stores.substores[environment.API].delegationTransaction;
+    const delegationTxStore = stores.substores.ada.delegationTransaction;
 
     if (
       !delegationTxStore.signAndBroadcastDelegationTx.isExecuting &&

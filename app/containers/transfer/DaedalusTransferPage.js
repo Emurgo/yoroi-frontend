@@ -109,7 +109,7 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
   render(): null | Node {
     const { profile } = this.generated.stores;
     const daedalusTransfer = this.generated.stores.substores.ada.daedalusTransfer;
-    const adaWallets = this.generated.stores.substores[environment.API].wallets;
+    const adaWallets = this.generated.stores.substores.ada.wallets;
 
     const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
       ? (
@@ -219,7 +219,7 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
           refreshWalletFromRemote: stores.wallets.refreshWalletFromRemote,
         },
         coinPriceStore: {
-          getCurrentPrice: stores.substores.ada.coinPriceStore.getCurrentPrice,
+          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
         },
         substores: {
           ada: {

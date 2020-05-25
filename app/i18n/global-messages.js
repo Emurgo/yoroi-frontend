@@ -598,23 +598,6 @@ export const addressTypes: * = defineMessages({
   },
 });
 
-export const environmentSpecificMessages: * = {
-  ada: defineMessages({
-    currency: {
-      id: 'environment.currency.ada',
-      defaultMessage: '!!!Ada',
-    },
-    apiName: {
-      id: 'environment.apiName.cardano',
-      defaultMessage: '!!!Cardano',
-    },
-    apiVersion: {
-      id: 'environment.apiVersion.cardano',
-      defaultMessage: '!!!1.0.4',
-    },
-  }),
-};
-
 export function listOfTranslators(
   contributorsList: string,
   contributorsAck: string,

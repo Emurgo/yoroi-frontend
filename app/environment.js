@@ -10,8 +10,6 @@ import { RustModule } from './api/ada/lib/cardanoCrypto/rustLoader';
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
-declare type Currency = 'ada';
-
 function getVersion(): string {
   const genManifest = require('../chrome/manifest.' + CONFIG.network.name);
   const content = genManifest.default !== undefined
@@ -26,7 +24,6 @@ export const environment = ((
     /** Network used to connect */
     NETWORK: CONFIG.network.name,
     version: getVersion(),
-    API: ('ada': Currency), // Note: can't change at runtime
     MOBX_DEV_TOOLS: process.env.MOBX_DEV_TOOLS,
     commit: process.env.COMMIT || '',
     isJest: () => process.env.NODE_ENV === 'jest' || process.env.NODE_ENV === 'test',
@@ -46,7 +43,6 @@ export const environment = ((
       }
       return RustModule.WalletV3.AddressDiscrimination.Test;
     },
-    isAdaApi: () => environment.API === 'ada',
     walletRefreshInterval: CONFIG.app.walletRefreshInterval,
     serverStatusRefreshInterval: CONFIG.app.serverStatusRefreshInterval,
     userAgentInfo,
@@ -54,7 +50,6 @@ export const environment = ((
 ): {
     NETWORK: Network,
     version: string,
-    API: Currency,
     MOBX_DEV_TOOLS: ?string,
     commit: string,
     branch: string,
@@ -64,7 +59,6 @@ export const environment = ((
     isTest: void => boolean,
     isMainnet: void => boolean,
     isProduction: void => boolean,
-    isAdaApi: void => boolean,
     getDiscriminant: void => AddressDiscriminationType,
     walletRefreshInterval: number,
     serverStatusRefreshInterval: number,

@@ -57,6 +57,7 @@ const genBaseProps: {|
   initialShowMemoState: request.initialShowMemoState || false,
   stores: {
     profile: {
+      selectedAPI: globalKnobs.selectedAPI(),
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
       selectedExplorer: getDefaultExplorer(),
       unitOfAccount: genUnitOfAccount(),
@@ -156,6 +157,7 @@ const genBaseProps: {|
     generated: {
       stores: {
         profile: {
+          selectedAPI: globalKnobs.selectedAPI(),
           isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
           selectedExplorer: getDefaultExplorer(),
         },

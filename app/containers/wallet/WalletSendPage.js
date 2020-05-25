@@ -5,7 +5,6 @@ import { action, computed, observable, runInAction } from 'mobx';
 import type { Node } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
-import environment from '../../environment';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import globalMessages from '../../i18n/global-messages';
 import { tryAddressToKind } from '../../api/ada/lib/storage/bridge/utils';
@@ -96,7 +95,6 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     // Guard against potential null values
     if (!publicDeriver) throw new Error('Active wallet required for WalletSendPage.');
 
-    const { intl } = this.context;
     const { uiDialogs, profile, } = this.generated.stores;
     const { actions } = this.generated;
     const { validateAmount, hasAnyPending } = transactions;
@@ -122,7 +120,10 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     return (
       <>
         <WalletSendForm
-          currencyUnit={intl.formatMessage(globalMessages.unitAda)}
+          currencyUnit={{
+            unitName: this.generated.stores.profile.selectedAPI.meta.unitName,
+            primaryTicker: this.generated.stores.profile.selectedAPI.meta.primaryTicker,
+          }}
           currencyMaxIntegerDigits={MAX_INTEGER_PLACES_IN_ADA}
           currencyMaxFractionalDigits={DECIMAL_PLACES_IN_ADA}
           validateAmount={validateAmount}
@@ -245,9 +246,13 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       unsignedTx,
     };
     if (isLedgerNanoWallet(conceptualWallet)) {
-      const ledgerSendAction = this.generated.actions[environment.API].ledgerSend;
+      const ledgerSendAction = this.generated.actions[
+        this.generated.stores.profile.selectedAPI.type
+      ].ledgerSend;
       ledgerSendAction.init.trigger();
-      const ledgerSendStore = this.generated.stores.substores[environment.API].ledgerSend;
+      const ledgerSendStore = this.generated.stores.substores[
+        this.generated.stores.profile.selectedAPI.type
+      ].ledgerSend;
       hwSendConfirmationDialog = (
         <HWSendConfirmationDialog
           staleTx={transactionBuilderStore.txMismatch}
@@ -271,8 +276,12 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           coinPrice={coinPrice}
         />);
     } else if (isTrezorTWallet(conceptualWallet)) {
-      const trezorSendAction = this.generated.actions[environment.API].trezorSend;
-      const trezorSendStore = this.generated.stores.substores[environment.API].trezorSend;
+      const trezorSendAction = this.generated.actions[
+        this.generated.stores.profile.selectedAPI.type
+      ].trezorSend;
+      const trezorSendStore = this.generated.stores.substores[
+        this.generated.stores.profile.selectedAPI.type
+      ].trezorSend;
       hwSendConfirmationDialog = (
         <HWSendConfirmationDialog
           staleTx={transactionBuilderStore.txMismatch}
@@ -345,6 +354,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     return Object.freeze({
       stores: {
         profile: {
+          selectedAPI: stores.profile.selectedAPI,
           isClassicTheme: stores.profile.isClassicTheme,
           selectedExplorer: stores.profile.selectedExplorer,
           unitOfAccount: stores.profile.unitOfAccount,
@@ -360,7 +370,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           resetUriParams: stores.loading.resetUriParams,
         },
         coinPriceStore: {
-          getCurrentPrice: stores.substores.ada.coinPriceStore.getCurrentPrice,
+          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
         },
         uiDialogs: {
           isOpen: stores.uiDialogs.isOpen,

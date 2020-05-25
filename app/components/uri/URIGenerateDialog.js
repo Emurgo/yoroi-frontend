@@ -14,8 +14,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
-import environment from '../../environment';
-import globalMessages, { environmentSpecificMessages } from '../../i18n/global-messages';
+import globalMessages from '../../i18n/global-messages';
 
 import { formattedAmountToNaturalUnits } from '../../utils/formatters';
 import config from '../../config';
@@ -51,6 +50,7 @@ type Props = {|
   +classicTheme: boolean,
   +walletAddress: string,
   +amount?: number,
+  +primaryTicker: string,
   +currencyMaxIntegerDigits: number,
   +currencyMaxFractionalDigits: number,
   +validateAmount: (amountInNaturalUnits: string) => Promise<boolean>,
@@ -67,11 +67,8 @@ export default class URIGenerateDialog extends Component<Props> {
   };
 
   getAmountLabel: (() => string) = (): string => {
-    const currency = this.context.intl.formatMessage(
-      environmentSpecificMessages[environment.API].currency
-    );
     const label = this.context.intl.formatMessage(messages.uriGenerateDialogAmountLabel, {
-      currency
+      currency: this.props.primaryTicker,
     });
 
     return label;

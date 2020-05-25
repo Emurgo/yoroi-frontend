@@ -193,7 +193,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
   }
 
   _getAdaWalletsStore() {
-    return this.generated.stores.substores[environment.API].wallets;
+    return this.generated.stores.substores.ada.wallets;
   }
 
   _getTxBuilderStore() {
@@ -219,7 +219,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
           selected: stores.wallets.selected,
         },
         coinPriceStore: {
-          getCurrentPrice: stores.substores.ada.coinPriceStore.getCurrentPrice,
+          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
         },
         substores: {
           ada: {
