@@ -14,8 +14,6 @@ import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import ComplexityLevel from '../../components/profile/complexity-level/ComplexityLevelForm';
 
-
-
 const messages = defineMessages({
   title: {
     id: 'profile.complexityLevel.title',

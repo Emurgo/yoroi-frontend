@@ -8,10 +8,10 @@ import BeginnerLevel from '../../../assets/images/complexity-level/beginner-leve
 import AdvancedLevel from '../../../assets/images/complexity-level/advanced-level.inline.svg';
 
 type Props = {|
-  
+
 |}
 type State = {|
-  
+
 |}
 
 const levels = [
@@ -48,7 +48,7 @@ class ComplexityLevel extends Component<Props, State> {
             {
             levels.map(level => (
               <div className={classes.card} key={level.name}>
-                <div className={classnames([classes.cardImage, classes[level.name]]) }>
+                <div className={classnames([classes.cardImage, classes[level.name]])}>
                   {level.image}
                 </div>
                 <div className={classes.cardContent}>
