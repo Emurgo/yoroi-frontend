@@ -1,0 +1,86 @@
+.component{
+  max-width: 650px;
+  margin: 0 auto;
+  margin-top: 80px;
+  .header {
+    color: var(--theme-wallet-dropdown-secondary-text-color);
+    text-align: center;
+    margin-bottom: 50px;
+    font-size: 1.125rem;
+    font-weight: bold;
+    letter-spacing: 0;
+    line-height: 1.375rem;
+  }
+  .description {
+    color: var(--theme-transactions-list-detail-row-text-color);
+    font-size: 1rem;
+    line-height: 1.375rem;
+    text-align: center;
+  }
+  .cardsWrapper {
+    margin: 30px auto;
+    display: flex;
+    & > div {
+      flex: 1;
+    }
+  }
+  .card {
+    margin-right: 30px;
+    border-radius: 8px;
+    background-color: #FFFFFF;
+    box-shadow: 0 5px 20px 0 rgba(24,26,30,0.08);
+    overflow: hidden;
+    &:last-child {
+      margin-right: 0;
+    }
+    .cardImage {
+      background-color: #e5e5e5;
+      height:184px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .simple {
+      background: #F1FDFA;
+    }
+    .advanced {
+      background: #F3F5FD;
+    }
+    .cardContent{
+      padding: 24px ;
+      color: var(--theme-transactions-list-text-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 300px;
+      h3 {
+        font-size: 1.5rem;
+        letter-spacing: 0;
+        line-height: 1.875rem;
+        text-align: center;
+        text-transform: capitalize;
+        margin-bottom: 16px;
+      }
+      p {
+        font-size: .75rem;
+        letter-spacing: 0;
+        line-height: 1.25rem;
+      }
+    }
+    .cardButton {
+      font-size: 1rem;
+      padding: 1rem 1.2rem;
+      border: 2px solid #15D1AA;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1.3125rem;
+      color:#15D1AA;
+      border-radius: 8px;
+      width: 100%;
+      transition: 0.3s;
+      &:hover {
+        transform: translateY(-2px);
+      }
+    }
+  }
+}

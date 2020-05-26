@@ -43,6 +43,7 @@ import StakingPage from './containers/wallet/staking/StakingPage';
 import NoticeBoardPage from './containers/notice-board/NoticeBoardPage';
 
 import type { ConfigType } from '../config/config-types';
+import ComplexityLevelPage from './containers/profile/ComplexityLevelPage';
 
 declare var CONFIG: ConfigType;
 
@@ -67,6 +68,11 @@ export const Routes = (
         exact
         path={ROUTES.PROFILE.LANGUAGE_SELECTION}
         component={(props) => <LanguageSelectionPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.PROFILE.COMPLEXITY_LEVEL}
+        component={(props) => <ComplexityLevelPage {...props} stores={stores} actions={actions} />}
       />
       <Route
         exact
