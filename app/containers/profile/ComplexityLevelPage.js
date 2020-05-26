@@ -8,7 +8,6 @@ import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarning
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import { computed } from 'mobx';
-import { environment } from '../../environment';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -65,11 +64,8 @@ export default class ComplexityLevelPage extends Component<InjectedOrGenerated<G
     return Object.freeze({
       stores: {
         serverConnectionStore: {
-          checkAdaServerStatus: stores.substores[environment.API]
-            .serverConnectionStore.checkAdaServerStatus,
+          checkAdaServerStatus: stores.serverConnectionStore.checkAdaServerStatus,
         },
-      },
-      actions: {
       },
     });
   }
