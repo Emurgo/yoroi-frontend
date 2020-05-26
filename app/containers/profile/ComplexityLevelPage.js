@@ -47,8 +47,8 @@ export default class ComplexityLevelPage extends Component<InjectedOrGenerated<G
       />);
     return (
       <TopBarLayout
-        // topbar={topbarElement}
-        // banner={displayedBanner}
+        topbar={topbarElement}
+        banner={displayedBanner}
       >
         <ComplexityLevel />
       </TopBarLayout>
@@ -63,8 +63,7 @@ export default class ComplexityLevelPage extends Component<InjectedOrGenerated<G
     if (this.props.stores == null || this.props.actions == null) {
       throw new Error(`${nameof(ComplexityLevelPage)} no way to generated props`);
     }
-    const { stores, actions } = this.props;
-    const profileStore = stores.profile;
+    const { stores } = this.props;
     return Object.freeze({
       stores: {
         serverConnectionStore: {
