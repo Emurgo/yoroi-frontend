@@ -4,7 +4,6 @@ import { find } from 'lodash';
 import Store from './Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import WalletTransaction from '../../domain/WalletTransaction';
-import environment from '../../environment';
 
 import type { GetTransactionsFunc, GetBalanceFunc,
   GetTransactionsRequest, GetTransactionsRequestOptions,
@@ -64,7 +63,8 @@ export default class TransactionsStore extends Store {
 
   setup(): void {
     super.setup();
-    const actions = this.actions[environment.API].transactions;
+    // TODO: not only ADA
+    const actions = this.actions[this.stores.profile.selectedAPI.type].transactions;
     actions.loadMoreTransactions.listen(this._increaseSearchLimit);
   }
 
@@ -164,7 +164,8 @@ export default class TransactionsStore extends Store {
     }
 
     // All Request
-    const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+    const API = this.stores.profile.selectedAPI.type;
+    const stateFetcher = this.stores.substores[API].stateFetchStore.fetcher;
     const {
       getTransactionsHistoryForAddresses,
       checkAddressesInUse,
@@ -191,7 +192,9 @@ export default class TransactionsStore extends Store {
 
     // update last sync (note: changes even if no new transaction is found)
     {
-      const lastUpdateDate = await this.api[environment.API].getTxLastUpdatedDate({
+      const lastUpdateDate = await this.api[
+        this.stores.profile.selectedAPI.type
+      ].getTxLastUpdatedDate({
         getLastSyncInfo: publicDeriver.getLastSyncInfo
       });
       runInAction(() => {
@@ -211,8 +214,7 @@ export default class TransactionsStore extends Store {
     // note: possible existing memos were modified on a difference instance, etc.
     await this.actions.memos.syncTxMemos.trigger(request.publicDeriver);
     // note: possible we failed to get the historical price for something in the past
-    const coinPriceStore = this.stores.substores[environment.API].coinPriceStore;
-    await coinPriceStore.updateTransactionPriceData({
+    await this.stores.coinPriceStore.updateTransactionPriceData({
       db: publicDeriver.getDb(),
       transactions: result.transactions,
     });
@@ -263,7 +265,8 @@ export default class TransactionsStore extends Store {
   ) => Promise<PromisslessReturnType<GetTransactionsFunc>> = (
     publicDeriver: PublicDeriver<> & IGetLastSyncInfo,
   ) => {
-    const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+    const API = this.stores.profile.selectedAPI;
+    const stateFetcher = this.stores.substores[API.type].stateFetchStore.fetcher;
 
     const limit = this.searchOptions
       ? this.searchOptions.limit
@@ -306,7 +309,7 @@ export default class TransactionsStore extends Store {
     if (foundRequest != null) {
       return;
     }
-    const api = this.api[environment.API];
+    const api = this.api[this.stores.profile.selectedAPI.type];
     this.transactionsRequests.push({
       publicDeriver: request.publicDeriver,
       lastSyncInfo: request.lastSyncInfo,

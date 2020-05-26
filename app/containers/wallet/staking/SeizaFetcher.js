@@ -8,7 +8,6 @@ import { observer } from 'mobx-react';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import { intlShape, } from 'react-intl';
 import DelegationTxDialog from '../../../components/wallet/staking/DelegationTxDialog';
-import environment from '../../../environment';
 import { getShelleyTxFee } from '../../../api/ada/transactions/shelley/utils';
 import AnnotatedLoader from '../../../components/transfer/AnnotatedLoader';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
@@ -53,7 +52,7 @@ export default class SeizaFetcher extends Component<Props> {
     if (selectedWallet == null) {
       return;
     }
-    const delegationTxActions = this.generated.actions[environment.API].delegationTransaction;
+    const delegationTxActions = this.generated.actions.ada.delegationTransaction;
     await delegationTxActions.createTransaction.trigger({
       poolRequest: { id: pools[0].poolHash },
       publicDeriver: selectedWallet,
@@ -85,8 +84,8 @@ export default class SeizaFetcher extends Component<Props> {
   };
 
   cancel: void => void = () => {
-    this.generated.actions[environment.API].delegationTransaction.setPools.trigger([]);
-    this.generated.actions[environment.API].delegationTransaction.reset.trigger();
+    this.generated.actions.ada.delegationTransaction.setPools.trigger([]);
+    this.generated.actions.ada.delegationTransaction.reset.trigger();
   }
 
   render(): Node {
@@ -115,8 +114,8 @@ export default class SeizaFetcher extends Component<Props> {
     const { actions, stores } = this.generated;
     const { intl } = this.context;
     const { profile } = stores;
-    const delegationTxStore = stores.substores[environment.API].delegationTransaction;
-    const delegationTxActions = actions[environment.API].delegationTransaction;
+    const delegationTxStore = stores.substores.ada.delegationTransaction;
+    const delegationTxActions = actions.ada.delegationTransaction;
 
     const delegationTx = delegationTxStore.createDelegationTx.result;
 

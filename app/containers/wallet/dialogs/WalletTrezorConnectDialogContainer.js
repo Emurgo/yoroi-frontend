@@ -4,7 +4,6 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 
-import environment from '../../../environment';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import { Logger } from '../../../utils/logging';
 import { handleExternalLinkClick } from '../../../utils/routing';
@@ -28,13 +27,17 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
 
   cancel: void => void = () => {
     this.props.onClose();
-    this.generated.actions[environment.API].trezorConnect.cancel.trigger();
+    this.generated.actions[
+      this.generated.stores.profile.selectedAPI.type
+    ].trezorConnect.cancel.trigger();
   };
 
   render(): null | Node {
     const { profile } = this.generated.stores;
     const trezorConnectStore = this._getTrezorConnectStore();
-    const hwConnectActions = this.generated.actions[environment.API].trezorConnect;
+    const hwConnectActions = this.generated.actions[
+      this.generated.stores.profile.selectedAPI.type
+    ].trezorConnect;
 
     let component = null;
 
@@ -88,7 +91,9 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
 
   /** Returns the store which is responsible for this Container */
   _getTrezorConnectStore() {
-    return this.generated.stores.substores[environment.API].trezorConnect;
+    return this.generated.stores.substores[
+      this.generated.stores.profile.selectedAPI.type
+    ].trezorConnect;
   }
 
   @computed get generated() {
@@ -102,6 +107,7 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
     return Object.freeze({
       stores: {
         profile: {
+          selectedAPI: stores.profile.selectedAPI,
           isClassicTheme: stores.profile.isClassicTheme,
         },
         substores: {

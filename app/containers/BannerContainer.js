@@ -39,8 +39,7 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
     return Object.freeze({
       stores: {
         serverConnectionStore: {
-          checkAdaServerStatus: stores.substores[environment.API]
-            .serverConnectionStore.checkAdaServerStatus,
+          checkAdaServerStatus: stores.serverConnectionStore.checkAdaServerStatus,
         },
       },
     });

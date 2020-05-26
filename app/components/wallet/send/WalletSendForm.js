@@ -19,7 +19,7 @@ import AmountInputSkin from '../skins/AmountInputSkin';
 import AddMemoSvg from '../../../assets/images/add-memo.inline.svg';
 import BorderedBox from '../../widgets/BorderedBox';
 import styles from './WalletSendForm.scss';
-import globalMessages, { memoMessages, environmentSpecificMessages } from '../../../i18n/global-messages';
+import globalMessages, { memoMessages, } from '../../../i18n/global-messages';
 import environment from '../../../environment';
 import type { UriParams } from '../../../utils/URIHandling';
 import { getAddressPayload } from '../../../api/ada/lib/storage/bridge/utils';
@@ -105,7 +105,10 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +currencyUnit: string,
+  +currencyUnit: {|
+    unitName: string,
+    primaryTicker: string,
+  |},
   +currencyMaxIntegerDigits: number,
   +currencyMaxFractionalDigits: number,
   +hasAnyPending: boolean,
@@ -309,7 +312,6 @@ export default class WalletSendForm extends Component<Props> {
         </WarningBox>
       </div>
     );
-    const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
 
     let transactionFeeError = null;
     if (this.props.isCalculatingFee) {
@@ -346,7 +348,7 @@ export default class WalletSendForm extends Component<Props> {
               disabled={this.props.shouldSendAll}
               error={(transactionFeeError || amountField.error)}
               // AmountInputSkin props
-              currency={currencyUnit}
+              currency={currencyUnit.unitName}
               fees={transactionFee.toFormat(currencyMaxFractionalDigits)}
               total={totalAmount.toFormat(currencyMaxFractionalDigits)}
               skin={AmountInputSkin}
@@ -355,7 +357,7 @@ export default class WalletSendForm extends Component<Props> {
           </div>
           <div className={styles.checkbox}>
             <Checkbox
-              label={intl.formatMessage(messages.checkboxLabel, { currency })}
+              label={intl.formatMessage(messages.checkboxLabel, { currency: currencyUnit.primaryTicker })}
               onChange={() => {
                 this.props.toggleSendAll();
                 if (this.props.shouldSendAll) {

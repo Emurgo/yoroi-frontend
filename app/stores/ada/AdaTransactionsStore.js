@@ -41,7 +41,7 @@ export default class AdaTransactionsStore extends TransactionsStore {
 
   setup(): void {
     super.setup();
-    const actions = this.actions[environment.API].transactions;
+    const actions = this.actions.ada.transactions;
     actions.exportTransactionsToFile.listen(this._exportTransactionsToFile);
     actions.closeExportTransactionDialog.listen(this._closeExportTransactionDialog);
   }
@@ -82,7 +82,7 @@ export default class AdaTransactionsStore extends TransactionsStore {
 
     const getUnitOfAccount = (timestamp: Date) => (!unitOfAccount.enabled
       ? undefined
-      : this.stores.substores.ada.coinPriceStore.priceMap.get(getPriceKey(
+      : this.stores.coinPriceStore.priceMap.get(getPriceKey(
         'ADA',
         unitOfAccount.currency,
         timestamp

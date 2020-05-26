@@ -75,7 +75,7 @@ export default class StakingDashboardPage extends Component<Props> {
   }
 
   componentWillUnmount() {
-    this.generated.actions[environment.API].delegationTransaction.reset.trigger();
+    this.generated.actions.ada.delegationTransaction.reset.trigger();
   }
 
   hideOrFormat: BigNumber => {|
@@ -119,7 +119,7 @@ export default class StakingDashboardPage extends Component<Props> {
       throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
     }
 
-    const delegationStore = this.generated.stores.substores[environment.API].delegation;
+    const delegationStore = this.generated.stores.substores.ada.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
@@ -198,12 +198,12 @@ export default class StakingDashboardPage extends Component<Props> {
 
   generatePopupDialog: PublicDeriver<> => (null | Node) = (publicDeriver) => {
     const { uiDialogs } = this.generated.stores;
-    const delegationTxStore = this.generated.stores.substores[environment.API]
+    const delegationTxStore = this.generated.stores.substores.ada
       .delegationTransaction;
 
     const cancel = () => {
       this.generated.actions.dialogs.closeActiveDialog.trigger();
-      this.generated.actions[environment.API].delegationTransaction.reset.trigger();
+      this.generated.actions.ada.delegationTransaction.reset.trigger();
     };
     if (delegationTxStore.createDelegationTx.error != null) {
       const { intl } = this.context;
@@ -243,14 +243,14 @@ export default class StakingDashboardPage extends Component<Props> {
       classicTheme={this.generated.stores.profile.isClassicTheme}
       error={delegationTxStore.signAndBroadcastDelegationTx.error}
       onSubmit={async request => {
-        await this.generated.actions[environment.API]
+        await this.generated.actions.ada
           .delegationTransaction
           .signTransaction
           .trigger({ password: request.password, publicDeriver, });
         cancel();
       }}
       generatingTx={
-        this.generated.stores.substores[environment.API]
+        this.generated.stores.substores.ada
           .delegationTransaction
           .createDelegationTx
           .isExecuting
@@ -273,7 +273,7 @@ export default class StakingDashboardPage extends Component<Props> {
     const toRealTime = timeCalcRequests.requests.toRealTime.result;
     if (toRealTime == null) return undefined;
 
-    const delegationStore = this.generated.stores.substores[environment.API].delegation;
+    const delegationStore = this.generated.stores.substores.ada.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
@@ -407,7 +407,7 @@ export default class StakingDashboardPage extends Component<Props> {
   getErrorInFetch: PublicDeriver<> => void | {| error: LocalizableError, |} = (
     publicDeriver
   ) => {
-    const delegationStore = this.generated.stores.substores[environment.API].delegation;
+    const delegationStore = this.generated.stores.substores.ada.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
@@ -436,7 +436,7 @@ export default class StakingDashboardPage extends Component<Props> {
   getStakePools: PublicDeriver<> => {| pools: null | Array<Node> |} = (
     publicDeriver
   ) => {
-    const delegationStore = this.generated.stores.substores[environment.API].delegation;
+    const delegationStore = this.generated.stores.substores.ada.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
@@ -519,7 +519,7 @@ export default class StakingDashboardPage extends Component<Props> {
               keyState.state.delegation.pools.length === 1
                 ? async () => {
                   this.generated.actions.dialogs.open.trigger({ dialog: UndelegateDialog });
-                  await this.generated.actions[environment.API]
+                  await this.generated.actions.ada
                     .delegationTransaction
                     .createTransaction
                     .trigger({
@@ -734,7 +734,7 @@ export default class StakingDashboardPage extends Component<Props> {
           selected: stores.wallets.selected,
         },
         coinPriceStore: {
-          getCurrentPrice: stores.substores.ada.coinPriceStore.getCurrentPrice,
+          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
         },
         uiDialogs: {
           isOpen: stores.uiDialogs.isOpen,

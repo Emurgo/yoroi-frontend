@@ -57,6 +57,9 @@ const defaultProps: {|
   WalletLedgerConnectDialogContainerProps?: *,
 |} => * = (request) => ({
   stores: {
+    profile: {
+      selectedAPI: globalKnobs.selectedAPI(),
+    },
     uiDialogs: {
       isOpen: (clazz) => clazz === request.openDialog,
       getParam: request.getParam || (() => (undefined: any)),
@@ -380,6 +383,7 @@ const restoreWalletProps: {|
 |} => * = (request) => ({
   stores: {
     profile: {
+      selectedAPI: globalKnobs.selectedAPI(),
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
       selectedExplorer: getDefaultExplorer(),
       unitOfAccount: genUnitOfAccount(),
@@ -693,6 +697,7 @@ const trezorPops: {|
 |} => * = (request) => ({
   stores: {
     profile: {
+      selectedAPI: globalKnobs.selectedAPI(),
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
     },
     substores: {
@@ -838,6 +843,7 @@ const ledgerProps: {|
 |} => * = (request) => ({
   stores: {
     profile: {
+      selectedAPI: globalKnobs.selectedAPI(),
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
     },
     substores: {

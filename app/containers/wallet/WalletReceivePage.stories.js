@@ -146,6 +146,7 @@ const genBaseProps: {|
         getParam: request.getParam || (() => (undefined: any)),
       },
       profile: {
+        selectedAPI: globalKnobs.selectedAPI(),
         isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
         selectedExplorer: getDefaultExplorer(),
       },

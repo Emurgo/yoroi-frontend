@@ -12,10 +12,12 @@ import type {
   AccountStateRequest, AccountStateResponse,
   PoolInfoRequest, PoolInfoResponse,
   ReputationRequest, ReputationResponse,
-  ServerStatusResponse,
   TxBodiesRequest, TxBodiesResponse,
   SignedRequestInternal,
 } from '../../app/api/ada/lib/state-fetch/types';
+import type {
+  ServerStatusResponse,
+} from '../../app/api/common/lib/state-fetch/types';
 import chai from 'chai';
 import mockImporter from './mockImporter';
 import { installCoinPriceRequestHandlers } from './coinPriceRequestHandler';

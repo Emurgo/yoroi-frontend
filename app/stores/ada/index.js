@@ -16,9 +16,7 @@ import LedgerConnectStore from './LedgerConnectStore';
 import LedgerSendStore from './LedgerSendStore';
 import HWVerifyAddressStore from './HWVerifyAddressStore';
 import PaperWalletCreateStore from './PaperWalletCreateStore';
-import StateFetchStore from './StateFetchStore';
-import ServerConnectionStore from './ServerConnectionStore';
-import CoinPriceStore from './CoinPriceStore';
+import AdaStateFetchStore from './AdaStateFetchStore';
 import WalletRestoreStore from './WalletRestoreStore';
 import DelegationTransactionStore from './DelegationTransactionStore';
 import DelegationStore from './DelegationStore';
@@ -40,10 +38,8 @@ export const adaStoreClasses = {
   ledgerConnect: LedgerConnectStore,
   ledgerSend: LedgerSendStore,
   hwVerifyAddress: HWVerifyAddressStore,
-  stateFetchStore: StateFetchStore,
+  stateFetchStore: AdaStateFetchStore,
   transactionBuilderStore: AdaTransactionBuilderStore,
-  serverConnectionStore: ServerConnectionStore,
-  coinPriceStore: CoinPriceStore,
   walletRestore: WalletRestoreStore,
   delegationTransaction: DelegationTransactionStore,
   delegation: DelegationStore,
@@ -63,10 +59,8 @@ export type AdaStoresMap = {|
   ledgerConnect: LedgerConnectStore,
   ledgerSend: LedgerSendStore,
   hwVerifyAddress: HWVerifyAddressStore,
-  stateFetchStore: StateFetchStore,
+  stateFetchStore: AdaStateFetchStore,
   transactionBuilderStore: AdaTransactionBuilderStore,
-  serverConnectionStore: ServerConnectionStore,
-  coinPriceStore: CoinPriceStore,
   walletRestore: WalletRestoreStore,
   delegationTransaction: DelegationTransactionStore,
   delegation: DelegationStore,
@@ -88,8 +82,6 @@ const adaStores: WithNullableFields<AdaStoresMap> = observable({
   hwVerifyAddress: null,
   stateFetchStore: null,
   transactionBuilderStore: null,
-  serverConnectionStore: null,
-  coinPriceStore: null,
   walletRestore: null,
   delegationTransaction: null,
   delegation: null,

@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import { computed, runInAction, observable } from 'mobx';
 import { intlShape, FormattedHTMLMessage } from 'react-intl';
 import { ROUTES } from '../../routes-config';
-import environment from '../../environment';
 import type { Notification } from '../../types/notificationType';
 import NotificationMessage from '../../components/widgets/NotificationMessage';
 import globalMessages from '../../i18n/global-messages';
@@ -72,7 +71,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
     const {
       exportTransactionsToFile,
       closeExportTransactionDialog,
-    } = actions[environment.API].transactions;
+    } = actions[this.generated.stores.profile.selectedAPI.type].transactions;
 
     const isLoadingTx = (
       !recentTransactionsRequest.wasExecuted || recentTransactionsRequest.isExecuting
@@ -135,7 +134,10 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
                 actions.dialogs.open.trigger({ dialog: EditMemoDialog });
               }
             })}
-            unitOfAccountSetting={profile.unitOfAccount}
+            unitOfAccountSetting={{
+              primaryTicker: profile.selectedAPI.meta.primaryTicker,
+              settings: profile.unitOfAccount,
+            }}
             addressLookup={(address) => {
               const addressStores = addresses.getStoresForWallet(publicDeriver);
               for (const addressStore of addressStores) {
@@ -334,6 +336,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
     return Object.freeze({
       stores: {
         profile: {
+          selectedAPI: stores.profile.selectedAPI,
           selectedExplorer: stores.profile.selectedExplorer,
           shouldHideBalance: stores.profile.shouldHideBalance,
           isClassicTheme: stores.profile.isClassicTheme,
@@ -352,7 +355,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
           selected: stores.wallets.selected,
         },
         coinPriceStore: {
-          priceMap: stores.substores.ada.coinPriceStore.priceMap,
+          priceMap: stores.coinPriceStore.priceMap,
         },
         memos: {
           hasSetSelectedExternalStorageProvider: stores.memos.hasSetSelectedExternalStorageProvider,

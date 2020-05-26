@@ -12,14 +12,20 @@ import MemosStore from './toplevel/MemosStore';
 import WalletStore from './toplevel/WalletStore';
 import setupAdaStores from './ada/index';
 import type { AdaStoresMap } from './ada/index';
-import environment from '../environment';
 import { RouterStore } from 'mobx-react-router';
 import type { ActionsMap } from '../actions/index';
 import type { Api } from '../api/index';
+import { ApiOptions } from '../api/index';
+import StateFetchStore from './toplevel/StateFetchStore';
+import CoinPriceStore from './toplevel/CoinPriceStore';
+import ServerConnectionStore from './toplevel/ServerConnectionStore';
 
 /** Map of var name to class. Allows dynamic lookup of class so we can init all stores one loop */
 const storeClasses = {
+  stateFetchStore: StateFetchStore,
+  coinPriceStore: CoinPriceStore,
   profile: ProfileStore,
+  serverConnectionStore: ServerConnectionStore,
   app: AppStore,
   topbar: TopbarStore,
   memos: MemosStore,
@@ -33,7 +39,10 @@ const storeClasses = {
 };
 
 export type StoresMap = {|
+  stateFetchStore: StateFetchStore,
+  coinPriceStore: CoinPriceStore,
   profile: ProfileStore,
+  serverConnectionStore: ServerConnectionStore,
   app: AppStore,
   topbar: TopbarStore,
   memos: MemosStore,
@@ -49,7 +58,10 @@ export type StoresMap = {|
 
 /** Constant that represents the stores across the lifetime of the application */
 const stores: WithNullableFields<StoresMap> = observable({
+  stateFetchStore: null, // best to initialize first to avoid issues
+  coinPriceStore: null,
   profile: null,
+  serverConnectionStore: null,
   app: null,
   topbar: null,
   memos: null,
@@ -97,13 +109,13 @@ export default (action(
      * Because to make sure all substores are non-null we have to create the object
      * But we only want to actually initialize it if it is the currency in use */
     stores.substores = {
-      ada: setupAdaStores((stores: any), api, actions)
+      ada: setupAdaStores((stores: any), api, actions),
     };
 
     const loadedStores: StoresMap = (stores: any);
-    if (environment.API === 'ada') {
+    for (const apiOption of Object.keys(ApiOptions)) {
       Object
-        .keys(loadedStores.substores.ada)
+        .keys(loadedStores.substores[apiOption])
         .map(key => loadedStores.substores.ada[key])
         .forEach(store => store.initialize());
     }

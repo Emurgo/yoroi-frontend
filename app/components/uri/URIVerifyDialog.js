@@ -9,8 +9,7 @@ import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import DialogBackButton from '../widgets/DialogBackButton';
 import type { UriParams } from '../../utils/URIHandling';
-import globalMessages, { environmentSpecificMessages } from '../../i18n/global-messages';
-import environment from '../../environment';
+import globalMessages from '../../i18n/global-messages';
 import { formattedWalletAmount } from '../../utils/formatters';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../widgets/hashWrappers/RawHash';
@@ -42,6 +41,7 @@ type Props = {|
   +onCancel: void => void,
   +uriParams: UriParams,
   +selectedExplorer: ExplorerType,
+  +primaryTicker: string,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +coinPrice: ?number,
 |};
@@ -56,8 +56,6 @@ export default class URIVerifyDialog extends Component<Props> {
   render(): Node {
     const { onCancel, onSubmit, unitOfAccountSetting, coinPrice } = this.props;
     const { intl } = this.context;
-
-    const currency = intl.formatMessage(environmentSpecificMessages[environment.API].currency);
 
     const dialogClasses = classnames([
       styles.dialog,
@@ -114,12 +112,12 @@ export default class URIVerifyDialog extends Component<Props> {
                 {unitOfAccountSetting.currency}
               </div>
               <div className={styles.amountSmall}>
-                {formattedWalletAmount(amount)} {currency}
+                {formattedWalletAmount(amount)} {this.props.primaryTicker}
               </div>
             </>
           ) : (
             <div className={styles.amount}>
-              {formattedWalletAmount(amount)} {currency}
+              {formattedWalletAmount(amount)} {this.props.primaryTicker}
             </div>
           )}
         </div>

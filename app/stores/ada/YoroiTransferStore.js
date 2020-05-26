@@ -352,7 +352,7 @@ export default class YoroiTransferStore extends Store {
     const rootPk = this.transferKind === TransferKind.LEDGER
       ? generateLedgerWalletRootKey(recoveryPhrase)
       : generateWalletRootKey(recoveryPhrase);
-    const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+    const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
     const restoreResult = await this.restoreForTransferRequest.execute({
       rootPk,
       accountIndex,

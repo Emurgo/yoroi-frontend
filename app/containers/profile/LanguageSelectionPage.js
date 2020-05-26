@@ -152,8 +152,7 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
           getProfileLocaleRequest: stores.profile.getProfileLocaleRequest,
         },
         serverConnectionStore: {
-          checkAdaServerStatus: stores.substores[environment.API]
-            .serverConnectionStore.checkAdaServerStatus,
+          checkAdaServerStatus: stores.serverConnectionStore.checkAdaServerStatus,
         },
       },
       actions: {

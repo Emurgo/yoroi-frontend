@@ -4,7 +4,6 @@ import cryptoRandomString from 'crypto-random-string';
 import type {
   SignedRequestInternal, SignedResponse,
   RemoteTransaction,
-  ServerStatusResponse,
   TxBodiesFunc,
   AccountStateFunc,
   ReputationFunc,
@@ -16,6 +15,9 @@ import type {
   BestBlockFunc,
   FilterFunc,
 } from '../../app/api/ada/lib/state-fetch/types';
+import type {
+  ServerStatusResponse,
+} from '../../app/api/common/lib/state-fetch/types';
 import {
   genGetTransactionsHistoryForAddresses,
   genGetRewardHistory,

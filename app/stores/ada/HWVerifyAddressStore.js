@@ -47,7 +47,7 @@ export default class AddressesStore extends Store {
 
   setup(): void {
     super.setup();
-    const actions = this.actions[environment.API].hwVerifyAddress;
+    const actions = this.actions.ada.hwVerifyAddress;
     actions.selectAddress.listen(this._selectAddress);
     actions.verifyAddress.listen(this._verifyAddress);
     actions.closeAddressDetailDialog.listen(this._closeAddressDetailDialog);

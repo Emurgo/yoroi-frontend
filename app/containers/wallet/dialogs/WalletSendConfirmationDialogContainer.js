@@ -3,7 +3,6 @@ import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
-import environment from '../../../environment';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import type { BaseSignRequest } from '../../../api/ada/transactions/types';
 import {
@@ -43,11 +42,11 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
       unitOfAccountSetting, coinPrice,
     } = this.props;
     const { stores, actions } = this.generated;
-    const { wallets } = stores.substores[environment.API];
+    const { wallets } = stores.substores[this.generated.stores.profile.selectedAPI.type];
     const { sendMoneyRequest } = wallets;
     const publicDeriver = stores.wallets.selected;
     const { profile } = stores;
-    const { sendMoney } = actions[environment.API].wallets;
+    const { sendMoney } = actions[this.generated.stores.profile.selectedAPI.type].wallets;
 
     if (publicDeriver == null) throw new Error('Active wallet required for WalletSendPage.');
 
@@ -96,6 +95,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     return Object.freeze({
       stores: {
         profile: {
+          selectedAPI: stores.profile.selectedAPI,
           isClassicTheme: stores.profile.isClassicTheme,
           selectedExplorer: stores.profile.selectedExplorer,
         },

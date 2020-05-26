@@ -8,6 +8,7 @@ import { action } from '@storybook/addon-actions';
 import LoadingPage from './LoadingPage';
 import { StorageLoadError, UnableToLoadError } from '../i18n/errors';
 import { withScreenshot } from 'storycap';
+import { globalKnobs } from '../../stories/helpers/StoryWrapper';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -26,6 +27,7 @@ export const Generic = (): Node => (
     generated={{
       stores: {
         profile: {
+          selectedAPI: globalKnobs.selectedAPI(),
           hasLoadedCurrentLocale: boolean('hasLoadedCurrentLocale', true),
           hasLoadedCurrentTheme: boolean('hasLoadedCurrentTheme', true),
         },
@@ -51,6 +53,7 @@ export const NoLocale = (): Node => (
     generated={{
       stores: {
         profile: {
+          selectedAPI: globalKnobs.selectedAPI(),
           hasLoadedCurrentLocale: false,
           hasLoadedCurrentTheme: boolean('hasLoadedCurrentTheme', true),
         },
@@ -74,6 +77,7 @@ export const NoTheme = (): Node => (
     generated={{
       stores: {
         profile: {
+          selectedAPI: globalKnobs.selectedAPI(),
           hasLoadedCurrentLocale: boolean('hasLoadedCurrentLocale', true),
           hasLoadedCurrentTheme: false,
         },
@@ -97,6 +101,7 @@ export const StorageLoadFailed = (): Node => (
     generated={{
       stores: {
         profile: {
+          selectedAPI: globalKnobs.selectedAPI(),
           hasLoadedCurrentLocale: boolean('hasLoadedCurrentLocale', true),
           hasLoadedCurrentTheme: boolean('hasLoadedCurrentTheme', true),
         },
@@ -116,6 +121,7 @@ export const UnknownLoadFailed = (): Node => (
     generated={{
       stores: {
         profile: {
+          selectedAPI: globalKnobs.selectedAPI(),
           hasLoadedCurrentLocale: boolean('hasLoadedCurrentLocale', true),
           hasLoadedCurrentTheme: boolean('hasLoadedCurrentTheme', true),
         },

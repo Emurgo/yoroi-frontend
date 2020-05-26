@@ -300,7 +300,7 @@ export default class LedgerConnectStore
       throw new Error(`${nameof(this._prepareCreateHWReqParams)} db not loaded. Should never happen`);
     }
 
-    const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+    const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
     return {
       db: persistentDb,
       derivationIndex,

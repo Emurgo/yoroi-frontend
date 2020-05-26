@@ -5,7 +5,6 @@ import { debounce, } from 'lodash';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { action, observable, runInAction } from 'mobx';
 import Store from '../base/Store';
-import environment from '../../environment';
 import {
   Logger,
   stringifyError
@@ -14,7 +13,7 @@ import Request from '../lib/LocalizedRequest';
 import type {
   CurrentCoinPriceResponse,
   HistoricalCoinPriceResponse,
-} from '../../api/ada/lib/state-fetch/types';
+} from '../../api/common/lib/state-fetch/types';
 import WalletTransaction from '../../domain/WalletTransaction';
 import type { Ticker, PriceDataRow } from '../../api/ada/lib/storage/database/prices/tables';
 import { getPrice, upsertPrices, getAllPrices, getPriceKey } from '../../api/ada/lib/storage/bridge/prices';
@@ -38,14 +37,14 @@ export default class CoinPriceStore extends Store {
 
   @observable refreshCurrentUnit: Request<void => Promise<void>>
     = new Request<void => Promise<void>>(async () => {
-      await this.stores.substores.ada.coinPriceStore.refreshCurrentCoinPrice();
+      await this.stores.coinPriceStore.refreshCurrentCoinPrice();
       const { selected } = this.stores.wallets;
       if (selected) {
         const { allRequest } = this.stores.substores.ada.transactions
           .getTxRequests(selected).requests;
         const transactions = allRequest.result?.transactions;
         if (allRequest.wasExecuted && transactions != null) {
-          await this.stores.substores.ada.coinPriceStore.updateTransactionPriceData({
+          await this.stores.coinPriceStore.updateTransactionPriceData({
             db: selected.getDb(),
             transactions,
           });
@@ -118,7 +117,7 @@ export default class CoinPriceStore extends Store {
     const { unitOfAccount } = this.stores.profile;
     if (!unitOfAccount.enabled) return;
 
-    const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+    const stateFetcher = this.stores.stateFetchStore.fetcher;
     try {
       const response: CurrentCoinPriceResponse = await stateFetcher.getCurrentCoinPrice({
         from: 'ADA',
@@ -188,7 +187,7 @@ export default class CoinPriceStore extends Store {
       return;
     }
 
-    const stateFetcher = this.stores.substores[environment.API].stateFetchStore.fetcher;
+    const stateFetcher = this.stores.stateFetchStore.fetcher;
     try {
       const response: HistoricalCoinPriceResponse =
         await stateFetcher.getHistoricalCoinPrice({ from: 'ADA', timestamps });

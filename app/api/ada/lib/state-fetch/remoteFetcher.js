@@ -9,14 +9,11 @@ import type {
   BestBlockRequest, BestBlockResponse,
   SignedRequest, SignedResponse,
   FilterUsedRequest, FilterUsedResponse,
-  ServerStatusRequest, ServerStatusResponse,
   ReputationRequest, ReputationResponse,
   AccountStateRequest, AccountStateResponse,
   PoolInfoRequest, PoolInfoResponse,
   SignedRequestInternal,
   RemoteTransaction,
-  CurrentCoinPriceRequest, CurrentCoinPriceResponse,
-  HistoricalCoinPriceRequest, HistoricalCoinPriceResponse,
 } from './types';
 
 import type { IFetcher } from './IFetcher';
@@ -36,13 +33,10 @@ import {
   SendTransactionApiError,
   CheckAdressesInUseApiError,
   InvalidWitnessError,
-  ServerStatusError,
   GetAccountStateApiError,
   GetPoolInfoApiError,
   GetReputationError,
   RollbackApiError,
-  CurrentCoinPriceError,
-  HistoricalCoinPriceError,
 } from '../../errors';
 
 import type { ConfigType } from '../../../../../config/config-types';
@@ -335,46 +329,4 @@ export class RemoteFetcher implements IFetcher {
         throw new GetReputationError();
       })
   )
-
-  checkServerStatus: ServerStatusRequest => Promise<ServerStatusResponse> = (_body) => (
-    axios(
-      `${backendUrl}/api/status`,
-      {
-        method: 'get',
-        headers: {
-          'yoroi-version': `${this.getPlatform()} / ${this.getLastLaunchVersion()}`,
-          'yoroi-locale': this.getCurrentLocale(),
-        }
-      }
-    ).then(response => response.data)
-      .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.checkServerStatus)} error: ` + stringifyError(error));
-        throw new ServerStatusError();
-      })
-  )
-
-  getCurrentCoinPrice: CurrentCoinPriceRequest => Promise<CurrentCoinPriceResponse> = (body) => (
-    axios(`${priceBackendUrl}/price/${body.from}/current`,
-      {
-        method: 'get'
-      }).then(response => response.data)
-      .catch(error => {
-        Logger.error('RemoteFetcher::getCurrentCoinPrice error: ' + stringifyError(error));
-        throw new CurrentCoinPriceError();
-      })
-  )
-
-  getHistoricalCoinPrice: HistoricalCoinPriceRequest => Promise<HistoricalCoinPriceResponse> = (
-    body
-  ) => (
-    axios(`${priceBackendUrl}/price/${body.from}/${body.timestamps.join(',')}`,
-      {
-        method: 'get'
-      }).then(response => response.data)
-      .catch(error => {
-        Logger.error('RemoteFetcher::getHistoricalCoinPrice error: ' + stringifyError(error));
-        throw new HistoricalCoinPriceError();
-      })
-  )
-
 }
