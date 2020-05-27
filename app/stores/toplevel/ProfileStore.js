@@ -80,6 +80,16 @@ export default class ProfileStore extends Store {
       },
     },
     {
+      isDone: () => this.isComplexityLevelSelected,
+      action: async () => {
+        const route = ROUTES.PROFILE.COMPLEXITY_LEVEL;
+        if (this.stores.app.currentRoute === route) {
+          return;
+        }
+        this.actions.router.goToRoute.trigger({ route });
+      },
+    },
+    {
       isDone: () => !environment.isNightly() || this.acceptedNightly,
       action: async () => {
         const route = ROUTES.NIGHTLY_INFO;
@@ -243,7 +253,7 @@ export default class ProfileStore extends Store {
     this.actions.profile.updateSelectedExplorer.listen(this.setSelectedExplorer);
     this.actions.profile.acceptTermsOfUse.listen(this._acceptTermsOfUse);
     this.actions.profile.acceptUriScheme.listen(this._acceptUriScheme);
-    this.actions.profile.selectComplexityLevel.listen(this.selectComplexityLevel);
+    this.actions.profile.selectComplexityLevel.listen(this._selectComplexityLevel);
     this.actions.profile.updateTheme.listen(this._updateTheme);
     this.actions.profile.exportTheme.listen(this._exportTheme);
     this.actions.profile.commitLocaleToStorage.listen(this._acceptLocale);
@@ -257,6 +267,7 @@ export default class ProfileStore extends Store {
       this._checkSetupSteps,
     ]);
     this._getTermsOfUseAcceptance(); // eagerly cache
+    this._getSelectComplexityLevel(); // eagerly cache
     this._getUriSchemeAcceptance(); // eagerly cache
     this.currentTheme; // eagerly cache (note: don't remove -- getter is stateful)
   }
@@ -479,19 +490,26 @@ export default class ProfileStore extends Store {
     this.getTermsOfUseAcceptanceRequest.execute();
   };
 
-  // ========== Complexity Level acceptance ========== //
+  // ========== Complexity Level Choice ========== //
 
-  @computed get selectedComplexityLevel(): string {
+  @computed get selectedComplexityLevel(): ?string {
     const { result } = this.getComplexityLevelRequest.execute();
-    return result != null ? result : 'simple';
+    return result;
   }
 
-  selectComplexityLevel: string => Promise<void> = async (
+  @computed get isComplexityLevelSelected(): boolean {
+    return !!this.getComplexityLevelRequest.result;
+  }
+
+  _selectComplexityLevel: string => Promise<void> = async (
     level: string
   ) :Promise<void> => {
     await this.setComplexityLevelRequest.execute(level);
     await this.getComplexityLevelRequest.execute();
   }
+  _getSelectComplexityLevel: void => void = () => {
+    this.getComplexityLevelRequest.execute();
+  };
 
   // ========== URI Scheme acceptance ========== //
 

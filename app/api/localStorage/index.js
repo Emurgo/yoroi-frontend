@@ -84,17 +84,17 @@ export default class LocalStorageApi {
   );
 
   // ========== Level Complexity ========== //
-  getComplexityLevel: void => Promise<string> = () => getLocalItem(
+  getComplexityLevel: void => Promise<?string> = () => getLocalItem(
     storageKeys.COMPLEXITY_LEVEL
   ).then((level) => {
-    if (level == null) return 'simple';
+    if (level == null) return '';
     return level;
-  });
+  })
 
   setComplexityLevel: string => Promise<void> = (
     level: string
   ) => setLocalItem(storageKeys.COMPLEXITY_LEVEL, level)
-
+  
   unsetComplexityLevel: void => Promise<void> = () => removeLocalItem(storageKeys.COMPLEXITY_LEVEL)
 
   // ========== User Theme ========== //

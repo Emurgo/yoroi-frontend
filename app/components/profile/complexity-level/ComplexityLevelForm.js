@@ -2,10 +2,13 @@
 import React, { Component } from 'react';
 import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import classes from './ComplexityLevelForm.scss';
+import styles from './ComplexityLevelForm.scss';
 import classnames  from 'classnames';
 import BeginnerLevel from '../../../assets/images/complexity-level/beginner-level.inline.svg';
 import AdvancedLevel from '../../../assets/images/complexity-level/advanced-level.inline.svg';
+import LocalizableError from '../../../../translations/messages/app/i18n/LocalizableError.json';
+import { Button } from 'react-polymorph/lib/components/Button';
+import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 
 const messages = defineMessages({
   subtitle: {
@@ -34,22 +37,32 @@ const messages = defineMessages({
   },
 });
 type Props = {|
-
+  +complexityLevel: string,
+  +onSubmit: string => PossiblyAsync<void>,
+  +isSubmitting: boolean,
+  +error?: ?LocalizableError
 |}
-type State = {|
-
-|}
 
 
 
-class ComplexityLevel extends Component<Props, State> {
+class ComplexityLevel extends Component<Props> {
+  static defaultProps: {|error: void|} = {
+    error: undefined
+  };
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
+
+  handleSubmit = (level: string) => {
+    this.props.onSubmit(level);
+  }
+
   render() {
     const { intl } = this.context;
+    const { complexityLevel, isSubmitting, error } = this.props;
+
     const levels = [
       {
         key: 'simple',
@@ -65,27 +78,43 @@ class ComplexityLevel extends Component<Props, State> {
       }
     ];
 
+    const buttonClasses = classnames([
+      'secondary',
+      isSubmitting ?
+        styles.submitButtonSpinning :
+        styles.submitButton
+    ]);
+
     return (
       <>
-        <div className={classes.component}>
-          <div className={classes.description}>
+        <div className={styles.component}>
+          <div className={styles.description}>
             {intl.formatMessage(messages.subtitle)}
           </div>
-          <div className={classes.cardsWrapper}>
+          <div className={styles.selected}>
+            {/* // TO FIX - PROPOSAL */}
+            { complexityLevel && <div> Youve choosen <span>{complexityLevel}</span></div> }
+          </div>
+          <div className={styles.cardsWrapper}>
             {
             levels.map(level => (
-              <div className={classes.card} key={level.key}>
-                <div className={classnames([classes.cardImage, classes[level.key]])}>
+              <div className={styles.card} key={level.key}>
+                <div className={classnames([styles.cardImage, styles[level.key]])}>
                   {level.image}
                 </div>
-                <div className={classes.cardContent}>
+                <div className={styles.cardContent}>
                   <div>
                     <h3>{level.name}</h3>
                     <p>{level.description}</p>
                   </div>
-                  <button type="button" className={classes.cardButton}>
-                    {intl.formatMessage(messages.labelChoose)}
-                  </button>
+                  <Button
+                    label={intl.formatMessage(messages.labelChoose)}
+                    className={buttonClasses}
+                    onClick={() => this.props.onSubmit(level.key)}
+                    skin={ButtonSkin}
+                  />
+
+
                 </div>
               </div>
             ))

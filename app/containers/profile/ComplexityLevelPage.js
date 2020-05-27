@@ -47,7 +47,12 @@ export default class ComplexityLevelPage extends Component<InjectedOrGenerated<G
         topbar={topbarElement}
         banner={displayedBanner}
       >
-        <ComplexityLevel />
+        <ComplexityLevel
+          complexityLevel={this.generated.stores.profile.complexityLevel}
+          onSubmit={this.generated.actions.profile.selectComplexityLevel.trigger}
+          isSubmitting={this.generated.stores.profile.setComplexityLevelRequest.isExecuting}
+          error={this.generated.stores.profile.setComplexityLevelRequest.error}
+        />
       </TopBarLayout>
     );
   }
@@ -60,11 +65,25 @@ export default class ComplexityLevelPage extends Component<InjectedOrGenerated<G
     if (this.props.stores == null || this.props.actions == null) {
       throw new Error(`${nameof(ComplexityLevelPage)} no way to generated props`);
     }
-    const { stores } = this.props;
+    const { stores, actions } = this.props;
+    const profileStore = stores.profile;
+
     return Object.freeze({
       stores: {
         serverConnectionStore: {
           checkAdaServerStatus: stores.serverConnectionStore.checkAdaServerStatus,
+        },
+        profile: {
+          setComplexityLevelRequest: {
+            error: profileStore.setComplexityLevelRequest.error,
+            isExecuting: profileStore.setComplexityLevelRequest.isExecuting,
+          },
+          complexityLevel: profileStore.selectedComplexityLevel
+        },
+      },
+      actions: {
+        profile: {
+          selectComplexityLevel: { trigger: actions.profile.selectComplexityLevel.trigger },
         },
       },
     });
