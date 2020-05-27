@@ -37,7 +37,7 @@ const messages = defineMessages({
   },
 });
 type Props = {|
-  +complexityLevel: string,
+  +complexityLevel: ?string,
   +onSubmit: string => PossiblyAsync<void>,
   +isSubmitting: boolean,
   +error?: ?LocalizableError
