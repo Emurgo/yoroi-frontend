@@ -197,6 +197,15 @@ export default class ProfileStore extends Store {
   @observable setUriSchemeAcceptanceRequest: Request<void => Promise<void>>
     = new Request<void => Promise<void>>(this.api.localStorage.setUriSchemeAcceptance);
 
+  @observable getComplexityLevelRequest: Request<void => Promise<?string>>
+  = new Request<void => Promise<?string>>(this.api.localStorage.getComplexityLevel);
+
+  @observable setComplexityLevelRequest: Request<string => Promise<void>>
+    = new Request<string => Promise<void>>(this.api.localStorage.setComplexityLevel);
+
+  @observable unsetComplexityLevelRequest: Request<void => Promise<void>>
+    = new Request<void => Promise<void>>(this.api.localStorage.unsetComplexityLevel);
+
   @observable getLastLaunchVersionRequest: Request<void => Promise<string>>
     = new Request<void => Promise<string>>(this.api.localStorage.getLastLaunchVersion);
 
@@ -234,6 +243,7 @@ export default class ProfileStore extends Store {
     this.actions.profile.updateSelectedExplorer.listen(this.setSelectedExplorer);
     this.actions.profile.acceptTermsOfUse.listen(this._acceptTermsOfUse);
     this.actions.profile.acceptUriScheme.listen(this._acceptUriScheme);
+    this.actions.profile.selectComplexityLevel.listen(this.selectComplexityLevel);
     this.actions.profile.updateTheme.listen(this._updateTheme);
     this.actions.profile.exportTheme.listen(this._exportTheme);
     this.actions.profile.commitLocaleToStorage.listen(this._acceptLocale);
@@ -468,6 +478,20 @@ export default class ProfileStore extends Store {
   _getTermsOfUseAcceptance: void => void = () => {
     this.getTermsOfUseAcceptanceRequest.execute();
   };
+
+  // ========== Complexity Level acceptance ========== //
+
+  @computed get selectedComplexityLevel(): string {
+    const { result } = this.getComplexityLevelRequest.execute();
+    return result != null ? result : 'simple';
+  }
+
+  selectComplexityLevel: string => Promise<void> = async (
+    level: string
+  ) :Promise<void> => {
+    await this.setComplexityLevelRequest.execute(level);
+    await this.getComplexityLevelRequest.execute();
+  }
 
   // ========== URI Scheme acceptance ========== //
 

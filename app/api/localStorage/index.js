@@ -19,6 +19,7 @@ const storageKeys = {
   USER_LOCALE: networkForLocalStorage + '-USER-LOCALE',
   TERMS_OF_USE_ACCEPTANCE: networkForLocalStorage + '-TERMS-OF-USE-ACCEPTANCE',
   URI_SCHEME_ACCEPTANCE: networkForLocalStorage + '-URI-SCHEME-ACCEPTANCE',
+  COMPLEXITY_LEVEL: networkForLocalStorage + '-COMPLEXITY-LEVEL',
   THEME: networkForLocalStorage + '-THEME',
   CUSTOM_THEME: networkForLocalStorage + '-CUSTOM-THEME',
   VERSION: networkForLocalStorage + '-LAST-LAUNCH-VER',
@@ -81,6 +82,20 @@ export default class LocalStorageApi {
   unsetUriSchemeAcceptance: void => Promise<void> = () => removeLocalItem(
     storageKeys.URI_SCHEME_ACCEPTANCE
   );
+
+  // ========== Level Complexity ========== //
+  getComplexityLevel: void => Promise<string> = () => getLocalItem(
+    storageKeys.COMPLEXITY_LEVEL
+  ).then((level) => {
+    if (level == null) return 'simple';
+    return level;
+  });
+
+  setComplexityLevel: string => Promise<void> = (
+    level: string
+  ) => setLocalItem(storageKeys.COMPLEXITY_LEVEL, level)
+
+  unsetComplexityLevel: void => Promise<void> = () => removeLocalItem(storageKeys.COMPLEXITY_LEVEL)
 
   // ========== User Theme ========== //
 

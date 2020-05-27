@@ -8,6 +8,7 @@ import type { UnitOfAccountSettingType } from '../types/unitOfAccountType';
 export default class ProfileActions {
   acceptTermsOfUse: AsyncAction<void> = new AsyncAction();
   acceptUriScheme: AsyncAction<void> = new AsyncAction();
+  selectComplexityLevel: AsyncAction<string> = new AsyncAction();
   updateTentativeLocale: Action<{| locale: string |}> = new Action();
   updateLocale: AsyncAction<{| locale: string |}> = new AsyncAction();
   updateSelectedExplorer: AsyncAction<{| explorer: ExplorerType |}> = new AsyncAction();
