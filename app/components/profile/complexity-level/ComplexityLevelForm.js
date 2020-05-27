@@ -91,10 +91,10 @@ class ComplexityLevel extends Component<Props> {
           <div className={styles.description}>
             {intl.formatMessage(messages.subtitle)}
           </div>
-          <div className={styles.selected}>
-            {/* // TO FIX - PROPOSAL */}
-            { complexityLevel && <div> Youve choosen <span>{complexityLevel}</span></div> }
-          </div>
+          {/* // TO DO - show the selected level */}
+          {/* <div className={styles.selected}> */}
+          {/* { <div> Youve choosen <span>{complexityLevel}</span></div> } */}
+          {/* </div> */}
           <div className={styles.cardsWrapper}>
             {
             levels.map(level => (
