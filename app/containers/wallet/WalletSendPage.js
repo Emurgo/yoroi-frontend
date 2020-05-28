@@ -33,6 +33,7 @@ import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWal
 import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { SelectedApiType } from '../../stores/toplevel/ProfileStore';
 
 // Hardware Wallet Confirmation
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
@@ -84,12 +85,21 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     });
   }
 
+  getSelectedApi: void => SelectedApiType = () => {
+    const { selectedAPI } = this.generated.stores.profile;
+    if (selectedAPI === undefined) {
+      throw new Error(`${nameof(WalletSendPage)} no API selected`);
+    }
+    return selectedAPI;
+  }
+
   @action
   toggleShowMemo: void => void = () => {
     this.showMemo = !this.showMemo;
   };
 
   render(): Node {
+    const selectedAPI = this.getSelectedApi();
     const { transactions, transactionBuilderStore } = this.generated.stores.substores.ada;
     const publicDeriver = this.generated.stores.wallets.selected;
     // Guard against potential null values
@@ -121,8 +131,8 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       <>
         <WalletSendForm
           currencyUnit={{
-            unitName: this.generated.stores.profile.selectedAPI.meta.unitName,
-            primaryTicker: this.generated.stores.profile.selectedAPI.meta.primaryTicker,
+            unitName: selectedAPI.meta.unitName,
+            primaryTicker: selectedAPI.meta.primaryTicker,
           }}
           currencyMaxIntegerDigits={MAX_INTEGER_PLACES_IN_ADA}
           currencyMaxFractionalDigits={DECIMAL_PLACES_IN_ADA}
@@ -212,6 +222,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     * Callback that creates a component to avoid the component knowing about actions/stores
     * separate container is not needed, this container acts as container for Confirmation dialog */
   hardwareWalletDoConfirmation: (() => Node) = () => {
+    const selectedAPI = this.getSelectedApi();
     const { intl } = this.context;
     const publicDeriver = this.generated.stores.wallets.selected;
     const { transactionBuilderStore } = this.generated.stores.substores.ada;
@@ -246,13 +257,9 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       unsignedTx,
     };
     if (isLedgerNanoWallet(conceptualWallet)) {
-      const ledgerSendAction = this.generated.actions[
-        this.generated.stores.profile.selectedAPI.type
-      ].ledgerSend;
+      const ledgerSendAction = this.generated.actions[selectedAPI.type].ledgerSend;
       ledgerSendAction.init.trigger();
-      const ledgerSendStore = this.generated.stores.substores[
-        this.generated.stores.profile.selectedAPI.type
-      ].ledgerSend;
+      const ledgerSendStore = this.generated.stores.substores[selectedAPI.type].ledgerSend;
       hwSendConfirmationDialog = (
         <HWSendConfirmationDialog
           staleTx={transactionBuilderStore.txMismatch}
@@ -276,12 +283,8 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           coinPrice={coinPrice}
         />);
     } else if (isTrezorTWallet(conceptualWallet)) {
-      const trezorSendAction = this.generated.actions[
-        this.generated.stores.profile.selectedAPI.type
-      ].trezorSend;
-      const trezorSendStore = this.generated.stores.substores[
-        this.generated.stores.profile.selectedAPI.type
-      ].trezorSend;
+      const trezorSendAction = this.generated.actions[selectedAPI.type].trezorSend;
+      const trezorSendStore = this.generated.stores.substores[selectedAPI.type].trezorSend;
       hwSendConfirmationDialog = (
         <HWSendConfirmationDialog
           staleTx={transactionBuilderStore.txMismatch}

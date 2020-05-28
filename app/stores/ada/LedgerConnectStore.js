@@ -9,7 +9,6 @@ import LedgerConnect, {
 } from '@emurgo/ledger-connect-handler';
 
 import Config from '../../config';
-import environment from '../../environment';
 
 import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';

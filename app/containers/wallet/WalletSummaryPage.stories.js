@@ -49,6 +49,7 @@ import {
   asGetPublicKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { addressTypes } from '../../i18n/global-messages';
+import { getApiMeta } from '../../stores/toplevel/ProfileStore';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -115,7 +116,7 @@ export const Loading = (): Node => {
       generated={{
         stores: {
           profile: {
-            selectedAPI: globalKnobs.selectedAPI(),
+            selectedAPI: getApiMeta('ada'),
             selectedExplorer: getDefaultExplorer(),
             shouldHideBalance: false,
             isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
@@ -204,7 +205,7 @@ const genPropsForTransactions: {|
   lastSyncInfo: LastSyncInfoRow,
 |} => * = (request) => ({
   profile: {
-    selectedAPI: globalKnobs.selectedAPI(),
+    selectedAPI: getApiMeta('ada'),
     selectedExplorer: getDefaultExplorer(),
     shouldHideBalance: request.txExport == null ? boolean('shouldHideBalance', false) : false,
     isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,

@@ -31,8 +31,8 @@ import {
   mapToTables,
   StaleStateError,
 } from '../../database/utils';
-import type { HwWalletMetaRow, } from '../../database/walletTypes/core/tables';
-import { GetHwWalletMeta } from '../../database/walletTypes/core/api/read';
+import type { HwWalletMetaRow, ConceptualWalletRow, } from '../../database/walletTypes/core/tables';
+import { GetHwWalletMeta, GetConceptualWallet } from '../../database/walletTypes/core/api/read';
 
 import {
   Mixin,
@@ -376,20 +376,37 @@ export async function refreshConceptualWalletFunctionality(
 ): Promise<IConceptualWalletConstructor> {
   const deps = Object.freeze({
     GetHwWalletMeta,
+    GetConceptualWallet,
   });
   const depTables = Object
     .keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(db, table));
-  const hardwareInfo = await raii<void | $ReadOnly<HwWalletMetaRow>>(
+  const result = await raii<{|
+    hardwareInfo: void | $ReadOnly<HwWalletMetaRow>,
+    fullInfo: $ReadOnly<ConceptualWalletRow>,
+  |}>(
     db,
     depTables,
-    async tx => await deps.GetHwWalletMeta.getMeta(
-      db, tx,
-      conceptualWalletId,
-    )
+    async tx => {
+      const fullInfo = await deps.GetConceptualWallet.get(
+        db, tx,
+        conceptualWalletId,
+      );
+      if (fullInfo == null) {
+        throw new Error(`${nameof(refreshConceptualWalletFunctionality)} no conceptual wallet with id ${conceptualWalletId}`);
+      }
+      const hardwareInfo = await deps.GetHwWalletMeta.getMeta(
+        db, tx,
+        conceptualWalletId,
+      );
+      return {
+        hardwareInfo,
+        fullInfo,
+      };
+    }
   );
-  const walletType = hardwareInfo == null
+  const walletType = result.hardwareInfo == null
     ? WalletTypeOption.WEB_WALLET
     : WalletTypeOption.HARDWARE_WALLET;
 
@@ -397,7 +414,8 @@ export async function refreshConceptualWalletFunctionality(
     db,
     conceptualWalletId,
     walletType,
-    hardwareInfo,
+    hardwareInfo: result.hardwareInfo,
+    coinType: result.fullInfo.CoinType,
   };
 }
 

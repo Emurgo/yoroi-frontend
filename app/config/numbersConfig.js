@@ -19,6 +19,7 @@ export type WalletTypePurposeT = $Values<typeof WalletTypePurpose>;
 export const CoinTypes = Object.freeze({
   CARDANO: 2147485463, // HARD_DERIVATION_START + 1812;
 });
+export type CoinTypesT = $Values<typeof CoinTypes>;
 
 /**
  * Defined by bip44

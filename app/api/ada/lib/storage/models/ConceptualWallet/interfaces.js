@@ -29,6 +29,7 @@ import type {
   IChangePasswordRequest, IChangePasswordRequestFunc,
   RawVariation, RawTableVariation,
 } from '../common/interfaces';
+import type { CoinTypesT } from '../../../../../../config/numbersConfig';
 
 export const WalletTypeOption = Object.freeze({
   WEB_WALLET: 0,
@@ -41,6 +42,7 @@ export type IConceptualWalletConstructor = {|
   conceptualWalletId: number,
   walletType: WalletType,
   hardwareInfo: ?$ReadOnly<HwWalletMetaRow>,
+  coinType: CoinTypesT,
 |};
 
 export interface IConceptualWallet {

@@ -9,8 +9,6 @@ import type { UiEvent } from 'trezor-connect/lib/types/events';
 import type { CardanoPublicKey } from 'trezor-connect/lib/types/networks/cardano';
 import type { Success, Unsuccessful, } from 'trezor-connect/lib/types/params';
 
-import environment from '../../environment';
-
 import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';
 

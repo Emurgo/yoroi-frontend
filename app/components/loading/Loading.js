@@ -5,14 +5,11 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 import LoadingSpinner from '../widgets/LoadingSpinner';
-import AdaLogo from '../../assets/images/ada-logo.inline.svg';
-import CardanoLogo from '../../assets/images/cardano-logo.inline.svg';
 import YoroiLogo from '../../assets/images/yoroi-logo-shape-white.inline.svg';
 import styles from './Loading.scss';
 import LocalizableError from '../../i18n/LocalizableError';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { ApiOptionType } from '../../api/index';
 
 const messages = defineMessages({
   loading: {
@@ -26,7 +23,6 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +api: ApiOptionType,
   +isLoadingDataForNextScreen: boolean,
   +hasLoadedCurrentLocale: boolean,
   +hasLoadedCurrentTheme: boolean,
@@ -45,7 +41,6 @@ export default class Loading extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
     const {
-      api,
       isLoadingDataForNextScreen,
       hasLoadedCurrentLocale,
       hasLoadedCurrentTheme,
@@ -59,13 +54,6 @@ export default class Loading extends Component<Props> {
       styles.yoroiLogo,
       hasLoadedCurrentTheme ? null : styles.hide,
     ]);
-    const currencyLogoStyles = classNames([
-      styles[`${api}-logo`],
-    ]);
-    const apiLogoStyles = classNames([
-      styles[`${api}-apiLogo`],
-    ]);
-
     const renderError = error == null || !hasLoadedCurrentLocale
       ? null
       : (
@@ -91,9 +79,7 @@ export default class Loading extends Component<Props> {
     return (
       <div className={componentStyles}>
         <div className={styles.logos}>
-          <span className={currencyLogoStyles}><AdaLogo /></span>
           <span className={yoroiLogoStyles}><YoroiLogo /></span>
-          <span className={apiLogoStyles}><CardanoLogo /></span>
         </div>
         {renderContent}
         {renderError}

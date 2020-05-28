@@ -43,7 +43,6 @@ import type { ConfigType } from '../../../../../config/config-types';
 
 declare var CONFIG: ConfigType;
 const backendUrl = CONFIG.network.backendUrl;
-const priceBackendUrl = CONFIG.network.priceBackendUrl;
 
 /**
  * Makes calls to Yoroi backend service

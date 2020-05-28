@@ -389,6 +389,8 @@
   "wallet.create.dialog.repeatPasswordLabel": "Repeat spending password",
   "wallet.create.dialog.title": "Create wallet",
   "wallet.create.dialog.walletNameHint": "e.g: Shopping Wallet",
+  "wallet.currency.pick.cardano": "Cardano is the first provably secure proof of stake protocol",
+  "wallet.currency.pick.header": "Pick a currency or platform",
   "wallet.dashboard.empty.text": "Go to Simple or Advance Staking to choose what stake pool you want to delegate in. Note, you may delegate only to one stake pool in this Tesnnet",
   "wallet.dashboard.empty.title": "You have not delegated your ADA yet",
   "wallet.dashboard.epochEndTitle": "Time until Epoch end",

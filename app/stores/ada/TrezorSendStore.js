@@ -4,7 +4,6 @@ import type { CardanoSignedTx } from 'trezor-connect/lib/types/networks/cardano'
 import type { Success, Unsuccessful } from 'trezor-connect/lib/types/params';
 
 import Store from '../base/Store';
-import environment from '../../environment';
 import LocalizedRequest from '../lib/LocalizedRequest';
 
 import { wrapWithFrame } from '../lib/TrezorWrapper';

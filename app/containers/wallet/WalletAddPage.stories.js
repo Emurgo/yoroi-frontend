@@ -40,6 +40,7 @@ import WalletRestoreOptionDialog from '../../components/wallet/add/option-dialog
 import WalletConnectHWOptionDialog from '../../components/wallet/add/option-dialog/WalletConnectHWOptionDialog';
 import WalletTrezorConnectDialogContainer from './dialogs/WalletTrezorConnectDialogContainer';
 import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDialogContainer';
+import { getApiMeta } from '../../stores/toplevel/ProfileStore';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -50,6 +51,7 @@ export default {
 const defaultProps: {|
   openDialog?: Object,
   getParam?: <T>(number | string) => T,
+  selectedAPI: *,
   WalletCreateDialogContainerProps?: *,
   WalletBackupDialogContainerProps?: *,
   WalletRestoreDialogContainerProps?: *,
@@ -58,9 +60,10 @@ const defaultProps: {|
 |} => * = (request) => ({
   stores: {
     profile: {
-      selectedAPI: globalKnobs.selectedAPI(),
+      selectedAPI: request.selectedAPI,
     },
     uiDialogs: {
+      activeDialog: request.openDialog,
       isOpen: (clazz) => clazz === request.openDialog,
       getParam: request.getParam || (() => (undefined: any)),
     },
@@ -80,6 +83,11 @@ const defaultProps: {|
       },
       open: {
         trigger: action('open'),
+      },
+    },
+    profile: {
+      setSelectedAPI: {
+        trigger: action('setSelectedAPI'),
       },
     },
     wallets: {
@@ -147,6 +155,34 @@ const defaultProps: {|
 export const MainPage = (): Node => (
   <WalletAddPage
     generated={defaultProps(Object.freeze({
+      selectedAPI: getApiMeta('ada'),
+    }))}
+  />
+);
+
+export const CurrencySelect = (): Node => (
+  <WalletAddPage
+    generated={defaultProps(Object.freeze({
+      openDialog: WalletCreateDialog,
+      selectedAPI: undefined,
+      WalletCreateDialogContainerProps: {
+        generated: {
+          stores: {
+            profile: {
+              isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+            },
+          },
+          actions: {
+            ada: {
+              wallets: {
+                createWallet: {
+                  trigger: async (req) => action('createWallet')(req),
+                },
+              },
+            },
+          },
+        },
+      },
     }))}
   />
 );
@@ -154,6 +190,7 @@ export const MainPage = (): Node => (
 export const CreateWalletStart = (): Node => (
   <WalletAddPage
     generated={defaultProps(Object.freeze({
+      selectedAPI: getApiMeta('ada'),
       openDialog: WalletCreateDialog,
       WalletCreateDialogContainerProps: {
         generated: {
@@ -229,6 +266,7 @@ export const CreateWalletPrivacyDialog = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
+        selectedAPI: getApiMeta('ada'),
         openDialog: WalletBackupDialog,
         WalletBackupDialogContainerProps: {
           generated: walletBackupProps({
@@ -262,6 +300,7 @@ export const CreateWalletRecoveryPhraseDisplay = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
+        selectedAPI: getApiMeta('ada'),
         openDialog: WalletBackupDialog,
         WalletBackupDialogContainerProps: {
           generated: walletBackupProps({
@@ -326,6 +365,7 @@ export const CreateWalletRecoveryPhraseEnter = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
+        selectedAPI: getApiMeta('ada'),
         openDialog: WalletBackupDialog,
         WalletBackupDialogContainerProps: {
           generated: walletBackupProps({
@@ -352,6 +392,7 @@ export const CreateWalletFinalConfirm = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
+        selectedAPI: getApiMeta('ada'),
         openDialog: WalletBackupDialog,
         WalletBackupDialogContainerProps: {
           generated: walletBackupProps({
@@ -375,6 +416,7 @@ export const CreateWalletFinalConfirm = (): Node => {
 
 const restoreWalletProps: {|
   step: *,
+  selectedAPI: *,
   walletRestoreMeta?: *,
   recoveryResult?: *,
   restoreRequest?: *,
@@ -383,7 +425,7 @@ const restoreWalletProps: {|
 |} => * = (request) => ({
   stores: {
     profile: {
-      selectedAPI: globalKnobs.selectedAPI(),
+      selectedAPI: request.selectedAPI,
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
       selectedExplorer: getDefaultExplorer(),
       unitOfAccount: genUnitOfAccount(),
@@ -474,6 +516,7 @@ export const RestoreOptions = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
+        selectedAPI: getApiMeta('ada'),
         openDialog: WalletRestoreOptionDialog,
       }))}
     />
@@ -493,13 +536,17 @@ export const RestoreWalletStart = (): Node => {
   const nameCases = getWalletNameCases();
   const password = getPasswordCreationCases();
   const paperPassword = getPasswordValidationCases('paper_password');
+
+  const selectedAPI = getApiMeta('ada');
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
+        selectedAPI,
         openDialog: WalletRestoreDialog,
         getParam: <T>() => getRestoreMode(), // eslint-disable-line no-unused-vars
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
+            selectedAPI,
             step: RestoreSteps.START,
             walletRestoreMeta: {
               recoveryPhrase: (() => {
@@ -539,13 +586,16 @@ export const RestoreVerify = (): Node => {
   const recoveryPhrase = creationRecoveryPhrase.join(' ');
   const rootPk = generateWalletRootKey(recoveryPhrase);
   const { byronPlate, shelleyPlate } = generatePlates(rootPk, getRestoreMode());
+  const selectedAPI = getApiMeta('ada');
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
+        selectedAPI,
         getParam: <T>() => getRestoreMode(), // eslint-disable-line no-unused-vars
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
+            selectedAPI,
             step: RestoreSteps.VERIFY_MNEMONIC,
             restoreRequest: {
               isExecuting: !environment.isShelley() && boolean('isExecuting', false),
@@ -565,12 +615,15 @@ export const RestoreVerify = (): Node => {
 };
 
 export const RestoreLegacyExplanation = (): Node => {
+  const selectedAPI = getApiMeta('ada');
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
+        selectedAPI,
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
+            selectedAPI,
             step: RestoreSteps.LEGACY_EXPLANATION,
             restoreRequest: {
               isExecuting: boolean('isExecuting', false),
@@ -585,12 +638,15 @@ export const RestoreLegacyExplanation = (): Node => {
 };
 
 export const RestoreUpgradeRestoringAddresses = (): Node => {
+  const selectedAPI = getApiMeta('ada');
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
+        selectedAPI,
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
+            selectedAPI,
             step: RestoreSteps.TRANSFER_TX_GEN,
             yoroiTransferStep: TransferStatus.RESTORING_ADDRESSES,
           })
@@ -601,12 +657,15 @@ export const RestoreUpgradeRestoringAddresses = (): Node => {
 };
 
 export const RestoreUpgradeCheckingAddresses = (): Node => {
+  const selectedAPI = getApiMeta('ada');
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
+        selectedAPI,
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
+            selectedAPI,
             step: RestoreSteps.TRANSFER_TX_GEN,
             yoroiTransferStep: TransferStatus.CHECKING_ADDRESSES,
           })
@@ -617,12 +676,15 @@ export const RestoreUpgradeCheckingAddresses = (): Node => {
 };
 
 export const RestoreUpgradeGeneratingTx = (): Node => {
+  const selectedAPI = getApiMeta('ada');
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
+        selectedAPI,
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
+            selectedAPI,
             step: RestoreSteps.TRANSFER_TX_GEN,
             yoroiTransferStep: TransferStatus.GENERATING_TX,
           })
@@ -633,12 +695,15 @@ export const RestoreUpgradeGeneratingTx = (): Node => {
 };
 
 export const RestoreUpgradeReadyToTransfer = (): Node => {
+  const selectedAPI = getApiMeta('ada');
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
+        selectedAPI,
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
+            selectedAPI,
             step: RestoreSteps.TRANSFER_TX_GEN,
             yoroiTransferStep: TransferStatus.READY_TO_TRANSFER,
           })
@@ -649,12 +714,15 @@ export const RestoreUpgradeReadyToTransfer = (): Node => {
 };
 
 export const RestoreUpgradeError = (): Node => {
+  const selectedAPI = getApiMeta('ada');
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
+        selectedAPI,
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
+            selectedAPI,
             step: RestoreSteps.TRANSFER_TX_GEN,
             yoroiTransferError: new GenericApiError(),
             yoroiTransferStep: TransferStatus.ERROR,
@@ -666,12 +734,15 @@ export const RestoreUpgradeError = (): Node => {
 };
 
 export const RestoreUpgradeNoNeed = (): Node => {
+  const selectedAPI = getApiMeta('ada');
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
+        selectedAPI,
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
+            selectedAPI,
             step: RestoreSteps.TRANSFER_TX_GEN,
             yoroiTransferError: new NoInputsError(),
             yoroiTransferStep: TransferStatus.ERROR,
@@ -687,6 +758,7 @@ export const HardwareOptions = (): Node => {
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletConnectHWOptionDialog,
+        selectedAPI: getApiMeta('ada'),
       }))}
     />
   );
@@ -694,10 +766,11 @@ export const HardwareOptions = (): Node => {
 
 const trezorPops: {|
   trezorConnect: *,
+  selectedAPI: *,
 |} => * = (request) => ({
   stores: {
     profile: {
-      selectedAPI: globalKnobs.selectedAPI(),
+      selectedAPI: request.selectedAPI,
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
     },
     substores: {
@@ -730,12 +803,15 @@ const trezorPops: {|
 });
 
 export const TrezorCheck = (): Node => {
+  const selectedAPI = getApiMeta('ada');
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletTrezorConnectDialogContainer,
+        selectedAPI,
         WalletTrezorConnectDialogContainerProps: {
           generated: trezorPops({
+            selectedAPI,
             trezorConnect: {
               progressInfo: {
                 currentStep: ProgressStep.CHECK,
@@ -769,12 +845,15 @@ export const TrezorConnect = (): Node => {
     }
     return StepState.LOAD;
   });
+  const selectedAPI = getApiMeta('ada');
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletTrezorConnectDialogContainer,
+        selectedAPI,
         WalletTrezorConnectDialogContainerProps: {
           generated: trezorPops({
+            selectedAPI,
             trezorConnect: {
               progressInfo: {
                 currentStep: ProgressStep.CONNECT,
@@ -814,12 +893,15 @@ export const TrezorSave = (): Node => {
     return StepState.LOAD;
   });
   const nameCases = getWalletNameCases();
+  const selectedAPI = getApiMeta('ada');
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletTrezorConnectDialogContainer,
+        selectedAPI,
         WalletTrezorConnectDialogContainerProps: {
           generated: trezorPops({
+            selectedAPI,
             trezorConnect: {
               progressInfo: {
                 currentStep: ProgressStep.SAVE,
@@ -840,10 +922,11 @@ export const TrezorSave = (): Node => {
 
 const ledgerProps: {|
   ledgerConnect: *,
+  selectedAPI: *,
 |} => * = (request) => ({
   stores: {
     profile: {
-      selectedAPI: globalKnobs.selectedAPI(),
+      selectedAPI: request.selectedAPI,
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
     },
     substores: {
@@ -876,12 +959,15 @@ const ledgerProps: {|
 });
 
 export const LedgerCheck = (): Node => {
+  const selectedAPI = getApiMeta('ada');
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletLedgerConnectDialogContainer,
+        selectedAPI,
         WalletLedgerConnectDialogContainerProps: {
           generated: ledgerProps({
+            selectedAPI,
             ledgerConnect: {
               progressInfo: {
                 currentStep: ProgressStep.CHECK,
@@ -915,12 +1001,15 @@ export const LedgerConnect = (): Node => {
     }
     return StepState.LOAD;
   });
+  const selectedAPI = getApiMeta('ada');
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletLedgerConnectDialogContainer,
+        selectedAPI,
         WalletLedgerConnectDialogContainerProps: {
           generated: ledgerProps({
+            selectedAPI,
             ledgerConnect: {
               progressInfo: {
                 currentStep: ProgressStep.CONNECT,
@@ -960,12 +1049,15 @@ export const LedgerSave = (): Node => {
     return StepState.LOAD;
   });
   const nameCases = getWalletNameCases();
+  const selectedAPI = getApiMeta('ada');
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletLedgerConnectDialogContainer,
+        selectedAPI,
         WalletLedgerConnectDialogContainerProps: {
           generated: ledgerProps({
+            selectedAPI,
             ledgerConnect: {
               progressInfo: {
                 currentStep: ProgressStep.SAVE,

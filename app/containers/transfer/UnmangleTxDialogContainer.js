@@ -12,7 +12,6 @@ import YoroiTransferErrorPage from './YoroiTransferErrorPage';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import Dialog from '../../components/widgets/Dialog';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
-import environment from '../../environment';
 import { formattedWalletAmount } from '../../utils/formatters';
 import { IGetFee, IReceivers, ITotalInput } from '../../api/ada/transactions/utils';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';

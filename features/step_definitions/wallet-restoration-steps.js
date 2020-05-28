@@ -11,6 +11,10 @@ async function checkErrorByTranslationId(client, errorSelector, error) {
 
 When(/^I click the restore button$/, async function () {
   await this.click('.WalletAdd_btnRestoreWallet');
+
+  await this.waitForElement('.PickCurrencyOptionDialog');
+  await this.click('.PickCurrencyOptionDialog_cardano');
+
   await this.waitForElement('.WalletRestoreOptionDialog');
 
   await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');
@@ -19,6 +23,10 @@ When(/^I click the restore button$/, async function () {
 
 When(/^I click the restore paper wallet button$/, async function () {
   await this.click('.WalletAdd_btnRestoreWallet');
+
+  await this.waitForElement('.PickCurrencyOptionDialog');
+  await this.click('.PickCurrencyOptionDialog_cardano');
+
   await this.waitForElement('.WalletRestoreOptionDialog');
 
   await this.click('.WalletRestoreOptionDialog_restorePaperWallet');

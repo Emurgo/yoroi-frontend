@@ -71,7 +71,6 @@ export const GettingMnemonics = (): Node => {
           generated: {
             stores: {
               profile: {
-                selectedAPI: globalKnobs.selectedAPI(),
                 isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
                 selectedExplorer: getDefaultExplorer(),
                 unitOfAccount: genUnitOfAccount(),

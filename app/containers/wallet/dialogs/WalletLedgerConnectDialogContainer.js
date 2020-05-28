@@ -13,6 +13,7 @@ import ConnectDialog from '../../../components/wallet/hwConnect/ledger/ConnectDi
 import SaveDialog from '../../../components/wallet/hwConnect/ledger/SaveDialog';
 
 import { ProgressStep } from '../../../types/HWConnectStoreTypes';
+import type { SelectedApiType } from '../../../stores/toplevel/ProfileStore';
 
 export type GeneratedData = typeof WalletLedgerConnectDialogContainer.prototype.generated;
 
@@ -25,19 +26,25 @@ type Props = {|
 @observer
 export default class WalletLedgerConnectDialogContainer extends Component<Props> {
 
+  getSelectedApi: void => SelectedApiType = () => {
+    const { selectedAPI } = this.generated.stores.profile;
+    if (selectedAPI === undefined) {
+      throw new Error(`${nameof(WalletLedgerConnectDialogContainer)} no API selected`);
+    }
+    return selectedAPI;
+  }
+
   cancel: (() => void) = () => {
+    const selectedAPI = this.getSelectedApi();
     this.props.onClose();
-    this.generated.actions[
-      this.generated.stores.profile.selectedAPI.type
-    ].ledgerConnect.cancel.trigger();
+    this.generated.actions[selectedAPI.type].ledgerConnect.cancel.trigger();
   };
 
   render(): null | Node {
+    const selectedAPI = this.getSelectedApi();
     const { profile } = this.generated.stores;
     const ledgerConnectStore = this._getLedgerConnectStore();
-    const hwConnectActions = this.generated.actions[
-      this.generated.stores.profile.selectedAPI.type
-    ].ledgerConnect;
+    const hwConnectActions = this.generated.actions[selectedAPI.type].ledgerConnect;
 
     let component = null;
 
@@ -91,9 +98,8 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
 
   /** Returns the store which is responsible for this Container */
   _getLedgerConnectStore() {
-    return this.generated.stores.substores[
-      this.generated.stores.profile.selectedAPI.type
-    ].ledgerConnect;
+    const selectedAPI = this.getSelectedApi();
+    return this.generated.stores.substores[selectedAPI.type].ledgerConnect;
   }
 
   @computed get generated() {

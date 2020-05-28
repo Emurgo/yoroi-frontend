@@ -21,6 +21,8 @@ import { unitOfAccountDisabledValue } from '../../types/unitOfAccountType';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { SUPPORTED_CURRENCIES } from '../../config/unitOfAccount';
 import AdaApi from '../../api/ada/index';
+import type { ApiOptionType } from '../../api/index';
+import { ApiOptions } from '../../api/index';
 
 export type SelectedApiType = {|
   type: 'ada',
@@ -39,6 +41,8 @@ export default class ProfileStore extends Store {
   ];
 
   UNIT_OF_ACCOUNT_OPTIONS: typeof SUPPORTED_CURRENCIES = SUPPORTED_CURRENCIES;
+
+  @observable __selectedAPI: void | SelectedApiType = undefined;
 
   /**
    * Need to store the selected language in-memory for when the user
@@ -261,6 +265,7 @@ export default class ProfileStore extends Store {
     this.actions.profile.updateUnitOfAccount.listen(this._updateUnitOfAccount);
     this.actions.profile.toggleSidebar.listen(this._toggleSidebar);
     this.actions.profile.acceptNightly.listen(this._acceptNightly);
+    this.actions.profile.setSelectedAPI.listen(this._setSelectedAPI);
     this.registerReactions([
       this._setBigNumberFormat,
       this._updateMomentJsLocaleAfterLocaleChange,
@@ -448,11 +453,12 @@ export default class ProfileStore extends Store {
 
   // ========== Active API ========== //
 
-  @computed get selectedAPI(): SelectedApiType {
-    return {
-      type: 'ada',
-      meta: this.api.ada.getCurrencyMeta(),
-    };
+  @computed get selectedAPI(): void | SelectedApiType {
+    return this.__selectedAPI;
+  }
+
+  @action _setSelectedAPI: (ApiOptionType | void) => void  = (type) => {
+    this.__selectedAPI = getApiMeta(type);
   }
 
   // ========== Paper Wallets ========== //
@@ -467,7 +473,7 @@ export default class ProfileStore extends Store {
   // ========== Terms of Use ========== //
 
   @computed get termsOfUse(): string {
-    return getTermsOfUse(this.selectedAPI.type, this.currentLocale);
+    return getTermsOfUse('ada', this.currentLocale);
   }
 
   @computed get hasLoadedTermsOfUseAcceptance(): boolean {
@@ -676,4 +682,22 @@ export function getTermsOfUse(
     return tos + '\n\n' + testnetAddition;
   }
   return tos;
+}
+
+export function getApiMeta(
+  api: void | ApiOptionType
+): void | SelectedApiType {
+  switch (api) {
+    case undefined: {
+      return undefined;
+    }
+    case ApiOptions.ada: {
+      return {
+        type: 'ada',
+        meta: AdaApi.prototype.getCurrencyMeta(),
+      };
+    }
+    default:
+      throw new Error(`${nameof(getApiMeta)} no result for ${api}`);
+  }
 }

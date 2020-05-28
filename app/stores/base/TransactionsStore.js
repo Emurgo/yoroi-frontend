@@ -21,6 +21,7 @@ import type {
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
 import { digetForHash } from '../../api/ada/lib/storage/database/primitives/api/utils';
+import { getApiForCoinType } from '../../api/index';
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -63,8 +64,7 @@ export default class TransactionsStore extends Store {
 
   setup(): void {
     super.setup();
-    // TODO: not only ADA
-    const actions = this.actions[this.stores.profile.selectedAPI.type].transactions;
+    const actions = this.actions.transactions;
     actions.loadMoreTransactions.listen(this._increaseSearchLimit);
   }
 
@@ -163,9 +163,11 @@ export default class TransactionsStore extends Store {
       return;
     }
 
+    const { coinType } = publicDeriver.getParent();
+    const apiType = getApiForCoinType(coinType);
+
     // All Request
-    const API = this.stores.profile.selectedAPI.type;
-    const stateFetcher = this.stores.substores[API].stateFetchStore.fetcher;
+    const stateFetcher = this.stores.substores[apiType].stateFetchStore.fetcher;
     const {
       getTransactionsHistoryForAddresses,
       checkAddressesInUse,
@@ -192,9 +194,7 @@ export default class TransactionsStore extends Store {
 
     // update last sync (note: changes even if no new transaction is found)
     {
-      const lastUpdateDate = await this.api[
-        this.stores.profile.selectedAPI.type
-      ].getTxLastUpdatedDate({
+      const lastUpdateDate = await this.api[apiType].getTxLastUpdatedDate({
         getLastSyncInfo: publicDeriver.getLastSyncInfo
       });
       runInAction(() => {
@@ -265,8 +265,9 @@ export default class TransactionsStore extends Store {
   ) => Promise<PromisslessReturnType<GetTransactionsFunc>> = (
     publicDeriver: PublicDeriver<> & IGetLastSyncInfo,
   ) => {
-    const API = this.stores.profile.selectedAPI;
-    const stateFetcher = this.stores.substores[API.type].stateFetchStore.fetcher;
+    const { coinType } = publicDeriver.getParent();
+    const apiType = getApiForCoinType(coinType);
+    const stateFetcher = this.stores.substores[apiType].stateFetchStore.fetcher;
 
     const limit = this.searchOptions
       ? this.searchOptions.limit
@@ -305,11 +306,16 @@ export default class TransactionsStore extends Store {
   |} => void = (
     request
   ) => {
-    const foundRequest = find(this.transactionsRequests, { publicDeriver: request.publicDeriver });
+    const { coinType } = request.publicDeriver.getParent();
+    const api = this.api[getApiForCoinType(coinType)];
+
+    const foundRequest = find(
+      this.transactionsRequests,
+      { publicDeriver: request.publicDeriver }
+    );
     if (foundRequest != null) {
       return;
     }
-    const api = this.api[this.stores.profile.selectedAPI.type];
     this.transactionsRequests.push({
       publicDeriver: request.publicDeriver,
       lastSyncInfo: request.lastSyncInfo,

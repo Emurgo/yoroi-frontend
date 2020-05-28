@@ -23,7 +23,6 @@ import UpcomingRewards from '../../../components/wallet/staking/dashboard/Upcomi
 import type { BoxInfo } from '../../../components/wallet/staking/dashboard/UpcomingRewards';
 import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard/LessThanExpectedDialog';
 import PoolWarningDialog from '../../../components/wallet/staking/dashboard/PoolWarningDialog';
-import environment from '../../../environment';
 import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
 import { digetForHash } from '../../../api/ada/lib/storage/database/primitives/api/utils';
 import { handleExternalLinkClick } from '../../../utils/routing';

@@ -3,9 +3,10 @@
 import { Type, ConstraintAction, } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 import { KeyDerivationSchema } from '../../primitives/tables';
+import type { CoinTypesT } from '../../../../../../../config/numbersConfig';
 
 export type ConceptualWalletInsert = {|
-  CoinType: number,
+  CoinType: CoinTypesT,
   Name: string,
   // NetworkId: number, // TODO
 |};

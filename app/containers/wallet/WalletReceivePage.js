@@ -32,6 +32,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type {
   BIP32Path
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import type { SelectedApiType } from '../../stores/toplevel/ProfileStore';
 
 export type GeneratedData = typeof WalletReceivePage.prototype.generated;
 
@@ -49,6 +50,14 @@ export default class WalletReceivePage extends Component<Props> {
   componentWillUnmount() {
     this.closeNotification();
     this.resetErrors();
+  }
+
+  getSelectedApi: void => SelectedApiType = () => {
+    const { selectedAPI } = this.generated.stores.profile;
+    if (selectedAPI === undefined) {
+      throw new Error(`${nameof(WalletReceivePage)} no API selected`);
+    }
+    return selectedAPI;
   }
 
   handleGenerateAddress: void => Promise<void> = async () => {
@@ -85,6 +94,7 @@ export default class WalletReceivePage extends Component<Props> {
     } = this.generated.stores.substores.ada;
     const publicDeriver = this.generated.stores.wallets.selected;
     const { validateAmount } = transactions;
+    const selectedAPI = this.getSelectedApi();
 
     // Guard against potential null values
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(WalletReceivePage)}.`);
@@ -212,7 +222,7 @@ export default class WalletReceivePage extends Component<Props> {
         ) : null}
         {uiDialogs.isOpen(URIGenerateDialog) ? (
           <URIGenerateDialog
-            primaryTicker={this.generated.stores.profile.selectedAPI.meta.primaryTicker}
+            primaryTicker={selectedAPI.meta.primaryTicker}
             walletAddress={uiDialogs.getParam<string>('address')}
             amount={uiDialogs.getParam<number>('amount')}
             onClose={() => actions.dialogs.closeActiveDialog.trigger()}

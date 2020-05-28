@@ -32,7 +32,7 @@ export const Generic = (): Node => {
       generated={{
         stores: {
           profile: {
-            termsOfUse: getTermsOfUse(globalKnobs.selectedAPI().type, globalKnobs.locale()),
+            termsOfUse: getTermsOfUse('ada', globalKnobs.locale()),
           },
         },
       }}

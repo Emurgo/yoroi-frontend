@@ -37,7 +37,6 @@ import { THEMES, changeToplevelTheme } from '../../app/themes';
 import type { Theme } from '../../app/themes';
 import environment from '../../app/environment';
 import { getVarsForTheme } from '../../app/stores/toplevel/ProfileStore';
-import type { SelectedApiType } from '../../app/stores/toplevel/ProfileStore';
 import type { HwWalletMetaRow, } from '../../app/api/ada/lib/storage/database/walletTypes/core/tables';
 import { assuranceModes } from '../../app/config/transactionAssuranceConfig';
 
@@ -76,8 +75,7 @@ import { ledgerErrors } from '../../app/domain/LedgerLocalizedError';
 import BigNumber from 'bignumber.js';
 import { utxoToTxInput } from '../../app/api/ada/transactions/shelley/inputSelection';
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
-import { ApiOptions } from '../../app/api/index';
-import { getCurrencyMeta } from '../../app/api/ada/index';
+import { CoinTypes } from '../../app/config/numbersConfig';
 
 /**
  * This whole file is meant to mirror code in App.js
@@ -100,21 +98,10 @@ environment.isNightly = () => boolean('IsNightly', false);
 export const globalKnobs: {|
   locale: void => string,
   currentTheme: void => Theme,
-  selectedAPI: void => SelectedApiType,
 |} = {
   // needs to use functions for storybook to work properly
   locale: () => select('Language', langCode, langCode[0]),
   currentTheme: () => select('Theme', themeNames, THEMES.YOROI_MODERN),
-  selectedAPI: () => {
-    const api = select('API', ApiOptions, ApiOptions.ada);
-    if (api === ApiOptions.ada) {
-      return {
-        type: 'ada',
-        meta: getCurrencyMeta(),
-      };
-    }
-    throw new Error('Missing storybook metadata call');
-  },
 };
 
 export const isFirefoxKnob: void => boolean = () => {
@@ -298,6 +285,7 @@ function genDummyWallet(): PublicDeriver<> {
       conceptualWalletId,
       walletType: WalletTypeOption.WEB_WALLET,
       hardwareInfo: null,
+      coinType: CoinTypes.CARDANO,
     },
     {
       ConceptualWalletId: conceptualWalletId,
@@ -420,6 +408,7 @@ function genSigningWallet(
         return WalletTypeOption.WEB_WALLET;
       })(),
       hardwareInfo,
+      coinType: CoinTypes.CARDANO,
     },
     {
       ConceptualWalletId: conceptualWalletId,

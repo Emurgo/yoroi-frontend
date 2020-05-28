@@ -17,6 +17,7 @@ import {
 } from '../../../utils/formatters';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
+import type { SelectedApiType } from '../../../stores/toplevel/ProfileStore';
 
 export type GeneratedData = typeof WalletSendConfirmationDialogContainer.prototype.generated;
 
@@ -35,18 +36,27 @@ type Props = {|
 @observer
 export default class WalletSendConfirmationDialogContainer extends Component<Props> {
 
+  getSelectedApi: void => SelectedApiType = () => {
+    const { selectedAPI } = this.generated.stores.profile;
+    if (selectedAPI === undefined) {
+      throw new Error(`${nameof(WalletSendConfirmationDialogContainer)} no API selected`);
+    }
+    return selectedAPI;
+  }
+
   render(): Node {
     const {
       currencyUnit,
       signRequest,
       unitOfAccountSetting, coinPrice,
     } = this.props;
+    const selectedAPI = this.getSelectedApi();
     const { stores, actions } = this.generated;
-    const { wallets } = stores.substores[this.generated.stores.profile.selectedAPI.type];
+    const { wallets } = stores.substores[selectedAPI.type];
     const { sendMoneyRequest } = wallets;
     const publicDeriver = stores.wallets.selected;
     const { profile } = stores;
-    const { sendMoney } = actions[this.generated.stores.profile.selectedAPI.type].wallets;
+    const { sendMoney } = actions[selectedAPI.type].wallets;
 
     if (publicDeriver == null) throw new Error('Active wallet required for WalletSendPage.');
 

@@ -27,6 +27,7 @@ import type {
   Address,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import config from '../../config';
+import type { SelectedApiType } from '../../stores/toplevel/ProfileStore';
 
 export type GeneratedData = typeof WalletSummaryPage.prototype.generated;
 
@@ -43,6 +44,14 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
     intl: intlShape.isRequired
   };
   @observable notificationElementId: string = '';
+
+  getSelectedApi: void => SelectedApiType = () => {
+    const { selectedAPI } = this.generated.stores.profile;
+    if (selectedAPI === undefined) {
+      throw new Error(`${nameof(WalletSummaryPage)} no API selected`);
+    }
+    return selectedAPI;
+  }
 
   render(): null | Node {
     const { intl } = this.context;
@@ -68,10 +77,12 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
       return null;
     }
 
+    const selectedAPI = this.getSelectedApi();
+
     const {
       exportTransactionsToFile,
       closeExportTransactionDialog,
-    } = actions[this.generated.stores.profile.selectedAPI.type].transactions;
+    } = actions[selectedAPI.type].transactions;
 
     const isLoadingTx = (
       !recentTransactionsRequest.wasExecuted || recentTransactionsRequest.isExecuting
@@ -135,7 +146,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
               }
             })}
             unitOfAccountSetting={{
-              primaryTicker: profile.selectedAPI.meta.primaryTicker,
+              primaryTicker: selectedAPI.meta.primaryTicker,
               settings: profile.unitOfAccount,
             }}
             addressLookup={(address) => {
@@ -432,7 +443,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
               trigger: actions.ada.transactions.closeExportTransactionDialog.trigger
             },
             loadMoreTransactions: {
-              trigger: actions.ada.transactions.loadMoreTransactions.trigger
+              trigger: actions.transactions.loadMoreTransactions.trigger
             },
           },
         },

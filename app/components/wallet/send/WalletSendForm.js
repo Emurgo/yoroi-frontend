@@ -357,7 +357,9 @@ export default class WalletSendForm extends Component<Props> {
           </div>
           <div className={styles.checkbox}>
             <Checkbox
-              label={intl.formatMessage(messages.checkboxLabel, { currency: currencyUnit.primaryTicker })}
+              label={intl.formatMessage(messages.checkboxLabel, {
+                currency: currencyUnit.primaryTicker
+              })}
               onChange={() => {
                 this.props.toggleSendAll();
                 if (this.props.shouldSendAll) {
