@@ -34,6 +34,7 @@ export const ROUTES = {
     EXTERNAL_STORAGE: '/settings/external-storage',
     TERMS_OF_USE: '/settings/terms-of-use',
     SUPPORT: '/settings/support',
+    LEVEL_OF_COMPLEXITY: '/settings/level-of-complexity',
   },
   TRANSFER: {
     ROOT: '/transfer',

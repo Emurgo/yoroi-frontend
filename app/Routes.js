@@ -43,6 +43,7 @@ import StakingPage from './containers/wallet/staking/StakingPage';
 import NoticeBoardPage from './containers/notice-board/NoticeBoardPage';
 
 import type { ConfigType } from '../config/config-types';
+import ComplexityLevelSettingsPage from './containers/settings/categories/ComplexityLevelSettingsPage';
 import ComplexityLevelPage from './containers/profile/ComplexityLevelPage';
 
 declare var CONFIG: ConfigType;
@@ -215,6 +216,11 @@ const SettingsSubpages = (stores, actions) => (
       exact
       path={ROUTES.SETTINGS.SUPPORT}
       component={(props) => <SupportSettingsPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY}
+      component={(props) => <ComplexityLevelSettingsPage {...props} stores={stores} actions={actions} />}
     />
     <Redirect to={ROUTES.SETTINGS.GENERAL} />
   </Switch>
