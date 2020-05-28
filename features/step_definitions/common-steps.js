@@ -177,6 +177,10 @@ Given(/^I have completed the basic setup$/, async function () {
   await this.click('.SimpleCheckbox_check');
   await this.click('.TermsOfUseForm_submitButton');
 
+  // complexity page
+  const levels = await this.driver.findElements(By.css('.ComplexityLevelForm_submitButton'));
+  await levels[levels.length - 1].click(); // chose most complex level for tests
+
   // uri prompt page
   await acceptUriPrompt(this);
 

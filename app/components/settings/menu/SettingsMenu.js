@@ -109,7 +109,7 @@ export default class SettingsMenu extends Component<Props> {
             label={intl.formatMessage(messages.levelOfComplexity)}
             onClick={() => onItemClick(ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY)}
             active={isActiveItem(ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY)}
-            className="termsOfUse"
+            className="levelOfComplexity"
           />
         </div>
       </div>

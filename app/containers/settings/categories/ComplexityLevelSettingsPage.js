@@ -9,7 +9,8 @@ import ComplexityLevel from '../../../components/profile/complexity-level/Comple
 type GeneratedData = typeof ComplexityLevelSettingsPage.prototype.generated;
 
 @observer
-export default class ComplexityLevelSettingsPage extends Component<InjectedOrGenerated<GeneratedData>> {
+export default class ComplexityLevelSettingsPage
+  extends Component<InjectedOrGenerated<GeneratedData>> {
 
   @computed get generated() {
     if (this.props.generated !== undefined) {

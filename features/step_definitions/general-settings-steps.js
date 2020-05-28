@@ -107,3 +107,12 @@ Then(/^I should see two addresses displayed$/, async function () {
     expect(address).to.be.equal(fakeAddresses[i]);
   }
 });
+
+Then(/^The selected level is "([^"]*)"$/, async function (level) {
+  await this.waitUntilText('.currentLevel', level.toUpperCase());
+});
+
+Then(/^I select the simplest level$/, async function () {
+  const levels = await this.driver.findElements(By.css('.ComplexityLevelForm_submitButton'));
+  await levels[0].click(); // chose the simplest
+});

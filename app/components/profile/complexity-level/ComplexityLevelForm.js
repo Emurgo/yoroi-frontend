@@ -49,8 +49,6 @@ type Props = {|
   +error?: ?LocalizableError
 |}
 
-
-
 class ComplexityLevel extends Component<Props> {
   static defaultProps: {|error: void|} = {
     error: undefined
@@ -96,7 +94,7 @@ class ComplexityLevel extends Component<Props> {
             {
               complexityLevel &&
                 <>
-                  {intl.formatMessage(messages.labelSelectedLevel)} : <span>{complexityLevel}</span>
+                  {intl.formatMessage(messages.labelSelectedLevel)} : <span className="currentLevel">{complexityLevel}</span>
                 </>
             }
           </div>
@@ -115,6 +113,7 @@ class ComplexityLevel extends Component<Props> {
                   <Button
                     label={intl.formatMessage(messages.labelChoose)}
                     className={buttonClasses}
+                    disabled={isSubmitting || (complexityLevel === level.key)}
                     onClick={() => this.props.onSubmit(level.key)}
                     skin={ButtonSkin}
                   />

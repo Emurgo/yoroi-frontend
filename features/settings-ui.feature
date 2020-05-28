@@ -191,3 +191,11 @@ Feature: Wallet UI Settings
     Then I click then button labeled "Verify wallet"
     Then I should see two addresses displayed
     Then I click the next button
+
+  @it-125
+  Scenario: Switch complexity levels (IT-125)
+    And I navigate to the general settings screen
+    And I click on secondary menu "levelOfComplexity" item
+    Then The selected level is "ADVANCED"
+    Then I select the simplest level
+    Then The selected level is "SIMPLE"
