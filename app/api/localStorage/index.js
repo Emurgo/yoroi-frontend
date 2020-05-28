@@ -13,12 +13,14 @@ import {
 import {
   OPEN_TAB_ID_KEY,
 } from '../../utils/tabManager';
+import type { ComplexityLevelType } from '../../types/complexityLevelType';
 
 const networkForLocalStorage = String(environment.NETWORK);
 const storageKeys = {
   USER_LOCALE: networkForLocalStorage + '-USER-LOCALE',
   TERMS_OF_USE_ACCEPTANCE: networkForLocalStorage + '-TERMS-OF-USE-ACCEPTANCE',
   URI_SCHEME_ACCEPTANCE: networkForLocalStorage + '-URI-SCHEME-ACCEPTANCE',
+  COMPLEXITY_LEVEL: networkForLocalStorage + '-COMPLEXITY-LEVEL',
   THEME: networkForLocalStorage + '-THEME',
   CUSTOM_THEME: networkForLocalStorage + '-CUSTOM-THEME',
   VERSION: networkForLocalStorage + '-LAST-LAUNCH-VER',
@@ -81,6 +83,20 @@ export default class LocalStorageApi {
   unsetUriSchemeAcceptance: void => Promise<void> = () => removeLocalItem(
     storageKeys.URI_SCHEME_ACCEPTANCE
   );
+
+  // ========== Level Complexity ========== //
+  getComplexityLevel: void => Promise<?ComplexityLevelType> = () => getLocalItem(
+    storageKeys.COMPLEXITY_LEVEL
+  ).then(level => {
+    if (level == null) return null;
+    return JSON.parse(level);
+  })
+
+  setComplexityLevel: ComplexityLevelType => Promise<void> = (
+    level: ComplexityLevelType
+  ) => setLocalItem(storageKeys.COMPLEXITY_LEVEL, JSON.stringify(level))
+
+  unsetComplexityLevel: void => Promise<void> = () => removeLocalItem(storageKeys.COMPLEXITY_LEVEL)
 
   // ========== User Theme ========== //
 
@@ -248,6 +264,7 @@ export default class LocalStorageApi {
     await this.unsetUserLocale();
     await this.unsetTermsOfUseAcceptance();
     await this.unsetUserTheme();
+    await this.unsetComplexityLevel();
     await this.unsetLastLaunchVersion();
     await this.unsetHideBalance();
     await this.unsetUnitOfAccount();

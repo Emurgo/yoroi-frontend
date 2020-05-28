@@ -23,6 +23,7 @@ import { SUPPORTED_CURRENCIES } from '../../config/unitOfAccount';
 import AdaApi from '../../api/ada/index';
 import type { ApiOptionType } from '../../api/index';
 import { ApiOptions } from '../../api/index';
+import type { ComplexityLevelType } from '../../types/complexityLevelType';
 
 export type SelectedApiType = {|
   type: 'ada',
@@ -77,6 +78,16 @@ export default class ProfileStore extends Store {
       isDone: () => this.areTermsOfUseAccepted,
       action: async () => {
         const route = ROUTES.PROFILE.TERMS_OF_USE;
+        if (this.stores.app.currentRoute === route) {
+          return;
+        }
+        this.actions.router.goToRoute.trigger({ route });
+      },
+    },
+    {
+      isDone: () => this.isComplexityLevelSelected,
+      action: async () => {
+        const route = ROUTES.PROFILE.COMPLEXITY_LEVEL;
         if (this.stores.app.currentRoute === route) {
           return;
         }
@@ -201,6 +212,15 @@ export default class ProfileStore extends Store {
   @observable setUriSchemeAcceptanceRequest: Request<void => Promise<void>>
     = new Request<void => Promise<void>>(this.api.localStorage.setUriSchemeAcceptance);
 
+  @observable getComplexityLevelRequest: Request<void => Promise<?ComplexityLevelType>>
+  = new Request<void => Promise<?ComplexityLevelType>>(this.api.localStorage.getComplexityLevel);
+
+  @observable setComplexityLevelRequest: Request<ComplexityLevelType => Promise<void>>
+    = new Request<ComplexityLevelType => Promise<void>>(this.api.localStorage.setComplexityLevel);
+
+  @observable unsetComplexityLevelRequest: Request<void => Promise<void>>
+    = new Request<void => Promise<void>>(this.api.localStorage.unsetComplexityLevel);
+
   @observable getLastLaunchVersionRequest: Request<void => Promise<string>>
     = new Request<void => Promise<string>>(this.api.localStorage.getLastLaunchVersion);
 
@@ -238,6 +258,7 @@ export default class ProfileStore extends Store {
     this.actions.profile.updateSelectedExplorer.listen(this.setSelectedExplorer);
     this.actions.profile.acceptTermsOfUse.listen(this._acceptTermsOfUse);
     this.actions.profile.acceptUriScheme.listen(this._acceptUriScheme);
+    this.actions.profile.selectComplexityLevel.listen(this._selectComplexityLevel);
     this.actions.profile.updateTheme.listen(this._updateTheme);
     this.actions.profile.exportTheme.listen(this._exportTheme);
     this.actions.profile.commitLocaleToStorage.listen(this._acceptLocale);
@@ -252,6 +273,7 @@ export default class ProfileStore extends Store {
       this._checkSetupSteps,
     ]);
     this._getTermsOfUseAcceptance(); // eagerly cache
+    this._getSelectComplexityLevel(); // eagerly cache
     this._getUriSchemeAcceptance(); // eagerly cache
     this.currentTheme; // eagerly cache (note: don't remove -- getter is stateful)
   }
@@ -473,6 +495,27 @@ export default class ProfileStore extends Store {
 
   _getTermsOfUseAcceptance: void => void = () => {
     this.getTermsOfUseAcceptanceRequest.execute();
+  };
+
+  // ========== Complexity Level Choice ========== //
+
+  @computed get selectedComplexityLevel(): ?ComplexityLevelType {
+    const { result } = this.getComplexityLevelRequest.execute();
+    return result;
+  }
+
+  @computed get isComplexityLevelSelected(): boolean {
+    return !!this.getComplexityLevelRequest.result;
+  }
+
+  _selectComplexityLevel: ComplexityLevelType => Promise<void> = async (
+    level: ComplexityLevelType
+  ) :Promise<void> => {
+    await this.setComplexityLevelRequest.execute(level);
+    await this.getComplexityLevelRequest.execute();
+  }
+  _getSelectComplexityLevel: void => void = () => {
+    this.getComplexityLevelRequest.execute();
   };
 
   // ========== URI Scheme acceptance ========== //
