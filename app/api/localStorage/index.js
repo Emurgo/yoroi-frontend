@@ -13,6 +13,7 @@ import {
 import {
   OPEN_TAB_ID_KEY,
 } from '../../utils/tabManager';
+import type { ComplexityLevelType } from '../../types/complexityLevelType';
 
 const networkForLocalStorage = String(environment.NETWORK);
 const storageKeys = {
@@ -84,17 +85,17 @@ export default class LocalStorageApi {
   );
 
   // ========== Level Complexity ========== //
-  getComplexityLevel: void => Promise<?string> = () => getLocalItem(
+  getComplexityLevel: void => Promise<?ComplexityLevelType> = () => getLocalItem(
     storageKeys.COMPLEXITY_LEVEL
-  ).then((level) => {
-    if (level == null) return '';
-    return level;
+  ).then(level => {
+    if (level == null) return null;
+    return JSON.parse(level);
   })
 
-  setComplexityLevel: string => Promise<void> = (
-    level: string
-  ) => setLocalItem(storageKeys.COMPLEXITY_LEVEL, level)
-  
+  setComplexityLevel: ComplexityLevelType => Promise<void> = (
+    level: ComplexityLevelType
+  ) => setLocalItem(storageKeys.COMPLEXITY_LEVEL, JSON.stringify(level))
+
   unsetComplexityLevel: void => Promise<void> = () => removeLocalItem(storageKeys.COMPLEXITY_LEVEL)
 
   // ========== User Theme ========== //

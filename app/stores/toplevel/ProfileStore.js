@@ -23,6 +23,7 @@ import { SUPPORTED_CURRENCIES } from '../../config/unitOfAccount';
 import AdaApi from '../../api/ada/index';
 import type { ApiOptionType } from '../../api/index';
 import { ApiOptions } from '../../api/index';
+import type { ComplexityLevelType } from '../../types/complexityLevelType';
 
 export type SelectedApiType = {|
   type: 'ada',
@@ -211,11 +212,11 @@ export default class ProfileStore extends Store {
   @observable setUriSchemeAcceptanceRequest: Request<void => Promise<void>>
     = new Request<void => Promise<void>>(this.api.localStorage.setUriSchemeAcceptance);
 
-  @observable getComplexityLevelRequest: Request<void => Promise<?string>>
-  = new Request<void => Promise<?string>>(this.api.localStorage.getComplexityLevel);
+  @observable getComplexityLevelRequest: Request<void => Promise<?ComplexityLevelType>>
+  = new Request<void => Promise<?ComplexityLevelType>>(this.api.localStorage.getComplexityLevel);
 
-  @observable setComplexityLevelRequest: Request<string => Promise<void>>
-    = new Request<string => Promise<void>>(this.api.localStorage.setComplexityLevel);
+  @observable setComplexityLevelRequest: Request<ComplexityLevelType => Promise<void>>
+    = new Request<ComplexityLevelType => Promise<void>>(this.api.localStorage.setComplexityLevel);
 
   @observable unsetComplexityLevelRequest: Request<void => Promise<void>>
     = new Request<void => Promise<void>>(this.api.localStorage.unsetComplexityLevel);
@@ -498,7 +499,7 @@ export default class ProfileStore extends Store {
 
   // ========== Complexity Level Choice ========== //
 
-  @computed get selectedComplexityLevel(): ?string {
+  @computed get selectedComplexityLevel(): ?ComplexityLevelType {
     const { result } = this.getComplexityLevelRequest.execute();
     return result;
   }
@@ -507,8 +508,8 @@ export default class ProfileStore extends Store {
     return !!this.getComplexityLevelRequest.result;
   }
 
-  _selectComplexityLevel: string => Promise<void> = async (
-    level: string
+  _selectComplexityLevel: ComplexityLevelType => Promise<void> = async (
+    level: ComplexityLevelType
   ) :Promise<void> => {
     await this.setComplexityLevelRequest.execute(level);
     await this.getComplexityLevelRequest.execute();

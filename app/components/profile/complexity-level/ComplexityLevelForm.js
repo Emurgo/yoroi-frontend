@@ -6,9 +6,11 @@ import styles from './ComplexityLevelForm.scss';
 import classnames  from 'classnames';
 import BeginnerLevel from '../../../assets/images/complexity-level/beginner-level.inline.svg';
 import AdvancedLevel from '../../../assets/images/complexity-level/advanced-level.inline.svg';
-import LocalizableError from '../../../../translations/messages/app/i18n/LocalizableError.json';
+import LocalizableError from '../../../i18n/LocalizableError';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { ComplexityLevels } from '../../../types/complexityLevelType';
+import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 
 const messages = defineMessages({
   subtitle: {
@@ -31,14 +33,18 @@ const messages = defineMessages({
     id: 'profile.complexityLevel.advanced.description',
     defaultMessage: '!!!I have a some understanding of blockchain and how cryptography is used to power both the blockchain itself and wallet software. I am okay with seeing options and functionality that critically depend on my understanding of these concepts.'
   },
+  labelSelectedLevel: {
+    id: 'profile.complexityLevel.selected.label',
+    defaultMessage: '!!!Your currently level of Complexity is'
+  },
   labelChoose: {
     id: 'global.label.choose',
     defaultMessage: '!!!Choose'
   },
 });
 type Props = {|
-  +complexityLevel: ?string,
-  +onSubmit: string => PossiblyAsync<void>,
+  +complexityLevel: ?ComplexityLevelType,
+  +onSubmit: ComplexityLevelType => PossiblyAsync<void>,
   +isSubmitting: boolean,
   +error?: ?LocalizableError
 |}
@@ -54,24 +60,19 @@ class ComplexityLevel extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-
-  handleSubmit = (level: string) => {
-    this.props.onSubmit(level);
-  }
-
   render() {
     const { intl } = this.context;
-    const { complexityLevel, isSubmitting, error } = this.props;
+    const { complexityLevel, isSubmitting } = this.props;
 
     const levels = [
       {
-        key: 'simple',
+        key: ComplexityLevels.Simple,
         name: intl.formatMessage(messages.titleSimpleLevel),
         image: <BeginnerLevel />,
         description: intl.formatMessage(messages.descriptionSimpleLevel),
       },
       {
-        key: 'advanced',
+        key: ComplexityLevels.Advanced,
         name: intl.formatMessage(messages.titleAdvancedLevel),
         image: <AdvancedLevel />,
         description: intl.formatMessage(messages.descriptionAdvancedLevel),
@@ -91,10 +92,14 @@ class ComplexityLevel extends Component<Props> {
           <div className={styles.description}>
             {intl.formatMessage(messages.subtitle)}
           </div>
-          {/* // TO DO - show the selected level */}
-          {/* <div className={styles.selected}> */}
-          {/* { <div> Youve choosen <span>{complexityLevel}</span></div> } */}
-          {/* </div> */}
+          <div className={styles.selected}>
+            {
+              complexityLevel &&
+                <>
+                  {intl.formatMessage(messages.labelSelectedLevel)} : <span>{complexityLevel}</span>
+                </>
+            }
+          </div>
           <div className={styles.cardsWrapper}>
             {
             levels.map(level => (
@@ -113,8 +118,6 @@ class ComplexityLevel extends Component<Props> {
                     onClick={() => this.props.onSubmit(level.key)}
                     skin={ButtonSkin}
                   />
-
-
                 </div>
               </div>
             ))
