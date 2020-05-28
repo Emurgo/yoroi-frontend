@@ -382,7 +382,7 @@
   "wallet.create.dialog.repeatPasswordLabel": "送金パスワードを再入力してください",
   "wallet.create.dialog.title": "ウォレットを作成",
   "wallet.create.dialog.walletNameHint": "例：ショッピングウォレット",
-  "wallet.currency.pick.cardano": "Cardanoは安全性が実証された世界初のプルーフオブステークプロトコルです",
+  "wallet.currency.pick.cardano": "Cardanoは世界で初めて安全性が実証されたプルーフオブステークプロトコルです",
   "wallet.currency.pick.header": "通貨またはプラットフォームを選択",
   "wallet.dashboard.empty.text": "「シンプルステーキング」または「アドバンスステーキング」にアクセスし、委任を行うステークプールを選択してください。本テストネットでは1つのステークプールに対してのみ委任が可能です。",
   "wallet.dashboard.empty.title": "まだADAを委任していません",
