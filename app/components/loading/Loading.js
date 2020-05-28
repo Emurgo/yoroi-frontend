@@ -80,8 +80,11 @@ export default class Loading extends Component<Props> {
       );
     return (
       <div className={componentStyles}>
-        <div>
-          <IntroBanner isNightly={environment.isNightly()} />
+        <div className={yoroiLogoStyles}>
+          { environment.isShelley() ?
+            <IntroBanner isNightly={environment.isNightly()} /> :
+            <IntroBanner isNightly />
+          }
         </div>
 
         {renderContent}

@@ -75,6 +75,7 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
         languageSelectionBackground
         banner={displayedBanner}
       >
+        <IntroBanner isNightly />
         <LanguageSelectionForm
           onSelectLanguage={this.onSelectLanguage}
           onSubmit={this.onSubmit}
