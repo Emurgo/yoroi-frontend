@@ -10,6 +10,8 @@ import styles from './Loading.scss';
 import LocalizableError from '../../i18n/LocalizableError';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import IntroBanner from '../profile/language-selection/IntroBanner';
+import { environment } from '../../environment';
 
 const messages = defineMessages({
   loading: {
@@ -78,9 +80,10 @@ export default class Loading extends Component<Props> {
       );
     return (
       <div className={componentStyles}>
-        <div className={styles.logos}>
-          <span className={yoroiLogoStyles}><YoroiLogo /></span>
+        <div>
+          <IntroBanner isNightly={environment.isNightly()} />
         </div>
+
         {renderContent}
         {renderError}
       </div>
