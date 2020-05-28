@@ -60,9 +60,18 @@ export default class WalletAddPage extends Component<Props> {
     if (!this.generated.stores.wallets.hasAnyWallets) {
       this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
     }
-    this.generated.actions.profile.setSelectedAPI.trigger(undefined);
     this.generated.actions.dialogs.closeActiveDialog.trigger();
   };
+
+  openDialogWrapper: any => void = (dialog) => {
+    // we reset the API when we open a dialog instead of when we close a dialog
+    // this is because on close, asynchronous unmount actions get triggered
+    // so there is no safe time at which we can un-select the API
+    // so instead, the API gets reset before we start any dialog flow
+    this.generated.actions.profile.setSelectedAPI.trigger(undefined);
+
+    this.generated.actions.dialogs.open.trigger({ dialog });
+  }
 
   componentDidMount() {
     this.generated.actions.wallets.unselectWallet.trigger();
@@ -163,10 +172,10 @@ export default class WalletAddPage extends Component<Props> {
         >
           <WalletAdd
             onHardwareConnect={
-              () => actions.dialogs.open.trigger({ dialog: WalletConnectHWOptionDialog })
+              () => this.openDialogWrapper(WalletConnectHWOptionDialog)
             }
-            onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
-            onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreOptionDialog })}
+            onCreate={() => this.openDialogWrapper(WalletCreateDialog)}
+            onRestore={() =>  this.openDialogWrapper(WalletRestoreOptionDialog)}
             onSettings={this._goToSettingsRoot}
             onDaedalusTransfer={this._goToDaedalusTransferRoot}
           />
@@ -192,10 +201,10 @@ export default class WalletAddPage extends Component<Props> {
       >
         <AddAnotherWallet
           onHardwareConnect={
-            () => actions.dialogs.open.trigger({ dialog: WalletConnectHWOptionDialog })
+            () => this.openDialogWrapper(WalletConnectHWOptionDialog)
           }
-          onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
-          onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreOptionDialog })}
+          onCreate={() => this.openDialogWrapper(WalletCreateDialog)}
+          onRestore={() => this.openDialogWrapper(WalletRestoreOptionDialog)}
         />
         {activeDialog}
       </TopBarLayout>
