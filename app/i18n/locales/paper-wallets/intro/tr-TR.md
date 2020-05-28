@@ -1,4 +1,4 @@
-# Paper Wallets
+# Kağıt Cüzdanlar
 
 A **"Paper Wallet"** is a special document, containing secret mnemonics words and a small set of addresses. When a paper wallet is created **it is NOT stored by Yoroi**. The generated PDF document is the only copy of this wallet in existence.
 
