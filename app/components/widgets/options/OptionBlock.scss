@@ -1,3 +1,5 @@
+@import '../../../themes/mixins/underline';
+
 .optionBlockListItem {
   box-shadow: 0 5px 20px 0px rgba(24, 26, 30, 0.08);
   border-radius: 8px;
@@ -50,13 +52,18 @@
 
     // LEARN MORE TEXT BLOCK
     .learnMoreTextBlock {
+      a {
+        @include underline(var(--theme-underline-dark-color));
+        color: var(--theme-wallet-add-option-dialog-item-title-color);
+      }
+
       overflow: hidden;
       max-height: 0;
       transition: 300ms linear;
       will-change: height;
       background-color: var(--theme-wallet-add-option-dialog-item-learn-more-block-bg-color);
 
-      .leramMoreTextWrapper {
+      .learnMoreTextWrapper {
         padding: 20px 40px 15px;
 
         .learnMoreText {
@@ -123,6 +130,9 @@
         }
         
         .optionImage {
+          &.cardano {
+            background-image: url(../../../assets/images/my-wallets/symbol_ada.inline.svg);
+          }
           &.legacyDaedalus {
             background-image: url(../../../assets/images/add-wallet/option-dialog/daedalus-modern.inline.svg);
           }
@@ -165,6 +175,9 @@
         }
 
         .optionImage {
+          &.cardano {
+            background-image: url(../../../assets/images/my-wallets/symbol_ada.inline.svg);
+          }
           &.legacyDaedalus {
             background-image: url(../../../assets/images/add-wallet/option-dialog/daedalus-modern.inline.svg);
           }

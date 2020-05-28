@@ -2,7 +2,6 @@
 import { observable, action, computed } from 'mobx';
 import BigNumber from 'bignumber.js';
 
-import environment from '../../environment';
 import {
   Logger,
   stringifyError

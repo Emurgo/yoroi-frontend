@@ -388,7 +388,7 @@ export default class Transaction extends Component<Props, State> {
                 {this.renderAmountDisplay({
                   amount: data.amount,
                 })}
-                {this.props.unitOfAccount == null && (
+                {this.props.unitOfAccount.primaryTicker === 'ADA' && (
                   <span className={styles.currencySymbol}><AdaSymbol /></span>
                 )}
               </div>

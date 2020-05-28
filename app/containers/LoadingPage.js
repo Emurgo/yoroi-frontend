@@ -18,7 +18,6 @@ export default class LoadingPage extends Component<InjectedOrGenerated<Generated
     return (
       <CenteredLayout>
         <Loading
-          api={this.generated.stores.profile.selectedAPI.type}
           hasLoadedCurrentLocale={this.generated.stores.profile.hasLoadedCurrentLocale}
           hasLoadedCurrentTheme={this.generated.stores.profile.hasLoadedCurrentTheme}
           isLoadingDataForNextScreen={this.generated.stores.loading.isLoading}
@@ -42,7 +41,6 @@ export default class LoadingPage extends Component<InjectedOrGenerated<Generated
     return Object.freeze({
       stores: {
         profile: {
-          selectedAPI: stores.profile.selectedAPI,
           hasLoadedCurrentLocale: profile.hasLoadedCurrentLocale,
           hasLoadedCurrentTheme: profile.hasLoadedCurrentTheme,
         },

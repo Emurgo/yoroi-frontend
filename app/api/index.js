@@ -4,11 +4,20 @@ import AdaApi from './ada/index';
 import LocalStorageApi from './localStorage/index';
 import ExternalStorageApi from './externalStorage/index';
 import ExportApi from './export/index';
+import type { CoinTypesT } from '../config/numbersConfig';
+import { CoinTypes } from '../config/numbersConfig';
 
 export const ApiOptions = Object.freeze({
   ada: 'ada',
 });
 export type ApiOptionType = $Values<typeof ApiOptions>;
+
+export const getApiForCoinType: CoinTypesT => ApiOptionType = (type) => {
+  if (type === CoinTypes.CARDANO) {
+    return ApiOptions.ada;
+  }
+  throw new Error(`${nameof(getApiForCoinType)} missing entry for coin type ${type}`);
+};
 
 export type Api = {|
   ada: AdaApi,

@@ -38,6 +38,7 @@ import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
 import VerifyAddressDialog from '../../components/wallet/receive/VerifyAddressDialog';
 import { addressTypes } from '../../i18n/global-messages';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { getApiMeta } from '../../stores/toplevel/ProfileStore';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -146,7 +147,7 @@ const genBaseProps: {|
         getParam: request.getParam || (() => (undefined: any)),
       },
       profile: {
-        selectedAPI: globalKnobs.selectedAPI(),
+        selectedAPI: getApiMeta('ada'),
         isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
         selectedExplorer: getDefaultExplorer(),
       },

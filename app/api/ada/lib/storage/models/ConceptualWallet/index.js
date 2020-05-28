@@ -22,6 +22,7 @@ import { ModifyConceptualWallet, } from '../../database/walletTypes/core/api/wri
 import type { HwWalletMetaRow, ConceptualWalletRow } from '../../database/walletTypes/core/tables';
 import { GetConceptualWallet } from '../../database/walletTypes/core/api/read';
 import Config from '../../../../../../config';
+import type { CoinTypesT } from '../../../../../../config/numbersConfig';
 
 /** Snapshot of a ConceptualWallet in the database */
 export class ConceptualWallet implements IConceptualWallet, IRename {
@@ -34,12 +35,14 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
   #protocolMagic: string;
   walletType: WalletType;
   hardwareInfo: ?$ReadOnly<HwWalletMetaRow>;
+  coinType: CoinTypesT;
 
   constructor(data: IConceptualWalletConstructor): IConceptualWallet {
     this.db = data.db;
     this.#conceptualWalletId = data.conceptualWalletId;
     this.walletType = data.walletType;
     this.hardwareInfo = data.hardwareInfo;
+    this.coinType = data.coinType;
     return this;
   }
 

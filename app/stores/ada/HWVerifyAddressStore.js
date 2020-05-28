@@ -11,8 +11,6 @@ import { wrapWithFrame } from '../lib/TrezorWrapper';
 
 import LocalizableError from '../../i18n/LocalizableError';
 
-import environment from '../../environment';
-
 import type {
   BIP32Path
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';

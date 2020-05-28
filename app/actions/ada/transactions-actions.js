@@ -7,7 +7,6 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 export type TransactionRowsToExportRequest = void;
 
 export default class TransactionsActions {
-  loadMoreTransactions: AsyncAction<PublicDeriver<>> = new AsyncAction();
   exportTransactionsToFile: AsyncAction<{|
     publicDeriver: PublicDeriver<>,
     exportRequest: TransactionRowsToExportRequest,

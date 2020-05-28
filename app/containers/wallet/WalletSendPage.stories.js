@@ -32,6 +32,7 @@ import { isValidAmountInLovelaces } from '../../utils/validations';
 import { InvalidWitnessError } from '../../api/ada/errors';
 import WalletSendConfirmationDialog from '../../components/wallet/send/WalletSendConfirmationDialog';
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
+import { getApiMeta } from '../../stores/toplevel/ProfileStore';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -53,11 +54,12 @@ const genBaseProps: {|
   noExternalStorage?: boolean,
   initialShowMemoState?: boolean,
   hwSend?: *,
+  selectedAPI: *,
 |} => * = (request) => ({
   initialShowMemoState: request.initialShowMemoState || false,
   stores: {
     profile: {
-      selectedAPI: globalKnobs.selectedAPI(),
+      selectedAPI: request.selectedAPI,
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
       selectedExplorer: getDefaultExplorer(),
       unitOfAccount: genUnitOfAccount(),
@@ -157,7 +159,7 @@ const genBaseProps: {|
     generated: {
       stores: {
         profile: {
-          selectedAPI: globalKnobs.selectedAPI(),
+          selectedAPI: request.selectedAPI,
           isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
           selectedExplorer: getDefaultExplorer(),
         },
@@ -203,6 +205,7 @@ export const UserInput = (): Node => {
     }),
     (<WalletSendPage
       generated={genBaseProps({
+        selectedAPI: getApiMeta('ada'),
         wallet,
       })}
     />)
@@ -220,6 +223,7 @@ export const MemoDialog = (): Node => {
     }),
     (<WalletSendPage
       generated={genBaseProps({
+        selectedAPI: getApiMeta('ada'),
         wallet,
         noExternalStorage: true,
       })}
@@ -238,6 +242,7 @@ export const MemoExpanded = (): Node => {
     }),
     (<WalletSendPage
       generated={genBaseProps({
+        selectedAPI: getApiMeta('ada'),
         wallet,
         initialShowMemoState: true,
       })}
@@ -268,6 +273,7 @@ export const RegularConfirmationDialog = (): Node => {
     (<WalletSendPage
       generated={genBaseProps({
         wallet,
+        selectedAPI: getApiMeta('ada'),
         dialogInfo: {
           sendMoneyRequest: {
             isExecuting: boolean('isExecuting', false),
@@ -313,6 +319,7 @@ export const LedgerConfirmationDialog = (): Node => {
     !environment.isShelley() && (<WalletSendPage
       generated={genBaseProps({
         wallet,
+        selectedAPI: getApiMeta('ada'),
         hwSend: {
           isActionProcessing: boolean('isActionProcessing', false),
           error: getErrorValue() === ledgerErrorCases.None
@@ -364,6 +371,7 @@ export const TrezorConfirmationDialog = (): Node => {
     !environment.isShelley() && (<WalletSendPage
       generated={genBaseProps({
         wallet,
+        selectedAPI: getApiMeta('ada'),
         hwSend: {
           isActionProcessing: boolean('isActionProcessing', false),
           error: getErrorValue() === trezorErrorCases.None

@@ -10,6 +10,8 @@ import URILandingDialog from '../../components/uri/URILandingDialog';
 import URIVerifyDialog from '../../components/uri/URIVerifyDialog';
 import URIInvalidDialog from '../../components/uri/URIInvalidDialog';
 
+import { getAdaCurrencyMeta } from '../../api/ada/index';
+
 export type GeneratedData = typeof URILandingDialogContainer.prototype.generated;
 
 type Props = {|
@@ -62,7 +64,7 @@ export default class URILandingDialogContainer extends Component<Props> {
     if (!this.showDisclaimer) {
       return (
         <URIVerifyDialog
-          primaryTicker={this.generated.stores.profile.selectedAPI.meta.primaryTicker}
+          primaryTicker={getAdaCurrencyMeta().primaryTicker}
           onSubmit={this.onVerifiedSubmit}
           onBack={this.toggleShowDisclaimer}
           onCancel={this.onCancel}
@@ -94,7 +96,6 @@ export default class URILandingDialogContainer extends Component<Props> {
     return Object.freeze({
       stores: {
         profile: {
-          selectedAPI: stores.profile.selectedAPI,
           selectedExplorer: stores.profile.selectedExplorer,
           isClassicTheme: stores.profile.isClassicTheme,
           unitOfAccount: stores.profile.unitOfAccount,

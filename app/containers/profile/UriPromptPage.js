@@ -4,7 +4,6 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed, observable, runInAction } from 'mobx';
 import { intlShape } from 'react-intl';
-import environment from '../../environment';
 
 import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import TopBar from '../../components/topbar/TopBar';

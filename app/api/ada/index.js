@@ -581,7 +581,7 @@ export type GetTransactionRowsToExportFunc = (
 
 export const DEFAULT_ADDRESSES_PER_PAPER = 1;
 
-export function getCurrencyMeta(_request: void): {|
+export function getAdaCurrencyMeta(_request: void): {|
   primaryTicker: string,
   unitName: string,
 |} {
@@ -597,7 +597,7 @@ export default class AdaApi {
     primaryTicker: string,
     unitName: string,
   |} {
-    return getCurrencyMeta();
+    return getAdaCurrencyMeta();
   }
 
   // noinspection JSMethodCanBeStatic

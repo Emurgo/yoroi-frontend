@@ -8,6 +8,7 @@ Feature: Wallet creation
   @it-5
   Scenario: Wallet creation (IT-5)
     When I click the create button
+    Then I select Cardano
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
     | password   | repeatedPassword  |
@@ -20,6 +21,7 @@ Feature: Wallet creation
   @it-9
   Scenario: Wallet access after browser restart (IT-9)
     When I click the create button
+    Then I select Cardano
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
     | password   | repeatedPassword  |
@@ -34,6 +36,7 @@ Feature: Wallet creation
   @it-18
   Scenario: Mnemonic words can be cleared by clicking "Clear button" on wallet creation screen (IT-18)
     When I click the create button
+    Then I select Cardano
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
     | password   | repeatedPassword  |
@@ -47,6 +50,7 @@ Feature: Wallet creation
   @it-24
   Scenario: Wallet can't be created without entering password (IT-24)
     When I click the create button
+    Then I select Cardano
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
     | password   | repeatedPassword  |
@@ -60,6 +64,7 @@ Feature: Wallet creation
   @it-27
    Scenario: Users will be presented with a security warning prior to seed creation (IT-27)
     When I click the create button
+    Then I select Cardano
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
     | password   | repeatedPassword  |
@@ -72,6 +77,7 @@ Feature: Wallet creation
   @it-16
   Scenario Outline: Wallet can't be created if wallet name doesn't meet requirements (IT-16)
     When I click the create button
+    Then I select Cardano
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
     | password   | repeatedPassword  |
@@ -93,6 +99,7 @@ Feature: Wallet creation
   @it-7
   Scenario Outline: Wallet can't be created if its password doesn't meet complexity requirements (IT-7)
     When I click the create button
+    Then I select Cardano
     And I enter the name "Created Wallet"
     And I enter the created wallet password:
     | password        | repeatedPassword  |

@@ -7,7 +7,6 @@ import type {
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 import Store from '../base/Store';
-import environment from '../../environment';
 
 import LocalizedRequest from '../lib/LocalizedRequest';
 import LocalizableError from '../../i18n/LocalizableError';

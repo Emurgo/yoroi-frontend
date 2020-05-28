@@ -11,7 +11,6 @@ import DaedalusTransferFormPage from './DaedalusTransferFormPage';
 import DaedalusTransferMasterKeyFormPage from './DaedalusTransferMasterKeyFormPage';
 import DaedalusTransferWaitingPage from './DaedalusTransferWaitingPage';
 import DaedalusTransferErrorPage from './DaedalusTransferErrorPage';
-import environment from '../../environment';
 import config from '../../config';
 import { TransferStatus, } from '../../types/TransferTypes';
 import type { TransferStatusT, TransferTx } from '../../types/TransferTypes';

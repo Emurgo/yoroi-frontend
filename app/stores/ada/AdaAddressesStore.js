@@ -15,5 +15,9 @@ export default class AdaAddressesStore extends AddressesStore {
 
   setup(): void {
     super.setup();
+
+    const actions = this.actions.ada.addresses;
+    actions.createAddress.listen(this._createAddress);
+    actions.resetErrors.listen(this._resetErrors);
   }
 }

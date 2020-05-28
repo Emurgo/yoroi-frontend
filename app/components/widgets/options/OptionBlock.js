@@ -16,7 +16,7 @@ type Props = {|
   +title: string,
   +onSubmit: void => void,
   // If learnMoreText is not provided, learn more block will disabled
-  +learnMoreText?: string,
+  +learnMoreText?: Node | string,
 |};
 
 type State = {|
@@ -77,7 +77,7 @@ export default class OptionBlock extends Component<Props, State> {
             ? (
               <div>
                 <div className={learnMoreTextBlockClasses}>
-                  <div className={styles.leramMoreTextWrapper}>
+                  <div className={styles.learnMoreTextWrapper}>
                     <p className={styles.learnMoreText}>{learnMoreText}</p>
                   </div>
                 </div>

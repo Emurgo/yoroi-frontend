@@ -13,6 +13,11 @@ When(/^I click the create button$/, async function () {
   await this.click('.WalletAdd_btnCreateWallet');
 });
 
+When(/^I select Cardano$/, async function () {
+  await this.waitForElement('.PickCurrencyOptionDialog');
+  await this.click('.PickCurrencyOptionDialog_cardano');
+});
+
 When(/^I enter the created wallet password:$/, async function (table) {
   const fields = table.hashes()[0];
   await this.input('.WalletCreateDialog .walletPassword input', fields.password);

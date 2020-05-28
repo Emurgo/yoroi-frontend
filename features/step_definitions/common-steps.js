@@ -145,6 +145,10 @@ Given(/^There is a wallet stored named ([^"]*)$/, async function (walletName) {
   expect(restoreInfo).to.not.equal(undefined);
 
   await this.click('.WalletAdd_btnRestoreWallet');
+
+  await this.waitForElement('.PickCurrencyOptionDialog');
+  await this.click('.PickCurrencyOptionDialog_cardano');
+
   await this.waitForElement('.WalletRestoreOptionDialog');
 
   await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');

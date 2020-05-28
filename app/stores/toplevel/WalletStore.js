@@ -38,6 +38,7 @@ import { assuranceModes, } from '../../config/transactionAssuranceConfig';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { legacyWalletChecksum } from '@emurgo/cip4-js';
 import { createDebugWalletDialog } from '../../containers/wallet/dialogs/DebugWalletDialogContainer';
+import { getApiForCoinType } from '../../api/index';
 
 type GroupedWallets = {|
   publicDerivers: Array<PublicDeriver<>>;
@@ -187,7 +188,9 @@ export default class WalletStore extends Store {
     }
     runInAction(() => {
       this.publicDerivers.push(...newWithCachedData);
-      this.selected = newWithCachedData[0];
+      this._setActiveWallet({
+        wallet: newWithCachedData[0]
+      });
     });
   }
 
@@ -251,8 +254,10 @@ export default class WalletStore extends Store {
   refreshWalletFromRemote: PublicDeriver<> => Promise<void> = async (
     publicDeriver
   ) => {
+    const { coinType } = publicDeriver.getParent();
+    const apiType = getApiForCoinType(coinType);
     try {
-      const substore = this.stores.substores[this.stores.profile.selectedAPI.type];
+      const substore = this.stores.substores[apiType];
       await substore.transactions.refreshTransactionData({
         publicDeriver,
         localRequest: false,
@@ -267,8 +272,10 @@ export default class WalletStore extends Store {
   refreshWalletFromLocalOnLaunch: PublicDeriver<> => Promise<void> = async (
     publicDeriver
   ) => {
+    const { coinType } = publicDeriver.getParent();
+    const apiType = getApiForCoinType(coinType);
     try {
-      const substore = this.stores.substores[this.stores.profile.selectedAPI.type];
+      const substore = this.stores.substores[apiType];
       await substore.transactions.refreshTransactionData({
         publicDeriver,
         localRequest: true,
@@ -309,8 +316,9 @@ export default class WalletStore extends Store {
     this._queueWarningIfNeeded(withCache);
     runInAction(() => {
       this.publicDerivers.push(withCache);
-
-      this.selected = withCache;
+      this._setActiveWallet({
+        wallet: withCache
+      });
     });
   }
 
@@ -359,7 +367,10 @@ export default class WalletStore extends Store {
   |} => void = (
     request
   ) => {
-    const stores = this.stores.substores[this.stores.profile.selectedAPI.type];
+    const { coinType } = request.publicDeriver.getParent();
+    const apiType = getApiForCoinType(coinType);
+
+    const stores = this.stores.substores[apiType];
     stores.addresses.addObservedWallet(request.publicDeriver);
     stores.transactions.addObservedWallet(request);
     stores.time.addObservedTime(request.publicDeriver);
@@ -373,12 +384,17 @@ export default class WalletStore extends Store {
   @action _setActiveWallet: {| wallet: PublicDeriver<> |} => void = (
     { wallet }
   ) => {
+    const { coinType } = wallet.getParent();
+    const apiType = getApiForCoinType(coinType);
+    this.actions.profile.setSelectedAPI.trigger(apiType);
+
     this.selected = wallet;
     // do not await on purpose since the UI will handle adding loaders while refresh is happening
     this.refreshWalletFromRemote(wallet);
   };
 
   @action _unsetActiveWallet: void => void = () => {
+    this.actions.profile.setSelectedAPI.trigger(undefined);
     this.selected = null;
   };
 

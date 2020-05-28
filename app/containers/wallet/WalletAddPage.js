@@ -22,6 +22,8 @@ import WalletBackupDialogContainer from './dialogs/WalletBackupDialogContainer';
 import type { GeneratedData as WalletBackupDialogContainerData } from './dialogs/WalletBackupDialogContainer';
 import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
 
+import PickCurrencyDialogContainer from './dialogs/PickCurrencyDialogContainer';
+
 import WalletRestoreOptionDialogContainer from './dialogs/WalletRestoreOptionDialogContainer';
 import WalletRestoreDialogContainer from './dialogs/WalletRestoreDialogContainer';
 import type { GeneratedData as WalletRestoreDialogContainerData } from './dialogs/WalletRestoreDialogContainer';
@@ -58,6 +60,7 @@ export default class WalletAddPage extends Component<Props> {
     if (!this.generated.stores.wallets.hasAnyWallets) {
       this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
     }
+    this.generated.actions.profile.setSelectedAPI.trigger(undefined);
     this.generated.actions.dialogs.closeActiveDialog.trigger();
   };
 
@@ -66,24 +69,32 @@ export default class WalletAddPage extends Component<Props> {
   }
 
   render(): Node {
+    const { selectedAPI } = this.generated.stores.profile;
     const { actions, stores } = this.generated;
     const { uiDialogs } = stores;
 
     const openTrezorConnectDialog = () => {
+      if (selectedAPI === undefined) {
+        throw new Error(`${nameof(WalletAddPage)} no API selected`);
+      }
       actions.dialogs.open.trigger({ dialog: WalletTrezorConnectDialogContainer });
-      this.generated.actions[
-        this.generated.stores.profile.selectedAPI.type
-      ].trezorConnect.init.trigger();
+      this.generated.actions[selectedAPI.type].trezorConnect.init.trigger();
     };
     const openLedgerConnectDialog = () => {
+      if (selectedAPI === undefined) {
+        throw new Error(`${nameof(WalletAddPage)} no API selected`);
+      }
       actions.dialogs.open.trigger({ dialog: WalletLedgerConnectDialogContainer });
-      this.generated.actions[
-        this.generated.stores.profile.selectedAPI.type
-      ].ledgerConnect.init.trigger();
+      this.generated.actions[selectedAPI.type].ledgerConnect.init.trigger();
     };
 
     let activeDialog = null;
-    if (uiDialogs.isOpen(WalletCreateDialog)) {
+    if (uiDialogs.activeDialog != null && selectedAPI == null) {
+      activeDialog = (<PickCurrencyDialogContainer
+        onClose={this.onClose}
+        onCardano={() => this.generated.actions.profile.setSelectedAPI.trigger('ada')}
+      />);
+    } else if (uiDialogs.isOpen(WalletCreateDialog)) {
       activeDialog = (
         <WalletCreateDialogContainer
           {...this.generated.WalletCreateDialogContainerProps}
@@ -217,6 +228,7 @@ export default class WalletAddPage extends Component<Props> {
           selectedAPI: stores.profile.selectedAPI,
         },
         uiDialogs: {
+          activeDialog: stores.uiDialogs.activeDialog,
           isOpen: stores.uiDialogs.isOpen,
           getParam: stores.uiDialogs.getParam,
         },
@@ -236,6 +248,11 @@ export default class WalletAddPage extends Component<Props> {
           },
           open: {
             trigger: actions.dialogs.open.trigger,
+          },
+        },
+        profile: {
+          setSelectedAPI: {
+            trigger: actions.profile.setSelectedAPI.trigger,
           },
         },
         wallets: {

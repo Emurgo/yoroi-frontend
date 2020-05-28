@@ -45,6 +45,7 @@ import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import {
   ConceptualWallet
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { getApiForCoinType } from '../../api/index';
 
 declare var CONFIG : ConfigType;
 
@@ -210,9 +211,6 @@ export default class AddressesStore extends Store {
 
   setup(): void {
     super.setup();
-    const actions = this.actions[this.stores.profile.selectedAPI.type].addresses;
-    actions.createAddress.listen(this._createAddress);
-    actions.resetErrors.listen(this._resetErrors);
 
     this.allAddressesForDisplay = new AddressTypeStore({
       stores: this.stores,
@@ -353,15 +351,16 @@ export default class AddressesStore extends Store {
     publicDeriver: PublicDeriver<>,
     invertFilter: boolean,
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
+    const { coinType } = request.publicDeriver.getParent();
+    const apiType = getApiForCoinType(coinType);
+
     const withUtxos = asGetAllUtxos(request.publicDeriver);
     if (withUtxos == null) {
       Logger.error(`${nameof(this._wrapForAllAddresses)} incorrect public deriver`);
       return Promise.resolve([]);
     }
 
-    const allAddresses = await this.api[
-      this.stores.profile.selectedAPI.type
-    ].getAllAddressesForDisplay({
+    const allAddresses = await this.api[apiType].getAllAddressesForDisplay({
       publicDeriver: withUtxos,
       type: request.publicDeriver.getParent() instanceof Bip44Wallet
         ? CoreAddressTypes.CARDANO_LEGACY
@@ -379,6 +378,9 @@ export default class AddressesStore extends Store {
     publicDeriver: PublicDeriver<>,
     chainsRequest: IHasUtxoChainsRequest,
   |}=> Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
+    const { coinType } = request.publicDeriver.getParent();
+    const apiType = getApiForCoinType(coinType);
+
     const withHasUtxoChains = asHasUtxoChains(
       request.publicDeriver
     );
@@ -386,9 +388,7 @@ export default class AddressesStore extends Store {
       Logger.error(`${nameof(this._wrapForChainAddresses)} incorrect public deriver`);
       return Promise.resolve([]);
     }
-    const addresses = await this.api[
-      this.stores.profile.selectedAPI.type
-    ].getChainAddressesForDisplay({
+    const addresses = await this.api[apiType].getChainAddressesForDisplay({
       publicDeriver: withHasUtxoChains,
       chainsRequest: request.chainsRequest,
       type: request.publicDeriver.getParent() instanceof Bip44Wallet
