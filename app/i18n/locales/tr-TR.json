@@ -1,7 +1,7 @@
 {
   "api.errors.ApiMethodNotYetImplementedError": "This API method is not yet implemented.",
   "api.errors.GenericApiError": "An error occurred, please try again later.",
-  "api.errors.IncorrectPasswordError": "Incorrect wallet password.",
+  "api.errors.IncorrectPasswordError": "Geçersiz Cüzdan Şifresi",
   "api.errors.NotEnoughMoneyToSendError": "Not enough ADA to make this transaction.",
   "api.errors.PromiseNotCalledYetError": "Result accessed before execution finished.",
   "api.errors.ReportRequestError": "There was a problem sending the support request.",
