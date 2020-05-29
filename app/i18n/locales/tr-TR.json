@@ -620,7 +620,7 @@
   "wallet.transaction.memo.delete.dialog.content": "Are you sure you want to remove the memo for this transaction?<br />Doing so will erase all copies of it and you will not be able to restore it in the future.",
   "wallet.transaction.memo.invalid": "Memo must be at least 1 and at most {maxMemo} characters.",
   "wallet.transaction.memo.optional.invalid": "Memo cannot be more than {maxMemo} characters.",
-  "wallet.transaction.received": "{currency} received",
+  "wallet.transaction.received": "{currency} Alındı",
   "wallet.transaction.sent": "{currency} sent",
   "wallet.transaction.state.failed": "failed",
   "wallet.transaction.state.pending": "pending",
