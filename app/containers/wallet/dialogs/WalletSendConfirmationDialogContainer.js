@@ -14,13 +14,14 @@ import {
 import WalletSendConfirmationDialog from '../../../components/wallet/send/WalletSendConfirmationDialog';
 import {
   formattedAmountToNaturalUnits,
+  formattedWalletAmount,
 } from '../../../utils/formatters';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
-import type { SelectedApiType } from '../../../stores/toplevel/ProfileStore';
 import LocalizableError from '../../../i18n/LocalizableError';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { ExplorerType } from '../../../domain/Explorer';
+import { ApiOptions, getApiForCoinType, getApiMeta } from '../../../api/common/utils';
 
 export type GeneratedData = typeof WalletSendConfirmationDialogContainer.prototype.generated;
 
@@ -39,12 +40,12 @@ type Props = {|
 @observer
 export default class WalletSendConfirmationDialogContainer extends Component<Props> {
 
-  getSelectedApi: void => SelectedApiType = () => {
-    const { selectedAPI } = this.generated.stores.profile;
-    if (selectedAPI === undefined) {
-      throw new Error(`${nameof(WalletSendConfirmationDialogContainer)} no API selected`);
+  getApiType: PublicDeriver<> => 'ada' = (publicDeriver) => {
+    const selectedApiType = getApiForCoinType(publicDeriver.getParent().getCoinType());
+    if (selectedApiType !== ApiOptions.ada) {
+      throw new Error(`${nameof(WalletSendConfirmationDialogContainer)} sending only supported for ADA`);
     }
-    return selectedAPI;
+    return (selectedApiType: any);
   }
 
   render(): Node {
@@ -53,15 +54,18 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
       signRequest,
       unitOfAccountSetting, coinPrice,
     } = this.props;
-    const selectedAPI = this.getSelectedApi();
     const { stores, actions } = this.generated;
-    const { wallets } = stores.substores[selectedAPI.type];
-    const { sendMoneyRequest } = wallets;
     const publicDeriver = stores.wallets.selected;
     const { profile } = stores;
-    const { sendMoney } = actions[selectedAPI.type].wallets;
 
-    if (publicDeriver == null) throw new Error('Active wallet required for WalletSendPage.');
+    if (publicDeriver == null) throw new Error(`Active wallet required for ${nameof(WalletSendConfirmationDialogContainer)}`);
+    const selectedApiType = this.getApiType(publicDeriver);
+    const apiMeta = getApiMeta(selectedApiType)?.meta;
+    if (apiMeta == null) throw new Error(`${nameof(WalletSendConfirmationDialogContainer)} no API selected`);
+
+    const { sendMoney } = actions[selectedApiType].wallets;
+    const { wallets } = stores.substores[selectedApiType];
+    const { sendMoneyRequest } = wallets;
 
     const totalInput = ITotalInput(signRequest, true);
     const fee = IGetFee(signRequest, true);
@@ -74,7 +78,14 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         receivers={receivers}
         totalAmount={totalInput}
         transactionFee={fee}
-        amountToNaturalUnits={formattedAmountToNaturalUnits}
+        amountToNaturalUnits={amount => formattedAmountToNaturalUnits(
+          amount,
+          apiMeta.decimalPlaces.toNumber()
+        )}
+        formattedWalletAmount={amount => formattedWalletAmount(
+          amount,
+          apiMeta.decimalPlaces.toNumber()
+        )}
         onSubmit={async ({ password }) => {
           const copyRequest = copySignRequest(signRequest);
           await sendMoney.trigger({
@@ -121,7 +132,6 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     stores: {|
       profile: {|
         isClassicTheme: boolean,
-        selectedAPI: void | SelectedApiType,
         selectedExplorer: ExplorerType
       |},
       substores: {|
@@ -148,7 +158,6 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     return Object.freeze({
       stores: {
         profile: {
-          selectedAPI: stores.profile.selectedAPI,
           isClassicTheme: stores.profile.isClassicTheme,
           selectedExplorer: stores.profile.selectedExplorer,
         },

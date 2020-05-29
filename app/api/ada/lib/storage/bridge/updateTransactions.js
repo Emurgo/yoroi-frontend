@@ -94,22 +94,25 @@ import {
 } from './timeUtils';
 import {
   rawGenHashToIdsFunc,
-} from './hashMapper';
+} from '../../../../common/lib/storage/bridge/hashMapper';
 import type {
   HashToIdsFunc,
-} from './hashMapper';
+} from '../../../../common/lib/storage/bridge/hashMapper';
 import { STABLE_SIZE } from '../../../../../config/numbersConfig';
 import { RollbackApiError } from '../../../errors';
 import { getFromUserPerspective, } from '../../../transactions/utils';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 
 import type {
-  FilterFunc, HistoryFunc, BestBlockFunc,
+  HistoryFunc, BestBlockFunc,
   RemoteTxState,
   RemoteTransaction,
   RemoteTransactionInput,
   RemoteCertificate,
 } from '../../state-fetch/types';
+import type {
+  FilterFunc,
+} from '../../../../common/lib/state-fetch/currencySpecificTypes';
 import { addressToKind } from './utils';
 
 import environment from '../../../../../environment';

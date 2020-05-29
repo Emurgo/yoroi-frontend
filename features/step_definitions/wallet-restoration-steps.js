@@ -9,11 +9,11 @@ async function checkErrorByTranslationId(client, errorSelector, error) {
   await client.waitUntilText(errorSelector, await client.intl(error.message));
 }
 
-When(/^I click the restore button$/, async function () {
+When(/^I click the restore button for ([^"]*)$/, async function (currency) {
   await this.click('.WalletAdd_btnRestoreWallet');
 
   await this.waitForElement('.PickCurrencyOptionDialog');
-  await this.click('.PickCurrencyOptionDialog_cardano');
+  await this.click(`.PickCurrencyOptionDialog_${currency}`);
 
   await this.waitForElement('.WalletRestoreOptionDialog');
 

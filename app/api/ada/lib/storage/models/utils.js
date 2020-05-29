@@ -409,10 +409,10 @@ export async function updateCutoffFromInsert(
     if (external == null || external.children == null) {
       throw new Error('updateCutoffFromInsert should never happen');
     }
-    let bestNewCuttoff = 0;
+    let bestNewCutoff = 0;
     for (const child of external.children) {
-      if (child.index > bestNewCuttoff) {
-        bestNewCuttoff = child.index;
+      if (child.index > bestNewCutoff) {
+        bestNewCutoff = child.index;
       }
     }
 
@@ -425,14 +425,14 @@ export async function updateCutoffFromInsert(
       undefined,
       derivationTables,
     );
-    if (bestNewCuttoff - BIP44_SCAN_SIZE > currentCutoff) {
+    if (bestNewCutoff - BIP44_SCAN_SIZE > currentCutoff) {
       await request.displayCutoffInstance.rawSetCutoff(
         tx,
         {
           ModifyDisplayCutoff: deps.ModifyDisplayCutoff,
           GetDerivationsByPath: deps.GetDerivationsByPath,
         },
-        { newIndex: bestNewCuttoff - BIP44_SCAN_SIZE },
+        { newIndex: bestNewCutoff - BIP44_SCAN_SIZE },
       );
     }
   }

@@ -30,6 +30,7 @@ import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import type { StandardAddress, } from '../../types/AddressFilterTypes';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { SetupSelfTxRequest } from '../../stores/ada/AdaTransactionBuilderStore';
+import { ApiOptions, getApiMeta } from '../../api/common/utils';
 
 declare var CONFIG: ConfigType;
 
@@ -153,10 +154,15 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
   > => Node = (
     tentativeTx
   ) => {
+    const apiMeta = getApiMeta(ApiOptions.ada);
+    if (apiMeta == null) throw new Error(`${nameof(UnmangleTxDialogContainer)} no API selected`);
+
     const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
       ? (
-        this.generated.stores.coinPriceStore
-          .getCurrentPrice('ADA', this.generated.stores.profile.unitOfAccount.currency)
+        this.generated.stores.coinPriceStore.getCurrentPrice(
+          apiMeta.meta.primaryTicker,
+          this.generated.stores.profile.unitOfAccount.currency
+        )
       )
       : null;
 
@@ -180,7 +186,10 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
     return (
       <TransferSummaryPage
         form={spendingPasswordForm}
-        formattedWalletAmount={formattedWalletAmount}
+        formattedWalletAmount={amount => formattedWalletAmount(
+          amount,
+          apiMeta.meta.decimalPlaces.toNumber(),
+        )}
         selectedExplorer={this.generated.stores.profile.selectedExplorer}
         transferTx={transferTx}
         onSubmit={this.submit}

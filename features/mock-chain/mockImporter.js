@@ -13,8 +13,10 @@ import type {
   AddressUtxoFunc,
   HistoryFunc,
   BestBlockFunc,
-  FilterFunc,
 } from '../../app/api/ada/lib/state-fetch/types';
+import type {
+  FilterFunc,
+} from '../../app/api/common/lib/state-fetch/currencySpecificTypes';
 import type {
   ServerStatusResponse,
 } from '../../app/api/common/lib/state-fetch/types';

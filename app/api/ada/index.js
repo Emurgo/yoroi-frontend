@@ -97,8 +97,10 @@ import {
 import {
   generateWalletRootKey,
   generateAdaMnemonic,
-  isValidEnglishAdaMnemonic,
 } from './lib/cardanoCrypto/cryptoWallet';
+import {
+  isValidBip39Mnemonic,
+} from '../common/lib/crypto/wallet';
 import { generateStandardPlate } from './lib/cardanoCrypto/plate';
 import {
   scramblePaperAdaMnemonic,
@@ -122,7 +124,8 @@ import {
   WalletAlreadyRestoredError,
 } from '../common/errors';
 import LocalizableError from '../../i18n/LocalizableError';
-import { scanBip44Account, } from './restoration/byron/scan';
+import { scanBip44Account, } from '../common/lib/restoration/bip44';
+import { v2genAddressBatchFunc, } from './restoration/byron/scan';
 import { scanCip1852Account, } from './restoration/shelley/scan';
 import type {
   BaseSignRequest,
@@ -134,7 +137,7 @@ import type {
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import {
   InvalidWitnessError,
-  CheckAdressesInUseApiError,
+  CheckAddressesInUseApiError,
 } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 import {
@@ -146,7 +149,6 @@ import type {
 } from '../../domain/Explorer';
 import LocalStorageApi from '../localStorage/index';
 import type {
-  FilterFunc,
   HistoryFunc,
   SendFunc,
   SignedResponse,
@@ -154,13 +156,16 @@ import type {
   BestBlockFunc,
   SignedRequest,
 } from './lib/state-fetch/types';
+import type {
+  FilterFunc,
+} from '../common/lib/state-fetch/currencySpecificTypes';
 import {
   getChainAddressesForDisplay,
 } from './lib/storage/models/utils';
 import {
   getAllAddressesForDisplay,
 } from './lib/storage/bridge/traitUtils';
-import { convertAdaTransactionsToExportRows } from './transactions/utils';
+import { v3PublicToV2, convertAdaTransactionsToExportRows } from './transactions/utils';
 import { migrateToLatest } from './lib/storage/adaMigration';
 import { generateAdaPaperPdf } from './paperWallet/paperWalletPdf';
 import type { PdfGenStepType } from './paperWallet/paperWalletPdf';
@@ -171,6 +176,13 @@ import { clear } from './lib/storage/database/index';
 import environment from '../../environment';
 import { Cip1852Wallet } from './lib/storage/models/Cip1852Wallet/wrapper';
 import type { WalletChecksum } from '@emurgo/cip4-js';
+import type {
+  IsValidMnemonicRequest,
+  IsValidMnemonicResponse,
+  RestoreWalletRequest, RestoreWalletResponse,
+} from '../common/types';
+import { getApiForCoinType } from '../common/utils';
+import { CoreAddressTypes } from './lib/storage/database/primitives/enums';
 
 declare var CONFIG: ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;
@@ -233,14 +245,6 @@ export type GetChainAddressesForDisplayResponse = Array<{|
 export type GetChainAddressesForDisplayFunc = (
   request: GetChainAddressesForDisplayRequest
 ) => Promise<GetChainAddressesForDisplayResponse>;
-
-// getBalance
-
-export type GetBalanceRequest = {| getBalance: () => Promise<BigNumber>, |};
-export type GetBalanceResponse = BigNumber;
-export type GetBalanceFunc = (
-  request: GetBalanceRequest
-) => Promise<GetBalanceResponse>;
 
 // ada refreshTransactions
 
@@ -412,17 +416,6 @@ export type SaveSelectedExplorerFunc = (
   request: SaveSelectedExplorerRequest
 ) => Promise<SaveSelectedExplorerResponse>;
 
-// isValidMnemonic
-
-export type IsValidMnemonicRequest = {|
-  mnemonic: string,
-  numberOfWords: number,
-|};
-export type IsValidMnemonicResponse = boolean;
-export type IsValidMnemonicFunc = (
-  request: IsValidMnemonicRequest
-) => IsValidMnemonicResponse;
-
 // isValidPaperMnemonic
 
 export type IsValidPaperMnemonicRequest = {|
@@ -453,21 +446,6 @@ export type GenerateWalletRecoveryPhraseResponse = Array<string>;
 export type GenerateWalletRecoveryPhraseFunc = (
   request: GenerateWalletRecoveryPhraseRequest
 ) => Promise<GenerateWalletRecoveryPhraseResponse>;
-
-// restoreWallet
-
-export type RestoreWalletRequest = {|
-  db: lf$Database,
-  recoveryPhrase: string,
-  walletName: string,
-  walletPassword: string,
-|};
-export type RestoreWalletResponse = {|
-  publicDerivers: Array<PublicDeriver<>>,
-|};
-export type RestoreWalletFunc = (
-  request: RestoreWalletRequest
-) => Promise<RestoreWalletResponse>;
 
 // restoreWalletForTransfer
 
@@ -539,15 +517,6 @@ export const DEFAULT_ADDRESSES_PER_PAPER = 1;
 
 export default class AdaApi {
 
-  static getCurrencyMeta(_request: void): {|
-    primaryTicker: string,
-    unitName: string,
-  |} {
-    return {
-      primaryTicker: 'ADA',
-      unitName: 'Ada',
-    };
-  }
 
   // noinspection JSMethodCanBeStatic
   createAdaPaper(
@@ -599,39 +568,27 @@ export default class AdaApi {
   async getAllAddressesForDisplay(
     request: GetAllAddressesForDisplayRequest
   ): Promise<GetAllAddressesForDisplayResponse> {
-    Logger.debug('AdaApi::getAllAddressesForDisplay called: ' + stringifyData(request));
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.getAllAddressesForDisplay)} called: ` + stringifyData(request));
     try {
       return await getAllAddressesForDisplay(request);
     } catch (error) {
-      Logger.error('AdaApi::getAllAddressesForDisplay error: ' + stringifyError(error));
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.getAllAddressesForDisplay)} error: ` + stringifyError(error));
       throw new GenericApiError();
     }
   }
 
   /**
-   * for the external chain, we truncate based on cuttoff
+   * for the external chain, we truncate based on cutoff
    * for the internal chain, we truncate based on the last used
    */
   async getChainAddressesForDisplay(
     request: GetChainAddressesForDisplayRequest
   ): Promise<GetChainAddressesForDisplayResponse> {
-    Logger.debug('AdaApi::getChainAddressesForDisplay called: ' + stringifyData(request));
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.getChainAddressesForDisplay)} called: ` + stringifyData(request));
     try {
       return await getChainAddressesForDisplay(request);
     } catch (error) {
-      Logger.error('AdaApi::getChainAddressesForDisplay error: ' + stringifyError(error));
-      throw new GenericApiError();
-    }
-  }
-
-  async getBalance(
-    request: GetBalanceRequest
-  ): Promise<GetBalanceResponse> {
-    try {
-      const balance = await request.getBalance();
-      return balance;
-    } catch (error) {
-      Logger.error('AdaApi::getBalance error: ' + stringifyError(error));
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.getChainAddressesForDisplay)} error: ` + stringifyError(error));
       throw new GenericApiError();
     }
   }
@@ -642,7 +599,7 @@ export default class AdaApi {
       ...AdaGetTransactionsRequest,
     |},
   ): Promise<GetTransactionsResponse> {
-    Logger.debug('AdaApi::refreshTransactions called: ' + stringifyData(request));
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.refreshTransactions)} called: ${stringifyData(request)}`);
     const { skip = 0, limit } = request;
     try {
       if (!request.isLocalRequest) {
@@ -659,12 +616,13 @@ export default class AdaApi {
         skip,
         limit,
       },);
-      Logger.debug('AdaApi::refreshTransactions success: ' + stringifyData(fetchedTxs));
+      Logger.debug(`${nameof(AdaApi)}::${nameof(this.refreshTransactions)} success: ` + stringifyData(fetchedTxs));
 
       const mappedTransactions = fetchedTxs.txs.map(tx => {
         return WalletTransaction.fromAnnotatedTx({
           tx,
           addressLookupMap: fetchedTxs.addressLookupMap,
+          api: getApiForCoinType(request.publicDeriver.getParent().getCoinType()),
         });
       });
       return {
@@ -672,7 +630,7 @@ export default class AdaApi {
         total: mappedTransactions.length
       };
     } catch (error) {
-      Logger.error('AdaApi::refreshTransactions error: ' + stringifyError(error));
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.refreshTransactions)} error: ` + stringifyError(error));
       throw new GenericApiError();
     }
   }
@@ -1131,10 +1089,10 @@ export default class AdaApi {
     }
   }
 
-  isValidMnemonic(
+  static isValidMnemonic(
     request: IsValidMnemonicRequest,
   ): IsValidMnemonicResponse {
-    return isValidEnglishAdaMnemonic(request.mnemonic, request.numberOfWords);
+    return isValidBip39Mnemonic(request.mnemonic, request.numberOfWords);
   }
 
   isValidPaperMnemonic(
@@ -1233,20 +1191,20 @@ export default class AdaApi {
         }
       }
 
-      Logger.debug('AdaApi::restoreWallet success');
+      Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} success`);
       return {
         publicDerivers: newPubDerivers,
       };
     } catch (error) {
-      Logger.error('AdaApi::restoreWallet error: ' + stringifyError(error));
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} error: ` + stringifyError(error));
       // TODO: handle case where wallet already exists (this if case is never hit)
       if (error.message.includes('Wallet with that mnemonics already exists')) {
         throw new WalletAlreadyRestoredError();
       }
 
       // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1055
-      if (error instanceof CheckAdressesInUseApiError) {
-        // CheckAdressesInUseApiError throw it as it is.
+      if (error instanceof CheckAddressesInUseApiError) {
+        // CheckAddressesInUseApiError throw it as it is.
         throw error;
       } else {
         // We don't know what the problem was so throw a generic error
@@ -1295,12 +1253,22 @@ export default class AdaApi {
 
       let insertTree;
       if (request.transferSource === TransferSource.BYRON) {
+        const key = RustModule.WalletV2.Bip44AccountPublic.new(
+          v3PublicToV2(accountKey.to_public()),
+          RustModule.WalletV2.DerivationScheme.v2(),
+        );
         insertTree = await scanBip44Account({
-          accountPublicKey: Buffer.from(accountKey.to_public().as_bytes()).toString('hex'),
+          generateInternalAddresses: v2genAddressBatchFunc(
+            key.bip44_chain(false),
+          ),
+          generateExternalAddresses: v2genAddressBatchFunc(
+            key.bip44_chain(true),
+          ),
           lastUsedInternal: -1,
           lastUsedExternal: -1,
           checkAddressesInUse,
           addByHash,
+          type: CoreAddressTypes.CARDANO_LEGACY,
         });
       } else if (sourceIsShelleyWallet) {
         const stakingKey = accountKey

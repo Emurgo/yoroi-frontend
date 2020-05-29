@@ -8,7 +8,6 @@ import {
   Logger,
   stringifyError,
 } from '../../../../utils/logging';
-import { LOVELACES_PER_ADA } from '../../../../config/numbersConfig';
 import { Bech32Prefix } from '../../../../config/stringConfig';
 import {
   GenerateTransferTxError
@@ -28,6 +27,7 @@ import type {
   V3UnsignedTxUtxoResponse,
   AddressKeyMap,
 } from '../types';
+import { getAdaCurrencyMeta } from '../../currencyInfo';
 
 import type { ConfigType } from '../../../../../config/config-types';
 
@@ -66,10 +66,11 @@ export async function buildDaedalusTransferTx(payload: {|
 
     const fragment = RustModule.WalletV3.Fragment.from_transaction(signedTx);
 
+    const lovelacesPerAda = new BigNumber(10).pow(getAdaCurrencyMeta().decimalPlaces);
     // return summary of transaction
     return {
-      recoveredBalance: totalBalance.dividedBy(LOVELACES_PER_ADA),
-      fee: fee.dividedBy(LOVELACES_PER_ADA),
+      recoveredBalance: totalBalance.dividedBy(lovelacesPerAda),
+      fee: fee.dividedBy(lovelacesPerAda),
       id: Buffer.from(fragment.id().as_bytes()).toString('hex'),
       encodedTx: fragment.as_bytes(),
       // recall: Daedalus addresses all have to be legacy so we don't turn them to bech32

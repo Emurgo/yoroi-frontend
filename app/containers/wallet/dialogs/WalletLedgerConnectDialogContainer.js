@@ -13,7 +13,8 @@ import ConnectDialog from '../../../components/wallet/hwConnect/ledger/ConnectDi
 import SaveDialog from '../../../components/wallet/hwConnect/ledger/SaveDialog';
 
 import { ProgressStep, ProgressInfo } from '../../../types/HWConnectStoreTypes';
-import type { SelectedApiType } from '../../../stores/toplevel/ProfileStore';
+import type { SelectedApiType } from '../../../api/common/utils';
+import { ApiOptions } from '../../../api/common/utils';
 import LocalizableError from '../../../i18n/LocalizableError';
 
 export type GeneratedData = typeof WalletLedgerConnectDialogContainer.prototype.generated;
@@ -37,12 +38,18 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
 
   cancel: (() => void) = () => {
     const selectedAPI = this.getSelectedApi();
+    if (selectedAPI.type !== ApiOptions.ada) {
+      throw new Error(`${nameof(WalletLedgerConnectDialogContainer)}::${nameof(this.getSelectedApi)} not ADA API`);
+    }
     this.props.onClose();
     this.generated.actions[selectedAPI.type].ledgerConnect.cancel.trigger();
   };
 
   render(): null | Node {
     const selectedAPI = this.getSelectedApi();
+    if (selectedAPI.type !== ApiOptions.ada) {
+      throw new Error(`${nameof(WalletLedgerConnectDialogContainer)}::${nameof(this.getSelectedApi)} not ADA API`);
+    }
     const { profile } = this.generated.stores;
     const ledgerConnectStore = this.generated.stores.substores[selectedAPI.type].ledgerConnect;
     const hwConnectActions = this.generated.actions[selectedAPI.type].ledgerConnect;

@@ -6,7 +6,7 @@ import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
-  asGetStakingKey, asHasUtxoChains,
+  asGetStakingKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import {
   filterAddressesByStakingKey,
@@ -21,6 +21,10 @@ import type { StandardAddress, } from '../../types/AddressFilterTypes';
 import { AddressStoreTypes } from '../../types/AddressFilterTypes';
 import { addressTypes } from '../../i18n/global-messages';
 import { ROUTES } from '../../routes-config';
+import type { CoreAddressT } from '../../api/ada/lib/storage/database/primitives/enums';
+import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
+import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
+import environment from '../../environment';
 
 declare var CONFIG : ConfigType;
 
@@ -66,19 +70,25 @@ export default class AdaAddressesStore extends Store {
 
   getStoresForWallet: (
     PublicDeriver<>,
-  ) => Array<AddressTypeStore<StandardAddress>> = (publicDeriver) => {
-    const withHasUtxoChains = asHasUtxoChains(publicDeriver);
-
+  ) => Array<AddressTypeStore<StandardAddress>> = (_publicDeriver) => {
     const stores = [];
-    if (withHasUtxoChains == null) {
-      stores.push(this.stores.addresses.allAddressesForDisplay);
-    } else {
-      stores.push(this.stores.addresses.externalForDisplay);
-      stores.push(this.stores.addresses.internalForDisplay);
-    }
     stores.push(this.mangledAddressesForDisplay);
 
     return stores;
+  }
+
+  getAddressTypesForWallet: (
+    PublicDeriver<>,
+  ) => Array<CoreAddressT> = (publicDeriver) => {
+    const types = [];
+
+    if (publicDeriver.getParent() instanceof Bip44Wallet) {
+      types.push(CoreAddressTypes.CARDANO_LEGACY);
+    }
+    if (environment.isShelley()) {
+      types.push(CoreAddressTypes.SHELLEY_GROUP);
+    }
+    return types;
   }
 
   storewiseFilter: {|

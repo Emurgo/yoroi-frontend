@@ -14,8 +14,8 @@ import { pbkdf2Sync as pbkdf2 } from 'pbkdf2';
 
 import { RustModule } from './rustLoader';
 import {
-  isValidEnglishAdaMnemonic
-} from './cryptoWallet';
+  isValidBip39Mnemonic
+} from '../../../common/lib/crypto/wallet';
 import config from '../../../../config';
 
 /**
@@ -43,7 +43,7 @@ export const isValidEnglishAdaPaperMnemonic = (
   const [unscrambled, unscrambledLen] =
     unscramblePaperAdaMnemonic(phrase, numberOfWords, fakePassword);
   if (unscrambled != null && unscrambledLen) {
-    return isValidEnglishAdaMnemonic(unscrambled, unscrambledLen);
+    return isValidBip39Mnemonic(unscrambled, unscrambledLen);
   }
   return false;
 };

@@ -26,6 +26,10 @@ type Props = {|
     +walletAmount: null | BigNumber,
     +infoText?: string,
     +showDetails?: boolean,
+    +meta: {|
+      +primaryTicker: string,
+      +decimalPlaces: number,
+    |},
 |};
 
 @observer
@@ -128,7 +132,10 @@ export default class NavWalletDetails extends Component<Props> {
     if (request.shouldHideBalance) {
       balanceDisplay = (<span>******</span>);
     } else {
-      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(request.amount);
+      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
+        request.amount,
+        this.props.meta.decimalPlaces,
+      );
 
       balanceDisplay = (
         <>
@@ -138,8 +145,6 @@ export default class NavWalletDetails extends Component<Props> {
       );
     }
 
-    const currency = ' ADA'; // TODO: get from variable
-
-    return (<>{balanceDisplay} {currency}</>);
+    return (<>{balanceDisplay} {this.props.meta.primaryTicker}</>);
   }
 }

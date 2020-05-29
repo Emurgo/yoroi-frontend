@@ -12,12 +12,12 @@ import LegacyExplanation from '../../../components/wallet/restore/LegacyExplanat
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import globalMessages from '../../../i18n/global-messages';
 import {
-  CheckAdressesInUseApiError,
+  CheckAddressesInUseApiError,
   NoInputsError,
 } from '../../../api/ada/errors';
-import type { RestoreModeType, WalletRestoreMeta } from '../../../actions/ada/wallet-restore-actions';
-import { RestoreMode } from '../../../actions/ada/wallet-restore-actions';
-import { RestoreSteps } from '../../../stores/ada/WalletRestoreStore';
+import type { RestoreModeType, WalletRestoreMeta } from '../../../actions/common/wallet-restore-actions';
+import { RestoreMode } from '../../../actions/common/wallet-restore-actions';
+import { RestoreSteps } from '../../../stores/toplevel/WalletRestoreStore';
 import { defineMessages, intlShape } from 'react-intl';
 import YoroiTransferWaitingPage from '../../transfer/YoroiTransferWaitingPage';
 import SuccessPage from '../../../components/transfer/SuccessPage';
@@ -25,11 +25,12 @@ import { TransferStatus, } from '../../../types/TransferTypes';
 import { formattedWalletAmount } from '../../../utils/formatters';
 import ErrorPage from '../../../components/transfer/ErrorPage';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { SelectedApiType } from '../../../stores/toplevel/ProfileStore';
+import type { SelectedApiType } from '../../../api/common/utils';
+import { ApiOptions, getApiMeta } from '../../../api/common/utils';
 import type { ExplorerType } from '../../../domain/Explorer';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import type { PlateResponse } from '../../../api/ada/lib/cardanoCrypto/plate';
-import type { RestoreStepsType } from '../../../stores/ada/WalletRestoreStore';
+import type { RestoreStepsType } from '../../../stores/toplevel/WalletRestoreStore';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { TransferStatusT, TransferTx } from '../../../types/TransferTypes';
 import type { Notification } from '../../../types/notificationType';
@@ -73,18 +74,15 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
   }
 
   componentDidMount() {
-    const selectedAPI = this.getSelectedApi();
     const { walletRestore } = this.props.generated
-      ? this.props.generated.actions[selectedAPI.type]
-      : this.props.actions[selectedAPI.type];
+      ? this.props.generated.actions
+      : this.props.actions;
     walletRestore.reset.trigger();
     walletRestore.setMode.trigger(this.props.mode);
   }
 
   componentWillUnmount() {
-    const selectedAPI = this.getSelectedApi();
-    const { walletRestore } = this.generated.actions[selectedAPI.type];
-    walletRestore.reset.trigger();
+    this.generated.actions.walletRestore.reset.trigger();
   }
 
   onCancel: void => void = () => {
@@ -95,11 +93,10 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
   };
 
   render(): null | Node {
-    const selectedAPI = this.getSelectedApi();
-    const walletRestoreActions = this.generated.actions[selectedAPI.type].walletRestore;
+    const walletRestoreActions = this.generated.actions.walletRestore;
     const actions = this.generated.actions;
     const { uiNotifications, profile, } = this.generated.stores;
-    const { walletRestore, } = this.generated.stores.substores[selectedAPI.type];
+    const { walletRestore, } = this.generated.stores;
     const { wallets } = this.generated.stores;
     const { restoreRequest } = wallets;
 
@@ -116,25 +113,21 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         return (<WalletRestoreDialog
           mnemonicValidator={mnemonic => {
             if (isPaper) {
-              return this.generated.stores.substores[
-                selectedAPI.type
-              ].wallets.isValidPaperMnemonic({
+              return this.generated.stores.walletRestore.isValidMnemonic({
                 mnemonic,
-                numberOfWords: wordsCount
+                numberOfWords: wordsCount,
+                mode: RestoreMode.PAPER,
               });
             }
-            return this.generated.stores.substores[
-              selectedAPI.type
-            ].wallets.isValidMnemonic({
+            return this.generated.stores.walletRestore.isValidMnemonic({
               mnemonic,
-              numberOfWords: wordsCount
+              numberOfWords: wordsCount,
+              mode: RestoreMode.REGULAR,
             });
           }}
           validWords={validWords}
           numberOfMnemonics={wordsCount}
-          onSubmit={meta => actions[
-            selectedAPI.type
-          ].walletRestore.submitFields.trigger(meta)}
+          onSubmit={meta => actions.walletRestore.submitFields.trigger(meta)}
           onCancel={this.onCancel}
           onBack={this.props.onBack}
           error={restoreRequest.error}
@@ -149,22 +142,22 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1055
         let error;
         /**
-         * CheckAdressesInUseApiError happens when yoroi could not fetch Used Address.
+         * CheckAddressesInUseApiError happens when yoroi could not fetch Used Address.
          * Mostly because internet not connected or yoroi backend is down.
          * At this point wallet is already created in the storage.
          * When internet connection is back, everything will be loaded correctly.
          */
-        if (restoreRequest.error instanceof CheckAdressesInUseApiError === false) {
+        if (restoreRequest.error instanceof CheckAddressesInUseApiError === false) {
           error = restoreRequest.error;
         }
         const isSubmitting = restoreRequest.isExecuting ||
-          (restoreRequest.error instanceof CheckAdressesInUseApiError);
+          (restoreRequest.error instanceof CheckAddressesInUseApiError);
         return (
           <WalletRestoreVerifyDialog
             byronPlate={walletRestore.recoveryResult ?.byronPlate}
             shelleyPlate={walletRestore.recoveryResult ?.shelleyPlate}
             selectedExplorer={profile.selectedExplorer}
-            onNext={actions[selectedAPI.type].walletRestore.verifyMnemonic.trigger}
+            onNext={actions.walletRestore.verifyMnemonic.trigger}
             onCancel={walletRestoreActions.back.trigger}
             onCopyAddressTooltip={(address, elementId) => {
               if (!uiNotifications.isOpen(elementId)) {
@@ -207,19 +200,23 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
 
   _transferDialogContent(): null | Node {
     const selectedAPI = this.getSelectedApi();
-    const { yoroiTransfer } = this.generated.stores.substores[
-      selectedAPI.type
-    ];
-    const walletRestoreActions = this.generated.actions[
-      selectedAPI.type
-    ].walletRestore;
+    if (selectedAPI.type !== ApiOptions.ada) {
+      throw new Error(`${nameof(this._transferDialogContent)} not set to ADA API`);
+    }
+    const apiMeta = getApiMeta(selectedAPI.type);
+    if (apiMeta == null) throw new Error(`${nameof(this._transferDialogContent)} no API selected`);
+    const { yoroiTransfer } = this.generated.stores.substores[selectedAPI.type];
+    const adaWalletRestoreActions = this.generated.actions[selectedAPI.type].walletRestore;
+    const walletRestoreActions = this.generated.actions.walletRestore;
     const { profile, } = this.generated.stores;
     const { intl } = this.context;
 
     const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
       ? (
-        this.generated.stores.coinPriceStore
-          .getCurrentPrice('ADA', this.generated.stores.profile.unitOfAccount.currency)
+        this.generated.stores.coinPriceStore.getCurrentPrice(
+          apiMeta.meta.primaryTicker,
+          this.generated.stores.profile.unitOfAccount.currency
+        )
       )
       : null;
 
@@ -239,10 +236,13 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         }
         return (<TransferSummaryPage
           form={null}
-          formattedWalletAmount={formattedWalletAmount}
+          formattedWalletAmount={amount => formattedWalletAmount(
+            amount,
+            apiMeta.meta.decimalPlaces.toNumber()
+          )}
           selectedExplorer={this.generated.stores.profile.selectedExplorer}
           transferTx={yoroiTransfer.transferTx}
-          onSubmit={walletRestoreActions.transferFromLegacy.trigger}
+          onSubmit={adaWalletRestoreActions.transferFromLegacy.trigger}
           isSubmitting={yoroiTransfer.transferFundsRequest.isExecuting}
           onCancel={this.onCancel}
           error={yoroiTransfer.error}
@@ -287,28 +287,30 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
 
   @computed get generated(): {|
     actions: {|
+      walletRestore: {|
+        back: {| trigger: (params: void) => void |},
+        reset: {| trigger: (params: void) => void |},
+        setMode: {|
+          trigger: (params: RestoreModeType) => void
+        |},
+        startCheck: {|
+          trigger: (params: void) => Promise<void>
+        |},
+        startRestore: {|
+          trigger: (params: void) => Promise<void>
+        |},
+        submitFields: {|
+          trigger: (params: WalletRestoreMeta) => void
+        |},
+        verifyMnemonic: {|
+          trigger: (params: void) => Promise<void>
+        |}
+      |},
       ada: {|
         walletRestore: {|
-          back: {| trigger: (params: void) => void |},
-          reset: {| trigger: (params: void) => void |},
-          setMode: {|
-            trigger: (params: RestoreModeType) => void
-          |},
-          startCheck: {|
-            trigger: (params: void) => Promise<void>
-          |},
-          startRestore: {|
-            trigger: (params: void) => Promise<void>
-          |},
-          submitFields: {|
-            trigger: (params: WalletRestoreMeta) => void
-          |},
           transferFromLegacy: {|
             trigger: (params: void) => Promise<void>
           |},
-          verifyMnemonic: {|
-            trigger: (params: void) => Promise<void>
-          |}
         |}
       |},
       notifications: {|
@@ -325,27 +327,22 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         selectedExplorer: ExplorerType,
         unitOfAccount: UnitOfAccountSettingType
       |},
+      walletRestore: {|
+        recoveryResult: void | {|
+          byronPlate: void | PlateResponse,
+          phrase: string,
+          shelleyPlate: void | PlateResponse
+        |},
+        step: RestoreStepsType,
+        walletRestoreMeta: void | WalletRestoreMeta,
+        isValidMnemonic: ({|
+          mnemonic: string,
+          numberOfWords: number,
+          mode: $PropertyType<typeof RestoreMode, 'REGULAR'> | $PropertyType<typeof RestoreMode, 'PAPER'>,
+        |}) => boolean,
+      |},
       substores: {|
         ada: {|
-          walletRestore: {|
-            recoveryResult: void | {|
-              byronPlate: void | PlateResponse,
-              phrase: string,
-              shelleyPlate: void | PlateResponse
-            |},
-            step: RestoreStepsType,
-            walletRestoreMeta: void | WalletRestoreMeta
-          |},
-          wallets: {|
-            isValidMnemonic: ({|
-              mnemonic: string,
-              numberOfWords: number
-            |}) => boolean,
-            isValidPaperMnemonic: ({|
-              mnemonic: string,
-              numberOfWords: number
-            |}) => boolean
-          |},
           yoroiTransfer: {|
             error: ?LocalizableError,
             status: TransferStatusT,
@@ -363,7 +360,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           error: ?LocalizableError,
           isExecuting: boolean,
           reset: () => void
-        |}
+        |},
       |}
     |}
     |} {
@@ -396,6 +393,12 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         coinPriceStore: {
           getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
         },
+        walletRestore: {
+          step: stores.walletRestore.step,
+          recoveryResult: stores.walletRestore.recoveryResult,
+          walletRestoreMeta: stores.walletRestore.walletRestoreMeta,
+          isValidMnemonic: stores.walletRestore.isValidMnemonic,
+        },
         substores: {
           ada: {
             yoroiTransfer: {
@@ -406,15 +409,6 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
                 isExecuting: stores.substores.ada.yoroiTransfer.transferFundsRequest.isExecuting,
               },
             },
-            walletRestore: {
-              step: stores.substores.ada.walletRestore.step,
-              recoveryResult: stores.substores.ada.walletRestore.recoveryResult,
-              walletRestoreMeta: stores.substores.ada.walletRestore.walletRestoreMeta,
-            },
-            wallets: {
-              isValidPaperMnemonic: stores.substores.ada.wallets.isValidPaperMnemonic,
-              isValidMnemonic: stores.substores.ada.wallets.isValidMnemonic,
-            },
           },
         },
       },
@@ -424,31 +418,33 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
             trigger: actions.notifications.open.trigger,
           },
         },
+        walletRestore: {
+          reset: {
+            trigger: actions.walletRestore.reset.trigger,
+          },
+          setMode: {
+            trigger: actions.walletRestore.setMode.trigger,
+          },
+          back: {
+            trigger: actions.walletRestore.back.trigger,
+          },
+          verifyMnemonic: {
+            trigger: actions.walletRestore.verifyMnemonic.trigger,
+          },
+          startRestore: {
+            trigger: actions.walletRestore.startRestore.trigger,
+          },
+          startCheck: {
+            trigger: actions.walletRestore.startCheck.trigger,
+          },
+          submitFields: {
+            trigger: actions.walletRestore.submitFields.trigger,
+          },
+        },
         ada: {
           walletRestore: {
-            reset: {
-              trigger: actions.ada.walletRestore.reset.trigger,
-            },
-            setMode: {
-              trigger: actions.ada.walletRestore.setMode.trigger,
-            },
-            back: {
-              trigger: actions.ada.walletRestore.back.trigger,
-            },
-            verifyMnemonic: {
-              trigger: actions.ada.walletRestore.verifyMnemonic.trigger,
-            },
-            startRestore: {
-              trigger: actions.ada.walletRestore.startRestore.trigger,
-            },
-            startCheck: {
-              trigger: actions.ada.walletRestore.startCheck.trigger,
-            },
             transferFromLegacy: {
               trigger: actions.ada.walletRestore.transferFromLegacy.trigger,
-            },
-            submitFields: {
-              trigger: actions.ada.walletRestore.submitFields.trigger,
             },
           },
         },

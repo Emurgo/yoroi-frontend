@@ -133,6 +133,9 @@
           &.cardano {
             background-image: url(../../../assets/images/my-wallets/symbol_ada.inline.svg);
           }
+          &.ergo {
+            background-image: url(../../../assets/images/my-wallets/symbol_ergo.inline.svg);
+          }
           &.legacyDaedalus {
             background-image: url(../../../assets/images/add-wallet/option-dialog/daedalus-modern.inline.svg);
           }
@@ -180,6 +183,9 @@
         .optionImage {
           &.cardano {
             background-image: url(../../../assets/images/my-wallets/symbol_ada.inline.svg);
+          }
+          &.ergo {
+            background-image: url(../../../assets/images/my-wallets/symbol_ergo.inline.svg);
           }
           &.legacyDaedalus {
             background-image: url(../../../assets/images/add-wallet/option-dialog/daedalus-modern.inline.svg);

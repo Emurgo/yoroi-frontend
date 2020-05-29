@@ -22,7 +22,6 @@ import type {
 } from '../lib/storage/database/transactionModels/account/tables';
 import type { TransactionExportRow } from '../../export';
 import {
-  LOVELACES_PER_ADA,
   HARD_DERIVATION_START,
 } from '../../../config/numbersConfig';
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
@@ -43,6 +42,7 @@ import {
   getShelleyTxReceivers,
   shelleyTxEqual,
 } from './shelley/utils';
+import { getAdaCurrencyMeta } from '../currencyInfo';
 
 export function getFromUserPerspective(data: {|
   utxoInputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionInputRow>>,
@@ -119,13 +119,14 @@ export function convertAdaTransactionsToExportRows(
   transactions: $ReadOnlyArray<$ReadOnly<AnnotatedTransaction>>
 ): Array<TransactionExportRow> {
   const result = [];
+  const lovelacesPerAda = new BigNumber(10).pow(getAdaCurrencyMeta().decimalPlaces);
   for (const tx of transactions) {
     if (tx.block != null) {
       result.push({
         date: tx.block.BlockTime,
         type: tx.type === transactionTypes.INCOME ? 'in' : 'out',
-        amount: formatBigNumberToFloatString(tx.amount.abs().dividedBy(LOVELACES_PER_ADA)),
-        fee: formatBigNumberToFloatString(tx.fee.abs().dividedBy(LOVELACES_PER_ADA)),
+        amount: formatBigNumberToFloatString(tx.amount.abs().dividedBy(lovelacesPerAda)),
+        fee: formatBigNumberToFloatString(tx.fee.abs().dividedBy(lovelacesPerAda)),
       });
     }
   }

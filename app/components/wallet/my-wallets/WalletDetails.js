@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import BigNumber from 'bignumber.js';
-// import classnames from 'classnames';
 import { intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { splitAmount } from '../../../utils/formatters';
@@ -23,6 +22,7 @@ type Props = {|
     +rewards: null | void | BigNumber,
     +walletAmount: null | BigNumber,
     +infoText?: string,
+    +decimalPlaces: number,
 |};
 
 @observer
@@ -60,7 +60,11 @@ export default class WalletDetails extends Component<Props> {
             </span>
           </div> */}
           <div className={styles.amount}>
-            {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
+            {this.renderAmountDisplay({
+              shouldHideBalance,
+              amount: walletAmount,
+              decimalPlaces: this.props.decimalPlaces,
+            })}
             <span className={styles.amountLabel}>
               {intl.formatMessage(globalMessages.walletLabel)}
             </span>
@@ -85,7 +89,8 @@ export default class WalletDetails extends Component<Props> {
 
   renderAmountDisplay: {|
     shouldHideBalance: boolean,
-    amount: ?BigNumber
+    amount: ?BigNumber,
+    decimalPlaces: number,
   |} => Node = (request) => {
     if (request.amount == null) {
       return <div className={styles.isLoading} />;
@@ -95,7 +100,10 @@ export default class WalletDetails extends Component<Props> {
     if (request.shouldHideBalance) {
       balanceDisplay = (<span>******</span>);
     } else {
-      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(request.amount);
+      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
+        request.amount,
+        request.decimalPlaces,
+      );
 
       balanceDisplay = (
         <>

@@ -21,7 +21,6 @@ import type { PoolRequest } from '../../../api/ada/lib/storage/bridge/delegation
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { ExplorerType } from '../../../domain/Explorer';
 import {
-  LOVELACES_PER_ADA,
   EPOCH_REWARD_DENOMINATOR,
 } from '../../../config/numbersConfig';
 import type { ConfigType } from '../../../../config/config-types';
@@ -30,6 +29,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type {
   CreateDelegationTxFunc,
 } from '../../../api/ada/index';
+import { getApiForCoinType, getApiMeta } from '../../../api/common/utils';
 
 declare var CONFIG: ConfigType;
 
@@ -134,6 +134,19 @@ export default class SeizaFetcher extends Component<Props> {
       },
     ];
 
+    const showSignDialog = delegationTxStore.signAndBroadcastDelegationTx.isExecuting ||
+      !delegationTxStore.signAndBroadcastDelegationTx.wasExecuted ||
+      delegationTxStore.signAndBroadcastDelegationTx.error != null;
+
+    const selectedWallet = this.generated.stores.wallets.selected;
+    if (selectedWallet == null) {
+      return null;
+    }
+
+    const apiMeta = getApiMeta(getApiForCoinType(selectedWallet.getParent().getCoinType()))?.meta;
+    if (apiMeta == null) throw new Error(`${nameof(SeizaFetcher)} no API selected`);
+    const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
+
     const approximateReward: BigNumber => BigNumber = (amount) => {
       // TODO: based on https://staking.cardano.org/en/calculator/
       // needs to be update per-network
@@ -143,18 +156,9 @@ export default class SeizaFetcher extends Component<Props> {
         .div(100);
 
       const result = rewardMultiplier(amount)
-        .div(LOVELACES_PER_ADA);
+        .div(amountPerUnit);
       return result;
     };
-
-    const showSignDialog = delegationTxStore.signAndBroadcastDelegationTx.isExecuting ||
-      !delegationTxStore.signAndBroadcastDelegationTx.wasExecuted ||
-      delegationTxStore.signAndBroadcastDelegationTx.error != null;
-
-    const selectedWallet = this.generated.stores.wallets.selected;
-    if (selectedWallet == null) {
-      return null;
-    }
 
     if (
       delegationTxStore.createDelegationTx.isExecuting ||
@@ -210,6 +214,10 @@ export default class SeizaFetcher extends Component<Props> {
           classicTheme={profile.isClassicTheme}
           error={delegationTxStore.signAndBroadcastDelegationTx.error}
           selectedExplorer={stores.profile.selectedExplorer}
+          meta={{
+            decimalPlaces: apiMeta.decimalPlaces.toNumber(),
+            totalSupply: apiMeta.totalSupply,
+          }}
         />
       );
     }

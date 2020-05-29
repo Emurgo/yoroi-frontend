@@ -41,7 +41,10 @@ type Props = {|
   +onCancel: void => void,
   +uriParams: UriParams,
   +selectedExplorer: ExplorerType,
-  +primaryTicker: string,
+  +meta: {|
+    primaryTicker: string,
+    decimalPlaces: number,
+  |},
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +coinPrice: ?number,
 |};
@@ -112,12 +115,16 @@ export default class URIVerifyDialog extends Component<Props> {
                 {unitOfAccountSetting.currency}
               </div>
               <div className={styles.amountSmall}>
-                {formattedWalletAmount(amount)} {this.props.primaryTicker}
+                {formattedWalletAmount(
+                  amount, this.props.meta.decimalPlaces
+                )} {this.props.meta.primaryTicker}
               </div>
             </>
           ) : (
             <div className={styles.amount}>
-              {formattedWalletAmount(amount)} {this.props.primaryTicker}
+              {formattedWalletAmount(
+                amount, this.props.meta.decimalPlaces
+              )} {this.props.meta.primaryTicker}
             </div>
           )}
         </div>

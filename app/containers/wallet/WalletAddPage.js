@@ -53,11 +53,11 @@ import type { GeneratedData as SidebarContainerData } from '../SidebarContainer'
 import NavBar from '../../components/topbar/NavBar';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 
-import type { RestoreModeType } from '../../actions/ada/wallet-restore-actions';
-import { RestoreMode } from '../../actions/ada/wallet-restore-actions';
+import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
+import { RestoreMode } from '../../actions/common/wallet-restore-actions';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { ApiOptionType } from '../../api/types';
-import type { SelectedApiType } from '../../stores/toplevel/ProfileStore';
+import type { ApiOptionType, SelectedApiType } from '../../api/common/utils';
+import { ApiOptions } from '../../api/common/utils';
 
 export type GeneratedData = typeof WalletAddPage.prototype.generated;
 
@@ -100,6 +100,9 @@ export default class WalletAddPage extends Component<Props> {
         throw new Error(`${nameof(WalletAddPage)} no API selected`);
       }
       actions.dialogs.open.trigger({ dialog: WalletTrezorConnectDialogContainer });
+      if (selectedAPI.type !== ApiOptions.ada) {
+        throw new Error(`${nameof(WalletAddPage)} not ADA API type`);
+      }
       this.generated.actions[selectedAPI.type].trezorConnect.init.trigger();
     };
     const openLedgerConnectDialog = () => {
@@ -107,6 +110,9 @@ export default class WalletAddPage extends Component<Props> {
         throw new Error(`${nameof(WalletAddPage)} no API selected`);
       }
       actions.dialogs.open.trigger({ dialog: WalletLedgerConnectDialogContainer });
+      if (selectedAPI.type !== ApiOptions.ada) {
+        throw new Error(`${nameof(WalletAddPage)} not ADA API type`);
+      }
       this.generated.actions[selectedAPI.type].ledgerConnect.init.trigger();
     };
 
@@ -115,15 +121,19 @@ export default class WalletAddPage extends Component<Props> {
       activeDialog = (<PickCurrencyDialogContainer
         onClose={this.onClose}
         onCardano={() => this.generated.actions.profile.setSelectedAPI.trigger('ada')}
+        onErgo={uiDialogs.isOpen(WalletConnectHWOptionDialog)
+          ? undefined
+          : () => this.generated.actions.profile.setSelectedAPI.trigger('ergo')}
       />);
     } else if (uiDialogs.isOpen(WalletCreateOptionDialog)) {
       activeDialog = (
         <WalletCreateOptionDialogContainer
           onClose={this.onClose}
           onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
-          onPaper={() => actions.dialogs.open.trigger(
-            { dialog: WalletPaperDialog }
-          )}
+          onPaper={selectedAPI?.type !== ApiOptions.ada
+            ? undefined
+            : () => actions.dialogs.open.trigger({ dialog: WalletPaperDialog })
+          }
         />
       );
     } else if (uiDialogs.isOpen(WalletCreateDialog)) {

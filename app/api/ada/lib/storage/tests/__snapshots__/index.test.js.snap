@@ -684,18 +684,21 @@ Object {
       "IsEncrypted": true,
       "KeyId": 1,
       "PasswordLastUpdate": null,
+      "Type": 0,
     },
     Object {
       "Hash": "30037ce72ab2163c2e2d8f864b974c7176f64c53b66a81db18640f267eed13b36fb042cc7a78843824c8d1afddd3ccb3a37be249881bbacf85c3192f2dca7060",
       "IsEncrypted": false,
       "KeyId": 2,
       "PasswordLastUpdate": null,
+      "Type": 0,
     },
     Object {
       "Hash": "bc31c83c1b03a6b976ced49e524512ee11e46dcdcace361c2527df22fc78c6ec5991e29a6db8779a29421acbcad6e42af414ffcacd8b68f1c01589f739f93a08",
       "IsEncrypted": false,
       "KeyId": 3,
       "PasswordLastUpdate": null,
+      "Type": 0,
     },
   ],
   "KeyDerivation": Array [

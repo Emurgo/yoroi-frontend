@@ -150,6 +150,7 @@
   },
   "dependencies": {
     "@cardano-foundation/ledgerjs-hw-app-cardano": "1.0.8",
+    "@coinbarn/ergo-ts": "0.3.0",
     "@download/blockies": "1.0.3",
     "@emurgo/cip4-js": "1.0.5",
     "@emurgo/js-chain-libs": "0.7.1",
@@ -161,6 +162,7 @@
     "bip32": "2.0.5",
     "bip39": "3.0.2",
     "bs58": "4.0.1",
+    "bs58check": "2.1.2",
     "cardano-wallet-browser": "1.2.2",
     "classnames": "2.2.6",
     "crypto-random-string": "3.2.0",

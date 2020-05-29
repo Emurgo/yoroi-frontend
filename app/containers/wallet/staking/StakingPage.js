@@ -1,6 +1,7 @@
 // @flow
 import type { Node } from 'react';
 import React, { Component } from 'react';
+import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import { defineMessages, intlShape } from 'react-intl';
@@ -10,7 +11,6 @@ import InformativeError from '../../../components/widgets/InformativeError';
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
 import { formattedAmountWithoutLovelace } from '../../../utils/formatters';
 import environment from '../../../environment';
-import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
 
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
@@ -18,6 +18,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { DelegationRequests } from '../../../stores/ada/DelegationStore';
 import type { TxRequests } from '../../../stores/toplevel/TransactionsStore';
+import { getApiForCoinType, getApiMeta } from '../../../api/common/utils';
 
 export type GeneratedData = typeof StakingPage.prototype.generated;
 
@@ -87,9 +88,15 @@ export default class StakingPage extends Component<Props> {
       .getTxRequests(publicDeriver);
     const balance = txRequests.requests.getBalanceRequest.result;
     if (balance != null) {
+      const apiMeta = getApiMeta(
+        getApiForCoinType(publicDeriver.getParent().getCoinType())
+      )?.meta;
+      if (apiMeta == null) throw new Error(`${nameof(StakingPage)} no API selected`);
+      const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
+
       // Seiza does not understand decimal places, so removing all Lovelaces
       finalURL += `&userAda=${formattedAmountWithoutLovelace(balance.dividedBy(
-        LOVELACES_PER_ADA
+        amountPerUnit
       ))}`;
     }
 

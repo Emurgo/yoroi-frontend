@@ -20,15 +20,9 @@ import type {
 import { unitOfAccountDisabledValue } from '../../types/unitOfAccountType';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { SUPPORTED_CURRENCIES } from '../../config/unitOfAccount';
-import AdaApi from '../../api/ada/index';
-import type { ApiOptionType } from '../../api/types';
-import { ApiOptions } from '../../api/types';
+import type { ApiOptionType, SelectedApiType } from '../../api/common/utils';
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
-
-export type SelectedApiType = {|
-  type: 'ada',
-  meta: ReturnType<typeof AdaApi.getCurrencyMeta>,
-|};
+import { getApiMeta } from '../../api/common/utils';
 
 export default class ProfileStore extends Store {
 
@@ -689,22 +683,4 @@ export function getTermsOfUse(
     return tos + '\n\n' + testnetAddition;
   }
   return tos;
-}
-
-export function getApiMeta(
-  api: void | ApiOptionType
-): void | SelectedApiType {
-  switch (api) {
-    case undefined: {
-      return undefined;
-    }
-    case ApiOptions.ada: {
-      return {
-        type: 'ada',
-        meta: AdaApi.getCurrencyMeta(),
-      };
-    }
-    default:
-      throw new Error(`${nameof(getApiMeta)} no result for ${api}`);
-  }
 }

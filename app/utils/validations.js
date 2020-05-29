@@ -1,7 +1,6 @@
 // @flow
 import BigNumber from 'bignumber.js';
 import isInt from 'validator/lib/isInt';
-import { TOTAL_SUPPLY } from '../config/numbersConfig';
 import { MAX_MEMO_SIZE } from '../config/externalStorageConfig';
 
 export const isValidWalletName: string => boolean = (walletName) => {
@@ -47,11 +46,11 @@ export const isValidMemoOptional: string => boolean = (memo) => (
   memo.length <= MAX_MEMO_SIZE
 );
 
-export const isValidAmountInLovelaces: string => boolean = (value) => {
+export const isWithinSupply: (string, BigNumber) => boolean = (value, totalSupply) => {
   const isNumeric = isInt(value, { allow_leading_zeroes: false });
   if (!isNumeric) return false;
   const numericValue = new BigNumber(value);
   const minValue = new BigNumber(1);
-  const isValid = numericValue.gte(minValue) && numericValue.lte(TOTAL_SUPPLY);
+  const isValid = numericValue.gte(minValue) && numericValue.lte(totalSupply);
   return isValid;
 };

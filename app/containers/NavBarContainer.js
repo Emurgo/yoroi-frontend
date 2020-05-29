@@ -15,7 +15,6 @@ import NavDropdown from '../components/topbar/NavDropdown';
 import NavDropdownRow from '../components/topbar/NavDropdownRow';
 import { ROUTES } from '../routes-config';
 import { switchRouteWallet } from '../utils/routing';
-import { LOVELACES_PER_ADA } from '../config/numbersConfig';
 import { ConceptualWallet, isLedgerNanoWallet, isTrezorTWallet } from '../api/ada/lib/storage/models/ConceptualWallet/index';
 import {
   asGetPublicKey,
@@ -27,6 +26,8 @@ import type { ConceptualWalletSettingsCache } from '../stores/toplevel/WalletSet
 import type { PublicKeyCache } from '../stores/toplevel/WalletStore';
 import type { TxRequests } from '../stores/toplevel/TransactionsStore';
 import type { IGetPublic } from '../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import { getApiForCoinType, getApiMeta } from '../api/common/utils';
+import type { SelectedApiType } from '../api/common/utils';
 
 const messages = defineMessages({
   allWalletsLabel: {
@@ -76,10 +77,17 @@ export default class NavBarContainer extends Component<Props> {
     });
   }
 
+  getMeta: PublicDeriver<> => $PropertyType<SelectedApiType, 'meta'> = (publicDeriver) => {
+    const apiMeta = getApiMeta(getApiForCoinType(publicDeriver.getParent().getCoinType()))?.meta;
+    if (apiMeta == null) throw new Error(`${nameof(NavBarContainer)} no API selected`);
+    return apiMeta;
+  }
+
   render(): Node {
     const { intl } = this.context;
     const { stores } = this.generated;
     const { profile } = stores;
+
 
     const walletsStore = stores.wallets;
 
@@ -88,9 +96,7 @@ export default class NavBarContainer extends Component<Props> {
     let utxoTotal = new BigNumber(0);
     const walletBalances = wallets.map(wallet => stores.transactions
       .getTxRequests(wallet).requests.getBalanceRequest.result
-      ?.dividedBy(
-        LOVELACES_PER_ADA
-      ));
+        ?.dividedBy(new BigNumber(10).pow(this.getMeta(wallet).decimalPlaces)));
     for (const walletUtxoAmount of walletBalances) {
       if (walletUtxoAmount == null) {
         utxoTotal = null;
@@ -113,7 +119,7 @@ export default class NavBarContainer extends Component<Props> {
     const walletComponents = wallets.map(wallet => {
       const txRequests = this.generated.stores.transactions.getTxRequests(wallet);
       const balance = txRequests.requests.getBalanceRequest.result
-        ?.dividedBy(LOVELACES_PER_ADA) || null;
+        ?.dividedBy(new BigNumber(10).pow(this.getMeta(wallet).decimalPlaces)) || null;
 
       const parent = wallet.getParent();
       const settingsCache = this.generated.stores.walletSettings
@@ -123,6 +129,8 @@ export default class NavBarContainer extends Component<Props> {
       const plate = withPubKey == null
         ? null
         : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
+
+      const apiMeta = this.getMeta(wallet);
 
       return (
         <NavDropdownRow
@@ -144,6 +152,10 @@ export default class NavBarContainer extends Component<Props> {
               onUpdateHideBalance={this.updateHideBalance}
               shouldHideBalance={profile.shouldHideBalance}
               rewards={this.getRewardBalance(wallet)}
+              meta={{
+                primaryTicker: apiMeta.primaryTicker,
+                decimalPlaces: apiMeta.decimalPlaces.toNumber(),
+              }}
             />
           }
         />
@@ -160,6 +172,11 @@ export default class NavBarContainer extends Component<Props> {
               shouldHideBalance={profile.shouldHideBalance}
               rewards={rewardTotal}
               walletAmount={utxoTotal}
+              meta={{
+                // TODO: this no longer makes sense in multi-wallet. Needs to be re-thought
+                primaryTicker: 'ADA',
+                decimalPlaces: 6,
+              }}
             />
           }
         />
@@ -176,9 +193,11 @@ export default class NavBarContainer extends Component<Props> {
           );
         }
 
+        const apiMeta = this.getMeta(publicDeriver);
+
         const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
         const balance = txRequests.requests.getBalanceRequest.result
-          ?.dividedBy(LOVELACES_PER_ADA) || null;
+          ?.dividedBy(new BigNumber(10).pow(apiMeta.decimalPlaces)) || null;
 
         return (
           <NavWalletDetails
@@ -186,6 +205,10 @@ export default class NavBarContainer extends Component<Props> {
             shouldHideBalance={profile.shouldHideBalance}
             rewards={this.getRewardBalance(publicDeriver)}
             walletAmount={balance}
+            meta={{
+              primaryTicker: apiMeta.primaryTicker,
+              decimalPlaces: apiMeta.decimalPlaces.toNumber(),
+            }}
           />
         );
       });
@@ -250,7 +273,8 @@ export default class NavBarContainer extends Component<Props> {
     if (balanceResult == null) {
       return null;
     }
-    return balanceResult.accountPart.dividedBy(LOVELACES_PER_ADA);
+    const apiMeta = this.getMeta(publicDeriver);
+    return balanceResult.accountPart.dividedBy(new BigNumber(10).pow(apiMeta.decimalPlaces));
   }
 
   @computed get generated(): {|
@@ -284,7 +308,9 @@ export default class NavBarContainer extends Component<Props> {
           PublicDeriver<>
         ) => void | DelegationRequests
       |},
-      profile: {| shouldHideBalance: boolean |},
+      profile: {|
+        shouldHideBalance: boolean,
+      |},
       transactions: {|
         getTxRequests: (PublicDeriver<>) => TxRequests
       |},

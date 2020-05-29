@@ -12,8 +12,7 @@ import URIInvalidDialog from '../../components/uri/URIInvalidDialog';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import type { ExplorerType } from '../../domain/Explorer';
 import type { UriParams } from '../../utils/URIHandling';
-
-import AdaApi from '../../api/ada/index';
+import { getApiMeta, ApiOptions, } from '../../api/common/utils';
 
 export type GeneratedData = typeof URILandingDialogContainer.prototype.generated;
 
@@ -57,17 +56,25 @@ export default class URILandingDialogContainer extends Component<Props> {
     // assert not null
     const uriParams = this.generated.stores.loading.uriParams;
 
+    const apiMeta = getApiMeta(ApiOptions.ada);
+    if (apiMeta == null) throw new Error(`${nameof(URILandingDialogContainer)} no API found`);
+
     const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
       ? (
-        this.generated.stores.coinPriceStore
-          .getCurrentPrice('ADA', this.generated.stores.profile.unitOfAccount.currency)
+        this.generated.stores.coinPriceStore.getCurrentPrice(
+          apiMeta.meta.primaryTicker,
+          this.generated.stores.profile.unitOfAccount.currency
+        )
       )
       : null;
 
     if (!this.showDisclaimer) {
       return (
         <URIVerifyDialog
-          primaryTicker={AdaApi.getCurrencyMeta().primaryTicker}
+          meta={{
+            primaryTicker: apiMeta.meta.primaryTicker,
+            decimalPlaces: apiMeta.meta.decimalPlaces.toNumber(),
+          }}
           onSubmit={this.onVerifiedSubmit}
           onBack={this.toggleShowDisclaimer}
           onCancel={this.onCancel}

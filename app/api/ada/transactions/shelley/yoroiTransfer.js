@@ -6,7 +6,6 @@ import {
   Logger,
   stringifyError,
 } from '../../../../utils/logging';
-import { LOVELACES_PER_ADA } from '../../../../config/numbersConfig';
 import { Bech32Prefix } from '../../../../config/stringConfig';
 import { addressToDisplayString } from '../../lib/storage/bridge/utils';
 import {
@@ -22,6 +21,7 @@ import type {
   TransferTx
 } from '../../../../types/TransferTypes';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
+import { getAdaCurrencyMeta } from '../../currencyInfo';
 
 /**
  * Generate transaction including all addresses with no change.
@@ -60,10 +60,11 @@ export async function buildYoroiTransferTx(payload: {|
 
     const uniqueSenders = Array.from(new Set(senderUtxos.map(utxo => utxo.receiver)));
 
+    const lovelacesPerAda = new BigNumber(10).pow(getAdaCurrencyMeta().decimalPlaces);
     // return summary of transaction
     return {
-      recoveredBalance: totalBalance.dividedBy(LOVELACES_PER_ADA),
-      fee: fee.dividedBy(LOVELACES_PER_ADA),
+      recoveredBalance: totalBalance.dividedBy(lovelacesPerAda),
+      fee: fee.dividedBy(lovelacesPerAda),
       id: Buffer.from(fragment.id().as_bytes()).toString('hex'),
       encodedTx: fragment.as_bytes(),
       // recall: some addresses may be legacy, some may be Shelley

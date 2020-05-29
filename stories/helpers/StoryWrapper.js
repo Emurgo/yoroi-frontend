@@ -67,7 +67,7 @@ import WalletSettingsStore from '../../app/stores/toplevel/WalletSettingsStore';
 import TransactionsStore from '../../app/stores/toplevel/TransactionsStore';
 import DelegationStore from '../../app/stores/ada/DelegationStore';
 import WalletStore from '../../app/stores/toplevel/WalletStore';
-import TimeStore from '../../app/stores/ada/TimeStore';
+import AdaTimeStore from '../../app/stores/ada/AdaTimeStore';
 import CachedRequest from '../../app/stores/lib/LocalizedCachedRequest';
 import LocalizableError from '../../app/i18n/LocalizableError';
 import globalMessages from '../../app/i18n/global-messages';
@@ -460,9 +460,9 @@ export type CacheValue = {|
   getPublicDeriverSettingsCache:
     typeof WalletSettingsStore.prototype.getPublicDeriverSettingsCache,
   getTimeCalcRequests:
-    typeof TimeStore.prototype.getTimeCalcRequests,
+    typeof AdaTimeStore.prototype.getTimeCalcRequests,
   getCurrentTimeRequests:
-    typeof TimeStore.prototype.getCurrentTimeRequests,
+    typeof AdaTimeStore.prototype.getCurrentTimeRequests,
 |};
 
 export function walletLookup(wallets: Array<CacheValue>): {|
@@ -480,9 +480,9 @@ export function walletLookup(wallets: Array<CacheValue>): {|
   getPublicDeriverSettingsCache:
     typeof WalletSettingsStore.prototype.getPublicDeriverSettingsCache,
   getTimeCalcRequests:
-    typeof TimeStore.prototype.getTimeCalcRequests,
+    typeof AdaTimeStore.prototype.getTimeCalcRequests,
   getCurrentTimeRequests:
-    typeof TimeStore.prototype.getCurrentTimeRequests,
+    typeof AdaTimeStore.prototype.getCurrentTimeRequests,
 |} {
   if (wallets.length === 0) {
     return ({

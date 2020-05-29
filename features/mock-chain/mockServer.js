@@ -8,13 +8,15 @@ import type {
   RewardHistoryRequest, RewardHistoryResponse,
   BestBlockRequest, BestBlockResponse,
   SignedResponse,
-  FilterUsedRequest, FilterUsedResponse,
   AccountStateRequest, AccountStateResponse,
   PoolInfoRequest, PoolInfoResponse,
   ReputationRequest, ReputationResponse,
   TxBodiesRequest, TxBodiesResponse,
   SignedRequestInternal,
 } from '../../app/api/ada/lib/state-fetch/types';
+import type {
+  FilterUsedRequest, FilterUsedResponse,
+} from '../../app/api/common/lib/state-fetch/currencySpecificTypes';
 import type {
   ServerStatusResponse,
 } from '../../app/api/common/lib/state-fetch/types';

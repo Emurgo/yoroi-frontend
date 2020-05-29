@@ -33,8 +33,8 @@ import { withScreenshot } from 'storycap';
 import { getDefaultExplorer } from '../../domain/Explorer';
 import { StepState } from '../../components/widgets/ProgressSteps';
 import { ProgressStep } from '../../types/HWConnectStoreTypes';
-import { RestoreSteps, generatePlates } from '../../stores/ada/WalletRestoreStore';
-import { RestoreMode } from '../../actions/ada/wallet-restore-actions';
+import { RestoreSteps, generatePlates } from '../../stores/toplevel/WalletRestoreStore';
+import { RestoreMode } from '../../actions/common/wallet-restore-actions';
 import WalletCreateDialog from '../../components/wallet/WalletCreateDialog';
 import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
 import WalletRestoreDialog from '../../components/wallet/WalletRestoreDialog';
@@ -42,7 +42,8 @@ import WalletRestoreOptionDialog from '../../components/wallet/add/option-dialog
 import WalletConnectHWOptionDialog from '../../components/wallet/add/option-dialog/WalletConnectHWOptionDialog';
 import WalletTrezorConnectDialogContainer from './dialogs/WalletTrezorConnectDialogContainer';
 import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDialogContainer';
-import { getApiMeta, getPaperWalletIntro } from '../../stores/toplevel/ProfileStore';
+import { getPaperWalletIntro } from '../../stores/toplevel/ProfileStore';
+import { getApiMeta } from '../../api/common/utils';
 import WalletCreateOptionDialog from '../../components/wallet/add/option-dialog/WalletCreateOptionDialog';
 import WalletPaperDialog from '../../components/wallet/WalletPaperDialog';
 import UserPasswordDialog from '../../components/wallet/add/paper-wallets/UserPasswordDialog';
@@ -467,6 +468,18 @@ const restoreWalletProps: {|
     coinPriceStore: {
       getCurrentPrice: (_from, _to) => 5,
     },
+    walletRestore: {
+      step: request.step,
+      walletRestoreMeta: request.walletRestoreMeta,
+      recoveryResult: request.recoveryResult,
+      isValidMnemonic: (isValidRequest) => {
+        const { mnemonic, numberOfWords } = isValidRequest;
+        if (isValidRequest.mode === RestoreMode.REGULAR) {
+          return AdaApi.isValidMnemonic({ mnemonic, numberOfWords });
+        }
+        return AdaApi.prototype.isValidPaperMnemonic({ mnemonic, numberOfWords });
+      },
+    },
     substores: {
       ada: {
         yoroiTransfer: {
@@ -486,15 +499,6 @@ const restoreWalletProps: {|
               : false,
           },
         },
-        walletRestore: {
-          step: request.step,
-          walletRestoreMeta: request.walletRestoreMeta,
-          recoveryResult: request.recoveryResult,
-        },
-        wallets: {
-          isValidMnemonic: AdaApi.prototype.isValidMnemonic,
-          isValidPaperMnemonic: AdaApi.prototype.isValidPaperMnemonic,
-        },
       },
     },
   },
@@ -504,31 +508,33 @@ const restoreWalletProps: {|
         trigger: action('open'),
       },
     },
+    walletRestore: {
+      reset: {
+        trigger: action('reset'),
+      },
+      setMode: {
+        trigger: action('setMode'),
+      },
+      back: {
+        trigger: action('back'),
+      },
+      verifyMnemonic: {
+        trigger: async (req) => action('verifyMnemonic')(req),
+      },
+      startRestore: {
+        trigger: async (req) => action('startRestore')(req),
+      },
+      startCheck: {
+        trigger: async (req) => action('startCheck')(req),
+      },
+      submitFields: {
+        trigger: action('submitFields'),
+      },
+    },
     ada: {
       walletRestore: {
-        reset: {
-          trigger: action('reset'),
-        },
-        setMode: {
-          trigger: action('setMode'),
-        },
-        back: {
-          trigger: action('back'),
-        },
-        verifyMnemonic: {
-          trigger: async (req) => action('verifyMnemonic')(req),
-        },
-        startRestore: {
-          trigger: async (req) => action('startRestore')(req),
-        },
-        startCheck: {
-          trigger: async (req) => action('startCheck')(req),
-        },
         transferFromLegacy: {
           trigger: async (req) => action('transferFromLegacy')(req),
-        },
-        submitFields: {
-          trigger: action('submitFields'),
         },
       },
     },

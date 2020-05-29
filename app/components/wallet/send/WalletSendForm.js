@@ -142,12 +142,15 @@ export default class WalletSendForm extends Component<Props> {
 
   amountFieldReactionDisposer: null | (() => mixed) = null;
 
-  componentDidMount() {
+  componentDidMount(): void {
     this.props.reset();
     if (this.props.uriParams) {
       // assert not null
       const uriParams = this.props.uriParams;
-      const adjustedAmount = formattedAmountToNaturalUnits(uriParams.amount.toString());
+      const adjustedAmount = formattedAmountToNaturalUnits(
+        uriParams.amount.toString(),
+        this.props.currencyMaxFractionalDigits,
+      );
       // note: assume these are validated externally
       this.props.updateAmount(Number(adjustedAmount));
       this.props.updateReceiver(getAddressPayload(uriParams.address));
@@ -171,7 +174,8 @@ export default class WalletSendForm extends Component<Props> {
         }
         // once sendAll is triggered, set the amount field to the total input
         this.form.$('amount').set('value', formattedWalletAmount(
-          totalInput.minus(fee)
+          totalInput.minus(fee),
+          this.props.currencyMaxFractionalDigits,
         ));
       },
     );
@@ -226,7 +230,10 @@ export default class WalletSendForm extends Component<Props> {
         placeholder: this.props.classicTheme ?
           `0.${'0'.repeat(this.props.currencyMaxFractionalDigits)}` : '',
         value: this.props.uriParams
-          ? formattedWalletAmount(this.props.uriParams.amount)
+          ? formattedWalletAmount(
+            this.props.uriParams.amount,
+            this.props.currencyMaxFractionalDigits,
+          )
           : '',
         validators: [async ({ field }) => {
           if (this.props.shouldSendAll) {
@@ -238,7 +245,10 @@ export default class WalletSendForm extends Component<Props> {
             this.props.updateAmount();
             return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
-          const formattedAmount = formattedAmountToNaturalUnits(amountValue);
+          const formattedAmount = formattedAmountToNaturalUnits(
+            amountValue,
+            this.props.currencyMaxFractionalDigits,
+          );
           const isValidAmount = await this.props.validateAmount(formattedAmount);
           if (isValidAmount) {
             this.props.updateAmount(Number(formattedAmount));
@@ -364,7 +374,8 @@ export default class WalletSendForm extends Component<Props> {
                 this.props.toggleSendAll();
                 if (this.props.shouldSendAll) {
                   this.props.updateAmount(Number(formattedAmountToNaturalUnits(
-                    this.form.$('amount').value
+                    this.form.$('amount').value,
+                    this.props.currencyMaxFractionalDigits,
                   )));
                 }
               }}

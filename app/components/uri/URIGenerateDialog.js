@@ -90,7 +90,10 @@ export default class URIGenerateDialog extends Component<Props> {
           if (amountValue === '') {
             return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
-          const formattedAmount = formattedAmountToNaturalUnits(amountValue);
+          const formattedAmount = formattedAmountToNaturalUnits(
+            amountValue,
+            this.props.currencyMaxFractionalDigits
+          );
           const isValidAmount = await this.props.validateAmount(formattedAmount);
           return [
             isValidAmount,
@@ -111,7 +114,7 @@ export default class URIGenerateDialog extends Component<Props> {
     },
   });
 
-  componentDidMount() {
+  componentDidMount(): void {
     const amountField = this.form.$('amount');
     amountField.set(
       'value',

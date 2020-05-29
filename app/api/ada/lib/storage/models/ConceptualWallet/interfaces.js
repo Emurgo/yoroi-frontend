@@ -52,6 +52,7 @@ export interface IConceptualWallet {
   getDb(): lf$Database;
   getConceptualWalletId(): number;
   getProtocolMagic(): string;
+  getCoinType(): CoinTypesT;
   rawRemove(db: lf$Database, tx: lf$Transaction): Promise<void>
 }
 

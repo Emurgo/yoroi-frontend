@@ -329,7 +329,7 @@ export class SendTransactionApiError extends LocalizableError {
   }
 }
 
-export class CheckAdressesInUseApiError extends LocalizableError {
+export class CheckAddressesInUseApiError extends LocalizableError {
   constructor() {
     super({
       id: messages.checkAdressesInUseApiError.id,

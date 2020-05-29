@@ -7,12 +7,14 @@ import type {
   HistoryRequest, HistoryResponse,
   RewardHistoryRequest, RewardHistoryResponse,
   SignedRequest, SignedResponse,
-  FilterUsedRequest, FilterUsedResponse,
   BestBlockRequest, BestBlockResponse,
   AccountStateRequest, AccountStateResponse,
   PoolInfoRequest, PoolInfoResponse,
   ReputationRequest, ReputationResponse,
 } from './types';
+import type {
+  FilterUsedRequest, FilterUsedResponse,
+} from '../../../common/lib/state-fetch/currencySpecificTypes';
 
 export interface IFetcher {
   getUTXOsForAddresses(body: AddressUtxoRequest): Promise<AddressUtxoResponse>;

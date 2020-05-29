@@ -37,7 +37,7 @@ type Props = {|
     +amount: ?BigNumber,
   |},
   +currentRoute: string,
-  +formattedWalletAmount?: BigNumber => string,
+  +formattedWalletAmount?: (BigNumber, PublicDeriver<>) => string,
   +themeProperties?: {|
     identiconSaturationFactor: number,
   |},
@@ -99,7 +99,7 @@ export default class WalletTopbarTitle extends Component<Props> {
     }
     return this.props.formattedWalletAmount == null
       ? undefined
-      : this.props.formattedWalletAmount(walletAmount);
+      : this.props.formattedWalletAmount(walletAmount, publicDeriver);
   }
 
   render(): Node {

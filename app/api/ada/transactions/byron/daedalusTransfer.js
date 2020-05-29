@@ -8,7 +8,6 @@ import {
   Logger,
   stringifyError,
 } from '../../../../utils/logging';
-import { LOVELACES_PER_ADA } from '../../../../config/numbersConfig';
 import {
   GenerateTransferTxError,
 } from '../../errors';
@@ -24,6 +23,7 @@ import type {
 } from '../../../../types/TransferTypes';
 import type { AddressKeyMap } from '../types';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
+import { getAdaCurrencyMeta } from '../../currencyInfo';
 
 import type { ConfigType } from '../../../../../config/config-types';
 
@@ -62,10 +62,11 @@ export async function buildDaedalusTransferTx(payload: {|
       senderUtxos,
     );
 
+    const lovelacesPerAda = new BigNumber(10).pow(getAdaCurrencyMeta().decimalPlaces);
     // return summary of transaction
     return {
-      recoveredBalance: totalBalance.dividedBy(LOVELACES_PER_ADA),
-      fee: fee.dividedBy(LOVELACES_PER_ADA),
+      recoveredBalance: totalBalance.dividedBy(lovelacesPerAda),
+      fee: fee.dividedBy(lovelacesPerAda),
       id: signedTx.id(),
       encodedTx: Buffer.from(signedTx.to_hex(), 'hex'),
       senders: Object.keys(addressKeys),

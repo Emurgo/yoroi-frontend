@@ -55,6 +55,7 @@ type Props = {|
   |},
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
+  +decimalPlaces: number, // TODO: this should be tied to individual values, not the currency itself
 |};
 
 @observer
@@ -196,6 +197,7 @@ export default class WalletTransactionsList extends Component<Props> {
                   addressLookup={this.props.addressLookup}
                   notification={notification}
                   onCopyAddressTooltip={onCopyAddressTooltip}
+                  decimalPlaces={this.props.decimalPlaces}
                 />
               ))}
             </div>

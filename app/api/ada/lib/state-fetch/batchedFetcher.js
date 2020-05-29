@@ -8,13 +8,11 @@ import type {
   HistoryRequest, HistoryResponse,
   RewardHistoryRequest, RewardHistoryResponse,
   SignedRequest, SignedResponse,
-  FilterUsedRequest, FilterUsedResponse,
   BestBlockRequest, BestBlockResponse,
   AccountStateRequest, AccountStateResponse,
   PoolInfoRequest, PoolInfoResponse,
   ReputationRequest, ReputationResponse,
   AddressUtxoFunc,
-  FilterFunc,
   HistoryFunc,
   RewardHistoryFunc,
   TxBodiesFunc,
@@ -24,12 +22,15 @@ import type {
   ReputationFunc,
   RemoteTransaction,
 } from './types';
+import type {
+  FilterFunc, FilterUsedRequest, FilterUsedResponse,
+} from '../../../common/lib/state-fetch/currencySpecificTypes';
 
 import type { IFetcher } from './IFetcher';
 
 import { chunk } from 'lodash';
 import {
-  CheckAdressesInUseApiError,
+  CheckAddressesInUseApiError,
   GetAllUTXOsForAddressesError,
   GetTxsBodiesForUTXOsError,
   GetUtxosSumsForAddressesApiError,
@@ -325,7 +326,7 @@ export function batchCheckAddressesInUse(
       return groupedAddresses.reduce((accum, chunkAddrs) => accum.concat(chunkAddrs), []);
     } catch (error) {
       Logger.error('batchedFetcher::batchCheckAddressesInUse error: ' + stringifyError(error));
-      throw new CheckAdressesInUseApiError();
+      throw new CheckAddressesInUseApiError();
     }
   };
 }

@@ -28,7 +28,6 @@ import type {
   IGetLastSyncInfoResponse,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import config from '../../config';
-import type { SelectedApiType } from '../../stores/toplevel/ProfileStore';
 import type {
   TxMemoTableUpsert, TxMemoTablePreInsert, TxMemoPreLookupKey,
 } from '../../api/ada/lib/storage/bridge/memos';
@@ -44,6 +43,7 @@ import type {
   GetTransactionsRequestOptions
 } from '../../api/common/index';
 import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
+import { getApiForCoinType, getApiMeta } from '../../api/common/utils';
 
 export type GeneratedData = typeof WalletSummaryPage.prototype.generated;
 
@@ -60,14 +60,6 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
     intl: intlShape.isRequired
   };
   @observable notificationElementId: string = '';
-
-  getSelectedApi: void => SelectedApiType = () => {
-    const { selectedAPI } = this.generated.stores.profile;
-    if (selectedAPI === undefined) {
-      throw new Error(`${nameof(WalletSummaryPage)} no API selected`);
-    }
-    return selectedAPI;
-  }
 
   render(): null | Node {
     const { intl } = this.context;
@@ -93,7 +85,10 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
       return null;
     }
 
-    const selectedAPI = this.getSelectedApi();
+    const apiMeta = getApiMeta(
+      getApiForCoinType(publicDeriver.getParent().getCoinType())
+    )?.meta;
+    if (apiMeta == null) throw new Error(`${nameof(WalletSummaryPage)} no API selected`);
 
     const {
       exportTransactionsToFile,
@@ -162,7 +157,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
               }
             })}
             unitOfAccountSetting={{
-              primaryTicker: selectedAPI.meta.primaryTicker,
+              primaryTicker: apiMeta.primaryTicker,
               settings: profile.unitOfAccount,
             }}
             addressLookup={(address) => {
@@ -182,6 +177,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
             }}
             onCopyAddressTooltip={onCopyAddressTooltip}
             notification={notificationToolTip}
+            decimalPlaces={apiMeta.decimalPlaces.toNumber()}
           />
         );
       } else {
@@ -218,6 +214,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
           }
           openExportTxToFileDialog={this.openExportTransactionDialog}
           unitOfAccountSetting={profile.unitOfAccount}
+          decimalPlaces={apiMeta.decimalPlaces.toNumber()}
         />
 
         {walletTransactions}
@@ -437,7 +434,6 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
       |},
       profile: {|
         isClassicTheme: boolean,
-        selectedAPI: void | SelectedApiType,
         selectedExplorer: ExplorerType,
         shouldHideBalance: boolean,
         unitOfAccount: UnitOfAccountSettingType
@@ -483,7 +479,6 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
     return Object.freeze({
       stores: {
         profile: {
-          selectedAPI: stores.profile.selectedAPI,
           selectedExplorer: stores.profile.selectedExplorer,
           shouldHideBalance: stores.profile.shouldHideBalance,
           isClassicTheme: stores.profile.isClassicTheme,

@@ -13,8 +13,8 @@ import {
 } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import type { PlateResponse } from '../../api/ada/lib/cardanoCrypto/plate';
 import { TransferKind } from '../../types/TransferTypes';
-import { generatePlates } from '../../stores/ada/WalletRestoreStore';
-import { RestoreMode } from '../../actions/ada/wallet-restore-actions';
+import { generatePlates } from '../../stores/toplevel/WalletRestoreStore';
+import { RestoreMode } from '../../actions/common/wallet-restore-actions';
 import type { ExplorerType } from '../../domain/Explorer';
 import type { TransferKindType, } from '../../types/TransferTypes';
 import type { Notification } from '../../types/notificationType';

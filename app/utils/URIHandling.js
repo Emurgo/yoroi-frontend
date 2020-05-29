@@ -1,8 +1,6 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
-import { DECIMAL_PLACES_IN_ADA } from '../config/numbersConfig';
-import { isValidAmountInLovelaces } from './validations';
 
 export type UriParams = {|
   address: string,
@@ -11,14 +9,21 @@ export type UriParams = {|
 /**
  * retrieves URI parameters following the web+cardano protocol
  */
-export const getURIParameters = async (
-  uri: string,
-  addressValidator: (string => Promise<boolean>)
-): Promise<?UriParams> => {
+export const getURIParameters: (
+  string,
+  string => Promise<boolean>,
+  string => boolean,
+  number
+) => Promise<?UriParams> = async (
+  uri,
+  addressValidator,
+  amountValidator,
+  decimalPlaces,
+) => {
   if (!uri) uri = decodeURIComponent(window.location.href);
   const address = await extractAddress(uri, addressValidator);
   if (address == null) return null;
-  const amount = extractAmount(uri);
+  const amount = extractAmount(uri, decimalPlaces, amountValidator);
   if (amount == null) return null;
   return {
     address,
@@ -47,8 +52,12 @@ const extractAddress: (
 
 const extractAmount: (
   string,
+  number,
+  string => boolean,
 ) => ?BigNumber = (
   uri,
+  decimalPlaces,
+  amountValidator,
 ) => {
   // consider use of URLSearchParams
   const amountRegex = new RegExp('amount=([0-9]+\\.?[0-9]*)');
@@ -56,8 +65,8 @@ const extractAmount: (
   if (amountMatch && amountMatch[1]) {
     try {
       const asNum = new BigNumber(amountMatch[1]);
-      const asString = asNum.shiftedBy(DECIMAL_PLACES_IN_ADA).toString();
-      if (!isValidAmountInLovelaces(asString)) {
+      const asString = asNum.shiftedBy(decimalPlaces).toString();
+      if (!amountValidator(asString)) {
         return null;
       }
       return asNum;

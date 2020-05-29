@@ -3,7 +3,6 @@
 import BigNumber from 'bignumber.js';
 import { InputTypes } from '../../../state-fetch/types';
 import type {
-  FilterUsedRequest, FilterUsedResponse, FilterFunc,
   HistoryRequest, HistoryResponse, HistoryFunc,
   BestBlockRequest, BestBlockResponse, BestBlockFunc,
   AddressUtxoRequest, AddressUtxoResponse, AddressUtxoFunc,
@@ -17,6 +16,9 @@ import type {
   SignedRequestInternal, RemoteCertificate,
   RemoteTransactionInput, RemoteTransactionOutput,
 } from '../../../state-fetch/types';
+import type {
+  FilterUsedRequest, FilterUsedResponse, FilterFunc,
+} from '../../../../../common/lib/state-fetch/currencySpecificTypes';
 import { RollbackApiError, } from '../../../../errors';
 import { addressToKind, groupToSingle, delegationTypeToResponse, } from '../utils';
 import { CoreAddressTypes } from '../../database/primitives/enums';

@@ -18,7 +18,7 @@ import type {
   CacheValue
 } from '../../../../stories/helpers/StoryWrapper';
 import CachedRequest from '../../../stores/lib/LocalizedCachedRequest';
-import type { GetBalanceFunc } from '../../../api/ada/index';
+import type { GetBalanceFunc } from '../../../api/common/types';
 import StakingDashboardPage from './StakingDashboardPage';
 import { mockWalletProps } from '../Wallet.mock';
 import { getVarsForTheme } from '../../../stores/toplevel/ProfileStore';

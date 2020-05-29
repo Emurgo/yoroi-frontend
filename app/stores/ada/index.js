@@ -19,7 +19,7 @@ import AdaStateFetchStore from './AdaStateFetchStore';
 import WalletRestoreStore from './WalletRestoreStore';
 import DelegationTransactionStore from './DelegationTransactionStore';
 import DelegationStore from './DelegationStore';
-import TimeStore from './TimeStore';
+import AdaTimeStore from './AdaTimeStore';
 import type { ActionsMap } from '../../actions/index';
 import type { Api } from '../../api/index';
 import type { StoresMap } from '../index';
@@ -41,7 +41,7 @@ export const adaStoreClasses = Object.freeze({
   walletRestore: WalletRestoreStore,
   delegationTransaction: DelegationTransactionStore,
   delegation: DelegationStore,
-  time: TimeStore,
+  time: AdaTimeStore,
 });
 
 export type AdaStoresMap = {|
@@ -61,7 +61,7 @@ export type AdaStoresMap = {|
   walletRestore: WalletRestoreStore,
   delegationTransaction: DelegationTransactionStore,
   delegation: DelegationStore,
-  time: TimeStore,
+  time: AdaTimeStore,
 |};
 
 const adaStores: WithNullableFields<AdaStoresMap> = observable({

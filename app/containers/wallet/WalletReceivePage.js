@@ -19,10 +19,6 @@ import VerticallyCenteredLayout from '../../components/layout/VerticallyCentered
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import Dialog from '../../components/widgets/Dialog';
-import {
-  DECIMAL_PLACES_IN_ADA,
-  MAX_INTEGER_PLACES_IN_ADA
-} from '../../config/numbersConfig';
 import globalMessages from '../../i18n/global-messages';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { asHasUtxoChains } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
@@ -33,12 +29,13 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type {
   BIP32Path
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import type { SelectedApiType } from '../../stores/toplevel/ProfileStore';
 import { AddressFilter, AddressStoreTypes } from '../../types/AddressFilterTypes';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { ExplorerType } from '../../domain/Explorer';
 import type { Notification } from '../../types/notificationType';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import { getApiForCoinType, getApiMeta } from '../../api/common/utils';
+import { isWithinSupply } from '../../utils/validations';
 
 export type GeneratedData = typeof WalletReceivePage.prototype.generated;
 
@@ -57,14 +54,6 @@ export default class WalletReceivePage extends Component<Props> {
     this.closeNotification();
     this.resetErrors();
     this.generated.actions.addresses.resetFilter.trigger();
-  }
-
-  getSelectedApi: void => SelectedApiType = () => {
-    const { selectedAPI } = this.generated.stores.profile;
-    if (selectedAPI === undefined) {
-      throw new Error(`${nameof(WalletReceivePage)} no API selected`);
-    }
-    return selectedAPI;
   }
 
   handleGenerateAddress: void => Promise<void> = async () => {
@@ -98,11 +87,13 @@ export default class WalletReceivePage extends Component<Props> {
       hwVerifyAddress,
     } = this.generated.stores.substores.ada;
     const publicDeriver = this.generated.stores.wallets.selected;
-    const { validateAmount } = this.generated.stores.transactions;
-    const selectedAPI = this.getSelectedApi();
+    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(WalletReceivePage)}.`);
+
+    const selectedApiType = getApiForCoinType(publicDeriver.getParent().getCoinType());
+    const apiMeta = getApiMeta(selectedApiType)?.meta;
+    if (apiMeta == null) throw new Error(`${nameof(WalletReceivePage)} no API selected`);
 
     // Guard against potential null values
-    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(WalletReceivePage)}.`);
 
     // assume account-level wallet for now
     const withChains = asHasUtxoChains(publicDeriver);
@@ -226,6 +217,10 @@ export default class WalletReceivePage extends Component<Props> {
           }
           shouldHideBalance={profile.shouldHideBalance}
           unitOfAccountSetting={profile.unitOfAccount}
+          meta={{
+            primaryTicker: apiMeta.primaryTicker,
+            decimalPlaces: apiMeta.decimalPlaces.toNumber(),
+          }}
         />
 
 
@@ -241,15 +236,19 @@ export default class WalletReceivePage extends Component<Props> {
         ) : null}
         {uiDialogs.isOpen(URIGenerateDialog) ? (
           <URIGenerateDialog
-            primaryTicker={selectedAPI.meta.primaryTicker}
+            primaryTicker={apiMeta.primaryTicker}
             walletAddress={uiDialogs.getParam<string>('address')}
             amount={uiDialogs.getParam<number>('amount')}
             onClose={() => actions.dialogs.closeActiveDialog.trigger()}
             onGenerate={(address, amount) => { this.generateURI(address, amount); }}
             classicTheme={profile.isClassicTheme}
-            currencyMaxIntegerDigits={MAX_INTEGER_PLACES_IN_ADA}
-            currencyMaxFractionalDigits={DECIMAL_PLACES_IN_ADA}
-            validateAmount={(amount) => validateAmount({ publicDeriver, amount })}
+            currencyMaxIntegerDigits={
+              apiMeta.totalSupply.div(apiMeta.decimalPlaces).toFixed().length
+            }
+            currencyMaxFractionalDigits={apiMeta.decimalPlaces.toNumber()}
+            validateAmount={(amount) => Promise.resolve(
+              isWithinSupply(amount, apiMeta.totalSupply)
+            )}
           />
         ) : null}
 
@@ -412,7 +411,6 @@ export default class WalletReceivePage extends Component<Props> {
       |},
       profile: {|
         isClassicTheme: boolean,
-        selectedAPI: void | SelectedApiType,
         selectedExplorer: ExplorerType,
         shouldHideBalance: boolean,
         unitOfAccount: UnitOfAccountSettingType,
@@ -434,12 +432,6 @@ export default class WalletReceivePage extends Component<Props> {
             |}
           |}
         |}
-      |},
-      transactions: {|
-        validateAmount: ({|
-          amount: string,
-          publicDeriver: PublicDeriver<>
-        |}) => Promise<boolean>
       |},
       uiDialogs: {|
         getParam: <T>(number | string) => T,
@@ -471,7 +463,6 @@ export default class WalletReceivePage extends Component<Props> {
           getParam: stores.uiDialogs.getParam,
         },
         profile: {
-          selectedAPI: stores.profile.selectedAPI,
           selectedExplorer: stores.profile.selectedExplorer,
           isClassicTheme: stores.profile.isClassicTheme,
           shouldHideBalance: stores.profile.shouldHideBalance,
@@ -479,9 +470,6 @@ export default class WalletReceivePage extends Component<Props> {
         },
         wallets: {
           selected: stores.wallets.selected,
-        },
-        transactions: {
-          validateAmount: stores.transactions.validateAmount,
         },
         addresses: {
           addressFilter: stores.addresses.addressFilter,

@@ -8,11 +8,12 @@ import WalletTransaction, { calculateUnconfirmedAmount } from '../../domain/Wall
 import { getPriceKey } from '../../api/ada/lib/storage/bridge/prices';
 import type {
   GetBalanceFunc,
-} from '../../api/ada/index';
+} from '../../api/common/types';
 import type {
   GetTransactionsFunc,
   BaseGetTransactionsRequest, GetTransactionsRequestOptions,
   RefreshPendingTransactionsFunc,
+  ExportTransactionsRequest,
   ExportTransactionsFunc,
 } from '../../api/common/index';
 import {
@@ -22,12 +23,13 @@ import {
   asGetBalance, asHasLevels,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
+  IPublicDeriver,
   IGetLastSyncInfo,
   IGetLastSyncInfoResponse,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
 import { digestForHash } from '../../api/ada/lib/storage/database/primitives/api/utils';
-import { getApiForCoinType } from '../../api/index';
+import { getApiForCoinType, getApiMeta } from '../../api/common/utils';
 import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
@@ -36,6 +38,9 @@ import {
   stringifyError
 } from '../../utils/logging';
 import type { TransactionRowsToExportRequest } from '../../actions/common/transactions-actions';
+import { isWithinSupply } from '../../utils/validations';
+import globalMessages from '../../i18n/global-messages';
+import type { IHasLevels } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -94,6 +99,16 @@ export default class TransactionsStore extends Store {
     actions.closeExportTransactionDialog.listen(this._closeExportTransactionDialog);
   }
 
+  // TODO: should probably turn the amount to a class with a validate function. Must more scalable
+  validateAmount: string => Promise<boolean> = (
+    amount: string
+  ): Promise<boolean> => {
+    const { selectedAPI } = this.stores.profile;
+    if (selectedAPI == null) throw new Error(`${nameof(this.validateAmount)} no API selected`);
+    return Promise.resolve(isWithinSupply(amount, selectedAPI.meta.totalSupply));
+  };
+
+
   /** Calculate information about transactions that are still realistically reversible */
   @computed get unconfirmedAmount(): UnconfirmedAmount {
     const defaultUnconfirmedAmount = {
@@ -119,12 +134,13 @@ export default class TransactionsStore extends Store {
       .getPublicDeriverSettingsCache(publicDeriver);
 
 
-    const { coinType } = publicDeriver.getParent();
-    const api = this.api[getApiForCoinType(coinType)];
+    const api = getApiForCoinType(publicDeriver.getParent().getCoinType());
+    const apiMeta = getApiMeta(api)?.meta;
+    if (apiMeta == null) throw new Error(`${nameof(this.unconfirmedAmount)} no API selected`);
     const getUnitOfAccount = (timestamp: Date) => (!unitOfAccount.enabled
       ? undefined
       : this.stores.coinPriceStore.priceMap.get(getPriceKey(
-        api.constructor.getCurrencyMeta().unitName,
+        apiMeta.primaryTicker,
         unitOfAccount.currency,
         timestamp
       )));
@@ -358,7 +374,6 @@ export default class TransactionsStore extends Store {
   ) => {
     const { coinType } = request.publicDeriver.getParent();
     const apiType = getApiForCoinType(coinType);
-    const api = this.api[apiType];
 
     const foundRequest = find(
       this.transactionsRequests,
@@ -378,7 +393,7 @@ export default class TransactionsStore extends Store {
         allRequest: new CachedRequest<GetTransactionsFunc>(
           this.stores.substores[apiType].transactions.refreshTransactions
         ),
-        getBalanceRequest: new CachedRequest<GetBalanceFunc>(api.getBalance),
+        getBalanceRequest: new CachedRequest<GetBalanceFunc>(this.api.common.getBalance),
         pendingRequest: new CachedRequest<RefreshPendingTransactionsFunc>(
           this.api.common.refreshPendingTransactions
         ),
@@ -405,15 +420,6 @@ export default class TransactionsStore extends Store {
     return foundRequest;
   };
 
-  validateAmount: {|
-    publicDeriver: PublicDeriver<>,
-    amount: string,
-  |} => Promise<boolean> = (request) => {
-    const { coinType } = request.publicDeriver.getParent();
-    const apiType = getApiForCoinType(coinType);
-    return this.stores.substores[apiType].transactions.validateAmount(request.amount);
-  };
-
   @action _exportTransactionsToFile: {|
     publicDeriver: PublicDeriver<>,
     exportRequest: TransactionRowsToExportRequest,
@@ -421,20 +427,16 @@ export default class TransactionsStore extends Store {
     try {
       this._setExporting(true);
 
-      const { coinType } = request.publicDeriver.getParent();
-      const apiType = getApiForCoinType(coinType);
-
       this.getTransactionRowsToExportRequest.reset();
       this.exportTransactions.reset();
 
       const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
       if (!withLevels) return;
 
-      const continuation = await this.stores.substores[apiType].transactions
-        .exportTransactionsToFile({
-          publicDeriver: withLevels,
-          exportRequest: request.exportRequest,
-        });
+      const continuation = await this.exportTransactionsToFile({
+        publicDeriver: withLevels,
+        exportRequest: request.exportRequest,
+      });
 
       /** Intentionally added delay to feel smooth flow */
       setTimeout(async () => {
@@ -472,6 +474,39 @@ export default class TransactionsStore extends Store {
       this._setExporting(false);
       this._setExportError(null);
     }
+  }
+
+  exportTransactionsToFile: {|
+    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
+    exportRequest: TransactionRowsToExportRequest,
+  |} => Promise<void => Promise<void>> = async (request) => {
+    const txStore = this.stores.transactions;
+    const respTxRows = [];
+
+    const { coinType } = request.publicDeriver.getParent();
+    const apiType = getApiForCoinType(coinType);
+
+    await txStore.getTransactionRowsToExportRequest.execute(async () => {
+      const rows = await this.api[apiType].getTransactionRowsToExport({
+        publicDeriver: request.publicDeriver,
+        ...request.exportRequest,
+      });
+      respTxRows.push(...rows);
+    }).promise;
+
+    if (respTxRows.length < 1) {
+      throw new LocalizableError(globalMessages.noTransactionsFound);
+    }
+
+    const meta = getApiMeta(apiType)?.meta;
+    if (meta == null) throw new Error(`${nameof(this.exportTransactionsToFile)} missing API`);
+    const req: ExportTransactionsRequest = {
+      ticker: meta.primaryTicker,
+      rows: respTxRows
+    };
+    return async () => {
+      await this.stores.transactions.exportTransactions.execute(req).promise;
+    };
   }
 }
 

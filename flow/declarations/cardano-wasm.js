@@ -1143,7 +1143,7 @@ declare module 'cardano-wallet-browser' { // need to wrap flowgen output into mo
 }
 
 // WASM bindings don't expose the underlying type of some Rust structs
-// so we expose the mourselves
+// so we expose the ourselves
 
 declare type TransactionType = {|
   inputs: Array<TxoPointerType>,

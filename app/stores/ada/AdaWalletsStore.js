@@ -36,7 +36,6 @@ export default class AdaWalletsStore extends Store {
     walletBackup.finishWalletBackup.listen(this._createInDb);
     wallets.createWallet.listen(this._startWalletCreation);
     wallets.sendMoney.listen(this._sendMoney);
-    wallets.restoreWallet.listen(this._restoreToDb);
     router.goToRoute.listen(this._onRouteChange);
   }
 
@@ -101,18 +100,6 @@ export default class AdaWalletsStore extends Store {
     }
   };
 
-  // =================== VALIDITY CHECK ==================== //
-
-  isValidMnemonic: {|
-    mnemonic: string,
-    numberOfWords: number,
-  |} => boolean = request => this.api.ada.isValidMnemonic(request);
-
-  isValidPaperMnemonic: {|
-    mnemonic: string,
-    numberOfWords: number,
-  |} => boolean = request => this.api.ada.isValidPaperMnemonic(request);
-
   // =================== WALLET RESTORATION ==================== //
 
   _startWalletCreation: {|
@@ -139,29 +126,11 @@ export default class AdaWalletsStore extends Store {
       throw new Error(`${nameof(this._createInDb)} db not loaded. Should never happen`);
     }
     await this.stores.wallets.createWalletRequest.execute(async () => {
-      const wallet = await this.api.ada.createWallet.bind(this.api.ada)({
+      const wallet = await this.api.ada.createWallet({
         db: persistentDb,
         walletName: this.stores.walletBackup.name,
         walletPassword: this.stores.walletBackup.password,
         recoveryPhrase: this.stores.walletBackup.recoveryPhrase.join(' '),
-      });
-      return wallet;
-    }).promise;
-  };
-
-  _restoreToDb: {|
-    recoveryPhrase: string,
-    walletName: string,
-    walletPassword: string,
-  |} => Promise<void> = async (params) => {
-    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
-    if (persistentDb == null) {
-      throw new Error(`${nameof(this._restoreToDb)} db not loaded. Should never happen`);
-    }
-    await this.stores.wallets.restoreRequest.execute(async () => {
-      const wallet = await this.api.ada.createWallet.bind(this.api.ada)({
-        db: persistentDb,
-        ...params,
       });
       return wallet;
     }).promise;

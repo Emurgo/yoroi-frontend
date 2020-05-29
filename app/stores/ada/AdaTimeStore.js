@@ -25,6 +25,13 @@ import type {
   TimeSinceGenesisRequestFunc,
   ToRealTimeFunc,
 } from '../../api/ada/lib/storage/bridge/timeUtils';
+import {
+  CoinTypes,
+} from '../../config/numbersConfig';
+import {
+  buildCheckAndCall,
+} from '../lib/check';
+import { ApiOptions } from '../../api/common/utils';
 
 export type TimeCalcRequests = {|
   // although time is network-specific
@@ -55,9 +62,7 @@ export type CurrentTimeRequests = {|
 /**
  * Different wallets can be on different networks and therefore have different measures of time
 */
-export default class TimeStore extends Store {
-  intervalId: void | IntervalID;
-
+export default class AdaTimeStore extends Store {
   @observable time: Date = new Date();
 
   /**
@@ -72,7 +77,11 @@ export default class TimeStore extends Store {
 
   setup(): void {
     super.setup();
-    this.intervalId = setInterval(this._updateTime, 1000);
+    const { asyncCheck } = buildCheckAndCall(
+      ApiOptions.ada,
+      () => this.stores.profile.selectedAPI,
+    );
+    this.actions.time.tick.listen(asyncCheck(this._updateTime));
   }
 
   getTimeCalcRequests: PublicDeriver<> => TimeCalcRequests = (
@@ -81,7 +90,7 @@ export default class TimeStore extends Store {
     const foundRequest = find(this.timeCalcRequests, { publicDeriver });
     if (foundRequest) return foundRequest;
 
-    throw new Error(`${nameof(TimeStore)}::${nameof(this.getTimeCalcRequests)} missing for public deriver`);
+    throw new Error(`${nameof(AdaTimeStore)}::${nameof(this.getTimeCalcRequests)} missing for public deriver`);
   }
 
   getCurrentTimeRequests: PublicDeriver<> => CurrentTimeRequests = (
@@ -90,7 +99,7 @@ export default class TimeStore extends Store {
     const foundRequest = find(this.currentTimeRequests, { publicDeriver });
     if (foundRequest) return foundRequest;
 
-    throw new Error(`${nameof(TimeStore)}::${nameof(this.getCurrentTimeRequests)} missing for public deriver`);
+    throw new Error(`${nameof(AdaTimeStore)}::${nameof(this.getCurrentTimeRequests)} missing for public deriver`);
   }
 
   @action addObservedTime: PublicDeriver<> => void = (
@@ -138,6 +147,9 @@ export default class TimeStore extends Store {
 
     const selected = this.stores.wallets.selected;
     if (selected == null) return;
+    if (selected.getParent().getCoinType() !== CoinTypes.CARDANO) {
+      return;
+    }
 
     const timeCalcRequests = this.getTimeCalcRequests(selected);
     const currTimeRequests = this.getCurrentTimeRequests(selected);
@@ -165,13 +177,10 @@ export default class TimeStore extends Store {
     // Get current public deriver
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return undefined;
+    if (publicDeriver.getParent().getCoinType() !== CoinTypes.CARDANO) {
+      return;
+    }
 
     return this.getCurrentTimeRequests(publicDeriver);
-  }
-
-
-  teardown(): void {
-    super.teardown();
-    if (this.intervalId) clearInterval(this.intervalId);
   }
 }

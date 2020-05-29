@@ -19,6 +19,8 @@ import { closeOtherInstances } from '../../utils/tabManager';
 import { loadLovefieldDB, } from '../../api/ada/lib/storage/database/index';
 import { tryAddressToKind } from '../../api/ada/lib/storage/bridge/utils';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
+import { ApiOptions, getApiMeta } from '../../api/common/utils';
+import { isWithinSupply } from '../../utils/validations';
 
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
@@ -115,6 +117,8 @@ export default class LoadingStore extends Store {
 
   @action
   validateUriPath: void => Promise<void> = async (): Promise<void> => {
+    const meta = getApiMeta(ApiOptions.ada);
+    if (meta == null) throw new Error(`${nameof(this.validateUriPath)} no API selected`);
     if (this.fromUriScheme) {
       const uriParams = await getURIParameters(
         decodeURIComponent(this._originRoute.location),
@@ -125,7 +129,9 @@ export default class LoadingStore extends Store {
             ? addressKind != null && addressKind !== CoreAddressTypes.CARDANO_LEGACY
             : addressKind != null && addressKind === CoreAddressTypes.CARDANO_LEGACY;
           return Promise.resolve(valid);
-        }
+        },
+        amount => isWithinSupply(amount, meta.meta.totalSupply),
+        meta.meta.decimalPlaces.toNumber(),
       );
       runInAction(() => {
         this._uriParams = uriParams;
@@ -134,7 +140,7 @@ export default class LoadingStore extends Store {
   }
 
   /**
-   * Need to clear any data inijected by the URI after we've applied it
+   * Need to clear any data injected by the URI after we've applied it
    */
   @action
   resetUriParams: void => void = (): void => {

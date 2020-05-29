@@ -7,7 +7,6 @@ import { defineMessages, intlShape } from 'react-intl';
 import AdaSymbolSmallest from '../../../assets/images/ada-symbol-smallest-dark.inline.svg';
 import ExportTxToFileSvg from '../../../assets/images/transaction/export-tx-to-file.inline.svg';
 import BorderedBox from '../../widgets/BorderedBox';
-import { DECIMAL_PLACES_IN_ADA } from '../../../config/numbersConfig';
 import type { UnconfirmedAmount } from '../../../types/unconfirmedAmountType';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletSummary.scss';
@@ -49,6 +48,7 @@ const messages = defineMessages({
 type Props = {|
   +numberOfTransactions: number,
   +pendingAmount: UnconfirmedAmount,
+  +decimalPlaces: number,
   +isLoadingTransactions: boolean,
   +openExportTxToFileDialog: void => void,
   +unitOfAccountSetting: UnitOfAccountSettingType,
@@ -96,7 +96,9 @@ export default class WalletSummary extends Component<Props> {
                             </span>
                           ) : (
                             <>
-                              <span>{pendingAmount.incoming.toFormat(DECIMAL_PLACES_IN_ADA)}</span>
+                              <span>
+                                {pendingAmount.incoming.toFormat(this.props.decimalPlaces)}
+                              </span>
                               <span className={styles.currencySymbolSmallest}>
                                 <AdaSymbolSmallest />
                               </span>
@@ -117,7 +119,9 @@ export default class WalletSummary extends Component<Props> {
                             </span>
                           ) : (
                             <>
-                              <span>{pendingAmount.outgoing.toFormat(DECIMAL_PLACES_IN_ADA)}</span>
+                              <span>
+                                {pendingAmount.outgoing.toFormat(this.props.decimalPlaces)}
+                              </span>
                               <span className={styles.currencySymbolSmallest}>
                                 <AdaSymbolSmallest />
                               </span>

@@ -20,9 +20,10 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { ExplorerType } from '../../domain/Explorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-
+import { RestoreMode } from '../../actions/common/wallet-restore-actions';
 import { formattedWalletAmount } from '../../utils/formatters';
 import { ROUTES } from '../../routes-config';
+import { ApiOptions, getApiMeta } from '../../api/common/utils';
 
 export type MockDaedalusTransferStore = {|
   +status: TransferStatusT,
@@ -111,12 +112,16 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
   render(): null | Node {
     const { profile } = this.generated.stores;
     const daedalusTransfer = this.generated.stores.substores.ada.daedalusTransfer;
-    const adaWallets = this.generated.stores.substores.ada.wallets;
+    const apiMeta = getApiMeta(ApiOptions.ada);
+    if (apiMeta == null) throw new Error(`${nameof(DaedalusTransferPage)} no API selected`);
 
     const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
       ? (
         this.generated.stores.coinPriceStore
-          .getCurrentPrice('ADA', this.generated.stores.profile.unitOfAccount.currency)
+          .getCurrentPrice(
+            apiMeta.meta.primaryTicker,
+            this.generated.stores.profile.unitOfAccount.currency
+          )
       )
       : null;
 
@@ -126,9 +131,10 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
           <DaedalusTransferFormPage
             onSubmit={this.setupTransferFundsWithMnemonic}
             onBack={this.backToUninitialized}
-            mnemonicValidator={mnemonic => adaWallets.isValidMnemonic({
+            mnemonicValidator={mnemonic => this.generated.stores.walletRestore.isValidMnemonic({
               mnemonic,
-              numberOfWords: config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT
+              numberOfWords: config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT,
+              mode: RestoreMode.REGULAR,
             })}
             validWords={validWords}
             mnemonicLength={config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT}
@@ -140,9 +146,10 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
           <DaedalusTransferFormPage
             onSubmit={this.setupTransferFundsWithMnemonic}
             onBack={this.backToUninitialized}
-            mnemonicValidator={mnemonic => adaWallets.isValidPaperMnemonic({
+            mnemonicValidator={mnemonic => this.generated.stores.walletRestore.isValidMnemonic({
               mnemonic,
-              numberOfWords: config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT
+              numberOfWords: config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT,
+              mode: RestoreMode.PAPER,
             })}
             validWords={validWords}
             mnemonicLength={config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT}
@@ -171,7 +178,10 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
         return (
           <TransferSummaryPage
             form={null}
-            formattedWalletAmount={formattedWalletAmount}
+            formattedWalletAmount={amount => formattedWalletAmount(
+              amount,
+              apiMeta.meta.decimalPlaces.toNumber()
+            )}
             selectedExplorer={this.generated.stores.profile.selectedExplorer}
             transferTx={daedalusTransfer.transferTx}
             onSubmit={this.transferFunds}
@@ -247,6 +257,13 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
         selectedExplorer: ExplorerType,
         unitOfAccount: UnitOfAccountSettingType
       |},
+      walletRestore: {|
+        isValidMnemonic: ({|
+          mnemonic: string,
+          numberOfWords: number,
+          mode: $PropertyType<typeof RestoreMode, 'REGULAR'> | $PropertyType<typeof RestoreMode, 'PAPER'>,
+        |}) => boolean,
+      |},
       substores: {|
         ada: {|
           daedalusTransfer: {|
@@ -255,16 +272,6 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
             transferFundsRequest: {| isExecuting: boolean |},
             transferTx: ?TransferTx
           |},
-          wallets: {|
-            isValidMnemonic: ({|
-              mnemonic: string,
-              numberOfWords: number
-            |}) => boolean,
-            isValidPaperMnemonic: ({|
-              mnemonic: string,
-              numberOfWords: number
-            |}) => boolean
-          |}
         |}
       |},
       wallets: {|
@@ -292,6 +299,9 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
           selectedExplorer: stores.profile.selectedExplorer,
           unitOfAccount: stores.profile.unitOfAccount,
         },
+        walletRestore: {
+          isValidMnemonic: stores.walletRestore.isValidMnemonic,
+        },
         wallets: {
           selected: stores.wallets.selected,
           activeWalletRoute: stores.wallets.activeWalletRoute,
@@ -302,10 +312,6 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
         },
         substores: {
           ada: {
-            wallets: {
-              isValidMnemonic: adaStores.wallets.isValidMnemonic,
-              isValidPaperMnemonic: adaStores.wallets.isValidPaperMnemonic,
-            },
             daedalusTransfer: {
               status: adaStores.daedalusTransfer.status,
               error: adaStores.daedalusTransfer.error,

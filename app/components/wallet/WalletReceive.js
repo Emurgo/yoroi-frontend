@@ -21,7 +21,6 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import BigNumber from 'bignumber.js';
 import { truncateAddress, splitAmount } from '../../utils/formatters';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
-import { DECIMAL_PLACES_IN_ADA } from '../../config/numbersConfig';
 import NotFoundIcon from '../../assets/images/cert-bad-ic.inline.svg';
 
 const messages = defineMessages({
@@ -65,6 +64,10 @@ type Props = {|
   +onGeneratePaymentURI: void | (string => void),
   +shouldHideBalance: boolean,
   +unitOfAccountSetting: UnitOfAccountSettingType,
+  +meta: {|
+    +primaryTicker: string,
+    +decimalPlaces: number,
+  |},
 |};
 
 @observer
@@ -73,11 +76,14 @@ export default class WalletReceive extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  getAmount: BigNumber => ?Node = (walletAmount) => {
+  getAmount: BigNumber => ?Node = walletAmount => {
     if (this.props.shouldHideBalance) {
       return (<span>******</span>);
     }
-    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(walletAmount);
+    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
+      walletAmount,
+      this.props.meta.decimalPlaces
+    );
     // recall: can't be negative in this situation
     const adjustedBefore = '+' + beforeDecimalRewards;
 
@@ -156,7 +162,7 @@ export default class WalletReceive extends Component<Props> {
                     ? (
                       <div className={styles.walletAmount}>
                         {this.getAmount(address.value.div(
-                          new BigNumber(10).pow(DECIMAL_PLACES_IN_ADA)
+                          new BigNumber(10).pow(this.props.meta.decimalPlaces)
                         ))}
                         {' '}
                         {unitOfAccountSetting.enabled

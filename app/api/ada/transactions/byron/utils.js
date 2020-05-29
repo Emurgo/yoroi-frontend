@@ -4,15 +4,14 @@ import BigNumber from 'bignumber.js';
 import type {
   BaseSignRequest,
 } from '../types';
-import {
-  DECIMAL_PLACES_IN_ADA,
-  LOVELACES_PER_ADA,
-} from '../../../../config/numbersConfig';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
+import { getAdaCurrencyMeta } from '../../currencyInfo';
+
 
 export function coinToBigNumber(coin: RustModule.WalletV2.Coin): BigNumber {
   const ada = new BigNumber(coin.ada());
-  const lovelace = ada.times(LOVELACES_PER_ADA).plus(coin.lovelace());
+  const lovelacesPerAda = new BigNumber(10).pow(getAdaCurrencyMeta().decimalPlaces);
+  const lovelace = ada.times(lovelacesPerAda).plus(coin.lovelace());
   return lovelace;
 }
 
@@ -31,7 +30,7 @@ export function signRequestFee(
 
   let result = inputTotal.minus(outputTotal);
   if (shift) {
-    result = result.shiftedBy(-DECIMAL_PLACES_IN_ADA);
+    result = result.shiftedBy(-getAdaCurrencyMeta().decimalPlaces.toNumber());
   }
   return result;
 }
@@ -50,7 +49,7 @@ export function signRequestTotalInput(
 
   let result = inputTotal.minus(change);
   if (shift) {
-    result = result.shiftedBy(-DECIMAL_PLACES_IN_ADA);
+    result = result.shiftedBy(-getAdaCurrencyMeta().decimalPlaces.toNumber());
   }
   return result;
 }

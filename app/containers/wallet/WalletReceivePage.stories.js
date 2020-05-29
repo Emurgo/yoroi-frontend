@@ -27,7 +27,6 @@ import { mockReceiveProps } from './Receive.mock';
 import { getDefaultExplorer } from '../../domain/Explorer';
 import { ROUTES } from '../../routes-config';
 import { buildRoute } from '../../utils/routing';
-import { isValidAmountInLovelaces } from '../../utils/validations';
 import type { AddressTypeName } from '../../stores/toplevel/AddressesStore';
 import type { StandardAddress, AddressFilterKind, AddressStoreKind } from '../../types/AddressFilterTypes';
 import URIGenerateDialog from '../../components/uri/URIGenerateDialog';
@@ -37,10 +36,8 @@ import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
 import VerifyAddressDialog from '../../components/wallet/receive/VerifyAddressDialog';
 import { addressTypes } from '../../i18n/global-messages';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { getApiMeta } from '../../stores/toplevel/ProfileStore';
 import { AddressFilter, AddressStoreTypes } from '../../types/AddressFilterTypes';
 import { userFilter } from '../../stores/toplevel/AddressesStore';
-
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -144,7 +141,6 @@ const genBaseProps: {|
         getParam: request.getParam || (() => (undefined: any)),
       },
       profile: {
-        selectedAPI: getApiMeta('ada'),
         isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
         selectedExplorer: getDefaultExplorer(),
         shouldHideBalance: false,
@@ -152,11 +148,6 @@ const genBaseProps: {|
       },
       wallets: {
         selected: request.wallet.publicDeriver,
-      },
-      transactions: {
-        validateAmount: validateAmountRequest => {
-          return Promise.resolve(isValidAmountInLovelaces(validateAmountRequest.amount));
-        },
       },
       addresses: {
         addressFilter: request.addressFilter,

@@ -36,7 +36,7 @@ import {
   genToRelativeSlotNumber,
   genTimeToSlot,
 } from '../../api/ada/lib/storage/bridge/timeUtils';
-
+import { CoinTypes } from '../../config/numbersConfig';
 
 export type StakingKeyState = {|
   state: AccountStateSuccess,
@@ -76,7 +76,7 @@ export default class DelegationStore extends Store {
 
   _recalculateDelegationInfoDisposer: void => void = () => {};
 
-  // TODO: refine input typ to staking key wallets only
+  // TODO: refine input type to staking key wallets only
   getDelegationRequests: PublicDeriver<> => void | DelegationRequests = (
     publicDeriver
   ) => {
@@ -256,6 +256,9 @@ export default class DelegationStore extends Store {
         }
         const selected = this.stores.wallets.selected;
         if (selected == null) return;
+        if (selected.getParent().getCoinType() !== CoinTypes.CARDANO) {
+          return;
+        }
         if (asGetStakingKey(selected) != null) {
           await this.refreshDelegation(selected);
         }

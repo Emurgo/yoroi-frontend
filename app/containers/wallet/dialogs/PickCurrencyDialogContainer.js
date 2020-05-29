@@ -8,6 +8,7 @@ import PickCurrencyOptionDialog from '../../../components/wallet/add/option-dial
 type Props = {|
   +onClose: void => void,
   +onCardano: void => void,
+  +onErgo: void | (void => void),
 |};
 
 @observer
@@ -19,6 +20,7 @@ export default class PickCurrencyDialogContainer extends Component<Props> {
         onExternalLinkClick={handleExternalLinkClick}
         onCancel={this.props.onClose}
         onCardano={this.props.onCardano}
+        onErgo={this.props.onErgo}
       />
     );
   }

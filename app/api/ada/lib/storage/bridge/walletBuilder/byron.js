@@ -35,9 +35,10 @@ import type {
   HasPublicDeriver,
   HasRoot,
 } from './builder';
-import type { AddByHashFunc } from '../hashMapper';
-import { rawGenAddByHash } from '../hashMapper';
+import type { AddByHashFunc } from '../../../../../common/lib/storage/bridge/hashMapper';
+import { rawGenAddByHash } from '../../../../../common/lib/storage/bridge/hashMapper';
 import { addByronAddress } from '../../../../restoration/byron/scan';
+import { KeyKind } from '../../../../../common/lib/crypto/keys/types';
 
 
 // TODO: maybe move this inside walletBuilder somehow so it's all done in the same transaction
@@ -130,7 +131,7 @@ export async function createStandardBip44Wallet(request: {|
   accountName: string,
 |}): Promise<HasConceptualWallet & HasBip44Wrapper & HasRoot & HasPublicDeriver<mixed>> {
   if (request.accountIndex < HARD_DERIVATION_START) {
-    throw new Error('createStandardBip44Wallet needs hardened index');
+    throw new Error(`${nameof(createStandardBip44Wallet)} needs hardened index`);
   }
 
   const encryptedRoot = encryptWithPassword(
@@ -169,6 +170,7 @@ export async function createStandardBip44Wallet(request: {|
               Hash: encryptedRoot,
               IsEncrypted: true,
               PasswordLastUpdate: null,
+              Type: KeyKind.BIP32ED25519,
             },
             publicKeyInfo: null,
             derivationInfo: keys => ({
@@ -202,7 +204,7 @@ export async function createStandardBip44Wallet(request: {|
           const id = finalState.bip44WrapperRow.PrivateDeriverKeyDerivationId;
           const level = finalState.bip44WrapperRow.PrivateDeriverLevel;
           if (id == null || level == null) {
-            throw new Error('createStandardBip44Wallet missing private deriver');
+            throw new Error(`${nameof(createStandardBip44Wallet)} missing private deriver`);
           }
           return {
             deriverRequest: {
@@ -235,7 +237,7 @@ export async function createHardwareWallet(request: {
   ...
 }): Promise<HasConceptualWallet & HasBip44Wrapper & HasPublicDeriver<mixed>> {
   if (request.accountIndex < HARD_DERIVATION_START) {
-    throw new Error('createHardwareWallet needs hardened index');
+    throw new Error(`${nameof(createHardwareWallet)} needs hardened index`);
   }
   const initialDerivations = await getAccountDefaultDerivations(
     request.settings,
@@ -320,6 +322,7 @@ export async function createHardwareWallet(request: {
                 Hash: request.accountPublicKey.key().to_hex(),
                 IsEncrypted: false,
                 PasswordLastUpdate: null,
+                Type: KeyKind.BIP32ED25519,
               },
               privateKey: null,
             },
@@ -485,7 +488,7 @@ async function addPublicDeriverToMigratedWallet<
     // replace default display cutoff
     const external = insert.find(chain => chain.index === ChainDerivations.EXTERNAL);
     if (external == null) {
-      throw new Error('migrateFromStorageV1 cannot find external chain. Should never happen');
+      throw new Error(`${nameof(addPublicDeriverToMigratedWallet)} cannot find external chain. Should never happen`);
     }
     external.insert = insertRequest => Promise.resolve({
       KeyDerivationId: insertRequest.keyDerivationId,
@@ -520,6 +523,7 @@ async function addPublicDeriverToMigratedWallet<
       Hash: accountPublicKey.key().to_hex(),
       IsEncrypted: false,
       PasswordLastUpdate: null,
+      Type: KeyKind.BIP32ED25519,
     },
     privateKey: null,
   }];

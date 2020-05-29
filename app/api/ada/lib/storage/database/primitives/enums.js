@@ -4,7 +4,7 @@ export const CoreAddressTypes = Object.freeze({
   CARDANO_LEGACY: 0,
   /**
    * Note: we store Shelley addresses as the full payload (not just payment key)
-   * since it's easier to extract a key from a payload then the invverse
+   * since it's easier to extract a key from a payload then the inverse
    *
    * This also matches how the remote works as it has to return the full payload
    * so we can tell the address type
@@ -13,6 +13,9 @@ export const CoreAddressTypes = Object.freeze({
   SHELLEY_GROUP: 2,
   SHELLEY_ACCOUNT: 3,
   SHELLEY_MULTISIG: 4,
+  ERGO_P2PK: 5,
+  ERGO_P2SH: 6,
+  ERGO_P2S: 7,
 });
 export type CoreAddressT = $Values<typeof CoreAddressTypes>;
 
