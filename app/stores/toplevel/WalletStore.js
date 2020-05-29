@@ -254,15 +254,12 @@ export default class WalletStore extends Store {
   refreshWalletFromRemote: PublicDeriver<> => Promise<void> = async (
     publicDeriver
   ) => {
-    const { coinType } = publicDeriver.getParent();
-    const apiType = getApiForCoinType(coinType);
     try {
-      const substore = this.stores.substores[apiType];
-      await substore.transactions.refreshTransactionData({
+      await this.stores.transactions.refreshTransactionData({
         publicDeriver,
         localRequest: false,
       });
-      await substore.addresses.refreshAddressesFromDb(publicDeriver);
+      await this.stores.addresses.refreshAddressesFromDb(publicDeriver);
     } catch (error) {
       Logger.error(`${nameof(WalletStore)}::${nameof(this.refreshWalletFromRemote)} ` + stringifyError(error));
       throw error;
@@ -272,18 +269,15 @@ export default class WalletStore extends Store {
   refreshWalletFromLocalOnLaunch: PublicDeriver<> => Promise<void> = async (
     publicDeriver
   ) => {
-    const { coinType } = publicDeriver.getParent();
-    const apiType = getApiForCoinType(coinType);
     try {
-      const substore = this.stores.substores[apiType];
-      await substore.transactions.refreshTransactionData({
+      await this.stores.transactions.refreshTransactionData({
         publicDeriver,
         localRequest: true,
       });
-      await substore.transactions.reactToTxHistoryUpdate({ publicDeriver });
+      await this.stores.transactions.reactToTxHistoryUpdate({ publicDeriver });
       // if after querying local history we find nothing, we just reset the DB entirely
       const txRequests = find(
-        substore.transactions.transactionsRequests,
+        this.stores.transactions.transactionsRequests,
         { publicDeriver }
       );
       if (txRequests == null) throw new Error(`${nameof(this.refreshWalletFromLocalOnLaunch)} should never happen`);
@@ -294,7 +288,7 @@ export default class WalletStore extends Store {
           txRequests.requests[txRequest].reset();
         }
       }
-      await substore.addresses.refreshAddressesFromDb(publicDeriver);
+      await this.stores.addresses.refreshAddressesFromDb(publicDeriver);
     } catch (error) {
       Logger.error(`${nameof(WalletStore)}::${nameof(this.refreshWalletFromLocalOnLaunch)} ` + stringifyError(error));
       throw error;
@@ -371,8 +365,8 @@ export default class WalletStore extends Store {
     const apiType = getApiForCoinType(coinType);
 
     const stores = this.stores.substores[apiType];
-    stores.addresses.addObservedWallet(request.publicDeriver);
-    stores.transactions.addObservedWallet(request);
+    this.stores.addresses.addObservedWallet(request.publicDeriver);
+    this.stores.transactions.addObservedWallet(request);
     stores.time.addObservedTime(request.publicDeriver);
     if (asGetStakingKey(request.publicDeriver) != null) {
       stores.delegation.addObservedWallet(request.publicDeriver);
@@ -540,16 +534,16 @@ export default class WalletStore extends Store {
       }
     }
     runInAction(() => {
-      this.stores.substores.ada.walletSettings.publicDeriverSettingsCache.push({
+      this.stores.walletSettings.publicDeriverSettingsCache.push({
         publicDeriver,
         assuranceMode: assuranceModes.NORMAL,
         publicDeriverName: publicDeriverInfo.Name,
       });
-      this.stores.substores.ada.walletSettings.conceptualWalletSettingsCache.push({
+      this.stores.walletSettings.conceptualWalletSettingsCache.push({
         conceptualWallet: publicDeriver.getParent(),
         conceptualWalletName: conceptualWalletInfo.Name,
       });
-      this.stores.substores.ada.walletSettings.walletWarnings.push({
+      this.stores.walletSettings.walletWarnings.push({
         publicDeriver,
         dialogs: [],
       });
@@ -575,7 +569,7 @@ export default class WalletStore extends Store {
     if (withPubKey != null) {
       const { plate } = this.getPublicKeyCache(withPubKey);
       if (debugWalletChecksums.find(elem => elem === plate.TextPart) != null) {
-        const existingWarnings = this.stores.substores.ada.walletSettings.getWalletWarnings(
+        const existingWarnings = this.stores.walletSettings.getWalletWarnings(
           publicDeriver
         );
         existingWarnings.dialogs.push(createDebugWalletDialog(

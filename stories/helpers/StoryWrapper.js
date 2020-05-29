@@ -62,9 +62,9 @@ import {
 import {
   Bip44DerivationLevels,
 } from '../../app/api/ada/lib/storage/database/walletTypes/bip44/api/utils';
-import type { ConceptualWalletSettingsCache } from '../../app/stores/base/WalletSettingsStore';
-import WalletSettingsStore from '../../app/stores/base/WalletSettingsStore';
-import TransactionsStore from '../../app/stores/base/TransactionsStore';
+import type { ConceptualWalletSettingsCache } from '../../app/stores/toplevel/WalletSettingsStore';
+import WalletSettingsStore from '../../app/stores/toplevel/WalletSettingsStore';
+import TransactionsStore from '../../app/stores/toplevel/TransactionsStore';
 import DelegationStore from '../../app/stores/ada/DelegationStore';
 import WalletStore from '../../app/stores/toplevel/WalletStore';
 import TimeStore from '../../app/stores/ada/TimeStore';

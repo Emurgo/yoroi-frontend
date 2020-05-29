@@ -8,7 +8,7 @@ import {
 import LocalizableError from '../../i18n/LocalizableError';
 
 import { sendFileToUser } from './utils';
-import { GenericApiError } from '../common';
+import { GenericApiError } from '../common/errors';
 import type {
   ExportTransactionsRequest,
   ExportTransactionsResponse,
@@ -65,9 +65,9 @@ export default class ExportApi {
     try {
       Logger.debug('ExportApi::exportTransactions: called');
 
-      const { rows, format, fileType, fileName } = request;
+      const { ticker, rows, format, fileType, fileName } = request;
       const dlFileName = fileName != null ? fileName : ExportApi.createDefaultFileName();
-      const data = ExportApi.convertExportRowsToCsv(rows, format);
+      const data = ExportApi.convertExportRowsToCsv(ticker, rows, format);
       const fileResponse = ExportApi.convertCsvDataToFile(data, fileType);
 
       Logger.debug('ExportApi::exportTransactions: success');
@@ -89,12 +89,13 @@ export default class ExportApi {
    * Convert specified abstract rows to a specific data-format.
    */
   static convertExportRowsToCsv(
+    ticker: string,
     rows: Array<TransactionExportRow>,
     format?: TransactionExportDataFormat = TRANSACTION_EXPORT_DATA_FORMAT.CoinTracking
   ): CsvData {
     switch (format) {
       case TRANSACTION_EXPORT_DATA_FORMAT.CoinTracking:
-        return _formatExportRowsIntoCoinTrackingFormat(rows);
+        return _formatExportRowsIntoCoinTrackingFormat(ticker, rows);
       default: throw new Error('Unexpected export data format: ' + format);
     }
   }
@@ -148,17 +149,20 @@ export const COIN_TRACKING_HEADERS = [
   'Date'
 ];
 
-function _formatExportRowsIntoCoinTrackingFormat(rows: Array<TransactionExportRow>): CsvData {
+function _formatExportRowsIntoCoinTrackingFormat(
+  ticker: string,
+  rows: Array<TransactionExportRow>
+): CsvData {
   return {
     headers: COIN_TRACKING_HEADERS,
     rows: rows.map(r => [
       _formatExportRowTypeForCoinTracking(r.type),
       r.type === 'in' ? r.amount : '',
-      r.type === 'in' ? 'ADA' : '',
+      r.type === 'in' ? ticker : '',
       r.type === 'out' ? r.amount : '',
-      r.type === 'out' ? 'ADA' : '',
+      r.type === 'out' ? ticker : '',
       r.type === 'out' ? r.fee : '',
-      r.type === 'out' ? 'ADA' : '',
+      r.type === 'out' ? ticker : '',
       '',
       '',
       '',

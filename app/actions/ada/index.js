@@ -1,9 +1,7 @@
 // @flow
 import AdaWalletsActions from './ada-wallets-actions';
 import PaperWalletsActions from './paper-wallets-actions';
-import TransactionsActions from './transactions-actions';
 import WalletSettingsActions from './wallet-settings-actions';
-import AddressesActions from './addresses-actions';
 import DaedalusTransferActions from './daedalus-transfer-actions';
 import YoroiTransferActions from './yoroi-transfer-actions';
 import HWConnectActions from './hw-connect-actions';
@@ -19,9 +17,7 @@ export type AdaActionsMap = {|
   txBuilderActions: TxBuilderActions,
   wallets: AdaWalletsActions,
   paperWallets: PaperWalletsActions,
-  transactions: TransactionsActions,
   walletSettings: WalletSettingsActions,
-  addresses: AddressesActions,
   daedalusTransfer: DaedalusTransferActions,
   yoroiTransfer: YoroiTransferActions,
   trezorConnect: HWConnectActions,
@@ -34,13 +30,11 @@ export type AdaActionsMap = {|
   delegation: DelegationActions,
 |};
 
-const adaActionsMap: AdaActionsMap = {
+const adaActionsMap: AdaActionsMap = Object.freeze({
   txBuilderActions: new TxBuilderActions(),
   wallets: new AdaWalletsActions(),
   paperWallets: new PaperWalletsActions(),
-  transactions: new TransactionsActions(),
   walletSettings: new WalletSettingsActions(),
-  addresses: new AddressesActions(),
   daedalusTransfer: new DaedalusTransferActions(),
   yoroiTransfer: new YoroiTransferActions(),
   trezorConnect: new HWConnectActions(),
@@ -51,6 +45,6 @@ const adaActionsMap: AdaActionsMap = {
   walletRestore: new WalletRestoreActions(),
   delegationTransaction: new DelegationTransactionActions(),
   delegation: new DelegationActions(),
-};
+});
 
 export default adaActionsMap;

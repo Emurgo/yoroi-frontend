@@ -37,7 +37,7 @@ export default class TopBarContainer extends Component<Props> {
         return null;
       }
       const selected = walletsStore.selected;
-      const amount = stores.substores.ada.transactions
+      const amount = stores.transactions
         .getTxRequests(selected).requests.getBalanceRequest.result
         ?.dividedBy(LOVELACES_PER_ADA);
 
@@ -107,12 +107,8 @@ export default class TopBarContainer extends Component<Props> {
         app: {
           currentRoute: stores.app.currentRoute,
         },
-        substores: {
-          ada: {
-            transactions: {
-              getTxRequests: stores.substores.ada.transactions.getTxRequests,
-            },
-          },
+        transactions: {
+          getTxRequests: stores.transactions.getTxRequests,
         },
       },
       actions: {

@@ -243,7 +243,7 @@ export default class DelegationStore extends Store {
       () => [
         this.stores.wallets.selected,
         // update if tx history changes
-        this.stores.substores.ada.transactions.hash,
+        this.stores.transactions.hash,
         // if query failed due to server issue, need to re-query when it comes back online
         this.stores.serverConnectionStore.checkAdaServerStatus,
         // reward grows every epoch so we have to refresh

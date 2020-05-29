@@ -80,7 +80,7 @@ export default class StakingPage extends Component<Props> {
     if (!publicDeriver) {
       return null;
     }
-    const txRequests = this.generated.stores.substores.ada.transactions
+    const txRequests = this.generated.stores.transactions
       .getTxRequests(publicDeriver);
     const balance = txRequests.requests.getBalanceRequest.result;
     if (balance != null) {
@@ -116,7 +116,7 @@ export default class StakingPage extends Component<Props> {
     if (
       !delegationTxStore.signAndBroadcastDelegationTx.isExecuting &&
       !delegationTxStore.signAndBroadcastDelegationTx.wasExecuted &&
-      this.generated.stores.substores.ada.transactions.hasAnyPending
+      this.generated.stores.transactions.hasAnyPending
     ) {
       return (
         <InformativeError
@@ -159,12 +159,12 @@ export default class StakingPage extends Component<Props> {
         wallets: {
           selected: stores.wallets.selected,
         },
+        transactions: {
+          getTxRequests: stores.transactions.getTxRequests,
+          hasAnyPending: stores.transactions.hasAnyPending,
+        },
         substores: {
           ada: {
-            transactions: {
-              getTxRequests: adaStores.transactions.getTxRequests,
-              hasAnyPending: adaStores.transactions.hasAnyPending,
-            },
             delegation: {
               getDelegationRequests: adaStores.delegation.getDelegationRequests,
             },

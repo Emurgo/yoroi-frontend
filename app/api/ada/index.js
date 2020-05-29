@@ -33,7 +33,6 @@ import {
 } from './lib/storage/bridge/walletBuilder/shelley';
 import {
   getAllTransactions,
-  getPendingTransactions,
   updateTransactions,
 } from './lib/storage/bridge/updateTransactions';
 import {
@@ -63,18 +62,19 @@ import type { IHasLevels } from './lib/storage/models/ConceptualWallet/interface
 import type {
   IPublicDeriver,
   IGetAllUtxos,
-  IGetLastSyncInfo,
   IGetSigningKey,
   IGetStakingKey,
   IDisplayCutoff,
-  IDisplayCutoffPopFunc,
-  IDisplayCutoffPopResponse,
   IGetAllUtxosResponse,
   IHasUtxoChains, IHasUtxoChainsRequest,
-  IGetLastSyncInfoResponse,
   IGetPublicResponse,
   Address, Addressing, UsedStatus, Value,
 } from './lib/storage/models/PublicDeriver/interfaces';
+import type {
+  BaseGetTransactionsRequest,
+  GetTransactionsResponse,
+  GetTransactionsRequestOptions
+} from '../common/index';
 import type {
   IRenameFunc, IRenameRequest, IRenameResponse,
   IChangePasswordRequestFunc, IChangePasswordRequest, IChangePasswordResponse,
@@ -120,8 +120,7 @@ import {
   GenericApiError,
   IncorrectWalletPasswordError,
   WalletAlreadyRestoredError,
-  UnusedAddressesError,
-} from '../common';
+} from '../common/errors';
 import LocalizableError from '../../i18n/LocalizableError';
 import { scanBip44Account, } from './restoration/byron/scan';
 import { scanCip1852Account, } from './restoration/shelley/scan';
@@ -243,48 +242,13 @@ export type GetBalanceFunc = (
   request: GetBalanceRequest
 ) => Promise<GetBalanceResponse>;
 
-// getTxLastUpdatedDate
+// ada refreshTransactions
 
-export type GetTxLastUpdateDateRequest = {|
-  getLastSyncInfo: () => Promise<IGetLastSyncInfoResponse>,
-|};
-export type GetTxLastUpdateDateResponse = IGetLastSyncInfoResponse;
-export type GetTxLastUpdateDateFunc = (
-  request: GetTxLastUpdateDateRequest
-) => Promise<GetTxLastUpdateDateResponse>;
-
-// refreshTransactions
-
-export type GetTransactionsRequestOptions = {|
-  skip: number,
-  limit: number,
-|};
-export type GetTransactionsRequest = {|
-  ...InexactSubset<GetTransactionsRequestOptions>,
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetLastSyncInfo,
-  isLocalRequest: boolean,
+export type AdaGetTransactionsRequest = {|
   getTransactionsHistoryForAddresses: HistoryFunc,
   checkAddressesInUse: FilterFunc,
   getBestBlock: BestBlockFunc,
 |};
-export type GetTransactionsResponse = {
-  transactions: Array<WalletTransaction>,
-  total: number,
-  ...
-};
-export type GetTransactionsFunc = (
-  request: GetTransactionsRequest
-) => Promise<GetTransactionsResponse>;
-
-// refreshPendingTransactions
-
-export type RefreshPendingTransactionsRequest = {|
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetLastSyncInfo,
-|};
-export type RefreshPendingTransactionsResponse = Array<WalletTransaction>;
-export type RefreshPendingTransactionsFunc = (
-  request: RefreshPendingTransactionsRequest
-) => Promise<RefreshPendingTransactionsResponse>;
 
 // notices
 export type GetNoticesRequestOptions = GetTransactionsRequestOptions;
@@ -420,14 +384,6 @@ export type SignAndBroadcastDelegationTxResponse = SignedResponse;
 export type SignAndBroadcastDelegationTxFunc = (
   request: SignAndBroadcastDelegationTxRequest
 ) => Promise<SignAndBroadcastDelegationTxResponse>;
-
-// createAddress
-
-export type CreateAddressRequest = {| popFunc: IDisplayCutoffPopFunc, |};
-export type CreateAddressResponse = IDisplayCutoffPopResponse;
-export type CreateAddressFunc = (
-  request: CreateAddressRequest
-) => Promise<CreateAddressResponse>;
 
 // saveLastReceiveAddressIndex
 
@@ -581,23 +537,16 @@ export type GetTransactionRowsToExportFunc = (
 
 export const DEFAULT_ADDRESSES_PER_PAPER = 1;
 
-export function getAdaCurrencyMeta(_request: void): {|
-  primaryTicker: string,
-  unitName: string,
-|} {
-  return {
-    primaryTicker: 'ADA',
-    unitName: 'Ada',
-  };
-}
-
 export default class AdaApi {
 
-  getCurrencyMeta(_request: void): {|
+  static getCurrencyMeta(_request: void): {|
     primaryTicker: string,
     unitName: string,
   |} {
-    return getAdaCurrencyMeta();
+    return {
+      primaryTicker: 'ADA',
+      unitName: 'Ada',
+    };
   }
 
   // noinspection JSMethodCanBeStatic
@@ -687,19 +636,11 @@ export default class AdaApi {
     }
   }
 
-  async getTxLastUpdatedDate(
-    request: GetTxLastUpdateDateRequest
-  ): Promise<GetTxLastUpdateDateResponse> {
-    try {
-      return await request.getLastSyncInfo();
-    } catch (error) {
-      Logger.error('AdaApi::getTxLastUpdatedDate error: ' + stringifyError(error));
-      throw new GenericApiError();
-    }
-  }
-
   async refreshTransactions(
-    request: GetTransactionsRequest
+    request: {|
+      ...BaseGetTransactionsRequest,
+      ...AdaGetTransactionsRequest,
+    |},
   ): Promise<GetTransactionsResponse> {
     Logger.debug('AdaApi::refreshTransactions called: ' + stringifyData(request));
     const { skip = 0, limit } = request;
@@ -732,29 +673,6 @@ export default class AdaApi {
       };
     } catch (error) {
       Logger.error('AdaApi::refreshTransactions error: ' + stringifyError(error));
-      throw new GenericApiError();
-    }
-  }
-
-  async refreshPendingTransactions(
-    request: RefreshPendingTransactionsRequest
-  ): Promise<RefreshPendingTransactionsResponse> {
-    Logger.debug('AdaApi::refreshPendingTransactions called');
-    try {
-      const fetchedTxs = await getPendingTransactions({
-        publicDeriver: request.publicDeriver,
-      });
-      Logger.debug('AdaApi::refreshPendingTransactions success: ' + stringifyData(fetchedTxs));
-
-      const mappedTransactions = fetchedTxs.txs.map(tx => {
-        return WalletTransaction.fromAnnotatedTx({
-          tx,
-          addressLookupMap: fetchedTxs.addressLookupMap,
-        });
-      });
-      return mappedTransactions;
-    } catch (error) {
-      Logger.error('AdaApi::refreshPendingTransactions error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }
@@ -1165,24 +1083,6 @@ export default class AdaApi {
       if (error instanceof InvalidWitnessError) {
         throw new InvalidWitnessError();
       }
-      throw new GenericApiError();
-    }
-  }
-
-  async createAddress(
-    request: CreateAddressRequest,
-  ): Promise<CreateAddressResponse> {
-    Logger.debug('AdaApi::createAddress called');
-    try {
-
-      const newAddress = await request.popFunc();
-      Logger.info('AdaApi::createAddress success: ' + stringifyData(newAddress));
-      return newAddress;
-    } catch (error) {
-      if (error instanceof UnusedAddressesError) {
-        throw error;
-      }
-      Logger.error('AdaApi::createAddress error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }

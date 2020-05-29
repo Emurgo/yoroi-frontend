@@ -33,7 +33,7 @@ import {
 } from '../database/primitives/api/write';
 import type { AddCertificateRequest } from '../database/primitives/api/write';
 import { ModifyMultipartTx } from  '../database/transactionModels/multipart/api/write';
-import { digetForHash, } from '../database/primitives/api/utils';
+import { digestForHash, } from '../database/primitives/api/utils';
 import {
   MarkUtxo,
 } from '../database/transactionModels/utxo/api/write';
@@ -965,7 +965,7 @@ export async function updateTransactionBatch(
 
   const matchesInDb = new Map<string, DbTxIO>();
   {
-    const digestsForNew = request.txsFromNetwork.map(tx => digetForHash(tx.hash, TransactionSeed));
+    const digestsForNew = request.txsFromNetwork.map(tx => digestForHash(tx.hash, TransactionSeed));
     const matchByDigest = await deps.GetTransaction.byDigest(db, dbTx, {
       digests: digestsForNew,
       txIds: request.txIds,
@@ -1289,7 +1289,7 @@ async function markAllInputs(
     db, dbTx,
     { ids: request.inputTxIds },
   );
-  const digests = inputs.map(input => digetForHash(input.ParentTxHash, request.TransactionSeed));
+  const digests = inputs.map(input => digestForHash(input.ParentTxHash, request.TransactionSeed));
   const txMap = await deps.GetTransaction.byDigest(
     db, dbTx,
     {
@@ -1356,10 +1356,10 @@ export function networkTxHeaderToDb(
         BlockTime: new Date(tx.time),
         Height: tx.height,
         SlotNum: toAbsoluteSlotNumber({ epoch: tx.epoch, slot: tx.slot }),
-        Digest: digetForHash(tx.hash, BlockSeed),
+        Digest: digestForHash(tx.hash, BlockSeed),
       }
       : null;
-  const digest = digetForHash(tx.hash, TransactionSeed);
+  const digest = digestForHash(tx.hash, TransactionSeed);
   return {
     block,
     transaction: (blockId) => ({

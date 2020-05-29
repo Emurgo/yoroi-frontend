@@ -16,7 +16,7 @@ import type {
   CacheValue,
 } from '../../../stories/helpers/StoryWrapper';
 import LocalizableError from '../../i18n/LocalizableError';
-import { GenericApiError, } from '../../api/common';
+import { GenericApiError, } from '../../api/common/errors';
 import WalletSummaryPage from './WalletSummaryPage';
 import { getDefaultExplorer } from '../../domain/Explorer';
 import { THEMES } from '../../themes';
@@ -30,17 +30,14 @@ import { wrapWallet } from '../../Routes';
 import {
   INITIAL_SEARCH_LIMIT,
   SEARCH_SKIP,
-} from '../../stores/base/TransactionsStore';
-import {
-  calculateUnconfirmedAmount,
-} from '../../stores/ada/AdaTransactionsStore';
+} from '../../stores/toplevel/TransactionsStore';
 import ExportTransactionDialog from '../../components/wallet/export/ExportTransactionDialog';
-import WalletTransaction from '../../domain/WalletTransaction';
+import WalletTransaction, { calculateUnconfirmedAmount } from '../../domain/WalletTransaction';
 import { transactionTypes } from '../../api/ada/transactions/types';
 import type { LastSyncInfoRow, } from '../../api/ada/lib/storage/database/walletTypes/core/tables';
 import { TxStatusCodes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { assuranceModes, } from '../../config/transactionAssuranceConfig';
-import WalletSettingsStore from '../../stores/base/WalletSettingsStore';
+import WalletSettingsStore from '../../stores/toplevel/WalletSettingsStore';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { getPriceKey } from '../../api/ada/lib/storage/bridge/prices';
 import { createDebugWalletDialog } from './dialogs/DebugWalletDialogContainer';
@@ -50,6 +47,7 @@ import {
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { addressTypes } from '../../i18n/global-messages';
 import { getApiMeta } from '../../stores/toplevel/ProfileStore';
+import { AddressStoreTypes } from '../../types/AddressFilterTypes';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -84,17 +82,15 @@ const actions = {
   dialogs: {
     open: { trigger: action('open') },
   },
-  ada: {
-    transactions: {
-      exportTransactionsToFile: {
-        trigger: async (req) => action('exportTransactionsToFile')(req)
-      },
-      closeExportTransactionDialog: {
-        trigger: action('closeExportTransactionDialog')
-      },
-      loadMoreTransactions: {
-        trigger: async (req) => action('loadMoreTransactions')(req)
-      },
+  transactions: {
+    exportTransactionsToFile: {
+      trigger: async (req) => action('exportTransactionsToFile')(req)
+    },
+    closeExportTransactionDialog: {
+      trigger: action('closeExportTransactionDialog')
+    },
+    loadMoreTransactions: {
+      trigger: async (req) => action('loadMoreTransactions')(req)
     },
   },
 };
@@ -144,40 +140,44 @@ export const Loading = (): Node => {
           coinPriceStore: {
             priceMap: new Map(),
           },
+          transactions: {
+            hasAny: false,
+            totalAvailable: 0,
+            recent: [],
+            searchOptions: {
+              limit: INITIAL_SEARCH_LIMIT,
+              skip: SEARCH_SKIP
+            },
+            recentTransactionsRequest: {
+              isExecuting: false,
+              wasExecuted: false,
+            },
+            lastSyncInfo: {
+              LastSyncInfoId: 1,
+              Time: null,
+              SlotNum: null,
+              BlockHash: null,
+              Height: 0,
+            },
+            unconfirmedAmount: {
+              total: new BigNumber(0),
+              incoming: new BigNumber(0),
+              outgoing: new BigNumber(0),
+              incomingInSelectedCurrency: new BigNumber(0),
+              outgoingInSelectedCurrency: new BigNumber(0),
+            },
+            isExporting: false,
+            exportError: undefined,
+          },
+          addresses: {
+            getStoresForWallet: (_publicDeriver) => [],
+          },
+          walletSettings: {
+            getPublicDeriverSettingsCache: lookup.getPublicDeriverSettingsCache,
+          },
           substores: {
             ada: {
-              addresses: {
-                getStoresForWallet: (_publicDeriver) => [],
-              },
-              walletSettings: {
-                getPublicDeriverSettingsCache: lookup.getPublicDeriverSettingsCache,
-              },
               transactions: {
-                hasAny: false,
-                totalAvailable: 0,
-                recent: [],
-                searchOptions: {
-                  limit: INITIAL_SEARCH_LIMIT,
-                  skip: SEARCH_SKIP
-                },
-                recentTransactionsRequest: {
-                  isExecuting: false,
-                  wasExecuted: false,
-                },
-                lastSyncInfo: {
-                  LastSyncInfoId: 1,
-                  Time: null,
-                  SlotNum: null,
-                  BlockHash: null,
-                  Height: 0,
-                },
-                unconfirmedAmount: {
-                  total: new BigNumber(0),
-                  incoming: new BigNumber(0),
-                  outgoing: new BigNumber(0),
-                  incomingInSelectedCurrency: new BigNumber(0),
-                  outgoingInSelectedCurrency: new BigNumber(0),
-                },
                 isExporting: false,
                 exportError: undefined,
               },
@@ -247,53 +247,57 @@ const genPropsForTransactions: {|
     getIdForWallet: () => '',
     txMemoMap: new Map(),
   },
+  transactions: {
+    hasAny: request.transactions.length > 0,
+    totalAvailable: request.transactions.length,
+    recent: request.transactions,
+    searchOptions: {
+      limit: INITIAL_SEARCH_LIMIT,
+      skip: SEARCH_SKIP
+    },
+    recentTransactionsRequest: {
+      isExecuting: request.isLoadingTxs || false,
+      wasExecuted: true,
+    },
+    lastSyncInfo: request.lastSyncInfo,
+    unconfirmedAmount: calculateUnconfirmedAmount(
+      request.transactions,
+      request.lastSyncInfo.Height,
+      assuranceModes.NORMAL,
+      (timestamp) => ({
+        From: 'ADA',
+        To: 'USD',
+        Price: 5,
+        Time: timestamp,
+      }),
+    ),
+    isExporting: request.txExport != null ? request.txExport.isExporting : false,
+    exportError: request.txExport?.exportError,
+  },
+  addresses: {
+    getStoresForWallet: (_publicDeriver) => [
+      {
+        route: AddressStoreTypes.external,
+        displayName: addressTypes.externalTab,
+        all: [{
+          address: 'Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf',
+        }],
+      },
+      {
+        route: AddressStoreTypes.internal,
+        displayName: addressTypes.internalLabel,
+        all: [{
+          address: 'Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM',
+        }],
+      },
+    ],
+  },
+  walletSettings: {
+    getPublicDeriverSettingsCache: request.getPublicDeriverSettingsCache,
+  },
   substores: {
     ada: {
-      addresses: {
-        getStoresForWallet: (_publicDeriver) => [
-          {
-            route: 'external',
-            displayName: addressTypes.externalTab,
-            all: [{
-              address: 'Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf',
-            }],
-          },
-          {
-            route: 'internal',
-            displayName: addressTypes.internalLabel,
-            all: [{
-              address: 'Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM',
-            }],
-          },
-        ],
-      },
-      walletSettings: {
-        getPublicDeriverSettingsCache: request.getPublicDeriverSettingsCache,
-      },
       transactions: {
-        hasAny: request.transactions.length > 0,
-        totalAvailable: request.transactions.length,
-        recent: request.transactions,
-        searchOptions: {
-          limit: INITIAL_SEARCH_LIMIT,
-          skip: SEARCH_SKIP
-        },
-        recentTransactionsRequest: {
-          isExecuting: request.isLoadingTxs || false,
-          wasExecuted: true,
-        },
-        lastSyncInfo: request.lastSyncInfo,
-        unconfirmedAmount: calculateUnconfirmedAmount(
-          request.transactions,
-          request.lastSyncInfo.Height,
-          assuranceModes.NORMAL,
-          (timestamp) => ({
-            From: 'ADA',
-            To: 'USD',
-            Price: 5,
-            Time: timestamp,
-          }),
-        ),
         isExporting: request.txExport != null ? request.txExport.isExporting : false,
         exportError: request.txExport?.exportError,
       },

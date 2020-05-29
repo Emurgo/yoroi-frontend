@@ -178,8 +178,9 @@ Given(/^I have completed the basic setup$/, async function () {
   await this.click('.TermsOfUseForm_submitButton');
 
   // complexity page
+  await this.waitForElement('.ComplexityLevelForm_submitButton');
   const levels = await this.driver.findElements(By.css('.ComplexityLevelForm_submitButton'));
-  await levels[levels.length - 1].click(); // chose most complex level for tests
+  await levels[levels.length - 1].click(); // choose most complex level for tests
 
   // uri prompt page
   await acceptUriPrompt(this);

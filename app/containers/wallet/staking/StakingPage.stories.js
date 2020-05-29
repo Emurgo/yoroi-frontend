@@ -22,7 +22,7 @@ import { getDefaultExplorer } from '../../../domain/Explorer';
 import { buildRoute } from '../../../utils/routing';
 import { ROUTES } from '../../../routes-config';
 import { THEMES } from '../../../themes';
-import { GenericApiError, } from '../../../api/common';
+import { GenericApiError, } from '../../../api/common/errors';
 import { wrapWallet } from '../../../Routes';
 import type {
   GetDelegatedBalanceFunc,
@@ -60,12 +60,12 @@ const genBaseProps: {|
       wallets: {
         selected: request.wallet.publicDeriver,
       },
+      transactions: {
+        getTxRequests: request.lookup.getTransactions,
+        hasAnyPending: request.hasPending || false,
+      },
       substores: {
         ada: {
-          transactions: {
-            getTxRequests: request.lookup.getTransactions,
-            hasAnyPending: request.hasPending || false,
-          },
           delegation: {
             getDelegationRequests: request.lookup.getDelegation,
           },

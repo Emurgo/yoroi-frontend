@@ -29,7 +29,7 @@ import { TxStatusCodes } from '../enums';
 
 import * as Tables from '../tables';
 import {
-  digetForHash,
+  digestForHash,
 } from './utils';
 import { getRowFromKey, getRowIn, StaleStateError, } from '../../utils';
 
@@ -150,7 +150,7 @@ export class GetAddress {
     addressHash: Array<string>,
   ): Promise<$ReadOnlyArray<$ReadOnly<AddressRow>>> {
     const { AddressSeed } = await GetAddress.depTables.GetEncryptionMeta.get(db, tx);
-    const digests = addressHash.map<number>(hash => digetForHash(hash, AddressSeed));
+    const digests = addressHash.map<number>(hash => digestForHash(hash, AddressSeed));
 
     const addressRows = await getRowIn<AddressRow>(
       db, tx,

@@ -14,7 +14,7 @@ import {
 
 import {
   UnusedAddressesError,
-} from '../../../../common';
+} from '../../../../common/errors';
 import {
   WrongPassphraseError,
 } from '../../cardanoCrypto/cryptoErrors';

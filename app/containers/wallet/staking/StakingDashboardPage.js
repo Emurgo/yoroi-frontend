@@ -24,7 +24,7 @@ import type { BoxInfo } from '../../../components/wallet/staking/dashboard/Upcom
 import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard/LessThanExpectedDialog';
 import PoolWarningDialog from '../../../components/wallet/staking/dashboard/PoolWarningDialog';
 import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
-import { digetForHash } from '../../../api/ada/lib/storage/database/primitives/api/utils';
+import { digestForHash } from '../../../api/ada/lib/storage/database/primitives/api/utils';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import { GetPoolInfoApiError } from '../../../api/ada/errors';
 import LocalizableError from '../../../i18n/LocalizableError';
@@ -149,7 +149,7 @@ export default class StakingDashboardPage extends Component<Props> {
                 }
               })
             }}
-        hasAnyPending={this.generated.stores.substores.ada.transactions.hasAnyPending}
+        hasAnyPending={this.generated.stores.transactions.hasAnyPending}
         themeVars={getThemeVars({ theme: 'YoroiModern' })}
         stakePools={stakePools}
         epochProgress={<EpochProgressContainer
@@ -489,7 +489,7 @@ export default class StakingDashboardPage extends Component<Props> {
         return (
           <StakePool
             poolName={name}
-            key={digetForHash(JSON.stringify(meta), 0)}
+            key={digestForHash(JSON.stringify(meta), 0)}
             data={stakePoolMeta}
             selectedExplorer={this.generated.stores.profile.selectedExplorer}
             hash={pool[0]}
@@ -594,7 +594,7 @@ export default class StakingDashboardPage extends Component<Props> {
       new BigNumber(0)
     );
 
-    const txRequests = this.generated.stores.substores.ada.transactions
+    const txRequests = this.generated.stores.transactions
       .getTxRequests(request.publicDeriver);
     const balance = txRequests.requests.getBalanceRequest.result;
 
@@ -743,6 +743,10 @@ export default class StakingDashboardPage extends Component<Props> {
           isOpen: stores.uiNotifications.isOpen,
           getTooltipActiveNotification: stores.uiNotifications.getTooltipActiveNotification,
         },
+        transactions: {
+          hasAnyPending: stores.transactions.hasAnyPending,
+          getTxRequests: stores.transactions.getTxRequests,
+        },
         substores: {
           ada: {
             addresses: {
@@ -757,10 +761,6 @@ export default class StakingDashboardPage extends Component<Props> {
               poolReputation: {
                 result: adaStore.delegation.poolReputation.result,
               },
-            },
-            transactions: {
-              hasAnyPending: adaStore.transactions.hasAnyPending,
-              getTxRequests: adaStore.transactions.getTxRequests,
             },
             delegationTransaction: {
               isStale: adaStore.delegationTransaction.isStale,

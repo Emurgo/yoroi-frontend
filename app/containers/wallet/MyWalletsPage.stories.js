@@ -87,14 +87,14 @@ export const Wallets = (): Node => {
           publicDerivers,
           getPublicKeyCache: lookup.getPublicKeyCache
         },
+        transactions: {
+          getTxRequests: lookup.getTransactions,
+        },
+        walletSettings: {
+          getConceptualWalletSettingsCache: lookup.getConceptualWalletSettingsCache,
+        },
         substores: {
           ada: {
-            transactions: {
-              getTxRequests: lookup.getTransactions,
-            },
-            walletSettings: {
-              getConceptualWalletSettingsCache: lookup.getConceptualWalletSettingsCache,
-            },
             delegation: {
               getDelegationRequests: lookup.getDelegation
             },

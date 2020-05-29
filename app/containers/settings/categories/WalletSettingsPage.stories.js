@@ -11,7 +11,7 @@ import {
   globalKnobs, genDummyWithCache, genSigningWalletWithCache,
   walletLookup,
 } from '../../../../stories/helpers/StoryWrapper';
-import { IncorrectWalletPasswordError } from '../../../api/common';
+import { IncorrectWalletPasswordError } from '../../../api/common/errors';
 import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
 import RemoveWalletDialogContainer from './RemoveWalletDialogContainer';
 import ResyncWalletDialogContainer from './ResyncWalletDialogContainer';
@@ -19,7 +19,7 @@ import { wrapSettings } from '../../../Routes';
 import { mockSettingsProps } from '../Settings.mock';
 import { ROUTES } from '../../../routes-config';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
-import WalletSettingsStore from '../../../stores/base/WalletSettingsStore';
+import WalletSettingsStore from '../../../stores/toplevel/WalletSettingsStore';
 import WalletStore from '../../../stores/toplevel/WalletStore';
 
 export default {

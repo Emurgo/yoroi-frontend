@@ -4,7 +4,7 @@ import type { CsvData } from './index';
 import ExportApi, { COIN_TRACKING_HEADERS } from './index';
 
 test('convert empty rows to CSV-data', () => {
-  const data: CsvData = ExportApi.convertExportRowsToCsv([]);
+  const data: CsvData = ExportApi.convertExportRowsToCsv('ADA', []);
   expect(data).toEqual({
     headers: COIN_TRACKING_HEADERS,
     rows: []
@@ -12,7 +12,7 @@ test('convert empty rows to CSV-data', () => {
 });
 
 test('convert in/out rows to CSV-data', () => {
-  const data: CsvData = ExportApi.convertExportRowsToCsv([
+  const data: CsvData = ExportApi.convertExportRowsToCsv('ADA', [
     { type: 'in', amount: '1.0', fee: '0.1', date: new Date('2010-01-01 22:12:13') },
     { type: 'out', amount: '2.0', fee: '0.2', date: new Date('2020-02-02 22:13:14') },
   ]);

@@ -26,7 +26,7 @@ import { getDefaultExplorer } from '../../../domain/Explorer';
 import { buildRoute } from '../../../utils/routing';
 import { ROUTES } from '../../../routes-config';
 import { THEMES } from '../../../themes';
-import { GenericApiError, } from '../../../api/common';
+import { GenericApiError, } from '../../../api/common/errors';
 import { wrapWallet } from '../../../Routes';
 import type {
   GetDelegatedBalanceFunc,
@@ -104,6 +104,12 @@ const genBaseProps: {|
         isOpen: () => false, // TODO
         getTooltipActiveNotification: () => null, // TODO
       },
+      transactions: {
+        hasAnyPending: request.openDialog == null
+          ? boolean('hasAnyPending', false)
+          : false,
+        getTxRequests: request.lookup.getTransactions,
+      },
       substores: {
         ada: {
           addresses: {
@@ -124,12 +130,6 @@ const genBaseProps: {|
             poolReputation: {
               result: request.poolReputation || (null: any)
             },
-          },
-          transactions: {
-            hasAnyPending: request.openDialog == null
-              ? boolean('hasAnyPending', false)
-              : false,
-            getTxRequests: request.lookup.getTransactions,
           },
           delegationTransaction: request.delegationTransaction || {
             isStale: false,

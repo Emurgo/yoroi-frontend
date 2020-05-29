@@ -10,7 +10,8 @@ import ReceiveNavButton from './ReceiveNavButton';
 import type {
   $npm$ReactIntl$IntlFormat,
 } from 'react-intl';
-import type { AddressTypeName } from '../../../stores/base/AddressesStore';
+import type { AddressTypeName } from '../../../stores/toplevel/AddressesStore';
+import { AddressStoreTypes } from '../../../types/AddressFilterTypes';
 
 export type Props = {|
   +addressTypes: Array<{|
@@ -38,9 +39,11 @@ export default class ReceiveNavigation extends Component<Props> {
             !type.isHidden && <ReceiveNavButton
               key={type.name.stable}
               className={type.name.stable}
-              icon={type.name.stable === 'internal' || type.name.stable === 'mangled'
-                ? AttentionIcon
-                : undefined
+              icon={
+                type.name.stable === AddressStoreTypes.internal ||
+                type.name.stable === AddressStoreTypes.mangled
+                  ? AttentionIcon
+                  : undefined
               }
               label={intl.formatMessage(type.name.display)}
               isActive={type.isActiveStore}

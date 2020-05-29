@@ -10,7 +10,7 @@ import URILandingDialog from '../../components/uri/URILandingDialog';
 import URIVerifyDialog from '../../components/uri/URIVerifyDialog';
 import URIInvalidDialog from '../../components/uri/URIInvalidDialog';
 
-import { getAdaCurrencyMeta } from '../../api/ada/index';
+import AdaApi from '../../api/ada/index';
 
 export type GeneratedData = typeof URILandingDialogContainer.prototype.generated;
 
@@ -64,7 +64,7 @@ export default class URILandingDialogContainer extends Component<Props> {
     if (!this.showDisclaimer) {
       return (
         <URIVerifyDialog
-          primaryTicker={getAdaCurrencyMeta().primaryTicker}
+          primaryTicker={AdaApi.getCurrencyMeta().primaryTicker}
           onSubmit={this.onVerifiedSubmit}
           onBack={this.toggleShowDisclaimer}
           onCancel={this.onCancel}

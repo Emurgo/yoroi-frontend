@@ -35,7 +35,7 @@ function clearBit(
  * On my macbook pro I get ~4hashes/second for a v2 address
  * I get about 1 collision every 500,000 addresses (so collisions are rare but possible)
  */
-export function digetForHash(
+export function digestForHash(
   str: string,
   seed: number,
 ): number {

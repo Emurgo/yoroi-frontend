@@ -11,7 +11,8 @@ import CopyableAddress from '../widgets/CopyableAddress';
 import RawHash from '../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../domain/Explorer';
-import type { StandardAddress } from '../../stores/base/AddressesStore';
+import type { StandardAddress, AddressFilterKind } from '../../types/AddressFilterTypes';
+import { AddressFilter } from '../../types/AddressFilterTypes';
 import environment from '../../environment';
 import type { Notification } from '../../types/notificationType';
 import type {
@@ -54,24 +55,14 @@ type Props = {|
   +notification: ?Notification,
   +onVerifyAddress: {| address: string, path: void | BIP32Path |} => Promise<void>,
   +onGeneratePaymentURI: void | (string => void),
-|};
-
-type State = {|
-  showUsed: boolean,
+  +setFilter: AddressFilterKind => void,
+  +activeFilter: AddressFilterKind,
 |};
 
 @observer
-export default class WalletReceive extends Component<Props, State> {
+export default class WalletReceive extends Component<Props> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
-  };
-
-  state: State = {
-    showUsed: true,
-  };
-
-  toggleUsedAddresses: void => void = () => {
-    this.setState(prevState => ({ showUsed: !prevState.showUsed }));
   };
 
   render(): Node {
@@ -81,20 +72,31 @@ export default class WalletReceive extends Component<Props, State> {
       onCopyAddressTooltip, notification,
     } = this.props;
     const { intl } = this.context;
-    const { showUsed } = this.state;
 
     const walletReceiveContent = (
       <>
         <div className={styles.generatedAddresses}>
           <h2>
             {intl.formatMessage(messages.generatedAddressesSectionTitle)}
-            <button type="button" onClick={this.toggleUsedAddresses}>
-              {intl.formatMessage(messages[showUsed ? 'hideUsedLabel' : 'showUsedLabel'])}
+            <button
+              type="button"
+              onClick={() => {
+                if (this.props.activeFilter === AddressFilter.None) {
+                  this.props.setFilter(AddressFilter.Unused);
+                }
+                if (this.props.activeFilter === AddressFilter.Unused) {
+                  this.props.setFilter(AddressFilter.None);
+                }
+              }}
+            >
+              {intl.formatMessage(messages[
+                this.props.activeFilter === AddressFilter.None
+                  ? 'hideUsedLabel'
+                  : 'showUsedLabel'
+              ])}
             </button>
           </h2>
           {walletAddresses.map((address, index) => {
-            const isAddressVisible = address.isUsed === false || showUsed;
-            if (!isAddressVisible) return null;
             const addressClasses = classnames([
               'generatedAddress-' + (index + 1),
               styles.walletAddress,

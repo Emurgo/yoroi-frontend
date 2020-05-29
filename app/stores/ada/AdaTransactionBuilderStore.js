@@ -151,7 +151,7 @@ export default class AdaTransactionBuilderStore extends Store {
       this.shouldSendAll,
       this.stores.wallets.selected,
       // update if tx history changes
-      this.stores.substores.ada.transactions.hash,
+      this.stores.transactions.hash,
     ],
     async () => this._updateTxBuilder(),
   )

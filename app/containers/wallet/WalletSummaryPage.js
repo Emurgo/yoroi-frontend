@@ -56,7 +56,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
   render(): null | Node {
     const { intl } = this.context;
     const actions = this.generated.actions;
-    const { transactions, addresses } = this.generated.stores.substores.ada;
+    const { addresses } = this.generated.stores;
     const { wallets } = this.generated.stores;
     const {
       hasAny,
@@ -68,7 +68,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
       unconfirmedAmount,
       isExporting,
       exportError,
-    } = transactions;
+    } = this.generated.stores.transactions;
     const publicDeriver = wallets.selected;
     let walletTransactions = null;
     // Guard against potential null values
@@ -82,7 +82,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
     const {
       exportTransactionsToFile,
       closeExportTransactionDialog,
-    } = actions[selectedAPI.type].transactions;
+    } = actions.transactions;
 
     const isLoadingTx = (
       !recentTransactionsRequest.wasExecuted || recentTransactionsRequest.isExecuting
@@ -117,7 +117,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
       const { limit } = searchOptions;
       const noTransactionsFoundLabel = intl.formatMessage(globalMessages.noTransactionsFound);
       if (!recentTransactionsRequest.wasExecuted || hasAny) {
-        const { assuranceMode } = this.generated.stores.substores.ada.walletSettings
+        const { assuranceMode } = this.generated.stores.walletSettings
           .getPublicDeriverSettingsCache(publicDeriver);
         walletTransactions = (
           <WalletTransactionsList
@@ -128,7 +128,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
             selectedExplorer={this.generated.stores.profile.selectedExplorer}
             isLoadingTransactions={isLoadingTx}
             hasMoreToLoad={totalAvailable > limit}
-            onLoadMore={() => actions.ada.transactions.loadMoreTransactions.trigger(publicDeriver)}
+            onLoadMore={() => actions.transactions.loadMoreTransactions.trigger(publicDeriver)}
             assuranceMode={assuranceMode}
             shouldHideBalance={profile.shouldHideBalance}
             onAddMemo={(transaction) => this.showMemoDialog({
@@ -343,7 +343,6 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
       throw new Error(`${nameof(WalletSummaryPage)} no way to generated props`);
     }
     const { stores, actions } = this.props;
-    const adaStores = stores.substores.ada;
     return Object.freeze({
       stores: {
         profile: {
@@ -375,42 +374,37 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
           getIdForWallet: stores.memos.getIdForWallet,
           txMemoMap: stores.memos.txMemoMap,
         },
-        substores: {
-          ada: {
-            addresses: {
-              getStoresForWallet: (publicDeriver: PublicDeriver<>) => {
-                const substore = stores.substores.ada;
-                const addressStores = substore.addresses.getStoresForWallet(publicDeriver);
-                const functionalitySubset: Array<{|
-                  +route: string,
-                  +displayName: $Exact<$npm$ReactIntl$MessageDescriptor>,
-                  +all: $ReadOnlyArray<$ReadOnly<{ ...Address, ... }>>,
-                |}> = addressStores.map(addressStore => ({
-                  route: addressStore.route,
-                  displayName: addressStore.name.display,
-                  all: addressStore.all,
-                }));
-                return functionalitySubset;
-              },
-            },
-            walletSettings: {
-              getPublicDeriverSettingsCache: adaStores.walletSettings.getPublicDeriverSettingsCache,
-            },
-            transactions: {
-              hasAny: adaStores.transactions.hasAny,
-              totalAvailable: adaStores.transactions.totalAvailable,
-              recent: adaStores.transactions.recent,
-              searchOptions: adaStores.transactions.searchOptions,
-              recentTransactionsRequest: {
-                isExecuting: adaStores.transactions.recentTransactionsRequest.isExecuting,
-                wasExecuted: adaStores.transactions.recentTransactionsRequest.wasExecuted,
-              },
-              lastSyncInfo: adaStores.transactions.lastSyncInfo,
-              unconfirmedAmount: adaStores.transactions.unconfirmedAmount,
-              isExporting: adaStores.transactions.isExporting,
-              exportError: adaStores.transactions.exportError,
-            },
+        transactions: {
+          hasAny: stores.transactions.hasAny,
+          totalAvailable: stores.transactions.totalAvailable,
+          recent: stores.transactions.recent,
+          searchOptions: stores.transactions.searchOptions,
+          recentTransactionsRequest: {
+            isExecuting: stores.transactions.recentTransactionsRequest.isExecuting,
+            wasExecuted: stores.transactions.recentTransactionsRequest.wasExecuted,
           },
+          lastSyncInfo: stores.transactions.lastSyncInfo,
+          unconfirmedAmount: stores.transactions.unconfirmedAmount,
+          isExporting: stores.transactions.isExporting,
+          exportError: stores.transactions.exportError,
+        },
+        addresses: {
+          getStoresForWallet: (publicDeriver: PublicDeriver<>) => {
+            const addressStores = stores.addresses.getStoresForWallet(publicDeriver);
+            const functionalitySubset: Array<{|
+              +route: string,
+              +displayName: $Exact<$npm$ReactIntl$MessageDescriptor>,
+              +all: $ReadOnlyArray<$ReadOnly<{ ...Address, ... }>>,
+            |}> = addressStores.map(addressStore => ({
+              route: addressStore.route,
+              displayName: addressStore.name.display,
+              all: addressStore.all,
+            }));
+            return functionalitySubset;
+          },
+        },
+        walletSettings: {
+          getPublicDeriverSettingsCache: stores.walletSettings.getPublicDeriverSettingsCache,
         },
       },
       actions: {
@@ -434,17 +428,15 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
           deleteTxMemo: { trigger: actions.memos.deleteTxMemo.trigger },
           selectTransaction: { trigger: actions.memos.selectTransaction.trigger },
         },
-        ada: {
-          transactions: {
-            exportTransactionsToFile: {
-              trigger: actions.ada.transactions.exportTransactionsToFile.trigger
-            },
-            closeExportTransactionDialog: {
-              trigger: actions.ada.transactions.closeExportTransactionDialog.trigger
-            },
-            loadMoreTransactions: {
-              trigger: actions.transactions.loadMoreTransactions.trigger
-            },
+        transactions: {
+          exportTransactionsToFile: {
+            trigger: actions.transactions.exportTransactionsToFile.trigger
+          },
+          closeExportTransactionDialog: {
+            trigger: actions.transactions.closeExportTransactionDialog.trigger
+          },
+          loadMoreTransactions: {
+            trigger: actions.transactions.loadMoreTransactions.trigger
           },
         },
       },

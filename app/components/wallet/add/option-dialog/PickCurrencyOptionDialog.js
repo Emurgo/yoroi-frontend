@@ -9,6 +9,7 @@ import globalMessages from '../../../../i18n/global-messages';
 import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import OptionBlock from '../../../widgets/options/OptionBlock';
+import environment from '../../../../environment';
 
 import styles from '../../../widgets/options/OptionListWrapperStyle.scss';
 

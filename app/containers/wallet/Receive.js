@@ -6,7 +6,7 @@ import { observer } from 'mobx-react';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import ReceiveWithNavigation from '../../components/wallet/layouts/ReceiveWithNavigation';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { AddressTypeName } from '../../stores/base/AddressesStore';
+import type { AddressTypeName } from '../../stores/toplevel/AddressesStore';
 
 export type GeneratedData = typeof Receive.prototype.generated;
 
@@ -25,7 +25,7 @@ export default class Receive extends Component<Props> {
   render(): Node {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) throw new Error(`${nameof(Receive)} no public deriver`);
-    const { addresses } = this.generated.stores.substores.ada;
+    const { addresses } = this.generated.stores;
     return (
       <ReceiveWithNavigation
         addressTypes={addresses.getStoresForWallet(publicDeriver)}
@@ -48,26 +48,21 @@ export default class Receive extends Component<Props> {
         wallets: {
           selected: stores.wallets.selected,
         },
-        substores: {
-          ada: {
-            addresses: {
-              getStoresForWallet: (publicDeriver: PublicDeriver<>) => {
-                const substore = stores.substores.ada;
-                const addressStores = substore.addresses.getStoresForWallet(publicDeriver);
-                const functionalitySubset: Array<{|
-                  +isActiveStore: boolean,
-                  +isHidden: boolean,
-                  +setAsActiveStore: void => void,
-                  +name: AddressTypeName,
-                |}> = addressStores.map(addressStore => ({
-                  isHidden: addressStore.isHidden,
-                  isActiveStore: addressStore.isActiveStore,
-                  setAsActiveStore: () => addressStore.setAsActiveStore(publicDeriver),
-                  name: addressStore.name,
-                }));
-                return functionalitySubset;
-              },
-            },
+        addresses: {
+          getStoresForWallet: (publicDeriver: PublicDeriver<>) => {
+            const addressStores = stores.addresses.getStoresForWallet(publicDeriver);
+            const functionalitySubset: Array<{|
+              +isActiveStore: boolean,
+              +isHidden: boolean,
+              +setAsActiveStore: void => void,
+              +name: AddressTypeName,
+            |}> = addressStores.map(addressStore => ({
+              isHidden: addressStore.isHidden,
+              isActiveStore: addressStore.isActiveStore,
+              setAsActiveStore: () => addressStore.setAsActiveStore(publicDeriver),
+              name: addressStore.name,
+            }));
+            return functionalitySubset;
           },
         },
       },

@@ -24,7 +24,7 @@ import type {
   TxStatusCodesType,
 } from '../enums';
 import {
-  digetForHash,
+  digestForHash,
 } from './utils';
 import {
   addNewRowToTable,
@@ -136,7 +136,7 @@ export class ModifyAddress {
     |}>,
   ): Promise<Array<$ReadOnly<AddressRow>>> {
     const { AddressSeed } = await ModifyAddress.depTables.GetEncryptionMeta.get(db, tx);
-    const digests = address.map<number>(meta => digetForHash(meta.data, AddressSeed));
+    const digests = address.map<number>(meta => digestForHash(meta.data, AddressSeed));
 
     const result = await addBatchToTable<AddressInsert, AddressRow>(
       db, tx,

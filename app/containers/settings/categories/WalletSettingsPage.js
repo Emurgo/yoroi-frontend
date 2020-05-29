@@ -149,7 +149,7 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
     }
     const { actions, stores, } = this.props;
     const settingActions = actions.ada.walletSettings;
-    const settingStore = this.props.stores.substores.ada.walletSettings;
+    const settingStore = this.props.stores.walletSettings;
     return Object.freeze({
       stores: {
         profile: {

@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import ReceiveNavigation from '../navigation/ReceiveNavigation';
 import styles from './ReceiveWithNavigation.scss';
-import type { AddressTypeName } from '../../../stores/base/AddressesStore';
+import type { AddressTypeName } from '../../../stores/toplevel/AddressesStore';
 
 export type Props = {|
   +children?: Node,
