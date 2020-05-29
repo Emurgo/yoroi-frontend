@@ -148,7 +148,7 @@
   "profile.complexityLevel.advanced.description": "ブロックチェーン、およびブロックチェーンやウォレットソフトウェアにおける暗号の働きについて、ある程度理解しています。これらに対する理解が必要となる、高度なオプションや機能が表示されることに問題はありません。",
   "profile.complexityLevel.selected.label": "表示情報の詳細レベルは、現在以下の通り設定されています",
   "profile.complexityLevel.simple": "簡易な表示",
-  "profile.complexityLevel.simple.description": "簡単に設定を行えます。ブロックチェーンの知識は問いません。初心者の方や、簡単に設定したい方におすすめです。",
+  "profile.complexityLevel.simple.description": "シンプルな表示設定でご利用いただけます。ブロックチェーンの予備知識に不安があるという方でも安心です。初心者の方や、簡単に設定したい方におすすめです。",
   "profile.complexityLevel.subtitle": "Understanding blockchain can be difficult, which is why we will try and keep the interface as simple as possible for you",
   "profile.complexityLevel.title": "設定の詳細レベル",
   "profile.languageSelect.form.languageSelectLabel": "使用する言語を選んでください",
