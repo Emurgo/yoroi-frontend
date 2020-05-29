@@ -608,7 +608,7 @@
   "wallet.transaction.certificate.PoolUpdate": "Pool update",
   "wallet.transaction.certificate.StakeDelegation": "Stake delegation",
   "wallet.transaction.certificateLabel": "Sertifika",
-  "wallet.transaction.confirmations": "Onaylama",
+  "wallet.transaction.confirmations": "Onaylamalar",
   "wallet.transaction.conversion.rate": "Conversion rate",
   "wallet.transaction.export.dialog.exportButton.label": "Export",
   "wallet.transaction.export.dialog.infoText1": "The entire transaction history within your wallet will be exported to a file.",
