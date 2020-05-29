@@ -472,7 +472,7 @@
   "wallet.navigation.delegationAdvance": "Delegation (Advance)",
   "wallet.navigation.delegationDashboard": "Dashboard",
   "wallet.navigation.delegationSimple": "Delegation (Simple)",
-  "wallet.navigation.receive": "Receive",
+  "wallet.navigation.receive": "Alıcı",
   "wallet.navigation.send": "Gönder",
   "wallet.navigation.transactions": "İşlemler",
   "wallet.nowallet.subtitle": "Please choose a wallet from the top-right dropdown",
