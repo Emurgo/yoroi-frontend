@@ -150,7 +150,7 @@
   "profile.complexityLevel.simple": "簡易な設定",
   "profile.complexityLevel.simple.description": "簡単に設定を行えます。ブロックチェーンの知識は問いません。初心者の方や、簡単に設定したい方におすすめです。",
   "profile.complexityLevel.subtitle": "Understanding blockchain can be difficult, which is why we will try and keep the interface as simple as possible for you",
-  "profile.complexityLevel.title": "Level of Interface Complexity",
+  "profile.complexityLevel.title": "設定の詳細レベル",
   "profile.languageSelect.form.languageSelectLabel": "使用する言語を選んでください",
   "profile.languageSelect.intro": "ヨロイShelleyテストネットを使用しています",
   "profile.languageSelect.title": "言語の選択",
