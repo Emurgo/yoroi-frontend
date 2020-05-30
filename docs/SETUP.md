@@ -47,12 +47,10 @@ Although the real `pem` is not uploaded to Github for security reasons, you can 
 
 ```
 npm run keygen
-mv key.pem testnet.pem
-npm run keygen
-mv key.pem mainnet.pem
+mv key.pem pem_name_here.pem
 ```
 
-Notably, I  recommend running this for `testnet` and `mainnet`.
+Notably, I  recommend running this for `production-key`, `shelley-production.pem` and `nightly-key.pem`.
 
 ### Firefox
 
