@@ -610,10 +610,10 @@
   "wallet.transaction.certificateLabel": "Sertifika",
   "wallet.transaction.confirmations": "Onaylamalar",
   "wallet.transaction.conversion.rate": "Conversion rate",
-  "wallet.transaction.export.dialog.exportButton.label": "Export",
+  "wallet.transaction.export.dialog.exportButton.label": "Dışarı Aktar",
   "wallet.transaction.export.dialog.infoText1": "The entire transaction history within your wallet will be exported to a file.",
   "wallet.transaction.export.dialog.title": "Export transactions to file",
-  "wallet.transaction.export.exportIcon.tooltip": "Export to file",
+  "wallet.transaction.export.exportIcon.tooltip": "Dosyaya Aktar",
   "wallet.transaction.fee": "Ücret",
   "wallet.transaction.memo.add.dialog.actions.submit": "Ekle",
   "wallet.transaction.memo.delete.dialog.actions.delete": "Sil",
@@ -651,10 +651,10 @@
   "yoroiTransfer.start.instructions.mnemonic-15": "15-word recovery phrase",
   "yoroiTransfer.start.instructions.yoroiPaper": "Yoroi Kağıt Cüzdan",
   "yoroiTransfer.successPage.text": "Your funds were successfully transferred.",
-  "yoroiTransfer.successPage.title": "success",
+  "yoroiTransfer.successPage.title": "Başarılı",
   "yoroiTransfer.summary.addressFrom.subLabel": "Cüzdan Adresleri",
   "yoroiTransfer.waiting.checkingAddresses.generatingTx": "Transfer İşlemi Oluşturuluyor",
   "yoroiTransfer.waiting.progressInfo.checkingAddresses": "Checking addresses funds",
   "yoroiTransfer.waiting.progressInfo.restoringAddresses": "Adresler Getiriliyor",
-  "yoroiTransfer.waiting.title.label": "Cüzdan Geri Yükleniyor"
+  "yoroiTransfer.waiting.title.label": "Wallet is being restored"
 }
