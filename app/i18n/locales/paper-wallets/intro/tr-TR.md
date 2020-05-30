@@ -1,6 +1,6 @@
 # Kağıt Cüzdanlar
 
-A **"Paper Wallet"** is a special document, containing secret mnemonics words and a small set of addresses. When a paper wallet is created **it is NOT stored by Yoroi**. The generated PDF document is the only copy of this wallet in existence.
+Bir **"Kağıt Cüzdan"** özel bir belgedir. gizli anımsatıcı kelimeler ve küçük bir adres kümesi içerir. Bir kağıt cüzdan oluşturulduğunda **Yoroi tarafından saklanmaz**. Oluşturulan bu PDF belgesi, bu cüzdanın var olan tek kopyasıdır.
 
 You can use a paper wallet to receive coins using the pre-generated addresses. You can restore your paper wallet at any time into Yoroi to access the funds. However, you should stop using a paper wallet after you restore its funds as it will no longer be a "cold" wallet.
 
