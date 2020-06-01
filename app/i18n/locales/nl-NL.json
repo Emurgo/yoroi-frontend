@@ -548,7 +548,7 @@
   "wallet.send.form.receiver.label": "Ontvanger",
   "wallet.send.form.sendAll.checkboxLabel": "Verstuur alles {currency}",
   "wallet.send.form.sendingIsDisabled": "Kan geen nieuwe transactie versturen als nog een lopende transactie  \"In afwachting\" is.",
-  "wallet.send.form.title.hint": "Voorbeeld: \"Betaling AnoekSj Smartphone 30-07-20\"",
+  "wallet.send.form.title.hint": "Voorbeeld: \"Betaling AnoekSj voor onkosten 30 juli\"",
   "wallet.send.form.title.label": "Titel",
   "wallet.send.form.transactionFeeError": "Niet genoeg Ada voor de transactievergoeding. Probeer een lager bedrag te sturen.",
   "wallet.send.ledger.confirmationDialog.info.line.1": "Na uw Ledger apparaat op de USB poort te hebben aangesloten, druk op de \"Verbinden\" knop.",
