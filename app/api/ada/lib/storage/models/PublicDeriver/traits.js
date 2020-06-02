@@ -104,7 +104,7 @@ import { scanCip1852Account } from '../../../../restoration/shelley/scan';
 
 import {
   UnusedAddressesError,
-} from '../../../../../common';
+} from '../../../../../common/errors';
 
 import { ChainDerivations, } from  '../../../../../../config/numbersConfig';
 

@@ -2,7 +2,7 @@
 
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import type { GeneratedData } from './Receive';
-import type { AddressTypeName } from '../../stores/base/AddressesStore';
+import type { AddressTypeName } from '../../stores/toplevel/AddressesStore';
 
 export const mockReceiveProps: {|
   selected: null | PublicDeriver<>,
@@ -18,12 +18,8 @@ export const mockReceiveProps: {|
       wallets: {
         selected: request.selected,
       },
-      substores: {
-        ada: {
-          addresses: {
-            getStoresForWallet: request.getStoresForWallet,
-          },
-        },
+      addresses: {
+        getStoresForWallet: request.getStoresForWallet,
       },
     },
   },

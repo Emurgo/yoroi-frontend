@@ -1,16 +1,14 @@
 // @flow
 import type { lf$Database, } from 'lovefield';
+import CommonApi from './common/index';
 import AdaApi from './ada/index';
 import LocalStorageApi from './localStorage/index';
 import ExternalStorageApi from './externalStorage/index';
 import ExportApi from './export/index';
 import type { CoinTypesT } from '../config/numbersConfig';
 import { CoinTypes } from '../config/numbersConfig';
-
-export const ApiOptions = Object.freeze({
-  ada: 'ada',
-});
-export type ApiOptionType = $Values<typeof ApiOptions>;
+import type { ApiOptionType } from './types';
+import { ApiOptions } from './types';
 
 export const getApiForCoinType: CoinTypesT => ApiOptionType = (type) => {
   if (type === CoinTypes.CARDANO) {
@@ -20,6 +18,7 @@ export const getApiForCoinType: CoinTypesT => ApiOptionType = (type) => {
 };
 
 export type Api = {|
+  common: CommonApi,
   ada: AdaApi,
   localStorage: LocalStorageApi,
   externalStorage: ExternalStorageApi,
@@ -27,6 +26,7 @@ export type Api = {|
 |};
 
 export const setupApi: void => Promise<Api> = async () => ({
+  common: new CommonApi(),
   ada: new AdaApi(),
   localStorage: new LocalStorageApi(),
   externalStorage: new ExternalStorageApi(),

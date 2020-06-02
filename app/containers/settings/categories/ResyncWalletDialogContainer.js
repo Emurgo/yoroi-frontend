@@ -81,7 +81,7 @@ export default class ResyncWalletDialogContainer extends Component<Props> {
     }
     const { actions, stores } = this.props;
     const settingActions = actions.ada.walletSettings;
-    const settingStore = stores.substores.ada.walletSettings;
+    const settingStore = stores.walletSettings;
     return Object.freeze({
       stores: {
         walletSettings: {

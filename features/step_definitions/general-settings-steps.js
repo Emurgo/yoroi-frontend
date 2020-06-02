@@ -112,7 +112,15 @@ Then(/^The selected level is "([^"]*)"$/, async function (level) {
   await this.waitUntilText('.currentLevel', level.toUpperCase());
 });
 
+Then(/^I select the most complex level simplest level$/, async function () {
+  await this.waitForElement('.ComplexityLevelForm_submitButton');
+  const levels = await this.driver.findElements(By.css('.ComplexityLevelForm_submitButton'));
+  await levels[levels.length - 1].click(); // choose most complex level for tests
+});
+
+
 Then(/^I select the simplest level$/, async function () {
+  await this.waitForElement('.ComplexityLevelForm_submitButton');
   const levels = await this.driver.findElements(By.css('.ComplexityLevelForm_submitButton'));
   await levels[0].click(); // chose the simplest
 });

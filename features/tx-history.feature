@@ -82,5 +82,5 @@ Feature: Txs History
     Then I expand the top transaction
     And The number of confirmations of the top tx is 199
     Then A successful tx gets sent from my wallet from another client
-    Given I sleep for 500
+    Given I sleep for 1000
     And The number of confirmations of the top tx is 201

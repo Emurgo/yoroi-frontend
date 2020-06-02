@@ -4,8 +4,7 @@
 
 import { observable, action } from 'mobx';
 import AdaWalletsStore from './AdaWalletsStore';
-import TransactionsStore from './AdaTransactionsStore';
-import AdaWalletSettingsStore from './AdaWalletSettingsStore';
+import AdaTransactionsStore from './AdaTransactionsStore';
 import AddressesStore from './AdaAddressesStore';
 import DaedalusTransferStore from './DaedalusTransferStore';
 import YoroiTransferStore from './YoroiTransferStore';
@@ -25,11 +24,10 @@ import type { ActionsMap } from '../../actions/index';
 import type { Api } from '../../api/index';
 import type { StoresMap } from '../index';
 
-export const adaStoreClasses = {
+export const adaStoreClasses = Object.freeze({
   wallets: AdaWalletsStore,
   paperWallets: PaperWalletCreateStore,
-  transactions: TransactionsStore,
-  walletSettings: AdaWalletSettingsStore,
+  transactions: AdaTransactionsStore,
   addresses: AddressesStore,
   daedalusTransfer: DaedalusTransferStore,
   yoroiTransfer: YoroiTransferStore,
@@ -44,13 +42,12 @@ export const adaStoreClasses = {
   delegationTransaction: DelegationTransactionStore,
   delegation: DelegationStore,
   time: TimeStore,
-};
+});
 
 export type AdaStoresMap = {|
   wallets: AdaWalletsStore,
   paperWallets: PaperWalletCreateStore,
-  transactions: TransactionsStore,
-  walletSettings: AdaWalletSettingsStore,
+  transactions: AdaTransactionsStore,
   addresses: AddressesStore,
   daedalusTransfer: DaedalusTransferStore,
   yoroiTransfer: YoroiTransferStore,
@@ -71,7 +68,6 @@ const adaStores: WithNullableFields<AdaStoresMap> = observable({
   wallets: null,
   paperWallets: null,
   transactions: null,
-  walletSettings: null,
   addresses: null,
   daedalusTransfer: null,
   yoroiTransfer: null,

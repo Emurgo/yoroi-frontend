@@ -62,7 +62,7 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Props
     }
     const { stores, actions } = this.props;
     const settingActions = actions.ada.walletSettings;
-    const settingStores = this.props.stores.substores.ada.walletSettings;
+    const settingStores = this.props.stores.walletSettings;
     return Object.freeze({
       stores: {
         walletSettings: {

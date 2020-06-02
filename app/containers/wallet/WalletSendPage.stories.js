@@ -92,13 +92,15 @@ const genBaseProps: {|
         return false;
       },
     },
+    transactions: {
+      hasAnyPending: request.dialogInfo == null
+        ? boolean('hasAnyPending', false)
+        : false,
+    },
     substores: {
       ada: {
         transactions: {
           validateAmount: amount => Promise.resolve(isValidAmountInLovelaces(amount)),
-          hasAnyPending: request.dialogInfo == null
-            ? boolean('hasAnyPending', false)
-            : false,
         },
         ledgerSend: request.hwSend || {
           isActionProcessing: false,

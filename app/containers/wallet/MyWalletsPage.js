@@ -80,7 +80,7 @@ export default class MyWalletsPage extends Component<Props> {
     const wallets = this.generated.stores.wallets.publicDerivers;
 
     let utxoTotal = new BigNumber(0);
-    const walletBalances = wallets.map(wallet => stores.substores.ada.transactions
+    const walletBalances = wallets.map(wallet => stores.transactions
       .getTxRequests(wallet).requests.getBalanceRequest.result
       ?.dividedBy(
         LOVELACES_PER_ADA
@@ -146,7 +146,7 @@ export default class MyWalletsPage extends Component<Props> {
   */
   generateRow: PublicDeriver<> => Node = (publicDeriver) => {
     const parent = publicDeriver.getParent();
-    const settingsCache = this.generated.stores.substores.ada.walletSettings
+    const settingsCache = this.generated.stores.walletSettings
       .getConceptualWalletSettingsCache(parent);
 
     const walletSumCurrencies = (
@@ -157,7 +157,7 @@ export default class MyWalletsPage extends Component<Props> {
         />
       </>
     );
-    const txRequests = this.generated.stores.substores.ada.transactions
+    const txRequests = this.generated.stores.transactions
       .getTxRequests(publicDeriver);
     const balance = txRequests.requests.getBalanceRequest.result
       ?.dividedBy(LOVELACES_PER_ADA) || null;
@@ -213,7 +213,7 @@ export default class MyWalletsPage extends Component<Props> {
     const addressesLength = walletAddresses.length;
 
     const parent = publicDeriver.getParent();
-    const settingsCache = this.generated.stores.substores.ada.walletSettings
+    const settingsCache = this.generated.stores.walletSettings
       .getConceptualWalletSettingsCache(parent);
 
     const withPubKey = asGetPublicKey(publicDeriver);
@@ -289,15 +289,15 @@ export default class MyWalletsPage extends Component<Props> {
           publicDerivers: stores.wallets.publicDerivers,
           getPublicKeyCache: stores.wallets.getPublicKeyCache,
         },
+        transactions: {
+          getTxRequests: stores.transactions.getTxRequests,
+        },
+        walletSettings: {
+          getConceptualWalletSettingsCache:
+            stores.walletSettings.getConceptualWalletSettingsCache,
+        },
         substores: {
           ada: {
-            transactions: {
-              getTxRequests: stores.substores.ada.transactions.getTxRequests,
-            },
-            walletSettings: {
-              getConceptualWalletSettingsCache:
-                stores.substores.ada.walletSettings.getConceptualWalletSettingsCache,
-            },
             delegation: {
               getDelegationRequests: stores.substores.ada.delegation.getDelegationRequests,
             },

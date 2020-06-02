@@ -262,7 +262,7 @@ export default class NavBarContainer extends Component<Props> {
           currentRoute: stores.app.currentRoute,
         },
         walletSettings: {
-          getConceptualWalletSettingsCache: stores.substores.ada.walletSettings
+          getConceptualWalletSettingsCache: stores.walletSettings
             .getConceptualWalletSettingsCache,
         },
         wallets: {
@@ -277,7 +277,7 @@ export default class NavBarContainer extends Component<Props> {
           getDelegationRequests: stores.substores.ada.delegation.getDelegationRequests,
         },
         transactions: {
-          getTxRequests: stores.substores.ada.transactions.getTxRequests,
+          getTxRequests: stores.transactions.getTxRequests,
         },
       },
       actions: {

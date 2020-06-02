@@ -25,7 +25,7 @@ import {
 import globalMessages from '../../i18n/global-messages';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { asHasUtxoChains } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import type { StandardAddress, AddressStoreKind, } from '../../stores/base/AddressesStore';
+import type { StandardAddress, AddressStoreKind, } from '../../types/AddressFilterTypes';
 import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
 import type { GeneratedData as UnmangleTxDialogContainerData } from '../transfer/UnmangleTxDialogContainer';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -33,6 +33,7 @@ import type {
   BIP32Path
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import type { SelectedApiType } from '../../stores/toplevel/ProfileStore';
+import { AddressStoreTypes } from '../../types/AddressFilterTypes';
 
 export type GeneratedData = typeof WalletReceivePage.prototype.generated;
 
@@ -50,6 +51,7 @@ export default class WalletReceivePage extends Component<Props> {
   componentWillUnmount() {
     this.closeNotification();
     this.resetErrors();
+    this.generated.actions.addresses.resetFilter.trigger();
   }
 
   getSelectedApi: void => SelectedApiType = () => {
@@ -66,13 +68,13 @@ export default class WalletReceivePage extends Component<Props> {
       this.generated.actions.dialogs.open.trigger({
         dialog: LoadingSpinner,
       });
-      await this.generated.actions.ada.addresses.createAddress.trigger(publicDeriver);
+      await this.generated.actions.addresses.createAddress.trigger(publicDeriver);
       this.generated.actions.dialogs.closeActiveDialog.trigger();
     }
   };
 
   resetErrors: void => void = () => {
-    this.generated.actions.ada.addresses.resetErrors.trigger();
+    this.generated.actions.addresses.resetErrors.trigger();
   };
 
   closeNotification: void => void = () => {
@@ -88,12 +90,10 @@ export default class WalletReceivePage extends Component<Props> {
     const actions = this.generated.actions;
     const { uiNotifications, uiDialogs, profile } = this.generated.stores;
     const {
-      addresses,
       hwVerifyAddress,
-      transactions
     } = this.generated.stores.substores.ada;
     const publicDeriver = this.generated.stores.wallets.selected;
-    const { validateAmount } = transactions;
+    const { validateAmount } = this.generated.stores.transactions;
     const selectedAPI = this.getSelectedApi();
 
     // Guard against potential null values
@@ -104,7 +104,7 @@ export default class WalletReceivePage extends Component<Props> {
     if (!withChains) throw new Error(`${nameof(WalletReceivePage)} only available for account-level wallets`);
     const addressTypeStore = this.getTypeStore(publicDeriver);
 
-    if (!addressTypeStore.wasExecuted || !addressTypeStore.hasAny) {
+    if (!addressTypeStore.wasExecuted || addressTypeStore.all.length === 0) {
       return (
         <VerticallyCenteredLayout>
           <LoadingSpinner />
@@ -113,11 +113,9 @@ export default class WalletReceivePage extends Component<Props> {
     }
 
     // get info about the latest address generated for special rendering
-    const lastAddress = addressTypeStore.last;
+    const lastAddress = addressTypeStore.all[addressTypeStore.all.length - 1];
     const walletAddress = lastAddress != null ? lastAddress.address : '';
     const isWalletAddressUsed = lastAddress != null ? lastAddress.isUsed === true : false;
-
-    const walletAddresses = addressTypeStore.all.slice().reverse();
 
     const tooltipNotification = {
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
@@ -144,10 +142,12 @@ export default class WalletReceivePage extends Component<Props> {
       this.notificationElementId
     );
 
-    const addressStores = addresses.getStoresForWallet(publicDeriver);
+    const addressStores = this.generated.stores.addresses.getStoresForWallet(publicDeriver);
     const { canUnmangle } = this.generated.stores.substores.ada.addresses.getUnmangleAmounts();
     const header = (() => {
-      if (addressStores.some(store => store.stableName === 'external' && store.isActiveStore)) {
+      if (addressStores.some(store => (
+        store.stableName === AddressStoreTypes.external && store.isActiveStore
+      ))) {
         return (<StandardHeader
           walletAddress={walletAddress}
           selectedExplorer={this.generated.stores.profile.selectedExplorer}
@@ -155,14 +155,18 @@ export default class WalletReceivePage extends Component<Props> {
           onGenerateAddress={this.handleGenerateAddress}
           onCopyAddressTooltip={onCopyAddressTooltip}
           notification={notification}
-          isSubmitting={addresses.createAddressRequest.isExecuting}
-          error={addresses.error}
+          isSubmitting={this.generated.stores.addresses.createAddressRequest.isExecuting}
+          error={this.generated.stores.addresses.error}
         />);
       }
-      if (addressStores.some(store => store.stableName === 'internal' && store.isActiveStore)) {
+      if (addressStores.some(store => (
+        store.stableName === AddressStoreTypes.internal && store.isActiveStore
+      ))) {
         return (<InternalHeader />);
       }
-      if (addressStores.some(store => store.stableName === 'mangled' && store.isActiveStore)) {
+      if (addressStores.some(store => (
+        store.stableName === AddressStoreTypes.mangled && store.isActiveStore
+      ))) {
         return (
           <MangledHeader
             hasMangledUtxo={canUnmangle.length > 0}
@@ -172,7 +176,9 @@ export default class WalletReceivePage extends Component<Props> {
           />
         );
       }
-      if (addressStores.some(store => store.stableName === 'all' && store.isActiveStore)) {
+      if (addressStores.some(store => (
+        store.stableName === AddressStoreTypes.all && store.isActiveStore
+      ))) {
         return (<StandardHeader
           walletAddress={walletAddress}
           selectedExplorer={this.generated.stores.profile.selectedExplorer}
@@ -180,8 +186,8 @@ export default class WalletReceivePage extends Component<Props> {
           onGenerateAddress={this.handleGenerateAddress}
           onCopyAddressTooltip={onCopyAddressTooltip}
           notification={notification}
-          isSubmitting={addresses.createAddressRequest.isExecuting}
-          error={addresses.error}
+          isSubmitting={this.generated.stores.addresses.createAddressRequest.isExecuting}
+          error={this.generated.stores.addresses.error}
         />);
       }
       throw new Error(`${nameof(WalletReceivePage)} unexpected address tab`);
@@ -192,7 +198,7 @@ export default class WalletReceivePage extends Component<Props> {
         <WalletReceive
           header={header}
           selectedExplorer={this.generated.stores.profile.selectedExplorer}
-          walletAddresses={walletAddresses}
+          walletAddresses={addressTypeStore.filtered.slice().reverse()}
           onCopyAddressTooltip={onCopyAddressTooltip}
           notification={notification}
           onVerifyAddress={async (request: {| address: string, path: void | BIP32Path, |}) => {
@@ -200,13 +206,19 @@ export default class WalletReceivePage extends Component<Props> {
             this.openVerifyAddressDialog();
           }}
           onGeneratePaymentURI={!addressStores.some(store => (
-            (store.stableName === 'external' || store.stableName === 'all') && store.isActiveStore
+            (
+              store.stableName === AddressStoreTypes.external ||
+              store.stableName === AddressStoreTypes.all
+            ) &&
+            store.isActiveStore
           ))
             ? undefined
             : (address) => {
               this.openURIGenerateDialog(address);
             }
           }
+          setFilter={filter => this.generated.actions.addresses.setFilter.trigger(filter)}
+          activeFilter={this.generated.stores.addresses.addressFilter}
         />
 
 
@@ -230,7 +242,7 @@ export default class WalletReceivePage extends Component<Props> {
             classicTheme={profile.isClassicTheme}
             currencyMaxIntegerDigits={MAX_INTEGER_PLACES_IN_ADA}
             currencyMaxFractionalDigits={DECIMAL_PLACES_IN_ADA}
-            validateAmount={validateAmount}
+            validateAmount={(amount) => validateAmount({ publicDeriver, amount })}
           />
         ) : null}
 
@@ -288,16 +300,13 @@ export default class WalletReceivePage extends Component<Props> {
 
   getTypeStore: PublicDeriver<> => {
     +all: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
-    +hasAny: boolean,
-    +last: ?$ReadOnly<StandardAddress>,
-    +totalAvailable: number,
+    +filtered: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
     +wasExecuted: boolean,
     ...,
   } = (
     publicDeriver
   ) => {
-    const { addresses } = this.generated.stores.substores.ada;
-    const addressStores = addresses.getStoresForWallet(publicDeriver);
+    const addressStores = this.generated.stores.addresses.getStoresForWallet(publicDeriver);
 
     for (const addressStore of addressStores) {
       if (addressStore.isActiveStore) {
@@ -355,44 +364,42 @@ export default class WalletReceivePage extends Component<Props> {
         wallets: {
           selected: stores.wallets.selected,
         },
+        transactions: {
+          validateAmount: stores.transactions.validateAmount,
+        },
+        addresses: {
+          addressFilter: stores.addresses.addressFilter,
+          getStoresForWallet: (publicDeriver: PublicDeriver<>) => {
+            const addressStores = stores.addresses.getStoresForWallet(publicDeriver);
+            const functionalitySubset: Array<{|
+              +isActiveStore: boolean,
+              +stableName: AddressStoreKind,
+              +all: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
+              +filtered: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
+              +wasExecuted: boolean,
+            |}> = addressStores.map(addressStore => ({
+              isActiveStore: addressStore.isActiveStore,
+              stableName: addressStore.name.stable,
+              all: addressStore.all,
+              filtered: addressStore.filtered,
+              wasExecuted: addressStore.wasExecuted,
+            }));
+            return functionalitySubset;
+          },
+          createAddressRequest: {
+            isExecuting: stores.addresses.createAddressRequest.isExecuting,
+          },
+          error: stores.addresses.error,
+        },
         substores: {
           ada: {
             addresses: {
               getUnmangleAmounts: adaStore.addresses.getUnmangleAmounts,
-              getStoresForWallet: (publicDeriver: PublicDeriver<>) => {
-                const substore = stores.substores.ada;
-                const addressStores = substore.addresses.getStoresForWallet(publicDeriver);
-                const functionalitySubset: Array<{|
-                  +isActiveStore: boolean,
-                  +stableName: AddressStoreKind,
-                  +all: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
-                  +hasAny: boolean,
-                  +last: ?$ReadOnly<StandardAddress>,
-                  +totalAvailable: number,
-                  +wasExecuted: boolean,
-                |}> = addressStores.map(addressStore => ({
-                  isActiveStore: addressStore.isActiveStore,
-                  stableName: addressStore.name.stable,
-                  all: addressStore.all,
-                  hasAny: addressStore.hasAny,
-                  last: addressStore.last,
-                  totalAvailable: addressStore.totalAvailable,
-                  wasExecuted: addressStore.wasExecuted,
-                }));
-                return functionalitySubset;
-              },
-              createAddressRequest: {
-                isExecuting: adaStore.addresses.createAddressRequest.isExecuting,
-              },
-              error: adaStore.addresses.error,
             },
             hwVerifyAddress: {
               selectedAddress: adaStore.hwVerifyAddress.selectedAddress,
               isActionProcessing: adaStore.hwVerifyAddress.isActionProcessing,
               error: adaStore.hwVerifyAddress.error,
-            },
-            transactions: {
-              validateAmount: adaStore.transactions.validateAmount,
             },
           },
         },
@@ -410,20 +417,22 @@ export default class WalletReceivePage extends Component<Props> {
             trigger: actions.notifications.open.trigger,
           },
         },
+        addresses: {
+          setFilter: { trigger: actions.addresses.setFilter.trigger, },
+          resetFilter: { trigger: actions.addresses.resetFilter.trigger, },
+          resetErrors: {
+            trigger: actions.addresses.resetErrors.trigger,
+          },
+          createAddress: {
+            trigger: actions.addresses.createAddress.trigger,
+          },
+        },
         ada: {
           hwVerifyAddress: {
             selectAddress: { trigger: actions.ada.hwVerifyAddress.selectAddress.trigger, },
             verifyAddress: { trigger: actions.ada.hwVerifyAddress.verifyAddress.trigger, },
             closeAddressDetailDialog: {
               trigger: actions.ada.hwVerifyAddress.closeAddressDetailDialog.trigger,
-            },
-          },
-          addresses: {
-            resetErrors: {
-              trigger: actions.ada.addresses.resetErrors.trigger,
-            },
-            createAddress: {
-              trigger: actions.ada.addresses.createAddress.trigger,
             },
           },
         },

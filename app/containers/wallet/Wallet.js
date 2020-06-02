@@ -150,7 +150,7 @@ export default class Wallet extends Component<Props> {
       throw new Error(`${nameof(Wallet)} no way to generated props`);
     }
     const { stores, actions } = this.props;
-    const settingStore = this.props.stores.substores.ada.walletSettings;
+    const settingStore = this.props.stores.walletSettings;
     return Object.freeze({
       stores: {
         app: {

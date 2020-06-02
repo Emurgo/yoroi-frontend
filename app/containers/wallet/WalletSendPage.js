@@ -107,7 +107,8 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
 
     const { uiDialogs, profile, } = this.generated.stores;
     const { actions } = this.generated;
-    const { validateAmount, hasAnyPending } = transactions;
+    const { validateAmount } = transactions;
+    const { hasAnyPending } = this.generated.stores.transactions;
     const { txBuilderActions } = this.generated.actions.ada;
 
     // disallow sending when pending tx exists
@@ -379,11 +380,13 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           isOpen: stores.uiDialogs.isOpen,
           getParam: stores.uiDialogs.getParam,
         },
+        transactions: {
+          hasAnyPending: stores.transactions.hasAnyPending,
+        },
         substores: {
           ada: {
             transactions: {
               validateAmount: adaStore.transactions.validateAmount,
-              hasAnyPending: adaStore.transactions.hasAnyPending,
             },
             ledgerSend: {
               isActionProcessing: adaStore.ledgerSend.isActionProcessing,

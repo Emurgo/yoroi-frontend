@@ -1,14 +1,20 @@
 // @flow
 import { runInAction, observable, computed, action, } from 'mobx';
 import { find } from 'lodash';
-import Store from './Store';
+import BigNumber from 'bignumber.js';
+import Store from '../base/Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
-import WalletTransaction from '../../domain/WalletTransaction';
-
-import type { GetTransactionsFunc, GetBalanceFunc,
-  GetTransactionsRequest, GetTransactionsRequestOptions,
-  RefreshPendingTransactionsFunc
-} from '../../api/ada';
+import WalletTransaction, { calculateUnconfirmedAmount } from '../../domain/WalletTransaction';
+import { getPriceKey } from '../../api/ada/lib/storage/bridge/prices';
+import type {
+  GetBalanceFunc,
+} from '../../api/ada/index';
+import type {
+  GetTransactionsFunc,
+  BaseGetTransactionsRequest, GetTransactionsRequestOptions,
+  RefreshPendingTransactionsFunc,
+  ExportTransactionsFunc,
+} from '../../api/common/index';
 import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -20,8 +26,16 @@ import type {
   IGetLastSyncInfoResponse,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
-import { digetForHash } from '../../api/ada/lib/storage/database/primitives/api/utils';
+import { digestForHash } from '../../api/ada/lib/storage/database/primitives/api/utils';
 import { getApiForCoinType } from '../../api/index';
+import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
+import LocalizedRequest from '../lib/LocalizedRequest';
+import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
+import {
+  Logger,
+  stringifyError
+} from '../../utils/logging';
+import type { TransactionRowsToExportRequest } from '../../actions/common/transactions-actions';
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -43,6 +57,9 @@ export type TxRequests = {|
   |},
 |};
 
+
+const EXPORT_START_DELAY = 800; // in milliseconds [1000 = 1sec]
+
 /** How many transactions to display */
 export const INITIAL_SEARCH_LIMIT: number = 5;
 
@@ -62,11 +79,63 @@ export default class TransactionsStore extends Store {
     options: GetTransactionsRequestOptions,
   |}> = [];
 
+  getTransactionRowsToExportRequest: LocalizedRequest<(void => Promise<void>) => Promise<void>>
+    = new LocalizedRequest<(void => Promise<void>) => Promise<void>>(func => func());
+  exportTransactions: LocalizedRequest<ExportTransactionsFunc>
+    = new LocalizedRequest<ExportTransactionsFunc>(this.api.export.exportTransactions);
+  @observable isExporting: boolean = false;
+  @observable exportError: ?LocalizableError;
+
   setup(): void {
     super.setup();
     const actions = this.actions.transactions;
     actions.loadMoreTransactions.listen(this._increaseSearchLimit);
+    actions.exportTransactionsToFile.listen(this._exportTransactionsToFile);
+    actions.closeExportTransactionDialog.listen(this._closeExportTransactionDialog);
   }
+
+  /** Calculate information about transactions that are still realistically reversible */
+  @computed get unconfirmedAmount(): UnconfirmedAmount {
+    const defaultUnconfirmedAmount = {
+      total: new BigNumber(0),
+      incoming: new BigNumber(0),
+      outgoing: new BigNumber(0),
+      incomingInSelectedCurrency: new BigNumber(0),
+      outgoingInSelectedCurrency: new BigNumber(0),
+    };
+
+    // Get current public deriver
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) return defaultUnconfirmedAmount;
+
+    // Get current transactions for public deriver
+    const txRequests = this.getTxRequests(publicDeriver);
+    const result = txRequests.requests.allRequest.result;
+    if (!result || !result.transactions) return defaultUnconfirmedAmount;
+
+    const unitOfAccount = this.stores.profile.unitOfAccount;
+
+    const { assuranceMode } = this.stores.walletSettings
+      .getPublicDeriverSettingsCache(publicDeriver);
+
+
+    const { coinType } = publicDeriver.getParent();
+    const api = this.api[getApiForCoinType(coinType)];
+    const getUnitOfAccount = (timestamp: Date) => (!unitOfAccount.enabled
+      ? undefined
+      : this.stores.coinPriceStore.priceMap.get(getPriceKey(
+        api.constructor.getCurrencyMeta().unitName,
+        unitOfAccount.currency,
+        timestamp
+      )));
+    return calculateUnconfirmedAmount(
+      result.transactions,
+      txRequests.lastSyncInfo.Height,
+      assuranceMode,
+      getUnitOfAccount
+    );
+  }
+
 
   @action _increaseSearchLimit: PublicDeriver<> => Promise<void> = async (
     publicDeriver
@@ -163,16 +232,7 @@ export default class TransactionsStore extends Store {
       return;
     }
 
-    const { coinType } = publicDeriver.getParent();
-    const apiType = getApiForCoinType(coinType);
-
     // All Request
-    const stateFetcher = this.stores.substores[apiType].stateFetchStore.fetcher;
-    const {
-      getTransactionsHistoryForAddresses,
-      checkAddressesInUse,
-      getBestBlock
-    } = stateFetcher;
     const allRequest = this.getTxRequests(request.publicDeriver).requests.allRequest;
 
     const oldHash = hashTransactions(allRequest.result?.transactions);
@@ -180,9 +240,6 @@ export default class TransactionsStore extends Store {
     allRequest.execute({
       publicDeriver,
       isLocalRequest: request.localRequest,
-      getTransactionsHistoryForAddresses,
-      checkAddressesInUse,
-      getBestBlock,
     });
 
     if (!allRequest.promise) throw new Error('should never happen');
@@ -194,7 +251,7 @@ export default class TransactionsStore extends Store {
 
     // update last sync (note: changes even if no new transaction is found)
     {
-      const lastUpdateDate = await this.api[apiType].getTxLastUpdatedDate({
+      const lastUpdateDate = await this.api.common.getTxLastUpdatedDate({
         getLastSyncInfo: publicDeriver.getLastSyncInfo
       });
       runInAction(() => {
@@ -265,10 +322,6 @@ export default class TransactionsStore extends Store {
   ) => Promise<PromisslessReturnType<GetTransactionsFunc>> = (
     publicDeriver: PublicDeriver<> & IGetLastSyncInfo,
   ) => {
-    const { coinType } = publicDeriver.getParent();
-    const apiType = getApiForCoinType(coinType);
-    const stateFetcher = this.stores.substores[apiType].stateFetchStore.fetcher;
-
     const limit = this.searchOptions
       ? this.searchOptions.limit
       : INITIAL_SEARCH_LIMIT;
@@ -283,14 +336,11 @@ export default class TransactionsStore extends Store {
     if (withLevels == null) {
       throw new Error(`${nameof(this.refreshLocal)} no levels`);
     }
-    const requestParams: GetTransactionsRequest = {
+    const requestParams: BaseGetTransactionsRequest = {
       publicDeriver: withLevels,
       isLocalRequest: true,
       limit,
       skip,
-      getTransactionsHistoryForAddresses: stateFetcher.getTransactionsHistoryForAddresses,
-      checkAddressesInUse: stateFetcher.checkAddressesInUse,
-      getBestBlock: stateFetcher.getBestBlock,
     };
     const recentRequest = this.getTxRequests(publicDeriver).requests.recentRequest;
     recentRequest.invalidate({ immediately: false });
@@ -307,7 +357,8 @@ export default class TransactionsStore extends Store {
     request
   ) => {
     const { coinType } = request.publicDeriver.getParent();
-    const api = this.api[getApiForCoinType(coinType)];
+    const apiType = getApiForCoinType(coinType);
+    const api = this.api[apiType];
 
     const foundRequest = find(
       this.transactionsRequests,
@@ -320,11 +371,16 @@ export default class TransactionsStore extends Store {
       publicDeriver: request.publicDeriver,
       lastSyncInfo: request.lastSyncInfo,
       requests: {
-        recentRequest: new CachedRequest<GetTransactionsFunc>(api.refreshTransactions),
-        allRequest: new CachedRequest<GetTransactionsFunc>(api.refreshTransactions),
+        // note: this captures the right API for the wallet
+        recentRequest: new CachedRequest<GetTransactionsFunc>(
+          this.stores.substores[apiType].transactions.refreshTransactions
+        ),
+        allRequest: new CachedRequest<GetTransactionsFunc>(
+          this.stores.substores[apiType].transactions.refreshTransactions
+        ),
         getBalanceRequest: new CachedRequest<GetBalanceFunc>(api.getBalance),
         pendingRequest: new CachedRequest<RefreshPendingTransactionsFunc>(
-          api.refreshPendingTransactions
+          this.api.common.refreshPendingTransactions
         ),
       },
     });
@@ -348,6 +404,75 @@ export default class TransactionsStore extends Store {
     }
     return foundRequest;
   };
+
+  validateAmount: {|
+    publicDeriver: PublicDeriver<>,
+    amount: string,
+  |} => Promise<boolean> = (request) => {
+    const { coinType } = request.publicDeriver.getParent();
+    const apiType = getApiForCoinType(coinType);
+    return this.stores.substores[apiType].transactions.validateAmount(request.amount);
+  };
+
+  @action _exportTransactionsToFile: {|
+    publicDeriver: PublicDeriver<>,
+    exportRequest: TransactionRowsToExportRequest,
+  |} => Promise<void> = async (request) => {
+    try {
+      this._setExporting(true);
+
+      const { coinType } = request.publicDeriver.getParent();
+      const apiType = getApiForCoinType(coinType);
+
+      this.getTransactionRowsToExportRequest.reset();
+      this.exportTransactions.reset();
+
+      const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
+      if (!withLevels) return;
+
+      const continuation = await this.stores.substores[apiType].transactions
+        .exportTransactionsToFile({
+          publicDeriver: withLevels,
+          exportRequest: request.exportRequest,
+        });
+
+      /** Intentionally added delay to feel smooth flow */
+      setTimeout(async () => {
+        await continuation();
+        this._setExporting(false);
+        this.actions.dialogs.closeActiveDialog.trigger();
+      }, EXPORT_START_DELAY);
+
+    } catch (error) {
+      let localizableError = error;
+      if (!(error instanceof LocalizableError)) {
+        localizableError = new UnexpectedError();
+      }
+
+      this._setExportError(localizableError);
+      this._setExporting(false);
+      Logger.error(`${nameof(TransactionsStore)}::${nameof(this._exportTransactionsToFile)} ${stringifyError(error)}`);
+    } finally {
+      this.getTransactionRowsToExportRequest.reset();
+      this.exportTransactions.reset();
+    }
+  }
+
+  @action _setExporting: boolean => void = (isExporting)  => {
+    this.isExporting = isExporting;
+  }
+
+  @action _setExportError: ?LocalizableError => void = (error) => {
+    this.exportError = error;
+  }
+
+  @action _closeExportTransactionDialog: void => void = () => {
+    if (!this.isExporting) {
+      this.actions.dialogs.closeActiveDialog.trigger();
+      this._setExporting(false);
+      this._setExportError(null);
+    }
+  }
 }
 
 function hashTransactions(transactions: ?Array<WalletTransaction>): number {
@@ -356,7 +481,7 @@ function hashTransactions(transactions: ?Array<WalletTransaction>): number {
 
   const seed = 858499202; // random seed
   for (const tx of transactions) {
-    hash = digetForHash(hash.toString(16) + tx.uniqueKey, seed);
+    hash = digestForHash(hash.toString(16) + tx.uniqueKey, seed);
   }
   return hash;
 }

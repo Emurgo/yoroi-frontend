@@ -25,7 +25,7 @@ import AdaApi from '../../api/ada/index';
 import {
   generateWalletRootKey,
 } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
-import { GenericApiError, } from '../../api/common';
+import { GenericApiError, } from '../../api/common/errors';
 import { NoInputsError } from '../../api/ada/errors';
 import { withScreenshot } from 'storycap';
 import { getDefaultExplorer } from '../../domain/Explorer';

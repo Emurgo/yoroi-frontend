@@ -5,7 +5,7 @@ import {
 } from '../../utils/logging';
 import {
   GenericApiError,
-} from '../common';
+} from '../common/errors';
 import DropboxApi from './providers/dropbox';
 import type {
   IProvider,

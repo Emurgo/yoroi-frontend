@@ -39,7 +39,7 @@ export default class DelegationTransactionStore extends Store {
     () => [
       this.stores.wallets.selected,
       // update if tx history changes
-      this.stores.substores.ada.transactions.hash,
+      this.stores.transactions.hash,
     ],
     () => {
       if (this.createDelegationTx.wasExecuted) {

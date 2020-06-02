@@ -11,7 +11,7 @@ import * as Tables from '../tables';
 import type { TxMemoTableRow, TxMemoTableInsert } from '../tables';
 import { addOrReplaceRow, } from '../../utils';
 import { GetEncryptionMeta } from '../../primitives/api/read';
-import { digetForHash } from '../../primitives/api/utils';
+import { digestForHash } from '../../primitives/api/utils';
 
 export class ModifyTxMemo {
   static ownTables = Object.freeze({
@@ -27,7 +27,7 @@ export class ModifyTxMemo {
     memo: TxMemoTableInsert | TxMemoTableRow,
   ): Promise<$ReadOnly<TxMemoTableRow>> {
     const { TransactionSeed } = await ModifyTxMemo.depTables.GetEncryptionMeta.get(db, dbTx);
-    const digest = digetForHash(memo.TransactionHash, TransactionSeed);
+    const digest = digestForHash(memo.TransactionHash, TransactionSeed);
     const memoWithDigest = {
       ...memo,
       Digest: digest,
@@ -48,7 +48,7 @@ export class ModifyTxMemo {
     |},
   ): Promise<void> {
     const { TransactionSeed } = await ModifyTxMemo.depTables.GetEncryptionMeta.get(db, dbTx);
-    const digest = digetForHash(request.txHash, TransactionSeed);
+    const digest = digestForHash(request.txHash, TransactionSeed);
 
     const table = db.getSchema().table(ModifyTxMemo.ownTables[Tables.TxMemoSchema.name].name);
 

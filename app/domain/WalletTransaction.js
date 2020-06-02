@@ -2,6 +2,7 @@
 import { action, computed, observable } from 'mobx';
 import BigNumber from 'bignumber.js';
 import { LOVELACES_PER_ADA } from '../config/numbersConfig';
+import type { PriceDataRow } from '../api/ada/lib/storage/database/prices/tables';
 import type { AssuranceMode, AssuranceLevel } from '../types/transactionAssuranceTypes';
 import { assuranceLevels } from '../config/transactionAssuranceConfig';
 import type {
@@ -17,6 +18,8 @@ import type {
 import type {
   TxStatusCodesType,
 } from '../api/ada/lib/storage/database/primitives/enums';
+import { transactionTypes } from '../api/ada/transactions/types';
+import type { UnconfirmedAmount } from '../types/unconfirmedAmountType';
 
 export type TransactionAddresses = {|
   from: Array<{|
@@ -143,4 +146,71 @@ export default class WalletTransaction {
       errorMsg: tx.transaction.ErrorMessage,
     });
   }
+}
+
+export function calculateUnconfirmedAmount(
+  transactions: Array<WalletTransaction>,
+  lastSyncBlock: number,
+  assuranceMode: AssuranceMode,
+  getUnitOfAccount: Date => (void | $ReadOnly<PriceDataRow>),
+): UnconfirmedAmount {
+  const unconfirmedAmount = {
+    total: new BigNumber(0),
+    incoming: new BigNumber(0),
+    outgoing: new BigNumber(0),
+    // If any of the below values becomes null, it means price data are
+    // unavailable for at least one of the transaction in the category
+    // and we just give up calculating the value.
+    incomingInSelectedCurrency: new BigNumber(0),
+    outgoingInSelectedCurrency: new BigNumber(0),
+  };
+
+  for (const transaction of transactions) {
+    // skip any failed transactions
+    if (transaction.state < 0) continue;
+
+    const assuranceForTx = transaction.getAssuranceLevelForMode(assuranceMode, lastSyncBlock);
+    if (assuranceForTx !== assuranceLevels.HIGH) {
+      // total
+      unconfirmedAmount.total = unconfirmedAmount.total.plus(transaction.amount.absoluteValue());
+
+      // outgoing
+      if (transaction.type === transactionTypes.EXPEND) {
+        unconfirmedAmount.outgoing = unconfirmedAmount.outgoing.plus(
+          transaction.amount.absoluteValue()
+        );
+        const unitOfAccount = getUnitOfAccount(transaction.date);
+        if (unitOfAccount != null) {
+          if (unconfirmedAmount.outgoingInSelectedCurrency) {
+            unconfirmedAmount.outgoingInSelectedCurrency =
+              unconfirmedAmount.outgoingInSelectedCurrency.plus(
+                transaction.amount.absoluteValue().multipliedBy(String(unitOfAccount.Price))
+              );
+          } else {
+            unconfirmedAmount.outgoingInSelectedCurrency = null;
+          }
+        }
+      }
+
+      // incoming
+      if (transaction.type === transactionTypes.INCOME) {
+        unconfirmedAmount.incoming = unconfirmedAmount.incoming.plus(
+          transaction.amount.absoluteValue()
+        );
+        const unitOfAccount = getUnitOfAccount(transaction.date);
+        if (unitOfAccount != null) {
+          if (unconfirmedAmount.incomingInSelectedCurrency) {
+            unconfirmedAmount.incomingInSelectedCurrency =
+              unconfirmedAmount.incomingInSelectedCurrency.plus(
+                transaction.amount.absoluteValue().multipliedBy(String(unitOfAccount.Price))
+              );
+          } else {
+            unconfirmedAmount.incomingInSelectedCurrency = null;
+          }
+        }
+      }
+    }
+  }
+
+  return unconfirmedAmount;
 }

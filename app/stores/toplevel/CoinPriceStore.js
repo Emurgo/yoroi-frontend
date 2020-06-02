@@ -40,7 +40,7 @@ export default class CoinPriceStore extends Store {
       await this.stores.coinPriceStore.refreshCurrentCoinPrice();
       const { selected } = this.stores.wallets;
       if (selected) {
-        const { allRequest } = this.stores.substores.ada.transactions
+        const { allRequest } = this.stores.transactions
           .getTxRequests(selected).requests;
         const transactions = allRequest.result?.transactions;
         if (allRequest.wasExecuted && transactions != null) {

@@ -10,18 +10,21 @@ import NoticeBoardStore from './toplevel/NoticeBoardStore';
 import LoadingStore from './toplevel/LoadingStore';
 import MemosStore from './toplevel/MemosStore';
 import WalletStore from './toplevel/WalletStore';
+import WalletSettingsStore from './toplevel/WalletSettingsStore';
+import TransactionsStore from './toplevel/TransactionsStore';
+import AddressesStore from './toplevel/AddressesStore';
 import setupAdaStores from './ada/index';
 import type { AdaStoresMap } from './ada/index';
 import { RouterStore } from 'mobx-react-router';
 import type { ActionsMap } from '../actions/index';
 import type { Api } from '../api/index';
-import { ApiOptions } from '../api/index';
+import { ApiOptions } from '../api/types';
 import StateFetchStore from './toplevel/StateFetchStore';
 import CoinPriceStore from './toplevel/CoinPriceStore';
 import ServerConnectionStore from './toplevel/ServerConnectionStore';
 
 /** Map of var name to class. Allows dynamic lookup of class so we can init all stores one loop */
-const storeClasses = {
+const storeClasses = Object.freeze({
   stateFetchStore: StateFetchStore,
   coinPriceStore: CoinPriceStore,
   profile: ProfileStore,
@@ -35,8 +38,11 @@ const storeClasses = {
   noticeBoard: NoticeBoardStore,
   loading: LoadingStore,
   wallets: WalletStore,
+  addresses: AddressesStore,
+  transactions: TransactionsStore,
+  walletSettings: WalletSettingsStore,
   // note: purposely exclude substores and router
-};
+});
 
 export type StoresMap = {|
   stateFetchStore: StateFetchStore,
@@ -52,6 +58,9 @@ export type StoresMap = {|
   noticeBoard: NoticeBoardStore,
   loading: LoadingStore,
   wallets: WalletStore,
+  addresses: AddressesStore,
+  transactions: TransactionsStore,
+  walletSettings: WalletSettingsStore,
   substores: {| ada: AdaStoresMap, |},
   router: RouterStore,
 |};
@@ -71,6 +80,9 @@ const stores: WithNullableFields<StoresMap> = observable({
   noticeBoard: null,
   loading: null,
   wallets: null,
+  addresses: null,
+  transactions: null,
+  walletSettings: null,
   substores: null,
   router: null,
 });

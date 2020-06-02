@@ -21,13 +21,13 @@ import { unitOfAccountDisabledValue } from '../../types/unitOfAccountType';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { SUPPORTED_CURRENCIES } from '../../config/unitOfAccount';
 import AdaApi from '../../api/ada/index';
-import type { ApiOptionType } from '../../api/index';
-import { ApiOptions } from '../../api/index';
+import type { ApiOptionType } from '../../api/types';
+import { ApiOptions } from '../../api/types';
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
 
 export type SelectedApiType = {|
   type: 'ada',
-  meta: ReturnType<typeof AdaApi.prototype.getCurrencyMeta>,
+  meta: ReturnType<typeof AdaApi.getCurrencyMeta>,
 |};
 
 export default class ProfileStore extends Store {
@@ -695,7 +695,7 @@ export function getApiMeta(
     case ApiOptions.ada: {
       return {
         type: 'ada',
-        meta: AdaApi.prototype.getCurrencyMeta(),
+        meta: AdaApi.getCurrencyMeta(),
       };
     }
     default:
