@@ -3,6 +3,7 @@ import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
+import globalMessages from '../../../../i18n/global-messages';
 
 import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
@@ -22,10 +23,6 @@ const messages = defineMessages({
   restoreNormalDescription: {
     id: 'wallet.add.optionDialog.restore.normalWallet.description',
     defaultMessage: '!!!If you have a Yoroi recovery phrase consisting of 15 words generated when you created a Yoroi Wallet, choose this option to restore your wallet.',
-  },
-  restorePaperWalletTitle: {
-    id: 'wallet.add.optionDialog.restore.paperWallet.title',
-    defaultMessage: '!!!Paper Wallet',
   },
   restorePaperWalletDescription: {
     id: 'wallet.add.optionDialog.restore.paperWallet.description',
@@ -69,7 +66,7 @@ export default class WalletRestoreOptionDialog extends Component<Props> {
             <OptionBlock
               parentName="WalletRestoreOptionDialog"
               type="restorePaperWallet"
-              title={intl.formatMessage(messages.restorePaperWalletTitle)}
+              title={intl.formatMessage(globalMessages.paperWalletLabel)}
               learnMoreText={intl.formatMessage(messages.restorePaperWalletDescription)}
               onSubmit={onPaperRestore}
             />

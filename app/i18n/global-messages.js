@@ -557,6 +557,14 @@ const globalMessages: * = defineMessages({
     id: 'global.label.addToAddressbook',
     defaultMessage: '!!!Add to address book',
   },
+  createWalletLabel: {
+    id: 'wallet.add.page.create.title',
+    defaultMessage: '!!!Create Wallet'
+  },
+  paperWalletLabel: {
+    id: 'wallet.add.optionDialog.restore.paperWallet.title',
+    defaultMessage: '!!!Paper Wallet'
+  }
 });
 export default globalMessages;
 

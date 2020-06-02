@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import classnames from 'classnames';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import globalMessages from '../../../i18n/global-messages';
 
 import CustomTooltip from '../../widgets/CustomTooltip';
 
@@ -21,10 +22,6 @@ const messages = defineMessages({
     id: 'wallet.add.page.hw.tooltip',
     defaultMessage: '!!!Create or restore a Yoroi wallet<br/>using a Ledger or Trezor hardware wallet.',
   },
-  createTitle: {
-    id: 'wallet.add.page.create.title',
-    defaultMessage: '!!!Create wallet',
-  },
   createTooltip: {
     id: 'wallet.add.page.create.tooltip',
     defaultMessage: '!!!Generate a new 15-word recovery phrase<br/>and create a Yoroi wallet.',
@@ -37,6 +34,7 @@ const messages = defineMessages({
     id: 'wallet.add.page.restore.tooltip',
     defaultMessage: '!!!Enter a 15-word recovery phrase<br/>to restore an already-existing Yoroi wallet,<br/>or import an existing Yoroi paper wallet.',
   },
+
 });
 
 type Props = {|
@@ -92,7 +90,7 @@ export default class MainCards extends Component<Props> {
           <div className={styles.heroCardsItem}>
             <div className={classnames([styles.heroCardsItemBg, styles.bgCreateWallet])} />
             <div className={styles.heroCardsItemTitle}>
-              {intl.formatMessage(messages.createTitle)}
+              {intl.formatMessage(globalMessages.createWalletLabel)}
               <div className={styles.tooltip}>
                 <CustomTooltip
                   toolTip={

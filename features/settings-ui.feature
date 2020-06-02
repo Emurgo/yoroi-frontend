@@ -172,26 +172,6 @@ Feature: Wallet UI Settings
     And I click on secondary menu "support" item
     Then I should see support screen
 
-  @it-77
-  Scenario: Paper wallet creation (IT-77)
-    And I navigate to the general settings screen
-    Then I click on secondary menu "paperWallet" item
-    Then I open Number of Adddresses selection dropdown
-    And I select 2 addresses
-    Then I click the create paper wallet button
-    Then I enter the paper wallet password "cool password"
-    And I repeat the wallet password "cool password"
-    Then I click the next button
-    # wait for paper wallet generation then go to next
-    Then I click the next button
-    And I enter the paper recovery phrase
-    And I enter the paper wallet password "cool password"
-    # swap addresses for UI testing
-    Given I swap the paper wallet addresses
-    Then I click then button labeled "Verify wallet"
-    Then I should see two addresses displayed
-    Then I click the next button
-
   @it-125
   Scenario: Switch complexity levels (IT-125)
     And I navigate to the general settings screen

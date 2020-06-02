@@ -3,34 +3,33 @@ import type { Node } from 'react';
 import React, { Component } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
-import PaperWalletSettings from '../../../components/settings/categories/PaperWalletSettings';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
-import UserPasswordDialog from '../../../components/wallet/settings/paper-wallets/UserPasswordDialog';
-import CreatePaperWalletDialogContainer from '../../wallet/dialogs/CreatePaperWalletDialogContainer';
-import type {
-  GeneratedData as CreatePaperWalletDialogContainerData
-} from '../../wallet/dialogs/CreatePaperWalletDialogContainer';
+import UserPasswordDialog from '../../../components/wallet/add/paper-wallets/UserPasswordDialog';
+import PaperWalletDialog from '../../../components/wallet/WalletPaperDialog';
 
-type GeneratedData = typeof PaperWalletPage.prototype.generated;
+export type GeneratedData = typeof WalletPaperDialogContainer.prototype.generated;
+
+type Props = {|
+  ...InjectedOrGenerated<GeneratedData>,
+  +onClose: void => void,
+|};
 
 @observer
-export default class PaperWalletPage extends Component<InjectedOrGenerated<GeneratedData>> {
+export default class WalletPaperDialogContainer
+  extends Component<Props> {
 
   @computed get generated() {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
     if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(PaperWalletPage)} no way to generated props`);
+      throw new Error(`${nameof(WalletPaperDialogContainer)} no way to generated props`);
     }
     const { stores, actions } = this.props;
     return Object.freeze({
       stores: {
         profile: {
           paperWalletsIntro: stores.profile.paperWalletsIntro,
-        },
-        uiDialogs: {
-          isOpen: stores.uiDialogs.isOpen,
         },
       },
       actions: {
@@ -39,9 +38,6 @@ export default class PaperWalletPage extends Component<InjectedOrGenerated<Gener
           updateDataForActiveDialog: { trigger: actions.dialogs.updateDataForActiveDialog.trigger },
         },
       },
-      CreatePaperWalletDialogContainerProps: (
-        { stores, actions }: InjectedOrGenerated<CreatePaperWalletDialogContainerData>
-      ),
     });
   }
 
@@ -55,15 +51,10 @@ export default class PaperWalletPage extends Component<InjectedOrGenerated<Gener
 
   render(): Node {
     return (
-      <PaperWalletSettings
+      <PaperWalletDialog
+        onCancel={this.props.onClose}
         onCreatePaper={this.createPaperWallet}
         paperWalletsIntroText={this.generated.stores.profile.paperWalletsIntro}
-        isDialogOpen={this.generated.stores.uiDialogs.isOpen(UserPasswordDialog)}
-        dialog={(
-          <CreatePaperWalletDialogContainer
-            {...this.generated.CreatePaperWalletDialogContainerProps}
-          />
-        )}
         error={null}
       />
     );
