@@ -418,7 +418,7 @@ export const ExternalTab = (): Node => {
           dialog: getAddressGenerationValue() === addressCases.Yes
             ? LoadingSpinner
             : undefined,
-          addressFilter: AddressFilter.None,
+          addressFilter: select('AddressFilter', AddressFilter, AddressFilter.None),
           getStoresForWallet: (pubDeriver) => wrapForReceivePage(getStoresForWallet(pubDeriver)),
         })}
       />)
