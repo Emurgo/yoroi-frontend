@@ -6,10 +6,12 @@ import styles from './IntroBanner.scss';
 import { defineMessages, intlShape, } from 'react-intl';
 import TestnetLogo from '../../../assets/images/yoroi-logotestnet-gradient.inline.svg';
 import NightlyLogo from '../../../assets/images/yoroi-logo-nightly.inline.svg';
+import YoroiLogo from '../../../assets/images/yoroi-logo-blue.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
   +isNightly: boolean,
+  +isShelley: boolean,
 |};
 
 const messages = defineMessages({
@@ -26,14 +28,24 @@ export default class IntroBanner extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  _getLogo: void => string = () => {
+    if (this.props.isNightly) {
+      return NightlyLogo;
+    }
+    if (this.props.isShelley) {
+      return TestnetLogo;
+    }
+    return YoroiLogo;
+  }
+
   render(): Node {
     const { intl } = this.context;
-    const logo = this.props.isNightly
-      ? <NightlyLogo />
-      : <TestnetLogo />;
+    const Logo = this._getLogo();
     return (
       <div className={styles.component}>
-        <span className={styles.banner}>{logo}</span>
+        <span className={styles.banner}>
+          <Logo />
+        </span>
         <div className={styles.mainTitle}>
           {intl.formatMessage(messages.title)}
         </div>

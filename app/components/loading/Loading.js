@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 import LoadingSpinner from '../widgets/LoadingSpinner';
-import YoroiLogo from '../../assets/images/yoroi-logo-shape-white.inline.svg';
 import styles from './Loading.scss';
 import LocalizableError from '../../i18n/LocalizableError';
 import globalMessages from '../../i18n/global-messages';
@@ -81,10 +80,10 @@ export default class Loading extends Component<Props> {
     return (
       <div className={componentStyles}>
         <div className={yoroiLogoStyles}>
-          { environment.isShelley() ?
-            <IntroBanner isNightly={environment.isNightly()} /> :
-            <IntroBanner isNightly />
-          }
+          <IntroBanner
+            isNightly={environment.isNightly()}
+            isShelley={environment.isShelley()}
+          />
         </div>
 
         {renderContent}

@@ -93,9 +93,11 @@
     background-position-y: bottom;
     background-position-x: right;
   }
-}
-:global(.YoroiModern):not(:global(.YoroiShelley)) .languageSelectionBackground {
-  background-image: url(../../assets/images/select-language.svg);
-  background-size: cover;
-  background-position-y: bottom;
+  :global(.YoroiModern):not(:global(.YoroiShelley)) .languageSelectionBackground {
+    background-image: url(../../assets/images/select-language.svg);
+    background-size: auto;
+    background-repeat: no-repeat;
+    background-position-y: bottom;
+    background-position-x: right;
+  }
 }

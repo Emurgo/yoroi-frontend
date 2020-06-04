@@ -75,7 +75,10 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
         languageSelectionBackground
         banner={displayedBanner}
       >
-        <IntroBanner isNightly />
+        <IntroBanner
+          isNightly={environment.isNightly()}
+          isShelley={environment.isShelley()}
+        />
         <LanguageSelectionForm
           onSelectLanguage={this.onSelectLanguage}
           onSubmit={this.onSubmit}
@@ -109,7 +112,10 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
         languageSelectionBackground
         banner={displayedBanner}
       >
-        <IntroBanner isNightly={environment.isNightly()} />
+        <IntroBanner
+          isNightly={environment.isNightly()}
+          isShelley={environment.isShelley()}
+        />
         <LanguageSelectionForm
           onSelectLanguage={this.onSelectLanguage}
           onSubmit={this.onSubmit}
