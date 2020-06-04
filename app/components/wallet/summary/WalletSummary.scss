@@ -1,4 +1,4 @@
-$leftBlockWidth: 72px;
+$leftBlockWidth: 'auto';
 $rightBlockWidth: $leftBlockWidth;
 
 @import "../transactions/categoryData";
@@ -23,7 +23,7 @@ $rightBlockWidth: $leftBlockWidth;
       display: none;
       float: left;
       padding-top: 20px;
-      width: $leftBlockWidth;
+      // width: $leftBlockWidth;
     }
 
     .leftBlock,
@@ -31,10 +31,48 @@ $rightBlockWidth: $leftBlockWidth;
       padding-top: 33px;
     }
 
+    .searchBtn {
+      margin-right: 1rem;
+      position: relative;
+      width: 280px;
+      border-radius: 8px;
+      overflow: hidden;
+      font-size: 14px;
+      .searchInput input {
+        width:100%;
+        // padding: 12px 0;
+        padding-right: 20px;
+        padding-left: 40px;
+        height: inherit;
+        border: 1px solid #F0F3F5;
+        background-color: #F1F3F5;
+        outline: none;
+      }
+      button {
+        position: absolute;
+        right: 24px;
+        top:50%;
+        transform: translateY(-50%);
+      }
+    }
+    .search {
+      position: absolute;
+      top:50%;
+      left: 10px;
+      transform: translateY(-50%);
+      & > svg {
+        & > path {
+          fill: #A7AFC0;
+        }
+        max-height: 20px;
+        max-width: 20px;
+      }
+    }
     .rightBlock {
       float: right;
       width: $rightBlockWidth;
-    
+      display: flex;
+      align-items: center;
       .exportTxToFileSvg {
         pointer-events: auto;
         float: right;

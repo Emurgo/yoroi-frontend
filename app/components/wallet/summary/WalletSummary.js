@@ -15,6 +15,11 @@ import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType'
 import { formatValue } from '../../../utils/unit-of-account';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
+import SearchIcon from '../../../assets/images/search-ic-dark.inline.svg';
+import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
+import { Input } from 'react-polymorph/lib/components/Input';
+
+
 const messages = defineMessages({
   pendingOutgoingConfirmationLabel: {
     id: 'wallet.summary.page.pendingOutgoingConfirmationLabel',
@@ -132,6 +137,12 @@ export default class WalletSummary extends Component<Props> {
           </BorderedBox>
         </div>
         <div className={styles.rightBlock}>
+        {/* //TODO MOVE */}
+          <div className={styles.searchBtn}>
+            <span className={styles.search}><SearchIcon /></span>
+            <input type="text" name="" placeholder="Search" />
+            <button>Filter Icon</button>
+          </div>
           {!isLoadingTransactions ? (
             <span
               className={styles.exportTxToFileSvg}
