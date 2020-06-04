@@ -179,3 +179,9 @@ Feature: Wallet UI Settings
     Then The selected level is "ADVANCED"
     Then I select the simplest level
     Then The selected level is "SIMPLE"
+
+  @it-126
+  Scenario: Yoroi Settings Screen / Blockchain (IT-126)
+    And I navigate to the general settings screen
+    And I click on secondary menu "blockchain" item
+    Then I should see blockchain screen

@@ -1,7 +1,5 @@
 // @flow
 
-// @flow
-
 import type { Node } from 'react';
 import React from 'react';
 
