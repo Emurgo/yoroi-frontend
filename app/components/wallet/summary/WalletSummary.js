@@ -145,7 +145,7 @@ export default class WalletSummary extends Component<Props> {
               <span>Filter-ic</span>
             </button>
           </div>
-          {/* ------------ TO MOVE */}
+          {/* ------------ */}
           {!isLoadingTransactions ? (
             <span
               className={styles.exportTxToFileSvg}
