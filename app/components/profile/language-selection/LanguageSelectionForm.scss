@@ -5,6 +5,7 @@
   display: flex;
   height: 100%;
   justify-content: center;
+  padding-top: 150px;
 
   .centeredBox {
     overflow: visible;
@@ -26,6 +27,20 @@
     @include error-message;
     text-align: center;
     margin-bottom: 1rem;
+  }
+
+  .languageSelect {
+    margin-bottom: 10px;
+  
+    label {
+      width: 100%;
+      left: 0;
+      top: -34px;
+      text-align: center;
+      font-size: 16px;
+      text-transform: uppercase;
+      font-family: var(--rp-theme-font-medium);
+    }
   }
 }
 
@@ -49,45 +64,6 @@
       border-color: var(--theme-select-language-color);
     }
   }
-}
-
-:global(.YoroiClassic) .component {
-  align-items: center;
-  
-  .languageSelect {
-    margin-bottom: 20px;
-  }  
-}
-
-:global(.YoroiModern):not(:global(.YoroiShelley)) .component {
-  padding-top: 222px;
-  .languageSelect {
-    label {
-      top: -72px;
-    }
-  }
-}
-:global(.YoroiModern):global(.YoroiShelley) .component {
-  padding-top: 150px;
-  .languageSelect {
-    label {
-      top: -34px;
-    }
-  }
-}
-:global(.YoroiModern) .component {
-  .languageSelect {
-    margin-bottom: 10px;
-  
-    label {
-      width: 100%;
-      left: 0;
-      text-align: center;
-      font-size: 16px;
-      text-transform: uppercase;
-      font-family: var(--rp-theme-font-medium);
-    }
-  }  
 }
 
 .info {

@@ -5,11 +5,12 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 import LoadingSpinner from '../widgets/LoadingSpinner';
-import YoroiLogo from '../../assets/images/yoroi-logo-shape-white.inline.svg';
 import styles from './Loading.scss';
 import LocalizableError from '../../i18n/LocalizableError';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import IntroBanner from '../profile/language-selection/IntroBanner';
+import { environment } from '../../environment';
 
 const messages = defineMessages({
   loading: {
@@ -78,9 +79,13 @@ export default class Loading extends Component<Props> {
       );
     return (
       <div className={componentStyles}>
-        <div className={styles.logos}>
-          <span className={yoroiLogoStyles}><YoroiLogo /></span>
+        <div className={yoroiLogoStyles}>
+          <IntroBanner
+            isNightly={environment.isNightly()}
+            isShelley={environment.isShelley()}
+          />
         </div>
+
         {renderContent}
         {renderError}
       </div>

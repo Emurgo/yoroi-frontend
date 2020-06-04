@@ -37,7 +37,6 @@ export default class AddAnotherWallet extends Component<Props> {
 
     const iconClass = classnames(
       styles.heroLogo,
-      LogoIcon === LogoYoroiIcon ? styles.makeBlue : null,
     );
     return (
       <div className={styles.component}>

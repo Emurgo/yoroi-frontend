@@ -17,10 +17,11 @@
 }
 
 .loading {	
-  bottom: 10%;	
+  top: 50%;	
   position: absolute;	
   text-align: center;	
   width: 100%;
+  transform: translateY(-50%);
 
   .spinner {
     margin-top: 20px;
