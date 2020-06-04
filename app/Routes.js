@@ -44,6 +44,7 @@ import NoticeBoardPage from './containers/notice-board/NoticeBoardPage';
 import type { ConfigType } from '../config/config-types';
 import ComplexityLevelSettingsPage from './containers/settings/categories/ComplexityLevelSettingsPage';
 import ComplexityLevelPage from './containers/profile/ComplexityLevelPage';
+import BlockchainSettingsPage from './containers/settings/categories/BlockchainSettingsPage';
 
 declare var CONFIG: ConfigType;
 
@@ -190,6 +191,11 @@ const SettingsSubpages = (stores, actions) => (
       exact
       path={ROUTES.SETTINGS.GENERAL}
       component={(props) => <GeneralSettingsPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.SETTINGS.BLOCKCHAIN}
+      component={(props) => <BlockchainSettingsPage {...props} stores={stores} actions={actions} />}
     />
     <Route
       exact
