@@ -137,12 +137,15 @@ export default class WalletSummary extends Component<Props> {
           </BorderedBox>
         </div>
         <div className={styles.rightBlock}>
-        {/* //TODO MOVE */}
+          {/* ------------ TO MOVE */}
           <div className={styles.searchBtn}>
             <span className={styles.search}><SearchIcon /></span>
             <input type="text" name="" placeholder="Search" />
-            <button>Filter Icon</button>
+            <button type="button">
+              <span>Filter-ic</span>
+            </button>
           </div>
+          {/* ------------ TO MOVE */}
           {!isLoadingTransactions ? (
             <span
               className={styles.exportTxToFileSvg}
