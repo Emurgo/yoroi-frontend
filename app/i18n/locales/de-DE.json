@@ -320,7 +320,7 @@
   "wallet.add.optionDialog.connect.hw.trezor.learnMoreText": "Eine Trezor Hardware-Wallet ist ein kleines USB-Gerät, das Deiner Wallet ein zusätzliches Sicherheitsniveau verleiht. Es ist sicherer, da dein privater Schlüssel nie die Hardware-Wallet verlässt. Dies schützt dein Geld, auch wenn dein Computer durch Malware, Phishing-Versuche usw. gefährdet ist.",
   "wallet.add.optionDialog.connect.hw.trezor.title": "Trezor Hardware Wallet",
   "wallet.add.optionDialog.create.normalWallet.description": "Ein Standard Wallet durch einen Wiederherstellungssatz geschützt.",
-  "wallet.add.optionDialog.create.paperWallet.description": "Paper wallets can be created even on devices not connected to the internet which makes them well-suited for single-use cold storage.",
+  "wallet.add.optionDialog.create.paperWallet.description": "Papier-Wallets können auch auf Geräten erstellt werden, die nicht mit dem Internet verbunden sind, wodurch sie sich gut für die exklusive Kalt-Lagerung (cold storage) eignen.",
   "wallet.add.optionDialog.restore.dialogTitle": "Wallet wiederherstellen",
   "wallet.add.optionDialog.restore.normalWallet.description": "Wähle diese Option um Deine Wallet wiederherzustellen, wenn Du einen Yoroi Wiederherstellungs-Satz bestehend aus 15 Wörtern hast, der generiert wurde als Du Deine Yoroi Wallet erstmals eingerichtet hast.",
   "wallet.add.optionDialog.restore.normalWallet.title": "Gib einen aus 15 Wörtern bestehenden Wiederherstellungssatz ein",
