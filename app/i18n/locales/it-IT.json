@@ -205,6 +205,7 @@
   "settings.general.languageSelect.labelInfo": "La traduzione della lingua selezionata è fornita completamente dalla comunità",
   "settings.general.translation.acknowledgment": "Quanto segue è grazie al loro contributo: ",
   "settings.general.translation.contributors": "Michael Dogali (of Stakelovelace.io), 8uDD4T & Giffas",
+  "settings.menu.blockchain.link.label": "Blockchain",
   "settings.menu.externalStorage.link.label": "Promemoria di archiviazione",
   "settings.menu.general.link.label": "Generale",
   "settings.menu.levelOfComplexity.link.label": "Livello di complessità",
