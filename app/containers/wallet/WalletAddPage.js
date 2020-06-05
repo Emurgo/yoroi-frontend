@@ -139,7 +139,6 @@ export default class WalletAddPage extends Component<Props> {
         />
       );
     } else if (uiDialogs.isOpen(UserPasswordDialog)) {
-      console.log('zxvasdf');
       activeDialog = (
         <CreatePaperWalletDialogContainer
           {...this.generated.CreatePaperWalletDialogContainerProps}
