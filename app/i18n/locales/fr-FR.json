@@ -205,6 +205,7 @@
   "settings.general.languageSelect.labelInfo": "La traduction de la langue que vous avez choisie est entièrement assurée par la communauté",
   "settings.general.translation.acknowledgment": "Merci à eux pour leur contribution : ",
   "settings.general.translation.contributors": "STKH Stake Pool",
+  "settings.menu.blockchain.link.label": "Blockchain",
   "settings.menu.externalStorage.link.label": "Stockage de mémos",
   "settings.menu.general.link.label": "Général",
   "settings.menu.levelOfComplexity.link.label": "Niveau de complexité",
