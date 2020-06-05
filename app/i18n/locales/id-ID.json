@@ -205,6 +205,7 @@
   "settings.general.languageSelect.labelInfo": "Terjemahan bahasa yang dipilih sepenuhnya disediakan oleh komunitas",
   "settings.general.translation.acknowledgment": "Terima kasih kepada mereka yang telah berkontribusi: ",
   "settings.general.translation.contributors": "_",
+  "settings.menu.blockchain.link.label": "Blockchain",
   "settings.menu.externalStorage.link.label": "Memo Storage",
   "settings.menu.general.link.label": "Umum",
   "settings.menu.levelOfComplexity.link.label": "Level of Complexity",
