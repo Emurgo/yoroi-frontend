@@ -205,6 +205,7 @@
   "settings.general.languageSelect.labelInfo": "La traducción del idioma elegido es proporcionada en su totalidad por la comunidad",
   "settings.general.translation.acknowledgment": "Gracias a los siguientes miembros por su contribución: ",
   "settings.general.translation.contributors": "Sebastián Videmato, Rodrigo [RODRI]",
+  "settings.menu.blockchain.link.label": "Blockchain",
   "settings.menu.externalStorage.link.label": "Almacenamiento de memos",
   "settings.menu.general.link.label": "General",
   "settings.menu.levelOfComplexity.link.label": "Nivel de Complejidad",
