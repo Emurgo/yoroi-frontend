@@ -29,6 +29,7 @@ export const ROUTES = {
   SETTINGS: {
     ROOT: '/settings',
     GENERAL: '/settings/general',
+    BLOCKCHAIN: '/settings/blockchain',
     PAPER_WALLET: '/settings/paper-wallet',
     WALLET: '/settings/wallet',
     EXTERNAL_STORAGE: '/settings/external-storage',

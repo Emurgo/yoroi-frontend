@@ -3,17 +3,15 @@
 import type { Node } from 'react';
 import React from 'react';
 
-import { boolean, select, } from '@storybook/addon-knobs';
+import { boolean } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import { LANGUAGES } from '../../../i18n/translations';
-import { SUPPORTED_CURRENCIES } from '../../../config/unitOfAccount';
 import GeneralSettingsPage from './GeneralSettingsPage';
 import { withScreenshot } from 'storycap';
 import { globalKnobs, walletLookup } from '../../../../stories/helpers/StoryWrapper';
 import { getVarsForTheme } from '../../../stores/toplevel/ProfileStore';
 import { wrapSettings } from '../../../Routes';
 import { mockSettingsProps } from '../Settings.mock';
-import { getDefaultExplorer } from '../../../domain/Explorer';
 import { ROUTES } from '../../../routes-config';
 
 export default {
@@ -25,15 +23,6 @@ export default {
 export const Generic = (): Node => {
   const lookup = walletLookup([]);
 
-  const lastUpdateCases = {
-    Never: 0,
-    Recent: 1,
-  };
-  const lastUpdatedTimestamp = select(
-    'currency_lastUpdate',
-    lastUpdateCases,
-    lastUpdateCases.Never
-  );
   return wrapSettings(
     mockSettingsProps({
       location: ROUTES.SETTINGS.GENERAL,
@@ -44,38 +33,15 @@ export const Generic = (): Node => {
       generated={{
         stores: {
           profile: {
-            setSelectedExplorerRequest: {
-              isExecuting: false,
-              error: undefined,
-            },
             setProfileLocaleRequest: {
               isExecuting: false,
               error: undefined,
             },
             LANGUAGE_OPTIONS: LANGUAGES,
             currentLocale: globalKnobs.locale(),
-            selectedExplorer: getDefaultExplorer(),
             currentTheme: globalKnobs.currentTheme(),
             getThemeVars: getVarsForTheme,
             hasCustomTheme: () => boolean('hasCustomTheme', false),
-            UNIT_OF_ACCOUNT_OPTIONS: SUPPORTED_CURRENCIES,
-            unitOfAccount: {
-              enabled: false,
-              currency: undefined,
-            },
-            setUnitOfAccountRequest: {
-              error: null,
-              isExecuting: boolean('setUnitOfAccountRequest_isExecuting'),
-            },
-          },
-          coinPriceStore: {
-            getCurrentPrice: (_from, _to) => 5,
-            lastUpdateTimestamp: lastUpdatedTimestamp === lastUpdateCases.Never
-              ? null
-              : new Date().getTime(),
-            refreshCurrentUnit: {
-              isExecuting: false,
-            },
           },
         },
         actions: {
@@ -83,11 +49,8 @@ export const Generic = (): Node => {
             updateLocale: { trigger: async (req) => action('updateLocale')(req) },
             updateTheme: { trigger: async (req) => action('updateTheme')(req) },
             exportTheme: { trigger: async (req) => action('exportTheme')(req) },
-            updateSelectedExplorer: { trigger: async (req) => action('updateSelectedExplorer')(req) },
-            updateUnitOfAccount: { trigger: async (req) => action('updateUnitOfAccount')(req) },
           },
         },
-        canRegisterProtocol: () => boolean('canRegisterProtocol', true),
       }}
     />)
   );

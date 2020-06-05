@@ -114,6 +114,12 @@ Then(/^I should see support screen$/, async function () {
   await this.waitForElement("//h1[contains(text(), 'Logs')]", By.xpath);
 });
 
+Then(/^I should see blockchain screen$/, async function () {
+  await this.waitForElement('.ExplorerSettings_explorer');
+  await this.waitForElement("//h2[contains(text(), 'Cardano Payment URLs')]", By.xpath);
+  await this.waitForElement("//h2[contains(text(), 'Currency Conversion')]", By.xpath);
+});
+
 When(/^I click on remove wallet$/, async function () {
   await this.click('.removeWallet');
 });

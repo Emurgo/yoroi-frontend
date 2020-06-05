@@ -41,7 +41,6 @@ import WalletRestoreOptionDialog from '../../components/wallet/add/option-dialog
 import WalletConnectHWOptionDialog from '../../components/wallet/add/option-dialog/WalletConnectHWOptionDialog';
 import WalletTrezorConnectDialogContainer from './dialogs/WalletTrezorConnectDialogContainer';
 import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDialogContainer';
-import CreatePaperWalletDialogContainer from './dialogs/CreatePaperWalletDialogContainer';
 import { getApiMeta, getPaperWalletIntro } from '../../stores/toplevel/ProfileStore';
 import WalletCreateOptionDialog from '../../components/wallet/add/option-dialog/WalletCreateOptionDialog';
 import WalletPaperDialog from '../../components/wallet/WalletPaperDialog';
