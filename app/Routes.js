@@ -18,7 +18,6 @@ import UriPromptPage from './containers/profile/UriPromptPage';
 import Settings from './containers/settings/Settings';
 import type { GeneratedData as SettingsData } from './containers/settings/Settings';
 import GeneralSettingsPage from './containers/settings/categories/GeneralSettingsPage';
-import PaperWalletPage from './containers/settings/categories/PaperWalletPage';
 import WalletSettingsPage from './containers/settings/categories/WalletSettingsPage';
 import ExternalStorageSettingsPage from './containers/settings/categories/ExternalStorageSettingsPage';
 import OAuthDropboxPage from './containers/settings/categories/OAuthDropboxPage';
@@ -191,11 +190,6 @@ const SettingsSubpages = (stores, actions) => (
       exact
       path={ROUTES.SETTINGS.GENERAL}
       component={(props) => <GeneralSettingsPage {...props} stores={stores} actions={actions} />}
-    />
-    <Route
-      exact
-      path={ROUTES.SETTINGS.PAPER_WALLET}
-      component={(props) => <PaperWalletPage {...props} stores={stores} actions={actions} />}
     />
     <Route
       exact

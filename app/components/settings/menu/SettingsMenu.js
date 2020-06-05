@@ -16,10 +16,6 @@ const messages = defineMessages({
     id: 'settings.menu.general.link.label',
     defaultMessage: '!!!General',
   },
-  paperWallet: {
-    id: 'settings.menu.paperWallet.link.label',
-    defaultMessage: '!!!Paper Wallet',
-  },
   support: {
     id: 'settings.menu.support.link.label',
     defaultMessage: '!!!Support',
@@ -65,15 +61,6 @@ export default class SettingsMenu extends Component<Props> {
             active={isActiveItem(ROUTES.SETTINGS.GENERAL)}
             className="general"
           />
-
-          {!environmnent.isShelley() &&
-            <SettingsMenuItem
-              label={intl.formatMessage(messages.paperWallet)}
-              onClick={() => onItemClick(ROUTES.SETTINGS.PAPER_WALLET)}
-              active={isActiveItem(ROUTES.SETTINGS.PAPER_WALLET)}
-              className="paperWallet"
-            />
-          }
 
           <SettingsMenuItem
             label={intl.formatMessage(globalMessages.walletLabel)}

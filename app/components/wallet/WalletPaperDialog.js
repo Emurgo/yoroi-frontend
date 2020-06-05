@@ -5,16 +5,16 @@ import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
 import { Select } from 'react-polymorph/lib/components/Select';
-import { Button } from 'react-polymorph/lib/components/Button';
 import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { defineMessages, intlShape } from 'react-intl';
-import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
-import LocalizableError from '../../../i18n/LocalizableError';
-import styles from './PaperWalletSettings.scss';
+import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
+import LocalizableError from '../../i18n/LocalizableError';
+import styles from './WalletPaperDialog.scss';
 import ReactMarkdown from 'react-markdown';
-import { CheckboxOwnSkin } from '../../../themes/skins/CheckboxOwnSkin';
+import { CheckboxOwnSkin } from '../../themes/skins/CheckboxOwnSkin';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import Dialog from '../widgets/Dialog';
+import DialogCloseButton from '../widgets/DialogCloseButton';
 
 const messages = defineMessages({
   numAddressesSelectLabel: {
@@ -37,14 +37,13 @@ const messages = defineMessages({
 
 type Props = {|
   +onCreatePaper: {| numAddresses: number, printAccountPlate: boolean |} => void,
-  +dialog: Node,
+  +onCancel: void => void,
   +paperWalletsIntroText: string,
-  +isDialogOpen: boolean,
   +error?: ?LocalizableError,
 |};
 
 @observer
-export default class PaperWalletSettings extends Component<Props> {
+export default class PaperWalletDialog extends Component<Props> {
   static defaultProps: {|error: void|} = {
     error: undefined
   };
@@ -82,19 +81,30 @@ export default class PaperWalletSettings extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { error, isDialogOpen, dialog, paperWalletsIntroText } = this.props;
+    const { error, paperWalletsIntroText, onCancel } = this.props;
     const numAddresses = this.form.$('numAddresses');
     const printPaperWalletIdentification = this.form.$('printPaperWalletIdentification');
     const numAddressOptions = [...Array(5).keys()].map(x => ({ value: `${x + 1}`, label: `${x + 1}` }));
     const componentClassNames = classNames([styles.component, 'general']);
     const numAddressesSelectClassNames = classNames([styles.numAddressesSelect]);
-    const buttonClassNames = classNames([
-      'primary',
-      styles.button,
-      'createPaperWallet' // classname for UI tests
-    ]);
+
+    const actions = [
+      {
+        label: this.context.intl.formatMessage(messages.createPaperLabel),
+        primary: true,
+        onClick: this.createPaper,
+      },
+    ];
+
     return (
-      <div className={componentClassNames}>
+      <Dialog
+        className={componentClassNames}
+        title={intl.formatMessage(messages.createPaperLabel)}
+        closeOnOverlayClick={false}
+        onClose={onCancel}
+        actions={actions}
+        closeButton={<DialogCloseButton />}
+      >
 
         <div className={styles.intro}>
           <ReactMarkdown source={paperWalletsIntroText} escapeHtml={false} />
@@ -105,7 +115,7 @@ export default class PaperWalletSettings extends Component<Props> {
           options={numAddressOptions}
           {...numAddresses.bind()}
           skin={SelectSkin}
-          isOpeningUpward // need this to make sure all options still show on small screens
+          isOpeningUpward
         />
 
         <Checkbox
@@ -117,20 +127,9 @@ export default class PaperWalletSettings extends Component<Props> {
           description={this.context.intl.formatMessage(messages.printIdentificationMessage)}
         />
 
-        <Button
-          className={buttonClassNames}
-          label={this.context.intl.formatMessage(messages.createPaperLabel)}
-          skin={ButtonSkin}
-          onClick={this.createPaper}
-        />
-
-        {isDialogOpen ? (
-          <div>{dialog}</div>
-        ) : null}
-
         {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
 
-      </div>
+      </Dialog>
     );
   }
 

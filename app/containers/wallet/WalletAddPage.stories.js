@@ -18,6 +18,7 @@ import {
   trezorErrorCases,
   ledgerErrorCases,
   genUnitOfAccount,
+  getValidationMnemonicCases,
 } from '../../../stories/helpers/StoryWrapper';
 import environment from '../../environment';
 import { THEMES } from '../../themes';
@@ -40,7 +41,13 @@ import WalletRestoreOptionDialog from '../../components/wallet/add/option-dialog
 import WalletConnectHWOptionDialog from '../../components/wallet/add/option-dialog/WalletConnectHWOptionDialog';
 import WalletTrezorConnectDialogContainer from './dialogs/WalletTrezorConnectDialogContainer';
 import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDialogContainer';
-import { getApiMeta } from '../../stores/toplevel/ProfileStore';
+import CreatePaperWalletDialogContainer from './dialogs/CreatePaperWalletDialogContainer';
+import { getApiMeta, getPaperWalletIntro } from '../../stores/toplevel/ProfileStore';
+import WalletCreateOptionDialog from '../../components/wallet/add/option-dialog/WalletCreateOptionDialog';
+import WalletPaperDialog from '../../components/wallet/WalletPaperDialog';
+import UserPasswordDialog from '../../components/wallet/add/paper-wallets/UserPasswordDialog';
+import { ProgressStep as PaperWalletProgressStep } from '../../stores/ada/PaperWalletCreateStore';
+import { PdfGenSteps } from '../../api/ada/paperWallet/paperWalletPdf';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -53,6 +60,8 @@ const defaultProps: {|
   getParam?: <T>(number | string) => T,
   selectedAPI: *,
   WalletCreateDialogContainerProps?: *,
+  WalletPaperDialogContainerProps?: *,
+  CreatePaperWalletDialogContainerProps?: *,
   WalletBackupDialogContainerProps?: *,
   WalletRestoreDialogContainerProps?: *,
   WalletTrezorConnectDialogContainerProps?: *,
@@ -130,6 +139,9 @@ const defaultProps: {|
     },
   },
   WalletCreateDialogContainerProps: request.WalletCreateDialogContainerProps || (null: any),
+  WalletPaperDialogContainerProps: request.WalletPaperDialogContainerProps || (null: any),
+  CreatePaperWalletDialogContainerProps:
+    request.CreatePaperWalletDialogContainerProps || (null: any),
   WalletBackupDialogContainerProps: request.WalletBackupDialogContainerProps || (null: any),
   WalletRestoreDialogContainerProps: request.WalletRestoreDialogContainerProps || (null: any),
   WalletTrezorConnectDialogContainerProps:
@@ -186,6 +198,17 @@ export const CurrencySelect = (): Node => (
     }))}
   />
 );
+
+export const CreateWalletOptions = (): Node => {
+  return (
+    <WalletAddPage
+      generated={defaultProps(Object.freeze({
+        selectedAPI: getApiMeta('ada'),
+        openDialog: WalletCreateOptionDialog,
+      }))}
+    />
+  );
+};
 
 export const CreateWalletStart = (): Node => (
   <WalletAddPage
@@ -1074,4 +1097,307 @@ export const LedgerSave = (): Node => {
       }))}
     />
   );
+};
+
+
+export const PaperWalletCreate = (): Node => (
+  <WalletAddPage
+    generated={defaultProps(Object.freeze({
+      selectedAPI: getApiMeta('ada'),
+      openDialog: WalletPaperDialog,
+      WalletPaperDialogContainerProps: {
+        generated: {
+          stores: {
+            profile: {
+              isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+              paperWalletsIntro: getPaperWalletIntro(globalKnobs.locale(), ''),
+            },
+          },
+          actions: {
+            dialogs: {
+              open: { trigger: action('open') },
+              updateDataForActiveDialog: { trigger: action('updateDataForActiveDialog') },
+            },
+          }
+        },
+      },
+    }))}
+  />
+);
+
+
+const paperWalletMockActions = {
+  dialogs: {
+    updateDataForActiveDialog: { trigger: action('updateDataForActiveDialog') },
+    closeActiveDialog: { trigger: action('closeActiveDialog') },
+  },
+  notifications: {
+    open: { trigger: action('open') },
+  },
+  paperWallets: {
+    cancel: { trigger: action('cancel') },
+    submitInit: { trigger: action('submitInit') },
+    submitUserPassword: { trigger: async (req) => action('submitUserPassword')(req) },
+    backToCreate: { trigger: action('backToCreate') },
+    submitVerify: { trigger: action('submitVerify') },
+    submitCreate: { trigger: action('submitCreate') },
+    downloadPaperWallet: { trigger: action('downloadPaperWallet') },
+  },
+};
+
+export const PaperWalletUserPasswordDialog = (): Node => {
+  const passwordCases = {
+    Untouched: 0,
+    TooShort: 1,
+    MisMatch: 2,
+    Correct: 3,
+  };
+  const passwordValue = () => select(
+    'passwordCases',
+    passwordCases,
+    passwordCases.Untouched,
+  );
+  const getNewPassword = () => {
+    const val = passwordValue();
+    if (val === passwordCases.Correct) return 'asdfasdfasdf';
+    if (val === passwordCases.MisMatch) return 'asdfasdfasdf';
+    if (val === passwordCases.TooShort) return 'a';
+    return '';
+  };
+  const getRepeatPassword = () => {
+    const val = passwordValue();
+    if (val === passwordCases.Correct) return 'asdfasdfasdf';
+    if (val === passwordCases.MisMatch) return 'zxcvzxcvzxcv';
+    if (val === passwordCases.TooShort) return 'a';
+    return '';
+  };
+  const selectedAPI = getApiMeta('ada');
+  return (
+    <WalletAddPage
+      generated={defaultProps(Object.freeze({
+        openDialog: UserPasswordDialog,
+        selectedAPI,
+        CreatePaperWalletDialogContainerProps: {
+          generated: {
+            stores: {
+              profile: {
+                paperWalletsIntro: getPaperWalletIntro(globalKnobs.locale(), ''),
+                isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+                selectedExplorer: getDefaultExplorer(),
+              },
+              uiDialogs: {
+                dataForActiveDialog: {
+                  numAddresses: 5,
+                  printAccountPlate: true,
+                  repeatedPasswordValue: getRepeatPassword(),
+                  passwordValue: getNewPassword(),
+                }
+              },
+              uiNotifications: {
+                isOpen: () => false,
+                getTooltipActiveNotification: () => null,
+              },
+              paperWallets: {
+                paper: null,
+                progressInfo: PaperWalletProgressStep.USER_PASSWORD,
+                userPassword: '',
+                pdfRenderStatus: null,
+                pdf: null,
+              },
+            },
+            actions: paperWalletMockActions,
+            verifyDefaultValues: undefined,
+          },
+        },
+      }))}
+    />
+  );
+};
+
+export const PaperWalletCreateDialog = (): Node => {
+  const modifiedSteps = {
+    undefined: 'undefined',
+    ...PdfGenSteps,
+    hasPdf: 'hasPdf',
+  };
+  const extendedSteps = () => select(
+    'currentStep',
+    modifiedSteps,
+    modifiedSteps.initializing,
+  );
+  const getRealStep = () => {
+    if (extendedSteps() === modifiedSteps.undefined) {
+      return undefined;
+    }
+    if (extendedSteps() === modifiedSteps.hasPdf) {
+      return modifiedSteps.done;
+    }
+    return extendedSteps();
+  };
+  const selectedAPI = getApiMeta('ada');
+  return (
+    <WalletAddPage
+      generated={defaultProps(Object.freeze({
+        openDialog: UserPasswordDialog,
+        selectedAPI,
+        CreatePaperWalletDialogContainerProps: {
+          generated: {
+            stores: {
+              profile: {
+                paperWalletsIntro: getPaperWalletIntro(globalKnobs.locale(), ''),
+                isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+                selectedExplorer: getDefaultExplorer(),
+              },
+              uiDialogs: {
+                dataForActiveDialog: {
+                  numAddresses: 5,
+                  printAccountPlate: true,
+                  repeatedPasswordValue: '',
+                  passwordValue: '',
+                }
+              },
+              uiNotifications: {
+                isOpen: () => false,
+                getTooltipActiveNotification: () => null,
+              },
+              paperWallets: {
+                paper: null,
+                progressInfo: PaperWalletProgressStep.CREATE,
+                userPassword: '',
+                pdfRenderStatus: getRealStep(),
+                pdf: extendedSteps() === modifiedSteps.hasPdf
+                  ? new Blob(['this is just fake data'])
+                  : null,
+              },
+            },
+            actions: paperWalletMockActions,
+            verifyDefaultValues: undefined,
+          },
+        },
+      }))}
+    />
+  );
+};
+
+
+const constructedPaperWallet = {
+  addresses: [
+    'Ae2tdPwUPEZCdEXujtvAFSnhqnNsPbd8YoCt5obzpWAH91tbLP6LsHxCVwB',
+    'Ae2tdPwUPEZJJzyff4UXcgsaj19twRknh9miCxjsLoAQLt5cpQ3nDnwZKMN',
+    'Ae2tdPwUPEZJcoYz71M8SZdsrtvxbsKX9oL1N6j24ULPSY6c5iAPUSAGzgB',
+    'Ae2tdPwUPEZ588oVb86pCyANsrPGJZVHU2mqhYqPzLWU1uo6jS2qM1vgn1P',
+    'Ae2tdPwUPEZAPUqpvUgoBB7QjrfAbu1RXbFRoLcdYYV8r4FaSJrq4oowAhv',
+  ],
+  scrambledWords: getValidationMnemonicCases(21).Correct.split(' '),
+  accountPlate: {
+    ImagePart: '7b9bf637f341bed7933c8673f9fb7e405097746115f24ec7d192f80fb6efb219da8bc1902dab99fc070f156b7877f29dd8e581da616ff7fdad28493d084a0db9',
+    TextPart: 'XLBS-6706',
+  },
+};
+
+export const PaperWalletVerifyDialog = (): Node => {
+  const mnemonicCases = getValidationMnemonicCases(21);
+  const mnemonicsValue = () => select(
+    'mnemonicCases',
+    mnemonicCases,
+    mnemonicCases.Empty,
+  );
+  const correctPassword = 'asdfasdfasdf';
+  const passwordCases = getPasswordValidationCases(correctPassword);
+  const passwordValue = () => select(
+    'passwordCases',
+    passwordCases,
+    passwordCases.Empty,
+  );
+  const selectedAPI = getApiMeta('ada');
+  return (
+    <WalletAddPage
+      generated={defaultProps(Object.freeze({
+        openDialog: UserPasswordDialog,
+        selectedAPI,
+        CreatePaperWalletDialogContainerProps: {
+          generated: {
+            stores: {
+              profile: {
+                paperWalletsIntro: getPaperWalletIntro(globalKnobs.locale(), ''),
+                isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+                selectedExplorer: getDefaultExplorer(),
+              },
+              uiDialogs: {
+                dataForActiveDialog: {
+                  numAddresses: 5,
+                  printAccountPlate: true,
+                  repeatedPasswordValue: '',
+                  passwordValue: '',
+                }
+              },
+              uiNotifications: {
+                isOpen: () => false,
+                getTooltipActiveNotification: () => null,
+              },
+              paperWallets: {
+                paper: constructedPaperWallet,
+                progressInfo: PaperWalletProgressStep.VERIFY,
+                userPassword: correctPassword,
+                pdfRenderStatus: null,
+                pdf: null,
+              },
+            },
+            actions: paperWalletMockActions,
+            verifyDefaultValues: passwordValue() === passwordCases.Empty &&
+              mnemonicsValue() === mnemonicCases.Empty
+              ? undefined
+              : {
+                paperPassword: passwordValue(),
+                recoveryPhrase: mnemonicsValue(),
+                walletName: '',
+                walletPassword: '',
+              }
+          },
+        },
+      }))}
+    />
+  );
+};
+
+export const PaperWalletFinalizeDialog = (): Node => {
+  const selectedAPI = getApiMeta('ada');
+  return (<WalletAddPage
+    generated={defaultProps(Object.freeze({
+      openDialog: UserPasswordDialog,
+      selectedAPI,
+      CreatePaperWalletDialogContainerProps: {
+        generated: {
+          stores: {
+            profile: {
+              paperWalletsIntro: getPaperWalletIntro(globalKnobs.locale(), ''),
+              isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+              selectedExplorer: getDefaultExplorer(),
+            },
+            uiDialogs: {
+              dataForActiveDialog: {
+                numAddresses: 5,
+                printAccountPlate: true,
+                repeatedPasswordValue: '',
+                passwordValue: '',
+              }
+            },
+            uiNotifications: {
+              isOpen: () => false,
+              getTooltipActiveNotification: () => null,
+            },
+            paperWallets: {
+              paper: constructedPaperWallet,
+              progressInfo: PaperWalletProgressStep.FINALIZE,
+              userPassword: '',
+              pdfRenderStatus: null,
+              pdf: null,
+            },
+          },
+          actions: paperWalletMockActions,
+          verifyDefaultValues: undefined,
+        },
+      },
+    }))}
+  />);
 };

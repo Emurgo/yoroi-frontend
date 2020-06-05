@@ -18,6 +18,15 @@ When(/^I select Cardano$/, async function () {
   await this.click('.PickCurrencyOptionDialog_cardano');
 });
 
+When(/^I select Create Wallet$/, async function () {
+  await this.waitForElement('.WalletCreateOptionDialog');
+  await this.click('.WalletCreateOptionDialog_createWallet');
+});
+When(/^I select Paper Wallet$/, async function () {
+  await this.waitForElement('.WalletCreateOptionDialog');
+  await this.click('.WalletCreateOptionDialog_restorePaperWallet');
+});
+
 When(/^I enter the created wallet password:$/, async function (table) {
   const fields = table.hashes()[0];
   await this.input('.WalletCreateDialog .walletPassword input', fields.password);

@@ -148,7 +148,10 @@
             background-image: url(../../../assets/images/add-wallet/option-dialog/connect-trezor-classic.inline.svg);
           }
 
-          // CREATE WALLET [NOT YET]
+          // CREATE WALLET
+          &.createWallet {
+            background-image: url(../../../assets/images/add-wallet/create-wallet-classic.inline.svg);
+          }
 
           // RESTORE WALLET
           &.restoreNormalWallet {
@@ -193,8 +196,11 @@
             background-image: url(../../../assets/images/add-wallet/option-dialog/connect-trezor-modern.inline.svg);
           }
 
-          // CREATE WALLET [NOT ANY YET]
-
+          // CREATE WALLET
+          &.createWallet {
+            background-image: url(../../../assets/images/add-wallet/create-wallet-modern.inline.svg);
+          }
+        
           // RESTORE WALLET
           &.restoreNormalWallet {
             background-image: url(../../../assets/images/add-wallet/option-dialog/restore-normal-wallet-modern.inline.svg);

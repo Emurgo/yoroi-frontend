@@ -37,6 +37,17 @@ import type { GeneratedData as WalletTrezorConnectDialogContainerData } from './
 import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDialogContainer';
 import type { GeneratedData as WalletLedgerConnectDialogContainerData } from './dialogs/WalletLedgerConnectDialogContainer';
 
+import WalletCreateOptionDialog from '../../components/wallet/add/option-dialog/WalletCreateOptionDialog';
+import WalletCreateOptionDialogContainer from './dialogs/WalletCreateOptionDialogContainer';
+import WalletPaperDialog from '../../components/wallet/WalletPaperDialog';
+import WalletPaperDialogContainer from './dialogs/WalletPaperDialogContainer';
+import type { GeneratedData as WalletPaperDialogContainerData } from './dialogs/WalletPaperDialogContainer';
+import CreatePaperWalletDialogContainer from './dialogs/CreatePaperWalletDialogContainer';
+import type {
+  GeneratedData as CreatePaperWalletDialogContainerData
+} from './dialogs/CreatePaperWalletDialogContainer';
+import UserPasswordDialog from '../../components/wallet/add/paper-wallets/UserPasswordDialog';
+
 import SidebarContainer from '../SidebarContainer';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import NavBar from '../../components/topbar/NavBar';
@@ -103,11 +114,35 @@ export default class WalletAddPage extends Component<Props> {
         onClose={this.onClose}
         onCardano={() => this.generated.actions.profile.setSelectedAPI.trigger('ada')}
       />);
+    } else if (uiDialogs.isOpen(WalletCreateOptionDialog)) {
+      activeDialog = (
+        <WalletCreateOptionDialogContainer
+          onClose={this.onClose}
+          onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
+          onPaper={() => actions.dialogs.open.trigger(
+            { dialog: WalletPaperDialog }
+          )}
+        />
+      );
     } else if (uiDialogs.isOpen(WalletCreateDialog)) {
       activeDialog = (
         <WalletCreateDialogContainer
           {...this.generated.WalletCreateDialogContainerProps}
           onClose={this.onClose}
+        />
+      );
+    } else if (uiDialogs.isOpen(WalletPaperDialog)) {
+      activeDialog = (
+        <WalletPaperDialogContainer
+          {...this.generated.WalletPaperDialogContainerProps}
+          onClose={this.onClose}
+        />
+      );
+    } else if (uiDialogs.isOpen(UserPasswordDialog)) {
+      console.log('zxvasdf');
+      activeDialog = (
+        <CreatePaperWalletDialogContainer
+          {...this.generated.CreatePaperWalletDialogContainerProps}
         />
       );
     } else if (uiDialogs.isOpen(WalletBackupDialog)) {
@@ -174,7 +209,7 @@ export default class WalletAddPage extends Component<Props> {
             onHardwareConnect={
               () => this.openDialogWrapper(WalletConnectHWOptionDialog)
             }
-            onCreate={() => this.openDialogWrapper(WalletCreateDialog)}
+            onCreate={() => this.openDialogWrapper(WalletCreateOptionDialog)}
             onRestore={() =>  this.openDialogWrapper(WalletRestoreOptionDialog)}
             onSettings={this._goToSettingsRoot}
             onDaedalusTransfer={this._goToDaedalusTransferRoot}
@@ -203,7 +238,7 @@ export default class WalletAddPage extends Component<Props> {
           onHardwareConnect={
             () => this.openDialogWrapper(WalletConnectHWOptionDialog)
           }
-          onCreate={() => this.openDialogWrapper(WalletCreateDialog)}
+          onCreate={() => this.openDialogWrapper(WalletCreateOptionDialog)}
           onRestore={() => this.openDialogWrapper(WalletRestoreOptionDialog)}
         />
         {activeDialog}
@@ -287,6 +322,12 @@ export default class WalletAddPage extends Component<Props> {
       ),
       WalletCreateDialogContainerProps: (
         { actions, stores, }: InjectedOrGenerated<WalletCreateDialogContainerData>
+      ),
+      WalletPaperDialogContainerProps: (
+        { actions, stores, }: InjectedOrGenerated<WalletPaperDialogContainerData>
+      ),
+      CreatePaperWalletDialogContainerProps: (
+        { stores, actions }: InjectedOrGenerated<CreatePaperWalletDialogContainerData>
       ),
       WalletBackupDialogContainerProps: (
         { actions, stores, }: InjectedOrGenerated<WalletBackupDialogContainerData>
