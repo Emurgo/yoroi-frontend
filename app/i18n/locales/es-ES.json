@@ -320,7 +320,7 @@
   "wallet.add.optionDialog.connect.hw.trezor.learnMoreText": "Una billetera de hardware Trezor es un dispositivo USB pequeño que agrega un nivel de seguridad adicional a tu billetera. Es más seguro porque tu clave privada nunca sale de tu billetera de hardware. Esto protege tus fondos, aún cuando tu computadora es comprometida debido a malware, ataques de phishing, etc.",
   "wallet.add.optionDialog.connect.hw.trezor.title": "Dispositivo Trezor",
   "wallet.add.optionDialog.create.normalWallet.description": "Una billetera estándar respaldada por una frase de recuperación.",
-  "wallet.add.optionDialog.create.paperWallet.description": "Paper wallets can be created even on devices not connected to the internet which makes them well-suited for single-use cold storage.",
+  "wallet.add.optionDialog.create.paperWallet.description": "Las billeteras de papel pueden crearse incluso en dispositivos no conectados a Internet, lo que las hace muy adecuadas para el almacenamiento en frío de un solo uso.",
   "wallet.add.optionDialog.restore.dialogTitle": "Restaurar billetera",
   "wallet.add.optionDialog.restore.normalWallet.description": "Si posees una frase de recuperación de Yoroi que consta de 15 palabras generadas cuando creaste una billetera de Yoroi, elige esta opción para restaurar tu billetera.",
   "wallet.add.optionDialog.restore.normalWallet.title": "Ingresa una frase de recuperación de 15 palabras",
