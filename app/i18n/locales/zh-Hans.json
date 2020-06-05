@@ -205,6 +205,7 @@
   "settings.general.languageSelect.labelInfo": "所选的语言翻译由社区志愿者提供",
   "settings.general.translation.acknowledgment": "感谢下列人员做出的贡献： ",
   "settings.general.translation.contributors": "红中玉",
+  "settings.menu.blockchain.link.label": "Blockchain",
   "settings.menu.externalStorage.link.label": "Memo Storage",
   "settings.menu.general.link.label": "一般",
   "settings.menu.levelOfComplexity.link.label": "Level of Complexity",
