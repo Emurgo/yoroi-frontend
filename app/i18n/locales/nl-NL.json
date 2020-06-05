@@ -205,6 +205,7 @@
   "settings.general.languageSelect.labelInfo": "De gekozen taal is volledig verzorgd door leden van de gemeenschap",
   "settings.general.translation.acknowledgment": "We bedanken graag de volgende mensen voor hun bijdrage: ",
   "settings.general.translation.contributors": "_",
+  "settings.menu.blockchain.link.label": "Blockchain",
   "settings.menu.externalStorage.link.label": "Memo opslag",
   "settings.menu.general.link.label": "Algemeen",
   "settings.menu.levelOfComplexity.link.label": "Niveau van complexiteit",
