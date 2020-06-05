@@ -319,7 +319,7 @@
   "wallet.add.optionDialog.connect.hw.trezor.learnMoreText": "Een Trezor hardware Portemonnee is een klein USB-apparaat dat een extra beveiligingsniveau aan je Portemonnee toevoegt. Het is veiliger omdat uw privésleutel nooit de hardware Portemonnee verlaat. Dit beschermt uw geld, zelfs als uw computer is gehackt door malware, phishing-pogingen, enz.",
   "wallet.add.optionDialog.connect.hw.trezor.title": "Trezor Hardware Portemonnee",
   "wallet.add.optionDialog.create.normalWallet.description": "Een standaardportemonnee ondersteund door een herstelzin.",
-  "wallet.add.optionDialog.create.paperWallet.description": "Paper wallets can be created even on devices not connected to the internet which makes them well-suited for single-use cold storage.",
+  "wallet.add.optionDialog.create.paperWallet.description": "\"Papier\" portemonnees kunnen zelfs worden gemaakt op apparaten die niet zijn verbonden met internet, waardoor ze zeer geschikt zijn voor eenmalig gebruik in een koude opslag.",
   "wallet.add.optionDialog.restore.dialogTitle": "Herstel Portemonnee",
   "wallet.add.optionDialog.restore.normalWallet.description": "Als u een Yoroi herstelzin heeft die bestaat uit 15 woorden die zijn gegenereerd toen u een Yoroi Portemonnee maakte, kiest u deze optie om uw Portemonnee te herstellen.",
   "wallet.add.optionDialog.restore.normalWallet.title": "Geen een 15 woorden herstelzin in",
