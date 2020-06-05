@@ -14,15 +14,16 @@
 
 .toggle {
   margin-left: 58px;
-  width: 12px;
-  height: 12px;
-  display: block;
-
+  padding: 15px;
+  border-radius: 100%;
+  display: flex;
+  transition: background-color .4s ;
   &:hover {
     cursor: pointer;
+    background-color: #EDEDED;
   }
 }
 
-.toggleRotate {
+.toggleRotate svg {
   transform: rotate(180deg);
 }
