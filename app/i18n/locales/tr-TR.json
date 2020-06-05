@@ -205,6 +205,7 @@
   "settings.general.languageSelect.labelInfo": "The selected language translation is fully provided by the community",
   "settings.general.translation.acknowledgment": "Thank you to the following for their contribution: ",
   "settings.general.translation.contributors": "_",
+  "settings.menu.blockchain.link.label": "Blockchain",
   "settings.menu.externalStorage.link.label": "Memo Storage",
   "settings.menu.general.link.label": "Genel",
   "settings.menu.levelOfComplexity.link.label": "Level of Complexity",
