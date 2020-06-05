@@ -112,7 +112,7 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
           error={profileStore.setSelectedExplorerRequest.error}
         />
         {uriSettings}
-        {!environment.isProduction() &&
+        {(!environment.isProduction() || environment.isTest()) &&
           <UnitOfAccountSettings
             onSelect={this.onSelectUnitOfAccount}
             isSubmitting={isSubmittingUnitOfAccount}

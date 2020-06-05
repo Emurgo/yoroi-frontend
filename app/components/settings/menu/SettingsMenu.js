@@ -66,8 +66,6 @@ export default class SettingsMenu extends Component<Props> {
             className="general"
           />
 
-<<<<<<< HEAD
-=======
           <SettingsMenuItem
             label={intl.formatMessage(messages.blockchain)}
             onClick={() => onItemClick(ROUTES.SETTINGS.BLOCKCHAIN)}
@@ -75,16 +73,6 @@ export default class SettingsMenu extends Component<Props> {
             className="blockchain"
           />
 
-          {!environmnent.isShelley() &&
-            <SettingsMenuItem
-              label={intl.formatMessage(messages.paperWallet)}
-              onClick={() => onItemClick(ROUTES.SETTINGS.PAPER_WALLET)}
-              active={isActiveItem(ROUTES.SETTINGS.PAPER_WALLET)}
-              className="paperWallet"
-            />
-          }
-
->>>>>>> move blockchain explorer, payment url and currency to new blockchain tab
           <SettingsMenuItem
             label={intl.formatMessage(globalMessages.walletLabel)}
             onClick={() => onItemClick(ROUTES.SETTINGS.WALLET)}

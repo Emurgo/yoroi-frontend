@@ -49,7 +49,7 @@ type Props = {|
 |};
 
 @observer
-export default class CoinPriceCurrencySettings extends Component<Props> {
+export default class UnitOfAccountSettings extends Component<Props> {
   static defaultProps: {|error: void|} = {
     error: undefined
   };
