@@ -205,6 +205,7 @@
   "settings.general.languageSelect.labelInfo": "Die ausgewählte Sprache ist vollständig von der Community übersetzt worden",
   "settings.general.translation.acknowledgment": "Ein Dank an folgende Personen für deren Beiträge: ",
   "settings.general.translation.contributors": "Christian Meng, Markus Gufler, Matthias Engelmann",
+  "settings.menu.blockchain.link.label": "Blockchain",
   "settings.menu.externalStorage.link.label": "Notiz Speicher",
   "settings.menu.general.link.label": "Allgemein",
   "settings.menu.levelOfComplexity.link.label": "Komplexitätsgrad",
