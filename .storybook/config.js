@@ -66,6 +66,7 @@ RustModule.load().then(() => {
       // $FlowFixMe comes from Webpack and not nodejs so Flow doesn't find the function
       require.context('../app/containers', true, /\.stories\.js$/),
     ],
+    // $FlowDisable
     module
   );
 });

@@ -12,8 +12,9 @@ import CheckDialog from '../../../components/wallet/hwConnect/trezor/CheckDialog
 import ConnectDialog from '../../../components/wallet/hwConnect/trezor/ConnectDialog';
 import SaveDialog from '../../../components/wallet/hwConnect/trezor/SaveDialog';
 
-import { ProgressStep } from '../../../types/HWConnectStoreTypes';
+import { ProgressStep, ProgressInfo } from '../../../types/HWConnectStoreTypes';
 import type { SelectedApiType } from '../../../stores/toplevel/ProfileStore';
+import LocalizableError from '../../../i18n/LocalizableError';
 
 export type GeneratedData = typeof WalletTrezorConnectDialogContainer.prototype.generated;
 
@@ -43,7 +44,7 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
   render(): null | Node {
     const selectedAPI = this.getSelectedApi();
     const { profile } = this.generated.stores;
-    const trezorConnectStore = this._getTrezorConnectStore();
+    const trezorConnectStore = this.generated.stores.substores[selectedAPI.type].trezorConnect;
     const hwConnectActions = this.generated.actions[selectedAPI.type].trezorConnect;
 
     let component = null;
@@ -96,13 +97,41 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
     return component;
   }
 
-  /** Returns the store which is responsible for this Container */
-  _getTrezorConnectStore() {
-    const selectedAPI = this.getSelectedApi();
-    return this.generated.stores.substores[selectedAPI.type].trezorConnect;
-  }
-
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      ada: {|
+        trezorConnect: {|
+          cancel: {| trigger: (params: void) => void |},
+          goBackToCheck: {|
+            trigger: (params: void) => void
+          |},
+          submitCheck: {| trigger: (params: void) => void |},
+          submitConnect: {|
+            trigger: (params: void) => Promise<void>
+          |},
+          submitSave: {|
+            trigger: (params: string) => Promise<void>
+          |}
+        |}
+      |}
+    |},
+    stores: {|
+      profile: {|
+        isClassicTheme: boolean,
+        selectedAPI: void | SelectedApiType
+      |},
+      substores: {|
+        ada: {|
+          trezorConnect: {|
+            defaultWalletName: string,
+            error: ?LocalizableError,
+            isActionProcessing: boolean,
+            progressInfo: ProgressInfo
+          |}
+        |}
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

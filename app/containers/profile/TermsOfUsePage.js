@@ -13,6 +13,8 @@ import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarning
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import LocalizableError from '../../i18n/LocalizableError';
+import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 
 const messages = defineMessages({
   title: {
@@ -57,7 +59,27 @@ export default class TermsOfUsePage extends Component<InjectedOrGenerated<Genera
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      profile: {|
+        acceptTermsOfUse: {|
+          trigger: (params: void) => Promise<void>
+        |}
+      |}
+    |},
+    stores: {|
+      profile: {|
+        setTermsOfUseAcceptanceRequest: {|
+          error: ?LocalizableError,
+          isExecuting: boolean
+        |},
+        termsOfUse: string
+      |},
+      serverConnectionStore: {|
+        checkAdaServerStatus: ServerStatusErrorType
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

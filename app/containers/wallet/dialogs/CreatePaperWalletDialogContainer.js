@@ -18,6 +18,10 @@ import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import type { WalletRestoreDialogValues } from '../../../components/wallet/WalletRestoreDialog';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { PdfGenStepType } from '../../../api/ada/paperWallet/paperWalletPdf';
+import type { ProgressStepEnum } from '../../../stores/ada/PaperWalletCreateStore';
+import type { ExplorerType } from '../../../domain/Explorer';
+import type { Notification } from '../../../types/notificationType';
 
 const messages = defineMessages({
   verifyPaperWallet: {
@@ -153,7 +157,71 @@ export default class CreatePaperWalletDialogContainer
     }
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      dialogs: {|
+        closeActiveDialog: {|
+          trigger: (params: void) => void
+        |},
+        updateDataForActiveDialog: {|
+          trigger: (params: {
+            [key: string]: any,
+            ...
+          }) => void
+        |}
+      |},
+      notifications: {|
+        open: {| trigger: (params: Notification) => void |}
+      |},
+      paperWallets: {|
+        backToCreate: {| trigger: (params: void) => void |},
+        cancel: {| trigger: (params: void) => void |},
+        downloadPaperWallet: {|
+          trigger: (params: void) => void
+        |},
+        submitCreate: {| trigger: (params: void) => void |},
+        submitInit: {|
+          trigger: (params: {|
+            numAddresses: number,
+            printAccountPlate: boolean
+          |}) => void
+        |},
+        submitUserPassword: {|
+          trigger: (params: {|
+            userPassword: string
+          |}) => Promise<void>
+        |},
+        submitVerify: {| trigger: (params: void) => void |}
+      |}
+    |},
+    stores: {|
+      paperWallets: {|
+        paper: ?AdaPaper,
+        pdf: ?Blob,
+        pdfRenderStatus: ?PdfGenStepType,
+        progressInfo: ?ProgressStepEnum,
+        userPassword: ?string
+      |},
+      profile: {|
+        isClassicTheme: boolean,
+        paperWalletsIntro: string,
+        selectedExplorer: ExplorerType
+      |},
+      uiDialogs: {|
+        dataForActiveDialog: {|
+          numAddresses: any,
+          passwordValue: any,
+          printAccountPlate: any,
+          repeatedPasswordValue: any
+        |}
+      |},
+      uiNotifications: {|
+        getTooltipActiveNotification: string => ?Notification,
+        isOpen: string => boolean
+      |}
+    |},
+    verifyDefaultValues: ?WalletRestoreDialogValues
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

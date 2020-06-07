@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import BigNumber from 'bignumber.js';
 import { action, computed, observable, runInAction } from 'mobx';
 import type { Node } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
@@ -34,6 +35,14 @@ import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/m
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { SelectedApiType } from '../../stores/toplevel/ProfileStore';
+import type { SendUsingLedgerParams } from '../../actions/ada/ledger-send-actions';
+import type { SendUsingTrezorParams } from '../../actions/ada/trezor-send-actions';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import type { UriParams } from '../../utils/URIHandling';
+import type { ExplorerType } from '../../domain/Explorer';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import LocalizableError from '../../i18n/LocalizableError';
+import type { BaseSignRequest } from '../../api/ada/transactions/types';
 
 // Hardware Wallet Confirmation
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
@@ -346,7 +355,127 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     />);
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    WalletSendConfirmationDialogContainerProps:
+      InjectedOrGenerated<WalletSendConfirmationDialogContainerData>,
+    actions: {|
+      ada: {|
+        ledgerSend: {|
+          cancel: {| trigger: (params: void) => void |},
+          init: {| trigger: (params: void) => void |},
+          sendUsingLedger: {|
+            trigger: (params: {|
+              params: SendUsingLedgerParams,
+              publicDeriver: PublicDeriver<>
+            |}) => Promise<void>
+          |}
+        |},
+        trezorSend: {|
+          cancel: {| trigger: (params: void) => void |},
+          sendUsingTrezor: {|
+            trigger: (params: {|
+              params: SendUsingTrezorParams,
+              publicDeriver: PublicDeriver<>
+            |}) => Promise<void>
+          |}
+        |},
+        txBuilderActions: {|
+          reset: {| trigger: (params: void) => void |},
+          toggleSendAll: {|
+            trigger: (params: void) => void
+          |},
+          updateAmount: {|
+            trigger: (params: void | number) => void
+          |},
+          updateMemo: {|
+            trigger: (params: void | string) => void
+          |},
+          updateReceiver: {|
+            trigger: (params: void | string) => void
+          |},
+          updateTentativeTx: {|
+            trigger: (params: void) => void
+          |}
+        |}
+      |},
+      dialogs: {|
+        closeActiveDialog: {|
+          trigger: (params: void) => void
+        |},
+        open: {|
+          trigger: (params: {|
+            dialog: any,
+            params?: any
+          |}) => void
+        |}
+      |},
+      memos: {|
+        closeMemoDialog: {| trigger: (params: void) => void |}
+      |},
+      router: {|
+        goToRoute: {|
+          trigger: (params: {|
+            forceRefresh?: boolean,
+            params?: ?any,
+            route: string
+          |}) => void
+        |}
+      |}
+    |},
+    initialShowMemoState: boolean,
+    stores: {|
+      coinPriceStore: {|
+        getCurrentPrice: (from: string, to: string) => ?number
+      |},
+      loading: {|
+        resetUriParams: void => void,
+        uriParams: ?UriParams
+      |},
+      memos: {|
+        hasSetSelectedExternalStorageProvider: boolean
+      |},
+      profile: {|
+        isClassicTheme: boolean,
+        selectedAPI: void | SelectedApiType,
+        selectedExplorer: ExplorerType,
+        unitOfAccount: UnitOfAccountSettingType
+      |},
+      substores: {|
+        ada: {|
+          ledgerSend: {|
+            error: ?LocalizableError,
+            isActionProcessing: boolean
+          |},
+          transactionBuilderStore: {|
+            createUnsignedTx: {|
+              error: ?LocalizableError,
+              isExecuting: boolean
+            |},
+            fee: ?BigNumber,
+            shouldSendAll: boolean,
+            tentativeTx: null | BaseSignRequest<
+              RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput
+            >,
+            totalInput: ?BigNumber,
+            txMismatch: boolean
+          |},
+          transactions: {|
+            validateAmount: string => Promise<boolean>
+          |},
+          trezorSend: {|
+            error: ?LocalizableError,
+            isActionProcessing: boolean
+          |}
+        |}
+      |},
+      transactions: {| hasAnyPending: boolean |},
+      uiDialogs: {|
+        getParam: <T>(number | string) => T,
+        isOpen: any => boolean
+      |},
+      wallets: {| selected: null | PublicDeriver<> |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

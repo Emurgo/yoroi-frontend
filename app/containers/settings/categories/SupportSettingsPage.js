@@ -13,7 +13,7 @@ type GeneratedData = typeof SupportSettingsPage.prototype.generated;
 @observer
 export default class SupportSettingsPage extends Component<InjectedOrGenerated<GeneratedData>> {
 
-  @computed get generated() {
+  @computed get generated(): {||} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

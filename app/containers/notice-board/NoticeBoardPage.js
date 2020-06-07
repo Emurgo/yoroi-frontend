@@ -14,6 +14,9 @@ import TopBar from '../../components/topbar/TopBar';
 import NoticeBoard from '../../components/notice-board/NoticeBoard';
 import NoNotice from '../../components/notice-board/NoNotice';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import Notice from '../../domain/Notice';
+import type { GetNoticesRequestOptions } from '../../api/ada/index';
+import type { Category } from '../../config/topbarConfig';
 
 const messages = defineMessages({
   title: {
@@ -80,7 +83,34 @@ export default class NoticeBoardPage extends Component<InjectedOrGenerated<Gener
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
+    actions: {|
+      noticeBoard: {|
+        loadMore: {|
+          trigger: (params: void) => Promise<void>
+        |}
+      |},
+      topbar: {|
+        activateTopbarCategory: {|
+          trigger: (params: {| category: string |}) => void
+        |}
+      |}
+    |},
+    stores: {|
+      noticeBoard: {|
+        hasMoreToLoad: boolean,
+        isLoading: boolean,
+        loadedNotices: Array<Notice>,
+        searchOptions: GetNoticesRequestOptions
+      |},
+      profile: {| isClassicTheme: boolean |},
+      topbar: {|
+        categories: Array<Category>,
+        isActiveCategory: Category => boolean
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

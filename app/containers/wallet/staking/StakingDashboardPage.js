@@ -32,18 +32,24 @@ import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer'
 import type { GeneratedData as UnmangleTxDialogContainerData } from '../../transfer/UnmangleTxDialogContainer';
 import config from '../../../config';
 import { formattedWalletAmount } from '../../../utils/formatters';
-import type { PoolTuples, ReputationObject, } from '../../../api/ada/lib/state-fetch/types';
+import type { PoolTuples, ReputationObject, ReputationFunc, } from '../../../api/ada/lib/state-fetch/types';
 import type { DelegationRequests } from '../../../stores/ada/DelegationStore';
 import EpochProgressContainer from './EpochProgressContainer';
 import type { GeneratedData as EpochProgressContainerData } from './EpochProgressContainer';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-
+import type { PoolRequest } from '../../../api/ada/lib/storage/bridge/delegationUtils';
+import type { ExplorerType } from '../../../domain/Explorer';
 import type {
   ToRealTimeFunc,
   ToAbsoluteSlotNumberFunc,
 } from '../../../api/ada/lib/storage/bridge/timeUtils';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import type { CreateDelegationTxFunc } from '../../../api/ada/index';
+import type { CurrentTimeRequests, TimeCalcRequests } from '../../../stores/ada/TimeStore';
+import type { TxRequests } from '../../../stores/toplevel/TransactionsStore';
+import type { Notification } from '../../../types/notificationType';
 
 import globalMessages from '../../../i18n/global-messages';
 import { computed, observable, runInAction } from 'mobx';
@@ -711,7 +717,109 @@ export default class StakingDashboardPage extends Component<Props> {
     };
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    EpochProgressContainerProps: InjectedOrGenerated<EpochProgressContainerData>,
+    UnmangleTxDialogContainerProps: InjectedOrGenerated<UnmangleTxDialogContainerData>,
+    actions: {|
+      ada: {|
+        delegationTransaction: {|
+          createTransaction: {|
+            trigger: (params: {|
+              poolRequest: PoolRequest,
+              publicDeriver: PublicDeriver<>
+            |}) => Promise<void>
+          |},
+          reset: {| trigger: (params: void) => void |},
+          signTransaction: {|
+            trigger: (params: {|
+              password: string,
+              publicDeriver: PublicDeriver<>
+            |}) => Promise<void>
+          |}
+        |}
+      |},
+      dialogs: {|
+        closeActiveDialog: {|
+          trigger: (params: void) => void
+        |},
+        open: {|
+          trigger: (params: {|
+            dialog: any,
+            params?: any
+          |}) => void
+        |}
+      |},
+      notifications: {|
+        open: {| trigger: (params: Notification) => void |}
+      |}
+    |},
+    stores: {|
+      coinPriceStore: {|
+        getCurrentPrice: (from: string, to: string) => ?number
+      |},
+      profile: {|
+        getThemeVars: ({| theme: string |}) => {
+          [key: string]: string,
+          ...
+        },
+        isClassicTheme: boolean,
+        selectedExplorer: ExplorerType,
+        shouldHideBalance: boolean,
+        unitOfAccount: UnitOfAccountSettingType
+      |},
+      substores: {|
+        ada: {|
+          addresses: {|
+            getUnmangleAmounts: void => {|
+              canUnmangle: Array<BigNumber>,
+              cannotUnmangle: Array<BigNumber>
+            |}
+          |},
+          delegation: {|
+            getDelegationRequests: (
+              PublicDeriver<>
+            ) => void | DelegationRequests,
+            poolReputation: {|
+              result: ?PromisslessReturnType<ReputationFunc>
+            |}
+          |},
+          delegationTransaction: {|
+            createDelegationTx: {|
+              error: ?LocalizableError,
+              isExecuting: boolean,
+              result: ?PromisslessReturnType<CreateDelegationTxFunc>
+            |},
+            isStale: boolean,
+            signAndBroadcastDelegationTx: {|
+              error: ?LocalizableError,
+              isExecuting: boolean
+            |}
+          |},
+          time: {|
+            getCurrentTimeRequests: (
+              PublicDeriver<>
+            ) => CurrentTimeRequests,
+            getTimeCalcRequests: (
+              PublicDeriver<>
+            ) => TimeCalcRequests
+          |}
+        |}
+      |},
+      transactions: {|
+        getTxRequests: (PublicDeriver<>) => TxRequests,
+        hasAnyPending: boolean
+      |},
+      uiDialogs: {|
+        getParam: <T>(number | string) => T,
+        isOpen: any => boolean
+      |},
+      uiNotifications: {|
+        getTooltipActiveNotification: string => ?Notification,
+        isOpen: string => boolean
+      |},
+      wallets: {| selected: null | PublicDeriver<> |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

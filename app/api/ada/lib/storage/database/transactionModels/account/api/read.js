@@ -18,10 +18,12 @@ import type {
 import { getRowIn, } from '../../../utils';
 
 export class GetAccountingInputs {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    AccountingTransactionInput: typeof Tables.AccountingTransactionInputSchema,
+  |} = Object.freeze({
     [Tables.AccountingTransactionInputSchema.name]: Tables.AccountingTransactionInputSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async fromAddressIds(
     db: lf$Database,
@@ -53,10 +55,12 @@ export class GetAccountingInputs {
 }
 
 export class GetAccountingOutputs {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    AccountingTransactionOutput: typeof Tables.AccountingTransactionOutputSchema,
+  |} = Object.freeze({
     [Tables.AccountingTransactionOutputSchema.name]: Tables.AccountingTransactionOutputSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async fromAddressIds(
     db: lf$Database,
@@ -88,8 +92,11 @@ export class GetAccountingOutputs {
 }
 
 export class AssociateTxWithAccountingIOs {
-  static ownTables = Object.freeze({});
-  static depTables = Object.freeze({
+  static ownTables: {||} = Object.freeze({});
+  static depTables: {|
+    GetAccountingInputs: typeof GetAccountingInputs,
+    GetAccountingOutputs: typeof GetAccountingOutputs,
+  |} = Object.freeze({
     GetAccountingInputs,
     GetAccountingOutputs,
   });

@@ -28,7 +28,7 @@ export default class DebugWalletDialogContainer extends Component<Props> {
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {||} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

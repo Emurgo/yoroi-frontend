@@ -37,10 +37,12 @@ export type MarkAsResponse = void | {|
   UtxoTransactionOutput: $ReadOnly<UtxoTransactionOutputRow>,
 |};
 export class MarkUtxo {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    UtxoTransactionOutput: typeof Tables.UtxoTransactionOutputSchema,
+  |} = Object.freeze({
     [Tables.UtxoTransactionOutputSchema.name]: Tables.UtxoTransactionOutputSchema,
   });
-  static depTables = Object.freeze({
+  static depTables: {|GetUtxoTxOutputsWithTx: typeof GetUtxoTxOutputsWithTx|} = Object.freeze({
     GetUtxoTxOutputsWithTx
   });
 
@@ -88,11 +90,14 @@ export class MarkUtxo {
 }
 
 export class ModifyUtxoTransaction {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    UtxoTransactionInput: typeof Tables.UtxoTransactionInputSchema,
+    UtxoTransactionOutput: typeof Tables.UtxoTransactionOutputSchema,
+  |} = Object.freeze({
     [Tables.UtxoTransactionInputSchema.name]: Tables.UtxoTransactionInputSchema,
     [Tables.UtxoTransactionOutputSchema.name]: Tables.UtxoTransactionOutputSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async addIOsToTx(
     db: lf$Database,

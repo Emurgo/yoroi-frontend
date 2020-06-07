@@ -20,7 +20,7 @@ export default class MaintenancePage extends Component<InjectedOrGenerated<Gener
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|handleExternalLinkClick: (event: MouseEvent) => void|} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

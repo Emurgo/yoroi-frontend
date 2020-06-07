@@ -14,6 +14,9 @@ import { getExplorers } from '../../../domain/Explorer';
 import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
 import AdaCurrency from '../../../assets/images/currencies/ADA.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { ExplorerType } from '../../../domain/Explorer';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import LocalizableError from '../../../i18n/LocalizableError';
 
 const currencyLabels = defineMessages({
   USD: {
@@ -126,7 +129,49 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      profile: {|
+        updateSelectedExplorer: {|
+          trigger: (params: {|
+            explorer: ExplorerType
+          |}) => Promise<void>
+        |},
+        updateUnitOfAccount: {|
+          trigger: (
+            params: UnitOfAccountSettingType
+          ) => Promise<void>
+        |}
+      |}
+    |},
+    canRegisterProtocol: () => boolean,
+    stores: {|
+      coinPriceStore: {|
+        getCurrentPrice: (
+          from: string,
+          to: string
+        ) => ?number,
+        lastUpdateTimestamp: null | number,
+        refreshCurrentUnit: {| isExecuting: boolean |}
+      |},
+      profile: {|
+        UNIT_OF_ACCOUNT_OPTIONS: Array<{|
+          svg: string,
+          symbol: string
+        |}>,
+        selectedExplorer: ExplorerType,
+        setSelectedExplorerRequest: {|
+          error: ?LocalizableError,
+          isExecuting: boolean
+        |},
+        setUnitOfAccountRequest: {|
+          error: ?LocalizableError,
+          isExecuting: boolean
+        |},
+        unitOfAccount: UnitOfAccountSettingType
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

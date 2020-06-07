@@ -26,7 +26,18 @@ export default class WalletCreateDialogContainer extends Component<Props> {
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      ada: {|
+        wallets: {|
+          createWallet: {|
+            trigger: (params: {|name: string, password: string|}) => Promise<void>,
+          |},
+        |},
+      |},
+    |},
+    stores: {|profile: {|isClassicTheme: boolean|}|},
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

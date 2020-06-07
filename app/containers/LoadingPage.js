@@ -8,6 +8,7 @@ import Loading from '../components/loading/Loading';
 import type { InjectedOrGenerated } from '../types/injectedPropsType';
 import { handleExternalLinkClick } from '../utils/routing';
 import { downloadLogs } from '../utils/logging';
+import LocalizableError from '../i18n/LocalizableError';
 
 type GeneratedData = typeof LoadingPage.prototype.generated;
 
@@ -29,7 +30,14 @@ export default class LoadingPage extends Component<InjectedOrGenerated<Generated
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    downloadLogs: () => void,
+    handleExternalLinkClick: (event: MouseEvent) => void,
+    stores: {|
+      loading: {|error: ?LocalizableError, isLoading: boolean|},
+      profile: {|hasLoadedCurrentLocale: boolean, hasLoadedCurrentTheme: boolean|},
+    |},
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

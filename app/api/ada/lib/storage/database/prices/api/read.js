@@ -9,10 +9,12 @@ import type { PriceDataRow } from '../tables';
 import { getAll, } from '../../utils';
 
 export class GetPriceData {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    PriceData: typeof Tables.PriceDataSchema,
+  |} = Object.freeze({
     [Tables.PriceDataSchema.name]: Tables.PriceDataSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async getAllPrices(
     db: lf$Database,

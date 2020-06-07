@@ -19,6 +19,7 @@ import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import registerProtocols from '../../uri-protocols';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 
 const Choices = {
   ACCEPT: 'accept',
@@ -104,7 +105,21 @@ export default class UriPromptPage extends Component<InjectedOrGenerated<Generat
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      profile: {|
+        acceptUriScheme: {|
+          trigger: (params: void) => Promise<void>
+        |}
+      |}
+    |},
+    stores: {|
+      profile: {| isClassicTheme: boolean |},
+      serverConnectionStore: {|
+        checkAdaServerStatus: ServerStatusErrorType
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

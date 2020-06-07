@@ -18,8 +18,12 @@ import {
 } from '../../utxo/api/read';
 
 export class AssociateTxWithIOs {
-  static ownTables = Object.freeze({});
-  static depTables = Object.freeze({
+  static ownTables: {||} = Object.freeze({});
+  static depTables: {|
+    AssociateTxWithAccountingIOs: typeof AssociateTxWithAccountingIOs,
+    AssociateTxWithUtxoIOs: typeof AssociateTxWithUtxoIOs,
+    GetCertificates: typeof GetCertificates,
+  |} = Object.freeze({
     AssociateTxWithAccountingIOs,
     AssociateTxWithUtxoIOs,
     GetCertificates,

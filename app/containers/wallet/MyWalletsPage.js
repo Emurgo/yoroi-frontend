@@ -29,12 +29,17 @@ import NavBarAddButton from '../../components/topbar/NavBarAddButton';
 import NavWalletDetails from '../../components/topbar/NavWalletDetails';
 import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
 import globalMessages from '../../i18n/global-messages';
-import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { ConceptualWallet, isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import {
   asGetPublicKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import type { ConceptualWalletSettingsCache } from '../../stores/toplevel/WalletSettingsStore';
+import type { DelegationRequests } from '../../stores/ada/DelegationStore';
+import type { PublicKeyCache } from '../../stores/toplevel/WalletStore';
+import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
+import type { IGetPublic } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 const messages = defineMessages({
   walletSumInfo: {
@@ -272,7 +277,51 @@ export default class MyWalletsPage extends Component<Props> {
     return balanceResult.accountPart.dividedBy(LOVELACES_PER_ADA);
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
+    SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
+    actions: {|
+      profile: {|
+        updateHideBalance: {|
+          trigger: (params: void) => Promise<void>
+        |}
+      |},
+      router: {|
+        goToRoute: {|
+          trigger: (params: {|
+            forceRefresh?: boolean,
+            params?: ?any,
+            route: string
+          |}) => void
+        |}
+      |},
+      wallets: {|
+        unselectWallet: {| trigger: (params: void) => void |}
+      |}
+    |},
+    stores: {|
+      profile: {| shouldHideBalance: boolean |},
+      substores: {|
+        ada: {|
+          delegation: {|
+            getDelegationRequests: (
+              PublicDeriver<>
+            ) => void | DelegationRequests
+          |}
+        |}
+      |},
+      transactions: {|
+        getTxRequests: (PublicDeriver<>) => TxRequests
+      |},
+      walletSettings: {|
+        getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache
+      |},
+      wallets: {|
+        getPublicKeyCache: IGetPublic => PublicKeyCache,
+        publicDerivers: Array<PublicDeriver<>>
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

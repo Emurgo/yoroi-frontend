@@ -19,6 +19,8 @@ import TopBarLayout from '../../components/layout/TopBarLayout';
 import SidebarContainer from '../SidebarContainer';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import type { Theme } from '../../themes/index';
 
 export type GeneratedData = typeof Settings.prototype.generated;
 
@@ -85,7 +87,30 @@ export default class Settings extends Component<Props> {
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
+    NavBarContainerProps: InjectedOrGenerated<NavBarContainerData>,
+    SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
+    actions: {|
+      router: {|
+        goToRoute: {|
+          trigger: (params: {|
+            forceRefresh?: boolean,
+            params?: ?any,
+            route: string
+          |}) => void
+        |}
+      |}
+    |},
+    stores: {|
+      profile: {|
+        currentLocale: string,
+        currentTheme: Theme
+      |},
+      router: {| location: any |},
+      wallets: {| selected: null | PublicDeriver<> |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

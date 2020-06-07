@@ -40,10 +40,15 @@ import {
 import { addNewRowToTable, } from '../../../utils';
 
 export class ModifyBip44Wrapper {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    Bip44Wrapper: typeof Bip44Tables.Bip44WrapperSchema,
+  |} = Object.freeze({
     [Bip44Tables.Bip44WrapperSchema.name]: Bip44Tables.Bip44WrapperSchema,
   });
-  static depTables = Object.freeze({
+  static depTables: {|
+    GetBip44Wrapper: typeof GetBip44Wrapper,
+    RemoveKeyDerivationTree: typeof RemoveKeyDerivationTree,
+  |} = Object.freeze({
     GetBip44Wrapper,
     RemoveKeyDerivationTree,
   });
@@ -83,12 +88,20 @@ export class ModifyBip44Wrapper {
 }
 
 export class ModifyDisplayCutoff {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    Bip44Chain: typeof Bip44ChainSchema,
+    CanonicalAddress: typeof CanonicalAddressSchema,
+    KeyDerivation: typeof KeyDerivationSchema,
+  |} = Object.freeze({
     [Bip44ChainSchema.name]: Bip44ChainSchema,
     [CanonicalAddressSchema.name]: CanonicalAddressSchema,
     [KeyDerivationSchema.name]: KeyDerivationSchema,
   });
-  static depTables = Object.freeze({
+  static depTables: {|
+    GetChildWithSpecific: typeof GetChildWithSpecific,
+    GetDerivationSpecific: typeof GetDerivationSpecific,
+    GetPathWithSpecific: typeof GetPathWithSpecific,
+  |} = Object.freeze({
     GetPathWithSpecific,
     GetChildWithSpecific,
     GetDerivationSpecific,

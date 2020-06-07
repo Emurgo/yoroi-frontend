@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import Sidebar from '../components/topbar/Sidebar';
 import type { InjectedOrGenerated } from '../types/injectedPropsType';
+import type { Category } from '../config/topbarConfig';
 
 export type GeneratedData = typeof SidebarContainer.prototype.generated;
 
@@ -32,7 +33,27 @@ export default class SidebarContainer extends Component<InjectedOrGenerated<Gene
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      profile: {|
+        toggleSidebar: {|
+          trigger: (params: void) => Promise<void>
+        |}
+      |},
+      topbar: {|
+        activateTopbarCategory: {|
+          trigger: (params: {| category: string |}) => void
+        |}
+      |}
+    |},
+    stores: {|
+      profile: {| isSidebarExpanded: boolean |},
+      topbar: {|
+        categories: Array<Category>,
+        isActiveCategory: Category => boolean
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

@@ -20,6 +20,7 @@ import { ROUTES } from '../../routes-config';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import type { WarningList } from '../../stores/toplevel/WalletSettingsStore';
 
 export type GeneratedData = typeof Wallet.prototype.generated;
 
@@ -142,7 +143,29 @@ export default class Wallet extends Component<Props> {
     return warnings[warnings.length - 1]();
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
+    NavBarContainerProps: InjectedOrGenerated<NavBarContainerData>,
+    SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
+    actions: {|
+      router: {|
+        goToRoute: {|
+          trigger: (params: {|
+            forceRefresh?: boolean,
+            params?: ?any,
+            route: string
+          |}) => void
+        |}
+      |}
+    |},
+    stores: {|
+      app: {| currentRoute: string |},
+      walletSettings: {|
+        getWalletWarnings: (PublicDeriver<>) => WarningList
+      |},
+      wallets: {| selected: null | PublicDeriver<> |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

@@ -9,6 +9,9 @@ import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import ThemeSettingsBlock from '../../../components/settings/categories/general-setting/ThemeSettingsBlock';
 import environment from '../../../environment';
 import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
+import LocalizableError from '../../../i18n/LocalizableError';
+import type { LanguageType } from '../../../i18n/translations';
+import type { Theme } from '../../../themes';
 
 type GeneratedData = typeof GeneralSettingsPage.prototype.generated;
 
@@ -45,7 +48,41 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      profile: {|
+        exportTheme: {|
+          trigger: (params: void) => Promise<void>
+        |},
+        updateLocale: {|
+          trigger: (params: {|
+            locale: string
+          |}) => Promise<void>
+        |},
+        updateTheme: {|
+          trigger: (params: {|
+            theme: string
+          |}) => Promise<void>
+        |}
+      |}
+    |},
+    stores: {|
+      profile: {|
+        LANGUAGE_OPTIONS: Array<LanguageType>,
+        currentLocale: string,
+        currentTheme: Theme,
+        getThemeVars: ({| theme: string |}) => {
+          [key: string]: string,
+          ...
+        },
+        hasCustomTheme: void => boolean,
+        setProfileLocaleRequest: {|
+          error: ?LocalizableError,
+          isExecuting: boolean
+        |}
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

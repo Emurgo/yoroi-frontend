@@ -25,7 +25,7 @@ import type {
 import type { SelectedExternalStorageProvider } from '../../domain/ExternalStorage';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
-type MemosForWallet = Map<string, $ReadOnly<TxMemoTableRow>>;
+export type MemosForWallet = Map<string, $ReadOnly<TxMemoTableRow>>;
 
 export default class MemosStore extends Store {
 

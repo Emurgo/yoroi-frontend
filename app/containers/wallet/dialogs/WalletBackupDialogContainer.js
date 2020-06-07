@@ -5,6 +5,11 @@ import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import WalletBackupDialog from '../../../components/wallet/WalletBackupDialog';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
+import type {
+  RecoveryPhraseSortedArray,
+  RecoveryPhraseWordArray,
+  WalletBackupSteps,
+} from '../../../stores/toplevel/WalletBackupStore';
 
 export type GeneratedData = typeof WalletBackupDialogContainer.prototype.generated;
 
@@ -86,7 +91,71 @@ export default class WalletBackupDialogContainer extends Component<Props> {
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      walletBackup: {|
+        acceptPrivacyNoticeForWalletBackup: {|
+          trigger: (params: void) => void
+        |},
+        acceptWalletBackupTermDevice: {|
+          trigger: (params: void) => void
+        |},
+        acceptWalletBackupTermRecovery: {|
+          trigger: (params: void) => void
+        |},
+        addWordToWalletBackupVerification: {|
+          trigger: (params: {|
+            index: number,
+            word: string
+          |}) => void
+        |},
+        cancelWalletBackup: {|
+          trigger: (params: void) => void
+        |},
+        clearEnteredRecoveryPhrase: {|
+          trigger: (params: void) => void
+        |},
+        continueToPrivacyWarning: {|
+          trigger: (params: void) => void
+        |},
+        continueToRecoveryPhraseForWalletBackup: {|
+          trigger: (params: void) => void
+        |},
+        finishWalletBackup: {|
+          trigger: (params: void) => Promise<void>
+        |},
+        removeOneMnemonicWord: {|
+          trigger: (params: void) => void
+        |},
+        restartWalletBackup: {|
+          trigger: (params: void) => void
+        |},
+        startWalletBackup: {|
+          trigger: (params: void) => void
+        |}
+      |}
+    |},
+    stores: {|
+      profile: {| isClassicTheme: boolean |},
+      walletBackup: {|
+        countdownRemaining: number,
+        currentStep: WalletBackupSteps,
+        enteredPhrase: Array<{|
+          index: number,
+          word: string
+        |}>,
+        isPrivacyNoticeAccepted: boolean,
+        isRecoveryPhraseValid: boolean,
+        isTermDeviceAccepted: boolean,
+        isTermRecoveryAccepted: boolean,
+        recoveryPhraseSorted: RecoveryPhraseSortedArray,
+        recoveryPhraseWords: RecoveryPhraseWordArray
+      |},
+      wallets: {|
+        createWalletRequest: {| isExecuting: boolean |}
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

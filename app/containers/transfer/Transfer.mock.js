@@ -122,9 +122,6 @@ export const mockTransferProps: {
           },
         },
         actions: {
-          router: {
-            goToRoute: { trigger: action('goToRoute'), },
-          },
           dialogs: {
             closeActiveDialog: {
               trigger: action('closeActiveDialog'),

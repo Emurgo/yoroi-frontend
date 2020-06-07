@@ -1,3 +1,4 @@
+
 // @flow
 
 import type { Node } from 'react';
@@ -1108,7 +1109,6 @@ export const PaperWalletCreate = (): Node => (
         generated: {
           stores: {
             profile: {
-              isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
               paperWalletsIntro: getPaperWalletIntro(globalKnobs.locale(), ''),
             },
           },

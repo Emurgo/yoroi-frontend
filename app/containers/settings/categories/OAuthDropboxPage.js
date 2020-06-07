@@ -6,6 +6,7 @@ import { Redirect } from 'react-router-dom';
 import { observer } from 'mobx-react';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import { ExternalStorageList } from '../../../domain/ExternalStorage';
+import type { SelectedExternalStorageProvider } from '../../../domain/ExternalStorage';
 
 type UrlProps = {|
   match: {|
@@ -47,7 +48,17 @@ export default class OAuthDropboxPage extends Component<Props> {
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      memos: {|
+        updateExternalStorageProvider: {|
+          trigger: (
+            params: SelectedExternalStorageProvider
+          ) => Promise<void>
+        |}
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

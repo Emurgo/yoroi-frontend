@@ -15,10 +15,15 @@ import { RemoveKeyDerivationTree } from '../../../primitives/api/write';
 import { addNewRowToTable, } from '../../../utils';
 
 export class ModifyCip1852Wrapper {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    Cip1852Wrapper: typeof Cip1852Tables.Cip1852WrapperSchema,
+  |} = Object.freeze({
     [Cip1852Tables.Cip1852WrapperSchema.name]: Cip1852Tables.Cip1852WrapperSchema,
   });
-  static depTables = Object.freeze({
+  static depTables: {|
+    GetCip1852Wrapper: typeof GetCip1852Wrapper,
+    RemoveKeyDerivationTree: typeof RemoveKeyDerivationTree,
+  |} = Object.freeze({
     GetCip1852Wrapper,
     RemoveKeyDerivationTree,
   });

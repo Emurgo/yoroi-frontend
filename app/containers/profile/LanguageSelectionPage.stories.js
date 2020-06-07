@@ -6,7 +6,6 @@ import React from 'react';
 import { select, boolean, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import { LANGUAGES } from '../../i18n/translations';
-import Request from '../../stores/lib/LocalizedRequest';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { THEMES } from '../../themes';
 import LanguageSelectionPage from './LanguageSelectionPage';
@@ -31,8 +30,6 @@ export const Generic = (): Node => (
             error: null,
             isExecuting: boolean('isExecuting', false),
           },
-          unsetProfileLocaleRequest: new Request(async () => undefined),
-          getProfileLocaleRequest: new Request(async () => undefined),
           isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
         },
         serverConnectionStore: {
@@ -45,6 +42,7 @@ export const Generic = (): Node => (
       },
       actions: {
         profile: {
+          resetLocale: { trigger: async (req) => action('resetLocale')(req) },
           updateTentativeLocale: { trigger: action('updateTentativeLocale') },
           commitLocaleToStorage: { trigger: async (req) => action('commitLocaleToStorage')(req) },
         }
@@ -68,8 +66,6 @@ export const NonTier1 = (): Node => (
             error: null,
             isExecuting: boolean('isExecuting', false),
           },
-          unsetProfileLocaleRequest: new Request(async () => undefined),
-          getProfileLocaleRequest: new Request(async () => undefined),
           isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
         },
         serverConnectionStore: {
@@ -82,6 +78,7 @@ export const NonTier1 = (): Node => (
       },
       actions: {
         profile: {
+          resetLocale: { trigger: async (req) => action('resetLocale')(req) },
           updateTentativeLocale: { trigger: action('updateTentativeLocale') },
           commitLocaleToStorage: { trigger: async (req) => action('commitLocaleToStorage')(req) },
         }
@@ -102,8 +99,6 @@ export const IsExecuting = (): Node => (
             error: null,
             isExecuting: true,
           },
-          unsetProfileLocaleRequest: new Request(async () => undefined),
-          getProfileLocaleRequest: new Request(async () => undefined),
           isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
         },
         serverConnectionStore: {
@@ -116,6 +111,7 @@ export const IsExecuting = (): Node => (
       },
       actions: {
         profile: {
+          resetLocale: { trigger: async (req) => action('resetLocale')(req) },
           updateTentativeLocale: { trigger: action('updateTentativeLocale') },
           commitLocaleToStorage: { trigger: async (req) => action('commitLocaleToStorage')(req) },
         }
@@ -136,8 +132,6 @@ export const ServerError = (): Node => (
             error: null,
             isExecuting: boolean('isExecuting', false),
           },
-          unsetProfileLocaleRequest: new Request(async () => undefined),
-          getProfileLocaleRequest: new Request(async () => undefined),
           isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
         },
         serverConnectionStore: {
@@ -146,6 +140,7 @@ export const ServerError = (): Node => (
       },
       actions: {
         profile: {
+          resetLocale: { trigger: async (req) => action('resetLocale')(req) },
           updateTentativeLocale: { trigger: action('updateTentativeLocale') },
           commitLocaleToStorage: { trigger: async (req) => action('commitLocaleToStorage')(req) },
         }

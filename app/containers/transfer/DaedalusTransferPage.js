@@ -17,6 +17,9 @@ import type { TransferStatusT, TransferTx } from '../../types/TransferTypes';
 import LocalizableError from '../../i18n/LocalizableError';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { ExplorerType } from '../../domain/Explorer';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 import { formattedWalletAmount } from '../../utils/formatters';
 import { ROUTES } from '../../routes-config';
@@ -195,7 +198,84 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
   }
 
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      ada: {|
+        daedalusTransfer: {|
+          backToUninitialized: {|
+            trigger: (params: void) => void
+          |},
+          cancelTransferFunds: {|
+            trigger: (params: void) => void
+          |},
+          setupTransferFundsWithMasterKey: {|
+            trigger: (params: {|
+              masterKey: string,
+              publicDeriver: PublicDeriver<>
+            |}) => Promise<void>
+          |},
+          setupTransferFundsWithMnemonic: {|
+            trigger: (params: {|
+              publicDeriver: PublicDeriver<>,
+              recoveryPhrase: string
+            |}) => Promise<void>
+          |},
+          transferFunds: {|
+            trigger: (params: {|
+              next: () => Promise<void>,
+              publicDeriver: PublicDeriver<>
+            |}) => Promise<void>
+          |}
+        |}
+      |},
+      router: {|
+        goToRoute: {|
+          trigger: (params: {|
+            forceRefresh?: boolean,
+            params?: ?any,
+            route: string
+          |}) => void
+        |}
+      |}
+    |},
+    stores: {|
+      coinPriceStore: {|
+        getCurrentPrice: (from: string, to: string) => ?number
+      |},
+      profile: {|
+        isClassicTheme: boolean,
+        selectedExplorer: ExplorerType,
+        unitOfAccount: UnitOfAccountSettingType
+      |},
+      substores: {|
+        ada: {|
+          daedalusTransfer: {|
+            error: ?LocalizableError,
+            status: TransferStatusT,
+            transferFundsRequest: {| isExecuting: boolean |},
+            transferTx: ?TransferTx
+          |},
+          wallets: {|
+            isValidMnemonic: ({|
+              mnemonic: string,
+              numberOfWords: number
+            |}) => boolean,
+            isValidPaperMnemonic: ({|
+              mnemonic: string,
+              numberOfWords: number
+            |}) => boolean
+          |}
+        |}
+      |},
+      wallets: {|
+        activeWalletRoute: ?string,
+        refreshWalletFromRemote: (
+          PublicDeriver<>
+        ) => Promise<void>,
+        selected: null | PublicDeriver<>
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

@@ -9,6 +9,9 @@ import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import URILandingDialog from '../../components/uri/URILandingDialog';
 import URIVerifyDialog from '../../components/uri/URIVerifyDialog';
 import URIInvalidDialog from '../../components/uri/URIInvalidDialog';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import type { ExplorerType } from '../../domain/Explorer';
+import type { UriParams } from '../../utils/URIHandling';
 
 import AdaApi from '../../api/ada/index';
 
@@ -85,7 +88,19 @@ export default class URILandingDialogContainer extends Component<Props> {
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    stores: {|
+      coinPriceStore: {|
+        getCurrentPrice: (from: string, to: string) => ?number
+      |},
+      loading: {| uriParams: ?UriParams |},
+      profile: {|
+        isClassicTheme: boolean,
+        selectedExplorer: ExplorerType,
+        unitOfAccount: UnitOfAccountSettingType
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
