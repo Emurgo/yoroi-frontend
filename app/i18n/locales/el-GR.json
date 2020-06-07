@@ -14,7 +14,7 @@
   "api.errors.generateTransferTxError": "Σφάλμα τη στιγμή δημιουργίας συναλλαγής.",
   "api.errors.getAccountStateApiError": "Error received from server while getting account state.",
   "api.errors.getAddressesWithFundsError": "Σφάλμα τη στιγμή λήψης διευθύνσεων με χρήματα.",
-  "api.errors.getAllUTXOsForAddressesError": "Error received from api method call while getting UTxOs.",
+  "api.errors.getAllUTXOsForAddressesError": "Παρελήφθη σφάλμα στη κλήση μεθόδου ΔΠΕ (Διεπαφής προγραμματισμού εφαρμογών), τη στιγμή ληψης των UTxOs.",
   "api.errors.getBalanceError": "Error while getting balance.",
   "api.errors.getBestBlockApiError": "Error received from server while getting best block.",
   "api.errors.getPoolInfoApiError": "Error received from server while getting pool info.",
