@@ -251,7 +251,7 @@
   "settings.support.faq.faqLinkURL": "https://yoroi-wallet.com/faq/",
   "settings.support.faq.supportRequestLinkURL": "https://yoroi-wallet.com/support/",
   "settings.support.faq.title": "Συχνές ερωτήσεις",
-  "settings.support.logs.content": "Αν θέλετε να εξετάσετε αρχεία καταγραφής, μπορείτε{downloadLogsLink}. Τα αρχεία καταγραφής δεν περιλαμβάνουν ευαίσθητες πληροφορίες και θα ηταν χρήσιμο να τα επισυνάπτετε σε αναφορές προβλημάτων για να βοηθήσετε την ομάδα μας να εξερευνεί το πρόβλημα που αντιμετωπίζετε.",
+  "settings.support.logs.content": "Αν θέλετε να εξετάσετε αρχεία καταγραφής, μπορείτε{downloadLogsLink}. Τα αρχεία καταγραφής δεν περιλαμβάνουν ευαίσθητες πληροφορίες και θα ηταν χρήσιμο να τα επισυνάπτετε σε αναφορές προβλημάτων για να βοηθήσετε την ομάδα μας να ερευνά το πρόβλημα που αντιμετωπίζετε.",
   "settings.support.logs.downloadLogsButtonLabel": "Λήψη αρχείων καταγραφής",
   "settings.support.logs.downloadLogsLink": "λήξη εδώ",
   "settings.support.logs.title": "Αρχεία καταγραφής",
