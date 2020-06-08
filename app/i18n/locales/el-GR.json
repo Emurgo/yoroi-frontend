@@ -319,7 +319,7 @@
   "wallet.add.optionDialog.connect.hw.ledger.title": "Ledger Υλισμικό (Hardware) Πορτοφόλι",
   "wallet.add.optionDialog.connect.hw.trezor.learnMoreText": "Ένα Trezor υλισμικό (hardware) πορτοφόλι είναι μία μικρή συσκευή Ενιαίου Σειριακού Διαύλου (USB) που προσθέτει μεγαλύτερο βαθμό ασφαλείας στο πορτοφόλι σας. Είναι πιο ασφαλές γιατί το προσωπικό σας κλειδί ποτε δεν φεύγει από τη συσκευή. Αυτό προστατεύει τα χρήματα σας ακόμη και όταν ο υπολογιστής σας έχει εκτεθεί λόγω κακόβουλου λογισμικού, απόπειρες ψαρέματος, κ.α.",
   "wallet.add.optionDialog.connect.hw.trezor.title": "Trezor Υλισμικό (Hardware) Πορτοφόλι",
-  "wallet.add.optionDialog.create.normalWallet.description": "A standard wallet backed by a recovery phrase.",
+  "wallet.add.optionDialog.create.normalWallet.description": "Ενα προδιαγεγραμμένο πορτοφόλι που υποστηρίζεται από μία φράση ανάκτησης.",
   "wallet.add.optionDialog.create.paperWallet.description": "Paper wallets can be created even on devices not connected to the internet which makes them well-suited for single-use cold storage.",
   "wallet.add.optionDialog.restore.dialogTitle": "Restore wallet",
   "wallet.add.optionDialog.restore.normalWallet.description": "If you have a Yoroi recovery phrase consisting of 15 words generated when you created a Yoroi Wallet, choose this option to restore your wallet.",
