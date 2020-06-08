@@ -18,6 +18,9 @@ import {
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import type { SelectedApiType } from '../../../stores/toplevel/ProfileStore';
+import LocalizableError from '../../../i18n/LocalizableError';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
+import type { ExplorerType } from '../../../domain/Explorer';
 
 export type GeneratedData = typeof WalletSendConfirmationDialogContainer.prototype.generated;
 
@@ -94,7 +97,47 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      ada: {|
+        wallets: {|
+          sendMoney: {|
+            trigger: (params: {|
+              password: string,
+              publicDeriver: PublicDeriver<>,
+              signRequest: BaseSignRequest<
+                RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput
+              >
+            |}) => Promise<void>
+          |}
+        |}
+      |},
+      dialogs: {|
+        closeActiveDialog: {|
+          trigger: (params: void) => void
+        |}
+      |}
+    |},
+    stores: {|
+      profile: {|
+        isClassicTheme: boolean,
+        selectedAPI: void | SelectedApiType,
+        selectedExplorer: ExplorerType
+      |},
+      substores: {|
+        ada: {|
+          wallets: {|
+            sendMoneyRequest: {|
+              error: ?LocalizableError,
+              isExecuting: boolean,
+              reset: () => void
+            |}
+          |}
+        |}
+      |},
+      wallets: {| selected: null | PublicDeriver<> |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

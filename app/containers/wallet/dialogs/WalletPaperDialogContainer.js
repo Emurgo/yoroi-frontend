@@ -18,7 +18,17 @@ type Props = {|
 export default class WalletPaperDialogContainer
   extends Component<Props> {
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      dialogs: {|
+        open: {|trigger: (params: {|dialog: any, params?: any|}) => void|},
+        updateDataForActiveDialog: {|
+          trigger: (params: {[key: string]: any, ...}) => void,
+        |},
+      |},
+    |},
+    stores: {|profile: {|paperWalletsIntro: string|}|},
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

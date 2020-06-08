@@ -56,7 +56,9 @@ export default class NightlyPage extends Component<InjectedOrGenerated<Generated
     return this.renderPage(this.generated);
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|profile: {|acceptNightly: {|trigger: (params: void) => void|}|}|},
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

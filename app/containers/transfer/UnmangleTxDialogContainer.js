@@ -24,6 +24,12 @@ import { addressToDisplayString, getAddressPayload } from '../../api/ada/lib/sto
 import globalMessages from '../../i18n/global-messages';
 import type { ConfigType } from '../../../config/config-types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import type { ExplorerType } from '../../domain/Explorer';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import type { StandardAddress, } from '../../types/AddressFilterTypes';
+import LocalizableError from '../../i18n/LocalizableError';
+import type { SetupSelfTxRequest } from '../../stores/ada/AdaTransactionBuilderStore';
 
 declare var CONFIG: ConfigType;
 
@@ -49,7 +55,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
   }
 
   componentDidMount() {
-    const selected = this._getWalletsStore().selected;
+    const selected = this.generated.stores.wallets.selected;
     if (selected == null) {
       throw new Error(`${nameof(UnmangleTxDialogContainer)} no wallet selected`);
     }
@@ -65,7 +71,8 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
         .map(info => getAddressPayload(info.address))
     );
 
-    this.generated.stores.substores.ada.transactionBuilderStore.setupSelfTx.execute({
+    // note: don't await
+    this.generated.actions.ada.txBuilderActions.initialize.trigger({
       publicDeriver: withChains,
       /**
        * We filter to only UTXOs of mangled addresses
@@ -78,11 +85,11 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
   componentWillUnmount() {
     const builderActions = this.generated.actions.ada.txBuilderActions;
     builderActions.reset.trigger();
-    this._getAdaWalletsStore().sendMoneyRequest.reset();
+    this.generated.stores.substores.ada.wallets.sendMoneyRequest.reset();
   }
 
   submit: void => Promise<void> = async () => {
-    const selected = this._getWalletsStore().selected;
+    const selected = this.generated.stores.wallets.selected;
     if (selected == null) {
       throw new Error(`${nameof(UnmangleTxDialogContainer)} no wallet selected`);
     }
@@ -93,7 +100,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
       onSuccess: async (form) => {
         const { walletPassword } = form.values();
 
-        const txBuilderStore = this._getTxBuilderStore();
+        const txBuilderStore = this.generated.stores.substores.ada.transactionBuilderStore;
         if (txBuilderStore.tentativeTx == null) return;
         await this.generated.actions.ada.wallets.sendMoney.trigger({
           signRequest: txBuilderStore.tentativeTx,
@@ -106,7 +113,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
   };
 
   render(): Node {
-    const txBuilder = this._getTxBuilderStore();
+    const txBuilder = this.generated.stores.substores.ada.transactionBuilderStore;
 
     if (txBuilder.setupSelfTx.error != null) {
       return (
@@ -165,7 +172,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
     const spendingPasswordForm = (<SpendingPasswordInput
       setForm={(form) => this.setSpendingPasswordForm(form)}
       classicTheme={this.generated.stores.profile.isClassicTheme}
-      isSubmitting={this._getAdaWalletsStore().sendMoneyRequest.isExecuting}
+      isSubmitting={this.generated.stores.substores.ada.wallets.sendMoneyRequest.isExecuting}
     />);
 
     const { intl } = this.context;
@@ -177,9 +184,9 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
         selectedExplorer={this.generated.stores.profile.selectedExplorer}
         transferTx={transferTx}
         onSubmit={this.submit}
-        isSubmitting={this._getAdaWalletsStore().sendMoneyRequest.isExecuting}
+        isSubmitting={this.generated.stores.substores.ada.wallets.sendMoneyRequest.isExecuting}
         onCancel={this.props.onClose}
-        error={this._getAdaWalletsStore().sendMoneyRequest.error}
+        error={this.generated.stores.substores.ada.wallets.sendMoneyRequest.error}
         dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
         coinPrice={coinPrice}
         unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
@@ -187,19 +194,62 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
     );
   }
 
-  _getWalletsStore() {
-    return this.generated.stores.wallets;
-  }
-
-  _getAdaWalletsStore() {
-    return this.generated.stores.substores.ada.wallets;
-  }
-
-  _getTxBuilderStore() {
-    return this.generated.stores.substores.ada.transactionBuilderStore;
-  }
-
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      ada: {|
+        txBuilderActions: {|
+          reset: {| trigger: (params: void) => void |},
+          initialize: {| trigger: (params: SetupSelfTxRequest) => Promise<void> |},
+        |},
+        wallets: {|
+          sendMoney: {|
+            trigger: (params: {|
+              password: string,
+              publicDeriver: PublicDeriver<>,
+              signRequest: BaseSignRequest<
+                RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput
+              >
+            |}) => Promise<void>
+          |}
+        |}
+      |}
+    |},
+    stores: {|
+      coinPriceStore: {|
+        getCurrentPrice: (from: string, to: string) => ?number
+      |},
+      profile: {|
+        isClassicTheme: boolean,
+        selectedExplorer: ExplorerType,
+        unitOfAccount: UnitOfAccountSettingType
+      |},
+      substores: {|
+        ada: {|
+          addresses: {|
+            mangledAddressesForDisplay: {|
+              all: $ReadOnlyArray<$ReadOnly<StandardAddress>>
+            |}
+          |},
+          transactionBuilderStore: {|
+            setupSelfTx: {|
+              error: ?LocalizableError,
+            |},
+            tentativeTx: null | BaseSignRequest<
+            RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput
+            >
+          |},
+          wallets: {|
+            sendMoneyRequest: {|
+              error: ?LocalizableError,
+              isExecuting: boolean,
+              reset: () => void
+            |}
+          |}
+        |}
+      |},
+      wallets: {| selected: null | PublicDeriver<> |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -237,7 +287,6 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
             transactionBuilderStore: {
               tentativeTx: stores.substores.ada.transactionBuilderStore.tentativeTx,
               setupSelfTx: {
-                execute: stores.substores.ada.transactionBuilderStore.setupSelfTx.execute,
                 error: stores.substores.ada.transactionBuilderStore.setupSelfTx.error,
               },
             },
@@ -247,6 +296,9 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
       actions: {
         ada: {
           txBuilderActions: {
+            initialize: {
+              trigger: actions.ada.txBuilderActions.initialize.trigger,
+            },
             reset: {
               trigger: actions.ada.txBuilderActions.reset.trigger
             },

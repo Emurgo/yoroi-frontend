@@ -13,10 +13,12 @@ import {
 } from '../../../primitives/tables';
 
 export class GetDerivationSpecific {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    KeyDerivation: typeof KeyDerivationSchema,
+  |} = Object.freeze({
     [KeyDerivationSchema.name]: KeyDerivationSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async get<Row>(
     db: lf$Database,

@@ -66,9 +66,6 @@ const actions = {
       trigger: action('open'),
     },
   },
-  profile: {
-    updateHideBalance: { trigger: async (req) => action('updateHideBalance')(req) },
-  },
   router: {
     goToRoute: { trigger: action('goToRoute') },
   },
@@ -174,14 +171,6 @@ export const Loading = (): Node => {
           },
           walletSettings: {
             getPublicDeriverSettingsCache: lookup.getPublicDeriverSettingsCache,
-          },
-          substores: {
-            ada: {
-              transactions: {
-                isExporting: false,
-                exportError: undefined,
-              },
-            },
           },
         },
         actions,
@@ -294,14 +283,6 @@ const genPropsForTransactions: {|
   },
   walletSettings: {
     getPublicDeriverSettingsCache: request.getPublicDeriverSettingsCache,
-  },
-  substores: {
-    ada: {
-      transactions: {
-        isExporting: request.txExport != null ? request.txExport.isExporting : false,
-        exportError: request.txExport?.exportError,
-      },
-    },
   },
 });
 

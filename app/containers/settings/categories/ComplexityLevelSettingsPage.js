@@ -5,6 +5,9 @@ import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import ComplexityLevel from '../../../components/profile/complexity-level/ComplexityLevelForm';
+import LocalizableError from '../../../i18n/LocalizableError';
+import type { ComplexityLevelType } from '../../../types/complexityLevelType';
+import type { ServerStatusErrorType } from '../../../types/serverStatusErrorType';
 
 type GeneratedData = typeof ComplexityLevelSettingsPage.prototype.generated;
 
@@ -12,7 +15,29 @@ type GeneratedData = typeof ComplexityLevelSettingsPage.prototype.generated;
 export default class ComplexityLevelSettingsPage
   extends Component<InjectedOrGenerated<GeneratedData>> {
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      profile: {|
+        selectComplexityLevel: {|
+          trigger: (
+            params: ComplexityLevelType
+          ) => Promise<void>
+        |}
+      |}
+    |},
+    stores: {|
+      profile: {|
+        complexityLevel: ?ComplexityLevelType,
+        setComplexityLevelRequest: {|
+          error: ?LocalizableError,
+          isExecuting: boolean
+        |}
+      |},
+      serverConnectionStore: {|
+        checkAdaServerStatus: ServerStatusErrorType
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

@@ -12,6 +12,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
+import LocalizableError from '../../../i18n/LocalizableError';
 
 export type GeneratedData = typeof ResyncWalletDialogContainer.prototype.generated;
 
@@ -72,7 +73,31 @@ export default class ResyncWalletDialogContainer extends Component<Props> {
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      dialogs: {|
+        closeActiveDialog: {|
+          trigger: (params: void) => void
+        |}
+      |},
+      walletSettings: {|
+        resyncHistory: {|
+          trigger: (params: {|
+            publicDeriver: PublicDeriver<>
+          |}) => Promise<void>
+        |}
+      |}
+    |},
+    stores: {|
+      walletSettings: {|
+        clearHistory: {|
+          error: ?LocalizableError,
+          isExecuting: boolean,
+          reset: () => void
+        |}
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

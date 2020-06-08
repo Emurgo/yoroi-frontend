@@ -16,12 +16,17 @@ import NavDropdownRow from '../components/topbar/NavDropdownRow';
 import { ROUTES } from '../routes-config';
 import { switchRouteWallet } from '../utils/routing';
 import { LOVELACES_PER_ADA } from '../config/numbersConfig';
-import { isLedgerNanoWallet, isTrezorTWallet } from '../api/ada/lib/storage/models/ConceptualWallet/index';
+import { ConceptualWallet, isLedgerNanoWallet, isTrezorTWallet } from '../api/ada/lib/storage/models/ConceptualWallet/index';
 import {
   asGetPublicKey,
 } from '../api/ada/lib/storage/models/PublicDeriver/traits';
 import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { DelegationRequests } from '../stores/ada/DelegationStore';
+import type { ConceptualWalletSettingsCache } from '../stores/toplevel/WalletSettingsStore';
+import type { PublicKeyCache } from '../stores/toplevel/WalletStore';
+import type { TxRequests } from '../stores/toplevel/TransactionsStore';
+import type { IGetPublic } from '../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 const messages = defineMessages({
   allWalletsLabel: {
@@ -248,7 +253,51 @@ export default class NavBarContainer extends Component<Props> {
     return balanceResult.accountPart.dividedBy(LOVELACES_PER_ADA);
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      profile: {|
+        updateHideBalance: {|
+          trigger: (params: void) => Promise<void>
+        |}
+      |},
+      router: {|
+        goToRoute: {|
+          trigger: (params: {|
+            forceRefresh?: boolean,
+            params?: ?any,
+            route: string
+          |}) => void
+        |}
+      |},
+      wallets: {|
+        setActiveWallet: {|
+          trigger: (params: {|
+            wallet: PublicDeriver<>
+          |}) => void
+        |}
+      |}
+    |},
+    stores: {|
+      app: {| currentRoute: string |},
+      delegation: {|
+        getDelegationRequests: (
+          PublicDeriver<>
+        ) => void | DelegationRequests
+      |},
+      profile: {| shouldHideBalance: boolean |},
+      transactions: {|
+        getTxRequests: (PublicDeriver<>) => TxRequests
+      |},
+      walletSettings: {|
+        getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache
+      |},
+      wallets: {|
+        getPublicKeyCache: IGetPublic => PublicKeyCache,
+        publicDerivers: Array<PublicDeriver<>>,
+        selected: null | PublicDeriver<>
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

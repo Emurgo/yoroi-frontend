@@ -51,7 +51,6 @@ export const NoLocale = (): Node => (
     generated={{
       stores: {
         profile: {
-          selectedAPI: undefined,
           hasLoadedCurrentLocale: false,
           hasLoadedCurrentTheme: boolean('hasLoadedCurrentTheme', true),
         },
@@ -75,7 +74,6 @@ export const NoTheme = (): Node => (
     generated={{
       stores: {
         profile: {
-          selectedAPI: undefined,
           hasLoadedCurrentLocale: boolean('hasLoadedCurrentLocale', true),
           hasLoadedCurrentTheme: false,
         },
@@ -99,7 +97,6 @@ export const StorageLoadFailed = (): Node => (
     generated={{
       stores: {
         profile: {
-          selectedAPI: undefined,
           hasLoadedCurrentLocale: boolean('hasLoadedCurrentLocale', true),
           hasLoadedCurrentTheme: boolean('hasLoadedCurrentTheme', true),
         },
@@ -119,7 +116,6 @@ export const UnknownLoadFailed = (): Node => (
     generated={{
       stores: {
         profile: {
-          selectedAPI: undefined,
           hasLoadedCurrentLocale: boolean('hasLoadedCurrentLocale', true),
           hasLoadedCurrentTheme: boolean('hasLoadedCurrentTheme', true),
         },

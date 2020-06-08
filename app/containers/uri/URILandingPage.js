@@ -7,6 +7,8 @@ import { ROUTES } from '../../routes-config';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import URILandingDialogContainer from './URILandingDialogContainer';
 import type { GeneratedData as URILandingDialogContainerData } from './URILandingDialogContainer';
+import type { UriParams } from '../../utils/URIHandling';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 export type GeneratedData = typeof URILandingPage.prototype.generated;
 
@@ -43,7 +45,36 @@ export default class URILandingPage extends Component<InjectedOrGenerated<Genera
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    URILandingDialogContainerProps: InjectedOrGenerated<URILandingDialogContainerData>,
+    actions: {|
+      dialogs: {|
+        closeActiveDialog: {|
+          trigger: (params: void) => void
+        |}
+      |},
+      router: {|
+        goToRoute: {|
+          trigger: (params: {|
+            forceRefresh?: boolean,
+            params?: ?any,
+            route: string
+          |}) => void
+        |}
+      |}
+    |},
+    stores: {|
+      loading: {|
+        resetUriParams: void => void,
+        uriParams: ?UriParams
+      |},
+      profile: {| isClassicTheme: boolean |},
+      wallets: {|
+        first: null | PublicDeriver<>,
+        hasAnyWallets: boolean
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

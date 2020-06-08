@@ -17,7 +17,7 @@ export type PriceDataRow = {|
   ...PriceDataInsert,
 |};
 export const PriceDataSchema: {|
-  name: 'PriceData',
+  +name: 'PriceData',
   properties: $ObjMapi<PriceDataRow, ToSchemaProp>,
 |} = {
   name: 'PriceData',

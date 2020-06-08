@@ -9,6 +9,7 @@ import NotProductionBanner from '../components/topbar/banners/NotProductionBanne
 import ServerErrorBanner from '../components/topbar/banners/ServerErrorBanner';
 import environment from '../environment';
 import { ServerStatusErrors } from '../types/serverStatusErrorType';
+import type { ServerStatusErrorType } from '../types/serverStatusErrorType';
 
 export type GeneratedData = typeof BannerContainer.prototype.generated;
 
@@ -28,7 +29,14 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    stores: {|
+      serverConnectionStore: {|
+        checkAdaServerStatus: ServerStatusErrorType
+      |}
+    |},
+    actions: {||},
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -42,6 +50,7 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
           checkAdaServerStatus: stores.serverConnectionStore.checkAdaServerStatus,
         },
       },
+      actions: Object.freeze({}),
     });
   }
 }

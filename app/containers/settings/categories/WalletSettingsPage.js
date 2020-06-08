@@ -18,6 +18,12 @@ import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWall
 import { asGetSigningKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type { GeneratedData as ChangeWalletPasswordDialogContainerData } from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
+import { ConceptualWallet } from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
+import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/WalletSettingsStore';
+import type { SigningKeyCache } from '../../../stores/toplevel/WalletStore';
+import LocalizableError from '../../../i18n/LocalizableError';
+import type { RenameModelFunc } from '../../../api/ada/index';
+import type { IGetSigningKey } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 type GeneratedData = typeof WalletSettingsPage.prototype.generated;
 
@@ -140,7 +146,58 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
     return null;
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    ChangeWalletPasswordDialogContainerProps:
+      InjectedOrGenerated<ChangeWalletPasswordDialogContainerData>,
+    RemoveWalletDialogContainerProps: InjectedOrGenerated<RemoveWalletDialogContainerData>,
+    ResyncWalletDialogContainerProps: InjectedOrGenerated<ResyncWalletDialogContainerData>,
+    actions: {|
+      dialogs: {|
+        open: {|
+          trigger: (params: {|
+            dialog: any,
+            params?: any
+          |}) => void
+        |}
+      |},
+      walletSettings: {|
+        cancelEditingWalletField: {|
+          trigger: (params: void) => void
+        |},
+        renameConceptualWallet: {|
+          trigger: (params: {|
+            newName: string,
+            publicDeriver: PublicDeriver<>
+          |}) => Promise<void>
+        |},
+        startEditingWalletField: {|
+          trigger: (params: {| field: string |}) => void
+        |},
+        stopEditingWalletField: {|
+          trigger: (params: void) => void
+        |}
+      |}
+    |},
+    stores: {|
+      profile: {| isClassicTheme: boolean |},
+      uiDialogs: {| isOpen: any => boolean |},
+      walletSettings: {|
+        getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache,
+        lastUpdatedWalletField: null | string,
+        renameModelRequest: {|
+          error: ?LocalizableError,
+          isExecuting: boolean,
+          result: ?PromisslessReturnType<RenameModelFunc>,
+          wasExecuted: boolean
+        |},
+        walletFieldBeingEdited: null | string
+      |},
+      wallets: {|
+        getSigningKeyCache: IGetSigningKey => SigningKeyCache,
+        selected: null | PublicDeriver<>
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

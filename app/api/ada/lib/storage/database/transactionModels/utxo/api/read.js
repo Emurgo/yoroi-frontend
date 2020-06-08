@@ -27,10 +27,12 @@ import type { TxStatusCodesType } from '../../../primitives/enums';
 import { getRowIn, } from '../../../utils';
 
 export class GetUtxoInputs {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    UtxoTransactionInput: typeof Tables.UtxoTransactionInputSchema,
+  |} = Object.freeze({
     [Tables.UtxoTransactionInputSchema.name]: Tables.UtxoTransactionInputSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async fromAddressIds(
     db: lf$Database,
@@ -62,10 +64,12 @@ export class GetUtxoInputs {
 }
 
 export class GetUtxoOutputs {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    UtxoTransactionOutput: typeof Tables.UtxoTransactionOutputSchema,
+  |} = Object.freeze({
     [Tables.UtxoTransactionOutputSchema.name]: Tables.UtxoTransactionOutputSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async fromAddressIds(
     db: lf$Database,
@@ -101,11 +105,14 @@ export type UtxoTxOutput = {|
   UtxoTransactionOutput: $ReadOnly<UtxoTransactionOutputRow>,
 |};
 export class GetUtxoTxOutputsWithTx {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    Transaction: typeof TransactionSchema,
+    UtxoTransactionOutput: typeof Tables.UtxoTransactionOutputSchema,
+  |} = Object.freeze({
     [TransactionSchema.name]: TransactionSchema,
     [Tables.UtxoTransactionOutputSchema.name]: Tables.UtxoTransactionOutputSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static baseQuery(
     db: lf$Database,
@@ -202,11 +209,14 @@ export type UtxoTxInput = {|
   UtxoTransactionInput: $ReadOnly<UtxoTransactionInputRow>,
 |};
 export class GetUtxoTxInputsWithTx {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    Transaction: typeof TransactionSchema,
+    UtxoTransactionInput: typeof Tables.UtxoTransactionInputSchema,
+  |} = Object.freeze({
     [TransactionSchema.name]: TransactionSchema,
     [Tables.UtxoTransactionInputSchema.name]: Tables.UtxoTransactionInputSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static baseQuery(
     db: lf$Database,
@@ -251,8 +261,11 @@ export class GetUtxoTxInputsWithTx {
 }
 
 export class AssociateTxWithUtxoIOs {
-  static ownTables = Object.freeze({});
-  static depTables = Object.freeze({
+  static ownTables: {||} = Object.freeze({});
+  static depTables: {|
+    GetUtxoInputs: typeof GetUtxoInputs,
+    GetUtxoOutputs: typeof GetUtxoOutputs,
+  |} = Object.freeze({
     GetUtxoInputs,
     GetUtxoOutputs,
   });

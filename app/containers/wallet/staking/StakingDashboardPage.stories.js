@@ -42,8 +42,6 @@ import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
 import PoolWarningDialog from '../../../components/wallet/staking/dashboard/PoolWarningDialog';
 import UndelegateDialog from '../../../components/wallet/staking/dashboard/UndelegateDialog';
-import LocalizedRequest from '../../../stores/lib/LocalizedRequest';
-import type { SetupSelfTxFunc } from '../../../stores/ada/AdaTransactionBuilderStore';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -234,6 +232,9 @@ const genBaseProps: {|
         actions: {
           ada: {
             txBuilderActions: {
+              initialize: {
+                trigger: async (req) => action('initialize')(req),
+              },
               reset: {
                 trigger: action('reset'),
               },
@@ -996,9 +997,6 @@ export const MangledDashboardWarning = (): Node => {
   );
 };
 
-const setupSelfTxRequest: LocalizedRequest<SetupSelfTxFunc>
-  = new LocalizedRequest(async (_foo) => undefined);
-
 export const UnmangleDialogLoading = (): Node => {
   const wallet = genBaseWallet();
   const lookup = walletLookup([wallet]);
@@ -1023,7 +1021,6 @@ export const UnmangleDialogLoading = (): Node => {
         transactionBuilderStore: {
           tentativeTx: null,
           setupSelfTx: {
-            execute: setupSelfTxRequest.execute.bind(setupSelfTxRequest),
             error: undefined,
           },
         }
@@ -1056,7 +1053,6 @@ export const UnmangleDialogError = (): Node => {
         transactionBuilderStore: {
           tentativeTx: null,
           setupSelfTx: {
-            execute: setupSelfTxRequest.execute.bind(setupSelfTxRequest),
             error: new GenericApiError(),
           },
         }
@@ -1090,7 +1086,6 @@ export const UnmangleDialogConfirm = (): Node => {
         transactionBuilderStore: {
           tentativeTx,
           setupSelfTx: {
-            execute: setupSelfTxRequest.execute.bind(setupSelfTxRequest),
             error: undefined,
           },
         }

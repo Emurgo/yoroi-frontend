@@ -17,10 +17,12 @@ import {
 } from '../../../utils';
 
 export class GetConceptualWallet {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    ConceptualWallet: typeof Tables.ConceptualWalletSchema,
+  |} = Object.freeze({
     [Tables.ConceptualWalletSchema.name]: Tables.ConceptualWalletSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async get(
     db: lf$Database,
@@ -38,10 +40,12 @@ export class GetConceptualWallet {
 }
 
 export class ReadLastSyncInfo {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    LastSyncInfo: typeof Tables.LastSyncInfoSchema,
+  |} = Object.freeze({
     [Tables.LastSyncInfoSchema.name]: Tables.LastSyncInfoSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async getLastSyncInfo(
     db: lf$Database,
@@ -58,10 +62,12 @@ export class ReadLastSyncInfo {
 }
 
 export class GetHwWalletMeta {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    HwWalletMeta: typeof Tables.HwWalletMetaSchema,
+  |} = Object.freeze({
     [Tables.HwWalletMetaSchema.name]: Tables.HwWalletMetaSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async getMeta(
     db: lf$Database,
@@ -79,10 +85,12 @@ export class GetHwWalletMeta {
 
 
 export class GetPublicDeriver {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    PublicDeriver: typeof Tables.PublicDeriverSchema,
+  |} = Object.freeze({
     [Tables.PublicDeriverSchema.name]: Tables.PublicDeriverSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async get(
     db: lf$Database,
@@ -112,8 +120,11 @@ export class GetPublicDeriver {
 }
 
 export class GetKeyForPublicDeriver {
-  static ownTables = Object.freeze({});
-  static depTables = Object.freeze({
+  static ownTables: {||} = Object.freeze({});
+  static depTables: {|
+    GetKeyForDerivation: typeof GetKeyForDerivation,
+    GetPublicDeriver: typeof GetPublicDeriver,
+  |} = Object.freeze({
     GetKeyForDerivation,
     GetPublicDeriver,
   });
@@ -153,8 +164,11 @@ export class GetKeyForPublicDeriver {
 }
 
 export class GetLastSyncForPublicDeriver {
-  static ownTables = Object.freeze({});
-  static depTables = Object.freeze({
+  static ownTables: {||} = Object.freeze({});
+  static depTables: {|
+    GetPublicDeriver: typeof GetPublicDeriver,
+    ReadLastSyncInfo: typeof ReadLastSyncInfo,
+  |} = Object.freeze({
     GetPublicDeriver,
     ReadLastSyncInfo,
   });

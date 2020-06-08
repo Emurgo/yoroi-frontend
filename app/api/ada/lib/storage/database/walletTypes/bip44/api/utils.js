@@ -12,32 +12,33 @@ import {
 } from '../../../primitives/tables';
 import type { CanonicalAddressInsert, } from '../../../primitives/tables';
 import type { TreeInsert, InsertRequest, } from '../../common/utils';
+import type { Schema } from '../../../utils';
 
 export const Bip44DerivationLevels = Object.freeze({
   ROOT: {
     level: 0,
     table: RootDerivationSchema,
-    extra: [],
+    extra: ([]: Array<Schema>),
   },
   PURPOSE: {
     level: 1,
     table: PurposeDerivationSchema,
-    extra: [],
+    extra: ([]: Array<Schema>),
   },
   COIN_TYPE: {
     level: 2,
     table: CoinTypeDerivationSchema,
-    extra: [],
+    extra: ([]: Array<Schema>),
   },
   ACCOUNT: {
     level: 3,
     table: Bip44AccountSchema,
-    extra: [],
+    extra: ([]: Array<Schema>),
   },
   CHAIN: {
     level: 4,
     table: Bip44ChainSchema,
-    extra: [],
+    extra: ([]: Array<Schema>),
   },
   ADDRESS: {
     level: 5,
@@ -55,7 +56,7 @@ export const Bip44DerivationLevels = Object.freeze({
  * follow by a query at that level.
  * Since we cannot statically determine which level will be used, we just lock all tables.
  */
-export const Bip44TableMap = new Map<number, string>(
+export const Bip44TableMap: Map<number, string> = new Map<number, string>(
   [
     ...Object.keys(Bip44DerivationLevels)
       .map(key => Bip44DerivationLevels[key])

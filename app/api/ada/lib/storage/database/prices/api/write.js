@@ -9,10 +9,12 @@ import type { PriceDataRow, PriceDataInsert } from '../tables';
 import { addOrReplaceRows, } from '../../utils';
 
 export class ModifyPriceData {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    PriceData: typeof Tables.PriceDataSchema,
+  |} = Object.freeze({
     [Tables.PriceDataSchema.name]: Tables.PriceDataSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async upsertPrices(
     db: lf$Database,

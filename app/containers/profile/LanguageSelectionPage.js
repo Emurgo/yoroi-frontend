@@ -15,6 +15,9 @@ import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner
 import IntroBanner from '../../components/profile/language-selection/IntroBanner';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { LanguageType } from '../../i18n/translations';
+import LocalizableError from '../../i18n/LocalizableError';
+import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 
 const messages = defineMessages({
   title: {
@@ -42,8 +45,7 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
       this.generated.actions.profile.updateTentativeLocale.trigger({ locale: prevLang });
     }
 
-    await profileStore.unsetProfileLocaleRequest.execute();
-    await profileStore.getProfileLocaleRequest.execute();
+    await this.generated.actions.profile.resetLocale.trigger();
   }
 
   onSelectLanguage: {| locale: string |} => void = (values) => {
@@ -135,7 +137,36 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
     return this.renderByron(this.generated);
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      profile: {|
+        commitLocaleToStorage: {|
+          trigger: (params: void) => Promise<void>
+        |},
+        resetLocale: {|
+          trigger: (params: void) => Promise<void>
+        |},
+        updateTentativeLocale: {|
+          trigger: (params: {| locale: string |}) => void
+        |}
+      |}
+    |},
+    stores: {|
+      profile: {|
+        LANGUAGE_OPTIONS: Array<LanguageType>,
+        currentLocale: string,
+        isClassicTheme: boolean,
+        isCurrentLocaleSet: boolean,
+        setProfileLocaleRequest: {|
+          error: ?LocalizableError,
+          isExecuting: boolean
+        |}
+      |},
+      serverConnectionStore: {|
+        checkAdaServerStatus: ServerStatusErrorType
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -155,8 +186,6 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
             error: profileStore.setProfileLocaleRequest.error,
             isExecuting: profileStore.setProfileLocaleRequest.isExecuting,
           },
-          unsetProfileLocaleRequest: stores.profile.unsetProfileLocaleRequest,
-          getProfileLocaleRequest: stores.profile.getProfileLocaleRequest,
         },
         serverConnectionStore: {
           checkAdaServerStatus: stores.serverConnectionStore.checkAdaServerStatus,
@@ -164,6 +193,7 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
       },
       actions: {
         profile: {
+          resetLocale: { trigger: actions.profile.resetLocale.trigger },
           updateTentativeLocale: { trigger: actions.profile.updateTentativeLocale.trigger },
           commitLocaleToStorage: { trigger: actions.profile.commitLocaleToStorage.trigger },
         },

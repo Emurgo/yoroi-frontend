@@ -18,10 +18,11 @@ import type {
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
-export type SetupSelfTxFunc = {|
+export type SetupSelfTxRequest = {|
   publicDeriver: IHasUtxoChains,
   filter: ElementOf<IGetAllUtxosResponse> => boolean,
-|} => Promise<void>;
+|};
+export type SetupSelfTxFunc = SetupSelfTxRequest => Promise<void>;
 
 /**
  * TODO: we make the following assumptions
@@ -68,6 +69,7 @@ export default class AdaTransactionBuilderStore extends Store {
     actions.updateMemo.listen(this._updateMemo);
     actions.updateTentativeTx.listen(this._updateTentativeTx);
     actions.toggleSendAll.listen(this._toggleSendAll);
+    actions.initialize.listen(this._initialize);
     actions.reset.listen(this._reset);
   }
 
@@ -261,6 +263,11 @@ export default class AdaTransactionBuilderStore extends Store {
       return;
     }
     this.tentativeTx = this._cloneTx(this.plannedTx);
+  }
+
+  @action
+  _initialize: SetupSelfTxRequest => Promise<void> = async (request) => {
+    await this.setupSelfTx.execute(request);
   }
 
   @action

@@ -28,10 +28,12 @@ import { AddDerivation, RemoveKeyDerivationTree } from '../../../primitives/api/
 
 
 export class ModifyLastSyncInfo {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    LastSyncInfo: typeof Tables.LastSyncInfoSchema,
+  |} = Object.freeze({
     [Tables.LastSyncInfoSchema.name]: Tables.LastSyncInfoSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async overrideLastSyncInfo(
     db: lf$Database,
@@ -77,10 +79,15 @@ export class ModifyLastSyncInfo {
 
 
 export class DeleteAllTransactions {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    Transaction: typeof TransactionSchema,
+  |} = Object.freeze({
     [TransactionSchema.name]: TransactionSchema,
   });
-  static depTables = Object.freeze({
+  static depTables: {|
+    GetLastSyncForPublicDeriver: typeof GetLastSyncForPublicDeriver,
+    ModifyLastSyncInfo: typeof ModifyLastSyncInfo,
+  |} = Object.freeze({
     ModifyLastSyncInfo,
     GetLastSyncForPublicDeriver,
   });
@@ -139,10 +146,15 @@ export type AddPublicDeriverResponse<Row> = {|
 |};
 
 export class AddPublicDeriver {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    PublicDeriver: typeof Tables.PublicDeriverSchema,
+  |} = Object.freeze({
     [Tables.PublicDeriverSchema.name]: Tables.PublicDeriverSchema,
   });
-  static depTables = Object.freeze({
+  static depTables: {|
+    AddDerivation: typeof AddDerivation,
+    ModifyLastSyncInfo: typeof ModifyLastSyncInfo,
+  |} = Object.freeze({
     AddDerivation,
     ModifyLastSyncInfo,
   });
@@ -175,10 +187,12 @@ export class AddPublicDeriver {
 }
 
 export class ModifyPublicDeriver {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    PublicDeriver: typeof Tables.PublicDeriverSchema,
+  |} = Object.freeze({
     [Tables.PublicDeriverSchema.name]: Tables.PublicDeriverSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async rename(
     db: lf$Database,
@@ -208,10 +222,12 @@ export class ModifyPublicDeriver {
 }
 
 export class ModifyHwWalletMeta {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    HwWalletMeta: typeof Tables.HwWalletMetaSchema,
+  |} = Object.freeze({
     [Tables.HwWalletMetaSchema.name]: Tables.HwWalletMetaSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async add(
     db: lf$Database,
@@ -227,10 +243,12 @@ export class ModifyHwWalletMeta {
 }
 
 export class ModifyConceptualWallet {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    ConceptualWallet: typeof Tables.ConceptualWalletSchema,
+  |} = Object.freeze({
     [Tables.ConceptualWalletSchema.name]: Tables.ConceptualWalletSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async add(
     db: lf$Database,
@@ -286,10 +304,16 @@ export class ModifyConceptualWallet {
 }
 
 export class RemovePublicDeriver {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    PublicDeriver: typeof Tables.PublicDeriverSchema,
+  |} = Object.freeze({
     [Tables.PublicDeriverSchema.name]: Tables.PublicDeriverSchema,
   });
-  static depTables = Object.freeze({
+  static depTables: {|
+    GetPublicDeriver: typeof GetPublicDeriver,
+    ModifyLastSyncInfo: typeof ModifyLastSyncInfo,
+    RemoveKeyDerivationTree: typeof RemoveKeyDerivationTree,
+  |} = Object.freeze({
     GetPublicDeriver,
     RemoveKeyDerivationTree,
     ModifyLastSyncInfo,

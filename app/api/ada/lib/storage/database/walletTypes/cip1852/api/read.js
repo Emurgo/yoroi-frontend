@@ -17,10 +17,12 @@ import { PublicDeriverSchema, } from '../../core/tables';
 import type { PublicDeriverRow, } from '../../core/tables';
 
 export class GetCip1852Wrapper {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    Cip1852Wrapper: typeof Tables.Cip1852WrapperSchema,
+  |} = Object.freeze({
     [Tables.Cip1852WrapperSchema.name]: Tables.Cip1852WrapperSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async get(
     db: lf$Database,
@@ -37,11 +39,14 @@ export class GetCip1852Wrapper {
 }
 
 export class GetAllCip1852Wallets {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    Cip1852Wrapper: typeof Tables.Cip1852WrapperSchema,
+    PublicDeriver: typeof PublicDeriverSchema,
+  |} = Object.freeze({
     [Tables.Cip1852WrapperSchema.name]: Tables.Cip1852WrapperSchema,
     [PublicDeriverSchema.name]: PublicDeriverSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async get(
     db: lf$Database,

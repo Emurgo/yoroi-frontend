@@ -16,6 +16,10 @@ import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
 import DelegationSuccessDialog from '../../../components/wallet/staking/DelegationSuccessDialog';
 import globalMessages from '../../../i18n/global-messages';
 import InvalidURIImg from '../../../assets/images/uri/invalid-uri.inline.svg';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
+import type { PoolRequest } from '../../../api/ada/lib/storage/bridge/delegationUtils';
+import LocalizableError from '../../../i18n/LocalizableError';
+import type { ExplorerType } from '../../../domain/Explorer';
 import {
   LOVELACES_PER_ADA,
   EPOCH_REWARD_DENOMINATOR,
@@ -23,6 +27,9 @@ import {
 import type { ConfigType } from '../../../../config/config-types';
 import type { SelectedPool } from '../../../actions/ada/delegation-transaction-actions';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type {
+  CreateDelegationTxFunc,
+} from '../../../api/ada/index';
 
 declare var CONFIG: ConfigType;
 
@@ -229,7 +236,58 @@ export default class SeizaFetcher extends Component<Props> {
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      ada: {|
+        delegationTransaction: {|
+          complete: {|
+            trigger: (params: PublicDeriver<>) => void
+          |},
+          createTransaction: {|
+            trigger: (params: {|
+              poolRequest: PoolRequest,
+              publicDeriver: PublicDeriver<>
+            |}) => Promise<void>
+          |},
+          reset: {| trigger: (params: void) => void |},
+          setPools: {|
+            trigger: (params: Array<SelectedPool>) => void
+          |},
+          signTransaction: {|
+            trigger: (params: {|
+              password: string,
+              publicDeriver: PublicDeriver<>
+            |}) => Promise<void>
+          |}
+        |}
+      |}
+    |},
+    stores: {|
+      profile: {|
+        isClassicTheme: boolean,
+        selectedExplorer: ExplorerType
+      |},
+      substores: {|
+        ada: {|
+          delegationTransaction: {|
+            createDelegationTx: {|
+              error: ?LocalizableError,
+              isExecuting: boolean,
+              result: ?PromisslessReturnType<CreateDelegationTxFunc>
+            |},
+            isStale: boolean,
+            selectedPools: Array<SelectedPool>,
+            signAndBroadcastDelegationTx: {|
+              error: ?LocalizableError,
+              isExecuting: boolean,
+              wasExecuted: boolean
+            |}
+          |}
+        |}
+      |},
+      wallets: {| selected: null | PublicDeriver<> |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

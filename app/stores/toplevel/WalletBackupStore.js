@@ -4,10 +4,10 @@ import Store from '../base/Store';
 import environment from '../../environment';
 import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
 
-export type walletBackupSteps = 'privacyWarning' | 'recoveryPhraseDisplay' | 'recoveryPhraseEntry' | null;
+export type WalletBackupSteps = 'privacyWarning' | 'recoveryPhraseDisplay' | 'recoveryPhraseEntry' | null;
 
-type RecoveryPhraseWordArray = Array<{| word: string, |}>;
-type recoveryPhraseSortedArray = Array<{|
+export type RecoveryPhraseWordArray = Array<{| word: string, |}>;
+export type RecoveryPhraseSortedArray = Array<{|
   word: string,
   isActive: boolean,
 |}>;
@@ -17,13 +17,13 @@ export default
 class WalletBackupStore extends Store {
 
   @observable inProgress: boolean;
-  @observable currentStep: walletBackupSteps;
+  @observable currentStep: WalletBackupSteps;
   @observable recoveryPhrase: Array<string>;
   @observable name: string;
   @observable password: string;
   @observable recoveryPhraseWords: RecoveryPhraseWordArray;
   /** Sorted recovery phrase the user clicks on to make sure they remember their mnemonic */
-  @observable recoveryPhraseSorted: recoveryPhraseSortedArray;
+  @observable recoveryPhraseSorted: RecoveryPhraseSortedArray;
   @observable completed: boolean;
   @observable enteredPhrase: Array<{|
     word: string,

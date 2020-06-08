@@ -17,6 +17,7 @@
     "keygen": "crx keygen",
     "clean": "rimraf build/ dev/ *.zip *.crx",
     "flow": "flow --show-all-errors .",
+    "flow-typed": "flow codemod annotate-exports --write --repeat ./app",
     "flow:install": "flow-typed create-stub insert-pkg-here --typescript",
     "jest": "NODE_ENV=jest jest",
     "eslint": "eslint app features chrome scripts webpack/*.js",

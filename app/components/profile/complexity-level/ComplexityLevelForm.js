@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './ComplexityLevelForm.scss';
@@ -58,7 +59,7 @@ class ComplexityLevel extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
     const { intl } = this.context;
     const { complexityLevel, isSubmitting } = this.props;
 

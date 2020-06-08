@@ -149,7 +149,7 @@ export class StaleStateError extends ExtendableError {
  * - Runtime error if you access a table which is not locked
  */
 export type Schema = {|
-  +name: string,
+  +name: any, // can't match string with exact literals
   // don't care about the type since we don't need it to inspect table names
   properties: any,
 |};
@@ -158,12 +158,9 @@ export type DepTableType = { [key: string]: TableClassType, ... };
 export type TableClassType = {
   +ownTables: OwnTableType,
   /**
-   * Recursively specify which tables will be required
-   * We need to recursively store this information
-   * That way each wrapper only needs to care about the tables it specifically will access
-   * and not what its dependencies will require
+   * can't recursively give type
    */
-  +depTables: DepTableType,
+  +depTables: any,
   ...
 }
 

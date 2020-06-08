@@ -23,7 +23,7 @@ export type TxMemoTableRow = {|
   ...TxMemoTableInsert,
 |};
 export const TxMemoSchema: {|
-  name: 'TxMemo',
+  +name: 'TxMemo',
   properties: $ObjMapi<TxMemoTableRow, ToSchemaProp>,
 |} = {
   name: 'TxMemo',
