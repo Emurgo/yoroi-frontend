@@ -268,7 +268,7 @@
   "settings.unitOfAccount.label": "Νόμισμα",
   "settings.unitOfAccount.lastUpdated": "<strong>Αναβαθμίστηκε τελευταία:</strong>{lastUpdated}",
   "settings.unitOfAccount.note": "<strong>Σημείωση:</strong> η τιμή νομίσματος είναι κατά προσέγγιση και ίσως να μην ταιριάζει με την τιμή που που δίδεται απο οποιαδήποτε πλατφόρμα συναλλαγών. Οποιεσδήποτε συναλλαγές βασίζονται στις κατα προσέγγιση τιμές γίνονται με δικό σας ρίσκο.",
-  "settings.unitOfAccount.title": "Currency Conversion",
+  "settings.unitOfAccount.title": "Μετατροπή Νομίσματος",
   "sidebar.settings": "Settings",
   "sidebar.transfer": "Claim / Transfer",
   "sidebar.wallets": "My wallets",
