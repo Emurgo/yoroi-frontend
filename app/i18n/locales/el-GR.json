@@ -171,7 +171,7 @@
   "profile.privacypolicy.serverLogs": "Οποιοδήποτε αρχείο καταγραφής του διακομιστή κρατείται το περισσότερο 2 εβδομάδες, καθαρά για σκοπους επίλυσης προβλημάτων του διακομιστή.",
   "profile.termsOfUse.checkboxLabel": "Συμφωνώ με τους όρους χρήσης",
   "profile.termsOfUse.title": "Όροι Χρήσης",
-  "profile.uriAccept.seePrompt": "Simply <strong>click <em>Allow</em></strong> to enable payment URLs",
+  "profile.uriAccept.seePrompt": "Απλά<strong>κάνετε κλικ<em>και επιτρέπετε</strong>την ενεργοποίηση πληρωμής με Ενιαίους Εντοπιστές Πόρων (URLs) ",
   "profile.uriPrompt.form.explanation": "Do you want to enable Cardano payment URLs?",
   "profile.uriPrompt.form.skipLabel": "Skip",
   "profile.uriSkip.descriptionLine1": "Although you will not be able to use payment URLs, you will still be able to generate them.",
