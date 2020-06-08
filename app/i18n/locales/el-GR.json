@@ -250,7 +250,7 @@
   "settings.support.faq.faqLink": "Συχνές ερωτήσεις στον ιστότοπο Yoroi",
   "settings.support.faq.faqLinkURL": "https://yoroi-wallet.com/faq/",
   "settings.support.faq.supportRequestLinkURL": "https://yoroi-wallet.com/support/",
-  "settings.support.faq.title": "Frequently asked questions",
+  "settings.support.faq.title": "Συχνές ερωτήσεις",
   "settings.support.logs.content": "If you want to inspect logs, you can {downloadLogsLink}. Logs do not contain sensitive information, and it would be helpful to attach them to problem reports to help the team investigate the issue you are experiencing.",
   "settings.support.logs.downloadLogsButtonLabel": "Download Logs",
   "settings.support.logs.downloadLogsLink": "download them here",
