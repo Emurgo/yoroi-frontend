@@ -1,5 +1,5 @@
 {
-  "api.errors.ApiMethodNotYetImplementedError": "Αυτή η μέθοδος ΔΠΕ (Διεπαφής προγραμματισμού εφαρμογών) δεν έχει εφαρμοστεί ακόμη.",
+  "api.errors.ApiMethodNotYetImplementedError": "Αυτή η μέθοδος ΔΠΕ (Διεπαφή προγραμματισμού εφαρμογών) δεν έχει εφαρμοστεί ακόμη.",
   "api.errors.GenericApiError": "Ένα σφάλμα προέκυψε, παρακαλώ προσπαθήστε ξανά αργότερα.",
   "api.errors.IncorrectPasswordError": "Λανθασμένος κωδικός πορτοφολιού.",
   "api.errors.NotEnoughMoneyToSendError": "Δεν υπάρχουν αρκετά ADA για να κάνετε αυτή τη συναλλαγή.",
