@@ -41,9 +41,13 @@ const messages = defineMessages({
     id: 'wallet.receive.page.verifyAddressLabel',
     defaultMessage: '!!!Verify address',
   },
-  generatePaymentURLLabel: {
-    id: 'wallet.receive.page.generatePaymentURLLabel',
-    defaultMessage: '!!!Generate payment URL',
+  generateURLLabel: {
+    id: 'wallet.receive.page.generateURLLabel',
+    defaultMessage: '!!!Generate URL',
+  },
+  outputAmountUTXO: {
+    id: 'wallet.receive.page.outputAmountUTXO',
+    defaultMessage: '!!!Output Amount (UTXO) ',
   },
 });
 
@@ -76,30 +80,20 @@ export default class WalletReceive extends Component<Props> {
     const walletReceiveContent = (
       <>
         <div className={styles.generatedAddresses}>
-          <h2>
-            {intl.formatMessage(messages.generatedAddressesSectionTitle)}
-            <button
-              type="button"
-              onClick={() => {
-                if (this.props.activeFilter === AddressFilter.None) {
-                  this.props.setFilter(AddressFilter.Unused);
-                }
-                if (this.props.activeFilter === AddressFilter.Unused) {
-                  this.props.setFilter(AddressFilter.None);
-                }
-              }}
-            >
-              {intl.formatMessage(messages[
-                this.props.activeFilter === AddressFilter.None
-                  ? 'hideUsedLabel'
-                  : 'showUsedLabel'
-              ])}
-            </button>
-          </h2>
+          {/* Header Addresses */}
+          <div className={styles.generatedAddressesGrid}>
+            <h2>{intl.formatMessage(messages.generatedAddressesSectionTitle)}</h2>
+            <h2>{intl.formatMessage(messages.outputAmountUTXO)}</h2>
+            <h2>{intl.formatMessage(messages.generateURLLabel)}</h2>
+            <h2>{intl.formatMessage(messages.verifyAddressLabel)}</h2>
+          </div>
+
+          {/* Content Addresses */}
           {walletAddresses.map((address, index) => {
             const addressClasses = classnames([
               'generatedAddress-' + (index + 1),
               styles.walletAddress,
+              styles.generatedAddressesGrid,
               address.isUsed === true ? styles.usedWalletAddress : null,
             ]);
             const notificationElementId = `address-${index}-copyNotification`;
@@ -132,54 +126,56 @@ export default class WalletReceive extends Component<Props> {
                     </RawHash>
                   </ExplorableHashContainer>
                 </CopyableAddress>
-                <div className={styles.addressMargin} />
                 {/* Address Action block start */}
-                <div className={styles.addressActions}>
-                  {/* Generate payment URL for Address action */}
-                  {/* disable URI for Shelley testnet */}
-                  {!environment.isShelley() && onGeneratePaymentURI != null && (
-                    <div className={classnames([
-                      styles.addressActionItemBlock,
-                      styles.generateURLActionBlock])}
-                    >
-                      <button
-                        type="button"
-                        onClick={onGeneratePaymentURI.bind(this, address.address)}
-                        className={styles.btnGenerateURI}
-                      >
-                        <div className={styles.generateURLActionBlock}>
-                          <span className={styles.generateURIIcon}>
-                            <GenerateURIIcon />
-                          </span>
-                          <span className={styles.actionIconText}>
-                            {intl.formatMessage(messages.generatePaymentURLLabel)}
-                          </span>
-                        </div>
-                      </button>
-                    </div>
-                  )}
-                  {/* Verify Address action */}
+                {/* Space for Output Amount UTX0 - */}
+                <div className={classnames([
+                  styles.addressActionItemBlock,
+                  styles.verifyActionBlock])}
+                >
+                  <div>
+                    <span>4.000000 ADA</span>
+                  </div>
+                </div>
+                {/* Generate payment URL for Address action */}
+                {/* disable URI for Shelley testnet */}
+                {!environment.isShelley() && onGeneratePaymentURI != null && (
                   <div className={classnames([
                     styles.addressActionItemBlock,
-                    styles.verifyActionBlock])}
+                    styles.generateURLActionBlock])}
                   >
                     <button
                       type="button"
-                      onClick={
-                        onVerifyAddress.bind(this, {
-                          address: address.address,
-                          path: address.addressing?.path
-                        })
-                      }
+                      onClick={onGeneratePaymentURI.bind(this, address.address)}
+                      className={styles.btnGenerateURI}
                     >
-                      <div>
-                        <span className={styles.verifyIcon}>
-                          <VerifyIcon />
+                      <div className={styles.generateURLActionBlock}>
+                        <span className={styles.generateURIIcon}>
+                          <GenerateURIIcon />
                         </span>
-                        <span>{intl.formatMessage(messages.verifyAddressLabel)}</span>
                       </div>
                     </button>
                   </div>
+                )}
+                {/* Verify Address action */}
+                <div className={classnames([
+                  styles.addressActionItemBlock,
+                  styles.verifyActionBlock])}
+                >
+                  <button
+                    type="button"
+                    onClick={
+                      onVerifyAddress.bind(this, {
+                        address: address.address,
+                        path: address.addressing?.path
+                      })
+                    }
+                  >
+                    <div>
+                      <span className={styles.verifyIcon}>
+                        <VerifyIcon />
+                      </span>
+                    </div>
+                  </button>
                 </div>
                 {/* Action block end */}
               </div>
@@ -199,8 +195,8 @@ export default class WalletReceive extends Component<Props> {
 }
 
 function truncateAddress(addr: string): string {
-  if (addr.length <= 63) {
+  if (addr.length <= 12) {
     return addr;
   }
-  return addr.substring(0, 30) + '...' + addr.substring(addr.length - 30, addr.length);
+  return addr.substring(0, 6) + '...' + addr.substring(addr.length - 6, addr.length);
 }
