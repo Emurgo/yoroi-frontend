@@ -12,6 +12,7 @@ import type {
 } from 'react-intl';
 import type { AddressTypeName } from '../../../stores/toplevel/AddressesStore';
 import { AddressStoreTypes } from '../../../types/AddressFilterTypes';
+import Accordion from '../../widgets/Accordion';
 
 export type Props = {|
   +addressTypes: Array<{|
@@ -35,21 +36,23 @@ export default class ReceiveNavigation extends Component<Props> {
     return (
       <div className={styles.wrapper}>
         <div className={styles.content}>
-          {this.props.addressTypes.map(type => (
-            !type.isHidden && <ReceiveNavButton
-              key={type.name.stable}
-              className={type.name.stable}
-              icon={
-                type.name.stable === AddressStoreTypes.internal ||
-                type.name.stable === AddressStoreTypes.mangled
-                  ? AttentionIcon
-                  : undefined
-              }
-              label={intl.formatMessage(type.name.display)}
-              isActive={type.isActiveStore}
-              onClick={type.setAsActiveStore}
-            />
-          ))}
+          <Accordion title="Base">
+            {this.props.addressTypes.map(type => (
+              !type.isHidden && <ReceiveNavButton
+                key={type.name.stable}
+                className={type.name.stable}
+                icon={
+                  type.name.stable === AddressStoreTypes.internal ||
+                  type.name.stable === AddressStoreTypes.mangled
+                    ? AttentionIcon
+                    : undefined
+                }
+                label={intl.formatMessage(type.name.display)}
+                isActive={type.isActiveStore}
+                onClick={type.setAsActiveStore}
+              />
+            ))}
+          </Accordion>
         </div>
       </div>
     );

@@ -1,0 +1,50 @@
+.accordionSection {
+  display:flex;
+  flex-direction: column;
+
+  .accordionTitle {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    font-family: var(--font-medium);
+    color: var(--theme-transactions-list-detail-row-text-color);
+    padding: 10px;
+    padding-left: 35px;
+    padding-right: 35px;
+    &:hover {
+      color: var(--theme-transactions-priority-high-text-color); 
+    }
+    &:hover {
+      background-color: #fff;
+    }
+  
+    svg {
+      transition: 300ms;
+    }
+  
+    &.arrowUp {
+      svg {
+        transform: rotate(180deg);
+      }
+    }
+    .icon {
+      display: flex;
+    }
+  }
+  .accordionContent {
+    overflow : hidden;
+    padding-left: 35px;
+    padding-right: 35px;
+    max-height: 0;
+    will-change: height;
+    transition: max-height 0.3s linear;
+    &.showActiveContent {
+      max-height: 300px;
+      transition: max-height 300ms linear;
+    }
+  }
+}

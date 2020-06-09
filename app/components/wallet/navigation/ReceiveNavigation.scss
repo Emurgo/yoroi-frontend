@@ -1,12 +1,13 @@
 .wrapper {
   padding-top: 37px;
-  padding-left: 35px;
-  padding-right: 35px;
   box-shadow: 0 2px 4px 0 rgba(56, 57, 61, 0.2);
   height: 100%;
+  background-color: var(--theme-transactions-list-detail-background-color);
 }
 
 .content {
   display: flex;
+  flex-direction: column;
   justify-content: flex-start;
+  min-width: 225px;
 }
