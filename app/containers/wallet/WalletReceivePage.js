@@ -38,6 +38,7 @@ import { AddressStoreTypes } from '../../types/AddressFilterTypes';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { ExplorerType } from '../../domain/Explorer';
 import type { Notification } from '../../types/notificationType';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 
 export type GeneratedData = typeof WalletReceivePage.prototype.generated;
 
@@ -410,7 +411,9 @@ export default class WalletReceivePage extends Component<Props> {
       profile: {|
         isClassicTheme: boolean,
         selectedAPI: void | SelectedApiType,
-        selectedExplorer: ExplorerType
+        selectedExplorer: ExplorerType,
+        shouldHideBalance: boolean,
+        unitOfAccount: UnitOfAccountSettingType,
       |},
       substores: {|
         ada: {|

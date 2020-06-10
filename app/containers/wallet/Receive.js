@@ -7,6 +7,7 @@ import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import ReceiveWithNavigation from '../../components/wallet/layouts/ReceiveWithNavigation';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { AddressTypeName } from '../../stores/toplevel/AddressesStore';
+import type { AddressFilterKind } from '../../types/AddressFilterTypes';
 
 export type GeneratedData = typeof Receive.prototype.generated;
 
@@ -44,6 +45,7 @@ export default class Receive extends Component<Props> {
   @computed get generated(): {|
     stores: {|
       addresses: {|
+        addressFilter: AddressFilterKind,
         getStoresForWallet: (
           publicDeriver: PublicDeriver<>
         ) => Array<
@@ -57,6 +59,12 @@ export default class Receive extends Component<Props> {
       |},
       wallets: {|selected: null | PublicDeriver<>|},
     |},
+    actions: {|
+      addresses: {|
+        setFilter: {| trigger: (params: AddressFilterKind) => void |},
+        resetFilter: {| trigger: (params: void) => void |},
+      |}
+    |}
     |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
