@@ -217,8 +217,8 @@ export default class WalletReceivePage extends Component<Props> {
               this.openURIGenerateDialog(address);
             }
           }
-          setFilter={filter => this.generated.actions.addresses.setFilter.trigger(filter)}
-          activeFilter={this.generated.stores.addresses.addressFilter}
+          shouldHideBalance={profile.shouldHideBalance}
+          unitOfAccountSetting={profile.unitOfAccount}
         />
 
 
@@ -360,6 +360,8 @@ export default class WalletReceivePage extends Component<Props> {
           selectedAPI: stores.profile.selectedAPI,
           selectedExplorer: stores.profile.selectedExplorer,
           isClassicTheme: stores.profile.isClassicTheme,
+          shouldHideBalance: stores.profile.shouldHideBalance,
+          unitOfAccount: stores.profile.unitOfAccount,
         },
         wallets: {
           selected: stores.wallets.selected,

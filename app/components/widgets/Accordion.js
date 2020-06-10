@@ -2,12 +2,11 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
 import classnames from 'classnames';
 
 import ArrowDownSVG from '../../assets/images/expand-arrow-grey.inline.svg';
 import styles from './Accordion.scss';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import AttentionIcon from '../../assets/images/attention-big-light.inline.svg';
 
 type Props = {|
   +title: string,
@@ -22,7 +21,7 @@ type State = {|
 export default class Accordion extends Component<Props, State> {
 
   state: State = {
-    active: false,
+    active: true,
   };
 
   toggleActive() {
@@ -45,7 +44,11 @@ export default class Accordion extends Component<Props, State> {
     return (
       <div className={styles.accordionSection}>
         <button className={activeButtonClasses} onClick={this.toggleActive.bind(this)} type="button">
-          <span>{title}</span>
+          <div> {title}
+            <span className={styles.atentionIcon}>
+              <AttentionIcon />
+            </span>
+          </div>
           <span className={styles.icon}><ArrowDownSVG /></span>
         </button>
         <div className={activeShowClasses}>

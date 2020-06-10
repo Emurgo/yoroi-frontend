@@ -22,6 +22,10 @@ export default class Receive extends Component<Props> {
     children: undefined,
   };
 
+  componentWillUnmount() {
+    this.generated.actions.addresses.resetFilter.trigger();
+  }
+
   render(): Node {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) throw new Error(`${nameof(Receive)} no public deriver`);
@@ -29,6 +33,8 @@ export default class Receive extends Component<Props> {
     return (
       <ReceiveWithNavigation
         addressTypes={addresses.getStoresForWallet(publicDeriver)}
+        setFilter={filter => this.generated.actions.addresses.setFilter.trigger(filter)}
+        activeFilter={this.generated.stores.addresses.addressFilter}
       >
         {this.props.children}
       </ReceiveWithNavigation>
@@ -42,13 +48,14 @@ export default class Receive extends Component<Props> {
     if (this.props.stores == null || this.props.actions == null) {
       throw new Error(`${nameof(Receive)} no way to generated props`);
     }
-    const { stores, } = this.props;
+    const { stores, actions } = this.props;
     return Object.freeze({
       stores: {
         wallets: {
           selected: stores.wallets.selected,
         },
         addresses: {
+          addressFilter: stores.addresses.addressFilter,
           getStoresForWallet: (publicDeriver: PublicDeriver<>) => {
             const addressStores = stores.addresses.getStoresForWallet(publicDeriver);
             const functionalitySubset: Array<{|
@@ -66,6 +73,12 @@ export default class Receive extends Component<Props> {
           },
         },
       },
+      actions: {
+        addresses: {
+          setFilter: { trigger: actions.addresses.setFilter.trigger, },
+          resetFilter: { trigger: actions.addresses.resetFilter.trigger, },
+        }
+      }
     });
   }
 }

@@ -1,37 +1,40 @@
 // ========= LAYOUT =========
 
 .wrapper {
+  position: relative;
   display: flex;
-  margin-right: 34px;
+  font-family: var(--font-light);
+  color: var(--theme-wallet-plate-secondary-text-color);
+  font-size: 1rem;
+  &:hover {
+    cursor: pointer;
+    background: #fff;
+  }
 }
 
 .button {
   display: inline-block;
   color: var(--theme-wallet-navigation-tab-text-color);
-  padding: 7px 0;
+  padding: 7px;
+  padding-left: 40px;
   border-bottom: 3px solid transparent;
-
-  &:hover {
-    border-bottom-color: var(--theme-wallet-navigation-tab-text-colorr);
-    cursor: pointer;
-  }
+  width: 100%;
+  text-align:left;
 }
 
 .active {
-  border-bottom-color: var(--theme-wallet-navigation-tab-text-color-active);
-
-  &:hover {
-    border-bottom-color: var(--theme-wallet-navigation-tab-text-color-active);
-  }
-
+  background: var(--theme-settings-menu-item-background-color-active);
+  
   .label {
-    color: var(--theme-wallet-navigation-tab-text-color-active);
+    font-family: var(--font-semibold);
+    color: var(--theme-transactions-list-detail-row-text-color);
   }
 }
 
 .icon {
-  margin-left: 10px;
-  margin-top: 7px;
+  position: absolute;
+  right: 24px;
+  top: 7px;
 
   & > svg {
     max-height: 24px;
@@ -48,7 +51,7 @@
 }
 
 .label {
-  font-size: 18px;
+  font-size: 1rem;
   line-height: 22px;
-  font-family: var(--font-medium);
+  font-family: var(--font-regular);
 }

@@ -421,5 +421,15 @@ export function userFilter<T>(request: {|
       address.isUsed === null || address.isUsed === false
     ));
   }
+  if (request.addressFilter === AddressFilter.Used) {
+    return request.addresses.filter(address => (
+      address.isUsed === true
+    ));
+  }
+  if (request.addressFilter === AddressFilter.HasBalance) {
+    return request.addresses.filter(address => (
+      address.value !== undefined
+    ));
+  }
   throw new Error(`${nameof(userFilter)} unknown filter type ${request.addressFilter}`);
 }

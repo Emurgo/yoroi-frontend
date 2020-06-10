@@ -22,5 +22,7 @@ export type AddressStoreKind = $Values<typeof AddressStoreTypes>;
 export const AddressFilter = Object.freeze({
   None: 0,
   Unused: 1,
+  Used: 2,
+  HasBalance: 3,
 });
 export type AddressFilterKind = $Values<typeof AddressFilter>;

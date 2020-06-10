@@ -10,23 +10,23 @@
     border: none;
     outline: none;
     font-size: 1rem;
-    font-family: var(--font-medium);
+    font-family: var(--font-regular);
     color: var(--theme-transactions-list-detail-row-text-color);
     padding: 10px;
-    padding-left: 35px;
-    padding-right: 35px;
-    &:hover {
-      color: var(--theme-transactions-priority-high-text-color); 
-    }
-    &:hover {
-      background-color: #fff;
-    }
-  
+    padding-left: 24px;
+    padding-right: 24px;
+
     svg {
+      path {
+        fill: #8A92A3;
+      }
       transition: 300ms;
     }
   
     &.arrowUp {
+      color: var(--theme-transactions-priority-high-text-color);
+      font-family: var(--font-medium);
+
       svg {
         transform: rotate(180deg);
       }
@@ -34,11 +34,16 @@
     .icon {
       display: flex;
     }
+    .atentionIcon {
+      margin-left: 8px;
+      svg {
+        max-width: 12px;
+        max-height: 12px;
+      }
+    }
   }
   .accordionContent {
     overflow : hidden;
-    padding-left: 35px;
-    padding-right: 35px;
     max-height: 0;
     will-change: height;
     transition: max-height 0.3s linear;

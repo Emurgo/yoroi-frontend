@@ -11,14 +11,16 @@ import CopyableAddress from '../widgets/CopyableAddress';
 import RawHash from '../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../domain/Explorer';
-import type { StandardAddress, AddressFilterKind } from '../../types/AddressFilterTypes';
-import { AddressFilter } from '../../types/AddressFilterTypes';
+import type { StandardAddress } from '../../types/AddressFilterTypes';
 import environment from '../../environment';
 import type { Notification } from '../../types/notificationType';
 import type {
   BIP32Path
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import BigNumber from 'bignumber.js';
+import { splitAmount } from '../../utils/formatters';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 
 const messages = defineMessages({
   generatedAddressesSectionTitle: {
@@ -59,8 +61,8 @@ type Props = {|
   +notification: ?Notification,
   +onVerifyAddress: {| address: string, path: void | BIP32Path |} => Promise<void>,
   +onGeneratePaymentURI: void | (string => void),
-  +setFilter: AddressFilterKind => void,
-  +activeFilter: AddressFilterKind,
+  +shouldHideBalance: boolean,
+  +unitOfAccountSetting: UnitOfAccountSettingType,
 |};
 
 @observer
@@ -69,14 +71,32 @@ export default class WalletReceive extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  getAmount: BigNumber => ?Node = (walletAmount) => {
+    if (this.props.shouldHideBalance) {
+      return (<span>******</span>);
+    }
+    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(walletAmount);
+    const adjustedBefore = beforeDecimalRewards.startsWith('-')
+      ? beforeDecimalRewards
+      : '+' + beforeDecimalRewards;
+
+    return (
+      <>
+        {adjustedBefore}
+        <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
+      </>
+    );
+  }
+
+
   render(): Node {
     const {
       walletAddresses,
       onVerifyAddress, onGeneratePaymentURI,
-      onCopyAddressTooltip, notification,
+      onCopyAddressTooltip, notification, unitOfAccountSetting
     } = this.props;
     const { intl } = this.context;
-
+    const currency = 'ADA';
     const walletReceiveContent = (
       <>
         <div className={styles.generatedAddresses}>
@@ -84,7 +104,10 @@ export default class WalletReceive extends Component<Props> {
           <div className={styles.generatedAddressesGrid}>
             <h2>{intl.formatMessage(messages.generatedAddressesSectionTitle)}</h2>
             <h2>{intl.formatMessage(messages.outputAmountUTXO)}</h2>
-            <h2>{intl.formatMessage(messages.generateURLLabel)}</h2>
+            {
+              !environment.isShelley() && onGeneratePaymentURI != null &&
+                <h2>{intl.formatMessage(messages.generateURLLabel)}</h2>
+            }
             <h2>{intl.formatMessage(messages.verifyAddressLabel)}</h2>
           </div>
 
@@ -128,13 +151,20 @@ export default class WalletReceive extends Component<Props> {
                 </CopyableAddress>
                 {/* Address Action block start */}
                 {/* Space for Output Amount UTX0 - */}
-                <div className={classnames([
-                  styles.addressActionItemBlock,
-                  styles.verifyActionBlock])}
-                >
-                  <div>
-                    <span>4.000000 ADA</span>
-                  </div>
+                <div className={styles.verifyActionBlock}>
+                  {address.value != null
+                    ? (
+                      <div className={styles.walletAmount}>
+                        {this.getAmount(address.value)}
+                        {' '}
+                        {unitOfAccountSetting.enabled
+                          ? unitOfAccountSetting.currency
+                          : currency
+                        }
+                      </div>
+                    )
+                    : '-'
+                  }
                 </div>
                 {/* Generate payment URL for Address action */}
                 {/* disable URI for Shelley testnet */}
@@ -195,8 +225,8 @@ export default class WalletReceive extends Component<Props> {
 }
 
 function truncateAddress(addr: string): string {
-  if (addr.length <= 12) {
+  if (addr.length <= 20) {
     return addr;
   }
-  return addr.substring(0, 6) + '...' + addr.substring(addr.length - 6, addr.length);
+  return addr.substring(0, 10) + '...' + addr.substring(addr.length - 10, addr.length);
 }

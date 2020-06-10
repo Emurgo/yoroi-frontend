@@ -25,15 +25,15 @@ export default class ReceiveNavButton extends Component<Props> {
 
     const componentClasses = classnames([
       className,
-      styles.button,
+      styles.wrapper,
       isActive && styles.active
     ]);
 
     const IconComponent = this.props.icon;
 
     return (
-      <div className={styles.wrapper}>
-        <button type="button" className={componentClasses} onClick={onClick}>
+      <div className={componentClasses}>
+        <button type="button" className={styles.button} onClick={onClick}>
           <span className={styles.label}>{label}</span>
         </button>
         {IconComponent != null &&
