@@ -12,6 +12,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
+import LocalizableError from '../../../i18n/LocalizableError';
 
 export type GeneratedData = typeof RemoveWalletDialogContainer.prototype.generated;
 
@@ -74,7 +75,31 @@ export default class RemoveWalletDialogContainer extends Component<Props> {
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      dialogs: {|
+        closeActiveDialog: {|
+          trigger: (params: void) => void
+        |}
+      |},
+      walletSettings: {|
+        removeWallet: {|
+          trigger: (params: {|
+            publicDeriver: PublicDeriver<>
+          |}) => Promise<void>
+        |}
+      |}
+    |},
+    stores: {|
+      walletSettings: {|
+        removeWalletRequest: {|
+          error: ?LocalizableError,
+          isExecuting: boolean,
+          reset: () => void
+        |}
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

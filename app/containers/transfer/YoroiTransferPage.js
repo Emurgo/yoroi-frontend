@@ -28,6 +28,8 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { GeneratedData as YoroiPlateData } from './YoroiPlatePage';
+import type { ExplorerType } from '../../domain/Explorer';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
@@ -43,7 +45,6 @@ export type MockYoroiTransferStore = {|
   |},
   +nextInternalAddress: PublicDeriver<> => (void => Promise<string>),
   +recoveryPhrase: string,
-  +reset: void => void,
 |};
 
 @observer
@@ -247,7 +248,97 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
     }
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    YoroiPlateProps: InjectedOrGenerated<YoroiPlateData>,
+    actions: {|
+      ada: {|
+        yoroiTransfer: {|
+          backToUninitialized: {|
+            trigger: (params: void) => void
+          |},
+          cancelTransferFunds: {|
+            trigger: (params: void) => void
+          |},
+          checkAddresses: {|
+            trigger: (params: {|
+              getDestinationAddress: void => Promise<string>
+            |}) => Promise<void>
+          |},
+          setupTransferFundsWithMnemonic: {|
+            trigger: (params: {|
+              recoveryPhrase: string
+            |}) => void
+          |},
+          setupTransferFundsWithPaperMnemonic: {|
+            trigger: (params: {|
+              paperPassword: string,
+              recoveryPhrase: string
+            |}) => void
+          |},
+          startHardwareMnemnoic: {|
+            trigger: (params: void) => void
+          |},
+          transferFunds: {|
+            trigger: (params: {|
+              getDestinationAddress: void => Promise<string>,
+              next: void => Promise<void>,
+              rebuildTx: boolean
+            |}) => Promise<void>
+          |}
+        |}
+      |},
+      router: {|
+        goToRoute: {|
+          trigger: (params: {|
+            forceRefresh?: boolean,
+            params?: ?any,
+            route: string
+          |}) => void
+        |}
+      |}
+    |},
+    stores: {|
+      coinPriceStore: {|
+        getCurrentPrice: (from: string, to: string) => ?number
+      |},
+      profile: {|
+        isClassicTheme: boolean,
+        selectedExplorer: ExplorerType,
+        unitOfAccount: UnitOfAccountSettingType
+      |},
+      substores: {|
+        ada: {|
+          wallets: {|
+            isValidMnemonic: ({|
+              mnemonic: string,
+              numberOfWords: number
+            |}) => boolean,
+            isValidPaperMnemonic: ({|
+              mnemonic: string,
+              numberOfWords: number
+            |}) => boolean
+          |},
+          yoroiTransfer: {|
+            error: ?LocalizableError,
+            nextInternalAddress: (
+              PublicDeriver<>
+            ) => void => Promise<string>,
+            recoveryPhrase: string,
+            status: TransferStatusT,
+            transferFundsRequest: {| isExecuting: boolean |},
+            transferTx: ?TransferTx
+          |}
+        |}
+      |},
+      wallets: {|
+        activeWalletRoute: ?string,
+        refreshWalletFromRemote: (
+          PublicDeriver<>
+        ) => Promise<void>,
+        selected: null | PublicDeriver<>
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

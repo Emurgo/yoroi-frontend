@@ -18,11 +18,14 @@ import {
 
 
 export class ModifyAccountingTransaction {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    AccountingTransactionInput: typeof Tables.AccountingTransactionInputSchema,
+    AccountingTransactionOutput: typeof Tables.AccountingTransactionOutputSchema,
+  |} = Object.freeze({
     [Tables.AccountingTransactionInputSchema.name]: Tables.AccountingTransactionInputSchema,
     [Tables.AccountingTransactionOutputSchema.name]: Tables.AccountingTransactionOutputSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async addIOsToTx(
     db: lf$Database,

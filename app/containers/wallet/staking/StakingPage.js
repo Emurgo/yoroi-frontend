@@ -15,6 +15,9 @@ import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
+import type { DelegationRequests } from '../../../stores/ada/DelegationStore';
+import type { TxRequests } from '../../../stores/toplevel/TransactionsStore';
 
 export type GeneratedData = typeof StakingPage.prototype.generated;
 
@@ -142,7 +145,39 @@ export default class StakingPage extends Component<Props> {
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    SeizaFetcherProps: InjectedOrGenerated<SeizaFetcherData>,
+    actions: {|
+      ada: {|
+        delegationTransaction: {|
+          reset: {| trigger: (params: void) => void |}
+        |}
+      |}
+    |},
+    stores: {|
+      profile: {| currentLocale: string |},
+      substores: {|
+        ada: {|
+          delegation: {|
+            getDelegationRequests: (
+              PublicDeriver<>
+            ) => void | DelegationRequests
+          |},
+          delegationTransaction: {|
+            signAndBroadcastDelegationTx: {|
+              isExecuting: boolean,
+              wasExecuted: boolean
+            |}
+          |}
+        |}
+      |},
+      transactions: {|
+        getTxRequests: (PublicDeriver<>) => TxRequests,
+        hasAnyPending: boolean
+      |},
+      wallets: {| selected: null | PublicDeriver<> |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

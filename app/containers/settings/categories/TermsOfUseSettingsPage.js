@@ -11,7 +11,7 @@ type GeneratedData = typeof TermsOfUseSettingsPage.prototype.generated;
 @observer
 export default class TermsOfUseSettingsPage extends Component<InjectedOrGenerated<GeneratedData>> {
 
-  @computed get generated() {
+  @computed get generated(): {|stores: {|profile: {|termsOfUse: string|}|}|} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

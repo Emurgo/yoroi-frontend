@@ -41,7 +41,23 @@ export default class Receive extends Component<Props> {
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    stores: {|
+      addresses: {|
+        getStoresForWallet: (
+          publicDeriver: PublicDeriver<>
+        ) => Array<
+          {|
+            +isActiveStore: boolean,
+            +isHidden: boolean,
+            +name: AddressTypeName,
+            +setAsActiveStore: (void) => void,
+          |},
+        >,
+      |},
+      wallets: {|selected: null | PublicDeriver<>|},
+    |},
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

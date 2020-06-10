@@ -9,10 +9,12 @@ import type { TxMemoTableRow } from '../tables';
 import { getAll, } from '../../utils';
 
 export class GetTxMemo {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    TxMemo: typeof Tables.TxMemoSchema,
+  |} = Object.freeze({
     [Tables.TxMemoSchema.name]: Tables.TxMemoSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async getAllMemos(
     db: lf$Database,

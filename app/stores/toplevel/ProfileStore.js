@@ -254,6 +254,7 @@ export default class ProfileStore extends Store {
   setup(): void {
     super.setup();
     this.actions.profile.updateLocale.listen(this._updateLocale);
+    this.actions.profile.resetLocale.listen(this._resetLocale);
     this.actions.profile.updateTentativeLocale.listen(this._updateTentativeLocale);
     this.actions.profile.updateSelectedExplorer.listen(this.setSelectedExplorer);
     this.actions.profile.acceptTermsOfUse.listen(this._acceptTermsOfUse);
@@ -326,6 +327,11 @@ export default class ProfileStore extends Store {
   _updateLocale: {| locale: string |} => Promise<void> = async ({ locale }) => {
     await this.setProfileLocaleRequest.execute(locale);
     await this.getProfileLocaleRequest.execute(); // eagerly cache
+  };
+
+  _resetLocale: void => Promise<void> = async () => {
+    await this.unsetProfileLocaleRequest.execute();
+    await this.getProfileLocaleRequest.execute();
   };
 
   _acceptLocale: void => Promise<void> = async () => {

@@ -17,6 +17,7 @@ import type { GeneratedData as DaedalusTransferPageData } from './DaedalusTransf
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import ByronEraOptionDialogContainer from './options/ByronEraOptionDialogContainer';
 import type { GeneratedData as ByronEraOptionDialogContainerData } from './options/ByronEraOptionDialogContainer';
+import type { TransferSourceType, } from '../../types/TransferTypes';
 
 export type GeneratedData = typeof WalletTransferPage.prototype.generated;
 
@@ -83,7 +84,39 @@ export default class WalletTransferPage extends Component<Props> {
   }
 
 
-  @computed get generated() {
+  @computed get generated(): {|
+    ByronEraOptionDialogContainerProps: InjectedOrGenerated<ByronEraOptionDialogContainerData>,
+    DaedalusTransferPageProps: ?InjectedOrGenerated<DaedalusTransferPageData>,
+    YoroiTransferPageProps: ?InjectedOrGenerated<YoroiTransferPageData>,
+    actions: {|
+      ada: {|
+        yoroiTransfer: {|
+          startTransferFunds: {|
+            trigger: (params: {|
+              source: TransferSourceType
+            |}) => void
+          |}
+        |}
+      |},
+      dialogs: {|
+        closeActiveDialog: {|
+          trigger: (params: void) => void
+        |},
+        open: {|
+          trigger: (params: {|
+            dialog: any,
+            params?: any
+          |}) => void
+        |}
+      |}
+    |},
+    stores: {|
+      uiDialogs: {|
+        getParam: <T>(number | string) => T,
+        isOpen: any => boolean
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

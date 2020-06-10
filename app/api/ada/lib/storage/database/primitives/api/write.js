@@ -44,10 +44,12 @@ import {
 import type { InsertRequest } from '../../walletTypes/common/utils';
 
 export class ModifyKey {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    Key: typeof Tables.KeySchema,
+  |} = Object.freeze({
     [Tables.KeySchema.name]: Tables.KeySchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async add(
     db: lf$Database,
@@ -88,10 +90,12 @@ export class ModifyKey {
 }
 
 export class GetOrAddBlock {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    Block: typeof Tables.BlockSchema
+  |} = Object.freeze({
     [Tables.BlockSchema.name]: Tables.BlockSchema,
   });
-  static depTables = Object.freeze({
+  static depTables: {|GetBlock: typeof GetBlock|} = Object.freeze({
     GetBlock,
   });
 
@@ -119,11 +123,14 @@ export class GetOrAddBlock {
 }
 
 export class ModifyAddress {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    Address: typeof Tables.AddressSchema,
+    AddressMapping: typeof Tables.AddressMappingSchema,
+  |} = Object.freeze({
     [Tables.AddressSchema.name]: Tables.AddressSchema,
     [Tables.AddressMappingSchema.name]: Tables.AddressMappingSchema,
   });
-  static depTables = Object.freeze({
+  static depTables: {|GetEncryptionMeta: typeof GetEncryptionMeta|} = Object.freeze({
     GetEncryptionMeta,
   });
 
@@ -192,10 +199,12 @@ export class ModifyAddress {
 }
 
 export class ModifyEncryptionMeta {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    EncryptionMeta: typeof Tables.EncryptionMetaSchema,
+  |} = Object.freeze({
     [Tables.EncryptionMetaSchema.name]: Tables.EncryptionMetaSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async setInitial(
     db: lf$Database,
@@ -226,10 +235,12 @@ export type DerivationQueryResult<Row> = {|
 |};
 
 export class AddDerivation {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    KeyDerivation: typeof Tables.KeyDerivationSchema,
+  |} = Object.freeze({
     [Tables.KeyDerivationSchema.name]: Tables.KeyDerivationSchema,
   });
-  static depTables = Object.freeze({
+  static depTables: {|ModifyKey: typeof ModifyKey|} = Object.freeze({
     ModifyKey,
   });
 
@@ -284,10 +295,15 @@ export class AddDerivation {
 }
 
 export class GetOrAddDerivation {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    KeyDerivation: typeof Tables.KeyDerivationSchema,
+  |} = Object.freeze({
     [Tables.KeyDerivationSchema.name]: Tables.KeyDerivationSchema,
   });
-  static depTables = Object.freeze({
+  static depTables: {|
+    AddDerivation: typeof AddDerivation,
+    GetChildIfExists: typeof GetChildIfExists,
+  |} = Object.freeze({
     AddDerivation,
     GetChildIfExists,
   });
@@ -340,10 +356,12 @@ export class GetOrAddDerivation {
 }
 
 export class ModifyTransaction {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    Transaction: typeof Tables.TransactionSchema,
+  |} = Object.freeze({
     [Tables.TransactionSchema.name]: Tables.TransactionSchema,
   });
-  static depTables = Object.freeze({
+  static depTables: {|GetOrAddBlock: typeof GetOrAddBlock|} = Object.freeze({
     GetOrAddBlock,
   });
 
@@ -434,11 +452,14 @@ export type AddCertificateRequest = {|
   relatedAddresses: number => $ReadOnlyArray<CertificateAddressInsert>,
 |};
 export class ModifyCertificate {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    Certificate: typeof Tables.CertificateSchema,
+    CertificateAddress: typeof Tables.CertificateAddressSchema,
+  |} = Object.freeze({
     [Tables.CertificateSchema.name]: Tables.CertificateSchema,
     [Tables.CertificateAddressSchema.name]: Tables.CertificateAddressSchema,
   });
-  static depTables = Object.freeze({
+  static depTables: {||} = Object.freeze({
   });
 
   static async addNew(
@@ -469,10 +490,15 @@ export class ModifyCertificate {
 }
 
 export class RemoveKeyDerivationTree {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    KeyDerivation: typeof Tables.KeyDerivationSchema,
+  |} = Object.freeze({
     [Tables.KeyDerivationSchema.name]: Tables.KeyDerivationSchema,
   });
-  static depTables = Object.freeze({
+  static depTables: {|
+    GetDerivationsByPath: typeof GetDerivationsByPath,
+    ModifyKey: typeof ModifyKey,
+  |} = Object.freeze({
     GetDerivationsByPath,
     ModifyKey,
   });
@@ -520,11 +546,14 @@ export class RemoveKeyDerivationTree {
 }
 
 export class FreeBlocks {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    Block: typeof Tables.BlockSchema,
+    Transaction: typeof Tables.TransactionSchema,
+  |} = Object.freeze({
     [Tables.TransactionSchema.name]: Tables.TransactionSchema,
     [Tables.BlockSchema.name]: Tables.BlockSchema,
   });
-  static depTables = Object.freeze({
+  static depTables: {||} = Object.freeze({
   });
 
   /**

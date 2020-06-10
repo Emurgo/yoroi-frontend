@@ -33,9 +33,8 @@ unsafe-addition=error
 # no-floating-promises=warn
 
 [options]
-well_formed_exports=false
+types_first=true
 include_warnings=true
-server.max_workers=1
 esproposal.class_static_fields=enable
 esproposal.class_instance_fields=enable
 esproposal.export_star_as=enable

@@ -17,10 +17,12 @@ import { PublicDeriverSchema, } from '../../core/tables';
 import type { PublicDeriverRow, } from '../../core/tables';
 
 export class GetBip44Wrapper {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    Bip44Wrapper: typeof Tables.Bip44WrapperSchema,
+  |} = Object.freeze({
     [Tables.Bip44WrapperSchema.name]: Tables.Bip44WrapperSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async get(
     db: lf$Database,
@@ -37,11 +39,14 @@ export class GetBip44Wrapper {
 }
 
 export class GetAllBip44Wallets {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    Bip44Wrapper: typeof Tables.Bip44WrapperSchema,
+    PublicDeriver: typeof PublicDeriverSchema,
+  |} = Object.freeze({
     [Tables.Bip44WrapperSchema.name]: Tables.Bip44WrapperSchema,
     [PublicDeriverSchema.name]: PublicDeriverSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async get(
     db: lf$Database,

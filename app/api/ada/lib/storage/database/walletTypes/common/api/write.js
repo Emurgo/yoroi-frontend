@@ -31,8 +31,11 @@ import type {
 } from '../utils';
 
 export class AddDerivationTree {
-  static ownTables = Object.freeze({});
-  static depTables = Object.freeze({
+  static ownTables: {||} = Object.freeze({});
+  static depTables: {|
+    AddDerivation: typeof AddDerivation,
+    GetOrAddDerivation: typeof GetOrAddDerivation,
+  |} = Object.freeze({
     GetOrAddDerivation,
     AddDerivation,
   });
@@ -187,8 +190,14 @@ export type DerivePublicDeriverFromKeyRequest<Insert> = {|
   initialDerivations: TreeInsert<any>,
 |};
 export class DerivePublicDeriverFromKey {
-  static ownTables = Object.freeze({});
-  static depTables = Object.freeze({
+  static ownTables: {||} = Object.freeze({});
+  static depTables: {|
+    AddDerivationTree: typeof AddDerivationTree,
+    AddPublicDeriver: typeof AddPublicDeriver,
+    GetKeyForDerivation: typeof GetKeyForDerivation,
+    GetOrAddDerivation: typeof GetOrAddDerivation,
+    GetPublicDeriver: typeof GetPublicDeriver,
+  |} = Object.freeze({
     GetPublicDeriver,
     AddPublicDeriver,
     GetKeyForDerivation,
@@ -310,8 +319,14 @@ export type AddAdhocPublicDeriverResponse<Row> = {|
   hwWalletMeta: void | $ReadOnly<HwWalletMetaRow>,
 |}
 export class AddAdhocPublicDeriver {
-  static ownTables = Object.freeze({});
-  static depTables = Object.freeze({
+  static ownTables: {||} = Object.freeze({});
+  static depTables: {|
+    AddDerivation: typeof AddDerivation,
+    AddDerivationTree: typeof AddDerivationTree,
+    AddPublicDeriver: typeof AddPublicDeriver,
+    GetPublicDeriver: typeof GetPublicDeriver,
+    ModifyHwWalletMeta: typeof ModifyHwWalletMeta,
+  |} = Object.freeze({
     GetPublicDeriver,
     AddDerivation,
     AddPublicDeriver,

@@ -14,10 +14,12 @@ import { GetEncryptionMeta } from '../../primitives/api/read';
 import { digestForHash } from '../../primitives/api/utils';
 
 export class ModifyTxMemo {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    TxMemo: typeof Tables.TxMemoSchema,
+  |} = Object.freeze({
     [Tables.TxMemoSchema.name]: Tables.TxMemoSchema,
   });
-  static depTables = Object.freeze({
+  static depTables: {|GetEncryptionMeta: typeof GetEncryptionMeta|} = Object.freeze({
     GetEncryptionMeta
   });
 

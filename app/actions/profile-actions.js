@@ -12,6 +12,7 @@ export default class ProfileActions {
   selectComplexityLevel: AsyncAction<ComplexityLevelType> = new AsyncAction();
   updateTentativeLocale: Action<{| locale: string |}> = new Action();
   updateLocale: AsyncAction<{| locale: string |}> = new AsyncAction();
+  resetLocale: AsyncAction<void> = new AsyncAction();
   updateSelectedExplorer: AsyncAction<{| explorer: ExplorerType |}> = new AsyncAction();
   updateTheme: AsyncAction<{| theme: string |}> = new AsyncAction();
   exportTheme: AsyncAction<void> = new AsyncAction();

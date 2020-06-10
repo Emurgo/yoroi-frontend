@@ -56,6 +56,8 @@ import NavBarTitle from '../../components/topbar/NavBarTitle';
 import type { RestoreModeType } from '../../actions/ada/wallet-restore-actions';
 import { RestoreMode } from '../../actions/ada/wallet-restore-actions';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { ApiOptionType } from '../../api/types';
+import type { SelectedApiType } from '../../stores/toplevel/ProfileStore';
 
 export type GeneratedData = typeof WalletAddPage.prototype.generated;
 
@@ -257,7 +259,67 @@ export default class WalletAddPage extends Component<Props> {
     });
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
+    CreatePaperWalletDialogContainerProps:
+      InjectedOrGenerated<CreatePaperWalletDialogContainerData>,
+    SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
+    WalletBackupDialogContainerProps: InjectedOrGenerated<WalletBackupDialogContainerData>,
+    WalletCreateDialogContainerProps: InjectedOrGenerated<WalletCreateDialogContainerData>,
+    WalletLedgerConnectDialogContainerProps:
+      InjectedOrGenerated<WalletLedgerConnectDialogContainerData>,
+    WalletPaperDialogContainerProps: InjectedOrGenerated<WalletPaperDialogContainerData>,
+    WalletRestoreDialogContainerProps: InjectedOrGenerated<WalletRestoreDialogContainerData>,
+    WalletTrezorConnectDialogContainerProps:
+      InjectedOrGenerated<WalletTrezorConnectDialogContainerData>,
+    actions: {|
+      ada: {|
+        ledgerConnect: {|
+          init: {| trigger: (params: void) => void |}
+        |},
+        trezorConnect: {|
+          init: {| trigger: (params: void) => void |}
+        |}
+      |},
+      dialogs: {|
+        closeActiveDialog: {|
+          trigger: (params: void) => void
+        |},
+        open: {|
+          trigger: (params: {|
+            dialog: any,
+            params?: any
+          |}) => void
+        |}
+      |},
+      profile: {|
+        setSelectedAPI: {|
+          trigger: (params: void | ApiOptionType) => void
+        |}
+      |},
+      router: {|
+        goToRoute: {|
+          trigger: (params: {|
+            forceRefresh?: boolean,
+            params?: ?any,
+            route: string
+          |}) => void
+        |}
+      |},
+      wallets: {|
+        unselectWallet: {| trigger: (params: void) => void |}
+      |}
+    |},
+    stores: {|
+      profile: {| selectedAPI: void | SelectedApiType |},
+      uiDialogs: {|
+        activeDialog: ?any,
+        getParam: <T>(number | string) => T,
+        isOpen: any => boolean
+      |},
+      wallets: {| hasAnyWallets: boolean |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

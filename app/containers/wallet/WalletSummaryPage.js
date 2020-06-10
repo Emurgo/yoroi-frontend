@@ -25,9 +25,25 @@ import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type {
   Address,
+  IGetLastSyncInfoResponse,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import config from '../../config';
 import type { SelectedApiType } from '../../stores/toplevel/ProfileStore';
+import type {
+  TxMemoTableUpsert, TxMemoTablePreInsert, TxMemoPreLookupKey,
+} from '../../api/ada/lib/storage/bridge/memos';
+import WalletTransaction from '../../domain/WalletTransaction';
+import type { TransactionRowsToExportRequest } from '../../actions/common/transactions-actions';
+import type { PriceDataRow } from '../../api/ada/lib/storage/database/prices/tables';
+import LocalizableError from '../../i18n/LocalizableError';
+import type { MemosForWallet } from '../../stores/toplevel/MemosStore';
+import type { PublicDeriverSettingsCache } from '../../stores/toplevel/WalletSettingsStore';
+import type { ExplorerType } from '../../domain/Explorer';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import type {
+  GetTransactionsRequestOptions
+} from '../../api/common/index';
+import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
 
 export type GeneratedData = typeof WalletSummaryPage.prototype.generated;
 
@@ -335,7 +351,128 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
     actions.dialogs.open.trigger({ dialog: DeleteMemoDialog });
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      dialogs: {|
+        open: {|
+          trigger: (params: {|
+            dialog: any,
+            params?: any
+          |}) => void
+        |}
+      |},
+      memos: {|
+        closeMemoDialog: {|
+          trigger: (params: void) => void
+        |},
+        deleteTxMemo: {|
+          trigger: (
+            params: TxMemoPreLookupKey
+          ) => Promise<void>
+        |},
+        saveTxMemo: {|
+          trigger: (
+            params: TxMemoTablePreInsert
+          ) => Promise<void>
+        |},
+        selectTransaction: {|
+          trigger: (params: {|
+            tx: WalletTransaction
+          |}) => void
+        |},
+        updateTxMemo: {|
+          trigger: (
+            params: TxMemoTableUpsert
+          ) => Promise<void>
+        |}
+      |},
+      notifications: {|
+        open: {| trigger: (params: Notification) => void |}
+      |},
+      router: {|
+        goToRoute: {|
+          trigger: (params: {|
+            forceRefresh?: boolean,
+            params?: ?any,
+            route: string
+          |}) => void
+        |}
+      |},
+      transactions: {|
+        closeExportTransactionDialog: {|
+          trigger: (params: void) => void
+        |},
+        exportTransactionsToFile: {|
+          trigger: (params: {|
+            exportRequest: TransactionRowsToExportRequest,
+            publicDeriver: PublicDeriver<>
+          |}) => Promise<void>
+        |},
+        loadMoreTransactions: {|
+          trigger: (params: PublicDeriver<>) => Promise<void>
+        |}
+      |}
+    |},
+    stores: {|
+      addresses: {|
+        getStoresForWallet: (
+          publicDeriver: PublicDeriver<>
+        ) => Array<{|
+          +all: $ReadOnlyArray<
+            $ReadOnly<{ ...Address, ... }>
+          >,
+          +displayName: $Exact<$npm$ReactIntl$MessageDescriptor>,
+          +route: string
+        |}>
+      |},
+      coinPriceStore: {|
+        priceMap: Map<string, $ReadOnly<PriceDataRow>>
+      |},
+      memos: {|
+        error: ?LocalizableError,
+        getIdForWallet: (PublicDeriver<>) => string,
+        hasSetSelectedExternalStorageProvider: boolean,
+        selectedTransaction: void | WalletTransaction,
+        txMemoMap: Map<string, MemosForWallet>
+      |},
+      profile: {|
+        isClassicTheme: boolean,
+        selectedAPI: void | SelectedApiType,
+        selectedExplorer: ExplorerType,
+        shouldHideBalance: boolean,
+        unitOfAccount: UnitOfAccountSettingType
+      |},
+      transactions: {|
+        exportError: ?LocalizableError,
+        hasAny: boolean,
+        isExporting: boolean,
+        lastSyncInfo: IGetLastSyncInfoResponse,
+        recent: Array<WalletTransaction>,
+        recentTransactionsRequest: {|
+          isExecuting: boolean,
+          wasExecuted: boolean
+        |},
+        searchOptions: ?GetTransactionsRequestOptions,
+        totalAvailable: number,
+        unconfirmedAmount: UnconfirmedAmount
+      |},
+      uiDialogs: {|
+        getParam: <T>(number | string) => T,
+        isOpen: any => boolean
+      |},
+      uiNotifications: {|
+        getTooltipActiveNotification: string => ?Notification,
+        isOpen: string => boolean,
+        mostRecentActiveNotification: ?Notification
+      |},
+      walletSettings: {|
+        getPublicDeriverSettingsCache: (
+          PublicDeriver<>
+        ) => PublicDeriverSettingsCache
+      |},
+      wallets: {| selected: null | PublicDeriver<> |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

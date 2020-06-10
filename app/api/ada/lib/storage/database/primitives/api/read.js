@@ -34,10 +34,12 @@ import {
 import { getRowFromKey, getRowIn, StaleStateError, } from '../../utils';
 
 export class GetEncryptionMeta {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    EncryptionMeta: typeof Tables.EncryptionMetaSchema,
+  |} = Object.freeze({
     [Tables.EncryptionMetaSchema.name]: Tables.EncryptionMetaSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async exists(
     db: lf$Database,
@@ -70,10 +72,12 @@ export class GetEncryptionMeta {
 }
 
 export class GetKey {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    Key: typeof Tables.KeySchema
+  |} = Object.freeze({
     [Tables.KeySchema.name]: Tables.KeySchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async get(
     db: lf$Database,
@@ -90,10 +94,12 @@ export class GetKey {
 }
 
 export class GetBlock {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    Block: typeof Tables.BlockSchema,
+  |} = Object.freeze({
     [Tables.BlockSchema.name]: Tables.BlockSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async byIds(
     db: lf$Database,
@@ -123,11 +129,14 @@ export class GetBlock {
 }
 
 export class GetAddress {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    Address: typeof Tables.AddressSchema,
+    AddressMapping: typeof Tables.AddressMappingSchema,
+  |} = Object.freeze({
     [Tables.AddressSchema.name]: Tables.AddressSchema,
     [Tables.AddressMappingSchema.name]: Tables.AddressMappingSchema,
   });
-  static depTables = Object.freeze({
+  static depTables: {|GetEncryptionMeta: typeof GetEncryptionMeta|} = Object.freeze({
     GetEncryptionMeta
   });
 
@@ -234,10 +243,12 @@ export class GetAddress {
 }
 
 export class GetChildIfExists {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    KeyDerivation: typeof Tables.KeyDerivationSchema,
+  |} = Object.freeze({
     [Tables.KeyDerivationSchema.name]: Tables.KeyDerivationSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   /**
    * Note: can't support ROOT level
@@ -271,8 +282,8 @@ export class GetChildIfExists {
 }
 
 export class GetChildWithSpecific {
-  static ownTables = Object.freeze({});
-  static depTables = Object.freeze({
+  static ownTables: {||} = Object.freeze({});
+  static depTables: {|GetChildIfExists: typeof GetChildIfExists|} = Object.freeze({
     GetChildIfExists,
   });
 
@@ -304,10 +315,12 @@ export class GetChildWithSpecific {
 }
 
 export class GetKeyDerivation {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    KeyDerivation: typeof Tables.KeyDerivationSchema,
+  |} = Object.freeze({
     [Tables.KeyDerivationSchema.name]: Tables.KeyDerivationSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async get(
     db: lf$Database,
@@ -334,10 +347,15 @@ export type BIP32QueryPath = $ReadOnlyArray<number | null>;
 type PathMapType = Map<number, Array<number>>;
 
 export class GetDerivationsByPath {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    KeyDerivation: typeof Tables.KeyDerivationSchema,
+  |} = Object.freeze({
     [Tables.KeyDerivationSchema.name]: Tables.KeyDerivationSchema,
   });
-  static depTables = Object.freeze({
+  static depTables: {|
+    GetChildIfExists: typeof GetChildIfExists,
+    GetKeyDerivation: typeof GetKeyDerivation,
+  |} = Object.freeze({
     GetChildIfExists,
     GetKeyDerivation,
   });
@@ -523,8 +541,8 @@ type GetPathWithSpecificRequest = {|
   level: number,
 |};
 export class GetPathWithSpecific {
-  static ownTables = Object.freeze({});
-  static depTables = Object.freeze({
+  static ownTables: {||} = Object.freeze({});
+  static depTables: {|GetDerivationsByPath: typeof GetDerivationsByPath|} = Object.freeze({
     GetDerivationsByPath,
   });
 
@@ -575,8 +593,11 @@ export class GetPathWithSpecific {
 }
 
 export class GetKeyForDerivation {
-  static ownTables = Object.freeze({});
-  static depTables = Object.freeze({
+  static ownTables: {||} = Object.freeze({});
+  static depTables: {|
+    GetKey: typeof GetKey,
+    GetKeyDerivation: typeof GetKeyDerivation,
+  |} = Object.freeze({
     GetKeyDerivation,
     GetKey,
   });
@@ -632,10 +653,12 @@ export class GetKeyForDerivation {
 }
 
 export class GetTransaction {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    Transaction: typeof Tables.TransactionSchema,
+  |} = Object.freeze({
     [Tables.TransactionSchema.name]: Tables.TransactionSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async fromIds(
     db: lf$Database,
@@ -702,11 +725,14 @@ export class GetTransaction {
 }
 
 export class GetTxAndBlock {
-  static ownTables = Object.freeze({
+    static ownTables: {|
+    Block: typeof Tables.BlockSchema,
+    Transaction: typeof Tables.TransactionSchema,
+  |} = Object.freeze({
     [Tables.TransactionSchema.name]: Tables.TransactionSchema,
     [Tables.BlockSchema.name]: Tables.BlockSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async gteSlot(
     db: lf$Database,
@@ -891,13 +917,18 @@ export type CertificateForKey = {|
 |};
 
 export class GetCertificates {
-  static ownTables = Object.freeze({
+  static ownTables: {|
+    Block: typeof Tables.BlockSchema,
+    Certificate: typeof Tables.CertificateSchema,
+    CertificateAddress: typeof Tables.CertificateAddressSchema,
+    Transaction: typeof Tables.TransactionSchema,
+  |} = Object.freeze({
     [Tables.CertificateAddressSchema.name]: Tables.CertificateAddressSchema,
     [Tables.CertificateSchema.name]: Tables.CertificateSchema,
     [Tables.TransactionSchema.name]: Tables.TransactionSchema,
     [Tables.BlockSchema.name]: Tables.BlockSchema,
   });
-  static depTables = Object.freeze({});
+  static depTables: {||} = Object.freeze({});
 
   static async forAddress(
     db: lf$Database,

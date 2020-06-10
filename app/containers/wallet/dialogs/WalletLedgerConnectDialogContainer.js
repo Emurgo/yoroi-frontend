@@ -12,8 +12,9 @@ import CheckDialog from '../../../components/wallet/hwConnect/ledger/CheckDialog
 import ConnectDialog from '../../../components/wallet/hwConnect/ledger/ConnectDialog';
 import SaveDialog from '../../../components/wallet/hwConnect/ledger/SaveDialog';
 
-import { ProgressStep } from '../../../types/HWConnectStoreTypes';
+import { ProgressStep, ProgressInfo } from '../../../types/HWConnectStoreTypes';
 import type { SelectedApiType } from '../../../stores/toplevel/ProfileStore';
+import LocalizableError from '../../../i18n/LocalizableError';
 
 export type GeneratedData = typeof WalletLedgerConnectDialogContainer.prototype.generated;
 
@@ -43,7 +44,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
   render(): null | Node {
     const selectedAPI = this.getSelectedApi();
     const { profile } = this.generated.stores;
-    const ledgerConnectStore = this._getLedgerConnectStore();
+    const ledgerConnectStore = this.generated.stores.substores[selectedAPI.type].ledgerConnect;
     const hwConnectActions = this.generated.actions[selectedAPI.type].ledgerConnect;
 
     let component = null;
@@ -96,13 +97,41 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
     return component;
   }
 
-  /** Returns the store which is responsible for this Container */
-  _getLedgerConnectStore() {
-    const selectedAPI = this.getSelectedApi();
-    return this.generated.stores.substores[selectedAPI.type].ledgerConnect;
-  }
-
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      ada: {|
+        ledgerConnect: {|
+          cancel: {| trigger: (params: void) => void |},
+          goBackToCheck: {|
+            trigger: (params: void) => void
+          |},
+          submitCheck: {| trigger: (params: void) => void |},
+          submitConnect: {|
+            trigger: (params: void) => Promise<void>
+          |},
+          submitSave: {|
+            trigger: (params: string) => Promise<void>
+          |}
+        |}
+      |}
+    |},
+    stores: {|
+      profile: {|
+        isClassicTheme: boolean,
+        selectedAPI: void | SelectedApiType
+      |},
+      substores: {|
+        ada: {|
+          ledgerConnect: {|
+            defaultWalletName: string,
+            error: ?LocalizableError,
+            isActionProcessing: boolean,
+            progressInfo: ProgressInfo
+          |}
+        |}
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

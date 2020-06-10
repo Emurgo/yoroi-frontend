@@ -55,9 +55,6 @@ export const GettingMnemonics = (): Node => {
             hasAnyWallets: false,
             first: null,
           },
-          coinPriceStore: {
-            getCurrentPrice: (_from, _to) => 5,
-          },
         },
         actions: {
           dialogs: {

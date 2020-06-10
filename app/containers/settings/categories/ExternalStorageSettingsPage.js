@@ -6,6 +6,8 @@ import { computed } from 'mobx';
 import { handleExternalClick } from '../../../utils/routing';
 import ExternalStorageSettings from '../../../components/settings/categories/ExternalStorageSettings';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
+import type { ProvidersType } from '../../../api/externalStorage/index';
+import type { SelectedExternalStorageProvider } from '../../../domain/ExternalStorage';
 
 type GeneratedData = typeof ExternalStorageSettingsPage.prototype.generated;
 
@@ -38,7 +40,21 @@ export default class ExternalStorageSettingsPage
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      memos: {|
+        unsetExternalStorageProvider: {|
+          trigger: (params: void) => Promise<void>
+        |}
+      |}
+    |},
+    stores: {|
+      memos: {|
+        providers: { [key: string]: ProvidersType, ... },
+        selectedProvider: ?SelectedExternalStorageProvider
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

@@ -2,6 +2,7 @@
 import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import BigNumber from 'bignumber.js';
 import { computed, observable, runInAction } from 'mobx';
 import { intlShape } from 'react-intl';
 import config from '../../config';
@@ -25,7 +26,7 @@ import {
 import globalMessages from '../../i18n/global-messages';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { asHasUtxoChains } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import type { StandardAddress, AddressStoreKind, } from '../../types/AddressFilterTypes';
+import type { AddressFilterKind, StandardAddress, AddressStoreKind, } from '../../types/AddressFilterTypes';
 import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
 import type { GeneratedData as UnmangleTxDialogContainerData } from '../transfer/UnmangleTxDialogContainer';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -34,6 +35,9 @@ import type {
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import type { SelectedApiType } from '../../stores/toplevel/ProfileStore';
 import { AddressStoreTypes } from '../../types/AddressFilterTypes';
+import LocalizableError from '../../i18n/LocalizableError';
+import type { ExplorerType } from '../../domain/Explorer';
+import type { Notification } from '../../types/notificationType';
 
 export type GeneratedData = typeof WalletReceivePage.prototype.generated;
 
@@ -337,7 +341,112 @@ export default class WalletReceivePage extends Component<Props> {
     });
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    UnmangleTxDialogContainerProps: InjectedOrGenerated<UnmangleTxDialogContainerData>,
+    actions: {|
+      ada: {|
+        hwVerifyAddress: {|
+          closeAddressDetailDialog: {|
+            trigger: (params: void) => void
+          |},
+          selectAddress: {|
+            trigger: (params: {|
+              address: string,
+              path: void | BIP32Path
+            |}) => Promise<void>
+          |},
+          verifyAddress: {|
+            trigger: (
+              params: PublicDeriver<>
+            ) => Promise<void>
+          |}
+        |}
+      |},
+      addresses: {|
+        createAddress: {|
+          trigger: (params: PublicDeriver<>) => Promise<void>
+        |},
+        resetErrors: {| trigger: (params: void) => void |},
+        resetFilter: {| trigger: (params: void) => void |},
+        setFilter: {|
+          trigger: (params: AddressFilterKind) => void
+        |}
+      |},
+      dialogs: {|
+        closeActiveDialog: {|
+          trigger: (params: void) => void
+        |},
+        open: {|
+          trigger: (params: {|
+            dialog: any,
+            params?: any
+          |}) => void
+        |}
+      |},
+      notifications: {|
+        closeActiveNotification: {|
+          trigger: (params: {| id: string |}) => void
+        |},
+        open: {| trigger: (params: Notification) => void |}
+      |}
+    |},
+    stores: {|
+      addresses: {|
+        addressFilter: AddressFilterKind,
+        createAddressRequest: {| isExecuting: boolean |},
+        error: ?LocalizableError,
+        getStoresForWallet: (
+          publicDeriver: PublicDeriver<>
+        ) => Array<{|
+          +all: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
+          +filtered: $ReadOnlyArray<
+            $ReadOnly<StandardAddress>
+          >,
+          +isActiveStore: boolean,
+          +stableName: AddressStoreKind,
+          +wasExecuted: boolean
+        |}>
+      |},
+      profile: {|
+        isClassicTheme: boolean,
+        selectedAPI: void | SelectedApiType,
+        selectedExplorer: ExplorerType
+      |},
+      substores: {|
+        ada: {|
+          addresses: {|
+            getUnmangleAmounts: void => {|
+              canUnmangle: Array<BigNumber>,
+              cannotUnmangle: Array<BigNumber>
+            |}
+          |},
+          hwVerifyAddress: {|
+            error: ?LocalizableError,
+            isActionProcessing: boolean,
+            selectedAddress: ?{|
+              address: string,
+              path: void | BIP32Path
+            |}
+          |}
+        |}
+      |},
+      transactions: {|
+        validateAmount: ({|
+          amount: string,
+          publicDeriver: PublicDeriver<>
+        |}) => Promise<boolean>
+      |},
+      uiDialogs: {|
+        getParam: <T>(number | string) => T,
+        isOpen: any => boolean
+      |},
+      uiNotifications: {|
+        getTooltipActiveNotification: string => ?Notification,
+        isOpen: string => boolean
+      |},
+      wallets: {| selected: null | PublicDeriver<> |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

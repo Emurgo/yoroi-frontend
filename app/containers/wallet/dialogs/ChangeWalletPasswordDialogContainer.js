@@ -6,6 +6,7 @@ import { computed } from 'mobx';
 import ChangeWalletPasswordDialog from '../../../components/wallet/settings/ChangeWalletPasswordDialog';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
+import LocalizableError from '../../../i18n/LocalizableError';
 
 export type GeneratedData = typeof ChangeWalletPasswordDialogContainer.prototype.generated;
 
@@ -53,7 +54,47 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Props
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      dialogs: {|
+        closeActiveDialog: {|
+          trigger: (params: void) => void
+        |},
+        updateDataForActiveDialog: {|
+          trigger: (params: {
+            [key: string]: any,
+            ...
+          }) => void
+        |}
+      |},
+      walletSettings: {|
+        updateSigningPassword: {|
+          trigger: (params: {|
+            newPassword: string,
+            oldPassword: string,
+            publicDeriver: PublicDeriver<>
+          |}) => Promise<void>
+        |}
+      |}
+    |},
+    stores: {|
+      profile: {| isClassicTheme: boolean |},
+      uiDialogs: {|
+        dataForActiveDialog: {|
+          +currentPasswordValue: void | string,
+          +newPasswordValue: void | string,
+          +repeatedPasswordValue: void | string
+        |}
+      |},
+      walletSettings: {|
+        changeSigningKeyRequest: {|
+          error: ?LocalizableError,
+          isExecuting: boolean,
+          reset: () => void
+        |}
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

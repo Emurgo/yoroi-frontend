@@ -6,6 +6,7 @@ import { observer } from 'mobx-react';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import ByronOptionDialog from '../../../components/transfer/cards/ByronOptionDialog';
 import { TransferKind, TransferSource, } from '../../../types/TransferTypes';
+import type { TransferSourceType, TransferKindType, } from '../../../types/TransferTypes';
 
 export type GeneratedData = typeof ByronEraOptionDialogContainer.prototype.generated;
 
@@ -16,10 +17,6 @@ type Props = {|
 
 @observer
 export default class ByronEraOptionDialogContainer extends Component<Props> {
-
-  _getYoroiTransferActions() {
-    return this.generated.actions.ada.yoroiTransfer;
-  }
 
   startTransferDaedalusFunds: void => void = () => {
     this.generated.actions.ada.daedalusTransfer.startTransferFunds.trigger();
@@ -34,23 +31,27 @@ export default class ByronEraOptionDialogContainer extends Component<Props> {
   }
 
   startTransferIcarusFunds: void => void = () => {
-    this._getYoroiTransferActions().startTransferFunds.trigger({
+    this.generated.actions.ada.yoroiTransfer.startTransferFunds.trigger({
       source: TransferSource.BYRON
     });
   }
 
   startTransferYoroiPaperFunds: void => void = () => {
-    this._getYoroiTransferActions().startTransferPaperFunds.trigger({
+    this.generated.actions.ada.yoroiTransfer.startTransferPaperFunds.trigger({
       source: TransferSource.BYRON
     });
   }
 
   startTransferTrezorFunds: void => void = () => {
-    this._getYoroiTransferActions().startTransferLegacyHardwareFunds.trigger(TransferKind.TREZOR);
+    this.generated.actions.ada.yoroiTransfer.startTransferLegacyHardwareFunds.trigger(
+      TransferKind.TREZOR
+    );
   }
 
   startTransferLedgerFunds: void => void = () => {
-    this._getYoroiTransferActions().startTransferLegacyHardwareFunds.trigger(TransferKind.LEDGER);
+    this.generated.actions.ada.yoroiTransfer.startTransferLegacyHardwareFunds.trigger(
+      TransferKind.LEDGER
+    );
   }
 
   render(): Node {
@@ -72,7 +73,38 @@ export default class ByronEraOptionDialogContainer extends Component<Props> {
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      ada: {|
+        daedalusTransfer: {|
+          startTransferFunds: {|
+            trigger: (params: void) => void
+          |},
+          startTransferMasterKey: {|
+            trigger: (params: void) => void
+          |},
+          startTransferPaperFunds: {|
+            trigger: (params: void) => void
+          |}
+        |},
+        yoroiTransfer: {|
+          startTransferFunds: {|
+            trigger: (params: {|
+              source: TransferSourceType
+            |}) => void
+          |},
+          startTransferLegacyHardwareFunds: {|
+            trigger: (params: TransferKindType) => void
+          |},
+          startTransferPaperFunds: {|
+            trigger: (params: {|
+              source: TransferSourceType
+            |}) => void
+          |}
+        |}
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

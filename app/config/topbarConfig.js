@@ -4,7 +4,7 @@ import type { MessageDescriptor } from 'react-intl';
 import globalMessages from '../i18n/global-messages';
 import walletsIcon from '../assets/images/sidebar/my_wallets.inline.svg';
 import transferIcon from '../assets/images/sidebar/transfer_wallets.inline.svg';
-import settingsIcon from '../assets/images/sidebar/settings.inline.svg';
+import settingsIcon from '../assets/images/sidebar/wallet-settings-2-ic.inline.svg';
 import withLedgerNanoIcon from '../assets/images/top-bar/with-ledger-nano-logo.inline.svg';
 import withTrezorTIcon from '../assets/images/top-bar/with-trezor-t-logo-white.inline.svg';
 import goBackIcon from '../assets/images/top-bar/back-arrow-white.inline.svg';

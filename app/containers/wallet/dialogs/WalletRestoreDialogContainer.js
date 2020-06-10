@@ -15,7 +15,7 @@ import {
   CheckAdressesInUseApiError,
   NoInputsError,
 } from '../../../api/ada/errors';
-import type { RestoreModeType } from '../../../actions/ada/wallet-restore-actions';
+import type { RestoreModeType, WalletRestoreMeta } from '../../../actions/ada/wallet-restore-actions';
 import { RestoreMode } from '../../../actions/ada/wallet-restore-actions';
 import { RestoreSteps } from '../../../stores/ada/WalletRestoreStore';
 import { defineMessages, intlShape } from 'react-intl';
@@ -26,6 +26,13 @@ import { formattedWalletAmount } from '../../../utils/formatters';
 import ErrorPage from '../../../components/transfer/ErrorPage';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { SelectedApiType } from '../../../stores/toplevel/ProfileStore';
+import type { ExplorerType } from '../../../domain/Explorer';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import type { PlateResponse } from '../../../api/ada/lib/cardanoCrypto/plate';
+import type { RestoreStepsType } from '../../../stores/ada/WalletRestoreStore';
+import LocalizableError from '../../../i18n/LocalizableError';
+import type { TransferStatusT, TransferTx } from '../../../types/TransferTypes';
+import type { Notification } from '../../../types/notificationType';
 
 const messages = defineMessages({
   walletUpgradeNoop: {
@@ -83,7 +90,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
   onCancel: void => void = () => {
     this.props.onClose();
     // Restore request should be reset only in case restore is finished/errored
-    const { restoreRequest } = this._getWalletsStore();
+    const { restoreRequest } = this.generated.stores.wallets;
     if (!restoreRequest.isExecuting) restoreRequest.reset();
   };
 
@@ -93,7 +100,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     const actions = this.generated.actions;
     const { uiNotifications, profile, } = this.generated.stores;
     const { walletRestore, } = this.generated.stores.substores[selectedAPI.type];
-    const wallets = this._getWalletsStore();
+    const { wallets } = this.generated.stores;
     const { restoreRequest } = wallets;
 
     const isPaper = isPaperMode(this.props.mode);
@@ -198,10 +205,6 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     }
   }
 
-  _getWalletsStore() {
-    return this.generated.stores.wallets;
-  }
-
   _transferDialogContent(): null | Node {
     const selectedAPI = this.getSelectedApi();
     const { yoroiTransfer } = this.generated.stores.substores[
@@ -282,7 +285,88 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     }
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      ada: {|
+        walletRestore: {|
+          back: {| trigger: (params: void) => void |},
+          reset: {| trigger: (params: void) => void |},
+          setMode: {|
+            trigger: (params: RestoreModeType) => void
+          |},
+          startCheck: {|
+            trigger: (params: void) => Promise<void>
+          |},
+          startRestore: {|
+            trigger: (params: void) => Promise<void>
+          |},
+          submitFields: {|
+            trigger: (params: WalletRestoreMeta) => void
+          |},
+          transferFromLegacy: {|
+            trigger: (params: void) => Promise<void>
+          |},
+          verifyMnemonic: {|
+            trigger: (params: void) => Promise<void>
+          |}
+        |}
+      |},
+      notifications: {|
+        open: {| trigger: (params: Notification) => void |}
+      |}
+    |},
+    stores: {|
+      coinPriceStore: {|
+        getCurrentPrice: (from: string, to: string) => ?number
+      |},
+      profile: {|
+        isClassicTheme: boolean,
+        selectedAPI: void | SelectedApiType,
+        selectedExplorer: ExplorerType,
+        unitOfAccount: UnitOfAccountSettingType
+      |},
+      substores: {|
+        ada: {|
+          walletRestore: {|
+            recoveryResult: void | {|
+              byronPlate: void | PlateResponse,
+              phrase: string,
+              shelleyPlate: void | PlateResponse
+            |},
+            step: RestoreStepsType,
+            walletRestoreMeta: void | WalletRestoreMeta
+          |},
+          wallets: {|
+            isValidMnemonic: ({|
+              mnemonic: string,
+              numberOfWords: number
+            |}) => boolean,
+            isValidPaperMnemonic: ({|
+              mnemonic: string,
+              numberOfWords: number
+            |}) => boolean
+          |},
+          yoroiTransfer: {|
+            error: ?LocalizableError,
+            status: TransferStatusT,
+            transferFundsRequest: {| isExecuting: boolean |},
+            transferTx: ?TransferTx
+          |}
+        |}
+      |},
+      uiNotifications: {|
+        getTooltipActiveNotification: string => ?Notification,
+        isOpen: string => boolean
+      |},
+      wallets: {|
+        restoreRequest: {|
+          error: ?LocalizableError,
+          isExecuting: boolean,
+          reset: () => void
+        |}
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

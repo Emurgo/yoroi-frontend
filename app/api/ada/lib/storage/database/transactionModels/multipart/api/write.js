@@ -26,8 +26,13 @@ import { ModifyUtxoTransaction } from '../../utxo/api/write';
 import { ModifyAccountingTransaction } from '../../account/api/write';
 
 export class ModifyMultipartTx {
-  static ownTables = Object.freeze({});
-  static depTables = Object.freeze({
+  static ownTables: {||} = Object.freeze({});
+  static depTables: {|
+    ModifyAccountingTransaction: typeof ModifyAccountingTransaction,
+    ModifyCertificate: typeof ModifyCertificate,
+    ModifyTransaction: typeof ModifyTransaction,
+    ModifyUtxoTransaction: typeof ModifyUtxoTransaction,
+  |} = Object.freeze({
     ModifyTransaction,
     ModifyUtxoTransaction,
     ModifyAccountingTransaction,

@@ -15,6 +15,9 @@ import type { PlateResponse } from '../../api/ada/lib/cardanoCrypto/plate';
 import { TransferKind } from '../../types/TransferTypes';
 import { generatePlates } from '../../stores/ada/WalletRestoreStore';
 import { RestoreMode } from '../../actions/ada/wallet-restore-actions';
+import type { ExplorerType } from '../../domain/Explorer';
+import type { TransferKindType, } from '../../types/TransferTypes';
+import type { Notification } from '../../types/notificationType';
 
 export type GeneratedData = typeof YoroiPlatePage.prototype.generated;
 
@@ -93,7 +96,28 @@ export default class YoroiPlatePage extends Component<Props> {
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      notifications: {|
+        open: {| trigger: (params: Notification) => void |}
+      |}
+    |},
+    stores: {|
+      profile: {| selectedExplorer: ExplorerType |},
+      substores: {|
+        ada: {|
+          yoroiTransfer: {|
+            recoveryPhrase: string,
+            transferKind: TransferKindType
+          |}
+        |}
+      |},
+      uiNotifications: {|
+        getTooltipActiveNotification: string => ?Notification,
+        isOpen: string => boolean
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

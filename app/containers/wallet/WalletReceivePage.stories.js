@@ -20,7 +20,6 @@ import {
   genUnitOfAccount,
 } from '../../../stories/helpers/StoryWrapper';
 import { GenericApiError, } from '../../api/common/errors';
-import LocalizedRequest from '../../stores/lib/LocalizedRequest';
 import type { CacheValue } from '../../../stories/helpers/StoryWrapper';
 import { wrapReceive, wrapWallet } from '../../Routes';
 import { mockWalletProps } from './Wallet.mock';
@@ -31,7 +30,6 @@ import { buildRoute } from '../../utils/routing';
 import { isValidAmountInLovelaces } from '../../utils/validations';
 import type { AddressTypeName } from '../../stores/toplevel/AddressesStore';
 import type { StandardAddress, AddressFilterKind, AddressStoreKind } from '../../types/AddressFilterTypes';
-import type { SetupSelfTxFunc } from '../../stores/ada/AdaTransactionBuilderStore';
 import URIGenerateDialog from '../../components/uri/URIGenerateDialog';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import URIDisplayDialog from '../../components/uri/URIDisplayDialog';
@@ -100,9 +98,6 @@ const genAddresses = () => {
     withUtxo('Ae2tdPwUPEZ8gpDazyi8VtcGMnMrkpKxts6ppCT45mdT6WMZEwHXs7pP8Tg'),
   ];
 };
-
-const setupSelfTxRequest: LocalizedRequest<SetupSelfTxFunc>
-  = new LocalizedRequest(async (_foo) => undefined);
 
 const genBaseProps: {|
   wallet: CacheValue,
@@ -302,6 +297,7 @@ const genBaseProps: {|
         actions: {
           ada: {
             txBuilderActions: {
+              initialize: { trigger: async (req) => action('initialize')(req), },
               reset: {
                 trigger: action('reset'),
               },
@@ -521,7 +517,6 @@ export const UnmangleDialogLoading = (): Node => {
           transactionBuilderStore: {
             tentativeTx: null,
             setupSelfTx: {
-              execute: setupSelfTxRequest.execute.bind(setupSelfTxRequest),
               error: undefined,
             },
           }
@@ -560,7 +555,6 @@ export const UnmangleDialogError = (): Node => {
           transactionBuilderStore: {
             tentativeTx: null,
             setupSelfTx: {
-              execute: setupSelfTxRequest.execute.bind(setupSelfTxRequest),
               error: new GenericApiError(),
             },
           }
@@ -597,7 +591,6 @@ export const UnmangleDialogConfirm = (): Node => {
           transactionBuilderStore: {
             tentativeTx,
             setupSelfTx: {
-              execute: setupSelfTxRequest.execute.bind(setupSelfTxRequest),
               error: undefined,
             },
           }

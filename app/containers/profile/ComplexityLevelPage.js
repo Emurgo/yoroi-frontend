@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import type { Node } from 'react';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import TopBar from '../../components/topbar/TopBar';
 import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
@@ -12,6 +13,9 @@ import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import ComplexityLevel from '../../components/profile/complexity-level/ComplexityLevelForm';
+import type { ComplexityLevelType } from '../../types/complexityLevelType';
+import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
+import LocalizableError from '../../i18n/LocalizableError';
 
 const messages = defineMessages({
   title: {
@@ -27,7 +31,7 @@ export default class ComplexityLevelPage extends Component<InjectedOrGenerated<G
     intl: intlShape.isRequired,
   };
 
-  render() {
+  render(): Node {
 
     const { checkAdaServerStatus } = this.generated.stores.serverConnectionStore;
     const displayedBanner = checkAdaServerStatus === ServerStatusErrors.Healthy ?
@@ -58,7 +62,25 @@ export default class ComplexityLevelPage extends Component<InjectedOrGenerated<G
   }
 
 
-  @computed get generated() {
+  @computed get generated(): {|
+    actions: {|
+      profile: {|
+        selectComplexityLevel: {| trigger: (params: ComplexityLevelType) => Promise < void > |}
+      |}
+    |},
+    stores: {|
+      profile: {|
+        complexityLevel: ?ComplexityLevelType,
+        setComplexityLevelRequest: {|
+          error: ?LocalizableError,
+          isExecuting: boolean
+        |}
+      |},
+      serverConnectionStore: {|
+        checkAdaServerStatus: ServerStatusErrorType
+      |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

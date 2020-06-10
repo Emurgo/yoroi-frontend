@@ -19,6 +19,7 @@ import type { GeneratedData as WalletTransferPageData } from './WalletTransferPa
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import type { GeneratedData as NavBarContainerData } from '../NavBarContainer';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 export type GeneratedData = typeof Transfer.prototype.generated;
 
@@ -77,7 +78,27 @@ export default class Transfer extends Component<Props> {
     );
   }
 
-  @computed get generated() {
+  @computed get generated(): {|
+    BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
+    NavBarContainerProps: InjectedOrGenerated<NavBarContainerData>,
+    SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
+    WalletTransferPageProps: InjectedOrGenerated<WalletTransferPageData>,
+    actions: {|
+      router: {|
+        goToRoute: {|
+          trigger: (params: {|
+            forceRefresh?: boolean,
+            params?: ?any,
+            route: string
+          |}) => void
+        |}
+      |}
+    |},
+    stores: {|
+      app: {| currentRoute: string |},
+      wallets: {| selected: null | PublicDeriver<> |}
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
