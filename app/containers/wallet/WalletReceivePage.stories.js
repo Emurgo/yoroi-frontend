@@ -152,6 +152,8 @@ const genBaseProps: {|
         selectedAPI: getApiMeta('ada'),
         isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
         selectedExplorer: getDefaultExplorer(),
+        shouldHideBalance: false,
+        unitOfAccount: genUnitOfAccount()
       },
       wallets: {
         selected: request.wallet.publicDeriver,
@@ -411,6 +413,7 @@ export const ExternalTab = (): Node => {
       mockReceiveProps({
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressFilter: AddressFilter.None,
       }),
       (<WalletReceivePage
         generated={genBaseProps({
@@ -445,6 +448,7 @@ export const InternalTab = (): Node => {
       mockReceiveProps({
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressFilter: AddressFilter.None,
       }),
       (<WalletReceivePage
         generated={genBaseProps({
@@ -475,6 +479,7 @@ export const MangledTab = (): Node => {
       mockReceiveProps({
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressFilter: AddressFilter.None,
       }),
       (<WalletReceivePage
         generated={genBaseProps({
@@ -505,6 +510,7 @@ export const UnmangleDialogLoading = (): Node => {
       mockReceiveProps({
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressFilter: AddressFilter.None,
       }),
       (<WalletReceivePage
         generated={genBaseProps({
@@ -543,6 +549,7 @@ export const UnmangleDialogError = (): Node => {
       mockReceiveProps({
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressFilter: AddressFilter.None,
       }),
       (<WalletReceivePage
         generated={genBaseProps({
@@ -579,6 +586,7 @@ export const UnmangleDialogConfirm = (): Node => {
       mockReceiveProps({
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressFilter: AddressFilter.None,
       }),
       (<WalletReceivePage
         generated={genBaseProps({
@@ -617,6 +625,7 @@ export const UriGenerateDialog = (): Node => {
       mockReceiveProps({
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressFilter: AddressFilter.None,
       }),
       (<WalletReceivePage
         generated={genBaseProps({
@@ -653,6 +662,7 @@ export const UriDisplayDialog = (): Node => {
       mockReceiveProps({
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressFilter: AddressFilter.None,
       }),
       (<WalletReceivePage
         generated={genBaseProps({
@@ -692,6 +702,7 @@ export const VerifyRegularAddress = (): Node => {
       mockReceiveProps({
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressFilter: AddressFilter.None,
       }),
       (<WalletReceivePage
         generated={genBaseProps({
@@ -731,6 +742,7 @@ export const VerifyLedgerAddress = (): Node => {
       mockReceiveProps({
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressFilter: AddressFilter.None,
       }),
       (<WalletReceivePage
         generated={genBaseProps({
