@@ -39,11 +39,15 @@ Make sure you checked out the exact commit for the version you're testing. Keep 
 
 However, overall the build should match exactly.
 
-##### Setting it up on your machine
+#### Setting it up on your machine
 
 If you want to build the code on your machine, you should be able to follow the regular project setup and build steps outlined in the repository's main readme.
 
-##### Building with docker
+#### Building with docker
+
+Docker is a tool that allows you to setup a virtual environment inside your computer. You can use this tool to setup an environment that replicate the environment we use for our automated CI builds.
+
+You can find download instructions for Docker [here](https://docs.docker.com/get-docker/)
 
 ```
 # go to exact commit that was released to Firefox & Chrome
