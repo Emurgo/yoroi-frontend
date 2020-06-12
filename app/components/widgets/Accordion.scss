@@ -20,26 +20,19 @@
       path {
         fill: #8A92A3;
       }
-      transition: 300ms;
+      transition: transform 300ms;
     }
   
     &.arrowUp {
       color: var(--theme-transactions-priority-high-text-color);
       font-family: var(--font-medium);
 
-      svg {
+      .arrowDownIcon svg {
         transform: rotate(180deg);
       }
     }
-    .icon {
+    .arrowDownIcon {
       display: flex;
-    }
-    .atentionIcon {
-      margin-left: 8px;
-      svg {
-        max-width: 12px;
-        max-height: 12px;
-      }
     }
   }
   .accordionContent {
