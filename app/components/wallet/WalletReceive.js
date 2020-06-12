@@ -21,6 +21,8 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import BigNumber from 'bignumber.js';
 import { splitAmount } from '../../utils/formatters';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import AddLabelIcon from '../../assets/images/add-label.inline.svg';
+import EditLabelIcon from '../../assets/images/edit.inline.svg';
 
 const messages = defineMessages({
   generatedAddressesSectionTitle: {
@@ -51,6 +53,10 @@ const messages = defineMessages({
     id: 'wallet.receive.page.outputAmountUTXO',
     defaultMessage: '!!!Output Amount (UTXO) ',
   },
+  label: {
+    id: 'wallet.receive.page.label',
+    defaultMessage: '!!!Label ',
+  },
 });
 
 type Props = {|
@@ -63,6 +69,7 @@ type Props = {|
   +onGeneratePaymentURI: void | (string => void),
   +shouldHideBalance: boolean,
   +unitOfAccountSetting: UnitOfAccountSettingType,
+  addressBook?: boolean, // TO REMOVE
 |};
 
 @observer
@@ -93,7 +100,7 @@ export default class WalletReceive extends Component<Props> {
     const {
       walletAddresses,
       onVerifyAddress, onGeneratePaymentURI,
-      onCopyAddressTooltip, notification, unitOfAccountSetting
+      onCopyAddressTooltip, notification, unitOfAccountSetting, addressBook
     } = this.props;
     const { intl } = this.context;
     const currency = 'ADA';
@@ -103,7 +110,14 @@ export default class WalletReceive extends Component<Props> {
           {/* Header Addresses */}
           <div className={styles.generatedAddressesGrid}>
             <h2>{intl.formatMessage(messages.generatedAddressesSectionTitle)}</h2>
-            <h2>{intl.formatMessage(messages.outputAmountUTXO)}</h2>
+            { 
+              addressBook &&
+                <h2 className={styles.labelHeader}>{intl.formatMessage(messages.label)}</h2>
+            }
+            {
+              !addressBook &&
+                <h2>{intl.formatMessage(messages.outputAmountUTXO)}</h2>
+            }
             {
               !environment.isShelley() && onGeneratePaymentURI != null &&
                 <h2>{intl.formatMessage(messages.generateURLLabel)}</h2>
@@ -150,22 +164,49 @@ export default class WalletReceive extends Component<Props> {
                   </ExplorableHashContainer>
                 </CopyableAddress>
                 {/* Address Action block start */}
-                {/* Space for Output Amount UTX0 - */}
-                <div className={styles.verifyActionBlock}>
-                  {address.value != null
-                    ? (
-                      <div className={styles.walletAmount}>
-                        {this.getAmount(address.value)}
-                        {' '}
-                        {unitOfAccountSetting.enabled
-                          ? unitOfAccountSetting.currency
-                          : currency
-                        }
-                      </div>
-                    )
-                    : '-'
+                {/* Output Amount UTX0 - */}
+                {
+                  !addressBook && 
+                  <div className={styles.verifyActionBlock}>
+                    {address.value != null
+                      ? (
+                        <div className={styles.walletAmount}>
+                          {this.getAmount(address.value)}
+                          {' '}
+                          {unitOfAccountSetting.enabled
+                            ? unitOfAccountSetting.currency
+                            : currency
+                          }
+                        </div>
+                      )
+                      : '-'
+                    }
+                  </div>
+                }
+                {/* Label for Address Book */}
+                { addressBook &&
+                  <div>
+                    {
+                      address.label != null ?
+                        <div className={styles.labelAddress}>
+                          <button type="button" onClick={()=> { /*On Edit */ }}>
+                            <span>
+                              <EditLabelIcon />
+                            </span>
+                          </button>
+                          <span className={styles.labelText}> {address.label} </span>
+                        </div>
+                        :
+                        <div className={styles.labelAddress}>
+                          <button type="button" onClick={()=> { /*On Add Label */ }}>
+                            <span>
+                              <AddLabelIcon />
+                            </span>
+                          </button>
+                        </div>
+                    }
+                  </div>
                   }
-                </div>
                 {/* Generate payment URL for Address action */}
                 {/* disable URI for Shelley testnet */}
                 {!environment.isShelley() && onGeneratePaymentURI != null && (

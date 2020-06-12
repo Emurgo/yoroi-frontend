@@ -237,11 +237,17 @@ const ReceiveSubpages = (stores, actions) => (
       exact
       path={ROUTES.WALLETS.RECEIVE.INTERNAL}
       component={(props) => <WalletReceivePage {...props} stores={stores} actions={actions} />}
+      // component={(props) => <h1>Holaaaa</h1> }
     />
     <Route
       exact
       path={ROUTES.WALLETS.RECEIVE.MANGLED}
       component={(props) => <WalletReceivePage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.WALLETS.RECEIVE.ADDRESS_BOOK}
+      component={(props) => <WalletReceivePage addressBook {...props} stores={stores} actions={actions} />}
     />
     <Redirect to={ROUTES.WALLETS.RECEIVE.EXTERNAL} />
   </Switch>

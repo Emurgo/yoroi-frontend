@@ -31,11 +31,14 @@ export default class Receive extends Component<Props> {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) throw new Error(`${nameof(Receive)} no public deriver`);
     const { addresses } = this.generated.stores;
+    const { actions } = this.generated;
+
     return (
       <ReceiveWithNavigation
         addressTypes={addresses.getStoresForWallet(publicDeriver)}
         setFilter={filter => this.generated.actions.addresses.setFilter.trigger(filter)}
         activeFilter={this.generated.stores.addresses.addressFilter}
+        goAddressBook={(route) => actions.router.goToRoute.trigger({ route })}
       >
         {this.props.children}
       </ReceiveWithNavigation>
@@ -63,6 +66,15 @@ export default class Receive extends Component<Props> {
       addresses: {|
         setFilter: {| trigger: (params: AddressFilterKind) => void |},
         resetFilter: {| trigger: (params: void) => void |},
+      |},
+      router: {|
+        goToRoute: {|
+          trigger: (params: {|
+            forceRefresh?: boolean,
+            params?: ?any,
+            route: string
+          |}) => void
+        |}
       |}
     |}
     |} {
@@ -101,7 +113,10 @@ export default class Receive extends Component<Props> {
         addresses: {
           setFilter: { trigger: actions.addresses.setFilter.trigger, },
           resetFilter: { trigger: actions.addresses.resetFilter.trigger, },
-        }
+        },
+        router: {
+          goToRoute: { trigger: actions.router.goToRoute.trigger },
+        },
       }
     });
   }

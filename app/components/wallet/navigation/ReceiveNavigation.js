@@ -13,13 +13,23 @@ import type {
 import type { AddressTypeName } from '../../../stores/toplevel/AddressesStore';
 import { AddressStoreTypes, AddressFilter } from '../../../types/AddressFilterTypes';
 import Accordion from '../../widgets/Accordion';
+import InfoIcon from '../../../assets/images/attention-big-light.inline.svg';
+
+// import AttentionIcon from '../../assets/images/attention-big-light.inline.svg';
+
+
 import type { AddressFilterKind } from '../../../types/AddressFilterTypes';
 import classNames from 'classnames';
+import { ROUTES } from '../../../routes-config';
 
 const messages = defineMessages({
   baseLabel: {
     id: 'wallet.receive.navigation.baseLabel',
     defaultMessage: '!!!Base'
+  },
+  AddressBook: {
+    id: 'wallet.receive.navigation.AddressBook',
+    defaultMessage: '!!!Address book'
   },
   allLabel: {
     id: 'wallet.receive.navigation.allLabel',
@@ -46,7 +56,8 @@ export type Props = {|
     +isHidden: boolean,
     +setAsActiveStore: void => void,
     +name: AddressTypeName,
-  |}>;
+  |}>,
+  +goAddressBook: string => void
 |};
 
 @observer
@@ -59,7 +70,7 @@ export default class ReceiveNavigation extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
 
-    const { activeFilter } = this.props;
+    const { activeFilter, addressTypes, goAddressBook } = this.props;
     const componentClasses = classNames([
       styles.filterButton,
       styles.active,
@@ -68,8 +79,16 @@ export default class ReceiveNavigation extends Component<Props> {
       <div className={styles.wrapper}>
         <div className={styles.content}>
           <div>
-            <Accordion title={intl.formatMessage(messages.baseLabel)}>
-              {this.props.addressTypes.map(type => (
+            <Accordion
+              header={
+                <div> {intl.formatMessage(messages.baseLabel)}
+                  <span className={styles.infoIcon}>
+                    <InfoIcon />
+                  </span>
+                </div>
+              }
+            >
+              {addressTypes.map(type => (
                 !type.isHidden && <ReceiveNavButton
                   key={type.name.stable}
                   className={type.name.stable}
@@ -85,6 +104,19 @@ export default class ReceiveNavigation extends Component<Props> {
                 />
               ))}
             </Accordion>
+            <div className={styles.addressBook}>
+              <button
+                className={styles.filterButton}
+                onClick={() => goAddressBook(ROUTES.WALLETS.RECEIVE.ADDRESS_BOOK)}
+                type="button"
+              >
+                <div> {intl.formatMessage(messages.AddressBook)}
+                  <span className={styles.infoIcon}>
+                    <InfoIcon />
+                  </span>
+                </div>
+              </button>
+            </div>
           </div>
           {/* Section filtered button */}
           <div className={styles.filterSection}>

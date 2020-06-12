@@ -6,6 +6,7 @@ import ReceiveNavigation from '../navigation/ReceiveNavigation';
 import styles from './ReceiveWithNavigation.scss';
 import type { AddressTypeName } from '../../../stores/toplevel/AddressesStore';
 import type { AddressFilterKind } from '../../../types/AddressFilterTypes';
+import type { ActionsMap } from '../../../actions';
 
 export type Props = {|
   +children?: Node,
@@ -16,7 +17,8 @@ export type Props = {|
     +isHidden: boolean,
     +setAsActiveStore: void => void,
     +name: AddressTypeName,
-  |}>;
+  |}>,
+  +goAddressBook: string => void,
 |};
 
 @observer
@@ -26,7 +28,7 @@ export default class ReceiveWithNavigation extends Component<Props> {
   };
 
   render(): Node {
-    const { children, addressTypes, setFilter, activeFilter } = this.props;
+    const { children, addressTypes, setFilter, activeFilter, goAddressBook } = this.props;
     return (
       <div className={styles.component}>
         <div className={styles.navigation}>
@@ -34,6 +36,7 @@ export default class ReceiveWithNavigation extends Component<Props> {
             addressTypes={addressTypes}
             setFilter={setFilter}
             activeFilter={activeFilter}
+            goAddressBook={goAddressBook}
           />
         </div>
         <div className={styles.page}>
