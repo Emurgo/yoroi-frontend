@@ -501,6 +501,8 @@
   "wallet.receive.page.internalWarning1": "Endereços internos (ou \"modificar\" endereços) mantêm sua privacidade ocultando quais endereços pertencem a você na blockchain",
   "wallet.receive.page.internalWarning2": "os endereços são mostrados aqui para fins de auditoria pessoal e <strong> nunca </strong> devem ser usados.",
   "wallet.receive.page.mangledWarning1": "Endereços Mangled contribuem para seu saldo de ADA, mas têm a preferência de delegação incorreta",
+  "wallet.receive.page.noResultsFoundLabel": "No results found",
+  "wallet.receive.page.notFoundAnyAddresses": "We couldn't find any addresses matching your filter.",
   "wallet.receive.page.outputAmountUTXO": "Balance (UTXO sum)",
   "wallet.receive.page.unmangeLabel": "Preferência de delegação correta",
   "wallet.receive.page.verifyAddressLabel": "Verificar endereço",
