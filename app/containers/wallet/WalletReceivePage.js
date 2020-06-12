@@ -34,7 +34,7 @@ import type {
   BIP32Path
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import type { SelectedApiType } from '../../stores/toplevel/ProfileStore';
-import { AddressStoreTypes } from '../../types/AddressFilterTypes';
+import { AddressFilter, AddressStoreTypes } from '../../types/AddressFilterTypes';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { ExplorerType } from '../../domain/Explorer';
 import type { Notification } from '../../types/notificationType';
@@ -162,6 +162,7 @@ export default class WalletReceivePage extends Component<Props> {
           notification={notification}
           isSubmitting={this.generated.stores.addresses.createAddressRequest.isExecuting}
           error={this.generated.stores.addresses.error}
+          isFilterActive={this.generated.stores.addresses.addressFilter !== AddressFilter.None}
         />);
       }
       if (addressStores.some(store => (
@@ -193,6 +194,7 @@ export default class WalletReceivePage extends Component<Props> {
           notification={notification}
           isSubmitting={this.generated.stores.addresses.createAddressRequest.isExecuting}
           error={this.generated.stores.addresses.error}
+          isFilterActive={this.generated.stores.addresses.addressFilter !== AddressFilter.None}
         />);
       }
       throw new Error(`${nameof(WalletReceivePage)} unexpected address tab`);

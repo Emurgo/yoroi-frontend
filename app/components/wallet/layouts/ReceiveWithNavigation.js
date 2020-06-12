@@ -17,6 +17,7 @@ export type Props = {|
     +setAsActiveStore: void => void,
     +name: AddressTypeName,
   |}>;
+  +categoryTitle: string,
 |};
 
 @observer
@@ -34,6 +35,7 @@ export default class ReceiveWithNavigation extends Component<Props> {
             addressTypes={addressTypes}
             setFilter={setFilter}
             activeFilter={activeFilter}
+            categoryTitle={this.props.categoryTitle}
           />
         </div>
         <div className={styles.page}>

@@ -399,6 +399,7 @@ export const ExternalTab = (): Node => {
     addresses: genAddresses(),
   });
 
+  const addressFilter = select('AddressFilter', AddressFilter, AddressFilter.None);
   return wrapWallet(
     mockWalletProps({
       location: getExternalRoute(wallet.publicDeriver.getPublicDeriverId()),
@@ -409,7 +410,7 @@ export const ExternalTab = (): Node => {
       mockReceiveProps({
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
-        addressFilter: AddressFilter.None,
+        addressFilter,
       }),
       (<WalletReceivePage
         generated={genBaseProps({
@@ -417,7 +418,7 @@ export const ExternalTab = (): Node => {
           dialog: getAddressGenerationValue() === addressCases.Yes
             ? LoadingSpinner
             : undefined,
-          addressFilter: select('AddressFilter', AddressFilter, AddressFilter.None),
+          addressFilter,
           getStoresForWallet: (pubDeriver) => wrapForReceivePage(getStoresForWallet(pubDeriver)),
         })}
       />)
@@ -434,6 +435,7 @@ export const InternalTab = (): Node => {
     selectedTab: AddressStoreTypes.internal,
     addresses: genAddresses(),
   });
+  const addressFilter = select('AddressFilter', AddressFilter, AddressFilter.None);
   return wrapWallet(
     mockWalletProps({
       location: getInternalRoute(wallet.publicDeriver.getPublicDeriverId()),
@@ -444,12 +446,12 @@ export const InternalTab = (): Node => {
       mockReceiveProps({
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
-        addressFilter: AddressFilter.None,
+        addressFilter,
       }),
       (<WalletReceivePage
         generated={genBaseProps({
           wallet,
-          addressFilter: AddressFilter.None,
+          addressFilter,
           getStoresForWallet: (pubDeriver) => wrapForReceivePage(getStoresForWallet(pubDeriver)),
         })}
       />)
@@ -465,6 +467,7 @@ export const MangledTab = (): Node => {
     selectedTab: AddressStoreTypes.mangled,
     addresses: genAddresses(),
   });
+  const addressFilter = select('AddressFilter', AddressFilter, AddressFilter.None);
   return wrapWallet(
     mockWalletProps({
       location: getInternalRoute(wallet.publicDeriver.getPublicDeriverId()),
@@ -475,12 +478,12 @@ export const MangledTab = (): Node => {
       mockReceiveProps({
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
-        addressFilter: AddressFilter.None,
+        addressFilter,
       }),
       (<WalletReceivePage
         generated={genBaseProps({
           wallet,
-          addressFilter: AddressFilter.None,
+          addressFilter,
           getStoresForWallet: (pubDeriver) => wrapForReceivePage(getStoresForWallet(pubDeriver)),
         })}
       />)
@@ -496,6 +499,7 @@ export const UnmangleDialogLoading = (): Node => {
     selectedTab: AddressStoreTypes.mangled,
     addresses: genAddresses(),
   });
+  const addressFilter = AddressFilter.None;
   return wrapWallet(
     mockWalletProps({
       location: getInternalRoute(wallet.publicDeriver.getPublicDeriverId()),
@@ -506,13 +510,13 @@ export const UnmangleDialogLoading = (): Node => {
       mockReceiveProps({
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
-        addressFilter: AddressFilter.None,
+        addressFilter,
       }),
       (<WalletReceivePage
         generated={genBaseProps({
           wallet,
           dialog: UnmangleTxDialogContainer,
-          addressFilter: AddressFilter.None,
+          addressFilter,
           getStoresForWallet: (pubDeriver) => wrapForReceivePage(getStoresForWallet(pubDeriver)),
           transactionBuilderStore: {
             tentativeTx: null,
@@ -534,6 +538,7 @@ export const UnmangleDialogError = (): Node => {
     selectedTab: AddressStoreTypes.mangled,
     addresses: genAddresses(),
   });
+  const addressFilter = AddressFilter.None;
   return wrapWallet(
     mockWalletProps({
       location: getInternalRoute(wallet.publicDeriver.getPublicDeriverId()),
@@ -544,13 +549,13 @@ export const UnmangleDialogError = (): Node => {
       mockReceiveProps({
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
-        addressFilter: AddressFilter.None,
+        addressFilter,
       }),
       (<WalletReceivePage
         generated={genBaseProps({
           wallet,
           dialog: UnmangleTxDialogContainer,
-          addressFilter: AddressFilter.None,
+          addressFilter,
           getStoresForWallet: (pubDeriver) => wrapForReceivePage(getStoresForWallet(pubDeriver)),
           transactionBuilderStore: {
             tentativeTx: null,
@@ -570,6 +575,7 @@ export const UnmangleDialogConfirm = (): Node => {
   const { tentativeTx } = genTentativeTx();
 
   const getStoresForWallet = genGetStoresForWallet({ selectedTab: 'mangled', addresses: genAddresses(), });
+  const addressFilter = AddressFilter.None;
   return wrapWallet(
     mockWalletProps({
       location: getInternalRoute(wallet.publicDeriver.getPublicDeriverId()),
@@ -580,13 +586,13 @@ export const UnmangleDialogConfirm = (): Node => {
       mockReceiveProps({
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
-        addressFilter: AddressFilter.None,
+        addressFilter,
       }),
       (<WalletReceivePage
         generated={genBaseProps({
           wallet,
           dialog: UnmangleTxDialogContainer,
-          addressFilter: AddressFilter.None,
+          addressFilter,
           getStoresForWallet: (pubDeriver) => wrapForReceivePage(getStoresForWallet(pubDeriver)),
           transactionBuilderStore: {
             tentativeTx,
@@ -608,6 +614,7 @@ export const UriGenerateDialog = (): Node => {
     selectedTab: AddressStoreTypes.external,
     addresses: genAddresses(),
   });
+  const addressFilter = AddressFilter.None;
   return wrapWallet(
     mockWalletProps({
       location: getExternalRoute(wallet.publicDeriver.getPublicDeriverId()),
@@ -618,13 +625,13 @@ export const UriGenerateDialog = (): Node => {
       mockReceiveProps({
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
-        addressFilter: AddressFilter.None,
+        addressFilter,
       }),
       (<WalletReceivePage
         generated={genBaseProps({
           wallet,
           dialog: URIGenerateDialog,
-          addressFilter: AddressFilter.None,
+          addressFilter,
           getParam: (param) => {
             if (param === 'address') {
               return genAddresses()[0].address;
@@ -645,6 +652,7 @@ export const UriDisplayDialog = (): Node => {
     selectedTab: AddressStoreTypes.external,
     addresses: genAddresses(),
   });
+  const addressFilter = AddressFilter.None;
   return wrapWallet(
     mockWalletProps({
       location: getExternalRoute(wallet.publicDeriver.getPublicDeriverId()),
@@ -655,13 +663,13 @@ export const UriDisplayDialog = (): Node => {
       mockReceiveProps({
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
-        addressFilter: AddressFilter.None,
+        addressFilter,
       }),
       (<WalletReceivePage
         generated={genBaseProps({
           wallet,
           dialog: URIDisplayDialog,
-          addressFilter: AddressFilter.None,
+          addressFilter,
           getParam: (param) => {
             if (param === 'address') {
               return genAddresses()[0].address;
@@ -685,6 +693,7 @@ export const VerifyRegularAddress = (): Node => {
     selectedTab: AddressStoreTypes.external,
     addresses: genAddresses(),
   });
+  const addressFilter = AddressFilter.None;
   return wrapWallet(
     mockWalletProps({
       location: getExternalRoute(wallet.publicDeriver.getPublicDeriverId()),
@@ -695,13 +704,13 @@ export const VerifyRegularAddress = (): Node => {
       mockReceiveProps({
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
-        addressFilter: AddressFilter.None,
+        addressFilter,
       }),
       (<WalletReceivePage
         generated={genBaseProps({
           wallet,
           dialog: VerifyAddressDialog,
-          addressFilter: AddressFilter.None,
+          addressFilter,
           getStoresForWallet: (pubDeriver) => wrapForReceivePage(getStoresForWallet(pubDeriver)),
         })}
       />)
@@ -725,6 +734,7 @@ export const VerifyLedgerAddress = (): Node => {
     selectedTab: AddressStoreTypes.external,
     addresses: genAddresses(),
   });
+  const addressFilter = AddressFilter.None;
   return wrapWallet(
     mockWalletProps({
       location: getExternalRoute(wallet.publicDeriver.getPublicDeriverId()),
@@ -735,13 +745,13 @@ export const VerifyLedgerAddress = (): Node => {
       mockReceiveProps({
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
-        addressFilter: AddressFilter.None,
+        addressFilter,
       }),
       (<WalletReceivePage
         generated={genBaseProps({
           wallet,
           dialog: VerifyAddressDialog,
-          addressFilter: AddressFilter.None,
+          addressFilter,
           verifyError: getErrorValue(),
           getStoresForWallet: (pubDeriver) => wrapForReceivePage(getStoresForWallet(pubDeriver)),
         })}

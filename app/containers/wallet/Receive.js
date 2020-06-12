@@ -3,11 +3,16 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
+import { intlShape, defineMessages } from 'react-intl';
+import type {
+  $npm$ReactIntl$IntlFormat,
+} from 'react-intl';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import ReceiveWithNavigation from '../../components/wallet/layouts/ReceiveWithNavigation';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { AddressTypeName } from '../../stores/toplevel/AddressesStore';
 import type { AddressFilterKind } from '../../types/AddressFilterTypes';
+import environment from '../../environment';
 
 export type GeneratedData = typeof Receive.prototype.generated;
 
@@ -16,26 +21,59 @@ type Props = {|
   +children?: Node
 |};
 
+const messages = defineMessages({
+  baseLabel: {
+    id: 'wallet.receive.navigation.baseLabel',
+    defaultMessage: '!!!Base'
+  },
+  groupLabel: {
+    id: 'wallet.receive.navigation.groupLabel',
+    defaultMessage: '!!!Group'
+  },
+  byronLabel: {
+    id: 'wallet.receive.navigation.byronLabel',
+    defaultMessage: '!!!Byron'
+  },
+});
+
 @observer
 export default class Receive extends Component<Props> {
 
   static defaultProps: {|children: void|} = {
     children: undefined,
   };
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+    intl: intlShape.isRequired,
+  };
 
   componentWillUnmount() {
     this.generated.actions.addresses.resetFilter.trigger();
+  }
+
+  getCategoryTitle: void => string = () => {
+    const { intl } = this.context;
+
+    if (environment.isShelley()) {
+      return intl.formatMessage(messages.groupLabel);
+    }
+    // eslint-disable-next-line no-constant-condition
+    if (false) { // TODO: fix condition during Haskell Shelley integration
+      return intl.formatMessage(messages.baseLabel);
+    }
+    return intl.formatMessage(messages.byronLabel);
   }
 
   render(): Node {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) throw new Error(`${nameof(Receive)} no public deriver`);
     const { addresses } = this.generated.stores;
+
     return (
       <ReceiveWithNavigation
         addressTypes={addresses.getStoresForWallet(publicDeriver)}
         setFilter={filter => this.generated.actions.addresses.setFilter.trigger(filter)}
         activeFilter={this.generated.stores.addresses.addressFilter}
+        categoryTitle={this.getCategoryTitle()}
       >
         {this.props.children}
       </ReceiveWithNavigation>

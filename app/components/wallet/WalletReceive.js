@@ -21,6 +21,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import BigNumber from 'bignumber.js';
 import { splitAmount } from '../../utils/formatters';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import { DECIMAL_PLACES_IN_ADA } from '../../config/numbersConfig';
 
 const messages = defineMessages({
   generatedAddressesSectionTitle: {
@@ -49,7 +50,7 @@ const messages = defineMessages({
   },
   outputAmountUTXO: {
     id: 'wallet.receive.page.outputAmountUTXO',
-    defaultMessage: '!!!Output Amount (UTXO) ',
+    defaultMessage: '!!!Balance (UTXO sum)',
   },
 });
 
@@ -76,9 +77,8 @@ export default class WalletReceive extends Component<Props> {
       return (<span>******</span>);
     }
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(walletAmount);
-    const adjustedBefore = beforeDecimalRewards.startsWith('-')
-      ? beforeDecimalRewards
-      : '+' + beforeDecimalRewards;
+    // recall: can't be negative in this situation
+    const adjustedBefore = '+' + beforeDecimalRewards;
 
     return (
       <>
@@ -155,7 +155,9 @@ export default class WalletReceive extends Component<Props> {
                   {address.value != null
                     ? (
                       <div className={styles.walletAmount}>
-                        {this.getAmount(address.value)}
+                        {this.getAmount(address.value.div(
+                          new BigNumber(10).pow(DECIMAL_PLACES_IN_ADA)
+                        ))}
                         {' '}
                         {unitOfAccountSetting.enabled
                           ? unitOfAccountSetting.currency

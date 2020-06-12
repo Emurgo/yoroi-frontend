@@ -17,10 +17,6 @@ import type { AddressFilterKind } from '../../../types/AddressFilterTypes';
 import classNames from 'classnames';
 
 const messages = defineMessages({
-  baseLabel: {
-    id: 'wallet.receive.navigation.baseLabel',
-    defaultMessage: '!!!Base'
-  },
   allLabel: {
     id: 'wallet.receive.navigation.allLabel',
     defaultMessage: '!!!All'
@@ -47,6 +43,7 @@ export type Props = {|
     +setAsActiveStore: void => void,
     +name: AddressTypeName,
   |}>;
+  +categoryTitle: string,
 |};
 
 @observer
@@ -68,7 +65,7 @@ export default class ReceiveNavigation extends Component<Props> {
       <div className={styles.wrapper}>
         <div className={styles.content}>
           <div>
-            <Accordion title={intl.formatMessage(messages.baseLabel)}>
+            <Accordion title={this.props.categoryTitle}>
               {this.props.addressTypes.map(type => (
                 !type.isHidden && <ReceiveNavButton
                   key={type.name.stable}
