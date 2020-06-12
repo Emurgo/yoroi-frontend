@@ -81,6 +81,11 @@ npm install
 npm run prod:byron
 ```
 
+If you need to access the build from your host machine, you can use the following command to copy the build folder out of the docker container and into your host machine.
+```
+docker cp yoroi_ci:/yoroi/build ./build
+```
+
 ### Other FAQ
 
 **Q**: Who can use the hardware wallet? Is it accessible to every user? What are the requirements to be able to use it? \
