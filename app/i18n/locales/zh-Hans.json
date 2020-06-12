@@ -501,6 +501,8 @@
   "wallet.receive.page.internalWarning1": "内部地址 (或 \"更改\" 地址) 通过隐藏区块链上属于您的地址来维护您的隐私",
   "wallet.receive.page.internalWarning2": "此处显示的地址仅供个人审核之用，<strong>永远</strong>不要使用。",
   "wallet.receive.page.mangledWarning1": "错乱的地址会累计到您的ADA余额，但是授权偏好不同",
+  "wallet.receive.page.noResultsFoundLabel": "No results found",
+  "wallet.receive.page.notFoundAnyAddresses": "We couldn't find any addresses matching your filter.",
   "wallet.receive.page.outputAmountUTXO": "Balance (UTXO sum)",
   "wallet.receive.page.unmangeLabel": "纠正授权偏好",
   "wallet.receive.page.verifyAddressLabel": "校验地址",
