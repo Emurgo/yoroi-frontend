@@ -501,6 +501,8 @@
   "wallet.receive.page.internalWarning1": "内部アドレス（おつりアドレス）は、ブロックチェーン上でユーザーがどのアドレスを所有しているかを不明瞭にするすることで、ユーザーのプライバシーを保護します。",
   "wallet.receive.page.internalWarning2": "ここに表示されるアドレスは、個人的な確認のためにのみご利用ください。このアドレスは<strong>ご使用にならないでください</strong>。",
   "wallet.receive.page.mangledWarning1": "不整合アドレスとは、ADA残高には含まれるものの委任設定が不正な状態のアドレスです。",
+  "wallet.receive.page.noResultsFoundLabel": "No results found",
+  "wallet.receive.page.notFoundAnyAddresses": "We couldn't find any addresses matching your filter.",
   "wallet.receive.page.outputAmountUTXO": "Balance (UTXO sum)",
   "wallet.receive.page.unmangeLabel": "委任設定を修正する",
   "wallet.receive.page.verifyAddressLabel": "アドレスを確認する",
