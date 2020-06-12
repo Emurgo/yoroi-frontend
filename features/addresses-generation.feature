@@ -35,12 +35,32 @@ Feature: Generate Addresses
     Then I see every generated address is unique
 
   @it-22
-  Scenario: Ensure user can hide used Addresses under "Receive tab" (IT-22)
-    And I click on the Hide used addresses button
+  Scenario: Test filers in the receive tab "Receive tab" (IT-22)
+    # test unused
+    And I click on the Unused addresses button
     Then I should see the addresses exactly list them
     | address                                                     |
     | Ae2tdPwUPEZAbDBFpgzALfryWbvDtx6H6BMynDxWFuThQthW7HX93yJ3wRS |
     And I shouldn't see the address "Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc"
+    # test used
+    And I click on the Used addresses button
+    Then I should see the addresses exactly list them
+    | address                                                     |
+    | Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc |
+    And I shouldn't see the address "Ae2tdPwUPEZAbDBFpgzALfryWbvDtx6H6BMynDxWFuThQthW7HX93yJ3wRS"
+    # test All
+    And I click on the All addresses button
+    Then I should see the addresses exactly list them
+    | address                                                     |
+    | Ae2tdPwUPEZAbDBFpgzALfryWbvDtx6H6BMynDxWFuThQthW7HX93yJ3wRS |
+    | Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc |
+    # test HasBalance
+    And I click on the HasBalance addresses button
+    Then I should see the addresses exactly list them
+    | address                                                     |
+    | Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc |
+    And I shouldn't see the address "Ae2tdPwUPEZAbDBFpgzALfryWbvDtx6H6BMynDxWFuThQthW7HX93yJ3wRS"
+    
 
   @it-88
   Scenario: Ensure user can see internal address in "Receive tab" (IT-88)

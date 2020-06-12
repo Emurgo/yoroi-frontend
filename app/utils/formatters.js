@@ -61,3 +61,10 @@ export const formattedAmountToNaturalUnits = (amount: string): string => {
 export const formattedAmountWithoutTrailingZeros = (amount: string): string => (
   amount.replace(/0+$/, '').replace(/\.$/, '')
 );
+
+export function truncateAddress(addr: string): string {
+  if (addr.length <= 20) {
+    return addr;
+  }
+  return addr.substring(0, 10) + '...' + addr.substring(addr.length - 10, addr.length);
+}

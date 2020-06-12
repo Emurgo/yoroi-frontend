@@ -19,7 +19,7 @@ import type {
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import BigNumber from 'bignumber.js';
-import { splitAmount } from '../../utils/formatters';
+import { truncateAddress, splitAmount } from '../../utils/formatters';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { DECIMAL_PLACES_IN_ADA } from '../../config/numbersConfig';
 
@@ -27,14 +27,6 @@ const messages = defineMessages({
   generatedAddressesSectionTitle: {
     id: 'wallet.receive.page.generatedAddressesSectionTitle',
     defaultMessage: '!!!Generated addresses',
-  },
-  hideUsedLabel: {
-    id: 'wallet.receive.page.hideUsedLabel',
-    defaultMessage: '!!!hide used',
-  },
-  showUsedLabel: {
-    id: 'wallet.receive.page.showUsedLabel',
-    defaultMessage: '!!!show used',
   },
   copyAddressLabel: {
     id: 'wallet.receive.page.copyAddressLabel',
@@ -149,9 +141,8 @@ export default class WalletReceive extends Component<Props> {
                     </RawHash>
                   </ExplorableHashContainer>
                 </CopyableAddress>
-                {/* Address Action block start */}
-                {/* Space for Output Amount UTX0 - */}
-                <div className={styles.verifyActionBlock}>
+                {/* Address balance block start */}
+                <div>
                   {address.value != null
                     ? (
                       <div className={styles.walletAmount}>
@@ -224,11 +215,4 @@ export default class WalletReceive extends Component<Props> {
       </div>
     );
   }
-}
-
-function truncateAddress(addr: string): string {
-  if (addr.length <= 20) {
-    return addr;
-  }
-  return addr.substring(0, 10) + '...' + addr.substring(addr.length - 10, addr.length);
 }
