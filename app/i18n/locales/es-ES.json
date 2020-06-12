@@ -501,6 +501,8 @@
   "wallet.receive.page.internalWarning1": "Las direcciones internas (o direcciones \"cambiantes\") mantienen tu privacidad ocultando en la blockchain las direcciones que te pertenecen.",
   "wallet.receive.page.internalWarning2": "se muestran aquí para propósitos de auditoría personal y <strong>nunca</strong> deberían ser usadas.",
   "wallet.receive.page.mangledWarning1": "Las direcciones manipuladas incrementan tu saldo de ADA, pero tienen una preferencia de delegación incorrecta",
+  "wallet.receive.page.noResultsFoundLabel": "No results found",
+  "wallet.receive.page.notFoundAnyAddresses": "We couldn't find any addresses matching your filter.",
   "wallet.receive.page.outputAmountUTXO": "Saldo (sumarización del UTxO)",
   "wallet.receive.page.unmangeLabel": "Corregir la preferencia de delegación",
   "wallet.receive.page.verifyAddressLabel": "Verifica la dirección",
