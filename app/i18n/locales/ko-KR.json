@@ -501,6 +501,8 @@
   "wallet.receive.page.internalWarning1": "내부 주소 (또는 가변 주소)는 블록체인의 어떤 주소가 당신에게 속해있는지 불분명하게 만들어 당신의 프라이버시를 지켜줍니다.",
   "wallet.receive.page.internalWarning2": "이곳에 보이는 내부 주소들은 개인 회계 사용 목적으로 제공된 것이므로 <strong>절대</strong> 사용해서는 안됩니다.",
   "wallet.receive.page.mangledWarning1": "훼손된 주소들은 ADA 전체 잔액에는 포함되지만 부정확한 위임 설정을 갖고 있는 주소입니다.",
+  "wallet.receive.page.noResultsFoundLabel": "No results found",
+  "wallet.receive.page.notFoundAnyAddresses": "We couldn't find any addresses matching your filter.",
   "wallet.receive.page.outputAmountUTXO": "Balance (UTXO sum)",
   "wallet.receive.page.unmangeLabel": "위임 설정 정정하기",
   "wallet.receive.page.verifyAddressLabel": "주소 검증하기",
