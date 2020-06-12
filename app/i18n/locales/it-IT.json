@@ -501,6 +501,8 @@
   "wallet.receive.page.internalWarning1": "Gli indirizzi interni (o \"cambio\" indirizzi) mantengono la vostra privacy oscurando quali indirizzi vi appartengono sulla blockchain",
   "wallet.receive.page.internalWarning2": "gli indirizzi qui indicati sono a scopo di verifica personale e non dovrebbero <strong>mai</strong> essere usati.",
   "wallet.receive.page.mangledWarning1": "Gli indirizzi Lacerati contribuiscono al bilancio degli ADA, ma hanno la preferenza di delega non corretta",
+  "wallet.receive.page.noResultsFoundLabel": "No results found",
+  "wallet.receive.page.notFoundAnyAddresses": "We couldn't find any addresses matching your filter.",
   "wallet.receive.page.outputAmountUTXO": "Balance (UTXO sum)",
   "wallet.receive.page.unmangeLabel": "Correggi le preferenze di delega",
   "wallet.receive.page.verifyAddressLabel": "Verifica indirizzo",
