@@ -501,6 +501,8 @@
   "wallet.receive.page.internalWarning1": "Interne adressen (of aliassen) waarborgen uw privacy door uw adressen te verbergen op de blockchain",
   "wallet.receive.page.internalWarning2": "adressen worden hier weergegeven voor persoonlijke controledoeleinden en mogen <strong> nooit </strong> worden gebruikt.",
   "wallet.receive.page.mangledWarning1": "Verminkte adressen dragen bij aan uw ADA-saldo, maar hebben de verkeerde delegatievoorkeur",
+  "wallet.receive.page.noResultsFoundLabel": "No results found",
+  "wallet.receive.page.notFoundAnyAddresses": "We couldn't find any addresses matching your filter.",
   "wallet.receive.page.outputAmountUTXO": "Saldo (UTXO som)",
   "wallet.receive.page.unmangeLabel": "Corrigeer delegatie voorkeur",
   "wallet.receive.page.verifyAddressLabel": "Controleer het adres",
