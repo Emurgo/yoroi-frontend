@@ -501,6 +501,8 @@
   "wallet.receive.page.internalWarning1": "Les adresses internes (ou adresses de \"change\") préservent votre vie privée en masquant les adresses qui vous appartiennent sur la blockchain",
   "wallet.receive.page.internalWarning2": "les adresses sont indiquées ici à des fins d'audit personnel et ne doivent <strong>jamais</strong> être utilisées.",
   "wallet.receive.page.mangledWarning1": "Les adresses mélangées contribuent à votre solde en ADA mais ont une préférence de délégation incorrecte",
+  "wallet.receive.page.noResultsFoundLabel": "No results found",
+  "wallet.receive.page.notFoundAnyAddresses": "We couldn't find any addresses matching your filter.",
   "wallet.receive.page.outputAmountUTXO": "Solde (somme des UTXO)",
   "wallet.receive.page.unmangeLabel": "Corriger la préférence de délégation",
   "wallet.receive.page.verifyAddressLabel": "Vérifier l'adresse",
