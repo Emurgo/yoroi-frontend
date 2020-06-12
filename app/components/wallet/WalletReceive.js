@@ -22,6 +22,7 @@ import BigNumber from 'bignumber.js';
 import { truncateAddress, splitAmount } from '../../utils/formatters';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { DECIMAL_PLACES_IN_ADA } from '../../config/numbersConfig';
+import NotFoundIcon from '../../assets/images/cert-bad-ic.inline.svg';
 
 const messages = defineMessages({
   generatedAddressesSectionTitle: {
@@ -44,6 +45,14 @@ const messages = defineMessages({
     id: 'wallet.receive.page.outputAmountUTXO',
     defaultMessage: '!!!Balance (UTXO sum)',
   },
+  noResultsFoundLabel: {
+    id: 'wallet.receive.page.noResultsFoundLabel',
+    defaultMessage: '!!!No results found',
+  },
+  notFoundAnyAddresses: {
+    id: 'wallet.receive.page.notFoundAnyAddresses',
+    defaultMessage: '!!!We couldn\'t find any addresses matching your filter.',
+  }
 });
 
 type Props = {|
@@ -207,6 +216,19 @@ export default class WalletReceive extends Component<Props> {
         </div>
       </>
     );
+
+    if (walletAddresses === undefined || walletAddresses.length === 0) {
+      return (
+        <div className={styles.component}>
+          {this.props.header}
+          <div className={styles.notFound}>
+            <NotFoundIcon />
+            <h1>{intl.formatMessage(messages.noResultsFoundLabel)}</h1>
+            <p>{intl.formatMessage(messages.notFoundAnyAddresses)}</p>
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div className={styles.component}>

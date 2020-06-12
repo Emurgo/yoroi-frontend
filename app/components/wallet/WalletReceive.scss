@@ -11,6 +11,25 @@
     display: block;
   }
 
+  .notFound {
+    padding-top: 2rem;
+    text-align: center;
+    color: var(--theme-transactions-list-detail-row-text-color);
+    svg {
+      max-width: 70px;
+      max-height: 70px;
+    }
+    h1 {
+      margin: 20px 0;
+      font-size: 1.2rem;
+      font-family: var(--font-medium);
+    }
+    p {
+      margin: 1rem 0;
+      font-size: .9rem;
+    }
+  }
+
   .generatedAddresses {
     color: var(--theme-bordered-box-text-color);
     font-family: var(--font-regular);
