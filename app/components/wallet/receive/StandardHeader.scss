@@ -2,7 +2,6 @@
 @import '../../../themes/mixins/error-message';
 
 .qrCodeAndInstructions {
-  border-bottom: 1px solid var(--theme-separation-border-color);
   display: flex;
   flex-direction: row;
   margin-bottom: 30px;
@@ -53,8 +52,9 @@
       font-size: 14px;
       letter-spacing: 0;
       line-height: 1.57;
-      margin-bottom: 12px;
+      margin-bottom: 24px;
       word-break: break-word;
+      color: var(--theme-transactions-list-detail-row-text-color);
     }
 
     .submitWithPasswordButton {

@@ -62,12 +62,8 @@ module.exports = function (api /*: ApiType */) /*: * */ {
       ],
       '@babel/plugin-syntax-dynamic-import',
       'add-module-exports',
-      [
-        '@babel/plugin-proposal-class-properties',
-        {
-          loose: true
-        }
-      ],
+      '@babel/plugin-proposal-class-properties',
+      '@babel/plugin-proposal-private-methods',
       '@babel/plugin-proposal-export-default-from',
       '@babel/plugin-proposal-export-namespace-from',
       ...(api.env('development') || api.env('storybook')

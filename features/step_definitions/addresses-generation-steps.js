@@ -7,6 +7,7 @@ import { expect } from 'chai';
 import {
   checkIfElementsInArrayAreUnique,
 } from '../support/helpers/helpers';
+import { truncateAddress } from '../../app/utils/formatters';
 
 Given(/^I go to the receive screen$/, async function () {
   await this.click('.receive');
@@ -17,11 +18,23 @@ When(/^I click on the Generate new address button$/, async function () {
 });
 
 When(/^I click on the internal tab$/, async function () {
-  await this.click('button.internal.ReceiveNavButton_button');
+  await this.click('div.internal.ReceiveNavButton_wrapper');
 });
 
-When(/^I click on the Hide used addresses button$/, async function () {
-  const hideUsedText = await i18n.formatMessage(this.driver, { id: 'wallet.receive.page.hideUsedLabel' });
+When(/^I click on the All addresses button$/, async function () {
+  const hideUsedText = await i18n.formatMessage(this.driver, { id: 'wallet.receive.navigation.allLabel' });
+  await this.click(`//button[contains(text(), "${hideUsedText}")]`, By.xpath);
+});
+When(/^I click on the Unused addresses button$/, async function () {
+  const hideUsedText = await i18n.formatMessage(this.driver, { id: 'wallet.receive.navigation.unusedLabel' });
+  await this.click(`//button[contains(text(), "${hideUsedText}")]`, By.xpath);
+});
+When(/^I click on the Used addresses button$/, async function () {
+  const hideUsedText = await i18n.formatMessage(this.driver, { id: 'wallet.receive.navigation.usedLabel' });
+  await this.click(`//button[contains(text(), "${hideUsedText}")]`, By.xpath);
+});
+When(/^I click on the HasBalance addresses button$/, async function () {
+  const hideUsedText = await i18n.formatMessage(this.driver, { id: 'wallet.receive.navigation.hasBalanceLabel' });
   await this.click(`//button[contains(text(), "${hideUsedText}")]`, By.xpath);
 });
 
@@ -61,7 +74,7 @@ Then(/^I should see the addresses exactly list them$/, async function (table) {
   const waitUntilAddressesAppeared = rows.map((row, index) => (
     this.waitUntilText(
       `.generatedAddress-${index + 1} .RawHash_hash`,
-      row.address
+      truncateAddress(row.address)
     )
   ));
   const noMoreAddressAppeared = this.waitForElementNotPresent(
@@ -72,7 +85,7 @@ Then(/^I should see the addresses exactly list them$/, async function (table) {
 });
 
 Then(/^I shouldn't see the address "([^"]*)"$/, async function (address) {
-  await this.waitForElementNotPresent(`//div[contains(text(), "${address}")]`, By.xpath);
+  await this.waitForElementNotPresent(`//div[contains(text(), "${truncateAddress(address)}")]`, By.xpath);
 });
 
 Then(/I should see an error about max unused addresses/, async function () {

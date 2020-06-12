@@ -375,14 +375,7 @@ export default class AddressesStore extends Store {
     const { coinType } = request.publicDeriver.getParent();
     const apiType = getApiForCoinType(coinType);
 
-    const filterByStore = await this.stores.substores[apiType].addresses.storewiseFilter(request);
-    if (this.addressFilter === AddressFilter.None) {
-      return filterByStore;
-    }
-    if (this.addressFilter === AddressFilter.Unused) {
-      return filterByStore.filter(address => address.isUsed === null || address.isUsed === false);
-    }
-    throw new Error(`${nameof(this.storewiseFilter)} unknown filter type ${this.addressFilter}`);
+    return await this.stores.substores[apiType].addresses.storewiseFilter(request);
   }
 
   _createAddressIfNeeded: {|
@@ -409,7 +402,7 @@ export default class AddressesStore extends Store {
   }
 }
 
-export function userFilter<T>(request: {|
+export function userFilter<T: StandardAddress>(request: {|
   addressFilter: AddressFilterKind,
   addresses: $ReadOnlyArray<$ReadOnly<T>>,
 |}): $ReadOnlyArray<$ReadOnly<T>> {
@@ -419,6 +412,16 @@ export function userFilter<T>(request: {|
   if (request.addressFilter === AddressFilter.Unused) {
     return request.addresses.filter(address => (
       address.isUsed === null || address.isUsed === false
+    ));
+  }
+  if (request.addressFilter === AddressFilter.Used) {
+    return request.addresses.filter(address => (
+      address.isUsed === true
+    ));
+  }
+  if (request.addressFilter === AddressFilter.HasBalance) {
+    return request.addresses.filter(address => (
+      address.value !== undefined && address.value.gt(0)
     ));
   }
   throw new Error(`${nameof(userFilter)} unknown filter type ${request.addressFilter}`);

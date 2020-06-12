@@ -40,6 +40,7 @@ type Props = {|
   +notification: ?Notification,
   +isSubmitting: boolean,
   +error?: ?LocalizableError,
+  +isFilterActive: boolean,
 |};
 
 @observer
@@ -78,6 +79,7 @@ export default class StandardHeader extends Component<Props> {
         label={intl.formatMessage(messages.generateNewAddressButtonLabel)}
         onMouseUp={this.submit}
         skin={ButtonSkin}
+        disabled={this.props.isFilterActive}
       />
     );
 

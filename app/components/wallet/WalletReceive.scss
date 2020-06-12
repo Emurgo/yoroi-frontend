@@ -17,29 +17,40 @@
     font-size: 14px;
     line-height: 22px;
 
+    .generatedAddressesGrid {
+      display: flex;
+      text-align: right;
+      &> *:first-child {
+        text-align: left;
+        flex: 1.5;
+      }
+      & > * {
+        flex: 1;
+        margin-left: 10px;
+      }
+    }
     h2 {
-      font-size: 18px;
-      font-family: var(--font-medium);
+      font-size: 14px;
+      font-family: var(--font-regular);
       margin-bottom: 10px;
       line-height: 22px;
+      font-weight: lighter;
+      color: var(--theme-transactions-list-detail-row-text-color);
+    }
+    button {
+      color: var(--theme-label-button-color);
+      cursor: pointer;
+      font-family: var(--font-medium);
+      font-size: 16px;
+      margin-left: 12px;
+      text-transform: uppercase;
 
-      button {
-        color: var(--theme-label-button-color);
-        cursor: pointer;
-        float: right;
-        font-family: var(--font-medium);
-        font-size: 16px;
-        margin-left: 12px;
-        text-transform: uppercase;
-
-        &:hover {
-          @include underline(var(--theme-underline-dark-color));
-        }
+      &:hover {
+        @include underline(var(--theme-underline-dark-color));
       }
     }
 
     .walletAddress {
-      box-sizing: border-box;
       display: flex;
       padding: 8.5px 0;
       word-break: break-all;
@@ -48,19 +59,11 @@
         border-top: 1px solid var(--theme-separation-border-color);
       }
 
-      .addressMargin {
-        margin-right: 32.5px;
-        flex-grow: 1;
-      }
-
       .addressActions {
-        display: inline-flex;
-        align-items: flex-start;
-
         .addressActionItemBlock {
           cursor: pointer;
           letter-spacing: 0.5px;
-          margin-left: 24px;
+          text-align: right;
           line-height: 20px;
           vertical-align: top;
           white-space: nowrap;
