@@ -501,6 +501,8 @@
   "wallet.receive.page.internalWarning1": "Внутренние адреса (или «заменяющие» адреса) поддерживают вашу конфиденциальность, скрывая, какие адреса принадлежат вам в блокчейне",
   "wallet.receive.page.internalWarning2": "здесь показаны адреса в целях личного аудита и <strong>никогда</strong> не должны использоваться.",
   "wallet.receive.page.mangledWarning1": "Искаженные адреса включены в общий баланс ADA, но имеют неправильные настройки делегирования",
+  "wallet.receive.page.noResultsFoundLabel": "No results found",
+  "wallet.receive.page.notFoundAnyAddresses": "We couldn't find any addresses matching your filter.",
   "wallet.receive.page.outputAmountUTXO": "Balance (UTXO sum)",
   "wallet.receive.page.unmangeLabel": "Правильные настройки делегирования",
   "wallet.receive.page.verifyAddressLabel": "Проверить адрес",
