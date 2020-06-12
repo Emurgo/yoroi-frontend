@@ -13,6 +13,8 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import type { AddressTypeName } from '../../stores/toplevel/AddressesStore';
 import type { AddressFilterKind } from '../../types/AddressFilterTypes';
 import environment from '../../environment';
+import { ROUTES } from '../../routes-config';
+import { buildRoute } from '../../utils/routing';
 
 export type GeneratedData = typeof Receive.prototype.generated;
 
@@ -66,14 +68,23 @@ export default class Receive extends Component<Props> {
   render(): Node {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) throw new Error(`${nameof(Receive)} no public deriver`);
-    const { addresses } = this.generated.stores;
+    const { addresses, app } = this.generated.stores;
+    const { actions } = this.generated;
 
+    const addressBookRoute = buildRoute(
+      ROUTES.WALLETS.RECEIVE.ADDRESS_BOOK,
+      {
+        id: publicDeriver.getPublicDeriverId(),
+      }
+    );
     return (
       <ReceiveWithNavigation
         addressTypes={addresses.getStoresForWallet(publicDeriver)}
         setFilter={filter => this.generated.actions.addresses.setFilter.trigger(filter)}
         activeFilter={this.generated.stores.addresses.addressFilter}
         categoryTitle={this.getCategoryTitle()}
+        goAddressBook={() => actions.router.goToRoute.trigger({ route: addressBookRoute })}
+        isAddressBookRoute={this.generated.stores.app.currentRoute === addressBookRoute}
       >
         {this.props.children}
       </ReceiveWithNavigation>
@@ -82,6 +93,7 @@ export default class Receive extends Component<Props> {
 
   @computed get generated(): {|
     stores: {|
+      app: {| currentRoute: string |},
       addresses: {|
         addressFilter: AddressFilterKind,
         getStoresForWallet: (
@@ -101,6 +113,15 @@ export default class Receive extends Component<Props> {
       addresses: {|
         setFilter: {| trigger: (params: AddressFilterKind) => void |},
         resetFilter: {| trigger: (params: void) => void |},
+      |},
+      router: {|
+        goToRoute: {|
+          trigger: (params: {|
+            forceRefresh?: boolean,
+            params?: ?any,
+            route: string
+          |}) => void
+        |}
       |}
     |}
     |} {
@@ -115,6 +136,9 @@ export default class Receive extends Component<Props> {
       stores: {
         wallets: {
           selected: stores.wallets.selected,
+        },
+        app: {
+          currentRoute: stores.app.currentRoute,
         },
         addresses: {
           addressFilter: stores.addresses.addressFilter,
@@ -139,7 +163,10 @@ export default class Receive extends Component<Props> {
         addresses: {
           setFilter: { trigger: actions.addresses.setFilter.trigger, },
           resetFilter: { trigger: actions.addresses.resetFilter.trigger, },
-        }
+        },
+        router: {
+          goToRoute: { trigger: actions.router.goToRoute.trigger },
+        },
       }
     });
   }

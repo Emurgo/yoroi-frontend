@@ -97,6 +97,7 @@ const genAddresses = () => {
 };
 
 const genBaseProps: {|
+  addressBook?: boolean,
   wallet: CacheValue,
   dialog?: any,
   getStoresForWallet: PublicDeriver<> => Array<{|
@@ -402,8 +403,10 @@ export const ExternalTab = (): Node => {
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
         addressFilter,
+        location: ROUTES.WALLETS.RECEIVE.ROOT
       }),
       (<WalletReceivePage
+        addressBook={false}
         generated={genBaseProps({
           wallet,
           dialog: getAddressGenerationValue() === addressCases.Yes
@@ -438,8 +441,10 @@ export const InternalTab = (): Node => {
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
         addressFilter,
+        location: ROUTES.WALLETS.RECEIVE.ROOT
       }),
       (<WalletReceivePage
+        addressBook={false}
         generated={genBaseProps({
           wallet,
           addressFilter,
@@ -470,8 +475,44 @@ export const MangledTab = (): Node => {
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
         addressFilter,
+        location: ROUTES.WALLETS.RECEIVE.ROOT
       }),
       (<WalletReceivePage
+        addressBook={false}
+        generated={genBaseProps({
+          wallet,
+          addressFilter,
+          getStoresForWallet: (pubDeriver) => wrapForReceivePage(getStoresForWallet(pubDeriver)),
+        })}
+      />)
+    )
+  );
+};
+export const AddressBookTab = (): Node => {
+  const wallet = genSigningWalletWithCache();
+  const lookup = walletLookup([wallet]);
+
+  // TODO: wrong I think
+  const getStoresForWallet = genGetStoresForWallet({
+    selectedTab: AddressStoreTypes.mangled,
+    addresses: genAddresses(),
+  });
+  const addressFilter = select('AddressFilter', AddressFilter, AddressFilter.None);
+  return wrapWallet(
+    mockWalletProps({
+      location: getInternalRoute(wallet.publicDeriver.getPublicDeriverId()),
+      selected: wallet.publicDeriver,
+      ...lookup,
+    }),
+    wrapReceive(
+      mockReceiveProps({
+        selected: wallet.publicDeriver,
+        getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressFilter,
+        location: ROUTES.WALLETS.RECEIVE.ADDRESS_BOOK
+      }),
+      (<WalletReceivePage
+        addressBook
         generated={genBaseProps({
           wallet,
           addressFilter,
@@ -502,8 +543,10 @@ export const UnmangleDialogLoading = (): Node => {
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
         addressFilter,
+        location: ROUTES.WALLETS.RECEIVE.ROOT
       }),
       (<WalletReceivePage
+        addressBook={false}
         generated={genBaseProps({
           wallet,
           dialog: UnmangleTxDialogContainer,
@@ -541,8 +584,10 @@ export const UnmangleDialogError = (): Node => {
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
         addressFilter,
+        location: ROUTES.WALLETS.RECEIVE.ROOT
       }),
       (<WalletReceivePage
+        addressBook={false}
         generated={genBaseProps({
           wallet,
           dialog: UnmangleTxDialogContainer,
@@ -578,8 +623,10 @@ export const UnmangleDialogConfirm = (): Node => {
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
         addressFilter,
+        location: ROUTES.WALLETS.RECEIVE.ROOT
       }),
       (<WalletReceivePage
+        addressBook={false}
         generated={genBaseProps({
           wallet,
           dialog: UnmangleTxDialogContainer,
@@ -617,8 +664,10 @@ export const UriGenerateDialog = (): Node => {
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
         addressFilter,
+        location: ROUTES.WALLETS.RECEIVE.ROOT
       }),
       (<WalletReceivePage
+        addressBook={false}
         generated={genBaseProps({
           wallet,
           dialog: URIGenerateDialog,
@@ -655,8 +704,10 @@ export const UriDisplayDialog = (): Node => {
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
         addressFilter,
+        location: ROUTES.WALLETS.RECEIVE.ROOT
       }),
       (<WalletReceivePage
+        addressBook={false}
         generated={genBaseProps({
           wallet,
           dialog: URIDisplayDialog,
@@ -696,8 +747,10 @@ export const VerifyRegularAddress = (): Node => {
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
         addressFilter,
+        location: ROUTES.WALLETS.RECEIVE.ROOT
       }),
       (<WalletReceivePage
+        addressBook={false}
         generated={genBaseProps({
           wallet,
           dialog: VerifyAddressDialog,
@@ -737,8 +790,10 @@ export const VerifyLedgerAddress = (): Node => {
         selected: wallet.publicDeriver,
         getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
         addressFilter,
+        location: ROUTES.WALLETS.RECEIVE.ROOT
       }),
       (<WalletReceivePage
+        addressBook={false}
         generated={genBaseProps({
           wallet,
           dialog: VerifyAddressDialog,

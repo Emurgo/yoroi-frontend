@@ -13,14 +13,19 @@ import type {
 import type { AddressTypeName } from '../../../stores/toplevel/AddressesStore';
 import { AddressStoreTypes, AddressFilter } from '../../../types/AddressFilterTypes';
 import Accordion from '../../widgets/Accordion';
+import InfoIcon from '../../../assets/images/attention-big-light.inline.svg';
+
 import type { AddressFilterKind } from '../../../types/AddressFilterTypes';
 import classNames from 'classnames';
-import InfoIcon from '../../../assets/images/attention-big-light.inline.svg';
 import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
 import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
 import { addressTypeInfo } from '../../../i18n/global-messages';
 
 const messages = defineMessages({
+  AddressBook: {
+    id: 'wallet.receive.navigation.AddressBook',
+    defaultMessage: '!!!Address book'
+  },
   allLabel: {
     id: 'wallet.receive.navigation.allLabel',
     defaultMessage: '!!!All'
@@ -48,6 +53,8 @@ export type Props = {|
     +name: AddressTypeName,
   |}>;
   +categoryTitle: string,
+  +goAddressBook: void => void,
+  +isAddressBookRoute: boolean
 |};
 
 @observer
@@ -60,7 +67,7 @@ export default class ReceiveNavigation extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
 
-    const { activeFilter } = this.props;
+    const { activeFilter, goAddressBook } = this.props;
     const componentClasses = classNames([
       styles.filterButton,
       styles.active,
@@ -102,6 +109,22 @@ export default class ReceiveNavigation extends Component<Props> {
                 />
               ))}
             </Accordion>
+            <div className={styles.addressBook}>
+              <button
+                onClick={() => goAddressBook()}
+                type="button"
+                className={this.props.isAddressBookRoute
+                  ? componentClasses
+                  : styles.filterButton
+                }
+              >
+                <div> {intl.formatMessage(messages.AddressBook)}
+                  <span className={styles.infoIcon}>
+                    <InfoIcon />
+                  </span>
+                </div>
+              </button>
+            </div>
           </div>
           {/* Section filtered button */}
           <div className={styles.filterSection}>
@@ -113,30 +136,35 @@ export default class ReceiveNavigation extends Component<Props> {
             >
               {intl.formatMessage(messages.allLabel)}
             </button>
-            <button
-              type="button"
-              onClick={() => { this.props.setFilter(AddressFilter.Used); }}
-              className={activeFilter === AddressFilter.Used ?
-                componentClasses : styles.filterButton}
-            >
-              {intl.formatMessage(messages.usedLabel)}
-            </button>
-            <button
-              type="button"
-              onClick={() => { this.props.setFilter(AddressFilter.Unused); }}
-              className={activeFilter === AddressFilter.Unused ?
-                componentClasses : styles.filterButton}
-            >
-              {intl.formatMessage(messages.unusedLabel)}
-            </button>
-            <button
-              type="button"
-              onClick={() => { this.props.setFilter(AddressFilter.HasBalance); }}
-              className={activeFilter === AddressFilter.HasBalance ?
-                componentClasses : styles.filterButton}
-            >
-              {intl.formatMessage(messages.hasBalanceLabel)}
-            </button>
+            {
+              !this.props.isAddressBookRoute &&
+              <>
+                <button
+                  type="button"
+                  onClick={() => { this.props.setFilter(AddressFilter.Used); }}
+                  className={activeFilter === AddressFilter.Used ?
+                    componentClasses : styles.filterButton}
+                >
+                  {intl.formatMessage(messages.usedLabel)}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { this.props.setFilter(AddressFilter.Unused); }}
+                  className={activeFilter === AddressFilter.Unused ?
+                    componentClasses : styles.filterButton}
+                >
+                  {intl.formatMessage(messages.unusedLabel)}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { this.props.setFilter(AddressFilter.HasBalance); }}
+                  className={activeFilter === AddressFilter.HasBalance ?
+                    componentClasses : styles.filterButton}
+                >
+                  {intl.formatMessage(messages.hasBalanceLabel)}
+                </button>
+              </>
+            }
           </div>
         </div>
       </div>

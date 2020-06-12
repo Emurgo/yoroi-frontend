@@ -4,8 +4,13 @@ import type {
   Address, Addressing, UsedStatus, Value,
 } from '../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
+export type Label = {|
+  +label: string,
+|}
+
 export type StandardAddress = {|
   ...Address,
+  ...InexactSubset<Label>, // TODO: remove and change to map
   ...InexactSubset<Value>,
   ...InexactSubset<Addressing>,
   ...InexactSubset<UsedStatus>,

@@ -243,6 +243,12 @@ const ReceiveSubpages = (stores, actions) => (
       path={ROUTES.WALLETS.RECEIVE.MANGLED}
       component={(props) => <WalletReceivePage {...props} stores={stores} actions={actions} />}
     />
+    <Route
+      exact
+      path={ROUTES.WALLETS.RECEIVE.ADDRESS_BOOK}
+        // TODO: Remove addressBook prop
+      component={(props) => <WalletReceivePage addressBook {...props} stores={stores} actions={actions} />} // FIX FOR ADDRESS BOOK
+    />
     <Redirect to={ROUTES.WALLETS.RECEIVE.EXTERNAL} />
   </Switch>
 );

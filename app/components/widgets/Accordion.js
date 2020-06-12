@@ -37,6 +37,7 @@ export default class Accordion extends Component<Props, State> {
       isToggle && styles.arrowUp,
       this.props.activeHeader && styles.activeHead
     ]);
+
     const toggleShowContent = classnames([
       styles.accordionContent,
       isToggle && styles.showActiveContent,

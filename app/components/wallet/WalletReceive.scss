@@ -56,6 +56,9 @@
       font-weight: lighter;
       color: var(--theme-transactions-list-detail-row-text-color);
     }
+    .labelHeader{
+      text-align: left;
+    }
     button {
       color: var(--theme-label-button-color);
       cursor: pointer;
@@ -123,9 +126,45 @@
             cursor: pointer;
           }
         }
-
+        
         .generateURLActionBlock {
           margin-left: unset;
+        }
+      }
+      .labelAddress {
+        font-family: var(--font-regular);
+        text-align: left;
+        font-size: 9px;
+        display: flex;
+       
+        .labelText {
+          position: relative;
+
+          background: #DEE2EA;
+          color: #6B7384;
+          padding: 2px 6px;
+          &:after {
+            content: " ";
+            display: block;
+            width: 0;
+            height: 0;
+            border-top: 13px solid transparent;
+            border-bottom: 14px solid transparent;
+            border-left: 14px solid #DEE2EA;
+            position: absolute;
+            top: 50%;
+            margin-top: -14px;
+            right: -14px;
+            z-index: 2;
+          }
+        }
+        button {
+          margin: 0;
+          margin-right: 8px;
+        }
+        svg {
+          max-width: 18px;
+          max-height: 18px;
         }
       }
     }

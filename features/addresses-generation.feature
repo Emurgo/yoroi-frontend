@@ -68,3 +68,10 @@ Feature: Generate Addresses
     And I should see the addresses exactly list them
     | address                                                     |
     | Ae2tdPwUPEZ3o8HadjafhGnNEqxwQm4V98Nm3kADDsfTv8QE2Ytpe2L8TSL |
+
+  @it-88
+  Scenario: Ensure user can see book address in "Receive tab" (IT-88)
+    When I click on the address book tab
+    And I should see the addresses exactly list them
+    | address                                                     |
+    | Ae2tdPwUPEZ3o8HadjafhGnNEqxwQm4V98Nm3kADDsfTv8QE2Ytpe2L8TSL |

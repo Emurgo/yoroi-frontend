@@ -607,6 +607,10 @@ export const addressTypeInfo: * = defineMessages({
     id: 'wallet.address.category.byron',
     defaultMessage: '!!!Addresses created using the Byron-era address format',
   },
+  addressBookInfo: {
+    id: 'wallet.address.category.addressBook',
+    defaultMessage: '!!!Addresses that do not belong to you, but are relevant to your wallet',
+  },
   groupInfo: {
     id: 'wallet.address.category.group',
     defaultMessage: '!!!Addresses formed by the combination of a spending key and a staking key',

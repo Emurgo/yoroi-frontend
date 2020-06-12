@@ -21,6 +21,10 @@ When(/^I click on the internal tab$/, async function () {
   await this.click('div.internal.ReceiveNavButton_wrapper');
 });
 
+When(/^I click on the address book tab$/, async function () {
+  await this.click('div.ReceiveNavigation_addressBook');
+});
+
 When(/^I click on the All addresses button$/, async function () {
   const hideUsedText = await i18n.formatMessage(this.driver, { id: 'wallet.receive.navigation.allLabel' });
   await this.click(`//button[contains(text(), "${hideUsedText}")]`, By.xpath);

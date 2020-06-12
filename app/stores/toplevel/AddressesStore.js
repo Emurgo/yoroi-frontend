@@ -13,7 +13,7 @@ import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
-  asGetAllUtxos, asHasUtxoChains, asDisplayCutoff, asHasLevels,
+  asGetAllUtxos, asHasUtxoChains, asDisplayCutoff,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   IHasUtxoChainsRequest,
@@ -25,15 +25,11 @@ import {
 } from '../../utils/logging';
 import { ROUTES } from '../../routes-config';
 import { buildRoute } from '../../utils/routing';
-import { ChainDerivations } from '../../config/numbersConfig';
 import { Bip44DerivationLevels } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import { Cip1852Wallet } from '../../api/ada/lib/storage/models/Cip1852Wallet/wrapper';
 import globalMessages, { addressTypes } from '../../i18n/global-messages';
 import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
-import {
-  ConceptualWallet
-} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { getApiForCoinType } from '../../api/common/utils';
 import type { AddressFilterKind, StandardAddress, AddressStoreKind } from '../../types/AddressFilterTypes';
 import { AddressFilter, AddressStoreTypes } from '../../types/AddressFilterTypes';
@@ -58,6 +54,7 @@ export class AddressTypeStore<T: StandardAddress> {
   actions: ActionsMap;
   request: SubRequestType<T>;
   name: AddressTypeName;
+  groupName: AddressTypeName;
   route: string;
   shouldHide: (PublicDeriver<>, AddressTypeStore<T>) => boolean;
   constructor(data: {|
@@ -65,13 +62,15 @@ export class AddressTypeStore<T: StandardAddress> {
     actions: ActionsMap,
     request: SubRequestType<T>,
     name: AddressTypeName,
-    route: string,
+    groupName: AddressTypeName;
+    route: string, // TODO: remove
     shouldHide: (PublicDeriver<>, AddressTypeStore<T>) => boolean,
   |}) {
     this.stores = data.stores;
     this.actions = data.actions;
     this.request = data.request;
     this.name = data.name;
+    this.groupName = data.groupName;
     this.route = data.route;
     this.shouldHide = data.shouldHide;
   }
@@ -159,9 +158,6 @@ export class AddressTypeStore<T: StandardAddress> {
 }
 
 export default class AddressesStore extends Store {
-  allAddressesForDisplay: AddressTypeStore<StandardAddress>;
-  externalForDisplay: AddressTypeStore<StandardAddress>;
-  internalForDisplay: AddressTypeStore<StandardAddress>;
 
   @observable error: ?LocalizableError = null;
 
@@ -179,83 +175,14 @@ export default class AddressesStore extends Store {
     actions.resetErrors.listen(this._resetErrors);
     actions.setFilter.listen(this._setFilter);
     actions.resetFilter.listen(this._resetFilter);
-
-    this.allAddressesForDisplay = new AddressTypeStore({
-      stores: this.stores,
-      actions: this.actions,
-      request: (request) => this._wrapForAllAddresses({
-        ...request,
-        storeToFilter: this.allAddressesForDisplay,
-        invertFilter: false,
-      }),
-      name: {
-        stable: AddressStoreTypes.all,
-        display: globalMessages.addressesLabel
-      },
-      route: ROUTES.WALLETS.RECEIVE.ROOT,
-      shouldHide: (publicDeriver, _store) => {
-        const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
-        if (withLevels == null) return true;
-        const parent = withLevels.getParent();
-        if (!(parent instanceof Bip44Wallet || parent instanceof Cip1852Wallet)) {
-          return false;
-        }
-        // don't show this if public deriver level < Account
-        return parent.getPublicDeriverLevel() > Bip44DerivationLevels.ACCOUNT.level;
-      },
-    });
-    this.externalForDisplay = new AddressTypeStore({
-      stores: this.stores,
-      actions: this.actions,
-      request: async (request) => this._createAddressIfNeeded({
-        publicDeriver: request.publicDeriver,
-        genAddresses: () => this._wrapForChainAddresses({
-          ...request,
-          storeToFilter: this.externalForDisplay,
-          chainsRequest: { chainId: ChainDerivations.EXTERNAL },
-        }),
-      }),
-      name: {
-        stable: AddressStoreTypes.external,
-        display: addressTypes.externalTab,
-      },
-      route: ROUTES.WALLETS.RECEIVE.EXTERNAL,
-      shouldHide: (_publicDeriver, store) => store.all.length === 0,
-    });
-    this.internalForDisplay = new AddressTypeStore({
-      stores: this.stores,
-      actions: this.actions,
-      request: (request) => this._wrapForChainAddresses({
-        ...request,
-        storeToFilter: this.internalForDisplay,
-        chainsRequest: { chainId: ChainDerivations.INTERNAL },
-      }),
-      name: {
-        stable: AddressStoreTypes.internal,
-        display: addressTypes.internalLabel,
-      },
-      route: ROUTES.WALLETS.RECEIVE.INTERNAL,
-      shouldHide: (_publicDeriver, store) => store.all.length === 0,
-    });
   }
 
   getStoresForWallet: (
     PublicDeriver<>
   ) => Array<AddressTypeStore<StandardAddress>> = (publicDeriver) => {
-    const withHasUtxoChains = asHasUtxoChains(publicDeriver);
-
-    const stores = [];
-    if (withHasUtxoChains == null) {
-      stores.push(this.stores.addresses.allAddressesForDisplay);
-    } else {
-      stores.push(this.stores.addresses.externalForDisplay);
-      stores.push(this.stores.addresses.internalForDisplay);
-    }
-
     const { coinType } = publicDeriver.getParent();
     const apiType = getApiForCoinType(coinType);
     return [
-      ...stores,
       ...this.stores.substores[apiType].addresses.getStoresForWallet(publicDeriver),
     ];
   }
@@ -294,13 +221,6 @@ export default class AddressesStore extends Store {
   addObservedWallet: PublicDeriver<> => void = (
     publicDeriver
   ) => {
-    const withHasUtxoChains = asHasUtxoChains(publicDeriver);
-    if (withHasUtxoChains == null) {
-      this.allAddressesForDisplay.addObservedWallet(publicDeriver);
-    } else {
-      this.externalForDisplay.addObservedWallet(publicDeriver);
-      this.internalForDisplay.addObservedWallet(publicDeriver);
-    }
     const { coinType } = publicDeriver.getParent();
     const apiType = getApiForCoinType(coinType);
     this.stores.substores[apiType].addresses.addObservedWallet(publicDeriver);
@@ -309,13 +229,6 @@ export default class AddressesStore extends Store {
   refreshAddressesFromDb: PublicDeriver<> => Promise<void> = async (
     publicDeriver
   ) => {
-    const withHasUtxoChains = asHasUtxoChains(publicDeriver);
-    if (withHasUtxoChains == null) {
-      await this.allAddressesForDisplay.refreshAddressesFromDb(publicDeriver);
-    } else {
-      await this.externalForDisplay.refreshAddressesFromDb(publicDeriver);
-      await this.internalForDisplay.refreshAddressesFromDb(publicDeriver);
-    }
     const { coinType } = publicDeriver.getParent();
     const apiType = getApiForCoinType(coinType);
     this.stores.substores[apiType].addresses.refreshAddressesFromDb(publicDeriver);
@@ -324,7 +237,6 @@ export default class AddressesStore extends Store {
   _wrapForAllAddresses: {|
     publicDeriver: PublicDeriver<>,
     storeToFilter: AddressTypeStore<StandardAddress>,
-    invertFilter: boolean,
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
     const { coinType } = request.publicDeriver.getParent();
     const apiType = getApiForCoinType(coinType);

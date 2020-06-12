@@ -15,9 +15,13 @@ export const mockReceiveProps: {|
     +setAsActiveStore: void => void,
     +name: AddressTypeName,
   |}>,
+  location: string
 |} => {| generated: GeneratedData |} = (request) => ({
   generated: {
     stores: {
+      app: {
+        currentRoute: request.location,
+      },
       wallets: {
         selected: request.selected,
       },
@@ -30,6 +34,9 @@ export const mockReceiveProps: {|
       addresses: {
         setFilter: { trigger: action('setFilter') },
         resetFilter: { trigger: action('resetFilter') },
+      },
+      router: {
+        goToRoute: { trigger: action('goToRouter') }
       }
     }
   },

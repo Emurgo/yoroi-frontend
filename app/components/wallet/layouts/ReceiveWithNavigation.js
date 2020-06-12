@@ -18,6 +18,8 @@ export type Props = {|
     +name: AddressTypeName,
   |}>;
   +categoryTitle: string,
+  +goAddressBook: void => void,
+  +isAddressBookRoute: boolean
 |};
 
 @observer
@@ -27,19 +29,20 @@ export default class ReceiveWithNavigation extends Component<Props> {
   };
 
   render(): Node {
-    const { children, addressTypes, setFilter, activeFilter } = this.props;
     return (
       <div className={styles.component}>
         <div className={styles.navigation}>
           <ReceiveNavigation
-            addressTypes={addressTypes}
-            setFilter={setFilter}
-            activeFilter={activeFilter}
+            addressTypes={this.props.addressTypes}
+            setFilter={this.props.setFilter}
+            activeFilter={this.props.activeFilter}
             categoryTitle={this.props.categoryTitle}
+            goAddressBook={this.props.goAddressBook}
+            isAddressBookRoute={this.props.isAddressBookRoute}
           />
         </div>
         <div className={styles.page}>
-          {children}
+          {this.props.children}
         </div>
       </div>
     );
