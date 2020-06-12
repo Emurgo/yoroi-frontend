@@ -81,7 +81,7 @@ npm install
 npm run prod:byron
 ```
 
-If you need to access the build from your host machine, you can use the following command to copy the build folder out of the docker container and into your host machine.
+If you need to access the build from your host machine, you can use the following command to copy the build folder out of the docker container and into your host machine. (**note**: you must run this command from the host machine and not from inside the docker image)
 ```
 docker cp yoroi_ci:/yoroi/build ./build
 ```
