@@ -666,5 +666,5 @@
   "yoroiTransfer.waiting.checkingAddresses.generatingTx": "Δημιουργία μεταφοράς συναλλαγής",
   "yoroiTransfer.waiting.progressInfo.checkingAddresses": "Έλεγχος χρημάτων στις διευθύνσεις",
   "yoroiTransfer.waiting.progressInfo.restoringAddresses": "Περισυλλογή διευθύνσεων",
-  "yoroiTransfer.waiting.title.label": "Wallet is being restored"
+  "yoroiTransfer.waiting.title.label": "Γίνεται επαναφορά του πορτοφολιού"
 }
