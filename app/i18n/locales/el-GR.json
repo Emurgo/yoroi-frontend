@@ -529,7 +529,7 @@
   "wallet.restore.dialog.verify.accountId.shelley.label": "Shelley account checksum:",
   "wallet.restore.dialog.verify.addressesLabel": "Διεύθυνση[εις] του Πορτοφολιού σας:",
   "wallet.restore.dialog.verify.byron.addressesLabel": "Byron Wallet address[es]:",
-  "wallet.restore.dialog.verify.intro.line1": "Be careful about wallet restoration:",
+  "wallet.restore.dialog.verify.intro.line1": "Να προσέξετε σχετικά με την επαναφορά πορτοφολιού:",
   "wallet.restore.dialog.verify.intro.line2": "Make sure account checksum and icon match what you remember.",
   "wallet.restore.dialog.verify.intro.line3": "Make sure addresses match what you remember.",
   "wallet.restore.dialog.verify.intro.line4": "If you've entered wrong mnemonics or a wrong paper wallet password - you will just open another empty wallet with wrong account checksum and wrong addresses.",
