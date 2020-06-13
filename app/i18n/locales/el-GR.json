@@ -624,7 +624,7 @@
   "wallet.transaction.export.dialog.infoText1": "Ολόκληρο το ιστορικό συναλλαγών μέσα στο πορτοφόλι σας θα εξαχθεί σε ένα αρχείο.",
   "wallet.transaction.export.dialog.title": "Εξαγωγή συναλλαγών σε αρχείο",
   "wallet.transaction.export.exportIcon.tooltip": "Εξαγωγή σε αρχείο",
-  "wallet.transaction.fee": "Τέλος (κόμιστρο) ",
+  "wallet.transaction.fee": "Τέλος",
   "wallet.transaction.memo.add.dialog.actions.submit": "Προσθήκη",
   "wallet.transaction.memo.delete.dialog.actions.delete": "Διαγραφή",
   "wallet.transaction.memo.delete.dialog.content": "Είστε σίγουροι ότι θέλετε να αφαιρέσετε το υπόμνημα για αυτή τη συναλλαγή?<br />Πραττοντας το, θα σβήσει όλα τα αντίγραφα του και δεν θα μπορείτε να το επαναφέρετε στο μέλλον.",
