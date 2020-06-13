@@ -1,6 +1,6 @@
 # Έντυπα Πορτοφόλια
 
-Το**"Έντυπο Πορτοφόλι"** είναι ένα ειδικό έγγραφο, πουπεριέχει κρυφές μνημονικές λέξεις και μία μικρή σειρά από διευθύνσεις. Όταν ένα έντυπο πορτοφόλι δημιουργηθεί**δεν αποθηκεύεται από το Yoroi**. Το PDF έγγραφο που θα δημιουργηθεί είναι το μόνο αντίγραφο αυτού του πορτοφολιού σε ύπαρξη.
+Το**"Έντυπο Πορτοφόλι"** είναι ένα ειδικό έγγραφο, που περιέχει κρυφές μνημονικές λέξεις και μία μικρή σειρά από διευθύνσεις. Όταν ένα έντυπο πορτοφόλι δημιουργηθεί** δεν αποθηκεύεται από το Yoroi**. Το PDF έγγραφο που θα δημιουργηθεί είναι το μόνο αντίγραφο αυτού του πορτοφολιού σε ύπαρξη.
 
 You can use a paper wallet to receive coins using the pre-generated addresses. You can restore your paper wallet at any time into Yoroi to access the funds. However, you should stop using a paper wallet after you restore its funds as it will no longer be a "cold" wallet.
 
