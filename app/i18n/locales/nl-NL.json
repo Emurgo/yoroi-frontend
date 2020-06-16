@@ -394,6 +394,7 @@
   "wallet.create.dialog.title": "Maak een Portemonnee",
   "wallet.create.dialog.walletNameHint": "bijv. Winkelportemonnee",
   "wallet.currency.pick.cardano": "Cardano is het eerste, aantoonbaar veilige, \"proof of stake\"-protocol",
+  "wallet.currency.pick.ergo": "Ergo builds advanced cryptographic features and radically new DeFi functionality on the rock-solid foundations laid by a decade of blockchain theory and development",
   "wallet.currency.pick.header": "Kies een valuta of een platform",
   "wallet.dashboard.empty.text": "Ga naar Eenvoudig of Uitgebreid Stemmen om te kiezen in welke Stakepool u wilt delegeren. Let op, u mag in dit Testnet slechts aan één Stakepool delegeren",
   "wallet.dashboard.empty.title": "U heeft uw ADA nog niet gedelegeerd",
