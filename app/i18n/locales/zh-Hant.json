@@ -394,6 +394,7 @@
   "wallet.create.dialog.title": "創建錢包",
   "wallet.create.dialog.walletNameHint": "諸如：購物錢包",
   "wallet.currency.pick.cardano": "Cardano is the first provably secure proof of stake protocol",
+  "wallet.currency.pick.ergo": "Ergo builds advanced cryptographic features and radically new DeFi functionality on the rock-solid foundations laid by a decade of blockchain theory and development",
   "wallet.currency.pick.header": "Pick a currency or platform",
   "wallet.dashboard.empty.text": "Go to Simple or Advance Staking to choose what stake pool you want to delegate in. Note, you may delegate only to one stake pool in this Tesnnet",
   "wallet.dashboard.empty.title": "You have not delegated your ADA yet",
