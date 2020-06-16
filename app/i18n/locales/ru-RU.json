@@ -394,6 +394,7 @@
   "wallet.create.dialog.title": "Создать кошелек",
   "wallet.create.dialog.walletNameHint": "например: Кошелек для шоппинга",
   "wallet.currency.pick.cardano": "Cardano is the first provably secure proof of stake protocol",
+  "wallet.currency.pick.ergo": "Ergo builds advanced cryptographic features and radically new DeFi functionality on the rock-solid foundations laid by a decade of blockchain theory and development",
   "wallet.currency.pick.header": "Pick a currency or platform",
   "wallet.dashboard.empty.text": "Перейдите в Простой или Расширенный стейкинг, чтобы выбрать стейк-пул в который вы хотите делегировать. Обратите внимание, что вы можете делегировать только в один стейк-пул в этом тестнете",
   "wallet.dashboard.empty.title": "Вы еще не делегировали вашу ADA",
