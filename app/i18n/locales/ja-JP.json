@@ -394,6 +394,7 @@
   "wallet.create.dialog.title": "ウォレットを作成",
   "wallet.create.dialog.walletNameHint": "例：ショッピングウォレット",
   "wallet.currency.pick.cardano": "Cardanoは世界初の安全性が実証されたプルーフオブステークプロトコルです",
+  "wallet.currency.pick.ergo": "Ergo builds advanced cryptographic features and radically new DeFi functionality on the rock-solid foundations laid by a decade of blockchain theory and development",
   "wallet.currency.pick.header": "通貨またはプラットフォームを選択",
   "wallet.dashboard.empty.text": "「シンプルステーキング」または「アドバンスステーキング」にアクセスし、委任を行うステークプールを選択してください。本テストネットでは1つのステークプールに対してのみ委任が可能です。",
   "wallet.dashboard.empty.title": "まだADAを委任していません",
