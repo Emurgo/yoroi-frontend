@@ -394,6 +394,7 @@
   "wallet.create.dialog.title": "지갑 생성",
   "wallet.create.dialog.walletNameHint": "예: 쇼핑 지갑",
   "wallet.currency.pick.cardano": "Cardano is the first provably secure proof of stake protocol",
+  "wallet.currency.pick.ergo": "Ergo builds advanced cryptographic features and radically new DeFi functionality on the rock-solid foundations laid by a decade of blockchain theory and development",
   "wallet.currency.pick.header": "Pick a currency or platform",
   "wallet.dashboard.empty.text": "간편 스테이킹 또는 고급 스테이킹을 선택하여 어떤 스테이킹 풀에 위임할지 고르세요. 단, 테스트넷에서는 오직 하나의 스테이킹 풀에만 위임이 가능합니다.",
   "wallet.dashboard.empty.title": "아직 ADA를 위임하지 않았습니다.",
