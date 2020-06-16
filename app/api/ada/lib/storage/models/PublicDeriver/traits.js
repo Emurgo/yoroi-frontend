@@ -40,7 +40,7 @@ import type {
   IChangePasswordRequest, IChangePasswordResponse,
 } from '../common/interfaces';
 import type {
-  IHasPrivateDeriver, IHasLevels, IHasSign,
+  IHasPrivateDeriver, IHasLevels, IHasSign, IConceptualWallet,
 } from '../ConceptualWallet/interfaces';
 
 import {
@@ -50,11 +50,11 @@ import {
   getBalanceForUtxos,
 } from '../utils';
 import {
-  normalizeBip32Ed25519ToPubDeriverLevel,
+  normalizeToPubDeriverLevel,
   rawChangePassword,
   decryptKey,
 } from '../keyUtils';
-import { rawGenAddByHash } from '../../bridge/hashMapper';
+import { rawGenAddByHash } from '../../../../../common/lib/storage/bridge/hashMapper';
 
 import {
   getAllSchemaTables,
@@ -99,7 +99,9 @@ import { CoreAddressTypes } from '../../database/primitives/enums';
 import type { KeyRow, KeyDerivationRow, } from '../../database/primitives/tables';
 import { ModifyKey, ModifyAddress, } from '../../database/primitives/api/write';
 
-import { scanBip44Account, } from '../../../../restoration/byron/scan';
+import { v2genAddressBatchFunc, } from '../../../../restoration/byron/scan';
+import { ergoGenAddressBatchFunc, } from '../../../../../ergo/lib/restoration/scan';
+import { scanBip44Account, } from '../../../../../common/lib/restoration/bip44';
 import { scanCip1852Account } from '../../../../restoration/shelley/scan';
 
 import {
@@ -107,6 +109,7 @@ import {
 } from '../../../../../common/errors';
 
 import { ChainDerivations, } from  '../../../../../../config/numbersConfig';
+import type { CoinTypesT, } from  '../../../../../../config/numbersConfig';
 
 import type {
   Bip44PublicDeriver,
@@ -114,6 +117,7 @@ import type {
 } from './index';
 import { ConceptualWallet } from '../ConceptualWallet/index';
 import { RustModule } from '../../../cardanoCrypto/rustLoader';
+import { fromBase58 } from 'bip32';
 
 interface Empty {}
 type HasPrivateDeriverDependencies = IPublicDeriver<ConceptualWallet & IHasPrivateDeriver>;
@@ -1332,7 +1336,7 @@ const GetSigningKeyMixin = (
       }
       return derivation.Index;
     });
-    return normalizeBip32Ed25519ToPubDeriverLevel({
+    return normalizeToPubDeriverLevel({
       privateKeyRow: body.row,
       password: body.password,
       path: indexPath,
@@ -1379,8 +1383,18 @@ const ScanLegacyCardanoUtxoMixin = (
     body,
     _derivationTables,
   ): Promise<IScanAccountResponse> => {
+    const key = RustModule.WalletV2.Bip44AccountPublic.new(
+      RustModule.WalletV2.PublicKey.from_hex(body.accountPublicKey),
+      RustModule.WalletV2.DerivationScheme.v2()
+    );
+
     return await scanBip44Account({
-      accountPublicKey: body.accountPublicKey,
+      generateInternalAddresses: v2genAddressBatchFunc(
+        key.bip44_chain(false),
+      ),
+      generateExternalAddresses: v2genAddressBatchFunc(
+        key.bip44_chain(true),
+      ),
       lastUsedInternal: body.lastUsedInternal,
       lastUsedExternal: body.lastUsedExternal,
       checkAddressesInUse: body.checkAddressesInUse,
@@ -1390,6 +1404,7 @@ const ScanLegacyCardanoUtxoMixin = (
           ...body.externalAddresses,
         ])
       ),
+      type: CoreAddressTypes.CARDANO_LEGACY,
     });
   }
 });
@@ -1478,6 +1493,69 @@ export function asScanShelleyUtxoInstance<
   obj: T
 ): void | (IScanUtxo & ScanShelleyUtxoDependencies & T) {
   if (obj instanceof ScanShelleyUtxoInstance) {
+    return obj;
+  }
+  return undefined;
+}
+
+// =========================
+//   ScanErgoUtxo
+// =========================
+
+type ScanErgoUtxoDependencies = IPublicDeriver<>;
+const ScanErgoUtxoMixin = (
+  superclass: Class<ScanErgoUtxoDependencies>,
+) => (class ScanErgoUtxo extends superclass implements IScanUtxo {
+  rawScanAccount: (
+    lf$Transaction,
+    {|
+      GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetAddress: Class<GetAddress>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
+    |},
+    IScanAccountRequest,
+    Map<number, string>,
+  ) => Promise<IScanAccountResponse> = async (
+    _tx,
+    _deps,
+    body,
+    _derivationTables,
+  ): Promise<IScanAccountResponse> => {
+    const key = fromBase58(body.accountPublicKey);
+    return await scanBip44Account({
+      generateInternalAddresses: ergoGenAddressBatchFunc(
+        key.derive(ChainDerivations.INTERNAL)
+      ),
+      generateExternalAddresses: ergoGenAddressBatchFunc(
+        key.derive(ChainDerivations.EXTERNAL)
+      ),
+      lastUsedInternal: body.lastUsedInternal,
+      lastUsedExternal: body.lastUsedExternal,
+      checkAddressesInUse: body.checkAddressesInUse,
+      addByHash: rawGenAddByHash(
+        new Set([
+          ...body.internalAddresses,
+          ...body.externalAddresses,
+        ])
+      ),
+      type: CoreAddressTypes.ERGO_P2PK,
+    });
+  }
+});
+
+const ScanErgoUtxo: * = Mixin<
+  ScanErgoUtxoDependencies,
+  IScanUtxo,
+>(ScanErgoUtxoMixin);
+const ScanErgoUtxoInstance = (
+  (ScanErgoUtxo: any): ReturnType<typeof ScanErgoUtxoMixin>
+);
+export function asScanErgoUtxoInstance<
+  T: IPublicDeriver<any>
+>(
+  obj: T
+): void | (IScanUtxo & ScanErgoUtxoDependencies & T) {
+  if (obj instanceof ScanErgoUtxoInstance) {
     return obj;
   }
   return undefined;
@@ -1777,17 +1855,34 @@ export function asGetBalance<T: IPublicDeriver<any>>(
   return undefined;
 }
 
-export async function addTraitsForBip44Child(
+
+type AddBip44TraitsRequest = {|
   db: lf$Database,
   pubDeriver: $ReadOnly<PublicDeriverRow>,
   pubDeriverKeyDerivation: $ReadOnly<KeyDerivationRow>,
-  conceptualWallet: IHasLevels & IHasSign,
+  conceptualWallet: IConceptualWallet & IHasLevels & IHasSign,
   startClass: Class<Bip44PublicDeriver>,
-): Promise<{|
+|};
+type AddBip44TraitsResponse = {|
   finalClass: Class<Bip44PublicDeriver>,
-  pathToPublic: Array<number>,
-|}> {
-  let currClass = startClass;
+|};
+type AddBip44TraitsFunc = (request: AddBip44TraitsRequest) => Promise<AddBip44TraitsResponse>;
+
+
+const traitFuncLookup: {
+  [key: $Call<typeof Number.prototype.toString, CoinTypesT>]: AddBip44TraitsFunc,
+  ...
+} = {
+  /* eslint-disable quote-props */
+  '2147485463': addTraitsForCardanoBip44,
+  '2147484077': addTraitsForErgoBip44,
+  /* eslint-enable quote-props */
+};
+
+export async function addTraitsForCardanoBip44(
+  request: AddBip44TraitsRequest
+): Promise<AddBip44TraitsResponse> {
+  let currClass = request.startClass;
   /**
    * WARNING: If you get a weird error about dependencies in this function
    * There is a high chance it has to do with initialization order
@@ -1807,14 +1902,14 @@ export async function addTraitsForBip44Child(
     const depTables = Object
       .keys(deps)
       .map(key => deps[key])
-      .flatMap(table => getAllSchemaTables(db, table));
+      .flatMap(table => getAllSchemaTables(request.db, table));
     publicKey = await raii<null | $ReadOnly<KeyRow>>(
-      db,
+      request.db,
       depTables,
       async tx => {
         const derivationAndKey = await deps.GetKeyForPublicDeriver.get(
-          db, tx,
-          pubDeriver.PublicDeriverId,
+          request.db, tx,
+          request.pubDeriver.PublicDeriverId,
           true,
           false,
         );
@@ -1828,7 +1923,7 @@ export async function addTraitsForBip44Child(
 
   currClass = AddBip44FromPublic(currClass);
 
-  if (conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.ACCOUNT.level) {
+  if (request.conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.ACCOUNT.level) {
     currClass = DisplayCutoff(currClass);
 
     currClass = HasUtxoChains(Bip44PickInternal(currClass));
@@ -1842,11 +1937,89 @@ export async function addTraitsForBip44Child(
     currClass = GetPublicKey(currClass);
   }
 
-  if (conceptualWallet.getSigningLevel() !== null) {
+  if (request.conceptualWallet.getSigningLevel() !== null) {
     currClass = GetSigningKey(currClass);
   }
   currClass = GetUtxoBalance(currClass);
   currClass = GetBalance(currClass);
+
+  return { finalClass: currClass, };
+}
+export async function addTraitsForErgoBip44(
+  request: AddBip44TraitsRequest
+): Promise<AddBip44TraitsResponse> {
+  let currClass = request.startClass;
+  /**
+   * WARNING: If you get a weird error about dependencies in this function
+   * There is a high chance it has to do with initialization order
+   * If a trait X is added after trait Y
+   * X must come before Y in this file (even if X doesn't depend on Y)
+   */
+  currClass = HasPrivateDeriver(currClass);
+  currClass = HasLevels(currClass);
+  currClass = HasSign(currClass);
+  currClass = (GetAllUtxos(currClass): Class<IGetAllUtxos & Bip44PublicDeriver>);
+
+  let publicKey;
+  {
+    const deps = Object.freeze({
+      GetKeyForPublicDeriver,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(request.db, table));
+    publicKey = await raii<null | $ReadOnly<KeyRow>>(
+      request.db,
+      depTables,
+      async tx => {
+        const derivationAndKey = await deps.GetKeyForPublicDeriver.get(
+          request.db, tx,
+          request.pubDeriver.PublicDeriverId,
+          true,
+          false,
+        );
+        if (derivationAndKey.publicKey === undefined) {
+          throw new StaleStateError('addTraitsForBip44Child publicKey');
+        }
+        return derivationAndKey.publicKey;
+      }
+    );
+  }
+
+  currClass = AddBip44FromPublic(currClass);
+
+  if (request.conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.ACCOUNT.level) {
+    currClass = DisplayCutoff(currClass);
+
+    currClass = HasUtxoChains(Bip44PickInternal(currClass));
+    if (publicKey !== null) {
+      currClass = GetPublicKey(currClass);
+      currClass = ScanErgoUtxo(currClass);
+      currClass = ScanUtxoAccountAddresses(currClass);
+      currClass = ScanAddresses(currClass);
+    }
+  } else if (publicKey !== null) {
+    currClass = GetPublicKey(currClass);
+  }
+
+  if (request.conceptualWallet.getSigningLevel() !== null) {
+    currClass = GetSigningKey(currClass);
+  }
+  currClass = GetUtxoBalance(currClass);
+  currClass = GetBalance(currClass);
+
+  return { finalClass: currClass, };
+}
+
+export async function addTraitsForBip44Child(
+  request: AddBip44TraitsRequest
+): Promise<{|
+  ...AddBip44TraitsResponse,
+  pathToPublic: Array<number>,
+|}> {
+  const traitFunc = traitFuncLookup[request.conceptualWallet.getCoinType().toString()];
+  const { finalClass } = await traitFunc(request);
 
   let pathToPublic;
   {
@@ -1856,16 +2029,17 @@ export async function addTraitsForBip44Child(
     const depTables = Object
       .keys(deps)
       .map(key => deps[key])
-      .flatMap(table => getAllSchemaTables(db, table));
+      .flatMap(table => getAllSchemaTables(request.db, table));
     pathToPublic = await raii<Array<number>>(
-      db,
+      request.db,
       depTables,
       async tx => {
-        const lvlDiff = conceptualWallet.getPublicDeriverLevel() - Bip44DerivationLevels.ROOT.level;
+        const lvl = request.conceptualWallet.getPublicDeriverLevel();
+        const lvlDiff = lvl - Bip44DerivationLevels.ROOT.level;
         const path = await deps.GetDerivationsByPath.getParentPath(
-          db, tx,
+          request.db, tx,
           {
-            startingKey: pubDeriverKeyDerivation,
+            startingKey: request.pubDeriverKeyDerivation,
             numLevels: lvlDiff,
           },
         );
@@ -1881,7 +2055,7 @@ export async function addTraitsForBip44Child(
     );
   }
   return {
-    finalClass: currClass,
+    finalClass,
     pathToPublic,
   };
 }

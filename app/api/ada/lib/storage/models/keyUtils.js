@@ -19,12 +19,26 @@ import {
   encryptWithPassword,
   decryptWithPassword,
 } from '../../../../../utils/passwordCipher';
-
-import { RustModule } from '../../cardanoCrypto/rustLoader';
+import {
+  KeyKind,
+  KeySubkind,
+} from '../../../../common/lib/crypto/keys/types';
+import type {
+  IKey,
+  KeySubkindType
+} from '../../../../common/lib/crypto/keys/types';
+import {
+  BIP32ED25519PrivateKey,
+  BIP32ED25519PublicKey,
+  BIP32PrivateKey,
+  BIP32PublicKey,
+  derivePath,
+  asPrivateKeyInstance,
+} from '../../../../common/lib/crypto/keys/keyRepository';
 
 import { WrongPassphraseError } from '../../cardanoCrypto/cryptoErrors';
 
-export function normalizeBip32Ed25519ToPubDeriverLevel(request: {|
+export function normalizeToPubDeriverLevel(request: {|
   privateKeyRow: $ReadOnly<KeyRow>,
   password: null | string,
   path: Array<number>,
@@ -32,18 +46,21 @@ export function normalizeBip32Ed25519ToPubDeriverLevel(request: {|
   prvKeyHex: string,
   pubKeyHex: string,
 |} {
-  const prvKey = decryptKey(
-    request.privateKeyRow,
-    request.password,
-  );
-  const wasmKey = RustModule.WalletV3.Bip32PrivateKey.from_bytes(Buffer.from(prvKey, 'hex'));
-  const newKey = deriveKey(
-    wasmKey,
+  const key = keyRowToClass({
+    keyRow: request.privateKeyRow,
+    subkind: KeySubkind.Private,
+    password: request.password,
+  });
+
+  const newKey = derivePath(
+    key,
     request.path,
   );
+  const privateKey = asPrivateKeyInstance(newKey);
+  if (privateKey == null) throw new Error(`Should never happen`);
   return {
-    prvKeyHex: Buffer.from(newKey.as_bytes()).toString('hex'),
-    pubKeyHex: Buffer.from(newKey.to_public().as_bytes()).toString('hex'),
+    prvKeyHex: privateKey.toBuffer().toString('hex'),
+    pubKeyHex: privateKey.toPublic().toBuffer().toString('hex'),
   };
 }
 
@@ -65,19 +82,37 @@ export function decryptKey(
   return rawKey;
 }
 
-
-export function deriveKey(
-  startingKey: RustModule.WalletV3.Bip32PrivateKey,
-  pathToPublic: Array<number>,
-): RustModule.WalletV3.Bip32PrivateKey {
-  let currKey = startingKey;
-  for (let i = 0; i < pathToPublic.length; i++) {
-    currKey = currKey.derive(
-      pathToPublic[i],
-    );
+export function keyRowToClass(request: {|
+  keyRow: $ReadOnly<KeyRow>,
+  subkind: KeySubkindType,
+  password: null | string,
+|}): IKey {
+  const key = decryptKey(
+    request.keyRow,
+    request.password,
+  );
+  switch (request.keyRow.Type) {
+    case KeyKind.BIP32ED25519: {
+      if (request.subkind === KeySubkind.Private) {
+        return BIP32ED25519PrivateKey.fromBuffer(Buffer.from(key, 'hex'));
+      }
+      if (request.subkind === KeySubkind.Public) {
+        return BIP32ED25519PublicKey.fromBuffer(Buffer.from(key, 'hex'));
+      }
+      throw new Error(`${nameof(keyRowToClass)} unexpected subtype ${request.keyRow.Type}-${request.subkind}`);
+    }
+    case KeyKind.BIP32: {
+      if (request.subkind === KeySubkind.Private) {
+        return BIP32PrivateKey.fromBuffer(Buffer.from(key, 'hex'));
+      }
+      if (request.subkind === KeySubkind.Public) {
+        return BIP32PublicKey.fromBuffer(Buffer.from(key, 'hex'));
+      }
+      throw new Error(`${nameof(keyRowToClass)} unexpected subtype ${request.keyRow.Type}-${request.subkind}`);
+    }
+    default:
+      throw new Error(`${nameof(keyRowToClass)} unexpected type ${request.keyRow.Type}`);
   }
-
-  return currKey;
 }
 
 export async function rawChangePassword(
@@ -104,6 +139,7 @@ export async function rawChangePassword(
     Hash: newKey,
     IsEncrypted: request.newPassword !== null,
     PasswordLastUpdate: request.currentTime,
+    Type: request.oldKeyRow.Type,
   };
 
   return await deps.ModifyKey.update(

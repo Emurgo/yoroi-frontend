@@ -1,7 +1,6 @@
 // @flow
 import { action, computed, observable } from 'mobx';
 import BigNumber from 'bignumber.js';
-import { LOVELACES_PER_ADA } from '../config/numbersConfig';
 import type { PriceDataRow } from '../api/ada/lib/storage/database/prices/tables';
 import type { AssuranceMode, AssuranceLevel } from '../types/transactionAssuranceTypes';
 import { assuranceLevels } from '../config/transactionAssuranceConfig';
@@ -20,6 +19,8 @@ import type {
 } from '../api/ada/lib/storage/database/primitives/enums';
 import { transactionTypes } from '../api/ada/transactions/types';
 import type { UnconfirmedAmount } from '../types/unconfirmedAmountType';
+import type { ApiOptionType } from '../api/common/utils';
+import { getApiMeta } from '../api/common/utils';
 
 export type TransactionAddresses = {|
   from: Array<{|
@@ -101,7 +102,12 @@ export default class WalletTransaction {
       ...UserAnnotation,
     |},
     addressLookupMap: Map<number, string>,
+    api: ApiOptionType,
   |}): WalletTransaction {
+    const apiMeta = getApiMeta(request.api)?.meta;
+    if (apiMeta == null) throw new Error(`${nameof(WalletTransaction)} no API selected`);
+    const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
+
     const { addressLookupMap, tx } = request;
 
     const toAddr = rows => {
@@ -116,7 +122,7 @@ export default class WalletTransaction {
         }
         result.push({
           address: val,
-          value: new BigNumber(row.Amount).dividedBy(LOVELACES_PER_ADA),
+          value: new BigNumber(row.Amount).dividedBy(amountPerUnit),
         });
       }
       return result;
@@ -126,8 +132,8 @@ export default class WalletTransaction {
       txid: tx.transaction.Hash,
       block: tx.block,
       type: tx.type,
-      amount: tx.amount.dividedBy(LOVELACES_PER_ADA).plus(tx.fee.dividedBy(LOVELACES_PER_ADA)),
-      fee: tx.fee.dividedBy(LOVELACES_PER_ADA),
+      amount: tx.amount.dividedBy(amountPerUnit).plus(tx.fee.dividedBy(amountPerUnit)),
+      fee: tx.fee.dividedBy(amountPerUnit),
       date: tx.block != null
         ? tx.block.BlockTime
         : new Date(tx.transaction.LastUpdateTime),

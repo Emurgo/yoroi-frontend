@@ -13,9 +13,9 @@ When(/^I click the create button$/, async function () {
   await this.click('.WalletAdd_btnCreateWallet');
 });
 
-When(/^I select Cardano$/, async function () {
+When(/^I select the currency ([^"]*)$/, async function (currency) {
   await this.waitForElement('.PickCurrencyOptionDialog');
-  await this.click('.PickCurrencyOptionDialog_cardano');
+  await this.click(`.PickCurrencyOptionDialog_${currency}`);
 });
 
 When(/^I select Create Wallet$/, async function () {

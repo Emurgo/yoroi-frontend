@@ -22,7 +22,6 @@ import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashC
 import RawHash from '../../widgets/hashWrappers/RawHash';
 import type { ExplorerType } from '../../../domain/Explorer';
 import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
-import { formattedWalletAmount } from '../../../utils/formatters';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import WarningBox from '../../widgets/WarningBox';
@@ -37,6 +36,7 @@ type Props = {|
   +transactionFee: BigNumber,
   +onSubmit: ({| password: string |}) => PossiblyAsync<void>,
   +amountToNaturalUnits: (amountWithFractions: string) => string,
+  +formattedWalletAmount: BigNumber => string,
   +onCancel: void => void,
   +isSubmitting: boolean,
   +error: ?LocalizableError,
@@ -188,12 +188,12 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
                       &nbsp;{unitOfAccountSetting.currency}
                     </span>
                   </div>
-                  <div className={styles.amountSmall}>{formattedWalletAmount(amount)}
+                  <div className={styles.amountSmall}>{this.props.formattedWalletAmount(amount)}
                     <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
                   </div>
                 </>
               ) : (
-                <div className={styles.amount}>{formattedWalletAmount(amount)}
+                <div className={styles.amount}>{this.props.formattedWalletAmount(amount)}
                   <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
                 </div>
               )}
@@ -214,13 +214,14 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
                       &nbsp;{unitOfAccountSetting.currency}
                     </span>
                   </div>
-                  <div className={styles.feesSmall}>+{formattedWalletAmount(transactionFee)}
+                  <div className={styles.feesSmall}>
+                    +{this.props.formattedWalletAmount(transactionFee)}
                     <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
                   </div>
                 </>
               ) : (
                 <div className={styles.fees}>
-                  +{formattedWalletAmount(transactionFee)}
+                  +{this.props.formattedWalletAmount(transactionFee)}
                   <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
                 </div>
               )}
@@ -243,12 +244,12 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
                   </span>
                 </div>
                 <div className={styles.totalAmountSmall}>
-                  {formattedWalletAmount(totalAmount)}
+                  {this.props.formattedWalletAmount(totalAmount)}
                   <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
                 </div>
               </>
             ) : (
-              <div className={styles.totalAmount}>{formattedWalletAmount(totalAmount)}
+              <div className={styles.totalAmount}>{this.props.formattedWalletAmount(totalAmount)}
                 <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
               </div>
             )}

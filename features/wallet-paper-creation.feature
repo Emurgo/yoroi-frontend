@@ -7,7 +7,7 @@ Feature: Wallet Paper creation
   @it-77
   Scenario: Paper wallet creation (IT-77)
     When I click the create button
-    Then I select Cardano
+    Then I select the currency cardano
     Then I select Paper Wallet
     Then I open Number of Adddresses selection dropdown
     And I select 2 addresses

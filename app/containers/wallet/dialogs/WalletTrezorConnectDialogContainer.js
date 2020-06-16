@@ -13,8 +13,9 @@ import ConnectDialog from '../../../components/wallet/hwConnect/trezor/ConnectDi
 import SaveDialog from '../../../components/wallet/hwConnect/trezor/SaveDialog';
 
 import { ProgressStep, ProgressInfo } from '../../../types/HWConnectStoreTypes';
-import type { SelectedApiType } from '../../../stores/toplevel/ProfileStore';
+import type { SelectedApiType } from '../../../api/common/utils';
 import LocalizableError from '../../../i18n/LocalizableError';
+import { ApiOptions } from '../../../api/common/utils';
 
 export type GeneratedData = typeof WalletTrezorConnectDialogContainer.prototype.generated;
 
@@ -36,13 +37,19 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
   }
 
   cancel: void => void = () => {
-    this.props.onClose();
     const selectedAPI = this.getSelectedApi();
+    this.props.onClose();
+    if (selectedAPI.type !== ApiOptions.ada) {
+      throw new Error(`${nameof(WalletTrezorConnectDialogContainer)}::${nameof(this.getSelectedApi)} not ADA API`);
+    }
     this.generated.actions[selectedAPI.type].trezorConnect.cancel.trigger();
   };
 
   render(): null | Node {
     const selectedAPI = this.getSelectedApi();
+    if (selectedAPI.type !== ApiOptions.ada) {
+      throw new Error(`${nameof(WalletTrezorConnectDialogContainer)}::${nameof(this.getSelectedApi)} not ADA API`);
+    }
     const { profile } = this.generated.stores;
     const trezorConnectStore = this.generated.stores.substores[selectedAPI.type].trezorConnect;
     const hwConnectActions = this.generated.actions[selectedAPI.type].trezorConnect;

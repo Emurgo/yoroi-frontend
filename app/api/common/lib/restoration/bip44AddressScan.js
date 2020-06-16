@@ -4,7 +4,7 @@
 import { range } from 'lodash';
 import type {
   FilterFunc,
-} from './state-fetch/types';
+} from '../state-fetch/currencySpecificTypes';
 
 type AddressInfo = {|
   address: string,

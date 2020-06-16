@@ -8,13 +8,15 @@ import type {
   RewardHistoryRequest, RewardHistoryResponse,
   BestBlockRequest, BestBlockResponse,
   SignedRequest, SignedResponse,
-  FilterUsedRequest, FilterUsedResponse,
   ReputationRequest, ReputationResponse,
   AccountStateRequest, AccountStateResponse,
   PoolInfoRequest, PoolInfoResponse,
   SignedRequestInternal,
   RemoteTransaction,
 } from './types';
+import type {
+  FilterUsedRequest, FilterUsedResponse,
+} from '../../../common/lib/state-fetch/currencySpecificTypes';
 
 import type { IFetcher } from './IFetcher';
 
@@ -31,7 +33,7 @@ import {
   GetRewardHistoryApiError,
   GetBestBlockError,
   SendTransactionApiError,
-  CheckAdressesInUseApiError,
+  CheckAddressesInUseApiError,
   InvalidWitnessError,
   GetAccountStateApiError,
   GetPoolInfoApiError,
@@ -252,7 +254,7 @@ export class RemoteFetcher implements IFetcher {
     ).then(response => response.data)
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.checkAddressesInUse)} error: ` + stringifyError(error));
-        throw new CheckAdressesInUseApiError();
+        throw new CheckAddressesInUseApiError();
       })
   )
 

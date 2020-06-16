@@ -21,10 +21,6 @@ import AnnotatedLoader from '../../../transfer/AnnotatedLoader';
 import config from '../../../../config';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
-import {
-  DECIMAL_PLACES_IN_ADA,
-} from '../../../../config/numbersConfig';
-
 import WarningBox from '../../../widgets/WarningBox';
 
 const messages = defineMessages({
@@ -47,6 +43,7 @@ type Props = {|
   +classicTheme: boolean,
   +error: ?LocalizableError,
   +generatingTx: boolean,
+  +decimalPlaces: number,
 |};
 
 @observer
@@ -182,7 +179,7 @@ export default class UndelegateDialog extends Component<Props> {
             {intl.formatMessage(globalMessages.walletSendConfirmationFeesLabel)}
           </p>
           <p className={styles.rewardAmount}>
-            {this.props.transactionFee.toFormat(DECIMAL_PLACES_IN_ADA)}&nbsp;
+            {this.props.transactionFee.toFormat(this.props.decimalPlaces)}&nbsp;
             {intl.formatMessage(globalMessages.unitAda).toUpperCase()}
           </p>
         </div>

@@ -4,7 +4,7 @@
 // https://github.com/Emurgo/EmIPs/blob/master/specs/emip-001.md
 
 import { RustModule } from './rustLoader';
-import type { GenerateAddressFunc } from '../adaAddressProcessing';
+import type { GenerateAddressFunc } from '../../../common/lib/restoration/bip44AddressScan';
 import { v2genAddressBatchFunc } from '../../restoration/byron/scan';
 import { Bech32Prefix } from '../../../../config/stringConfig';
 import {

@@ -8,7 +8,7 @@ import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import EpochProgress from '../../../components/wallet/staking/dashboard/EpochProgress';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { CurrentTimeRequests, TimeCalcRequests } from '../../../stores/ada/TimeStore';
+import type { CurrentTimeRequests, TimeCalcRequests } from '../../../stores/ada/AdaTimeStore';
 
 export type GeneratedData = typeof EpochProgressContainer.prototype.generated;
 

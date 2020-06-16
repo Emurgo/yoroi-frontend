@@ -7,8 +7,8 @@ import {
 } from '../scripts/connections';
 
 export const Version = {
-  Shelley: '2.7.10',
-  Byron: '1.10.4',
+  Shelley: '2.7.11',
+  Byron: '1.10.5',
 };
 
 export function genCSP(request: {|

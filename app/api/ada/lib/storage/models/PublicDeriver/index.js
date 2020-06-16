@@ -183,13 +183,13 @@ export async function refreshPublicDeriverFunctionality(
   );
 
   if (parent instanceof Bip44Wallet) {
-    const result = await addTraitsForBip44Child(
+    const result = await addTraitsForBip44Child({
       db,
       pubDeriver,
-      keyDerivation,
-      parent,
-      PublicDeriver,
-    );
+      pubDeriverKeyDerivation: keyDerivation,
+      conceptualWallet: parent,
+      startClass: PublicDeriver,
+    });
     const finalClass = result.finalClass;
     const instance = new finalClass({
       publicDeriverId: pubDeriver.PublicDeriverId,

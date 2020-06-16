@@ -14,7 +14,7 @@ import {
 import type {
   FilterUsedRequest,
   FilterUsedResponse,
-} from './lib/state-fetch/types';
+} from '../common/lib/state-fetch/currencySpecificTypes';
 
 import {
   loadLovefieldDB,

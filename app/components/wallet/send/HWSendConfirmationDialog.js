@@ -17,7 +17,6 @@ import LocalizableError from '../../../i18n/LocalizableError';
 
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../../widgets/hashWrappers/RawHash';
-import { formattedWalletAmount } from '../../../utils/formatters';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 
 import type { ExplorerType } from '../../../domain/Explorer';
@@ -44,7 +43,8 @@ type Props = {|
   +onSubmit: void => PossiblyAsync<void>,
   +onCancel: void => void,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +coinPrice: ?number
+  +coinPrice: ?number,
+  +formattedWalletAmount: BigNumber => string,
 |};
 
 @observer
@@ -121,12 +121,12 @@ export default class HWSendConfirmationDialog extends Component<Props> {
                 {coinPrice != null ? calculateAndFormatValue(amount, coinPrice) : '-'}
                 &nbsp;{unitOfAccountSetting.currency}
               </div>
-              <div className={styles.amountSmall}>{formattedWalletAmount(amount)}
+              <div className={styles.amountSmall}>{this.props.formattedWalletAmount(amount)}
                 <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
               </div>
             </>
           ) : (
-            <div className={styles.amount}>{formattedWalletAmount(amount)}
+            <div className={styles.amount}>{this.props.formattedWalletAmount(amount)}
               <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
             </div>
           )}
@@ -142,12 +142,12 @@ export default class HWSendConfirmationDialog extends Component<Props> {
                 {coinPrice != null ? calculateAndFormatValue(transactionFee, coinPrice) : '-'}
                 &nbsp;{unitOfAccountSetting.currency}
               </div>
-              <div className={styles.feesSmall}>+{formattedWalletAmount(transactionFee)}
+              <div className={styles.feesSmall}>+{this.props.formattedWalletAmount(transactionFee)}
                 <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
               </div>
             </>
           ) : (
-            <div className={styles.fees}>+{formattedWalletAmount(transactionFee)}
+            <div className={styles.fees}>+{this.props.formattedWalletAmount(transactionFee)}
               <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
             </div>
           )}
@@ -165,12 +165,12 @@ export default class HWSendConfirmationDialog extends Component<Props> {
               {coinPrice != null ? calculateAndFormatValue(totalAmount, coinPrice) : '-'}
               &nbsp;{unitOfAccountSetting.currency}
             </div>
-            <div className={styles.totalAmountSmall}>{formattedWalletAmount(totalAmount)}
+            <div className={styles.totalAmountSmall}>{this.props.formattedWalletAmount(totalAmount)}
               <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
             </div>
           </>
         ) : (
-          <div className={styles.totalAmount}>{formattedWalletAmount(totalAmount)}
+          <div className={styles.totalAmount}>{this.props.formattedWalletAmount(totalAmount)}
             <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
           </div>
         )}

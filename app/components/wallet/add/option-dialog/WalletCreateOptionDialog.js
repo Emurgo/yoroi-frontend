@@ -25,7 +25,7 @@ const messages = defineMessages({
 
 type Props = {|
   +onCancel: void => void,
-  +onPaper: void => void,
+  +onPaper: void | (void => void),
   +onCreate: void => void,
 |};
 
@@ -37,7 +37,7 @@ export default class WalletCreateOptionDialog extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { onCancel, onCreate, onPaper, } = this.props;
+    const { onCancel, onCreate, } = this.props;
 
     return (
       <Dialog
@@ -56,13 +56,13 @@ export default class WalletCreateOptionDialog extends Component<Props> {
               learnMoreText={intl.formatMessage(messages.createNormalDescription)}
               onSubmit={onCreate}
             />
-            {!environment.isShelley() &&
+            {!environment.isShelley() && this.props.onPaper != null &&
               <OptionBlock
                 parentName="WalletCreateOptionDialog"
                 type="restorePaperWallet"
+                onSubmit={this.props.onPaper}
                 title={intl.formatMessage(globalMessages.paperWalletLabel)}
                 learnMoreText={intl.formatMessage(messages.createPaperWalletDescription)}
-                onSubmit={onPaper}
               />
             }
           </ul>

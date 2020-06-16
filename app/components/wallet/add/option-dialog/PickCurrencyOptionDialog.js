@@ -9,6 +9,7 @@ import globalMessages from '../../../../i18n/global-messages';
 import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import OptionBlock from '../../../widgets/options/OptionBlock';
+import environment from '../../../../environment';
 
 import styles from '../../../widgets/options/OptionListWrapperStyle.scss';
 
@@ -21,11 +22,16 @@ const messages = defineMessages({
     id: 'wallet.currency.pick.cardano',
     defaultMessage: '!!!Cardano is the first provably secure proof of stake protocol',
   },
+  ergoDescription: {
+    id: 'wallet.currency.pick.ergo',
+    defaultMessage: '!!!Ergo builds advanced cryptographic features and radically new DeFi functionality on the rock-solid foundations laid by a decade of blockchain theory and development',
+  },
 });
 
 type Props = {|
   +onCancel: void => void,
   +onCardano: void => void,
+  +onErgo: void | (void => void),
   +onExternalLinkClick: MouseEvent => void,
 |};
 
@@ -37,13 +43,12 @@ export default class PickCurrencyOptionDialog extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { onCancel, onCardano, } = this.props;
 
     return (
       <Dialog
         title={intl.formatMessage(messages.dialogTitle)}
         closeOnOverlayClick={false}
-        onClose={onCancel}
+        onClose={this.props.onCancel}
         closeButton={<DialogCloseButton />}
         className="PickCurrencyOptionDialog"
       >
@@ -63,8 +68,28 @@ export default class PickCurrencyOptionDialog extends Component<Props> {
                     {intl.formatMessage(globalMessages.learnMore)}
                   </a>
                 </>}
-              onSubmit={onCardano}
+              onSubmit={this.props.onCardano}
             />
+            {!environment.isShelley() && this.props.onErgo != null && (
+              !environment.isProduction() || environment.isNightly() || environment.isTest()
+            ) &&
+              <OptionBlock
+                parentName="PickCurrencyOptionDialog"
+                type="ergo"
+                title="Ergo"
+                onSubmit={this.props.onErgo}
+                learnMoreText={
+                  <>
+                    {intl.formatMessage(messages.ergoDescription)}<br />
+                    <a
+                      href="https://ergoplatform.org/en/"
+                      onClick={event => this.props.onExternalLinkClick(event)}
+                    >
+                      {intl.formatMessage(globalMessages.learnMore)}
+                    </a>
+                  </>}
+              />
+            }
           </ul>
         </div>
       </Dialog>

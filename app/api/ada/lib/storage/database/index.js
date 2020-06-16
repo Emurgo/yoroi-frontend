@@ -25,6 +25,7 @@ import { populateMultipartTransactionsDb } from './transactionModels/multipart/t
 import { populateWalletDb } from './walletTypes/core/tables';
 import { populateMemoTransactionsDb } from './memos/tables';
 import { populatePricesDb } from './prices/tables';
+import { KeyKind } from '../../../../common/lib/crypto/keys/types';
 
 // global var from window.indexedDB
 declare var indexedDB: IDBFactory;
@@ -76,7 +77,7 @@ export const loadLovefieldDB = async (
 const populateAndCreate = async (
   storeType: $Values<typeof schema.DataStoreType>
 ): Promise<lf$Database> => {
-  const schemaBuilder = schema.create('yoroi-schema', 9);
+  const schemaBuilder = schema.create('yoroi-schema', 10);
 
   populatePrimitivesDb(schemaBuilder);
   populateWalletDb(schemaBuilder);
@@ -186,6 +187,14 @@ async function onUpgrade(
     await rawDb.dropTableColumn(
       'Cip1852Wrapper',
       'Cip1852WrapperId',
+    );
+  }
+
+  if (version >= 3 && version <= 10) {
+    await rawDb.addTableColumn(
+      'Key',
+      'Type',
+      KeyKind.BIP32ED25519,
     );
   }
 }

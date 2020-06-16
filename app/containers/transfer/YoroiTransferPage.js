@@ -30,6 +30,8 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { GeneratedData as YoroiPlateData } from './YoroiPlatePage';
 import type { ExplorerType } from '../../domain/Explorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import { RestoreMode } from '../../actions/common/wallet-restore-actions';
+import { ApiOptions, getApiMeta } from '../../api/common/utils';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
@@ -135,7 +137,9 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
     const { stores } = this.generated;
     const { profile } = stores;
     const yoroiTransfer = this.generated.stores.substores.ada.yoroiTransfer;
-    const adaWallet = this.generated.stores.substores.ada.wallets;
+
+    const apiMeta = getApiMeta(ApiOptions.ada);
+    if (apiMeta == null) throw new Error(`${nameof(YoroiTransferPage)} no API selected`);
 
     const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
       ? (
@@ -150,9 +154,10 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
           <YoroiTransferFormPage
             onSubmit={this.setupTransferFundsWithMnemonic}
             onBack={this.backToUninitialized}
-            mnemonicValidator={mnemonic => adaWallet.isValidMnemonic({
+            mnemonicValidator={mnemonic => this.generated.stores.walletRestore.isValidMnemonic({
               mnemonic,
-              numberOfWords: config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT
+              numberOfWords: config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT,
+              mode: RestoreMode.REGULAR,
             })}
             validWords={validWords}
             mnemonicLength={config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT}
@@ -164,9 +169,10 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
           <YoroiPaperWalletFormPage
             onSubmit={this.setupTransferFundsWithPaperMnemonic}
             onBack={this.backToUninitialized}
-            mnemonicValidator={mnemonic => adaWallet.isValidPaperMnemonic({
+            mnemonicValidator={mnemonic => this.generated.stores.walletRestore.isValidMnemonic({
               mnemonic,
-              numberOfWords: config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT
+              numberOfWords: config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT,
+              mode: RestoreMode.PAPER,
             })}
             validWords={validWords}
             mnemonicLength={config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT}
@@ -216,7 +222,10 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         return (
           <TransferSummaryPage
             form={null}
-            formattedWalletAmount={formattedWalletAmount}
+            formattedWalletAmount={amount => formattedWalletAmount(
+              amount,
+              apiMeta.meta.decimalPlaces.toNumber(),
+            )}
             selectedExplorer={this.generated.stores.profile.selectedExplorer}
             transferTx={yoroiTransfer.transferTx}
             onSubmit={this.transferFunds}
@@ -308,16 +317,6 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
       |},
       substores: {|
         ada: {|
-          wallets: {|
-            isValidMnemonic: ({|
-              mnemonic: string,
-              numberOfWords: number
-            |}) => boolean,
-            isValidPaperMnemonic: ({|
-              mnemonic: string,
-              numberOfWords: number
-            |}) => boolean
-          |},
           yoroiTransfer: {|
             error: ?LocalizableError,
             nextInternalAddress: (
@@ -329,6 +328,13 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
             transferTx: ?TransferTx
           |}
         |}
+      |},
+      walletRestore: {|
+        isValidMnemonic: ({|
+          mnemonic: string,
+          numberOfWords: number,
+          mode: $PropertyType<typeof RestoreMode, 'REGULAR'> | $PropertyType<typeof RestoreMode, 'PAPER'>,
+        |}) => boolean,
       |},
       wallets: {|
         activeWalletRoute: ?string,
@@ -363,12 +369,11 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         coinPriceStore: {
           getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
         },
+        walletRestore: {
+          isValidMnemonic: stores.walletRestore.isValidMnemonic,
+        },
         substores: {
           ada: {
-            wallets: {
-              isValidMnemonic: adaStores.wallets.isValidMnemonic,
-              isValidPaperMnemonic: adaStores.wallets.isValidPaperMnemonic,
-            },
             yoroiTransfer: {
               status: adaStores.yoroiTransfer.status,
               error: adaStores.yoroiTransfer.error,

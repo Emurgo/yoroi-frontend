@@ -7,10 +7,12 @@ import type {
   CertificateRelationType,
 } from './enums';
 import type { CertificateKindType } from '@emurgo/js-chain-libs/js_chain_libs';
+import type { KeyKindType } from '../../../../../common/lib/crypto/keys/types';
 
 export type KeyInsert = {|
   Hash: string,
   IsEncrypted: boolean,
+  Type: KeyKindType,
   PasswordLastUpdate: Date | null,
 |};
 export type KeyRow = {|
@@ -24,6 +26,7 @@ export const KeySchema: {|
   name: 'Key',
   properties: {
     KeyId: 'KeyId',
+    Type: 'Type',
     Hash: 'Hash',
     IsEncrypted: 'IsEncrypted',
     PasswordLastUpdate: 'PasswordLastUpdate',
@@ -289,6 +292,7 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
   // Key Table
   schemaBuilder.createTable(KeySchema.name)
     .addColumn(KeySchema.properties.KeyId, Type.INTEGER)
+    .addColumn(KeySchema.properties.Type, Type.INTEGER)
     .addColumn(KeySchema.properties.Hash, Type.STRING)
     .addColumn(KeySchema.properties.IsEncrypted, Type.BOOLEAN)
     .addColumn(KeySchema.properties.PasswordLastUpdate, Type.DATE_TIME)

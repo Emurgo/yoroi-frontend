@@ -7,7 +7,6 @@ import {
   Logger,
   stringifyError,
 } from '../../../../utils/logging';
-import { LOVELACES_PER_ADA } from '../../../../config/numbersConfig';
 import {
   GenerateTransferTxError
 } from '../../errors';
@@ -21,6 +20,7 @@ import type {
   TransferTx
 } from '../../../../types/TransferTypes';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
+import { getAdaCurrencyMeta } from '../../currencyInfo';
 
 /**
  * Generate transaction including all addresses with no change.
@@ -63,10 +63,11 @@ export async function buildYoroiTransferTx(payload: {|
       ,
     );
 
+    const lovelacesPerAda = new BigNumber(10).pow(getAdaCurrencyMeta().decimalPlaces);
     // return summary of transaction
     return {
-      recoveredBalance: totalBalance.dividedBy(LOVELACES_PER_ADA),
-      fee: fee.dividedBy(LOVELACES_PER_ADA),
+      recoveredBalance: totalBalance.dividedBy(lovelacesPerAda),
+      fee: fee.dividedBy(lovelacesPerAda),
       id: signedTx.id(),
       encodedTx: Buffer.from(signedTx.to_hex(), 'hex'),
       // only display unique addresses

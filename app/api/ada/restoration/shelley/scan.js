@@ -4,12 +4,12 @@
 
 import {
   discoverAllAddressesFrom,
-} from '../../lib/adaAddressProcessing';
+} from '../../../common/lib/restoration/bip44AddressScan';
 import type {
   GenerateAddressFunc,
-} from '../../lib/adaAddressProcessing';
+} from '../../../common/lib/restoration/bip44AddressScan';
 import type { ConfigType } from '../../../../../config/config-types';
-import type { FilterFunc } from '../../lib/state-fetch/types';
+import type { FilterFunc } from '../../../common/lib/state-fetch/currencySpecificTypes';
 
 import {
   ChainDerivations, BIP44_SCAN_SIZE,
@@ -21,7 +21,7 @@ import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import type {
   TreeInsert, InsertRequest,
 } from '../../lib/storage/database/walletTypes/common/utils';
-import type { AddByHashFunc, } from '../../lib/storage/bridge/hashMapper';
+import type { AddByHashFunc, } from '../../../common/lib/storage/bridge/hashMapper';
 import type { AddressDiscriminationType } from '@emurgo/js-chain-libs/js_chain_libs';
 import type { CanonicalAddressInsert } from '../../lib/storage/database/primitives/tables';
 import { CoreAddressTypes } from '../../lib/storage/database/primitives/enums';

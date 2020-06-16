@@ -4,7 +4,6 @@
 // Utility functions for handling the private master key
 
 import {
-  validateMnemonic,
   generateMnemonic,
   mnemonicToEntropy,
   mnemonicToSeedSync,
@@ -15,20 +14,6 @@ import { RustModule } from './rustLoader';
 
 /** Generate a random mnemonic based on 160-bits of entropy (15 words) */
 export const generateAdaMnemonic: void => Array<string> = () => generateMnemonic(160).split(' ');
-
-/** Check validity of mnemonic (including checksum) */
-export const isValidEnglishAdaMnemonic = (
-  phrase: string,
-  numberOfWords: number
-): boolean => {
-  // Note: splitting on spaces will not work for Japanese-encoded mnemonics who use \u3000 instead
-  // We only use English mnemonics in Yoroi so this is okay.
-  const split = phrase.split(' ');
-  if (split.length !== numberOfWords) {
-    return false;
-  }
-  return validateMnemonic(phrase);
-};
 
 export const hashRepeatedly = (seed: Buffer): [Buffer, Buffer] => {
   let currSeed = seed;

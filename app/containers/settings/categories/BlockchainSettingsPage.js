@@ -17,6 +17,11 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { ExplorerType } from '../../../domain/Explorer';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import LocalizableError from '../../../i18n/LocalizableError';
+import {
+  PublicDeriver,
+} from '../../../api/ada/lib/storage/models/PublicDeriver/index';
+import NoWalletMessage from '../../../components/wallet/settings/NoWalletMessage';
+import { CoinTypes, } from '../../../config/numbersConfig';
 
 const currencyLabels = defineMessages({
   USD: {
@@ -66,6 +71,12 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
   };
 
   render(): Node {
+    const walletsStore = this.generated.stores.wallets;
+    if (walletsStore.selected == null) {
+      return (<NoWalletMessage />);
+    }
+    const coinType = walletsStore.selected.getParent().getCoinType();
+
     const profileStore = this.generated.stores.profile;
     const coinPriceStore = this.generated.stores.coinPriceStore;
 
@@ -74,7 +85,11 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
       || coinPriceStore.refreshCurrentUnit.isExecuting;
     const explorerOptions = getExplorers();
 
-    const uriSettings = !environment.isShelley() && this.generated.canRegisterProtocol()
+    const uriSettings = (
+      coinType === CoinTypes.CARDANO &&
+      !environment.isShelley() &&
+      this.generated.canRegisterProtocol()
+    )
       ? (
         <UriSettingsBlock
           registerUriScheme={() => registerProtocols()}
@@ -169,6 +184,9 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
           isExecuting: boolean
         |},
         unitOfAccount: UnitOfAccountSettingType
+      |},
+      wallets: {|
+        selected: null | PublicDeriver<>
       |}
     |}
     |} {
@@ -201,6 +219,9 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
           refreshCurrentUnit: {
             isExecuting: stores.coinPriceStore.refreshCurrentUnit.isExecuting,
           },
+        },
+        wallets: {
+          selected: stores.wallets.selected,
         },
       },
       actions: {

@@ -50,6 +50,10 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
     return this.db;
   }
 
+  getCoinType(): CoinTypesT {
+    return this.coinType;
+  }
+
   getConceptualWalletId(): number {
     return this.#conceptualWalletId;
   }

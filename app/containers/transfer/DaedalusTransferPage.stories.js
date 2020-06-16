@@ -19,7 +19,6 @@ import DaedalusTransferPage from './DaedalusTransferPage';
 import type { MockDaedalusTransferStore } from './DaedalusTransferPage';
 import { TransferStatus } from '../../types/TransferTypes';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import AdaApi from '../../api/ada/index';
 import {
   TransferFundsError,
   NoTransferTxError,
@@ -29,6 +28,8 @@ import {
   GenerateTransferTxError,
   NotEnoughMoneyToSendError,
 } from '../../api/ada/errors';
+import AdaApi from '../../api/ada/index';
+import { RestoreMode } from '../../actions/common/wallet-restore-actions';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -54,12 +55,17 @@ const genBaseProps: {|
     coinPriceStore: {
       getCurrentPrice: (_from, _to) => 5,
     },
+    walletRestore: {
+      isValidMnemonic: (isValidRequest) => {
+        const { mnemonic, numberOfWords } = isValidRequest;
+        if (isValidRequest.mode === RestoreMode.REGULAR) {
+          return AdaApi.isValidMnemonic({ mnemonic, numberOfWords });
+        }
+        return AdaApi.prototype.isValidPaperMnemonic({ mnemonic, numberOfWords });
+      },
+    },
     substores: {
       ada: {
-        wallets: {
-          isValidMnemonic: AdaApi.prototype.isValidMnemonic,
-          isValidPaperMnemonic: AdaApi.prototype.isValidPaperMnemonic,
-        },
         daedalusTransfer: {
           status: TransferStatus.UNINITIALIZED,
           error: undefined,

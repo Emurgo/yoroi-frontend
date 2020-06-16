@@ -11,11 +11,13 @@ import globalMessages from '../../i18n/global-messages';
 import type { Notification } from '../../types/notificationType';
 import type {
   CreateWalletResponse,
-  RestoreWalletResponse,
 } from '../../api/ada';
 import type {
-  GetWalletsFunc
+  GetWalletsFunc,
 } from '../../api/common/index';
+import type {
+  RestoreWalletResponse,
+} from '../../api/common/types';
 import {
   getWallets
 } from '../../api/common/index';
@@ -38,7 +40,7 @@ import { assuranceModes, } from '../../config/transactionAssuranceConfig';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { legacyWalletChecksum } from '@emurgo/cip4-js';
 import { createDebugWalletDialog } from '../../containers/wallet/dialogs/DebugWalletDialogContainer';
-import { getApiForCoinType } from '../../api/index';
+import { getApiForCoinType } from '../../api/common/utils';
 
 type GroupedWallets = {|
   publicDerivers: Array<PublicDeriver<>>;
@@ -369,6 +371,9 @@ export default class WalletStore extends Store {
     this.stores.transactions.addObservedWallet(request);
     stores.time.addObservedTime(request.publicDeriver);
     if (asGetStakingKey(request.publicDeriver) != null) {
+      if (!stores.delegation) {
+        throw new Error(`${nameof(this.registerObserversForNewWallet)} wallet has staking key but currency doesn't support delegation`);
+      }
       stores.delegation.addObservedWallet(request.publicDeriver);
     }
   };

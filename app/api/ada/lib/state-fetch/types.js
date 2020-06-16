@@ -70,12 +70,6 @@ export type SignedRequest = {|
 export type SignedResponse = {| txId: string, |};
 export type SendFunc = (body: SignedRequest) => Promise<SignedResponse>;
 
-// checkAddressesInUse
-
-export type FilterUsedRequest = {| addresses: Array<string>, |};
-export type FilterUsedResponse = Array<string>;
-export type FilterFunc = (body: FilterUsedRequest) => Promise<FilterUsedResponse>;
-
 // getAccountState
 
 export type AccountStateRequest = {|

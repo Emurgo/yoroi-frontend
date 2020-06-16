@@ -174,6 +174,7 @@ type Props = {|
   |},
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
+  +decimalPlaces: number, // TODO: this should be tied to individual values, not the currency itself
 |};
 
 type State = {|
@@ -246,6 +247,7 @@ export default class Transaction extends Component<Props, State> {
 
   renderAmountDisplay: {|
     amount: BigNumber,
+    decimalPlaces: number,
   |} => Node = (request) => {
     if (this.props.shouldHideBalance) {
       return (<span>******</span>);
@@ -263,7 +265,10 @@ export default class Transaction extends Component<Props, State> {
         </>
       );
     }
-    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(request.amount);
+    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
+      request.amount,
+      request.decimalPlaces
+    );
 
     // we may need to explicitly add + for positive values
     const adjustedBefore = beforeDecimalRewards.startsWith('-')
@@ -280,6 +285,7 @@ export default class Transaction extends Component<Props, State> {
 
   renderFeeDisplay: {|
     amount: BigNumber,
+    decimalPlaces: number,
     type: TransactionDirectionType,
   |} => Node = (request) => {
     if (this.props.shouldHideBalance) {
@@ -300,7 +306,10 @@ export default class Transaction extends Component<Props, State> {
     if (request.type === transactionTypes.INCOME) {
       return (<span>-</span>);
     }
-    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(request.amount.abs());
+    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
+      request.amount.abs(),
+      request.decimalPlaces
+    );
 
     return (
       <>
@@ -382,11 +391,13 @@ export default class Transaction extends Component<Props, State> {
                 {this.renderFeeDisplay({
                   amount: data.fee,
                   type: data.type,
+                  decimalPlaces: this.props.decimalPlaces,
                 })}
               </div>
               <div className={classnames([styles.currency, styles.amount])}>
                 {this.renderAmountDisplay({
                   amount: data.amount,
+                  decimalPlaces: this.props.decimalPlaces,
                 })}
                 {this.props.unitOfAccount.primaryTicker === 'ADA' && (
                   <span className={styles.currencySymbol}><AdaSymbol /></span>
@@ -459,7 +470,8 @@ export default class Transaction extends Component<Props, State> {
                           </div>
                           <div className={styles.fee}>
                             {this.renderAmountDisplay({
-                              amount: address.value.negated()
+                              amount: address.value.negated(),
+                              decimalPlaces: this.props.decimalPlaces,
                             })} {this.props.unitOfAccount.primaryTicker}
                           </div>
                         </div>
@@ -513,7 +525,8 @@ export default class Transaction extends Component<Props, State> {
                           </div>
                           <div className={styles.fee}>
                             {this.renderAmountDisplay({
-                              amount: address.value
+                              amount: address.value,
+                              decimalPlaces: this.props.decimalPlaces,
                             })} {this.props.unitOfAccount.primaryTicker}
                           </div>
                         </div>);

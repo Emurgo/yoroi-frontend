@@ -11,11 +11,6 @@ import globalMessages from '../../i18n/global-messages';
 import { tryAddressToKind } from '../../api/ada/lib/storage/bridge/utils';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 
-import {
-  DECIMAL_PLACES_IN_ADA,
-  MAX_INTEGER_PLACES_IN_ADA
-} from '../../config/numbersConfig';
-
 import WalletSendForm from '../../components/wallet/send/WalletSendForm';
 // Web Wallet Confirmation
 import WalletSendConfirmationDialogContainer from './dialogs/WalletSendConfirmationDialogContainer';
@@ -34,7 +29,6 @@ import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWal
 import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { SelectedApiType } from '../../stores/toplevel/ProfileStore';
 import type { SendUsingLedgerParams } from '../../actions/ada/ledger-send-actions';
 import type { SendUsingTrezorParams } from '../../actions/ada/trezor-send-actions';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -43,6 +37,9 @@ import type { ExplorerType } from '../../domain/Explorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { BaseSignRequest } from '../../api/ada/transactions/types';
+import { ApiOptions, getApiForCoinType, getApiMeta } from '../../api/common/utils';
+import { isWithinSupply } from '../../utils/validations';
+import { formattedWalletAmount } from '../../utils/formatters';
 
 // Hardware Wallet Confirmation
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
@@ -94,31 +91,36 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     });
   }
 
-  getSelectedApi: void => SelectedApiType = () => {
-    const { selectedAPI } = this.generated.stores.profile;
-    if (selectedAPI === undefined) {
-      throw new Error(`${nameof(WalletSendPage)} no API selected`);
-    }
-    return selectedAPI;
-  }
-
   @action
   toggleShowMemo: void => void = () => {
     this.showMemo = !this.showMemo;
   };
 
+  getApiType: PublicDeriver<> => 'ada' = (publicDeriver) => {
+    const selectedApiType = getApiForCoinType(publicDeriver.getParent().getCoinType());
+    if (selectedApiType !== ApiOptions.ada) {
+      throw new Error(`${nameof(WalletSendPage)} sending only supported for ADA`);
+    }
+    return (selectedApiType: any);
+  }
+
   render(): Node {
-    const selectedAPI = this.getSelectedApi();
-    const { transactions, transactionBuilderStore } = this.generated.stores.substores.ada;
     const publicDeriver = this.generated.stores.wallets.selected;
     // Guard against potential null values
-    if (!publicDeriver) throw new Error('Active wallet required for WalletSendPage.');
+    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(WalletSendPage)}.`);
+
+    const selectedApiType = this.getApiType(publicDeriver);
+    const apiMeta = getApiMeta(selectedApiType)?.meta;
+    if (apiMeta == null) throw new Error(`${nameof(WalletSendPage)} no API selected`);
+
+    const { transactionBuilderStore } = this.generated.stores.substores[
+      selectedApiType
+    ];
 
     const { uiDialogs, profile, } = this.generated.stores;
     const { actions } = this.generated;
-    const { validateAmount } = transactions;
     const { hasAnyPending } = this.generated.stores.transactions;
-    const { txBuilderActions } = this.generated.actions.ada;
+    const { txBuilderActions } = this.generated.actions[selectedApiType];
 
     // disallow sending when pending tx exists
     if (uiDialogs.isOpen && hasAnyPending) {
@@ -141,12 +143,14 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       <>
         <WalletSendForm
           currencyUnit={{
-            unitName: selectedAPI.meta.unitName,
-            primaryTicker: selectedAPI.meta.primaryTicker,
+            unitName: apiMeta.unitName,
+            primaryTicker: apiMeta.primaryTicker,
           }}
-          currencyMaxIntegerDigits={MAX_INTEGER_PLACES_IN_ADA}
-          currencyMaxFractionalDigits={DECIMAL_PLACES_IN_ADA}
-          validateAmount={validateAmount}
+          currencyMaxIntegerDigits={
+            apiMeta.totalSupply.div(apiMeta.decimalPlaces).toFixed().length
+          }
+          currencyMaxFractionalDigits={apiMeta.decimalPlaces.toNumber()}
+          validateAmount={amount => Promise.resolve(isWithinSupply(amount, apiMeta.totalSupply))}
           onSubmit={onSubmit}
           isValidShelleyAddress={address => {
             const kind = tryAddressToKind(address, 'bech32');
@@ -205,7 +209,13 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
   webWalletDoConfirmation: (() => Node) = () => {
     const { intl } = this.context;
 
-    const { transactionBuilderStore } = this.generated.stores.substores.ada;
+    const publicDeriver = this.generated.stores.wallets.selected;
+    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(this.webWalletDoConfirmation)}.`);
+    const selectedApiType = this.getApiType(publicDeriver);
+    const apiMeta = getApiMeta(selectedApiType)?.meta;
+    if (apiMeta == null) throw new Error(`${nameof(this.hardwareWalletDoConfirmation)} no API selected`);
+
+    const { transactionBuilderStore } = this.generated.stores.substores[selectedApiType];
     if (!transactionBuilderStore.tentativeTx) {
       throw new Error('webWalletDoConfirmation::should never happen');
     }
@@ -213,8 +223,10 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
 
     const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
       ? (
-        this.generated.stores.coinPriceStore
-          .getCurrentPrice('ADA', this.generated.stores.profile.unitOfAccount.currency)
+        this.generated.stores.coinPriceStore.getCurrentPrice(
+          apiMeta.primaryTicker,
+          this.generated.stores.profile.unitOfAccount.currency
+        )
       )
       : null;
 
@@ -232,10 +244,19 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     * Callback that creates a component to avoid the component knowing about actions/stores
     * separate container is not needed, this container acts as container for Confirmation dialog */
   hardwareWalletDoConfirmation: (() => Node) = () => {
-    const selectedAPI = this.getSelectedApi();
-    const { intl } = this.context;
     const publicDeriver = this.generated.stores.wallets.selected;
-    const { transactionBuilderStore } = this.generated.stores.substores.ada;
+    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(this.webWalletDoConfirmation)}.`);
+    const selectedApiType = getApiForCoinType(publicDeriver.getParent().getCoinType());
+    const apiMeta = getApiMeta(selectedApiType)?.meta;
+    if (apiMeta == null) throw new Error(`${nameof(this.hardwareWalletDoConfirmation)} no API selected`);
+
+    if (selectedApiType !== ApiOptions.ada) {
+      throw new Error(`${nameof(this.hardwareWalletDoConfirmation)} not ADA API type`);
+    }
+    const adaApi = ApiOptions.ada;
+
+    const { intl } = this.context;
+    const { transactionBuilderStore } = this.generated.stores.substores[adaApi];
     // Guard against potential null values
     if (!publicDeriver) throw new Error('Active wallet required for hardwareWalletDoConfirmation.');
 
@@ -250,8 +271,10 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
 
     const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
       ? (
-        this.generated.stores.coinPriceStore
-          .getCurrentPrice('ADA', this.generated.stores.profile.unitOfAccount.currency)
+        this.generated.stores.coinPriceStore.getCurrentPrice(
+          apiMeta.primaryTicker,
+          this.generated.stores.profile.unitOfAccount.currency
+        )
       )
       : null;
 
@@ -267,9 +290,9 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       unsignedTx,
     };
     if (isLedgerNanoWallet(conceptualWallet)) {
-      const ledgerSendAction = this.generated.actions[selectedAPI.type].ledgerSend;
+      const ledgerSendAction = this.generated.actions[adaApi].ledgerSend;
       ledgerSendAction.init.trigger();
-      const ledgerSendStore = this.generated.stores.substores[selectedAPI.type].ledgerSend;
+      const ledgerSendStore = this.generated.stores.substores[adaApi].ledgerSend;
       hwSendConfirmationDialog = (
         <HWSendConfirmationDialog
           staleTx={transactionBuilderStore.txMismatch}
@@ -291,10 +314,14 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           onCancel={ledgerSendAction.cancel.trigger}
           unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
           coinPrice={coinPrice}
+          formattedWalletAmount={amount => formattedWalletAmount(
+            amount,
+            apiMeta.decimalPlaces.toNumber()
+          )}
         />);
     } else if (isTrezorTWallet(conceptualWallet)) {
-      const trezorSendAction = this.generated.actions[selectedAPI.type].trezorSend;
-      const trezorSendStore = this.generated.stores.substores[selectedAPI.type].trezorSend;
+      const trezorSendAction = this.generated.actions[adaApi].trezorSend;
+      const trezorSendStore = this.generated.stores.substores[adaApi].trezorSend;
       hwSendConfirmationDialog = (
         <HWSendConfirmationDialog
           staleTx={transactionBuilderStore.txMismatch}
@@ -316,6 +343,10 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           onCancel={trezorSendAction.cancel.trigger}
           unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
           coinPrice={coinPrice}
+          formattedWalletAmount={amount => formattedWalletAmount(
+            amount,
+            apiMeta.decimalPlaces.toNumber()
+          )}
         />);
     } else {
       throw new Error('Unsupported hardware wallet found at hardwareWalletDoConfirmation.');
@@ -436,7 +467,6 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       |},
       profile: {|
         isClassicTheme: boolean,
-        selectedAPI: void | SelectedApiType,
         selectedExplorer: ExplorerType,
         unitOfAccount: UnitOfAccountSettingType
       |},
@@ -458,9 +488,6 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
             >,
             totalInput: ?BigNumber,
             txMismatch: boolean
-          |},
-          transactions: {|
-            validateAmount: string => Promise<boolean>
           |},
           trezorSend: {|
             error: ?LocalizableError,
@@ -487,7 +514,6 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     return Object.freeze({
       stores: {
         profile: {
-          selectedAPI: stores.profile.selectedAPI,
           isClassicTheme: stores.profile.isClassicTheme,
           selectedExplorer: stores.profile.selectedExplorer,
           unitOfAccount: stores.profile.unitOfAccount,
@@ -514,9 +540,6 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
         },
         substores: {
           ada: {
-            transactions: {
-              validateAmount: adaStore.transactions.validateAmount,
-            },
             ledgerSend: {
               isActionProcessing: adaStore.ledgerSend.isActionProcessing,
               error: adaStore.ledgerSend.error,

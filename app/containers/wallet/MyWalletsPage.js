@@ -27,7 +27,6 @@ import BigNumber from 'bignumber.js';
 import moment from 'moment';
 import NavBarAddButton from '../../components/topbar/NavBarAddButton';
 import NavWalletDetails from '../../components/topbar/NavWalletDetails';
-import { LOVELACES_PER_ADA } from '../../config/numbersConfig';
 import globalMessages from '../../i18n/global-messages';
 import { ConceptualWallet, isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import {
@@ -40,6 +39,7 @@ import type { DelegationRequests } from '../../stores/ada/DelegationStore';
 import type { PublicKeyCache } from '../../stores/toplevel/WalletStore';
 import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
 import type { IGetPublic } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import { getApiForCoinType, getApiMeta } from '../../api/common/utils';
 
 const messages = defineMessages({
   walletSumInfo: {
@@ -85,11 +85,14 @@ export default class MyWalletsPage extends Component<Props> {
     const wallets = this.generated.stores.wallets.publicDerivers;
 
     let utxoTotal = new BigNumber(0);
-    const walletBalances = wallets.map(wallet => stores.transactions
-      .getTxRequests(wallet).requests.getBalanceRequest.result
-      ?.dividedBy(
-        LOVELACES_PER_ADA
-      ));
+    const walletBalances = wallets.map(wallet => {
+      const balanceResult = stores.transactions
+        .getTxRequests(wallet).requests.getBalanceRequest.result;
+      const apiMeta = getApiMeta(getApiForCoinType(wallet.getParent().getCoinType()))?.meta;
+      if (apiMeta == null) throw new Error(`${nameof(MyWalletsPage)} no API selected`);
+      const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
+      return balanceResult?.dividedBy(amountPerUnit);
+    });
     for (const walletUtxoAmount of walletBalances) {
       if (walletUtxoAmount == null) {
         utxoTotal = null;
@@ -119,6 +122,11 @@ export default class MyWalletsPage extends Component<Props> {
             rewards={new BigNumber('0.000000') /* TODO */}
             walletAmount={utxoTotal}
             infoText={intl.formatMessage(messages.walletSumInfo)}
+            meta={{
+              // TODO: this no longer makes sense in multi-wallet. Needs to be re-thought
+              primaryTicker: 'ADA',
+              decimalPlaces: 6,
+            }}
           />
         }
       />
@@ -154,18 +162,23 @@ export default class MyWalletsPage extends Component<Props> {
     const settingsCache = this.generated.stores.walletSettings
       .getConceptualWalletSettingsCache(parent);
 
+    const apiMeta = getApiMeta(getApiForCoinType(publicDeriver.getParent().getCoinType()))?.meta;
+    if (apiMeta == null) throw new Error(`${nameof(MyWalletsPage)} no API selected`);
+    const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
+
     const walletSumCurrencies = (
       <>
         <WalletCurrency
-          currency="ADA"
+          currency={apiMeta.primaryTicker}
           tooltipText={undefined /* TODO */}
         />
       </>
     );
+
     const txRequests = this.generated.stores.transactions
       .getTxRequests(publicDeriver);
     const balance = txRequests.requests.getBalanceRequest.result
-      ?.dividedBy(LOVELACES_PER_ADA) || null;
+      ?.dividedBy(amountPerUnit) || null;
 
     const withPubKey = asGetPublicKey(publicDeriver);
     const plate = withPubKey == null
@@ -183,6 +196,7 @@ export default class MyWalletsPage extends Component<Props> {
           // TODO: This should be probably bound to an individual wallet
           onUpdateHideBalance={this.updateHideBalance}
           shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
+          decimalPlaces={apiMeta.decimalPlaces.toNumber()}
         />}
         walletSumCurrencies={walletSumCurrencies}
         walletSubRow={() => this.createSubrow(publicDeriver)}
@@ -208,6 +222,9 @@ export default class MyWalletsPage extends Component<Props> {
 
   createSubrow: PublicDeriver<> => Node = (publicDeriver) => {
     const { intl } = this.context;
+
+    const apiMeta = getApiMeta(getApiForCoinType(publicDeriver.getParent().getCoinType()))?.meta;
+    if (apiMeta == null) throw new Error(`${nameof(MyWalletsPage)} no API selected`);
 
     // TODO: replace with wallet addresses
     const walletAddresses = [
@@ -244,11 +261,12 @@ export default class MyWalletsPage extends Component<Props> {
           shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
           rewards={null /* TODO */}
           walletAmount={null /* TODO */}
+          decimalPlaces={apiMeta.decimalPlaces.toNumber()}
         />}
         walletNumber={1}
         walletAddresses={walletAddresses /* TODO: replace with proper hashes */}
         walletCurrencies={<WalletCurrency
-          currency="ADA"
+          currency={apiMeta.primaryTicker}
           tooltipText="0.060" // TODO
         />}
       />
@@ -274,7 +292,10 @@ export default class MyWalletsPage extends Component<Props> {
     if (balanceResult == null) {
       return null;
     }
-    return balanceResult.accountPart.dividedBy(LOVELACES_PER_ADA);
+    const apiMeta = getApiMeta(getApiForCoinType(publicDeriver.getParent().getCoinType()))?.meta;
+    if (apiMeta == null) throw new Error(`${nameof(MyWalletsPage)} no API selected`);
+    const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
+    return balanceResult.accountPart.dividedBy(amountPerUnit);
   }
 
   @computed get generated(): {|

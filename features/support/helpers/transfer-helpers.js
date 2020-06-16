@@ -1,10 +1,7 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
-import {
-  LOVELACES_PER_ADA,
-  DECIMAL_PLACES_IN_ADA
-} from '../../../app/config/numbersConfig';
+import { getAdaCurrencyMeta } from '../../../app/api/ada/currencyInfo';
 
 type TransferSourceType = Array<{|
   fromAddress: string,
@@ -31,9 +28,11 @@ export async function checkTotalAmountIsCorrect(
   const totalAmount = rows.reduce(
     (acc, row) => acc.plus(new BigNumber(row.amount)), new BigNumber(0)
   );
+  const { decimalPlaces } = getAdaCurrencyMeta();
+  const amountPerUnit = new BigNumber(10).pow(decimalPlaces);
   const totalAmountFormated = `${totalAmount
-    .dividedBy(LOVELACES_PER_ADA)
-    .toFormat(DECIMAL_PLACES_IN_ADA)} ADA`;
+    .dividedBy(amountPerUnit)
+    .toFormat(decimalPlaces.toNumber())} ADA`;
   await world.waitUntilText(
     '.TransferSummaryPage_amount',
     totalAmountFormated

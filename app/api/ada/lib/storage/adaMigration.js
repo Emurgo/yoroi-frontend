@@ -32,6 +32,7 @@ import {
 } from './models/ConceptualWallet/index';
 import { loadWalletsFromStorage } from './models/load';
 import environment from '../../../../environment';
+import { KeyKind } from '../../../common/lib/crypto/keys/types';
 
 declare var CONFIG: ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;
@@ -204,6 +205,7 @@ export async function storagev2Migation(
           PasswordLastUpdate: wallet.adaWallet.cwPassphraseLU == null
             ? null
             : new Date(wallet.adaWallet.cwPassphraseLU),
+          Type: KeyKind.BIP32ED25519,
         },
       hwWalletMetaInsert: wallet.adaWallet.cwHardwareInfo == null
         ? undefined

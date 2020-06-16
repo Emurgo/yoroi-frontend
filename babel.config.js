@@ -28,7 +28,7 @@ module.exports = function (api /*: ApiType */) /*: * */ {
         {
           corejs: 3,
           modules: (api.env('test') || api.env('jest')) ? 'commonjs' : 'auto',
-          useBuiltIns: 'entry'
+          useBuiltIns: 'entry',
         }
       ],
       '@babel/preset-flow',

@@ -34,13 +34,13 @@ import type {
   HasPublicDeriver,
   HasRoot,
 } from './builder';
-import type { AddByHashFunc } from '../hashMapper';
-import { rawGenAddByHash } from '../hashMapper';
+import type { AddByHashFunc } from '../../../../../common/lib/storage/bridge/hashMapper';
+import { rawGenAddByHash } from '../../../../../common/lib/storage/bridge/hashMapper';
 import {
   addShelleyUtxoAddress,
   addShelleyChimericAccountAddress,
 } from '../../../../restoration/shelley/scan';
-
+import { KeyKind } from '../../../../../common/lib/crypto/keys/types';
 
 // TODO: maybe move this inside walletBuilder somehow so it's all done in the same transaction
 /**
@@ -209,6 +209,7 @@ export async function createStandardCip1852Wallet(request: {|
               Hash: encryptedRoot,
               IsEncrypted: true,
               PasswordLastUpdate: null,
+              Type: KeyKind.BIP32ED25519,
             },
             publicKeyInfo: null,
             derivationInfo: keys => ({

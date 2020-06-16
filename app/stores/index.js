@@ -13,12 +13,16 @@ import WalletStore from './toplevel/WalletStore';
 import WalletSettingsStore from './toplevel/WalletSettingsStore';
 import TransactionsStore from './toplevel/TransactionsStore';
 import AddressesStore from './toplevel/AddressesStore';
+import TimeStore from './toplevel/TimeStore';
+import WalletRestoreStore from './toplevel/WalletRestoreStore';
 import setupAdaStores from './ada/index';
+import setupErgoStores from './ergo/index';
 import type { AdaStoresMap } from './ada/index';
+import type { ErgoStoresMap } from './ergo/index';
 import { RouterStore } from 'mobx-react-router';
 import type { ActionsMap } from '../actions/index';
 import type { Api } from '../api/index';
-import { ApiOptions } from '../api/types';
+import { ApiOptions } from '../api/common/utils';
 import StateFetchStore from './toplevel/StateFetchStore';
 import CoinPriceStore from './toplevel/CoinPriceStore';
 import ServerConnectionStore from './toplevel/ServerConnectionStore';
@@ -39,7 +43,9 @@ const storeClasses = Object.freeze({
   loading: LoadingStore,
   wallets: WalletStore,
   addresses: AddressesStore,
+  time: TimeStore,
   transactions: TransactionsStore,
+  walletRestore: WalletRestoreStore,
   walletSettings: WalletSettingsStore,
   // note: purposely exclude substores and router
 });
@@ -59,9 +65,11 @@ export type StoresMap = {|
   loading: LoadingStore,
   wallets: WalletStore,
   addresses: AddressesStore,
+  time: TimeStore,
   transactions: TransactionsStore,
+  walletRestore: WalletRestoreStore,
   walletSettings: WalletSettingsStore,
-  substores: {| ada: AdaStoresMap, |},
+  substores: {| ada: AdaStoresMap, ergo: ErgoStoresMap, |},
   router: RouterStore,
 |};
 
@@ -81,11 +89,22 @@ const stores: WithNullableFields<StoresMap> = observable({
   loading: null,
   wallets: null,
   addresses: null,
+  time: null,
   transactions: null,
+  walletRestore: null,
   walletSettings: null,
   substores: null,
   router: null,
 });
+
+function initializeSubstore<T: {...}>(
+  substore: T,
+): void {
+  Object
+    .keys(substore)
+    .map(key => substore[key])
+    .forEach(store => store.initialize());
+}
 
 /** Set up and return the stores for this app -> also used to reset all stores to defaults */
 export default (action(
@@ -122,15 +141,12 @@ export default (action(
      * But we only want to actually initialize it if it is the currency in use */
     stores.substores = {
       ada: setupAdaStores((stores: any), api, actions),
+      ergo: setupErgoStores((stores: any), api, actions),
     };
 
     const loadedStores: StoresMap = (stores: any);
-    for (const apiOption of Object.keys(ApiOptions)) {
-      Object
-        .keys(loadedStores.substores[apiOption])
-        .map(key => loadedStores.substores.ada[key])
-        .forEach(store => store.initialize());
-    }
+    initializeSubstore<ErgoStoresMap>(loadedStores.substores[ApiOptions.ergo]);
+    initializeSubstore<AdaStoresMap>(loadedStores.substores[ApiOptions.ada]);
 
     // Perform load after all setup is done to ensure migration can modify store state
     loadedStores.loading.load();

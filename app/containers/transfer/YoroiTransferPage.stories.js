@@ -20,7 +20,6 @@ import type { MockYoroiTransferStore } from './YoroiTransferPage';
 import { TransferKind, TransferStatus, } from '../../types/TransferTypes';
 import type { TransferKindType } from '../../types/TransferTypes';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import AdaApi from '../../api/ada/index';
 import {
   GenerateTransferTxError,
   NotEnoughMoneyToSendError,
@@ -30,6 +29,8 @@ import {
   NoTransferTxError,
   WalletChangedError,
 } from '../../stores/ada/YoroiTransferStore';
+import AdaApi from '../../api/ada/index';
+import { RestoreMode } from '../../actions/common/wallet-restore-actions';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -51,6 +52,15 @@ const genBaseProps: {|
       selectedExplorer: getDefaultExplorer(),
       unitOfAccount: genUnitOfAccount(),
     },
+    walletRestore: {
+      isValidMnemonic: (isValidRequest) => {
+        const { mnemonic, numberOfWords } = isValidRequest;
+        if (isValidRequest.mode === RestoreMode.REGULAR) {
+          return AdaApi.isValidMnemonic({ mnemonic, numberOfWords });
+        }
+        return AdaApi.prototype.isValidPaperMnemonic({ mnemonic, numberOfWords });
+      },
+    },
     wallets: {
       selected: request.wallet,
       activeWalletRoute: request.wallet == null ? null : '',
@@ -61,10 +71,6 @@ const genBaseProps: {|
     },
     substores: {
       ada: {
-        wallets: {
-          isValidMnemonic: AdaApi.prototype.isValidMnemonic,
-          isValidPaperMnemonic: AdaApi.prototype.isValidPaperMnemonic,
-        },
         yoroiTransfer: {
           status: TransferStatus.UNINITIALIZED,
           error: undefined,

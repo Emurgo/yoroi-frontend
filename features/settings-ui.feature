@@ -182,6 +182,7 @@ Feature: Wallet UI Settings
 
   @it-126
   Scenario: Yoroi Settings Screen / Blockchain (IT-126)
+    And There is a wallet stored named empty-wallet
     And I navigate to the general settings screen
     And I click on secondary menu "blockchain" item
     Then I should see blockchain screen

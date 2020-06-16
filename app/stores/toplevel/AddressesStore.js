@@ -26,7 +26,6 @@ import {
 import { ROUTES } from '../../routes-config';
 import { buildRoute } from '../../utils/routing';
 import { ChainDerivations } from '../../config/numbersConfig';
-import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { Bip44DerivationLevels } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import { Cip1852Wallet } from '../../api/ada/lib/storage/models/Cip1852Wallet/wrapper';
@@ -35,7 +34,7 @@ import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import {
   ConceptualWallet
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { getApiForCoinType } from '../../api/index';
+import { getApiForCoinType } from '../../api/common/utils';
 import type { AddressFilterKind, StandardAddress, AddressStoreKind } from '../../types/AddressFilterTypes';
 import { AddressFilter, AddressStoreTypes } from '../../types/AddressFilterTypes';
 
@@ -243,9 +242,22 @@ export default class AddressesStore extends Store {
   getStoresForWallet: (
     PublicDeriver<>
   ) => Array<AddressTypeStore<StandardAddress>> = (publicDeriver) => {
+    const withHasUtxoChains = asHasUtxoChains(publicDeriver);
+
+    const stores = [];
+    if (withHasUtxoChains == null) {
+      stores.push(this.stores.addresses.allAddressesForDisplay);
+    } else {
+      stores.push(this.stores.addresses.externalForDisplay);
+      stores.push(this.stores.addresses.internalForDisplay);
+    }
+
     const { coinType } = publicDeriver.getParent();
     const apiType = getApiForCoinType(coinType);
-    return this.stores.substores[apiType].addresses.getStoresForWallet(publicDeriver);
+    return [
+      ...stores,
+      ...this.stores.substores[apiType].addresses.getStoresForWallet(publicDeriver),
+    ];
   }
 
   _createAddress: PublicDeriver<> => Promise<void> = async (
@@ -325,9 +337,7 @@ export default class AddressesStore extends Store {
 
     const allAddresses = await this.api[apiType].getAllAddressesForDisplay({
       publicDeriver: withUtxos,
-      type: request.publicDeriver.getParent() instanceof Bip44Wallet
-        ? CoreAddressTypes.CARDANO_LEGACY
-        : CoreAddressTypes.SHELLEY_GROUP,
+      type: this.stores.substores[apiType].addresses.getAddressTypesForWallet(withUtxos)[0]
     });
 
     return this.storewiseFilter({
@@ -355,9 +365,7 @@ export default class AddressesStore extends Store {
     const addresses = await this.api[apiType].getChainAddressesForDisplay({
       publicDeriver: withHasUtxoChains,
       chainsRequest: request.chainsRequest,
-      type: request.publicDeriver.getParent() instanceof Bip44Wallet
-        ? CoreAddressTypes.CARDANO_LEGACY
-        : CoreAddressTypes.SHELLEY_GROUP,
+      type: this.stores.substores[apiType].addresses.getAddressTypesForWallet(withHasUtxoChains)[0]
     });
 
     return this.storewiseFilter({

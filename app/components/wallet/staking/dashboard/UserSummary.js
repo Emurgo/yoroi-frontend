@@ -6,7 +6,6 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage, } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor, $npm$ReactIntl$IntlFormat } from 'react-intl';
 
-import { DECIMAL_PLACES_IN_ADA } from '../../../../config/numbersConfig';
 import Card from './Card';
 import styles from './UserSummary.scss';
 import IconAda from '../../../../assets/images/dashboard/total-ada.inline.svg';
@@ -69,6 +68,10 @@ type Props = {|
   +canUnmangleSum: BigNumber,
   +cannotUnmangleSum: BigNumber,
   +onUnmangle: void => void,
+  +meta: {|
+    +primaryTicker: string,
+    +decimalPlaces: number,
+  |},
 |};
 
 type State = {|
@@ -120,7 +123,7 @@ export default class UserSummary extends Component<Props, State> {
                 </p>
               )}
               <p className={styles.value}>
-                {totalAdaSum.ADA} ADA
+                {totalAdaSum.ADA} {this.props.meta.primaryTicker}
               </p>
             </>
           )
@@ -152,7 +155,7 @@ export default class UserSummary extends Component<Props, State> {
                 </p>
               )}
               <p className={styles.value}>
-                {totalRewards.ADA} ADA
+                {totalRewards.ADA} {this.props.meta.primaryTicker}
               </p>
               <span
                 className={styles.note}
@@ -204,7 +207,8 @@ export default class UserSummary extends Component<Props, State> {
                 <p>
                   {this.formatWithAmount(
                     messages.mangledPopupDialogLine1,
-                    this.props.canUnmangleSum.plus(this.props.cannotUnmangleSum)
+                    this.props.canUnmangleSum.plus(this.props.cannotUnmangleSum),
+                    this.props.meta.decimalPlaces,
                   )}
                 </p>
                 {this.props.cannotUnmangleSum.gt(0) && (
@@ -212,13 +216,15 @@ export default class UserSummary extends Component<Props, State> {
                     <li>
                       {this.formatWithAmount(
                         messages.canUnmangleLine,
-                        this.props.canUnmangleSum
+                        this.props.canUnmangleSum,
+                        this.props.meta.decimalPlaces,
                       )}
                     </li>
                     <li>
                       {this.formatWithAmount(
                         messages.cannotUnmangleLine,
-                        this.props.cannotUnmangleSum
+                        this.props.cannotUnmangleSum,
+                        this.props.meta.decimalPlaces,
                       )}
                     </li>
                   </ul>
@@ -259,7 +265,7 @@ export default class UserSummary extends Component<Props, State> {
                 </p>
               )}
               <p className={styles.value}>
-                {totalDelegated.ADA} ADA
+                {totalDelegated.ADA} {this.props.meta.primaryTicker}
               </p>
             </>
           )
@@ -269,13 +275,17 @@ export default class UserSummary extends Component<Props, State> {
     );
   }
 
-  formatWithAmount: ($npm$ReactIntl$MessageDescriptor, BigNumber) => Node = (message, amount) => {
+  formatWithAmount: (
+    $npm$ReactIntl$MessageDescriptor,
+    BigNumber,
+    number
+  ) => Node = (message, amount, decimalPlaces) => {
     return (<FormattedMessage
       {...message}
       values={{
         adaAmount: amount
-          .shiftedBy(-DECIMAL_PLACES_IN_ADA)
-          .toFormat(DECIMAL_PLACES_IN_ADA),
+          .shiftedBy(-decimalPlaces)
+          .toFormat(decimalPlaces),
       }}
     />
     );

@@ -48,7 +48,7 @@ import { GetKeyForDerivation, } from '../../database/primitives/api/read';
 
 import {
   rawChangePassword,
-  normalizeBip32Ed25519ToPubDeriverLevel,
+  normalizeToPubDeriverLevel,
 } from '../keyUtils';
 
 import type {
@@ -74,7 +74,7 @@ export async function derivePublicDeriver<Row>(
     {
       publicDeriverMeta: body.publicDeriverMeta,
       pathToPublic: privateKeyRow => {
-        const accountKey = normalizeBip32Ed25519ToPubDeriverLevel({
+        const accountKey = normalizeToPubDeriverLevel({
           privateKeyRow,
           password: body.decryptPrivateDeriverPassword,
           path: body.path,
@@ -104,11 +104,13 @@ export async function derivePublicDeriver<Row>(
                   ),
                 IsEncrypted: true,
                 PasswordLastUpdate: null,
+                Type: privateKeyRow.Type, // type doesn't change with derivations
               },
             publicKey: {
               Hash: accountKey.pubKeyHex,
               IsEncrypted: false,
               PasswordLastUpdate: null,
+              Type: privateKeyRow.Type, // type doesn't change with derivations
             },
           },
         ];

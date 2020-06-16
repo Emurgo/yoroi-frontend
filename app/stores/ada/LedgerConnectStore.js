@@ -37,7 +37,7 @@ import {
 } from '../../utils/hwConnectHandler';
 
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
-import { CheckAdressesInUseApiError } from '../../api/ada/errors';
+import { CheckAddressesInUseApiError } from '../../api/ada/errors';
 
 import {
   Logger,
@@ -261,7 +261,7 @@ export default class LedgerConnectStore
       Logger.error(`${nameof(LedgerConnectStore)}::${nameof(this._saveHW)}::error ${stringifyError(error)}`);
 
       // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1055
-      if (error instanceof CheckAdressesInUseApiError) {
+      if (error instanceof CheckAddressesInUseApiError) {
         /**
          * This error happens when yoroi could not fetch Used Address.
          * Mostly because internet not connected or yoroi backend is down.

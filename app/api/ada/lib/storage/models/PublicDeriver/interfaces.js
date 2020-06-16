@@ -51,7 +51,7 @@ import { GetDerivationSpecific } from '../../database/walletTypes/common/api/rea
 import { ModifyKey, ModifyAddress, } from '../../database/primitives/api/write';
 import type {
   FilterFunc,
-} from '../../../state-fetch/types';
+} from '../../../../../common/lib/state-fetch/currencySpecificTypes';
 import {
   ChainDerivations,
 } from '../../../../../../config/numbersConfig';

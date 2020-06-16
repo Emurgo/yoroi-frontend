@@ -23,7 +23,6 @@ import UpcomingRewards from '../../../components/wallet/staking/dashboard/Upcomi
 import type { BoxInfo } from '../../../components/wallet/staking/dashboard/UpcomingRewards';
 import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard/LessThanExpectedDialog';
 import PoolWarningDialog from '../../../components/wallet/staking/dashboard/PoolWarningDialog';
-import { LOVELACES_PER_ADA } from '../../../config/numbersConfig';
 import { digestForHash } from '../../../api/ada/lib/storage/database/primitives/api/utils';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import { GetPoolInfoApiError } from '../../../api/ada/errors';
@@ -47,12 +46,14 @@ import type {
 } from '../../../api/ada/lib/storage/bridge/timeUtils';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import type { CreateDelegationTxFunc } from '../../../api/ada/index';
-import type { CurrentTimeRequests, TimeCalcRequests } from '../../../stores/ada/TimeStore';
+import type { CurrentTimeRequests, TimeCalcRequests } from '../../../stores/ada/AdaTimeStore';
 import type { TxRequests } from '../../../stores/toplevel/TransactionsStore';
 import type { Notification } from '../../../types/notificationType';
 
 import globalMessages from '../../../i18n/global-messages';
 import { computed, observable, runInAction } from 'mobx';
+import { getApiForCoinType, getApiMeta } from '../../../api/common/utils';
+import type { SelectedApiType, } from '../../../api/common/utils';
 
 export type GeneratedData = typeof StakingDashboardPage.prototype.generated;
 
@@ -83,10 +84,10 @@ export default class StakingDashboardPage extends Component<Props> {
     this.generated.actions.ada.delegationTransaction.reset.trigger();
   }
 
-  hideOrFormat: BigNumber => {|
+  hideOrFormat: (BigNumber, $PropertyType<SelectedApiType, 'meta'>) => {|
     +ADA: string,
     +unitOfAccount: void | {| currency: string, amount: string |},
-  |} = (amount) => {
+  |} = (amount, apiMeta) => {
     if (this.generated.stores.profile.shouldHideBalance) {
       return {
         ADA: '******',
@@ -96,8 +97,10 @@ export default class StakingDashboardPage extends Component<Props> {
 
     const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
       ? (
-        this.generated.stores.coinPriceStore
-          .getCurrentPrice('ADA', this.generated.stores.profile.unitOfAccount.currency)
+        this.generated.stores.coinPriceStore.getCurrentPrice(
+          apiMeta.primaryTicker,
+          this.generated.stores.profile.unitOfAccount.currency
+        )
       )
       : null;
 
@@ -113,7 +116,7 @@ export default class StakingDashboardPage extends Component<Props> {
           )
         };
     return {
-      ADA: formattedWalletAmount(amount),
+      ADA: formattedWalletAmount(amount, apiMeta.decimalPlaces.toNumber()),
       unitOfAccount,
     };
   };
@@ -202,6 +205,11 @@ export default class StakingDashboardPage extends Component<Props> {
   }
 
   generatePopupDialog: PublicDeriver<> => (null | Node) = (publicDeriver) => {
+    const apiMeta = getApiMeta(
+      getApiForCoinType(publicDeriver.getParent().getCoinType())
+    )?.meta;
+    if (apiMeta == null) throw new Error(`${nameof(StakingDashboardPage)} no API selected`);
+
     const { uiDialogs } = this.generated.stores;
     const delegationTxStore = this.generated.stores.substores.ada
       .delegationTransaction;
@@ -263,6 +271,7 @@ export default class StakingDashboardPage extends Component<Props> {
       isSubmitting={delegationTxStore.signAndBroadcastDelegationTx.isExecuting}
       transactionFee={getShelleyTxFee(delegationTx.unsignedTx.IOs, true)}
       staleTx={delegationTxStore.isStale}
+      decimalPlaces={apiMeta.decimalPlaces.toNumber()}
     />);
   }
 
@@ -604,8 +613,18 @@ export default class StakingDashboardPage extends Component<Props> {
       .getTxRequests(request.publicDeriver);
     const balance = txRequests.requests.getBalanceRequest.result;
 
+    const apiMeta = getApiMeta(
+      getApiForCoinType(request.publicDeriver.getParent().getCoinType())
+    )?.meta;
+    if (apiMeta == null) throw new Error(`${nameof(StakingDashboardPage)} no API selected`);
+    const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
+
     return (
       <UserSummary
+        meta={{
+          decimalPlaces: apiMeta.decimalPlaces.toNumber(),
+          primaryTicker: apiMeta.primaryTicker,
+        }}
         canUnmangleSum={canUnmangleSum}
         cannotUnmangleSum={cannotUnmangleSum}
         onUnmangle={() => this.generated.actions.dialogs.open.trigger({
@@ -613,9 +632,7 @@ export default class StakingDashboardPage extends Component<Props> {
         })}
         totalAdaSum={balance == null
           ? undefined
-          : this.hideOrFormat(balance.dividedBy(
-            LOVELACES_PER_ADA
-          ))
+          : this.hideOrFormat(balance.dividedBy(amountPerUnit), apiMeta)
         }
         totalRewards={
           !showRewardAmount || request.delegationRequests.getDelegatedBalance.result == null
@@ -623,7 +640,8 @@ export default class StakingDashboardPage extends Component<Props> {
             : this.hideOrFormat(
               request.delegationRequests.getDelegatedBalance.result
                 .accountPart
-                .dividedBy(LOVELACES_PER_ADA)
+                .dividedBy(amountPerUnit),
+              apiMeta
             )
         }
         openLearnMore={() => this.generated.actions.dialogs.open.trigger({
@@ -635,7 +653,8 @@ export default class StakingDashboardPage extends Component<Props> {
             : this.hideOrFormat(
               request.delegationRequests.getDelegatedBalance.result.utxoPart.plus(
                 request.delegationRequests.getDelegatedBalance.result.accountPart
-              ).dividedBy(LOVELACES_PER_ADA)
+              ).dividedBy(amountPerUnit),
+              apiMeta
             )}
       />
     );
@@ -644,12 +663,19 @@ export default class StakingDashboardPage extends Component<Props> {
   _generateRewardGraphData: {|
     delegationRequests: DelegationRequests,
     currentEpoch: number,
+    publicDeriver: PublicDeriver<>,
   |} => (?{|
     totalRewards: Array<GraphItems>,
     perEpochRewards: Array<GraphItems>,
   |}) = (
     request
   ) => {
+    const apiMeta = getApiMeta(
+      getApiForCoinType(request.publicDeriver.getParent().getCoinType())
+    )?.meta;
+    if (apiMeta == null) throw new Error(`${nameof(StakingDashboardPage)} no API selected`);
+    const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
+
     const history = request.delegationRequests.rewardHistory.result;
     if (history == null) {
       return null;
@@ -673,18 +699,18 @@ export default class StakingDashboardPage extends Component<Props> {
         adaSum = adaSum.plus(nextReward);
         totalRewards.push({
           name: i,
-          primary: adaSum.dividedBy(LOVELACES_PER_ADA).toNumber(),
+          primary: adaSum.dividedBy(amountPerUnit).toNumber(),
         });
         perEpochRewards.push({
           name: i,
-          primary: nextReward / LOVELACES_PER_ADA.toNumber(),
+          primary: nextReward / amountPerUnit.toNumber(),
         });
         historyIterator++;
       } else {
         // no reward for this epoch
         totalRewards.push({
           name: i,
-          primary: adaSum.dividedBy(LOVELACES_PER_ADA).toNumber(),
+          primary: adaSum.dividedBy(amountPerUnit).toNumber(),
         });
         perEpochRewards.push({
           name: i,
@@ -711,6 +737,7 @@ export default class StakingDashboardPage extends Component<Props> {
         items: this._generateRewardGraphData({
           delegationRequests: request.delegationRequests,
           currentEpoch: currTimeRequests.currentEpoch,
+          publicDeriver: request.publicDeriver,
         }),
         hideYAxis: this.generated.stores.profile.shouldHideBalance
       }

@@ -65,7 +65,11 @@ export class RemoteFetcher implements IFetcher {
   getCurrentCoinPrice: CurrentCoinPriceRequest => Promise<CurrentCoinPriceResponse> = (body) => (
     axios(`${priceBackendUrl}/price/${body.from}/current`,
       {
-        method: 'get'
+        method: 'get',
+        headers: {
+          'yoroi-version': this.getLastLaunchVersion(),
+          'yoroi-locale': this.getCurrentLocale()
+        }
       }).then(response => response.data)
       .catch(error => {
         Logger.error('RemoteFetcher::getCurrentCoinPrice error: ' + stringifyError(error));
@@ -78,7 +82,11 @@ export class RemoteFetcher implements IFetcher {
   ) => (
     axios(`${priceBackendUrl}/price/${body.from}/${body.timestamps.join(',')}`,
       {
-        method: 'get'
+        method: 'get',
+        headers: {
+          'yoroi-version': this.getLastLaunchVersion(),
+          'yoroi-locale': this.getCurrentLocale()
+        }
       }).then(response => response.data)
       .catch(error => {
         Logger.error('RemoteFetcher::getHistoricalCoinPrice error: ' + stringifyError(error));

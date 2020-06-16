@@ -1,12 +1,12 @@
 // @flow
 import type { Node } from 'react';
+import BigNumber from 'bignumber.js';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import TopBar from '../components/topbar/TopBar';
 import WalletTopbarTitle from '../components/topbar/WalletTopbarTitle';
 import type { InjectedOrGenerated } from '../types/injectedPropsType';
-import { LOVELACES_PER_ADA } from '../config/numbersConfig';
 import {
   asGetPublicKey,
 } from '../api/ada/lib/storage/models/PublicDeriver/traits';
@@ -18,6 +18,7 @@ import type { TxRequests } from '../stores/toplevel/TransactionsStore';
 import type { IGetPublic } from '../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { Category } from '../config/topbarConfig';
 import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver/index';
+import { getApiForCoinType, getApiMeta } from '../api/common/utils';
 
 export type GeneratedData = typeof TopBarContainer.prototype.generated;
 
@@ -42,10 +43,15 @@ export default class TopBarContainer extends Component<Props> {
       if (walletsStore.selected == null) {
         return null;
       }
-      const selected = walletsStore.selected;
+      const { selected } = walletsStore;
+
+      const apiMeta = getApiMeta(getApiForCoinType(selected.getParent().getCoinType()))?.meta;
+      if (apiMeta == null) throw new Error(`${nameof(TopBarContainer)} no API selected`);
+      const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
+
       const amount = stores.transactions
         .getTxRequests(selected).requests.getBalanceRequest.result
-        ?.dividedBy(LOVELACES_PER_ADA);
+        ?.dividedBy(amountPerUnit);
 
       const withPubKey = asGetPublicKey(selected);
       const plate = withPubKey == null
@@ -63,7 +69,14 @@ export default class TopBarContainer extends Component<Props> {
       walletInfo={walletInfo}
       publicDeriver={walletsStore.selected}
       currentRoute={app.currentRoute}
-      formattedWalletAmount={formattedWalletAmount}
+      formattedWalletAmount={(amount, pubDeriver) => {
+        const apiMeta = getApiMeta(getApiForCoinType(pubDeriver.getParent().getCoinType()))?.meta;
+        if (apiMeta == null) throw new Error(`${nameof(TopBarContainer)} no API selected`);
+        return formattedWalletAmount(
+          amount,
+          apiMeta.decimalPlaces.toNumber(),
+        );
+      }}
       themeProperties={{
         identiconSaturationFactor: profile.isClassicTheme ? -5 : 0
       }}
@@ -105,7 +118,7 @@ export default class TopBarContainer extends Component<Props> {
       profile: {|
         isClassicTheme: boolean,
         shouldHideBalance: boolean,
-        unitOfAccount: UnitOfAccountSettingType
+        unitOfAccount: UnitOfAccountSettingType,
       |},
       topbar: {|
         categories: Array<Category>,

@@ -2,9 +2,6 @@
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import BigNumber from 'bignumber.js';
-import {
-  DECIMAL_PLACES_IN_ADA,
-} from '../../../../config/numbersConfig';
 import type {
   BaseSignRequest,
 } from '../types';
@@ -14,6 +11,9 @@ import {
 import type {
   Addressing,
 } from '../../lib/storage/models/PublicDeriver/interfaces';
+import {
+  getAdaCurrencyMeta
+} from '../../currencyInfo';
 
 import type { ConfigType } from '../../../../../config/config-types';
 
@@ -56,7 +56,7 @@ export function getTxInputTotal(
     sum = sum.plus(value);
   }
   if (shift) {
-    return sum.shiftedBy(-DECIMAL_PLACES_IN_ADA);
+    return sum.shiftedBy(-getAdaCurrencyMeta().decimalPlaces.toNumber());
   }
   return sum;
 }
@@ -74,7 +74,7 @@ export function getTxOutputTotal(
     sum = sum.plus(value);
   }
   if (shift) {
-    return sum.shiftedBy(-DECIMAL_PLACES_IN_ADA);
+    return sum.shiftedBy(-getAdaCurrencyMeta().decimalPlaces.toNumber());
   }
   return sum;
 }
@@ -87,7 +87,7 @@ export function getShelleyTxFee(
   const ins = getTxInputTotal(IOs, false);
   const result = ins.minus(out);
   if (shift) {
-    return result.shiftedBy(-DECIMAL_PLACES_IN_ADA);
+    return result.shiftedBy(-getAdaCurrencyMeta().decimalPlaces.toNumber());
   }
   return result;
 }

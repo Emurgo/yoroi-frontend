@@ -2,24 +2,15 @@
 import type { lf$Database, } from 'lovefield';
 import CommonApi from './common/index';
 import AdaApi from './ada/index';
+import ErgoApi from './ergo/index';
 import LocalStorageApi from './localStorage/index';
 import ExternalStorageApi from './externalStorage/index';
 import ExportApi from './export/index';
-import type { CoinTypesT } from '../config/numbersConfig';
-import { CoinTypes } from '../config/numbersConfig';
-import type { ApiOptionType } from './types';
-import { ApiOptions } from './types';
-
-export const getApiForCoinType: CoinTypesT => ApiOptionType = (type) => {
-  if (type === CoinTypes.CARDANO) {
-    return ApiOptions.ada;
-  }
-  throw new Error(`${nameof(getApiForCoinType)} missing entry for coin type ${type}`);
-};
 
 export type Api = {|
   common: CommonApi,
   ada: AdaApi,
+  ergo: ErgoApi,
   localStorage: LocalStorageApi,
   externalStorage: ExternalStorageApi,
   export: ExportApi,
@@ -28,6 +19,7 @@ export type Api = {|
 export const setupApi: void => Promise<Api> = async () => ({
   common: new CommonApi(),
   ada: new AdaApi(),
+  ergo: new ErgoApi(),
   localStorage: new LocalStorageApi(),
   externalStorage: new ExternalStorageApi(),
   export: new ExportApi(),

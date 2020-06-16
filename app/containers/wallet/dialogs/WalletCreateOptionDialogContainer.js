@@ -4,11 +4,10 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import WalletCreateOptionDialog from '../../../components/wallet/add/option-dialog/WalletCreateOptionDialog';
 
-
 type Props = {|
   +onClose: void => void,
   +onCreate: void => void,
-  +onPaper: void => void,
+  +onPaper: void | (void => void),
 |};
 
 @observer

@@ -1,17 +1,17 @@
 // @flow
 import BigNumber from 'bignumber.js';
-import { DECIMAL_PLACES_IN_ADA } from '../config/numbersConfig';
 
 export function splitAmount(
   amount: BigNumber,
+  decimalPlaces: number,
 ): [string, string] {
-  const valString = formattedWalletAmount(amount);
-  const startIndex = valString.length - DECIMAL_PLACES_IN_ADA;
+  const valString = formattedWalletAmount(amount, decimalPlaces);
+  const startIndex = valString.length - decimalPlaces;
   return [valString.substring(0, startIndex), valString.substring(startIndex)];
 }
 
-export const formattedWalletAmount = (amount: BigNumber): string => (
-  amount.toFormat(DECIMAL_PLACES_IN_ADA)
+export const formattedWalletAmount: (BigNumber, number) => string = (amount, decimalPlaces) => (
+  amount.toFormat(decimalPlaces)
 );
 
 export const maxNameLengthBeforeTruncation = 15;
@@ -43,14 +43,17 @@ export const formattedAmountToBigNumber = (amount: string): BigNumber => {
  * ensures `DECIMAL_PLACES_IN_ADA` decimal positions
  * shifts decimal places over to turn into a whole number
  */
-export const formattedAmountToNaturalUnits = (amount: string): string => {
+export const formattedAmountToNaturalUnits: (
+  string,
+  number
+) => string = (amount, decimalPlaces) => {
   // pad number in the case of missing digits
   const split = amount.split('.');
   if (split.length === 2) {
     const numPlaces = split[1].length;
-    amount += '0'.repeat(DECIMAL_PLACES_IN_ADA - numPlaces);
+    amount += '0'.repeat(decimalPlaces - numPlaces);
   } else {
-    amount += '0'.repeat(DECIMAL_PLACES_IN_ADA);
+    amount += '0'.repeat(decimalPlaces);
   }
 
   const cleanedAmount = amount.replace('.', '').replace(/,/g, '').replace(/^0+/, '');

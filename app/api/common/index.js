@@ -33,6 +33,8 @@ import type {
   TransactionExportDataFormat,
   TransactionExportFileType
 } from '../export';
+import { getApiForCoinType } from './utils';
+import type { GetBalanceRequest, GetBalanceResponse } from './types';
 
 // getWallets
 
@@ -147,6 +149,18 @@ export default class CommonApi {
     }
   }
 
+  async getBalance(
+    request: GetBalanceRequest
+  ): Promise<GetBalanceResponse> {
+    try {
+      const balance = await request.getBalance();
+      return balance;
+    } catch (error) {
+      Logger.error(`${nameof(CommonApi)}::${nameof(this.getBalance)} error: ` + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
   async refreshPendingTransactions(
     request: RefreshPendingTransactionsRequest
   ): Promise<RefreshPendingTransactionsResponse> {
@@ -161,6 +175,7 @@ export default class CommonApi {
         return WalletTransaction.fromAnnotatedTx({
           tx,
           addressLookupMap: fetchedTxs.addressLookupMap,
+          api: getApiForCoinType(request.publicDeriver.getParent().getCoinType()),
         });
       });
       return mappedTransactions;

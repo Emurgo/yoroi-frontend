@@ -15,6 +15,9 @@ import transactionsIcon from '../../../assets/images/wallet-nav/tab-transactions
 import sendIcon from '../../../assets/images/wallet-nav/tab-send.inline.svg';
 import receiveIcon from '../../../assets/images/wallet-nav/tab-receive.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import {
+  CoinTypes,
+} from '../../../config/numbersConfig';
 
 const messages = defineMessages({
   transactions: {
@@ -66,8 +69,9 @@ export default class WalletNavigation extends Component<Props> {
     // since you can't generate change addresses
     // it's easier to have people use the "upgrade wallet" UX
     // then to make a special "send" page that only allows sendAll
-    const canSend = !environment.isShelley() ||
-      !(this.props.wallet.getParent() instanceof Bip44Wallet);
+    const canSend = (
+      !environment.isShelley() || !(this.props.wallet.getParent() instanceof Bip44Wallet)
+    ) && this.props.wallet.getParent().getCoinType() !== CoinTypes.ERGO;
     return (
       <div className={styles.component}>
 

@@ -2,7 +2,7 @@
 import { AsyncAction, Action } from './lib/Action';
 import type { ExplorerType } from '../domain/Explorer';
 import type { UnitOfAccountSettingType } from '../types/unitOfAccountType';
-import type { ApiOptionType } from '../api/types';
+import type { ApiOptionType } from '../api/common/utils';
 import type { ComplexityLevelType } from '../types/complexityLevelType';
 // ======= PROFILE ACTIONS =======
 

@@ -25,11 +25,6 @@ import RawHash from '../../widgets/hashWrappers/RawHash';
 import type { ExplorerType } from '../../../domain/Explorer';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
-import {
-  DECIMAL_PLACES_IN_ADA,
-  MAX_INTEGER_PLACES_IN_ADA
-} from '../../../config/numbersConfig';
-
 import WarningBox from '../../widgets/WarningBox';
 
 const messages = defineMessages({
@@ -72,6 +67,10 @@ type Props = {|
   +onSubmit: ({| password: string |}) => PossiblyAsync<void>,
   +classicTheme: boolean,
   +error: ?LocalizableError,
+  +meta: {|
+    +totalSupply: BigNumber,
+    +decimalPlaces: number,
+  |},
 |};
 
 @observer
@@ -206,18 +205,20 @@ export default class DelegationTxDialog extends Component<Props> {
           <NumericInput
             className="amount"
             label={intl.formatMessage(globalMessages.amountLabel)}
-            maxBeforeDot={MAX_INTEGER_PLACES_IN_ADA}
-            maxAfterDot={DECIMAL_PLACES_IN_ADA}
+            maxBeforeDot={
+              this.props.meta.totalSupply.div(this.props.meta.decimalPlaces).toFixed().length
+            }
+            maxAfterDot={this.props.meta.decimalPlaces}
             disabled
             // AmountInputSkin props
             currency={intl.formatMessage(globalMessages.unitAda)}
-            fees={this.props.transactionFee.toFormat(DECIMAL_PLACES_IN_ADA)}
+            fees={this.props.transactionFee.toFormat(this.props.meta.decimalPlaces)}
             // note: we purposely don't put "total" since it doesn't really make sense here
             // since the fee is unrelated to the amount you're about to stake
             total=""
             value={this.props.amountToDelegate
-              .shiftedBy(-DECIMAL_PLACES_IN_ADA)
-              .toFormat(DECIMAL_PLACES_IN_ADA)
+              .shiftedBy(-this.props.meta.decimalPlaces)
+              .toFormat(this.props.meta.decimalPlaces)
             }
             skin={AmountInputSkin}
             classicTheme={this.props.classicTheme}
@@ -236,7 +237,7 @@ export default class DelegationTxDialog extends Component<Props> {
         <div className={styles.headerBlock}>
           <p className={styles.header}>{intl.formatMessage(messages.approximateLabel)}</p>
           <p className={styles.rewardAmount}>
-            {this.props.approximateReward.toFormat(DECIMAL_PLACES_IN_ADA)}&nbsp;
+            {this.props.approximateReward.toFormat(this.props.meta.decimalPlaces)}&nbsp;
             {intl.formatMessage(globalMessages.unitAda).toUpperCase()}
           </p>
         </div>
