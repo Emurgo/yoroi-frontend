@@ -21,7 +21,7 @@ Check out our [documents](docs/specs/meta) on the governance of this project.
 
 ## Other steps
 
-[BUILD.md](docs/BUILD.md) how to build the code
+[BUILD.md](docs/BUILD.md) how to build the code (make sure you followed the "first steps" first)
 
 [RUN.md](docs/RUN.md) for how to load a build into your browser
 

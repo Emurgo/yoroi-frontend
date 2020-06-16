@@ -39,7 +39,7 @@ Make sure you checked out the exact commit for the version you're testing. Keep 
 
 However, overall the build should match exactly.
 
-#### Setting it up on your machine
+#### Setting it up on your machine (recommended)
 
 If you want to build the code on your machine, you should be able to follow the regular project setup and build steps outlined in the repository's main readme.
 
