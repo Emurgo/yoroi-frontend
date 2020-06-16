@@ -1,4 +1,4 @@
-# Terms of Service Agreement
+# Συμφωνία Όρων Παροχής Υπηρεσιών
 
 THIS TERMS OF SERVICE AGREEMENT ("Agreement") is made between EMURGO Co., Ltd. ("Company") and any person or entity ("User") who completes the process to download, utilize, or operate the software known as the Yoroi cryptocurrency Wallet application, and data processing service, application, communication service or other content or offered or provided with the software by the Company ("Software"). The Company and User are collectively referred to as the "Parties." BY CLICKING THE ACCEPTANCE BUTTON OR ACCESSING, USING OR INSTALLING ANY PART OF THE SOFTWARE, USER EXPRESSLY AGREES TO AND CONSENTS TO BE LEGALLY BOUND BY ALL OF THE TERMS OF THIS AGREEMENT. IF USER DOES NOT AGREE TO ALL OF THE TERMS OF THIS AGREEMENT, THE USER SHALL NOT BE AUTHORIZED TO ACCESS, USE OR INSTALL ANY PART OF THE SOFTWARE.
 
