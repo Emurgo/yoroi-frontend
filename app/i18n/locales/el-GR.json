@@ -394,6 +394,7 @@
   "wallet.create.dialog.title": "Δημιουργήστε πορτοφόλι",
   "wallet.create.dialog.walletNameHint": "π.χ: Πορτοφόλι Αγορών",
   "wallet.currency.pick.cardano": "Το Cardano είναι το πρώτο αποδεδειγμένα ασφαλές με τεκμηρίωση μεριδίου πρωτόκολλο",
+  "wallet.currency.pick.ergo": "Ergo builds advanced cryptographic features and radically new DeFi functionality on the rock-solid foundations laid by a decade of blockchain theory and development",
   "wallet.currency.pick.header": "Επιλέξτε ένα νόμισμα ή πλατφόρμα",
   "wallet.dashboard.empty.text": "Go to Simple or Advance Staking to choose what stake pool you want to delegate in. Note, you may delegate only to one stake pool in this Tesnnet",
   "wallet.dashboard.empty.title": "You have not delegated your ADA yet",
