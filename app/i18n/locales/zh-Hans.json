@@ -394,6 +394,7 @@
   "wallet.create.dialog.title": "创建钱包",
   "wallet.create.dialog.walletNameHint": "例如：购物钱包",
   "wallet.currency.pick.cardano": "Cardano是第一个被证明安全的权益证明（PoS）协议。",
+  "wallet.currency.pick.ergo": "Ergo builds advanced cryptographic features and radically new DeFi functionality on the rock-solid foundations laid by a decade of blockchain theory and development",
   "wallet.currency.pick.header": "选择一个货币或交易平台",
   "wallet.dashboard.empty.text": "前往委托（简单）或委托（高级）选择你想要委托的权益池。注意，在本次测试网中仅能同时委托一个权益池。",
   "wallet.dashboard.empty.title": "你尚未委托你的ADA",
