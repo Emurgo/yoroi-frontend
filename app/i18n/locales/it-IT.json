@@ -394,6 +394,7 @@
   "wallet.create.dialog.title": "Crea portafoglio",
   "wallet.create.dialog.walletNameHint": "ad esempio: portafoglio Shopping",
   "wallet.currency.pick.cardano": "Cardano is the first provably secure proof of stake protocol",
+  "wallet.currency.pick.ergo": "Ergo builds advanced cryptographic features and radically new DeFi functionality on the rock-solid foundations laid by a decade of blockchain theory and development",
   "wallet.currency.pick.header": "Pick a currency or platform",
   "wallet.dashboard.empty.text": "Vai allo Staking semplice o avanzato per scegliere in quale stake pool vuoi delegare i tuoi fondi. Nota, puoi delegare solo una stake pool per questa Testnet",
   "wallet.dashboard.empty.title": "Non hai ancora delegato i tuoi ADA",
