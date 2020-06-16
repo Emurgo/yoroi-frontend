@@ -1,6 +1,6 @@
 # Συμφωνία Όρων Παροχής Υπηρεσιών
 
-THIS TERMS OF SERVICE AGREEMENT ("Agreement") is made between EMURGO Co., Ltd. ("Company") and any person or entity ("User") who completes the process to download, utilize, or operate the software known as the Yoroi cryptocurrency Wallet application, and data processing service, application, communication service or other content or offered or provided with the software by the Company ("Software"). The Company and User are collectively referred to as the "Parties." BY CLICKING THE ACCEPTANCE BUTTON OR ACCESSING, USING OR INSTALLING ANY PART OF THE SOFTWARE, USER EXPRESSLY AGREES TO AND CONSENTS TO BE LEGALLY BOUND BY ALL OF THE TERMS OF THIS AGREEMENT. IF USER DOES NOT AGREE TO ALL OF THE TERMS OF THIS AGREEMENT, THE USER SHALL NOT BE AUTHORIZED TO ACCESS, USE OR INSTALL ANY PART OF THE SOFTWARE.
+ΑΥΤΗ Η ΣΥΜΦΩΝΙΑ ΟΡΩΝ ΠΑΡΟΧΗΣ ΥΠΗΡΕΣΙΩΝ ("Συμφωνία") έγινε μεταξύ της EMURGO Co., Ltd. ("Εταιρείας") και οποιουδήποτε ανθρώπου ή οντότητας ("Χρήστης") που ολοκληρώνει τη διαδικασία λήψης, εφαρμογής ή χειρίζεται το λογισμικό γνωστό ως την εφαρμογή Yoroi Πορτοφόλι κρυπτονομισμάτων και υπηρεσία διαχείρισης δεδομένων, εφαρμογή, υπηρεσία επικοινωνίας ή άλλο περιεχόμενο ή προσφερόμενο ή παρεχόμενο μαζί με το λογισμικό από την Εταιρεία ("Λογισμικο"). Η Εταιρεία και ο Χρήστης συλλογικά αναφέρονται ως "Συμβαλλόμενοι." 
 
 ## 1. Rights and Obligations
 
