@@ -394,7 +394,7 @@
   "wallet.create.dialog.title": "Crear billetera",
   "wallet.create.dialog.walletNameHint": "por ejemplo: Billetera de Compras",
   "wallet.currency.pick.cardano": "Cardano es el primer protocolo de prueba de participación probadamente seguro",
-  "wallet.currency.pick.ergo": "Ergo builds advanced cryptographic features and radically new DeFi functionality on the rock-solid foundations laid by a decade of blockchain theory and development",
+  "wallet.currency.pick.ergo": "Ergo construye características criptográficas avanzadas y una funcionalidad DeFi radicalmente nueva sobre los sólidos cimientos de una década de teoría y desarrollo de la blockchain",
   "wallet.currency.pick.header": "Selecciona una moneda o plataforma",
   "wallet.dashboard.empty.text": "Dirígete a Participación Simple o Avanzada para elegir el stake pool al cuál delegar. Ten en cuenta que sólo puedes delegar en un stake pool durante esta Red de Prueba",
   "wallet.dashboard.empty.title": "No has delegado tus ADA aún",
