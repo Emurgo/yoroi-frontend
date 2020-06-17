@@ -592,7 +592,7 @@
   "wallet.staking.warning.title": "Delegatie tijdelijk uitgeschakeld",
   "wallet.summary.no.transaction": "Geen transacties gevonden",
   "wallet.summary.page.dateTime": "Datum/Tijd",
-  "wallet.summary.page.integratedNotificationMessage": "You have successfully integrated with your {deviceName}",
+  "wallet.summary.page.integratedNotificationMessage": "U heeft met succes de integratie met uw {deviceName} uitgevoerd",
   "wallet.summary.page.pendingIncomingConfirmationLabel": "Inkomende \"In afwachting\" bevestiging",
   "wallet.summary.page.pendingOutgoingConfirmationLabel": "Uitgaande \"In Afwachting\" bevestiging",
   "wallet.summary.page.showMoreTransactionsButtonLabel": "Toon meer transacties",
