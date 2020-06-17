@@ -467,7 +467,7 @@ export default class WalletStore extends Store {
 
   // =================== NOTIFICATION ==================== //
   showLedgerWalletIntegratedNotification: void => void = (): void => {
-    this.actions.notifications.open.trigger(WalletCreationNotifications.LedgerNanoSNotification);
+    this.actions.notifications.open.trigger(WalletCreationNotifications.LedgerNotification);
   }
 
   showTrezorTWalletIntegratedNotification: void => void = (): void => {
@@ -568,7 +568,7 @@ export default class WalletStore extends Store {
 }
 
 export const WalletCreationNotifications: {| [key: string]: Notification |} = {
-  LedgerNanoSNotification: {
+  LedgerNotification: {
     id: globalMessages.integratedNotificationMessage.id,
     message: globalMessages.integratedNotificationMessage,
     duration: config.wallets.WALLET_CREATED_NOTIFICATION_DURATION,
