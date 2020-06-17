@@ -319,7 +319,7 @@ export default class LedgerConnectStore
     await wallets.addHwWallet(publicDeriver);
 
     // show success notification
-    wallets.showLedgerNanoWalletIntegratedNotification();
+    wallets.showLedgerWalletIntegratedNotification();
 
     this.teardown();
     Logger.info('SUCCESS: Ledger Connected Wallet created and loaded');

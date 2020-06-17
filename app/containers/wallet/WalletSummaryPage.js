@@ -50,8 +50,7 @@ export type GeneratedData = typeof WalletSummaryPage.prototype.generated;
 const targetNotificationIds = [
   globalMessages.walletCreatedNotificationMessage.id,
   globalMessages.walletRestoredNotificationMessage.id,
-  globalMessages.ledgerNanoSWalletIntegratedNotificationMessage.id,
-  globalMessages.trezorTWalletIntegratedNotificationMessage.id,
+  globalMessages.integratedNotificationMessage.id,
 ];
 
 @observer
@@ -199,7 +198,13 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
           icon={successIcon}
           show={!!notification}
         >
-          {!!notification && <FormattedHTMLMessage {...notification.message} />}
+          {!!notification && <FormattedHTMLMessage
+            {...notification.message}
+            values={notification.values == null
+              ? undefined
+              : notification.values(intl)
+            }
+          />}
         </NotificationMessage>
 
         <WalletSummary

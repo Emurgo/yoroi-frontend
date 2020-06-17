@@ -466,40 +466,20 @@ export default class WalletStore extends Store {
   };
 
   // =================== NOTIFICATION ==================== //
-  showLedgerNanoWalletIntegratedNotification: void => void = (): void => {
-    const notification: Notification = {
-      id: globalMessages.ledgerNanoSWalletIntegratedNotificationMessage.id,
-      message: globalMessages.ledgerNanoSWalletIntegratedNotificationMessage,
-      duration: config.wallets.WALLET_CREATED_NOTIFICATION_DURATION,
-    };
-    this.actions.notifications.open.trigger(notification);
+  showLedgerWalletIntegratedNotification: void => void = (): void => {
+    this.actions.notifications.open.trigger(WalletCreationNotifications.LedgerNotification);
   }
 
   showTrezorTWalletIntegratedNotification: void => void = (): void => {
-    const notification: Notification = {
-      id: globalMessages.trezorTWalletIntegratedNotificationMessage.id,
-      message: globalMessages.trezorTWalletIntegratedNotificationMessage,
-      duration: config.wallets.WALLET_CREATED_NOTIFICATION_DURATION,
-    };
-    this.actions.notifications.open.trigger(notification);
+    this.actions.notifications.open.trigger(WalletCreationNotifications.TrezorTNotification);
   }
 
   showWalletCreatedNotification: void => void = (): void => {
-    const notification: Notification = {
-      id: globalMessages.walletCreatedNotificationMessage.id,
-      message: globalMessages.walletCreatedNotificationMessage,
-      duration: config.wallets.WALLET_CREATED_NOTIFICATION_DURATION,
-    };
-    this.actions.notifications.open.trigger(notification);
+    this.actions.notifications.open.trigger(WalletCreationNotifications.WalletCreatedNotification);
   }
 
   showWalletRestoredNotification: void => void = (): void => {
-    const notification: Notification = {
-      id: globalMessages.walletRestoredNotificationMessage.id,
-      message: globalMessages.walletRestoredNotificationMessage,
-      duration: config.wallets.WALLET_RESTORED_NOTIFICATION_DURATION,
-    };
-    this.actions.notifications.open.trigger(notification);
+    this.actions.notifications.open.trigger(WalletCreationNotifications.WalletRestoredNotification);
   }
 
   // TODO: maybe delete this function and turn it into another "addObservedWallet"
@@ -586,3 +566,32 @@ export default class WalletStore extends Store {
     }
   }
 }
+
+export const WalletCreationNotifications: {| [key: string]: Notification |} = {
+  LedgerNotification: {
+    id: globalMessages.integratedNotificationMessage.id,
+    message: globalMessages.integratedNotificationMessage,
+    duration: config.wallets.WALLET_CREATED_NOTIFICATION_DURATION,
+    values: intl => ({
+      deviceName: intl.formatMessage(globalMessages.ledgerTitle),
+    }),
+  },
+  TrezorTNotification: {
+    id: globalMessages.integratedNotificationMessage.id,
+    message: globalMessages.integratedNotificationMessage,
+    duration: config.wallets.WALLET_CREATED_NOTIFICATION_DURATION,
+    values: intl => ({
+      deviceName: intl.formatMessage(globalMessages.trezorTitle),
+    }),
+  },
+  WalletCreatedNotification: {
+    id: globalMessages.walletCreatedNotificationMessage.id,
+    message: globalMessages.walletCreatedNotificationMessage,
+    duration: config.wallets.WALLET_CREATED_NOTIFICATION_DURATION,
+  },
+  WalletRestoredNotification: {
+    id: globalMessages.walletRestoredNotificationMessage.id,
+    message: globalMessages.walletRestoredNotificationMessage,
+    duration: config.wallets.WALLET_RESTORED_NOTIFICATION_DURATION,
+  },
+};

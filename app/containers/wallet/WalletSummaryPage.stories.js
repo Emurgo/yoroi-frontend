@@ -47,6 +47,9 @@ import {
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { addressTypes } from '../../i18n/global-messages';
 import { AddressStoreTypes } from '../../types/AddressFilterTypes';
+import {
+  WalletCreationNotifications,
+} from '../../stores/toplevel/WalletStore';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -190,6 +193,7 @@ const genPropsForTransactions: {|
     exportError: ?LocalizableError
   |},
   lastSyncInfo: LastSyncInfoRow,
+  topLevelNotification?: *,
 |} => * = (request) => ({
   profile: {
     selectedExplorer: getDefaultExplorer(),
@@ -202,8 +206,8 @@ const genPropsForTransactions: {|
     getParam: () => (undefined: any)
   },
   uiNotifications: {
-    mostRecentActiveNotification: undefined, // TODO
-    isOpen: () => false,
+    mostRecentActiveNotification: request.topLevelNotification,
+    isOpen: () => request.topLevelNotification != null,
     getTooltipActiveNotification: () => null,
 
   },
@@ -368,6 +372,15 @@ export const Transaction = (): Node => {
       confirmationCases.Low
     )
     : confirmationCases.Low;
+
+  const notification = select(
+    'notification',
+    [
+      'None',
+      ...Object.keys(WalletCreationNotifications),
+    ],
+    'None'
+  );
   return wrapWallet(
     mockWalletProps({
       location: getRoute(wallet.publicDeriver.getPublicDeriverId()),
@@ -387,6 +400,9 @@ export const Transaction = (): Node => {
             BlockHash: walletTransaction.block?.Hash || '',
             Height: numConfirmations,
           },
+          topLevelNotification: notification === 'None'
+            ? undefined
+            : WalletCreationNotifications[notification]
         }),
         actions,
       }}

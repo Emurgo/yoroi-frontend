@@ -254,19 +254,15 @@ const globalMessages: * = defineMessages({
   },
   walletCreatedNotificationMessage: {
     id: 'wallet.summary.page.walletCreatedNotificationMessage',
-    defaultMessage: '!!!You have successfully created a new Wallet',
+    defaultMessage: '!!!You have successfully created a new wallet',
   },
   walletRestoredNotificationMessage: {
     id: 'wallet.summary.page.walletRestoredNotificationMessage',
-    defaultMessage: '!!!You have successfully restored your Wallet',
+    defaultMessage: '!!!You have successfully restored your wallet',
   },
-  ledgerNanoSWalletIntegratedNotificationMessage: {
-    id: 'wallet.summary.page.ledgerNanoSWalletIntegratedNotificationMessage',
-    defaultMessage: '!!!You have successfully integrated with your Ledger Nano S device',
-  },
-  trezorTWalletIntegratedNotificationMessage: {
-    id: 'wallet.summary.page.trezorTWalletIntegratedNotificationMessage',
-    defaultMessage: '!!!You have successfully integrated with your Trezor Model T device',
+  integratedNotificationMessage: {
+    id: 'wallet.summary.page.integratedNotificationMessage',
+    defaultMessage: '!!!You have successfully integrated with your {deviceName}',
   },
   noTransactionsFound: {
     id: 'wallet.summary.no.transaction',
