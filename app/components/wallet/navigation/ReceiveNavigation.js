@@ -36,10 +36,10 @@ const messages = defineMessages({
     id: 'wallet.receive.navigation.hasBalanceLabel',
     defaultMessage: '!!!Has Balance'
   },
-  helperInfo: {
-    id: 'wallet.receive.navigation.helperInfo',
-    defaultMessage: '!!!Here\'s the helper message' ,
-  },
+  // helperInfo: {
+  //   id: 'wallet.receive.navigation.helperInfo',
+  //   defaultMessage: '!!!Here\'s the helper message',
+  // },
 });
 export type Props = {|
   +setFilter: AddressFilterKind => void,
