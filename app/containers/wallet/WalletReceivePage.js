@@ -36,6 +36,7 @@ import type { Notification } from '../../types/notificationType';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { getApiForCoinType, getApiMeta } from '../../api/common/utils';
 import { isWithinSupply } from '../../utils/validations';
+import { Logger, } from '../../utils/logging';
 
 export type GeneratedData = typeof WalletReceivePage.prototype.generated;
 
@@ -100,7 +101,11 @@ export default class WalletReceivePage extends Component<Props> {
     if (!withChains) throw new Error(`${nameof(WalletReceivePage)} only available for account-level wallets`);
     const addressTypeStore = this.getTypeStore(publicDeriver);
 
-    if (!addressTypeStore.wasExecuted || addressTypeStore.all.length === 0) {
+    if (
+      addressTypeStore == null ||
+      !addressTypeStore.wasExecuted ||
+      addressTypeStore.all.length === 0
+    ) {
       return (
         <VerticallyCenteredLayout>
           <LoadingSpinner />
@@ -304,7 +309,7 @@ export default class WalletReceivePage extends Component<Props> {
     );
   }
 
-  getTypeStore: PublicDeriver<> => {
+  getTypeStore: PublicDeriver<> => void | {
     +all: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
     +filtered: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
     +wasExecuted: boolean,
@@ -319,7 +324,7 @@ export default class WalletReceivePage extends Component<Props> {
         return addressStore;
       }
     }
-    throw new Error(`${nameof(WalletReceivePage)} unexpected address tab`);
+    Logger.error(`${nameof(WalletReceivePage)} unexpected address tab`);
   }
 
   openVerifyAddressDialog: void => void = (): void => {
