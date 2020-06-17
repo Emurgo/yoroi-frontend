@@ -26,7 +26,7 @@ export class UserAgentInfo {
     // if running Yoroi in browser mode
     // we need to rely on detecting what features of the API are enabled
 
-    // $FlowFixMe InstallTrigger is a global from the browser
+    // $FlowExpectedError[cannot-resolve-name] InstallTrigger is a global from the browser
     this.isFirefox = (typeof InstallTrigger !== 'undefined');
     this.isChrome = !!window.chrome &&
       (!!window.chrome.webstore || !!window.chrome.runtime) &&

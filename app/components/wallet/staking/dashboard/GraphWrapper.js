@@ -158,7 +158,7 @@ const Graph: {|
     return null;
   };
 
-  // $FlowFixMe props are passed implicitly which causes a flow error
+  // $FlowExpectedError[prop-missing] props are passed implicitly which causes a flow error
   const graphTooltip = (<GraphTooltip />);
   return (
     <ResponsiveContainer width="100%" height={240}>

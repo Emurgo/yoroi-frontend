@@ -32,7 +32,7 @@ const wasmv2 = require('cardano-wallet');
 const wasmv3 = require('@emurgo/js-chain-libs-node/js_chain_libs');
 
 RustModule._wasmv2 = wasmv2;
-// $FlowFixMe nodejs & browser API have same interface so it's okay
+// $FlowExpectedError[incompatible-type] nodejs & browser API have same interface so it's okay
 RustModule._wasmv3 = wasmv3;
 
 const { getMockServer } = require('../features/mock-chain/mockServer');

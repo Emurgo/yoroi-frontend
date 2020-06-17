@@ -16,7 +16,7 @@ import IndonesianFlag from '../assets/images/flags/indonesian.inline.svg';
 
 // This is essentially bulk require
 
-// $FlowFixMe require.context comes from webpack
+// $FlowExpectedError[prop-missing] require.context comes from webpack
 const req = require.context('./locales', true, /\.json.*$/);
 export const translations: { [locale: string]: { [key: string]: string, ... }, ... } = {};
 

@@ -6,7 +6,7 @@ const argv = require('minimist')(process.argv.slice(2));
 /* eslint import/no-unresolved: 0 */
 
 // Ignore FlowLint telling you to delete this. CI needs it
-// $FlowFixMe this file is generated at build time so Flow fails to find it
+// $FlowExpectedError[cannot-resolve-module] build-time generated file so Flow fails to find it
 const name = require('../build/manifest.json').name;
 
 function readKeyFromFile(keyPath) {

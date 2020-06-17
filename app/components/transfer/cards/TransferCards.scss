@@ -16,8 +16,14 @@
 }
 
 .heroCardsItemBg {
-  &.bgCreateWallet {
-    background-image: url(../../../assets/images/add-wallet/create-wallet-modern.inline.svg);
+  &.bgByronMainnet {
+    background-image: url(../../../assets/images/claim/byron-mainnet.inline.svg);
+  }
+  &.bgShelleyTestnet {
+    background-image: url(../../../assets/images/claim/shelley-testnet.inline.svg);
+  }
+  &.bgShelleyMainnet {
+    background-image: url(../../../assets/images/claim/shelley-mainnet.inline.svg);
   }
 }
 

@@ -6,9 +6,9 @@ import styles from './LoadingGif.scss';
 
 function getBgUrl(el) {
   let bg = '';
-  // $FlowDisable flow doesn't work that well for HTML access
+  // $FlowExpectedError[prop-missing] flow doesn't work that well for HTML access
   if (el.currentStyle != null) { // IE
-    // $FlowDisable flow doesn't work that well for HTML access
+    // $FlowExpectedError[incompatible-use] flow doesn't work that well for HTML access
     bg = el.currentStyle.backgroundImage;
   } else if (document.defaultView && document.defaultView.getComputedStyle) { // Firefox
     bg = document.defaultView.getComputedStyle(el, '').backgroundImage;

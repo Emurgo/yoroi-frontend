@@ -122,7 +122,7 @@ async function setupCip1852(
 
 export function mockDate(): void {
   const time = [0];
-  // $FlowFixMe flow doesn't like that we override built-in functions.
+  // $FlowExpectedError[cannot-write] flow doesn't like that we override built-in functions.
   Date.now = jest.spyOn(Date, 'now').mockImplementation(() => time[0]++);
 }
 

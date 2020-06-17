@@ -375,7 +375,7 @@ export default class ProfileStore extends Store {
     if (this.isCurrentThemeSet && result != null) {
       // verify content is an actual theme
       if (Object.values(THEMES).find(theme => theme === result)) {
-        // $FlowFixMe: can safely cast
+        // $FlowExpectedError[incompatible-return]: can safely cast
         return result;
       }
     }

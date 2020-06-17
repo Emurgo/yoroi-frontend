@@ -61,12 +61,12 @@ RustModule.load().then(() => {
 
   configure(
     [
-      // $FlowFixMe comes from Webpack and not nodejs so Flow doesn't find the function
+      // $FlowExpectedError[prop-missing] comes from Webpack and not nodejs so Flow doesn't find the function
       require.context('../app/components', true, /\.stories\.js$/),
-      // $FlowFixMe comes from Webpack and not nodejs so Flow doesn't find the function
+      // $FlowExpectedError[prop-missing] comes from Webpack and not nodejs so Flow doesn't find the function
       require.context('../app/containers', true, /\.stories\.js$/),
     ],
-    // $FlowDisable
+    // $FlowExpectedError[invalid-export]
     module
   );
 });
