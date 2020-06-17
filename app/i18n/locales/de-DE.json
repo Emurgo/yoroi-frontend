@@ -592,7 +592,7 @@
   "wallet.staking.warning.title": "Delegierung vorübergehend deaktiviert",
   "wallet.summary.no.transaction": "Keine Transaktionen gefunden",
   "wallet.summary.page.dateTime": "Datum/Uhrzeit",
-  "wallet.summary.page.integratedNotificationMessage": "You have successfully integrated with your {deviceName}",
+  "wallet.summary.page.integratedNotificationMessage": "Dein {deviceName} wurde erfolgreich integriert",
   "wallet.summary.page.pendingIncomingConfirmationLabel": "Eingehende anstehende Bestätigung",
   "wallet.summary.page.pendingOutgoingConfirmationLabel": "Ausgehende anstehende Bestätigung",
   "wallet.summary.page.showMoreTransactionsButtonLabel": "Zeige mehr Transaktionen",
