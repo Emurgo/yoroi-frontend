@@ -110,7 +110,7 @@ function CustomWorld(cmdInput: WorldInput) {
   this.getExtensionUrl = (): string => {
     if (cmdInput.parameters.browser === 'chrome' || cmdInput.parameters.browser === 'brave') {
       /**
-       * Extension id is determinisitically calculated based on pubKey used to generate the crx file
+       * Extension id is deterministically calculated based on pubKey used to generate the crx file
        * so we can just hardcode this value if we keep e2etest-key.pem file
        * https://stackoverflow.com/a/10089780/3329806
        */
@@ -122,7 +122,7 @@ function CustomWorld(cmdInput: WorldInput) {
   this.getElementBy = (locator, method = By.css) => this.driver.findElement(method(locator));
   this.getElementsBy = (locator, method = By.css) => this.driver.findElements(method(locator));
   this.getText = (locator) => this.getElementBy(locator).getText();
-  // $FlowFixMe Flow doesn't like that we add a new function to driver
+  // $FlowExpectedError[prop-missing] Flow doesn't like that we add a new function to driver
   this.getValue = this.driver.getValue =
     async (locator) => this.getElementBy(locator).getAttribute('value');
 
@@ -132,7 +132,7 @@ function CustomWorld(cmdInput: WorldInput) {
   };
 
   // Returns a promise that resolves to the element
-  // $FlowFixMe Flow doesn't like that we add a new function to driver
+  // $FlowExpectedError[prop-missing] Flow doesn't like that we add a new function to driver
   this.waitForElement = this.driver.waitForElement = async (locator, method = By.css) => {
     await this.waitForElementLocated(locator, method);
     const element = await this.getElementBy(locator, method);
@@ -148,7 +148,7 @@ function CustomWorld(cmdInput: WorldInput) {
     return element;
   };
 
-  // $FlowFixMe Flow doesn't like that we add a new function to driver
+  // $FlowExpectedError[prop-missing] Flow doesn't like that we add a new function to driver
   this.waitForElementNotPresent = this.driver.waitForElementNotPresent =
     async (locator, method = By.css) => {
       await this.driver.wait(async () => {

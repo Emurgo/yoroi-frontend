@@ -155,7 +155,7 @@ export default class WalletStore extends Store {
     wallets.unselectWallet.listen(this._unsetActiveWallet);
     wallets.setActiveWallet.listen(this._setActiveWallet);
     setInterval(this._pollRefresh, this.WALLET_REFRESH_INTERVAL);
-    // $FlowFixMe built-in types can't handle visibilitychange
+    // $FlowExpectedError[incompatible-call] built-in types can't handle visibilitychange
     document.addEventListener('visibilitychange', debounce(this._pollRefresh, this.ON_VISIBLE_DEBOUNCE_WAIT));
     this.registerReactions([
       this._updateActiveWalletOnRouteChanges,

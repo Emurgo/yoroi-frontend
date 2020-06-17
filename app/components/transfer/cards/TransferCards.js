@@ -45,7 +45,7 @@ export default class TransferCards extends Component<Props> {
           onClick={this.props.onByron}
         >
           <div className={styles.heroCardsItem}>
-            <div className={classnames([styles.heroCardsItemBg, styles.bgCreateWallet])} />
+            <div className={classnames([styles.heroCardsItemBg, styles.bgByronMainnet])} />
             <div className={styles.heroCardsItemTitle}>
               {intl.formatMessage(messages.byronWallet)}
               <div className={styles.tooltip}>
@@ -68,7 +68,7 @@ export default class TransferCards extends Component<Props> {
             onClick={this.props.onShelleyItn}
           >
             <div className={styles.heroCardsItem}>
-              <div className={classnames([styles.heroCardsItemBg, styles.bgCreateWallet])} />
+              <div className={classnames([styles.heroCardsItemBg, styles.bgShelleyTestnet])} />
               <div className={styles.heroCardsItemTitle}>
                 {intl.formatMessage(messages.shelleyItnWallet)}
                 <div className={styles.tooltip}>

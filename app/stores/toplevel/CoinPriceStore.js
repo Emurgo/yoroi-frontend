@@ -27,6 +27,7 @@ declare var CONFIG: ConfigType;
 export default class CoinPriceStore extends Store {
   @observable currentPriceTickers: Array<{| From: string, To: string, Price: number |}> = [];
   @observable lastUpdateTimestamp: number|null = null;
+  ON_VISIBLE_DEBOUNCE_WAIT: number = 1000;
 
   expirePriceDataTimeoutId: ?TimeoutID = null;
   // Cached public key to verify the price data.
@@ -58,7 +59,7 @@ export default class CoinPriceStore extends Store {
 
   setup(): void {
     setInterval(this._pollRefresh, CONFIG.app.coinPriceRefreshInterval);
-    // $FlowFixMe built-in types can't handle visibilitychange
+    // $FlowExpectedError[incompatible-call] built-in types can't handle visibilitychange
     document.addEventListener('visibilitychange', debounce(this._pollRefresh, this.ON_VISIBLE_DEBOUNCE_WAIT));
   }
 

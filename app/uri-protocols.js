@@ -19,7 +19,7 @@ const registerProtocols = () => {
   try {
     // Unregistering the protocol before calling register again will make the browser
     // to always show the allow/block dialog.
-    // $FlowFixMe
+    // $FlowExpectedError[prop-missing] handled by try-catch
     navigator.unregisterProtocolHandler(
       cardanoURI.PROTOCOL,
       cardanoURI.URL,
