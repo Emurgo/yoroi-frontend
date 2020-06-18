@@ -16,8 +16,9 @@ import Accordion from '../../widgets/Accordion';
 import type { AddressFilterKind } from '../../../types/AddressFilterTypes';
 import classNames from 'classnames';
 import InfoIcon from '../../../assets/images/attention-big-light.inline.svg';
-// import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
-// import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
+import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
+import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
+import { addressTypeInfo } from '../../../i18n/global-messages';
 
 const messages = defineMessages({
   allLabel: {
@@ -36,10 +37,6 @@ const messages = defineMessages({
     id: 'wallet.receive.navigation.hasBalanceLabel',
     defaultMessage: '!!!Has Balance'
   },
-  // helperInfo: {
-  //   id: 'wallet.receive.navigation.helperInfo',
-  //   defaultMessage: '!!!Here\'s the helper message',
-  // },
 });
 export type Props = {|
   +setFilter: AddressFilterKind => void,
@@ -76,15 +73,15 @@ export default class ReceiveNavigation extends Component<Props> {
               header={
                 <div>
                   {this.props.categoryTitle}
-                  {/* <Tooltip
+                  <Tooltip
                     className={styles.Tooltip}
                     skin={TooltipSkin}
-                    tip={intl.formatMessage(messages.helperInfo)}
-                  > */}
-                  <span className={styles.infoIcon}>
-                    <InfoIcon />
-                  </span>
-                  {/* </Tooltip> */}
+                    tip={intl.formatMessage(addressTypeInfo.byronInfo)}
+                  >
+                    <span className={styles.infoIcon}>
+                      <InfoIcon />
+                    </span>
+                  </Tooltip>
                 </div>
               }
               activeHeader={this.props.addressTypes.some(address => address.isActiveStore)}
