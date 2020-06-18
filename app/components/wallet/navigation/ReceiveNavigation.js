@@ -15,6 +15,10 @@ import { AddressStoreTypes, AddressFilter } from '../../../types/AddressFilterTy
 import Accordion from '../../widgets/Accordion';
 import type { AddressFilterKind } from '../../../types/AddressFilterTypes';
 import classNames from 'classnames';
+import InfoIcon from '../../../assets/images/attention-big-light.inline.svg';
+import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
+import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
+import { addressTypeInfo } from '../../../i18n/global-messages';
 
 const messages = defineMessages({
   allLabel: {
@@ -65,7 +69,23 @@ export default class ReceiveNavigation extends Component<Props> {
       <div className={styles.wrapper}>
         <div className={styles.content}>
           <div>
-            <Accordion title={this.props.categoryTitle}>
+            <Accordion
+              header={
+                <div>
+                  {this.props.categoryTitle}
+                  <Tooltip
+                    className={styles.Tooltip}
+                    skin={TooltipSkin}
+                    tip={intl.formatMessage(addressTypeInfo.byronInfo)}
+                  >
+                    <span className={styles.infoIcon}>
+                      <InfoIcon />
+                    </span>
+                  </Tooltip>
+                </div>
+              }
+              activeHeader={this.props.addressTypes.some(address => address.isActiveStore)}
+            >
               {this.props.addressTypes.map(type => (
                 !type.isHidden && <ReceiveNavButton
                   key={type.name.stable}

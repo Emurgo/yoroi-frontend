@@ -602,6 +602,21 @@ export const addressTypes: * = defineMessages({
   },
 });
 
+export const addressTypeInfo: * = defineMessages({
+  byronInfo: {
+    id: 'wallet.address.category.byron',
+    defaultMessage: '!!!Addresses created using the Byron-era address format',
+  },
+  groupInfo: {
+    id: 'wallet.address.category.group',
+    defaultMessage: '!!!Addresses formed by the combination of a spending key and a staking key',
+  },
+  ergoP2PKInfo: {
+    id: 'wallet.address.category.p2pk',
+    defaultMessage: '!!!Addresses generated directly from a public key',
+  },
+});
+
 export function listOfTranslators(
   contributorsList: string,
   contributorsAck: string,

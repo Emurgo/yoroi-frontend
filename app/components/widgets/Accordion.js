@@ -6,55 +6,51 @@ import classnames from 'classnames';
 
 import ArrowDownSVG from '../../assets/images/expand-arrow-grey.inline.svg';
 import styles from './Accordion.scss';
-import AttentionIcon from '../../assets/images/attention-big-light.inline.svg';
 
 type Props = {|
-  +title: string,
+  +header: Node,
   +children: Node,
+  activeHeader: boolean
 |};
 
 type State = {|
-  active: boolean,
+  isToggle: boolean,
 |};
 
 @observer
 export default class Accordion extends Component<Props, State> {
 
   state: State = {
-    active: true,
+    isToggle: true,
   };
 
   toggleActive() {
-    this.setState(prevState => ({ active: !prevState.active }));
+    this.setState(prevState => ({ isToggle: !prevState.isToggle }));
   }
 
   render(): Node {
-    const { title, children } = this.props;
-    const { active } = this.state;
+    const { header, children } = this.props;
+    const { isToggle } = this.state;
 
     const activeButtonClasses = classnames([
       styles.accordionTitle,
-      active && styles.arrowUp,
+      isToggle && styles.arrowUp,
+      this.props.activeHeader && styles.activeHead
     ]);
-    const activeShowClasses = classnames([
+    const toggleShowContent = classnames([
       styles.accordionContent,
-      active && styles.showActiveContent,
+      isToggle && styles.showActiveContent,
     ]);
 
     return (
       <div className={styles.accordionSection}>
         <button className={activeButtonClasses} onClick={this.toggleActive.bind(this)} type="button">
-          <div> {title}
-            <span className={styles.atentionIcon}>
-              <AttentionIcon />
-            </span>
-          </div>
-          <span className={styles.icon}><ArrowDownSVG /></span>
+          {header}
+          <span className={styles.arrowDownIcon}><ArrowDownSVG /></span>
         </button>
-        <div className={activeShowClasses}>
+        <div className={toggleShowContent}>
           {children}
         </div>
-
       </div>
     );
   }
