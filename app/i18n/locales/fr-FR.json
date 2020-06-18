@@ -397,7 +397,7 @@
   "wallet.create.dialog.title": "Créer un wallet",
   "wallet.create.dialog.walletNameHint": "ex: Wallet de shopping",
   "wallet.currency.pick.cardano": "Cardano est le premier protocole de preuve d'enjeu dont la sécurité est prouvée",
-  "wallet.currency.pick.ergo": "Ergo builds advanced cryptographic features and radically new DeFi functionality on the rock-solid foundations laid by a decade of blockchain theory and development",
+  "wallet.currency.pick.ergo": "Ergo construit des outils cryptographiques avancés et des fonctionnalités DeFi radicalement nouvelles, sur des bases solides issues d'une décennie de recherche et de développement des blockchains",
   "wallet.currency.pick.header": "Choisissez une devise ou une plateforme",
   "wallet.dashboard.empty.text": "Cliquez sur 'Simple 'ou 'Advanced Staking' pour choisir le Stake Pool (groupe d'enjeu) dans lequel vous voulez déléguer. Notez que vous ne pouvez déléguer qu'à un seul Stake Pool durant ce Testnet",
   "wallet.dashboard.empty.title": "Vous n'avez pas encore délégué vos ADA",
