@@ -18,9 +18,8 @@ import type {
 } from '../../../config/config-types';
 import { AddressTypeStore } from '../toplevel/AddressesStore';
 import type { StandardAddress, } from '../../types/AddressFilterTypes';
-import { AddressStoreTypes } from '../../types/AddressFilterTypes';
-import globalMessages, { addressTypes } from '../../i18n/global-messages';
-import { ROUTES } from '../../routes-config';
+import { addressTypes, addressGroups, AddressGroupTypes, AddressStoreTypes } from '../../types/AddressFilterTypes';
+import globalMessages from '../../i18n/global-messages';
 import type { CoreAddressT } from '../../api/ada/lib/storage/database/primitives/enums';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
@@ -35,9 +34,8 @@ import {
 declare var CONFIG : ConfigType;
 
 const byronGroup = {
-  // todo: byron text
-  stable: AddressStoreTypes.external,
-  display: addressTypes.externalTab,
+  stable: AddressGroupTypes.byron,
+  display: addressGroups.byron,
 };
 
 export default class AdaAddressesStore extends Store {
@@ -62,7 +60,6 @@ export default class AdaAddressesStore extends Store {
         display: globalMessages.addressesLabel
       },
       groupName: byronGroup,
-      route: ROUTES.WALLETS.RECEIVE.ROOT,
       shouldHide: (publicDeriver, _store) => {
         const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
         if (withLevels == null) return true;
@@ -87,10 +84,9 @@ export default class AdaAddressesStore extends Store {
       }),
       name: {
         stable: AddressStoreTypes.external,
-        display: addressTypes.externalTab,
+        display: addressTypes.external,
       },
       groupName: byronGroup,
-      route: ROUTES.WALLETS.RECEIVE.EXTERNAL,
       shouldHide: (_publicDeriver, store) => store.all.length === 0,
     });
     this.internalForDisplay = new AddressTypeStore({
@@ -103,10 +99,9 @@ export default class AdaAddressesStore extends Store {
       }),
       name: {
         stable: AddressStoreTypes.internal,
-        display: addressTypes.internalLabel,
+        display: addressTypes.internal,
       },
       groupName: byronGroup,
-      route: ROUTES.WALLETS.RECEIVE.INTERNAL,
       shouldHide: (_publicDeriver, store) => store.all.length === 0,
     });
     this.mangledAddressesForDisplay = new AddressTypeStore({
@@ -118,10 +113,9 @@ export default class AdaAddressesStore extends Store {
       }),
       name: {
         stable: AddressStoreTypes.mangled,
-        display: addressTypes.mangledLabel,
+        display: addressTypes.mangled,
       },
       groupName: byronGroup,
-      route: ROUTES.WALLETS.RECEIVE.MANGLED,
       shouldHide: (_publicDeriver, store) => store.all.length === 0,
     });
   }

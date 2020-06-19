@@ -10,8 +10,8 @@ import type {
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import ReceiveWithNavigation from '../../components/wallet/layouts/ReceiveWithNavigation';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { AddressTypeName } from '../../stores/toplevel/AddressesStore';
-import type { AddressFilterKind } from '../../types/AddressFilterTypes';
+import type { AddressTypeName, AddressGroupName, AddressFilterKind } from '../../types/AddressFilterTypes';
+import { AddressStoreTypes, AddressGroupTypes } from '../../types/AddressFilterTypes';
 import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
 import { buildRoute } from '../../utils/routing';
@@ -48,6 +48,29 @@ export default class Receive extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  componentDidMount() {
+    const publicDeriver = this.generated.stores.wallets.selected;
+    if (publicDeriver == null) throw new Error(`${nameof(Receive)} no public deriver`);
+    const rootRoute = buildRoute(
+      ROUTES.WALLETS.RECEIVE.ROOT,
+      {
+        id: publicDeriver.getPublicDeriverId(),
+      }
+    );
+    if (this.generated.stores.app.currentRoute === rootRoute) {
+      // if no store is specified, we just send the user to the first store in the list
+      const stores = this.generated.stores.addresses.getStoresForWallet(publicDeriver);
+      const firstRoute = buildRoute(
+        ROUTES.WALLETS.RECEIVE.ADDRESS_LIST,
+        {
+          id: publicDeriver.getPublicDeriverId(),
+          group: stores[0].groupName.stable,
+          name: stores[0].name.stable,
+        }
+      );
+      this.generated.actions.router.goToRoute.trigger({ route: firstRoute });
+    }
+  }
   componentWillUnmount() {
     this.generated.actions.addresses.resetFilter.trigger();
   }
@@ -68,13 +91,15 @@ export default class Receive extends Component<Props> {
   render(): Node {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) throw new Error(`${nameof(Receive)} no public deriver`);
-    const { addresses, app } = this.generated.stores;
+    const { addresses } = this.generated.stores;
     const { actions } = this.generated;
 
     const addressBookRoute = buildRoute(
-      ROUTES.WALLETS.RECEIVE.ADDRESS_BOOK,
+      ROUTES.WALLETS.RECEIVE.ADDRESS_LIST,
       {
         id: publicDeriver.getPublicDeriverId(),
+        group: AddressGroupTypes.addressBook,
+        name: AddressStoreTypes.all,
       }
     );
     return (
@@ -102,6 +127,7 @@ export default class Receive extends Component<Props> {
           {|
             +isActiveStore: boolean,
             +isHidden: boolean,
+            +groupName: AddressGroupName,
             +name: AddressTypeName,
             +setAsActiveStore: (void) => void,
           |},
@@ -144,16 +170,12 @@ export default class Receive extends Component<Props> {
           addressFilter: stores.addresses.addressFilter,
           getStoresForWallet: (publicDeriver: PublicDeriver<>) => {
             const addressStores = stores.addresses.getStoresForWallet(publicDeriver);
-            const functionalitySubset: Array<{|
-              +isActiveStore: boolean,
-              +isHidden: boolean,
-              +setAsActiveStore: void => void,
-              +name: AddressTypeName,
-            |}> = addressStores.map(addressStore => ({
+            const functionalitySubset = addressStores.map(addressStore => ({
               isHidden: addressStore.isHidden,
               isActiveStore: addressStore.isActiveStore,
               setAsActiveStore: () => addressStore.setAsActiveStore(publicDeriver),
               name: addressStore.name,
+              groupName: addressStore.groupName,
             }));
             return functionalitySubset;
           },

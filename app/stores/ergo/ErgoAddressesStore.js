@@ -11,24 +11,20 @@ import {
 import type { StandardAddress, } from '../../types/AddressFilterTypes';
 import type { CoreAddressT } from '../../api/ada/lib/storage/database/primitives/enums';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
-import globalMessages, { addressTypes } from '../../i18n/global-messages';
-import environment from '../../environment';
+import globalMessages from '../../i18n/global-messages';
 import { ChainDerivations } from '../../config/numbersConfig';
-import { ROUTES } from '../../routes-config';
 import {
   ConceptualWallet
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { AddressStoreTypes } from '../../types/AddressFilterTypes';
+import { addressTypes, addressGroups, AddressGroupTypes, AddressStoreTypes } from '../../types/AddressFilterTypes';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import { Cip1852Wallet } from '../../api/ada/lib/storage/models/Cip1852Wallet/wrapper';
 import { Bip44DerivationLevels } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 
 const p2pkGroup = {
-  // TODO: p2pk
-  stable: AddressStoreTypes.external,
-  display: addressTypes.externalTab,
+  stable: AddressGroupTypes.p2pk,
+  display: addressGroups.p2pk,
 };
-
 
 export default class ErgoAddressesStore extends Store {
 
@@ -51,7 +47,6 @@ export default class ErgoAddressesStore extends Store {
         display: globalMessages.addressesLabel
       },
       groupName: p2pkGroup,
-      route: ROUTES.WALLETS.RECEIVE.ROOT,
       shouldHide: (publicDeriver, _store) => {
         const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
         if (withLevels == null) return true;
@@ -76,10 +71,9 @@ export default class ErgoAddressesStore extends Store {
       }),
       name: {
         stable: AddressStoreTypes.external,
-        display: addressTypes.externalTab,
+        display: addressTypes.external,
       },
       groupName: p2pkGroup,
-      route: ROUTES.WALLETS.RECEIVE.EXTERNAL,
       shouldHide: (_publicDeriver, store) => store.all.length === 0,
     });
     this.internalForDisplay = new AddressTypeStore({
@@ -92,10 +86,9 @@ export default class ErgoAddressesStore extends Store {
       }),
       name: {
         stable: AddressStoreTypes.internal,
-        display: addressTypes.internalLabel,
+        display: addressTypes.internal,
       },
       groupName: p2pkGroup,
-      route: ROUTES.WALLETS.RECEIVE.INTERNAL,
       shouldHide: (_publicDeriver, store) => store.all.length === 0,
     });
   }

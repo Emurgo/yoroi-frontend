@@ -4,8 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import ReceiveNavigation from '../navigation/ReceiveNavigation';
 import styles from './ReceiveWithNavigation.scss';
-import type { AddressTypeName } from '../../../stores/toplevel/AddressesStore';
-import type { AddressFilterKind } from '../../../types/AddressFilterTypes';
+import type { AddressTypeName, AddressGroupName, AddressFilterKind } from '../../../types/AddressFilterTypes';
 
 export type Props = {|
   +children?: Node,
@@ -16,6 +15,7 @@ export type Props = {|
     +isHidden: boolean,
     +setAsActiveStore: void => void,
     +name: AddressTypeName,
+    +groupName: AddressGroupName,
   |}>;
   +categoryTitle: string,
   +goAddressBook: void => void,

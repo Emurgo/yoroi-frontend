@@ -10,25 +10,20 @@ import ReceiveNavButton from './ReceiveNavButton';
 import type {
   $npm$ReactIntl$IntlFormat,
 } from 'react-intl';
-import type { AddressTypeName } from '../../../stores/toplevel/AddressesStore';
-import { AddressStoreTypes, AddressFilter } from '../../../types/AddressFilterTypes';
+import { addressGroups, AddressStoreTypes, AddressFilter } from '../../../types/AddressFilterTypes';
 import Accordion from '../../widgets/Accordion';
 import InfoIcon from '../../../assets/images/attention-big-light.inline.svg';
 
-import type { AddressFilterKind } from '../../../types/AddressFilterTypes';
+import type { AddressTypeName, AddressGroupName, AddressFilterKind } from '../../../types/AddressFilterTypes';
 import classNames from 'classnames';
 import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
 import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
-import { addressTypeInfo } from '../../../i18n/global-messages';
+import globalMessages from '../../../i18n/global-messages';
 
 const messages = defineMessages({
   AddressBook: {
     id: 'wallet.receive.navigation.AddressBook',
     defaultMessage: '!!!Address book'
-  },
-  allLabel: {
-    id: 'wallet.receive.navigation.allLabel',
-    defaultMessage: '!!!All'
   },
   usedLabel: {
     id: 'wallet.receive.navigation.usedLabel',
@@ -51,6 +46,7 @@ export type Props = {|
     +isHidden: boolean,
     +setAsActiveStore: void => void,
     +name: AddressTypeName,
+    +groupName: AddressGroupName,
   |}>;
   +categoryTitle: string,
   +goAddressBook: void => void,
@@ -83,7 +79,7 @@ export default class ReceiveNavigation extends Component<Props> {
                   <Tooltip
                     className={styles.Tooltip}
                     skin={TooltipSkin}
-                    tip={intl.formatMessage(addressTypeInfo.byronInfo)}
+                    tip={intl.formatMessage(addressGroups.byron)}
                   >
                     <span className={styles.infoIcon}>
                       <InfoIcon />
@@ -134,7 +130,7 @@ export default class ReceiveNavigation extends Component<Props> {
               className={activeFilter === AddressFilter.None ?
                 componentClasses : styles.filterButton}
             >
-              {intl.formatMessage(messages.allLabel)}
+              {intl.formatMessage(globalMessages.allLabel)}
             </button>
             {
               !this.props.isAddressBookRoute &&

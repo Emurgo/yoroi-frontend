@@ -7,7 +7,8 @@ import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import WarningHeader from './WarningHeader';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import globalMessages, { addressTypes } from '../../../i18n/global-messages';
+import globalMessages from '../../../i18n/global-messages';
+import { addressTypes } from '../../../types/AddressFilterTypes';
 import styles from './MangledHeader.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
@@ -47,7 +48,7 @@ export default class MangledHeader extends Component<Props> {
             <>
               <p>{intl.formatMessage(messages.warning1)}</p><br />
               <p>
-                {intl.formatMessage(addressTypes.mangledLabel)}&nbsp;
+                {intl.formatMessage(addressTypes.mangled)}&nbsp;
                 <FormattedHTMLMessage {...globalMessages.auditAddressWarning} />
               </p>
             </>

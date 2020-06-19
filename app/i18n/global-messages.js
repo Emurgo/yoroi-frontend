@@ -560,7 +560,11 @@ const globalMessages: * = defineMessages({
   paperWalletLabel: {
     id: 'wallet.add.optionDialog.restore.paperWallet.title',
     defaultMessage: '!!!Paper Wallet'
-  }
+  },
+  allLabel: {
+    id: 'global.labels.all',
+    defaultMessage: '!!!All'
+  },
 });
 export default globalMessages;
 
@@ -587,39 +591,6 @@ export const memoMessages: * = defineMessages({
   },
 });
 
-export const addressTypes: * = defineMessages({
-  externalTab: {
-    id: 'wallet.receive.nav.external',
-    defaultMessage: '!!!External',
-  },
-  internalLabel: {
-    id: 'wallet.receive.nav.internal',
-    defaultMessage: '!!!Internal',
-  },
-  mangledLabel: {
-    id: 'wallet.receive.nav.mangled',
-    defaultMessage: '!!!Mangled',
-  },
-});
-
-export const addressTypeInfo: * = defineMessages({
-  byronInfo: {
-    id: 'wallet.address.category.byron',
-    defaultMessage: '!!!Addresses created using the Byron-era address format',
-  },
-  addressBookInfo: {
-    id: 'wallet.address.category.addressBook',
-    defaultMessage: '!!!Addresses that do not belong to you, but are relevant to your wallet',
-  },
-  groupInfo: {
-    id: 'wallet.address.category.group',
-    defaultMessage: '!!!Addresses formed by the combination of a spending key and a staking key',
-  },
-  ergoP2PKInfo: {
-    id: 'wallet.address.category.p2pk',
-    defaultMessage: '!!!Addresses generated directly from a public key',
-  },
-});
 
 export function listOfTranslators(
   contributorsList: string,

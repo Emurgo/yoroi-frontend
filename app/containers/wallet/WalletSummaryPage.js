@@ -21,7 +21,7 @@ import DeleteMemoDialog from '../../components/wallet/memos/DeleteMemoDialog';
 import MemoNoExternalStorageDialog from '../../components/wallet/memos/MemoNoExternalStorageDialog';
 import { Logger } from '../../utils/logging';
 import { buildRoute } from '../../utils/routing';
-import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type {
   Address,
@@ -44,6 +44,7 @@ import type {
 } from '../../api/common/index';
 import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
 import { getApiForCoinType, getApiMeta } from '../../api/common/utils';
+import type { AddressTypeName, AddressGroupName } from '../../types/AddressFilterTypes';
 
 export type GeneratedData = typeof WalletSummaryPage.prototype.generated;
 
@@ -163,12 +164,14 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
               const addressStores = addresses.getStoresForWallet(publicDeriver);
               for (const addressStore of addressStores) {
                 if (addressStore.all.some(addressInStore => addressInStore.address === address)) {
-                  const route = buildRoute(addressStore.route, {
+                  const route = buildRoute(ROUTES.WALLETS.RECEIVE.ADDRESS_LIST, {
                     id: publicDeriver.getPublicDeriverId(),
+                    group: addressStore.groupName.stable,
+                    name: addressStore.name.stable,
                   });
                   return {
                     goToRoute: () => this.generated.actions.router.goToRoute.trigger({ route }),
-                    displayName: addressStore.displayName,
+                    displayName: addressStore.name.display,
                   };
                 }
               }
@@ -423,8 +426,8 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
           +all: $ReadOnlyArray<
             $ReadOnly<{ ...Address, ... }>
           >,
-          +displayName: $Exact<$npm$ReactIntl$MessageDescriptor>,
-          +route: string
+          +groupName: AddressGroupName,
+          +name: AddressTypeName,
         |}>
       |},
       coinPriceStore: {|
@@ -528,14 +531,10 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
         addresses: {
           getStoresForWallet: (publicDeriver: PublicDeriver<>) => {
             const addressStores = stores.addresses.getStoresForWallet(publicDeriver);
-            const functionalitySubset: Array<{|
-              +route: string,
-              +displayName: $Exact<$npm$ReactIntl$MessageDescriptor>,
-              +all: $ReadOnlyArray<$ReadOnly<{ ...Address, ... }>>,
-            |}> = addressStores.map(addressStore => ({
-              route: addressStore.route,
-              displayName: addressStore.name.display,
+            const functionalitySubset = addressStores.map(addressStore => ({
               all: addressStore.all,
+              name: addressStore.name,
+              groupName: addressStore.groupName,
             }));
             return functionalitySubset;
           },

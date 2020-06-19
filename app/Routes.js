@@ -154,7 +154,7 @@ const WalletsSubpages = (stores, actions) => (
       component={(props) => (
         wrapReceive(
           { ...props, stores, actions },
-          ReceiveSubpages(stores, actions)
+          (<WalletReceivePage {...props} stores={stores} actions={actions} />)
         )
       )}
     />
@@ -223,33 +223,6 @@ const SettingsSubpages = (stores, actions) => (
       component={(props) => <ComplexityLevelSettingsPage {...props} stores={stores} actions={actions} />}
     />
     <Redirect to={ROUTES.SETTINGS.GENERAL} />
-  </Switch>
-);
-
-const ReceiveSubpages = (stores, actions) => (
-  <Switch>
-    <Route
-      exact
-      path={ROUTES.WALLETS.RECEIVE.EXTERNAL}
-      component={(props) => <WalletReceivePage {...props} stores={stores} actions={actions} />}
-    />
-    <Route
-      exact
-      path={ROUTES.WALLETS.RECEIVE.INTERNAL}
-      component={(props) => <WalletReceivePage {...props} stores={stores} actions={actions} />}
-    />
-    <Route
-      exact
-      path={ROUTES.WALLETS.RECEIVE.MANGLED}
-      component={(props) => <WalletReceivePage {...props} stores={stores} actions={actions} />}
-    />
-    <Route
-      exact
-      path={ROUTES.WALLETS.RECEIVE.ADDRESS_BOOK}
-        // TODO: Remove addressBook prop
-      component={(props) => <WalletReceivePage addressBook {...props} stores={stores} actions={actions} />} // FIX FOR ADDRESS BOOK
-    />
-    <Redirect to={ROUTES.WALLETS.RECEIVE.EXTERNAL} />
   </Switch>
 );
 

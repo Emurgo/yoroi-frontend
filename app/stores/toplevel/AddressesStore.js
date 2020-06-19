@@ -23,25 +23,15 @@ import type { ActionsMap } from '../../actions';
 import {
   Logger,
 } from '../../utils/logging';
-import { ROUTES } from '../../routes-config';
 import { buildRoute } from '../../utils/routing';
-import { Bip44DerivationLevels } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
-import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
-import { Cip1852Wallet } from '../../api/ada/lib/storage/models/Cip1852Wallet/wrapper';
-import globalMessages, { addressTypes } from '../../i18n/global-messages';
-import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import { getApiForCoinType } from '../../api/common/utils';
-import type { AddressFilterKind, StandardAddress, AddressStoreKind } from '../../types/AddressFilterTypes';
-import { AddressFilter, AddressStoreTypes } from '../../types/AddressFilterTypes';
+import type { AddressFilterKind, AddressGroupName, StandardAddress, AddressTypeName } from '../../types/AddressFilterTypes';
+import { AddressFilter, } from '../../types/AddressFilterTypes';
+import { ROUTES } from '../../routes-config';
 
 type SubRequestType<+T> = {|
   publicDeriver: PublicDeriver<>,
 |} => Promise<$ReadOnlyArray<$ReadOnly<T>>>;
-
-export type AddressTypeName = {|
-  stable: AddressStoreKind, // constant name that doesn't change with language selected
-  display: $Exact<$npm$ReactIntl$MessageDescriptor>,
-|};
 
 export class AddressTypeStore<T: StandardAddress> {
 
@@ -54,16 +44,14 @@ export class AddressTypeStore<T: StandardAddress> {
   actions: ActionsMap;
   request: SubRequestType<T>;
   name: AddressTypeName;
-  groupName: AddressTypeName;
-  route: string;
+  groupName: AddressGroupName;
   shouldHide: (PublicDeriver<>, AddressTypeStore<T>) => boolean;
   constructor(data: {|
     stores: StoresMap,
     actions: ActionsMap,
     request: SubRequestType<T>,
     name: AddressTypeName,
-    groupName: AddressTypeName;
-    route: string, // TODO: remove
+    groupName: AddressGroupName;
     shouldHide: (PublicDeriver<>, AddressTypeStore<T>) => boolean,
   |}) {
     this.stores = data.stores;
@@ -71,7 +59,6 @@ export class AddressTypeStore<T: StandardAddress> {
     this.request = data.request;
     this.name = data.name;
     this.groupName = data.groupName;
-    this.route = data.route;
     this.shouldHide = data.shouldHide;
   }
 
@@ -80,9 +67,11 @@ export class AddressTypeStore<T: StandardAddress> {
     if (!publicDeriver) return false;
     const { app } = this.stores;
     const screenRoute = buildRoute(
-      this.route,
+      ROUTES.WALLETS.RECEIVE.ADDRESS_LIST,
       {
         id: publicDeriver.getPublicDeriverId(),
+        group: this.groupName.stable,
+        name: this.name.stable,
       }
     );
     return app.currentRoute === screenRoute;
@@ -90,8 +79,12 @@ export class AddressTypeStore<T: StandardAddress> {
 
   setAsActiveStore: (PublicDeriver<>) => void = (publicDeriver) => {
     this.actions.router.goToRoute.trigger({
-      route: this.route,
-      params: { id: publicDeriver.getPublicDeriverId() },
+      route: ROUTES.WALLETS.RECEIVE.ADDRESS_LIST,
+      params: {
+        id: publicDeriver.getPublicDeriverId(),
+        group: this.groupName.stable,
+        name: this.name.stable,
+      },
     });
   };
 
