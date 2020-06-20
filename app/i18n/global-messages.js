@@ -562,7 +562,7 @@ const globalMessages: * = defineMessages({
     defaultMessage: '!!!Paper Wallet'
   },
   allLabel: {
-    id: 'global.labels.all',
+    id: 'wallet.receive.navigation.allLabel',
     defaultMessage: '!!!All'
   },
 });

@@ -74,16 +74,13 @@ type Props = {|
     +primaryTicker: string,
     +decimalPlaces: number,
   |},
-  +addressBook?: ?boolean,
+  +addressBook: boolean, // TODO: specify which fields to show in store instead of here
 |};
 
 @observer
 export default class WalletReceive extends Component<Props> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
-  };
-  static defaultProps: {|addressBook: void|} = {
-    addressBook: undefined
   };
 
   getAmount: BigNumber => ?Node = walletAmount => {
@@ -105,253 +102,168 @@ export default class WalletReceive extends Component<Props> {
     );
   }
 
+  getValueBlock: void => {|
+    header: ?Node,
+    body: $ReadOnly<StandardAddress> => ?Node,
+  |} = () => {
+    if (this.props.addressBook) {
+      return { header: undefined, body: () => undefined };
+    }
+    const { intl } = this.context;
+
+    const header = (<h2>{intl.formatMessage(messages.outputAmountUTXO)}</h2>);
+    const body = address => (
+      <div>
+        {address.value != null
+          ? (
+            <div className={styles.walletAmount}>
+              {this.getAmount(address.value.div(
+                new BigNumber(10).pow(this.props.meta.decimalPlaces)
+              ))}
+              {' '}
+              {this.props.unitOfAccountSetting.enabled
+                ? this.props.unitOfAccountSetting.currency
+                : this.props.meta.primaryTicker
+              }
+            </div>
+          )
+          : '-'
+        }
+      </div>
+    );
+    return { header, body };
+  }
 
   render(): Node {
     const {
       walletAddresses,
       onVerifyAddress, onGeneratePaymentURI,
-      onCopyAddressTooltip, notification, unitOfAccountSetting, addressBook
+      onCopyAddressTooltip, notification,
     } = this.props;
     const { intl } = this.context;
-    const currency = 'ADA';
-    const walletReceiveContent = addressBook === true ? (
-      <>
-        <div className={styles.generatedAddresses}>
-          {/* Header Addresses */}
-          <div className={styles.generatedAddressesGrid}>
-            <h2>{intl.formatMessage(messages.generatedAddressesSectionTitle)}</h2>
-            <h2 className={styles.labelHeader}>{intl.formatMessage(messages.label)}</h2>
-            {
-              !environment.isShelley() && onGeneratePaymentURI != null &&
-                <h2>{intl.formatMessage(messages.generateURLLabel)}</h2>
-            }
-            <h2>{intl.formatMessage(messages.verifyAddressLabel)}</h2>
-          </div>
+    const valueBlock = this.getValueBlock();
+    const walletReceiveContent = (
+      <div className={styles.generatedAddresses}>
+        {/* Header Addresses */}
+        <div className={styles.generatedAddressesGrid}>
+          <h2>{intl.formatMessage(messages.generatedAddressesSectionTitle)}</h2>
+          <h2 className={styles.labelHeader}>{intl.formatMessage(messages.label)}</h2>
+          {valueBlock.header}
+          {
+            !environment.isShelley() && onGeneratePaymentURI != null &&
+              <h2>{intl.formatMessage(messages.generateURLLabel)}</h2>
+          }
+          <h2>{intl.formatMessage(messages.verifyAddressLabel)}</h2>
+        </div>
 
-          {/* Content Addresses */}
-          {walletAddresses.map((address, index) => {
-            const addressClasses = classnames([
-              'generatedAddress-' + (index + 1),
-              styles.walletAddress,
-              styles.generatedAddressesGrid,
-              address.isUsed === true ? styles.usedWalletAddress : null,
-            ]);
-            const notificationElementId = `address-${index}-copyNotification`;
-            return (
-              <div key={`gen-${address.address}`} className={addressClasses}>
-                {/* Address Id */}
-                <CopyableAddress
+        {/* Content Addresses */}
+        {walletAddresses.map((address, index) => {
+          const addressClasses = classnames([
+            'generatedAddress-' + (index + 1),
+            styles.walletAddress,
+            styles.generatedAddressesGrid,
+            address.isUsed === true ? styles.usedWalletAddress : null,
+          ]);
+          const notificationElementId = `address-${index}-copyNotification`;
+          return (
+            <div key={`gen-${address.address}`} className={addressClasses}>
+              {/* Address Id */}
+              <CopyableAddress
+                hash={address.address}
+                elementId={notificationElementId}
+                onCopyAddress={
+                  () => onCopyAddressTooltip(address.address, notificationElementId)
+                }
+                notification={notification}
+              >
+                <ExplorableHashContainer
+                  selectedExplorer={this.props.selectedExplorer}
                   hash={address.address}
-                  elementId={notificationElementId}
-                  onCopyAddress={
-                    () => onCopyAddressTooltip(address.address, notificationElementId)
-                  }
-                  notification={notification}
+                  light={address.isUsed === true}
+                  linkType="address"
                 >
-                  <ExplorableHashContainer
-                    selectedExplorer={this.props.selectedExplorer}
-                    hash={address.address}
-                    light={address.isUsed === true}
-                    linkType="address"
-                  >
-                    <RawHash light={address.isUsed === true}>
-                      <span
-                        className={classnames([
-                          styles.addressHash,
-                          address.isUsed === true && styles.addressHashUsed
-                        ])}
-                      >
-                        {truncateAddress(address.address)}
-                      </span>
-                    </RawHash>
-                  </ExplorableHashContainer>
-                </CopyableAddress>
-                {/* Label for Address Book */}
-                <div>
-                  {
-                    address.label != null ?
-                      <div className={styles.labelAddress}>
-                        <button type="button" onClick={() => { /* On Edit */ }}>
-                          <span>
-                            <EditLabelIcon />
-                          </span>
-                        </button>
-                        <span className={styles.labelText}> {address.label} </span>
-                      </div>
-                      :
-                      <div className={styles.labelAddress}>
-                        <button type="button" onClick={() => { /* On Add Label */ }}>
-                          <span>
-                            <AddLabelIcon />
-                          </span>
-                        </button>
-                      </div>
-                  }
-                </div>
-                {/* Generate payment URL for Address action */}
-                {/* disable URI for Shelley testnet */}
-                {!environment.isShelley() && onGeneratePaymentURI != null && (
-                  <div className={classnames([
-                    styles.addressActionItemBlock,
-                    styles.generateURLActionBlock])}
-                  >
-                    <button
-                      type="button"
-                      onClick={onGeneratePaymentURI.bind(this, address.address)}
-                      className={styles.btnGenerateURI}
+                  <RawHash light={address.isUsed === true}>
+                    <span
+                      className={classnames([
+                        styles.addressHash,
+                        address.isUsed === true && styles.addressHashUsed
+                      ])}
                     >
-                      <div className={styles.generateURLActionBlock}>
-                        <span className={styles.generateURIIcon}>
-                          <GenerateURIIcon />
+                      {truncateAddress(address.address)}
+                    </span>
+                  </RawHash>
+                </ExplorableHashContainer>
+              </CopyableAddress>
+              {/* Label for Address Book */}
+              <div>
+                {
+                  address.label != null ?
+                    <div className={styles.labelAddress}>
+                      <button type="button" onClick={() => { /* On Edit */ }}>
+                        <span>
+                          <EditLabelIcon />
                         </span>
-                      </div>
-                    </button>
-                  </div>
-                )}
-                {/* Verify Address action */}
+                      </button>
+                      <span className={styles.labelText}> {address.label} </span>
+                    </div>
+                    :
+                    <div className={styles.labelAddress}>
+                      <button type="button" onClick={() => { /* On Add Label */ }}>
+                        <span>
+                          <AddLabelIcon />
+                        </span>
+                      </button>
+                    </div>
+                }
+              </div>
+              {/* Address balance block start */}
+              {valueBlock.body(address)}
+              {/* Generate payment URL for Address action */}
+              {/* disable URI for Shelley testnet */}
+              {!environment.isShelley() && onGeneratePaymentURI != null && (
                 <div className={classnames([
                   styles.addressActionItemBlock,
-                  styles.verifyActionBlock])}
+                  styles.generateURLActionBlock])}
                 >
                   <button
                     type="button"
-                    onClick={
-                      onVerifyAddress.bind(this, {
-                        address: address.address,
-                        path: address.addressing?.path
-                      })
-                    }
+                    onClick={onGeneratePaymentURI.bind(this, address.address)}
+                    className={styles.btnGenerateURI}
                   >
-                    <div>
-                      <span className={styles.verifyIcon}>
-                        <VerifyIcon />
+                    <div className={styles.generateURLActionBlock}>
+                      <span className={styles.generateURIIcon}>
+                        <GenerateURIIcon />
                       </span>
                     </div>
                   </button>
                 </div>
-                {/* Action block end */}
-              </div>
-            );
-          })}
-        </div>
-      </>
-    ) : (
-      <>
-        <div className={styles.generatedAddresses}>
-          {/* Header Addresses */}
-          <div className={styles.generatedAddressesGrid}>
-            <h2>{intl.formatMessage(messages.generatedAddressesSectionTitle)}</h2>
-            <h2>{intl.formatMessage(messages.outputAmountUTXO)}</h2>
-            {
-              !environment.isShelley() && onGeneratePaymentURI != null &&
-                <h2>{intl.formatMessage(messages.generateURLLabel)}</h2>
-            }
-            <h2>{intl.formatMessage(messages.verifyAddressLabel)}</h2>
-          </div>
-
-          {/* Content Addresses */}
-          {walletAddresses.map((address, index) => {
-            const addressClasses = classnames([
-              'generatedAddress-' + (index + 1),
-              styles.walletAddress,
-              styles.generatedAddressesGrid,
-              address.isUsed === true ? styles.usedWalletAddress : null,
-            ]);
-            const notificationElementId = `address-${index}-copyNotification`;
-            return (
-              <div key={`gen-${address.address}`} className={addressClasses}>
-                {/* Address Id */}
-                <CopyableAddress
-                  hash={address.address}
-                  elementId={notificationElementId}
-                  onCopyAddress={
-                    () => onCopyAddressTooltip(address.address, notificationElementId)
+              )}
+              {/* Verify Address action */}
+              <div className={classnames([
+                styles.addressActionItemBlock,
+                styles.verifyActionBlock])}
+              >
+                <button
+                  type="button"
+                  onClick={
+                    onVerifyAddress.bind(this, {
+                      address: address.address,
+                      path: address.addressing?.path
+                    })
                   }
-                  notification={notification}
                 >
-                  <ExplorableHashContainer
-                    selectedExplorer={this.props.selectedExplorer}
-                    hash={address.address}
-                    light={address.isUsed === true}
-                    linkType="address"
-                  >
-                    <RawHash light={address.isUsed === true}>
-                      <span
-                        className={classnames([
-                          styles.addressHash,
-                          address.isUsed === true && styles.addressHashUsed
-                        ])}
-                      >
-                        {truncateAddress(address.address)}
-                      </span>
-                    </RawHash>
-                  </ExplorableHashContainer>
-                </CopyableAddress>
-                {/* Address balance block start */}
-                <div>
-                  {address.value != null
-                    ? (
-                      <div className={styles.walletAmount}>
-                        {this.getAmount(address.value.div(
-                          new BigNumber(10).pow(this.props.meta.decimalPlaces)
-                        ))}
-                        {' '}
-                        {unitOfAccountSetting.enabled
-                          ? unitOfAccountSetting.currency
-                          : currency
-                        }
-                      </div>
-                    )
-                    : '-'
-                  }
-                </div>
-                {/* Generate payment URL for Address action */}
-                {/* disable URI for Shelley testnet */}
-                {!environment.isShelley() && onGeneratePaymentURI != null && (
-                  <div className={classnames([
-                    styles.addressActionItemBlock,
-                    styles.generateURLActionBlock])}
-                  >
-                    <button
-                      type="button"
-                      onClick={onGeneratePaymentURI.bind(this, address.address)}
-                      className={styles.btnGenerateURI}
-                    >
-                      <div className={styles.generateURLActionBlock}>
-                        <span className={styles.generateURIIcon}>
-                          <GenerateURIIcon />
-                        </span>
-                      </div>
-                    </button>
+                  <div>
+                    <span className={styles.verifyIcon}>
+                      <VerifyIcon />
+                    </span>
                   </div>
-                )}
-                {/* Verify Address action */}
-                <div className={classnames([
-                  styles.addressActionItemBlock,
-                  styles.verifyActionBlock])}
-                >
-                  <button
-                    type="button"
-                    onClick={
-                      onVerifyAddress.bind(this, {
-                        address: address.address,
-                        path: address.addressing?.path
-                      })
-                    }
-                  >
-                    <div>
-                      <span className={styles.verifyIcon}>
-                        <VerifyIcon />
-                      </span>
-                    </div>
-                  </button>
-                </div>
-                {/* Action block end */}
+                </button>
               </div>
-            );
-          })}
-        </div>
-      </>
+              {/* Action block end */}
+            </div>
+          );
+        })}
+      </div>
     );
 
     if (walletAddresses === undefined || walletAddresses.length === 0) {

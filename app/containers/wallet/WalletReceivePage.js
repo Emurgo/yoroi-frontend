@@ -22,14 +22,14 @@ import Dialog from '../../components/widgets/Dialog';
 import globalMessages from '../../i18n/global-messages';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { asHasUtxoChains } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import type { AddressFilterKind, StandardAddress, AddressStoreKind, } from '../../types/AddressFilterTypes';
+import type { AddressFilterKind, StandardAddress, AddressTypeName, AddressGroupName, } from '../../types/AddressFilterTypes';
 import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
 import type { GeneratedData as UnmangleTxDialogContainerData } from '../transfer/UnmangleTxDialogContainer';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type {
   BIP32Path
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { AddressFilter, AddressStoreTypes } from '../../types/AddressFilterTypes';
+import { AddressFilter, AddressStoreTypes, AddressGroupTypes } from '../../types/AddressFilterTypes';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { ExplorerType } from '../../domain/Explorer';
 import type { Notification } from '../../types/notificationType';
@@ -42,152 +42,7 @@ export type GeneratedData = typeof WalletReceivePage.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
-  addressBook: boolean, // TODO: remove
 |};
-
-// TO REMOVE - DATA FOR ADDRESS BOOK
-const addressBookStores = {
-  isActiveStore: true,
-  stableName: 'AddressBook',
-  all: [
-    {
-      address: 'Ae2tdPwUPEZJ9HwF8zATdjWcbMTpWAMSMLMxpzdwxiou6evpT57cixBaVyh',
-      label: undefined,
-      addressing: {
-        path: [
-          2147483692,
-          2147485463,
-          2147483648,
-          0,
-          0
-        ],
-        startLevel: 1
-      },
-      value: undefined
-    },
-    {
-      address: 'Ae2tdPwUPEZ76BjmWDTS7poTekAvNqBjgfthF92pSLSDVpRVnLP7meaFhVd',
-      label: 'TO RECEIVE PAYMENT FROM A AND B',
-      addressing: {
-        path: [
-          2147483692,
-          2147485463,
-          2147483648,
-          0,
-          1
-        ],
-        startLevel: 1
-      },
-      value: undefined
-    },
-    {
-      address: 'Ae2tdPwUPEZ9MXvDp7cWRPEZLNkpvP7t5zcVQfRsz2vVqWR74GTZGX3JoxN',
-      label: undefined,
-      addressing: {
-        path: [
-          2147483692,
-          2147485463,
-          2147483648,
-          0,
-          2
-        ],
-        startLevel: 1
-      },
-      value: undefined
-    },
-    {
-      address: 'Ae2tdPwUPEZ51dzqqzbgwWLYidHFEEsougKw7U7956QoACCU6zTybYrBMk2',
-      label: 'TO RECEIVE PAYMENT FROM X AND Y',
-      addressing: {
-        path: [
-          2147483692,
-          2147485463,
-          2147483648,
-          0,
-          3
-        ],
-        startLevel: 1
-      },
-      value: undefined
-    },
-    {
-      address: 'Ae2tdPwUPEZ1SSYES4uTcNe2fVszQ9ECsWG8otkmfedn983rNmEGj6dUvh9',
-      label: 'TO RECEIVE PAYMENT FROM X AND Y',
-      addressing: {
-        path: [
-          2147483692,
-          2147485463,
-          2147483648,
-          0,
-          9
-        ],
-        startLevel: 1
-      },
-      value: undefined
-    },
-    {
-      address: 'Ae2tdPwUPEZJGKfqajPqZv4HT26JGw6SDhXaQSLeTfAa2pTEQfz9g2FRPy6',
-      label: 'TO RECEIVE PAYMENT FROM X AND Y',
-      addressing: {
-        path: [
-          2147483692,
-          2147485463,
-          2147483648,
-          0,
-          10
-        ],
-        startLevel: 1
-      },
-      value: undefined
-    },
-    {
-      address: 'Ae2tdPwUPEZH8ZcK1FXoJNm2wYjU3LbDjU7BRJmC3AgiSLMSmsXjqvMnTdc',
-      label: undefined,
-      addressing: {
-        path: [
-          2147483692,
-          2147485463,
-          2147483648,
-          0,
-          11
-        ],
-        startLevel: 1
-      },
-    },
-    {
-      address: 'Ae2tdPwUPEZGzg1QAxkzXAWpobgPnrKurmquSCx78R78v22nb8MSgewXUfH',
-      label: 'TO RECEIVE PAYMENT FROM X AND Y',
-      addressing: {
-        path: [
-          2147483692,
-          2147485463,
-          2147483648,
-          0,
-          12
-        ],
-        startLevel: 1
-      },
-      value: undefined
-    },
-    {
-      address: 'Ae2tdPwUPEZ5VVzEBgbnETGkhfgDbenRDvREoTtNDQzoWdyr46bNGCi84R6',
-      label: undefined,
-      addressing: {
-        path: [
-          2147483692,
-          2147485463,
-          2147483648,
-          0,
-          13
-        ],
-        startLevel: 1
-      },
-      value: undefined
-    },
-  ],
-  filtered: [],
-  wasExecuted: true
-};
 
 @observer
 export default class WalletReceivePage extends Component<Props> {
@@ -292,7 +147,7 @@ export default class WalletReceivePage extends Component<Props> {
     const { canUnmangle } = this.generated.stores.substores.ada.addresses.getUnmangleAmounts();
     const header = (() => {
       if (addressStores.some(store => (
-        store.stableName === AddressStoreTypes.external && store.isActiveStore
+        store.name.stable === AddressStoreTypes.external && store.isActiveStore
       ))) {
         return (<StandardHeader
           walletAddress={walletAddress}
@@ -307,12 +162,12 @@ export default class WalletReceivePage extends Component<Props> {
         />);
       }
       if (addressStores.some(store => (
-        store.stableName === AddressStoreTypes.internal && store.isActiveStore
+        store.name.stable === AddressStoreTypes.internal && store.isActiveStore
       ))) {
         return (<InternalHeader />);
       }
       if (addressStores.some(store => (
-        store.stableName === AddressStoreTypes.mangled && store.isActiveStore
+        store.name.stable === AddressStoreTypes.mangled && store.isActiveStore
       ))) {
         return (
           <MangledHeader
@@ -324,7 +179,13 @@ export default class WalletReceivePage extends Component<Props> {
         );
       }
       if (addressStores.some(store => (
-        store.stableName === AddressStoreTypes.all && store.isActiveStore
+        store.groupName.stable === AddressGroupTypes.addressBook &&
+        store.isActiveStore
+      ))) {
+        return null;
+      }
+      if (addressStores.some(store => (
+        store.name.stable === AddressStoreTypes.all && store.isActiveStore
       ))) {
         return (<StandardHeader
           walletAddress={walletAddress}
@@ -338,69 +199,47 @@ export default class WalletReceivePage extends Component<Props> {
           isFilterActive={this.generated.stores.addresses.addressFilter !== AddressFilter.None}
         />);
       }
-      if (this.props.addressBook) { // TO REMOVE FOR ADDRESS BOOK
-        return null;
-      }
       throw new Error(`${nameof(WalletReceivePage)} unexpected address tab`);
     })();
 
     return (
       <VerticalFlexContainer>
         {/* FOR ADDRESS BOOK */}
-        {
-          this.props.addressBook ?
-            <WalletReceive
-              header={null}
-              selectedExplorer={this.generated.stores.profile.selectedExplorer}
-              // TODO: fix to not hardcode data
-              walletAddresses={addressBookStores.all}
-              addressBook={this.props.addressBook}
-              onCopyAddressTooltip={onCopyAddressTooltip}
-              notification={notification}
-              onVerifyAddress={async (request: {| address: string, path: void | BIP32Path, |}) => {
-                await actions.ada.hwVerifyAddress.selectAddress.trigger(request);
-                this.openVerifyAddressDialog();
-              }}
-              onGeneratePaymentURI={undefined}
-              shouldHideBalance={profile.shouldHideBalance}
-              unitOfAccountSetting={profile.unitOfAccount}
-              meta={{
-                primaryTicker: apiMeta.primaryTicker,
-                decimalPlaces: apiMeta.decimalPlaces.toNumber(),
-              }}
-            />
-            :
-            <WalletReceive
-              header={header}
-              selectedExplorer={this.generated.stores.profile.selectedExplorer}
-              walletAddresses={addressTypeStore.filtered.slice().reverse()}
-              onCopyAddressTooltip={onCopyAddressTooltip}
-              notification={notification}
-              onVerifyAddress={async (request: {| address: string, path: void | BIP32Path, |}) => {
-                await actions.ada.hwVerifyAddress.selectAddress.trigger(request);
-                this.openVerifyAddressDialog();
-              }}
-              onGeneratePaymentURI={!addressStores.some(store => (
-                (
-                  store.stableName === AddressStoreTypes.external ||
-                  store.stableName === AddressStoreTypes.all
-                ) &&
-                store.isActiveStore
-              ))
-                ? undefined
-                : (address) => {
-                  this.openURIGenerateDialog(address);
-                }
+        <WalletReceive
+          header={header}
+          selectedExplorer={this.generated.stores.profile.selectedExplorer}
+          walletAddresses={addressTypeStore.filtered.slice().reverse()}
+          onCopyAddressTooltip={onCopyAddressTooltip}
+          notification={notification}
+          onVerifyAddress={async (request: {| address: string, path: void | BIP32Path, |}) => {
+            await actions.ada.hwVerifyAddress.selectAddress.trigger(request);
+            this.openVerifyAddressDialog();
+          }}
+          onGeneratePaymentURI={!addressStores.some(store => (
+            (
+              store.name.stable === AddressStoreTypes.external ||
+              store.name.stable === AddressStoreTypes.all
+            ) &&
+            store.isActiveStore
+          ))
+            ? undefined
+            : (address) => {
+              this.openURIGenerateDialog(address);
             }
-              shouldHideBalance={profile.shouldHideBalance}
-              unitOfAccountSetting={profile.unitOfAccount}
-              meta={{
-                primaryTicker: apiMeta.primaryTicker,
-                decimalPlaces: apiMeta.decimalPlaces.toNumber(),
-              }}
-            />
         }
-
+          shouldHideBalance={profile.shouldHideBalance}
+          unitOfAccountSetting={profile.unitOfAccount}
+          meta={{
+            primaryTicker: apiMeta.primaryTicker,
+            decimalPlaces: apiMeta.decimalPlaces.toNumber(),
+          }}
+          addressBook={
+            addressStores
+              .find(store => store.isActiveStore)
+              ?.groupName.stable === AddressGroupTypes.addressBook
+              ?? false
+          }
+        />
 
         {uiDialogs.isOpen(LoadingSpinner) ? (
           <Dialog
@@ -491,11 +330,6 @@ export default class WalletReceivePage extends Component<Props> {
     publicDeriver
   ) => {
     const addressStores = this.generated.stores.addresses.getStoresForWallet(publicDeriver);
-    // TODO: remove
-    if (this.props.addressBook) {
-      return addressBookStores;
-    }
-
     for (const addressStore of addressStores) {
       if (addressStore.isActiveStore) {
         return addressStore;
@@ -587,7 +421,8 @@ export default class WalletReceivePage extends Component<Props> {
             $ReadOnly<StandardAddress>
           >,
           +isActiveStore: boolean,
-          +stableName: AddressStoreKind,
+          +name: AddressTypeName,
+          +groupName: AddressGroupName,
           +wasExecuted: boolean
         |}>
       |},
@@ -657,15 +492,10 @@ export default class WalletReceivePage extends Component<Props> {
           addressFilter: stores.addresses.addressFilter,
           getStoresForWallet: (publicDeriver: PublicDeriver<>) => {
             const addressStores = stores.addresses.getStoresForWallet(publicDeriver);
-            const functionalitySubset: Array<{|
-              +isActiveStore: boolean,
-              +stableName: AddressStoreKind,
-              +all: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
-              +filtered: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
-              +wasExecuted: boolean,
-            |}> = addressStores.map(addressStore => ({
+            const functionalitySubset = addressStores.map(addressStore => ({
               isActiveStore: addressStore.isActiveStore,
-              stableName: addressStore.name.stable,
+              groupName: addressStore.groupName,
+              name: addressStore.name,
               all: addressStore.all,
               filtered: addressStore.filtered,
               wasExecuted: addressStore.wasExecuted,

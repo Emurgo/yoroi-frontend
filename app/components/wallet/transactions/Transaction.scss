@@ -60,6 +60,7 @@
   }
   .typeAddress{
     min-width: fit-content;
+    width: 105px;
     background: var(--cmn-default-color-grey-5);
     font-size: 10px;
     letter-spacing: 0;
@@ -234,7 +235,7 @@
     .addressHeader {
       display: grid;
       grid-gap: 15px;
-      grid-template-columns: minmax(230px,1fr) 1fr 1fr;
+      grid-template-columns: minmax(230px,1fr) 105px 1fr;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 24px;
@@ -258,7 +259,7 @@
     .addressItem {
       display: grid;
       grid-gap: 15px;
-      grid-template-columns: minmax(230px,1fr) 1fr 1fr;
+      grid-template-columns: minmax(230px,1fr) 105px 1fr;
       align-items: center;
     }
     * + h2,

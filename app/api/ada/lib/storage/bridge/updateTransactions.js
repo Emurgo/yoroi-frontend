@@ -379,7 +379,7 @@ export async function getPendingTransactions(
   );
 }
 
-export async function rawRemoveAllTransactions(
+export async function rawGetForeignAddresses(
   db: lf$Database,
   dbTx: lf$Transaction,
   deps: {|
@@ -387,16 +387,13 @@ export async function rawRemoveAllTransactions(
     GetAddress: Class<GetAddress>,
     AssociateTxWithIOs: Class<AssociateTxWithIOs>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
-    DeleteAllTransactions: Class<DeleteAllTransactions>,
     GetTransaction: Class<GetTransaction>,
-    ModifyAddress: Class<ModifyAddress>,
-    FreeBlocks: Class<FreeBlocks>,
   |},
   derivationTables: Map<number, string>,
   request: {|
     publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
   |},
-): ReturnType<typeof rawGetAllTxIds> {
+): Promise<Array<number>> {
   const relatedIds = await rawGetAllTxIds(
     db, dbTx,
     {
@@ -433,6 +430,94 @@ export async function rawRemoveAllTransactions(
   // recall: we store addresses that don't belong to our wallet in the DB
   // if they're in a tx that belongs to us
   const unownedAddresses = allAddressIds.filter(address => !ourIds.has(address));
+
+  // get rid of duplications (some tx can have multiple inputs of same address)
+  return Array.from(new Set(unownedAddresses));
+}
+export async function getForeignAddresses(
+  request: {| publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>, |},
+): Promise<Array<string>> {
+  const derivationTables = request.publicDeriver.getParent().getDerivationTables();
+  const deps = Object.freeze({
+    GetPathWithSpecific,
+    GetAddress,
+    AssociateTxWithIOs,
+    GetDerivationSpecific,
+    GetTransaction,
+  });
+  const db = request.publicDeriver.getDb();
+  const depTables = Object
+    .keys(deps)
+    .map(key => deps[key])
+    .flatMap(table => getAllSchemaTables(db, table));
+
+  return await raii(
+    db,
+    [
+      // need a lock on all tables to delete
+      ...db.getSchema().tables(),
+      ...depTables,
+      ...mapToTables(db, derivationTables),
+    ],
+    async dbTx => {
+      const addressIds = await rawGetForeignAddresses(
+        db, dbTx,
+        deps,
+        request.publicDeriver.getParent().getDerivationTables(),
+        { publicDeriver: request.publicDeriver },
+      );
+      const addressRows = await GetAddress.getById(
+        db, dbTx,
+        addressIds
+      );
+      const result = addressRows.map(row => row.Hash);
+      // remove duplicates
+      return Array.from(new Set(result));
+    }
+  );
+}
+
+export async function rawRemoveAllTransactions(
+  db: lf$Database,
+  dbTx: lf$Transaction,
+  deps: {|
+    GetPathWithSpecific: Class<GetPathWithSpecific>,
+    GetAddress: Class<GetAddress>,
+    AssociateTxWithIOs: Class<AssociateTxWithIOs>,
+    GetDerivationSpecific: Class<GetDerivationSpecific>,
+    DeleteAllTransactions: Class<DeleteAllTransactions>,
+    GetTransaction: Class<GetTransaction>,
+    ModifyAddress: Class<ModifyAddress>,
+    FreeBlocks: Class<FreeBlocks>,
+  |},
+  derivationTables: Map<number, string>,
+  request: {|
+    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
+  |},
+): ReturnType<typeof rawGetAllTxIds> {
+  const unownedAddresses = await rawGetForeignAddresses(
+    db, dbTx,
+    {
+      GetPathWithSpecific: deps.GetPathWithSpecific,
+      GetAddress: deps.GetAddress,
+      AssociateTxWithIOs: deps.AssociateTxWithIOs,
+      GetDerivationSpecific: deps.GetDerivationSpecific,
+      GetTransaction: deps.GetTransaction,
+    },
+    derivationTables,
+    request,
+  );
+  const relatedIds = await rawGetAllTxIds(
+    db, dbTx,
+    {
+      GetPathWithSpecific: deps.GetPathWithSpecific,
+      GetAddress: deps.GetAddress,
+      AssociateTxWithIOs: deps.AssociateTxWithIOs,
+      GetDerivationSpecific: deps.GetDerivationSpecific,
+    },
+    { publicDeriver: request.publicDeriver },
+    derivationTables,
+  );
 
   // 1) remove txs themselves
   await deps.DeleteAllTransactions.delete(

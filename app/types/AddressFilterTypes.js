@@ -15,7 +15,7 @@ type ToMessage = <K>(K) => $Exact<$npm$ReactIntl$MessageDescriptor>;
 
 export type StandardAddress = {|
   ...Address,
-  ...InexactSubset<Label>, // TODO: remove and change to map
+  ...InexactSubset<Label>,
   ...InexactSubset<Value>,
   ...InexactSubset<Addressing>,
   ...InexactSubset<UsedStatus>,
@@ -52,34 +52,64 @@ export type AddressTypeName = {|
 
 
 export const AddressGroupTypes = Object.freeze({
+  base: 'base',
   byron: 'byron',
   addressBook: 'addressBook',
   group: 'group',
   p2pk: 'p2pk',
 });
-export type AddressGroupKind = $Values<typeof AddressGroupTypes>;
-export const addressGroups: $ObjMap<typeof AddressGroupTypes, ToMessage> = defineMessages({
-  byron: {
-    id: 'wallet.address.category.byron',
-    defaultMessage: '!!!Addresses created using the Byron-era address format',
-  },
-  addressBook: {
-    id: 'wallet.address.category.addressBook',
-    defaultMessage: '!!!Addresses that do not belong to you, but are relevant to your wallet',
-  },
+
+const commonDescriptions = defineMessages({
   group: {
     id: 'wallet.address.category.group',
     defaultMessage: '!!!Addresses formed by the combination of a spending key and a staking key',
-  },
-  p2pk: {
-    id: 'wallet.address.category.p2pk',
-    defaultMessage: '!!!Addresses generated directly from a public key',
-  },
+  }
+});
+export type AddressGroupKind = $Values<typeof AddressGroupTypes>;
+export const addressGroupsTooltip: $ObjMap<typeof AddressGroupTypes, ToMessage> = Object.freeze({
+  group: commonDescriptions.group,
+  base: commonDescriptions.group,
+  ...defineMessages({
+    byron: {
+      id: 'wallet.address.category.byron',
+      defaultMessage: '!!!Addresses created using the Byron-era address format',
+    },
+    addressBook: {
+      id: 'wallet.address.category.addressBook',
+      defaultMessage: '!!!Addresses that do not belong to you, but are relevant to your wallet',
+    },
+    p2pk: {
+      id: 'wallet.address.category.p2pk',
+      defaultMessage: '!!!Addresses generated directly from a public key',
+    },
+  })
 });
 export type AddressGroupName = {|
   stable: AddressGroupKind, // constant name that doesn't change with language selected
   display: $Exact<$npm$ReactIntl$MessageDescriptor>,
 |};
+export const addressGroups: $ObjMap<typeof AddressGroupTypes, ToMessage> = defineMessages({
+  base: {
+    id: 'wallet.receive.navigation.baseLabel',
+    defaultMessage: '!!!Base'
+  },
+  group: {
+    id: 'wallet.receive.navigation.groupLabel',
+    defaultMessage: '!!!Group'
+  },
+  byron: {
+    id: 'wallet.receive.navigation.byronLabel',
+    defaultMessage: '!!!Byron'
+  },
+  p2pk: {
+    id: 'wallet.receive.navigation.p2pkLabel',
+    defaultMessage: '!!!P2PK'
+  },
+  addressBook: {
+    id: 'wallet.receive.navigation.AddressBook',
+    defaultMessage: '!!!Address book'
+  },
+});
 
 
 export const AddressFilter = Object.freeze({

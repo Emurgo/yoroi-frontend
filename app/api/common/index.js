@@ -27,6 +27,8 @@ import type { IHasLevels } from '../ada/lib/storage/models/ConceptualWallet/inte
 import WalletTransaction from '../../domain/WalletTransaction';
 import {
   getPendingTransactions,
+  removeAllTransactions,
+  getForeignAddresses,
 } from '../ada/lib/storage/bridge/updateTransactions';
 import type {
   TransactionExportRow,
@@ -67,6 +69,27 @@ export type RefreshPendingTransactionsResponse = Array<WalletTransaction>;
 export type RefreshPendingTransactionsFunc = (
   request: RefreshPendingTransactionsRequest
 ) => Promise<RefreshPendingTransactionsResponse>;
+
+// removeAllTransactions
+
+export type RemoveAllTransactionsRequest = {|
+  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
+  refreshWallet: () => Promise<void>,
+|};
+export type RemoveAllTransactionsResponse = void;
+export type RemoveAllTransactionsFunc = (
+  request: RemoveAllTransactionsRequest
+) => Promise<RemoveAllTransactionsResponse>;
+
+// getForeignAddresses
+
+export type GetForeignAddressesRequest = {|
+  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
+|};
+export type GetForeignAddressesResponse = Array<string>;
+export type GetForeignAddressesFunc = (
+  request: GetForeignAddressesRequest
+) => Promise<GetForeignAddressesResponse>;
 
 // getTxLastUpdatedDate
 
@@ -157,6 +180,36 @@ export default class CommonApi {
       return balance;
     } catch (error) {
       Logger.error(`${nameof(CommonApi)}::${nameof(this.getBalance)} error: ` + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  async removeAllTransactions(
+    request: RemoveAllTransactionsRequest
+  ): Promise<RemoveAllTransactionsResponse> {
+    try {
+      // 1) clear existing history
+      await removeAllTransactions({ publicDeriver: request.publicDeriver });
+
+      // 2) trigger a history sync
+      try {
+        await request.refreshWallet();
+      } catch (_e) {
+        Logger.warn(`${nameof(this.removeAllTransactions)} failed to connect to remote to resync. Data was still cleared locally`);
+      }
+    } catch (error) {
+      Logger.error(`${nameof(CommonApi)}::${nameof(this.removeAllTransactions)} error: ` + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  async getForeignAddresses(
+    request: GetForeignAddressesRequest
+  ): Promise<GetForeignAddressesResponse> {
+    try {
+      return await getForeignAddresses({ publicDeriver: request.publicDeriver });
+    } catch (error) {
+      Logger.error(`${nameof(CommonApi)}::${nameof(this.getForeignAddresses)} error: ` + stringifyError(error));
       throw new GenericApiError();
     }
   }

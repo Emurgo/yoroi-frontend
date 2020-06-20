@@ -13,7 +13,7 @@ import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
-  asGetAllUtxos, asHasUtxoChains, asDisplayCutoff,
+  asGetAllUtxos, asHasUtxoChains, asDisplayCutoff, asHasLevels,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   IHasUtxoChainsRequest,
@@ -26,12 +26,20 @@ import {
 import { buildRoute } from '../../utils/routing';
 import { getApiForCoinType } from '../../api/common/utils';
 import type { AddressFilterKind, AddressGroupName, StandardAddress, AddressTypeName } from '../../types/AddressFilterTypes';
-import { AddressFilter, } from '../../types/AddressFilterTypes';
+import { addressGroups, addressTypes, AddressStoreTypes, AddressFilter, AddressGroupTypes } from '../../types/AddressFilterTypes';
 import { ROUTES } from '../../routes-config';
+import {
+  ConceptualWallet
+} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 
 type SubRequestType<+T> = {|
   publicDeriver: PublicDeriver<>,
 |} => Promise<$ReadOnlyArray<$ReadOnly<T>>>;
+
+const addressBookGroup = {
+  stable: AddressGroupTypes.addressBook,
+  display: addressGroups.addressBook,
+};
 
 export class AddressTypeStore<T: StandardAddress> {
 
@@ -156,6 +164,8 @@ export default class AddressesStore extends Store {
 
   @observable addressFilter: AddressFilterKind = AddressFilter.None;
 
+  addressBook: AddressTypeStore<StandardAddress>;
+
   // REQUESTS
   @observable createAddressRequest: Request<CreateAddressFunc>
     = new Request<CreateAddressFunc>(this.api.common.createAddress);
@@ -168,6 +178,21 @@ export default class AddressesStore extends Store {
     actions.resetErrors.listen(this._resetErrors);
     actions.setFilter.listen(this._setFilter);
     actions.resetFilter.listen(this._resetFilter);
+
+    this.addressBook = new AddressTypeStore({
+      stores: this.stores,
+      actions: this.actions,
+      request: (request) => this.stores.addresses._wrapForeign({
+        ...request,
+        storeToFilter: this.addressBook,
+      }),
+      name: {
+        stable: AddressStoreTypes.all,
+        display: addressTypes.all
+      },
+      groupName: addressBookGroup,
+      shouldHide: (_publicDeriver, _store) => false,
+    });
   }
 
   getStoresForWallet: (
@@ -177,6 +202,7 @@ export default class AddressesStore extends Store {
     const apiType = getApiForCoinType(coinType);
     return [
       ...this.stores.substores[apiType].addresses.getStoresForWallet(publicDeriver),
+      this.addressBook,
     ];
   }
 
@@ -217,6 +243,7 @@ export default class AddressesStore extends Store {
     const { coinType } = publicDeriver.getParent();
     const apiType = getApiForCoinType(coinType);
     this.stores.substores[apiType].addresses.addObservedWallet(publicDeriver);
+    this.addressBook.addObservedWallet(publicDeriver);
   }
 
   refreshAddressesFromDb: PublicDeriver<> => Promise<void> = async (
@@ -225,6 +252,7 @@ export default class AddressesStore extends Store {
     const { coinType } = publicDeriver.getParent();
     const apiType = getApiForCoinType(coinType);
     this.stores.substores[apiType].addresses.refreshAddressesFromDb(publicDeriver);
+    this.addressBook.refreshAddressesFromDb(publicDeriver);
   }
 
   _wrapForAllAddresses: {|
@@ -249,6 +277,29 @@ export default class AddressesStore extends Store {
       publicDeriver: request.publicDeriver,
       storeToFilter: request.storeToFilter,
       addresses: allAddresses,
+    });
+  }
+
+  _wrapForeign: {|
+    publicDeriver: PublicDeriver<>,
+    storeToFilter: AddressTypeStore<StandardAddress>,
+  |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
+    const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
+    if (withLevels == null) {
+      throw new Error(`${nameof(this._wrapForeign)} missing levels`);
+    }
+
+    const allAddresses = await this.api.common.getForeignAddresses({
+      publicDeriver: withLevels,
+    });
+
+    return this.storewiseFilter({
+      publicDeriver: request.publicDeriver,
+      storeToFilter: request.storeToFilter,
+      addresses: allAddresses.map(hash => ({
+        address: hash,
+        label: 'asdf',
+      })),
     });
   }
 

@@ -33,9 +33,17 @@ import {
 
 declare var CONFIG : ConfigType;
 
-const byronGroup = {
-  stable: AddressGroupTypes.byron,
-  display: addressGroups.byron,
+const getAddressGroup = () => {
+  if (environment.isShelley()) {
+    return {
+      stable: AddressGroupTypes.group,
+      display: addressGroups.group,
+    };
+  }
+  return {
+    stable: AddressGroupTypes.byron,
+    display: addressGroups.byron,
+  };
 };
 
 export default class AdaAddressesStore extends Store {
@@ -59,7 +67,7 @@ export default class AdaAddressesStore extends Store {
         stable: AddressStoreTypes.all,
         display: globalMessages.addressesLabel
       },
-      groupName: byronGroup,
+      groupName: getAddressGroup(),
       shouldHide: (publicDeriver, _store) => {
         const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
         if (withLevels == null) return true;
@@ -86,7 +94,7 @@ export default class AdaAddressesStore extends Store {
         stable: AddressStoreTypes.external,
         display: addressTypes.external,
       },
-      groupName: byronGroup,
+      groupName: getAddressGroup(),
       shouldHide: (_publicDeriver, store) => store.all.length === 0,
     });
     this.internalForDisplay = new AddressTypeStore({
@@ -101,7 +109,7 @@ export default class AdaAddressesStore extends Store {
         stable: AddressStoreTypes.internal,
         display: addressTypes.internal,
       },
-      groupName: byronGroup,
+      groupName: getAddressGroup(),
       shouldHide: (_publicDeriver, store) => store.all.length === 0,
     });
     this.mangledAddressesForDisplay = new AddressTypeStore({
@@ -115,7 +123,7 @@ export default class AdaAddressesStore extends Store {
         stable: AddressStoreTypes.mangled,
         display: addressTypes.mangled,
       },
-      groupName: byronGroup,
+      groupName: getAddressGroup(),
       shouldHide: (_publicDeriver, store) => store.all.length === 0,
     });
   }

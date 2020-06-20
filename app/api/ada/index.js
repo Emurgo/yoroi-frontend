@@ -831,7 +831,7 @@ export default class AdaApi {
 
       const publicKeyRow = await request.getPublicKey();
       if (publicKeyRow.IsEncrypted) {
-        throw new Error('prepareAndBroadcastLedgerSignedTx unexpcted encrypted public key');
+        throw new Error('prepareAndBroadcastLedgerSignedTx unexpected encrypted public key');
       }
       const publicKey = RustModule.WalletV2.PublicKey.from_hex(publicKeyRow.Hash);
       const { ledgerSignTxResp, unsignedTx, sendTx } = request;

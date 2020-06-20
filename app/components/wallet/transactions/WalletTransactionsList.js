@@ -51,7 +51,7 @@ type Props = {|
   |},
   +addressLookup: string => void | {|
     goToRoute: void => void,
-    displayName: $Exact<$npm$ReactIntl$MessageDescriptor>,
+    name: string,
   |},
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,

@@ -11,23 +11,19 @@ import {
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import Store from '../base/Store';
 import type { ChangeModelPasswordFunc, RenameModelFunc } from '../../api/ada';
+import type { RemoveAllTransactionsFunc } from '../../api/common';
 import Request from '../lib/LocalizedRequest';
 import {
   asGetSigningKey,
   asHasLevels,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
-  IHasLevels,
   IConceptualWallet,
 } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import type {
   IPublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import { removeAllTransactions } from '../../api/ada/lib/storage/bridge/updateTransactions';
 import { removePublicDeriver } from '../../api/ada/lib/storage/bridge/walletBuilder/remove';
-import {
-  Logger,
-} from '../../utils/logging';
 import {
   groupForWallet,
 } from './WalletStore';
@@ -59,8 +55,8 @@ export default class WalletSettingsStore extends Store {
   @observable changeSigningKeyRequest: Request<ChangeModelPasswordFunc>
     = new Request<ChangeModelPasswordFunc>(this.api.ada.changeModelPassword);
 
-  @observable clearHistory: Request<typeof _clearHistory>
-    = new Request<typeof _clearHistory>(_clearHistory);
+  @observable clearHistory: Request<RemoveAllTransactionsFunc>
+    = new Request<RemoveAllTransactionsFunc>(this.api.common.removeAllTransactions);
 
   @observable removeWalletRequest: Request<typeof _removeWalletFromDb>
     = new Request<typeof _removeWalletFromDb>(_removeWalletFromDb);
@@ -250,19 +246,4 @@ async function _removeWalletFromDb(request: {|
     publicDeriver: request.publicDeriver,
     conceptualWallet: request.conceptualWallet,
   });
-}
-
-async function _clearHistory(request: {|
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
-  refreshWallet: () => Promise<void>,
-|}): Promise<void> {
-  // 1) clear existing history
-  await removeAllTransactions({ publicDeriver: request.publicDeriver });
-
-  // 2) trigger a history sync
-  try {
-    await request.refreshWallet();
-  } catch (_e) {
-    Logger.warn(`${nameof(_clearHistory)} failed to connect to remote to resync. Data was still cleared locally`);
-  }
 }

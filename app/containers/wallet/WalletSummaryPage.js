@@ -45,6 +45,7 @@ import type {
 import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
 import { getApiForCoinType, getApiMeta } from '../../api/common/utils';
 import type { AddressTypeName, AddressGroupName } from '../../types/AddressFilterTypes';
+import { AddressStoreTypes } from '../../types/AddressFilterTypes';
 
 export type GeneratedData = typeof WalletSummaryPage.prototype.generated;
 
@@ -169,13 +170,17 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
                     group: addressStore.groupName.stable,
                     name: addressStore.name.stable,
                   });
+
+                  const name = addressStore.name.stable === AddressStoreTypes.all
+                    ? intl.formatMessage(addressStore.groupName.display)
+                    : `${intl.formatMessage(addressStore.groupName.display)} - ${intl.formatMessage(addressStore.name.display)}`;
                   return {
                     goToRoute: () => this.generated.actions.router.goToRoute.trigger({ route }),
-                    displayName: addressStore.name.display,
+                    name,
                   };
                 }
               }
-              return undefined;
+              return undefined; // could mean the address store is still loading
             }}
             onCopyAddressTooltip={onCopyAddressTooltip}
             notification={notificationToolTip}

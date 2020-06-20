@@ -17,9 +17,6 @@ export type Props = {|
     +name: AddressTypeName,
     +groupName: AddressGroupName,
   |}>;
-  +categoryTitle: string,
-  +goAddressBook: void => void,
-  +isAddressBookRoute: boolean
 |};
 
 @observer
@@ -36,9 +33,6 @@ export default class ReceiveWithNavigation extends Component<Props> {
             addressTypes={this.props.addressTypes}
             setFilter={this.props.setFilter}
             activeFilter={this.props.activeFilter}
-            categoryTitle={this.props.categoryTitle}
-            goAddressBook={this.props.goAddressBook}
-            isAddressBookRoute={this.props.isAddressBookRoute}
           />
         </div>
         <div className={styles.page}>
