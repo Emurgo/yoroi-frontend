@@ -21,7 +21,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import BigNumber from 'bignumber.js';
 import { truncateAddress, splitAmount } from '../../utils/formatters';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
-import NotFoundIcon from '../../assets/images/cert-bad-ic.inline.svg';
+import NoTransactionModernSvg from '../../assets/images/transaction/no-transactions-yet.modern.inline.svg';
 import AddLabelIcon from '../../assets/images/add-label.inline.svg';
 import EditLabelIcon from '../../assets/images/edit.inline.svg';
 
@@ -299,7 +299,7 @@ export default class WalletReceive extends Component<Props> {
           {this.getHierarchy()}
           {this.props.header}
           <div className={styles.notFound}>
-            <NotFoundIcon />
+            <NoTransactionModernSvg />
             <h1>{intl.formatMessage(messages.noResultsFoundLabel)}</h1>
             <p>{intl.formatMessage(messages.notFoundAnyAddresses)}</p>
           </div>
