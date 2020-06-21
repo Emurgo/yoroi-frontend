@@ -75,7 +75,7 @@ type Props = {|
     +primaryTicker: string,
     +decimalPlaces: number,
   |},
-  +addressBook: boolean, // TODO: specify which fields to show in store instead of here
+  +addressBook: boolean,
 |};
 
 @observer
