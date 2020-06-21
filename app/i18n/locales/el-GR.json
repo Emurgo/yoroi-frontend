@@ -110,7 +110,7 @@
   "global.staleTxnWarningLine1": "Το πορτοφόλι σας έχει αλλάξει από τότε που δημιουργήσατε αυτή τη συναλλαγή.",
   "global.staleTxnWarningLine2": "Μπορείτε ακόμη να στείλετε αυτή τη συναλλαγή, αλλά ίσως αποτύχει.",
   "global.unit.ada": "Ada",
-  "global.uriExplanation": "Αυτά σας επιτρέπουν να μοιραστείτε τιμολόγια με φίλους και επιχειρήσεις εύκολα, απλά κάνοντας κλικ σε έναν Ενιαίο Εντοπιστή Πόρων (URL).",
+  "global.uriExplanation": "Αυτά σας επιτρέπουν να μοιραστείτε τιμολόγια με φίλους και επιχειρήσεις εύκολα, απλά κάνοντας κλικ σε μία διεύθυνση (URL).",
   "global.uriSchemeTitleLabel": "Ενιαίοι Εντοπιστές Πόρων (URLs) πληρωμής Cardano",
   "inline.editing.input.cancel.label": "ακύρωση",
   "inline.editing.input.change.label": "αλλαγή",
