@@ -42,6 +42,37 @@ export default class ReceiveNavigation extends Component<Props> {
   createAccordionForGroup: $PropertyType<Props, 'addressTypes'> => Node = (stores) => {
     const { intl } = this.context;
 
+    if (stores.length === 1 && stores[0].name.stable === AddressStoreTypes.all) {
+      const store = stores[0];
+      return (
+        <div className={styles.addressBook}>
+          <button
+            onClick={store.setAsActiveStore}
+            type="button"
+            className={classNames([
+              store.name.stable,
+              store.groupName.stable,
+              styles.filterButton,
+              ...(store.isActiveStore ? [styles.active] : [])
+            ])}
+          >
+            <div>
+              {intl.formatMessage(addressGroups[stores[0].groupName.stable])}
+              <Tooltip
+                className={styles.Tooltip}
+                skin={TooltipSkin}
+                tip={intl.formatMessage(addressGroupsTooltip[stores[0].groupName.stable])}
+              >
+                <span className={styles.infoIcon}>
+                  <InfoIcon />
+                </span>
+              </Tooltip>
+            </div>
+          </button>
+        </div>
+      );
+    }
+
     return (
       <Accordion
         header={
