@@ -87,6 +87,7 @@ export default class Receive extends Component<Props> {
             +groupName: AddressGroupName,
             +name: AddressTypeName,
             +setAsActiveStore: (void) => void,
+            +validFilters: Array<AddressFilterKind>,
           |},
         >,
       |},
@@ -133,6 +134,7 @@ export default class Receive extends Component<Props> {
               setAsActiveStore: () => addressStore.setAsActiveStore(publicDeriver),
               name: addressStore.name,
               groupName: addressStore.groupName,
+              validFilters: addressStore.validFilters,
             }));
             return functionalitySubset;
           },

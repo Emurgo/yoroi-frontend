@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages } from 'react-intl';
+import { intlShape } from 'react-intl';
 import styles from './ReceiveNavigation.scss';
 
 import AttentionIcon from '../../../assets/images/attention-modern.inline.svg';
@@ -10,7 +10,7 @@ import ReceiveNavButton from './ReceiveNavButton';
 import type {
   $npm$ReactIntl$IntlFormat,
 } from 'react-intl';
-import { addressGroups, addressGroupsTooltip, AddressStoreTypes, AddressFilter } from '../../../types/AddressFilterTypes';
+import { addressGroups, addressGroupsTooltip, addressFilter, AddressStoreTypes } from '../../../types/AddressFilterTypes';
 import Accordion from '../../widgets/Accordion';
 import InfoIcon from '../../../assets/images/attention-big-light.inline.svg';
 
@@ -18,22 +18,7 @@ import type { AddressTypeName, AddressGroupName, AddressFilterKind } from '../..
 import classNames from 'classnames';
 import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
 import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
-import globalMessages from '../../../i18n/global-messages';
 
-const messages = defineMessages({
-  usedLabel: {
-    id: 'wallet.receive.navigation.usedLabel',
-    defaultMessage: '!!!Used'
-  },
-  unusedLabel: {
-    id: 'wallet.receive.navigation.unusedLabel',
-    defaultMessage: '!!!Unused'
-  },
-  hasBalanceLabel: {
-    id: 'wallet.receive.navigation.hasBalanceLabel',
-    defaultMessage: '!!!Has Balance'
-  },
-});
 export type Props = {|
   +setFilter: AddressFilterKind => void,
   +activeFilter: AddressFilterKind,
@@ -43,6 +28,7 @@ export type Props = {|
     +setAsActiveStore: void => void,
     +name: AddressTypeName,
     +groupName: AddressGroupName,
+    +validFilters: Array<AddressFilterKind>,
   |}>;
 |};
 
@@ -112,13 +98,14 @@ export default class ReceiveNavigation extends Component<Props> {
     return groups.map(group => (
       <div
         key={group[0].groupName.stable}
+        className={styles.accordion}
       >
         {this.createAccordionForGroup(group)}
       </div>
     ));
   }
 
-  render(): Node {
+  generateFilterSection: void => ?Node = () => {
     const { intl } = this.context;
 
     const { activeFilter } = this.props;
@@ -126,46 +113,38 @@ export default class ReceiveNavigation extends Component<Props> {
       styles.filterButton,
       styles.active,
     ]);
+
+    const activeStore = this.props.addressTypes.find(store => store.isActiveStore);
+    if (activeStore == null) return undefined;
+
+    return (
+      <div className={styles.filterSection}>
+        {activeStore.validFilters.map(filter => (
+          <button
+            key={intl.formatMessage(addressFilter[filter])}
+            type="button"
+            onClick={() => this.props.setFilter(filter)}
+            className={activeFilter === filter
+              ? componentClasses
+              : styles.filterButton
+            }
+          >
+            {intl.formatMessage(addressFilter[filter])}
+          </button>
+        ))}
+      </div>
+    );
+  }
+
+  render(): Node {
     return (
       <div className={styles.wrapper}>
         <div className={styles.content}>
-          {this.createAccordions()}
-          {/* Section filtered button */}
-          <div className={styles.filterSection}>
-            <button
-              type="button"
-              onClick={() => { this.props.setFilter(AddressFilter.None); }}
-              className={activeFilter === AddressFilter.None ?
-                componentClasses : styles.filterButton}
-            >
-              {intl.formatMessage(globalMessages.allLabel)}
-            </button>
-            {/* TODO: conditional filters */}
-            <button
-              type="button"
-              onClick={() => { this.props.setFilter(AddressFilter.Used); }}
-              className={activeFilter === AddressFilter.Used ?
-                componentClasses : styles.filterButton}
-            >
-              {intl.formatMessage(messages.usedLabel)}
-            </button>
-            <button
-              type="button"
-              onClick={() => { this.props.setFilter(AddressFilter.Unused); }}
-              className={activeFilter === AddressFilter.Unused ?
-                componentClasses : styles.filterButton}
-            >
-              {intl.formatMessage(messages.unusedLabel)}
-            </button>
-            <button
-              type="button"
-              onClick={() => { this.props.setFilter(AddressFilter.HasBalance); }}
-              className={activeFilter === AddressFilter.HasBalance ?
-                componentClasses : styles.filterButton}
-            >
-              {intl.formatMessage(messages.hasBalanceLabel)}
-            </button>
+          <div className={styles.accordions}>
+            {this.createAccordions()}
           </div>
+          {/* Section filtered button */}
+          {this.generateFilterSection()}
         </div>
       </div>
     );

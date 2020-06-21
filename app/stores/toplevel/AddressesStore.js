@@ -54,6 +54,7 @@ export class AddressTypeStore<T: StandardAddress> {
   name: AddressTypeName;
   groupName: AddressGroupName;
   shouldHide: (PublicDeriver<>, AddressTypeStore<T>) => boolean;
+  validFilters: Array<AddressFilterKind>;
   constructor(data: {|
     stores: StoresMap,
     actions: ActionsMap,
@@ -61,6 +62,7 @@ export class AddressTypeStore<T: StandardAddress> {
     name: AddressTypeName,
     groupName: AddressGroupName;
     shouldHide: (PublicDeriver<>, AddressTypeStore<T>) => boolean,
+    validFilters: Array<AddressFilterKind>;
   |}) {
     this.stores = data.stores;
     this.actions = data.actions;
@@ -68,6 +70,7 @@ export class AddressTypeStore<T: StandardAddress> {
     this.name = data.name;
     this.groupName = data.groupName;
     this.shouldHide = data.shouldHide;
+    this.validFilters = data.validFilters;
   }
 
   @computed get isActiveStore(): boolean {
@@ -192,6 +195,7 @@ export default class AddressesStore extends Store {
       },
       groupName: addressBookGroup,
       shouldHide: (_publicDeriver, _store) => false,
+      validFilters: [AddressFilter.None],
     });
   }
 

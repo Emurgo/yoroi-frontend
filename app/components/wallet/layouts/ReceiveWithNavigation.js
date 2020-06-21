@@ -16,6 +16,7 @@ export type Props = {|
     +setAsActiveStore: void => void,
     +name: AddressTypeName,
     +groupName: AddressGroupName,
+    +validFilters: Array<AddressFilterKind>,
   |}>;
 |};
 

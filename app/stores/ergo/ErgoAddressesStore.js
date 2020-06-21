@@ -16,7 +16,7 @@ import { ChainDerivations } from '../../config/numbersConfig';
 import {
   ConceptualWallet
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { addressTypes, addressGroups, AddressGroupTypes, AddressStoreTypes } from '../../types/AddressFilterTypes';
+import { addressTypes, addressGroups, AddressFilter, AddressGroupTypes, AddressStoreTypes } from '../../types/AddressFilterTypes';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import { Cip1852Wallet } from '../../api/ada/lib/storage/models/Cip1852Wallet/wrapper';
 import { Bip44DerivationLevels } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
@@ -57,6 +57,12 @@ export default class ErgoAddressesStore extends Store {
         // don't show this if public deriver level < Account
         return parent.getPublicDeriverLevel() > Bip44DerivationLevels.ACCOUNT.level;
       },
+      validFilters: [
+        AddressFilter.None,
+        AddressFilter.Unused,
+        AddressFilter.Used,
+        AddressFilter.HasBalance,
+      ],
     });
     this.externalForDisplay = new AddressTypeStore({
       stores: this.stores,
@@ -75,6 +81,12 @@ export default class ErgoAddressesStore extends Store {
       },
       groupName: p2pkGroup,
       shouldHide: (_publicDeriver, store) => store.all.length === 0,
+      validFilters: [
+        AddressFilter.None,
+        AddressFilter.Unused,
+        AddressFilter.Used,
+        AddressFilter.HasBalance,
+      ],
     });
     this.internalForDisplay = new AddressTypeStore({
       stores: this.stores,
@@ -90,6 +102,12 @@ export default class ErgoAddressesStore extends Store {
       },
       groupName: p2pkGroup,
       shouldHide: (_publicDeriver, store) => store.all.length === 0,
+      validFilters: [
+        AddressFilter.None,
+        AddressFilter.Unused,
+        AddressFilter.Used,
+        AddressFilter.HasBalance,
+      ],
     });
   }
 

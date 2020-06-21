@@ -18,7 +18,7 @@ import type {
 } from '../../../config/config-types';
 import { AddressTypeStore } from '../toplevel/AddressesStore';
 import type { StandardAddress, } from '../../types/AddressFilterTypes';
-import { addressTypes, addressGroups, AddressGroupTypes, AddressStoreTypes } from '../../types/AddressFilterTypes';
+import { addressTypes, addressGroups, AddressGroupTypes, AddressFilter, AddressStoreTypes } from '../../types/AddressFilterTypes';
 import globalMessages from '../../i18n/global-messages';
 import type { CoreAddressT } from '../../api/ada/lib/storage/database/primitives/enums';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
@@ -78,6 +78,12 @@ export default class AdaAddressesStore extends Store {
         // don't show this if public deriver level < Account
         return parent.getPublicDeriverLevel() > Bip44DerivationLevels.ACCOUNT.level;
       },
+      validFilters: [
+        AddressFilter.None,
+        AddressFilter.Unused,
+        AddressFilter.Used,
+        AddressFilter.HasBalance,
+      ],
     });
     this.externalForDisplay = new AddressTypeStore({
       stores: this.stores,
@@ -96,6 +102,12 @@ export default class AdaAddressesStore extends Store {
       },
       groupName: getAddressGroup(),
       shouldHide: (_publicDeriver, store) => store.all.length === 0,
+      validFilters: [
+        AddressFilter.None,
+        AddressFilter.Unused,
+        AddressFilter.Used,
+        AddressFilter.HasBalance,
+      ],
     });
     this.internalForDisplay = new AddressTypeStore({
       stores: this.stores,
@@ -111,6 +123,12 @@ export default class AdaAddressesStore extends Store {
       },
       groupName: getAddressGroup(),
       shouldHide: (_publicDeriver, store) => store.all.length === 0,
+      validFilters: [
+        AddressFilter.None,
+        AddressFilter.Unused,
+        AddressFilter.Used,
+        AddressFilter.HasBalance,
+      ],
     });
     this.mangledAddressesForDisplay = new AddressTypeStore({
       stores: this.stores,
@@ -125,6 +143,12 @@ export default class AdaAddressesStore extends Store {
       },
       groupName: getAddressGroup(),
       shouldHide: (_publicDeriver, store) => store.all.length === 0,
+      validFilters: [
+        AddressFilter.None,
+        AddressFilter.Unused,
+        AddressFilter.Used,
+        AddressFilter.HasBalance,
+      ],
     });
   }
 

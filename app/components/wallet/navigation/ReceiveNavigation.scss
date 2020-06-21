@@ -12,6 +12,16 @@
   min-width: 225px;
   height: inherit;
 }
+.accordion {
+  &:not(:nth-child(1)) {
+    margin-top: 24px;
+  }
+}
+.accordions {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+}
 .filterSection {
   padding-top: 20px;
   padding-bottom: 40px;

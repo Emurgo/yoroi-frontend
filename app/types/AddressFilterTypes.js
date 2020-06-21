@@ -113,9 +113,26 @@ export const addressGroups: $ObjMap<typeof AddressGroupTypes, ToMessage> = defin
 
 
 export const AddressFilter = Object.freeze({
-  None: 0,
-  Unused: 1,
-  Used: 2,
-  HasBalance: 3,
+  None: 'None',
+  Unused: 'Unused',
+  Used: 'Used',
+  HasBalance: 'HasBalance',
 });
 export type AddressFilterKind = $Values<typeof AddressFilter>;
+export const addressFilter: $ObjMap<typeof AddressFilter, ToMessage> = Object.freeze({
+  None: globalMessages.allLabel,
+  ...defineMessages({
+    Used: {
+      id: 'wallet.receive.navigation.usedLabel',
+      defaultMessage: '!!!Used'
+    },
+    Unused: {
+      id: 'wallet.receive.navigation.unusedLabel',
+      defaultMessage: '!!!Unused'
+    },
+    HasBalance: {
+      id: 'wallet.receive.navigation.hasBalanceLabel',
+      defaultMessage: '!!!Has Balance'
+    },
+  })
+});
