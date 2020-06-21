@@ -6,6 +6,14 @@
   overflow-y: overlay;
   padding: 40px 24px;
 
+  .hierarchy {
+    margin-bottom: 24px;
+    font-family: var(--font-regular);
+    font-size: 20px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--theme-separation-border-color);
+  }
+
   &::-webkit-scrollbar-button {
     height: 7px;
     display: block;

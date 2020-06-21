@@ -29,7 +29,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type {
   BIP32Path
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { AddressFilter, AddressSubgroup, AddressGroupTypes } from '../../types/AddressFilterTypes';
+import { addressGroupName, addressSubgroupName, AddressFilter, AddressSubgroup, AddressGroupTypes } from '../../types/AddressFilterTypes';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { ExplorerType } from '../../domain/Explorer';
 import type { Notification } from '../../types/notificationType';
@@ -202,10 +202,25 @@ export default class WalletReceivePage extends Component<Props> {
       throw new Error(`${nameof(WalletReceivePage)} unexpected address tab`);
     })();
 
+    const getSelectedHierarchy = () => {
+      const selectedStore = addressStores.find(store => store.isActiveStore);
+      if (selectedStore == null) return [];
+
+      if (selectedStore.name.subgroup === AddressSubgroup.all) {
+        return [
+          intl.formatMessage(addressGroupName[selectedStore.name.group]),
+        ];
+      }
+
+      return [
+        intl.formatMessage(addressGroupName[selectedStore.name.group]),
+        intl.formatMessage(addressSubgroupName[selectedStore.name.subgroup])
+      ];
+    };
     return (
       <VerticalFlexContainer>
-        {/* FOR ADDRESS BOOK */}
         <WalletReceive
+          hierarchy={getSelectedHierarchy()}
           header={header}
           selectedExplorer={this.generated.stores.profile.selectedExplorer}
           walletAddresses={addressTypeStore.filtered.slice().reverse()}

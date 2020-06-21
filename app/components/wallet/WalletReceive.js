@@ -61,6 +61,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
+  +hierarchy: Array<string>,
   +header: Node,
   +selectedExplorer: ExplorerType,
   +walletAddresses: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
@@ -169,6 +170,15 @@ export default class WalletReceive extends Component<Props> {
     );
     return { header, body };
   }
+
+  getHierarchy: void => Node = () => {
+    const hierarchy = this.props.hierarchy.join(' > ');
+    return (
+      <div className={styles.hierarchy}>
+        {hierarchy}
+      </div>
+    );
+  };
 
   render(): Node {
     const {
@@ -286,6 +296,7 @@ export default class WalletReceive extends Component<Props> {
     if (walletAddresses === undefined || walletAddresses.length === 0) {
       return (
         <div className={styles.component}>
+          {this.getHierarchy()}
           {this.props.header}
           <div className={styles.notFound}>
             <NotFoundIcon />
@@ -298,6 +309,7 @@ export default class WalletReceive extends Component<Props> {
 
     return (
       <div className={styles.component}>
+        {this.getHierarchy()}
         {this.props.header}
         {walletReceiveContent}
       </div>
