@@ -1,3 +1,5 @@
+@import '../../themes/mixins/loading-spinner';
+
 .accordionSection {
   display:flex;
   flex-direction: column;
@@ -46,4 +48,10 @@
       transition: max-height 300ms linear;
     }
   }
+}
+.spinner {
+  position: relative;
+  margin-right: 124px;
+  height: 40px;
+  @include loading-spinner("../../assets/images/spinner-dark.svg", 14);
 }

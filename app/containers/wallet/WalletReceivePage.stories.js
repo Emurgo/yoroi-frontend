@@ -327,6 +327,7 @@ const genGetStoresForWallet: {|
   location: string,
   addresses: Array<StandardAddress>,
   addressFilter: AddressFilterKind,
+  wasExecuted: boolean,
 |} => (PublicDeriver<> => Array<{|
   +isActiveStore: boolean,
   +isHidden: boolean,
@@ -362,7 +363,7 @@ const genGetStoresForWallet: {|
         addressFilter: request.addressFilter,
         addresses: request.addresses,
       }),
-      wasExecuted: true,
+      wasExecuted: request.wasExecuted,
       validFilters,
     });
   };
@@ -423,6 +424,7 @@ const wrapForReceive: ReturnType<ReturnType<typeof genGetStoresForWallet>> => Ar
   +name: AddressTypeName,
   +groupName: AddressGroupName,
   +validFilters: Array<AddressFilterKind>,
+  +wasExecuted: boolean,
 |}> = (result) => {
   return result.map(addressStore => Object.freeze({
     isActiveStore: addressStore.isActiveStore,
@@ -431,6 +433,7 @@ const wrapForReceive: ReturnType<ReturnType<typeof genGetStoresForWallet>> => Ar
     name: addressStore.name,
     groupName: addressStore.groupName,
     validFilters: addressStore.validFilters,
+    wasExecuted: addressStore.wasExecuted,
   }));
 };
 const wrapForReceivePage: ReturnType<ReturnType<typeof genGetStoresForWallet>> => Array<{|
@@ -449,6 +452,82 @@ const wrapForReceivePage: ReturnType<ReturnType<typeof genGetStoresForWallet>> =
     groupName: addressStore.groupName,
     wasExecuted: addressStore.wasExecuted,
   }));
+};
+
+export const Loading = (): Node => {
+  const wallet = genSigningWalletWithCache();
+  const lookup = walletLookup([wallet]);
+
+  const location = getExternalRoute(wallet.publicDeriver.getPublicDeriverId());
+  const addressFilter = AddressFilter.None;
+  const getStoresForWallet = genGetStoresForWallet({
+    location,
+    publicDeriver: wallet.publicDeriver,
+    addresses: genAddresses(),
+    addressFilter,
+    wasExecuted: false,
+  });
+
+  return wrapWallet(
+    mockWalletProps({
+      location,
+      selected: wallet.publicDeriver,
+      ...lookup,
+    }),
+    wrapReceive(
+      mockReceiveProps({
+        selected: wallet.publicDeriver,
+        getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressFilter,
+        location,
+      }),
+      (<WalletReceivePage
+        generated={genBaseProps({
+          wallet,
+          addressFilter,
+          getStoresForWallet: (pubDeriver) => wrapForReceivePage(getStoresForWallet(pubDeriver)),
+        })}
+      />)
+    )
+  );
+};
+
+export const NoMatchFilter = (): Node => {
+  const wallet = genSigningWalletWithCache();
+  const lookup = walletLookup([wallet]);
+
+  const location = getExternalRoute(wallet.publicDeriver.getPublicDeriverId());
+  const addressFilter = AddressFilter.Used;
+  const getStoresForWallet = genGetStoresForWallet({
+    location,
+    publicDeriver: wallet.publicDeriver,
+    addresses: [genAddresses()[0]],
+    addressFilter,
+    wasExecuted: true,
+  });
+
+  return wrapWallet(
+    mockWalletProps({
+      location,
+      selected: wallet.publicDeriver,
+      ...lookup,
+    }),
+    wrapReceive(
+      mockReceiveProps({
+        selected: wallet.publicDeriver,
+        getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressFilter,
+        location,
+      }),
+      (<WalletReceivePage
+        generated={genBaseProps({
+          wallet,
+          addressFilter,
+          getStoresForWallet: (pubDeriver) => wrapForReceivePage(getStoresForWallet(pubDeriver)),
+        })}
+      />)
+    )
+  );
 };
 
 export const ExternalTab = (): Node => {
@@ -471,6 +550,7 @@ export const ExternalTab = (): Node => {
     publicDeriver: wallet.publicDeriver,
     addresses: genAddresses(),
     addressFilter,
+    wasExecuted: true,
   });
 
   return wrapWallet(
@@ -512,6 +592,7 @@ export const InternalTab = (): Node => {
     publicDeriver: wallet.publicDeriver,
     addresses: genAddresses(),
     addressFilter,
+    wasExecuted: true,
   });
   return wrapWallet(
     mockWalletProps({
@@ -548,6 +629,7 @@ export const MangledTab = (): Node => {
     publicDeriver: wallet.publicDeriver,
     addresses: genAddresses(),
     addressFilter,
+    wasExecuted: true,
   });
   return wrapWallet(
     mockWalletProps({
@@ -583,6 +665,7 @@ export const AddressBookTab = (): Node => {
     publicDeriver: wallet.publicDeriver,
     addresses: genAddresses(),
     addressFilter,
+    wasExecuted: true,
   });
   return wrapWallet(
     mockWalletProps({
@@ -619,6 +702,7 @@ export const UnmangleDialogLoading = (): Node => {
     publicDeriver: wallet.publicDeriver,
     addresses: genAddresses(),
     addressFilter,
+    wasExecuted: true,
   });
   return wrapWallet(
     mockWalletProps({
@@ -662,6 +746,7 @@ export const UnmangleDialogError = (): Node => {
     publicDeriver: wallet.publicDeriver,
     addresses: genAddresses(),
     addressFilter,
+    wasExecuted: true,
   });
   return wrapWallet(
     mockWalletProps({
@@ -706,6 +791,7 @@ export const UnmangleDialogConfirm = (): Node => {
     publicDeriver: wallet.publicDeriver,
     addresses: genAddresses(),
     addressFilter,
+    wasExecuted: true,
   });
   return wrapWallet(
     mockWalletProps({
@@ -749,6 +835,7 @@ export const UriGenerateDialog = (): Node => {
     publicDeriver: wallet.publicDeriver,
     addresses: genAddresses(),
     addressFilter,
+    wasExecuted: true,
   });
   return wrapWallet(
     mockWalletProps({
@@ -791,6 +878,7 @@ export const UriDisplayDialog = (): Node => {
     publicDeriver: wallet.publicDeriver,
     addresses: genAddresses(),
     addressFilter,
+    wasExecuted: true,
   });
   return wrapWallet(
     mockWalletProps({
@@ -836,6 +924,7 @@ export const VerifyRegularAddress = (): Node => {
     publicDeriver: wallet.publicDeriver,
     addresses: genAddresses(),
     addressFilter,
+    wasExecuted: true,
   });
   return wrapWallet(
     mockWalletProps({
@@ -881,6 +970,7 @@ export const VerifyLedgerAddress = (): Node => {
     publicDeriver: wallet.publicDeriver,
     addresses: genAddresses(),
     addressFilter,
+    wasExecuted: true,
   });
   return wrapWallet(
     mockWalletProps({

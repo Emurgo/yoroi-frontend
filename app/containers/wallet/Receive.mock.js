@@ -15,6 +15,7 @@ export const mockReceiveProps: {|
     +name: AddressTypeName,
     +groupName: AddressGroupName,
     +validFilters: Array<AddressFilterKind>,
+    +wasExecuted: boolean,
   |}>,
   location: string
 |} => {| generated: GeneratedData |} = (request) => ({

@@ -10,7 +10,8 @@ import styles from './Accordion.scss';
 type Props = {|
   +header: Node,
   +children: Node,
-  activeHeader: boolean
+  +activeHeader: boolean,
+  +showSpinner: boolean,
 |};
 
 type State = {|
@@ -51,6 +52,10 @@ export default class Accordion extends Component<Props, State> {
         </button>
         <div className={toggleShowContent}>
           {children}
+          {this.props.showSpinner
+            ? <div className={styles.spinner} />
+            : null
+          }
         </div>
       </div>
     );

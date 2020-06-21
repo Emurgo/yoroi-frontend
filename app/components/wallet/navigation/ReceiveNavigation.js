@@ -29,6 +29,7 @@ export type Props = {|
     +name: AddressTypeName,
     +groupName: AddressGroupName,
     +validFilters: Array<AddressFilterKind>,
+    +wasExecuted: boolean,
   |}>;
 |};
 
@@ -75,6 +76,7 @@ export default class ReceiveNavigation extends Component<Props> {
 
     return (
       <Accordion
+        showSpinner={stores.find(store => !store.wasExecuted) != null}
         header={
           <div>
             {intl.formatMessage(addressGroups[stores[0].groupName.stable])}

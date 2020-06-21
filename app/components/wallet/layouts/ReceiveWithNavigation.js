@@ -17,6 +17,7 @@ export type Props = {|
     +name: AddressTypeName,
     +groupName: AddressGroupName,
     +validFilters: Array<AddressFilterKind>,
+    +wasExecuted: boolean,
   |}>;
 |};
 
