@@ -3,7 +3,7 @@
   "api.errors.GenericApiError": "Bir hata oluştu, lütfen tekrar deneyin.",
   "api.errors.IncorrectPasswordError": "Geçersiz cüzdan şifresi.",
   "api.errors.NotEnoughMoneyToSendError": "Bu işlemi yapmak için yeterli ADA yok.",
-  "api.errors.PromiseNotCalledYetError": "Result accessed before execution finished.",
+  "api.errors.PromiseNotCalledYetError": "Uygulama tamamlanmadan sonuca erişildi.",
   "api.errors.ReportRequestError": "There was a problem sending the support request.",
   "api.errors.WalletAlreadyImportedError": "The wallet you are trying to import already exists.",
   "api.errors.WalletAlreadyRestoredError": "The wallet you are trying to restore already exists.",
