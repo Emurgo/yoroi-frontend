@@ -20,7 +20,7 @@ import globalMessages from '../../../i18n/global-messages';
 import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
 import type { PriceDataRow } from '../../../api/ada/lib/storage/database/prices/tables';
 import { getPriceKey } from '../../../api/ada/lib/storage/bridge/prices';
-import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor, } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
 import type { Notification } from '../../../types/notificationType';
 
 const messages = defineMessages({
@@ -51,7 +51,7 @@ type Props = {|
   |},
   +addressLookup: string => void | {|
     goToRoute: void => void,
-    displayName: $Exact<$npm$ReactIntl$MessageDescriptor>,
+    name: string,
   |},
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,

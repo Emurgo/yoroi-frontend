@@ -68,3 +68,9 @@ Feature: Generate Addresses
     And I should see the addresses exactly list them
     | address                                                     |
     | Ae2tdPwUPEZ3o8HadjafhGnNEqxwQm4V98Nm3kADDsfTv8QE2Ytpe2L8TSL |
+
+  @it-122
+  Scenario: Ensure user can see address book in "Receive tab" (IT-122)
+    When I click on the address book tab
+    Then I should see 13 addresses with address "Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj" at the top
+

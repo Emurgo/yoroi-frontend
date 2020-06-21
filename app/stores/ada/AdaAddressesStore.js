@@ -6,7 +6,7 @@ import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
-  asGetStakingKey,
+  asGetStakingKey, asHasUtxoChains, asHasLevels,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import {
   filterAddressesByStakingKey,
@@ -18,43 +18,139 @@ import type {
 } from '../../../config/config-types';
 import { AddressTypeStore } from '../toplevel/AddressesStore';
 import type { StandardAddress, } from '../../types/AddressFilterTypes';
-import { AddressStoreTypes } from '../../types/AddressFilterTypes';
-import { addressTypes } from '../../i18n/global-messages';
-import { ROUTES } from '../../routes-config';
+import { AddressGroupTypes, AddressFilter, AddressSubgroup } from '../../types/AddressFilterTypes';
 import type { CoreAddressT } from '../../api/ada/lib/storage/database/primitives/enums';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
+import { Cip1852Wallet } from '../../api/ada/lib/storage/models/Cip1852Wallet/wrapper';
+import { Bip44DerivationLevels } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import environment from '../../environment';
+import { ChainDerivations } from '../../config/numbersConfig';
+import {
+  ConceptualWallet
+} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 
 declare var CONFIG : ConfigType;
 
+const getAddressGroup = () => {
+  if (environment.isShelley()) {
+    return AddressGroupTypes.group;
+  }
+  return AddressGroupTypes.byron;
+};
+
 export default class AdaAddressesStore extends Store {
 
+  allAddressesForDisplay: AddressTypeStore<StandardAddress>;
+  externalForDisplay: AddressTypeStore<StandardAddress>;
+  internalForDisplay: AddressTypeStore<StandardAddress>;
   mangledAddressesForDisplay: AddressTypeStore<StandardAddress>;
 
   setup(): void {
     super.setup();
 
+    this.allAddressesForDisplay = new AddressTypeStore({
+      stores: this.stores,
+      actions: this.actions,
+      request: (request) => this.stores.addresses._wrapForAllAddresses({
+        ...request,
+        storeToFilter: this.allAddressesForDisplay,
+      }),
+      name: {
+        subgroup: AddressSubgroup.all,
+        group: getAddressGroup(),
+      },
+      shouldHide: (publicDeriver, _store) => {
+        const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
+        if (withLevels == null) return true;
+        const parent = withLevels.getParent();
+        if (!(parent instanceof Bip44Wallet || parent instanceof Cip1852Wallet)) {
+          return false;
+        }
+        // don't show this if public deriver level < Account
+        return parent.getPublicDeriverLevel() > Bip44DerivationLevels.ACCOUNT.level;
+      },
+      validFilters: [
+        AddressFilter.None,
+        AddressFilter.Unused,
+        AddressFilter.Used,
+        AddressFilter.HasBalance,
+      ],
+    });
+    this.externalForDisplay = new AddressTypeStore({
+      stores: this.stores,
+      actions: this.actions,
+      request: async (request) => this.stores.addresses._createAddressIfNeeded({
+        publicDeriver: request.publicDeriver,
+        genAddresses: () => this.stores.addresses._wrapForChainAddresses({
+          ...request,
+          storeToFilter: this.externalForDisplay,
+          chainsRequest: { chainId: ChainDerivations.EXTERNAL },
+        }),
+      }),
+      name: {
+        subgroup: AddressSubgroup.external,
+        group: getAddressGroup(),
+      },
+      shouldHide: (_publicDeriver, store) => store.all.length === 0,
+      validFilters: [
+        AddressFilter.None,
+        AddressFilter.Unused,
+        AddressFilter.Used,
+        AddressFilter.HasBalance,
+      ],
+    });
+    this.internalForDisplay = new AddressTypeStore({
+      stores: this.stores,
+      actions: this.actions,
+      request: (request) => this.stores.addresses._wrapForChainAddresses({
+        ...request,
+        storeToFilter: this.internalForDisplay,
+        chainsRequest: { chainId: ChainDerivations.INTERNAL },
+      }),
+      name: {
+        subgroup: AddressSubgroup.internal,
+        group: getAddressGroup(),
+      },
+      shouldHide: (_publicDeriver, store) => store.all.length === 0,
+      validFilters: [
+        AddressFilter.None,
+        AddressFilter.Unused,
+        AddressFilter.Used,
+        AddressFilter.HasBalance,
+      ],
+    });
     this.mangledAddressesForDisplay = new AddressTypeStore({
       stores: this.stores,
       actions: this.actions,
       request: (request) => this.stores.addresses._wrapForAllAddresses({
         ...request,
         storeToFilter: this.mangledAddressesForDisplay,
-        invertFilter: true,
       }),
       name: {
-        stable: AddressStoreTypes.mangled,
-        display: addressTypes.mangledLabel,
+        subgroup: AddressSubgroup.mangled,
+        group: getAddressGroup(),
       },
-      route: ROUTES.WALLETS.RECEIVE.MANGLED,
       shouldHide: (_publicDeriver, store) => store.all.length === 0,
+      validFilters: [
+        AddressFilter.None,
+        AddressFilter.Unused,
+        AddressFilter.Used,
+        AddressFilter.HasBalance,
+      ],
     });
   }
 
   addObservedWallet: PublicDeriver<> => void = (
     publicDeriver
   ) => {
+    const withHasUtxoChains = asHasUtxoChains(publicDeriver);
+    if (withHasUtxoChains == null) {
+      this.allAddressesForDisplay.addObservedWallet(publicDeriver);
+    } else {
+      this.externalForDisplay.addObservedWallet(publicDeriver);
+      this.internalForDisplay.addObservedWallet(publicDeriver);
+    }
     if (asGetStakingKey(publicDeriver) != null) {
       this.mangledAddressesForDisplay.addObservedWallet(publicDeriver);
     }
@@ -63,6 +159,13 @@ export default class AdaAddressesStore extends Store {
   refreshAddressesFromDb: PublicDeriver<> => Promise<void> = async (
     publicDeriver
   ) => {
+    const withHasUtxoChains = asHasUtxoChains(publicDeriver);
+    if (withHasUtxoChains == null) {
+      await this.allAddressesForDisplay.refreshAddressesFromDb(publicDeriver);
+    } else {
+      await this.externalForDisplay.refreshAddressesFromDb(publicDeriver);
+      await this.internalForDisplay.refreshAddressesFromDb(publicDeriver);
+    }
     if (asGetStakingKey(publicDeriver) != null) {
       await this.mangledAddressesForDisplay.refreshAddressesFromDb(publicDeriver);
     }
@@ -70,8 +173,17 @@ export default class AdaAddressesStore extends Store {
 
   getStoresForWallet: (
     PublicDeriver<>,
-  ) => Array<AddressTypeStore<StandardAddress>> = (_publicDeriver) => {
+  ) => Array<AddressTypeStore<StandardAddress>> = (publicDeriver) => {
+    const withHasUtxoChains = asHasUtxoChains(publicDeriver);
+
     const stores = [];
+    if (withHasUtxoChains == null) {
+      stores.push(this.allAddressesForDisplay);
+    } else {
+      stores.push(this.externalForDisplay);
+      stores.push(this.internalForDisplay);
+    }
+
     stores.push(this.mangledAddressesForDisplay);
 
     return stores;
@@ -96,14 +208,17 @@ export default class AdaAddressesStore extends Store {
     storeToFilter: AddressTypeStore<StandardAddress>,
     addresses: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
-    if (request.storeToFilter.name.stable === AddressStoreTypes.all) {
+    if (request.storeToFilter.name.group === AddressGroupTypes.addressBook) {
+      return request.addresses;
+    }
+    if (request.storeToFilter.name.subgroup === AddressSubgroup.all) {
       return filterMangledAddresses({
         publicDeriver: request.publicDeriver,
         baseAddresses: request.addresses,
         invertFilter: false,
       });
     }
-    if (request.storeToFilter.name.stable === AddressStoreTypes.mangled) {
+    if (request.storeToFilter.name.subgroup === AddressSubgroup.mangled) {
       return filterMangledAddresses({
         publicDeriver: request.publicDeriver,
         baseAddresses: request.addresses,

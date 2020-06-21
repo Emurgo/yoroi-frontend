@@ -21,6 +21,10 @@ When(/^I click on the internal tab$/, async function () {
   await this.click('div.internal.ReceiveNavButton_wrapper');
 });
 
+When(/^I click on the address book tab$/, async function () {
+  await this.click('button.addressBook');
+});
+
 When(/^I click on the All addresses button$/, async function () {
   const hideUsedText = await i18n.formatMessage(this.driver, { id: 'wallet.receive.navigation.allLabel' });
   await this.click(`//button[contains(text(), "${hideUsedText}")]`, By.xpath);
@@ -47,6 +51,14 @@ When(/^I click on the Generate new address button ([0-9]+) times$/, async functi
 
 Then(/^I should see my latest address "([^"]*)" at the top$/, async function (address) {
   await this.waitUntilText('.StandardHeader_copyableHash', address);
+});
+Then(/^I should see ([^"]*) addresses with address "([^"]*)" at the top$/, async function (numAddresses, address) {
+  const rows = await this.driver.findElements(By.css('.WalletReceive_walletAddress'));
+  expect(rows.length).to.equal(Number.parseInt(numAddresses, 10));
+
+  const topAddrElem = await rows[0].findElement(By.css('.WalletReceive_addressHash'));
+  const topAddr = await topAddrElem.getText();
+  expect(topAddr).to.equal(truncateAddress(address));
 });
 
 Then(/^I see every generated address is unique$/, async function () {

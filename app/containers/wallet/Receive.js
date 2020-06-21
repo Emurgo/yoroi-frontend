@@ -3,16 +3,16 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages } from 'react-intl';
+import { intlShape } from 'react-intl';
 import type {
   $npm$ReactIntl$IntlFormat,
 } from 'react-intl';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import ReceiveWithNavigation from '../../components/wallet/layouts/ReceiveWithNavigation';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { AddressTypeName } from '../../stores/toplevel/AddressesStore';
-import type { AddressFilterKind } from '../../types/AddressFilterTypes';
-import environment from '../../environment';
+import type { AddressTypeName, AddressFilterKind } from '../../types/AddressFilterTypes';
+import { ROUTES } from '../../routes-config';
+import { buildRoute } from '../../utils/routing';
 
 export type GeneratedData = typeof Receive.prototype.generated;
 
@@ -20,21 +20,6 @@ type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
   +children?: Node
 |};
-
-const messages = defineMessages({
-  baseLabel: {
-    id: 'wallet.receive.navigation.baseLabel',
-    defaultMessage: '!!!Base'
-  },
-  groupLabel: {
-    id: 'wallet.receive.navigation.groupLabel',
-    defaultMessage: '!!!Group'
-  },
-  byronLabel: {
-    id: 'wallet.receive.navigation.byronLabel',
-    defaultMessage: '!!!Byron'
-  },
-});
 
 @observer
 export default class Receive extends Component<Props> {
@@ -46,34 +31,42 @@ export default class Receive extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  componentDidMount() {
+    const publicDeriver = this.generated.stores.wallets.selected;
+    if (publicDeriver == null) throw new Error(`${nameof(Receive)} no public deriver`);
+    const rootRoute = buildRoute(
+      ROUTES.WALLETS.RECEIVE.ROOT,
+      {
+        id: publicDeriver.getPublicDeriverId(),
+      }
+    );
+    if (this.generated.stores.app.currentRoute === rootRoute) {
+      // if no store is specified, we just send the user to the first store in the list
+      const stores = this.generated.stores.addresses.getStoresForWallet(publicDeriver);
+      const firstRoute = buildRoute(
+        ROUTES.WALLETS.RECEIVE.ADDRESS_LIST,
+        {
+          id: publicDeriver.getPublicDeriverId(),
+          group: stores[0].name.group,
+          name: stores[0].name.subgroup,
+        }
+      );
+      this.generated.actions.router.goToRoute.trigger({ route: firstRoute });
+    }
+  }
   componentWillUnmount() {
     this.generated.actions.addresses.resetFilter.trigger();
-  }
-
-  getCategoryTitle: void => string = () => {
-    const { intl } = this.context;
-
-    if (environment.isShelley()) {
-      return intl.formatMessage(messages.groupLabel);
-    }
-    // eslint-disable-next-line no-constant-condition
-    if (false) { // TODO: fix condition during Haskell Shelley integration
-      return intl.formatMessage(messages.baseLabel);
-    }
-    return intl.formatMessage(messages.byronLabel);
   }
 
   render(): Node {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) throw new Error(`${nameof(Receive)} no public deriver`);
     const { addresses } = this.generated.stores;
-
     return (
       <ReceiveWithNavigation
-        addressTypes={addresses.getStoresForWallet(publicDeriver)}
+        addressStores={addresses.getStoresForWallet(publicDeriver)}
         setFilter={filter => this.generated.actions.addresses.setFilter.trigger(filter)}
         activeFilter={this.generated.stores.addresses.addressFilter}
-        categoryTitle={this.getCategoryTitle()}
       >
         {this.props.children}
       </ReceiveWithNavigation>
@@ -82,6 +75,7 @@ export default class Receive extends Component<Props> {
 
   @computed get generated(): {|
     stores: {|
+      app: {| currentRoute: string |},
       addresses: {|
         addressFilter: AddressFilterKind,
         getStoresForWallet: (
@@ -92,6 +86,8 @@ export default class Receive extends Component<Props> {
             +isHidden: boolean,
             +name: AddressTypeName,
             +setAsActiveStore: (void) => void,
+            +validFilters: Array<AddressFilterKind>,
+            +wasExecuted: boolean,
           |},
         >,
       |},
@@ -101,6 +97,15 @@ export default class Receive extends Component<Props> {
       addresses: {|
         setFilter: {| trigger: (params: AddressFilterKind) => void |},
         resetFilter: {| trigger: (params: void) => void |},
+      |},
+      router: {|
+        goToRoute: {|
+          trigger: (params: {|
+            forceRefresh?: boolean,
+            params?: ?any,
+            route: string
+          |}) => void
+        |}
       |}
     |}
     |} {
@@ -116,20 +121,20 @@ export default class Receive extends Component<Props> {
         wallets: {
           selected: stores.wallets.selected,
         },
+        app: {
+          currentRoute: stores.app.currentRoute,
+        },
         addresses: {
           addressFilter: stores.addresses.addressFilter,
           getStoresForWallet: (publicDeriver: PublicDeriver<>) => {
             const addressStores = stores.addresses.getStoresForWallet(publicDeriver);
-            const functionalitySubset: Array<{|
-              +isActiveStore: boolean,
-              +isHidden: boolean,
-              +setAsActiveStore: void => void,
-              +name: AddressTypeName,
-            |}> = addressStores.map(addressStore => ({
+            const functionalitySubset = addressStores.map(addressStore => ({
               isHidden: addressStore.isHidden,
               isActiveStore: addressStore.isActiveStore,
               setAsActiveStore: () => addressStore.setAsActiveStore(publicDeriver),
               name: addressStore.name,
+              validFilters: addressStore.validFilters,
+              wasExecuted: addressStore.wasExecuted,
             }));
             return functionalitySubset;
           },
@@ -139,7 +144,10 @@ export default class Receive extends Component<Props> {
         addresses: {
           setFilter: { trigger: actions.addresses.setFilter.trigger, },
           resetFilter: { trigger: actions.addresses.resetFilter.trigger, },
-        }
+        },
+        router: {
+          goToRoute: { trigger: actions.router.goToRoute.trigger },
+        },
       }
     });
   }

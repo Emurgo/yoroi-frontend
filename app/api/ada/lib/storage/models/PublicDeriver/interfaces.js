@@ -63,6 +63,7 @@ import type { Bip44ChainInsert } from '../../database/walletTypes/common/tables'
 export type Address = {|
   +address: string,
 |};
+
 export type Value = {|
   /**
    * note: an undefined value is different than a value of 0

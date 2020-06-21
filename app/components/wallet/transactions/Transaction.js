@@ -6,7 +6,6 @@ import BigNumber from 'bignumber.js';
 import { defineMessages, intlShape } from 'react-intl';
 import type {
   $npm$ReactIntl$IntlFormat,
-  $npm$ReactIntl$MessageDescriptor,
 } from 'react-intl';
 import moment from 'moment';
 import classnames from 'classnames';
@@ -20,7 +19,6 @@ import globalMessages, { memoMessages, } from '../../../i18n/global-messages';
 import type { TransactionDirectionType, } from '../../../api/ada/transactions/types';
 import { transactionTypes } from '../../../api/ada/transactions/types';
 import type { AssuranceLevel } from '../../../types/transactionAssuranceTypes';
-import environment from '../../../environment';
 import { Logger } from '../../../utils/logging';
 import ExpandArrow from '../../../assets/images/expand-arrow-grey.inline.svg';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
@@ -170,7 +168,7 @@ type Props = {|
   |},
   +addressLookup: string => void | {|
     goToRoute: void => void,
-    displayName: $Exact<$npm$ReactIntl$MessageDescriptor>,
+    name: string,
   |},
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
@@ -465,9 +463,7 @@ export default class Transaction extends Component<Props, State> {
                               </span>
                             </ExplorableHashContainer>
                           </CopyableAddress>
-                          <div>
-                            {this.generateAddressButton(address.address)}
-                          </div>
+                          {this.generateAddressButton(address.address)}
                           <div className={styles.fee}>
                             {this.renderAmountDisplay({
                               amount: address.value.negated(),
@@ -618,23 +614,30 @@ export default class Transaction extends Component<Props, State> {
     const addressInfo = this.props.addressLookup(
       addressToDisplayString(address)
     );
-    if (addressInfo != null) {
+    if (addressInfo == null) {
+      // this can happen in three main case:
+      // 1) When user launches the app:
+      // Tx history finishes loading but address stores are still loading
+      // Therefore we show the tx history but don't know which store the address belongs to yet
+      // 2) The transaction is pending and uses an address we don't know we own yet
+      // recall: a transaction shouldn't change wallet state until it's confirmed
+      // so if a pending transaction uses an external address that is
+      // A) beyond the display cutoff
+      // B) within bip44 gap
+      // then the address store will not contain this address yet
+      // but it will once the transaction confirms
+      // 3) A bug and/of unsupported address kind
+
       return (
-        <button type="button" className={classnames([styles.status, styles.typeAddress])} onClick={addressInfo.goToRoute}>
-          {intl.formatMessage(addressInfo.displayName)}
-        </button>
+        <div className={classnames([styles.status, styles.typeAddress])}>
+          {intl.formatMessage(globalMessages.processingLabel)}
+        </div>
       );
     }
     return (
-      environment.isProduction()
-        ? '   -'
-        : (
-          <button type="button" className={classnames([styles.status, styles.typeAddress])} onClick={() => {} /* todo: link to address book */}>
-            {/* padding using irregular whitespacing in the HTML */}
-            {/* eslint-disable-next-line no-irregular-whitespace */}
-            {` ${intl.formatMessage(globalMessages.addToAddressbookLabel)} `}
-          </button>
-        )
+      <button type="button" className={classnames([styles.status, styles.typeAddress])} onClick={addressInfo.goToRoute}>
+        {addressInfo.name}
+      </button>
     );
   }
 

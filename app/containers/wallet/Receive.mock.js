@@ -2,9 +2,8 @@
 
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import type { GeneratedData } from './Receive';
-import type { AddressTypeName } from '../../stores/toplevel/AddressesStore';
 import { action } from '@storybook/addon-actions';
-import type { AddressFilterKind } from '../../types/AddressFilterTypes';
+import type { AddressTypeName, AddressFilterKind } from '../../types/AddressFilterTypes';
 
 export const mockReceiveProps: {|
   selected: null | PublicDeriver<>,
@@ -14,10 +13,16 @@ export const mockReceiveProps: {|
     +isHidden: boolean,
     +setAsActiveStore: void => void,
     +name: AddressTypeName,
+    +validFilters: Array<AddressFilterKind>,
+    +wasExecuted: boolean,
   |}>,
+  location: string
 |} => {| generated: GeneratedData |} = (request) => ({
   generated: {
     stores: {
+      app: {
+        currentRoute: request.location,
+      },
       wallets: {
         selected: request.selected,
       },
@@ -30,6 +35,9 @@ export const mockReceiveProps: {|
       addresses: {
         setFilter: { trigger: action('setFilter') },
         resetFilter: { trigger: action('resetFilter') },
+      },
+      router: {
+        goToRoute: { trigger: action('goToRouter') }
       }
     }
   },

@@ -133,15 +133,17 @@ export default class VerifyAddressDialog extends Component<Props> {
               </ExplorableHashContainer>
             </div>
             <br />
-            <span className={labelStyle}>
-              {intl.formatMessage(messages.derivationPathLabel)}
-            </span>
             {walletPath != null && (
-              <div className={derivationClasses}>
-                <div className={styles.hash}>
-                  {toDerivationPathString(walletPath)}
+              <>
+                <span className={labelStyle}>
+                  {intl.formatMessage(messages.derivationPathLabel)}
+                </span>
+                <div className={derivationClasses}>
+                  <div className={styles.hash}>
+                    {toDerivationPathString(walletPath)}
+                  </div>
                 </div>
-              </div>
+              </>
             )}
           </div>
         ) : null}

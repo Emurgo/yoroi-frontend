@@ -44,10 +44,6 @@
       fill: var(--theme-wallet-navigation-tab-text-color);
     }
   }
-
-  @media (max-width: 550px) {
-    display: none;
-  }
 }
 
 .label {
