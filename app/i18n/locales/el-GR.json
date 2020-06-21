@@ -9,7 +9,7 @@
   "api.errors.WalletAlreadyRestoredError": "Το πορτοφόλι που προσπαθείτε να επαναφέρετε υπάρχει ήδη.",
   "api.errors.WalletFileImportError": "Το πορτοφόλι δεν μπόρεσε να εισαχθεί. Παρακαλω επιβεβαιώστε ότι παρέχετε το σωστό αρχείο.",
   "api.errors.checkAdressesInUseApiError": "Παρελήφθη σφάλμα από τον διακομιστή καθώς γινόταν έλεγχος στις χρησιμοποιημένες διευθύνσεις.",
-  "api.errors.currentCoinPriceError": "Τα δεδομένα της τρέχουσας τιμήςτου νομίσματος, δεν είναι διαθέσιμα αυτή τη στιγμή.",
+  "api.errors.currentCoinPriceError": "Τα δεδομένα της τρέχουσας τιμής του νομίσματος, δεν είναι διαθέσιμα αυτή τη στιγμή.",
   "api.errors.discoverAddressesError": "Παρελήφθη σφάλμα στη κλήση μεθόδου ΔΠΕ (Διεπαφή προγραμματισμού εφαρμογών), τη στιγμή ανακάλυψης διευθύνσεων.",
   "api.errors.generateTransferTxError": "Σφάλμα τη στιγμή δημιουργίας συναλλαγής.",
   "api.errors.getAccountStateApiError": "Error received from server while getting account state.",
