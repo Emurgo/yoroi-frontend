@@ -610,10 +610,30 @@ export default class Transaction extends Component<Props, State> {
   }
 
   generateAddressButton: string => ?Node = (address) => {
+    const { intl } = this.context;
     const addressInfo = this.props.addressLookup(
       addressToDisplayString(address)
     );
-    if (addressInfo == null) return null; // address stores still loading
+    if (addressInfo == null) {
+      // this can happen in three main case:
+      // 1) When user launches the app:
+      // Tx history finishes loading but address stores are still loading
+      // Therefore we show the tx history but don't know which store the address belongs to yet
+      // 2) The transaction is pending and uses an address we don't know we own yet
+      // recall: a transaction shouldn't change wallet state until it's confirmed
+      // so if a pending transaction uses an external address that is
+      // A) beyond the display cutoff
+      // B) within bip44 gap
+      // then the address store will not contain this address yet
+      // but it will once the transaction confirms
+      // 3) A bug and/of unsupported address kind
+
+      return (
+        <div className={classnames([styles.status, styles.typeAddress])}>
+          {intl.formatMessage(globalMessages.processingLabel)}
+        </div>
+      );
+    }
     return (
       <button type="button" className={classnames([styles.status, styles.typeAddress])} onClick={addressInfo.goToRoute}>
         {addressInfo.name}
