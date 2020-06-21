@@ -10,11 +10,11 @@ import ReceiveNavButton from './ReceiveNavButton';
 import type {
   $npm$ReactIntl$IntlFormat,
 } from 'react-intl';
-import { addressGroups, addressGroupsTooltip, addressFilter, AddressStoreTypes } from '../../../types/AddressFilterTypes';
+import { addressGroupName, addressSubgroupName, addressGroupsTooltip, addressFilter, AddressSubgroup } from '../../../types/AddressFilterTypes';
 import Accordion from '../../widgets/Accordion';
 import InfoIcon from '../../../assets/images/attention-big-light.inline.svg';
 
-import type { AddressTypeName, AddressGroupName, AddressFilterKind } from '../../../types/AddressFilterTypes';
+import type { AddressTypeName, AddressFilterKind } from '../../../types/AddressFilterTypes';
 import classNames from 'classnames';
 import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
 import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
@@ -22,12 +22,11 @@ import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
 export type Props = {|
   +setFilter: AddressFilterKind => void,
   +activeFilter: AddressFilterKind,
-  +addressTypes: Array<{|
+  +addressStores: Array<{|
     +isActiveStore: boolean,
     +isHidden: boolean,
     +setAsActiveStore: void => void,
     +name: AddressTypeName,
-    +groupName: AddressGroupName,
     +validFilters: Array<AddressFilterKind>,
     +wasExecuted: boolean,
   |}>;
@@ -40,10 +39,10 @@ export default class ReceiveNavigation extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  createAccordionForGroup: $PropertyType<Props, 'addressTypes'> => Node = (stores) => {
+  createAccordionForGroup: $PropertyType<Props, 'addressStores'> => Node = (stores) => {
     const { intl } = this.context;
 
-    if (stores.length === 1 && stores[0].name.stable === AddressStoreTypes.all) {
+    if (stores.length === 1 && stores[0].name.subgroup === AddressSubgroup.all) {
       const store = stores[0];
       return (
         <div className={styles.addressBook}>
@@ -51,18 +50,18 @@ export default class ReceiveNavigation extends Component<Props> {
             onClick={store.setAsActiveStore}
             type="button"
             className={classNames([
-              store.name.stable,
-              store.groupName.stable,
+              store.name.subgroup,
+              store.name.group,
               styles.filterButton,
               ...(store.isActiveStore ? [styles.active] : [])
             ])}
           >
             <div>
-              {intl.formatMessage(addressGroups[stores[0].groupName.stable])}
+              {intl.formatMessage(addressGroupName[stores[0].name.group])}
               <Tooltip
                 className={styles.Tooltip}
                 skin={TooltipSkin}
-                tip={intl.formatMessage(addressGroupsTooltip[stores[0].groupName.stable])}
+                tip={intl.formatMessage(addressGroupsTooltip[stores[0].name.group])}
               >
                 <span className={styles.infoIcon}>
                   <InfoIcon />
@@ -79,11 +78,11 @@ export default class ReceiveNavigation extends Component<Props> {
         showSpinner={stores.find(store => !store.wasExecuted) != null}
         header={
           <div>
-            {intl.formatMessage(addressGroups[stores[0].groupName.stable])}
+            {intl.formatMessage(addressGroupName[stores[0].name.group])}
             <Tooltip
               className={styles.Tooltip}
               skin={TooltipSkin}
-              tip={intl.formatMessage(addressGroupsTooltip[stores[0].groupName.stable])}
+              tip={intl.formatMessage(addressGroupsTooltip[stores[0].name.group])}
             >
               <span className={styles.infoIcon}>
                 <InfoIcon />
@@ -95,15 +94,15 @@ export default class ReceiveNavigation extends Component<Props> {
       >
         {stores.map(type => (
           !type.isHidden && <ReceiveNavButton
-            key={type.name.stable}
-            className={classNames([type.name.stable, type.groupName.stable])}
+            key={type.name.subgroup}
+            className={classNames([type.name.subgroup, type.name.group])}
             icon={
-              type.name.stable === AddressStoreTypes.internal ||
-              type.name.stable === AddressStoreTypes.mangled
+              type.name.subgroup === AddressSubgroup.internal ||
+              type.name.subgroup === AddressSubgroup.mangled
                 ? AttentionIcon
                 : undefined
             }
-            label={intl.formatMessage(type.name.display)}
+            label={intl.formatMessage(addressSubgroupName[type.name.subgroup])}
             isActive={type.isActiveStore}
             onClick={type.setAsActiveStore}
           />
@@ -114,12 +113,12 @@ export default class ReceiveNavigation extends Component<Props> {
 
   createAccordions: void => Node = () => {
     // we use an array instead of a map to maintain the order of stores
-    const groups: Array<$PropertyType<Props, 'addressTypes'>> = [];
+    const groups: Array<$PropertyType<Props, 'addressStores'>> = [];
 
-    for (const store of this.props.addressTypes) {
+    for (const store of this.props.addressStores) {
       const existingGroup = groups.find(
-        // if any existing group shares the groupName
-        group => group[0].groupName.stable === store.groupName.stable
+        // if any existing group shares the group name
+        group => group[0].name.group === store.name.group
       );
       if (existingGroup == null) {
         groups.push([store]);
@@ -130,7 +129,7 @@ export default class ReceiveNavigation extends Component<Props> {
 
     return groups.map(group => (
       <div
-        key={group[0].groupName.stable}
+        key={group[0].name.group}
         className={styles.accordion}
       >
         {this.createAccordionForGroup(group)}
@@ -147,7 +146,7 @@ export default class ReceiveNavigation extends Component<Props> {
       styles.active,
     ]);
 
-    const activeStore = this.props.addressTypes.find(store => store.isActiveStore);
+    const activeStore = this.props.addressStores.find(store => store.isActiveStore);
     if (activeStore == null) return undefined;
 
     return (

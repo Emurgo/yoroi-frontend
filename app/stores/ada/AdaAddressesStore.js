@@ -18,8 +18,7 @@ import type {
 } from '../../../config/config-types';
 import { AddressTypeStore } from '../toplevel/AddressesStore';
 import type { StandardAddress, } from '../../types/AddressFilterTypes';
-import { addressTypes, addressGroups, AddressGroupTypes, AddressFilter, AddressStoreTypes } from '../../types/AddressFilterTypes';
-import globalMessages from '../../i18n/global-messages';
+import { AddressGroupTypes, AddressFilter, AddressSubgroup } from '../../types/AddressFilterTypes';
 import type { CoreAddressT } from '../../api/ada/lib/storage/database/primitives/enums';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
@@ -35,15 +34,9 @@ declare var CONFIG : ConfigType;
 
 const getAddressGroup = () => {
   if (environment.isShelley()) {
-    return {
-      stable: AddressGroupTypes.group,
-      display: addressGroups.group,
-    };
+    return AddressGroupTypes.group;
   }
-  return {
-    stable: AddressGroupTypes.byron,
-    display: addressGroups.byron,
-  };
+  return AddressGroupTypes.byron;
 };
 
 export default class AdaAddressesStore extends Store {
@@ -64,10 +57,9 @@ export default class AdaAddressesStore extends Store {
         storeToFilter: this.allAddressesForDisplay,
       }),
       name: {
-        stable: AddressStoreTypes.all,
-        display: globalMessages.addressesLabel
+        subgroup: AddressSubgroup.all,
+        group: getAddressGroup(),
       },
-      groupName: getAddressGroup(),
       shouldHide: (publicDeriver, _store) => {
         const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
         if (withLevels == null) return true;
@@ -97,10 +89,9 @@ export default class AdaAddressesStore extends Store {
         }),
       }),
       name: {
-        stable: AddressStoreTypes.external,
-        display: addressTypes.external,
+        subgroup: AddressSubgroup.external,
+        group: getAddressGroup(),
       },
-      groupName: getAddressGroup(),
       shouldHide: (_publicDeriver, store) => store.all.length === 0,
       validFilters: [
         AddressFilter.None,
@@ -118,10 +109,9 @@ export default class AdaAddressesStore extends Store {
         chainsRequest: { chainId: ChainDerivations.INTERNAL },
       }),
       name: {
-        stable: AddressStoreTypes.internal,
-        display: addressTypes.internal,
+        subgroup: AddressSubgroup.internal,
+        group: getAddressGroup(),
       },
-      groupName: getAddressGroup(),
       shouldHide: (_publicDeriver, store) => store.all.length === 0,
       validFilters: [
         AddressFilter.None,
@@ -138,10 +128,9 @@ export default class AdaAddressesStore extends Store {
         storeToFilter: this.mangledAddressesForDisplay,
       }),
       name: {
-        stable: AddressStoreTypes.mangled,
-        display: addressTypes.mangled,
+        subgroup: AddressSubgroup.mangled,
+        group: getAddressGroup(),
       },
-      groupName: getAddressGroup(),
       shouldHide: (_publicDeriver, store) => store.all.length === 0,
       validFilters: [
         AddressFilter.None,
@@ -219,17 +208,17 @@ export default class AdaAddressesStore extends Store {
     storeToFilter: AddressTypeStore<StandardAddress>,
     addresses: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
-    if (request.storeToFilter.groupName.stable === AddressGroupTypes.addressBook) {
+    if (request.storeToFilter.name.group === AddressGroupTypes.addressBook) {
       return request.addresses;
     }
-    if (request.storeToFilter.name.stable === AddressStoreTypes.all) {
+    if (request.storeToFilter.name.subgroup === AddressSubgroup.all) {
       return filterMangledAddresses({
         publicDeriver: request.publicDeriver,
         baseAddresses: request.addresses,
         invertFilter: false,
       });
     }
-    if (request.storeToFilter.name.stable === AddressStoreTypes.mangled) {
+    if (request.storeToFilter.name.subgroup === AddressSubgroup.mangled) {
       return filterMangledAddresses({
         publicDeriver: request.publicDeriver,
         baseAddresses: request.addresses,

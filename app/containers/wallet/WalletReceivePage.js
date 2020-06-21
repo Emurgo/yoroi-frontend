@@ -22,14 +22,14 @@ import Dialog from '../../components/widgets/Dialog';
 import globalMessages from '../../i18n/global-messages';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { asHasUtxoChains } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import type { AddressFilterKind, StandardAddress, AddressTypeName, AddressGroupName, } from '../../types/AddressFilterTypes';
+import type { AddressFilterKind, StandardAddress, AddressTypeName, } from '../../types/AddressFilterTypes';
 import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
 import type { GeneratedData as UnmangleTxDialogContainerData } from '../transfer/UnmangleTxDialogContainer';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type {
   BIP32Path
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { AddressFilter, AddressStoreTypes, AddressGroupTypes } from '../../types/AddressFilterTypes';
+import { AddressFilter, AddressSubgroup, AddressGroupTypes } from '../../types/AddressFilterTypes';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { ExplorerType } from '../../domain/Explorer';
 import type { Notification } from '../../types/notificationType';
@@ -147,7 +147,7 @@ export default class WalletReceivePage extends Component<Props> {
     const { canUnmangle } = this.generated.stores.substores.ada.addresses.getUnmangleAmounts();
     const header = (() => {
       if (addressStores.some(store => (
-        store.name.stable === AddressStoreTypes.external && store.isActiveStore
+        store.name.subgroup === AddressSubgroup.external && store.isActiveStore
       ))) {
         return (<StandardHeader
           walletAddress={walletAddress}
@@ -162,12 +162,12 @@ export default class WalletReceivePage extends Component<Props> {
         />);
       }
       if (addressStores.some(store => (
-        store.name.stable === AddressStoreTypes.internal && store.isActiveStore
+        store.name.subgroup === AddressSubgroup.internal && store.isActiveStore
       ))) {
         return (<InternalHeader />);
       }
       if (addressStores.some(store => (
-        store.name.stable === AddressStoreTypes.mangled && store.isActiveStore
+        store.name.subgroup === AddressSubgroup.mangled && store.isActiveStore
       ))) {
         return (
           <MangledHeader
@@ -179,13 +179,13 @@ export default class WalletReceivePage extends Component<Props> {
         );
       }
       if (addressStores.some(store => (
-        store.groupName.stable === AddressGroupTypes.addressBook &&
+        store.name.group === AddressGroupTypes.addressBook &&
         store.isActiveStore
       ))) {
         return null;
       }
       if (addressStores.some(store => (
-        store.name.stable === AddressStoreTypes.all && store.isActiveStore
+        store.name.subgroup === AddressSubgroup.all && store.isActiveStore
       ))) {
         return (<StandardHeader
           walletAddress={walletAddress}
@@ -217,8 +217,8 @@ export default class WalletReceivePage extends Component<Props> {
           }}
           onGeneratePaymentURI={!addressStores.some(store => (
             (
-              store.name.stable === AddressStoreTypes.external ||
-              store.name.stable === AddressStoreTypes.all
+              store.name.subgroup === AddressSubgroup.external ||
+              store.name.subgroup === AddressSubgroup.all
             ) &&
             store.isActiveStore
           ))
@@ -236,7 +236,7 @@ export default class WalletReceivePage extends Component<Props> {
           addressBook={
             addressStores
               .find(store => store.isActiveStore)
-              ?.groupName.stable === AddressGroupTypes.addressBook
+              ?.name.group === AddressGroupTypes.addressBook
               ?? false
           }
         />
@@ -420,7 +420,6 @@ export default class WalletReceivePage extends Component<Props> {
           +filtered: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
           +isActiveStore: boolean,
           +name: AddressTypeName,
-          +groupName: AddressGroupName,
           +wasExecuted: boolean,
         |}>
       |},
@@ -492,7 +491,6 @@ export default class WalletReceivePage extends Component<Props> {
             const addressStores = stores.addresses.getStoresForWallet(publicDeriver);
             const functionalitySubset = addressStores.map(addressStore => ({
               isActiveStore: addressStore.isActiveStore,
-              groupName: addressStore.groupName,
               name: addressStore.name,
               all: addressStore.all,
               filtered: addressStore.filtered,

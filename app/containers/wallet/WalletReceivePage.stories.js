@@ -27,14 +27,14 @@ import { mockReceiveProps } from './Receive.mock';
 import { getDefaultExplorer } from '../../domain/Explorer';
 import { ROUTES } from '../../routes-config';
 import { buildRoute } from '../../utils/routing';
-import type { AddressTypeName, AddressGroupName, StandardAddress, AddressFilterKind, } from '../../types/AddressFilterTypes';
+import type { AddressTypeName, StandardAddress, AddressFilterKind, } from '../../types/AddressFilterTypes';
 import URIGenerateDialog from '../../components/uri/URIGenerateDialog';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import URIDisplayDialog from '../../components/uri/URIDisplayDialog';
 import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
 import VerifyAddressDialog from '../../components/wallet/receive/VerifyAddressDialog';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { addressTypes, addressGroups, AddressGroupTypes, AddressFilter, AddressStoreTypes } from '../../types/AddressFilterTypes';
+import { AddressGroupTypes, AddressFilter, AddressSubgroup } from '../../types/AddressFilterTypes';
 import { userFilter } from '../../stores/toplevel/AddressesStore';
 
 export default {
@@ -48,7 +48,7 @@ const getExternalRoute = (id) => buildRoute(
   {
     id,
     group: AddressGroupTypes.byron,
-    name: AddressStoreTypes.external,
+    name: AddressSubgroup.external,
   }
 );
 const getInternalRoute = (id) => buildRoute(
@@ -56,7 +56,7 @@ const getInternalRoute = (id) => buildRoute(
   {
     id,
     group: AddressGroupTypes.byron,
-    name: AddressStoreTypes.internal,
+    name: AddressSubgroup.internal,
   }
 );
 const getMangledRoute = (id) => buildRoute(
@@ -64,7 +64,7 @@ const getMangledRoute = (id) => buildRoute(
   {
     id,
     group: AddressGroupTypes.byron,
-    name: AddressStoreTypes.mangled,
+    name: AddressSubgroup.mangled,
   }
 );
 const getAddressBookRoute = (id) => buildRoute(
@@ -72,7 +72,7 @@ const getAddressBookRoute = (id) => buildRoute(
   {
     id,
     group: AddressGroupTypes.addressBook,
-    name: AddressStoreTypes.all,
+    name: AddressSubgroup.all,
   }
 );
 
@@ -128,7 +128,6 @@ const genBaseProps: {|
     +filtered: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
     +isActiveStore: boolean,
     +name: AddressTypeName,
-    +groupName: AddressGroupName,
     +wasExecuted: boolean,
   |}>,
   addressFilter: AddressFilterKind,
@@ -188,7 +187,7 @@ const genBaseProps: {|
           addresses: {
             getUnmangleAmounts: () => ({
               canUnmangle: addressesStore.some(
-                addressStore => addressStore.name.stable === AddressStoreTypes.mangled &&
+                addressStore => addressStore.name.subgroup === AddressSubgroup.mangled &&
                 addressStore.isActiveStore
               ) && request.dialog == null
                 ? getMangledValue()
@@ -289,11 +288,11 @@ const genBaseProps: {|
               addresses: {
                 mangledAddressesForDisplay: {
                   all: addressesStore.some(
-                    addressStore => addressStore.name.stable === AddressStoreTypes.mangled &&
+                    addressStore => addressStore.name.subgroup === AddressSubgroup.mangled &&
                     addressStore.isActiveStore
                   )
                     ? addressesStore.filter(
-                      addressStore => addressStore.name.stable === AddressStoreTypes.mangled
+                      addressStore => addressStore.name.subgroup === AddressSubgroup.mangled
                     )[0].all
                     : [],
                 },
@@ -333,7 +332,6 @@ const genGetStoresForWallet: {|
   +isHidden: boolean,
   +setAsActiveStore: void => void,
   +name: AddressTypeName,
-  +groupName: AddressGroupName,
   +all: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   +filtered: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   +wasExecuted: boolean,
@@ -342,22 +340,21 @@ const genGetStoresForWallet: {|
   const tabs = [];
 
   const push: (
-    AddressGroupName, AddressTypeName, Array<AddressFilterKind>
-  ) => void = (groupName, tabName, validFilters) => {
+    AddressTypeName, Array<AddressFilterKind>
+  ) => void = (tabName, validFilters) => {
     const routeForTab = buildRoute(
       ROUTES.WALLETS.RECEIVE.ADDRESS_LIST,
       {
         id: request.publicDeriver.getPublicDeriverId(),
-        group: groupName.stable,
-        name: tabName.stable,
+        group: tabName.group,
+        name: tabName.subgroup,
       }
     );
     tabs.push({
       isActiveStore: request.location === routeForTab,
       isHidden: false,
-      setAsActiveStore: action(`set ${tabName.stable}`),
+      setAsActiveStore: action(`set ${tabName.group}-${tabName.subgroup}`),
       name: tabName,
-      groupName,
       all: request.addresses,
       filtered: userFilter({
         addressFilter: request.addressFilter,
@@ -369,35 +366,23 @@ const genGetStoresForWallet: {|
   };
   push(
     {
-      stable: AddressGroupTypes.byron,
-      display: addressGroups.byron,
-    },
-    {
-      stable: AddressStoreTypes.external,
-      display: addressTypes.external,
+      group: AddressGroupTypes.byron,
+      subgroup: AddressSubgroup.external,
     },
     [AddressFilter.None, AddressFilter.Unused, AddressFilter.Used, AddressFilter.HasBalance],
   );
   push(
     {
-      stable: AddressGroupTypes.byron,
-      display: addressGroups.byron,
-    },
-    {
-      stable: AddressStoreTypes.internal,
-      display: addressTypes.internal,
+      group: AddressGroupTypes.byron,
+      subgroup: AddressSubgroup.internal,
     },
     [AddressFilter.None, AddressFilter.Unused, AddressFilter.Used, AddressFilter.HasBalance],
   );
-  if (request.location.includes(AddressStoreTypes.mangled)) {
+  if (request.location.includes(AddressSubgroup.mangled)) {
     push(
       {
-        stable: AddressGroupTypes.byron,
-        display: addressGroups.byron,
-      },
-      {
-        stable: AddressStoreTypes.mangled,
-        display: addressTypes.mangled,
+        group: AddressGroupTypes.byron,
+        subgroup: AddressSubgroup.mangled,
       },
       [AddressFilter.None, AddressFilter.Unused, AddressFilter.Used, AddressFilter.HasBalance],
     );
@@ -405,12 +390,8 @@ const genGetStoresForWallet: {|
 
   push(
     {
-      stable: AddressGroupTypes.addressBook,
-      display: addressGroups.addressBook,
-    },
-    {
-      stable: AddressStoreTypes.all,
-      display: addressTypes.all,
+      group: AddressGroupTypes.addressBook,
+      subgroup: AddressSubgroup.all,
     },
     [AddressFilter.None],
   );
@@ -422,7 +403,6 @@ const wrapForReceive: ReturnType<ReturnType<typeof genGetStoresForWallet>> => Ar
   +isHidden:boolean,
   +setAsActiveStore: void => void,
   +name: AddressTypeName,
-  +groupName: AddressGroupName,
   +validFilters: Array<AddressFilterKind>,
   +wasExecuted: boolean,
 |}> = (result) => {
@@ -431,7 +411,6 @@ const wrapForReceive: ReturnType<ReturnType<typeof genGetStoresForWallet>> => Ar
     isHidden: addressStore.isHidden,
     setAsActiveStore: addressStore.setAsActiveStore,
     name: addressStore.name,
-    groupName: addressStore.groupName,
     validFilters: addressStore.validFilters,
     wasExecuted: addressStore.wasExecuted,
   }));
@@ -441,7 +420,6 @@ const wrapForReceivePage: ReturnType<ReturnType<typeof genGetStoresForWallet>> =
   +filtered: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   +isActiveStore: boolean,
   +name: AddressTypeName,
-  +groupName: AddressGroupName,
   +wasExecuted: boolean,
 |}> = (result) => {
   return result.map(addressStore => ({
@@ -449,7 +427,6 @@ const wrapForReceivePage: ReturnType<ReturnType<typeof genGetStoresForWallet>> =
     filtered: addressStore.filtered,
     isActiveStore: addressStore.isActiveStore,
     name: addressStore.name,
-    groupName: addressStore.groupName,
     wasExecuted: addressStore.wasExecuted,
   }));
 };

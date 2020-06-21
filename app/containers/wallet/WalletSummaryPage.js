@@ -44,8 +44,8 @@ import type {
 } from '../../api/common/index';
 import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
 import { getApiForCoinType, getApiMeta } from '../../api/common/utils';
-import type { AddressTypeName, AddressGroupName } from '../../types/AddressFilterTypes';
-import { AddressStoreTypes } from '../../types/AddressFilterTypes';
+import type { AddressTypeName, } from '../../types/AddressFilterTypes';
+import { addressSubgroupName, addressGroupName, AddressSubgroup } from '../../types/AddressFilterTypes';
 
 export type GeneratedData = typeof WalletSummaryPage.prototype.generated;
 
@@ -167,13 +167,13 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
                 if (addressStore.all.some(addressInStore => addressInStore.address === address)) {
                   const route = buildRoute(ROUTES.WALLETS.RECEIVE.ADDRESS_LIST, {
                     id: publicDeriver.getPublicDeriverId(),
-                    group: addressStore.groupName.stable,
-                    name: addressStore.name.stable,
+                    group: addressStore.name.group,
+                    name: addressStore.name.subgroup,
                   });
 
-                  const name = addressStore.name.stable === AddressStoreTypes.all
-                    ? intl.formatMessage(addressStore.groupName.display)
-                    : `${intl.formatMessage(addressStore.groupName.display)} - ${intl.formatMessage(addressStore.name.display)}`;
+                  const name = addressStore.name.subgroup === AddressSubgroup.all
+                    ? intl.formatMessage(addressGroupName[addressStore.name.group])
+                    : `${intl.formatMessage(addressGroupName[addressStore.name.group])} - ${intl.formatMessage(addressSubgroupName[addressStore.name.subgroup])}`;
                   return {
                     goToRoute: () => this.generated.actions.router.goToRoute.trigger({ route }),
                     name,
@@ -431,7 +431,6 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
           +all: $ReadOnlyArray<
             $ReadOnly<{ ...Address, ... }>
           >,
-          +groupName: AddressGroupName,
           +name: AddressTypeName,
         |}>
       |},
@@ -539,7 +538,6 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
             const functionalitySubset = addressStores.map(addressStore => ({
               all: addressStore.all,
               name: addressStore.name,
-              groupName: addressStore.groupName,
             }));
             return functionalitySubset;
           },

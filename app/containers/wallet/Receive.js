@@ -10,7 +10,7 @@ import type {
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import ReceiveWithNavigation from '../../components/wallet/layouts/ReceiveWithNavigation';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { AddressTypeName, AddressGroupName, AddressFilterKind } from '../../types/AddressFilterTypes';
+import type { AddressTypeName, AddressFilterKind } from '../../types/AddressFilterTypes';
 import { ROUTES } from '../../routes-config';
 import { buildRoute } from '../../utils/routing';
 
@@ -47,8 +47,8 @@ export default class Receive extends Component<Props> {
         ROUTES.WALLETS.RECEIVE.ADDRESS_LIST,
         {
           id: publicDeriver.getPublicDeriverId(),
-          group: stores[0].groupName.stable,
-          name: stores[0].name.stable,
+          group: stores[0].name.group,
+          name: stores[0].name.subgroup,
         }
       );
       this.generated.actions.router.goToRoute.trigger({ route: firstRoute });
@@ -64,7 +64,7 @@ export default class Receive extends Component<Props> {
     const { addresses } = this.generated.stores;
     return (
       <ReceiveWithNavigation
-        addressTypes={addresses.getStoresForWallet(publicDeriver)}
+        addressStores={addresses.getStoresForWallet(publicDeriver)}
         setFilter={filter => this.generated.actions.addresses.setFilter.trigger(filter)}
         activeFilter={this.generated.stores.addresses.addressFilter}
       >
@@ -84,7 +84,6 @@ export default class Receive extends Component<Props> {
           {|
             +isActiveStore: boolean,
             +isHidden: boolean,
-            +groupName: AddressGroupName,
             +name: AddressTypeName,
             +setAsActiveStore: (void) => void,
             +validFilters: Array<AddressFilterKind>,
@@ -134,7 +133,6 @@ export default class Receive extends Component<Props> {
               isActiveStore: addressStore.isActiveStore,
               setAsActiveStore: () => addressStore.setAsActiveStore(publicDeriver),
               name: addressStore.name,
-              groupName: addressStore.groupName,
               validFilters: addressStore.validFilters,
               wasExecuted: addressStore.wasExecuted,
             }));

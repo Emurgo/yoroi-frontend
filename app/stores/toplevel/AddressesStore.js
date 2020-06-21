@@ -25,8 +25,8 @@ import {
 } from '../../utils/logging';
 import { buildRoute } from '../../utils/routing';
 import { getApiForCoinType } from '../../api/common/utils';
-import type { AddressFilterKind, AddressGroupName, StandardAddress, AddressTypeName } from '../../types/AddressFilterTypes';
-import { addressGroups, addressTypes, AddressStoreTypes, AddressFilter, AddressGroupTypes } from '../../types/AddressFilterTypes';
+import type { AddressFilterKind, StandardAddress, AddressTypeName } from '../../types/AddressFilterTypes';
+import { AddressSubgroup, AddressFilter, AddressGroupTypes } from '../../types/AddressFilterTypes';
 import { ROUTES } from '../../routes-config';
 import {
   ConceptualWallet
@@ -36,11 +36,6 @@ import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 type SubRequestType<+T> = {|
   publicDeriver: PublicDeriver<>,
 |} => Promise<$ReadOnlyArray<$ReadOnly<T>>>;
-
-const addressBookGroup = {
-  stable: AddressGroupTypes.addressBook,
-  display: addressGroups.addressBook,
-};
 
 export class AddressTypeStore<T: StandardAddress> {
 
@@ -53,7 +48,6 @@ export class AddressTypeStore<T: StandardAddress> {
   actions: ActionsMap;
   request: SubRequestType<T>;
   name: AddressTypeName;
-  groupName: AddressGroupName;
   shouldHide: (PublicDeriver<>, AddressTypeStore<T>) => boolean;
   validFilters: Array<AddressFilterKind>;
   constructor(data: {|
@@ -61,7 +55,6 @@ export class AddressTypeStore<T: StandardAddress> {
     actions: ActionsMap,
     request: SubRequestType<T>,
     name: AddressTypeName,
-    groupName: AddressGroupName;
     shouldHide: (PublicDeriver<>, AddressTypeStore<T>) => boolean,
     validFilters: Array<AddressFilterKind>;
   |}) {
@@ -69,7 +62,6 @@ export class AddressTypeStore<T: StandardAddress> {
     this.actions = data.actions;
     this.request = data.request;
     this.name = data.name;
-    this.groupName = data.groupName;
     this.shouldHide = data.shouldHide;
     this.validFilters = data.validFilters;
   }
@@ -82,8 +74,8 @@ export class AddressTypeStore<T: StandardAddress> {
       ROUTES.WALLETS.RECEIVE.ADDRESS_LIST,
       {
         id: publicDeriver.getPublicDeriverId(),
-        group: this.groupName.stable,
-        name: this.name.stable,
+        group: this.name.group,
+        name: this.name.subgroup,
       }
     );
     return app.currentRoute === screenRoute;
@@ -94,8 +86,8 @@ export class AddressTypeStore<T: StandardAddress> {
       route: ROUTES.WALLETS.RECEIVE.ADDRESS_LIST,
       params: {
         id: publicDeriver.getPublicDeriverId(),
-        group: this.groupName.stable,
-        name: this.name.stable,
+        group: this.name.group,
+        name: this.name.subgroup,
       },
     });
   };
@@ -191,10 +183,9 @@ export default class AddressesStore extends Store {
         storeToFilter: this.addressBook,
       }),
       name: {
-        stable: AddressStoreTypes.all,
-        display: addressTypes.all
+        subgroup: AddressSubgroup.all,
+        group: AddressGroupTypes.addressBook,
       },
-      groupName: addressBookGroup,
       shouldHide: (_publicDeriver, _store) => false,
       validFilters: [AddressFilter.None],
     });

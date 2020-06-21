@@ -11,20 +11,14 @@ import {
 import type { StandardAddress, } from '../../types/AddressFilterTypes';
 import type { CoreAddressT } from '../../api/ada/lib/storage/database/primitives/enums';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
-import globalMessages from '../../i18n/global-messages';
 import { ChainDerivations } from '../../config/numbersConfig';
 import {
   ConceptualWallet
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { addressTypes, addressGroups, AddressFilter, AddressGroupTypes, AddressStoreTypes } from '../../types/AddressFilterTypes';
+import { AddressFilter, AddressGroupTypes, AddressSubgroup } from '../../types/AddressFilterTypes';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import { Cip1852Wallet } from '../../api/ada/lib/storage/models/Cip1852Wallet/wrapper';
 import { Bip44DerivationLevels } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
-
-const p2pkGroup = {
-  stable: AddressGroupTypes.p2pk,
-  display: addressGroups.p2pk,
-};
 
 export default class ErgoAddressesStore extends Store {
 
@@ -43,10 +37,9 @@ export default class ErgoAddressesStore extends Store {
         storeToFilter: this.allAddressesForDisplay,
       }),
       name: {
-        stable: AddressStoreTypes.all,
-        display: globalMessages.addressesLabel
+        subgroup: AddressSubgroup.all,
+        group: AddressGroupTypes.p2pk,
       },
-      groupName: p2pkGroup,
       shouldHide: (publicDeriver, _store) => {
         const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
         if (withLevels == null) return true;
@@ -76,10 +69,9 @@ export default class ErgoAddressesStore extends Store {
         }),
       }),
       name: {
-        stable: AddressStoreTypes.external,
-        display: addressTypes.external,
+        subgroup: AddressSubgroup.external,
+        group: AddressGroupTypes.p2pk,
       },
-      groupName: p2pkGroup,
       shouldHide: (_publicDeriver, store) => store.all.length === 0,
       validFilters: [
         AddressFilter.None,
@@ -97,10 +89,9 @@ export default class ErgoAddressesStore extends Store {
         chainsRequest: { chainId: ChainDerivations.INTERNAL },
       }),
       name: {
-        stable: AddressStoreTypes.internal,
-        display: addressTypes.internal,
+        subgroup: AddressSubgroup.internal,
+        group: AddressGroupTypes.p2pk,
       },
-      groupName: p2pkGroup,
       shouldHide: (_publicDeriver, store) => store.all.length === 0,
       validFilters: [
         AddressFilter.None,

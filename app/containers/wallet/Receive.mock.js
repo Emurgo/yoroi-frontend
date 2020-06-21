@@ -3,7 +3,7 @@
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import type { GeneratedData } from './Receive';
 import { action } from '@storybook/addon-actions';
-import type { AddressTypeName, AddressGroupName, AddressFilterKind } from '../../types/AddressFilterTypes';
+import type { AddressTypeName, AddressFilterKind } from '../../types/AddressFilterTypes';
 
 export const mockReceiveProps: {|
   selected: null | PublicDeriver<>,
@@ -13,7 +13,6 @@ export const mockReceiveProps: {|
     +isHidden: boolean,
     +setAsActiveStore: void => void,
     +name: AddressTypeName,
-    +groupName: AddressGroupName,
     +validFilters: Array<AddressFilterKind>,
     +wasExecuted: boolean,
   |}>,

@@ -45,7 +45,7 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import {
   asGetPublicKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { addressTypes, addressGroups, AddressGroupTypes, AddressStoreTypes } from '../../types/AddressFilterTypes';
+import { AddressGroupTypes, AddressSubgroup } from '../../types/AddressFilterTypes';
 import {
   WalletCreationNotifications,
 } from '../../stores/toplevel/WalletStore';
@@ -267,12 +267,8 @@ const genPropsForTransactions: {|
     getStoresForWallet: (_publicDeriver) => [
       {
         name: {
-          stable: AddressStoreTypes.external,
-          display: addressTypes.external,
-        },
-        groupName: {
-          stable: AddressGroupTypes.byron,
-          display: addressGroups.byron,
+          group: AddressGroupTypes.byron,
+          subgroup: AddressSubgroup.external,
         },
         all: [{
           address: 'Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf',
@@ -280,12 +276,8 @@ const genPropsForTransactions: {|
       },
       {
         name: {
-          stable: AddressStoreTypes.internal,
-          display: addressTypes.internal,
-        },
-        groupName: {
-          stable: AddressGroupTypes.byron,
-          display: addressGroups.byron,
+          group: AddressGroupTypes.byron,
+          subgroup: AddressSubgroup.internal,
         },
         all: [{
           address: 'Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM',

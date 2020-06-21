@@ -4,18 +4,17 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import ReceiveNavigation from '../navigation/ReceiveNavigation';
 import styles from './ReceiveWithNavigation.scss';
-import type { AddressTypeName, AddressGroupName, AddressFilterKind } from '../../../types/AddressFilterTypes';
+import type { AddressTypeName, AddressFilterKind } from '../../../types/AddressFilterTypes';
 
 export type Props = {|
   +children?: Node,
   +setFilter: AddressFilterKind => void,
   +activeFilter: AddressFilterKind,
-  +addressTypes: Array<{|
+  +addressStores: Array<{|
     +isActiveStore: boolean,
     +isHidden: boolean,
     +setAsActiveStore: void => void,
     +name: AddressTypeName,
-    +groupName: AddressGroupName,
     +validFilters: Array<AddressFilterKind>,
     +wasExecuted: boolean,
   |}>;
@@ -32,7 +31,7 @@ export default class ReceiveWithNavigation extends Component<Props> {
       <div className={styles.component}>
         <div className={styles.navigation}>
           <ReceiveNavigation
-            addressTypes={this.props.addressTypes}
+            addressStores={this.props.addressStores}
             setFilter={this.props.setFilter}
             activeFilter={this.props.activeFilter}
           />

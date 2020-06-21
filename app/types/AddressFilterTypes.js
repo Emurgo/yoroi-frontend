@@ -21,14 +21,14 @@ export type StandardAddress = {|
   ...InexactSubset<UsedStatus>,
 |};
 
-export const AddressStoreTypes = Object.freeze({
+export const AddressSubgroup = Object.freeze({
   all: 'all',
   internal: 'internal',
   external: 'external',
   mangled: 'mangled',
 });
-export type AddressStoreKind = $Values<typeof AddressStoreTypes>;
-export const addressTypes: $ObjMap<typeof AddressStoreTypes, ToMessage> = Object.freeze({
+export type AddressSubgroupKind = $Values<typeof AddressSubgroup>;
+export const addressSubgroupName: $ObjMap<typeof AddressSubgroup, ToMessage> = Object.freeze({
   all: globalMessages.allLabel,
   ...defineMessages({
     external: {
@@ -46,8 +46,9 @@ export const addressTypes: $ObjMap<typeof AddressStoreTypes, ToMessage> = Object
   }),
 });
 export type AddressTypeName = {|
-  stable: AddressStoreKind, // constant name that doesn't change with language selected
-  display: $Exact<$npm$ReactIntl$MessageDescriptor>,
+  // constant names that doesn't change with language selected
+  group: AddressGroupKind,
+  subgroup: AddressSubgroupKind,
 |};
 
 
@@ -84,11 +85,7 @@ export const addressGroupsTooltip: $ObjMap<typeof AddressGroupTypes, ToMessage> 
     },
   })
 });
-export type AddressGroupName = {|
-  stable: AddressGroupKind, // constant name that doesn't change with language selected
-  display: $Exact<$npm$ReactIntl$MessageDescriptor>,
-|};
-export const addressGroups: $ObjMap<typeof AddressGroupTypes, ToMessage> = defineMessages({
+export const addressGroupName: $ObjMap<typeof AddressGroupTypes, ToMessage> = defineMessages({
   base: {
     id: 'wallet.receive.navigation.baseLabel',
     defaultMessage: '!!!Base'
