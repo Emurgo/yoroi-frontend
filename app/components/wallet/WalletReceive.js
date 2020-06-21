@@ -134,6 +134,42 @@ export default class WalletReceive extends Component<Props> {
     return { header, body };
   }
 
+  getLabelBlock: void => {|
+    header: ?Node,
+    body: $ReadOnly<StandardAddress> => ?Node,
+  |} = () => {
+    if (environment.isProduction()) {
+      return { header: undefined, body: () => undefined };
+    }
+    const { intl } = this.context;
+
+    const header = (<h2 className={styles.labelHeader}>{intl.formatMessage(messages.label)}</h2>);
+    const body = address => (
+      <div>
+        {
+          address.label != null ?
+            <div className={styles.labelAddress}>
+              <button type="button" onClick={() => { /* On Edit */ }}>
+                <span>
+                  <EditLabelIcon />
+                </span>
+              </button>
+              <span className={styles.labelText}> {address.label} </span>
+            </div>
+            :
+            <div className={styles.labelAddress}>
+              <button type="button" onClick={() => { /* On Add Label */ }}>
+                <span>
+                  <AddLabelIcon />
+                </span>
+              </button>
+            </div>
+        }
+      </div>
+    );
+    return { header, body };
+  }
+
   render(): Node {
     const {
       walletAddresses,
@@ -142,12 +178,13 @@ export default class WalletReceive extends Component<Props> {
     } = this.props;
     const { intl } = this.context;
     const valueBlock = this.getValueBlock();
+    const labelBlock = this.getLabelBlock();
     const walletReceiveContent = (
       <div className={styles.generatedAddresses}>
         {/* Header Addresses */}
         <div className={styles.generatedAddressesGrid}>
           <h2>{intl.formatMessage(messages.generatedAddressesSectionTitle)}</h2>
-          <h2 className={styles.labelHeader}>{intl.formatMessage(messages.label)}</h2>
+          {labelBlock.header}
           {valueBlock.header}
           {
             !environment.isShelley() && onGeneratePaymentURI != null &&
@@ -195,27 +232,7 @@ export default class WalletReceive extends Component<Props> {
                 </ExplorableHashContainer>
               </CopyableAddress>
               {/* Label for Address Book */}
-              <div>
-                {
-                  address.label != null ?
-                    <div className={styles.labelAddress}>
-                      <button type="button" onClick={() => { /* On Edit */ }}>
-                        <span>
-                          <EditLabelIcon />
-                        </span>
-                      </button>
-                      <span className={styles.labelText}> {address.label} </span>
-                    </div>
-                    :
-                    <div className={styles.labelAddress}>
-                      <button type="button" onClick={() => { /* On Add Label */ }}>
-                        <span>
-                          <AddLabelIcon />
-                        </span>
-                      </button>
-                    </div>
-                }
-              </div>
+              {labelBlock.body(address)}
               {/* Address balance block start */}
               {valueBlock.body(address)}
               {/* Generate payment URL for Address action */}
