@@ -14,6 +14,7 @@ export const mockReceiveProps: {|
     +setAsActiveStore: void => void,
     +name: AddressTypeName,
     +groupName: AddressGroupName,
+    +validFilters: Array<AddressFilterKind>,
   |}>,
   location: string
 |} => {| generated: GeneratedData |} = (request) => ({

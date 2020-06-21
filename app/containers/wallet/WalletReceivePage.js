@@ -417,13 +417,11 @@ export default class WalletReceivePage extends Component<Props> {
           publicDeriver: PublicDeriver<>
         ) => Array<{|
           +all: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
-          +filtered: $ReadOnlyArray<
-            $ReadOnly<StandardAddress>
-          >,
+          +filtered: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
           +isActiveStore: boolean,
           +name: AddressTypeName,
           +groupName: AddressGroupName,
-          +wasExecuted: boolean
+          +wasExecuted: boolean,
         |}>
       |},
       profile: {|

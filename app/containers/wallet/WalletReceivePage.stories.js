@@ -27,7 +27,7 @@ import { mockReceiveProps } from './Receive.mock';
 import { getDefaultExplorer } from '../../domain/Explorer';
 import { ROUTES } from '../../routes-config';
 import { buildRoute } from '../../utils/routing';
-import type { AddressTypeName, AddressGroupName, StandardAddress, AddressFilterKind, AddressStoreKind } from '../../types/AddressFilterTypes';
+import type { AddressTypeName, AddressGroupName, StandardAddress, AddressFilterKind, } from '../../types/AddressFilterTypes';
 import URIGenerateDialog from '../../components/uri/URIGenerateDialog';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import URIDisplayDialog from '../../components/uri/URIDisplayDialog';
@@ -124,9 +124,11 @@ const genBaseProps: {|
   wallet: CacheValue,
   dialog?: any,
   getStoresForWallet: PublicDeriver<> => Array<{|
-    +isActiveStore: boolean,
-    +stableName: AddressStoreKind,
     +all: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
+    +filtered: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
+    +isActiveStore: boolean,
+    +name: AddressTypeName,
+    +groupName: AddressGroupName,
     +wasExecuted: boolean,
   |}>,
   addressFilter: AddressFilterKind,
@@ -175,16 +177,7 @@ const genBaseProps: {|
       },
       addresses: {
         addressFilter: request.addressFilter,
-        getStoresForWallet: args => {
-          const addressStores = request.getStoresForWallet(args);
-          return addressStores.map(content => ({
-            ...content,
-            filtered: userFilter({
-              addressFilter: request.addressFilter,
-              addresses: content.all,
-            })
-          }));
-        },
+        getStoresForWallet: request.getStoresForWallet,
         createAddressRequest: {
           isExecuting: false,
         },
@@ -195,7 +188,7 @@ const genBaseProps: {|
           addresses: {
             getUnmangleAmounts: () => ({
               canUnmangle: addressesStore.some(
-                addressStore => addressStore.stableName === AddressStoreTypes.mangled &&
+                addressStore => addressStore.name.stable === AddressStoreTypes.mangled &&
                 addressStore.isActiveStore
               ) && request.dialog == null
                 ? getMangledValue()
@@ -296,11 +289,11 @@ const genBaseProps: {|
               addresses: {
                 mangledAddressesForDisplay: {
                   all: addressesStore.some(
-                    addressStore => addressStore.stableName === AddressStoreTypes.mangled &&
+                    addressStore => addressStore.name.stable === AddressStoreTypes.mangled &&
                     addressStore.isActiveStore
                   )
                     ? addressesStore.filter(
-                      addressStore => addressStore.stableName === AddressStoreTypes.mangled
+                      addressStore => addressStore.name.stable === AddressStoreTypes.mangled
                     )[0].all
                     : [],
                 },
@@ -333,6 +326,7 @@ const genGetStoresForWallet: {|
   publicDeriver: PublicDeriver<>,
   location: string,
   addresses: Array<StandardAddress>,
+  addressFilter: AddressFilterKind,
 |} => (PublicDeriver<> => Array<{|
   +isActiveStore: boolean,
   +isHidden: boolean,
@@ -340,11 +334,15 @@ const genGetStoresForWallet: {|
   +name: AddressTypeName,
   +groupName: AddressGroupName,
   +all: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
+  +filtered: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   +wasExecuted: boolean,
+  +validFilters: Array<AddressFilterKind>,
 |}>) = (request) => {
   const tabs = [];
 
-  const push: (AddressGroupName, AddressTypeName) => void = (groupName, tabName) => {
+  const push: (
+    AddressGroupName, AddressTypeName, Array<AddressFilterKind>
+  ) => void = (groupName, tabName, validFilters) => {
     const routeForTab = buildRoute(
       ROUTES.WALLETS.RECEIVE.ADDRESS_LIST,
       {
@@ -360,7 +358,12 @@ const genGetStoresForWallet: {|
       name: tabName,
       groupName,
       all: request.addresses,
+      filtered: userFilter({
+        addressFilter: request.addressFilter,
+        addresses: request.addresses,
+      }),
       wasExecuted: true,
+      validFilters,
     });
   };
   push(
@@ -371,7 +374,8 @@ const genGetStoresForWallet: {|
     {
       stable: AddressStoreTypes.external,
       display: addressTypes.external,
-    }
+    },
+    [AddressFilter.None, AddressFilter.Unused, AddressFilter.Used, AddressFilter.HasBalance],
   );
   push(
     {
@@ -381,7 +385,8 @@ const genGetStoresForWallet: {|
     {
       stable: AddressStoreTypes.internal,
       display: addressTypes.internal,
-    }
+    },
+    [AddressFilter.None, AddressFilter.Unused, AddressFilter.Used, AddressFilter.HasBalance],
   );
   if (request.location.includes(AddressStoreTypes.mangled)) {
     push(
@@ -392,9 +397,22 @@ const genGetStoresForWallet: {|
       {
         stable: AddressStoreTypes.mangled,
         display: addressTypes.mangled,
-      }
+      },
+      [AddressFilter.None, AddressFilter.Unused, AddressFilter.Used, AddressFilter.HasBalance],
     );
   }
+
+  push(
+    {
+      stable: AddressGroupTypes.addressBook,
+      display: addressGroups.addressBook,
+    },
+    {
+      stable: AddressStoreTypes.all,
+      display: addressTypes.all,
+    },
+    [AddressFilter.None],
+  );
 
   return (_publicDeriver) => tabs;
 };
@@ -404,6 +422,7 @@ const wrapForReceive: ReturnType<ReturnType<typeof genGetStoresForWallet>> => Ar
   +setAsActiveStore: void => void,
   +name: AddressTypeName,
   +groupName: AddressGroupName,
+  +validFilters: Array<AddressFilterKind>,
 |}> = (result) => {
   return result.map(addressStore => Object.freeze({
     isActiveStore: addressStore.isActiveStore,
@@ -411,18 +430,23 @@ const wrapForReceive: ReturnType<ReturnType<typeof genGetStoresForWallet>> => Ar
     setAsActiveStore: addressStore.setAsActiveStore,
     name: addressStore.name,
     groupName: addressStore.groupName,
+    validFilters: addressStore.validFilters,
   }));
 };
 const wrapForReceivePage: ReturnType<ReturnType<typeof genGetStoresForWallet>> => Array<{|
-  +isActiveStore: boolean,
-  +stableName: AddressStoreKind,
   +all: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
+  +filtered: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
+  +isActiveStore: boolean,
+  +name: AddressTypeName,
+  +groupName: AddressGroupName,
   +wasExecuted: boolean,
 |}> = (result) => {
   return result.map(addressStore => ({
-    isActiveStore: addressStore.isActiveStore,
-    stableName: addressStore.name.stable,
     all: addressStore.all,
+    filtered: addressStore.filtered,
+    isActiveStore: addressStore.isActiveStore,
+    name: addressStore.name,
+    groupName: addressStore.groupName,
     wasExecuted: addressStore.wasExecuted,
   }));
 };
@@ -446,6 +470,7 @@ export const ExternalTab = (): Node => {
     location,
     publicDeriver: wallet.publicDeriver,
     addresses: genAddresses(),
+    addressFilter,
   });
 
   return wrapWallet(
@@ -462,7 +487,6 @@ export const ExternalTab = (): Node => {
         location,
       }),
       (<WalletReceivePage
-        addressBook={false}
         generated={genBaseProps({
           wallet,
           dialog: getAddressGenerationValue() === addressCases.Yes
@@ -487,6 +511,7 @@ export const InternalTab = (): Node => {
     location,
     publicDeriver: wallet.publicDeriver,
     addresses: genAddresses(),
+    addressFilter,
   });
   return wrapWallet(
     mockWalletProps({
@@ -502,7 +527,6 @@ export const InternalTab = (): Node => {
         location
       }),
       (<WalletReceivePage
-        addressBook={false}
         generated={genBaseProps({
           wallet,
           addressFilter,
@@ -523,6 +547,7 @@ export const MangledTab = (): Node => {
     location,
     publicDeriver: wallet.publicDeriver,
     addresses: genAddresses(),
+    addressFilter,
   });
   return wrapWallet(
     mockWalletProps({
@@ -538,7 +563,6 @@ export const MangledTab = (): Node => {
         location
       }),
       (<WalletReceivePage
-        addressBook={false}
         generated={genBaseProps({
           wallet,
           addressFilter,
@@ -552,12 +576,13 @@ export const AddressBookTab = (): Node => {
   const wallet = genSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
 
-  const addressFilter = select('AddressFilter', AddressFilter, AddressFilter.None);
+  const addressFilter = AddressFilter.None;
   const location = getAddressBookRoute(wallet.publicDeriver.getPublicDeriverId());
   const getStoresForWallet = genGetStoresForWallet({
     location,
     publicDeriver: wallet.publicDeriver,
     addresses: genAddresses(),
+    addressFilter,
   });
   return wrapWallet(
     mockWalletProps({
@@ -573,7 +598,6 @@ export const AddressBookTab = (): Node => {
         location,
       }),
       (<WalletReceivePage
-        addressBook
         generated={genBaseProps({
           wallet,
           addressFilter,
@@ -594,6 +618,7 @@ export const UnmangleDialogLoading = (): Node => {
     location,
     publicDeriver: wallet.publicDeriver,
     addresses: genAddresses(),
+    addressFilter,
   });
   return wrapWallet(
     mockWalletProps({
@@ -609,7 +634,6 @@ export const UnmangleDialogLoading = (): Node => {
         location
       }),
       (<WalletReceivePage
-        addressBook={false}
         generated={genBaseProps({
           wallet,
           dialog: UnmangleTxDialogContainer,
@@ -637,6 +661,7 @@ export const UnmangleDialogError = (): Node => {
     location,
     publicDeriver: wallet.publicDeriver,
     addresses: genAddresses(),
+    addressFilter,
   });
   return wrapWallet(
     mockWalletProps({
@@ -652,7 +677,6 @@ export const UnmangleDialogError = (): Node => {
         location
       }),
       (<WalletReceivePage
-        addressBook={false}
         generated={genBaseProps({
           wallet,
           dialog: UnmangleTxDialogContainer,
@@ -681,6 +705,7 @@ export const UnmangleDialogConfirm = (): Node => {
     location,
     publicDeriver: wallet.publicDeriver,
     addresses: genAddresses(),
+    addressFilter,
   });
   return wrapWallet(
     mockWalletProps({
@@ -696,7 +721,6 @@ export const UnmangleDialogConfirm = (): Node => {
         location
       }),
       (<WalletReceivePage
-        addressBook={false}
         generated={genBaseProps({
           wallet,
           dialog: UnmangleTxDialogContainer,
@@ -724,6 +748,7 @@ export const UriGenerateDialog = (): Node => {
     location,
     publicDeriver: wallet.publicDeriver,
     addresses: genAddresses(),
+    addressFilter,
   });
   return wrapWallet(
     mockWalletProps({
@@ -739,7 +764,6 @@ export const UriGenerateDialog = (): Node => {
         location
       }),
       (<WalletReceivePage
-        addressBook={false}
         generated={genBaseProps({
           wallet,
           dialog: URIGenerateDialog,
@@ -766,6 +790,7 @@ export const UriDisplayDialog = (): Node => {
     location,
     publicDeriver: wallet.publicDeriver,
     addresses: genAddresses(),
+    addressFilter,
   });
   return wrapWallet(
     mockWalletProps({
@@ -781,7 +806,6 @@ export const UriDisplayDialog = (): Node => {
         location
       }),
       (<WalletReceivePage
-        addressBook={false}
         generated={genBaseProps({
           wallet,
           dialog: URIDisplayDialog,
@@ -811,6 +835,7 @@ export const VerifyRegularAddress = (): Node => {
     location,
     publicDeriver: wallet.publicDeriver,
     addresses: genAddresses(),
+    addressFilter,
   });
   return wrapWallet(
     mockWalletProps({
@@ -826,7 +851,6 @@ export const VerifyRegularAddress = (): Node => {
         location
       }),
       (<WalletReceivePage
-        addressBook={false}
         generated={genBaseProps({
           wallet,
           dialog: VerifyAddressDialog,
@@ -856,6 +880,7 @@ export const VerifyLedgerAddress = (): Node => {
     location,
     publicDeriver: wallet.publicDeriver,
     addresses: genAddresses(),
+    addressFilter,
   });
   return wrapWallet(
     mockWalletProps({
@@ -871,7 +896,6 @@ export const VerifyLedgerAddress = (): Node => {
         location
       }),
       (<WalletReceivePage
-        addressBook={false}
         generated={genBaseProps({
           wallet,
           dialog: VerifyAddressDialog,
