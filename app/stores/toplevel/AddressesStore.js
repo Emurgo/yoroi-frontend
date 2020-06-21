@@ -31,6 +31,7 @@ import { ROUTES } from '../../routes-config';
 import {
   ConceptualWallet
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 
 type SubRequestType<+T> = {|
   publicDeriver: PublicDeriver<>,
@@ -301,7 +302,7 @@ export default class AddressesStore extends Store {
       publicDeriver: request.publicDeriver,
       storeToFilter: request.storeToFilter,
       addresses: allAddresses.map(hash => ({
-        address: hash,
+        address: addressToDisplayString(hash),
         label: 'asdf',
       })),
     });

@@ -219,6 +219,9 @@ export default class AdaAddressesStore extends Store {
     storeToFilter: AddressTypeStore<StandardAddress>,
     addresses: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
+    if (request.storeToFilter.groupName.stable === AddressGroupTypes.addressBook) {
+      return request.addresses;
+    }
     if (request.storeToFilter.name.stable === AddressStoreTypes.all) {
       return filterMangledAddresses({
         publicDeriver: request.publicDeriver,
