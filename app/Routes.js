@@ -158,25 +158,21 @@ const WalletsSubpages = (stores, actions) => (
         )
       )}
     />
-    {environment.isJormungandr() && (
-      <>
-        <Route
-          exact
-          path={ROUTES.WALLETS.DELEGATION_DASHBOARD}
-          component={(props) => <StakingDashboardPage {...props} stores={stores} actions={actions} />}
-        />
-        <Route
-          exact
-          path={ROUTES.WALLETS.DELEGATION_SIMPLE}
-          component={(props) => <StakingPage {...props} stores={stores} actions={actions} urlTemplate={CONFIG.seiza.simpleTemplate} />}
-        />
-        <Route
-          exact
-          path={ROUTES.WALLETS.DELEGATION_ADVANCE}
-          component={(props) => <StakingPage {...props} stores={stores} actions={actions} urlTemplate={CONFIG.seiza.advanceTemplate} />}
-        />
-      </>)
-    }
+    <Route
+      exact
+      path={ROUTES.WALLETS.DELEGATION_DASHBOARD}
+      component={(props) => <StakingDashboardPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.WALLETS.DELEGATION_SIMPLE}
+      component={(props) => <StakingPage {...props} stores={stores} actions={actions} urlTemplate={CONFIG.seiza.simpleTemplate} />}
+    />
+    <Route
+      exact
+      path={ROUTES.WALLETS.DELEGATION_ADVANCE}
+      component={(props) => <StakingPage {...props} stores={stores} actions={actions} urlTemplate={CONFIG.seiza.advanceTemplate} />}
+    />
     <Route
       path={ROUTES.WALLETS.SWITCH}
       component={(_props) => <></> /* this is a temporary state as the wallet is switching wallets. Faster than user can really notice or skipped entirely */}
