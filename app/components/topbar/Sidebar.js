@@ -57,7 +57,7 @@ export default class Sidebar extends Component<Props> {
           {categories ? categories.map(category => {
             return (
               <SideBarCategory
-                key={category.name}
+                key={category.className}
                 icon={category.icon}
                 active={isActiveCategory !== undefined && isActiveCategory(category)}
                 label={category.label}
