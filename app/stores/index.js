@@ -3,7 +3,7 @@ import { observable, action } from 'mobx';
 import AppStore from './toplevel/AppStore';
 import ProfileStore from './toplevel/ProfileStore';
 import WalletBackupStore from './toplevel/WalletBackupStore';
-import TopbarStore from './toplevel/TopbarStore';
+import SidebarStore from './toplevel/SidebarStore';
 import UiDialogsStore from './toplevel/UiDialogsStore';
 import UiNotificationsStore from './toplevel/UiNotificationsStore';
 import NoticeBoardStore from './toplevel/NoticeBoardStore';
@@ -34,7 +34,7 @@ const storeClasses = Object.freeze({
   profile: ProfileStore,
   serverConnectionStore: ServerConnectionStore,
   app: AppStore,
-  topbar: TopbarStore,
+  sidebar: SidebarStore,
   memos: MemosStore,
   walletBackup: WalletBackupStore,
   uiDialogs: UiDialogsStore,
@@ -56,7 +56,7 @@ export type StoresMap = {|
   profile: ProfileStore,
   serverConnectionStore: ServerConnectionStore,
   app: AppStore,
-  topbar: TopbarStore,
+  sidebar: SidebarStore,
   memos: MemosStore,
   walletBackup: WalletBackupStore,
   uiDialogs: UiDialogsStore,
@@ -80,7 +80,7 @@ const stores: WithNullableFields<StoresMap> = observable({
   profile: null,
   serverConnectionStore: null,
   app: null,
-  topbar: null,
+  sidebar: null,
   memos: null,
   walletBackup: null,
   uiDialogs: null,

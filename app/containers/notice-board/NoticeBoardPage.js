@@ -16,7 +16,7 @@ import NoNotice from '../../components/notice-board/NoNotice';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import Notice from '../../domain/Notice';
 import type { GetNoticesRequestOptions } from '../../api/ada/index';
-import type { Category } from '../../config/topbarConfig';
+import type { Category } from '../../config/sidebarConfig';
 
 const messages = defineMessages({
   title: {
@@ -48,11 +48,6 @@ export default class NoticeBoardPage extends Component<InjectedOrGenerated<Gener
     const topbarComp = (
       <TopBar
         title={topbarTitle}
-        onCategoryClicked={category => {
-          this.generated.actions.topbar.activateTopbarCategory.trigger({ category });
-        }}
-        isActiveCategory={this.generated.stores.topbar.isActiveCategory}
-        categories={this.generated.stores.topbar.categories}
       />
     );
     const hasAny = loadedNotices.length > 0;
@@ -91,8 +86,8 @@ export default class NoticeBoardPage extends Component<InjectedOrGenerated<Gener
           trigger: (params: void) => Promise<void>
         |}
       |},
-      topbar: {|
-        activateTopbarCategory: {|
+      sidebar: {|
+        activateSidebarCategory: {|
           trigger: (params: {| category: string |}) => void
         |}
       |}
@@ -105,7 +100,7 @@ export default class NoticeBoardPage extends Component<InjectedOrGenerated<Gener
         searchOptions: GetNoticesRequestOptions
       |},
       profile: {| isClassicTheme: boolean |},
-      topbar: {|
+      sidebar: {|
         categories: Array<Category>,
         isActiveCategory: Category => boolean
       |}
@@ -124,9 +119,9 @@ export default class NoticeBoardPage extends Component<InjectedOrGenerated<Gener
         profile: {
           isClassicTheme: profileStore.isClassicTheme,
         },
-        topbar: {
-          isActiveCategory: stores.topbar.isActiveCategory,
-          categories: stores.topbar.categories,
+        sidebar: {
+          isActiveCategory: stores.sidebar.isActiveCategory,
+          categories: stores.sidebar.categories,
         },
         noticeBoard: {
           loadedNotices: stores.noticeBoard.loadedNotices,
@@ -136,8 +131,8 @@ export default class NoticeBoardPage extends Component<InjectedOrGenerated<Gener
         },
       },
       actions: {
-        topbar: {
-          activateTopbarCategory: { trigger: actions.topbar.activateTopbarCategory.trigger },
+        sidebar: {
+          activateSidebarCategory: { trigger: actions.sidebar.activateSidebarCategory.trigger },
         },
         noticeBoard: {
           loadMore: { trigger: actions.noticeBoard.loadMore.trigger },

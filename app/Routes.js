@@ -2,7 +2,6 @@
 import React from 'react';
 import type { Node } from 'react';
 import { Route, Redirect, Switch } from 'react-router-dom';
-import environment from './environment';
 import { ROUTES } from './routes-config';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';

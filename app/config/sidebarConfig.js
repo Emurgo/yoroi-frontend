@@ -9,14 +9,12 @@ import withLedgerNanoIcon from '../assets/images/top-bar/with-ledger-nano-logo.i
 import withTrezorTIcon from '../assets/images/top-bar/with-trezor-t-logo-white.inline.svg';
 import goBackIcon from '../assets/images/top-bar/back-arrow-white.inline.svg';
 import noticeBoardIcon from '../assets/images/notice-board/notice-board.inline.svg';
-import styles from '../components/topbar/TopBarCategory.scss';
 
 export type Category = {|
   name: string,
   className: string,
   route: string,
   icon: string,
-  iconStyle?: string,
   inlineText?: MessageDescriptor,
   label?: MessageDescriptor,
 |};
@@ -26,7 +24,6 @@ export const WALLETS: string => Category = route => ({
   className: 'wallets',
   route,
   icon: walletsIcon,
-  iconStyle: styles.walletsIcon,
   label: globalMessages.sidebarWallets
 });
 
@@ -35,7 +32,6 @@ export const WITH_TREZOR_T: Category = {
   className: 'with-trezor-t',
   route: ROUTES.WALLETS.ROOT,
   icon: withTrezorTIcon,
-  iconStyle: styles.withTrezorTIcon,
 };
 
 export const WITH_LEDGER_NANO: Category = {
@@ -43,7 +39,6 @@ export const WITH_LEDGER_NANO: Category = {
   className: 'with-ledger-nano',
   route: ROUTES.WALLETS.ROOT,
   icon: withLedgerNanoIcon,
-  iconStyle: styles.withLedgerNanoIcon,
 };
 
 export const BACK_TO_ADD: Category = {
@@ -51,7 +46,6 @@ export const BACK_TO_ADD: Category = {
   className: 'go-back',
   route: ROUTES.WALLETS.ADD,
   icon: goBackIcon,
-  iconStyle: styles.goBackIcon,
   inlineText: globalMessages.goBack
 };
 
@@ -60,7 +54,6 @@ export const BACK_TO_MY_WALLETS: Category = {
   className: 'go-back',
   route: ROUTES.MY_WALLETS,
   icon: goBackIcon,
-  iconStyle: styles.goBackIcon,
   inlineText: globalMessages.goBack
 };
 
@@ -85,5 +78,4 @@ export const NOTICE_BOARD: Category = {
   className: 'notice-board',
   route: ROUTES.NOTICE_BOARD.ROOT,
   icon: noticeBoardIcon,
-  iconStyle: styles.noticeBoardIcon,
 };

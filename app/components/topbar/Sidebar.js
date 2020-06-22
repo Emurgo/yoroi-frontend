@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import SideBarCategory from './SideBarCategory';
 import styles from './Sidebar.scss';
-import type { Category } from '../../config/topbarConfig';
+import type { Category } from '../../config/sidebarConfig';
 import classnames from 'classnames';
 
 import yoroiLogo from '../../assets/images/sidebar/yoroi_logo.inline.svg';

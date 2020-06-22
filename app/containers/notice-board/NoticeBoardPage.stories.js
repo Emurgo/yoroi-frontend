@@ -68,7 +68,7 @@ export const Generic = (): Node => {
           profile: {
             isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
           },
-          topbar: {
+          sidebar: {
             isActiveCategory: () => false,
             categories: [],
           },
@@ -88,8 +88,8 @@ export const Generic = (): Node => {
           },
         },
         actions: {
-          topbar: {
-            activateTopbarCategory: { trigger: action('activateTopbarCategory') },
+          sidebar: {
+            activateSidebarCategory: { trigger: action('activateSidebarCategory') },
           },
           noticeBoard: {
             loadMore: { trigger: async (request) => action('loadMore')(request) },

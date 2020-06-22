@@ -57,7 +57,7 @@ export const mockTransferProps: {
     SidebarContainerProps: {
       generated: {
         stores: {
-          topbar: {
+          sidebar: {
             isActiveCategory: (_category) => false,
             categories: [],
           },
@@ -69,8 +69,8 @@ export const mockTransferProps: {
           profile: {
             toggleSidebar: { trigger: async (req) => action('toggleSidebar')(req) },
           },
-          topbar: {
-            activateTopbarCategory: { trigger: action('activateTopbarCategory') },
+          sidebar: {
+            activateSidebarCategory: { trigger: action('activateSidebarCategory') },
           },
         },
       },
