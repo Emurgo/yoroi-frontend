@@ -56,7 +56,7 @@ export default class WalletCreateOptionDialog extends Component<Props> {
               learnMoreText={intl.formatMessage(messages.createNormalDescription)}
               onSubmit={onCreate}
             />
-            {!environment.isShelley() && this.props.onPaper != null &&
+            {!environment.isJormungandr() && this.props.onPaper != null &&
               <OptionBlock
                 parentName="WalletCreateOptionDialog"
                 type="restorePaperWallet"

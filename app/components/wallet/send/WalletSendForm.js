@@ -213,7 +213,7 @@ export default class WalletSendForm extends Component<Props> {
             }
           };
           const isValidLegacy = this.props.isValidLegacyAddress(receiverValue);
-          if (!environment.isShelley()) {
+          if (!environment.isJormungandr()) {
             updateReceiver(isValidLegacy);
             return [isValidLegacy, this.context.intl.formatMessage(messages.invalidAddress)];
           }

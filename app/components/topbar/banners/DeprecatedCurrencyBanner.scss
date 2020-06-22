@@ -1,0 +1,57 @@
+$height: 128px;
+
+.component {
+  height: $height;
+  margin-top: 20px;
+  margin-left: 40px;
+  margin-right: 40px;
+
+  .center {
+    height: inherit;
+    max-width: var(--theme-page-container-width);
+    margin: 0 auto;
+    padding-right: var(--theme-page-container-side-padding);
+    padding-left: var(--theme-page-container-side-padding);
+
+    .background {
+      height: inherit;
+      background-color: var(--theme-default-main-color);
+      opacity: 0.06;
+      border-radius: 8px;
+    }
+
+    .content {
+      position: relative;
+      top: calc(-#{$height} + 25px);
+      height:calc(#{$height} - 25px);
+      overflow: overlay;
+      margin-left: 30px;
+      margin-right: 30px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .title {
+      color: var(--theme-default-main-color);
+      font-family: var(--font-medium);
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: 0;
+      line-height: 19px;
+      margin-bottom: 16px;
+    }
+    .explanation {
+      color: var(--theme-transactions-list-text-color);
+      font-family: var(--font-regular);
+      font-size: 14px;
+      letter-spacing: 0;
+      line-height: 22px;
+    }
+    .action {
+      margin-left: 10px;
+      button {
+        width: 230px;
+      }
+      margin-top: 13px;
+    }
+  }
+}

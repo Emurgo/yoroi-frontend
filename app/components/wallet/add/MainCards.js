@@ -60,7 +60,7 @@ export default class MainCards extends Component<Props> {
     return (
       <div className={styles.heroCardsList}>
         {/* Connect to hardware wallet */}
-        {!environment.isShelley() &&
+        {!environment.isJormungandr() &&
           <button
             type="button"
             className="WalletAdd_btnConnectHW"

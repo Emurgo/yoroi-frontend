@@ -17,13 +17,13 @@ const ByronExplorers = Object.freeze({
 });
 export function getDefaultExplorer(): ExplorerType {
   // TODO: change default back to Seiza once we have a public URL
-  return environment.isShelley()
+  return environment.isJormungandr()
     ? 'jormungandr'
     : 'seiza';
 }
 export function getExplorers(): Array<{| value: ExplorerType, label: string |}> {
   const explorerInfo = getExplorerInfo();
-  if (environment.isShelley()) {
+  if (environment.isJormungandr()) {
     return Object.keys(ShelleyExplorers)
       .filter(explorer => ShelleyExplorers[explorer] !== ShelleyExplorers.SEIZA)
       .map(key => ({
@@ -39,7 +39,7 @@ export function getExplorers(): Array<{| value: ExplorerType, label: string |}> 
 }
 export const Explorer:
   | typeof ShelleyExplorers
-  | typeof ByronExplorers = environment.isShelley()
+  | typeof ByronExplorers = environment.isJormungandr()
     ? ShelleyExplorers
     : ByronExplorers;
 export type ExplorerType = $Values<typeof ShelleyExplorers> | $Values<typeof ByronExplorers>;
@@ -55,7 +55,7 @@ export type ExplorerInfo = {|
   ...InexactSubset<typeof Link>,
   name: string,
 |}
-const seiza = environment.isShelley()
+const seiza = environment.isJormungandr()
   ? {
     name: 'Seiza',
     // TODO: proper URL for Shelley
@@ -93,7 +93,7 @@ const getExplorerInfo: void => {
   ...
 } = () => Object.freeze({
   seiza,
-  ...(!environment.isShelley()
+  ...(!environment.isJormungandr()
     ? {
       adaex: {
         name: 'ADAex.org',

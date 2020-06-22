@@ -170,14 +170,14 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
       {
         label: intl.formatMessage(globalMessages.backButtonLabel),
         onClick: onCancel,
-        disabled: !environment.isShelley() && isSubmitting,
+        disabled: !environment.isJormungandr() && isSubmitting,
       },
       {
         label: intl.formatMessage(globalMessages.confirm),
         onClick: onNext,
         primary: true,
         className: classnames(['confirmButton']),
-        isSubmitting: !environment.isShelley() && isSubmitting,
+        isSubmitting: !environment.isJormungandr() && isSubmitting,
       },
     ];
 

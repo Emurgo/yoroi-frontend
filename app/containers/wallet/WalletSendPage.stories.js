@@ -306,7 +306,7 @@ export const LedgerConfirmationDialog = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
-    !environment.isShelley() && (<WalletSendPage
+    !environment.isJormungandr() && (<WalletSendPage
       generated={genBaseProps({
         wallet,
         hwSend: {
@@ -357,7 +357,7 @@ export const TrezorConfirmationDialog = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
-    !environment.isShelley() && (<WalletSendPage
+    !environment.isJormungandr() && (<WalletSendPage
       generated={genBaseProps({
         wallet,
         hwSend: {

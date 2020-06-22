@@ -3,13 +3,15 @@ import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
-import type { InjectedOrGenerated } from '../types/injectedPropsType';
-import TestnetWarningBanner from '../components/topbar/banners/TestnetWarningBanner';
-import NotProductionBanner from '../components/topbar/banners/NotProductionBanner';
-import ServerErrorBanner from '../components/topbar/banners/ServerErrorBanner';
-import environment from '../environment';
-import { ServerStatusErrors } from '../types/serverStatusErrorType';
-import type { ServerStatusErrorType } from '../types/serverStatusErrorType';
+import type { InjectedOrGenerated } from '../../types/injectedPropsType';
+import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
+// import ByronDeprecationBanner from './ByronDeprecationBanner';
+import ItnDeprecationBanner from './ItnDeprecationBanner';
+import NotProductionBanner from '../../components/topbar/banners/NotProductionBanner';
+import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
+import environment from '../../environment';
+import { ServerStatusErrors } from '../../types/serverStatusErrorType';
+import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 
 export type GeneratedData = typeof BannerContainer.prototype.generated;
 
@@ -25,6 +27,8 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
         )}
         <TestnetWarningBanner />
         {!environment.isProduction() && <NotProductionBanner />}
+        {/* <ByronDeprecationBanner /> */}
+        {environment.isJormungandr() && <ItnDeprecationBanner />}
       </>
     );
   }

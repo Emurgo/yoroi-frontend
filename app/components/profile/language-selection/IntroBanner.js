@@ -11,7 +11,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
   +isNightly: boolean,
-  +isShelley: boolean,
+  +isJormungandr: boolean,
 |};
 
 const messages = defineMessages({
@@ -32,7 +32,7 @@ export default class IntroBanner extends Component<Props> {
     if (this.props.isNightly) {
       return NightlyLogo;
     }
-    if (this.props.isShelley) {
+    if (this.props.isJormungandr) {
       return TestnetLogo;
     }
     return YoroiLogo;

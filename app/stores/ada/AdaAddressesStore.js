@@ -33,7 +33,7 @@ import {
 declare var CONFIG : ConfigType;
 
 const getAddressGroup = () => {
-  if (environment.isShelley()) {
+  if (environment.isJormungandr()) {
     return AddressGroupTypes.group;
   }
   return AddressGroupTypes.byron;
@@ -197,7 +197,7 @@ export default class AdaAddressesStore extends Store {
     if (publicDeriver.getParent() instanceof Bip44Wallet) {
       types.push(CoreAddressTypes.CARDANO_LEGACY);
     }
-    if (environment.isShelley()) {
+    if (environment.isJormungandr()) {
       types.push(CoreAddressTypes.SHELLEY_GROUP);
     }
     return types;

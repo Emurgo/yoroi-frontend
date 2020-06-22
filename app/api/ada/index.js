@@ -867,13 +867,13 @@ export default class AdaApi {
       const utxos = await request.publicDeriver.getAllUtxos();
       const filteredUtxos = utxos.filter(utxo => request.filter(utxo));
 
-      const addressedUtxo = environment.isShelley()
+      const addressedUtxo = environment.isJormungandr()
         ? shelleyAsAddressedUtxo(filteredUtxos)
         : byronAsAddressedUtxo(filteredUtxos);
 
       let unsignedTxResponse;
       if (request.shouldSendAll != null) {
-        unsignedTxResponse = environment.isShelley()
+        unsignedTxResponse = environment.isJormungandr()
           ? shelleySendAllUnsignedTx(
             receiver,
             addressedUtxo
@@ -889,7 +889,7 @@ export default class AdaApi {
           throw new Error(`${nameof(this.createUnsignedTx)} no internal addresses left. Should never happen`);
         }
         const changeAddr = nextUnusedInternal.addressInfo;
-        unsignedTxResponse = environment.isShelley()
+        unsignedTxResponse = environment.isJormungandr()
           ? shelleyNewAdaUnsignedTx(
             [{
               address: receiver,
@@ -1138,7 +1138,7 @@ export default class AdaApi {
       const rootPk = generateWalletRootKey(recoveryPhrase);
       const newPubDerivers = [];
 
-      if (environment.isShelley()) {
+      if (environment.isJormungandr()) {
         const wallet = await createStandardCip1852Wallet({
           db: request.db,
           discrimination: environment.getDiscriminant(),

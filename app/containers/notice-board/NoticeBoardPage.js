@@ -7,8 +7,8 @@ import { intlShape, defineMessages } from 'react-intl';
 
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import TopBarLayout from '../../components/layout/TopBarLayout';
-import BannerContainer from '../BannerContainer';
-import type { GeneratedData as BannerContainerData } from '../BannerContainer';
+import BannerContainer from '../banners/BannerContainer';
+import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer';
 import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import TopBar from '../../components/topbar/TopBar';
 import NoticeBoard from '../../components/notice-board/NoticeBoard';

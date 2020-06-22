@@ -100,7 +100,7 @@ export default class ProfileStore extends Store {
     },
     {
       isDone: () => (
-        environment.isShelley() || // disable for Shelley to avoid overriding mainnet Yoroi URI
+        environment.isJormungandr() || // disable for Shelley to avoid overriding mainnet Yoroi URI
         !environment.userAgentInfo.canRegisterProtocol() ||
         this.isUriSchemeAccepted
       ),
@@ -393,7 +393,7 @@ export default class ProfileStore extends Store {
   }
 
   @computed get isShelleyTestnetTheme(): boolean {
-    return environment.isShelley();
+    return environment.isJormungandr();
   }
 
   /* @Returns Merged Pre-Built Theme and Custom Theme */
@@ -656,7 +656,7 @@ export const getVarsForTheme: {|
   theme: string
 |} => { [key: string]: string, ... } = ({ theme }) => {
   const { getThemeVars } = require(`../../themes/prebuilt/${theme}.js`);
-  if (environment.isShelley()) {
+  if (environment.isJormungandr()) {
     return getThemeVars('shelley');
   }
   return getThemeVars(undefined);
@@ -678,7 +678,7 @@ export function getTermsOfUse(
   currentLocale: string,
 ): string {
   const tos = require(`../../i18n/locales/terms-of-use/${api}/${currentLocale}.md`);
-  if (environment.isShelley()) {
+  if (environment.isJormungandr()) {
     const testnetAddition = require(`../../i18n/locales/terms-of-use/itn/${currentLocale}.md`);
     return tos + '\n\n' + testnetAddition;
   }

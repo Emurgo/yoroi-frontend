@@ -28,7 +28,7 @@ export const environment = ((
     commit: process.env.COMMIT || '',
     isJest: () => process.env.NODE_ENV === 'jest' || process.env.NODE_ENV === 'test',
     branch: process.env.BRANCH || '',
-    isShelley: () => {
+    isJormungandr: () => {
       return CONFIG.network.name === NetworkType.SHELLEY_DEV ||
         CONFIG.network.name === NetworkType.SHELLEY_TESTNET;
     },
@@ -54,7 +54,7 @@ export const environment = ((
     commit: string,
     branch: string,
     isJest: void => boolean,
-    isShelley: void => boolean,
+    isJormungandr: void => boolean,
     isNightly: void => boolean,
     isTest: void => boolean,
     isMainnet: void => boolean,

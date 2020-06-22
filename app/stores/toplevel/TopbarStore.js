@@ -50,7 +50,7 @@ export default class TopbarStore extends Store {
     const selected = wallets.selected;
 
     // recall: legacy bip44 wallets can't receive in Shelley era
-    const canTransfer = !environment.isShelley() ||
+    const canTransfer = !environment.isJormungandr() ||
       !(selected != null && selected.getParent() instanceof Bip44Wallet);
 
     return [

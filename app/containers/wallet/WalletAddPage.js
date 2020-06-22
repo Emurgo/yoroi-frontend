@@ -10,8 +10,8 @@ import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import globalMessages from '../../i18n/global-messages';
 
 import TopBarLayout from '../../components/layout/TopBarLayout';
-import BannerContainer from '../BannerContainer';
-import type { GeneratedData as BannerContainerData } from '../BannerContainer';
+import BannerContainer from '../banners/BannerContainer';
+import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer';
 import WalletAdd from '../../components/wallet/WalletAdd';
 import AddAnotherWallet from '../../components/wallet/add/AddAnotherWallet';
 

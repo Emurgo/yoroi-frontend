@@ -67,7 +67,7 @@ export default class TestnetWarningBanner extends Component<Props> {
         </div>
       );
     }
-    if (environment.isShelley()) {
+    if (environment.isJormungandr()) {
       return (
         <div className={styles.shelleyTestnetWarning}>
           <span key="0" className={styles.shelleyTestnetWarningIcon}><ShelleyTestnetWarningSvg /></span>

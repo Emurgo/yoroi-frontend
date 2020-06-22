@@ -21,7 +21,7 @@ export function changeToplevelTheme(currentTheme: Theme) {
     bodyClassList.remove(...allThemes);
     bodyClassList.remove('YoroiShelley');
     bodyClassList.add(currentTheme);
-    if (environment.isShelley()) {
+    if (environment.isJormungandr()) {
       bodyClassList.add('YoroiShelley');
     }
   }

@@ -627,7 +627,7 @@ export const RestoreVerify = (): Node => {
             selectedAPI,
             step: RestoreSteps.VERIFY_MNEMONIC,
             restoreRequest: {
-              isExecuting: !environment.isShelley() && boolean('isExecuting', false),
+              isExecuting: !environment.isJormungandr() && boolean('isExecuting', false),
               error: undefined,
               reset: action('reset'),
             },

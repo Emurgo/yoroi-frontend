@@ -36,7 +36,7 @@ export default class NoNotice extends Component<Props> {
     const { classicTheme } = this.props;
 
     let NoNoticeImage;
-    if (environmnent.isShelley()) {
+    if (environmnent.isJormungandr()) {
       NoNoticeImage = NoNoticeTestnetSvg;
     } else {
       NoNoticeImage = classicTheme ? NoNoticeClassicSvg : NoNoticeModernSvg;

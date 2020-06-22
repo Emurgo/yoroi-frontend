@@ -158,7 +158,7 @@ const WalletsSubpages = (stores, actions) => (
         )
       )}
     />
-    {environment.isShelley() && (
+    {environment.isJormungandr() && (
       <>
         <Route
           exact
