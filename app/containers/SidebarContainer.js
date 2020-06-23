@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import Sidebar from '../components/topbar/Sidebar';
 import type { InjectedOrGenerated } from '../types/injectedPropsType';
-import type { Category } from '../config/topbarConfig';
+import type { Category } from '../config/sidebarConfig';
 
 export type GeneratedData = typeof SidebarContainer.prototype.generated;
 
@@ -18,15 +18,15 @@ export default class SidebarContainer extends Component<InjectedOrGenerated<Gene
 
   render(): Node {
     const { actions, stores } = this.generated;
-    const { topbar, profile } = stores;
+    const { sidebar, profile } = stores;
 
     return (
       <Sidebar
         onCategoryClicked={category => {
-          actions.topbar.activateTopbarCategory.trigger({ category });
+          actions.sidebar.activateSidebarCategory.trigger({ category });
         }}
-        isActiveCategory={topbar.isActiveCategory}
-        categories={topbar.categories}
+        isActiveCategory={sidebar.isActiveCategory}
+        categories={sidebar.categories}
         onToggleSidebar={this.toggleSidebar}
         isSidebarExpanded={profile.isSidebarExpanded}
       />
@@ -40,15 +40,15 @@ export default class SidebarContainer extends Component<InjectedOrGenerated<Gene
           trigger: (params: void) => Promise<void>
         |}
       |},
-      topbar: {|
-        activateTopbarCategory: {|
+      sidebar: {|
+        activateSidebarCategory: {|
           trigger: (params: {| category: string |}) => void
         |}
       |}
     |},
     stores: {|
       profile: {| isSidebarExpanded: boolean |},
-      topbar: {|
+      sidebar: {|
         categories: Array<Category>,
         isActiveCategory: Category => boolean
       |}
@@ -63,9 +63,9 @@ export default class SidebarContainer extends Component<InjectedOrGenerated<Gene
     const { stores, actions } = this.props;
     return Object.freeze({
       stores: {
-        topbar: {
-          isActiveCategory: stores.topbar.isActiveCategory,
-          categories: stores.topbar.categories,
+        sidebar: {
+          isActiveCategory: stores.sidebar.isActiveCategory,
+          categories: stores.sidebar.categories,
         },
         profile: {
           isSidebarExpanded: stores.profile.isSidebarExpanded,
@@ -75,8 +75,8 @@ export default class SidebarContainer extends Component<InjectedOrGenerated<Gene
         profile: {
           toggleSidebar: { trigger: actions.profile.toggleSidebar.trigger },
         },
-        topbar: {
-          activateTopbarCategory: { trigger: actions.topbar.activateTopbarCategory.trigger },
+        sidebar: {
+          activateSidebarCategory: { trigger: actions.sidebar.activateSidebarCategory.trigger },
         },
       },
     });

@@ -1,5 +1,6 @@
 // @flow
 import { Action } from './lib/Action';
+import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver/index';
 
 // ======= ROUTER ACTIONS =======
 
@@ -7,8 +8,11 @@ export default class RouterActions {
   goToRoute: Action<{|
     route: string,
     params?: ?Object,
-    /** react-router doesn't refresh the page if you go to the URL you are already on */
-    forceRefresh?: boolean,
+    publicDeriver?: null | PublicDeriver<>,
+  |}> = new Action();
+  redirect: Action<{|
+    route: string,
+    params?: ?Object,
   |}> = new Action();
 
   goToTransactionsList: Action<{| params?: ?Object |}> = new Action();

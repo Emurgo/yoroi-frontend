@@ -70,7 +70,7 @@ export default class PickCurrencyOptionDialog extends Component<Props> {
                 </>}
               onSubmit={this.props.onCardano}
             />
-            {!environment.isShelley() && this.props.onErgo != null && (
+            {!environment.isJormungandr() && this.props.onErgo != null && (
               !environment.isProduction() || environment.isNightly() || environment.isTest()
             ) &&
               <OptionBlock

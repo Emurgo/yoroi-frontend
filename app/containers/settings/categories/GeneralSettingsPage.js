@@ -33,7 +33,7 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           currentLocale={profileStore.currentLocale}
           error={profileStore.setProfileLocaleRequest.error}
         />
-        {!environment.isShelley() &&
+        {!environment.isJormungandr() &&
           <ThemeSettingsBlock
             currentTheme={currentTheme}
             selectTheme={this.generated.actions.profile.updateTheme.trigger}

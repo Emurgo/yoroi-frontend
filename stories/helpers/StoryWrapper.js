@@ -92,7 +92,7 @@ const langCode = LANGUAGES.map(item => item.value);
 
 type Props = { +children: any, ... };
 
-environment.isShelley = () => boolean('IsJormungandr', true);
+environment.isJormungandr = () => boolean('IsJormungandr', false);
 environment.isNightly = () => boolean('IsNightly', false);
 
 export const globalKnobs: {|
@@ -583,7 +583,7 @@ export const genTentativeTx = (): {|
   const ouputAmount = '400';
   const fee = new BigNumber(inputAmount).minus(new BigNumber(ouputAmount));
 
-  if (environment.isShelley()) {
+  if (environment.isJormungandr()) {
     const remoteUnspentUtxo = {
       amount: inputAmount,
       receiver: 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
@@ -656,7 +656,7 @@ export const genTentativeTx = (): {|
 export const genUndelegateTx = (): V3UnsignedTxAddressedUtxoResponse => {
   const inputAmount = '1000001';
 
-  if (!environment.isShelley()) {
+  if (!environment.isJormungandr()) {
     throw new Error('Delegation not supported for Byron');
   }
   const remoteUnspentUtxo = {

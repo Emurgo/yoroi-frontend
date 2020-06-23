@@ -23,15 +23,10 @@ export default class URILandingPage extends Component<InjectedOrGenerated<Genera
 
   onConfirm: void => void = () => {
     const { wallets } = this.generated.stores;
-    let params = {};
-    if (wallets.hasAnyWallets && wallets.first) {
-      const firstWallet = wallets.first;
-      params = { id: firstWallet.getPublicDeriverId() };
-    }
     // this will automatically reroute to the right page if no wallet exists
     this.generated.actions.router.goToRoute.trigger({
       route: ROUTES.WALLETS.SEND,
-      params,
+      publicDeriver: wallets.first,
     });
   }
 
@@ -56,7 +51,7 @@ export default class URILandingPage extends Component<InjectedOrGenerated<Genera
       router: {|
         goToRoute: {|
           trigger: (params: {|
-            forceRefresh?: boolean,
+            publicDeriver?: null | PublicDeriver<>,
             params?: ?any,
             route: string
           |}) => void

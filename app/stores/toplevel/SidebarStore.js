@@ -2,7 +2,7 @@
 import { observable, computed, action } from 'mobx';
 import Store from '../base/Store';
 import environment from '../../environment';
-import type { Category } from '../../config/topbarConfig';
+import type { Category } from '../../config/sidebarConfig';
 import { matchRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import {
@@ -12,23 +12,23 @@ import {
   TRANSFER_PAGE,
   SETTINGS,
   NOTICE_BOARD,
-} from '../../config/topbarConfig';
+} from '../../config/sidebarConfig';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 
-export default class TopbarStore extends Store {
+export default class SidebarStore extends Store {
 
-  @observable activeTopbarCategory: ?string = ROUTES.MY_WALLETS;
+  @observable activeSidebarCategory: ?string = ROUTES.MY_WALLETS;
 
   setup(): void {
     super.setup();
     this.isActiveCategory = this.isActiveCategory.bind(this);
-    this.actions.topbar.activateTopbarCategory.listen(this._onActivateTopbarCategory);
+    this.actions.sidebar.activateSidebarCategory.listen(this._onActivateSidebarCategory);
     this.registerReactions([
-      this._syncTopbarRouteWithRouter,
+      this._syncSidebarRouteWithRouter,
     ]);
   }
 
-  _genTopCategory: void => Category = () => {
+  _genSidebarCategory: void => Category = () => {
     const { wallets } = this.stores;
     if (!wallets.hasAnyPublicDeriver) {
       return BACK_TO_ADD;
@@ -50,11 +50,11 @@ export default class TopbarStore extends Store {
     const selected = wallets.selected;
 
     // recall: legacy bip44 wallets can't receive in Shelley era
-    const canTransfer = !environment.isShelley() ||
+    const canTransfer = !environment.isJormungandr() ||
       !(selected != null && selected.getParent() instanceof Bip44Wallet);
 
     return [
-      this._genTopCategory(),
+      this._genSidebarCategory(),
       SETTINGS,
       ...(canTransfer ? [TRANSFER_PAGE] : []),
       ...(environment.isTest() ? [NOTICE_BOARD] : []), // Temporarily Hide
@@ -66,33 +66,33 @@ export default class TopbarStore extends Store {
   isActiveCategory: Category => boolean = (
     category: Category
   ): boolean => computed(
-    () => this.activeTopbarCategory != null && this.activeTopbarCategory === category.route
+    () => this.activeSidebarCategory != null && this.activeSidebarCategory === category.route
   ).get();
 
-  @action _onActivateTopbarCategory: {| category: string |} => void = (
+  @action _onActivateSidebarCategory: {| category: string |} => void = (
     params
   ) => {
     const { category } = params;
-    if (category !== this.activeTopbarCategory) {
+    if (category !== this.activeSidebarCategory) {
       this.actions.router.goToRoute.trigger({ route: category });
     }
   };
 
-  @action _setActivateTopbarCategory: (void | string) => void = (
+  @action _setActivateSidebarCategory: (void | string) => void = (
     category
   ) => {
-    this.activeTopbarCategory = category;
+    this.activeSidebarCategory = category;
   };
 
-  _syncTopbarRouteWithRouter: void => void = () => {
+  _syncSidebarRouteWithRouter: void => void = () => {
     const route = this.stores.app.currentRoute;
     if (matchRoute(ROUTES.WALLETS.ADD, route) && this.stores.wallets.hasAnyPublicDeriver) {
-      this._setActivateTopbarCategory(undefined);
+      this._setActivateSidebarCategory(undefined);
     }
     this.categories.forEach((category) => {
       // If the current route starts with the route of the category
       // E.g. category could be settings, and route could be settings/general
-      if (route.indexOf(category.route) === 0) this._setActivateTopbarCategory(category.route);
+      if (route.indexOf(category.route) === 0) this._setActivateSidebarCategory(category.route);
     });
   };
 }

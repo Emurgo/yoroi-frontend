@@ -26,7 +26,7 @@ export default class AddAnotherWallet extends Component<Props> {
     if (environment.isNightly()) {
       return NightlyLogo;
     }
-    if (environment.isShelley()) {
+    if (environment.isJormungandr()) {
       return LogoYoroiShelleyTestnetIcon;
     }
     return LogoYoroiIcon;

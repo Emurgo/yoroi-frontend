@@ -54,7 +54,7 @@ export default class WalletAdd extends Component<Props> {
     if (environment.isNightly()) {
       return NightlyLogo;
     }
-    if (environment.isShelley()) {
+    if (environment.isJormungandr()) {
       return LogoYoroiShelleyTestnetIcon;
     }
     return LogoYoroiIcon;
@@ -69,7 +69,7 @@ export default class WalletAdd extends Component<Props> {
 
     const componentStyle = classnames([
       styles.component,
-      environment.isShelley() ? styles.shelleyTestnet : null
+      environment.isJormungandr() ? styles.shelleyTestnet : null
     ]);
 
     const LogoIcon = this.getLogo();

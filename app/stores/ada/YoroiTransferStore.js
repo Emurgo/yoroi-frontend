@@ -207,7 +207,7 @@ export default class YoroiTransferStore extends Store {
       ? await generateCip1852TransferTx(baseRequest)
       : await generateLegacyYoroiTransferTx({
         ...baseRequest,
-        legacy: !environment.isShelley(),
+        legacy: !environment.isJormungandr(),
       });
     // Possible exception: NotEnoughMoneyToSendError
     return transferTx;

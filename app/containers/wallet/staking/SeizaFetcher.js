@@ -224,7 +224,7 @@ export default class SeizaFetcher extends Component<Props> {
     if (delegationTx != null && !showSignDialog) {
       return (
         <DelegationSuccessDialog
-          onClose={() => delegationTxActions.complete.trigger(selectedWallet)}
+          onClose={delegationTxActions.complete.trigger}
           classicTheme={profile.isClassicTheme}
         />
       );
@@ -249,7 +249,7 @@ export default class SeizaFetcher extends Component<Props> {
       ada: {|
         delegationTransaction: {|
           complete: {|
-            trigger: (params: PublicDeriver<>) => void
+            trigger: void => void
           |},
           createTransaction: {|
             trigger: (params: {|

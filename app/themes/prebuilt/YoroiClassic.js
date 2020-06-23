@@ -182,8 +182,8 @@ const rpYoroiTheme = {
   ...itemCard,
 };
 
-// Topbar gradient
-const topbarGradient = {
+// Sidebar gradient
+const sidebarGradient = {
   start: '#373f52',
   end: '#373f52',
 };
@@ -301,12 +301,9 @@ const YoroiClassic = {
   '--theme-system-error-overlay-button-text-color-hover': '#ab1700',
   '--theme-system-error-overlay-text-color': '#fafbfc',
 
-  '--theme-topbar-active-item-bottom-border': '5px solid #daa49a',
-  '--theme-topbar-active-item-top-border': '5px solid transparent',
-  '--theme-topbar-category-text-color': '#fafbfc',
-  '--theme-topbar-background-color-gradient-start': topbarGradient.start,
-  '--theme-topbar-background-color-gradient-end': topbarGradient.end,
-  '--theme-topbar-background-color': `linear-gradient(to right, ${topbarGradient.start}, ${topbarGradient.end})`,
+  '--theme-topbar-background-color-gradient-start': sidebarGradient.start,
+  '--theme-topbar-background-color-gradient-end': sidebarGradient.end,
+  '--theme-topbar-background-color': `linear-gradient(to right, ${sidebarGradient.start}, ${sidebarGradient.end})`,
   '--theme-topbar-wallet-name-color': '#fafbfc',
   '--theme-topbar-wallet-info-color': '#fafbfc',
   '--theme-topbar-layout-body-background-color': '#ffffff',
@@ -419,7 +416,7 @@ const YoroiClassic = {
   '--theme-tooltipbox-border-color': 'rgba(77,32,192,0.08)', // 4d20c0
 
   // Sidebar
-  '--theme-sidebar-background-color': `linear-gradient(22.58deg, ${topbarGradient.start} 0%, ${topbarGradient.end} 100%)`,
+  '--theme-sidebar-background-color': `linear-gradient(22.58deg, ${sidebarGradient.start} 0%, ${sidebarGradient.end} 100%)`,
   '--theme-sidebar-text-left-spacing': '16px',
   '--theme-sidebar-text-color': '#FFFFFF',
   '--theme-sidebar-text-font-size': '14px',
@@ -427,7 +424,7 @@ const YoroiClassic = {
   '--theme-sidebar-icon-color': '#FFFFFF',
   '--theme-sidebar-icon-color-hover': '#DAA49A',
   '--theme-sidebar-icon-color-active': '#DAA49A',
-  '--theme-sidebar-item-background-color-hover': `${topbarGradient.end}`,
+  '--theme-sidebar-item-background-color-hover': `${sidebarGradient.end}`,
 
   // Page
 

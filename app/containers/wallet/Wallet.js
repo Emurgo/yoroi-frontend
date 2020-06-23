@@ -10,8 +10,8 @@ import SidebarContainer from '../SidebarContainer';
 import NavBarContainer from '../NavBarContainer';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import type { GeneratedData as NavBarContainerData } from '../NavBarContainer';
-import BannerContainer from '../BannerContainer';
-import type { GeneratedData as BannerContainerData } from '../BannerContainer';
+import BannerContainer from '../banners/BannerContainer';
+import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer';
 import WalletWithNavigation from '../../components/wallet/layouts/WalletWithNavigation';
 import NavBarBack from '../../components/topbar/NavBarBack';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
@@ -60,9 +60,6 @@ export default class Wallet extends Component<Props> {
     if (selected == null) return false;
     const screenRoute = buildRoute(
       route,
-      {
-        id: selected.getPublicDeriverId(),
-      }
     );
     // only check that the page is a prefix of the current route (to handle subpages)
     if (matchesPrefix === true) {
@@ -77,7 +74,6 @@ export default class Wallet extends Component<Props> {
     if (selected == null) return;
     this.generated.actions.router.goToRoute.trigger({
       route,
-      params: { id: selected.getPublicDeriverId() },
     });
   };
 
@@ -151,7 +147,7 @@ export default class Wallet extends Component<Props> {
       router: {|
         goToRoute: {|
           trigger: (params: {|
-            forceRefresh?: boolean,
+            publicDeriver?: null | PublicDeriver<>,
             params?: ?any,
             route: string
           |}) => void

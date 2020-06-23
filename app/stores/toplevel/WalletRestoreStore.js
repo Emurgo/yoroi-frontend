@@ -61,7 +61,7 @@ export default class WalletRestoreStore extends Store {
 
   @action
   _verifyMnemonic: void => Promise<void> = async () => {
-    if (environment.isShelley()) {
+    if (environment.isJormungandr()) {
       runInAction(() => { this.step = RestoreSteps.LEGACY_EXPLANATION; });
     } else {
       await this.actions.walletRestore.startRestore.trigger();
@@ -164,7 +164,7 @@ export function generatePlates(
   // TODO: we disable shelley restoration information for paper wallet restoration
   // this is because we've temporarily disabled paper wallet creation for Shelley
   // so no point in showing the Shelley checksum
-  const shelleyPlate = !environment.isShelley() || mode === RestoreMode.PAPER
+  const shelleyPlate = !environment.isJormungandr() || mode === RestoreMode.PAPER
     ? undefined
     : generateStandardPlate(
       rootPk,

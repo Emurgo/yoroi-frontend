@@ -179,8 +179,8 @@ const rpYoroiTheme = {
   ...itemCard,
 };
 
-// Topbar gradient
-const topbarGradient = {
+// Sidebar gradient
+const sidebarGradient = {
   start: '#1e46bd',
   end: '#4760ff',
 };
@@ -310,12 +310,9 @@ const YoroiModern = {
   '--theme-system-error-overlay-button-text-color-hover': '#ab1700',
   '--theme-system-error-overlay-text-color': '#fafbfc',
 
-  '--theme-topbar-active-item-bottom-border': '5px solid #17d1aa',
-  '--theme-topbar-active-item-top-border': '5px solid transparent',
-  '--theme-topbar-category-text-color': '#fafbfc',
-  '--theme-topbar-background-color-gradient-start': topbarGradient.start,
-  '--theme-topbar-background-color-gradient-end': topbarGradient.end,
-  '--theme-topbar-background-color': `linear-gradient(to right, ${topbarGradient.start}, ${topbarGradient.end})`,
+  '--theme-topbar-background-color-gradient-start': sidebarGradient.start,
+  '--theme-topbar-background-color-gradient-end': sidebarGradient.end,
+  '--theme-topbar-background-color': `linear-gradient(to right, ${sidebarGradient.start}, ${sidebarGradient.end})`,
   '--theme-topbar-wallet-name-color': '#ffffff',
   '--theme-topbar-wallet-info-color': '#ffffff',
   '--theme-topbar-layout-body-background-color': '#ffffff',
@@ -552,9 +549,8 @@ const ShelleyTestnetOverrides = {
   '--rp-button-bg-color-active': '#3154CB',
   '--rp-button-bg-color-disabled': 'rgba(49, 84, 203, 0.3)', // #3154CB
   '--rp-button-bg-color-hover': '#4760FF',
-  // Toolbar
+  // Sidebar
   '--theme-topbar-background-color': 'linear-gradient(225deg, #F14D78 0%, #1A44B7 100%)',
-  '--theme-topbar-active-item-bottom-border': '5px solid #ffffff',
   // Button Primary
   '--theme-button-primary-background-color': '#3154CB',
   '--theme-button-primary-background-color-hover': '#4760FF',

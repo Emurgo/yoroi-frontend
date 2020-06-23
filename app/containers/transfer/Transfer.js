@@ -6,8 +6,8 @@ import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import TopBarLayout from '../../components/layout/TopBarLayout';
-import BannerContainer from '../BannerContainer';
-import type { GeneratedData as BannerContainerData } from '../BannerContainer';
+import BannerContainer from '../banners/BannerContainer';
+import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer';
 import SidebarContainer from '../SidebarContainer';
 import BackgroundColoredLayout from '../../components/layout/BackgroundColoredLayout';
 import NoWalletMessage from '../../components/wallet/settings/NoWalletMessage';
@@ -87,7 +87,7 @@ export default class Transfer extends Component<Props> {
       router: {|
         goToRoute: {|
           trigger: (params: {|
-            forceRefresh?: boolean,
+            publicDeriver?: null | PublicDeriver<>,
             params?: ?any,
             route: string
           |}) => void

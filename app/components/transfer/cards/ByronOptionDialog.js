@@ -182,7 +182,7 @@ export default class ByronOptionDialog extends Component<Props, State> {
           title={intl.formatMessage(icarusMessages.yoroiPaperLabel)}
           learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
         />
-        {(environment.isShelley() || environment.isTest()) && (
+        {(environment.isJormungandr() || environment.isTest()) && (
           <>
             <OptionBlock
               parentName="fromLedger"

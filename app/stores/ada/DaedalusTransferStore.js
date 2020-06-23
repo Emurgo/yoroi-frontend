@@ -133,7 +133,7 @@ export default class DaedalusTransferStore extends Store {
             outputAddr: nextInternalAddress,
             getUTXOsForAddresses:
               this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
-            legacy: !environment.isShelley()
+            legacy: !environment.isJormungandr()
           });
           runInAction(() => {
             this.transferTx = transferTx;

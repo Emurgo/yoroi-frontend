@@ -70,7 +70,7 @@ export default class WalletNavigation extends Component<Props> {
     // it's easier to have people use the "upgrade wallet" UX
     // then to make a special "send" page that only allows sendAll
     const canSend = (
-      !environment.isShelley() || !(this.props.wallet.getParent() instanceof Bip44Wallet)
+      !environment.isJormungandr() || !(this.props.wallet.getParent() instanceof Bip44Wallet)
     ) && this.props.wallet.getParent().getCoinType() !== CoinTypes.ERGO;
     return (
       <div className={styles.component}>
@@ -107,7 +107,7 @@ export default class WalletNavigation extends Component<Props> {
           />
         </div>
 
-        {environment.isShelley() && canStake && (
+        {environment.isJormungandr() && canStake && (
           <>
             <div className={styles.navItem}>
               <WalletNavButton

@@ -166,7 +166,6 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
               for (const addressStore of addressStores) {
                 if (addressStore.all.some(addressInStore => addressInStore.address === address)) {
                   const route = buildRoute(ROUTES.WALLETS.RECEIVE.ADDRESS_LIST, {
-                    id: publicDeriver.getPublicDeriverId(),
                     group: addressStore.name.group,
                     name: addressStore.name.subgroup,
                   });
@@ -402,7 +401,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
       router: {|
         goToRoute: {|
           trigger: (params: {|
-            forceRefresh?: boolean,
+            publicDeriver?: null | PublicDeriver<>,
             params?: ?any,
             route: string
           |}) => void

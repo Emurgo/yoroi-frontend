@@ -79,7 +79,7 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
       >
         <IntroBanner
           isNightly={environment.isNightly()}
-          isShelley={environment.isShelley()}
+          isJormungandr={environment.isJormungandr()}
         />
         <LanguageSelectionForm
           onSelectLanguage={this.onSelectLanguage}
@@ -116,7 +116,7 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
       >
         <IntroBanner
           isNightly={environment.isNightly()}
-          isShelley={environment.isShelley()}
+          isJormungandr={environment.isJormungandr()}
         />
         <LanguageSelectionForm
           onSelectLanguage={this.onSelectLanguage}
@@ -131,7 +131,7 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
   }
 
   render(): Node {
-    if (environment.isShelley()) {
+    if (environment.isJormungandr()) {
       return this.renderShelley(this.generated);
     }
     return this.renderByron(this.generated);

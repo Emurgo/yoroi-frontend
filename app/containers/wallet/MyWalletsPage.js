@@ -16,8 +16,8 @@ import WalletCurrency from '../../components/wallet/my-wallets/WalletCurrency';
 import WalletSubRow from '../../components/wallet/my-wallets/WalletSubRow';
 import NavPlate from '../../components/topbar/NavPlate';
 import SidebarContainer from '../SidebarContainer';
-import BannerContainer from '../BannerContainer';
-import type { GeneratedData as BannerContainerData } from '../BannerContainer';
+import BannerContainer from '../banners/BannerContainer';
+import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import { ROUTES } from '../../routes-config';
 import NavBar from '../../components/topbar/NavBar';
@@ -72,7 +72,7 @@ export default class MyWalletsPage extends Component<Props> {
   ) => {
     this.generated.actions.router.goToRoute.trigger({
       route: ROUTES.WALLETS.TRANSACTIONS,
-      params: { id: publicDeriver.getPublicDeriverId() },
+      publicDeriver
     });
   };
 
@@ -310,7 +310,7 @@ export default class MyWalletsPage extends Component<Props> {
       router: {|
         goToRoute: {|
           trigger: (params: {|
-            forceRefresh?: boolean,
+            publicDeriver?: null | PublicDeriver<>,
             params?: ?any,
             route: string
           |}) => void

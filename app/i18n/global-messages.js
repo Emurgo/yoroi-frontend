@@ -565,6 +565,14 @@ const globalMessages: * = defineMessages({
     id: 'wallet.receive.navigation.allLabel',
     defaultMessage: '!!!All'
   },
+  noteLabel: {
+    id: 'global.labels.note',
+    defaultMessage: '!!!Note:'
+  },
+  upgradeLabel: {
+    id: 'global.labels.upgrade',
+    defaultMessage: '!!!Upgrade'
+  },
 });
 export default globalMessages;
 

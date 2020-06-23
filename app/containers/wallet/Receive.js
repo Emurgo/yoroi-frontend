@@ -35,23 +35,31 @@ export default class Receive extends Component<Props> {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) throw new Error(`${nameof(Receive)} no public deriver`);
     const rootRoute = buildRoute(
-      ROUTES.WALLETS.RECEIVE.ROOT,
+      ROUTES.WALLETS.RECEIVE.ROOT
+    );
+
+    const routeForStore = store => buildRoute(
+      ROUTES.WALLETS.RECEIVE.ADDRESS_LIST,
       {
-        id: publicDeriver.getPublicDeriverId(),
+        group: store.name.group,
+        name: store.name.subgroup,
       }
     );
+    const stores = this.generated.stores.addresses.getStoresForWallet(publicDeriver);
     if (this.generated.stores.app.currentRoute === rootRoute) {
       // if no store is specified, we just send the user to the first store in the list
-      const stores = this.generated.stores.addresses.getStoresForWallet(publicDeriver);
-      const firstRoute = buildRoute(
-        ROUTES.WALLETS.RECEIVE.ADDRESS_LIST,
-        {
-          id: publicDeriver.getPublicDeriverId(),
-          group: stores[0].name.group,
-          name: stores[0].name.subgroup,
-        }
+      const firstRoute = routeForStore(stores[0]);
+      // we redirect otherwise it would break the back button
+      this.generated.actions.router.redirect.trigger({ route: firstRoute });
+    } else {
+      const currentSelectedStore = stores.find(
+        store => routeForStore(store) === this.generated.stores.app.currentRoute
       );
-      this.generated.actions.router.goToRoute.trigger({ route: firstRoute });
+      // if user switched to a different wallet that doesn't support the store type selected
+      if (currentSelectedStore == null) {
+        // just send user to the first store supported by this wallet
+        this.generated.actions.router.redirect.trigger({ route: routeForStore(stores[0]) });
+      }
     }
   }
   componentWillUnmount() {
@@ -85,7 +93,7 @@ export default class Receive extends Component<Props> {
             +isActiveStore: boolean,
             +isHidden: boolean,
             +name: AddressTypeName,
-            +setAsActiveStore: (void) => void,
+            +setAsActiveStore: void => void,
             +validFilters: Array<AddressFilterKind>,
             +wasExecuted: boolean,
           |},
@@ -99,9 +107,15 @@ export default class Receive extends Component<Props> {
         resetFilter: {| trigger: (params: void) => void |},
       |},
       router: {|
+        redirect: {|
+          trigger: (params: {|
+            params?: ?any,
+            route: string
+          |}) => void
+        |},
         goToRoute: {|
           trigger: (params: {|
-            forceRefresh?: boolean,
+            publicDeriver?: null | PublicDeriver<>,
             params?: ?any,
             route: string
           |}) => void
@@ -131,7 +145,7 @@ export default class Receive extends Component<Props> {
             const functionalitySubset = addressStores.map(addressStore => ({
               isHidden: addressStore.isHidden,
               isActiveStore: addressStore.isActiveStore,
-              setAsActiveStore: () => addressStore.setAsActiveStore(publicDeriver),
+              setAsActiveStore: addressStore.setAsActiveStore,
               name: addressStore.name,
               validFilters: addressStore.validFilters,
               wasExecuted: addressStore.wasExecuted,
@@ -147,6 +161,7 @@ export default class Receive extends Component<Props> {
         },
         router: {
           goToRoute: { trigger: actions.router.goToRoute.trigger },
+          redirect: { trigger: actions.router.redirect.trigger },
         },
       }
     });

@@ -1,7 +1,6 @@
 // @flow
 
 import RouteParser from 'route-parser';
-import { ROUTES } from '../routes-config';
 
 export const matchRoute = (
   pattern: string, path: string
@@ -117,20 +116,8 @@ export const handleExternalClick: string => void = (link) => {
 };
 
 type RecursiveTree = string | { [key: string]: RecursiveTree, ... };
+/** visit all the possible root paths of our application */
 export function visitPaths(value: RecursiveTree): Array<string> {
   if (typeof value !== 'object') return [value];
   return Object.keys(value).map(key => value[key]).flatMap(nextValue => visitPaths(nextValue));
-}
-
-export function switchRouteWallet(currentRoute: string, newWalletId: number): string {
-  for (const route of visitPaths(ROUTES)) {
-    const matchWalletRoute = matchRoute(route, currentRoute);
-    if (matchWalletRoute === false) continue;
-
-    if (matchWalletRoute.id != null) {
-      matchWalletRoute.id = newWalletId.toString();
-    }
-    return buildRoute(route, (matchWalletRoute: any));
-  }
-  throw new Error(`${nameof(switchRouteWallet)} No path matched`);
 }

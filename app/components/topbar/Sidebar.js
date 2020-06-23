@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import SideBarCategory from './SideBarCategory';
 import styles from './Sidebar.scss';
-import type { Category } from '../../config/topbarConfig';
+import type { Category } from '../../config/sidebarConfig';
 import classnames from 'classnames';
 
 import yoroiLogo from '../../assets/images/sidebar/yoroi_logo.inline.svg';
@@ -57,7 +57,7 @@ export default class Sidebar extends Component<Props> {
           {categories ? categories.map(category => {
             return (
               <SideBarCategory
-                key={category.name}
+                key={category.className}
                 icon={category.icon}
                 active={isActiveCategory !== undefined && isActiveCategory(category)}
                 label={category.label}

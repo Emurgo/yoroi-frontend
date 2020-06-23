@@ -2,7 +2,6 @@
 import React from 'react';
 import type { Node } from 'react';
 import { Route, Redirect, Switch } from 'react-router-dom';
-import environment from './environment';
 import { ROUTES } from './routes-config';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';
@@ -158,28 +157,32 @@ const WalletsSubpages = (stores, actions) => (
         )
       )}
     />
-    {environment.isShelley() && (
-      <>
-        <Route
-          exact
-          path={ROUTES.WALLETS.DELEGATION_DASHBOARD}
-          component={(props) => <StakingDashboardPage {...props} stores={stores} actions={actions} />}
-        />
-        <Route
-          exact
-          path={ROUTES.WALLETS.DELEGATION_SIMPLE}
-          component={(props) => <StakingPage {...props} stores={stores} actions={actions} urlTemplate={CONFIG.seiza.simpleTemplate} />}
-        />
-        <Route
-          exact
-          path={ROUTES.WALLETS.DELEGATION_ADVANCE}
-          component={(props) => <StakingPage {...props} stores={stores} actions={actions} urlTemplate={CONFIG.seiza.advanceTemplate} />}
-        />
-      </>)
-    }
+    <Route
+      exact
+      path={ROUTES.WALLETS.DELEGATION_DASHBOARD}
+      component={(props) => <StakingDashboardPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.WALLETS.DELEGATION_SIMPLE}
+      component={(props) => <StakingPage {...props} stores={stores} actions={actions} urlTemplate={CONFIG.seiza.simpleTemplate} />}
+    />
+    <Route
+      exact
+      path={ROUTES.WALLETS.DELEGATION_ADVANCE}
+      component={(props) => <StakingPage {...props} stores={stores} actions={actions} urlTemplate={CONFIG.seiza.advanceTemplate} />}
+    />
     <Route
       path={ROUTES.WALLETS.SWITCH}
-      component={(_props) => <></> /* this is a temporary state as the wallet is switching wallets. Faster than user can really notice or skipped entirely */}
+      component={(_props) => {
+        // this is a temporary state as the wallet is switching wallets.
+        // if switching to a new wallet, a blank screen is just flashed for a very brief amount of time
+        // if pressing "back" after switching wallets, it will stop the user from going back
+        React.useEffect(() => {
+          stores.router.goForward();
+        });
+        return (<></>);
+      }}
     />
     <Redirect to={ROUTES.WALLETS.TRANSACTIONS} />
   </Switch>

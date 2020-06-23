@@ -87,7 +87,7 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
 
     const uriSettings = (
       coinType === CoinTypes.CARDANO &&
-      !environment.isShelley() &&
+      !environment.isJormungandr() &&
       this.generated.canRegisterProtocol()
     )
       ? (

@@ -121,7 +121,7 @@ const defaultProps: {|
   SidebarContainerProps: {
     generated: {
       stores: {
-        topbar: {
+        sidebar: {
           isActiveCategory: (_category) => false,
           categories: [],
         },
@@ -133,8 +133,8 @@ const defaultProps: {|
         profile: {
           toggleSidebar: { trigger: async (req) => action('toggleSidebar')(req) },
         },
-        topbar: {
-          activateTopbarCategory: { trigger: action('activateTopbarCategory') },
+        sidebar: {
+          activateSidebarCategory: { trigger: action('activateSidebarCategory') },
         },
       },
     },
@@ -627,7 +627,7 @@ export const RestoreVerify = (): Node => {
             selectedAPI,
             step: RestoreSteps.VERIFY_MNEMONIC,
             restoreRequest: {
-              isExecuting: !environment.isShelley() && boolean('isExecuting', false),
+              isExecuting: !environment.isJormungandr() && boolean('isExecuting', false),
               error: undefined,
               reset: action('reset'),
             },
