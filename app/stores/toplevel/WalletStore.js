@@ -158,7 +158,6 @@ export default class WalletStore extends Store {
     // $FlowExpectedError[incompatible-call] built-in types can't handle visibilitychange
     document.addEventListener('visibilitychange', debounce(this._pollRefresh, this.ON_VISIBLE_DEBOUNCE_WAIT));
     this.registerReactions([
-      this._updateActiveWalletOnRouteChanges,
       this._showAddWalletPageWhenNoWallets,
     ]);
   }
@@ -241,11 +240,9 @@ export default class WalletStore extends Store {
   }
 
   getWalletRoute: PublicDeriver<> => string = (
-    publicDeriver,
+    _publicDeriver,
   ) => (
-    buildRoute(ROUTES.WALLETS.TRANSACTIONS, {
-      id: publicDeriver.getPublicDeriverId(),
-    })
+    buildRoute(ROUTES.WALLETS.TRANSACTIONS)
   );
 
   goToWalletRoute: PublicDeriver<> => void = (publicDeriver) => {
@@ -421,48 +418,6 @@ export default class WalletStore extends Store {
     if (this.isWalletRoute && !this.hasAnyWallets) {
       this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
     }
-  };
-
-  /* @Attention:
-      This method has a really tricky logic because is in charge of some redirection rules
-      related to app urls and wallet status. Also, this behaviour is trigger by mobx reactions,
-      so it's hard to reason about all the scenarios could happened.
-  */
-  _updateActiveWalletOnRouteChanges: void => void = () => {
-    const currentRoute = this.stores.app.currentRoute;
-    const hasAnyPublicDeriver = this.hasAnyPublicDeriver;
-    runInAction(`${nameof(WalletStore)}::${nameof(this._updateActiveWalletOnRouteChanges)}`, () => {
-      // There are not wallets loaded (yet) -> unset active and return
-      if (!hasAnyPublicDeriver) {
-        return this._unsetActiveWallet();
-      }
-      const matchWalletRoute = matchRoute(`${ROUTES.WALLETS.ROOT}/:id(*page)`, currentRoute);
-      if (matchWalletRoute !== false) {
-        // We have a route for a specific wallet -> lets try to find it
-        let publicDeriverForRoute = undefined;
-        for (const publicDeriver of this.publicDerivers) {
-          if (publicDeriver.getPublicDeriverId().toString() === matchWalletRoute.id) {
-            publicDeriverForRoute = publicDeriver;
-          }
-        }
-        if (publicDeriverForRoute != null) {
-          // The wallet exists, we are done
-          this._setActiveWallet({ wallet: publicDeriverForRoute });
-        } else if (hasAnyPublicDeriver) {
-          if (this.selected != null) {
-            this.goToWalletRoute(this.selected);
-          }
-        }
-      } else if (this._canRedirectToWallet) {
-        // The route does not specify any wallet -> pick first wallet
-        if (!this.hasActiveWallet && hasAnyPublicDeriver) {
-          this._setActiveWallet({ wallet: this.publicDerivers[0] });
-        }
-        if (this.selected != null) {
-          this.goToWalletRoute(this.selected);
-        }
-      }
-    });
   };
 
   // =================== NOTIFICATION ==================== //

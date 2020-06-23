@@ -58,6 +58,7 @@ import { RestoreMode } from '../../actions/common/wallet-restore-actions';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { ApiOptionType, SelectedApiType } from '../../api/common/utils';
 import { ApiOptions } from '../../api/common/utils';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 export type GeneratedData = typeof WalletAddPage.prototype.generated;
 
@@ -310,7 +311,7 @@ export default class WalletAddPage extends Component<Props> {
       router: {|
         goToRoute: {|
           trigger: (params: {|
-            forceRefresh?: boolean,
+            publicDeriver?: null | PublicDeriver<>,
             params?: ?any,
             route: string
           |}) => void

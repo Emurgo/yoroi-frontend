@@ -14,7 +14,6 @@ import NoWalletsDropdown from '../components/topbar/NoWalletsDropdown';
 import NavDropdown from '../components/topbar/NavDropdown';
 import NavDropdownRow from '../components/topbar/NavDropdownRow';
 import { ROUTES } from '../routes-config';
-import { switchRouteWallet } from '../utils/routing';
 import { ConceptualWallet, isLedgerNanoWallet, isTrezorTWallet } from '../api/ada/lib/storage/models/ConceptualWallet/index';
 import {
   asGetPublicKey,
@@ -55,25 +54,9 @@ export default class NavBarContainer extends Component<Props> {
   }
 
   switchToNewWallet: PublicDeriver<> => void = (newWallet) => {
-    const newRoute = switchRouteWallet(
-      this.generated.stores.app.currentRoute,
-      newWallet.getPublicDeriverId()
-    );
-    if (newRoute === this.generated.stores.app.currentRoute) {
-      // the route specified in the URL would usually switch the selected wallet for us
-      // but if the route is the same even after switching wallets, this won't trigger
-      // so we manually switch the wallets in this case
-      this.generated.actions.wallets.setActiveWallet.trigger({
-        wallet: newWallet,
-      });
-    }
     this.generated.actions.router.goToRoute.trigger({
-      route: newRoute,
-      /**
-       * need to force a refresh
-       * since some onMount and willMount hooks depend on the selected wallet
-      */
-      forceRefresh: true,
+      route: this.generated.stores.app.currentRoute,
+      publicDeriver: newWallet,
     });
   }
 
@@ -287,7 +270,7 @@ export default class NavBarContainer extends Component<Props> {
       router: {|
         goToRoute: {|
           trigger: (params: {|
-            forceRefresh?: boolean,
+            publicDeriver?: null | PublicDeriver<>,
             params?: ?any,
             route: string
           |}) => void

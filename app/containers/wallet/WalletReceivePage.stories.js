@@ -345,7 +345,6 @@ const genGetStoresForWallet: {|
     const routeForTab = buildRoute(
       ROUTES.WALLETS.RECEIVE.ADDRESS_LIST,
       {
-        id: request.publicDeriver.getPublicDeriverId(),
         group: tabName.group,
         name: tabName.subgroup,
       }

@@ -87,7 +87,7 @@ export default class Transfer extends Component<Props> {
       router: {|
         goToRoute: {|
           trigger: (params: {|
-            forceRefresh?: boolean,
+            publicDeriver?: null | PublicDeriver<>,
             params?: ?any,
             route: string
           |}) => void

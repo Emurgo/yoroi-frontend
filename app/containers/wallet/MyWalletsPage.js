@@ -72,7 +72,7 @@ export default class MyWalletsPage extends Component<Props> {
   ) => {
     this.generated.actions.router.goToRoute.trigger({
       route: ROUTES.WALLETS.TRANSACTIONS,
-      params: { id: publicDeriver.getPublicDeriverId() },
+      publicDeriver
     });
   };
 
@@ -310,7 +310,7 @@ export default class MyWalletsPage extends Component<Props> {
       router: {|
         goToRoute: {|
           trigger: (params: {|
-            forceRefresh?: boolean,
+            publicDeriver?: null | PublicDeriver<>,
             params?: ?any,
             route: string
           |}) => void

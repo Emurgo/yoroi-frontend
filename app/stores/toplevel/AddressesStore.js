@@ -81,11 +81,10 @@ export class AddressTypeStore<T: StandardAddress> {
     return app.currentRoute === screenRoute;
   }
 
-  setAsActiveStore: (PublicDeriver<>) => void = (publicDeriver) => {
+  setAsActiveStore: void => void = () => {
     this.actions.router.goToRoute.trigger({
       route: ROUTES.WALLETS.RECEIVE.ADDRESS_LIST,
       params: {
-        id: publicDeriver.getPublicDeriverId(),
         group: this.name.group,
         name: this.name.subgroup,
       },

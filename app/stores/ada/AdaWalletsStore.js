@@ -1,14 +1,12 @@
 // @flow
-import { observable, action } from 'mobx';
+import { observable, } from 'mobx';
 
 import Store from '../base/Store';
-import { matchRoute, buildRoute } from '../../utils/routing';
 import {
   Logger,
   stringifyError
 } from '../../utils/logging';
 import Request from '../lib/LocalizedRequest';
-import { ROUTES } from '../../routes-config';
 import type {
   SignAndBroadcastRequest, SignAndBroadcastResponse,
   GenerateWalletRecoveryPhraseFunc
@@ -31,12 +29,11 @@ export default class AdaWalletsStore extends Store {
 
   setup(): void {
     super.setup();
-    const { router, ada, walletBackup } = this.actions;
+    const { ada, walletBackup } = this.actions;
     const { wallets } = ada;
     walletBackup.finishWalletBackup.listen(this._createInDb);
     wallets.createWallet.listen(this._startWalletCreation);
     wallets.sendMoney.listen(this._sendMoney);
-    router.goToRoute.listen(this._onRouteChange);
   }
 
   // =================== SEND MONEY ==================== //
@@ -86,18 +83,6 @@ export default class AdaWalletsStore extends Store {
     this.sendMoneyRequest.reset();
     // go to transaction screen
     this.stores.wallets.goToWalletRoute(transactionDetails.publicDeriver);
-  };
-
-  // TODO: delete this and put this logic inside componentWillUnmount
-  @action _onRouteChange: {|
-    route: string,
-    params: ?Object,
-    forceRefresh?: boolean,
-  |} => void = (options) => {
-    // Reset the send request anytime we visit the send page (e.g: to remove any previous errors)
-    if (matchRoute(ROUTES.WALLETS.SEND, buildRoute(options.route, options.params)) !== false) {
-      this.sendMoneyRequest.reset();
-    }
   };
 
   // =================== WALLET RESTORATION ==================== //

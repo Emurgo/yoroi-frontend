@@ -18,6 +18,6 @@ export default class DelegationTransactionActions {
     password: string,
     publicDeriver: PublicDeriver<>,
   |}> = new AsyncAction();
-  complete: Action<PublicDeriver<>> = new Action();
+  complete: Action<void> = new Action();
   reset: Action<void> = new Action();
 }

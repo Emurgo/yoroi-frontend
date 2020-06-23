@@ -48,6 +48,10 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     return (selectedApiType: any);
   }
 
+  componentWillUnmount() {
+    this.generated.stores.substores.ada.wallets.sendMoneyRequest.reset();
+  }
+
   render(): Node {
     const {
       currencyUnit,

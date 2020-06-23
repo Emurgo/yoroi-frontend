@@ -174,7 +174,15 @@ const WalletsSubpages = (stores, actions) => (
     />
     <Route
       path={ROUTES.WALLETS.SWITCH}
-      component={(_props) => <></> /* this is a temporary state as the wallet is switching wallets. Faster than user can really notice or skipped entirely */}
+      component={(_props) => {
+        // this is a temporary state as the wallet is switching wallets.
+        // if switching to a new wallet, a blank screen is just flashed for a very brief amount of time
+        // if pressing "back" after switching wallets, it will stop the user from going back
+        React.useEffect(() => {
+          stores.router.goForward();
+        });
+        return (<></>);
+      }}
     />
     <Redirect to={ROUTES.WALLETS.TRANSACTIONS} />
   </Switch>

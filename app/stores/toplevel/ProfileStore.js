@@ -134,7 +134,7 @@ export default class ProfileStore extends Store {
             // if user only has 1 wallet, just go to it directly as a shortcut
             this.actions.router.goToRoute.trigger({
               route: ROUTES.WALLETS.TRANSACTIONS,
-              params: { id: firstWallet.getPublicDeriverId() }
+              publicDeriver: firstWallet,
             });
           } else {
             this.actions.router.goToRoute.trigger({

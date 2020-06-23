@@ -446,7 +446,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       router: {|
         goToRoute: {|
           trigger: (params: {|
-            forceRefresh?: boolean,
+            publicDeriver?: null | PublicDeriver<>,
             params?: ?any,
             route: string
           |}) => void

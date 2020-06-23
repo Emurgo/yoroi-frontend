@@ -60,9 +60,6 @@ export default class Wallet extends Component<Props> {
     if (selected == null) return false;
     const screenRoute = buildRoute(
       route,
-      {
-        id: selected.getPublicDeriverId(),
-      }
     );
     // only check that the page is a prefix of the current route (to handle subpages)
     if (matchesPrefix === true) {
@@ -77,7 +74,6 @@ export default class Wallet extends Component<Props> {
     if (selected == null) return;
     this.generated.actions.router.goToRoute.trigger({
       route,
-      params: { id: selected.getPublicDeriverId() },
     });
   };
 
@@ -151,7 +147,7 @@ export default class Wallet extends Component<Props> {
       router: {|
         goToRoute: {|
           trigger: (params: {|
-            forceRefresh?: boolean,
+            publicDeriver?: null | PublicDeriver<>,
             params?: ?any,
             route: string
           |}) => void

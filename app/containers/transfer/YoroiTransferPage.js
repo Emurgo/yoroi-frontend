@@ -299,7 +299,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
       router: {|
         goToRoute: {|
           trigger: (params: {|
-            forceRefresh?: boolean,
+            publicDeriver?: null | PublicDeriver<>,
             params?: ?any,
             route: string
           |}) => void
