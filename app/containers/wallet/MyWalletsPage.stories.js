@@ -14,6 +14,7 @@ import CachedRequest from '../../stores/lib/LocalizedCachedRequest';
 import type { GetBalanceFunc } from '../../api/common/types';
 import MyWalletsPage from './MyWalletsPage';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
+import { ROUTES } from '../../routes-config';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -115,10 +116,11 @@ export const Wallets = (): Node => {
       SidebarContainerProps: {
         generated: {
           stores: {
-            sidebar: {
-              isActiveCategory: (_category) => false,
-              categories: [],
+            wallets: {
+              hasAnyWallets: publicDerivers.length > 0,
+              selected: null,
             },
+            app: { currentRoute: ROUTES.MY_WALLETS },
             profile: {
               isSidebarExpanded: false,
             },
@@ -127,8 +129,8 @@ export const Wallets = (): Node => {
             profile: {
               toggleSidebar: { trigger: async (req) => action('toggleSidebar')(req) },
             },
-            sidebar: {
-              activateSidebarCategory: { trigger: action('activateSidebarCategory') },
+            router: {
+              goToRoute: { trigger: action('goToRoute') },
             },
           },
         },

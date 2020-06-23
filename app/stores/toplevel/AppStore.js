@@ -11,7 +11,6 @@ export default class AppStore extends Store {
     super.setup();
     this.actions.router.goToRoute.listen(this._updateRouteLocation);
     this.actions.router.redirect.listen(this._redirect);
-    this.actions.router.goToTransactionsList.listen(this._setRouteLocationToTransactionsList);
   }
 
   @computed get currentRoute(): string {
@@ -48,7 +47,7 @@ export default class AppStore extends Store {
       }
       // we can't clear the browser history programmatically (requires root privilege)
       // so instead, we route the user to a page that blocks the back button
-      this.stores.router.push({ pathname: ROUTES.WALLETS.SWITCH });
+      this.stores.router.push({ pathname: ROUTES.SWITCH });
       // we need the timeout otherwise mobx will optimize out the fake path
       setTimeout(() => {
         this.stores.router.push({ pathname: routePath });
@@ -56,13 +55,5 @@ export default class AppStore extends Store {
     } else if (currentRoute !== routePath) {
       this.stores.router.push(routePath);
     }
-  };
-
-  _setRouteLocationToTransactionsList: {| params: ?Object |} => void = (
-    options
-  ) => {
-    const routePath = buildRoute(ROUTES.WALLETS.TRANSACTIONS, options.params);
-    const currentRoute = this.stores.router.location.pathname;
-    if (currentRoute !== routePath) this.stores.router.push(routePath);
   };
 }

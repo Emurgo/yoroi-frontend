@@ -15,12 +15,12 @@ import type { GeneratedData as BannerContainerData } from '../banners/BannerCont
 import WalletWithNavigation from '../../components/wallet/layouts/WalletWithNavigation';
 import NavBarBack from '../../components/topbar/NavBarBack';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
-import { buildRoute, } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { WarningList } from '../../stores/toplevel/WalletSettingsStore';
+import { allCategories } from '../../stores/stateless/topbarCategories';
 
 export type GeneratedData = typeof Wallet.prototype.generated;
 
@@ -47,35 +47,30 @@ export default class Wallet extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  componentDidMount() {
+    const publicDeriver = this.generated.stores.wallets.selected;
+    if (publicDeriver == null) throw new Error(`${nameof(Wallet)} no public deriver`);
+
+    const activeCategory = allCategories.find(
+      category => this.generated.stores.app.currentRoute.startsWith(category.route)
+    );
+    if (activeCategory == null) return;
+    if (!activeCategory.isVisible({ selected: publicDeriver })) {
+      const firstValidCategory = allCategories.find(
+        category => category.isVisible({ selected: publicDeriver })
+      );
+      if (firstValidCategory == null) {
+        throw new Error(`Selected wallet has no valid category`);
+      }
+      this.generated.actions.router.redirect.trigger({
+        route: firstValidCategory.route,
+      });
+    }
+  }
+
   navigateToWallets: string => void = (destination) => {
     this.generated.actions.router.goToRoute.trigger({ route: destination });
   }
-
-  isActiveScreen: (
-    route: string,
-    matchesPrefix: ?boolean
-  ) => boolean = (route, matchesPrefix) => {
-    const { app } = this.generated.stores;
-    const { selected } = this.generated.stores.wallets;
-    if (selected == null) return false;
-    const screenRoute = buildRoute(
-      route,
-    );
-    // only check that the page is a prefix of the current route (to handle subpages)
-    if (matchesPrefix === true) {
-      return app.currentRoute.indexOf(screenRoute) !== -1;
-    }
-    return app.currentRoute === screenRoute;
-  };
-
-  handleWalletNavItemClick: (string) => void = (route) => {
-    const { wallets } = this.generated.stores;
-    const selected = wallets.selected;
-    if (selected == null) return;
-    this.generated.actions.router.goToRoute.trigger({
-      route,
-    });
-  };
 
   render(): Node {
     const { intl } = this.context;
@@ -121,9 +116,19 @@ export default class Wallet extends Component<Props> {
       >
         {warning}
         <WalletWithNavigation
-          wallet={selectedWallet}
-          isActiveScreen={this.isActiveScreen}
-          onWalletNavItemClick={this.handleWalletNavItemClick}
+          categories={
+            allCategories
+              .filter(category => category.isVisible({ selected: selectedWallet }))
+              .map(category => ({
+                className: category.className,
+                icon: category.icon,
+                label: category.label,
+                isActive: this.generated.stores.app.currentRoute.startsWith(category.route),
+                onClick: () => this.generated.actions.router.goToRoute.trigger({
+                  route: category.route,
+                }),
+              }))
+          }
         >
           {this.props.children}
         </WalletWithNavigation>
@@ -150,8 +155,14 @@ export default class Wallet extends Component<Props> {
             publicDeriver?: null | PublicDeriver<>,
             params?: ?any,
             route: string
+          |}) => void,
+        |},
+        redirect: {|
+          trigger: (params: {|
+            params?: ?any,
+            route: string
           |}) => void
-        |}
+        |},
       |}
     |},
     stores: {|
@@ -185,6 +196,7 @@ export default class Wallet extends Component<Props> {
       actions: {
         router: {
           goToRoute: { trigger: actions.router.goToRoute.trigger },
+          redirect: { trigger: actions.router.redirect.trigger },
         },
       },
       SidebarContainerProps: ({ actions, stores, }: InjectedOrGenerated<SidebarContainerData>),

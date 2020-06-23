@@ -63,7 +63,6 @@ const genBaseProps: {|
     },
     wallets: {
       selected: request.wallet,
-      activeWalletRoute: request.wallet == null ? null : '',
       refreshWalletFromRemote: async () => action('refreshWalletFromRemote')(),
     },
     coinPriceStore: {

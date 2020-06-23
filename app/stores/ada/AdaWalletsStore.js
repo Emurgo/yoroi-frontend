@@ -17,6 +17,7 @@ import {
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { ROUTES } from '../../routes-config';
 
 export default class AdaWalletsStore extends Store {
 
@@ -81,8 +82,7 @@ export default class AdaWalletsStore extends Store {
 
     this.actions.dialogs.closeActiveDialog.trigger();
     this.sendMoneyRequest.reset();
-    // go to transaction screen
-    this.stores.wallets.goToWalletRoute(transactionDetails.publicDeriver);
+    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
   };
 
   // =================== WALLET RESTORATION ==================== //

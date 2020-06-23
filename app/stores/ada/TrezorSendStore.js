@@ -23,6 +23,7 @@ import {
 } from '../../domain/TrezorLocalizedError';
 import LocalizableError from '../../i18n/LocalizableError';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { ROUTES } from '../../routes-config';
 
 /** Note: Handles Trezor Signing */
 export default class TrezorSendStore extends Store {
@@ -144,9 +145,7 @@ export default class TrezorSendStore extends Store {
     }
 
     this.actions.dialogs.closeActiveDialog.trigger();
-
-    // go to transaction screen
-    wallets.goToWalletRoute(publicDeriver);
+    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
 
     Logger.info('SUCCESS: ADA sent using Trezor SignTx');
   }

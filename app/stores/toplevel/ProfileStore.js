@@ -124,7 +124,7 @@ export default class ProfileStore extends Store {
         await this.stores.coinPriceStore.refreshCurrentCoinPrice();
 
         await wallets.restoreWalletsFromStorage();
-        if (wallets.hasAnyPublicDeriver && this.stores.loading.fromUriScheme) {
+        if (wallets.hasAnyWallets && this.stores.loading.fromUriScheme) {
           this.actions.router.goToRoute.trigger({ route: ROUTES.SEND_FROM_URI.ROOT });
         } else {
           const firstWallet = wallets.first;
@@ -133,7 +133,7 @@ export default class ProfileStore extends Store {
           } else if (wallets.publicDerivers.length === 1) {
             // if user only has 1 wallet, just go to it directly as a shortcut
             this.actions.router.goToRoute.trigger({
-              route: ROUTES.WALLETS.TRANSACTIONS,
+              route: ROUTES.WALLETS.ROOT,
               publicDeriver: firstWallet,
             });
           } else {

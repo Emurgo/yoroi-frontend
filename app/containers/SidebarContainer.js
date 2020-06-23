@@ -1,3 +1,4 @@
+
 // @flow
 import type { Node } from 'react';
 import React, { Component } from 'react';
@@ -5,7 +6,8 @@ import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import Sidebar from '../components/topbar/Sidebar';
 import type { InjectedOrGenerated } from '../types/injectedPropsType';
-import type { Category } from '../config/sidebarConfig';
+import { allCategories } from '../stores/stateless/sidebarCategories';
+import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
 
 export type GeneratedData = typeof SidebarContainer.prototype.generated;
 
@@ -17,16 +19,24 @@ export default class SidebarContainer extends Component<InjectedOrGenerated<Gene
   }
 
   render(): Node {
-    const { actions, stores } = this.generated;
-    const { sidebar, profile } = stores;
+    const { stores } = this.generated;
+    const { profile } = stores;
 
     return (
       <Sidebar
         onCategoryClicked={category => {
-          actions.sidebar.activateSidebarCategory.trigger({ category });
+          this.generated.actions.router.goToRoute.trigger({
+            route: category.route,
+          });
         }}
-        isActiveCategory={sidebar.isActiveCategory}
-        categories={sidebar.categories}
+        isActiveCategory={
+          category => this.generated.stores.app.currentRoute.startsWith(category.route)
+        }
+        categories={allCategories.filter(category => category.isVisible({
+          hasAnyWallets: this.generated.stores.wallets.hasAnyWallets,
+          selected: this.generated.stores.wallets.selected,
+          currentRoute: this.generated.stores.app.currentRoute,
+        }))}
         onToggleSidebar={this.toggleSidebar}
         isSidebarExpanded={profile.isSidebarExpanded}
       />
@@ -40,17 +50,22 @@ export default class SidebarContainer extends Component<InjectedOrGenerated<Gene
           trigger: (params: void) => Promise<void>
         |}
       |},
-      sidebar: {|
-        activateSidebarCategory: {|
-          trigger: (params: {| category: string |}) => void
+      router: {|
+        goToRoute: {|
+          trigger: (params: {|
+            publicDeriver?: null | PublicDeriver<>,
+            params?: ?any,
+            route: string
+          |}) => void
         |}
-      |}
+      |},
     |},
     stores: {|
+      app: {| currentRoute: string |},
       profile: {| isSidebarExpanded: boolean |},
-      sidebar: {|
-        categories: Array<Category>,
-        isActiveCategory: Category => boolean
+      wallets: {|
+        hasAnyWallets: boolean,
+        selected: null | PublicDeriver<>
       |}
     |}
     |} {
@@ -63,20 +78,23 @@ export default class SidebarContainer extends Component<InjectedOrGenerated<Gene
     const { stores, actions } = this.props;
     return Object.freeze({
       stores: {
-        sidebar: {
-          isActiveCategory: stores.sidebar.isActiveCategory,
-          categories: stores.sidebar.categories,
-        },
         profile: {
           isSidebarExpanded: stores.profile.isSidebarExpanded,
+        },
+        app: {
+          currentRoute: stores.app.currentRoute,
+        },
+        wallets: {
+          selected: stores.wallets.selected,
+          hasAnyWallets: stores.wallets.hasAnyWallets,
         },
       },
       actions: {
         profile: {
           toggleSidebar: { trigger: actions.profile.toggleSidebar.trigger },
         },
-        sidebar: {
-          activateSidebarCategory: { trigger: actions.sidebar.activateSidebarCategory.trigger },
+        router: {
+          goToRoute: { trigger: actions.router.goToRoute.trigger },
         },
       },
     });

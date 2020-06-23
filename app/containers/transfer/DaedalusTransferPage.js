@@ -90,10 +90,9 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
         } catch (_e) {
           // still need to re-route even if refresh failed
         }
-        if (walletsStore.activeWalletRoute != null) {
-          const newRoute = walletsStore.activeWalletRoute;
+        if (walletsStore.selected != null) {
           this.generated.actions.router.goToRoute.trigger({
-            route: newRoute
+            route: ROUTES.WALLETS.ROOT
           });
         }
       },
@@ -275,7 +274,6 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
         |}
       |},
       wallets: {|
-        activeWalletRoute: ?string,
         refreshWalletFromRemote: (
           PublicDeriver<>
         ) => Promise<void>,
@@ -304,7 +302,6 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
         },
         wallets: {
           selected: stores.wallets.selected,
-          activeWalletRoute: stores.wallets.activeWalletRoute,
           refreshWalletFromRemote: stores.wallets.refreshWalletFromRemote,
         },
         coinPriceStore: {

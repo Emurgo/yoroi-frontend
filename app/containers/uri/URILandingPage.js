@@ -17,7 +17,7 @@ export default class URILandingPage extends Component<InjectedOrGenerated<Genera
 
   onClose: void => void = () => {
     this.generated.actions.dialogs.closeActiveDialog.trigger();
-    this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS });
+    this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
     this.generated.stores.loading.resetUriParams();
   };
 
