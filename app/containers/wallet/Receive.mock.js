@@ -37,7 +37,8 @@ export const mockReceiveProps: {|
         resetFilter: { trigger: action('resetFilter') },
       },
       router: {
-        goToRoute: { trigger: action('goToRouter') }
+        redirect: { trigger: action('redirect') },
+        goToRoute: { trigger: action('goToRouter') },
       }
     }
   },
