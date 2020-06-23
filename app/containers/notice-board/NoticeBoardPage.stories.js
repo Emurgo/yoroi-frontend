@@ -98,6 +98,9 @@ export const Generic = (): Node => {
                   ServerStatusErrors.Healthy,
                 ),
               },
+              wallets: {
+                selected: null,
+              },
             },
             actions: Object.freeze({}),
           },

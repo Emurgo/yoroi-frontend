@@ -12,6 +12,7 @@ import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner
 import environment from '../../environment';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 export type GeneratedData = typeof BannerContainer.prototype.generated;
 
@@ -28,7 +29,11 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
         <TestnetWarningBanner />
         {!environment.isProduction() && <NotProductionBanner />}
         {/* <ByronDeprecationBanner /> */}
-        {environment.isJormungandr() && <ItnDeprecationBanner />}
+        {
+          environment.isJormungandr() &&
+          this.generated.stores.wallets.selected != null &&
+          <ItnDeprecationBanner />
+        }
       </>
     );
   }
@@ -37,7 +42,8 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
     stores: {|
       serverConnectionStore: {|
         checkAdaServerStatus: ServerStatusErrorType
-      |}
+      |},
+      wallets: {| selected: null | PublicDeriver<> |}
     |},
     actions: {||},
     |} {
@@ -52,6 +58,9 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
       stores: {
         serverConnectionStore: {
           checkAdaServerStatus: stores.serverConnectionStore.checkAdaServerStatus,
+        },
+        wallets: {
+          selected: stores.wallets.selected,
         },
       },
       actions: Object.freeze({}),

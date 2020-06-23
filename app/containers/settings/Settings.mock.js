@@ -115,6 +115,9 @@ export const mockSettingsProps: {
               ServerStatusErrors.Healthy,
             ),
           },
+          wallets: {
+            selected: null,
+          },
         },
         actions: Object.freeze({}),
       },

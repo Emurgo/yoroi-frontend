@@ -145,6 +145,9 @@ export const Wallets = (): Node => {
                 ServerStatusErrors.Healthy,
               ),
             },
+            wallets: {
+              selected: null,
+            },
           },
           actions: Object.freeze({}),
         },

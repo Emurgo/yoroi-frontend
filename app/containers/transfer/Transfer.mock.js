@@ -173,6 +173,9 @@ export const mockTransferProps: {
               ServerStatusErrors.Healthy,
             ),
           },
+          wallets: {
+            selected: request.selected,
+          },
         },
         actions: Object.freeze({}),
       },

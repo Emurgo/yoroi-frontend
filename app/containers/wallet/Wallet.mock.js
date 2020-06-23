@@ -118,6 +118,9 @@ export const mockWalletProps: {
               ServerStatusErrors.Healthy,
             ),
           },
+          wallets: {
+            selected: request.selected,
+          },
         },
         actions: {},
       },

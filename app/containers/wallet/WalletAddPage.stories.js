@@ -161,6 +161,9 @@ const defaultProps: {|
             ServerStatusErrors.Healthy,
           ),
         },
+        wallets: {
+          selected: null,
+        },
       },
       actions: Object.freeze({}),
     },
