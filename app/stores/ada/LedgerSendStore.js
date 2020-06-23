@@ -39,7 +39,7 @@ import {
 import {
   prepareLedgerConnect,
 } from '../../utils/hwConnectHandler';
-
+import { ROUTES } from '../../routes-config';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 /** Note: Handles Ledger Signing */
@@ -190,9 +190,7 @@ export default class LedgerSendStore extends Store {
     }
 
     this.actions.dialogs.closeActiveDialog.trigger();
-
-    // go to transaction screen
-    wallets.goToWalletRoute(publicDeriver);
+    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
 
     this._reset();
     Logger.info('SUCCESS: ADA sent using Ledger SignTx');

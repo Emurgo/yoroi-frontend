@@ -14,6 +14,4 @@ export default class RouterActions {
     route: string,
     params?: ?Object,
   |}> = new Action();
-
-  goToTransactionsList: Action<{| params?: ?Object |}> = new Action();
 }

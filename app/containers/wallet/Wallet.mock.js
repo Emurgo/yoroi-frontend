@@ -45,15 +45,17 @@ export const mockWalletProps: {
     actions: {
       router: {
         goToRoute: { trigger: action('goToRoute') },
+        redirect: { trigger: action('redirect') },
       },
     },
     SidebarContainerProps: {
       generated: {
         stores: {
-          sidebar: {
-            isActiveCategory: (_category) => false,
-            categories: [],
+          wallets: {
+            hasAnyWallets: request.publicDerivers.length > 0,
+            selected: request.selected,
           },
+          app: { currentRoute: request.location },
           profile: {
             isSidebarExpanded: false,
           },
@@ -62,8 +64,8 @@ export const mockWalletProps: {
           profile: {
             toggleSidebar: { trigger: async (req) => action('toggleSidebar')(req) },
           },
-          sidebar: {
-            activateSidebarCategory: { trigger: action('activateSidebarCategory') },
+          router: {
+            goToRoute: { trigger: action('goToRoute') },
           },
         },
       },
@@ -115,6 +117,9 @@ export const mockWalletProps: {
               ServerStatusErrors,
               ServerStatusErrors.Healthy,
             ),
+          },
+          wallets: {
+            selected: request.selected,
           },
         },
         actions: {},

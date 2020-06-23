@@ -109,10 +109,9 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         const timeToRefresh = (new Date().getTime()) - preRefreshTime;
         await new Promise(resolve => {
           setTimeout(() => {
-            if (walletsStore.activeWalletRoute != null) {
-              const newRoute = walletsStore.activeWalletRoute;
+            if (walletsStore.selected != null) {
               this.generated.actions.router.goToRoute.trigger({
-                route: newRoute
+                route: ROUTES.WALLETS.ROOT
               });
             }
             resolve();
@@ -337,7 +336,6 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         |}) => boolean,
       |},
       wallets: {|
-        activeWalletRoute: ?string,
         refreshWalletFromRemote: (
           PublicDeriver<>
         ) => Promise<void>,
@@ -363,7 +361,6 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         },
         wallets: {
           selected: stores.wallets.selected,
-          activeWalletRoute: stores.wallets.activeWalletRoute,
           refreshWalletFromRemote: stores.wallets.refreshWalletFromRemote,
         },
         coinPriceStore: {

@@ -16,7 +16,6 @@ import NoNotice from '../../components/notice-board/NoNotice';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import Notice from '../../domain/Notice';
 import type { GetNoticesRequestOptions } from '../../api/ada/index';
-import type { Category } from '../../config/sidebarConfig';
 
 const messages = defineMessages({
   title: {
@@ -86,11 +85,6 @@ export default class NoticeBoardPage extends Component<InjectedOrGenerated<Gener
           trigger: (params: void) => Promise<void>
         |}
       |},
-      sidebar: {|
-        activateSidebarCategory: {|
-          trigger: (params: {| category: string |}) => void
-        |}
-      |}
     |},
     stores: {|
       noticeBoard: {|
@@ -100,10 +94,6 @@ export default class NoticeBoardPage extends Component<InjectedOrGenerated<Gener
         searchOptions: GetNoticesRequestOptions
       |},
       profile: {| isClassicTheme: boolean |},
-      sidebar: {|
-        categories: Array<Category>,
-        isActiveCategory: Category => boolean
-      |}
     |}
     |} {
     if (this.props.generated !== undefined) {
@@ -119,10 +109,6 @@ export default class NoticeBoardPage extends Component<InjectedOrGenerated<Gener
         profile: {
           isClassicTheme: profileStore.isClassicTheme,
         },
-        sidebar: {
-          isActiveCategory: stores.sidebar.isActiveCategory,
-          categories: stores.sidebar.categories,
-        },
         noticeBoard: {
           loadedNotices: stores.noticeBoard.loadedNotices,
           searchOptions: stores.noticeBoard.searchOptions,
@@ -131,9 +117,6 @@ export default class NoticeBoardPage extends Component<InjectedOrGenerated<Gener
         },
       },
       actions: {
-        sidebar: {
-          activateSidebarCategory: { trigger: actions.sidebar.activateSidebarCategory.trigger },
-        },
         noticeBoard: {
           loadMore: { trigger: actions.noticeBoard.loadMore.trigger },
         },

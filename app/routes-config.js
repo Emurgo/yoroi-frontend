@@ -10,9 +10,9 @@ export const ROUTES = {
     COMPLEXITY_LEVEL: '/profile/complexity-level',
     URI_PROMPT: '/profile/uri-prompt',
   },
+  SWITCH: '/switch',
   WALLETS: {
     ROOT: '/wallets',
-    SWITCH: '/wallets/switch',
     ADD: '/wallets/add',
     TRANSACTIONS: '/wallets/transactions',
     SEND: '/wallets/send',

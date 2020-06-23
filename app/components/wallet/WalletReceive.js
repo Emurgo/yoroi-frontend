@@ -11,7 +11,8 @@ import CopyableAddress from '../widgets/CopyableAddress';
 import RawHash from '../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import type { ExplorerType } from '../../domain/Explorer';
-import type { StandardAddress } from '../../types/AddressFilterTypes';
+import type { AddressFilterKind, StandardAddress } from '../../types/AddressFilterTypes';
+import { addressFilter, AddressFilter, } from '../../types/AddressFilterTypes';
 import environment from '../../environment';
 import type { Notification } from '../../types/notificationType';
 import type {
@@ -61,7 +62,10 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +hierarchy: Array<string>,
+  +hierarchy: {|
+    path: Array<string>,
+    filter: AddressFilterKind,
+  |},
   +header: Node,
   +selectedExplorer: ExplorerType,
   +walletAddresses: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
@@ -172,10 +176,19 @@ export default class WalletReceive extends Component<Props> {
   }
 
   getHierarchy: void => Node = () => {
-    const hierarchy = this.props.hierarchy.join(' > ');
+    const { intl } = this.context;
+    const hierarchy = this.props.hierarchy.path.join(' > ');
+
+    const filter = this.props.hierarchy.filter === AddressFilter.None
+      ? null
+      : (
+        <span className={styles.filter}>
+          [{intl.formatMessage(addressFilter[this.props.hierarchy.filter])}]
+        </span>
+      );
     return (
       <div className={styles.hierarchy}>
-        {hierarchy}
+        {hierarchy} {filter}
       </div>
     );
   };

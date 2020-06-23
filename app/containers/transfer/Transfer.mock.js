@@ -57,20 +57,21 @@ export const mockTransferProps: {
     SidebarContainerProps: {
       generated: {
         stores: {
-          sidebar: {
-            isActiveCategory: (_category) => false,
-            categories: [],
-          },
           profile: {
             isSidebarExpanded: false,
           },
+          wallets: {
+            hasAnyWallets: request.publicDerivers.length > 0,
+            selected: request.selected,
+          },
+          app: { currentRoute: request.currentRoute },
         },
         actions: {
           profile: {
             toggleSidebar: { trigger: async (req) => action('toggleSidebar')(req) },
           },
-          sidebar: {
-            activateSidebarCategory: { trigger: action('activateSidebarCategory') },
+          router: {
+            goToRoute: { trigger: action('goToRoute') },
           },
         },
       },
@@ -171,6 +172,9 @@ export const mockTransferProps: {
               ServerStatusErrors,
               ServerStatusErrors.Healthy,
             ),
+          },
+          wallets: {
+            selected: request.selected,
           },
         },
         actions: Object.freeze({}),

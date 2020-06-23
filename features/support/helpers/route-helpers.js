@@ -18,9 +18,3 @@ export const navigateTo: string => Promise<void> = function (requestedRoute) {
     window.yoroi.actions.router.goToRoute.trigger({ route });
   }, requestedRoute);
 };
-
-export const navigateToTransactionsList: any => Promise<void> = function (client) {
-  return client.driver.executeScript(() => {
-    window.yoroi.actions.router.goToTransactionsList.trigger();
-  });
-};

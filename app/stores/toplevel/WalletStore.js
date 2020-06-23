@@ -3,7 +3,7 @@ import { observable, action, computed, runInAction } from 'mobx';
 import { debounce, find, } from 'lodash';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
-import { buildRoute, matchRoute } from '../../utils/routing';
+import { matchRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import environment from '../../environment';
 import config from '../../config';
@@ -157,9 +157,6 @@ export default class WalletStore extends Store {
     setInterval(this._pollRefresh, this.WALLET_REFRESH_INTERVAL);
     // $FlowExpectedError[incompatible-call] built-in types can't handle visibilitychange
     document.addEventListener('visibilitychange', debounce(this._pollRefresh, this.ON_VISIBLE_DEBOUNCE_WAIT));
-    this.registerReactions([
-      this._showAddWalletPageWhenNoWallets,
-    ]);
   }
 
   @action
@@ -172,8 +169,6 @@ export default class WalletStore extends Store {
       const withCache = await this.populateCacheForWallet(newPublicDeriver);
       newWithCachedData.push(withCache);
     }
-    this.actions.dialogs.closeActiveDialog.trigger();
-    this.goToWalletRoute(newWithCachedData[0]);
 
     this.showWalletCreatedNotification();
 
@@ -192,6 +187,8 @@ export default class WalletStore extends Store {
       this._setActiveWallet({
         wallet: newWithCachedData[0]
       });
+      this.actions.dialogs.closeActiveDialog.trigger();
+      this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
     });
   }
 
@@ -223,31 +220,6 @@ export default class WalletStore extends Store {
     return this.publicDerivers.length === 0
       ? null
       : this.publicDerivers[0];
-  }
-
-  @computed get hasAnyPublicDeriver(): boolean {
-    return this.publicDerivers.length > 0;
-  }
-
-  @computed get activeWalletRoute(): ?string {
-    if (this.selected == null) return null;
-    return this.getWalletRoute(this.selected);
-  }
-
-  @computed get isWalletRoute(): boolean {
-    const { currentRoute } = this.stores.app;
-    return matchRoute(ROUTES.WALLETS.ROOT + '(/*rest)', currentRoute) !== false;
-  }
-
-  getWalletRoute: PublicDeriver<> => string = (
-    _publicDeriver,
-  ) => (
-    buildRoute(ROUTES.WALLETS.TRANSACTIONS)
-  );
-
-  goToWalletRoute: PublicDeriver<> => void = (publicDeriver) => {
-    const route = this.getWalletRoute(publicDeriver);
-    this.actions.router.goToRoute.trigger({ route });
   }
 
   refreshWalletFromRemote: PublicDeriver<> => Promise<void> = async (
@@ -300,7 +272,6 @@ export default class WalletStore extends Store {
   ): Promise<void> => {
     const lastSyncInfo = await publicDeriver.getLastSyncInfo();
     const withCache = await this.populateCacheForWallet(publicDeriver);
-    this.goToWalletRoute(withCache);
 
     this.registerObserversForNewWallet({
       publicDeriver: withCache,
@@ -312,6 +283,7 @@ export default class WalletStore extends Store {
       this._setActiveWallet({
         wallet: withCache
       });
+      this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
     });
   }
 
@@ -411,12 +383,6 @@ export default class WalletStore extends Store {
         // note: don't need to await since UI will handle this
         this.refreshWalletFromRemote(selected);
       }
-    }
-  };
-
-  _showAddWalletPageWhenNoWallets: void => void = () => {
-    if (this.isWalletRoute && !this.hasAnyWallets) {
-      this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
     }
   };
 

@@ -71,7 +71,7 @@ export default class MyWalletsPage extends Component<Props> {
     publicDeriver
   ) => {
     this.generated.actions.router.goToRoute.trigger({
-      route: ROUTES.WALLETS.TRANSACTIONS,
+      route: ROUTES.WALLETS.ROOT,
       publicDeriver
     });
   };

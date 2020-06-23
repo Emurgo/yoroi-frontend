@@ -44,6 +44,7 @@ import type { ConfigType } from '../config/config-types';
 import ComplexityLevelSettingsPage from './containers/settings/categories/ComplexityLevelSettingsPage';
 import ComplexityLevelPage from './containers/profile/ComplexityLevelPage';
 import BlockchainSettingsPage from './containers/settings/categories/BlockchainSettingsPage';
+import WalletSwitch from './containers/WalletSwitch';
 
 declare var CONFIG: ConfigType;
 
@@ -131,6 +132,11 @@ export const Routes = (
         path={ROUTES.NOTICE_BOARD.ROOT}
         component={(props) => <NoticeBoardPage {...props} stores={stores} actions={actions} />}
       />
+      <Route
+        exact
+        path={ROUTES.SWITCH}
+        component={(props) => <WalletSwitch {...props} stores={stores} actions={actions} />}
+      />
       <Redirect to={ROUTES.MY_WALLETS} />
     </Switch>
   </div>
@@ -171,18 +177,6 @@ const WalletsSubpages = (stores, actions) => (
       exact
       path={ROUTES.WALLETS.DELEGATION_ADVANCE}
       component={(props) => <StakingPage {...props} stores={stores} actions={actions} urlTemplate={CONFIG.seiza.advanceTemplate} />}
-    />
-    <Route
-      path={ROUTES.WALLETS.SWITCH}
-      component={(_props) => {
-        // this is a temporary state as the wallet is switching wallets.
-        // if switching to a new wallet, a blank screen is just flashed for a very brief amount of time
-        // if pressing "back" after switching wallets, it will stop the user from going back
-        React.useEffect(() => {
-          stores.router.goForward();
-        });
-        return (<></>);
-      }}
     />
     <Redirect to={ROUTES.WALLETS.TRANSACTIONS} />
   </Switch>

@@ -21,7 +21,6 @@ import WalletSummaryPage from './WalletSummaryPage';
 import { getDefaultExplorer } from '../../domain/Explorer';
 import { THEMES } from '../../themes';
 import { mockWalletProps } from './Wallet.mock';
-import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import AddMemoDialog from '../../components/wallet/memos/AddMemoDialog';
 import EditMemoDialog from '../../components/wallet/memos/EditMemoDialog';
@@ -55,11 +54,6 @@ export default {
   component: WalletSummaryPage,
   decorators: [withScreenshot],
 };
-
-const getRoute = (id) => buildRoute(
-  ROUTES.WALLETS.TRANSACTIONS,
-  { id, }
-);
 
 const actions = {
   notifications: {
@@ -102,7 +96,7 @@ export const Loading = (): Node => {
   const lookup = walletLookup([wallet]);
   return wrapWallet(
     mockWalletProps({
-      location: getRoute(wallet.publicDeriver.getPublicDeriverId()),
+      location: ROUTES.WALLETS.TRANSACTIONS,
       selected: wallet.publicDeriver,
       ...lookup,
     }),
@@ -386,7 +380,7 @@ export const Transaction = (): Node => {
   );
   return wrapWallet(
     mockWalletProps({
-      location: getRoute(wallet.publicDeriver.getPublicDeriverId()),
+      location: ROUTES.WALLETS.TRANSACTIONS,
       selected: wallet.publicDeriver,
       ...lookup,
     }),
@@ -456,7 +450,7 @@ export const TransactionWithMemo = (): Node => {
   const transactions = [walletTransaction];
   return wrapWallet(
     mockWalletProps({
-      location: getRoute(wallet.publicDeriver.getPublicDeriverId()),
+      location: ROUTES.WALLETS.TRANSACTIONS,
       selected: wallet.publicDeriver,
       ...lookup,
     }),
@@ -549,7 +543,7 @@ export const MemoDialog = (): Node => {
   })();
   return wrapWallet(
     mockWalletProps({
-      location: getRoute(wallet.publicDeriver.getPublicDeriverId()),
+      location: ROUTES.WALLETS.TRANSACTIONS,
       selected: wallet.publicDeriver,
       ...lookup,
     }),
@@ -598,7 +592,7 @@ export const NoTransactions = (): Node => {
   const transactions = [];
   return wrapWallet(
     mockWalletProps({
-      location: getRoute(wallet.publicDeriver.getPublicDeriverId()),
+      location: ROUTES.WALLETS.TRANSACTIONS,
       selected: wallet.publicDeriver,
       ...lookup,
     }),
@@ -665,7 +659,7 @@ export const ManyTransactions = (): Node => {
 
   return wrapWallet(
     mockWalletProps({
-      location: getRoute(wallet.publicDeriver.getPublicDeriverId()),
+      location: ROUTES.WALLETS.TRANSACTIONS,
       selected: wallet.publicDeriver,
       ...lookup,
     }),
@@ -733,7 +727,7 @@ export const TxHistoryExport = (): Node => {
   const getErrorValue = () => select('error', errorCases, errorCases.None);
   return wrapWallet(
     mockWalletProps({
-      location: getRoute(wallet.publicDeriver.getPublicDeriverId()),
+      location: ROUTES.WALLETS.TRANSACTIONS,
       selected: wallet.publicDeriver,
       ...lookup,
     }),
@@ -781,7 +775,7 @@ export const DebugWalletWarning = (): Node => {
   const transactions = [];
   return wrapWallet(
     mockWalletProps({
-      location: getRoute(wallet.publicDeriver.getPublicDeriverId()),
+      location: ROUTES.WALLETS.TRANSACTIONS,
       selected: wallet.publicDeriver,
       getWalletWarnings: (publicDeriver) => ({
         publicDeriver,

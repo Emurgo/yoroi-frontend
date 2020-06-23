@@ -96,18 +96,26 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     this.showMemo = !this.showMemo;
   };
 
-  getApiType: PublicDeriver<> => 'ada' = (publicDeriver) => {
+  getApiType: PublicDeriver<> => 'ada' = (_publicDeriver) => {
+    return 'ada'; // TODO: eventually make send page work for multiple currencies
+  }
+
+  shouldDisable: PublicDeriver<> => boolean = (publicDeriver) => {
+    // we disable in the non-ADA case instead of throwing an error
+    // since the Wallets page should take care of correctly redirecting away from the send page
+    // for currency types that don't support it.
     const selectedApiType = getApiForCoinType(publicDeriver.getParent().getCoinType());
     if (selectedApiType !== ApiOptions.ada) {
-      throw new Error(`${nameof(WalletSendPage)} sending only supported for ADA`);
+      return true;
     }
-    return (selectedApiType: any);
+    return false;
   }
 
   render(): Node {
     const publicDeriver = this.generated.stores.wallets.selected;
     // Guard against potential null values
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(WalletSendPage)}.`);
+    if (this.shouldDisable(publicDeriver)) return null;
 
     const selectedApiType = this.getApiType(publicDeriver);
     const apiMeta = getApiMeta(selectedApiType)?.meta;

@@ -49,6 +49,7 @@ import WalletPaperDialog from '../../components/wallet/WalletPaperDialog';
 import UserPasswordDialog from '../../components/wallet/add/paper-wallets/UserPasswordDialog';
 import { ProgressStep as PaperWalletProgressStep } from '../../stores/ada/PaperWalletCreateStore';
 import { PdfGenSteps } from '../../api/ada/paperWallet/paperWalletPdf';
+import { ROUTES } from '../../routes-config';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -121,20 +122,21 @@ const defaultProps: {|
   SidebarContainerProps: {
     generated: {
       stores: {
-        sidebar: {
-          isActiveCategory: (_category) => false,
-          categories: [],
-        },
         profile: {
           isSidebarExpanded: false,
         },
+        wallets: {
+          hasAnyWallets: boolean('hasAnyWallets', false),
+          selected: null,
+        },
+        app: { currentRoute: ROUTES.WALLETS.ADD },
       },
       actions: {
         profile: {
           toggleSidebar: { trigger: async (req) => action('toggleSidebar')(req) },
         },
-        sidebar: {
-          activateSidebarCategory: { trigger: action('activateSidebarCategory') },
+        router: {
+          goToRoute: { trigger: action('goToRoute') },
         },
       },
     },
@@ -158,6 +160,9 @@ const defaultProps: {|
             ServerStatusErrors,
             ServerStatusErrors.Healthy,
           ),
+        },
+        wallets: {
+          selected: null,
         },
       },
       actions: Object.freeze({}),
