@@ -202,7 +202,7 @@ export default class WalletReceivePage extends Component<Props> {
       throw new Error(`${nameof(WalletReceivePage)} unexpected address tab`);
     })();
 
-    const getSelectedHierarchy = () => {
+    const getSelectedHierarchyPath = () => {
       const selectedStore = addressStores.find(store => store.isActiveStore);
       if (selectedStore == null) return [];
 
@@ -220,7 +220,10 @@ export default class WalletReceivePage extends Component<Props> {
     return (
       <VerticalFlexContainer>
         <WalletReceive
-          hierarchy={getSelectedHierarchy()}
+          hierarchy={{
+            path: getSelectedHierarchyPath(),
+            filter: this.generated.stores.addresses.addressFilter,
+          }}
           header={header}
           selectedExplorer={this.generated.stores.profile.selectedExplorer}
           walletAddresses={addressTypeStore.filtered.slice().reverse()}

@@ -12,6 +12,11 @@
     font-size: 20px;
     padding-bottom: 5px;
     border-bottom: 1px solid var(--theme-separation-border-color);
+
+    .filter {
+      font-size: 14px;
+      margin-left: 14px;
+    }
   }
 
   &::-webkit-scrollbar-button {
