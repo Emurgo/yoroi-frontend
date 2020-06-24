@@ -1,6 +1,7 @@
 .component {
-  height: 78vh;
   display: flex;
+  overflow: hidden;
+  height: 100%;
 }
 
 .navigation {

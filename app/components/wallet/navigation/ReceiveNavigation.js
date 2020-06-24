@@ -19,17 +19,18 @@ import classNames from 'classnames';
 import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
 import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
 
-export type Props = {|
-  +setFilter: AddressFilterKind => void,
-  +activeFilter: AddressFilterKind,
-  +addressStores: Array<{|
+type AddressStoreSubset = {
     +isActiveStore: boolean,
-    +isHidden: boolean,
     +setAsActiveStore: void => void,
     +name: AddressTypeName,
     +validFilters: Array<AddressFilterKind>,
     +wasExecuted: boolean,
-  |}>;
+    ...,
+};
+export type Props = {|
+  +setFilter: AddressFilterKind => void,
+  +activeFilter: AddressFilterKind,
+  +addressStores: $ReadOnlyArray<AddressStoreSubset>;
 |};
 
 @observer
@@ -93,7 +94,7 @@ export default class ReceiveNavigation extends Component<Props> {
         activeHeader={stores.some(address => address.isActiveStore)}
       >
         {stores.map(type => (
-          !type.isHidden && <ReceiveNavButton
+          <ReceiveNavButton
             key={type.name.subgroup}
             className={classNames([type.name.subgroup, type.name.group])}
             icon={
@@ -113,7 +114,7 @@ export default class ReceiveNavigation extends Component<Props> {
 
   createAccordions: void => Node = () => {
     // we use an array instead of a map to maintain the order of stores
-    const groups: Array<$PropertyType<Props, 'addressStores'>> = [];
+    const groups: Array<Array<AddressStoreSubset>> = [];
 
     for (const store of this.props.addressStores) {
       const existingGroup = groups.find(

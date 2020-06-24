@@ -10,14 +10,14 @@ export type Props = {|
   +children?: Node,
   +setFilter: AddressFilterKind => void,
   +activeFilter: AddressFilterKind,
-  +addressStores: Array<{|
+  +addressStores: $ReadOnlyArray<{
     +isActiveStore: boolean,
-    +isHidden: boolean,
     +setAsActiveStore: void => void,
     +name: AddressTypeName,
     +validFilters: Array<AddressFilterKind>,
     +wasExecuted: boolean,
-  |}>;
+    ...,
+  }>;
 |};
 
 @observer

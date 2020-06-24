@@ -72,7 +72,11 @@ export default class Receive extends Component<Props> {
     const { addresses } = this.generated.stores;
     return (
       <ReceiveWithNavigation
-        addressStores={addresses.getStoresForWallet(publicDeriver)}
+        addressStores={
+          addresses
+            .getStoresForWallet(publicDeriver)
+            .filter(store => !store.isHidden)
+        }
         setFilter={filter => this.generated.actions.addresses.setFilter.trigger(filter)}
         activeFilter={this.generated.stores.addresses.addressFilter}
       >
