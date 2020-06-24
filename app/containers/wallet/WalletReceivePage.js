@@ -103,8 +103,7 @@ export default class WalletReceivePage extends Component<Props> {
 
     if (
       addressTypeStore == null ||
-      !addressTypeStore.wasExecuted ||
-      addressTypeStore.all.length === 0
+      !addressTypeStore.wasExecuted
     ) {
       return (
         <VerticallyCenteredLayout>
