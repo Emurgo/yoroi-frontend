@@ -102,15 +102,6 @@ const genBaseProps: {|
   transactionBuilderStore?: *,
   verifyError?: *,
 |} => * = (request) => {
-  const mangledCases = {
-    NoMangled: [],
-    HasMangled: [new BigNumber(0)],
-  };
-  const getMangledValue = () => select(
-    'hasMangled',
-    mangledCases,
-    mangledCases.NoMangled
-  );
   const sendErrorCases = {
     None: undefined,
     Error: new GenericApiError(),
@@ -451,9 +442,22 @@ export const MangledTab = (): Node => {
   const addressFilter = select('AddressFilter', AddressFilter, AddressFilter.None);
   const location = routeForStore(GROUP_MANGLED.name);
 
+  const mangledCases = {
+    NoMangled: 0,
+    HasMangled: 1000000,
+  };
+  const getMangledValue = () => select(
+    'hasMangled',
+    mangledCases,
+    mangledCases.NoMangled
+  );
+
   const addressSubgroupMap = genDefaultGroupMap(true);
   addressSubgroupMap.set(GROUP_MANGLED.class, {
-    all: genAddresses('jormungandr'),
+    all: genAddresses('jormungandr').map(addr => ({
+      ...addr,
+      value: new BigNumber(getMangledValue()),
+    })),
     wasExecuted: true,
   });
 

@@ -21,7 +21,7 @@ import {
 } from '../../utils/logging';
 import { getApiForCoinType } from '../../api/common/utils';
 import type { AddressFilterKind, StandardAddress, AddressTypeName, } from '../../types/AddressFilterTypes';
-import { AddressSubgroup, AddressFilter, AddressGroupTypes } from '../../types/AddressFilterTypes';
+import { AddressFilter, } from '../../types/AddressFilterTypes';
 import {
   ConceptualWallet
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
