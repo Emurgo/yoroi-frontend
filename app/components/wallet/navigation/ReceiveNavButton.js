@@ -11,13 +11,15 @@ type Props = {|
   +onClick: void => void,
   +className?: string,
   +icon?: string,
+  +isToplevel?: boolean,
 |};
 
 @observer
 export default class ReceiveNavButton extends Component<Props> {
-  static defaultProps: {|className: void, icon: void|} = {
+  static defaultProps: {| className: void, icon: void, isToplevel:void |} = {
     className: undefined,
     icon: undefined,
+    isToplevel: undefined,
   };
 
   render(): Node {
@@ -26,14 +28,21 @@ export default class ReceiveNavButton extends Component<Props> {
     const componentClasses = classnames([
       className,
       styles.wrapper,
-      isActive && styles.active
+      isActive && styles.active,
+    ]);
+
+    const buttonClass = classnames([
+      styles.button,
+      this.props.isToplevel === true
+        ? styles.topLevel
+        : styles.notTopLevel,
     ]);
 
     const IconComponent = this.props.icon;
 
     return (
       <div className={componentClasses}>
-        <button type="button" className={styles.button} onClick={onClick}>
+        <button type="button" className={buttonClass} onClick={onClick}>
           <span className={styles.label}>{label}</span>
         </button>
         {IconComponent != null &&

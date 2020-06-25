@@ -14,7 +14,7 @@ export type Props = {|
     +isActiveStore: boolean,
     +setAsActiveStore: void => void,
     +name: AddressTypeName,
-    +validFilters: Array<AddressFilterKind>,
+    +validFilters: $ReadOnlyArray<AddressFilterKind>,
     +wasExecuted: boolean,
     ...,
   }>;

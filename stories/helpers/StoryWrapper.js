@@ -45,6 +45,7 @@ import { addDecorator } from '@storybook/react';
 
 import { PublicDeriver } from '../../app/api/ada/lib/storage/models/PublicDeriver';
 import { Cip1852Wallet } from '../../app/api/ada/lib/storage/models/Cip1852Wallet/wrapper';
+import { Bip44Wallet } from '../../app/api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import { WalletTypeOption } from '../../app/api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import {
   HasPrivateDeriver,
@@ -55,6 +56,7 @@ import {
   GetPublicKey,
   DisplayCutoff,
   Cip1852PickInternal,
+  Bip44PickInternal,
   GetAllAccounting,
   GetStakingKey,
   HasUtxoChains,
@@ -435,11 +437,65 @@ function genSigningWallet(
   });
   return self;
 }
+function genByronSigningWallet(
+  genHardwareInfo?: number => HwWalletMetaRow,
+): PublicDeriver<> {
+  const conceptualWalletId = conceptualWalletCounter++;
+  const hardwareInfo = genHardwareInfo == null
+    ? null
+    : genHardwareInfo(conceptualWalletId);
+  const parent = new Bip44Wallet(
+    (null: any),
+    {
+      db: (null: any),
+      conceptualWalletId,
+      walletType: (() => {
+        if (hardwareInfo != null) {
+          return WalletTypeOption.HARDWARE_WALLET;
+        }
+        return WalletTypeOption.WEB_WALLET;
+      })(),
+      hardwareInfo,
+      coinType: CoinTypes.CARDANO,
+    },
+    {
+      ConceptualWalletId: conceptualWalletId,
+      SignerLevel: null,
+      PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
+      PrivateDeriverLevel: null,
+      PrivateDeriverKeyDerivationId: null,
+      RootKeyDerivationId: 0,
+    },
+    null,
+    null,
+  );
+  const clazz = HasUtxoChains(Bip44PickInternal(
+    DisplayCutoff(GetSigningKey(GetPublicKey(
+      GetAllUtxos(HasLevels(HasSign(HasPrivateDeriver((PublicDeriver: any)))))
+    )))
+  ));
+  const self = new clazz({
+    publicDeriverId: publicDeriverCounter++,
+    parent,
+    pathToPublic: [],
+    derivationId: 0,
+  });
+  return self;
+}
 
 export function genSigningWalletWithCache(
   genHardwareInfo?: number => HwWalletMetaRow,
 ): CacheValue {
   const dummyWallet = genSigningWallet(genHardwareInfo);
+  return {
+    publicDeriver: dummyWallet,
+    ...genMockCache(dummyWallet),
+  };
+}
+export function getByronSigningWalletWithCache(
+  genHardwareInfo?: number => HwWalletMetaRow,
+): CacheValue {
+  const dummyWallet = genByronSigningWallet(genHardwareInfo);
   return {
     publicDeriver: dummyWallet,
     ...genMockCache(dummyWallet),

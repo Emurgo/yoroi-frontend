@@ -1,8 +1,6 @@
 // @flow
-import { observable, computed, action, runInAction } from 'mobx';
-import { find } from 'lodash';
+import { observable, action, runInAction } from 'mobx';
 import Store from '../base/Store';
-import CachedRequest from '../lib/LocalizedCachedRequest';
 import Request from '../lib/LocalizedRequest';
 import LocalizableError, { localizedError } from '../../i18n/LocalizableError';
 import type {
@@ -18,148 +16,31 @@ import {
 import type {
   IHasUtxoChainsRequest,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import type { StoresMap } from '../index';
-import type { ActionsMap } from '../../actions';
 import {
   Logger,
 } from '../../utils/logging';
-import { buildRoute } from '../../utils/routing';
 import { getApiForCoinType } from '../../api/common/utils';
-import type { AddressFilterKind, StandardAddress, AddressTypeName } from '../../types/AddressFilterTypes';
+import type { AddressFilterKind, StandardAddress, AddressTypeName, } from '../../types/AddressFilterTypes';
 import { AddressSubgroup, AddressFilter, AddressGroupTypes } from '../../types/AddressFilterTypes';
-import { ROUTES } from '../../routes-config';
 import {
   ConceptualWallet
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
-
-type SubRequestType<+T> = {|
-  publicDeriver: PublicDeriver<>,
-|} => Promise<$ReadOnlyArray<$ReadOnly<T>>>;
-
-export class AddressTypeStore<T: StandardAddress> {
-
-  @observable addressesRequests: Array<{|
-    publicDeriver: PublicDeriver<>,
-    cachedRequest: CachedRequest<SubRequestType<T>>,
-  |}> = [];
-
-  stores: StoresMap;
-  actions: ActionsMap;
-  request: SubRequestType<T>;
-  name: AddressTypeName;
-  shouldHide: (PublicDeriver<>, AddressTypeStore<T>) => boolean;
-  validFilters: Array<AddressFilterKind>;
-  constructor(data: {|
-    stores: StoresMap,
-    actions: ActionsMap,
-    request: SubRequestType<T>,
-    name: AddressTypeName,
-    shouldHide: (PublicDeriver<>, AddressTypeStore<T>) => boolean,
-    validFilters: Array<AddressFilterKind>;
-  |}) {
-    this.stores = data.stores;
-    this.actions = data.actions;
-    this.request = data.request;
-    this.name = data.name;
-    this.shouldHide = data.shouldHide;
-    this.validFilters = data.validFilters;
-  }
-
-  @computed get isActiveStore(): boolean {
-    const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver) return false;
-    const { app } = this.stores;
-    const screenRoute = buildRoute(
-      ROUTES.WALLETS.RECEIVE.ADDRESS_LIST,
-      {
-        id: publicDeriver.getPublicDeriverId(),
-        group: this.name.group,
-        name: this.name.subgroup,
-      }
-    );
-    return app.currentRoute === screenRoute;
-  }
-
-  setAsActiveStore: void => void = () => {
-    this.actions.router.goToRoute.trigger({
-      route: ROUTES.WALLETS.RECEIVE.ADDRESS_LIST,
-      params: {
-        group: this.name.group,
-        name: this.name.subgroup,
-      },
-    });
-  };
-
-  @computed get isHidden(): boolean {
-    const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver) return true;
-    return this.shouldHide(publicDeriver, this);
-  }
-
-  @computed get all(): $ReadOnlyArray<$ReadOnly<T>> {
-    const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver) return [];
-    const result = this._flowCoerceResult(this._getRequest(publicDeriver));
-    if (result == null) return [];
-    return result;
-  }
-
-  @computed get filtered(): $ReadOnlyArray<$ReadOnly<T>> {
-    return userFilter<T>({
-      addressFilter: this.stores.addresses.addressFilter,
-      addresses: this.all,
-    });
-  }
-
-  @computed get wasExecuted(): boolean {
-    const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver) return false;
-    return this._getRequest(publicDeriver).wasExecuted;
-  }
-
-  /** Refresh addresses from database */
-  @action refreshAddressesFromDb: PublicDeriver<> => Promise<void> = async (
-    publicDeriver,
-  ) => {
-    const allRequest = this._getRequest(publicDeriver);
-    allRequest.invalidate({ immediately: false });
-    await allRequest.execute({ publicDeriver }).promise;
-  };
-
-  _flowCoerceResult: (
-    CachedRequest<SubRequestType<T>>
-  ) => ?$ReadOnlyArray<$ReadOnly<T>> = (request) => {
-    // Flow fails when resolving types so this is the best we can check
-    (request.result: ?$ReadOnlyArray<$ReadOnly<any>>);
-    return (request.result: any);
-  }
-
-  _getRequest: (PublicDeriver<>) => CachedRequest<SubRequestType<T>> = (publicDeriver) => {
-    const foundRequest = find(this.addressesRequests, { publicDeriver });
-    if (foundRequest && foundRequest.cachedRequest) {
-      return foundRequest.cachedRequest;
-    }
-    return new CachedRequest<SubRequestType<T>>(this.request);
-  };
-
-  @action addObservedWallet: PublicDeriver<> => void = (
-    publicDeriver
-  ) => {
-    this.addressesRequests.push({
-      publicDeriver,
-      cachedRequest: this._getRequest(publicDeriver),
-    });
-  }
-}
+import { AddressTypeStore } from '../base/AddressSubgroupStore';
+import type { CoreAddressT } from '../../api/ada/lib/storage/database/primitives/enums';
+import { allAddressSubgroups } from '../stateless/addressStores';
+import type { IAddressTypeUiSubset, IAddressTypeStore } from '../stateless/addressStores';
 
 export default class AddressesStore extends Store {
+
+  // note: no need for this to be observable
+  _addressSubgroupMap: Map<Class<IAddressTypeStore>, IAddressTypeStore> = new Map();
 
   @observable error: ?LocalizableError = null;
 
   @observable addressFilter: AddressFilterKind = AddressFilter.None;
 
-  addressBook: AddressTypeStore<StandardAddress>;
+  addressBook: AddressTypeStore;
 
   // REQUESTS
   @observable createAddressRequest: Request<CreateAddressFunc>
@@ -174,31 +55,17 @@ export default class AddressesStore extends Store {
     actions.setFilter.listen(this._setFilter);
     actions.resetFilter.listen(this._resetFilter);
 
-    this.addressBook = new AddressTypeStore({
-      stores: this.stores,
-      actions: this.actions,
-      request: (request) => this.stores.addresses._wrapForeign({
-        ...request,
-        storeToFilter: this.addressBook,
-      }),
-      name: {
-        subgroup: AddressSubgroup.all,
-        group: AddressGroupTypes.addressBook,
-      },
-      shouldHide: (_publicDeriver, _store) => false,
-      validFilters: [AddressFilter.None],
-    });
+    for (const store of allAddressSubgroups) {
+      this._addressSubgroupMap.set(store.class, new store.class({
+        stores: this.stores,
+        actions: this.actions,
+        name: store.name,
+      }));
+    }
   }
 
-  getStoresForWallet: (
-    PublicDeriver<>
-  ) => Array<AddressTypeStore<StandardAddress>> = (publicDeriver) => {
-    const { coinType } = publicDeriver.getParent();
-    const apiType = getApiForCoinType(coinType);
-    return [
-      ...this.stores.substores[apiType].addresses.getStoresForWallet(publicDeriver),
-      this.addressBook,
-    ];
+  get addressSubgroupMap(): $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset> {
+    return this._addressSubgroupMap;
   }
 
   _createAddress: PublicDeriver<> => Promise<void> = async (
@@ -235,24 +102,35 @@ export default class AddressesStore extends Store {
   addObservedWallet: PublicDeriver<> => void = (
     publicDeriver
   ) => {
-    const { coinType } = publicDeriver.getParent();
-    const apiType = getApiForCoinType(coinType);
-    this.stores.substores[apiType].addresses.addObservedWallet(publicDeriver);
-    this.addressBook.addObservedWallet(publicDeriver);
+    allAddressSubgroups
+      .filter(store => store.isRelated({
+        selected: publicDeriver
+      }))
+      .map(store => store.class)
+      .forEach(
+        storeClass => this._addressSubgroupMap.get(storeClass)?.addObservedWallet(publicDeriver)
+      );
   }
 
   refreshAddressesFromDb: PublicDeriver<> => Promise<void> = async (
     publicDeriver
   ) => {
-    const { coinType } = publicDeriver.getParent();
-    const apiType = getApiForCoinType(coinType);
-    this.stores.substores[apiType].addresses.refreshAddressesFromDb(publicDeriver);
-    this.addressBook.refreshAddressesFromDb(publicDeriver);
+    await Promise.all(
+      allAddressSubgroups
+        .filter(store => store.isRelated({
+          selected: publicDeriver
+        }))
+        .map(store => store.class)
+        .map(storeClass => (
+          this._addressSubgroupMap.get(storeClass)?.refreshAddressesFromDb(publicDeriver)
+        ))
+    );
   }
 
   _wrapForAllAddresses: {|
     publicDeriver: PublicDeriver<>,
-    storeToFilter: AddressTypeStore<StandardAddress>,
+    storeName: AddressTypeName,
+    type: CoreAddressT,
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
     const { coinType } = request.publicDeriver.getParent();
     const apiType = getApiForCoinType(coinType);
@@ -265,19 +143,19 @@ export default class AddressesStore extends Store {
 
     const allAddresses = await this.api[apiType].getAllAddressesForDisplay({
       publicDeriver: withUtxos,
-      type: this.stores.substores[apiType].addresses.getAddressTypesForWallet(withUtxos)[0]
+      type: request.type,
     });
 
     return this.storewiseFilter({
       publicDeriver: request.publicDeriver,
-      storeToFilter: request.storeToFilter,
+      storeName: request.storeName,
       addresses: allAddresses,
     });
   }
 
   _wrapForeign: {|
     publicDeriver: PublicDeriver<>,
-    storeToFilter: AddressTypeStore<StandardAddress>,
+    storeName: AddressTypeName,
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
     const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
     if (withLevels == null) {
@@ -290,7 +168,7 @@ export default class AddressesStore extends Store {
 
     return this.storewiseFilter({
       publicDeriver: request.publicDeriver,
-      storeToFilter: request.storeToFilter,
+      storeName: request.storeName,
       addresses: allAddresses.map(hash => ({
         address: addressToDisplayString(hash),
         label: 'asdf',
@@ -300,7 +178,8 @@ export default class AddressesStore extends Store {
 
   _wrapForChainAddresses: {|
     publicDeriver: PublicDeriver<>,
-    storeToFilter: AddressTypeStore<StandardAddress>,
+    storeName: AddressTypeName,
+    type: CoreAddressT,
     chainsRequest: IHasUtxoChainsRequest,
   |}=> Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
     const { coinType } = request.publicDeriver.getParent();
@@ -316,19 +195,19 @@ export default class AddressesStore extends Store {
     const addresses = await this.api[apiType].getChainAddressesForDisplay({
       publicDeriver: withHasUtxoChains,
       chainsRequest: request.chainsRequest,
-      type: this.stores.substores[apiType].addresses.getAddressTypesForWallet(withHasUtxoChains)[0]
+      type: request.type,
     });
 
     return this.storewiseFilter({
       publicDeriver: request.publicDeriver,
-      storeToFilter: request.storeToFilter,
+      storeName: request.storeName,
       addresses,
     });
   }
 
   storewiseFilter: {|
     publicDeriver: PublicDeriver<>,
-    storeToFilter: AddressTypeStore<StandardAddress>,
+    storeName: AddressTypeName,
     addresses: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
     const { coinType } = request.publicDeriver.getParent();
@@ -359,29 +238,4 @@ export default class AddressesStore extends Store {
   @action _resetFilter: void => void = () => {
     this.addressFilter = AddressFilter.None;
   }
-}
-
-export function userFilter<T: StandardAddress>(request: {|
-  addressFilter: AddressFilterKind,
-  addresses: $ReadOnlyArray<$ReadOnly<T>>,
-|}): $ReadOnlyArray<$ReadOnly<T>> {
-  if (request.addressFilter === AddressFilter.None) {
-    return request.addresses;
-  }
-  if (request.addressFilter === AddressFilter.Unused) {
-    return request.addresses.filter(address => (
-      address.isUsed === null || address.isUsed === false
-    ));
-  }
-  if (request.addressFilter === AddressFilter.Used) {
-    return request.addresses.filter(address => (
-      address.isUsed === true
-    ));
-  }
-  if (request.addressFilter === AddressFilter.HasBalance) {
-    return request.addresses.filter(address => (
-      address.value !== undefined && address.value.gt(0)
-    ));
-  }
-  throw new Error(`${nameof(userFilter)} unknown filter type ${request.addressFilter}`);
 }

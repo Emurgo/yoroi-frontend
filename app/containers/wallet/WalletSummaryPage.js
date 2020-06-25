@@ -20,11 +20,9 @@ import EditMemoDialog from '../../components/wallet/memos/EditMemoDialog';
 import DeleteMemoDialog from '../../components/wallet/memos/DeleteMemoDialog';
 import MemoNoExternalStorageDialog from '../../components/wallet/memos/MemoNoExternalStorageDialog';
 import { Logger } from '../../utils/logging';
-import { buildRoute } from '../../utils/routing';
 import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type {
-  Address,
   IGetLastSyncInfoResponse,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import config from '../../config';
@@ -44,8 +42,9 @@ import type {
 } from '../../api/common/index';
 import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
 import { getApiForCoinType, getApiMeta } from '../../api/common/utils';
-import type { AddressTypeName, } from '../../types/AddressFilterTypes';
 import { addressSubgroupName, addressGroupName, AddressSubgroup } from '../../types/AddressFilterTypes';
+import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
+import { routeForStore, allAddressSubgroups, } from '../../stores/stateless/addressStores';
 
 export type GeneratedData = typeof WalletSummaryPage.prototype.generated;
 
@@ -65,7 +64,6 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
   render(): null | Node {
     const { intl } = this.context;
     const actions = this.generated.actions;
-    const { addresses } = this.generated.stores;
     const { wallets } = this.generated.stores;
     const {
       hasAny,
@@ -162,19 +160,22 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
               settings: profile.unitOfAccount,
             }}
             addressLookup={(address) => {
-              const addressStores = addresses.getStoresForWallet(publicDeriver);
-              for (const addressStore of addressStores) {
-                if (addressStore.all.some(addressInStore => addressInStore.address === address)) {
-                  const route = buildRoute(ROUTES.WALLETS.RECEIVE.ADDRESS_LIST, {
-                    group: addressStore.name.group,
-                    name: addressStore.name.subgroup,
-                  });
-
+              for (const addressStore of allAddressSubgroups) {
+                if (!addressStore.isRelated({ selected: publicDeriver })) {
+                  continue;
+                }
+                const request = this.generated.stores.addresses.addressSubgroupMap.get(
+                  addressStore.class
+                );
+                if (request == null) throw new Error('Should never happen');
+                if (request.all.some(addressInStore => addressInStore.address === address)) {
                   const name = addressStore.name.subgroup === AddressSubgroup.all
                     ? intl.formatMessage(addressGroupName[addressStore.name.group])
                     : `${intl.formatMessage(addressGroupName[addressStore.name.group])} - ${intl.formatMessage(addressSubgroupName[addressStore.name.subgroup])}`;
                   return {
-                    goToRoute: () => this.generated.actions.router.goToRoute.trigger({ route }),
+                    goToRoute: () => this.generated.actions.router.goToRoute.trigger({
+                      route: routeForStore(addressStore.name)
+                    }),
                     name,
                   };
                 }
@@ -424,14 +425,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
     |},
     stores: {|
       addresses: {|
-        getStoresForWallet: (
-          publicDeriver: PublicDeriver<>
-        ) => Array<{|
-          +all: $ReadOnlyArray<
-            $ReadOnly<{ ...Address, ... }>
-          >,
-          +name: AddressTypeName,
-        |}>
+        addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
       |},
       coinPriceStore: {|
         priceMap: Map<string, $ReadOnly<PriceDataRow>>
@@ -532,14 +526,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
           exportError: stores.transactions.exportError,
         },
         addresses: {
-          getStoresForWallet: (publicDeriver: PublicDeriver<>) => {
-            const addressStores = stores.addresses.getStoresForWallet(publicDeriver);
-            const functionalitySubset = addressStores.map(addressStore => ({
-              all: addressStore.all,
-              name: addressStore.name,
-            }));
-            return functionalitySubset;
-          },
+          addressSubgroupMap: stores.addresses.addressSubgroupMap,
         },
         walletSettings: {
           getPublicDeriverSettingsCache: stores.walletSettings.getPublicDeriverSettingsCache,

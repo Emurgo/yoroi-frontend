@@ -27,10 +27,11 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { ExplorerType } from '../../domain/Explorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
-import type { StandardAddress, } from '../../types/AddressFilterTypes';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { SetupSelfTxRequest } from '../../stores/ada/AdaTransactionBuilderStore';
 import { ApiOptions, getApiMeta } from '../../api/common/utils';
+import { GROUP_MANGLED } from '../../stores/stateless/addressStores';
+import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
 
 declare var CONFIG: ConfigType;
 
@@ -65,8 +66,11 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
       throw new Error(`${nameof(UnmangleTxDialogContainer)} no chains`);
     }
 
+    const request = this.generated.stores.addresses.addressSubgroupMap.get(GROUP_MANGLED.class);
+    if (request == null) throw new Error('No request. Should never happen');
+
     const filterTo = new Set(
-      this.generated.stores.substores.ada.addresses.mangledAddressesForDisplay.all
+      request.all
         // we don't want to include any UTXO that would do nothing but increase the tx fee
         .filter(info => info.value != null && info.value.gt(CONFIG.genesis.linearFee.coefficient))
         .map(info => getAddressPayload(info.address))
@@ -232,13 +236,11 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
         selectedExplorer: ExplorerType,
         unitOfAccount: UnitOfAccountSettingType
       |},
+      addresses: {|
+        addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
+      |},
       substores: {|
         ada: {|
-          addresses: {|
-            mangledAddressesForDisplay: {|
-              all: $ReadOnlyArray<$ReadOnly<StandardAddress>>
-            |}
-          |},
           transactionBuilderStore: {|
             setupSelfTx: {|
               error: ?LocalizableError,
@@ -279,6 +281,9 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
         coinPriceStore: {
           getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
         },
+        addresses: {
+          addressSubgroupMap: stores.addresses.addressSubgroupMap,
+        },
         substores: {
           ada: {
             wallets: {
@@ -286,11 +291,6 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
                 reset: stores.substores.ada.wallets.sendMoneyRequest.reset,
                 error: stores.substores.ada.wallets.sendMoneyRequest.error,
                 isExecuting: stores.substores.ada.wallets.sendMoneyRequest.isExecuting,
-              },
-            },
-            addresses: {
-              mangledAddressesForDisplay: {
-                all: stores.substores.ada.addresses.mangledAddressesForDisplay.all,
               },
             },
             transactionBuilderStore: {

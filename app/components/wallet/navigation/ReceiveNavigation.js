@@ -23,7 +23,7 @@ type AddressStoreSubset = {
     +isActiveStore: boolean,
     +setAsActiveStore: void => void,
     +name: AddressTypeName,
-    +validFilters: Array<AddressFilterKind>,
+    +validFilters: $ReadOnlyArray<AddressFilterKind>,
     +wasExecuted: boolean,
     ...,
 };
@@ -47,29 +47,16 @@ export default class ReceiveNavigation extends Component<Props> {
       const store = stores[0];
       return (
         <div className={styles.addressBook}>
-          <button
-            onClick={store.setAsActiveStore}
-            type="button"
+          <ReceiveNavButton
             className={classNames([
               store.name.subgroup,
               store.name.group,
-              styles.filterButton,
-              ...(store.isActiveStore ? [styles.active] : [])
             ])}
-          >
-            <div>
-              {intl.formatMessage(addressGroupName[stores[0].name.group])}
-              <Tooltip
-                className={styles.Tooltip}
-                skin={TooltipSkin}
-                tip={intl.formatMessage(addressGroupsTooltip[stores[0].name.group])}
-              >
-                <span className={styles.infoIcon}>
-                  <InfoIcon />
-                </span>
-              </Tooltip>
-            </div>
-          </button>
+            label={intl.formatMessage(addressGroupName[stores[0].name.group])}
+            isActive={store.isActiveStore}
+            onClick={store.setAsActiveStore}
+            isToplevel
+          />
         </div>
       );
     }
@@ -142,10 +129,6 @@ export default class ReceiveNavigation extends Component<Props> {
     const { intl } = this.context;
 
     const { activeFilter } = this.props;
-    const componentClasses = classNames([
-      styles.filterButton,
-      styles.active,
-    ]);
 
     const activeStore = this.props.addressStores.find(store => store.isActiveStore);
     if (activeStore == null) return undefined;
@@ -153,17 +136,13 @@ export default class ReceiveNavigation extends Component<Props> {
     return (
       <div className={styles.filterSection}>
         {activeStore.validFilters.map(filter => (
-          <button
+          <ReceiveNavButton
             key={intl.formatMessage(addressFilter[filter])}
-            type="button"
+            label={intl.formatMessage(addressFilter[filter])}
+            isActive={activeFilter === filter}
             onClick={() => this.props.setFilter(filter)}
-            className={activeFilter === filter
-              ? componentClasses
-              : styles.filterButton
-            }
-          >
-            {intl.formatMessage(addressFilter[filter])}
-          </button>
+            isToplevel
+          />
         ))}
       </div>
     );

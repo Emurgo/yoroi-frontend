@@ -14,9 +14,7 @@
 
 .button {
   display: inline-block;
-  color: var(--theme-wallet-navigation-tab-text-color);
   padding: 7px;
-  padding-left: 40px;
   border-bottom: 3px solid transparent;
   width: 100%;
   text-align:left;
@@ -27,9 +25,21 @@
   
   .label {
     font-family: var(--font-semibold);
-    color: var(--theme-transactions-list-detail-row-text-color);
+  }
+  .notTopLevel {
+    color: var(--theme-wallet-navigation-tab-text-color);
+  }
+  .topLevel {
+    color: var(--theme-transactions-priority-high-text-color);
   }
 }
+.notTopLevel {
+  padding-left: 40px;
+}
+.topLevel {
+  padding-left: 24px;
+}
+
 
 .icon {
   position: absolute;

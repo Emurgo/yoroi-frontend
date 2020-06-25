@@ -8,7 +8,6 @@ import { boolean, select } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import WalletReceivePage from './WalletReceivePage';
 import { THEMES } from '../../themes';
-import environment from '../../environment';
 import { withScreenshot } from 'storycap';
 import {
   globalKnobs,
@@ -25,17 +24,22 @@ import { wrapReceive, wrapWallet } from '../../Routes';
 import { mockWalletProps } from './Wallet.mock';
 import { mockReceiveProps } from './Receive.mock';
 import { getDefaultExplorer } from '../../domain/Explorer';
-import { ROUTES } from '../../routes-config';
-import { buildRoute } from '../../utils/routing';
-import type { AddressTypeName, StandardAddress, AddressFilterKind, } from '../../types/AddressFilterTypes';
+import type { StandardAddress, AddressFilterKind, } from '../../types/AddressFilterTypes';
 import URIGenerateDialog from '../../components/uri/URIGenerateDialog';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import URIDisplayDialog from '../../components/uri/URIDisplayDialog';
 import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
 import VerifyAddressDialog from '../../components/wallet/receive/VerifyAddressDialog';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { AddressGroupTypes, AddressFilter, AddressSubgroup } from '../../types/AddressFilterTypes';
-import { userFilter } from '../../stores/toplevel/AddressesStore';
+import { AddressFilter } from '../../types/AddressFilterTypes';
+import {
+  allAddressSubgroups,
+  routeForStore,
+  ADDRESS_BOOK,
+  GROUP_EXTERNAL,
+  GROUP_INTERNAL,
+  GROUP_MANGLED,
+} from '../../stores/stateless/addressStores';
+import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -43,41 +47,9 @@ export default {
   decorators: [withScreenshot],
 };
 
-const getExternalRoute = (id) => buildRoute(
-  ROUTES.WALLETS.RECEIVE.ADDRESS_LIST,
-  {
-    id,
-    group: AddressGroupTypes.byron,
-    name: AddressSubgroup.external,
-  }
-);
-const getInternalRoute = (id) => buildRoute(
-  ROUTES.WALLETS.RECEIVE.ADDRESS_LIST,
-  {
-    id,
-    group: AddressGroupTypes.byron,
-    name: AddressSubgroup.internal,
-  }
-);
-const getMangledRoute = (id) => buildRoute(
-  ROUTES.WALLETS.RECEIVE.ADDRESS_LIST,
-  {
-    id,
-    group: AddressGroupTypes.byron,
-    name: AddressSubgroup.mangled,
-  }
-);
-const getAddressBookRoute = (id) => buildRoute(
-  ROUTES.WALLETS.RECEIVE.ADDRESS_LIST,
-  {
-    id,
-    group: AddressGroupTypes.addressBook,
-    name: AddressSubgroup.all,
-  }
-);
-
-
-const genAddresses = () => {
+const genAddresses: (
+  'byron' | 'jormungandr'
+) => $ReadOnlyArray<$ReadOnly<StandardAddress>> = (type: "byron" | "jormungandr") => {
   const unusedProps = (address) => ({
     address,
     value: undefined,
@@ -105,7 +77,7 @@ const genAddresses = () => {
     },
     isUsed: true,
   });
-  if (environment.isJormungandr()) {
+  if (type === 'jormungandr') {
     return [
       unusedProps('addr1ssuvzjs82mshgvyp4r4lmwgknvgjswnm7mpcq3wycjj7v2nk393e6qwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm9078ssez'),
       noUtxoProps('addr1ssruckcp4drq2cj8nul8lhmc9vgkxmz2rdepcxdec9sfh3ekpdgcuqwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm90lfrsm9'),
@@ -120,16 +92,11 @@ const genAddresses = () => {
 };
 
 const genBaseProps: {|
+  location: string,
   addressBook?: boolean,
   wallet: CacheValue,
   dialog?: any,
-  getStoresForWallet: PublicDeriver<> => Array<{|
-    +all: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
-    +filtered: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
-    +isActiveStore: boolean,
-    +name: AddressTypeName,
-    +wasExecuted: boolean,
-  |}>,
+  addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
   addressFilter: AddressFilterKind,
   getParam?: (number | string) => any,
   transactionBuilderStore?: *,
@@ -153,10 +120,11 @@ const genBaseProps: {|
     sendErrorCases,
     sendErrorCases.None
   );
-
-  const addressesStore = request.getStoresForWallet(request.wallet.publicDeriver);
   return {
     stores: {
+      app: {
+        currentRoute: request.location,
+      },
       uiNotifications: {
         isOpen: () => false,
         getTooltipActiveNotification: () => null,
@@ -176,7 +144,7 @@ const genBaseProps: {|
       },
       addresses: {
         addressFilter: request.addressFilter,
-        getStoresForWallet: request.getStoresForWallet,
+        addressSubgroupMap: request.addressSubgroupMap,
         createAddressRequest: {
           isExecuting: false,
         },
@@ -184,25 +152,16 @@ const genBaseProps: {|
       },
       substores: {
         ada: {
-          addresses: {
-            getUnmangleAmounts: () => ({
-              canUnmangle: addressesStore.some(
-                addressStore => addressStore.name.subgroup === AddressSubgroup.mangled &&
-                addressStore.isActiveStore
-              ) && request.dialog == null
-                ? getMangledValue()
-                : [],
-              cannotUnmangle: [],
-            }),
-          },
           hwVerifyAddress: request.dialog === VerifyAddressDialog
             ? {
               selectedAddress: (() => {
-                const activeStore = addressesStore.filter(
-                  addressStore => addressStore.isActiveStore
-                )[0];
-                const firstAddress = activeStore.all[0];
-                if (firstAddress.addressing == null) {
+                const activeStore = allAddressSubgroups.find(
+                  type => request.location.startsWith(routeForStore(type.name))
+                );
+                if (activeStore == null) throw new Error('Should never happen');
+                const storeRequest = request.addressSubgroupMap.get(activeStore.class);
+                const firstAddress = storeRequest?.all[0];
+                if (firstAddress?.addressing == null) {
                   throw new Error('Expected addressing');
                 }
                 return Object.freeze({
@@ -268,6 +227,9 @@ const genBaseProps: {|
           coinPriceStore: {
             getCurrentPrice: (_from, _to) => 5,
           },
+          addresses: {
+            addressSubgroupMap: request.addressSubgroupMap,
+          },
           substores: {
             ada: {
               wallets: {
@@ -284,18 +246,6 @@ const genBaseProps: {|
                       : sendErrorValue(),
                     isExecuting: boolean('isExecuting', false),
                   },
-              },
-              addresses: {
-                mangledAddressesForDisplay: {
-                  all: addressesStore.some(
-                    addressStore => addressStore.name.subgroup === AddressSubgroup.mangled &&
-                    addressStore.isActiveStore
-                  )
-                    ? addressesStore.filter(
-                      addressStore => addressStore.name.subgroup === AddressSubgroup.mangled
-                    )[0].all
-                    : [],
-                },
               },
               transactionBuilderStore: request.transactionBuilderStore || (null: any),
             },
@@ -321,128 +271,27 @@ const genBaseProps: {|
   };
 };
 
-const genGetStoresForWallet: {|
-  publicDeriver: PublicDeriver<>,
-  location: string,
-  addresses: Array<StandardAddress>,
-  addressFilter: AddressFilterKind,
-  wasExecuted: boolean,
-|} => (PublicDeriver<> => Array<{|
-  +isActiveStore: boolean,
-  +isHidden: boolean,
-  +setAsActiveStore: void => void,
-  +name: AddressTypeName,
-  +all: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
-  +filtered: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
-  +wasExecuted: boolean,
-  +validFilters: Array<AddressFilterKind>,
-|}>) = (request) => {
-  const tabs = [];
-
-  const push: (
-    AddressTypeName, Array<AddressFilterKind>
-  ) => void = (tabName, validFilters) => {
-    const routeForTab = buildRoute(
-      ROUTES.WALLETS.RECEIVE.ADDRESS_LIST,
+const genDefaultGroupMap: (
+  boolean => Map<Class<IAddressTypeStore>, IAddressTypeUiSubset>
+) = (wasExecuted) => {
+  return new Map(
+    allAddressSubgroups.map(type => [
+      type.class,
       {
-        group: tabName.group,
-        name: tabName.subgroup,
-      }
-    );
-    tabs.push({
-      isActiveStore: request.location === routeForTab,
-      isHidden: false,
-      setAsActiveStore: action(`set ${tabName.group}-${tabName.subgroup}`),
-      name: tabName,
-      all: request.addresses,
-      filtered: userFilter({
-        addressFilter: request.addressFilter,
-        addresses: request.addresses,
-      }),
-      wasExecuted: request.wasExecuted,
-      validFilters,
-    });
-  };
-  push(
-    {
-      group: AddressGroupTypes.byron,
-      subgroup: AddressSubgroup.external,
-    },
-    [AddressFilter.None, AddressFilter.Unused, AddressFilter.Used, AddressFilter.HasBalance],
-  );
-  push(
-    {
-      group: AddressGroupTypes.byron,
-      subgroup: AddressSubgroup.internal,
-    },
-    [AddressFilter.None, AddressFilter.Unused, AddressFilter.Used, AddressFilter.HasBalance],
-  );
-  if (request.location.includes(AddressSubgroup.mangled)) {
-    push(
-      {
-        group: AddressGroupTypes.byron,
-        subgroup: AddressSubgroup.mangled,
+        all: [],
+        wasExecuted,
       },
-      [AddressFilter.None, AddressFilter.Unused, AddressFilter.Used, AddressFilter.HasBalance],
-    );
-  }
-
-  push(
-    {
-      group: AddressGroupTypes.addressBook,
-      subgroup: AddressSubgroup.all,
-    },
-    [AddressFilter.None],
+    ])
   );
-
-  return (_publicDeriver) => tabs;
-};
-const wrapForReceive: ReturnType<ReturnType<typeof genGetStoresForWallet>> => Array<{|
-  +isActiveStore: boolean,
-  +isHidden:boolean,
-  +setAsActiveStore: void => void,
-  +name: AddressTypeName,
-  +validFilters: Array<AddressFilterKind>,
-  +wasExecuted: boolean,
-|}> = (result) => {
-  return result.map(addressStore => Object.freeze({
-    isActiveStore: addressStore.isActiveStore,
-    isHidden: addressStore.isHidden,
-    setAsActiveStore: addressStore.setAsActiveStore,
-    name: addressStore.name,
-    validFilters: addressStore.validFilters,
-    wasExecuted: addressStore.wasExecuted,
-  }));
-};
-const wrapForReceivePage: ReturnType<ReturnType<typeof genGetStoresForWallet>> => Array<{|
-  +all: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
-  +filtered: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
-  +isActiveStore: boolean,
-  +name: AddressTypeName,
-  +wasExecuted: boolean,
-|}> = (result) => {
-  return result.map(addressStore => ({
-    all: addressStore.all,
-    filtered: addressStore.filtered,
-    isActiveStore: addressStore.isActiveStore,
-    name: addressStore.name,
-    wasExecuted: addressStore.wasExecuted,
-  }));
 };
 
 export const Loading = (): Node => {
   const wallet = genSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
 
-  const location = getExternalRoute(wallet.publicDeriver.getPublicDeriverId());
+  const location = routeForStore(GROUP_EXTERNAL.name);
   const addressFilter = AddressFilter.None;
-  const getStoresForWallet = genGetStoresForWallet({
-    location,
-    publicDeriver: wallet.publicDeriver,
-    addresses: genAddresses(),
-    addressFilter,
-    wasExecuted: false,
-  });
+  const addressSubgroupMap = genDefaultGroupMap(false);
 
   return wrapWallet(
     mockWalletProps({
@@ -453,15 +302,16 @@ export const Loading = (): Node => {
     wrapReceive(
       mockReceiveProps({
         selected: wallet.publicDeriver,
-        getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressSubgroupMap,
         addressFilter,
         location,
       }),
       (<WalletReceivePage
         generated={genBaseProps({
+          location,
           wallet,
           addressFilter,
-          getStoresForWallet: (pubDeriver) => wrapForReceivePage(getStoresForWallet(pubDeriver)),
+          addressSubgroupMap,
         })}
       />)
     )
@@ -472,16 +322,14 @@ export const NoMatchFilter = (): Node => {
   const wallet = genSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
 
-  const location = getExternalRoute(wallet.publicDeriver.getPublicDeriverId());
+  const location = routeForStore(GROUP_EXTERNAL.name);
   const addressFilter = AddressFilter.Used;
-  const getStoresForWallet = genGetStoresForWallet({
-    location,
-    publicDeriver: wallet.publicDeriver,
-    addresses: [genAddresses()[0]],
-    addressFilter,
+  const addressSubgroupMap = genDefaultGroupMap(true);
+
+  addressSubgroupMap.set(GROUP_EXTERNAL.class, {
+    all: [genAddresses('byron')[0]],
     wasExecuted: true,
   });
-
   return wrapWallet(
     mockWalletProps({
       location,
@@ -491,15 +339,16 @@ export const NoMatchFilter = (): Node => {
     wrapReceive(
       mockReceiveProps({
         selected: wallet.publicDeriver,
-        getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressSubgroupMap,
         addressFilter,
         location,
       }),
       (<WalletReceivePage
         generated={genBaseProps({
+          location,
           wallet,
           addressFilter,
-          getStoresForWallet: (pubDeriver) => wrapForReceivePage(getStoresForWallet(pubDeriver)),
+          addressSubgroupMap,
         })}
       />)
     )
@@ -520,12 +369,11 @@ export const ExternalTab = (): Node => {
   );
 
   const addressFilter = select('AddressFilter', AddressFilter, AddressFilter.None);
-  const location = getExternalRoute(wallet.publicDeriver.getPublicDeriverId());
-  const getStoresForWallet = genGetStoresForWallet({
-    location,
-    publicDeriver: wallet.publicDeriver,
-    addresses: genAddresses(),
-    addressFilter,
+  const location = routeForStore(GROUP_EXTERNAL.name);
+
+  const addressSubgroupMap = genDefaultGroupMap(true);
+  addressSubgroupMap.set(GROUP_EXTERNAL.class, {
+    all: genAddresses('jormungandr'),
     wasExecuted: true,
   });
 
@@ -538,18 +386,19 @@ export const ExternalTab = (): Node => {
     wrapReceive(
       mockReceiveProps({
         selected: wallet.publicDeriver,
-        getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressSubgroupMap,
         addressFilter,
         location,
       }),
       (<WalletReceivePage
         generated={genBaseProps({
+          location,
           wallet,
           dialog: getAddressGenerationValue() === addressCases.Yes
             ? LoadingSpinner
             : undefined,
           addressFilter,
-          getStoresForWallet: (pubDeriver) => wrapForReceivePage(getStoresForWallet(pubDeriver)),
+          addressSubgroupMap,
         })}
       />)
     )
@@ -562,14 +411,14 @@ export const InternalTab = (): Node => {
   const lookup = walletLookup([wallet]);
 
   const addressFilter = select('AddressFilter', AddressFilter, AddressFilter.None);
-  const location = getInternalRoute(wallet.publicDeriver.getPublicDeriverId());
-  const getStoresForWallet = genGetStoresForWallet({
-    location,
-    publicDeriver: wallet.publicDeriver,
-    addresses: genAddresses(),
-    addressFilter,
+  const location = routeForStore(GROUP_INTERNAL.name);
+
+  const addressSubgroupMap = genDefaultGroupMap(true);
+  addressSubgroupMap.set(GROUP_INTERNAL.class, {
+    all: genAddresses('jormungandr'),
     wasExecuted: true,
   });
+
   return wrapWallet(
     mockWalletProps({
       location,
@@ -579,15 +428,16 @@ export const InternalTab = (): Node => {
     wrapReceive(
       mockReceiveProps({
         selected: wallet.publicDeriver,
-        getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressSubgroupMap,
         addressFilter,
         location
       }),
       (<WalletReceivePage
         generated={genBaseProps({
+          location,
           wallet,
           addressFilter,
-          getStoresForWallet: (pubDeriver) => wrapForReceivePage(getStoresForWallet(pubDeriver)),
+          addressSubgroupMap,
         })}
       />)
     )
@@ -599,14 +449,14 @@ export const MangledTab = (): Node => {
   const lookup = walletLookup([wallet]);
 
   const addressFilter = select('AddressFilter', AddressFilter, AddressFilter.None);
-  const location = getMangledRoute(wallet.publicDeriver.getPublicDeriverId());
-  const getStoresForWallet = genGetStoresForWallet({
-    location,
-    publicDeriver: wallet.publicDeriver,
-    addresses: genAddresses(),
-    addressFilter,
+  const location = routeForStore(GROUP_MANGLED.name);
+
+  const addressSubgroupMap = genDefaultGroupMap(true);
+  addressSubgroupMap.set(GROUP_MANGLED.class, {
+    all: genAddresses('jormungandr'),
     wasExecuted: true,
   });
+
   return wrapWallet(
     mockWalletProps({
       location,
@@ -616,15 +466,16 @@ export const MangledTab = (): Node => {
     wrapReceive(
       mockReceiveProps({
         selected: wallet.publicDeriver,
-        getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressSubgroupMap,
         addressFilter,
         location
       }),
       (<WalletReceivePage
         generated={genBaseProps({
+          location,
           wallet,
           addressFilter,
-          getStoresForWallet: (pubDeriver) => wrapForReceivePage(getStoresForWallet(pubDeriver)),
+          addressSubgroupMap,
         })}
       />)
     )
@@ -635,14 +486,14 @@ export const AddressBookTab = (): Node => {
   const lookup = walletLookup([wallet]);
 
   const addressFilter = AddressFilter.None;
-  const location = getAddressBookRoute(wallet.publicDeriver.getPublicDeriverId());
-  const getStoresForWallet = genGetStoresForWallet({
-    location,
-    publicDeriver: wallet.publicDeriver,
-    addresses: genAddresses(),
-    addressFilter,
+  const location = routeForStore(ADDRESS_BOOK.name);
+
+  const addressSubgroupMap = genDefaultGroupMap(true);
+  addressSubgroupMap.set(ADDRESS_BOOK.class, {
+    all: genAddresses('jormungandr'),
     wasExecuted: true,
   });
+
   return wrapWallet(
     mockWalletProps({
       location,
@@ -652,15 +503,16 @@ export const AddressBookTab = (): Node => {
     wrapReceive(
       mockReceiveProps({
         selected: wallet.publicDeriver,
-        getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressSubgroupMap,
         addressFilter,
         location,
       }),
       (<WalletReceivePage
         generated={genBaseProps({
+          location,
           wallet,
           addressFilter,
-          getStoresForWallet: (pubDeriver) => wrapForReceivePage(getStoresForWallet(pubDeriver)),
+          addressSubgroupMap,
         })}
       />)
     )
@@ -672,14 +524,14 @@ export const UnmangleDialogLoading = (): Node => {
   const lookup = walletLookup([wallet]);
 
   const addressFilter = AddressFilter.None;
-  const location = getMangledRoute(wallet.publicDeriver.getPublicDeriverId());
-  const getStoresForWallet = genGetStoresForWallet({
-    location,
-    publicDeriver: wallet.publicDeriver,
-    addresses: genAddresses(),
-    addressFilter,
+  const location = routeForStore(GROUP_MANGLED.name);
+
+  const addressSubgroupMap = genDefaultGroupMap(true);
+  addressSubgroupMap.set(GROUP_MANGLED.class, {
+    all: genAddresses('jormungandr'),
     wasExecuted: true,
   });
+
   return wrapWallet(
     mockWalletProps({
       location,
@@ -689,16 +541,17 @@ export const UnmangleDialogLoading = (): Node => {
     wrapReceive(
       mockReceiveProps({
         selected: wallet.publicDeriver,
-        getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressSubgroupMap,
         addressFilter,
         location
       }),
       (<WalletReceivePage
         generated={genBaseProps({
+          location,
           wallet,
           dialog: UnmangleTxDialogContainer,
           addressFilter,
-          getStoresForWallet: (pubDeriver) => wrapForReceivePage(getStoresForWallet(pubDeriver)),
+          addressSubgroupMap,
           transactionBuilderStore: {
             tentativeTx: null,
             setupSelfTx: {
@@ -716,14 +569,14 @@ export const UnmangleDialogError = (): Node => {
   const lookup = walletLookup([wallet]);
 
   const addressFilter = AddressFilter.None;
-  const location = getMangledRoute(wallet.publicDeriver.getPublicDeriverId());
-  const getStoresForWallet = genGetStoresForWallet({
-    location,
-    publicDeriver: wallet.publicDeriver,
-    addresses: genAddresses(),
-    addressFilter,
+  const location = routeForStore(GROUP_MANGLED.name);
+
+  const addressSubgroupMap = genDefaultGroupMap(true);
+  addressSubgroupMap.set(GROUP_MANGLED.class, {
+    all: genAddresses('jormungandr'),
     wasExecuted: true,
   });
+
   return wrapWallet(
     mockWalletProps({
       location,
@@ -733,16 +586,17 @@ export const UnmangleDialogError = (): Node => {
     wrapReceive(
       mockReceiveProps({
         selected: wallet.publicDeriver,
-        getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressSubgroupMap,
         addressFilter,
         location
       }),
       (<WalletReceivePage
         generated={genBaseProps({
+          location,
           wallet,
           dialog: UnmangleTxDialogContainer,
           addressFilter,
-          getStoresForWallet: (pubDeriver) => wrapForReceivePage(getStoresForWallet(pubDeriver)),
+          addressSubgroupMap,
           transactionBuilderStore: {
             tentativeTx: null,
             setupSelfTx: {
@@ -761,14 +615,14 @@ export const UnmangleDialogConfirm = (): Node => {
   const { tentativeTx } = genTentativeTx();
 
   const addressFilter = AddressFilter.None;
-  const location = getMangledRoute(wallet.publicDeriver.getPublicDeriverId());
-  const getStoresForWallet = genGetStoresForWallet({
-    location,
-    publicDeriver: wallet.publicDeriver,
-    addresses: genAddresses(),
-    addressFilter,
+  const location = routeForStore(GROUP_MANGLED.name);
+
+  const addressSubgroupMap = genDefaultGroupMap(true);
+  addressSubgroupMap.set(GROUP_MANGLED.class, {
+    all: genAddresses('jormungandr'),
     wasExecuted: true,
   });
+
   return wrapWallet(
     mockWalletProps({
       location,
@@ -778,16 +632,17 @@ export const UnmangleDialogConfirm = (): Node => {
     wrapReceive(
       mockReceiveProps({
         selected: wallet.publicDeriver,
-        getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressSubgroupMap,
         addressFilter,
         location
       }),
       (<WalletReceivePage
         generated={genBaseProps({
+          location,
           wallet,
           dialog: UnmangleTxDialogContainer,
           addressFilter,
-          getStoresForWallet: (pubDeriver) => wrapForReceivePage(getStoresForWallet(pubDeriver)),
+          addressSubgroupMap,
           transactionBuilderStore: {
             tentativeTx,
             setupSelfTx: {
@@ -805,14 +660,15 @@ export const UriGenerateDialog = (): Node => {
   const lookup = walletLookup([wallet]);
 
   const addressFilter = AddressFilter.None;
-  const location = getExternalRoute(wallet.publicDeriver.getPublicDeriverId());
-  const getStoresForWallet = genGetStoresForWallet({
-    location,
-    publicDeriver: wallet.publicDeriver,
-    addresses: genAddresses(),
-    addressFilter,
+  const location = routeForStore(GROUP_EXTERNAL.name);
+
+  const addressSubgroupMap = genDefaultGroupMap(true);
+  const addresses = genAddresses('jormungandr');
+  addressSubgroupMap.set(GROUP_EXTERNAL.class, {
+    all: addresses,
     wasExecuted: true,
   });
+
   return wrapWallet(
     mockWalletProps({
       location,
@@ -822,21 +678,22 @@ export const UriGenerateDialog = (): Node => {
     wrapReceive(
       mockReceiveProps({
         selected: wallet.publicDeriver,
-        getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressSubgroupMap,
         addressFilter,
         location
       }),
       (<WalletReceivePage
         generated={genBaseProps({
+          location,
           wallet,
           dialog: URIGenerateDialog,
           addressFilter,
           getParam: (param) => {
             if (param === 'address') {
-              return genAddresses()[0].address;
+              return addresses[0].address;
             }
           },
-          getStoresForWallet: (pubDeriver) => wrapForReceivePage(getStoresForWallet(pubDeriver)),
+          addressSubgroupMap,
         })}
       />)
     )
@@ -848,14 +705,15 @@ export const UriDisplayDialog = (): Node => {
   const lookup = walletLookup([wallet]);
 
   const addressFilter = AddressFilter.None;
-  const location = getExternalRoute(wallet.publicDeriver.getPublicDeriverId());
-  const getStoresForWallet = genGetStoresForWallet({
-    location,
-    publicDeriver: wallet.publicDeriver,
-    addresses: genAddresses(),
-    addressFilter,
+  const location = routeForStore(GROUP_EXTERNAL.name);
+
+  const addresses = genAddresses('jormungandr');
+  const addressSubgroupMap = genDefaultGroupMap(true);
+  addressSubgroupMap.set(GROUP_EXTERNAL.class, {
+    all: addresses,
     wasExecuted: true,
   });
+
   return wrapWallet(
     mockWalletProps({
       location,
@@ -865,24 +723,25 @@ export const UriDisplayDialog = (): Node => {
     wrapReceive(
       mockReceiveProps({
         selected: wallet.publicDeriver,
-        getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressSubgroupMap,
         addressFilter,
         location
       }),
       (<WalletReceivePage
         generated={genBaseProps({
+          location,
           wallet,
           dialog: URIDisplayDialog,
           addressFilter,
           getParam: (param) => {
             if (param === 'address') {
-              return genAddresses()[0].address;
+              return addresses[0].address;
             }
             if (param === 'amount') {
               return new BigNumber(5);
             }
           },
-          getStoresForWallet: (pubDeriver) => wrapForReceivePage(getStoresForWallet(pubDeriver)),
+          addressSubgroupMap,
         })}
       />)
     )
@@ -894,14 +753,14 @@ export const VerifyRegularAddress = (): Node => {
   const lookup = walletLookup([wallet]);
 
   const addressFilter = AddressFilter.None;
-  const location = getExternalRoute(wallet.publicDeriver.getPublicDeriverId());
-  const getStoresForWallet = genGetStoresForWallet({
-    location,
-    publicDeriver: wallet.publicDeriver,
-    addresses: genAddresses(),
-    addressFilter,
+  const location = routeForStore(GROUP_EXTERNAL.name);
+
+  const addressSubgroupMap = genDefaultGroupMap(true);
+  addressSubgroupMap.set(GROUP_EXTERNAL.class, {
+    all: genAddresses('jormungandr'),
     wasExecuted: true,
   });
+
   return wrapWallet(
     mockWalletProps({
       location,
@@ -911,16 +770,17 @@ export const VerifyRegularAddress = (): Node => {
     wrapReceive(
       mockReceiveProps({
         selected: wallet.publicDeriver,
-        getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressSubgroupMap,
         addressFilter,
         location
       }),
       (<WalletReceivePage
         generated={genBaseProps({
+          location,
           wallet,
           dialog: VerifyAddressDialog,
           addressFilter,
-          getStoresForWallet: (pubDeriver) => wrapForReceivePage(getStoresForWallet(pubDeriver)),
+          addressSubgroupMap,
         })}
       />)
     )
@@ -940,14 +800,14 @@ export const VerifyLedgerAddress = (): Node => {
   const lookup = walletLookup([wallet]);
 
   const addressFilter = AddressFilter.None;
-  const location = getExternalRoute(wallet.publicDeriver.getPublicDeriverId());
-  const getStoresForWallet = genGetStoresForWallet({
-    location,
-    publicDeriver: wallet.publicDeriver,
-    addresses: genAddresses(),
-    addressFilter,
+  const location = routeForStore(GROUP_EXTERNAL.name);
+
+  const addressSubgroupMap = genDefaultGroupMap(true);
+  addressSubgroupMap.set(GROUP_EXTERNAL.class, {
+    all: genAddresses('jormungandr'),
     wasExecuted: true,
   });
+
   return wrapWallet(
     mockWalletProps({
       location,
@@ -957,17 +817,18 @@ export const VerifyLedgerAddress = (): Node => {
     wrapReceive(
       mockReceiveProps({
         selected: wallet.publicDeriver,
-        getStoresForWallet: (publicDeriver) => wrapForReceive(getStoresForWallet(publicDeriver)),
+        addressSubgroupMap,
         addressFilter,
         location
       }),
       (<WalletReceivePage
         generated={genBaseProps({
+          location,
           wallet,
           dialog: VerifyAddressDialog,
           addressFilter,
           verifyError: getErrorValue(),
-          getStoresForWallet: (pubDeriver) => wrapForReceivePage(getStoresForWallet(pubDeriver)),
+          addressSubgroupMap,
         })}
       />)
     )
