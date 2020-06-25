@@ -22,24 +22,24 @@ When(/^I click on the internal tab$/, async function () {
 });
 
 When(/^I click on the address book tab$/, async function () {
-  await this.click('button.addressBook');
+  await this.click(`//span[contains(text(), "Address book") and contains(@class, "ReceiveNavButton_label")]`, By.xpath);
 });
 
 When(/^I click on the All addresses button$/, async function () {
   const hideUsedText = await i18n.formatMessage(this.driver, { id: 'wallet.receive.navigation.allLabel' });
-  await this.click(`//button[contains(text(), "${hideUsedText}")]`, By.xpath);
+  await this.click(`//span[contains(text(), "${hideUsedText}")]`, By.xpath);
 });
 When(/^I click on the Unused addresses button$/, async function () {
   const hideUsedText = await i18n.formatMessage(this.driver, { id: 'wallet.receive.navigation.unusedLabel' });
-  await this.click(`//button[contains(text(), "${hideUsedText}")]`, By.xpath);
+  await this.click(`//span[contains(text(), "${hideUsedText}")]`, By.xpath);
 });
 When(/^I click on the Used addresses button$/, async function () {
   const hideUsedText = await i18n.formatMessage(this.driver, { id: 'wallet.receive.navigation.usedLabel' });
-  await this.click(`//button[contains(text(), "${hideUsedText}")]`, By.xpath);
+  await this.click(`//span[contains(text(), "${hideUsedText}")]`, By.xpath);
 });
 When(/^I click on the HasBalance addresses button$/, async function () {
   const hideUsedText = await i18n.formatMessage(this.driver, { id: 'wallet.receive.navigation.hasBalanceLabel' });
-  await this.click(`//button[contains(text(), "${hideUsedText}")]`, By.xpath);
+  await this.click(`//span[contains(text(), "${hideUsedText}")]`, By.xpath);
 });
 
 When(/^I click on the Generate new address button ([0-9]+) times$/, async function (times) {

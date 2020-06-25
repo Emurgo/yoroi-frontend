@@ -2,7 +2,6 @@
 import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import BigNumber from 'bignumber.js';
 import { computed, observable, runInAction } from 'mobx';
 import { intlShape } from 'react-intl';
 import config from '../../config';
@@ -21,8 +20,7 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import Dialog from '../../components/widgets/Dialog';
 import globalMessages from '../../i18n/global-messages';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
-import { asHasUtxoChains } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import type { AddressFilterKind, StandardAddress, AddressTypeName, } from '../../types/AddressFilterTypes';
+import type { AddressFilterKind, } from '../../types/AddressFilterTypes';
 import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
 import type { GeneratedData as UnmangleTxDialogContainerData } from '../transfer/UnmangleTxDialogContainer';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -37,6 +35,9 @@ import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { getApiForCoinType, getApiMeta } from '../../api/common/utils';
 import { isWithinSupply } from '../../utils/validations';
 import { Logger, } from '../../utils/logging';
+import type { AddressSubgroupMeta, IAddressTypeUiSubset, IAddressTypeStore } from '../../stores/stateless/addressStores';
+import { routeForStore, allAddressSubgroups, applyAddressFilter, } from '../../stores/stateless/addressStores';
+import { getUnmangleAmounts, } from '../../stores/stateless/mangledAddresses';
 
 export type GeneratedData = typeof WalletReceivePage.prototype.generated;
 
@@ -94,16 +95,11 @@ export default class WalletReceivePage extends Component<Props> {
     const apiMeta = getApiMeta(selectedApiType)?.meta;
     if (apiMeta == null) throw new Error(`${nameof(WalletReceivePage)} no API selected`);
 
-    // Guard against potential null values
-
-    // assume account-level wallet for now
-    const withChains = asHasUtxoChains(publicDeriver);
-    if (!withChains) throw new Error(`${nameof(WalletReceivePage)} only available for account-level wallets`);
     const addressTypeStore = this.getTypeStore(publicDeriver);
 
     if (
       addressTypeStore == null ||
-      !addressTypeStore.wasExecuted
+      !addressTypeStore.request.wasExecuted
     ) {
       return (
         <VerticallyCenteredLayout>
@@ -113,7 +109,7 @@ export default class WalletReceivePage extends Component<Props> {
     }
 
     // get info about the latest address generated for special rendering
-    const lastAddress = addressTypeStore.all[addressTypeStore.all.length - 1];
+    const lastAddress = addressTypeStore.request.all[addressTypeStore.request.all.length - 1];
     const walletAddress = lastAddress != null ? lastAddress.address : '';
     const isWalletAddressUsed = lastAddress != null ? lastAddress.isUsed === true : false;
 
@@ -142,12 +138,8 @@ export default class WalletReceivePage extends Component<Props> {
       this.notificationElementId
     );
 
-    const addressStores = this.generated.stores.addresses.getStoresForWallet(publicDeriver);
-    const { canUnmangle } = this.generated.stores.substores.ada.addresses.getUnmangleAmounts();
     const header = (() => {
-      if (addressStores.some(store => (
-        store.name.subgroup === AddressSubgroup.external && store.isActiveStore
-      ))) {
+      if (addressTypeStore.meta.name.subgroup === AddressSubgroup.external) {
         return (<StandardHeader
           walletAddress={walletAddress}
           selectedExplorer={this.generated.stores.profile.selectedExplorer}
@@ -160,32 +152,23 @@ export default class WalletReceivePage extends Component<Props> {
           isFilterActive={this.generated.stores.addresses.addressFilter !== AddressFilter.None}
         />);
       }
-      if (addressStores.some(store => (
-        store.name.subgroup === AddressSubgroup.internal && store.isActiveStore
-      ))) {
+      if (addressTypeStore.meta.name.subgroup === AddressSubgroup.internal) {
         return (<InternalHeader />);
       }
-      if (addressStores.some(store => (
-        store.name.subgroup === AddressSubgroup.mangled && store.isActiveStore
-      ))) {
+      if (addressTypeStore.meta.name.subgroup === AddressSubgroup.mangled) {
         return (
           <MangledHeader
-            hasMangledUtxo={canUnmangle.length > 0}
+            hasMangledUtxo={getUnmangleAmounts(addressTypeStore.request.all).canUnmangle.length > 0}
             onClick={() => this.generated.actions.dialogs.open.trigger({
               dialog: UnmangleTxDialogContainer,
             })}
           />
         );
       }
-      if (addressStores.some(store => (
-        store.name.group === AddressGroupTypes.addressBook &&
-        store.isActiveStore
-      ))) {
+      if (addressTypeStore.meta.name.group === AddressGroupTypes.addressBook) {
         return null;
       }
-      if (addressStores.some(store => (
-        store.name.subgroup === AddressSubgroup.all && store.isActiveStore
-      ))) {
+      if (addressTypeStore.meta.name.subgroup === AddressSubgroup.all) {
         return (<StandardHeader
           walletAddress={walletAddress}
           selectedExplorer={this.generated.stores.profile.selectedExplorer}
@@ -202,18 +185,15 @@ export default class WalletReceivePage extends Component<Props> {
     })();
 
     const getSelectedHierarchyPath = () => {
-      const selectedStore = addressStores.find(store => store.isActiveStore);
-      if (selectedStore == null) return [];
-
-      if (selectedStore.name.subgroup === AddressSubgroup.all) {
+      if (addressTypeStore.meta.name.subgroup === AddressSubgroup.all) {
         return [
-          intl.formatMessage(addressGroupName[selectedStore.name.group]),
+          intl.formatMessage(addressGroupName[addressTypeStore.meta.name.group]),
         ];
       }
 
       return [
-        intl.formatMessage(addressGroupName[selectedStore.name.group]),
-        intl.formatMessage(addressSubgroupName[selectedStore.name.subgroup])
+        intl.formatMessage(addressGroupName[addressTypeStore.meta.name.group]),
+        intl.formatMessage(addressSubgroupName[addressTypeStore.meta.name.subgroup])
       ];
     };
     return (
@@ -225,24 +205,25 @@ export default class WalletReceivePage extends Component<Props> {
           }}
           header={header}
           selectedExplorer={this.generated.stores.profile.selectedExplorer}
-          walletAddresses={addressTypeStore.filtered.slice().reverse()}
+          walletAddresses={applyAddressFilter({
+            addressFilter: this.generated.stores.addresses.addressFilter,
+            addresses: addressTypeStore.request.all,
+          }).slice().reverse()}
           onCopyAddressTooltip={onCopyAddressTooltip}
           notification={notification}
           onVerifyAddress={async (request: {| address: string, path: void | BIP32Path, |}) => {
             await actions.ada.hwVerifyAddress.selectAddress.trigger(request);
             this.openVerifyAddressDialog();
           }}
-          onGeneratePaymentURI={!addressStores.some(store => (
+          onGeneratePaymentURI={
             (
-              store.name.subgroup === AddressSubgroup.external ||
-              store.name.subgroup === AddressSubgroup.all
-            ) &&
-            store.isActiveStore
-          ))
-            ? undefined
-            : (address) => {
-              this.openURIGenerateDialog(address);
-            }
+              addressTypeStore.meta.name.subgroup !== AddressSubgroup.external &&
+              addressTypeStore.meta.name.subgroup !== AddressSubgroup.all
+            )
+              ? undefined
+              : (address) => {
+                this.openURIGenerateDialog(address);
+              }
         }
           shouldHideBalance={profile.shouldHideBalance}
           unitOfAccountSetting={profile.unitOfAccount}
@@ -250,12 +231,7 @@ export default class WalletReceivePage extends Component<Props> {
             primaryTicker: apiMeta.primaryTicker,
             decimalPlaces: apiMeta.decimalPlaces.toNumber(),
           }}
-          addressBook={
-            addressStores
-              .find(store => store.isActiveStore)
-              ?.name.group === AddressGroupTypes.addressBook
-              ?? false
-          }
+          addressBook={addressTypeStore.meta.name.group === AddressGroupTypes.addressBook}
         />
 
         {uiDialogs.isOpen(LoadingSpinner) ? (
@@ -338,18 +314,23 @@ export default class WalletReceivePage extends Component<Props> {
     );
   }
 
-  getTypeStore: PublicDeriver<> => void | {
-    +all: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
-    +filtered: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
-    +wasExecuted: boolean,
-    ...,
-  } = (
-    publicDeriver
-  ) => {
-    const addressStores = this.generated.stores.addresses.getStoresForWallet(publicDeriver);
-    for (const addressStore of addressStores) {
-      if (addressStore.isActiveStore) {
-        return addressStore;
+  getTypeStore: PublicDeriver<> => void | {|
+    +request: IAddressTypeUiSubset,
+    +meta: AddressSubgroupMeta<IAddressTypeStore>,
+  |} = (publicDeriver) => {
+    for (const addressStore of allAddressSubgroups) {
+      if (!addressStore.isRelated({ selected: publicDeriver })) {
+        continue;
+      }
+      if (this.generated.stores.app.currentRoute.startsWith(
+        routeForStore(addressStore.name)
+      )) {
+        const request = this.generated.stores.addresses.addressSubgroupMap.get(addressStore.class);
+        if (request == null) throw new Error('Should never happen');
+        return {
+          request,
+          meta: addressStore,
+        };
       }
     }
     Logger.error(`${nameof(WalletReceivePage)} unexpected address tab`);
@@ -426,19 +407,12 @@ export default class WalletReceivePage extends Component<Props> {
       |}
     |},
     stores: {|
+      app: {| currentRoute: string |},
       addresses: {|
         addressFilter: AddressFilterKind,
         createAddressRequest: {| isExecuting: boolean |},
         error: ?LocalizableError,
-        getStoresForWallet: (
-          publicDeriver: PublicDeriver<>
-        ) => Array<{|
-          +all: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
-          +filtered: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
-          +isActiveStore: boolean,
-          +name: AddressTypeName,
-          +wasExecuted: boolean,
-        |}>
+        addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
       |},
       profile: {|
         isClassicTheme: boolean,
@@ -448,12 +422,6 @@ export default class WalletReceivePage extends Component<Props> {
       |},
       substores: {|
         ada: {|
-          addresses: {|
-            getUnmangleAmounts: void => {|
-              canUnmangle: Array<BigNumber>,
-              cannotUnmangle: Array<BigNumber>
-            |}
-          |},
           hwVerifyAddress: {|
             error: ?LocalizableError,
             isActionProcessing: boolean,
@@ -485,6 +453,9 @@ export default class WalletReceivePage extends Component<Props> {
     const adaStore = stores.substores.ada;
     return Object.freeze({
       stores: {
+        app: {
+          currentRoute: stores.app.currentRoute,
+        },
         uiNotifications: {
           isOpen: stores.uiNotifications.isOpen,
           getTooltipActiveNotification: stores.uiNotifications.getTooltipActiveNotification,
@@ -504,17 +475,7 @@ export default class WalletReceivePage extends Component<Props> {
         },
         addresses: {
           addressFilter: stores.addresses.addressFilter,
-          getStoresForWallet: (publicDeriver: PublicDeriver<>) => {
-            const addressStores = stores.addresses.getStoresForWallet(publicDeriver);
-            const functionalitySubset = addressStores.map(addressStore => ({
-              isActiveStore: addressStore.isActiveStore,
-              name: addressStore.name,
-              all: addressStore.all,
-              filtered: addressStore.filtered,
-              wasExecuted: addressStore.wasExecuted,
-            }));
-            return functionalitySubset;
-          },
+          addressSubgroupMap: stores.addresses.addressSubgroupMap,
           createAddressRequest: {
             isExecuting: stores.addresses.createAddressRequest.isExecuting,
           },
@@ -522,9 +483,6 @@ export default class WalletReceivePage extends Component<Props> {
         },
         substores: {
           ada: {
-            addresses: {
-              getUnmangleAmounts: adaStore.addresses.getUnmangleAmounts,
-            },
             hwVerifyAddress: {
               selectedAddress: adaStore.hwVerifyAddress.selectedAddress,
               isActionProcessing: adaStore.hwVerifyAddress.isActionProcessing,

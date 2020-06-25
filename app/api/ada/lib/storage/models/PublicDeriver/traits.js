@@ -875,7 +875,7 @@ const Bip44PickInternalMixin = (
     };
   }
 });
-const Bip44PickInternal: * = Mixin<
+export const Bip44PickInternal: * = Mixin<
   Bip44PickInternalMixinDependencies,
   IPickInternal
 >(Bip44PickInternalMixin);

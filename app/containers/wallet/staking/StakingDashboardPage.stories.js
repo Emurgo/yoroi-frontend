@@ -42,6 +42,8 @@ import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
 import PoolWarningDialog from '../../../components/wallet/staking/dashboard/PoolWarningDialog';
 import UndelegateDialog from '../../../components/wallet/staking/dashboard/UndelegateDialog';
+import { GROUP_MANGLED } from '../../../stores/stateless/addressStores';
+import type { StandardAddress } from '../../../types/AddressFilterTypes';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -63,8 +65,7 @@ const genBaseProps: {|
   poolReputation?: *,
   allowToggleHidden?: *,
   mangledInfo?: {|
-    addresses: Array<*>,
-    amounts: *,
+    addresses: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   |},
   getParam?: <T>(number | string) => T,
 |} => * = (request) => {
@@ -108,17 +109,17 @@ const genBaseProps: {|
           : false,
         getTxRequests: request.lookup.getTransactions,
       },
+      addresses: {
+        addressSubgroupMap: new Map([[
+          GROUP_MANGLED.class,
+          {
+            all: request.mangledInfo?.addresses ?? [],
+            wasExecuted: true,
+          },
+        ]]),
+      },
       substores: {
         ada: {
-          addresses: {
-            getUnmangleAmounts: () => (request.mangledInfo == null
-              ? {
-                canUnmangle: [],
-                cannotUnmangle: [],
-              }
-              : request.mangledInfo.amounts
-            )
-          },
           time: {
             getTimeCalcRequests: request.lookup.getTimeCalcRequests,
             getCurrentTimeRequests: request.lookup.getCurrentTimeRequests,
@@ -200,6 +201,15 @@ const genBaseProps: {|
           coinPriceStore: {
             getCurrentPrice: (_from, _to) => 5,
           },
+          addresses: {
+            addressSubgroupMap: new Map([[
+              GROUP_MANGLED.class,
+              {
+                all: request.mangledInfo?.addresses ?? [],
+                wasExecuted: true,
+              },
+            ]]),
+          },
           substores: {
             ada: {
               wallets: {
@@ -219,11 +229,6 @@ const genBaseProps: {|
                       : sendErrorValue(),
                     isExecuting: boolean('isExecuting', false),
                   },
-              },
-              addresses: {
-                mangledAddressesForDisplay: {
-                  all: request.mangledInfo == null ? [] : request.mangledInfo.addresses,
-                },
               },
               transactionBuilderStore: request.transactionBuilderStore || (null: any),
             },
@@ -969,6 +974,31 @@ export const MangledDashboardWarning = (): Node => {
     mangledCases,
     mangledCases.CanUnmangleAll
   );
+
+  const addresses = (() => {
+    if (mangledValue === mangledCases.CannotUnmangle) {
+      return [{
+        address: 'addr1sj045dheysyptfekdyqa508nuzdzmh82vkda9hcwqwysrja6d8d66f0cfsfk50hhuqjymr08drnm2kdf0r2337l6kl7mtm0z44vv4jexkqhz5w',
+        value: new BigNumber(1),
+      }];
+    }
+    if (mangledValue === mangledCases.CanUnmangleSome) {
+      return [{
+        address: 'addr1sj045dheysyptfekdyqa508nuzdzmh82vkda9hcwqwysrja6d8d66f0cfsfk50hhuqjymr08drnm2kdf0r2337l6kl7mtm0z44vv4jexkqhz5w',
+        value: new BigNumber(1),
+      }, {
+        address: 'addr1sj045dheysyptfekdyqa508nuzdzmh82vkda9hcwqwysrja6d8d66f0cfsfk50hhuqjymr08drnm2kdf0r2337l6kl7mtm0z44vv4jexkqhz5w',
+        value: new BigNumber(1000000),
+      }];
+    }
+    if (mangledValue === mangledCases.CanUnmangleAll) {
+      return [{
+        address: 'addr1sj045dheysyptfekdyqa508nuzdzmh82vkda9hcwqwysrja6d8d66f0cfsfk50hhuqjymr08drnm2kdf0r2337l6kl7mtm0z44vv4jexkqhz5w',
+        value: new BigNumber(1000000),
+      }];
+    }
+    throw new Error(`Unhandled mangled case ${mangledValue}`);
+  })();
   const wallet = genBaseWallet();
   const lookup = walletLookup([wallet]);
   return wrapWallet(
@@ -982,15 +1012,7 @@ export const MangledDashboardWarning = (): Node => {
         wallet,
         lookup,
         mangledInfo: {
-          addresses: [],
-          amounts: {
-            canUnmangle: mangledValue === mangledCases.CannotUnmangle
-              ? []
-              : [new BigNumber(5)],
-            cannotUnmangle: mangledValue === mangledCases.CanUnmangleAll
-              ? []
-              : [new BigNumber(4)],
-          }
+          addresses,
         },
       })}
     />)
@@ -1012,10 +1034,6 @@ export const UnmangleDialogLoading = (): Node => {
         lookup,
         mangledInfo: {
           addresses: [],
-          amounts: {
-            canUnmangle: [],
-            cannotUnmangle: [],
-          }
         },
         openDialog: UnmangleTxDialogContainer,
         transactionBuilderStore: {
@@ -1044,10 +1062,6 @@ export const UnmangleDialogError = (): Node => {
         lookup,
         mangledInfo: {
           addresses: [],
-          amounts: {
-            canUnmangle: [],
-            cannotUnmangle: [],
-          }
         },
         openDialog: UnmangleTxDialogContainer,
         transactionBuilderStore: {
@@ -1077,10 +1091,6 @@ export const UnmangleDialogConfirm = (): Node => {
         lookup,
         mangledInfo: {
           addresses: [],
-          amounts: {
-            canUnmangle: [],
-            cannotUnmangle: [],
-          }
         },
         openDialog: UnmangleTxDialogContainer,
         transactionBuilderStore: {

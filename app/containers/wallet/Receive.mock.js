@@ -3,19 +3,13 @@
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import type { GeneratedData } from './Receive';
 import { action } from '@storybook/addon-actions';
-import type { AddressTypeName, AddressFilterKind } from '../../types/AddressFilterTypes';
+import type { AddressFilterKind } from '../../types/AddressFilterTypes';
+import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
 
 export const mockReceiveProps: {|
   selected: null | PublicDeriver<>,
   addressFilter: AddressFilterKind,
-  getStoresForWallet: PublicDeriver<> => Array<{|
-    +isActiveStore: boolean,
-    +isHidden: boolean,
-    +setAsActiveStore: void => void,
-    +name: AddressTypeName,
-    +validFilters: Array<AddressFilterKind>,
-    +wasExecuted: boolean,
-  |}>,
+  addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
   location: string
 |} => {| generated: GeneratedData |} = (request) => ({
   generated: {
@@ -28,7 +22,7 @@ export const mockReceiveProps: {|
       },
       addresses: {
         addressFilter: request.addressFilter,
-        getStoresForWallet: request.getStoresForWallet,
+        addressSubgroupMap: request.addressSubgroupMap,
       },
     },
     actions: {

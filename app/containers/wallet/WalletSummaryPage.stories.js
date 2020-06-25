@@ -9,7 +9,7 @@ import { withScreenshot } from 'storycap';
 import {
   walletLookup,
   globalKnobs,
-  genSigningWalletWithCache,
+  getByronSigningWalletWithCache,
   genUnitOfAccount,
 } from '../../../stories/helpers/StoryWrapper';
 import type {
@@ -44,10 +44,15 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import {
   asGetPublicKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { AddressGroupTypes, AddressSubgroup } from '../../types/AddressFilterTypes';
 import {
   WalletCreationNotifications,
 } from '../../stores/toplevel/WalletStore';
+import {
+  allAddressSubgroups,
+  BYRON_EXTERNAL,
+  BYRON_INTERNAL,
+} from '../../stores/stateless/addressStores';
+import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -89,7 +94,7 @@ const actions = {
 
 export const Loading = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = getByronSigningWalletWithCache();
     return wallet;
   };
   const wallet = genWallet();
@@ -103,6 +108,9 @@ export const Loading = (): Node => {
     (<WalletSummaryPage
       generated={{
         stores: {
+          addresses: {
+            addressSubgroupMap: new Map(),
+          },
           profile: {
             selectedExplorer: getDefaultExplorer(),
             shouldHideBalance: false,
@@ -160,9 +168,6 @@ export const Loading = (): Node => {
             isExporting: false,
             exportError: undefined,
           },
-          addresses: {
-            getStoresForWallet: (_publicDeriver) => [],
-          },
           walletSettings: {
             getPublicDeriverSettingsCache: lookup.getPublicDeriverSettingsCache,
           },
@@ -170,6 +175,20 @@ export const Loading = (): Node => {
         actions,
       }}
     />)
+  );
+};
+
+const genDefaultGroupMap: (
+  boolean => Map<Class<IAddressTypeStore>, IAddressTypeUiSubset>
+) = (wasExecuted) => {
+  return new Map(
+    allAddressSubgroups.map(type => [
+      type.class,
+      {
+        all: [],
+        wasExecuted,
+      },
+    ])
   );
 };
 
@@ -258,26 +277,26 @@ const genPropsForTransactions: {|
     exportError: request.txExport?.exportError,
   },
   addresses: {
-    getStoresForWallet: (_publicDeriver) => [
-      {
-        name: {
-          group: AddressGroupTypes.byron,
-          subgroup: AddressSubgroup.external,
-        },
-        all: [{
-          address: 'Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf',
-        }],
-      },
-      {
-        name: {
-          group: AddressGroupTypes.byron,
-          subgroup: AddressSubgroup.internal,
-        },
-        all: [{
-          address: 'Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM',
-        }],
-      },
-    ],
+    addressSubgroupMap: (() => {
+      const defaultMap = genDefaultGroupMap(true);
+      defaultMap.set(
+        BYRON_EXTERNAL.class,
+        {
+          all: [
+            { address: 'Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf', }
+          ],
+          wasExecuted: true,
+        }
+      );
+      defaultMap.set(
+        BYRON_INTERNAL.class,
+        {
+          all: [{ address: 'Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM', }],
+          wasExecuted: true,
+        }
+      );
+      return defaultMap;
+    })(),
   },
   walletSettings: {
     getPublicDeriverSettingsCache: request.getPublicDeriverSettingsCache,
@@ -286,7 +305,7 @@ const genPropsForTransactions: {|
 
 export const Transaction = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = getByronSigningWalletWithCache();
     return wallet;
   };
   const wallet = genWallet();
@@ -409,7 +428,7 @@ export const Transaction = (): Node => {
 
 export const TransactionWithMemo = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = getByronSigningWalletWithCache();
     return wallet;
   };
   const wallet = genWallet();
@@ -489,7 +508,7 @@ export const TransactionWithMemo = (): Node => {
 
 export const MemoDialog = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = getByronSigningWalletWithCache();
     return wallet;
   };
   const wallet = genWallet();
@@ -583,7 +602,7 @@ export const MemoDialog = (): Node => {
 
 export const NoTransactions = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = getByronSigningWalletWithCache();
     return wallet;
   };
   const wallet = genWallet();
@@ -618,7 +637,7 @@ export const NoTransactions = (): Node => {
 
 export const ManyTransactions = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = getByronSigningWalletWithCache();
     return wallet;
   };
   const wallet = genWallet();
@@ -686,7 +705,7 @@ export const ManyTransactions = (): Node => {
 
 export const TxHistoryExport = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = getByronSigningWalletWithCache();
     return wallet;
   };
   const wallet = genWallet();
@@ -760,7 +779,7 @@ export const TxHistoryExport = (): Node => {
 
 export const DebugWalletWarning = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = getByronSigningWalletWithCache();
     return wallet;
   };
   const wallet = genWallet();

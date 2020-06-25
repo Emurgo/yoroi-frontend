@@ -54,6 +54,9 @@ import globalMessages from '../../../i18n/global-messages';
 import { computed, observable, runInAction } from 'mobx';
 import { getApiForCoinType, getApiMeta } from '../../../api/common/utils';
 import type { SelectedApiType, } from '../../../api/common/utils';
+import { getUnmangleAmounts, } from '../../../stores/stateless/mangledAddresses';
+import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../../stores/stateless/addressStores';
+import { GROUP_MANGLED } from '../../../stores/stateless/addressStores';
 
 export type GeneratedData = typeof StakingDashboardPage.prototype.generated;
 
@@ -595,10 +598,14 @@ export default class StakingDashboardPage extends Component<Props> {
       request.delegationRequests.getDelegatedBalance.wasExecuted &&
       request.errorIfPresent == null;
 
+    const mangledAddrRequest = this.generated.stores.addresses.addressSubgroupMap.get(
+      GROUP_MANGLED.class
+    );
+    if (mangledAddrRequest == null) throw new Error('No request. Should never happen');
     const {
       canUnmangle,
       cannotUnmangle,
-    } = this.generated.stores.substores.ada.addresses.getUnmangleAmounts();
+    } = getUnmangleAmounts(mangledAddrRequest.all);
 
     const canUnmangleSum = canUnmangle.reduce(
       (sum, val) => sum.plus(val),
@@ -781,6 +788,9 @@ export default class StakingDashboardPage extends Component<Props> {
       |}
     |},
     stores: {|
+      addresses: {|
+        addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
+      |},
       coinPriceStore: {|
         getCurrentPrice: (from: string, to: string) => ?number
       |},
@@ -796,12 +806,6 @@ export default class StakingDashboardPage extends Component<Props> {
       |},
       substores: {|
         ada: {|
-          addresses: {|
-            getUnmangleAmounts: void => {|
-              canUnmangle: Array<BigNumber>,
-              cannotUnmangle: Array<BigNumber>
-            |}
-          |},
           delegation: {|
             getDelegationRequests: (
               PublicDeriver<>
@@ -864,6 +868,9 @@ export default class StakingDashboardPage extends Component<Props> {
           getThemeVars: stores.profile.getThemeVars,
           unitOfAccount: stores.profile.unitOfAccount,
         },
+        addresses: {
+          addressSubgroupMap: stores.addresses.addressSubgroupMap,
+        },
         wallets: {
           selected: stores.wallets.selected,
         },
@@ -884,9 +891,6 @@ export default class StakingDashboardPage extends Component<Props> {
         },
         substores: {
           ada: {
-            addresses: {
-              getUnmangleAmounts: adaStore.addresses.getUnmangleAmounts,
-            },
             time: {
               getTimeCalcRequests: adaStore.time.getTimeCalcRequests,
               getCurrentTimeRequests: adaStore.time.getCurrentTimeRequests,
