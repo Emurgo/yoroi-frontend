@@ -44,7 +44,8 @@ import {
   DerivePublicDeriverFromKey, AddAdhocPublicDeriver,
 } from '../../database/walletTypes/common/api/write';
 import { ModifyKey, } from '../../database/primitives/api/write';
-import { GetKeyForDerivation, } from '../../database/primitives/api/read';
+import { GetNetworks, GetKeyForDerivation, } from '../../database/primitives/api/read';
+import type { NetworkRow, } from '../../database/primitives/tables';
 
 import {
   rawChangePassword,
@@ -379,6 +380,7 @@ export async function refreshConceptualWalletFunctionality(
   const deps = Object.freeze({
     GetHwWalletMeta,
     GetConceptualWallet,
+    GetNetworks,
   });
   const depTables = Object
     .keys(deps)
@@ -387,6 +389,7 @@ export async function refreshConceptualWalletFunctionality(
   const result = await raii<{|
     hardwareInfo: void | $ReadOnly<HwWalletMetaRow>,
     fullInfo: $ReadOnly<ConceptualWalletRow>,
+    networkInfo: $ReadOnly<NetworkRow>,
   |}>(
     db,
     depTables,
@@ -402,9 +405,15 @@ export async function refreshConceptualWalletFunctionality(
         db, tx,
         conceptualWalletId,
       );
+      const allNetworks = await deps.GetNetworks.get(db, tx);
+      const networkForWallet = allNetworks.find(
+        network => network.NetworkId === fullInfo.NetworkId
+      );
+      if (networkForWallet == null) throw new Error(`${nameof(refreshConceptualWalletFunctionality)} missing network ${fullInfo.NetworkId}`);
       return {
         hardwareInfo,
         fullInfo,
+        networkInfo: networkForWallet,
       };
     }
   );
@@ -417,7 +426,7 @@ export async function refreshConceptualWalletFunctionality(
     conceptualWalletId,
     walletType,
     hardwareInfo: result.hardwareInfo,
-    coinType: result.fullInfo.CoinType,
+    networkInfo: result.networkInfo,
   };
 }
 

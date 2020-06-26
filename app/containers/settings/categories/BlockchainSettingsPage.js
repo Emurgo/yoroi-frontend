@@ -22,6 +22,7 @@ import {
 } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import NoWalletMessage from '../../../components/wallet/settings/NoWalletMessage';
 import { CoinTypes, } from '../../../config/numbersConfig';
+import { CardanoForks } from '../../../api/ada/lib/storage/database/prepackagedNetworks';
 
 const currencyLabels = defineMessages({
   USD: {
@@ -75,7 +76,7 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
     if (walletsStore.selected == null) {
       return (<NoWalletMessage />);
     }
-    const coinType = walletsStore.selected.getParent().getCoinType();
+    const networkInfo = walletsStore.selected.getParent().getNetworkInfo();
 
     const profileStore = this.generated.stores.profile;
     const coinPriceStore = this.generated.stores.coinPriceStore;
@@ -86,7 +87,8 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
     const explorerOptions = getExplorers();
 
     const uriSettings = (
-      coinType === CoinTypes.CARDANO &&
+      networkInfo.CoinType === CoinTypes.CARDANO &&
+      networkInfo.Fork === CardanoForks.Haskell &&
       !environment.isJormungandr() &&
       this.generated.canRegisterProtocol()
     )

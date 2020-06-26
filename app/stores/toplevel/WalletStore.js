@@ -40,7 +40,7 @@ import { assuranceModes, } from '../../config/transactionAssuranceConfig';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { legacyWalletChecksum } from '@emurgo/cip4-js';
 import { createDebugWalletDialog } from '../../containers/wallet/dialogs/DebugWalletDialogContainer';
-import { getApiForCoinType } from '../../api/common/utils';
+import { getApiForNetwork } from '../../api/common/utils';
 
 type GroupedWallets = {|
   publicDerivers: Array<PublicDeriver<>>;
@@ -332,8 +332,7 @@ export default class WalletStore extends Store {
   |} => void = (
     request
   ) => {
-    const { coinType } = request.publicDeriver.getParent();
-    const apiType = getApiForCoinType(coinType);
+    const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
 
     const stores = this.stores.substores[apiType];
     this.stores.addresses.addObservedWallet(request.publicDeriver);
@@ -352,8 +351,7 @@ export default class WalletStore extends Store {
   @action _setActiveWallet: {| wallet: PublicDeriver<> |} => void = (
     { wallet }
   ) => {
-    const { coinType } = wallet.getParent();
-    const apiType = getApiForCoinType(coinType);
+    const apiType = getApiForNetwork(wallet.getParent().getNetworkInfo());
     this.actions.profile.setSelectedAPI.trigger(apiType);
 
     this.selected = wallet;

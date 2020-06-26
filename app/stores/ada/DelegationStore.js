@@ -256,7 +256,7 @@ export default class DelegationStore extends Store {
         }
         const selected = this.stores.wallets.selected;
         if (selected == null) return;
-        if (selected.getParent().getCoinType() !== CoinTypes.CARDANO) {
+        if (selected.getParent().getNetworkInfo().CoinType !== CoinTypes.CARDANO) {
           return;
         }
         if (asGetStakingKey(selected) != null) {

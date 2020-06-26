@@ -25,7 +25,7 @@ import type { ConceptualWalletSettingsCache } from '../stores/toplevel/WalletSet
 import type { PublicKeyCache } from '../stores/toplevel/WalletStore';
 import type { TxRequests } from '../stores/toplevel/TransactionsStore';
 import type { IGetPublic } from '../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import { getApiForCoinType, getApiMeta } from '../api/common/utils';
+import { getApiForNetwork, getApiMeta } from '../api/common/utils';
 import type { SelectedApiType } from '../api/common/utils';
 
 const messages = defineMessages({
@@ -61,7 +61,7 @@ export default class NavBarContainer extends Component<Props> {
   }
 
   getMeta: PublicDeriver<> => $PropertyType<SelectedApiType, 'meta'> = (publicDeriver) => {
-    const apiMeta = getApiMeta(getApiForCoinType(publicDeriver.getParent().getCoinType()))?.meta;
+    const apiMeta = getApiMeta(getApiForNetwork(publicDeriver.getParent().getNetworkInfo()))?.meta;
     if (apiMeta == null) throw new Error(`${nameof(NavBarContainer)} no API selected`);
     return apiMeta;
   }

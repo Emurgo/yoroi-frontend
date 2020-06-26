@@ -22,14 +22,14 @@ import {
 
 import type {
   KeyRow,
-  KeyDerivationRow
+  KeyDerivationRow,
+  NetworkRow,
 } from '../../database/primitives/tables';
 
 import type {
   IChangePasswordRequest, IChangePasswordRequestFunc,
   RawVariation, RawTableVariation,
 } from '../common/interfaces';
-import type { CoinTypesT } from '../../../../../../config/numbersConfig';
 
 export const WalletTypeOption = Object.freeze({
   WEB_WALLET: 0,
@@ -42,7 +42,7 @@ export type IConceptualWalletConstructor = {|
   conceptualWalletId: number,
   walletType: WalletType,
   hardwareInfo: ?$ReadOnly<HwWalletMetaRow>,
-  coinType: CoinTypesT,
+  networkInfo: $ReadOnly<NetworkRow>,
 |};
 
 export interface IConceptualWallet {
@@ -51,8 +51,7 @@ export interface IConceptualWallet {
   getHwWalletMeta(): ?$ReadOnly<HwWalletMetaRow>;
   getDb(): lf$Database;
   getConceptualWalletId(): number;
-  getProtocolMagic(): string;
-  getCoinType(): CoinTypesT;
+  getNetworkInfo(): $ReadOnly<NetworkRow>;
   rawRemove(db: lf$Database, tx: lf$Transaction): Promise<void>
 }
 

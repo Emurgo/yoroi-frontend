@@ -37,7 +37,7 @@ import type { ExplorerType } from '../../domain/Explorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { BaseSignRequest } from '../../api/ada/transactions/types';
-import { ApiOptions, getApiForCoinType, getApiMeta } from '../../api/common/utils';
+import { ApiOptions, getApiForNetwork, getApiMeta } from '../../api/common/utils';
 import { isWithinSupply } from '../../utils/validations';
 import { formattedWalletAmount } from '../../utils/formatters';
 
@@ -104,7 +104,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     // we disable in the non-ADA case instead of throwing an error
     // since the Wallets page should take care of correctly redirecting away from the send page
     // for currency types that don't support it.
-    const selectedApiType = getApiForCoinType(publicDeriver.getParent().getCoinType());
+    const selectedApiType = getApiForNetwork(publicDeriver.getParent().getNetworkInfo());
     if (selectedApiType !== ApiOptions.ada) {
       return true;
     }
@@ -254,7 +254,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
   hardwareWalletDoConfirmation: (() => Node) = () => {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(this.webWalletDoConfirmation)}.`);
-    const selectedApiType = getApiForCoinType(publicDeriver.getParent().getCoinType());
+    const selectedApiType = getApiForNetwork(publicDeriver.getParent().getNetworkInfo());
     const apiMeta = getApiMeta(selectedApiType)?.meta;
     if (apiMeta == null) throw new Error(`${nameof(this.hardwareWalletDoConfirmation)} no API selected`);
 

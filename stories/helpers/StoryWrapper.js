@@ -78,6 +78,7 @@ import BigNumber from 'bignumber.js';
 import { utxoToTxInput } from '../../app/api/ada/transactions/shelley/inputSelection';
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { CoinTypes } from '../../app/config/numbersConfig';
+import { networks } from '../../app/api/ada/lib/storage/database/prepackagedNetworks';
 
 /**
  * This whole file is meant to mirror code in App.js
@@ -287,7 +288,7 @@ function genDummyWallet(): PublicDeriver<> {
       conceptualWalletId,
       walletType: WalletTypeOption.WEB_WALLET,
       hardwareInfo: null,
-      coinType: CoinTypes.CARDANO,
+      networkInfo: networks.JormungandrMainnet,
     },
     {
       ConceptualWalletId: conceptualWalletId,
@@ -410,7 +411,7 @@ function genSigningWallet(
         return WalletTypeOption.WEB_WALLET;
       })(),
       hardwareInfo,
-      coinType: CoinTypes.CARDANO,
+      networkInfo: networks.JormungandrMainnet,
     },
     {
       ConceptualWalletId: conceptualWalletId,
@@ -456,7 +457,7 @@ function genByronSigningWallet(
         return WalletTypeOption.WEB_WALLET;
       })(),
       hardwareInfo,
-      coinType: CoinTypes.CARDANO,
+      networkInfo: networks.ByronMainnet,
     },
     {
       ConceptualWalletId: conceptualWalletId,

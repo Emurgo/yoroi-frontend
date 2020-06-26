@@ -10,6 +10,13 @@ import type {
 import { size } from 'lodash';
 import ExtendableError from 'es6-error';
 
+export async function promisifyDbCall(request: IDBRequest): Promise<void> {
+  return await new Promise((resolve, reject) => {
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject();
+  });
+}
+
 export async function getAll<Row>(
   db: lf$Database,
   tx: lf$Transaction,

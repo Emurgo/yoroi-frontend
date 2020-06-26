@@ -18,7 +18,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { DelegationRequests } from '../../../stores/ada/DelegationStore';
 import type { TxRequests } from '../../../stores/toplevel/TransactionsStore';
-import { getApiForCoinType, getApiMeta } from '../../../api/common/utils';
+import { getApiForNetwork, getApiMeta } from '../../../api/common/utils';
 
 export type GeneratedData = typeof StakingPage.prototype.generated;
 
@@ -89,7 +89,7 @@ export default class StakingPage extends Component<Props> {
     const balance = txRequests.requests.getBalanceRequest.result;
     if (balance != null) {
       const apiMeta = getApiMeta(
-        getApiForCoinType(publicDeriver.getParent().getCoinType())
+        getApiForNetwork(publicDeriver.getParent().getNetworkInfo())
       )?.meta;
       if (apiMeta == null) throw new Error(`${nameof(StakingPage)} no API selected`);
       const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);

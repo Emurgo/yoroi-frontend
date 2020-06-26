@@ -22,7 +22,9 @@ import { ModifyConceptualWallet, } from '../../database/walletTypes/core/api/wri
 import type { HwWalletMetaRow, ConceptualWalletRow } from '../../database/walletTypes/core/tables';
 import { GetConceptualWallet } from '../../database/walletTypes/core/api/read';
 import Config from '../../../../../../config';
-import type { CoinTypesT } from '../../../../../../config/numbersConfig';
+import type {
+  NetworkRow,
+} from '../../database/primitives/tables';
 
 /** Snapshot of a ConceptualWallet in the database */
 export class ConceptualWallet implements IConceptualWallet, IRename {
@@ -35,14 +37,14 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
   #protocolMagic: string;
   walletType: WalletType;
   hardwareInfo: ?$ReadOnly<HwWalletMetaRow>;
-  coinType: CoinTypesT;
+  networkInfo: $ReadOnly<NetworkRow>;
 
   constructor(data: IConceptualWalletConstructor): IConceptualWallet {
     this.db = data.db;
     this.#conceptualWalletId = data.conceptualWalletId;
     this.walletType = data.walletType;
     this.hardwareInfo = data.hardwareInfo;
-    this.coinType = data.coinType;
+    this.networkInfo = data.networkInfo;
     return this;
   }
 
@@ -50,16 +52,12 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
     return this.db;
   }
 
-  getCoinType(): CoinTypesT {
-    return this.coinType;
+  getNetworkInfo(): $ReadOnly<NetworkRow> {
+    return this.networkInfo;
   }
 
   getConceptualWalletId(): number {
     return this.#conceptualWalletId;
-  }
-
-  getProtocolMagic(): string {
-    return this.#protocolMagic;
   }
 
   getWalletType: void => WalletType = () => {

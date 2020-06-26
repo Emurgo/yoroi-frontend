@@ -2018,7 +2018,7 @@ export async function addTraitsForBip44Child(
   ...AddBip44TraitsResponse,
   pathToPublic: Array<number>,
 |}> {
-  const traitFunc = traitFuncLookup[request.conceptualWallet.getCoinType().toString()];
+  const traitFunc = traitFuncLookup[request.conceptualWallet.getNetworkInfo().CoinType.toString()];
   const { finalClass } = await traitFunc(request);
 
   let pathToPublic;

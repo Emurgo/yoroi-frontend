@@ -62,7 +62,7 @@ export const SUMMARY: TopbarCategory = registerCategory({
   icon: transactionsIcon,
   label: messages.transactions,
   isVisible: request => (
-    request.selected.getParent().getCoinType() !== CoinTypes.ERGO
+    request.selected.getParent().getNetworkInfo().CoinType !== CoinTypes.ERGO
   ),
 });
 export const SEND: TopbarCategory = registerCategory({
@@ -71,7 +71,7 @@ export const SEND: TopbarCategory = registerCategory({
   icon: sendIcon,
   label: messages.send,
   isVisible: request => {
-    if (request.selected.getParent().getCoinType() !== CoinTypes.ERGO) {
+    if (request.selected.getParent().getNetworkInfo().CoinType !== CoinTypes.ERGO) {
       return true;
     }
     return false;

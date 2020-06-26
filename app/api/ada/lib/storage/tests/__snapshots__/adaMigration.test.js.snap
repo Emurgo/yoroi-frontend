@@ -47,9 +47,9 @@ Array [
   Object {
     "ConceptualWallet": Array [
       Object {
-        "CoinType": 2147485463,
         "ConceptualWalletId": 1,
         "Name": "Yoroi-Ledger",
+        "NetworkId": 0,
       },
     ],
   },
@@ -466,9 +466,9 @@ Array [
   Object {
     "ConceptualWallet": Array [
       Object {
-        "CoinType": 2147485463,
         "ConceptualWalletId": 1,
         "Name": "Wallet",
+        "NetworkId": 0,
       },
     ],
   },
@@ -885,9 +885,9 @@ Array [
   Object {
     "ConceptualWallet": Array [
       Object {
-        "CoinType": 2147485463,
         "ConceptualWalletId": 1,
         "Name": "Trezorro",
+        "NetworkId": 0,
       },
     ],
   },

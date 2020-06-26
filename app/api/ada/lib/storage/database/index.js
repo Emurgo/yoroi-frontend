@@ -11,9 +11,10 @@ import type {
 import {
   getAllSchemaTables,
   raii,
+  promisifyDbCall,
 } from './utils';
 import { GetEncryptionMeta, } from './primitives/api/read';
-import { ModifyEncryptionMeta, } from './primitives/api/write';
+import { ModifyEncryptionMeta, ModifyNetworks, } from './primitives/api/write';
 
 import { populatePrimitivesDb } from './primitives/tables';
 import { populateCommonDb } from './walletTypes/common/tables';
@@ -26,6 +27,8 @@ import { populateWalletDb } from './walletTypes/core/tables';
 import { populateMemoTransactionsDb } from './memos/tables';
 import { populatePricesDb } from './prices/tables';
 import { KeyKind } from '../../../../common/lib/crypto/keys/types';
+import { networks } from './prepackagedNetworks';
+import environment from '../../../../../environment';
 
 // global var from window.indexedDB
 declare var indexedDB: IDBFactory;
@@ -36,11 +39,9 @@ const deleteDb = () => new Promise(resolve => {
   deleteRequest.onerror = () => resolve();
 });
 
-export const loadLovefieldDB = async (
-  storeType: $Values<typeof schema.DataStoreType>
-): Promise<lf$Database> => {
-  const db = await populateAndCreate(storeType);
-
+const populateEncryptionDefault = async (
+  db: lf$Database,
+): Promise<void> => {
   const deps = Object.freeze({
     GetEncryptionMeta,
     ModifyEncryptionMeta,
@@ -70,6 +71,37 @@ export const loadLovefieldDB = async (
       }
     }
   );
+};
+const populateNetworkDefaults = async (
+  db: lf$Database,
+): Promise<void> => {
+  const deps = Object.freeze({
+    GetEncryptionMeta,
+    ModifyEncryptionMeta,
+    ModifyNetworks,
+  });
+  const depTables = Object
+    .keys(deps)
+    .map(key => deps[key])
+    .flatMap(table => getAllSchemaTables(db, table));
+  await raii(
+    db,
+    depTables,
+    async tx => ModifyNetworks.upsert(
+      db,
+      tx,
+      Object.keys(networks).map(network => networks[network])
+    )
+  );
+};
+
+export const loadLovefieldDB = async (
+  storeType: $Values<typeof schema.DataStoreType>
+): Promise<lf$Database> => {
+  const db = await populateAndCreate(storeType);
+
+  await populateEncryptionDefault(db);
+  await populateNetworkDefaults(db);
 
   return db;
 };
@@ -77,7 +109,9 @@ export const loadLovefieldDB = async (
 const populateAndCreate = async (
   storeType: $Values<typeof schema.DataStoreType>
 ): Promise<lf$Database> => {
-  const schemaBuilder = schema.create('yoroi-schema', 10);
+  const schemaName = 'yoroi-schema';
+  const schemaVersion = 11;
+  const schemaBuilder = schema.create(schemaName, schemaVersion);
 
   populatePrimitivesDb(schemaBuilder);
   populateWalletDb(schemaBuilder);
@@ -90,10 +124,11 @@ const populateAndCreate = async (
   populateMemoTransactionsDb(schemaBuilder);
   populatePricesDb(schemaBuilder);
 
-  return await schemaBuilder.connect({
+  const db = await schemaBuilder.connect({
     storeType,
     onUpgrade,
   });
+  return db;
 };
 
 export async function clear(
@@ -172,11 +207,7 @@ async function onUpgrade(
     // fix mistake of assuming tx hash was always unencrypted
     const tx = rawDb.getRawTransaction();
     const txMemoStore = tx.objectStore('TxMemo');
-    await new Promise(resolve => {
-      const clearRequest = txMemoStore.clear();
-      clearRequest.onsuccess = () => resolve();
-      clearRequest.onerror = () => resolve();
-    });
+    await promisifyDbCall(txMemoStore.clear());
   }
 
   if (version >= 3 && version <= 9) {
@@ -195,6 +226,20 @@ async function onUpgrade(
       'Key',
       'Type',
       KeyKind.BIP32ED25519,
+    );
+  }
+  if (version >= 3 && version <= 11) {
+    await rawDb.dropTableColumn(
+      'ConceptualWallet',
+      'CoinType',
+    );
+    await rawDb.addTableColumn(
+      'ConceptualWallet',
+      'NetworkId',
+      // recall: at the time we only supported 1 currency per Yoroi install
+      environment.isJormungandr()
+        ? networks.JormungandrMainnet.NetworkId
+        : networks.ByronMainnet.NetworkId
     );
   }
 }

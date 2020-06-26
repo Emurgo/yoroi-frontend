@@ -39,7 +39,7 @@ import type { DelegationRequests } from '../../stores/ada/DelegationStore';
 import type { PublicKeyCache } from '../../stores/toplevel/WalletStore';
 import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
 import type { IGetPublic } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import { getApiForCoinType, getApiMeta } from '../../api/common/utils';
+import { getApiForNetwork, getApiMeta } from '../../api/common/utils';
 
 const messages = defineMessages({
   walletSumInfo: {
@@ -88,7 +88,7 @@ export default class MyWalletsPage extends Component<Props> {
     const walletBalances = wallets.map(wallet => {
       const balanceResult = stores.transactions
         .getTxRequests(wallet).requests.getBalanceRequest.result;
-      const apiMeta = getApiMeta(getApiForCoinType(wallet.getParent().getCoinType()))?.meta;
+      const apiMeta = getApiMeta(getApiForNetwork(wallet.getParent().getNetworkInfo()))?.meta;
       if (apiMeta == null) throw new Error(`${nameof(MyWalletsPage)} no API selected`);
       const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
       return balanceResult?.dividedBy(amountPerUnit);
@@ -162,7 +162,7 @@ export default class MyWalletsPage extends Component<Props> {
     const settingsCache = this.generated.stores.walletSettings
       .getConceptualWalletSettingsCache(parent);
 
-    const apiMeta = getApiMeta(getApiForCoinType(publicDeriver.getParent().getCoinType()))?.meta;
+    const apiMeta = getApiMeta(getApiForNetwork(publicDeriver.getParent().getNetworkInfo()))?.meta;
     if (apiMeta == null) throw new Error(`${nameof(MyWalletsPage)} no API selected`);
     const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
 
@@ -223,7 +223,7 @@ export default class MyWalletsPage extends Component<Props> {
   createSubrow: PublicDeriver<> => Node = (publicDeriver) => {
     const { intl } = this.context;
 
-    const apiMeta = getApiMeta(getApiForCoinType(publicDeriver.getParent().getCoinType()))?.meta;
+    const apiMeta = getApiMeta(getApiForNetwork(publicDeriver.getParent().getNetworkInfo()))?.meta;
     if (apiMeta == null) throw new Error(`${nameof(MyWalletsPage)} no API selected`);
 
     // TODO: replace with wallet addresses
@@ -292,7 +292,7 @@ export default class MyWalletsPage extends Component<Props> {
     if (balanceResult == null) {
       return null;
     }
-    const apiMeta = getApiMeta(getApiForCoinType(publicDeriver.getParent().getCoinType()))?.meta;
+    const apiMeta = getApiMeta(getApiForNetwork(publicDeriver.getParent().getNetworkInfo()))?.meta;
     if (apiMeta == null) throw new Error(`${nameof(MyWalletsPage)} no API selected`);
     const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
     return balanceResult.accountPart.dividedBy(amountPerUnit);
