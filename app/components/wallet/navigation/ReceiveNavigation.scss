@@ -21,6 +21,12 @@
   display: flex;
   flex-direction: column;
   justify-content: start;
+  overflow-y: auto;
+  flex: 1;
+  padding-bottom: 10px;
+  .Tooltip {
+    position: absolute; // added here due of specificity
+  }
 }
 .filterSection {
   padding-top: 20px;
