@@ -52,6 +52,8 @@
     .generatedAddressesGrid {
       display: flex;
       text-align: right;
+      align-items: center;
+
       &> *:first-child {
         text-align: left;
         flex: 1.5;
@@ -79,9 +81,12 @@
       font-size: 16px;
       margin-left: 12px;
       text-transform: uppercase;
-
+      padding: 5px;
+      border-radius: 50%;
+      transition: background-color 0.3s;
+      box-sizing: border-box;
       &:hover {
-        @include underline(var(--theme-underline-dark-color));
+        background-color: var(--cmn-default-color-grey-5);
       }
     }
 
@@ -120,7 +125,8 @@
             display: inline-flex;
             object-fit: contain;
             margin-left: 4px;
-            & > svg {
+            display: flex;
+            & svg {
               height: 20px;
               width: 20px;
               path:nth-of-type(2) {
@@ -149,13 +155,17 @@
         text-align: left;
         font-size: 9px;
         display: flex;
-       
+        align-items: center;
+        & button span{
+          display: flex;
+        }
         .labelText {
           position: relative;
 
           background: var(--theme-border-gray);
           color: #6B7384;
           padding: 2px 6px;
+          height: 27px;
           &:after {
             content: " ";
             display: block;
@@ -176,8 +186,8 @@
           margin-right: 8px;
         }
         svg {
-          max-width: 18px;
-          max-height: 18px;
+          max-width: 22px;
+          max-height: 22px;
         }
       }
     }
