@@ -15,6 +15,19 @@
     display: flex;
 }
 
+.currency {
+    box-sizing: border-box;
+    height: fit-content;
+    width: fit-content;
+    border: 1px solid var(--theme-border-gray);
+    border-radius: 8px;
+    background-color: var(--cmn-default-color-grey-5);
+    margin-right: 11.5px;
+}
+.currencyAlign {
+    margin-top: 10px;
+}
+
 .content {
     display: flex;
     flex-direction: column;

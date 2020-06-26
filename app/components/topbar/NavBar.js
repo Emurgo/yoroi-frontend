@@ -45,9 +45,11 @@ export default class NavBar extends Component<Props> {
               {this.props.button}
             </div>
           )}
-          <div className={styles.details}>
-            {walletDetails}
-          </div>
+          {this.props.walletDetails != null && (
+            <div className={styles.details}>
+              {walletDetails}
+            </div>
+          )}
         </div>
       </header>
     );

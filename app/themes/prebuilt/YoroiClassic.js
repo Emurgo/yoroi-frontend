@@ -217,6 +217,7 @@ const YoroiClassic = {
   '--theme-input-hint-font': 'SFUIDisplay-Regular',
 
   // COLORS
+  '--theme-border-gray': '#DEE2EA',
   '--theme-scrollbar-thumb-background': '#c8ccce',
 
   '--theme-bordered-box-background-color': '#ffffff',

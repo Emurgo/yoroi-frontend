@@ -20,7 +20,7 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import {
   PublicDeriver,
 } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
-import NoWalletMessage from '../../../components/wallet/settings/NoWalletMessage';
+import NoWalletMessage from '../../wallet/NoWalletMessage';
 import { CoinTypes, } from '../../../config/numbersConfig';
 
 const currencyLabels = defineMessages({

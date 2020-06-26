@@ -3,7 +3,7 @@
 .component {
   background-color: var(--theme-settings-menu-box-background-color);
   padding: 10px 24px 0 24px;
-  box-shadow: 0 4px 6px 0 #DEE2EA, 0 1px 2px 0 rgba(222,226,234,0.82), 0 2px 4px 0 rgba(222,226,234,0.74);
+  box-shadow: 0 4px 6px 0 var(--theme-border-gray), 0 1px 2px 0 rgba(222,226,234,0.82), 0 2px 4px 0 rgba(222,226,234,0.74);
   width: 100%;
   border: none;
   background: none;

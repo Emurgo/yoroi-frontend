@@ -12,6 +12,7 @@ import styles from './NavWalletDetails.scss';
 import IconEyeOpen from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
 import IconEyeClosed from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import WalletCurrency from '../wallet/my-wallets/WalletCurrency';
 
 type Props = {|
     +onUpdateHideBalance: void => Promise<void>,
@@ -59,9 +60,23 @@ export default class NavWalletDetails extends Component<Props> {
     const { intl } = this.context;
 
     const totalAmount = this.getTotalAmount();
+
+    const showsRewards = (
+      this.props.rewards !== undefined &&
+      showDetails !== null &&
+      showDetails === true
+    );
     return (
       <div className={styles.wrapper}>
         <div className={styles.outerWrapper}>
+          <div
+            className={classnames([
+              styles.currency,
+              showsRewards && styles.currencyAlign
+            ])}
+          >
+            <WalletCurrency currency={this.props.meta.primaryTicker} />
+          </div>
           <div className={styles.content}>
             <div
               className={classnames([
@@ -74,7 +89,7 @@ export default class NavWalletDetails extends Component<Props> {
                 amount: totalAmount
               })}
             </div>
-            {this.props.rewards !== undefined && showDetails !== null && showDetails === true &&
+            {showsRewards &&
             <div className={styles.details}>
               <div>
                 <p className={styles.label}>
@@ -89,7 +104,12 @@ export default class NavWalletDetails extends Component<Props> {
                 {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
               </div>
             </div>
-          }
+            }
+            {this.props.rewards === undefined && (
+              <div className={styles.info}>
+                {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
+              </div>
+            )}
           </div>
           {totalAmount != null &&
             <button
