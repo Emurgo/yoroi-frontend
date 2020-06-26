@@ -1,9 +1,9 @@
 // @flow
 
-import type { CoinTypesT } from '../../config/numbersConfig';
 import { CoinTypes } from '../../config/numbersConfig';
 import { getAdaCurrencyMeta } from '../ada/currencyInfo';
 import { getErgoCurrencyMeta } from '../ergo/currencyInfo';
+import type { NetworkRow } from '../ada/lib/storage/database/primitives/tables';
 
 export const ApiOptions = Object.freeze({
   ada: 'ada',
@@ -11,14 +11,14 @@ export const ApiOptions = Object.freeze({
 });
 export type ApiOptionType = $Values<typeof ApiOptions>;
 
-export const getApiForCoinType: CoinTypesT => ApiOptionType = (type) => {
-  if (type === CoinTypes.CARDANO) {
+export const getApiForNetwork: $ReadOnly<NetworkRow> => ApiOptionType = (type) => {
+  if (type.CoinType === CoinTypes.CARDANO) {
     return ApiOptions.ada;
   }
-  if (type === CoinTypes.ERGO) {
+  if (type.CoinType === CoinTypes.ERGO) {
     return ApiOptions.ergo;
   }
-  throw new Error(`${nameof(getApiForCoinType)} missing entry for coin type ${type}`);
+  throw new Error(`${nameof(getApiForNetwork)} missing entry for type ${JSON.stringify(type)}`);
 };
 
 export type SelectedApiType = {|

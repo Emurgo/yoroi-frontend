@@ -21,7 +21,7 @@ import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import LocalizableError from '../../../i18n/LocalizableError';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { ExplorerType } from '../../../domain/Explorer';
-import { ApiOptions, getApiForCoinType, getApiMeta } from '../../../api/common/utils';
+import { ApiOptions, getApiForNetwork, getApiMeta } from '../../../api/common/utils';
 
 export type GeneratedData = typeof WalletSendConfirmationDialogContainer.prototype.generated;
 
@@ -41,7 +41,7 @@ type Props = {|
 export default class WalletSendConfirmationDialogContainer extends Component<Props> {
 
   getApiType: PublicDeriver<> => 'ada' = (publicDeriver) => {
-    const selectedApiType = getApiForCoinType(publicDeriver.getParent().getCoinType());
+    const selectedApiType = getApiForNetwork(publicDeriver.getParent().getNetworkInfo());
     if (selectedApiType !== ApiOptions.ada) {
       throw new Error(`${nameof(WalletSendConfirmationDialogContainer)} sending only supported for ADA`);
     }

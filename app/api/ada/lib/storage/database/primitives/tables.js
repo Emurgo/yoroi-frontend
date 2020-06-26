@@ -8,6 +8,37 @@ import type {
 } from './enums';
 import type { CertificateKindType } from '@emurgo/js-chain-libs/js_chain_libs';
 import type { KeyKindType } from '../../../../../common/lib/crypto/keys/types';
+import type { CoinTypesT } from '../../../../../../config/numbersConfig';
+
+export type NetworkInsert = {|
+  NetworkId: number,
+  CoinType: CoinTypesT,
+  /**
+    many blockchains require a different kind of magic number or string to identify a network
+    ex: hash of the genesis block or 0=mainnet,1=testnet, etc.
+  */
+  NetworkMagic: string,
+  /**
+   * Some currencies have totally different implementations that use the same coin type
+   * To differentiate these, we need some identifier of the fork
+   */
+  Fork: number,
+|};
+export type NetworkRow = {|
+  ...NetworkInsert,
+|};
+export const NetworkSchema: {|
+  +name: 'Network',
+  properties: $ObjMapi<NetworkRow, ToSchemaProp>,
+|} = {
+  name: 'Network',
+  properties: {
+    NetworkId: 'NetworkId',
+    CoinType: 'CoinType',
+    NetworkMagic: 'NetworkMagic',
+    Fork: 'Fork',
+  }
+};
 
 export type KeyInsert = {|
   Hash: string,
@@ -289,6 +320,21 @@ export type DbTransaction = {|
 |};
 
 export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
+  // Network Table
+  schemaBuilder.createTable(NetworkSchema.name)
+    .addColumn(NetworkSchema.properties.NetworkId, Type.INTEGER)
+    .addColumn(NetworkSchema.properties.CoinType, Type.NUMBER)
+    .addColumn(NetworkSchema.properties.NetworkMagic, Type.STRING)
+    .addColumn(NetworkSchema.properties.Fork, Type.INTEGER)
+    .addPrimaryKey(
+      /* note: doesn't auto-increment
+       * since we may want to support users adding custom networks eventually
+       * so we need custom user networks to live in a different ID range than pre-built networks
+       * so that if we add any new premade-network, we can just hardcode an ID without conflict
+      */
+      ([NetworkSchema.properties.NetworkId]: Array<string>),
+    );
+
   // Key Table
   schemaBuilder.createTable(KeySchema.name)
     .addColumn(KeySchema.properties.KeyId, Type.INTEGER)

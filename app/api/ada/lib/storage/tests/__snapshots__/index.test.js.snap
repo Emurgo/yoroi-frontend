@@ -664,9 +664,9 @@ Object {
   ],
   "ConceptualWallet": Array [
     Object {
-      "CoinType": 2147485463,
       "ConceptualWalletId": 1,
       "Name": "My Test Wallet",
+      "NetworkId": 0,
     },
   ],
   "EncryptionMeta": Array [
@@ -1060,6 +1060,26 @@ Object {
       "LastSyncInfoId": 2,
       "SlotNum": null,
       "Time": null,
+    },
+  ],
+  "Network": Array [
+    Object {
+      "CoinType": 2147485463,
+      "Fork": 0,
+      "NetworkId": 0,
+      "NetworkMagic": "764824073",
+    },
+    Object {
+      "CoinType": 2147485463,
+      "Fork": 1,
+      "NetworkId": 1,
+      "NetworkMagic": "8e4d2a343f3dcf9330ad9035b3e8d168e6728904262f2c434a4f8f934ec7b676",
+    },
+    Object {
+      "CoinType": 2147484077,
+      "Fork": 0,
+      "NetworkId": 2,
+      "NetworkMagic": "0",
     },
   ],
   "PriceData": Array [],

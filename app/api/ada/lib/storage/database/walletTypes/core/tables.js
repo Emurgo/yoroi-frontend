@@ -3,12 +3,10 @@
 import { Type, ConstraintAction, } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 import { KeyDerivationSchema } from '../../primitives/tables';
-import type { CoinTypesT } from '../../../../../../../config/numbersConfig';
 
 export type ConceptualWalletInsert = {|
-  CoinType: CoinTypesT,
   Name: string,
-  // NetworkId: number, // TODO
+  NetworkId: number,
 |};
 export type ConceptualWalletRow = {|
   ConceptualWalletId: number,
@@ -21,8 +19,8 @@ export const ConceptualWalletSchema: {|
   name: 'ConceptualWallet',
   properties: {
     ConceptualWalletId: 'ConceptualWalletId',
-    CoinType: 'CoinType',
     Name: 'Name',
+    NetworkId: 'NetworkId',
   }
 };
 
@@ -115,7 +113,7 @@ export const populateWalletDb = (schemaBuilder: lf$schema$Builder) => {
   // ConceptualWallet Table
   schemaBuilder.createTable(ConceptualWalletSchema.name)
     .addColumn(ConceptualWalletSchema.properties.ConceptualWalletId, Type.INTEGER)
-    .addColumn(ConceptualWalletSchema.properties.CoinType, Type.INTEGER)
+    .addColumn(ConceptualWalletSchema.properties.NetworkId, Type.INTEGER)
     .addColumn(ConceptualWalletSchema.properties.Name, Type.STRING)
     .addPrimaryKey(
       ([ConceptualWalletSchema.properties.ConceptualWalletId]: Array<string>),

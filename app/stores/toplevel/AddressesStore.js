@@ -19,7 +19,7 @@ import type {
 import {
   Logger,
 } from '../../utils/logging';
-import { getApiForCoinType } from '../../api/common/utils';
+import { getApiForNetwork } from '../../api/common/utils';
 import type { AddressFilterKind, StandardAddress, AddressTypeName, } from '../../types/AddressFilterTypes';
 import { AddressFilter, } from '../../types/AddressFilterTypes';
 import {
@@ -132,8 +132,7 @@ export default class AddressesStore extends Store {
     storeName: AddressTypeName,
     type: CoreAddressT,
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
-    const { coinType } = request.publicDeriver.getParent();
-    const apiType = getApiForCoinType(coinType);
+    const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
 
     const withUtxos = asGetAllUtxos(request.publicDeriver);
     if (withUtxos == null) {
@@ -182,8 +181,7 @@ export default class AddressesStore extends Store {
     type: CoreAddressT,
     chainsRequest: IHasUtxoChainsRequest,
   |}=> Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
-    const { coinType } = request.publicDeriver.getParent();
-    const apiType = getApiForCoinType(coinType);
+    const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
 
     const withHasUtxoChains = asHasUtxoChains(
       request.publicDeriver
@@ -210,8 +208,7 @@ export default class AddressesStore extends Store {
     storeName: AddressTypeName,
     addresses: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
-    const { coinType } = request.publicDeriver.getParent();
-    const apiType = getApiForCoinType(coinType);
+    const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
 
     return await this.stores.substores[apiType].addresses.storewiseFilter(request);
   }

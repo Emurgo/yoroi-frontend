@@ -32,7 +32,7 @@ import LocalizableError from '../../i18n/LocalizableError';
 import type { ExplorerType } from '../../domain/Explorer';
 import type { Notification } from '../../types/notificationType';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
-import { getApiForCoinType, getApiMeta } from '../../api/common/utils';
+import { getApiForNetwork, getApiMeta } from '../../api/common/utils';
 import { isWithinSupply } from '../../utils/validations';
 import { Logger, } from '../../utils/logging';
 import type { AddressSubgroupMeta, IAddressTypeUiSubset, IAddressTypeStore } from '../../stores/stateless/addressStores';
@@ -91,7 +91,7 @@ export default class WalletReceivePage extends Component<Props> {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(WalletReceivePage)}.`);
 
-    const selectedApiType = getApiForCoinType(publicDeriver.getParent().getCoinType());
+    const selectedApiType = getApiForNetwork(publicDeriver.getParent().getNetworkInfo());
     const apiMeta = getApiMeta(selectedApiType)?.meta;
     if (apiMeta == null) throw new Error(`${nameof(WalletReceivePage)} no API selected`);
 

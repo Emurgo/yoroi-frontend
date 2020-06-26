@@ -37,6 +37,7 @@ import { rawGenAddByHash } from '../../../common/lib/storage/bridge/hashMapper';
 import { addErgoP2PK } from '../restoration/scan';
 import { decode } from 'bs58check';
 import { KeyKind } from '../../../common/lib/crypto/keys/types';
+import { networks } from '../../../ada/lib/storage/database/prepackagedNetworks';
 
 // TODO: maybe move this inside walletBuilder somehow so it's all done in the same transaction
 /**
@@ -157,7 +158,7 @@ export async function createStandardBip44Wallet(request: {|
       )
       .addConceptualWallet(
         _finalState => ({
-          CoinType: CoinTypes.ERGO,
+          NetworkId: networks.ErgoMainnet.NetworkId,
           Name: request.walletName,
         })
       )

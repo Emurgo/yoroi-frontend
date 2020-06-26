@@ -35,7 +35,7 @@ import type {
   TransactionExportDataFormat,
   TransactionExportFileType
 } from '../export';
-import { getApiForCoinType } from './utils';
+import { getApiForNetwork } from './utils';
 import type { GetBalanceRequest, GetBalanceResponse } from './types';
 
 // getWallets
@@ -228,7 +228,7 @@ export default class CommonApi {
         return WalletTransaction.fromAnnotatedTx({
           tx,
           addressLookupMap: fetchedTxs.addressLookupMap,
-          api: getApiForCoinType(request.publicDeriver.getParent().getCoinType()),
+          api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
         });
       });
       return mappedTransactions;

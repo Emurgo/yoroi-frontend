@@ -28,7 +28,7 @@ import { ConceptualWallet } from '../ada/lib/storage/models/ConceptualWallet/ind
 import type { IHasLevels } from '../ada/lib/storage/models/ConceptualWallet/interfaces';
 import type { TransactionExportRow } from '../export';
 import WalletTransaction from '../../domain/WalletTransaction';
-import { getApiForCoinType } from '../common/utils';
+import { getApiForNetwork } from '../common/utils';
 import {
   GenericApiError,
   WalletAlreadyRestoredError,
@@ -134,7 +134,7 @@ export default class ErgoApi {
         return WalletTransaction.fromAnnotatedTx({
           tx,
           addressLookupMap: fetchedTxs.addressLookupMap,
-          api: getApiForCoinType(request.publicDeriver.getParent().getCoinType()),
+          api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
         });
       });
       return {

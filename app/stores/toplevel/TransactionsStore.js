@@ -29,7 +29,7 @@ import type {
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
 import { digestForHash } from '../../api/ada/lib/storage/database/primitives/api/utils';
-import { getApiForCoinType, getApiMeta } from '../../api/common/utils';
+import { getApiForNetwork, getApiMeta } from '../../api/common/utils';
 import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
@@ -134,7 +134,9 @@ export default class TransactionsStore extends Store {
       .getPublicDeriverSettingsCache(publicDeriver);
 
 
-    const api = getApiForCoinType(publicDeriver.getParent().getCoinType());
+    const api = getApiForNetwork(
+      publicDeriver.getParent().getNetworkInfo()
+    );
     const apiMeta = getApiMeta(api)?.meta;
     if (apiMeta == null) throw new Error(`${nameof(this.unconfirmedAmount)} no API selected`);
     const getUnitOfAccount = (timestamp: Date) => (!unitOfAccount.enabled
@@ -372,8 +374,7 @@ export default class TransactionsStore extends Store {
   |} => void = (
     request
   ) => {
-    const { coinType } = request.publicDeriver.getParent();
-    const apiType = getApiForCoinType(coinType);
+    const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
 
     const foundRequest = find(
       this.transactionsRequests,
@@ -483,8 +484,7 @@ export default class TransactionsStore extends Store {
     const txStore = this.stores.transactions;
     const respTxRows = [];
 
-    const { coinType } = request.publicDeriver.getParent();
-    const apiType = getApiForCoinType(coinType);
+    const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
 
     await txStore.getTransactionRowsToExportRequest.execute(async () => {
       const rows = await this.api[apiType].getTransactionRowsToExport({

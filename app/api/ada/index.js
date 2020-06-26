@@ -181,7 +181,7 @@ import type {
   IsValidMnemonicResponse,
   RestoreWalletRequest, RestoreWalletResponse,
 } from '../common/types';
-import { getApiForCoinType } from '../common/utils';
+import { getApiForNetwork } from '../common/utils';
 import { CoreAddressTypes } from './lib/storage/database/primitives/enums';
 
 declare var CONFIG: ConfigType;
@@ -622,7 +622,7 @@ export default class AdaApi {
         return WalletTransaction.fromAnnotatedTx({
           tx,
           addressLookupMap: fetchedTxs.addressLookupMap,
-          api: getApiForCoinType(request.publicDeriver.getParent().getCoinType()),
+          api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
         });
       });
       return {

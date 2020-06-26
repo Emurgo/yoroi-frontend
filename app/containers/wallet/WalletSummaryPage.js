@@ -41,7 +41,7 @@ import type {
   GetTransactionsRequestOptions
 } from '../../api/common/index';
 import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
-import { getApiForCoinType, getApiMeta } from '../../api/common/utils';
+import { getApiForNetwork, getApiMeta } from '../../api/common/utils';
 import { addressSubgroupName, addressGroupName, AddressSubgroup } from '../../types/AddressFilterTypes';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
 import { routeForStore, allAddressSubgroups, } from '../../stores/stateless/addressStores';
@@ -85,7 +85,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
     }
 
     const apiMeta = getApiMeta(
-      getApiForCoinType(publicDeriver.getParent().getCoinType())
+      getApiForNetwork(publicDeriver.getParent().getNetworkInfo())
     )?.meta;
     if (apiMeta == null) throw new Error(`${nameof(WalletSummaryPage)} no API selected`);
 

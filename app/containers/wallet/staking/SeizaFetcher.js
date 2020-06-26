@@ -29,7 +29,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type {
   CreateDelegationTxFunc,
 } from '../../../api/ada/index';
-import { getApiForCoinType, getApiMeta } from '../../../api/common/utils';
+import { getApiForNetwork, getApiMeta } from '../../../api/common/utils';
 
 declare var CONFIG: ConfigType;
 
@@ -143,7 +143,7 @@ export default class SeizaFetcher extends Component<Props> {
       return null;
     }
 
-    const apiMeta = getApiMeta(getApiForCoinType(selectedWallet.getParent().getCoinType()))?.meta;
+    const apiMeta = getApiMeta(getApiForNetwork(selectedWallet.getParent().getNetworkInfo()))?.meta;
     if (apiMeta == null) throw new Error(`${nameof(SeizaFetcher)} no API selected`);
     const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
 

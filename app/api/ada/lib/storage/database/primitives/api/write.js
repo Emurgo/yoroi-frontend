@@ -18,6 +18,7 @@ import type {
   CertificateInsert, CertificateRow,
   CertificateAddressInsert, CertificateAddressRow,
   DbBlock,
+  NetworkInsert, NetworkRow,
 } from '../tables';
 import type {
   CoreAddressT,
@@ -30,6 +31,7 @@ import {
   addNewRowToTable,
   removeFromTableBatch,
   addBatchToTable,
+  addOrReplaceRows,
   addOrReplaceRow,
   getRowIn,
   StaleStateError,
@@ -596,5 +598,28 @@ export class FreeBlocks {
       blockTableMeta.properties.BlockId,
       freeableBlocks.map(row => row.BlockId)
     );
+  }
+}
+
+export class ModifyNetworks {
+  static ownTables: {|
+    Network: typeof Tables.NetworkSchema,
+  |} = Object.freeze({
+    [Tables.NetworkSchema.name]: Tables.NetworkSchema,
+  });
+  static depTables: {||} = Object.freeze({});
+
+  static async upsert(
+    db: lf$Database,
+    tx: lf$Transaction,
+    rows: $ReadOnlyArray<NetworkInsert>,
+  ): Promise<void> {
+    const result = await addOrReplaceRows<NetworkInsert, NetworkRow>(
+      db, tx,
+      rows,
+      ModifyNetworks.ownTables[Tables.NetworkSchema.name].name,
+    );
+
+    return result;
   }
 }

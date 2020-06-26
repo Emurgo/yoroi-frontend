@@ -41,6 +41,7 @@ import {
   addShelleyChimericAccountAddress,
 } from '../../../../restoration/shelley/scan';
 import { KeyKind } from '../../../../../common/lib/crypto/keys/types';
+import { networks } from '../../database/prepackagedNetworks';
 
 // TODO: maybe move this inside walletBuilder somehow so it's all done in the same transaction
 /**
@@ -198,7 +199,7 @@ export async function createStandardCip1852Wallet(request: {|
       )
       .addConceptualWallet(
         _finalState => ({
-          CoinType: CoinTypes.CARDANO,
+          NetworkId: networks.JormungandrMainnet.NetworkId,
           Name: request.walletName,
         })
       )

@@ -20,6 +20,7 @@ import type {
   CertificateRow,
   CertificateAddressRow,
   CertificatePart,
+  NetworkRow,
 } from '../tables';
 import type {
   TxStatusCodesType,
@@ -31,7 +32,7 @@ import * as Tables from '../tables';
 import {
   digestForHash,
 } from './utils';
-import { getRowFromKey, getRowIn, StaleStateError, } from '../../utils';
+import { getAll, getRowFromKey, getRowIn, StaleStateError, } from '../../utils';
 
 export class GetEncryptionMeta {
   static ownTables: {|
@@ -1063,5 +1064,25 @@ export class GetCertificates {
         ])
     );
     return certByTxId;
+  }
+}
+
+export class GetNetworks {
+  static ownTables: {|
+    Network: typeof Tables.NetworkSchema,
+  |} = Object.freeze({
+    [Tables.NetworkSchema.name]: Tables.NetworkSchema,
+  });
+  static depTables: {||} = Object.freeze({});
+
+  static async get(
+    db: lf$Database,
+    tx: lf$Transaction,
+  ): Promise<$ReadOnlyArray<$ReadOnly<NetworkRow>>> {
+    const rows = await getAll<NetworkRow>(
+      db, tx,
+      GetNetworks.ownTables[Tables.NetworkSchema.name].name,
+    );
+    return rows;
   }
 }

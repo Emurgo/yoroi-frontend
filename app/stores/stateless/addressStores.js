@@ -78,7 +78,7 @@ function matchCoinType(
   publicDeriver: PublicDeriver<>,
   match: CoinTypesT => boolean
 ): boolean {
-  return match(publicDeriver.parent.getCoinType());
+  return match(publicDeriver.parent.getNetworkInfo().CoinType);
 }
 
 const standardFilter = [

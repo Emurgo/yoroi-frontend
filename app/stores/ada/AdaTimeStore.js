@@ -147,7 +147,7 @@ export default class AdaTimeStore extends Store {
 
     const selected = this.stores.wallets.selected;
     if (selected == null) return;
-    if (selected.getParent().getCoinType() !== CoinTypes.CARDANO) {
+    if (selected.getParent().getNetworkInfo().CoinType !== CoinTypes.CARDANO) {
       return;
     }
 
@@ -177,7 +177,7 @@ export default class AdaTimeStore extends Store {
     // Get current public deriver
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return undefined;
-    if (publicDeriver.getParent().getCoinType() !== CoinTypes.CARDANO) {
+    if (publicDeriver.getParent().getNetworkInfo().CoinType !== CoinTypes.CARDANO) {
       return;
     }
 

@@ -52,7 +52,7 @@ import type { Notification } from '../../../types/notificationType';
 
 import globalMessages from '../../../i18n/global-messages';
 import { computed, observable, runInAction } from 'mobx';
-import { getApiForCoinType, getApiMeta } from '../../../api/common/utils';
+import { getApiForNetwork, getApiMeta } from '../../../api/common/utils';
 import type { SelectedApiType, } from '../../../api/common/utils';
 import { getUnmangleAmounts, } from '../../../stores/stateless/mangledAddresses';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../../stores/stateless/addressStores';
@@ -209,7 +209,7 @@ export default class StakingDashboardPage extends Component<Props> {
 
   generatePopupDialog: PublicDeriver<> => (null | Node) = (publicDeriver) => {
     const apiMeta = getApiMeta(
-      getApiForCoinType(publicDeriver.getParent().getCoinType())
+      getApiForNetwork(publicDeriver.getParent().getNetworkInfo())
     )?.meta;
     if (apiMeta == null) throw new Error(`${nameof(StakingDashboardPage)} no API selected`);
 
@@ -621,7 +621,7 @@ export default class StakingDashboardPage extends Component<Props> {
     const balance = txRequests.requests.getBalanceRequest.result;
 
     const apiMeta = getApiMeta(
-      getApiForCoinType(request.publicDeriver.getParent().getCoinType())
+      getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo())
     )?.meta;
     if (apiMeta == null) throw new Error(`${nameof(StakingDashboardPage)} no API selected`);
     const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
@@ -678,7 +678,7 @@ export default class StakingDashboardPage extends Component<Props> {
     request
   ) => {
     const apiMeta = getApiMeta(
-      getApiForCoinType(request.publicDeriver.getParent().getCoinType())
+      getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo())
     )?.meta;
     if (apiMeta == null) throw new Error(`${nameof(StakingDashboardPage)} no API selected`);
     const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
