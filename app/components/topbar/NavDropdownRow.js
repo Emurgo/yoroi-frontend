@@ -11,7 +11,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 type Props = {|
   +title?: string,
   +plateComponent?: ?Node,
-  +detailComponent: Node,
+  +detailComponent: ?Node,
   /**
    * null -> never synced
    * undefined -> don't display sync info
@@ -57,9 +57,11 @@ export default class NavDropdownRow extends Component<Props> {
     return (
       <div className={wrapperClassname}>
         {titleSection}
-        <div className={styles.details}>
-          {detailComponent}
-        </div>
+        {this.props.detailComponent != null && (
+          <div className={styles.details}>
+            {detailComponent}
+          </div>
+        )}
         {syncTime != null &&
           <div className={styles.sync}>
             <span className={styles.syncLabel}>

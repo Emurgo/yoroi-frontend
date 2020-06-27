@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import WalletNameSetting from '../../../components/wallet/settings/WalletNameSetting';
-import NoWalletMessage from '../../../components/wallet/settings/NoWalletMessage';
+import NoWalletMessage from '../../wallet/NoWalletMessage';
 import SpendingPasswordSetting from '../../../components/wallet/settings/SpendingPasswordSetting';
 import ResyncBlock from '../../../components/wallet/settings/ResyncBlock';
 import RemoveWallet from '../../../components/wallet/settings/RemoveWallet';

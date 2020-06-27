@@ -10,7 +10,8 @@ import BannerContainer from '../banners/BannerContainer';
 import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer';
 import SidebarContainer from '../SidebarContainer';
 import BackgroundColoredLayout from '../../components/layout/BackgroundColoredLayout';
-import NoWalletMessage from '../../components/wallet/settings/NoWalletMessage';
+import NoWalletMessage from '../wallet/NoWalletMessage';
+import UnsupportedWallet from '../wallet/UnsupportedWallet';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import NavBarContainer from '../NavBarContainer';
 import globalMessages from '../../i18n/global-messages';
@@ -20,6 +21,9 @@ import type { GeneratedData as SidebarContainerData } from '../SidebarContainer'
 import type { GeneratedData as NavBarContainerData } from '../NavBarContainer';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import {
+  CoinTypes,
+} from '../../config/numbersConfig';
 
 export type GeneratedData = typeof Transfer.prototype.generated;
 
@@ -67,6 +71,10 @@ export default class Transfer extends Component<Props> {
     const wallet = this.generated.stores.wallets.selected;
     if (wallet == null) {
       return (<NoWalletMessage />);
+    }
+    // temporary solution: will need to handle more cases later for different currencies
+    if (wallet.getParent().getCoinType() !== CoinTypes.CARDANO) {
+      return (<UnsupportedWallet />);
     }
     return (
       <BackgroundColoredLayout>

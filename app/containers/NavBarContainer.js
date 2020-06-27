@@ -148,7 +148,7 @@ export default class NavBarContainer extends Component<Props> {
       <>
         <NavDropdownRow
           title={intl.formatMessage(messages.allWalletsLabel)}
-          detailComponent={
+          detailComponent={undefined /*
             <NavWalletDetails
               highlightTitle
               onUpdateHideBalance={this.updateHideBalance}
@@ -161,7 +161,7 @@ export default class NavBarContainer extends Component<Props> {
                 decimalPlaces: 6,
               }}
             />
-          }
+          */}
         />
         {walletComponents}
       </>

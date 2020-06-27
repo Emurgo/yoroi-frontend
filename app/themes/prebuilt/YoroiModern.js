@@ -222,6 +222,7 @@ const YoroiModern = {
   '--theme-input-hint-font': 'Rubik-Regular',
 
   // COLORS
+  '--theme-border-gray': '#DEE2EA',
   '--theme-scrollbar-thumb-background': '#c8ccce',
 
   '--theme-bordered-box-background-color': '#ffffff',

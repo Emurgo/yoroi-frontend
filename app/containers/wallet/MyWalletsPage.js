@@ -77,9 +77,8 @@ export default class MyWalletsPage extends Component<Props> {
   };
 
   render(): Node {
-    const { intl } = this.context;
     const { stores } = this.generated;
-    const { profile } = stores;
+    const { intl } = this.context;
     const sidebarContainer = (<SidebarContainer {...this.generated.SidebarContainerProps} />);
 
     const wallets = this.generated.stores.wallets.publicDerivers;
@@ -113,22 +112,24 @@ export default class MyWalletsPage extends Component<Props> {
           () => this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
         }
         />}
-        walletDetails={
-          <NavWalletDetails
-            showDetails={false}
-            highlightTitle
-            onUpdateHideBalance={this.updateHideBalance}
-            shouldHideBalance={profile.shouldHideBalance}
-            rewards={new BigNumber('0.000000') /* TODO */}
-            walletAmount={utxoTotal}
-            infoText={intl.formatMessage(messages.walletSumInfo)}
-            meta={{
-              // TODO: this no longer makes sense in multi-wallet. Needs to be re-thought
-              primaryTicker: 'ADA',
-              decimalPlaces: 6,
-            }}
-          />
-        }
+        walletDetails={true // eslint-disable-line no-constant-condition
+          ? undefined
+          : (
+            <NavWalletDetails
+              showDetails={false}
+              highlightTitle
+              onUpdateHideBalance={this.updateHideBalance}
+              shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
+              rewards={new BigNumber('0.000000')}
+              walletAmount={utxoTotal}
+              infoText={intl.formatMessage(messages.walletSumInfo)}
+              meta={{
+                // TODO: this no longer makes sense in multi-wallet. Needs to be re-thought
+                primaryTicker: 'ADA',
+                decimalPlaces: 6,
+              }}
+            />
+          )}
       />
     );
 

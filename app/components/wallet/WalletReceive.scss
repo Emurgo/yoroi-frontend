@@ -153,7 +153,7 @@
         .labelText {
           position: relative;
 
-          background: #DEE2EA;
+          background: var(--theme-border-gray);
           color: #6B7384;
           padding: 2px 6px;
           &:after {
@@ -163,7 +163,7 @@
             height: 0;
             border-top: 13px solid transparent;
             border-bottom: 14px solid transparent;
-            border-left: 14px solid #DEE2EA;
+            border-left: 14px solid var(--theme-border-gray);
             position: absolute;
             top: 50%;
             margin-top: -14px;
