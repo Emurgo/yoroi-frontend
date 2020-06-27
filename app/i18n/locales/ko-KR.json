@@ -656,6 +656,8 @@
   "wallet.transfer.instruction": "복구된 모든 ADA는 현재 선택된 지갑으로 전송됩니다.",
   "wallet.undelegation.transaction.explanationLine1": "위임할 풀을 바꾸기 위해서 위임 취소를 할 필요는 없습니다.",
   "wallet.undelegation.transaction.explanationLine2": "위임 취소는 해당 에포크 종료 후 2개 에포크가 지나야 처리됩니다.",
+  "wallet.unsupported.subtitle": "The selected wallet does not support this functionality",
+  "wallet.unsupported.title": "Wallet type not supported",
   "widgets.copyableaddress.addressCopyTooltipMessage": "클립보드로 복사",
   "widgets.explorer.tooltip": "{websiteName} 로 가기",
   "widgets.warningBox.headerText": "주의:",
