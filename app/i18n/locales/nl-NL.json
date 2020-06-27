@@ -656,6 +656,8 @@
   "wallet.transfer.instruction": "Elke ADA die wordt geclaimd, wordt overgebracht naar de, huidige, gekozen Portemonnee",
   "wallet.undelegation.transaction.explanationLine1": "U hoeft de delegatie NIET ongedaan te maken om van Stakepool te wisselen",
   "wallet.undelegation.transaction.explanationLine2": "Het duurt 2 Epochs (tijdperken) na het einde van het huidige tijdvak om de delegatie in werking te laten treden",
+  "wallet.unsupported.subtitle": "The selected wallet does not support this functionality",
+  "wallet.unsupported.title": "Wallet type not supported",
   "widgets.copyableaddress.addressCopyTooltipMessage": "Kopieer naar klembord",
   "widgets.explorer.tooltip": "Ga naar {websiteName}",
   "widgets.warningBox.headerText": "ATTENTIE:",
