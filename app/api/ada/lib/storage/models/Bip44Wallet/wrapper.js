@@ -82,13 +82,11 @@ export class Bip44Wallet
   static async createBip44Wallet(
     db: lf$Database,
     row: $ReadOnly<Bip44WrapperRow>,
-    protocolMagic: number,
   ): Promise<Bip44Wallet> {
     return await refreshBip44WalletFunctionality(
       db,
       row,
       Bip44Wallet,
-      protocolMagic
     );
   }
 

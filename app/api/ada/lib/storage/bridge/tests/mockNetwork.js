@@ -33,8 +33,7 @@ import {
 import { RustModule } from '../../../cardanoCrypto/rustLoader';
 
 import { generateLedgerWalletRootKey } from '../../../cardanoCrypto/cryptoWallet';
-
-const protocolMagic = 764824073; // mainnet
+import { networks } from '../../database/prepackagedNetworks';
 
 export function genCheckAddressesInUse(
   blockchain: Array<RemoteTransaction>,
@@ -300,7 +299,7 @@ export function getSingleAddressString(
       Buffer.from(derivedKey.to_public().as_bytes()).toString('hex')
     );
     const settings = RustModule.WalletV2.BlockchainSettings.from_json({
-      protocol_magic: protocolMagic
+      protocol_magic: Number.parseInt(networks.ByronMainnet.NetworkMagic, 10)
     });
     const addr = v2Key.bootstrap_era_address(settings);
     const hex = addr.to_base58();

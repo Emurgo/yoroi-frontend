@@ -54,7 +54,6 @@ import {
   PublicDeriver,
 } from '../ada/lib/storage/models/PublicDeriver/index';
 import { createStandardBip44Wallet } from './lib/walletBuilder/builder';
-import { Network } from '@coinbarn/ergo-ts';
 
 // getTransactionRowsToExport
 
@@ -205,7 +204,6 @@ export default class ErgoApi {
       const bip44Wallet = await Bip44Wallet.createBip44Wallet(
         request.db,
         wallet.bip44WrapperRow,
-        Network.Mainnet,
       );
       for (const pubDeriver of wallet.publicDeriver) {
         newPubDerivers.push(await PublicDeriver.createPublicDeriver(

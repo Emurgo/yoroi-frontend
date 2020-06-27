@@ -16,10 +16,6 @@ import {
   GetAllBip44Wallets,
 } from '../database/walletTypes/bip44/api/read';
 import { GetAllCip1852Wallets } from '../database/walletTypes/cip1852/api/read';
-import type { ConfigType } from '../../../../../../config/config-types';
-
-declare var CONFIG: ConfigType;
-const protocolMagic = CONFIG.network.protocolMagic;
 
 export async function loadWalletsFromStorage(
   db: lf$Database,
@@ -50,7 +46,6 @@ export async function loadWalletsFromStorage(
         bip44Wallet = await Bip44Wallet.createBip44Wallet(
           db,
           entry.Bip44Wrapper,
-          protocolMagic,
         );
         bip44Map.set(entry.Bip44Wrapper.ConceptualWalletId, bip44Wallet);
       }
@@ -70,7 +65,6 @@ export async function loadWalletsFromStorage(
         cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(
           db,
           entry.Cip1852Wrapper,
-          protocolMagic,
         );
         cip1852Map.set(entry.Cip1852Wrapper.ConceptualWalletId, cip1852Wallet);
       }

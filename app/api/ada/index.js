@@ -1152,7 +1152,6 @@ export default class AdaApi {
         const cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(
           request.db,
           wallet.cip1852WrapperRow,
-          protocolMagic,
         );
         for (const pubDeriver of wallet.publicDeriver) {
           newPubDerivers.push(await PublicDeriver.createPublicDeriver(
@@ -1181,7 +1180,6 @@ export default class AdaApi {
         const bip44Wallet = await Bip44Wallet.createBip44Wallet(
           request.db,
           wallet.bip44WrapperRow,
-          protocolMagic,
         );
         for (const pubDeriver of wallet.publicDeriver) {
           newPubDerivers.push(await PublicDeriver.createPublicDeriver(
@@ -1403,7 +1401,6 @@ export default class AdaApi {
       const bip44Wallet = await Bip44Wallet.createBip44Wallet(
         request.db,
         wallet.bip44WrapperRow,
-        protocolMagic,
       );
 
       if (wallet.publicDeriver.length !== 1) {

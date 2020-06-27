@@ -17,6 +17,5 @@ export interface ICip1852Wallet {
     row: $ReadOnly<Cip1852WrapperRow>,
     privateDeriverLevel: number | null,
     privateDeriverKeyDerivationId: number | null,
-    protocolMagic: number,
   ): ICip1852Wallet;
 }

@@ -98,7 +98,6 @@ test('Can add and fetch address in wallet', async (done) => {
     bipWallet = await Bip44Wallet.createBip44Wallet(
       db,
       state.bip44WrapperRow,
-      protocolMagic,
     );
     const withPublicFromPrivate = asPublicFromPrivate(bipWallet);
     expect(withPublicFromPrivate != null).toEqual(true);

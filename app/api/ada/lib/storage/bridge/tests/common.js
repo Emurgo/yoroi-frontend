@@ -27,13 +27,12 @@ import {
 } from 'bip39';
 
 import { RustModule } from '../../../cardanoCrypto/rustLoader';
+import { networks } from '../../database/prepackagedNetworks';
 
 export const TX_TEST_MNEMONIC_1 = 'prevent company field green slot measure chief hero apple task eagle sunset endorse dress seed';
 export const ABANDON_SHARE = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon share';
 
 const privateDeriverPassword = 'greatest_password_ever';
-
-const protocolMagic = 764824073; // mainnet
 
 export async function setup(
   db: lf$Database,
@@ -56,7 +55,7 @@ async function setupBip44(
   await RustModule.load();
 
   const settings = RustModule.WalletV2.BlockchainSettings.from_json({
-    protocol_magic: protocolMagic
+    protocol_magic: Number.parseInt(networks.ByronMainnet.NetworkMagic, 10),
   });
   const entropy = RustModule.WalletV2.Entropy.from_english_mnemonics(walletMnemonic);
   const rootPk = RustModule.WalletV2.Bip44RootPrivateKey.recover(entropy, '');
@@ -74,7 +73,6 @@ async function setupBip44(
   const bipWallet = await Bip44Wallet.createBip44Wallet(
     db,
     state.bip44WrapperRow,
-    protocolMagic,
   );
 
   const publicDeriver = await PublicDeriver.createPublicDeriver(
@@ -109,7 +107,6 @@ async function setupCip1852(
   const bipWallet = await Cip1852Wallet.createCip1852Wallet(
     db,
     state.cip1852WrapperRow,
-    protocolMagic,
   );
 
   const publicDeriver = await PublicDeriver.createPublicDeriver(

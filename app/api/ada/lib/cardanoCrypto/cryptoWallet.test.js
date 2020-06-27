@@ -9,6 +9,7 @@ import {
   HARD_DERIVATION_START,
 } from '../../../../config/numbersConfig';
 import { v3PublicToV2 } from '../../transactions/utils';
+import { networks } from '../storage/database/prepackagedNetworks';
 
 beforeAll(async () => {
   await RustModule.load();
@@ -16,7 +17,7 @@ beforeAll(async () => {
 
 const getAddressForLedgerMnemonic = (mnemonic: string): string => {
   const settings = RustModule.WalletV2.BlockchainSettings.from_json({
-    protocol_magic: 764824073 // mainnet
+    protocol_magic: Number.parseInt(networks.ByronMainnet.NetworkMagic, 10)
   });
 
   const rootKey = generateLedgerWalletRootKey(mnemonic);

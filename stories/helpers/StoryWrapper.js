@@ -300,7 +300,6 @@ function genDummyWallet(): PublicDeriver<> {
     },
     null,
     null,
-    0,
   );
   const clazz = GetPublicKey(HasLevels(HasSign(PublicDeriver)));
   const self = new clazz({
@@ -423,7 +422,6 @@ function genSigningWallet(
     },
     null,
     null,
-    0,
   );
   const clazz = HasUtxoChains(Cip1852PickInternal(GetStakingKey(GetAllAccounting(
     DisplayCutoff(GetSigningKey(GetPublicKey(

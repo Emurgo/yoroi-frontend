@@ -31,7 +31,6 @@ export class Cip1852Wallet
   #signingLevel: number | null;
   #privateDeriverLevel: number | null;
   #privateDeriverKeyDerivationId: number | null;
-  #protocolMagic: number;
 
   /**
    * This constructor it will NOT populate functionality from db
@@ -42,14 +41,12 @@ export class Cip1852Wallet
     row: $ReadOnly<Cip1852WrapperRow>,
     privateDeriverLevel: number | null,
     privateDeriverKeyDerivationId: number | null,
-    protocolMagic: number,
   ): Cip1852Wallet {
     super(conceptualWalletCtorData);
     this.#publicDeriverLevel = row.PublicDeriverLevel;
     this.#signingLevel = row.SignerLevel;
     this.#privateDeriverLevel = privateDeriverLevel;
     this.#privateDeriverKeyDerivationId = privateDeriverKeyDerivationId;
-    this.#protocolMagic = protocolMagic;
     return this;
   }
 
@@ -77,13 +74,11 @@ export class Cip1852Wallet
   static async createCip1852Wallet(
     db: lf$Database,
     row: $ReadOnly<Cip1852WrapperRow>,
-    protocolMagic: number,
   ): Promise<Cip1852Wallet> {
     return await refreshCip1852WalletFunctionality(
       db,
       row,
       Cip1852Wallet,
-      protocolMagic
     );
   }
 

@@ -73,7 +73,7 @@ export default class Transfer extends Component<Props> {
       return (<NoWalletMessage />);
     }
     // temporary solution: will need to handle more cases later for different currencies
-    if (wallet.getParent().getCoinType() !== CoinTypes.CARDANO) {
+    if (wallet.getParent().getNetworkInfo().CoinType !== CoinTypes.CARDANO) {
       return (<UnsupportedWallet />);
     }
     return (

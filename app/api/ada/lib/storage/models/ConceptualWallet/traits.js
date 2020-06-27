@@ -436,7 +436,6 @@ export async function refreshCip1852WalletFunctionality<
   db: lf$Database,
   row: $ReadOnly<Cip1852WrapperRow>,
   base: Class<T>,
-  protocolMagic: number, // TODO: should be stored in a table somewhere in the future
 ): Promise<ICip1852Wallet> {
   const conceptualWalletCtorData = await refreshConceptualWalletFunctionality(
     db,
@@ -463,7 +462,6 @@ export async function refreshCip1852WalletFunctionality<
     row,
     privateDeriverLevel,
     privateDeriverKeyDerivationId,
-    protocolMagic,
   );
   return instance;
 }
@@ -474,7 +472,6 @@ export async function refreshBip44WalletFunctionality<
   db: lf$Database,
   row: $ReadOnly<Bip44WrapperRow>,
   base: Class<T>,
-  protocolMagic: number, // TODO: should be stored in a table somewhere in the future
 ): Promise<IBip44Wallet> {
   const conceptualWalletCtorData = await refreshConceptualWalletFunctionality(
     db,
