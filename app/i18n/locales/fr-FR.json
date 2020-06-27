@@ -656,6 +656,8 @@
   "wallet.transfer.instruction": "Tout ADA réclamé sera transféré dans votre portefeuille actuellement sélectionné",
   "wallet.undelegation.transaction.explanationLine1": "Vous n'avez PAS besoin d'arrêter une délégation avant de changer de groupe d'enjeu (pool)",
   "wallet.undelegation.transaction.explanationLine2": "Cela prendra 2 époques après la fin de l'époque courante pour que votre choix d'arrêter de déléguer soit effectif",
+  "wallet.unsupported.subtitle": "The selected wallet does not support this functionality",
+  "wallet.unsupported.title": "Wallet type not supported",
   "widgets.copyableaddress.addressCopyTooltipMessage": "Copier dans le presse-papier",
   "widgets.explorer.tooltip": "Aller sur {websiteName}",
   "widgets.warningBox.headerText": "ATTENTION :",
