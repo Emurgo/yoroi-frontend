@@ -656,6 +656,8 @@
   "wallet.transfer.instruction": "Qualsiasi richiesta di ADA verrà trasferito sul portafoglio selezionato",
   "wallet.undelegation.transaction.explanationLine1": "NON è necessario rimuovere la delega prima di cambiare pool",
   "wallet.undelegation.transaction.explanationLine2": "Ci vorranno 2 epoche dopo la fine dell'epoca attuale perché il ritiro delega abbia effetto",
+  "wallet.unsupported.subtitle": "The selected wallet does not support this functionality",
+  "wallet.unsupported.title": "Wallet type not supported",
   "widgets.copyableaddress.addressCopyTooltipMessage": "Copia negli appunti",
   "widgets.explorer.tooltip": "Vai a {websiteName}",
   "widgets.warningBox.headerText": "ATTENZIONE:",
