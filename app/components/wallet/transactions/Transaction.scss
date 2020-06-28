@@ -234,6 +234,20 @@
           padding-left: 24px;
         }
       }
+      @media (max-width: 1140px) {
+        flex-direction: column;
+        border: none;
+        & > div {
+          &:first-child{
+            padding-right: 0;
+          }
+          &:last-child{
+            border: none;
+            padding-left: 0;
+            padding-top: 40px;
+          }
+        }
+      }
     }
     .addressHeader {
       display: grid;
