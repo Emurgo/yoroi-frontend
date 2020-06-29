@@ -155,7 +155,7 @@ export default class WalletReceive extends Component<Props> {
           address.label != null ?
             <div className={styles.labelAddress}>
               <button type="button" onClick={() => { /* On Edit */ }}>
-                <span>
+                <span className={styles.labelAddressIcon}>
                   <EditLabelIcon />
                 </span>
               </button>
@@ -164,7 +164,7 @@ export default class WalletReceive extends Component<Props> {
             :
             <div className={styles.labelAddress}>
               <button type="button" onClick={() => { /* On Add Label */ }}>
-                <span>
+                <span className={styles.labelAddressIcon}>
                   <AddLabelIcon />
                 </span>
               </button>

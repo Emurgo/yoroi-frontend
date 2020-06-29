@@ -235,7 +235,7 @@
     .addressHeader {
       display: grid;
       grid-gap: 15px;
-      grid-template-columns: minmax(230px,1fr) 105px 1fr;
+      grid-template-columns: minmax(232px,1fr) 105px 1fr;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 24px;
@@ -259,7 +259,7 @@
     .addressItem {
       display: grid;
       grid-gap: 15px;
-      grid-template-columns: minmax(230px,1fr) 105px 1fr;
+      grid-template-columns: minmax(232px,1fr) 105px 1fr;
       align-items: center;
     }
     * + h2,
