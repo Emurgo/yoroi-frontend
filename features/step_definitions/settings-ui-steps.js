@@ -129,7 +129,11 @@ Then(/^I click on the checkbox$/, async function () {
 });
 
 Then(/^I should see a no wallet message$/, async function () {
-  await this.waitForElement('.NoWalletMessage_component');
+  const noWalletMessage = await i18n.formatMessage(
+    this.driver,
+    { id: 'wallet.nowallet.title' }
+  );
+  await this.waitUntilText('.FullscreenMessage_title', noWalletMessage);
 });
 
 

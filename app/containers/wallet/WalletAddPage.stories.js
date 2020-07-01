@@ -30,7 +30,7 @@ import {
 import { GenericApiError, } from '../../api/common/errors';
 import { NoInputsError } from '../../api/ada/errors';
 import { withScreenshot } from 'storycap';
-import { getDefaultExplorer } from '../../domain/Explorer';
+import { defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
 import { StepState } from '../../components/widgets/ProgressSteps';
 import { ProgressStep } from '../../types/HWConnectStoreTypes';
 import { RestoreSteps, generatePlates } from '../../stores/toplevel/WalletRestoreStore';
@@ -43,13 +43,13 @@ import WalletConnectHWOptionDialog from '../../components/wallet/add/option-dial
 import WalletTrezorConnectDialogContainer from './dialogs/WalletTrezorConnectDialogContainer';
 import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDialogContainer';
 import { getPaperWalletIntro } from '../../stores/toplevel/ProfileStore';
-import { getApiMeta } from '../../api/common/utils';
 import WalletCreateOptionDialog from '../../components/wallet/add/option-dialog/WalletCreateOptionDialog';
 import WalletPaperDialog from '../../components/wallet/WalletPaperDialog';
 import UserPasswordDialog from '../../components/wallet/add/paper-wallets/UserPasswordDialog';
 import { ProgressStep as PaperWalletProgressStep } from '../../stores/ada/PaperWalletCreateStore';
 import { PdfGenSteps } from '../../api/ada/paperWallet/paperWalletPdf';
 import { ROUTES } from '../../routes-config';
+import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -60,7 +60,7 @@ export default {
 const defaultProps: {|
   openDialog?: Object,
   getParam?: <T>(number | string) => T,
-  selectedAPI: *,
+  selectedNetwork: *,
   WalletCreateDialogContainerProps?: *,
   WalletPaperDialogContainerProps?: *,
   CreatePaperWalletDialogContainerProps?: *,
@@ -71,7 +71,7 @@ const defaultProps: {|
 |} => * = (request) => ({
   stores: {
     profile: {
-      selectedAPI: request.selectedAPI,
+      selectedNetwork: request.selectedNetwork,
     },
     uiDialogs: {
       activeDialog: request.openDialog,
@@ -97,8 +97,8 @@ const defaultProps: {|
       },
     },
     profile: {
-      setSelectedAPI: {
-        trigger: action('setSelectedAPI'),
+      setSelectedNetwork: {
+        trigger: action('setSelectedNetwork'),
       },
     },
     wallets: {
@@ -173,7 +173,7 @@ const defaultProps: {|
 export const MainPage = (): Node => (
   <WalletAddPage
     generated={defaultProps(Object.freeze({
-      selectedAPI: getApiMeta('ada'),
+      selectedNetwork: networks.ByronMainnet,
     }))}
   />
 );
@@ -182,7 +182,7 @@ export const CurrencySelect = (): Node => (
   <WalletAddPage
     generated={defaultProps(Object.freeze({
       openDialog: WalletCreateDialog,
-      selectedAPI: undefined,
+      selectedNetwork: undefined,
       WalletCreateDialogContainerProps: {
         generated: {
           stores: {
@@ -209,7 +209,7 @@ export const CreateWalletOptions = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
-        selectedAPI: getApiMeta('ada'),
+        selectedNetwork: networks.ByronMainnet,
         openDialog: WalletCreateOptionDialog,
       }))}
     />
@@ -219,7 +219,7 @@ export const CreateWalletOptions = (): Node => {
 export const CreateWalletStart = (): Node => (
   <WalletAddPage
     generated={defaultProps(Object.freeze({
-      selectedAPI: getApiMeta('ada'),
+      selectedNetwork: networks.ByronMainnet,
       openDialog: WalletCreateDialog,
       WalletCreateDialogContainerProps: {
         generated: {
@@ -295,7 +295,7 @@ export const CreateWalletPrivacyDialog = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
-        selectedAPI: getApiMeta('ada'),
+        selectedNetwork: networks.ByronMainnet,
         openDialog: WalletBackupDialog,
         WalletBackupDialogContainerProps: {
           generated: walletBackupProps({
@@ -329,7 +329,7 @@ export const CreateWalletRecoveryPhraseDisplay = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
-        selectedAPI: getApiMeta('ada'),
+        selectedNetwork: networks.ByronMainnet,
         openDialog: WalletBackupDialog,
         WalletBackupDialogContainerProps: {
           generated: walletBackupProps({
@@ -394,7 +394,7 @@ export const CreateWalletRecoveryPhraseEnter = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
-        selectedAPI: getApiMeta('ada'),
+        selectedNetwork: networks.ByronMainnet,
         openDialog: WalletBackupDialog,
         WalletBackupDialogContainerProps: {
           generated: walletBackupProps({
@@ -421,7 +421,7 @@ export const CreateWalletFinalConfirm = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
-        selectedAPI: getApiMeta('ada'),
+        selectedNetwork: networks.ByronMainnet,
         openDialog: WalletBackupDialog,
         WalletBackupDialogContainerProps: {
           generated: walletBackupProps({
@@ -445,7 +445,7 @@ export const CreateWalletFinalConfirm = (): Node => {
 
 const restoreWalletProps: {|
   step: *,
-  selectedAPI: *,
+  selectedNetwork: *,
   walletRestoreMeta?: *,
   recoveryResult?: *,
   restoreRequest?: *,
@@ -453,10 +453,12 @@ const restoreWalletProps: {|
   yoroiTransferError?: *,
 |} => * = (request) => ({
   stores: {
+    explorers: {
+      selectedExplorer: defaultToSelectedExplorer(),
+    },
     profile: {
-      selectedAPI: request.selectedAPI,
+      selectedNetwork: request.selectedNetwork,
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-      selectedExplorer: getDefaultExplorer(),
       unitOfAccount: genUnitOfAccount(),
     },
     uiNotifications: {
@@ -550,7 +552,7 @@ export const RestoreOptions = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
-        selectedAPI: getApiMeta('ada'),
+        selectedNetwork: networks.ByronMainnet,
         openDialog: WalletRestoreOptionDialog,
       }))}
     />
@@ -571,16 +573,16 @@ export const RestoreWalletStart = (): Node => {
   const password = getPasswordCreationCases();
   const paperPassword = getPasswordValidationCases('paper_password');
 
-  const selectedAPI = getApiMeta('ada');
+  const selectedNetwork = networks.ByronMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
-        selectedAPI,
+        selectedNetwork,
         openDialog: WalletRestoreDialog,
         getParam: <T>() => getRestoreMode(), // eslint-disable-line no-unused-vars
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
-            selectedAPI,
+            selectedNetwork,
             step: RestoreSteps.START,
             walletRestoreMeta: {
               recoveryPhrase: (() => {
@@ -620,16 +622,16 @@ export const RestoreVerify = (): Node => {
   const recoveryPhrase = creationRecoveryPhrase.join(' ');
   const rootPk = generateWalletRootKey(recoveryPhrase);
   const { byronPlate, shelleyPlate } = generatePlates(rootPk, getRestoreMode());
-  const selectedAPI = getApiMeta('ada');
+  const selectedNetwork = networks.ByronMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
-        selectedAPI,
+        selectedNetwork,
         getParam: <T>() => getRestoreMode(), // eslint-disable-line no-unused-vars
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
-            selectedAPI,
+            selectedNetwork,
             step: RestoreSteps.VERIFY_MNEMONIC,
             restoreRequest: {
               isExecuting: !environment.isJormungandr() && boolean('isExecuting', false),
@@ -649,15 +651,15 @@ export const RestoreVerify = (): Node => {
 };
 
 export const RestoreLegacyExplanation = (): Node => {
-  const selectedAPI = getApiMeta('ada');
+  const selectedNetwork = networks.ByronMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
-        selectedAPI,
+        selectedNetwork,
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
-            selectedAPI,
+            selectedNetwork,
             step: RestoreSteps.LEGACY_EXPLANATION,
             restoreRequest: {
               isExecuting: boolean('isExecuting', false),
@@ -672,15 +674,15 @@ export const RestoreLegacyExplanation = (): Node => {
 };
 
 export const RestoreUpgradeRestoringAddresses = (): Node => {
-  const selectedAPI = getApiMeta('ada');
+  const selectedNetwork = networks.ByronMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
-        selectedAPI,
+        selectedNetwork,
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
-            selectedAPI,
+            selectedNetwork,
             step: RestoreSteps.TRANSFER_TX_GEN,
             yoroiTransferStep: TransferStatus.RESTORING_ADDRESSES,
           })
@@ -691,15 +693,15 @@ export const RestoreUpgradeRestoringAddresses = (): Node => {
 };
 
 export const RestoreUpgradeCheckingAddresses = (): Node => {
-  const selectedAPI = getApiMeta('ada');
+  const selectedNetwork = networks.ByronMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
-        selectedAPI,
+        selectedNetwork,
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
-            selectedAPI,
+            selectedNetwork,
             step: RestoreSteps.TRANSFER_TX_GEN,
             yoroiTransferStep: TransferStatus.CHECKING_ADDRESSES,
           })
@@ -710,15 +712,15 @@ export const RestoreUpgradeCheckingAddresses = (): Node => {
 };
 
 export const RestoreUpgradeGeneratingTx = (): Node => {
-  const selectedAPI = getApiMeta('ada');
+  const selectedNetwork = networks.ByronMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
-        selectedAPI,
+        selectedNetwork,
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
-            selectedAPI,
+            selectedNetwork,
             step: RestoreSteps.TRANSFER_TX_GEN,
             yoroiTransferStep: TransferStatus.GENERATING_TX,
           })
@@ -729,15 +731,15 @@ export const RestoreUpgradeGeneratingTx = (): Node => {
 };
 
 export const RestoreUpgradeReadyToTransfer = (): Node => {
-  const selectedAPI = getApiMeta('ada');
+  const selectedNetwork = networks.ByronMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
-        selectedAPI,
+        selectedNetwork,
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
-            selectedAPI,
+            selectedNetwork,
             step: RestoreSteps.TRANSFER_TX_GEN,
             yoroiTransferStep: TransferStatus.READY_TO_TRANSFER,
           })
@@ -748,15 +750,15 @@ export const RestoreUpgradeReadyToTransfer = (): Node => {
 };
 
 export const RestoreUpgradeError = (): Node => {
-  const selectedAPI = getApiMeta('ada');
+  const selectedNetwork = networks.ByronMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
-        selectedAPI,
+        selectedNetwork,
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
-            selectedAPI,
+            selectedNetwork,
             step: RestoreSteps.TRANSFER_TX_GEN,
             yoroiTransferError: new GenericApiError(),
             yoroiTransferStep: TransferStatus.ERROR,
@@ -768,15 +770,15 @@ export const RestoreUpgradeError = (): Node => {
 };
 
 export const RestoreUpgradeNoNeed = (): Node => {
-  const selectedAPI = getApiMeta('ada');
+  const selectedNetwork = networks.ByronMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
-        selectedAPI,
+        selectedNetwork,
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
-            selectedAPI,
+            selectedNetwork,
             step: RestoreSteps.TRANSFER_TX_GEN,
             yoroiTransferError: new NoInputsError(),
             yoroiTransferStep: TransferStatus.ERROR,
@@ -792,7 +794,7 @@ export const HardwareOptions = (): Node => {
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletConnectHWOptionDialog,
-        selectedAPI: getApiMeta('ada'),
+        selectedNetwork: networks.ByronMainnet,
       }))}
     />
   );
@@ -800,11 +802,11 @@ export const HardwareOptions = (): Node => {
 
 const trezorPops: {|
   trezorConnect: *,
-  selectedAPI: *,
+  selectedNetwork: *,
 |} => * = (request) => ({
   stores: {
     profile: {
-      selectedAPI: request.selectedAPI,
+      selectedNetwork: request.selectedNetwork,
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
     },
     substores: {
@@ -837,15 +839,15 @@ const trezorPops: {|
 });
 
 export const TrezorCheck = (): Node => {
-  const selectedAPI = getApiMeta('ada');
+  const selectedNetwork = networks.ByronMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletTrezorConnectDialogContainer,
-        selectedAPI,
+        selectedNetwork,
         WalletTrezorConnectDialogContainerProps: {
           generated: trezorPops({
-            selectedAPI,
+            selectedNetwork,
             trezorConnect: {
               progressInfo: {
                 currentStep: ProgressStep.CHECK,
@@ -879,15 +881,15 @@ export const TrezorConnect = (): Node => {
     }
     return StepState.LOAD;
   });
-  const selectedAPI = getApiMeta('ada');
+  const selectedNetwork = networks.ByronMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletTrezorConnectDialogContainer,
-        selectedAPI,
+        selectedNetwork,
         WalletTrezorConnectDialogContainerProps: {
           generated: trezorPops({
-            selectedAPI,
+            selectedNetwork,
             trezorConnect: {
               progressInfo: {
                 currentStep: ProgressStep.CONNECT,
@@ -927,15 +929,15 @@ export const TrezorSave = (): Node => {
     return StepState.LOAD;
   });
   const nameCases = getWalletNameCases();
-  const selectedAPI = getApiMeta('ada');
+  const selectedNetwork = networks.ByronMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletTrezorConnectDialogContainer,
-        selectedAPI,
+        selectedNetwork,
         WalletTrezorConnectDialogContainerProps: {
           generated: trezorPops({
-            selectedAPI,
+            selectedNetwork,
             trezorConnect: {
               progressInfo: {
                 currentStep: ProgressStep.SAVE,
@@ -956,11 +958,11 @@ export const TrezorSave = (): Node => {
 
 const ledgerProps: {|
   ledgerConnect: *,
-  selectedAPI: *,
+  selectedNetwork: *,
 |} => * = (request) => ({
   stores: {
     profile: {
-      selectedAPI: request.selectedAPI,
+      selectedNetwork: request.selectedNetwork,
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
     },
     substores: {
@@ -993,15 +995,15 @@ const ledgerProps: {|
 });
 
 export const LedgerCheck = (): Node => {
-  const selectedAPI = getApiMeta('ada');
+  const selectedNetwork = networks.ByronMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletLedgerConnectDialogContainer,
-        selectedAPI,
+        selectedNetwork,
         WalletLedgerConnectDialogContainerProps: {
           generated: ledgerProps({
-            selectedAPI,
+            selectedNetwork,
             ledgerConnect: {
               progressInfo: {
                 currentStep: ProgressStep.CHECK,
@@ -1035,15 +1037,15 @@ export const LedgerConnect = (): Node => {
     }
     return StepState.LOAD;
   });
-  const selectedAPI = getApiMeta('ada');
+  const selectedNetwork = networks.ByronMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletLedgerConnectDialogContainer,
-        selectedAPI,
+        selectedNetwork,
         WalletLedgerConnectDialogContainerProps: {
           generated: ledgerProps({
-            selectedAPI,
+            selectedNetwork,
             ledgerConnect: {
               progressInfo: {
                 currentStep: ProgressStep.CONNECT,
@@ -1083,15 +1085,15 @@ export const LedgerSave = (): Node => {
     return StepState.LOAD;
   });
   const nameCases = getWalletNameCases();
-  const selectedAPI = getApiMeta('ada');
+  const selectedNetwork = networks.ByronMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletLedgerConnectDialogContainer,
-        selectedAPI,
+        selectedNetwork,
         WalletLedgerConnectDialogContainerProps: {
           generated: ledgerProps({
-            selectedAPI,
+            selectedNetwork,
             ledgerConnect: {
               progressInfo: {
                 currentStep: ProgressStep.SAVE,
@@ -1114,7 +1116,7 @@ export const LedgerSave = (): Node => {
 export const PaperWalletCreate = (): Node => (
   <WalletAddPage
     generated={defaultProps(Object.freeze({
-      selectedAPI: getApiMeta('ada'),
+      selectedNetwork: networks.ByronMainnet,
       openDialog: WalletPaperDialog,
       WalletPaperDialogContainerProps: {
         generated: {
@@ -1181,19 +1183,22 @@ export const PaperWalletUserPasswordDialog = (): Node => {
     if (val === passwordCases.TooShort) return 'a';
     return '';
   };
-  const selectedAPI = getApiMeta('ada');
+  const selectedNetwork = networks.ByronMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: UserPasswordDialog,
-        selectedAPI,
+        selectedNetwork,
         CreatePaperWalletDialogContainerProps: {
           generated: {
             stores: {
+              explorers: {
+                selectedExplorer: defaultToSelectedExplorer(),
+              },
               profile: {
                 paperWalletsIntro: getPaperWalletIntro(globalKnobs.locale(), ''),
                 isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-                selectedExplorer: getDefaultExplorer(),
+                selectedNetwork,
               },
               uiDialogs: {
                 dataForActiveDialog: {
@@ -1244,19 +1249,22 @@ export const PaperWalletCreateDialog = (): Node => {
     }
     return extendedSteps();
   };
-  const selectedAPI = getApiMeta('ada');
+  const selectedNetwork = networks.ByronMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: UserPasswordDialog,
-        selectedAPI,
+        selectedNetwork,
         CreatePaperWalletDialogContainerProps: {
           generated: {
             stores: {
+              explorers: {
+                selectedExplorer: defaultToSelectedExplorer(),
+              },
               profile: {
                 paperWalletsIntro: getPaperWalletIntro(globalKnobs.locale(), ''),
                 isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-                selectedExplorer: getDefaultExplorer(),
+                selectedNetwork,
               },
               uiDialogs: {
                 dataForActiveDialog: {
@@ -1319,19 +1327,22 @@ export const PaperWalletVerifyDialog = (): Node => {
     passwordCases,
     passwordCases.Empty,
   );
-  const selectedAPI = getApiMeta('ada');
+  const selectedNetwork = networks.ByronMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: UserPasswordDialog,
-        selectedAPI,
+        selectedNetwork,
         CreatePaperWalletDialogContainerProps: {
           generated: {
             stores: {
+              explorers: {
+                selectedExplorer: defaultToSelectedExplorer(),
+              },
               profile: {
                 paperWalletsIntro: getPaperWalletIntro(globalKnobs.locale(), ''),
                 isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-                selectedExplorer: getDefaultExplorer(),
+                selectedNetwork,
               },
               uiDialogs: {
                 dataForActiveDialog: {
@@ -1371,18 +1382,21 @@ export const PaperWalletVerifyDialog = (): Node => {
 };
 
 export const PaperWalletFinalizeDialog = (): Node => {
-  const selectedAPI = getApiMeta('ada');
+  const selectedNetwork = networks.ByronMainnet;
   return (<WalletAddPage
     generated={defaultProps(Object.freeze({
       openDialog: UserPasswordDialog,
-      selectedAPI,
+      selectedNetwork,
       CreatePaperWalletDialogContainerProps: {
         generated: {
           stores: {
+            explorers: {
+              selectedExplorer: defaultToSelectedExplorer(),
+            },
             profile: {
               paperWalletsIntro: getPaperWalletIntro(globalKnobs.locale(), ''),
               isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-              selectedExplorer: getDefaultExplorer(),
+              selectedNetwork,
             },
             uiDialogs: {
               dataForActiveDialog: {

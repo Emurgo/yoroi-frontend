@@ -35,7 +35,7 @@ import type { PriceDataRow } from '../../api/ada/lib/storage/database/prices/tab
 import LocalizableError from '../../i18n/LocalizableError';
 import type { MemosForWallet } from '../../stores/toplevel/MemosStore';
 import type { PublicDeriverSettingsCache } from '../../stores/toplevel/WalletSettingsStore';
-import type { ExplorerType } from '../../domain/Explorer';
+import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import type {
   GetTransactionsRequestOptions
@@ -135,7 +135,9 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
             lastSyncBlock={lastSyncInfo.Height}
             memoMap={this.generated.stores.memos.txMemoMap.get(walletId) || new Map()}
             priceMap={this.generated.stores.coinPriceStore.priceMap}
-            selectedExplorer={this.generated.stores.profile.selectedExplorer}
+            selectedExplorer={this.generated.stores.explorers.selectedExplorer
+              .get(publicDeriver.getParent().getNetworkInfo().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
+            }
             isLoadingTransactions={isLoadingTx}
             hasMoreToLoad={totalAvailable > limit}
             onLoadMore={() => actions.transactions.loadMoreTransactions.trigger(publicDeriver)}
@@ -437,9 +439,11 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
         selectedTransaction: void | WalletTransaction,
         txMemoMap: Map<string, MemosForWallet>
       |},
+      explorers: {|
+        selectedExplorer: Map<number, SelectedExplorer>,
+      |},
       profile: {|
         isClassicTheme: boolean,
-        selectedExplorer: ExplorerType,
         shouldHideBalance: boolean,
         unitOfAccount: UnitOfAccountSettingType
       |},
@@ -483,8 +487,10 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
     const { stores, actions } = this.props;
     return Object.freeze({
       stores: {
+        explorers: {
+          selectedExplorer: stores.explorers.selectedExplorer,
+        },
         profile: {
-          selectedExplorer: stores.profile.selectedExplorer,
           shouldHideBalance: stores.profile.shouldHideBalance,
           isClassicTheme: stores.profile.isClassicTheme,
           unitOfAccount: stores.profile.unitOfAccount,

@@ -36,7 +36,9 @@ import type {
   TransactionExportFileType
 } from '../export';
 import { getApiForNetwork } from './utils';
-import type { GetBalanceRequest, GetBalanceResponse } from './types';
+import type {
+  GetBalanceRequest, GetBalanceResponse,
+} from './types';
 
 // getWallets
 

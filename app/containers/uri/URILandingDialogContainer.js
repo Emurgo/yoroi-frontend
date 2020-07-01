@@ -10,9 +10,10 @@ import URILandingDialog from '../../components/uri/URILandingDialog';
 import URIVerifyDialog from '../../components/uri/URIVerifyDialog';
 import URIInvalidDialog from '../../components/uri/URIInvalidDialog';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
-import type { ExplorerType } from '../../domain/Explorer';
+import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { UriParams } from '../../utils/URIHandling';
-import { getApiMeta, ApiOptions, } from '../../api/common/utils';
+import { getApiForNetwork, getApiMeta, } from '../../api/common/utils';
+import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export type GeneratedData = typeof URILandingDialogContainer.prototype.generated;
 
@@ -56,7 +57,10 @@ export default class URILandingDialogContainer extends Component<Props> {
     // assert not null
     const uriParams = this.generated.stores.loading.uriParams;
 
-    const apiMeta = getApiMeta(ApiOptions.ada);
+    const network = networks.ByronMainnet; // todo: uri scheme for other networks
+    const selectedApiType = getApiForNetwork(network);
+
+    const apiMeta = getApiMeta(selectedApiType);
     if (apiMeta == null) throw new Error(`${nameof(URILandingDialogContainer)} no API found`);
 
     const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
@@ -79,7 +83,9 @@ export default class URILandingDialogContainer extends Component<Props> {
           onBack={this.toggleShowDisclaimer}
           onCancel={this.onCancel}
           uriParams={uriParams}
-          selectedExplorer={this.generated.stores.profile.selectedExplorer}
+          selectedExplorer={this.generated.stores.explorers.selectedExplorer
+            .get(network.NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
+          }
           unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
           coinPrice={coinPrice}
         />
@@ -101,9 +107,11 @@ export default class URILandingDialogContainer extends Component<Props> {
         getCurrentPrice: (from: string, to: string) => ?number
       |},
       loading: {| uriParams: ?UriParams |},
+      explorers: {|
+        selectedExplorer: Map<number, SelectedExplorer>,
+      |},
       profile: {|
         isClassicTheme: boolean,
-        selectedExplorer: ExplorerType,
         unitOfAccount: UnitOfAccountSettingType
       |}
     |}
@@ -117,8 +125,10 @@ export default class URILandingDialogContainer extends Component<Props> {
     const { stores, } = this.props;
     return Object.freeze({
       stores: {
+        explorers: {
+          selectedExplorer: stores.explorers.selectedExplorer,
+        },
         profile: {
-          selectedExplorer: stores.profile.selectedExplorer,
           isClassicTheme: stores.profile.isClassicTheme,
           unitOfAccount: stores.profile.unitOfAccount,
         },

@@ -77,8 +77,7 @@ import { ledgerErrors } from '../../app/domain/LedgerLocalizedError';
 import BigNumber from 'bignumber.js';
 import { utxoToTxInput } from '../../app/api/ada/transactions/shelley/inputSelection';
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
-import { CoinTypes } from '../../app/config/numbersConfig';
-import { networks } from '../../app/api/ada/lib/storage/database/prepackagedNetworks';
+import { networks } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 
 /**
  * This whole file is meant to mirror code in App.js

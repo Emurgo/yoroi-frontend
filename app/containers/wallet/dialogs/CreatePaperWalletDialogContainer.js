@@ -20,8 +20,9 @@ import type { WalletRestoreDialogValues } from '../../../components/wallet/Walle
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { PdfGenStepType } from '../../../api/ada/paperWallet/paperWalletPdf';
 import type { ProgressStepEnum } from '../../../stores/ada/PaperWalletCreateStore';
-import type { ExplorerType } from '../../../domain/Explorer';
+import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { Notification } from '../../../types/notificationType';
+import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 const messages = defineMessages({
   verifyPaperWallet: {
@@ -41,6 +42,14 @@ export default class CreatePaperWalletDialogContainer
   };
 
   @observable notificationElementId: string = '';
+
+  getSelectedNetwork: void => $ReadOnly<NetworkRow> = () => {
+    const { selectedNetwork } = this.generated.stores.profile;
+    if (selectedNetwork === undefined) {
+      throw new Error(`${nameof(CreatePaperWalletDialogContainer)} no API selected`);
+    }
+    return selectedNetwork;
+  }
 
   render(): null | Node {
     const { intl } = this.context;
@@ -130,7 +139,9 @@ export default class CreatePaperWalletDialogContainer
         return (
           <FinalizeDialog
             paper={getPaperFromStore()}
-            selectedExplorer={this.generated.stores.profile.selectedExplorer}
+            selectedExplorer={this.generated.stores.explorers.selectedExplorer
+              .get(this.getSelectedNetwork().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
+            }
             onNext={onCancel}
             onCancel={onCancel}
             onBack={this.generated.actions.paperWallets.backToCreate.trigger}
@@ -202,10 +213,13 @@ export default class CreatePaperWalletDialogContainer
         progressInfo: ?ProgressStepEnum,
         userPassword: ?string
       |},
+      explorers: {|
+        selectedExplorer: Map<number, SelectedExplorer>,
+      |},
       profile: {|
         isClassicTheme: boolean,
         paperWalletsIntro: string,
-        selectedExplorer: ExplorerType
+        selectedNetwork: void | $ReadOnly<NetworkRow>,
       |},
       uiDialogs: {|
         dataForActiveDialog: {|
@@ -231,10 +245,13 @@ export default class CreatePaperWalletDialogContainer
     const { stores, actions } = this.props;
     return Object.freeze({
       stores: {
+        explorers: {
+          selectedExplorer: stores.explorers.selectedExplorer,
+        },
         profile: {
           paperWalletsIntro: stores.profile.paperWalletsIntro,
           isClassicTheme: stores.profile.isClassicTheme,
-          selectedExplorer: stores.profile.selectedExplorer,
+          selectedNetwork: stores.profile.selectedNetwork,
         },
         uiDialogs: {
           dataForActiveDialog: {

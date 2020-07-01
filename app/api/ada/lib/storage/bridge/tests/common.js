@@ -27,7 +27,7 @@ import {
 } from 'bip39';
 
 import { RustModule } from '../../../cardanoCrypto/rustLoader';
-import { networks } from '../../database/prepackagedNetworks';
+import { networks } from '../../database/prepackaged/networks';
 
 export const TX_TEST_MNEMONIC_1 = 'prevent company field green slot measure chief hero apple task eagle sunset endorse dress seed';
 export const ABANDON_SHARE = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon share';

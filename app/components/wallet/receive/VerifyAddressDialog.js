@@ -20,7 +20,7 @@ import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
 import RawHash from '../../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
-import type { ExplorerType } from '../../../domain/Explorer';
+import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 
 import LocalizableError from '../../../i18n/LocalizableError';
 import globalMessages from '../../../i18n/global-messages';
@@ -47,7 +47,7 @@ type Props = {|
   +error: ?LocalizableError,
   +verify: void => PossiblyAsync<void>,
   +cancel: void => void,
-  +selectedExplorer: ExplorerType,
+  +selectedExplorer: SelectedExplorer,
   +isHardware: boolean,
   +walletAddress: string,
   +walletPath: void | BIP32Path,

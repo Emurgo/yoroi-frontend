@@ -10,19 +10,14 @@ import type { Theme } from '../../themes';
 import { ROUTES } from '../../routes-config';
 import { LANGUAGES } from '../../i18n/translations';
 import type { LanguageType } from '../../i18n/translations';
-import type { ExplorerType } from '../../domain/Explorer';
-import type {
-  GetSelectedExplorerFunc, SaveSelectedExplorerFunc,
-} from '../../api/ada';
 import type {
   SetCustomUserThemeRequest
 } from '../../api/localStorage/index';
 import { unitOfAccountDisabledValue } from '../../types/unitOfAccountType';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { SUPPORTED_CURRENCIES } from '../../config/unitOfAccount';
-import type { ApiOptionType, SelectedApiType } from '../../api/common/utils';
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
-import { getApiMeta } from '../../api/common/utils';
+import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 
 export default class ProfileStore extends Store {
 
@@ -37,7 +32,7 @@ export default class ProfileStore extends Store {
 
   UNIT_OF_ACCOUNT_OPTIONS: typeof SUPPORTED_CURRENCIES = SUPPORTED_CURRENCIES;
 
-  @observable __selectedAPI: void | SelectedApiType = undefined;
+  @observable __selectedNetwork: void | $ReadOnly<NetworkRow> = undefined;
 
   /**
    * Need to store the selected language in-memory for when the user
@@ -221,12 +216,6 @@ export default class ProfileStore extends Store {
   @observable setLastLaunchVersionRequest: Request<string => Promise<void>>
     = new Request<string => Promise<void>>(this.api.localStorage.setLastLaunchVersion);
 
-  @observable getSelectedExplorerRequest: Request<GetSelectedExplorerFunc>
-    = new Request<GetSelectedExplorerFunc>(this.api.ada.getSelectedExplorer);
-
-  @observable setSelectedExplorerRequest: Request<SaveSelectedExplorerFunc>
-    = new Request<SaveSelectedExplorerFunc>(this.api.ada.saveSelectedExplorer);
-
   @observable getHideBalanceRequest: Request<void => Promise<boolean>>
     = new Request<void => Promise<boolean>>(this.api.localStorage.getHideBalance);
 
@@ -250,7 +239,6 @@ export default class ProfileStore extends Store {
     this.actions.profile.updateLocale.listen(this._updateLocale);
     this.actions.profile.resetLocale.listen(this._resetLocale);
     this.actions.profile.updateTentativeLocale.listen(this._updateTentativeLocale);
-    this.actions.profile.updateSelectedExplorer.listen(this.setSelectedExplorer);
     this.actions.profile.acceptTermsOfUse.listen(this._acceptTermsOfUse);
     this.actions.profile.acceptUriScheme.listen(this._acceptUriScheme);
     this.actions.profile.selectComplexityLevel.listen(this._selectComplexityLevel);
@@ -261,7 +249,7 @@ export default class ProfileStore extends Store {
     this.actions.profile.updateUnitOfAccount.listen(this._updateUnitOfAccount);
     this.actions.profile.toggleSidebar.listen(this._toggleSidebar);
     this.actions.profile.acceptNightly.listen(this._acceptNightly);
-    this.actions.profile.setSelectedAPI.listen(this._setSelectedAPI);
+    this.actions.profile.setSelectedNetwork.listen(this._setSelectedNetwork);
     this.registerReactions([
       this._setBigNumberFormat,
       this._updateMomentJsLocaleAfterLocaleChange,
@@ -454,12 +442,12 @@ export default class ProfileStore extends Store {
 
   // ========== Active API ========== //
 
-  @computed get selectedAPI(): void | SelectedApiType {
-    return this.__selectedAPI;
+  @computed get selectedNetwork(): void | $ReadOnly<NetworkRow> {
+    return this.__selectedNetwork;
   }
 
-  @action _setSelectedAPI: (ApiOptionType | void) => void  = (type) => {
-    this.__selectedAPI = getApiMeta(type);
+  @action _setSelectedNetwork: ($ReadOnly<NetworkRow> | void) => void  = (type) => {
+    this.__selectedNetwork = type;
   }
 
   // ========== Paper Wallets ========== //
@@ -558,28 +546,6 @@ export default class ProfileStore extends Store {
     return (
       this.getLastLaunchVersionRequest.wasExecuted &&
       this.getLastLaunchVersionRequest.result !== null
-    );
-  }
-
-  // ========== Selected Explorer ========== //
-
-  @computed get selectedExplorer(): ExplorerType {
-    const { result } = this.getSelectedExplorerRequest.execute();
-    if (result == null || result === '') return 'seiza';
-    return result;
-  }
-
-  setSelectedExplorer: {| explorer: ExplorerType |} => Promise<void> = async (
-    { explorer }
-  ): Promise<void> => {
-    await this.setSelectedExplorerRequest.execute({ explorer });
-    await this.getSelectedExplorerRequest.execute(); // eagerly cache
-  };
-
-  @computed get hasLoadedSelectedExplorer(): boolean {
-    return (
-      this.getSelectedExplorerRequest.wasExecuted &&
-      this.getSelectedExplorerRequest.result !== null
     );
   }
 

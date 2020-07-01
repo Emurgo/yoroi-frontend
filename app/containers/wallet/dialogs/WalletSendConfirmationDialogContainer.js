@@ -20,7 +20,7 @@ import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType'
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import LocalizableError from '../../../i18n/LocalizableError';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { ExplorerType } from '../../../domain/Explorer';
+import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { ApiOptions, getApiForNetwork, getApiMeta } from '../../../api/common/utils';
 
 export type GeneratedData = typeof WalletSendConfirmationDialogContainer.prototype.generated;
@@ -77,7 +77,11 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     return (
       <WalletSendConfirmationDialog
         staleTx={this.props.staleTx}
-        selectedExplorer={stores.profile.selectedExplorer}
+        selectedExplorer={stores.explorers.selectedExplorer
+          .get(
+            publicDeriver.getParent().getNetworkInfo().NetworkId
+          ) ?? (() => { throw new Error('No explorer for wallet network'); })()
+        }
         amount={totalInput.minus(fee)}
         receivers={receivers}
         totalAmount={totalInput}
@@ -134,9 +138,11 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
       |}
     |},
     stores: {|
+      explorers: {|
+        selectedExplorer: Map<number, SelectedExplorer>,
+      |},
       profile: {|
         isClassicTheme: boolean,
-        selectedExplorer: ExplorerType
       |},
       substores: {|
         ada: {|
@@ -161,9 +167,11 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     const { stores, actions } = this.props;
     return Object.freeze({
       stores: {
+        explorers: {
+          selectedExplorer: stores.explorers.selectedExplorer,
+        },
         profile: {
           isClassicTheme: stores.profile.isClassicTheme,
-          selectedExplorer: stores.profile.selectedExplorer,
         },
         wallets: {
           selected: stores.wallets.selected,

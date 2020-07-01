@@ -22,7 +22,7 @@ import type { GetBalanceFunc } from '../../../api/common/types';
 import StakingDashboardPage from './StakingDashboardPage';
 import { mockWalletProps } from '../Wallet.mock';
 import { getVarsForTheme } from '../../../stores/toplevel/ProfileStore';
-import { getDefaultExplorer } from '../../../domain/Explorer';
+import { defaultToSelectedExplorer } from '../../../domain/SelectedExplorer';
 import { buildRoute } from '../../../utils/routing';
 import { ROUTES } from '../../../routes-config';
 import { THEMES } from '../../../themes';
@@ -80,9 +80,11 @@ const genBaseProps: {|
   );
   return {
     stores: {
+      explorers: {
+        selectedExplorer: defaultToSelectedExplorer(),
+      },
       profile: {
         isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-        selectedExplorer: getDefaultExplorer(),
         shouldHideBalance: request.allowToggleHidden
           ? boolean('hideBalance', false)
           : false,
@@ -190,9 +192,11 @@ const genBaseProps: {|
     UnmangleTxDialogContainerProps: {
       generated: {
         stores: {
+          explorers: {
+            selectedExplorer: defaultToSelectedExplorer(),
+          },
           profile: {
             isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-            selectedExplorer: getDefaultExplorer(),
             unitOfAccount: genUnitOfAccount(),
           },
           wallets: {

@@ -24,6 +24,7 @@ import type { Api } from '../api/index';
 import { ApiOptions } from '../api/common/utils';
 import StateFetchStore from './toplevel/StateFetchStore';
 import CoinPriceStore from './toplevel/CoinPriceStore';
+import ExplorerStore from './toplevel/ExplorerStore';
 import ServerConnectionStore from './toplevel/ServerConnectionStore';
 
 /** Map of var name to class. Allows dynamic lookup of class so we can init all stores one loop */
@@ -45,6 +46,7 @@ const storeClasses = Object.freeze({
   transactions: TransactionsStore,
   walletRestore: WalletRestoreStore,
   walletSettings: WalletSettingsStore,
+  explorers: ExplorerStore,
   // note: purposely exclude substores and router
 });
 
@@ -66,6 +68,7 @@ export type StoresMap = {|
   transactions: TransactionsStore,
   walletRestore: WalletRestoreStore,
   walletSettings: WalletSettingsStore,
+  explorers: ExplorerStore,
   substores: {| ada: AdaStoresMap, ergo: ErgoStoresMap, |},
   router: RouterStore,
 |};
@@ -90,6 +93,7 @@ const stores: WithNullableFields<StoresMap> = observable({
   transactions: null,
   walletRestore: null,
   walletSettings: null,
+  explorers: null,
   substores: null,
   router: null,
 });

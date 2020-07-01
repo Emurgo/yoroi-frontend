@@ -13,10 +13,10 @@ import globalMessages from '../../i18n/global-messages';
 import { formattedWalletAmount } from '../../utils/formatters';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../widgets/hashWrappers/RawHash';
-import type { ExplorerType } from '../../domain/Explorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { calculateAndFormatValue } from '../../utils/unit-of-account';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { SelectedExplorer } from '../../domain/SelectedExplorer';
 
 import styles from './URIVerifyDialog.scss';
 
@@ -40,7 +40,7 @@ type Props = {|
   +onBack: void => void,
   +onCancel: void => void,
   +uriParams: UriParams,
-  +selectedExplorer: ExplorerType,
+  +selectedExplorer: SelectedExplorer,
   +meta: {|
     primaryTicker: string,
     decimalPlaces: number,

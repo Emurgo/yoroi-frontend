@@ -15,9 +15,10 @@ import type { PlateResponse } from '../../api/ada/lib/cardanoCrypto/plate';
 import { TransferKind } from '../../types/TransferTypes';
 import { generatePlates } from '../../stores/toplevel/WalletRestoreStore';
 import { RestoreMode } from '../../actions/common/wallet-restore-actions';
-import type { ExplorerType } from '../../domain/Explorer';
+import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { TransferKindType, } from '../../types/TransferTypes';
 import type { Notification } from '../../types/notificationType';
+import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 
 export type GeneratedData = typeof YoroiPlatePage.prototype.generated;
 
@@ -58,6 +59,14 @@ export default class YoroiPlatePage extends Component<Props> {
 
   @observable plates: void | WalletRestoreDialogContainerState;
 
+  getSelectedNetwork: void => $ReadOnly<NetworkRow> = () => {
+    const { selectedNetwork } = this.generated.stores.profile;
+    if (selectedNetwork === undefined) {
+      throw new Error(`${nameof(YoroiPlatePage)} no API selected`);
+    }
+    return selectedNetwork;
+  }
+
   render(): null | Node {
     if (this.plates == null) return null;
     const actions = this.generated.actions;
@@ -72,7 +81,9 @@ export default class YoroiPlatePage extends Component<Props> {
       <WalletRestoreVerifyDialog
         byronPlate={byronPlate}
         shelleyPlate={shelleyPlate}
-        selectedExplorer={this.generated.stores.profile.selectedExplorer}
+        selectedExplorer={this.generated.stores.explorers.selectedExplorer
+          .get(this.getSelectedNetwork().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
+        }
         onCopyAddressTooltip={(address, elementId) => {
           if (!uiNotifications.isOpen(elementId)) {
             runInAction(() => {
@@ -103,7 +114,12 @@ export default class YoroiPlatePage extends Component<Props> {
       |}
     |},
     stores: {|
-      profile: {| selectedExplorer: ExplorerType |},
+      explorers: {|
+        selectedExplorer: Map<number, SelectedExplorer>,
+      |},
+      profile: {|
+        selectedNetwork: void | $ReadOnly<NetworkRow>,
+      |},
       substores: {|
         ada: {|
           yoroiTransfer: {|
@@ -128,12 +144,15 @@ export default class YoroiPlatePage extends Component<Props> {
     const adaStores = stores.substores.ada;
     return Object.freeze({
       stores: {
-        profile: {
-          selectedExplorer: stores.profile.selectedExplorer,
+        explorers: {
+          selectedExplorer: stores.explorers.selectedExplorer,
         },
         uiNotifications: {
           isOpen: stores.uiNotifications.isOpen,
           getTooltipActiveNotification: stores.uiNotifications.getTooltipActiveNotification,
+        },
+        profile: {
+          selectedNetwork: stores.profile.selectedNetwork,
         },
         substores: {
           ada: {

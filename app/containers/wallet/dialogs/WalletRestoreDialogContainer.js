@@ -25,15 +25,17 @@ import { TransferStatus, } from '../../../types/TransferTypes';
 import { formattedWalletAmount } from '../../../utils/formatters';
 import ErrorPage from '../../../components/transfer/ErrorPage';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { SelectedApiType } from '../../../api/common/utils';
-import { ApiOptions, getApiMeta } from '../../../api/common/utils';
-import type { ExplorerType } from '../../../domain/Explorer';
+import { ApiOptions, getApiForNetwork, getApiMeta } from '../../../api/common/utils';
+import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import type { PlateResponse } from '../../../api/ada/lib/cardanoCrypto/plate';
 import type { RestoreStepsType } from '../../../stores/toplevel/WalletRestoreStore';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { TransferStatusT, TransferTx } from '../../../types/TransferTypes';
 import type { Notification } from '../../../types/notificationType';
+import type {
+  NetworkRow,
+} from '../../../api/ada/lib/storage/database/primitives/tables';
 
 const messages = defineMessages({
   walletUpgradeNoop: {
@@ -65,12 +67,12 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
 
   @observable notificationElementId: string = '';
 
-  getSelectedApi: void => SelectedApiType = () => {
-    const { selectedAPI } = this.generated.stores.profile;
-    if (selectedAPI === undefined) {
+  getSelectedNetwork: void => $ReadOnly<NetworkRow> = () => {
+    const { selectedNetwork } = this.generated.stores.profile;
+    if (selectedNetwork === undefined) {
       throw new Error(`${nameof(WalletRestoreDialogContainer)} no API selected`);
     }
-    return selectedAPI;
+    return selectedNetwork;
   }
 
   componentDidMount() {
@@ -95,7 +97,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
   render(): null | Node {
     const walletRestoreActions = this.generated.actions.walletRestore;
     const actions = this.generated.actions;
-    const { uiNotifications, profile, } = this.generated.stores;
+    const { uiNotifications, } = this.generated.stores;
     const { walletRestore, } = this.generated.stores;
     const { wallets } = this.generated.stores;
     const { restoreRequest } = wallets;
@@ -156,7 +158,9 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           <WalletRestoreVerifyDialog
             byronPlate={walletRestore.recoveryResult ?.byronPlate}
             shelleyPlate={walletRestore.recoveryResult ?.shelleyPlate}
-            selectedExplorer={profile.selectedExplorer}
+            selectedExplorer={this.generated.stores.explorers.selectedExplorer
+              .get(this.getSelectedNetwork().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
+            }
             onNext={actions.walletRestore.verifyMnemonic.trigger}
             onCancel={walletRestoreActions.back.trigger}
             onCopyAddressTooltip={(address, elementId) => {
@@ -199,14 +203,15 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
   }
 
   _transferDialogContent(): null | Node {
-    const selectedAPI = this.getSelectedApi();
-    if (selectedAPI.type !== ApiOptions.ada) {
+    const selectedAPI = getApiForNetwork(this.getSelectedNetwork());
+    if (selectedAPI !== ApiOptions.ada) {
       throw new Error(`${nameof(this._transferDialogContent)} not set to ADA API`);
     }
-    const apiMeta = getApiMeta(selectedAPI.type);
+    (selectedAPI: typeof ApiOptions.ada);
+    const apiMeta = getApiMeta(selectedAPI);
     if (apiMeta == null) throw new Error(`${nameof(this._transferDialogContent)} no API selected`);
-    const { yoroiTransfer } = this.generated.stores.substores[selectedAPI.type];
-    const adaWalletRestoreActions = this.generated.actions[selectedAPI.type].walletRestore;
+    const { yoroiTransfer } = this.generated.stores.substores[ApiOptions.ada];
+    const adaWalletRestoreActions = this.generated.actions[ApiOptions.ada].walletRestore;
     const walletRestoreActions = this.generated.actions.walletRestore;
     const { profile, } = this.generated.stores;
     const { intl } = this.context;
@@ -240,8 +245,10 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
             amount,
             apiMeta.meta.decimalPlaces.toNumber()
           )}
-          selectedExplorer={this.generated.stores.profile.selectedExplorer}
           transferTx={yoroiTransfer.transferTx}
+          selectedExplorer={this.generated.stores.explorers.selectedExplorer
+            .get(this.getSelectedNetwork().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
+          }
           onSubmit={adaWalletRestoreActions.transferFromLegacy.trigger}
           isSubmitting={yoroiTransfer.transferFundsRequest.isExecuting}
           onCancel={this.onCancel}
@@ -321,10 +328,12 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
       coinPriceStore: {|
         getCurrentPrice: (from: string, to: string) => ?number
       |},
+      explorers: {|
+        selectedExplorer: Map<number, SelectedExplorer>,
+      |},
       profile: {|
         isClassicTheme: boolean,
-        selectedAPI: void | SelectedApiType,
-        selectedExplorer: ExplorerType,
+        selectedNetwork: void | $ReadOnly<NetworkRow>,
         unitOfAccount: UnitOfAccountSettingType
       |},
       walletRestore: {|
@@ -373,10 +382,12 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     const { stores, actions, } = this.props;
     return Object.freeze({
       stores: {
+        explorers: {
+          selectedExplorer: stores.explorers.selectedExplorer,
+        },
         profile: {
-          selectedAPI: stores.profile.selectedAPI,
+          selectedNetwork: stores.profile.selectedNetwork,
           isClassicTheme: stores.profile.isClassicTheme,
-          selectedExplorer: stores.profile.selectedExplorer,
           unitOfAccount: stores.profile.unitOfAccount,
         },
         uiNotifications: {

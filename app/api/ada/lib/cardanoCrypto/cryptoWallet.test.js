@@ -9,7 +9,7 @@ import {
   HARD_DERIVATION_START,
 } from '../../../../config/numbersConfig';
 import { v3PublicToV2 } from '../../transactions/utils';
-import { networks } from '../storage/database/prepackagedNetworks';
+import { networks } from '../storage/database/prepackaged/networks';
 
 beforeAll(async () => {
   await RustModule.load();

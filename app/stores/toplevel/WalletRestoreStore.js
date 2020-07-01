@@ -21,6 +21,7 @@ import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import {
   generateWalletRootKey,
 } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
+import { getApiForNetwork } from '../../api/common/utils';
 
 export const NUMBER_OF_VERIFIED_ADDRESSES = 1;
 export const NUMBER_OF_VERIFIED_ADDRESSES_PAPER = 5;
@@ -139,9 +140,10 @@ export default class WalletRestoreStore extends Store {
     numberOfWords: number,
     mode: $PropertyType<typeof RestoreMode, 'REGULAR'> | $PropertyType<typeof RestoreMode, 'PAPER'>,
   |} => boolean = request => {
-    const { selectedAPI } = this.stores.profile;
-    if (selectedAPI == null) throw new Error(`${nameof(this.isValidMnemonic)} no API selected`);
-    return this.stores.substores[selectedAPI.type].walletRestore.isValidMnemonic(request);
+    const { selectedNetwork } = this.stores.profile;
+    if (selectedNetwork == null) throw new Error(`${nameof(this.isValidMnemonic)} no API selected`);
+    const api = getApiForNetwork(selectedNetwork);
+    return this.stores.substores[api].walletRestore.isValidMnemonic(request);
   }
 }
 

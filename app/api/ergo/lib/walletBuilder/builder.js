@@ -37,7 +37,7 @@ import { rawGenAddByHash } from '../../../common/lib/storage/bridge/hashMapper';
 import { addErgoP2PK } from '../restoration/scan';
 import { decode } from 'bs58check';
 import { KeyKind } from '../../../common/lib/crypto/keys/types';
-import { networks } from '../../../ada/lib/storage/database/prepackagedNetworks';
+import { networks } from '../../../ada/lib/storage/database/prepackaged/networks';
 
 // TODO: maybe move this inside walletBuilder somehow so it's all done in the same transaction
 /**

@@ -22,7 +22,7 @@ import styles from './DelegationTxDialog.scss';
 import config from '../../../config';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../../widgets/hashWrappers/RawHash';
-import type { ExplorerType } from '../../../domain/Explorer';
+import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import WarningBox from '../../widgets/WarningBox';
@@ -56,7 +56,7 @@ const messages = defineMessages({
 
 type Props = {|
   +staleTx: boolean,
-  +selectedExplorer: ExplorerType,
+  +selectedExplorer: SelectedExplorer,
   +poolName: null | string,
   +poolHash: string,
   +amountToDelegate: BigNumber,

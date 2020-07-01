@@ -19,7 +19,7 @@ import InvalidURIImg from '../../../assets/images/uri/invalid-uri.inline.svg';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { PoolRequest } from '../../../api/ada/lib/storage/bridge/delegationUtils';
 import LocalizableError from '../../../i18n/LocalizableError';
-import type { ExplorerType } from '../../../domain/Explorer';
+import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import {
   EPOCH_REWARD_DENOMINATOR,
 } from '../../../config/numbersConfig';
@@ -213,7 +213,11 @@ export default class SeizaFetcher extends Component<Props> {
           })}
           classicTheme={profile.isClassicTheme}
           error={delegationTxStore.signAndBroadcastDelegationTx.error}
-          selectedExplorer={stores.profile.selectedExplorer}
+          selectedExplorer={stores.explorers.selectedExplorer
+            .get(
+              selectedWallet.getParent().getNetworkInfo().NetworkId
+            ) ?? (() => { throw new Error('No explorer for wallet network'); })()
+          }
           meta={{
             decimalPlaces: apiMeta.decimalPlaces.toNumber(),
             totalSupply: apiMeta.totalSupply,
@@ -271,9 +275,11 @@ export default class SeizaFetcher extends Component<Props> {
       |}
     |},
     stores: {|
+      explorers: {|
+        selectedExplorer: Map<number, SelectedExplorer>,
+      |},
       profile: {|
         isClassicTheme: boolean,
-        selectedExplorer: ExplorerType
       |},
       substores: {|
         ada: {|
@@ -306,9 +312,11 @@ export default class SeizaFetcher extends Component<Props> {
     const delegationTxStore = stores.substores.ada.delegationTransaction;
     return Object.freeze({
       stores: {
+        explorers: {
+          selectedExplorer: stores.explorers.selectedExplorer,
+        },
         profile: {
           isClassicTheme: stores.profile.isClassicTheme,
-          selectedExplorer: stores.profile.selectedExplorer,
         },
         wallets: {
           selected: stores.wallets.selected,

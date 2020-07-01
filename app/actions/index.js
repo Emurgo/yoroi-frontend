@@ -12,6 +12,7 @@ import AddressesActions from './common/addresses-actions';
 import TimeActions from './common/time-actions';
 import TransactionsActions from './common/transactions-actions';
 import WalletRestoreActions from './common/wallet-restore-actions';
+import ExplorerActions from './common/explorer-actions';
 import adaActionsMap from './ada/index';
 import type { AdaActionsMap } from './ada/index';
 
@@ -29,6 +30,7 @@ export type ActionsMap = {|
   time: TimeActions,
   transactions: TransactionsActions,
   walletRestore: WalletRestoreActions,
+  explorers: ExplorerActions,
   ada: AdaActionsMap,
 |};
 
@@ -46,6 +48,7 @@ const actionsMap: ActionsMap = Object.freeze({
   time: new TimeActions(),
   walletRestore: new WalletRestoreActions(),
   transactions: new TransactionsActions(),
+  explorers: new ExplorerActions(),
   ada: adaActionsMap
 });
 

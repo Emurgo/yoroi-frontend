@@ -351,8 +351,7 @@ export default class WalletStore extends Store {
   @action _setActiveWallet: {| wallet: PublicDeriver<> |} => void = (
     { wallet }
   ) => {
-    const apiType = getApiForNetwork(wallet.getParent().getNetworkInfo());
-    this.actions.profile.setSelectedAPI.trigger(apiType);
+    this.actions.profile.setSelectedNetwork.trigger(wallet.getParent().getNetworkInfo());
 
     this.selected = wallet;
     // do not await on purpose since the UI will handle adding loaders while refresh is happening
@@ -360,7 +359,7 @@ export default class WalletStore extends Store {
   };
 
   @action _unsetActiveWallet: void => void = () => {
-    this.actions.profile.setSelectedAPI.trigger(undefined);
+    this.actions.profile.setSelectedNetwork.trigger(undefined);
     this.selected = null;
   };
 

@@ -13,7 +13,7 @@ import {
 } from '../../../stories/helpers/StoryWrapper';
 import { mockTransferProps, wrapTransfer, } from './Transfer.mock';
 import { THEMES } from '../../themes';
-import { getDefaultExplorer } from '../../domain/Explorer';
+import { defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
 import { ROUTES } from '../../routes-config';
 import YoroiTransferPage from './YoroiTransferPage';
 import type { MockYoroiTransferStore } from './YoroiTransferPage';
@@ -47,9 +47,11 @@ const genBaseProps: {|
   openDialog?: boolean,
 |} => * = (request) => ({
   stores: {
+    explorers: {
+      selectedExplorer: defaultToSelectedExplorer(),
+    },
     profile: {
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-      selectedExplorer: getDefaultExplorer(),
       unitOfAccount: genUnitOfAccount(),
     },
     walletRestore: {
@@ -103,8 +105,13 @@ const genBaseProps: {|
   YoroiPlateProps: {
     generated: {
       stores: {
+        explorers: {
+          selectedExplorer: defaultToSelectedExplorer(),
+        },
         profile: {
-          selectedExplorer: getDefaultExplorer(),
+          selectedNetwork: request.wallet == null
+            ? undefined
+            : request.wallet.getParent().getNetworkInfo()
         },
         uiNotifications: {
           isOpen: (_request) => request.openDialog === true,

@@ -56,9 +56,14 @@ import NavBarTitle from '../../components/topbar/NavBarTitle';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import { RestoreMode } from '../../actions/common/wallet-restore-actions';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { ApiOptionType, SelectedApiType } from '../../api/common/utils';
-import { ApiOptions } from '../../api/common/utils';
+import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import type {
+  NetworkRow,
+} from '../../api/ada/lib/storage/database/primitives/tables';
+import {
+  networks
+} from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export type GeneratedData = typeof WalletAddPage.prototype.generated;
 
@@ -82,7 +87,7 @@ export default class WalletAddPage extends Component<Props> {
     // this is because on close, asynchronous unmount actions get triggered
     // so there is no safe time at which we can un-select the API
     // so instead, the API gets reset before we start any dialog flow
-    this.generated.actions.profile.setSelectedAPI.trigger(undefined);
+    this.generated.actions.profile.setSelectedNetwork.trigger(undefined);
 
     this.generated.actions.dialogs.open.trigger({ dialog });
   }
@@ -92,46 +97,51 @@ export default class WalletAddPage extends Component<Props> {
   }
 
   render(): Node {
-    const { selectedAPI } = this.generated.stores.profile;
+    const { selectedNetwork } = this.generated.stores.profile;
     const { actions, stores } = this.generated;
     const { uiDialogs } = stores;
 
     const openTrezorConnectDialog = () => {
-      if (selectedAPI === undefined) {
+      if (selectedNetwork === undefined) {
         throw new Error(`${nameof(WalletAddPage)} no API selected`);
       }
+      const api = getApiForNetwork(selectedNetwork);
       actions.dialogs.open.trigger({ dialog: WalletTrezorConnectDialogContainer });
-      if (selectedAPI.type !== ApiOptions.ada) {
+      if (api !== ApiOptions.ada) {
         throw new Error(`${nameof(WalletAddPage)} not ADA API type`);
       }
-      this.generated.actions[selectedAPI.type].trezorConnect.init.trigger();
+      this.generated.actions[ApiOptions.ada].trezorConnect.init.trigger();
     };
     const openLedgerConnectDialog = () => {
-      if (selectedAPI === undefined) {
+      if (selectedNetwork === undefined) {
         throw new Error(`${nameof(WalletAddPage)} no API selected`);
       }
+      const api = getApiForNetwork(selectedNetwork);
       actions.dialogs.open.trigger({ dialog: WalletLedgerConnectDialogContainer });
-      if (selectedAPI.type !== ApiOptions.ada) {
+      if (api !== ApiOptions.ada) {
         throw new Error(`${nameof(WalletAddPage)} not ADA API type`);
       }
-      this.generated.actions[selectedAPI.type].ledgerConnect.init.trigger();
+      this.generated.actions[ApiOptions.ada].ledgerConnect.init.trigger();
     };
 
     let activeDialog = null;
-    if (uiDialogs.activeDialog != null && selectedAPI == null) {
+    if (uiDialogs.activeDialog != null && selectedNetwork == null) {
       activeDialog = (<PickCurrencyDialogContainer
         onClose={this.onClose}
-        onCardano={() => this.generated.actions.profile.setSelectedAPI.trigger('ada')}
+        onCardano={() => actions.profile.setSelectedNetwork.trigger(networks.ByronMainnet)}
         onErgo={uiDialogs.isOpen(WalletConnectHWOptionDialog)
           ? undefined
-          : () => this.generated.actions.profile.setSelectedAPI.trigger('ergo')}
+          : () => actions.profile.setSelectedNetwork.trigger(networks.ErgoMainnet)}
       />);
     } else if (uiDialogs.isOpen(WalletCreateOptionDialog)) {
+      if (selectedNetwork === undefined) {
+        throw new Error(`${nameof(WalletAddPage)} no API selected`);
+      }
       activeDialog = (
         <WalletCreateOptionDialogContainer
           onClose={this.onClose}
           onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
-          onPaper={selectedAPI?.type !== ApiOptions.ada
+          onPaper={getApiForNetwork(selectedNetwork) !== ApiOptions.ada
             ? undefined
             : () => actions.dialogs.open.trigger({ dialog: WalletPaperDialog })
           }
@@ -304,8 +314,8 @@ export default class WalletAddPage extends Component<Props> {
         |}
       |},
       profile: {|
-        setSelectedAPI: {|
-          trigger: (params: void | ApiOptionType) => void
+        setSelectedNetwork: {|
+          trigger: (params: void | $ReadOnly<NetworkRow>) => void
         |}
       |},
       router: {|
@@ -322,7 +332,7 @@ export default class WalletAddPage extends Component<Props> {
       |}
     |},
     stores: {|
-      profile: {| selectedAPI: void | SelectedApiType |},
+      profile: {| selectedNetwork: void | $ReadOnly<NetworkRow> |},
       uiDialogs: {|
         activeDialog: ?any,
         getParam: <T>(number | string) => T,
@@ -341,7 +351,7 @@ export default class WalletAddPage extends Component<Props> {
     return Object.freeze({
       stores: {
         profile: {
-          selectedAPI: stores.profile.selectedAPI,
+          selectedNetwork: stores.profile.selectedNetwork,
         },
         uiDialogs: {
           activeDialog: stores.uiDialogs.activeDialog,
@@ -367,8 +377,8 @@ export default class WalletAddPage extends Component<Props> {
           },
         },
         profile: {
-          setSelectedAPI: {
-            trigger: actions.profile.setSelectedAPI.trigger,
+          setSelectedNetwork: {
+            trigger: actions.profile.setSelectedNetwork.trigger,
           },
         },
         wallets: {

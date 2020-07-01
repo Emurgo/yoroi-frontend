@@ -6,7 +6,6 @@ import moment from 'moment';
 import { observer } from 'mobx-react';
 import BigNumber from 'bignumber.js';
 
-import { getOrDefault } from '../../../domain/Explorer';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import StakingDashboard from '../../../components/wallet/staking/dashboard/StakingDashboard';
 import type { GraphData } from '../../../components/wallet/staking/dashboard/StakingDashboard';
@@ -39,7 +38,7 @@ import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { PoolRequest } from '../../../api/ada/lib/storage/bridge/delegationUtils';
-import type { ExplorerType } from '../../../domain/Explorer';
+import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type {
   ToRealTimeFunc,
   ToAbsoluteSlotNumberFunc,
@@ -364,14 +363,17 @@ export default class StakingDashboardPage extends Component<Props> {
           }));
         }
 
-        const { baseUrl } = getOrDefault(this.generated.stores.profile.selectedExplorer, 'pool');
+        const poolExplorerLink = this.generated.stores.explorers.selectedExplorer
+          .get(publicDeriver.getParent().getNetworkInfo().NetworkId)
+          ?.getOrDefault('pool') ?? (() => { throw new Error('No explorer for wallet network'); })();
+
         const upcomingTuples = ((upcomingRewards.slice(0, 3): any): [?BoxInfo, ?BoxInfo, ?BoxInfo]);
         const rewardPopup = (
           <UpcomingRewards
             content={upcomingTuples}
             showWarning={upcomingRewards.length === 3}
             onExternalLinkClick={handleExternalLinkClick}
-            baseUrl={baseUrl}
+            baseUrl={poolExplorerLink.baseUrl}
           />
         );
         rewardInfo = {
@@ -509,7 +511,9 @@ export default class StakingDashboardPage extends Component<Props> {
             poolName={name}
             key={digestForHash(JSON.stringify(meta), 0)}
             data={stakePoolMeta}
-            selectedExplorer={this.generated.stores.profile.selectedExplorer}
+            selectedExplorer={this.generated.stores.explorers.selectedExplorer.get(
+              publicDeriver.getParent().getNetworkInfo().NetworkId
+            ) ?? (() => { throw new Error('No explorer for wallet network'); })()}
             hash={pool[0]}
             moreInfo={moreInfo}
             classicTheme={this.generated.stores.profile.isClassicTheme}
@@ -794,13 +798,15 @@ export default class StakingDashboardPage extends Component<Props> {
       coinPriceStore: {|
         getCurrentPrice: (from: string, to: string) => ?number
       |},
+      explorers: {|
+        selectedExplorer: Map<number, SelectedExplorer>,
+      |},
       profile: {|
         getThemeVars: ({| theme: string |}) => {
           [key: string]: string,
           ...
         },
         isClassicTheme: boolean,
-        selectedExplorer: ExplorerType,
         shouldHideBalance: boolean,
         unitOfAccount: UnitOfAccountSettingType
       |},
@@ -861,9 +867,11 @@ export default class StakingDashboardPage extends Component<Props> {
     const adaStore = stores.substores.ada;
     return Object.freeze({
       stores: {
+        explorers: {
+          selectedExplorer: stores.explorers.selectedExplorer,
+        },
         profile: {
           isClassicTheme: stores.profile.isClassicTheme,
-          selectedExplorer: stores.profile.selectedExplorer,
           shouldHideBalance: stores.profile.shouldHideBalance,
           getThemeVars: stores.profile.getThemeVars,
           unitOfAccount: stores.profile.unitOfAccount,

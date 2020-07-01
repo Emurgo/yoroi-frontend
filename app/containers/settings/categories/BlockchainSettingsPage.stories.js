@@ -10,10 +10,11 @@ import { withScreenshot } from 'storycap';
 import { walletLookup, genDummyWithCache } from '../../../../stories/helpers/StoryWrapper';
 import { wrapSettings } from '../../../Routes';
 import { mockSettingsProps } from '../Settings.mock';
-import { getDefaultExplorer } from '../../../domain/Explorer';
+import { defaultToSelectedExplorer } from '../../../domain/SelectedExplorer';
 import { ROUTES } from '../../../routes-config';
 import BlockchainSettingsPage from './BlockchainSettingsPage';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
+import { prepackagedExplorers } from '../../../api/ada/lib/storage/database/prepackaged/explorers';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -26,12 +27,15 @@ const defaultSettingsPageProps: {|
   lastUpdatedTimestamp: null | number,
 |} => * = (request) => ({
   stores: {
-    profile: {
+    explorers: {
       setSelectedExplorerRequest: {
         isExecuting: false,
         error: undefined,
       },
-      selectedExplorer: getDefaultExplorer(),
+      selectedExplorer: defaultToSelectedExplorer(),
+      allExplorers: prepackagedExplorers,
+    },
+    profile: {
       UNIT_OF_ACCOUNT_OPTIONS: SUPPORTED_CURRENCIES,
       unitOfAccount: {
         enabled: false,
@@ -54,8 +58,10 @@ const defaultSettingsPageProps: {|
     },
   },
   actions: {
-    profile: {
+    explorers: {
       updateSelectedExplorer: { trigger: async (req) => action('updateSelectedExplorer')(req) },
+    },
+    profile: {
       updateUnitOfAccount: { trigger: async (req) => action('updateUnitOfAccount')(req) },
     },
   },

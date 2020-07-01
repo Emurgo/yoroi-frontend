@@ -1,9 +1,9 @@
 // @flow
 import { AsyncAction, Action } from './lib/Action';
-import type { ExplorerType } from '../domain/Explorer';
 import type { UnitOfAccountSettingType } from '../types/unitOfAccountType';
-import type { ApiOptionType } from '../api/common/utils';
 import type { ComplexityLevelType } from '../types/complexityLevelType';
+import type { NetworkRow } from '../api/ada/lib/storage/database/primitives/tables';
+
 // ======= PROFILE ACTIONS =======
 
 export default class ProfileActions {
@@ -13,7 +13,6 @@ export default class ProfileActions {
   updateTentativeLocale: Action<{| locale: string |}> = new Action();
   updateLocale: AsyncAction<{| locale: string |}> = new AsyncAction();
   resetLocale: AsyncAction<void> = new AsyncAction();
-  updateSelectedExplorer: AsyncAction<{| explorer: ExplorerType |}> = new AsyncAction();
   updateTheme: AsyncAction<{| theme: string |}> = new AsyncAction();
   exportTheme: AsyncAction<void> = new AsyncAction();
   commitLocaleToStorage: AsyncAction<void> = new AsyncAction();
@@ -21,5 +20,5 @@ export default class ProfileActions {
   toggleSidebar: AsyncAction<void> = new AsyncAction();
   acceptNightly: Action<void> = new Action();
   updateUnitOfAccount: AsyncAction<UnitOfAccountSettingType> = new AsyncAction();
-  setSelectedAPI: Action<void | ApiOptionType> = new Action();
+  setSelectedNetwork: Action<void | $ReadOnly<NetworkRow>> = new Action();
 }

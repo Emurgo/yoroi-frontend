@@ -18,7 +18,7 @@ import type {
 import LocalizableError from '../../i18n/LocalizableError';
 import { GenericApiError, } from '../../api/common/errors';
 import WalletSummaryPage from './WalletSummaryPage';
-import { getDefaultExplorer } from '../../domain/Explorer';
+import { defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
 import { THEMES } from '../../themes';
 import { mockWalletProps } from './Wallet.mock';
 import { ROUTES } from '../../routes-config';
@@ -111,8 +111,10 @@ export const Loading = (): Node => {
           addresses: {
             addressSubgroupMap: new Map(),
           },
+          explorers: {
+            selectedExplorer: defaultToSelectedExplorer(),
+          },
           profile: {
-            selectedExplorer: getDefaultExplorer(),
             shouldHideBalance: false,
             isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
             unitOfAccount: genUnitOfAccount(),
@@ -207,8 +209,10 @@ const genPropsForTransactions: {|
   lastSyncInfo: LastSyncInfoRow,
   topLevelNotification?: *,
 |} => * = (request) => ({
+  explorers: {
+    selectedExplorer: defaultToSelectedExplorer(),
+  },
   profile: {
-    selectedExplorer: getDefaultExplorer(),
     shouldHideBalance: request.txExport == null ? boolean('shouldHideBalance', false) : false,
     isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
     unitOfAccount: genUnitOfAccount(),

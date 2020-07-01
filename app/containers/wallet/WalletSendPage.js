@@ -33,7 +33,7 @@ import type { SendUsingLedgerParams } from '../../actions/ada/ledger-send-action
 import type { SendUsingTrezorParams } from '../../actions/ada/trezor-send-actions';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { UriParams } from '../../utils/URIHandling';
-import type { ExplorerType } from '../../domain/Explorer';
+import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { BaseSignRequest } from '../../api/ada/transactions/types';
@@ -151,7 +151,6 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       <>
         <WalletSendForm
           currencyUnit={{
-            unitName: apiMeta.unitName,
             primaryTicker: apiMeta.primaryTicker,
           }}
           currencyMaxIntegerDigits={
@@ -297,6 +296,10 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       ...signRequest,
       unsignedTx,
     };
+    const selectedExplorerForNetwork = this.generated.stores.explorers.selectedExplorer
+      .get(publicDeriver.getParent().getNetworkInfo().NetworkId)
+      ?? (() => { throw new Error('No explorer for wallet network'); })();
+
     if (isLedgerNanoWallet(conceptualWallet)) {
       const ledgerSendAction = this.generated.actions[adaApi].ledgerSend;
       ledgerSendAction.init.trigger();
@@ -304,7 +307,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       hwSendConfirmationDialog = (
         <HWSendConfirmationDialog
           staleTx={transactionBuilderStore.txMismatch}
-          selectedExplorer={this.generated.stores.profile.selectedExplorer}
+          selectedExplorer={selectedExplorerForNetwork}
           amount={totalInput.minus(fee)}
           receivers={receivers}
           totalAmount={totalInput}
@@ -333,7 +336,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       hwSendConfirmationDialog = (
         <HWSendConfirmationDialog
           staleTx={transactionBuilderStore.txMismatch}
-          selectedExplorer={this.generated.stores.profile.selectedExplorer}
+          selectedExplorer={selectedExplorerForNetwork}
           amount={totalInput.minus(fee)}
           receivers={receivers}
           totalAmount={totalInput}
@@ -473,9 +476,11 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       memos: {|
         hasSetSelectedExternalStorageProvider: boolean
       |},
+      explorers: {|
+        selectedExplorer: Map<number, SelectedExplorer>,
+      |},
       profile: {|
         isClassicTheme: boolean,
-        selectedExplorer: ExplorerType,
         unitOfAccount: UnitOfAccountSettingType
       |},
       substores: {|
@@ -521,9 +526,11 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     const adaStore = stores.substores.ada;
     return Object.freeze({
       stores: {
+        explorers: {
+          selectedExplorer: stores.explorers.selectedExplorer,
+        },
         profile: {
           isClassicTheme: stores.profile.isClassicTheme,
-          selectedExplorer: stores.profile.selectedExplorer,
           unitOfAccount: stores.profile.unitOfAccount,
         },
         wallets: {

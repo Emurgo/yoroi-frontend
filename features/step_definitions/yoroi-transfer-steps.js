@@ -60,7 +60,11 @@ Then(/^I should see the Yoroi transfer success screen$/, async function () {
 });
 
 Then(/^I should see the transfer screen disabled$/, async function () {
-  await this.waitForElement('.NoWalletMessage_component');
+  const noWalletMessage = await i18n.formatMessage(
+    this.driver,
+    { id: 'wallet.nowallet.title' }
+  );
+  await this.waitUntilText('.FullscreenMessage_title', noWalletMessage);
 });
 
 Then(/^I should see the "CREATE YOROI WALLET" button disabled$/, async function () {

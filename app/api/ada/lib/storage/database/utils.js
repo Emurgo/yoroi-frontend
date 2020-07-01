@@ -61,7 +61,7 @@ export async function addNewRowToTable<Insert, Row>(
 export async function addOrReplaceRows<Insert, Row>(
   db: lf$Database,
   tx: lf$Transaction,
-  request: $ReadOnlyArray<Insert>,
+  request: $ReadOnlyArray<$ReadOnly<Insert>>,
   tableName: string,
 ): Promise<$ReadOnlyArray<Row>> {
   const table = db.getSchema().table(tableName);

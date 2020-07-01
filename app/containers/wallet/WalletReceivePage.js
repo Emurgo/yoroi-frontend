@@ -29,7 +29,7 @@ import type {
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { addressGroupName, addressSubgroupName, AddressFilter, AddressSubgroup, AddressGroupTypes } from '../../types/AddressFilterTypes';
 import LocalizableError from '../../i18n/LocalizableError';
-import type { ExplorerType } from '../../domain/Explorer';
+import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { Notification } from '../../types/notificationType';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { getApiForNetwork, getApiMeta } from '../../api/common/utils';
@@ -138,11 +138,15 @@ export default class WalletReceivePage extends Component<Props> {
       this.notificationElementId
     );
 
+    const selectedExplorerForNetwork = this.generated.stores.explorers.selectedExplorer
+      .get(publicDeriver.getParent().getNetworkInfo().NetworkId)
+      ?? (() => { throw new Error('No explorer for wallet network'); })();
+
     const header = (() => {
       if (addressTypeStore.meta.name.subgroup === AddressSubgroup.external) {
         return (<StandardHeader
           walletAddress={walletAddress}
-          selectedExplorer={this.generated.stores.profile.selectedExplorer}
+          selectedExplorer={selectedExplorerForNetwork}
           isWalletAddressUsed={isWalletAddressUsed}
           onGenerateAddress={this.handleGenerateAddress}
           onCopyAddressTooltip={onCopyAddressTooltip}
@@ -171,7 +175,7 @@ export default class WalletReceivePage extends Component<Props> {
       if (addressTypeStore.meta.name.subgroup === AddressSubgroup.all) {
         return (<StandardHeader
           walletAddress={walletAddress}
-          selectedExplorer={this.generated.stores.profile.selectedExplorer}
+          selectedExplorer={selectedExplorerForNetwork}
           isWalletAddressUsed={isWalletAddressUsed}
           onGenerateAddress={this.handleGenerateAddress}
           onCopyAddressTooltip={onCopyAddressTooltip}
@@ -204,7 +208,7 @@ export default class WalletReceivePage extends Component<Props> {
             filter: this.generated.stores.addresses.addressFilter,
           }}
           header={header}
-          selectedExplorer={this.generated.stores.profile.selectedExplorer}
+          selectedExplorer={selectedExplorerForNetwork}
           walletAddresses={applyAddressFilter({
             addressFilter: this.generated.stores.addresses.addressFilter,
             addresses: addressTypeStore.request.all,
@@ -299,7 +303,7 @@ export default class WalletReceivePage extends Component<Props> {
         {uiDialogs.isOpen(VerifyAddressDialog) && hwVerifyAddress.selectedAddress ? (
           <VerifyAddressDialog
             isActionProcessing={hwVerifyAddress.isActionProcessing}
-            selectedExplorer={this.generated.stores.profile.selectedExplorer}
+            selectedExplorer={selectedExplorerForNetwork}
             error={hwVerifyAddress.error}
             walletAddress={hwVerifyAddress.selectedAddress.address}
             walletPath={hwVerifyAddress.selectedAddress.path}
@@ -414,9 +418,11 @@ export default class WalletReceivePage extends Component<Props> {
         error: ?LocalizableError,
         addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
       |},
+      explorers: {|
+        selectedExplorer: Map<number, SelectedExplorer>,
+      |},
       profile: {|
         isClassicTheme: boolean,
-        selectedExplorer: ExplorerType,
         shouldHideBalance: boolean,
         unitOfAccount: UnitOfAccountSettingType,
       |},
@@ -464,8 +470,10 @@ export default class WalletReceivePage extends Component<Props> {
           isOpen: stores.uiDialogs.isOpen,
           getParam: stores.uiDialogs.getParam,
         },
+        explorers: {
+          selectedExplorer: stores.explorers.selectedExplorer,
+        },
         profile: {
-          selectedExplorer: stores.profile.selectedExplorer,
           isClassicTheme: stores.profile.isClassicTheme,
           shouldHideBalance: stores.profile.shouldHideBalance,
           unitOfAccount: stores.profile.unitOfAccount,
