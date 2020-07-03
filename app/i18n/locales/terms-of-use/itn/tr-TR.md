@@ -18,4 +18,4 @@
 
 12.9 **Teşvik Edilmiş Test Ağının Sona Ermesi.** Kullanıcı, Şirketin Teşvik Edilmiş Test Ağına (veya herhangi bir bölümüne) erişimi istediği zaman ve tamamen kendi takdirine bağlı olarak değiştirebileceğini, geri çekebileceğini, sonlandırabileceğini ve/veya durdurabileceğini kabul eder. Kullanıcı, Teşvik Edilmiş Test Ağına katılımı istediği zaman sonlandırabilir ve o zamana kadar elde edilen Ödüller, Teşvik Edilmiş Test Ağı kesildikten sonra yine de Kullanıcının Daedalus veya Yoroi ana cüzdanına aktarılır.
 
-12.10 **Feedback.** Users may provide suggestions, comments or ideas and report issues or problems related to their use of the Incentivized Testnet at any time by using any of the official feedback channels.
+12.10 **Geri Bildirim** Kullanıcılar, Teşvik Edilen Test Ağını kullanmalarıyla ilgili herhangi bir zamanda öneri, yorum veya fikir verebilir ve resmi geri bildirim kanallarından herhangi birini kullanarak istedikleri zaman soru veya sorun bildirebilirler.
