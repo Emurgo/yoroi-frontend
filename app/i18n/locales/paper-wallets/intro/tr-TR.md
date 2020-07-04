@@ -2,6 +2,6 @@
 
 Bir **"Kağıt Cüzdan"** özel bir belgedir. gizli anımsatıcı kelimeler ve küçük bir adres kümesi içerir. Bir kağıt cüzdan oluşturulduğunda **Yoroi tarafından saklanmaz**. Oluşturulan bu PDF belgesi, bu cüzdanın var olan tek kopyasıdır.
 
-You can use a paper wallet to receive coins using the pre-generated addresses. You can restore your paper wallet at any time into Yoroi to access the funds. However, you should stop using a paper wallet after you restore its funds as it will no longer be a "cold" wallet.
+Önceden oluşturulmuş adresleri kullanarak bozuk para almak için bir kağıt cüzdan kullanabilirsiniz. Fonlara erişmek için kağıt cüzdanınızı istediğiniz zaman Yoroi’ye geri yükleyebilirsiniz. Ancak, artık "soğuk" bir cüzdan olmayacağından, paralarını geri yükledikten sonra bir kağıt cüzdan kullanmayı bırakmalısınız.
 
-Yoroi Paper Wallets are protected with a **custom user password** and contain 21 secret words. Even if someone gets access to this paper-wallet, they will also need to know your password to gain access to the funds. **But if you lose or forget your password, your funds will be lost forever and no one will be able to restore them**. Typing the wrong wallet password will give you a different wallet. This allows for plausible deniability.
+Yoroi Kağıt Cüzdan özel bir **kullanıcı şifresi** ile korunmaktadır ve 21 gizli kelime içermektedir. Birisi bu kağıt cüzdanına erişse bile, fonlara erişmek için şifrenizi de bilmesi gerekir. **Ancak parolanızı kaybederseniz veya unutursanız, paranız sonsuza kadar kaybedilir ve hiç kimse bunları geri yükleyemez.** Yanlış cüzdan şifresi yazmak size farklı bir cüzdan verecektir. Bu makul inkar edilebilirlik sağlar.
