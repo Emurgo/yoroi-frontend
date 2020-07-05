@@ -13,6 +13,7 @@ export default {
   '--cmn-default-color-grey-6': '#676970',
   '--cmn-default-color-grey-2': '#93979C',
   '--cmn-default-color-grey-3': '#ADAEB6',
+  '--cmn-default-color-grey-3-alpha': 'rgba(173, 174, 182, 0.3)', // #ADAEB6
   '--cmn-default-color-grey-4': '#D9DAE0',
   '--cmn-default-color-grey-5': '#F0F3F5',
 

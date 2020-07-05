@@ -1,7 +1,7 @@
 @import '../../../../themes/mixins/underline';
 
 .component {
-  border-top: 1px solid rgba(173, 174, 182, 0.3);
+  border-top: 1px solid var(--cmn-default-color-grey-3-alpha);
   padding-top: 30px;
 
   .main {
