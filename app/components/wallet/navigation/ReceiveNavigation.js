@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import type { Node } from 'react';
+import type { Node, ElementRef } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import styles from './ReceiveNavigation.scss';
@@ -33,12 +33,63 @@ export type Props = {|
   +addressStores: $ReadOnlyArray<AddressStoreSubset>;
 |};
 
+type State = {|
+  accordionScrollHeight: null | number,
+  groupsToHide: Set<string>,
+|};
+
+
 @observer
-export default class ReceiveNavigation extends Component<Props> {
+export default class ReceiveNavigation extends Component<Props, State> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
+  contentRef: ?ElementRef<*>;
+  accordionTooltipRefs: Map<string, ElementRef<*>>;
+
+  state: State = {
+    accordionScrollHeight: null,
+    groupsToHide: new Set(),
+  };
+
+  constructor(props: Props) {
+    super(props);
+    this.accordionTooltipRefs = new Map();
+    this.contentRef = React.createRef();
+    this.resize();
+  }
+
+  resize: void => void = () => {
+    const { documentElement } = document;
+    if (
+      !documentElement || !documentElement.style ||
+      !this.contentRef
+    ) {
+      return;
+    }
+    const current = this.contentRef.current;
+    if (current == null) return;
+
+    const groupsToHide = new Set();
+    for (const [groupName, accordion] of this.accordionTooltipRefs.entries()) {
+      const { bottom, top } = accordion.getBoundingClientRect();
+      const insetCut = current.getBoundingClientRect().top - top;
+
+      if (insetCut >= (bottom - top)) {
+        groupsToHide.add(groupName);
+      } else {
+        // we hide the info icon progressively with the scrollbar
+        // ex: if only 50% of the element is visible, this will properly mask 50% of the icon
+        accordion.style.clipPath = `inset(${insetCut}px 0% 0% 0%)`;
+      }
+    }
+
+    this.setState({
+      accordionScrollHeight: current.scrollTop,
+      groupsToHide,
+    });
+  }
 
   createAccordionForGroup: $PropertyType<Props, 'addressStores'> => Node = (stores) => {
     const { intl } = this.context;
@@ -68,11 +119,30 @@ export default class ReceiveNavigation extends Component<Props> {
           <div>
             {intl.formatMessage(addressGroupName[stores[0].name.group])}
             <Tooltip
-              className={styles.Tooltip}
+              className={classNames([
+                styles.Tooltip,
+                // if tooltip scrolls out of view, we need to manually hide it
+                // note: this is different than hiding the "info" icon
+                // since even if the info icon is hidden,
+                // hovering it over it still triggers the tooltip unless we hide the tooltip also
+                this.state.groupsToHide.has(stores[0].name.group)
+                  ? styles.hidden
+                  : null,
+              ])}
+              style={{
+                // need the tooltip to be absolute position in order to appear above other content
+                // however, it also needs to properly sync its y position with the scrollbar
+                marginTop: `-${this.state.accordionScrollHeight || 0}px`,
+              }}
               skin={TooltipSkin}
               tip={intl.formatMessage(addressGroupsTooltip[stores[0].name.group])}
             >
-              <span className={styles.infoIcon}>
+              <span
+                className={styles.infoIcon}
+                ref={(accordionTooltip) => {
+                  this.accordionTooltipRefs.set(stores[0].name.group, accordionTooltip);
+                }}
+              >
                 <InfoIcon />
               </span>
             </Tooltip>
@@ -152,7 +222,11 @@ export default class ReceiveNavigation extends Component<Props> {
     return (
       <div className={styles.wrapper}>
         <div className={styles.content}>
-          <div className={styles.accordions}>
+          <div
+            ref={this.contentRef}
+            onScroll={this.resize}
+            className={styles.accordions}
+          >
             {this.createAccordions()}
           </div>
           {/* Section filtered button */}

@@ -22,6 +22,7 @@
   flex-direction: column;
   justify-content: start;
   overflow-y: auto;
+  min-height: 80px; // always show at least ~2 elements
   flex: 1;
   padding-bottom: 10px;
   .Tooltip {
@@ -45,7 +46,14 @@
     }
   }
 }
+.hidden {
+  visibility: hidden;
+}
 .Tooltip {
+  :global(.SimpleBubble_root.SimpleBubble_openUpward)  {
+    margin-bottom: -5px !important;
+    margin-left: 5px;
+  }
   div[data-bubble-container] {
     font-size: 14px;
     transform: translateX(-50px);
