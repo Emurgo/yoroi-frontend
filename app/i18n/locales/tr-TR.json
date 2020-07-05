@@ -169,7 +169,7 @@
   "profile.privacypolicy.neverAnalytics": "Herhangi bir analiz yazılımı veya üçüncü taraf takipçiler <strong> asla </strong> çalıştırmayın.",
   "profile.privacypolicy.neverProfile": "<strong> Asla </strong> bilgilerinizle profil oluşturma.",
   "profile.privacypolicy.neverSell": "Verilerinizi <strong> asla </strong> satmayın.",
-  "profile.privacypolicy.neverTrack": "<strong>Never</strong> track your behavior.",
+  "profile.privacypolicy.neverTrack": "Davranışınızı <strong> asla </strong> takip etmeyin.",
   "profile.privacypolicy.serverLogs": "Any server log is kept for at most 2 weeks purely for server troubleshooting purposes.",
   "profile.termsOfUse.checkboxLabel": "Kullanım şartlarını kabul ediyorum",
   "profile.termsOfUse.title": "Kullanım Şartları",
