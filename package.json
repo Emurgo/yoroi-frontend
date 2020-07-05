@@ -88,7 +88,7 @@
     "@storybook/addons": "5.3.19",
     "@storybook/react": "5.3.19",
     "@storybook/source-loader": "5.3.19",
-    "autoprefixer": "9.8.0",
+    "autoprefixer": "9.8.4",
     "babel-eslint": "11.0.0-beta.2",
     "babel-jest": "26.0.1",
     "babel-loader": "8.1.0",
