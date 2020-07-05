@@ -117,7 +117,7 @@
     "eslint-plugin-promise": "4.2.1",
     "eslint-plugin-react": "7.20.3",
     "file-loader": "6.0.0",
-    "flow-bin": "0.127.0",
+    "flow-bin": "0.128.0",
     "flow-typed": "3.1.0",
     "geckodriver": "1.19.1",
     "html-loader": "1.1.0",
