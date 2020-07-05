@@ -122,6 +122,9 @@
     color: var(--theme-widgets-hash-light-color);
     font-size: 14px;
   }
+  .afterDecimal {
+    font-size: 12px;
+  }
 
   .failedLabel {
     color: var(--theme-transactions-state-failed-text-color);
@@ -229,6 +232,20 @@
         &:last-child{
           border-left: 1px solid rgba(173, 174, 182, 0.3);
           padding-left: 24px;
+        }
+      }
+      @media (max-width: 1140px) {
+        flex-direction: column;
+        border: none;
+        & > div {
+          &:first-child{
+            padding-right: 0;
+          }
+          &:last-child{
+            border: none;
+            padding-left: 0;
+            padding-top: 40px;
+          }
         }
       }
     }
