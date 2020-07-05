@@ -19,7 +19,7 @@ import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashC
 import RawHash from '../../widgets/hashWrappers/RawHash';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 
-import type { ExplorerType } from '../../../domain/Explorer';
+import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import styles from './HWSendConfirmationDialog.scss';
 
@@ -31,7 +31,7 @@ type ExpectedMessages = {|
 
 type Props = {|
   +staleTx: boolean,
-  +selectedExplorer: ExplorerType,
+  +selectedExplorer: SelectedExplorer,
   +amount: BigNumber,
   +receivers: Array<string>,
   +totalAmount: BigNumber,

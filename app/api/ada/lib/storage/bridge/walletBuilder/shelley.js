@@ -41,7 +41,7 @@ import {
   addShelleyChimericAccountAddress,
 } from '../../../../restoration/shelley/scan';
 import { KeyKind } from '../../../../../common/lib/crypto/keys/types';
-import { networks } from '../../database/prepackagedNetworks';
+import { networks } from '../../database/prepackaged/networks';
 
 // TODO: maybe move this inside walletBuilder somehow so it's all done in the same transaction
 /**

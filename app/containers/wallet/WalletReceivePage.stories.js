@@ -23,7 +23,7 @@ import type { CacheValue } from '../../../stories/helpers/StoryWrapper';
 import { wrapReceive, wrapWallet } from '../../Routes';
 import { mockWalletProps } from './Wallet.mock';
 import { mockReceiveProps } from './Receive.mock';
-import { getDefaultExplorer } from '../../domain/Explorer';
+import { defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
 import type { StandardAddress, AddressFilterKind, } from '../../types/AddressFilterTypes';
 import URIGenerateDialog from '../../components/uri/URIGenerateDialog';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
@@ -124,9 +124,11 @@ const genBaseProps: {|
         isOpen: (dialog) => request.dialog === dialog,
         getParam: request.getParam || (() => (undefined: any)),
       },
+      explorers: {
+        selectedExplorer: defaultToSelectedExplorer(),
+      },
       profile: {
         isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-        selectedExplorer: getDefaultExplorer(),
         shouldHideBalance: false,
         unitOfAccount: genUnitOfAccount()
       },
@@ -207,9 +209,11 @@ const genBaseProps: {|
     UnmangleTxDialogContainerProps: {
       generated: {
         stores: {
+          explorers: {
+            selectedExplorer: defaultToSelectedExplorer(),
+          },
           profile: {
             isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-            selectedExplorer: getDefaultExplorer(),
             unitOfAccount: genUnitOfAccount(),
           },
           wallets: {

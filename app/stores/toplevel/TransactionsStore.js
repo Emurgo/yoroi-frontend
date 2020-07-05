@@ -103,9 +103,11 @@ export default class TransactionsStore extends Store {
   validateAmount: string => Promise<boolean> = (
     amount: string
   ): Promise<boolean> => {
-    const { selectedAPI } = this.stores.profile;
-    if (selectedAPI == null) throw new Error(`${nameof(this.validateAmount)} no API selected`);
-    return Promise.resolve(isWithinSupply(amount, selectedAPI.meta.totalSupply));
+    const { selectedNetwork } = this.stores.profile;
+    if (selectedNetwork == null) throw new Error(`${nameof(this.validateAmount)} no API selected`);
+    const meta = getApiMeta(getApiForNetwork(selectedNetwork));
+    if (meta == null) throw new Error(`${nameof(this.validateAmount)} no meta found`);
+    return Promise.resolve(isWithinSupply(amount, meta.meta.totalSupply));
   };
 
 

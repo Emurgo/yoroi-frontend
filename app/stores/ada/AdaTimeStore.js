@@ -31,7 +31,7 @@ import {
 import {
   buildCheckAndCall,
 } from '../lib/check';
-import { ApiOptions } from '../../api/common/utils';
+import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
 
 export type TimeCalcRequests = {|
   // although time is network-specific
@@ -79,7 +79,10 @@ export default class AdaTimeStore extends Store {
     super.setup();
     const { asyncCheck } = buildCheckAndCall(
       ApiOptions.ada,
-      () => this.stores.profile.selectedAPI,
+      () => {
+        if (this.stores.profile.selectedNetwork == null) return undefined;
+        return getApiForNetwork(this.stores.profile.selectedNetwork);
+      }
     );
     this.actions.time.tick.listen(asyncCheck(this._updateTime));
   }

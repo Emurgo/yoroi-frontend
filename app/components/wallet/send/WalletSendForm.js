@@ -106,7 +106,6 @@ const messages = defineMessages({
 
 type Props = {|
   +currencyUnit: {|
-    unitName: string,
     primaryTicker: string,
   |},
   +currencyMaxIntegerDigits: number,
@@ -358,7 +357,7 @@ export default class WalletSendForm extends Component<Props> {
               disabled={this.props.shouldSendAll}
               error={(transactionFeeError || amountField.error)}
               // AmountInputSkin props
-              currency={currencyUnit.unitName}
+              currency={currencyUnit.primaryTicker}
               fees={transactionFee.toFormat(currencyMaxFractionalDigits)}
               total={totalAmount.toFormat(currencyMaxFractionalDigits)}
               skin={AmountInputSkin}

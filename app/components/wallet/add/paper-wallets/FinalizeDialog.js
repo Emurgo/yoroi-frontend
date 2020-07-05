@@ -14,7 +14,7 @@ import RawHash from '../../../widgets/hashWrappers/RawHash';
 import type { AdaPaper } from '../../../../api/ada';
 import WalletAccountIcon from '../../../topbar/WalletAccountIcon';
 import ExplorableHashContainer from '../../../../containers/widgets/ExplorableHashContainer';
-import type { ExplorerType } from '../../../../domain/Explorer';
+import { SelectedExplorer } from '../../../../domain/SelectedExplorer';
 import type { Notification } from '../../../../types/notificationType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
@@ -48,7 +48,7 @@ const messages = defineMessages({
 type Props = {|
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
-  +selectedExplorer: ExplorerType,
+  +selectedExplorer: SelectedExplorer,
   +paper: AdaPaper,
   +onNext: void => PossiblyAsync<void>,
   +onCancel: void => PossiblyAsync<void>,

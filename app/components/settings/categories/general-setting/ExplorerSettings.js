@@ -10,13 +10,18 @@ import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './ExplorerSettings.scss';
 import globalMessages from '../../../../i18n/global-messages';
-import type { ExplorerType } from '../../../../domain/Explorer';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type {
+  ExplorerRow,
+} from '../../../../api/ada/lib/storage/database/explorers/tables';
+import { SelectedExplorer  } from '../../../../domain/SelectedExplorer';
 
 type Props = {|
-  +explorers: Array<{| value: ExplorerType, label: string |}>,
-  +selectedExplorer: ExplorerType,
-  +onSelectExplorer: {| explorer: ExplorerType |} => PossiblyAsync<void>,
+  +explorers: $ReadOnlyArray<$ReadOnly<ExplorerRow>>,
+  +selectedExplorer: SelectedExplorer,
+  +onSelectExplorer: {|
+    explorer: $ReadOnly<ExplorerRow>,
+  |} => PossiblyAsync<void>,
   +isSubmitting: boolean,
   +error?: ?LocalizableError,
 |};
@@ -31,7 +36,7 @@ export default class ExplorerSettings extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  selectExplorer: ExplorerType => Promise<void> = async (explorer) => {
+  selectExplorer: $ReadOnly<ExplorerRow> => Promise<void> = async (explorer) => {
     await this.props.onSelectExplorer({ explorer });
   };
 
@@ -39,28 +44,32 @@ export default class ExplorerSettings extends Component<Props> {
     fields: {
       explorerId: {
         label: this.context.intl.formatMessage(globalMessages.blockchainExplorer),
-        value: this.props.selectedExplorer
+        value: this.props.selectedExplorer.selected,
       }
     }
   });
 
   render(): Node {
-    const { explorers, isSubmitting, error } = this.props;
+    const { isSubmitting, error } = this.props;
     const { intl } = this.context;
     const { form } = this;
     const explorerId = form.$('explorerId');
     const componentClassNames = classNames([styles.component, 'explorer']);
-    const explorerelectClassNames = classNames([
+    const explorerSelectClassNames = classNames([
       styles.explorer,
       isSubmitting ? styles.submitExplorerSpinner : null,
     ]);
+    const options = this.props.explorers.map(explorer => ({
+      value: explorer,
+      label: explorer.Name,
+    }));
     return (
       <div className={componentClassNames}>
         <Select
-          className={explorerelectClassNames}
-          options={explorers}
+          className={explorerSelectClassNames}
+          options={options}
           {...explorerId.bind()}
-          value={this.props.selectedExplorer}
+          value={this.props.selectedExplorer.selected}
           onChange={this.selectExplorer}
           skin={SelectSkin}
         />

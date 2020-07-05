@@ -666,7 +666,7 @@ Object {
     Object {
       "ConceptualWalletId": 1,
       "Name": "My Test Wallet",
-      "NetworkId": 0,
+      "NetworkId": 100,
     },
   ],
   "EncryptionMeta": Array [
@@ -675,6 +675,89 @@ Object {
       "BlockSeed": 371536492,
       "EncryptionMetaId": 0,
       "TransactionSeed": 769388545,
+    },
+  ],
+  "Explorer": Array [
+    Object {
+      "Endpoints": Object {
+        "address": "https://adaex.org/",
+        "pool": "https://adaex.org/",
+        "transaction": "https://adaex.org/",
+      },
+      "ExplorerId": 100,
+      "IsBackup": false,
+      "Name": "ADAex.org",
+      "NetworkId": 100,
+    },
+    Object {
+      "Endpoints": Object {
+        "address": "https://adascan.net/address/",
+        "transaction": "https://adascan.net/transaction/",
+      },
+      "ExplorerId": 101,
+      "IsBackup": false,
+      "Name": "AdaScan",
+      "NetworkId": 100,
+    },
+    Object {
+      "Endpoints": Object {
+        "address": "https://blockchair.com/cardano/address/",
+        "transaction": "https://blockchair.com/cardano/transaction/",
+      },
+      "ExplorerId": 102,
+      "IsBackup": false,
+      "Name": "Blockchair",
+      "NetworkId": 100,
+    },
+    Object {
+      "Endpoints": Object {
+        "address": "https://clio.one/tracker/address/",
+      },
+      "ExplorerId": 103,
+      "IsBackup": false,
+      "Name": "Clio.1",
+      "NetworkId": 100,
+    },
+    Object {
+      "Endpoints": Object {
+        "address": "https://cardanoexplorer.com/address/",
+        "transaction": "https://explorer.cardano.org/en/transaction/",
+      },
+      "ExplorerId": 104,
+      "IsBackup": true,
+      "Name": "CardanoExplorer",
+      "NetworkId": 100,
+    },
+    Object {
+      "Endpoints": Object {
+        "address": "https://adastat.net/address/",
+        "pool": "https://adastat.net/pool/",
+        "transaction": "https://adastat.net/transaction/",
+      },
+      "ExplorerId": 200,
+      "IsBackup": false,
+      "Name": "AdaStat",
+      "NetworkId": 200,
+    },
+    Object {
+      "Endpoints": Object {
+        "address": "https://itnexplorer.cardano.org/en/address/",
+        "transaction": "https://itnexplorer.cardano.org/en/transaction/",
+      },
+      "ExplorerId": 201,
+      "IsBackup": true,
+      "Name": "CardanoExplorer",
+      "NetworkId": 200,
+    },
+    Object {
+      "Endpoints": Object {
+        "address": "https://explorer.ergoplatform.com/en/addresses/",
+        "transaction": "https://explorer.ergoplatform.com/en/transactions/",
+      },
+      "ExplorerId": 300,
+      "IsBackup": true,
+      "Name": "ErgoPlatform",
+      "NetworkId": 300,
     },
   ],
   "HwWalletMeta": Array [],
@@ -1066,22 +1149,23 @@ Object {
     Object {
       "CoinType": 2147485463,
       "Fork": 0,
-      "NetworkId": 0,
+      "NetworkId": 100,
       "NetworkMagic": "764824073",
     },
     Object {
       "CoinType": 2147485463,
       "Fork": 1,
-      "NetworkId": 1,
+      "NetworkId": 200,
       "NetworkMagic": "8e4d2a343f3dcf9330ad9035b3e8d168e6728904262f2c434a4f8f934ec7b676",
     },
     Object {
       "CoinType": 2147484077,
       "Fork": 0,
-      "NetworkId": 2,
+      "NetworkId": 300,
       "NetworkMagic": "0",
     },
   ],
+  "PreferredExplorer": Array [],
   "PriceData": Array [],
   "PublicDeriver": Array [
     Object {

@@ -25,7 +25,7 @@ import type { CacheValue } from '../../../stories/helpers/StoryWrapper';
 import MemoNoExternalStorageDialog from '../../components/wallet/memos/MemoNoExternalStorageDialog';
 import { wrapWallet } from '../../Routes';
 import { mockWalletProps } from './Wallet.mock';
-import { getDefaultExplorer } from '../../domain/Explorer';
+import { defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
 import { ROUTES } from '../../routes-config';
 import { buildRoute } from '../../utils/routing';
 import { InvalidWitnessError } from '../../api/ada/errors';
@@ -55,9 +55,11 @@ const genBaseProps: {|
 |} => * = (request) => ({
   initialShowMemoState: request.initialShowMemoState || false,
   stores: {
+    explorers: {
+      selectedExplorer: defaultToSelectedExplorer(),
+    },
     profile: {
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-      selectedExplorer: getDefaultExplorer(),
       unitOfAccount: genUnitOfAccount(),
     },
     wallets: {
@@ -153,9 +155,11 @@ const genBaseProps: {|
   WalletSendConfirmationDialogContainerProps: {
     generated: {
       stores: {
+        explorers: {
+          selectedExplorer: defaultToSelectedExplorer(),
+        },
         profile: {
           isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-          selectedExplorer: getDefaultExplorer(),
         },
         wallets: {
           selected: request.wallet.publicDeriver,

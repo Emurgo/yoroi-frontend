@@ -28,10 +28,10 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { GeneratedData as YoroiPlateData } from './YoroiPlatePage';
-import type { ExplorerType } from '../../domain/Explorer';
+import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { RestoreMode } from '../../actions/common/wallet-restore-actions';
-import { ApiOptions, getApiMeta } from '../../api/common/utils';
+import { ApiOptions, getApiMeta, getApiForNetwork, } from '../../api/common/utils';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
@@ -94,7 +94,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
     // broadcast transfer transaction then call continuation
     const walletsStore = this.generated.stores.wallets;
     const yoroiTransfer = this.generated.stores.substores.ada.yoroiTransfer;
-    const publicDeriver = walletsStore.selected;
+    const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(this.transferFunds)} no wallet selected`);
     }
@@ -137,7 +137,15 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
     const { profile } = stores;
     const yoroiTransfer = this.generated.stores.substores.ada.yoroiTransfer;
 
-    const apiMeta = getApiMeta(ApiOptions.ada);
+    const publicDeriver = this.generated.stores.wallets.selected;
+    if (publicDeriver == null) {
+      throw new Error(`${nameof(this.checkAddresses)} no wallet selected`);
+    }
+    const api = getApiForNetwork(publicDeriver.getParent().getNetworkInfo());
+    if (api !== ApiOptions.ada) {
+      throw new Error(`${nameof(YoroiTransferPage)} not ADA API type`);
+    }
+    const apiMeta = getApiMeta(api);
     if (apiMeta == null) throw new Error(`${nameof(YoroiTransferPage)} no API selected`);
 
     const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
@@ -225,8 +233,10 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
               amount,
               apiMeta.meta.decimalPlaces.toNumber(),
             )}
-            selectedExplorer={this.generated.stores.profile.selectedExplorer}
             transferTx={yoroiTransfer.transferTx}
+            selectedExplorer={this.generated.stores.explorers.selectedExplorer
+              .get(publicDeriver.getParent().getNetworkInfo().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
+            }
             onSubmit={this.transferFunds}
             isSubmitting={yoroiTransfer.transferFundsRequest.isExecuting}
             onCancel={this.cancelTransferFunds}
@@ -309,9 +319,11 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
       coinPriceStore: {|
         getCurrentPrice: (from: string, to: string) => ?number
       |},
+      explorers: {|
+        selectedExplorer: Map<number, SelectedExplorer>,
+      |},
       profile: {|
         isClassicTheme: boolean,
-        selectedExplorer: ExplorerType,
         unitOfAccount: UnitOfAccountSettingType
       |},
       substores: {|
@@ -354,9 +366,11 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
     const { yoroiTransfer } = actions.ada;
     return Object.freeze({
       stores: {
+        explorers: {
+          selectedExplorer: stores.explorers.selectedExplorer,
+        },
         profile: {
           isClassicTheme: stores.profile.isClassicTheme,
-          selectedExplorer: stores.profile.selectedExplorer,
           unitOfAccount: stores.profile.unitOfAccount,
         },
         wallets: {

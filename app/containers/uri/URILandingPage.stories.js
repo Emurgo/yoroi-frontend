@@ -12,7 +12,7 @@ import {
   globalKnobs,
   genUnitOfAccount,
 } from '../../../stories/helpers/StoryWrapper';
-import { getDefaultExplorer } from '../../domain/Explorer';
+import { defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -67,9 +67,11 @@ export const GettingMnemonics = (): Node => {
         URILandingDialogContainerProps: {
           generated: {
             stores: {
+              explorers: {
+                selectedExplorer: defaultToSelectedExplorer(),
+              },
               profile: {
                 isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-                selectedExplorer: getDefaultExplorer(),
                 unitOfAccount: genUnitOfAccount(),
               },
               coinPriceStore: {

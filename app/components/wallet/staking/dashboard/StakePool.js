@@ -16,7 +16,7 @@ import CopyableAddress from '../../../widgets/CopyableAddress';
 import RawHash from '../../../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../../../containers/widgets/ExplorableHashContainer';
 import styles from './StakePool.scss';
-import type { ExplorerType } from '../../../../domain/Explorer';
+import { SelectedExplorer } from '../../../../domain/SelectedExplorer';
 import type { ReputationObject } from '../../../../api/ada/lib/state-fetch/types';
 import globalMessages from '../../../../i18n/global-messages';
 import WarningIcon from '../../../../assets/images/attention-modern.inline.svg';
@@ -86,7 +86,7 @@ type Props = {|
   +poolName: string,
   +hash: string,
   +moreInfo: void | MoreInfoProp,
-  +selectedExplorer: ExplorerType,
+  +selectedExplorer: SelectedExplorer,
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
   /**

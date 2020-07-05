@@ -12,7 +12,7 @@ import styles from './StandardHeader.scss';
 import CopyableAddress from '../../widgets/CopyableAddress';
 import RawHash from '../../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
-import type { ExplorerType } from '../../../domain/Explorer';
+import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { Notification } from '../../../types/notificationType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
@@ -33,7 +33,7 @@ const messages = defineMessages({
 
 type Props = {|
   +walletAddress: string,
-  +selectedExplorer: ExplorerType,
+  +selectedExplorer: SelectedExplorer,
   +isWalletAddressUsed: boolean,
   +onGenerateAddress: void => Promise<void>,
   +onCopyAddressTooltip: (string, string) => void,

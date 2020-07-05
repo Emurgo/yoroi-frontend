@@ -2,10 +2,7 @@
 
 import { dumpByVersion } from './index';
 import {
-  _getFromStorage,
-  _saveInStorage,
-} from '../adaLocalStorage';
-import {
+  getLocalItem, setLocalItem,
   removeLocalItem,
 } from '../../../../localStorage/primitives';
 
@@ -73,10 +70,11 @@ export type LegacyAdaWalletHardwareInfo = {|
   publicMasterKey: string,
 |};
 
-const legacyStorageKeys = {
+export const legacyStorageKeys = {
   ACCOUNT_KEY: 'ACCOUNT', // Note: only a single account
   WALLET_KEY: 'WALLET',
   LAST_BLOCK_NUMBER_KEY: 'LAST_BLOCK_NUMBER',
+  SELECTED_EXPLORER_KEY: 'SELECTED_EXPLORER',
 };
 
 export const getLegacyAddressesList = (): Array<LegacyAdaAddress> => {
@@ -131,4 +129,18 @@ export async function clearStorageV1(): Promise<void> {
   await removeLocalItem(legacyStorageKeys.ACCOUNT_KEY);
   await removeLocalItem(legacyStorageKeys.WALLET_KEY);
   await removeLocalItem(legacyStorageKeys.LAST_BLOCK_NUMBER_KEY);
+}
+
+/* Util functions */
+async function _saveInStorage(key: string, toSave: any): Promise<void> {
+  await setLocalItem(key, JSON.stringify(toSave));
+}
+
+async function _getFromStorage<T>(key: string): Promise<T | void> {
+  return await getLocalItem(key).then((result) => {
+    if (result == null) {
+      return result;
+    }
+    return JSON.parse(result);
+  });
 }

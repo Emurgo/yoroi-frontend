@@ -140,13 +140,6 @@ import {
   CheckAddressesInUseApiError,
 } from './errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
-import {
-  getSelectedExplorer,
-  saveSelectedExplorer,
-} from './lib/storage/adaLocalStorage';
-import type {
-  ExplorerType,
-} from '../../domain/Explorer';
 import LocalStorageApi from '../localStorage/index';
 import type {
   HistoryFunc,
@@ -399,22 +392,6 @@ export type SaveLastReceiveAddressIndexResponse = void;
 export type SaveLastReceiveAddressIndexFunc = (
   request: SaveLastReceiveAddressIndexRequest
 ) => Promise<SaveLastReceiveAddressIndexResponse>;
-
-// getSelectedExplorer
-
-export type GetSelectedExplorerRequest = void;
-export type GetSelectedExplorerResponse = ExplorerType;
-export type GetSelectedExplorerFunc = (
-  request: GetSelectedExplorerRequest
-) => Promise<GetSelectedExplorerResponse>;
-
-// saveSelectedExplorer
-
-export type SaveSelectedExplorerRequest = {| explorer: ExplorerType, |};
-export type SaveSelectedExplorerResponse = void;
-export type SaveSelectedExplorerFunc = (
-  request: SaveSelectedExplorerRequest
-) => Promise<SaveSelectedExplorerResponse>;
 
 // isValidPaperMnemonic
 
@@ -1061,30 +1038,6 @@ export default class AdaApi {
       });
     } catch (error) {
       Logger.error('AdaApi::saveAddress error: ' + stringifyError(error));
-      throw new GenericApiError();
-    }
-  }
-
-  async getSelectedExplorer(
-    _request: GetSelectedExplorerRequest
-  ): Promise<GetSelectedExplorerResponse> {
-    Logger.debug('AdaApi::getSelectedExplorer called');
-    try {
-      return await getSelectedExplorer();
-    } catch (error) {
-      Logger.error('AdaApi::getSelectedExplorer error: ' + stringifyError(error));
-      throw new GenericApiError();
-    }
-  }
-
-  async saveSelectedExplorer(
-    request: SaveSelectedExplorerRequest
-  ): Promise<SaveSelectedExplorerResponse> {
-    Logger.debug('AdaApi::saveSelectedExplorer called');
-    try {
-      await saveSelectedExplorer(request.explorer);
-    } catch (error) {
-      Logger.error('AdaApi::saveSelectedExplorer error: ' + stringifyError(error));
       throw new GenericApiError();
     }
   }

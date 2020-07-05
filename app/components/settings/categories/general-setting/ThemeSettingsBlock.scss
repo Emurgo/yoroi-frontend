@@ -51,13 +51,12 @@
   position: relative;
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: space-evenly;
   width: 100%;
 
   .themeImageWrapper {
     margin-bottom: 32px;
     position: relative;
-    width: 48%;
     text-align: left;
 
     div {
@@ -88,6 +87,7 @@
     &.inactive {
       opacity: 0.5;
       &:hover {
+        opacity: 0.6;
         cursor: pointer;
       }
     }

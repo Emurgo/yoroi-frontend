@@ -10,7 +10,7 @@ import styles from './WalletReceive.scss';
 import CopyableAddress from '../widgets/CopyableAddress';
 import RawHash from '../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
-import type { ExplorerType } from '../../domain/Explorer';
+import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { AddressFilterKind, StandardAddress } from '../../types/AddressFilterTypes';
 import { addressFilter, AddressFilter, } from '../../types/AddressFilterTypes';
 import environment from '../../environment';
@@ -67,7 +67,7 @@ type Props = {|
     filter: AddressFilterKind,
   |},
   +header: Node,
-  +selectedExplorer: ExplorerType,
+  +selectedExplorer: SelectedExplorer,
   +walletAddresses: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,

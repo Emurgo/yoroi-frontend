@@ -11,11 +11,11 @@ import RawHash from '../widgets/hashWrappers/RawHash';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import Dialog from '../widgets/Dialog';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
-import type { ExplorerType } from '../../domain/Explorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { calculateAndFormatValue } from '../../utils/unit-of-account';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { SelectedExplorer } from '../../domain/SelectedExplorer';
 
 const messages = defineMessages({
   addressFromLabel: {
@@ -51,7 +51,7 @@ const messages = defineMessages({
 type Props = {|
   +dialogTitle: string,
   +formattedWalletAmount: BigNumber => string,
-  +selectedExplorer: ExplorerType,
+  +selectedExplorer: SelectedExplorer,
   +transferTx: {|
     +recoveredBalance: BigNumber,
     +fee: BigNumber,

@@ -18,7 +18,7 @@ import type {
 import CachedRequest from '../../../stores/lib/LocalizedCachedRequest';
 import StakingPage from './StakingPage';
 import { mockWalletProps } from '../Wallet.mock';
-import { getDefaultExplorer } from '../../../domain/Explorer';
+import { defaultToSelectedExplorer } from '../../../domain/SelectedExplorer';
 import { buildRoute } from '../../../utils/routing';
 import { ROUTES } from '../../../routes-config';
 import { THEMES } from '../../../themes';
@@ -93,9 +93,11 @@ const genBaseProps: {|
     SeizaFetcherProps: {
       generated: {
         stores: {
+          explorers: {
+            selectedExplorer: defaultToSelectedExplorer(),
+          },
           profile: {
             isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-            selectedExplorer: getDefaultExplorer(),
           },
           wallets: {
             selected: request.wallet.publicDeriver,

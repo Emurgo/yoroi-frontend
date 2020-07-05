@@ -31,7 +31,7 @@ import {
 import {
   buildCheckAndCall,
 } from '../lib/check';
-import { ApiOptions } from '../../api/common/utils';
+import { ApiOptions, getApiForNetwork } from '../../api/common/utils';
 
 export default class WalletRestoreStore extends Store {
 
@@ -42,7 +42,10 @@ export default class WalletRestoreStore extends Store {
     const actions = this.actions.walletRestore;
     const { syncCheck, asyncCheck } = buildCheckAndCall(
       ApiOptions.ada,
-      () => this.stores.profile.selectedAPI,
+      () => {
+        if (this.stores.profile.selectedNetwork == null) return undefined;
+        return getApiForNetwork(this.stores.profile.selectedNetwork);
+      }
     );
     adaActions.transferFromLegacy.listen(asyncCheck(this._transferFromLegacy));
     actions.startRestore.listen(asyncCheck(this._restoreToDb));

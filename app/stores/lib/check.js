@@ -1,15 +1,15 @@
 // @flow
 
-import type { ApiOptionType, SelectedApiType } from '../../api/common/utils';
+import type { ApiOptionType } from '../../api/common/utils';
 
 export function checkAndCall<TArgs: *>(
   expectedAPI: ApiOptionType,
-  getAPI: void => (void | SelectedApiType),
+  getAPI: void => (void | ApiOptionType),
   func: (...args: TArgs) => void,
 ): (...args: TArgs) => void {
   return function (...args: TArgs): void {
-    const selectedAPI = getAPI();
-    if (selectedAPI?.type === expectedAPI) {
+    const selectedNetwork = getAPI();
+    if (selectedNetwork === expectedAPI) {
       return func(...args);
     }
   };
@@ -17,12 +17,12 @@ export function checkAndCall<TArgs: *>(
 
 export function checkAndCallAsync<TArgs: *>(
   expectedAPI: ApiOptionType,
-  getAPI: void => (void | SelectedApiType),
+  getAPI: void => (void | ApiOptionType),
   func: (...args: TArgs) => Promise<void>,
 ): (...args: TArgs) => Promise<void> {
   return async function (...args: TArgs): Promise<void> {
-    const selectedAPI = getAPI();
-    if (selectedAPI?.type === expectedAPI) {
+    const selectedNetwork = getAPI();
+    if (selectedNetwork === expectedAPI) {
       return func(...args);
     }
   };
@@ -30,7 +30,7 @@ export function checkAndCallAsync<TArgs: *>(
 
 export function buildCheckAndCall(
   expectedAPI: ApiOptionType,
-  getAPI: void => (void | SelectedApiType),
+  getAPI: void => (void | ApiOptionType),
 ): {| syncCheck: typeof fakeSyncFunc, asyncCheck: typeof fakeAsyncFunc |} {
   return {
     syncCheck: (func: any): any => {

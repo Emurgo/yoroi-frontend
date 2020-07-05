@@ -33,7 +33,7 @@ import {
 import { RustModule } from '../../../cardanoCrypto/rustLoader';
 
 import { generateLedgerWalletRootKey } from '../../../cardanoCrypto/cryptoWallet';
-import { networks } from '../../database/prepackagedNetworks';
+import { networks } from '../../database/prepackaged/networks';
 
 export function genCheckAddressesInUse(
   blockchain: Array<RemoteTransaction>,

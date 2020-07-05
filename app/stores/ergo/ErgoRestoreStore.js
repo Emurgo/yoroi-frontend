@@ -2,7 +2,7 @@
 
 import { action, } from 'mobx';
 import Store from '../base/Store';
-import { ApiOptions } from '../../api/common/utils';
+import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
 import { RestoreMode } from '../../actions/common/wallet-restore-actions';
 import {
   buildCheckAndCall,
@@ -16,7 +16,10 @@ export default class ErgoRestoreStore extends Store {
     const actions = this.actions.walletRestore;
     const { asyncCheck, syncCheck, } = buildCheckAndCall(
       ApiOptions.ergo,
-      () => this.stores.profile.selectedAPI,
+      () => {
+        if (this.stores.profile.selectedNetwork == null) return undefined;
+        return getApiForNetwork(this.stores.profile.selectedNetwork);
+      }
     );
     actions.startRestore.listen(asyncCheck(this._restoreToDb));
     actions.reset.listen(syncCheck(this.reset));

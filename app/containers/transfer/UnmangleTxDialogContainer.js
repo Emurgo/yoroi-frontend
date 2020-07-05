@@ -25,11 +25,11 @@ import globalMessages from '../../i18n/global-messages';
 import type { ConfigType } from '../../../config/config-types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { ExplorerType } from '../../domain/Explorer';
+import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { SetupSelfTxRequest } from '../../stores/ada/AdaTransactionBuilderStore';
-import { ApiOptions, getApiMeta } from '../../api/common/utils';
+import { ApiOptions, getApiForNetwork, getApiMeta } from '../../api/common/utils';
 import { GROUP_MANGLED } from '../../stores/stateless/addressStores';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
 
@@ -158,7 +158,15 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
   > => Node = (
     tentativeTx
   ) => {
-    const apiMeta = getApiMeta(ApiOptions.ada);
+    const selected = this.generated.stores.wallets.selected;
+    if (selected == null) {
+      throw new Error(`${nameof(UnmangleTxDialogContainer)} no wallet selected`);
+    }
+    const api = getApiForNetwork(selected.getParent().getNetworkInfo());
+    if (api !== ApiOptions.ada) {
+      throw new Error(`${nameof(UnmangleTxDialogContainer)} not ADA API type`);
+    }
+    const apiMeta = getApiMeta(api);
     if (apiMeta == null) throw new Error(`${nameof(UnmangleTxDialogContainer)} no API selected`);
 
     const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
@@ -194,7 +202,9 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
           amount,
           apiMeta.meta.decimalPlaces.toNumber(),
         )}
-        selectedExplorer={this.generated.stores.profile.selectedExplorer}
+        selectedExplorer={this.generated.stores.explorers.selectedExplorer
+          .get(selected.getParent().getNetworkInfo().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
+        }
         transferTx={transferTx}
         onSubmit={this.submit}
         isSubmitting={this.generated.stores.substores.ada.wallets.sendMoneyRequest.isExecuting}
@@ -231,9 +241,11 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
       coinPriceStore: {|
         getCurrentPrice: (from: string, to: string) => ?number
       |},
+      explorers: {|
+        selectedExplorer: Map<number, SelectedExplorer>,
+      |},
       profile: {|
         isClassicTheme: boolean,
-        selectedExplorer: ExplorerType,
         unitOfAccount: UnitOfAccountSettingType
       |},
       addresses: {|
@@ -270,9 +282,11 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
     const { stores, actions } = this.props;
     return Object.freeze({
       stores: {
+        explorers: {
+          selectedExplorer: stores.explorers.selectedExplorer,
+        },
         profile: {
           isClassicTheme: stores.profile.isClassicTheme,
-          selectedExplorer: stores.profile.selectedExplorer,
           unitOfAccount: stores.profile.unitOfAccount,
         },
         wallets: {

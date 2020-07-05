@@ -13,7 +13,7 @@ import WalletTransaction from '../../../domain/WalletTransaction';
 import LoadingSpinner from '../../widgets/LoadingSpinner';
 import type { AssuranceMode } from '../../../types/transactionAssuranceTypes';
 import { Logger } from '../../../utils/logging';
-import type { ExplorerType } from '../../../domain/Explorer';
+import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import OneSideBarDecoration from '../../widgets/OneSideBarDecoration';
 import globalMessages from '../../../i18n/global-messages';
@@ -39,7 +39,7 @@ type Props = {|
   +priceMap: Map<string, $ReadOnly<PriceDataRow>>,
   +isLoadingTransactions: boolean,
   +hasMoreToLoad: boolean,
-  +selectedExplorer: ExplorerType,
+  +selectedExplorer: SelectedExplorer,
   +assuranceMode: AssuranceMode,
   +onLoadMore: void => PossiblyAsync<void>,
   +shouldHideBalance: boolean,

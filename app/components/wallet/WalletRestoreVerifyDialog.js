@@ -14,7 +14,7 @@ import Dialog from '../widgets/Dialog';
 import DialogTextBlock from '../widgets/DialogTextBlock';
 import LocalizableError from '../../i18n/LocalizableError';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
-import type { ExplorerType } from '../../domain/Explorer';
+import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { Notification } from '../../types/notificationType';
 import type { PlateResponse } from '../../api/ada/lib/cardanoCrypto/plate';
 import CenteredLayout from '../layout/CenteredLayout';
@@ -73,7 +73,7 @@ const messages = defineMessages({
 type Props = {|
   +byronPlate: void | PlateResponse,
   +shelleyPlate: void | PlateResponse,
-  +selectedExplorer: ExplorerType,
+  +selectedExplorer: SelectedExplorer,
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
   +onNext: void => PossiblyAsync<void>,

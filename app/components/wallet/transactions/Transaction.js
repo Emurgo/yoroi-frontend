@@ -22,7 +22,7 @@ import type { AssuranceLevel } from '../../../types/transactionAssuranceTypes';
 import { Logger } from '../../../utils/logging';
 import ExpandArrow from '../../../assets/images/expand-arrow-grey.inline.svg';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
-import type { ExplorerType } from '../../../domain/Explorer';
+import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { PriceDataRow } from '../../../api/ada/lib/storage/database/prices/tables';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import { TxStatusCodes, } from '../../../api/ada/lib/storage/database/primitives/enums';
@@ -156,7 +156,7 @@ type Props = {|
   +numberOfConfirmations: ?number,
   +memo: void | $ReadOnly<TxMemoTableRow>,
   +state: TxStatusCodesType,
-  +selectedExplorer: ExplorerType,
+  +selectedExplorer: SelectedExplorer,
   +assuranceLevel: AssuranceLevel,
   +isLastInList: boolean,
   +shouldHideBalance: boolean,

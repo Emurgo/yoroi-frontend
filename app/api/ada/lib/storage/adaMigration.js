@@ -11,6 +11,7 @@ import {
   legacyGetLocalStorageWallet,
   getCurrentCryptoAccount,
   clearStorageV1,
+  legacyStorageKeys,
 } from './database/legacy';
 import LocalStorageApi from '../../../localStorage/index';
 import {
@@ -33,6 +34,9 @@ import {
 import { loadWalletsFromStorage } from './models/load';
 import environment from '../../../../environment';
 import { KeyKind } from '../../../common/lib/crypto/keys/types';
+import {
+  removeLocalItem,
+} from '../../../localStorage/primitives';
 
 declare var CONFIG: ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;
@@ -77,6 +81,7 @@ export async function migrateToLatest(
     ['<1.10.0', async () => await storagev2Migation(persistentDb)],
     ['=1.10.0', async () => await txHistoryReset(persistentDb)],
     ['>=2.0.0 <2.4.0', async () => await txHistoryReset(persistentDb)],
+    ['<3.0.0', async () => await removeLocalItem(legacyStorageKeys.SELECTED_EXPLORER_KEY)],
   ];
 
   let appliedMigration = false;

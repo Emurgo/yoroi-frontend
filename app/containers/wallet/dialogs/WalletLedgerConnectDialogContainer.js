@@ -13,9 +13,9 @@ import ConnectDialog from '../../../components/wallet/hwConnect/ledger/ConnectDi
 import SaveDialog from '../../../components/wallet/hwConnect/ledger/SaveDialog';
 
 import { ProgressStep, ProgressInfo } from '../../../types/HWConnectStoreTypes';
-import type { SelectedApiType } from '../../../api/common/utils';
-import { ApiOptions } from '../../../api/common/utils';
+import { getApiForNetwork, ApiOptions } from '../../../api/common/utils';
 import LocalizableError from '../../../i18n/LocalizableError';
+import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 export type GeneratedData = typeof WalletLedgerConnectDialogContainer.prototype.generated;
 
@@ -28,31 +28,31 @@ type Props = {|
 @observer
 export default class WalletLedgerConnectDialogContainer extends Component<Props> {
 
-  getSelectedApi: void => SelectedApiType = () => {
-    const { selectedAPI } = this.generated.stores.profile;
-    if (selectedAPI === undefined) {
+  getSelectedNetwork: void => $ReadOnly<NetworkRow> = () => {
+    const { selectedNetwork } = this.generated.stores.profile;
+    if (selectedNetwork === undefined) {
       throw new Error(`${nameof(WalletLedgerConnectDialogContainer)} no API selected`);
     }
-    return selectedAPI;
+    return selectedNetwork;
   }
 
   cancel: (() => void) = () => {
-    const selectedAPI = this.getSelectedApi();
-    if (selectedAPI.type !== ApiOptions.ada) {
-      throw new Error(`${nameof(WalletLedgerConnectDialogContainer)}::${nameof(this.getSelectedApi)} not ADA API`);
+    const api = getApiForNetwork(this.getSelectedNetwork());
+    if (api !== ApiOptions.ada) {
+      throw new Error(`${nameof(WalletLedgerConnectDialogContainer)}::${nameof(this.cancel)} not ADA API`);
     }
     this.props.onClose();
-    this.generated.actions[selectedAPI.type].ledgerConnect.cancel.trigger();
+    this.generated.actions[ApiOptions.ada].ledgerConnect.cancel.trigger();
   };
 
   render(): null | Node {
-    const selectedAPI = this.getSelectedApi();
-    if (selectedAPI.type !== ApiOptions.ada) {
-      throw new Error(`${nameof(WalletLedgerConnectDialogContainer)}::${nameof(this.getSelectedApi)} not ADA API`);
+    const api = getApiForNetwork(this.getSelectedNetwork());
+    if (api !== ApiOptions.ada) {
+      throw new Error(`${nameof(WalletLedgerConnectDialogContainer)}::${nameof(this.render)} not ADA API`);
     }
     const { profile } = this.generated.stores;
-    const ledgerConnectStore = this.generated.stores.substores[selectedAPI.type].ledgerConnect;
-    const hwConnectActions = this.generated.actions[selectedAPI.type].ledgerConnect;
+    const ledgerConnectStore = this.generated.stores.substores[ApiOptions.ada].ledgerConnect;
+    const hwConnectActions = this.generated.actions[ApiOptions.ada].ledgerConnect;
 
     let component = null;
 
@@ -125,7 +125,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
     stores: {|
       profile: {|
         isClassicTheme: boolean,
-        selectedAPI: void | SelectedApiType
+        selectedNetwork: void | $ReadOnly<NetworkRow>
       |},
       substores: {|
         ada: {|
@@ -149,7 +149,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
     return Object.freeze({
       stores: {
         profile: {
-          selectedAPI: stores.profile.selectedAPI,
+          selectedNetwork: stores.profile.selectedNetwork,
           isClassicTheme: stores.profile.isClassicTheme,
         },
         substores: {

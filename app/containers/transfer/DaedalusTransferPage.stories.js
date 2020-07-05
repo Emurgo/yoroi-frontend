@@ -13,7 +13,7 @@ import {
 } from '../../../stories/helpers/StoryWrapper';
 import { mockTransferProps, wrapTransfer } from './Transfer.mock';
 import { THEMES } from '../../themes';
-import { getDefaultExplorer } from '../../domain/Explorer';
+import { defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
 import { ROUTES } from '../../routes-config';
 import DaedalusTransferPage from './DaedalusTransferPage';
 import type { MockDaedalusTransferStore } from './DaedalusTransferPage';
@@ -42,9 +42,11 @@ const genBaseProps: {|
   daedalusTransfer: InexactSubset<MockDaedalusTransferStore>,
 |} => * = (request) => ({
   stores: {
+    explorers: {
+      selectedExplorer: defaultToSelectedExplorer(),
+    },
     profile: {
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-      selectedExplorer: getDefaultExplorer(),
       unitOfAccount: genUnitOfAccount(),
     },
     wallets: {

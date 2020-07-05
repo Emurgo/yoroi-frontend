@@ -10,11 +10,9 @@ import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import UriSettingsBlock from '../../../components/settings/categories/general-setting/UriSettingsBlock';
 import registerProtocols from '../../../uri-protocols';
 import environment from '../../../environment';
-import { getExplorers } from '../../../domain/Explorer';
 import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
 import AdaCurrency from '../../../assets/images/currencies/ADA.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { ExplorerType } from '../../../domain/Explorer';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import LocalizableError from '../../../i18n/LocalizableError';
 import {
@@ -22,7 +20,14 @@ import {
 } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import NoWalletMessage from '../../wallet/NoWalletMessage';
 import { CoinTypes, } from '../../../config/numbersConfig';
-import { CardanoForks } from '../../../api/ada/lib/storage/database/prepackagedNetworks';
+import { CardanoForks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import type {
+  ExplorerRow,
+} from '../../../api/ada/lib/storage/database/explorers/tables';
+import { SelectedExplorer } from '../../../domain/SelectedExplorer';
+import type {
+  GetAllExplorersResponse,
+} from '../../../api/ada/lib/storage/bridge/explorers';
 
 const currencyLabels = defineMessages({
   USD: {
@@ -78,13 +83,11 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
     }
     const networkInfo = walletsStore.selected.getParent().getNetworkInfo();
 
-    const profileStore = this.generated.stores.profile;
-    const coinPriceStore = this.generated.stores.coinPriceStore;
+    const { stores } = this.generated;
 
-    const isSubmittingExplorer = profileStore.setSelectedExplorerRequest.isExecuting;
-    const isSubmittingUnitOfAccount = profileStore.setUnitOfAccountRequest.isExecuting
-      || coinPriceStore.refreshCurrentUnit.isExecuting;
-    const explorerOptions = getExplorers();
+    const isSubmittingExplorer = stores.explorers.setSelectedExplorerRequest.isExecuting;
+    const isSubmittingUnitOfAccount = stores.profile.setUnitOfAccountRequest.isExecuting
+      || stores.coinPriceStore.refreshCurrentUnit.isExecuting;
 
     const uriSettings = (
       networkInfo.CoinType === CoinTypes.CARDANO &&
@@ -100,13 +103,13 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
       )
       : null;
 
-    const currencies = profileStore.UNIT_OF_ACCOUNT_OPTIONS.map(c => {
+    const currencies = stores.profile.UNIT_OF_ACCOUNT_OPTIONS.map(c => {
       const name = this.context.intl.formatMessage(currencyLabels[c.symbol]);
       return {
         value: c.symbol,
         label: `${c.symbol} - ${name}`,
         name,
-        price: coinPriceStore.getCurrentPrice('ADA', c.symbol),
+        price: stores.coinPriceStore.getCurrentPrice('ADA', c.symbol),
         svg: c.svg
       };
     });
@@ -118,18 +121,23 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
       svg: AdaCurrency,
     });
 
-    const unitOfAccountValue = profileStore.unitOfAccount.enabled
-      ? profileStore.unitOfAccount.currency
+    const unitOfAccountValue = stores.profile.unitOfAccount.enabled
+      ? stores.profile.unitOfAccount.currency
       : 'ADA';
 
+    console.log(this.generated.stores.explorers.allExplorers.entries());
     return (
       <>
         <ExplorerSettings
-          onSelectExplorer={this.generated.actions.profile.updateSelectedExplorer.trigger}
+          onSelectExplorer={this.generated.actions.explorers.updateSelectedExplorer.trigger}
           isSubmitting={isSubmittingExplorer}
-          explorers={explorerOptions}
-          selectedExplorer={profileStore.selectedExplorer}
-          error={profileStore.setSelectedExplorerRequest.error}
+          explorers={this.generated.stores.explorers.allExplorers
+            .get(networkInfo.NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
+          }
+          selectedExplorer={stores.explorers.selectedExplorer
+            .get(networkInfo.NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
+          }
+          error={stores.explorers.setSelectedExplorerRequest.error}
         />
         {uriSettings}
         {(!environment.isProduction() || environment.isTest()) &&
@@ -138,8 +146,8 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
             isSubmitting={isSubmittingUnitOfAccount}
             currencies={currencies}
             currentValue={unitOfAccountValue}
-            error={profileStore.setUnitOfAccountRequest.error}
-            lastUpdatedTimestamp={coinPriceStore.lastUpdateTimestamp}
+            error={stores.profile.setUnitOfAccountRequest.error}
+            lastUpdatedTimestamp={stores.coinPriceStore.lastUpdateTimestamp}
           />
         }
       </>
@@ -148,12 +156,14 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
 
   @computed get generated(): {|
     actions: {|
-      profile: {|
+      explorers: {|
         updateSelectedExplorer: {|
           trigger: (params: {|
-            explorer: ExplorerType
+            explorer: $ReadOnly<ExplorerRow>,
           |}) => Promise<void>
         |},
+      |},
+      profile: {|
         updateUnitOfAccount: {|
           trigger: (
             params: UnitOfAccountSettingType
@@ -171,16 +181,19 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
         lastUpdateTimestamp: null | number,
         refreshCurrentUnit: {| isExecuting: boolean |}
       |},
+      explorers: {|
+        selectedExplorer: Map<number, SelectedExplorer>,
+        setSelectedExplorerRequest: {|
+          error: ?LocalizableError,
+          isExecuting: boolean
+        |},
+        allExplorers: GetAllExplorersResponse,
+      |},
       profile: {|
         UNIT_OF_ACCOUNT_OPTIONS: Array<{|
           svg: string,
           symbol: string
         |}>,
-        selectedExplorer: ExplorerType,
-        setSelectedExplorerRequest: {|
-          error: ?LocalizableError,
-          isExecuting: boolean
-        |},
         setUnitOfAccountRequest: {|
           error: ?LocalizableError,
           isExecuting: boolean
@@ -202,12 +215,15 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
     const profileStore = stores.profile;
     return Object.freeze({
       stores: {
-        profile: {
+        explorers: {
+          selectedExplorer: stores.explorers.selectedExplorer,
+          allExplorers: stores.explorers.allExplorers,
           setSelectedExplorerRequest: {
-            isExecuting: profileStore.setSelectedExplorerRequest.isExecuting,
-            error: profileStore.setSelectedExplorerRequest.error,
+            isExecuting: stores.explorers.setSelectedExplorerRequest.isExecuting,
+            error: stores.explorers.setSelectedExplorerRequest.error,
           },
-          selectedExplorer: profileStore.selectedExplorer,
+        },
+        profile: {
           UNIT_OF_ACCOUNT_OPTIONS: profileStore.UNIT_OF_ACCOUNT_OPTIONS,
           unitOfAccount: profileStore.unitOfAccount,
           setUnitOfAccountRequest: {
@@ -227,8 +243,10 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
         },
       },
       actions: {
+        explorers: {
+          updateSelectedExplorer: { trigger: actions.explorers.updateSelectedExplorer.trigger },
+        },
         profile: {
-          updateSelectedExplorer: { trigger: actions.profile.updateSelectedExplorer.trigger },
           updateUnitOfAccount: { trigger: actions.profile.updateUnitOfAccount.trigger },
         },
       },

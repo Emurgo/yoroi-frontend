@@ -20,7 +20,7 @@ import styles from './WalletSendConfirmationDialog.scss';
 import config from '../../../config';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../../widgets/hashWrappers/RawHash';
-import type { ExplorerType } from '../../../domain/Explorer';
+import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
@@ -29,7 +29,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
   +staleTx: boolean,
-  +selectedExplorer: ExplorerType,
+  +selectedExplorer: SelectedExplorer,
   +amount: BigNumber,
   +receivers: Array<string>,
   +totalAmount: BigNumber,
