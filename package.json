@@ -112,7 +112,7 @@
     "eslint-config-airbnb": "18.1.0",
     "eslint-plugin-flowtype": "5.2.0",
     "eslint-plugin-import": "2.21.2",
-    "eslint-plugin-jsx-a11y": "6.2.3",
+    "eslint-plugin-jsx-a11y": "6.3.1",
     "eslint-plugin-no-floating-promise": "git+https://github.com/SebastienGllmt/eslint-plugin-no-floating-promise.git",
     "eslint-plugin-promise": "4.2.1",
     "eslint-plugin-react": "7.20.3",
