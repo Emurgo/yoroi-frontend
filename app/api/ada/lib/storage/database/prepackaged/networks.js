@@ -4,6 +4,7 @@ import {
   CoinTypes,
 } from '../../../../../../config/numbersConfig';
 import { Network } from '@coinbarn/ergo-ts';
+import type { NetworkRow } from '../primitives/tables';
 
 export const CardanoForks = Object.freeze({
   Haskell: 0,
@@ -33,3 +34,10 @@ export const networks = Object.freeze({
     Fork: ErgoForks.Primary,
   },
 });
+
+export function isTestnet(
+  network: $ReadOnly<NetworkRow>,
+): boolean {
+  if (network.NetworkId === networks.JormungandrMainnet.NetworkId) return true;
+  return false;
+}

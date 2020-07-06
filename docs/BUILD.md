@@ -30,13 +30,3 @@ $ npm run prod:byron
 This command will create a full build of the extension in the `./build` directory, which you can also "load unpacked" into your browser, and it will not require you to keep a running process to continue working (standalone build).
 
 Note: debug build does not imply that you are connecting to the mainnet. The network picked depends on the `npm` command.
-
-#### Shelley testnet
-```bash
-# build files to './dev'
-$ npm run dev:shelley
-# build files to './build'
-$ npm run prod:shelley
-```
-
-Same as previous but connects to the [Jormungandr testnet]https://staking.cardano.org/).

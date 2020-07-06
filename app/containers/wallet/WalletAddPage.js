@@ -137,11 +137,12 @@ export default class WalletAddPage extends Component<Props> {
       if (selectedNetwork === undefined) {
         throw new Error(`${nameof(WalletAddPage)} no API selected`);
       }
+      const isJormungandr = selectedNetwork.NetworkId === networks.JormungandrMainnet.NetworkId;
       activeDialog = (
         <WalletCreateOptionDialogContainer
           onClose={this.onClose}
           onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
-          onPaper={getApiForNetwork(selectedNetwork) !== ApiOptions.ada
+          onPaper={getApiForNetwork(selectedNetwork) !== ApiOptions.ada || isJormungandr
             ? undefined
             : () => actions.dialogs.open.trigger({ dialog: WalletPaperDialog })
           }
@@ -175,14 +176,21 @@ export default class WalletAddPage extends Component<Props> {
         />
       );
     } else if (uiDialogs.isOpen(WalletRestoreOptionDialog)) {
+      if (selectedNetwork === undefined) {
+        throw new Error(`${nameof(WalletAddPage)} no API selected`);
+      }
+      const isJormungandr = selectedNetwork.NetworkId === networks.JormungandrMainnet.NetworkId;
       activeDialog = (
         <WalletRestoreOptionDialogContainer
           onClose={this.onClose}
           onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
-          onPaperRestore={() => actions.dialogs.open.trigger({
-            dialog: WalletRestoreDialog,
-            params: { restoreType: (RestoreMode.PAPER: RestoreModeType)  }
-          })}
+          onPaperRestore={getApiForNetwork(selectedNetwork) !== ApiOptions.ada || isJormungandr
+            ? undefined
+            : () => actions.dialogs.open.trigger({
+              dialog: WalletRestoreDialog,
+              params: { restoreType: (RestoreMode.PAPER: RestoreModeType)  }
+            })
+          }
         />
       );
     } else if (uiDialogs.isOpen(WalletRestoreDialog)) {

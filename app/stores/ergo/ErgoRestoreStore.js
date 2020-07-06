@@ -58,10 +58,12 @@ export default class ErgoRestoreStore extends Store {
     if (persistentDb == null) {
       throw new Error(`${nameof(this._restoreToDb)} db not loaded. Should never happen`);
     }
+    const { selectedNetwork } = this.stores.profile;
+    if (selectedNetwork == null) throw new Error(`${nameof(this._restoreToDb)} no network selected`);
     await this.stores.wallets.restoreRequest.execute(async () => {
       const wallet = await this.api.ergo.restoreWallet({
         db: persistentDb,
-        ...{ recoveryPhrase: phrase, walletName, walletPassword },
+        ...{ recoveryPhrase: phrase, walletName, walletPassword, network: selectedNetwork  },
       });
       return wallet;
     }).promise;

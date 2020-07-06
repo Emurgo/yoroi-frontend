@@ -9,8 +9,9 @@ import globalMessages from '../../../i18n/global-messages';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import OptionBlock from '../../widgets/options/OptionBlock';
-import environment from '../../../environment';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { ComplexityLevelType } from '../../../types/complexityLevelType';
+import { ComplexityLevels } from '../../../types/complexityLevelType';
 
 import styles from '../../widgets/options/OptionListWrapperStyle.scss';
 
@@ -69,6 +70,7 @@ type Props = {|
     +onLedger: void => void,
   |},
   +onCancel: void => void,
+  +complexityLevel: ComplexityLevelType,
 |};
 
 const TabOptions = Object.freeze({
@@ -182,7 +184,7 @@ export default class ByronOptionDialog extends Component<Props, State> {
           title={intl.formatMessage(icarusMessages.yoroiPaperLabel)}
           learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
         />
-        {(environment.isJormungandr() || environment.isTest()) && (
+        {this.props.complexityLevel === ComplexityLevels.Advanced && (
           <>
             <OptionBlock
               parentName="fromLedger"

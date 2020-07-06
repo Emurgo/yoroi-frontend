@@ -3,23 +3,14 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import styles from './IntroBanner.scss';
-import { defineMessages, intlShape, } from 'react-intl';
-import TestnetLogo from '../../../assets/images/yoroi-logotestnet-gradient.inline.svg';
+import { intlShape, } from 'react-intl';
 import NightlyLogo from '../../../assets/images/yoroi-logo-nightly.inline.svg';
 import YoroiLogo from '../../../assets/images/yoroi-logo-blue.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
   +isNightly: boolean,
-  +isJormungandr: boolean,
 |};
-
-const messages = defineMessages({
-  title: {
-    id: 'profile.languageSelect.intro',
-    defaultMessage: '!!!You are on the Yoroi Shelley Testnet',
-  },
-});
 
 @observer
 export default class IntroBanner extends Component<Props> {
@@ -32,22 +23,19 @@ export default class IntroBanner extends Component<Props> {
     if (this.props.isNightly) {
       return NightlyLogo;
     }
-    if (this.props.isJormungandr) {
-      return TestnetLogo;
-    }
     return YoroiLogo;
   }
 
   render(): Node {
-    const { intl } = this.context;
     const Logo = this._getLogo();
+    const title = '';
     return (
       <div className={styles.component}>
         <span className={styles.banner}>
           <Logo />
         </span>
         <div className={styles.mainTitle}>
-          {intl.formatMessage(messages.title)}
+          {title}
         </div>
       </div>
     );

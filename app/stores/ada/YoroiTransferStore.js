@@ -20,7 +20,7 @@ import type {
 import { TransferStatus, TransferSource, TransferKind, } from '../../types/TransferTypes';
 import { generateLegacyYoroiTransferTx } from '../../api/ada/transactions/transfer/legacyYoroi';
 import { generateCip1852TransferTx } from '../../api/ada/transactions/transfer/cip1852Transfer';
-import environment from '../../environment';
+import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { generateWalletRootKey, generateLedgerWalletRootKey, } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import {
@@ -203,11 +203,14 @@ export default class YoroiTransferStore extends Store {
         this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
     };
 
+    const { selectedNetwork } = this.stores.profile;
+    if (selectedNetwork == null) throw new Error(`${nameof(this._generateTransferTxFromMnemonic)} no network selected`);
+
     const transferTx = sourceIsShelleyWallet
       ? await generateCip1852TransferTx(baseRequest)
       : await generateLegacyYoroiTransferTx({
         ...baseRequest,
-        legacy: !environment.isJormungandr(),
+        legacy: selectedNetwork.NetworkId !== networks.JormungandrMainnet.NetworkId,
       });
     // Possible exception: NotEnoughMoneyToSendError
     return transferTx;

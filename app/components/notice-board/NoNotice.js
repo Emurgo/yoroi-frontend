@@ -4,8 +4,6 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
 
-import environmnent from '../../environment';
-import NoNoticeTestnetSvg from '../../assets/images/transaction/no-transactions-yet.testnet.inline.svg';
 import NoNoticeClassicSvg from '../../assets/images/transaction/no-transactions-yet.classic.inline.svg';
 import NoNoticeModernSvg from '../../assets/images/transaction/no-transactions-yet.modern.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -35,12 +33,7 @@ export default class NoNotice extends Component<Props> {
     const { intl } = this.context;
     const { classicTheme } = this.props;
 
-    let NoNoticeImage;
-    if (environmnent.isJormungandr()) {
-      NoNoticeImage = NoNoticeTestnetSvg;
-    } else {
-      NoNoticeImage = classicTheme ? NoNoticeClassicSvg : NoNoticeModernSvg;
-    }
+    const NoNoticeImage = classicTheme ? NoNoticeClassicSvg : NoNoticeModernSvg;
 
     return (
       <div className={styles.component}>

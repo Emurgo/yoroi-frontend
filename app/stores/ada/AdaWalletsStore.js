@@ -110,12 +110,15 @@ export default class AdaWalletsStore extends Store {
     if (persistentDb == null) {
       throw new Error(`${nameof(this._createInDb)} db not loaded. Should never happen`);
     }
+    const { selectedNetwork } = this.stores.profile;
+    if (selectedNetwork == null) throw new Error(`${nameof(this._createInDb)} no network selected`);
     await this.stores.wallets.createWalletRequest.execute(async () => {
       const wallet = await this.api.ada.createWallet({
         db: persistentDb,
         walletName: this.stores.walletBackup.name,
         walletPassword: this.stores.walletBackup.password,
         recoveryPhrase: this.stores.walletBackup.recoveryPhrase.join(' '),
+        network: selectedNetwork,
       });
       return wallet;
     }).promise;

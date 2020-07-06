@@ -16,6 +16,8 @@ import ComplexityLevel from '../../components/profile/complexity-level/Complexit
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 import LocalizableError from '../../i18n/LocalizableError';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { isTestnet } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 const messages = defineMessages({
   title: {
@@ -34,9 +36,14 @@ export default class ComplexityLevelPage extends Component<InjectedOrGenerated<G
   render(): Node {
 
     const { checkAdaServerStatus } = this.generated.stores.serverConnectionStore;
-    const displayedBanner = checkAdaServerStatus === ServerStatusErrors.Healthy ?
-      <TestnetWarningBanner /> :
-      <ServerErrorBanner errorType={checkAdaServerStatus} />;
+
+    const { selected } = this.generated.stores.wallets;
+    const isWalletTestnet = selected == null
+      ? false
+      : isTestnet(selected.getParent().getNetworkInfo());
+    const displayedBanner = checkAdaServerStatus === ServerStatusErrors.Healthy
+      ? <TestnetWarningBanner isTestnet={isWalletTestnet} />
+      : <ServerErrorBanner errorType={checkAdaServerStatus} />;
 
     const topbarTitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
@@ -69,6 +76,7 @@ export default class ComplexityLevelPage extends Component<InjectedOrGenerated<G
       |}
     |},
     stores: {|
+      wallets: {| selected: null | PublicDeriver<> |},
       profile: {|
         complexityLevel: ?ComplexityLevelType,
         setComplexityLevelRequest: {|
@@ -94,6 +102,9 @@ export default class ComplexityLevelPage extends Component<InjectedOrGenerated<G
       stores: {
         serverConnectionStore: {
           checkAdaServerStatus: stores.serverConnectionStore.checkAdaServerStatus,
+        },
+        wallets: {
+          selected: stores.wallets.selected,
         },
         profile: {
           setComplexityLevelRequest: {

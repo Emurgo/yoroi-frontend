@@ -824,7 +824,7 @@ export const UndelegateExecuting = (): Node => {
             isExecuting: true,
             error: undefined,
             result: {
-              unsignedTx: genUndelegateTx(),
+              unsignedTx: genUndelegateTx(wallet.publicDeriver),
               totalAmountToDelegate: new BigNumber(0),
             },
           },
@@ -858,7 +858,7 @@ export const UndelegateError = (): Node => {
             isExecuting: true,
             error: new GenericApiError(),
             result: {
-              unsignedTx: genUndelegateTx(),
+              unsignedTx: genUndelegateTx(wallet.publicDeriver),
               totalAmountToDelegate: new BigNumber(0),
             },
           },
@@ -901,7 +901,7 @@ export const UndelegateDialogShown = (): Node => {
             isExecuting: false,
             error: undefined,
             result: {
-              unsignedTx: genUndelegateTx(),
+              unsignedTx: genUndelegateTx(wallet.publicDeriver),
               totalAmountToDelegate: new BigNumber(0),
             },
           },
@@ -1082,7 +1082,7 @@ export const UnmangleDialogError = (): Node => {
 export const UnmangleDialogConfirm = (): Node => {
   const wallet = genBaseWallet();
   const lookup = walletLookup([wallet]);
-  const { tentativeTx } = genTentativeTx();
+  const { tentativeTx } = genTentativeTx(wallet.publicDeriver);
   return wrapWallet(
     mockWalletProps({
       location: getRoute(wallet.publicDeriver.getPublicDeriverId()),

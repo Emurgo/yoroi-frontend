@@ -125,9 +125,7 @@ export default class LoadingStore extends Store {
         address => {
           // TODO: validation should be done based on wallet type
           const addressKind = tryAddressToKind(address, 'bech32');
-          const valid = environment.isJormungandr()
-            ? addressKind != null && addressKind !== CoreAddressTypes.CARDANO_LEGACY
-            : addressKind != null && addressKind === CoreAddressTypes.CARDANO_LEGACY;
+          const valid = addressKind != null && addressKind === CoreAddressTypes.CARDANO_LEGACY;
           return Promise.resolve(valid);
         },
         amount => isWithinSupply(amount, meta.meta.totalSupply),

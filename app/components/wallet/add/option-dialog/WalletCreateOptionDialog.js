@@ -10,7 +10,6 @@ import OptionBlock from '../../../widgets/options/OptionBlock';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from '../../../widgets/options/OptionListWrapperStyle.scss';
 import globalMessages from '../../../../i18n/global-messages';
-import environment from '../../../../environment';
 
 const messages = defineMessages({
   createNormalDescription: {
@@ -56,7 +55,7 @@ export default class WalletCreateOptionDialog extends Component<Props> {
               learnMoreText={intl.formatMessage(messages.createNormalDescription)}
               onSubmit={onCreate}
             />
-            {!environment.isJormungandr() && this.props.onPaper != null &&
+            {this.props.onPaper != null &&
               <OptionBlock
                 parentName="WalletCreateOptionDialog"
                 type="restorePaperWallet"

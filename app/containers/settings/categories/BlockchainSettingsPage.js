@@ -92,7 +92,6 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
     const uriSettings = (
       networkInfo.CoinType === CoinTypes.CARDANO &&
       networkInfo.Fork === CardanoForks.Haskell &&
-      !environment.isJormungandr() &&
       this.generated.canRegisterProtocol()
     )
       ? (
@@ -125,7 +124,6 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
       ? stores.profile.unitOfAccount.currency
       : 'ADA';
 
-    console.log(this.generated.stores.explorers.allExplorers.entries());
     return (
       <>
         <ExplorerSettings

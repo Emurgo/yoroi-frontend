@@ -27,6 +27,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
+  isTestnet: boolean,
 |};
 
 @observer
@@ -67,7 +68,7 @@ export default class TestnetWarningBanner extends Component<Props> {
         </div>
       );
     }
-    if (environment.isJormungandr()) {
+    if (this.props.isTestnet) {
       return (
         <div className={styles.shelleyTestnetWarning}>
           <span key="0" className={styles.shelleyTestnetWarningIcon}><ShelleyTestnetWarningSvg /></span>

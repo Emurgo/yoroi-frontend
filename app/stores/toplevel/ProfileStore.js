@@ -95,7 +95,6 @@ export default class ProfileStore extends Store {
     },
     {
       isDone: () => (
-        environment.isJormungandr() || // disable for Shelley to avoid overriding mainnet Yoroi URI
         !environment.userAgentInfo.canRegisterProtocol() ||
         this.isUriSchemeAccepted
       ),
@@ -380,10 +379,6 @@ export default class ProfileStore extends Store {
     return this.currentTheme === THEMES.YOROI_CLASSIC;
   }
 
-  @computed get isShelleyTestnetTheme(): boolean {
-    return environment.isJormungandr();
-  }
-
   /* @Returns Merged Pre-Built Theme and Custom Theme */
   @computed get currentThemeVars(): { [key: string]: string, ... } {
     const { result } = this.getCustomThemeRequest.execute();
@@ -622,7 +617,9 @@ export const getVarsForTheme: {|
   theme: string
 |} => { [key: string]: string, ... } = ({ theme }) => {
   const { getThemeVars } = require(`../../themes/prebuilt/${theme}.js`);
-  if (environment.isJormungandr()) {
+  // we used this theme for the Shelley version of the Yoroi extension
+  // however, going forward, Yoroi will be a mono-project containing all sub-networks
+  if (false) { // eslint-disable-line no-constant-condition
     return getThemeVars('shelley');
   }
   return getThemeVars(undefined);
@@ -644,9 +641,6 @@ export function getTermsOfUse(
   currentLocale: string,
 ): string {
   const tos = require(`../../i18n/locales/terms-of-use/${api}/${currentLocale}.md`);
-  if (environment.isJormungandr()) {
-    const testnetAddition = require(`../../i18n/locales/terms-of-use/itn/${currentLocale}.md`);
-    return tos + '\n\n' + testnetAddition;
-  }
-  return tos;
+  const stakingTerms = require(`../../i18n/locales/terms-of-use/itn/${currentLocale}.md`);
+  return tos + '\n\n' + stakingTerms;
 }

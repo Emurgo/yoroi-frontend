@@ -620,7 +620,7 @@ export const UnmangleDialogError = (): Node => {
 export const UnmangleDialogConfirm = (): Node => {
   const wallet = genSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
-  const { tentativeTx } = genTentativeTx();
+  const { tentativeTx } = genTentativeTx(wallet.publicDeriver);
 
   const addressFilter = AddressFilter.None;
   const location = routeForStore(GROUP_MANGLED.name);

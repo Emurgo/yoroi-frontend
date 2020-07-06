@@ -19,6 +19,9 @@ export const Generic = (): Node => (
   <ComplexityLevelPage
     generated={{
       stores: {
+        wallets: {
+          selected: null,
+        },
         profile: {
           setComplexityLevelRequest: {
             isExecuting: boolean('isExecuting', false),

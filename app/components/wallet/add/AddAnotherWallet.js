@@ -6,7 +6,6 @@ import classnames from 'classnames';
 
 import MainCards from './MainCards';
 import LogoYoroiIcon from '../../../assets/images/yoroi-logo-white.inline.svg';
-import LogoYoroiShelleyTestnetIcon from '../../../assets/images/yoroi-logotestnet-gradient.inline.svg';
 import NightlyLogo from '../../../assets/images/yoroi-logo-nightly.inline.svg';
 
 import styles from './AddAnotherWallet.scss';
@@ -25,9 +24,6 @@ export default class AddAnotherWallet extends Component<Props> {
   getLogo: void => string = () => {
     if (environment.isNightly()) {
       return NightlyLogo;
-    }
-    if (environment.isJormungandr()) {
-      return LogoYoroiShelleyTestnetIcon;
     }
     return LogoYoroiIcon;
   }

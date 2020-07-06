@@ -16,6 +16,7 @@ import DelegationStore from '../../stores/ada/DelegationStore';
 import WalletStore from '../../stores/toplevel/WalletStore';
 import type { GeneratedData } from './Transfer';
 import Transfer from './Transfer';
+import { ComplexityLevels } from '../../types/complexityLevelType';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -137,6 +138,15 @@ export const mockTransferProps: {
         },
         ByronEraOptionDialogContainerProps: {
           generated: {
+            stores: {
+              profile: {
+                selectedComplexityLevel: select(
+                  'complexityLevel',
+                  ComplexityLevels,
+                  ComplexityLevels.Advanced
+                ),
+              },
+            },
             actions: {
               ada: {
                 daedalusTransfer: {

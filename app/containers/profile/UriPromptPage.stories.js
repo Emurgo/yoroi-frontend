@@ -21,6 +21,9 @@ export const Generic = (): Node => (
   <UriPromptPage
     generated={{
       stores: {
+        wallets: {
+          selected: null,
+        },
         profile: {
           isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
         },

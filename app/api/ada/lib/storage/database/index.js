@@ -30,7 +30,6 @@ import { populateExplorerDb } from './explorers/tables';
 import { KeyKind } from '../../../../common/lib/crypto/keys/types';
 import { networks } from './prepackaged/networks';
 import { prepackagedExplorers } from './prepackaged/explorers';
-import environment from '../../../../../environment';
 
 // global var from window.indexedDB
 declare var indexedDB: IDBFactory;
@@ -263,9 +262,7 @@ async function onUpgrade(
       'ConceptualWallet',
       'NetworkId',
       // recall: at the time we only supported 1 currency per Yoroi install
-      environment.isJormungandr()
-        ? networks.JormungandrMainnet.NetworkId
-        : networks.ByronMainnet.NetworkId
+      networks.ByronMainnet.NetworkId
     );
   }
 }

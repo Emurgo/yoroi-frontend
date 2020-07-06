@@ -45,7 +45,8 @@ export default class YoroiPlatePage extends Component<Props> {
       rootPk,
       yoroiTransfer.transferKind === TransferKind.PAPER
         ? RestoreMode.PAPER
-        : RestoreMode.PAPER
+        : RestoreMode.REGULAR,
+      this.getSelectedNetwork(),
     );
     runInAction(() => {
       this.plates = {

@@ -20,6 +20,8 @@ import registerProtocols from '../../uri-protocols';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { isTestnet } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 const Choices = {
   ACCEPT: 'accept',
@@ -85,9 +87,14 @@ export default class UriPromptPage extends Component<InjectedOrGenerated<Generat
 
   render(): Node {
     const { checkAdaServerStatus } = this.generated.stores.serverConnectionStore;
-    const displayedBanner = checkAdaServerStatus === ServerStatusErrors.Healthy ?
-      <TestnetWarningBanner /> :
-      <ServerErrorBanner errorType={checkAdaServerStatus} />;
+    const { selected } = this.generated.stores.wallets;
+    const isWalletTestnet = selected == null
+      ? false
+      : isTestnet(selected.getParent().getNetworkInfo());
+
+    const displayedBanner = checkAdaServerStatus === ServerStatusErrors.Healthy
+      ? <TestnetWarningBanner isTestnet={isWalletTestnet} />
+      : <ServerErrorBanner errorType={checkAdaServerStatus} />;
     const topbarTitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(globalMessages.uriSchemeLabel)} />
     );
@@ -117,7 +124,8 @@ export default class UriPromptPage extends Component<InjectedOrGenerated<Generat
       profile: {| isClassicTheme: boolean |},
       serverConnectionStore: {|
         checkAdaServerStatus: ServerStatusErrorType
-      |}
+      |},
+      wallets: {| selected: null | PublicDeriver<> |},
     |}
     |} {
     if (this.props.generated !== undefined) {
@@ -135,6 +143,9 @@ export default class UriPromptPage extends Component<InjectedOrGenerated<Generat
         },
         serverConnectionStore: {
           checkAdaServerStatus: stores.serverConnectionStore.checkAdaServerStatus,
+        },
+        wallets: {
+          selected: stores.wallets.selected,
         },
       },
       actions: {
