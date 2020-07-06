@@ -244,7 +244,7 @@
   "settings.paperWallet.dialog.userPassword.title": "Özel kağıt cüzdan şifresi ayarlayın",
   "settings.paperWallet.dialog.verify.message": "Bu son adım. Paranıza daha sonra erişmek için geçerli tüm bilgilere sahip olduğunuzdan emin olmak için lütfen anımsatıcı ifadeyi (PDF sertifikasında yazılı olan) ve şifreyi doğrulayın.",
   "settings.paperWallet.numAddressesSelect.label": "Adres sayısı",
-  "settings.paperWallet.printIdentificationCheckbox.description": "Enabling this will help you verify your wallet at the moment of restoration, but it will also **forfeit plausible deniability**.",
+  "settings.paperWallet.printIdentificationCheckbox.description": "Bunu etkinleştirmek, yenileme anında cüzdanınızı doğrulamanıza yardımcı olacaktır, ancak aynı zamanda makul inkar edilebilirliği kaybedecektir.",
   "settings.paperWallet.printIdentificationCheckbox.label": "Print Paper Wallet account checksum",
   "settings.support.faq.blogLinkUrl": "https://emurgo.io/tr/blog/yoroi-custom-themes",
   "settings.support.faq.blogLinkWrapper": "blog yazısı",
