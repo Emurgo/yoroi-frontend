@@ -6,7 +6,11 @@ Tested on Ubuntu 18.04
 
 ### NodeJS
 
-**If you have `nvm`**, just run `nvm use`
+**If you have `nvm`**, just run 
+
+```
+nvm use
+```
 
 **If you don't have `nvm`** you can download `node` manually from [here](https://nodejs.org) but you need to be careful the version matches the one specified in our `package.lock` file.
 
