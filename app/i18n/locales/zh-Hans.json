@@ -656,6 +656,8 @@
   "wallet.transfer.instruction": "所有的ADA会转移到你目前选择的钱包中",
   "wallet.undelegation.transaction.explanationLine1": "切换权益池之前，您无需先解除委托",
   "wallet.undelegation.transaction.explanationLine2": "撤除授权在当前纪元结束后需要2个纪元才能生效",
+  "wallet.unsupported.subtitle": "The selected wallet does not support this functionality",
+  "wallet.unsupported.title": "Wallet type not supported",
   "widgets.copyableaddress.addressCopyTooltipMessage": "复制到剪贴板",
   "widgets.explorer.tooltip": "前往{websiteName}",
   "widgets.warningBox.headerText": "注意：",

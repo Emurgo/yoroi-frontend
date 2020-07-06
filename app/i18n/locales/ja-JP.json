@@ -656,6 +656,8 @@
   "wallet.transfer.instruction": "請求されたADAを、現在選択しているウォレットに送信します",
   "wallet.undelegation.transaction.explanationLine1": "ステークプールを切り替えるために委任を解除する必要はありません。",
   "wallet.undelegation.transaction.explanationLine2": "委任の解除は、現在のエポック終了後、2エポックかかります。",
+  "wallet.unsupported.subtitle": "The selected wallet does not support this functionality",
+  "wallet.unsupported.title": "Wallet type not supported",
   "widgets.copyableaddress.addressCopyTooltipMessage": "クリップボードにコピーする",
   "widgets.explorer.tooltip": "{websiteName}へ",
   "widgets.warningBox.headerText": "注意：",

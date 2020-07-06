@@ -656,6 +656,8 @@
   "wallet.transfer.instruction": "Toda ADA solicitada será transferida para sua carteira selecionada recentemente",
   "wallet.undelegation.transaction.explanationLine1": "Você NÃO precisa desfazer a delegação para mudar de stake pool",
   "wallet.undelegation.transaction.explanationLine2": "Levará duas épocas após o final da época atual para que a remoção da delegação entre em vigor",
+  "wallet.unsupported.subtitle": "The selected wallet does not support this functionality",
+  "wallet.unsupported.title": "Wallet type not supported",
   "widgets.copyableaddress.addressCopyTooltipMessage": "Copiar para área de transferência",
   "widgets.explorer.tooltip": "Ir para {websiteName}",
   "widgets.warningBox.headerText": "ATENÇÃO:",

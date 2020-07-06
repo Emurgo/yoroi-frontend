@@ -656,6 +656,8 @@
   "wallet.transfer.instruction": "Любая заявленная ADA будет переведена на Ваш текущий выбранный кошелек",
   "wallet.undelegation.transaction.explanationLine1": "Вам НЕ нужно отменять делегирование перед сменой пула",
   "wallet.undelegation.transaction.explanationLine2": "Чтобы разделегирование вступило в силу необходимо 2 эпохи после окончания текущей эпохи",
+  "wallet.unsupported.subtitle": "The selected wallet does not support this functionality",
+  "wallet.unsupported.title": "Wallet type not supported",
   "widgets.copyableaddress.addressCopyTooltipMessage": "Скопировать в буфер обмена",
   "widgets.explorer.tooltip": "Перейти на {websiteName}",
   "widgets.warningBox.headerText": "ВНИМАНИЕ:",

@@ -656,6 +656,8 @@
   "wallet.transfer.instruction": "Any ADA claimed will be transferred to your currently selected wallet",
   "wallet.undelegation.transaction.explanationLine1": "You do NOT need to undelegate before switching stake pools",
   "wallet.undelegation.transaction.explanationLine2": "It will take 2 epochs after the end of the current epoch for undelegation to take effect",
+  "wallet.unsupported.subtitle": "The selected wallet does not support this functionality",
+  "wallet.unsupported.title": "Wallet type not supported",
   "widgets.copyableaddress.addressCopyTooltipMessage": "Menyalin ke clipboard",
   "widgets.explorer.tooltip": "Pergi ke {websiteName}",
   "widgets.warningBox.headerText": "PERHATIAN:",
