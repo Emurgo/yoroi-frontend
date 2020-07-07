@@ -88,7 +88,7 @@ module.exports = {
     'prefer-const': 1,
     'object-curly-spacing': 1,
     'spaced-comment': 1,
-    'quotes': ['error', 'single', {avoidEscape: true, allowTemplateLiterals: true}],
+    quotes: ['error', 'single', {avoidEscape: true, allowTemplateLiterals: true}],
     'import/imports-first': 1,
     'no-multiple-empty-lines': 1,
     'react/jsx-indent': 1,
