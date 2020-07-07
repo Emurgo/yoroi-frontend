@@ -21,6 +21,9 @@ import {
 } from './lib/storage/database/index';
 import { legacyWalletChecksum } from '@emurgo/cip4-js';
 import { asGetPublicKey } from './lib/storage/models/PublicDeriver/traits';
+import {
+  networks,
+} from './lib/storage/database/prepackaged/networks';
 
 let db: lf$Database;
 
@@ -36,6 +39,7 @@ test('Restore wallet', async () => {
     recoveryPhrase: TX_TEST_MNEMONIC_1,
     walletName: 'mywallet',
     walletPassword: '123',
+    network: networks.ByronMainnet,
   };
 
   const response = await AdaApi.prototype.restoreWallet(restoreRequest);

@@ -176,6 +176,7 @@ import type {
 } from '../common/types';
 import { getApiForNetwork } from '../common/utils';
 import { CoreAddressTypes } from './lib/storage/database/primitives/enums';
+import { networks } from './lib/storage/database/prepackaged/networks';
 
 declare var CONFIG: ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;
@@ -333,7 +334,7 @@ export type PrepareAndBroadcastLedgerSignedTxFunc = (
 // createUnsignedTx
 
 export type CreateUnsignedTxRequest = {|
-  publicDeriver: IGetAllUtxos & IHasUtxoChains,
+  publicDeriver: IPublicDeriver<ConceptualWallet> & IGetAllUtxos & IHasUtxoChains,
   receiver: string,
   filter: ElementOf<IGetAllUtxosResponse> => boolean,
   ...({|
@@ -844,13 +845,16 @@ export default class AdaApi {
       const utxos = await request.publicDeriver.getAllUtxos();
       const filteredUtxos = utxos.filter(utxo => request.filter(utxo));
 
-      const addressedUtxo = environment.isJormungandr()
+      const network = request.publicDeriver.getParent().getNetworkInfo();
+      const isJormungandr = network.NetworkId === networks.JormungandrMainnet.NetworkId;
+
+      const addressedUtxo = isJormungandr
         ? shelleyAsAddressedUtxo(filteredUtxos)
         : byronAsAddressedUtxo(filteredUtxos);
 
       let unsignedTxResponse;
       if (request.shouldSendAll != null) {
-        unsignedTxResponse = environment.isJormungandr()
+        unsignedTxResponse = isJormungandr
           ? shelleySendAllUnsignedTx(
             receiver,
             addressedUtxo
@@ -866,7 +870,7 @@ export default class AdaApi {
           throw new Error(`${nameof(this.createUnsignedTx)} no internal addresses left. Should never happen`);
         }
         const changeAddr = nextUnusedInternal.addressInfo;
-        unsignedTxResponse = environment.isJormungandr()
+        unsignedTxResponse = isJormungandr
           ? shelleyNewAdaUnsignedTx(
             [{
               address: receiver,
@@ -1085,13 +1089,14 @@ export default class AdaApi {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} called`);
     const { recoveryPhrase, walletName, walletPassword, } = request;
 
+    const isJormungandr = request.network.NetworkId === networks.JormungandrMainnet.NetworkId;
     try {
       // Note: we only restore for 0th account
       const accountIndex = HARD_DERIVATION_START + 0;
       const rootPk = generateWalletRootKey(recoveryPhrase);
       const newPubDerivers = [];
 
-      if (environment.isJormungandr()) {
+      if (isJormungandr) {
         const wallet = await createStandardCip1852Wallet({
           db: request.db,
           discrimination: environment.getDiscriminant(),

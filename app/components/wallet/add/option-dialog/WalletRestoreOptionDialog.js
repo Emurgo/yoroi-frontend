@@ -33,7 +33,7 @@ const messages = defineMessages({
 type Props = {|
   +onCancel: void => void,
   +onRestore: void => void,
-  +onPaperRestore: void => void,
+  +onPaperRestore: void | (void => void),
 |};
 
 @observer
@@ -63,13 +63,15 @@ export default class WalletRestoreOptionDialog extends Component<Props> {
               learnMoreText={intl.formatMessage(messages.restoreNormalDescription)}
               onSubmit={onRestore}
             />
-            <OptionBlock
-              parentName="WalletRestoreOptionDialog"
-              type="restorePaperWallet"
-              title={intl.formatMessage(globalMessages.paperWalletLabel)}
-              learnMoreText={intl.formatMessage(messages.restorePaperWalletDescription)}
-              onSubmit={onPaperRestore}
-            />
+            {onPaperRestore != null && (
+              <OptionBlock
+                parentName="WalletRestoreOptionDialog"
+                type="restorePaperWallet"
+                title={intl.formatMessage(globalMessages.paperWalletLabel)}
+                learnMoreText={intl.formatMessage(messages.restorePaperWalletDescription)}
+                onSubmit={onPaperRestore}
+              />
+            )}
           </ul>
         </div>
       </Dialog>

@@ -22,6 +22,8 @@ import {
   generateWalletRootKey,
 } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import { getApiForNetwork } from '../../api/common/utils';
+import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export const NUMBER_OF_VERIFIED_ADDRESSES = 1;
 export const NUMBER_OF_VERIFIED_ADDRESSES_PAPER = 5;
@@ -62,7 +64,9 @@ export default class WalletRestoreStore extends Store {
 
   @action
   _verifyMnemonic: void => Promise<void> = async () => {
-    if (environment.isJormungandr()) {
+    const { selectedNetwork } = this.stores.profile;
+    if (selectedNetwork == null) throw new Error(`${nameof(this._processRestoreMeta)} no network selected`);
+    if (selectedNetwork.NetworkId === networks.JormungandrMainnet.NetworkId) {
       runInAction(() => { this.step = RestoreSteps.LEGACY_EXPLANATION; });
     } else {
       await this.actions.walletRestore.startRestore.trigger();
@@ -99,7 +103,13 @@ export default class WalletRestoreStore extends Store {
       resolvedRecoveryPhrase = newPhrase;
     }
     const rootPk = generateWalletRootKey(resolvedRecoveryPhrase);
-    const { byronPlate, shelleyPlate } = generatePlates(rootPk, this.mode);
+    const { selectedNetwork } = this.stores.profile;
+    if (selectedNetwork == null) throw new Error(`${nameof(this._processRestoreMeta)} no network selected`);
+    const { byronPlate, shelleyPlate } = generatePlates(
+      rootPk,
+      this.mode,
+      selectedNetwork
+    );
 
     runInAction(() => {
       this.recoveryResult = {
@@ -150,6 +160,7 @@ export default class WalletRestoreStore extends Store {
 export function generatePlates(
   rootPk: RustModule.WalletV3.Bip32PrivateKey,
   mode: RestoreModeType,
+  network: $ReadOnly<NetworkRow>,
 ): {|
   byronPlate: PlateResponse,
   shelleyPlate: void | PlateResponse,
@@ -166,7 +177,8 @@ export function generatePlates(
   // TODO: we disable shelley restoration information for paper wallet restoration
   // this is because we've temporarily disabled paper wallet creation for Shelley
   // so no point in showing the Shelley checksum
-  const shelleyPlate = !environment.isJormungandr() || mode === RestoreMode.PAPER
+  const isJormungandr = network.NetworkId === networks.JormungandrMainnet.NetworkId;
+  const shelleyPlate = !isJormungandr || mode === RestoreMode.PAPER
     ? undefined
     : generateStandardPlate(
       rootPk,

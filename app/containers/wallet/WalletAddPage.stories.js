@@ -21,7 +21,6 @@ import {
   genUnitOfAccount,
   getValidationMnemonicCases,
 } from '../../../stories/helpers/StoryWrapper';
-import environment from '../../environment';
 import { THEMES } from '../../themes';
 import AdaApi from '../../api/ada/index';
 import {
@@ -49,7 +48,7 @@ import UserPasswordDialog from '../../components/wallet/add/paper-wallets/UserPa
 import { ProgressStep as PaperWalletProgressStep } from '../../stores/ada/PaperWalletCreateStore';
 import { PdfGenSteps } from '../../api/ada/paperWallet/paperWalletPdf';
 import { ROUTES } from '../../routes-config';
-import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { networks, } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -621,8 +620,13 @@ export const RestoreVerify = (): Node => {
   );
   const recoveryPhrase = creationRecoveryPhrase.join(' ');
   const rootPk = generateWalletRootKey(recoveryPhrase);
-  const { byronPlate, shelleyPlate } = generatePlates(rootPk, getRestoreMode());
   const selectedNetwork = networks.ByronMainnet;
+  const { byronPlate, shelleyPlate } = generatePlates(
+    rootPk,
+    getRestoreMode(),
+    selectedNetwork,
+  );
+  const isJormungandr = selectedNetwork.NetworkId === networks.JormungandrMainnet.NetworkId;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -634,7 +638,7 @@ export const RestoreVerify = (): Node => {
             selectedNetwork,
             step: RestoreSteps.VERIFY_MNEMONIC,
             restoreRequest: {
-              isExecuting: !environment.isJormungandr() && boolean('isExecuting', false),
+              isExecuting: !isJormungandr && boolean('isExecuting', false),
               error: undefined,
               reset: action('reset'),
             },

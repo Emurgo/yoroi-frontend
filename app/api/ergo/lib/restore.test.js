@@ -16,6 +16,9 @@ import {
   loadLovefieldDB,
 } from '../../ada/lib/storage/database/index';
 import { generateWalletRootKey } from './crypto/wallet';
+import {
+  networks,
+} from '../../ada/lib/storage/database/prepackaged/networks';
 
 let db: lf$Database;
 
@@ -52,6 +55,7 @@ test('Restore Ergo wallet', async () => {
     recoveryPhrase,
     walletName: 'mywallet',
     walletPassword: '123',
+    network: networks.ErgoMainnet,
   };
 
   const response = await ErgoApi.prototype.restoreWallet(restoreRequest);

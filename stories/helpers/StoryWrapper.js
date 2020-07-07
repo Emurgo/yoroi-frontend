@@ -77,7 +77,8 @@ import { ledgerErrors } from '../../app/domain/LedgerLocalizedError';
 import BigNumber from 'bignumber.js';
 import { utxoToTxInput } from '../../app/api/ada/transactions/shelley/inputSelection';
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
-import { networks } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
+import { networks, CardanoForks } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
+import { CoinTypes } from '../../app/config/numbersConfig';
 
 /**
  * This whole file is meant to mirror code in App.js
@@ -94,7 +95,6 @@ const langCode = LANGUAGES.map(item => item.value);
 
 type Props = { +children: any, ... };
 
-environment.isJormungandr = () => boolean('IsJormungandr', false);
 environment.isNightly = () => boolean('IsNightly', false);
 
 export const globalKnobs: {|
@@ -626,7 +626,9 @@ export function walletLookup(wallets: Array<CacheValue>): {|
   });
 }
 
-export const genTentativeTx = (): {|
+export const genTentativeTx = (
+  publicDeriver: PublicDeriver<>,
+): {|
   tentativeTx: null | BaseSignRequest<
     RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput
   >,
@@ -637,7 +639,8 @@ export const genTentativeTx = (): {|
   const ouputAmount = '400';
   const fee = new BigNumber(inputAmount).minus(new BigNumber(ouputAmount));
 
-  if (environment.isJormungandr()) {
+  const networkInfo = publicDeriver.getParent().getNetworkInfo();
+  if (networkInfo.CoinType === CoinTypes.CARDANO && networkInfo.Fork === CardanoForks.Jormungandr) {
     const remoteUnspentUtxo = {
       amount: inputAmount,
       receiver: 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
@@ -707,11 +710,17 @@ export const genTentativeTx = (): {|
   }
 };
 
-export const genUndelegateTx = (): V3UnsignedTxAddressedUtxoResponse => {
+export const genUndelegateTx = (
+  publicDeriver: PublicDeriver<>,
+): V3UnsignedTxAddressedUtxoResponse => {
   const inputAmount = '1000001';
 
-  if (!environment.isJormungandr()) {
-    throw new Error('Delegation not supported for Byron');
+  const networkInfo = publicDeriver.getParent().getNetworkInfo();
+  if (networkInfo.CoinType !== CoinTypes.CARDANO) {
+    throw new Error('Delegation only supported for Cardano');
+  }
+  if (networkInfo.Fork !== CardanoForks.Jormungandr) {
+    throw new Error('Delegation only supported for Jormungandr');
   }
   const remoteUnspentUtxo = {
     amount: inputAmount,

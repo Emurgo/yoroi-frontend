@@ -36,6 +36,7 @@ import type { Notification } from '../../../types/notificationType';
 import type {
   NetworkRow,
 } from '../../../api/ada/lib/storage/database/primitives/tables';
+import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
 const messages = defineMessages({
   walletUpgradeNoop: {
@@ -152,6 +153,9 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         if (restoreRequest.error instanceof CheckAddressesInUseApiError === false) {
           error = restoreRequest.error;
         }
+        const isJormungandr = (
+          this.getSelectedNetwork().NetworkId === networks.JormungandrMainnet.NetworkId
+        );
         const isSubmitting = restoreRequest.isExecuting ||
           (restoreRequest.error instanceof CheckAddressesInUseApiError);
         return (
@@ -178,7 +182,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
             notification={uiNotifications.getTooltipActiveNotification(
               this.notificationElementId
             )}
-            isSubmitting={isSubmitting}
+            isSubmitting={!isJormungandr && isSubmitting}
             error={error}
           />
         );

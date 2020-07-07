@@ -20,11 +20,10 @@ import AddMemoSvg from '../../../assets/images/add-memo.inline.svg';
 import BorderedBox from '../../widgets/BorderedBox';
 import styles from './WalletSendForm.scss';
 import globalMessages, { memoMessages, } from '../../../i18n/global-messages';
-import environment from '../../../environment';
 import type { UriParams } from '../../../utils/URIHandling';
 import { getAddressPayload } from '../../../api/ada/lib/storage/bridge/utils';
 import { MAX_MEMO_SIZE } from '../../../config/externalStorageConfig';
-
+import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import {
   formattedWalletAmount,
   formattedAmountToBigNumber,
@@ -33,7 +32,7 @@ import {
 import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import LocalizableError from '../../../i18n/LocalizableError';
-
+import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import WarningBox from '../../widgets/WarningBox';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
@@ -108,6 +107,7 @@ type Props = {|
   +currencyUnit: {|
     primaryTicker: string,
   |},
+  +selectedNetwork: $ReadOnly<NetworkRow>,
   +currencyMaxIntegerDigits: number,
   +currencyMaxFractionalDigits: number,
   +hasAnyPending: boolean,
@@ -212,7 +212,10 @@ export default class WalletSendForm extends Component<Props> {
             }
           };
           const isValidLegacy = this.props.isValidLegacyAddress(receiverValue);
-          if (!environment.isJormungandr()) {
+          const isJormungandr = (
+            this.props.selectedNetwork.NetworkId === networks.JormungandrMainnet.NetworkId
+          );
+          if (!isJormungandr) {
             updateReceiver(isValidLegacy);
             return [isValidLegacy, this.context.intl.formatMessage(messages.invalidAddress)];
           }

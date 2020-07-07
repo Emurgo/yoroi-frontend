@@ -18,7 +18,6 @@ import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { Notification } from '../../types/notificationType';
 import type { PlateResponse } from '../../api/ada/lib/cardanoCrypto/plate';
 import CenteredLayout from '../layout/CenteredLayout';
-import environment from '../../environment';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
@@ -170,14 +169,14 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
       {
         label: intl.formatMessage(globalMessages.backButtonLabel),
         onClick: onCancel,
-        disabled: !environment.isJormungandr() && isSubmitting,
+        disabled: isSubmitting,
       },
       {
         label: intl.formatMessage(globalMessages.confirm),
         onClick: onNext,
         primary: true,
         className: classnames(['confirmButton']),
-        isSubmitting: !environment.isJormungandr() && isSubmitting,
+        isSubmitting,
       },
     ];
 

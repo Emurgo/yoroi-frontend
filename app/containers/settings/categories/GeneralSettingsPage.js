@@ -7,7 +7,6 @@ import { handleExternalLinkClick } from '../../../utils/routing';
 import GeneralSettings from '../../../components/settings/categories/general-setting/GeneralSettings';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import ThemeSettingsBlock from '../../../components/settings/categories/general-setting/ThemeSettingsBlock';
-import environment from '../../../environment';
 import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { LanguageType } from '../../../i18n/translations';
@@ -33,16 +32,14 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           currentLocale={profileStore.currentLocale}
           error={profileStore.setProfileLocaleRequest.error}
         />
-        {!environment.isJormungandr() &&
-          <ThemeSettingsBlock
-            currentTheme={currentTheme}
-            selectTheme={this.generated.actions.profile.updateTheme.trigger}
-            getThemeVars={this.generated.stores.profile.getThemeVars}
-            exportTheme={this.generated.actions.profile.exportTheme.trigger}
-            hasCustomTheme={this.generated.stores.profile.hasCustomTheme}
-            onExternalLinkClick={handleExternalLinkClick}
-          />
-        }
+        <ThemeSettingsBlock
+          currentTheme={currentTheme}
+          selectTheme={this.generated.actions.profile.updateTheme.trigger}
+          getThemeVars={this.generated.stores.profile.getThemeVars}
+          exportTheme={this.generated.actions.profile.exportTheme.trigger}
+          hasCustomTheme={this.generated.stores.profile.hasCustomTheme}
+          onExternalLinkClick={handleExternalLinkClick}
+        />
         <AboutYoroiSettingsBlock />
       </>
     );

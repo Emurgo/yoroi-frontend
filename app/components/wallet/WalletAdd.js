@@ -8,7 +8,6 @@ import classnames from 'classnames';
 import CustomTooltip from '../widgets/CustomTooltip';
 import MainCards from './add/MainCards';
 import LogoYoroiIcon from '../../assets/images/yoroi-logo-white.inline.svg';
-import LogoYoroiShelleyTestnetIcon from '../../assets/images/yoroi-logo-shelley-testnet-white.inline.svg';
 import SettingsIcon from '../../assets/images/sidebar/wallet-settings-2-ic.inline.svg';
 import DaedalusIcon from '../../assets/images/top-bar/daedalus-migration.inline.svg';
 import NightlyLogo from '../../assets/images/yoroi-logo-nightly-white.inline.svg';
@@ -54,9 +53,6 @@ export default class WalletAdd extends Component<Props> {
     if (environment.isNightly()) {
       return NightlyLogo;
     }
-    if (environment.isJormungandr()) {
-      return LogoYoroiShelleyTestnetIcon;
-    }
     return LogoYoroiIcon;
   }
 
@@ -69,7 +65,6 @@ export default class WalletAdd extends Component<Props> {
 
     const componentStyle = classnames([
       styles.component,
-      environment.isJormungandr() ? styles.shelleyTestnet : null
     ]);
 
     const LogoIcon = this.getLogo();

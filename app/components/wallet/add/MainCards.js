@@ -11,8 +11,6 @@ import CustomTooltip from '../../widgets/CustomTooltip';
 
 import styles from './MainCards.scss';
 
-import environment from '../../../environment';
-
 const messages = defineMessages({
   connectToHWTitle: {
     id: 'wallet.add.page.hw.title',
@@ -60,27 +58,25 @@ export default class MainCards extends Component<Props> {
     return (
       <div className={styles.heroCardsList}>
         {/* Connect to hardware wallet */}
-        {!environment.isJormungandr() &&
-          <button
-            type="button"
-            className="WalletAdd_btnConnectHW"
-            onClick={onHardwareConnect}
-          >
-            <div className={styles.heroCardsItem}>
-              <div className={classnames([styles.heroCardsItemBg, styles.bgConnectHW])} />
-              <div className={styles.heroCardsItemTitle}>
-                {intl.formatMessage(messages.connectToHWTitle)}
-                <div className={styles.tooltip}>
-                  <CustomTooltip
-                    toolTip={
-                      <div><FormattedHTMLMessage {...messages.connectToHWTooltip} /></div>
-                    }
-                  />
-                </div>
+        <button
+          type="button"
+          className="WalletAdd_btnConnectHW"
+          onClick={onHardwareConnect}
+        >
+          <div className={styles.heroCardsItem}>
+            <div className={classnames([styles.heroCardsItemBg, styles.bgConnectHW])} />
+            <div className={styles.heroCardsItemTitle}>
+              {intl.formatMessage(messages.connectToHWTitle)}
+              <div className={styles.tooltip}>
+                <CustomTooltip
+                  toolTip={
+                    <div><FormattedHTMLMessage {...messages.connectToHWTooltip} /></div>
+                  }
+                />
               </div>
             </div>
-          </button>
-        }
+          </div>
+        </button>
         {/* Create wallet */}
         <button
           type="button"

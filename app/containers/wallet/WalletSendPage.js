@@ -150,6 +150,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     return (
       <>
         <WalletSendForm
+          selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
           currencyUnit={{
             primaryTicker: apiMeta.primaryTicker,
           }}

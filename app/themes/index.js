@@ -1,7 +1,5 @@
 // @flow
 
-import environment from '../environment';
-
 export const THEMES = Object.freeze({
   YOROI_CLASSIC: 'YoroiClassic',
   YOROI_MODERN: 'YoroiModern',
@@ -21,7 +19,10 @@ export function changeToplevelTheme(currentTheme: Theme) {
     bodyClassList.remove(...allThemes);
     bodyClassList.remove('YoroiShelley');
     bodyClassList.add(currentTheme);
-    if (environment.isJormungandr()) {
+
+    // we used this theme for the Shelley version of the Yoroi extension
+    // however, going forward, Yoroi will be a mono-project containing all sub-networks
+    if (false) { // eslint-disable-line no-constant-condition
       bodyClassList.add('YoroiShelley');
     }
   }

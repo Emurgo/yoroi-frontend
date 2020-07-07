@@ -7,6 +7,8 @@ import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import ByronOptionDialog from '../../../components/transfer/cards/ByronOptionDialog';
 import { TransferKind, TransferSource, } from '../../../types/TransferTypes';
 import type { TransferSourceType, TransferKindType, } from '../../../types/TransferTypes';
+import type { ComplexityLevelType } from '../../../types/complexityLevelType';
+import { ComplexityLevels } from '../../../types/complexityLevelType';
 
 export type GeneratedData = typeof ByronEraOptionDialogContainer.prototype.generated;
 
@@ -69,11 +71,19 @@ export default class ByronEraOptionDialogContainer extends Component<Props> {
           onLedger: this.startTransferLedgerFunds,
         }}
         onCancel={this.props.onCancel}
+        complexityLevel={
+          this.generated.stores.profile.selectedComplexityLevel || ComplexityLevels.Simple
+        }
       />
     );
   }
 
   @computed get generated(): {|
+    stores: {|
+      profile: {|
+        selectedComplexityLevel: ?ComplexityLevelType,
+      |},
+    |},
     actions: {|
       ada: {|
         daedalusTransfer: {|
@@ -111,10 +121,15 @@ export default class ByronEraOptionDialogContainer extends Component<Props> {
     if (this.props.stores == null || this.props.actions == null) {
       throw new Error(`${nameof(ByronEraOptionDialogContainer)} no way to generated props`);
     }
-    const { actions } = this.props;
+    const { actions, stores, } = this.props;
     const { daedalusTransfer } = actions.ada;
     const { yoroiTransfer } = actions.ada;
     return Object.freeze({
+      stores: {
+        profile: {
+          selectedComplexityLevel: stores.profile.selectedComplexityLevel,
+        },
+      },
       actions: {
         ada: {
           daedalusTransfer: {

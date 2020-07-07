@@ -18,6 +18,8 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { LanguageType } from '../../i18n/translations';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { isTestnet } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 const messages = defineMessages({
   title: {
@@ -57,16 +59,20 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
   };
 
   renderByron(generated: GeneratedData): Node {
-    const topBartitle = (
+    const topBarTitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
+    const { selected } = this.generated.stores.wallets;
+    const isWalletTestnet = selected == null
+      ? false
+      : isTestnet(selected.getParent().getNetworkInfo());
     const topBar = generated.stores.profile.isClassicTheme ? (
       <TopBar
-        title={topBartitle}
+        title={topBarTitle}
       />) : undefined;
     const displayedBanner = generated.stores
       .serverConnectionStore.checkAdaServerStatus === ServerStatusErrors.Healthy
-      ? <TestnetWarningBanner />
+      ? <TestnetWarningBanner isTestnet={isWalletTestnet} />
       : <ServerErrorBanner errorType={
         generated.stores.serverConnectionStore.checkAdaServerStatus
       }
@@ -79,44 +85,6 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
       >
         <IntroBanner
           isNightly={environment.isNightly()}
-          isJormungandr={environment.isJormungandr()}
-        />
-        <LanguageSelectionForm
-          onSelectLanguage={this.onSelectLanguage}
-          onSubmit={this.onSubmit}
-          isSubmitting={generated.stores.profile.setProfileLocaleRequest.isExecuting}
-          currentLocale={generated.stores.profile.currentLocale}
-          languages={generated.stores.profile.LANGUAGE_OPTIONS}
-          error={generated.stores.profile.setProfileLocaleRequest.error}
-        />
-      </TopBarLayout>
-    );
-  }
-
-  renderShelley(generated: GeneratedData): Node {
-    const topBartitle = (
-      <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
-    );
-    const topBar = generated.stores.profile.isClassicTheme ? (
-      <TopBar
-        title={topBartitle}
-      />) : undefined;
-    const displayedBanner = generated.stores
-      .serverConnectionStore.checkAdaServerStatus === ServerStatusErrors.Healthy
-      ? undefined
-      : <ServerErrorBanner errorType={
-        generated.stores.serverConnectionStore.checkAdaServerStatus
-      }
-      />;
-    return (
-      <TopBarLayout
-        topbar={topBar}
-        languageSelectionBackground
-        banner={displayedBanner}
-      >
-        <IntroBanner
-          isNightly={environment.isNightly()}
-          isJormungandr={environment.isJormungandr()}
         />
         <LanguageSelectionForm
           onSelectLanguage={this.onSelectLanguage}
@@ -131,9 +99,6 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
   }
 
   render(): Node {
-    if (environment.isJormungandr()) {
-      return this.renderShelley(this.generated);
-    }
     return this.renderByron(this.generated);
   }
 
@@ -152,6 +117,7 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
       |}
     |},
     stores: {|
+      wallets: {| selected: null | PublicDeriver<> |},
       profile: {|
         LANGUAGE_OPTIONS: Array<LanguageType>,
         currentLocale: string,
@@ -177,6 +143,9 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
     const profileStore = stores.profile;
     return Object.freeze({
       stores: {
+        wallets: {
+          selected: stores.wallets.selected,
+        },
         profile: {
           LANGUAGE_OPTIONS: profileStore.LANGUAGE_OPTIONS,
           isCurrentLocaleSet: profileStore.isCurrentLocaleSet,

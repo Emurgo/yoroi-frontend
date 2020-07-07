@@ -6,13 +6,13 @@ import { computed } from 'mobx';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 // import ByronDeprecationBanner from './ByronDeprecationBanner';
-import ItnDeprecationBanner from './ItnDeprecationBanner';
 import NotProductionBanner from '../../components/topbar/banners/NotProductionBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
 import environment from '../../environment';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { isTestnet } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export type GeneratedData = typeof BannerContainer.prototype.generated;
 
@@ -21,19 +21,18 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
 
   render(): Node {
     const serverStatus = this.generated.stores.serverConnectionStore.checkAdaServerStatus;
+
+    const { selected } = this.generated.stores.wallets;
+    const isWalletTestnet = selected == null
+      ? false
+      : isTestnet(selected.getParent().getNetworkInfo());
     return (
       <>
         {serverStatus !== ServerStatusErrors.Healthy && (
           <ServerErrorBanner errorType={serverStatus} />
         )}
-        <TestnetWarningBanner />
+        <TestnetWarningBanner isTestnet={isWalletTestnet} />
         {!environment.isProduction() && <NotProductionBanner />}
-        {/* <ByronDeprecationBanner /> */}
-        {
-          environment.isJormungandr() &&
-          this.generated.stores.wallets.selected != null &&
-          <ItnDeprecationBanner />
-        }
       </>
     );
   }
@@ -41,9 +40,9 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
   @computed get generated(): {|
     stores: {|
       serverConnectionStore: {|
-        checkAdaServerStatus: ServerStatusErrorType
+        checkAdaServerStatus: ServerStatusErrorType,
       |},
-      wallets: {| selected: null | PublicDeriver<> |}
+      wallets: {| selected: null | PublicDeriver<> |},
     |},
     actions: {||},
     |} {

@@ -20,7 +20,6 @@ import {
   getAddressesKeys,
   buildDaedalusTransferTx,
 } from '../../api/ada/transactions/transfer/legacyDaedalus';
-import environment from '../../environment';
 import type { SendFunc } from '../../api/ada/lib/state-fetch/types';
 import {
   getCryptoDaedalusWalletFromMnemonics,
@@ -31,6 +30,7 @@ import {
   asHasUtxoChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 declare var CONFIG: ConfigType;
 const websocketUrl = CONFIG.network.websocketUrl;
@@ -128,12 +128,15 @@ export default class DaedalusTransferStore extends Store {
           const addressKeys = getAddressesKeys({ checker, fullUtxo: data.addresses });
           this._updateStatus(TransferStatus.GENERATING_TX);
 
+          const { selectedNetwork } = this.stores.profile;
+          if (selectedNetwork == null) throw new Error(`${nameof(this._setupTransferWebSocket)} no network selected`);
+
           const transferTx = await buildDaedalusTransferTx({
             addressKeys,
             outputAddr: nextInternalAddress,
             getUTXOsForAddresses:
               this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
-            legacy: !environment.isJormungandr()
+            legacy: selectedNetwork.NetworkId !== networks.JormungandrMainnet.NetworkId
           });
           runInAction(() => {
             this.transferTx = transferTx;

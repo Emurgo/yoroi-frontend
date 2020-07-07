@@ -21,6 +21,9 @@ export const Generic = (): Node => (
   <TermsOfUsePage
     generated={{
       stores: {
+        wallets: {
+          selected: null,
+        },
         profile: {
           setTermsOfUseAcceptanceRequest: {
             isExecuting: boolean('isExecuting', false),

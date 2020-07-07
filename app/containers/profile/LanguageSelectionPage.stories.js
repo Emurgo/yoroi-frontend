@@ -22,6 +22,9 @@ export const Generic = (): Node => (
   <LanguageSelectionPage
     generated={{
       stores: {
+        wallets: {
+          selected: null,
+        },
         profile: {
           LANGUAGE_OPTIONS: LANGUAGES,
           isCurrentLocaleSet: false,
@@ -57,6 +60,9 @@ export const NonTier1 = (): Node => (
   <LanguageSelectionPage
     generated={{
       stores: {
+        wallets: {
+          selected: null,
+        },
         profile: {
           LANGUAGE_OPTIONS: LANGUAGES,
           isCurrentLocaleSet: false,
@@ -91,6 +97,9 @@ export const IsExecuting = (): Node => (
   <LanguageSelectionPage
     generated={{
       stores: {
+        wallets: {
+          selected: null,
+        },
         profile: {
           LANGUAGE_OPTIONS: LANGUAGES,
           isCurrentLocaleSet: false,
@@ -124,6 +133,9 @@ export const ServerError = (): Node => (
   <LanguageSelectionPage
     generated={{
       stores: {
+        wallets: {
+          selected: null,
+        },
         profile: {
           LANGUAGE_OPTIONS: LANGUAGES,
           isCurrentLocaleSet: false,

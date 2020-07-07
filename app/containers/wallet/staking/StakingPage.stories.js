@@ -369,7 +369,7 @@ export const Transaction = (): Node => {
         }],
         createDelegationTx: {
           result: {
-            unsignedTx: genUndelegateTx(),
+            unsignedTx: genUndelegateTx(wallet.publicDeriver),
             totalAmountToDelegate: new BigNumber(1000000),
           },
           error: undefined,
@@ -410,7 +410,7 @@ export const DelegationSuccess = (): Node => {
         selectedPools: [],
         createDelegationTx: {
           result: {
-            unsignedTx: genUndelegateTx(),
+            unsignedTx: genUndelegateTx(wallet.publicDeriver),
             totalAmountToDelegate: new BigNumber(100),
           },
           error: undefined,

@@ -8,7 +8,6 @@ import { boolean, select } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import WalletSendPage from './WalletSendPage';
 import { THEMES } from '../../themes';
-import environment from '../../environment';
 import { withScreenshot } from 'storycap';
 import {
   globalKnobs,
@@ -31,6 +30,7 @@ import { buildRoute } from '../../utils/routing';
 import { InvalidWitnessError } from '../../api/ada/errors';
 import WalletSendConfirmationDialog from '../../components/wallet/send/WalletSendConfirmationDialog';
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
+import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -249,7 +249,7 @@ export const RegularConfirmationDialog = (): Node => {
   const wallet = genSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
 
-  const { tentativeTx, inputAmount, fee } = genTentativeTx();
+  const { tentativeTx, inputAmount, fee } = genTentativeTx(wallet.publicDeriver);
   const errorCases = Object.freeze({
     None: undefined,
     InvalidWitness: new InvalidWitnessError(),
@@ -298,11 +298,15 @@ export const LedgerConfirmationDialog = (): Node => {
   }));
   const lookup = walletLookup([wallet]);
 
-  const { tentativeTx, inputAmount, fee } = genTentativeTx();
+  const { tentativeTx, inputAmount, fee } = genTentativeTx(wallet.publicDeriver);
   const getErrorValue = () => select(
     'errorCases',
     ledgerErrorCases,
     ledgerErrorCases.None
+  );
+  const network = wallet.publicDeriver.getParent().getNetworkInfo();
+  const isJormungandr = (
+    network.NetworkId === networks.JormungandrMainnet.NetworkId
   );
   return wrapWallet(
     mockWalletProps({
@@ -310,7 +314,7 @@ export const LedgerConfirmationDialog = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
-    !environment.isJormungandr() && (<WalletSendPage
+    !isJormungandr && (<WalletSendPage
       generated={genBaseProps({
         wallet,
         hwSend: {
@@ -349,11 +353,15 @@ export const TrezorConfirmationDialog = (): Node => {
   }));
   const lookup = walletLookup([wallet]);
 
-  const { tentativeTx, inputAmount, fee } = genTentativeTx();
+  const { tentativeTx, inputAmount, fee } = genTentativeTx(wallet.publicDeriver);
   const getErrorValue = () => select(
     'errorCases',
     trezorErrorCases,
     trezorErrorCases.None
+  );
+  const network = wallet.publicDeriver.getParent().getNetworkInfo();
+  const isJormungandr = (
+    network.NetworkId === networks.JormungandrMainnet.NetworkId
   );
   return wrapWallet(
     mockWalletProps({
@@ -361,7 +369,7 @@ export const TrezorConfirmationDialog = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
-    !environment.isJormungandr() && (<WalletSendPage
+    !isJormungandr && (<WalletSendPage
       generated={genBaseProps({
         wallet,
         hwSend: {

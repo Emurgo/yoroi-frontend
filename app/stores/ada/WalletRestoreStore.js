@@ -4,14 +4,7 @@ import { action, runInAction, } from 'mobx';
 import Store from '../base/Store';
 
 import environment from '../../environment';
-import type {
-  WalletRestoreMeta,
-} from '../../actions/common/wallet-restore-actions';
 import { RestoreMode } from '../../actions/common/wallet-restore-actions';
-import {
-  unscramblePaperAdaMnemonic,
-} from '../../api/ada/lib/cardanoCrypto/paperWallet';
-import config from '../../config';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { TransferSource } from '../../types/TransferTypes';
 import {
@@ -26,7 +19,6 @@ import {
 } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import {
   RestoreSteps,
-  generatePlates,
 } from '../toplevel/WalletRestoreStore';
 import {
   buildCheckAndCall,
@@ -113,47 +105,6 @@ export default class WalletRestoreStore extends Store {
     });
   }
 
-  @action
-  _processRestoreMeta: (WalletRestoreMeta) => void = (restoreMeta) => {
-    this.stores.walletRestore.walletRestoreMeta = restoreMeta;
-    this.stores.walletRestore.step = RestoreSteps.VERIFY_MNEMONIC;
-
-    const wordCount = this.stores.walletRestore.mode === RestoreMode.PAPER
-      ? config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT
-      : config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT;
-
-    let resolvedRecoveryPhrase = restoreMeta.recoveryPhrase;
-
-    if (this.stores.walletRestore.mode === RestoreMode.UNSET) {
-      throw new Error(
-        `${nameof(this._processRestoreMeta)} ${nameof(this.stores.walletRestore.mode)} unset`
-      );
-    }
-    if (this.stores.walletRestore.mode === RestoreMode.PAPER) {
-      const [newPhrase] = unscramblePaperAdaMnemonic(
-        restoreMeta.recoveryPhrase,
-        wordCount,
-        restoreMeta.paperPassword
-      );
-      if (newPhrase == null) {
-        throw new Error(`
-          ${nameof(this._processRestoreMeta)} Failed to restore a paper wallet! Invalid recovery phrase!
-        `);
-      }
-      resolvedRecoveryPhrase = newPhrase;
-    }
-    const rootPk = generateWalletRootKey(resolvedRecoveryPhrase);
-    const { byronPlate, shelleyPlate } = generatePlates(rootPk, this.stores.walletRestore.mode);
-
-    runInAction(() => {
-      this.stores.walletRestore.recoveryResult = {
-        phrase: resolvedRecoveryPhrase,
-        byronPlate,
-        shelleyPlate,
-      };
-    });
-  }
-
   _restoreToDb: void => Promise<void> = async () => {
     if (
       this.stores.walletRestore.recoveryResult == null ||
@@ -169,10 +120,12 @@ export default class WalletRestoreStore extends Store {
     if (persistentDb == null) {
       throw new Error(`${nameof(this._restoreToDb)} db not loaded. Should never happen`);
     }
+    const { selectedNetwork } = this.stores.profile;
+    if (selectedNetwork == null) throw new Error(`${nameof(this._restoreToDb)} no network selected`);
     await this.stores.wallets.restoreRequest.execute(async () => {
       const wallet = await this.api.ada.restoreWallet({
         db: persistentDb,
-        ...{ recoveryPhrase: phrase, walletName, walletPassword },
+        ...{ recoveryPhrase: phrase, walletName, walletPassword, network: selectedNetwork },
       });
       return wallet;
     }).promise;

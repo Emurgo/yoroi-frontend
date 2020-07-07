@@ -209,10 +209,9 @@ export default class WalletReceive extends Component<Props> {
           <h2>{intl.formatMessage(messages.generatedAddressesSectionTitle)}</h2>
           {labelBlock.header}
           {valueBlock.header}
-          {
-            !environment.isJormungandr() && onGeneratePaymentURI != null &&
-              <h2>{intl.formatMessage(messages.generateURLLabel)}</h2>
-          }
+          {onGeneratePaymentURI != null && (
+            <h2>{intl.formatMessage(messages.generateURLLabel)}</h2>
+          )}
           <h2>{intl.formatMessage(messages.verifyAddressLabel)}</h2>
         </div>
 
@@ -260,7 +259,7 @@ export default class WalletReceive extends Component<Props> {
               {valueBlock.body(address)}
               {/* Generate payment URL for Address action */}
               {/* disable URI for Shelley testnet */}
-              {!environment.isJormungandr() && onGeneratePaymentURI != null && (
+              {onGeneratePaymentURI != null && (
                 <div className={classnames([
                   styles.addressActionItemBlock,
                   styles.generateURLActionBlock])}

@@ -7,7 +7,7 @@ import WalletRestoreOptionDialog from '../../../components/wallet/add/option-dia
 type Props = {|
   +onClose: void => void,
   +onRestore: void => void,
-  +onPaperRestore: void => void,
+  +onPaperRestore: void | (void => void),
 |};
 
 @observer
