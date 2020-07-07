@@ -156,7 +156,7 @@ export class GroupExternalAddressesSubgroup extends AddressTypeStore implements 
         genAddresses: () => data.stores.addresses._wrapForChainAddresses({
           ...request,
           storeName: data.name,
-          type: CoreAddressTypes.SHELLEY_GROUP,
+          type: CoreAddressTypes.JORMUNGANDR_GROUP,
           chainsRequest: { chainId: ChainDerivations.EXTERNAL },
         }),
       }),
@@ -172,7 +172,7 @@ export class GroupInternalAddressesSubgroup extends AddressTypeStore implements 
       request: (request) => data.stores.addresses._wrapForChainAddresses({
         ...request,
         storeName: data.name,
-        type: CoreAddressTypes.SHELLEY_GROUP,
+        type: CoreAddressTypes.JORMUNGANDR_GROUP,
         chainsRequest: { chainId: ChainDerivations.INTERNAL },
       }),
     });
@@ -186,7 +186,7 @@ export class GroupMangledAddressesSubgroup extends AddressTypeStore implements I
       actions: data.actions,
       request: (request) => data.stores.addresses._wrapForAllAddresses({
         ...request,
-        type: CoreAddressTypes.SHELLEY_GROUP,
+        type: CoreAddressTypes.JORMUNGANDR_GROUP,
         storeName: data.name,
       }),
     });

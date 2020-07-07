@@ -14,7 +14,7 @@ import UserSummary from '../../../components/wallet/staking/dashboard/UserSummar
 import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
 import UndelegateDialog from '../../../components/wallet/staking/dashboard/UndelegateDialog';
 import Dialog from '../../../components/widgets/Dialog';
-import { getShelleyTxFee } from '../../../api/ada/transactions/shelley/utils';
+import { getJormungandrTxFee } from '../../../api/ada/transactions/jormungandr/utils';
 import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
 import InvalidURIImg from '../../../assets/images/uri/invalid-uri.inline.svg';
@@ -271,7 +271,7 @@ export default class StakingDashboardPage extends Component<Props> {
           .isExecuting
       }
       isSubmitting={delegationTxStore.signAndBroadcastDelegationTx.isExecuting}
-      transactionFee={getShelleyTxFee(delegationTx.unsignedTx.IOs, true)}
+      transactionFee={getJormungandrTxFee(delegationTx.unsignedTx.IOs, true)}
       staleTx={delegationTxStore.isStale}
       decimalPlaces={apiMeta.decimalPlaces.toNumber()}
     />);

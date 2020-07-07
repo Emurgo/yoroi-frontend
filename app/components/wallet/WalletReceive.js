@@ -258,7 +258,6 @@ export default class WalletReceive extends Component<Props> {
               {/* Address balance block start */}
               {valueBlock.body(address)}
               {/* Generate payment URL for Address action */}
-              {/* disable URI for Shelley testnet */}
               {onGeneratePaymentURI != null && (
                 <div className={classnames([
                   styles.addressActionItemBlock,

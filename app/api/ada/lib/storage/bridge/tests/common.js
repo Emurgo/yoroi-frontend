@@ -15,7 +15,7 @@ import {
 } from '../walletBuilder/byron';
 import {
   createStandardCip1852Wallet
-} from '../walletBuilder/shelley';
+} from '../walletBuilder/jormungandr';
 import {
   HARD_DERIVATION_START,
   WalletTypePurpose,

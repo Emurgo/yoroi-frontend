@@ -975,7 +975,7 @@ async function rawUpdateTransactions(
         ...utxoAddresses
           // Note: don't send group keys
           // Okay to filter them because the payment key is duplicated inside the single addresses
-          .filter(address => address.Type !== CoreAddressTypes.SHELLEY_GROUP)
+          .filter(address => address.Type !== CoreAddressTypes.JORMUNGANDR_GROUP)
           .map(address => address.Hash),
         ...accountingAddresses.map(address => address.Hash),
       ],
@@ -1314,8 +1314,8 @@ async function networkTxToDbTx(
           // since the payment (UTXO) key is the one that signs
           if (
             txType === CoreAddressTypes.CARDANO_LEGACY ||
-            txType === CoreAddressTypes.SHELLEY_SINGLE ||
-            txType === CoreAddressTypes.SHELLEY_GROUP
+            txType === CoreAddressTypes.JORMUNGANDR_SINGLE ||
+            txType === CoreAddressTypes.JORMUNGANDR_GROUP
           ) {
             utxoOutputs.push({
               TransactionId: txRowId,
@@ -1330,7 +1330,7 @@ async function networkTxToDbTx(
               IsUnspent: true,
             });
           } else if (
-            txType === CoreAddressTypes.SHELLEY_ACCOUNT
+            txType === CoreAddressTypes.JORMUNGANDR_ACCOUNT
           ) {
             accountingOutputs.push({
               TransactionId: txRowId,

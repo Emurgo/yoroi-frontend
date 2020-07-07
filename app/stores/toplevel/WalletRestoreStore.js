@@ -48,7 +48,7 @@ export default class WalletRestoreStore extends Store {
   @observable recoveryResult: void | {|
     phrase: string,
     byronPlate: void | PlateResponse,
-    shelleyPlate: void | PlateResponse,
+    jormungandrPlate: void | PlateResponse,
   |};
 
   setup(): void {
@@ -105,7 +105,7 @@ export default class WalletRestoreStore extends Store {
     const rootPk = generateWalletRootKey(resolvedRecoveryPhrase);
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null) throw new Error(`${nameof(this._processRestoreMeta)} no network selected`);
-    const { byronPlate, shelleyPlate } = generatePlates(
+    const { byronPlate, jormungandrPlate } = generatePlates(
       rootPk,
       this.mode,
       selectedNetwork
@@ -115,7 +115,7 @@ export default class WalletRestoreStore extends Store {
       this.recoveryResult = {
         phrase: resolvedRecoveryPhrase,
         byronPlate,
-        shelleyPlate,
+        jormungandrPlate,
       };
     });
   }
@@ -163,7 +163,7 @@ export function generatePlates(
   network: $ReadOnly<NetworkRow>,
 ): {|
   byronPlate: PlateResponse,
-  shelleyPlate: void | PlateResponse,
+  jormungandrPlate: void | PlateResponse,
 |} {
   const byronPlate = generateStandardPlate(
     rootPk,
@@ -178,7 +178,7 @@ export function generatePlates(
   // this is because we've temporarily disabled paper wallet creation for Shelley
   // so no point in showing the Shelley checksum
   const isJormungandr = network.NetworkId === networks.JormungandrMainnet.NetworkId;
-  const shelleyPlate = !isJormungandr || mode === RestoreMode.PAPER
+  const jormungandrPlate = !isJormungandr || mode === RestoreMode.PAPER
     ? undefined
     : generateStandardPlate(
       rootPk,
@@ -192,6 +192,6 @@ export function generatePlates(
 
   return {
     byronPlate,
-    shelleyPlate,
+    jormungandrPlate,
   };
 }

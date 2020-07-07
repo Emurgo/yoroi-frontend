@@ -20,7 +20,7 @@ declare var CONFIG: ConfigType;
  * Note: we purpose hardcode this in the Bip44 case
  * because for Cardano we want to use the legacy Cardano protocol magic
  * to be able to generate the right legacy addresses
- * instead of the actual protocol magic the network is using (which is a block hash for Shelley
+ * instead of the actual protocol magic the network is using (which is a block hash for Jormungandr)
  */
 const protocolMagic = CONFIG.network.protocolMagic;
 

@@ -38,10 +38,10 @@ import {
   byronTxEqual,
 } from './byron/utils';
 import {
-  getShelleyTxFee,
-  getShelleyTxReceivers,
-  shelleyTxEqual,
-} from './shelley/utils';
+  getJormungandrTxFee,
+  getJormungandrTxReceivers,
+  jormungandrTxEqual,
+} from './jormungandr/utils';
 import { getAdaCurrencyMeta } from '../currencyInfo';
 
 export function getFromUserPerspective(data: {|
@@ -265,7 +265,7 @@ export function IGetFee(
     );
   }
   if (unsignedTx instanceof RustModule.WalletV3.InputOutput) {
-    return getShelleyTxFee(unsignedTx, shift);
+    return getJormungandrTxFee(unsignedTx, shift);
   }
   throw new Error('IGetFee Unimplemented');
 }
@@ -299,7 +299,7 @@ export function IReceivers(
     );
   }
   if (unsignedTx instanceof RustModule.WalletV3.InputOutput) {
-    return getShelleyTxReceivers(
+    return getJormungandrTxReceivers(
       {
         ...signRequest,
         unsignedTx,
@@ -359,7 +359,7 @@ export function ITxEqual(
     unsignedTx1 instanceof RustModule.WalletV3.InputOutput &&
     unsignedTx2 instanceof RustModule.WalletV3.InputOutput
   ) {
-    return shelleyTxEqual(unsignedTx1, unsignedTx2);
+    return jormungandrTxEqual(unsignedTx1, unsignedTx2);
   }
   return false;
 }

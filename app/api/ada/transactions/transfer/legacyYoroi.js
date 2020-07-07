@@ -10,7 +10,7 @@ import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import type {
   Address, Addressing
 } from '../../lib/storage/models/PublicDeriver/interfaces';
-import { buildYoroiTransferTx as shelleyFormatYoroiTx } from '../shelley/yoroiTransfer';
+import { buildYoroiTransferTx as jormungandrFormatYoroiTx } from '../jormungandr/yoroiTransfer';
 import { buildYoroiTransferTx as legacyFormatYoroiTx } from '../byron/yoroiTransfer';
 import { toSenderUtxos } from './utils';
 
@@ -33,7 +33,7 @@ export async function generateLegacyYoroiTransferTx(payload: {|
   };
   return legacy
     ? legacyFormatYoroiTx(txRequest)
-    : shelleyFormatYoroiTx({
+    : jormungandrFormatYoroiTx({
       ...txRequest,
       useLegacyWitness: true,
     });

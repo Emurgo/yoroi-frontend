@@ -30,8 +30,8 @@ export type TransferTx = {|
 
 export const TransferSource = Object.freeze({
   BYRON: 0,
-  SHELLEY_UTXO: 1,
-  SHELLEY_CHIMERIC_ACCOUNT: 2,
+  JORMUNGANDR_UTXO: 1,
+  JORMUNGANDR_CHIMERIC_ACCOUNT: 2,
 });
 export type TransferSourceType = $Values<typeof TransferSource>;
 

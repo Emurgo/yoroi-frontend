@@ -18,7 +18,7 @@ import type {
 } from '../../../../types/TransferTypes';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import type { AddressKeyMap } from '../types';
-import { buildDaedalusTransferTx as shelleyFormatDaedalusTx } from '../shelley/daedalusTransfer';
+import { buildDaedalusTransferTx as jormungandrFormatDaedalusTx } from '../jormungandr/daedalusTransfer';
 import { buildDaedalusTransferTx as legacyFormatDaedalusTx } from '../byron/daedalusTransfer';
 
 /**
@@ -85,5 +85,5 @@ export async function buildDaedalusTransferTx(payload: {|
   };
   return payload.legacy
     ? legacyFormatDaedalusTx(txRequest)
-    : shelleyFormatDaedalusTx(txRequest);
+    : jormungandrFormatDaedalusTx(txRequest);
 }

@@ -35,7 +35,6 @@ const wasmv4 = require('@emurgo/cardano-serialization-lib-browser/cardano_serial
 RustModule._wasmv2 = wasmv2;
 // $FlowExpectedError[incompatible-type] nodejs & browser API have same interface so it's okay
 RustModule._wasmv3 = wasmv3;
-// $FlowExpectedError[incompatible-type] nodejs & browser API have same interface so it's okay
 RustModule._wasmv4 = wasmv4;
 
 const { getMockServer } = require('../features/mock-chain/mockServer');

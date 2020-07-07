@@ -3,7 +3,7 @@
 // Create byron transactions for wallets created with the v1 address scheme
 
 import BigNumber from 'bignumber.js';
-import { getShelleyTxFee, } from './utils';
+import { getJormungandrTxFee, } from './utils';
 import {
   Logger,
   stringifyError,
@@ -56,7 +56,7 @@ export async function buildDaedalusTransferTx(payload: {|
       outputAddr,
       senderUtxos
     );
-    const fee = getShelleyTxFee(utxoResponse.IOs, false);
+    const fee = getJormungandrTxFee(utxoResponse.IOs, false);
 
     // sign
     const signedTx = signDaedalusTransaction(

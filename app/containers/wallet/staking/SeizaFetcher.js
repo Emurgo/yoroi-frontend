@@ -8,7 +8,7 @@ import { observer } from 'mobx-react';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import { intlShape, } from 'react-intl';
 import DelegationTxDialog from '../../../components/wallet/staking/DelegationTxDialog';
-import { getShelleyTxFee } from '../../../api/ada/transactions/shelley/utils';
+import { getJormungandrTxFee } from '../../../api/ada/transactions/jormungandr/utils';
 import AnnotatedLoader from '../../../components/transfer/AnnotatedLoader';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
 import Dialog from '../../../components/widgets/Dialog';
@@ -200,7 +200,7 @@ export default class SeizaFetcher extends Component<Props> {
           staleTx={delegationTxStore.isStale}
           poolName={delegationTxStore.selectedPools[0].name}
           poolHash={delegationTxStore.selectedPools[0].poolHash}
-          transactionFee={getShelleyTxFee(delegationTx.unsignedTx.IOs, true)}
+          transactionFee={getJormungandrTxFee(delegationTx.unsignedTx.IOs, true)}
           amountToDelegate={delegationTx.totalAmountToDelegate}
           approximateReward={approximateReward(delegationTx.totalAmountToDelegate)}
           isSubmitting={

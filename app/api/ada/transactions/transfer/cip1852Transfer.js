@@ -10,7 +10,7 @@ import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import type {
   Address, Addressing
 } from '../../lib/storage/models/PublicDeriver/interfaces';
-import { buildYoroiTransferTx as shelleyFormatYoroiTx } from '../shelley/yoroiTransfer';
+import { buildYoroiTransferTx as jormungandrFormatYoroiTx } from '../jormungandr/yoroiTransfer';
 import { toSenderUtxos } from './utils';
 
 export async function generateCip1852TransferTx(payload: {|
@@ -28,7 +28,7 @@ export async function generateCip1852TransferTx(payload: {|
     signingKey: payload.signingKey,
     senderUtxos,
   };
-  return shelleyFormatYoroiTx({
+  return jormungandrFormatYoroiTx({
     ...txRequest,
     useLegacyWitness: false,
   });

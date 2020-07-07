@@ -49,7 +49,7 @@ export function genSingleAddressBatchFunc(
   };
 }
 
-export async function addShelleyChimericAccountAddress(
+export async function addJormungandrChimericAccountAddress(
   addByHash: AddByHashFunc,
   insertRequest: InsertRequest,
   stakingKey: RustModule.WalletV3.PublicKey,
@@ -64,7 +64,7 @@ export async function addShelleyChimericAccountAddress(
   await addByHash({
     ...insertRequest,
     address: {
-      type: CoreAddressTypes.SHELLEY_ACCOUNT,
+      type: CoreAddressTypes.JORMUNGANDR_ACCOUNT,
       data: Buffer.from(accountAddr.as_bytes()).toString('hex'),
     },
   });
@@ -74,7 +74,7 @@ export async function addShelleyChimericAccountAddress(
   };
 }
 
-export async function addShelleyUtxoAddress(
+export async function addJormungandrUtxoAddress(
   addByHash: AddByHashFunc,
   insertRequest: InsertRequest,
   stakingKey: RustModule.WalletV3.PublicKey,
@@ -85,13 +85,13 @@ export async function addShelleyUtxoAddress(
   const paymentAddr = RustModule.WalletV3.Address.from_bytes(Buffer.from(singleAddress, 'hex'));
   const singleAddr = paymentAddr.to_single_address();
   if (singleAddr == null) {
-    throw new Error('addShelleyUtxoAddress address is not a single address');
+    throw new Error(`${nameof(addJormungandrUtxoAddress)} address is not a single address`);
   }
   const paymentKey = singleAddr.get_spending_key();
   await addByHash({
     ...insertRequest,
     address: {
-      type: CoreAddressTypes.SHELLEY_SINGLE,
+      type: CoreAddressTypes.JORMUNGANDR_SINGLE,
       data: singleAddress,
     },
   });
@@ -103,7 +103,7 @@ export async function addShelleyUtxoAddress(
   await addByHash({
     ...insertRequest,
     address: {
-      type: CoreAddressTypes.SHELLEY_GROUP,
+      type: CoreAddressTypes.JORMUNGANDR_GROUP,
       data: Buffer.from(groupAddr.as_bytes()).toString('hex'),
     },
   });
@@ -132,7 +132,7 @@ export async function scanChain(request: {|
       return {
         index: i + request.lastUsedIndex + 1,
         insert: async insertRequest => {
-          return await addShelleyUtxoAddress(
+          return await addJormungandrUtxoAddress(
             request.addByHash,
             insertRequest,
             request.stakingKey,
@@ -202,7 +202,7 @@ export async function scanAccount(request: {|
   const accountAddress = [0].map(i => ({
     index: i,
     insert: async insertRequest => {
-      return await addShelleyChimericAccountAddress(
+      return await addJormungandrChimericAccountAddress(
         request.addByHash,
         insertRequest,
         request.stakingKey,

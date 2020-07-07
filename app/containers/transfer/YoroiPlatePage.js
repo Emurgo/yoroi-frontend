@@ -29,7 +29,7 @@ type Props = {|
 |};
 type WalletRestoreDialogContainerState = {|
   byronPlate: void | PlateResponse,
-  shelleyPlate: void | PlateResponse,
+  jormungandrPlate: void | PlateResponse,
 |}
 
 @observer
@@ -41,7 +41,7 @@ export default class YoroiPlatePage extends Component<Props> {
     const rootPk = yoroiTransfer.transferKind === TransferKind.LEDGER
       ? generateLedgerWalletRootKey(yoroiTransfer.recoveryPhrase)
       : generateWalletRootKey(yoroiTransfer.recoveryPhrase);
-    const { byronPlate, shelleyPlate } = generatePlates(
+    const { byronPlate, jormungandrPlate } = generatePlates(
       rootPk,
       yoroiTransfer.transferKind === TransferKind.PAPER
         ? RestoreMode.PAPER
@@ -51,7 +51,7 @@ export default class YoroiPlatePage extends Component<Props> {
     runInAction(() => {
       this.plates = {
         byronPlate,
-        shelleyPlate,
+        jormungandrPlate,
       };
     });
   }
@@ -77,11 +77,11 @@ export default class YoroiPlatePage extends Component<Props> {
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
       message: globalMessages.copyTooltipMessage,
     };
-    const { byronPlate, shelleyPlate } = this.plates;
+    const { byronPlate, jormungandrPlate } = this.plates;
     return (
       <WalletRestoreVerifyDialog
         byronPlate={byronPlate}
-        shelleyPlate={shelleyPlate}
+        jormungandrPlate={jormungandrPlate}
         selectedExplorer={this.generated.stores.explorers.selectedExplorer
           .get(this.getSelectedNetwork().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
         }

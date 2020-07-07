@@ -102,7 +102,7 @@ import { ModifyKey, ModifyAddress, } from '../../database/primitives/api/write';
 import { v2genAddressBatchFunc, } from '../../../../restoration/byron/scan';
 import { ergoGenAddressBatchFunc, } from '../../../../../ergo/lib/restoration/scan';
 import { scanBip44Account, } from '../../../../../common/lib/restoration/bip44';
-import { scanCip1852Account } from '../../../../restoration/shelley/scan';
+import { scanCip1852Account } from '../../../../restoration/jormungandr/scan';
 
 import {
   UnusedAddressesError,
@@ -446,7 +446,7 @@ const GetAllAccountingMixin = (
     const allAccounts = await this.rawGetAllAccountingAddresses(tx, deps, body, derivationTables);
     const stakingKeyAccount = allAccounts[0];
     const stakingAddr = stakingKeyAccount.addrs.find(
-      addr => addr.Type === CoreAddressTypes.SHELLEY_ACCOUNT
+      addr => addr.Type === CoreAddressTypes.JORMUNGANDR_ACCOUNT
     );
     if (stakingAddr == null) {
       throw new StaleStateError('rawGetStakingKey no account found at account derivation');
@@ -917,7 +917,7 @@ const Cip1852PickInternalMixin = (
     }
     const stakingKey = Buffer.from(stakingAddr.get_account_key().as_bytes()).toString('hex');
     const ourGroupAddress = body.addrs
-      .filter(addr => addr.Type === CoreAddressTypes.SHELLEY_GROUP)
+      .filter(addr => addr.Type === CoreAddressTypes.JORMUNGANDR_GROUP)
       .filter(addr => addr.Hash.includes(stakingKey));
     if (ourGroupAddress.length !== 1) throw new Error('pickInternal no group address found');
     return {

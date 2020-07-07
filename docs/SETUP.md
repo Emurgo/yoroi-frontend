@@ -30,7 +30,7 @@ npm run keygen
 mv key.pem pem_name_here.pem
 ```
 
-Notably, I recommend running this for `production-key`, `shelley-production.pem` and `nightly-key.pem` (but you can look at the `npm` command to see the expected pem name for a build type)
+Notably, I recommend running this for `production-key.pem` and `nightly-key.pem` (but you can look at the `npm` command to see the expected pem name for a build type)
 
 ### Firefox
 

@@ -35,15 +35,25 @@ export function addressToKind(
       : RustModule.WalletV3.Address.from_string(address);
 
     switch (wasmAddr.get_kind()) {
-      case RustModule.WalletV3.AddressKind.Single: return CoreAddressTypes.SHELLEY_SINGLE;
-      case RustModule.WalletV3.AddressKind.Group: return CoreAddressTypes.SHELLEY_GROUP;
-      case RustModule.WalletV3.AddressKind.Account: return CoreAddressTypes.SHELLEY_ACCOUNT;
-      case RustModule.WalletV3.AddressKind.Multisig: return CoreAddressTypes.SHELLEY_MULTISIG;
+      case RustModule.WalletV3.AddressKind.Single: return CoreAddressTypes.JORMUNGANDR_SINGLE;
+      case RustModule.WalletV3.AddressKind.Group: return CoreAddressTypes.JORMUNGANDR_GROUP;
+      case RustModule.WalletV3.AddressKind.Account: return CoreAddressTypes.JORMUNGANDR_ACCOUNT;
+      case RustModule.WalletV3.AddressKind.Multisig: return CoreAddressTypes.JORMUNGANDR_MULTISIG;
       default: throw new Error(`${nameof(addressToKind)} unknown address type ` + address);
     }
   } catch (e1) {
     throw new Error(`${nameof(addressToKind)} failed to parse address type ${e1} ${address}`);
   }
+}
+
+export function isJormungandrAddress(
+  kind: CoreAddressT
+): boolean {
+  if (kind === CoreAddressTypes.JORMUNGANDR_SINGLE) return true;
+  if (kind === CoreAddressTypes.JORMUNGANDR_GROUP) return true;
+  if (kind === CoreAddressTypes.JORMUNGANDR_ACCOUNT) return true;
+  if (kind === CoreAddressTypes.JORMUNGANDR_MULTISIG) return true;
+  return false;
 }
 
 export function groupToSingle(
