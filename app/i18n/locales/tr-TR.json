@@ -276,7 +276,7 @@
   "sidebar.wallets": "Cüzdanlarım",
   "testnet.label.message": "UYARI: Bu bir {network} ağıdır. ADA'nın burada parasal bir değeri yoktur. Daha fazla bilgi için {faqLink} adresindeki FAQ bölümüne göz atın",
   "testnet.shelley.label.message": "YOU ARE ON TESTNET NETWORK ({network}).",
-  "transfer.form.instructions.step1.text": "It will take about 1 minute to restore your balance. In the next step, you will be presented with a transaction that will move all of your funds. Please review the details of the transaction carefully. You will need to pay a standard transaction fee on the Cardano network to make the transaction.",
+  "transfer.form.instructions.step1.text": "Bakiyenizi geri yüklemek yaklaşık 1 dakika sürecektir. Bir sonraki adımda, tüm paranızı taşıyacak bir işlem sunulacak. Lütfen işlemin ayrıntılarını dikkatlice gözden geçirin. İşlemi yapmak için Cardano ağında standart bir işlem ücreti ödemeniz gerekecektir.",
   "transfer.form.masterkey.input.hint": "Ana anahtarı giriniz",
   "transfer.form.masterkey.input.label": "Ana anahtar",
   "transfer.form.masterkey.requirement": "Note: master keys are 192 characters and hexadecimal-encoded",
