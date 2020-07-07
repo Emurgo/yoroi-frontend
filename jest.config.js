@@ -5,6 +5,7 @@ module.exports = {
     // mock out the browser version of WASM bindings with the nodejs bindings
     'cardano-wallet-browser': 'cardano-wallet',
     '@emurgo/js-chain-libs': '@emurgo/js-chain-libs-node',
+    '@emurgo/cardano-serialization-lib-browser': '@emurgo/cardano-serialization-lib-nodejs',
     '\\.png$': 'lodash/noop.js',
   },
   transformIgnorePatterns: [
