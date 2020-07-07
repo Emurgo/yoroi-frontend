@@ -1,6 +1,6 @@
-## 12. Delegation and Staking
+## 12. Delegierung und Staking
 
-12.1 **Rewards.** The amount of Rewards a User may earn from delegation depends on various factors including, but not limited to, user participation, stakepool profit margins and the volume of ada being delegated. It is possible that delegation generates no Reward for a User due to the above-mentioned factors. Rewards are earned as of the start of the 3rd epoch on the Cardano blockchain.
+12.1 **Erträge.** Die Höhe der Belohnungen, die ein Benutzer aus der Delegierung erhalten kann, hängt von verschiedenen Faktoren ab, einschließlich, aber nicht beschränkt auf die Benutzerbeteiligung, die Gewinnspannen des Stakepools und das Volumen der delegierten ADA. Es ist möglich, dass die Delegierung aufgrund der oben genannten Faktoren keine Belohnung für einen Benutzer erzeugt. Belohnungen werden ab dem Beginn der 3. Epoche auf der Cardano-Blockchain verdient.
 
 12.2 **Delegation.** Users may delegate their stake to one of the various stake pools of the Company or to a third party stake pool. User will have the sole right to determine the volume to be delegated to a stake pool and may increase or decrease its level of participation at any time. Any information Company shares regarding stakepools, including performance metrics and Rewards, will be for indicative purposes only and may not be accurate. Users may only delegate their stake to a stake pool if their ada is in an updated Daedalus or an updated Yoroi wallet at the time of the setup process. User does not acquire any automatic right to Rewards as a result of delegating its stake.
 
