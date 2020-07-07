@@ -32,8 +32,7 @@ import {
 import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import LocalizableError from '../../../i18n/LocalizableError';
-import { CoinTypes, } from '../../../config/numbersConfig';
-import { CardanoForks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import WarningBox from '../../widgets/WarningBox';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
@@ -214,8 +213,7 @@ export default class WalletSendForm extends Component<Props> {
           };
           const isValidLegacy = this.props.isValidLegacyAddress(receiverValue);
           const isJormungandr = (
-            this.props.selectedNetwork.CoinType === CoinTypes.CARDANO &&
-            this.props.selectedNetwork.Fork === CardanoForks.Jormungandr
+            this.props.selectedNetwork.NetworkId === networks.JormungandrMainnet.NetworkId
           );
           if (!isJormungandr) {
             updateReceiver(isValidLegacy);
