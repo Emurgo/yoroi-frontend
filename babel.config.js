@@ -11,6 +11,7 @@ const nodePlugins = {
       alias: {
         'cardano-wallet-browser': 'cardano-wallet',
         '@emurgo/js-chain-libs': '@emurgo/js-chain-libs-node',
+        '@emurgo/cardano-serialization-lib-browser': '@emurgo/cardano-serialization-lib-nodejs',
       }
     }]
   ]

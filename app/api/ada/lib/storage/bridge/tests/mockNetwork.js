@@ -67,7 +67,7 @@ function ourAddressesInTx(
   const addressesUsed = new Set();
   for (const addr of addresses) {
     const kind = addressToKind(addr, 'bytes');
-    const payload = kind === CoreAddressTypes.SHELLEY_GROUP
+    const payload = kind === CoreAddressTypes.JORMUNGANDR_GROUP
       ? groupToSingle(addr)
       : addr;
     if (ownAddresses.has(payload)) {
@@ -220,8 +220,8 @@ export function genUtxoForAddresses(
           const kind = addressToKind(address, 'bytes');
           if (
             kind !== CoreAddressTypes.CARDANO_LEGACY &&
-            kind !== CoreAddressTypes.SHELLEY_SINGLE &&
-            kind !== CoreAddressTypes.SHELLEY_GROUP
+            kind !== CoreAddressTypes.JORMUNGANDR_SINGLE &&
+            kind !== CoreAddressTypes.JORMUNGANDR_GROUP
           ) {
             throw new Error('genUtxoForAddresses non-utxo address in utxo endpoint');
           }
@@ -329,21 +329,21 @@ export function getAddressForType(
   const derivedKey = derivePath(rootKey, path);
 
   switch (type) {
-    case CoreAddressTypes.SHELLEY_SINGLE: {
+    case CoreAddressTypes.JORMUNGANDR_SINGLE: {
       const addr = RustModule.WalletV3.Address.single_from_public_key(
         derivedKey.to_public().to_raw_key(),
         RustModule.WalletV3.AddressDiscrimination.Production,
       );
       return Buffer.from(addr.as_bytes()).toString('hex');
     }
-    case CoreAddressTypes.SHELLEY_ACCOUNT: {
+    case CoreAddressTypes.JORMUNGANDR_ACCOUNT: {
       const addr = RustModule.WalletV3.Address.account_from_public_key(
         derivedKey.to_public().to_raw_key(),
         RustModule.WalletV3.AddressDiscrimination.Production,
       );
       return Buffer.from(addr.as_bytes()).toString('hex');
     }
-    case CoreAddressTypes.SHELLEY_GROUP: {
+    case CoreAddressTypes.JORMUNGANDR_GROUP: {
       const newPath = [...path];
       // -1 because newPath here starts at PURPOSE and not at ROOT
       const chainLevel = 4 - 1;

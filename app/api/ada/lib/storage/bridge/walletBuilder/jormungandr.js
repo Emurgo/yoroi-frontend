@@ -37,9 +37,9 @@ import type {
 import type { AddByHashFunc } from '../../../../../common/lib/storage/bridge/hashMapper';
 import { rawGenAddByHash } from '../../../../../common/lib/storage/bridge/hashMapper';
 import {
-  addShelleyUtxoAddress,
-  addShelleyChimericAccountAddress,
-} from '../../../../restoration/shelley/scan';
+  addJormungandrUtxoAddress,
+  addJormungandrChimericAccountAddress,
+} from '../../../../restoration/jormungandr/scan';
 import { KeyKind } from '../../../../../common/lib/crypto/keys/types';
 import { networks } from '../../database/prepackaged/networks';
 
@@ -99,7 +99,7 @@ export async function getAccountDefaultDerivations(
   const externalAddresses = addressesIndex.map(i => ({
     index: i,
     insert: async insertRequest => {
-      return await addShelleyUtxoAddress(
+      return await addJormungandrUtxoAddress(
         addByHash,
         insertRequest,
         stakingKey,
@@ -110,7 +110,7 @@ export async function getAccountDefaultDerivations(
   const internalAddresses = addressesIndex.map(i => ({
     index: i,
     insert: async insertRequest => {
-      return await addShelleyUtxoAddress(
+      return await addJormungandrUtxoAddress(
         addByHash,
         insertRequest,
         stakingKey,
@@ -121,7 +121,7 @@ export async function getAccountDefaultDerivations(
   const accountAddress = [0].map(i => ({
     index: i,
     insert: async insertRequest => {
-      return await addShelleyChimericAccountAddress(
+      return await addJormungandrChimericAccountAddress(
         addByHash,
         insertRequest,
         stakingKey,

@@ -45,7 +45,8 @@ import {
 import { testWallets } from './TestWallets';
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 
-const isShelley = false;
+const isJormungandr = false;
+const isShelley = isJormungandr;
 
 // based on abandon x 14 + share
 const genesisTransaction = '52929ce6f1ab83b439e65f6613bad9590bd264c0d6c4f910e36e2369bb987b35';
@@ -258,7 +259,7 @@ export const generateTransaction = (): {|
         // eslint-disable-next-line max-len
         // addr1sjag9rgwe04haycr283datdrjv3mlttalc2waz34xcct0g4uvf6gdg3dpwrsne4uqng3y47ugp2pp5dvuq0jqlperwj83r4pwxvwuxsghptz42
         address: getAddressForType(
-          testWallets['shelley-test'].mnemonic,
+          testWallets['jormungandr-test'].mnemonic,
           [
             WalletTypePurpose.CIP1852,
             CoinTypes.CARDANO,
@@ -266,7 +267,7 @@ export const generateTransaction = (): {|
             ChainDerivations.EXTERNAL,
             0
           ],
-          CoreAddressTypes.SHELLEY_GROUP
+          CoreAddressTypes.JORMUNGANDR_GROUP
         ),
         amount: '2100000'
       },
@@ -901,7 +902,7 @@ export const generateTransaction = (): {|
   };
 
   // ================
-  //   shelley-test
+  //   jormungandr-test
   // ================
 
   const certificateTx = {
@@ -911,7 +912,7 @@ export const generateTransaction = (): {|
         // eslint-disable-next-line max-len
         // addr1sjag9rgwe04haycr283datdrjv3mlttalc2waz34xcct0g4uvf6gdg3dpwrsne4uqng3y47ugp2pp5dvuq0jqlperwj83r4pwxvwuxsghptz42
         address: getAddressForType(
-          testWallets['shelley-test'].mnemonic,
+          testWallets['jormungandr-test'].mnemonic,
           [
             WalletTypePurpose.CIP1852,
             CoinTypes.CARDANO,
@@ -919,7 +920,7 @@ export const generateTransaction = (): {|
             ChainDerivations.EXTERNAL,
             0
           ],
-          CoreAddressTypes.SHELLEY_GROUP
+          CoreAddressTypes.JORMUNGANDR_GROUP
         ),
         txHash: distributorTx.hash,
         id: distributorTx.hash + '12',
@@ -930,7 +931,7 @@ export const generateTransaction = (): {|
     outputs: [
       {
         address: getAddressForType(
-          testWallets['shelley-test'].mnemonic,
+          testWallets['jormungandr-test'].mnemonic,
           [
             WalletTypePurpose.CIP1852,
             CoinTypes.CARDANO,
@@ -938,7 +939,7 @@ export const generateTransaction = (): {|
             ChainDerivations.INTERNAL,
             0
           ],
-          CoreAddressTypes.SHELLEY_GROUP
+          CoreAddressTypes.JORMUNGANDR_GROUP
         ),
         amount: '2099990'
       },
@@ -1242,8 +1243,8 @@ export function resetChain(
     addTransaction(txs.useChange);
     // failed-single-tx
     addTransaction(txs.failedTx);
-    // shelley-test
-    if (isShelley) {
+    // jormungandr-test
+    if (isJormungandr) {
       addTransaction(txs.certificateTx);
     }
     // ledger-wallet
@@ -1321,7 +1322,7 @@ const utxoForAddresses: AddressUtxoFunc = genUtxoForAddresses(
 );
 const utxoSumForAddresses: UtxoSumFunc = genUtxoSumForAddresses(utxoForAddresses);
 const sendTx = (request: SignedRequestInternal): SignedResponse => {
-  const remoteTx = isShelley
+  const remoteTx = isJormungandr
     ? toRemoteJormungandrTx(transactions, request)
     : toRemoteByronTx(transactions, request);
 

@@ -113,7 +113,7 @@ type Props = {|
   +hasAnyPending: boolean,
   +validateAmount: (amountInNaturalUnits: string) => Promise<boolean>,
   +onSubmit: void => void,
-  +isValidShelleyAddress: string => boolean,
+  +isValidJormungandrAddress: string => boolean,
   +isValidLegacyAddress: string => boolean,
   +totalInput: ?BigNumber,
   +classicTheme: boolean,
@@ -222,9 +222,9 @@ export default class WalletSendForm extends Component<Props> {
           if (isValidLegacy) {
             return [false, this.context.intl.formatMessage(messages.cannotSendtoLegacy)];
           }
-          const isValidShelley = this.props.isValidShelleyAddress(receiverValue);
-          updateReceiver(isValidShelley);
-          return [isValidShelley, this.context.intl.formatMessage(messages.invalidAddress)];
+          const isValidJormungandr = this.props.isValidJormungandrAddress(receiverValue);
+          updateReceiver(isValidJormungandr);
+          return [isValidJormungandr, this.context.intl.formatMessage(messages.invalidAddress)];
         }],
       },
       amount: {

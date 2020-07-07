@@ -79,7 +79,7 @@ export function getTxOutputTotal(
   return sum;
 }
 
-export function getShelleyTxFee(
+export function getJormungandrTxFee(
   IOs: RustModule.WalletV3.InputOutput,
   shift: boolean,
 ): BigNumber {
@@ -92,7 +92,7 @@ export function getShelleyTxFee(
   return result;
 }
 
-export function getShelleyTxReceivers(
+export function getJormungandrTxReceivers(
   signRequest: BaseSignRequest<RustModule.WalletV3.InputOutput>,
   includeChange: boolean
 ): Array<string> {
@@ -113,7 +113,7 @@ export function getShelleyTxReceivers(
   return receivers;
 }
 
-export function shelleyTxEqual(
+export function jormungandrTxEqual(
   req1: RustModule.WalletV3.InputOutput,
   req2: RustModule.WalletV3.InputOutput,
 ): boolean {

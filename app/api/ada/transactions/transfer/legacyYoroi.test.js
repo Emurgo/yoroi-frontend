@@ -36,7 +36,7 @@ beforeAll(async () => {
   silenceLogsForTesting();
 });
 
-function getShelleyAddress(
+function getJormungandrAddress(
   accountKey: RustModule.WalletV3.Bip32PrivateKey,
   derivationId: number
 ): {| ...Address, ...Addressing |} {
@@ -140,7 +140,7 @@ describe('Byron era tx format tests', () => {
   });
 });
 
-describe('Shelley era tx format tests', () => {
+describe('Jormungandr tx format tests', () => {
   test('Yoroi transfer from single small UTXO', async () => {
     const txId = '915f2e6865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c';
     const inputAmount = '1000000';
@@ -157,8 +157,8 @@ describe('Shelley era tx format tests', () => {
       ),
     );
 
-    const addr1 = getShelleyAddress(accountPrivateKey, 0);
-    const addr2 = getShelleyAddress(accountPrivateKey, 1);
+    const addr1 = getJormungandrAddress(accountPrivateKey, 0);
+    const addr2 = getJormungandrAddress(accountPrivateKey, 1);
 
     const utxo = {
       utxo_id: 'ignore',

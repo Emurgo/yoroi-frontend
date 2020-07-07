@@ -53,7 +53,7 @@ export function sendAllUnsignedTx(
     utxo => {
       const addressedUtxo = addressingMap.get(utxo);
       if (addressedUtxo == null) {
-        throw new Error('sendAllUnsignedTx utxo refernece was changed. Should not happen');
+        throw new Error('sendAllUnsignedTx utxo reference was changed. Should not happen');
       }
       return addressedUtxo;
     }
@@ -83,7 +83,7 @@ export function sendAllUnsignedTxFromUtxo(
   const feeAlgorithm = RustModule.WalletV2.LinearFeeAlgorithm.default();
   let fee;
   {
-    // firts build a transaction to see what the cost would be
+    // first build a transaction to see what the cost would be
     const fakeTxBuilder = new RustModule.WalletV2.TransactionBuilder();
     const inputs = utxoToTxInput(allUtxos);
     addTxInputs(fakeTxBuilder, inputs);
@@ -92,7 +92,7 @@ export function sendAllUnsignedTxFromUtxo(
     fee = coinToBigNumber(fakeTxBuilder.estimate_fee(feeAlgorithm));
   }
 
-  // create a new transaction subtracing the fee from your total UTXO
+  // create a new transaction subtracting the fee from your total UTXO
   if (totalBalance.isLessThan(fee)) {
     throw new NotEnoughMoneyToSendError();
   }
@@ -146,7 +146,7 @@ export function newAdaUnsignedTx(
     utxo => {
       const addressedUtxo = addressingMap.get(utxo);
       if (addressedUtxo == null) {
-        throw new Error('newAdaUnsignedTx utxo refernece was changed. Should not happen');
+        throw new Error('newAdaUnsignedTx utxo reference was changed. Should not happen');
       }
       return addressedUtxo;
     }

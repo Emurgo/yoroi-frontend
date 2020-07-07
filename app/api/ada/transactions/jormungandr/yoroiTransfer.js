@@ -1,7 +1,7 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
-import { getShelleyTxFee, } from './utils';
+import { getJormungandrTxFee, } from './utils';
 import {
   Logger,
   stringifyError,
@@ -48,7 +48,7 @@ export async function buildYoroiTransferTx(payload: {|
       outputAddr,
       senderUtxos
     );
-    const fee = getShelleyTxFee(unsignedTxResponse.IOs, false);
+    const fee = getJormungandrTxFee(unsignedTxResponse.IOs, false);
 
     // sign inputs
     const fragment = signTransaction(

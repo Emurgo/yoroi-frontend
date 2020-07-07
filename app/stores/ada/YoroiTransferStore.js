@@ -181,13 +181,15 @@ export default class YoroiTransferStore extends Store {
 
     updateStatusCallback();
 
-    const sourceIsShelleyWallet = this.transferSource === TransferSource.SHELLEY_UTXO ||
-      this.transferSource === TransferSource.SHELLEY_CHIMERIC_ACCOUNT;
+    const sourceIsJormungandrWallet = (
+      this.transferSource === TransferSource.JORMUNGANDR_UTXO ||
+      this.transferSource === TransferSource.JORMUNGANDR_CHIMERIC_ACCOUNT
+    );
 
     // 3) Calculate private keys for restored wallet utxo
     const accountKey = RustModule.WalletV3.Bip32PrivateKey
       .from_bytes(Buffer.from(masterKey, 'hex'))
-      .derive(sourceIsShelleyWallet
+      .derive(sourceIsJormungandrWallet
         ? WalletTypePurpose.CIP1852
         : WalletTypePurpose.BIP44)
       .derive(CoinTypes.CARDANO)
@@ -206,7 +208,7 @@ export default class YoroiTransferStore extends Store {
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null) throw new Error(`${nameof(this._generateTransferTxFromMnemonic)} no network selected`);
 
-    const transferTx = sourceIsShelleyWallet
+    const transferTx = sourceIsJormungandrWallet
       ? await generateCip1852TransferTx(baseRequest)
       : await generateLegacyYoroiTransferTx({
         ...baseRequest,

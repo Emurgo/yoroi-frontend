@@ -157,7 +157,7 @@ export function rawGenHashToIdsFunc(
       type: addressToKind(addr, 'bytes'),
     }));
     for (const address of addressWithType) {
-      if (address.type !== CoreAddressTypes.SHELLEY_GROUP) {
+      if (address.type !== CoreAddressTypes.JORMUNGANDR_GROUP) {
         notFoundWithoutCanonical.push(address);
       } else {
         // for group addresses we have to look at the payment key
@@ -189,7 +189,7 @@ export function rawGenHashToIdsFunc(
           const newAddr = await deps.ModifyAddress.addFromCanonicalByHash(request.db, request.tx, [{
             keyDerivationId,
             data: address.data,
-            type: CoreAddressTypes.SHELLEY_GROUP,
+            type: CoreAddressTypes.JORMUNGANDR_GROUP,
           }]);
           finalMapping.set(address.data, newAddr[0].AddressId);
           ownAddressIds.add(newAddr[0].AddressId);

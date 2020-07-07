@@ -32,7 +32,7 @@ type WalletNames =
   'simple-pending-wallet' |
   'tx-big-input-wallet' |
   'dump-wallet' |
-  'shelley-test' |
+  'jormungandr-test' |
   'ledger-wallet' |
   'trezor-wallet';
 
@@ -77,7 +77,7 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
     plate: 'XXXX-1111',
   }),
   createWallet({
-    name: ('shelley-test': WalletNames),
+    name: ('jormungandr-test': WalletNames),
     mnemonic: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon address',
     plate: 'XXXX-1111',
   }),

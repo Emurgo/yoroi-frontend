@@ -8,7 +8,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import globalMessages from '../../i18n/global-messages';
-import { tryAddressToKind } from '../../api/ada/lib/storage/bridge/utils';
+import { tryAddressToKind, isJormungandrAddress } from '../../api/ada/lib/storage/bridge/utils';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 
 import WalletSendForm from '../../components/wallet/send/WalletSendForm';
@@ -160,11 +160,10 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           currencyMaxFractionalDigits={apiMeta.decimalPlaces.toNumber()}
           validateAmount={amount => Promise.resolve(isWithinSupply(amount, apiMeta.totalSupply))}
           onSubmit={onSubmit}
-          isValidShelleyAddress={address => {
+          isValidJormungandrAddress={address => {
             const kind = tryAddressToKind(address, 'bech32');
             if (kind == null) return false;
-            if (kind === CoreAddressTypes.CARDANO_LEGACY) return false;
-            return true;
+            return isJormungandrAddress(kind);
           }}
           isValidLegacyAddress={address => {
             const kind = tryAddressToKind(address, 'bech32');
@@ -291,7 +290,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
 
     const unsignedTx = signRequest.unsignedTx;
     if (!(unsignedTx instanceof RustModule.WalletV2.Transaction)) {
-      throw new Error('hardwareWalletDoConfirmation hw wallets unsupported for Shelley');
+      throw new Error('hardwareWalletDoConfirmation hw wallets only supported for Byron');
     }
     const v2Request = {
       ...signRequest,

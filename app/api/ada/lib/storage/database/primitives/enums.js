@@ -9,10 +9,10 @@ export const CoreAddressTypes = Object.freeze({
    * This also matches how the remote works as it has to return the full payload
    * so we can tell the address type
    */
-  SHELLEY_SINGLE: 1,
-  SHELLEY_GROUP: 2,
-  SHELLEY_ACCOUNT: 3,
-  SHELLEY_MULTISIG: 4,
+  JORMUNGANDR_SINGLE: 1,
+  JORMUNGANDR_GROUP: 2,
+  JORMUNGANDR_ACCOUNT: 3,
+  JORMUNGANDR_MULTISIG: 4,
   ERGO_P2PK: 5,
   ERGO_P2SH: 6,
   ERGO_P2S: 7,

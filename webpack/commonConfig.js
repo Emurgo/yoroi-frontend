@@ -9,16 +9,8 @@ const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
 const shell = require('shelljs');
 const manifestEnvs = require('../chrome/manifestEnvs');
 
-const plugins = (folder /*: string */, networkName /*: string */) /*: * */ => {
-  let pageTitle = '';
-  switch (networkName) {
-    case 'shelley-dev':
-    case 'shelley-testnet':
-      pageTitle = 'Yoroi Staking Testnet';
-      break;
-    default:
-      pageTitle = 'Yoroi';
-  }
+const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
+  const pageTitle = 'Yoroi';
 
   return [
     /** We remove non-English languages from BIP39 to avoid triggering bad word filtering */

@@ -30,7 +30,7 @@ import {
 } from './lib/storage/bridge/walletBuilder/byron';
 import {
   createStandardCip1852Wallet,
-} from './lib/storage/bridge/walletBuilder/shelley';
+} from './lib/storage/bridge/walletBuilder/jormungandr';
 import {
   getAllTransactions,
   updateTransactions,
@@ -86,14 +86,14 @@ import {
   signTransaction as byronSignTransaction,
 } from './transactions/byron/transactionsV2';
 import {
-  sendAllUnsignedTx as shelleySendAllUnsignedTx,
-  newAdaUnsignedTx as shelleyNewAdaUnsignedTx,
-  asAddressedUtxo as shelleyAsAddressedUtxo,
-  signTransaction as shelleySignTransaction,
-} from './transactions/shelley/utxoTransactions';
+  sendAllUnsignedTx as jormungandrSendAllUnsignedTx,
+  newAdaUnsignedTx as jormungandrNewAdaUnsignedTx,
+  asAddressedUtxo as jormungandrAsAddressedUtxo,
+  signTransaction as jormungandrSignTransaction,
+} from './transactions/jormungandr/utxoTransactions';
 import {
   normalizeKey
-} from './transactions/shelley/utils';
+} from './transactions/jormungandr/utils';
 import {
   generateWalletRootKey,
   generateAdaMnemonic,
@@ -126,7 +126,7 @@ import {
 import LocalizableError from '../../i18n/LocalizableError';
 import { scanBip44Account, } from '../common/lib/restoration/bip44';
 import { v2genAddressBatchFunc, } from './restoration/byron/scan';
-import { scanCip1852Account, } from './restoration/shelley/scan';
+import { scanCip1852Account, } from './restoration/jormungandr/scan';
 import type {
   BaseSignRequest,
   UnsignedTxResponse,
@@ -685,7 +685,7 @@ export default class AdaApi {
         id = signedTx.id();
         encodedTx = Buffer.from(signedTx.to_hex(), 'hex');
       } else if (unsignedTx instanceof RustModule.WalletV3.InputOutput) {
-        const signedTx = shelleySignTransaction(
+        const signedTx = jormungandrSignTransaction(
           {
             senderUtxos: signRequest.senderUtxos,
             changeAddr: signRequest.changeAddr,
@@ -849,13 +849,13 @@ export default class AdaApi {
       const isJormungandr = network.NetworkId === networks.JormungandrMainnet.NetworkId;
 
       const addressedUtxo = isJormungandr
-        ? shelleyAsAddressedUtxo(filteredUtxos)
+        ? jormungandrAsAddressedUtxo(filteredUtxos)
         : byronAsAddressedUtxo(filteredUtxos);
 
       let unsignedTxResponse;
       if (request.shouldSendAll != null) {
         unsignedTxResponse = isJormungandr
-          ? shelleySendAllUnsignedTx(
+          ? jormungandrSendAllUnsignedTx(
             receiver,
             addressedUtxo
           )
@@ -871,7 +871,7 @@ export default class AdaApi {
         }
         const changeAddr = nextUnusedInternal.addressInfo;
         unsignedTxResponse = isJormungandr
-          ? shelleyNewAdaUnsignedTx(
+          ? jormungandrNewAdaUnsignedTx(
             [{
               address: receiver,
               amount
@@ -919,13 +919,13 @@ export default class AdaApi {
     const certificate = RustModule.WalletV3.Certificate.stake_delegation(stakeDelegationCert);
 
     const allUtxo = await request.publicDeriver.getAllUtxos();
-    const addressedUtxo = shelleyAsAddressedUtxo(allUtxo);
+    const addressedUtxo = jormungandrAsAddressedUtxo(allUtxo);
     const nextUnusedInternal = await request.publicDeriver.nextInternal();
     if (nextUnusedInternal.addressInfo == null) {
       throw new Error(`${nameof(this.createDelegationTx)} no internal addresses left. Should never happen`);
     }
     const changeAddr = nextUnusedInternal.addressInfo;
-    const unsignedTx = shelleyNewAdaUnsignedTx(
+    const unsignedTx = jormungandrNewAdaUnsignedTx(
       [],
       [{
         address: changeAddr.addr.Hash,
@@ -988,7 +988,7 @@ export default class AdaApi {
         throw new Error(`${nameof(this.signAndBroadcastDelegationTx)} missing certificate`);
       }
       const certificate = request.signRequest.certificate;
-      const signedTx = shelleySignTransaction(
+      const signedTx = jormungandrSignTransaction(
         {
           senderUtxos: signRequest.senderUtxos,
           changeAddr: signRequest.changeAddr,
@@ -1185,10 +1185,12 @@ export default class AdaApi {
       const reverseAddressLookup = new Map<number, Array<string>>();
       const foundAddresses = new Set<string>();
 
-      const sourceIsShelleyWallet = request.transferSource === TransferSource.SHELLEY_UTXO ||
-        request.transferSource === TransferSource.SHELLEY_CHIMERIC_ACCOUNT;
+      const sourceIsJormungandrWallet = (
+        request.transferSource === TransferSource.JORMUNGANDR_UTXO ||
+        request.transferSource === TransferSource.JORMUNGANDR_CHIMERIC_ACCOUNT
+      );
       const accountKey = rootPk
-        .derive(sourceIsShelleyWallet
+        .derive(sourceIsJormungandrWallet
           ? WalletTypePurpose.CIP1852
           : WalletTypePurpose.BIP44)
         .derive(CoinTypes.CARDANO)
@@ -1226,7 +1228,7 @@ export default class AdaApi {
           addByHash,
           type: CoreAddressTypes.CARDANO_LEGACY,
         });
-      } else if (sourceIsShelleyWallet) {
+      } else if (sourceIsJormungandrWallet) {
         const stakingKey = accountKey
           .derive(ChainDerivations.CHIMERIC_ACCOUNT)
           .derive(STAKING_KEY_INDEX)
@@ -1242,11 +1244,11 @@ export default class AdaApi {
           stakingKey,
         });
 
-        if (request.transferSource === TransferSource.SHELLEY_UTXO) {
+        if (request.transferSource === TransferSource.JORMUNGANDR_UTXO) {
           insertTree = cip1852InsertTree.filter(child => (
             child.index === ChainDerivations.EXTERNAL || child.index === ChainDerivations.INTERNAL
           ));
-        } else if (request.transferSource === TransferSource.SHELLEY_CHIMERIC_ACCOUNT) {
+        } else if (request.transferSource === TransferSource.JORMUNGANDR_CHIMERIC_ACCOUNT) {
           insertTree = cip1852InsertTree.filter(child => (
             child.index === ChainDerivations.CHIMERIC_ACCOUNT
           ));

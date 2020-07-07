@@ -11,7 +11,7 @@ declare var __HOST__: string;
 declare var __PORT__: number;
 */
 
-if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'shelley-dev') {
+if (process.env.NODE_ENV !== 'development') {
   __webpack_public_path__ = chrome.extension.getURL('/js/');
 } else {
   // In development mode,

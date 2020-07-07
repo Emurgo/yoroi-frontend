@@ -71,7 +71,7 @@ const messages = defineMessages({
 
 type Props = {|
   +byronPlate: void | PlateResponse,
-  +shelleyPlate: void | PlateResponse,
+  +jormungandrPlate: void | PlateResponse,
   +selectedExplorer: SelectedExplorer,
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
@@ -154,7 +154,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
     const { intl } = this.context;
     const {
       byronPlate,
-      shelleyPlate,
+      jormungandrPlate,
       error,
       isSubmitting,
       onCancel,
@@ -200,25 +200,25 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
     const byronPlateElem = byronPlate == null
       ? undefined
       : this.generatePlate(
-        shelleyPlate == null
+        jormungandrPlate == null
           ? intl.formatMessage(messages.walletRestoreVerifyAccountIdLabel)
           : intl.formatMessage(messages.walletRestoreVerifyByronAccountIdLabel),
         byronPlate.accountPlate
       );
 
-    const shelleyPlateElem = shelleyPlate == null
+    const jormungandrPlateElem = jormungandrPlate == null
       ? undefined
       : this.generatePlate(
         byronPlate == null
           ? intl.formatMessage(messages.walletRestoreVerifyAccountIdLabel)
           : intl.formatMessage(messages.walletRestoreVerifyShelleyAccountIdLabel),
-        shelleyPlate.accountPlate
+        jormungandrPlate.accountPlate
       );
 
     const byronAddressesElem = byronPlate == null
       ? undefined
       : this.generateAddresses(
-        shelleyPlate == null
+        jormungandrPlate == null
           ? intl.formatMessage(messages.walletRestoreVerifyAddressesLabel)
           : intl.formatMessage(messages.walletRestoreVerifyByronAddressesLabel),
         byronPlate.addresses,
@@ -226,13 +226,13 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
         notification,
       );
 
-    const shelleyAddressesElem = shelleyPlate == null
+    const jormungandrAddressesElem = jormungandrPlate == null
       ? undefined
       : this.generateAddresses(
         byronPlate == null
           ? intl.formatMessage(messages.walletRestoreVerifyAddressesLabel)
           : intl.formatMessage(messages.walletRestoreVerifyShelleyAddressesLabel),
-        shelleyPlate.addresses,
+        jormungandrPlate.addresses,
         onCopyAddressTooltip,
         notification,
       );
@@ -253,13 +253,13 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
         <DialogTextBlock>
           <CenteredLayout>
             {byronPlateElem}
-            {shelleyPlateElem}
+            {jormungandrPlateElem}
           </CenteredLayout>
         </DialogTextBlock>
 
         <DialogTextBlock subclass="component-bottom">
           {byronAddressesElem}<br />
-          {shelleyAddressesElem}
+          {jormungandrAddressesElem}
         </DialogTextBlock>
 
         <div className={styles.postCopyMargin} />

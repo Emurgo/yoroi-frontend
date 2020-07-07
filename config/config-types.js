@@ -65,17 +65,13 @@ export type GenesisConfigType = {|
   slot_duration: number,
 |};
 
-export type Network = 'shelley-dev' | 'shelley-testnet' | 'development' | 'mainnet' | 'testnet' | 'test';
+export type Network =  'development' | 'mainnet' | 'testnet' | 'test';
 export const NetworkType: {|
-  SHELLEY_DEV: Network,
-  SHELLEY_TESTNET: Network,
   DEVELOPMENT: Network,
   MAINNET: Network,
   TESTNET: Network,
   TEST: Network,
 |} = {
-  SHELLEY_DEV: 'shelley-dev',
-  SHELLEY_TESTNET: 'shelley-testnet',
   DEVELOPMENT: 'development',
   MAINNET: 'mainnet',
   TESTNET: 'testnet',

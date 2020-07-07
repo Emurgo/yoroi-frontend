@@ -75,7 +75,7 @@ import LocalizableError from '../../app/i18n/LocalizableError';
 import globalMessages from '../../app/i18n/global-messages';
 import { ledgerErrors } from '../../app/domain/LedgerLocalizedError';
 import BigNumber from 'bignumber.js';
-import { utxoToTxInput } from '../../app/api/ada/transactions/shelley/inputSelection';
+import { utxoToTxInput } from '../../app/api/ada/transactions/jormungandr/inputSelection';
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { networks, CardanoForks } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 import { CoinTypes } from '../../app/config/numbersConfig';

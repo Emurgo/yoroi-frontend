@@ -89,7 +89,7 @@ const firstTx: void => Array<RemoteTransaction> = () => [{
           ChainDerivations.EXTERNAL,
           4
         ],
-        CoreAddressTypes.SHELLEY_GROUP
+        CoreAddressTypes.JORMUNGANDR_GROUP
       ),
       amount: '2100000'
     },
@@ -132,7 +132,7 @@ const nextRegularSpend: void => Array<RemoteTransaction> = () => [{
           ChainDerivations.EXTERNAL,
           4
         ],
-        CoreAddressTypes.SHELLEY_GROUP
+        CoreAddressTypes.JORMUNGANDR_GROUP
       ),
       amount: '2100000',
       id: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed5450',
@@ -153,7 +153,7 @@ const nextRegularSpend: void => Array<RemoteTransaction> = () => [{
           ChainDerivations.INTERNAL,
           0
         ],
-        CoreAddressTypes.SHELLEY_GROUP
+        CoreAddressTypes.JORMUNGANDR_GROUP
       ),
       amount: '1100000'
     },
@@ -167,7 +167,7 @@ const nextRegularSpend: void => Array<RemoteTransaction> = () => [{
           ChainDerivations.EXTERNAL,
           19
         ],
-        CoreAddressTypes.SHELLEY_SINGLE
+        CoreAddressTypes.JORMUNGANDR_SINGLE
       ),
       amount: '900000'
     }
@@ -273,7 +273,7 @@ const txWithCert: void => Array<RemoteTransaction> = () => [{
           ChainDerivations.EXTERNAL,
           4
         ],
-        CoreAddressTypes.SHELLEY_GROUP
+        CoreAddressTypes.JORMUNGANDR_GROUP
       ),
       amount: '2100000'
     },
@@ -287,7 +287,7 @@ const txWithCert: void => Array<RemoteTransaction> = () => [{
           ChainDerivations.INTERNAL,
           12
         ],
-        CoreAddressTypes.SHELLEY_SINGLE
+        CoreAddressTypes.JORMUNGANDR_SINGLE
       ),
       amount: '1731391'
     }
@@ -320,7 +320,7 @@ const secondCertTx: ('Pending' | 'Successful') => RemoteTransaction = status => 
           ChainDerivations.INTERNAL,
           12
         ],
-        CoreAddressTypes.SHELLEY_SINGLE
+        CoreAddressTypes.JORMUNGANDR_SINGLE
       ),
       amount: '1731391',
       id: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed5451',
@@ -341,7 +341,7 @@ const secondCertTx: ('Pending' | 'Successful') => RemoteTransaction = status => 
           ChainDerivations.EXTERNAL,
           4
         ],
-        CoreAddressTypes.SHELLEY_GROUP
+        CoreAddressTypes.JORMUNGANDR_GROUP
       ),
       amount: '1000000'
     },
@@ -355,7 +355,7 @@ const secondCertTx: ('Pending' | 'Successful') => RemoteTransaction = status => 
           ChainDerivations.INTERNAL,
           13
         ],
-        CoreAddressTypes.SHELLEY_SINGLE
+        CoreAddressTypes.JORMUNGANDR_SINGLE
       ),
       amount: '200000'
     }
@@ -415,7 +415,7 @@ async function syncingSimpleTransaction(): Promise<void> {
         address: getAddressForType(
           TX_TEST_MNEMONIC_1,
           expectedAddressing,
-          CoreAddressTypes.SHELLEY_GROUP
+          CoreAddressTypes.JORMUNGANDR_GROUP
         ),
         addressing: {
           path: expectedAddressing,
@@ -505,7 +505,7 @@ async function syncingSimpleTransaction(): Promise<void> {
         address: getAddressForType(
           TX_TEST_MNEMONIC_1,
           expectedAddressing1,
-          CoreAddressTypes.SHELLEY_GROUP
+          CoreAddressTypes.JORMUNGANDR_GROUP
         ),
         addressing: {
           path: expectedAddressing1,
@@ -537,7 +537,7 @@ async function syncingSimpleTransaction(): Promise<void> {
         address: getAddressForType(
           TX_TEST_MNEMONIC_1,
           expectedAddressing2,
-          CoreAddressTypes.SHELLEY_SINGLE
+          CoreAddressTypes.JORMUNGANDR_SINGLE
         ),
         addressing: {
           path: expectedAddressing2,

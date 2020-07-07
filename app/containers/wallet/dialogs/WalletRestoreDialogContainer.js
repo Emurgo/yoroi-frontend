@@ -161,7 +161,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         return (
           <WalletRestoreVerifyDialog
             byronPlate={walletRestore.recoveryResult ?.byronPlate}
-            shelleyPlate={walletRestore.recoveryResult ?.shelleyPlate}
+            jormungandrPlate={walletRestore.recoveryResult ?.jormungandrPlate}
             selectedExplorer={this.generated.stores.explorers.selectedExplorer
               .get(this.getSelectedNetwork().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
             }
@@ -344,7 +344,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         recoveryResult: void | {|
           byronPlate: void | PlateResponse,
           phrase: string,
-          shelleyPlate: void | PlateResponse
+          jormungandrPlate: void | PlateResponse
         |},
         step: RestoreStepsType,
         walletRestoreMeta: void | WalletRestoreMeta,

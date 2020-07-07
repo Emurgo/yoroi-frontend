@@ -220,7 +220,7 @@ async function onUpgrade(
   if (version >= 3 && version <= 4) {
     // we know that before this version, Yoroi only supported 1 wallet
     // therefore the single wallet always has its root key as derivation id 1
-    // and we only launched the new DB for the Shelley testnet
+    // and we only launched the new DB for the Jormungandr Shelley testnet
     // so there are only Cip1852 wallets
     await rawDb.addTableColumn(
       'Cip1852Wrapper',

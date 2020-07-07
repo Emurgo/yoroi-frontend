@@ -189,7 +189,7 @@ describe('Byron era tx format tests', () => {
   });
 });
 
-describe('Shelley era tx format tests', () => {
+describe('Jormungandr tx format tests', () => {
   test('Daedalus transfer from single small UTXO', async () => {
     const words = 'note park thrive ignore spare latin common balance clap soup school tiny';
     const address = 'DdzFFzCqrhsmcx7z25PRkdbeUNqNNW4brhznpVxbm1EknAahjaCFEjYXg9KJRqkixjgGyz8D9GSX3CFDRoNrZyfJsi61N2FxCnq9yWBy';
