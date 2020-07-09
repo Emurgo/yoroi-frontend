@@ -43,7 +43,7 @@ $rightBlockWidth: $leftBlockWidth;
       .exportTxToFileSvg:hover {
         cursor: pointer;
         circle {
-          fill: var(--theme-export-transactions-to-file);
+          fill:  var(--cmn-default-color-grey-5);
         }
       }
     }

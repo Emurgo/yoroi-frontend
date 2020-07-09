@@ -3,11 +3,22 @@
   top: 4px;
   right: 0;
   cursor: pointer;
-  svg {
-    width: 16px;
+  display: inline-flex;
+  margin-left: 5px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: background-color 0.3s;
+  & > svg {
+    display: block;
+    margin: auto;
     height: 16px;
+    width: 16px;
     path {
       fill: var(--theme-icon-close-button-color);
     }
+  }
+  &:hover {
+    background-color: var(--cmn-default-color-grey-5);
   }
 }

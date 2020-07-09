@@ -1,28 +1,35 @@
 .component {
-  div, svg {
-    vertical-align: middle;
-  }
+  display: flex;
+  align-items: center;
+
   .copyIconBig {
     cursor: pointer;
     object-fit: contain;
-    margin-left: 3px;
+    display: inline-flex;
+    margin-left: 5px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    transition: background-color 0.3s;
     & > svg {
-      margin-top: -6px;
-      height: 28px;
-      width: 28px;
-      padding: 4px;
-      border-radius: 15px;
+      display: block;
+      margin: auto;
+      height: 20px;
+      width: 20px;
       path {
         fill: var(--theme-icon-copy-address-color);
       }
     }
   }
-  .copyIconBig svg:hover {
-    background-color: var(--theme-icon-copy-address-button-background-color);
+  .copyIconBig:hover {
+    background-color: var(--cmn-default-color-grey-5);
   }
 }
 
 .SimpleTooltip {
+  :global(.SimpleBubble_root:not(.SimpleBubble_openUpward))  {
+    margin-top: -5px !important;
+  }
   div[data-bubble-container] {
     transform: translate(-50%, 0); // center the tooltip no matter how long is the text inside
     margin-left: 20px; // offset = horizontal padding of icon and tooltip
@@ -35,10 +42,4 @@
   align-items: center;
   padding: 8px 20px;
   border-radius: 8px;
-
-  .copyIconBig {
-    & > svg {
-      margin-top: 0;
-    }
-  }
 }

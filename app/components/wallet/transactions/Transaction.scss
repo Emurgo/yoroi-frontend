@@ -201,7 +201,7 @@
     }
   }
   .shadow {
-    box-shadow: inset 0 -1px 10px 0 rgba(255,255,255,0.5), inset 0 2px 4px 0 rgba(56,57,61,0.2);
+    box-shadow: var(--theme-mywallets-expandable-box-shadow);
   }
 
   .last {
@@ -220,8 +220,8 @@
     
     .addressContent {
       display: flex;
-      border-top: 1px solid rgba(173, 174, 182, 0.3);
-      border-bottom: 1px solid rgba(173, 174, 182, 0.3);
+      border-top: 1px solid var(--cmn-default-color-grey-3-alpha);
+      border-bottom: 1px solid var(--cmn-default-color-grey-3-alpha);
       & > div {
         flex: 1 1 50%;
         padding-top: 24px;
@@ -230,7 +230,7 @@
           padding-right: 24px;
         }
         &:last-child{
-          border-left: 1px solid rgba(173, 174, 182, 0.3);
+          border-left: 1px solid var(--cmn-default-color-grey-3-alpha);
           padding-left: 24px;
         }
       }
@@ -252,7 +252,7 @@
     .addressHeader {
       display: grid;
       grid-gap: 15px;
-      grid-template-columns: minmax(230px,1fr) 105px 1fr;
+      grid-template-columns: minmax(232px,1fr) 105px 1fr;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 24px;
@@ -276,7 +276,7 @@
     .addressItem {
       display: grid;
       grid-gap: 15px;
-      grid-template-columns: minmax(230px,1fr) 105px 1fr;
+      grid-template-columns: minmax(232px,1fr) 105px 1fr;
       align-items: center;
     }
     * + h2,
