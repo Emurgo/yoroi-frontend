@@ -22,6 +22,7 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { ApiOptions, getApiForNetwork, getApiMeta } from '../../../api/common/utils';
+import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
 
 export type GeneratedData = typeof WalletSendConfirmationDialogContainer.prototype.generated;
 
@@ -112,6 +113,9 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         classicTheme={profile.isClassicTheme}
         unitOfAccountSetting={unitOfAccountSetting}
         coinPrice={coinPrice}
+        addressToDisplayString={
+          addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
+        }
       />
     );
   }

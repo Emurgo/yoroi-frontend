@@ -99,7 +99,7 @@ beforeAll(async () => {
 });
 
 describe('Create unsigned TX from UTXO', () => {
-  it('Should create a valid transaction withhout selection', () => {
+  it('Should create a valid transaction without selection', () => {
     const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[1]];
     const unsignedTxResponse = newAdaUnsignedTxFromUtxo(
       'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',

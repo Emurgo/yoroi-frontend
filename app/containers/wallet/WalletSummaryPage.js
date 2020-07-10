@@ -45,6 +45,7 @@ import { getApiForNetwork, getApiMeta } from '../../api/common/utils';
 import { addressSubgroupName, addressGroupName, AddressSubgroup } from '../../types/AddressFilterTypes';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
 import { routeForStore, allAddressSubgroups, } from '../../stores/stateless/addressStores';
+import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 
 export type GeneratedData = typeof WalletSummaryPage.prototype.generated;
 
@@ -187,6 +188,9 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
             onCopyAddressTooltip={onCopyAddressTooltip}
             notification={notificationToolTip}
             decimalPlaces={apiMeta.decimalPlaces.toNumber()}
+            addressToDisplayString={
+              addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
+            }
           />
         );
       } else {

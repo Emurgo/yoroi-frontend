@@ -30,7 +30,7 @@ import { buildRoute } from '../../utils/routing';
 import { InvalidWitnessError } from '../../api/ada/errors';
 import WalletSendConfirmationDialog from '../../components/wallet/send/WalletSendConfirmationDialog';
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
-import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { isJormungandr } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -305,16 +305,13 @@ export const LedgerConfirmationDialog = (): Node => {
     ledgerErrorCases.None
   );
   const network = wallet.publicDeriver.getParent().getNetworkInfo();
-  const isJormungandr = (
-    network.NetworkId === networks.JormungandrMainnet.NetworkId
-  );
   return wrapWallet(
     mockWalletProps({
       location: getRoute(wallet.publicDeriver.getPublicDeriverId()),
       selected: wallet.publicDeriver,
       ...lookup,
     }),
-    !isJormungandr && (<WalletSendPage
+    !isJormungandr(network) && (<WalletSendPage
       generated={genBaseProps({
         wallet,
         hwSend: {
@@ -360,16 +357,13 @@ export const TrezorConfirmationDialog = (): Node => {
     trezorErrorCases.None
   );
   const network = wallet.publicDeriver.getParent().getNetworkInfo();
-  const isJormungandr = (
-    network.NetworkId === networks.JormungandrMainnet.NetworkId
-  );
   return wrapWallet(
     mockWalletProps({
       location: getRoute(wallet.publicDeriver.getPublicDeriverId()),
       selected: wallet.publicDeriver,
       ...lookup,
     }),
-    !isJormungandr && (<WalletSendPage
+    !isJormungandr(network) && (<WalletSendPage
       generated={genBaseProps({
         wallet,
         hwSend: {

@@ -41,3 +41,22 @@ export function isTestnet(
   if (network.NetworkId === networks.JormungandrMainnet.NetworkId) return true;
   return false;
 }
+
+export function isJormungandr(
+  network: $ReadOnly<NetworkRow>,
+): boolean {
+  if (
+    network.CoinType === CoinTypes.CARDANO &&
+    network.Fork === CardanoForks.Jormungandr
+  ) return true;
+  return false;
+}
+export function isCardanoHaskell(
+  network: $ReadOnly<NetworkRow>,
+): boolean {
+  if (
+    network.CoinType === CoinTypes.CARDANO &&
+    network.Fork === CardanoForks.Haskell
+  ) return true;
+  return false;
+}

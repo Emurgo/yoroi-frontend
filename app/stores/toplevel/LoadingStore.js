@@ -21,6 +21,7 @@ import { tryAddressToKind } from '../../api/ada/lib/storage/bridge/utils';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { ApiOptions, getApiMeta } from '../../api/common/utils';
 import { isWithinSupply } from '../../utils/validations';
+import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
@@ -124,7 +125,7 @@ export default class LoadingStore extends Store {
         decodeURIComponent(this._originRoute.location),
         address => {
           // TODO: validation should be done based on wallet type
-          const addressKind = tryAddressToKind(address, 'bech32');
+          const addressKind = tryAddressToKind(address, 'bech32', networks.ByronMainnet);
           const valid = addressKind != null && addressKind === CoreAddressTypes.CARDANO_LEGACY;
           return Promise.resolve(valid);
         },

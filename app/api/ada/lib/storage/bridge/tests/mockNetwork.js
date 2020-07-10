@@ -66,7 +66,7 @@ function ourAddressesInTx(
   ];
   const addressesUsed = new Set();
   for (const addr of addresses) {
-    const kind = addressToKind(addr, 'bytes');
+    const kind = addressToKind(addr, 'bytes', networks.ByronMainnet);
     const payload = kind === CoreAddressTypes.JORMUNGANDR_GROUP
       ? groupToSingle(addr)
       : addr;
@@ -217,7 +217,7 @@ export function genUtxoForAddresses(
       for (let j = 0; j < tx.outputs.length; j++) {
         const address = tx.outputs[j].address;
         if (ourAddressSet.has(address)) {
-          const kind = addressToKind(address, 'bytes');
+          const kind = addressToKind(address, 'bytes', networks.ByronMainnet);
           if (
             kind !== CoreAddressTypes.CARDANO_LEGACY &&
             kind !== CoreAddressTypes.JORMUNGANDR_SINGLE &&
@@ -463,7 +463,7 @@ function getJormungandrInputs(
         throw new Error(`${nameof(getJormungandrInputs)} no tx found ${hash}`);
       }
       const pointedOutput = pointedTx.outputs[index];
-      const addressKind = addressToKind(pointedOutput.address, 'bytes');
+      const addressKind = addressToKind(pointedOutput.address, 'bytes', networks.JormungandrMainnet);
       if (addressKind === CoreAddressTypes.CARDANO_LEGACY) {
         result.push({
           address: pointedOutput.address,
@@ -535,7 +535,7 @@ function getByronInputs(
       throw new Error(`${nameof(getJormungandrInputs)} no tx found ${input.id}`);
     }
     const pointedOutput = pointedTx.outputs[input.index];
-    const addressKind = addressToKind(pointedOutput.address, 'bytes');
+    const addressKind = addressToKind(pointedOutput.address, 'bytes', networks.ByronMainnet);
     if (addressKind === CoreAddressTypes.CARDANO_LEGACY) {
       result.push({
         address: pointedOutput.address,

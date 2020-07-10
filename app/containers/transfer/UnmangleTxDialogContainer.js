@@ -73,7 +73,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
       request.all
         // we don't want to include any UTXO that would do nothing but increase the tx fee
         .filter(info => info.value != null && info.value.gt(CONFIG.genesis.linearFee.coefficient))
-        .map(info => getAddressPayload(info.address))
+        .map(info => getAddressPayload(info.address, selected.getParent.getNetworkInfo()))
     );
 
     // note: don't await
@@ -182,9 +182,9 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
       recoveredBalance: ITotalInput(tentativeTx, true),
       fee: IGetFee(tentativeTx, true),
       senders: Array.from(new Set(tentativeTx.senderUtxos.map(utxo => utxo.receiver)))
-        .map(addr => addressToDisplayString(addr)),
+        .map(addr => addressToDisplayString(addr, selected.getParent.getNetworkInfo())),
       receiver: IReceivers(tentativeTx, false)
-        .map(addr => addressToDisplayString(addr))[0],
+        .map(addr => addressToDisplayString(addr, selected.getParent.getNetworkInfo()))[0],
     };
 
     const spendingPasswordForm = (<SpendingPasswordInput

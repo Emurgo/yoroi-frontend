@@ -169,7 +169,7 @@ export default class AddressesStore extends Store {
       publicDeriver: request.publicDeriver,
       storeName: request.storeName,
       addresses: allAddresses.map(hash => ({
-        address: addressToDisplayString(hash),
+        address: addressToDisplayString(hash, request.publicDeriver.getParent.getNetworkInfo()),
         label: 'asdf',
       })),
     });

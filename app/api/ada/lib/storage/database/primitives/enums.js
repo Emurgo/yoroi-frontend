@@ -16,6 +16,10 @@ export const CoreAddressTypes = Object.freeze({
   ERGO_P2PK: 5,
   ERGO_P2SH: 6,
   ERGO_P2S: 7,
+  CARDANO_BASE: 8,
+  CARDANO_PTR: 9,
+  CARDANO_ENTERPRISE: 10,
+  CARDANO_REWARD: 11,
 });
 export type CoreAddressT = $Values<typeof CoreAddressTypes>;
 

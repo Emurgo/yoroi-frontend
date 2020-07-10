@@ -21,7 +21,6 @@ import config from '../../../config';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../../widgets/hashWrappers/RawHash';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
-import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import WarningBox from '../../widgets/WarningBox';
@@ -37,6 +36,7 @@ type Props = {|
   +onSubmit: ({| password: string |}) => PossiblyAsync<void>,
   +amountToNaturalUnits: (amountWithFractions: string) => string,
   +formattedWalletAmount: BigNumber => string,
+  +addressToDisplayString: string => string,
   +onCancel: void => void,
   +isSubmitting: boolean,
   +error: ?LocalizableError,
@@ -159,13 +159,13 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
               <ExplorableHashContainer
                 key={receiver + i} // eslint-disable-line react/no-array-index-key
                 selectedExplorer={this.props.selectedExplorer}
-                hash={addressToDisplayString(receiver)}
+                hash={this.props.addressToDisplayString(receiver)}
                 light
                 linkType="address"
               >
                 <RawHash light>
                   <span className={styles.addressTo}>
-                    {addressToDisplayString(receiver)}
+                    {this.props.addressToDisplayString(receiver)}
                   </span>
                 </RawHash>
               </ExplorableHashContainer>

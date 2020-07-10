@@ -13,6 +13,7 @@ import {
 import type {
   BlockInsert, BlockRow,
   TransactionInsert, TransactionRow,
+  NetworkRow,
 } from '../database/primitives/tables';
 import type {
   TxStatusCodesType,
@@ -998,13 +999,15 @@ async function rawUpdateTransactions(
         ModifyMultipartTx: deps.ModifyMultipartTx,
       },
       {
+        network: publicDeriver.getParent().getNetworkInfo(),
         txIds,
         txsFromNetwork,
         hashToIds: rawGenHashToIdsFunc(
           new Set([
             ...utxoAddressIds,
             ...accountingAddressIds,
-          ])
+          ]),
+          publicDeriver.getParent().getNetworkInfo()
         ),
         toAbsoluteSlotNumber,
         derivationTables,
@@ -1042,6 +1045,7 @@ export async function updateTransactionBatch(
     ModifyMultipartTx: Class<ModifyMultipartTx>,
   |},
   request: {|
+    network: $ReadOnly<NetworkRow>,
     toAbsoluteSlotNumber: ToAbsoluteSlotNumberFunc,
     txIds: Array<number>,
     txsFromNetwork: Array<RemoteTransaction>,
@@ -1068,13 +1072,13 @@ export async function updateTransactionBatch(
     }
   }
 
-  const unseedNewTxs: Array<RemoteTransaction> = [];
+  const unseenNewTxs: Array<RemoteTransaction> = [];
   const txsAddedToBlock: Array<DbTxInChain> = [];
   const modifiedTxIds = new Set<number>();
   for (const txFromNetwork of request.txsFromNetwork) {
     const matchInDb = matchesInDb.get(txFromNetwork.hash);
     if (matchInDb == null) {
-      unseedNewTxs.push(txFromNetwork);
+      unseenNewTxs.push(txFromNetwork);
       continue;
     }
 
@@ -1127,8 +1131,9 @@ export async function updateTransactionBatch(
   const newTxsForDb = await networkTxToDbTx(
     db,
     dbTx,
+    request.network,
     request.derivationTables,
-    unseedNewTxs,
+    unseenNewTxs,
     request.hashToIds,
     request.toAbsoluteSlotNumber,
     TransactionSeed,
@@ -1213,6 +1218,7 @@ export async function updateTransactionBatch(
 async function networkTxToDbTx(
   db: lf$Database,
   dbTx: lf$Transaction,
+  network: $ReadOnly<NetworkRow>,
   derivationTables: Map<number, string>,
   newTxs: Array<RemoteTransaction>,
   hashToIds: HashToIdsFunc,
@@ -1309,7 +1315,7 @@ async function networkTxToDbTx(
         }
         for (let i = 0; i < networkTx.outputs.length; i++) {
           const output = networkTx.outputs[i];
-          const txType = addressToKind(output.address, 'bytes');
+          const txType = addressToKind(output.address, 'bytes', network);
           // consider a group address as a UTXO output
           // since the payment (UTXO) key is the one that signs
           if (
