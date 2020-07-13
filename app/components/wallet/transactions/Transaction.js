@@ -442,7 +442,8 @@ export default class Transaction extends Component<Props, State> {
 
                       const notificationElementId = `address-${addressIndex}-copyNotification`;
                       return (
-                        <div key={`${data.txid}-from-${address.address}`} className={styles.addressItem}>
+                        // eslint-disable-next-line react/no-array-index-key
+                        <div key={`${data.txid}-from-${address.address}-${addressIndex}`} className={styles.addressItem}>
                           <CopyableAddress
                             hash={address.address}
                             elementId={notificationElementId}
@@ -452,7 +453,6 @@ export default class Transaction extends Component<Props, State> {
                             notification={notification}
                           >
                             <ExplorableHashContainer
-                              key={`${data.txid}-from-${address.address}`}
                               selectedExplorer={this.props.selectedExplorer}
                               hash={addressToDisplayString(address.address)}
                               light
@@ -505,7 +505,6 @@ export default class Transaction extends Component<Props, State> {
                             notification={notification}
                           >
                             <ExplorableHashContainer
-                              key={`${data.txid}-from-${address.address}`}
                               selectedExplorer={this.props.selectedExplorer}
                               hash={addressToDisplayString(address.address)}
                               light
