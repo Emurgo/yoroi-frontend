@@ -603,7 +603,7 @@
   "wallet.staking.warning.title": "Delegation temporarily disabled",
   "wallet.summary.no.transaction": "İşlem bulunamadı",
   "wallet.summary.page.dateTime": "Tarih/saat",
-  "wallet.summary.page.integratedNotificationMessage": "You have successfully integrated with your {deviceName}",
+  "wallet.summary.page.integratedNotificationMessage": "{deviceName} ile başarıyla entegre oldunuz",
   "wallet.summary.page.pendingIncomingConfirmationLabel": "Gelen bekleyen onay",
   "wallet.summary.page.pendingOutgoingConfirmationLabel": "Giden bekleyen onay",
   "wallet.summary.page.showMoreTransactionsButtonLabel": "Daha fazla işlem göster",
