@@ -638,7 +638,7 @@
   "wallet.transaction.fee": "Ücret",
   "wallet.transaction.memo.add.dialog.actions.submit": "Ekle",
   "wallet.transaction.memo.delete.dialog.actions.delete": "Sil",
-  "wallet.transaction.memo.delete.dialog.content": "Are you sure you want to remove the memo for this transaction?<br />Doing so will erase all copies of it and you will not be able to restore it in the future.",
+  "wallet.transaction.memo.delete.dialog.content": "Bu işlemle ilgili notu kaldırmak istediğinizden emin misiniz? <br /> Bunu yaptığınızda tüm kopyaları silinir ve gelecekte geri yükleyemezsiniz.",
   "wallet.transaction.memo.invalid": "Not en az 1 ve en fazla {maxMemo} karakter olmalıdır.",
   "wallet.transaction.memo.optional.invalid": "Not {maxMemo} karakterden fazla olamaz.",
   "wallet.transaction.received": "{currency} alındı",
