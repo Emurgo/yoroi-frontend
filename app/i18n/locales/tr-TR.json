@@ -404,7 +404,7 @@
   "wallet.currency.pick.header": "Bir para birimi veya platform seçin",
   "wallet.dashboard.empty.text": "Go to Simple or Advance Staking to choose what stake pool you want to delegate in. Note, you may delegate only to one stake pool in this Tesnnet",
   "wallet.dashboard.empty.title": "You have not delegated your ADA yet",
-  "wallet.dashboard.epochEndTitle": "Time until Epoch end",
+  "wallet.dashboard.epochEndTitle": "Dönem sonuna kadar geçen süre",
   "wallet.dashboard.epochProgress": "Epoch progress",
   "wallet.dashboard.epochTooltip": "Note: only the first reward after delegating will take 2 epochs. Afterwards, rewards come every epoch",
   "wallet.dashboard.graph.dayToggleLabel": "Gün (Eş Güdümlü Evrensel Zaman)",
