@@ -29,7 +29,10 @@ export async function filterMangledAddresses(request: {|
     if (request.invertFilter) return [];
     return request.baseAddresses.map(info => ({
       ...info,
-      address: addressToDisplayString(info.address, request.publicDeriver.getParent.getNetworkInfo()),
+      address: addressToDisplayString(
+        info.address,
+        request.publicDeriver.getParent.getNetworkInfo()
+      ),
     }));
   }
 

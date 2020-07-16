@@ -8,7 +8,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import globalMessages from '../../i18n/global-messages';
-import { tryAddressToKind, isJormungandrAddress, getAddressPayload } from '../../api/ada/lib/storage/bridge/utils';
+import { tryAddressToKind, isJormungandrAddress } from '../../api/ada/lib/storage/bridge/utils';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 
 import WalletSendForm from '../../components/wallet/send/WalletSendForm';
