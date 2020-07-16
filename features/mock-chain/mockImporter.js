@@ -35,6 +35,9 @@ import {
   toRemoteJormungandrTx,
   toRemoteByronTx,
 } from '../../app/api/ada/lib/storage/bridge/tests/mockNetwork';
+import {
+  networks,
+} from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 import { CoreAddressTypes } from '../../app/api/ada/lib/storage/database/primitives/enums';
 import {
   HARD_DERIVATION_START,
@@ -1313,8 +1316,18 @@ function getApiStatus(): ServerStatusResponse {
   return apiStatuses[0];
 }
 
-const usedAddresses: FilterFunc = genCheckAddressesInUse(transactions);
-const history: HistoryFunc = genGetTransactionsHistoryForAddresses(transactions);
+const usedAddresses: FilterFunc = genCheckAddressesInUse(
+  transactions,
+  isJormungandr
+    ? networks.JormungandrMainnet
+    : networks.ByronMainnet,
+);
+const history: HistoryFunc = genGetTransactionsHistoryForAddresses(
+  transactions,
+  isJormungandr
+    ? networks.JormungandrMainnet
+    : networks.ByronMainnet,
+);
 const getBestBlock: BestBlockFunc = genGetBestBlock(transactions);
 const utxoForAddresses: AddressUtxoFunc = genUtxoForAddresses(
   history,

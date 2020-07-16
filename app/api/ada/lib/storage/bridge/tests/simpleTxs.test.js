@@ -38,6 +38,9 @@ import {
 import {
   updateTransactions,
 } from '../updateTransactions';
+import {
+  networks,
+} from '../../database/prepackaged/networks';
 
 jest.mock('../../database/initialSeed');
 
@@ -266,10 +269,14 @@ async function syncingSimpleTransaction(
   const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
   const publicDeriver = await setup(db, TX_TEST_MNEMONIC_1, purposeForTest);
 
+  const network = purposeForTest === WalletTypePurpose.BIP44
+    ? networks.ByronMainnet
+    : networks.JormungandrMainnet;
   const txHistory = networkTransactions(purposeForTest);
-  const checkAddressesInUse = genCheckAddressesInUse(txHistory);
+  const checkAddressesInUse = genCheckAddressesInUse(txHistory, network);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
-    txHistory
+    txHistory,
+    network,
   );
   const getBestBlock = genGetBestBlock(txHistory);
 
@@ -616,9 +623,13 @@ async function utxoCreatedAndUsed(
   const publicDeriver = await setup(db, TX_TEST_MNEMONIC_1, purposeForTest);
 
   const txHistory = networkTransactions(purposeForTest);
-  const checkAddressesInUse = genCheckAddressesInUse(txHistory);
+  const network = purposeForTest === WalletTypePurpose.BIP44
+    ? networks.ByronMainnet
+    : networks.JormungandrMainnet;
+  const checkAddressesInUse = genCheckAddressesInUse(txHistory, network);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
-    txHistory
+    txHistory,
+    network
   );
   const getBestBlock = genGetBestBlock(txHistory);
 

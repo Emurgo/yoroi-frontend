@@ -29,6 +29,7 @@ import {
 import {
   WalletTypePurpose,
 } from '../../../../../../config/numbersConfig';
+import type { NetworkRow } from '../../database/primitives/tables';
 
 import { RustModule } from '../../../cardanoCrypto/rustLoader';
 
@@ -37,6 +38,7 @@ import { networks } from '../../database/prepackaged/networks';
 
 export function genCheckAddressesInUse(
   blockchain: Array<RemoteTransaction>,
+  network: $ReadOnly<NetworkRow>,
 ): FilterFunc {
   return async (
     body: FilterUsedRequest,
@@ -47,7 +49,7 @@ export function genCheckAddressesInUse(
       if (tx.tx_state !== 'Successful') {
         continue;
       }
-      const oursInTx = ourAddressesInTx(tx, addressSet);
+      const oursInTx = ourAddressesInTx(tx, addressSet, network);
       for (const found of oursInTx) {
         usedSet.add(found);
       }
@@ -59,6 +61,7 @@ export function genCheckAddressesInUse(
 function ourAddressesInTx(
   tx: RemoteTransaction,
   ownAddresses: Set<string>,
+  network: $ReadOnly<NetworkRow>,
 ): Set<string> {
   const addresses = [
     ...tx.inputs.map(input => input.address),
@@ -66,7 +69,7 @@ function ourAddressesInTx(
   ];
   const addressesUsed = new Set();
   for (const addr of addresses) {
-    const kind = addressToKind(addr, 'bytes', networks.ByronMainnet);
+    const kind = addressToKind(addr, 'bytes', network);
     const payload = kind === CoreAddressTypes.JORMUNGANDR_GROUP
       ? groupToSingle(addr)
       : addr;
@@ -80,10 +83,11 @@ function ourAddressesInTx(
 function filterForOwn(
   txs: Array<RemoteTransaction>,
   ownAddresses: Set<string>,
+  network: $ReadOnly<NetworkRow>,
 ): Array<RemoteTransaction> {
   const ownTxs = [];
   for (const tx of txs) {
-    const oursInTx = ourAddressesInTx(tx, ownAddresses);
+    const oursInTx = ourAddressesInTx(tx, ownAddresses, network);
     if (oursInTx.size > 0) {
       ownTxs.push(tx);
     }
@@ -93,6 +97,7 @@ function filterForOwn(
 
 export function genGetTransactionsHistoryForAddresses(
   blockchain: Array<RemoteTransaction>,
+  network: $ReadOnly<NetworkRow>,
 ): HistoryFunc {
   return async (
     body: HistoryRequest,
@@ -110,7 +115,7 @@ export function genGetTransactionsHistoryForAddresses(
     }
     const ownAddresses = new Set(body.addresses);
     if (body.after == null)  {
-      const filtered = filterForOwn(subChain, ownAddresses);
+      const filtered = filterForOwn(subChain, ownAddresses, network);
       return filtered;
     }
     const after = body.after;
@@ -152,7 +157,7 @@ export function genGetTransactionsHistoryForAddresses(
         }
       }
     }
-    const filtered = filterForOwn(txsToInclude, ownAddresses);
+    const filtered = filterForOwn(txsToInclude, ownAddresses, network);
     return filtered;
   };
 }
