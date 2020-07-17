@@ -30,7 +30,9 @@ import {
 import { loadLovefieldDB } from '../../database/index';
 import { CoreAddressTypes } from '../../database/primitives/enums';
 import { RustModule } from '../../../cardanoCrypto/rustLoader';
-
+import {
+  networks,
+} from '../../database/prepackaged/networks';
 import {
   asGetAllAccounting,
   asGetAllUtxos,
@@ -371,9 +373,11 @@ async function syncingSimpleTransaction(): Promise<void> {
   const publicDeriver = await setup(db, TX_TEST_MNEMONIC_1, WalletTypePurpose.CIP1852);
 
   const txHistory = firstTx();
-  const checkAddressesInUse = genCheckAddressesInUse(txHistory);
+  const network = networks.JormungandrMainnet;
+  const checkAddressesInUse = genCheckAddressesInUse(txHistory, network);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
-    txHistory
+    txHistory,
+    network
   );
   const getBestBlock = genGetBestBlock(txHistory);
 
@@ -611,9 +615,11 @@ async function syncWithSwappedGroup(): Promise<void> {
   const publicDeriver = await setup(db, TX_TEST_MNEMONIC_1, WalletTypePurpose.CIP1852);
 
   const txHistory = txWithGroupSwapped();
-  const checkAddressesInUse = genCheckAddressesInUse(txHistory);
+  const network = networks.JormungandrMainnet;
+  const checkAddressesInUse = genCheckAddressesInUse(txHistory, network);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
-    txHistory
+    txHistory,
+    network
   );
   const getBestBlock = genGetBestBlock(txHistory);
 
@@ -722,9 +728,11 @@ async function syncWithCertificate(): Promise<void> {
   const publicDeriver = await setup(db, TX_TEST_MNEMONIC_1, WalletTypePurpose.CIP1852);
 
   const txHistory = txWithCert();
-  const checkAddressesInUse = genCheckAddressesInUse(txHistory);
+  const network = networks.JormungandrMainnet;
+  const checkAddressesInUse = genCheckAddressesInUse(txHistory, network);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
-    txHistory
+    txHistory,
+    network,
   );
   const getBestBlock = genGetBestBlock(txHistory);
 

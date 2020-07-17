@@ -180,7 +180,7 @@ export function newAdaUnsignedTxFromUtxo(
   if (changeAdaAddr.length === 1) {
     /**
      * The current Rust code doesn't allow to separate input selection
-     * from the chnage address output policy so we combinue it
+     * from the change address output policy so we combine it
      */
     const changeAddr = RustModule.WalletV2.Address.from_base58(changeAdaAddr[0].address);
     outputPolicy = RustModule.WalletV2.OutputPolicy.change_to_one_address(changeAddr);

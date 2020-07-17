@@ -32,7 +32,7 @@ import {
 import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import LocalizableError from '../../../i18n/LocalizableError';
-import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import { isJormungandr } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import WarningBox from '../../widgets/WarningBox';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
@@ -152,7 +152,7 @@ export default class WalletSendForm extends Component<Props> {
       );
       // note: assume these are validated externally
       this.props.updateAmount(Number(adjustedAmount));
-      this.props.updateReceiver(getAddressPayload(uriParams.address));
+      this.props.updateReceiver(getAddressPayload(uriParams.address, this.props.selectedNetwork));
       this.props.resetUriParams();
     }
 
@@ -206,16 +206,15 @@ export default class WalletSendForm extends Component<Props> {
           }
           const updateReceiver = (isValid) => {
             if (isValid) {
-              this.props.updateReceiver(getAddressPayload(receiverValue));
+              this.props.updateReceiver(
+                getAddressPayload(receiverValue, this.props.selectedNetwork)
+              );
             } else {
               this.props.updateReceiver();
             }
           };
           const isValidLegacy = this.props.isValidLegacyAddress(receiverValue);
-          const isJormungandr = (
-            this.props.selectedNetwork.NetworkId === networks.JormungandrMainnet.NetworkId
-          );
-          if (!isJormungandr) {
+          if (!isJormungandr(this.props.selectedNetwork)) {
             updateReceiver(isValidLegacy);
             return [isValidLegacy, this.context.intl.formatMessage(messages.invalidAddress)];
           }

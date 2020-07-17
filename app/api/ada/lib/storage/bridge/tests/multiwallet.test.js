@@ -41,6 +41,9 @@ import {
   updateTransactions,
   removeAllTransactions,
 } from '../updateTransactions';
+import {
+  networks,
+} from '../../database/prepackaged/networks';
 
 jest.mock('../../database/initialSeed');
 
@@ -350,9 +353,13 @@ async function syncingSimpleTransaction(
   const publicDeriver2 = await setup(db, TX_TEST_MNEMONIC_2, purposeForTest);
 
   const txHistory = networkTransactions(purposeForTest);
-  const checkAddressesInUse = genCheckAddressesInUse(txHistory);
+  const network = purposeForTest === WalletTypePurpose.BIP44
+    ? networks.ByronMainnet
+    : networks.JormungandrMainnet;
+  const checkAddressesInUse = genCheckAddressesInUse(txHistory, network);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
-    txHistory
+    txHistory,
+    network,
   );
   const getBestBlock = genGetBestBlock(txHistory);
 

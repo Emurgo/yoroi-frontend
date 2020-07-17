@@ -22,6 +22,7 @@ import type {
 } from '../../../../types/TransferTypes';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { getAdaCurrencyMeta } from '../../currencyInfo';
+import { networks } from '../../lib/storage/database/prepackaged/networks';
 
 /**
  * Generate transaction including all addresses with no change.
@@ -68,7 +69,7 @@ export async function buildYoroiTransferTx(payload: {|
       id: Buffer.from(fragment.id().as_bytes()).toString('hex'),
       encodedTx: fragment.as_bytes(),
       // recall: some addresses may be legacy, some may be Shelley
-      senders: uniqueSenders.map(addr => addressToDisplayString(addr)),
+      senders: uniqueSenders.map(addr => addressToDisplayString(addr, networks.JormungandrMainnet)),
       receiver: RustModule.WalletV3.Address.from_bytes(
         Buffer.from(outputAddr, 'hex')
       ).to_string(Bech32Prefix.ADDRESS)

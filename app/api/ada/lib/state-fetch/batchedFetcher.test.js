@@ -22,6 +22,9 @@ import type {
   ConfigType,
 } from '../../../../../config/config-types';
 import config from '../../../../config';
+import {
+  networks,
+} from '../storage/database/prepackaged/networks';
 
 declare var CONFIG: ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;
@@ -96,7 +99,7 @@ test('Batched history', async (done) => {
   }
 
   const getTransactionsHistoryForAddresses = await batchGetTransactionsHistoryForAddresses(
-    genGetTransactionsHistoryForAddresses(transactions)
+    genGetTransactionsHistoryForAddresses(transactions, networks.ByronMainnet)
   );
   const result = await getTransactionsHistoryForAddresses({
     addresses,

@@ -40,6 +40,7 @@ import type { BaseSignRequest } from '../../api/ada/transactions/types';
 import { ApiOptions, getApiForNetwork, getApiMeta } from '../../api/common/utils';
 import { isWithinSupply } from '../../utils/validations';
 import { formattedWalletAmount } from '../../utils/formatters';
+import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 // Hardware Wallet Confirmation
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
@@ -161,12 +162,12 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           validateAmount={amount => Promise.resolve(isWithinSupply(amount, apiMeta.totalSupply))}
           onSubmit={onSubmit}
           isValidJormungandrAddress={address => {
-            const kind = tryAddressToKind(address, 'bech32');
+            const kind = tryAddressToKind(address, 'bech32', networks.JormungandrMainnet);
             if (kind == null) return false;
             return isJormungandrAddress(kind);
           }}
           isValidLegacyAddress={address => {
-            const kind = tryAddressToKind(address, 'bech32');
+            const kind = tryAddressToKind(address, 'bech32', networks.ByronMainnet);
             if (kind == null) return false;
             if (kind === CoreAddressTypes.CARDANO_LEGACY) return true;
             return false;

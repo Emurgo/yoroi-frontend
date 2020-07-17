@@ -27,7 +27,6 @@ import type { PriceDataRow } from '../../../api/ada/lib/storage/database/prices/
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import { TxStatusCodes, } from '../../../api/ada/lib/storage/database/primitives/enums';
 import type { TxStatusCodesType, } from '../../../api/ada/lib/storage/database/primitives/enums';
-import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
 import type { CertificateRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { splitAmount } from '../../../utils/formatters';
@@ -173,6 +172,7 @@ type Props = {|
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
   +decimalPlaces: number, // TODO: this should be tied to individual values, not the currency itself
+  +addressToDisplayString: string => string,
 |};
 
 type State = {|
@@ -454,12 +454,14 @@ export default class Transaction extends Component<Props, State> {
                           >
                             <ExplorableHashContainer
                               selectedExplorer={this.props.selectedExplorer}
-                              hash={addressToDisplayString(address.address)}
+                              hash={this.props.addressToDisplayString(address.address)}
                               light
                               linkType="address"
                             >
                               <span className={classnames([styles.rowData, styles.hash])}>
-                                {this.truncateString(addressToDisplayString(address.address))}
+                                {this.truncateString(
+                                  this.props.addressToDisplayString(address.address)
+                                )}
                               </span>
                             </ExplorableHashContainer>
                           </CopyableAddress>
@@ -506,12 +508,14 @@ export default class Transaction extends Component<Props, State> {
                           >
                             <ExplorableHashContainer
                               selectedExplorer={this.props.selectedExplorer}
-                              hash={addressToDisplayString(address.address)}
+                              hash={this.props.addressToDisplayString(address.address)}
                               light
                               linkType="address"
                             >
                               <span className={classnames([styles.rowData, styles.hash])}>
-                                {this.truncateString(addressToDisplayString(address.address))}
+                                {this.truncateString(
+                                  this.props.addressToDisplayString(address.address)
+                                )}
                               </span>
                             </ExplorableHashContainer>
                           </CopyableAddress>
@@ -611,7 +615,7 @@ export default class Transaction extends Component<Props, State> {
   generateAddressButton: string => ?Node = (address) => {
     const { intl } = this.context;
     const addressInfo = this.props.addressLookup(
-      addressToDisplayString(address)
+      this.props.addressToDisplayString(address)
     );
     if (addressInfo == null) {
       // this can happen in three main case:

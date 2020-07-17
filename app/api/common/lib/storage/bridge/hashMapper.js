@@ -8,7 +8,7 @@ import {
   GetAddress,
 } from '../../../../ada/lib/storage/database/primitives/api/read';
 import type {
-  AddressRow,
+  AddressRow, NetworkRow,
 } from '../../../../ada/lib/storage/database/primitives/tables';
 import type {
   CoreAddressT,
@@ -98,6 +98,7 @@ export type HashToIdsFunc = HashToIdsRequest => Promise<Map<string, number>>;
  */
 export function rawGenHashToIdsFunc(
   ownAddressIds: Set<number>,
+  network: $ReadOnly<NetworkRow>,
 ): HashToIdsFunc {
   return async (
     request: HashToIdsRequest
@@ -154,7 +155,7 @@ export function rawGenHashToIdsFunc(
     const addressWithType = notFound.map(addr => ({
       data: addr,
       // TODO: make multi-currency friendly
-      type: addressToKind(addr, 'bytes'),
+      type: addressToKind(addr, 'bytes', network),
     }));
     for (const address of addressWithType) {
       if (address.type !== CoreAddressTypes.JORMUNGANDR_GROUP) {

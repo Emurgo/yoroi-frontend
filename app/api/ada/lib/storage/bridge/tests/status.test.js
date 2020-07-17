@@ -27,6 +27,9 @@ import {
   ChainDerivations,
 } from '../../../../../../config/numbersConfig';
 import type { WalletTypePurposeT } from '../../../../../../config/numbersConfig';
+import {
+  networks,
+} from '../../database/prepackaged/networks';
 
 import {
   asGetAllUtxos,
@@ -273,10 +276,14 @@ async function baseTest(
   const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
   const publicDeriver = await setup(db, TX_TEST_MNEMONIC_1, purposeForTest);
 
+  const network = purposeForTest === WalletTypePurpose.BIP44
+    ? networks.ByronMainnet
+    : networks.JormungandrMainnet;
   const networkTransactions: Array<RemoteTransaction> = [initialPendingTx(type, purposeForTest)];
-  const checkAddressesInUse = genCheckAddressesInUse(networkTransactions);
+  const checkAddressesInUse = genCheckAddressesInUse(networkTransactions, network);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
-    networkTransactions
+    networkTransactions,
+    network,
   );
   const getBestBlock = genGetBestBlock(networkTransactions);
 
@@ -765,9 +772,13 @@ async function pendingDropped(
     pointlessTx(purposeForTest),
     initialPendingTx('Pending', purposeForTest)
   ];
-  const checkAddressesInUse = genCheckAddressesInUse(networkTransactions);
+  const network = purposeForTest === WalletTypePurpose.BIP44
+    ? networks.ByronMainnet
+    : networks.JormungandrMainnet;
+  const checkAddressesInUse = genCheckAddressesInUse(networkTransactions, network);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
-    networkTransactions
+    networkTransactions,
+    network
   );
   const getBestBlock = genGetBestBlock(networkTransactions);
 

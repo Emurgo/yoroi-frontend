@@ -48,7 +48,7 @@ import UserPasswordDialog from '../../components/wallet/add/paper-wallets/UserPa
 import { ProgressStep as PaperWalletProgressStep } from '../../stores/ada/PaperWalletCreateStore';
 import { PdfGenSteps } from '../../api/ada/paperWallet/paperWalletPdf';
 import { ROUTES } from '../../routes-config';
-import { networks, } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { networks, isJormungandr, } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -626,7 +626,6 @@ export const RestoreVerify = (): Node => {
     getRestoreMode(),
     selectedNetwork,
   );
-  const isJormungandr = selectedNetwork.NetworkId === networks.JormungandrMainnet.NetworkId;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -638,7 +637,7 @@ export const RestoreVerify = (): Node => {
             selectedNetwork,
             step: RestoreSteps.VERIFY_MNEMONIC,
             restoreRequest: {
-              isExecuting: !isJormungandr && boolean('isExecuting', false),
+              isExecuting: !isJormungandr(selectedNetwork) && boolean('isExecuting', false),
               error: undefined,
               reset: action('reset'),
             },
