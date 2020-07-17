@@ -27,6 +27,7 @@ import {
 } from '../../lib/storage/bridge/utils';
 
 const defaultTtlOffset = 7200; // based off what the cardano-wallet team found worked empirically
+const minimumUtxoValue = '0'; // TODO: make this a protocol parameter that can dynamically change
 
 export function sendAllUnsignedTx(
   receiver: string,
@@ -108,13 +109,18 @@ export function sendAllUnsignedTxFromUtxo(
     RustModule.WalletV4.LinearFee.new(
       RustModule.WalletV4.BigNum.from_str('2'),
       RustModule.WalletV4.BigNum.from_str('500'),
-    )
+    ),
+    RustModule.WalletV4.BigNum.from_str(minimumUtxoValue),
   );
   txBuilder.set_ttl(absSlotNumber.plus(defaultTtlOffset).toNumber());
   for (const input of allUtxos) {
     addUtxoInput(txBuilder, input);
   }
 
+  if (totalBalance.lt(txBuilder.estimate_fee().to_str())) {
+    // not enough in inputs to even cover the cost of including themselves in a tx
+    throw new NotEnoughMoneyToSendError();
+  }
   {
     // semantically, sending all ADA to somebody
     // is the same as if you're sending all the ADA as change to yourself
@@ -198,7 +204,8 @@ export function newAdaUnsignedTxFromUtxo(
     RustModule.WalletV4.LinearFee.new(
       RustModule.WalletV4.BigNum.from_str('2'),
       RustModule.WalletV4.BigNum.from_str('500'),
-    )
+    ),
+    RustModule.WalletV4.BigNum.from_str(minimumUtxoValue),
   );
   txBuilder.set_ttl(absSlotNumber.plus(defaultTtlOffset).toNumber());
   txBuilder.add_output(
@@ -216,8 +223,9 @@ export function newAdaUnsignedTxFromUtxo(
     currentInputSum = currentInputSum.plus(utxo.amount);
     addUtxoInput(txBuilder, utxo);
     const output = new BigNumber(
-      txBuilder.get_feeless_output_total().checked_add(txBuilder.calc_fee()).to_str()
+      txBuilder.get_feeless_output_total().checked_add(txBuilder.estimate_fee()).to_str()
     );
+
     if (currentInputSum.gte(output)) {
       break;
     }
@@ -225,7 +233,7 @@ export function newAdaUnsignedTxFromUtxo(
   // check to see if we have enough balance in the wallet to cover the transaction
   {
     const output = new BigNumber(
-      txBuilder.get_feeless_output_total().checked_add(txBuilder.calc_fee()).to_str()
+      txBuilder.get_feeless_output_total().checked_add(txBuilder.estimate_fee()).to_str()
     );
     if (currentInputSum.lt(output)) {
       throw new NotEnoughMoneyToSendError();
@@ -234,7 +242,7 @@ export function newAdaUnsignedTxFromUtxo(
 
   const changeAddr = (() => {
     if (changeAdaAddr == null) {
-      txBuilder.set_fee(txBuilder.calc_fee());
+      txBuilder.set_fee(txBuilder.estimate_fee());
       return [];
     }
     const oldOutput = txBuilder.get_feeless_output_total();

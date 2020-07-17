@@ -39,7 +39,7 @@ import {
 
 const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
   {
-    amount: '7001',
+    amount: '701',
     receiver: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
     tx_hash: '05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f',
     tx_index: 0,
@@ -152,12 +152,11 @@ describe('Create unsigned TX from UTXO', () => {
     // input selection will only take 2 of the 3 inputs
     // it takes 2 inputs because input selection algorithm
     expect(unsignedTxResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
-    expect(unsignedTxResponse.txBuilder.get_input_total().to_str()).toEqual('1007002');
-    expect(unsignedTxResponse.txBuilder.get_feeless_output_total().to_str()).toEqual('821500');
-    expect(unsignedTxResponse.txBuilder.calc_fee().to_str()).toEqual('184002');
+    expect(unsignedTxResponse.txBuilder.get_input_total().to_str()).toEqual('1000702');
+    expect(unsignedTxResponse.txBuilder.get_feeless_output_total().to_str()).toEqual('999528');
+    expect(unsignedTxResponse.txBuilder.estimate_fee().to_str()).toEqual('1154');
   });
 });
-
 
 describe('Create unsigned TX from addresses', () => {
   it('Should create a valid transaction without selection', () => {
@@ -171,15 +170,15 @@ describe('Create unsigned TX from addresses', () => {
     );
     expect(unsignedTxResponse.senderUtxos).toEqual([addressedUtxos[0], addressedUtxos[1]]);
 
-    expect(unsignedTxResponse.txBuilder.get_input_total().to_str()).toEqual('1007002');
+    expect(unsignedTxResponse.txBuilder.get_input_total().to_str()).toEqual('1000702');
     expect(unsignedTxResponse.txBuilder.get_feeless_output_total().to_str()).toEqual('5001');
-    expect(unsignedTxResponse.txBuilder.calc_fee().to_str()).toEqual('151502');
+    expect(unsignedTxResponse.txBuilder.estimate_fee().to_str()).toEqual('1052');
     // burns remaining amount
     expect(
       unsignedTxResponse.txBuilder.get_input_total().checked_sub(
         unsignedTxResponse.txBuilder.get_feeless_output_total()
       ).to_str()
-    ).toEqual('1002001');
+    ).toEqual('995701');
   });
 });
 
@@ -221,7 +220,7 @@ describe('Create signed transactions', () => {
     expect(bootstrapWits.len()).toEqual(1);
 
     expect(Buffer.from(bootstrapWits.get(0).to_bytes()).toString('hex')).toEqual(
-      '8558208fb03c3aa052f51c086c54bd4059ead2d2e426ac89fa4b3ce41cbfd8800b51c058408202a668af7b2c435d9bca847785fa327eb81e149518aa3596cd407f898b94f86ef68ca3c34f57a11ee80c90ec856f5e99d4e0170bc2e836327280dee522140c58202623fceb96b07408531a5cb259f53845a38d6b68928e7c0c7e390f07545d0e624683008200525441a0'
+      '8458208fb03c3aa052f51c086c54bd4059ead2d2e426ac89fa4b3ce41cbfd8800b51c0584053685c27ee95dc8e2ea87e6c9e7b0557c7d060cc9d18ada7df3c2eec5949011c76e8647b072fe3fa8310894f087b097cbb15d7fbcc743100a716bf5df3c6190058202623fceb96b07408531a5cb259f53845a38d6b68928e7c0c7e390f07545d0e6241a0'
     );
   });
 
@@ -302,7 +301,7 @@ describe('Create signed transactions', () => {
     expect(bootstrapWits.len()).toEqual(1);
 
     expect(Buffer.from(bootstrapWits.get(0).to_bytes()).toString('hex')).toEqual(
-      '8558208fb03c3aa052f51c086c54bd4059ead2d2e426ac89fa4b3ce41cbfd8800b51c058401edebb108c74a991bef5b28458778fc0713499349d77fb98acc63e4219cfcd1b51321ccaccdf2ce2e80d7c2687f3d79feea32daedcfbc19792dff0358af5950358202623fceb96b07408531a5cb259f53845a38d6b68928e7c0c7e390f07545d0e624683008200525441a0'
+      '8458208fb03c3aa052f51c086c54bd4059ead2d2e426ac89fa4b3ce41cbfd8800b51c058401edebb108c74a991bef5b28458778fc0713499349d77fb98acc63e4219cfcd1b51321ccaccdf2ce2e80d7c2687f3d79feea32daedcfbc19792dff0358af5950358202623fceb96b07408531a5cb259f53845a38d6b68928e7c0c7e390f07545d0e6241a0'
     );
   });
 });
@@ -320,14 +319,14 @@ describe('Create sendAll unsigned TX from UTXO', () => {
 
       expect(sendAllResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
       expect(sendAllResponse.txBuilder.get_input_total().to_str()).toEqual('11000002');
-      expect(sendAllResponse.txBuilder.get_feeless_output_total().to_str()).toEqual('10775000');
-      expect(sendAllResponse.txBuilder.calc_fee().to_str()).toEqual('223502');
+      expect(sendAllResponse.txBuilder.get_feeless_output_total().to_str()).toEqual('10998652');
+      expect(sendAllResponse.txBuilder.estimate_fee().to_str()).toEqual('1330');
       // make sure we don't accidentally burn a lot of coins
       expect(
         sendAllResponse.txBuilder.get_input_total().checked_sub(
           sendAllResponse.txBuilder.get_feeless_output_total()
         ).to_str()
-      ).toEqual('225002');
+      ).toEqual('1350');
     });
   });
 
