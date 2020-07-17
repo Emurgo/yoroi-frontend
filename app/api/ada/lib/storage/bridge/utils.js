@@ -113,7 +113,7 @@ export function getCardanoAddrKeyHash(
 ): (
   // null -> legacy address (no key hash)
   // undefined -> script hash instead of key hash
-  RustModule.WalletV4.AddrKeyHash | null | void
+  RustModule.WalletV4.Ed25519KeyHash | null | void
 ) {
   const wasmAddr = typeof addr === 'string'
     ? RustModule.WalletV4.Address.from_bytes(Buffer.from(addr, 'hex'))
