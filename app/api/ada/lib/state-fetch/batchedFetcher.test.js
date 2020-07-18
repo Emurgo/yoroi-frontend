@@ -33,21 +33,23 @@ beforeAll(async () => {
   await RustModule.load();
 });
 
-test('Batched history', async (done) => {
-  const chainKey = (() => {
-    const rootPk = generateWalletRootKey('abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon share');
-    const v3Chain = rootPk
-      .derive(WalletTypePurpose.BIP44)
-      .derive(CoinTypes.CARDANO)
-      .derive(HARD_DERIVATION_START + 0)
-      .derive(ChainDerivations.EXTERNAL);
-    return RustModule.WalletV2.Bip44ChainPublic.new(
-      RustModule.WalletV2.PublicKey.from_hex(
-        Buffer.from(v3Chain.to_public().as_bytes()).toString('hex')
-      ),
-      RustModule.WalletV2.DerivationScheme.v2()
-    );
-  })();
+function generateWallet(): RustModule.WalletV2.Bip44ChainPublic {
+  const rootPk = generateWalletRootKey('abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon share');
+  const v3Chain = rootPk
+    .derive(WalletTypePurpose.BIP44)
+    .derive(CoinTypes.CARDANO)
+    .derive(HARD_DERIVATION_START + 0)
+    .derive(ChainDerivations.EXTERNAL);
+  return RustModule.WalletV2.Bip44ChainPublic.new(
+    RustModule.WalletV2.PublicKey.from_hex(
+      Buffer.from(v3Chain.to_public().as_bytes()).toString('hex')
+    ),
+    RustModule.WalletV2.DerivationScheme.v2()
+  );
+}
+
+test('Batched history pagination', async (done) => {
+  const chainKey = generateWallet();
 
   // We want to make sure both batching on addresses and transactions is executed
   const numIterations = (Math.max(
@@ -69,14 +71,14 @@ test('Batched history', async (done) => {
 
   const transactions = [];
   for (let i = 0; i < numIterations; i++) {
-    const genesisBlockHask = '0';
+    const genesisBlockHash = '0';
     transactions.push({
       hash: (i + 1).toString(),
       inputs: [
         {
           address: addresses[0],
-          txHash: genesisBlockHask,
-          id: genesisBlockHask + i.toString(),
+          txHash: genesisBlockHash,
+          id: genesisBlockHash + i.toString(),
           index: i,
           amount: '1000000'
         }
@@ -107,5 +109,95 @@ test('Batched history', async (done) => {
   });
 
   expect(result.length).toEqual(numIterations);
+  done();
+});
+
+test('Batched history edge case: full response with a pending transaction', async (done) => {
+  const chainKey = generateWallet();
+
+  const addresses = [];
+  for (let i = 0; i < config.wallets.TRANSACTION_REQUEST_SIZE; i++) {
+    const pubKey = chainKey.address_key(
+      RustModule.WalletV2.AddressKeyIndex.new(i)
+    );
+    const addr = pubKey.bootstrap_era_address(RustModule.WalletV2.BlockchainSettings.from_json({
+      protocol_magic: protocolMagic
+    }));
+    const hex = addr.to_base58();
+    addresses.push(hex);
+  }
+
+  const transactions = [];
+  const genesisBlockHash = '0'; // fake hash just for the test
+
+  // fill response with in-block transactions except for one
+  for (let i = 0; i < config.wallets.TRANSACTION_REQUEST_SIZE - 1; i++) {
+    transactions.push({
+      hash: (i + 1).toString(),
+      inputs: [
+        {
+          address: addresses[0],
+          txHash: genesisBlockHash,
+          id: genesisBlockHash + i.toString(),
+          index: i,
+          amount: '1000000'
+        }
+      ],
+      outputs: [
+        {
+          address: addresses[i],
+          amount: '1'
+        },
+      ],
+      height: i,
+      epoch: 0,
+      slot: i,
+      tx_ordinal: 0,
+      block_hash: i.toString(),
+      time: new Date(i).toString(),
+      last_update: new Date(i).toString(),
+      tx_state: 'Successful'
+    });
+  }
+  // last tx in response is a pending transaction
+  {
+    const i = config.wallets.TRANSACTION_REQUEST_SIZE - 1;
+    transactions.push({
+      hash: (i + 1).toString(),
+      inputs: [
+        {
+          address: addresses[0],
+          txHash: genesisBlockHash,
+          id: genesisBlockHash + i.toString(),
+          index: i,
+          amount: '1000000'
+        }
+      ],
+      outputs: [
+        {
+          address: addresses[i],
+          amount: '1'
+        },
+      ],
+      height: null,
+      epoch: null,
+      slot: null,
+      tx_ordinal: null,
+      block_hash: null,
+      time: null,
+      last_update: new Date(i).toString(),
+      tx_state: 'Pending'
+    });
+  }
+
+  const getTransactionsHistoryForAddresses = await batchGetTransactionsHistoryForAddresses(
+    genGetTransactionsHistoryForAddresses(transactions, networks.ByronMainnet)
+  );
+  const result = await getTransactionsHistoryForAddresses({
+    addresses,
+    untilBlock: transactions.filter(tx => tx.block_hash != null).slice(-1)[0].block_hash || ''
+  });
+
+  expect(result.length).toEqual(config.wallets.TRANSACTION_REQUEST_SIZE);
   done();
 });
