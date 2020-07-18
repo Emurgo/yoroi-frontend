@@ -295,7 +295,7 @@ async function _batchHistoryByTransaction(
     if (newBest === undefined) {
       // if we don't have a single tx in a block
       // we can't advance in pagination
-      throw new Error('_batchHistoryByTransaction only pending/failed tx returned');
+      throw new Error(`${nameof(_batchHistoryByTransaction)} only pending/failed tx returned`);
     }
     return await _batchHistoryByTransaction(
       transactions,
@@ -399,7 +399,7 @@ function getLatestTransaction(
     return undefined;
   }
   let best = blockInfo[0];
-  for (let i = 1; i < txs.length; i++) {
+  for (let i = 1; i < blockInfo.length; i++) {
     if (blockInfo[i].height > best.height) {
       best = blockInfo[i];
       continue;
