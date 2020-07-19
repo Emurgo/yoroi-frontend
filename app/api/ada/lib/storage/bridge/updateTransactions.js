@@ -100,7 +100,7 @@ import type {
   HashToIdsFunc,
 } from '../../../../common/lib/storage/bridge/hashMapper';
 import { STABLE_SIZE } from '../../../../../config/numbersConfig';
-import { RollbackApiError } from '../../../errors';
+import { RollbackApiError } from '../../../../common/errors';
 import { getFromUserPerspective, } from '../../../transactions/utils';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 

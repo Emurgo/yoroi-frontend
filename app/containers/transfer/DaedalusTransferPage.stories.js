@@ -23,7 +23,7 @@ import {
   TransferFundsError,
   NoTransferTxError,
   WebSocketRestoreError,
-} from '../../stores/ada/DaedalusTransferStore';
+} from '../../stores/ada/AdaDaedalusTransferStore';
 import {
   GenerateTransferTxError,
   NotEnoughMoneyToSendError,

@@ -2,7 +2,7 @@
 
 import {
   NotEnoughMoneyToSendError,
-} from '../../errors';
+} from '../../../common/errors';
 import type { ConfigType } from '../../../../../config/config-types';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import BigNumber from 'bignumber.js';

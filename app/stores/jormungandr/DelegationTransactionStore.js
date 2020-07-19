@@ -6,7 +6,7 @@ import LocalizedRequest from '../lib/LocalizedRequest';
 import type {
   CreateDelegationTxFunc,
   SignAndBroadcastDelegationTxRequest, SignAndBroadcastDelegationTxResponse,
-} from '../../api/ada';
+} from '../../api/jormungandr';
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import {
@@ -15,15 +15,15 @@ import {
 import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { PoolRequest } from '../../api/ada/lib/storage/bridge/delegationUtils';
-import type { SelectedPool } from '../../actions/ada/delegation-transaction-actions';
+import type { PoolRequest } from '../../api/jormungandr/lib/storage/bridge/delegationUtils';
+import type { SelectedPool } from '../../actions/jormungandr/delegation-transaction-actions';
 
 export default class DelegationTransactionStore extends Store {
 
   @observable selectedPools: Array<SelectedPool>;
 
   @observable createDelegationTx: LocalizedRequest<CreateDelegationTxFunc>
-    = new LocalizedRequest<CreateDelegationTxFunc>(this.api.ada.createDelegationTx);
+    = new LocalizedRequest<CreateDelegationTxFunc>(this.api.jormungandr.createDelegationTx);
 
   @observable signAndBroadcastDelegationTx: LocalizedRequest<
     typeof DelegationTransactionStore.prototype.sendAndRefresh
@@ -61,7 +61,7 @@ export default class DelegationTransactionStore extends Store {
   setup(): void {
     super.setup();
     this.reset();
-    const a = this.actions.ada.delegationTransaction;
+    const a = this.actions.jormungandr.delegationTransaction;
     a.createTransaction.listen(this._createTransaction);
     a.signTransaction.listen(this._signTransaction);
     a.complete.listen(this._complete);
@@ -88,7 +88,7 @@ export default class DelegationTransactionStore extends Store {
     }
     const basePubDeriver = withStakingKey;
 
-    const delegationRequests = this.stores.substores.ada.delegation.getDelegationRequests(
+    const delegationRequests = this.stores.substores.jormungandr.delegation.getDelegationRequests(
       request.publicDeriver
     );
     if (delegationRequests == null) {
@@ -136,7 +136,7 @@ export default class DelegationTransactionStore extends Store {
           unsignedTx: result.unsignedTx.IOs,
         },
         password: request.password,
-        sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
+        sendTx: this.stores.substores.jormungandr.stateFetchStore.fetcher.sendTx,
       },
       refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(
         request.publicDeriver
@@ -158,7 +158,9 @@ export default class DelegationTransactionStore extends Store {
     broadcastRequest: SignAndBroadcastDelegationTxRequest,
     refreshWallet: () => Promise<void>,
   |} => Promise<SignAndBroadcastDelegationTxResponse> = async (request) => {
-    const result = await this.api.ada.signAndBroadcastDelegationTx(request.broadcastRequest);
+    const result = await this.api.jormungandr.signAndBroadcastDelegationTx(
+      request.broadcastRequest
+    );
     try {
       await request.refreshWallet();
     } catch (_e) {

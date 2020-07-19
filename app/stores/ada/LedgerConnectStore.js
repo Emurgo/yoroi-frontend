@@ -37,7 +37,7 @@ import {
 } from '../../utils/hwConnectHandler';
 
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
-import { CheckAddressesInUseApiError } from '../../api/ada/errors';
+import { CheckAddressesInUseApiError } from '../../api/common/errors';
 
 import {
   Logger,

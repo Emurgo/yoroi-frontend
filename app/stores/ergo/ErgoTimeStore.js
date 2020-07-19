@@ -9,7 +9,7 @@ import Store from '../base/Store';
 /**
  * Different wallets can be on different networks and therefore have different measures of time
 */
-export default class TimeStore extends Store {
+export default class ErgoTimeStore extends Store {
 
   setup(): void {
     super.setup();

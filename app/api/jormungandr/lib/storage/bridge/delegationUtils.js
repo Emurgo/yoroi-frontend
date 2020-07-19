@@ -4,18 +4,18 @@ import BigNumber from 'bignumber.js';
 import {
   getAllSchemaTables,
   raii,
-} from '../database/utils';
-import { RustModule } from '../../cardanoCrypto/rustLoader';
-import { GetCertificates } from '../database/primitives/api/read';
+} from '../../../../ada/lib/storage/database/utils';
+import { RustModule } from '../../../../ada/lib/cardanoCrypto/rustLoader';
+import { GetCertificates } from '../../../../ada/lib/storage/database/primitives/api/read';
 import {
   asGetAllUtxos,
-} from '../models/PublicDeriver/traits';
+} from '../../../../ada/lib/storage/models/PublicDeriver/traits';
 import {
   PublicDeriver,
-} from '../models/PublicDeriver/index';
+} from '../../../../ada/lib/storage/models/PublicDeriver/index';
 import type {
   IGetStakingKey,
-} from '../models/PublicDeriver/interfaces';
+} from '../../../../ada/lib/storage/models/PublicDeriver/interfaces';
 import {
   filterAddressesByStakingKey,
   delegationTypeToResponse,
@@ -25,8 +25,8 @@ import type {
   AccountStateDelegation,
   AccountStateSuccess,
 } from '../../state-fetch/types';
-import { TxStatusCodes } from '../database/primitives/enums';
-import type { CertificateForKey } from '../database/primitives/api/read';
+import { TxStatusCodes } from '../../../../ada/lib/storage/database/primitives/enums';
+import type { CertificateForKey } from '../../../../ada/lib/storage/database/primitives/api/read';
 import type { ToRelativeSlotNumberFunc } from './timeUtils';
 import type { CertificateKindType } from '@emurgo/js-chain-libs/js_chain_libs';
 

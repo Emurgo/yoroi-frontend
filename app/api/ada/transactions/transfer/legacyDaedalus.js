@@ -8,7 +8,7 @@ import {
 import {
   GetAddressesKeysError,
   NoInputsError,
-} from '../../errors';
+} from '../../../common/errors';
 import type {
   AddressUtxoFunc,
   AddressUtxoResponse,
@@ -43,7 +43,7 @@ export function getAddressesKeys(payload: {|
     }
     return addrKeyMap;
   } catch (error) {
-    Logger.error(`legacyDaedalus::getAddressesKeys ${stringifyError(error)}`);
+    Logger.error(`legacyDaedalus::${nameof(getAddressesKeys)} ${stringifyError(error)}`);
     throw new GetAddressesKeysError();
   }
 }
@@ -59,7 +59,7 @@ async function toSenderUtxos(payload: {|
 
   if (isEmpty(senderUtxos)) {
     const error = new NoInputsError();
-    Logger.error(`legacyDaedalus::generateTransferTx ${stringifyError(error)}`);
+    Logger.error(`legacyDaedalus::${nameof(toSenderUtxos)} ${stringifyError(error)}`);
     throw error;
   }
 

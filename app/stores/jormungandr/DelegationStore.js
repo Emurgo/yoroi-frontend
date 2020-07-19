@@ -20,22 +20,22 @@ import type {
 import {
   getDelegatedBalance,
   getCurrentDelegation,
-} from '../../api/ada/lib/storage/bridge/delegationUtils';
+} from '../../api/jormungandr/lib/storage/bridge/delegationUtils';
 import type {
   GetDelegatedBalanceFunc,
   GetCurrentDelegationFunc,
-} from '../../api/ada/lib/storage/bridge/delegationUtils';
+} from '../../api/jormungandr/lib/storage/bridge/delegationUtils';
 import type {
   AccountStateSuccess,
   RemotePoolMetaSuccess,
   ReputationFunc,
   RewardTuple,
-} from '../../api/ada/lib/state-fetch/types';
+} from '../../api/jormungandr/lib/state-fetch/types';
 import LocalizableError from '../../i18n/LocalizableError';
 import {
   genToRelativeSlotNumber,
   genTimeToSlot,
-} from '../../api/ada/lib/storage/bridge/timeUtils';
+} from '../../api/jormungandr/lib/storage/bridge/timeUtils';
 import { CoinTypes } from '../../config/numbersConfig';
 
 export type StakingKeyState = {|
@@ -70,7 +70,7 @@ export default class DelegationStore extends Store {
     = new CachedRequest<ReputationFunc>(() => {
       // we need to defer this call because the store may not be initialized yet
       // by the time this constructor is called
-      const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
+      const stateFetcher = this.stores.substores.jormungandr.stateFetchStore.fetcher;
       return stateFetcher.getReputation();
     });
 
@@ -96,7 +96,7 @@ export default class DelegationStore extends Store {
       rewardHistory: new CachedRequest<RewardHistoryForWallet>(async (address) => {
         // we need to defer this call because the store may not be initialized yet
         // by the time this constructor is called
-        const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
+        const stateFetcher = this.stores.substores.jormungandr.stateFetchStore.fetcher;
         const result = await stateFetcher.getRewardHistory({ addresses: [address] });
         return result[address] ?? [];
       }),
@@ -138,7 +138,7 @@ export default class DelegationStore extends Store {
 
       const accountStateCalcs = (async () => {
         try {
-          const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
+          const stateFetcher = this.stores.substores.jormungandr.stateFetchStore.fetcher;
           const accountStateResp = await stateFetcher.getAccountState({
             addresses: [stakingKeyResp.addr.Hash],
           });
@@ -192,7 +192,7 @@ export default class DelegationStore extends Store {
     delegationRequest: DelegationRequests,
     stateForStakingKey: AccountStateSuccess,
   |} => Promise<void> = async (request) => {
-    const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
+    const stateFetcher = this.stores.substores.jormungandr.stateFetchStore.fetcher;
     const poolInfoResp = await stateFetcher.getPoolInfo({
       ids: request.stateForStakingKey.delegation.pools.map(delegation => delegation[0]),
     });
@@ -247,7 +247,7 @@ export default class DelegationStore extends Store {
         // if query failed due to server issue, need to re-query when it comes back online
         this.stores.serverConnectionStore.checkAdaServerStatus,
         // reward grows every epoch so we have to refresh
-        this.stores.substores.ada.time.currentTime?.currentEpoch,
+        this.stores.substores.jormungandr.time.currentTime?.currentEpoch,
       ],
       async () => {
         if (!this.stores.serverConnectionStore.checkAdaServerStatus) {

@@ -6,7 +6,7 @@ import { observable, action } from 'mobx';
 import AdaWalletsStore from './AdaWalletsStore';
 import AdaTransactionsStore from './AdaTransactionsStore';
 import AddressesStore from './AdaAddressesStore';
-import DaedalusTransferStore from './DaedalusTransferStore';
+import AdaDaedalusTransferStore from './AdaDaedalusTransferStore';
 import YoroiTransferStore from './YoroiTransferStore';
 import TrezorConnectStore from './TrezorConnectStore';
 import TrezorSendStore from './TrezorSendStore';
@@ -17,8 +17,6 @@ import HWVerifyAddressStore from './HWVerifyAddressStore';
 import PaperWalletCreateStore from './PaperWalletCreateStore';
 import AdaStateFetchStore from './AdaStateFetchStore';
 import WalletRestoreStore from './WalletRestoreStore';
-import DelegationTransactionStore from './DelegationTransactionStore';
-import DelegationStore from './DelegationStore';
 import AdaTimeStore from './AdaTimeStore';
 import type { ActionsMap } from '../../actions/index';
 import type { Api } from '../../api/index';
@@ -29,7 +27,7 @@ export const adaStoreClasses = Object.freeze({
   paperWallets: PaperWalletCreateStore,
   transactions: AdaTransactionsStore,
   addresses: AddressesStore,
-  daedalusTransfer: DaedalusTransferStore,
+  daedalusTransfer: AdaDaedalusTransferStore,
   yoroiTransfer: YoroiTransferStore,
   trezorConnect: TrezorConnectStore,
   trezorSend: TrezorSendStore,
@@ -39,8 +37,6 @@ export const adaStoreClasses = Object.freeze({
   stateFetchStore: AdaStateFetchStore,
   transactionBuilderStore: AdaTransactionBuilderStore,
   walletRestore: WalletRestoreStore,
-  delegationTransaction: DelegationTransactionStore,
-  delegation: DelegationStore,
   time: AdaTimeStore,
 });
 
@@ -49,7 +45,7 @@ export type AdaStoresMap = {|
   paperWallets: PaperWalletCreateStore,
   transactions: AdaTransactionsStore,
   addresses: AddressesStore,
-  daedalusTransfer: DaedalusTransferStore,
+  daedalusTransfer: AdaDaedalusTransferStore,
   yoroiTransfer: YoroiTransferStore,
   trezorConnect: TrezorConnectStore,
   trezorSend: TrezorSendStore,
@@ -59,8 +55,6 @@ export type AdaStoresMap = {|
   stateFetchStore: AdaStateFetchStore,
   transactionBuilderStore: AdaTransactionBuilderStore,
   walletRestore: WalletRestoreStore,
-  delegationTransaction: DelegationTransactionStore,
-  delegation: DelegationStore,
   time: AdaTimeStore,
 |};
 
@@ -79,8 +73,6 @@ const adaStores: WithNullableFields<AdaStoresMap> = observable({
   stateFetchStore: null,
   transactionBuilderStore: null,
   walletRestore: null,
-  delegationTransaction: null,
-  delegation: null,
   time: null,
 });
 

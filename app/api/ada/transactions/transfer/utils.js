@@ -7,7 +7,7 @@ import {
 } from '../../../../utils/logging';
 import {
   NoInputsError,
-} from '../../errors';
+} from '../../../common/errors';
 import type { AddressedUtxo } from '../types';
 import type {
   AddressUtxoFunc,

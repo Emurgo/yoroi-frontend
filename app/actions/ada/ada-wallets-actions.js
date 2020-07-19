@@ -9,7 +9,7 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 export default class AdaWalletsActions {
   createWallet: AsyncAction<{| name: string, password: string |}> = new AsyncAction();
   sendMoney: AsyncAction<{|
-    signRequest: BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>,
+    signRequest: BaseSignRequest<RustModule.WalletV2.Transaction>,
     password: string,
     publicDeriver: PublicDeriver<>,
   |}> = new AsyncAction();

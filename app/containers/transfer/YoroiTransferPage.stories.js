@@ -23,7 +23,7 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import {
   GenerateTransferTxError,
   NotEnoughMoneyToSendError,
-} from '../../api/ada/errors';
+} from '../../api/common/errors';
 import {
   TransferFundsError,
   NoTransferTxError,

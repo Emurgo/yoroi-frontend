@@ -16,7 +16,9 @@ import TimeStore from './toplevel/TimeStore';
 import WalletRestoreStore from './toplevel/WalletRestoreStore';
 import setupAdaStores from './ada/index';
 import setupErgoStores from './ergo/index';
+import setupJormungandrStores from './jormungandr/index';
 import type { AdaStoresMap } from './ada/index';
+import type { JormungandrStoresMap } from './jormungandr/index';
 import type { ErgoStoresMap } from './ergo/index';
 import { RouterStore } from 'mobx-react-router';
 import type { ActionsMap } from '../actions/index';
@@ -69,7 +71,11 @@ export type StoresMap = {|
   walletRestore: WalletRestoreStore,
   walletSettings: WalletSettingsStore,
   explorers: ExplorerStore,
-  substores: {| ada: AdaStoresMap, ergo: ErgoStoresMap, |},
+  substores: {|
+    ada: AdaStoresMap,
+    jormungandr: JormungandrStoresMap,
+    ergo: ErgoStoresMap,
+  |},
   router: RouterStore,
 |};
 
@@ -142,12 +148,14 @@ export default (action(
      * But we only want to actually initialize it if it is the currency in use */
     stores.substores = {
       ada: setupAdaStores((stores: any), api, actions),
+      jormungandr: setupJormungandrStores((stores: any), api, actions),
       ergo: setupErgoStores((stores: any), api, actions),
     };
 
     const loadedStores: StoresMap = (stores: any);
     initializeSubstore<ErgoStoresMap>(loadedStores.substores[ApiOptions.ergo]);
     initializeSubstore<AdaStoresMap>(loadedStores.substores[ApiOptions.ada]);
+    initializeSubstore<JormungandrStoresMap>(loadedStores.substores[ApiOptions.jormungandr]);
 
     // Perform load after all setup is done to ensure migration can modify store state
     loadedStores.loading.load();

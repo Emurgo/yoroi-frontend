@@ -6,20 +6,12 @@ import type {
   TxBodiesRequest, TxBodiesResponse,
   UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
-  RewardHistoryRequest, RewardHistoryResponse,
   SignedRequest, SignedResponse,
   BestBlockRequest, BestBlockResponse,
-  AccountStateRequest, AccountStateResponse,
-  PoolInfoRequest, PoolInfoResponse,
-  ReputationRequest, ReputationResponse,
   AddressUtxoFunc,
   HistoryFunc,
-  RewardHistoryFunc,
   TxBodiesFunc,
   UtxoSumFunc,
-  AccountStateFunc,
-  PoolInfoFunc,
-  ReputationFunc,
   RemoteTransaction,
 } from './types';
 import type {
@@ -35,10 +27,7 @@ import {
   GetTxsBodiesForUTXOsError,
   GetUtxosSumsForAddressesApiError,
   GetTxHistoryForAddressesApiError,
-  GetRewardHistoryApiError,
-  GetAccountStateApiError,
-  GetPoolInfoApiError,
-} from '../../errors';
+} from '../../../common/errors';
 import {
   Logger,
   stringifyError
@@ -52,7 +41,7 @@ const addressesLimit = CONFIG.app.addressRequestSize;
 
 /**
  * Makes calls to Yoroi backend service
- * https://github.com/Emurgo/yoroi-backend-service/
+ * https://github.com/Emurgo/yoroi-graphql-migration-backend
  */
 export class BatchedFetcher implements IFetcher {
 
@@ -80,12 +69,6 @@ export class BatchedFetcher implements IFetcher {
     )(body)
   )
 
-  getRewardHistory: RewardHistoryRequest => Promise<RewardHistoryResponse> = (body) => (
-    batchGetRewardHistory(
-      this.baseFetcher.getRewardHistory
-    )(body)
-  )
-
   getBestBlock: BestBlockRequest => Promise<BestBlockResponse> = (body) => (
     // We don't batch transaction sending (it's just a single request)
     this.baseFetcher.getBestBlock(body)
@@ -99,18 +82,6 @@ export class BatchedFetcher implements IFetcher {
 
   checkAddressesInUse: FilterUsedRequest => Promise<FilterUsedResponse> = (body) => (
     batchCheckAddressesInUse(this.baseFetcher.checkAddressesInUse)(body)
-  )
-
-  getAccountState: AccountStateRequest => Promise<AccountStateResponse> = (body) => (
-    batchGetAccountState(this.baseFetcher.getAccountState)(body)
-  )
-
-  getReputation: ReputationRequest => Promise<ReputationResponse> = (body) => (
-    batchGetReputation(this.baseFetcher.getReputation)(body)
-  )
-
-  getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => (
-    batchGetPoolInfo(this.baseFetcher.getPoolInfo)(body)
   )
 }
 
@@ -209,24 +180,6 @@ export function batchGetUTXOsSumsForAddresses(
   };
 }
 
-export function batchGetRewardHistory(
-  getRewardHistory: RewardHistoryFunc,
-): RewardHistoryFunc {
-  return async function (body: RewardHistoryRequest): Promise<RewardHistoryResponse> {
-    try {
-      const chimericAccountAddresses = chunk(body.addresses, addressesLimit);
-      const chimericAccountPromises = chimericAccountAddresses.map(
-        addr => getRewardHistory({ addresses: addr })
-      );
-      const rewardHistories = await Promise.all(chimericAccountPromises);
-      return Object.assign({}, ...rewardHistories);
-    } catch (error) {
-      Logger.error(`batchedFetcher::${nameof(batchGetRewardHistory)} error: ` + stringifyError(error));
-      throw new GetRewardHistoryApiError();
-    }
-  };
-}
-
 export function batchGetTransactionsHistoryForAddresses(
   getTransactionsHistoryForAddresses: HistoryFunc,
 ): HistoryFunc {
@@ -295,7 +248,7 @@ async function _batchHistoryByTransaction(
     if (newBest === undefined) {
       // if we don't have a single tx in a block
       // we can't advance in pagination
-      throw new Error(`${nameof(_batchHistoryByTransaction)} only pending/failed tx returned`);
+      throw new Error('_batchHistoryByTransaction only pending/failed tx returned');
     }
     return await _batchHistoryByTransaction(
       transactions,
@@ -331,50 +284,6 @@ export function batchCheckAddressesInUse(
   };
 }
 
-export function batchGetAccountState(
-  getAccountState: AccountStateFunc,
-): AccountStateFunc {
-  return async function (body: AccountStateRequest): Promise<AccountStateResponse> {
-    try {
-      const chimericAccountAddresses = chunk(body.addresses, addressesLimit);
-      const chimericAccountPromises = chimericAccountAddresses.map(
-        addr => getAccountState({ addresses: addr })
-      );
-      const chimericAccounutStates = await Promise.all(chimericAccountPromises);
-      return Object.assign({}, ...chimericAccounutStates);
-    } catch (error) {
-      Logger.error(`batchedFetcher::${nameof(batchGetAccountState)} error: ` + stringifyError(error));
-      throw new GetAccountStateApiError();
-    }
-  };
-}
-
-export function batchGetPoolInfo(
-  getPoolInfo: PoolInfoFunc,
-): PoolInfoFunc {
-  return async function (body: PoolInfoRequest): Promise<PoolInfoResponse> {
-    try {
-      const poolIds = chunk(body.ids, addressesLimit);
-      const poolInfoPromises = poolIds.map(
-        addr => getPoolInfo({ ids: addr })
-      );
-      const poolInfos = await Promise.all(poolInfoPromises);
-      return Object.assign({}, ...poolInfos);
-    } catch (error) {
-      Logger.error(`batchedFetcher::${nameof(batchGetPoolInfo)} error: ` + stringifyError(error));
-      throw new GetPoolInfoApiError();
-    }
-  };
-}
-
-export function batchGetReputation(
-  getReputation: ReputationFunc,
-): ReputationFunc {
-  return async function (body: ReputationRequest): Promise<ReputationResponse> {
-    return getReputation(body);
-  };
-}
-
 export type TimeForTx = {|
   blockHash: string,
   height: number,
@@ -399,7 +308,7 @@ function getLatestTransaction(
     return undefined;
   }
   let best = blockInfo[0];
-  for (let i = 1; i < blockInfo.length; i++) {
+  for (let i = 1; i < txs.length; i++) {
     if (blockInfo[i].height > best.height) {
       best = blockInfo[i];
       continue;

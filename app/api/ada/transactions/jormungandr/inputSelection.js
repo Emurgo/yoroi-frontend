@@ -2,7 +2,7 @@
 
 import {
   NotEnoughMoneyToSendError,
-} from '../../errors';
+} from '../../../common/errors';
 import type { RemoteUnspentOutput, } from '../../lib/state-fetch/types';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 

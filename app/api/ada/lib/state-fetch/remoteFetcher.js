@@ -5,12 +5,8 @@ import type {
   TxBodiesRequest, TxBodiesResponse,
   UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
-  RewardHistoryRequest, RewardHistoryResponse,
   BestBlockRequest, BestBlockResponse,
   SignedRequest, SignedResponse,
-  ReputationRequest, ReputationResponse,
-  AccountStateRequest, AccountStateResponse,
-  PoolInfoRequest, PoolInfoResponse,
   SignedRequestInternal,
   RemoteTransaction,
 } from './types';
@@ -39,7 +35,7 @@ import {
   GetPoolInfoApiError,
   GetReputationError,
   RollbackApiError,
-} from '../../errors';
+} from '../../../common/errors';
 
 import type { ConfigType } from '../../../../../config/config-types';
 
@@ -48,7 +44,7 @@ const backendUrl = CONFIG.network.backendUrl;
 
 /**
  * Makes calls to Yoroi backend service
- * https://github.com/Emurgo/yoroi-backend-service/
+ * https://github.com/Emurgo/yoroi-graphql-migration-backend
  */
 export class RemoteFetcher implements IFetcher {
 
@@ -146,13 +142,6 @@ export class RemoteFetcher implements IFetcher {
         }
         if (resp.height != null) {
           return resp;
-        }
-        // There can only ever be one certificate per tx but our backend returns an array
-        // $FlowExpectedError[prop-missing] remove this if we ever fix this
-        if (resp.certificates != null && resp.certificates.length > 0) {
-          resp.certificate = resp.certificates[0];
-          // $FlowExpectedError[prop-missing] remove this if we ever fix this
-          delete resp.certificates;
         }
         // $FlowExpectedError[prop-missing] remove if we rename the field in the backend-service
         const height = resp.block_num;

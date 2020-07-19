@@ -11,7 +11,7 @@ import {
 import { Bech32Prefix } from '../../../../config/stringConfig';
 import {
   GenerateTransferTxError
-} from '../../errors';
+} from '../../../common/errors';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import {
   sendAllUnsignedTxFromUtxo,

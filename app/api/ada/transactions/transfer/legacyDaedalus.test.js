@@ -11,7 +11,7 @@ import {
 } from './legacyDaedalus';
 import {
   NotEnoughMoneyToSendError,
-} from '../../errors';
+} from '../../../common/errors';
 import {
   silenceLogsForTesting,
 } from '../../../../utils/logging';

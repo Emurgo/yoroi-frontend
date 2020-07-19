@@ -272,7 +272,7 @@ async function exportLocalStorage(client, exportDir: string) {
 async function exportIndexedDB(client, exportDir: string) {
   const indexedDBPath = `${exportDir}/indexedDB.json`;
   const indexedDB = await client.driver.executeAsyncScript((done) => {
-    window.yoroi.api.ada.exportLocalDatabase(
+    window.yoroi.api.common.exportLocalDatabase(
       window.yoroi.stores.loading.loadPersitentDbRequest.result,
     )
       .then(done)
@@ -326,7 +326,7 @@ async function importIndexedDB(client, importDir: string) {
   try {
     const indexedDBData = fs.readFileSync(indexedDBPath).toString();
     await client.driver.executeAsyncScript((data, done) => {
-      window.yoroi.api.ada.importLocalDatabase(
+      window.yoroi.api.common.importLocalDatabase(
         window.yoroi.stores.loading.loadPersitentDbRequest.result,
         data
       )
@@ -339,7 +339,7 @@ async function importIndexedDB(client, importDir: string) {
 let capturedDbState = undefined;
 async function captureDbStae(client) {
   const rawDb = await client.driver.executeAsyncScript((done) => {
-    window.yoroi.api.ada.exportLocalDatabase(
+    window.yoroi.api.common.exportLocalDatabase(
       window.yoroi.stores.loading.loadPersitentDbRequest.result,
     )
       .then(done)
@@ -350,7 +350,7 @@ async function captureDbStae(client) {
 async function compareToCapturedDbState(client, excludeSyncTime) {
   if (capturedDbState == null) throw new Error('Db state was never captured');
   const rawDb = await client.driver.executeAsyncScript((done) => {
-    window.yoroi.api.ada.exportLocalDatabase(
+    window.yoroi.api.common.exportLocalDatabase(
       window.yoroi.stores.loading.loadPersitentDbRequest.result,
     )
       .then(done)

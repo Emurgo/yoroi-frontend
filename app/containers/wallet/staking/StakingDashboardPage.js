@@ -44,7 +44,7 @@ import type {
   ToAbsoluteSlotNumberFunc,
 } from '../../../api/ada/lib/storage/bridge/timeUtils';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
-import type { CreateDelegationTxFunc } from '../../../api/ada/index';
+import type { CreateDelegationTxFunc } from '../../../api/jormungandr/index';
 import type { CurrentTimeRequests, TimeCalcRequests } from '../../../stores/ada/AdaTimeStore';
 import type { TxRequests } from '../../../stores/toplevel/TransactionsStore';
 import type { Notification } from '../../../types/notificationType';

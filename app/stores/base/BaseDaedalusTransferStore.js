@@ -5,7 +5,7 @@ import {
   Logger,
   stringifyError
 } from '../../utils/logging';
-import Store from '../base/Store';
+import Store from './Store';
 import Request from '../lib/LocalizedRequest';
 import type { ConfigType } from '../../../config/config-types';
 import LocalizableError, {
@@ -18,7 +18,6 @@ import type {
 import { TransferStatus } from '../../types/TransferTypes';
 import {
   getAddressesKeys,
-  buildDaedalusTransferTx,
 } from '../../api/ada/transactions/transfer/legacyDaedalus';
 import type { SendFunc } from '../../api/ada/lib/state-fetch/types';
 import {
@@ -30,34 +29,65 @@ import {
   asHasUtxoChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { getApiForNetwork } from '../../api/common/utils';
+import type { AddressKeyMap } from '../../api/ada/transactions/types';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
+import type { Api } from '../../api/index';
 
 declare var CONFIG: ConfigType;
 const websocketUrl = CONFIG.network.websocketUrl;
 const MSG_TYPE_RESTORE = 'RESTORE';
 const WS_CODE_NORMAL_CLOSURE = 1000;
 
-export default class DaedalusTransferStore extends Store {
+type BuildTxFunc = {|
+  addressKeys: AddressKeyMap,
+  outputAddr: string,
+|} => Promise<TransferTx>;
+
+export default class BaseDaedalusTransferStore extends Store {
 
   @observable status: TransferStatusT = TransferStatus.UNINITIALIZED;
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
-  @observable transferFundsRequest: Request<SendFunc>
-    = new Request<SendFunc>(this._transferFundsRequest);
+
+  buildTxFunc: BuildTxFunc;
+  expectedAPI: ApiOptionType;
+
+  // careful: this is a global request and not per-wallet or per-currency
+  @observable transferFundsRequest: Request<SendFunc> = new Request<SendFunc>(request => {
+    const network = this.stores.profile.selectedNetwork;
+    if (network == null) throw new Error(`${nameof(BaseDaedalusTransferStore)} transfer tx no selected network`);
+    const selectedApiType = getApiForNetwork(network);
+    if (!this.stores.substores[selectedApiType].daedalusTransfer) {
+      throw new Error(`${nameof(BaseDaedalusTransferStore)} transfer tx currency doesn't support Daedalus transfer`);
+    }
+
+    return this.stores.substores[selectedApiType].stateFetchStore.fetcher.sendTx(request);
+  });
 
   @observable ws: ?WebSocket = null;
 
+  constructor(
+    stores: StoresMap,
+    api: Api,
+    actions: ActionsMap,
+    buildTxFunc: BuildTxFunc,
+    expectedAPI: ApiOptionType
+  ) {
+    super(stores, api, actions);
+    this.buildTxFunc = buildTxFunc;
+  }
+
   setup(): void {
     super.setup();
-    const actions = this.actions.ada.daedalusTransfer;
+    const actions = this.actions.daedalusTransfer;
     actions.startTransferFunds.listen(this._startTransferFunds);
     actions.startTransferPaperFunds.listen(this._startTransferPaperFunds);
     actions.startTransferMasterKey.listen(this._startTransferMasterKey);
     actions.setupTransferFundsWithMnemonic.listen(this._setupTransferFundsWithMnemonic);
     actions.setupTransferFundsWithMasterKey.listen(this._setupTransferFundsWithMasterKey);
     actions.backToUninitialized.listen(this._backToUninitialized);
-    actions.transferFunds.listen(this._transferFunds);
-    actions.cancelTransferFunds.listen(this._reset);
   }
 
   teardown(): void {
@@ -128,15 +158,13 @@ export default class DaedalusTransferStore extends Store {
           const addressKeys = getAddressesKeys({ checker, fullUtxo: data.addresses });
           this._updateStatus(TransferStatus.GENERATING_TX);
 
-          const { selectedNetwork } = this.stores.profile;
-          if (selectedNetwork == null) throw new Error(`${nameof(this._setupTransferWebSocket)} no network selected`);
-
-          const transferTx = await buildDaedalusTransferTx({
+          const selectedApiType = getApiForNetwork(publicDeriver.getParent().getNetworkInfo());
+          if (!this.stores.substores[selectedApiType].daedalusTransfer) {
+            throw new Error(`${nameof(BaseDaedalusTransferStore)}::${nameof(this._setupTransferWebSocket)} currency doesn't support Daedalus transfer`);
+          }
+          const transferTx = await this.buildTxFunc({
             addressKeys,
             outputAddr: nextInternalAddress,
-            getUTXOsForAddresses:
-              this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
-            legacy: selectedNetwork.NetworkId !== networks.JormungandrMainnet.NetworkId
           });
           runInAction(() => {
             this.transferTx = transferTx;
@@ -144,7 +172,7 @@ export default class DaedalusTransferStore extends Store {
           this._updateStatus(TransferStatus.READY_TO_TRANSFER);
         }
       } catch (error) {
-        Logger.error(`${nameof(DaedalusTransferStore)}::${nameof(this._setupTransferWebSocket)} ${stringifyError(error)}`);
+        Logger.error(`${nameof(BaseDaedalusTransferStore)}::${nameof(this._setupTransferWebSocket)} ${stringifyError(error)}`);
         runInAction(() => {
           this.status = TransferStatus.ERROR;
           this.error = localizedError(error);
@@ -217,11 +245,6 @@ export default class DaedalusTransferStore extends Store {
     this.status = s;
   }
 
-  /** Send a transaction to the backend-service to be broadcast into the network */
-  _transferFundsRequest: SendFunc = async (request) => (
-    this.stores.substores.ada.stateFetchStore.fetcher.sendTx(request)
-  )
-
   /** Broadcast the transfer transaction if one exists and proceed to continuation */
   _transferFunds: {|
     next: Function,
@@ -239,7 +262,7 @@ export default class DaedalusTransferStore extends Store {
       next();
       this._reset();
     } catch (error) {
-      Logger.error(`DaedalusTransferStore::transferFunds ${stringifyError(error)}`);
+      Logger.error(`${nameof(BaseDaedalusTransferStore)}::${nameof(this._transferFunds)} ${stringifyError(error)}`);
       if (error instanceof NoTransferTxError) {
         runInAction(() => {
           this.error = error;

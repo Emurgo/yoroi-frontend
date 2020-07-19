@@ -41,7 +41,7 @@ export default class AdaWalletsStore extends Store {
 
   /** Send money and then return to transaction screen */
   _sendMoney:  {|
-    signRequest: BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>,
+    signRequest: BaseSignRequest<RustModule.WalletV2.Transaction>,
     password: string,
     publicDeriver: PublicDeriver<>,
   |} => Promise<void> = async (transactionDetails) => {

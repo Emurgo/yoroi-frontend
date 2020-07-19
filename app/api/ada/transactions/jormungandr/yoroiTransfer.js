@@ -10,7 +10,7 @@ import { Bech32Prefix } from '../../../../config/stringConfig';
 import { addressToDisplayString } from '../../lib/storage/bridge/utils';
 import {
   GenerateTransferTxError
-} from '../../errors';
+} from '../../../common/errors';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import {
   sendAllUnsignedTx,

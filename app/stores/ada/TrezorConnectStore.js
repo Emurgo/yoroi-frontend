@@ -14,7 +14,7 @@ import LocalizedRequest from '../lib/LocalizedRequest';
 
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
-import { CheckAddressesInUseApiError } from '../../api/ada/errors';
+import { CheckAddressesInUseApiError } from '../../api/common/errors';
 import { derivePathPrefix } from '../../api/ada/transactions/utils';
 import { getTrezorManifest, wrapWithFrame, wrapWithoutFrame } from '../lib/TrezorWrapper';
 

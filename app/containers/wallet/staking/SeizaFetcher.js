@@ -28,7 +28,7 @@ import type { SelectedPool } from '../../../actions/ada/delegation-transaction-a
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type {
   CreateDelegationTxFunc,
-} from '../../../api/ada/index';
+} from '../../../api/jormungandr/index';
 import { getApiForNetwork, getApiMeta } from '../../../api/common/utils';
 
 declare var CONFIG: ConfigType;

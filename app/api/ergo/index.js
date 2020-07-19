@@ -32,6 +32,7 @@ import { getApiForNetwork } from '../common/utils';
 import {
   GenericApiError,
   WalletAlreadyRestoredError,
+  CheckAddressesInUseApiError,
 } from '../common/errors';
 import type { CoreAddressT } from '../ada/lib/storage/database/primitives/enums';
 import {
@@ -40,9 +41,6 @@ import {
 import {
   getAllAddressesForDisplay,
 } from '../ada/lib/storage/bridge/traitUtils';
-import {
-  CheckAddressesInUseApiError,
-} from '../ada/errors';
 import {
   HARD_DERIVATION_START,
 } from '../../config/numbersConfig';

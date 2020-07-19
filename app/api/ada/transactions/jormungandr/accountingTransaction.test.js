@@ -7,7 +7,7 @@ import {
 } from './utils';
 import {
   NotEnoughMoneyToSendError,
-} from '../../errors';
+} from '../../../common/errors';
 import {
   buildUnsignedAccountTx,
   signTransaction,

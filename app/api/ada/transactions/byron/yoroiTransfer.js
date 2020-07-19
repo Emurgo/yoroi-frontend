@@ -9,7 +9,7 @@ import {
 } from '../../../../utils/logging';
 import {
   GenerateTransferTxError
-} from '../../errors';
+} from '../../../common/errors';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import {
   sendAllUnsignedTx,

@@ -1,6 +1,5 @@
 // @flow
 import moment from 'moment';
-import BigNumber from 'bignumber.js';
 import type { lf$Database } from 'lovefield';
 import {
   Logger,
@@ -36,13 +35,6 @@ import {
   updateTransactions,
 } from './lib/storage/bridge/updateTransactions';
 import {
-  filterAddressesByStakingKey,
-  groupAddrContainsAccountKey,
-  unwrapStakingKey,
-} from './lib/storage/bridge/utils';
-import { createCertificate, } from './lib/storage/bridge/delegationUtils';
-import type { PoolRequest } from './lib/storage/bridge/delegationUtils';
-import {
   Bip44Wallet,
 } from './lib/storage/models/Bip44Wallet/wrapper';
 import type { HWFeatures, } from './lib/storage/database/walletTypes/core/tables';
@@ -63,7 +55,6 @@ import type {
   IPublicDeriver,
   IGetAllUtxos,
   IGetSigningKey,
-  IGetStakingKey,
   IDisplayCutoff,
   IGetAllUtxosResponse,
   IHasUtxoChains, IHasUtxoChainsRequest,
@@ -75,10 +66,6 @@ import type {
   GetTransactionsResponse,
   GetTransactionsRequestOptions
 } from '../common/index';
-import type {
-  IRenameFunc, IRenameRequest, IRenameResponse,
-  IChangePasswordRequestFunc, IChangePasswordRequest, IChangePasswordResponse,
-} from './lib/storage/models/common/interfaces';
 import {
   sendAllUnsignedTx as byronSendAllUnsignedTx,
   newAdaUnsignedTx as byronNewAdaUnsignedTx,
@@ -91,9 +78,6 @@ import {
   asAddressedUtxo as jormungandrAsAddressedUtxo,
   signTransaction as jormungandrSignTransaction,
 } from './transactions/jormungandr/utxoTransactions';
-import {
-  normalizeKey
-} from './transactions/jormungandr/utils';
 import {
   generateWalletRootKey,
   generateAdaMnemonic,
@@ -138,9 +122,9 @@ import type {
 import {
   InvalidWitnessError,
   CheckAddressesInUseApiError,
-} from './errors';
+} from '../common/errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
-import LocalStorageApi from '../localStorage/index';
+
 import type {
   HistoryFunc,
   SendFunc,
@@ -159,13 +143,11 @@ import {
   getAllAddressesForDisplay,
 } from './lib/storage/bridge/traitUtils';
 import { v3PublicToV2, convertAdaTransactionsToExportRows } from './transactions/utils';
-import { migrateToLatest } from './lib/storage/adaMigration';
 import { generateAdaPaperPdf } from './paperWallet/paperWalletPdf';
 import type { PdfGenStepType } from './paperWallet/paperWalletPdf';
 import type { TransactionExportRow } from '../export';
 
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
-import { clear } from './lib/storage/database/index';
 import environment from '../../environment';
 import { Cip1852Wallet } from './lib/storage/models/Cip1852Wallet/wrapper';
 import type { WalletChecksum } from '@emurgo/cip4-js';
@@ -240,7 +222,7 @@ export type GetChainAddressesForDisplayFunc = (
   request: GetChainAddressesForDisplayRequest
 ) => Promise<GetChainAddressesForDisplayResponse>;
 
-// ada refreshTransactions
+// refreshTransactions
 
 export type AdaGetTransactionsRequest = {|
   getTransactionsHistoryForAddresses: HistoryFunc,
@@ -272,7 +254,7 @@ export type CreateWalletFunc = (
 
 export type SignAndBroadcastRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey,
-  signRequest: BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>,
+  signRequest: BaseSignRequest<RustModule.WalletV2.Transaction>,
   password: string,
   sendTx: SendFunc,
 |};
@@ -349,40 +331,6 @@ export type CreateUnsignedTxFunc = (
   request: CreateUnsignedTxRequest
 ) => Promise<CreateUnsignedTxResponse>;
 
-// createDelegationTx
-
-export type CreateDelegationTxRequest = {|
-  publicDeriver: IGetAllUtxos & IHasUtxoChains & IGetStakingKey,
-  poolRequest: PoolRequest,
-  /**
-   * TODO: right now we can only get this information from the network
-   * but it should be held in storage eventually
-   */
-  valueInAccount: number,
-|};
-export type CreateDelegationTxResponse = {|
-  unsignedTx: V3UnsignedTxAddressedUtxoResponse,
-  totalAmountToDelegate: BigNumber,
-|};
-
-export type CreateDelegationTxFunc = (
-  request: CreateDelegationTxRequest
-) => Promise<CreateDelegationTxResponse>;
-
-// signAndBroadcastDelegationTx
-
-export type SignAndBroadcastDelegationTxRequest = {|
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey & IGetStakingKey,
-  signRequest: BaseSignRequest<RustModule.WalletV3.InputOutput>,
-  password: string,
-  sendTx: SendFunc,
-|};
-export type SignAndBroadcastDelegationTxResponse = SignedResponse;
-
-export type SignAndBroadcastDelegationTxFunc = (
-  request: SignAndBroadcastDelegationTxRequest
-) => Promise<SignAndBroadcastDelegationTxResponse>;
-
 // saveLastReceiveAddressIndex
 
 export type SaveLastReceiveAddressIndexRequest = {|
@@ -440,28 +388,6 @@ export type RestoreWalletForTransferResponse = {|
 export type RestoreWalletForTransferFunc = (
   request: RestoreWalletForTransferRequest
 ) => Promise<RestoreWalletForTransferResponse>;
-
-// renameModel
-
-export type RenameModelRequest = {|
-  func: IRenameFunc,
-  request: IRenameRequest,
-|};
-export type RenameModelResponse = IRenameResponse;
-export type RenameModelFunc = (
-  request: RenameModelRequest
-) => Promise<RenameModelResponse>;
-
-// changeModelPassword
-
-export type ChangeModelPasswordRequest = {|
-  func: IChangePasswordRequestFunc,
-  request: IChangePasswordRequest,
-|};
-export type ChangeModelPasswordResponse = IChangePasswordResponse;
-export type ChangeModelPasswordFunc = (
-  request: ChangeModelPasswordRequest
-) => Promise<ChangeModelPasswordResponse>;
 
 // createHardwareWallet
 
@@ -616,7 +542,7 @@ export default class AdaApi {
   async getNotices(
     request: GetNoticesRequestOptions
   ): Promise<GetNoticesResponse> {
-    Logger.debug('AdaApi::getNotices called: ' + stringifyData(request));
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.getNotices)} called: ` + stringifyData(request));
     try {
       let next = 0;
       const dummyNotices =  [
@@ -647,7 +573,7 @@ export default class AdaApi {
         total: dummyNotices.length
       };
     } catch (error) {
-      Logger.error('AdaApi::getNotices error: ' + stringifyError(error));
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.getNotices)} error: ` + stringifyError(error));
       throw new GenericApiError();
     }
   }
@@ -709,14 +635,14 @@ export default class AdaApi {
         encodedTx,
       });
       Logger.debug(
-        'AdaApi::signAndBroadcast success: ' + stringifyData(response)
+        `${nameof(AdaApi)}::${nameof(this.signAndBroadcast)} success: ` + stringifyData(response)
       );
       return response;
     } catch (error) {
       if (error instanceof WrongPassphraseError) {
         throw new IncorrectWalletPasswordError();
       }
-      Logger.error('AdaApi::signAndBroadcast error: ' + stringifyError(error));
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
       if (error instanceof InvalidWitnessError) {
         throw new InvalidWitnessError();
       }
@@ -728,20 +654,20 @@ export default class AdaApi {
     request: CreateTrezorSignTxDataRequest
   ): Promise<CreateTrezorSignTxDataResponse> {
     try {
-      Logger.debug('AdaApi::createTrezorSignTxData called');
+      Logger.debug(`${nameof(AdaApi)}::${nameof(this.createTrezorSignTxData)} called`);
       const { signRequest } = request;
 
       const trezorSignTxPayload = await createTrezorSignTxPayload(
         signRequest,
         request.getTxsBodiesForUTXOs,
       );
-      Logger.debug('AdaApi::createTrezorSignTxData success: ' + stringifyData(trezorSignTxPayload));
+      Logger.debug(`${nameof(AdaApi)}::${nameof(this.createTrezorSignTxData)} success: ` + stringifyData(trezorSignTxPayload));
 
       return {
         trezorSignTxPayload,
       };
     } catch (error) {
-      Logger.error('AdaApi::createTrezorSignTxData error: ' + stringifyError(error));
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.createTrezorSignTxData)} error: ` + stringifyError(error));
 
       // We don't know what the problem was so throw a generic error
       throw new GenericApiError();
@@ -751,17 +677,17 @@ export default class AdaApi {
   async broadcastTrezorSignedTx(
     request: BroadcastTrezorSignedTxRequest
   ): Promise<BroadcastTrezorSignedTxResponse> {
-    Logger.debug('AdaApi::broadcastTrezorSignedTx called');
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.broadcastTrezorSignedTx)} called`);
     try {
       const response = await broadcastTrezorSignedTx(
         request.signedTxRequest,
         request.sendTx
       );
-      Logger.debug('AdaApi::broadcastTrezorSignedTx success: ' + stringifyData(response));
+      Logger.debug(`${nameof(AdaApi)}::${nameof(this.broadcastTrezorSignedTx)} success: ` + stringifyData(response));
 
       return response;
     } catch (error) {
-      Logger.error('AdaApi::broadcastTrezorSignedTx error: ' + stringifyError(error));
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.broadcastTrezorSignedTx)} error: ` + stringifyError(error));
 
       if (error instanceof InvalidWitnessError) {
         throw new InvalidWitnessError();
@@ -776,7 +702,7 @@ export default class AdaApi {
     request: CreateLedgerSignTxDataRequest
   ): Promise<CreateLedgerSignTxDataResponse> {
     try {
-      Logger.debug('AdaApi::createLedgerSignTxData called');
+      Logger.debug(`${nameof(AdaApi)}::${nameof(this.createLedgerSignTxData)} called`);
       const { signRequest, getTxsBodiesForUTXOs } = request;
 
       const ledgerSignTxPayload = await createLedgerSignTxPayload(
@@ -784,12 +710,12 @@ export default class AdaApi {
         getTxsBodiesForUTXOs,
       );
 
-      Logger.debug('AdaApi::createLedgerSignTxData success: ' + stringifyData(ledgerSignTxPayload));
+      Logger.debug(`${nameof(AdaApi)}::${nameof(this.createLedgerSignTxData)} success: ` + stringifyData(ledgerSignTxPayload));
       return {
         ledgerSignTxPayload,
       };
     } catch (error) {
-      Logger.error('AdaApi::createLedgerSignTxData error: ' + stringifyError(error));
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.createLedgerSignTxData)} error: ` + stringifyError(error));
 
       if (error instanceof LocalizableError) {
         // we found it as a LocalizableError, so could throw it as it is.
@@ -805,11 +731,11 @@ export default class AdaApi {
     request: PrepareAndBroadcastLedgerSignedTxRequest
   ): Promise<PrepareAndBroadcastLedgerSignedTxResponse> {
     try {
-      Logger.debug('AdaApi::prepareAndBroadcastLedgerSignedTx called');
+      Logger.debug(`${nameof(AdaApi)}::${nameof(this.prepareAndBroadcastLedgerSignedTx)} called`);
 
       const publicKeyRow = await request.getPublicKey();
       if (publicKeyRow.IsEncrypted) {
-        throw new Error('prepareAndBroadcastLedgerSignedTx unexpected encrypted public key');
+        throw new Error(`${nameof(AdaApi)}::${nameof(this.prepareAndBroadcastLedgerSignedTx)} unexpected encrypted public key`);
       }
       const publicKey = RustModule.WalletV2.PublicKey.from_hex(publicKeyRow.Hash);
       const { ledgerSignTxResp, unsignedTx, sendTx } = request;
@@ -820,11 +746,11 @@ export default class AdaApi {
         request.keyLevel,
         sendTx,
       );
-      Logger.debug('AdaApi::prepareAndBroadcastLedgerSignedTx success: ' + stringifyData(response));
+      Logger.debug(`${nameof(AdaApi)}::${nameof(this.prepareAndBroadcastLedgerSignedTx)} success: ` + stringifyData(response));
 
       return response;
     } catch (error) {
-      Logger.error('AdaApi::prepareAndBroadcastLedgerSignedTx error: ' + stringifyError(error));
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.prepareAndBroadcastLedgerSignedTx)} error: ` + stringifyError(error));
 
       if (error instanceof LocalizableError) {
         // we found it as a LocalizableError, so could throw it as it is.
@@ -894,133 +820,14 @@ export default class AdaApi {
         throw new Error(`${nameof(this.createUnsignedTx)} unknown param`);
       }
       Logger.debug(
-        'AdaApi::createUnsignedTx success: ' + stringifyData(unsignedTxResponse)
+        `${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} success: ` + stringifyData(unsignedTxResponse)
       );
       return unsignedTxResponse;
     } catch (error) {
       Logger.error(
-        'AdaApi::createUnsignedTx error: ' + stringifyError(error)
+        `${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} error: ` + stringifyError(error)
       );
       if (error.id.includes('NotEnoughMoneyToSendError')) throw error;
-      throw new GenericApiError();
-    }
-  }
-
-  async createDelegationTx(
-    request: CreateDelegationTxRequest
-  ): Promise<CreateDelegationTxResponse> {
-    Logger.debug(`${nameof(AdaApi)}::${nameof(this.createDelegationTx)} called`);
-
-    const stakingKeyResp = await request.publicDeriver.getStakingKey();
-    const stakingKey = unwrapStakingKey(stakingKeyResp.addr.Hash);
-
-    const stakeDelegationCert = createCertificate(stakingKey, request.poolRequest);
-    const certificate = RustModule.WalletV3.Certificate.stake_delegation(stakeDelegationCert);
-
-    const allUtxo = await request.publicDeriver.getAllUtxos();
-    const addressedUtxo = jormungandrAsAddressedUtxo(allUtxo);
-    const nextUnusedInternal = await request.publicDeriver.nextInternal();
-    if (nextUnusedInternal.addressInfo == null) {
-      throw new Error(`${nameof(this.createDelegationTx)} no internal addresses left. Should never happen`);
-    }
-    const changeAddr = nextUnusedInternal.addressInfo;
-    const unsignedTx = jormungandrNewAdaUnsignedTx(
-      [],
-      [{
-        address: changeAddr.addr.Hash,
-        addressing: changeAddr.addressing,
-      }],
-      addressedUtxo,
-      certificate
-    );
-
-    const allUtxosForKey = filterAddressesByStakingKey(
-      stakingKey,
-      allUtxo,
-      false,
-    );
-    const utxoSum = allUtxosForKey.reduce(
-      (sum, utxo) => sum.plus(new BigNumber(utxo.output.UtxoTransactionOutput.Amount)),
-      new BigNumber(0)
-    );
-
-    const differenceAfterTx = getDifferenceAfterTx(
-      unsignedTx,
-      allUtxo,
-      stakingKey
-    );
-
-    const totalAmountToDelegate = utxoSum
-      .plus(differenceAfterTx) // subtract any part of the fee that comes from UTXO
-      .plus(request.valueInAccount); // recall: Jormungandr rewards are compounding
-
-    return {
-      unsignedTx,
-      totalAmountToDelegate
-    };
-  }
-
-  async signAndBroadcastDelegationTx(
-    request: SignAndBroadcastDelegationTxRequest
-  ): Promise<SignAndBroadcastDelegationTxResponse> {
-    Logger.debug(`${nameof(AdaApi)}::${nameof(this.signAndBroadcastDelegationTx)} called`);
-    const { password, signRequest } = request;
-    try {
-      const signingKeyFromStorage = await request.publicDeriver.getSigningKey();
-      const stakingAddr = await request.publicDeriver.getStakingKey();
-      const normalizedKey = await request.publicDeriver.normalizeKey({
-        ...signingKeyFromStorage,
-        password,
-      });
-      const normalizedSigningKey = RustModule.WalletV3.Bip32PrivateKey.from_bytes(
-        Buffer.from(normalizedKey.prvKeyHex, 'hex')
-      );
-      const normalizedStakingKey = normalizeKey({
-        addressing: stakingAddr.addressing,
-        startingFrom: {
-          key: normalizedSigningKey,
-          level: request.publicDeriver.getParent().getPublicDeriverLevel(),
-        },
-      }).to_raw_key();
-      const unsignedTx = signRequest.unsignedTx;
-      if (request.signRequest.certificate == null) {
-        throw new Error(`${nameof(this.signAndBroadcastDelegationTx)} missing certificate`);
-      }
-      const certificate = request.signRequest.certificate;
-      const signedTx = jormungandrSignTransaction(
-        {
-          senderUtxos: signRequest.senderUtxos,
-          changeAddr: signRequest.changeAddr,
-          certificate,
-          IOs: unsignedTx,
-        },
-        request.publicDeriver.getParent().getPublicDeriverLevel(),
-        normalizedSigningKey,
-        // Note: always false because we should only do legacy txs for wallet transfers
-        false,
-        {
-          certificate,
-          stakingKey: normalizedStakingKey,
-        },
-      );
-      const id = Buffer.from(signedTx.id().as_bytes()).toString('hex');
-      const encodedTx = signedTx.as_bytes();
-      const response = request.sendTx({
-        id,
-        encodedTx,
-      });
-      Logger.debug(
-        `${nameof(AdaApi)}::${nameof(this.signAndBroadcastDelegationTx)} success: ` + stringifyData(response)
-      );
-      return response;
-    } catch (error) {
-      if (error instanceof WrongPassphraseError) {
-        throw new IncorrectWalletPasswordError();
-      }
-      Logger.error(`${nameof(AdaApi)}::${nameof(this.signAndBroadcastDelegationTx)} error: ` + stringifyError(error));
-      if (error instanceof InvalidWitnessError) {
-        throw new InvalidWitnessError();
-      }
       throw new GenericApiError();
     }
   }
@@ -1029,7 +836,7 @@ export default class AdaApi {
   async saveLastReceiveAddressIndex(
     request: SaveLastReceiveAddressIndexRequest
   ): Promise<SaveLastReceiveAddressIndexResponse> {
-    Logger.debug('AdaApi::saveLastReceiveAddressIndex called');
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.saveLastReceiveAddressIndex)} called`);
     try {
       // note: it's better to take a DisplayCutoff as a parameter to the function directly
       // but this would be kind of ugly to do from the test code
@@ -1040,7 +847,7 @@ export default class AdaApi {
         newIndex: request.index
       });
     } catch (error) {
-      Logger.error('AdaApi::saveAddress error: ' + stringifyError(error));
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.saveLastReceiveAddressIndex)} error: ` + stringifyError(error));
       throw new GenericApiError();
     }
   }
@@ -1064,16 +871,16 @@ export default class AdaApi {
   }
 
   generateWalletRecoveryPhrase(): Promise<GenerateWalletRecoveryPhraseResponse> {
-    Logger.debug('AdaApi::generateWalletRecoveryPhrase called');
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.generateWalletRecoveryPhrase)} called`);
     try {
       const response = new Promise(
         resolve => resolve(generateAdaMnemonic())
       );
-      Logger.debug('AdaApi::generateWalletRecoveryPhrase success');
+      Logger.debug(`${nameof(AdaApi)}::${nameof(this.generateWalletRecoveryPhrase)} success`);
       return response;
     } catch (error) {
       Logger.error(
-        'AdaApi::generateWalletRecoveryPhrase error: ' + stringifyError(error)
+        `${nameof(AdaApi)}::${nameof(this.generateWalletRecoveryPhrase)} error: ` + stringifyError(error)
       );
       throw new GenericApiError();
     }
@@ -1173,7 +980,7 @@ export default class AdaApi {
   async restoreWalletForTransfer(
     request: RestoreWalletForTransferRequest
   ): Promise<RestoreWalletForTransferResponse> {
-    Logger.debug('AdaApi::restoreWalletForTransfer called');
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWalletForTransfer)} called`);
     const { rootPk, checkAddressesInUse } = request;
 
     try {
@@ -1303,44 +1110,11 @@ export default class AdaApi {
     }
   }
 
-  async renameModel(
-    request: RenameModelRequest
-  ): Promise<RenameModelResponse> {
-    Logger.debug('AdaApi::renameModel called: ' + stringifyData(request));
-    try {
-      const result = await request.func(request.request);
-      Logger.debug('AdaApi::renameModel success: ' + stringifyData(result));
-      return result;
-    } catch (error) {
-      Logger.error('AdaApi::renameModel error: ' + stringifyError(error));
-      throw new GenericApiError();
-    }
-  }
-
-  async changeModelPassword(
-    request: ChangeModelPasswordRequest
-  ): Promise<ChangeModelPasswordResponse> {
-    Logger.debug('AdaApi::changeModelPassword called');
-    try {
-      const result = await request.func(request.request);
-      Logger.debug('AdaApi::changeModelPassword success');
-      return result;
-    } catch (error) {
-      Logger.error(
-        'AdaApi::changeModelPassword error: ' + stringifyError(error)
-      );
-      if (error instanceof WrongPassphraseError) {
-        throw new IncorrectWalletPasswordError();
-      }
-      throw new GenericApiError();
-    }
-  }
-
   async createHardwareWallet(
     request: CreateHardwareWalletRequest
   ): Promise<CreateHardwareWalletResponse> {
     try {
-      Logger.debug('AdaApi::createHardwareWallet called');
+      Logger.debug(`${nameof(AdaApi)}::${nameof(this.createHardwareWallet)} called`);
       const wallet = await createHardwareWallet({
         db: request.db,
         settings: RustModule.WalletV2.BlockchainSettings.from_json({
@@ -1362,7 +1136,7 @@ export default class AdaApi {
       );
 
       if (wallet.publicDeriver.length !== 1) {
-        throw new Error('createHardwareWallet should only do 1 HW derivation at a time');
+        throw new Error(`${nameof(AdaApi)}::${nameof(this.createHardwareWallet)} should only do 1 HW derivation at a time`);
       }
       const pubDeriverResult = wallet.publicDeriver[0].publicDeriverResult;
       const newPubDeriver = await PublicDeriver.createPublicDeriver(
@@ -1370,13 +1144,13 @@ export default class AdaApi {
         bip44Wallet,
       );
 
-      Logger.debug('AdaApi::restoreWallet success');
+      Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} success`);
       return {
         bip44Wallet,
         publicDeriver: newPubDeriver,
       };
     } catch (error) {
-      Logger.error('AdaApi::createHardwareWallet error: ' + stringifyError(error));
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.createHardwareWallet)} error: ` + stringifyError(error));
 
       if (error instanceof LocalizableError) {
         // we found it as a LocalizableError, so could throw it as it is.
@@ -1397,10 +1171,10 @@ export default class AdaApi {
       const fetchedTxs = await getAllTransactions({
         publicDeriver: request.publicDeriver,
       });
-      Logger.debug('AdaApi::getTransactionRowsToExport: success');
+      Logger.debug(`${nameof(AdaApi)}::${nameof(this.getTransactionRowsToExport)}: success`);
       return convertAdaTransactionsToExportRows(fetchedTxs.txs);
     } catch (error) {
-      Logger.error('AdaApi::getTransactionRowsToExport: ' + stringifyError(error));
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.getTransactionRowsToExport)}: ` + stringifyError(error));
 
       if (error instanceof LocalizableError) {
         // we found it as a LocalizableError, so could throw it as it is.
@@ -1411,80 +1185,5 @@ export default class AdaApi {
       }
     }
   }
-
-  async migrate(
-    localstorageApi: LocalStorageApi,
-    persistentDb: lf$Database,
-  ): Promise<boolean> {
-    return await migrateToLatest(
-      localstorageApi,
-      persistentDb,
-    );
-  }
-
-  async importLocalDatabase(
-    db: lf$Database,
-    data: {...},
-  ): Promise<void> {
-    await clear(db);
-    await db.import(data);
-  }
-
-  async exportLocalDatabase(
-    db: lf$Database,
-  ): Promise<string> {
-    const data = await db.export();
-    return JSON.stringify(data);
-  }
 }
 // ========== End of class AdaApi =========
-
-/**
- * Sending the transaction may affect the amount delegated in a few ways:
- * 1) The transaction fee for the transaction
- *  - may be paid with UTXO that either does or doesn't belong to our staking key.
- * 2) The change for the transaction
- *  - may get turned into a group address for our staking key
- */
-function getDifferenceAfterTx(
-  utxoResponse: V3UnsignedTxAddressedUtxoResponse,
-  allUtxos: IGetAllUtxosResponse,
-  stakingKey: RustModule.WalletV3.PublicKey,
-): BigNumber {
-  const stakingKeyString = Buffer.from(stakingKey.as_bytes()).toString('hex');
-
-  let sumInForKey = new BigNumber(0);
-  {
-    // note senderUtxos.length is approximately 1
-    // since it's just to cover transaction fees
-    // so this for loop is faster than building a map
-    for (const senderUtxo of utxoResponse.senderUtxos) {
-      const match = allUtxos.find(utxo => (
-        utxo.output.Transaction.Hash === senderUtxo.tx_hash &&
-        utxo.output.UtxoTransactionOutput.OutputIndex === senderUtxo.tx_index
-      ));
-      if (match == null) {
-        throw new Error(`${nameof(getDifferenceAfterTx)} utxo not found. Should not happen`);
-      }
-      const address = match.address;
-      if (groupAddrContainsAccountKey(address, stakingKeyString, true)) {
-        sumInForKey = sumInForKey.plus(new BigNumber(senderUtxo.amount));
-      }
-    }
-  }
-
-  let sumOutForKey = new BigNumber(0);
-  {
-    const outputs = utxoResponse.IOs.outputs();
-    for (let i = 0; i < outputs.size(); i++) {
-      const output = outputs.get(i);
-      const address = Buffer.from(output.address().as_bytes()).toString('hex');
-      if (groupAddrContainsAccountKey(address, stakingKeyString, true)) {
-        const value = new BigNumber(output.value().to_str());
-        sumOutForKey = sumOutForKey.plus(value);
-      }
-    }
-  }
-
-  return sumOutForKey.minus(sumInForKey);
-}
