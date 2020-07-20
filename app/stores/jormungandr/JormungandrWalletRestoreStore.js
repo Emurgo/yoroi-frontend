@@ -39,7 +39,7 @@ export default class JormungandrWalletRestoreStore extends Store {
         return getApiForNetwork(this.stores.profile.selectedNetwork);
       }
     );
-    jormungandr.walletRestore.transferFromLegacy.listen(asyncCheck(this._transferFromLegacy));
+    jormungandr.walletRestore.transferFromLegacy.listen(this._transferFromLegacy);
     actions.startRestore.listen(asyncCheck(this._restoreToDb));
     actions.reset.listen(syncCheck(this.reset));
   }
