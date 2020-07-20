@@ -3,8 +3,8 @@
 import {
   NotEnoughMoneyToSendError,
 } from '../../../common/errors';
-import type { RemoteUnspentOutput, } from '../../lib/state-fetch/types';
-import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
+import type { RemoteUnspentOutput, } from '../state-fetch/types';
+import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 
 export function selectAllInputSelection(
   txBuilder: RustModule.WalletV3.InputOutputBuilder,

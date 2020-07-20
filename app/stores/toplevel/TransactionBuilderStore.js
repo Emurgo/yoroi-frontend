@@ -8,15 +8,13 @@ import type {
   CreateUnsignedTxFunc,
 } from '../../api/ada';
 
-import type { BaseSignRequest } from '../../api/ada/transactions/types';
-import { IGetFee, ITotalInput, ITxEqual, copySignRequest } from '../../api/ada/transactions/utils';
+import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import {
   asGetAllUtxos, asHasUtxoChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   IGetAllUtxosResponse, IHasUtxoChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 export type SetupSelfTxRequest = {|
   publicDeriver: IHasUtxoChains,
@@ -37,13 +35,9 @@ export default class AdaTransactionBuilderStore extends Store {
   /** Stores the tx information as the user is building it */
   @observable plannedTxInfo: Array<{| ...InexactSubset<TxOutType<number>>, |}>;
   /** Stores the tx used to generate the information on the send form */
-  @observable plannedTx: null | BaseSignRequest<
-    RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput
-  >;
+  @observable plannedTx: null | ISignRequest<any>;
   /** Stores the tx that will be sent if the user confirms sending */
-  @observable tentativeTx: null | BaseSignRequest<
-    RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput
-  >;
+  @observable tentativeTx: null | ISignRequest<any>;
 
   @observable filter: ElementOf<IGetAllUtxosResponse> => boolean;
 
@@ -82,7 +76,7 @@ export default class AdaTransactionBuilderStore extends Store {
     if (!this.plannedTx) {
       return undefined;
     }
-    return IGetFee(this.plannedTx, true);
+    return this.plannedTx.fee(true);
   }
 
   @computed get
@@ -90,7 +84,7 @@ export default class AdaTransactionBuilderStore extends Store {
     if (!this.plannedTx) {
       return undefined;
     }
-    return ITotalInput(this.plannedTx, true);
+    return this.plannedTx.totalInput(true);
   }
 
   // ================
@@ -125,18 +119,8 @@ export default class AdaTransactionBuilderStore extends Store {
     }
     const result = this.createUnsignedTx.result;
 
-    const certificate = result.certificate == null
-      ? undefined
-      : result.certificate;
     runInAction(() => {
-      this.plannedTx = {
-        senderUtxos: result.senderUtxos,
-        unsignedTx: result.txBuilder
-          ? result.txBuilder.make_transaction()
-          : result.IOs,
-        changeAddr: result.changeAddr,
-        certificate,
-      };
+      this.plannedTx = result;
     });
   }
 
@@ -292,20 +276,17 @@ export default class AdaTransactionBuilderStore extends Store {
    * We need to clone to tentative tx to avoid the dialog changing
    * when the send page recalculates the utxo
    */
-  _cloneTx: (
-    BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>
-  ) => BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput> = (
+  _cloneTx: ISignRequest<mixed> => ISignRequest<mixed> = (
     signRequest
   ) => {
-    // drop mobx observable behavior
-    const copy = toJS(signRequest);
-
-    /* In the Rust code, attempting to sign a transaction is destructive
+    /* In the Rust code, it may be that signing a transaction is destructive
      * as it frees the pointer to the original tx.
      *
      * To avoid the back button breaking the send page form, we clone the tx
      */
-    return copySignRequest(copy);
+    return toJS( // drop mobx observable behavior
+      signRequest.copy()
+    );
   }
 
   /**
@@ -319,7 +300,7 @@ export default class AdaTransactionBuilderStore extends Store {
       return this.txMismatch;
     }
 
-    return !ITxEqual(this.tentativeTx, this.plannedTx);
+    return !this.tentativeTx.isEqual(this.plannedTx.self().unsignedTx);
   }
 
   _setupSelfTx: SetupSelfTxFunc = async (request): Promise<void> => {

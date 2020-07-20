@@ -27,11 +27,11 @@ import { wrapWallet } from '../../../Routes';
 import type {
   GetDelegatedBalanceFunc,
   GetCurrentDelegationFunc,
-} from '../../../api/ada/lib/storage/bridge/delegationUtils';
+} from '../../../api/jormungandr/lib/storage/bridge/delegationUtils';
 import type {
   RewardHistoryForWallet,
   DelegationRequests,
-} from '../../../stores/ada/DelegationStore';
+} from '../../../stores/jormungandr/DelegationStore';
 
 export default {
   title: `${__filename.split('.')[0]}`,

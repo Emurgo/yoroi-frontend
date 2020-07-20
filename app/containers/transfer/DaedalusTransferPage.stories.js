@@ -23,11 +23,11 @@ import {
   TransferFundsError,
   NoTransferTxError,
   WebSocketRestoreError,
-} from '../../stores/ada/AdaDaedalusTransferStore';
+} from '../../stores/toplevel/DaedalusTransferStore';
 import {
   GenerateTransferTxError,
   NotEnoughMoneyToSendError,
-} from '../../api/ada/errors';
+} from '../../api/common/errors';
 import AdaApi from '../../api/ada/index';
 import { RestoreMode } from '../../actions/common/wallet-restore-actions';
 

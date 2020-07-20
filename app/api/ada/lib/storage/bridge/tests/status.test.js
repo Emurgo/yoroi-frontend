@@ -8,17 +8,19 @@ import '../../../test-config';
 import type { RemoteTransaction, RemoteTxBlockMeta, } from '../../../state-fetch/types';
 import {
   setup,
-  mockDate,
-  filterDbSnapshot,
+} from './common';
+import {
   ABANDON_SHARE,
   TX_TEST_MNEMONIC_1,
-} from './common';
+  mockDate,
+  filterDbSnapshot,
+} from '../../../../../jestUtils';
 import {
   genCheckAddressesInUse,
   genGetTransactionsHistoryForAddresses,
   genGetBestBlock,
   getSingleAddressString,
-} from './mockNetwork';
+} from '../../../state-fetch/mockNetwork';
 import { loadLovefieldDB } from '../../database/index';
 import {
   HARD_DERIVATION_START,

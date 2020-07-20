@@ -4,14 +4,14 @@ import {
   NotEnoughMoneyToSendError,
 } from '../../../common/errors';
 import type { ConfigType } from '../../../../../config/config-types';
-import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
+import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 import BigNumber from 'bignumber.js';
 import { generateAuthData, generateFee, } from './utils';
 
 declare var CONFIG: ConfigType;
 
 /**
- * Transactions cannot both send money and post a certifiate
+ * Transactions cannot both send money and post a certificate
  */
 type SendType = {|
   amount: BigNumber,

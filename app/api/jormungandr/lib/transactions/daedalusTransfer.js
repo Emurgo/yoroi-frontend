@@ -3,7 +3,7 @@
 // Create byron transactions for wallets created with the v1 address scheme
 
 import BigNumber from 'bignumber.js';
-import { getJormungandrTxFee, } from './utils';
+import { getJormungandrTxFee, } from './JormungandrTxSignRequest';
 import {
   Logger,
   stringifyError,
@@ -18,16 +18,16 @@ import {
 } from './utxoTransactions';
 import type {
   RemoteUnspentOutput
-} from '../../lib/state-fetch/types';
+} from '../state-fetch/types';
 import type {
   TransferTx
 } from '../../../../types/TransferTypes';
-import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
+import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 import type {
   V3UnsignedTxUtxoResponse,
   AddressKeyMap,
-} from '../types';
-import { getAdaCurrencyMeta } from '../../currencyInfo';
+} from '../../../ada/transactions/types';
+import { getJormungandrCurrencyMeta } from '../../currencyInfo';
 
 import type { ConfigType } from '../../../../../config/config-types';
 
@@ -66,7 +66,7 @@ export async function buildDaedalusTransferTx(payload: {|
 
     const fragment = RustModule.WalletV3.Fragment.from_transaction(signedTx);
 
-    const lovelacesPerAda = new BigNumber(10).pow(getAdaCurrencyMeta().decimalPlaces);
+    const lovelacesPerAda = new BigNumber(10).pow(getJormungandrCurrencyMeta().decimalPlaces);
     // return summary of transaction
     return {
       recoveredBalance: totalBalance.dividedBy(lovelacesPerAda),

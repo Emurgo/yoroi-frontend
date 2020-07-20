@@ -18,8 +18,7 @@ import type {
 } from '../../../../types/TransferTypes';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import type { AddressKeyMap } from '../types';
-import { buildDaedalusTransferTx as jormungandrFormatDaedalusTx } from '../jormungandr/daedalusTransfer';
-import { buildDaedalusTransferTx as legacyFormatDaedalusTx } from '../byron/daedalusTransfer';
+import { buildDaedalusTransferTx } from '../byron/daedalusTransfer';
 
 /**
  * Go through the whole UTXO and find the addresses that belong to the user along with the keys
@@ -48,8 +47,7 @@ export function getAddressesKeys(payload: {|
   }
 }
 
-async function toSenderUtxos(payload: {|
-  outputAddr: string,
+export async function toSenderUtxos(payload: {|
   addressKeys: AddressKeyMap,
   getUTXOsForAddresses: AddressUtxoFunc,
 |}): Promise<AddressUtxoResponse> {
@@ -66,24 +64,18 @@ async function toSenderUtxos(payload: {|
   return senderUtxos;
 }
 
-export async function buildDaedalusTransferTx(payload: {|
+export async function daedalusTransferTxFromAddresses(payload: {|
   addressKeys: AddressKeyMap,
   outputAddr: string,
   getUTXOsForAddresses: AddressUtxoFunc,
-  legacy: boolean,
 |}): Promise<TransferTx> {
   const senderUtxos = await toSenderUtxos({
-    outputAddr: payload.outputAddr,
     addressKeys: payload.addressKeys,
     getUTXOsForAddresses: payload.getUTXOsForAddresses,
   });
-
-  const txRequest = {
+  return buildDaedalusTransferTx({
     outputAddr: payload.outputAddr,
     addressKeys: payload.addressKeys,
     senderUtxos,
-  };
-  return payload.legacy
-    ? legacyFormatDaedalusTx(txRequest)
-    : jormungandrFormatDaedalusTx(txRequest);
+  });
 }

@@ -20,7 +20,7 @@ import {
 } from '../api/ada/lib/storage/models/PublicDeriver/traits';
 import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { DelegationRequests } from '../stores/ada/DelegationStore';
+import type { DelegationRequests } from '../stores/jormungandr/DelegationStore';
 import type { ConceptualWalletSettingsCache } from '../stores/toplevel/WalletSettingsStore';
 import type { PublicKeyCache } from '../stores/toplevel/WalletStore';
 import type { TxRequests } from '../stores/toplevel/TransactionsStore';

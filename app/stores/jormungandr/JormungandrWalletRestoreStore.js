@@ -8,7 +8,6 @@ import { RestoreMode } from '../../actions/common/wallet-restore-actions';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { TransferSource } from '../../types/TransferTypes';
 import {
-  HARD_DERIVATION_START,
   WalletTypePurpose,
   CoinTypes,
   ChainDerivations,
@@ -17,6 +16,9 @@ import {
 import {
   generateWalletRootKey,
 } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
+import {
+  v4Bip32PrivateToV3,
+} from '../../api/jormungandr/lib/crypto/utils';
 import {
   RestoreSteps,
 } from '../toplevel/WalletRestoreStore';
@@ -51,22 +53,26 @@ export default class JormungandrWalletRestoreStore extends Store {
     }
     await this.actions.jormungandr.yoroiTransfer.transferFunds.trigger({
       next: async () => { await this._restoreToDb(); },
-      getDestinationAddress: () => Promise.resolve(this._getFirstInternalAddr(phrase)),
+      getDestinationAddress: () => Promise.resolve(this._getFirstCip1852InternalAddr()),
       // funds in genesis block should be either entirely claimed or not claimed
       // so if another wallet instance claims the funds, it's not a big deal
       rebuildTx: false,
     });
   }
 
-  _getFirstInternalAddr: string => string = (recoveryPhrase) => {
-    const accountKey = generateWalletRootKey(recoveryPhrase)
+  _getFirstCip1852InternalAddr: void => string = () => {
+    const phrase = this.stores.walletRestore.recoveryResult?.phrase;
+    if (phrase == null) {
+      throw new Error(`${nameof(this._getFirstCip1852InternalAddr)} no recovery phrase set. Should never happen`);
+    }
+    const accountKey = v4Bip32PrivateToV3(generateWalletRootKey(phrase))
       .derive(WalletTypePurpose.CIP1852)
       .derive(CoinTypes.CARDANO)
-      .derive(0 + HARD_DERIVATION_START);
+      .derive(this.stores.walletRestore.selectedAccount);
 
     const internalKey = accountKey
       .derive(ChainDerivations.INTERNAL)
-      .derive(0)
+      .derive(0) // first address
       .to_public()
       .to_raw_key();
 
@@ -99,7 +105,7 @@ export default class JormungandrWalletRestoreStore extends Store {
     });
     runInAction(() => { this.stores.walletRestore.step = RestoreSteps.TRANSFER_TX_GEN; });
 
-    const internalAddrHash = this._getFirstInternalAddr(phrase);
+    const internalAddrHash = this._getFirstCip1852InternalAddr();
     await this.actions.jormungandr.yoroiTransfer.checkAddresses.trigger({
       getDestinationAddress: () => Promise.resolve(internalAddrHash),
     });

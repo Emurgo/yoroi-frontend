@@ -3,7 +3,7 @@ import { Action, AsyncAction } from '../lib/Action';
 import type {
   IGetAllUtxosResponse,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import type { SetupSelfTxRequest } from '../../stores/ada/AdaTransactionBuilderStore';
+import type { SetupSelfTxRequest } from '../../stores/toplevel/TransactionBuilderStore';
 
 export default class TxBuilderActions {
   updateReceiver: Action<void | string> = new Action();

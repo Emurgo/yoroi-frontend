@@ -8,7 +8,7 @@ import {
 } from './batchedFetcher';
 import {
   genGetTransactionsHistoryForAddresses,
-} from '../storage/bridge/tests/mockNetwork';
+} from './mockNetwork';
 import {
   generateWalletRootKey,
 } from '../cardanoCrypto/cryptoWallet';

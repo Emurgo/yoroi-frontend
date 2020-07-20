@@ -28,9 +28,6 @@ import {
   createStandardBip44Wallet, createHardwareWallet,
 } from './lib/storage/bridge/walletBuilder/byron';
 import {
-  createStandardCip1852Wallet,
-} from './lib/storage/bridge/walletBuilder/jormungandr';
-import {
   getAllTransactions,
   updateTransactions,
 } from './lib/storage/bridge/updateTransactions';
@@ -73,19 +70,13 @@ import {
   signTransaction as byronSignTransaction,
 } from './transactions/byron/transactionsV2';
 import {
-  sendAllUnsignedTx as jormungandrSendAllUnsignedTx,
-  newAdaUnsignedTx as jormungandrNewAdaUnsignedTx,
-  asAddressedUtxo as jormungandrAsAddressedUtxo,
-  signTransaction as jormungandrSignTransaction,
-} from './transactions/jormungandr/utxoTransactions';
-import {
   generateWalletRootKey,
   generateAdaMnemonic,
 } from './lib/cardanoCrypto/cryptoWallet';
 import {
   isValidBip39Mnemonic,
 } from '../common/lib/crypto/wallet';
-import { generateStandardPlate } from './lib/cardanoCrypto/plate';
+import { generateByronPlate } from './lib/cardanoCrypto/plate';
 import {
   scramblePaperAdaMnemonic,
   isValidEnglishAdaPaperMnemonic,
@@ -106,6 +97,8 @@ import {
   GenericApiError,
   IncorrectWalletPasswordError,
   WalletAlreadyRestoredError,
+  InvalidWitnessError,
+  CheckAddressesInUseApiError,
 } from '../common/errors';
 import LocalizableError from '../../i18n/LocalizableError';
 import { scanBip44Account, } from '../common/lib/restoration/bip44';
@@ -113,16 +106,11 @@ import { v2genAddressBatchFunc, } from './restoration/byron/scan';
 import { scanCip1852Account, } from './restoration/jormungandr/scan';
 import type {
   BaseSignRequest,
-  UnsignedTxResponse,
-  V3UnsignedTxAddressedUtxoResponse,
 } from './transactions/types';
+import { ByronTxSignRequest } from './transactions/byron/ByronTxSignRequest';
 import type {
   SignTransactionResponse as LedgerSignTxResponse
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import {
-  InvalidWitnessError,
-  CheckAddressesInUseApiError,
-} from '../common/errors';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 
 import type {
@@ -142,14 +130,12 @@ import {
 import {
   getAllAddressesForDisplay,
 } from './lib/storage/bridge/traitUtils';
-import { v3PublicToV2, convertAdaTransactionsToExportRows } from './transactions/utils';
+import { convertAdaTransactionsToExportRows } from './transactions/utils';
 import { generateAdaPaperPdf } from './paperWallet/paperWalletPdf';
 import type { PdfGenStepType } from './paperWallet/paperWalletPdf';
 import type { TransactionExportRow } from '../export';
 
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
-import environment from '../../environment';
-import { Cip1852Wallet } from './lib/storage/models/Cip1852Wallet/wrapper';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type {
   IsValidMnemonicRequest,
@@ -158,7 +144,6 @@ import type {
 } from '../common/types';
 import { getApiForNetwork } from '../common/utils';
 import { CoreAddressTypes } from './lib/storage/database/primitives/enums';
-import { isJormungandr } from './lib/storage/database/prepackaged/networks';
 
 declare var CONFIG: ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;
@@ -170,7 +155,6 @@ const protocolMagic = CONFIG.network.protocolMagic;
 export type CreateAdaPaperRequest = {|
   password: string,
   numAddresses?: number,
-  legacy: true,
 |};
 export type AdaPaper = {|
   addresses: Array<string>,
@@ -325,7 +309,7 @@ export type CreateUnsignedTxRequest = {|
     shouldSendAll: true,
   |}),
 |};
-export type CreateUnsignedTxResponse = UnsignedTxResponse | V3UnsignedTxAddressedUtxoResponse;
+export type CreateUnsignedTxResponse = ByronTxSignRequest;
 
 export type CreateUnsignedTxFunc = (
   request: CreateUnsignedTxRequest
@@ -376,7 +360,7 @@ export type GenerateWalletRecoveryPhraseFunc = (
 // restoreWalletForTransfer
 
 export type RestoreWalletForTransferRequest = {|
-  rootPk: RustModule.WalletV3.Bip32PrivateKey,
+  rootPk: RustModule.WalletV4.Bip32PrivateKey,
   transferSource: TransferSourceType,
   accountIndex: number,
   checkAddressesInUse: FilterFunc,
@@ -421,7 +405,6 @@ export const DEFAULT_ADDRESSES_PER_PAPER = 1;
 
 export default class AdaApi {
 
-
   // noinspection JSMethodCanBeStatic
   createAdaPaper(
     request: CreateAdaPaperRequest
@@ -432,12 +415,10 @@ export default class AdaApi {
       words.join(' '),
       request.password
     ).split(' ');
-    const { addresses, accountPlate } = generateStandardPlate(
+    const { addresses, accountPlate } = generateByronPlate(
       rootPk,
       0, // paper wallets always use account 0
       request.numAddresses != null ? request.numAddresses : DEFAULT_ADDRESSES_PER_PAPER,
-      environment.getDiscriminant(),
-      request.legacy,
     );
     return { addresses, scrambledWords, accountPlate };
   }
@@ -597,42 +578,19 @@ export default class AdaApi {
         password,
       });
       const unsignedTx = signRequest.unsignedTx;
-      let id;
-      let encodedTx;
-      if (unsignedTx instanceof RustModule.WalletV2.Transaction) {
-        const signedTx = byronSignTransaction(
-          {
-            ...signRequest,
-            unsignedTx,
-          },
-          request.publicDeriver.getParent().getPublicDeriverLevel(),
-          RustModule.WalletV2.PrivateKey.from_hex(normalizedKey.prvKeyHex)
-        );
-        id = signedTx.id();
-        encodedTx = Buffer.from(signedTx.to_hex(), 'hex');
-      } else if (unsignedTx instanceof RustModule.WalletV3.InputOutput) {
-        const signedTx = jormungandrSignTransaction(
-          {
-            senderUtxos: signRequest.senderUtxos,
-            changeAddr: signRequest.changeAddr,
-            IOs: unsignedTx,
-            certificate: signRequest.certificate,
-          },
-          request.publicDeriver.getParent().getPublicDeriverLevel(),
-          RustModule.WalletV3.Bip32PrivateKey.from_bytes(
-            Buffer.from(normalizedKey.prvKeyHex, 'hex')
-          ),
-          // Note: always false because we should only do legacy txs for wallet transfers
-          false,
-        );
-        id = Buffer.from(signedTx.id().as_bytes()).toString('hex');
-        encodedTx = signedTx.as_bytes();
-      } else {
-        throw new Error(`${nameof(this.signAndBroadcast)} not supported`);
-      }
+
+      const signedTx = byronSignTransaction(
+        {
+          ...signRequest,
+          unsignedTx,
+        },
+        request.publicDeriver.getParent().getPublicDeriverLevel(),
+        RustModule.WalletV2.PrivateKey.from_hex(normalizedKey.prvKeyHex)
+      );
+
       const response = request.sendTx({
-        id,
-        encodedTx,
+        id: signedTx.id(),
+        encodedTx: Buffer.from(signedTx.to_hex(), 'hex'),
       });
       Logger.debug(
         `${nameof(AdaApi)}::${nameof(this.signAndBroadcast)} success: ` + stringifyData(response)
@@ -771,23 +729,14 @@ export default class AdaApi {
       const utxos = await request.publicDeriver.getAllUtxos();
       const filteredUtxos = utxos.filter(utxo => request.filter(utxo));
 
-      const network = request.publicDeriver.getParent().getNetworkInfo();
-
-      const addressedUtxo = isJormungandr(network)
-        ? jormungandrAsAddressedUtxo(filteredUtxos)
-        : byronAsAddressedUtxo(filteredUtxos);
+      const addressedUtxo = byronAsAddressedUtxo(filteredUtxos);
 
       let unsignedTxResponse;
       if (request.shouldSendAll != null) {
-        unsignedTxResponse = isJormungandr(network)
-          ? jormungandrSendAllUnsignedTx(
-            receiver,
-            addressedUtxo
-          )
-          : byronSendAllUnsignedTx(
-            receiver,
-            addressedUtxo
-          );
+        unsignedTxResponse = byronSendAllUnsignedTx(
+          receiver,
+          addressedUtxo
+        );
       } else if (request.amount != null) {
         const amount = request.amount;
         const nextUnusedInternal = await request.publicDeriver.nextInternal();
@@ -795,34 +744,27 @@ export default class AdaApi {
           throw new Error(`${nameof(this.createUnsignedTx)} no internal addresses left. Should never happen`);
         }
         const changeAddr = nextUnusedInternal.addressInfo;
-        unsignedTxResponse = isJormungandr(network)
-          ? jormungandrNewAdaUnsignedTx(
-            [{
-              address: receiver,
-              amount
-            }],
-            [{
-              address: changeAddr.addr.Hash,
-              addressing: changeAddr.addressing,
-            }],
-            addressedUtxo
-          )
-          : byronNewAdaUnsignedTx(
-            receiver,
-            amount,
-            [{
-              address: changeAddr.addr.Hash,
-              addressing: changeAddr.addressing,
-            }],
-            addressedUtxo
-          );
+        unsignedTxResponse = byronNewAdaUnsignedTx(
+          receiver,
+          amount,
+          [{
+            address: changeAddr.addr.Hash,
+            addressing: changeAddr.addressing,
+          }],
+          addressedUtxo
+        );
       } else {
         throw new Error(`${nameof(this.createUnsignedTx)} unknown param`);
       }
       Logger.debug(
         `${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} success: ` + stringifyData(unsignedTxResponse)
       );
-      return unsignedTxResponse;
+      return new ByronTxSignRequest({
+        senderUtxos: unsignedTxResponse.senderUtxos,
+        unsignedTx: unsignedTxResponse.txBuilder.make_transaction(),
+        changeAddr: unsignedTxResponse.changeAddr,
+        certificate: undefined,
+      });
     } catch (error) {
       Logger.error(
         `${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} error: ` + stringifyError(error)
@@ -901,55 +843,32 @@ export default class AdaApi {
       const rootPk = generateWalletRootKey(recoveryPhrase);
       const newPubDerivers = [];
 
-      if (isJormungandr(request.network)) {
-        const wallet = await createStandardCip1852Wallet({
-          db: request.db,
-          discrimination: environment.getDiscriminant(),
-          rootPk,
-          password: walletPassword,
-          accountIndex,
-          walletName,
-          accountName: '', // set account name empty now
-        });
-
-        const cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(
-          request.db,
-          wallet.cip1852WrapperRow,
-        );
-        for (const pubDeriver of wallet.publicDeriver) {
-          newPubDerivers.push(await PublicDeriver.createPublicDeriver(
-            pubDeriver.publicDeriverResult,
-            cip1852Wallet,
-          ));
-        }
-      } else {
-        const wallet = await createStandardBip44Wallet({
-          db: request.db,
-          settings: RustModule.WalletV2.BlockchainSettings.from_json({
-            protocol_magic: protocolMagic
-          }),
-          rootPk: RustModule.WalletV2.Bip44RootPrivateKey.new(
-            RustModule.WalletV2.PrivateKey.from_hex(
-              Buffer.from(rootPk.as_bytes()).toString('hex')
-            ),
-            RustModule.WalletV2.DerivationScheme.v2()
+      const wallet = await createStandardBip44Wallet({
+        db: request.db,
+        settings: RustModule.WalletV2.BlockchainSettings.from_json({
+          protocol_magic: protocolMagic
+        }),
+        rootPk: RustModule.WalletV2.Bip44RootPrivateKey.new(
+          RustModule.WalletV2.PrivateKey.from_hex(
+            Buffer.from(rootPk.as_bytes()).toString('hex')
           ),
-          password: walletPassword,
-          accountIndex,
-          walletName,
-          accountName: '', // set account name empty now
-        });
+          RustModule.WalletV2.DerivationScheme.v2()
+        ),
+        password: walletPassword,
+        accountIndex,
+        walletName,
+        accountName: '', // set account name empty now
+      });
 
-        const bip44Wallet = await Bip44Wallet.createBip44Wallet(
-          request.db,
-          wallet.bip44WrapperRow,
-        );
-        for (const pubDeriver of wallet.publicDeriver) {
-          newPubDerivers.push(await PublicDeriver.createPublicDeriver(
-            pubDeriver.publicDeriverResult,
-            bip44Wallet,
-          ));
-        }
+      const bip44Wallet = await Bip44Wallet.createBip44Wallet(
+        request.db,
+        wallet.bip44WrapperRow,
+      );
+      for (const pubDeriver of wallet.publicDeriver) {
+        newPubDerivers.push(await PublicDeriver.createPublicDeriver(
+          pubDeriver.publicDeriverResult,
+          bip44Wallet,
+        ));
       }
 
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} success`);

@@ -99,8 +99,6 @@ export default class PaperWalletCreateStore extends Store {
       this.paper = this.api.ada.createAdaPaper({
         numAddresses: this.numAddresses,
         password: this.userPassword,
-        // TODO: fix paper wallets for Shelley
-        legacy: true,
       });
     }
   };

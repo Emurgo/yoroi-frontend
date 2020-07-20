@@ -71,7 +71,7 @@ export default class JormungandrWalletsStore extends Store {
       ),
     })
       .then(async (response) => {
-        const memo = this.stores.substores.jormungandr.transactionBuilderStore.memo;
+        const memo = this.stores.transactionBuilderStore.memo;
         if (memo !== '' && memo !== undefined) {
           try {
             await this.actions.memos.saveTxMemo.trigger({

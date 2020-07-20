@@ -17,14 +17,14 @@ import DelegationSuccessDialog from '../../../components/wallet/staking/Delegati
 import globalMessages from '../../../i18n/global-messages';
 import InvalidURIImg from '../../../assets/images/uri/invalid-uri.inline.svg';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { PoolRequest } from '../../../api/ada/lib/storage/bridge/delegationUtils';
+import type { PoolRequest } from '../../../api/jormungandr/lib/storage/bridge/delegationUtils';
 import LocalizableError from '../../../i18n/LocalizableError';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import {
   EPOCH_REWARD_DENOMINATOR,
 } from '../../../config/numbersConfig';
 import type { ConfigType } from '../../../../config/config-types';
-import type { SelectedPool } from '../../../actions/ada/delegation-transaction-actions';
+import type { SelectedPool } from '../../../actions/jormungandr/delegation-transaction-actions';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type {
   CreateDelegationTxFunc,

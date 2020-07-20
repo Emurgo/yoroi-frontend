@@ -8,16 +8,18 @@ import {
   WalletTypePurpose,
   HARD_DERIVATION_START,
 } from '../../../../config/numbersConfig';
-import { v3PublicToV2 } from '../../transactions/utils';
-import { networks } from '../storage/database/prepackaged/networks';
+import { v4PublicToV2 } from './utils';
+import { getCardanoHaskellStaticConfig, networks } from '../storage/database/prepackaged/networks';
 
 beforeAll(async () => {
   await RustModule.load();
 });
 
 const getAddressForLedgerMnemonic = (mnemonic: string): string => {
+  const staticConfigs = getCardanoHaskellStaticConfig(networks.ByronMainnet);
+  if (staticConfigs == null) throw new Error('Should never happen');
   const settings = RustModule.WalletV2.BlockchainSettings.from_json({
-    protocol_magic: Number.parseInt(networks.ByronMainnet.NetworkMagic, 10)
+    protocol_magic: staticConfigs.ByronNetworkId,
   });
 
   const rootKey = generateLedgerWalletRootKey(mnemonic);
@@ -29,7 +31,7 @@ const getAddressForLedgerMnemonic = (mnemonic: string): string => {
     .derive(0)
     .to_public();
 
-  const v2Key = v3PublicToV2(firstExternalAddressKey);
+  const v2Key = v4PublicToV2(firstExternalAddressKey);
   const firstExternalAddressHash = v2Key
     .bootstrap_era_address(settings)
     .to_base58();

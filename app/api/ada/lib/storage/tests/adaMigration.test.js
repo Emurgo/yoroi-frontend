@@ -10,7 +10,7 @@ import oldStorageLedger from '../../../../../../features/yoroi_snapshots/histori
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 import { dumpByVersion, loadLovefieldDB } from '../database/index';
 import { storagev2Migation } from '../adaMigration';
-import { mockDate, filterDbSnapshot } from '../bridge/tests/common';
+import { mockDate, filterDbSnapshot } from '../../../../jestUtils';
 
 beforeAll(async () => {
   await RustModule.load();

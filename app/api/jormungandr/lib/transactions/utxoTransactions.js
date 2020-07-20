@@ -7,19 +7,19 @@ import type {
   V3UnsignedTxAddressedUtxoResponse,
   V3UnsignedTxUtxoResponse,
   AddressedUtxo,
-} from '../types';
-import type { RemoteUnspentOutput, } from '../../lib/state-fetch/types';
+} from '../../../ada/transactions/types';
+import type { RemoteUnspentOutput, } from '../state-fetch/types';
 import {
   NotEnoughMoneyToSendError,
 } from '../../../common/errors';
 import type { ConfigType } from '../../../../../config/config-types';
 
-import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
+import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 
 import type {
   Address, Value, Addressing,
   IGetAllUtxosResponse
-} from '../../lib/storage/models/PublicDeriver/interfaces';
+} from '../../../ada/lib/storage/models/PublicDeriver/interfaces';
 import { generateAuthData, normalizeKey, generateFee, } from './utils';
 import {
   selectAllInputSelection,

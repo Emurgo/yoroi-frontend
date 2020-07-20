@@ -26,18 +26,17 @@ import { defaultToSelectedExplorer } from '../../../domain/SelectedExplorer';
 import { buildRoute } from '../../../utils/routing';
 import { ROUTES } from '../../../routes-config';
 import { THEMES } from '../../../themes';
-import { GenericApiError, } from '../../../api/common/errors';
 import { wrapWallet } from '../../../Routes';
 import type {
   GetDelegatedBalanceFunc,
   CertificateForEpoch,
   GetCurrentDelegationFunc,
-} from '../../../api/ada/lib/storage/bridge/delegationUtils';
+} from '../../../api/jormungandr/lib/storage/bridge/delegationUtils';
 import type {
   RewardHistoryForWallet,
   DelegationRequests,
-} from '../../../stores/ada/DelegationStore';
-import { GetAccountStateApiError, GetPoolInfoApiError } from '../../../api/ada/errors';
+} from '../../../stores/jormungandr/DelegationStore';
+import { GenericApiError, GetAccountStateApiError, GetPoolInfoApiError } from '../../../api/common/errors';
 import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard/LessThanExpectedDialog';
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
 import PoolWarningDialog from '../../../components/wallet/staking/dashboard/PoolWarningDialog';

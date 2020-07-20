@@ -1,7 +1,7 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
-import { v3SecretToV2, } from '../utils';
+import { v4SecretToV2, } from '../../lib/cardanoCrypto/utils';
 import { coinToBigNumber, } from './utils';
 import {
   Logger,
@@ -29,7 +29,7 @@ export async function buildYoroiTransferTx(payload: {|
   senderUtxos: Array<AddressedUtxo>,
   outputAddr: string,
   keyLevel: number,
-  signingKey: RustModule.WalletV3.Bip32PrivateKey,
+  signingKey: RustModule.WalletV4.Bip32PrivateKey,
 |}): Promise<TransferTx> {
   try {
     const { senderUtxos, outputAddr, } = payload;
@@ -59,7 +59,7 @@ export async function buildYoroiTransferTx(payload: {|
         certificate: undefined,
       },
       payload.keyLevel,
-      v3SecretToV2(payload.signingKey)
+      v4SecretToV2(payload.signingKey)
       ,
     );
 

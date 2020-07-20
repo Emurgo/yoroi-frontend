@@ -12,7 +12,7 @@ import type { GeneratedData as DaedalusTransferPageData } from './DaedalusTransf
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import WalletSettingsStore from '../../stores/toplevel/WalletSettingsStore';
 import TransactionsStore from '../../stores/toplevel/TransactionsStore';
-import DelegationStore from '../../stores/ada/DelegationStore';
+import DelegationStore from '../../stores/jormungandr/DelegationStore';
 import WalletStore from '../../stores/toplevel/WalletStore';
 import type { GeneratedData } from './Transfer';
 import Transfer from './Transfer';

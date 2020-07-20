@@ -3,12 +3,10 @@
 import { action, runInAction, } from 'mobx';
 import Store from '../base/Store';
 
-import environment from '../../environment';
 import { RestoreMode } from '../../actions/common/wallet-restore-actions';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { TransferSource } from '../../types/TransferTypes';
 import {
-  HARD_DERIVATION_START,
   WalletTypePurpose,
   CoinTypes,
   ChainDerivations,
@@ -24,6 +22,7 @@ import {
   buildCheckAndCall,
 } from '../lib/check';
 import { ApiOptions, getApiForNetwork } from '../../api/common/utils';
+import { getCardanoHaskellStaticConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export default class AdaWalletRestoreStore extends Store {
 
@@ -51,22 +50,32 @@ export default class AdaWalletRestoreStore extends Store {
     }
     await this.actions.ada.yoroiTransfer.transferFunds.trigger({
       next: async () => { await this._restoreToDb(); },
-      getDestinationAddress: () => Promise.resolve(this._getFirstInternalAddr(phrase)),
+      getDestinationAddress: () => Promise.resolve(this._getFirstCip1852InternalAddr()),
       // funds in genesis block should be either entirely claimed or not claimed
       // so if another wallet instance claims the funds, it's not a big deal
       rebuildTx: false,
     });
   }
 
-  _getFirstInternalAddr: string => string = (recoveryPhrase) => {
-    const accountKey = generateWalletRootKey(recoveryPhrase)
+  _getFirstCip1852InternalAddr: void => string = () => {
+    const phrase = this.stores.walletRestore.recoveryResult?.phrase;
+    if (phrase == null) {
+      throw new Error(`${nameof(this._getFirstCip1852InternalAddr)} no recovery phrase set. Should never happen`);
+    }
+
+    const { selectedNetwork } = this.stores.profile;
+    if (selectedNetwork == null) throw new Error('Should never happen');
+    const staticConfigs = getCardanoHaskellStaticConfig(selectedNetwork);
+    if (staticConfigs == null) throw new Error('Should never happen');
+
+    const accountKey = generateWalletRootKey(phrase)
       .derive(WalletTypePurpose.CIP1852)
       .derive(CoinTypes.CARDANO)
-      .derive(0 + HARD_DERIVATION_START);
+      .derive(this.stores.walletRestore.selectedAccount);
 
     const internalKey = accountKey
       .derive(ChainDerivations.INTERNAL)
-      .derive(0)
+      .derive(0) // first address
       .to_public()
       .to_raw_key();
 
@@ -75,12 +84,18 @@ export default class AdaWalletRestoreStore extends Store {
       .derive(STAKING_KEY_INDEX)
       .to_public()
       .to_raw_key();
-    const internalAddr = RustModule.WalletV3.Address.delegation_from_public_key(
-      internalKey,
-      stakingKey,
-      environment.getDiscriminant(),
+
+    const internalAddr = RustModule.WalletV4.BaseAddress.new(
+      Number.parseInt(staticConfigs.NetworkId, 10),
+      RustModule.WalletV4.StakeCredential.from_keyhash(
+        internalKey.hash()
+      ),
+      RustModule.WalletV4.StakeCredential.from_keyhash(
+        stakingKey.hash()
+      ),
     );
-    const internalAddrHash = Buffer.from(internalAddr.as_bytes()).toString('hex');
+
+    const internalAddrHash = Buffer.from(internalAddr.to_address().to_bytes()).toString('hex');
     return internalAddrHash;
   }
 
@@ -99,7 +114,7 @@ export default class AdaWalletRestoreStore extends Store {
     });
     runInAction(() => { this.stores.walletRestore.step = RestoreSteps.TRANSFER_TX_GEN; });
 
-    const internalAddrHash = this._getFirstInternalAddr(phrase);
+    const internalAddrHash = this._getFirstCip1852InternalAddr();
     await this.actions.ada.yoroiTransfer.checkAddresses.trigger({
       getDestinationAddress: () => Promise.resolve(internalAddrHash),
     });

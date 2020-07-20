@@ -26,14 +26,10 @@ import {
   GetUtxosForAddressesApiError,
   GetUtxosSumsForAddressesApiError,
   GetTxHistoryForAddressesApiError,
-  GetRewardHistoryApiError,
   GetBestBlockError,
   SendTransactionApiError,
   CheckAddressesInUseApiError,
   InvalidWitnessError,
-  GetAccountStateApiError,
-  GetPoolInfoApiError,
-  GetReputationError,
   RollbackApiError,
 } from '../../../common/errors';
 
@@ -166,24 +162,6 @@ export class RemoteFetcher implements IFetcher {
       })
   )
 
-  getRewardHistory: RewardHistoryRequest => Promise<RewardHistoryResponse> = (body) => (
-    axios(
-      `${backendUrl}/api/v2/account/rewards`,
-      {
-        method: 'post',
-        data: body,
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
-        }
-      }
-    ).then(response => response.data)
-      .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getRewardHistory)} error: ` + stringifyError(error));
-        throw new GetRewardHistoryApiError();
-      })
-  )
-
   getBestBlock: BestBlockRequest => Promise<BestBlockResponse> = (_body) => (
     axios(
       `${backendUrl}/api/v2/bestblock`,
@@ -244,79 +222,6 @@ export class RemoteFetcher implements IFetcher {
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.checkAddressesInUse)} error: ` + stringifyError(error));
         throw new CheckAddressesInUseApiError();
-      })
-  )
-
-  getAccountState: AccountStateRequest => Promise<AccountStateResponse> = (body) => (
-    axios(
-      `${backendUrl}/api/v2/account/state`,
-      {
-        method: 'post',
-        data: {
-          addresses: body.addresses
-        },
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
-        }
-      }
-    ).then(response => {
-      const mapped = {};
-      for (const key of Object.keys(response.data)) {
-        // Jormungandr returns '' when the address is valid but it hasn't appeared in the blockchain
-        // edit: Jormungandr can now also return a description error whe not in the blockchain
-        if (response.data[key] === '' || response.data[key] === 'Account does not exist') {
-          mapped[key] = {
-            delegation: { pools: [], },
-            value: 0,
-            counter: 0,
-          };
-        } else {
-          mapped[key] = response.data[key];
-        }
-      }
-      return mapped;
-    })
-      .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getAccountState)} error: ` + stringifyError(error));
-        throw new GetAccountStateApiError();
-      })
-  )
-
-  getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => (
-    axios(
-      `${backendUrl}/api/v2/pool/info`,
-      {
-        method: 'post',
-        data: {
-          ids: body.ids
-        },
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
-        }
-      }
-    ).then(response => response.data)
-      .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getPoolInfo)} error: ` + stringifyError(error));
-        throw new GetPoolInfoApiError();
-      })
-  )
-
-  getReputation: ReputationRequest => Promise<ReputationResponse> = (_body) => (
-    axios(
-      `${backendUrl}/api/v2/pool/reputation`,
-      {
-        method: 'get',
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
-        }
-      }
-    ).then(response => response.data)
-      .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getReputation)} error: ` + stringifyError(error));
-        throw new GetReputationError();
       })
   )
 }

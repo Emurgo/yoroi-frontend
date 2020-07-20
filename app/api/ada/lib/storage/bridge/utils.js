@@ -93,6 +93,25 @@ export function isJormungandrAddress(
   return false;
 }
 
+export function baseToEnterprise(
+  groupAddress: string
+): string {
+  const wasmAddr = RustModule.WalletV4.Address.from_bytes(
+    Buffer.from(groupAddress, 'hex')
+  );
+  const baseAddr = RustModule.WalletV4.BaseAddress.from_address(wasmAddr);
+  if (baseAddr == null) {
+    throw new Error(`${nameof(baseToEnterprise)} not a group address ` + groupAddress);
+  }
+  const singleAddr = RustModule.WalletV4.EnterpriseAddress.new(
+    wasmAddr.network_id(),
+    baseAddr.payment_cred(),
+  );
+  const asString = Buffer.from(singleAddr.to_address().to_bytes()).toString('hex');
+
+  return asString;
+}
+
 export function isCardanoHaskellAddress(
   kind: CoreAddressT
 ): boolean {

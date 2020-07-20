@@ -1,12 +1,12 @@
 // @flow
-import '../../lib/test-config';
+import '../../../ada/lib/test-config';
 import { schema } from 'lovefield';
 import type {
   AddressedUtxo,
-} from '../types';
+} from '../../../ada/transactions/types';
 import type {
   RemoteUnspentOutput,
-} from '../../lib/state-fetch/types';
+} from '../state-fetch/types';
 import {
   newAdaUnsignedTx,
   newAdaUnsignedTxFromUtxo,
@@ -19,15 +19,15 @@ import {
 
 import {
   loadLovefieldDB,
-} from '../../lib/storage/database/index';
+} from '../../../ada/lib/storage/database/index';
 import {
   Bip44DerivationLevels,
-} from '../../lib/storage/database/walletTypes/bip44/api/utils';
+} from '../../../ada/lib/storage/database/walletTypes/bip44/api/utils';
 import type {
   Address, Addressing
-} from '../../lib/storage/models/PublicDeriver/interfaces';
+} from '../../../ada/lib/storage/models/PublicDeriver/interfaces';
 
-import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
+import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 import {
   HARD_DERIVATION_START,
   CoinTypes,
@@ -38,7 +38,7 @@ import { Bech32Prefix } from '../../../../config/stringConfig';
 import {
   getTxInputTotal,
   getTxOutputTotal,
-} from './utils';
+} from './JormungandrTxSignRequest';
 
 const keys = [
   {

@@ -24,20 +24,20 @@ import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard
 import PoolWarningDialog from '../../../components/wallet/staking/dashboard/PoolWarningDialog';
 import { digestForHash } from '../../../api/ada/lib/storage/database/primitives/api/utils';
 import { handleExternalLinkClick } from '../../../utils/routing';
-import { GetPoolInfoApiError } from '../../../api/ada/errors';
+import { GetPoolInfoApiError } from '../../../api/common/errors';
 import LocalizableError from '../../../i18n/LocalizableError';
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
 import type { GeneratedData as UnmangleTxDialogContainerData } from '../../transfer/UnmangleTxDialogContainer';
 import config from '../../../config';
 import { formattedWalletAmount } from '../../../utils/formatters';
-import type { PoolTuples, ReputationObject, ReputationFunc, } from '../../../api/ada/lib/state-fetch/types';
-import type { DelegationRequests } from '../../../stores/ada/DelegationStore';
+import type { PoolTuples, ReputationObject, ReputationFunc, } from '../../../api/jormungandr/lib/state-fetch/types';
+import type { DelegationRequests } from '../../../stores/jormungandr/DelegationStore';
 import EpochProgressContainer from './EpochProgressContainer';
 import type { GeneratedData as EpochProgressContainerData } from './EpochProgressContainer';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { PoolRequest } from '../../../api/ada/lib/storage/bridge/delegationUtils';
+import type { PoolRequest } from '../../../api/jormungandr/lib/storage/bridge/delegationUtils';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type {
   ToRealTimeFunc,

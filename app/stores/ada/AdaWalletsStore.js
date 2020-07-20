@@ -69,7 +69,7 @@ export default class AdaWalletsStore extends Store {
       ),
     })
       .then(async (response) => {
-        const memo = this.stores.substores.ada.transactionBuilderStore.memo;
+        const memo = this.stores.transactionBuilderStore.memo;
         if (memo !== '' && memo !== undefined) {
           try {
             await this.actions.memos.saveTxMemo.trigger({

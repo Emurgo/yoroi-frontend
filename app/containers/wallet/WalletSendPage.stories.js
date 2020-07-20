@@ -27,7 +27,7 @@ import { mockWalletProps } from './Wallet.mock';
 import { defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
 import { ROUTES } from '../../routes-config';
 import { buildRoute } from '../../utils/routing';
-import { InvalidWitnessError } from '../../api/ada/errors';
+import { InvalidWitnessError } from '../../api/common/errors';
 import WalletSendConfirmationDialog from '../../components/wallet/send/WalletSendConfirmationDialog';
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
 import { isJormungandr } from '../../api/ada/lib/storage/database/prepackaged/networks';

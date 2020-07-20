@@ -13,7 +13,6 @@ import VerticallyCenteredLayout from '../../components/layout/VerticallyCentered
 import Dialog from '../../components/widgets/Dialog';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { formattedWalletAmount } from '../../utils/formatters';
-import { IGetFee, IReceivers, ITotalInput } from '../../api/ada/transactions/utils';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import type { BaseSignRequest } from '../../api/ada/transactions/types';
 import {

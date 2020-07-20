@@ -6,7 +6,6 @@ import JormungandrTransactionsStore from './JormungandrTransactionsStore';
 import AddressesStore from './JormungandrAddressesStore';
 import JormungandrDaedalusTransferStore from './JormungandrDaedalusTransferStore';
 import JormungandrYoroiTransferStore from './JormungandrYoroiTransferStore';
-import JormungandrTransactionBuilderStore from './JormungandrTransactionBuilderStore';
 import JormungandrStateFetchStore from './JormungandrStateFetchStore';
 import JormungandrWalletRestoreStore from './JormungandrWalletRestoreStore';
 import DelegationTransactionStore from './DelegationTransactionStore';
@@ -23,7 +22,6 @@ export const jormungandrStoreClasses = Object.freeze({
   daedalusTransfer: JormungandrDaedalusTransferStore,
   yoroiTransfer: JormungandrYoroiTransferStore,
   stateFetchStore: JormungandrStateFetchStore,
-  transactionBuilderStore: JormungandrTransactionBuilderStore,
   walletRestore: JormungandrWalletRestoreStore,
   delegationTransaction: DelegationTransactionStore,
   delegation: DelegationStore,
@@ -37,7 +35,6 @@ export type JormungandrStoresMap = {|
   daedalusTransfer: JormungandrDaedalusTransferStore,
   yoroiTransfer: JormungandrYoroiTransferStore,
   stateFetchStore: JormungandrStateFetchStore,
-  transactionBuilderStore: JormungandrTransactionBuilderStore,
   walletRestore: JormungandrWalletRestoreStore,
   delegationTransaction: DelegationTransactionStore,
   delegation: DelegationStore,
@@ -51,7 +48,6 @@ const jormungandrStores: WithNullableFields<JormungandrStoresMap> = observable({
   daedalusTransfer: null,
   yoroiTransfer: null,
   stateFetchStore: null,
-  transactionBuilderStore: null,
   walletRestore: null,
   delegationTransaction: null,
   delegation: null,

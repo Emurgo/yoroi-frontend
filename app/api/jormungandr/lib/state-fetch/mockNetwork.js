@@ -1,7 +1,7 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
-import { InputTypes } from '../../../state-fetch/types';
+import { InputTypes } from './types';
 import type {
   HistoryRequest, HistoryResponse, HistoryFunc,
   BestBlockRequest, BestBlockResponse, BestBlockFunc,
@@ -15,26 +15,28 @@ import type {
   AccountStateSuccess, AccountStateFailure, AccountStateDelegation,
   SignedRequestInternal, RemoteCertificate,
   RemoteTransactionInput, RemoteTransactionOutput,
-} from '../../../state-fetch/types';
+} from './types';
 import type {
   FilterUsedRequest, FilterUsedResponse, FilterFunc,
-} from '../../../../../common/lib/state-fetch/currencySpecificTypes';
-import { RollbackApiError, } from '../../../../errors';
-import { addressToKind, groupToSingle, delegationTypeToResponse, } from '../utils';
-import { CoreAddressTypes } from '../../database/primitives/enums';
-import type { CoreAddressT } from '../../database/primitives/enums';
+} from '../../../common/lib/state-fetch/currencySpecificTypes';
+import { RollbackApiError, } from '../../../common/errors';
+import { groupToSingle, delegationTypeToResponse, } from '../storage/bridge/utils';
+import { addressToKind, } from '../../../ada/lib/storage/bridge/utils';
+import { CoreAddressTypes } from '../../../ada/lib/storage/database/primitives/enums';
+import type { CoreAddressT } from '../../../ada/lib/storage/database/primitives/enums';
 import {
   mnemonicToEntropy
 } from 'bip39';
 import {
   WalletTypePurpose,
-} from '../../../../../../config/numbersConfig';
-import type { NetworkRow } from '../../database/primitives/tables';
+} from '../../../../config/numbersConfig';
+import type { NetworkRow } from '../../../ada/lib/storage/database/primitives/tables';
 
-import { RustModule } from '../../../cardanoCrypto/rustLoader';
+import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 
-import { generateLedgerWalletRootKey } from '../../../cardanoCrypto/cryptoWallet';
-import { networks } from '../../database/prepackaged/networks';
+import { generateLedgerWalletRootKey } from '../../../ada/lib/cardanoCrypto/cryptoWallet';
+import { v4Bip32PrivateToV3 } from '../crypto/utils';
+import { networks, getJormungandrStaticConfig } from '../../../ada/lib/storage/database/prepackaged/networks';
 
 export function genCheckAddressesInUse(
   blockchain: Array<RemoteTransaction>,
@@ -134,7 +136,7 @@ export function genGetTransactionsHistoryForAddresses(
       throw new RollbackApiError();
     }
     if (cutoffTx.height == null || cutoffTx.tx_ordinal == null) {
-      throw new Error('genGetTransactionsHistoryForAddresses cutoffTx not in block - should never happen');
+      throw new Error(`${nameof(genGetTransactionsHistoryForAddresses)} cutoffTx not in block - should never happen`);
     }
     const cutoffBlockNum = cutoffTx.height;
     const cutoffOrdinal = cutoffTx.tx_ordinal;
@@ -228,7 +230,7 @@ export function genUtxoForAddresses(
             kind !== CoreAddressTypes.JORMUNGANDR_SINGLE &&
             kind !== CoreAddressTypes.JORMUNGANDR_GROUP
           ) {
-            throw new Error('genUtxoForAddresses non-utxo address in utxo endpoint');
+            throw new Error(`${nameof(genUtxoForAddresses)} non-utxo address in utxo endpoint`);
           }
           const key = JSON.stringify({
             id: tx.hash,
@@ -292,19 +294,24 @@ export function getSingleAddressString(
   const bip39entropy = mnemonicToEntropy(mnemonic);
   const EMPTY_PASSWORD = Buffer.from('');
   const rootKey = isLedger
-    ? generateLedgerWalletRootKey(mnemonic)
+    ? v4Bip32PrivateToV3(generateLedgerWalletRootKey(mnemonic))
     : RustModule.WalletV3.Bip32PrivateKey.from_bip39_entropy(
       Buffer.from(bip39entropy, 'hex'),
       EMPTY_PASSWORD
     );
-  const derivedKey = derivePath(rootKey, path);
+  const derivedKey = derivePath(
+    rootKey,
+    path
+  );
 
   if (path[0] === WalletTypePurpose.BIP44) {
     const v2Key = RustModule.WalletV2.PublicKey.from_hex(
       Buffer.from(derivedKey.to_public().as_bytes()).toString('hex')
     );
+    const staticConfigs = getJormungandrStaticConfig(networks.JormungandrMainnet);
+    if (staticConfigs == null) throw new Error('Should never happen');
     const settings = RustModule.WalletV2.BlockchainSettings.from_json({
-      protocol_magic: Number.parseInt(networks.ByronMainnet.NetworkMagic, 10)
+      protocol_magic: staticConfigs.ByronNetworkId,
     });
     const addr = v2Key.bootstrap_era_address(settings);
     const hex = addr.to_base58();
@@ -363,7 +370,7 @@ export function getAddressForType(
       );
       return Buffer.from(addr.as_bytes()).toString('hex');
     }
-    default: throw new Error('getAddressForType unknown type ' + type);
+    default: throw new Error(`${nameof(getAddressForType)} unknown type ` + type);
   }
 }
 
@@ -537,7 +544,7 @@ function getByronInputs(
   for (const input of inputs) {
     const pointedTx = blockchain.find(tx => tx.hash === input.id);
     if (pointedTx == null) {
-      throw new Error(`${nameof(getJormungandrInputs)} no tx found ${input.id}`);
+      throw new Error(`${nameof(getByronInputs)} no tx found ${input.id}`);
     }
     const pointedOutput = pointedTx.outputs[input.index];
     const addressKind = addressToKind(pointedOutput.address, 'bytes', networks.ByronMainnet);

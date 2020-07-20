@@ -10,7 +10,6 @@ import AdaDaedalusTransferStore from './AdaDaedalusTransferStore';
 import AdaYoroiTransferStore from './AdaYoroiTransferStore';
 import TrezorConnectStore from './TrezorConnectStore';
 import TrezorSendStore from './TrezorSendStore';
-import AdaTransactionBuilderStore from './AdaTransactionBuilderStore';
 import LedgerConnectStore from './LedgerConnectStore';
 import LedgerSendStore from './LedgerSendStore';
 import HWVerifyAddressStore from './HWVerifyAddressStore';
@@ -35,7 +34,6 @@ export const adaStoreClasses = Object.freeze({
   ledgerSend: LedgerSendStore,
   hwVerifyAddress: HWVerifyAddressStore,
   stateFetchStore: AdaStateFetchStore,
-  transactionBuilderStore: AdaTransactionBuilderStore,
   walletRestore: AdaWalletRestoreStore,
   time: AdaTimeStore,
 });
@@ -53,7 +51,6 @@ export type AdaStoresMap = {|
   ledgerSend: LedgerSendStore,
   hwVerifyAddress: HWVerifyAddressStore,
   stateFetchStore: AdaStateFetchStore,
-  transactionBuilderStore: AdaTransactionBuilderStore,
   walletRestore: AdaWalletRestoreStore,
   time: AdaTimeStore,
 |};
@@ -71,7 +68,6 @@ const adaStores: WithNullableFields<AdaStoresMap> = observable({
   ledgerSend: null,
   hwVerifyAddress: null,
   stateFetchStore: null,
-  transactionBuilderStore: null,
   walletRestore: null,
   time: null,
 });

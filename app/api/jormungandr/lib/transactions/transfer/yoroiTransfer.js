@@ -1,28 +1,35 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
-import { getJormungandrTxFee, } from './utils';
+import { getJormungandrTxFee, } from '../JormungandrTxSignRequest';
 import {
   Logger,
   stringifyError,
-} from '../../../../utils/logging';
-import { Bech32Prefix } from '../../../../config/stringConfig';
-import { addressToDisplayString } from '../../lib/storage/bridge/utils';
+} from '../../../../../utils/logging';
+import { Bech32Prefix } from '../../../../../config/stringConfig';
+import { addressToDisplayString } from '../../../../ada/lib/storage/bridge/utils';
 import {
   GenerateTransferTxError
-} from '../../../common/errors';
-import LocalizableError from '../../../../i18n/LocalizableError';
+} from '../../../../common/errors';
+import LocalizableError from '../../../../../i18n/LocalizableError';
 import {
   sendAllUnsignedTx,
   signTransaction,
-} from './utxoTransactions';
-import type { AddressedUtxo } from '../types';
+} from '../utxoTransactions';
+import type { AddressedUtxo } from '../../../../ada/transactions/types';
 import type {
   TransferTx
-} from '../../../../types/TransferTypes';
-import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
-import { getAdaCurrencyMeta } from '../../currencyInfo';
-import { networks } from '../../lib/storage/database/prepackaged/networks';
+} from '../../../../../types/TransferTypes';
+import { RustModule } from '../../../../ada/lib/cardanoCrypto/rustLoader';
+import { getJormungandrCurrencyMeta } from '../../../currencyInfo';
+import { networks } from '../../../../ada/lib/storage/database/prepackaged/networks';
+import type {
+  AddressUtxoFunc,
+} from '../../state-fetch/types';
+import type {
+  Address, Addressing
+} from '../../../../ada/lib/storage/models/PublicDeriver/interfaces';
+import { toSenderUtxos } from '../../../../ada/transactions/transfer/utils';
 
 /**
  * Generate transaction including all addresses with no change.
@@ -61,7 +68,7 @@ export async function buildYoroiTransferTx(payload: {|
 
     const uniqueSenders = Array.from(new Set(senderUtxos.map(utxo => utxo.receiver)));
 
-    const lovelacesPerAda = new BigNumber(10).pow(getAdaCurrencyMeta().decimalPlaces);
+    const lovelacesPerAda = new BigNumber(10).pow(getJormungandrCurrencyMeta().decimalPlaces);
     // return summary of transaction
     return {
       recoveredBalance: totalBalance.dividedBy(lovelacesPerAda),
@@ -81,4 +88,26 @@ export async function buildYoroiTransferTx(payload: {|
     }
     throw new GenerateTransferTxError();
   }
+}
+
+
+export async function yoroiTransferTxFromAddresses(payload: {|
+  addresses: Array<{| ...Address, ...Addressing |}>,
+  outputAddr: string,
+  keyLevel: number,
+  signingKey: RustModule.WalletV3.Bip32PrivateKey,
+  getUTXOsForAddresses: AddressUtxoFunc,
+  useLegacyWitness: boolean,
+|}): Promise<TransferTx> {
+  const senderUtxos = await toSenderUtxos({
+    addresses: payload.addresses,
+    getUTXOsForAddresses: payload.getUTXOsForAddresses,
+  });
+  return buildYoroiTransferTx({
+    outputAddr: payload.outputAddr,
+    keyLevel: payload.keyLevel,
+    signingKey: payload.signingKey,
+    senderUtxos,
+    useLegacyWitness: payload.useLegacyWitness,
+  });
 }

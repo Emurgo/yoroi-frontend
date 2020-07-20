@@ -8,18 +8,20 @@ import '../../../test-config';
 import type { RemoteTransaction } from '../../../state-fetch/types';
 import {
   setup,
-  filterDbSnapshot,
-  mockDate,
+} from './common';
+import {
   ABANDON_SHARE,
   TX_TEST_MNEMONIC_1,
+  mockDate,
+  filterDbSnapshot,
   compareObject,
-} from './common';
+} from '../../../../../jestUtils';
 import {
   genCheckAddressesInUse,
   genGetTransactionsHistoryForAddresses,
   genGetBestBlock,
   getSingleAddressString,
-} from './mockNetwork';
+} from '../../../state-fetch/mockNetwork';
 import {
   HARD_DERIVATION_START,
   WalletTypePurpose,

@@ -11,7 +11,7 @@ import {
   generateLedgerWalletRootKey,
   generateWalletRootKey,
 } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
-import type { PlateResponse } from '../../api/ada/lib/cardanoCrypto/plate';
+import type { PlateResponse } from '../../api/common/lib/crypto/plate';
 import { TransferKind } from '../../types/TransferTypes';
 import { generatePlates } from '../../stores/toplevel/WalletRestoreStore';
 import { RestoreMode } from '../../actions/common/wallet-restore-actions';

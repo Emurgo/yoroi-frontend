@@ -14,7 +14,7 @@ import globalMessages from '../../../i18n/global-messages';
 import {
   CheckAddressesInUseApiError,
   NoInputsError,
-} from '../../../api/ada/errors';
+} from '../../../api/common/errors';
 import type { RestoreModeType, WalletRestoreMeta } from '../../../actions/common/wallet-restore-actions';
 import { RestoreMode } from '../../../actions/common/wallet-restore-actions';
 import { RestoreSteps } from '../../../stores/toplevel/WalletRestoreStore';
@@ -28,7 +28,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ApiOptions, getApiForNetwork, getApiMeta } from '../../../api/common/utils';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
-import type { PlateResponse } from '../../../api/ada/lib/cardanoCrypto/plate';
+import type { PlateResponse } from '../../../api/common/lib/crypto/plate';
 import type { RestoreStepsType } from '../../../stores/toplevel/WalletRestoreStore';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { TransferStatusT, TransferTx } from '../../../types/TransferTypes';

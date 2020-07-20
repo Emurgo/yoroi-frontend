@@ -28,7 +28,7 @@ import {
   TransferFundsError,
   NoTransferTxError,
   WalletChangedError,
-} from '../../stores/ada/YoroiTransferStore';
+} from '../../stores/toplevel/YoroiTransferStore';
 import AdaApi from '../../api/ada/index';
 import { RestoreMode } from '../../actions/common/wallet-restore-actions';
 

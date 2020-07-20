@@ -128,7 +128,7 @@ export default class TrezorSendStore extends Store {
     }).promise;
     if (signedTxResponse == null) throw new Error('Should never happen');
 
-    const memo = this.stores.substores.ada.transactionBuilderStore.memo;
+    const memo = this.stores.transactionBuilderStore.memo;
     if (memo !== '' && memo !== undefined) {
       try {
         await this.actions.memos.saveTxMemo.trigger({

@@ -6,9 +6,8 @@ import type {
   TransferTx,
 } from '../../types/TransferTypes';
 import { TransferSource, TransferKind, } from '../../types/TransferTypes';
-import { generateLegacyYoroiTransferTx } from '../../api/ada/transactions/transfer/legacyYoroi';
-import { generateCip1852TransferTx } from '../../api/ada/transactions/transfer/cip1852Transfer';
-import { isJormungandr } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { v4Bip32PrivateToV3 } from '../../api/jormungandr/lib/crypto/utils';
+import { yoroiTransferTxFromAddresses } from '../../api/jormungandr/lib/transactions/transfer/yoroiTransfer';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { generateWalletRootKey, generateLedgerWalletRootKey, } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import {
@@ -16,7 +15,7 @@ import {
   WalletTypePurpose,
   CoinTypes,
 } from '../../config/numbersConfig';
-import type { RestoreWalletForTransferResponse, RestoreWalletForTransferFunc } from '../../api/ada/index';
+import type { RestoreWalletForTransferResponse, RestoreWalletForTransferFunc } from '../../api/jormungandr/index';
 import {
   Bip44DerivationLevels,
 } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
@@ -24,7 +23,7 @@ import {
 export default class JormungandrYoroiTransferStore extends Store {
 
   @observable restoreForTransferRequest: Request<RestoreWalletForTransferFunc>
-    = new Request(this.api.ada.restoreWalletForTransfer);
+    = new Request(this.api.jormungandr.restoreWalletForTransfer);
 
   _restoreWalletForTransfer: (string, number) => Promise<RestoreWalletForTransferResponse> = async (
     recoveryPhrase,
@@ -33,9 +32,9 @@ export default class JormungandrYoroiTransferStore extends Store {
     const rootPk = this.stores.yoroiTransfer.transferKind === TransferKind.LEDGER
       ? generateLedgerWalletRootKey(recoveryPhrase)
       : generateWalletRootKey(recoveryPhrase);
-    const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
+    const stateFetcher = this.stores.substores.jormungandr.stateFetchStore.fetcher;
     const restoreResult = await this.restoreForTransferRequest.execute({
-      rootPk,
+      rootPk: v4Bip32PrivateToV3(rootPk),
       accountIndex,
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
       transferSource: this.stores.yoroiTransfer.transferSource,
@@ -76,24 +75,15 @@ export default class JormungandrYoroiTransferStore extends Store {
       .derive(accountIndex);
 
     // 4) generate transaction
-    const baseRequest = {
+    const transferTx = await yoroiTransferTxFromAddresses({
       addresses,
       outputAddr: destinationAddress,
       keyLevel: Bip44DerivationLevels.ACCOUNT.level,
       signingKey: accountKey,
       getUTXOsForAddresses:
-        this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
-    };
-
-    const { selectedNetwork } = this.stores.profile;
-    if (selectedNetwork == null) throw new Error(`${nameof(this.generateTransferTxFromMnemonic)} no network selected`);
-
-    const transferTx = sourceIsJormungandrWallet
-      ? await generateCip1852TransferTx(baseRequest)
-      : await generateLegacyYoroiTransferTx({
-        ...baseRequest,
-        legacy: !isJormungandr(selectedNetwork),
-      });
+        this.stores.substores.jormungandr.stateFetchStore.fetcher.getUTXOsForAddresses,
+      useLegacyWitness: !sourceIsJormungandrWallet,
+    });
     // Possible exception: NotEnoughMoneyToSendError
     return transferTx;
   }
