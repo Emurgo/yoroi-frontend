@@ -23,7 +23,7 @@ import {
 } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import { getApiForNetwork } from '../../api/common/utils';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import { networks, isJormungandr } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { isJormungandr } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export const NUMBER_OF_VERIFIED_ADDRESSES = 1;
 export const NUMBER_OF_VERIFIED_ADDRESSES_PAPER = 5;
@@ -36,7 +36,7 @@ export const RestoreSteps = Object.freeze({
 });
 export type RestoreStepsType = $Values<typeof RestoreSteps>;
 
-export default class WalletRestoreStore extends Store {
+export default class AdaWalletRestoreStore extends Store {
 
   @observable step: RestoreStepsType;
 
@@ -66,7 +66,7 @@ export default class WalletRestoreStore extends Store {
   _verifyMnemonic: void => Promise<void> = async () => {
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null) throw new Error(`${nameof(this._processRestoreMeta)} no network selected`);
-    if (selectedNetwork.NetworkId === networks.JormungandrMainnet.NetworkId) {
+    if (isJormungandr(selectedNetwork)) {
       runInAction(() => { this.step = RestoreSteps.LEGACY_EXPLANATION; });
     } else {
       await this.actions.walletRestore.startRestore.trigger();

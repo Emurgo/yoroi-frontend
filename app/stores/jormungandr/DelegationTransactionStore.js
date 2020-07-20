@@ -61,12 +61,12 @@ export default class DelegationTransactionStore extends Store {
   setup(): void {
     super.setup();
     this.reset();
-    const a = this.actions.jormungandr.delegationTransaction;
-    a.createTransaction.listen(this._createTransaction);
-    a.signTransaction.listen(this._signTransaction);
-    a.complete.listen(this._complete);
-    a.setPools.listen(this._setPools);
-    a.reset.listen(this.reset);
+    const { jormungandr } = this.actions;
+    jormungandr.delegationTransaction.createTransaction.listen(this._createTransaction);
+    jormungandr.delegationTransaction.signTransaction.listen(this._signTransaction);
+    jormungandr.delegationTransaction.complete.listen(this._complete);
+    jormungandr.delegationTransaction.setPools.listen(this._setPools);
+    jormungandr.delegationTransaction.reset.listen(this.reset);
   }
 
   @action

@@ -36,7 +36,7 @@ import {
   genToRelativeSlotNumber,
   genTimeToSlot,
 } from '../../api/jormungandr/lib/storage/bridge/timeUtils';
-import { CoinTypes } from '../../config/numbersConfig';
+import { isJormungandr } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export type StakingKeyState = {|
   state: AccountStateSuccess,
@@ -256,7 +256,7 @@ export default class DelegationStore extends Store {
         }
         const selected = this.stores.wallets.selected;
         if (selected == null) return;
-        if (selected.getParent().getNetworkInfo().CoinType !== CoinTypes.CARDANO) {
+        if (!isJormungandr(selected.getParent().getNetworkInfo())) {
           return;
         }
         if (asGetStakingKey(selected) != null) {

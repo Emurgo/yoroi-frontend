@@ -5,10 +5,10 @@ import JormungandrWalletsStore from './JormungandrWalletsStore';
 import JormungandrTransactionsStore from './JormungandrTransactionsStore';
 import AddressesStore from './JormungandrAddressesStore';
 import JormungandrDaedalusTransferStore from './JormungandrDaedalusTransferStore';
-import YoroiTransferStore from './YoroiTransferStore';
+import JormungandrYoroiTransferStore from './JormungandrYoroiTransferStore';
 import JormungandrTransactionBuilderStore from './JormungandrTransactionBuilderStore';
 import JormungandrStateFetchStore from './JormungandrStateFetchStore';
-import WalletRestoreStore from './WalletRestoreStore';
+import JormungandrWalletRestoreStore from './JormungandrWalletRestoreStore';
 import DelegationTransactionStore from './DelegationTransactionStore';
 import DelegationStore from './DelegationStore';
 import JormungandrTimeStore from './JormungandrTimeStore';
@@ -21,10 +21,10 @@ export const jormungandrStoreClasses = Object.freeze({
   transactions: JormungandrTransactionsStore,
   addresses: AddressesStore,
   daedalusTransfer: JormungandrDaedalusTransferStore,
-  yoroiTransfer: YoroiTransferStore,
+  yoroiTransfer: JormungandrYoroiTransferStore,
   stateFetchStore: JormungandrStateFetchStore,
   transactionBuilderStore: JormungandrTransactionBuilderStore,
-  walletRestore: WalletRestoreStore,
+  walletRestore: JormungandrWalletRestoreStore,
   delegationTransaction: DelegationTransactionStore,
   delegation: DelegationStore,
   time: JormungandrTimeStore,
@@ -35,10 +35,10 @@ export type JormungandrStoresMap = {|
   transactions: JormungandrTransactionsStore,
   addresses: AddressesStore,
   daedalusTransfer: JormungandrDaedalusTransferStore,
-  yoroiTransfer: YoroiTransferStore,
+  yoroiTransfer: JormungandrYoroiTransferStore,
   stateFetchStore: JormungandrStateFetchStore,
   transactionBuilderStore: JormungandrTransactionBuilderStore,
-  walletRestore: WalletRestoreStore,
+  walletRestore: JormungandrWalletRestoreStore,
   delegationTransaction: DelegationTransactionStore,
   delegation: DelegationStore,
   time: JormungandrTimeStore,

@@ -1,31 +1,23 @@
 // @flow
 
-import BaseDaedalusTransferStore from '../base/BaseDaedalusTransferStore';
+import Store from '../base/Store';
 import {
   buildDaedalusTransferTx,
 } from '../../api/ada/transactions/transfer/legacyDaedalus';
-import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import type { ActionsMap } from '../../actions/index';
-import type { StoresMap } from '../index';
-import type { Api } from '../../api/index';
+import { isJormungandr } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type { BuildTxFunc } from '../toplevel/DaedalusTransferStore';
 
-export default class JormungandrDaedalusTransferStore extends BaseDaedalusTransferStore {
+export default class JormungandrDaedalusTransferStore extends Store {
 
-  constructor(stores: StoresMap, api: Api, actions: ActionsMap) {
-    super(
-      stores, api, actions,
-      async (request) => {
-        const { selectedNetwork } = stores.profile;
-        if (selectedNetwork == null) throw new Error(`buildTxFunc no network selected`);
-
-        return await buildDaedalusTransferTx({
-          addressKeys: request.addressKeys,
-          outputAddr: request.outputAddr,
-          getUTXOsForAddresses:
-            stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
-          legacy: selectedNetwork.NetworkId !== networks.JormungandrMainnet.NetworkId
-        });
-      }
-    );
+  buildTx: BuildTxFunc = async (request) => {
+    const selectedNetwork = this.stores.profile.selectedNetwork;
+    if (selectedNetwork == null) throw new Error(`${nameof(JormungandrDaedalusTransferStore)} transfer tx no selected network`);
+    return await buildDaedalusTransferTx({
+      addressKeys: request.addressKeys,
+      outputAddr: request.outputAddr,
+      getUTXOsForAddresses:
+        this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
+      legacy: !isJormungandr(selectedNetwork)
+    });
   }
 }

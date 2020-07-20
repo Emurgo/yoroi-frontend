@@ -25,12 +25,12 @@ import {
 } from '../lib/check';
 import { ApiOptions, getApiForNetwork } from '../../api/common/utils';
 
-export default class WalletRestoreStore extends Store {
+export default class AdaWalletRestoreStore extends Store {
 
   setup(): void {
     super.setup();
     this.reset();
-    const adaActions = this.actions.ada.walletRestore;
+    const { ada } = this.actions;
     const actions = this.actions.walletRestore;
     const { syncCheck, asyncCheck } = buildCheckAndCall(
       ApiOptions.ada,
@@ -39,7 +39,7 @@ export default class WalletRestoreStore extends Store {
         return getApiForNetwork(this.stores.profile.selectedNetwork);
       }
     );
-    adaActions.transferFromLegacy.listen(asyncCheck(this._transferFromLegacy));
+    ada.walletRestore.transferFromLegacy.listen(this._transferFromLegacy);
     actions.startRestore.listen(asyncCheck(this._restoreToDb));
     actions.reset.listen(syncCheck(this.reset));
   }
@@ -138,7 +138,7 @@ export default class WalletRestoreStore extends Store {
 
   @action.bound
   reset(): void {
-    this.stores.walletRestore.stores.substores.ada.yoroiTransfer.reset();
+    this.stores.walletRestore.stores.yoroiTransfer.reset();
   }
 
   // =================== VALIDITY CHECK ==================== //

@@ -201,11 +201,11 @@ export default class AdaTransactionBuilderStore extends Store {
 
     const withUtxos = asGetAllUtxos(publicDeriver);
     if (withUtxos == null) {
-      throw new Error('_updateTxBuilder missing utxo functionality');
+      throw new Error(`${nameof(this._updateTxBuilder)} missing utxo functionality`);
     }
     const withHasUtxoChains = asHasUtxoChains(withUtxos);
     if (withHasUtxoChains == null) {
-      throw new Error('_updateTxBuilder missing chains functionality');
+      throw new Error(`${nameof(this._updateTxBuilder)} missing chains functionality`);
     }
     if (amount == null && shouldSendAll === true) {
       await this.createUnsignedTx.execute({

@@ -18,12 +18,14 @@ import {
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { ROUTES } from '../../routes-config';
+import { buildCheckAndCall } from '../lib/check';
+import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
 
-export default class AdaWalletsStore extends Store {
+export default class JormungandrWalletsStore extends Store {
 
   // REQUESTS
-  @observable sendMoneyRequest: Request<typeof AdaWalletsStore.prototype.sendAndRefresh>
-    = new Request<typeof AdaWalletsStore.prototype.sendAndRefresh>(this.sendAndRefresh);
+  @observable sendMoneyRequest: Request<typeof JormungandrWalletsStore.prototype.sendAndRefresh>
+    = new Request<typeof JormungandrWalletsStore.prototype.sendAndRefresh>(this.sendAndRefresh);
 
   @observable generateWalletRecoveryPhraseRequest: Request<GenerateWalletRecoveryPhraseFunc>
     = new Request<GenerateWalletRecoveryPhraseFunc>(
@@ -33,10 +35,16 @@ export default class AdaWalletsStore extends Store {
   setup(): void {
     super.setup();
     const { jormungandr, walletBackup } = this.actions;
-    const { wallets } = jormungandr;
-    walletBackup.finishWalletBackup.listen(this._createInDb);
-    wallets.createWallet.listen(this._startWalletCreation);
-    wallets.sendMoney.listen(this._sendMoney);
+    const { asyncCheck } = buildCheckAndCall(
+      ApiOptions.jormungandr,
+      () => {
+        if (this.stores.profile.selectedNetwork == null) return undefined;
+        return getApiForNetwork(this.stores.profile.selectedNetwork);
+      }
+    );
+    walletBackup.finishWalletBackup.listen(asyncCheck(this._createInDb));
+    jormungandr.wallets.createWallet.listen(this._startWalletCreation);
+    jormungandr.wallets.sendMoney.listen(this._sendMoney);
   }
 
   // =================== SEND MONEY ==================== //
@@ -75,7 +83,7 @@ export default class AdaWalletsStore extends Store {
               },
             });
           } catch (error) {
-            Logger.error(`${nameof(AdaWalletsStore)}::${nameof(this._sendMoney)} error: ` + stringifyError(error));
+            Logger.error(`${nameof(JormungandrWalletsStore)}::${nameof(this._sendMoney)} error: ` + stringifyError(error));
             throw new Error('An error has ocurred when saving the transaction memo.');
           }
         }

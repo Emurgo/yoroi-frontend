@@ -14,6 +14,8 @@ import TransactionsStore from './toplevel/TransactionsStore';
 import AddressesStore from './toplevel/AddressesStore';
 import TimeStore from './toplevel/TimeStore';
 import WalletRestoreStore from './toplevel/WalletRestoreStore';
+import DaedalusTransferStore from './toplevel/DaedalusTransferStore';
+import YoroiTransferStore from './toplevel/YoroiTransferStore';
 import setupAdaStores from './ada/index';
 import setupErgoStores from './ergo/index';
 import setupJormungandrStores from './jormungandr/index';
@@ -48,6 +50,8 @@ const storeClasses = Object.freeze({
   transactions: TransactionsStore,
   walletRestore: WalletRestoreStore,
   walletSettings: WalletSettingsStore,
+  daedalusTransfer: DaedalusTransferStore,
+  yoroiTransfer: YoroiTransferStore,
   explorers: ExplorerStore,
   // note: purposely exclude substores and router
 });
@@ -70,6 +74,8 @@ export type StoresMap = {|
   transactions: TransactionsStore,
   walletRestore: WalletRestoreStore,
   walletSettings: WalletSettingsStore,
+  daedalusTransfer: DaedalusTransferStore,
+  yoroiTransfer: YoroiTransferStore,
   explorers: ExplorerStore,
   substores: {|
     ada: AdaStoresMap,
@@ -99,6 +105,8 @@ const stores: WithNullableFields<StoresMap> = observable({
   transactions: null,
   walletRestore: null,
   walletSettings: null,
+  daedalusTransfer: null,
+  yoroiTransfer: null,
   explorers: null,
   substores: null,
   router: null,

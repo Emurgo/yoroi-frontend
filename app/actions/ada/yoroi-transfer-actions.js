@@ -2,14 +2,14 @@
 import { AsyncAction, Action } from '../lib/Action';
 import type { TransferSourceType, TransferKindType, } from '../../types/TransferTypes';
 
-export default class YoroiTranferActions {
+export default class YoroiTransferActions {
   startTransferFunds: Action<{|
     source: TransferSourceType,
   |}> = new Action();
   startTransferPaperFunds: Action<{|
     source: TransferSourceType,
   |}> = new Action();
-  startHardwareMnemnoic: Action<void> = new Action();
+  startHardwareMnemonic: Action<void> = new Action();
   startTransferLegacyHardwareFunds: Action<TransferKindType> = new Action();
   setupTransferFundsWithMnemonic: Action<{|
     recoveryPhrase: string,

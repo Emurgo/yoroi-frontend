@@ -7,7 +7,7 @@ import AdaWalletsStore from './AdaWalletsStore';
 import AdaTransactionsStore from './AdaTransactionsStore';
 import AddressesStore from './AdaAddressesStore';
 import AdaDaedalusTransferStore from './AdaDaedalusTransferStore';
-import YoroiTransferStore from './YoroiTransferStore';
+import AdaYoroiTransferStore from './AdaYoroiTransferStore';
 import TrezorConnectStore from './TrezorConnectStore';
 import TrezorSendStore from './TrezorSendStore';
 import AdaTransactionBuilderStore from './AdaTransactionBuilderStore';
@@ -16,7 +16,7 @@ import LedgerSendStore from './LedgerSendStore';
 import HWVerifyAddressStore from './HWVerifyAddressStore';
 import PaperWalletCreateStore from './PaperWalletCreateStore';
 import AdaStateFetchStore from './AdaStateFetchStore';
-import WalletRestoreStore from './WalletRestoreStore';
+import AdaWalletRestoreStore from './AdaWalletRestoreStore';
 import AdaTimeStore from './AdaTimeStore';
 import type { ActionsMap } from '../../actions/index';
 import type { Api } from '../../api/index';
@@ -28,7 +28,7 @@ export const adaStoreClasses = Object.freeze({
   transactions: AdaTransactionsStore,
   addresses: AddressesStore,
   daedalusTransfer: AdaDaedalusTransferStore,
-  yoroiTransfer: YoroiTransferStore,
+  yoroiTransfer: AdaYoroiTransferStore,
   trezorConnect: TrezorConnectStore,
   trezorSend: TrezorSendStore,
   ledgerConnect: LedgerConnectStore,
@@ -36,7 +36,7 @@ export const adaStoreClasses = Object.freeze({
   hwVerifyAddress: HWVerifyAddressStore,
   stateFetchStore: AdaStateFetchStore,
   transactionBuilderStore: AdaTransactionBuilderStore,
-  walletRestore: WalletRestoreStore,
+  walletRestore: AdaWalletRestoreStore,
   time: AdaTimeStore,
 });
 
@@ -46,7 +46,7 @@ export type AdaStoresMap = {|
   transactions: AdaTransactionsStore,
   addresses: AddressesStore,
   daedalusTransfer: AdaDaedalusTransferStore,
-  yoroiTransfer: YoroiTransferStore,
+  yoroiTransfer: AdaYoroiTransferStore,
   trezorConnect: TrezorConnectStore,
   trezorSend: TrezorSendStore,
   ledgerConnect: LedgerConnectStore,
@@ -54,7 +54,7 @@ export type AdaStoresMap = {|
   hwVerifyAddress: HWVerifyAddressStore,
   stateFetchStore: AdaStateFetchStore,
   transactionBuilderStore: AdaTransactionBuilderStore,
-  walletRestore: WalletRestoreStore,
+  walletRestore: AdaWalletRestoreStore,
   time: AdaTimeStore,
 |};
 

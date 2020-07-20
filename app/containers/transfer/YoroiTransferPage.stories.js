@@ -94,7 +94,7 @@ const genBaseProps: {|
       yoroiTransfer: {
         backToUninitialized: { trigger: action('backToUninitialized') },
         cancelTransferFunds: { trigger: action('cancelTransferFunds') },
-        startHardwareMnemnoic: { trigger: action('startHardwareMnemnoic') },
+        startHardwareMnemonic: { trigger: action('startHardwareMnemonic') },
         transferFunds: { trigger: async (req) => action('transferFunds')(req) },
         checkAddresses: { trigger: async (req) => action('checkAddresses')(req) },
         setupTransferFundsWithPaperMnemonic: { trigger: action('setupTransferFundsWithPaperMnemonic') },

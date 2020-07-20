@@ -18,6 +18,8 @@ import {
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { ROUTES } from '../../routes-config';
+import { buildCheckAndCall } from '../lib/check';
+import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
 
 export default class AdaWalletsStore extends Store {
 
@@ -31,10 +33,16 @@ export default class AdaWalletsStore extends Store {
   setup(): void {
     super.setup();
     const { ada, walletBackup } = this.actions;
-    const { wallets } = ada;
-    walletBackup.finishWalletBackup.listen(this._createInDb);
-    wallets.createWallet.listen(this._startWalletCreation);
-    wallets.sendMoney.listen(this._sendMoney);
+    const { asyncCheck } = buildCheckAndCall(
+      ApiOptions.ada,
+      () => {
+        if (this.stores.profile.selectedNetwork == null) return undefined;
+        return getApiForNetwork(this.stores.profile.selectedNetwork);
+      }
+    );
+    walletBackup.finishWalletBackup.listen(asyncCheck(this._createInDb));
+    ada.wallets.createWallet.listen(this._startWalletCreation);
+    ada.wallets.sendMoney.listen(this._sendMoney);
   }
 
   // =================== SEND MONEY ==================== //

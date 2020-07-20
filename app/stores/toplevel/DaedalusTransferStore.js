@@ -5,7 +5,7 @@ import {
   Logger,
   stringifyError
 } from '../../utils/logging';
-import Store from './Store';
+import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import type { ConfigType } from '../../../config/config-types';
 import LocalizableError, {
@@ -31,53 +31,36 @@ import {
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { getApiForNetwork } from '../../api/common/utils';
 import type { AddressKeyMap } from '../../api/ada/transactions/types';
-import type { ActionsMap } from '../../actions/index';
-import type { StoresMap } from '../index';
-import type { Api } from '../../api/index';
 
 declare var CONFIG: ConfigType;
 const websocketUrl = CONFIG.network.websocketUrl;
 const MSG_TYPE_RESTORE = 'RESTORE';
 const WS_CODE_NORMAL_CLOSURE = 1000;
 
-type BuildTxFunc = {|
+export type BuildTxFunc = {|
   addressKeys: AddressKeyMap,
   outputAddr: string,
 |} => Promise<TransferTx>;
 
-export default class BaseDaedalusTransferStore extends Store {
+export default class DaedalusTransferStore extends Store {
 
   @observable status: TransferStatusT = TransferStatus.UNINITIALIZED;
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
 
-  buildTxFunc: BuildTxFunc;
-  expectedAPI: ApiOptionType;
-
   // careful: this is a global request and not per-wallet or per-currency
   @observable transferFundsRequest: Request<SendFunc> = new Request<SendFunc>(request => {
     const network = this.stores.profile.selectedNetwork;
-    if (network == null) throw new Error(`${nameof(BaseDaedalusTransferStore)} transfer tx no selected network`);
+    if (network == null) throw new Error(`${nameof(DaedalusTransferStore)} transfer tx no selected network`);
     const selectedApiType = getApiForNetwork(network);
     if (!this.stores.substores[selectedApiType].daedalusTransfer) {
-      throw new Error(`${nameof(BaseDaedalusTransferStore)} transfer tx currency doesn't support Daedalus transfer`);
+      throw new Error(`${nameof(DaedalusTransferStore)} transfer tx currency doesn't support Daedalus transfer`);
     }
 
     return this.stores.substores[selectedApiType].stateFetchStore.fetcher.sendTx(request);
   });
 
   @observable ws: ?WebSocket = null;
-
-  constructor(
-    stores: StoresMap,
-    api: Api,
-    actions: ActionsMap,
-    buildTxFunc: BuildTxFunc,
-    expectedAPI: ApiOptionType
-  ) {
-    super(stores, api, actions);
-    this.buildTxFunc = buildTxFunc;
-  }
 
   setup(): void {
     super.setup();
@@ -160,9 +143,9 @@ export default class BaseDaedalusTransferStore extends Store {
 
           const selectedApiType = getApiForNetwork(publicDeriver.getParent().getNetworkInfo());
           if (!this.stores.substores[selectedApiType].daedalusTransfer) {
-            throw new Error(`${nameof(BaseDaedalusTransferStore)}::${nameof(this._setupTransferWebSocket)} currency doesn't support Daedalus transfer`);
+            throw new Error(`${nameof(DaedalusTransferStore)}::${nameof(this._setupTransferWebSocket)} currency doesn't support Daedalus transfer`);
           }
-          const transferTx = await this.buildTxFunc({
+          const transferTx = await this.stores.substores[selectedApiType].daedalusTransfer.buildTx({
             addressKeys,
             outputAddr: nextInternalAddress,
           });
@@ -172,7 +155,7 @@ export default class BaseDaedalusTransferStore extends Store {
           this._updateStatus(TransferStatus.READY_TO_TRANSFER);
         }
       } catch (error) {
-        Logger.error(`${nameof(BaseDaedalusTransferStore)}::${nameof(this._setupTransferWebSocket)} ${stringifyError(error)}`);
+        Logger.error(`${nameof(DaedalusTransferStore)}::${nameof(this._setupTransferWebSocket)} ${stringifyError(error)}`);
         runInAction(() => {
           this.status = TransferStatus.ERROR;
           this.error = localizedError(error);
@@ -262,7 +245,7 @@ export default class BaseDaedalusTransferStore extends Store {
       next();
       this._reset();
     } catch (error) {
-      Logger.error(`${nameof(BaseDaedalusTransferStore)}::${nameof(this._transferFunds)} ${stringifyError(error)}`);
+      Logger.error(`${nameof(DaedalusTransferStore)}::${nameof(this._transferFunds)} ${stringifyError(error)}`);
       if (error instanceof NoTransferTxError) {
         runInAction(() => {
           this.error = error;

@@ -192,7 +192,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         return (
           <HardwareDisclaimerPage
             onBack={() => this.generated.actions.ada.yoroiTransfer.cancelTransferFunds.trigger()}
-            onNext={() => this.generated.actions.ada.yoroiTransfer.startHardwareMnemnoic.trigger()}
+            onNext={() => this.generated.actions.ada.yoroiTransfer.startHardwareMnemonic.trigger()}
           />
         );
       case TransferStatus.GETTING_HARDWARE_MNEMONIC:
@@ -293,7 +293,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
               recoveryPhrase: string
             |}) => void
           |},
-          startHardwareMnemnoic: {|
+          startHardwareMnemonic: {|
             trigger: (params: void) => void
           |},
           transferFunds: {|
@@ -406,7 +406,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
           yoroiTransfer: {
             backToUninitialized: { trigger: yoroiTransfer.backToUninitialized.trigger },
             cancelTransferFunds: { trigger: yoroiTransfer.cancelTransferFunds.trigger },
-            startHardwareMnemnoic: { trigger: yoroiTransfer.startHardwareMnemnoic.trigger },
+            startHardwareMnemonic: { trigger: yoroiTransfer.startHardwareMnemonic.trigger },
             transferFunds: { trigger: yoroiTransfer.transferFunds.trigger },
             checkAddresses: { trigger: yoroiTransfer.checkAddresses.trigger },
             setupTransferFundsWithPaperMnemonic: {
