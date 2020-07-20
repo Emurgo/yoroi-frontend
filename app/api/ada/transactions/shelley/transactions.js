@@ -72,7 +72,7 @@ function addUtxoInput(
   input: RemoteUnspentOutput,
 ): void {
   const keyHash = getCardanoAddrKeyHash(input.receiver);
-  if (keyHash == null) {
+  if (keyHash === null) {
     txBuilder.add_bootstrap_input(
       RustModule.WalletV4.ByronAddress.from_bytes(Buffer.from(input.receiver, 'hex')),
       utxoToTxInput(input),
